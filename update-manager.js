@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.44';
-const HD_APP_BUILD=44;
+const HD_APP_VERSION='1.0.45';
+const HD_APP_BUILD=45;
 
 async function hdFetchLatestVersion(){
   const res=await fetch(`./app-version.json?t=${Date.now()}`,{cache:'no-store'});
@@ -23,8 +23,11 @@ function hdLoadCurrentAssets(){
   hdAppendStyle('data-hd-fleet-calc','./fleet-calculator.css');
   hdAppendScript('data-hd-fleet-calc','./fleet-calculator.js',()=>setTimeout(()=>{if(typeof hdFCRender==='function')hdFCRender()},0));
   hdAppendStyle('data-hd-exp-fleet','./expedition-fleet-manager.css');
+  hdAppendStyle('data-hd-exp-stats','./expedition-stats-extension.css');
   hdAppendScript('data-hd-exp-fleet','./expedition-fleet-manager.js',()=>{
-    hdAppendScript('data-hd-exp-fleet-patch','./expedition-fleet-manager-patch.js',()=>setTimeout(()=>{if(typeof hdEFEnsure==='function')hdEFEnsure()},0));
+    hdAppendScript('data-hd-exp-fleet-patch','./expedition-fleet-manager-patch.js',()=>{
+      hdAppendScript('data-hd-exp-stats','./expedition-stats-extension.js',()=>setTimeout(()=>{if(typeof hdEFStatsInstall==='function')hdEFStatsInstall();if(typeof hdEFEnsure==='function')hdEFEnsure()},0));
+    });
   });
 }
 
