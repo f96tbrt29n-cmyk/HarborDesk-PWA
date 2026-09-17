@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.42';
-const HD_APP_BUILD=42;
+const HD_APP_VERSION='1.0.43';
+const HD_APP_BUILD=43;
 
 async function hdFetchLatestVersion(){
   const res=await fetch(`./app-version.json?t=${Date.now()}`,{cache:'no-store'});
@@ -19,6 +19,12 @@ function hdLoadCurrentAssets(){
   }
   if(!document.querySelector('script[data-hd-land-base]')){
     const script=document.createElement('script');script.src='./land-base-planner.js';script.async=false;script.dataset.hdLandBase='1';script.onload=()=>setTimeout(()=>{if(typeof hdRenderLandBasePlanner==='function')hdRenderLandBasePlanner()},0);document.body.appendChild(script);
+  }
+  if(!document.querySelector('link[data-hd-fleet-calc]')){
+    const link=document.createElement('link');link.rel='stylesheet';link.href='./fleet-calculator.css';link.dataset.hdFleetCalc='1';document.head.appendChild(link);
+  }
+  if(!document.querySelector('script[data-hd-fleet-calc]')){
+    const script=document.createElement('script');script.src='./fleet-calculator.js';script.async=false;script.dataset.hdFleetCalc='1';script.onload=()=>setTimeout(()=>{if(typeof hdFCRender==='function')hdFCRender()},0);document.body.appendChild(script);
   }
 }
 
