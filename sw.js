@@ -1,5 +1,5 @@
-const CACHE='harbordesk-pwa-v14';
-const ASSETS=['./styles.css','./map-details.css','./map-plans.css','./custom-fleets.css','./ship-roster.css','./advanced-tools.css','./home-dashboard.css','./app.js','./map-details.js','./map-details-34.js','./map-details-57.js','./map-plans.js','./ship-roster.js','./custom-fleets.js','./advanced-tools.js','./home-dashboard.js','./manifest.webmanifest'];
+const CACHE='harbordesk-pwa-v15';
+const ASSETS=['./styles.css','./map-details.css','./map-plans.css','./custom-fleets.css','./ship-roster.css','./advanced-tools.css','./home-dashboard.css','./update-manager.css','./app.js','./map-details.js','./map-details-34.js','./map-details-57.js','./map-plans.js','./ship-roster.js','./custom-fleets.js','./advanced-tools.js','./home-dashboard.js','./update-manager.js','./app-version.json','./manifest.webmanifest'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
 self.addEventListener('fetch',event=>{
