@@ -28,7 +28,7 @@ function hdALEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').repl
 function hdALLoad(){try{return JSON.parse(localStorage.getItem(HD_ACTIVITY_LOG_KEY)||'[]')||[]}catch{return []}}
 function hdALSave(rows){localStorage.setItem(HD_ACTIVITY_LOG_KEY,JSON.stringify(rows.slice(0,100)))}
 function hdALQuest(id){try{return typeof HD_QUESTS!=='undefined'?HD_QUESTS.find(q=>q.id===id):null}catch{return null}}
-function hdALIsAccepted(q){try{return typeof hdQuestInChecklist==='function'?hdQuestInChecklist(q):(typeof state!=='undefined'&&(state.quests||[]).some(x=>x.sourceId===q.id&&!x.done))}catch{return false}}
+function hdALIsAccepted(q){try{return typeof hdQuestAcceptedInChecklist==='function'?hdQuestAcceptedInChecklist(q):(typeof state!=='undefined'&&(state.quests||[]).some(x=>!x.done&&(x.sourceId===q.id||x.name===q.name||x.name===`[${HD_QUEST_CYCLE_LABEL[q.cycle]}] ${q.name}`)))}catch{return false}}
 function hdALStore(){try{return typeof hdQPStore==='function'?hdQPStore():JSON.parse(localStorage.getItem('harbordesk-quest-progress-v1')||'{}')||{}}catch{return {}}}
 function hdALSaveStore(v){try{if(typeof hdQPSave==='function')hdQPSave(v);else localStorage.setItem('harbordesk-quest-progress-v1',JSON.stringify(v))}catch{}}
 function hdALPeriodKey(q){try{return typeof hdQPPeriodKey==='function'?hdQPPeriodKey(q):''}catch{return ''}}
