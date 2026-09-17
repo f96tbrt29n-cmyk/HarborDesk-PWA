@@ -23,18 +23,21 @@ function hdTrainingPlanFor(ship){
  return {active:!!saved.active,priority:Number(saved.priority)||2,target,runs:Number(saved.runs)||0,exercises:Number(saved.exercises)||0,note:String(saved.note||''),db};
 }
 function hdTrainingUpdate(shipId,patch){const all=hdTrainingLoad();all[shipId]={...(all[shipId]||{}),...patch};hdTrainingSave(all);hdRenderTrainingPlanner()}
-function hdTrainingType(ship,plan){return plan.db?.type||String(ship.remodel||'').includes('駆逐')?'駆逐艦':plan.db?.type||''}
 function hdTrainingTypeSafe(ship,plan){
  if(plan.db?.type)return plan.db.type;
  const text=`${ship.name||''} ${ship.remodel||''} ${ship.memo||''}`;
  const types=['航空戦艦','装甲空母','正規空母','軽空母','航空巡洋艦','重巡洋艦','軽巡洋艦','重雷装巡洋艦','駆逐艦','海防艦','戦艦','潜水艦','水上機母艦'];
  return types.find(t=>text.includes(t))||'';
 }
+function hdTrainingRank(order,id){const i=order.indexOf(id);return i<0?99:i}
 function hdTrainingSpots(ship,plan){
  const type=hdTrainingTypeSafe(ship,plan),lv=Math.max(1,Number(ship.level)||1);
  let spots=HD_TRAINING_SPOTS.filter(s=>s.tags.includes('*')||(type&&s.tags.includes(type))).filter(s=>lv>=s.minLv||s.id==='1-5'||s.id==='7-2-1'||s.id==='exercise');
- if((type==='駆逐艦'||type==='軽巡洋艦'||type==='海防艦')&&lv<45){spots.sort((a,b)=>['1-5','7-2-1','exercise'].indexOf(a.id)-['1-5','7-2-1','exercise'].indexOf(b.id))}
- else if(['戦艦','重巡洋艦','航空巡洋艦','軽巡洋艦','駆逐艦'].includes(type)&&lv>=45){spots.sort((a,b)=>['5-3-P','4-4','7-1','exercise'].indexOf(a.id)-['5-3-P','4-4','7-1','exercise'].indexOf(b.id))}
+ let order=['4-4','exercise','7-2-1','1-5','5-3-P','7-1'];
+ if((type==='駆逐艦'||type==='軽巡洋艦'||type==='海防艦')&&lv<45)order=['1-5','7-2-1','exercise','4-4','7-1','5-3-P'];
+ else if(['戦艦','重巡洋艦','航空巡洋艦','軽巡洋艦','駆逐艦'].includes(type)&&lv>=45)order=['5-3-P','4-4','7-1','7-2-1','exercise','1-5'];
+ else if(type==='正規空母'||type==='装甲空母'||type==='軽空母'||type==='航空戦艦')order=['4-4','exercise','7-2-1'];
+ spots.sort((a,b)=>hdTrainingRank(order,a.id)-hdTrainingRank(order,b.id));
  return spots.slice(0,3);
 }
 function hdTrainingPriorityLabel(n){return n===3?'高':n===1?'低':'中'}
@@ -44,9 +47,7 @@ function hdTrainingStatus(ship,plan){
  if(plan.active)return {label:`あと${gap}Lv`,cls:'active',gap};
  return {label:`あと${gap}Lv`,cls:'idle',gap};
 }
-function hdTrainingRows(){
- return hdTrainingRoster().map(ship=>({ship,plan:hdTrainingPlanFor(ship)}));
-}
+function hdTrainingRows(){return hdTrainingRoster().map(ship=>({ship,plan:hdTrainingPlanFor(ship)}))}
 function hdTrainingSummary(rows){
  const active=rows.filter(x=>x.plan.active),done=active.filter(x=>hdTrainingStatus(x.ship,x.plan).gap===0),remaining=active.reduce((a,x)=>a+hdTrainingStatus(x.ship,x.plan).gap,0);
  const nearest=active.filter(x=>hdTrainingStatus(x.ship,x.plan).gap>0).sort((a,b)=>hdTrainingStatus(a.ship,a.plan).gap-hdTrainingStatus(b.ship,b.plan).gap)[0];
@@ -54,7 +55,7 @@ function hdTrainingSummary(rows){
 }
 function hdTrainingGoGuide(id){
  if(id==='exercise'){document.getElementById('quests')?.scrollIntoView({behavior:'smooth',block:'start'});return}
- const map=id.replace('-P','');const input=document.getElementById('guideQuery');if(input){input.value=map;document.getElementById('guideSearchBtn')?.click()}document.getElementById('guide')?.scrollIntoView({behavior:'smooth',block:'start'});
+ const map=id==='7-2-1'?'7-2':id.replace('-P','');const input=document.getElementById('guideQuery');if(input){input.value=map;document.getElementById('guideSearchBtn')?.click()}document.getElementById('guide')?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function hdTrainingEditShip(id){const ship=hdTrainingRoster().find(x=>x.id===id);if(ship&&typeof openShipRosterDialog==='function')openShipRosterDialog(ship);else document.getElementById('roster')?.scrollIntoView({behavior:'smooth'})}
 function hdRenderTrainingPlanner(){
