@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.47';
-const HD_APP_BUILD=47;
+const HD_APP_VERSION='1.0.48';
+const HD_APP_BUILD=48;
 
 async function hdFetchLatestVersion(){
   const res=await fetch(`./app-version.json?t=${Date.now()}`,{cache:'no-store'});
@@ -33,6 +33,8 @@ function hdLoadCurrentAssets(){
   hdAppendScript('data-hd-support-fleet','./support-fleet-planner.js',()=>setTimeout(()=>{if(typeof hdSPRender==='function')hdSPRender()},0));
   hdAppendStyle('data-hd-quest-progress','./quest-progress-extension.css');
   hdAppendScript('data-hd-quest-progress','./quest-progress-extension.js',()=>setTimeout(()=>{if(typeof hdQPEnsureCycleButtons==='function')hdQPEnsureCycleButtons();if(typeof hdRenderQuestDb==='function')hdRenderQuestDb()},0));
+  hdAppendStyle('data-hd-command-center','./command-center.css');
+  hdAppendScript('data-hd-command-center','./command-center.js',()=>setTimeout(()=>{if(typeof hdCCEnsure==='function')hdCCEnsure();if(typeof hdCCRender==='function')hdCCRender()},0));
 }
 
 function hdEnsureUpdateUI(){
