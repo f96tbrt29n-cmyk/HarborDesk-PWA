@@ -26,7 +26,7 @@ function hdSLApplyActivity(entry){
  if(entry.result==='S')push('swin');else if(hdSLResultWin(entry.result))push('win');else if(battles>0)push('battle');
  const counted=(entry.result==='S'||hdSLResultWin(entry.result)||battles>0)?1:0;
  for(let i=counted;i<battles;i++)push('battle');
- if(entry.boss){push('boss-arrive');if(hdSLResultWin(entry.result))push('boss-win')}
+ if(entry.boss){if(hdSLResultWin(entry.result))push('boss-win');else push('boss-arrive')}
  if(entry.boss&&hdSLResultWin(entry.result)&&/^2-[1-5]$/.test(entry.map))push('southwest-boss');
  return refs;
 }
