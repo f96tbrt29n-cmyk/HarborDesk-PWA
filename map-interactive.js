@@ -11,6 +11,9 @@ const HD_MAP_KIND_INFO={
  normal:{label:'通常戦・分岐',hint:'通常戦闘またはルート分岐として扱うマス。'}
 };
 
+// 個別マスの敵編成・制空・分岐条件を正確に確認できたものから追加していく拡張用データ。
+const HD_NODE_DETAIL_OVERRIDES={};
+
 function hdInteractiveMap(){return typeof selectedMap!=='undefined'&&selectedMap?selectedMap:null}
 function hdInteractiveGraph(map){return typeof HD_MAP_GRAPHS!=='undefined'?HD_MAP_GRAPHS[map]:null}
 function hdInteractiveKind(map,label){const g=hdInteractiveGraph(map);return g&&typeof hdMapKind==='function'?hdMapKind(g,label):'normal'}
@@ -21,10 +24,52 @@ function hdEnsureNodeInfoHost(){
   if(!host){host=document.createElement('div');host.id='hdMapNodeInfo';host.className='hd-map-node-info';pane.appendChild(host)}
   return host;
 }
+function hdNodeLinks(map,label){
+  const g=hdInteractiveGraph(map);if(!g)return {next:[],prev:[]};
+  return {
+    next:g.edges.filter(([a])=>a===label).map(([,b])=>b),
+    prev:g.edges.filter(([,b])=>b===label).map(([a])=>a)
+  };
+}
+function hdNodeOverride(map,label){return HD_NODE_DETAIL_OVERRIDES?.[map]?.[label]||{}}
+function hdCurrentMapDetail(map){return typeof MAP_DETAILS!=='undefined'?MAP_DETAILS[map]||{}:{}}
+function hdNodeBranchText(map,label,next,override){
+  if(override.branch)return override.branch;
+  if(next.length===0)return 'この先の分岐なし。';
+  if(next.length===1)return `${label} → ${next[0]} へ進行。`;
+  return `${next.join(' / ')} へ分岐。固定条件・確率分岐は「ルート」タブで確認してね。`;
+}
+function hdNodeEnemyText(kind,override){
+  if(override.enemy)return override.enemy;
+  if(kind==='start'||kind==='safe'||kind==='item'||kind==='vortex'||kind==='goal')return '戦闘編成なし。';
+  return '敵編成詳細は未登録。誤情報を避けるため、確認済みデータだけ順次追加するよ。';
+}
+function hdNodeAirText(map,kind,override){
+  if(override.air)return override.air;
+  const d=hdCurrentMapDetail(map);
+  if(kind==='air')return d.air||'航空戦マス。制空と対空装備を確認。';
+  return d.air||'海域全体の制空・装備メモは「装備」タブで確認。';
+}
 function hdShowNodeInfo(map,label){
   const host=hdEnsureNodeInfoHost();if(!host)return;
   const kind=hdInteractiveKind(map,label),info=HD_MAP_KIND_INFO[kind]||HD_MAP_KIND_INFO.normal;
-  host.innerHTML=`<div class="eyebrow">MAP NODE</div><div class="hd-map-node-info-title"><strong>${label}</strong><span>${info.label}</span></div><p>${info.hint}</p>`;
+  const links=hdNodeLinks(map,label),override=hdNodeOverride(map,label);
+  const next=links.next.length?links.next.join(' / '):'なし';
+  const prev=links.prev.length?links.prev.join(' / '):'出撃地点';
+  const enemy=hdNodeEnemyText(kind,override);
+  const air=hdNodeAirText(map,kind,override);
+  const branch=hdNodeBranchText(map,label,links.next,override);
+  host.innerHTML=`<div class="eyebrow">MAP NODE DETAIL</div>
+    <div class="hd-map-node-info-title"><strong>${label}</strong><span>${info.label}</span></div>
+    <p class="hd-node-summary">${info.hint}</p>
+    <div class="hd-node-detail-grid">
+      <div><span>進入元</span><strong>${prev}</strong></div>
+      <div><span>進行先</span><strong>${next}</strong></div>
+      <div class="wide"><span>分岐・進行</span><strong>${branch}</strong></div>
+      <div class="wide"><span>敵編成</span><strong>${enemy}</strong></div>
+      <div class="wide"><span>制空・装備</span><strong>${air}</strong></div>
+    </div>
+    <div class="hd-node-actions"><button class="ghost small" type="button" data-open-route-tab>ルート条件を見る</button><a class="guide-link" href="${wikiMapUrl(map)}" target="_blank" rel="noopener">Wikiで最新情報 ↗</a></div>`;
 }
 function hdShortestPath(map){
   const g=hdInteractiveGraph(map);if(!g)return [];
@@ -41,7 +86,11 @@ function hdHighlightShortest(map){
   const paths=[...(pane?.querySelectorAll('.hd-map-route')||[])],g=hdInteractiveGraph(map);if(!g)return;
   const wanted=new Set(path.slice(0,-1).map((a,i)=>`${a}>${path[i+1]}`));
   paths.forEach((el,i)=>{const edge=g.edges[i];if(edge&&wanted.has(`${edge[0]}>${edge[1]}`))el.classList.add('highlight')});
-  const host=hdEnsureNodeInfoHost();if(host)host.innerHTML=`<div class="eyebrow">ROUTE GUIDE</div><div class="hd-map-node-info-title"><strong>${path.join(' → ')}</strong><span>構造上の最短経路</span></div><p>これはグラフ上の最短経路表示で、実際の固定条件や推奨編成を保証するものではないよ。出撃前に「ルート」タブも確認してね。</p>`;
+  const host=hdEnsureNodeInfoHost();if(host)host.innerHTML=`<div class="eyebrow">ROUTE GUIDE</div><div class="hd-map-node-info-title"><strong>${path.join(' → ')}</strong><span>構造上の最短経路</span></div><p>これはグラフ上の最短経路表示で、実際の固定条件や推奨編成を保証するものではないよ。出撃前に「ルート」タブも確認してね。</p><div class="hd-node-actions"><button class="ghost small" type="button" data-open-route-tab>ルート条件を見る</button></div>`;
+}
+function hdOpenRouteTab(){
+  const btn=document.querySelector('[data-map-tab="route"]');if(!btn)return;
+  btn.click();
 }
 function hdEnhanceMapPane(){
   const pane=document.querySelector('[data-map-pane="map"]');if(!pane||pane.dataset.hdEnhanced==='1')return;
@@ -66,6 +115,7 @@ document.addEventListener('click',e=>{
   hdShowNodeInfo(map,label);
 },true);
 
+document.addEventListener('click',e=>{if(e.target.closest('[data-open-route-tab]'))hdOpenRouteTab()});
 document.addEventListener('click',e=>{if(e.target.closest('[data-map-tab="map"]'))setTimeout(hdEnhanceMapPane,0)});
 
 const hdInteractivePrevRender=renderMapPicker;
