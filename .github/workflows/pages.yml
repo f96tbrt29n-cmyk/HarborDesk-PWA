@@ -52,6 +52,21 @@ jobs:
           console.log(`OK cached assets: ${assets.length}`);
           NODE
 
+      - name: Validate runtime asset graph
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const sources=['index.html','update-manager.js','quick-nav.js'].map(f=>fs.readFileSync(f,'utf8')).join('\n');
+          const top=fs.readdirSync('.').filter(f=>fs.statSync(f).isFile());
+          const orphanJs=top.filter(f=>f.endsWith('.js')&&f!=='sw.js'&&!sources.includes(f));
+          const orphanCss=top.filter(f=>f.endsWith('.css')&&!sources.includes(f));
+          if(orphanJs.length||orphanCss.length){
+            throw new Error('Unconnected runtime assets: '+[...orphanJs,...orphanCss].join(', '));
+          }
+          console.log('OK runtime JS/CSS graph');
+          NODE
+
       - name: Install browser test runtime
         run: |
           npm install --no-save --no-package-lock @playwright/test@1.55.0
