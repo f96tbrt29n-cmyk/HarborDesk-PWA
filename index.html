@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="custom-fleets.css">
   <link rel="stylesheet" href="ship-roster.css">
   <link rel="stylesheet" href="advanced-tools.css">
+  <link rel="stylesheet" href="home-dashboard.css">
 </head>
 <body id="top">
   <header class="topbar"><div><div class="eyebrow">艦これ 提督補助</div><h1>HarborDesk</h1></div><button id="notifyBtn" class="ghost">通知を許可</button></header>
@@ -47,7 +48,7 @@
     <section class="card note"><strong>HarborDesk</strong><p>攻略、遠征・入渠タイマー、任務、艦隊台帳、自分用編成、装備改修管理、資源履歴、イベント記録、計算ツール、バックアップまでこのiPhone内でまとめて使える。重要な出撃前は元Wikiの最新情報も確認してね。</p></section>
   </main>
 
-  <nav class="bottom-nav"><a href="#guide">攻略</a><a href="#roster">艦隊</a><a href="#equipmentBook">装備</a><a href="#expeditions">遠征</a><a href="#quests">任務</a><a href="#calculators">ツール</a></nav>
+  <nav class="bottom-nav"><a href="#home">ホーム</a><a href="#guide">攻略</a><a href="#roster">艦隊</a><a href="#expeditions">遠征</a><a href="#dashboard">管理</a></nav>
 
   <dialog id="timerDialog"><form method="dialog" id="timerForm"><h3 id="timerDialogTitle">タイマー追加</h3><label>名前<input id="timerName" required maxlength="40" placeholder="例：東京急行"></label><label>時間（分）<input id="timerMinutes" required type="number" min="1" max="14400" value="30"></label><div class="dialog-actions"><button value="cancel" class="ghost">キャンセル</button><button id="timerSave" value="default" class="primary">開始</button></div></form></dialog>
   <dialog id="questDialog"><form method="dialog" id="questForm"><h3>任務を追加</h3><label>任務名<input id="questName" required maxlength="60" placeholder="例：デイリー演習"></label><div class="dialog-actions"><button value="cancel" class="ghost">キャンセル</button><button value="default" class="primary">追加</button></div></form></dialog>
@@ -57,5 +58,6 @@
   <script src="ship-roster.js"></script>
   <script src="custom-fleets.js"></script>
   <script src="advanced-tools.js"></script>
+  <script src="home-dashboard.js"></script>
 </body>
 </html>
