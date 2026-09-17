@@ -16,13 +16,14 @@ function ensureCustomFleetDialog(){
   dialog.innerHTML=`<form method="dialog" id="customFleetForm">
     <h3>自分用編成を保存</h3>
     <label>編成名<input id="customFleetName" maxlength="40" required placeholder="例：5-5 月次用"></label>
+    <div class="muted">艦隊台帳に登録した艦娘は、艦娘名を入力すると候補に出るよ。</div>
     <div id="customFleetRows" class="custom-fleet-form-grid"></div>
     <label>編成メモ<textarea id="customFleetMemo" maxlength="500" placeholder="支援あり、制空○○目安、など"></textarea></label>
     <div class="dialog-actions"><button value="cancel" class="ghost">キャンセル</button><button value="default" class="primary">保存</button></div>
   </form>`;
   document.body.appendChild(dialog);
   const rows=document.getElementById('customFleetRows');
-  rows.innerHTML=Array.from({length:6},(_,i)=>`<div class="custom-fleet-row"><div class="custom-fleet-no">${i+1}</div><input id="cfShip${i}" maxlength="30" placeholder="艦娘名"><input id="cfGear${i}" maxlength="120" placeholder="装備メモ"></div>`).join('');
+  rows.innerHTML=Array.from({length:6},(_,i)=>`<div class="custom-fleet-row"><div class="custom-fleet-no">${i+1}</div><input id="cfShip${i}" class="cf-ship-input" data-cf-index="${i}" list="shipRosterOptions" maxlength="40" placeholder="艦娘名"><input id="cfGear${i}" maxlength="160" placeholder="装備メモ"></div>`).join('');
   document.getElementById('customFleetForm').addEventListener('submit',e=>{
     if(e.submitter?.value==='cancel')return;
     if(!selectedMap)return;
@@ -46,6 +47,7 @@ function ensureCustomFleetDialog(){
 
 function openCustomFleetDialog(item=null){
   ensureCustomFleetDialog();
+  if(typeof refreshShipRosterOptions==='function')refreshShipRosterOptions();
   customFleetEditId=item?.id||null;
   document.getElementById('customFleetName').value=item?.name||'';
   document.getElementById('customFleetMemo').value=item?.memo||'';
@@ -71,6 +73,13 @@ function renderCustomFleets(map){
   host.innerHTML=`<div class="custom-fleet-title"><div><div class="eyebrow">MY FLEET</div><h4>自分用編成</h4></div><button class="primary small" id="addCustomFleet">＋ 編成を保存</button></div>${saved}`;
   document.getElementById('addCustomFleet').onclick=()=>openCustomFleetDialog();
 }
+
+document.addEventListener('change',e=>{
+  if(e.target.matches('.cf-ship-input')&&typeof findRosterShip==='function'){
+    const item=findRosterShip(e.target.value.trim());
+    if(item){const gear=document.getElementById(`cfGear${e.target.dataset.cfIndex}`);if(gear&&!gear.value.trim()&&item.gear)gear.value=item.gear;}
+  }
+});
 
 document.addEventListener('click',e=>{
   const edit=e.target.closest('[data-cf-edit]');
