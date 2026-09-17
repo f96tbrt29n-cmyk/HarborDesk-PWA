@@ -22,6 +22,7 @@ const HD_WS_EXPLICIT={
 let hdWSState=hdWSLoad();
 let hdWSObserver=null;
 let hdWSApplying=false;
+let hdWSRefreshTimer=0;
 
 function hdWSLoad(){try{const v=JSON.parse(localStorage.getItem(HD_WS_KEY)||'{}');return {group:v.group||'home',sections:v.sections||{}}}catch{return {group:'home',sections:{}}}}
 function hdWSSave(){localStorage.setItem(HD_WS_KEY,JSON.stringify(hdWSState))}
@@ -97,9 +98,11 @@ function hdWSShowElement(target,scroll=true){
 function hdWSPatchQuickNav(){if(window.__hdWSQuickPatched||typeof window.hdQNJump!=='function')return;window.__hdWSQuickPatched=true;const old=window.hdQNJump;window.hdQNJump=function(id){const target=document.getElementById(id);if(target){hdWSShowElement(target,false);setTimeout(()=>old(id),30)}else old(id)}}
 function hdWSHandleAnchor(a){const href=a?.getAttribute?.('href')||'';if(!href.startsWith('#')||href==='#')return false;let id='';try{id=decodeURIComponent(href.slice(1))}catch{id=href.slice(1)}const target=document.getElementById(id);if(!target)return false;hdWSShowElement(target,false);setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),30);return true}
 function hdWSRefresh(){hdWSApply(hdWSState.group,hdWSState.sections?.[hdWSState.group]);hdWSPatchQuickNav()}
+function hdWSMutationAddsSection(ms){return ms.some(m=>[...m.addedNodes].some(n=>n?.nodeType===1&&(n.matches?.('section')||n.querySelector?.('section'))))}
+function hdWSScheduleRefresh(){clearTimeout(hdWSRefreshTimer);hdWSRefreshTimer=setTimeout(hdWSRefresh,60)}
 function hdWSInstall(){
  hdWSEnsureUI();hdWSRefresh();
- if(!hdWSObserver){hdWSObserver=new MutationObserver(ms=>{if(ms.some(m=>m.addedNodes?.length))setTimeout(hdWSRefresh,40)});const main=document.querySelector('main');if(main)hdWSObserver.observe(main,{childList:true,subtree:true})}
+ if(!hdWSObserver){hdWSObserver=new MutationObserver(ms=>{if(hdWSMutationAddsSection(ms))hdWSScheduleRefresh()});const main=document.querySelector('main');if(main)hdWSObserver.observe(main,{childList:true,subtree:true})}
 }
 
 document.addEventListener('click',e=>{
