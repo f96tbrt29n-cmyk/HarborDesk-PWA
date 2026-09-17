@@ -101,3 +101,42 @@ test('periodic quest checklist lifecycle blocks completed progress and allows ne
   expect(result.afterExpiryReadd.active).toBe(1);
   expect(errors).toEqual([]);
 });
+
+
+test('boss win and sortie logging count boss arrival exactly once', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', e => errors.push(e.message));
+  await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
+  await page.waitForTimeout(3500);
+
+  const result = await page.evaluate(() => {
+    window.alert = () => {};
+    state.quests = [];
+    save();
+    localStorage.setItem('harbordesk-quest-progress-v1', '{}');
+    localStorage.setItem('harbordesk-activity-log-v1', '[]');
+
+    const bw1 = HD_QUESTS.find(x => x.id === 'Bw1');
+    if (!bw1) throw new Error('Bw1 missing');
+    hdAddQuestToChecklist(bw1);
+
+    hdALRecord('boss-win');
+    const manual = JSON.parse(localStorage.getItem('harbordesk-quest-progress-v1') || '{}').Bw1?.values || [];
+
+    localStorage.setItem('harbordesk-quest-progress-v1', '{}');
+    localStorage.setItem('harbordesk-activity-log-v1', '[]');
+    hdSLApplyActivity({ result:'S', battles:1, boss:true, map:'2-1' });
+    const sortie = JSON.parse(localStorage.getItem('harbordesk-quest-progress-v1') || '{}').Bw1?.values || [];
+
+    return { manual, sortie };
+  });
+
+  expect(result.manual[2]).toBe(1);
+  expect(result.manual[3]).toBe(1);
+  expect(result.sortie[0]).toBe(1);
+  expect(result.sortie[1]).toBe(1);
+  expect(result.sortie[2]).toBe(1);
+  expect(result.sortie[3]).toBe(1);
+  expect(errors).toEqual([]);
+});
