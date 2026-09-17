@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.33';
-const HD_APP_BUILD=33;
+const HD_APP_VERSION='1.0.34';
+const HD_APP_BUILD=34;
 
 async function hdFetchLatestVersion(){
   const res=await fetch(`./app-version.json?t=${Date.now()}`,{cache:'no-store'});
