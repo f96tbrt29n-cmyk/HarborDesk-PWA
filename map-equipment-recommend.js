@@ -23,7 +23,8 @@ function hdMapEquipNeeds(map){
   const text=hdMapEquipText(map);
   const needs=[];
   const add=(id,label,reason)=>{if(!needs.some(x=>x.id===id))needs.push({id,label,reason})};
-  if((g.sub||[]).length||/潜水|対潜/.test(text))add('対潜','対潜','潜水マス・潜水艦対策。先制対潜や対潜シナジーを組みやすい装備を優先。');
+  const subPositive=(g.sub||[]).length||/対潜|潜水マス|潜水艦との戦闘|潜水戦|敵[^。 ]*潜水|潜水(?:カ級|ヨ級|ソ級|新棲姫)/.test(text);
+  if(subPositive)add('対潜','対潜','潜水マス・潜水艦対策。先制対潜や対潜シナジーを組みやすい装備を優先。');
   const airPositive=(g.air||[]).length||/航空戦|空襲|航空優勢|航空均衡|制空値|制空確保|制空を(?:確保|取る|調整)|制空調整|制空重視|艦戦/.test(text);
   if(airPositive){
     add('制空','制空','航空優勢・拮抗などの制空調整用。艦戦/水戦から編成に合うものを選ぶ。');
