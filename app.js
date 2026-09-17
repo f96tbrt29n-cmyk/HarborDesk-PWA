@@ -4,10 +4,22 @@ const state=load();
 let timerKind='expedition';
 let notified=new Set();
 let guideFilter='all';
+let selectedWorld='1';
+let selectedMap='';
 const guideFavs=new Set(JSON.parse(localStorage.getItem(FAV_KEY)||'[]'));
 
+const MAPS={
+ '1':['1-1','1-2','1-3','1-4','1-5','1-6'],
+ '2':['2-1','2-2','2-3','2-4','2-5'],
+ '3':['3-1','3-2','3-3','3-4','3-5'],
+ '4':['4-1','4-2','4-3','4-4','4-5'],
+ '5':['5-1','5-2','5-3','5-4','5-5'],
+ '6':['6-1','6-2','6-3','6-4','6-5'],
+ '7':['7-1','7-2','7-3','7-4','7-5']
+};
+
 const GUIDE=[
-{id:'maps',type:'map',title:'通常海域 攻略入口',subtitle:'海域',summary:'通常海域の攻略情報を確認。個別海域カードは今後追加予定。',keywords:'海域 1-1 2-4 3-2 5-5 6-5 7-5 攻略',url:'https://wikiwiki.jp/kancolle/'},
+{id:'maps',type:'map',title:'通常海域 攻略入口',subtitle:'海域',summary:'通常海域の攻略情報を確認。上の海域セレクタから個別海域を選択できる。',keywords:'海域 1-1 2-4 3-2 5-5 6-5 7-5 攻略',url:'https://wikiwiki.jp/kancolle/'},
 {id:'early',type:'map',title:'序盤海域攻略指南',subtitle:'初心者向け',summary:'序盤の進め方、遠征開放、任務消化などをまとめて確認。',keywords:'序盤 初心者 海域 遠征 任務',url:'https://wikiwiki.jp/kancolle/%E5%BA%8F%E7%9B%A4%E6%B5%B7%E5%9F%9F%E6%94%BB%E7%95%A5%E6%8C%87%E5%8D%97'},
 {id:'exp-main',type:'expedition',title:'遠征 総合ガイド',subtitle:'遠征',summary:'遠征の概要、開放条件、海域別一覧への入口。',keywords:'遠征 資源 燃料 弾薬 鋼材 ボーキ 開放',url:'https://wikiwiki.jp/kancolle/%E9%81%A0%E5%BE%81'},
 {id:'exp-detail',type:'expedition',title:'遠征 詳細一覧表',subtitle:'時間・条件・報酬',summary:'遠征時間、必要編成、必要Lv、消費、獲得資源などを一覧で確認。',keywords:'遠征 時間 編成 報酬 大成功 旗艦 レベル',url:'https://wikiwiki.jp/kancolle/%E9%81%A0%E5%BE%81/%E8%A9%B3%E7%B4%B0%E4%B8%80%E8%A6%A7%E8%A1%A8'},
@@ -20,11 +32,21 @@ const guideLabels={all:'すべて',map:'海域',quest:'任務',expedition:'遠�
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||blankState()}catch{return blankState()}}
 function blankState(){return{expeditions:[],docks:[],quests:[],resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
-function esc(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function esc(s){return String(s).replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]||c))}
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)}
 function fmt(ms){if(ms<=0)return '完了';const sec=Math.ceil(ms/1000),h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return h>0?`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${m}:${String(s).padStart(2,'0')}`}
+function wikiMapUrl(map){return `https://wikiwiki.jp/kancolle/${encodeURIComponent(map)}`}
+
+function renderMapPicker(){
+ document.getElementById('worldPicker').innerHTML=Object.keys(MAPS).map(w=>`<button class="world-chip ${selectedWorld===w?'active':''}" data-world="${w}">${w}海域</button>`).join('');
+ document.getElementById('mapPicker').innerHTML=MAPS[selectedWorld].map(m=>`<button class="map-button ${selectedMap===m?'active':''}" data-map="${m}">${m}</button>`).join('');
+ const card=document.getElementById('selectedMapCard');
+ if(!selectedMap){card.innerHTML='<div class="empty">海域を選ぶとここに攻略入口が出るよ</div>';return}
+ card.innerHTML=`<article class="guide-card selected"><div class="guide-card-top"><div><span class="guide-tag">海域</span><h3>${selectedMap} 攻略</h3><div class="muted">通常海域 ${selectedWorld}</div></div></div><p>${selectedMap} のルート、敵編成、制空、ドロップなどを確認できる攻略入口。</p><a class="guide-link" href="${wikiMapUrl(selectedMap)}" target="_blank" rel="noopener">${selectedMap} の攻略Wikiを見る ↗</a></article>`;
+}
 
 function renderGuide(){
+ renderMapPicker();
  const filters=document.getElementById('guideFilters');
  filters.innerHTML=Object.entries(guideLabels).map(([k,v])=>`<button class="guide-chip ${guideFilter===k?'active':''}" data-guide-filter="${k}">${v}</button>`).join('');
  const q=document.getElementById('guideQuery').value.trim().toLowerCase();
@@ -33,6 +55,8 @@ function renderGuide(){
 }
 
 document.addEventListener('click',e=>{
+ const world=e.target.closest('[data-world]');if(world){selectedWorld=world.dataset.world;selectedMap='';renderMapPicker();return}
+ const map=e.target.closest('[data-map]');if(map){selectedMap=map.dataset.map;guideFilter='map';document.getElementById('guideQuery').value=selectedMap;renderGuide();document.getElementById('selectedMapCard').scrollIntoView({behavior:'smooth',block:'center'});return}
  const gf=e.target.closest('[data-guide-filter]');if(gf){guideFilter=gf.dataset.guideFilter;renderGuide();return}
  const fav=e.target.closest('[data-guide-fav]');if(fav){const id=fav.dataset.guideFav;guideFavs.has(id)?guideFavs.delete(id):guideFavs.add(id);localStorage.setItem(FAV_KEY,JSON.stringify([...guideFavs]));renderGuide();return}
  const del=e.target.closest('[data-delete-timer]');if(del){const k=del.dataset.kind,arr=k==='expedition'?state.expeditions:state.docks;const i=arr.findIndex(x=>x.id===del.dataset.deleteTimer);if(i>=0)arr.splice(i,1);save();renderTimers(k);return}
@@ -53,7 +77,7 @@ document.getElementById('questForm').addEventListener('submit',e=>{if(e.submitte
 document.addEventListener('change',e=>{if(e.target.matches('[data-quest-check]')){const q=state.quests.find(x=>x.id===e.target.dataset.questCheck);if(q){q.done=e.target.checked;save();renderQuests()}}});
 document.getElementById('saveResources').onclick=()=>{['fuel','ammo','steel','bauxite'].forEach(k=>state.resources[k]=document.getElementById(k).value);state.resources.savedAt=Date.now();save();renderResources()};
 
-const secretaryLines=['提督、攻略で迷ったら上の検索からすぐ探せるよ。','遠征の帰投時刻はこっちで見てるよ。焦らずいこう。','任務、ひとつずつ片付けよ。全部いっぺんにやらなくていいから。','資源の記録、あとで効いてくるよ。今日の分だけ残しておこ。'];
+const secretaryLines=['提督、上の海域ボタンから行きたい場所を選べるようにしたよ。','攻略で迷ったら上の検索からすぐ探せるよ。','遠征の帰投時刻はこっちで見てるよ。焦らずいこう。','任務、ひとつずつ片付けよ。全部いっぺんにやらなくていいから。','資源の記録、あとで効いてくるよ。今日の分だけ残しておこ。'];
 document.getElementById('secretaryRefresh').onclick=()=>{document.getElementById('secretaryText').textContent=secretaryLines[Math.floor(Math.random()*secretaryLines.length)]};
 document.getElementById('notifyBtn').onclick=async()=>{if(!('Notification'in window)){alert('このブラウザでは通知APIが使えないみたい');return}const result=await Notification.requestPermission();document.getElementById('notifyBtn').textContent=result==='granted'?'通知ON':'通知OFF'};
 function tick(){const now=Date.now();document.querySelectorAll('.timer-time').forEach(el=>{const end=Number(el.dataset.end);el.textContent=fmt(end-now);el.closest('.timer')?.classList.toggle('done',end<=now)});for(const [kind,arr] of [['遠征',state.expeditions],['入渠',state.docks]])for(const t of arr){if(t.endsAt<=now&&!notified.has(t.id)){notified.add(t.id);if(Notification.permission==='granted')new Notification(`HarborDesk: ${kind}完了`,{body:`${t.name} が完了したよ`})}}}
