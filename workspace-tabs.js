@@ -14,8 +14,8 @@ const HD_WS_EXPLICIT={
  guide:new Set(['guide','eoTracker','sortieReadiness','eventOperationsCenter','eventOperations','grandOperations','landBasePlanner']),
  fleet:new Set(['shipDatabase','roster','shipProfilesPlus','trainingPlanner','customFleets','fleetCalculator','supportFleetPlanner']),
  quest:new Set(['questDatabase','quests','exerciseRoutine','activityLogger']),
- expedition:new Set(['expeditions','expeditionFleetManager','expeditionOptimizer']),
- arsenal:new Set(['equipmentBook','equipmentVariants','developmentRecipes','constructionDb','improvementWorkshop','optimizationImprovement','materialPlanner']),
+ expedition:new Set(['expeditions','hdExpeditionDb','expeditionFleetManager','expeditionOptimizer']),
+ arsenal:new Set(['equipmentBook','equipmentVariants','developmentLab','developmentRecipes','constructionDb','improvementWorkshop','optimizationImprovement','materialPlanner']),
  records:new Set(['sortieLog','sortieCostForecast','dropHunting','dropHuntingDb','farmingAnalytics','eventLog','rankingTracker','rankingTrackerCenter','farmAnalysis']),
  settings:new Set(['calculators','backup','diagnosticsCenter','notificationCenter','dataQualityAudit'])
 };
