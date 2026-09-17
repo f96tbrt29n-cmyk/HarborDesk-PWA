@@ -21,7 +21,9 @@ function hdLoadCurrentAssets(){
   hdAppendStyle('data-hd-land-base','./land-base-planner.css');
   hdAppendScript('data-hd-land-base','./land-base-planner.js',()=>setTimeout(()=>{if(typeof hdRenderLandBasePlanner==='function')hdRenderLandBasePlanner()},0));
   hdAppendStyle('data-hd-fleet-calc','./fleet-calculator.css');
-  hdAppendScript('data-hd-fleet-calc','./fleet-calculator.js',()=>setTimeout(()=>{if(typeof hdFCRender==='function')hdFCRender()},0));
+  hdAppendScript('data-hd-fleet-calc','./fleet-calculator.js',()=>{
+    hdAppendScript('data-hd-fleet-calc-fix','./fleet-calculator-fix.js',()=>setTimeout(()=>{if(typeof hdFCRender==='function')hdFCRender()},0));
+  });
   hdAppendStyle('data-hd-exp-fleet','./expedition-fleet-manager.css');
   hdAppendStyle('data-hd-exp-stats','./expedition-stats-extension.css');
   hdAppendScript('data-hd-exp-fleet','./expedition-fleet-manager.js',()=>{
