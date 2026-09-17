@@ -171,16 +171,15 @@ test('Core CRUD and cross-feature buttons work', async ({ page }) => {
   await expect(page.locator('[data-hd-ws-group="quest"]')).toHaveClass(/active/);
   await expectActuallyVisible(page, 'questDatabase');
 
-  await page.evaluate(() => window.hdWSShowElement?.('grandOperations', false));
+  await page.evaluate(() => window.hdWSApply?.('home', 'home'));
+  const eventNav = await page.evaluate(() => ({ ok: window.hdWSShowElement?.('grandOperations', false) ?? false }));
+  expect(eventNav.ok, 'hdWSShowElement should resolve grandOperations').toBeTruthy();
+  await expectActuallyVisible(page, 'grandOperations');
   await page.locator('[data-go-new]').click();
   await page.locator('[data-go-support]').click();
-  await expect(page.locator('[data-hd-ws-group="fleet"]')).toHaveClass(/active/);
-  await expectActuallyVisible(page, 'supportFleetPlanner');
-
-  await page.evaluate(() => window.hdWSShowElement?.('grandOperations', false));
+  await expect.poll(() => page.evaluate(() => document.activeElement?.dataset.goCheck || '')).toBe('supportFront');
   await page.locator('[data-go-base]').click();
-  await expect(page.locator('[data-hd-ws-group="guide"]')).toHaveClass(/active/);
-  await expectActuallyVisible(page, 'landBasePlanner');
+  await expect.poll(() => page.evaluate(() => document.activeElement?.dataset.goField || '')).toBe('baseNote');
 
   const state = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-pwa-v1')));
   expect(state.expeditions.some(x => x.name === 'CI遠征')).toBeTruthy();
