@@ -1,4 +1,4 @@
-const MAP_DETAILS={
+Object.assign(MAP_DETAILS,{
 '1-1':{name:'鎮守府正面海域',overview:'最初から開放されている海域。敵は駆逐・軽巡中心で、序盤の艦隊でも攻略しやすい。',fleet:'駆逐艦を中心に2〜4隻程度から。戦力が整えば少数編成でも周回しやすい。',route:'どちらのルートでも戦闘は2回。編成数が少ないほどボス側へ進みやすい傾向がある。',air:'敵空母は出ないため、制空を意識する必要はほぼない。',note:'序盤のキラ付け・任務消化でもよく使う海域。',updated:'2026-08-11'},
 '1-2':{name:'南西諸島沖',overview:'序盤の小規模海域。軽量な水雷戦隊で進めやすい。',fleet:'5隻以下の軽量編成を基本に、駆逐・海防艦を多めにするとルートを制御しやすい。',route:'少数かつ駆逐・海防艦を多く含む編成でボス方面を狙いやすい。',air:'航空戦力への依存は小さく、砲撃・雷撃中心で十分。',note:'低速艦や重い編成を増やすより、序盤は軽い編成が扱いやすい。',updated:'2026-09'},
 '1-3':{name:'製油所地帯沿岸',overview:'敵重巡・戦艦が初登場し、序盤では被害が急に増えやすい海域。',fleet:'軽巡・駆逐を軸にしつつ、戦力不足なら空母系や重巡を加えて火力を補う。',route:'空母系を含むと開始分岐が変化。ルートによってはうずしおを通る。',air:'空母を使う場合は艦戦も載せて制空を確保。',note:'大破した艦が出たら進軍しない。うずしお対策には電探が有効。',updated:'2026-08-12'},
@@ -9,23 +9,23 @@ const MAP_DETAILS={
 '2-2':{name:'バシー海峡',overview:'ボーキサイト回収や補給艦関連任務でよく使われる海域。',fleet:'通常攻略は空母系を含む編成が扱いやすい。補給艦狙いでは戦艦級0・空母3以上の編成でBマス固定が可能。',route:'目的がボス攻略か補給艦狩りかで編成を切り替えると便利。',air:'敵空母が出る場合に備えて艦戦を搭載。',note:'デイリーの補給艦撃破任務消化に向く。',updated:'2026-09-14'},
 '2-3':{name:'東部オリョール海',overview:'任務対象になることが非常に多い海域。燃料・弾薬の資源マスもある。',fleet:'初攻略は戦艦・空母を含む主力編成でOK。戦艦+空母系を4隻以下にするとボスへ向かいやすい。',route:'軽巡1+駆逐4以上、または軽巡1+重巡5でボス固定が可能だが、初攻略では火力不足に注意。',air:'ボスに空母がいるため制空権を確保できるよう艦戦を用意。',note:'ボスには戦艦ル級flagshipが出るため、制空を失うと危険。',updated:'2026-07-29'},
 '2-4':{name:'沖ノ島海域',overview:'序盤の大きな壁になりやすい海域。ルートが複雑で、敵戦力もそれまでより強い。',fleet:'初回攻略例：戦艦1・正規空母1・軽空母1・重巡/雷巡2・駆逐1。大型艦だけで固めない。',route:'戦艦・正規空母ばかりにすると遠回りや逸れが起きやすい。',air:'空母2隻前後を使い、艦戦を載せてボスまで制空を維持する。',note:'改造済み・近代化改修済みの主力艦を揃えてから挑戦すると安定。',updated:'2026-08-20'},
-'2-5':{name:'沖ノ島沖',overview:'南西諸島のEO。ボス旗艦を4回撃沈してゲージ破壊。勲章と特別戦果を獲得できる。',fleet:'北ルート例：航巡2を含む重巡級・戦艦級中心。南ルートでは空母系を含む編成も選択肢。',route:'大きく北ルート・北から南へ転進するルート・南ルートの3系統。',air:'南ルートなど空母系を使う場合は制空を確保。',note:'ボス到達には索敵値が重要。偵察機や電探不足に注意。月初にゲージが復活する。',updated:'2026-09-12'},
-'3-2':{name:'キス島撤退作戦',overview:'駆逐艦主体の高速艦隊で攻略する特殊海域。',fleet:'軽巡1+駆逐5、または駆逐6が基本候補。',route:'高速+以上や電探数などで最短ルート条件が変わる。',air:'航空戦力は基本不要。',note:'ボス到達条件が厳しいため、速力と電探条件を元Wikiで確認。',updated:'2026'},
-'5-5':{name:'サーモン海域北方',overview:'高難度EO。ボス旗艦を5回撃沈してゲージ破壊。',fleet:'戦艦・空母を軸にした高火力編成や、条件に応じた下ルート編成など複数候補。',route:'編成と索敵値によって主要ルートが分かれる。',air:'高い制空要求があるため艦戦配分が重要。',note:'支援艦隊や特殊砲撃も選択肢。最新編成は元Wiki確認を推奨。',updated:'2026'},
-'6-5':{name:'KW環礁沖海域',overview:'基地航空隊を使う高難度EO。ボス旗艦を6回撃沈でゲージ破壊。',fleet:'上・下ルートで編成が大きく変わる。基地航空隊込みで設計する。',route:'ルート選択と基地航空隊の派遣先が攻略の鍵。',air:'本隊と基地航空隊の制空調整が重要。',note:'ゲージ進行で敵編成が変わるため、最終形態では再調整推奨。',updated:'2026'},
-'7-5':{name:'ジャワ島沖',overview:'複数ゲージとギミックを順番に攻略するEO。',fleet:'ゲージごとに適した編成が変わる。',route:'ギミック→各ゲージの順で進行するため、現在段階の確認が重要。',air:'段階ごとに必要制空が変化する。',note:'攻略段階を取り違えないよう、元Wikiと併用がおすすめ。',updated:'2026'}
-};
+'2-5':{name:'沖ノ島沖',overview:'南西諸島のEO。ボス旗艦を4回撃沈してゲージ破壊。勲章と特別戦果を獲得できる。',fleet:'北ルート例：航巡2を含む重巡級・戦艦級中心。南ルートでは空母系を含む編成も選択肢。',route:'大きく北ルート・北から南へ転進するルート・南ルートの3系統。',air:'南ルートなど空母系を使う場合は制空を確保。',note:'ボス到達には索敵値が重要。偵察機や電探不足に注意。月初にゲージが復活する。',updated:'2026-09-12'}
+});
 
-function detailBlock(label,value){return `<div class="map-detail-row"><div class="map-detail-label">${label}</div><div class="map-detail-value">${esc(value)}</div></div>`}
+function detailBlock(label,value){return `<div class="map-detail-row"><div class="map-detail-label">${label}</div><div class="map-detail-value">${esc(value??'')}</div></div>`}
 
 renderMapPicker=function(){
- document.getElementById('worldPicker').innerHTML=Object.keys(MAPS).map(w=>`<button class="world-chip ${selectedWorld===w?'active':''}" data-world="${w}">${w}海域</button>`).join('');
- document.getElementById('mapPicker').innerHTML=MAPS[selectedWorld].map(m=>`<button class="map-button ${selectedMap===m?'active':''}" data-map="${m}">${m}</button>`).join('');
- const card=document.getElementById('selectedMapCard');
+ const world=document.getElementById('worldPicker'), maps=document.getElementById('mapPicker'), card=document.getElementById('selectedMapCard');
+ if(!world||!maps||!card)return;
+ world.innerHTML=Object.keys(MAPS).map(w=>`<button class="world-chip ${selectedWorld===w?'active':''}" data-world="${w}">${w}海域</button>`).join('');
+ maps.innerHTML=MAPS[selectedWorld].map(m=>`<button class="map-button ${selectedMap===m?'active':''}" data-map="${m}">${m}</button>`).join('');
  if(!selectedMap){card.innerHTML='<div class="empty">海域を選ぶとここに攻略情報が出るよ</div>';return}
  const d=MAP_DETAILS[selectedMap];
  if(!d){card.innerHTML=`<article class="guide-card selected"><div class="guide-card-top"><div><span class="guide-tag">海域</span><h3>${selectedMap} 攻略</h3><div class="muted">攻略データ拡充中</div></div></div><p>この海域は現在アプリ内データを整備中。元Wikiでは最新のルート・敵編成・制空値を確認できるよ。</p><a class="guide-link" href="${wikiMapUrl(selectedMap)}" target="_blank" rel="noopener">${selectedMap} の攻略Wikiを見る ↗</a></article>`;return}
- card.innerHTML=`<article class="guide-card selected map-detail-card"><div class="guide-card-top"><div><span class="guide-tag">${selectedMap}</span><h3>${esc(d.name)}</h3><div class="muted">アプリ内攻略要点・参照 ${esc(d.updated)}</div></div></div><p class="map-overview">${esc(d.overview)}</p><div class="map-detail-grid">${detailBlock('おすすめ編成',d.fleet)}${detailBlock('ルート',d.route)}${detailBlock('制空・装備',d.air)}${detailBlock('注意点',d.note)}</div><div class="map-source-note">※攻略条件はアップデートや編成条件で変化する場合があります。</div><a class="guide-link" href="${wikiMapUrl(selectedMap)}" target="_blank" rel="noopener">元Wikiで最新情報を確認 ↗</a></article>`;
+ const fleet=d.fleet||d.formation||'';
+ const note=d.note||d.caution||'';
+ const updated=d.updated||d.sourceDate||'参照日未設定';
+ card.innerHTML=`<article class="guide-card selected map-detail-card"><div class="guide-card-top"><div><span class="guide-tag">${selectedMap}</span><h3>${esc(d.name||selectedMap)}</h3><div class="muted">アプリ内攻略要点・参照 ${esc(updated)}</div></div></div><p class="map-overview">${esc(d.overview||'')}</p><div class="map-detail-grid">${detailBlock('おすすめ編成',fleet)}${detailBlock('ルート',d.route)}${detailBlock('制空・装備',d.air)}${detailBlock('注意点',note)}</div><div class="map-source-note">※攻略条件はアップデートや編成条件で変化する場合があります。</div><a class="guide-link" href="${wikiMapUrl(selectedMap)}" target="_blank" rel="noopener">元Wikiで最新情報を確認 ↗</a></article>`;
 };
 
 renderGuide();
