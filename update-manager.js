@@ -1,10 +1,19 @@
-const HD_APP_VERSION='1.0.40';
-const HD_APP_BUILD=40;
+const HD_APP_VERSION='1.0.41';
+const HD_APP_BUILD=41;
 
 async function hdFetchLatestVersion(){
   const res=await fetch(`./app-version.json?t=${Date.now()}`,{cache:'no-store'});
   if(!res.ok)throw new Error('version fetch failed');
   return res.json();
+}
+
+function hdLoadV41Assets(){
+  if(!document.querySelector('link[data-hd-sortie-ready]')){
+    const link=document.createElement('link');link.rel='stylesheet';link.href='./sortie-readiness.css';link.dataset.hdSortieReady='1';document.head.appendChild(link);
+  }
+  if(!document.querySelector('script[data-hd-sortie-ready]')){
+    const script=document.createElement('script');script.src='./sortie-readiness.js';script.async=false;script.dataset.hdSortieReady='1';script.onload=()=>setTimeout(()=>{if(typeof hdRenderSortieReadiness==='function')hdRenderSortieReadiness()},0);document.body.appendChild(script);
+  }
 }
 
 function hdEnsureUpdateUI(){
@@ -45,4 +54,4 @@ async function hdForceUpdate(){
   }catch{}
   const url=new URL(location.href);url.searchParams.set('v',Date.now().toString());location.replace(url.toString());
 }
-window.addEventListener('load',()=>{hdEnsureUpdateUI();setTimeout(()=>hdCheckForUpdate(false),1200)});
+window.addEventListener('load',()=>{hdLoadV41Assets();hdEnsureUpdateUI();setTimeout(()=>hdCheckForUpdate(false),1200)});
