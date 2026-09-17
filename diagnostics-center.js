@@ -61,7 +61,7 @@ function hdDXReport(d=window.__hdDXLast){
 }
 async function hdDXCopy(){const text=hdDXReport();try{await navigator.clipboard.writeText(text);alert('診断結果をコピーしたよ')}catch{prompt('この診断結果をコピーしてね',text)}}
 async function hdDXReinit(){try{if(typeof hdInitLoadedModules==='function')hdInitLoadedModules();window.dispatchEvent(new CustomEvent('hd:modules-ready',{detail:{manual:true}}));setTimeout(hdDXRender,250)}catch{setTimeout(hdDXRender,250)}}
-async function hdDXCacheRepair(){if(!confirm('アプリキャッシュだけ再構築する？\n艦娘・装備・任務・資源などの保存データは消さないよ。'))return;if(typeof hdForceUpdate==='function'){hdForceUpdate();return}try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('harbordesk-pwa-')).map(k=>caches.delete(k)));location.reload()}catch{location.reload()}}
+async function hdDXCacheRepair(){if(!navigator.onLine){alert('オフライン中はキャッシュ再構築を実行しないよ。通信できる状態で試してね。');return}if(!confirm('アプリキャッシュだけ再構築する？\n艦娘・装備・任務・資源などの保存データは消さないよ。'))return;if(typeof hdForceUpdate==='function'){hdForceUpdate();return}try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('harbordesk-pwa-')).map(k=>caches.delete(k)));location.reload()}catch{location.reload()}}
 
 document.addEventListener('click',e=>{if(e.target.closest?.('[data-dx-recheck]')){hdDXRender();return}if(e.target.closest?.('[data-dx-reinit]')){hdDXReinit();return}if(e.target.closest?.('[data-dx-cache]')){hdDXCacheRepair();return}if(e.target.closest?.('[data-dx-update]')){if(typeof hdCheckForUpdate==='function')hdCheckForUpdate(true);return}if(e.target.closest?.('[data-dx-copy]')){hdDXCopy();return}});
 window.addEventListener('online',()=>hdDXRender());window.addEventListener('offline',()=>hdDXRender());
