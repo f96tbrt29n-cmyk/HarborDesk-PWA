@@ -226,3 +226,30 @@ test('Cross-workspace shortcuts open the correct visible tab', async ({ page }) 
 
   expect(runtimeErrors, `runtime errors: ${runtimeErrors.join('\n')}`).toEqual([]);
 });
+
+
+test('Global search routes representative data types to the correct workspace', async ({ page }) => {
+  const runtimeErrors = [];
+  await boot(page, runtimeErrors);
+
+  const cases = [
+    ['ship', 'fleet', 'shipDatabase'],
+    ['equipment', 'arsenal', 'equipmentBook'],
+    ['quest', 'quest', 'questDatabase'],
+    ['expedition', 'expedition', 'expeditions']
+  ];
+
+  for (const [type, group, target] of cases) {
+    const available = await page.evaluate(t => {
+      const row = window.hdGSIndex?.().find(x => x.type === t);
+      if (!row) return false;
+      window.hdGSOpenResult?.(row);
+      return true;
+    }, type);
+    expect(available, `missing global-search sample for ${type}`).toBeTruthy();
+    await expect(page.locator(`[data-hd-ws-group="${group}"]`)).toHaveClass(/active/);
+    await expectActuallyVisible(page, target);
+  }
+
+  expect(runtimeErrors, `runtime errors: ${runtimeErrors.join('\n')}`).toEqual([]);
+});
