@@ -49,7 +49,7 @@ function hdApplyMapTabs(){
     <div class="map-tab-pane ${active==='map'?'active':''}" data-map-pane="map">${mapHtml}</div>
     <div class="map-tab-pane ${active==='fleet'?'active':''}" data-map-pane="fleet">${hdFleetHtml(selectedMap)}${fleet?`<div class="map-tab-card"><b>基本方針</b><p>${hdMapEsc(fleet)}</p></div>`:''}</div>
     <div class="map-tab-pane ${active==='route'?'active':''}" data-map-pane="route"><div class="map-tab-card"><b>主なルート</b><p>${hdMapEsc(d.route||'ルート情報を整理中')}</p></div></div>
-    <div class="map-tab-pane ${active==='gear'?'active':''}" data-map-pane="gear"><div class="map-tab-card"><b>制空・装備</b><p>${hdMapEsc(d.air||'装備情報を整理中')}</p></div></div>
+    <div class="map-tab-pane ${active==='gear'?'active':''}" data-map-pane="gear"><div class="map-tab-card"><b>制空・装備</b><p>${hdMapEsc(d.air||'装備情報を整理中')}</p></div><div id="hdMapEquipRecommend"></div></div>
     <div class="map-tab-pane ${active==='quest'?'active':''}" data-map-pane="quest">${hdQuestHtml(selectedMap)}</div>
     <div class="map-tab-pane ${active==='mine'?'active':''}" data-map-pane="mine"><section id="customFleetPanel" class="custom-fleet-section">${hdCustomFleetHtml(selectedMap)}</section></div>
   </article>`;
