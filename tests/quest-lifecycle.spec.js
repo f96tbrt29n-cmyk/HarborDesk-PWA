@@ -55,7 +55,23 @@ test('periodic quest checklist lifecycle blocks completed progress and allows ne
       newKey: rows.find(x => !x.done)?.sourcePeriodKey || ''
     };
 
-    return { initial, doneSamePeriod, samePeriodCount, nextCycle };
+    const current = rows.find(x => !x.done);
+    current.sourcePeriodKey = 'D:1999-01-01';
+    save();
+    hdQuestSyncChecklistPeriods();
+    const afterExpiryRows = state.quests.filter(x => x.sourceId === 'Bd1');
+    const stale = afterExpiryRows.find(x => x.id === current.id);
+    const expiredCycle = {
+      accepted: hdQuestAcceptedInChecklist(q),
+      staleDone: !!stale?.done,
+      staleExpired: !!stale?.expired,
+      autoExercise: hdAutoQuestAccepted('Bd1'),
+      autoActivity: hdALIsAccepted(q)
+    };
+    hdAddQuestToChecklist(q);
+    const afterReadd = state.quests.filter(x => x.sourceId === 'Bd1');
+
+    return { initial, doneSamePeriod, samePeriodCount, nextCycle, expiredCycle, afterExpiryReadd:{count:afterReadd.length,active:afterReadd.filter(x=>!x.done).length} };
   });
 
   expect(result.initial.count).toBe(1);
@@ -76,5 +92,12 @@ test('periodic quest checklist lifecycle blocks completed progress and allows ne
   expect(result.nextCycle.accepted).toBeTruthy();
   expect(result.nextCycle.label).toBe('追加済み');
   expect(result.nextCycle.newKey).not.toBe('');
+  expect(result.expiredCycle.accepted).toBeFalsy();
+  expect(result.expiredCycle.staleDone).toBeTruthy();
+  expect(result.expiredCycle.staleExpired).toBeTruthy();
+  expect(result.expiredCycle.autoExercise).toBeFalsy();
+  expect(result.expiredCycle.autoActivity).toBeFalsy();
+  expect(result.afterExpiryReadd.count).toBe(3);
+  expect(result.afterExpiryReadd.active).toBe(1);
   expect(errors).toEqual([]);
 });
