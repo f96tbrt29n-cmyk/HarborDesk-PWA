@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.57';
-const HD_APP_BUILD=57;
+const HD_APP_VERSION='1.0.58';
+const HD_APP_BUILD=58;
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 
 async function hdFetchLatestVersion(){
