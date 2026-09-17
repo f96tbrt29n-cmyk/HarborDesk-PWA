@@ -1,5 +1,5 @@
 function hdAutoQuestAccepted(id){
- try{const q=typeof HD_QUESTS!=='undefined'?HD_QUESTS.find(x=>x.id===id):null;if(!q)return false;if(typeof hdQuestInChecklist==='function')return hdQuestInChecklist(q);return typeof state!=='undefined'&&(state.quests||[]).some(x=>x.sourceId===id&&!x.done)}catch{return false}
+ try{const q=typeof HD_QUESTS!=='undefined'?HD_QUESTS.find(x=>x.id===id):null;if(!q)return false;if(typeof hdQuestAcceptedInChecklist==='function')return hdQuestAcceptedInChecklist(q);return typeof state!=='undefined'&&(state.quests||[]).some(x=>!x.done&&(x.sourceId===id||x.name===q.name||x.name===`[${HD_QUEST_CYCLE_LABEL[q.cycle]}] ${q.name}`))}catch{return false}
 }
 (function hdInstallExerciseAcceptanceGuard(){
  if(typeof window.hdERQuestDelta!=='function'||window.__hdExerciseAcceptanceGuard)return;
