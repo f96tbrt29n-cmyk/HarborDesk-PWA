@@ -18,6 +18,7 @@ function hdCCQuestProgress(){
  if(typeof HD_QUESTS==='undefined')return [];
  const rows=[];
  for(const q of HD_QUESTS){
+  try{if(typeof hdQuestAcceptedInChecklist==='function'&&!hdQuestAcceptedInChecklist(q))continue}catch{}
   let goals=[];try{goals=typeof hdQPGoals==='function'?hdQPGoals(q):[]}catch{}
   if(!goals.length)continue;
   let entry=null;try{entry=typeof hdQPEntry==='function'?hdQPEntry(q):null}catch{}
