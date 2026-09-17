@@ -17,7 +17,17 @@ const HD_NODE_DETAIL_OVERRIDES={};
 function hdInteractiveMap(){return typeof selectedMap!=='undefined'&&selectedMap?selectedMap:null}
 function hdInteractiveGraph(map){return typeof HD_MAP_GRAPHS!=='undefined'?HD_MAP_GRAPHS[map]:null}
 function hdInteractiveKind(map,label){const g=hdInteractiveGraph(map);return g&&typeof hdMapKind==='function'?hdMapKind(g,label):'normal'}
-function hdNodeLabel(group){return group?.querySelector('text')?.textContent?.trim()||''}
+function hdNodeLabel(group,map){
+  const g=hdInteractiveGraph(map);
+  if(g&&typeof hdMapLayout==='function'){
+    const svg=group?.closest?.('svg');
+    const groups=[...(svg?.querySelectorAll?.('.hd-map-node')||[])];
+    const idx=groups.indexOf(group);
+    const labels=Object.keys(hdMapLayout(g,780,470));
+    if(idx>=0&&labels[idx])return labels[idx];
+  }
+  return group?.querySelector('text')?.textContent?.trim()||'';
+}
 function hdEnsureNodeInfoHost(){
   const pane=document.querySelector('[data-map-pane="map"]');if(!pane)return null;
   let host=pane.querySelector('#hdMapNodeInfo');
@@ -59,6 +69,7 @@ function hdShowNodeInfo(map,label){
   const enemy=hdNodeEnemyText(kind,override);
   const air=hdNodeAirText(map,kind,override);
   const branch=hdNodeBranchText(map,label,links.next,override);
+  const source=override.source?`<div class="hd-node-source">データ出典: ${typeof hdMapEsc2==='function'?hdMapEsc2(override.source):override.source}</div>`:'';
   host.innerHTML=`<div class="eyebrow">MAP NODE DETAIL</div>
     <div class="hd-map-node-info-title"><strong>${label}</strong><span>${info.label}</span></div>
     <p class="hd-node-summary">${info.hint}</p>
@@ -69,6 +80,7 @@ function hdShowNodeInfo(map,label){
       <div class="wide"><span>敵編成</span><strong>${enemy}</strong></div>
       <div class="wide"><span>制空・装備</span><strong>${air}</strong></div>
     </div>
+    ${source}
     <div class="hd-node-actions"><button class="ghost small" type="button" data-open-route-tab>ルート条件を見る</button><a class="guide-link" href="${wikiMapUrl(map)}" target="_blank" rel="noopener">Wikiで最新情報 ↗</a></div>`;
 }
 function hdShortestPath(map){
@@ -108,10 +120,8 @@ document.addEventListener('click',e=>{
   const group=e.target.closest?.('[data-map-pane="map"] .hd-map-node');if(!group)return;
   e.preventDefault();e.stopPropagation();
   const map=hdInteractiveMap();if(!map)return;
-  const raw=hdNodeLabel(group);let label=raw;
-  if(raw==='B')label=hdInteractiveGraph(map)?.boss||'B';
-  else if(raw==='G')label=hdInteractiveGraph(map)?.goal||'G';
-  else if(raw==='S')label='S';
+  const label=hdNodeLabel(group,map);
+  if(!label)return;
   hdShowNodeInfo(map,label);
 },true);
 
