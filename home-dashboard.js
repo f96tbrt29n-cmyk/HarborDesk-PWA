@@ -57,7 +57,7 @@ document.addEventListener('click',e=>{
  const mapButton=e.target.closest('[data-map]');
  if(mapButton?.dataset.map){saveRecentMap(mapButton.dataset.map);setTimeout(renderHomeDashboard,0)}
  const recent=e.target.closest('[data-home-map]');
- if(recent){const map=recent.dataset.homeMap;try{selectedWorld=map.split('-')[0];selectedMap=map;guideFilter='map';const q=document.getElementById('guideQuery');if(q)q.value=map;renderGuide();saveRecentMap(map);location.hash='guide';setTimeout(()=>document.getElementById('selectedMapCard')?.scrollIntoView({behavior:'smooth',block:'start'}),80)}catch{location.hash='guide'}}
+ if(recent){const map=recent.dataset.homeMap;try{selectedWorld=map.split('-')[0];selectedMap=map;guideFilter='map';const q=document.getElementById('guideQuery');if(q)q.value=map;renderGuide();saveRecentMap(map);if(typeof hdWSShowElement==='function')hdWSShowElement('guide',false);else location.hash='guide';setTimeout(()=>document.getElementById('selectedMapCard')?.scrollIntoView({behavior:'smooth',block:'start'}),80)}catch{location.hash='guide'}}
 });
 
 window.addEventListener('storage',renderHomeDashboard);
