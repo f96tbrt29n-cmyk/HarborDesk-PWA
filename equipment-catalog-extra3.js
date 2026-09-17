@@ -18,6 +18,14 @@ HD_EQUIPMENT_CATALOG.push(
  {name:'橘花改',category:'噴式戦闘爆撃機',stats:{爆装:11,対空:12,回避:1},range:'長',radius:2,tags:['噴式','空母','制空','基地航空隊'],improve:'改修不可',obtain:'任務「噴式戦闘爆撃機の開発」等。',update:'運用時に鋼材を消費。',role:'対空12を持つ噴式戦闘爆撃機。制空と攻撃を両立。',equip:'翔鶴改二甲・瑞鶴改二甲・加賀改二護・一部空母、基地航空隊。',special:'噴式強襲に参加。高い対空射撃回避力を持つ。'}
 );
 
+// v27: render signed values correctly, including bulge evasion penalties.
+hdEquipStatText=function(item){
+ const parts=Object.entries(item.stats||{}).map(([k,v])=>`${k}${Number(v)>=0?'+':''}${v}`);
+ if(item.range)parts.push(`射程 ${item.range}`);
+ if(item.radius!=null)parts.push(`半径 ${item.radius}`);
+ return parts;
+};
+
 // v27: show equipability / special-effect fields when available.
 hdRenderEquipmentCatalog=function(){
  const list=document.getElementById('hdEquipCatalogList');if(!list)return;
