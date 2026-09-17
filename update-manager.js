@@ -15,7 +15,12 @@ function hdAppendStyle(attr,href){
 function hdLoadScript(attr,src){
   return new Promise(resolve=>{
     const old=document.querySelector(`script[${attr}]`);
-    if(old){if(old.dataset.hdLoaded==='1'){window.HD_MODULE_STATUS[src]='ok';resolve(true);return}old.addEventListener('load',()=>{old.dataset.hdLoaded='1';window.HD_MODULE_STATUS[src]='ok';resolve(true)},{once:true});old.addEventListener('error',()=>{window.HD_MODULE_STATUS[src]='error';resolve(false)},{once:true});return}
+    if(old){
+      if(old.dataset.hdLoaded==='1'){window.HD_MODULE_STATUS[src]='ok';resolve(true);return}
+      old.addEventListener('load',()=>{old.dataset.hdLoaded='1';window.HD_MODULE_STATUS[src]='ok';resolve(true)},{once:true});
+      old.addEventListener('error',()=>{window.HD_MODULE_STATUS[src]='error';resolve(false)},{once:true});
+      return;
+    }
     const script=document.createElement('script');script.src=src;script.async=false;script.setAttribute(attr,'1');window.HD_MODULE_STATUS[src]='loading';
     script.onload=()=>{script.dataset.hdLoaded='1';window.HD_MODULE_STATUS[src]='ok';resolve(true)};
     script.onerror=()=>{window.HD_MODULE_STATUS[src]='error';resolve(false)};
@@ -51,13 +56,12 @@ async function hdLoadCurrentAssets(){
 
   const sortieP=hdLoadScript('data-hd-sortie-ready','./sortie-readiness.js');
   const landP=hdLoadScript('data-hd-land-base','./land-base-planner.js');
-  const fleetP=hdLoadScript('data-hd-fleet-calc','./fleet-calculator.js').then(()=>hdLoadScript('data-hd-fleet-calc-fix','./fleet-calculator-fix.js'));
+  const fleetP=hdLoadScript('data-hd-fleet-calc','./fleet-calculator.js').then(ok=>ok?hdLoadScript('data-hd-fleet-calc-fix','./fleet-calculator-fix.js'):false);
   const questP=hdLoadScript('data-hd-quest-progress','./quest-progress-extension.js');
   const commandP=hdLoadScript('data-hd-command-center','./command-center.js');
   const eventP=hdLoadScript('data-hd-event-ops','./event-operations.js');
 
-  const expBaseP=hdLoadScript('data-hd-exp-fleet','./expedition-fleet-manager.js')
-    .then(ok=>ok?hdLoadScript('data-hd-exp-fleet-patch','./expedition-fleet-manager-patch.js'):false);
+  const expBaseP=hdLoadScript('data-hd-exp-fleet','./expedition-fleet-manager.js').then(ok=>ok?hdLoadScript('data-hd-exp-fleet-patch','./expedition-fleet-manager-patch.js'):false);
   const expP=expBaseP.then(async ok=>{
     if(!ok)return false;
     const [stats,support]=await Promise.all([
@@ -82,8 +86,7 @@ async function hdLoadCurrentAssets(){
 
 function hdEnsureUpdateUI(){
   if(document.getElementById('hdUpdateBanner'))return;
-  const banner=document.createElement('div');
-  banner.id='hdUpdateBanner';banner.className='hd-update-banner';banner.hidden=true;
+  const banner=document.createElement('div');banner.id='hdUpdateBanner';banner.className='hd-update-banner';banner.hidden=true;
   banner.innerHTML=`<div><strong>HarborDeskの最新版があります</strong><div id="hdUpdateText" class="muted"></div></div><button id="hdUpdateNow" class="primary small">今すぐ更新</button>`;
   document.body.appendChild(banner);
   const header=document.querySelector('.topbar');
@@ -93,13 +96,21 @@ function hdEnsureUpdateUI(){
 }
 async function hdCheckForUpdate(showResult=false){
   hdEnsureUpdateUI();const btn=document.getElementById('hdUpdateCheck');
-  try{if(btn){btn.disabled=true;btn.textContent='確認中…'}const latest=await hdFetchLatestVersion(),newer=Number(latest.build||0)>HD_APP_BUILD,banner=document.getElementById('hdUpdateBanner'),text=document.getElementById('hdUpdateText');if(newer){if(text)text.textContent=`v${HD_APP_VERSION} → v${latest.version}${latest.notes?`｜${latest.notes}`:''}`;if(banner)banner.hidden=false}else{if(banner)banner.hidden=true;if(showResult)alert(`HarborDesk v${HD_APP_VERSION} は最新版だよ`)}}
-  catch{if(showResult)alert('更新情報を確認できなかったよ。通信状態を確認してもう一度試してね。')}
+  try{
+    if(btn){btn.disabled=true;btn.textContent='確認中…'}
+    const latest=await hdFetchLatestVersion(),newer=Number(latest.build||0)>HD_APP_BUILD,banner=document.getElementById('hdUpdateBanner'),text=document.getElementById('hdUpdateText');
+    if(newer){if(text)text.textContent=`v${HD_APP_VERSION} → v${latest.version}${latest.notes?`｜${latest.notes}`:''}`;if(banner)banner.hidden=false}
+    else{if(banner)banner.hidden=true;if(showResult)alert(`HarborDesk v${HD_APP_VERSION} は最新版だよ`)}
+  }catch{if(showResult)alert('更新情報を確認できなかったよ。通信状態を確認してもう一度試してね。')}
   finally{if(btn){btn.disabled=false;btn.textContent='更新確認'}}
 }
 async function hdForceUpdate(){
   const btn=document.getElementById('hdUpdateNow');
-  try{if(btn){btn.disabled=true;btn.textContent='更新中…'}if('serviceWorker' in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.update().catch(()=>null))}const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('harbordesk-pwa-')).map(k=>caches.delete(k)))}catch{}
+  try{
+    if(btn){btn.disabled=true;btn.textContent='更新中…'}
+    if('serviceWorker' in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.update().catch(()=>null)))}
+    const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('harbordesk-pwa-')).map(k=>caches.delete(k)));
+  }catch{}
   const url=new URL(location.href);url.searchParams.set('v',Date.now().toString());location.replace(url.toString());
 }
 window.addEventListener('load',()=>{hdLoadCurrentAssets().catch(()=>{});hdEnsureUpdateUI();setTimeout(()=>hdCheckForUpdate(false),1200)});
