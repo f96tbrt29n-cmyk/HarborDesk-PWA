@@ -10,14 +10,14 @@ const HD_WS_GROUPS=[
  {key:'settings',label:'設定'}
 ];
 const HD_WS_EXPLICIT={
- home:new Set(['home','personalHomeCenter','dailyOpsCenter','dashboard','resources','resourceHistory','docks']),
- guide:new Set(['guide','eoTracker','sortieReadiness','eventOperationsCenter','eventOperations','landBasePlanner']),
- fleet:new Set(['shipDatabase','roster','trainingPlanner','customFleets','fleetCalculator','supportFleetPlanner']),
+ home:new Set(['home','personalHomeCenter','dailyOpsCenter','dashboard','resources','resourceHistory','docks','resourceBudget']),
+ guide:new Set(['guide','eoTracker','sortieReadiness','eventOperationsCenter','eventOperations','grandOperations','landBasePlanner']),
+ fleet:new Set(['shipDatabase','roster','shipProfilesPlus','trainingPlanner','customFleets','fleetCalculator','supportFleetPlanner']),
  quest:new Set(['questDatabase','quests','exerciseRoutine','activityLogger']),
- expedition:new Set(['expeditions']),
- arsenal:new Set(['equipmentBook','developmentRecipes','constructionDb','improvementWorkshop','materialPlanner']),
- records:new Set(['sortieLog','dropHunting','eventLog','rankingTracker','rankingTrackerCenter','farmAnalysis']),
- settings:new Set(['calculators','backup','diagnosticsCenter'])
+ expedition:new Set(['expeditions','expeditionFleetManager','expeditionOptimizer']),
+ arsenal:new Set(['equipmentBook','equipmentVariants','developmentRecipes','constructionDb','improvementWorkshop','optimizationImprovement','materialPlanner']),
+ records:new Set(['sortieLog','sortieCostForecast','dropHunting','dropHuntingDb','farmingAnalytics','eventLog','rankingTracker','rankingTrackerCenter','farmAnalysis']),
+ settings:new Set(['calculators','backup','diagnosticsCenter','notificationCenter','dataQualityAudit'])
 };
 let hdWSState=hdWSLoad();
 let hdWSObserver=null;
@@ -34,8 +34,8 @@ function hdWSGroupForSection(el){
  const id=el.id||'';
  for(const [g,set] of Object.entries(HD_WS_EXPLICIT))if(set.has(id))return g;
  const text=`${id} ${hdWSTitle(el)} ${el.className||''}`.toLowerCase();
- if(/診断|設定|バックアップ|backup|diagnostic|計算ツール|calculator|about|概要/.test(text))return 'settings';
- if(/周回|掘り|戦果|記録|分析|ログ|sortie.?log|drop|ranking|event.?log/.test(text))return 'records';
+ if(/診断|設定|通知|監査|データ品質|バックアップ|backup|diagnostic|計算ツール|calculator|about|概要/.test(text))return 'settings';
+ if(/周回|掘り|戦果|記録|分析|ログ|予測|sortie.?log|drop|ranking|event.?log/.test(text))return 'records';
  if(/装備|工廠|開発|建造|改修|素材|equipment|development|construction|improvement|material/.test(text))return 'arsenal';
  if(/遠征|expedition/.test(text))return 'expedition';
  if(/任務|演習|activity|quest|exercise/.test(text))return 'quest';
@@ -46,14 +46,20 @@ function hdWSGroupForSection(el){
 }
 function hdWSSections(){
  const main=document.querySelector('main');if(!main)return [];
- const rows=[...main.querySelectorAll('section')];
+ const all=[...main.querySelectorAll('section')];
+ const rows=all.filter(el=>!el.parentElement?.closest('section'));
  for(const el of rows){
-  if(!el.id){if(el.classList.contains('hero'))el.id='hdWorkspaceHero';else if(el.classList.contains('note'))el.id='hdWorkspaceAbout';else el.id=`hdWorkspaceSection${rows.indexOf(el)}`}
+  if(!el.id){if(el.classList.contains('hero'))el.id='hdWorkspaceHero';else if(el.classList.contains('note'))el.id='hdWorkspaceAbout';else el.id=`hdWorkspaceSection${all.indexOf(el)}`}
   if(el.id==='hdWorkspaceHero')el.dataset.hdWorkspaceGroup='home';
   else if(el.id==='hdWorkspaceAbout')el.dataset.hdWorkspaceGroup='settings';
   else el.dataset.hdWorkspaceGroup=hdWSGroupForSection(el);
  }
  return rows;
+}
+function hdWSManagedSectionFor(el){
+ if(!el)return null;const rows=hdWSSections();let section=el.closest?.('section')||null;
+ while(section){if(rows.includes(section))return section;section=section.parentElement?.closest('section')||null}
+ return null;
 }
 function hdWSVisibleSections(group){return hdWSSections().filter(el=>el.dataset.hdWorkspaceGroup===group&&el.id!=='hdWorkspaceHero')}
 function hdWSResolveSection(group,preferred){const rows=hdWSVisibleSections(group);if(!rows.length)return null;if(preferred&&rows.some(x=>x.id===preferred))return preferred;const stored=hdWSState.sections?.[group];if(stored&&rows.some(x=>x.id===stored))return stored;const preferredIds={home:'home',guide:'guide',fleet:'roster',quest:'quests',expedition:'expeditions',arsenal:'equipmentBook',records:'sortieLog',settings:'diagnosticsCenter'};return rows.find(x=>x.id===preferredIds[group])?.id||rows[0].id}
@@ -106,7 +112,7 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
 }
 function hdWSShowElement(target,scroll=true){
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
- const section=el.closest('section');if(!section)return false;hdWSSections();const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);hdWSApply(group,section.id);
+ const section=hdWSManagedSectionFor(el);if(!section)return false;const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);hdWSApply(group,section.id);
  if(scroll)setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),40);return true;
 }
 function hdWSPatchQuickNav(){if(window.__hdWSQuickPatched||typeof window.hdQNJump!=='function')return;window.__hdWSQuickPatched=true;const old=window.hdQNJump;window.hdQNJump=function(id){const target=document.getElementById(id);if(target){hdWSShowElement(target,false);setTimeout(()=>old(id),30)}else old(id)}}
