@@ -50,6 +50,20 @@ jobs:
           }
           if(missing.length)throw new Error(`Missing cached assets: ${missing.join(', ')}`);
           console.log(`OK cached assets: ${assets.length}`);
+          const version=JSON.parse(fs.readFileSync('app-version.json','utf8'));
+          const update=fs.readFileSync('update-manager.js','utf8');
+          const updateVersion=update.match(/const HD_APP_VERSION='([^']+)'/)?.[1];
+          const updateBuild=Number(update.match(/const HD_APP_BUILD=(\d+)/)?.[1]);
+          const cacheBuild=Number(sw.match(/const CACHE='harbordesk-pwa-v(\d+)'/)?.[1]);
+          if(version.version!==updateVersion||Number(version.build)!==updateBuild||Number(version.build)!==cacheBuild){
+            throw new Error(`Version mismatch: app-version=${version.version}/${version.build}, update-manager=${updateVersion}/${updateBuild}, sw=v${cacheBuild}`);
+          }
+          const cacheSet=new Set(assets.map(x=>x.replace(/^\.\//,'')));
+          const runtimeFiles=fs.readdirSync('.').filter(f=>fs.statSync(f).isFile()&&(f.endsWith('.js')||f.endsWith('.css'))&&f!=='sw.js');
+          const uncached=runtimeFiles.filter(f=>!cacheSet.has(f));
+          if(uncached.length)throw new Error(`Runtime assets missing from SW cache: ${uncached.join(', ')}`);
+          console.log(`OK version alignment: v${version.version} build ${version.build}`);
+          console.log(`OK runtime assets cached: ${runtimeFiles.length}`);
           NODE
 
       - name: Validate runtime asset graph
