@@ -1,4 +1,4 @@
-const HD_STABILITY_VERSION='1.0.54';
+const HD_STABILITY_VERSION='1.0.61';
 
 function hdStabLoad(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}}
 function hdStabEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -30,8 +30,19 @@ function hdStabInstallEventOpsFixes(){
  };
  window.hdEOpsLedger=function(){const raw=ledgerBase(),m=new Map();for(const x of raw){const name=String(x.name||'').trim();if(!name)continue;const cur=m.get(name)||{...x,name,count:0,star:0};cur.count+=(Number(x.count)||0);cur.star=Math.max(Number(cur.star)||0,Number(x.star)||0);m.set(name,cur)}return [...m.values()].sort((a,b)=>String(a.name).localeCompare(String(b.name),'ja'))};
  document.addEventListener('click',e=>{
-   if(e.target.closest?.('[data-go-support]')){const el=document.getElementById('hdSupportPlanner');if(el){el.scrollIntoView({behavior:'smooth',block:'start'})}else{const p=typeof hdEOpsCurrent==='function'?hdEOpsCurrent():null;alert(p&&/^E/i.test(String(p.area||''))?'イベント作戦の支援は作戦室の「道中支援/決戦支援」で管理中。通常海域の支援艦隊プランナーは5-x海域を開くと表示されるよ。':'5-x海域の「自分用」タブを開くと支援艦隊プランナーが表示されるよ。')} }
-   if(e.target.closest?.('[data-go-base]')){const el=document.getElementById('hdLandBasePlanner');if(el){el.scrollIntoView({behavior:'smooth',block:'start'})}else{alert('基地航空隊を使える通常海域の「装備」タブを開くと基地航空隊プランナーが表示されるよ。イベント分は作戦室の基地航空隊メモに残してね。')}}
+   const support=e.target.closest?.('[data-go-support]');
+   if(support){
+     const root=support.closest('#grandOperations')||document.getElementById('grandOperations');
+     const target=root?.querySelector('[data-go-check="supportFront"]')||root?.querySelector('[data-go-check="supportBoss"]');
+     if(target){e.preventDefault();e.stopImmediatePropagation();target.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>target.focus({preventScroll:true}),60)}
+     return;
+   }
+   const base=e.target.closest?.('[data-go-base]');
+   if(base){
+     const root=base.closest('#grandOperations')||document.getElementById('grandOperations');
+     const target=root?.querySelector('[data-go-field="baseNote"]');
+     if(target){e.preventDefault();e.stopImmediatePropagation();target.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>target.focus({preventScroll:true}),60)}
+   }
  },true);
  window.__hdStabEventInstalled=true;return true;
 }
