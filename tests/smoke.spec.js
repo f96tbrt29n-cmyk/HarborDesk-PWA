@@ -188,3 +188,41 @@ test('Core CRUD and cross-feature buttons work', async ({ page }) => {
 
   expect(runtimeErrors, `runtime errors: ${runtimeErrors.join('\n')}`).toEqual([]);
 });
+
+
+test('Cross-workspace shortcuts open the correct visible tab', async ({ page }) => {
+  const runtimeErrors = [];
+  await boot(page, runtimeErrors);
+
+  await page.evaluate(() => window.hdWSShowElement?.('activityLogger', false));
+  await page.locator('[data-hd-al-quests]').click();
+  await expect(page.locator('[data-hd-ws-group="quest"]')).toHaveClass(/active/);
+  await expectActuallyVisible(page, 'questDatabase');
+
+  await page.evaluate(() => window.hdWSShowElement?.('exerciseRoutine', false));
+  const erQuest = page.locator('[data-hd-er-quest]');
+  if (await erQuest.count()) {
+    await erQuest.click();
+    await expectActuallyVisible(page, 'questDatabase');
+  }
+
+  await page.evaluate(() => window.hdEOGoGuide?.('1-5'));
+  await expect(page.locator('[data-hd-ws-group="guide"]')).toHaveClass(/active/);
+  await expectActuallyVisible(page, 'guide');
+
+  await page.evaluate(() => window.hdOpenEquipmentDb?.('12.7cm連装砲'));
+  await expect(page.locator('[data-hd-ws-group="arsenal"]')).toHaveClass(/active/);
+  await expectActuallyVisible(page, 'equipmentBook');
+
+  await page.evaluate(() => window.hdOwnedOpenLedger?.('12.7cm連装砲'));
+  await expectActuallyVisible(page, 'equipmentBook');
+
+  await page.evaluate(() => window.hdWSShowElement?.('improvementWorkshop', false));
+  const improveJump = page.locator('[data-hd-improve-equip]').first();
+  if (await improveJump.count()) {
+    await improveJump.click();
+    await expectActuallyVisible(page, 'equipmentBook');
+  }
+
+  expect(runtimeErrors, `runtime errors: ${runtimeErrors.join('\n')}`).toEqual([]);
+});
