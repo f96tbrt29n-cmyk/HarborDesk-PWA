@@ -40,9 +40,7 @@ function hdLoadCurrentAssets(){
     hdAppendScript('data-hd-resource-budget','./resource-budget.js',()=>{
       setTimeout(()=>{if(typeof hdRBEnsure==='function')hdRBEnsure();if(typeof hdRBInstallCommandCenterPatch==='function')hdRBInstallCommandCenterPatch()},0);
       hdAppendStyle('data-hd-exercise-routine','./exercise-routine.css');
-      hdAppendScript('data-hd-exercise-routine','./exercise-routine.js',()=>{
-        hdAppendScript('data-hd-exercise-routine-patch','./exercise-routine-patch.js',()=>setTimeout(()=>{if(typeof hdEREnsure==='function')hdEREnsure();if(typeof hdERRender==='function')hdERRender();if(typeof hdCCRender==='function')hdCCRender()},0));
-      });
+      hdAppendScript('data-hd-exercise-routine','./exercise-routine.js',()=>setTimeout(()=>{if(typeof hdEREnsure==='function')hdEREnsure();if(typeof hdERRender==='function')hdERRender();if(typeof hdCCRender==='function')hdCCRender()},0));
     });
   });
 }
