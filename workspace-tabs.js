@@ -23,6 +23,7 @@ let hdWSState=hdWSLoad();
 let hdWSObserver=null;
 let hdWSApplying=false;
 let hdWSRefreshTimer=0;
+let hdWSNavLockUntil=0;
 let hdWSTouch=null;
 
 function hdWSLoad(){try{const v=JSON.parse(localStorage.getItem(HD_WS_KEY)||'{}');return {group:v.group||'home',sections:v.sections||{}}}catch{return {group:'home',sections:{}}}}
@@ -91,6 +92,7 @@ function hdWSRenderSubtabs(group,selected){
 function hdWSUpdateWrappers(){
  const wrap=document.getElementById('advancedToolsWrap');if(wrap){const sections=[...wrap.querySelectorAll(':scope > section')];wrap.classList.toggle('hd-ws-wrapper-hidden',sections.length>0&&sections.every(x=>x.classList.contains('hd-ws-hidden')))}
 }
+function hdWSUnhideAncestors(el){for(let p=el?.parentElement;p&&p!==document.body;p=p.parentElement){if(p.classList?.contains('hd-ws-wrapper-hidden'))p.classList.remove('hd-ws-wrapper-hidden')}}
 function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
  if(hdWSApplying)return;hdWSApplying=true;
  try{
@@ -112,14 +114,18 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
 }
 function hdWSShowElement(target,scroll=true){
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
- const section=hdWSManagedSectionFor(el);if(!section)return false;const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);hdWSApply(group,section.id);
- if(scroll)setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),40);return true;
+ const section=hdWSManagedSectionFor(el);if(!section)return false;const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
+ clearTimeout(hdWSRefreshTimer);hdWSNavLockUntil=Date.now()+300;
+ const apply=()=>{hdWSApply(group,section.id);section.classList.remove('hd-ws-hidden');hdWSUnhideAncestors(section)};
+ if(hdWSApplying)setTimeout(apply,0);else apply();
+ setTimeout(()=>{apply();if(scroll)el.scrollIntoView({behavior:'smooth',block:'start'})},50);
+ return true;
 }
-function hdWSPatchQuickNav(){if(window.__hdWSQuickPatched||typeof window.hdQNJump!=='function')return;window.__hdWSQuickPatched=true;const old=window.hdQNJump;window.hdQNJump=function(id){const target=document.getElementById(id);if(target){hdWSShowElement(target,false);setTimeout(()=>old(id),30)}else old(id)}}
-function hdWSHandleAnchor(a){const href=a?.getAttribute?.('href')||'';if(!href.startsWith('#')||href==='#')return false;let id='';try{id=decodeURIComponent(href.slice(1))}catch{id=href.slice(1)}const target=document.getElementById(id);if(!target)return false;hdWSShowElement(target,false);setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),30);return true}
-function hdWSRefresh(){hdWSApply(hdWSState.group,hdWSState.sections?.[hdWSState.group]);hdWSPatchQuickNav();hdWSUpdateBadges()}
+function hdWSPatchQuickNav(){if(window.__hdWSQuickPatched||typeof window.hdQNJump!=='function')return;window.__hdWSQuickPatched=true;const old=window.hdQNJump;window.hdQNJump=function(id){const target=document.getElementById(id);if(target){hdWSShowElement(target,false);setTimeout(()=>old(id),70)}else old(id)}}
+function hdWSHandleAnchor(a){const href=a?.getAttribute?.('href')||'';if(!href.startsWith('#')||href==='#')return false;let id='';try{id=decodeURIComponent(href.slice(1))}catch{id=href.slice(1)}const target=document.getElementById(id);if(!target)return false;hdWSShowElement(target,false);setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),70);return true}
+function hdWSRefresh(){if(Date.now()<hdWSNavLockUntil){hdWSScheduleRefresh();return}hdWSApply(hdWSState.group,hdWSState.sections?.[hdWSState.group]);hdWSPatchQuickNav();hdWSUpdateBadges()}
 function hdWSMutationAddsSection(ms){return ms.some(m=>[...m.addedNodes].some(n=>n?.nodeType===1&&(n.matches?.('section')||n.querySelector?.('section'))))}
-function hdWSScheduleRefresh(){clearTimeout(hdWSRefreshTimer);hdWSRefreshTimer=setTimeout(hdWSRefresh,60)}
+function hdWSScheduleRefresh(){clearTimeout(hdWSRefreshTimer);const delay=Math.max(60,hdWSNavLockUntil-Date.now()+20);hdWSRefreshTimer=setTimeout(hdWSRefresh,delay)}
 function hdWSInstall(){
  hdWSEnsureUI();hdWSRefresh();
  if(!hdWSObserver){hdWSObserver=new MutationObserver(ms=>{if(hdWSMutationAddsSection(ms))hdWSScheduleRefresh()});const main=document.querySelector('main');if(main)hdWSObserver.observe(main,{childList:true,subtree:true})}
