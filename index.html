@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="ship-roster.css">
   <link rel="stylesheet" href="ship-database.css">
   <link rel="stylesheet" href="drop-hunting.css">
+  <link rel="stylesheet" href="material-planner.css">
   <link rel="stylesheet" href="advanced-tools.css">
   <link rel="stylesheet" href="home-dashboard.css">
   <link rel="stylesheet" href="map-tabs.css">
@@ -41,7 +42,7 @@
     <section id="quests"><div class="section-head"><h2>任務チェック</h2><button id="addQuest" class="primary small">＋追加</button></div><div id="questList" class="stack"></div></section>
     <section id="roster" class="roster-section"><div class="section-head"><div><div class="eyebrow">FLEET BOOK</div><h2>艦隊台帳</h2></div><span class="muted">端末内保存</span></div><div class="roster-toolbar"><input id="shipRosterSearch" type="search" placeholder="艦娘名・タグ・メモで検索"><button id="addShipRoster" class="primary">＋艦娘を登録</button></div><div id="shipRosterFilters" class="roster-filters"></div><div id="shipRosterList" class="roster-list"></div></section>
     <section id="resources"><div class="section-head"><h2>資源メモ</h2><span class="muted">端末内保存</span></div><div class="resource-grid"><label>燃料<input id="fuel" inputmode="numeric" type="number" min="0"></label><label>弾薬<input id="ammo" inputmode="numeric" type="number" min="0"></label><label>鋼材<input id="steel" inputmode="numeric" type="number" min="0"></label><label>ボーキ<input id="bauxite" inputmode="numeric" type="number" min="0"></label></div><button id="saveResources" class="primary full">資源を保存</button><div id="resourceSaved" class="saved muted"></div></section>
-    <section class="card note"><strong>HarborDesk</strong><p>攻略、海域構造マップ、マス解説、遠征・入渠タイマー、定期任務データベース、任務チェック、艦娘データベース・改装計画、ドロップ逆引き・掘り記録、艦隊台帳、自分用編成、装備データベース・改修管理、開発レシピ、建造データベース、改修工廠、遠征データベース、資源履歴、イベント記録、計算ツール、バックアップまでこのiPhone内でまとめて使える。重要な出撃前は元Wikiの最新情報も確認してね。</p></section>
+    <section class="card note"><strong>HarborDesk</strong><p>攻略、海域構造マップ、マス解説、遠征・入渠タイマー、定期任務データベース、任務チェック、艦娘データベース・改装計画、ドロップ逆引き・掘り記録、改装素材・特殊アイテム管理、艦隊台帳、自分用編成、装備データベース・改修管理、開発レシピ、建造データベース、改修工廠、遠征データベース、資源履歴、イベント記録、計算ツール、バックアップまでこのiPhone内でまとめて使える。重要な出撃前は元Wikiの最新情報も確認してね。</p></section>
   </main>
   <nav class="bottom-nav"><a href="#home">ホーム</a><a href="#guide">攻略</a><a href="#roster">艦隊</a><a href="#expeditions">遠征</a><a href="#dashboard">管理</a></nav>
   <dialog id="timerDialog"><form method="dialog" id="timerForm"><h3 id="timerDialogTitle">タイマー追加</h3><label>名前<input id="timerName" required maxlength="40" placeholder="例：東京急行"></label><label>時間（分）<input id="timerMinutes" required type="number" min="1" max="14400" value="30"></label><div class="dialog-actions"><button value="cancel" class="ghost">キャンセル</button><button id="timerSave" value="default" class="primary">開始</button></div></form></dialog>
@@ -49,7 +50,7 @@
   <script src="app.js"></script>
   <script src="map-details.js"></script><script src="map-details-34.js"></script><script src="map-details-57.js"></script>
   <script src="map-plans.js"></script><script src="ship-roster.js"></script><script src="ship-database.js"></script><script src="drop-hunting.js"></script><script src="custom-fleets.js"></script><script src="map-images.js"></script><script src="map-tabs.js"></script><script src="map-interactive.js"></script><script src="map-node-data-1.js"></script><script src="map-node-data-2-7.js"></script><script src="map-advanced-data.js"></script><script src="advanced-tools.js"></script>
-  <script src="equipment-catalog.js"></script><script src="equipment-catalog-extra.js"></script><script src="equipment-catalog-extra2.js"></script><script src="equipment-catalog-extra3.js"></script><script src="equipment-catalog-extra4.js"></script><script src="equipment-catalog-ui-patch.js"></script><script src="map-equipment-recommend.js"></script><script src="map-equipment-owned.js"></script><script src="development-recipes.js"></script><script src="construction-database.js"></script><script src="improvement-workshop.js"></script><script src="quest-database.js"></script>
+  <script src="equipment-catalog.js"></script><script src="equipment-catalog-extra.js"></script><script src="equipment-catalog-extra2.js"></script><script src="equipment-catalog-extra3.js"></script><script src="equipment-catalog-extra4.js"></script><script src="equipment-catalog-ui-patch.js"></script><script src="map-equipment-recommend.js"></script><script src="map-equipment-owned.js"></script><script src="development-recipes.js"></script><script src="construction-database.js"></script><script src="improvement-workshop.js"></script><script src="material-planner.js"></script><script src="quest-database.js"></script>
   <script src="expedition-database.js"></script>
   <script src="home-dashboard.js"></script><script src="update-manager.js"></script>
 </body>
