@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.49';
-const HD_APP_BUILD=49;
+const HD_APP_VERSION='1.0.50';
+const HD_APP_BUILD=50;
 
 async function hdFetchLatestVersion(){
   const res=await fetch(`./app-version.json?t=${Date.now()}`,{cache:'no-store'});
@@ -37,7 +37,13 @@ function hdLoadCurrentAssets(){
   hdAppendScript('data-hd-command-center','./command-center.js',()=>{
     setTimeout(()=>{if(typeof hdCCEnsure==='function')hdCCEnsure();if(typeof hdCCRender==='function')hdCCRender()},0);
     hdAppendStyle('data-hd-resource-budget','./resource-budget.css');
-    hdAppendScript('data-hd-resource-budget','./resource-budget.js',()=>setTimeout(()=>{if(typeof hdRBEnsure==='function')hdRBEnsure();if(typeof hdRBInstallCommandCenterPatch==='function')hdRBInstallCommandCenterPatch()},0));
+    hdAppendScript('data-hd-resource-budget','./resource-budget.js',()=>{
+      setTimeout(()=>{if(typeof hdRBEnsure==='function')hdRBEnsure();if(typeof hdRBInstallCommandCenterPatch==='function')hdRBInstallCommandCenterPatch()},0);
+      hdAppendStyle('data-hd-exercise-routine','./exercise-routine.css');
+      hdAppendScript('data-hd-exercise-routine','./exercise-routine.js',()=>{
+        hdAppendScript('data-hd-exercise-routine-patch','./exercise-routine-patch.js',()=>setTimeout(()=>{if(typeof hdEREnsure==='function')hdEREnsure();if(typeof hdERRender==='function')hdERRender();if(typeof hdCCRender==='function')hdCCRender()},0));
+      });
+    });
   });
 }
 
