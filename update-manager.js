@@ -1,6 +1,23 @@
 const HD_APP_VERSION='1.0.60';
 const HD_APP_BUILD=60;
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
+window.HD_SERVICE_WORKER_STATUS='idle';
+
+async function hdEnsureServiceWorker(){
+  if(!('serviceWorker' in navigator)){window.HD_SERVICE_WORKER_STATUS='unsupported';return null}
+  try{
+    window.HD_SERVICE_WORKER_STATUS='registering';
+    const reg=await navigator.serviceWorker.register('./sw.js',{scope:'./'});
+    window.HD_SERVICE_WORKER_STATUS='registered';
+    reg.update().catch(()=>{});
+    navigator.serviceWorker.ready.then(()=>{window.HD_SERVICE_WORKER_STATUS='ready'}).catch(()=>{});
+    return reg;
+  }catch(err){
+    window.HD_SERVICE_WORKER_STATUS='error';
+    console.warn('HarborDesk Service Worker registration failed',err);
+    return null;
+  }
+}
 
 async function hdFetchLatestVersion(){
   const res=await fetch(`./app-version.json?t=${Date.now()}`,{cache:'no-store'});
@@ -125,4 +142,4 @@ async function hdForceUpdate(){
   }catch{}
   const url=new URL(location.href);url.searchParams.set('v',Date.now().toString());location.replace(url.toString());
 }
-window.addEventListener('load',()=>{hdLoadCurrentAssets().catch(()=>{});hdEnsureUpdateUI();setTimeout(()=>hdCheckForUpdate(false),1200)});
+window.addEventListener('load',()=>{hdEnsureServiceWorker();hdLoadCurrentAssets().catch(()=>{});hdEnsureUpdateUI();setTimeout(()=>hdCheckForUpdate(false),1200)});
