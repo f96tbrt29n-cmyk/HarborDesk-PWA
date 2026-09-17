@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#0b1b2b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="HarborDesk">
+  <title>HarborDesk PWA</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">艦これ 提督補助</div>
+      <h1>HarborDesk</h1>
+    </div>
+    <button id="notifyBtn" class="ghost">通知を許可</button>
+  </header>
+
+  <main>
+    <section class="hero card">
+      <div>
+        <div class="eyebrow">秘書パネル</div>
+        <p id="secretaryText" class="secretary">提督、今日も無理しすぎないで。遠征と任務は私が横で見てるから。</p>
+      </div>
+      <button id="secretaryRefresh" class="round">↻</button>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>遠征タイマー</h2><button id="addExpedition" class="primary small">＋追加</button></div>
+      <div id="expeditionList" class="stack"></div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>入渠タイマー</h2><button id="addDock" class="primary small">＋追加</button></div>
+      <div id="dockList" class="stack"></div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>任務チェック</h2><button id="addQuest" class="primary small">＋追加</button></div>
+      <div id="questList" class="stack"></div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>資源メモ</h2><span class="muted">端末内保存</span></div>
+      <div class="resource-grid">
+        <label>燃料<input id="fuel" inputmode="numeric" type="number" min="0"></label>
+        <label>弾薬<input id="ammo" inputmode="numeric" type="number" min="0"></label>
+        <label>鋼材<input id="steel" inputmode="numeric" type="number" min="0"></label>
+        <label>ボーキ<input id="bauxite" inputmode="numeric" type="number" min="0"></label>
+      </div>
+      <button id="saveResources" class="primary full">資源を保存</button>
+      <div id="resourceSaved" class="saved muted"></div>
+    </section>
+
+    <section class="card note">
+      <strong>通知について</strong>
+      <p>このMVPでは、HarborDeskを開いている間はタイマー完了を通知できる。iPhoneでアプリを閉じた後も確実に鳴らすWeb Pushは、次の段階でサーバー側通知を追加して対応する。</p>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="#top" data-jump="top">秘書</a>
+    <a href="#expeditionList">遠征</a>
+    <a href="#questList">任務</a>
+    <a href="#fuel">資源</a>
+  </nav>
+
+  <dialog id="timerDialog">
+    <form method="dialog" id="timerForm">
+      <h3 id="timerDialogTitle">タイマー追加</h3>
+      <label>名前<input id="timerName" required maxlength="40" placeholder="例：東京急行"></label>
+      <label>時間（分）<input id="timerMinutes" required type="number" min="1" max="14400" value="30"></label>
+      <div class="dialog-actions"><button value="cancel" class="ghost">キャンセル</button><button id="timerSave" value="default" class="primary">開始</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="questDialog">
+    <form method="dialog" id="questForm">
+      <h3>任務を追加</h3>
+      <label>任務名<input id="questName" required maxlength="60" placeholder="例：デイリー演習"></label>
+      <div class="dialog-actions"><button value="cancel" class="ghost">キャンセル</button><button value="default" class="primary">追加</button></div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
