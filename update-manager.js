@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.55';
-const HD_APP_BUILD=55;
+const HD_APP_VERSION='1.0.56';
+const HD_APP_BUILD=56;
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 
 async function hdFetchLatestVersion(){
@@ -45,6 +45,7 @@ function hdInitLoadedModules(){
   try{if(typeof hdStabInstall==='function')hdStabInstall()}catch{}
   try{if(typeof hdMRInstall==='function')hdMRInstall()}catch{}
   try{if(typeof hdQNEnsure==='function')hdQNEnsure()}catch{}
+  try{if(typeof hdPHEnsure==='function')hdPHEnsure();if(typeof hdPHInstallBackupHooks==='function')hdPHInstallBackupHooks()}catch{}
   window.dispatchEvent(new CustomEvent('hd:modules-ready',{detail:{status:{...window.HD_MODULE_STATUS}}}));
 }
 async function hdLoadCurrentAssets(){
@@ -53,7 +54,7 @@ async function hdLoadCurrentAssets(){
    ['data-hd-exp-fleet','./expedition-fleet-manager.css'],['data-hd-exp-stats','./expedition-stats-extension.css'],['data-hd-support-fleet','./support-fleet-planner.css'],
    ['data-hd-quest-progress','./quest-progress-extension.css'],['data-hd-command-center','./command-center.css'],['data-hd-resource-budget','./resource-budget.css'],
    ['data-hd-exercise-routine','./exercise-routine.css'],['data-hd-activity-logger','./activity-logger.css'],['data-hd-sortie-log','./sortie-log.css'],
-   ['data-hd-grand-ops','./grand-operations.css'],['data-hd-quick-nav','./quick-nav.css']
+   ['data-hd-grand-ops','./grand-operations.css'],['data-hd-quick-nav','./quick-nav.css'],['data-hd-personal-home','./personal-home.css']
   ].forEach(([a,h])=>hdAppendStyle(a,h));
 
   const sortieP=hdLoadScript('data-hd-sortie-ready','./sortie-readiness.js');
@@ -83,8 +84,9 @@ async function hdLoadCurrentAssets(){
   const stabilityP=Promise.all([sortieP,landP,fleetP,expP,eventP,optimizeP,dailyP]).then(()=>hdLoadScript('data-hd-stability','./stability-integration.js'));
   const mapRuntimeP=Promise.all([stabilityP,sortieP,landP,fleetP,expP]).then(()=>hdLoadScript('data-hd-map-runtime','./map-runtime.js'));
   const quickNavP=Promise.all([eventP,optimizeP,dailyP]).then(()=>hdLoadScript('data-hd-quick-nav','./quick-nav.js'));
+  const personalHomeP=Promise.all([quickNavP,dailyP,stabilityP]).then(()=>hdLoadScript('data-hd-personal-home','./personal-home.js'));
 
-  await Promise.all([sortieP,landP,fleetP,questP,commandP,eventP,expP,resourceP,exerciseP,guardP,activityP,sortieLogP,optimizeP,dailyP,stabilityP,mapRuntimeP,quickNavP]);
+  await Promise.all([sortieP,landP,fleetP,questP,commandP,eventP,expP,resourceP,exerciseP,guardP,activityP,sortieLogP,optimizeP,dailyP,stabilityP,mapRuntimeP,quickNavP,personalHomeP]);
   hdInitLoadedModules();
 }
 
