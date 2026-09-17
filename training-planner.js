@@ -54,10 +54,10 @@ function hdTrainingSummary(rows){
  return {active:active.length,done:done.length,remaining,nearest};
 }
 function hdTrainingGoGuide(id){
- if(id==='exercise'){document.getElementById('quests')?.scrollIntoView({behavior:'smooth',block:'start'});return}
- const map=id==='7-2-1'?'7-2':id.replace('-P','');const input=document.getElementById('guideQuery');if(input){input.value=map;document.getElementById('guideSearchBtn')?.click()}document.getElementById('guide')?.scrollIntoView({behavior:'smooth',block:'start'});
+ if(id==='exercise'){if(typeof hdWSShowElement==='function')hdWSShowElement('exerciseRoutine',true);else if(typeof hdQNJump==='function')hdQNJump('exerciseRoutine');else document.getElementById('quests')?.scrollIntoView({behavior:'smooth',block:'start'});return}
+ const map=id==='7-2-1'?'7-2':id.replace('-P','');const input=document.getElementById('guideQuery');if(input){input.value=map;document.getElementById('guideSearchBtn')?.click()}if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);else if(typeof hdQNJump==='function')hdQNJump('guide');else document.getElementById('guide')?.scrollIntoView({behavior:'smooth',block:'start'});
 }
-function hdTrainingEditShip(id){const ship=hdTrainingRoster().find(x=>x.id===id);if(ship&&typeof openShipRosterDialog==='function')openShipRosterDialog(ship);else document.getElementById('roster')?.scrollIntoView({behavior:'smooth'})}
+function hdTrainingEditShip(id){const ship=hdTrainingRoster().find(x=>x.id===id);if(ship&&typeof openShipRosterDialog==='function'){if(typeof hdWSShowElement==='function')hdWSShowElement('roster',false);openShipRosterDialog(ship)}else if(typeof hdWSShowElement==='function')hdWSShowElement('roster',true);else if(typeof hdQNJump==='function')hdQNJump('roster');else document.getElementById('roster')?.scrollIntoView({behavior:'smooth'})}
 function hdRenderTrainingPlanner(){
  const host=document.getElementById('hdTrainingList');if(!host)return;let rows=hdTrainingRows();
  const q=(document.getElementById('hdTrainingSearch')?.value||'').trim().toLowerCase();
