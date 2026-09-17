@@ -33,20 +33,22 @@ function hdGSRender(){
  host.innerHTML=rows.length?`<div class="hd-gs-count">${rows.length}件${rows.length===60?'（上位60件）':''}</div>${rows.map(r=>`<button type="button" class="hd-gs-result" data-hd-gs-result="${r.key}"><span class="hd-gs-kind">${hdGSLabel(r.type)}</span><span class="hd-gs-main"><b>${hdGSEsc(r.title)}</b><small>${hdGSEsc(r.subtitle)}</small></span><span class="hd-gs-arrow">›</span></button>`).join('')}`:'<div class="hd-gs-empty">一致する項目がないよ。別のキーワードも試してみて。</div>';
 }
 function hdGSSetCategory(cat){hdGSCategory=cat;document.querySelectorAll('[data-hd-gs-cat]').forEach(b=>b.classList.toggle('active',b.dataset.hdGsCat===cat));hdGSRender()}
-function hdGSEnsure(){
- if(document.getElementById('hdGlobalSearchDialog'))return;
- const d=document.createElement('dialog');d.id='hdGlobalSearchDialog';d.className='hd-gs-dialog';d.innerHTML=`<div class="hd-gs-head"><div><div class="eyebrow">GLOBAL SEARCH</div><h3>HarborDesk全体検索</h3></div><button type="button" class="ghost small" data-hd-gs-close>閉じる</button></div><div class="hd-gs-searchbox"><span>⌕</span><input id="hdGSSearch" type="search" autocomplete="off" placeholder="例：矢矧 / 6-5 / 東海 / あ号 / 東京急行"></div><div class="hd-gs-cats">${[['all','すべて'],['map','海域'],['ship','艦娘'],['equipment','装備'],['quest','任務'],['expedition','遠征'],['feature','機能']].map(([k,v])=>`<button type="button" class="ghost small${k==='all'?' active':''}" data-hd-gs-cat="${k}">${v}</button>`).join('')}</div><div id="hdGSResults" class="hd-gs-results"></div>`;document.body.appendChild(d);d.addEventListener('click',e=>{if(e.target===d)hdGSClose()});document.getElementById('hdGSSearch')?.addEventListener('input',hdGSRender);
+function hdGSAttachLaunchers(){
  const qn=document.querySelector('#hdQuickNavDialog .hd-qn-tools');if(qn&&!qn.querySelector('[data-hd-gs-open]')){const b=document.createElement('button');b.type='button';b.className='primary small';b.dataset.hdGsOpen='1';b.textContent='全体検索';qn.appendChild(b)}
- const ph=document.querySelector('#hdPersonalHome .hd-ph-head');if(ph&&!ph.querySelector('[data-hd-gs-open]')){const b=document.createElement('button');b.type='button';b.className='ghost small';b.dataset.hdGsOpen='1';b.textContent='⌕ 全体検索';ph.appendChild(b)}
- hdGSRender();
+ const ph=document.querySelector('#hdPersonalHome .section-head');if(ph&&!ph.querySelector('[data-hd-gs-open]')){const b=document.createElement('button');b.type='button';b.className='ghost small';b.dataset.hdGsOpen='1';b.textContent='⌕ 全体検索';ph.appendChild(b)}
+}
+function hdGSEnsure(){
+ let d=document.getElementById('hdGlobalSearchDialog');
+ if(!d){d=document.createElement('dialog');d.id='hdGlobalSearchDialog';d.className='hd-gs-dialog';d.innerHTML=`<div class="hd-gs-head"><div><div class="eyebrow">GLOBAL SEARCH</div><h3>HarborDesk全体検索</h3></div><button type="button" class="ghost small" data-hd-gs-close>閉じる</button></div><div class="hd-gs-searchbox"><span>⌕</span><input id="hdGSSearch" type="search" autocomplete="off" placeholder="例：矢矧 / 6-5 / 東海 / あ号 / 東京急行"></div><div class="hd-gs-cats">${[['all','すべて'],['map','海域'],['ship','艦娘'],['equipment','装備'],['quest','任務'],['expedition','遠征'],['feature','機能']].map(([k,v])=>`<button type="button" class="ghost small${k==='all'?' active':''}" data-hd-gs-cat="${k}">${v}</button>`).join('')}</div><div id="hdGSResults" class="hd-gs-results"></div>`;document.body.appendChild(d);d.addEventListener('click',e=>{if(e.target===d)hdGSClose()});document.getElementById('hdGSSearch')?.addEventListener('input',hdGSRender)}
+ hdGSAttachLaunchers();hdGSRender();
 }
 function hdGSOpen(query=''){hdGSEnsure();if(typeof hdQNClose==='function')hdQNClose();const d=document.getElementById('hdGlobalSearchDialog'),i=document.getElementById('hdGSSearch');if(i)i.value=query;hdGSCategory='all';document.querySelectorAll('[data-hd-gs-cat]').forEach(b=>b.classList.toggle('active',b.dataset.hdGsCat==='all'));hdGSRender();if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');setTimeout(()=>i?.focus(),50)}
 function hdGSClose(){const d=document.getElementById('hdGlobalSearchDialog');if(!d)return;if(typeof d.close==='function'&&d.open)d.close();else d.removeAttribute('open')}
-function hdGSScroll(id){hdGSClose();setTimeout(()=>{if(typeof hdQNJump==='function')hdQNJump(id);else document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})},30)}
+function hdGSScroll(id){hdGSClose();setTimeout(()=>{if(typeof hdQNJump==='function')hdQNJump(id);else if(typeof hdWSShowElement==='function')hdWSShowElement(id,true);else document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})},30)}
 function hdGSOpenResult(row){
  if(!row)return;const a=row.action;hdGSSaveHistory(document.getElementById('hdGSSearch')?.value||row.title);
  if(a.kind==='feature'){hdGSScroll(a.id);return}
- if(a.kind==='map'){try{selectedWorld=String(a.map).split('-')[0];selectedMap=a.map;if(typeof renderMapPicker==='function')renderMapPicker();hdGSClose();setTimeout(()=>document.getElementById('selectedMapCard')?.scrollIntoView({behavior:'smooth',block:'start'}),40)}catch{}return}
+ if(a.kind==='map'){try{if(typeof hdWSShowElement==='function')hdWSShowElement('guide',false);selectedWorld=String(a.map).split('-')[0];selectedMap=a.map;if(typeof renderMapPicker==='function')renderMapPicker();hdGSClose();setTimeout(()=>document.getElementById('selectedMapCard')?.scrollIntoView({behavior:'smooth',block:'start'}),60)}catch{}return}
  if(a.kind==='ship'){try{if(typeof hdEnsureShipDatabase==='function')hdEnsureShipDatabase();hdShipDbType='すべて';hdShipDbMissingOnly=false;const cb=document.getElementById('hdShipDbMissingOnly');if(cb)cb.checked=false;const i=document.getElementById('hdShipDbSearch');if(i)i.value=a.name;if(typeof hdRenderShipDatabase==='function')hdRenderShipDatabase();hdGSScroll('shipDatabase')}catch{}return}
  if(a.kind==='roster'){hdGSScroll('roster');return}
  if(a.kind==='equipment'){try{if(typeof hdEnsureEquipmentCatalog==='function')hdEnsureEquipmentCatalog();hdEquipCatalogFilter='すべて';const i=document.getElementById('hdEquipCatalogSearch');if(i)i.value=a.name;if(typeof hdRenderEquipmentCatalog==='function')hdRenderEquipmentCatalog();hdGSScroll('equipmentBook')}catch{}return}
@@ -55,6 +57,7 @@ function hdGSOpenResult(row){
  if(a.kind==='expedition'){try{if(typeof hdEnsureExpeditionDb==='function')hdEnsureExpeditionDb();hdExpGoal='all';hdExpSearch=a.id;const i=document.getElementById('hdExpSearch');if(i)i.value=a.id;document.querySelectorAll('[data-hd-exp-goal]').forEach(b=>b.classList.toggle('active',b.dataset.hdExpGoal==='all'));if(typeof hdRenderExpeditionDb==='function')hdRenderExpeditionDb();hdGSScroll('expeditions')}catch{}return}
 }
 document.addEventListener('click',e=>{if(e.target.closest?.('[data-hd-gs-open]')){hdGSOpen();return}if(e.target.closest?.('[data-hd-gs-close]')){hdGSClose();return}const c=e.target.closest?.('[data-hd-gs-cat]');if(c){hdGSSetCategory(c.dataset.hdGsCat);return}const h=e.target.closest?.('[data-hd-gs-history]');if(h){const i=document.getElementById('hdGSSearch');if(i)i.value=h.dataset.hdGsHistory;hdGSRender();return}const r=e.target.closest?.('[data-hd-gs-result]');if(r)hdGSOpenResult(hdGSResults.get(r.dataset.hdGsResult))});
+window.addEventListener('hd:quick-nav-updated',()=>hdGSAttachLaunchers());
 window.addEventListener('hd:modules-ready',()=>setTimeout(hdGSEnsure,0));
 window.addEventListener('load',()=>setTimeout(hdGSEnsure,1100));
 setTimeout(hdGSEnsure,1800);
