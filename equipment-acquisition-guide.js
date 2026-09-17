@@ -50,8 +50,8 @@ function hdAGCandidates(kind){
   return hdAGScore(b)-hdAGScore(a);
  }).slice(0,8);
 }
-function hdAGRecipeHtml(r){
- return `<div class="hd-ag-recipe"><strong>${hdAGEsc(r.title)}</strong><span>燃${r.fuel} / 弾${r.ammo} / 鋼${r.steel} / ボ${r.bauxite}</span><small>秘書艦: ${hdAGEsc(r.secretary)}｜${hdAGEsc(r.rates||'')}</small><button type="button" class="ghost small" data-hd-ag-development="${hdAGEsc((r.targets||[])[0]||'')}">開発レシピへ</button></div>`;
+function hdAGRecipeHtml(r,target=''){
+ return `<div class="hd-ag-recipe"><strong>${hdAGEsc(r.title)}</strong><span>燃${r.fuel} / 弾${r.ammo} / 鋼${r.steel} / ボ${r.bauxite}</span><small>秘書艦: ${hdAGEsc(r.secretary)}｜${hdAGEsc(r.rates||'')}</small><button type="button" class="ghost small" data-hd-ag-development="${hdAGEsc(target||(r.targets||[])[0]||'')}">開発レシピへ</button></div>`;
 }
 function hdAGCandidateHtml(item){
  const own=hdAGOwned(item.name),method=hdAGMethod(item),recipes=hdAGRecipesFor(item.name),sources=hdAGUpdateSources(item.name);
@@ -63,7 +63,7 @@ function hdAGCandidateHtml(item){
   <div class="hd-ag-head"><div><strong>${hdAGEsc(item.name)}</strong><span>${hdAGEsc(item.category||'')}</span></div><div class="hd-ag-badges"><b class="${method.key}">${method.label}</b><em>${own.count>0?`所持 ${own.count}${own.maxStar?` / ★${own.maxStar}`:''}`:'未所持'}</em></div></div>
   <p class="hd-ag-role">${hdAGEsc(item.role||'')}</p>
   <div class="hd-ag-info"><div><span>入手</span><strong>${hdAGEsc(item.obtain||'情報整理中')}</strong></div><div><span>更新・補足</span><strong>${hdAGEsc(item.update||'なし')}</strong></div></div>
-  ${recipes.map(hdAGRecipeHtml).join('')}
+  ${recipes.map(r=>hdAGRecipeHtml(r,item.name)).join('')}
   ${sourceHtml}
   <div class="hd-ag-actions">${action}<button type="button" class="ghost small" data-hd-ag-catalog="${hdAGEsc(item.name)}">図鑑で詳細</button></div>
  </article>`;
@@ -74,10 +74,11 @@ function hdAGEnsureDialog(){
  d.innerHTML=`<div class="hd-ag-shell"><div class="hd-ag-title"><div><div class="eyebrow">ACQUISITION GUIDE</div><h3 id="hdAcquisitionTitle">不足装備の入手ルート</h3></div><button type="button" class="ghost small" data-hd-ag-close>閉じる</button></div><p id="hdAcquisitionNote" class="muted"></p><div id="hdAcquisitionList" class="hd-ag-list"></div></div>`;
  document.body.appendChild(d);
 }
+function hdAGKindLabel(kind){if(kind==='高速化')return '高速化セット';if(kind==='基地航空隊')return '基地航空隊';return typeof HD_SORTIE_EQUIP_RULES!=='undefined'&&HD_SORTIE_EQUIP_RULES[kind]?.label?HD_SORTIE_EQUIP_RULES[kind].label:kind}
 function hdAGOpen(kind,map=''){
  hdAGEnsureDialog();
  const d=document.getElementById('hdAcquisitionDialog'),list=document.getElementById('hdAcquisitionList'),title=document.getElementById('hdAcquisitionTitle'),note=document.getElementById('hdAcquisitionNote');
- const label=typeof HD_SORTIE_EQUIP_RULES!=='undefined'&&HD_SORTIE_EQUIP_RULES[kind]?.label?HD_SORTIE_EQUIP_RULES[kind].label:kind;
+ const label=hdAGKindLabel(kind);
  if(title)title.textContent=`${map?map+'｜':''}${label}の入手ルート`;
  if(note)note.textContent='入手しやすい候補を優先して表示。開発率や任務・改修条件は変更されることがあるため、最終確認は装備図鑑/Wikiも使ってね。';
  const rows=hdAGCandidates(kind);
