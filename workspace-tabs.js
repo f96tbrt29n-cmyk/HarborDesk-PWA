@@ -24,6 +24,7 @@ let hdWSObserver=null;
 let hdWSApplying=false;
 let hdWSRefreshTimer=0;
 let hdWSNavLockUntil=0;
+let hdWSNavSeq=0;
 let hdWSTouch=null;
 
 function hdWSLoad(){try{const v=JSON.parse(localStorage.getItem(HD_WS_KEY)||'{}');return {group:v.group||'home',sections:v.sections||{}}}catch{return {group:'home',sections:{}}}}
@@ -94,6 +95,7 @@ function hdWSUpdateWrappers(){
 }
 function hdWSUnhideAncestors(el){for(let p=el?.parentElement;p&&p!==document.body;p=p.parentElement){if(p.classList?.contains('hd-ws-wrapper-hidden'))p.classList.remove('hd-ws-wrapper-hidden')}}
 function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
+ if(!opts.preserveNavSeq)hdWSNavSeq++;
  if(hdWSApplying)return;hdWSApplying=true;
  try{
   hdWSEnsureUI();hdWSSections();
@@ -115,10 +117,10 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
 function hdWSShowElement(target,scroll=true){
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
  const section=hdWSManagedSectionFor(el);if(!section)return false;const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
- clearTimeout(hdWSRefreshTimer);hdWSNavLockUntil=Date.now()+300;
- const apply=()=>{hdWSApply(group,section.id);section.classList.remove('hd-ws-hidden');hdWSUnhideAncestors(section)};
+ clearTimeout(hdWSRefreshTimer);hdWSNavLockUntil=Date.now()+300;const navSeq=++hdWSNavSeq;
+ const apply=()=>{if(navSeq!==hdWSNavSeq)return false;hdWSApply(group,section.id,{preserveNavSeq:true});section.classList.remove('hd-ws-hidden');hdWSUnhideAncestors(section);return true};
  if(hdWSApplying)setTimeout(apply,0);else apply();
- setTimeout(()=>{apply();if(scroll)el.scrollIntoView({behavior:'smooth',block:'start'})},50);
+ setTimeout(()=>{if(apply()&&scroll)el.scrollIntoView({behavior:'smooth',block:'start'})},50);
  return true;
 }
 function hdWSPatchQuickNav(){if(window.__hdWSQuickPatched||typeof window.hdQNJump!=='function')return;window.__hdWSQuickPatched=true;const old=window.hdQNJump;window.hdQNJump=function(id){const target=document.getElementById(id);if(target){hdWSShowElement(target,false);setTimeout(()=>old(id),70)}else old(id)}}
