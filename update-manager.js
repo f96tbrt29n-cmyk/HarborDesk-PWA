@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.58';
-const HD_APP_BUILD=58;
+const HD_APP_VERSION='1.0.59';
+const HD_APP_BUILD=59;
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 
 async function hdFetchLatestVersion(){
@@ -47,6 +47,7 @@ function hdInitLoadedModules(){
   try{if(typeof hdQNEnsure==='function')hdQNEnsure()}catch{}
   try{if(typeof hdPHEnsure==='function')hdPHEnsure();if(typeof hdPHInstallBackupHooks==='function')hdPHInstallBackupHooks()}catch{}
   try{if(typeof hdGSEnsure==='function')hdGSEnsure()}catch{}
+  try{if(typeof hdWSInstall==='function')hdWSInstall()}catch{}
   window.dispatchEvent(new CustomEvent('hd:modules-ready',{detail:{status:{...window.HD_MODULE_STATUS}}}));
 }
 async function hdLoadCurrentAssets(){
@@ -55,7 +56,8 @@ async function hdLoadCurrentAssets(){
    ['data-hd-exp-fleet','./expedition-fleet-manager.css'],['data-hd-exp-stats','./expedition-stats-extension.css'],['data-hd-support-fleet','./support-fleet-planner.css'],
    ['data-hd-quest-progress','./quest-progress-extension.css'],['data-hd-command-center','./command-center.css'],['data-hd-resource-budget','./resource-budget.css'],
    ['data-hd-exercise-routine','./exercise-routine.css'],['data-hd-activity-logger','./activity-logger.css'],['data-hd-sortie-log','./sortie-log.css'],
-   ['data-hd-grand-ops','./grand-operations.css'],['data-hd-quick-nav','./quick-nav.css'],['data-hd-personal-home','./personal-home.css'],['data-hd-global-search','./global-search.css']
+   ['data-hd-grand-ops','./grand-operations.css'],['data-hd-quick-nav','./quick-nav.css'],['data-hd-personal-home','./personal-home.css'],['data-hd-global-search','./global-search.css'],
+   ['data-hd-workspace-tabs','./workspace-tabs.css']
   ].forEach(([a,h])=>hdAppendStyle(a,h));
 
   const sortieP=hdLoadScript('data-hd-sortie-ready','./sortie-readiness.js');
@@ -87,8 +89,9 @@ async function hdLoadCurrentAssets(){
   const quickNavP=Promise.all([eventP,optimizeP,dailyP]).then(()=>hdLoadScript('data-hd-quick-nav','./quick-nav.js'));
   const personalHomeP=Promise.all([quickNavP,dailyP,stabilityP]).then(()=>hdLoadScript('data-hd-personal-home','./personal-home.js'));
   const globalSearchP=Promise.all([quickNavP,personalHomeP,questP,expP]).then(()=>hdLoadScript('data-hd-global-search','./global-search.js'));
+  const workspaceP=Promise.all([globalSearchP,mapRuntimeP,personalHomeP]).then(()=>hdLoadScript('data-hd-workspace-tabs','./workspace-tabs.js'));
 
-  await Promise.all([sortieP,landP,fleetP,questP,commandP,eventP,expP,resourceP,exerciseP,guardP,activityP,sortieLogP,optimizeP,dailyP,stabilityP,mapRuntimeP,quickNavP,personalHomeP,globalSearchP]);
+  await Promise.all([sortieP,landP,fleetP,questP,commandP,eventP,expP,resourceP,exerciseP,guardP,activityP,sortieLogP,optimizeP,dailyP,stabilityP,mapRuntimeP,quickNavP,personalHomeP,globalSearchP,workspaceP]);
   hdInitLoadedModules();
 }
 
