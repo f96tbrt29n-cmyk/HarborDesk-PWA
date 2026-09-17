@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="map-details.css">
   <link rel="stylesheet" href="map-plans.css">
+  <link rel="stylesheet" href="custom-fleets.css">
 </head>
 <body id="top">
   <header class="topbar"><div><div class="eyebrow">艦これ 提督補助</div><h1>HarborDesk</h1></div><button id="notifyBtn" class="ghost">通知を許可</button></header>
@@ -24,7 +25,7 @@
       <div class="map-picker card">
         <div class="eyebrow">通常海域</div>
         <h3>攻略海域を選択</h3>
-        <p class="muted map-picker-note">海域をタップすると、その海域の攻略要点・編成例・関連任務をアプリ内で表示するよ。</p>
+        <p class="muted map-picker-note">海域をタップすると、攻略要点・編成例・関連任務・自分用編成をまとめて表示するよ。</p>
         <div id="worldPicker" class="world-picker"></div>
         <div id="mapPicker" class="map-grid"></div>
         <div id="selectedMapCard" class="selected-map-card"></div>
@@ -39,7 +40,7 @@
     <section id="docks"><div class="section-head"><h2>入渠タイマー</h2><button id="addDock" class="primary small">＋追加</button></div><div id="dockList" class="stack"></div></section>
     <section id="quests"><div class="section-head"><h2>任務チェック</h2><button id="addQuest" class="primary small">＋追加</button></div><div id="questList" class="stack"></div></section>
     <section id="resources"><div class="section-head"><h2>資源メモ</h2><span class="muted">端末内保存</span></div><div class="resource-grid"><label>燃料<input id="fuel" inputmode="numeric" type="number" min="0"></label><label>弾薬<input id="ammo" inputmode="numeric" type="number" min="0"></label><label>鋼材<input id="steel" inputmode="numeric" type="number" min="0"></label><label>ボーキ<input id="bauxite" inputmode="numeric" type="number" min="0"></label></div><button id="saveResources" class="primary full">資源を保存</button><div id="resourceSaved" class="saved muted"></div></section>
-    <section class="card note"><strong>使い方</strong><p>攻略海域は上のボタンから選択。通常海域はアプリ内攻略要点に対応済みで、主要海域は複数の編成例と関連任務も表示する。タイマー・任務・資源はこのiPhone内に保存される。重要な出撃前は元Wikiの最新情報も確認してね。</p></section>
+    <section class="card note"><strong>使い方</strong><p>攻略海域を選ぶと、攻略要点・編成例・関連任務に加えて自分用編成も保存できる。自分用編成、タイマー、任務、資源はこのiPhone内に保存される。重要な出撃前は元Wikiの最新情報も確認してね。</p></section>
   </main>
 
   <nav class="bottom-nav"><a href="#guide">攻略</a><a href="#expeditions">遠征</a><a href="#quests">任務</a><a href="#resources">資源</a></nav>
@@ -51,5 +52,6 @@
   <script src="map-details-34.js"></script>
   <script src="map-details-57.js"></script>
   <script src="map-plans.js"></script>
+  <script src="custom-fleets.js"></script>
 </body>
 </html>
