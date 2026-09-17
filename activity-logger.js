@@ -2,11 +2,11 @@ const HD_ACTIVITY_LOG_KEY='harbordesk-activity-log-v1';
 
 const HD_ACTIVITY_ACTIONS=[
  {id:'sortie',group:'出撃',icon:'🚢',label:'出撃開始 +1',note:'あ号「出撃」',targets:[['Bw1',0]]},
- {id:'battle',group:'出撃',icon:'⚔️',label:'戦闘 +1',note:'勝敗を問わない戦闘',targets:[['Bd2',0],['Bd3',0]]},
+ {id:'battle',group:'出撃',icon:'⚔️',label:'戦闘（勝利以外）+1',note:'敗北・撤退前など。勝利/S勝利ボタンとは重ねて押さない',targets:[['Bd2',0],['Bd3',0]]},
  {id:'win',group:'出撃',icon:'🏆',label:'戦闘勝利 +1',note:'通常勝利＋戦闘として記録',targets:[['Bd1',0],['Bd2',0],['Bd3',0]]},
  {id:'swin',group:'出撃',icon:'✨',label:'S勝利 +1',note:'勝利・戦闘・あ号S勝利',targets:[['Bd1',0],['Bd2',0],['Bd3',0],['Bw1',1]]},
  {id:'boss-arrive',group:'出撃',icon:'📍',label:'ボス到達 +1',note:'あ号「ボス到達」',targets:[['Bw1',2]]},
- {id:'boss-win',group:'出撃',icon:'👑',label:'ボス勝利 +1',note:'あ号「ボス勝利」',targets:[['Bw1',3]]},
+ {id:'boss-win',group:'出撃',icon:'👑',label:'ボス勝利 +1',note:'ボス到達＋ボス勝利をまとめて記録',targets:[['Bw1',2],['Bw1',3]]},
  {id:'southwest-boss',group:'撃沈・海域',icon:'🌊',label:'南西ボス勝利 +1',note:'2-1〜2-5のボスB勝利以上',targets:[['Bd7',0]]},
  {id:'carrier-kill',group:'撃沈・海域',icon:'✈️',label:'空母撃沈 +1',note:'敵空母/軽空母',targets:[['Bd4',0],['Bw2',0]]},
  {id:'transport-kill',group:'撃沈・海域',icon:'📦',label:'補給艦撃沈 +1',note:'デイリー/ウィークリー輸送艦系',targets:[['Bd5',0],['Bd6',0],['Bw3',0],['Bw4',0]]},
@@ -49,5 +49,5 @@ function hdALRender(){
 }
 function hdALEnsure(){if(document.getElementById('activityLogger'))return;const anchor=document.getElementById('exerciseRoutine')||document.getElementById('questDatabase')||document.getElementById('quests');if(!anchor)return;const sec=document.createElement('section');sec.id='activityLogger';sec.className='advanced-section hd-al-section';sec.innerHTML='<div id="hdActivityLogger"></div>';anchor.insertAdjacentElement('beforebegin',sec);hdALRender()}
 
-document.addEventListener('click',e=>{const g=e.target.closest?.('[data-hd-al-group]');if(g){hdALGroup=g.dataset.hdAlGroup;hdALRender();return}const a=e.target.closest?.('[data-hd-al-action]');if(a){hdALRecord(a.dataset.hdAlAction);return}const u=e.target.closest?.('[data-hd-al-undo]');if(u){hdALUndo(u.dataset.hdAlUndo);return}if(e.target.closest?.('[data-hd-al-quests]'))document.getElementById('questDatabase')?.scrollIntoView({behavior:'smooth',block:'start'})});
+document.addEventListener('click',e=>{const g=e.target.closest?.('[data-hd-al-group]');if(g){hdALGroup=g.dataset.hdAlGroup;hdALRender();return}const a=e.target.closest?.('[data-hd-al-action]');if(a){hdALRecord(a.dataset.hdAlAction);return}const u=e.target.closest?.('[data-hd-al-undo]');if(u){hdALUndo(u.dataset.hdAlUndo);return}if(e.target.closest?.('[data-hd-al-quests]')){if(typeof hdWSShowElement==='function')hdWSShowElement('questDatabase',true);else if(typeof hdQNJump==='function')hdQNJump('questDatabase');else document.getElementById('questDatabase')?.scrollIntoView({behavior:'smooth',block:'start'})}});
 window.addEventListener('load',()=>setTimeout(()=>{hdALEnsure();hdALRender()},1200));setTimeout(hdALEnsure,1600);window.addEventListener('storage',()=>setTimeout(hdALRender,0));
