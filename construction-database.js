@@ -61,6 +61,7 @@ function hdConstructionOwnedSet(){
 }
 function hdConstructionTimers(){try{return JSON.parse(localStorage.getItem(HD_CONSTRUCTION_TIMER_KEY)||'[]')||[]}catch{return []}}
 function hdSaveConstructionTimers(v){localStorage.setItem(HD_CONSTRUCTION_TIMER_KEY,JSON.stringify(v))}
+function hdConstructionNotify(){try{if(typeof hdCCRender==='function')hdCCRender();if(typeof renderHomeDashboard==='function')renderHomeDashboard();window.dispatchEvent(new CustomEvent('hd:workspace-refresh'))}catch{}}
 function hdConstructionFmt(ms){if(ms<=0)return '完了';const sec=Math.ceil(ms/1000),h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`}
 function hdConstructionCost(r){return `${r.fuel}/${r.ammo}/${r.steel}/${r.bauxite}${r.dev!=null?`｜開発資材 ${r.dev}`:''}`}
 function hdConstructionTargets(r){
@@ -94,7 +95,7 @@ function renderConstructionTimers(){
  host.innerHTML=rows.length?`<div class="hd-build-timer-title"><strong>建造タイマー</strong><span>${rows.length}件</span></div>${rows.map(t=>`<div class="hd-build-timer-row ${t.endsAt<=now?'done':''}"><div><strong>${hdConstructionEsc(t.name)}</strong><span data-hd-build-end="${t.endsAt}">${hdConstructionFmt(t.endsAt-now)}</span></div><button class="icon-btn" data-hd-build-delete="${t.id}">×</button></div>`).join('')}`:'';
 }
 function hdStartConstructionTimer(min,label){
- const rows=hdConstructionTimers();rows.push({id:crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2),name:`建造 ${label}`,endsAt:Date.now()+Number(min)*60000});hdSaveConstructionTimers(rows);renderConstructionTimers();
+ const rows=hdConstructionTimers();rows.push({id:crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2),name:`建造 ${label}`,endsAt:Date.now()+Number(min)*60000});hdSaveConstructionTimers(rows);renderConstructionTimers();hdConstructionNotify();
 }
 async function hdCopyConstructionRecipe(id){
  const r=HD_CONSTRUCTION_RECIPES.find(x=>x.id===id);if(!r)return;const text=hdConstructionCost(r);try{await navigator.clipboard.writeText(text)}catch{};alert(`コピーしたよ: ${text}`)
@@ -103,7 +104,7 @@ document.addEventListener('click',e=>{
  const mode=e.target.closest?.('[data-hd-build-mode]');if(mode){hdConstructionMode=mode.dataset.hdBuildMode;renderConstructionDb();return}
  const copy=e.target.closest?.('[data-hd-copy-build]');if(copy){hdCopyConstructionRecipe(copy.dataset.hdCopyBuild);return}
  const timer=e.target.closest?.('[data-hd-build-timer]');if(timer){hdStartConstructionTimer(timer.dataset.hdBuildTimer,timer.dataset.hdBuildLabel);return}
- const del=e.target.closest?.('[data-hd-build-delete]');if(del){hdSaveConstructionTimers(hdConstructionTimers().filter(x=>x.id!==del.dataset.hdBuildDelete));renderConstructionTimers();return}
+ const del=e.target.closest?.('[data-hd-build-delete]');if(del){hdSaveConstructionTimers(hdConstructionTimers().filter(x=>x.id!==del.dataset.hdBuildDelete));renderConstructionTimers();hdConstructionNotify();return}
 });
 document.addEventListener('input',e=>{if(e.target.id==='hdConstructionSearch')renderConstructionDb()});
 setInterval(()=>{
