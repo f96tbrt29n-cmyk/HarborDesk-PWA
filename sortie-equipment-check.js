@@ -30,7 +30,7 @@ function hdSEOwnedTypes(items){return (items||[]).filter(x=>(hdSEOwned(x.name).c
 function hdSEFastCheck(){
  const items=typeof HD_EQUIPMENT_CATALOG!=='undefined'?HD_EQUIPMENT_CATALOG:[];
  const turbines=items.filter(x=>/タービン/.test(x.name)||(x.tags||[]).includes('タービン'));
- const cans=items.filter(x=>/缶$/.test(x.name)||(x.tags||[]).includes('機関'));
+ const cans=items.filter(x=>!/タービン/.test(x.name)&&(/缶$/.test(x.name)||(x.tags||[]).some(t=>String(t).includes('缶'))));
  const turbineCount=hdSEOwnedCount(turbines),canCount=hdSEOwnedCount(cans);
  return {kind:'高速化',label:'高速化セット',count:Math.min(turbineCount,canCount),minCount:1,ownedTypes:[...hdSEOwnedTypes(turbines),...hdSEOwnedTypes(cans)],candidates:[...turbines,...cans],status:turbineCount>0&&canCount>0?'ready':(turbineCount>0||canCount>0?'partial':'missing'),detail:`タービン ${turbineCount} / 缶 ${canCount}`,hint:'高速化はタービン＋缶の組み合わせが基本。艦ごとの速力条件も確認'};
 }
