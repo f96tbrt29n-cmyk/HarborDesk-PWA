@@ -88,7 +88,7 @@ function hdRenderMapEquipmentRecommendations(){
 function hdOpenEquipmentDb(name=''){
   const target=document.getElementById('equipmentBook');
   if(!target)return;
-  target.scrollIntoView({behavior:'smooth',block:'start'});
+  if(typeof hdWSShowElement==='function')hdWSShowElement('equipmentBook',true);else if(typeof hdQNJump==='function')hdQNJump('equipmentBook');else target.scrollIntoView({behavior:'smooth',block:'start'});
   setTimeout(()=>{
     const input=document.getElementById('hdEquipCatalogSearch');
     if(input&&name){input.value=name;if(typeof hdRenderEquipmentCatalog==='function')hdRenderEquipmentCatalog();input.focus()}
