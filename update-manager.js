@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.51';
-const HD_APP_BUILD=51;
+const HD_APP_VERSION='1.0.52';
+const HD_APP_BUILD=52;
 
 async function hdFetchLatestVersion(){
   const res=await fetch(`./app-version.json?t=${Date.now()}`,{cache:'no-store'});
@@ -43,7 +43,11 @@ function hdLoadCurrentAssets(){
       hdAppendScript('data-hd-exercise-routine','./exercise-routine.js',()=>{
         hdAppendScript('data-hd-quest-acceptance','./quest-acceptance-guard.js',()=>{
           hdAppendStyle('data-hd-activity-logger','./activity-logger.css');
-          hdAppendScript('data-hd-activity-logger','./activity-logger.js',()=>setTimeout(()=>{if(typeof hdEREnsure==='function')hdEREnsure();if(typeof hdERRender==='function')hdERRender();if(typeof hdALEnsure==='function')hdALEnsure();if(typeof hdALRender==='function')hdALRender();if(typeof hdCCRender==='function')hdCCRender()},0));
+          hdAppendScript('data-hd-activity-logger','./activity-logger.js',()=>{
+            hdAppendStyle('data-hd-sortie-log','./sortie-log.css');
+            hdAppendScript('data-hd-sortie-log','./sortie-log.js',()=>setTimeout(()=>{if(typeof hdSLEnsure==='function')hdSLEnsure();if(typeof hdSLRender==='function')hdSLRender()},0));
+            setTimeout(()=>{if(typeof hdEREnsure==='function')hdEREnsure();if(typeof hdERRender==='function')hdERRender();if(typeof hdALEnsure==='function')hdALEnsure();if(typeof hdALRender==='function')hdALRender();if(typeof hdCCRender==='function')hdCCRender()},0);
+          });
         });
       });
     });
