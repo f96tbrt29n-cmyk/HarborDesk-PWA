@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.52';
-const HD_APP_BUILD=52;
+const HD_APP_VERSION='1.0.53';
+const HD_APP_BUILD=53;
 
 async function hdFetchLatestVersion(){
   const res=await fetch(`./app-version.json?t=${Date.now()}`,{cache:'no-store'});
@@ -45,7 +45,28 @@ function hdLoadCurrentAssets(){
           hdAppendStyle('data-hd-activity-logger','./activity-logger.css');
           hdAppendScript('data-hd-activity-logger','./activity-logger.js',()=>{
             hdAppendStyle('data-hd-sortie-log','./sortie-log.css');
-            hdAppendScript('data-hd-sortie-log','./sortie-log.js',()=>setTimeout(()=>{if(typeof hdSLEnsure==='function')hdSLEnsure();if(typeof hdSLRender==='function')hdSLRender()},0));
+            hdAppendScript('data-hd-sortie-log','./sortie-log.js',()=>{
+              hdAppendStyle('data-hd-grand-ops','./grand-operations.css');
+              hdAppendScript('data-hd-event-ops','./event-operations.js',()=>{
+                hdAppendScript('data-hd-optimization','./optimization-tools.js',()=>{
+                  hdAppendScript('data-hd-daily-ops','./daily-ops.js',()=>setTimeout(()=>{
+                    if(typeof hdEOpsEnsure==='function')hdEOpsEnsure();
+                    if(typeof hdProfileEnsure==='function')hdProfileEnsure();
+                    if(typeof hdVariantEnsure==='function')hdVariantEnsure();
+                    if(typeof hdOptImproveEnsure==='function')hdOptImproveEnsure();
+                    if(typeof hdOptExpEnsure==='function')hdOptExpEnsure();
+                    if(typeof hdOptCostEnsure==='function')hdOptCostEnsure();
+                    if(typeof hdOptFarmEnsure==='function')hdOptFarmEnsure();
+                    if(typeof hdOptRankEnsure==='function')hdOptRankEnsure();
+                    if(typeof hdDOEnsure==='function')hdDOEnsure();
+                    if(typeof hdDONotifyEnsure==='function')hdDONotifyEnsure();
+                    if(typeof hdDOAuditEnsure==='function')hdDOAuditEnsure();
+                    if(typeof hdCCRender==='function')hdCCRender();
+                  },0));
+                });
+              });
+              setTimeout(()=>{if(typeof hdSLEnsure==='function')hdSLEnsure();if(typeof hdSLRender==='function')hdSLRender()},0);
+            });
             setTimeout(()=>{if(typeof hdEREnsure==='function')hdEREnsure();if(typeof hdERRender==='function')hdERRender();if(typeof hdALEnsure==='function')hdALEnsure();if(typeof hdALRender==='function')hdALRender();if(typeof hdCCRender==='function')hdCCRender()},0);
           });
         });
