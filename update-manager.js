@@ -135,6 +135,7 @@ async function hdCheckForUpdate(showResult=false){
 }
 async function hdForceUpdate(){
   const btn=document.getElementById('hdUpdateNow');
+  if(!navigator.onLine){alert('オフライン中はアプリキャッシュを再構築できないよ。通信できる状態で「更新確認」または「キャッシュ再構築」を使ってね。');return false}
   try{
     if(btn){btn.disabled=true;btn.textContent='更新中…'}
     if('serviceWorker' in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.update().catch(()=>null)))}
