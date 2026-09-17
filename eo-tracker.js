@@ -36,7 +36,7 @@ function hdEOSyncMedals(){
  const add=eligible.reduce((a,m)=>a+m.medal,0);stock.medal=(Number(stock.medal)||0)+add;localStorage.setItem('harbordesk-material-stock-v1',JSON.stringify(stock));s.credited.push(...eligible.map(m=>m.id));hdEOSave(s);if(typeof hdMatRenderInventory==='function')hdMatRenderInventory();alert(`完了EO ${eligible.length}海域分の勲章 ${add}個を素材在庫へ反映したよ`);hdEORender();
 }
 function hdEOResetCurrent(){if(!confirm('今月のEO進捗を0に戻す？ 素材在庫へ反映済みの勲章数は減らさず、反映済み記録も保持するよ。'))return;const s=hdEOLoad();s.maps={};hdEOSave(s);hdEORender()}
-function hdEOGoGuide(mapId){const input=document.getElementById('guideQuery');if(input){input.value=mapId;input.dispatchEvent(new Event('input',{bubbles:true}));document.getElementById('guideSearchBtn')?.click()}document.getElementById('guide')?.scrollIntoView({behavior:'smooth',block:'start'})}
+function hdEOGoGuide(mapId){const input=document.getElementById('guideQuery');if(input){input.value=mapId;input.dispatchEvent(new Event('input',{bubbles:true}));document.getElementById('guideSearchBtn')?.click()}if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);else if(typeof hdQNJump==='function')hdQNJump('guide');else document.getElementById('guide')?.scrollIntoView({behavior:'smooth',block:'start'})}
 function hdEORender(){
  const list=document.getElementById('hdEOList');if(!list)return;const s=hdEOLoad(),sum=hdEOSummary(s);const totalScore=HD_EO_MAPS.reduce((a,m)=>a+m.score,0),totalMedals=HD_EO_MAPS.reduce((a,m)=>a+m.medal,0),creditable=HD_EO_MAPS.filter(m=>hdEOComplete(m,s)&&!s.credited.includes(m.id)).length;
  const month=document.getElementById('hdEOMonth');if(month)month.textContent=`${s.month.replace('-','年')}月`;
