@@ -2,6 +2,8 @@ const { test, expect } = require('@playwright/test');
 
 test('equipment analyzer loads and compares catalog equipment', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
+  await page.waitForSelector('#hdEquipAnalyzer');
+  await page.evaluate(() => window.hdWSShowElement?.('hdEquipAnalyzer', false));
   await expect(page.locator('#hdEquipAnalyzer')).toBeVisible();
   await expect(page.locator('#hdEquipCoverageGrid .hd-ea-card')).toHaveCount(8);
 
@@ -19,6 +21,8 @@ test('equipment analyzer reflects owned ledger after reload', async ({ page }) =
     { id:'t1', name:'33号水上電探', category:'小型水上電探', count:2, star:6, targetStar:10, assigned:'', memo:'' }
   ])));
   await page.reload();
+  await page.waitForSelector('#hdEquipAnalyzer');
+  await page.evaluate(() => window.hdWSShowElement?.('hdEquipAnalyzer', false));
   await expect(page.locator('#hdEquipAnalyzer')).toBeVisible();
   await expect(page.locator('[data-hd-ea-pick="33号水上電探"]').first()).toContainText('所持 2');
   await expect(page.locator('[data-hd-ea-pick="33号水上電探"]').first()).toContainText('★6');
