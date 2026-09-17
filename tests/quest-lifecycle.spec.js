@@ -140,3 +140,33 @@ test('boss win and sortie logging count boss arrival exactly once', async ({ pag
   expect(result.sortie[3]).toBe(1);
   expect(errors).toEqual([]);
 });
+
+
+test('command center excludes completed periodic quests with leftover partial progress', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
+  await page.waitForTimeout(3500);
+
+  const result = await page.evaluate(() => {
+    window.alert = () => {};
+    state.quests = [];
+    save();
+    localStorage.setItem('harbordesk-quest-progress-v1', '{}');
+
+    const q = HD_QUESTS.find(x => x.id === 'Bw1');
+    hdAddQuestToChecklist(q);
+    const store = hdQPStore();
+    store.Bw1 = { periodKey: hdQPPeriodKey(q), values:[5,1,2,1], updatedAt:Date.now() };
+    hdQPSave(store);
+    const before = hdCCQuestProgress().some(x => x.q.id === 'Bw1');
+
+    const row = state.quests.find(x => x.sourceId === 'Bw1');
+    row.done = true;
+    save();
+    const after = hdCCQuestProgress().some(x => x.q.id === 'Bw1');
+    return { before, after };
+  });
+
+  expect(result.before).toBeTruthy();
+  expect(result.after).toBeFalsy();
+});
