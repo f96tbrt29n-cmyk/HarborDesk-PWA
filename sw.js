@@ -1,4 +1,4 @@
-const CACHE='harbordesk-pwa-v19';
+const CACHE='harbordesk-pwa-v20';
 const ASSETS=['./styles.css','./map-details.css','./map-plans.css','./custom-fleets.css','./ship-roster.css','./advanced-tools.css','./home-dashboard.css','./map-tabs.css','./map-images.css','./map-interactive.css','./update-manager.css','./app.js','./map-details.js','./map-details-34.js','./map-details-57.js','./map-plans.js','./ship-roster.js','./custom-fleets.js','./map-images.js','./map-tabs.js','./map-interactive.js','./advanced-tools.js','./home-dashboard.js','./update-manager.js','./app-version.json','./manifest.webmanifest'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
