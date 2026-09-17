@@ -17,10 +17,10 @@ function hdSLActivity(actionId){
  let before=[];try{before=JSON.parse(localStorage.getItem('harbordesk-activity-log-v1')||'[]')||[]}catch{}
  const oldFirst=before[0]?.id||null;hdALRecord(actionId);
  let after=[];try{after=JSON.parse(localStorage.getItem('harbordesk-activity-log-v1')||'[]')||[]}catch{}
- const first=after[0];return first&&first.id!==oldFirst?first.id:null;
+ const first=after[0];return first&&first.id!==oldFirst?{id:first.id,changes:Array.isArray(first.changes)?first.changes.map(x=>({...x})):[]}:null;
 }
 function hdSLApplyActivity(entry){
- const ids=[];const push=id=>{const x=hdSLActivity(id);if(x)ids.push(x)};
+ const refs=[];const push=id=>{const x=hdSLActivity(id);if(x)refs.push(x)};
  push('sortie');
  const battles=Math.max(0,Number(entry.battles)||0);
  if(entry.result==='S')push('swin');else if(hdSLResultWin(entry.result))push('win');else if(battles>0)push('battle');
@@ -28,7 +28,7 @@ function hdSLApplyActivity(entry){
  for(let i=counted;i<battles;i++)push('battle');
  if(entry.boss){push('boss-arrive');if(hdSLResultWin(entry.result))push('boss-win')}
  if(entry.boss&&hdSLResultWin(entry.result)&&/^2-[1-5]$/.test(entry.map))push('southwest-boss');
- return ids;
+ return refs;
 }
 function hdSLApplyHunt(entry){
  if(!entry.huntId)return null;const rows=hdSLHunts(),h=rows.find(x=>x.id===entry.huntId);if(!h)return null;
@@ -48,10 +48,14 @@ function hdSLRecord(){
  const hunt=hdSLSelectedHunt(),map=(document.getElementById('hdSLMap')?.value||hunt?.map||'').trim(),node=(document.getElementById('hdSLNode')?.value||hunt?.node||'').trim(),result=document.getElementById('hdSLResult')?.value||'S';
  if(!map){alert('海域を入力してね');return}
  const entry={id:hdSLUid(),at:Date.now(),map,node,result,boss:!!document.getElementById('hdSLBoss')?.checked,retreat:result==='撤退',battles:Math.max(0,Math.min(20,hdSLNum('hdSLBattles'))),drop:(document.getElementById('hdSLDrop')?.value||'').trim(),buckets:hdSLNum('hdSLBuckets'),fuel:hdSLNum('hdSLFuel'),ammo:hdSLNum('hdSLAmmo'),steel:hdSLNum('hdSLSteel'),bauxite:hdSLNum('hdSLBauxite'),memo:(document.getElementById('hdSLMemo')?.value||'').trim(),huntId:hunt?.id||'',huntShip:hunt?.ship||'',targetObtained:!!document.getElementById('hdSLTargetObtained')?.checked};
- entry.activityLogIds=hdSLApplyActivity(entry);entry.huntDelta=hdSLApplyHunt(entry);const rows=hdSLLoad();rows.unshift(entry);hdSLSave(rows);hdSLResetForm();if(hunt){const sel=document.getElementById('hdSLHunt');if(sel)sel.value=hunt.id;hdSLFillFromHunt()}hdSLRender();try{if(typeof hdCCRender==='function')hdCCRender()}catch{}
+ entry.activityRefs=hdSLApplyActivity(entry);entry.activityLogIds=entry.activityRefs.map(x=>x.id);entry.huntDelta=hdSLApplyHunt(entry);const rows=hdSLLoad();rows.unshift(entry);hdSLSave(rows);hdSLResetForm();if(hunt){const sel=document.getElementById('hdSLHunt');if(sel)sel.value=hunt.id;hdSLFillFromHunt()}hdSLRender();try{if(typeof hdCCRender==='function')hdCCRender()}catch{}
 }
+function hdSLUndoActivityChanges(changes){if(!Array.isArray(changes)||!changes.length)return;try{const store=typeof hdALStore==='function'?hdALStore():JSON.parse(localStorage.getItem('harbordesk-quest-progress-v1')||'{}')||{};for(const c of changes){const row=store[c.id];if(!row||row.periodKey!==c.periodKey)continue;row.values=row.values||[];row.values[c.index]=Math.max(0,(Number(row.values[c.index])||0)-(Number(c.delta)||0));row.updatedAt=Date.now();store[c.id]=row}if(typeof hdALSaveStore==='function')hdALSaveStore(store);else localStorage.setItem('harbordesk-quest-progress-v1',JSON.stringify(store))}catch{}}
 function hdSLDelete(id){
- const rows=hdSLLoad(),log=rows.find(x=>x.id===id);if(!log)return;if(!confirm('この出撃ログを削除して、連動した掘り/任務カウントも戻す？'))return;const remaining=rows.filter(x=>x.id!==id);for(const aid of log.activityLogIds||[]){try{if(typeof hdALUndo==='function')hdALUndo(aid)}catch{}}hdSLUndoHunt(log,remaining);hdSLSave(remaining);hdSLRender();try{if(typeof hdCCRender==='function')hdCCRender()}catch{}
+ const rows=hdSLLoad(),log=rows.find(x=>x.id===id);if(!log)return;if(!confirm('この出撃ログを削除して、連動した掘り/任務カウントも戻す？'))return;const remaining=rows.filter(x=>x.id!==id),refs=Array.isArray(log.activityRefs)?log.activityRefs:[],refIds=new Set(refs.map(x=>x.id));
+ for(const ref of refs){try{const live=typeof hdALLoad==='function'?hdALLoad().some(x=>x.id===ref.id):false;if(live&&typeof hdALUndo==='function')hdALUndo(ref.id);else hdSLUndoActivityChanges(ref.changes)}catch{hdSLUndoActivityChanges(ref.changes)}}
+ for(const aid of log.activityLogIds||[]){if(refIds.has(aid))continue;try{if(typeof hdALUndo==='function')hdALUndo(aid)}catch{}}
+ hdSLUndoHunt(log,remaining);hdSLSave(remaining);hdSLRender();try{if(typeof hdRenderQuestDb==='function')hdRenderQuestDb();if(typeof hdCCRender==='function')hdCCRender()}catch{}
 }
 function hdSLFillFromHunt(){const h=hdSLSelectedHunt();if(!h)return;const map=document.getElementById('hdSLMap'),node=document.getElementById('hdSLNode');if(map)map.value=h.map||'';if(node)node.value=h.node||'';hdSLRenderTargetHint()}
 function hdSLRenderTargetHint(){const h=hdSLSelectedHunt(),hint=document.getElementById('hdSLTargetHint');if(hint)hint.textContent=h?`目標: ${h.ship}｜${h.map} ${h.node}`:'掘り目標を選ぶと周回数にも連動する';const box=document.getElementById('hdSLTargetObtainedWrap');if(box)box.hidden=!h}
