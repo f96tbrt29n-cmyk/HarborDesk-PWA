@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.43';
-const HD_APP_BUILD=43;
+const HD_APP_VERSION='1.0.44';
+const HD_APP_BUILD=44;
 
 async function hdFetchLatestVersion(){
   const res=await fetch(`./app-version.json?t=${Date.now()}`,{cache:'no-store'});
@@ -7,25 +7,25 @@ async function hdFetchLatestVersion(){
   return res.json();
 }
 
+function hdAppendStyle(attr,href){
+  if(document.querySelector(`link[${attr}]`))return;
+  const link=document.createElement('link');link.rel='stylesheet';link.href=href;link.setAttribute(attr,'1');document.head.appendChild(link);
+}
+function hdAppendScript(attr,src,onload){
+  if(document.querySelector(`script[${attr}]`))return;
+  const script=document.createElement('script');script.src=src;script.async=false;script.setAttribute(attr,'1');if(onload)script.onload=onload;document.body.appendChild(script);
+}
 function hdLoadCurrentAssets(){
-  if(!document.querySelector('link[data-hd-sortie-ready]')){
-    const link=document.createElement('link');link.rel='stylesheet';link.href='./sortie-readiness.css';link.dataset.hdSortieReady='1';document.head.appendChild(link);
-  }
-  if(!document.querySelector('script[data-hd-sortie-ready]')){
-    const script=document.createElement('script');script.src='./sortie-readiness.js';script.async=false;script.dataset.hdSortieReady='1';script.onload=()=>setTimeout(()=>{if(typeof hdRenderSortieReadiness==='function')hdRenderSortieReadiness()},0);document.body.appendChild(script);
-  }
-  if(!document.querySelector('link[data-hd-land-base]')){
-    const link=document.createElement('link');link.rel='stylesheet';link.href='./land-base-planner.css';link.dataset.hdLandBase='1';document.head.appendChild(link);
-  }
-  if(!document.querySelector('script[data-hd-land-base]')){
-    const script=document.createElement('script');script.src='./land-base-planner.js';script.async=false;script.dataset.hdLandBase='1';script.onload=()=>setTimeout(()=>{if(typeof hdRenderLandBasePlanner==='function')hdRenderLandBasePlanner()},0);document.body.appendChild(script);
-  }
-  if(!document.querySelector('link[data-hd-fleet-calc]')){
-    const link=document.createElement('link');link.rel='stylesheet';link.href='./fleet-calculator.css';link.dataset.hdFleetCalc='1';document.head.appendChild(link);
-  }
-  if(!document.querySelector('script[data-hd-fleet-calc]')){
-    const script=document.createElement('script');script.src='./fleet-calculator.js';script.async=false;script.dataset.hdFleetCalc='1';script.onload=()=>setTimeout(()=>{if(typeof hdFCRender==='function')hdFCRender()},0);document.body.appendChild(script);
-  }
+  hdAppendStyle('data-hd-sortie-ready','./sortie-readiness.css');
+  hdAppendScript('data-hd-sortie-ready','./sortie-readiness.js',()=>setTimeout(()=>{if(typeof hdRenderSortieReadiness==='function')hdRenderSortieReadiness()},0));
+  hdAppendStyle('data-hd-land-base','./land-base-planner.css');
+  hdAppendScript('data-hd-land-base','./land-base-planner.js',()=>setTimeout(()=>{if(typeof hdRenderLandBasePlanner==='function')hdRenderLandBasePlanner()},0));
+  hdAppendStyle('data-hd-fleet-calc','./fleet-calculator.css');
+  hdAppendScript('data-hd-fleet-calc','./fleet-calculator.js',()=>setTimeout(()=>{if(typeof hdFCRender==='function')hdFCRender()},0));
+  hdAppendStyle('data-hd-exp-fleet','./expedition-fleet-manager.css');
+  hdAppendScript('data-hd-exp-fleet','./expedition-fleet-manager.js',()=>{
+    hdAppendScript('data-hd-exp-fleet-patch','./expedition-fleet-manager-patch.js',()=>setTimeout(()=>{if(typeof hdEFEnsure==='function')hdEFEnsure()},0));
+  });
 }
 
 function hdEnsureUpdateUI(){
