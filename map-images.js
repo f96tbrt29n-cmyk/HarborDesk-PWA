@@ -92,7 +92,7 @@ function hdMapSvg(map,detail,large=false){
  const nodes=Object.keys(pos).map(label=>{
   const p=pos[label],kind=hdMapKind(graph,label);
   const shown=kind==='start'?'S':kind==='boss'?'B':kind==='goal'?'G':label;
-  return `<g class="hd-map-node ${kind}"><circle cx="${p.x}" cy="${p.y}" r="${kind==='boss'?25:kind==='start'?22:19}"/><text x="${p.x}" y="${p.y+5}" text-anchor="middle">${hdMapEsc2(shown)}</text></g>`;
+  return `<g class="hd-map-node ${kind}" data-hd-node-id="${hdMapEsc2(label)}"><circle cx="${p.x}" cy="${p.y}" r="${kind==='boss'?25:kind==='start'?22:19}"/><text x="${p.x}" y="${p.y+5}" text-anchor="middle">${hdMapEsc2(shown)}</text></g>`;
  }).join('');
  const name=hdMapEsc2(detail?.name||map);
  return `<svg class="hd-map-svg${large?' large':''}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${hdMapEsc2(map)} ${name} 海域構造図">
