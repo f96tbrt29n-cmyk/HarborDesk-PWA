@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="map-plans.css">
   <link rel="stylesheet" href="custom-fleets.css">
   <link rel="stylesheet" href="ship-roster.css">
+  <link rel="stylesheet" href="advanced-tools.css">
 </head>
 <body id="top">
   <header class="topbar"><div><div class="eyebrow">艦これ 提督補助</div><h1>HarborDesk</h1></div><button id="notifyBtn" class="ghost">通知を許可</button></header>
@@ -43,10 +44,10 @@
     </section>
 
     <section id="resources"><div class="section-head"><h2>資源メモ</h2><span class="muted">端末内保存</span></div><div class="resource-grid"><label>燃料<input id="fuel" inputmode="numeric" type="number" min="0"></label><label>弾薬<input id="ammo" inputmode="numeric" type="number" min="0"></label><label>鋼材<input id="steel" inputmode="numeric" type="number" min="0"></label><label>ボーキ<input id="bauxite" inputmode="numeric" type="number" min="0"></label></div><button id="saveResources" class="primary full">資源を保存</button><div id="resourceSaved" class="saved muted"></div></section>
-    <section class="card note"><strong>使い方</strong><p>艦隊台帳に艦娘を一度登録すると、海域の自分用編成で艦名候補として呼び出せる。登録した装備メモも自動入力できる。攻略データ以外の個人データはこのiPhone内に保存されるよ。</p></section>
+    <section class="card note"><strong>HarborDesk</strong><p>攻略、遠征・入渠タイマー、任務、艦隊台帳、自分用編成、装備改修管理、資源履歴、イベント記録、計算ツール、バックアップまでこのiPhone内でまとめて使える。重要な出撃前は元Wikiの最新情報も確認してね。</p></section>
   </main>
 
-  <nav class="bottom-nav"><a href="#guide">攻略</a><a href="#roster">艦隊</a><a href="#expeditions">遠征</a><a href="#quests">任務</a><a href="#resources">資源</a></nav>
+  <nav class="bottom-nav"><a href="#guide">攻略</a><a href="#roster">艦隊</a><a href="#equipmentBook">装備</a><a href="#expeditions">遠征</a><a href="#quests">任務</a><a href="#calculators">ツール</a></nav>
 
   <dialog id="timerDialog"><form method="dialog" id="timerForm"><h3 id="timerDialogTitle">タイマー追加</h3><label>名前<input id="timerName" required maxlength="40" placeholder="例：東京急行"></label><label>時間（分）<input id="timerMinutes" required type="number" min="1" max="14400" value="30"></label><div class="dialog-actions"><button value="cancel" class="ghost">キャンセル</button><button id="timerSave" value="default" class="primary">開始</button></div></form></dialog>
   <dialog id="questDialog"><form method="dialog" id="questForm"><h3>任務を追加</h3><label>任務名<input id="questName" required maxlength="60" placeholder="例：デイリー演習"></label><div class="dialog-actions"><button value="cancel" class="ghost">キャンセル</button><button value="default" class="primary">追加</button></div></form></dialog>
@@ -55,5 +56,6 @@
   <script src="map-plans.js"></script>
   <script src="ship-roster.js"></script>
   <script src="custom-fleets.js"></script>
+  <script src="advanced-tools.js"></script>
 </body>
 </html>
