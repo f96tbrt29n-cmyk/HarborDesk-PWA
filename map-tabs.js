@@ -39,12 +39,14 @@ function hdApplyMapTabs(){
   const fleet=d.fleet||d.formation||'';
   const note=d.note||d.caution||'';
   const updated=d.updated||d.sourceDate||'参照日未設定';
-  const tabs=[['overview','概要'],['fleet','編成'],['route','ルート'],['gear','装備'],['quest','任務'],['mine','自分用']];
+  const tabs=[['overview','概要'],['map','マップ'],['fleet','編成'],['route','ルート'],['gear','装備'],['quest','任務'],['mine','自分用']];
   const active=hdMapTabSaved(selectedMap);
+  const mapHtml=typeof hdMapImageHtml==='function'?hdMapImageHtml(selectedMap,d):'<div class="empty">マップ画像を読み込み中</div>';
   card.innerHTML=`<article class="map-tabs-shell">
     <div class="map-tabs-head"><div><span class="guide-tag">${selectedMap}</span><h3>${hdMapEsc(d.name||selectedMap)}</h3><div class="muted">アプリ内攻略要点・参照 ${hdMapEsc(updated)}</div></div><a class="guide-link map-wiki-link" href="${wikiMapUrl(selectedMap)}" target="_blank" rel="noopener">Wiki ↗</a></div>
     <div class="map-tab-bar" role="tablist">${tabs.map(([id,label])=>`<button class="map-tab-btn ${active===id?'active':''}" data-map-tab="${id}" role="tab">${label}</button>`).join('')}</div>
     <div class="map-tab-pane ${active==='overview'?'active':''}" data-map-pane="overview"><p class="map-overview">${hdMapEsc(d.overview||'')}</p><div class="map-tab-card warn"><b>注意点</b><p>${hdMapEsc(note||'特記事項なし')}</p></div><div class="map-source-note">※攻略条件はアップデートや編成条件で変化する場合があります。</div></div>
+    <div class="map-tab-pane ${active==='map'?'active':''}" data-map-pane="map">${mapHtml}</div>
     <div class="map-tab-pane ${active==='fleet'?'active':''}" data-map-pane="fleet">${hdFleetHtml(selectedMap)}${fleet?`<div class="map-tab-card"><b>基本方針</b><p>${hdMapEsc(fleet)}</p></div>`:''}</div>
     <div class="map-tab-pane ${active==='route'?'active':''}" data-map-pane="route"><div class="map-tab-card"><b>主なルート</b><p>${hdMapEsc(d.route||'ルート情報を整理中')}</p></div></div>
     <div class="map-tab-pane ${active==='gear'?'active':''}" data-map-pane="gear"><div class="map-tab-card"><b>制空・装備</b><p>${hdMapEsc(d.air||'装備情報を整理中')}</p></div></div>
