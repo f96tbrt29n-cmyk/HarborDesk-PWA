@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="advanced-tools.css">
   <link rel="stylesheet" href="home-dashboard.css">
   <link rel="stylesheet" href="map-tabs.css">
+  <link rel="stylesheet" href="map-images.css">
   <link rel="stylesheet" href="update-manager.css">
 </head>
 <body id="top">
@@ -28,7 +29,7 @@
       <div class="section-head"><div><div class="eyebrow">攻略データベース</div><h2>攻略情報を探す</h2></div><span class="muted">海域・任務・遠征</span></div>
       <div class="map-picker card">
         <div class="eyebrow">通常海域</div><h3>攻略海域を選択</h3>
-        <p class="muted map-picker-note">海域をタップすると、概要・編成・ルート・装備・任務・自分用編成をタブで切り替えて見られるよ。</p>
+        <p class="muted map-picker-note">海域をタップすると、概要・マップ・編成・ルート・装備・任務・自分用編成をタブで切り替えて見られるよ。</p>
         <div id="worldPicker" class="world-picker"></div><div id="mapPicker" class="map-grid"></div><div id="selectedMapCard" class="selected-map-card"></div>
       </div>
       <div class="guide-search"><input id="guideQuery" type="search" placeholder="例：5-5 / 海上護衛 / あ号 / ボーキ"><button id="guideSearchBtn" class="primary">検索</button></div>
@@ -47,7 +48,7 @@
     </section>
 
     <section id="resources"><div class="section-head"><h2>資源メモ</h2><span class="muted">端末内保存</span></div><div class="resource-grid"><label>燃料<input id="fuel" inputmode="numeric" type="number" min="0"></label><label>弾薬<input id="ammo" inputmode="numeric" type="number" min="0"></label><label>鋼材<input id="steel" inputmode="numeric" type="number" min="0"></label><label>ボーキ<input id="bauxite" inputmode="numeric" type="number" min="0"></label></div><button id="saveResources" class="primary full">資源を保存</button><div id="resourceSaved" class="saved muted"></div></section>
-    <section class="card note"><strong>HarborDesk</strong><p>攻略、遠征・入渠タイマー、任務、艦隊台帳、自分用編成、装備改修管理、資源履歴、イベント記録、計算ツール、バックアップまでこのiPhone内でまとめて使える。重要な出撃前は元Wikiの最新情報も確認してね。</p></section>
+    <section class="card note"><strong>HarborDesk</strong><p>攻略、海域概略マップ、遠征・入渠タイマー、任務、艦隊台帳、自分用編成、装備改修管理、資源履歴、イベント記録、計算ツール、バックアップまでこのiPhone内でまとめて使える。重要な出撃前は元Wikiの最新情報も確認してね。</p></section>
   </main>
 
   <nav class="bottom-nav"><a href="#home">ホーム</a><a href="#guide">攻略</a><a href="#roster">艦隊</a><a href="#expeditions">遠征</a><a href="#dashboard">管理</a></nav>
@@ -59,6 +60,7 @@
   <script src="map-plans.js"></script>
   <script src="ship-roster.js"></script>
   <script src="custom-fleets.js"></script>
+  <script src="map-images.js"></script>
   <script src="map-tabs.js"></script>
   <script src="advanced-tools.js"></script>
   <script src="home-dashboard.js"></script>
