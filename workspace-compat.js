@@ -9,8 +9,9 @@
       Object.defineProperty(Element.prototype,'__hdOriginalScrollIntoView',{value:original,configurable:true});
       Element.prototype.scrollIntoView=function(...args){
         try{
-          const section=this.closest?.('section');
-          if(section?.classList.contains('hd-ws-hidden'))window.hdWSShowElement(this,false);
+          let node=this.closest?.('section')||null,hidden=false;
+          while(node){if(node.classList?.contains('hd-ws-hidden')){hidden=true;break}node=node.parentElement?.closest?.('section')||null}
+          if(hidden)window.hdWSShowElement(this,false);
         }catch{}
         return original.apply(this,args);
       };
