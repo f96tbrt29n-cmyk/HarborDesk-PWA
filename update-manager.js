@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.50';
-const HD_APP_BUILD=50;
+const HD_APP_VERSION='1.0.51';
+const HD_APP_BUILD=51;
 
 async function hdFetchLatestVersion(){
   const res=await fetch(`./app-version.json?t=${Date.now()}`,{cache:'no-store'});
@@ -40,7 +40,12 @@ function hdLoadCurrentAssets(){
     hdAppendScript('data-hd-resource-budget','./resource-budget.js',()=>{
       setTimeout(()=>{if(typeof hdRBEnsure==='function')hdRBEnsure();if(typeof hdRBInstallCommandCenterPatch==='function')hdRBInstallCommandCenterPatch()},0);
       hdAppendStyle('data-hd-exercise-routine','./exercise-routine.css');
-      hdAppendScript('data-hd-exercise-routine','./exercise-routine.js',()=>setTimeout(()=>{if(typeof hdEREnsure==='function')hdEREnsure();if(typeof hdERRender==='function')hdERRender();if(typeof hdCCRender==='function')hdCCRender()},0));
+      hdAppendScript('data-hd-exercise-routine','./exercise-routine.js',()=>{
+        hdAppendScript('data-hd-quest-acceptance','./quest-acceptance-guard.js',()=>{
+          hdAppendStyle('data-hd-activity-logger','./activity-logger.css');
+          hdAppendScript('data-hd-activity-logger','./activity-logger.js',()=>setTimeout(()=>{if(typeof hdEREnsure==='function')hdEREnsure();if(typeof hdERRender==='function')hdERRender();if(typeof hdALEnsure==='function')hdALEnsure();if(typeof hdALRender==='function')hdALRender();if(typeof hdCCRender==='function')hdCCRender()},0));
+        });
+      });
     });
   });
 }
