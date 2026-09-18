@@ -10,6 +10,7 @@ async function boot(page) {
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
   await expect.poll(() => page.evaluate(() => window.HD_MODULE_STATUS?.['./sortie-preparation-sheet.js'] || '')).toBe('ok');
+  await expect.poll(() => page.evaluate(() => window.HD_MODULE_STATUS?.['./land-base-planner.js'] || '')).toBe('ok');
 }
 
 async function selectMap(page, world, map) {
