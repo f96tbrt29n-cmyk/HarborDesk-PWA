@@ -23,6 +23,133 @@ const HD_SHIP_DATABASE=[
  {base:'Fletcher',final:'Fletcher Mk.II',type:'駆逐艦',speed:'高速',targetLv:90,path:'Fletcher → Fletcher改(Lv55) → Fletcher改 Mod.2(Lv88) ⇔ Fletcher Mk.II(Lv90)',requirements:'改: Lv55＋高速建造材×10＋開発資材×80 / Mod.2: Lv88＋改装設計図＋高速建造材×30＋開発資材×120 / Mk.II: Lv90＋高速建造材×30＋開発資材×180',roles:['対空CI','自動先制対潜','夜戦CI'],note:'対空・対潜・夜戦を高水準でこなす万能駆逐艦。'}
 ];
 
+
+const HD_SHIP_STATS={
+ '長門改二':{hp:91,armor:110,evasion:70,fire:118,torp:0,aa:100,asw:0,los:55,luck:40,air:15,fuel:180,ammo:225,range:'長'},
+ '陸奥改二':{hp:91,armor:109,evasion:71,fire:118,torp:0,aa:102,asw:0,los:57,luck:16,air:17,fuel:180,ammo:225,range:'長'},
+ '大和改二':{hp:98,armor:122,evasion:68,fire:144,torp:0,aa:108,asw:0,los:59,luck:18,air:22,fuel:290,ammo:350,range:'超長'},
+ '武蔵改二':{hp:99,armor:125,evasion:65,fire:145,torp:0,aa:105,asw:0,los:58,luck:10,air:28,fuel:275,ammo:350,range:'超長'},
+ '伊勢改二':{hp:78,armor:94,evasion:82,fire:88,torp:0,aa:85,asw:0,los:72,luck:40,air:57,fuel:110,ammo:145,range:'中'},
+ '日向改二':{hp:78,armor:94,evasion:83,fire:86,torp:0,aa:84,asw:85,los:75,luck:40,air:57,fuel:115,ammo:140,range:'中'},
+ '赤城改二':{hp:81,armor:81,evasion:73,fire:60,torp:0,aa:85,asw:0,los:91,luck:20,air:90,fuel:95,ammo:90,range:'中'},
+ '加賀改二':{hp:84,armor:80,evasion:70,fire:56,torp:0,aa:84,asw:0,los:90,luck:18,air:99,fuel:100,ammo:95,range:'中'},
+ '翔鶴改二甲':{hp:78,armor:83,evasion:81,fire:70,torp:0,aa:88,asw:0,los:90,luck:20,air:76,fuel:100,ammo:85,range:'中'},
+ '瑞鶴改二甲':{hp:79,armor:84,evasion:85,fire:65,torp:0,aa:90,asw:0,los:90,luck:50,air:76,fuel:100,ammo:85,range:'中'},
+ '最上改二特':{hp:61,armor:78,evasion:81,fire:81,torp:90,aa:86,asw:0,los:80,luck:18,air:14,fuel:55,ammo:70,range:'中'},
+ '矢矧改二乙':{hp:53,armor:74,evasion:86,fire:81,torp:88,aa:89,asw:80,los:60,luck:17,air:6,fuel:45,ammo:50,range:'中'},
+ '夕張改二特':{hp:41,armor:66,evasion:81,fire:56,torp:88,aa:78,asw:70,los:50,luck:30,air:0,fuel:30,ammo:40,range:'短'},
+ '阿武隈改二':{hp:45,armor:68,evasion:83,fire:56,torp:94,aa:78,asw:82,los:60,luck:20,air:3,fuel:25,ammo:35,range:'短'},
+ '北上改二':{hp:43,armor:63,evasion:83,fire:63,torp:139,aa:49,asw:79,los:43,luck:30,air:0,fuel:25,ammo:75,range:'中'},
+ '大井改二':{hp:43,armor:63,evasion:83,fire:63,torp:139,aa:49,asw:79,los:43,luck:13,air:0,fuel:25,ammo:75,range:'中'},
+ '雪風改二':{hp:35,armor:60,evasion:100,fire:66,torp:90,aa:85,asw:74,los:48,luck:63,air:0,fuel:15,ammo:25,range:'短'},
+ '時雨改三':{hp:34,armor:57,evasion:98,fire:67,torp:91,aa:87,asw:88,los:51,luck:55,air:0,fuel:15,ammo:25,range:'短'},
+ '霞改二乙':{hp:31,armor:52,evasion:92,fire:63,torp:83,aa:83,asw:68,los:56,luck:37,air:0,fuel:15,ammo:20,range:'短'},
+ '秋月改二':{hp:38,armor:56,evasion:92,fire:67,torp:84,aa:119,asw:76,los:56,luck:17,air:0,fuel:25,ammo:30,range:'短'},
+ '初月改二':{hp:39,armor:57,evasion:93,fire:70,torp:82,aa:118,asw:75,los:54,luck:18,air:0,fuel:25,ammo:30,range:'短'},
+ 'Fletcher Mk.II':{hp:38,armor:56,evasion:94,fire:62,torp:82,aa:95,asw:97,los:66,luck:47,air:0,fuel:25,ammo:25,range:'短'}
+};
+
+const HD_SHIP_LOADOUTS={
+ '長門改二':[
+  {name:'通常攻略・弾着',gear:['41cm三連装砲改二','試製41cm三連装砲','零式水上偵察機11型乙(熟練)','一式徹甲弾改'],memo:'昼連撃・弾着観測を基本に、徹甲弾補正を取る。'},
+  {name:'特殊砲撃寄り',gear:['41cm三連装砲改二','試製41cm三連装砲','一式徹甲弾改','高性能電探'],memo:'長門型特殊砲撃を使う高難度向け。制空や索敵は艦隊全体で調整。'}
+ ],
+ '陸奥改二':[
+  {name:'通常攻略・弾着',gear:['41cm三連装砲改二','試製41cm三連装砲','零式水上偵察機11型乙(熟練)','一式徹甲弾改'],memo:'長門改二と同じく主砲2＋偵察機＋徹甲弾が基本。'},
+  {name:'長門タッチ随伴',gear:['41cm三連装砲改二','試製41cm三連装砲','一式徹甲弾改','高性能電探'],memo:'長門改二との特殊砲撃編成で火力を重視。'}
+ ],
+ '大和改二':[
+  {name:'高火力・弾着',gear:['51cm連装砲','46cm三連装砲改','零式水上偵察機11型乙(熟練)','一式徹甲弾改','15m二重測距儀+21号電探改二'],memo:'5スロを活かした高火力の定番。'},
+  {name:'特殊砲撃・命中重視',gear:['51cm連装砲','46cm三連装砲改','一式徹甲弾改','15m二重測距儀+21号電探改二','高性能水偵'],memo:'大和型特殊砲撃を意識しつつ命中と索敵を確保。'}
+ ],
+ '武蔵改二':[
+  {name:'高火力・弾着',gear:['51cm連装砲','46cm三連装砲改','零式水上偵察機11型乙(熟練)','一式徹甲弾改','15m二重測距儀+21号電探改二'],memo:'5スロの重量級テンプレ。'},
+  {name:'大和型タッチ随伴',gear:['51cm連装砲','46cm三連装砲改','一式徹甲弾改','高性能電探','高性能水偵'],memo:'大和改二/重との特殊砲撃で採用しやすい。'}
+ ],
+ '伊勢改二':[
+  {name:'制空補助戦艦',gear:['41cm三連装砲改二','41cm三連装砲改二','零式水上偵察機11型乙(熟練)','高性能艦戦','一式徹甲弾改'],memo:'戦艦火力を維持しながら制空値を補う。'},
+  {name:'航空寄り',gear:['41cm三連装砲改二','41cm三連装砲改二','瑞雲改二','高性能艦戦','高性能艦戦'],memo:'海域の制空要求が高い時の補助型。'}
+ ],
+ '日向改二':[
+  {name:'制空・航空補助',gear:['41cm三連装砲改二','41cm三連装砲改二','瑞雲改二','高性能艦戦','一式徹甲弾改'],memo:'航空戦艦として火力と制空を両立。'},
+  {name:'対潜補助',gear:['41cm三連装砲改二','瑞雲改二','対潜回転翼機','対潜哨戒機','高性能艦戦'],memo:'日向改二の対潜値を活かす用途。海域条件に合わせて調整。'}
+ ],
+ '赤城改二':[
+  {name:'昼戦バランス',gear:['天山一二型(友永隊)','彗星(江草隊)','高性能艦戦','高性能艦戦','彩雲'],memo:'攻撃2枠＋制空＋触接/索敵をまとめた汎用型。'},
+  {name:'航空火力重視',gear:['強力な艦攻','強力な艦爆','高性能艦戦','高性能艦戦','熟練甲板要員系'],memo:'制空を満たした残りを攻撃機へ。'}
+ ],
+ '加賀改二':[
+  {name:'制空安定',gear:['天山一二型(友永隊)','彗星(江草隊)','高性能艦戦','高性能艦戦','彩雲'],memo:'大搭載を活かして制空を安定させる。'},
+  {name:'攻撃寄り',gear:['強力な艦攻','強力な艦爆','強力な艦攻','高性能艦戦','高性能艦戦'],memo:'必要制空を満たせる海域で攻撃機を増やす。'}
+ ],
+ '翔鶴改二甲':[
+  {name:'装甲空母バランス',gear:['天山一二型(友永隊)','彗星(江草隊)','高性能艦戦','高性能艦戦'],memo:'中破攻撃可能を活かす汎用型。'},
+  {name:'攻撃寄り',gear:['強力な艦攻','強力な艦爆','強力な艦攻','高性能艦戦'],memo:'制空に余裕がある海域で航空火力を伸ばす。'}
+ ],
+ '瑞鶴改二甲':[
+  {name:'装甲空母バランス',gear:['天山一二型(友永隊)','彗星(江草隊)','高性能艦戦','高性能艦戦'],memo:'翔鶴改二甲と並べやすい標準型。'},
+  {name:'攻撃寄り',gear:['強力な艦攻','強力な艦爆','強力な艦攻','高性能艦戦'],memo:'高い運も活かしつつ航空火力を重視。'}
+ ],
+ '最上改二特':[
+  {name:'先制雷撃＋弾着',gear:['20.3cm(3号)連装砲','20.3cm(3号)連装砲','甲標的 丁型改','瑞雲改二'],memo:'先制雷撃と昼連撃を両立する万能構成。'},
+  {name:'対地',gear:['20.3cm(3号)連装砲','甲標的 丁型改','大発動艇(八九式中戦車＆陸戦隊)','特二式内火艇'],memo:'陸上型相手に。敵や特効に応じて水戦・WG系と交換。'}
+ ],
+ '矢矧改二乙':[
+  {name:'万能連撃',gear:['15.2cm連装砲改二','15.2cm連装砲改二','零式水上偵察機11型乙(熟練)','甲標的 丁型改'],memo:'先制雷撃＋昼夜連撃の汎用構成。'},
+  {name:'夜戦CI寄り',gear:['61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷','甲標的 丁型改','水雷戦隊 熟練見張員'],memo:'高難度ボスの夜戦打点を意識。運改修状況で連撃型と使い分け。'}
+ ],
+ '夕張改二特':[
+  {name:'先制雷撃・汎用',gear:['甲標的 丙型','主砲','主砲','高性能電探','機銃/対潜補助'],memo:'スロット制限に注意しつつ雷撃・連撃・電探をまとめる。'},
+  {name:'対地',gear:['甲標的 丙型','大発動艇(八九式中戦車＆陸戦隊)','特二式内火艇','高性能電探','機銃/補助装備'],memo:'対地と先制雷撃を両立しやすい。'}
+ ],
+ '阿武隈改二':[
+  {name:'魚雷CI',gear:['甲標的 丙型','61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷'],memo:'先制雷撃＋夜戦魚雷CI。運改修済みだと特に強力。'},
+  {name:'輸送',gear:['甲標的 丙型','大発動艇','大発動艇'],memo:'輸送量を確保しつつ先制雷撃も維持。'}
+ ],
+ '北上改二':[
+  {name:'夜戦魚雷CI',gear:['甲標的 丁型改','61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷'],memo:'最大雷装139を活かす高火力型。'},
+  {name:'夜戦連撃',gear:['甲標的 丁型改','主砲','主砲'],memo:'運改修に依存しにくい安定型。'}
+ ],
+ '大井改二':[
+  {name:'夜戦火力',gear:['甲標的 丁型改','61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷'],memo:'魚雷CIを使うなら運改修や見張員補助を意識。'},
+  {name:'夜戦連撃',gear:['甲標的 丁型改','主砲','主砲'],memo:'初期運13なので通常は連撃型が扱いやすい。'}
+ ],
+ '雪風改二':[
+  {name:'魚雷CI',gear:['61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷','水雷戦隊 熟練見張員'],memo:'高い運63を活かす定番の夜戦CI。'},
+  {name:'対空・汎用',gear:['10cm連装高角砲＋高射装置','10cm連装高角砲＋高射装置','高性能対空電探'],memo:'対空CIや通常連撃を意識。'}
+ ],
+ '時雨改三':[
+  {name:'魚雷CI',gear:['61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷','水雷戦隊 熟練見張員','対潜/電探補助'],memo:'4スロと高運を活かして夜戦火力を伸ばす。'},
+  {name:'対潜兼用',gear:['四式水中聴音機','対潜爆雷投射機','爆雷','主砲/電探'],memo:'高い対潜値を活かす。必要対潜値を満たしたら残りを火力へ。'}
+ ],
+ '霞改二乙':[
+  {name:'輸送・司令部',gear:['大発動艇','大発動艇','艦隊司令部施設'],memo:'輸送や遊撃部隊運用向け。'},
+  {name:'対地',gear:['大発動艇(八九式中戦車＆陸戦隊)','特二式内火艇','主砲/補助装備'],memo:'陸上型対策。敵に応じてWG系や電探へ調整。'}
+ ],
+ '秋月改二':[
+  {name:'防空CI',gear:['10cm連装高角砲＋高射装置','10cm連装高角砲＋高射装置','高性能対空電探','対潜/機銃/煙幕'],memo:'最大対空119を活かす防空の基本。4枠目は海域に応じて自由枠。'},
+  {name:'防空＋対潜',gear:['10cm連装高角砲＋高射装置','10cm連装高角砲＋高射装置','高性能対空電探','四式水中聴音機'],memo:'防空を維持しつつ対潜補助。'}
+ ],
+ '初月改二':[
+  {name:'防空CI',gear:['10cm連装高角砲＋高射装置','10cm連装高角砲＋高射装置','高性能対空電探','対潜/機銃/煙幕'],memo:'4スロ防空駆逐として柔軟に運用。'},
+  {name:'防空＋対潜',gear:['10cm連装高角砲＋高射装置','10cm連装高角砲＋高射装置','高性能対空電探','四式水中聴音機'],memo:'防空と対潜を同時に担当。'}
+ ],
+ 'Fletcher Mk.II':[
+  {name:'対空CI',gear:['5inch単装砲 Mk.30 改','5inch単装砲 Mk.30 改','GFCS Mk.37'],memo:'米駆逐の対空CIを狙う標準構成。'},
+  {name:'先制対潜',gear:['HF/DF + Type144/147 ASDIC','RUR-4A Weapon Alpha改','5inch単装砲 Mk.30 改'],memo:'高い対潜97を活かす。対潜装備を減らしても先制対潜可能な場面が多い。'}
+ ]
+};
+
+function hdShipDbStatsHtml(item){
+ const s=HD_SHIP_STATS[item.final];if(!s)return '';
+ const cells=[['耐久',s.hp],['火力',s.fire],['雷装',s.torp],['対空',s.aa],['装甲',s.armor],['回避',s.evasion],['対潜',s.asw],['索敵',s.los],['運',s.luck],['搭載',s.air]];
+ return `<details class="hd-shipdb-detail"><summary>ステータス・おすすめ装備</summary><div class="hd-shipdb-detail-body"><div class="hd-shipdb-stat-head"><b>Lv99最大ステータス</b><span>装備補正なし</span></div><div class="hd-shipdb-stats">${cells.map(([k,v])=>`<div><span>${k}</span><strong>${v}</strong></div>`).join('')}</div><div class="hd-shipdb-substats"><span>速力 <b>${hdShipDbEsc(item.speed)}</b></span><span>射程 <b>${hdShipDbEsc(s.range)}</b></span><span>燃料 <b>${s.fuel}</b></span><span>弾薬 <b>${s.ammo}</b></span></div>${hdShipDbLoadoutsHtml(item)}</div></details>`;
+}
+function hdShipDbLoadoutsHtml(item){
+ const sets=HD_SHIP_LOADOUTS[item.final]||[];if(!sets.length)return '';
+ return `<div class="hd-shipdb-loadouts"><div class="hd-shipdb-stat-head"><b>おすすめ装備例</b><span>海域・特効・所持装備で調整</span></div>${sets.map(x=>`<article class="hd-shipdb-loadout"><strong>${hdShipDbEsc(x.name)}</strong><div class="hd-shipdb-gearchips">${x.gear.map(g=>`<span>${hdShipDbEsc(g)}</span>`).join('')}</div><p>${hdShipDbEsc(x.memo)}</p></article>`).join('')}</div>`;
+}
+
 let hdShipDbType='すべて';
 let hdShipDbMissingOnly=false;
 
@@ -43,17 +170,17 @@ function hdShipDbStatus(item){
 function hdRenderShipDatabase(){
  const list=document.getElementById('hdShipDbList');if(!list)return;
  const q=(document.getElementById('hdShipDbSearch')?.value||'').trim().toLowerCase();
- let rows=HD_SHIP_DATABASE.filter(x=>(hdShipDbType==='すべて'||x.type===hdShipDbType)&&(!q||`${x.base} ${x.final} ${x.type} ${x.roles.join(' ')} ${x.note} ${x.path}`.toLowerCase().includes(q)));
+ let rows=HD_SHIP_DATABASE.filter(x=>(hdShipDbType==='すべて'||x.type===hdShipDbType)&&(!q||`${x.base} ${x.final} ${x.type} ${x.roles.join(' ')} ${x.note} ${x.path} ${(HD_SHIP_LOADOUTS[x.final]||[]).flatMap(y=>[y.name,...y.gear,y.memo]).join(' ')}`.toLowerCase().includes(q)));
  if(hdShipDbMissingOnly)rows=rows.filter(x=>!hdShipDbOwned(x));
  const count=document.getElementById('hdShipDbCount');if(count)count.textContent=`${rows.length}隻`;
- list.innerHTML=rows.map(x=>{const s=hdShipDbStatus(x);return `<article class="hd-shipdb-card"><div class="hd-shipdb-head"><div><strong>${hdShipDbEsc(x.final)}</strong><span>${hdShipDbEsc(x.type)}・${hdShipDbEsc(x.speed)}</span></div><div class="hd-shipdb-status ${s.cls}"><b>${s.label}</b>${s.detail?`<small>${hdShipDbEsc(s.detail)}</small>`:''}</div></div><div class="hd-shipdb-path">${hdShipDbEsc(x.path)}</div><div class="hd-shipdb-require"><span>改装条件</span><strong>${hdShipDbEsc(x.requirements)}</strong></div><div class="hd-shipdb-roles">${x.roles.map(r=>`<span>${hdShipDbEsc(r)}</span>`).join('')}</div><p>${hdShipDbEsc(x.note)}</p><div class="hd-shipdb-actions"><button class="primary small" type="button" data-hd-shipdb-add="${hdShipDbEsc(x.base)}">台帳へ追加</button><a class="guide-link" href="https://wikiwiki.jp/kancolle/${encodeURIComponent(x.final)}" target="_blank" rel="noopener">Wiki ↗</a></div></article>`}).join('')||'<div class="empty">条件に合う艦娘がいないよ</div>';
+ list.innerHTML=rows.map(x=>{const s=hdShipDbStatus(x);return `<article class="hd-shipdb-card"><div class="hd-shipdb-head"><div><strong>${hdShipDbEsc(x.final)}</strong><span>${hdShipDbEsc(x.type)}・${hdShipDbEsc(x.speed)}</span></div><div class="hd-shipdb-status ${s.cls}"><b>${s.label}</b>${s.detail?`<small>${hdShipDbEsc(s.detail)}</small>`:''}</div></div><div class="hd-shipdb-path">${hdShipDbEsc(x.path)}</div><div class="hd-shipdb-require"><span>改装条件</span><strong>${hdShipDbEsc(x.requirements)}</strong></div><div class="hd-shipdb-roles">${x.roles.map(r=>`<span>${hdShipDbEsc(r)}</span>`).join('')}</div>${hdShipDbStatsHtml(x)}<p>${hdShipDbEsc(x.note)}</p><div class="hd-shipdb-actions"><button class="primary small" type="button" data-hd-shipdb-add="${hdShipDbEsc(x.base)}">台帳へ追加</button><a class="guide-link" href="https://wikiwiki.jp/kancolle/${encodeURIComponent(x.final)}" target="_blank" rel="noopener">Wiki ↗</a></div></article>`}).join('')||'<div class="empty">条件に合う艦娘がいないよ</div>';
 }
 function hdEnsureShipDatabase(){
  if(document.getElementById('shipDatabase'))return;
  const roster=document.getElementById('roster');if(!roster)return;
  const sec=document.createElement('section');sec.id='shipDatabase';sec.className='advanced-section';
  const types=['すべて',...new Set(HD_SHIP_DATABASE.map(x=>x.type))];
- sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">SHIP DATABASE</div><h2>艦娘データベース・改装計画</h2></div><span id="hdShipDbCount" class="muted"></span></div><div class="hd-shipdb-note">主要艦の改装Lv・必要アイテム・役割を確認。艦隊台帳のLvと照合して「あと何Lv」「改装条件達成」も表示するよ。</div><div class="hd-shipdb-toolbar"><input id="hdShipDbSearch" type="search" placeholder="艦名・艦種・役割で検索"><label><input id="hdShipDbMissingOnly" type="checkbox"> 未所持だけ</label></div><div class="hd-shipdb-filters">${types.map((t,i)=>`<button class="ghost small${i===0?' active':''}" type="button" data-hd-shipdb-filter="${hdShipDbEsc(t)}">${hdShipDbEsc(t)}</button>`).join('')}</div><div id="hdShipDbList" class="hd-shipdb-list"></div><div><a class="guide-link" href="https://wikiwiki.jp/kancolle/%E6%94%B9%E9%80%A0/%E8%89%A6%E7%A8%AE%E5%88%A5%E4%B8%80%E8%A6%A7" target="_blank" rel="noopener">攻略Wiki 改造一覧で最新情報 ↗</a></div>`;
+ sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">SHIP DATABASE</div><h2>艦娘データベース・改装計画</h2></div><span id="hdShipDbCount" class="muted"></span></div><div class="hd-shipdb-note">主要艦の改装Lv・必要アイテム・役割に加えて、Lv99最大ステータスと用途別おすすめ装備を確認。艦隊台帳のLvとも照合するよ。</div><div class="hd-shipdb-toolbar"><input id="hdShipDbSearch" type="search" placeholder="艦名・艦種・役割で検索"><label><input id="hdShipDbMissingOnly" type="checkbox"> 未所持だけ</label></div><div class="hd-shipdb-filters">${types.map((t,i)=>`<button class="ghost small${i===0?' active':''}" type="button" data-hd-shipdb-filter="${hdShipDbEsc(t)}">${hdShipDbEsc(t)}</button>`).join('')}</div><div id="hdShipDbList" class="hd-shipdb-list"></div><div><a class="guide-link" href="https://wikiwiki.jp/kancolle/%E6%94%B9%E9%80%A0/%E8%89%A6%E7%A8%AE%E5%88%A5%E4%B8%80%E8%A6%A7" target="_blank" rel="noopener">攻略Wiki 改造一覧で最新情報 ↗</a></div>`;
  roster.insertAdjacentElement('beforebegin',sec);
  document.getElementById('hdShipDbSearch').addEventListener('input',hdRenderShipDatabase);
  document.getElementById('hdShipDbMissingOnly').addEventListener('change',e=>{hdShipDbMissingOnly=e.target.checked;hdRenderShipDatabase()});
