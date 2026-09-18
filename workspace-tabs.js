@@ -117,10 +117,13 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
 function hdWSShowElement(target,scroll=true){
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
  const section=hdWSManagedSectionFor(el);if(!section)return false;const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
- clearTimeout(hdWSRefreshTimer);hdWSNavLockUntil=Date.now()+500;const navSeq=++hdWSNavSeq;
+ clearTimeout(hdWSRefreshTimer);hdWSNavLockUntil=Date.now()+1400;const navSeq=++hdWSNavSeq;
  const apply=()=>{if(navSeq!==hdWSNavSeq)return false;hdWSApply(group,section.id,{preserveNavSeq:true});section.classList.remove('hd-ws-hidden');hdWSUnhideAncestors(section);return true};
  if(hdWSApplying)setTimeout(apply,0);else apply();
- setTimeout(()=>{if(apply()&&scroll)el.scrollIntoView({behavior:'smooth',block:'start'})},50);
+ setTimeout(()=>apply(),40);
+ setTimeout(()=>{if(apply()&&scroll)el.scrollIntoView({behavior:'smooth',block:'start'})},140);
+ setTimeout(()=>apply(),520);
+ setTimeout(()=>apply(),1100);
  return true;
 }
 function hdWSPatchQuickNav(){if(window.__hdWSQuickPatched||typeof window.hdQNJump!=='function')return;window.__hdWSQuickPatched=true;const old=window.hdQNJump;window.hdQNJump=function(id){const target=document.getElementById(id);if(target){hdWSShowElement(target,false);setTimeout(()=>old(id),60);setTimeout(()=>{hdWSShowElement(target,false);target.scrollIntoView({behavior:'smooth',block:'start'})},140)}else old(id)}}
