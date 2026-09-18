@@ -456,7 +456,30 @@ function hdShipDbOwnedFitHtml(ship,set){
  const plan=hdShipDbResolveOwnedLoadout(ship,set);
  if(!plan.inventoryCount)return '<div class="hd-map-owned-fit empty-fit"><b>手持ち装備案</b><span>装備台帳が空だよ。装備を登録するとここに自動配備する。</span></div>';
  const cls=plan.filled===plan.total?'complete':plan.filled?'partial':'missing';
- return `<div class="hd-map-owned-fit ${cls}"><div class="hd-map-owned-fit-head"><div><b>手持ち装備案</b><small>${plan.filled}/${plan.total}枠を配備</small></div><button type="button" class="ghost small" data-hd-ship-owned-refresh>再配備</button></div><div class="hd-map-owned-slots">${plan.slots.map(x=>x.found?`<span class="owned"><i>✓</i><b>${hdShipDbEsc(x.name)}${x.star?` ★${x.star}`:''}</b><small>所持 ${x.count}｜${hdShipDbEsc(x.wanted)}</small></span>`:`<span class="missing"><i>!</i><b>不足</b><small>${hdShipDbEsc(x.wanted)}</small></span>`).join('')}</div><button type="button" class="ghost small" data-hd-ship-equip-ledger>装備台帳を開く</button></div>`;
+ return `<div class="hd-map-owned-fit ${cls}"><div class="hd-map-owned-fit-head"><div><b>手持ち装備案</b><small>${plan.filled}/${plan.total}枠を配備</small></div><button type="button" class="ghost small" data-hd-ship-owned-refresh>再配備</button></div><div class="hd-map-owned-slots">${plan.slots.map(x=>x.found?`<span class="owned"><i>✓</i><b>${hdShipDbEsc(x.name)}${x.star?` ★${x.star}`:''}</b><small>所持 ${x.count}｜${hdShipDbEsc(x.wanted)}</small></span>`:`<span class="missing"><i>!</i><b>不足</b><small>${hdShipDbEsc(x.wanted)}</small><button type="button" class="ghost small" data-hd-ship-acquire="${hdShipDbEsc(x.wanted)}">入手方法</button></span>`).join('')}</div><button type="button" class="ghost small" data-hd-ship-equip-ledger>装備台帳を開く</button></div>`;
+}
+function hdShipDbAcquisitionKind(wanted){
+ const w=String(wanted||'');
+ if(/艦戦|制空/.test(w))return '制空';
+ if(/艦攻|艦爆|航空火力/.test(w))return '航空火力';
+ if(/ソナー|水中聴音機|探信儀|爆雷|対潜/.test(w))return '対潜';
+ if(/電探/.test(w))return '電探';
+ if(/水偵|偵察|彩雲|索敵/.test(w))return '索敵';
+ if(/魚雷/.test(w)&&!/甲標的/.test(w))return '魚雷';
+ if(/主砲|連装砲|三連装砲/.test(w))return '主砲';
+ if(/内火艇|大発|三式弾|ロケット|対地/.test(w))return '対地';
+ if(/高角砲|機銃|対空/.test(w))return '防空';
+ if(/照明弾|探照灯|見張員|夜戦/.test(w))return '夜戦';
+ if(/缶|タービン|高速化|機関/.test(w))return '高速化';
+ return '';
+}
+function hdShipDbOpenAcquire(wanted){
+ const cat=hdShipDbEquipCatalog(),key=hdShipDbEquipNorm(wanted),exact=cat.find(x=>hdShipDbEquipNorm(x.name)===key);
+ const map=typeof selectedMap!=='undefined'?selectedMap:'';
+ if(exact&&typeof hdAGOpenItem==='function'){hdAGOpenItem(exact.name,map);return}
+ const kind=hdShipDbAcquisitionKind(wanted);
+ if(kind&&typeof hdAGOpen==='function'){hdAGOpen(kind,map);return}
+ if(typeof hdAGOpenCatalog==='function')hdAGOpenCatalog(wanted);
 }
 function hdShipDbRefreshOwnedFits(root=document){
  root.querySelectorAll?.('[data-hd-owned-fit]').forEach(host=>{
@@ -549,6 +572,7 @@ function hdShipDbAdd(base){
 }
 document.addEventListener('click',e=>{
  if(e.target.closest?.('[data-hd-ship-owned-refresh]')){const card=e.target.closest('.hd-map-ship-candidate');if(card)hdShipDbRefreshOwnedFits(card);return}
+ const acquire=e.target.closest?.('[data-hd-ship-acquire]');if(acquire){hdShipDbOpenAcquire(acquire.dataset.hdShipAcquire);return}
  if(e.target.closest?.('[data-hd-ship-equip-ledger]')){
   if(typeof hdOwnedOpenLedger==='function')hdOwnedOpenLedger('');
   else{const target=document.getElementById('equipmentBook');if(target)target.scrollIntoView({behavior:'smooth',block:'start'})}
