@@ -138,6 +138,35 @@ function hdFOOptimize(plan,mode,maxChanges){
  out.optimizedAt=Date.now();return out;
 }
 function hdFOStatusText(e){return e?'配置あり '+e.ready+'/'+e.requirements.length+'｜一部 '+e.partial+'｜未配置 '+e.missing:'評価なし'}
+function hdFOStandardPlan(index){
+ const map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+index,current=(typeof HD_FL_CACHE!=='undefined'&&HD_FL_CACHE[key])||null;
+ const fresh=typeof hdFLGenerate==='function'?hdFLGenerate(index):null;if(!fresh)return null;
+ const base=hdFOClone(fresh);
+ if(typeof HD_FL_CACHE!=='undefined'){if(current)HD_FL_CACHE[key]=current;else delete HD_FL_CACHE[key]}
+ return base;
+}
+function hdFORareUsage(plan){
+ const inv=typeof hdFLInventory==='function'?hdFLInventory():new Map();let slots=0;const names=new Set();
+ for(const ship of plan&&plan.ships||[])for(const item of ship.items||[]){
+  const key=typeof hdFLNorm==='function'?hdFLNorm(item.name):String(item.name||''),own=inv.get(key);
+  if(!own)continue;
+  if((Number(own.count)||0)<=2||(Number(item.star)||0)>=6){slots++;names.add(item.name)}
+ }
+ return {slots:slots,names:[...names]};
+}
+function hdFOCompare(index){
+ const base=hdFOStandardPlan(index);if(!base)return [];
+ return Object.keys(HD_FO_MODES).map(function(id){
+  const plan=hdFOOptimize(base,id),e=plan.optimization&&plan.optimization.after||hdFEEvaluate(plan),rare=hdFORareUsage(plan);
+  return {mode:id,label:hdFOMode(id).label,note:hdFOMode(id).note,plan:plan,ready:e&&e.ready||0,total:e&&e.requirements&&e.requirements.length||0,partial:e&&e.partial||0,missing:e&&e.missing||0,changes:plan.optimization&&plan.optimization.changes.length||0,equipAttack:e&&e.night&&e.night.equipmentAttack||0,rareSlots:rare.slots,rareNames:rare.names,unresolved:plan.optimization&&plan.optimization.unresolved||[]};
+ });
+}
+function hdFOCompareHtml(index,rows){
+ return '<div class="hd-fo-compare"><div class="hd-fo-compare-head"><div><strong>5モード比較</strong><span>同じ標準配備から各方針を個別計算</span></div><button type="button" class="ghost small" data-hd-fo-close-compare>閉じる</button></div><div class="hd-fo-compare-grid">'+rows.map(function(x){
+  const unresolved=x.unresolved.length?x.unresolved.map(function(r){return hdFOEsc(r.label)+' '+r.count+'/'+r.minCount}).join('、'):'主要要求は配備目安内';
+  return '<article class="hd-fo-compare-card" data-hd-fo-compare-card="'+x.mode+'"><div class="hd-fo-compare-card-head"><div><strong>'+hdFOEsc(x.label)+'</strong><small>'+hdFOEsc(x.note)+'</small></div><b>'+x.ready+'/'+x.total+'</b></div><div class="hd-fo-compare-metrics"><span>条件充足 <b>'+x.ready+'/'+x.total+'</b></span><span>未配置 <b>'+x.missing+'</b></span><span>交換 <b>'+x.changes+'</b></span><span>装備 火力+雷装 <b>'+x.equipAttack+'</b></span><span>希少・高改修 <b>'+x.rareSlots+'枠</b></span></div><p>'+unresolved+'</p><button type="button" class="primary small" data-hd-fo-adopt="'+x.mode+'" data-hd-fo-index="'+index+'">この案を採用</button></article>';
+ }).join('')+'</div><p class="hd-fo-compare-note">※数値は装備台帳とアプリ内評価式による比較。最終制空値・最終33式・個艦固有の搭載可否などは別途確認してね。</p></div>';
+}
 function hdFOResultHtml(plan){
  const o=plan.optimization;if(!o)return '';
  const improved=(o.after&&o.after.ready||0)>(o.before&&o.before.ready||0)||(o.after&&o.after.missing||0)<(o.before&&o.before.missing||0);
@@ -153,7 +182,7 @@ function hdFOInstall(){
  hdFEHtml=function(plan){
   let html=prev(plan);
   const current=plan.optimization&&plan.optimization.strategy||hdFOStoredMode(),modeOptions=Object.values(HD_FO_MODES).map(function(m){return '<option value="'+m.id+'" '+(m.id===current?'selected':'')+'>'+m.label+'</option>'}).join('');
-  const controls='<div class="hd-fo-controls"><label class="hd-fo-mode"><span>最適化方針</span><select data-hd-fo-mode="'+plan.index+'">'+modeOptions+'</select><small>'+hdFOEsc(hdFOMode(current).note)+'</small></label><button type="button" class="primary small" data-hd-fo-optimize="'+plan.index+'">この方針で最適化</button>'+(plan.optimization?'<button type="button" class="ghost small" data-hd-fo-reset="'+plan.index+'">標準配備に戻す</button>':'')+'</div>';
+  const controls='<div class="hd-fo-controls"><label class="hd-fo-mode"><span>最適化方針</span><select data-hd-fo-mode="'+plan.index+'">'+modeOptions+'</select><small>'+hdFOEsc(hdFOMode(current).note)+'</small></label><button type="button" class="primary small" data-hd-fo-optimize="'+plan.index+'">この方針で最適化</button><button type="button" class="ghost small" data-hd-fo-compare="'+plan.index+'">5モードを比較</button>'+(plan.optimization?'<button type="button" class="ghost small" data-hd-fo-reset="'+plan.index+'">標準配備に戻す</button>':'')+'</div><div class="hd-fo-compare-host"></div>';
   return html.replace('<div class="hd-fe-actions">',hdFOResultHtml(plan)+controls+'<div class="hd-fe-actions">');
  };
  return true;
@@ -164,12 +193,25 @@ function hdFOApply(index,card,mode){
  const optimized=hdFOOptimize(base,selected);if(typeof HD_FL_CACHE!=='undefined')HD_FL_CACHE[key]=optimized;
  const host=card.querySelector('.hd-fl-host');if(host)host.innerHTML=hdFLPlanHtml(optimized);
 }
+function hdFOShowCompare(index,card){
+ if(!card)return;const rows=hdFOCompare(index),host=card.querySelector('.hd-fo-compare-host');if(!host)return;
+ host.innerHTML=hdFOCompareHtml(index,rows);host.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function hdFOAdopt(index,mode,card){
+ const base=hdFOStandardPlan(index);if(!base||!card)return;
+ const selected=hdFOMode(mode).id,plan=hdFOOptimize(base,selected),map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+index;
+ hdFOSetStoredMode(selected);if(typeof HD_FL_CACHE!=='undefined')HD_FL_CACHE[key]=plan;
+ const host=card.querySelector('.hd-fl-host');if(host)host.innerHTML=hdFLPlanHtml(plan);
+}
 function hdFOReset(index,card){
  const map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+index;if(typeof HD_FL_CACHE!=='undefined')delete HD_FL_CACHE[key];
  if(typeof hdFLRender==='function')hdFLRender(index,card);
 }
 document.addEventListener('click',function(e){
  const opt=e.target.closest&&e.target.closest('[data-hd-fo-optimize]');if(opt){const card=opt.closest('.hd-fs-card'),sel=card&&card.querySelector('[data-hd-fo-mode="'+opt.dataset.hdFoOptimize+'"]');hdFOApply(opt.dataset.hdFoOptimize,card,sel&&sel.value);return}
+ const compare=e.target.closest&&e.target.closest('[data-hd-fo-compare]');if(compare){hdFOShowCompare(compare.dataset.hdFoCompare,compare.closest('.hd-fs-card'));return}
+ const adopt=e.target.closest&&e.target.closest('[data-hd-fo-adopt]');if(adopt){hdFOAdopt(adopt.dataset.hdFoIndex,adopt.dataset.hdFoAdopt,adopt.closest('.hd-fs-card'));return}
+ if(e.target.closest&&e.target.closest('[data-hd-fo-close-compare]')){const host=e.target.closest('.hd-fo-compare-host');if(host)host.innerHTML='';return}
  const mode=e.target.closest&&e.target.closest('[data-hd-fo-mode]');if(mode){hdFOSetStoredMode(mode.value);const note=mode.parentElement&&mode.parentElement.querySelector('small');if(note)note.textContent=hdFOMode(mode.value).note;return}
  const reset=e.target.closest&&e.target.closest('[data-hd-fo-reset]');if(reset){hdFOReset(reset.dataset.hdFoReset,reset.closest('.hd-fs-card'));return}
 });
