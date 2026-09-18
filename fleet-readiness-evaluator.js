@@ -94,7 +94,7 @@ function hdFERequirementHtml(r){
 function hdFEHtml(plan){
  const e=hdFEEvaluate(plan),losText=e.los.weighted!=null?e.los.weighted.toFixed(2):e.los.raw.toFixed(2),losLabel=e.los.weighted!=null?`33式 装備項×係数`:'索敵 装備項';
  const requirementHtml=e.requirements.length?e.requirements.map(hdFERequirementHtml).join(''):'<div class="muted">この海域では主要な特殊装備要求を検出していないよ。</div>';
- const airNote=e.air.count?'搭載数がないため制空値そのものは未計算':'航空装備なし';
+ const airNote=e.air.count?'制空値そのものは未計算（各艦の搭載数が必要）':'航空装備なし｜制空値そのものは未計算';
  const losNote=e.los.summary?e.los.summary:'艦娘素索敵・司令部Lvを含む最終33式は別計算';
  return `<section class="hd-fe-panel">
   <div class="hd-fe-head"><div><div class="eyebrow">FLEET READINESS SCORECARD</div><strong>編成・装備の数値評価</strong><span>実際にこの候補へ配備された装備だけを集計</span></div><b class="${e.missing?'warn':e.partial?'partial':'ok'}">配置 ${e.ready}/${e.requirements.length}</b></div>
