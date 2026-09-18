@@ -48,7 +48,7 @@ test('procurement readiness updates from the equipment ledger', async ({ page })
 
   const card = page.locator('.hd-pl-map-card', { hasText: '3-2 調達リスト' });
   const speed = card.locator('.hd-pl-req', { hasText: '高速化セット' });
-  const radar = card.locator('.hd-pl-req', { hasText: '電探' }).filter({ hasNotText: '高速化セット' }).first();
+  const radar = card.locator('.hd-pl-req').filter({ has: page.locator('.hd-pl-req-head strong', { hasText: /^電探$/ }) });
   await expect(speed).toContainText('準備完了');
   await expect(radar).toContainText('準備完了');
 });
