@@ -61,7 +61,13 @@ function hdGSScroll(id){
 function hdGSOpenResult(row){
  if(!row)return;const a=row.action;hdGSSaveHistory(document.getElementById('hdGSSearch')?.value||row.title);
  if(a.kind==='feature'){hdGSScroll(a.id);return}
- if(a.kind==='map'){try{if(typeof hdWSShowElement==='function')hdWSShowElement('guide',false);selectedWorld=String(a.map).split('-')[0];selectedMap=a.map;if(typeof renderMapPicker==='function')renderMapPicker();hdGSClose();setTimeout(()=>document.getElementById('selectedMapCard')?.scrollIntoView({behavior:'smooth',block:'start'}),60)}catch{}return}
+ if(a.kind==='map'){try{
+  if(typeof hdWSShowElement==='function')hdWSShowElement('guide',false);
+  selectedWorld=String(a.map).split('-')[0];selectedMap=a.map;
+  if(typeof renderMapPicker==='function')renderMapPicker();
+  hdGSClose();const seq=hdGSNavSeq;
+  setTimeout(()=>{if(seq!==hdGSNavSeq)return;document.getElementById('selectedMapCard')?.scrollIntoView({behavior:'smooth',block:'start'})},60);
+ }catch{}return}
  if(a.kind==='ship'){try{if(typeof hdEnsureShipDatabase==='function')hdEnsureShipDatabase();hdShipDbType='すべて';hdShipDbMissingOnly=false;const cb=document.getElementById('hdShipDbMissingOnly');if(cb)cb.checked=false;const i=document.getElementById('hdShipDbSearch');if(i)i.value=a.name;if(typeof hdRenderShipDatabase==='function')hdRenderShipDatabase();hdGSScroll('shipDatabase')}catch{}return}
  if(a.kind==='roster'){hdGSScroll('roster');return}
  if(a.kind==='equipment'){try{if(typeof hdEnsureEquipmentCatalog==='function')hdEnsureEquipmentCatalog();hdEquipCatalogFilter='すべて';const i=document.getElementById('hdEquipCatalogSearch');if(i)i.value=a.name;if(typeof hdRenderEquipmentCatalog==='function')hdRenderEquipmentCatalog();hdGSScroll('equipmentBook')}catch{}return}
