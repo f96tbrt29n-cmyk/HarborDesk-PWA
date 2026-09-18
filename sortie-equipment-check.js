@@ -102,6 +102,14 @@ document.addEventListener('click',e=>{
  if(e.target.closest?.('[data-hd-se-analyzer]')){hdSEOpenAnalyzer();return}
  if(e.target.closest?.('[data-hd-se-calculator]')){hdSEOpenCalculator();return}
 });
-window.addEventListener('storage',e=>{if(e.key==='harbordesk-equipment-v1'&&typeof hdRenderMapEquipmentRecommendations==='function')hdRenderMapEquipmentRecommendations()});
-window.addEventListener('load',()=>setTimeout(()=>{if(!hdSEInstall())setTimeout(hdSEInstall,500)},250));
-hdSEInstall();
+function hdSEEnsure(){
+ const installed=hdSEInstall();
+ if((installed||window.__hdSortieEquipCheckInstalled)&&typeof hdRenderMapEquipmentRecommendations==='function')hdRenderMapEquipmentRecommendations();
+ return !!window.__hdSortieEquipCheckInstalled;
+}
+window.addEventListener('storage',e=>{if(e.key==='harbordesk-equipment-v1')hdSEEnsure()});
+window.addEventListener('hd:modules-ready',()=>hdSEEnsure());
+window.addEventListener('hd:map-rendered',()=>hdSEEnsure());
+window.addEventListener('hd:map-tab-changed',e=>{if(e.detail?.tab==='gear')hdSEEnsure()});
+window.addEventListener('load',()=>setTimeout(hdSEEnsure,120));
+hdSEEnsure();
