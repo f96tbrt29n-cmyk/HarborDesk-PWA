@@ -146,6 +146,7 @@ function hdWSPatchQuickNav(){
  if(window.__hdWSQuickPatched||typeof window.hdQNJump!=='function')return;
  window.__hdWSQuickPatched=true;const old=window.hdQNJump;
  window.hdQNJump=function(id){
+  if(typeof hdGSClose==='function')hdGSClose();
   const target=document.getElementById(id);
   if(!target){old(id);return}
   hdWSShowElement(target,false);
