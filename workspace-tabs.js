@@ -126,13 +126,20 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
 function hdWSShowElement(target,scroll=true){
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
  const section=hdWSManagedSectionFor(el);if(!section)return false;const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
- clearTimeout(hdWSRefreshTimer);hdWSNavLockUntil=Date.now()+1600;hdWSSetPin(group,section.id,1600);const navSeq=++hdWSNavSeq;
- const apply=()=>{if(navSeq!==hdWSNavSeq)return false;hdWSApply(group,section.id,{preserveNavSeq:true});section.classList.remove('hd-ws-hidden');hdWSUnhideAncestors(section);return true};
+ clearTimeout(hdWSRefreshTimer);hdWSNavLockUntil=Date.now()+1800;hdWSSetPin(group,section.id,1800);const navSeq=++hdWSNavSeq;
+ const pinNow=()=>{
+  if(navSeq!==hdWSNavSeq)return false;
+  hdWSState.group=group;hdWSState.sections[group]=section.id;hdWSSave();
+  document.querySelectorAll('[data-hd-ws-group]').forEach(b=>{const active=b.dataset.hdWsGroup===group;b.classList.toggle('active',active);b.setAttribute('aria-selected',active?'true':'false')});
+  section.classList.remove('hd-ws-hidden');hdWSUnhideAncestors(section);return true;
+ };
+ const apply=()=>{if(navSeq!==hdWSNavSeq)return false;hdWSApply(group,section.id,{preserveNavSeq:true});pinNow();return true};
+ pinNow();
  if(hdWSApplying)setTimeout(apply,0);else apply();
  setTimeout(()=>apply(),40);
  setTimeout(()=>{if(apply()&&scroll)el.scrollIntoView({behavior:'smooth',block:'start'})},140);
- setTimeout(()=>apply(),520);
- setTimeout(()=>apply(),1100);
+ setTimeout(()=>apply(),600);
+ setTimeout(()=>apply(),1300);
  return true;
 }
 function hdWSPatchQuickNav(){if(window.__hdWSQuickPatched||typeof window.hdQNJump!=='function')return;window.__hdWSQuickPatched=true;const old=window.hdQNJump;window.hdQNJump=function(id){const target=document.getElementById(id);if(target){hdWSShowElement(target,false);setTimeout(()=>old(id),60);setTimeout(()=>{hdWSShowElement(target,false);target.scrollIntoView({behavior:'smooth',block:'start'})},140)}else old(id)}}
