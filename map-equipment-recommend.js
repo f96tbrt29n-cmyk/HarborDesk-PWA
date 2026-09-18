@@ -25,7 +25,8 @@ function hdMapEquipNeeds(map){
   const add=(id,label,reason)=>{if(!needs.some(x=>x.id===id))needs.push({id,label,reason})};
   const subPositive=(g.sub||[]).length||/対潜|潜水マス|潜水艦との戦闘|潜水戦|敵[^。 ]*潜水|潜水(?:カ級|ヨ級|ソ級|新棲姫)/.test(text);
   if(subPositive)add('対潜','対潜','潜水マス・潜水艦対策。先制対潜や対潜シナジーを組みやすい装備を優先。');
-  const airPositive=(g.air||[]).length||/航空戦|空襲|航空優勢|航空均衡|制空値|制空確保|制空を(?:確保|取る|調整)|制空調整|制空重視|艦戦/.test(text);
+  const airExplicitNone=/航空戦力(?:は|が)?(?:基本)?不要|制空(?:は|より)?[^。]*(?:不要|優先度が低い)/.test(text);
+  const airPositive=(g.air||[]).length||(!airExplicitNone&&/航空戦(?!力)|空襲|航空優勢|航空均衡|制空値|制空確保|制空を(?:確保|取る|調整)|制空調整|制空重視|艦戦/.test(text));
   if(airPositive){
     add('制空','制空','航空優勢・拮抗などの制空調整用。艦戦/水戦から編成に合うものを選ぶ。');
     add('防空','防空','空襲・航空戦の被害軽減用。対空CIや噴進弾幕を組める艦では特に有効。');
