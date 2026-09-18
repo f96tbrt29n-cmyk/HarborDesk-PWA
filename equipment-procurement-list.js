@@ -28,6 +28,34 @@ function hdPLMergeGearItems(items=[]){
  }
  return [...m.values()].sort((a,b)=>(a.rank||9)-(b.rank||9)||(a.target||a.wanted).localeCompare(b.target||b.wanted,'ja'));
 }
+function hdPLOwnedCount(name){
+ if(!name)return 0;
+ if(typeof hdAGOwned==='function')return Math.max(0,Number(hdAGOwned(name)?.count)||0);
+ try{
+  const norm=s=>String(s||'').normalize('NFKC').replace(/\s+/g,'').replace(/･/g,'・'),key=norm(name);
+  const rows=JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]');
+  return (Array.isArray(rows)?rows:[]).filter(x=>norm(x.name)===key).reduce((s,x)=>s+Math.max(0,Number(x.count)||0),0);
+ }catch{return 0}
+}
+function hdPLDemandRows(items=[]){
+ const m=new Map();
+ for(const x of items){
+  const target=x.target||x.wanted||'',key=[x.map||'',target,x.methodKey||'',x.kind||''].join('|');
+  const cur=m.get(key)||{...x,target,needed:0,ships:[],loadouts:[],sources:[]};
+  cur.needed+=(x.needed||1);
+  cur.ships=[...new Set([...cur.ships,x.ship].filter(Boolean))];
+  cur.loadouts=[...new Set([...cur.loadouts,x.loadout].filter(Boolean))];
+  cur.sources=[...new Set([...(cur.sources||[]),...(x.sources||[])])];
+  m.set(key,cur);
+ }
+ return [...m.values()].map(x=>{
+  const owned=x.target?hdPLOwnedCount(x.target):0,shortfall=Math.max(0,(x.needed||0)-owned);
+  return {...x,owned,shortfall,status:shortfall===0?'ready':owned>0?'partial':'missing'};
+ }).sort((a,b)=>{
+  if((a.shortfall===0)!==(b.shortfall===0))return a.shortfall===0?1:-1;
+  return (a.rank||9)-(b.rank||9)||(b.shortfall||0)-(a.shortfall||0)||(a.target||a.wanted).localeCompare(b.target||b.wanted,'ja');
+ });
+}
 function hdPLAddShipLoadout(map,shipName,loadoutName){
  if(!map||typeof HD_SHIP_DATABASE==='undefined'||typeof HD_SHIP_LOADOUTS==='undefined'||typeof hdShipDbResolveOwnedLoadout!=='function')return false;
  const ship=HD_SHIP_DATABASE.find(x=>x.final===shipName||x.base===shipName);if(!ship)return false;
@@ -59,7 +87,7 @@ function hdPLAddMap(map){
  if(!checks.length){alert?.(`${map} は現在の装備台帳では主要装備が準備済みだよ`);return false}
  const list=hdPLLoad(),old=list.find(x=>x.map===map);
  const kinds=[...new Set([...(old?.kinds||[]),...checks.map(x=>x.kind)])];
- const next={id:old?.id||`pl-${Date.now()}-${Math.random().toString(16).slice(2)}`,map,kinds,createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};
+ const next={id:old?.id||`pl-${Date.now()}-${Math.random().toString(16).slice(2)}`,map,kinds,gearItems:old?.gearItems||[],createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};
  const out=old?list.map(x=>x.map===map?next:x):[next,...list];
  hdPLSave(out);return true;
 }
@@ -67,17 +95,24 @@ function hdPLRemove(map){hdPLSave(hdPLLoad().filter(x=>x.map!==map))}
 function hdPLPruneReady(map){
  const list=hdPLLoad(),row=list.find(x=>x.map===map);if(!row)return;
  const kinds=(row.kinds||[]).filter(k=>hdPLCurrentCheck(map,k).status!=='ready');
- if(!kinds.length){hdPLRemove(map);return}
- row.kinds=kinds;row.updatedAt=Date.now();hdPLSave(list);
+ const demand=hdPLDemandRows(row.gearItems||[]),openKeys=new Set(demand.filter(x=>x.shortfall>0).map(x=>[x.map||map,x.target||x.wanted,x.methodKey||'',x.kind||''].join('|')));
+ const gearItems=(row.gearItems||[]).filter(x=>openKeys.has([x.map||map,x.target||x.wanted,x.methodKey||'',x.kind||''].join('|')));
+ if(!kinds.length&&!gearItems.length){hdPLRemove(map);return}
+ row.kinds=kinds;row.gearItems=gearItems;row.updatedAt=Date.now();hdPLSave(list);
 }
 function hdPLGearItemHtml(map,row){
  const target=row.target||'',method=row.methodLabel||'入手情報',rank=row.rank||4,label=rank===1?'優先1':rank===2?'優先2':rank===3?'優先3':rank===5?'優先5':'優先4';
- return `<article class="hd-pl-gear-item method-${hdPLEsc(row.methodKey||'other')}"><div class="hd-pl-gear-head"><div><strong>${hdPLEsc(target||row.wanted)}</strong><span>${hdPLEsc(row.ship||'')}｜${hdPLEsc(row.loadout||'')}</span></div><div><b>${label}</b><em>${hdPLEsc(method)}</em></div></div><div class="hd-pl-gear-meta"><span>必要枠 <b>${row.needed||1}</b></span>${target&&target!==row.wanted?`<span>元の希望 <b>${hdPLEsc(row.wanted)}</b></span>`:''}</div><div class="hd-pl-actions">${target?`<button type="button" class="ghost small" data-hd-pl-item-guide="${hdPLEsc(target)}" data-hd-pl-map="${hdPLEsc(map)}">この装備の入手方法</button><button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(target)}">図鑑</button>`:(row.kind?`<button type="button" class="ghost small" data-hd-pl-guide="${hdPLEsc(row.kind)}" data-hd-pl-map="${hdPLEsc(map)}">代替候補を見る</button>`:'')}</div></article>`;
+ const need=Math.max(0,Number(row.needed)||0),owned=Math.max(0,Number(row.owned)||0),left=Math.max(0,Number(row.shortfall)||0);
+ const status=left===0?'準備済み':owned>0?'あと少し':'不足';
+ const shipText=(row.ships||[]).join('・')||row.ship||'',loadoutText=(row.loadouts||[]).join('・')||row.loadout||'';
+ return `<article class="hd-pl-gear-item method-${hdPLEsc(row.methodKey||'other')} ${row.status||''}"><div class="hd-pl-gear-head"><div><strong>${hdPLEsc(target||row.wanted)}</strong><span>${hdPLEsc(shipText)}${loadoutText?`｜${hdPLEsc(loadoutText)}`:''}</span></div><div><b>${left?label:'完了'}</b><em>${hdPLEsc(method)}</em></div></div><div class="hd-pl-gear-counts"><span>必要 <b>${need}</b></span><span>所持 <b>${owned}</b></span><span class="${left?'short':'done'}">あと <b>${left}</b></span></div><div class="hd-pl-gear-meta">${target&&target!==row.wanted?`<span>元の希望 <b>${hdPLEsc(row.wanted)}</b></span>`:''}<span>状態 <b>${status}</b></span></div><div class="hd-pl-actions">${left>0?(target?`<button type="button" class="ghost small" data-hd-pl-item-guide="${hdPLEsc(target)}" data-hd-pl-map="${hdPLEsc(map)}">この装備の入手方法</button><button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(target)}">図鑑</button>`:(row.kind?`<button type="button" class="ghost small" data-hd-pl-guide="${hdPLEsc(row.kind)}" data-hd-pl-map="${hdPLEsc(map)}">代替候補を見る</button>`:'')):(target?`<button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(target)}">所持装備を確認</button>`:'')}</div></article>`;
 }
 function hdPLGearPlanHtml(row){
- const items=hdPLMergeGearItems(row.gearItems||[]);if(!items.length)return '';
- const counts={develop:0,improve:0,quest:0,other:0,limited:0};items.forEach(x=>counts[x.methodKey||'other']=(counts[x.methodKey||'other']||0)+(x.needed||1));
- return `<section class="hd-pl-gear-plan"><div class="hd-pl-gear-summary"><div><div class="eyebrow">SHIP LOADOUT PROCUREMENT</div><strong>個艦の不足装備</strong></div><span>開発 ${counts.develop} / 改修 ${counts.improve} / 任務 ${counts.quest} / その他 ${counts.other} / 限定 ${counts.limited}</span></div><div class="hd-pl-gear-list">${items.map(x=>hdPLGearItemHtml(row.map,x)).join('')}</div></section>`;
+ const items=hdPLDemandRows(row.gearItems||[]);if(!items.length)return '';
+ const open=items.filter(x=>x.shortfall>0),ready=items.length-open.length;
+ const counts={develop:0,improve:0,quest:0,other:0,limited:0};open.forEach(x=>counts[x.methodKey||'other']=(counts[x.methodKey||'other']||0)+(x.shortfall||0));
+ const totalNeed=items.reduce((s,x)=>s+(x.needed||0),0),totalOwnedApplied=items.reduce((s,x)=>s+Math.min(x.needed||0,x.owned||0),0),totalLeft=items.reduce((s,x)=>s+(x.shortfall||0),0);
+ return `<section class="hd-pl-gear-plan"><div class="hd-pl-gear-summary"><div><div class="eyebrow">SHIP LOADOUT PROCUREMENT</div><strong>個艦の不足装備</strong></div><span>必要 ${totalNeed} / 所持充当 ${totalOwnedApplied} / あと ${totalLeft}</span></div><div class="hd-pl-gear-progress"><span style="width:${totalNeed?Math.min(100,Math.round(totalOwnedApplied/totalNeed*100)):100}%"></span></div><p class="hd-pl-gear-method-summary">未調達: 開発 ${counts.develop} / 改修 ${counts.improve} / 任務 ${counts.quest} / その他 ${counts.other} / 限定 ${counts.limited}｜準備済み ${ready}種</p><div class="hd-pl-gear-list">${items.map(x=>hdPLGearItemHtml(row.map,x)).join('')}</div></section>`;
 }
 function hdPLRequirementHtml(map,kind){
  const check=hdPLCurrentCheck(map,kind),rec=hdPLRecommendation(kind),ready=check.status==='ready';
