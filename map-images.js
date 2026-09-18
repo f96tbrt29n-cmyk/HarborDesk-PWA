@@ -103,14 +103,18 @@ function hdMapSvg(map,detail,large=false){
  <text x="${w-30}" y="36" text-anchor="end" class="hd-map-svg-badge">海域構造寄せ</text>
  </svg>`;
 }
+// The supplied KC3Kai mini-map assets preserve their source pixels and aspect ratio.
+const HD_MAP_IMAGE_SOURCE='https://github.com/KC3Kai/KC3Kai/tree/6b0534d291c27220da1b6fe454e91fc96a6a7b27/src/assets/img/client/minimaps';
+function hdMapReferenceImage(map,detail){
+ if(!Object.prototype.hasOwnProperty.call(HD_MAP_GRAPHS,map))return '<p class="empty">この海域の画像は未登録です。</p>';
+ return `<img class="hd-map-reference-image" src="./assets/maps/${map}.png" alt="${hdMapEsc2(map)} ${hdMapEsc2(detail?.name||'')} 海域マップ（KC3改掲載画像）" decoding="async">`;
+}
 function hdMapImageHtml(map,detail){
- const graph=HD_MAP_GRAPHS[map]||{};
- const route=detail?.route||'ルート情報を整理中';
- return `<section class="hd-map-image-section">
- <button class="hd-map-image-button" type="button" data-hd-map-open="${hdMapEsc2(map)}" aria-label="${hdMapEsc2(map)}の海域構造図を拡大表示">${hdMapSvg(map,detail,false)}<span class="hd-map-zoom-label">タップで拡大</span></button>
- <div class="map-tab-card"><b>ルートメモ</b><p>${hdMapEsc2(route)}</p></div>
- ${graph.note?`<div class="map-tab-card"><b>段階メモ</b><p>${hdMapEsc2(graph.note)}</p></div>`:''}
- <div class="hd-map-image-note">※現行Wikiの分岐構造を参考にHarborDesk用に描き直した構造図。ノードの左右・上下位置は見やすさ優先で、公式マップ画像そのものではないよ。</div>
+ return `<section class="hd-map-image-section" data-hd-map-reference="${hdMapEsc2(map)}">
+ <button class="hd-map-image-button" type="button" data-hd-map-open="${hdMapEsc2(map)}" aria-label="${hdMapEsc2(map)}の海域マップを拡大表示">${hdMapReferenceImage(map,detail)}<span class="hd-map-zoom-label">タップで拡大</span></button>
+ <div class="map-tab-card"><b>ルートメモ</b><p>${hdMapEsc2(detail?.route||'ルート情報を整理中')}</p></div>
+ <div class="hd-map-image-note">KC3改の海域マップ画像。地形・マス・航路を画像のまま表示しています。小型画像のため、拡大時は粗く見える場合があります。複数ゲージの海域は掲載画像の開放段階を示します。</div>
+ <div><a class="guide-link" href="${HD_MAP_IMAGE_SOURCE}" target="_blank" rel="noopener">画像の出典 ↗</a> <a class="guide-link" href="${wikiMapUrl(map)}" target="_blank" rel="noopener">海域の攻略・開放条件 ↗</a></div>
  </section>`;
 }
 function hdEnsureMapDialog(){
@@ -119,4 +123,4 @@ function hdEnsureMapDialog(){
  d.innerHTML='<div class="hd-map-dialog-head"><strong id="hdMapDialogTitle">海域マップ</strong><button class="ghost small" type="button" id="hdMapDialogClose">閉じる</button></div><div id="hdMapDialogBody"></div>';
  document.body.appendChild(d);document.getElementById('hdMapDialogClose').onclick=()=>d.close();d.addEventListener('click',e=>{if(e.target===d)d.close()});return d;
 }
-document.addEventListener('click',e=>{const btn=e.target.closest('[data-hd-map-open]');if(!btn)return;const map=btn.dataset.hdMapOpen;const detail=typeof MAP_DETAILS!=='undefined'?MAP_DETAILS[map]:null;const d=hdEnsureMapDialog();document.getElementById('hdMapDialogTitle').textContent=`${map} ${detail?.name||''}`;document.getElementById('hdMapDialogBody').innerHTML=hdMapSvg(map,detail,true);d.showModal()});
+document.addEventListener('click',e=>{const btn=e.target.closest('[data-hd-map-open]');if(!btn)return;const map=btn.dataset.hdMapOpen;const detail=typeof MAP_DETAILS!=='undefined'?MAP_DETAILS[map]:null;const d=hdEnsureMapDialog();document.getElementById('hdMapDialogTitle').textContent=`${map} ${detail?.name||''}`;document.getElementById('hdMapDialogBody').innerHTML=hdMapReferenceImage(map,detail);d.showModal()});

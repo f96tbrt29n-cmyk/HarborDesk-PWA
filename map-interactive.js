@@ -134,6 +134,8 @@ function hdEnhanceMapPane(){
   const pane=document.querySelector('[data-map-pane="map"]');if(!pane||pane.dataset.hdEnhanced==='1')return;
   const imageSection=pane.querySelector('.hd-map-image-section');if(!imageSection)return;
   pane.dataset.hdEnhanced='1';
+  // Source images have no verified clickable coordinates or graph overlay.
+  if(imageSection.hasAttribute('data-hd-map-reference'))return;
   const tools=document.createElement('div');tools.className='hd-map-tools';
   tools.innerHTML=`<div class="hd-map-legend"><span data-kind="normal">通常</span><span data-kind="sub">潜水</span><span data-kind="air">航空</span><span data-kind="night">夜戦</span><span data-kind="vortex">うずしお</span><span data-kind="item">資源</span><span data-kind="boss">ボス</span></div><button class="ghost small" type="button" id="hdRouteHighlight">最短経路を強調</button>`;
   imageSection.prepend(tools);
