@@ -8581,20 +8581,8 @@ const HD_SLOT_EXCLUSION_RULES=[
  {shipIds:[743,744,745],slot:3,allowOnly:[21,43]}
 ];
 const HD_EQUIP_TYPE_LABELS={1:'小口径主砲',2:'中口径主砲',3:'大口径主砲',5:'魚雷',12:'小型電探',13:'大型電探',21:'対空機銃',22:'特殊潜航艇',43:'戦闘糧食',38:'大口径主砲(II)',91:'噴式戦闘爆撃機(II)',93:'大型電探(II)',94:'艦上偵察機(II)',95:'副砲(II)'};
-const HD_SHIP_EXPANSION_SPECIAL={
- '綾波改二':['12.7cm単装高角砲系'],
- '潮改二':['12.7cm単装高角砲系'],
- '暁改二':['12.7cm単装高角砲系'],
- '初霜改二':['12.7cm単装高角砲系'],
- '時雨改三':['12.7cm単装高角砲系','爆雷系'],
- '夕立改二':['12.7cm単装高角砲系'],
- '雪風改二':['12.7cm単装高角砲系'],
- '磯風乙改':['12.7cm単装高角砲系'],
- '秋月改二':['三式爆雷投射機系'],
- '初月改二':['三式爆雷投射機系'],
- '涼月改':['三式爆雷投射機系'],
- '天津風改二':['強化缶系']
-};
+const HD_EQUIPMENT_MASTER_NAME_BY_ID=Object.fromEntries(Object.entries(HD_EQUIPMENT_MASTER_META_BY_NAME).map(([name,v])=>[String(v.id),name]));
+const HD_EXSLOT_TYPE_LABELS={16:'追加装甲',21:'対空機銃',23:'応急修理要員',27:'追加装甲(中型)',28:'追加装甲(大型)',36:'高射装置',39:'水上艦要員',43:'戦闘糧食',44:'補給物資'};
 function hdShipDbSlotProfile(ship){
  const name=typeof ship==='string'?ship:ship?.final;
  const p=HD_SHIP_SLOT_PROFILES[name];if(!p)return null;
@@ -8624,38 +8612,72 @@ function hdShipDbMasterCompatible(item,ship){
  }
  return saw?false:null;
 }
-function hdShipDbExpansionRuleMatch(rule,profile,star=0){
+function hdShipDbExpansionRuleApplies(rule,profile){
  if(!rule||!profile)return false;
- if(Number(star||0)<Number(rule.reqStar||0))return false;
- return (rule.shipIds||[]).includes(Number(profile.id))||(rule.stypes||[]).includes(Number(profile.stype))||(rule.ctypes||[]).includes(Number(profile.ctype));
+ return (rule.shipIds||[]).includes(Number(profile.id))||(rule.stypes||[]).includes(Number(profile.stype))||(rule.stypes||[]).includes(99)||(rule.ctypes||[]).includes(Number(profile.ctype));
 }
-function hdShipDbExpansionCompatible(item,ship,star=0){
- const profile=hdShipDbSlotProfile(ship),normal=hdShipDbMasterCompatible(item,ship);
- if(normal===false)return false;
- if(normal===null&&!hdShipDbEquipCompatible(item,ship))return false;
+function hdShipDbExpansionRuleMatch(rule,profile,star=0){
+ return hdShipDbExpansionRuleApplies(rule,profile)&&Number(star||0)>=Number(rule?.reqStar||0);
+}
+function hdShipDbExpansionInfo(item,ship,star=0){
+ const profile=hdShipDbSlotProfile(ship);if(!profile)return {allowed:false,mode:'none',reason:'艦娘マスター未登録',reqStar:0};
+ const normal=hdShipDbMasterCompatible(item,ship);
+ if(normal===false)return {allowed:false,mode:'none',reason:'通常スロット装備不可',reqStar:0};
+ if(normal===null&&!hdShipDbEquipCompatible(item,ship))return {allowed:false,mode:'none',reason:'通常スロット装備不可',reqStar:0};
  const exact=hdShipDbMasterMeta(item),typeIds=hdShipDbMasterTypeIdsForItem(item);
+ let starShort=null;
  if(exact){
   const special=HD_EXSLOT_ITEM_RULES[String(exact.id)];
-  if(special&&hdShipDbExpansionRuleMatch(special,profile,star))return true;
-  if(HD_EXSLOT_GLOBAL_ITEM_IDS.includes(Number(exact.id)))return true;
+  if(special&&hdShipDbExpansionRuleApplies(special,profile)){
+   const req=Number(special.reqStar||0);
+   if(Number(star||0)>=req)return {allowed:true,mode:(special.stypes||[]).includes(99)?'global':'special',reason:(special.stypes||[]).includes(99)?'全艦個別許可':'艦/艦級/艦種別の個別許可',reqStar:req};
+   starShort={allowed:false,mode:'special',reason:`改修★${req}以上が必要`,reqStar:req};
+  }
+  if(HD_EXSLOT_GLOBAL_ITEM_IDS.includes(Number(exact.id)))return {allowed:true,mode:'global',reason:'全艦個別許可',reqStar:0};
  }
- const blocked=new Set(HD_EXSLOT_LIMIT_TYPE_IDS[String(profile?.id)]||[]);
- return typeIds.some(id=>HD_EXSLOT_BASE_TYPE_IDS.includes(Number(id))&&!blocked.has(Number(id)));
+ const blocked=new Set(HD_EXSLOT_LIMIT_TYPE_IDS[String(profile.id)]||[]);
+ const common=typeIds.find(id=>HD_EXSLOT_BASE_TYPE_IDS.includes(Number(id))&&!blocked.has(Number(id)));
+ if(common)return {allowed:true,mode:'common',reason:`共通増設カテゴリ: ${HD_EXSLOT_TYPE_LABELS[common]||HD_EQUIP_TYPE_LABELS[common]||('#'+common)}`,reqStar:0,typeId:Number(common)};
+ return starShort||{allowed:false,mode:'none',reason:'補強増設対象外',reqStar:0};
+}
+function hdShipDbExpansionCompatible(item,ship,star=0){
+ return hdShipDbExpansionInfo(item,ship,star).allowed;
 }
 function hdShipDbExpansionCandidates(ship,remaining=null,context=''){
  const inv=hdShipDbOwnedEquipInventory(),rows=[];
  for(const own of inv.values()){
   const remain=remaining?Number(remaining.get(own.key)||0):Number(own.count||0);if(remain<=0)continue;
-  if(!hdShipDbExpansionCompatible(own.item,ship,own.maxStar||0))continue;
-  const score=hdShipDbEquipPower(own.item,context)+(own.maxStar||0)*2;
-  rows.push({own,score,remain});
+  const info=hdShipDbExpansionInfo(own.item,ship,own.maxStar||0);if(!info.allowed)continue;
+  const bonus=info.mode==='special'?24:info.mode==='global'?16:0;
+  const score=hdShipDbEquipPower(own.item,context)+(own.maxStar||0)*2+bonus;
+  rows.push({own,info,score,remain});
  }
  return rows.sort((a,b)=>b.score-a.score||b.own.maxStar-a.own.maxStar||a.own.name.localeCompare(b.own.name,'ja'));
+}
+function hdShipDbExpansionMasterRows(ship){
+ const p=hdShipDbSlotProfile(ship);if(!p)return {common:[],special:[]};
+ const blocked=new Set(HD_EXSLOT_LIMIT_TYPE_IDS[String(p.id)]||[]);
+ const common=HD_EXSLOT_BASE_TYPE_IDS.filter(id=>Object.prototype.hasOwnProperty.call(p.equipRules||{},String(id))&&!blocked.has(Number(id))).map(id=>HD_EXSLOT_TYPE_LABELS[id]||HD_EQUIP_TYPE_LABELS[id]||('#'+id));
+ const special=[];
+ for(const [id,rule] of Object.entries(HD_EXSLOT_ITEM_RULES)){
+  if(!hdShipDbExpansionRuleApplies(rule,p))continue;
+  const name=HD_EQUIPMENT_MASTER_NAME_BY_ID[String(id)];if(!name)continue;
+  const normal=hdShipDbMasterCompatible({name},ship);if(normal===false)continue;
+  special.push({id:Number(id),name,reqStar:Number(rule.reqStar||0),global:(rule.stypes||[]).includes(99)});
+ }
+ special.sort((a,b)=>(a.global===b.global?0:a.global?-1:1)||a.reqStar-b.reqStar||a.id-b.id);
+ return {common:[...new Set(common)],special};
+}
+function hdShipDbExpansionMasterHtml(ship){
+ const rows=hdShipDbExpansionMasterRows(ship),max=12,shown=rows.special.slice(0,max),rest=Math.max(0,rows.special.length-shown.length);
+ const common=rows.common.length?rows.common.map(x=>`<span>${hdShipDbEsc(x)}</span>`).join(''):'<span class="muted-chip">共通カテゴリなし</span>';
+ const special=shown.length?shown.map(x=>`<span class="${x.reqStar?'star-rule':''}">${hdShipDbEsc(x.name)}${x.reqStar?` ★${x.reqStar}+`:''}${x.global?'・全艦':''}</span>`).join(''):'<span class="muted-chip">個別追加なし</span>';
+ return `<div class="hd-shipdb-exslot-master"><div><b>共通カテゴリ</b><div>${common}</div></div><div><b>個別追加</b><div>${special}${rest?`<span>ほか${rest}件</span>`:''}</div></div></div>`;
 }
 function hdShipDbExpansionHtml(ship){
  const rows=hdShipDbExpansionCandidates(ship,null,(HD_SHIP_LOADOUTS[ship.final]||[]).map(x=>x.name+' '+x.memo).join(' ')).slice(0,6);
  if(!rows.length)return '<div class="hd-shipdb-expansion-owned"><b>手持ち増設候補</b><span>装備台帳に搭載可能な候補なし</span></div>';
- return `<div class="hd-shipdb-expansion-owned"><b>手持ち増設候補</b><div>${rows.map(({own})=>`<span>${hdShipDbEsc(own.name)}${own.maxStar?` ★${own.maxStar}`:''}</span>`).join('')}</div></div>`;
+ return `<div class="hd-shipdb-expansion-owned"><b>手持ち増設候補</b><div>${rows.map(({own,info})=>`<span title="${hdShipDbEsc(info.reason)}">${hdShipDbEsc(own.name)}${own.maxStar?` ★${own.maxStar}`:''}<i>${info.mode==='common'?'共通':info.mode==='global'?'全艦':'個別'}${info.reqStar?` ★${info.reqStar}+`:''}</i></span>`).join('')}</div></div>`;
 }
 function hdShipDbSlotRules(profile,index){
  if(!profile)return [];return HD_SLOT_EXCLUSION_RULES.filter(r=>r.shipIds.includes(Number(profile.id))&&(r.fromSlot?index>=r.slot:index===r.slot));
@@ -8685,15 +8707,20 @@ function hdShipDbPickNormalSlot(profile,free,item,wanted){
  return sorted[0]||null;
 }
 function hdShipDbSlotHtml(item){
- const p=hdShipDbSlotProfile(item),special=HD_SHIP_EXPANSION_SPECIAL[item.final]||[];
- if(!p&&!special.length)return '';
- const slotHtml=p?`<div class="hd-shipdb-slot-grid">${p.slots.map((n,i)=>{const rule=hdShipDbSlotRuleText(p,i);return `<span class="${rule?'restricted':''}"><i>第${i+1}</i><b>${n}</b><small>${rule?'制限':'機'}</small>${rule?`<em>${hdShipDbEsc(rule)}</em>`:''}</span>`}).join('')}</div>`:'';
- const flags=p?.flags?.length?`<div class="hd-shipdb-slot-flags">${p.flags.map(x=>`<span>${hdShipDbEsc(x)}</span>`).join('')}</div>`:'';
- const expansion=`<div class="hd-shipdb-expansion"><b>補強増設</b><span>Lv30以上で開放可能。共通カテゴリ・艦別追加許可・艦別制限・改修★条件をマスター基準で判定。</span>${special.length?`<small>参考表示: ${special.map(hdShipDbEsc).join(' / ')}</small>`:''}${hdShipDbExpansionHtml(item)}</div>`;
- return `<div class="hd-shipdb-slot-profile"><div class="hd-shipdb-stat-head"><b>装備スロット</b><span>${p?`${p.count}スロット・搭載計${p.total}`:'特殊増設対応'}</span></div>${slotHtml}${flags}${expansion}</div>`;
+ const p=hdShipDbSlotProfile(item);if(!p)return '';
+ const slotHtml=`<div class="hd-shipdb-slot-grid">${p.slots.map((n,i)=>{const rule=hdShipDbSlotRuleText(p,i);return `<span class="${rule?'restricted':''}"><i>第${i+1}</i><b>${n}</b><small>${rule?'制限':'機'}</small>${rule?`<em>${hdShipDbEsc(rule)}</em>`:''}</span>`}).join('')}</div>`;
+ const flags=p.flags?.length?`<div class="hd-shipdb-slot-flags">${p.flags.map(x=>`<span>${hdShipDbEsc(x)}</span>`).join('')}</div>`:'';
+ const expansion=`<div class="hd-shipdb-expansion"><b>補強増設（マスター同期）</b><span>通常スロット可否を満たした上で、共通カテゴリ・艦/艦級/艦種別の追加許可・改修★条件を判定。</span>${hdShipDbExpansionMasterHtml(item)}${hdShipDbExpansionHtml(item)}</div>`;
+ return `<div class="hd-shipdb-slot-profile"><div class="hd-shipdb-stat-head"><b>装備スロット</b><span>${p.count}スロット・搭載計${p.total}</span></div>${slotHtml}${flags}${expansion}</div>`;
 }
 
-
+function hdShipDbMasterAudit(){
+ const ships=HD_SHIP_DATABASE.map(x=>x.final),missingProfiles=ships.filter(x=>!HD_SHIP_SLOT_PROFILES[x]);
+ const badSlots=ships.filter(x=>{const p=HD_SHIP_SLOT_PROFILES[x];return p&&(!Array.isArray(p.slots)||p.slots.length!==p.count&&p.count!=null)});
+ const ruleCount=Object.keys(HD_EXSLOT_ITEM_RULES||{}).length,starRuleCount=Object.values(HD_EXSLOT_ITEM_RULES||{}).filter(x=>Number(x.reqStar||0)>0).length;
+ return {ships:ships.length,profiles:ships.length-missingProfiles.length,missingProfiles,badSlots,exslotRules:ruleCount,starRules:starRuleCount,source:HD_SHIP_MASTER_SOURCE};
+}
+window.HD_SHIP_MASTER_AUDIT=hdShipDbMasterAudit();
 function hdShipDbMapCandidates(detail){
  const text=[detail?.name,detail?.overview,detail?.fleet,detail?.route,detail?.air,detail?.note,detail?.caution].filter(Boolean).join(' ');
  const rules=[
@@ -8859,7 +8886,7 @@ function hdShipDbOwnedFitHtml(ship,set){
  const cls=plan.filled===plan.total?'complete':plan.filled?'partial':'missing';
  const rows=[...plan.slots].sort((a,b)=>(a.slotIndex??99)-(b.slotIndex??99));
  const slotNote=plan.profile?'<small>搭載数を考慮して航空装備を自動配置</small>':'<small>装備可否・性能から自動配備</small>';
- return `<div class="hd-map-owned-fit ${cls}"><div class="hd-map-owned-fit-head"><div><b>手持ち装備案</b><small>${plan.filled}/${plan.total}枠を配備</small>${slotNote}</div><button type="button" class="ghost small" data-hd-ship-owned-refresh>再配備</button></div><div class="hd-map-owned-slots">${rows.map(x=>{const slot=plan.profile?`第${(x.slotIndex??0)+1}スロ・${x.capacity}機`:`装備枠${(x.slotIndex??0)+1}`;return x.found?`<span class="owned"><i>✓</i><b>${hdShipDbEsc(x.name)}${x.star?` ★${x.star}`:''}</b><small>${slot}｜所持 ${x.count}｜${hdShipDbEsc(x.wanted)}</small></span>`:`<span class="missing"><i>!</i><b>不足</b><small>${slot}｜${hdShipDbEsc(x.wanted)}</small><button type="button" class="ghost small" data-hd-ship-acquire="${hdShipDbEsc(x.wanted)}">入手方法</button></span>`}).join('')}${plan.profile&&plan.freeSlots.length?plan.freeSlots.sort((a,b)=>a.index-b.index).map(x=>`<span class="free"><i>＋</i><b>空きスロット</b><small>第${x.index+1}スロ・${x.cap}機</small></span>`).join(''):''}${plan.expansion?`<div class="hd-map-expansion-pick"><i>増設</i><b>${hdShipDbEsc(plan.expansion.own.name)}${plan.expansion.own.maxStar?` ★${plan.expansion.own.maxStar}`:''}</b><small>通常枠で未使用の手持ちから選択</small></div>`:''}</div><button type="button" class="ghost small" data-hd-ship-equip-ledger>装備台帳を開く</button></div>`;
+ return `<div class="hd-map-owned-fit ${cls}"><div class="hd-map-owned-fit-head"><div><b>手持ち装備案</b><small>${plan.filled}/${plan.total}枠を配備</small>${slotNote}</div><button type="button" class="ghost small" data-hd-ship-owned-refresh>再配備</button></div><div class="hd-map-owned-slots">${rows.map(x=>{const slot=plan.profile?`第${(x.slotIndex??0)+1}スロ・${x.capacity}機`:`装備枠${(x.slotIndex??0)+1}`;return x.found?`<span class="owned"><i>✓</i><b>${hdShipDbEsc(x.name)}${x.star?` ★${x.star}`:''}</b><small>${slot}｜所持 ${x.count}｜${hdShipDbEsc(x.wanted)}</small></span>`:`<span class="missing"><i>!</i><b>不足</b><small>${slot}｜${hdShipDbEsc(x.wanted)}</small><button type="button" class="ghost small" data-hd-ship-acquire="${hdShipDbEsc(x.wanted)}">入手方法</button></span>`}).join('')}${plan.profile&&plan.freeSlots.length?plan.freeSlots.sort((a,b)=>a.index-b.index).map(x=>`<span class="free"><i>＋</i><b>空きスロット</b><small>第${x.index+1}スロ・${x.cap}機</small></span>`).join(''):''}${plan.expansion?`<div class="hd-map-expansion-pick"><i>増設</i><b>${hdShipDbEsc(plan.expansion.own.name)}${plan.expansion.own.maxStar?` ★${plan.expansion.own.maxStar}`:''}</b><small>${plan.expansion.info.mode==='common'?'共通カテゴリ':plan.expansion.info.mode==='global'?'全艦個別許可':'個別許可'}${plan.expansion.info.reqStar?`｜必要★${plan.expansion.info.reqStar}+`:''}｜通常枠で未使用の手持ち</small></div>`:''}</div><button type="button" class="ghost small" data-hd-ship-equip-ledger>装備台帳を開く</button></div>`;
 }
 function hdShipDbAcquisitionKind(wanted){
  const w=String(wanted||'');
