@@ -9,6 +9,8 @@ test.use({
 async function boot(page) {
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
+  await expect(page.locator('[data-world="1"]')).toBeAttached();
+  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
   await expect(page.locator('[data-world="1"]')).toBeVisible();
 }
 
