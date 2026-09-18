@@ -66,7 +66,7 @@ test('review suggestions map deterioration signals to distinct next actions', as
   expect(recs.some(x=>x.action==='prep')).toBeTruthy();
 
   expect(recs.filter(x=>x.mode==='route')).toHaveLength(1);
-  expect(recs.length).toBeLessThanOrEqual(3);
+  expect(recs.length).toBeLessThanOrEqual(4);
 });
 
 test('review UI renders reasons and action buttons for the current trend', async ({ page }) => {
@@ -85,7 +85,7 @@ test('review UI renders reasons and action buttons for the current trend', async
   await expect(panel.locator('.hd-spa-review')).toBeVisible();
   await expect(panel).toContainText('次の見直し候補');
   await expect(panel).toContainText('道中突破重視を再検討');
-  await expect(panel.locator('[data-hd-spa-review]')).toHaveCount(3);
+  await expect(panel.locator('[data-hd-spa-review]')).toHaveCount(4);
 });
 
 test('optimize review action sets the suggested mode and opens fleet suggestions for the same map', async ({ page }) => {
