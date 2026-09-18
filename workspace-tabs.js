@@ -25,7 +25,14 @@ let hdWSApplying=false;
 let hdWSRefreshTimer=0;
 let hdWSNavLockUntil=0;
 let hdWSNavSeq=0;
+let hdWSPin={group:'',sectionId:'',until:0};
 let hdWSTouch=null;
+function hdWSSetPin(group,sectionId,ms=1600){hdWSPin={group,sectionId,until:Date.now()+ms}}
+function hdWSClearPin(){hdWSPin={group:'',sectionId:'',until:0}}
+function hdWSActivePin(){
+ if(!hdWSPin.sectionId||Date.now()>=hdWSPin.until){if(hdWSPin.sectionId)hdWSClearPin();return null}
+ return hdWSPin;
+}
 
 function hdWSLoad(){try{const v=JSON.parse(localStorage.getItem(HD_WS_KEY)||'{}');return {group:v.group||'home',sections:v.sections||{}}}catch{return {group:'home',sections:{}}}}
 function hdWSSave(){localStorage.setItem(HD_WS_KEY,JSON.stringify(hdWSState))}
@@ -99,6 +106,8 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
  if(hdWSApplying)return;hdWSApplying=true;
  try{
   hdWSEnsureUI();hdWSSections();
+  const pin=!opts.ignorePin?hdWSActivePin():null;
+  if(pin){group=pin.group;sectionId=pin.sectionId}
   if(!HD_WS_GROUPS.some(x=>x.key===group))group='home';
   const chosen=hdWSResolveSection(group,sectionId);hdWSState.group=group;if(chosen)hdWSState.sections[group]=chosen;hdWSSave();
   document.querySelectorAll('[data-hd-ws-group]').forEach(b=>{const active=b.dataset.hdWsGroup===group;b.classList.toggle('active',active);b.setAttribute('aria-selected',active?'true':'false')});
@@ -117,7 +126,7 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
 function hdWSShowElement(target,scroll=true){
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
  const section=hdWSManagedSectionFor(el);if(!section)return false;const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
- clearTimeout(hdWSRefreshTimer);hdWSNavLockUntil=Date.now()+1400;const navSeq=++hdWSNavSeq;
+ clearTimeout(hdWSRefreshTimer);hdWSNavLockUntil=Date.now()+1600;hdWSSetPin(group,section.id,1600);const navSeq=++hdWSNavSeq;
  const apply=()=>{if(navSeq!==hdWSNavSeq)return false;hdWSApply(group,section.id,{preserveNavSeq:true});section.classList.remove('hd-ws-hidden');hdWSUnhideAncestors(section);return true};
  if(hdWSApplying)setTimeout(apply,0);else apply();
  setTimeout(()=>apply(),40);
@@ -137,13 +146,13 @@ function hdWSInstall(){
 }
 function hdWSHorizontalScroller(el){for(let n=el;n&&n!==document.body;n=n.parentElement){if(n.scrollWidth>n.clientWidth+12){const s=getComputedStyle(n);if(['auto','scroll'].includes(s.overflowX))return true}}return false}
 function hdWSSwipeBlocked(target){return !!target?.closest?.('input,textarea,select,button,a,dialog,[contenteditable="true"],.hd-ws-primary,.hd-ws-secondary')||hdWSHorizontalScroller(target)}
-function hdWSMoveGroup(dir){const i=HD_WS_GROUPS.findIndex(x=>x.key===hdWSState.group),next=HD_WS_GROUPS[i+dir];if(!next)return false;hdWSApply(next.key,null,{scrollTop:true});return true}
+function hdWSMoveGroup(dir){const i=HD_WS_GROUPS.findIndex(x=>x.key===hdWSState.group),next=HD_WS_GROUPS[i+dir];if(!next)return false;hdWSClearPin();hdWSApply(next.key,null,{scrollTop:true,ignorePin:true});return true}
 function hdWSTouchStart(e){if(e.touches?.length!==1||hdWSSwipeBlocked(e.target))return;const t=e.touches[0];if(t.clientX<24||t.clientX>window.innerWidth-24)return;hdWSTouch={x:t.clientX,y:t.clientY,at:Date.now()}}
 function hdWSTouchEnd(e){if(!hdWSTouch)return;const t=e.changedTouches?.[0],start=hdWSTouch;hdWSTouch=null;if(!t)return;const dx=t.clientX-start.x,dy=t.clientY-start.y,dt=Date.now()-start.at;if(dt>800||Math.abs(dx)<72||Math.abs(dx)<Math.abs(dy)*1.35)return;hdWSMoveGroup(dx<0?1:-1)}
 
 document.addEventListener('click',e=>{
- const g=e.target.closest?.('[data-hd-ws-group]');if(g){hdWSApply(g.dataset.hdWsGroup,null,{scrollTop:true});return}
- const s=e.target.closest?.('[data-hd-ws-section]');if(s){hdWSApply(hdWSState.group,s.dataset.hdWsSection,{scrollTop:true});return}
+ const g=e.target.closest?.('[data-hd-ws-group]');if(g){hdWSClearPin();hdWSApply(g.dataset.hdWsGroup,null,{scrollTop:true,ignorePin:true});return}
+ const s=e.target.closest?.('[data-hd-ws-section]');if(s){hdWSClearPin();hdWSApply(hdWSState.group,s.dataset.hdWsSection,{scrollTop:true,ignorePin:true});return}
  const a=e.target.closest?.('a[href^="#"]');if(a&&hdWSHandleAnchor(a)){e.preventDefault();history.replaceState(null,'',a.getAttribute('href'))}
 },true);
 document.addEventListener('touchstart',hdWSTouchStart,{passive:true});
