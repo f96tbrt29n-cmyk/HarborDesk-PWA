@@ -92,3 +92,69 @@ test('drop chips show roster ownership and add a ship to hunting targets', async
   await expect(activeChip).toHaveClass(/hunting/);
   await expect(activeChip).toContainText('掘り中');
 });
+
+
+test('map drop collection stats count duplicate ships only once', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      {id:'kami',name:'神威',level:'80',remodel:'',gear:'',memo:'',tags:[]}
+    ]));
+  });
+
+  const stats = await page.evaluate(() => hdMapDropStats('7-4'));
+  expect(stats.total).toBe(14);
+  expect(stats.owned).toBe(1);
+  expect(stats.missing).toBe(13);
+  expect(stats.featured).toBe(9);
+  expect(stats.rate).toBe(7);
+});
+
+test('map drop filters switch between unowned and featured ships', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      {id:'kami',name:'神威',level:'80',remodel:'',gear:'',memo:'',tags:[]}
+    ]));
+    localStorage.removeItem('harbordesk-map-drop-view-v1');
+  });
+  await selectMap(page, '7', '7-4');
+
+  let pane = page.locator('[data-map-pane="drop"]');
+  await expect(pane).toContainText('収録艦 所持率');
+  await expect(pane).toContainText('1 / 14隻・7%');
+  await expect(pane).toContainText('未所持 13');
+  await expect(pane).toContainText('注目艦 9');
+
+  await pane.locator('[data-hd-map-drop-view="missing"]').click();
+  pane = page.locator('[data-map-pane="drop"]');
+  await expect(pane.locator('[data-hd-map-drop-view="missing"]')).toHaveClass(/active/);
+  await expect(pane.locator('[data-hd-map-drop-ship="神威"]')).toHaveCount(0);
+  await expect(pane.locator('[data-hd-map-drop-ship="対馬"]').first()).toBeVisible();
+
+  await pane.locator('[data-hd-map-drop-view="featured"]').click();
+  pane = page.locator('[data-map-pane="drop"]');
+  await expect(pane.locator('[data-hd-map-drop-view="featured"]')).toHaveClass(/active/);
+  await expect(pane.locator('[data-hd-map-drop-ship="春日丸"]').first()).toBeVisible();
+  await expect(pane.locator('[data-hd-map-drop-ship="瑞鶴"]')).toHaveCount(0);
+});
+
+test('map drop view preference is stored independently for each map', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => localStorage.removeItem('harbordesk-map-drop-view-v1'));
+
+  await selectMap(page, '1', '1-5');
+  await page.locator('[data-map-pane="drop"] [data-hd-map-drop-view="missing"]').click();
+
+  await page.locator('[data-map="1-4"]').click();
+  await page.locator('[data-map-tab="drop"]').click();
+  await expect(page.locator('[data-map-pane="drop"] [data-hd-map-drop-view="all"]')).toHaveClass(/active/);
+
+  await page.locator('[data-map="1-5"]').click();
+  await expect(page.locator('[data-map-pane="drop"]')).toHaveClass(/active/);
+  await expect(page.locator('[data-map-pane="drop"] [data-hd-map-drop-view="missing"]')).toHaveClass(/active/);
+
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-map-drop-view-v1') || '{}'));
+  expect(stored['1-5']).toBe('missing');
+  expect(stored['1-4']).toBeUndefined();
+});
