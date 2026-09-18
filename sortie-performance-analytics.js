@@ -1,5 +1,6 @@
 const HD_SPA_MODE_KEY='harbordesk-sortie-analytics-mode-v1';
 const HD_SPA_MAP_KEY='harbordesk-sortie-analytics-map-v1';
+const HD_SPA_WINDOW_KEY='harbordesk-sortie-analytics-window-v1';
 const HD_SPA_STRATEGY_ORDER=['stable','firepower','route','boss','reserve','manual'];
 
 function hdSPAEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -7,6 +8,8 @@ function hdSPAMode(){try{return localStorage.getItem(HD_SPA_MODE_KEY)||'strategy
 function hdSPASetMode(v){try{localStorage.setItem(HD_SPA_MODE_KEY,v)}catch{}}
 function hdSPAMap(){try{return localStorage.getItem(HD_SPA_MAP_KEY)||'all'}catch{return 'all'}}
 function hdSPASetMap(v){try{localStorage.setItem(HD_SPA_MAP_KEY,v)}catch{}}
+function hdSPAWindow(){try{const n=Number(localStorage.getItem(HD_SPA_WINDOW_KEY)||5);return [3,5,10].includes(n)?n:5}catch{return 5}}
+function hdSPASetWindow(v){try{const n=Number(v);localStorage.setItem(HD_SPA_WINDOW_KEY,[3,5,10].includes(n)?String(n):'5')}catch{}}
 function hdSPALogs(){
  try{return (typeof hdSLLoad==='function'?hdSLLoad():JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]')).filter(x=>x&&x.sessionId&&x.fleetId)}catch{return []}
 }
@@ -30,6 +33,41 @@ function hdSPAMetrics(rows){
   avgReadiness:readiness.length?Math.round(readiness.reduce((a,b)=>a+b,0)/readiness.length*100):null
  };
 }
+function hdSPADelta(a,b){return a==null||b==null?null:Number((a-b).toFixed(1))}
+function hdSPAPctChange(a,b){return a==null||b==null||b===0?null:Number(((a-b)/b*100).toFixed(1))}
+function hdSPATrend(rows,windowSize=hdSPAWindow()){
+ const sorted=[...(rows||[])].sort((a,b)=>(Number(b.at)||0)-(Number(a.at)||0));
+ const recent=sorted.slice(0,windowSize),previous=sorted.slice(windowSize,windowSize*2);
+ if(recent.length<windowSize||previous.length<windowSize)return {ready:false,windowSize,recentCount:recent.length,previousCount:previous.length};
+ const a=hdSPAMetrics(recent),b=hdSPAMetrics(previous),delta={
+  bossRate:hdSPADelta(a.bossRate,b.bossRate),sRate:hdSPADelta(a.sRate,b.sRate),winRate:hdSPADelta(a.winRate,b.winRate),
+  retreatRate:hdSPADelta(a.retreatRate,b.retreatRate),avgResource:hdSPADelta(a.avgResource,b.avgResource),
+  avgResourcePct:hdSPAPctChange(a.avgResource,b.avgResource),avgBuckets:hdSPADelta(a.avgBuckets,b.avgBuckets),
+  avgDurationMin:hdSPADelta(a.avgDurationMin,b.avgDurationMin),avgDurationPct:hdSPAPctChange(a.avgDurationMin,b.avgDurationMin),
+  avgReadiness:hdSPADelta(a.avgReadiness,b.avgReadiness)
+ };
+ const issues=[],improvements=[];
+ if(delta.bossRate!=null&&delta.bossRate<=-15)issues.push('ボス到達率が15pt以上低下');
+ if(delta.sRate!=null&&delta.sRate<=-15)issues.push('S率が15pt以上低下');
+ if(delta.retreatRate!=null&&delta.retreatRate>=15)issues.push('撤退率が15pt以上上昇');
+ if(delta.avgResourcePct!=null&&delta.avgResourcePct>=20)issues.push('平均資源消費が20%以上増加');
+ if(delta.avgDurationPct!=null&&delta.avgDurationPct>=20)issues.push('平均時間が20%以上増加');
+ if(delta.avgReadiness!=null&&delta.avgReadiness<=-10)issues.push('開始時確認率が10pt以上低下');
+ if(delta.bossRate!=null&&delta.bossRate>=15)improvements.push('ボス到達率が改善');
+ if(delta.sRate!=null&&delta.sRate>=15)improvements.push('S率が改善');
+ if(delta.retreatRate!=null&&delta.retreatRate<=-15)improvements.push('撤退率が改善');
+ if(delta.avgResourcePct!=null&&delta.avgResourcePct<=-20)improvements.push('資源効率が改善');
+ if(delta.avgDurationPct!=null&&delta.avgDurationPct<=-20)improvements.push('平均時間が短縮');
+ if(delta.avgReadiness!=null&&delta.avgReadiness>=10)improvements.push('開始時確認率が改善');
+ return {ready:true,windowSize,recent,previous,recentMetrics:a,previousMetrics:b,delta,issues,improvements};
+}
+function hdSPARecentRef(rows){
+ const latest=[...(rows||[])].sort((a,b)=>(Number(b.at)||0)-(Number(a.at)||0))[0];if(!latest)return null;
+ const map=latest.map||'',fleetId=latest.fleetId||'',fleetName=latest.fleetName||'';
+ let available=false;try{available=!!map&&!!fleetId&&typeof hdSPMFleets==='function'&&hdSPMFleets(map).some(x=>x.id===fleetId)}catch{}
+ return {map,fleetId,fleetName,available};
+}
+
 function hdSPAGroupKey(row,mode){
  if(mode==='fleet')return row.fleetId||row.fleetName||'unknown';
  return row.strategy||'manual';
@@ -44,7 +82,7 @@ function hdSPARows(){
   if(!groups.has(key))groups.set(key,{key,label:hdSPAGroupLabel(row,mode),strategy:row.strategy||'manual',rows:[],maps:new Set()});
   const g=groups.get(key);g.rows.push(row);g.maps.add(row.map);
  }
- const out=[...groups.values()].map(g=>({...g,metrics:hdSPAMetrics(g.rows),maps:[...g.maps]}));
+ const out=[...groups.values()].map(g=>({...g,metrics:hdSPAMetrics(g.rows),trend:hdSPATrend(g.rows),recentRef:hdSPARecentRef(g.rows),maps:[...g.maps]}));
  out.sort((a,b)=>{
   if(mode==='strategy'){const ai=HD_SPA_STRATEGY_ORDER.indexOf(a.strategy),bi=HD_SPA_STRATEGY_ORDER.indexOf(b.strategy);if(ai!==bi)return (ai<0?99:ai)-(bi<0?99:bi)}
   return b.metrics.n-a.metrics.n||a.label.localeCompare(b.label,'ja');
@@ -61,14 +99,29 @@ function hdSPAMaps(){
  const maps=[...new Set(hdSPALogs().map(x=>x.map).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
  return maps;
 }
+function hdSPATrendDelta(label,value,suffix='',goodWhen='up'){
+ if(value==null||value===0)return '<span>'+hdSPAEsc(label)+' <b>±0'+hdSPAEsc(suffix)+'</b></span>';
+ const good=goodWhen==='up'?value>0:value<0,sign=value>0?'+':'';
+ return '<span class="'+(good?'good':'bad')+'">'+hdSPAEsc(label)+' <b>'+sign+value+hdSPAEsc(suffix)+'</b></span>';
+}
+function hdSPATrendHtml(row){
+ const t=row.trend;if(!t)return '';
+ if(!t.ready)return '<div class="hd-spa-trend pending"><strong>トレンド待ち</strong><span>直近'+t.windowSize+'周 vs 前'+t.windowSize+'周には合計'+(t.windowSize*2)+'周必要｜現在 '+(t.recentCount+t.previousCount)+'周</span></div>';
+ const d=t.delta,signals=[...t.issues.map(x=>'<li class="bad">'+hdSPAEsc(x)+'</li>'),...t.improvements.map(x=>'<li class="good">'+hdSPAEsc(x)+'</li>')];
+ return '<div class="hd-spa-trend"><div class="hd-spa-trend-head"><strong>直近'+t.windowSize+'周の変化</strong><span>その前'+t.windowSize+'周と比較</span></div><div class="hd-spa-trend-grid">'+
+  hdSPATrendDelta('ボス',d.bossRate,'pt','up')+hdSPATrendDelta('S率',d.sRate,'pt','up')+hdSPATrendDelta('撤退',d.retreatRate,'pt','down')+
+  hdSPATrendDelta('資源',d.avgResource,'','down')+hdSPATrendDelta('時間',d.avgDurationMin,'分','down')+hdSPATrendDelta('確認',d.avgReadiness,'pt','up')+
+  '</div>'+(signals.length?'<ul class="hd-spa-signals">'+signals.join('')+'</ul>':'<div class="hd-spa-steady">大きな変化は検出していないよ。</div>')+'</div>';
+}
 function hdSPACard(row){
  const m=row.metrics,sample=m.n<3?'<div class="hd-spa-sample warn">サンプル少なめ</div>':'<div class="hd-spa-sample">記録 '+m.n+'周</div>',badges=row.badges.length?'<div class="hd-spa-badges">'+row.badges.map(x=>'<span>'+hdSPAEsc(x)+'</span>').join('')+'</div>':'';
- return `<article class="hd-spa-card" data-hd-spa-card="${hdSPAEsc(row.key)}">${badges}<div class="hd-spa-card-head"><div><strong>${hdSPAEsc(row.label)}</strong><small>${hdSPAEsc(row.maps.join(' / '))}</small></div>${sample}</div><div class="hd-spa-metrics"><span>ボス到達 <b>${m.bossRate}%</b></span><span>S勝利 <b>${m.sRate}%</b></span><span>B以上勝利 <b>${m.winRate}%</b></span><span>撤退 <b>${m.retreatRate}%</b></span><span>平均資源 <b>${m.avgResource}</b></span><span>平均バケツ <b>${m.avgBuckets}</b></span><span>平均時間 <b>${m.avgDurationMin==null?'—':m.avgDurationMin+'分'}</b></span><span>開始時確認 <b>${m.avgReadiness==null?'—':m.avgReadiness+'%'}</b></span></div></article>`;
+ const reopen=row.recentRef?.available?'<button type="button" class="ghost small" data-hd-spa-reopen="'+hdSPAEsc(row.key)+'">この編成を準備表へ</button>':'';
+ return `<article class="hd-spa-card" data-hd-spa-card="${hdSPAEsc(row.key)}">${badges}<div class="hd-spa-card-head"><div><strong>${hdSPAEsc(row.label)}</strong><small>${hdSPAEsc(row.maps.join(' / '))}</small></div>${sample}</div><div class="hd-spa-metrics"><span>ボス到達 <b>${m.bossRate}%</b></span><span>S勝利 <b>${m.sRate}%</b></span><span>B以上勝利 <b>${m.winRate}%</b></span><span>撤退 <b>${m.retreatRate}%</b></span><span>平均資源 <b>${m.avgResource}</b></span><span>平均バケツ <b>${m.avgBuckets}</b></span><span>平均時間 <b>${m.avgDurationMin==null?'—':m.avgDurationMin+'分'}</b></span><span>開始時確認 <b>${m.avgReadiness==null?'—':m.avgReadiness+'%'}</b></span></div>${hdSPATrendHtml(row)}${reopen?'<div class="hd-spa-actions">'+reopen+'</div>':''}</article>`;
 }
 function hdSPAHtml(){
- const mode=hdSPAMode(),map=hdSPAMap(),rows=hdSPARows(),maps=hdSPAMaps();
+ const mode=hdSPAMode(),map=hdSPAMap(),windowSize=hdSPAWindow(),rows=hdSPARows(),maps=hdSPAMaps();
  if(!hdSPALogs().length)return '<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>実戦データ分析</strong><span>実戦モードで帰還結果を記録すると、ここに方針別の実績が出るよ。</span></div></div></section>';
- return `<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>実戦データ分析</strong><span>実際の出撃結果を方針・保存編成ごとに比較</span></div><div class="hd-spa-controls"><select data-hd-spa-mode><option value="strategy" ${mode==='strategy'?'selected':''}>方針別</option><option value="fleet" ${mode==='fleet'?'selected':''}>保存編成別</option></select><select data-hd-spa-map><option value="all">全海域</option>${maps.map(x=>`<option value="${hdSPAEsc(x)}" ${map===x?'selected':''}>${hdSPAEsc(x)}</option>`).join('')}</select></div></div>${rows.length?'<div class="hd-spa-grid">'+rows.map(hdSPACard).join('')+'</div>':'<div class="hd-spa-empty">この条件に一致する実戦ログはまだないよ。</div>'}<p class="hd-spa-note">※各バッジはその表示範囲内の指標最大・最小を示すだけ。記録数が少ないうちは傾向として見てね。通常フォームから手入力した旧ログは方針情報がないため、この比較には含めないよ。</p></section>`;
+ return `<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>実戦データ分析</strong><span>実際の出撃結果を方針・保存編成ごとに比較</span></div><div class="hd-spa-controls"><select data-hd-spa-mode><option value="strategy" ${mode==='strategy'?'selected':''}>方針別</option><option value="fleet" ${mode==='fleet'?'selected':''}>保存編成別</option></select><select data-hd-spa-map><option value="all">全海域</option>${maps.map(x=>`<option value="${hdSPAEsc(x)}" ${map===x?'selected':''}>${hdSPAEsc(x)}</option>`).join('')}</select><select data-hd-spa-window><option value="3" ${windowSize===3?'selected':''}>直近3周比較</option><option value="5" ${windowSize===5?'selected':''}>直近5周比較</option><option value="10" ${windowSize===10?'selected':''}>直近10周比較</option></select></div></div>${rows.length?'<div class="hd-spa-grid">'+rows.map(hdSPACard).join('')+'</div>':'<div class="hd-spa-empty">この条件に一致する実戦ログはまだないよ。</div>'}<p class="hd-spa-note">※各バッジはその表示範囲内の指標最大・最小を示すだけ。トレンドは直近N周とその前N周の比較で、閾値を超えた変化だけを見直し候補として表示。通常フォームから手入力した旧ログは方針情報がないため、この比較には含めないよ。</p></section>`;
 }
 function hdSPARender(){
  const root=document.getElementById('sortieLog');if(!root)return;
@@ -82,10 +135,23 @@ function hdSPAInstall(){
  hdSLRender=function(){const v=prev.apply(this,arguments);setTimeout(hdSPARender,0);return v};
  setTimeout(hdSPARender,0);return true;
 }
+function hdSPAReopen(key){
+ const row=hdSPARows().find(x=>x.key===key),ref=row?.recentRef;if(!ref?.available)return false;
+ try{
+  if(typeof selectedWorld!=='undefined')selectedWorld=String(ref.map).split('-')[0];
+  if(typeof selectedMap!=='undefined')selectedMap=ref.map;
+  if(typeof renderMapPicker==='function')renderMapPicker();
+  if(typeof hdSPMSelect==='function')hdSPMSelect(ref.map,ref.fleetId);
+  setTimeout(()=>{if(typeof hdSPSOpen==='function')hdSPSOpen();else if(typeof hdWSShowElement==='function')hdWSShowElement('hdSortiePreparation',true)},80);
+  return true;
+ }catch{return false}
+}
 document.addEventListener('change',e=>{
  const m=e.target.closest?.('[data-hd-spa-mode]');if(m){hdSPASetMode(m.value);hdSPARender();return}
  const map=e.target.closest?.('[data-hd-spa-map]');if(map){hdSPASetMap(map.value);hdSPARender();return}
+ const win=e.target.closest?.('[data-hd-spa-window]');if(win){hdSPASetWindow(win.value);hdSPARender();return}
 });
+document.addEventListener('click',e=>{const b=e.target.closest?.('[data-hd-spa-reopen]');if(b){hdSPAReopen(b.dataset.hdSpaReopen);return}});
 window.addEventListener('storage',e=>{if(e.key==='harbordesk-sortie-log-v1')hdSPARender()});
 window.addEventListener('load',()=>setTimeout(()=>{if(!hdSPAInstall())setTimeout(hdSPAInstall,500)},1500));
 hdSPAInstall();
