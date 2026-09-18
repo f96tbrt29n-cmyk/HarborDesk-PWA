@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.76';
-const HD_APP_BUILD=76;
+const HD_APP_VERSION='1.0.77';
+const HD_APP_BUILD=77;
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
 
@@ -76,6 +76,7 @@ function hdInitLoadedModules(){
   try{if(typeof hdFOInstall==='function')hdFOInstall()}catch{}
   try{if(typeof hdSPMInstall==='function')hdSPMInstall();if(typeof hdSPMRender==='function')hdSPMRender()}catch{}
   try{if(typeof hdSSInstall==='function')hdSSInstall();if(typeof hdSSRender==='function')hdSSRender()}catch{}
+  try{if(typeof hdSPAInstall==='function')hdSPAInstall();if(typeof hdSPARender==='function')hdSPARender()}catch{}
   window.dispatchEvent(new CustomEvent('hd:modules-ready',{detail:{status:{...window.HD_MODULE_STATUS}}}));
 }
 async function hdLoadCurrentAssets(){
@@ -85,7 +86,7 @@ async function hdLoadCurrentAssets(){
    ['data-hd-quest-progress','./quest-progress-extension.css'],['data-hd-command-center','./command-center.css'],['data-hd-resource-budget','./resource-budget.css'],
    ['data-hd-exercise-routine','./exercise-routine.css'],['data-hd-activity-logger','./activity-logger.css'],['data-hd-sortie-log','./sortie-log.css'],
    ['data-hd-grand-ops','./grand-operations.css'],['data-hd-quick-nav','./quick-nav.css'],['data-hd-personal-home','./personal-home.css'],['data-hd-global-search','./global-search.css'],
-   ['data-hd-workspace-tabs','./workspace-tabs.css'],['data-hd-equipment-analyzer','./equipment-analyzer.css'],['data-hd-sortie-equipment-check','./sortie-equipment-check.css'],['data-hd-equipment-acquisition-guide','./equipment-acquisition-guide.css'],['data-hd-equipment-procurement-list','./equipment-procurement-list.css'],['data-hd-sortie-preparation-sheet','./sortie-preparation-sheet.css'],['data-hd-fleet-suggester','./fleet-suggester.css'],['data-hd-fleet-loadout','./fleet-loadout-planner.css'],['data-hd-fleet-evaluator','./fleet-readiness-evaluator.css'],['data-hd-fleet-optimizer','./fleet-loadout-optimizer.css'],['data-hd-sortie-preset-manager','./sortie-preset-manager.css'],['data-hd-sortie-session','./sortie-session.css']
+   ['data-hd-workspace-tabs','./workspace-tabs.css'],['data-hd-equipment-analyzer','./equipment-analyzer.css'],['data-hd-sortie-equipment-check','./sortie-equipment-check.css'],['data-hd-equipment-acquisition-guide','./equipment-acquisition-guide.css'],['data-hd-equipment-procurement-list','./equipment-procurement-list.css'],['data-hd-sortie-preparation-sheet','./sortie-preparation-sheet.css'],['data-hd-fleet-suggester','./fleet-suggester.css'],['data-hd-fleet-loadout','./fleet-loadout-planner.css'],['data-hd-fleet-evaluator','./fleet-readiness-evaluator.css'],['data-hd-fleet-optimizer','./fleet-loadout-optimizer.css'],['data-hd-sortie-preset-manager','./sortie-preset-manager.css'],['data-hd-sortie-session','./sortie-session.css'],['data-hd-sortie-performance','./sortie-performance-analytics.css']
   ].forEach(([a,h])=>hdAppendStyle(a,h));
 
   const equipmentAnalyzerP=hdLoadScript('data-hd-equipment-analyzer','./equipment-analyzer.js');
@@ -121,6 +122,7 @@ async function hdLoadCurrentAssets(){
   const activityP=Promise.all([guardP,questP]).then(()=>hdLoadScript('data-hd-activity-logger','./activity-logger.js'));
   const sortieLogP=activityP.then(()=>hdLoadScript('data-hd-sortie-log','./sortie-log.js'));
   const sortieSessionP=Promise.all([sortiePresetManagerP,sortieLogP]).then(([presetOk,logOk])=>presetOk&&logOk?hdLoadScript('data-hd-sortie-session','./sortie-session.js'):false);
+  const sortiePerformanceP=sortieSessionP.then(ok=>ok?hdLoadScript('data-hd-sortie-performance','./sortie-performance-analytics.js'):false);
   const optimizeP=Promise.all([expP,sortieLogP]).then(()=>hdLoadScript('data-hd-optimization','./optimization-tools.js'));
   const dailyP=Promise.all([commandP,exerciseP,eventP,optimizeP,sortieLogP,landP,fleetP]).then(()=>hdLoadScript('data-hd-daily-ops','./daily-ops.js'));
   const stabilityP=Promise.all([sortieP,landP,fleetP,expP,eventP,optimizeP,dailyP]).then(()=>hdLoadScript('data-hd-stability','./stability-integration.js'));
@@ -131,7 +133,7 @@ async function hdLoadCurrentAssets(){
   const workspaceP=Promise.all([globalSearchP,mapRuntimeP,personalHomeP]).then(()=>hdLoadScript('data-hd-workspace-tabs','./workspace-tabs.js'));
   const workspaceCompatP=workspaceP.then(()=>hdLoadScript('data-hd-workspace-compat','./workspace-compat.js'));
 
-  await Promise.all([equipmentAnalyzerP,sortieEquipmentCheckP,equipmentAcquisitionGuideP,equipmentProcurementP,sortiePreparationP,fleetSuggesterP,fleetLoadoutP,fleetEvaluatorP,fleetOptimizerP,sortiePresetManagerP,sortieSessionP,sortieP,landP,fleetP,questP,commandP,eventP,expP,resourceP,exerciseP,guardP,activityP,sortieLogP,optimizeP,dailyP,stabilityP,mapRuntimeP,quickNavP,personalHomeP,globalSearchP,workspaceP,workspaceCompatP]);
+  await Promise.all([equipmentAnalyzerP,sortieEquipmentCheckP,equipmentAcquisitionGuideP,equipmentProcurementP,sortiePreparationP,fleetSuggesterP,fleetLoadoutP,fleetEvaluatorP,fleetOptimizerP,sortiePresetManagerP,sortieSessionP,sortiePerformanceP,sortieP,landP,fleetP,questP,commandP,eventP,expP,resourceP,exerciseP,guardP,activityP,sortieLogP,optimizeP,dailyP,stabilityP,mapRuntimeP,quickNavP,personalHomeP,globalSearchP,workspaceP,workspaceCompatP]);
   hdInitLoadedModules();
 }
 
