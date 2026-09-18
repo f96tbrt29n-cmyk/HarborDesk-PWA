@@ -105,12 +105,55 @@ function hdMapSvg(map,detail,large=false){
 }
 // The supplied KC3Kai mini-map assets preserve their source pixels and aspect ratio.
 const HD_MAP_IMAGE_SOURCE='https://github.com/KC3Kai/KC3Kai/tree/6b0534d291c27220da1b6fe454e91fc96a6a7b27/src/assets/img/client/minimaps';
+const HD_MAP_STAGE_KEY='harbordesk-map-stage-v1';
+const HD_MAP_STAGE_INFO={
+ '5-6':[
+  {id:'1',label:'第一ゲージ',title:'輸送ゲージ',target:'G',detail:'Gマスの輸送ゲージ。TP最大値は約280。第一段階を完了すると次の攻略段階へ進む。'},
+  {id:'2',label:'第二ゲージ',title:'R到達ギミック → 戦力ゲージ',target:'N',detail:'Rマスへ1回到達するとI〜Q2が出現。Nマスのボス旗艦を2回撃沈してゲージ破壊。'},
+  {id:'3',label:'第三ゲージ',title:'最終戦力ゲージ',target:'Z',detail:'Zマスのボス旗艦を3回撃沈して海域クリア。'}
+ ],
+ '7-2':[
+  {id:'1',label:'第一ゲージ',title:'戦力ゲージ',target:'G',detail:'Gマスのボス旗艦を3回撃沈。破壊後にH〜Mマスが出現する。'},
+  {id:'2',label:'第二ゲージ',title:'最終戦力ゲージ',target:'M',detail:'Mマスのボス旗艦を4回撃沈して海域クリア。'}
+ ],
+ '7-3':[
+  {id:'1',label:'第一ゲージ',title:'戦力ゲージ',target:'E',detail:'Eマスのボス旗艦を3回撃沈。破壊後にG〜Pマスが出現する。'},
+  {id:'2',label:'第二ゲージ',title:'最終戦力ゲージ',target:'P',detail:'Pマスのボス旗艦を4回撃沈して海域クリア。'}
+ ],
+ '7-5':[
+  {id:'1',label:'第一ゲージ',title:'戦力ゲージ',target:'K',detail:'Kマスのボス旗艦を2回撃沈。破壊後にL〜Qマスが出現する。'},
+  {id:'2',label:'第二ゲージ',title:'戦力ゲージ＋第三ゲージ出現ギミック',target:'Q',detail:'Qマスの陸上型ボス旗艦を3回破壊。第三ゲージ出現にはMマスS勝利1回が必要。'},
+  {id:'3',label:'第三ゲージ',title:'最終戦力ゲージ',target:'T',detail:'Tマスのボス旗艦を3回撃沈して海域クリア。'}
+ ]
+};
+function hdMapStageLoad(){
+ try{return JSON.parse(localStorage.getItem(HD_MAP_STAGE_KEY)||'{}')}catch{return {}}
+}
+function hdMapStageSave(map,id){
+ const data=hdMapStageLoad();data[map]=String(id);localStorage.setItem(HD_MAP_STAGE_KEY,JSON.stringify(data));
+}
+function hdMapStageCurrent(map){
+ const stages=HD_MAP_STAGE_INFO[map]||[];if(!stages.length)return null;
+ const saved=hdMapStageLoad()[map];
+ return stages.find(x=>x.id===saved)||stages[0];
+}
+function hdMapStageHtml(map){
+ const stages=HD_MAP_STAGE_INFO[map]||[];if(!stages.length)return '';
+ const active=hdMapStageCurrent(map)||stages[0];
+ return `<section class="hd-map-stage-shell" aria-label="${hdMapEsc2(map)} 攻略段階">
+  <div class="hd-map-stage-head"><div><div class="eyebrow">MAP PHASE</div><strong>攻略段階</strong></div><span>${stages.length}段階</span></div>
+  <div class="hd-map-stage-tabs" role="tablist" aria-label="攻略段階を選択">${stages.map(s=>`<button type="button" class="hd-map-stage-btn ${s.id===active.id?'active':''}" data-hd-map-stage="${hdMapEsc2(map)}" data-hd-stage-id="${s.id}" role="tab" aria-selected="${s.id===active.id?'true':'false'}">${hdMapEsc2(s.label)}</button>`).join('')}</div>
+  <article class="map-tab-card hd-map-stage-card"><div><span>目標マス</span><strong>${hdMapEsc2(active.target)}</strong></div><div><b>${hdMapEsc2(active.title)}</b><p>${hdMapEsc2(active.detail)}</p></div></article>
+  <div class="hd-map-image-note">※段階ボタンは攻略状態の説明を切り替えるもの。下のKC3改参照画像は元データを改変せず表示しているため、段階ごとの追加マスは最新Wikiの実図でも確認してね。</div>
+ </section>`;
+}
 function hdMapReferenceImage(map,detail){
  if(!Object.prototype.hasOwnProperty.call(HD_MAP_GRAPHS,map))return '<p class="empty">この海域の画像は未登録です。</p>';
  return `<img class="hd-map-reference-image" src="./assets/maps/${map}.png" alt="${hdMapEsc2(map)} ${hdMapEsc2(detail?.name||'')} 海域マップ（KC3改掲載画像）" decoding="async">`;
 }
 function hdMapImageHtml(map,detail){
  return `<section class="hd-map-image-section" data-hd-map-reference="${hdMapEsc2(map)}">
+ ${hdMapStageHtml(map)}
  <button class="hd-map-image-button" type="button" data-hd-map-open="${hdMapEsc2(map)}" aria-label="${hdMapEsc2(map)}の海域マップを拡大表示">${hdMapReferenceImage(map,detail)}<span class="hd-map-zoom-label">タップで拡大</span></button>
  <div class="map-tab-card"><b>ルートメモ</b><p>${hdMapEsc2(detail?.route||'ルート情報を整理中')}</p></div>
  <div class="hd-map-image-note">KC3改の海域マップ画像。地形・マス・航路を画像のまま表示しています。小型画像のため、拡大時は粗く見える場合があります。複数ゲージの海域は掲載画像の開放段階を示します。</div>
@@ -123,4 +166,12 @@ function hdEnsureMapDialog(){
  d.innerHTML='<div class="hd-map-dialog-head"><strong id="hdMapDialogTitle">海域マップ</strong><button class="ghost small" type="button" id="hdMapDialogClose">閉じる</button></div><div id="hdMapDialogBody"></div>';
  document.body.appendChild(d);document.getElementById('hdMapDialogClose').onclick=()=>d.close();d.addEventListener('click',e=>{if(e.target===d)d.close()});return d;
 }
+document.addEventListener('click',e=>{
+ const btn=e.target.closest('[data-hd-map-stage][data-hd-stage-id]');if(!btn)return;
+ const map=btn.dataset.hdMapStage,id=btn.dataset.hdStageId;if(!map||!id)return;
+ hdMapStageSave(map,id);
+ const shell=btn.closest('.hd-map-stage-shell'),stages=HD_MAP_STAGE_INFO[map]||[],active=stages.find(x=>x.id===id);if(!shell||!active)return;
+ shell.querySelectorAll('.hd-map-stage-btn').forEach(x=>{const on=x.dataset.hdStageId===id;x.classList.toggle('active',on);x.setAttribute('aria-selected',on?'true':'false')});
+ const card=shell.querySelector('.hd-map-stage-card');if(card)card.innerHTML=`<div><span>目標マス</span><strong>${hdMapEsc2(active.target)}</strong></div><div><b>${hdMapEsc2(active.title)}</b><p>${hdMapEsc2(active.detail)}</p></div>`;
+});
 document.addEventListener('click',e=>{const btn=e.target.closest('[data-hd-map-open]');if(!btn)return;const map=btn.dataset.hdMapOpen;const detail=typeof MAP_DETAILS!=='undefined'?MAP_DETAILS[map]:null;const d=hdEnsureMapDialog();document.getElementById('hdMapDialogTitle').textContent=`${map} ${detail?.name||''}`;document.getElementById('hdMapDialogBody').innerHTML=hdMapReferenceImage(map,detail);d.showModal()});
