@@ -41,7 +41,12 @@ function hdEAmatches(item,group){
 }
 function hdEAcandidates(group,limit=5){
  const cat=Array.isArray(window.HD_EQUIPMENT_CATALOG)?window.HD_EQUIPMENT_CATALOG:(typeof HD_EQUIPMENT_CATALOG!=='undefined'?HD_EQUIPMENT_CATALOG:[]);
- return cat.filter(x=>hdEAmatches(x,group)).sort((a,b)=>hdEAitemScore(b)-hdEAitemScore(a)).slice(0,limit);
+ const owned=hdEAownedMap();
+ return cat.filter(x=>hdEAmatches(x,group)).sort((a,b)=>{
+  const ao=(owned.get(hdEAnormalize(a.name))?.count||0)>0,bo=(owned.get(hdEAnormalize(b.name))?.count||0)>0;
+  if(ao!==bo)return ao?-1:1;
+  return hdEAitemScore(b)-hdEAitemScore(a);
+ }).slice(0,limit);
 }
 function hdEAsummary(){
  const owned=hdEAownedMap();
