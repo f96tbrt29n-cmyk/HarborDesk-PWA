@@ -100,12 +100,64 @@ function hdPLPruneReady(map){
  if(!kinds.length&&!gearItems.length){hdPLRemove(map);return}
  row.kinds=kinds;row.gearItems=gearItems;row.updatedAt=Date.now();hdPLSave(list);
 }
+function hdPLNumFirst(v){
+ const m=String(v??'').match(/\d+/);return m?Number(m[0]):0;
+}
+function hdPLDevRecipeFor(target){
+ if(!target||typeof HD_DEV_RECIPES==='undefined')return null;
+ const aliases=typeof hdAGNames==='function'?hdAGNames(target):[target];
+ return HD_DEV_RECIPES.find(r=>(r.targets||[]).some(t=>aliases.includes(t)))||null;
+}
+function hdPLDevRate(recipe,target){
+ if(!recipe)return 0;
+ const text=String(recipe.rates||''),parts=text.split('/').map(x=>x.trim()),norm=s=>String(s||'').normalize('NFKC').replace(/[\s()（）・･]/g,'');
+ const key=norm(target),short=key.replace(/改二|改|型|式/g,'').slice(0,6);
+ let seg=parts.find(x=>{const n=norm(x);return (key&&n.includes(key))||(short.length>=2&&n.includes(short))});
+ if(!seg&&parts.length===1)seg=parts[0];
+ if(!seg)return 0;
+ const m=seg.match(/([0-9]+(?:\.[0-9]+)?)\s*%/);return m?Number(m[1])/100:0;
+}
+function hdPLDevEstimate(row){
+ const target=row.target||'',recipe=hdPLDevRecipeFor(target);if(!recipe)return null;
+ const need=Math.max(1,Number(row.shortfall)||Number(row.needed)||1),rate=hdPLDevRate(recipe,target);
+ const attempts=rate>0?Math.max(1,Math.ceil(need/rate)):null;
+ const one={fuel:Number(recipe.fuel)||0,ammo:Number(recipe.ammo)||0,steel:Number(recipe.steel)||0,bauxite:Number(recipe.bauxite)||0};
+ const total=attempts?{fuel:one.fuel*attempts,ammo:one.ammo*attempts,steel:one.steel*attempts,bauxite:one.bauxite*attempts}:null;
+ return {recipe,rate,attempts,one,total};
+}
+function hdPLImproveSourceFor(target){
+ if(!target||typeof HD_IMPROVEMENTS==='undefined')return null;
+ return HD_IMPROVEMENTS.find(x=>String(x.update||'').includes(target))||null;
+}
+function hdPLImproveEstimate(row){
+ const target=row.target||'',src=hdPLImproveSourceFor(target);if(!src)return null;
+ let dev=0,screw=0,attempts=0,consumes=[];
+ for(const stage of (src.stages||[])){
+  const label=String(stage[0]||''),devCost=hdPLNumFirst(stage[1]),screwCost=hdPLNumFirst(stage[2]),consume=String(stage[3]||'');
+  let n=0;if(/0.?5/.test(label))n=6;else if(/6.?9/.test(label))n=4;else if(/max/i.test(label))n=1;
+  dev+=devCost*n;screw+=screwCost*n;attempts+=n;if(consume&&consume!=='なし'&&consume!=='更新なし'&&consume!=='更新不可')consumes.push(`${label}: ${consume}`);
+ }
+ const r=src.resource||[0,0,0,0],need=Math.max(1,Number(row.shortfall)||Number(row.needed)||1);
+ return {source:src,need,attempts,dev:dev*need,screw:screw*need,resource:{fuel:(Number(r[0])||0)*attempts*need,ammo:(Number(r[1])||0)*attempts*need,steel:(Number(r[2])||0)*attempts*need,bauxite:(Number(r[3])||0)*attempts*need},consumes:[...new Set(consumes)]};
+}
+function hdPLCostHtml(row){
+ if((row.shortfall||0)<=0)return '';
+ if(row.methodKey==='develop'){
+  const e=hdPLDevEstimate(row);if(!e)return '';
+  return `<div class="hd-pl-cost"><div><span>開発レシピ</span><b>${hdPLEsc(e.recipe.title)}</b></div><div><span>1回</span><b>燃${e.one.fuel} / 弾${e.one.ammo} / 鋼${e.one.steel} / ボ${e.one.bauxite}</b></div>${e.attempts?`<div><span>期待試行目安</span><b>約${e.attempts}回${e.rate?`（${(e.rate*100).toFixed(1)}%基準）`:''}</b></div><div class="total"><span>期待資源目安</span><b>燃${e.total.fuel} / 弾${e.total.ammo} / 鋼${e.total.steel} / ボ${e.total.bauxite}</b></div>`:'<div><span>試行目安</span><b>成功率データなし</b></div>'}<small>確率からの単純期待値。実際の入手回数は上下するよ。</small></div>`;
+ }
+ if(row.methodKey==='improve'){
+  const e=hdPLImproveEstimate(row);if(!e)return '';
+  return `<div class="hd-pl-cost"><div><span>更新元</span><b>${hdPLEsc(e.source.name)} → ${hdPLEsc(row.target||row.wanted)}</b></div><div><span>最低目安</span><b>ネジ ${e.screw} / 開発資材 ${e.dev}</b></div><div class="total"><span>改修資源目安</span><b>燃${e.resource.fuel} / 弾${e.resource.ammo} / 鋼${e.resource.steel} / ボ${e.resource.bauxite}</b></div>${e.consumes.length?`<small>消費装備等: ${e.consumes.map(hdPLEsc).join(' / ')}</small>`:''}<small>通常改修の必要数を使った最低目安。失敗・確実化・曜日/二番艦条件で増える場合があるよ。</small></div>`;
+ }
+ return '';
+}
 function hdPLGearItemHtml(map,row){
  const target=row.target||'',method=row.methodLabel||'入手情報',rank=row.rank||4,label=rank===1?'優先1':rank===2?'優先2':rank===3?'優先3':rank===5?'優先5':'優先4';
  const need=Math.max(0,Number(row.needed)||0),owned=Math.max(0,Number(row.owned)||0),left=Math.max(0,Number(row.shortfall)||0);
  const status=left===0?'準備済み':owned>0?'あと少し':'不足';
  const shipText=(row.ships||[]).join('・')||row.ship||'',loadoutText=(row.loadouts||[]).join('・')||row.loadout||'';
- return `<article class="hd-pl-gear-item method-${hdPLEsc(row.methodKey||'other')} ${row.status||''}"><div class="hd-pl-gear-head"><div><strong>${hdPLEsc(target||row.wanted)}</strong><span>${hdPLEsc(shipText)}${loadoutText?`｜${hdPLEsc(loadoutText)}`:''}</span></div><div><b>${left?label:'完了'}</b><em>${hdPLEsc(method)}</em></div></div><div class="hd-pl-gear-counts"><span>必要 <b>${need}</b></span><span>所持 <b>${owned}</b></span><span class="${left?'short':'done'}">あと <b>${left}</b></span></div><div class="hd-pl-gear-meta">${target&&target!==row.wanted?`<span>元の希望 <b>${hdPLEsc(row.wanted)}</b></span>`:''}<span>状態 <b>${status}</b></span></div><div class="hd-pl-actions">${left>0?(target?`<button type="button" class="ghost small" data-hd-pl-item-guide="${hdPLEsc(target)}" data-hd-pl-map="${hdPLEsc(map)}">この装備の入手方法</button><button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(target)}">図鑑</button>`:(row.kind?`<button type="button" class="ghost small" data-hd-pl-guide="${hdPLEsc(row.kind)}" data-hd-pl-map="${hdPLEsc(map)}">代替候補を見る</button>`:'')):(target?`<button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(target)}">所持装備を確認</button>`:'')}</div></article>`;
+ return `<article class="hd-pl-gear-item method-${hdPLEsc(row.methodKey||'other')} ${row.status||''}"><div class="hd-pl-gear-head"><div><strong>${hdPLEsc(target||row.wanted)}</strong><span>${hdPLEsc(shipText)}${loadoutText?`｜${hdPLEsc(loadoutText)}`:''}</span></div><div><b>${left?label:'完了'}</b><em>${hdPLEsc(method)}</em></div></div><div class="hd-pl-gear-counts"><span>必要 <b>${need}</b></span><span>所持 <b>${owned}</b></span><span class="${left?'short':'done'}">あと <b>${left}</b></span></div><div class="hd-pl-gear-meta">${target&&target!==row.wanted?`<span>元の希望 <b>${hdPLEsc(row.wanted)}</b></span>`:''}<span>状態 <b>${status}</b></span></div>${hdPLCostHtml(row)}<div class="hd-pl-actions">${left>0?(target?`<button type="button" class="ghost small" data-hd-pl-item-guide="${hdPLEsc(target)}" data-hd-pl-map="${hdPLEsc(map)}">この装備の入手方法</button><button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(target)}">図鑑</button>`:(row.kind?`<button type="button" class="ghost small" data-hd-pl-guide="${hdPLEsc(row.kind)}" data-hd-pl-map="${hdPLEsc(map)}">代替候補を見る</button>`:'')):(target?`<button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(target)}">所持装備を確認</button>`:'')}</div></article>`;
 }
 function hdPLGearPlanHtml(row){
  const items=hdPLDemandRows(row.gearItems||[]);if(!items.length)return '';
