@@ -69,7 +69,17 @@ const HD_SHIP_DATABASE=[
  {base:'満潮',final:'満潮改二',type:'駆逐艦',speed:'高速',targetLv:77,path:'満潮 → 満潮改(Lv20) → 満潮改二(Lv77)',requirements:'Lv77',roles:['対地','輸送','大発','高火力'],note:'設計図不要で大発・内火艇を扱える対地/輸送向け駆逐艦。'},
  {base:'朝霜',final:'朝霜改二',type:'駆逐艦',speed:'高速',targetLv:77,path:'朝霜 → 朝霜改(Lv45) → 朝霜改二(Lv77) → 朝霜改二補(Lv92)',requirements:'Lv77＋改装設計図＋戦闘詳報＋開発資材×30',roles:['D型砲','対潜','夜戦','高回避'],note:'回避94・対潜76を持つ夕雲型改二。D型砲運用と対潜を両立しやすい。'},
  {base:'初霜',final:'初霜改二',type:'駆逐艦',speed:'高速',targetLv:70,path:'初霜 → 初霜改(Lv20) → 初霜改二(Lv70)',requirements:'Lv70',roles:['高運','夜戦CI','対空','対潜'],note:'運53の幸運駆逐。魚雷CIを狙いやすく、対空・対潜もバランスが良い。'},
- {base:'磯風',final:'磯風乙改',type:'駆逐艦',speed:'高速',targetLv:68,path:'磯風 → 磯風改(Lv45) → 磯風乙改(Lv68)',requirements:'Lv68＋高速建造材×10＋開発資材×40',roles:['対空','対空CI','夜戦','対潜'],note:'対空91の乙改駆逐。防空と通常夜戦を兼ねる使いやすい改装形態。'}
+ {base:'磯風',final:'磯風乙改',type:'駆逐艦',speed:'高速',targetLv:68,path:'磯風 → 磯風改(Lv45) → 磯風乙改(Lv68)',requirements:'Lv68＋高速建造材×10＋開発資材×40',roles:['対空','対空CI','夜戦','対潜'],note:'対空91の乙改駆逐。防空と通常夜戦を兼ねる使いやすい改装形態。'},
+ {base:'荒潮',final:'荒潮改二',type:'駆逐艦',speed:'高速',targetLv:67,path:'荒潮 → 荒潮改(Lv20) → 荒潮改二(Lv67)',requirements:'Lv67＋改装設計図',roles:['対地','輸送','大発','高火力'],note:'設計図は必要だが、対地・輸送をこなしやすい朝潮型改二。'},
+ {base:'白露',final:'白露改二',type:'駆逐艦',speed:'高速',targetLv:77,path:'白露 → 白露改(Lv20) → 白露改二(Lv77)',requirements:'Lv77＋戦闘詳報＋開発資材×15',roles:['対潜','司令部','対地','高火力'],note:'対潜83を持つ高対潜駆逐。司令部・内火艇運用にも対応しやすい。'},
+ {base:'村雨',final:'村雨改二',type:'駆逐艦',speed:'高速',targetLv:70,path:'村雨 → 村雨改(Lv20) → 村雨改二(Lv70)',requirements:'Lv70＋戦闘詳報',roles:['輸送','大発','対潜','司令部'],note:'大発と司令部を扱える汎用駆逐。対潜77で潜水対策にも使いやすい。'},
+ {base:'江風',final:'江風改二',type:'駆逐艦',speed:'高速',targetLv:75,path:'江風 → 江風改(Lv30) → 江風改二(Lv75)',requirements:'Lv75',roles:['高雷装','輸送','大発','夜戦'],note:'雷装96の高雷装駆逐。輸送と夜戦火力を両立しやすい。'},
+ {base:'陽炎',final:'陽炎改二',type:'駆逐艦',speed:'高速',targetLv:70,path:'陽炎 → 陽炎改(Lv20) → 陽炎改二(Lv70)',requirements:'Lv70＋改装設計図＋開発資材×20',roles:['夜戦','駆逐主力','高雷装'],note:'雷装90のバランス型改二。通常連撃・魚雷CIどちらにも寄せやすい。'},
+ {base:'不知火',final:'不知火改二',type:'駆逐艦',speed:'高速',targetLv:72,path:'不知火 → 不知火改(Lv20) → 不知火改二(Lv72)',requirements:'Lv72＋改装設計図＋開発資材×20',roles:['夜戦','駆逐主力','高雷装'],note:'雷装91・運24の陽炎型改二。夜戦火力と汎用性を両立。'},
+ {base:'黒潮',final:'黒潮改二',type:'駆逐艦',speed:'高速',targetLv:73,path:'黒潮 → 黒潮改(Lv20) → 黒潮改二(Lv73)',requirements:'Lv73＋改装設計図＋開発資材×20',roles:['高火力','夜戦','対潜','駆逐主力'],note:'火力69・対潜70の攻撃寄り陽炎型改二。通常攻略で扱いやすい。'},
+ {base:'浦風',final:'浦風丁改',type:'駆逐艦',speed:'高速',targetLv:69,path:'浦風 → 浦風改(Lv35) → 浦風丁改(Lv69)',requirements:'Lv69＋高速建造材×10＋開発資材×40',roles:['対潜','対空','内火艇','護衛'],note:'対潜88の丁改駆逐。対潜先制ラインを満たしやすく、内火艇も扱える。'},
+ {base:'谷風',final:'谷風丁改',type:'駆逐艦',speed:'高速',targetLv:70,path:'谷風 → 谷風改(Lv30) → 谷風丁改(Lv70)',requirements:'Lv70＋高速建造材×20＋開発資材×50',roles:['対潜','高回避','対空','護衛'],note:'回避94・対潜86の護衛向け駆逐。潜水マスの安定化に使いやすい。'},
+ {base:'浜風',final:'浜風乙改',type:'駆逐艦',speed:'高速',targetLv:67,path:'浜風 → 浜風改(Lv30) → 浜風乙改(Lv67)',requirements:'Lv67＋高速建造材×10＋開発資材×40',roles:['防空','対空CI','対潜','護衛'],note:'対空93の乙改駆逐。防空寄りの通常攻略と対潜補助に向く。'}
 ];
 
 
@@ -143,7 +153,17 @@ const HD_SHIP_STATS={
  '満潮改二':{hp:31,armor:54,evasion:90,fire:69,torp:89,aa:65,asw:60,los:55,luck:18,air:0,fuel:15,ammo:20,range:'短'},
  '朝霜改二':{hp:33,armor:55,evasion:94,fire:69,torp:88,aa:76,asw:76,los:46,luck:28,air:0,fuel:15,ammo:20,range:'短'},
  '初霜改二':{hp:32,armor:55,evasion:95,fire:63,torp:85,aa:81,asw:72,los:49,luck:53,air:0,fuel:15,ammo:20,range:'短'},
- '磯風乙改':{hp:34,armor:53,evasion:91,fire:66,torp:84,aa:91,asw:72,los:52,luck:24,air:0,fuel:15,ammo:25,range:'短'}
+ '磯風乙改':{hp:34,armor:53,evasion:91,fire:66,torp:84,aa:91,asw:72,los:52,luck:24,air:0,fuel:15,ammo:25,range:'短'},
+ '荒潮改二':{hp:31,armor:52,evasion:90,fire:69,torp:88,aa:70,asw:59,los:52,luck:17,air:0,fuel:15,ammo:20,range:'短'},
+ '白露改二':{hp:31,armor:50,evasion:91,fire:69,torp:87,aa:71,asw:83,los:50,luck:16,air:0,fuel:15,ammo:20,range:'短'},
+ '村雨改二':{hp:31,armor:51,evasion:90,fire:68,torp:88,aa:70,asw:77,los:47,luck:17,air:0,fuel:15,ammo:20,range:'短'},
+ '江風改二':{hp:31,armor:51,evasion:89,fire:62,torp:96,aa:64,asw:63,los:53,luck:19,air:0,fuel:15,ammo:20,range:'短'},
+ '陽炎改二':{hp:33,armor:53,evasion:90,fire:68,torp:90,aa:62,asw:67,los:42,luck:20,air:0,fuel:15,ammo:20,range:'短'},
+ '不知火改二':{hp:33,armor:54,evasion:90,fire:67,torp:91,aa:64,asw:68,los:43,luck:24,air:0,fuel:15,ammo:20,range:'短'},
+ '黒潮改二':{hp:33,armor:53,evasion:90,fire:69,torp:88,aa:65,asw:70,los:41,luck:22,air:0,fuel:15,ammo:20,range:'短'},
+ '浦風丁改':{hp:33,armor:53,evasion:88,fire:62,torp:80,aa:76,asw:88,los:48,luck:18,air:0,fuel:15,ammo:25,range:'短'},
+ '谷風丁改':{hp:33,armor:51,evasion:94,fire:59,torp:84,aa:80,asw:86,los:42,luck:17,air:0,fuel:15,ammo:25,range:'短'},
+ '浜風乙改':{hp:33,armor:54,evasion:89,fire:64,torp:83,aa:93,asw:74,los:47,luck:20,air:0,fuel:15,ammo:25,range:'短'}
 };
 
 const HD_SHIP_LOADOUTS={
@@ -426,6 +446,46 @@ const HD_SHIP_LOADOUTS={
  '磯風乙改':[
   {name:'防空連撃',gear:['10cm連装高角砲＋高射装置','10cm連装高角砲＋高射装置','高性能対空電探'],memo:'対空91を活かした防空寄り連撃。'},
   {name:'対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'対潜72を活かす潜水対策。'}
+ ],
+ '荒潮改二':[
+  {name:'対地',gear:['大発動艇(八九式中戦車＆陸戦隊)','特二式内火艇','主砲/対地補助'],memo:'大発系と内火艇を使って陸上型を担当。'},
+  {name:'輸送',gear:['大発動艇','大発動艇','大発動艇'],memo:'TP輸送量を優先する構成。'}
+ ],
+ '白露改二':[
+  {name:'先制対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'対潜83を活かす標準対潜構成。'},
+  {name:'夜戦連撃',gear:['高性能駆逐主砲','高性能駆逐主砲','水上電探'],memo:'火力69・雷装87を安定して活かす。'}
+ ],
+ '村雨改二':[
+  {name:'輸送',gear:['大発動艇','大発動艇','大発動艇'],memo:'輸送海域で大発運用。'},
+  {name:'対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'対潜77を活かして潜水マスを対処。'}
+ ],
+ '江風改二':[
+  {name:'夜戦連撃',gear:['高性能駆逐主砲','高性能駆逐主砲','水上電探'],memo:'雷装96を連撃で安定して活かす。'},
+  {name:'輸送',gear:['大発動艇','大発動艇','主砲/電探'],memo:'輸送量を稼ぎつつ1枠を戦闘補助へ。'}
+ ],
+ '陽炎改二':[
+  {name:'夜戦連撃',gear:['高性能駆逐主砲','高性能駆逐主砲','水上電探'],memo:'汎用性の高い昼夜連撃型。'},
+  {name:'魚雷CI',gear:['61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷','水雷戦隊 熟練見張員'],memo:'運改修や夜戦補助込みで高打点を狙う。'}
+ ],
+ '不知火改二':[
+  {name:'夜戦連撃',gear:['高性能駆逐主砲','高性能駆逐主砲','水上電探'],memo:'雷装91を活かす安定型。'},
+  {name:'魚雷CI',gear:['61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷','水雷戦隊 熟練見張員'],memo:'運24を活かし、補助込みでCIを狙う。'}
+ ],
+ '黒潮改二':[
+  {name:'高火力連撃',gear:['高性能駆逐主砲','高性能駆逐主砲','水上電探'],memo:'火力69を活かした通常攻略向け。'},
+  {name:'対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'対潜70を活かす潜水対策。'}
+ ],
+ '浦風丁改':[
+  {name:'先制対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'対潜88を活かした対潜特化。'},
+  {name:'対地補助',gear:['特二式内火艇','高性能駆逐主砲','高性能駆逐主砲'],memo:'内火艇搭載可を活かして陸上型へ追加打点。'}
+ ],
+ '谷風丁改':[
+  {name:'先制対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'対潜86・回避94を活かす護衛型。'},
+  {name:'防空補助',gear:['10cm連装高角砲＋高射装置','10cm連装高角砲＋高射装置','高性能対空電探'],memo:'対空80を活かして航空戦対策を補助。'}
+ ],
+ '浜風乙改':[
+  {name:'防空CI',gear:['10cm連装高角砲＋高射装置','10cm連装高角砲＋高射装置','高性能対空電探'],memo:'対空93を活かした防空寄り構成。'},
+  {name:'対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'対潜74を活かして潜水艦を処理。'}
  ]
 };
 
