@@ -131,7 +131,13 @@ function hdWSShowElement(target,scroll=true){
   if(navSeq!==hdWSNavSeq)return false;
   hdWSState.group=group;hdWSState.sections[group]=section.id;hdWSSave();
   document.querySelectorAll('[data-hd-ws-group]').forEach(b=>{const active=b.dataset.hdWsGroup===group;b.classList.toggle('active',active);b.setAttribute('aria-selected',active?'true':'false')});
-  section.classList.remove('hd-ws-hidden');hdWSUnhideAncestors(section);return true;
+  for(const row of hdWSSections()){
+   const same=row.dataset.hdWorkspaceGroup===group,hero=row.id==='hdWorkspaceHero';
+   row.classList.toggle('hd-ws-hidden',!(same&&(hero||row.id===section.id)));
+  }
+  section.classList.remove('hd-ws-hidden');hdWSUnhideAncestors(section);
+  hdWSRenderSubtabs(group,section.id);hdWSUpdateWrappers();hdWSUpdateBadges();
+  return true;
  };
  const apply=()=>{if(navSeq!==hdWSNavSeq)return false;hdWSApply(group,section.id,{preserveNavSeq:true});pinNow();return true};
  pinNow();
