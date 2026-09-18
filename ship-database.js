@@ -59,7 +59,17 @@ const HD_SHIP_DATABASE=[
  {base:'鬼怒',final:'鬼怒改二',type:'軽巡洋艦',speed:'高速',targetLv:75,path:'鬼怒 → 鬼怒改(Lv17) → 鬼怒改二(Lv75)',requirements:'Lv75＋改装設計図',roles:['輸送','大発','対潜','防空','遠征'],note:'大発系を扱え、輸送・遠征・対潜・防空をまとめて担当しやすい。'},
  {base:'綾波',final:'綾波改二',type:'駆逐艦',speed:'高速',targetLv:70,path:'綾波 → 綾波改(Lv20) → 綾波改二(Lv70)',requirements:'Lv70',roles:['高火力','夜戦CI','高運','駆逐主力'],note:'高火力・高運の夜戦向け駆逐。魚雷CIと連撃を使い分けやすい。'},
  {base:'大潮',final:'大潮改二',type:'駆逐艦',speed:'高速',targetLv:65,path:'大潮 → 大潮改(Lv20) → 大潮改二(Lv65)',requirements:'Lv65＋改装設計図',roles:['対地','輸送','大発','夜戦'],note:'大発・内火艇を扱える高雷装駆逐。輸送と対地の両方で使いやすい。'},
- {base:'大淀',final:'大淀改',type:'軽巡洋艦',speed:'高速',targetLv:35,path:'大淀 → 大淀改(Lv35)',requirements:'Lv35',roles:['4スロット','索敵','司令部','昼連撃'],note:'高索敵の4スロ軽巡。艦隊司令部施設や偵察機を使う連合艦隊運用で便利。'}
+ {base:'大淀',final:'大淀改',type:'軽巡洋艦',speed:'高速',targetLv:35,path:'大淀 → 大淀改(Lv35)',requirements:'Lv35',roles:['4スロット','索敵','司令部','昼連撃'],note:'高索敵の4スロ軽巡。艦隊司令部施設や偵察機を使う連合艦隊運用で便利。'},
+ {base:'榛名',final:'榛名改二乙',type:'高速戦艦',speed:'高速',targetLv:88,path:'榛名 → 榛名改(Lv25) → 榛名改二(Lv80) → 榛名改二乙(Lv88) ⇔ 榛名改二丙(Lv90)',requirements:'Lv88＋改装設計図×2＋新型兵装資材×2＋戦闘詳報＋開発資材×390',roles:['高速戦艦','対空','夜戦','高運'],note:'高い対空と運を持つ高速戦艦。通常攻略から夜戦・防空寄りまで幅広く使いやすい。'},
+ {base:'霧島',final:'霧島改二丙',type:'高速戦艦',speed:'高速',targetLv:89,path:'霧島 → 霧島改(Lv25) → 霧島改二(Lv75) → 霧島改二丙(Lv89)',requirements:'Lv89＋改装設計図×2＋新型砲熕兵装資材×2＋戦闘詳報＋開発資材×400',roles:['高速戦艦','高火力','夜戦','対艦'],note:'火力106と雷装40を持つ攻撃寄り高速戦艦。昼夜を通じて高い打点を出しやすい。'},
+ {base:'木曾',final:'木曾改二',type:'重雷装巡洋艦',speed:'高速',targetLv:65,path:'木曾 → 木曾改(Lv20) → 木曾改二(Lv65)',requirements:'Lv65',roles:['先制雷撃','夜戦','対潜','高雷装'],note:'雷装111の雷巡。北上・大井より雷装は低いが、対空・対潜とのバランスが良い。'},
+ {base:'神通',final:'神通改二',type:'軽巡洋艦',speed:'高速',targetLv:60,path:'神通 → 神通改(Lv20) → 神通改二(Lv60)',requirements:'Lv60',roles:['高火力','高雷装','夜戦','軽巡主力'],note:'火力74・雷装99の夜戦火力型軽巡。連撃や魚雷CIでボス夜戦に向く。'},
+ {base:'鳥海',final:'鳥海改二',type:'重巡洋艦',speed:'高速',targetLv:65,path:'鳥海 → 鳥海改(Lv25) → 鳥海改二(Lv65)',requirements:'Lv65＋改装設計図',roles:['高火力','夜戦','重巡','対艦'],note:'火力86・雷装87の高夜戦火力重巡。通常連撃でも高い打点を出せる。'},
+ {base:'夕雲',final:'夕雲改二',type:'駆逐艦',speed:'高速',targetLv:75,path:'夕雲 → 夕雲改(Lv30) → 夕雲改二(Lv75)',requirements:'Lv75＋改装設計図＋戦闘詳報',roles:['D型砲','夜戦','対潜','駆逐主力'],note:'夕雲型改二の標準格。D型砲系と相性がよく、対潜も高め。'},
+ {base:'満潮',final:'満潮改二',type:'駆逐艦',speed:'高速',targetLv:77,path:'満潮 → 満潮改(Lv20) → 満潮改二(Lv77)',requirements:'Lv77',roles:['対地','輸送','大発','高火力'],note:'設計図不要で大発・内火艇を扱える対地/輸送向け駆逐艦。'},
+ {base:'朝霜',final:'朝霜改二',type:'駆逐艦',speed:'高速',targetLv:77,path:'朝霜 → 朝霜改(Lv45) → 朝霜改二(Lv77) → 朝霜改二補(Lv92)',requirements:'Lv77＋改装設計図＋戦闘詳報＋開発資材×30',roles:['D型砲','対潜','夜戦','高回避'],note:'回避94・対潜76を持つ夕雲型改二。D型砲運用と対潜を両立しやすい。'},
+ {base:'初霜',final:'初霜改二',type:'駆逐艦',speed:'高速',targetLv:70,path:'初霜 → 初霜改(Lv20) → 初霜改二(Lv70)',requirements:'Lv70',roles:['高運','夜戦CI','対空','対潜'],note:'運53の幸運駆逐。魚雷CIを狙いやすく、対空・対潜もバランスが良い。'},
+ {base:'磯風',final:'磯風乙改',type:'駆逐艦',speed:'高速',targetLv:68,path:'磯風 → 磯風改(Lv45) → 磯風乙改(Lv68)',requirements:'Lv68＋高速建造材×10＋開発資材×40',roles:['対空','対空CI','夜戦','対潜'],note:'対空91の乙改駆逐。防空と通常夜戦を兼ねる使いやすい改装形態。'}
 ];
 
 
@@ -123,7 +133,17 @@ const HD_SHIP_STATS={
  '鬼怒改二':{hp:45,armor:68,evasion:82,fire:58,torp:84,aa:86,asw:87,los:60,luck:17,air:3,fuel:25,ammo:30,range:'短'},
  '綾波改二':{hp:32,armor:54,evasion:90,fire:76,torp:89,aa:52,asw:63,los:51,luck:40,air:0,fuel:15,ammo:20,range:'短'},
  '大潮改二':{hp:31,armor:51,evasion:90,fire:67,torp:90,aa:62,asw:64,los:54,luck:17,air:0,fuel:15,ammo:20,range:'短'},
- '大淀改':{hp:47,armor:69,evasion:78,fire:71,torp:49,aa:77,asw:39,los:84,luck:30,air:12,fuel:35,ammo:35,range:'中'}
+ '大淀改':{hp:47,armor:69,evasion:78,fire:71,torp:49,aa:77,asw:39,los:84,luck:30,air:12,fuel:35,ammo:35,range:'中'},
+ '榛名改二乙':{hp:85,armor:93,evasion:75,fire:94,torp:40,aa:94,asw:0,los:53,luck:48,air:12,fuel:100,ammo:160,range:'長'},
+ '霧島改二丙':{hp:85,armor:92,evasion:74,fire:106,torp:40,aa:82,asw:0,los:52,luck:16,air:11,fuel:100,ammo:160,range:'長'},
+ '木曾改二':{hp:44,armor:65,evasion:85,fire:65,torp:111,aa:72,asw:82,los:49,luck:13,air:0,fuel:25,ammo:50,range:'中'},
+ '神通改二':{hp:51,armor:69,evasion:80,fire:74,torp:99,aa:68,asw:80,los:54,luck:13,air:3,fuel:25,ammo:35,range:'中'},
+ '鳥海改二':{hp:57,armor:78,evasion:80,fire:86,torp:87,aa:70,asw:0,los:62,luck:20,air:12,fuel:45,ammo:80,range:'中'},
+ '夕雲改二':{hp:33,armor:54,evasion:93,fire:67,torp:87,aa:68,asw:77,los:46,luck:18,air:0,fuel:15,ammo:20,range:'短'},
+ '満潮改二':{hp:31,armor:54,evasion:90,fire:69,torp:89,aa:65,asw:60,los:55,luck:18,air:0,fuel:15,ammo:20,range:'短'},
+ '朝霜改二':{hp:33,armor:55,evasion:94,fire:69,torp:88,aa:76,asw:76,los:46,luck:28,air:0,fuel:15,ammo:20,range:'短'},
+ '初霜改二':{hp:32,armor:55,evasion:95,fire:63,torp:85,aa:81,asw:72,los:49,luck:53,air:0,fuel:15,ammo:20,range:'短'},
+ '磯風乙改':{hp:34,armor:53,evasion:91,fire:66,torp:84,aa:91,asw:72,los:52,luck:24,air:0,fuel:15,ammo:25,range:'短'}
 };
 
 const HD_SHIP_LOADOUTS={
@@ -366,6 +386,46 @@ const HD_SHIP_LOADOUTS={
  '大淀改':[
   {name:'4スロ索敵連撃',gear:['15.2cm連装砲改二','15.2cm連装砲改二','零式水上偵察機11型乙(熟練)','高性能電探'],memo:'索敵84を活かして分岐と昼連撃を安定。'},
   {name:'司令部・連合艦隊',gear:['主砲','主砲','艦隊司令部施設','高性能水偵'],memo:'連合艦隊旗艦で護衛退避を使う場合の構成例。'}
+ ],
+ '榛名改二乙':[
+  {name:'高速戦艦・弾着',gear:['35.6cm連装砲改','35.6cm連装砲改','零式水上偵察機11型乙(熟練)','一式徹甲弾改'],memo:'高運・高対空を活かしつつ主砲2＋水偵＋徹甲弾で安定運用。'},
+  {name:'夜戦・命中寄り',gear:['35.6cm連装砲改','35.6cm連装砲改','高性能電探','高性能水偵'],memo:'夜戦や命中重視の海域で使いやすい。'}
+ ],
+ '霧島改二丙':[
+  {name:'高火力・弾着',gear:['35.6cm連装砲改','35.6cm連装砲改','零式水上偵察機11型乙(熟練)','一式徹甲弾改'],memo:'火力106を活かす標準弾着構成。'},
+  {name:'夜戦寄り',gear:['35.6cm連装砲改','35.6cm連装砲改','魚雷/夜戦補助','高性能水偵'],memo:'雷装40を持つ特徴を夜戦で活かす。'}
+ ],
+ '木曾改二':[
+  {name:'先制雷撃＋連撃',gear:['甲標的 丁型改','主砲','主砲'],memo:'先制雷撃を維持しながら夜戦連撃を狙う安定型。'},
+  {name:'魚雷CI',gear:['甲標的 丁型改','61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷'],memo:'運改修済みなら夜戦CIで火力を伸ばす。'}
+ ],
+ '神通改二':[
+  {name:'夜戦連撃',gear:['15.2cm連装砲改二','15.2cm連装砲改二','夜戦補助/電探'],memo:'高い火力・雷装を安定して活かす夜戦連撃型。'},
+  {name:'魚雷CI',gear:['61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷','水雷戦隊 熟練見張員'],memo:'運改修後の高難度ボス向け。'}
+ ],
+ '鳥海改二':[
+  {name:'高火力連撃',gear:['20.3cm(3号)連装砲','20.3cm(3号)連装砲','零式水上偵察機11型乙(熟練)','高性能電探'],memo:'火力86・雷装87を活かした昼夜連撃。'},
+  {name:'夜戦寄り',gear:['20.3cm(3号)連装砲','20.3cm(3号)連装砲','夜戦補助','高性能水偵'],memo:'重巡トップクラスの夜戦火力を活かす。'}
+ ],
+ '夕雲改二':[
+  {name:'D型砲連撃',gear:['12.7cm連装砲D型改二','12.7cm連装砲D型改二','水上電探'],memo:'D型砲系との相性を活かした標準型。'},
+  {name:'対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'対潜77を活かす潜水マス向け。'}
+ ],
+ '満潮改二':[
+  {name:'対地',gear:['大発動艇(八九式中戦車＆陸戦隊)','特二式内火艇','主砲/対地補助'],memo:'大発・内火艇で陸上型を攻撃。'},
+  {name:'輸送',gear:['大発動艇','大発動艇','大発動艇'],memo:'設計図不要の輸送要員として使いやすい。'}
+ ],
+ '朝霜改二':[
+  {name:'D型砲連撃',gear:['12.7cm連装砲D型改二','12.7cm連装砲D型改二','水上電探'],memo:'高回避を活かしつつ夜戦連撃。'},
+  {name:'対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'対潜76を活かす標準対潜型。'}
+ ],
+ '初霜改二':[
+  {name:'魚雷CI',gear:['61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷','水雷戦隊 熟練見張員'],memo:'運53を活かした夜戦フィニッシャー。'},
+  {name:'防空・汎用',gear:['10cm連装高角砲＋高射装置','10cm連装高角砲＋高射装置','高性能対空電探'],memo:'対空81を活かしつつ通常連撃も可能。'}
+ ],
+ '磯風乙改':[
+  {name:'防空連撃',gear:['10cm連装高角砲＋高射装置','10cm連装高角砲＋高射装置','高性能対空電探'],memo:'対空91を活かした防空寄り連撃。'},
+  {name:'対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'対潜72を活かす潜水対策。'}
  ]
 };
 
