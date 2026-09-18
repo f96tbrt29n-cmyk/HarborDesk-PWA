@@ -31,7 +31,17 @@ const HD_SHIP_DATABASE=[
  {base:'夕立',final:'夕立改二',type:'駆逐艦',speed:'高速',targetLv:55,path:'夕立 → 夕立改(Lv20) → 夕立改二(Lv55)',requirements:'Lv55',roles:['高火力','夜戦','駆逐主力'],note:'低い改装Lvで高い火力と雷装を得られる定番主力駆逐艦。'},
  {base:'長波',final:'長波改二',type:'駆逐艦',speed:'高速',targetLv:75,path:'長波 → 長波改(Lv30) → 長波改二(Lv75)',requirements:'Lv75＋改装設計図＋戦闘詳報',roles:['D型砲','夜戦CI','高火力','司令部'],note:'D型砲系との相性がよく、夜戦火力と汎用性を両立する夕雲型改二。'},
  {base:'瑞鳳',final:'瑞鳳改二乙',type:'軽空母',speed:'高速',targetLv:80,path:'瑞鳳 → 瑞鳳改(Lv25) → 瑞鳳改二(Lv80) ⇔ 瑞鳳改二乙(Lv80)',requirements:'改二乙: Lv80＋高速建造材×20＋開発資材×5',roles:['護衛空母','対潜','制空','航空火力'],note:'射程長の護衛空母。対潜支援と航空戦を両立しやすい。'},
- {base:'Saratoga',final:'Saratoga Mk.II Mod.2',type:'装甲空母',speed:'高速',targetLv:85,path:'Saratoga → Saratoga改(Lv40) → Saratoga Mk.II(Lv85) ⇔ Saratoga Mk.II Mod.2(Lv85)',requirements:'Mk.II: Lv85＋試製甲板カタパルト＋改装設計図 / Mod.2: 高速建造材×30＋開発資材×20',roles:['装甲空母','航空火力','制空'],note:'93機搭載の装甲空母形態。中破時も攻撃でき、高難度海域で安定した航空火力を出しやすい。'}
+ {base:'Saratoga',final:'Saratoga Mk.II Mod.2',type:'装甲空母',speed:'高速',targetLv:85,path:'Saratoga → Saratoga改(Lv40) → Saratoga Mk.II(Lv85) ⇔ Saratoga Mk.II Mod.2(Lv85)',requirements:'Mk.II: Lv85＋試製甲板カタパルト＋改装設計図 / Mod.2: 高速建造材×30＋開発資材×20',roles:['装甲空母','航空火力','制空'],note:'93機搭載の装甲空母形態。中破時も攻撃でき、高難度海域で安定した航空火力を出しやすい。'},
+ {base:'Iowa',final:'Iowa改',type:'高速戦艦',speed:'高速',targetLv:50,path:'Iowa → Iowa改(Lv50)',requirements:'Lv50',roles:['高速戦艦','高火力','高対空','対艦'],note:'高速・高火力・高対空を兼ねる海外戦艦。通常攻略から高難度まで扱いやすい。'},
+ {base:'Atlanta',final:'Atlanta改',type:'軽巡洋艦',speed:'高速',targetLv:50,path:'Atlanta → Atlanta改(Lv50)',requirements:'Lv50＋高速建造材×20＋開発資材×100',roles:['防空','対空CI','軽巡','高対空'],note:'専用対空CIが強力な防空巡洋艦。空襲・航空戦が厳しい海域向け。'},
+ {base:'由良',final:'由良改二',type:'軽巡洋艦',speed:'高速',targetLv:77,path:'由良 → 由良改(Lv20) → 由良改二(Lv77)',requirements:'Lv77＋改装設計図',roles:['甲標的','水戦','対潜','対地','輸送'],note:'甲標的・水戦・大発系を扱える多用途軽巡。制空補助や輸送にも対応。'},
+ {base:'朝潮',final:'朝潮改二丁',type:'駆逐艦',speed:'高速',targetLv:85,path:'朝潮 → 朝潮改(Lv20) → 朝潮改二(Lv70) ⇔ 朝潮改二丁(Lv85)',requirements:'Lv85',roles:['対潜','対地','輸送','大発'],note:'高い対潜値と大発・内火艇運用が強み。対潜・輸送・対地で便利。'},
+ {base:'Jervis',final:'Jervis改',type:'駆逐艦',speed:'高速',targetLv:45,path:'Jervis → Jervis改(Lv45)',requirements:'Lv45',roles:['夜戦CI','高運','対潜','駆逐主力'],note:'高運と高対潜を持つ英国駆逐。夜戦CIと対潜を両立しやすい。'},
+ {base:'Samuel B.Roberts',final:'Samuel B.Roberts Mk.II',type:'駆逐艦',speed:'高速',targetLv:78,path:'Samuel B.Roberts → Samuel B.Roberts改(Lv50) → Samuel B.Roberts Mk.II(Lv78)',requirements:'Lv78＋改装設計図＋高速建造材×20＋開発資材×60',roles:['自動先制対潜','対潜','高運','護衛'],note:'無条件先制対潜が可能な護衛駆逐艦。対潜海域の専門要員。'},
+ {base:'大鳳',final:'大鳳改',type:'装甲空母',speed:'高速',targetLv:40,path:'大鳳 → 大鳳改(Lv40)',requirements:'Lv40',roles:['装甲空母','航空火力','制空','高耐久'],note:'中破でも航空攻撃できる装甲空母。高難度攻略で安定した航空火力を出しやすい。'},
+ {base:'利根',final:'利根改二',type:'航空巡洋艦',speed:'高速',targetLv:70,path:'利根 → 利根改(Lv25) → 利根改二(Lv70)',requirements:'Lv70＋改装設計図',roles:['索敵','水戦','制空補助','対地'],note:'高い索敵を持つ航巡。偵察機・水戦・対地装備を使い分けやすい。'},
+ {base:'筑摩',final:'筑摩改二',type:'航空巡洋艦',speed:'高速',targetLv:70,path:'筑摩 → 筑摩改(Lv25) → 筑摩改二(Lv70)',requirements:'Lv70＋改装設計図',roles:['索敵','水戦','制空補助','対地'],note:'利根改二と並ぶ高索敵航巡。制空補助や弾着観測を担当しやすい。'},
+ {base:'Ташкент',final:'Ташкент改',type:'駆逐艦',speed:'高速',targetLv:50,path:'Ташкент → Ташкент改(Lv50)',requirements:'Lv50',roles:['4スロット','対潜','夜戦','高運'],note:'4スロット・射程中の大型駆逐艦。対潜・夜戦・補助装備を同時に積みやすい。'}
 ];
 
 
@@ -67,7 +77,17 @@ const HD_SHIP_STATS={
  '夕立改二':{hp:31,armor:52,evasion:89,fire:74,torp:94,aa:59,asw:69,los:49,luck:22,air:0,fuel:15,ammo:20,range:'短'},
  '長波改二':{hp:33,armor:55,evasion:92,fire:69,torp:90,aa:67,asw:68,los:45,luck:30,air:0,fuel:15,ammo:20,range:'短'},
  '瑞鳳改二乙':{hp:59,armor:72,evasion:67,fire:48,torp:0,aa:88,asw:48,los:77,luck:42,air:50,fuel:40,ammo:45,range:'長'},
- 'Saratoga Mk.II Mod.2':{hp:89,armor:88,evasion:56,fire:58,torp:0,aa:94,asw:0,los:95,luck:40,air:93,fuel:100,ammo:100,range:'中'}
+ 'Saratoga Mk.II Mod.2':{hp:89,armor:88,evasion:56,fire:58,torp:0,aa:94,asw:0,los:95,luck:40,air:93,fuel:100,ammo:100,range:'中'},
+ 'Iowa改':{hp:92,armor:107,evasion:70,fire:117,torp:0,aa:120,asw:0,los:71,luck:41,air:16,fuel:200,ammo:275,range:'長'},
+ 'Atlanta改':{hp:41,armor:61,evasion:76,fire:64,torp:70,aa:128,asw:32,los:50,luck:18,air:0,fuel:30,ammo:60,range:'短'},
+ '由良改二':{hp:45,armor:67,evasion:84,fire:57,torp:83,aa:88,asw:83,los:64,luck:16,air:4,fuel:25,ammo:30,range:'短'},
+ '朝潮改二丁':{hp:34,armor:55,evasion:88,fire:55,torp:86,aa:75,asw:89,los:55,luck:17,air:0,fuel:15,ammo:20,range:'短'},
+ 'Jervis改':{hp:31,armor:50,evasion:90,fire:52,torp:90,aa:70,asw:92,los:52,luck:55,air:0,fuel:15,ammo:25,range:'短'},
+ 'Samuel B.Roberts Mk.II':{hp:29,armor:47,evasion:90,fire:52,torp:70,aa:68,asw:90,los:52,luck:40,air:3,fuel:15,ammo:20,range:'短'},
+ '大鳳改':{hp:70,armor:84,evasion:59,fire:59,torp:0,aa:86,asw:0,los:77,luck:4,air:86,fuel:90,ammo:75,range:'短'},
+ '利根改二':{hp:59,armor:80,evasion:83,fire:78,torp:82,aa:84,asw:0,los:93,luck:15,air:19,fuel:50,ammo:65,range:'中'},
+ '筑摩改二':{hp:58,armor:79,evasion:80,fire:79,torp:83,aa:85,asw:0,los:94,luck:14,air:19,fuel:50,ammo:65,range:'中'},
+ 'Ташкент改':{hp:39,armor:56,evasion:94,fire:66,torp:68,aa:69,asw:73,los:48,luck:43,air:0,fuel:15,ammo:35,range:'中'}
 };
 
 const HD_SHIP_LOADOUTS={
@@ -198,6 +218,46 @@ const HD_SHIP_LOADOUTS={
  'Saratoga Mk.II Mod.2':[
   {name:'装甲空母バランス',gear:['強力な艦攻','強力な艦爆','高性能艦戦','高性能艦戦'],memo:'93機搭載と中破攻撃可能を活かす標準型。'},
   {name:'航空火力重視',gear:['強力な艦攻','強力な艦爆','強力な艦攻','高性能艦戦'],memo:'必要制空を満たした海域で攻撃機を増やす。'}
+ ],
+ 'Iowa改':[
+  {name:'高速戦艦・弾着',gear:['16inch三連装砲 Mk.7','16inch三連装砲 Mk.7','高性能水偵','一式徹甲弾改'],memo:'高火力と命中を活かす主砲2＋水偵＋徹甲弾。'},
+  {name:'防空寄り',gear:['16inch三連装砲 Mk.7','16inch三連装砲 Mk.7','高性能水偵','高性能対空装備'],memo:'高対空120を活かしつつ通常の弾着運用を維持。'}
+ ],
+ 'Atlanta改':[
+  {name:'専用対空CI',gear:['5inch連装両用砲(集中配備)','5inch連装両用砲(集中配備)','GFCS Mk.37'],memo:'Atlantaの専用対空CIを優先する防空特化構成。'},
+  {name:'防空＋夜戦補助',gear:['5inch連装両用砲(集中配備)','5inch連装両用砲(集中配備)','高性能電探'],memo:'航空攻撃対策を主目的に、夜戦連撃も意識。'}
+ ],
+ '由良改二':[
+  {name:'先制雷撃・制空補助',gear:['甲標的 丁型改','二式水戦改(熟練)','主砲/水偵'],memo:'甲標的と水戦を同時運用して先制雷撃と制空補助を両立。'},
+  {name:'対地・輸送',gear:['甲標的 丁型改','大発動艇(八九式中戦車＆陸戦隊)','特二式内火艇'],memo:'対地または輸送海域向け。'}
+ ],
+ '朝潮改二丁':[
+  {name:'先制対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'最大対潜89を活かした対潜特化。'},
+  {name:'対地・輸送',gear:['大発動艇(八九式中戦車＆陸戦隊)','特二式内火艇','大発動艇/補助装備'],memo:'大発・内火艇を使う輸送/対地向け。'}
+ ],
+ 'Jervis改':[
+  {name:'魚雷CI',gear:['61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷','水雷戦隊 熟練見張員'],memo:'高運55を活かした夜戦魚雷CI。'},
+  {name:'対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'最大対潜92を活かす対潜型。'}
+ ],
+ 'Samuel B.Roberts Mk.II':[
+  {name:'無条件先制対潜',gear:['HF/DF + Type144/147 ASDIC','RUR-4A Weapon Alpha改','主砲/電探'],memo:'無条件先制対潜を活かし、余裕があれば1枠を補助へ。'},
+  {name:'対潜火力重視',gear:['HF/DF + Type144/147 ASDIC','RUR-4A Weapon Alpha改','爆雷'],memo:'潜水艦対策を最優先する構成。'}
+ ],
+ '大鳳改':[
+  {name:'装甲空母バランス',gear:['強力な艦攻','強力な艦爆','高性能艦戦','高性能艦戦'],memo:'86機搭載と中破攻撃可能を活かす汎用構成。'},
+  {name:'航空火力重視',gear:['強力な艦攻','強力な艦爆','強力な艦攻','高性能艦戦'],memo:'必要制空を満たした海域で攻撃機を増やす。'}
+ ],
+ '利根改二':[
+  {name:'索敵・弾着',gear:['20.3cm(3号)連装砲','20.3cm(3号)連装砲','零式水上偵察機11型乙(熟練)','高性能水偵/電探'],memo:'最大索敵93を活かし、索敵分岐と昼連撃を両立。'},
+  {name:'制空補助',gear:['20.3cm(3号)連装砲','20.3cm(3号)連装砲','二式水戦改(熟練)','零式水上偵察機11型乙(熟練)'],memo:'航巡の水戦運用で制空を補う。'}
+ ],
+ '筑摩改二':[
+  {name:'索敵・弾着',gear:['20.3cm(3号)連装砲','20.3cm(3号)連装砲','零式水上偵察機11型乙(熟練)','高性能水偵/電探'],memo:'最大索敵94を活かす索敵重視型。'},
+  {name:'制空補助',gear:['20.3cm(3号)連装砲','20.3cm(3号)連装砲','二式水戦改(熟練)','零式水上偵察機11型乙(熟練)'],memo:'制空補助と昼連撃を両立。'}
+ ],
+ 'Ташкент改':[
+  {name:'4スロ対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷','主砲/電探'],memo:'4スロを活かして対潜3点セット＋自由枠。'},
+  {name:'夜戦・補助',gear:['61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷','水雷戦隊 熟練見張員','照明弾/探照灯/電探'],memo:'高運43と4スロを使って夜戦CIと補助を両立。'}
  ]
 };
 
