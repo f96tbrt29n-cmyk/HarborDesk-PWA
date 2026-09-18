@@ -42,7 +42,7 @@ function hdApplyMapTabs(){
   const fleet=d.fleet||d.formation||'';
   const note=d.note||d.caution||'';
   const updated=d.updated||d.sourceDate||'参照日未設定';
-  const tabs=[['overview','概要'],['map','マップ'],['fleet','編成'],['route','ルート'],['gear','装備'],['quest','任務'],['mine','自分用']];
+  const tabs=[['overview','概要'],['map','マップ'],['fleet','編成'],['route','ルート'],['gear','装備'],['quest','任務'],['drop','ドロップ'],['mine','自分用']];
   const active=hdMapTabSaved(selectedMap);
   const mapHtml=typeof hdMapImageHtml==='function'?hdMapImageHtml(selectedMap,d):'<div class="empty">マップ画像を読み込み中</div>';
   card.innerHTML=`<article class="map-tabs-shell">
@@ -54,6 +54,7 @@ function hdApplyMapTabs(){
     <div class="map-tab-pane ${active==='route'?'active':''}" data-map-pane="route"><div class="map-tab-card"><b>主なルート</b><p>${hdMapEsc(d.route||'ルート情報を整理中')}</p></div></div>
     <div class="map-tab-pane ${active==='gear'?'active':''}" data-map-pane="gear"><div class="map-tab-card"><b>制空・装備</b><p>${hdMapEsc(d.air||'装備情報を整理中')}</p></div><div id="hdMapEquipRecommend"></div></div>
     <div class="map-tab-pane ${active==='quest'?'active':''}" data-map-pane="quest">${hdQuestHtml(selectedMap)}</div>
+    <div class="map-tab-pane ${active==='drop'?'active':''}" data-map-pane="drop">${typeof hdMapDropHtml==='function'?hdMapDropHtml(selectedMap):'<div class="empty">ドロップ情報を読み込み中</div>'}</div>
     <div class="map-tab-pane ${active==='mine'?'active':''}" data-map-pane="mine"><section id="customFleetPanel" class="custom-fleet-section">${hdCustomFleetHtml(selectedMap)}</section></div>
   </article>`;
   const add=document.getElementById('addCustomFleet');if(add&&typeof openCustomFleetDialog==='function')add.onclick=()=>openCustomFleetDialog();
