@@ -1,8 +1,28 @@
 
 const HD_FO_PRIORITY=['高速化','対潜','対地','制空','防空','索敵','電探','夜戦','煙幕','輸送'];
+const HD_FO_MODE_KEY='harbordesk-fleet-optimizer-mode-v1';
+const HD_FO_MODES={
+ stable:{id:'stable',label:'安定重視',note:'海域条件の充足を最優先',priority:['高速化','対潜','防空','制空','索敵','電探','煙幕','対地','夜戦','輸送'],conditionWeight:1.15,offenseWeight:.12,protectWeight:.12,rareWeight:.03,maxChanges:8,minNet:0},
+ firepower:{id:'firepower',label:'火力重視',note:'主砲・魚雷・攻撃力をなるべく維持',priority:['対地','夜戦','制空','索敵','電探','高速化','対潜','防空','煙幕','輸送'],conditionWeight:.88,offenseWeight:.9,protectWeight:.34,rareWeight:.03,maxChanges:6,minNet:0},
+ route:{id:'route',label:'道中突破重視',note:'高速化・対潜・防空・煙幕を優先',priority:['高速化','対潜','防空','煙幕','電探','索敵','制空','夜戦','対地','輸送'],conditionWeight:1.2,offenseWeight:.08,protectWeight:.08,rareWeight:.03,maxChanges:8,minNet:0},
+ boss:{id:'boss',label:'ボス重視',note:'対地・夜戦・制空を優先',priority:['対地','夜戦','制空','索敵','電探','高速化','防空','対潜','煙幕','輸送'],conditionWeight:1.02,offenseWeight:.48,protectWeight:.14,rareWeight:.03,maxChanges:8,minNet:0},
+ reserve:{id:'reserve',label:'装備温存',note:'交換回数と高改修・希少装備の使用を抑える',priority:['高速化','索敵','電探','対潜','防空','制空','対地','夜戦','煙幕','輸送'],conditionWeight:.92,offenseWeight:.22,protectWeight:.22,rareWeight:.75,maxChanges:3,minNet:6}
+};
 
 function hdFOEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function hdFOClone(v){return JSON.parse(JSON.stringify(v))}
+function hdFOMode(id){return HD_FO_MODES[id]||HD_FO_MODES.stable}
+function hdFOStoredMode(){try{return localStorage.getItem(HD_FO_MODE_KEY)||'stable'}catch{return 'stable'}}
+function hdFOSetStoredMode(id){try{localStorage.setItem(HD_FO_MODE_KEY,hdFOMode(id).id)}catch{}}
+function hdFOCombatScore(e){
+ const s=e&&e.stats||{};
+ return (Number(s.火力)||0)*1.2+(Number(s.雷装)||0)*1.1+(Number(s.爆装)||0)+(Number(s.対空)||0)*.18+(Number(s.命中)||0)*.25;
+}
+function hdFORarePenalty(candidate){
+ if(!candidate)return 0;
+ const count=Math.max(1,Number(candidate.count)||1),star=Math.max(0,Number(candidate.maxStar)||0);
+ return star*2+(count===1?22:count===2?10:count===3?4:0);
+}
 function hdFOItemMeta(item){
  const meta=typeof hdFEFind==='function'?hdFEFind(item&&item.name):null;
  return meta||{name:item&&item.name||'',category:item&&item.category||'',stats:{},tags:[]};
@@ -15,13 +35,14 @@ function hdFORefreshUsage(plan){
  for(const x of inv.values())owned[x.name]=x.count;
  plan.used=used;plan.owned=owned;return plan;
 }
-function hdFOReqScore(e){
+function hdFOReqScore(e,mode){
  if(!e)return -9999;
- let score=0;
+ const cfg=hdFOMode(mode),priority=cfg.priority||HD_FO_PRIORITY;let score=0;
  for(const r of e.requirements||[]){
   const min=Math.max(1,Number(r.minCount)||1),ratio=Math.min(1,(Number(r.count)||0)/min);
-  score+=ratio*100;
-  if(r.status==='ready')score+=30;else if(r.status==='partial')score+=10;else score-=10;
+  const pos=priority.indexOf(r.kind),weight=pos<0?1:Math.max(.72,1.22-pos*.045);
+  score+=ratio*100*weight;
+  if(r.status==='ready')score+=30*weight;else if(r.status==='partial')score+=10*weight;else score-=10*weight;
  }
  return score;
 }
@@ -39,10 +60,12 @@ function hdFOItemMatches(kind,item){
  if(kind==='煙幕')return /煙幕/.test(name)||tags.some(function(t){return /煙幕/.test(String(t))});
  return false;
 }
-function hdFOCandidateRows(kind){
+function hdFOCandidateRows(kind,mode){
  const inv=typeof hdFLInventory==='function'?hdFLInventory():new Map();
+ const cfg=hdFOMode(mode);
  return [...inv.values()].filter(function(x){return x.count>0&&hdFOItemMatches(kind,{name:x.name,category:x.item&&x.item.category||''})}).sort(function(a,b){
   const as=typeof hdFLScoreBase==='function'?hdFLScoreBase(a.item,a):0,bs=typeof hdFLScoreBase==='function'?hdFLScoreBase(b.item,b):0;
+  if(cfg.id==='reserve')return (a.maxStar-b.maxStar)||(b.count-a.count)||(as-bs)||a.name.localeCompare(b.name,'ja');
   return bs-as||b.maxStar-a.maxStar||a.name.localeCompare(b.name,'ja');
  });
 }
@@ -67,8 +90,8 @@ function hdFOCoverage(plan){
  for(const r of e&&e.requirements||[])map[r.kind]=Object.assign({},r);
  return {evaluation:e,map:map};
 }
-function hdFOBestSwap(plan,focusKind){
- const before=hdFOCoverage(plan),baseScore=hdFOReqScore(before.evaluation),candidates=hdFOCandidateRows(focusKind);let best=null;
+function hdFOBestSwap(plan,focusKind,mode){
+ const cfg=hdFOMode(mode),before=hdFOCoverage(plan),baseScore=hdFOReqScore(before.evaluation,cfg.id),baseCombat=hdFOCombatScore(before.evaluation),candidates=hdFOCandidateRows(focusKind,cfg.id);let best=null;
  for(const cand of candidates){
   for(let si=0;si<(plan.ships||[]).length;si++){
    const ship=plan.ships[si];if(!ship||!ship.ship||!hdFOCompatible(plan,cand,si))continue;
@@ -77,13 +100,14 @@ function hdFOBestSwap(plan,focusKind){
     const trial=hdFOClone(plan);
     trial.ships[si].items[ii]={name:cand.name,star:cand.maxStar||0,category:cand.item&&cand.item.category||'',kind:old&&old.kind||'utility'};
     hdFORefreshUsage(trial);
-    const after=hdFOCoverage(trial),afterScore=hdFOReqScore(after.evaluation),focusBefore=before.map[focusKind],focusAfter=after.map[focusKind];
+    const after=hdFOCoverage(trial),afterScore=hdFOReqScore(after.evaluation,cfg.id),afterCombat=hdFOCombatScore(after.evaluation),focusBefore=before.map[focusKind],focusAfter=after.map[focusKind];
     if(!focusBefore||!focusAfter)continue;
     const focusDelta=(Number(focusAfter.count)||0)-(Number(focusBefore.count)||0);
     const statusGain=(focusAfter.status==='ready'?2:focusAfter.status==='partial'?1:0)-(focusBefore.status==='ready'?2:focusBefore.status==='partial'?1:0);
     if(focusDelta<=0&&statusGain<=0)continue;
-    const net=afterScore-baseScore-hdFOProtectedPenalty(old)*.12;
-    if(net<=0)continue;
+    const conditionGain=(afterScore-baseScore)*cfg.conditionWeight,combatGain=(afterCombat-baseCombat)*cfg.offenseWeight;
+    const net=conditionGain+combatGain-hdFOProtectedPenalty(old)*cfg.protectWeight-hdFORarePenalty(cand)*cfg.rareWeight;
+    if(net<=cfg.minNet)continue;
     const row={trial:trial,net:net,focusDelta:focusDelta,statusGain:statusGain,shipIndex:si,itemIndex:ii,ship:ship.ship,old:old&&old.name||'',next:cand.name,kind:focusKind,before:focusBefore,after:focusAfter};
     if(!best||row.net>best.net||(row.net===best.net&&row.statusGain>best.statusGain))best=row;
    }
@@ -91,25 +115,26 @@ function hdFOBestSwap(plan,focusKind){
  }
  return best;
 }
-function hdFOOptimize(plan,maxChanges){
- maxChanges=maxChanges||8;
+function hdFOOptimize(plan,mode,maxChanges){
+ if(typeof mode==='number'){maxChanges=mode;mode='stable'}
+ const cfg=hdFOMode(mode||'stable');maxChanges=maxChanges||cfg.maxChanges||8;
  const out=hdFOClone(plan);hdFORefreshUsage(out);
  const before=typeof hdFEEvaluate==='function'?hdFEEvaluate(out):null,changes=[];
  for(let pass=0;pass<maxChanges;pass++){
   const current=typeof hdFEEvaluate==='function'?hdFEEvaluate(out):null;
   const needs=(current&&current.requirements||[]).filter(function(r){return r.status!=='ready'}).sort(function(a,b){
-   const ai=HD_FO_PRIORITY.indexOf(a.kind),bi=HD_FO_PRIORITY.indexOf(b.kind);
+   const ai=cfg.priority.indexOf(a.kind),bi=cfg.priority.indexOf(b.kind);
    return (ai<0?99:ai)-(bi<0?99:bi)||(a.status==='missing'?-1:1);
   });
   if(!needs.length)break;
   let chosen=null;
-  for(const req of needs){const swap=hdFOBestSwap(out,req.kind);if(swap){chosen=swap;break}}
+  for(const req of needs){const swap=hdFOBestSwap(out,req.kind,cfg.id);if(swap){chosen=swap;break}}
   if(!chosen)break;
   out.ships=chosen.trial.ships;hdFORefreshUsage(out);
   changes.push({ship:chosen.ship,from:chosen.old,to:chosen.next,kind:chosen.kind,before:chosen.before.count,after:chosen.after.count,statusBefore:chosen.before.status,statusAfter:chosen.after.status});
  }
  const after=typeof hdFEEvaluate==='function'?hdFEEvaluate(out):null;
- out.optimization={before:before,after:after,changes:changes,unresolved:(after&&after.requirements||[]).filter(function(r){return r.status!=='ready'}).map(function(r){return {kind:r.kind,label:r.label,status:r.status,count:r.count,minCount:r.minCount}})};
+ out.optimization={strategy:cfg.id,strategyLabel:cfg.label,before:before,after:after,changes:changes,unresolved:(after&&after.requirements||[]).filter(function(r){return r.status!=='ready'}).map(function(r){return {kind:r.kind,label:r.label,status:r.status,count:r.count,minCount:r.minCount}})};
  out.optimizedAt=Date.now();return out;
 }
 function hdFOStatusText(e){return e?'配置あり '+e.ready+'/'+e.requirements.length+'｜一部 '+e.partial+'｜未配置 '+e.missing:'評価なし'}
@@ -119,7 +144,7 @@ function hdFOResultHtml(plan){
  let changes='';
  if(o.changes.length)changes='<div class="hd-fo-changes">'+o.changes.map(function(x){return '<div><span>'+hdFOEsc(x.ship)+'</span><strong>'+hdFOEsc(x.from)+' → '+hdFOEsc(x.to)+'</strong><small>'+hdFOEsc(x.kind)+' '+x.before+'→'+x.after+'</small></div>'}).join('')+'</div>';
  let unresolved=o.unresolved.length?'<div class="hd-fo-unresolved"><b>まだ要確認</b><span>'+o.unresolved.map(function(x){return hdFOEsc(x.label)+' '+x.count+'/'+x.minCount}).join('、')+'</span></div>':'<div class="hd-fo-complete">主要な装備要求は配備上の目安を満たしたよ。</div>';
- return '<div class="hd-fo-result '+(improved?'improved':'steady')+'"><div class="hd-fo-head"><div><strong>海域条件へ自動最適化</strong><span>'+hdFOEsc(hdFOStatusText(o.before))+' → '+hdFOEsc(hdFOStatusText(o.after))+'</span></div><b>'+(o.changes.length?o.changes.length+'件交換':'交換候補なし')+'</b></div>'+changes+unresolved+'</div>';
+ return '<div class="hd-fo-result '+(improved?'improved':'steady')+'"><div class="hd-fo-head"><div><strong>'+hdFOEsc(o.strategyLabel||'安定重視')+'で自動最適化</strong><span>'+hdFOEsc(hdFOStatusText(o.before))+' → '+hdFOEsc(hdFOStatusText(o.after))+'</span></div><b>'+(o.changes.length?o.changes.length+'件交換':'交換候補なし')+'</b></div>'+changes+unresolved+'</div>';
 }
 function hdFOInstall(){
  if(window.__hdFleetOptimizerInstalled||typeof hdFEHtml!=='function')return false;
@@ -127,14 +152,16 @@ function hdFOInstall(){
  const prev=hdFEHtml;
  hdFEHtml=function(plan){
   let html=prev(plan);
-  const controls='<div class="hd-fo-controls"><button type="button" class="primary small" data-hd-fo-optimize="'+plan.index+'">海域条件へ装備を最適化</button>'+(plan.optimization?'<button type="button" class="ghost small" data-hd-fo-reset="'+plan.index+'">標準配備に戻す</button>':'')+'</div>';
+  const current=plan.optimization&&plan.optimization.strategy||hdFOStoredMode(),modeOptions=Object.values(HD_FO_MODES).map(function(m){return '<option value="'+m.id+'" '+(m.id===current?'selected':'')+'>'+m.label+'</option>'}).join('');
+  const controls='<div class="hd-fo-controls"><label class="hd-fo-mode"><span>最適化方針</span><select data-hd-fo-mode="'+plan.index+'">'+modeOptions+'</select><small>'+hdFOEsc(hdFOMode(current).note)+'</small></label><button type="button" class="primary small" data-hd-fo-optimize="'+plan.index+'">この方針で最適化</button>'+(plan.optimization?'<button type="button" class="ghost small" data-hd-fo-reset="'+plan.index+'">標準配備に戻す</button>':'')+'</div>';
   return html.replace('<div class="hd-fe-actions">',hdFOResultHtml(plan)+controls+'<div class="hd-fe-actions">');
  };
  return true;
 }
-function hdFOApply(index,card){
+function hdFOApply(index,card,mode){
  const map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+index,base=(typeof HD_FL_CACHE!=='undefined'&&HD_FL_CACHE[key])||hdFLGenerate(index);if(!base||!card)return;
- const optimized=hdFOOptimize(base);if(typeof HD_FL_CACHE!=='undefined')HD_FL_CACHE[key]=optimized;
+ const selected=hdFOMode(mode||hdFOStoredMode()).id;hdFOSetStoredMode(selected);
+ const optimized=hdFOOptimize(base,selected);if(typeof HD_FL_CACHE!=='undefined')HD_FL_CACHE[key]=optimized;
  const host=card.querySelector('.hd-fl-host');if(host)host.innerHTML=hdFLPlanHtml(optimized);
 }
 function hdFOReset(index,card){
@@ -142,7 +169,8 @@ function hdFOReset(index,card){
  if(typeof hdFLRender==='function')hdFLRender(index,card);
 }
 document.addEventListener('click',function(e){
- const opt=e.target.closest&&e.target.closest('[data-hd-fo-optimize]');if(opt){hdFOApply(opt.dataset.hdFoOptimize,opt.closest('.hd-fs-card'));return}
+ const opt=e.target.closest&&e.target.closest('[data-hd-fo-optimize]');if(opt){const card=opt.closest('.hd-fs-card'),sel=card&&card.querySelector('[data-hd-fo-mode="'+opt.dataset.hdFoOptimize+'"]');hdFOApply(opt.dataset.hdFoOptimize,card,sel&&sel.value);return}
+ const mode=e.target.closest&&e.target.closest('[data-hd-fo-mode]');if(mode){hdFOSetStoredMode(mode.value);const note=mode.parentElement&&mode.parentElement.querySelector('small');if(note)note.textContent=hdFOMode(mode.value).note;return}
  const reset=e.target.closest&&e.target.closest('[data-hd-fo-reset]');if(reset){hdFOReset(reset.dataset.hdFoReset,reset.closest('.hd-fs-card'));return}
 });
 window.addEventListener('load',function(){setTimeout(function(){if(!hdFOInstall())setTimeout(hdFOInstall,500)},780)});
