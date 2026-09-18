@@ -1,6 +1,7 @@
 const HD_GS_HISTORY_KEY='harbordesk-global-search-history-v1';
 let hdGSCategory='all';
 let hdGSResults=new Map();
+let hdGSNavSeq=0;
 
 function hdGSNorm(v){return String(v??'').normalize('NFKC').toLowerCase().replace(/\s+/g,' ').trim()}
 function hdGSEsc(v){return typeof hdEsc==='function'?hdEsc(v):String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -45,12 +46,14 @@ function hdGSEnsure(){
 function hdGSOpen(query=''){hdGSEnsure();if(typeof hdQNClose==='function')hdQNClose();const d=document.getElementById('hdGlobalSearchDialog'),i=document.getElementById('hdGSSearch');if(i)i.value=query;hdGSCategory='all';document.querySelectorAll('[data-hd-gs-cat]').forEach(b=>b.classList.toggle('active',b.dataset.hdGsCat==='all'));hdGSRender();if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');setTimeout(()=>i?.focus(),50)}
 function hdGSClose(){const d=document.getElementById('hdGlobalSearchDialog');if(!d)return;if(typeof d.close==='function'&&d.open)d.close();else d.removeAttribute('open')}
 function hdGSScroll(id){
- hdGSClose();
- const reveal=(scroll=false)=>{try{if(typeof hdWSShowElement==='function')hdWSShowElement(id,scroll);else if(scroll)document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})}catch{}};
- reveal(false);
- setTimeout(()=>{reveal(false);if(typeof hdQNJump==='function')hdQNJump(id);else reveal(true)},30);
- setTimeout(()=>{reveal(false);document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})},170);
- setTimeout(()=>reveal(false),340);
+ hdGSClose();const seq=++hdGSNavSeq;
+ const current=()=>seq===hdGSNavSeq;
+ const reveal=(scroll=false)=>{if(!current())return false;try{if(typeof hdWSShowElement==='function')hdWSShowElement(id,scroll);else if(scroll)document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});return true}catch{return false}};
+ const focus=()=>{if(!current())return;const el=document.getElementById(id);if(!el)return;el.classList.add('hd-qn-flash');setTimeout(()=>{if(current())el.classList.remove('hd-qn-flash')},900)};
+ reveal(false);focus();
+ setTimeout(()=>reveal(false),60);
+ setTimeout(()=>{if(reveal(false))document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})},180);
+ setTimeout(()=>reveal(false),420);
 }
 function hdGSOpenResult(row){
  if(!row)return;const a=row.action;hdGSSaveHistory(document.getElementById('hdGSSearch')?.value||row.title);
