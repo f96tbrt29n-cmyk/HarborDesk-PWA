@@ -21,6 +21,17 @@ const HD_SHIP_DATABASE=[
  {base:'秋月',final:'秋月改二',type:'駆逐艦',speed:'高速',targetLv:85,path:'秋月 → 秋月改(Lv40) → 秋月改二(Lv85)',requirements:'Lv85＋改装設計図＋新型兵装資材×2＋戦闘詳報＋開発資材×30',roles:['防空','対空CI'],note:'防空駆逐艦。改二で4スロット化し、防空性能がさらに向上。'},
  {base:'初月',final:'初月改二',type:'駆逐艦',speed:'高速',targetLv:88,path:'初月 → 初月改(Lv40) → 初月改二(Lv88)',requirements:'Lv88＋改装設計図＋新型兵装資材×2＋戦闘詳報',roles:['防空','対空CI','4スロット'],note:'4スロットの防空駆逐艦で、対空以外にも柔軟に使える。'},
  {base:'Fletcher',final:'Fletcher Mk.II',type:'駆逐艦',speed:'高速',targetLv:90,path:'Fletcher → Fletcher改(Lv55) → Fletcher改 Mod.2(Lv88) ⇔ Fletcher Mk.II(Lv90)',requirements:'改: Lv55＋高速建造材×10＋開発資材×80 / Mod.2: Lv88＋改装設計図＋高速建造材×30＋開発資材×120 / Mk.II: Lv90＋高速建造材×30＋開発資材×180',roles:['対空CI','自動先制対潜','夜戦CI'],note:'対空・対潜・夜戦を高水準でこなす万能駆逐艦。'}
+,
+ {base:'金剛',final:'金剛改二丙',type:'高速戦艦',speed:'高速',targetLv:92,path:'金剛 → 金剛改(Lv25) → 金剛改二(Lv75) → 金剛改二丙(Lv92)',requirements:'Lv92＋改装設計図×2＋新型砲熕兵装資材×2＋戦闘詳報＋開発資材×300',roles:['高速戦艦','夜戦','特殊砲撃','対艦'],note:'雷装を持つ高速戦艦。比叡改二丙との特殊砲撃や夜戦込みの攻略で使いやすい。'},
+ {base:'比叡',final:'比叡改二丙',type:'高速戦艦',speed:'高速',targetLv:90,path:'比叡 → 比叡改(Lv25) → 比叡改二(Lv75) → 比叡改二丙(Lv90)',requirements:'Lv90＋改装設計図×2＋新型砲熕兵装資材×2＋戦闘詳報＋開発資材×330',roles:['高速戦艦','夜戦','特殊砲撃','対艦'],note:'雷装を持つ高速戦艦。金剛改二丙との特殊砲撃や夜戦込みの攻略向け。'},
+ {base:'摩耶',final:'摩耶改二',type:'重巡洋艦',speed:'高速',targetLv:75,path:'摩耶 → 摩耶改(Lv18) → 摩耶改二(Lv75)',requirements:'Lv75',roles:['対空CI','防空','重巡','夜戦'],note:'専用対空CIを組みやすい防空重巡。航空攻撃が厳しい海域で特に有用。'},
+ {base:'鈴谷',final:'鈴谷改二',type:'航空巡洋艦',speed:'高速',targetLv:84,path:'鈴谷 → 鈴谷改(Lv35) → 鈴谷改二(Lv84) ⇔ 鈴谷航改二(Lv88)',requirements:'Lv84＋改装設計図',roles:['水戦','対地','輸送','制空補助'],note:'水戦・水爆・対地装備を扱える万能航巡。軽空母形態へコンバート可能。'},
+ {base:'熊野',final:'熊野改二',type:'航空巡洋艦',speed:'高速',targetLv:84,path:'熊野 → 熊野改(Lv35) → 熊野改二(Lv84) ⇔ 熊野航改二(Lv88)',requirements:'Lv84＋改装設計図',roles:['水戦','対地','輸送','制空補助'],note:'鈴谷改二と同系統の万能航巡。海域に応じて制空・対地・輸送を切り替えやすい。'},
+ {base:'能代',final:'能代改二',type:'軽巡洋艦',speed:'高速',targetLv:85,path:'能代 → 能代改(Lv35) → 能代改二(Lv85)',requirements:'Lv85＋改装設計図＋戦闘詳報＋高速建造材×77＋開発資材×80',roles:['4スロット','対潜','昼連撃','夜戦'],note:'4スロット軽巡。火力・雷装・対潜を高水準でまとめやすい。'},
+ {base:'夕立',final:'夕立改二',type:'駆逐艦',speed:'高速',targetLv:55,path:'夕立 → 夕立改(Lv20) → 夕立改二(Lv55)',requirements:'Lv55',roles:['高火力','夜戦','駆逐主力'],note:'低い改装Lvで高い火力と雷装を得られる定番主力駆逐艦。'},
+ {base:'長波',final:'長波改二',type:'駆逐艦',speed:'高速',targetLv:75,path:'長波 → 長波改(Lv30) → 長波改二(Lv75)',requirements:'Lv75＋改装設計図＋戦闘詳報',roles:['D型砲','夜戦CI','高火力','司令部'],note:'D型砲系との相性がよく、夜戦火力と汎用性を両立する夕雲型改二。'},
+ {base:'瑞鳳',final:'瑞鳳改二乙',type:'軽空母',speed:'高速',targetLv:80,path:'瑞鳳 → 瑞鳳改(Lv25) → 瑞鳳改二(Lv80) ⇔ 瑞鳳改二乙(Lv80)',requirements:'改二乙: Lv80＋高速建造材×20＋開発資材×5',roles:['護衛空母','対潜','制空','航空火力'],note:'射程長の護衛空母。対潜支援と航空戦を両立しやすい。'},
+ {base:'Saratoga',final:'Saratoga Mk.II Mod.2',type:'装甲空母',speed:'高速',targetLv:85,path:'Saratoga → Saratoga改(Lv40) → Saratoga Mk.II(Lv85) ⇔ Saratoga Mk.II Mod.2(Lv85)',requirements:'Mk.II: Lv85＋試製甲板カタパルト＋改装設計図 / Mod.2: 高速建造材×30＋開発資材×20',roles:['装甲空母','航空火力','制空'],note:'93機搭載の装甲空母形態。中破時も攻撃でき、高難度海域で安定した航空火力を出しやすい。'}
 ];
 
 
@@ -46,7 +57,17 @@ const HD_SHIP_STATS={
  '霞改二乙':{hp:31,armor:52,evasion:92,fire:63,torp:83,aa:83,asw:68,los:56,luck:37,air:0,fuel:15,ammo:20,range:'短'},
  '秋月改二':{hp:38,armor:56,evasion:92,fire:67,torp:84,aa:119,asw:76,los:56,luck:17,air:0,fuel:25,ammo:30,range:'短'},
  '初月改二':{hp:39,armor:57,evasion:93,fire:70,torp:82,aa:118,asw:75,los:54,luck:18,air:0,fuel:25,ammo:30,range:'短'},
- 'Fletcher Mk.II':{hp:38,armor:56,evasion:94,fire:62,torp:82,aa:95,asw:97,los:66,luck:47,air:0,fuel:25,ammo:25,range:'短'}
+ 'Fletcher Mk.II':{hp:38,armor:56,evasion:94,fire:62,torp:82,aa:95,asw:97,los:66,luck:47,air:0,fuel:25,ammo:25,range:'短'},
+ '金剛改二丙':{hp:86,armor:91,evasion:75,fire:99,torp:44,aa:89,asw:0,los:51,luck:18,air:13,fuel:100,ammo:160,range:'長'},
+ '比叡改二丙':{hp:86,armor:90,evasion:73,fire:98,torp:47,aa:85,asw:0,los:53,luck:15,air:8,fuel:100,ammo:160,range:'長'},
+ '摩耶改二':{hp:57,armor:78,evasion:81,fire:77,torp:84,aa:106,asw:0,los:55,luck:14,air:12,fuel:45,ammo:80,range:'中'},
+ '鈴谷改二':{hp:61,armor:74,evasion:82,fire:76,torp:88,aa:85,asw:0,los:83,luck:14,air:24,fuel:55,ammo:60,range:'中'},
+ '熊野改二':{hp:62,armor:75,evasion:81,fire:76,torp:87,aa:84,asw:0,los:81,luck:13,air:24,fuel:55,ammo:60,range:'中'},
+ '能代改二':{hp:53,armor:72,evasion:83,fire:78,torp:86,aa:82,asw:84,los:61,luck:13,air:8,fuel:35,ammo:45,range:'中'},
+ '夕立改二':{hp:31,armor:52,evasion:89,fire:74,torp:94,aa:59,asw:69,los:49,luck:22,air:0,fuel:15,ammo:20,range:'短'},
+ '長波改二':{hp:33,armor:55,evasion:92,fire:69,torp:90,aa:67,asw:68,los:45,luck:30,air:0,fuel:15,ammo:20,range:'短'},
+ '瑞鳳改二乙':{hp:59,armor:72,evasion:67,fire:48,torp:0,aa:88,asw:48,los:77,luck:42,air:50,fuel:40,ammo:45,range:'長'},
+ 'Saratoga Mk.II Mod.2':{hp:89,armor:88,evasion:56,fire:58,torp:0,aa:94,asw:0,los:95,luck:40,air:93,fuel:100,ammo:100,range:'中'}
 };
 
 const HD_SHIP_LOADOUTS={
@@ -137,6 +158,46 @@ const HD_SHIP_LOADOUTS={
  'Fletcher Mk.II':[
   {name:'対空CI',gear:['5inch単装砲 Mk.30 改','5inch単装砲 Mk.30 改','GFCS Mk.37'],memo:'米駆逐の対空CIを狙う標準構成。'},
   {name:'先制対潜',gear:['HF/DF + Type144/147 ASDIC','RUR-4A Weapon Alpha改','5inch単装砲 Mk.30 改'],memo:'高い対潜97を活かす。対潜装備を減らしても先制対潜可能な場面が多い。'}
+ ],
+ '金剛改二丙':[
+  {name:'高速戦艦・弾着',gear:['35.6cm連装砲改','35.6cm連装砲改','零式水上偵察機11型乙(熟練)','一式徹甲弾改'],memo:'高速戦艦として扱いやすい主砲2＋水偵＋徹甲弾。'},
+  {name:'夜戦寄り',gear:['35.6cm連装砲改','35.6cm連装砲改','魚雷/夜戦補助','高性能水偵'],memo:'雷装を持つ特性を活かす形。特殊砲撃を使う場合は相方と海域条件を優先。'}
+ ],
+ '比叡改二丙':[
+  {name:'高速戦艦・弾着',gear:['35.6cm連装砲改','35.6cm連装砲改','零式水上偵察機11型乙(熟練)','一式徹甲弾改'],memo:'主砲2＋水偵＋徹甲弾を基本にする。'},
+  {name:'特殊砲撃随伴',gear:['35.6cm連装砲改','35.6cm連装砲改','一式徹甲弾改','高性能電探'],memo:'金剛改二丙との特殊砲撃や命中重視の攻略用。'}
+ ],
+ '摩耶改二':[
+  {name:'対空CI',gear:['主砲','高角砲＋高射装置','高性能対空電探','特殊機銃'],memo:'摩耶の強みを出す防空型。対空CI条件を優先して組む。'},
+  {name:'対空＋昼連撃',gear:['主砲','高角砲＋高射装置','零式水上偵察機11型乙(熟練)','高性能対空電探'],memo:'制空権を取れる海域で昼連撃も意識した構成。'}
+ ],
+ '鈴谷改二':[
+  {name:'航巡・制空補助',gear:['20.3cm(3号)連装砲','20.3cm(3号)連装砲','零式水上偵察機11型乙(熟練)','二式水戦改(熟練)'],memo:'昼連撃を維持しつつ制空を補助。'},
+  {name:'対地',gear:['20.3cm(3号)連装砲','三式弾','大発系対地装備/ロケット','水戦/水偵'],memo:'陸上型相手。敵種に合わせて対地装備を差し替える。'}
+ ],
+ '熊野改二':[
+  {name:'航巡・制空補助',gear:['20.3cm(3号)連装砲','20.3cm(3号)連装砲','零式水上偵察機11型乙(熟練)','二式水戦改(熟練)'],memo:'鈴谷改二と同様に火力と制空を両立。'},
+  {name:'対地',gear:['20.3cm(3号)連装砲','三式弾','大発系対地装備/ロケット','水戦/水偵'],memo:'陸上型・港湾系の攻略で役割を持たせやすい。'}
+ ],
+ '能代改二':[
+  {name:'4スロ連撃',gear:['15.2cm連装砲改二','15.2cm連装砲改二','零式水上偵察機11型乙(熟練)','高性能電探/見張員'],memo:'昼夜連撃を軸に4枠目で索敵や夜戦補助を調整。'},
+  {name:'対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷','主砲/水偵'],memo:'最大対潜84を活かして先制対潜ラインを狙う。'}
+ ],
+ '夕立改二':[
+  {name:'夜戦連撃',gear:['高性能駆逐主砲','高性能駆逐主砲','水上電探'],memo:'高火力74・雷装94を活かす安定型。'},
+  {name:'魚雷CI',gear:['61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷','水雷戦隊 熟練見張員'],memo:'運22なので発動率を補助できる場合に採用。'}
+ ],
+ '長波改二':[
+  {name:'D型砲・夜戦',gear:['12.7cm連装砲D型改二','61cm四連装(酸素)魚雷後期型','水上電探'],memo:'D型砲＋魚雷＋電探の夜戦CIを狙う構成。'},
+  {name:'通常連撃',gear:['12.7cm連装砲D型改二','12.7cm連装砲D型改二','水上電探'],memo:'昼夜の安定運用。'}
+ ],
+ '瑞鳳改二乙':[
+  {name:'護衛空母バランス',gear:['強力な艦攻','強力な艦爆','高性能艦戦','彩雲/対潜艦攻'],memo:'航空火力・制空・索敵をまとめる汎用型。'},
+  {name:'対潜支援',gear:['対潜値の高い艦攻','対潜値の高い艦攻','高性能艦戦','彩雲/艦戦'],memo:'護衛空母の先制対潜を活かす。制空値に応じて艦戦数を調整。'}
+ ],
+ 'Saratoga Mk.II Mod.2':[
+  {name:'装甲空母バランス',gear:['強力な艦攻','強力な艦爆','高性能艦戦','高性能艦戦'],memo:'93機搭載と中破攻撃可能を活かす標準型。'},
+  {name:'航空火力重視',gear:['強力な艦攻','強力な艦爆','強力な艦攻','高性能艦戦'],memo:'必要制空を満たした海域で攻撃機を増やす。'}
  ]
 };
 
@@ -180,7 +241,7 @@ function hdEnsureShipDatabase(){
  const roster=document.getElementById('roster');if(!roster)return;
  const sec=document.createElement('section');sec.id='shipDatabase';sec.className='advanced-section';
  const types=['すべて',...new Set(HD_SHIP_DATABASE.map(x=>x.type))];
- sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">SHIP DATABASE</div><h2>艦娘データベース・改装計画</h2></div><span id="hdShipDbCount" class="muted"></span></div><div class="hd-shipdb-note">主要艦の改装Lv・必要アイテム・役割に加えて、Lv99最大ステータスと用途別おすすめ装備を確認。艦隊台帳のLvとも照合するよ。</div><div class="hd-shipdb-toolbar"><input id="hdShipDbSearch" type="search" placeholder="艦名・艦種・役割で検索"><label><input id="hdShipDbMissingOnly" type="checkbox"> 未所持だけ</label></div><div class="hd-shipdb-filters">${types.map((t,i)=>`<button class="ghost small${i===0?' active':''}" type="button" data-hd-shipdb-filter="${hdShipDbEsc(t)}">${hdShipDbEsc(t)}</button>`).join('')}</div><div id="hdShipDbList" class="hd-shipdb-list"></div><div><a class="guide-link" href="https://wikiwiki.jp/kancolle/%E6%94%B9%E9%80%A0/%E8%89%A6%E7%A8%AE%E5%88%A5%E4%B8%80%E8%A6%A7" target="_blank" rel="noopener">攻略Wiki 改造一覧で最新情報 ↗</a></div>`;
+ sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">SHIP DATABASE</div><h2>艦娘データベース・改装計画</h2></div><span id="hdShipDbCount" class="muted"></span></div><div class="hd-shipdb-note">主要艦の改装Lv・必要アイテム・役割に加えて、Lv99最大ステータスと用途別おすすめ装備を確認。艦隊台帳のLvとも照合するよ。ステータスは攻略Wikiの現行Lv99最大値（装備補正なし）基準。</div><div class="hd-shipdb-toolbar"><input id="hdShipDbSearch" type="search" placeholder="艦名・艦種・役割で検索"><label><input id="hdShipDbMissingOnly" type="checkbox"> 未所持だけ</label></div><div class="hd-shipdb-filters">${types.map((t,i)=>`<button class="ghost small${i===0?' active':''}" type="button" data-hd-shipdb-filter="${hdShipDbEsc(t)}">${hdShipDbEsc(t)}</button>`).join('')}</div><div id="hdShipDbList" class="hd-shipdb-list"></div><div><a class="guide-link" href="https://wikiwiki.jp/kancolle/%E6%94%B9%E9%80%A0/%E8%89%A6%E7%A8%AE%E5%88%A5%E4%B8%80%E8%A6%A7" target="_blank" rel="noopener">攻略Wiki 改造一覧で最新情報 ↗</a></div>`;
  roster.insertAdjacentElement('beforebegin',sec);
  document.getElementById('hdShipDbSearch').addEventListener('input',hdRenderShipDatabase);
  document.getElementById('hdShipDbMissingOnly').addEventListener('change',e=>{hdShipDbMissingOnly=e.target.checked;hdRenderShipDatabase()});
