@@ -3,7 +3,12 @@ function hdAGCatalog(){return typeof HD_EQUIPMENT_CATALOG!=='undefined'?HD_EQUIP
 function hdAGRecipes(){return typeof HD_DEV_RECIPES!=='undefined'?HD_DEV_RECIPES:[]}
 function hdAGImprovements(){return typeof HD_IMPROVEMENTS!=='undefined'?HD_IMPROVEMENTS:[]}
 function hdAGOwned(name){return typeof hdSEOwned==='function'?hdSEOwned(name):{owned:false,count:0,maxStar:0}}
-function hdAGRecipesFor(name){return hdAGRecipes().filter(r=>(r.targets||[]).includes(name))}
+const HD_AG_NAME_ALIASES={
+ '33号水上電探':['33号水上電探','33号対水上電探'],
+ '33号対水上電探':['33号対水上電探','33号水上電探']
+};
+function hdAGNames(name){return HD_AG_NAME_ALIASES[name]||[name]}
+function hdAGRecipesFor(name){const names=new Set(hdAGNames(name));return hdAGRecipes().filter(r=>(r.targets||[]).some(t=>names.has(t)))}
 function hdAGItemByName(name){return hdAGCatalog().find(x=>x.name===name)}
 function hdAGUpdateSources(name){
  const rows=[];
@@ -92,7 +97,8 @@ function hdAGShowElement(id){
 }
 function hdAGOpenDevelopment(name){
  document.getElementById('hdAcquisitionDialog')?.close();hdAGShowElement('developmentLab');
- setTimeout(()=>{const q=document.getElementById('hdDevelopmentSearch');if(q){q.value=name;q.dispatchEvent(new Event('input',{bubbles:true}));q.focus()}},180);
+ const recipe=hdAGRecipesFor(name)[0],searchName=recipe?(recipe.targets||[]).find(t=>hdAGNames(name).includes(t))||name:name;
+ setTimeout(()=>{const q=document.getElementById('hdDevelopmentSearch');if(q){q.value=searchName;q.dispatchEvent(new Event('input',{bubbles:true}));q.focus()}},180);
 }
 function hdAGOpenImprovement(name){
  document.getElementById('hdAcquisitionDialog')?.close();hdAGShowElement('improvementWorkshop');
