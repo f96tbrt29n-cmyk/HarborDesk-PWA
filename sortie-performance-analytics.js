@@ -71,7 +71,7 @@ function hdSPARecentRef(rows){
 function hdSPARecommendations(row){
  const t=row?.trend;if(!t?.ready)return [];
  const d=t.delta||{},out=[],seen=new Set();
- const push=(id,title,reason,action,mode='')=>{if(seen.has(id))return;seen.add(id);out.push({id,title,reason,action,mode})};
+ const push=(id,title,reason,action,mode='')=>{const key=action==='optimize'?action+':'+mode:action+':'+id;if(seen.has(key))return;seen.add(key);out.push({id,title,reason,action,mode})};
  if(d.retreatRate!=null&&d.retreatRate>=15)push('route-retreat','道中突破重視を再検討','撤退率が'+d.retreatRate+'pt上昇','optimize','route');
  if(d.bossRate!=null&&d.bossRate<=-15)push('route-boss','道中到達を見直す','ボス到達率が'+Math.abs(d.bossRate)+'pt低下','optimize','route');
  if(d.sRate!=null&&d.sRate<=-15)push('boss-s','ボス重視を比較','S率が'+Math.abs(d.sRate)+'pt低下','optimize','boss');
