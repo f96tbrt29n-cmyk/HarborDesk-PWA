@@ -46,14 +46,30 @@ function hdGSEnsure(){
 function hdGSOpen(query=''){hdGSEnsure();if(typeof hdQNClose==='function')hdQNClose();const d=document.getElementById('hdGlobalSearchDialog'),i=document.getElementById('hdGSSearch');if(i)i.value=query;hdGSCategory='all';document.querySelectorAll('[data-hd-gs-cat]').forEach(b=>b.classList.toggle('active',b.dataset.hdGsCat==='all'));hdGSRender();if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');setTimeout(()=>i?.focus(),50)}
 function hdGSClose(){const d=document.getElementById('hdGlobalSearchDialog');if(!d)return;if(typeof d.close==='function'&&d.open)d.close();else d.removeAttribute('open')}
 function hdGSScroll(id){
- hdGSClose();const seq=++hdGSNavSeq;
+ hdGSClose();const seq=++hdGSNavSeq,el=document.getElementById(id);
  const current=()=>seq===hdGSNavSeq;
- const reveal=(scroll=false)=>{if(!current())return false;try{if(typeof hdWSShowElement==='function')hdWSShowElement(id,scroll);else if(scroll)document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});return true}catch{return false}};
- const focus=()=>{if(!current())return;const el=document.getElementById(id);if(!el)return;el.classList.add('hd-qn-flash');setTimeout(()=>{if(current())el.classList.remove('hd-qn-flash')},900)};
+ const reveal=(scroll=false)=>{
+  if(!current()||!el)return false;
+  try{
+   const section=typeof hdWSManagedSectionFor==='function'?hdWSManagedSectionFor(el):null;
+   if(section&&typeof hdWSApply==='function'){
+    const group=section.dataset.hdWorkspaceGroup||(typeof hdWSGroupForSection==='function'?hdWSGroupForSection(section):'home');
+    hdWSApply(group,section.id);
+    section.classList.remove('hd-ws-hidden');
+    if(typeof hdWSUnhideAncestors==='function')hdWSUnhideAncestors(section);
+   }
+   if(typeof hdWSShowElement==='function')hdWSShowElement(el,false);
+   if(scroll)el.scrollIntoView({behavior:'smooth',block:'start'});
+   return true;
+  }catch{return false}
+ };
+ const focus=()=>{if(!current()||!el)return;el.classList.add('hd-qn-flash');setTimeout(()=>{if(current())el.classList.remove('hd-qn-flash')},900)};
  reveal(false);focus();
- setTimeout(()=>reveal(false),60);
- setTimeout(()=>{if(reveal(false))document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})},180);
- setTimeout(()=>reveal(false),420);
+ setTimeout(()=>reveal(false),30);
+ setTimeout(()=>reveal(false),120);
+ setTimeout(()=>{if(reveal(false))el.scrollIntoView({behavior:'smooth',block:'start'})},300);
+ setTimeout(()=>reveal(false),700);
+ setTimeout(()=>reveal(false),1250);
 }
 function hdGSOpenResult(row){
  if(!row)return;const a=row.action;hdGSSaveHistory(document.getElementById('hdGSSearch')?.value||row.title);
