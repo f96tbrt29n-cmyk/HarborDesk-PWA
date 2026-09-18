@@ -89,7 +89,17 @@ const HD_SHIP_DATABASE=[
  {base:'加古',final:'加古改二',type:'重巡洋艦',speed:'高速',targetLv:65,path:'加古 → 加古改(Lv25) → 加古改二(Lv65)',requirements:'Lv65',roles:['重巡','夜戦','低燃費','対艦'],note:'火力78・雷装77の低燃費寄り重巡。通常海域の連撃要員に向く。'},
  {base:'衣笠',final:'衣笠改二',type:'重巡洋艦',speed:'高速',targetLv:55,path:'衣笠 → 衣笠改(Lv25) → 衣笠改二(Lv55)',requirements:'Lv55',roles:['重巡','夜戦','低改装Lv','対艦'],note:'Lv55で改二になり、燃費も比較的軽い重巡。育成しやすい。'},
  {base:'那智',final:'那智改二',type:'重巡洋艦',speed:'高速',targetLv:65,path:'那智 → 那智改(Lv25) → 那智改二(Lv65)',requirements:'Lv65',roles:['重巡','対空','夜戦','対艦'],note:'対空83・索敵63を持つ妙高型改二。通常連撃から夜戦まで安定。'},
- {base:'皐月',final:'皐月改二',type:'駆逐艦',speed:'高速',targetLv:75,path:'皐月 → 皐月改(Lv20) → 皐月改二(Lv75)',requirements:'Lv75',roles:['対潜','防空','輸送','大発'],note:'低燃費で対潜81・対空82。大発運用もでき、遠征・輸送・対潜で便利。'}
+ {base:'皐月',final:'皐月改二',type:'駆逐艦',speed:'高速',targetLv:75,path:'皐月 → 皐月改(Lv20) → 皐月改二(Lv75)',requirements:'Lv75',roles:['対潜','防空','輸送','大発'],note:'低燃費で対潜81・対空82。大発運用もでき、遠征・輸送・対潜で便利。'},
+ {base:'足柄',final:'足柄改二',type:'重巡洋艦',speed:'高速',targetLv:65,path:'足柄 → 足柄改(Lv25) → 足柄改二(Lv65)',requirements:'Lv65',roles:['高火力','夜戦','重巡','対艦'],note:'火力84・雷装84の攻撃寄り重巡。昼連撃と夜戦の両方で扱いやすい。'},
+ {base:'睦月',final:'睦月改二',type:'駆逐艦',speed:'高速',targetLv:65,path:'睦月 → 睦月改(Lv20) → 睦月改二(Lv65)',requirements:'Lv65',roles:['輸送','大発','遠征','低燃費'],note:'燃料15・弾薬15の低燃費駆逐。大発運用と遠征・輸送で使いやすい。'},
+ {base:'如月',final:'如月改二',type:'駆逐艦',speed:'高速',targetLv:65,path:'如月 → 如月改(Lv20) → 如月改二(Lv65)',requirements:'Lv65',roles:['輸送','大発','遠征','低燃費'],note:'睦月改二と同系統の低燃費駆逐。輸送や遠征で運用しやすい。'},
+ {base:'球磨',final:'球磨改二',type:'軽巡洋艦',speed:'高速',targetLv:88,path:'球磨 → 球磨改(Lv20) → 球磨改二(Lv88) ⇔ 球磨改二丁(Lv88)',requirements:'Lv88＋改装設計図＋高速建造材×55＋開発資材×55',roles:['高火力','高雷装','対潜','制空補助'],note:'火力70・雷装92・対潜80の高バランス軽巡。水上機運用による補助も可能。'},
+ {base:'天龍',final:'天龍改二',type:'軽巡洋艦',speed:'高速',targetLv:84,path:'天龍 → 天龍改(Lv20) → 天龍改二(Lv84)',requirements:'Lv84＋高速建造材×8＋開発資材×24',roles:['防空','対空','夜戦','低燃費'],note:'対空89を持つ軽巡。弾薬25で比較的軽く、防空寄りの水雷編成に使いやすい。'},
+ {base:'叢雲',final:'叢雲改二',type:'駆逐艦',speed:'高速',targetLv:70,path:'叢雲 → 叢雲改(Lv20) → 叢雲改二(Lv70)',requirements:'Lv70',roles:['夜戦','高雷装','駆逐主力'],note:'雷装89のバランス型改二。設計図不要で通常攻略に投入しやすい。'},
+ {base:'暁',final:'暁改二',type:'駆逐艦',speed:'高速',targetLv:70,path:'暁 → 暁改(Lv20) → 暁改二(Lv70)',requirements:'Lv70',roles:['高雷装','索敵','夜戦','駆逐主力'],note:'雷装90・索敵60が特徴。通常連撃と索敵補助を両立しやすい。'},
+ {base:'潮',final:'潮改二',type:'駆逐艦',speed:'高速',targetLv:60,path:'潮 → 潮改(Lv20) → 潮改二(Lv60)',requirements:'Lv60',roles:['高運','夜戦CI','対潜','防空'],note:'運32・回避95・対潜75を持つ生存力の高い駆逐。魚雷CIや対潜向け。'},
+ {base:'初春',final:'初春改二',type:'駆逐艦',speed:'高速',targetLv:65,path:'初春 → 初春改(Lv20) → 初春改二(Lv65)',requirements:'Lv65',roles:['高雷装','夜戦','防空','駆逐主力'],note:'雷装90を持つ設計図不要改二。夜戦と通常攻略で使いやすい。'},
+ {base:'文月',final:'文月改二',type:'駆逐艦',speed:'高速',targetLv:77,path:'文月 → 文月改(Lv20) → 文月改二(Lv77)',requirements:'Lv77',roles:['対潜','輸送','大発','防空'],note:'対潜81・対空82の護衛寄り睦月型改二。輸送と潜水対策を兼ねやすい。'}
 ];
 
 
@@ -183,7 +193,17 @@ const HD_SHIP_STATS={
  '加古改二':{hp:52,armor:72,evasion:76,fire:78,torp:77,aa:65,asw:0,los:55,luck:12,air:8,fuel:35,ammo:65,range:'中'},
  '衣笠改二':{hp:53,armor:73,evasion:79,fire:78,torp:78,aa:66,asw:0,los:58,luck:13,air:8,fuel:35,ammo:65,range:'中'},
  '那智改二':{hp:56,armor:78,evasion:83,fire:81,torp:85,aa:83,asw:0,los:63,luck:18,air:12,fuel:45,ammo:75,range:'中'},
- '皐月改二':{hp:28,armor:45,evasion:96,fire:42,torp:78,aa:82,asw:81,los:45,luck:20,air:0,fuel:15,ammo:15,range:'短'}
+ '皐月改二':{hp:28,armor:45,evasion:96,fire:42,torp:78,aa:82,asw:81,los:45,luck:20,air:0,fuel:15,ammo:15,range:'短'},
+ '足柄改二':{hp:56,armor:79,evasion:85,fire:84,torp:84,aa:77,asw:0,los:57,luck:20,air:12,fuel:45,ammo:75,range:'中'},
+ '睦月改二':{hp:27,armor:43,evasion:90,fire:45,torp:79,aa:56,asw:69,los:43,luck:14,air:0,fuel:15,ammo:15,range:'短'},
+ '如月改二':{hp:27,armor:43,evasion:91,fire:46,torp:80,aa:57,asw:69,los:44,luck:13,air:0,fuel:15,ammo:15,range:'短'},
+ '球磨改二':{hp:46,armor:70,evasion:82,fire:70,torp:92,aa:80,asw:80,los:58,luck:16,air:3,fuel:25,ammo:35,range:'短'},
+ '天龍改二':{hp:42,armor:63,evasion:82,fire:64,torp:78,aa:89,asw:70,los:53,luck:17,air:3,fuel:25,ammo:25,range:'短'},
+ '叢雲改二':{hp:31,armor:51,evasion:90,fire:57,torp:89,aa:74,asw:69,los:42,luck:16,air:0,fuel:15,ammo:20,range:'短'},
+ '暁改二':{hp:31,armor:50,evasion:89,fire:62,torp:90,aa:59,asw:66,los:60,luck:15,air:0,fuel:15,ammo:20,range:'短'},
+ '潮改二':{hp:33,armor:59,evasion:95,fire:59,torp:84,aa:81,asw:75,los:48,luck:32,air:0,fuel:15,ammo:20,range:'短'},
+ '初春改二':{hp:31,armor:51,evasion:90,fire:55,torp:90,aa:73,asw:69,los:45,luck:16,air:0,fuel:15,ammo:20,range:'短'},
+ '文月改二':{hp:27,armor:46,evasion:93,fire:45,torp:77,aa:82,asw:81,los:47,luck:17,air:0,fuel:15,ammo:15,range:'短'}
 };
 
 const HD_SHIP_LOADOUTS={
@@ -546,6 +566,46 @@ const HD_SHIP_LOADOUTS={
  '皐月改二':[
   {name:'対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'低コストで対潜81を活かす。'},
   {name:'輸送・防空',gear:['大発動艇','10cm連装高角砲＋高射装置','高性能対空電探'],memo:'輸送をしつつ航空戦対策も補助。'}
+ ],
+ '足柄改二':[
+  {name:'高火力連撃',gear:['20.3cm(3号)連装砲','20.3cm(3号)連装砲','零式水上偵察機11型乙(熟練)','高性能電探'],memo:'火力84・雷装84を昼夜連撃で安定して活かす。'},
+  {name:'夜戦寄り',gear:['20.3cm(3号)連装砲','20.3cm(3号)連装砲','夜戦補助','高性能水偵'],memo:'夜戦火力を重視するボス戦向け。'}
+ ],
+ '睦月改二':[
+  {name:'輸送',gear:['大発動艇','大発動艇','大発動艇'],memo:'低燃費を活かしたTP輸送・遠征向け。'},
+  {name:'汎用連撃',gear:['高性能駆逐主砲','高性能駆逐主砲','水上電探'],memo:'通常海域で最低限の戦闘力を確保。'}
+ ],
+ '如月改二':[
+  {name:'輸送',gear:['大発動艇','大発動艇','大発動艇'],memo:'低燃費の輸送要員として運用。'},
+  {name:'汎用連撃',gear:['高性能駆逐主砲','高性能駆逐主砲','水上電探'],memo:'戦闘が必要な遠征・通常海域向け。'}
+ ],
+ '球磨改二':[
+  {name:'軽巡連撃',gear:['15.2cm連装砲改二','15.2cm連装砲改二','零式水上偵察機11型乙(熟練)'],memo:'火力70・雷装92を昼夜連撃で活かす。'},
+  {name:'対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'対潜80を活かした潜水艦対策。'}
+ ],
+ '天龍改二':[
+  {name:'防空連撃',gear:['高角砲＋高射装置','高角砲＋高射装置','高性能対空電探'],memo:'対空89を活かす防空寄り構成。'},
+  {name:'夜戦連撃',gear:['主砲','主砲','夜戦補助/電探'],memo:'軽巡としての夜戦連撃を維持。'}
+ ],
+ '叢雲改二':[
+  {name:'夜戦連撃',gear:['高性能駆逐主砲','高性能駆逐主砲','水上電探'],memo:'雷装89を安定して活かす。'},
+  {name:'魚雷CI',gear:['61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷','水雷戦隊 熟練見張員'],memo:'運改修後や夜戦補助込みで採用。'}
+ ],
+ '暁改二':[
+  {name:'夜戦連撃',gear:['高性能駆逐主砲','高性能駆逐主砲','水上電探'],memo:'雷装90と索敵60を活かす汎用型。'},
+  {name:'索敵補助',gear:['高性能駆逐主砲','高性能駆逐主砲','33号水上電探'],memo:'索敵分岐が厳しい海域で使いやすい。'}
+ ],
+ '潮改二':[
+  {name:'魚雷CI',gear:['61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷','水雷戦隊 熟練見張員'],memo:'運32を活かして夜戦CIを狙う。'},
+  {name:'対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'対潜75を活かす潜水艦対策。'}
+ ],
+ '初春改二':[
+  {name:'夜戦連撃',gear:['高性能駆逐主砲','高性能駆逐主砲','水上電探'],memo:'雷装90を活かした安定型。'},
+  {name:'防空補助',gear:['10cm連装高角砲＋高射装置','10cm連装高角砲＋高射装置','高性能対空電探'],memo:'対空73を活かして航空戦を補助。'}
+ ],
+ '文月改二':[
+  {name:'先制対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'対潜81を活かした護衛・潜水対策。'},
+  {name:'輸送',gear:['大発動艇','大発動艇','大発動艇'],memo:'低燃費と輸送適性を活かすTP海域向け。'}
  ]
 };
 
