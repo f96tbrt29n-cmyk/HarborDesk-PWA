@@ -152,6 +152,53 @@ function hdPLCostHtml(row){
  }
  return '';
 }
+function hdPLGlobalDemandRows(rows=hdPLLoad()){
+ const m=new Map();
+ for(const mapRow of rows){
+  for(const x of hdPLDemandRows(mapRow.gearItems||[])){
+   const target=x.target||x.wanted||'',key=[target,x.methodKey||'',x.kind||''].join('|');
+   const cur=m.get(key)||{...x,target,needed:0,maps:[],ships:[],loadouts:[]};
+   cur.needed=Math.max(cur.needed||0,x.needed||0);
+   cur.maps=[...new Set([...cur.maps,mapRow.map].filter(Boolean))];
+   cur.ships=[...new Set([...cur.ships,...(x.ships||[]),x.ship].filter(Boolean))];
+   cur.loadouts=[...new Set([...cur.loadouts,...(x.loadouts||[]),x.loadout].filter(Boolean))];
+   m.set(key,cur);
+  }
+ }
+ return [...m.values()].map(x=>{
+  const owned=x.target?hdPLOwnedCount(x.target):0,shortfall=Math.max(0,(x.needed||0)-owned);
+  return {...x,owned,shortfall,status:shortfall===0?'ready':owned>0?'partial':'missing'};
+ }).sort((a,b)=>{
+  if((a.shortfall===0)!==(b.shortfall===0))return a.shortfall===0?1:-1;
+  return (a.rank||9)-(b.rank||9)||(b.shortfall||0)-(a.shortfall||0)||(a.target||a.wanted).localeCompare(b.target||b.wanted,'ja');
+ });
+}
+function hdPLOverallBudget(rows=hdPLLoad()){
+ const items=hdPLGlobalDemandRows(rows),open=items.filter(x=>x.shortfall>0);
+ const dev={attempts:0,fuel:0,ammo:0,steel:0,bauxite:0,items:0,unknown:0};
+ const imp={screw:0,devmat:0,fuel:0,ammo:0,steel:0,bauxite:0,items:0,unknown:0};
+ const other={quest:0,limited:0,other:0};
+ for(const x of open){
+  if(x.methodKey==='develop'){
+   const e=hdPLDevEstimate(x);dev.items+=x.shortfall||0;
+   if(e?.total){dev.attempts+=e.attempts||0;dev.fuel+=e.total.fuel||0;dev.ammo+=e.total.ammo||0;dev.steel+=e.total.steel||0;dev.bauxite+=e.total.bauxite||0}
+   else dev.unknown+=x.shortfall||0;
+  }else if(x.methodKey==='improve'){
+   const e=hdPLImproveEstimate(x);imp.items+=x.shortfall||0;
+   if(e){imp.screw+=e.screw||0;imp.devmat+=e.dev||0;imp.fuel+=e.resource?.fuel||0;imp.ammo+=e.resource?.ammo||0;imp.steel+=e.resource?.steel||0;imp.bauxite+=e.resource?.bauxite||0}
+   else imp.unknown+=x.shortfall||0;
+  }else if(x.methodKey==='quest')other.quest+=x.shortfall||0;
+  else if(x.methodKey==='limited')other.limited+=x.shortfall||0;
+  else other.other+=x.shortfall||0;
+ }
+ return {items,open,dev,imp,other,totalShortfall:open.reduce((s,x)=>s+(x.shortfall||0),0)};
+}
+function hdPLOverallBudgetHtml(rows=hdPLLoad()){
+ if(!rows.length)return '';
+ const b=hdPLOverallBudget(rows),ready=b.items.filter(x=>x.shortfall===0).length;
+ if(!b.items.length)return '<section class="hd-pl-overall"><div><div class="eyebrow">TOTAL PROCUREMENT BUDGET</div><strong>全海域の調達総予算</strong></div><p>個艦装備の調達項目を追加すると、ここに全体予算が出るよ。</p></section>';
+ return `<section class="hd-pl-overall"><div class="hd-pl-overall-head"><div><div class="eyebrow">TOTAL PROCUREMENT BUDGET</div><strong>全海域の調達総予算</strong><small>同じ装備は海域間で使い回す前提。各装備の最大同時必要数で計算。</small></div><span>不足 ${b.totalShortfall}個 / 準備済み ${ready}種</span></div><div class="hd-pl-overall-grid"><article><b>開発</b><strong>${b.dev.items}個</strong><span>${b.dev.attempts?`期待 約${b.dev.attempts}回`:'成功率データ不足'}</span><small>燃${b.dev.fuel} / 弾${b.dev.ammo} / 鋼${b.dev.steel} / ボ${b.dev.bauxite}${b.dev.unknown?`＋見積不可${b.dev.unknown}個`:''}</small></article><article><b>改修・更新</b><strong>${b.imp.items}個</strong><span>ネジ ${b.imp.screw} / 開発資材 ${b.imp.devmat}</span><small>燃${b.imp.fuel} / 弾${b.imp.ammo} / 鋼${b.imp.steel} / ボ${b.imp.bauxite}${b.imp.unknown?`＋見積不可${b.imp.unknown}個`:''}</small></article><article><b>任務など</b><strong>${b.other.quest+b.other.other+b.other.limited}個</strong><span>任務 ${b.other.quest} / その他 ${b.other.other}</span><small>限定入手 ${b.other.limited}</small></article></div><p class="hd-pl-overall-note">開発は登録成功率からの期待値、改修は通常改修を前提にした最低目安。乱数・確実化・素材不足・曜日条件で実際の消費は増減するよ。</p></section>`;
+}
 function hdPLGearItemHtml(map,row){
  const target=row.target||'',method=row.methodLabel||'入手情報',rank=row.rank||4,label=rank===1?'優先1':rank===2?'優先2':rank===3?'優先3':rank===5?'優先5':'優先4';
  const need=Math.max(0,Number(row.needed)||0),owned=Math.max(0,Number(row.owned)||0),left=Math.max(0,Number(row.shortfall)||0);
@@ -181,7 +228,8 @@ function hdPLMapHtml(row){
 }
 function hdPLRender(){
  const host=document.getElementById('hdProcurementList');if(!host)return;
- const rows=hdPLLoad();host.innerHTML=rows.map(hdPLMapHtml).join('')||'<div class="empty">調達リストはまだないよ。海域の装備タブから不足分を追加できる。</div>';
+ const rows=hdPLLoad(),budget=document.getElementById('hdProcurementBudget');if(budget)budget.innerHTML=hdPLOverallBudgetHtml(rows);
+ host.innerHTML=rows.map(hdPLMapHtml).join('')||'<div class="empty">調達リストはまだないよ。海域の装備タブから不足分を追加できる。</div>';
  const count=document.getElementById('hdProcurementCount');if(count)count.textContent=`${rows.length}海域`;
  const add=document.getElementById('hdProcurementAddCurrent');if(add){const map=typeof selectedMap!=='undefined'?selectedMap:'';add.disabled=!map;add.textContent=map?`${map} の不足を追加`:'海域を選んでね'}
 }
@@ -189,7 +237,7 @@ function hdPLEnsure(){
  if(document.getElementById('hdEquipmentProcurement'))return;
  const anchor=document.getElementById('hdEquipAnalyzer')||document.getElementById('equipmentBook');if(!anchor)return;
  const sec=document.createElement('section');sec.id='hdEquipmentProcurement';sec.className='advanced-section hd-pl-section';
- sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">PROCUREMENT LIST</div><h2>装備調達リスト</h2></div><span id="hdProcurementCount" class="muted"></span></div><div class="hd-pl-toolbar"><p>攻略予定の海域で足りない装備カテゴリを保存。装備台帳を更新すると準備状況も自動で変わるよ。</p><button id="hdProcurementAddCurrent" type="button" class="primary small">海域を選んでね</button></div><div id="hdProcurementList" class="hd-pl-list"></div>`;
+ sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">PROCUREMENT LIST</div><h2>装備調達リスト</h2></div><span id="hdProcurementCount" class="muted"></span></div><div class="hd-pl-toolbar"><p>攻略予定の海域で足りない装備カテゴリを保存。装備台帳を更新すると準備状況も自動で変わるよ。</p><button id="hdProcurementAddCurrent" type="button" class="primary small">海域を選んでね</button></div><div id="hdProcurementBudget"></div><div id="hdProcurementList" class="hd-pl-list"></div>`;
  anchor.insertAdjacentElement('afterend',sec);document.getElementById('hdProcurementAddCurrent')?.addEventListener('click',()=>{if(typeof selectedMap!=='undefined'&&selectedMap)hdPLAddMap(selectedMap)});hdPLRender();
 }
 function hdPLInstallSortieButton(){
