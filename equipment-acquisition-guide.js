@@ -41,7 +41,17 @@ function hdAGScore(item){
 }
 function hdAGCandidates(kind){
  let rows=[];
- if(kind==='高速化'){
+ if(kind==='航空火力'){
+  rows=hdAGCatalog().filter(x=>/艦上攻撃機|艦上爆撃機/.test(String(x.category||''))||(x.tags||[]).some(t=>['艦攻','艦爆','航空火力'].includes(t)));
+ }else if(kind==='主砲'){
+  rows=hdAGCatalog().filter(x=>/小口径主砲|中口径主砲|大口径主砲/.test(String(x.category||'')));
+ }else if(kind==='魚雷'){
+  rows=hdAGCatalog().filter(x=>/魚雷/.test(String(x.category||''))||(x.tags||[]).includes('魚雷CI'));
+ }else if(kind==='索敵'){
+  rows=hdAGCatalog().filter(x=>/偵察機|電探/.test(String(x.category||''))||(x.tags||[]).includes('索敵'));
+ }else if(kind==='電探'){
+  rows=hdAGCatalog().filter(x=>/電探/.test(String(x.category||''))||(x.tags||[]).includes('電探'));
+ }else if(kind==='高速化'){
   rows=hdAGCatalog().filter(x=>/タービン|缶$/.test(x.name)||(x.tags||[]).includes('高速化'));
  }else if(kind==='基地航空隊'){
   rows=hdAGCatalog().filter(x=>(x.tags||[]).includes('基地航空隊')||['陸上攻撃機','陸軍戦闘機','局地戦闘機'].includes(x.category));
@@ -79,7 +89,11 @@ function hdAGEnsureDialog(){
  d.innerHTML=`<div class="hd-ag-shell"><div class="hd-ag-title"><div><div class="eyebrow">ACQUISITION GUIDE</div><h3 id="hdAcquisitionTitle">不足装備の入手ルート</h3></div><button type="button" class="ghost small" data-hd-ag-close>閉じる</button></div><p id="hdAcquisitionNote" class="muted"></p><div id="hdAcquisitionList" class="hd-ag-list"></div></div>`;
  document.body.appendChild(d);
 }
-function hdAGKindLabel(kind){if(kind==='高速化')return '高速化セット';if(kind==='基地航空隊')return '基地航空隊';return typeof HD_SORTIE_EQUIP_RULES!=='undefined'&&HD_SORTIE_EQUIP_RULES[kind]?.label?HD_SORTIE_EQUIP_RULES[kind].label:kind}
+function hdAGKindLabel(kind){
+ const extra={高速化:'高速化セット',基地航空隊:'基地航空隊',航空火力:'艦攻・艦爆',主砲:'主砲',魚雷:'魚雷',索敵:'索敵・偵察',電探:'電探',制空:'制空・艦戦',対潜:'対潜装備',対地:'対地装備',防空:'防空・対空CI',夜戦:'夜戦装備'};
+ if(extra[kind])return extra[kind];
+ return typeof HD_SORTIE_EQUIP_RULES!=='undefined'&&HD_SORTIE_EQUIP_RULES[kind]?.label?HD_SORTIE_EQUIP_RULES[kind].label:kind;
+}
 function hdAGOpen(kind,map=''){
  hdAGEnsureDialog();
  const d=document.getElementById('hdAcquisitionDialog'),list=document.getElementById('hdAcquisitionList'),title=document.getElementById('hdAcquisitionTitle'),note=document.getElementById('hdAcquisitionNote');
@@ -88,6 +102,15 @@ function hdAGOpen(kind,map=''){
  if(note)note.textContent='入手しやすい候補を優先して表示。開発率や任務・改修条件は変更されることがあるため、最終確認は装備図鑑/Wikiも使ってね。';
  const rows=hdAGCandidates(kind);
  if(list)list.innerHTML=rows.map(hdAGCandidateHtml).join('')||'<div class="empty">候補装備を整理中だよ</div>';
+ if(d&&!d.open)d.showModal();
+}
+function hdAGOpenItem(name,map=''){
+ hdAGEnsureDialog();
+ const d=document.getElementById('hdAcquisitionDialog'),list=document.getElementById('hdAcquisitionList'),title=document.getElementById('hdAcquisitionTitle'),note=document.getElementById('hdAcquisitionNote');
+ const item=hdAGItemByName(name);
+ if(title)title.textContent=`${map?map+'｜':''}${name} の入手方法`;
+ if(note)note.textContent='この不足装備そのものの入手方法を表示。入手不可・限定装備の場合は、図鑑の入手情報や更新元も確認してね。';
+ if(list)list.innerHTML=item?hdAGCandidateHtml(item):`<div class="empty">${hdAGEsc(name)} は装備図鑑の登録情報を確認してね。</div>`;
  if(d&&!d.open)d.showModal();
 }
 function hdAGShowElement(id){
@@ -130,6 +153,7 @@ function hdAGInstall(){
 }
 document.addEventListener('click',e=>{
  const kind=e.target.closest?.('[data-hd-ag-kind]');if(kind){hdAGOpen(kind.dataset.hdAgKind,typeof selectedMap!=='undefined'?selectedMap:'');return}
+ const direct=e.target.closest?.('[data-hd-ag-item]');if(direct){hdAGOpenItem(direct.dataset.hdAgItem,typeof selectedMap!=='undefined'?selectedMap:'');return}
  const dev=e.target.closest?.('[data-hd-ag-development]');if(dev){hdAGOpenDevelopment(dev.dataset.hdAgDevelopment);return}
  const imp=e.target.closest?.('[data-hd-ag-improvement]');if(imp){hdAGOpenImprovement(imp.dataset.hdAgImprovement);return}
  const cat=e.target.closest?.('[data-hd-ag-catalog]');if(cat){hdAGOpenCatalog(cat.dataset.hdAgCatalog);return}
