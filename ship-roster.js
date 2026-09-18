@@ -1,6 +1,7 @@
 const SHIP_ROSTER_KEY='harbordesk-ship-roster-v1';
 let shipRosterEditId=null;
 const SHIP_TAGS=['主力','育成中','改二待ち','任務用','イベント温存'];
+const SHIP_ROSTER_TYPES=['','駆逐艦','海防艦','軽巡洋艦','重雷装巡洋艦','練習巡洋艦','重巡洋艦','航空巡洋艦','高速戦艦','戦艦','航空戦艦','軽空母','正規空母','装甲空母','水上機母艦','潜水艦','潜水空母','潜水母艦','補給艦','揚陸艦'];
 
 function rosterLoad(){try{return JSON.parse(localStorage.getItem(SHIP_ROSTER_KEY))||[]}catch{return []}}
 function rosterSave(items){localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(items));renderShipRoster();refreshShipRosterOptions()}
@@ -12,7 +13,8 @@ function ensureShipRosterDialog(){
  const d=document.createElement('dialog');d.id='shipRosterDialog';
  d.innerHTML=`<form method="dialog" id="shipRosterForm"><h3>艦娘を登録</h3>
  <label>艦娘名<input id="rosterName" required maxlength="40" placeholder="例：矢矧改二乙"></label>
- <div class="roster-two"><label>Lv<input id="rosterLevel" type="number" min="1" max="180" inputmode="numeric" placeholder="99"></label><label>改造状態<input id="rosterRemodel" maxlength="30" placeholder="例：改二乙"></label></div>
+ <div class="roster-two"><label>艦種<select id="rosterType">${SHIP_ROSTER_TYPES.map(x=>`<option value="${x}">${x||'自動判定 / 未設定'}</option>`).join('')}</select></label><label>Lv<input id="rosterLevel" type="number" min="1" max="180" inputmode="numeric" placeholder="99"></label></div>
+ <label>改造状態<input id="rosterRemodel" maxlength="30" placeholder="例：改二乙"></label>
  <div><div class="roster-label">タグ</div><div id="rosterTagBox" class="roster-tags"></div></div>
  <label>よく使う装備メモ<textarea id="rosterGear" maxlength="300" placeholder="例：15.2改二 / 水偵乙熟練 / 甲標的 丁型改 / 水雷見張員"></textarea></label>
  <label>メモ<textarea id="rosterMemo" maxlength="300" placeholder="運改修済み、対潜100、など"></textarea></label>
@@ -23,7 +25,7 @@ function ensureShipRosterDialog(){
   if(e.submitter?.value==='cancel')return;
   const name=document.getElementById('rosterName').value.trim();if(!name)return;
   const items=rosterLoad();
-  const payload={name,level:document.getElementById('rosterLevel').value.trim(),remodel:document.getElementById('rosterRemodel').value.trim(),gear:document.getElementById('rosterGear').value.trim(),memo:document.getElementById('rosterMemo').value.trim(),tags:[...document.querySelectorAll('#rosterTagBox input:checked')].map(x=>x.value),updatedAt:Date.now()};
+  const payload={name,type:document.getElementById('rosterType')?.value||'',level:document.getElementById('rosterLevel').value.trim(),remodel:document.getElementById('rosterRemodel').value.trim(),gear:document.getElementById('rosterGear').value.trim(),memo:document.getElementById('rosterMemo').value.trim(),tags:[...document.querySelectorAll('#rosterTagBox input:checked')].map(x=>x.value),updatedAt:Date.now()};
   if(shipRosterEditId){const i=items.findIndex(x=>x.id===shipRosterEditId);if(i>=0)items[i]={...items[i],...payload}}
   else items.push({id:rosterUid(),createdAt:Date.now(),...payload});
   shipRosterEditId=null;rosterSave(items);
@@ -33,7 +35,7 @@ function ensureShipRosterDialog(){
 function openShipRosterDialog(item=null){
  ensureShipRosterDialog();shipRosterEditId=item?.id||null;
  document.querySelector('#shipRosterDialog h3').textContent=item?'艦娘を編集':'艦娘を登録';
- document.getElementById('rosterName').value=item?.name||'';document.getElementById('rosterLevel').value=item?.level||'';document.getElementById('rosterRemodel').value=item?.remodel||'';document.getElementById('rosterGear').value=item?.gear||'';document.getElementById('rosterMemo').value=item?.memo||'';
+ document.getElementById('rosterName').value=item?.name||'';document.getElementById('rosterType').value=item?.type||'';document.getElementById('rosterLevel').value=item?.level||'';document.getElementById('rosterRemodel').value=item?.remodel||'';document.getElementById('rosterGear').value=item?.gear||'';document.getElementById('rosterMemo').value=item?.memo||'';
  document.querySelectorAll('#rosterTagBox input').forEach(x=>x.checked=(item?.tags||[]).includes(x.value));
  document.getElementById('shipRosterDialog').showModal();
 }
@@ -49,7 +51,7 @@ function renderShipRoster(){
  const q=(document.getElementById('shipRosterSearch')?.value||'').trim().toLowerCase();
  const active=document.querySelector('[data-roster-filter].active')?.dataset.rosterFilter||'all';
  const rows=rosterLoad().filter(x=>(active==='all'||(x.tags||[]).includes(active))&&(!q||`${x.name} ${x.remodel||''} ${(x.tags||[]).join(' ')} ${x.memo||''}`.toLowerCase().includes(q))).sort((a,b)=>Number(b.level||0)-Number(a.level||0)||a.name.localeCompare(b.name,'ja'));
- host.innerHTML=rows.length?rows.map(x=>`<article class="roster-card"><div class="roster-card-head"><div><strong>${rosterEsc(x.name)}</strong><div class="muted">${x.level?`Lv.${rosterEsc(x.level)}`:''}${x.remodel?` ・ ${rosterEsc(x.remodel)}`:''}</div></div><div class="roster-actions"><button class="ghost small" data-roster-edit="${x.id}">編集</button><button class="ghost small" data-roster-delete="${x.id}">削除</button></div></div><div class="roster-badges">${(x.tags||[]).map(t=>`<span>${rosterEsc(t)}</span>`).join('')}</div>${x.gear?`<div class="roster-note"><b>装備:</b> ${rosterEsc(x.gear)}</div>`:''}${x.memo?`<div class="roster-note"><b>メモ:</b> ${rosterEsc(x.memo)}</div>`:''}</article>`).join(''):'<div class="empty">まだ艦娘が登録されてないよ。「＋艦娘を登録」から追加してね。</div>';
+ host.innerHTML=rows.length?rows.map(x=>`<article class="roster-card"><div class="roster-card-head"><div><strong>${rosterEsc(x.name)}</strong><div class="muted">${x.type?`${rosterEsc(x.type)} ・ `:''}${x.level?`Lv.${rosterEsc(x.level)}`:''}${x.remodel?` ・ ${rosterEsc(x.remodel)}`:''}</div></div><div class="roster-actions"><button class="ghost small" data-roster-edit="${x.id}">編集</button><button class="ghost small" data-roster-delete="${x.id}">削除</button></div></div><div class="roster-badges">${(x.tags||[]).map(t=>`<span>${rosterEsc(t)}</span>`).join('')}</div>${x.gear?`<div class="roster-note"><b>装備:</b> ${rosterEsc(x.gear)}</div>`:''}${x.memo?`<div class="roster-note"><b>メモ:</b> ${rosterEsc(x.memo)}</div>`:''}</article>`).join(''):'<div class="empty">まだ艦娘が登録されてないよ。「＋艦娘を登録」から追加してね。</div>';
 }
 
 function initShipRoster(){
