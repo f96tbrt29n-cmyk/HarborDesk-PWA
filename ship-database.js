@@ -610,6 +610,74 @@ const HD_SHIP_LOADOUTS={
 };
 
 
+const HD_SHIP_SLOT_PROFILES={
+ '長門改二':{slots:[3,3,6,3],flags:['水戦','大発','内火艇','51cm砲']},
+ '陸奥改二':{slots:[2,3,5,7],flags:['水戦','内火艇','回転翼機','51cm砲']},
+ '大和改二':{slots:[4,4,4,8,2],flags:['水戦','水爆','回転翼機','小型ソナー']},
+ '武蔵改二':{slots:[5,5,5,8,5],flags:['水戦','回転翼機','小型ソナー']},
+ '伊勢改二':{slots:[2,2,22,22,9],flags:['艦戦','艦爆','水戦','水爆']},
+ '日向改二':{slots:[2,8,24,12,11],flags:['艦戦','艦爆','水戦','水爆','回転翼機','小型ソナー']},
+ '榛名改二乙':{slots:[1,2,5,4],flags:['魚雷','水戦','水爆','対地','小型ソナー']},
+ '霧島改二丙':{slots:[2,2,4,3],flags:['魚雷','水戦','対地','内火艇','小型ソナー']},
+ '赤城改二':{slots:[21,21,32,12,4],flags:['艦戦','艦攻','艦爆','艦偵']},
+ '加賀改二':{slots:[20,20,44,12,3],flags:['艦戦','艦攻','艦爆','艦偵']},
+ '翔鶴改二甲':{slots:[34,21,12,9],flags:['艦戦','艦攻','艦爆','艦偵','噴式']},
+ '瑞鶴改二甲':{slots:[34,24,12,6],flags:['艦戦','艦攻','艦爆','艦偵','噴式']},
+ 'Saratoga Mk.II Mod.2':{slots:[37,24,19,13],flags:['艦戦','艦攻','艦爆','艦偵']},
+ '大鳳改':{slots:[30,24,24,8],flags:['艦戦','艦攻','艦爆','艦偵']},
+ '瑞鳳改二乙':{slots:[18,15,15,2],flags:['艦戦','艦攻','艦爆','艦偵','護衛空母']},
+ '千歳航改二':{slots:[24,16,11,8],flags:['艦戦','艦攻','艦爆','艦偵']},
+ '千代田航改二':{slots:[24,16,11,8],flags:['艦戦','艦攻','艦爆','艦偵']},
+ '龍驤改二':{slots:[18,28,6,3],flags:['艦戦','艦攻','艦爆','艦偵']},
+ '隼鷹改二':{slots:[24,18,20,4],flags:['艦戦','艦攻','艦爆','艦偵']},
+ '大鷹改二':{slots:[14,14,8,3],flags:['艦戦','艦攻','艦爆','艦偵','護衛空母']},
+ '神鷹改二':{slots:[9,18,18,6],flags:['艦戦','艦攻','艦爆','艦偵','護衛空母']}
+};
+const HD_SHIP_EXPANSION_SPECIAL={
+ '綾波改二':['12.7cm単装高角砲系'],
+ '潮改二':['12.7cm単装高角砲系'],
+ '暁改二':['12.7cm単装高角砲系'],
+ '初霜改二':['12.7cm単装高角砲系'],
+ '時雨改三':['12.7cm単装高角砲系','爆雷系'],
+ '夕立改二':['12.7cm単装高角砲系'],
+ '雪風改二':['12.7cm単装高角砲系'],
+ '磯風乙改':['12.7cm単装高角砲系'],
+ '秋月改二':['三式爆雷投射機系'],
+ '初月改二':['三式爆雷投射機系'],
+ '涼月改':['三式爆雷投射機系'],
+ '天津風改二':['強化缶系']
+};
+function hdShipDbSlotProfile(ship){
+ const name=typeof ship==='string'?ship:ship?.final;
+ const p=HD_SHIP_SLOT_PROFILES[name];if(!p)return null;
+ return {...p,total:p.slots.reduce((s,n)=>s+n,0),count:p.slots.length};
+}
+function hdShipDbAirGearKind(item,wanted=''){
+ const cat=String(item?.category||''),text=`${wanted} ${item?.name||''} ${cat}`;
+ if(/彩雲|艦上偵察機|水上偵察機|偵察機|水偵/.test(text))return 'recon';
+ if(/艦上戦闘機|艦上攻撃機|艦上爆撃機|水上戦闘機|水上爆撃機|噴式|艦戦|艦攻|艦爆|水戦|瑞雲/.test(text))return 'air';
+ if(/回転翼機|対潜哨戒機/.test(text))return 'air';
+ return 'normal';
+}
+function hdShipDbPickNormalSlot(profile,free,item,wanted){
+ if(!profile||!free.length)return null;
+ const kind=hdShipDbAirGearKind(item,wanted);
+ let sorted=[...free];
+ if(kind==='air')sorted.sort((a,b)=>b.cap-a.cap||a.index-b.index);
+ else if(kind==='recon')sorted.sort((a,b)=>a.cap-b.cap||b.index-a.index);
+ else sorted.sort((a,b)=>a.index-b.index);
+ return sorted[0]||null;
+}
+function hdShipDbSlotHtml(item){
+ const p=hdShipDbSlotProfile(item),special=HD_SHIP_EXPANSION_SPECIAL[item.final]||[];
+ if(!p&&!special.length)return '';
+ const slotHtml=p?`<div class="hd-shipdb-slot-grid">${p.slots.map((n,i)=>`<span><i>第${i+1}</i><b>${n}</b><small>機</small></span>`).join('')}</div>`:'';
+ const flags=p?.flags?.length?`<div class="hd-shipdb-slot-flags">${p.flags.map(x=>`<span>${hdShipDbEsc(x)}</span>`).join('')}</div>`:'';
+ const expansion=`<div class="hd-shipdb-expansion"><b>補強増設</b><span>Lv30以上で開放可能。共通装備に加えて艦ごとの特殊対応あり。</span>${special.length?`<small>特殊対応: ${special.map(hdShipDbEsc).join(' / ')}</small>`:''}</div>`;
+ return `<div class="hd-shipdb-slot-profile"><div class="hd-shipdb-stat-head"><b>装備スロット</b><span>${p?`${p.count}スロット・搭載計${p.total}`:'特殊増設対応'}</span></div>${slotHtml}${flags}${expansion}</div>`;
+}
+
+
 function hdShipDbMapCandidates(detail){
  const text=[detail?.name,detail?.overview,detail?.fleet,detail?.route,detail?.air,detail?.note,detail?.caution].filter(Boolean).join(' ');
  const rules=[
@@ -662,20 +730,31 @@ function hdShipDbOwnedEquipInventory(){
  return m;
 }
 function hdShipDbEquipCompatible(item,ship){
- if(typeof hdFLCompatible==='function')return hdFLCompatible(item,{profile:{type:ship.type,roles:ship.roles||[],row:{name:ship.final}}});
- const cat=String(item.category||''),type=ship.type,roles=ship.roles||[];
+ if(typeof hdFLCompatible==='function'){
+  const base=hdFLCompatible(item,{profile:{type:ship.type,roles:ship.roles||[],row:{name:ship.final}}});
+  if(base)return true;
+ }
+ const cat=String(item.category||''),name=String(item.name||''),type=ship.type,roles=ship.roles||[],profile=hdShipDbSlotProfile(ship),flags=profile?.flags||[];
  const carrier=['軽空母','正規空母','装甲空母'].includes(type),battle=['戦艦','高速戦艦','航空戦艦'].includes(type),destroyer=['駆逐艦','海防艦'].includes(type),cruiser=['軽巡洋艦','重雷装巡洋艦','重巡洋艦','航空巡洋艦','練習巡洋艦'].includes(type);
  if(/陸上攻撃機|陸軍戦闘機|局地戦闘機/.test(cat))return false;
- if(/艦上戦闘機|艦上攻撃機|艦上爆撃機|艦上偵察機/.test(cat))return carrier;
+ if(/艦上戦闘機/.test(cat))return carrier||flags.includes('艦戦');
+ if(/艦上攻撃機/.test(cat))return carrier||flags.includes('艦攻');
+ if(/艦上爆撃機/.test(cat))return carrier||flags.includes('艦爆');
+ if(/艦上偵察機/.test(cat))return carrier||flags.includes('艦偵');
+ if(/噴式/.test(cat)||/噴式/.test(name))return flags.includes('噴式');
  if(/大口径主砲/.test(cat))return battle;
- if(/中口径主砲/.test(cat))return cruiser;
+ if(/中口径主砲/.test(cat))return cruiser||['大和改二'].includes(ship.final);
  if(/小口径主砲/.test(cat))return destroyer||['軽巡洋艦','練習巡洋艦'].includes(type);
- if(/水上戦闘機/.test(cat))return ['航空巡洋艦','航空戦艦','水上機母艦'].includes(type)||roles.includes('水戦')||roles.includes('制空補助');
+ if(/水上戦闘機/.test(cat))return ['航空巡洋艦','航空戦艦','水上機母艦'].includes(type)||roles.includes('水戦')||roles.includes('制空補助')||flags.includes('水戦');
+ if(/水上爆撃機/.test(cat))return ['航空巡洋艦','航空戦艦','水上機母艦'].includes(type)||flags.includes('水爆');
  if(/水上偵察機/.test(cat))return battle||['軽巡洋艦','重巡洋艦','航空巡洋艦','航空戦艦','水上機母艦'].includes(type);
+ if(/回転翼機/.test(cat))return flags.includes('回転翼機')||roles.some(r=>String(r).includes('対潜'));
  if(/対艦強化弾/.test(cat))return battle;
- if(/魚雷/.test(cat))return destroyer||['軽巡洋艦','重雷装巡洋艦','重巡洋艦','航空巡洋艦','潜水艦','潜水空母'].includes(type);
- if(/ソナー|爆雷/.test(cat))return destroyer||['軽巡洋艦','練習巡洋艦','軽空母'].includes(type)||roles.some(r=>String(r).includes('対潜'));
- if(/上陸用舟艇|特型内火艇/.test(cat))return roles.some(r=>['対地','輸送','大発'].includes(r));
+ if(/魚雷/.test(cat)&&!/特殊潜航艇|甲標的/.test(cat))return destroyer||['軽巡洋艦','重雷装巡洋艦','重巡洋艦','航空巡洋艦','潜水艦','潜水空母'].includes(type)||flags.includes('魚雷');
+ if(/ソナー/.test(cat))return destroyer||['軽巡洋艦','練習巡洋艦','軽空母'].includes(type)||roles.some(r=>String(r).includes('対潜'))||flags.includes('小型ソナー');
+ if(/爆雷/.test(cat))return destroyer||['軽巡洋艦','練習巡洋艦','軽空母'].includes(type)||roles.some(r=>String(r).includes('対潜'));
+ if(/上陸用舟艇/.test(cat))return roles.some(r=>['対地','輸送','大発'].includes(r))||flags.includes('大発');
+ if(/特型内火艇/.test(cat))return roles.some(r=>['対地','輸送','大発'].includes(r))||flags.includes('内火艇');
  return true;
 }
 function hdShipDbEquipPower(item,wanted){
@@ -736,7 +815,9 @@ function hdShipDbEquipWantedMatch(item,wanted,ship){
  return score+hdShipDbEquipPower(item,raw);
 }
 function hdShipDbResolveOwnedLoadout(ship,set){
- const inv=hdShipDbOwnedEquipInventory(),remaining=new Map([...inv].map(([k,v])=>[k,v.count])),slots=[];
+ const inv=hdShipDbOwnedEquipInventory(),remaining=new Map([...inv].map(([k,v])=>[k,v.count])),slots=[],profile=hdShipDbSlotProfile(ship);
+ const free=profile?profile.slots.map((cap,index)=>({index,cap})):[];
+ let seq=0;
  for(const wanted of (set?.gear||[])){
   const candidates=[];
   for(const own of inv.values()){
@@ -745,18 +826,22 @@ function hdShipDbResolveOwnedLoadout(ship,set){
    candidates.push({own,score:score+(own.maxStar||0)*1.5});
   }
   candidates.sort((a,b)=>b.score-a.score||b.own.maxStar-a.own.maxStar||a.own.name.localeCompare(b.own.name,'ja'));
-  const best=candidates[0];
-  if(best){remaining.set(best.own.key,(remaining.get(best.own.key)||0)-1);slots.push({wanted,found:true,name:best.own.name,star:best.own.maxStar,count:best.own.count})}
-  else slots.push({wanted,found:false,name:'',star:0,count:0});
+  const best=candidates[0],pick=profile?hdShipDbPickNormalSlot(profile,free,best?.own?.item,wanted):null;
+  const slotIndex=pick?pick.index:seq++,capacity=pick?pick.cap:null;
+  if(pick){const at=free.findIndex(x=>x.index===pick.index);if(at>=0)free.splice(at,1)}
+  if(best){remaining.set(best.own.key,(remaining.get(best.own.key)||0)-1);slots.push({wanted,found:true,name:best.own.name,star:best.own.maxStar,count:best.own.count,slotIndex,capacity})}
+  else slots.push({wanted,found:false,name:'',star:0,count:0,slotIndex,capacity});
  }
- return {slots,filled:slots.filter(x=>x.found).length,total:slots.length,inventoryCount:[...inv.values()].reduce((s,x)=>s+x.count,0)};
+ return {slots,filled:slots.filter(x=>x.found).length,total:slots.length,inventoryCount:[...inv.values()].reduce((s,x)=>s+x.count,0),profile,freeSlots:free};
 }
 function hdShipDbOwnedFitHtml(ship,set){
  if(!set)return '';
  const plan=hdShipDbResolveOwnedLoadout(ship,set);
  if(!plan.inventoryCount)return '<div class="hd-map-owned-fit empty-fit"><b>手持ち装備案</b><span>装備台帳が空だよ。装備を登録するとここに自動配備する。</span></div>';
  const cls=plan.filled===plan.total?'complete':plan.filled?'partial':'missing';
- return `<div class="hd-map-owned-fit ${cls}"><div class="hd-map-owned-fit-head"><div><b>手持ち装備案</b><small>${plan.filled}/${plan.total}枠を配備</small></div><button type="button" class="ghost small" data-hd-ship-owned-refresh>再配備</button></div><div class="hd-map-owned-slots">${plan.slots.map(x=>x.found?`<span class="owned"><i>✓</i><b>${hdShipDbEsc(x.name)}${x.star?` ★${x.star}`:''}</b><small>所持 ${x.count}｜${hdShipDbEsc(x.wanted)}</small></span>`:`<span class="missing"><i>!</i><b>不足</b><small>${hdShipDbEsc(x.wanted)}</small><button type="button" class="ghost small" data-hd-ship-acquire="${hdShipDbEsc(x.wanted)}">入手方法</button></span>`).join('')}</div><button type="button" class="ghost small" data-hd-ship-equip-ledger>装備台帳を開く</button></div>`;
+ const rows=[...plan.slots].sort((a,b)=>(a.slotIndex??99)-(b.slotIndex??99));
+ const slotNote=plan.profile?'<small>搭載数を考慮して航空装備を自動配置</small>':'<small>装備可否・性能から自動配備</small>';
+ return `<div class="hd-map-owned-fit ${cls}"><div class="hd-map-owned-fit-head"><div><b>手持ち装備案</b><small>${plan.filled}/${plan.total}枠を配備</small>${slotNote}</div><button type="button" class="ghost small" data-hd-ship-owned-refresh>再配備</button></div><div class="hd-map-owned-slots">${rows.map(x=>{const slot=plan.profile?`第${(x.slotIndex??0)+1}スロ・${x.capacity}機`:`装備枠${(x.slotIndex??0)+1}`;return x.found?`<span class="owned"><i>✓</i><b>${hdShipDbEsc(x.name)}${x.star?` ★${x.star}`:''}</b><small>${slot}｜所持 ${x.count}｜${hdShipDbEsc(x.wanted)}</small></span>`:`<span class="missing"><i>!</i><b>不足</b><small>${slot}｜${hdShipDbEsc(x.wanted)}</small><button type="button" class="ghost small" data-hd-ship-acquire="${hdShipDbEsc(x.wanted)}">入手方法</button></span>`}).join('')}${plan.profile&&plan.freeSlots.length?plan.freeSlots.sort((a,b)=>a.index-b.index).map(x=>`<span class="free"><i>＋</i><b>空きスロット</b><small>第${x.index+1}スロ・${x.cap}機</small></span>`).join(''):''}</div><button type="button" class="ghost small" data-hd-ship-equip-ledger>装備台帳を開く</button></div>`;
 }
 function hdShipDbAcquisitionKind(wanted){
  const w=String(wanted||'');
@@ -819,7 +904,7 @@ function hdShipDbJumpTo(name){
 function hdShipDbStatsHtml(item){
  const s=HD_SHIP_STATS[item.final];if(!s)return '';
  const cells=[['耐久',s.hp],['火力',s.fire],['雷装',s.torp],['対空',s.aa],['装甲',s.armor],['回避',s.evasion],['対潜',s.asw],['索敵',s.los],['運',s.luck],['搭載',s.air]];
- return `<details class="hd-shipdb-detail"><summary>ステータス・おすすめ装備</summary><div class="hd-shipdb-detail-body"><div class="hd-shipdb-stat-head"><b>Lv99最大ステータス</b><span>装備補正なし</span></div><div class="hd-shipdb-stats">${cells.map(([k,v])=>`<div><span>${k}</span><strong>${v}</strong></div>`).join('')}</div><div class="hd-shipdb-substats"><span>速力 <b>${hdShipDbEsc(item.speed)}</b></span><span>射程 <b>${hdShipDbEsc(s.range)}</b></span><span>燃料 <b>${s.fuel}</b></span><span>弾薬 <b>${s.ammo}</b></span></div>${hdShipDbLoadoutsHtml(item)}</div></details>`;
+ return `<details class="hd-shipdb-detail"><summary>ステータス・おすすめ装備</summary><div class="hd-shipdb-detail-body"><div class="hd-shipdb-stat-head"><b>Lv99最大ステータス</b><span>装備補正なし</span></div><div class="hd-shipdb-stats">${cells.map(([k,v])=>`<div><span>${k}</span><strong>${v}</strong></div>`).join('')}</div><div class="hd-shipdb-substats"><span>速力 <b>${hdShipDbEsc(item.speed)}</b></span><span>射程 <b>${hdShipDbEsc(s.range)}</b></span><span>燃料 <b>${s.fuel}</b></span><span>弾薬 <b>${s.ammo}</b></span></div>${hdShipDbSlotHtml(item)}${hdShipDbLoadoutsHtml(item)}</div></details>`;
 }
 function hdShipDbLoadoutsHtml(item){
  const sets=HD_SHIP_LOADOUTS[item.final]||[];if(!sets.length)return '';
@@ -856,7 +941,7 @@ function hdEnsureShipDatabase(){
  const roster=document.getElementById('roster');if(!roster)return;
  const sec=document.createElement('section');sec.id='shipDatabase';sec.className='advanced-section';
  const types=['すべて',...new Set(HD_SHIP_DATABASE.map(x=>x.type))];
- sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">SHIP DATABASE</div><h2>艦娘データベース・改装計画</h2></div><span id="hdShipDbCount" class="muted"></span></div><div class="hd-shipdb-note">主要艦の改装Lv・必要アイテム・役割に加えて、Lv99最大ステータスと用途別おすすめ装備を確認。艦隊台帳のLvとも照合するよ。ステータスは攻略Wikiの現行Lv99最大値（装備補正なし）基準。</div><div class="hd-shipdb-toolbar"><input id="hdShipDbSearch" type="search" placeholder="艦名・艦種・役割で検索"><label><input id="hdShipDbMissingOnly" type="checkbox"> 未所持だけ</label></div><div class="hd-shipdb-filters">${types.map((t,i)=>`<button class="ghost small${i===0?' active':''}" type="button" data-hd-shipdb-filter="${hdShipDbEsc(t)}">${hdShipDbEsc(t)}</button>`).join('')}</div><div id="hdShipDbList" class="hd-shipdb-list"></div><div><a class="guide-link" href="https://wikiwiki.jp/kancolle/%E6%94%B9%E9%80%A0/%E8%89%A6%E7%A8%AE%E5%88%A5%E4%B8%80%E8%A6%A7" target="_blank" rel="noopener">攻略Wiki 改造一覧で最新情報 ↗</a></div>`;
+ sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">SHIP DATABASE</div><h2>艦娘データベース・改装計画</h2></div><span id="hdShipDbCount" class="muted"></span></div><div class="hd-shipdb-note">主要艦の改装Lv・必要アイテム・役割に加えて、Lv99最大ステータスと用途別おすすめ装備を確認。艦隊台帳のLvとも照合するよ。ステータスは攻略Wikiの現行Lv99最大値（装備補正なし）基準。スロット配分は現行データを確認できた艦から順次正確値を収録。</div><div class="hd-shipdb-toolbar"><input id="hdShipDbSearch" type="search" placeholder="艦名・艦種・役割で検索"><label><input id="hdShipDbMissingOnly" type="checkbox"> 未所持だけ</label></div><div class="hd-shipdb-filters">${types.map((t,i)=>`<button class="ghost small${i===0?' active':''}" type="button" data-hd-shipdb-filter="${hdShipDbEsc(t)}">${hdShipDbEsc(t)}</button>`).join('')}</div><div id="hdShipDbList" class="hd-shipdb-list"></div><div><a class="guide-link" href="https://wikiwiki.jp/kancolle/%E6%94%B9%E9%80%A0/%E8%89%A6%E7%A8%AE%E5%88%A5%E4%B8%80%E8%A6%A7" target="_blank" rel="noopener">攻略Wiki 改造一覧で最新情報 ↗</a></div>`;
  roster.insertAdjacentElement('beforebegin',sec);
  document.getElementById('hdShipDbSearch').addEventListener('input',hdRenderShipDatabase);
  document.getElementById('hdShipDbMissingOnly').addEventListener('change',e=>{hdShipDbMissingOnly=e.target.checked;hdRenderShipDatabase()});
