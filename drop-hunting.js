@@ -48,6 +48,157 @@ const HD_DROP_TARGETS=[
  {ship:'佐渡',type:'海防艦',locations:[
   {map:'7-4',node:'H',rank:'S',note:'Hマスで確認。'}],source:'攻略Wiki 出撃ドロップ7-4',checked:'2026-09-17'}
 ];
+
+const HD_MAP_DROP_CHECKED='2026-09-18';
+const HD_MAP_DROP_DATA={
+ '1-1':{nodes:[
+  {node:'C ボス',rank:'S中心',ships:'鳳翔、天龍、龍田、多摩、川内、神通、那珂、鹿島、睦月、如月、皐月、文月、長月、菊月、三日月、望月、吹雪、白雪、初雪、深雪、叢雲、磯波、綾波、敷波、朧、曙、漣、潮、暁、響、雷、電、初春、子日、若葉、初霜、白露、時雨、村雨、夕立、五月雨、山風、涼風、朝潮、大潮、満潮、荒潮、霰、霞、陽炎、不知火、黒潮、瑞穂',featured:'鳳翔、鹿島、山風、瑞穂'}
+ ]},
+ '1-2':{nodes:[
+  {node:'E ボス',rank:'S中心',ships:'祥鳳、天龍、龍田、球磨、多摩、北上、木曾、長良、五十鈴、川内、神通、那珂、磯風、迅鯨',featured:'磯風、迅鯨'}
+ ],note:'通常駆逐艦も多数ドロップ。'},
+ '1-3':{nodes:[
+  {node:'J ボス',rank:'S中心',ships:'鳳翔、古鷹、加古、青葉、衣笠、山風、千歳、千代田、瑞穂',featured:'衣笠、山風、瑞穂'}
+ ],note:'通常の軽巡・駆逐艦もドロップ。'},
+ '1-4':{nodes:[
+  {node:'L ボス',rank:'S中心',ships:'龍驤、祥鳳、衣笠、酒匂、巻雲、朝霜、千歳、千代田',featured:'酒匂、巻雲、朝霜'}
+ ],note:'通常の重巡・軽巡・駆逐艦もドロップ。'},
+ '1-5':{nodes:[
+  {node:'J ボス',rank:'S中心',ships:'鳳翔、飛鷹、隼鷹、古鷹、加古、青葉、衣笠、球磨、多摩、長良、五十鈴、名取、由良、川内、神通、那珂、第四号海防艦、第二十二号海防艦、伊168、伊8、伊19、伊58、伊201、伊203、明石',featured:'第四号海防艦、第二十二号海防艦、伊8、伊201、伊203、明石'}
+ ],note:'明石は敵編成や所持状況などで条件が変わる場合あり。期間限定ドロップはWiki側でも未反映の場合がある。'},
+ '1-6':{nodes:[
+  {node:'B / J 主要マス',rank:'S中心',ships:'大淀、朝雲、浦風、磯風、浜風、伊8',featured:'大淀、朝雲、磯風、伊8',kind:'route'}
+ ],note:'1-6はボスマスがないため、主要な道中ドロップを表示。'},
+
+ '2-1':{nodes:[
+  {node:'H ボス',rank:'S中心',ships:'榛名、霧島、扶桑、山城、鳳翔、龍驤、祥鳳、飛鷹、隼鷹、桃、千歳、千代田',featured:'桃'}
+ ],note:'通常の重巡・軽巡・駆逐艦も多数ドロップ。'},
+ '2-2':{nodes:[
+  {node:'K ボス',rank:'S中心',ships:'金剛、比叡、霧島、扶桑、山城、伊勢、加賀、蒼龍、龍驤、祥鳳、飛鷹、隼鷹、狭霧、天津風、浦風、浜風、夕雲、巻雲',featured:'狭霧、天津風、浦風、夕雲、巻雲'}
+ ]},
+ '2-3':{nodes:[
+  {node:'N ボス',rank:'S中心',ships:'金剛、比叡、榛名、霧島、扶桑、山城、伊勢、日向、赤城、加賀、蒼龍、飛龍、翔鶴、龍驤、祥鳳、飛鷹、隼鷹、Gambier Bay、阿賀野、朝雲、山雲、天津風、秋月、長波、早波、浜波、岸波、能美、伊168、神州丸',featured:'飛龍、翔鶴、Gambier Bay、阿賀野、天津風、秋月、早波、浜波、岸波、能美、神州丸'}
+ ]},
+ '2-4':{nodes:[
+  {node:'P ボス',rank:'S中心',ships:'長門、陸奥、赤城、龍驤、祥鳳、飛鷹、隼鷹、弥生、浦波、山雲、親潮、雪風、浦風、浜風、浜波、大鯨',featured:'長門、陸奥、親潮、浜波、大鯨'}
+ ]},
+ '2-5':{nodes:[
+  {node:'O ボス',rank:'S/A',ships:'長門、陸奥、蒼龍、飛龍、鳳翔、龍驤、祥鳳、瑞鳳、飛鷹、隼鷹、三隈、鈴谷、熊野、鬼怒、阿武隈、能代、弥生、卯月、海風、江風、野分、夕雲、巻雲、伊168、伊19、伊58、大鯨、明石',featured:'長門、陸奥、三隈、能代、海風、江風、野分、大鯨、明石'}
+ ]},
+
+ '3-1':{nodes:[
+  {node:'G ボス',rank:'S中心',ships:'陸奥、赤城、加賀、蒼龍、飛龍、阿武隈、白雲、陽炎、不知火、雪風、千歳、千代田、宗谷、大泊',featured:'陸奥、飛龍、白雲、宗谷、大泊'}
+ ]},
+ '3-2':{nodes:[
+  {node:'L ボス',rank:'S中心',ships:'陸奥、赤城、加賀、蒼龍、飛龍、龍驤、祥鳳、飛鷹、隼鷹、長波、島風、千歳、千代田',featured:'陸奥、長波、島風'}
+ ]},
+ '3-3':{nodes:[
+  {node:'M ボス',rank:'S中心',ships:'長門、陸奥、赤城、加賀、蒼龍、飛龍、弥生、山雲、雪風、浜風、舞風、伊168、千歳、千代田',featured:'長門、陸奥、山雲、舞風'}
+ ]},
+ '3-4':{nodes:[
+  {node:'P ボス',rank:'S中心',ships:'長門、陸奥、赤城、加賀、蒼龍、飛龍、卯月、初風、雪風、伊58、大鯨',featured:'長門、陸奥、初風、大鯨'}
+ ]},
+ '3-5':{nodes:[
+  {node:'K ボス',rank:'S中心',ships:'長門、陸奥、赤城、加賀、蒼龍、飛龍、山雲、天津風、谷風、秋雲、風雲、長波、島風、伊168、伊8、伊19、伊58、明石',featured:'天津風、風雲、長波、明石'},
+  {node:'H 北方棲姫',rank:'S',ships:'谷風、伊168、伊8、伊19、伊58、まるゆ、明石',featured:'まるゆ、明石',kind:'route'}
+ ]},
+
+ '4-1':{nodes:[
+  {node:'J ボス',rank:'S中心',ships:'陸奥、赤城、加賀、蒼龍、飛龍、鬼怒、阿武隈、夕張、浦波、島風、伊168',featured:'陸奥、夕張、島風'}
+ ]},
+ '4-2':{nodes:[
+  {node:'L ボス',rank:'S中心',ships:'陸奥、赤城、加賀、蒼龍、飛龍、瑞鳳、弥生、雪風、浦風、夕雲、伊58',featured:'陸奥、瑞鳳、浦風、夕雲'}
+ ]},
+ '4-3':{nodes:[
+  {node:'N ボス',rank:'S中心',ships:'陸奥、赤城、加賀、蒼龍、飛龍、瑞鳳、三隈、鬼怒、阿武隈、夕張、巻雲、島風',featured:'陸奥、瑞鳳、三隈、夕張、巻雲、島風'}
+ ]},
+ '4-4':{nodes:[
+  {node:'K ボス',rank:'S中心',ships:'長門、陸奥、赤城、加賀、翔鶴、瑞鶴、鳳翔、龍驤、祥鳳、瑞鳳、飛鷹、隼鷹、卯月、浜風、夕雲、長波、大鯨',featured:'長門、陸奥、翔鶴、瑞鶴、長波、大鯨'}
+ ]},
+ '4-5':{nodes:[
+  {node:'T ボス',rank:'S中心',ships:'翔鶴、加賀、龍驤、祥鳳、飛鷹、隼鷹、三隈、鈴谷、熊野、野分、舞風、朝霜、早霜、清霜、まるゆ',featured:'翔鶴、三隈、野分、朝霜、早霜、清霜、まるゆ'},
+  {node:'K / N / S 主要マス',rank:'S中心',ships:'Z1、Libeccio、伊8',featured:'Z1、Libeccio、伊8',kind:'route'}
+ ]},
+
+ '5-1':{nodes:[
+  {node:'J ボス',rank:'S中心',ships:'弥生、卯月、浦波、浜風、夕雲、長波、島風、伊58',featured:'卯月、浜風、夕雲、長波、島風'}
+ ],note:'通常の戦艦・重巡・軽巡などもドロップ。'},
+ '5-2':{nodes:[
+  {node:'O ボス',rank:'S中心',ships:'陸奥、赤城、加賀、蒼龍、飛龍、翔鶴、瑞鶴、三隈、夕張、雪風、浜風、秋雲、夕雲、巻雲、伊58、大鯨',featured:'陸奥、翔鶴、瑞鶴、三隈、大鯨'}
+ ]},
+ '5-3':{nodes:[
+  {node:'Q ボス',rank:'S中心',ships:'翔鶴、瑞鶴、鈴谷、弥生、卯月、山雲、浦風、浜風、秋雲、夕雲、長波、伊168、伊58、瑞穂',featured:'翔鶴、瑞鶴、山雲、浦風、長波、瑞穂'}
+ ]},
+ '5-4':{nodes:[
+  {node:'P ボス',rank:'S中心',ships:'陸奥、翔鶴、瑞鶴、瑞鳳、鈴谷、熊野、夕張、阿賀野、有明、雪風、浜風、秋雲、夕雲、巻雲、長波、涼波、伊19、伊58',featured:'翔鶴、瑞鶴、阿賀野、有明、涼波、長波'}
+ ]},
+ '5-5':{nodes:[
+  {node:'S ボス',rank:'S中心',ships:'陸奥、翔鶴、瑞鶴、龍驤、瑞鳳、阿賀野、弥生、卯月、初風、雪風、浜風、舞風、秋雲、夕雲、巻雲、伊168、伊8、伊19、伊58、大鯨',featured:'陸奥、翔鶴、瑞鶴、阿賀野、初風、大鯨'}
+ ]},
+ '5-6':{nodes:[
+  {node:'G 第1ボス',rank:'S中心',ships:'妙高、羽黒、高雄、愛宕、摩耶、鳥海、最上、鈴谷、筑摩、Northampton、長良、川内、夕張、能代、浦波、天霧、有明、夕暮、朝雲、夏雲、早潮、初風、雪風、時津風、玉波、涼波、藤波、早波、宗谷',featured:'Northampton、夕張、能代、有明、夕暮、夏雲、早潮、玉波、涼波、藤波、早波、宗谷'},
+  {node:'N 第2ボス',rank:'S中心',ships:'翔鶴、瑞鶴、妙高、羽黒、高雄、愛宕、摩耶、鳥海、最上、鈴谷、筑摩、Northampton、長良、川内、神通、那珂、阿賀野、能代、Helena、卯月、水無月、天霧、初風、浦風、長波、玉波、涼波、藤波、早波、島風、Fletcher、長鯨、宗谷',featured:'翔鶴、瑞鶴、Northampton、阿賀野、能代、Helena、水無月、Fletcher、長鯨、宗谷'},
+  {node:'Z 第3ボス',rank:'S中心',ships:'翔鶴、瑞鶴、Saratoga、Hornet、妙高、羽黒、高雄、愛宕、摩耶、鳥海、最上、鈴谷、筑摩、Northampton、長良、川内、神通、那珂、阿賀野、能代、Helena、卯月、水無月、天霧、初風、時津風、浦風、長波、玉波、涼波、藤波、早波、照月、島風、Fletcher、長鯨、宗谷',featured:'Saratoga、Hornet、Northampton、Helena、水無月、照月、Fletcher、長鯨、宗谷'}
+ ],note:'G/Nは確定ドロップではない。段階ごとにボスが異なる。'},
+
+ '6-1':{nodes:[
+  {node:'K ボス',rank:'S中心',ships:'長門、陸奥、翔鶴、瑞鶴、雪風、巻雲、長波、伊168、伊8、伊19、伊58、まるゆ、大鯨、長鯨',featured:'長門、陸奥、まるゆ、大鯨、長鯨'}
+ ]},
+ '6-2':{nodes:[
+  {node:'K ボス',rank:'S中心',ships:'長門、陸奥、翔鶴、瑞鶴、夕張、矢矧、酒匂、浦波、浜風、夕雲、島風、伊168、伊19、まるゆ',featured:'長門、陸奥、矢矧、酒匂、まるゆ'},
+  {node:'I / J 道中',rank:'S',ships:'明石',featured:'明石',kind:'route'}
+ ]},
+ '6-3':{nodes:[
+  {node:'J ボス',rank:'S中心',ships:'翔鶴、瑞鶴、雲龍、阿武隈、夕張、阿賀野、能代、香取、伊168、伊19、伊58',featured:'雲龍、阿賀野、能代、香取'}
+ ],note:'春雨は2025/10/29以降、この海域のボスドロップから外れたとされる。'},
+ '6-4':{nodes:[
+  {node:'N ボス',rank:'S中心',ships:'長門、陸奥、蒼龍、飛龍、弥生、朝雲、山雲、時津風、浦風、谷風、秋雲、夕雲、巻雲、速吸',featured:'長門、陸奥、朝雲、山雲、時津風、速吸'}
+ ]},
+ '6-5':{nodes:[
+  {node:'M ボス',rank:'S中心',ships:'長門、陸奥、赤城、加賀、翔鶴、瑞鶴、鬼怒、阿武隈、夕張、鹿島、春雨、海風、江風、野分、舞風、秋雲、夕雲、巻雲、長波、高波、沖波、朝霜',featured:'長門、陸奥、翔鶴、瑞鶴、鹿島、海風、江風、高波、沖波'},
+  {node:'E 道中',rank:'S',ships:'大鯨',featured:'大鯨',kind:'route'}
+ ]},
+
+ '7-1':{nodes:[
+  {node:'K ボス',rank:'S中心',ships:'金剛、祥鳳、瑞鳳、三隈、鈴谷、熊野、狭霧、嵐、萩風、伊168、伊8、伊19、伊58、千歳、千代田',featured:'瑞鳳、三隈、狭霧、嵐、萩風'},
+  {node:'C 主要マス',rank:'S中心',ships:'親潮、伊168、伊8、伊19、伊58、大鯨',featured:'親潮、大鯨',kind:'route'}
+ ]},
+ '7-2':{nodes:[
+  {node:'G 第1ボス',rank:'S中心',ships:'阿武隈、夕張、谷風、秋雲、早波、伊168、伊8、伊19、伊58',featured:'夕張、早波'},
+  {node:'M 第2ボス',rank:'S中心',ships:'翔鶴、瑞鶴、水無月、天霧、狭霧、谷風、秋雲、風雲、瑞穂',featured:'翔鶴、瑞鶴、水無月、天霧、狭霧、風雲、瑞穂'}
+ ],note:'瑞穂は攻略中のみの報告条件があるため、掘り前に最新Wikiを確認。'},
+ '7-3':{nodes:[
+  {node:'E 第1ボス',rank:'S中心',ships:'神風、阿賀野、山風、藤波、岸波',featured:'神風、阿賀野、山風、藤波、岸波'},
+  {node:'P 第2ボス',rank:'S中心',ships:'Gambier Bay、神風、朝風、山風、藤波、岸波、Luigi Torelli',featured:'Gambier Bay、朝風、Luigi Torelli'}
+ ]},
+ '7-4':{nodes:[
+  {node:'P ボス',rank:'S中心',ships:'瑞鶴、瑞鳳、春日丸、旗風、天津風、対馬、平戸、御蔵、日振、大東、神威',featured:'春日丸、対馬、平戸、御蔵、日振、大東、神威'},
+  {node:'H 道中',rank:'S',ships:'旗風、天津風、浦風、松輪、佐渡、日振、神威',featured:'松輪、佐渡、日振、神威',kind:'route'}
+ ]},
+ '7-5':{nodes:[
+  {node:'K 第1ボス',rank:'S中心',ships:'Houston、De Ruyter、Perth、松風、春雨、山風、江風、朝雲、峯雲、初風、雪風、天津風、時津風、瑞穂',featured:'Houston、De Ruyter、Perth、峯雲、瑞穂'},
+  {node:'Q 第2ボス',rank:'S中心',ships:'Perth、朝風、春風、旗風、水無月',featured:'Perth、朝風、春風、旗風、水無月'},
+  {node:'T 第3ボス',rank:'S中心',ships:'瑞鳳、三隈、鈴谷、熊野、Houston、Perth、朝風、春風、旗風、水無月、神州丸、あきつ丸',featured:'Houston、Perth、神州丸、あきつ丸'}
+ ]}
+};
+
+function hdMapDropNames(v){return Array.isArray(v)?v:String(v||'').split('、').map(x=>x.trim()).filter(Boolean)}
+function hdMapDropWikiUrl(map){return 'https://wikiwiki.jp/kancolle/%E5%87%BA%E6%92%83%E3%83%89%E3%83%AD%E3%83%83%E3%83%97/'+encodeURIComponent(map)}
+function hdMapDropHuntActive(ship,map,node){return hdDropHunts().some(x=>x.ship===ship&&x.map===map&&x.node===node&&!x.obtained)}
+function hdMapDropShipHtml(ship,map,node,featured){
+ const owned=hdDropOwned(ship),active=hdMapDropHuntActive(ship,map,node);
+ return `<button type="button" class="hd-map-drop-chip${featured?' featured':''}${owned?' owned':''}${active?' hunting':''}" data-hd-map-drop-ship="${hdDropEsc(ship)}" data-hd-map-drop-map="${hdDropEsc(map)}" data-hd-map-drop-node="${hdDropEsc(node)}" title="${active?'掘り目標に追加済み':'タップで掘り目標に追加'}"><span>${hdDropEsc(ship)}</span>${featured?'<em>注目</em>':''}${owned?'<i>所持</i>':''}${active?'<b>掘り中</b>':''}</button>`;
+}
+function hdMapDropHtml(map){
+ const data=HD_MAP_DROP_DATA[map];
+ if(!data)return `<div class="empty">この海域のドロップ情報は整理中だよ。<a class="guide-link" href="${hdMapDropWikiUrl(map)}" target="_blank" rel="noopener">Wiki全ドロップ表 ↗</a></div>`;
+ const nodeHtml=(data.nodes||[]).map(n=>{
+  const ships=hdMapDropNames(n.ships),featured=new Set(hdMapDropNames(n.featured));
+  return `<article class="hd-map-drop-node ${n.kind==='route'?'route':'boss'}"><div class="hd-map-drop-node-head"><div><strong>${hdDropEsc(n.node)}</strong><span>${hdDropEsc(n.rank||'S中心')}</span></div><b>${ships.length}隻</b></div><div class="hd-map-drop-ships">${ships.map(ship=>hdMapDropShipHtml(ship,map,n.node,featured.has(ship))).join('')}</div>${n.note?`<p>${hdDropEsc(n.note)}</p>`:''}</article>`;
+ }).join('');
+ return `<section class="hd-map-drop-panel"><div class="hd-map-drop-intro"><div><div class="eyebrow">MAP DROPS</div><h4>${hdDropEsc(map)} ドロップ艦娘</h4><p>ボス・主要マスで確認されている主なドロップ。艦名をタップすると掘り目標へ追加できるよ。</p></div><a class="guide-link" href="${hdMapDropWikiUrl(map)}" target="_blank" rel="noopener">Wiki全表 ↗</a></div>${data.note?`<div class="hd-drop-warning">${hdDropEsc(data.note)}</div>`:''}<div class="hd-map-drop-nodes">${nodeHtml}</div><div class="hd-map-drop-foot">確認 ${HD_MAP_DROP_CHECKED}｜ドロップテーブルは告知なく変わる場合があるため、限定艦を狙う前は最新Wikiも確認してね。</div></section>`;
+}
+
 let hdDropMap='すべて';
 let hdDropMissingOnly=false;
 function hdDropEsc(s){return typeof esc==='function'?esc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -77,6 +228,7 @@ function hdEnsureDropDb(){
  document.getElementById('hdDropSearch').addEventListener('input',hdRenderDropDb);document.getElementById('hdDropMissingOnly').addEventListener('change',e=>{hdDropMissingOnly=e.target.checked;hdRenderDropDb()});hdRenderDropHunts();hdRenderDropDb();
 }
 document.addEventListener('click',e=>{
+ const mapShip=e.target.closest?.('[data-hd-map-drop-ship]');if(mapShip){hdAddDropTarget(mapShip.dataset.hdMapDropShip,mapShip.dataset.hdMapDropMap,mapShip.dataset.hdMapDropNode);if(typeof hdApplyMapTabs==='function')hdApplyMapTabs();return}
  const mf=e.target.closest?.('[data-hd-drop-mapfilter]');if(mf){hdDropMap=mf.dataset.hdDropMapfilter;document.querySelectorAll('[data-hd-drop-mapfilter]').forEach(b=>b.classList.toggle('active',b===mf));hdRenderDropDb();return}
  const add=e.target.closest?.('[data-hd-drop-target]');if(add){hdAddDropTarget(add.dataset.hdDropTarget,add.dataset.hdDropMap,add.dataset.hdDropNode);return}
  const inc=e.target.closest?.('[data-hd-hunt-add]');if(inc){const rows=hdDropHunts(),h=rows.find(x=>x.id===inc.dataset.hdHuntAdd);if(h){h.runs=(h.runs||0)+1;if(inc.dataset.field==='s')h.s=(h.s||0)+1;if(inc.dataset.field==='a')h.a=(h.a||0)+1;hdDropSave(rows)}return}
