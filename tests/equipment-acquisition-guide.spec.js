@@ -42,7 +42,7 @@ test('missing high-speed gear opens acquisition routes and development recipe', 
 test('radar shortage guide exposes catalog acquisition information', async ({ page }) => {
   await open32Gear(page);
 
-  const radar = page.locator('.hd-se-check', { hasText: '電探' }).filter({ hasNotText: '高速化セット' }).first();
+  const radar = page.locator('.hd-se-check').filter({ has: page.locator('.hd-se-check-head strong', { hasText: /^電探$/ }) });
   await radar.locator('[data-hd-ag-kind="電探"]').click();
 
   const dialog = page.locator('#hdAcquisitionDialog');
