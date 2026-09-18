@@ -95,15 +95,17 @@ function hdSPASelectContext(ref){
  }catch{return false}
 }
 function hdSPAReview(key,action,mode){
+ if(!['prep','optimize'].includes(action))return false;
+ if(action==='optimize'&&mode&&!['stable','firepower','route','boss','reserve'].includes(mode))return false;
  const row=hdSPARows().find(x=>x.key===key),ref=row?.recentRef;if(!row||!ref?.map)return false;
  if(!hdSPASelectContext(ref))return false;
  if(action==='prep'){
-  setTimeout(()=>{if(typeof hdSPSOpen==='function')hdSPSOpen();else if(typeof hdWSShowElement==='function')hdWSShowElement('hdSortiePreparation',true)},100);
+  if(typeof hdSPSOpen==='function')hdSPSOpen();else if(typeof hdWSShowElement==='function')hdWSShowElement('hdSortiePreparation',true);
   return true;
  }
  if(action==='optimize'){
   try{if(typeof hdFOSetStoredMode==='function')hdFOSetStoredMode(mode||'stable');else localStorage.setItem('harbordesk-fleet-optimizer-mode-v1',mode||'stable')}catch{}
-  setTimeout(()=>{if(typeof hdFSOpen==='function')hdFSOpen();else if(typeof hdWSShowElement==='function')hdWSShowElement('hdFleetSuggester',true)},120);
+  if(typeof hdFSOpen==='function')hdFSOpen();else if(typeof hdWSShowElement==='function')hdWSShowElement('hdFleetSuggester',true);
   return true;
  }
  return false;
@@ -141,7 +143,8 @@ function hdSPAMaps(){
  return maps;
 }
 function hdSPATrendDelta(label,value,suffix='',goodWhen='up'){
- if(value==null||value===0)return '<span>'+hdSPAEsc(label)+' <b>±0'+hdSPAEsc(suffix)+'</b></span>';
+ if(value==null)return '<span>'+hdSPAEsc(label)+' <b>比較不可</b></span>';
+ if(value===0)return '<span>'+hdSPAEsc(label)+' <b>±0'+hdSPAEsc(suffix)+'</b></span>';
  const good=goodWhen==='up'?value>0:value<0,sign=value>0?'+':'';
  return '<span class="'+(good?'good':'bad')+'">'+hdSPAEsc(label)+' <b>'+sign+value+hdSPAEsc(suffix)+'</b></span>';
 }
@@ -183,7 +186,7 @@ function hdSPAReopen(key){
   if(typeof selectedMap!=='undefined')selectedMap=ref.map;
   if(typeof renderMapPicker==='function')renderMapPicker();
   if(typeof hdSPMSelect==='function')hdSPMSelect(ref.map,ref.fleetId);
-  setTimeout(()=>{if(typeof hdSPSOpen==='function')hdSPSOpen();else if(typeof hdWSShowElement==='function')hdWSShowElement('hdSortiePreparation',true)},80);
+  if(typeof hdSPSOpen==='function')hdSPSOpen();else if(typeof hdWSShowElement==='function')hdWSShowElement('hdSortiePreparation',true);
   return true;
  }catch{return false}
 }

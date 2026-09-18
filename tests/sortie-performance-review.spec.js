@@ -138,3 +138,61 @@ test('prep review action keeps the saved fleet selected and opens sortie prepara
   })).toBe('stable1');
   await expect(page.locator('#hdSortiePreparation')).toBeVisible({timeout:5000});
 });
+
+for (const action of ['prep', 'optimize', 'reopen']) {
+  test(`${action} opens synchronously and preserves a newer workspace choice`, async ({ page }) => {
+    await boot(page);
+    await seed(page);
+    await page.evaluate(() => hdWSShowElement('sortieLog', false));
+    const result = await page.evaluate(action => {
+      const ok = action === 'reopen' ? hdSPAReopen('stable1') : hdSPAReview('stable1', action, 'route');
+      const id = action === 'optimize' ? 'hdFleetSuggester' : 'hdSortiePreparation';
+      const visible = document.getElementById(id).getBoundingClientRect().height > 0;
+      document.querySelector('[data-hd-ws-group="settings"]').click();
+      return { ok, visible };
+    }, action);
+    expect(result).toEqual({ ok: true, visible: true });
+    await page.waitForTimeout(2000);
+    await expect(page.locator('[data-hd-ws-group="settings"]')).toHaveClass(/active/);
+    await expect(page.locator('#hdFleetSuggester')).not.toBeVisible();
+    await expect(page.locator('#hdSortiePreparation')).not.toBeVisible();
+  });
+}
+
+test('quick navigation cannot overwrite a later workspace choice', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => {
+    hdWSPatchQuickNav();
+    hdQNJump('backup');
+    document.querySelector('[data-hd-ws-group="quest"]').click();
+  });
+  await page.waitForTimeout(2000);
+  await expect(page.locator('[data-hd-ws-group="quest"]')).toHaveClass(/active/);
+  await expect(page.locator('#backup')).not.toBeVisible();
+});
+
+test('invalid review requests leave the map and optimizer settings unchanged', async ({ page }) => {
+  await boot(page);
+  await seed(page);
+  const result = await page.evaluate(() => {
+    const before = { map: selectedMap, mode: localStorage.getItem('harbordesk-fleet-optimizer-mode-v1') };
+    const invalidAction = hdSPAReview('stable1', 'invalid', 'route');
+    const invalidMode = hdSPAReview('stable1', 'optimize', 'invalid');
+    return { before, after: { map: selectedMap, mode: localStorage.getItem('harbordesk-fleet-optimizer-mode-v1') }, invalidAction, invalidMode };
+  });
+  expect(result.after).toEqual(result.before);
+  expect(result.invalidAction).toBe(false);
+  expect(result.invalidMode).toBe(false);
+});
+
+test('missing trend observations are distinguished from zero change', async ({ page }) => {
+  await boot(page);
+  const result = await page.evaluate(() => {
+    const trend = hdSPATrend(Array.from({ length: 6 }, (_, i) => ({ at: i, result: 'S', boss: true })), 3);
+    return { html: hdSPATrendHtml({ trend }), recommendations: hdSPARecommendations({ trend }) };
+  });
+  expect(result.html).toContain('時間 <b>比較不可</b>');
+  expect(result.html).toContain('確認 <b>比較不可</b>');
+  expect(result.html).toContain('S率 <b>±0pt</b>');
+  expect(result.recommendations).toEqual([]);
+});

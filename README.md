@@ -22,3 +22,10 @@ Settings → Pages → Build and deployment → Source を `GitHub Actions` に�
 
 ## 注意
 攻略情報はゲーム更新で変わる可能性があります。出撃・装備更新など重要な操作前はリンク先の最新版も確認してください。
+
+## 開発・公開の確認
+- `app-version.json`、`update-manager.js`、`sw.js` のバージョンとbuildを揃えて更新します。
+- mainへのpushで構文・キャッシュ整合性・全テストをChromium / WebKitで確認し、成功後にPagesへ公開します。WebKitはSafari系の互換性確認であり、iPhone実機テストの代替ではありません。
+- Actionsでは最新mainのコミットSHAとrunのHEADが一致すること、テストとDeployの両ステップが成功したことを確認します。古いrunのcancelledは最新runの結果とは別です。
+- iPhoneでは公開後に「更新確認」→「今すぐ更新」で反映できます。Mac・Xcodeは不要です。
+- ローカル検証時は `npm install --no-save --no-package-lock @playwright/test@1.55.0`、`npx playwright install --with-deps chromium webkit` を実行し、別ターミナルで `python3 -m http.server 4173`、続いて `npx playwright test` を実行します。
