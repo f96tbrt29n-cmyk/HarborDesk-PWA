@@ -30,7 +30,15 @@ function hdQNOpen(){
   setTimeout(()=>input?.focus(),50);
 }
 function hdQNClose(){const d=document.getElementById('hdQuickNavDialog');if(!d)return;if(typeof d.close==='function'&&d.open)d.close();else d.removeAttribute('open')}
-function hdQNJump(id){const target=document.getElementById(id);if(!target)return;hdQNRecordRecent(id);hdQNClose();target.scrollIntoView({behavior:'smooth',block:'start'});target.classList.add('hd-qn-flash');setTimeout(()=>target.classList.remove('hd-qn-flash'),900)}
+function hdQNJump(id){
+ const target=document.getElementById(id);if(!target)return false;
+ hdQNRecordRecent(id);hdQNClose();
+ if(typeof hdGSClose==='function')hdGSClose();
+ if(typeof hdWSShowElement==='function')hdWSShowElement(target,false);
+ target.scrollIntoView({behavior:'smooth',block:'start'});
+ target.classList.add('hd-qn-flash');setTimeout(()=>target.classList.remove('hd-qn-flash'),900);
+ return true;
+}
 function hdQNTogglePin(id){const pins=hdQNLoadPins(),set=new Set(pins);set.has(id)?set.delete(id):set.add(id);hdQNSavePins([...set]);hdQNRenderList(document.getElementById('hdQNSearch')?.value||'');window.dispatchEvent(new CustomEvent('hd:quick-nav-updated'))}
 function hdQNEnsure(){
   if(document.getElementById('hdQuickNavButton'))return;
