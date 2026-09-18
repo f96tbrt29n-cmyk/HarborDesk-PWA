@@ -205,6 +205,61 @@ function hdMapDropStats(map){
  const rows=hdMapDropUnique(map),owned=rows.filter(x=>hdDropOwned(x.ship)).length,featured=rows.filter(x=>x.featured).length,missing=Math.max(0,rows.length-owned);
  return {total:rows.length,owned,missing,featured,rate:rows.length?Math.round(owned/rows.length*100):0};
 }
+function hdMapDropShipType(ship){
+ const norm=String(ship||'').normalize('NFKC');
+ const curated=HD_DROP_TARGETS.find(x=>x.ship===ship);
+ if(curated?.type)return curated.type;
+ try{
+  const roster=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')||[];
+  const own=roster.find(x=>{
+   const name=String(x.name||'').normalize('NFKC');
+   return name===norm||name.startsWith(norm);
+  });
+  if(own?.type)return own.type;
+ }catch{}
+ if(typeof HD_SHIP_DATABASE!=='undefined'){
+  const db=HD_SHIP_DATABASE.find(x=>{
+   return [x.base,x.final].some(n=>{
+    const name=String(n||'').normalize('NFKC');
+    return name===norm||name.startsWith(norm);
+   });
+  });
+  if(db?.type)return db.type;
+ }
+ return '艦娘';
+}
+function hdMapDropReverseIndex(){
+ const rows=new Map();
+ const curatedByShip=new Map(HD_DROP_TARGETS.map(x=>[x.ship,x]));
+ for(const [map,data] of Object.entries(HD_MAP_DROP_DATA)){
+  for(const node of data?.nodes||[]){
+   const featured=new Set(hdMapDropNames(node.featured));
+   for(const ship of hdMapDropNames(node.ships)){
+    if(!rows.has(ship))rows.set(ship,{ship,type:hdMapDropShipType(ship),locations:[],source:'HarborDesk 海域ドロップ表',checked:HD_MAP_DROP_CHECKED,featured:false});
+    const row=rows.get(ship),curated=curatedByShip.get(ship);
+    const detailed=(curated?.locations||[]).find(l=>l.map===map&&(
+      l.node===node.node||
+      String(l.node||'').includes(String(node.node||'').replace(' ボス',''))||
+      String(node.node||'').includes(String(l.node||'').replace(' ボス',''))
+    ));
+    row.featured=row.featured||featured.has(ship);
+    row.locations.push({
+      map,
+      node:node.node,
+      rank:detailed?.rank||node.rank||'S中心',
+      note:detailed?.note||node.note||data.note||'海域ドロップタブ収録。限定・条件付きドロップは最新Wikiも確認してね。',
+      featured:featured.has(ship),
+      kind:node.kind||'boss'
+    });
+    if(curated?.source)row.source=curated.source;
+    if(curated?.checked)row.checked=curated.checked;
+   }
+  }
+ }
+ return [...rows.values()].sort((a,b)=>a.ship.localeCompare(b.ship,'ja'));
+}
+function hdDropAllTargets(){return hdMapDropReverseIndex()}
+
 function hdMapDropWikiUrl(map){return 'https://wikiwiki.jp/kancolle/%E5%87%BA%E6%92%83%E3%83%89%E3%83%AD%E3%83%83%E3%83%97/'+encodeURIComponent(map)}
 function hdMapDropHuntActive(ship,map,node){return hdDropHunts().some(x=>x.ship===ship&&x.map===map&&x.node===node&&!x.obtained)}
 function hdMapDropShipHtml(ship,map,node,featured){
