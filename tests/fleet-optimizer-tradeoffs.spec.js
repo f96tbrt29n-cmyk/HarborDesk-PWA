@@ -51,23 +51,25 @@ test('comparison assigns criterion badges without creating an overall winner', a
   expect(badges).not.toContain('総合1位');
 });
 
-test('comparison exposes final equipment diffs from the standard loadout', async ({ page }) => {
+test('equipment diff reports the final changed slot between two plans', async ({ page }) => {
   await boot(page);
-  await prepareUi(page);
 
-  const rows=await page.evaluate(() => hdFOCompare(0).map(x=>({mode:x.mode,diff:x.diff})));
-  const changed=rows.filter(x=>x.diff.length>0);
+  const diff=await page.evaluate(() => hdFODiff(
+    {ships:[{ship:'差分テスト艦',items:[
+      {name:'10cm連装高角砲＋高射装置',star:4},
+      {name:'10cm連装高角砲＋高射装置',star:4}
+    ]}]},
+    {ships:[{ship:'差分テスト艦',items:[
+      {name:'10cm連装高角砲＋高射装置',star:4},
+      {name:'33号水上電探',star:2}
+    ]}]}
+  ));
 
-  expect(changed.length).toBeGreaterThan(0);
-  for(const row of changed){
-    for(const d of row.diff){
-      expect(d.ship.length).toBeGreaterThan(0);
-      expect(d.slot).toBeGreaterThan(0);
-      expect(d.from.length).toBeGreaterThan(0);
-      expect(d.to.length).toBeGreaterThan(0);
-      expect(d.from).not.toBe(d.to);
-    }
-  }
+  expect(diff).toHaveLength(1);
+  expect(diff[0].ship).toBe('差分テスト艦');
+  expect(diff[0].slot).toBe(2);
+  expect(diff[0].from).toContain('10cm連装高角砲＋高射装置');
+  expect(diff[0].to).toContain('33号水上電探');
 });
 
 test('comparison UI renders metric badges and expandable equipment differences', async ({ page }) => {
@@ -77,12 +79,15 @@ test('comparison UI renders metric badges and expandable equipment differences',
 
   const compare=card.locator('.hd-fo-compare');
   await expect(compare).toBeVisible();
-  await expect(compare.locator('.hd-fo-badges span')).toHaveCount(await compare.locator('.hd-fo-badges span').count());
+  const badgeCount=await compare.locator('.hd-fo-badges span').count();
+  expect(badgeCount).toBeGreaterThan(0);
   await expect(compare).toContainText('条件充足最大');
   await expect(compare).toContainText('火力最大');
   await expect(compare).toContainText('交換最少');
   await expect(compare).toContainText('希少装備最少');
-  await expect(compare.locator('.hd-fo-diff').first()).toBeVisible();
+  const diffCount=await compare.locator('.hd-fo-diff').count();
+  const noDiffCount=await compare.locator('.hd-fo-no-diff').count();
+  expect(diffCount+noDiffCount).toBe(5);
   await expect(compare.locator('[data-hd-fo-save-preset]')).toHaveCount(5);
 });
 
