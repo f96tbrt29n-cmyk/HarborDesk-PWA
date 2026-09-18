@@ -49,7 +49,17 @@ const HD_SHIP_DATABASE=[
  {base:'龍驤',final:'龍驤改二',type:'軽空母',speed:'高速',targetLv:75,path:'龍驤 → 龍驤改(Lv25) → 龍驤改二(Lv75)',requirements:'Lv75',roles:['軽空母','高速','航空火力','制空'],note:'28機スロットを活かした攻撃機・艦戦運用が特徴。高速軽空母枠の有力候補。'},
  {base:'隼鷹',final:'隼鷹改二',type:'軽空母',speed:'低速',targetLv:80,path:'隼鷹 → 隼鷹改(Lv25) → 隼鷹改二(Lv80)',requirements:'Lv80',roles:['軽空母','低速','航空火力','高運'],note:'搭載66・高運の低速軽空母。速力制限がない海域で航空戦力を出しやすい。'},
  {base:'神鷹',final:'神鷹改二',type:'軽空母',speed:'低速',targetLv:85,path:'神鷹 → 神鷹改(Lv60) → 神鷹改二(Lv85)',requirements:'Lv85＋試製甲板カタパルト＋改装設計図＋開発資材×40',roles:['護衛空母','対潜','先制対潜','護衛'],note:'高対潜の護衛空母。潜水艦が多い海域や輸送護衛で役割を持ちやすい。'},
- {base:'大鷹',final:'大鷹改二',type:'軽空母',speed:'低速',targetLv:85,path:'春日丸 → 大鷹(Lv30) → 大鷹改(Lv60) → 大鷹改二(Lv85)',requirements:'Lv85＋試製甲板カタパルト＋改装設計図',roles:['護衛空母','対潜','先制対潜','護衛'],note:'高対潜の護衛空母。対潜攻撃と船団護衛を兼ねる軽空母枠。'}
+ {base:'大鷹',final:'大鷹改二',type:'軽空母',speed:'低速',targetLv:85,path:'春日丸 → 大鷹(Lv30) → 大鷹改(Lv60) → 大鷹改二(Lv85)',requirements:'Lv85＋試製甲板カタパルト＋改装設計図',roles:['護衛空母','対潜','先制対潜','護衛'],note:'高対潜の護衛空母。対潜攻撃と船団護衛を兼ねる軽空母枠。'},
+ {base:'Zara',final:'Zara due',type:'重巡洋艦',speed:'高速',targetLv:88,path:'Zara → Zara改(Lv40) → Zara due(Lv88)',requirements:'Lv88＋改装設計図',roles:['水戦','制空補助','重巡','対地'],note:'水戦・水爆を扱える重巡。射程長で、制空補助や対地を兼ねやすい。'},
+ {base:'Gotland',final:'Gotland andra',type:'軽巡洋艦',speed:'高速',targetLv:85,path:'Gotland → Gotland改(Lv55) → Gotland andra(Lv85)',requirements:'Lv85＋試製甲板カタパルト＋改装設計図＋高速建造材×35＋開発資材×55',roles:['4スロット','対潜','索敵','水上機','夜戦'],note:'4スロットの軽航空巡洋艦。水上機・対潜・夜戦補助を柔軟に組める。'},
+ {base:'Johnston',final:'Johnston改',type:'駆逐艦',speed:'高速',targetLv:55,path:'Johnston → Johnston改(Lv55)',requirements:'Lv55＋高速建造材×10＋開発資材×80',roles:['対空CI','自動先制対潜','高運','夜戦CI'],note:'高対空・高対潜・高運を併せ持つFletcher級。防空と対潜を両立しやすい。'},
+ {base:'響',final:'Верный',type:'駆逐艦',speed:'高速',targetLv:70,path:'響 → 響改(Lv20) → Верный(Lv70)',requirements:'Lv70',roles:['対潜','対地','輸送','高耐久'],note:'駆逐艦として耐久・装甲が高く、大発系や内火艇を使う対地・輸送でも便利。'},
+ {base:'妙高',final:'妙高改二',type:'重巡洋艦',speed:'高速',targetLv:70,path:'妙高 → 妙高改(Lv25) → 妙高改二(Lv70)',requirements:'Lv70',roles:['夜戦CI','高運','重巡','対艦'],note:'高めの運と夜戦火力を持つ重巡。魚雷CIや通常連撃の両方に対応。'},
+ {base:'羽黒',final:'羽黒改二',type:'重巡洋艦',speed:'高速',targetLv:65,path:'羽黒 → 羽黒改(Lv25) → 羽黒改二(Lv65)',requirements:'Lv65',roles:['高火力','重巡','夜戦','対艦'],note:'火力85の攻撃寄り重巡。昼連撃から夜戦まで扱いやすい。'},
+ {base:'鬼怒',final:'鬼怒改二',type:'軽巡洋艦',speed:'高速',targetLv:75,path:'鬼怒 → 鬼怒改(Lv17) → 鬼怒改二(Lv75)',requirements:'Lv75＋改装設計図',roles:['輸送','大発','対潜','防空','遠征'],note:'大発系を扱え、輸送・遠征・対潜・防空をまとめて担当しやすい。'},
+ {base:'綾波',final:'綾波改二',type:'駆逐艦',speed:'高速',targetLv:70,path:'綾波 → 綾波改(Lv20) → 綾波改二(Lv70)',requirements:'Lv70',roles:['高火力','夜戦CI','高運','駆逐主力'],note:'高火力・高運の夜戦向け駆逐。魚雷CIと連撃を使い分けやすい。'},
+ {base:'大潮',final:'大潮改二',type:'駆逐艦',speed:'高速',targetLv:65,path:'大潮 → 大潮改(Lv20) → 大潮改二(Lv65)',requirements:'Lv65＋改装設計図',roles:['対地','輸送','大発','夜戦'],note:'大発・内火艇を扱える高雷装駆逐。輸送と対地の両方で使いやすい。'},
+ {base:'大淀',final:'大淀改',type:'軽巡洋艦',speed:'高速',targetLv:35,path:'大淀 → 大淀改(Lv35)',requirements:'Lv35',roles:['4スロット','索敵','司令部','昼連撃'],note:'高索敵の4スロ軽巡。艦隊司令部施設や偵察機を使う連合艦隊運用で便利。'}
 ];
 
 
@@ -103,7 +113,17 @@ const HD_SHIP_STATS={
  '龍驤改二':{hp:50,armor:62,evasion:69,fire:40,torp:0,aa:48,asw:0,los:79,luck:15,air:55,fuel:40,ammo:45,range:'短'},
  '隼鷹改二':{hp:55,armor:62,evasion:84,fire:40,torp:0,aa:74,asw:0,los:79,luck:41,air:66,fuel:45,ammo:50,range:'短'},
  '神鷹改二':{hp:50,armor:56,evasion:53,fire:37,torp:0,aa:58,asw:88,los:64,luck:15,air:51,fuel:35,ammo:35,range:'中'},
- '大鷹改二':{hp:49,armor:55,evasion:54,fire:39,torp:0,aa:54,asw:89,los:68,luck:14,air:39,fuel:35,ammo:35,range:'中'}
+ '大鷹改二':{hp:49,armor:55,evasion:54,fire:39,torp:0,aa:54,asw:89,los:68,luck:14,air:39,fuel:35,ammo:35,range:'中'},
+ 'Zara due':{hp:62,armor:88,evasion:73,fire:87,torp:48,aa:90,asw:0,los:64,luck:17,air:15,fuel:50,ammo:80,range:'長'},
+ 'Gotland andra':{hp:47,armor:67,evasion:78,fire:60,torp:73,aa:90,asw:60,los:72,luck:26,air:14,fuel:30,ammo:35,range:'中'},
+ 'Johnston改':{hp:34,armor:52,evasion:89,fire:55,torp:72,aa:90,asw:90,los:60,luck:40,air:0,fuel:20,ammo:20,range:'短'},
+ 'Верный':{hp:37,armor:58,evasion:89,fire:58,torp:89,aa:65,asw:77,los:44,luck:20,air:0,fuel:15,ammo:25,range:'短'},
+ '妙高改二':{hp:56,armor:80,evasion:88,fire:82,torp:88,aa:80,asw:0,los:61,luck:32,air:12,fuel:45,ammo:75,range:'中'},
+ '羽黒改二':{hp:57,armor:78,evasion:86,fire:85,torp:84,aa:76,asw:0,los:58,luck:19,air:12,fuel:45,ammo:75,range:'中'},
+ '鬼怒改二':{hp:45,armor:68,evasion:82,fire:58,torp:84,aa:86,asw:87,los:60,luck:17,air:3,fuel:25,ammo:30,range:'短'},
+ '綾波改二':{hp:32,armor:54,evasion:90,fire:76,torp:89,aa:52,asw:63,los:51,luck:40,air:0,fuel:15,ammo:20,range:'短'},
+ '大潮改二':{hp:31,armor:51,evasion:90,fire:67,torp:90,aa:62,asw:64,los:54,luck:17,air:0,fuel:15,ammo:20,range:'短'},
+ '大淀改':{hp:47,armor:69,evasion:78,fire:71,torp:49,aa:77,asw:39,los:84,luck:30,air:12,fuel:35,ammo:35,range:'中'}
 };
 
 const HD_SHIP_LOADOUTS={
@@ -306,6 +326,46 @@ const HD_SHIP_LOADOUTS={
  '大鷹改二':[
   {name:'護衛空母・対潜',gear:['対潜値の高い艦攻','対潜値の高い艦攻','高性能艦戦','彩雲/対潜艦攻'],memo:'最大対潜89を活かす船団護衛向け。'},
   {name:'対潜＋制空',gear:['対潜値の高い艦攻','高性能艦戦','高性能艦戦','彩雲'],memo:'潜水対策と最低限の制空を両立。'}
+ ],
+ 'Zara due':[
+  {name:'重巡連撃＋水戦',gear:['203mm/53 連装砲','203mm/53 連装砲','零式水上偵察機11型乙(熟練)','二式水戦改(熟練)'],memo:'重巡火力を維持しながら水戦で制空補助。'},
+  {name:'対地',gear:['主砲','主砲','三式弾','水戦/水偵'],memo:'陸上型相手の基本。敵に応じて対地装備を調整。'}
+ ],
+ 'Gotland andra':[
+  {name:'4スロ連撃',gear:['15.2cm連装砲改二','15.2cm連装砲改二','零式水上偵察機11型乙(熟練)','高性能電探'],memo:'4スロを使って昼連撃・索敵・命中をまとめる。'},
+  {name:'対潜＋補助',gear:['四式水中聴音機','対潜爆雷投射機','爆雷','水偵/夜戦補助'],memo:'対潜3点セットに1枠の補助装備を追加。'}
+ ],
+ 'Johnston改':[
+  {name:'対空CI',gear:['5inch単装砲 Mk.30 改','5inch単装砲 Mk.30 改','GFCS Mk.37'],memo:'Fletcher級の防空性能を活かす定番。'},
+  {name:'先制対潜',gear:['HF/DF + Type144/147 ASDIC','RUR-4A Weapon Alpha改','5inch単装砲 Mk.30 改'],memo:'高対潜90を活かして対潜と防空を両立。'}
+ ],
+ 'Верный':[
+  {name:'対地',gear:['大発動艇(八九式中戦車＆陸戦隊)','特二式内火艇','主砲/補助装備'],memo:'耐久の高さと対地装備適性を活かす。'},
+  {name:'対潜',gear:['四式水中聴音機','対潜爆雷投射機','爆雷'],memo:'対潜77を活かす標準対潜型。'}
+ ],
+ '妙高改二':[
+  {name:'重巡連撃',gear:['20.3cm(3号)連装砲','20.3cm(3号)連装砲','零式水上偵察機11型乙(熟練)','高性能電探'],memo:'昼夜連撃と索敵を両立。'},
+  {name:'魚雷CI',gear:['61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷','夜戦補助/電探','高性能水偵'],memo:'運32を活かして夜戦CIを狙う高難度向け。'}
+ ],
+ '羽黒改二':[
+  {name:'高火力連撃',gear:['20.3cm(3号)連装砲','20.3cm(3号)連装砲','零式水上偵察機11型乙(熟練)','高性能電探'],memo:'火力85を活かした標準重巡構成。'},
+  {name:'夜戦火力',gear:['20.3cm(3号)連装砲','20.3cm(3号)連装砲','夜戦補助','高性能水偵'],memo:'連撃を維持しつつ夜戦支援装備を追加。'}
+ ],
+ '鬼怒改二':[
+  {name:'輸送',gear:['大発動艇','大発動艇','大発動艇'],memo:'輸送量を優先するTP海域向け。'},
+  {name:'対潜＋輸送',gear:['四式水中聴音機','対潜爆雷投射機','大発動艇'],memo:'高対潜87を活かしながら輸送も担当。'}
+ ],
+ '綾波改二':[
+  {name:'魚雷CI',gear:['61cm五連装(酸素)魚雷','61cm五連装(酸素)魚雷','水雷戦隊 熟練見張員'],memo:'運40と高火力を活かす夜戦フィニッシャー。'},
+  {name:'夜戦連撃',gear:['高性能駆逐主砲','高性能駆逐主砲','水上電探'],memo:'安定重視の昼夜連撃型。'}
+ ],
+ '大潮改二':[
+  {name:'対地',gear:['大発動艇(八九式中戦車＆陸戦隊)','特二式内火艇','主砲/対地補助'],memo:'対地火力を優先する陸上型向け。'},
+  {name:'輸送',gear:['大発動艇','大発動艇','大発動艇'],memo:'TP輸送量を優先。'}
+ ],
+ '大淀改':[
+  {name:'4スロ索敵連撃',gear:['15.2cm連装砲改二','15.2cm連装砲改二','零式水上偵察機11型乙(熟練)','高性能電探'],memo:'索敵84を活かして分岐と昼連撃を安定。'},
+  {name:'司令部・連合艦隊',gear:['主砲','主砲','艦隊司令部施設','高性能水偵'],memo:'連合艦隊旗艦で護衛退避を使う場合の構成例。'}
  ]
 };
 
