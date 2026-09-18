@@ -44,11 +44,28 @@ function hdSLResetForm(){
  const map=document.getElementById('hdSLMap'),node=document.getElementById('hdSLNode'),drop=document.getElementById('hdSLDrop'),memo=document.getElementById('hdSLMemo');if(map)map.value='';if(node)node.value='';if(drop)drop.value='';if(memo)memo.value='';
  for(const id of ['hdSLBuckets','hdSLFuel','hdSLAmmo','hdSLSteel','hdSLBauxite']){const el=document.getElementById(id);if(el)el.value='0'}const battles=document.getElementById('hdSLBattles');if(battles)battles.value='1';const boss=document.getElementById('hdSLBoss');if(boss)boss.checked=false;const obtained=document.getElementById('hdSLTargetObtained');if(obtained)obtained.checked=false;
 }
+function hdSLRecordEntry(input={}){
+ const now=Date.now(),map=String(input.map||'').trim();if(!map)return null;
+ const result=input.result||'S',entry={
+  id:input.id||hdSLUid(),at:Number(input.at)||now,map,node:String(input.node||'').trim(),result,
+  boss:!!input.boss,retreat:input.retreat!=null?!!input.retreat:result==='撤退',
+  battles:Math.max(0,Math.min(20,Number(input.battles)||0)),drop:String(input.drop||'').trim(),
+  buckets:Math.max(0,Number(input.buckets)||0),fuel:Math.max(0,Number(input.fuel)||0),ammo:Math.max(0,Number(input.ammo)||0),
+  steel:Math.max(0,Number(input.steel)||0),bauxite:Math.max(0,Number(input.bauxite)||0),memo:String(input.memo||'').trim(),
+  huntId:String(input.huntId||''),huntShip:String(input.huntShip||''),targetObtained:!!input.targetObtained
+ };
+ for(const k of ['sessionId','fleetId','fleetName','strategy','strategyLabel','startedAt','durationMs','fleetSnapshot','readinessSnapshot']){
+  if(input[k]!=null)entry[k]=input[k];
+ }
+ entry.activityRefs=hdSLApplyActivity(entry);entry.activityLogIds=entry.activityRefs.map(x=>x.id);entry.huntDelta=hdSLApplyHunt(entry);
+ const rows=hdSLLoad();rows.unshift(entry);hdSLSave(rows);hdSLRender();try{if(typeof hdCCRender==='function')hdCCRender()}catch{}
+ return entry;
+}
 function hdSLRecord(){
  const hunt=hdSLSelectedHunt(),map=(document.getElementById('hdSLMap')?.value||hunt?.map||'').trim(),node=(document.getElementById('hdSLNode')?.value||hunt?.node||'').trim(),result=document.getElementById('hdSLResult')?.value||'S';
  if(!map){alert('海域を入力してね');return}
- const entry={id:hdSLUid(),at:Date.now(),map,node,result,boss:!!document.getElementById('hdSLBoss')?.checked,retreat:result==='撤退',battles:Math.max(0,Math.min(20,hdSLNum('hdSLBattles'))),drop:(document.getElementById('hdSLDrop')?.value||'').trim(),buckets:hdSLNum('hdSLBuckets'),fuel:hdSLNum('hdSLFuel'),ammo:hdSLNum('hdSLAmmo'),steel:hdSLNum('hdSLSteel'),bauxite:hdSLNum('hdSLBauxite'),memo:(document.getElementById('hdSLMemo')?.value||'').trim(),huntId:hunt?.id||'',huntShip:hunt?.ship||'',targetObtained:!!document.getElementById('hdSLTargetObtained')?.checked};
- entry.activityRefs=hdSLApplyActivity(entry);entry.activityLogIds=entry.activityRefs.map(x=>x.id);entry.huntDelta=hdSLApplyHunt(entry);const rows=hdSLLoad();rows.unshift(entry);hdSLSave(rows);hdSLResetForm();if(hunt){const sel=document.getElementById('hdSLHunt');if(sel)sel.value=hunt.id;hdSLFillFromHunt()}hdSLRender();try{if(typeof hdCCRender==='function')hdCCRender()}catch{}
+ const entry=hdSLRecordEntry({map,node,result,boss:!!document.getElementById('hdSLBoss')?.checked,retreat:result==='撤退',battles:Math.max(0,Math.min(20,hdSLNum('hdSLBattles'))),drop:(document.getElementById('hdSLDrop')?.value||'').trim(),buckets:hdSLNum('hdSLBuckets'),fuel:hdSLNum('hdSLFuel'),ammo:hdSLNum('hdSLAmmo'),steel:hdSLNum('hdSLSteel'),bauxite:hdSLNum('hdSLBauxite'),memo:(document.getElementById('hdSLMemo')?.value||'').trim(),huntId:hunt?.id||'',huntShip:hunt?.ship||'',targetObtained:!!document.getElementById('hdSLTargetObtained')?.checked});
+ if(!entry)return;hdSLResetForm();if(hunt){const sel=document.getElementById('hdSLHunt');if(sel)sel.value=hunt.id;hdSLFillFromHunt()}
 }
 function hdSLUndoActivityChanges(changes){if(!Array.isArray(changes)||!changes.length)return;try{const store=typeof hdALStore==='function'?hdALStore():JSON.parse(localStorage.getItem('harbordesk-quest-progress-v1')||'{}')||{};for(const c of changes){const row=store[c.id];if(!row||row.periodKey!==c.periodKey)continue;row.values=row.values||[];row.values[c.index]=Math.max(0,(Number(row.values[c.index])||0)-(Number(c.delta)||0));row.updatedAt=Date.now();store[c.id]=row}if(typeof hdALSaveStore==='function')hdALSaveStore(store);else localStorage.setItem('harbordesk-quest-progress-v1',JSON.stringify(store))}catch{}}
 function hdSLDelete(id){
