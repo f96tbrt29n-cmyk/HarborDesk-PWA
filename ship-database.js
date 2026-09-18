@@ -8568,6 +8568,19 @@ const HD_EXSLOT_LIMIT_TYPE_IDS={
   27
  ]
 };
+const HD_PICKER_TYPE_SP_OVERRIDES={128:38,281:38,465:38,142:93,460:93,151:94,561:91};
+const HD_PICKER_TYPE_OVERRIDES={467:95};
+const HD_SLOT_EXCLUSION_RULES=[
+ {shipIds:[553,554],slot:2,fromSlot:true,exclude:[2,3]},
+ {shipIds:[622,623,624],slot:3,exclude:[1,2,5,22]},
+ {shipIds:[622,623,624],slot:4,allowOnly:[12,21,43]},
+ {shipIds:[662,663,668],slot:3,exclude:[5]},
+ {shipIds:[963,968],slot:3,exclude:[1,5,13]},
+ {shipIds:[978],slot:2,exclude:[2]},
+ {shipIds:[961,1035],slot:3,exclude:[1,5]},
+ {shipIds:[743,744,745],slot:3,allowOnly:[21,43]}
+];
+const HD_EQUIP_TYPE_LABELS={1:'小口径主砲',2:'中口径主砲',3:'大口径主砲',5:'魚雷',12:'小型電探',13:'大型電探',21:'対空機銃',22:'特殊潜航艇',43:'戦闘糧食',38:'大口径主砲(II)',91:'噴式戦闘爆撃機(II)',93:'大型電探(II)',94:'艦上偵察機(II)',95:'副砲(II)'};
 const HD_SHIP_EXPANSION_SPECIAL={
  '綾波改二':['12.7cm単装高角砲系'],
  '潮改二':['12.7cm単装高角砲系'],
@@ -8590,8 +8603,13 @@ function hdShipDbSlotProfile(ship){
 function hdShipDbMasterMeta(item){
  return HD_EQUIPMENT_MASTER_META_BY_NAME[String(item?.name||'')]||null;
 }
+function hdShipDbPickerTypeId(item){
+ const exact=hdShipDbMasterMeta(item);
+ if(exact?.id){const id=Number(exact.id);return Number(HD_PICKER_TYPE_OVERRIDES[id]??HD_PICKER_TYPE_SP_OVERRIDES[id]??exact.typeId??0)}
+ const ids=HD_EQUIPMENT_CATEGORY_MASTER_TYPE_IDS[String(item?.category||'')]||[];return Number(ids[0]||0);
+}
 function hdShipDbMasterTypeIdsForItem(item){
- const exact=hdShipDbMasterMeta(item);if(exact?.typeId)return [Number(exact.typeId)];
+ const exact=hdShipDbMasterMeta(item);if(exact?.id)return [hdShipDbPickerTypeId(item)].filter(Boolean);
  return HD_EQUIPMENT_CATEGORY_MASTER_TYPE_IDS[String(item?.category||'')]||[];
 }
 function hdShipDbMasterCompatible(item,ship){
@@ -8639,6 +8657,17 @@ function hdShipDbExpansionHtml(ship){
  if(!rows.length)return '<div class="hd-shipdb-expansion-owned"><b>手持ち増設候補</b><span>装備台帳に搭載可能な候補なし</span></div>';
  return `<div class="hd-shipdb-expansion-owned"><b>手持ち増設候補</b><div>${rows.map(({own})=>`<span>${hdShipDbEsc(own.name)}${own.maxStar?` ★${own.maxStar}`:''}</span>`).join('')}</div></div>`;
 }
+function hdShipDbSlotRules(profile,index){
+ if(!profile)return [];return HD_SLOT_EXCLUSION_RULES.filter(r=>r.shipIds.includes(Number(profile.id))&&(r.fromSlot?index>=r.slot:index===r.slot));
+}
+function hdShipDbSlotRejects(profile,index,item){
+ const typeId=hdShipDbPickerTypeId(item);if(!typeId)return false;
+ return hdShipDbSlotRules(profile,index).some(r=>Array.isArray(r.allowOnly)?!r.allowOnly.includes(typeId):Array.isArray(r.exclude)&&r.exclude.includes(typeId));
+}
+function hdShipDbSlotRuleText(profile,index){
+ const rules=hdShipDbSlotRules(profile,index);if(!rules.length)return '';
+ return rules.map(r=>Array.isArray(r.allowOnly)?'許可のみ: '+r.allowOnly.map(x=>HD_EQUIP_TYPE_LABELS[x]||('#'+x)).join('・'):'不可: '+(r.exclude||[]).map(x=>HD_EQUIP_TYPE_LABELS[x]||('#'+x)).join('・')).join(' / ');
+}
 function hdShipDbAirGearKind(item,wanted=''){
  const cat=String(item?.category||''),text=`${wanted} ${item?.name||''} ${cat}`;
  if(/彩雲|艦上偵察機|水上偵察機|偵察機|水偵/.test(text))return 'recon';
@@ -8649,7 +8678,7 @@ function hdShipDbAirGearKind(item,wanted=''){
 function hdShipDbPickNormalSlot(profile,free,item,wanted){
  if(!profile||!free.length)return null;
  const kind=hdShipDbAirGearKind(item,wanted);
- let sorted=[...free];
+ let sorted=free.filter(x=>!item||!hdShipDbSlotRejects(profile,x.index,item));
  if(kind==='air')sorted.sort((a,b)=>b.cap-a.cap||a.index-b.index);
  else if(kind==='recon')sorted.sort((a,b)=>a.cap-b.cap||b.index-a.index);
  else sorted.sort((a,b)=>a.index-b.index);
@@ -8658,7 +8687,7 @@ function hdShipDbPickNormalSlot(profile,free,item,wanted){
 function hdShipDbSlotHtml(item){
  const p=hdShipDbSlotProfile(item),special=HD_SHIP_EXPANSION_SPECIAL[item.final]||[];
  if(!p&&!special.length)return '';
- const slotHtml=p?`<div class="hd-shipdb-slot-grid">${p.slots.map((n,i)=>`<span><i>第${i+1}</i><b>${n}</b><small>機</small></span>`).join('')}</div>`:'';
+ const slotHtml=p?`<div class="hd-shipdb-slot-grid">${p.slots.map((n,i)=>{const rule=hdShipDbSlotRuleText(p,i);return `<span class="${rule?'restricted':''}"><i>第${i+1}</i><b>${n}</b><small>${rule?'制限':'機'}</small>${rule?`<em>${hdShipDbEsc(rule)}</em>`:''}</span>`}).join('')}</div>`:'';
  const flags=p?.flags?.length?`<div class="hd-shipdb-slot-flags">${p.flags.map(x=>`<span>${hdShipDbEsc(x)}</span>`).join('')}</div>`:'';
  const expansion=`<div class="hd-shipdb-expansion"><b>補強増設</b><span>Lv30以上で開放可能。共通カテゴリ・艦別追加許可・艦別制限・改修★条件をマスター基準で判定。</span>${special.length?`<small>参考表示: ${special.map(hdShipDbEsc).join(' / ')}</small>`:''}${hdShipDbExpansionHtml(item)}</div>`;
  return `<div class="hd-shipdb-slot-profile"><div class="hd-shipdb-stat-head"><b>装備スロット</b><span>${p?`${p.count}スロット・搭載計${p.total}`:'特殊増設対応'}</span></div>${slotHtml}${flags}${expansion}</div>`;
@@ -8810,10 +8839,11 @@ function hdShipDbResolveOwnedLoadout(ship,set){
   for(const own of inv.values()){
    if((remaining.get(own.key)||0)<=0)continue;
    const score=hdShipDbEquipWantedMatch(own.item,wanted,ship);if(!Number.isFinite(score))continue;
-   candidates.push({own,score:score+(own.maxStar||0)*1.5});
+   const pick=profile?hdShipDbPickNormalSlot(profile,free,own.item,wanted):null;if(profile&&!pick)continue;
+   candidates.push({own,pick,score:score+(own.maxStar||0)*1.5});
   }
   candidates.sort((a,b)=>b.score-a.score||b.own.maxStar-a.own.maxStar||a.own.name.localeCompare(b.own.name,'ja'));
-  const best=candidates[0],pick=profile?hdShipDbPickNormalSlot(profile,free,best?.own?.item,wanted):null;
+  const best=candidates[0],pick=best?.pick||(profile?hdShipDbPickNormalSlot(profile,free,null,wanted):null);
   const slotIndex=pick?pick.index:seq++,capacity=pick?pick.cap:null;
   if(pick){const at=free.findIndex(x=>x.index===pick.index);if(at>=0)free.splice(at,1)}
   if(best){remaining.set(best.own.key,(remaining.get(best.own.key)||0)-1);slots.push({wanted,found:true,name:best.own.name,star:best.own.maxStar,count:best.own.count,slotIndex,capacity})}
