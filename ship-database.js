@@ -201,6 +201,51 @@ const HD_SHIP_LOADOUTS={
  ]
 };
 
+
+function hdShipDbMapCandidates(detail){
+ const text=[detail?.name,detail?.overview,detail?.fleet,detail?.route,detail?.air,detail?.note,detail?.caution].filter(Boolean).join(' ');
+ const rules=[
+  {re:/潜水|対潜/,roles:['対潜','自動先制対潜'],reason:'対潜'},
+  {re:/空襲|制空|航空|艦戦|防空/,roles:['防空','対空CI','制空','制空補助'],reason:'防空・制空'},
+  {re:/陸上|対地|砲台|集積|港湾/,roles:['対地'],reason:'対地'},
+  {re:/輸送|TP/,roles:['輸送'],reason:'輸送'},
+  {re:/夜戦/,roles:['夜戦','夜戦CI'],reason:'夜戦'},
+  {re:/先制雷撃|甲標的/,roles:['甲標的','先制雷撃'],reason:'先制雷撃'},
+  {re:/特殊砲撃|タッチ/,roles:['特殊砲撃'],reason:'特殊砲撃'},
+  {re:/高難度|最終海域|EO|ボス/,roles:['装甲空母','高耐久','高火力'],reason:'高難度'}
+ ];
+ const typeRules=[
+  {re:/駆逐/,test:x=>x.type==='駆逐艦',reason:'駆逐枠'},
+  {re:/軽巡/,test:x=>x.type==='軽巡洋艦',reason:'軽巡枠'},
+  {re:/航巡|航空巡洋艦/,test:x=>x.type==='航空巡洋艦',reason:'航巡枠'},
+  {re:/重巡/,test:x=>x.type==='重巡洋艦',reason:'重巡枠'},
+  {re:/軽空母/,test:x=>x.type==='軽空母',reason:'軽空母枠'},
+  {re:/正規空母|空母/,test:x=>['正規空母','装甲空母'].includes(x.type),reason:'空母枠'},
+  {re:/戦艦/,test:x=>['戦艦','高速戦艦','航空戦艦'].includes(x.type),reason:'戦艦枠'}
+ ];
+ return HD_SHIP_DATABASE.map((x,index)=>{
+  let score=0;const reasons=[];
+  for(const r of rules){
+   if(!r.re.test(text))continue;
+   const hits=x.roles.filter(role=>r.roles.some(k=>role.includes(k)||k.includes(role)));
+   if(hits.length){score+=3+Math.min(2,hits.length-1);reasons.push(r.reason)}
+  }
+  for(const r of typeRules){if(r.re.test(text)&&r.test(x)){score+=1;reasons.push(r.reason)}}
+  if(/高速/.test(text)&&x.speed==='高速'){score+=1;reasons.push('高速')}
+  if(/4スロ|四スロ/.test(text)&&x.roles.some(r=>r.includes('4スロ'))){score+=2;reasons.push('4スロ')}
+  return {item:x,score,reasons:[...new Set(reasons)],index};
+ }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||a.index-b.index).slice(0,6);
+}
+function hdShipDbMapRecommendHtml(map,detail){
+ const rows=hdShipDbMapCandidates(detail);if(!rows.length)return '';
+ return `<section class="hd-map-ship-recommend"><div class="hd-map-ship-recommend-head"><div><div class="eyebrow">SHIP CANDIDATES</div><strong>この海域の艦娘候補</strong></div><span>DBから自動抽出</span></div><p class="hd-map-ship-recommend-note">海域説明の役割・艦種・速力キーワードから候補を抽出。ルート固定条件・特効・札・所持装備を最優先してね。</p><div class="hd-map-ship-recommend-grid">${rows.map(({item,reasons})=>`<button type="button" class="hd-map-ship-candidate" data-hd-shipdb-jump="${hdShipDbEsc(item.final)}"><span><b>${hdShipDbEsc(item.final)}</b><small>${hdShipDbEsc(item.type)}</small></span><span class="hd-map-ship-reasons">${reasons.slice(0,3).map(r=>`<i>${hdShipDbEsc(r)}</i>`).join('')}</span></button>`).join('')}</div></section>`;
+}
+function hdShipDbJumpTo(name){
+ hdEnsureShipDatabase();
+ const input=document.getElementById('hdShipDbSearch');if(input){input.value=name;hdRenderShipDatabase()}
+ const sec=document.getElementById('shipDatabase');if(sec){sec.scrollIntoView({behavior:'smooth',block:'start'})}
+}
+
 function hdShipDbStatsHtml(item){
  const s=HD_SHIP_STATS[item.final];if(!s)return '';
  const cells=[['耐久',s.hp],['火力',s.fire],['雷装',s.torp],['対空',s.aa],['装甲',s.armor],['回避',s.evasion],['対潜',s.asw],['索敵',s.los],['運',s.luck],['搭載',s.air]];
@@ -255,6 +300,7 @@ function hdShipDbAdd(base){
   if(name)name.value=item.base;if(remodel)remodel.value='育成中';if(memo) memo.value=`目標: ${item.final} / ${item.requirements}`;
  },0);
 }
+document.addEventListener('click',e=>{const jump=e.target.closest?.('[data-hd-shipdb-jump]');if(jump){hdShipDbJumpTo(jump.dataset.hdShipdbJump);return}});
 document.addEventListener('click',e=>{
  const f=e.target.closest?.('[data-hd-shipdb-filter]');if(f){hdShipDbType=f.dataset.hdShipdbFilter;document.querySelectorAll('[data-hd-shipdb-filter]').forEach(b=>b.classList.toggle('active',b===f));hdRenderShipDatabase();return}
  const add=e.target.closest?.('[data-hd-shipdb-add]');if(add){hdShipDbAdd(add.dataset.hdShipdbAdd);return}
