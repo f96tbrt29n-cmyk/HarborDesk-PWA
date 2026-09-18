@@ -81,7 +81,7 @@ test('sparse inventory is shown as unfilled loadout slots instead of invented ge
   await expect(plan).toBeVisible();
   await expect(plan).toContainText('未配備');
 
-  const data = await page.evaluate(() => window.HD_FL_CACHE['3-2:0']);
+  const data = await page.evaluate(() => window.hdFLGenerate?.(0));
   expect(data.missing.length).toBeGreaterThan(0);
   for (const [name, used] of Object.entries(data.used)) {
     expect(used).toBeLessThanOrEqual(data.owned[name] || 0);
