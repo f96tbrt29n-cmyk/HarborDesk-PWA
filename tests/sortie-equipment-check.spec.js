@@ -34,7 +34,7 @@ test('3-2 sortie equipment check detects missing speed and radar gear', async ({
 
   await page.locator('[data-hd-se-refresh]').click();
   const speed = panel.locator('.hd-se-check', { hasText: '高速化セット' });
-  const radar = panel.locator('.hd-se-check', { hasText: '電探' }).filter({ hasNotText: '高速化セット' }).first();
+  const radar = panel.locator('.hd-se-check').filter({ has: page.locator('.hd-se-check-head strong', { hasText: /^電探$/ }) });
   await expect(speed).toContainText('準備あり');
   await expect(speed).toContainText('タービン 1 / 缶 1');
   await expect(radar).toContainText('準備あり');
