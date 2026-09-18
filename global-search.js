@@ -44,7 +44,14 @@ function hdGSEnsure(){
 }
 function hdGSOpen(query=''){hdGSEnsure();if(typeof hdQNClose==='function')hdQNClose();const d=document.getElementById('hdGlobalSearchDialog'),i=document.getElementById('hdGSSearch');if(i)i.value=query;hdGSCategory='all';document.querySelectorAll('[data-hd-gs-cat]').forEach(b=>b.classList.toggle('active',b.dataset.hdGsCat==='all'));hdGSRender();if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');setTimeout(()=>i?.focus(),50)}
 function hdGSClose(){const d=document.getElementById('hdGlobalSearchDialog');if(!d)return;if(typeof d.close==='function'&&d.open)d.close();else d.removeAttribute('open')}
-function hdGSScroll(id){hdGSClose();setTimeout(()=>{if(typeof hdQNJump==='function')hdQNJump(id);else if(typeof hdWSShowElement==='function')hdWSShowElement(id,true);else document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})},30)}
+function hdGSScroll(id){
+ hdGSClose();
+ const reveal=(scroll=false)=>{try{if(typeof hdWSShowElement==='function')hdWSShowElement(id,scroll);else if(scroll)document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})}catch{}};
+ reveal(false);
+ setTimeout(()=>{reveal(false);if(typeof hdQNJump==='function')hdQNJump(id);else reveal(true)},30);
+ setTimeout(()=>{reveal(false);document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})},170);
+ setTimeout(()=>reveal(false),340);
+}
 function hdGSOpenResult(row){
  if(!row)return;const a=row.action;hdGSSaveHistory(document.getElementById('hdGSSearch')?.value||row.title);
  if(a.kind==='feature'){hdGSScroll(a.id);return}
