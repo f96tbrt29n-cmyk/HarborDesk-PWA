@@ -233,12 +233,31 @@ function hdShipDbMapCandidates(detail){
   for(const r of typeRules){if(r.re.test(text)&&r.test(x)){score+=1;reasons.push(r.reason)}}
   if(/高速/.test(text)&&x.speed==='高速'){score+=1;reasons.push('高速')}
   if(/4スロ|四スロ/.test(text)&&x.roles.some(r=>r.includes('4スロ'))){score+=2;reasons.push('4スロ')}
+  const own=hdShipDbOwned(x);if(own){score+=2;reasons.push(`所持${own.level?` Lv.${own.level}`:''}`)}
   return {item:x,score,reasons:[...new Set(reasons)],index};
  }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||a.index-b.index).slice(0,6);
 }
+function hdShipDbMapLoadout(item,reasons=[]){
+ const sets=HD_SHIP_LOADOUTS[item.final]||[];if(!sets.length)return null;
+ const prefs=[
+  {reason:'対潜',re:/対潜/},
+  {reason:'防空・制空',re:/対空|防空|制空|航空/},
+  {reason:'対地',re:/対地/},
+  {reason:'輸送',re:/輸送/},
+  {reason:'夜戦',re:/夜戦|魚雷CI|連撃/},
+  {reason:'先制雷撃',re:/先制雷撃|甲標的|魚雷CI/},
+  {reason:'特殊砲撃',re:/特殊砲撃|タッチ/},
+  {reason:'高難度',re:/高火力|装甲空母|弾着/}
+ ];
+ for(const p of prefs){
+  if(!reasons.includes(p.reason))continue;
+  const hit=sets.find(x=>p.re.test(`${x.name} ${x.memo}`));if(hit)return hit;
+ }
+ return sets[0];
+}
 function hdShipDbMapRecommendHtml(map,detail){
  const rows=hdShipDbMapCandidates(detail);if(!rows.length)return '';
- return `<section class="hd-map-ship-recommend"><div class="hd-map-ship-recommend-head"><div><div class="eyebrow">SHIP CANDIDATES</div><strong>この海域の艦娘候補</strong></div><span>DBから自動抽出</span></div><p class="hd-map-ship-recommend-note">海域説明の役割・艦種・速力キーワードから候補を抽出。ルート固定条件・特効・札・所持装備を最優先してね。</p><div class="hd-map-ship-recommend-grid">${rows.map(({item,reasons})=>`<button type="button" class="hd-map-ship-candidate" data-hd-shipdb-jump="${hdShipDbEsc(item.final)}"><span><b>${hdShipDbEsc(item.final)}</b><small>${hdShipDbEsc(item.type)}</small></span><span class="hd-map-ship-reasons">${reasons.slice(0,3).map(r=>`<i>${hdShipDbEsc(r)}</i>`).join('')}</span></button>`).join('')}</div></section>`;
+ return `<section class="hd-map-ship-recommend"><div class="hd-map-ship-recommend-head"><div><div class="eyebrow">SHIP CANDIDATES</div><strong>この海域の艦娘候補＋装備例</strong></div><span>DB・台帳から自動抽出</span></div><p class="hd-map-ship-recommend-note">海域説明の役割・艦種・速力と、艦隊台帳の所持状況から候補を抽出。装備例は海域の特徴に近いプリセットを優先表示するよ。ルート固定・特効・札・制空値は最優先で調整してね。</p><div class="hd-map-ship-recommend-grid">${rows.map(({item,reasons})=>{const set=hdShipDbMapLoadout(item,reasons);return `<article class="hd-map-ship-candidate"><button type="button" class="hd-map-ship-candidate-main" data-hd-shipdb-jump="${hdShipDbEsc(item.final)}"><span><b>${hdShipDbEsc(item.final)}</b><small>${hdShipDbEsc(item.type)}・${hdShipDbEsc(item.speed)}</small></span><span class="hd-map-ship-reasons">${reasons.slice(0,4).map(r=>`<i>${hdShipDbEsc(r)}</i>`).join('')}</span></button>${set?`<div class="hd-map-candidate-loadout"><div><b>${hdShipDbEsc(set.name)}</b><small>おすすめ装備例</small></div><div class="hd-map-candidate-gears">${set.gear.map(g=>`<span>${hdShipDbEsc(g)}</span>`).join('')}</div><p>${hdShipDbEsc(set.memo)}</p></div>`:''}<button type="button" class="ghost small hd-map-candidate-more" data-hd-shipdb-jump="${hdShipDbEsc(item.final)}">ステータス・別装備を見る</button></article>`}).join('')}</div></section>`;
 }
 function hdShipDbJumpTo(name){
  hdEnsureShipDatabase();
