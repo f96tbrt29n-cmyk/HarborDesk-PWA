@@ -241,7 +241,7 @@ function hdFOSavePreset(index,mode,button){
  const name=(map+' '+label+'｜'+(preset.name||('候補'+(Number(index)+1)))).slice(0,40);
  const ships=Array.from({length:6},function(_,i){const p=plan.ships&&plan.ships[i]||{};return {ship:p.ship||'',gear:(p.items||[]).map(function(x){return hdFOItemLabel(x)}).join(' / ')}});
  const e=plan.optimization&&plan.optimization.after||hdFEEvaluate(plan),memo='HarborDesk '+label+'比較案。条件充足 '+(e&&e.ready||0)+'/'+(e&&e.requirements&&e.requirements.length||0)+'、交換 '+(plan.optimization&&plan.optimization.changes.length||0)+'件。比較ビューから保存。ゲーム側で最終確認。';
- const old=all[map].find(function(x){return x.name===name}),id=old&&old.id||(typeof cfUid==='function'?cfUid():'fo-'+Date.now()+'-'+Math.random().toString(16).slice(2)),item={id:id,name:name,ships:ships,memo:memo,createdAt:old&&old.createdAt||Date.now(),updatedAt:Date.now()};
+ const old=all[map].find(function(x){return x.name===name}),id=old&&old.id||(typeof cfUid==='function'?cfUid():'fo-'+Date.now()+'-'+Math.random().toString(16).slice(2)),item={id:id,name:name,ships:ships,memo:memo,source:'optimizer-preset',strategy:selected,strategyLabel:label,map:map,createdAt:old&&old.createdAt||Date.now(),updatedAt:Date.now()};
  all[map]=old?all[map].map(function(x){return x.id===id?item:x}):all[map].concat(item);
  if(typeof saveCustomFleets==='function')saveCustomFleets(all);else localStorage.setItem('harbordesk-custom-fleets-v1',JSON.stringify(all));
  if(typeof renderCustomFleets==='function')renderCustomFleets(map);
