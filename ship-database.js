@@ -610,10 +610,11 @@ const HD_SHIP_LOADOUTS={
 };
 
 
-const HD_SHIP_MASTER_SOURCE={"repo":"Tibowl/api_start2","commit":"f45f36fdc8caddf8f78c287e599dcab0cb5d5c68","updated":"2026-09-16","basis":"api_start2 api_mst_ship/api_mst_stype/api_mst_equip_ship"};
+const HD_SHIP_MASTER_SOURCE={"repo":"Tibowl/api_start2","commit":"f45f36fdc8caddf8f78c287e599dcab0cb5d5c68","updated":"2026-09-16","basis":"api_start2 normal/exslot masters"};
 const HD_SHIP_SLOT_PROFILES={
  "長門改二": {
   "id": 541,
+  "ctype": 19,
   "stype": 9,
   "slots": [
    3,
@@ -621,6 +622,37 @@ const HD_SHIP_SLOT_PROFILES={
    6,
    3
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "3": null,
+   "4": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "19": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "28": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "38": null,
+   "39": null,
+   "40": null,
+   "42": null,
+   "43": null,
+   "45": null,
+   "46": null,
+   "93": null,
+   "95": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -661,6 +693,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "陸奥改二": {
   "id": 573,
+  "ctype": 19,
   "stype": 9,
   "slots": [
    2,
@@ -668,6 +701,37 @@ const HD_SHIP_SLOT_PROFILES={
    5,
    7
   ],
+  "equipRules": {
+   "2": null,
+   "3": null,
+   "4": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "19": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "28": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "38": null,
+   "39": null,
+   "40": null,
+   "42": null,
+   "43": null,
+   "45": null,
+   "46": null,
+   "93": null,
+   "95": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "大口径主砲",
@@ -708,6 +772,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "大和改二": {
   "id": 911,
+  "ctype": 37,
   "stype": 8,
   "slots": [
    4,
@@ -716,6 +781,37 @@ const HD_SHIP_SLOT_PROFILES={
    8,
    2
   ],
+  "equipRules": {
+   "2": null,
+   "3": null,
+   "4": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "19": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "28": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "38": null,
+   "39": null,
+   "40": null,
+   "42": null,
+   "43": null,
+   "45": null,
+   "93": null,
+   "95": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "大口径主砲",
@@ -756,6 +852,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "武蔵改二": {
   "id": 546,
+  "ctype": 37,
   "stype": 9,
   "slots": [
    5,
@@ -764,6 +861,36 @@ const HD_SHIP_SLOT_PROFILES={
    8,
    5
   ],
+  "equipRules": {
+   "2": null,
+   "3": null,
+   "4": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "19": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "28": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "38": null,
+   "39": null,
+   "40": null,
+   "42": null,
+   "43": null,
+   "45": null,
+   "93": null,
+   "95": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "大口径主砲",
@@ -802,6 +929,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "伊勢改二": {
   "id": 553,
+  "ctype": 2,
   "stype": 10,
   "slots": [
    2,
@@ -810,6 +938,41 @@ const HD_SHIP_SLOT_PROFILES={
    22,
    9
   ],
+  "equipRules": {
+   "2": null,
+   "3": null,
+   "4": null,
+   "6": null,
+   "7": null,
+   "9": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "19": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "26": null,
+   "28": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "39": null,
+   "40": null,
+   "42": null,
+   "43": null,
+   "45": null,
+   "50": null,
+   "93": null,
+   "95": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "大口径主砲",
@@ -858,6 +1021,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "日向改二": {
   "id": 554,
+  "ctype": 2,
   "stype": 10,
   "slots": [
    2,
@@ -866,6 +1030,42 @@ const HD_SHIP_SLOT_PROFILES={
    12,
    11
   ],
+  "equipRules": {
+   "2": null,
+   "3": null,
+   "4": null,
+   "6": null,
+   "7": null,
+   "9": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "19": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "26": null,
+   "28": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "39": null,
+   "40": null,
+   "42": null,
+   "43": null,
+   "45": null,
+   "50": null,
+   "93": null,
+   "95": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "大口径主砲",
@@ -915,6 +1115,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "赤城改二": {
   "id": 594,
+  "ctype": 14,
   "stype": 11,
   "slots": [
    21,
@@ -923,6 +1124,28 @@ const HD_SHIP_SLOT_PROFILES={
    12,
    4
   ],
+  "equipRules": {
+   "4": null,
+   "6": null,
+   "7": null,
+   "8": null,
+   "9": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "28": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "40": null,
+   "43": null,
+   "50": null,
+   "95": null
+  },
   "allowedTypes": [
    "副砲",
    "艦上戦闘機",
@@ -955,6 +1178,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "加賀改二": {
   "id": 698,
+  "ctype": 3,
   "stype": 11,
   "slots": [
    20,
@@ -963,6 +1187,28 @@ const HD_SHIP_SLOT_PROFILES={
    12,
    3
   ],
+  "equipRules": {
+   "4": null,
+   "6": null,
+   "7": null,
+   "8": null,
+   "9": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "28": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "40": null,
+   "43": null,
+   "50": null,
+   "95": null
+  },
   "allowedTypes": [
    "副砲",
    "艦上戦闘機",
@@ -995,6 +1241,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "翔鶴改二甲": {
   "id": 466,
+  "ctype": 33,
   "stype": 18,
   "slots": [
    34,
@@ -1002,6 +1249,33 @@ const HD_SHIP_SLOT_PROFILES={
    12,
    9
   ],
+  "equipRules": {
+   "4": null,
+   "6": null,
+   "7": null,
+   "8": null,
+   "9": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "28": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "40": null,
+   "43": null,
+   "50": null,
+   "56": null,
+   "57": null,
+   "58": null,
+   "59": null,
+   "94": null,
+   "95": null
+  },
   "allowedTypes": [
    "副砲",
    "艦上戦闘機",
@@ -1040,6 +1314,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "瑞鶴改二甲": {
   "id": 467,
+  "ctype": 33,
   "stype": 18,
   "slots": [
    34,
@@ -1047,6 +1322,33 @@ const HD_SHIP_SLOT_PROFILES={
    12,
    6
   ],
+  "equipRules": {
+   "4": null,
+   "6": null,
+   "7": null,
+   "8": null,
+   "9": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "28": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "40": null,
+   "43": null,
+   "50": null,
+   "56": null,
+   "57": null,
+   "58": null,
+   "59": null,
+   "94": null,
+   "95": null
+  },
   "allowedTypes": [
    "副砲",
    "艦上戦闘機",
@@ -1085,6 +1387,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "最上改二特": {
   "id": 506,
+  "ctype": 9,
   "stype": 6,
   "slots": [
    2,
@@ -1092,6 +1395,40 @@ const HD_SHIP_SLOT_PROFILES={
    7,
    3
   ],
+  "equipRules": {
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "20": null,
+   "21": null,
+   "22": null,
+   "23": null,
+   "24": null,
+   "25": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "40": null,
+   "42": null,
+   "43": null,
+   "45": null,
+   "46": null,
+   "50": null,
+   "54": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "副砲",
@@ -1138,6 +1475,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "矢矧改二乙": {
   "id": 668,
+  "ctype": 41,
   "stype": 3,
   "slots": [
    1,
@@ -1145,6 +1483,38 @@ const HD_SHIP_SLOT_PROFILES={
    2,
    2
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "22": null,
+   "23": null,
+   "25": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "45": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -1188,6 +1558,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "夕張改二特": {
   "id": 623,
+  "ctype": 34,
   "stype": 3,
   "slots": [
    0,
@@ -1196,6 +1567,31 @@ const HD_SHIP_SLOT_PROFILES={
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "22": null,
+   "23": null,
+   "24": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -1229,12 +1625,43 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "阿武隈改二": {
   "id": 200,
+  "ctype": 20,
   "stype": 3,
   "slots": [
    1,
    1,
    1
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "22": null,
+   "23": null,
+   "24": null,
+   "27": [
+    268
+   ],
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -1271,12 +1698,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "北上改二": {
   "id": 119,
+  "ctype": 4,
   "stype": 4,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "22": null,
+   "23": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -1304,12 +1753,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "大井改二": {
   "id": 118,
+  "ctype": 4,
   "stype": 4,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "22": null,
+   "23": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -1337,12 +1808,35 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "雪風改二": {
   "id": 656,
+  "ctype": 30,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -1371,6 +1865,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "時雨改三": {
   "id": 961,
+  "ctype": 23,
   "stype": 2,
   "slots": [
    0,
@@ -1378,6 +1873,28 @@ const HD_SHIP_SLOT_PROFILES={
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -1406,12 +1923,35 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "霞改二乙": {
   "id": 470,
+  "ctype": 18,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -1441,6 +1981,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "秋月改二": {
   "id": 963,
+  "ctype": 54,
   "stype": 2,
   "slots": [
    0,
@@ -1448,6 +1989,29 @@ const HD_SHIP_SLOT_PROFILES={
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -1477,6 +2041,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "初月改二": {
   "id": 968,
+  "ctype": 54,
   "stype": 2,
   "slots": [
    0,
@@ -1484,6 +2049,29 @@ const HD_SHIP_SLOT_PROFILES={
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -1513,12 +2101,35 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "Fletcher Mk.II": {
   "id": 629,
+  "ctype": 91,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -1547,6 +2158,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "金剛改二丙": {
   "id": 591,
+  "ctype": 6,
   "stype": 8,
   "slots": [
    2,
@@ -1554,6 +2166,35 @@ const HD_SHIP_SLOT_PROFILES={
    3,
    6
   ],
+  "equipRules": {
+   "3": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "19": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "28": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "40": null,
+   "42": null,
+   "43": null,
+   "93": null,
+   "95": null
+  },
   "allowedTypes": [
    "大口径主砲",
    "副砲",
@@ -1590,6 +2231,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "比叡改二丙": {
   "id": 592,
+  "ctype": 6,
   "stype": 8,
   "slots": [
    2,
@@ -1597,6 +2239,35 @@ const HD_SHIP_SLOT_PROFILES={
    2,
    2
   ],
+  "equipRules": {
+   "3": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "19": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "28": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "40": null,
+   "42": null,
+   "43": null,
+   "45": null,
+   "93": null,
+   "95": null
+  },
   "allowedTypes": [
    "大口径主砲",
    "副砲",
@@ -1633,6 +2304,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "摩耶改二": {
   "id": 428,
+  "ctype": 8,
   "stype": 5,
   "slots": [
    3,
@@ -1640,6 +2312,30 @@ const HD_SHIP_SLOT_PROFILES={
    3,
    3
   ],
+  "equipRules": {
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "54": null,
+   "95": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "副砲",
@@ -1670,6 +2366,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "鈴谷改二": {
   "id": 503,
+  "ctype": 9,
   "stype": 6,
   "slots": [
    3,
@@ -1677,6 +2374,36 @@ const HD_SHIP_SLOT_PROFILES={
    7,
    11
   ],
+  "equipRules": {
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "45": null,
+   "50": null,
+   "54": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "副砲",
@@ -1716,6 +2443,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "熊野改二": {
   "id": 504,
+  "ctype": 9,
   "stype": 6,
   "slots": [
    3,
@@ -1723,6 +2451,36 @@ const HD_SHIP_SLOT_PROFILES={
    7,
    11
   ],
+  "equipRules": {
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "45": null,
+   "50": null,
+   "54": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "副砲",
@@ -1762,6 +2520,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "能代改二": {
   "id": 662,
+  "ctype": 41,
   "stype": 3,
   "slots": [
    1,
@@ -1769,6 +2528,36 @@ const HD_SHIP_SLOT_PROFILES={
    4,
    2
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -1808,12 +2597,32 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "夕立改二": {
   "id": 144,
+  "ctype": 23,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -1837,12 +2646,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "長波改二": {
   "id": 543,
+  "ctype": 38,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -1868,6 +2699,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "瑞鳳改二乙": {
   "id": 560,
+  "ctype": 11,
   "stype": 7,
   "slots": [
    18,
@@ -1875,6 +2707,29 @@ const HD_SHIP_SLOT_PROFILES={
    15,
    2
   ],
+  "equipRules": {
+   "4": null,
+   "6": null,
+   "7": null,
+   "8": null,
+   "9": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "26": null,
+   "27": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "40": null,
+   "43": null,
+   "50": null
+  },
   "allowedTypes": [
    "副砲",
    "艦上戦闘機",
@@ -1910,6 +2765,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "Saratoga Mk.II Mod.2": {
   "id": 550,
+  "ctype": 69,
   "stype": 18,
   "slots": [
    37,
@@ -1917,6 +2773,29 @@ const HD_SHIP_SLOT_PROFILES={
    19,
    13
   ],
+  "equipRules": {
+   "4": null,
+   "6": null,
+   "7": null,
+   "8": null,
+   "9": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "28": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "40": null,
+   "43": null,
+   "50": null,
+   "94": null,
+   "95": null
+  },
   "allowedTypes": [
    "副砲",
    "艦上戦闘機",
@@ -1950,6 +2829,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "Iowa改": {
   "id": 360,
+  "ctype": 65,
   "stype": 8,
   "slots": [
    4,
@@ -1957,6 +2837,31 @@ const HD_SHIP_SLOT_PROFILES={
    4,
    4
   ],
+  "equipRules": {
+   "3": null,
+   "4": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "19": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "28": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "39": null,
+   "40": null,
+   "42": null,
+   "43": null,
+   "93": null,
+   "95": null
+  },
   "allowedTypes": [
    "大口径主砲",
    "副砲",
@@ -1988,12 +2893,37 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "Atlanta改": {
   "id": 696,
+  "ctype": 99,
   "stype": 3,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -2022,12 +2952,43 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "由良改二": {
   "id": 488,
+  "ctype": 20,
   "stype": 3,
   "slots": [
    1,
    2,
    1
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "22": null,
+   "23": null,
+   "24": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "45": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -2068,12 +3029,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "朝潮改二丁": {
   "id": 468,
+  "ctype": 18,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -2102,12 +3085,32 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "Jervis改": {
   "id": 394,
+  "ctype": 82,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -2131,12 +3134,33 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "Samuel B.Roberts Mk.II": {
   "id": 920,
+  "ctype": 87,
   "stype": 2,
   "slots": [
    1,
    1,
    1
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -2163,6 +3187,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "大鳳改": {
   "id": 156,
+  "ctype": 43,
   "stype": 18,
   "slots": [
    30,
@@ -2170,6 +3195,29 @@ const HD_SHIP_SLOT_PROFILES={
    24,
    8
   ],
+  "equipRules": {
+   "4": null,
+   "6": null,
+   "7": null,
+   "8": null,
+   "9": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "28": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "40": null,
+   "43": null,
+   "50": null,
+   "94": null,
+   "95": null
+  },
   "allowedTypes": [
    "副砲",
    "艦上戦闘機",
@@ -2203,6 +3251,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "利根改二": {
   "id": 188,
+  "ctype": 31,
   "stype": 6,
   "slots": [
    2,
@@ -2210,6 +3259,36 @@ const HD_SHIP_SLOT_PROFILES={
    9,
    6
   ],
+  "equipRules": {
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "45": null,
+   "50": null,
+   "54": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "副砲",
@@ -2249,6 +3328,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "筑摩改二": {
   "id": 189,
+  "ctype": 31,
   "stype": 6,
   "slots": [
    2,
@@ -2256,6 +3336,36 @@ const HD_SHIP_SLOT_PROFILES={
    9,
    6
   ],
+  "equipRules": {
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "45": null,
+   "50": null,
+   "54": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "副砲",
@@ -2295,6 +3405,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "Ташкент改": {
   "id": 395,
+  "ctype": 81,
   "stype": 2,
   "slots": [
    0,
@@ -2302,6 +3413,28 @@ const HD_SHIP_SLOT_PROFILES={
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": [
+    268
+   ],
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -2326,12 +3459,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "天津風改二": {
   "id": 951,
+  "ctype": 30,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -2359,12 +3514,36 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "涼月改": {
   "id": 537,
+  "ctype": 54,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -2394,6 +3573,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "千歳航改二": {
   "id": 296,
+  "ctype": 15,
   "stype": 7,
   "slots": [
    24,
@@ -2401,6 +3581,29 @@ const HD_SHIP_SLOT_PROFILES={
    11,
    8
   ],
+  "equipRules": {
+   "4": null,
+   "6": null,
+   "7": null,
+   "8": null,
+   "9": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "26": null,
+   "27": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "40": null,
+   "43": null,
+   "50": null
+  },
   "allowedTypes": [
    "副砲",
    "艦上戦闘機",
@@ -2436,6 +3639,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "千代田航改二": {
   "id": 297,
+  "ctype": 15,
   "stype": 7,
   "slots": [
    24,
@@ -2443,6 +3647,29 @@ const HD_SHIP_SLOT_PROFILES={
    11,
    8
   ],
+  "equipRules": {
+   "4": null,
+   "6": null,
+   "7": null,
+   "8": null,
+   "9": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "26": null,
+   "27": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "40": null,
+   "43": null,
+   "50": null
+  },
   "allowedTypes": [
    "副砲",
    "艦上戦闘機",
@@ -2478,6 +3705,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "龍驤改二": {
   "id": 157,
+  "ctype": 32,
   "stype": 7,
   "slots": [
    18,
@@ -2485,6 +3713,29 @@ const HD_SHIP_SLOT_PROFILES={
    6,
    3
   ],
+  "equipRules": {
+   "4": null,
+   "6": null,
+   "7": null,
+   "8": null,
+   "9": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "26": null,
+   "27": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "40": null,
+   "43": null,
+   "50": null
+  },
   "allowedTypes": [
    "副砲",
    "艦上戦闘機",
@@ -2520,6 +3771,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "隼鷹改二": {
   "id": 408,
+  "ctype": 24,
   "stype": 7,
   "slots": [
    24,
@@ -2527,6 +3779,29 @@ const HD_SHIP_SLOT_PROFILES={
    20,
    4
   ],
+  "equipRules": {
+   "4": null,
+   "6": null,
+   "7": null,
+   "8": null,
+   "9": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "26": null,
+   "27": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "40": null,
+   "43": null,
+   "50": null
+  },
   "allowedTypes": [
    "副砲",
    "艦上戦闘機",
@@ -2562,6 +3837,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "神鷹改二": {
   "id": 536,
+  "ctype": 76,
   "stype": 7,
   "slots": [
    9,
@@ -2569,6 +3845,32 @@ const HD_SHIP_SLOT_PROFILES={
    18,
    6
   ],
+  "equipRules": {
+   "4": null,
+   "6": null,
+   "7": null,
+   "8": null,
+   "9": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "16": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "26": null,
+   "27": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "50": null
+  },
   "allowedTypes": [
    "副砲",
    "艦上戦闘機",
@@ -2607,6 +3909,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "大鷹改二": {
   "id": 529,
+  "ctype": 76,
   "stype": 7,
   "slots": [
    14,
@@ -2614,6 +3917,32 @@ const HD_SHIP_SLOT_PROFILES={
    8,
    3
   ],
+  "equipRules": {
+   "4": null,
+   "6": null,
+   "7": null,
+   "8": null,
+   "9": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "16": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "26": null,
+   "27": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "50": null
+  },
   "allowedTypes": [
    "副砲",
    "艦上戦闘機",
@@ -2652,6 +3981,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "Zara due": {
   "id": 496,
+  "ctype": 64,
   "stype": 5,
   "slots": [
    6,
@@ -2659,6 +3989,34 @@ const HD_SHIP_SLOT_PROFILES={
    3,
    3
   ],
+  "equipRules": {
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "39": null,
+   "40": null,
+   "42": null,
+   "43": null,
+   "45": null,
+   "54": null,
+   "95": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "副砲",
@@ -2695,6 +4053,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "Gotland andra": {
   "id": 630,
+  "ctype": 89,
   "stype": 3,
   "slots": [
    2,
@@ -2702,6 +4061,36 @@ const HD_SHIP_SLOT_PROFILES={
    3,
    7
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "25": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "42": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -2740,12 +4129,32 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "Johnston改": {
   "id": 689,
+  "ctype": 91,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -2769,12 +4178,35 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "Верный": {
   "id": 147,
+  "ctype": 5,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -2804,6 +4236,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "妙高改二": {
   "id": 319,
+  "ctype": 29,
   "stype": 5,
   "slots": [
    2,
@@ -2811,6 +4244,30 @@ const HD_SHIP_SLOT_PROFILES={
    4,
    4
   ],
+  "equipRules": {
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "54": null,
+   "95": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "副砲",
@@ -2841,6 +4298,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "羽黒改二": {
   "id": 194,
+  "ctype": 29,
   "stype": 5,
   "slots": [
    2,
@@ -2848,6 +4306,30 @@ const HD_SHIP_SLOT_PROFILES={
    4,
    4
   ],
+  "equipRules": {
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "54": null,
+   "95": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "副砲",
@@ -2878,12 +4360,39 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "鬼怒改二": {
   "id": 487,
+  "ctype": 20,
   "stype": 3,
   "slots": [
    1,
    1,
    1
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -2917,12 +4426,32 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "綾波改二": {
   "id": 195,
+  "ctype": 1,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -2946,12 +4475,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "大潮改二": {
   "id": 199,
+  "ctype": 18,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -2980,6 +4531,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "大淀改": {
   "id": 321,
+  "ctype": 52,
   "stype": 3,
   "slots": [
    0,
@@ -2987,6 +4539,30 @@ const HD_SHIP_SLOT_PROFILES={
    6,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -3015,6 +4591,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "榛名改二乙": {
   "id": 593,
+  "ctype": 6,
   "stype": 8,
   "slots": [
    1,
@@ -3022,6 +4599,36 @@ const HD_SHIP_SLOT_PROFILES={
    5,
    4
   ],
+  "equipRules": {
+   "3": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "19": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "28": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "40": null,
+   "42": null,
+   "43": null,
+   "45": null,
+   "93": null,
+   "95": null
+  },
   "allowedTypes": [
    "大口径主砲",
    "副砲",
@@ -3060,6 +4667,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "霧島改二丙": {
   "id": 694,
+  "ctype": 6,
   "stype": 8,
   "slots": [
    2,
@@ -3067,6 +4675,36 @@ const HD_SHIP_SLOT_PROFILES={
    4,
    3
   ],
+  "equipRules": {
+   "3": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "19": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "28": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "40": null,
+   "42": null,
+   "43": null,
+   "45": null,
+   "46": null,
+   "93": null,
+   "95": null
+  },
   "allowedTypes": [
    "大口径主砲",
    "副砲",
@@ -3105,12 +4743,35 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "木曾改二": {
   "id": 146,
+  "ctype": 4,
   "stype": 4,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "22": null,
+   "23": null,
+   "27": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -3139,12 +4800,37 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "神通改二": {
   "id": 159,
+  "ctype": 16,
   "stype": 3,
   "slots": [
    1,
    1,
    1
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -3173,6 +4859,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "鳥海改二": {
   "id": 427,
+  "ctype": 8,
   "stype": 5,
   "slots": [
    3,
@@ -3180,6 +4867,30 @@ const HD_SHIP_SLOT_PROFILES={
    3,
    3
   ],
+  "equipRules": {
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "54": null,
+   "95": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "副砲",
@@ -3210,12 +4921,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "夕雲改二": {
   "id": 542,
+  "ctype": 38,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -3241,12 +4974,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "満潮改二": {
   "id": 489,
+  "ctype": 18,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -3275,12 +5030,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "朝霜改二": {
   "id": 578,
+  "ctype": 38,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -3308,12 +5085,35 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "初霜改二": {
   "id": 419,
+  "ctype": 10,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -3342,12 +5142,32 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "磯風乙改": {
   "id": 557,
+  "ctype": 30,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -3371,12 +5191,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "荒潮改二": {
   "id": 490,
+  "ctype": 18,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -3405,12 +5247,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "白露改二": {
   "id": 497,
+  "ctype": 23,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -3438,12 +5302,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "村雨改二": {
   "id": 498,
+  "ctype": 23,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -3471,12 +5357,33 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "江風改二": {
   "id": 469,
+  "ctype": 23,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -3503,12 +5410,33 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "陽炎改二": {
   "id": 566,
+  "ctype": 30,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -3533,12 +5461,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "不知火改二": {
   "id": 567,
+  "ctype": 30,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -3564,12 +5514,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "黒潮改二": {
   "id": 568,
+  "ctype": 30,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -3597,12 +5569,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "浦風丁改": {
   "id": 556,
+  "ctype": 30,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -3630,12 +5624,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "谷風丁改": {
   "id": 559,
+  "ctype": 30,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -3663,12 +5679,32 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "浜風乙改": {
   "id": 558,
+  "ctype": 30,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -3692,12 +5728,37 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "五十鈴改二": {
   "id": 141,
+  "ctype": 20,
   "stype": 3,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -3726,12 +5787,37 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "川内改二": {
   "id": 158,
+  "ctype": 16,
   "stype": 3,
   "slots": [
    1,
    1,
    1
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -3760,12 +5846,37 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "那珂改二": {
   "id": 160,
+  "ctype": 16,
   "stype": 3,
   "slots": [
    1,
    1,
    1
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -3794,12 +5905,44 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "多摩改二": {
   "id": 547,
+  "ctype": 4,
   "stype": 3,
   "slots": [
    1,
    1,
    1
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "25": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "45": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -3841,12 +5984,37 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "龍田改二": {
   "id": 478,
+  "ctype": 21,
   "stype": 3,
   "slots": [
    1,
    1,
    1
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "25": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -3879,6 +6047,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "古鷹改二": {
   "id": 416,
+  "ctype": 7,
   "stype": 5,
   "slots": [
    2,
@@ -3886,6 +6055,30 @@ const HD_SHIP_SLOT_PROFILES={
    2,
    2
   ],
+  "equipRules": {
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "54": null,
+   "95": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "副砲",
@@ -3916,6 +6109,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "加古改二": {
   "id": 417,
+  "ctype": 7,
   "stype": 5,
   "slots": [
    2,
@@ -3923,6 +6117,30 @@ const HD_SHIP_SLOT_PROFILES={
    2,
    2
   ],
+  "equipRules": {
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "54": null,
+   "95": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "副砲",
@@ -3953,6 +6171,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "衣笠改二": {
   "id": 142,
+  "ctype": 13,
   "stype": 5,
   "slots": [
    2,
@@ -3960,6 +6179,30 @@ const HD_SHIP_SLOT_PROFILES={
    2,
    2
   ],
+  "equipRules": {
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "54": null,
+   "95": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "副砲",
@@ -3990,6 +6233,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "那智改二": {
   "id": 192,
+  "ctype": 29,
   "stype": 5,
   "slots": [
    2,
@@ -3997,6 +6241,30 @@ const HD_SHIP_SLOT_PROFILES={
    4,
    4
   ],
+  "equipRules": {
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "54": null,
+   "95": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "副砲",
@@ -4027,12 +6295,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "皐月改二": {
   "id": 418,
+  "ctype": 28,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -4061,6 +6351,7 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "足柄改二": {
   "id": 193,
+  "ctype": 29,
   "stype": 5,
   "slots": [
    2,
@@ -4068,6 +6359,30 @@ const HD_SHIP_SLOT_PROFILES={
    4,
    4
   ],
+  "equipRules": {
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "12": null,
+   "13": null,
+   "16": null,
+   "17": null,
+   "18": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "27": null,
+   "29": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "39": null,
+   "40": null,
+   "43": null,
+   "54": null,
+   "95": null
+  },
   "allowedTypes": [
    "中口径主砲",
    "副砲",
@@ -4098,12 +6413,33 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "睦月改二": {
   "id": 434,
+  "ctype": 28,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -4130,12 +6466,33 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "如月改二": {
   "id": 435,
+  "ctype": 28,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -4162,12 +6519,42 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "球磨改二": {
   "id": 652,
+  "ctype": 4,
   "stype": 3,
   "slots": [
    1,
    1,
    1
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "4": null,
+   "5": null,
+   "10": null,
+   "11": null,
+   "12": null,
+   "13": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "27": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "35": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "45": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -4205,12 +6592,36 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "天龍改二": {
   "id": 477,
+  "ctype": 21,
   "stype": 3,
   "slots": [
    1,
    1,
    1
   ],
+  "equipRules": {
+   "1": null,
+   "2": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "25": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "34": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "42": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "中口径主砲",
@@ -4240,12 +6651,32 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "叢雲改二": {
   "id": 420,
+  "ctype": 12,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -4269,12 +6700,32 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "暁改二": {
   "id": 437,
+  "ctype": 5,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -4298,12 +6749,32 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "潮改二": {
   "id": 407,
+  "ctype": 1,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -4327,12 +6798,32 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "初春改二": {
   "id": 326,
+  "ctype": 10,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -4356,12 +6847,34 @@ const HD_SHIP_SLOT_PROFILES={
  },
  "文月改二": {
   "id": 548,
+  "ctype": 28,
   "stype": 2,
   "slots": [
    0,
    0,
    0
   ],
+  "equipRules": {
+   "1": null,
+   "5": null,
+   "12": null,
+   "14": null,
+   "15": null,
+   "17": null,
+   "20": null,
+   "21": null,
+   "23": null,
+   "24": null,
+   "29": null,
+   "30": null,
+   "33": null,
+   "36": null,
+   "37": null,
+   "39": null,
+   "43": null,
+   "46": null,
+   "54": null
+  },
   "allowedTypes": [
    "小口径主砲",
    "魚雷",
@@ -4389,100 +6902,1671 @@ const HD_SHIP_SLOT_PROFILES={
   ]
  }
 };
-const HD_EQUIPMENT_MASTER_TYPE_BY_NAME={
- "零式艦戦53型(岩本隊)": "艦上戦闘機",
- "試製烈風 後期型": "艦上戦闘機",
- "彩雲": "艦上偵察機",
- "零式水上偵察機11型乙(熟練)": "水上偵察機",
- "四式水中聴音機": "ソナー",
- "三式水中探信儀": "ソナー",
- "61cm五連装(酸素)魚雷": "魚雷",
- "九一式徹甲弾": "対艦強化弾",
- "一式徹甲弾": "対艦強化弾",
- "三式弾": "対空強化弾",
- "大発動艇": "上陸用舟艇",
- "二式水戦改(熟練)": "水上戦闘機",
- "一式陸攻": "陸上攻撃機",
- "試製東海": "陸上攻撃機",
- "発煙装置(煙幕)": "水上艦装備",
- "41cm連装砲": "大口径主砲",
- "41cm三連装砲改": "大口径主砲",
- "41cm三連装砲改二": "大口径主砲",
- "41cm連装砲改二": "大口径主砲",
- "試製51cm連装砲": "大口径主砲",
- "51cm連装砲": "大口径主砲",
- "20.3cm(3号)連装砲": "中口径主砲",
- "15.2cm連装砲改二": "中口径主砲",
- "甲標的 丙型": "特殊潜航艇",
- "22号対水上電探改四": "小型電探",
- "13号対空電探改": "小型電探",
- "13号対空電探改(後期型)": "小型電探",
- "SG レーダー(初期型)": "小型電探",
- "HF/DF + Type144/147 ASDIC": "ソナー",
- "三式爆雷投射機 集中配備": "爆雷",
- "烈風(六〇一空)": "艦上戦闘機",
- "天山一二型(友永隊)": "艦上攻撃機",
- "流星改(一航戦)": "艦上攻撃機",
- "流星改(一航戦/熟練)": "艦上攻撃機",
- "彗星(江草隊)": "艦上爆撃機",
- "特二式内火艇": "特型内火艇",
- "M4A1 DD": "上陸用舟艇",
- "25mm三連装機銃 集中配備": "対空機銃",
- "25mm連装機銃(熟練機銃員分隊)": "対空機銃",
- "Bofors 40mm四連装機関砲": "対空機銃",
- "12cm30連装噴進砲改二": "対空機銃",
- "91式高射装置": "高射装置",
- "94式高射装置": "高射装置",
- "15.5cm三連装副砲改二": "副砲",
- "熟練見張員": "水上艦要員",
- "探照灯": "探照灯",
- "照明弾": "照明弾",
- "九八式水上偵察機(夜偵)": "水上偵察機",
- "熟練甲板要員": "航空要員",
- "銀河": "陸上攻撃機",
- "一式陸攻 三四型": "陸上攻撃機",
- "四式重爆 飛龍": "陸上攻撃機",
- "一式戦 隼II型(64戦隊)": "局地戦闘機",
- "一式戦 隼III型甲(54戦隊)": "局地戦闘機",
- "雷電": "局地戦闘機",
- "紫電改(三四三空) 戦闘301": "局地戦闘機",
- "改良型艦本式タービン": "機関部強化",
- "強化型艦本式缶": "機関部強化",
- "新型高温高圧缶": "機関部強化",
- "増設バルジ(中型艦)": "追加装甲(中型)",
- "増設バルジ(大型艦)": "追加装甲(大型)",
- "艦本新設計 増設バルジ(中型艦)": "追加装甲(中型)",
- "艦本新設計 増設バルジ(大型艦)": "追加装甲(大型)",
- "艦隊司令部施設": "司令部施設",
- "遊撃部隊 艦隊司令部": "司令部施設",
- "精鋭水雷戦隊 司令部": "司令部施設",
- "水雷戦隊 熟練見張員": "水上艦要員",
- "96式150cm探照灯": "大型探照灯",
- "紫雲": "水上偵察機",
- "紫雲(熟練)": "水上偵察機",
- "瑞雲改二(六三四空)": "水上爆撃機",
- "噴式景雲改": "噴式戦闘爆撃機",
- "橘花改": "噴式戦闘爆撃機",
- "応急修理要員": "応急修理要員",
- "応急修理女神": "応急修理要員",
- "洋上補給": "補給物資",
- "夜間作戦航空要員": "航空要員",
- "F6F-3N": "艦上戦闘機",
- "F6F-5N": "艦上戦闘機",
- "TBM-3D": "艦上攻撃機",
- "42号対空電探改二": "大型電探",
- "FuMO25 レーダー": "大型電探",
- "カ号観測機": "オートジャイロ",
- "オ号観測機改二": "オートジャイロ",
- "S-51J": "オートジャイロ",
- "S-51J改": "オートジャイロ",
- "後期型艦首魚雷(6門)": "潜水艦魚雷"
+const HD_EQUIPMENT_MASTER_META_BY_NAME={
+ "零式艦戦53型(岩本隊)": {
+  "id": 157,
+  "typeId": 6,
+  "typeName": "艦上戦闘機"
+ },
+ "試製烈風 後期型": {
+  "id": 22,
+  "typeId": 6,
+  "typeName": "艦上戦闘機"
+ },
+ "彩雲": {
+  "id": 54,
+  "typeId": 9,
+  "typeName": "艦上偵察機"
+ },
+ "零式水上偵察機11型乙(熟練)": {
+  "id": 239,
+  "typeId": 10,
+  "typeName": "水上偵察機"
+ },
+ "四式水中聴音機": {
+  "id": 149,
+  "typeId": 14,
+  "typeName": "ソナー"
+ },
+ "三式水中探信儀": {
+  "id": 47,
+  "typeId": 14,
+  "typeName": "ソナー"
+ },
+ "61cm五連装(酸素)魚雷": {
+  "id": 58,
+  "typeId": 5,
+  "typeName": "魚雷"
+ },
+ "九一式徹甲弾": {
+  "id": 36,
+  "typeId": 19,
+  "typeName": "対艦強化弾"
+ },
+ "一式徹甲弾": {
+  "id": 116,
+  "typeId": 19,
+  "typeName": "対艦強化弾"
+ },
+ "三式弾": {
+  "id": 35,
+  "typeId": 18,
+  "typeName": "対空強化弾"
+ },
+ "大発動艇": {
+  "id": 68,
+  "typeId": 24,
+  "typeName": "上陸用舟艇"
+ },
+ "二式水戦改(熟練)": {
+  "id": 216,
+  "typeId": 45,
+  "typeName": "水上戦闘機"
+ },
+ "一式陸攻": {
+  "id": 169,
+  "typeId": 47,
+  "typeName": "陸上攻撃機"
+ },
+ "試製東海": {
+  "id": 269,
+  "typeId": 47,
+  "typeName": "陸上攻撃機"
+ },
+ "発煙装置(煙幕)": {
+  "id": 500,
+  "typeId": 54,
+  "typeName": "水上艦装備"
+ },
+ "41cm連装砲": {
+  "id": 8,
+  "typeId": 3,
+  "typeName": "大口径主砲"
+ },
+ "41cm三連装砲改": {
+  "id": 236,
+  "typeId": 3,
+  "typeName": "大口径主砲"
+ },
+ "41cm三連装砲改二": {
+  "id": 290,
+  "typeId": 3,
+  "typeName": "大口径主砲"
+ },
+ "41cm連装砲改二": {
+  "id": 318,
+  "typeId": 3,
+  "typeName": "大口径主砲"
+ },
+ "試製51cm連装砲": {
+  "id": 128,
+  "typeId": 3,
+  "typeName": "大口径主砲"
+ },
+ "51cm連装砲": {
+  "id": 281,
+  "typeId": 3,
+  "typeName": "大口径主砲"
+ },
+ "20.3cm(3号)連装砲": {
+  "id": 50,
+  "typeId": 2,
+  "typeName": "中口径主砲"
+ },
+ "15.2cm連装砲改二": {
+  "id": 407,
+  "typeId": 2,
+  "typeName": "中口径主砲"
+ },
+ "甲標的 丙型": {
+  "id": 309,
+  "typeId": 22,
+  "typeName": "特殊潜航艇"
+ },
+ "22号対水上電探改四": {
+  "id": 88,
+  "typeId": 12,
+  "typeName": "小型電探"
+ },
+ "13号対空電探改": {
+  "id": 106,
+  "typeId": 12,
+  "typeName": "小型電探"
+ },
+ "13号対空電探改(後期型)": {
+  "id": 450,
+  "typeId": 12,
+  "typeName": "小型電探"
+ },
+ "SG レーダー(初期型)": {
+  "id": 315,
+  "typeId": 12,
+  "typeName": "小型電探"
+ },
+ "HF/DF + Type144/147 ASDIC": {
+  "id": 262,
+  "typeId": 14,
+  "typeName": "ソナー"
+ },
+ "三式爆雷投射機 集中配備": {
+  "id": 287,
+  "typeId": 15,
+  "typeName": "爆雷"
+ },
+ "烈風(六〇一空)": {
+  "id": 110,
+  "typeId": 6,
+  "typeName": "艦上戦闘機"
+ },
+ "天山一二型(友永隊)": {
+  "id": 94,
+  "typeId": 8,
+  "typeName": "艦上攻撃機"
+ },
+ "流星改(一航戦)": {
+  "id": 342,
+  "typeId": 8,
+  "typeName": "艦上攻撃機"
+ },
+ "流星改(一航戦/熟練)": {
+  "id": 343,
+  "typeId": 8,
+  "typeName": "艦上攻撃機"
+ },
+ "彗星(江草隊)": {
+  "id": 100,
+  "typeId": 7,
+  "typeName": "艦上爆撃機"
+ },
+ "特二式内火艇": {
+  "id": 167,
+  "typeId": 46,
+  "typeName": "特型内火艇"
+ },
+ "M4A1 DD": {
+  "id": 355,
+  "typeId": 24,
+  "typeName": "上陸用舟艇"
+ },
+ "25mm三連装機銃 集中配備": {
+  "id": 131,
+  "typeId": 21,
+  "typeName": "対空機銃"
+ },
+ "25mm連装機銃(熟練機銃員分隊)": {
+  "id": 575,
+  "typeId": 21,
+  "typeName": "対空機銃"
+ },
+ "Bofors 40mm四連装機関砲": {
+  "id": 173,
+  "typeId": 21,
+  "typeName": "対空機銃"
+ },
+ "12cm30連装噴進砲改二": {
+  "id": 274,
+  "typeId": 21,
+  "typeName": "対空機銃"
+ },
+ "91式高射装置": {
+  "id": 120,
+  "typeId": 36,
+  "typeName": "高射装置"
+ },
+ "94式高射装置": {
+  "id": 121,
+  "typeId": 36,
+  "typeName": "高射装置"
+ },
+ "15.5cm三連装副砲改二": {
+  "id": 463,
+  "typeId": 4,
+  "typeName": "副砲"
+ },
+ "熟練見張員": {
+  "id": 129,
+  "typeId": 39,
+  "typeName": "水上艦要員"
+ },
+ "探照灯": {
+  "id": 74,
+  "typeId": 29,
+  "typeName": "探照灯"
+ },
+ "照明弾": {
+  "id": 101,
+  "typeId": 33,
+  "typeName": "照明弾"
+ },
+ "九八式水上偵察機(夜偵)": {
+  "id": 102,
+  "typeId": 10,
+  "typeName": "水上偵察機"
+ },
+ "熟練甲板要員": {
+  "id": 477,
+  "typeId": 35,
+  "typeName": "航空要員"
+ },
+ "銀河": {
+  "id": 187,
+  "typeId": 47,
+  "typeName": "陸上攻撃機"
+ },
+ "一式陸攻 三四型": {
+  "id": 186,
+  "typeId": 47,
+  "typeName": "陸上攻撃機"
+ },
+ "四式重爆 飛龍": {
+  "id": 403,
+  "typeId": 47,
+  "typeName": "陸上攻撃機"
+ },
+ "一式戦 隼II型(64戦隊)": {
+  "id": 225,
+  "typeId": 48,
+  "typeName": "局地戦闘機"
+ },
+ "一式戦 隼III型甲(54戦隊)": {
+  "id": 223,
+  "typeId": 48,
+  "typeName": "局地戦闘機"
+ },
+ "雷電": {
+  "id": 175,
+  "typeId": 48,
+  "typeName": "局地戦闘機"
+ },
+ "紫電改(三四三空) 戦闘301": {
+  "id": 263,
+  "typeId": 48,
+  "typeName": "局地戦闘機"
+ },
+ "改良型艦本式タービン": {
+  "id": 33,
+  "typeId": 17,
+  "typeName": "機関部強化"
+ },
+ "強化型艦本式缶": {
+  "id": 34,
+  "typeId": 17,
+  "typeName": "機関部強化"
+ },
+ "新型高温高圧缶": {
+  "id": 87,
+  "typeId": 17,
+  "typeName": "機関部強化"
+ },
+ "増設バルジ(中型艦)": {
+  "id": 72,
+  "typeId": 27,
+  "typeName": "追加装甲(中型)"
+ },
+ "増設バルジ(大型艦)": {
+  "id": 73,
+  "typeId": 28,
+  "typeName": "追加装甲(大型)"
+ },
+ "艦本新設計 増設バルジ(中型艦)": {
+  "id": 203,
+  "typeId": 27,
+  "typeName": "追加装甲(中型)"
+ },
+ "艦本新設計 増設バルジ(大型艦)": {
+  "id": 204,
+  "typeId": 28,
+  "typeName": "追加装甲(大型)"
+ },
+ "艦隊司令部施設": {
+  "id": 107,
+  "typeId": 34,
+  "typeName": "司令部施設"
+ },
+ "遊撃部隊 艦隊司令部": {
+  "id": 272,
+  "typeId": 34,
+  "typeName": "司令部施設"
+ },
+ "精鋭水雷戦隊 司令部": {
+  "id": 413,
+  "typeId": 34,
+  "typeName": "司令部施設"
+ },
+ "水雷戦隊 熟練見張員": {
+  "id": 412,
+  "typeId": 39,
+  "typeName": "水上艦要員"
+ },
+ "96式150cm探照灯": {
+  "id": 140,
+  "typeId": 42,
+  "typeName": "大型探照灯"
+ },
+ "紫雲": {
+  "id": 118,
+  "typeId": 10,
+  "typeName": "水上偵察機"
+ },
+ "紫雲(熟練)": {
+  "id": 521,
+  "typeId": 10,
+  "typeName": "水上偵察機"
+ },
+ "瑞雲改二(六三四空)": {
+  "id": 322,
+  "typeId": 11,
+  "typeName": "水上爆撃機"
+ },
+ "噴式景雲改": {
+  "id": 199,
+  "typeId": 57,
+  "typeName": "噴式戦闘爆撃機"
+ },
+ "橘花改": {
+  "id": 200,
+  "typeId": 57,
+  "typeName": "噴式戦闘爆撃機"
+ },
+ "応急修理要員": {
+  "id": 42,
+  "typeId": 23,
+  "typeName": "応急修理要員"
+ },
+ "応急修理女神": {
+  "id": 43,
+  "typeId": 23,
+  "typeName": "応急修理要員"
+ },
+ "洋上補給": {
+  "id": 146,
+  "typeId": 44,
+  "typeName": "補給物資"
+ },
+ "夜間作戦航空要員": {
+  "id": 258,
+  "typeId": 35,
+  "typeName": "航空要員"
+ },
+ "F6F-3N": {
+  "id": 254,
+  "typeId": 6,
+  "typeName": "艦上戦闘機"
+ },
+ "F6F-5N": {
+  "id": 255,
+  "typeId": 6,
+  "typeName": "艦上戦闘機"
+ },
+ "TBM-3D": {
+  "id": 257,
+  "typeId": 8,
+  "typeName": "艦上攻撃機"
+ },
+ "42号対空電探改二": {
+  "id": 411,
+  "typeId": 13,
+  "typeName": "大型電探"
+ },
+ "FuMO25 レーダー": {
+  "id": 124,
+  "typeId": 13,
+  "typeName": "大型電探"
+ },
+ "カ号観測機": {
+  "id": 69,
+  "typeId": 25,
+  "typeName": "オートジャイロ"
+ },
+ "オ号観測機改二": {
+  "id": 325,
+  "typeId": 25,
+  "typeName": "オートジャイロ"
+ },
+ "S-51J": {
+  "id": 326,
+  "typeId": 25,
+  "typeName": "オートジャイロ"
+ },
+ "S-51J改": {
+  "id": 327,
+  "typeId": 25,
+  "typeName": "オートジャイロ"
+ },
+ "後期型艦首魚雷(6門)": {
+  "id": 213,
+  "typeId": 32,
+  "typeName": "潜水艦魚雷"
+ },
+ "12.7cm連装高角砲": {
+  "id": 10,
+  "typeId": 4,
+  "typeName": "副砲"
+ },
+ "15.5cm三連装副砲": {
+  "id": 12,
+  "typeId": 4,
+  "typeName": "副砲"
+ },
+ "13号対空電探": {
+  "id": 27,
+  "typeId": 12,
+  "typeName": "小型電探"
+ },
+ "22号対水上電探": {
+  "id": 28,
+  "typeId": 12,
+  "typeName": "小型電探"
+ },
+ "三式爆雷投射機": {
+  "id": 45,
+  "typeId": 15,
+  "typeName": "爆雷"
+ },
+ "8cm高角砲": {
+  "id": 66,
+  "typeId": 4,
+  "typeName": "副砲"
+ },
+ "10cm連装高角砲(砲架)": {
+  "id": 71,
+  "typeId": 4,
+  "typeName": "副砲"
+ },
+ "12.7cm高角砲+高射装置": {
+  "id": 130,
+  "typeId": 4,
+  "typeName": "副砲"
+ },
+ "15m二重測距儀+21号電探改二": {
+  "id": 142,
+  "typeId": 13,
+  "typeName": "大型電探"
+ },
+ "潜水艦搭載電探&水防式望遠鏡": {
+  "id": 210,
+  "typeId": 51,
+  "typeName": "潜水艦装備"
+ },
+ "潜水艦搭載電探&逆探(E27)": {
+  "id": 211,
+  "typeId": 51,
+  "typeName": "潜水艦装備"
+ },
+ "8cm高角砲改+増設機銃": {
+  "id": 220,
+  "typeId": 4,
+  "typeName": "副砲"
+ },
+ "九五式爆雷": {
+  "id": 226,
+  "typeId": 15,
+  "typeName": "爆雷"
+ },
+ "二式爆雷": {
+  "id": 227,
+  "typeId": 15,
+  "typeName": "爆雷"
+ },
+ "15.5cm三連装副砲改": {
+  "id": 234,
+  "typeId": 4,
+  "typeName": "副砲"
+ },
+ "22号対水上電探改四(後期調整型)": {
+  "id": 240,
+  "typeId": 12,
+  "typeName": "小型電探"
+ },
+ "北方迷彩(+北方装備)": {
+  "id": 268,
+  "typeId": 27,
+  "typeName": "追加装甲(中型)"
+ },
+ "10cm連装高角砲改+増設機銃": {
+  "id": 275,
+  "typeId": 4,
+  "typeName": "副砲"
+ },
+ "三式弾改": {
+  "id": 317,
+  "typeId": 18,
+  "typeName": "対空強化弾"
+ },
+ "二式12cm迫撃砲改": {
+  "id": 346,
+  "typeId": 15,
+  "typeName": "爆雷"
+ },
+ "二式12cm迫撃砲改 集中配備": {
+  "id": 347,
+  "typeId": 15,
+  "typeName": "爆雷"
+ },
+ "12.7cm単装高角砲改二": {
+  "id": 379,
+  "typeId": 1,
+  "typeName": "小口径主砲"
+ },
+ "後期型潜水艦搭載電探&逆探": {
+  "id": 384,
+  "typeId": 51,
+  "typeName": "潜水艦装備"
+ },
+ "装甲艇(AB艇)": {
+  "id": 408,
+  "typeId": 24,
+  "typeName": "上陸用舟艇"
+ },
+ "21号対空電探改二": {
+  "id": 410,
+  "typeId": 13,
+  "typeName": "大型電探"
+ },
+ "潜水艦後部魚雷発射管4門(初期型)": {
+  "id": 442,
+  "typeId": 32,
+  "typeName": "潜水艦魚雷"
+ },
+ "潜水艦後部魚雷発射管4門(後期型)": {
+  "id": 443,
+  "typeId": 32,
+  "typeName": "潜水艦魚雷"
+ },
+ "後期型電探&逆探+シュノーケル装備": {
+  "id": 458,
+  "typeId": 51,
+  "typeName": "潜水艦装備"
+ },
+ "15m二重測距儀改+21号電探改二+熟練射撃指揮所": {
+  "id": 460,
+  "typeId": 13,
+  "typeName": "大型電探"
+ },
+ "10cm連装高角砲群 集中配備": {
+  "id": 464,
+  "typeId": 4,
+  "typeName": "副砲"
+ },
+ "熟練甲板要員+航空整備員": {
+  "id": 478,
+  "typeId": 35,
+  "typeName": "航空要員"
+ },
+ "三式弾改二": {
+  "id": 483,
+  "typeId": 18,
+  "typeName": "対空強化弾"
+ },
+ "二式爆雷改二": {
+  "id": 488,
+  "typeId": 15,
+  "typeName": "爆雷"
+ },
+ "電探装備マスト(13号改+22号電探改四)": {
+  "id": 506,
+  "typeId": 12,
+  "typeName": "小型電探"
+ },
+ "逆探(E27)+22号対水上電探改四(後期調整型)": {
+  "id": 517,
+  "typeId": 12,
+  "typeName": "小型電探"
+ },
+ "SJレーダー+潜水艦司令塔装備": {
+  "id": 519,
+  "typeId": 51,
+  "typeName": "潜水艦装備"
+ },
+ "12cm単装高角砲+25mm機銃増備": {
+  "id": 524,
+  "typeId": 4,
+  "typeName": "副砲"
+ },
+ "特四式内火艇": {
+  "id": 525,
+  "typeId": 46,
+  "typeName": "特型内火艇"
+ },
+ "特四式内火艇改": {
+  "id": 526,
+  "typeId": 46,
+  "typeName": "特型内火艇"
+ },
+ "Type281 レーダー": {
+  "id": 527,
+  "typeId": 13,
+  "typeName": "大型電探"
+ },
+ "Type274 射撃管制レーダー": {
+  "id": 528,
+  "typeId": 13,
+  "typeName": "大型電探"
+ },
+ "三式爆雷投射機改": {
+  "id": 569,
+  "typeId": 15,
+  "typeName": "爆雷"
+ },
+ "53cm連装魚雷改(酸素魚雷)": {
+  "id": 571,
+  "typeId": 5,
+  "typeName": "魚雷"
+ },
+ "12.7cm単装高角砲改三": {
+  "id": 572,
+  "typeId": 1,
+  "typeName": "小口径主砲"
+ }
 };
-const HD_EQUIPMENT_CATEGORY_MASTER_ALIASES={
- '小型水上電探':['小型電探'],'小型対空電探':['小型電探'],'小型電探':['小型電探'],
- '回転翼機':['オートジャイロ'],'増設バルジ':['追加装甲','追加装甲(中型)','追加装甲(大型)'],
- '艦載発煙装置':['水上艦装備'],'噴式戦闘爆撃機':['噴式戦闘爆撃機','噴式戦闘爆撃機(II'],
- '陸軍戦闘機':['局地戦闘機']
+const HD_EQUIPMENT_CATEGORY_MASTER_TYPE_IDS={
+ "小口径主砲": [
+  1
+ ],
+ "中口径主砲": [
+  2
+ ],
+ "大口径主砲": [
+  3
+ ],
+ "副砲": [
+  4
+ ],
+ "魚雷": [
+  5
+ ],
+ "艦上戦闘機": [
+  6
+ ],
+ "艦上爆撃機": [
+  7
+ ],
+ "艦上攻撃機": [
+  8
+ ],
+ "艦上偵察機": [
+  9
+ ],
+ "水上偵察機": [
+  10
+ ],
+ "水上爆撃機": [
+  11
+ ],
+ "小型電探": [
+  12
+ ],
+ "小型水上電探": [
+  12
+ ],
+ "小型対空電探": [
+  12
+ ],
+ "大型電探": [
+  13
+ ],
+ "ソナー": [
+  14
+ ],
+ "爆雷": [
+  15
+ ],
+ "増設バルジ": [
+  16,
+  27,
+  28
+ ],
+ "機関部強化": [
+  17
+ ],
+ "対空強化弾": [
+  18
+ ],
+ "対艦強化弾": [
+  19
+ ],
+ "対空機銃": [
+  21
+ ],
+ "特殊潜航艇": [
+  22
+ ],
+ "応急修理要員": [
+  23
+ ],
+ "上陸用舟艇": [
+  24
+ ],
+ "回転翼機": [
+  25
+ ],
+ "探照灯": [
+  29
+ ],
+ "潜水艦魚雷": [
+  32
+ ],
+ "照明弾": [
+  33
+ ],
+ "司令部施設": [
+  34
+ ],
+ "航空要員": [
+  35
+ ],
+ "高射装置": [
+  36
+ ],
+ "大型探照灯": [
+  42
+ ],
+ "補給物資": [
+  44
+ ],
+ "水上戦闘機": [
+  45
+ ],
+ "特型内火艇": [
+  46
+ ],
+ "陸上攻撃機": [
+  47
+ ],
+ "局地戦闘機": [
+  48
+ ],
+ "陸軍戦闘機": [
+  48
+ ],
+ "潜水艦装備": [
+  51
+ ],
+ "水上艦要員": [
+  39,
+  54
+ ],
+ "艦載発煙装置": [
+  54
+ ],
+ "噴式戦闘爆撃機": [
+  57,
+  91
+ ]
+};
+const HD_EXSLOT_BASE_TYPE_IDS=[16,21,23,27,28,36,39,43,44];
+const HD_EXSLOT_GLOBAL_ITEM_IDS=[33];
+const HD_EXSLOT_ITEM_RULES={
+ "10": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   546,
+   593,
+   911,
+   916,
+   954,
+   1031
+  ]
+ },
+ "12": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   546,
+   911,
+   916
+  ]
+ },
+ "27": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [
+   38,
+   41,
+   52,
+   54,
+   101
+  ],
+  "shipIds": [
+   229,
+   426,
+   961,
+   975,
+   979,
+   986,
+   987,
+   1035,
+   1040
+  ]
+ },
+ "28": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [
+   30,
+   38,
+   101
+  ],
+  "shipIds": [
+   229,
+   591,
+   592,
+   593,
+   694,
+   954,
+   961,
+   975,
+   1035,
+   1040
+  ]
+ },
+ "33": {
+  "reqStar": 0,
+  "stypes": [
+   99
+  ],
+  "ctypes": [],
+  "shipIds": []
+ },
+ "34": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   229,
+   316,
+   951,
+   961,
+   1035,
+   1040
+  ]
+ },
+ "35": {
+  "reqStar": 0,
+  "stypes": [
+   5,
+   6,
+   8,
+   9,
+   10
+  ],
+  "ctypes": [],
+  "shipIds": []
+ },
+ "45": {
+  "reqStar": 0,
+  "stypes": [
+   1
+  ],
+  "ctypes": [
+   54,
+   101
+  ],
+  "shipIds": [
+   564,
+   648,
+   961,
+   982,
+   1033,
+   1035,
+   1040
+  ]
+ },
+ "66": {
+  "reqStar": 0,
+  "stypes": [
+   19,
+   20,
+   21
+  ],
+  "ctypes": [
+   41
+  ],
+  "shipIds": [
+   488,
+   501,
+   502,
+   503,
+   504,
+   506,
+   507,
+   508,
+   509,
+   883,
+   888,
+   894,
+   899
+  ]
+ },
+ "71": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [
+   43,
+   52
+  ],
+  "shipIds": [
+   136,
+   148,
+   546,
+   593,
+   894,
+   899,
+   911,
+   916,
+   954,
+   1031
+  ]
+ },
+ "87": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   229,
+   316,
+   951,
+   961,
+   1035,
+   1040
+  ]
+ },
+ "88": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [
+   30,
+   38,
+   101
+  ],
+  "shipIds": [
+   229,
+   591,
+   592,
+   593,
+   694,
+   954,
+   961,
+   975,
+   1035,
+   1040
+  ]
+ },
+ "106": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [
+   38,
+   41,
+   52,
+   54,
+   101
+  ],
+  "shipIds": [
+   229,
+   426,
+   961,
+   975,
+   979,
+   986,
+   987,
+   1035,
+   1040
+  ]
+ },
+ "124": {
+  "reqStar": 7,
+  "stypes": [],
+  "ctypes": [
+   47,
+   55
+  ],
+  "shipIds": []
+ },
+ "130": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   546,
+   593,
+   911,
+   916,
+   954,
+   1031
+  ]
+ },
+ "142": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   546,
+   911,
+   916
+  ]
+ },
+ "210": {
+  "reqStar": 0,
+  "stypes": [
+   13,
+   14
+  ],
+  "ctypes": [],
+  "shipIds": []
+ },
+ "211": {
+  "reqStar": 0,
+  "stypes": [
+   13,
+   14
+  ],
+  "ctypes": [],
+  "shipIds": []
+ },
+ "220": {
+  "reqStar": 0,
+  "stypes": [
+   19,
+   20,
+   21
+  ],
+  "ctypes": [
+   41
+  ],
+  "shipIds": [
+   488,
+   501,
+   502,
+   503,
+   504,
+   506,
+   507,
+   508,
+   509,
+   883,
+   888,
+   894,
+   899
+  ]
+ },
+ "226": {
+  "reqStar": 0,
+  "stypes": [
+   1
+  ],
+  "ctypes": [],
+  "shipIds": [
+   145,
+   961,
+   982,
+   1033,
+   1035,
+   1040
+  ]
+ },
+ "227": {
+  "reqStar": 0,
+  "stypes": [
+   1
+  ],
+  "ctypes": [],
+  "shipIds": [
+   145,
+   961,
+   982,
+   1033,
+   1035,
+   1040
+  ]
+ },
+ "234": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   546,
+   911,
+   916
+  ]
+ },
+ "240": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [
+   30,
+   38,
+   101
+  ],
+  "shipIds": [
+   229,
+   591,
+   592,
+   593,
+   694,
+   954,
+   961,
+   975,
+   1035,
+   1040
+  ]
+ },
+ "268": {
+  "reqStar": 7,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   100,
+   101,
+   114,
+   200,
+   290,
+   395,
+   511,
+   512,
+   513,
+   516,
+   574,
+   995,
+   1000,
+   1001,
+   1006
+  ]
+ },
+ "275": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [
+   43,
+   52
+  ],
+  "shipIds": [
+   136,
+   148,
+   546,
+   593,
+   894,
+   899,
+   911,
+   916,
+   954,
+   1031
+  ]
+ },
+ "317": {
+  "reqStar": 0,
+  "stypes": [
+   5,
+   6,
+   8,
+   9,
+   10
+  ],
+  "ctypes": [],
+  "shipIds": []
+ },
+ "346": {
+  "reqStar": 0,
+  "stypes": [
+   1,
+   16,
+   17,
+   19,
+   20,
+   22
+  ],
+  "ctypes": [],
+  "shipIds": []
+ },
+ "347": {
+  "reqStar": 0,
+  "stypes": [
+   1,
+   16,
+   17,
+   19,
+   20,
+   22
+  ],
+  "ctypes": [],
+  "shipIds": []
+ },
+ "379": {
+  "reqStar": 7,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   144,
+   145,
+   195,
+   407,
+   419,
+   426,
+   437,
+   557,
+   656,
+   961,
+   1035,
+   1040
+  ]
+ },
+ "384": {
+  "reqStar": 0,
+  "stypes": [
+   13,
+   14
+  ],
+  "ctypes": [],
+  "shipIds": []
+ },
+ "408": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   621,
+   626
+  ]
+ },
+ "410": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   591,
+   592,
+   593,
+   694,
+   954,
+   1031
+  ]
+ },
+ "411": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   591,
+   592,
+   593,
+   694,
+   954,
+   1031
+  ]
+ },
+ "413": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [
+   4,
+   16,
+   20,
+   38,
+   41,
+   52,
+   54
+  ],
+  "shipIds": []
+ },
+ "442": {
+  "reqStar": 0,
+  "stypes": [
+   13,
+   14
+  ],
+  "ctypes": [],
+  "shipIds": []
+ },
+ "443": {
+  "reqStar": 0,
+  "stypes": [
+   13,
+   14
+  ],
+  "ctypes": [],
+  "shipIds": []
+ },
+ "450": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [
+   38,
+   41,
+   52,
+   54,
+   101
+  ],
+  "shipIds": [
+   229,
+   426,
+   961,
+   975,
+   979,
+   986,
+   987,
+   1035,
+   1040
+  ]
+ },
+ "458": {
+  "reqStar": 0,
+  "stypes": [
+   13,
+   14
+  ],
+  "ctypes": [],
+  "shipIds": []
+ },
+ "460": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   546,
+   911,
+   916
+  ]
+ },
+ "463": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   546,
+   911,
+   916
+  ]
+ },
+ "464": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   546,
+   593,
+   911,
+   916,
+   954,
+   1031
+  ]
+ },
+ "477": {
+  "reqStar": 0,
+  "stypes": [
+   7,
+   11,
+   18
+  ],
+  "ctypes": [],
+  "shipIds": []
+ },
+ "478": {
+  "reqStar": 0,
+  "stypes": [
+   7,
+   11,
+   18
+  ],
+  "ctypes": [],
+  "shipIds": []
+ },
+ "483": {
+  "reqStar": 0,
+  "stypes": [
+   5,
+   6,
+   8,
+   9,
+   10
+  ],
+  "ctypes": [],
+  "shipIds": []
+ },
+ "488": {
+  "reqStar": 0,
+  "stypes": [
+   1
+  ],
+  "ctypes": [],
+  "shipIds": [
+   145,
+   961,
+   982,
+   1033,
+   1035,
+   1040
+  ]
+ },
+ "506": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   147,
+   235,
+   407,
+   419,
+   464,
+   470,
+   537,
+   538,
+   557,
+   558,
+   578,
+   656,
+   743,
+   744,
+   745,
+   955,
+   956,
+   960,
+   961,
+   963,
+   968,
+   975,
+   981,
+   982,
+   983,
+   1033,
+   1034,
+   1035,
+   1040,
+   1046
+  ]
+ },
+ "517": {
+  "reqStar": 4,
+  "stypes": [],
+  "ctypes": [
+   30,
+   38,
+   101
+  ],
+  "shipIds": [
+   229,
+   591,
+   592,
+   593,
+   694,
+   954,
+   961,
+   975,
+   1035,
+   1040
+  ]
+ },
+ "519": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [
+   114,
+   122
+  ],
+  "shipIds": []
+ },
+ "524": {
+  "reqStar": 0,
+  "stypes": [
+   17,
+   19,
+   20,
+   21,
+   22
+  ],
+  "ctypes": [],
+  "shipIds": []
+ },
+ "525": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   399,
+   607,
+   971,
+   972,
+   976,
+   977
+  ]
+ },
+ "526": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   399,
+   607,
+   971,
+   972,
+   976,
+   977
+  ]
+ },
+ "527": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [
+   67,
+   78,
+   88,
+   108,
+   112,
+   135
+  ],
+  "shipIds": []
+ },
+ "528": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [
+   67,
+   88,
+   108,
+   134
+  ],
+  "shipIds": []
+ },
+ "569": {
+  "reqStar": 0,
+  "stypes": [
+   1
+  ],
+  "ctypes": [
+   54,
+   101
+  ],
+  "shipIds": [
+   564,
+   648,
+   961,
+   982,
+   1033,
+   1035,
+   1040
+  ]
+ },
+ "571": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   591,
+   592,
+   656,
+   694,
+   954,
+   961
+  ]
+ },
+ "572": {
+  "reqStar": 0,
+  "stypes": [],
+  "ctypes": [],
+  "shipIds": [
+   144,
+   145,
+   195,
+   407,
+   419,
+   426,
+   437,
+   557,
+   656,
+   961,
+   1035,
+   1040
+  ]
+ }
+};
+const HD_EXSLOT_LIMIT_TYPE_IDS={
+ "100": [
+  27
+ ],
+ "101": [
+  27
+ ],
+ "114": [
+  27
+ ],
+ "200": [
+  27
+ ],
+ "290": [
+  27
+ ],
+ "395": [
+  27
+ ],
+ "511": [
+  27
+ ],
+ "512": [
+  27
+ ],
+ "513": [
+  27
+ ],
+ "516": [
+  27
+ ],
+ "574": [
+  27
+ ],
+ "995": [
+  27
+ ],
+ "1000": [
+  27
+ ],
+ "1001": [
+  27
+ ],
+ "1006": [
+  27
+ ]
 };
 const HD_SHIP_EXPANSION_SPECIAL={
  '綾波改二':['12.7cm単装高角砲系'],
@@ -4503,20 +8587,57 @@ function hdShipDbSlotProfile(ship){
  const p=HD_SHIP_SLOT_PROFILES[name];if(!p)return null;
  return {...p,total:p.slots.reduce((s,n)=>s+n,0),count:p.slots.length};
 }
-function hdShipDbMasterTypesForItem(item){
- const exact=HD_EQUIPMENT_MASTER_TYPE_BY_NAME[item?.name];
- if(exact)return [exact];
- const cat=String(item?.category||'');
- if(HD_EQUIPMENT_CATEGORY_MASTER_ALIASES[cat])return HD_EQUIPMENT_CATEGORY_MASTER_ALIASES[cat];
- return cat?[cat]:[];
+function hdShipDbMasterMeta(item){
+ return HD_EQUIPMENT_MASTER_META_BY_NAME[String(item?.name||'')]||null;
+}
+function hdShipDbMasterTypeIdsForItem(item){
+ const exact=hdShipDbMasterMeta(item);if(exact?.typeId)return [Number(exact.typeId)];
+ return HD_EQUIPMENT_CATEGORY_MASTER_TYPE_IDS[String(item?.category||'')]||[];
 }
 function hdShipDbMasterCompatible(item,ship){
- const p=hdShipDbSlotProfile(ship);if(!p?.allowedTypes?.length)return null;
- const types=hdShipDbMasterTypesForItem(item);if(!types.length)return null;
- const known=new Set(p.allowedTypes);
- const mapped=types.filter(Boolean);
- if(!mapped.length)return null;
- return mapped.some(t=>known.has(t));
+ const p=hdShipDbSlotProfile(ship);if(!p?.equipRules)return null;
+ const exact=hdShipDbMasterMeta(item),ids=hdShipDbMasterTypeIdsForItem(item);if(!ids.length)return null;
+ let saw=false;
+ for(const typeId of ids){
+  const key=String(typeId);if(!Object.prototype.hasOwnProperty.call(p.equipRules,key))continue;
+  saw=true;const rule=p.equipRules[key];
+  if(rule===null)return true;
+  if(exact&&Array.isArray(rule)&&rule.includes(Number(exact.id)))return true;
+ }
+ return saw?false:null;
+}
+function hdShipDbExpansionRuleMatch(rule,profile,star=0){
+ if(!rule||!profile)return false;
+ if(Number(star||0)<Number(rule.reqStar||0))return false;
+ return (rule.shipIds||[]).includes(Number(profile.id))||(rule.stypes||[]).includes(Number(profile.stype))||(rule.ctypes||[]).includes(Number(profile.ctype));
+}
+function hdShipDbExpansionCompatible(item,ship,star=0){
+ const profile=hdShipDbSlotProfile(ship),normal=hdShipDbMasterCompatible(item,ship);
+ if(normal===false)return false;
+ if(normal===null&&!hdShipDbEquipCompatible(item,ship))return false;
+ const exact=hdShipDbMasterMeta(item),typeIds=hdShipDbMasterTypeIdsForItem(item);
+ if(exact){
+  const special=HD_EXSLOT_ITEM_RULES[String(exact.id)];
+  if(special&&hdShipDbExpansionRuleMatch(special,profile,star))return true;
+  if(HD_EXSLOT_GLOBAL_ITEM_IDS.includes(Number(exact.id)))return true;
+ }
+ const blocked=new Set(HD_EXSLOT_LIMIT_TYPE_IDS[String(profile?.id)]||[]);
+ return typeIds.some(id=>HD_EXSLOT_BASE_TYPE_IDS.includes(Number(id))&&!blocked.has(Number(id)));
+}
+function hdShipDbExpansionCandidates(ship,remaining=null,context=''){
+ const inv=hdShipDbOwnedEquipInventory(),rows=[];
+ for(const own of inv.values()){
+  const remain=remaining?Number(remaining.get(own.key)||0):Number(own.count||0);if(remain<=0)continue;
+  if(!hdShipDbExpansionCompatible(own.item,ship,own.maxStar||0))continue;
+  const score=hdShipDbEquipPower(own.item,context)+(own.maxStar||0)*2;
+  rows.push({own,score,remain});
+ }
+ return rows.sort((a,b)=>b.score-a.score||b.own.maxStar-a.own.maxStar||a.own.name.localeCompare(b.own.name,'ja'));
+}
+function hdShipDbExpansionHtml(ship){
+ const rows=hdShipDbExpansionCandidates(ship,null,(HD_SHIP_LOADOUTS[ship.final]||[]).map(x=>x.name+' '+x.memo).join(' ')).slice(0,6);
+ if(!rows.length)return '<div class="hd-shipdb-expansion-owned"><b>手持ち増設候補</b><span>装備台帳に搭載可能な候補なし</span></div>';
+ return `<div class="hd-shipdb-expansion-owned"><b>手持ち増設候補</b><div>${rows.map(({own})=>`<span>${hdShipDbEsc(own.name)}${own.maxStar?` ★${own.maxStar}`:''}</span>`).join('')}</div></div>`;
 }
 function hdShipDbAirGearKind(item,wanted=''){
  const cat=String(item?.category||''),text=`${wanted} ${item?.name||''} ${cat}`;
@@ -4539,7 +8660,7 @@ function hdShipDbSlotHtml(item){
  if(!p&&!special.length)return '';
  const slotHtml=p?`<div class="hd-shipdb-slot-grid">${p.slots.map((n,i)=>`<span><i>第${i+1}</i><b>${n}</b><small>機</small></span>`).join('')}</div>`:'';
  const flags=p?.flags?.length?`<div class="hd-shipdb-slot-flags">${p.flags.map(x=>`<span>${hdShipDbEsc(x)}</span>`).join('')}</div>`:'';
- const expansion=`<div class="hd-shipdb-expansion"><b>補強増設</b><span>Lv30以上で開放可能。通常装備可否はゲームマスター基準、補強増設の個別制限は別途表示。</span>${special.length?`<small>特殊対応: ${special.map(hdShipDbEsc).join(' / ')}</small>`:''}</div>`;
+ const expansion=`<div class="hd-shipdb-expansion"><b>補強増設</b><span>Lv30以上で開放可能。共通カテゴリ・艦別追加許可・艦別制限・改修★条件をマスター基準で判定。</span>${special.length?`<small>参考表示: ${special.map(hdShipDbEsc).join(' / ')}</small>`:''}${hdShipDbExpansionHtml(item)}</div>`;
  return `<div class="hd-shipdb-slot-profile"><div class="hd-shipdb-stat-head"><b>装備スロット</b><span>${p?`${p.count}スロット・搭載計${p.total}`:'特殊増設対応'}</span></div>${slotHtml}${flags}${expansion}</div>`;
 }
 
@@ -4698,7 +8819,8 @@ function hdShipDbResolveOwnedLoadout(ship,set){
   if(best){remaining.set(best.own.key,(remaining.get(best.own.key)||0)-1);slots.push({wanted,found:true,name:best.own.name,star:best.own.maxStar,count:best.own.count,slotIndex,capacity})}
   else slots.push({wanted,found:false,name:'',star:0,count:0,slotIndex,capacity});
  }
- return {slots,filled:slots.filter(x=>x.found).length,total:slots.length,inventoryCount:[...inv.values()].reduce((s,x)=>s+x.count,0),profile,freeSlots:free};
+ const expansion=hdShipDbExpansionCandidates(ship,remaining,`${set?.name||''} ${set?.memo||''} ${(set?.gear||[]).join(' ')}`)[0]||null;
+ return {slots,filled:slots.filter(x=>x.found).length,total:slots.length,inventoryCount:[...inv.values()].reduce((s,x)=>s+x.count,0),profile,freeSlots:free,expansion};
 }
 function hdShipDbOwnedFitHtml(ship,set){
  if(!set)return '';
@@ -4707,7 +8829,7 @@ function hdShipDbOwnedFitHtml(ship,set){
  const cls=plan.filled===plan.total?'complete':plan.filled?'partial':'missing';
  const rows=[...plan.slots].sort((a,b)=>(a.slotIndex??99)-(b.slotIndex??99));
  const slotNote=plan.profile?'<small>搭載数を考慮して航空装備を自動配置</small>':'<small>装備可否・性能から自動配備</small>';
- return `<div class="hd-map-owned-fit ${cls}"><div class="hd-map-owned-fit-head"><div><b>手持ち装備案</b><small>${plan.filled}/${plan.total}枠を配備</small>${slotNote}</div><button type="button" class="ghost small" data-hd-ship-owned-refresh>再配備</button></div><div class="hd-map-owned-slots">${rows.map(x=>{const slot=plan.profile?`第${(x.slotIndex??0)+1}スロ・${x.capacity}機`:`装備枠${(x.slotIndex??0)+1}`;return x.found?`<span class="owned"><i>✓</i><b>${hdShipDbEsc(x.name)}${x.star?` ★${x.star}`:''}</b><small>${slot}｜所持 ${x.count}｜${hdShipDbEsc(x.wanted)}</small></span>`:`<span class="missing"><i>!</i><b>不足</b><small>${slot}｜${hdShipDbEsc(x.wanted)}</small><button type="button" class="ghost small" data-hd-ship-acquire="${hdShipDbEsc(x.wanted)}">入手方法</button></span>`}).join('')}${plan.profile&&plan.freeSlots.length?plan.freeSlots.sort((a,b)=>a.index-b.index).map(x=>`<span class="free"><i>＋</i><b>空きスロット</b><small>第${x.index+1}スロ・${x.cap}機</small></span>`).join(''):''}</div><button type="button" class="ghost small" data-hd-ship-equip-ledger>装備台帳を開く</button></div>`;
+ return `<div class="hd-map-owned-fit ${cls}"><div class="hd-map-owned-fit-head"><div><b>手持ち装備案</b><small>${plan.filled}/${plan.total}枠を配備</small>${slotNote}</div><button type="button" class="ghost small" data-hd-ship-owned-refresh>再配備</button></div><div class="hd-map-owned-slots">${rows.map(x=>{const slot=plan.profile?`第${(x.slotIndex??0)+1}スロ・${x.capacity}機`:`装備枠${(x.slotIndex??0)+1}`;return x.found?`<span class="owned"><i>✓</i><b>${hdShipDbEsc(x.name)}${x.star?` ★${x.star}`:''}</b><small>${slot}｜所持 ${x.count}｜${hdShipDbEsc(x.wanted)}</small></span>`:`<span class="missing"><i>!</i><b>不足</b><small>${slot}｜${hdShipDbEsc(x.wanted)}</small><button type="button" class="ghost small" data-hd-ship-acquire="${hdShipDbEsc(x.wanted)}">入手方法</button></span>`}).join('')}${plan.profile&&plan.freeSlots.length?plan.freeSlots.sort((a,b)=>a.index-b.index).map(x=>`<span class="free"><i>＋</i><b>空きスロット</b><small>第${x.index+1}スロ・${x.cap}機</small></span>`).join(''):''}${plan.expansion?`<div class="hd-map-expansion-pick"><i>増設</i><b>${hdShipDbEsc(plan.expansion.own.name)}${plan.expansion.own.maxStar?` ★${plan.expansion.own.maxStar}`:''}</b><small>通常枠で未使用の手持ちから選択</small></div>`:''}</div><button type="button" class="ghost small" data-hd-ship-equip-ledger>装備台帳を開く</button></div>`;
 }
 function hdShipDbAcquisitionKind(wanted){
  const w=String(wanted||'');
@@ -4807,7 +8929,7 @@ function hdEnsureShipDatabase(){
  const roster=document.getElementById('roster');if(!roster)return;
  const sec=document.createElement('section');sec.id='shipDatabase';sec.className='advanced-section';
  const types=['すべて',...new Set(HD_SHIP_DATABASE.map(x=>x.type))];
- sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">SHIP DATABASE</div><h2>艦娘データベース・改装計画</h2></div><span id="hdShipDbCount" class="muted"></span></div><div class="hd-shipdb-note">主要艦の改装Lv・必要アイテム・役割に加えて、Lv99最大ステータスと用途別おすすめ装備を確認。艦隊台帳のLvとも照合するよ。ステータスは攻略Wikiの現行Lv99最大値（装備補正なし）基準。通常スロット数・各搭載数・公式装備カテゴリ可否は2026-09-16更新のapi_start2マスターを100隻すべて照合済み。</div><div class="hd-shipdb-toolbar"><input id="hdShipDbSearch" type="search" placeholder="艦名・艦種・役割で検索"><label><input id="hdShipDbMissingOnly" type="checkbox"> 未所持だけ</label></div><div class="hd-shipdb-filters">${types.map((t,i)=>`<button class="ghost small${i===0?' active':''}" type="button" data-hd-shipdb-filter="${hdShipDbEsc(t)}">${hdShipDbEsc(t)}</button>`).join('')}</div><div id="hdShipDbList" class="hd-shipdb-list"></div><div><a class="guide-link" href="https://wikiwiki.jp/kancolle/%E6%94%B9%E9%80%A0/%E8%89%A6%E7%A8%AE%E5%88%A5%E4%B8%80%E8%A6%A7" target="_blank" rel="noopener">攻略Wiki 改造一覧で最新情報 ↗</a></div>`;
+ sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">SHIP DATABASE</div><h2>艦娘データベース・改装計画</h2></div><span id="hdShipDbCount" class="muted"></span></div><div class="hd-shipdb-note">主要艦の改装Lv・必要アイテム・役割に加えて、Lv99最大ステータスと用途別おすすめ装備を確認。艦隊台帳のLvとも照合するよ。ステータスは攻略Wikiの現行Lv99最大値（装備補正なし）基準。通常スロット数・各搭載数・装備ID例外・補強増設可否は2026-09-16更新のapi_start2マスターを100隻すべて照合済み。</div><div class="hd-shipdb-toolbar"><input id="hdShipDbSearch" type="search" placeholder="艦名・艦種・役割で検索"><label><input id="hdShipDbMissingOnly" type="checkbox"> 未所持だけ</label></div><div class="hd-shipdb-filters">${types.map((t,i)=>`<button class="ghost small${i===0?' active':''}" type="button" data-hd-shipdb-filter="${hdShipDbEsc(t)}">${hdShipDbEsc(t)}</button>`).join('')}</div><div id="hdShipDbList" class="hd-shipdb-list"></div><div><a class="guide-link" href="https://wikiwiki.jp/kancolle/%E6%94%B9%E9%80%A0/%E8%89%A6%E7%A8%AE%E5%88%A5%E4%B8%80%E8%A6%A7" target="_blank" rel="noopener">攻略Wiki 改造一覧で最新情報 ↗</a></div>`;
  roster.insertAdjacentElement('beforebegin',sec);
  document.getElementById('hdShipDbSearch').addEventListener('input',hdRenderShipDatabase);
  document.getElementById('hdShipDbMissingOnly').addEventListener('change',e=>{hdShipDbMissingOnly=e.target.checked;hdRenderShipDatabase()});
