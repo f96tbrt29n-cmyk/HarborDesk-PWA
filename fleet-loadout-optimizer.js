@@ -154,18 +154,49 @@ function hdFORareUsage(plan){
  }
  return {slots:slots,names:[...names]};
 }
+function hdFOItemLabel(item){
+ if(!item||!item.name)return 'なし';
+ return item.name+(Number(item.star)?' ★'+Number(item.star):'');
+}
+function hdFODiff(base,plan){
+ const out=[],maxShips=Math.max((base&&base.ships||[]).length,(plan&&plan.ships||[]).length);
+ for(let si=0;si<maxShips;si++){
+  const a=base&&base.ships&&base.ships[si]||{},b=plan&&plan.ships&&plan.ships[si]||{},maxItems=Math.max((a.items||[]).length,(b.items||[]).length);
+  for(let ii=0;ii<maxItems;ii++){
+   const from=a.items&&a.items[ii]||null,to=b.items&&b.items[ii]||null;
+   if(hdFOItemLabel(from)===hdFOItemLabel(to))continue;
+   out.push({ship:b.ship||a.ship||'未選択',slot:ii+1,from:hdFOItemLabel(from),to:hdFOItemLabel(to)});
+  }
+ }
+ return out;
+}
+function hdFOCompareBadges(rows){
+ if(!rows.length)return rows;
+ const maxReady=Math.max(...rows.map(function(x){return x.ready})),maxAttack=Math.max(...rows.map(function(x){return x.equipAttack})),minChanges=Math.min(...rows.map(function(x){return x.changes})),minRare=Math.min(...rows.map(function(x){return x.rareSlots}));
+ return rows.map(function(x){
+  const badges=[];
+  if(x.ready===maxReady)badges.push('条件充足最大');
+  if(x.equipAttack===maxAttack)badges.push('火力最大');
+  if(x.changes===minChanges)badges.push('交換最少');
+  if(x.rareSlots===minRare)badges.push('希少装備最少');
+  return Object.assign({},x,{badges:badges});
+ });
+}
 function hdFOCompare(index){
  const base=hdFOStandardPlan(index);if(!base)return [];
- return Object.keys(HD_FO_MODES).map(function(id){
+ const rows=Object.keys(HD_FO_MODES).map(function(id){
   const plan=hdFOOptimize(base,id),e=plan.optimization&&plan.optimization.after||hdFEEvaluate(plan),rare=hdFORareUsage(plan);
-  return {mode:id,label:hdFOMode(id).label,note:hdFOMode(id).note,plan:plan,ready:e&&e.ready||0,total:e&&e.requirements&&e.requirements.length||0,partial:e&&e.partial||0,missing:e&&e.missing||0,changes:plan.optimization&&plan.optimization.changes.length||0,equipAttack:e&&e.night&&e.night.equipmentAttack||0,rareSlots:rare.slots,rareNames:rare.names,unresolved:plan.optimization&&plan.optimization.unresolved||[]};
+  return {mode:id,label:hdFOMode(id).label,note:hdFOMode(id).note,plan:plan,ready:e&&e.ready||0,total:e&&e.requirements&&e.requirements.length||0,partial:e&&e.partial||0,missing:e&&e.missing||0,changes:plan.optimization&&plan.optimization.changes.length||0,equipAttack:e&&e.night&&e.night.equipmentAttack||0,rareSlots:rare.slots,rareNames:rare.names,unresolved:plan.optimization&&plan.optimization.unresolved||[],diff:hdFODiff(base,plan)};
  });
+ return hdFOCompareBadges(rows);
 }
 function hdFOCompareHtml(index,rows){
  return '<div class="hd-fo-compare"><div class="hd-fo-compare-head"><div><strong>5モード比較</strong><span>同じ標準配備から各方針を個別計算</span></div><button type="button" class="ghost small" data-hd-fo-close-compare>閉じる</button></div><div class="hd-fo-compare-grid">'+rows.map(function(x){
   const unresolved=x.unresolved.length?x.unresolved.map(function(r){return hdFOEsc(r.label)+' '+r.count+'/'+r.minCount}).join('、'):'主要要求は配備目安内';
-  return '<article class="hd-fo-compare-card" data-hd-fo-compare-card="'+x.mode+'"><div class="hd-fo-compare-card-head"><div><strong>'+hdFOEsc(x.label)+'</strong><small>'+hdFOEsc(x.note)+'</small></div><b>'+x.ready+'/'+x.total+'</b></div><div class="hd-fo-compare-metrics"><span>条件充足 <b>'+x.ready+'/'+x.total+'</b></span><span>未配置 <b>'+x.missing+'</b></span><span>交換 <b>'+x.changes+'</b></span><span>装備 火力+雷装 <b>'+x.equipAttack+'</b></span><span>希少・高改修 <b>'+x.rareSlots+'枠</b></span></div><p>'+unresolved+'</p><button type="button" class="primary small" data-hd-fo-adopt="'+x.mode+'" data-hd-fo-index="'+index+'">この案を採用</button></article>';
- }).join('')+'</div><p class="hd-fo-compare-note">※数値は装備台帳とアプリ内評価式による比較。最終制空値・最終33式・個艦固有の搭載可否などは別途確認してね。</p></div>';
+  const badges=(x.badges||[]).length?'<div class="hd-fo-badges">'+x.badges.map(function(b){return '<span>'+hdFOEsc(b)+'</span>'}).join('')+'</div>':'';
+  const diff=x.diff&&x.diff.length?'<details class="hd-fo-diff"><summary>装備変更差分 '+x.diff.length+'件</summary><div>'+x.diff.map(function(d){return '<p><b>'+hdFOEsc(d.ship)+'</b><span>'+hdFOEsc(d.from)+' → '+hdFOEsc(d.to)+'</span></p>'}).join('')+'</div></details>':'<div class="hd-fo-no-diff">標準配備から変更なし</div>';
+  return '<article class="hd-fo-compare-card" data-hd-fo-compare-card="'+x.mode+'">'+badges+'<div class="hd-fo-compare-card-head"><div><strong>'+hdFOEsc(x.label)+'</strong><small>'+hdFOEsc(x.note)+'</small></div><b>'+x.ready+'/'+x.total+'</b></div><div class="hd-fo-compare-metrics"><span>条件充足 <b>'+x.ready+'/'+x.total+'</b></span><span>未配置 <b>'+x.missing+'</b></span><span>交換 <b>'+x.changes+'</b></span><span>装備 火力+雷装 <b>'+x.equipAttack+'</b></span><span>希少・高改修 <b>'+x.rareSlots+'枠</b></span></div><p>'+unresolved+'</p>'+diff+'<div class="hd-fo-compare-actions"><button type="button" class="primary small" data-hd-fo-adopt="'+x.mode+'" data-hd-fo-index="'+index+'">この案を採用</button><button type="button" class="ghost small" data-hd-fo-save-preset="'+x.mode+'" data-hd-fo-index="'+index+'">プリセット保存</button></div></article>';
+ }).join('')+'</div><p class="hd-fo-compare-note">※バッジは各指標ごとの最大・最小を示すだけで、総合順位ではないよ。最終制空値・最終33式・個艦固有の搭載可否などは別途確認してね。</p></div>';
 }
 function hdFOResultHtml(plan){
  const o=plan.optimization;if(!o)return '';
@@ -203,6 +234,20 @@ function hdFOAdopt(index,mode,card){
  hdFOSetStoredMode(selected);if(typeof HD_FL_CACHE!=='undefined')HD_FL_CACHE[key]=plan;
  const host=card.querySelector('.hd-fl-host');if(host)host.innerHTML=hdFLPlanHtml(plan);
 }
+function hdFOSavePreset(index,mode,button){
+ const base=hdFOStandardPlan(index),map=typeof hdFSMap==='function'?hdFSMap():'';if(!base||!map)return false;
+ const selected=hdFOMode(mode).id,plan=hdFOOptimize(base,selected),label=hdFOMode(selected).label,suggestion=plan.suggestion||{},preset=suggestion.preset||{},all=typeof loadCustomFleets==='function'?loadCustomFleets():{};
+ all[map]=all[map]||[];
+ const name=(map+' '+label+'｜'+(preset.name||('候補'+(Number(index)+1)))).slice(0,40);
+ const ships=Array.from({length:6},function(_,i){const p=plan.ships&&plan.ships[i]||{};return {ship:p.ship||'',gear:(p.items||[]).map(function(x){return hdFOItemLabel(x)}).join(' / ')}});
+ const e=plan.optimization&&plan.optimization.after||hdFEEvaluate(plan),memo='HarborDesk '+label+'比較案。条件充足 '+(e&&e.ready||0)+'/'+(e&&e.requirements&&e.requirements.length||0)+'、交換 '+(plan.optimization&&plan.optimization.changes.length||0)+'件。比較ビューから保存。ゲーム側で最終確認。';
+ const old=all[map].find(function(x){return x.name===name}),id=old&&old.id||(typeof cfUid==='function'?cfUid():'fo-'+Date.now()+'-'+Math.random().toString(16).slice(2)),item={id:id,name:name,ships:ships,memo:memo,createdAt:old&&old.createdAt||Date.now(),updatedAt:Date.now()};
+ all[map]=old?all[map].map(function(x){return x.id===id?item:x}):all[map].concat(item);
+ if(typeof saveCustomFleets==='function')saveCustomFleets(all);else localStorage.setItem('harbordesk-custom-fleets-v1',JSON.stringify(all));
+ if(typeof renderCustomFleets==='function')renderCustomFleets(map);
+ if(button){const original=button.textContent;button.textContent='保存したよ';setTimeout(function(){button.textContent=original},1200)}
+ return true;
+}
 function hdFOReset(index,card){
  const map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+index;if(typeof HD_FL_CACHE!=='undefined')delete HD_FL_CACHE[key];
  if(typeof hdFLRender==='function')hdFLRender(index,card);
@@ -211,6 +256,7 @@ document.addEventListener('click',function(e){
  const opt=e.target.closest&&e.target.closest('[data-hd-fo-optimize]');if(opt){const card=opt.closest('.hd-fs-card'),sel=card&&card.querySelector('[data-hd-fo-mode="'+opt.dataset.hdFoOptimize+'"]');hdFOApply(opt.dataset.hdFoOptimize,card,sel&&sel.value);return}
  const compare=e.target.closest&&e.target.closest('[data-hd-fo-compare]');if(compare){hdFOShowCompare(compare.dataset.hdFoCompare,compare.closest('.hd-fs-card'));return}
  const adopt=e.target.closest&&e.target.closest('[data-hd-fo-adopt]');if(adopt){hdFOAdopt(adopt.dataset.hdFoIndex,adopt.dataset.hdFoAdopt,adopt.closest('.hd-fs-card'));return}
+ const preset=e.target.closest&&e.target.closest('[data-hd-fo-save-preset]');if(preset){hdFOSavePreset(preset.dataset.hdFoIndex,preset.dataset.hdFoSavePreset,preset);return}
  if(e.target.closest&&e.target.closest('[data-hd-fo-close-compare]')){const host=e.target.closest('.hd-fo-compare-host');if(host)host.innerHTML='';return}
  const mode=e.target.closest&&e.target.closest('[data-hd-fo-mode]');if(mode){hdFOSetStoredMode(mode.value);const note=mode.parentElement&&mode.parentElement.querySelector('small');if(note)note.textContent=hdFOMode(mode.value).note;return}
  const reset=e.target.closest&&e.target.closest('[data-hd-fo-reset]');if(reset){hdFOReset(reset.dataset.hdFoReset,reset.closest('.hd-fs-card'));return}
