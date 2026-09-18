@@ -149,21 +149,7 @@ function hdWSShowElement(target,scroll=true){
  return true;
 }
 function hdWSPatchQuickNav(){
- if(window.__hdWSQuickPatched||typeof window.hdQNJump!=='function')return;
- window.__hdWSQuickPatched=true;const old=window.hdQNJump;
- window.hdQNJump=function(id){
-  if(typeof hdGSClose==='function')hdGSClose();
-  const target=document.getElementById(id);
-  if(!target){old(id);return}
-  hdWSShowElement(target,false);
-  try{
-   if(typeof hdQNRecordRecent==='function')hdQNRecordRecent(id);
-   if(typeof hdQNClose==='function')hdQNClose();
-   target.scrollIntoView({behavior:'smooth',block:'start'});
-   target.classList.add('hd-qn-flash');
-   setTimeout(()=>target.classList.remove('hd-qn-flash'),900);
-  }catch{}
- };
+ window.__hdWSQuickPatched=true;
 }
 function hdWSHandleAnchor(a){const href=a?.getAttribute?.('href')||'';if(!href.startsWith('#')||href==='#')return false;let id='';try{id=decodeURIComponent(href.slice(1))}catch{id=href.slice(1)}const target=document.getElementById(id);if(!target)return false;hdWSShowElement(target,false);setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),70);return true}
 function hdWSRefresh(){if(Date.now()<hdWSNavLockUntil){hdWSScheduleRefresh();return}hdWSApply(hdWSState.group,hdWSState.sections?.[hdWSState.group]);hdWSPatchQuickNav();hdWSUpdateBadges()}
