@@ -78,7 +78,7 @@ function hdSPARecommendations(row){
  if(d.avgResourcePct!=null&&d.avgResourcePct>=20)push('reserve-resource','装備温存を比較','平均資源消費が'+d.avgResourcePct+'%増加','optimize','reserve');
  if(d.avgDurationPct!=null&&d.avgDurationPct>=20)push('route-time','周回時間を見直す','平均時間が'+d.avgDurationPct+'%増加','optimize','route');
  if(d.avgReadiness!=null&&d.avgReadiness<=-10)push('prep-readiness','出撃前チェックを見直す','開始時確認率が'+Math.abs(d.avgReadiness)+'pt低下','prep');
- return out.slice(0,3);
+ return out.slice(0,4);
 }
 function hdSPARecommendationHtml(row){
  const recs=hdSPARecommendations(row);if(!recs.length)return '';
