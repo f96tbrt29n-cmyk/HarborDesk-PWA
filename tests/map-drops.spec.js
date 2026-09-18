@@ -158,3 +158,61 @@ test('map drop view preference is stored independently for each map', async ({ p
   expect(stored['1-5']).toBe('missing');
   expect(stored['1-4']).toBeUndefined();
 });
+
+
+test('full reverse index includes ships from all map drop data', async ({ page }) => {
+  await boot(page);
+  const result = await page.evaluate(() => {
+    const rows = hdMapDropReverseIndex();
+    const by = name => rows.find(x => x.ship === name);
+    return {
+      total: rows.length,
+      fletcher: by('Fletcher'),
+      saratoga: by('Saratoga'),
+      maps: [...new Set(rows.flatMap(x => x.locations.map(l => l.map)))]
+    };
+  });
+
+  expect(result.total).toBeGreaterThan(100);
+  expect(result.maps).toHaveLength(37);
+  expect(result.fletcher).toBeTruthy();
+  expect(result.fletcher.locations.map(x => x.node)).toEqual(expect.arrayContaining(['N 第2ボス', 'Z 第3ボス']));
+  expect(result.saratoga).toBeTruthy();
+  expect(result.saratoga.locations.some(x => x.map === '5-6' && x.node === 'Z 第3ボス')).toBeTruthy();
+});
+
+test('reverse lookup UI searches ships that were not in the old curated rare list', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => {
+    hdEnsureDropDb?.();
+    hdWSShowElement?.('dropHuntingDb', false);
+  });
+
+  const search = page.locator('#hdDropSearch');
+  await expect(search).toBeVisible();
+  await search.fill('Fletcher');
+
+  const list = page.locator('#hdDropDbList');
+  await expect(list).toContainText('Fletcher');
+  await expect(list).toContainText('5-6 N 第2ボス');
+  await expect(list).toContainText('5-6 Z 第3ボス');
+  await expect(list).toContainText('注目ドロップ');
+});
+
+test('reverse lookup can add a full-index ship directly to hunting targets', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-drop-hunts-v1');
+    hdEnsureDropDb?.();
+    hdWSShowElement?.('dropHuntingDb', false);
+  });
+
+  const search = page.locator('#hdDropSearch');
+  await search.fill('Saratoga');
+  const card = page.locator('#hdDropDbList .hd-drop-card').filter({ hasText: 'Saratoga' });
+  await expect(card).toBeVisible();
+  await card.locator('[data-hd-drop-target]').first().click();
+
+  const hunts = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1') || '[]'));
+  expect(hunts.some(x => x.ship === 'Saratoga' && x.map === '5-6' && x.node === 'Z 第3ボス')).toBeTruthy();
+});
