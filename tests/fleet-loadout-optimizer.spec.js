@@ -127,7 +127,7 @@ test('optimizer UI shows swaps and optimized loadout can be saved', async ({ pag
   await optimize.click();
 
   await expect(card.locator('.hd-fo-result')).toBeVisible();
-  await expect(card.locator('.hd-fo-result')).toContainText('海域条件へ自動最適化');
+  await expect(card.locator('.hd-fo-result')).toContainText('安定重視で自動最適化');
   await expect(card.locator('[data-hd-fo-reset="0"]')).toBeVisible();
 
   await card.locator('[data-hd-fl-save="0"]').click();
