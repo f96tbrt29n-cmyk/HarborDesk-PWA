@@ -2557,3 +2557,39 @@ test('Sortie analytics highlights risk trends and route differences', async ({ p
   });
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('HarborDesk Userscript is installable and page-context ready', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const data = await page.evaluate(async () => {
+    const text = await fetch('./HarborDesk-Kancolle.user.js', {cache:'no-store'}).then(r => r.text());
+    let parseError = '';
+    try { new Function(text); } catch (e) { parseError = String(e && e.message || e); }
+    return {
+      length:text.length,
+      parseError,
+      hasName:text.includes('@name         HarborDesk 艦これ連携'),
+      hasRunAt:text.includes('@run-at       document-start'),
+      hasPageContext:text.includes('@inject-into  page'),
+      hasFrameInclude:text.includes('203\\.104\\.'),
+      hasDmmMatch:text.includes('@match        https://*.dmm.com/*'),
+      hasKcsapiFilter:text.includes('/kcsapi/'),
+      hasDirectSend:text.includes("type:'harbordesk-kancolle-import'"),
+      hasTokenStorage:text.includes('api_token=') || text.includes('Cookie='),
+      hasNoFrames:text.includes('@noframes')
+    };
+  });
+  expect(data.length).toBeGreaterThan(5000);
+  expect(data.parseError).toBe('');
+  expect(data.hasName).toBe(true);
+  expect(data.hasRunAt).toBe(true);
+  expect(data.hasPageContext).toBe(true);
+  expect(data.hasFrameInclude).toBe(true);
+  expect(data.hasDmmMatch).toBe(true);
+  expect(data.hasKcsapiFilter).toBe(true);
+  expect(data.hasDirectSend).toBe(true);
+  expect(data.hasTokenStorage).toBe(false);
+  expect(data.hasNoFrames).toBe(false);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
