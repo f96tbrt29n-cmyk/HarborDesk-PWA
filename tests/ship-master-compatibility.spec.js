@@ -4935,3 +4935,25 @@ test('mobile header overflow menu uses touch-friendly action grid', async ({ pag
   expect(data.badgeWidth).toBeGreaterThan(data.menuWidth*0.8);
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
+
+
+test('header offers return to Kancolle after sync handoff', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdEnsureUpdateUI?.();
+    sessionStorage.setItem('harbordesk-kc-return-game-v1','1');
+    window.hdWSEnsureGameReturnAction?.();
+    window.hdWSUpdateGameReturnAction?.();
+    const btn=document.querySelector('[data-hd-header-game-return]');
+    const visible={exists:!!btn,hidden:!!btn?.hidden,text:btn?.textContent||''};
+    sessionStorage.removeItem('harbordesk-kc-return-game-v1');
+    window.hdWSUpdateGameReturnAction?.();
+    return {...visible,hiddenAfter:!!btn?.hidden};
+  });
+  expect(data.exists).toBe(true);
+  expect(data.hidden).toBe(false);
+  expect(data.text).toContain('艦これへ戻る');
+  expect(data.hiddenAfter).toBe(true);
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
