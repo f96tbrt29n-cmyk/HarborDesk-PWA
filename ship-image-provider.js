@@ -218,15 +218,19 @@ async function hdShipImageHydrate(root=document){
  const hosts=[...root.querySelectorAll?.('[data-hd-ship-image-host]')||[]];
  await Promise.all(hosts.map(async host=>{
   const id=Number(host.dataset.hdShipImageHost),img=host.querySelector('img'),del=host.querySelector('[data-hd-ship-image-delete]'),upload=host.querySelector('[data-hd-ship-image-upload]');if(!id||!img)return;
-  host.classList.remove('loaded','remote','missing','verify-verified','verify-mismatch','verify-unverified','verify-pending');delete host.dataset.hdShipImageVerify;img.removeAttribute('src');
-  const local=await hdShipImageGet(id);
+  const seq=(Number(host.dataset.hdShipHydrateSeq)||0)+1;host.dataset.hdShipHydrateSeq=String(seq);
+  const local=await hdShipImageGet(id);if(Number(host.dataset.hdShipHydrateSeq)!==seq)return;
+  host.classList.remove('loaded','remote','missing','verify-verified','verify-mismatch','verify-unverified','verify-pending');delete host.dataset.hdShipImageVerify;
   if(local?.blob){
    const url=hdShipImageObjectUrl(id,local.blob),v=hdShipImageVerifyStatus(id,local.hash||'');img.src=url;host.classList.add('loaded','verify-'+v.status);host.dataset.hdShipImageVerify=v.status;if(del)del.hidden=false;if(upload)upload.textContent='画像を変更';return;
   }
-  if(del)del.hidden=true;if(upload)upload.textContent='画像を登録';
+  img.removeAttribute('src');if(del)del.hidden=true;if(upload)upload.textContent='画像を登録';
   const remote=hdShipImageRemoteUrl(id);
-  if(remote){img.onload=()=>{host.classList.add('loaded','remote');host.classList.remove('missing')};img.onerror=()=>{host.classList.remove('loaded','remote');host.classList.add('missing');img.removeAttribute('src')};img.src=remote}
-  else host.classList.add('missing');
+  if(remote){
+   img.onload=()=>{if(Number(host.dataset.hdShipHydrateSeq)!==seq)return;host.classList.add('loaded','remote');host.classList.remove('missing')};
+   img.onerror=()=>{if(Number(host.dataset.hdShipHydrateSeq)!==seq)return;host.classList.remove('loaded','remote');host.classList.add('missing');img.removeAttribute('src')};
+   img.src=remote
+  } else host.classList.add('missing');
  }));
 }
 function hdShipImageEnsurePicker(){
