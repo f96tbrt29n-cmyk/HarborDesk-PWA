@@ -5722,3 +5722,26 @@ test('partial global sync status explains missing game screens', async ({ page }
   expect(data.text).toContain('入渠');
   expect(data.text).toContain('装備・改装');
 });
+
+
+test('fresh sync status opens dialog instead of navigating', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now()-60000,
+      ships:206,equipment:93,decks:4,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true}
+    }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdWSEnsureSyncStatus?.();
+    window.hdWSUpdateSyncStatus?.();
+    document.getElementById('hdGlobalSyncStatus')?.click();
+    const d=document.getElementById('hdSyncStatusDialog');
+    return {open:!!d?.open,text:d?.textContent||''};
+  });
+  expect(data.open).toBe(true);
+  expect(data.text).toContain('ゲームデータは最新だよ');
+  expect(data.text).toContain('このまま使ってOK');
+});
