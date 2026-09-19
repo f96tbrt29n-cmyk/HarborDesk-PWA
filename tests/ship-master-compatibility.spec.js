@@ -1471,3 +1471,212 @@ test('expansion procurement tracks total copies and one star-qualified copy sepa
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('KanColle game data import syncs ships equipment resources and fleets without storing auth data', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    const secret = 'DO_NOT_STORE_TOKEN_12345';
+
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      { id:'manual-meta', name:'41cm連装砲', category:'大口径主砲', count:99, star:4, targetStar:10, assigned:'長門改二', memo:'手動メモを保持' }
+    ]));
+    localStorage.setItem('harbordesk-ship-roster-v1', '[]');
+    localStorage.removeItem('harbordesk-kancolle-sync-v1');
+    localStorage.removeItem('harbordesk-kancolle-fleets-v1');
+    localStorage.removeItem('harbordesk-kancolle-materials-v1');
+    localStorage.removeItem('harbordesk-kancolle-equipment-detail-v1');
+
+    const bundle = {
+      format:'harbordesk-kancolle-import',
+      api_token:secret,
+      endpoints:{
+        '/kcsapi/api_port/port':{
+          api_result:1,
+          api_result_msg:'成功',
+          api_data:{
+            api_ship:[{
+              api_id:9001,
+              api_ship_id:541,
+              api_lv:99,
+              api_nowhp:91,
+              api_maxhp:91,
+              api_cond:49,
+              api_locked:1,
+              api_sally_area:0,
+              api_slot:[5001,-1,-1,-1,-1],
+              api_slot_ex:-1
+            }],
+            api_deck_port:[{
+              api_id:1,
+              api_name:'第一艦隊',
+              api_mission:[0,0,0,0],
+              api_ship:[9001,-1,-1,-1,-1,-1]
+            }],
+            api_material:[
+              {api_id:1,api_value:12345},
+              {api_id:2,api_value:23456},
+              {api_id:3,api_value:34567},
+              {api_id:4,api_value:45678},
+              {api_id:5,api_value:50},
+              {api_id:6,api_value:60},
+              {api_id:7,api_value:70},
+              {api_id:8,api_value:80}
+            ]
+          }
+        },
+        '/kcsapi/api_get_member/slot_item':{
+          api_result:1,
+          api_result_msg:'成功',
+          api_data:[
+            {api_id:5001,api_slotitem_id:8,api_level:4,api_alv:0},
+            {api_id:5002,api_slotitem_id:8,api_level:0,api_alv:0}
+          ]
+        }
+      }
+    };
+
+    const preview = window.hdKcPreviewData?.(window.hdKcParseImport?.(JSON.stringify(bundle)));
+    const sync = window.hdKcApplyImport?.(preview,{ships:true,equipment:true,resources:true,fleets:true});
+
+    const roster = JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]');
+    const equipment = JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]');
+    const app = JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}');
+    const materials = JSON.parse(localStorage.getItem('harbordesk-kancolle-materials-v1')||'{}');
+    const fleets = JSON.parse(localStorage.getItem('harbordesk-kancolle-fleets-v1')||'[]');
+
+    const star4 = equipment.find(x=>x.name==='41cm連装砲'&&Number(x.star)===4);
+    const star0 = equipment.find(x=>x.name==='41cm連装砲'&&Number(x.star)===0);
+
+    let secretStored=false;
+    for(let i=0;i<localStorage.length;i++){
+      const key=localStorage.key(i);
+      const value=key?localStorage.getItem(key):'';
+      if(String(value||'').includes(secret)){secretStored=true;break}
+    }
+
+    localStorage.setItem('harbordesk-ship-roster-v1','[]');
+    localStorage.setItem('harbordesk-equipment-v1','[]');
+    localStorage.removeItem('harbordesk-kancolle-sync-v1');
+    localStorage.removeItem('harbordesk-kancolle-fleets-v1');
+    localStorage.removeItem('harbordesk-kancolle-materials-v1');
+    localStorage.removeItem('harbordesk-kancolle-equipment-detail-v1');
+
+    return {
+      preview:{
+        ships:preview?.ships,
+        slotItems:preview?.slotItems,
+        materials:preview?.materials,
+        decks:preview?.decks,
+        completeShips:preview?.completeShips,
+        completeSlotItems:preview?.completeSlotItems
+      },
+      sync,
+      roster:roster.map(x=>({
+        name:x.name,
+        masterId:x.masterId,
+        gameShipId:x.gameShipId,
+        level:x.level,
+        gear:x.gear,
+        hp:x.gameHp,
+        maxHp:x.gameMaxHp,
+        cond:x.gameCond,
+        source:x.source
+      })),
+      star4:star4?{count:star4.count,memo:star4.memo,assigned:star4.assigned,masterEquipId:star4.masterEquipId,source:star4.source}:null,
+      star0:star0?{count:star0.count,masterEquipId:star0.masterEquipId,source:star0.source}:null,
+      resources:app.resources||{},
+      materials,
+      fleets,
+      secretStored
+    };
+  });
+
+  expect(data.preview.ships).toBe(1);
+  expect(data.preview.slotItems).toBe(2);
+  expect(data.preview.materials).toBe(8);
+  expect(data.preview.decks).toBe(1);
+  expect(data.preview.completeShips).toBeTruthy();
+  expect(data.preview.completeSlotItems).toBeTruthy();
+
+  expect(data.roster[0]).toEqual(expect.objectContaining({
+    name:'長門改二',
+    masterId:541,
+    gameShipId:9001,
+    level:99,
+    hp:91,
+    maxHp:91,
+    cond:49,
+    source:'kancolle-import'
+  }));
+  expect(data.roster[0].gear).toContain('41cm連装砲 ★4');
+
+  expect(data.star4).toEqual(expect.objectContaining({
+    count:1,
+    memo:'手動メモを保持',
+    assigned:'長門改二',
+    masterEquipId:8,
+    source:'kancolle-import'
+  }));
+  expect(data.star0).toEqual(expect.objectContaining({
+    count:1,
+    masterEquipId:8,
+    source:'kancolle-import'
+  }));
+
+  expect(data.resources).toEqual(expect.objectContaining({
+    fuel:12345,
+    ammo:23456,
+    steel:34567,
+    bauxite:45678
+  }));
+  expect(data.materials).toEqual(expect.objectContaining({
+    instantBuild:50,
+    bucket:60,
+    devMaterial:70,
+    screw:80
+  }));
+
+  expect(data.fleets[0].name).toBe('第一艦隊');
+  expect(data.fleets[0].ships[0]).toEqual(expect.objectContaining({
+    gameShipId:9001,
+    masterId:541,
+    name:'長門改二',
+    level:99
+  }));
+  expect(data.secretStored).toBeFalsy();
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
+
+test('KanColle importer accepts raw svdata material response', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    const raw = 'svdata=' + JSON.stringify({
+      api_result:1,
+      api_result_msg:'成功',
+      api_data:[
+        {api_id:1,api_value:111},
+        {api_id:2,api_value:222},
+        {api_id:3,api_value:333},
+        {api_id:4,api_value:444}
+      ]
+    });
+    const parsed = window.hdKcParseImport?.(raw);
+    const preview = window.hdKcPreviewData?.(parsed);
+    return {
+      materials:preview?.materials||0,
+      fuel:parsed?.materials?.get?.(1)?.api_value||0,
+      ammo:parsed?.materials?.get?.(2)?.api_value||0
+    };
+  });
+
+  expect(data.materials).toBe(4);
+  expect(data.fuel).toBe(111);
+  expect(data.ammo).toBe(222);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
