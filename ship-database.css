@@ -57,3 +57,21 @@
 .hd-shipdb-list.hd-compact .hd-shipdb-actions .guide-link{display:none}
 .hd-shipdb-list.hd-compact .hd-shipdb-head strong{font-size:13px}
 @media(max-width:680px){.hd-shipdb-toolbar [data-hd-shipdb-compact]{order:3}}
+
+.hd-shipdb-search-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;margin:10px 0 6px}
+.hd-shipdb-search-row input{min-width:0;width:100%}
+@media(max-width:680px){
+ .hd-shipdb-search-row{
+  position:sticky;
+  top:calc(var(--hd-topbar-h,58px) + 66px);
+  z-index:7;
+  padding:7px;
+  margin:0 -4px 7px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:rgba(8,24,38,.97);
+  backdrop-filter:blur(12px);
+  box-shadow:0 7px 22px rgba(0,0,0,.18);
+ }
+ .hd-shipdb-search-row input,.hd-shipdb-search-row button{min-height:42px}
+}
