@@ -6,6 +6,13 @@ function loadCustomFleets(){
   catch{return {}}
 }
 function saveCustomFleets(data){localStorage.setItem(CUSTOM_FLEET_KEY,JSON.stringify(data))}
+function cfMasterId(name){return Number(typeof hdShipImageResolve==='function'?hdShipImageResolve(name)?.id:0)||0}
+function cfShipRef(row){return Number(row?.masterId)>0?{id:Number(row.masterId),name:String(row.ship||'')}:String(row?.ship||'')}
+function cfMigrateMasterIds(){
+ const all=loadCustomFleets();let changed=false;
+ for(const fleets of Object.values(all||{}))for(const fleet of (Array.isArray(fleets)?fleets:[]))for(const row of (fleet.ships||[])){if(Number(row.masterId)>0||!row.ship)continue;const id=cfMasterId(row.ship);if(id){row.masterId=id;changed=true}}
+ if(changed)localStorage.setItem(CUSTOM_FLEET_KEY,JSON.stringify(all));return changed;
+}
 function cfEsc(s){return typeof esc==='function'?esc(s):String(s)}
 function cfUid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)}
 
@@ -29,7 +36,7 @@ function ensureCustomFleetDialog(){
     if(!selectedMap)return;
     const name=document.getElementById('customFleetName').value.trim();
     if(!name)return;
-    const ships=Array.from({length:6},(_,i)=>({ship:document.getElementById(`cfShip${i}`).value.trim(),gear:document.getElementById(`cfGear${i}`).value.trim()}));
+    const ships=Array.from({length:6},(_,i)=>{const ship=document.getElementById(`cfShip${i}`).value.trim();return {ship,masterId:cfMasterId(ship),gear:document.getElementById(`cfGear${i}`).value.trim()}});
     const memo=document.getElementById('customFleetMemo').value.trim();
     const all=loadCustomFleets();
     all[selectedMap]=all[selectedMap]||[];
@@ -47,8 +54,6 @@ function ensureCustomFleetDialog(){
 
 function openCustomFleetDialog(item=null){
   ensureCustomFleetDialog();
-window.addEventListener('hd:ship-images-changed',()=>{if(typeof selectedMap!=='undefined'&&selectedMap)renderCustomFleets(selectedMap)});
-window.addEventListener('hd:ship-images-ready',()=>{if(typeof selectedMap!=='undefined'&&selectedMap)renderCustomFleets(selectedMap)});
   if(typeof refreshShipRosterOptions==='function')refreshShipRosterOptions();
   customFleetEditId=item?.id||null;
   document.getElementById('customFleetName').value=item?.name||'';
@@ -69,7 +74,7 @@ function renderCustomFleets(map){
   const all=loadCustomFleets();
   const list=all[map]||[];
   const saved=list.length?list.map(item=>{
-    const rows=(item.ships||[]).map((s,i)=>{if(!s.ship&&!s.gear)return '';const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(s.ship,'custom-fleet-thumb'):'';return `<div class="custom-fleet-saved-row"><span>${i+1}</span>${image}<div><b>${cfEsc(s.ship||'未入力')}</b><small>${cfEsc(s.gear||'装備メモなし')}</small></div></div>`}).join('');
+    const rows=(item.ships||[]).map((s,i)=>{if(!s.ship&&!s.gear)return '';const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(cfShipRef(s),'custom-fleet-thumb'):'';return `<div class="custom-fleet-saved-row"><span>${i+1}</span>${image}<div><b>${cfEsc(s.ship||'未入力')}</b><small>${cfEsc(s.gear||'装備メモなし')}</small></div></div>`}).join('');
     return `<article class="custom-fleet-card" data-cf-id="${item.id}"><div class="custom-fleet-head"><div><strong>${cfEsc(item.name)}</strong><div class="muted">${new Date(item.updatedAt||item.createdAt).toLocaleString('ja-JP')} 更新</div></div><div class="custom-fleet-actions"><button class="ghost small" data-cf-edit="${item.id}">編集</button><button class="ghost small" data-cf-delete="${item.id}">削除</button></div></div><div class="custom-fleet-saved-list">${rows||'<div class="muted">艦娘はまだ未入力</div>'}</div>${item.memo?`<p class="custom-fleet-memo">${cfEsc(item.memo)}</p>`:''}</article>`;
   }).join(''):'<div class="muted">この海域の自分用編成はまだ保存されてないよ。</div>';
   host.innerHTML=`<div class="custom-fleet-title"><div><div class="eyebrow">MY FLEET</div><h4>自分用編成</h4></div><button class="primary small" id="addCustomFleet">＋ 編成を保存</button></div>${saved}`;
@@ -97,4 +102,6 @@ document.addEventListener('click',e=>{
 
 const prevRenderMapPickerCustom=renderMapPicker;
 renderMapPicker=function(){prevRenderMapPickerCustom();renderCustomFleets(selectedMap)};
-ensureCustomFleetDialog();
+cfMigrateMasterIds();ensureCustomFleetDialog();
+window.addEventListener('hd:ship-images-changed',()=>{if(typeof selectedMap!=='undefined'&&selectedMap)renderCustomFleets(selectedMap)});
+window.addEventListener('hd:ship-images-ready',()=>{if(typeof selectedMap!=='undefined'&&selectedMap)renderCustomFleets(selectedMap)});
