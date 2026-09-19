@@ -54,7 +54,7 @@ function hdSLRecordEntry(input={}){
   steel:Math.max(0,Number(input.steel)||0),bauxite:Math.max(0,Number(input.bauxite)||0),memo:String(input.memo||'').trim(),
   huntId:String(input.huntId||''),huntShip:String(input.huntShip||''),targetObtained:!!input.targetObtained
  };
- for(const k of ['sessionId','fleetId','fleetName','strategy','strategyLabel','startedAt','durationMs','fleetSnapshot','readinessSnapshot','source','gameSortieKey','gameNodeNo','gameBossCellNo','gameRouteNodes','gameBattleResults']){
+ for(const k of ['sessionId','fleetId','fleetName','strategy','strategyLabel','startedAt','durationMs','fleetSnapshot','readinessSnapshot','source','gameSortieKey','gameNodeNo','gameNodeLabel','gameBossCellNo','gameBossCellLabel','gameRouteNodes','gameRouteLabels','gameBattleResults']){
   if(input[k]!=null)entry[k]=input[k];
  }
  entry.activityRefs=hdSLApplyActivity(entry);entry.activityLogIds=entry.activityRefs.map(x=>x.id);entry.huntDelta=hdSLApplyHunt(entry);
