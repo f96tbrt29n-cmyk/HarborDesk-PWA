@@ -1,7 +1,7 @@
 {
-  "version": "1.0.169",
-  "build": 169,
-  "releasedAt": "2026-09-19T22:23:00+09:00",
-  "notes": "Userscripts艦これ連携の送信方式をSafariポップアップから同一タブの圧縮ハンドオフへ変更。『HarborDeskへ送る』で同じタブがHarborDeskへ移動し、URLフラグメント内の端末内データを展開して自動同期するため、Safariのポップアップ許可が不要。",
+  "version": "1.0.170",
+  "build": 170,
+  "releasedAt": "2026-09-19T22:36:00+09:00",
+  "notes": "Userscripts連携の同一タブ受け渡しをwindow.name方式へ変更。圧縮処理や長いURLフラグメントを使わず、艦これ側で端末内の一時データをwindow.nameへ格納してHarborDeskへ遷移し、HarborDeskが読み取り後すぐ消去して自動同期する。",
   "masterChanges": null
 }
