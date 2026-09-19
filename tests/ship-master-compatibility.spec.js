@@ -3732,3 +3732,32 @@ test('equipment ledger preserves search and shows filtered count', async ({ page
   expect(data.clearDisabled).toBe(false);
   expect(data.cards).toBe(1);
 });
+
+
+test('completed core items can be bulk cleaned and undone', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const now=Date.now();
+    if(typeof state!=='undefined'){
+      state.expeditions=[{id:'e-active',name:'稼働',endsAt:now+3600000},{id:'e-done',name:'完了',endsAt:now-60000}];
+      state.quests=[{id:'q-active',name:'未完了',done:false},{id:'q-done',name:'完了',done:true}];
+    }
+    window.renderTimers?.('expedition');window.renderQuests?.();
+    return {
+      expCleanup:document.querySelector('[data-core-cleanup="expedition"]')?.hidden===false,
+      questCleanup:document.querySelector('[data-core-cleanup="quest"]')?.hidden===false
+    };
+  });
+  expect(data.expCleanup).toBe(true);
+  expect(data.questCleanup).toBe(true);
+
+  await page.locator('[data-core-cleanup="quest"]').click();
+  let rows=await page.evaluate(()=>state.quests.map(x=>x.id));
+  expect(rows).toEqual(['q-active']);
+  const undo=page.locator('#hdToastRegion .hd-toast-action');
+  await expect(undo).toBeVisible();
+  await undo.click();
+  rows=await page.evaluate(()=>state.quests.map(x=>x.id));
+  expect(rows).toEqual(['q-active','q-done']);
+});
