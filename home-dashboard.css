@@ -84,3 +84,11 @@ button.home-next-main{cursor:pointer}
  .home-timer-actions button{min-height:34px}
  .home-card-actions [data-home-jump="kancolleImport"]{min-height:32px}
 }
+
+.home-timer-recent{display:grid;gap:6px;margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.07)}
+.home-timer-recent>small{color:var(--muted);font-size:9px;font-weight:800}
+.home-timer-recent>div{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.home-timer-recent>div::-webkit-scrollbar{display:none}
+.home-timer-recent button{flex:0 0 auto;display:grid;gap:1px;text-align:left;max-width:190px;padding:7px 9px}
+.home-timer-recent button b{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.home-timer-recent button span{font-size:9px;color:var(--accent2)}
