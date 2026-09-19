@@ -5896,3 +5896,27 @@ test('mobile attention sheet lists actionable reasons', async ({ page }) => {
   expect(data.list).toContain('ゲーム同期');
   expect(data.open).toBe(true);
 });
+
+
+test('mobile dock shows current workspace group', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdQNEnsure?.();
+    const fleet=document.querySelector('[data-hd-ws-group="fleet"]');
+    fleet?.classList.add('active');
+    document.querySelectorAll('[data-hd-ws-group]').forEach(x=>{if(x!==fleet)x.classList.remove('active')});
+    window.hdQNUpdateMobileDock?.();
+    const menu=document.querySelector('[data-hd-mobile-menu]');
+    return {
+      label:menu?.querySelector('b')?.textContent||'',
+      icon:menu?.querySelector('span')?.textContent||'',
+      context:menu?.classList.contains('has-context')||false,
+      aria:menu?.getAttribute('aria-label')||''
+    };
+  });
+  expect(data.label).toBe('艦隊');
+  expect(data.icon).toBe('⚓');
+  expect(data.context).toBe(true);
+  expect(data.aria).toContain('艦隊');
+});
