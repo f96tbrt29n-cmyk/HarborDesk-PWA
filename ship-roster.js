@@ -82,6 +82,10 @@ function renderShipRoster(){
  const rows=allRows.filter(x=>(active==='all'||(x.tags||[]).includes(active))&&(!q||`${x.name} ${x.remodel||''} ${(x.tags||[]).join(' ')} ${x.memo||''}`.toLowerCase().includes(q))).sort(sorter);
  const count=document.getElementById('shipRosterCount');if(count)count.textContent=(rows.length===allRows.length?allRows.length:rows.length+' / '+allRows.length)+'隻';
  const reset=document.querySelector('[data-roster-reset]'),dirty=!!q||active!=='all'||sort!=='level';if(reset){reset.disabled=!dirty;reset.classList.toggle('is-active',dirty)}
+ let summary=document.getElementById('shipRosterActiveFilters');if(!summary){summary=document.createElement('div');summary.id='shipRosterActiveFilters';summary.className='hd-active-filters';document.getElementById('shipRosterFilters')?.insertAdjacentElement('beforebegin',summary)}
+ const sortLabel={level:'Lv高い順',name:'名前順',updated:'最近更新',type:'艦種順'}[sort]||sort;
+ const chips=[];if(q)chips.push('検索: '+q);if(active!=='all')chips.push('タグ: '+active);if(sort!=='level')chips.push('並び: '+sortLabel);
+ if(summary){summary.hidden=!chips.length;summary.innerHTML=chips.length?chips.map(x=>`<span>${rosterEsc(x)}</span>`).join('')+'<button type="button" class="ghost small" data-roster-reset>クリア</button>':''}
  const emptyHtml=allRows.length===0
   ?'<div class="empty empty-action"><strong>艦娘がまだ登録されてないよ</strong><p>ゲーム同期でも手動でも登録できるよ。</p><button type="button" class="primary small" data-empty-roster-add>＋ 艦娘を登録</button></div>'
   :'<div class="empty empty-action"><strong>条件に合う艦娘がいないよ</strong><p>検索やタグを戻すと一覧へ戻れるよ。</p><button type="button" class="ghost small" data-empty-roster-reset>条件をクリア</button></div>';
