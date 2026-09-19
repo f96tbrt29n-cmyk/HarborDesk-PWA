@@ -5105,3 +5105,24 @@ test('mobile header compacts on downward scroll and restores upward', async ({ p
   expect(data.compactUp).toBe(false);
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
+
+
+test('mobile workspace can pin current function', async ({ page }) => {
+  const errors=[];
+  await page.setViewportSize({width:390,height:844});
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    localStorage.setItem('harbordesk-quick-nav-pins-v1','[]');
+    window.hdWSShowElement?.('roster',false);
+    window.hdWSUpdatePinButton?.();
+    const before=document.querySelector('[data-hd-ws-pin]')?.textContent||'';
+    window.hdWSToggleCurrentPin?.();
+    const after=document.querySelector('[data-hd-ws-pin]')?.textContent||'';
+    let pins=[];try{pins=JSON.parse(localStorage.getItem('harbordesk-quick-nav-pins-v1')||'[]')}catch{}
+    return {before,after,pins};
+  });
+  expect(data.before).toBe('☆');
+  expect(data.after).toBe('★');
+  expect(data.pins).toContain('roster');
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
