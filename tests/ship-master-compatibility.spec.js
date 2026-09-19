@@ -2598,6 +2598,7 @@ test('Safari capture helper sends data directly to HarborDesk', async ({ page })
       shortcutHasCompletion: shortcut.includes('completion('),
       shortcutInjectsPageScript: shortcut.includes("script.textContent="),
       shortcutChecksPanel: shortcut.includes("document.getElementById('hd-kc-capture-panel')"),
+      shortcutShowsVisibleStatus: shortcut.includes('HarborDeskショートカット：実行OK'),
       bookmarkletPrefix: bookmarklet.startsWith('javascript:'),
       sent,
       recordCount,
@@ -2621,6 +2622,7 @@ test('Safari capture helper sends data directly to HarborDesk', async ({ page })
   expect(data.shortcutHasCompletion).toBe(true);
   expect(data.shortcutInjectsPageScript).toBe(true);
   expect(data.shortcutChecksPanel).toBe(true);
+  expect(data.shortcutShowsVisibleStatus).toBe(true);
   expect(data.bookmarkletPrefix).toBe(true);
   expect(data.sent).toBe(true);
   expect(data.recordCount).toBe(1);
@@ -2693,6 +2695,7 @@ test('Safari shortcut injects capture into page context', async ({ page }) => {
       hasPanel:!!panel,
       mode:cap?.mode||'',
       panelText:panel?.textContent||'',
+      shortcutStatus:document.getElementById('hd-kc-shortcut-status')?.textContent||'',
       hasInjector:!!document.getElementById('hd-kc-shortcut-inject')
     };
     cap?.restore?.();
@@ -2703,6 +2706,8 @@ test('Safari shortcut injects capture into page context', async ({ page }) => {
   expect(data.hasPanel).toBe(true);
   expect(data.mode).toBe('capture');
   expect(data.panelText).toContain('キャプチャ待機中');
+  expect(data.shortcutStatus).toContain('HarborDeskショートカット：実行OK');
+  expect(data.shortcutStatus).toContain('ページ本体への注入成功');
   expect(data.hasInjector).toBe(false);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
