@@ -2683,3 +2683,36 @@ test('Userscripts gzip hash handoff auto-syncs', async ({ page }) => {
   expect(data.result).toContain('Userscriptsから自動同期完了');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('mobile synced import UI is compact', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now(),ships:206,equipment:93,materials:8,decks:4,expeditions:0,docks:0,quests:0,sorties:0
+    }));
+  });
+  await boot(page,errors);
+  await page.setViewportSize({width:390,height:844});
+  const data=await page.evaluate(()=>{
+    const section=document.getElementById('kancolleImport');
+    const auto=section?.querySelector('[data-hd-kc-auto-guide]');
+    const manual=section?.querySelector('.hd-kc-manual-panel');
+    const overview=section?.querySelector('.hd-kc-sync-overview');
+    return {
+      autoOpen:!!auto?.open,
+      manualOpen:!!manual?.open,
+      synced:!!overview?.classList.contains('is-synced'),
+      headline:document.getElementById('hdKcSyncHeadline')?.textContent||'',
+      last:document.getElementById('hdKcSyncLast')?.textContent||'',
+      resultLive:document.getElementById('hdKcImportResult')?.getAttribute('aria-live')||''
+    };
+  });
+  expect(data.autoOpen).toBe(false);
+  expect(data.manualOpen).toBe(false);
+  expect(data.synced).toBe(true);
+  expect(data.headline).toContain('同期済み');
+  expect(data.last).toContain('艦娘206');
+  expect(data.resultLive).toBe('polite');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
