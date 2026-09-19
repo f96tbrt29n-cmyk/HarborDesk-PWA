@@ -212,14 +212,63 @@ function hdKcRenderCurrentFleets(){
  host.innerHTML=rows.map(deck=>`<article class="hd-kc-deck"><div class="hd-kc-deck-head"><div><strong>${hdKcEsc(deck.name)}</strong><small>第${deck.deckId}艦隊 ・ ${deck.ships?.length||0}隻</small></div><button type="button" class="ghost small" data-hd-kc-copy-deck="${deck.deckId}">${map?`${hdKcEsc(map)}へコピー`:'海域を選んでコピー'}</button></div><div class="hd-kc-deck-ships">${(deck.ships||[]).map((s,i)=>{const image=s.name&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(Number(s.masterId)>0?{id:Number(s.masterId),name:s.name}:s.name,'kc-deck-thumb'):'';return `<div class="hd-kc-deck-ship"><span>${i+1}</span>${image}<div><b>${hdKcEsc(s.name||'未解決')}</b><small>Lv.${Number(s.level)||0}</small><em>${hdKcEsc(s.gear||'装備データなし')}</em></div></div>`}).join('')}</div></article>`).join('');
  if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
 }
+function hdKcExpeditionName(id){
+ const row=(typeof HD_EXPEDITIONS!=='undefined'?HD_EXPEDITIONS:[]).find(x=>String(x.id)===String(id));
+ return row?`${row.id} ${row.name}`:`遠征 ${id}`;
+}
+function hdKcShipNameByGameId(parsed,gameShipId){
+ const live=parsed?.ships?.get?.(Number(gameShipId));if(live){const m=hdKcMasterShip(live.api_ship_id);if(m?.name)return String(m.name)}
+ try{const rows=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]');const hit=(Array.isArray(rows)?rows:[]).find(x=>Number(x.gameShipId)===Number(gameShipId));if(hit?.name)return String(hit.name)}catch{}
+ return '';
+}
+function hdKcApplyTimers(parsed){
+ const base=(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'null')}catch{return null}})()||{expeditions:[],docks:[],quests:[],resources:{}};
+ base.expeditions=Array.isArray(base.expeditions)?base.expeditions:[];base.docks=Array.isArray(base.docks)?base.docks:[];
+ const now=Date.now();
+
+ const incomingExp=[];
+ for(const deck of parsed.decks.values()){
+  const m=Array.isArray(deck?.api_mission)?deck.api_mission:[],stateCode=Number(m[0])||0,missionId=Number(m[1])||0,endsAt=Number(m[2])||0,fleetNo=Number(deck?.api_id)||0;
+  if(stateCode<=0||missionId<=0||endsAt<=0||fleetNo<=0)continue;
+  incomingExp.push({id:`kc-exp-${fleetNo}`,name:`${hdKcExpeditionName(missionId)}（第${fleetNo}艦隊）`,endsAt,expeditionId:String(missionId),fleetNo,source:'kancolle-import',gameState:stateCode,syncedAt:now});
+ }
+ if(parsed.completeDecks){
+  base.expeditions=[...base.expeditions.filter(x=>x?.source!=='kancolle-import'),...incomingExp];
+ }else{
+  const touched=new Set([...parsed.decks.keys()].map(Number));
+  base.expeditions=[...base.expeditions.filter(x=>!(x?.source==='kancolle-import'&&touched.has(Number(x.fleetNo)))),...incomingExp];
+ }
+
+ const incomingDock=[];
+ for(const dock of parsed.ndocks.values()){
+  const dockNo=Number(dock?.api_id)||0,stateCode=Number(dock?.api_state)||0,gameShipId=Number(dock?.api_ship_id)||0,endsAt=Number(dock?.api_complete_time)||0;
+  if(dockNo<=0||stateCode!==1||gameShipId<=0||endsAt<=0)continue;
+  const shipName=hdKcShipNameByGameId(parsed,gameShipId)||`艦ID ${gameShipId}`;
+  incomingDock.push({id:`kc-dock-${dockNo}`,name:`${shipName}（第${dockNo}入渠ドック）`,endsAt,dockNo,gameShipId,source:'kancolle-import',syncedAt:now});
+ }
+ if(parsed.completeNdocks){
+  base.docks=[...base.docks.filter(x=>x?.source!=='kancolle-import'),...incomingDock];
+ }else{
+  const touched=new Set([...parsed.ndocks.keys()].map(Number));
+  base.docks=[...base.docks.filter(x=>!(x?.source==='kancolle-import'&&touched.has(Number(x.dockNo)))),...incomingDock];
+ }
+
+ localStorage.setItem('harbordesk-pwa-v1',JSON.stringify(base));
+ try{
+  if(typeof state!=='undefined'&&state){state.expeditions=base.expeditions;state.docks=base.docks;if(typeof save==='function')save();if(typeof renderTimers==='function'){renderTimers('expedition');renderTimers('dock')}}
+ }catch{}
+ window.dispatchEvent(new CustomEvent('hd:workspace-refresh'));
+ return {expeditions:incomingExp.length,docks:incomingDock.length};
+}
 function hdKcApplyImport(preview,opts={}){
  const parsed=preview?.parsed;if(!parsed)throw new Error('先にデータを解析してください');
- const result={ships:0,equipment:0,materials:0,decks:0};
+ const result={ships:0,equipment:0,materials:0,decks:0,expeditions:0,docks:0};
  if(opts.ships!==false&&parsed.ships.size)result.ships=hdKcMergeRoster(parsed);
  if(opts.equipment!==false&&parsed.slotItems.size)result.equipment=hdKcMergeEquipment(parsed);
  if(opts.resources!==false&&parsed.materials.size)result.materials=hdKcApplyMaterials(parsed);
  if(opts.fleets!==false&&parsed.decks.size)result.decks=hdKcApplyDecks(parsed);
- const sync={syncedAt:Date.now(),sources:preview.sources,ships:result.ships,equipment:result.equipment,materials:result.materials,decks:result.decks,unknownShips:preview.unknownShips,unknownEquip:preview.unknownEquip};
+ if(opts.timers!==false&&(parsed.decks.size||parsed.ndocks.size)){const t=hdKcApplyTimers(parsed);result.expeditions=t.expeditions;result.docks=t.docks}
+ const sync={syncedAt:Date.now(),sources:preview.sources,ships:result.ships,equipment:result.equipment,materials:result.materials,decks:result.decks,expeditions:result.expeditions,docks:result.docks,unknownShips:preview.unknownShips,unknownEquip:preview.unknownEquip};
  localStorage.setItem(HD_KC_SYNC_KEY,JSON.stringify(sync));window.dispatchEvent(new CustomEvent('hd:kancolle-sync',{detail:sync}));hdKcRenderCurrentFleets();
  return sync;
 }
