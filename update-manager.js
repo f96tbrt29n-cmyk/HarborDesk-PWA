@@ -254,6 +254,12 @@ document.addEventListener('click',e=>{
   const menu=document.querySelector('.hd-header-more');
   if(menu?.open&&!e.target?.closest?.('.hd-header-more'))menu.removeAttribute('open');
 },true);
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  const menu=document.querySelector('.hd-header-more');if(!menu?.open)return;
+  menu.removeAttribute('open');
+  const summary=menu.querySelector(':scope > summary');try{summary?.focus({preventScroll:true})}catch{summary?.focus()}
+});
 window.addEventListener('load',()=>{
   hdEnsureServiceWorker();hdLoadCurrentAssets().catch(()=>{});hdEnsureUpdateUI();
   if(new URL(location.href).searchParams.has('hd_update')){
