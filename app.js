@@ -269,15 +269,16 @@ function render(){renderGuide();renderTimers('expedition');renderTimers('dock');
 function timerStartRecent(kind,index){
  const rows=Array.isArray(timerRecentLoad()[kind])?timerRecentLoad()[kind]:[],row=rows[Number(index)];
  if(!row?.name||!(Number(row.minutes)>0))return false;
- const startedAt=Date.now(),target=kind==='expedition'?state.expeditions:state.docks;
- timerLastSave(kind,row.name,row.minutes);
- target.push({id:uid(),name:String(row.name),startedAt,durationMinutes:Number(row.minutes),endsAt:startedAt+Number(row.minutes)*60000});
- save();render();document.getElementById('timerDialog')?.close();hdToast(`${row.name} を開始したよ`);return true;
+ const startedAt=Date.now(),target=kind==='expedition'?state.expeditions:state.docks,item={id:uid(),name:String(row.name),startedAt,durationMinutes:Number(row.minutes),endsAt:startedAt+Number(row.minutes)*60000};
+ timerLastSave(kind,row.name,row.minutes);target.push(item);
+ save();render();document.getElementById('timerDialog')?.close();
+ hdToastAction(`${row.name} を開始したよ`,'元に戻す',()=>{const i=target.findIndex(x=>String(x.id)===String(item.id));if(i>=0)target.splice(i,1);save();render();hdToast('元に戻したよ')},6500);return true;
 }
 function questAddRecent(name){
  const value=String(name||'').trim();if(!value)return false;
  if(state.quests.some(q=>!q.done&&String(q.name||'').trim()===value)){hdToast(`${value} は未完了で登録済みだよ`,'warn',2400);return false}
- questRecentSave(value);state.quests.push({id:uid(),name:value,done:false});save();renderQuests();document.getElementById('questDialog')?.close();hdToast(`${value} を追加したよ`);return true;
+ const item={id:uid(),name:value,done:false};questRecentSave(value);state.quests.push(item);save();renderQuests();document.getElementById('questDialog')?.close();
+ hdToastAction(`${value} を追加したよ`,'元に戻す',()=>{const i=state.quests.findIndex(x=>String(x.id)===String(item.id));if(i>=0)state.quests.splice(i,1);save();renderQuests();hdToast('元に戻したよ')},6500);return true;
 }
 function openTimer(kind){
  timerKind=kind;
@@ -304,8 +305,8 @@ document.addEventListener('click',e=>{
  const recent=e.target.closest?.('[data-quest-recent]');if(recent){const input=document.getElementById('questName');if(input){input.value=recent.dataset.questRecent||recent.textContent||'';try{input.focus({preventScroll:true});input.select()}catch{input.focus()}}}
 });
 document.getElementById('addExpedition').onclick=()=>openTimer('expedition');document.getElementById('addDock').onclick=()=>openTimer('dock');document.getElementById('addQuest').onclick=openQuestDialog;
-document.getElementById('timerForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const name=document.getElementById('timerName').value.trim(),mins=Number(document.getElementById('timerMinutes').value);if(!name||!mins)return;const startedAt=Date.now();timerLastSave(timerKind,name,mins);(timerKind==='expedition'?state.expeditions:state.docks).push({id:uid(),name,startedAt,durationMinutes:mins,endsAt:startedAt+mins*60000});save();render();hdToast(`${name} を開始したよ`)});
-document.getElementById('questForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const name=document.getElementById('questName').value.trim();if(!name)return;if(state.quests.some(q=>!q.done&&String(q.name||'').trim()===name)){e.preventDefault();hdToast(`${name} は未完了で登録済みだよ`,'warn',2400);return}questRecentSave(name);state.quests.push({id:uid(),name,done:false});save();renderQuests();hdToast(`${name} を追加したよ`)});
+document.getElementById('timerForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const name=document.getElementById('timerName').value.trim(),mins=Number(document.getElementById('timerMinutes').value);if(!name||!mins)return;const startedAt=Date.now(),target=timerKind==='expedition'?state.expeditions:state.docks,item={id:uid(),name,startedAt,durationMinutes:mins,endsAt:startedAt+mins*60000};timerLastSave(timerKind,name,mins);target.push(item);save();render();hdToastAction(`${name} を開始したよ`,'元に戻す',()=>{const i=target.findIndex(x=>String(x.id)===String(item.id));if(i>=0)target.splice(i,1);save();render();hdToast('元に戻したよ')},6500)});
+document.getElementById('questForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const name=document.getElementById('questName').value.trim();if(!name)return;if(state.quests.some(q=>!q.done&&String(q.name||'').trim()===name)){e.preventDefault();hdToast(`${name} は未完了で登録済みだよ`,'warn',2400);return}const item={id:uid(),name,done:false};questRecentSave(name);state.quests.push(item);save();renderQuests();hdToastAction(`${name} を追加したよ`,'元に戻す',()=>{const i=state.quests.findIndex(x=>String(x.id)===String(item.id));if(i>=0)state.quests.splice(i,1);save();renderQuests();hdToast('元に戻したよ')},6500)});
 document.addEventListener('change',e=>{if(e.target.matches('[data-quest-check]')){const q=state.quests.find(x=>x.id===e.target.dataset.questCheck);if(q){q.done=e.target.checked;save();renderQuests()}}});
 document.getElementById('saveResources').onclick=()=>{['fuel','ammo','steel','bauxite'].forEach(k=>state.resources[k]=document.getElementById(k).value);state.resources.savedAt=Date.now();save();renderResources();hdToast('資源を保存したよ')};
 
