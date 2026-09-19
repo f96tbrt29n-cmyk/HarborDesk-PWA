@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HarborDesk 艦これ連携
 // @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
-// @version      1.0.5
+// @version      1.0.6
 // @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
 // @match        http://*.dmm.com/*
 // @match        https://*.dmm.com/*
@@ -21,7 +21,7 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.5';
+const HD_VERSION='1.0.6';
 const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/';
 const RECORD_MESSAGE='harbordesk-kancolle-frame-record-v1';
 const STATUS_MESSAGE='harbordesk-kancolle-frame-status-v1';
@@ -177,8 +177,24 @@ try{
 const records=[];
 const signatures=new Set();
 const captureId='kc-userscript-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
-let panel,countEl,statusEl,frameEl;
+let panel,countEl,statusEl,frameEl,coverageEl,sendEl;
 let frameHits=0;
+
+function captureCoverage(){
+  const endpoints=records.map(x=>String(x.endpoint||''));
+  const has=re=>endpoints.some(x=>re.test(x));
+  return {
+    port:has(/api_port\/port|api_get_member\/ship2|api_get_member\/material/),
+    equipment:has(/api_get_member\/(?:slot_item|require_info)/),
+    quests:has(/api_get_member\/questlist/),
+    docks:has(/api_port\/port|api_get_member\/ndock/),
+    sorties:has(/api_req_map\/(?:start|next)|api_req_(?:sortie|combined_battle)\/battleresult/)
+  };
+}
+function coverageHtml(){
+  const c=captureCoverage(),rows=[['母港',c.port],['装備',c.equipment],['任務',c.quests],['入渠',c.docks],['出撃',c.sorties]];
+  return rows.map(([name,ok])=>'<span style="display:inline-flex;align-items:center;gap:3px;padding:3px 6px;border-radius:999px;border:1px solid '+(ok?'rgba(110,224,159,.45)':'rgba(255,255,255,.12)')+';background:'+(ok?'rgba(29,92,60,.3)':'rgba(255,255,255,.04)')+';color:'+(ok?'#bcefd0':'#8298aa')+'"><b>'+name+'</b> '+(ok?'✓':'—')+'</span>').join('');
+}
 
 function signature(r){
   try{return r.endpoint+'|'+JSON.stringify(r.payload)}catch{return r.endpoint+'|'+r.at}
@@ -217,12 +233,15 @@ function ensurePanel(){
   panel.style.cssText='position:fixed;z-index:2147483647;right:8px;bottom:8px;width:min(350px,calc(100vw - 16px));padding:10px;border:1px solid #5f7892;border-radius:12px;background:#071521;color:#eef6ff;font:12px/1.45 -apple-system,BlinkMacSystemFont,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.45)';
   panel.innerHTML='<div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>HarborDesk 艦これ連携 <small style="color:#7f9aae">v'+HD_VERSION+'</small></b><button data-hd-hide style="background:none;border:0;color:#9eb7cb;font-size:18px">×</button></div>'+
     '<div style="margin:6px 0;color:#aac0d1"><b data-hd-status style="color:#9fe0b7">通信待機中</b><br>取得 <b data-hd-count>0</b>件 / 検出フレーム <b data-hd-frames>0</b><br><small>母港・装備・任務などを開くと自動で取得するよ。</small></div>'+
+    '<div data-hd-coverage style="display:flex;gap:4px;flex-wrap:wrap;margin:7px 0 9px"></div>'+
     '<div style="display:flex;gap:6px;flex-wrap:wrap"><button data-hd-send style="font-weight:700">HarborDeskへ送る</button><button data-hd-copy>JSONをコピー</button><button data-hd-clear>クリア</button></div>'+
     '<div style="margin-top:7px;color:#7f9aae"><small>api_token・Cookie・DMMログイン情報・リクエスト本文は保存しません。</small></div>';
   document.documentElement.appendChild(panel);
   countEl=panel.querySelector('[data-hd-count]');
   statusEl=panel.querySelector('[data-hd-status]');
   frameEl=panel.querySelector('[data-hd-frames]');
+  coverageEl=panel.querySelector('[data-hd-coverage]');
+  sendEl=panel.querySelector('[data-hd-send]');
   panel.querySelector('[data-hd-hide]').onclick=()=>{panel.hidden=true};
   panel.querySelector('[data-hd-clear]').onclick=()=>{records.length=0;signatures.clear();render()};
   panel.querySelector('[data-hd-copy]').onclick=copy;
@@ -232,8 +251,11 @@ function ensurePanel(){
 function render(){
   if(countEl)countEl.textContent=String(records.length);
   if(frameEl)frameEl.textContent=String(frameHits);
+  if(coverageEl)coverageEl.innerHTML=coverageHtml();
+  if(sendEl)sendEl.disabled=!records.length;
   if(statusEl){
-    statusEl.textContent=records.length?'取得中':'通信待機中';
+    const c=captureCoverage(),core=c.port&&c.equipment&&c.quests;
+    statusEl.textContent=records.length?(core?'主要データ取得済み':'取得中'):'通信待機中';
     statusEl.style.color=records.length?'#9fe0b7':'#f0d590';
   }
 }
@@ -295,6 +317,7 @@ window.__HARBORDESK_KANCOLLE_USERSCRIPT__={
   version:HD_VERSION,
   records,
   exportObject,
+  captureCoverage,
   show,
   send
 };
