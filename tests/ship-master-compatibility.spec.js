@@ -6043,3 +6043,27 @@ test('mobile sync dock labels match sync state', async ({ page }) => {
   expect(data.partial.aria).toContain('未取得');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('mobile dock shows current section breadcrumb', async ({ page }) => {
+  const errors=[];
+  await page.setViewportSize({width:390,height:844});
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdQNEnsure?.();
+    if(typeof hdWSApply==='function')hdWSApply('fleet','roster',{ignorePin:true});
+    window.hdQNUpdateMobileDock?.();
+    const b=document.querySelector('[data-hd-mobile-location]');
+    return {
+      exists:!!b,
+      group:b?.querySelector('[data-hd-mobile-location-group]')?.textContent||'',
+      section:b?.querySelector('[data-hd-mobile-location-section]')?.textContent||'',
+      aria:b?.getAttribute('aria-label')||''
+    };
+  });
+  expect(data.exists).toBe(true);
+  expect(data.group).toBe('艦隊');
+  expect(data.section).toContain('艦隊台帳');
+  expect(data.aria).toContain('艦隊');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
