@@ -26,14 +26,14 @@ async function rawText(url){
 function normalizeRule(v){if(v==null)return null;if(Array.isArray(v))return v.map(Number);return null}
 function parsePickerTables(src){
   const between=(a,b)=>{const i=src.indexOf(a);if(i<0)throw new Error('picker table missing: '+a);const j=src.indexOf(b,i+a.length);if(j<0)throw new Error('picker table missing: '+b);return src.slice(i+a.length,j)};
-  const parseMap=body=>{const o={};for(const m of body.matchAll(/(\\d+)\\s*:\\s*(\\d+)/g))o[String(Number(m[1]))]=Number(m[2]);return o};
+  const parseMap=body=>{const o={};for(const m of body.matchAll(/(\d+)\s*:\s*(\d+)/g))o[String(Number(m[1]))]=Number(m[2]);return o};
   const nums=s=>s?s.split(',').map(x=>Number(x.trim())).filter(Number.isFinite):[];
-  const slotBody=between('slotExclusions: [','],\\n}'),slotExclusions=[];
-  for(const m of slotBody.matchAll(/\\{([^{}]+)\\}/g)){
-    const x=m[1],ships=x.match(/shipMstIds:\\s*\\[([^\\]]*)\\]/),slot=x.match(/slot:\\s*(\\d+)/);if(!ships||!slot)continue;
-    const r={shipIds:nums(ships[1]),slot:Number(slot[1])};if(/fromSlot:\\s*true/.test(x))r.fromSlot=true;
-    const ex=x.match(/exclude:\\s*\\[([^\\]]*)\\]/);if(ex)r.exclude=nums(ex[1]);
-    const al=x.match(/allowOnly:\\s*\\[([^\\]]*)\\]/);if(al)r.allowOnly=nums(al[1]);slotExclusions.push(r);
+  const slotBody=between('slotExclusions: [','],\n}'),slotExclusions=[];
+  for(const m of slotBody.matchAll(/\{([^{}]+)\}/g)){
+    const x=m[1],ships=x.match(/shipMstIds:\s*\[([^\]]*)\]/),slot=x.match(/slot:\s*(\d+)/);if(!ships||!slot)continue;
+    const r={shipIds:nums(ships[1]),slot:Number(slot[1])};if(/fromSlot:\s*true/.test(x))r.fromSlot=true;
+    const ex=x.match(/exclude:\s*\[([^\]]*)\]/);if(ex)r.exclude=nums(ex[1]);
+    const al=x.match(/allowOnly:\s*\[([^\]]*)\]/);if(al)r.allowOnly=nums(al[1]);slotExclusions.push(r);
   }
   return {equipTypeSpOverrides:parseMap(between('equipTypeSpOverrides: {','filterTypeSplits:')),pickerTypeOverrides:parseMap(between('pickerTypeOverrides: {','// The only field replaced outright')),slotExclusions};
 }
