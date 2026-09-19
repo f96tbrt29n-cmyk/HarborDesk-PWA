@@ -71,3 +71,8 @@
  .hd-ws-swipe-hint small{font-size:11px;color:var(--muted)}
  body.hd-keyboard-open .hd-ws-swipe-hint{display:none}
 }
+
+@supports(padding:max(0px)){
+ .hd-ws-shell{padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right))}
+ .hd-network-status{padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}
+}
