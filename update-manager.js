@@ -146,7 +146,7 @@ function hdEnsureUpdateUI(){
   const header=document.querySelector('.topbar');
   if(header&&!document.getElementById('hdUpdateCheck')){
     const controls=document.createElement('details');controls.className='hd-version-controls hd-header-more';
-    controls.innerHTML=`<summary aria-label="HarborDeskメニュー" title="バージョン・更新"><span aria-hidden="true">•••</span></summary><div class="hd-version-menu"><span class="hd-version-badge" title="HarborDesk バージョン">v${HD_APP_VERSION}</span><button id="hdUpdateCheck" class="ghost small hd-update-check" aria-label="更新確認"><span aria-hidden="true">↻</span><b>更新確認</b></button></div>`;
+    controls.innerHTML=`<summary aria-label="HarborDeskメニュー" title="バージョン・更新"><span aria-hidden="true">•••</span></summary><div class="hd-version-menu"><span class="hd-version-badge" title="HarborDesk バージョン">v${HD_APP_VERSION}</span><button id="hdUpdateCheck" class="ghost small hd-update-check" aria-label="更新確認"><span aria-hidden="true">↻</span><b>更新確認</b></button><button type="button" class="ghost small hd-header-settings" data-hd-header-settings><span aria-hidden="true">⚙</span><b>設定</b></button></div>`;
     header.appendChild(controls)
   }
   const notify=document.getElementById('notifyBtn'),menu=document.querySelector('.hd-header-more .hd-version-menu');
@@ -183,6 +183,7 @@ async function hdCheckForUpdate(showResult=false){
     if(btn){btn.disabled=true;const b=btn.querySelector('b');if(b)b.textContent='確認中…'}
     const latest=await hdFetchLatestVersion(),newer=Number(latest.build||0)>HD_APP_BUILD,banner=document.getElementById('hdUpdateBanner'),text=document.getElementById('hdUpdateText'),changes=document.getElementById('hdUpdateChanges');
     if(newer){
+      document.querySelector('.hd-header-more')?.classList.add('has-update');
       if(text)text.textContent=`v${HD_APP_VERSION} → v${latest.version}${latest.notes?`｜${latest.notes}`:''}`;
       const master=hdUpdateMasterChangeView(latest.masterChanges);
       if(changes){
@@ -191,7 +192,7 @@ async function hdCheckForUpdate(showResult=false){
       }
       if(banner)banner.hidden=false
     }
-    else{if(banner)banner.hidden=true;if(changes){changes.hidden=true;changes.innerHTML=''}if(showResult)alert(`HarborDesk v${HD_APP_VERSION} は最新版だよ`)}
+    else{document.querySelector('.hd-header-more')?.classList.remove('has-update');if(banner)banner.hidden=true;if(changes){changes.hidden=true;changes.innerHTML=''}if(showResult)alert(`HarborDesk v${HD_APP_VERSION} は最新版だよ`)}
   }catch{if(showResult)alert('更新情報を確認できなかったよ。通信状態を確認してもう一度試してね。')}
   finally{if(btn){btn.disabled=false;const b=btn.querySelector('b');if(b)b.textContent='更新確認'}}
 }
@@ -223,7 +224,15 @@ async function hdForceUpdate(){
   return true;
 }
 document.addEventListener('click',e=>{
-  if(e.target?.closest?.('#hdUpdateNow')){e.preventDefault();hdForceUpdate()}
+  if(e.target?.closest?.('#hdUpdateNow')){e.preventDefault();hdForceUpdate();return}
+  if(e.target?.closest?.('[data-hd-header-settings]')){
+    document.querySelector('.hd-header-more')?.removeAttribute('open');
+    if(typeof hdWSShowElement==='function')hdWSShowElement('diagnosticsCenter',true);
+    else location.hash='diagnosticsCenter';
+    return;
+  }
+  const menu=document.querySelector('.hd-header-more');
+  if(menu?.open&&!e.target?.closest?.('.hd-header-more'))menu.removeAttribute('open');
 },true);
 window.addEventListener('load',()=>{
   hdEnsureServiceWorker();hdLoadCurrentAssets().catch(()=>{});hdEnsureUpdateUI();
