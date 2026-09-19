@@ -5359,3 +5359,44 @@ test('Home current fleet shows sortie readiness summary', async ({ page }) => {
   expect(text).toContain('自動');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('sortie readiness uses copied live fleet state', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const now=Date.now();
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
+      {deckId:1,name:'第一艦隊',syncedAt:now-120000,ships:[
+        {name:'加賀改',masterId:1,level:94,nowHp:10,maxHp:40,cond:55,gear:'烈風'},
+        {name:'赤城改',masterId:2,level:90,nowHp:40,maxHp:40,cond:32,gear:'流星'}
+      ]}
+    ]));
+    localStorage.setItem('harbordesk-custom-fleets-v1','{}');
+    const copied=window.hdKcCopyFleetToCustom?.(1,'5-5');
+    const auto=window.hdSortieAutoChecks?.('5-5',copied)?.checks||[];
+    return {
+      copied:{
+        source:copied?.source,
+        sourceSyncedAt:copied?.sourceSyncedAt,
+        ship0:copied?.ships?.[0],
+        ship1:copied?.ships?.[1]
+      },
+      checks:auto.map(x=>({label:x.label,state:x.state,detail:x.detail}))
+    };
+  });
+  expect(data.copied.source).toBe('kancolle-import');
+  expect(data.copied.sourceSyncedAt).toBeGreaterThan(0);
+  expect(data.copied.ship0).toEqual(expect.objectContaining({level:94,nowHp:10,maxHp:40,cond:55}));
+  expect(data.copied.ship1).toEqual(expect.objectContaining({level:90,nowHp:40,maxHp:40,cond:32}));
+  const sync=data.checks.find(x=>x.label==='ゲーム同期');
+  const hp=data.checks.find(x=>x.label==='耐久');
+  const morale=data.checks.find(x=>x.label==='疲労');
+  expect(sync?.state).toBe('ok');
+  expect(sync?.detail).toContain('分前');
+  expect(hp).toEqual(expect.objectContaining({state:'warn'}));
+  expect(hp?.detail).toContain('加賀改');
+  expect(morale).toEqual(expect.objectContaining({state:'warn'}));
+  expect(morale?.detail).toContain('赤城改');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
