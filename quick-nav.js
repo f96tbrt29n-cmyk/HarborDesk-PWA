@@ -149,7 +149,19 @@ function hdQNUpdateMobileDock(){
  }
  const attention=hdQNMobileAttentionMeta();if(badge){badge.textContent=String(attention.count);badge.hidden=attention.count<=0;badge.setAttribute('aria-label',attention.count?`要対応 ${attention.count}件`:'要対応なし')}
  if(home){const detail=attention.reasons.join('・');home.setAttribute('aria-label',attention.count?('ホーム・確認項目 '+detail):'ホーム');home.title=detail}
- if(sync){sync.classList.remove('fresh','stale','partial','missing');let state='missing';try{state=typeof hdWSSyncInfo==='function'?(hdWSSyncInfo().state||'missing'):'missing'}catch{}sync.classList.add(state)}
+ if(sync){
+  sync.classList.remove('fresh','stale','partial','missing','return-game');
+  const returnReady=typeof hdWSCanReturnGame==='function'&&hdWSCanReturnGame();
+  const icon=sync.querySelector('span'),label=sync.querySelector('b'),dot=sync.querySelector('i');
+  if(returnReady){
+    sync.classList.add('return-game');if(icon)icon.textContent='⚓';if(label)label.textContent='艦これ';if(dot)dot.hidden=true;
+    sync.setAttribute('aria-label','艦これへ戻る');sync.title='同期元の艦これへ戻る';
+  }else{
+    let state='missing';try{state=typeof hdWSSyncInfo==='function'?(hdWSSyncInfo().state||'missing'):'missing'}catch{}
+    sync.classList.add(state);if(icon)icon.textContent='↻';if(label)label.textContent='同期';if(dot)dot.hidden=false;
+    sync.setAttribute('aria-label','ゲーム同期の状態を開く');sync.title='';
+  }
+ }
 }
 function hdQNEnsure(){
   if(document.getElementById('hdQuickNavButton')){hdQNEnsureMobileDock();return;}
@@ -174,7 +186,10 @@ document.addEventListener('click',e=>{
   const attentionJump=e.target.closest?.('[data-hd-attention-jump]');if(attentionJump){const id=attentionJump.dataset.hdAttentionJump;hdQNCloseAttention();if(typeof hdWSShowElement==='function')hdWSShowElement(id,true);else document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});return}
   if(e.target.closest?.('[data-hd-mobile-home]')){hdQNMobileHome();return}
   if(e.target.closest?.('[data-hd-mobile-search]')){if(typeof hdGSOpen==='function')hdGSOpen();return}
-  if(e.target.closest?.('[data-hd-mobile-sync]')){if(typeof hdWSOpenSyncStatus==='function')hdWSOpenSyncStatus();else hdQNJump('kancolleImport');return}
+  if(e.target.closest?.('[data-hd-mobile-sync]')){
+    if(typeof hdWSCanReturnGame==='function'&&hdWSCanReturnGame()&&typeof hdWSReturnToGame==='function'){hdWSReturnToGame();setTimeout(hdQNUpdateMobileDock,0);return}
+    if(typeof hdWSOpenSyncStatus==='function')hdWSOpenSyncStatus();else hdQNJump('kancolleImport');return
+  }
   if(e.target.closest?.('[data-hd-mobile-menu]')){hdQNOpen();return}
   if(e.target.closest?.('[data-hd-qn-close]')){hdQNClose();return}
   if(e.target.closest?.('[data-hd-qn-back]')){if(!hdQNBack())hdQNClose();return}
@@ -193,6 +208,7 @@ window.addEventListener('load',()=>setTimeout(()=>{const id=window.hdWSState?.se
 
 window.addEventListener('hd:workspace-changed',()=>{hdQNUpdateMobileDock();if(document.getElementById('hdQuickNavDialog')?.open)hdQNRenderContext()});
 window.addEventListener('hd:kancolle-sync',hdQNUpdateMobileDock);
+window.addEventListener('hd:kancolle-return-ready',hdQNUpdateMobileDock);
 window.addEventListener('storage',e=>{if(!e||e.key==='harbordesk-kancolle-sync-v1')hdQNUpdateMobileDock()});
 
 window.addEventListener('hd:state-changed',hdQNUpdateMobileDock);
@@ -202,3 +218,5 @@ setInterval(hdQNUpdateMobileDock,60000);
 
 window.addEventListener('hd:global-search-open',hdQNUpdateMobileDock);
 window.addEventListener('hd:global-search-close',hdQNUpdateMobileDock);
+
+window.addEventListener('pageshow',hdQNUpdateMobileDock);
