@@ -2847,3 +2847,27 @@ test('quick nav exposes one-tap mobile actions', async ({ page }) => {
   expect(data.game).toContain('play.games.dmm.com/game/kancolle');
   expect(data.top).toBe(true);
 });
+
+
+test('roster sort and compact mode persist in session', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-roster-view-v1', JSON.stringify({sort:'name',compact:true}));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      {id:'1',name:'翔鶴改二甲',level:99,tags:[]},
+      {id:'2',name:'赤城改',level:90,tags:[]},
+      {id:'3',name:'加賀改',level:94,tags:[]}
+    ]));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>({
+    sort:document.getElementById('shipRosterSort')?.value||'',
+    compact:document.getElementById('roster')?.classList.contains('roster-compact')||false,
+    first:document.querySelector('#shipRosterList .roster-card strong')?.textContent||'',
+    button:document.querySelector('[data-roster-compact]')?.textContent||''
+  }));
+  expect(data.sort).toBe('name');
+  expect(data.compact).toBe(true);
+  expect(data.first).toBe('赤城改');
+  expect(data.button).toContain('詳細');
+});
