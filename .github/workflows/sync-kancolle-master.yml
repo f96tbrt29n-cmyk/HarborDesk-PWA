@@ -27,18 +27,33 @@ jobs:
       - name: Regenerate master snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/sync-kancolle-master.mjs --write
-      - name: Validate generated JavaScript
-        run: node --check ship-master-snapshot.js
+        run: node scripts/sync-kancolle-master.mjs --write --bump-app
+      - name: Validate generated runtime
+        shell: bash
+        run: |
+          node --check ship-master-snapshot.js
+          node --check update-manager.js
+          node --check sw.js
+          node <<'NODE'
+          const fs=require('fs');
+          const v=JSON.parse(fs.readFileSync('app-version.json','utf8'));
+          const u=fs.readFileSync('update-manager.js','utf8');
+          const s=fs.readFileSync('sw.js','utf8');
+          const uv=u.match(/const HD_APP_VERSION='([^']+)'/)?.[1];
+          const ub=Number(u.match(/const HD_APP_BUILD=(\d+)/)?.[1]);
+          const sb=Number(s.match(/const CACHE='harbordesk-pwa-v(\d+)'/)?.[1]);
+          if(v.version!==uv||Number(v.build)!==ub||Number(v.build)!==sb)throw new Error('Version mismatch');
+          console.log('Runtime aligned:',v.version,v.build);
+          NODE
       - name: Commit if master changed
         shell: bash
         run: |
-          if git diff --quiet -- ship-master-snapshot.js; then
+          if git diff --quiet -- ship-master-snapshot.js app-version.json update-manager.js sw.js; then
             echo "No master changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ship-master-snapshot.js
-          git commit -m "Sync Kancolle master snapshot"
+          git add ship-master-snapshot.js app-version.json update-manager.js sw.js
+          git commit -m "Sync Kancolle master and bump HarborDesk"
           git push
