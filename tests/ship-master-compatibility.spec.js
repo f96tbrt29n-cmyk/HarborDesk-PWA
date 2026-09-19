@@ -3799,3 +3799,24 @@ test('core completed cleanup supports undo', async ({ page }) => {
   state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
   expect(state.quests.map(x=>x.id)).toEqual(['q-done','q-active']);
 });
+
+
+test('home task can complete quest with undo', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-v2', JSON.stringify({
+      expeditions:[],docks:[],
+      quests:[{id:'q-home',name:'ホーム確認任務',done:false}],
+      resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
+    }));
+  });
+  await boot(page,[]);
+  await page.waitForSelector('[data-home-quest-done="q-home"]');
+  await page.click('[data-home-quest-done="q-home"]');
+  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  expect(state.quests[0].done).toBe(true);
+  expect(await page.locator('#homeTodo').textContent()).toContain('未完了の任務はないよ');
+  await page.click('#hdToastRegion .hd-toast-action');
+  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  expect(state.quests[0].done).toBe(false);
+  expect(await page.locator('#homeTodo').textContent()).toContain('ホーム確認任務');
+});
