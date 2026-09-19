@@ -6163,3 +6163,27 @@ test('update banner can be snoozed for the session', async ({ page }) => {
   expect(data.cleared).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('workspace deep link opens requested feature', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const ok=window.hdWSOpenAnchorId?.('roster',false);
+    await new Promise(r=>setTimeout(r,20));
+    const state=JSON.parse(localStorage.getItem('harbordesk-workspace-tabs-v1')||'{}');
+    return {
+      ok:!!ok,
+      group:state.group||'',
+      section:state.sections?.fleet||'',
+      visible:!document.getElementById('roster')?.classList.contains('hd-ws-hidden'),
+      ignoresBridge:window.hdWSOpenAnchorId?.('kcimport=g.test',false)===false
+    };
+  });
+  expect(data.ok).toBe(true);
+  expect(data.group).toBe('fleet');
+  expect(data.section).toBe('roster');
+  expect(data.visible).toBe(true);
+  expect(data.ignoresBridge).toBe(true);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
