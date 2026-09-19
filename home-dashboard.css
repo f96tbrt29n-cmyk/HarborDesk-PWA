@@ -75,3 +75,12 @@ button.home-next-main{cursor:pointer}
 .home-empty-action{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .home-empty-action>div{display:flex;gap:6px;flex-wrap:wrap}
 @media(max-width:520px){.home-empty-action{align-items:stretch;flex-direction:column}.home-empty-action>div{display:grid;grid-template-columns:1fr 1fr}.home-empty-action button{min-height:38px}}
+
+.home-timer-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.home-timer-actions{display:flex;align-items:center;gap:7px}
+.home-timer-actions button{padding:6px 8px;font-size:10px;color:#f0c7c7;border-color:rgba(210,117,117,.34)}
+.home-card-actions [data-home-jump="kancolleImport"]{font-size:9px;padding:6px 8px}
+@media(max-width:520px){
+ .home-timer-actions button{min-height:34px}
+ .home-card-actions [data-home-jump="kancolleImport"]{min-height:32px}
+}
