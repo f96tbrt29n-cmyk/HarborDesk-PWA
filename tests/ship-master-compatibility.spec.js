@@ -4872,3 +4872,33 @@ test('Kancolle sync toast prioritizes delta and next action', async ({ page }) =
   expect(data.first.button).toBe('同期詳細');
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
+
+
+test('global sync status flags partial capture coverage', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now()-120000,ships:206,equipment:93,decks:4,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:false,docks:false,sorties:false}
+    }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdWSEnsureSyncStatus?.();
+    window.hdWSUpdateSyncStatus?.();
+    const info=window.hdWSSyncInfo?.();
+    const b=document.getElementById('hdGlobalSyncStatus');
+    return {
+      text:b?.textContent||'',
+      partial:b?.classList.contains('partial')||false,
+      title:b?.title||'',
+      missing:info?.missing||[]
+    };
+  });
+  expect(data.text).toContain('一部');
+  expect(data.partial).toBe(true);
+  expect(data.title).toContain('任務');
+  expect(data.title).toContain('入渠');
+  expect(data.missing).toEqual(expect.arrayContaining(['quests','docks']));
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
