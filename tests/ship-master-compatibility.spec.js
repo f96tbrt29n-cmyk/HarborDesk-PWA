@@ -4406,3 +4406,20 @@ test('home reorder controls stay hidden until edit mode', async ({ page }) => {
   await page.click('[data-home-edit-toggle]');
   expect(await page.locator('#home').evaluate(el=>el.classList.contains('home-editing'))).toBe(false);
 });
+
+
+test('home edit mode closes when leaving Home', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  await page.click('[data-home-edit-toggle]');
+  expect(await page.locator('#home').evaluate(el=>el.classList.contains('home-editing'))).toBe(true);
+  await page.evaluate(()=>window.dispatchEvent(new CustomEvent('hd:workspace-changed',{detail:{group:'fleet',section:'roster'}})));
+  const data=await page.evaluate(()=>({
+    editing:document.getElementById('home')?.classList.contains('home-editing')||false,
+    label:document.querySelector('[data-home-edit-toggle]')?.textContent||'',
+    resetHidden:!!document.querySelector('[data-home-order-reset]')?.hidden
+  }));
+  expect(data.editing).toBe(false);
+  expect(data.label).toContain('ホーム編集');
+  expect(data.resetHidden).toBe(true);
+});
