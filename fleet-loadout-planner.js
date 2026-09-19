@@ -8,12 +8,13 @@ function hdFLCatalog(){
  return Array.isArray(cat)?cat:[];
 }
 function hdFLRows(){try{const x=JSON.parse(localStorage.getItem(HD_FL_KEY)||'[]');return Array.isArray(x)?x:[]}catch{return []}}
+function hdFLInventoryStackKey(name,star=0){return hdFLNorm(name)+'@@'+Math.max(0,Number(star)||0)}
 function hdFLInventory(){
  const cat=hdFLCatalog(),byName=new Map(cat.map(x=>[hdFLNorm(x.name),x])),m=new Map();
  for(const row of hdFLRows()){
-  const key=hdFLNorm(row.name),count=Math.max(0,Number(row.count)||0);if(!key||!count)continue;
-  const meta=byName.get(key)||{name:row.name,category:row.category||'',stats:{},tags:[],role:''},cur=m.get(key)||{key,name:row.name,count:0,maxStar:0,item:meta};
-  cur.count+=count;cur.maxStar=Math.max(cur.maxStar,Math.max(0,Number(row.star)||0));m.set(key,cur);
+  const norm=hdFLNorm(row.name),star=Math.max(0,Number(row.star)||0),key=hdFLInventoryStackKey(row.name,star),count=Math.max(0,Number(row.count)||0);if(!norm||!count)continue;
+  const meta=byName.get(norm)||{name:row.name,category:row.category||'',stats:{},tags:[],role:''},cur=m.get(key)||{key,norm,name:row.name,count:0,star,maxStar:star,item:meta};
+  cur.count+=count;m.set(key,cur);
  }
  return m;
 }
@@ -156,7 +157,7 @@ function hdFLGenerate(index){
   remaining.set(pick.own.key,Math.max(0,(remaining.get(pick.own.key)||0)-1));
  });
  const used={};for(const s of ships){for(const x of s.items)used[x.name]=(used[x.name]||0)+1;if(s.expansion)used[s.expansion.name]=(used[s.expansion.name]||0)+1}
- const owned={};for(const x of inv.values())owned[x.name]=x.count;
+ const owned={};for(const x of inv.values())owned[x.name]=(owned[x.name]||0)+x.count;
  const plan={map,index:Number(index),suggestion,ships,missing,used,owned,masterBacked:ships.filter(x=>x.master).length,createdAt:Date.now()};HD_FL_CACHE[map+':'+index]=plan;return plan;
 }
 function hdFLKindLabel(k){return ({smallGun:'小口径主砲',mediumGun:'中口径主砲',smallMediumGun:'主砲',largeGun:'大口径主砲',torpedo:'魚雷',recon:'偵察/索敵',fighter:'艦戦',airAttack:'艦攻/艦爆',waterAir:'水上機',ap:'徹甲弾',utility:'海域向け装備'})[k]||k}
