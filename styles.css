@@ -215,3 +215,9 @@ body.hd-booting::after{
  .timer-actions{flex-wrap:wrap;justify-content:flex-end}
  .timer-actions .timer-adjust{min-width:38px;min-height:34px}
 }
+
+.timer-recent-run,.quest-recent-run,.timer-recent-remove,.quest-recent-remove{flex:0 0 auto;min-width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:#10283b;color:var(--text);font-weight:900;line-height:1}
+.timer-recent-run,.quest-recent-run{color:#b9f4cf;border-color:rgba(99,216,151,.4);background:rgba(24,86,59,.26)}
+.timer-recent-remove,.quest-recent-remove{color:#e9a6aa}
+.timer-recent-item,.quest-recent-item{display:inline-flex;align-items:center;gap:4px}
+@media(max-width:560px){.timer-recent-run,.quest-recent-run,.timer-recent-remove,.quest-recent-remove{min-width:36px;height:36px}}
