@@ -477,6 +477,10 @@ function hdKcCaptureShortcutScript(){
   completion('HarborDeskキャプチャ失敗: '+String(e&&e.message||e))
  }`;
 }
+function hdKcShortcutDiagnosticScript(){
+ return "try{var d=document.getElementById('hd-kc-shortcut-test');if(d)d.remove();d=document.createElement('div');d.id='hd-kc-shortcut-test';d.textContent='HarborDesk ショートカット実行OK';d.style.cssText='position:fixed;z-index:2147483647;left:12px;right:12px;top:12px;padding:16px;border-radius:12px;background:#0b2235;color:#fff;border:2px solid #74d4ff;font:700 16px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center';(document.documentElement||document.body).appendChild(d);completion('HarborDesk診断OK: '+location.href)}catch(e){completion('HarborDesk診断エラー: '+String(e&&e.message||e))}";
+}
+async function hdKcCopyShortcutDiagnostic(){const code=hdKcShortcutDiagnosticScript();try{await navigator.clipboard.writeText(code);return true}catch{return false}}
 async function hdKcCopyCaptureShortcut(){const code=hdKcCaptureShortcutScript();try{await navigator.clipboard.writeText(code);return true}catch{return false}}
 async function hdKcCopyCaptureHelper(){
  const code=hdKcCaptureBookmarklet();try{await navigator.clipboard.writeText(code);return true}catch{return false}
@@ -488,7 +492,7 @@ function hdKcEnsureImport(){
  <div class="hd-kc-import card">
   <div class="hd-kc-import-note"><strong>DMMのID・パスワード・Cookieは不要</strong><p>艦これAPIレスポンスから艦娘・装備・資源・現在艦隊・遠征/入渠・任務・出撃結果を抽出してHarborDeskへ反映する。貼り付けた生JSONは保存しないよ。</p></div>
   <div class="hd-kc-import-actions"><label class="ghost hd-kc-import-file">JSONファイルを選ぶ<input id="hdKcImportFile" type="file" accept=".json,.txt,application/json,text/plain"></label><button type="button" class="ghost" data-hd-kc-paste>クリップボードから貼る</button></div>
-  <details class="hd-kc-capture-guide" open><summary>iPhone / Safariでゲーム通信を拾う（かんたん設定）</summary><div><p><b>おすすめ:</b> iPhoneの「ショートカット」に1回だけ登録すると、以後は艦これ画面で「共有 → HarborDeskキャプチャ」を押すだけで開始できる。取得後はゲーム画面の「HarborDeskへ送る」で直接転送できるよ。</p><div class="hd-kc-import-actions"><button type="button" class="primary" data-hd-kc-copy-shortcut>ショートカット用JSをコピー</button><button type="button" class="ghost" data-hd-kc-copy-capture>従来のブックマーク用コード</button></div><ol><li>「ショートカット用JSをコピー」</li><li>ショートカットAppで「WebページでJavaScriptを実行」へ貼る</li><li>「共有シートに表示」をON、受け入れを「SafariのWebページ」にする</li><li>艦これをSafariで開き、共有 → HarborDeskキャプチャ</li><li>「DMMの外側ページ」と出たら「ゲーム本体を開く」→ 本体側でもう一度共有 → HarborDeskキャプチャ</li><li>「キャプチャ待機中」になったら母港/装備/任務などを操作し、「HarborDeskへ送る」</li></ol><small>実行するとまず画面上部に「HarborDeskショートカット：実行OK」が必ず出る。その後、ページ本体への注入結果と「DMMの外側ページ」または「キャプチャ待機中」を表示する。上部の実行OKすら出ない場合はショートカット設定/共有シート側で止まっている。HarborDeskへの送信はクリップボード不要。リクエスト本文・api_token・Cookieは記録しない。</small></div></details>
+  <details class="hd-kc-capture-guide" open><summary>iPhone / Safariでゲーム通信を拾う（かんたん設定）</summary><div><p><b>おすすめ:</b> iPhoneの「ショートカット」に1回だけ登録すると、以後は艦これ画面で「共有 → HarborDeskキャプチャ」を押すだけで開始できる。取得後はゲーム画面の「HarborDeskへ送る」で直接転送できるよ。</p><div class="hd-kc-import-actions"><button type="button" class="primary" data-hd-kc-copy-shortcut>ショートカット用JSをコピー</button><button type="button" class="ghost" data-hd-kc-copy-shortcut-test>最小診断JSをコピー</button><button type="button" class="ghost" data-hd-kc-copy-capture>従来のブックマーク用コード</button></div><ol><li>「ショートカット用JSをコピー」</li><li>ショートカットAppで「WebページでJavaScriptを実行」へ貼る</li><li>「共有シートに表示」をON、受け入れを「SafariのWebページ」にする</li><li>艦これをSafariで開き、共有 → HarborDeskキャプチャ</li><li>「DMMの外側ページ」と出たら「ゲーム本体を開く」→ 本体側でもう一度共有 → HarborDeskキャプチャ</li><li>「キャプチャ待機中」になったら母港/装備/任務などを操作し、「HarborDeskへ送る」</li></ol><small>実行するとまず画面上部に「HarborDeskショートカット：実行OK」が必ず出る。その後、ページ本体への注入結果と「DMMの外側ページ」または「キャプチャ待機中」を表示する。上部の実行OKすら出ない場合はショートカット設定/共有シート側で止まっている。HarborDeskへの送信はクリップボード不要。リクエスト本文・api_token・Cookieは記録しない。</small></div></details>
   <textarea id="hdKcImportText" spellcheck="false" placeholder="svdata={...} または複数APIをまとめたJSONを貼り付け"></textarea>
   <div class="hd-kc-import-actions"><button type="button" class="primary" data-hd-kc-parse>内容を解析</button><button type="button" class="ghost" data-hd-kc-clear>入力を消す</button></div>
   <div id="hdKcImportPreview" class="hd-kc-import-preview">${hdKcPreviewHtml(null)}</div>
@@ -505,6 +509,7 @@ async function hdKcReadAndPreview(raw){
  const p=hdKcPreviewData(hdKcParseImport(raw));HD_KC_IMPORT_PREVIEW=p;const el=document.getElementById('hdKcImportPreview');if(el)el.innerHTML=hdKcPreviewHtml(p);const btn=document.querySelector('[data-hd-kc-apply]');if(btn)btn.disabled=false;return p;
 }
 document.addEventListener('click',async e=>{
+ if(e.target.closest?.('[data-hd-kc-copy-shortcut-test]')){const ok=await hdKcCopyShortcutDiagnostic();document.getElementById('hdKcImportResult').textContent=ok?'最小診断JSをコピーしたよ。今のショートカットのJavaScriptをこれに置き換えて、艦これ画面の共有から実行してね。':'診断JSをコピーできなかったよ。';return}
  if(e.target.closest?.('[data-hd-kc-copy-shortcut]')){const ok=await hdKcCopyCaptureShortcut();document.getElementById('hdKcImportResult').textContent=ok?'ショートカット用JSをコピーしたよ。下の5手順で一度だけ設定してね。':'コピーできなかったよ。SafariでHarborDeskを開いてもう一度試してね。';return}
  if(e.target.closest?.('[data-hd-kc-copy-capture]')){const ok=await hdKcCopyCaptureHelper();document.getElementById('hdKcImportResult').textContent=ok?'Safari用キャプチャコードをコピーしたよ。下の手順でブックマークURLへ貼ってね。':'コピーできなかったので、このブラウザではJSONファイル/貼り付け取込を使ってね。';return}
  const deck=e.target.closest?.('[data-hd-kc-copy-deck]');if(deck){try{const row=hdKcCopyFleetToCustom(deck.dataset.hdKcCopyDeck);document.getElementById('hdKcImportResult').textContent=`${row.name} を ${typeof selectedMap!=='undefined'?selectedMap:''} の自分用編成へコピーしたよ`}catch(err){document.getElementById('hdKcImportResult').textContent='コピーできなかった: '+String(err?.message||err)}return}
