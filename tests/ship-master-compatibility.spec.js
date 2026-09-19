@@ -4276,3 +4276,28 @@ test('recent suggestions and drop hunts support undo', async ({ page }) => {
   expect(data.hasDrop).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('active filter summaries describe current list conditions', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-roster-view-v1', JSON.stringify({query:'加賀',filter:'主力',sort:'name'}));
+    sessionStorage.setItem('harbordesk-session-shipdb-view-v1', JSON.stringify({query:'榛名',type:'高速戦艦',missingOnly:true,includeMaster:false,imageFilter:'missing'}));
+    sessionStorage.setItem('harbordesk-session-equip-catalog-view-v1', JSON.stringify({query:'電探',filter:'小型水上電探'}));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.renderShipRoster?.();window.hdEnsureShipDatabase?.();window.hdRenderShipDatabase?.();window.hdEnsureEquipmentCatalog?.();window.hdRenderEquipmentCatalog?.();
+    return {
+      roster:document.getElementById('shipRosterActiveFilters')?.textContent||'',
+      ship:document.getElementById('hdShipDbActiveFilters')?.textContent||'',
+      equip:document.getElementById('hdEquipCatalogActiveFilters')?.textContent||''
+    };
+  });
+  expect(data.roster).toContain('検索: 加賀');
+  expect(data.roster).toContain('タグ: 主力');
+  expect(data.ship).toContain('艦種: 高速戦艦');
+  expect(data.ship).toContain('未所持');
+  expect(data.equip).toContain('カテゴリ: 小型水上電探');
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
