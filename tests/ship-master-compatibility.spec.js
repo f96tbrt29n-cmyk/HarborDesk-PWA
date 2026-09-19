@@ -5480,3 +5480,22 @@ test('sortie readiness collapses OK auto checks', async ({ page }) => {
   expect(data.outsideStates.every(x=>!x.includes(' ok'))).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('sortie readiness highlights one next action', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const source=await fetch('./sortie-readiness.js',{cache:'no-store'}).then(r=>r.text());
+    return {
+      hasHelper:source.includes('function hdSortieNextActionHtml'),
+      hasLabel:source.includes('まず直す'),
+      hasRemaining:source.includes('remainingProblems'),
+      collapsesOk:source.includes('hd-sortie-auto-ok')
+    };
+  });
+  expect(data.hasHelper).toBe(true);
+  expect(data.hasLabel).toBe(true);
+  expect(data.hasRemaining).toBe(true);
+  expect(data.collapsesOk).toBe(true);
+});
