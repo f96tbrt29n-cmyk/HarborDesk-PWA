@@ -5869,3 +5869,30 @@ test('mobile dock highlights open search and feature menu', async ({ page }) => 
   expect(data.searchActive).toBe(true);
   expect(data.menuActive).toBe(true);
 });
+
+
+test('mobile attention sheet lists actionable reasons', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({syncedAt:Date.now()-8*60*60*1000,ships:206,equipment:93,decks:4}));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.state=window.state||{};
+    window.state.quests=[{id:'q1',name:'デイリー任務',done:false}];
+    window.state.expeditions=[{id:'e1',name:'海上護衛任務',endsAt:Date.now()+5*60*1000}];
+    window.state.docks=[];
+    window.hdQNEnsure?.();
+    window.hdQNUpdateMobileDock?.();
+    window.hdQNOpenAttention?.();
+    const badge=document.querySelector('[data-hd-mobile-home-badge]');
+    const list=document.getElementById('hdMobileAttentionList')?.textContent||'';
+    return {badge:badge?.textContent||'',hidden:!!badge?.hidden,list,open:!!document.getElementById('hdMobileAttentionDialog')?.open};
+  });
+  expect(data.hidden).toBe(false);
+  expect(Number(data.badge)).toBeGreaterThanOrEqual(2);
+  expect(data.list).toContain('未完了任務');
+  expect(data.list).toContain('遠征まもなく帰投');
+  expect(data.list).toContain('ゲーム同期');
+  expect(data.open).toBe(true);
+});
