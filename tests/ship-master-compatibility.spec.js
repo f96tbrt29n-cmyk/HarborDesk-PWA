@@ -489,3 +489,96 @@ test('same-tab equipment save immediately advances procurement state', async ({ 
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('procurement progress history records completion once and activity log only on completion', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    const equipKey = 'harbordesk-equipment-v1';
+    const procKey = 'harbordesk-equipment-procurement-v1';
+    const histKey = 'harbordesk-equipment-procurement-history-v1';
+    const activityKey = 'harbordesk-activity-log-v1';
+
+    localStorage.setItem(histKey, '[]');
+    localStorage.setItem(activityKey, '[]');
+    localStorage.setItem(equipKey, JSON.stringify([
+      { id: 'eq-progress', name: '41cm連装砲', category: '大口径主砲', count: 1, star: 0, targetStar: 10 }
+    ]));
+    localStorage.setItem(procKey, JSON.stringify([
+      {
+        id: 'proc-progress',
+        map: '進捗テスト',
+        kinds: [],
+        gearItems: [
+          {
+            map: '進捗テスト',
+            ship: '長門改二',
+            loadout: '昼戦',
+            wanted: '大口径主砲',
+            target: '41cm連装砲',
+            kind: '主砲',
+            methodKey: 'develop',
+            methodLabel: '開発候補',
+            rank: 1,
+            needed: 1,
+            requiredTotal: 3,
+            sources: ['長門改二']
+          }
+        ]
+      }
+    ]));
+
+    window.hdPLPrimeDemandSnapshot?.();
+
+    window.hdSave?.(equipKey, [
+      { id: 'eq-progress', name: '41cm連装砲', category: '大口径主砲', count: 2, star: 0, targetStar: 10 }
+    ]);
+    const afterProgress = {
+      history: window.hdPLHistoryLoad?.() || [],
+      activity: JSON.parse(localStorage.getItem(activityKey) || '[]')
+    };
+
+    window.hdSave?.(equipKey, [
+      { id: 'eq-progress', name: '41cm連装砲', category: '大口径主砲', count: 3, star: 0, targetStar: 10 }
+    ]);
+    const afterComplete = {
+      history: window.hdPLHistoryLoad?.() || [],
+      activity: JSON.parse(localStorage.getItem(activityKey) || '[]'),
+      html: window.hdPLHistoryHtml?.() || ''
+    };
+
+    window.hdSave?.(equipKey, [
+      { id: 'eq-progress', name: '41cm連装砲', category: '大口径主砲', count: 3, star: 0, targetStar: 10 }
+    ]);
+    const afterRepeat = {
+      history: window.hdPLHistoryLoad?.() || [],
+      activity: JSON.parse(localStorage.getItem(activityKey) || '[]')
+    };
+
+    return { afterProgress, afterComplete, afterRepeat };
+  });
+
+  expect(data.afterProgress.history).toHaveLength(1);
+  expect(data.afterProgress.history[0].complete).toBeFalsy();
+  expect(data.afterProgress.history[0].beforeShortfall).toBe(2);
+  expect(data.afterProgress.history[0].afterShortfall).toBe(1);
+  expect(data.afterProgress.activity.filter(x => x.external)).toHaveLength(0);
+
+  expect(data.afterComplete.history).toHaveLength(2);
+  expect(data.afterComplete.history[0].complete).toBeTruthy();
+  expect(data.afterComplete.history[0].target).toBe('41cm連装砲');
+  expect(data.afterComplete.history[0].beforeShortfall).toBe(1);
+  expect(data.afterComplete.history[0].afterShortfall).toBe(0);
+  expect(data.afterComplete.html).toContain('調達完了');
+
+  const external = data.afterComplete.activity.filter(x => x.external);
+  expect(external).toHaveLength(1);
+  expect(external[0].label).toContain('装備調達完了: 41cm連装砲');
+
+  expect(data.afterRepeat.history).toHaveLength(2);
+  expect(data.afterRepeat.activity.filter(x => x.external)).toHaveLength(1);
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
