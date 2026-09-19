@@ -162,8 +162,8 @@ function homeSortieReadiness(map){
   if(typeof hdSortieFleets!=='function'||typeof hdSortieSelection!=='function'||typeof hdSortieAutoChecks!=='function'||typeof hdSortieManualChecks!=='function'||typeof hdSortieState!=='function'||typeof hdSortieSummary!=='function')return null;
   const fleets=hdSortieFleets(target),id=hdSortieSelection(target),fleet=fleets.find(x=>x.id===id)||fleets[0];if(!fleet)return null;
   const autoInfo=hdSortieAutoChecks(target,fleet),manual=hdSortieManualChecks(target,autoInfo.adv),state=hdSortieState(target,fleet.id),sum=hdSortieSummary(manual,state,autoInfo.checks),sorted=typeof hdSortieSortedChecks==='function'?hdSortieSortedChecks(autoInfo.checks):autoInfo.checks;
-  const nextAuto=(sorted||[]).find(x=>x.state!=='ok')||null,manualLeft=Math.max(0,sum.total-sum.done);
-  return {map:target,fleetId:fleet.id,name:fleet.name||'',nextAuto,manualLeft,ready:!nextAuto&&manualLeft===0,...sum};
+  const nextAuto=(sorted||[]).find(x=>x.state!=='ok')||null,manualLeft=Math.max(0,sum.total-sum.done),resetReason=String(state?._resetReason||'');
+  return {map:target,fleetId:fleet.id,name:fleet.name||'',nextAuto,manualLeft,resetReason,ready:!nextAuto&&manualLeft===0,...sum};
  }catch{return null}
 }
 function homeOpenSortieFix(action){
@@ -261,9 +261,9 @@ function renderHomeDashboard(){
    const missingText=syncInfo.state==='partial'&&syncInfo.missing.length?`次に開く: ${homeSyncMissingGuide(syncInfo.missing).join(' → ')||'母港'}`:'艦娘・装備・資源を最新状態にしよう';
    nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="kancolleImport"><span>${syncInfo.state==='partial'?'同期を補完する':'先に更新しておく'}</span><strong>ゲーム同期 ${homeEsc(syncInfo.label)}</strong><small>${homeEsc(missingText)}</small></button><a class="ghost small home-next-game" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a>`;
   }else if(sortieNeedsAttention){
-   const label=sortieInfo.nextAuto?'まず直す':'出撃直前チェック';
-   const title=sortieInfo.nextAuto?(sortieInfo.nextAuto.label||'出撃準備を確認'):`手動確認 あと ${sortieInfo.manualLeft}件`;
-   const detail=sortieInfo.nextAuto?(sortieInfo.nextAuto.detail||`${sortieInfo.map} の出撃準備`):`${sortieInfo.map}・${sortieInfo.name||'使用編成'}`;
+   const label=sortieInfo.nextAuto?'まず直す':sortieInfo.resetReason?'再確認が必要':'出撃直前チェック';
+   const title=sortieInfo.nextAuto?(sortieInfo.nextAuto.label||'出撃準備を確認'):sortieInfo.resetReason?'手動チェックをやり直す':`手動確認 あと ${sortieInfo.manualLeft}件`;
+   const detail=sortieInfo.nextAuto?(sortieInfo.nextAuto.detail||`${sortieInfo.map} の出撃準備`):sortieInfo.resetReason?sortieInfo.resetReason:`${sortieInfo.map}・${sortieInfo.name||'使用編成'}`;
    const fix=String(sortieInfo.nextAuto?.action||''),fixLabel=String(sortieInfo.nextAuto?.actionLabel||'確認');
    nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-sortie-open><span>${homeEsc(sortieInfo.map)} 出撃準備・${homeEsc(label)}</span><strong>${homeEsc(title)}</strong><small>${homeEsc(detail)}</small></button>${fix?`<button type="button" class="primary small home-next-fix" data-home-sortie-fix="${homeEsc(fix)}">${homeEsc(fixLabel)}</button>`:'<button type="button" class="primary small" data-home-sortie-open>準備を見る</button>'}`;
   }else if(todo.length){
