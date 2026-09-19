@@ -327,15 +327,41 @@ document.getElementById('saveResources').onclick=()=>{['fuel','ammo','steel','ba
 
 const secretaryLines=['提督、3-2・5-5・6-5・7-5はアプリ内で攻略要点まで見られるようにしたよ。','攻略で迷ったら上の海域ボタンから選んで。必要なところだけ一緒に見よ。','遠征の帰投時刻はこっちで見てるよ。焦らずいこう。','任務、ひとつずつ片付けよ。全部いっぺんにやらなくていいから。','資源の記録、あとで効いてくるよ。今日の分だけ残しておこ。'];
 document.getElementById('secretaryRefresh').onclick=()=>{document.getElementById('secretaryText').textContent=secretaryLines[Math.floor(Math.random()*secretaryLines.length)]};
+function hdNotifyIsIOS(ua=String(navigator.userAgent||''),touch=Number(navigator.maxTouchPoints)||0){
+ return /iPhone|iPad|iPod/i.test(String(ua||''))||(/Macintosh/i.test(String(ua||''))&&Number(touch)>1);
+}
+function hdNotifyIsStandalone(matches=window.matchMedia?.('(display-mode: standalone)')?.matches,standalone=navigator.standalone){
+ return matches===true||standalone===true;
+}
+function hdNotifyUiState({ios=hdNotifyIsIOS(),standalone=hdNotifyIsStandalone(),supported=('Notification'in window),permission=(supported?Notification.permission:'unsupported')}={}){
+ if(ios&&!standalone)return 'needs-install';
+ if(!supported)return 'unsupported';
+ if(permission==='granted')return 'granted';
+ if(permission==='denied')return 'denied';
+ return 'default';
+}
 function updateNotifyButton(){
  const btn=document.getElementById('notifyBtn');if(!btn)return;
- let state='unsupported';if('Notification'in window)state=Notification.permission||'default';
- btn.dataset.notifyState=state;
- const label=state==='granted'?'通知ON':state==='denied'?'通知OFF':state==='default'?'通知':'通知不可';
- btn.innerHTML=`<span aria-hidden="true">${state==='granted'?'🔔':state==='denied'?'🔕':'🔔'}</span><b>${label}</b>`;
- btn.setAttribute('aria-label',state==='granted'?'通知は許可済み':state==='denied'?'通知はブロックされています':'通知を設定');
+ const state=hdNotifyUiState();btn.dataset.notifyState=state;
+ const map={
+  granted:['🔔','通知ON','通知は許可済み'],
+  denied:['🔕','通知OFF','通知がブロックされています。設定を確認'],
+  'needs-install':['＋','通知設定','iPhoneではホーム画面追加後に通知を設定'],
+  unsupported:['🔕','通知不可','この環境では通知を利用できません'],
+  default:['🔔','通知','通知を設定']
+ };
+ const row=map[state]||map.default;
+ btn.innerHTML=`<span aria-hidden="true">${row[0]}</span><b>${row[1]}</b>`;btn.setAttribute('aria-label',row[2]);btn.title=row[2];
 }
-document.getElementById('notifyBtn').onclick=async()=>{if(!('Notification'in window)){alert('このブラウザでは通知APIが使えないみたい');return}await Notification.requestPermission();updateNotifyButton()};
+document.getElementById('notifyBtn').onclick=async()=>{
+ const state=hdNotifyUiState();
+ if(state==='needs-install'){alert('iPhoneで通知を使うには、Safariの共有ボタン →「ホーム画面に追加」→ ホーム画面のHarborDeskから開いて、もう一度「通知設定」を押してね。');return}
+ if(state==='unsupported'){alert('このブラウザでは通知APIが使えないみたい');return}
+ if(state==='denied'){alert('通知がブロックされてるよ。iPhoneの「設定」→「通知」からHarborDeskの通知を許可してね。');return}
+ if(state==='granted'){alert('HarborDeskの通知はONだよ。遠征・入渠の完了時に通知するね。');return}
+ try{await Notification.requestPermission()}catch{}
+ updateNotifyButton();
+};
 updateNotifyButton();
 function tick(){const now=Date.now();document.querySelectorAll('.timer-time').forEach(el=>{const end=Number(el.dataset.end);el.textContent=fmt(end-now);el.closest('.timer')?.classList.toggle('done',end<=now)});for(const [kind,arr] of [['遠征',state.expeditions],['入渠',state.docks]])for(const t of arr){if(t.endsAt<=now&&!notified.has(t.id)){notified.add(t.id);if(Notification.permission==='granted')new Notification(`HarborDesk: ${kind}完了`,{body:`${t.name} が完了したよ`})}}}
 setInterval(tick,1000);if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));render();tick();setTimeout(()=>{document.body?.classList.remove('hd-booting');document.body?.setAttribute('data-hd-boot-fallback','1')},8000);
