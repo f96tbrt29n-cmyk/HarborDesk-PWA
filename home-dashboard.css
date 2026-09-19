@@ -155,3 +155,9 @@ button.home-next-main{cursor:pointer}
  .home-fleet-ships{grid-template-columns:1fr}
  .home-fleet-ships>button{min-height:44px}
 }
+
+.home-fleet-meta small.warn{color:#f0cf82}.home-fleet-meta small.danger{color:#ff9f9f;font-weight:800}
+.home-fleet-ships>button.warn{border-color:rgba(239,191,93,.55);background:rgba(86,62,22,.3)}
+.home-fleet-ships>button.warn small{color:#f0cf82}
+.home-fleet-ships>button.danger{border-color:rgba(244,116,116,.62);background:rgba(90,34,39,.34)}
+.home-fleet-ships>button.danger small{color:#ffb1b1;font-weight:800}
