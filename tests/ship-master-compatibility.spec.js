@@ -4660,3 +4660,25 @@ test('Userscript remembers minimized capture panel', async ({ page }) => {
   expect(data.state).toBe(true);
   expect(data.bodyHidden).toBe(true);
 });
+
+
+test('mobile workspace shows one-time swipe hint', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => localStorage.removeItem('harbordesk-workspace-swipe-hint-v1'));
+  await boot(page,errors);
+  await page.setViewportSize({width:390,height:844});
+  await page.evaluate(()=>window.hdWSEnsureSwipeHint?.());
+  const before=await page.evaluate(()=>({
+    shown:!!document.getElementById('hdWorkspaceSwipeHint'),
+    text:document.getElementById('hdWorkspaceSwipeHint')?.textContent||''
+  }));
+  expect(before.shown).toBe(true);
+  expect(before.text).toContain('左右スワイプ');
+  await page.locator('#hdWorkspaceSwipeHint').click();
+  const after=await page.evaluate(()=>({
+    shown:!!document.getElementById('hdWorkspaceSwipeHint'),
+    saved:localStorage.getItem('harbordesk-workspace-swipe-hint-v1')
+  }));
+  expect(after.shown).toBe(false);
+  expect(after.saved).toBe('1');
+});
