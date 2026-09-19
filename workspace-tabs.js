@@ -1,5 +1,6 @@
 const HD_WS_KEY='harbordesk-workspace-tabs-v1';
 const HD_WS_SCROLL_KEY='harbordesk-session-workspace-scroll-v1';
+const HD_WS_UPDATE_RETURN_KEY='harbordesk-update-return-v1';
 const HD_WS_HISTORY_KEY='harbordesk-session-workspace-history-v1';
 const HD_WS_SWIPE_HINT_KEY='harbordesk-workspace-swipe-hint-v1';
 const HD_WS_GROUPS=[
@@ -60,6 +61,19 @@ function hdWSSaveCurrentScroll(){
  const section=hdWSVisibleSections(hdWSState.group).find(x=>!x.classList.contains('hd-ws-hidden'));if(!section)return;
  const top=section.getBoundingClientRect().top+window.scrollY,offset=Math.max(0,Math.round(window.scrollY-top));
  const all=hdWSScrollLoad();all[section.id]=offset;try{sessionStorage.setItem(HD_WS_SCROLL_KEY,JSON.stringify(all))}catch{}
+}
+function hdWSPrepareUpdateReturn(){
+ hdWSSaveCurrentScroll();
+ const loc=hdWSCurrentLocation();if(!loc)return false;
+ try{sessionStorage.setItem(HD_WS_UPDATE_RETURN_KEY,JSON.stringify({...loc,at:Date.now()}));return true}catch{return false}
+}
+function hdWSConsumeUpdateReturn(){
+ let saved=null;try{saved=JSON.parse(sessionStorage.getItem(HD_WS_UPDATE_RETURN_KEY)||'null')}catch{}
+ try{sessionStorage.removeItem(HD_WS_UPDATE_RETURN_KEY)}catch{}
+ if(!saved?.section||!saved?.group||Date.now()-Number(saved.at||0)>10*60*1000)return false;
+ if(!document.getElementById(saved.section))return false;
+ hdWSClearPin();hdWSApply(saved.group,saved.section,{restoreScroll:true,ignorePin:true});
+ return true;
 }
 function hdWSRestoreScroll(sectionId){
  const section=document.getElementById(sectionId),saved=Number(hdWSScrollLoad()[sectionId]);if(!section||!Number.isFinite(saved))return false;
@@ -402,6 +416,7 @@ function hdWSMutationAddsSection(ms){return ms.some(m=>[...m.addedNodes].some(n=
 function hdWSScheduleRefresh(){clearTimeout(hdWSRefreshTimer);const delay=Math.max(60,hdWSNavLockUntil-Date.now()+20);hdWSRefreshTimer=setTimeout(hdWSRefresh,delay)}
 function hdWSInstall(){
  hdWSEnsureUI();hdWSInstallKeyboardTracking();hdWSInstallScrollCompact();hdWSRefresh();
+ setTimeout(()=>hdWSConsumeUpdateReturn(),80);
  if(!hdWSObserver){hdWSObserver=new MutationObserver(ms=>{if(hdWSMutationAddsSection(ms))hdWSScheduleRefresh()});const main=document.querySelector('main');if(main)hdWSObserver.observe(main,{childList:true,subtree:true})}
 }
 function hdWSHorizontalScroller(el){for(let n=el;n&&n!==document.body;n=n.parentElement){if(n.scrollWidth>n.clientWidth+12){const s=getComputedStyle(n);if(['auto','scroll'].includes(s.overflowX))return true}}return false}
