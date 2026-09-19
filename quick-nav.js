@@ -54,9 +54,9 @@ function hdQNEnsureMobileDock(){
 }
 function hdQNUpdateMobileDock(){
  const dock=document.getElementById('hdMobileDock');if(!dock)return;
- const home=dock.querySelector('[data-hd-mobile-home]'),sync=dock.querySelector('[data-hd-mobile-sync]');
- home?.classList.toggle('active',window.hdWSState?.group==='home');
- if(sync){sync.classList.remove('fresh','stale','partial','missing');let state='missing';try{state=window.hdWSSyncInfo?.().state||'missing'}catch{}sync.classList.add(state)}
+ const home=dock.querySelector('[data-hd-mobile-home]'),sync=dock.querySelector('[data-hd-mobile-sync]'),activeGroup=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'';
+ home?.classList.toggle('active',activeGroup==='home');
+ if(sync){sync.classList.remove('fresh','stale','partial','missing');let state='missing';try{state=typeof hdWSSyncInfo==='function'?(hdWSSyncInfo().state||'missing'):'missing'}catch{}sync.classList.add(state)}
 }
 function hdQNEnsure(){
   if(document.getElementById('hdQuickNavButton')){hdQNEnsureMobileDock();return;}
