@@ -2595,7 +2595,9 @@ test('Safari capture helper sends data directly to HarborDesk', async ({ page })
     return {
       shortcutStartsWithFunction: shortcut.startsWith('('),
       shortcutHasJavascriptPrefix: shortcut.startsWith('javascript:'),
-      shortcutHasCompletion: shortcut.includes("completion('HarborDeskキャプチャを開始したよ')"),
+      shortcutHasCompletion: shortcut.includes('completion('),
+      shortcutInjectsPageScript: shortcut.includes("script.textContent="),
+      shortcutChecksPanel: shortcut.includes("document.getElementById('hd-kc-capture-panel')"),
       bookmarkletPrefix: bookmarklet.startsWith('javascript:'),
       sent,
       recordCount,
@@ -2617,6 +2619,8 @@ test('Safari capture helper sends data directly to HarborDesk', async ({ page })
   expect(data.shortcutStartsWithFunction).toBe(false);
   expect(data.shortcutHasJavascriptPrefix).toBe(false);
   expect(data.shortcutHasCompletion).toBe(true);
+  expect(data.shortcutInjectsPageScript).toBe(true);
+  expect(data.shortcutChecksPanel).toBe(true);
   expect(data.bookmarkletPrefix).toBe(true);
   expect(data.sent).toBe(true);
   expect(data.recordCount).toBe(1);
@@ -2669,5 +2673,36 @@ test('Safari capture helper detects outer game iframe', async ({ page }) => {
   expect(data.panelText).toContain('DMMの外側ページを検出したよ');
   expect(data.panelText).toContain('ゲーム本体を開く');
   expect(data.hasOpenButton).toBe(true);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
+
+
+test('Safari shortcut injects capture into page context', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    const shortcut=window.hdKcCaptureShortcutScript?.()||'';
+    let completed='';
+    const run=new Function('completion',shortcut);
+    run(value=>{completed=String(value||'')});
+    const panel=document.getElementById('hd-kc-capture-panel');
+    const cap=window.__HD_KC_CAPTURE;
+    const result={
+      completed,
+      hasPanel:!!panel,
+      mode:cap?.mode||'',
+      panelText:panel?.textContent||'',
+      hasInjector:!!document.getElementById('hd-kc-shortcut-inject')
+    };
+    cap?.restore?.();
+    return result;
+  });
+
+  expect(data.completed).toContain('ページ本体への注入成功');
+  expect(data.hasPanel).toBe(true);
+  expect(data.mode).toBe('capture');
+  expect(data.panelText).toContain('キャプチャ待機中');
+  expect(data.hasInjector).toBe(false);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
