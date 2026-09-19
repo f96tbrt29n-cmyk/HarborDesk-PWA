@@ -855,3 +855,75 @@ test('ship thumbnails reuse one object URL across roster and fleet surfaces', as
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('saved fleets and sortie preparation show the same exact-ID ship image', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    await window.hdShipImageDelete?.(541);
+    const file = new File([new Uint8Array([9,8,7,6,5,4])], '541.png', { type: 'image/png' });
+    await window.hdShipImagePut?.(541, file, '長門改二', true);
+
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      { id: 'ship-541', name: '長門改二', type: '戦艦', level: 99, remodel: '改二', tags: ['主力'], gear: '', memo: '' }
+    ]));
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({
+      '5-5': [{
+        id: 'fleet-image-test',
+        name: '画像テスト艦隊',
+        ships: [{ ship: '長門改二', gear: '46cm三連装砲' }],
+        memo: '',
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      }]
+    }));
+
+    window.renderCustomFleets?.('5-5');
+    const customHost = document.getElementById('customFleetPanel');
+    await window.hdShipImageHydrate?.(customHost);
+
+    const sortieInfo = {
+      fleet: { id: 'fleet-image-test', name: '画像テスト艦隊', ships: [{ ship: '長門改二', gear: '46cm三連装砲' }] },
+      ships: [{ ship: '長門改二', gear: '46cm三連装砲' }],
+      registered: 1,
+      gearChecks: [],
+      manual: [],
+      manualState: {},
+      manualDone: 0,
+      manualTotal: 0
+    };
+    const sortieHtml = window.hdSPSFleetHtml?.('5-5', sortieInfo) || '';
+    const wrap = document.createElement('div');
+    wrap.innerHTML = sortieHtml;
+    document.body.appendChild(wrap);
+    await window.hdShipImageHydrate?.(wrap);
+
+    const customImg = customHost?.querySelector('[data-hd-ship-image-host="541"] img');
+    const sortieImg = wrap.querySelector('[data-hd-ship-image-host="541"] img');
+    const result = {
+      customHtml: customHost?.innerHTML || '',
+      sortieHtml,
+      customSrc: customImg?.getAttribute('src') || '',
+      sortieSrc: sortieImg?.getAttribute('src') || ''
+    };
+
+    wrap.remove();
+    await window.hdShipImageDelete?.(541);
+    localStorage.setItem('harbordesk-ship-roster-v1', '[]');
+    localStorage.setItem('harbordesk-custom-fleets-v1', '{}');
+    window.renderCustomFleets?.('5-5');
+    return result;
+  });
+
+  expect(data.customHtml).toContain('data-hd-ship-image-host="541"');
+  expect(data.customHtml).toContain('custom-fleet-thumb');
+  expect(data.sortieHtml).toContain('data-hd-ship-image-host="541"');
+  expect(data.sortieHtml).toContain('sortie-prep-thumb');
+  expect(data.customSrc).not.toBe('');
+  expect(data.sortieSrc).not.toBe('');
+  expect(data.customSrc).toBe(data.sortieSrc);
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
