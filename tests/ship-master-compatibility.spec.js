@@ -4719,3 +4719,18 @@ test('roster search uses deferred rendering', async ({ page }) => {
   expect(data.hasScheduler).toBe(true);
   expect(data.inputExists).toBe(true);
 });
+
+
+test('mobile layout includes horizontal safe-area guards', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const css=await page.evaluate(async()=>({
+    styles:await fetch('./styles.css').then(r=>r.text()),
+    workspace:await fetch('./workspace-tabs.css').then(r=>r.text()),
+    quick:await fetch('./quick-nav.css').then(r=>r.text())
+  }));
+  expect(css.styles).toContain('safe-area-inset-left');
+  expect(css.styles).toContain('safe-area-inset-right');
+  expect(css.workspace).toContain('safe-area-inset-left');
+  expect(css.quick).toContain('safe-area-inset-left');
+});
