@@ -157,9 +157,15 @@ function hdQNUpdateMobileDock(){
     sync.classList.add('return-game');if(icon)icon.textContent='⚓';if(label)label.textContent='艦これ';if(dot)dot.hidden=true;
     sync.setAttribute('aria-label','艦これへ戻る');sync.title='同期元の艦これへ戻る';
   }else{
-    let state='missing';try{state=typeof hdWSSyncInfo==='function'?(hdWSSyncInfo().state||'missing'):'missing'}catch{}
-    sync.classList.add(state);if(icon)icon.textContent='↻';if(label)label.textContent='同期';if(dot)dot.hidden=false;
-    sync.setAttribute('aria-label','ゲーム同期の状態を開く');sync.title='';
+    let info={state:'missing',label:'未同期'};try{info=typeof hdWSSyncInfo==='function'?hdWSSyncInfo():info}catch{}
+    const state=info.state||'missing',meta={
+      fresh:{icon:'✓',label:'最新',aria:'ゲーム同期は最新。状態を開く'},
+      stale:{icon:'↻',label:'更新',aria:'ゲーム同期が古い。更新手順を開く'},
+      partial:{icon:'＋',label:'補完',aria:'ゲーム同期に未取得項目がある。補完手順を開く'},
+      missing:{icon:'↻',label:'同期',aria:'ゲームデータが未同期。同期手順を開く'}
+    }[state]||{icon:'↻',label:'同期',aria:'ゲーム同期の状態を開く'};
+    sync.classList.add(state);if(icon)icon.textContent=meta.icon;if(label)label.textContent=meta.label;if(dot)dot.hidden=state==='fresh';
+    sync.setAttribute('aria-label',meta.aria);sync.title=state==='fresh'?String(info.label||'最新'):meta.aria;
   }
  }
 }
