@@ -6187,3 +6187,22 @@ test('workspace deep link opens requested feature', async ({ page }) => {
   expect(data.ignoresBridge).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('workspace navigation reflects current feature in URL', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    window.hdWSOpenAnchorId?.('home',false);
+    window.hdWSShowElement?.('roster',false);
+    await new Promise(r=>setTimeout(r,20));
+    const rosterHash=location.hash;
+    window.hdWSShowElement?.('equipmentBook',false);
+    await new Promise(r=>setTimeout(r,20));
+    return {rosterHash,equipmentHash:location.hash,historyLength:history.length};
+  });
+  expect(data.rosterHash).toBe('#roster');
+  expect(data.equipmentHash).toBe('#equipmentBook');
+  expect(data.historyLength).toBeGreaterThan(0);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
