@@ -4640,3 +4640,23 @@ test('mobile global search lives inside header menu', async ({ page }) => {
   expect(data.menuSearch).toBe(true);
   expect(data.menuText).toContain('全体検索');
 });
+
+
+test('Userscript remembers minimized capture panel', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    localStorage.removeItem('harbordesk-kc-panel-minimized-v1');
+    const text=await fetch('./HarborDesk-Kancolle.user.js',{cache:'no-store'}).then(r=>r.text());
+    new Function(text)();
+    const api=window.__HARBORDESK_KANCOLLE_USERSCRIPT__;api?.show?.();api?.setMinimized?.(true);
+    return {
+      stored:localStorage.getItem('harbordesk-kc-panel-minimized-v1'),
+      state:api?.isMinimized?.(),
+      bodyHidden:!!document.querySelector('#hd-kc-userscript-panel [data-hd-panel-body]')?.hidden
+    };
+  });
+  expect(data.stored).toBe('1');
+  expect(data.state).toBe(true);
+  expect(data.bodyHidden).toBe(true);
+});
