@@ -39,3 +39,7 @@
 .hd-master-owned-items .missing button{grid-column:2;justify-self:start;margin-top:3px;font-size:8px;padding:3px 6px}
 
 .hd-master-procure{justify-self:start;margin-top:2px}.hd-master-owned-plan.empty .hd-master-procure{grid-column:1/-1}
+
+@supports(content-visibility:auto){
+ .hd-shipdb-card,.hd-shipdb-master-card,.hd-equip-reverse-row{content-visibility:auto;contain-intrinsic-size:190px}
+}
