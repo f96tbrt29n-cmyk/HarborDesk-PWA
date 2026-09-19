@@ -77,7 +77,8 @@ function hdFSPlans(map){
 function hdFSShipHtml(slot,i){
  if(!slot.profile)return '<div class="hd-fs-ship missing"><span>'+(i+1)+'</span><div><strong>'+hdFSEsc(slot.required||'自由枠')+' が不足</strong><small>艦隊台帳に候補を追加してね</small></div></div>';
  var p=slot.profile,r=p.row,meta=(p.type||'艦種未設定')+(r.level?' ・ Lv.'+r.level:'')+(p.speed?' ・ '+p.speed:'')+(p.db&&p.db._masterOnly?' ・ MASTER':'');
- return '<div class="hd-fs-ship"><span>'+(i+1)+'</span><div><strong>'+hdFSEsc(r.name)+'</strong><small>'+hdFSEsc(meta)+'</small><em>'+(slot.required?'担当: '+hdFSEsc(slot.required):'自由枠')+(r.gear?' ・ '+hdFSEsc(r.gear):'')+'</em></div></div>';
+ var image=typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(r.name,'fleet-thumb'):'';
+ return '<div class="hd-fs-ship"><span>'+(i+1)+'</span>'+image+'<div><strong>'+hdFSEsc(r.name)+'</strong><small>'+hdFSEsc(meta)+'</small><em>'+(slot.required?'担当: '+hdFSEsc(slot.required):'自由枠')+(r.gear?' ・ '+hdFSEsc(r.gear):'')+'</em></div></div>';
 }
 function hdFSMissingGearHtml(s){
  var missing=s.needs.filter(function(x){return x.status!=='ready'});if(!missing.length)return '<div class="hd-fs-good">主要装備カテゴリは台帳上準備あり</div>';
@@ -99,6 +100,7 @@ function hdFSRender(){
  if(label)label.textContent=map;var roster=hdFSRoster();
  if(!roster.length){host.innerHTML='<div class="empty">艦隊台帳が空だよ。艦娘を登録すると、Lv・艦種・役割から候補を自動生成できる。</div><button type="button" class="primary small" data-hd-fs-roster>艦隊台帳を開く</button>';return}
  var plans=hdFSPlans(map);host.innerHTML='<div class="hd-fs-summary"><div><strong>'+hdFSEsc(map)+' 自動編成候補</strong><span>艦隊台帳 '+roster.length+'隻から、詳細DB＋全865形態マスターで艦種・速力・役割を補完</span></div><button type="button" class="ghost small" data-hd-fs-refresh>再生成</button></div><div class="hd-fs-list">'+plans.map(hdFSSuggestionHtml).join('')+'</div><p class="hd-fs-note">※候補艦の艦種・速力・通常スロット/装備可否は公式マスターで補完。ルート固定・ランダム分岐、索敵スコア、イベント特効・札は出撃準備表と海域攻略情報で最終確認してね。</p>';
+ if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
 }
 function hdFSEnsure(){
  if(document.getElementById('hdFleetSuggester'))return;var anchor=document.getElementById('hdSortiePreparation')||document.getElementById('guide');if(!anchor)return;
@@ -125,5 +127,7 @@ document.addEventListener('click',function(e){
 });
 window.addEventListener('storage',function(e){if(['harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-custom-fleets-v1'].includes(e.key))hdFSRender()});
 window.addEventListener('hd:workspace-refresh',hdFSRender);
+window.addEventListener('hd:ship-images-changed',hdFSRender);
+window.addEventListener('hd:ship-images-ready',hdFSRender);
 window.addEventListener('hd:map-rendered',function(){hdFSMapButton();hdFSRender()});
 window.addEventListener('load',function(){setTimeout(function(){hdFSEnsure();hdFSMapButton();hdFSRender()},560)});
