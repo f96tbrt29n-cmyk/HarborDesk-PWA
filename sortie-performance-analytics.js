@@ -28,6 +28,33 @@ function hdSPADropStats(rows){
  const recent=drops.slice(0,6).map(x=>({ship:String(x.drop).trim(),map:x.map||'',node:x.node||x.gameNodeLabel||'',result:x.result||'',at:Number(x.at)||0,source:hdSPASourceKind(x)}));
  return {count:drops.length,unique:counts.size,top,recent};
 }
+function hdSPANormalizeNode(v){return String(v||'').replace(/\s*ボス\s*/g,'').trim()}
+function hdSPANodeStats(rows){
+ const nodes=new Map(),ensure=(map,node)=>{const n=hdSPANormalizeNode(node);if(!n)return null;const key=String(map||'')+'|'+n;if(!nodes.has(key))nodes.set(key,{key,map:String(map||''),node:n,visits:0,battles:0,ranks:{S:0,A:0,B:0,C:0,D:0,E:0},retreats:0,drops:0});return nodes.get(key)};
+ for(const row of rows||[]){
+  const map=String(row?.map||''),route=Array.isArray(row?.gameRouteLabels)?row.gameRouteLabels.map(hdSPANormalizeNode).filter(Boolean):[];
+  if(route.length){for(const node of route){const x=ensure(map,node);if(x)x.visits++}}
+  const battles=Array.isArray(row?.gameBattleResults)?row.gameBattleResults:[];
+  if(battles.length){
+   for(const b of battles){const node=hdSPANormalizeNode(b?.nodeLabel||b?.nodeNo),x=ensure(map,node);if(!x)continue;if(!route.length)x.visits++;x.battles++;const rank=String(b?.rank||'').toUpperCase();if(Object.prototype.hasOwnProperty.call(x.ranks,rank))x.ranks[rank]++;if(String(b?.drop||'').trim())x.drops++}
+  }else{
+   const node=hdSPANormalizeNode(row?.gameNodeLabel||row?.node),x=ensure(map,node);
+   if(x){if(!route.length)x.visits++;const rank=String(row?.result||'').toUpperCase();if(Object.prototype.hasOwnProperty.call(x.ranks,rank)){x.battles++;x.ranks[rank]++}if(String(row?.drop||'').trim())x.drops++}
+  }
+  if(row?.retreat||row?.result==='撤退'){const node=hdSPANormalizeNode(row?.gameNodeLabel||row?.node),x=ensure(map,node);if(x)x.retreats++}
+ }
+ return [...nodes.values()].map(x=>({...x,retreatRate:hdSPAPct(x.retreats,x.visits),sRate:hdSPAPct(x.ranks.S,x.battles),aRate:hdSPAPct(x.ranks.A,x.battles),bRate:hdSPAPct(x.ranks.B,x.battles),winRate:hdSPAPct(x.ranks.S+x.ranks.A+x.ranks.B,x.battles)})).sort((a,b)=>b.retreats-a.retreats||b.retreatRate-a.retreatRate||b.visits-a.visits||a.map.localeCompare(b.map,undefined,{numeric:true})||a.node.localeCompare(b.node,undefined,{numeric:true}));
+}
+function hdSPARouteStats(rows){
+ const routes=new Map();
+ for(const row of rows||[]){
+  const labels=Array.isArray(row?.gameRouteLabels)?row.gameRouteLabels.map(hdSPANormalizeNode).filter(Boolean):[];if(!labels.length)continue;
+  const map=String(row?.map||''),route=labels.join('→'),key=map+'|'+route;
+  if(!routes.has(key))routes.set(key,{key,map,route,n:0,boss:0,retreats:0,s:0,wins:0,drops:0});
+  const x=routes.get(key);x.n++;if(row?.boss)x.boss++;if(row?.retreat||row?.result==='撤退')x.retreats++;if(row?.result==='S')x.s++;if(['S','A','B'].includes(row?.result))x.wins++;if(String(row?.drop||'').trim())x.drops++;
+ }
+ return [...routes.values()].map(x=>({...x,bossRate:hdSPAPct(x.boss,x.n),retreatRate:hdSPAPct(x.retreats,x.n),sRate:hdSPAPct(x.s,x.n),winRate:hdSPAPct(x.wins,x.n),dropRate:hdSPAPct(x.drops,x.n)})).sort((a,b)=>b.n-a.n||b.bossRate-a.bossRate||a.map.localeCompare(b.map,undefined,{numeric:true})||a.route.localeCompare(b.route,'ja'));
+}
 function hdSPAStrategyLabel(id,row){
  if(row?.strategyLabel)return row.strategyLabel;
  if(typeof HD_SPM_STRATEGIES!=='undefined'&&HD_SPM_STRATEGIES[id])return HD_SPM_STRATEGIES[id].label;
@@ -147,7 +174,7 @@ function hdSPARows(){
   if(!groups.has(key))groups.set(key,{key,label:hdSPAGroupLabel(row,mode),strategy:row.strategy||'manual',rows:[],maps:new Set()});
   const g=groups.get(key);g.rows.push(row);g.maps.add(row.map);
  }
- const out=[...groups.values()].map(g=>({...g,metrics:hdSPAMetrics(g.rows),dropStats:hdSPADropStats(g.rows),trend:hdSPATrend(g.rows),recentRef:hdSPARecentRef(g.rows),maps:[...g.maps]}));
+ const out=[...groups.values()].map(g=>({...g,metrics:hdSPAMetrics(g.rows),dropStats:hdSPADropStats(g.rows),nodeStats:hdSPANodeStats(g.rows),routeStats:hdSPARouteStats(g.rows),trend:hdSPATrend(g.rows),recentRef:hdSPARecentRef(g.rows),maps:[...g.maps]}));
  out.sort((a,b)=>{
   if(mode==='strategy'){const ai=HD_SPA_STRATEGY_ORDER.indexOf(a.strategy),bi=HD_SPA_STRATEGY_ORDER.indexOf(b.strategy);if(ai!==bi)return (ai<0?99:ai)-(bi<0?99:bi)}
   return b.metrics.n-a.metrics.n||a.label.localeCompare(b.label,'ja');
@@ -191,15 +218,22 @@ function hdSPADropHtml(row){
  const recent=d.recent.map(x=>'<li><div><b>'+hdSPAEsc(x.ship)+'</b><span>'+hdSPAEsc([x.map,x.node,x.result].filter(Boolean).join(' '))+'</span></div><small>'+hdSPAEsc(hdSPAFmtAt(x.at))+'</small></li>').join('');
  return '<div class="hd-spa-drops"><div class="hd-spa-drop-head"><strong>ドロップ履歴</strong><span>'+d.count+'件 / '+d.unique+'種類</span></div><div class="hd-spa-drop-top">'+top+'</div><ul>'+recent+'</ul></div>';
 }
+function hdSPANodeRouteHtml(row){
+ const nodes=(row.nodeStats||[]).slice(0,8),routes=(row.routeStats||[]).slice(0,6),multi=(row.maps||[]).length>1;
+ if(!nodes.length&&!routes.length)return '';
+ const nodeHtml=nodes.length?'<div class="hd-spa-node-panel"><div class="hd-spa-detail-head"><strong>マス別分析</strong><span>撤退数の多い順</span></div><div class="hd-spa-node-list">'+nodes.map(x=>'<div class="'+(x.retreats?'danger':'')+'"><div><b>'+hdSPAEsc((multi?x.map+' ':'')+x.node)+'</b><small>到達 '+x.visits+' / 戦闘 '+x.battles+(x.drops?' / Drop '+x.drops:'')+'</small></div><span>S '+x.sRate+'%｜A '+x.aRate+'%｜B '+x.bRate+'%｜撤退 '+x.retreatRate+'%</span></div>').join('')+'</div></div>':'';
+ const routeHtml=routes.length?'<div class="hd-spa-route-panel"><div class="hd-spa-detail-head"><strong>ルート別分析</strong><span>ゲーム同期で取得した経路</span></div><div class="hd-spa-route-list">'+routes.map(x=>'<div><div><b>'+hdSPAEsc((multi?x.map+' ':'')+x.route)+'</b><small>'+x.n+'周'+(x.drops?' / Drop '+x.drops:'')+'</small></div><span>ボス '+x.bossRate+'%｜撤退 '+x.retreatRate+'%｜S '+x.sRate+'%</span></div>').join('')+'</div></div>':'';
+ return '<div class="hd-spa-route-node">'+nodeHtml+routeHtml+'</div>';
+}
 function hdSPACard(row){
  const m=row.metrics,sample=m.n<3?'<div class="hd-spa-sample warn">サンプル少なめ</div>':'<div class="hd-spa-sample">記録 '+m.n+'周</div>',badges=row.badges.length?'<div class="hd-spa-badges">'+row.badges.map(x=>'<span>'+hdSPAEsc(x)+'</span>').join('')+'</div>':'';
  const reopen=row.recentRef?.available?'<button type="button" class="ghost small" data-hd-spa-reopen="'+hdSPAEsc(row.key)+'">この編成を準備表へ</button>':'';
- return `<article class="hd-spa-card" data-hd-spa-card="${hdSPAEsc(row.key)}">${badges}<div class="hd-spa-card-head"><div><strong>${hdSPAEsc(row.label)}</strong><small>${hdSPAEsc(row.maps.join(' / '))}</small></div>${sample}</div>${hdSPASourceHtml(m)}<div class="hd-spa-metrics"><span>ボス到達 <b>${m.bossRate}%</b></span><span>S勝利 <b>${m.sRate}%</b></span><span>B以上勝利 <b>${m.winRate}%</b></span><span>撤退 <b>${m.retreatRate}%</b></span><span>ドロップ <b>${m.dropRate}%</b></span><span>ドロップ種類 <b>${m.uniqueDrops}</b></span><span>平均資源 <b>${m.avgResource==null?'—':m.avgResource}</b></span><span>平均バケツ <b>${m.avgBuckets==null?'—':m.avgBuckets}</b></span><span>平均時間 <b>${m.avgDurationMin==null?'—':m.avgDurationMin+'分'}</b></span><span>開始時確認 <b>${m.avgReadiness==null?'—':m.avgReadiness+'%'}</b></span></div>${hdSPADropHtml(row)}${hdSPATrendHtml(row)}${hdSPARecommendationHtml(row)}${reopen?'<div class="hd-spa-actions">'+reopen+'</div>':''}</article>`;
+ return `<article class="hd-spa-card" data-hd-spa-card="${hdSPAEsc(row.key)}">${badges}<div class="hd-spa-card-head"><div><strong>${hdSPAEsc(row.label)}</strong><small>${hdSPAEsc(row.maps.join(' / '))}</small></div>${sample}</div>${hdSPASourceHtml(m)}<div class="hd-spa-metrics"><span>ボス到達 <b>${m.bossRate}%</b></span><span>S勝利 <b>${m.sRate}%</b></span><span>B以上勝利 <b>${m.winRate}%</b></span><span>撤退 <b>${m.retreatRate}%</b></span><span>ドロップ <b>${m.dropRate}%</b></span><span>ドロップ種類 <b>${m.uniqueDrops}</b></span><span>平均資源 <b>${m.avgResource==null?'—':m.avgResource}</b></span><span>平均バケツ <b>${m.avgBuckets==null?'—':m.avgBuckets}</b></span><span>平均時間 <b>${m.avgDurationMin==null?'—':m.avgDurationMin+'分'}</b></span><span>開始時確認 <b>${m.avgReadiness==null?'—':m.avgReadiness+'%'}</b></span></div>${hdSPADropHtml(row)}${hdSPANodeRouteHtml(row)}${hdSPATrendHtml(row)}${hdSPARecommendationHtml(row)}${reopen?'<div class="hd-spa-actions">'+reopen+'</div>':''}</article>`;
 }
 function hdSPAHtml(){
  const mode=hdSPAMode(),map=hdSPAMap(),windowSize=hdSPAWindow(),rows=hdSPARows(),maps=hdSPAMaps();
  if(!hdSPALogs().length)return '<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>出撃データ分析</strong><span>ゲーム同期または出撃ログを記録すると、海域別の実績とドロップ履歴がここに出るよ。</span></div></div></section>';
- return `<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>出撃データ分析</strong><span>ゲーム同期・実戦モード・手動ログをまとめて自動集計</span></div><div class="hd-spa-controls"><select data-hd-spa-mode><option value="map" ${mode==='map'?'selected':''}>海域別</option><option value="strategy" ${mode==='strategy'?'selected':''}>方針別</option><option value="fleet" ${mode==='fleet'?'selected':''}>保存編成別</option></select><select data-hd-spa-map><option value="all">全海域</option>${maps.map(x=>`<option value="${hdSPAEsc(x)}" ${map===x?'selected':''}>${hdSPAEsc(x)} ${hdSPAEsc(hdSPAMapName(x))}</option>`).join('')}</select><select data-hd-spa-window><option value="3" ${windowSize===3?'selected':''}>直近3周比較</option><option value="5" ${windowSize===5?'selected':''}>直近5周比較</option><option value="10" ${windowSize===10?'selected':''}>直近10周比較</option></select></div></div>${rows.length?'<div class="hd-spa-grid">'+rows.map(hdSPACard).join('')+'</div>':'<div class="hd-spa-empty">この条件に一致する出撃ログはまだないよ。</div>'}<p class="hd-spa-note">※ゲーム同期・実戦モード・手動ログを海域別集計に含める。資源/バケツ・時間・開始時確認は値を持つログだけで平均する。トレンドは直近N周とその前N周を比較し、ドロップ履歴は記録済みの艦名を集計する。</p></section>`;
+ return `<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>出撃データ分析</strong><span>ゲーム同期・実戦モード・手動ログをまとめて自動集計</span></div><div class="hd-spa-controls"><select data-hd-spa-mode><option value="map" ${mode==='map'?'selected':''}>海域別</option><option value="strategy" ${mode==='strategy'?'selected':''}>方針別</option><option value="fleet" ${mode==='fleet'?'selected':''}>保存編成別</option></select><select data-hd-spa-map><option value="all">全海域</option>${maps.map(x=>`<option value="${hdSPAEsc(x)}" ${map===x?'selected':''}>${hdSPAEsc(x)} ${hdSPAEsc(hdSPAMapName(x))}</option>`).join('')}</select><select data-hd-spa-window><option value="3" ${windowSize===3?'selected':''}>直近3周比較</option><option value="5" ${windowSize===5?'selected':''}>直近5周比較</option><option value="10" ${windowSize===10?'selected':''}>直近10周比較</option></select></div></div>${rows.length?'<div class="hd-spa-grid">'+rows.map(hdSPACard).join('')+'</div>':'<div class="hd-spa-empty">この条件に一致する出撃ログはまだないよ。</div>'}<p class="hd-spa-note">※ゲーム同期・実戦モード・手動ログを海域別集計に含める。資源/バケツ・時間・開始時確認は値を持つログだけで平均する。マス別の勝敗はゲーム同期の各戦闘結果を優先し、撤退率はそのマスへの到達数に対する撤退回数。ルート別分析はゲーム同期で取得できた通過ルートだけを対象にする。</p></section>`;
 }
 function hdSPARender(){
  const root=document.getElementById('sortieLog');if(!root)return;
