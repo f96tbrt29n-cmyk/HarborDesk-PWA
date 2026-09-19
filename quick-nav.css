@@ -92,3 +92,8 @@ body.hd-workspace-mode{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 .hd-mobile-attention-list>button.tone-soon>span{background:#513f1d;color:#ffe0a1}
 .hd-mobile-attention-list>button.tone-sync{border-color:rgba(91,188,243,.42)}
 .hd-mobile-attention-list>button.tone-sync>span{background:#17445f;color:#cceeff}
+
+@media(max-width:560px){
+ .hd-mobile-dock [data-hd-mobile-sync].return-game{background:rgba(37,104,73,.32);color:#c9f3d7;border:1px solid rgba(99,216,151,.38)}
+ .hd-mobile-dock [data-hd-mobile-sync].return-game span{font-size:17px}
+}
