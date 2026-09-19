@@ -582,3 +582,59 @@ test('procurement progress history records completion once and activity log only
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('ship image library binds exact master IDs and keeps remodel forms separate', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    const nagato = window.hdShipImageResolve?.('長門改二');
+    const mutsu = window.hdShipImageResolve?.('陸奥改二');
+    const nagatoHtml = window.hdShipImageCardHtml?.('長門改二') || '';
+    const mutsuHtml = window.hdShipImageCardHtml?.('陸奥改二') || '';
+
+    const fileA = new File([new Uint8Array([1,2,3])], '541.png', { type: 'image/png' });
+    const fileB = new File([new Uint8Array([4,5,6])], '陸奥改二.webp', { type: 'image/webp' });
+
+    const imported = await window.hdShipImageImportFiles?.([fileA, fileB]);
+    const count = await window.hdShipImageCount?.();
+    const a = await window.hdShipImageGet?.(nagato?.id);
+    const b = await window.hdShipImageGet?.(mutsu?.id);
+
+    window.hdShipImageSaveConfig?.({ remoteTemplate: 'https://example.invalid/card/{id}.png' });
+    const remoteNagato = window.hdShipImageRemoteUrl?.(nagato?.id);
+    window.hdShipImageSaveConfig?.({ remoteTemplate: '' });
+
+    await window.hdShipImageDelete?.(nagato?.id);
+    await window.hdShipImageDelete?.(mutsu?.id);
+
+    return {
+      nagato,
+      mutsu,
+      nagatoHtml,
+      mutsuHtml,
+      imported,
+      count,
+      storedA: { id: a?.id, name: a?.name, type: a?.type },
+      storedB: { id: b?.id, name: b?.name, type: b?.type },
+      remoteNagato
+    };
+  });
+
+  expect(data.nagato.id).toBe(541);
+  expect(data.nagato.name).toBe('長門改二');
+  expect(data.mutsu.id).toBe(573);
+  expect(data.mutsu.name).toBe('陸奥改二');
+  expect(data.nagatoHtml).toContain('data-hd-ship-image-host="541"');
+  expect(data.mutsuHtml).toContain('data-hd-ship-image-host="573"');
+  expect(data.imported.ok).toBe(2);
+  expect(data.imported.skip).toBe(0);
+  expect(data.count).toBeGreaterThanOrEqual(2);
+  expect(data.storedA.id).toBe(541);
+  expect(data.storedB.id).toBe(573);
+  expect(data.storedA.id).not.toBe(data.storedB.id);
+  expect(data.remoteNagato).toBe('https://example.invalid/card/541.png');
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
