@@ -1988,3 +1988,91 @@ test('KanColle timer sync imports expeditions and repair docks while preserving 
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('KanColle quest sync merges active quest pages while preserving manual quests', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
+      expeditions:[],
+      docks:[],
+      quests:[
+        {id:'manual-quest',name:'手動任務',done:false},
+        {id:'kc-quest-999',name:'古いゲーム任務',done:false,questNo:999,source:'kancolle-import'}
+      ],
+      resources:{}
+    }));
+
+    const bundle = {
+      format:'harbordesk-kancolle-import',
+      records:[
+        {
+          endpoint:'/kcsapi/api_get_member/questlist',
+          payload:{
+            api_result:1,
+            api_result_msg:'成功',
+            api_data:{
+              api_count:3,
+              api_page_count:2,
+              api_disp_page:1,
+              api_list:[
+                {api_no:214,api_category:2,api_type:2,api_label_type:3,api_state:2,api_title:'あ号作戦',api_detail:'テスト詳細A',api_progress_flag:1,api_invalid_flag:0},
+                {api_no:220,api_category:2,api_type:2,api_label_type:3,api_state:1,api_title:'い号作戦',api_detail:'テスト詳細B',api_progress_flag:0,api_invalid_flag:0}
+              ]
+            }
+          }
+        },
+        {
+          endpoint:'/kcsapi/api_get_member/questlist',
+          payload:{
+            api_result:1,
+            api_result_msg:'成功',
+            api_data:{
+              api_count:3,
+              api_page_count:2,
+              api_disp_page:2,
+              api_list:[
+                {api_no:221,api_category:2,api_type:2,api_label_type:3,api_state:3,api_title:'ろ号作戦',api_detail:'テスト詳細C',api_progress_flag:2,api_invalid_flag:0}
+              ]
+            }
+          }
+        }
+      ]
+    };
+
+    const parsed = window.hdKcParseImport?.(JSON.stringify(bundle));
+    const preview = window.hdKcPreviewData?.(parsed);
+    const sync = window.hdKcApplyImport?.(preview,{
+      ships:false,
+      equipment:false,
+      resources:false,
+      fleets:false,
+      timers:false,
+      quests:true
+    });
+    const app = JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}');
+
+    const result = {
+      preview:{quests:preview?.quests||0,activeQuests:preview?.activeQuests||0,completeQuests:!!preview?.completeQuests},
+      sync,
+      quests:(app.quests||[]).map(q=>({id:q.id,name:q.name,done:q.done,questNo:q.questNo,questState:q.questState,progressFlag:q.progressFlag,source:q.source||''}))
+    };
+
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({expeditions:[],docks:[],quests:[],resources:{}}));
+    return result;
+  });
+
+  expect(data.preview).toEqual({quests:3,activeQuests:2,completeQuests:true});
+  expect(data.sync.quests).toBe(2);
+  expect(data.quests).toEqual(expect.arrayContaining([
+    expect.objectContaining({id:'manual-quest',name:'手動任務'}),
+    expect.objectContaining({id:'kc-quest-214',name:'あ号作戦',done:false,questNo:214,questState:2,progressFlag:1,source:'kancolle-import'}),
+    expect.objectContaining({id:'kc-quest-221',name:'ろ号作戦',done:true,questNo:221,questState:3,progressFlag:2,source:'kancolle-import'})
+  ]));
+  expect(data.quests.some(q=>q.id==='kc-quest-220')).toBeFalsy();
+  expect(data.quests.some(q=>q.id==='kc-quest-999')).toBeFalsy();
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
