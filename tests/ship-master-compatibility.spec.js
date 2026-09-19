@@ -4158,3 +4158,24 @@ test('active manual timer can be extended in one tap', async ({ page }) => {
   expect(data.duration).toBe(165);
   expect(data.active).toBe(true);
 });
+
+
+test('recent timer and quest suggestions support one-tap reuse', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-timer-recent-v1', JSON.stringify({expedition:[{name:'海上護衛任務',minutes:90}]}));
+    localStorage.setItem('harbordesk-quest-recent-v1', JSON.stringify(['あ号作戦']));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.openTimer?.('expedition');
+    window.renderQuestRecent?.();
+    const timerRun=document.querySelector('[data-timer-recent-run]');
+    const questRun=document.querySelector('[data-quest-recent-run]');
+    return {timerRun:!!timerRun,questRun:!!questRun,timerLabel:timerRun?.getAttribute('aria-label')||'',questLabel:questRun?.getAttribute('aria-label')||''};
+  });
+  expect(data.timerRun).toBe(true);
+  expect(data.timerLabel).toContain('開始');
+  expect(data.questRun).toBe(true);
+  expect(data.questLabel).toContain('追加');
+});
