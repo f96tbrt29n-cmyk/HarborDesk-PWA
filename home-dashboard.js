@@ -132,8 +132,8 @@ function renderHomeDashboard(){
    <button type="button" class="home-summary-item" data-home-jump="roster"><span>艦娘</span><strong>${rosterCount}</strong><small>艦隊へ</small></button>
    <button type="button" class="home-summary-item" data-home-jump="equipmentBook"><span>装備</span><strong>${equipCount}</strong><small>装備へ</small></button>
    <button type="button" class="home-summary-item" data-home-jump="kancolleImport"><span>最終同期</span><strong class="home-sync-age">${homeEsc(syncInfo.label)}</strong><small>更新</small></button>`;
- document.getElementById('homeTodo').innerHTML=todo.length?todo.slice(0,5).map(q=>`<div class="home-row home-task-row"><span>${homeEsc(q.name)}</span><button type="button" class="ghost small home-task-done" data-home-quest-done="${homeEsc(q.id)}">完了</button></div>`).join(''):'<div class="home-empty">未完了の任務はないよ</div>';
- document.getElementById('homeTimers').innerHTML=running.length?running.slice(0,5).map(t=>`<div class="home-row"><span><b>${t.kind}</b> ${homeEsc(t.name)}</span><small>${typeof fmt==='function'?fmt(t.endsAt-now):''}</small></div>`).join(''):'<div class="home-empty">動いているタイマーはないよ</div>';
+ document.getElementById('homeTodo').innerHTML=todo.length?todo.slice(0,5).map(q=>`<div class="home-row home-task-row"><span>${homeEsc(q.name)}</span><button type="button" class="ghost small home-task-done" data-home-quest-done="${homeEsc(q.id)}">完了</button></div>`).join(''):'<div class="home-empty home-empty-action"><span>未完了の任務はないよ</span><button type="button" class="ghost small" data-home-add-quest>＋ 任務を追加</button></div>';
+ document.getElementById('homeTimers').innerHTML=running.length?running.slice(0,5).map(t=>`<div class="home-row"><span><b>${t.kind}</b> ${homeEsc(t.name)}</span><small>${typeof fmt==='function'?fmt(t.endsAt-now):''}</small></div>`).join(''):'<div class="home-empty home-empty-action"><span>動いているタイマーはないよ</span><div><button type="button" class="ghost small" data-home-add-timer="expedition">＋ 遠征</button><button type="button" class="ghost small" data-home-add-timer="dock">＋ 入渠</button></div></div>';
  const res=[['燃料',resources.fuel],['弾薬',resources.ammo],['鋼材',resources.steel],['ボーキ',resources.bauxite]];
  document.getElementById('homeResources').innerHTML=res.map(([name,val])=>`<div><span>${name}</span><strong>${val!==''&&val!=null?Number(val).toLocaleString():'-'}</strong></div>`).join('');
  const procurement=document.getElementById('homeProcurement');
@@ -157,7 +157,9 @@ function renderHomeDashboard(){
 }
 
 document.addEventListener('click',e=>{
- const done=e.target.closest('[data-home-quest-done]');if(done){
+ const addQuest=e.target.closest('[data-home-add-quest]');if(addQuest){const input=document.getElementById('questName');if(input)input.value='';document.getElementById('questDialog')?.showModal();return}
+ const addTimer=e.target.closest('[data-home-add-timer]');if(addTimer){if(typeof openTimer==='function')openTimer(addTimer.dataset.homeAddTimer);return}
+  const done=e.target.closest('[data-home-quest-done]');if(done){
   const id=done.dataset.homeQuestDone,q=(typeof state!=='undefined'&&Array.isArray(state.quests))?state.quests.find(x=>String(x.id)===String(id)):null;
   if(!q)return;
   const prev=!!q.done;q.done=true;
