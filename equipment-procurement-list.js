@@ -23,8 +23,8 @@ function hdPLMergeGearItems(items=[]){
  const m=new Map();
  for(const x of items){
   const key=[x.map,x.target||x.wanted,x.methodKey||'',x.ship||''].join('|'),cur=m.get(key);
-  if(cur){cur.needed=(cur.needed||1)+(x.needed||1);cur.sources=[...new Set([...(cur.sources||[]),...(x.sources||[])])];}
-  else m.set(key,{...x,needed:x.needed||1,sources:[...new Set(x.sources||[])]});
+  if(cur){cur.needed=(cur.needed||1)+(x.needed||1);cur.requiredTotal=Math.max(Number(cur.requiredTotal)||0,Number(x.requiredTotal)||0);cur.sources=[...new Set([...(cur.sources||[]),...(x.sources||[])])];}
+  else m.set(key,{...x,needed:x.needed||1,requiredTotal:Number(x.requiredTotal)||0,sources:[...new Set(x.sources||[])]});
  }
  return [...m.values()].sort((a,b)=>(a.rank||9)-(b.rank||9)||(a.target||a.wanted).localeCompare(b.target||b.wanted,'ja'));
 }
@@ -41,20 +41,27 @@ function hdPLDemandRows(items=[]){
  const m=new Map();
  for(const x of items){
   const target=x.target||x.wanted||'',key=[x.map||'',target,x.methodKey||'',x.kind||''].join('|');
-  const cur=m.get(key)||{...x,target,needed:0,ships:[],loadouts:[],sources:[]};
-  cur.needed+=(x.needed||1);
+  const cur=m.get(key)||{...x,target,needed:0,requiredTotal:0,ships:[],loadouts:[],sources:[]};
+  cur.needed+=(x.needed||1);cur.requiredTotal=Math.max(Number(cur.requiredTotal)||0,Number(x.requiredTotal)||0);
   cur.ships=[...new Set([...cur.ships,x.ship].filter(Boolean))];
   cur.loadouts=[...new Set([...cur.loadouts,x.loadout].filter(Boolean))];
   cur.sources=[...new Set([...(cur.sources||[]),...(x.sources||[])])];
   m.set(key,cur);
  }
  return [...m.values()].map(x=>{
-  const owned=x.target?hdPLOwnedCount(x.target):0,shortfall=Math.max(0,(x.needed||0)-owned);
-  return {...x,owned,shortfall,status:shortfall===0?'ready':owned>0?'partial':'missing'};
+  const needed=Math.max(Number(x.needed)||0,Number(x.requiredTotal)||0),owned=x.target?hdPLOwnedCount(x.target):0,shortfall=Math.max(0,needed-owned);
+  return {...x,needed,owned,shortfall,status:shortfall===0?'ready':owned>0?'partial':'missing'};
  }).sort((a,b)=>{
   if((a.shortfall===0)!==(b.shortfall===0))return a.shortfall===0?1:-1;
   return (a.rank||9)-(b.rank||9)||(b.shortfall||0)-(a.shortfall||0)||(a.target||a.wanted).localeCompare(b.target||b.wanted,'ja');
  });
+}
+function hdPLApplyRequiredTotals(added,filledSlots=[]){
+ const norm=s=>String(s||'').normalize('NFKC').replace(/\s+/g,'').replace(/･/g,'・');
+ const found=new Map(),missing=new Map();
+ for(const slot of filledSlots||[]){if(slot?.found&&slot.name){const k=norm(slot.name);found.set(k,(found.get(k)||0)+1)}}
+ for(const x of added||[]){const k=norm(x.target||'');if(k)missing.set(k,(missing.get(k)||0)+(x.needed||1))}
+ return (added||[]).map(x=>{const k=norm(x.target||'');return {...x,requiredTotal:k?(found.get(k)||0)+(missing.get(k)||0):0}});
 }
 function hdPLAddShipLoadout(map,shipName,loadoutName){
  if(!map||typeof HD_SHIP_DATABASE==='undefined'||typeof HD_SHIP_LOADOUTS==='undefined'||typeof hdShipDbResolveOwnedLoadout!=='function')return false;
@@ -62,12 +69,31 @@ function hdPLAddShipLoadout(map,shipName,loadoutName){
  const sets=HD_SHIP_LOADOUTS[ship.final]||[],set=sets.find(x=>x.name===loadoutName)||sets[0];if(!set)return false;
  const plan=hdShipDbResolveOwnedLoadout(ship,set),missing=plan.slots.filter(x=>!x.found);
  if(!missing.length){alert?.(`${ship.final} の「${set.name}」は手持ち装備で埋められるよ`);return false}
- const added=missing.map(slot=>{
+ let added=missing.map(slot=>{
   const r=hdPLResolveWanted(slot.wanted),method=hdPLMethodMeta(r.item);
   return {map,ship:ship.final,loadout:set.name,wanted:slot.wanted,target:r.item?.name||'',kind:r.kind||'',exact:r.exact,methodKey:method.key,methodLabel:method.label,rank:method.rank,needed:1,sources:[ship.final],createdAt:Date.now()};
  });
+ added=hdPLApplyRequiredTotals(added,plan.slots);
  const list=hdPLLoad(),old=list.find(x=>x.map===map),next={id:old?.id||`pl-${Date.now()}-${Math.random().toString(16).slice(2)}`,map,kinds:old?.kinds||[],gearItems:hdPLMergeGearItems([...(old?.gearItems||[]),...added]),createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};
  hdPLSave(old?list.map(x=>x.map===map?next:x):[next,...list]);return true;
+}
+function hdPLResolveMasterWanted(shipId,wanted){
+ const candidates=typeof hdAGMasterCandidates==='function'?hdAGMasterCandidates(shipId,wanted):[],item=candidates[0]||null,kind=hdPLWantedKind(wanted),method=hdPLMethodMeta(item);
+ return {item,kind,method};
+}
+function hdPLAddMasterLoadout(shipId,loadoutName,map=''){
+ const row=window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips?.[String(shipId)];if(!row||typeof hdShipDbMasterSuggestedLoadouts!=='function'||typeof hdShipDbMasterResolveOwnedPlan!=='function')return false;
+ const set=hdShipDbMasterSuggestedLoadouts(row).find(x=>x.name===loadoutName)||hdShipDbMasterSuggestedLoadouts(row)[0];if(!set)return false;
+ const plan=hdShipDbMasterResolveOwnedPlan(row,set),missing=plan.slots.filter(x=>!x.found);
+ if(!missing.length){alert?.(`${row.name} の「${set.name}」は手持ち装備で埋められるよ`);return false}
+ const sourceMap=map||(typeof selectedMap!=='undefined'&&selectedMap?selectedMap:'艦娘DB');
+ let added=missing.map(slot=>{
+  const r=hdPLResolveMasterWanted(row.id,slot.wanted),item=r.item,method=r.method;
+  return {map:sourceMap,ship:row.name,loadout:set.name,wanted:slot.wanted,target:item?.name||'',kind:r.kind||'',exact:false,methodKey:method.key,methodLabel:method.label,rank:method.rank,needed:1,sources:[row.name],createdAt:Date.now()};
+ });
+ added=hdPLApplyRequiredTotals(added,plan.slots);
+ const list=hdPLLoad(),old=list.find(x=>x.map===sourceMap),next={id:old?.id||`pl-${Date.now()}-${Math.random().toString(16).slice(2)}`,map:sourceMap,kinds:old?.kinds||[],gearItems:hdPLMergeGearItems([...(old?.gearItems||[]),...added]),createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};
+ hdPLSave(old?list.map(x=>x.map===sourceMap?next:x):[next,...list]);return true;
 }
 
 function hdPLEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -229,15 +255,15 @@ function hdPLMapHtml(row){
 function hdPLRender(){
  const host=document.getElementById('hdProcurementList');if(!host)return;
  const rows=hdPLLoad(),budget=document.getElementById('hdProcurementBudget');if(budget)budget.innerHTML=hdPLOverallBudgetHtml(rows);
- host.innerHTML=rows.map(hdPLMapHtml).join('')||'<div class="empty">調達リストはまだないよ。海域の装備タブから不足分を追加できる。</div>';
- const count=document.getElementById('hdProcurementCount');if(count)count.textContent=`${rows.length}海域`;
+ host.innerHTML=rows.map(hdPLMapHtml).join('')||'<div class="empty">調達リストはまだないよ。海域の装備タブや艦娘DBのおすすめ装備から不足分を追加できる。</div>';
+ const count=document.getElementById('hdProcurementCount');if(count)count.textContent=`${rows.length}件`;
  const add=document.getElementById('hdProcurementAddCurrent');if(add){const map=typeof selectedMap!=='undefined'?selectedMap:'';add.disabled=!map;add.textContent=map?`${map} の不足を追加`:'海域を選んでね'}
 }
 function hdPLEnsure(){
  if(document.getElementById('hdEquipmentProcurement'))return;
  const anchor=document.getElementById('hdEquipAnalyzer')||document.getElementById('equipmentBook');if(!anchor)return;
  const sec=document.createElement('section');sec.id='hdEquipmentProcurement';sec.className='advanced-section hd-pl-section';
- sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">PROCUREMENT LIST</div><h2>装備調達リスト</h2></div><span id="hdProcurementCount" class="muted"></span></div><div class="hd-pl-toolbar"><p>攻略予定の海域で足りない装備カテゴリを保存。装備台帳を更新すると準備状況も自動で変わるよ。</p><button id="hdProcurementAddCurrent" type="button" class="primary small">海域を選んでね</button></div><div id="hdProcurementBudget"></div><div id="hdProcurementList" class="hd-pl-list"></div>`;
+ sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">PROCUREMENT LIST</div><h2>装備調達リスト</h2></div><span id="hdProcurementCount" class="muted"></span></div><div class="hd-pl-toolbar"><p>攻略予定の海域や艦娘ごとのおすすめ構成で足りない装備を保存。装備台帳を更新すると準備状況も自動で変わるよ。</p><button id="hdProcurementAddCurrent" type="button" class="primary small">海域を選んでね</button></div><div id="hdProcurementBudget"></div><div id="hdProcurementList" class="hd-pl-list"></div>`;
  anchor.insertAdjacentElement('afterend',sec);document.getElementById('hdProcurementAddCurrent')?.addEventListener('click',()=>{if(typeof selectedMap!=='undefined'&&selectedMap)hdPLAddMap(selectedMap)});hdPLRender();
 }
 function hdPLInstallSortieButton(){
@@ -258,6 +284,7 @@ function hdPLOpenList(){
 }
 document.addEventListener('click',e=>{
  const add=e.target.closest?.('[data-hd-pl-add-current]');if(add){if(hdPLAddMap(add.dataset.hdPlAddCurrent))hdPLOpenList();return}
+ const master=e.target.closest?.('[data-hd-master-procure]');if(master){if(hdPLAddMasterLoadout(master.dataset.hdMasterProcure,master.dataset.hdMasterPlan||'',master.dataset.hdMasterMap||''))hdPLOpenList();return}
  const guide=e.target.closest?.('[data-hd-pl-guide]');if(guide){if(typeof hdAGOpen==='function')hdAGOpen(guide.dataset.hdPlGuide,guide.dataset.hdPlMap||'');return}
  const itemGuide=e.target.closest?.('[data-hd-pl-item-guide]');if(itemGuide){if(typeof hdAGOpenItem==='function')hdAGOpenItem(itemGuide.dataset.hdPlItemGuide,itemGuide.dataset.hdPlMap||'');return}
  const cat=e.target.closest?.('[data-hd-pl-catalog]');if(cat){if(typeof hdAGOpenCatalog==='function')hdAGOpenCatalog(cat.dataset.hdPlCatalog);return}
