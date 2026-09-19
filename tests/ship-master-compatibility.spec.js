@@ -238,6 +238,7 @@ test('master procurement counts total required copies, not only missing slots', 
     const plan = window.hdShipDbMasterSuggestedLoadouts?.(row)?.find(x => x.name === '昼戦・連撃');
     const before = window.hdShipDbMasterResolveOwnedPlan?.(row, plan);
     const added = window.hdPLAddMasterLoadout?.(row.id, plan?.name || '', '艦娘DBテスト');
+    const secondAdded = window.hdPLAddMasterLoadout?.(row.id, plan?.name || '', '艦娘DBテスト');
     const list = window.hdPLLoad?.() || [];
     const source = list.find(x => x.map === '艦娘DBテスト');
     const demand = window.hdPLDemandRows?.(source?.gearItems || []) || [];
@@ -250,6 +251,7 @@ test('master procurement counts total required copies, not only missing slots', 
       filledBefore: before?.filled || 0,
       totalBefore: before?.total || 0,
       added: !!added,
+      secondAdded: !!secondAdded,
       needed: target?.needed || 0,
       owned: target?.owned || 0,
       shortfall: target?.shortfall || 0,
@@ -261,6 +263,7 @@ test('master procurement counts total required copies, not only missing slots', 
   expect(data.filledBefore).toBe(1);
   expect(data.totalBefore).toBe(4);
   expect(data.added).toBeTruthy();
+  expect(data.secondAdded).toBeTruthy();
   expect(data.needed).toBe(2);
   expect(data.owned).toBe(1);
   expect(data.shortfall).toBe(1);
