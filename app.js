@@ -3,9 +3,13 @@ const FAV_KEY='harbordesk-guide-favs-v1';
 const state=load();
 let timerKind='expedition';
 let notified=new Set();
-let guideFilter='all';
-let selectedWorld='1';
-let selectedMap='';
+const GUIDE_VIEW_KEY='harbordesk-session-guide-view-v1';
+function guideViewLoad(){try{return JSON.parse(sessionStorage.getItem(GUIDE_VIEW_KEY)||'{}')||{}}catch{return {}}}
+function guideViewSave(patch={}){const next={...guideViewLoad(),...patch};try{sessionStorage.setItem(GUIDE_VIEW_KEY,JSON.stringify(next))}catch{}return next}
+const guideView=guideViewLoad();
+let guideFilter=['all','map','quest','expedition','fav'].includes(guideView.filter)?guideView.filter:'all';
+let selectedWorld=/^[1-7]$/.test(String(guideView.world||''))?String(guideView.world):'1';
+let selectedMap=/^[1-7]-[1-9]$/.test(String(guideView.map||''))?String(guideView.map):'';
 const guideFavs=new Set(JSON.parse(localStorage.getItem(FAV_KEY)||'[]'));
 
 const MAPS={
@@ -115,7 +119,10 @@ function renderGuide(){
  renderMapPicker();
  const filters=document.getElementById('guideFilters');
  filters.innerHTML=Object.entries(guideLabels).map(([k,v])=>`<button class="guide-chip ${guideFilter===k?'active':''}" data-guide-filter="${k}">${v}</button>`).join('');
- const q=document.getElementById('guideQuery').value.trim().toLowerCase();
+ const input=document.getElementById('guideQuery'),q=input.value.trim().toLowerCase(),reset=document.getElementById('guideResetBtn');
+ if(reset)reset.hidden=!q&&guideFilter==='all'&&!selectedMap;
+ guideViewSave({query:input.value,filter:guideFilter,world:selectedWorld,map:selectedMap});
+
  const rows=GUIDE.filter(x=>(guideFilter==='all'||(guideFilter==='fav'?guideFavs.has(x.id):x.type===guideFilter))&&(!q||`${x.title} ${x.subtitle} ${x.summary} ${x.keywords}`.toLowerCase().includes(q)));
  document.getElementById('guideResults').innerHTML=rows.length?rows.map(x=>`<article class="guide-card"><div class="guide-card-top"><div><span class="guide-tag">${guideLabels[x.type]}</span><h3>${esc(x.title)}</h3><div class="muted">${esc(x.subtitle)}</div></div><button class="guide-fav" data-guide-fav="${x.id}" aria-label="お気に入り">${guideFavs.has(x.id)?'★':'☆'}</button></div><p>${esc(x.summary)}</p><a class="guide-link" href="${x.url}" target="_blank" rel="noopener">攻略Wikiで詳しく見る ↗</a></article>`).join(''):`<div class="empty empty-action"><strong>該当する攻略情報がないよ</strong><p>${q?`「${esc(q)}」の検索結果は0件`:guideFilter==='fav'?'お気に入り登録した攻略情報がまだないよ':`${guideLabels[guideFilter]||'現在の条件'}では0件`}</p><div class="empty-action-buttons">${q?'<button type="button" class="ghost small" data-guide-clear-query>検索をクリア</button>':''}${guideFilter!=='all'?'<button type="button" class="ghost small" data-guide-show-all>すべて表示</button>':''}</div></div>`;
 }
@@ -125,19 +132,21 @@ document.addEventListener('click',e=>{
  const showAll=e.target.closest('[data-core-filter-show-all]');if(showAll){const kind=showAll.dataset.coreFilterShowAll;coreListFilterSave(kind,'all');kind==='quest'?renderQuests():renderTimers(kind);return}
  const cleanup=e.target.closest('[data-core-cleanup]');if(cleanup){coreCleanupDone(cleanup.dataset.coreCleanup);return}
 
- const world=e.target.closest('[data-world]');if(world){selectedWorld=world.dataset.world;selectedMap='';renderMapPicker();return}
- const map=e.target.closest('[data-map]');if(map){selectedMap=map.dataset.map;selectedWorld=selectedMap.split('-')[0];renderMapPicker();document.getElementById('selectedMapCard').scrollIntoView({behavior:'smooth',block:'center'});return}
- const clearGuideQuery=e.target.closest('[data-guide-clear-query]');if(clearGuideQuery){const input=document.getElementById('guideQuery');if(input)input.value='';renderGuide();input?.focus();return}
- if(e.target.closest('[data-guide-show-all]')){guideFilter='all';renderGuide();return}
-  const gf=e.target.closest('[data-guide-filter]');if(gf){guideFilter=gf.dataset.guideFilter;renderGuide();return}
+ const world=e.target.closest('[data-world]');if(world){selectedWorld=world.dataset.world;selectedMap='';guideViewSave({world:selectedWorld,map:''});renderGuide();return}
+ const map=e.target.closest('[data-map]');if(map){selectedMap=map.dataset.map;selectedWorld=selectedMap.split('-')[0];guideViewSave({world:selectedWorld,map:selectedMap});renderGuide();document.getElementById('selectedMapCard').scrollIntoView({behavior:'smooth',block:'center'});return}
+ const clearGuideQuery=e.target.closest('[data-guide-clear-query]');if(clearGuideQuery){const input=document.getElementById('guideQuery');if(input)input.value='';guideViewSave({query:''});renderGuide();input?.focus();return}
+ if(e.target.closest('[data-guide-show-all]')){guideFilter='all';guideViewSave({filter:'all'});renderGuide();return}
+ const gf=e.target.closest('[data-guide-filter]');if(gf){guideFilter=gf.dataset.guideFilter;guideViewSave({filter:guideFilter});renderGuide();return}
  const fav=e.target.closest('[data-guide-fav]');if(fav){const id=fav.dataset.guideFav;guideFavs.has(id)?guideFavs.delete(id):guideFavs.add(id);localStorage.setItem(FAV_KEY,JSON.stringify([...guideFavs]));renderGuide();return}
  const emptyTimer=e.target.closest('[data-empty-add-timer]');if(emptyTimer){openTimer(emptyTimer.dataset.emptyAddTimer);return}
  if(e.target.closest('[data-empty-add-quest]')){document.getElementById('questName').value='';document.getElementById('questDialog').showModal();return}
  const del=e.target.closest('[data-delete-timer]');if(del){const k=del.dataset.kind,arr=k==='expedition'?state.expeditions:state.docks,i=arr.findIndex(x=>x.id===del.dataset.deleteTimer);if(i<0)return;const [item]=arr.splice(i,1);save();renderTimers(k);hdToastAction(`${item.name} を削除したよ`,'元に戻す',()=>{const target=k==='expedition'?state.expeditions:state.docks;if(!target.some(x=>x.id===item.id)){target.splice(Math.min(i,target.length),0,item);save();renderTimers(k);hdToast('元に戻したよ')}});return}
  const qd=e.target.closest('[data-delete-quest]');if(qd){const i=state.quests.findIndex(x=>x.id===qd.dataset.deleteQuest);if(i<0)return;const [item]=state.quests.splice(i,1);save();renderQuests();hdToastAction(`${item.name} を削除したよ`,'元に戻す',()=>{if(!state.quests.some(x=>x.id===item.id)){state.quests.splice(Math.min(i,state.quests.length),0,item);save();renderQuests();hdToast('元に戻したよ')}});return}
 });
-document.getElementById('guideQuery').addEventListener('input',renderGuide);
+const guideQueryInput=document.getElementById('guideQuery');
+if(guideQueryInput){guideQueryInput.value=String(guideView.query||'');guideQueryInput.addEventListener('input',()=>{guideViewSave({query:guideQueryInput.value});renderGuide()})}
 document.getElementById('guideSearchBtn').onclick=renderGuide;
+document.getElementById('guideResetBtn').onclick=()=>{guideFilter='all';selectedMap='';selectedWorld='1';if(guideQueryInput)guideQueryInput.value='';guideViewSave({query:'',filter:'all',world:'1',map:''});renderGuide()};
 
 const CORE_LIST_FILTER_KEY='harbordesk-core-list-filters-v1';
 function coreListFiltersLoad(){try{const v=JSON.parse(localStorage.getItem(CORE_LIST_FILTER_KEY)||'{}')||{};return {expedition:v.expedition||'active',dock:v.dock||'active',quest:v.quest||'active'}}catch{return {expedition:'active',dock:'active',quest:'active'}}}
