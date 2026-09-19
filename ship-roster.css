@@ -39,3 +39,6 @@
   background:linear-gradient(180deg,rgba(7,21,33,.98),rgba(7,21,33,.9));
  }
 }
+
+[data-roster-reset]:disabled{opacity:.42}
+[data-roster-reset].is-active{border-color:#d9b45b;background:#3b2f16;color:#ffe9a8}
