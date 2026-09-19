@@ -2711,3 +2711,31 @@ test('Safari shortcut injects capture into page context', async ({ page }) => {
   expect(data.hasInjector).toBe(false);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('minimal Safari shortcut diagnostic shows a visible marker', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    const code=window.hdKcShortcutDiagnosticScript?.()||'';
+    let completed='';
+    new Function('completion',code)(value=>{completed=String(value||'')});
+    const marker=document.getElementById('hd-kc-shortcut-test');
+    return {
+      codeLength:code.length,
+      hasCompletion:code.includes('completion('),
+      completed,
+      markerText:marker?.textContent||'',
+      hasCopyButton:!!document.querySelector('[data-hd-kc-copy-shortcut-test]')
+    };
+  });
+
+  expect(data.codeLength).toBeGreaterThan(0);
+  expect(data.codeLength).toBeLessThan(1400);
+  expect(data.hasCompletion).toBe(true);
+  expect(data.completed).toContain('HarborDesk診断OK:');
+  expect(data.markerText).toBe('HarborDesk ショートカット実行OK');
+  expect(data.hasCopyButton).toBe(true);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
