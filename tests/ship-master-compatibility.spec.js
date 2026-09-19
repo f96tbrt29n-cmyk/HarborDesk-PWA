@@ -4591,3 +4591,31 @@ test('mobile header keeps primary controls compact', async ({ page }) => {
   expect(data.notifyInMenu).toBe(true);
   expect(data.topChildren).toBeLessThanOrEqual(3);
 });
+
+
+test('Userscript panel can minimize without disappearing', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const text=await fetch('./HarborDesk-Kancolle.user.js',{cache:'no-store'}).then(r=>r.text());
+    const oldUrl=location.href;
+    Object.defineProperty(window,'top',{value:window,configurable:true});
+    new Function(text)();
+    await new Promise(r=>setTimeout(r,20));
+    const api=window.__HARBORDESK_KANCOLLE_USERSCRIPT__,panel=document.getElementById('hd-kc-userscript-panel');
+    api?.setMinimized(true);
+    const mini={exists:!!panel,hidden:!!panel?.hidden,bodyHidden:!!panel?.querySelector('[data-hd-panel-body]')?.hidden,label:panel?.querySelector('[data-hd-panel-name]')?.textContent||'',button:panel?.querySelector('[data-hd-minimize]')?.textContent||'',state:api?.isMinimized?.()};
+    api?.setMinimized(false);
+    const full={bodyHidden:!!panel?.querySelector('[data-hd-panel-body]')?.hidden,label:panel?.querySelector('[data-hd-panel-name]')?.textContent||'',button:panel?.querySelector('[data-hd-minimize]')?.textContent||'',state:api?.isMinimized?.()};
+    return {mini,full,oldUrl};
+  });
+  expect(data.mini.exists).toBe(true);
+  expect(data.mini.hidden).toBe(false);
+  expect(data.mini.bodyHidden).toBe(true);
+  expect(data.mini.label).toContain('HD 艦これ');
+  expect(data.mini.button).toBe('＋');
+  expect(data.mini.state).toBe(true);
+  expect(data.full.bodyHidden).toBe(false);
+  expect(data.full.button).toBe('−');
+  expect(data.full.state).toBe(false);
+});
