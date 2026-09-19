@@ -422,7 +422,8 @@ async function hdKcDecodeHandoff(token){
  const mode=token.slice(0,dot),bytes=hdKcBase64UrlBytes(token.slice(dot+1));let raw=bytes;
  if(mode==='g'){
   if(typeof DecompressionStream!=='function')throw new Error('このSafariは圧縮連携データの展開に対応していません');
-  const ds=new DecompressionStream('gzip'),writer=ds.writable.getWriter();await writer.write(bytes);await writer.close();raw=new Uint8Array(await new Response(ds.readable).arrayBuffer());
+  const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+  raw=new Uint8Array(await new Response(stream).arrayBuffer());
  }else if(mode!=='j')throw new Error('未知の連携データ形式です');
  return new TextDecoder().decode(raw);
 }
