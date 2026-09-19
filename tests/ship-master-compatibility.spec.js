@@ -4380,3 +4380,29 @@ test('Kancolle sync stores and renders deltas', async ({ page }) => {
   expect(data.html).toContain('燃料 +120');
   expect(data.html).toContain('弾薬 -50');
 });
+
+
+test('home reorder controls stay hidden until edit mode', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const before=await page.evaluate(()=>{
+    const root=document.getElementById('home'),edit=document.querySelector('[data-home-edit-toggle]'),reset=document.querySelector('[data-home-order-reset]'),controls=document.querySelector('.home-order-controls');
+    return {editing:root?.classList.contains('home-editing')||false,label:edit?.textContent||'',resetHidden:!!reset?.hidden,display:controls?getComputedStyle(controls).display:''};
+  });
+  expect(before.editing).toBe(false);
+  expect(before.label).toContain('ホーム編集');
+  expect(before.resetHidden).toBe(true);
+  expect(before.display).toBe('none');
+  await page.click('[data-home-edit-toggle]');
+  const during=await page.evaluate(()=>{
+    const root=document.getElementById('home'),edit=document.querySelector('[data-home-edit-toggle]'),reset=document.querySelector('[data-home-order-reset]'),controls=document.querySelector('.home-order-controls');
+    return {editing:root?.classList.contains('home-editing')||false,label:edit?.textContent||'',pressed:edit?.getAttribute('aria-pressed')||'',resetHidden:!!reset?.hidden,display:controls?getComputedStyle(controls).display:''};
+  });
+  expect(during.editing).toBe(true);
+  expect(during.label).toContain('編集完了');
+  expect(during.pressed).toBe('true');
+  expect(during.resetHidden).toBe(false);
+  expect(during.display).toBe('inline-flex');
+  await page.click('[data-home-edit-toggle]');
+  expect(await page.locator('#home').evaluate(el=>el.classList.contains('home-editing'))).toBe(false);
+});
