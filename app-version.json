@@ -1,7 +1,7 @@
 {
-  "version": "1.0.148",
-  "build": 148,
-  "releasedAt": "2026-09-19T17:24:00+09:00",
-  "notes": "艦これゲーム内データ取込を強化。iPhone/Safari向け受動キャプチャ補助を追加し、対応/kcsapi/レスポンスだけを必要項目へ縮小してHarborDesk用JSON化。リクエスト本文・api_token・Cookie・DMM認証情報は記録しない。部分的な装備同期は既存在庫へ安全に差分マージし、同一装備個体の改修値変化もゲーム内装備個体IDで旧★から新★へ正しく移動。Playwright実ブラウザ27/27ケース成功を確認。",
+  "version": "1.0.151",
+  "build": 151,
+  "releasedAt": "2026-09-19T17:29:00+09:00",
+  "notes": "ゲーム同期をさらに統合。同期した現在艦隊を自分用編成へ再利用でき、ゲーム内の遠征状態と入渠ドック状態をHarborDeskのタイマーへ反映。iPhone/Safari受動キャプチャ、部分slot_item差分同期、同一装備個体の改修★移動追跡も維持。Browser Regressionは外部ネットワーク依存を隔離し、最新mainでPlaywright実ブラウザ29/29ケース成功を確認。",
   "masterChanges": null
 }
