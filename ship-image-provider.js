@@ -113,7 +113,7 @@ function hdShipImageCardHtml(ref){
 }
 function hdShipImageThumbHtml(ref,context=''){
  const row=hdShipImageResolve(ref);if(!row)return '';
- return `<div class="hd-ship-image-thumb ${hdShipImageEsc(context)}" data-hd-ship-image-host="${row.id}"><div class="hd-ship-image-thumb-fallback">ID ${row.id}</div><img alt="${hdShipImageEsc(row.name||'艦娘')} 画像" loading="lazy" decoding="async"></div>`;
+ return `<button type="button" class="hd-ship-image-thumb ${hdShipImageEsc(context)}" data-hd-ship-image-host="${row.id}" data-hd-ship-image-upload="${row.id}" title="${hdShipImageEsc(row.name||'艦娘')}の画像を登録・変更"><span class="hd-ship-image-thumb-fallback">ID ${row.id}</span><img alt="${hdShipImageEsc(row.name||'艦娘')} 画像" loading="lazy" decoding="async"></button>`;
 }
 async function hdShipImageHydrate(root=document){
  const hosts=[...root.querySelectorAll?.('[data-hd-ship-image-host]')||[]];
