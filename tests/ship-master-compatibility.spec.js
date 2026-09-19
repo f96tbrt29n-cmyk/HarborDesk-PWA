@@ -4244,3 +4244,16 @@ test('manual timers and quests can be edited', async ({ page }) => {
   expect(await page.locator('#questDialogTitle').textContent()).toContain('編集');
   expect(await page.locator('#questName').inputValue()).toBe('あ号作戦');
 });
+
+
+test('mobile timer actions can wrap', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  await page.setViewportSize({width:390,height:844});
+  const data=await page.evaluate(()=>{
+    const s=[...document.styleSheets].flatMap(x=>{try{return [...x.cssRules].map(r=>r.cssText)}catch{return []}}).join('\n');
+    return {hasTimerActions:s.includes('.timer-actions'),hasWrap:s.includes('flex-wrap: wrap')};
+  });
+  expect(data.hasTimerActions).toBe(true);
+  expect(data.hasWrap).toBe(true);
+});
