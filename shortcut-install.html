@@ -24,13 +24,14 @@ button.sub,a.sub{background:#152b3d;color:#dcecff;border:1px solid #38546c}
 <p>Safariの共有シートから艦これページ上で実行する、署名済みのHarborDesk用ショートカット。</p>
 
 <button id="downloadMain">HarborDeskキャプチャを保存</button>
-<button id="downloadTest" class="sub">診断版を保存</button>
+<button id="downloadDebug" class="sub">反応確認版を保存</button>
+<button id="downloadTest" class="sub">最小診断版を保存</button>
 
 <div id="status"></div>
 
 <p class="small">
-保存後は「ファイル」アプリ → ダウンロード → <b>HarborDesk-Capture.shortcut</b> をタップ。<br>
-ショートカットAppが開いたら「ショートカットを追加」を押してね。
+まず「反応確認版を保存」を使うのがおすすめ。保存後は「ファイル」アプリ → ダウンロード → <b>HarborDesk-Debug.shortcut</b> をタップ。<br>
+追加後、Safariの艦これ画面で共有 → <b>HarborDesk診断2</b> を実行してね。開始ダイアログ→JavaScript→完了ダイアログの順で動作確認できる。
 </p>
 
 <a class="btn sub" href="./downloads/HarborDesk-Capture.shortcut" download="HarborDesk-Capture.shortcut">うまく保存できない時の直接リンク</a>
@@ -60,6 +61,7 @@ async function saveShortcut(file,name){
   }
 }
 document.getElementById('downloadMain').onclick=()=>saveShortcut('./downloads/HarborDesk-Capture.shortcut','HarborDesk-Capture.shortcut');
+document.getElementById('downloadDebug').onclick=()=>saveShortcut('./downloads/HarborDesk-Debug.shortcut','HarborDesk-Debug.shortcut');
 document.getElementById('downloadTest').onclick=()=>saveShortcut('./downloads/HarborDesk-Test.shortcut','HarborDesk-Test.shortcut');
 </script>
 </body>
