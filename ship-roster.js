@@ -1,12 +1,14 @@
 const SHIP_ROSTER_KEY='harbordesk-ship-roster-v1';
 const SHIP_ROSTER_VIEW_KEY='harbordesk-session-roster-view-v1';
 let shipRosterEditId=null;
+let shipRosterRenderTimer=0;
 const SHIP_TAGS=['主力','育成中','改二待ち','任務用','イベント温存'];
 const SHIP_ROSTER_TYPES=['','駆逐艦','海防艦','軽巡洋艦','重雷装巡洋艦','練習巡洋艦','重巡洋艦','航空巡洋艦','高速戦艦','戦艦','航空戦艦','軽空母','正規空母','装甲空母','水上機母艦','潜水艦','潜水空母','潜水母艦','補給艦','揚陸艦'];
 
 function rosterLoad(){try{return JSON.parse(localStorage.getItem(SHIP_ROSTER_KEY))||[]}catch{return []}}
 function rosterViewLoad(){try{return JSON.parse(sessionStorage.getItem(SHIP_ROSTER_VIEW_KEY)||'{}')||{}}catch{return {}}}
 function rosterViewSave(patch={}){const next={...rosterViewLoad(),...patch};try{sessionStorage.setItem(SHIP_ROSTER_VIEW_KEY,JSON.stringify(next))}catch{}return next}
+function rosterScheduleRender(delay=90){clearTimeout(shipRosterRenderTimer);shipRosterRenderTimer=setTimeout(renderShipRoster,Math.max(0,Number(delay)||0))}
 function rosterMasterRef(input){
  const name=typeof input==='object'?String(input?.name||''):String(input||''),id=Number(typeof input==='object'?input?.masterId:0)||0;
  if(id&&typeof hdShipImageResolve==='function')return hdShipImageResolve({id,name});
@@ -97,7 +99,7 @@ function initShipRoster(){
  rosterMigrateMasterIds();ensureShipRosterDialog();refreshShipRosterOptions();
  const view=rosterViewLoad(),savedFilter=SHIP_TAGS.includes(view.filter)?view.filter:'all';
  const filters=document.getElementById('shipRosterFilters');if(filters)filters.innerHTML=['all',...SHIP_TAGS].map(x=>`<button class="guide-chip ${x===savedFilter?'active':''}" data-roster-filter="${x}">${x==='all'?'すべて':x}</button>`).join('');
- const search=document.getElementById('shipRosterSearch');if(search){search.value=String(view.query||'');search.addEventListener('input',()=>{rosterViewSave({query:search.value});renderShipRoster()})}
+ const search=document.getElementById('shipRosterSearch');if(search){search.value=String(view.query||'');search.addEventListener('input',()=>{rosterViewSave({query:search.value});rosterScheduleRender()})}
  const sort=document.getElementById('shipRosterSort');if(sort){sort.value=['level','name','updated','type'].includes(view.sort)?view.sort:'level';sort.addEventListener('change',()=>{rosterViewSave({sort:sort.value});renderShipRoster()})}
  const compact=view.compact==null?!!window.matchMedia?.('(max-width:620px)')?.matches:!!view.compact,section=document.getElementById('roster'),compactBtn=document.querySelector('[data-roster-compact]');
  section?.classList.toggle('roster-compact',compact);if(compactBtn)compactBtn.textContent=compact?'詳細表示':'コンパクト';
