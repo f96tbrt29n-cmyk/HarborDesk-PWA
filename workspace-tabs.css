@@ -42,3 +42,9 @@
  }
  .hd-ws-primary button:last-child{margin-right:12px}
 }
+
+.hd-network-status{position:sticky;top:calc(var(--hd-topbar-h) + var(--hd-workspace-nav-h,0px));z-index:17;display:flex;align-items:center;justify-content:center;gap:7px;padding:7px 12px;border-bottom:1px solid rgba(239,191,93,.35);background:rgba(82,58,19,.96);color:#ffe3a1;font-size:11px;backdrop-filter:blur(10px)}
+.hd-network-status[hidden]{display:none}
+.hd-network-status span{font-size:15px}
+.hd-network-status small{color:#e8c97f}
+@media(max-width:560px){.hd-network-status{justify-content:flex-start;padding:6px 10px}.hd-network-status small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
