@@ -1,6 +1,7 @@
 const HD_WS_KEY='harbordesk-workspace-tabs-v1';
 const HD_WS_SCROLL_KEY='harbordesk-session-workspace-scroll-v1';
 const HD_WS_HISTORY_KEY='harbordesk-session-workspace-history-v1';
+const HD_WS_SWIPE_HINT_KEY='harbordesk-workspace-swipe-hint-v1';
 const HD_WS_GROUPS=[
  {key:'home',label:'ホーム'},
  {key:'guide',label:'攻略'},
@@ -66,6 +67,22 @@ function hdWSRestoreScroll(sectionId){
 }
 function hdWSEsc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdWSJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}}
+function hdWSShouldShowSwipeHint(){
+ if(window.matchMedia?.('(min-width:561px)')?.matches)return false;
+ try{return localStorage.getItem(HD_WS_SWIPE_HINT_KEY)!=='1'}catch{return false}
+}
+function hdWSDismissSwipeHint(){
+ try{localStorage.setItem(HD_WS_SWIPE_HINT_KEY,'1')}catch{}
+ document.getElementById('hdWorkspaceSwipeHint')?.remove();
+ requestAnimationFrame(hdWSUpdateTopbarHeight);
+}
+function hdWSEnsureSwipeHint(){
+ if(!hdWSShouldShowSwipeHint()||document.getElementById('hdWorkspaceSwipeHint'))return;
+ const nav=document.getElementById('hdWorkspaceNav');if(!nav)return;
+ const hint=document.createElement('button');hint.id='hdWorkspaceSwipeHint';hint.type='button';hint.className='hd-ws-swipe-hint';
+ hint.innerHTML='<span aria-hidden="true">↔</span><b>左右スワイプでカテゴリ移動</b><small>×</small>';
+ hint.addEventListener('click',hdWSDismissSwipeHint);nav.appendChild(hint);requestAnimationFrame(hdWSUpdateTopbarHeight);
+}
 function hdWSSyncInfo(){
  const sync=hdWSJson('harbordesk-kancolle-sync-v1',null);
  if(!sync?.syncedAt)return {sync:null,state:'missing',label:'未同期',detail:'ゲームデータ未同期'};
@@ -185,7 +202,7 @@ function hdWSEnsureUI(){
  if(document.getElementById('hdWorkspaceNav'))return;
  const top=document.querySelector('.topbar');if(!top)return;
  const nav=document.createElement('div');nav.id='hdWorkspaceNav';nav.className='hd-ws-shell';nav.innerHTML=`<div class="hd-ws-primary" role="tablist" aria-label="HarborDeskカテゴリ">${HD_WS_GROUPS.map(g=>`<button type="button" role="tab" data-hd-ws-group="${g.key}"><span>${g.label}</span><em data-hd-ws-badge hidden>0</em></button>`).join('')}</div><div id="hdWorkspaceMobilePicker" class="hd-ws-mobile-picker" hidden><button type="button" class="ghost small hd-ws-back" data-hd-ws-back aria-label="ひとつ前の機能へ戻る" title="戻る">←</button><span id="hdWorkspaceContextGroup">ホーム</span><select id="hdWorkspaceSectionSelect" aria-label="カテゴリ内機能"></select><button type="button" class="ghost small" data-hd-ws-group-top>先頭</button></div><div id="hdWorkspaceSubtabs" class="hd-ws-secondary" role="tablist" aria-label="カテゴリ内機能"></div>`;
- top.insertAdjacentElement('afterend',nav);document.body.classList.add('hd-workspace-mode');hdWSEnsureSyncStatus();hdWSEnsureNetworkStatus();hdWSUpdateTopbarHeight();hdWSUpdateBadges();hdWSUpdateSyncStatus();
+ top.insertAdjacentElement('afterend',nav);document.body.classList.add('hd-workspace-mode');hdWSEnsureSyncStatus();hdWSEnsureNetworkStatus();hdWSEnsureSwipeHint();hdWSUpdateTopbarHeight();hdWSUpdateBadges();hdWSUpdateSyncStatus();
 }
 function hdWSRenderSubtabs(group,selected){
  const host=document.getElementById('hdWorkspaceSubtabs'),picker=document.getElementById('hdWorkspaceMobilePicker'),select=document.getElementById('hdWorkspaceSectionSelect'),context=document.getElementById('hdWorkspaceContextGroup');if(!host)return;const rows=hdWSVisibleSections(group);
@@ -264,14 +281,14 @@ function hdWSInstall(){
 }
 function hdWSHorizontalScroller(el){for(let n=el;n&&n!==document.body;n=n.parentElement){if(n.scrollWidth>n.clientWidth+12){const s=getComputedStyle(n);if(['auto','scroll'].includes(s.overflowX))return true}}return false}
 function hdWSSwipeBlocked(target){return !!target?.closest?.('input,textarea,select,button,a,dialog,[contenteditable="true"],.hd-ws-primary,.hd-ws-secondary')||hdWSHorizontalScroller(target)}
-function hdWSMoveGroup(dir){const i=HD_WS_GROUPS.findIndex(x=>x.key===hdWSState.group),next=HD_WS_GROUPS[i+dir];if(!next)return false;hdWSPushHistory();hdWSClearPin();hdWSApply(next.key,null,{restoreScroll:true,ignorePin:true});return true}
+function hdWSMoveGroup(dir){const i=HD_WS_GROUPS.findIndex(x=>x.key===hdWSState.group),next=HD_WS_GROUPS[i+dir];if(!next)return false;hdWSDismissSwipeHint();hdWSPushHistory();hdWSClearPin();hdWSApply(next.key,null,{restoreScroll:true,ignorePin:true});window.hdToast?.(next.label,'info',900);return true}
 function hdWSTouchStart(e){if(e.touches?.length!==1||hdWSSwipeBlocked(e.target))return;const t=e.touches[0];if(t.clientX<24||t.clientX>window.innerWidth-24)return;hdWSTouch={x:t.clientX,y:t.clientY,at:Date.now()}}
 function hdWSTouchEnd(e){if(!hdWSTouch)return;const t=e.changedTouches?.[0],start=hdWSTouch;hdWSTouch=null;if(!t)return;const dx=t.clientX-start.x,dy=t.clientY-start.y,dt=Date.now()-start.at;if(dt>800||Math.abs(dx)<72||Math.abs(dx)<Math.abs(dy)*1.35)return;hdWSMoveGroup(dx<0?1:-1)}
 
 document.addEventListener('click',e=>{
  const back=e.target.closest?.('[data-hd-ws-back]');if(back){hdWSGoBack();return}
  const top=e.target.closest?.('[data-hd-ws-group-top]');if(top){hdWSPushHistory();hdWSClearPin();const target=hdWSDefaultSection(hdWSState.group);hdWSApply(hdWSState.group,target,{scrollTop:true,ignorePin:true});return}
- const g=e.target.closest?.('[data-hd-ws-group]');if(g){hdWSPushHistory();hdWSClearPin();hdWSApply(g.dataset.hdWsGroup,null,{restoreScroll:true,ignorePin:true});return}
+ const g=e.target.closest?.('[data-hd-ws-group]');if(g){hdWSDismissSwipeHint();hdWSPushHistory();hdWSClearPin();hdWSApply(g.dataset.hdWsGroup,null,{restoreScroll:true,ignorePin:true});return}
  const s=e.target.closest?.('[data-hd-ws-section]');if(s){hdWSPushHistory();hdWSClearPin();hdWSApply(hdWSState.group,s.dataset.hdWsSection,{restoreScroll:true,ignorePin:true});return}
  const a=e.target.closest?.('a[href^="#"]');if(a&&hdWSHandleAnchor(a)){e.preventDefault();history.replaceState(null,'',a.getAttribute('href'))}
 },true);
