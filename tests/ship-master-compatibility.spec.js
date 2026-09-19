@@ -5259,7 +5259,7 @@ test('Home current fleet gear toggle works on mobile', async ({ page }) => {
 test('Home current fleet copies to selected map', async ({ page }) => {
   const errors=[];
   await page.addInitScript(() => {
-    sessionStorage.setItem('harbordesk-guide-view-v1', JSON.stringify({world:'5',map:'5-5',filter:'map',query:'5-5'}));
+    sessionStorage.setItem('harbordesk-session-guide-view-v1', JSON.stringify({world:'5',map:'5-5',filter:'map',query:'5-5'}));
     localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
       {deckId:1,name:'第1艦隊',mission:[0,0,0,0],ships:[
         {name:'加賀改',masterId:84,level:94,gear:'烈風 / 彩雲'},
