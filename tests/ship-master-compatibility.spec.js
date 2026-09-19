@@ -3969,3 +3969,23 @@ test('timer dialog quick duration presets', async ({ page }) => {
   expect(data.value).toBe('120');
   expect(data.presetCount).toBe(6);
 });
+
+
+test('quest dialog shows recent manual quest names', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-quest-recent-v1', JSON.stringify(['デイリー演習','南西諸島海域の制海権を握れ！']));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    openQuestDialog();
+    const buttons=[...document.querySelectorAll('[data-quest-recent]')].map(x=>x.textContent);
+    const first=document.querySelector('[data-quest-recent]');
+    first?.click();
+    const value=document.getElementById('questName')?.value||'';
+    document.getElementById('questDialog')?.close();
+    return {buttons,value};
+  });
+  expect(data.buttons).toContain('デイリー演習');
+  expect(data.value).toBe('デイリー演習');
+});
