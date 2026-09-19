@@ -1,4 +1,15 @@
 const HD_RECENT_MAPS_KEY='harbordesk-recent-maps-v1';
+const HOME_INSTALL_TIP_KEY='harbordesk-install-tip-dismissed-v1';
+function homeIsStandalone(){
+ return !!(window.matchMedia?.('(display-mode: standalone)')?.matches||navigator.standalone===true);
+}
+function homeIsIOS(){
+ const ua=String(navigator.userAgent||'');return /iPhone|iPad|iPod/i.test(ua)||(/Macintosh/i.test(ua)&&Number(navigator.maxTouchPoints)>1);
+}
+function homeShowInstallTip(){
+ if(homeIsStandalone()||!homeIsIOS())return false;
+ try{return localStorage.getItem(HOME_INSTALL_TIP_KEY)!=='1'}catch{return true}
+}
 const HD_HOME_PANELS_KEY='harbordesk-home-panels-v1';
 const HD_HOME_ORDER_KEY='harbordesk-home-order-v1';
 const HD_HOME_ORDER_DEFAULT=['resources','procurement','quick','recent'];
@@ -88,6 +99,7 @@ function ensureHomeDashboard(){
  section.innerHTML=`
   <div class="section-head"><div><div class="eyebrow">HOME</div><h2>今日の司令部</h2></div><div class="home-head-actions"><span class="muted" id="homeUpdated"></span><button type="button" class="ghost small" data-home-order-reset>配置を戻す</button></div></div>
   <article id="homeGameSync" class="home-sync-card"></article>
+  <article id="homeInstallTip" class="home-install-tip" hidden><div><span>iPhoneでさらに使いやすく</span><strong>HarborDeskをホーム画面に追加</strong><small>Safariの共有ボタン →「ホーム画面に追加」で、アプリみたいにすぐ開けるよ。</small></div><button type="button" class="ghost small" data-home-install-dismiss>閉じる</button></article>
   <article id="homeNextAction" class="home-next-action"></article>
   <div id="homeSummary" class="home-summary"></div>
   <div class="home-grid">
@@ -118,6 +130,7 @@ function renderHomeDashboard(){
  try{equipCount=JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]').length}catch{}
  try{eventCount=JSON.parse(localStorage.getItem('harbordesk-events-v1')||'[]').length}catch{}
  document.getElementById('homeUpdated').textContent=new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+ const installTip=document.getElementById('homeInstallTip');if(installTip)installTip.hidden=!homeShowInstallTip();
  const syncInfo=homeSyncInfo(),sync=syncInfo.sync;
  const syncHost=document.getElementById('homeGameSync');
  if(syncHost){
@@ -170,6 +183,7 @@ function renderHomeDashboard(){
 }
 
 document.addEventListener('click',e=>{
+ const dismissInstall=e.target.closest('[data-home-install-dismiss]');if(dismissInstall){try{localStorage.setItem(HOME_INSTALL_TIP_KEY,'1')}catch{};const tip=document.getElementById('homeInstallTip');if(tip)tip.hidden=true;return}
  const addQuest=e.target.closest('[data-home-add-quest]');if(addQuest){if(typeof openQuestDialog==='function')openQuestDialog();else{const input=document.getElementById('questName');if(input)input.value='';document.getElementById('questDialog')?.showModal()}return}
  const quickTimer=e.target.closest('[data-home-timer-start]');if(quickTimer){
   const kind=quickTimer.dataset.kind==='dock'?'dock':'expedition',rows=homeRecentTimerRows(kind),row=rows[Number(quickTimer.dataset.homeTimerStart)];
