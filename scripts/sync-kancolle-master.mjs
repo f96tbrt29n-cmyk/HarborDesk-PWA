@@ -49,7 +49,7 @@ function jstIsoNow(){
  const d=new Date(Date.now()+9*60*60*1000);
  return d.toISOString().replace('Z','+09:00');
 }
-async function bumpHarborDeskVersion(sourceCommit,pickerCommit){
+async function bumpHarborDeskVersion(sourceCommit,pickerCommit,changes=null){
  const app=JSON.parse(await fs.readFile(APP_VERSION_FILE,'utf8'));
  const update=await fs.readFile(UPDATE_MANAGER_FILE,'utf8');
  const sw=await fs.readFile(SW_FILE,'utf8');
@@ -60,7 +60,8 @@ async function bumpHarborDeskVersion(sourceCommit,pickerCommit){
  ];
  const build=Math.max(...builds)+1,version=`1.0.${build}`;
  app.version=version;app.build=build;app.releasedAt=jstIsoNow();
- app.notes=`艦これマスター自動同期。api_start2 ${String(sourceCommit||'').slice(0,7)} / 装備picker ${String(pickerCommit||'').slice(0,7)} を反映し、艦娘スロット・通常装備可否・補強増設・位置制限・公式装備辞書を更新。`;
+ const shipDiff=changes?(changes.ships.added.length+changes.ships.removed.length+changes.ships.changed.length):0,equipAdd=changes?.equipment?.added?.length||0,equipChanged=changes?(changes.equipment.removed.length+changes.equipment.changed.length):0,exDiff=changes?(changes.exslot?.itemRulesChanged||0)+(changes.exslot?.limitShipsChanged||0):0;
+ app.notes=`艦これマスター自動同期。api_start2 ${String(sourceCommit||'').slice(0,7)} / 装備picker ${String(pickerCommit||'').slice(0,7)} を反映。艦娘変更 ${shipDiff}件 / 新装備 ${equipAdd}件 / 装備変更 ${equipChanged}件 / 増設ルール ${exDiff}件${changes?.picker?.changed?' / picker位置制限変更':''}。`;
  const nextUpdate=update.replace(/const HD_APP_VERSION='[^']+';/,`const HD_APP_VERSION='${version}';`).replace(/const HD_APP_BUILD=\d+;/,`const HD_APP_BUILD=${build};`);
  const nextSw=sw.replace(/const CACHE='harbordesk-pwa-v\d+';/,`const CACHE='harbordesk-pwa-v${build}';`);
  if(nextUpdate===update)throw new Error('update-manager version marker not found');
@@ -164,5 +165,5 @@ const semanticallyCurrent=oldSnapshot&&oldSnapshot.source?.commit===snapshot.sou
 if(semanticallyCurrent&&oldSnapshot?.changes){console.log('Kancolle master snapshot is current:',commit.sha);process.exit(0)}
 if(!write){console.error('Kancolle master snapshot is stale. Run: node scripts/sync-kancolle-master.mjs --write --bump-app');process.exit(1)}
 await fs.writeFile(OUT,out,'utf8');
-if(bump)await bumpHarborDeskVersion(commit.sha,pickerCommit.sha);
+if(bump)await bumpHarborDeskVersion(commit.sha,pickerCommit.sha,snapshot.changes);
 console.log('Updated ship-master-snapshot.js from',commit.sha,'picker',pickerCommit.sha,'ships',Object.keys(ships).length,'equipment',Object.keys(equipment).length,'slotRules',pickerTables.slotExclusions.length,'bumpApp',bump);
