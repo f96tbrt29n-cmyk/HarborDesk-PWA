@@ -223,9 +223,11 @@ function openTimer(kind){
  document.getElementById('timerDialogTitle').textContent=kind==='expedition'?'遠征タイマー追加':'入渠タイマー追加';
  document.getElementById('timerName').value=String(saved.name||'');
  document.getElementById('timerMinutes').value=String(Number(saved.minutes)||30);
- document.getElementById('timerDialog').showModal();
+ const dialog=document.getElementById('timerDialog');dialog.showModal();
+ const name=document.getElementById('timerName');try{name.focus({preventScroll:true});if(name.value)name.select()}catch{}
 }
 
+document.addEventListener('click',e=>{const preset=e.target.closest?.('[data-timer-minutes]');if(preset){const input=document.getElementById('timerMinutes');if(input){input.value=preset.dataset.timerMinutes;try{input.focus({preventScroll:true})}catch{input.focus()}}}});
 document.getElementById('addExpedition').onclick=()=>openTimer('expedition');document.getElementById('addDock').onclick=()=>openTimer('dock');document.getElementById('addQuest').onclick=()=>{document.getElementById('questName').value='';document.getElementById('questDialog').showModal()};
 document.getElementById('timerForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const name=document.getElementById('timerName').value.trim(),mins=Number(document.getElementById('timerMinutes').value);if(!name||!mins)return;const startedAt=Date.now();timerLastSave(timerKind,name,mins);(timerKind==='expedition'?state.expeditions:state.docks).push({id:uid(),name,startedAt,durationMinutes:mins,endsAt:startedAt+mins*60000});save();render();hdToast(`${name} を開始したよ`)});
 document.getElementById('questForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const name=document.getElementById('questName').value.trim();if(!name)return;state.quests.push({id:uid(),name,done:false});save();renderQuests();hdToast(`${name} を追加したよ`)});
