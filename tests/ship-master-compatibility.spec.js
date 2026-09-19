@@ -3243,3 +3243,24 @@ test('global toast gives save feedback without blocking', async ({ page }) => {
   expect(data.show).toBe(true);
   expect(data.pointer).toBe('none');
 });
+
+
+test('action toast can undo destructive actions', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'undo-1',name:'加賀改',level:94,tags:[]}]));
+  });
+  await boot(page,errors);
+  await page.evaluate(()=>window.renderShipRoster?.());
+  const deleteButton=page.locator('[data-roster-delete="undo-1"]');
+  await expect(deleteButton).toHaveCount(1);
+  await deleteButton.click();
+  let rows=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]'));
+  expect(rows).toHaveLength(0);
+  const undo=page.locator('#hdToastRegion .hd-toast-action');
+  await expect(undo).toBeVisible();
+  await undo.click();
+  rows=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]'));
+  expect(rows).toHaveLength(1);
+  expect(rows[0].name).toBe('加賀改');
+});
