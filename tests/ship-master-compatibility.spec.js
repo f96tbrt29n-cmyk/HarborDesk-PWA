@@ -4957,3 +4957,73 @@ test('header offers return to Kancolle after sync handoff', async ({ page }) => 
   expect(data.hiddenAfter).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
+
+
+test('home next action prioritizes sync over distant timer', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now()-7*60*60*1000,
+      ships:206,equipment:93,decks:4,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true}
+    }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    if(typeof state!=='undefined'){
+      state.expeditions=[{id:'e1',name:'長距離遠征',endsAt:Date.now()+6*60*60*1000}];
+      state.docks=[];
+      state.quests=[{id:'q1',name:'任務A',done:false}];
+    }
+    window.renderHomeDashboard?.();
+    return document.getElementById('homeNextAction')?.textContent||'';
+  });
+  expect(data).toContain('ゲーム同期');
+  expect(data).not.toContain('長距離遠征');
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
+
+test('home next action keeps near timer above sync attention', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now()-7*60*60*1000,
+      ships:206,equipment:93,decks:4,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true}
+    }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    if(typeof state!=='undefined'){
+      state.expeditions=[{id:'e1',name:'東京急行',endsAt:Date.now()+20*60*1000}];
+      state.docks=[];state.quests=[];
+    }
+    window.renderHomeDashboard?.();
+    return document.getElementById('homeNextAction')?.textContent||'';
+  });
+  expect(data).toContain('東京急行');
+  expect(data).toContain('もうすぐ終わる');
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
+
+test('home flags fresh partial Kancolle sync', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now()-120000,ships:206,equipment:0,decks:4,
+      coverage:{ships:true,equipment:false,resources:true,fleets:true}
+    }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.renderHomeDashboard?.();
+    return {
+      card:document.getElementById('homeGameSync')?.textContent||'',
+      next:document.getElementById('homeNextAction')?.textContent||'',
+      partial:document.getElementById('homeGameSync')?.classList.contains('partial')||false
+    };
+  });
+  expect(data.partial).toBe(true);
+  expect(data.card).toContain('未取得: 装備');
+  expect(data.next).toContain('同期を補完する');
+});
