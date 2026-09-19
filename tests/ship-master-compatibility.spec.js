@@ -3457,3 +3457,17 @@ test('global search history can be cleared', async ({ page }) => {
   expect(data.history).toEqual([]);
   expect(data.clear).toBe(false);
 });
+
+
+test('heavy searches use scheduled rendering', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>({
+    global:typeof window.hdGSScheduleRender==='function',
+    ship:typeof window.hdShipDbScheduleRender==='function',
+    equipment:typeof window.hdEquipCatalogScheduleRender==='function'
+  }));
+  expect(data.global).toBe(true);
+  expect(data.ship).toBe(true);
+  expect(data.equipment).toBe(true);
+});
