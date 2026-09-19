@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HarborDesk 艦これ連携
 // @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
-// @version      1.0.6
+// @version      1.0.7
 // @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
 // @match        http://*.dmm.com/*
 // @match        https://*.dmm.com/*
@@ -21,7 +21,7 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.6';
+const HD_VERSION='1.0.7';
 const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/';
 const RECORD_MESSAGE='harbordesk-kancolle-frame-record-v1';
 const STATUS_MESSAGE='harbordesk-kancolle-frame-status-v1';
@@ -177,8 +177,8 @@ try{
 const records=[];
 const signatures=new Set();
 const captureId='kc-userscript-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
-let panel,countEl,statusEl,frameEl,coverageEl,sendEl;
-let frameHits=0;
+let panel,countEl,statusEl,frameEl,coverageEl,sendEl,miniCountEl,minimizeEl,panelBodyEl;
+let frameHits=0,minimized=false;
 
 function captureCoverage(){
   const endpoints=records.map(x=>String(x.endpoint||''));
@@ -231,25 +231,42 @@ function ensurePanel(){
   panel=document.createElement('div');
   panel.id='hd-kc-userscript-panel';
   panel.style.cssText='position:fixed;z-index:2147483647;right:8px;bottom:8px;width:min(350px,calc(100vw - 16px));padding:10px;border:1px solid #5f7892;border-radius:12px;background:#071521;color:#eef6ff;font:12px/1.45 -apple-system,BlinkMacSystemFont,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.45)';
-  panel.innerHTML='<div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>HarborDesk 艦これ連携 <small style="color:#7f9aae">v'+HD_VERSION+'</small></b><button data-hd-hide style="background:none;border:0;color:#9eb7cb;font-size:18px">×</button></div>'+
-    '<div style="margin:6px 0;color:#aac0d1"><b data-hd-status style="color:#9fe0b7">通信待機中</b><br>取得 <b data-hd-count>0</b>件 / 検出フレーム <b data-hd-frames>0</b><br><small>母港・装備・任務などを開くと自動で取得するよ。</small></div>'+
-    '<div data-hd-coverage style="display:flex;gap:4px;flex-wrap:wrap;margin:7px 0 9px"></div>'+
-    '<div style="display:flex;gap:6px;flex-wrap:wrap"><button data-hd-send style="font-weight:700">HarborDeskへ送る</button><button data-hd-copy>JSONをコピー</button><button data-hd-clear>クリア</button></div>'+
-    '<div style="margin-top:7px;color:#7f9aae"><small>api_token・Cookie・DMMログイン情報・リクエスト本文は保存しません。</small></div>';
+  panel.innerHTML='<div data-hd-panel-head style="display:flex;justify-content:space-between;gap:8px;align-items:center;cursor:pointer"><b><span data-hd-panel-name>HarborDesk 艦これ連携</span> <small style="color:#7f9aae">v'+HD_VERSION+'</small> <em data-hd-mini-count style="font-style:normal;font-size:10px;color:#9fe0b7">0件</em></b><button data-hd-minimize aria-label="パネルを最小化" style="background:none;border:0;color:#9eb7cb;font-size:18px;min-width:30px;min-height:30px">−</button></div>'+
+    '<div data-hd-panel-body>'+
+      '<div style="margin:6px 0;color:#aac0d1"><b data-hd-status style="color:#9fe0b7">通信待機中</b><br>取得 <b data-hd-count>0</b>件 / 検出フレーム <b data-hd-frames>0</b><br><small>母港・装備・任務などを開くと自動で取得するよ。</small></div>'+
+      '<div data-hd-coverage style="display:flex;gap:4px;flex-wrap:wrap;margin:7px 0 9px"></div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap"><button data-hd-send style="font-weight:700">HarborDeskへ送る</button><button data-hd-copy>JSONをコピー</button><button data-hd-clear>クリア</button></div>'+
+      '<div style="margin-top:7px;color:#7f9aae"><small>api_token・Cookie・DMMログイン情報・リクエスト本文は保存しません。</small></div>'+
+    '</div>';
   document.documentElement.appendChild(panel);
   countEl=panel.querySelector('[data-hd-count]');
   statusEl=panel.querySelector('[data-hd-status]');
   frameEl=panel.querySelector('[data-hd-frames]');
   coverageEl=panel.querySelector('[data-hd-coverage]');
   sendEl=panel.querySelector('[data-hd-send]');
-  panel.querySelector('[data-hd-hide]').onclick=()=>{panel.hidden=true};
+  miniCountEl=panel.querySelector('[data-hd-mini-count]');
+  minimizeEl=panel.querySelector('[data-hd-minimize]');
+  panelBodyEl=panel.querySelector('[data-hd-panel-body]');
+  minimizeEl.onclick=e=>{e.stopPropagation();setMinimized(!minimized)};
+  panel.querySelector('[data-hd-panel-head]').onclick=e=>{if(minimized&&!e.target.closest('button'))setMinimized(false)};
   panel.querySelector('[data-hd-clear]').onclick=()=>{records.length=0;signatures.clear();render()};
   panel.querySelector('[data-hd-copy]').onclick=copy;
   panel.querySelector('[data-hd-send]').onclick=send;
   render();
 }
+function setMinimized(next){
+  minimized=!!next;if(!panel)return minimized;
+  if(panelBodyEl)panelBodyEl.hidden=minimized;
+  panel.style.width=minimized?'auto':'min(350px,calc(100vw - 16px))';
+  panel.style.padding=minimized?'7px 8px':'10px';
+  panel.style.borderRadius=minimized?'999px':'12px';
+  const name=panel.querySelector('[data-hd-panel-name]');if(name)name.textContent=minimized?'HD 艦これ':'HarborDesk 艦これ連携';
+  if(minimizeEl){minimizeEl.textContent=minimized?'＋':'−';minimizeEl.setAttribute('aria-label',minimized?'パネルを展開':'パネルを最小化')}
+  render();return minimized;
+}
 function render(){
   if(countEl)countEl.textContent=String(records.length);
+  if(miniCountEl)miniCountEl.textContent=records.length+'件';
   if(frameEl)frameEl.textContent=String(frameHits);
   if(coverageEl)coverageEl.innerHTML=coverageHtml();
   if(sendEl)sendEl.disabled=!records.length;
@@ -318,6 +335,8 @@ window.__HARBORDESK_KANCOLLE_USERSCRIPT__={
   records,
   exportObject,
   captureCoverage,
+  setMinimized,
+  isMinimized:()=>minimized,
   show,
   send
 };
