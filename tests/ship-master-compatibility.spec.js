@@ -2479,3 +2479,81 @@ test('Sortie analytics finds dangerous nodes and route performance', async ({ pa
   });
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('Sortie analytics highlights risk trends and route differences', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-sortie-analytics-mode-v1','map');
+    localStorage.setItem('harbordesk-sortie-analytics-map-v1','1-1');
+    localStorage.setItem('harbordesk-sortie-analytics-window-v1','3');
+    const mk=(id,at,route,result,boss,retreat)=>({
+      id,at,map:'1-1',node:(route.at(-1)||'')+(boss?' ボス':''),result,boss,retreat,drop:'',
+      source:'kancolle-import',gameRouteLabels:route,
+      gameBattleResults:route.map((node,i)=>({nodeLabel:node,rank:i===route.length-1?result:'S',drop:''}))
+    });
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify([
+      mk('old1',1000,['A','B'],'A',false,false),
+      mk('old2',2000,['A','B'],'B',false,false),
+      mk('old3',3000,['A','B'],'A',false,false),
+      mk('new1',4000,['A','C'],'S',true,false),
+      mk('new2',5000,['A','B'],'C',false,true),
+      mk('new3',6000,['A','B'],'C',false,true)
+    ]));
+
+    const row=(window.hdSPARows?.()||[])[0]||null;
+    const html=window.hdSPAHtml?.()||'';
+    const result={
+      danger:row?.dangerNodes||[],
+      nodeTrend:row?.nodeTrend||null,
+      routeComparison:row?.routeComparison||null,
+      htmlChecks:{
+        hasInsights:html.includes('攻略インサイト'),
+        hasDanger:html.includes('危険マス'),
+        hasWorse:html.includes('+100pt'),
+        hasReference:html.includes('構造図最短（参考）'),
+        hasActual:html.includes('最多実績'),
+        hasDiff:html.includes('構造図最短と異なる')
+      }
+    };
+
+    localStorage.removeItem('harbordesk-sortie-analytics-mode-v1');
+    localStorage.removeItem('harbordesk-sortie-analytics-map-v1');
+    localStorage.removeItem('harbordesk-sortie-analytics-window-v1');
+    localStorage.setItem('harbordesk-sortie-log-v1','[]');
+    return result;
+  });
+
+  expect(data.danger[0]).toEqual(expect.objectContaining({
+    map:'1-1',node:'B',visits:5,retreats:2,retreatRate:40
+  }));
+  expect(data.nodeTrend.ready).toBe(true);
+  const bTrend=data.nodeTrend.items.find(x=>x.node==='B');
+  expect(bTrend).toEqual(expect.objectContaining({
+    delta:100,recentRate:100,previousRate:0,recentVisits:2,previousVisits:3,
+    recentRetreats:2,previousRetreats:0
+  }));
+  expect(data.routeComparison).toEqual(expect.objectContaining({
+    map:'1-1',
+    reference:['A','C'],
+    referenceRoute:'A→C',
+    matches:false
+  }));
+  expect(data.routeComparison.actual).toEqual(expect.objectContaining({
+    route:'A→B',n:5,bossRate:0,retreatRate:40
+  }));
+  expect(data.routeComparison.referenceStats).toEqual(expect.objectContaining({
+    route:'A→C',n:1,bossRate:100,sRate:100
+  }));
+  expect(data.htmlChecks).toEqual({
+    hasInsights:true,
+    hasDanger:true,
+    hasWorse:true,
+    hasReference:true,
+    hasActual:true,
+    hasDiff:true
+  });
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
