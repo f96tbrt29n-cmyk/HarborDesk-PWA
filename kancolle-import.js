@@ -442,13 +442,24 @@ function hdKcSyncStatus(){
 }
 function hdKcNotifySyncSuccess(sync){
  if(!sync)return;
- const message=`同期完了：艦娘${Number(sync.ships)||0} / 装備${Number(sync.equipment)||0} / 艦隊${Number(sync.decks)||0}`;
- const openRoster=()=>{
-  if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return;
-  document.getElementById('roster')?.scrollIntoView({behavior:'smooth',block:'start'});
+ const delta=sync.delta,parts=hdKcDeltaParts(sync);
+ let message='';
+ if(!delta?.baseline)message='同期完了：初回同期の基準を保存したよ';
+ else if(parts.length)message='同期完了：'+parts.slice(0,3).join(' / ')+(parts.length>3?' ほか':'' );
+ else message='同期完了：前回から大きな変化なし';
+
+ let target='kancolleImport',label='同期詳細';
+ if(delta?.baseline&&Number(delta.ships)){target='roster';label='艦隊を見る'}
+ else if(delta?.baseline&&Number(delta.equipment)){target='equipmentBook';label='装備を見る'}
+ else if(delta?.baseline&&Object.values(delta.resources||{}).some(v=>Number(v))){target='resources';label='資源を見る'}
+
+ const open=()=>{
+  if(typeof hdQNRecordRecent==='function')hdQNRecordRecent(target);
+  if(typeof hdWSShowElement==='function'&&hdWSShowElement(target,true))return;
+  document.getElementById(target)?.scrollIntoView({behavior:'smooth',block:'start'});
  };
- if(typeof window.hdToastAction==='function')window.hdToastAction(message,'艦隊を見る',openRoster,6500);
- else if(typeof window.hdToast==='function')window.hdToast(message,'ok',4000);
+ if(typeof window.hdToastAction==='function')window.hdToastAction(message,label,open,7000);
+ else if(typeof window.hdToast==='function')window.hdToast(message,'ok',4500);
 }
 function hdKcPreviewHtml(p){
  if(!p)return '<div class="hd-kc-import-empty">JSONを読み込むと内容をここで確認できるよ</div>';
