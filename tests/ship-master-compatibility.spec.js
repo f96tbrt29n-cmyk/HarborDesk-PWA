@@ -5671,3 +5671,35 @@ test('global search Enter opens first result', async ({ page }) => {
   });
   expect(data.open).toBe(false);
 });
+
+
+test('global search restores session filters and resets empty results', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-global-search-view-v1', JSON.stringify({category:'equipment',ownedOnly:true}));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdGSOpen?.('絶対に一致しない検索語xyz987');
+    const before={
+      category:document.querySelector('[data-hd-gs-cat].active')?.dataset.hdGsCat||'',
+      owned:document.querySelector('[data-hd-gs-owned]')?.getAttribute('aria-pressed')||'',
+      reset:!!document.querySelector('[data-hd-gs-reset]')
+    };
+    document.querySelector('[data-hd-gs-reset]')?.click();
+    const saved=JSON.parse(sessionStorage.getItem('harbordesk-session-global-search-view-v1')||'{}');
+    return {
+      before,
+      afterCategory:document.querySelector('[data-hd-gs-cat].active')?.dataset.hdGsCat||'',
+      afterOwned:document.querySelector('[data-hd-gs-owned]')?.getAttribute('aria-pressed')||'',
+      saved
+    };
+  });
+  expect(data.before.category).toBe('equipment');
+  expect(data.before.owned).toBe('true');
+  expect(data.before.reset).toBe(true);
+  expect(data.afterCategory).toBe('all');
+  expect(data.afterOwned).toBe('false');
+  expect(data.saved).toEqual(expect.objectContaining({category:'all',ownedOnly:false}));
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
