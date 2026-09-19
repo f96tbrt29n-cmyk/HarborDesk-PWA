@@ -204,6 +204,13 @@ async function hdForceUpdate(){
   if(!navigator.onLine){HD_FORCE_UPDATE_BUSY=false;alert('オフライン中は更新できないよ。通信できる状態で試してね。');return false}
   try{
     if(btn){btn.disabled=true;btn.textContent='強制更新中…'}
+    if(typeof hdWSPrepareUpdateReturn==='function')hdWSPrepareUpdateReturn();
+    else{
+      try{
+        const state=JSON.parse(localStorage.getItem('harbordesk-workspace-tabs-v1')||'{}'),group=state.group||'',section=state.sections?.[group]||'';
+        if(group&&section)sessionStorage.setItem('harbordesk-update-return-v1',JSON.stringify({group,section,at:Date.now()}));
+      }catch{}
+    }
     if('serviceWorker' in navigator){
       const regs=await navigator.serviceWorker.getRegistrations();
       await Promise.all(regs.filter(r=>String(r.scope||'').includes('/HarborDesk-PWA/')).map(async r=>{
