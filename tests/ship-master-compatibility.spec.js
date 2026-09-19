@@ -3471,3 +3471,26 @@ test('heavy searches use scheduled rendering', async ({ page }) => {
   expect(data.ship).toBe(true);
   expect(data.equipment).toBe(true);
 });
+
+
+test('home prioritizes pinned functions over recent functions', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-quick-nav-pins-v1', JSON.stringify(['roster','equipmentBook']));
+    localStorage.setItem('harbordesk-quick-nav-recent-v1', JSON.stringify([
+      {id:'roster',at:Date.now()},
+      {id:'quests',at:Date.now()-1000},
+      {id:'expeditions',at:Date.now()-2000}
+    ]));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.renderHomeDashboard?.();
+    const pinned=[...document.querySelectorAll('#homeRecentFunctions .home-pinned-function-list [data-home-jump]')].map(x=>x.dataset.homeJump);
+    const recent=[...document.querySelectorAll('#homeRecentFunctions .home-recent-function-list:not(.home-pinned-function-list) [data-home-jump]')].map(x=>x.dataset.homeJump);
+    return {pinned,recent};
+  });
+  expect(data.pinned).toEqual(expect.arrayContaining(['roster','equipmentBook']));
+  expect(data.recent).toEqual(expect.arrayContaining(['quests','expeditions']));
+  expect(data.recent).not.toContain('roster');
+});
