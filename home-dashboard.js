@@ -1,11 +1,32 @@
 const HD_RECENT_MAPS_KEY='harbordesk-recent-maps-v1';
 const HD_HOME_PANELS_KEY='harbordesk-home-panels-v1';
+const HD_HOME_ORDER_KEY='harbordesk-home-order-v1';
+const HD_HOME_ORDER_DEFAULT=['resources','procurement','quick','recent'];
 
 function homeEsc(s){return typeof esc==='function'?esc(s):String(s??'')}
 function loadRecentMaps(){try{return JSON.parse(localStorage.getItem(HD_RECENT_MAPS_KEY))||[]}catch{return []}}
 function saveRecentMap(map){if(!map)return;const rows=loadRecentMaps().filter(x=>x!==map);rows.unshift(map);localStorage.setItem(HD_RECENT_MAPS_KEY,JSON.stringify(rows.slice(0,6)))}
 function homePanelState(){try{return JSON.parse(localStorage.getItem(HD_HOME_PANELS_KEY)||'{}')||{}}catch{return {}}}
 function homePanelSave(name,collapsed){const next={...homePanelState(),[name]:!!collapsed};try{localStorage.setItem(HD_HOME_PANELS_KEY,JSON.stringify(next))}catch{}}
+function homeOrderLoad(){
+ let rows=[];try{rows=JSON.parse(localStorage.getItem(HD_HOME_ORDER_KEY)||'[]')||[]}catch{}
+ rows=rows.filter(x=>HD_HOME_ORDER_DEFAULT.includes(x));
+ for(const id of HD_HOME_ORDER_DEFAULT)if(!rows.includes(id))rows.push(id);
+ return rows;
+}
+function homeOrderSave(rows){try{localStorage.setItem(HD_HOME_ORDER_KEY,JSON.stringify(rows))}catch{}}
+function homeApplyOrder(){
+ const root=document.getElementById('home');if(!root)return;
+ const items=[...root.querySelectorAll('[data-home-order-item]')];if(!items.length)return;
+ const byId=new Map(items.map(el=>[el.dataset.homeOrderItem,el]));
+ const after=items[items.length-1].nextSibling;
+ for(const id of homeOrderLoad()){const el=byId.get(id);if(el)root.insertBefore(el,after)}
+}
+function homeMoveOrder(id,dir){
+ const rows=homeOrderLoad(),i=rows.indexOf(id);if(i<0)return false;
+ const j=dir==='up'?i-1:i+1;if(j<0||j>=rows.length)return false;
+ [rows[i],rows[j]]=[rows[j],rows[i]];homeOrderSave(rows);homeApplyOrder();return true;
+}
 function homeApplyPanelState(){
  const state=homePanelState();
  document.querySelectorAll('[data-home-panel]').forEach(card=>{
@@ -60,14 +81,14 @@ function ensureHomeDashboard(){
    <article class="home-card"><div class="home-card-title"><strong>今日やること</strong><a href="#quests">任務へ</a></div><div id="homeTodo"></div></article>
    <article class="home-card"><div class="home-card-title"><strong>進行中タイマー</strong><a href="#expeditions">遠征へ</a></div><div id="homeTimers"></div></article>
   </div>
-  <article class="home-card home-collapsible" data-home-panel="resources"><div class="home-card-title"><strong>資源</strong><div class="home-card-actions"><a href="#resources">記録へ</a><button type="button" class="ghost small home-collapse-btn" data-home-collapse="resources" aria-label="資源カードを折りたたむ" aria-expanded="true">−</button></div></div><div data-home-panel-body><div id="homeResources" class="home-resource-grid"></div></div></article>
-  <article class="home-card home-collapsible" data-home-panel="procurement"><div class="home-card-title"><strong>次の装備調達</strong><div class="home-card-actions"><button type="button" class="ghost small" data-home-procurement-open>調達リストへ</button><button type="button" class="ghost small home-collapse-btn" data-home-collapse="procurement" aria-label="装備調達カードを折りたたむ" aria-expanded="true">−</button></div></div><div data-home-panel-body><div id="homeProcurement"></div></div></article>
-  <article class="home-card"><div class="home-card-title"><strong>クイックアクセス</strong><span class="muted">1〜2タップで移動</span></div><div class="home-shortcuts">
+  <article class="home-card home-collapsible" data-home-panel="resources" data-home-order-item="resources"><div class="home-card-title"><strong>資源</strong><div class="home-card-actions"><a href="#resources">記録へ</a><span class="home-order-controls"><button type="button" class="ghost small home-move-btn" data-home-move="up" aria-label="資源を上へ">↑</button><button type="button" class="ghost small home-move-btn" data-home-move="down" aria-label="資源を下へ">↓</button></span><button type="button" class="ghost small home-collapse-btn" data-home-collapse="resources" aria-label="資源カードを折りたたむ" aria-expanded="true">−</button></div></div><div data-home-panel-body><div id="homeResources" class="home-resource-grid"></div></div></article>
+  <article class="home-card home-collapsible" data-home-panel="procurement" data-home-order-item="procurement"><div class="home-card-title"><strong>次の装備調達</strong><div class="home-card-actions"><button type="button" class="ghost small" data-home-procurement-open>調達リストへ</button><span class="home-order-controls"><button type="button" class="ghost small home-move-btn" data-home-move="up" aria-label="装備調達を上へ">↑</button><button type="button" class="ghost small home-move-btn" data-home-move="down" aria-label="装備調達を下へ">↓</button></span><button type="button" class="ghost small home-collapse-btn" data-home-collapse="procurement" aria-label="装備調達カードを折りたたむ" aria-expanded="true">−</button></div></div><div data-home-panel-body><div id="homeProcurement"></div></div></article>
+  <article class="home-card" data-home-order-item="quick"><div class="home-card-title"><strong>クイックアクセス</strong><div class="home-card-actions"><span class="muted">1〜2タップで移動</span><span class="home-order-controls"><button type="button" class="ghost small home-move-btn" data-home-move="up" aria-label="クイックアクセスを上へ">↑</button><button type="button" class="ghost small home-move-btn" data-home-move="down" aria-label="クイックアクセスを下へ">↓</button></span></div></div><div class="home-shortcuts">
     <a href="#kancolleImport">🎮 ゲーム同期</a><a href="#guide">🗺️ 攻略</a><a href="#roster">⚓ 艦隊</a><a href="#equipmentBook">🧰 装備</a><a href="#quests">✅ 任務</a><a href="#expeditions">⏱️ 遠征</a>
   </div><div id="homeRecentFunctions" class="home-recent-functions"></div></article>
-  <article class="home-card home-collapsible" data-home-panel="recent"><div class="home-card-title"><strong>最近見た海域</strong><div class="home-card-actions"><span class="muted">タップで攻略</span><button type="button" class="ghost small home-collapse-btn" data-home-collapse="recent" aria-label="最近見た海域を折りたたむ" aria-expanded="true">−</button></div></div><div data-home-panel-body><div id="homeRecentMaps" class="home-recent-maps"></div></div></article>`;
+  <article class="home-card home-collapsible" data-home-panel="recent" data-home-order-item="recent"><div class="home-card-title"><strong>最近見た海域</strong><div class="home-card-actions"><span class="muted">タップで攻略</span><span class="home-order-controls"><button type="button" class="ghost small home-move-btn" data-home-move="up" aria-label="最近見た海域を上へ">↑</button><button type="button" class="ghost small home-move-btn" data-home-move="down" aria-label="最近見た海域を下へ">↓</button></span><button type="button" class="ghost small home-collapse-btn" data-home-collapse="recent" aria-label="最近見た海域を折りたたむ" aria-expanded="true">−</button></div></div><div data-home-panel-body><div id="homeRecentMaps" class="home-recent-maps"></div></div></article>`;
  hero.insertAdjacentElement('afterend',section);
- renderHomeDashboard();homeApplyPanelState();
+ homeApplyOrder();renderHomeDashboard();homeApplyPanelState();
 }
 
 function renderHomeDashboard(){
@@ -133,6 +154,7 @@ function renderHomeDashboard(){
 }
 
 document.addEventListener('click',e=>{
+ const move=e.target.closest('[data-home-move]');if(move){const card=move.closest('[data-home-order-item]');if(card)homeMoveOrder(card.dataset.homeOrderItem,move.dataset.homeMove);return}
  const managePins=e.target.closest('[data-home-pins-manage]');if(managePins){if(typeof hdQNOpen==='function')hdQNOpen();return}
  const collapse=e.target.closest('[data-home-collapse]');
  if(collapse){
