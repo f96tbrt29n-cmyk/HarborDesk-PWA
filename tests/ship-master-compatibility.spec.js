@@ -5126,3 +5126,29 @@ test('mobile workspace can pin current function', async ({ page }) => {
   expect(data.pins).toContain('roster');
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
+
+
+test('current fleet cards expose direct navigation actions', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([{
+      deckId:1,name:'第1艦隊',ships:[{name:'加賀改',masterId:90,level:94,gear:'烈風'}]
+    }]));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdKcEnsureImport?.();window.hdKcRenderCurrentFleets?.();
+    const card=document.querySelector('.hd-kc-deck');
+    return {
+      roster:!!card?.querySelector('[data-hd-kc-jump="roster"]'),
+      guide:!!card?.querySelector('[data-hd-kc-jump="guide"]'),
+      copy:!!card?.querySelector('[data-hd-kc-copy-deck="1"]'),
+      ship:card?.querySelector('[data-hd-kc-ship]')?.dataset.hdKcShip||''
+    };
+  });
+  expect(data.roster).toBe(true);
+  expect(data.guide).toBe(true);
+  expect(data.copy).toBe(true);
+  expect(data.ship).toBe('加賀改');
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
