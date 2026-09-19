@@ -10,11 +10,12 @@
  body.hd-workspace-mode section{scroll-margin-top:calc(var(--hd-topbar-h) + 94px)}
 }
 
-.hd-ws-mobile-picker{display:none;align-items:center;gap:8px;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)}
-.hd-ws-mobile-picker>span{font-size:9px;color:var(--muted);font-weight:800;white-space:nowrap}
+.hd-ws-mobile-picker{display:none;align-items:center;gap:7px;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)}
+.hd-ws-mobile-picker>span{font-size:9px;color:var(--accent2);font-weight:900;white-space:nowrap}
 .hd-ws-mobile-picker select{min-width:0;width:100%;background:#0d2234;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-size:11px;font-weight:700}
+.hd-ws-mobile-picker button{white-space:nowrap;padding:7px 9px;font-size:10px}
 @media(max-width:560px){
- .hd-ws-mobile-picker:not([hidden]){display:flex}
+ .hd-ws-mobile-picker:not([hidden]){display:grid;grid-template-columns:auto minmax(0,1fr) auto}
  .hd-ws-secondary{display:none!important}
 }
 
