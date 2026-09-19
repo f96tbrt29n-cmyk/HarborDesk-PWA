@@ -3,6 +3,8 @@ const HD_SHIP_IMAGE_STORE='images';
 const HD_SHIP_IMAGE_CONFIG_KEY='harbordesk-ship-image-config-v1';
 let HD_SHIP_IMAGE_DB_PROMISE=null;
 const HD_SHIP_IMAGE_OBJECT_URLS=new Map();
+const HD_SHIP_IMAGE_LOCAL_IDS=new Set();
+let HD_SHIP_IMAGE_LOCAL_IDS_READY=false;
 
 function hdShipImageEsc(s){return typeof hdShipDbEsc==='function'?hdShipDbEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdShipImageRows(){return Object.values(window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips||{})}
@@ -29,17 +31,31 @@ function hdShipImageOpenDb(){
 async function hdShipImageGet(id){
  try{const db=await hdShipImageOpenDb();return await new Promise((resolve,reject)=>{const tx=db.transaction(HD_SHIP_IMAGE_STORE,'readonly'),req=tx.objectStore(HD_SHIP_IMAGE_STORE).get(Number(id));req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>reject(req.error)})}catch{return null}
 }
-async function hdShipImagePut(id,file,name=''){
+async function hdShipImageRefreshLocalIds(){
+ try{
+  const db=await hdShipImageOpenDb(),keys=await new Promise((resolve,reject)=>{const tx=db.transaction(HD_SHIP_IMAGE_STORE,'readonly'),req=tx.objectStore(HD_SHIP_IMAGE_STORE).getAllKeys();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error)});
+  HD_SHIP_IMAGE_LOCAL_IDS.clear();for(const id of keys)HD_SHIP_IMAGE_LOCAL_IDS.add(Number(id));HD_SHIP_IMAGE_LOCAL_IDS_READY=true;return new Set(HD_SHIP_IMAGE_LOCAL_IDS);
+ }catch{HD_SHIP_IMAGE_LOCAL_IDS_READY=true;return new Set()}
+}
+function hdShipImageHasLocalSync(ref){
+ const row=hdShipImageResolve(ref);return !!(row?.id&&HD_SHIP_IMAGE_LOCAL_IDS.has(Number(row.id)));
+}
+async function hdShipImageCoverage(){
+ if(!HD_SHIP_IMAGE_LOCAL_IDS_READY)await hdShipImageRefreshLocalIds();
+ const total=hdShipImageRows().length,local=HD_SHIP_IMAGE_LOCAL_IDS.size;
+ return {local,total,missing:Math.max(0,total-local)};
+}
+async function hdShipImagePut(id,file,name='',silent=false){
  const row=hdShipImageResolve(id)||{id:Number(id),name:String(name||'')};if(!row?.id||!file)return false;
  const db=await hdShipImageOpenDb();
  await new Promise((resolve,reject)=>{const tx=db.transaction(HD_SHIP_IMAGE_STORE,'readwrite');tx.objectStore(HD_SHIP_IMAGE_STORE).put({id:Number(row.id),name:row.name||String(name||''),blob:file,type:file.type||'',updatedAt:Date.now()});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
- hdShipImageRevoke(row.id);window.dispatchEvent(new CustomEvent('hd:ship-images-changed',{detail:{id:row.id,name:row.name}}));return true;
+ HD_SHIP_IMAGE_LOCAL_IDS.add(Number(row.id));HD_SHIP_IMAGE_LOCAL_IDS_READY=true;hdShipImageRevoke(row.id);if(!silent)window.dispatchEvent(new CustomEvent('hd:ship-images-changed',{detail:{id:row.id,name:row.name}}));return true;
 }
 async function hdShipImageDelete(id){
- try{const db=await hdShipImageOpenDb();await new Promise((resolve,reject)=>{const tx=db.transaction(HD_SHIP_IMAGE_STORE,'readwrite');tx.objectStore(HD_SHIP_IMAGE_STORE).delete(Number(id));tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});hdShipImageRevoke(id);window.dispatchEvent(new CustomEvent('hd:ship-images-changed',{detail:{id:Number(id),deleted:true}}));return true}catch{return false}
+ try{const db=await hdShipImageOpenDb();await new Promise((resolve,reject)=>{const tx=db.transaction(HD_SHIP_IMAGE_STORE,'readwrite');tx.objectStore(HD_SHIP_IMAGE_STORE).delete(Number(id));tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});HD_SHIP_IMAGE_LOCAL_IDS.delete(Number(id));HD_SHIP_IMAGE_LOCAL_IDS_READY=true;hdShipImageRevoke(id);window.dispatchEvent(new CustomEvent('hd:ship-images-changed',{detail:{id:Number(id),deleted:true}}));return true}catch{return false}
 }
 async function hdShipImageCount(){
- try{const db=await hdShipImageOpenDb();return await new Promise((resolve,reject)=>{const tx=db.transaction(HD_SHIP_IMAGE_STORE,'readonly'),req=tx.objectStore(HD_SHIP_IMAGE_STORE).count();req.onsuccess=()=>resolve(Number(req.result)||0);req.onerror=()=>reject(req.error)})}catch{return 0}
+ if(!HD_SHIP_IMAGE_LOCAL_IDS_READY)await hdShipImageRefreshLocalIds();return HD_SHIP_IMAGE_LOCAL_IDS.size;
 }
 function hdShipImageRevoke(id){
  const old=HD_SHIP_IMAGE_OBJECT_URLS.get(Number(id));if(old){try{URL.revokeObjectURL(old)}catch{}HD_SHIP_IMAGE_OBJECT_URLS.delete(Number(id))}
@@ -81,19 +97,20 @@ function hdShipImageEnsureDialog(){
  return d;
 }
 async function hdShipImageOpenDialog(){
- const d=hdShipImageEnsureDialog(),n=await hdShipImageCount();d.querySelector('#hdShipImageCount').textContent=`${n}形態`;if(!d.open)d.showModal();
+ const d=hdShipImageEnsureDialog(),c=await hdShipImageCoverage();d.querySelector('#hdShipImageCount').textContent=`${c.local}/${c.total}形態・未登録${c.missing}`;if(!d.open)d.showModal();
 }
 async function hdShipImageImportFiles(files,targetId=0){
- let ok=0,skip=0;
+ let ok=0,skip=0;const skipped=[];
  for(const file of [...files||[]]){
-  if(!file.type?.startsWith('image/')){skip++;continue}
+  if(!file.type?.startsWith('image/')){skip++;skipped.push({file:file.name,reason:'画像形式ではない'});continue}
   let row=null;
   if(targetId)row=hdShipImageResolve(targetId);
   else{const stem=file.name.replace(/\.[^.]+$/,'').trim();row=hdShipImageResolve(stem)}
-  if(!row?.id){skip++;continue}
-  if(await hdShipImagePut(row.id,file,row.name))ok++;else skip++;
+  if(!row?.id){skip++;skipped.push({file:file.name,reason:'艦ID/艦名を解決できない'});continue}
+  if(await hdShipImagePut(row.id,file,row.name,true))ok++;else{skip++;skipped.push({file:file.name,reason:'保存に失敗'})}
  }
- return {ok,skip};
+ if(ok)window.dispatchEvent(new CustomEvent('hd:ship-images-changed',{detail:{bulk:true,ok,skip}}));
+ return {ok,skip,skipped};
 }
 document.addEventListener('click',async e=>{
  const upload=e.target.closest?.('[data-hd-ship-image-upload]');if(upload){
@@ -109,7 +126,10 @@ document.addEventListener('change',async e=>{
   const id=Number(e.target.dataset.targetId)||0,res=await hdShipImageImportFiles(e.target.files,id);if(res.ok)await hdShipImageHydrate(document);return;
  }
  if(e.target.id==='hdShipImageBulkInput'){
-  const d=hdShipImageEnsureDialog(),status=d.querySelector('#hdShipImageImportStatus'),res=await hdShipImageImportFiles(e.target.files);if(status)status.textContent=`取込 ${res.ok}件 / スキップ ${res.skip}件`;const n=await hdShipImageCount();const count=d.querySelector('#hdShipImageCount');if(count)count.textContent=`${n}形態`;await hdShipImageHydrate(document);return;
+  const d=hdShipImageEnsureDialog(),status=d.querySelector('#hdShipImageImportStatus'),res=await hdShipImageImportFiles(e.target.files),c=await hdShipImageCoverage();
+  if(status)status.innerHTML=`<b>取込 ${res.ok}件 / スキップ ${res.skip}件</b>${res.skipped.length?`<small>${res.skipped.slice(0,12).map(x=>`${hdShipImageEsc(x.file)}: ${hdShipImageEsc(x.reason)}`).join('<br>')}${res.skipped.length>12?`<br>ほか${res.skipped.length-12}件`:''}</small>`:''}`;
+  const count=d.querySelector('#hdShipImageCount');if(count)count.textContent=`${c.local}/${c.total}形態・未登録${c.missing}`;await hdShipImageHydrate(document);return;
  }
 });
-window.addEventListener('hd:ship-images-changed',()=>{hdShipImageHydrate(document);if(document.getElementById('hdShipImageDialog')?.open)hdShipImageCount().then(n=>{const x=document.getElementById('hdShipImageCount');if(x)x.textContent=`${n}形態`})});
+window.addEventListener('hd:ship-images-changed',()=>{hdShipImageHydrate(document);if(document.getElementById('hdShipImageDialog')?.open)hdShipImageCoverage().then(c=>{const x=document.getElementById('hdShipImageCount');if(x)x.textContent=`${c.local}/${c.total}形態・未登録${c.missing}`})});
+hdShipImageRefreshLocalIds().then(()=>window.dispatchEvent(new CustomEvent('hd:ship-images-ready',{detail:{count:HD_SHIP_IMAGE_LOCAL_IDS.size}})));
