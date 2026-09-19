@@ -48,9 +48,10 @@ function hdPLDemandRows(items=[]){
  for(const x of items){
   const target=x.target||x.wanted||'',key=hdPLDemandKey({...x,target});
   const cur=m.get(key)||{...x,target,needed:0,requiredTotal:0,qualifiedNeeded:0,ships:[],loadouts:[],sources:[]};
-  cur.needed+=Math.max(Number(x.needed)||1,0);
-  cur.requiredTotal=Math.max(Number(cur.requiredTotal)||0,Number(x.requiredTotal)||0);
-  cur.qualifiedNeeded=Math.max(Number(cur.qualifiedNeeded)||0,Number(x.qualifiedNeeded)||0,hdPLReqStar(x)?1:0);
+  const reqStar=hdPLReqStar(x),unit=Math.max(Number(x.needed)||1,Number(x.requiredTotal)||0);
+  if(reqStar){cur.needed=Math.max(Number(cur.needed)||0,unit);cur.requiredTotal=Math.max(Number(cur.requiredTotal)||0,Number(x.requiredTotal)||0)}
+  else{cur.needed=(Number(cur.needed)||0)+unit;cur.requiredTotal=(Number(cur.requiredTotal)||0)+(Number(x.requiredTotal)||0)}
+  cur.qualifiedNeeded=Math.max(Number(cur.qualifiedNeeded)||0,Number(x.qualifiedNeeded)||0,reqStar?1:0);
   cur.ships=[...new Set([...cur.ships,x.ship].filter(Boolean))];
   cur.loadouts=[...new Set([...cur.loadouts,x.loadout].filter(Boolean))];
   cur.sources=[...new Set([...(cur.sources||[]),...(x.sources||[])])];
