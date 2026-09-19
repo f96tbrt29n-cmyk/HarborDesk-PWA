@@ -51,7 +51,8 @@ function hdSPSFleetHtml(map,info){
  }
  const rows=info.ships.map((s,i)=>{
   const roster=s.ship?hdSPSRosterMatch(s.ship):null,db=s.ship?hdSPSDb(s.ship):null;
-  return `<div class="hd-sps-ship ${s.ship&&roster?'ok':s.ship?'warn':'note'}"><span>${i+1}</span><div><strong>${hdSPSEsc(s.ship||'艦娘未入力')}</strong><small>${roster?`Lv.${hdSPSEsc(roster.level||'?')}${roster.remodel?` ・ ${hdSPSEsc(roster.remodel)}`:''}`:'艦隊台帳に未登録'}${db?.speed?` ・ ${hdSPSEsc(db.speed)}`:''}</small><em>${hdSPSEsc(s.gear||'装備メモなし')}</em></div></div>`;
+  const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(s.ship,'sortie-prep-thumb'):'';
+  return `<div class="hd-sps-ship ${s.ship&&roster?'ok':s.ship?'warn':'note'}"><span>${i+1}</span>${image}<div><strong>${hdSPSEsc(s.ship||'艦娘未入力')}</strong><small>${roster?`Lv.${hdSPSEsc(roster.level||'?')}${roster.remodel?` ・ ${hdSPSEsc(roster.remodel)}`:''}`:'艦隊台帳に未登録'}${db?.speed?` ・ ${hdSPSEsc(db.speed)}`:''}</small><em>${hdSPSEsc(s.gear||'装備メモなし')}</em></div></div>`;
  }).join('');
  const fleetState=info.ships.length&&info.registered===info.ships.length?'ok':info.ships.length?'warn':'bad';
  return `<section class="hd-sps-card hd-sps-fleet"><div class="hd-sps-card-head"><div><span>艦隊</span><strong>${hdSPSEsc(info.fleet.name)}</strong></div><b class="${fleetState}">${info.registered}/${info.ships.length} 台帳確認</b></div>
@@ -136,6 +137,7 @@ function hdSPSRender(){
  host.innerHTML=`<div class="hd-sps-overview"><div><strong>準備状況 ${score}/4</strong><span>艦隊・装備・基地航空隊・出撃直前チェックを統合</span></div><div class="hd-sps-actions"><button type="button" class="ghost small" data-hd-sps-refresh>再判定</button><button type="button" class="ghost small" data-hd-sps-copy>準備表をコピー</button><button type="button" class="ghost small" data-hd-sps-guide>海域攻略へ戻る</button></div></div>
   <div class="hd-sps-grid">${hdSPSFleetHtml(map,fleet)}${hdSPSEquipmentHtml(map,fleet)}${hdSPSBaseHtml(map)}${hdSPSManualHtml(map,fleet)}</div>
   <div class="hd-sps-foot">※これはHarborDesk内に登録したデータから作る準備表。実際の耐久・疲労・補給、敵編成変化、索敵スコア、艦載機熟練度などは出撃前にゲーム画面で最終確認してね。</div>`;
+ if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
 }
 function hdSPSEnsure(){
  if(document.getElementById('hdSortiePreparation'))return;
@@ -166,5 +168,7 @@ document.addEventListener('click',e=>{
 });
 window.addEventListener('hd:map-rendered',()=>{hdSPSMapButton();hdSPSRender()});
 window.addEventListener('hd:workspace-refresh',hdSPSRender);
+window.addEventListener('hd:ship-images-changed',hdSPSRender);
+window.addEventListener('hd:ship-images-ready',hdSPSRender);
 window.addEventListener('storage',e=>{if([HD_SPS_EQUIP_KEY,'harbordesk-ship-roster-v1','harbordesk-custom-fleets-v1','harbordesk-land-base-v1','harbordesk-sortie-readiness-v1'].includes(e.key))hdSPSRender()});
 window.addEventListener('load',()=>setTimeout(()=>{hdSPSEnsure();hdSPSMapButton();hdSPSRender()},500));
