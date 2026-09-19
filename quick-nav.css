@@ -42,3 +42,14 @@ body.hd-workspace-mode{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
  body.hd-workspace-mode{padding-bottom:calc(82px + env(safe-area-inset-bottom))}
  body.hd-keyboard-open .hd-mobile-dock{opacity:0;pointer-events:none;transform:translate(-50%,12px)}
 }
+
+@media(max-width:560px){
+ .hd-mobile-dock [data-hd-mobile-home-badge]{
+  position:absolute;right:calc(50% - 19px);top:4px;
+  display:flex;align-items:center;justify-content:center;
+  min-width:16px;height:16px;padding:0 4px;border-radius:999px;
+  background:#e6a84f;color:#1e1507;font-size:9px;font-weight:900;font-style:normal;line-height:1;
+  box-shadow:0 0 0 2px rgba(8,24,38,.96)
+ }
+ .hd-mobile-dock [data-hd-mobile-home-badge][hidden]{display:none}
+}
