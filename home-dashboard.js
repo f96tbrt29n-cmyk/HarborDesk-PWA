@@ -29,6 +29,7 @@ function ensureHomeDashboard(){
  section.innerHTML=`
   <div class="section-head"><div><div class="eyebrow">HOME</div><h2>今日の司令部</h2></div><span class="muted" id="homeUpdated"></span></div>
   <article id="homeGameSync" class="home-sync-card"></article>
+  <article id="homeNextAction" class="home-next-action"></article>
   <div id="homeSummary" class="home-summary"></div>
   <div class="home-grid">
    <article class="home-card"><div class="home-card-title"><strong>今日やること</strong><a href="#quests">任務へ</a></div><div id="homeTodo"></div></article>
@@ -51,6 +52,8 @@ function renderHomeDashboard(){
  try{if(typeof state!=='undefined'){expeditions=state.expeditions||[];docks=state.docks||[];quests=state.quests||[];resources=state.resources||resources}}catch{}
  const running=[...expeditions.map(x=>({...x,kind:'遠征'})),...docks.map(x=>({...x,kind:'入渠'}))].filter(x=>x.endsAt>now).sort((a,b)=>a.endsAt-b.endsAt);
  const todo=quests.filter(x=>!x.done);
+ const nextTimer=running[0]||null,nextMs=nextTimer?Math.max(0,nextTimer.endsAt-now):Infinity;
+ const nextState=nextTimer?(nextMs<=15*60*1000?'urgent':nextMs<=60*60*1000?'soon':'normal'):(todo.length?'task':'clear');
  let rosterCount=0,equipCount=0,eventCount=0;
  try{rosterCount=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]').length}catch{}
  try{equipCount=JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]').length}catch{}
@@ -61,6 +64,18 @@ function renderHomeDashboard(){
  if(syncHost){
   syncHost.className='home-sync-card '+syncInfo.state;
   syncHost.innerHTML=sync?`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>${homeEsc(syncInfo.label)}</strong><small>艦娘 ${Number(sync.ships)||0} / 装備 ${Number(sync.equipment)||0} / 艦隊 ${Number(sync.decks)||0}</small></div><div class="home-sync-actions"><a class="ghost small" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面へ</button></div></div>${syncInfo.state==='warn'?'<div class="home-sync-note">少し時間が空いてるよ。艦これを開いた時にもう一度同期すると最新状態になる。</div>':''}`:`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>まだ同期してないよ</strong><small>艦娘・装備・資源・現在艦隊をまとめて取り込める</small></div><div class="home-sync-actions"><a class="primary small" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面</button></div></div>`;
+ }
+ const nextHost=document.getElementById('homeNextAction');
+ if(nextHost){
+  nextHost.className='home-next-action '+nextState;
+  if(nextTimer){
+   const mins=Math.ceil(nextMs/60000),timeText=typeof fmt==='function'?fmt(nextMs):(mins<60?mins+'分':Math.floor(mins/60)+'時間');
+   nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="expeditions"><span>次に終わる</span><strong>${homeEsc(nextTimer.kind)}・${homeEsc(nextTimer.name||'タイマー')}</strong><small>あと ${homeEsc(timeText)}</small></button><button type="button" class="ghost small" data-home-jump="expeditions">タイマーを見る</button>`;
+  }else if(todo.length){
+   nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="quests"><span>次にやること</span><strong>未完了任務 ${todo.length}件</strong><small>${homeEsc(todo[0]?.name||'任務を確認')}</small></button><button type="button" class="ghost small" data-home-jump="quests">任務を見る</button>`;
+  }else{
+   nextHost.innerHTML='<div class="home-next-main"><span>次にやること</span><strong>急ぎの項目はないよ</strong><small>ホームから各機能へすぐ移動できる</small></div>';
+  }
  }
  document.getElementById('homeSummary').innerHTML=`
    <button type="button" class="home-summary-item" data-home-jump="quests"><span>未完了任務</span><strong>${todo.length}</strong><small>任務へ</small></button>
