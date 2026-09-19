@@ -158,4 +158,4 @@ function updateNotifyButton(){
 document.getElementById('notifyBtn').onclick=async()=>{if(!('Notification'in window)){alert('このブラウザでは通知APIが使えないみたい');return}await Notification.requestPermission();updateNotifyButton()};
 updateNotifyButton();
 function tick(){const now=Date.now();document.querySelectorAll('.timer-time').forEach(el=>{const end=Number(el.dataset.end);el.textContent=fmt(end-now);el.closest('.timer')?.classList.toggle('done',end<=now)});for(const [kind,arr] of [['遠征',state.expeditions],['入渠',state.docks]])for(const t of arr){if(t.endsAt<=now&&!notified.has(t.id)){notified.add(t.id);if(Notification.permission==='granted')new Notification(`HarborDesk: ${kind}完了`,{body:`${t.name} が完了したよ`})}}}
-setInterval(tick,1000);if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));render();tick();
+setInterval(tick,1000);if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));render();tick();setTimeout(()=>{document.body?.classList.remove('hd-booting');document.body?.setAttribute('data-hd-boot-fallback','1')},8000);
