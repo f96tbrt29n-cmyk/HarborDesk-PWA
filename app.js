@@ -5,6 +5,23 @@ let timerKind='expedition';
 let notified=new Set();
 const GUIDE_VIEW_KEY='harbordesk-session-guide-view-v1';
 const TIMER_LAST_KEY='harbordesk-timer-last-v1';
+const TIMER_RECENT_KEY='harbordesk-timer-recent-v1';
+function timerRecentLoad(){try{return JSON.parse(localStorage.getItem(TIMER_RECENT_KEY)||'{}')||{}}catch{return {}}}
+function timerDurationLabel(minutes){
+ const m=Number(minutes)||0;if(m>0&&m%60===0)return (m/60)+'時間';if(m>=60)return Math.floor(m/60)+'時間'+(m%60)+'分';return m+'分';
+}
+function timerRecentSave(kind,name,minutes){
+ const all=timerRecentLoad(),rows=Array.isArray(all[kind])?all[kind]:[],n=String(name||'').trim(),m=Number(minutes)||0;
+ if(!n||m<=0)return rows;
+ const next=[{name:n,minutes:m},...rows.filter(x=>String(x?.name)!==n||Number(x?.minutes)!==m)].slice(0,6);
+ all[kind]=next;try{localStorage.setItem(TIMER_RECENT_KEY,JSON.stringify(all))}catch{}return next;
+}
+function renderTimerRecent(kind){
+ const host=document.getElementById('timerRecent');if(!host)return;
+ const rows=Array.isArray(timerRecentLoad()[kind])?timerRecentLoad()[kind]:[];
+ host.innerHTML=rows.map((x,i)=>`<button type="button" class="ghost small" data-timer-recent="${i}"><span>${esc(x.name)}</span><small>${timerDurationLabel(x.minutes)}</small></button>`).join('');
+ host.hidden=!rows.length;
+}
 const QUEST_RECENT_KEY='harbordesk-quest-recent-v1';
 function questRecentLoad(){try{return JSON.parse(localStorage.getItem(QUEST_RECENT_KEY)||'[]')||[]}catch{return []}}
 function questRecentSave(name){
@@ -25,6 +42,7 @@ function timerLastLoad(){try{return JSON.parse(localStorage.getItem(TIMER_LAST_K
 function timerLastSave(kind,name,minutes){
  const all=timerLastLoad();all[kind]={name:String(name||''),minutes:Number(minutes)||30};
  try{localStorage.setItem(TIMER_LAST_KEY,JSON.stringify(all))}catch{}
+ timerRecentSave(kind,name,minutes);
  return all[kind];
 }
 function guideViewLoad(){try{return JSON.parse(sessionStorage.getItem(GUIDE_VIEW_KEY)||'{}')||{}}catch{return {}}}
@@ -239,11 +257,17 @@ function openTimer(kind){
  document.getElementById('timerDialogTitle').textContent=kind==='expedition'?'遠征タイマー追加':'入渠タイマー追加';
  document.getElementById('timerName').value=String(saved.name||'');
  document.getElementById('timerMinutes').value=String(Number(saved.minutes)||30);
+ renderTimerRecent(kind);
  const dialog=document.getElementById('timerDialog');dialog.showModal();
  const name=document.getElementById('timerName');try{name.focus({preventScroll:true});if(name.value)name.select()}catch{}
 }
 
 document.addEventListener('click',e=>{
+ const timerRecent=e.target.closest?.('[data-timer-recent]');if(timerRecent){
+  const rows=timerRecentLoad()[timerKind]||[],row=rows[Number(timerRecent.dataset.timerRecent)];
+  if(row){const name=document.getElementById('timerName'),mins=document.getElementById('timerMinutes');if(name)name.value=String(row.name||'');if(mins)mins.value=String(Number(row.minutes)||30);try{name?.focus({preventScroll:true});name?.select()}catch{}}
+  return;
+ }
  const preset=e.target.closest?.('[data-timer-minutes]');if(preset){const input=document.getElementById('timerMinutes');if(input){input.value=preset.dataset.timerMinutes;try{input.focus({preventScroll:true})}catch{input.focus()}}return}
  const recent=e.target.closest?.('[data-quest-recent]');if(recent){const input=document.getElementById('questName');if(input){input.value=recent.dataset.questRecent||recent.textContent||'';try{input.focus({preventScroll:true});input.select()}catch{input.focus()}}}
 });
