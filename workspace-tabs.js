@@ -1,4 +1,5 @@
 const HD_WS_KEY='harbordesk-workspace-tabs-v1';
+const HD_WS_SCROLL_KEY='harbordesk-session-workspace-scroll-v1';
 const HD_WS_GROUPS=[
  {key:'home',label:'ホーム'},
  {key:'guide',label:'攻略'},
@@ -36,6 +37,16 @@ function hdWSActivePin(){
 
 function hdWSLoad(){try{const v=JSON.parse(localStorage.getItem(HD_WS_KEY)||'{}');return {group:v.group||'home',sections:v.sections||{}}}catch{return {group:'home',sections:{}}}}
 function hdWSSave(){localStorage.setItem(HD_WS_KEY,JSON.stringify(hdWSState))}
+function hdWSScrollLoad(){try{return JSON.parse(sessionStorage.getItem(HD_WS_SCROLL_KEY)||'{}')||{}}catch{return {}}}
+function hdWSSaveCurrentScroll(){
+ const section=hdWSVisibleSections(hdWSState.group).find(x=>!x.classList.contains('hd-ws-hidden'));if(!section)return;
+ const top=section.getBoundingClientRect().top+window.scrollY,offset=Math.max(0,Math.round(window.scrollY-top));
+ const all=hdWSScrollLoad();all[section.id]=offset;try{sessionStorage.setItem(HD_WS_SCROLL_KEY,JSON.stringify(all))}catch{}
+}
+function hdWSRestoreScroll(sectionId){
+ const section=document.getElementById(sectionId),saved=Number(hdWSScrollLoad()[sectionId]);if(!section||!Number.isFinite(saved))return false;
+ const top=section.getBoundingClientRect().top+window.scrollY;window.scrollTo({top:Math.max(0,top+saved),behavior:'instant'});return true;
+}
 function hdWSEsc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdWSJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}}
 function hdWSTitle(el){return el?.querySelector(':scope > .section-head h2,:scope > .section-head h3,:scope > h2,:scope > h3')?.textContent?.trim()||el?.querySelector('h2,h3')?.textContent?.trim()||el?.id||'機能'}
@@ -119,11 +130,13 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
   }
   hdWSRenderSubtabs(group,chosen);hdWSUpdateWrappers();hdWSUpdateBadges();
   document.getElementById('hdWorkspaceNav')?.querySelector(`[data-hd-ws-group="${group}"]`)?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
-  if(opts.scrollTop){const y=(document.getElementById('hdWorkspaceNav')?.offsetTop||0)-2;window.scrollTo({top:Math.max(0,y),behavior:'smooth'})}
+  if(opts.restoreScroll){setTimeout(()=>{if(!hdWSRestoreScroll(chosen)){const y=(document.getElementById('hdWorkspaceNav')?.offsetTop||0)-2;window.scrollTo({top:Math.max(0,y),behavior:'smooth'})}},0)}
+  else if(opts.scrollTop){const y=(document.getElementById('hdWorkspaceNav')?.offsetTop||0)-2;window.scrollTo({top:Math.max(0,y),behavior:'smooth'})}
   window.dispatchEvent(new CustomEvent('hd:workspace-changed',{detail:{group,section:chosen}}));
  }finally{hdWSApplying=false}
 }
 function hdWSShowElement(target,scroll=true){
+ hdWSSaveCurrentScroll();
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
  const section=hdWSManagedSectionFor(el);if(!section)return false;
  const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
@@ -161,13 +174,13 @@ function hdWSInstall(){
 }
 function hdWSHorizontalScroller(el){for(let n=el;n&&n!==document.body;n=n.parentElement){if(n.scrollWidth>n.clientWidth+12){const s=getComputedStyle(n);if(['auto','scroll'].includes(s.overflowX))return true}}return false}
 function hdWSSwipeBlocked(target){return !!target?.closest?.('input,textarea,select,button,a,dialog,[contenteditable="true"],.hd-ws-primary,.hd-ws-secondary')||hdWSHorizontalScroller(target)}
-function hdWSMoveGroup(dir){const i=HD_WS_GROUPS.findIndex(x=>x.key===hdWSState.group),next=HD_WS_GROUPS[i+dir];if(!next)return false;hdWSClearPin();hdWSApply(next.key,null,{scrollTop:true,ignorePin:true});return true}
+function hdWSMoveGroup(dir){const i=HD_WS_GROUPS.findIndex(x=>x.key===hdWSState.group),next=HD_WS_GROUPS[i+dir];if(!next)return false;hdWSSaveCurrentScroll();hdWSClearPin();hdWSApply(next.key,null,{restoreScroll:true,ignorePin:true});return true}
 function hdWSTouchStart(e){if(e.touches?.length!==1||hdWSSwipeBlocked(e.target))return;const t=e.touches[0];if(t.clientX<24||t.clientX>window.innerWidth-24)return;hdWSTouch={x:t.clientX,y:t.clientY,at:Date.now()}}
 function hdWSTouchEnd(e){if(!hdWSTouch)return;const t=e.changedTouches?.[0],start=hdWSTouch;hdWSTouch=null;if(!t)return;const dx=t.clientX-start.x,dy=t.clientY-start.y,dt=Date.now()-start.at;if(dt>800||Math.abs(dx)<72||Math.abs(dx)<Math.abs(dy)*1.35)return;hdWSMoveGroup(dx<0?1:-1)}
 
 document.addEventListener('click',e=>{
- const g=e.target.closest?.('[data-hd-ws-group]');if(g){hdWSClearPin();hdWSApply(g.dataset.hdWsGroup,null,{scrollTop:true,ignorePin:true});return}
- const s=e.target.closest?.('[data-hd-ws-section]');if(s){hdWSClearPin();hdWSApply(hdWSState.group,s.dataset.hdWsSection,{scrollTop:true,ignorePin:true});return}
+ const g=e.target.closest?.('[data-hd-ws-group]');if(g){hdWSSaveCurrentScroll();hdWSClearPin();hdWSApply(g.dataset.hdWsGroup,null,{restoreScroll:true,ignorePin:true});return}
+ const s=e.target.closest?.('[data-hd-ws-section]');if(s){hdWSSaveCurrentScroll();hdWSClearPin();hdWSApply(hdWSState.group,s.dataset.hdWsSection,{restoreScroll:true,ignorePin:true});return}
  const a=e.target.closest?.('a[href^="#"]');if(a&&hdWSHandleAnchor(a)){e.preventDefault();history.replaceState(null,'',a.getAttribute('href'))}
 },true);
 document.addEventListener('touchstart',hdWSTouchStart,{passive:true});
