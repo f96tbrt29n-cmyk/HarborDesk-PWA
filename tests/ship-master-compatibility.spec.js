@@ -6067,3 +6067,26 @@ test('mobile dock shows current section breadcrumb', async ({ page }) => {
   expect(data.aria).toContain('艦隊');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('mobile dock exposes direct back action', async ({ page }) => {
+  const errors=[];
+  await page.setViewportSize({width:390,height:844});
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdQNEnsure?.();
+    if(typeof hdWSApply==='function')hdWSApply('home','home',{ignorePin:true});
+    if(typeof hdWSShowElement==='function')hdWSShowElement('roster',false);
+    window.hdQNUpdateMobileDock?.();
+    const b=document.querySelector('[data-hd-mobile-back]');
+    const before={exists:!!b,disabled:!!b?.disabled,title:b?.title||''};
+    b?.click();
+    const active=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'';
+    return {before,active};
+  });
+  expect(data.before.exists).toBe(true);
+  expect(data.before.disabled).toBe(false);
+  expect(data.before.title).toContain('戻る');
+  expect(data.active).toBe('home');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
