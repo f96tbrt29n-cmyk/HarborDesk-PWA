@@ -67,3 +67,7 @@ button.home-next-main{cursor:pointer}
 .home-head-actions{display:flex;align-items:center;gap:7px}
 .home-head-actions [data-home-order-reset]{font-size:9px;padding:6px 8px}
 @media(max-width:520px){.home-head-actions{gap:5px}.home-head-actions [data-home-order-reset]{padding:5px 7px}}
+
+.home-task-row{grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.home-task-row .home-task-done{min-width:58px;padding:6px 9px;font-size:10px;color:#bff2cf;border-color:rgba(89,197,133,.36)}
+@media(max-width:520px){.home-task-row .home-task-done{min-height:36px}}
