@@ -9159,9 +9159,67 @@ function hdShipDbMasterSuggestedLoadouts(row){
  if(!out.length)add('汎用',Array.from(types).slice(0,slots),'公式マスターで装備可能なカテゴリから組んだ入口用の構成。');
  return out.slice(0,4).map(({key,...x})=>x);
 }
+function hdShipDbMasterOwnedStacks(){
+ let rows=[];try{const x=JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]');rows=Array.isArray(x)?x:[]}catch{}
+ const cat=hdShipDbEquipCatalog(),byName=new Map(cat.map(x=>[hdShipDbEquipNorm(x.name),x])),m=new Map();
+ for(const row of rows){
+  const name=String(row.name||'').trim(),norm=hdShipDbEquipNorm(name),count=Math.max(0,Number(row.count)||0),star=Math.max(0,Math.min(10,Number(row.star)||0));
+  if(!norm||!count)continue;
+  const key=norm+'|'+star,item=byName.get(norm)||{name,category:row.category||'',stats:{},tags:[],role:''},cur=m.get(key)||{key,norm,name,count:0,star,item};
+  cur.count+=count;m.set(key,cur);
+ }
+ return [...m.values()].sort((a,b)=>b.star-a.star||a.name.localeCompare(b.name,'ja'));
+}
+function hdShipDbMasterOwnedTotal(stacks,norm){return stacks.filter(x=>x.norm===norm).reduce((s,x)=>s+x.count,0)}
+function hdShipDbMasterWantedMatch(meta,wanted){
+ const type=String(meta?.typeName||''),w=String(wanted||'');
+ if(!type||!w)return false;
+ if(type===w)return true;
+ if(w==='小型電探')return /小型.*電探|小型電探/.test(type);
+ if(w==='大型電探')return /大型.*電探|大型電探/.test(type);
+ if(w==='爆雷')return /爆雷/.test(type);
+ if(w==='ソナー')return /ソナー/.test(type);
+ return false;
+}
+function hdShipDbMasterOwnedPickSlot(normal,free,wanted){
+ let slots=(normal?.allowedSlots||[]).filter(x=>free.has(x.index));if(!slots.length)return null;
+ const w=String(wanted||'');
+ if(/艦上戦闘機|艦上攻撃機|艦上爆撃機|水上戦闘機|水上爆撃機|噴式/.test(w))slots.sort((a,b)=>b.cap-a.cap||a.index-b.index);
+ else if(/偵察機/.test(w))slots.sort((a,b)=>a.cap-b.cap||b.index-a.index);
+ else slots.sort((a,b)=>a.index-b.index);
+ return slots[0]||null;
+}
+function hdShipDbMasterResolveOwnedPlan(row,plan){
+ const stacks=hdShipDbMasterOwnedStacks(),remaining=new Map(stacks.map(x=>[x.key,x.count])),free=new Set((row.slots||[]).map((_,i)=>i)),slots=[];
+ for(const wanted of (plan?.gear||[])){
+  const candidates=[];
+  for(const stack of stacks){
+   if((remaining.get(stack.key)||0)<=0)continue;
+   const meta=hdShipDbMasterEquipmentMeta(stack.name);if(!hdShipDbMasterWantedMatch(meta,wanted))continue;
+   const normal=hdShipDbMasterNormalCheck(row,stack.name);if(!normal.allowed)continue;
+   const pick=hdShipDbMasterOwnedPickSlot(normal,free,wanted);if(!pick)continue;
+   const score=(typeof hdShipDbEquipPower==='function'?hdShipDbEquipPower(stack.item,wanted):0)+stack.star*1.35+(Number(stack.item?.stats?.命中)||0)*.2;
+   candidates.push({stack,normal,pick,score});
+  }
+  candidates.sort((a,b)=>b.score-a.score||b.stack.star-a.stack.star||a.stack.name.localeCompare(b.stack.name,'ja'));
+  const best=candidates[0];
+  if(best){
+   remaining.set(best.stack.key,(remaining.get(best.stack.key)||0)-1);free.delete(best.pick.index);
+   slots.push({wanted,found:true,name:best.stack.name,star:best.stack.star,slotIndex:best.pick.index,capacity:best.pick.cap,ownedTotal:hdShipDbMasterOwnedTotal(stacks,best.stack.norm)});
+  }else slots.push({wanted,found:false,name:'',star:0,slotIndex:null,capacity:null,ownedTotal:0});
+ }
+ return {slots,filled:slots.filter(x=>x.found).length,total:slots.length,inventoryCount:stacks.reduce((s,x)=>s+x.count,0),freeSlots:[...free]};
+}
+function hdShipDbMasterOwnedPlanHtml(row,plan){
+ const r=hdShipDbMasterResolveOwnedPlan(row,plan);
+ if(!r.inventoryCount)return '<div class="hd-master-owned-plan empty"><b>手持ち装備</b><span>装備台帳が空。登録すると実物装備へ自動変換するよ。</span></div>';
+ const cls=r.filled===r.total?'complete':r.filled?'partial':'missing';
+ const rows=[...r.slots].sort((a,b)=>(a.slotIndex??99)-(b.slotIndex??99));
+ return `<div class="hd-master-owned-plan ${cls}"><div class="hd-master-owned-head"><b>手持ちで組む</b><span>${r.filled}/${r.total}枠</span></div><div class="hd-master-owned-items">${rows.map(x=>x.found?`<span class="owned"><i>✓</i><b>${hdShipDbEsc(x.name)}${x.star?` ★${x.star}`:''}</b><small>第${x.slotIndex+1}スロ・${x.capacity}機｜所持${x.ownedTotal}</small></span>`:`<span class="missing"><i>!</i><b>不足: ${hdShipDbEsc(x.wanted)}</b><small>装備台帳に候補なし</small></span>`).join('')}</div></div>`;
+}
 function hdShipDbMasterSuggestedHtml(row){
  const plans=hdShipDbMasterSuggestedLoadouts(row);if(!plans.length)return '';
- return `<details class="hd-shipdb-master-equip hd-shipdb-master-suggest"><summary>汎用おすすめ装備 ${plans.length}案</summary><div class="hd-shipdb-master-suggest-list">${plans.map(p=>`<div><b>${hdShipDbEsc(p.name)}</b><div class="hd-shipdb-roles">${p.gear.map(g=>`<span>${hdShipDbEsc(g)}</span>`).join('')}</div><small>${hdShipDbEsc(p.note)}</small></div>`).join('')}</div><p>カテゴリ単位の自動提案。実際の装備名・改修値・スロット位置は「装備可否」で確認してね。</p></details>`;
+ return `<details class="hd-shipdb-master-equip hd-shipdb-master-suggest"><summary>汎用おすすめ装備 ${plans.length}案</summary><div class="hd-shipdb-master-suggest-list">${plans.map(p=>`<div><b>${hdShipDbEsc(p.name)}</b><div class="hd-shipdb-roles">${p.gear.map(g=>`<span>${hdShipDbEsc(g)}</span>`).join('')}</div><small>${hdShipDbEsc(p.note)}</small>${hdShipDbMasterOwnedPlanHtml(row,p)}</div>`).join('')}</div><p>公式マスターのカテゴリ案を、装備台帳の所持数・改修★・装備可否・スロット位置制限まで見て実物装備へ変換。足りない枠は不足表示するよ。</p></details>`;
 }
 function hdShipDbMasterNext(row){return hdShipDbMasterSnapshot().allShips?.[String(row.afterId)]?.name||''}
 function hdShipDbMasterOwned(row){
