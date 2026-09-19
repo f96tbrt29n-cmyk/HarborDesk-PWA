@@ -2828,3 +2828,22 @@ test('workspace remembers per-section scroll offset', async ({ page }) => {
   expect(data.hasSave).toBe(true);
   expect(data.hasRestore).toBe(true);
 });
+
+
+test('quick nav exposes one-tap mobile actions', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdQNEnsure?.();
+    return {
+      home:!!document.querySelector('[data-hd-qn-home]'),
+      sync:!!document.querySelector('[data-hd-qn-sync]'),
+      game:document.querySelector('.hd-qn-actions a')?.getAttribute('href')||'',
+      top:!!document.querySelector('[data-hd-qn-top]')
+    };
+  });
+  expect(data.home).toBe(true);
+  expect(data.sync).toBe(true);
+  expect(data.game).toContain('play.games.dmm.com/game/kancolle');
+  expect(data.top).toBe(true);
+});
