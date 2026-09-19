@@ -4599,10 +4599,10 @@ test('Userscript panel can minimize without disappearing', async ({ page }) => {
   const data=await page.evaluate(async()=>{
     const text=await fetch('./HarborDesk-Kancolle.user.js',{cache:'no-store'}).then(r=>r.text());
     const oldUrl=location.href;
-    Object.defineProperty(window,'top',{value:window,configurable:true});
     new Function(text)();
     await new Promise(r=>setTimeout(r,20));
-    const api=window.__HARBORDESK_KANCOLLE_USERSCRIPT__,panel=document.getElementById('hd-kc-userscript-panel');
+    const api=window.__HARBORDESK_KANCOLLE_USERSCRIPT__;api?.show?.();
+    const panel=document.getElementById('hd-kc-userscript-panel');
     api?.setMinimized(true);
     const mini={exists:!!panel,hidden:!!panel?.hidden,bodyHidden:!!panel?.querySelector('[data-hd-panel-body]')?.hidden,label:panel?.querySelector('[data-hd-panel-name]')?.textContent||'',button:panel?.querySelector('[data-hd-minimize]')?.textContent||'',state:api?.isMinimized?.()};
     api?.setMinimized(false);
