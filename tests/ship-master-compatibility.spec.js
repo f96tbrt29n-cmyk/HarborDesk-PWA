@@ -1152,3 +1152,88 @@ test('ship image integrity audit fingerprints duplicates and invalid master IDs'
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('ship image verification manifest marks exact and mismatched fingerprints and survives backup', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    localStorage.removeItem('harbordesk-ship-image-verify-v1');
+    await window.hdShipImageDelete?.(541);
+    await window.hdShipImageDelete?.(573);
+
+    const a = new File([new Uint8Array([2,4,6,8,10,12])], '541.png', { type: 'image/png' });
+    const b = new File([new Uint8Array([1,3,5,7,9,11])], '573.png', { type: 'image/png' });
+    await window.hdShipImagePut?.(541, a, '長門改二', true);
+    await window.hdShipImagePut?.(573, b, '陸奥改二', true);
+
+    const rowA = await window.hdShipImageGet?.(541);
+    const rowB = await window.hdShipImageGet?.(573);
+    const wrong = rowB?.hash === '0'.repeat(64) ? 'f'.repeat(64) : '0'.repeat(64);
+    const manifestFile = new File([JSON.stringify({
+      format: 'harbordesk-ship-image-hashes',
+      version: 1,
+      source: 'test-reference',
+      hashes: {
+        '541': rowA?.hash || '',
+        '573': wrong
+      }
+    })], 'ship-image-hashes.json', { type: 'application/json' });
+
+    const manifest = await window.hdShipImageImportVerifyManifest?.(manifestFile);
+    const audit = await window.hdShipImageIntegrityAudit?.(true);
+
+    const wrap = document.createElement('div');
+    wrap.innerHTML =
+      (window.hdShipImageCardHtml?.({ id: 541, name: '長門改二' }) || '') +
+      (window.hdShipImageCardHtml?.({ id: 573, name: '陸奥改二' }) || '');
+    document.body.appendChild(wrap);
+    await window.hdShipImageHydrate?.(wrap);
+
+    const verifiedHost = wrap.querySelector('[data-hd-ship-image-host="541"]');
+    const mismatchHost = wrap.querySelector('[data-hd-ship-image-host="573"]');
+
+    const backup = await window.hdShipImageBuildBackup?.();
+    localStorage.removeItem('harbordesk-ship-image-verify-v1');
+    const cleared = window.hdShipImageVerifyLoad?.();
+    await window.hdShipImageImportBackup?.(backup.blob);
+    const restored = window.hdShipImageVerifyLoad?.();
+
+    const result = {
+      hashA: rowA?.hash || '',
+      hashB: rowB?.hash || '',
+      manifestCount: Object.keys(manifest?.hashes || {}).length,
+      verifyEntries: audit?.verifyEntries || 0,
+      verifiedIds: (audit?.verified || []).map(x => x.id),
+      mismatchIds: (audit?.mismatch || []).map(x => x.id),
+      verifiedClass: verifiedHost?.classList.contains('verify-verified') || false,
+      mismatchClass: mismatchHost?.classList.contains('verify-mismatch') || false,
+      backupVerifyCount: Object.keys(backup?.manifest?.verify?.hashes || {}).length,
+      clearedCount: Object.keys(cleared?.hashes || {}).length,
+      restoredCount: Object.keys(restored?.hashes || {}).length,
+      restoredSource: restored?.source || ''
+    };
+
+    wrap.remove();
+    localStorage.removeItem('harbordesk-ship-image-verify-v1');
+    await window.hdShipImageDelete?.(541);
+    await window.hdShipImageDelete?.(573);
+    return result;
+  });
+
+  expect(data.hashA).toMatch(/^[0-9a-f]{64}$/);
+  expect(data.hashB).toMatch(/^[0-9a-f]{64}$/);
+  expect(data.manifestCount).toBe(2);
+  expect(data.verifyEntries).toBe(2);
+  expect(data.verifiedIds).toContain(541);
+  expect(data.mismatchIds).toContain(573);
+  expect(data.verifiedClass).toBeTruthy();
+  expect(data.mismatchClass).toBeTruthy();
+  expect(data.backupVerifyCount).toBe(2);
+  expect(data.clearedCount).toBe(0);
+  expect(data.restoredCount).toBe(2);
+  expect(data.restoredSource).toBe('test-reference');
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
