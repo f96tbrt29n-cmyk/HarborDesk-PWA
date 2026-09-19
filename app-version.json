@@ -1,7 +1,7 @@
 {
-  "version": "1.0.159",
-  "build": 159,
-  "releasedAt": "2026-09-19T19:21:00+09:00",
-  "notes": "ConningTowerLite連携の試験機能を削除。専用UI、HAR/外部ログ互換変換、ConningTowerLite向け外部ブリッジ、専用回帰テストを撤去した。既存の艦これJSONファイル取込、クリップボード貼り付け、Safari用キャプチャ補助、艦娘・装備・資源・艦隊・遠征/入渠・任務・出撃ログ同期は維持。",
+  "version": "1.0.160",
+  "build": 160,
+  "releasedAt": "2026-09-19T20:00:00+09:00",
+  "notes": "iPhone/Safariの艦これ通信取込を簡略化。ブックマークレットに加えてiOSショートカットの「WebページでJavaScriptを実行」へ貼れる専用JSをワンタップでコピー可能にした。キャプチャ開始後は艦これ画面のパネルに「HarborDeskへ送る」を追加し、JSONコピー・画面切替・貼り付けをせずHarborDeskへpostMessageで直接受け渡して解析画面まで移動できる。従来のJSONコピー/保存・ブックマーク方式も維持。DMM認証情報、Cookie、api_token、リクエスト本文は保存しない。",
   "masterChanges": null
 }
