@@ -6015,3 +6015,31 @@ test('core state save broadcasts mobile attention refresh', async ({ page }) => 
   expect(data.last.quests.some(x=>x.name==='テスト任務')).toBe(true);
   expect(data.live.quests.some(x=>x.name==='テスト任務')).toBe(true);
 });
+
+
+test('mobile sync dock labels match sync state', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdQNEnsure?.();
+    const b=document.querySelector('[data-hd-mobile-sync]');
+    const read=()=>({label:b?.querySelector('b')?.textContent||'',icon:b?.querySelector('span')?.textContent||'',aria:b?.getAttribute('aria-label')||''});
+    sessionStorage.removeItem('harbordesk-kc-return-game-v1');
+    localStorage.removeItem('harbordesk-kancolle-sync-v1');
+    window.hdQNUpdateMobileDock?.();const missing=read();
+    localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({syncedAt:Date.now()-8*3600000,coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true}}));
+    window.hdQNUpdateMobileDock?.();const stale=read();
+    localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({syncedAt:Date.now(),coverage:{ships:true,equipment:false,resources:true,fleets:true,quests:false,docks:true}}));
+    window.hdQNUpdateMobileDock?.();const partial=read();
+    localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({syncedAt:Date.now(),coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true}}));
+    window.hdQNUpdateMobileDock?.();const fresh=read();
+    return {missing,stale,partial,fresh};
+  });
+  expect(data.missing.label).toBe('同期');
+  expect(data.stale.label).toBe('更新');
+  expect(data.partial.label).toBe('補完');
+  expect(data.fresh.label).toBe('最新');
+  expect(data.fresh.icon).toBe('✓');
+  expect(data.partial.aria).toContain('未取得');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
