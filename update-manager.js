@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.172';
-const HD_APP_BUILD=172;
+const HD_APP_VERSION='1.0.173';
+const HD_APP_BUILD=173;
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
 
@@ -140,7 +140,7 @@ async function hdLoadCurrentAssets(){
 function hdEnsureUpdateUI(){
   if(document.getElementById('hdUpdateBanner'))return;
   const banner=document.createElement('div');banner.id='hdUpdateBanner';banner.className='hd-update-banner';banner.hidden=true;
-  banner.innerHTML=`<div class="hd-update-main"><strong>HarborDeskの最新版があります</strong><div id="hdUpdateText" class="muted"></div><div id="hdUpdateChanges" class="hd-update-changes" hidden></div></div><button id="hdUpdateNow" class="primary small">今すぐ更新</button>`;
+  banner.innerHTML=`<div class="hd-update-main"><strong>HarborDeskの最新版があります</strong><div id="hdUpdateText" class="muted"></div><div id="hdUpdateChanges" class="hd-update-changes" hidden></div></div><button id="hdUpdateNow" type="button" class="primary small" onclick="hdForceUpdate()">今すぐ更新</button>`;
   document.body.appendChild(banner);
   const header=document.querySelector('.topbar');
   if(header&&!document.getElementById('hdUpdateCheck')){const controls=document.createElement('div');controls.className='hd-version-controls';controls.innerHTML=`<span class="hd-version-badge">v${HD_APP_VERSION}</span><button id="hdUpdateCheck" class="ghost small">更新確認</button>`;header.appendChild(controls)}
@@ -188,14 +188,40 @@ async function hdCheckForUpdate(showResult=false){
   }catch{if(showResult)alert('更新情報を確認できなかったよ。通信状態を確認してもう一度試してね。')}
   finally{if(btn){btn.disabled=false;btn.textContent='更新確認'}}
 }
+let HD_FORCE_UPDATE_BUSY=false;
 async function hdForceUpdate(){
+  if(HD_FORCE_UPDATE_BUSY)return false;
+  HD_FORCE_UPDATE_BUSY=true;
   const btn=document.getElementById('hdUpdateNow');
-  if(!navigator.onLine){alert('オフライン中はアプリキャッシュを再構築できないよ。通信できる状態で「更新確認」または「キャッシュ再構築」を使ってね。');return false}
+  if(!navigator.onLine){HD_FORCE_UPDATE_BUSY=false;alert('オフライン中は更新できないよ。通信できる状態で試してね。');return false}
   try{
-    if(btn){btn.disabled=true;btn.textContent='更新中…'}
-    if('serviceWorker' in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.update().catch(()=>null)))}
-    const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('harbordesk-pwa-')).map(k=>caches.delete(k)));
+    if(btn){btn.disabled=true;btn.textContent='強制更新中…'}
+    if('serviceWorker' in navigator){
+      const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.filter(r=>String(r.scope||'').includes('/HarborDesk-PWA/')).map(async r=>{
+        try{await r.update()}catch{}
+        try{await r.unregister()}catch{}
+      }));
+    }
+    if('caches' in window){
+      const keys=await caches.keys();
+      await Promise.all(keys.filter(k=>k.startsWith('harbordesk-pwa-')).map(k=>caches.delete(k)));
+    }
   }catch{}
-  const url=new URL(location.href);url.searchParams.set('v',Date.now().toString());location.replace(url.toString());
+  const url=new URL(location.origin+location.pathname);
+  url.searchParams.set('hd_update',String(HD_APP_BUILD));
+  url.searchParams.set('_',Date.now().toString());
+  location.assign(url.toString());
+  setTimeout(()=>{try{location.reload()}catch{}},1200);
+  return true;
 }
-window.addEventListener('load',()=>{hdEnsureServiceWorker();hdLoadCurrentAssets().catch(()=>{});hdEnsureUpdateUI();setTimeout(()=>hdCheckForUpdate(false),1200)});
+document.addEventListener('click',e=>{
+  if(e.target?.closest?.('#hdUpdateNow')){e.preventDefault();hdForceUpdate()}
+},true);
+window.addEventListener('load',()=>{
+  hdEnsureServiceWorker();hdLoadCurrentAssets().catch(()=>{});hdEnsureUpdateUI();
+  if(new URL(location.href).searchParams.has('hd_update')){
+    setTimeout(()=>{try{history.replaceState(null,'',location.pathname+location.hash)}catch{}},500);
+  }
+  setTimeout(()=>hdCheckForUpdate(false),1200)
+});
