@@ -99,7 +99,7 @@ function initShipRoster(){
  const filters=document.getElementById('shipRosterFilters');if(filters)filters.innerHTML=['all',...SHIP_TAGS].map(x=>`<button class="guide-chip ${x===savedFilter?'active':''}" data-roster-filter="${x}">${x==='all'?'すべて':x}</button>`).join('');
  const search=document.getElementById('shipRosterSearch');if(search){search.value=String(view.query||'');search.addEventListener('input',()=>{rosterViewSave({query:search.value});renderShipRoster()})}
  const sort=document.getElementById('shipRosterSort');if(sort){sort.value=['level','name','updated','type'].includes(view.sort)?view.sort:'level';sort.addEventListener('change',()=>{rosterViewSave({sort:sort.value});renderShipRoster()})}
- const compact=!!view.compact,section=document.getElementById('roster'),compactBtn=document.querySelector('[data-roster-compact]');
+ const compact=view.compact==null?!!window.matchMedia?.('(max-width:620px)')?.matches:!!view.compact,section=document.getElementById('roster'),compactBtn=document.querySelector('[data-roster-compact]');
  section?.classList.toggle('roster-compact',compact);if(compactBtn)compactBtn.textContent=compact?'詳細表示':'コンパクト';
  document.getElementById('addShipRoster')?.addEventListener('click',()=>openShipRosterDialog());
  renderShipRoster();
