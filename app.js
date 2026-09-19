@@ -4,6 +4,13 @@ const state=load();
 let timerKind='expedition';
 let notified=new Set();
 const GUIDE_VIEW_KEY='harbordesk-session-guide-view-v1';
+const TIMER_LAST_KEY='harbordesk-timer-last-v1';
+function timerLastLoad(){try{return JSON.parse(localStorage.getItem(TIMER_LAST_KEY)||'{}')||{}}catch{return {}}}
+function timerLastSave(kind,name,minutes){
+ const all=timerLastLoad();all[kind]={name:String(name||''),minutes:Number(minutes)||30};
+ try{localStorage.setItem(TIMER_LAST_KEY,JSON.stringify(all))}catch{}
+ return all[kind];
+}
 function guideViewLoad(){try{return JSON.parse(sessionStorage.getItem(GUIDE_VIEW_KEY)||'{}')||{}}catch{return {}}}
 function guideViewSave(patch={}){const next={...guideViewLoad(),...patch};try{sessionStorage.setItem(GUIDE_VIEW_KEY,JSON.stringify(next))}catch{}return next}
 const guideView=guideViewLoad();
@@ -202,10 +209,17 @@ function renderQuests(){
 }
 function renderResources(){['fuel','ammo','steel','bauxite'].forEach(k=>document.getElementById(k).value=state.resources[k]??'');document.getElementById('resourceSaved').textContent=state.resources.savedAt?`最終保存: ${new Date(state.resources.savedAt).toLocaleString('ja-JP')}`:''}
 function render(){renderGuide();renderTimers('expedition');renderTimers('dock');renderQuests();renderResources()}
-function openTimer(kind){timerKind=kind;document.getElementById('timerDialogTitle').textContent=kind==='expedition'?'遠征タイマー追加':'入渠タイマー追加';document.getElementById('timerName').value='';document.getElementById('timerMinutes').value='30';document.getElementById('timerDialog').showModal()}
+function openTimer(kind){
+ timerKind=kind;
+ const saved=timerLastLoad()[kind]||{};
+ document.getElementById('timerDialogTitle').textContent=kind==='expedition'?'遠征タイマー追加':'入渠タイマー追加';
+ document.getElementById('timerName').value=String(saved.name||'');
+ document.getElementById('timerMinutes').value=String(Number(saved.minutes)||30);
+ document.getElementById('timerDialog').showModal();
+}
 
 document.getElementById('addExpedition').onclick=()=>openTimer('expedition');document.getElementById('addDock').onclick=()=>openTimer('dock');document.getElementById('addQuest').onclick=()=>{document.getElementById('questName').value='';document.getElementById('questDialog').showModal()};
-document.getElementById('timerForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const name=document.getElementById('timerName').value.trim(),mins=Number(document.getElementById('timerMinutes').value);if(!name||!mins)return;(timerKind==='expedition'?state.expeditions:state.docks).push({id:uid(),name,endsAt:Date.now()+mins*60000});save();render();hdToast(`${name} を開始したよ`)});
+document.getElementById('timerForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const name=document.getElementById('timerName').value.trim(),mins=Number(document.getElementById('timerMinutes').value);if(!name||!mins)return;const startedAt=Date.now();timerLastSave(timerKind,name,mins);(timerKind==='expedition'?state.expeditions:state.docks).push({id:uid(),name,startedAt,durationMinutes:mins,endsAt:startedAt+mins*60000});save();render();hdToast(`${name} を開始したよ`)});
 document.getElementById('questForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const name=document.getElementById('questName').value.trim();if(!name)return;state.quests.push({id:uid(),name,done:false});save();renderQuests();hdToast(`${name} を追加したよ`)});
 document.addEventListener('change',e=>{if(e.target.matches('[data-quest-check]')){const q=state.quests.find(x=>x.id===e.target.dataset.questCheck);if(q){q.done=e.target.checked;save();renderQuests()}}});
 document.getElementById('saveResources').onclick=()=>{['fuel','ammo','steel','bauxite'].forEach(k=>state.resources[k]=document.getElementById(k).value);state.resources.savedAt=Date.now();save();renderResources();hdToast('資源を保存したよ')};
