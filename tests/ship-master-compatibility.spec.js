@@ -2614,7 +2614,7 @@ test('Safari capture helper sends data directly to HarborDesk', async ({ page })
     };
   });
 
-  expect(data.shortcutStartsWithFunction).toBe(true);
+  expect(data.shortcutStartsWithFunction).toBe(false);
   expect(data.shortcutHasJavascriptPrefix).toBe(false);
   expect(data.shortcutHasCompletion).toBe(true);
   expect(data.bookmarkletPrefix).toBe(true);
@@ -2633,5 +2633,41 @@ test('Safari capture helper sends data directly to HarborDesk', async ({ page })
   expect(data.ui.guideText).toContain('共有 → HarborDeskキャプチャ');
   expect(data.ui.guideText).toContain('クリップボード貼り付けは不要');
 
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
+
+
+test('Safari capture helper detects outer game iframe', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    const frame=document.createElement('iframe');
+    frame.id='game_frame';
+    frame.src='https://game.example.invalid/kancolle/';
+    frame.style.cssText='width:1200px;height:720px';
+    document.body.appendChild(frame);
+
+    window.hdKcCaptureBootstrap?.();
+    const cap=window.__HD_KC_CAPTURE;
+    const panel=document.getElementById('hd-kc-capture-panel');
+    const result={
+      mode:cap?.mode||'',
+      frameCount:cap?.frameCount||0,
+      frameUrl:cap?.frameUrl||'',
+      panelText:panel?.textContent||'',
+      hasOpenButton:!!panel?.querySelector('[data-hd-open-game]')
+    };
+    cap?.restore?.();
+    frame.remove();
+    return result;
+  });
+
+  expect(data.mode).toBe('outer');
+  expect(data.frameCount).toBeGreaterThan(0);
+  expect(data.frameUrl).toBe('https://game.example.invalid/kancolle/');
+  expect(data.panelText).toContain('DMMの外側ページを検出したよ');
+  expect(data.panelText).toContain('ゲーム本体を開く');
+  expect(data.hasOpenButton).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
