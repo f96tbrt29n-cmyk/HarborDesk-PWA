@@ -2911,3 +2911,28 @@ test('ship and equipment database compact modes restore from session', async ({ 
   expect(data.equipButton).toContain('詳細');
   expect(data.equipCount).toContain('/');
 });
+
+
+test('mobile workspace uses compact section picker', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  await page.setViewportSize({width:390,height:844});
+  const data=await page.evaluate(()=>{
+    window.hdWSApply?.('home','home');
+    const picker=document.getElementById('hdWorkspaceMobilePicker');
+    const select=document.getElementById('hdWorkspaceSectionSelect');
+    const style=picker?getComputedStyle(picker):null;
+    return {
+      exists:!!picker&&!!select,
+      display:style?.display||'',
+      options:select?.options?.length||0,
+      value:select?.value||'',
+      secondaryDisplay:getComputedStyle(document.getElementById('hdWorkspaceSubtabs')).display
+    };
+  });
+  expect(data.exists).toBe(true);
+  expect(data.display).toBe('flex');
+  expect(data.options).toBeGreaterThan(1);
+  expect(data.value).toBe('home');
+  expect(data.secondaryDisplay).toBe('none');
+});
