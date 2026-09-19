@@ -181,3 +181,10 @@ body.hd-booting::after{
  .guide-search input{min-width:0}
  .guide-search button{padding-left:10px;padding-right:10px}
 }
+
+.timer-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.timer-actions [data-restart-timer]{font-size:10px;padding:6px 9px;color:#bfe8ff}
+@media(max-width:520px){
+ .timer-actions [data-restart-timer]{min-height:36px}
+ .timer-actions .icon-btn{min-width:36px;min-height:36px}
+}
