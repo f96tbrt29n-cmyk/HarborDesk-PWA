@@ -8739,7 +8739,8 @@ function hdShipDbMasterAudit(){
  const ships=HD_SHIP_DATABASE.map(x=>x.final),missingProfiles=ships.filter(x=>!HD_SHIP_SLOT_PROFILES[x]);
  const badSlots=ships.filter(x=>{const p=HD_SHIP_SLOT_PROFILES[x];return p&&(!Array.isArray(p.slots)||p.slots.length!==p.count&&p.count!=null)});
  const ruleCount=Object.keys(HD_EXSLOT_ITEM_RULES||{}).length,starRuleCount=Object.values(HD_EXSLOT_ITEM_RULES||{}).filter(x=>Number(x.reqStar||0)>0).length;
- return {ships:ships.length,profiles:ships.length-missingProfiles.length,missingProfiles,badSlots,equipmentMasterCount:Object.keys(HD_EQUIPMENT_MASTER_META_BY_NAME||{}).length,exslotRules:ruleCount,starRules:starRuleCount,slotRules:HD_SLOT_EXCLUSION_RULES.length,pickerOverrides:Object.keys(HD_PICKER_TYPE_SP_OVERRIDES||{}).length+Object.keys(HD_PICKER_TYPE_OVERRIDES||{}).length,snapshotLoaded:window.HD_SHIP_MASTER_RUNTIME_SYNCED===true,pickerRulesLoaded:window.HD_SHIP_PICKER_RUNTIME_SYNCED===true,source:window.HD_SHIP_MASTER_RUNTIME_SOURCE||HD_SHIP_MASTER_SOURCE,pickerSource:window.HD_SHIP_PICKER_RUNTIME_SOURCE||null};
+ const masterForms=Object.keys(window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips||{}).length;
+ return {ships:ships.length,profiles:ships.length-missingProfiles.length,masterForms,missingProfiles,badSlots,equipmentMasterCount:Object.keys(HD_EQUIPMENT_MASTER_META_BY_NAME||{}).length,exslotRules:ruleCount,starRules:starRuleCount,slotRules:HD_SLOT_EXCLUSION_RULES.length,pickerOverrides:Object.keys(HD_PICKER_TYPE_SP_OVERRIDES||{}).length+Object.keys(HD_PICKER_TYPE_OVERRIDES||{}).length,snapshotLoaded:window.HD_SHIP_MASTER_RUNTIME_SYNCED===true,pickerRulesLoaded:window.HD_SHIP_PICKER_RUNTIME_SYNCED===true,source:window.HD_SHIP_MASTER_RUNTIME_SOURCE||HD_SHIP_MASTER_SOURCE,pickerSource:window.HD_SHIP_PICKER_RUNTIME_SOURCE||null};
 }
 window.HD_SHIP_MASTER_AUDIT=hdShipDbMasterAudit();
 function hdShipDbMapCandidates(detail){
@@ -8977,6 +8978,38 @@ function hdShipDbLoadoutsHtml(item){
  return `<div class="hd-shipdb-loadouts"><div class="hd-shipdb-stat-head"><b>おすすめ装備例</b><span>海域・特効・所持装備で調整</span></div>${sets.map(x=>`<article class="hd-shipdb-loadout"><strong>${hdShipDbEsc(x.name)}</strong><div class="hd-shipdb-gearchips">${x.gear.map(g=>`<span>${hdShipDbEsc(g)}</span>`).join('')}</div><p>${hdShipDbEsc(x.memo)}</p></article>`).join('')}</div>`;
 }
 
+function hdShipDbMasterSnapshot(){return window.HD_KANCOLLE_MASTER_SNAPSHOT||{}}
+function hdShipDbMasterRows(){return Object.values(hdShipDbMasterSnapshot().allShips||{})}
+function hdShipDbMasterSpeed(code){return ({5:'低速',10:'高速',15:'高速+',20:'最速'})[Number(code)]||`速力${Number(code)||0}`}
+function hdShipDbMasterRange(code){return ({0:'無',1:'短',2:'中',3:'長',4:'超長'})[Number(code)]||`射程${Number(code)||0}`}
+function hdShipDbMasterTypeMap(){
+ const m=new Map();
+ for(const x of Object.values(hdShipDbMasterSnapshot().equipment||{})){if(x?.typeId&&x?.typeName&&!m.has(String(x.typeId)))m.set(String(x.typeId),x.typeName)}
+ return m;
+}
+function hdShipDbMasterAllowedTypes(row){
+ const snap=hdShipDbMasterSnapshot(),rules=snap.shipEquipOverrides?.[String(row.id)]||snap.stypeEquipRules?.[String(row.stype)]||{},names=hdShipDbMasterTypeMap();
+ return Object.keys(rules).map(id=>names.get(String(id))||`装備種#${id}`).filter(Boolean);
+}
+function hdShipDbMasterNext(row){return hdShipDbMasterSnapshot().allShips?.[String(row.afterId)]?.name||''}
+function hdShipDbMasterOwned(row){
+ const rows=hdShipDbRoster().filter(x=>String(x.name||'').trim()===row.name);
+ return rows.sort((a,b)=>(Number(b.level)||0)-(Number(a.level)||0))[0]||null;
+}
+function hdShipDbMasterMatchesType(row,type){
+ if(type==='すべて')return true;
+ if(type==='高速戦艦')return row.type==='戦艦'&&Number(row.speed)>=10;
+ if(type==='航空戦艦')return row.type==='航空戦艦';
+ if(type==='装甲空母')return row.type==='装甲空母';
+ return row.type===type;
+}
+function hdShipDbMasterCardHtml(row){
+ const next=hdShipDbMasterNext(row),owned=hdShipDbMasterOwned(row),types=hdShipDbMasterAllowedTypes(row),showTypes=types.slice(0,12),rest=Math.max(0,types.length-showTypes.length),s=row.stats||{};
+ const remodel=next&&row.afterLv?`Lv.${row.afterLv} → ${next}`:'改装先なし / 最終形態';
+ return `<article class="hd-shipdb-card hd-shipdb-master-card"><div class="hd-shipdb-head"><div><strong>${hdShipDbEsc(row.name)}</strong><span>${hdShipDbEsc(row.type)}・${hdShipDbMasterSpeed(row.speed)}・${hdShipDbMasterRange(row.range)}</span></div><div class="hd-shipdb-master-badge"><b>MASTER</b><small>ID ${row.id}</small></div></div><div class="hd-shipdb-path">${hdShipDbEsc(remodel)}</div><div class="hd-shipdb-master-mini"><span>耐久 <b>${s.hp||0}</b></span><span>火力上限 <b>${s.fire||0}</b></span><span>雷装上限 <b>${s.torp||0}</b></span><span>対空上限 <b>${s.aa||0}</b></span><span>装甲上限 <b>${s.armor||0}</b></span><span>運上限 <b>${s.luck||0}</b></span></div><div class="hd-shipdb-master-slots">${(row.slots||[]).map((n,i)=>`<span><i>第${i+1}</i><b>${n}</b><small>機</small></span>`).join('')||'<span><b>通常スロットなし</b></span>'}</div><div class="hd-shipdb-substats"><span>燃料 <b>${row.fuel||0}</b></span><span>弾薬 <b>${row.ammo||0}</b></span><span>艦種ID <b>${row.stype}</b></span>${owned?`<span>台帳 <b>Lv.${Number(owned.level)||0}</b></span>`:''}</div><details class="hd-shipdb-master-equip"><summary>公式装備カテゴリ ${types.length}種</summary><div class="hd-shipdb-roles">${showTypes.map(x=>`<span>${hdShipDbEsc(x)}</span>`).join('')}${rest?`<span>ほか${rest}種</span>`:''}</div></details><p>api_start2自動同期の公式マスター参照。詳細な育成方針・用途別装備は詳細攻略DB収録艦のみ対応。</p><div class="hd-shipdb-actions"><button class="primary small" type="button" data-hd-shipmaster-add="${row.id}">台帳へ追加</button><a class="guide-link" href="https://wikiwiki.jp/kancolle/${encodeURIComponent(row.name)}" target="_blank" rel="noopener">Wiki ↗</a></div></article>`;
+}
+
+let hdShipDbIncludeMaster=true;
 let hdShipDbType='すべて';
 let hdShipDbMissingOnly=false;
 
@@ -8999,19 +9032,38 @@ function hdRenderShipDatabase(){
  const q=(document.getElementById('hdShipDbSearch')?.value||'').trim().toLowerCase();
  let rows=HD_SHIP_DATABASE.filter(x=>(hdShipDbType==='すべて'||x.type===hdShipDbType)&&(!q||`${x.base} ${x.final} ${x.type} ${x.roles.join(' ')} ${x.note} ${x.path} ${(HD_SHIP_LOADOUTS[x.final]||[]).flatMap(y=>[y.name,...y.gear,y.memo]).join(' ')}`.toLowerCase().includes(q)));
  if(hdShipDbMissingOnly)rows=rows.filter(x=>!hdShipDbOwned(x));
- const count=document.getElementById('hdShipDbCount');if(count)count.textContent=`${rows.length}隻`;
- list.innerHTML=rows.map(x=>{const s=hdShipDbStatus(x);return `<article class="hd-shipdb-card"><div class="hd-shipdb-head"><div><strong>${hdShipDbEsc(x.final)}</strong><span>${hdShipDbEsc(x.type)}・${hdShipDbEsc(x.speed)}</span></div><div class="hd-shipdb-status ${s.cls}"><b>${s.label}</b>${s.detail?`<small>${hdShipDbEsc(s.detail)}</small>`:''}</div></div><div class="hd-shipdb-path">${hdShipDbEsc(x.path)}</div><div class="hd-shipdb-require"><span>改装条件</span><strong>${hdShipDbEsc(x.requirements)}</strong></div><div class="hd-shipdb-roles">${x.roles.map(r=>`<span>${hdShipDbEsc(r)}</span>`).join('')}</div>${hdShipDbStatsHtml(x)}<p>${hdShipDbEsc(x.note)}</p><div class="hd-shipdb-actions"><button class="primary small" type="button" data-hd-shipdb-add="${hdShipDbEsc(x.base)}">台帳へ追加</button><a class="guide-link" href="https://wikiwiki.jp/kancolle/${encodeURIComponent(x.final)}" target="_blank" rel="noopener">Wiki ↗</a></div></article>`}).join('')||'<div class="empty">条件に合う艦娘がいないよ</div>';
+ const detailedHtml=rows.map(x=>{const s=hdShipDbStatus(x);return `<article class="hd-shipdb-card"><div class="hd-shipdb-head"><div><strong>${hdShipDbEsc(x.final)}</strong><span>${hdShipDbEsc(x.type)}・${hdShipDbEsc(x.speed)}</span></div><div class="hd-shipdb-status ${s.cls}"><b>${s.label}</b>${s.detail?`<small>${hdShipDbEsc(s.detail)}</small>`:''}</div></div><div class="hd-shipdb-path">${hdShipDbEsc(x.path)}</div><div class="hd-shipdb-require"><span>改装条件</span><strong>${hdShipDbEsc(x.requirements)}</strong></div><div class="hd-shipdb-roles">${x.roles.map(r=>`<span>${hdShipDbEsc(r)}</span>`).join('')}</div>${hdShipDbStatsHtml(x)}<p>${hdShipDbEsc(x.note)}</p><div class="hd-shipdb-actions"><button class="primary small" type="button" data-hd-shipdb-add="${hdShipDbEsc(x.base)}">台帳へ追加</button><a class="guide-link" href="https://wikiwiki.jp/kancolle/${encodeURIComponent(x.final)}" target="_blank" rel="noopener">Wiki ↗</a></div></article>`}).join('');
+ let masterRows=[];
+ if(q&&hdShipDbIncludeMaster){
+  const detailedNames=new Set(HD_SHIP_DATABASE.map(x=>x.final));
+  masterRows=hdShipDbMasterRows().filter(x=>!detailedNames.has(x.name)&&hdShipDbMasterMatchesType(x,hdShipDbType)&&(`${x.name} ${x.type}`.toLowerCase().includes(q)));
+  if(hdShipDbMissingOnly)masterRows=masterRows.filter(x=>!hdShipDbMasterOwned(x));
+  masterRows.sort((a,b)=>(a.sortno||99999)-(b.sortno||99999)||a.id-b.id);
+ }
+ const shown=masterRows.slice(0,80),masterHtml=shown.length?`<div class="hd-shipdb-master-group"><div class="hd-shipdb-master-group-head"><div><div class="eyebrow">OFFICIAL MASTER</div><strong>公式マスター参照</strong></div><span>${masterRows.length}件${masterRows.length>80?'・先頭80件表示':''}</span></div>${shown.map(hdShipDbMasterCardHtml).join('')}</div>`:'';
+ const count=document.getElementById('hdShipDbCount');if(count)count.textContent=q&&hdShipDbIncludeMaster?`詳細 ${rows.length} / マスター ${masterRows.length}`:`詳細 ${rows.length}隻`;
+ list.innerHTML=(detailedHtml||masterHtml)?detailedHtml+masterHtml:'<div class="empty">条件に合う艦娘がいないよ</div>';
 }
 function hdEnsureShipDatabase(){
  if(document.getElementById('shipDatabase'))return;
  const roster=document.getElementById('roster');if(!roster)return;
  const sec=document.createElement('section');sec.id='shipDatabase';sec.className='advanced-section';
  const types=['すべて',...new Set(HD_SHIP_DATABASE.map(x=>x.type))];
- sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">SHIP DATABASE</div><h2>艦娘データベース・改装計画</h2></div><span id="hdShipDbCount" class="muted"></span></div><div class="hd-shipdb-note">主要艦の改装Lv・必要アイテム・役割に加えて、Lv99最大ステータスと用途別おすすめ装備を確認。艦隊台帳のLvとも照合するよ。ステータスは攻略Wikiの現行Lv99最大値（装備補正なし）基準。通常スロット数・各搭載数・装備ID例外・補強増設可否は2026-09-16更新のapi_start2マスターを100隻すべて照合済み。</div><div class="hd-shipdb-toolbar"><input id="hdShipDbSearch" type="search" placeholder="艦名・艦種・役割で検索"><label><input id="hdShipDbMissingOnly" type="checkbox"> 未所持だけ</label></div><div class="hd-shipdb-filters">${types.map((t,i)=>`<button class="ghost small${i===0?' active':''}" type="button" data-hd-shipdb-filter="${hdShipDbEsc(t)}">${hdShipDbEsc(t)}</button>`).join('')}</div><div id="hdShipDbList" class="hd-shipdb-list"></div><div><a class="guide-link" href="https://wikiwiki.jp/kancolle/%E6%94%B9%E9%80%A0/%E8%89%A6%E7%A8%AE%E5%88%A5%E4%B8%80%E8%A6%A7" target="_blank" rel="noopener">攻略Wiki 改造一覧で最新情報 ↗</a></div>`;
+ const masterCount=hdShipDbMasterRows().length;
+ sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">SHIP DATABASE</div><h2>艦娘データベース・改装計画</h2></div><span id="hdShipDbCount" class="muted"></span></div><div class="hd-shipdb-note">詳細攻略DB ${HD_SHIP_DATABASE.length}隻＋公式マスター参照 ${masterCount}形態。詳細DBはLv99最大値・育成・用途別装備まで対応し、公式マスターはapi_start2自動同期で全形態の艦種・改装・スロット・搭載・装備可能カテゴリを検索できるよ。</div><div class="hd-shipdb-toolbar"><input id="hdShipDbSearch" type="search" placeholder="艦名・艦種・役割で検索"><label><input id="hdShipDbMissingOnly" type="checkbox"> 未所持だけ</label><label><input id="hdShipDbIncludeMaster" type="checkbox" checked> 全艦マスターも検索</label></div><div class="hd-shipdb-filters">${types.map((t,i)=>`<button class="ghost small${i===0?' active':''}" type="button" data-hd-shipdb-filter="${hdShipDbEsc(t)}">${hdShipDbEsc(t)}</button>`).join('')}</div><div id="hdShipDbList" class="hd-shipdb-list"></div><div><a class="guide-link" href="https://wikiwiki.jp/kancolle/%E6%94%B9%E9%80%A0/%E8%89%A6%E7%A8%AE%E5%88%A5%E4%B8%80%E8%A6%A7" target="_blank" rel="noopener">攻略Wiki 改造一覧で最新情報 ↗</a></div>`;
  roster.insertAdjacentElement('beforebegin',sec);
  document.getElementById('hdShipDbSearch').addEventListener('input',hdRenderShipDatabase);
  document.getElementById('hdShipDbMissingOnly').addEventListener('change',e=>{hdShipDbMissingOnly=e.target.checked;hdRenderShipDatabase()});
+ document.getElementById('hdShipDbIncludeMaster').addEventListener('change',e=>{hdShipDbIncludeMaster=e.target.checked;hdRenderShipDatabase()});
  hdRenderShipDatabase();
+}
+function hdShipDbAddMaster(id){
+ const item=hdShipDbMasterSnapshot().allShips?.[String(id)];if(!item)return;
+ if(typeof openShipRosterDialog==='function')openShipRosterDialog();
+ setTimeout(()=>{
+  const name=document.getElementById('rosterName'),remodel=document.getElementById('rosterRemodel'),memo=document.getElementById('rosterMemo'),next=hdShipDbMasterNext(item);
+  if(name)name.value=item.name;if(remodel)remodel.value='育成中';if(memo)memo.value=`公式マスターID ${item.id} / ${item.type}${next&&item.afterLv?` / Lv.${item.afterLv}→${next}`:''}`;
+ },0);
 }
 function hdShipDbAdd(base){
  const item=HD_SHIP_DATABASE.find(x=>x.base===base);if(!item)return;
@@ -9038,5 +9090,6 @@ document.addEventListener('click',e=>{const jump=e.target.closest?.('[data-hd-sh
 document.addEventListener('click',e=>{
  const f=e.target.closest?.('[data-hd-shipdb-filter]');if(f){hdShipDbType=f.dataset.hdShipdbFilter;document.querySelectorAll('[data-hd-shipdb-filter]').forEach(b=>b.classList.toggle('active',b===f));hdRenderShipDatabase();return}
  const add=e.target.closest?.('[data-hd-shipdb-add]');if(add){hdShipDbAdd(add.dataset.hdShipdbAdd);return}
+ const masterAdd=e.target.closest?.('[data-hd-shipmaster-add]');if(masterAdd){hdShipDbAddMaster(masterAdd.dataset.hdShipmasterAdd);return}
 });
 window.addEventListener('load',()=>setTimeout(hdEnsureShipDatabase,300));setTimeout(hdEnsureShipDatabase,500);
