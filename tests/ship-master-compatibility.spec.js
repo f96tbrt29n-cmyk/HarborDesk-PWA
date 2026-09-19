@@ -661,9 +661,11 @@ test('ship image coverage filter finds registered and missing exact forms', asyn
 
     document.querySelector('[data-hd-shipdb-image-filter="missing"]')?.click();
     const missingText = document.getElementById('hdShipDbList')?.textContent || '';
+    const missingHasNagato = !!document.querySelector('#hdShipDbList [data-hd-ship-image-host="541"]');
 
     document.querySelector('[data-hd-shipdb-image-filter="registered"]')?.click();
     const registeredText = document.getElementById('hdShipDbList')?.textContent || '';
+    const registeredHasNagato = !!document.querySelector('#hdShipDbList [data-hd-ship-image-host="541"]');
     const coverageText = document.getElementById('hdShipDbImageCoverage')?.textContent || '';
 
     await window.hdShipImageDelete?.(541);
@@ -673,7 +675,9 @@ test('ship image coverage filter finds registered and missing exact forms', asyn
       coverage,
       hasNagato,
       missingText,
+      missingHasNagato,
       registeredText,
+      registeredHasNagato,
       coverageText
     };
   });
@@ -685,7 +689,8 @@ test('ship image coverage filter finds registered and missing exact forms', asyn
   expect(data.coverage.local).toBeGreaterThanOrEqual(1);
   expect(data.coverage.total).toBeGreaterThan(data.coverage.local);
   expect(data.hasNagato).toBeTruthy();
-  expect(data.missingText).not.toContain('長門改二');
+  expect(data.missingHasNagato).toBeFalsy();
+  expect(data.registeredHasNagato).toBeTruthy();
   expect(data.registeredText).toContain('長門改二');
   expect(data.coverageText).toContain('画像');
 
