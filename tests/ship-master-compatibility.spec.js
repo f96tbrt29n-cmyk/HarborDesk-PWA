@@ -5920,3 +5920,25 @@ test('mobile dock shows current workspace group', async ({ page }) => {
   expect(data.context).toBe(true);
   expect(data.aria).toContain('艦隊');
 });
+
+
+test('quick nav surfaces current workspace sections', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    if(typeof hdWSApply==='function')hdWSApply('fleet','roster',{ignorePin:true});
+    window.hdQNEnsure?.();
+    window.hdQNRenderContext?.();
+    const host=document.getElementById('hdQNContext');
+    return {
+      hidden:!!host?.hidden,
+      labels:[...document.querySelectorAll('[data-hd-qn-context]')].map(x=>x.textContent.trim()),
+      ids:[...document.querySelectorAll('[data-hd-qn-context]')].map(x=>x.dataset.hdQnContext),
+      active:document.querySelector('[data-hd-qn-context].active')?.dataset.hdQnContext||''
+    };
+  });
+  expect(data.hidden).toBe(false);
+  expect(data.ids).toContain('roster');
+  expect(data.active).toBe('roster');
+  expect(data.labels.length).toBeGreaterThan(1);
+});
