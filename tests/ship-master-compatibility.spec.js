@@ -691,3 +691,81 @@ test('ship image coverage filter finds registered and missing exact forms', asyn
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('ship image binary backup round-trips exact master IDs and config', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    await window.hdShipImageDelete?.(541);
+    await window.hdShipImageDelete?.(573);
+
+    const a = new File([new Uint8Array([10,20,30,40])], '541.png', { type: 'image/png' });
+    const b = new File([new Uint8Array([50,60,70,80,90])], '573.webp', { type: 'image/webp' });
+    await window.hdShipImagePut?.(541, a, '長門改二', true);
+    await window.hdShipImagePut?.(573, b, '陸奥改二', true);
+    window.hdShipImageSaveConfig?.({ remoteTemplate: 'https://backup.example/card/{id}.png' });
+
+    const built = await window.hdShipImageBuildBackup?.();
+    const parsed = await window.hdShipImageReadBackup?.(built.blob);
+
+    await window.hdShipImageDelete?.(541);
+    await window.hdShipImageDelete?.(573);
+    window.hdShipImageSaveConfig?.({ remoteTemplate: '' });
+
+    const beforeRestore = {
+      a: await window.hdShipImageGet?.(541),
+      b: await window.hdShipImageGet?.(573),
+      config: window.hdShipImageConfig?.()
+    };
+
+    const restored = await window.hdShipImageImportBackup?.(built.blob);
+    const afterA = await window.hdShipImageGet?.(541);
+    const afterB = await window.hdShipImageGet?.(573);
+    const config = window.hdShipImageConfig?.();
+
+    const bytesA = afterA?.blob ? [...new Uint8Array(await afterA.blob.arrayBuffer())] : [];
+    const bytesB = afterB?.blob ? [...new Uint8Array(await afterB.blob.arrayBuffer())] : [];
+
+    await window.hdShipImageDelete?.(541);
+    await window.hdShipImageDelete?.(573);
+    window.hdShipImageSaveConfig?.({ remoteTemplate: '' });
+
+    return {
+      manifestFormat: built.manifest?.format,
+      manifestVersion: built.manifest?.version,
+      parsedIds: parsed.items?.map(x => x.id) || [],
+      beforeRestore: {
+        a: !!beforeRestore.a,
+        b: !!beforeRestore.b,
+        remote: beforeRestore.config?.remoteTemplate || ''
+      },
+      restored: { ok: restored?.ok || 0, total: restored?.total || 0 },
+      after: {
+        a: { id: afterA?.id, name: afterA?.name, type: afterA?.type, bytes: bytesA },
+        b: { id: afterB?.id, name: afterB?.name, type: afterB?.type, bytes: bytesB },
+        remote: config?.remoteTemplate || ''
+      }
+    };
+  });
+
+  expect(data.manifestFormat).toBe('harbordesk-ship-images');
+  expect(data.manifestVersion).toBe(1);
+  expect(data.parsedIds).toEqual(expect.arrayContaining([541, 573]));
+  expect(data.beforeRestore.a).toBeFalsy();
+  expect(data.beforeRestore.b).toBeFalsy();
+  expect(data.beforeRestore.remote).toBe('');
+  expect(data.restored.ok).toBeGreaterThanOrEqual(2);
+  expect(data.after.a.id).toBe(541);
+  expect(data.after.a.name).toBe('長門改二');
+  expect(data.after.a.type).toBe('image/png');
+  expect(data.after.a.bytes).toEqual([10,20,30,40]);
+  expect(data.after.b.id).toBe(573);
+  expect(data.after.b.name).toBe('陸奥改二');
+  expect(data.after.b.type).toBe('image/webp');
+  expect(data.after.b.bytes).toEqual([50,60,70,80,90]);
+  expect(data.after.remote).toBe('https://backup.example/card/{id}.png');
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
