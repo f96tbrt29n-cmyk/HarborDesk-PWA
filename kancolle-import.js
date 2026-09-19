@@ -509,6 +509,7 @@ async function hdKcConsumeHashImport(){
   const result=document.getElementById('hdKcImportResult');
   if(result)result.textContent=`Userscriptsから自動同期完了: 艦娘 ${sync.ships} / 装備 ${sync.equipment} / 資源 ${sync.materials} / 艦隊 ${sync.decks} / 遠征 ${sync.expeditions||0} / 入渠 ${sync.docks||0} / 任務 ${sync.quests||0} / 出撃 ${sync.sorties||0}`;
   const sec=document.getElementById('kancolleImport');if(sec)sec.scrollIntoView({block:'start'});
+  sessionStorage.setItem('harbordesk-kc-return-game-v1','1');
   HD_KC_IMPORT_PREVIEW=null;hdKcRenderSyncStatus();if(typeof renderAllAdvanced==='function')renderAllAdvanced();
   return true;
  }catch(err){
