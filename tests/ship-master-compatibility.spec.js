@@ -3046,3 +3046,23 @@ test('mobile header keeps notification and update controls compact', async ({ pa
   expect(data.updateLabel).toContain('更新');
   expect(data.version).toContain('v');
 });
+
+
+test('home dashboard promotes the next timer', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const now=Date.now();
+    if(typeof state!=='undefined'){
+      state.expeditions=[{name:'東京急行',endsAt:now+10*60*1000}];
+      state.docks=[{name:'入渠1',endsAt:now+45*60*1000}];
+      state.quests=[{name:'任務A',done:false}];
+    }
+    window.renderHomeDashboard?.();
+    const el=document.getElementById('homeNextAction');
+    return {text:el?.textContent||'',urgent:el?.classList.contains('urgent')||false};
+  });
+  expect(data.text).toContain('東京急行');
+  expect(data.text).toContain('次に終わる');
+  expect(data.urgent).toBe(true);
+});
