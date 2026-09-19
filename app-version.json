@@ -1,7 +1,7 @@
 {
-  "version": "1.0.160",
-  "build": 160,
-  "releasedAt": "2026-09-19T20:00:00+09:00",
-  "notes": "iPhone/Safariの艦これ通信取込を簡略化。ブックマークレットに加えてiOSショートカットの「WebページでJavaScriptを実行」へ貼れる専用JSをワンタップでコピー可能にした。キャプチャ開始後は艦これ画面のパネルに「HarborDeskへ送る」を追加し、JSONコピー・画面切替・貼り付けをせずHarborDeskへpostMessageで直接受け渡して解析画面まで移動できる。従来のJSONコピー/保存・ブックマーク方式も維持。DMM認証情報、Cookie、api_token、リクエスト本文は保存しない。",
+  "version": "1.0.161",
+  "build": 161,
+  "releasedAt": "2026-09-19T20:16:00+09:00",
+  "notes": "iPhoneショートカット用の艦これキャプチャJavaScriptが、Safariの「WebページでJavaScriptを実行」アクションで正常終了できるよう completion() コールバックを追加。初回設定後は共有シートからキャプチャ開始し、ゲーム画面の「HarborDeskへ送る」で直接受け渡しできる。",
   "masterChanges": null
 }
