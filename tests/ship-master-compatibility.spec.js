@@ -3877,3 +3877,28 @@ test('home timer cancel supports undo', async ({ page }) => {
   expect(data.homeText).toContain('動いているタイマーはない');
   expect(data.resourceSync).toBe(true);
 });
+
+
+test('guide view restores query filter and selected map in session', async ({ page }) => {
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-guide-view-v1', JSON.stringify({
+      query:'遠征',filter:'expedition',world:'5',map:'5-5'
+    }));
+  });
+  await boot(page,[]);
+  const data=await page.evaluate(()=>({
+    query:document.getElementById('guideQuery')?.value||'',
+    filter:document.querySelector('[data-guide-filter].active')?.dataset.guideFilter||'',
+    selected:document.querySelector('[data-map].active')?.dataset.map||'',
+    resetHidden:document.getElementById('guideResetBtn')?.hidden
+  }));
+  expect(data.query).toBe('遠征');
+  expect(data.filter).toBe('expedition');
+  expect(data.selected).toBe('5-5');
+  expect(data.resetHidden).toBe(false);
+  await page.click('#guideResetBtn');
+  expect(await page.inputValue('#guideQuery')).toBe('');
+  const resetState=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('harbordesk-session-guide-view-v1')||'{}'));
+  expect(resetState.filter).toBe('all');
+  expect(resetState.map).toBe('');
+});
