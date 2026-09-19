@@ -130,3 +130,6 @@ button.home-next-main{cursor:pointer}
  .home-head-actions [data-home-edit-toggle]{padding:5px 7px}
  .home-dashboard.home-editing .home-card-actions{flex-wrap:wrap}
 }
+
+.home-sync-card.partial{border-color:rgba(239,191,93,.45);background:rgba(96,68,23,.18)}
+.home-sync-card.partial .home-sync-main>div>strong{color:#f1d28a}
