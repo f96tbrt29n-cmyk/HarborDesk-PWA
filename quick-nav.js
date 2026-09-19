@@ -51,31 +51,52 @@ function hdQNEnsureMobileDock(){
  if(document.getElementById('hdMobileDock'))return;
  const dock=document.createElement('nav');dock.id='hdMobileDock';dock.className='hd-mobile-dock';dock.setAttribute('aria-label','主要操作');
  dock.innerHTML='<button type="button" data-hd-mobile-home><span>⌂</span><b>ホーム</b><em data-hd-mobile-home-badge hidden>0</em></button><button type="button" data-hd-mobile-search><span>⌕</span><b>検索</b></button><button type="button" data-hd-mobile-sync><span>↻</span><b>同期</b><i aria-hidden="true"></i></button><button type="button" data-hd-mobile-menu><span>☰</span><b>機能</b></button>';
- document.body.appendChild(dock);hdQNUpdateMobileDock();
+ document.body.appendChild(dock);hdQNEnsureAttentionDialog();hdQNUpdateMobileDock();
 }
-function hdQNMobileAttentionMeta(){
- const reasons=[],now=Date.now();
+function hdQNMobileAttentionItems(){
+ const items=[],now=Date.now();
  try{
   const appState=window.state||{};
   const quests=Array.isArray(appState.quests)?appState.quests:[];
   const expeditions=Array.isArray(appState.expeditions)?appState.expeditions:[];
   const docks=Array.isArray(appState.docks)?appState.docks:[];
-  if(quests.some(x=>!x.done))reasons.push('未完了任務');
-  if(expeditions.some(x=>Number(x.endsAt)>now&&Number(x.endsAt)-now<=15*60*1000))reasons.push('遠征まもなく終了');
-  if(docks.some(x=>Number(x.endsAt)>now&&Number(x.endsAt)-now<=15*60*1000))reasons.push('入渠まもなく終了');
+  const todo=quests.filter(x=>!x.done);
+  if(todo.length)items.push({id:'quests',reason:'未完了任務',icon:'✓',title:`未完了任務 ${todo.length}件`,detail:String(todo[0]?.name||'任務一覧を確認')});
+  const nearExp=expeditions.filter(x=>Number(x.endsAt)>now&&Number(x.endsAt)-now<=15*60*1000).sort((a,b)=>Number(a.endsAt)-Number(b.endsAt));
+  if(nearExp.length){const m=Math.max(1,Math.ceil((Number(nearExp[0].endsAt)-now)/60000));items.push({id:'expeditions',reason:'遠征まもなく終了',icon:'↗',title:`遠征まもなく帰投 ${nearExp.length}件`,detail:`${nearExp[0].name||'遠征'}・あと約${m}分`})}
+  const nearDock=docks.filter(x=>Number(x.endsAt)>now&&Number(x.endsAt)-now<=15*60*1000).sort((a,b)=>Number(a.endsAt)-Number(b.endsAt));
+  if(nearDock.length){const m=Math.max(1,Math.ceil((Number(nearDock[0].endsAt)-now)/60000));items.push({id:'docks',reason:'入渠まもなく終了',icon:'♨',title:`入渠まもなく完了 ${nearDock.length}件`,detail:`${nearDock[0].name||'入渠'}・あと約${m}分`})}
  }catch{}
  try{
-  const syncState=typeof hdWSSyncInfo==='function'?hdWSSyncInfo().state:'missing';
-  if(syncState&&syncState!=='fresh')reasons.push('ゲーム同期確認');
- }catch{reasons.push('ゲーム同期確認')}
- return {count:Math.min(9,reasons.length),reasons};
+  const info=typeof hdWSSyncInfo==='function'?hdWSSyncInfo():{state:'missing',label:'未同期'};
+  if(info.state&&info.state!=='fresh'){
+   const title=info.state==='missing'?'ゲームデータ未同期':info.state==='partial'?'ゲーム同期を補完':'ゲーム同期が古い';
+   items.push({id:'kancolleImport',reason:'ゲーム同期確認',icon:'↻',title,detail:String(info.label||'同期画面を確認')});
+  }
+ }catch{items.push({id:'kancolleImport',reason:'ゲーム同期確認',icon:'↻',title:'ゲーム同期を確認',detail:'同期画面を開く'})}
+ return items;
 }
+function hdQNMobileAttentionMeta(){const items=hdQNMobileAttentionItems();return {count:Math.min(9,items.length),reasons:items.map(x=>x.reason),items}}
 function hdQNMobileAttentionCount(){return hdQNMobileAttentionMeta().count}
+function hdQNEnsureAttentionDialog(){
+ if(document.getElementById('hdMobileAttentionDialog'))return;
+ const d=document.createElement('dialog');d.id='hdMobileAttentionDialog';d.className='hd-mobile-attention-dialog';
+ d.innerHTML='<div class="hd-mobile-attention-head"><div><div class="eyebrow">ATTENTION</div><h3>要対応</h3></div><button type="button" class="ghost small" data-hd-attention-close>閉じる</button></div><div id="hdMobileAttentionList" class="hd-mobile-attention-list"></div>';
+ document.body.appendChild(d);
+ d.addEventListener('click',e=>{if(e.target===d)hdQNCloseAttention()});
+}
+function hdQNOpenAttention(){
+ hdQNEnsureAttentionDialog();
+ const d=document.getElementById('hdMobileAttentionDialog'),host=document.getElementById('hdMobileAttentionList');if(!d||!host)return false;
+ const items=hdQNMobileAttentionItems();
+ host.innerHTML=items.length?items.map(x=>`<button type="button" data-hd-attention-jump="${hdQNEsc(x.id)}"><span>${hdQNEsc(x.icon)}</span><div><strong>${hdQNEsc(x.title)}</strong><small>${hdQNEsc(x.detail)}</small></div><i>›</i></button>`).join(''):'<div class="empty">今すぐ対応が必要な項目はないよ。</div>';
+ if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');
+ return true;
+}
+function hdQNCloseAttention(){const d=document.getElementById('hdMobileAttentionDialog');if(!d)return;if(typeof d.close==='function'&&d.open)d.close();else d.removeAttribute('open')}
 function hdQNMobileHome(){
  const active=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup==='home',attention=hdQNMobileAttentionMeta();
- if(active&&attention.count>0){
-  const target=document.getElementById('homeNextAction');if(target){target.scrollIntoView({behavior:'smooth',block:'center'});target.classList.add('hd-qn-flash');setTimeout(()=>target.classList.remove('hd-qn-flash'),900);return true}
- }
+ if(active&&attention.count>0)return hdQNOpenAttention();
  if(typeof hdWSShowElement==='function')return hdWSShowElement('home',true);
  const home=document.getElementById('home');if(home){home.scrollIntoView({behavior:'smooth',block:'start'});return true}
  return false;
@@ -87,7 +108,7 @@ function hdQNUpdateMobileDock(){
  home?.classList.toggle('active',activeGroup==='home'&&!searchOpen&&!menuOpen);
  search?.classList.toggle('active',searchOpen);
  menu?.classList.toggle('active',menuOpen);
- const attention=hdQNMobileAttentionMeta();if(badge){badge.textContent=String(attention.count);badge.hidden=attention.count<=0}
+ const attention=hdQNMobileAttentionMeta();if(badge){badge.textContent=String(attention.count);badge.hidden=attention.count<=0;badge.setAttribute('aria-label',attention.count?`要対応 ${attention.count}件`:'要対応なし')}
  if(home){const detail=attention.reasons.join('・');home.setAttribute('aria-label',attention.count?('ホーム・確認項目 '+detail):'ホーム');home.title=detail}
  if(sync){sync.classList.remove('fresh','stale','partial','missing');let state='missing';try{state=typeof hdWSSyncInfo==='function'?(hdWSSyncInfo().state||'missing'):'missing'}catch{}sync.classList.add(state)}
 }
@@ -109,6 +130,9 @@ function hdQNLoadDiagnostics(){
 }
 
 document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-hd-mobile-home-badge]')){hdQNOpenAttention();return}
+  if(e.target.closest?.('[data-hd-attention-close]')){hdQNCloseAttention();return}
+  const attentionJump=e.target.closest?.('[data-hd-attention-jump]');if(attentionJump){const id=attentionJump.dataset.hdAttentionJump;hdQNCloseAttention();if(typeof hdWSShowElement==='function')hdWSShowElement(id,true);else document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});return}
   if(e.target.closest?.('[data-hd-mobile-home]')){hdQNMobileHome();return}
   if(e.target.closest?.('[data-hd-mobile-search]')){if(typeof hdGSOpen==='function')hdGSOpen();return}
   if(e.target.closest?.('[data-hd-mobile-sync]')){if(typeof hdWSOpenSyncStatus==='function')hdWSOpenSyncStatus();else hdQNJump('kancolleImport');return}
