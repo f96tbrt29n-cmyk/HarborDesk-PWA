@@ -1,7 +1,7 @@
 {
-  "version": "1.0.168",
-  "build": 168,
-  "releasedAt": "2026-09-19T21:55:00+09:00",
-  "notes": "Userscripts艦これ連携の対象ドメインを拡張。現在のkancolle-server.com系ゲームサーバーと125.6.*.*系旧サーバーにもdocument-start/page-contextで注入し、ゲーム本体フレームのkcsapi通信を取得できるよう修正。",
+  "version": "1.0.169",
+  "build": 169,
+  "releasedAt": "2026-09-19T22:23:00+09:00",
+  "notes": "Userscripts艦これ連携の送信方式をSafariポップアップから同一タブの圧縮ハンドオフへ変更。『HarborDeskへ送る』で同じタブがHarborDeskへ移動し、URLフラグメント内の端末内データを展開して自動同期するため、Safariのポップアップ許可が不要。",
   "masterChanges": null
 }
