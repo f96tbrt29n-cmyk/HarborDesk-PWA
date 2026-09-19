@@ -5622,3 +5622,20 @@ test('sortie manual checks invalidate when fleet changes', async ({ page }) => {
   expect(data.resetReason).toBe(true);
   expect(data.safeMerge).toBe(true);
 });
+
+
+test('home shows sortie manual reset reason', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const source=await fetch('./home-dashboard.js',{cache:'no-store'}).then(r=>r.text());
+    return {
+      carriesReason:source.includes("resetReason=String(state?._resetReason||'')"),
+      relabels:source.includes("sortieInfo.resetReason?'再確認が必要'"),
+      retitles:source.includes("'手動チェックをやり直す'")
+    };
+  });
+  expect(data.carriesReason).toBe(true);
+  expect(data.relabels).toBe(true);
+  expect(data.retitles).toBe(true);
+});
