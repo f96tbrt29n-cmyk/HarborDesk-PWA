@@ -78,6 +78,18 @@ function hdQNMobileAttentionItems(){
 }
 function hdQNMobileAttentionMeta(){const items=hdQNMobileAttentionItems();return {count:Math.min(9,items.length),reasons:items.map(x=>x.reason),items}}
 function hdQNMobileAttentionCount(){return hdQNMobileAttentionMeta().count}
+function hdQNMobileGroupMeta(group){
+ const map={
+  guide:{icon:'🗺',label:'攻略'},
+  fleet:{icon:'⚓',label:'艦隊'},
+  quest:{icon:'✓',label:'任務'},
+  expedition:{icon:'⏱',label:'遠征'},
+  arsenal:{icon:'⚒',label:'工廠'},
+  records:{icon:'▤',label:'記録'},
+  settings:{icon:'⚙',label:'設定'}
+ };
+ return map[group]||{icon:'☰',label:'機能'};
+}
 function hdQNEnsureAttentionDialog(){
  if(document.getElementById('hdMobileAttentionDialog'))return;
  const d=document.createElement('dialog');d.id='hdMobileAttentionDialog';d.className='hd-mobile-attention-dialog';
@@ -108,6 +120,12 @@ function hdQNUpdateMobileDock(){
  home?.classList.toggle('active',activeGroup==='home'&&!searchOpen&&!menuOpen);
  search?.classList.toggle('active',searchOpen);
  menu?.classList.toggle('active',menuOpen);
+ if(menu){
+  const meta=hdQNMobileGroupMeta(activeGroup),icon=menu.querySelector('span'),label=menu.querySelector('b');
+  if(icon)icon.textContent=meta.icon;if(label)label.textContent=meta.label;
+  menu.classList.toggle('has-context',!!activeGroup&&activeGroup!=='home');
+  menu.setAttribute('aria-label',activeGroup&&activeGroup!=='home'?`${meta.label}・機能一覧を開く`:'機能一覧を開く');
+ }
  const attention=hdQNMobileAttentionMeta();if(badge){badge.textContent=String(attention.count);badge.hidden=attention.count<=0;badge.setAttribute('aria-label',attention.count?`要対応 ${attention.count}件`:'要対応なし')}
  if(home){const detail=attention.reasons.join('・');home.setAttribute('aria-label',attention.count?('ホーム・確認項目 '+detail):'ホーム');home.title=detail}
  if(sync){sync.classList.remove('fresh','stale','partial','missing');let state='missing';try{state=typeof hdWSSyncInfo==='function'?(hdWSSyncInfo().state||'missing'):'missing'}catch{}sync.classList.add(state)}
