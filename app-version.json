@@ -1,6 +1,6 @@
 {
-  "version": "1.0.115",
-  "build": 115,
-  "releasedAt": "2026-09-19T10:42:00+09:00",
-  "notes": "艦これマスター定期同期をPWA更新へ完全連動。api_start2または装備pickerに差分が出た時だけ、ship-master-snapshotと同時にHarborDeskのversion/build・Service Workerキャッシュを自動更新。診断センターには同期元commitとupstream更新日も表示。"
+  "version": "1.0.116",
+  "build": 116,
+  "releasedAt": "2026-09-19T11:50:00+09:00",
+  "notes": "艦これマスター自動同期に差分履歴を追加。艦娘プロファイル・公式装備辞書・補強増設ルール・増設制限艦・装備picker位置制限の変更を前回スナップショットと比較し、診断センターで件数と対象名を確認可能。現行マスターを差分比較の基準値として登録。"
 }
