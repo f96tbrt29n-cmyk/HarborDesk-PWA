@@ -3175,3 +3175,28 @@ test('home secondary panels remember collapsed state', async ({ page }) => {
   expect(data.procurement.collapsed).toBe(false);
   expect(data.recent.collapsed).toBe(true);
 });
+
+
+test('map tabs stay usable with sticky mobile navigation', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    if(typeof MAP_DETAILS==='undefined')return {ok:false};
+    const key=Object.keys(MAP_DETAILS)[0];
+    window.selectedMap=key;
+    window.hdApplyMapTabs?.();
+    const bar=document.querySelector('.map-tab-bar'),buttons=[...document.querySelectorAll('.map-tab-btn')];
+    const gear=buttons.find(x=>x.dataset.mapTab==='gear');
+    gear?.click();
+    return {
+      ok:!!bar,
+      count:buttons.length,
+      active:document.querySelector('.map-tab-btn.active')?.dataset.mapTab||'',
+      reveal:typeof window.hdMapTabsRevealActive==='function'
+    };
+  });
+  expect(data.ok).toBe(true);
+  expect(data.count).toBeGreaterThan(5);
+  expect(data.active).toBe('gear');
+  expect(data.reveal).toBe(true);
+});
