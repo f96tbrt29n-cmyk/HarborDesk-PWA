@@ -1,7 +1,7 @@
 {
-  "version": "1.0.146",
-  "build": 146,
-  "releasedAt": "2026-09-19T06:36:03.649Z",
-  "notes": "全865形態に対応する標準カード画像をMASTER IDで自動表示。画像提供元の固定リビジョンを参照し、端末登録画像と個別URLを優先。自動表示の切替、縦長カード表示に対応。公開チェックがPlaywright設定ファイルを実行時資産と誤認する問題を修正。ゲーム最新画像との全件一致は未検証。",
+  "version": "1.0.147",
+  "build": 147,
+  "releasedAt": "2026-09-19T16:00:00+09:00",
+  "notes": "艦これゲーム内データ取込ブリッジを追加。api_port/port・ship2・slot_item・require_info内slot_item・api_materialのJSONを端末内で解析し、艦隊台帳へMASTER ID/Lv/HP/cond/装備、装備台帳へ所持個数/改修★/熟練度分布、資源、現在艦隊を同期。svdata=形式・複数APIバンドル・JSONファイル・クリップボード入力に対応。DMM認証情報やapi_token、生レスポンスは保存しない。Playwright実ブラウザ25/25ケース成功を確認。",
   "masterChanges": null
 }
