@@ -47,6 +47,8 @@ function ensureCustomFleetDialog(){
 
 function openCustomFleetDialog(item=null){
   ensureCustomFleetDialog();
+window.addEventListener('hd:ship-images-changed',()=>{if(typeof selectedMap!=='undefined'&&selectedMap)renderCustomFleets(selectedMap)});
+window.addEventListener('hd:ship-images-ready',()=>{if(typeof selectedMap!=='undefined'&&selectedMap)renderCustomFleets(selectedMap)});
   if(typeof refreshShipRosterOptions==='function')refreshShipRosterOptions();
   customFleetEditId=item?.id||null;
   document.getElementById('customFleetName').value=item?.name||'';
@@ -67,10 +69,11 @@ function renderCustomFleets(map){
   const all=loadCustomFleets();
   const list=all[map]||[];
   const saved=list.length?list.map(item=>{
-    const rows=(item.ships||[]).map((s,i)=>s.ship||s.gear?`<div class="custom-fleet-saved-row"><span>${i+1}</span><b>${cfEsc(s.ship||'未入力')}</b><small>${cfEsc(s.gear||'装備メモなし')}</small></div>`:'').join('');
+    const rows=(item.ships||[]).map((s,i)=>{if(!s.ship&&!s.gear)return '';const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(s.ship,'custom-fleet-thumb'):'';return `<div class="custom-fleet-saved-row"><span>${i+1}</span>${image}<div><b>${cfEsc(s.ship||'未入力')}</b><small>${cfEsc(s.gear||'装備メモなし')}</small></div></div>`}).join('');
     return `<article class="custom-fleet-card" data-cf-id="${item.id}"><div class="custom-fleet-head"><div><strong>${cfEsc(item.name)}</strong><div class="muted">${new Date(item.updatedAt||item.createdAt).toLocaleString('ja-JP')} 更新</div></div><div class="custom-fleet-actions"><button class="ghost small" data-cf-edit="${item.id}">編集</button><button class="ghost small" data-cf-delete="${item.id}">削除</button></div></div><div class="custom-fleet-saved-list">${rows||'<div class="muted">艦娘はまだ未入力</div>'}</div>${item.memo?`<p class="custom-fleet-memo">${cfEsc(item.memo)}</p>`:''}</article>`;
   }).join(''):'<div class="muted">この海域の自分用編成はまだ保存されてないよ。</div>';
   host.innerHTML=`<div class="custom-fleet-title"><div><div class="eyebrow">MY FLEET</div><h4>自分用編成</h4></div><button class="primary small" id="addCustomFleet">＋ 編成を保存</button></div>${saved}`;
+  if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
   document.getElementById('addCustomFleet').onclick=()=>openCustomFleetDialog();
 }
 
