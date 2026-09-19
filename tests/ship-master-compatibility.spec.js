@@ -2574,6 +2574,8 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
       hasPageContext:text.includes('@inject-into  page'),
       hasFrameInclude:text.includes('203\\.104\\.'),
       hasDmmMatch:text.includes('@match        https://*.dmm.com/*'),
+      hasKancolleServerMatch:text.includes('@match        https://*.kancolle-server.com/*'),
+      hasLegacyServerInclude:text.includes('125\\.6'),
       hasKcsapiFilter:text.includes('/kcsapi/'),
       hasDirectSend:text.includes("type:'harbordesk-kancolle-import'"),
       hasTokenStorage:text.includes('api_token=') || text.includes('Cookie='),
@@ -2587,6 +2589,8 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
   expect(data.hasPageContext).toBe(true);
   expect(data.hasFrameInclude).toBe(true);
   expect(data.hasDmmMatch).toBe(true);
+  expect(data.hasKancolleServerMatch).toBe(true);
+  expect(data.hasLegacyServerInclude).toBe(true);
   expect(data.hasKcsapiFilter).toBe(true);
   expect(data.hasDirectSend).toBe(true);
   expect(data.hasTokenStorage).toBe(false);
