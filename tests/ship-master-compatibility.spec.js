@@ -3952,3 +3952,20 @@ test('completed manual timer can restart in one tap', async ({ page }) => {
   expect(data.duration).toBe(30);
   expect(data.saved).toEqual(expect.objectContaining({name:'東京急行',minutes:30}));
 });
+
+
+test('timer dialog quick duration presets', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    openTimer('expedition');
+    const button=document.querySelector('[data-timer-minutes="120"]');
+    button?.click();
+    const value=document.getElementById('timerMinutes')?.value||'';
+    const presetCount=document.querySelectorAll('[data-timer-minutes]').length;
+    document.getElementById('timerDialog')?.close();
+    return {value,presetCount};
+  });
+  expect(data.value).toBe('120');
+  expect(data.presetCount).toBe(6);
+});
