@@ -357,3 +357,61 @@ test('procurement priority favors broad reusable and near-complete equipment', a
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('next procurement action routes to the correct workflow', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    const originalDev = window.hdPLDevEstimate;
+    const originalImprove = window.hdPLImproveEstimate;
+
+    window.hdPLDevEstimate = () => ({
+      recipe: { title: '戦艦主砲レシピ' },
+      attempts: 5,
+      total: { fuel: 50, ammo: 500, steel: 500, bauxite: 0 }
+    });
+    window.hdPLImproveEstimate = () => ({
+      source: { name: '九一式徹甲弾' },
+      screw: 18,
+      dev: 24
+    });
+
+    const dev = window.hdPLNextActionMeta?.({
+      target: '41cm連装砲',
+      methodKey: 'develop',
+      shortfall: 1
+    });
+    const improve = window.hdPLNextActionMeta?.({
+      target: '一式徹甲弾',
+      methodKey: 'improve',
+      shortfall: 1
+    });
+    const quest = window.hdPLNextActionMeta?.({
+      target: '任務装備',
+      methodKey: 'quest',
+      shortfall: 1
+    });
+
+    window.hdPLDevEstimate = originalDev;
+    window.hdPLImproveEstimate = originalImprove;
+
+    return { dev, improve, quest };
+  });
+
+  expect(data.dev.kind).toBe('develop');
+  expect(data.dev.detail).toContain('戦艦主砲レシピ');
+  expect(data.dev.sub).toContain('期待 約5回');
+  expect(data.dev.action).toBe('開発レシピへ');
+
+  expect(data.improve.kind).toBe('improve');
+  expect(data.improve.sourceName).toBe('九一式徹甲弾');
+  expect(data.improve.detail).toContain('九一式徹甲弾 → 一式徹甲弾');
+  expect(data.improve.action).toBe('改修工廠へ');
+
+  expect(data.quest.kind).toBe('quest');
+  expect(data.quest.action).toBe('入手ルートへ');
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
