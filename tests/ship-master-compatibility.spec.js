@@ -5787,3 +5787,24 @@ test('sync dialog renders numbered completion checklist', async ({ page }) => {
   expect(data.rows.at(-1)).toContain('HarborDeskへ送る');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('mobile dock reflects current workspace and sync state', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({syncedAt:Date.now(),ships:10,equipment:10,decks:1,coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true}}));
+  });
+  await page.setViewportSize({width:390,height:844});
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdQNEnsure?.();window.hdQNUpdateMobileDock?.();
+    const home=document.querySelector('[data-hd-mobile-home]'),sync=document.querySelector('[data-hd-mobile-sync]');
+    const activeBefore=home?.classList.contains('active')||false;
+    document.querySelectorAll('[data-hd-ws-group]').forEach(b=>b.classList.toggle('active',b.dataset.hdWsGroup==='guide'));
+    window.hdQNUpdateMobileDock?.();
+    return {activeBefore,activeAfter:home?.classList.contains('active')||false,syncFresh:sync?.classList.contains('fresh')||false};
+  });
+  expect(data.activeBefore).toBe(true);
+  expect(data.activeAfter).toBe(false);
+  expect(data.syncFresh).toBe(true);
+});
