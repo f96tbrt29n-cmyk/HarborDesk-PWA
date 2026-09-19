@@ -9,3 +9,16 @@
  .hd-version-controls .hd-version-badge,.hd-version-controls button{font-size:11px}
  main{padding-left:12px;padding-right:12px}
 }
+
+.hd-notify-btn{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.hd-notify-btn span{font-size:14px;line-height:1}
+.hd-notify-btn b{font-size:12px}
+.hd-notify-btn[data-notify-state="granted"]{border-color:rgba(99,216,151,.45);background:rgba(24,86,59,.28)}
+.hd-notify-btn[data-notify-state="denied"]{opacity:.7}
+@media(max-width:560px){
+ .topbar{justify-content:flex-start}
+ .topbar>div:first-child{margin-right:auto;min-width:106px}
+ .hd-notify-btn{width:36px;height:34px;padding:0;justify-content:center;border-radius:10px}
+ .hd-notify-btn b{display:none}
+ .hd-notify-btn span{font-size:13px}
+}
