@@ -5233,3 +5233,24 @@ test('synced fleet preserves hp and Home highlights low hp', async ({ page }) =>
   expect(data.text).toContain('HP 10/40');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('Home current fleet gear toggle works on mobile', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
+      {deckId:1,name:'第1艦隊',mission:[0,0,0,0],ships:[{name:'加賀改',level:94,nowHp:60,maxHp:79,gear:'烈風 / 彩雲'}]}
+    ]));
+  });
+  await boot(page,errors);
+  await page.setViewportSize({width:390,height:844});
+  await page.evaluate(()=>window.renderHomeDashboard?.());
+  expect(await page.locator('[data-home-fleet-gear-toggle]').textContent()).toContain('装備を表示');
+  expect(await page.locator('#homeCurrentFleet .home-fleet-ships em').count()).toBe(0);
+  await page.click('[data-home-fleet-gear-toggle]');
+  expect(await page.locator('[data-home-fleet-gear-toggle]').textContent()).toContain('装備を隠す');
+  expect(await page.locator('#homeCurrentFleet .home-fleet-ships em').textContent()).toContain('烈風 / 彩雲');
+  const stored=await page.evaluate(()=>localStorage.getItem('harbordesk-home-current-fleet-gear-v1'));
+  expect(stored).toBe('1');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
