@@ -5574,3 +5574,32 @@ test('home next action prioritizes sortie readiness', async ({ page }) => {
   expect(data.hasFirstFix).toBe(true);
   expect(data.hasOpen).toBe(true);
 });
+
+
+test('Home sortie next action links directly to fix', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-guide-view-v1', JSON.stringify({world:'5',map:'5-5',filter:'map',query:'5-5'}));
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({syncedAt:Date.now(),ships:1,equipment:1,materials:8,decks:1,expeditions:0,docks:0,quests:0,sorties:0}));
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({'5-5':[
+      {id:'fleet-home-fix',name:'ゲーム同期｜第1艦隊',source:'kancolle-import',sourceDeckId:1,sourceSyncedAt:Date.now()-3600000,ships:[
+        {ship:'加賀改',gear:'烈風 / 彩雲',nowHp:70,maxHp:79,cond:55}
+      ]}
+    ]}));
+    localStorage.setItem('harbordesk-sortie-selection-v1', JSON.stringify({'5-5':'fleet-home-fix'}));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'1',name:'加賀改',level:94,tags:[]}]));
+  });
+  await boot(page,errors);
+  await page.evaluate(()=>{
+    if(typeof selectedMap!=='undefined')selectedMap='5-5';
+    window.renderHomeDashboard?.();
+  });
+  const data=await page.evaluate(()=>{
+    const b=document.querySelector('#homeNextAction [data-home-sortie-fix]');
+    return {action:b?.dataset.homeSortieFix||'',label:b?.textContent?.trim()||'',text:document.getElementById('homeNextAction')?.textContent||''};
+  });
+  expect(data.action).toBe('kancolleImport');
+  expect(data.label).toContain('再同期');
+  expect(data.text).toContain('ゲーム同期');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
