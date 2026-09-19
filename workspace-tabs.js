@@ -10,14 +10,14 @@ const HD_WS_GROUPS=[
  {key:'settings',label:'設定'}
 ];
 const HD_WS_EXPLICIT={
- home:new Set(['home','personalHomeCenter','dailyOpsCenter','dashboard','resources','resourceHistory','docks','resourceBudget']),
+ home:new Set(['home','dailyOpsCenter','dashboard','resources','resourceHistory','docks','resourceBudget']),
  guide:new Set(['guide','hdSortiePreparation','hdFleetSuggester','eoTracker','sortieReadiness','eventOperationsCenter','eventOperations','grandOperations','landBasePlanner']),
  fleet:new Set(['shipDatabase','roster','shipProfilesPlus','trainingPlanner','customFleets','fleetCalculator','supportFleetPlanner']),
  quest:new Set(['questDatabase','quests','exerciseRoutine','activityLogger']),
  expedition:new Set(['expeditions','hdExpeditionDb','expeditionFleetManager','expeditionOptimizer']),
  arsenal:new Set(['equipmentBook','hdEquipAnalyzer','hdEquipmentProcurement','equipmentVariants','developmentLab','developmentRecipes','constructionDb','improvementWorkshop','optimizationImprovement','materialPlanner']),
  records:new Set(['sortieLog','sortieCostForecast','dropHunting','dropHuntingDb','farmingAnalytics','eventLog','rankingTracker','rankingTrackerCenter','farmAnalysis']),
- settings:new Set(['calculators','backup','diagnosticsCenter','notificationCenter','dataQualityAudit'])
+ settings:new Set(['personalHomeCenter','calculators','backup','diagnosticsCenter','notificationCenter','dataQualityAudit'])
 };
 let hdWSState=hdWSLoad();
 let hdWSObserver=null;
