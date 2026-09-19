@@ -2,3 +2,16 @@
 @supports(content-visibility:auto){
  .advanced-list>.advanced-card{content-visibility:auto;contain-intrinsic-size:160px}
 }
+
+.advanced-head-actions{display:flex;align-items:center;gap:8px}
+.equipment-ledger-toolbar input{flex:1;min-width:0}
+.equipment-ledger-toolbar [data-eq-search-clear]:disabled{opacity:.38}
+@media(max-width:560px){
+ #equipmentBook .equipment-ledger-toolbar{
+  position:sticky;top:calc(var(--hd-topbar-h,58px) + var(--hd-workspace-nav-h,72px));
+  z-index:6;padding:7px;margin:0 -4px;border:1px solid var(--line);border-radius:13px;
+  background:rgba(8,24,38,.97);backdrop-filter:blur(12px);box-shadow:0 7px 22px rgba(0,0,0,.18)
+ }
+ #equipmentBook .equipment-ledger-toolbar input,#equipmentBook .equipment-ledger-toolbar button{min-height:42px}
+ .advanced-head-actions{gap:6px}
+}
