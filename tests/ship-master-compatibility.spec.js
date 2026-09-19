@@ -2577,7 +2577,8 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
       hasKancolleServerMatch:text.includes('@match        https://*.kancolle-server.com/*'),
       hasLegacyServerInclude:text.includes('125\\.6'),
       hasKcsapiFilter:text.includes('/kcsapi/'),
-      hasDirectSend:text.includes("type:'harbordesk-kancolle-import'"),
+      hasDirectSend:text.includes("#kcimport="),
+      usesPopup:text.includes('window.open('),
       hasTokenStorage:text.includes('api_token=') || text.includes('Cookie='),
       hasNoFrames:text.includes('@noframes')
     };
@@ -2593,7 +2594,36 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
   expect(data.hasLegacyServerInclude).toBe(true);
   expect(data.hasKcsapiFilter).toBe(true);
   expect(data.hasDirectSend).toBe(true);
+  expect(data.usesPopup).toBe(false);
   expect(data.hasTokenStorage).toBe(false);
   expect(data.hasNoFrames).toBe(false);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
+
+
+test('Userscripts same-tab handoff auto-syncs', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const payload={
+      format:'harbordesk-kancolle-import',version:2,source:'userscripts',captureId:'test-handoff',
+      records:[{endpoint:'/kcsapi/api_get_member/material',at:1,payload:{api_result:1,api_data:[
+        {api_id:1,api_value:12345},{api_id:2,api_value:23456},{api_id:3,api_value:34567},{api_id:4,api_value:45678}
+      ]}}]
+    };
+    const bytes=new TextEncoder().encode(JSON.stringify(payload));
+    let binary='';for(let i=0;i<bytes.length;i++)binary+=String.fromCharCode(bytes[i]);
+    const token='j.'+btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    location.hash='#kcimport='+token;
+    const ok=await window.hdKcConsumeHashImport();
+    const materials=JSON.parse(localStorage.getItem('harbordesk-kancolle-materials-v1')||'{}');
+    const sync=JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'{}');
+    return {ok,materials,sync,hash:location.hash,result:document.getElementById('hdKcImportResult')?.textContent||''};
+  });
+  expect(data.ok).toBe(true);
+  expect(data.materials).toEqual(expect.objectContaining({fuel:12345,ammo:23456,steel:34567,bauxite:45678}));
+  expect(data.sync.materials).toBe(4);
+  expect(data.hash).toBe('#kancolleImport');
+  expect(data.result).toContain('Userscriptsから自動同期完了');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
