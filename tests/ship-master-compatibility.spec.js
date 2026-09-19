@@ -3200,3 +3200,25 @@ test('map tabs stay usable with sticky mobile navigation', async ({ page }) => {
   expect(data.active).toBe('gear');
   expect(data.reveal).toBe(true);
 });
+
+
+test('mobile dialogs keep actions reachable and inputs zoom-safe', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const dialog=document.getElementById('timerDialog');
+    const actions=dialog?.querySelector('.dialog-actions');
+    const input=dialog?.querySelector('input');
+    const ds=dialog?getComputedStyle(dialog):null,as=actions?getComputedStyle(actions):null,is=input?getComputedStyle(input):null;
+    return {
+      overflow:ds?.overflowY||'',
+      maxHeight:ds?.maxHeight||'',
+      actionPosition:as?.position||'',
+      inputFont:is?.fontSize||''
+    };
+  });
+  expect(['auto','scroll']).toContain(data.overflow);
+  expect(data.maxHeight).not.toBe('none');
+  expect(data.actionPosition).toBe('sticky');
+  expect(data.inputFont).toBe('16px');
+});
