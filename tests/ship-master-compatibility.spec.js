@@ -4203,3 +4203,21 @@ test('home exposes recent dock and quest one-tap actions', async ({ page }) => {
   expect(data.quest).toContain('あ号作戦');
   expect(data.expedition).toContain('海上護衛任務');
 });
+
+
+test('manual timer and quest additions expose undo actions', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const source={
+      timerStartRecent:String(window.timerStartRecent||''),
+      questAddRecent:String(window.questAddRecent||'')
+    };
+    return {
+      timerUndo:source.timerStartRecent.includes("hdToastAction")&&source.timerStartRecent.includes("元に戻す"),
+      questUndo:source.questAddRecent.includes("hdToastAction")&&source.questAddRecent.includes("元に戻す")
+    };
+  });
+  expect(data.timerUndo).toBe(true);
+  expect(data.questUndo).toBe(true);
+});
