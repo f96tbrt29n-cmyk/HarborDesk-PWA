@@ -17,3 +17,18 @@
  .hd-ws-mobile-picker:not([hidden]){display:flex}
  .hd-ws-secondary{display:none!important}
 }
+
+.hd-global-sync-status{display:grid;gap:1px;min-width:76px;padding:7px 10px;border:1px solid var(--line);border-radius:12px;background:#0d2234;color:var(--text);text-align:left;line-height:1.1}
+.hd-global-sync-status span{font-size:9px;color:var(--muted);font-weight:800;white-space:nowrap}
+.hd-global-sync-status b{font-size:11px;white-space:nowrap}
+.hd-global-sync-status.fresh{border-color:rgba(99,216,151,.5);background:rgba(24,86,59,.32)}
+.hd-global-sync-status.fresh b{color:#b9f4cf}
+.hd-global-sync-status.stale{border-color:rgba(239,191,93,.52);background:rgba(96,68,23,.3)}
+.hd-global-sync-status.stale b{color:#f1d28a}
+.hd-global-sync-status.missing{border-color:rgba(226,126,126,.45);background:rgba(87,35,39,.28)}
+.hd-global-sync-status.missing b{color:#f0b0b4}
+@media(max-width:560px){
+ .hd-global-sync-status{min-width:0;padding:6px 8px;border-radius:10px}
+ .hd-global-sync-status span{display:none}
+ .hd-global-sync-status b{font-size:10px}
+}
