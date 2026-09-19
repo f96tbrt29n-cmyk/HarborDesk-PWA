@@ -21,38 +21,44 @@ function hdPLResolveWanted(wanted){
  const missing=candidates.find(x=>(typeof hdAGOwned==='function'?hdAGOwned(x.name).count:0)<=0)||candidates[0]||null;
  return {item:missing,kind,exact:false};
 }
+function hdPLReqStar(x){return Math.max(0,Number(x?.reqStar)||0)}
+function hdPLMergeKey(x){return [x.map||'',x.target||x.wanted||'',x.methodKey||'',x.ship||'',x.kind||'',hdPLReqStar(x)].join('|')}
+function hdPLDemandKey(x,map=''){return [map||x.map||'',x.target||x.wanted||'',x.methodKey||'',x.kind||'',hdPLReqStar(x)].join('|')}
+function hdPLTargetLabel(x){const t=x?.target||x?.wanted||'';return t+(hdPLReqStar(x)?` ★${hdPLReqStar(x)}+`:'')}
 function hdPLMergeGearItems(items=[]){
  const m=new Map();
  for(const x of items){
-  const key=[x.map,x.target||x.wanted,x.methodKey||'',x.ship||''].join('|'),cur=m.get(key);
-  if(cur){cur.needed=(cur.needed||1)+(x.needed||1);cur.requiredTotal=Math.max(Number(cur.requiredTotal)||0,Number(x.requiredTotal)||0);cur.sources=[...new Set([...(cur.sources||[]),...(x.sources||[])])];}
-  else m.set(key,{...x,needed:x.needed||1,requiredTotal:Number(x.requiredTotal)||0,sources:[...new Set(x.sources||[])]});
+  const key=hdPLMergeKey(x),cur=m.get(key);
+  if(cur){cur.needed=(cur.needed||1)+(x.needed||1);cur.requiredTotal=Math.max(Number(cur.requiredTotal)||0,Number(x.requiredTotal)||0);cur.qualifiedNeeded=Math.max(Number(cur.qualifiedNeeded)||0,Number(x.qualifiedNeeded)||0);cur.sources=[...new Set([...(cur.sources||[]),...(x.sources||[])])];}
+  else m.set(key,{...x,needed:x.needed||1,requiredTotal:Number(x.requiredTotal)||0,qualifiedNeeded:Number(x.qualifiedNeeded)||0,sources:[...new Set(x.sources||[])]});
  }
  return [...m.values()].sort((a,b)=>(a.rank||9)-(b.rank||9)||(a.target||a.wanted).localeCompare(b.target||b.wanted,'ja'));
 }
-function hdPLOwnedCount(name){
- if(!name)return 0;
- if(typeof hdAGOwned==='function')return Math.max(0,Number(hdAGOwned(name)?.count)||0);
+function hdPLOwnedCount(name,minStar=0){
+ if(!name)return 0;const req=Math.max(0,Number(minStar)||0);
+ if(!req&&typeof hdAGOwned==='function')return Math.max(0,Number(hdAGOwned(name)?.count)||0);
  try{
-  const norm=s=>String(s||'').normalize('NFKC').replace(/\s+/g,'').replace(/･/g,'・'),key=norm(name);
+  const norm=s=>String(s||'').normalize('NFKC').replace(/\s+/g,'').replace(/･/g,'・'),names=typeof hdAGNames==='function'?hdAGNames(name):[name],keys=new Set((names||[name]).map(norm));
   const rows=JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]');
-  return (Array.isArray(rows)?rows:[]).filter(x=>norm(x.name)===key).reduce((s,x)=>s+Math.max(0,Number(x.count)||0),0);
+  return (Array.isArray(rows)?rows:[]).filter(x=>keys.has(norm(x.name))&&Math.max(0,Number(x.star)||0)>=req).reduce((s,x)=>s+Math.max(0,Number(x.count)||0),0);
  }catch{return 0}
 }
 function hdPLDemandRows(items=[]){
  const m=new Map();
  for(const x of items){
-  const target=x.target||x.wanted||'',key=[x.map||'',target,x.methodKey||'',x.kind||''].join('|');
-  const cur=m.get(key)||{...x,target,needed:0,ships:[],loadouts:[],sources:[]};
-  cur.needed+=Math.max(Number(x.needed)||1,Number(x.requiredTotal)||0);
+  const target=x.target||x.wanted||'',key=hdPLDemandKey({...x,target});
+  const cur=m.get(key)||{...x,target,needed:0,requiredTotal:0,qualifiedNeeded:0,ships:[],loadouts:[],sources:[]};
+  cur.needed+=Math.max(Number(x.needed)||1,0);
+  cur.requiredTotal=Math.max(Number(cur.requiredTotal)||0,Number(x.requiredTotal)||0);
+  cur.qualifiedNeeded=Math.max(Number(cur.qualifiedNeeded)||0,Number(x.qualifiedNeeded)||0,hdPLReqStar(x)?1:0);
   cur.ships=[...new Set([...cur.ships,x.ship].filter(Boolean))];
   cur.loadouts=[...new Set([...cur.loadouts,x.loadout].filter(Boolean))];
   cur.sources=[...new Set([...(cur.sources||[]),...(x.sources||[])])];
   m.set(key,cur);
  }
  return [...m.values()].map(x=>{
-  const needed=Math.max(0,Number(x.needed)||0),owned=x.target?hdPLOwnedCount(x.target):0,shortfall=Math.max(0,needed-owned);
-  return {...x,needed,owned,shortfall,status:shortfall===0?'ready':owned>0?'partial':'missing'};
+  const reqStar=hdPLReqStar(x),needed=Math.max(Number(x.needed)||0,Number(x.requiredTotal)||0),ownedTotal=x.target?hdPLOwnedCount(x.target,0):0,qualifiedNeeded=reqStar?Math.max(1,Number(x.qualifiedNeeded)||0):0,ownedQualified=reqStar&&x.target?hdPLOwnedCount(x.target,reqStar):ownedTotal,totalShortfall=Math.max(0,needed-ownedTotal),starShortfall=reqStar?Math.max(0,qualifiedNeeded-ownedQualified):0,shortfall=Math.max(totalShortfall,starShortfall),owned=reqStar?ownedQualified:ownedTotal;
+  return {...x,reqStar,needed,qualifiedNeeded,ownedTotal,ownedQualified,owned,shortfall,totalShortfall,starShortfall,status:shortfall===0?'ready':(ownedTotal>0||ownedQualified>0)?'partial':'missing'};
  }).sort((a,b)=>{
   if((a.shortfall===0)!==(b.shortfall===0))return a.shortfall===0?1:-1;
   return (a.rank||9)-(b.rank||9)||(b.shortfall||0)-(a.shortfall||0)||(a.target||a.wanted).localeCompare(b.target||b.wanted,'ja');
@@ -98,6 +104,15 @@ function hdPLAddMasterLoadout(shipId,loadoutName,map=''){
  hdPLSave(old?list.map(x=>x.map===sourceMap?next:x):[next,...list]);return true;
 }
 
+function hdPLAddExpansionRequirement(map,shipName,masterId,target,reqStar=0,reason='',requiredTotal=1){
+ if(!target)return false;const sourceMap=map||(typeof selectedMap!=='undefined'&&selectedMap?selectedMap:'自動編成'),req=Math.max(0,Number(reqStar)||0),total=Math.max(1,Number(requiredTotal)||1),qualifiedNeeded=req?1:0;
+ const resolved=hdPLResolveWanted(target),item=resolved.item,baseMethod=hdPLMethodMeta(item),baseOwned=hdPLOwnedCount(target,0),qualifiedOwned=req?hdPLOwnedCount(target,req):baseOwned;
+ const method=req&&baseOwned>qualifiedOwned?{key:'improve',label:`改修★${req}+`,rank:2}:baseMethod;
+ const added={map:sourceMap,ship:String(shipName||''),masterId:Number(masterId)||0,loadout:'補強増設',wanted:target,target:item?.name||target,kind:'補強増設',exact:true,reqStar:req,qualifiedNeeded,requiredTotal:total,methodKey:method.key,methodLabel:method.label,rank:method.rank,needed:1,reason:String(reason||''),sources:[String(shipName||'補強増設')],createdAt:Date.now()};
+ const list=hdPLLoad(),old=list.find(x=>x.map===sourceMap),next={id:old?.id||`pl-${Date.now()}-${Math.random().toString(16).slice(2)}`,map:sourceMap,kinds:old?.kinds||[],gearItems:hdPLMergeGearItems([...(old?.gearItems||[]),added]),createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};
+ hdPLSave(old?list.map(x=>x.map===sourceMap?next:x):[next,...list]);return true;
+}
+
 function hdPLEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdPLLabel(kind){return typeof hdAGKindLabel==='function'?hdAGKindLabel(kind):kind}
 function hdPLCurrentCheck(map,kind){
@@ -123,8 +138,8 @@ function hdPLRemove(map){hdPLSave(hdPLLoad().filter(x=>x.map!==map))}
 function hdPLPruneReady(map){
  const list=hdPLLoad(),row=list.find(x=>x.map===map);if(!row)return;
  const kinds=(row.kinds||[]).filter(k=>hdPLCurrentCheck(map,k).status!=='ready');
- const demand=hdPLDemandRows(row.gearItems||[]),openKeys=new Set(demand.filter(x=>x.shortfall>0).map(x=>[x.map||map,x.target||x.wanted,x.methodKey||'',x.kind||''].join('|')));
- const gearItems=(row.gearItems||[]).filter(x=>openKeys.has([x.map||map,x.target||x.wanted,x.methodKey||'',x.kind||''].join('|')));
+ const demand=hdPLDemandRows(row.gearItems||[]),openKeys=new Set(demand.filter(x=>x.shortfall>0).map(x=>hdPLDemandKey(x,map)));
+ const gearItems=(row.gearItems||[]).filter(x=>openKeys.has(hdPLDemandKey(x,map)));
  if(!kinds.length&&!gearItems.length){hdPLRemove(map);return}
  row.kinds=kinds;row.gearItems=gearItems;row.updatedAt=Date.now();hdPLSave(list);
 }
@@ -184,9 +199,9 @@ function hdPLGlobalDemandRows(rows=hdPLLoad()){
  const m=new Map();
  for(const mapRow of rows){
   for(const x of hdPLDemandRows(mapRow.gearItems||[])){
-   const target=x.target||x.wanted||'',key=[target,x.methodKey||'',x.kind||''].join('|');
-   const cur=m.get(key)||{...x,target,needed:0,maps:[],ships:[],loadouts:[]};
-   cur.needed=Math.max(cur.needed||0,x.needed||0);
+   const target=x.target||x.wanted||'',key=[target,x.methodKey||'',x.kind||'',hdPLReqStar(x)].join('|');
+   const cur=m.get(key)||{...x,target,needed:0,requiredTotal:0,qualifiedNeeded:0,maps:[],ships:[],loadouts:[]};
+   cur.needed=Math.max(cur.needed||0,x.needed||0);cur.requiredTotal=Math.max(cur.requiredTotal||0,x.requiredTotal||0);cur.qualifiedNeeded=Math.max(cur.qualifiedNeeded||0,x.qualifiedNeeded||0);
    cur.maps=[...new Set([...cur.maps,mapRow.map].filter(Boolean))];
    cur.ships=[...new Set([...cur.ships,...(x.ships||[]),x.ship].filter(Boolean))];
    cur.loadouts=[...new Set([...cur.loadouts,...(x.loadouts||[]),x.loadout].filter(Boolean))];
@@ -194,8 +209,8 @@ function hdPLGlobalDemandRows(rows=hdPLLoad()){
   }
  }
  return [...m.values()].map(x=>{
-  const owned=x.target?hdPLOwnedCount(x.target):0,shortfall=Math.max(0,(x.needed||0)-owned);
-  return {...x,owned,shortfall,status:shortfall===0?'ready':owned>0?'partial':'missing'};
+  const reqStar=hdPLReqStar(x),needed=Math.max(Number(x.needed)||0,Number(x.requiredTotal)||0),ownedTotal=x.target?hdPLOwnedCount(x.target,0):0,qualifiedNeeded=reqStar?Math.max(1,Number(x.qualifiedNeeded)||0):0,ownedQualified=reqStar&&x.target?hdPLOwnedCount(x.target,reqStar):ownedTotal,totalShortfall=Math.max(0,needed-ownedTotal),starShortfall=reqStar?Math.max(0,qualifiedNeeded-ownedQualified):0,shortfall=Math.max(totalShortfall,starShortfall),owned=reqStar?ownedQualified:ownedTotal;
+  return {...x,reqStar,needed,qualifiedNeeded,ownedTotal,ownedQualified,owned,shortfall,totalShortfall,starShortfall,status:shortfall===0?'ready':(ownedTotal>0||ownedQualified>0)?'partial':'missing'};
  }).sort((a,b)=>{
   if((a.shortfall===0)!==(b.shortfall===0))return a.shortfall===0?1:-1;
   return (a.rank||9)-(b.rank||9)||(b.shortfall||0)-(a.shortfall||0)||(a.target||a.wanted).localeCompare(b.target||b.wanted,'ja');
@@ -206,8 +221,8 @@ function hdPLHistorySave(rows){localStorage.setItem(HD_PROCUREMENT_HISTORY_KEY,J
 function hdPLDemandSnapshot(rows=hdPLLoad()){
  const m=new Map();
  for(const x of hdPLGlobalDemandRows(rows)){
-  const key=[x.target||x.wanted||'',x.methodKey||'',x.kind||''].join('|');
-  m.set(key,{key,target:x.target||x.wanted||'',wanted:x.wanted||'',methodKey:x.methodKey||'',methodLabel:x.methodLabel||'',kind:x.kind||'',needed:Number(x.needed)||0,owned:Number(x.owned)||0,shortfall:Number(x.shortfall)||0,maps:[...(x.maps||[])],ships:[...(x.ships||[])],loadouts:[...(x.loadouts||[])]});
+  const key=[x.target||x.wanted||'',x.methodKey||'',x.kind||'',hdPLReqStar(x)].join('|');
+  m.set(key,{key,target:x.target||x.wanted||'',wanted:x.wanted||'',methodKey:x.methodKey||'',methodLabel:x.methodLabel||'',kind:x.kind||'',reqStar:hdPLReqStar(x),needed:Number(x.needed)||0,qualifiedNeeded:Number(x.qualifiedNeeded)||0,owned:Number(x.owned)||0,ownedTotal:Number(x.ownedTotal)||0,ownedQualified:Number(x.ownedQualified)||0,shortfall:Number(x.shortfall)||0,maps:[...(x.maps||[])],ships:[...(x.ships||[])],loadouts:[...(x.loadouts||[])]});
  }
  return m;
 }
@@ -219,7 +234,7 @@ function hdPLRecordDemandChanges(){
   const next=after.get(key);if(!next||prev.shortfall<=0)continue;
   const gained=Math.max(0,prev.shortfall-(Number(next.shortfall)||0));if(!gained)continue;
   const complete=Number(next.shortfall||0)===0;
-  const row={id:`ph-${Date.now()}-${Math.random().toString(16).slice(2)}`,at:Date.now(),target:next.target||prev.target,wanted:next.wanted||prev.wanted,methodKey:next.methodKey||prev.methodKey,methodLabel:next.methodLabel||prev.methodLabel,kind:next.kind||prev.kind,gained,beforeShortfall:prev.shortfall,afterShortfall:next.shortfall,needed:next.needed,owned:next.owned,maps:[...(next.maps||prev.maps||[])],ships:[...(next.ships||prev.ships||[])],complete};
+  const row={id:`ph-${Date.now()}-${Math.random().toString(16).slice(2)}`,at:Date.now(),target:next.target||prev.target,wanted:next.wanted||prev.wanted,methodKey:next.methodKey||prev.methodKey,methodLabel:next.methodLabel||prev.methodLabel,kind:next.kind||prev.kind,reqStar:Number(next.reqStar||prev.reqStar)||0,gained,beforeShortfall:prev.shortfall,afterShortfall:next.shortfall,needed:next.needed,owned:next.owned,maps:[...(next.maps||prev.maps||[])],ships:[...(next.ships||prev.ships||[])],complete};
   history.unshift(row);added.push(row);
   window.dispatchEvent(new CustomEvent('hd:procurement-progress',{detail:row}));
  }
@@ -244,6 +259,7 @@ function hdPLPriorityMeta(row){
  if(maps>1)reasons.push(`${maps}計画で共用`);
  if(owned>0&&shortfall>0)reasons.push(`あと${shortfall}個`);
  else if(shortfall>0)reasons.push(`不足${shortfall}個`);
+ if(hdPLReqStar(row))reasons.push(`★${hdPLReqStar(row)}以上`);
  if(row.methodLabel)reasons.push(row.methodLabel);
  return {score,label,reasons,impact,methodBonus,progress,effortPenalty};
 }
@@ -252,18 +268,18 @@ function hdPLPriorityRows(rows=hdPLLoad(),limit=6){
 }
 function hdPLNextActionMeta(row){
  if(!row||!(Number(row.shortfall)>0))return null;
- const target=row.target||row.wanted||'';
+ const target=row.target||row.wanted||'',targetLabel=hdPLTargetLabel(row);
  if(row.methodKey==='develop'){
   const e=hdPLDevEstimate(row);
-  return {kind:'develop',label:'開発で狙う',title:target,detail:e?.recipe?.title||'開発レシピを確認',sub:e?.attempts?`期待 約${e.attempts}回｜燃${e.total?.fuel||0} 弾${e.total?.ammo||0} 鋼${e.total?.steel||0} ボ${e.total?.bauxite||0}`:'成功率データを確認',action:'開発レシピへ'};
+  return {kind:'develop',label:'開発で狙う',title:targetLabel,detail:e?.recipe?.title||'開発レシピを確認',sub:e?.attempts?`期待 約${e.attempts}回｜燃${e.total?.fuel||0} 弾${e.total?.ammo||0} 鋼${e.total?.steel||0} ボ${e.total?.bauxite||0}`:'成功率データを確認',action:'開発レシピへ'};
  }
  if(row.methodKey==='improve'){
   const e=hdPLImproveEstimate(row);
-  return {kind:'improve',label:'改修・更新で作る',title:target,sourceName:e?.source?.name||target,detail:e?.source?.name?`${e.source.name} → ${target}`:'更新元を確認',sub:e?`ネジ ${e.screw} / 開発資材 ${e.dev}`:'必要素材を確認',action:'改修工廠へ'};
+  return {kind:'improve',label:'改修・更新で作る',title:targetLabel,sourceName:e?.source?.name||target,detail:e?.source?.name?`${e.source.name} → ${target}`:'更新元を確認',sub:e?`ネジ ${e.screw} / 開発資材 ${e.dev}`:'必要素材を確認',action:'改修工廠へ'};
  }
- if(row.methodKey==='quest')return {kind:'quest',label:'任務・初期装備を確認',title:target,detail:'常設任務や初期装備の入手ルートを確認',sub:`不足 ${row.shortfall||0}個`,action:'入手ルートへ'};
- if(row.methodKey==='limited')return {kind:'limited',label:'限定入手を確認',title:target,detail:'イベント・期間限定などの入手条件を確認',sub:`不足 ${row.shortfall||0}個`,action:'入手情報へ'};
- return {kind:'other',label:'入手方法を確認',title:target,detail:'図鑑・入手ガイドから候補を確認',sub:`不足 ${row.shortfall||0}個`,action:'入手情報へ'};
+ if(row.methodKey==='quest')return {kind:'quest',label:'任務・初期装備を確認',title:targetLabel,detail:'常設任務や初期装備の入手ルートを確認',sub:`不足 ${row.shortfall||0}個`,action:'入手ルートへ'};
+ if(row.methodKey==='limited')return {kind:'limited',label:'限定入手を確認',title:targetLabel,detail:'イベント・期間限定などの入手条件を確認',sub:`不足 ${row.shortfall||0}個`,action:'入手情報へ'};
+ return {kind:'other',label:'入手方法を確認',title:targetLabel,detail:'図鑑・入手ガイドから候補を確認',sub:`不足 ${row.shortfall||0}個`,action:'入手情報へ'};
 }
 function hdPLNextActionHtml(rows=hdPLLoad()){
  const row=hdPLPriorityRows(rows,1)[0];if(!row)return '';
@@ -278,7 +294,7 @@ function hdPLNextActionHtml(rows=hdPLLoad()){
 }
 function hdPLPriorityQueueHtml(rows=hdPLLoad()){
  const items=hdPLPriorityRows(rows,6);if(!items.length)return '';
- return `<section class="hd-pl-priority"><div class="hd-pl-priority-head"><div><div class="eyebrow">NEXT PROCUREMENT</div><strong>先に揃える候補</strong><small>使用艦数・共用範囲・所持状況・入手しやすさから自動整理</small></div><span>${items.length}件</span></div><div class="hd-pl-priority-list">${items.map((x,i)=>`<article><div class="hd-pl-priority-rank"><b>#${i+1}</b><span>${hdPLEsc(x.priority.label)}</span></div><div class="hd-pl-priority-main"><strong>${hdPLEsc(x.target||x.wanted)}</strong><small>${x.priority.reasons.map(hdPLEsc).join('・')}</small><div><span>必要 <b>${x.needed||0}</b></span><span>所持 <b>${x.owned||0}</b></span><span>あと <b>${x.shortfall||0}</b></span></div></div><div class="hd-pl-priority-actions">${x.target?`<button type="button" class="ghost small" data-hd-pl-item-guide="${hdPLEsc(x.target)}" data-hd-pl-map="${hdPLEsc((x.maps||[])[0]||'')}">入手方法</button><button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(x.target)}">図鑑</button>`:''}</div></article>`).join('')}</div><p>同じ装備を複数海域で使い回せる場合、海域間では最大同時必要数を基準にしているよ。限定装備は入手性を低めに評価。</p></section>`;
+ return `<section class="hd-pl-priority"><div class="hd-pl-priority-head"><div><div class="eyebrow">NEXT PROCUREMENT</div><strong>先に揃える候補</strong><small>使用艦数・共用範囲・所持状況・入手しやすさから自動整理</small></div><span>${items.length}件</span></div><div class="hd-pl-priority-list">${items.map((x,i)=>`<article><div class="hd-pl-priority-rank"><b>#${i+1}</b><span>${hdPLEsc(x.priority.label)}</span></div><div class="hd-pl-priority-main"><strong>${hdPLEsc(hdPLTargetLabel(x))}</strong><small>${x.priority.reasons.map(hdPLEsc).join('・')}</small><div><span>必要 <b>${x.needed||0}</b></span><span>所持 <b>${x.owned||0}</b></span><span>あと <b>${x.shortfall||0}</b></span></div></div><div class="hd-pl-priority-actions">${x.target?`<button type="button" class="ghost small" data-hd-pl-item-guide="${hdPLEsc(x.target)}" data-hd-pl-map="${hdPLEsc((x.maps||[])[0]||'')}">入手方法</button><button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(x.target)}">図鑑</button>`:''}</div></article>`).join('')}</div><p>同じ装備を複数海域で使い回せる場合、海域間では最大同時必要数を基準にしているよ。限定装備は入手性を低めに評価。</p></section>`;
 }
 function hdPLOverallBudget(rows=hdPLLoad()){
  const items=hdPLGlobalDemandRows(rows),open=items.filter(x=>x.shortfall>0);
@@ -311,7 +327,7 @@ function hdPLGearItemHtml(map,row){
  const need=Math.max(0,Number(row.needed)||0),owned=Math.max(0,Number(row.owned)||0),left=Math.max(0,Number(row.shortfall)||0);
  const status=left===0?'準備済み':owned>0?'あと少し':'不足';
  const shipText=(row.ships||[]).join('・')||row.ship||'',loadoutText=(row.loadouts||[]).join('・')||row.loadout||'';
- return `<article class="hd-pl-gear-item method-${hdPLEsc(row.methodKey||'other')} ${row.status||''}"><div class="hd-pl-gear-head"><div><strong>${hdPLEsc(target||row.wanted)}</strong><span>${hdPLEsc(shipText)}${loadoutText?`｜${hdPLEsc(loadoutText)}`:''}</span></div><div><b>${left?label:'完了'}</b><em>${hdPLEsc(method)}</em></div></div><div class="hd-pl-gear-counts"><span>必要 <b>${need}</b></span><span>所持 <b>${owned}</b></span><span class="${left?'short':'done'}">あと <b>${left}</b></span></div><div class="hd-pl-gear-meta">${target&&target!==row.wanted?`<span>元の希望 <b>${hdPLEsc(row.wanted)}</b></span>`:''}<span>状態 <b>${status}</b></span></div>${hdPLCostHtml(row)}<div class="hd-pl-actions">${left>0?(target?`<button type="button" class="ghost small" data-hd-pl-item-guide="${hdPLEsc(target)}" data-hd-pl-map="${hdPLEsc(map)}">この装備の入手方法</button><button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(target)}">図鑑</button>`:(row.kind?`<button type="button" class="ghost small" data-hd-pl-guide="${hdPLEsc(row.kind)}" data-hd-pl-map="${hdPLEsc(map)}">代替候補を見る</button>`:'')):(target?`<button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(target)}">所持装備を確認</button>`:'')}</div></article>`;
+ return `<article class="hd-pl-gear-item method-${hdPLEsc(row.methodKey||'other')} ${row.status||''}"><div class="hd-pl-gear-head"><div><strong>${hdPLEsc(hdPLTargetLabel(row))}</strong><span>${hdPLEsc(shipText)}${loadoutText?`｜${hdPLEsc(loadoutText)}`:''}</span></div><div><b>${left?label:'完了'}</b><em>${hdPLEsc(method)}</em></div></div><div class="hd-pl-gear-counts"><span>必要 <b>${need}</b></span><span>所持 <b>${owned}</b></span><span class="${left?'short':'done'}">あと <b>${left}</b></span></div><div class="hd-pl-gear-meta">${target&&target!==row.wanted?`<span>元の希望 <b>${hdPLEsc(row.wanted)}</b></span>`:''}<span>状態 <b>${status}</b></span></div>${hdPLCostHtml(row)}<div class="hd-pl-actions">${left>0?(target?`<button type="button" class="ghost small" data-hd-pl-item-guide="${hdPLEsc(target)}" data-hd-pl-map="${hdPLEsc(map)}">この装備の入手方法</button><button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(target)}">図鑑</button>`:(row.kind?`<button type="button" class="ghost small" data-hd-pl-guide="${hdPLEsc(row.kind)}" data-hd-pl-map="${hdPLEsc(map)}">代替候補を見る</button>`:'')):(target?`<button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(target)}">所持装備を確認</button>`:'')}</div></article>`;
 }
 function hdPLGearPlanHtml(row){
  const items=hdPLDemandRows(row.gearItems||[]);if(!items.length)return '';
