@@ -3925,3 +3925,30 @@ test('timer dialog remembers last input per kind', async ({ page }) => {
   expect(data.expedition).toEqual({name:'東京急行',minutes:'165'});
   expect(data.dock).toEqual({name:'加賀改',minutes:'45'});
 });
+
+
+test('completed manual timer can restart in one tap', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    state.expeditions=[{id:'repeat1',name:'東京急行',startedAt:Date.now()-3600000,durationMinutes:30,endsAt:Date.now()-1000}];
+    coreListFilters.expedition='done';
+    save();renderTimers('expedition');
+    const before=state.expeditions[0].endsAt;
+    const btn=document.querySelector('[data-restart-timer="repeat1"]');
+    btn?.click();
+    return {
+      hadButton:!!btn,
+      before,
+      after:state.expeditions[0].endsAt,
+      active:state.expeditions[0].endsAt>Date.now(),
+      duration:state.expeditions[0].durationMinutes,
+      saved:JSON.parse(localStorage.getItem('harbordesk-timer-last-v1')||'{}').expedition||null
+    };
+  });
+  expect(data.hadButton).toBe(true);
+  expect(data.after).toBeGreaterThan(data.before);
+  expect(data.active).toBe(true);
+  expect(data.duration).toBe(30);
+  expect(data.saved).toEqual(expect.objectContaining({name:'東京急行',minutes:30}));
+});
