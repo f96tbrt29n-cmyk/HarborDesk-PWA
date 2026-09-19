@@ -1,7 +1,9 @@
 const HD_PROCUREMENT_KEY='harbordesk-equipment-procurement-v1';
+const HD_PROCUREMENT_HISTORY_KEY='harbordesk-equipment-procurement-history-v1';
+let HD_PL_DEMAND_SNAPSHOT=null;
 
 function hdPLLoad(){try{const v=JSON.parse(localStorage.getItem(HD_PROCUREMENT_KEY)||'[]');return Array.isArray(v)?v:[]}catch{return []}}
-function hdPLSave(v){localStorage.setItem(HD_PROCUREMENT_KEY,JSON.stringify(v));hdPLRender();window.dispatchEvent(new CustomEvent('hd:procurement-changed',{detail:{count:Array.isArray(v)?v.length:0,at:Date.now()}}))}
+function hdPLSave(v){localStorage.setItem(HD_PROCUREMENT_KEY,JSON.stringify(v));hdPLRender();hdPLPrimeDemandSnapshot();window.dispatchEvent(new CustomEvent('hd:procurement-changed',{detail:{count:Array.isArray(v)?v.length:0,at:Date.now()}}))}
 const HD_PL_METHOD_ORDER={develop:1,improve:2,quest:3,other:4,limited:5};
 function hdPLMethodMeta(item){
  const m=item&&typeof hdAGMethod==='function'?hdAGMethod(item):{key:'other',label:'入手情報'};
@@ -199,6 +201,35 @@ function hdPLGlobalDemandRows(rows=hdPLLoad()){
   return (a.rank||9)-(b.rank||9)||(b.shortfall||0)-(a.shortfall||0)||(a.target||a.wanted).localeCompare(b.target||b.wanted,'ja');
  });
 }
+function hdPLHistoryLoad(){try{const v=JSON.parse(localStorage.getItem(HD_PROCUREMENT_HISTORY_KEY)||'[]');return Array.isArray(v)?v:[]}catch{return []}}
+function hdPLHistorySave(rows){localStorage.setItem(HD_PROCUREMENT_HISTORY_KEY,JSON.stringify((rows||[]).slice(0,80)))}
+function hdPLDemandSnapshot(rows=hdPLLoad()){
+ const m=new Map();
+ for(const x of hdPLGlobalDemandRows(rows)){
+  const key=[x.target||x.wanted||'',x.methodKey||'',x.kind||''].join('|');
+  m.set(key,{key,target:x.target||x.wanted||'',wanted:x.wanted||'',methodKey:x.methodKey||'',methodLabel:x.methodLabel||'',kind:x.kind||'',needed:Number(x.needed)||0,owned:Number(x.owned)||0,shortfall:Number(x.shortfall)||0,maps:[...(x.maps||[])],ships:[...(x.ships||[])],loadouts:[...(x.loadouts||[])]});
+ }
+ return m;
+}
+function hdPLPrimeDemandSnapshot(){HD_PL_DEMAND_SNAPSHOT=hdPLDemandSnapshot();return HD_PL_DEMAND_SNAPSHOT}
+function hdPLRecordDemandChanges(){
+ const before=HD_PL_DEMAND_SNAPSHOT,after=hdPLDemandSnapshot();HD_PL_DEMAND_SNAPSHOT=after;if(!before)return [];
+ const history=hdPLHistoryLoad(),added=[];
+ for(const [key,prev] of before){
+  const next=after.get(key);if(!next||prev.shortfall<=0)continue;
+  const gained=Math.max(0,prev.shortfall-(Number(next.shortfall)||0));if(!gained)continue;
+  const complete=Number(next.shortfall||0)===0;
+  const row={id:`ph-${Date.now()}-${Math.random().toString(16).slice(2)}`,at:Date.now(),target:next.target||prev.target,wanted:next.wanted||prev.wanted,methodKey:next.methodKey||prev.methodKey,methodLabel:next.methodLabel||prev.methodLabel,kind:next.kind||prev.kind,gained,beforeShortfall:prev.shortfall,afterShortfall:next.shortfall,needed:next.needed,owned:next.owned,maps:[...(next.maps||prev.maps||[])],ships:[...(next.ships||prev.ships||[])],complete};
+  history.unshift(row);added.push(row);
+  window.dispatchEvent(new CustomEvent('hd:procurement-progress',{detail:row}));
+ }
+ if(added.length){hdPLHistorySave(history);window.dispatchEvent(new CustomEvent('hd:procurement-history-changed',{detail:{count:history.length,at:Date.now()}}))}
+ return added;
+}
+function hdPLHistoryHtml(){
+ const rows=hdPLHistoryLoad().slice(0,10);if(!rows.length)return '';
+ return `<section class="hd-pl-history"><div class="hd-pl-history-head"><div><div class="eyebrow">PROCUREMENT HISTORY</div><strong>調達進捗</strong></div><button type="button" class="ghost small" data-hd-pl-history-clear>履歴を消去</button></div><div class="hd-pl-history-list">${rows.map(x=>`<article class="${x.complete?'complete':'progress'}"><div><b>${x.complete?'✓':'+'}</b></div><div><strong>${hdPLEsc(x.target||x.wanted)}</strong><span>${x.complete?'調達完了':`不足 ${x.beforeShortfall} → ${x.afterShortfall}`}・+${x.gained}個</span><small>${[...(x.ships||[]),...(x.maps||[])].slice(0,4).map(hdPLEsc).join('・')}</small></div><time>${new Date(x.at).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})}</time></article>`).join('')}</div></section>`;
+}
 function hdPLPriorityMeta(row){
  const maps=(row.maps||[]).length,ships=(row.ships||[]).length,loadouts=(row.loadouts||[]).length,owned=Math.max(0,Number(row.owned)||0),shortfall=Math.max(0,Number(row.shortfall)||0);
  const methodBonus={develop:24,improve:18,quest:13,other:7,limited:2}[row.methodKey||'other']||7;
@@ -304,7 +335,7 @@ function hdPLMapHtml(row){
 }
 function hdPLRender(){
  const host=document.getElementById('hdProcurementList');if(!host)return;
- const rows=hdPLLoad(),next=document.getElementById('hdProcurementNextAction'),budget=document.getElementById('hdProcurementBudget'),priority=document.getElementById('hdProcurementPriority');if(next)next.innerHTML=hdPLNextActionHtml(rows);if(budget)budget.innerHTML=hdPLOverallBudgetHtml(rows);if(priority)priority.innerHTML=hdPLPriorityQueueHtml(rows);
+ const rows=hdPLLoad(),next=document.getElementById('hdProcurementNextAction'),budget=document.getElementById('hdProcurementBudget'),priority=document.getElementById('hdProcurementPriority'),history=document.getElementById('hdProcurementHistory');if(next)next.innerHTML=hdPLNextActionHtml(rows);if(budget)budget.innerHTML=hdPLOverallBudgetHtml(rows);if(priority)priority.innerHTML=hdPLPriorityQueueHtml(rows);if(history)history.innerHTML=hdPLHistoryHtml();
  host.innerHTML=rows.map(hdPLMapHtml).join('')||'<div class="empty">調達リストはまだないよ。海域の装備タブや艦娘DBのおすすめ装備から不足分を追加できる。</div>';
  const count=document.getElementById('hdProcurementCount');if(count)count.textContent=`${rows.length}件`;
  const add=document.getElementById('hdProcurementAddCurrent');if(add){const map=typeof selectedMap!=='undefined'?selectedMap:'';add.disabled=!map;add.textContent=map?`${map} の不足を追加`:'海域を選んでね'}
@@ -313,7 +344,7 @@ function hdPLEnsure(){
  if(document.getElementById('hdEquipmentProcurement'))return;
  const anchor=document.getElementById('hdEquipAnalyzer')||document.getElementById('equipmentBook');if(!anchor)return;
  const sec=document.createElement('section');sec.id='hdEquipmentProcurement';sec.className='advanced-section hd-pl-section';
- sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">PROCUREMENT LIST</div><h2>装備調達リスト</h2></div><span id="hdProcurementCount" class="muted"></span></div><div class="hd-pl-toolbar"><p>攻略予定の海域や艦娘ごとのおすすめ構成で足りない装備を保存。装備台帳を更新すると準備状況も自動で変わるよ。</p><button id="hdProcurementAddCurrent" type="button" class="primary small">海域を選んでね</button></div><div id="hdProcurementNextAction"></div><div id="hdProcurementPriority"></div><div id="hdProcurementBudget"></div><div id="hdProcurementList" class="hd-pl-list"></div>`;
+ sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">PROCUREMENT LIST</div><h2>装備調達リスト</h2></div><span id="hdProcurementCount" class="muted"></span></div><div class="hd-pl-toolbar"><p>攻略予定の海域や艦娘ごとのおすすめ構成で足りない装備を保存。装備台帳を更新すると準備状況も自動で変わるよ。</p><button id="hdProcurementAddCurrent" type="button" class="primary small">海域を選んでね</button></div><div id="hdProcurementNextAction"></div><div id="hdProcurementPriority"></div><div id="hdProcurementBudget"></div><div id="hdProcurementHistory"></div><div id="hdProcurementList" class="hd-pl-list"></div>`;
  anchor.insertAdjacentElement('afterend',sec);document.getElementById('hdProcurementAddCurrent')?.addEventListener('click',()=>{if(typeof selectedMap!=='undefined'&&selectedMap)hdPLAddMap(selectedMap)});hdPLRender();
 }
 function hdPLInstallSortieButton(){
@@ -340,10 +371,11 @@ document.addEventListener('click',e=>{
  const cat=e.target.closest?.('[data-hd-pl-catalog]');if(cat){if(typeof hdAGOpenCatalog==='function')hdAGOpenCatalog(cat.dataset.hdPlCatalog);return}
  const remove=e.target.closest?.('[data-hd-pl-remove]');if(remove){hdPLRemove(remove.dataset.hdPlRemove);return}
  const prune=e.target.closest?.('[data-hd-pl-prune]');if(prune){hdPLPruneReady(prune.dataset.hdPlPrune);return}
+ if(e.target.closest?.('[data-hd-pl-history-clear]')){hdPLHistorySave([]);hdPLRender();window.dispatchEvent(new CustomEvent('hd:procurement-history-changed',{detail:{count:0,at:Date.now()}}));return}
 });
 window.addEventListener('storage',e=>{if(e.key===HD_PROCUREMENT_KEY||e.key==='harbordesk-equipment-v1')hdPLRender()});
-window.addEventListener('hd:equipment-changed',()=>hdPLRender());
-window.addEventListener('hd:workspace-refresh',hdPLRender);
+window.addEventListener('hd:equipment-changed',()=>{hdPLRecordDemandChanges();hdPLRender()});
+window.addEventListener('hd:workspace-refresh',()=>{if(!HD_PL_DEMAND_SNAPSHOT)hdPLPrimeDemandSnapshot();hdPLRender()});
 window.addEventListener('hd:map-rendered',hdPLRender);
-window.addEventListener('load',()=>setTimeout(()=>{hdPLEnsure();if(!hdPLInstallSortieButton())setTimeout(hdPLInstallSortieButton,500)},380));
+window.addEventListener('load',()=>setTimeout(()=>{hdPLEnsure();hdPLPrimeDemandSnapshot();if(!hdPLInstallSortieButton())setTimeout(hdPLInstallSortieButton,500)},380));
 hdPLInstallSortieButton();
