@@ -5942,3 +5942,23 @@ test('quick nav surfaces current workspace sections', async ({ page }) => {
   expect(data.active).toBe('roster');
   expect(data.labels.length).toBeGreaterThan(1);
 });
+
+
+test('mobile attention prioritizes completed timers', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const now=Date.now();
+    window.state=window.state||{};
+    window.state.quests=[{id:'q1',name:'任務A',done:false}];
+    window.state.expeditions=[{id:'e1',name:'遠征A',endsAt:now-60000}];
+    window.state.docks=[{id:'d1',name:'入渠A',endsAt:now+10*60000}];
+    localStorage.removeItem('harbordesk-kancolle-sync-v1');
+    const rows=window.hdQNMobileAttentionItems?.()||[];
+    return rows.map(x=>({id:x.id,title:x.title,priority:x.priority,tone:x.tone}));
+  });
+  expect(data[0].title).toContain('帰投済み');
+  expect(data[0].tone).toBe('urgent');
+  expect(data.some(x=>x.title.includes('入渠まもなく完了'))).toBe(true);
+  expect(data[data.length-1].id).toBe('quests');
+});
