@@ -228,7 +228,7 @@ function hdPLNextActionMeta(row){
  }
  if(row.methodKey==='improve'){
   const e=hdPLImproveEstimate(row);
-  return {kind:'improve',label:'改修・更新で作る',title:target,detail:e?.source?.name?`${e.source.name} → ${target}`:'更新元を確認',sub:e?`ネジ ${e.screw} / 開発資材 ${e.dev}`:'必要素材を確認',action:'改修工廠へ'};
+  return {kind:'improve',label:'改修・更新で作る',title:target,sourceName:e?.source?.name||target,detail:e?.source?.name?`${e.source.name} → ${target}`:'更新元を確認',sub:e?`ネジ ${e.screw} / 開発資材 ${e.dev}`:'必要素材を確認',action:'改修工廠へ'};
  }
  if(row.methodKey==='quest')return {kind:'quest',label:'任務・初期装備を確認',title:target,detail:'常設任務や初期装備の入手ルートを確認',sub:`不足 ${row.shortfall||0}個`,action:'入手ルートへ'};
  if(row.methodKey==='limited')return {kind:'limited',label:'限定入手を確認',title:target,detail:'イベント・期間限定などの入手条件を確認',sub:`不足 ${row.shortfall||0}個`,action:'入手情報へ'};
@@ -241,7 +241,7 @@ function hdPLNextActionHtml(rows=hdPLLoad()){
  const action=a.kind==='develop'
   ?`<button type="button" class="primary small" data-hd-ag-development="${hdPLEsc(row.target||row.wanted)}">${hdPLEsc(a.action)}</button>`
   :a.kind==='improve'
-   ?`<button type="button" class="primary small" data-hd-ag-improvement="${hdPLEsc(row.target||row.wanted)}">${hdPLEsc(a.action)}</button>`
+   ?`<button type="button" class="primary small" data-hd-ag-improvement="${hdPLEsc(a.sourceName||row.target||row.wanted)}">${hdPLEsc(a.action)}</button>`
    :`<button type="button" class="primary small" data-hd-pl-item-guide="${hdPLEsc(row.target||row.wanted)}" data-hd-pl-map="${hdPLEsc(map)}">${hdPLEsc(a.action)}</button>`;
  return `<section class="hd-pl-next-action method-${hdPLEsc(a.kind)}"><div class="hd-pl-next-kicker"><span>NEXT ACTION</span><b>${hdPLEsc(row.priority?.label||'優先')}</b></div><div class="hd-pl-next-main"><div><small>${hdPLEsc(a.label)}</small><strong>${hdPLEsc(a.title)}</strong><p>${hdPLEsc(a.detail)}</p><span>${hdPLEsc(a.sub)}</span></div><div class="hd-pl-next-buttons">${action}<button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(row.target||row.wanted)}">図鑑</button></div></div><div class="hd-pl-next-why"><b>優先理由</b><span>${(row.priority?.reasons||[]).map(hdPLEsc).join('・')}</span></div></section>`;
 }
