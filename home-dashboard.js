@@ -139,12 +139,16 @@ function renderHomeDashboard(){
  }
  const nextHost=document.getElementById('homeNextAction');
  if(nextHost){
-  nextHost.className='home-next-action '+nextState;
+  const actionState=nextTimer?(nextMs<=15*60*1000?'urgent':nextMs<=60*60*1000?'soon':'normal'):(syncInfo.state==='warn'?'sync':todo.length?'task':'clear');
+  nextHost.className='home-next-action '+actionState;
   if(nextTimer){
    const mins=Math.ceil(nextMs/60000),timeText=typeof fmt==='function'?fmt(nextMs):(mins<60?mins+'分':Math.floor(mins/60)+'時間');
    nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="expeditions"><span>次に終わる</span><strong>${homeEsc(nextTimer.kind)}・${homeEsc(nextTimer.name||'タイマー')}</strong><small>あと ${homeEsc(timeText)}</small></button><button type="button" class="ghost small" data-home-jump="expeditions">タイマーを見る</button>`;
+  }else if(syncInfo.state==='warn'){
+   nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="kancolleImport"><span>先に更新しておく</span><strong>ゲーム同期 ${homeEsc(syncInfo.label)}</strong><small>艦娘・装備・資源を最新状態にしよう</small></button><a class="ghost small home-next-game" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a>`;
   }else if(todo.length){
-   nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="quests"><span>次にやること</span><strong>未完了任務 ${todo.length}件</strong><small>${homeEsc(todo[0]?.name||'任務を確認')}</small></button><button type="button" class="ghost small" data-home-jump="quests">任務を見る</button>`;
+   const first=todo[0];
+   nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="quests"><span>次にやること・残り ${todo.length}件</span><strong>${homeEsc(first.name||'任務を確認')}</strong><small>タップで任務一覧へ</small></button><button type="button" class="ghost small home-next-done" data-home-quest-done="${homeEsc(first.id)}">完了</button>`;
   }else{
    nextHost.innerHTML='<div class="home-next-main"><span>次にやること</span><strong>急ぎの項目はないよ</strong><small>ホームから各機能へすぐ移動できる</small></div>';
   }
