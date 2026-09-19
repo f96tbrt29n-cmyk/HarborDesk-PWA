@@ -38,6 +38,13 @@ function homeMoveOrder(id,dir){
  const j=dir==='up'?i-1:i+1;if(j<0||j>=rows.length)return false;
  [rows[i],rows[j]]=[rows[j],rows[i]];homeOrderSave(rows);homeApplyOrder();return true;
 }
+function homeSetEditing(editing){
+ const root=document.getElementById('home'),btn=root?.querySelector('[data-home-edit-toggle]'),reset=root?.querySelector('[data-home-order-reset]'),on=!!editing;
+ root?.classList.toggle('home-editing',on);
+ if(btn){btn.textContent=on?'編集完了':'ホーム編集';btn.setAttribute('aria-pressed',on?'true':'false')}
+ if(reset)reset.hidden=!on;
+ return on;
+}
 function homeResetOrder(){
  homeOrderSave([...HD_HOME_ORDER_DEFAULT]);homeApplyOrder();window.hdToast?.('ホーム配置を初期状態に戻したよ','info',1400);return true;
 }
@@ -206,7 +213,7 @@ function renderHomeDashboard(){
 }
 
 document.addEventListener('click',e=>{
- const edit=e.target.closest('[data-home-edit-toggle]');if(edit){const root=document.getElementById('home'),next=!root?.classList.contains('home-editing');root?.classList.toggle('home-editing',next);edit.textContent=next?'編集完了':'ホーム編集';edit.setAttribute('aria-pressed',next?'true':'false');const reset=root?.querySelector('[data-home-order-reset]');if(reset)reset.hidden=!next;return}
+ const edit=e.target.closest('[data-home-edit-toggle]');if(edit){homeSetEditing(!document.getElementById('home')?.classList.contains('home-editing'));return}
  const dismissInstall=e.target.closest('[data-home-install-dismiss]');if(dismissInstall){try{localStorage.setItem(HOME_INSTALL_TIP_KEY,'1')}catch{};const tip=document.getElementById('homeInstallTip');if(tip)tip.hidden=true;return}
  const addQuest=e.target.closest('[data-home-add-quest]');if(addQuest){if(typeof openQuestDialog==='function')openQuestDialog();else{const input=document.getElementById('questName');if(input)input.value='';document.getElementById('questDialog')?.showModal()}return}
  const quickQuest=e.target.closest('[data-home-quest-start]');if(quickQuest){
@@ -298,6 +305,7 @@ window.addEventListener('hd:procurement-changed',renderHomeDashboard);
 window.addEventListener('hd:kancolle-sync',renderHomeDashboard);
 window.addEventListener('hd:workspace-refresh',renderHomeDashboard);
 window.addEventListener('hd:quick-nav-updated',renderHomeDashboard);
+window.addEventListener('hd:workspace-changed',e=>{if(e.detail?.group!=='home')homeSetEditing(false);renderHomeDashboard()});
 setInterval(renderHomeDashboard,5000);
 window.addEventListener('load',()=>setTimeout(renderHomeDashboard,300));
 ensureHomeDashboard();
