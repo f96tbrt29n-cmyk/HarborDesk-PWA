@@ -118,3 +118,7 @@ button.home-next-main{cursor:pointer}
 .home-quest-recent button b,.home-timer-recent button b{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .home-quest-recent button span,.home-timer-recent button span{font-size:9px;color:var(--accent2);white-space:nowrap}
 .home-dock-recent button span{color:#b9d7ff}
+
+.home-sync-delta{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)}
+.home-sync-delta span{font-size:9px;color:var(--muted);font-weight:800}
+.home-sync-delta b{font-size:9px;padding:4px 6px;border-radius:999px;background:#12344c;border:1px solid #2a5877;color:#d8f2ff}
