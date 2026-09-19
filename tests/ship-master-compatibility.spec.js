@@ -6115,8 +6115,9 @@ test('forced update return restores workspace location', async ({ page }) => {
   const errors=[];
   await boot(page,errors);
   const data=await page.evaluate(async()=>{
+    const read=()=>{try{return JSON.parse(localStorage.getItem('harbordesk-workspace-tabs-v1')||'{}')}catch{return {}}};
     window.hdWSApply?.('fleet','roster',{ignorePin:true});
-    const before={group:window.hdWSState?.group||'',section:window.hdWSState?.sections?.fleet||''};
+    const before=read();
     const saved=window.hdWSPrepareUpdateReturn?.();
     window.hdWSApply?.('home','home',{ignorePin:true});
     const marker=JSON.parse(sessionStorage.getItem('harbordesk-update-return-v1')||'null');
@@ -6125,7 +6126,7 @@ test('forced update return restores workspace location', async ({ page }) => {
     return {
       before,saved:!!saved,marker,
       restored:!!restored,
-      after:{group:window.hdWSState?.group||'',section:window.hdWSState?.sections?.fleet||''},
+      after:read(),
       markerGone:sessionStorage.getItem('harbordesk-update-return-v1')===null
     };
   });
@@ -6134,7 +6135,7 @@ test('forced update return restores workspace location', async ({ page }) => {
   expect(data.marker.section).toBe('roster');
   expect(data.restored).toBe(true);
   expect(data.after.group).toBe('fleet');
-  expect(data.after.section).toBe('roster');
+  expect(data.after.sections.fleet).toBe('roster');
   expect(data.markerGone).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
