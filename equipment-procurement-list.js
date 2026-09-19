@@ -1,7 +1,7 @@
 const HD_PROCUREMENT_KEY='harbordesk-equipment-procurement-v1';
 
 function hdPLLoad(){try{const v=JSON.parse(localStorage.getItem(HD_PROCUREMENT_KEY)||'[]');return Array.isArray(v)?v:[]}catch{return []}}
-function hdPLSave(v){localStorage.setItem(HD_PROCUREMENT_KEY,JSON.stringify(v));hdPLRender()}
+function hdPLSave(v){localStorage.setItem(HD_PROCUREMENT_KEY,JSON.stringify(v));hdPLRender();window.dispatchEvent(new CustomEvent('hd:procurement-changed',{detail:{count:Array.isArray(v)?v.length:0,at:Date.now()}}))}
 const HD_PL_METHOD_ORDER={develop:1,improve:2,quest:3,other:4,limited:5};
 function hdPLMethodMeta(item){
  const m=item&&typeof hdAGMethod==='function'?hdAGMethod(item):{key:'other',label:'入手情報'};
