@@ -5312,3 +5312,27 @@ test('Home current fleet shows morale and sparkle status', async ({ page }) => {
   expect(data.conds.join(' ')).toContain('cond 32');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('Home fleet readiness quick check summarizes risks', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
+      {deckId:1,name:'第1艦隊',mission:[0,0,0,0],ships:[
+        {name:'加賀改',level:94,nowHp:10,maxHp:40,cond:55,gear:'烈風'},
+        {name:'赤城改',level:90,nowHp:40,maxHp:40,cond:32,gear:'流星'}
+      ]}
+    ]));
+  });
+  await boot(page,errors);
+  await page.evaluate(()=>window.renderHomeDashboard?.());
+  const data=await page.evaluate(()=>({
+    text:document.querySelector('#homeCurrentFleet .home-fleet-readiness')?.textContent||'',
+    check:document.querySelector('#homeCurrentFleet .home-fleet-readiness')?.classList.contains('check')||false
+  }));
+  expect(data.check).toBe(true);
+  expect(data.text).toContain('要確認');
+  expect(data.text).toContain('HP25%以下 1隻');
+  expect(data.text).toContain('疲労 1隻');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
