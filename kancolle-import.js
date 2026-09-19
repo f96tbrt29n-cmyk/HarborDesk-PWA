@@ -366,6 +366,7 @@ function hdKcRenderSyncStatus(){
  if(el)el.textContent=s?`最終同期 ${new Date(s.syncedAt).toLocaleString('ja-JP')} ・ 艦娘${s.ships} / 装備${s.equipment} / 資源${s.materials} / 艦隊${s.decks} / 遠征${s.expeditions||0} / 入渠${s.docks||0} / 任務${s.quests||0} / 出撃${s.sorties||0}`:'まだ同期してないよ';
  if(headline)headline.textContent=s?'艦これデータは同期済み':'まず艦これから同期しよう';
  if(box)box.classList.toggle('is-synced',!!s);
+ const back=document.querySelector('[data-hd-kc-return-game]');if(back)back.hidden=sessionStorage.getItem('harbordesk-kc-return-game-v1')!=='1';
 }
 function hdKcCaptureBootstrap(){
  if(window.__HD_KC_CAPTURE?.show){window.__HD_KC_CAPTURE.show();return}
@@ -440,6 +441,8 @@ async function hdKcConsumeWindowNameImport(){
   const result=document.getElementById('hdKcImportResult');
   if(result)result.textContent=`Userscriptsから自動同期完了: 艦娘 ${sync.ships} / 装備 ${sync.equipment} / 資源 ${sync.materials} / 艦隊 ${sync.decks} / 遠征 ${sync.expeditions||0} / 入渠 ${sync.docks||0} / 任務 ${sync.quests||0} / 出撃 ${sync.sorties||0}`;
   const sec=document.getElementById('kancolleImport');if(sec)sec.scrollIntoView({block:'start'});
+  sessionStorage.setItem('harbordesk-kc-return-game-v1','1');
+  sessionStorage.setItem('harbordesk-kc-return-game-v1','1');
   HD_KC_IMPORT_PREVIEW=null;hdKcRenderSyncStatus();if(typeof renderAllAdvanced==='function')renderAllAdvanced();
   return true;
  }catch(err){
@@ -474,7 +477,7 @@ function hdKcEnsureImport(){
  const sec=document.createElement('section');sec.id='kancolleImport';sec.className='advanced-section';sec.innerHTML=`
  <div class="section-head"><div><div class="eyebrow">GAME DATA IMPORT</div><h2>艦これゲーム内データ取込</h2></div><span class="muted">端末内処理</span></div>
  <div class="hd-kc-import card">
-  <div class="hd-kc-sync-overview"><div><span>連携状態</span><strong id="hdKcSyncHeadline">確認中…</strong></div><div id="hdKcSyncLast" class="muted"></div></div>
+  <div class="hd-kc-sync-overview"><div><span>連携状態</span><strong id="hdKcSyncHeadline">確認中…</strong></div><div class="hd-kc-sync-side"><div id="hdKcSyncLast" class="muted"></div><button type="button" class="ghost small" data-hd-kc-return-game hidden>艦これへ戻る</button></div></div>
   <div id="hdKcImportResult" class="hd-kc-import-result muted" aria-live="polite"></div>
   <details class="hd-kc-capture-guide" data-hd-kc-auto-guide open><summary>Userscripts 自動連携</summary><div><p>艦これを開くだけで対応APIを自動取得。ゲーム画面の「HarborDeskへ送る」でそのまま同期できるよ。</p><div class="hd-kc-import-actions"><a class="primary" href="./HarborDesk-Kancolle.user.js" target="_blank" rel="noopener">Userscripts版を確認・更新</a></div><ol><li>Userscriptsを有効にする</li><li>艦これを開き直す</li><li>母港・装備・任務などを一度開く</li><li>「HarborDeskへ送る」を押す</li></ol><small>リクエスト本文・api_token・Cookie・DMMログイン情報は保存しない。</small></div></details>
   <details class="hd-kc-capture-guide"><summary>その他の取込方法</summary><div>
@@ -497,6 +500,13 @@ async function hdKcReadAndPreview(raw){
  const p=hdKcPreviewData(hdKcParseImport(raw));HD_KC_IMPORT_PREVIEW=p;const el=document.getElementById('hdKcImportPreview');if(el)el.innerHTML=hdKcPreviewHtml(p);const btn=document.querySelector('[data-hd-kc-apply]');if(btn)btn.disabled=false;return p;
 }
 document.addEventListener('click',async e=>{
+ if(e.target.closest?.('[data-hd-kc-return-game]')){
+  sessionStorage.removeItem('harbordesk-kc-return-game-v1');
+  const here=location.href;
+  try{history.back()}catch{}
+  setTimeout(()=>{if(location.href===here)location.href='https://play.games.dmm.com/game/kancolle'},500);
+  return;
+ }
  if(e.target.closest?.('[data-hd-kc-copy-capture]')){const ok=await hdKcCopyCaptureHelper();document.getElementById('hdKcImportResult').textContent=ok?'Safari用キャプチャコードをコピーしたよ。下の手順でブックマークURLへ貼ってね。':'コピーできなかったので、このブラウザではJSONファイル/貼り付け取込を使ってね。';return}
  const deck=e.target.closest?.('[data-hd-kc-copy-deck]');if(deck){try{const row=hdKcCopyFleetToCustom(deck.dataset.hdKcCopyDeck);document.getElementById('hdKcImportResult').textContent=`${row.name} を ${typeof selectedMap!=='undefined'?selectedMap:''} の自分用編成へコピーしたよ`}catch(err){document.getElementById('hdKcImportResult').textContent='コピーできなかった: '+String(err?.message||err)}return}
  if(e.target.closest?.('[data-hd-kc-parse]')){const raw=document.getElementById('hdKcImportText')?.value||'';try{await hdKcReadAndPreview(raw);document.getElementById('hdKcImportResult').textContent='解析できたよ。反映する項目を確認して「HarborDeskへ同期」を押してね。'}catch(err){HD_KC_IMPORT_PREVIEW=null;document.getElementById('hdKcImportResult').textContent='解析失敗: '+String(err?.message||err)}return}
