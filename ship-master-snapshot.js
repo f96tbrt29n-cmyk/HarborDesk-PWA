@@ -5,7 +5,7 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
     "ref": "master",
     "commit": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
     "updated": "2026-09-16T21:50:47Z",
-    "basis": "api_start2"
+    "basis": "api_start2 / player equipment api_id < 1500"
   },
   "ships": {
     "長門改二": {
@@ -6299,58 +6299,38 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
     }
   },
   "equipment": {
-    "12cm30連装噴進砲改二": {
-      "id": 274,
-      "typeId": 21,
-      "typeName": "対空機銃"
+    "12cm単装砲": {
+      "id": 1,
+      "typeId": 1,
+      "typeName": "小口径主砲"
     },
-    "13号対空電探改": {
-      "id": 106,
-      "typeId": 12,
-      "typeName": "小型電探"
+    "12.7cm連装砲": {
+      "id": 2,
+      "typeId": 1,
+      "typeName": "小口径主砲"
     },
-    "13号対空電探改(後期型)": {
-      "id": 450,
-      "typeId": 12,
-      "typeName": "小型電探"
+    "10cm連装高角砲": {
+      "id": 3,
+      "typeId": 1,
+      "typeName": "小口径主砲"
     },
-    "15.2cm連装砲改二": {
-      "id": 407,
+    "14cm単装砲": {
+      "id": 4,
       "typeId": 2,
       "typeName": "中口径主砲"
     },
-    "15.5cm三連装副砲改二": {
-      "id": 463,
-      "typeId": 4,
-      "typeName": "副砲"
-    },
-    "20.3cm(3号)連装砲": {
-      "id": 50,
+    "15.5cm三連装砲": {
+      "id": 5,
       "typeId": 2,
       "typeName": "中口径主砲"
     },
-    "22号対水上電探改四": {
-      "id": 88,
-      "typeId": 12,
-      "typeName": "小型電探"
+    "20.3cm連装砲": {
+      "id": 6,
+      "typeId": 2,
+      "typeName": "中口径主砲"
     },
-    "25mm三連装機銃 集中配備": {
-      "id": 131,
-      "typeId": 21,
-      "typeName": "対空機銃"
-    },
-    "25mm連装機銃(熟練機銃員分隊)": {
-      "id": 575,
-      "typeId": 21,
-      "typeName": "対空機銃"
-    },
-    "41cm三連装砲改": {
-      "id": 236,
-      "typeId": 3,
-      "typeName": "大口径主砲"
-    },
-    "41cm三連装砲改二": {
-      "id": 290,
+    "35.6cm連装砲": {
+      "id": 7,
       "typeId": 3,
       "typeName": "大口径主砲"
     },
@@ -6359,25 +6339,560 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "typeId": 3,
       "typeName": "大口径主砲"
     },
-    "41cm連装砲改二": {
-      "id": 318,
+    "46cm三連装砲": {
+      "id": 9,
       "typeId": 3,
       "typeName": "大口径主砲"
     },
-    "42号対空電探改二": {
-      "id": 411,
+    "12.7cm連装高角砲": {
+      "id": 10,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "15.2cm単装砲": {
+      "id": 11,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "15.5cm三連装副砲": {
+      "id": 12,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "61cm三連装魚雷": {
+      "id": 13,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "61cm四連装魚雷": {
+      "id": 14,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "61cm四連装(酸素)魚雷": {
+      "id": 15,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "九七式艦攻": {
+      "id": 16,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "天山": {
+      "id": 17,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "流星": {
+      "id": 18,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "九六式艦戦": {
+      "id": 19,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "零式艦戦21型": {
+      "id": 20,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "零式艦戦52型": {
+      "id": 21,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "試製烈風 後期型": {
+      "id": 22,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "九九式艦爆": {
+      "id": 23,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "彗星": {
+      "id": 24,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "零式水上偵察機": {
+      "id": 25,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "瑞雲": {
+      "id": 26,
+      "typeId": 11,
+      "typeName": "水上爆撃機"
+    },
+    "13号対空電探": {
+      "id": 27,
+      "typeId": 12,
+      "typeName": "小型電探"
+    },
+    "22号対水上電探": {
+      "id": 28,
+      "typeId": 12,
+      "typeName": "小型電探"
+    },
+    "33号対水上電探": {
+      "id": 29,
+      "typeId": 12,
+      "typeName": "小型電探"
+    },
+    "21号対空電探": {
+      "id": 30,
       "typeId": 13,
       "typeName": "大型電探"
     },
-    "51cm連装砲": {
-      "id": 281,
-      "typeId": 3,
-      "typeName": "大口径主砲"
+    "32号対水上電探": {
+      "id": 31,
+      "typeId": 13,
+      "typeName": "大型電探"
+    },
+    "42号対空電探": {
+      "id": 32,
+      "typeId": 13,
+      "typeName": "大型電探"
+    },
+    "改良型艦本式タービン": {
+      "id": 33,
+      "typeId": 17,
+      "typeName": "機関部強化"
+    },
+    "強化型艦本式缶": {
+      "id": 34,
+      "typeId": 17,
+      "typeName": "機関部強化"
+    },
+    "三式弾": {
+      "id": 35,
+      "typeId": 18,
+      "typeName": "対空強化弾"
+    },
+    "九一式徹甲弾": {
+      "id": 36,
+      "typeId": 19,
+      "typeName": "対艦強化弾"
+    },
+    "7.7mm機銃": {
+      "id": 37,
+      "typeId": 21,
+      "typeName": "対空機銃"
+    },
+    "12.7mm単装機銃": {
+      "id": 38,
+      "typeId": 21,
+      "typeName": "対空機銃"
+    },
+    "25mm連装機銃": {
+      "id": 39,
+      "typeId": 21,
+      "typeName": "対空機銃"
+    },
+    "25mm三連装機銃": {
+      "id": 40,
+      "typeId": 21,
+      "typeName": "対空機銃"
+    },
+    "甲標的 甲型": {
+      "id": 41,
+      "typeId": 22,
+      "typeName": "特殊潜航艇"
+    },
+    "応急修理要員": {
+      "id": 42,
+      "typeId": 23,
+      "typeName": "応急修理要員"
+    },
+    "応急修理女神": {
+      "id": 43,
+      "typeId": 23,
+      "typeName": "応急修理要員"
+    },
+    "九四式爆雷投射機": {
+      "id": 44,
+      "typeId": 15,
+      "typeName": "爆雷"
+    },
+    "三式爆雷投射機": {
+      "id": 45,
+      "typeId": 15,
+      "typeName": "爆雷"
+    },
+    "九三式水中聴音機": {
+      "id": 46,
+      "typeId": 14,
+      "typeName": "ソナー"
+    },
+    "三式水中探信儀": {
+      "id": 47,
+      "typeId": 14,
+      "typeName": "ソナー"
+    },
+    "12cm単装高角砲": {
+      "id": 48,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "25mm単装機銃": {
+      "id": 49,
+      "typeId": 21,
+      "typeName": "対空機銃"
+    },
+    "20.3cm(3号)連装砲": {
+      "id": 50,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "12cm30連装噴進砲": {
+      "id": 51,
+      "typeId": 21,
+      "typeName": "対空機銃"
+    },
+    "流星改": {
+      "id": 52,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "烈風 一一型": {
+      "id": 53,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "彩雲": {
+      "id": 54,
+      "typeId": 9,
+      "typeName": "艦上偵察機"
+    },
+    "紫電改二": {
+      "id": 55,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "震電改": {
+      "id": 56,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "彗星一二型甲": {
+      "id": 57,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
     },
     "61cm五連装(酸素)魚雷": {
       "id": 58,
       "typeId": 5,
       "typeName": "魚雷"
+    },
+    "零式水上観測機": {
+      "id": 59,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "零式艦戦62型(爆戦)": {
+      "id": 60,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "二式艦上偵察機": {
+      "id": 61,
+      "typeId": 9,
+      "typeName": "艦上偵察機"
+    },
+    "試製晴嵐": {
+      "id": 62,
+      "typeId": 11,
+      "typeName": "水上爆撃機"
+    },
+    "12.7cm連装砲B型改二": {
+      "id": 63,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "Ju87C改": {
+      "id": 64,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "15.2cm連装砲": {
+      "id": 65,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "8cm高角砲": {
+      "id": 66,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "53cm艦首(酸素)魚雷": {
+      "id": 67,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "大発動艇": {
+      "id": 68,
+      "typeId": 24,
+      "typeName": "上陸用舟艇"
+    },
+    "カ号観測機": {
+      "id": 69,
+      "typeId": 25,
+      "typeName": "オートジャイロ"
+    },
+    "三式指揮連絡機(対潜)": {
+      "id": 70,
+      "typeId": 26,
+      "typeName": "対潜哨戒機"
+    },
+    "10cm連装高角砲(砲架)": {
+      "id": 71,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "増設バルジ(中型艦)": {
+      "id": 72,
+      "typeId": 27,
+      "typeName": "追加装甲(中型)"
+    },
+    "増設バルジ(大型艦)": {
+      "id": 73,
+      "typeId": 28,
+      "typeName": "追加装甲(大型)"
+    },
+    "探照灯": {
+      "id": 74,
+      "typeId": 29,
+      "typeName": "探照灯"
+    },
+    "ドラム缶(輸送用)": {
+      "id": 75,
+      "typeId": 30,
+      "typeName": "簡易輸送部材"
+    },
+    "38cm連装砲": {
+      "id": 76,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "15cm連装副砲": {
+      "id": 77,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "12.7cm単装砲": {
+      "id": 78,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "瑞雲(六三四空)": {
+      "id": 79,
+      "typeId": 11,
+      "typeName": "水上爆撃機"
+    },
+    "瑞雲12型": {
+      "id": 80,
+      "typeId": 11,
+      "typeName": "水上爆撃機"
+    },
+    "瑞雲12型(六三四空)": {
+      "id": 81,
+      "typeId": 11,
+      "typeName": "水上爆撃機"
+    },
+    "九七式艦攻(九三一空)": {
+      "id": 82,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "天山(九三一空)": {
+      "id": 83,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "2cm 四連装FlaK 38": {
+      "id": 84,
+      "typeId": 21,
+      "typeName": "対空機銃"
+    },
+    "3.7cm FlaK M42": {
+      "id": 85,
+      "typeId": 21,
+      "typeName": "対空機銃"
+    },
+    "艦艇修理施設": {
+      "id": 86,
+      "typeId": 31,
+      "typeName": "艦艇修理施設"
+    },
+    "新型高温高圧缶": {
+      "id": 87,
+      "typeId": 17,
+      "typeName": "機関部強化"
+    },
+    "22号対水上電探改四": {
+      "id": 88,
+      "typeId": 12,
+      "typeName": "小型電探"
+    },
+    "21号対空電探改": {
+      "id": 89,
+      "typeId": 13,
+      "typeName": "大型電探"
+    },
+    "20.3cm(2号)連装砲": {
+      "id": 90,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "12.7cm連装高角砲(後期型)": {
+      "id": 91,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "毘式40mm連装機銃": {
+      "id": 92,
+      "typeId": 21,
+      "typeName": "対空機銃"
+    },
+    "九七式艦攻(友永隊)": {
+      "id": 93,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "天山一二型(友永隊)": {
+      "id": 94,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "潜水艦53cm艦首魚雷(8門)": {
+      "id": 95,
+      "typeId": 32,
+      "typeName": "潜水艦魚雷"
+    },
+    "零式艦戦21型(熟練)": {
+      "id": 96,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "九九式艦爆(熟練)": {
+      "id": 97,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "九七式艦攻(熟練)": {
+      "id": 98,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "九九式艦爆(江草隊)": {
+      "id": 99,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "彗星(江草隊)": {
+      "id": 100,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "照明弾": {
+      "id": 101,
+      "typeId": 33,
+      "typeName": "照明弾"
+    },
+    "九八式水上偵察機(夜偵)": {
+      "id": 102,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "試製35.6cm三連装砲": {
+      "id": 103,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "35.6cm連装砲(ダズル迷彩)": {
+      "id": 104,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "試製41cm三連装砲": {
+      "id": 105,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "13号対空電探改": {
+      "id": 106,
+      "typeId": 12,
+      "typeName": "小型電探"
+    },
+    "艦隊司令部施設": {
+      "id": 107,
+      "typeId": 34,
+      "typeName": "司令部施設"
+    },
+    "熟練艦載機整備員": {
+      "id": 108,
+      "typeId": 35,
+      "typeName": "航空要員"
+    },
+    "零戦52型丙(六〇一空)": {
+      "id": 109,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "烈風(六〇一空)": {
+      "id": 110,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "彗星(六〇一空)": {
+      "id": 111,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "天山(六〇一空)": {
+      "id": 112,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "流星(六〇一空)": {
+      "id": 113,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "38cm連装砲改": {
+      "id": 114,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "Ar196改": {
+      "id": 115,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "一式徹甲弾": {
+      "id": 116,
+      "typeId": 19,
+      "typeName": "対艦強化弾"
+    },
+    "試製46cm連装砲": {
+      "id": 117,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "紫雲": {
+      "id": 118,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "14cm連装砲": {
+      "id": 119,
+      "typeId": 2,
+      "typeName": "中口径主砲"
     },
     "91式高射装置": {
       "id": 120,
@@ -6389,15 +6904,665 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "typeId": 36,
       "typeName": "高射装置"
     },
+    "10cm連装高角砲+高射装置": {
+      "id": 122,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "SKC34 20.3cm連装砲": {
+      "id": 123,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "FuMO25 レーダー": {
+      "id": 124,
+      "typeId": 13,
+      "typeName": "大型電探"
+    },
+    "61cm三連装(酸素)魚雷": {
+      "id": 125,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "WG42 (Wurfgerät 42)": {
+      "id": 126,
+      "typeId": 37,
+      "typeName": "対地装備"
+    },
+    "試製FaT仕様九五式酸素魚雷改": {
+      "id": 127,
+      "typeId": 32,
+      "typeName": "潜水艦魚雷"
+    },
+    "試製51cm連装砲": {
+      "id": 128,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "熟練見張員": {
+      "id": 129,
+      "typeId": 39,
+      "typeName": "水上艦要員"
+    },
+    "12.7cm高角砲+高射装置": {
+      "id": 130,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "25mm三連装機銃 集中配備": {
+      "id": 131,
+      "typeId": 21,
+      "typeName": "対空機銃"
+    },
+    "零式水中聴音機": {
+      "id": 132,
+      "typeId": 40,
+      "typeName": "大型ソナー"
+    },
+    "381mm/50 三連装砲": {
+      "id": 133,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "OTO 152mm三連装速射砲": {
+      "id": 134,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "90mm単装高角砲": {
+      "id": 135,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "プリエーゼ式水中防御隔壁": {
+      "id": 136,
+      "typeId": 28,
+      "typeName": "追加装甲(大型)"
+    },
+    "381mm/50 三連装砲改": {
+      "id": 137,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "二式大艇": {
+      "id": 138,
+      "typeId": 41,
+      "typeName": "大型飛行艇"
+    },
+    "15.2cm連装砲改": {
+      "id": 139,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
     "96式150cm探照灯": {
       "id": 140,
       "typeId": 42,
       "typeName": "大型探照灯"
     },
+    "32号対水上電探改": {
+      "id": 141,
+      "typeId": 13,
+      "typeName": "大型電探"
+    },
+    "15m二重測距儀+21号電探改二": {
+      "id": 142,
+      "typeId": 13,
+      "typeName": "大型電探"
+    },
+    "九七式艦攻(村田隊)": {
+      "id": 143,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "天山一二型(村田隊)": {
+      "id": 144,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "戦闘糧食": {
+      "id": 145,
+      "typeId": 43,
+      "typeName": "戦闘糧食"
+    },
+    "洋上補給": {
+      "id": 146,
+      "typeId": 44,
+      "typeName": "補給物資"
+    },
+    "120mm/50 連装砲": {
+      "id": 147,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "試製南山": {
+      "id": 148,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "四式水中聴音機": {
+      "id": 149,
+      "typeId": 14,
+      "typeName": "ソナー"
+    },
+    "秋刀魚の缶詰": {
+      "id": 150,
+      "typeId": 43,
+      "typeName": "戦闘糧食"
+    },
+    "試製景雲(艦偵型)": {
+      "id": 151,
+      "typeId": 9,
+      "typeName": "艦上偵察機"
+    },
+    "零式艦戦52型(熟練)": {
+      "id": 152,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "零戦52型丙(付岩井小隊)": {
+      "id": 153,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "零戦62型(爆戦/岩井隊)": {
+      "id": 154,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "零戦21型(付岩本小隊)": {
+      "id": 155,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "零戦52型甲(付岩本小隊)": {
+      "id": 156,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "零式艦戦53型(岩本隊)": {
+      "id": 157,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "Bf109T改": {
+      "id": 158,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "Fw190T改": {
+      "id": 159,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "10.5cm連装砲": {
+      "id": 160,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "16inch三連装砲 Mk.7": {
+      "id": 161,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "203mm/53 連装砲": {
+      "id": 162,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "Ro.43水偵": {
+      "id": 163,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "Ro.44水上戦闘機": {
+      "id": 164,
+      "typeId": 45,
+      "typeName": "水上戦闘機"
+    },
+    "二式水戦改": {
+      "id": 165,
+      "typeId": 45,
+      "typeName": "水上戦闘機"
+    },
+    "大発動艇(八九式中戦車&陸戦隊)": {
+      "id": 166,
+      "typeId": 24,
+      "typeName": "上陸用舟艇"
+    },
+    "特二式内火艇": {
+      "id": 167,
+      "typeId": 46,
+      "typeName": "特型内火艇"
+    },
+    "九六式陸攻": {
+      "id": 168,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "一式陸攻": {
+      "id": 169,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "一式陸攻(野中隊)": {
+      "id": 170,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "OS2U": {
+      "id": 171,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "5inch連装砲 Mk.28 mod.2": {
+      "id": 172,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
     "Bofors 40mm四連装機関砲": {
       "id": 173,
       "typeId": 21,
       "typeName": "対空機銃"
+    },
+    "53cm連装魚雷": {
+      "id": 174,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "雷電": {
+      "id": 175,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "三式戦 飛燕": {
+      "id": 176,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "三式戦 飛燕(飛行第244戦隊)": {
+      "id": 177,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "PBY-5A Catalina": {
+      "id": 178,
+      "typeId": 41,
+      "typeName": "大型飛行艇"
+    },
+    "試製61cm六連装(酸素)魚雷": {
+      "id": 179,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "一式陸攻 二二型甲": {
+      "id": 180,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "零式艦戦32型": {
+      "id": 181,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "零式艦戦32型(熟練)": {
+      "id": 182,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "16inch三連装砲 Mk.7+GFCS": {
+      "id": 183,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "Re.2001 OR改": {
+      "id": 184,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "三式戦 飛燕一型丁": {
+      "id": 185,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "一式陸攻 三四型": {
+      "id": 186,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "銀河": {
+      "id": 187,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "Re.2001 G改": {
+      "id": 188,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "Re.2005 改": {
+      "id": 189,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "38.1cm Mk.I連装砲": {
+      "id": 190,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "QF 2ポンド8連装ポンポン砲": {
+      "id": 191,
+      "typeId": 21,
+      "typeName": "対空機銃"
+    },
+    "38.1cm Mk.I/N連装砲改": {
+      "id": 192,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "特大発動艇": {
+      "id": 193,
+      "typeId": 24,
+      "typeName": "上陸用舟艇"
+    },
+    "Laté 298B": {
+      "id": 194,
+      "typeId": 11,
+      "typeName": "水上爆撃機"
+    },
+    "SBD": {
+      "id": 195,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "TBD": {
+      "id": 196,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "F4F-3": {
+      "id": 197,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "F4F-4": {
+      "id": 198,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "噴式景雲改": {
+      "id": 199,
+      "typeId": 57,
+      "typeName": "噴式戦闘爆撃機"
+    },
+    "橘花改": {
+      "id": 200,
+      "typeId": 57,
+      "typeName": "噴式戦闘爆撃機"
+    },
+    "紫電一一型": {
+      "id": 201,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "紫電二一型 紫電改": {
+      "id": 202,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "艦本新設計 増設バルジ(中型艦)": {
+      "id": 203,
+      "typeId": 27,
+      "typeName": "追加装甲(中型)"
+    },
+    "艦本新設計 増設バルジ(大型艦)": {
+      "id": 204,
+      "typeId": 28,
+      "typeName": "追加装甲(大型)"
+    },
+    "F6F-3": {
+      "id": 205,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "F6F-5": {
+      "id": 206,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "瑞雲(六三一空)": {
+      "id": 207,
+      "typeId": 11,
+      "typeName": "水上爆撃機"
+    },
+    "晴嵐(六三一空)": {
+      "id": 208,
+      "typeId": 11,
+      "typeName": "水上爆撃機"
+    },
+    "彩雲(輸送用分解済)": {
+      "id": 209,
+      "typeId": 50,
+      "typeName": "輸送機材"
+    },
+    "潜水艦搭載電探&水防式望遠鏡": {
+      "id": 210,
+      "typeId": 51,
+      "typeName": "潜水艦装備"
+    },
+    "潜水艦搭載電探&逆探(E27)": {
+      "id": 211,
+      "typeId": 51,
+      "typeName": "潜水艦装備"
+    },
+    "彩雲(東カロリン空)": {
+      "id": 212,
+      "typeId": 9,
+      "typeName": "艦上偵察機"
+    },
+    "後期型艦首魚雷(6門)": {
+      "id": 213,
+      "typeId": 32,
+      "typeName": "潜水艦魚雷"
+    },
+    "熟練聴音員+後期型艦首魚雷(6門)": {
+      "id": 214,
+      "typeId": 32,
+      "typeName": "潜水艦魚雷"
+    },
+    "Ro.44水上戦闘機bis": {
+      "id": 215,
+      "typeId": 45,
+      "typeName": "水上戦闘機"
+    },
+    "二式水戦改(熟練)": {
+      "id": 216,
+      "typeId": 45,
+      "typeName": "水上戦闘機"
+    },
+    "強風改": {
+      "id": 217,
+      "typeId": 45,
+      "typeName": "水上戦闘機"
+    },
+    "四式戦 疾風": {
+      "id": 218,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "零式艦戦63型(爆戦)": {
+      "id": 219,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "8cm高角砲改+増設機銃": {
+      "id": 220,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "一式戦 隼II型": {
+      "id": 221,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "一式戦 隼III型甲": {
+      "id": 222,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "一式戦 隼III型甲(54戦隊)": {
+      "id": 223,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "爆装一式戦 隼III型改(65戦隊)": {
+      "id": 224,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "一式戦 隼II型(64戦隊)": {
+      "id": 225,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "九五式爆雷": {
+      "id": 226,
+      "typeId": 15,
+      "typeName": "爆雷"
+    },
+    "二式爆雷": {
+      "id": 227,
+      "typeId": 15,
+      "typeName": "爆雷"
+    },
+    "九六式艦戦改": {
+      "id": 228,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "12.7cm単装高角砲(後期型)": {
+      "id": 229,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "特大発動艇+戦車第11連隊": {
+      "id": 230,
+      "typeId": 24,
+      "typeName": "上陸用舟艇"
+    },
+    "30.5cm三連装砲": {
+      "id": 231,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "30.5cm三連装砲改": {
+      "id": 232,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "F4U-1D": {
+      "id": 233,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "15.5cm三連装副砲改": {
+      "id": 234,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "15.5cm三連装砲改": {
+      "id": 235,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "41cm三連装砲改": {
+      "id": 236,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "瑞雲(六三四空/熟練)": {
+      "id": 237,
+      "typeId": 11,
+      "typeName": "水上爆撃機"
+    },
+    "零式水上偵察機11型乙": {
+      "id": 238,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "零式水上偵察機11型乙(熟練)": {
+      "id": 239,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "22号対水上電探改四(後期調整型)": {
+      "id": 240,
+      "typeId": 12,
+      "typeName": "小型電探"
+    },
+    "戦闘糧食(特別なおにぎり)": {
+      "id": 241,
+      "typeId": 43,
+      "typeName": "戦闘糧食"
+    },
+    "Swordfish": {
+      "id": 242,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "Swordfish Mk.II(熟練)": {
+      "id": 243,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "Swordfish Mk.III(熟練)": {
+      "id": 244,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "38cm四連装砲": {
+      "id": 245,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "38cm四連装砲改": {
+      "id": 246,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "15.2cm三連装砲": {
+      "id": 247,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "Skua": {
+      "id": 248,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "Fulmar": {
+      "id": 249,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "Spitfire Mk.I": {
+      "id": 250,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "Spitfire Mk.V": {
+      "id": 251,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "Seafire Mk.III改": {
+      "id": 252,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "Spitfire Mk.IX(熟練)": {
+      "id": 253,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
     },
     "F6F-3N": {
       "id": 254,
@@ -6409,20 +7574,350 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "typeId": 6,
       "typeName": "艦上戦闘機"
     },
-    "FuMO25 レーダー": {
-      "id": 124,
-      "typeId": 13,
-      "typeName": "大型電探"
+    "TBF": {
+      "id": 256,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "TBM-3D": {
+      "id": 257,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "夜間作戦航空要員": {
+      "id": 258,
+      "typeId": 35,
+      "typeName": "航空要員"
+    },
+    "夜間作戦航空要員+熟練甲板員": {
+      "id": 259,
+      "typeId": 35,
+      "typeName": "航空要員"
+    },
+    "Type124 ASDIC": {
+      "id": 260,
+      "typeId": 14,
+      "typeName": "ソナー"
+    },
+    "Type144/147 ASDIC": {
+      "id": 261,
+      "typeId": 14,
+      "typeName": "ソナー"
     },
     "HF/DF + Type144/147 ASDIC": {
       "id": 262,
       "typeId": 14,
       "typeName": "ソナー"
     },
-    "M4A1 DD": {
-      "id": 355,
-      "typeId": 24,
-      "typeName": "上陸用舟艇"
+    "紫電改(三四三空) 戦闘301": {
+      "id": 263,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "紫電改(三四三空) 戦闘701": {
+      "id": 264,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "紫電改(三四三空) 戦闘407": {
+      "id": 265,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "12.7cm連装砲C型改二": {
+      "id": 266,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "12.7cm連装砲D型改二": {
+      "id": 267,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "北方迷彩(+北方装備)": {
+      "id": 268,
+      "typeId": 27,
+      "typeName": "追加装甲(中型)"
+    },
+    "試製東海": {
+      "id": 269,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "東海(九〇一空)": {
+      "id": 270,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "紫電改四": {
+      "id": 271,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "遊撃部隊 艦隊司令部": {
+      "id": 272,
+      "typeId": 34,
+      "typeName": "司令部施設"
+    },
+    "彩雲(偵四)": {
+      "id": 273,
+      "typeId": 9,
+      "typeName": "艦上偵察機"
+    },
+    "12cm30連装噴進砲改二": {
+      "id": 274,
+      "typeId": 21,
+      "typeName": "対空機銃"
+    },
+    "10cm連装高角砲改+増設機銃": {
+      "id": 275,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "46cm三連装砲改": {
+      "id": 276,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "FM-2": {
+      "id": 277,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "SK レーダー": {
+      "id": 278,
+      "typeId": 13,
+      "typeName": "大型電探"
+    },
+    "SK+SG レーダー": {
+      "id": 279,
+      "typeId": 13,
+      "typeName": "大型電探"
+    },
+    "QF 4.7inch砲 Mk.XII改": {
+      "id": 280,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "51cm連装砲": {
+      "id": 281,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "130mm B-13連装砲": {
+      "id": 282,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "533mm 三連装魚雷": {
+      "id": 283,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "5inch単装砲 Mk.30": {
+      "id": 284,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "61cm三連装(酸素)魚雷後期型": {
+      "id": 285,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "61cm四連装(酸素)魚雷後期型": {
+      "id": 286,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "三式爆雷投射機 集中配備": {
+      "id": 287,
+      "typeId": 15,
+      "typeName": "爆雷"
+    },
+    "試製15cm9連装対潜噴進砲": {
+      "id": 288,
+      "typeId": 15,
+      "typeName": "爆雷"
+    },
+    "35.6cm三連装砲改(ダズル迷彩仕様)": {
+      "id": 289,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "41cm三連装砲改二": {
+      "id": 290,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "彗星二二型(六三四空)": {
+      "id": 291,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "彗星二二型(六三四空/熟練)": {
+      "id": 292,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "12cm単装砲改二": {
+      "id": 293,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "12.7cm連装砲A型改二": {
+      "id": 294,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "12.7cm連装砲A型改三(戦時改修)+高射装置": {
+      "id": 295,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "12.7cm連装砲B型改四(戦時改修)+高射装置": {
+      "id": 296,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "12.7cm連装砲A型": {
+      "id": 297,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "16inch Mk.I三連装砲": {
+      "id": 298,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "16inch Mk.I三連装砲+AFCT改": {
+      "id": 299,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "16inch Mk.I三連装砲改+FCR type284": {
+      "id": 300,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "20連装7inch UP Rocket Launchers": {
+      "id": 301,
+      "typeId": 21,
+      "typeName": "対空機銃"
+    },
+    "九七式艦攻(九三一空/熟練)": {
+      "id": 302,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "Bofors 15.2cm連装砲 Model 1930": {
+      "id": 303,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "S9 Osprey": {
+      "id": 304,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "Ju87C改二(KMX搭載機)": {
+      "id": 305,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "Ju87C改二(KMX搭載機/熟練)": {
+      "id": 306,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "GFCS Mk.37": {
+      "id": 307,
+      "typeId": 12,
+      "typeName": "小型電探"
+    },
+    "5inch単装砲 Mk.30改+GFCS Mk.37": {
+      "id": 308,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "甲標的 丙型": {
+      "id": 309,
+      "typeId": 22,
+      "typeName": "特殊潜航艇"
+    },
+    "14cm連装砲改": {
+      "id": 310,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "二式陸上偵察機": {
+      "id": 311,
+      "typeId": 49,
+      "typeName": "陸上偵察機"
+    },
+    "二式陸上偵察機(熟練)": {
+      "id": 312,
+      "typeId": 49,
+      "typeName": "陸上偵察機"
+    },
+    "5inch単装砲 Mk.30改": {
+      "id": 313,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "533mm五連装魚雷(初期型)": {
+      "id": 314,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "SG レーダー(初期型)": {
+      "id": 315,
+      "typeId": 12,
+      "typeName": "小型電探"
+    },
+    "Re.2001 CB改": {
+      "id": 316,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "三式弾改": {
+      "id": 317,
+      "typeId": 18,
+      "typeName": "対空強化弾"
+    },
+    "41cm連装砲改二": {
+      "id": 318,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "彗星一二型(六三四空/三号爆弾搭載機)": {
+      "id": 319,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "彗星一二型(三一号光電管爆弾搭載機)": {
+      "id": 320,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "瑞雲改二(六三四空)": {
+      "id": 322,
+      "typeId": 11,
+      "typeName": "水上爆撃機"
+    },
+    "瑞雲改二(六三四空/熟練)": {
+      "id": 323,
+      "typeId": 11,
+      "typeName": "水上爆撃機"
+    },
+    "オ号観測機改": {
+      "id": 324,
+      "typeId": 25,
+      "typeName": "オートジャイロ"
+    },
+    "オ号観測機改二": {
+      "id": 325,
+      "typeId": 25,
+      "typeName": "オートジャイロ"
     },
     "S-51J": {
       "id": 326,
@@ -6434,275 +7929,75 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "typeId": 25,
       "typeName": "オートジャイロ"
     },
-    "SG レーダー(初期型)": {
-      "id": 315,
-      "typeId": 12,
-      "typeName": "小型電探"
-    },
-    "TBM-3D": {
-      "id": 257,
-      "typeId": 8,
-      "typeName": "艦上攻撃機"
-    },
-    "オ号観測機改二": {
-      "id": 325,
-      "typeId": 25,
-      "typeName": "オートジャイロ"
-    },
-    "カ号観測機": {
-      "id": 69,
-      "typeId": 25,
-      "typeName": "オートジャイロ"
-    },
-    "一式戦 隼III型甲(54戦隊)": {
-      "id": 223,
-      "typeId": 48,
-      "typeName": "局地戦闘機"
-    },
-    "一式戦 隼II型(64戦隊)": {
-      "id": 225,
-      "typeId": 48,
-      "typeName": "局地戦闘機"
-    },
-    "一式徹甲弾": {
-      "id": 116,
-      "typeId": 19,
-      "typeName": "対艦強化弾"
-    },
-    "一式陸攻": {
-      "id": 169,
-      "typeId": 47,
-      "typeName": "陸上攻撃機"
-    },
-    "一式陸攻 三四型": {
-      "id": 186,
-      "typeId": 47,
-      "typeName": "陸上攻撃機"
-    },
-    "応急修理女神": {
-      "id": 43,
-      "typeId": 23,
-      "typeName": "応急修理要員"
-    },
-    "応急修理要員": {
-      "id": 42,
-      "typeId": 23,
-      "typeName": "応急修理要員"
-    },
-    "改良型艦本式タービン": {
-      "id": 33,
-      "typeId": 17,
-      "typeName": "機関部強化"
-    },
-    "艦隊司令部施設": {
-      "id": 107,
-      "typeId": 34,
-      "typeName": "司令部施設"
-    },
-    "艦本新設計 増設バルジ(大型艦)": {
-      "id": 204,
-      "typeId": 28,
-      "typeName": "追加装甲(大型)"
-    },
-    "艦本新設計 増設バルジ(中型艦)": {
-      "id": 203,
-      "typeId": 27,
-      "typeName": "追加装甲(中型)"
-    },
-    "橘花改": {
-      "id": 200,
-      "typeId": 57,
-      "typeName": "噴式戦闘爆撃機"
-    },
-    "強化型艦本式缶": {
-      "id": 34,
-      "typeId": 17,
-      "typeName": "機関部強化"
-    },
-    "銀河": {
-      "id": 187,
-      "typeId": 47,
-      "typeName": "陸上攻撃機"
-    },
-    "九一式徹甲弾": {
-      "id": 36,
-      "typeId": 19,
-      "typeName": "対艦強化弾"
-    },
-    "九八式水上偵察機(夜偵)": {
-      "id": 102,
-      "typeId": 10,
-      "typeName": "水上偵察機"
-    },
-    "後期型艦首魚雷(6門)": {
-      "id": 213,
-      "typeId": 32,
-      "typeName": "潜水艦魚雷"
-    },
-    "甲標的 丙型": {
-      "id": 309,
-      "typeId": 22,
-      "typeName": "特殊潜航艇"
-    },
-    "彩雲": {
-      "id": 54,
-      "typeId": 9,
-      "typeName": "艦上偵察機"
-    },
-    "三式水中探信儀": {
-      "id": 47,
-      "typeId": 14,
-      "typeName": "ソナー"
-    },
-    "三式弾": {
-      "id": 35,
-      "typeId": 18,
-      "typeName": "対空強化弾"
-    },
-    "三式爆雷投射機 集中配備": {
-      "id": 287,
-      "typeId": 15,
-      "typeName": "爆雷"
-    },
-    "四式重爆 飛龍": {
-      "id": 403,
-      "typeId": 47,
-      "typeName": "陸上攻撃機"
-    },
-    "四式水中聴音機": {
-      "id": 149,
-      "typeId": 14,
-      "typeName": "ソナー"
-    },
-    "紫雲": {
-      "id": 118,
-      "typeId": 10,
-      "typeName": "水上偵察機"
-    },
-    "紫雲(熟練)": {
-      "id": 521,
-      "typeId": 10,
-      "typeName": "水上偵察機"
-    },
-    "紫電改(三四三空) 戦闘301": {
-      "id": 263,
-      "typeId": 48,
-      "typeName": "局地戦闘機"
-    },
-    "試製51cm連装砲": {
-      "id": 128,
+    "35.6cm連装砲改": {
+      "id": 328,
       "typeId": 3,
       "typeName": "大口径主砲"
     },
-    "試製東海": {
-      "id": 269,
-      "typeId": 47,
-      "typeName": "陸上攻撃機"
+    "35.6cm連装砲改二": {
+      "id": 329,
+      "typeId": 3,
+      "typeName": "大口径主砲"
     },
-    "試製烈風 後期型": {
-      "id": 22,
+    "16inch Mk.I連装砲": {
+      "id": 330,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "16inch Mk.V連装砲": {
+      "id": 331,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "16inch Mk.VIII連装砲改": {
+      "id": 332,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "烈風改": {
+      "id": 333,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "烈風改(三五二空/熟練)": {
+      "id": 334,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "烈風改(試製艦載型)": {
+      "id": 335,
       "typeId": 6,
       "typeName": "艦上戦闘機"
     },
-    "熟練見張員": {
-      "id": 129,
-      "typeId": 39,
-      "typeName": "水上艦要員"
+    "烈風改二": {
+      "id": 336,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
     },
-    "熟練甲板要員": {
-      "id": 477,
-      "typeId": 35,
-      "typeName": "航空要員"
+    "烈風改二(一航戦/熟練)": {
+      "id": 337,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
     },
-    "照明弾": {
-      "id": 101,
-      "typeId": 33,
-      "typeName": "照明弾"
+    "烈風改二戊型": {
+      "id": 338,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
     },
-    "新型高温高圧缶": {
-      "id": 87,
-      "typeId": 17,
-      "typeName": "機関部強化"
+    "烈風改二戊型(一航戦/熟練)": {
+      "id": 339,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
     },
-    "水雷戦隊 熟練見張員": {
-      "id": 412,
-      "typeId": 39,
-      "typeName": "水上艦要員"
+    "152mm/55 三連装速射砲": {
+      "id": 340,
+      "typeId": 2,
+      "typeName": "中口径主砲"
     },
-    "瑞雲改二(六三四空)": {
-      "id": 322,
-      "typeId": 11,
-      "typeName": "水上爆撃機"
-    },
-    "精鋭水雷戦隊 司令部": {
-      "id": 413,
-      "typeId": 34,
-      "typeName": "司令部施設"
-    },
-    "増設バルジ(大型艦)": {
-      "id": 73,
-      "typeId": 28,
-      "typeName": "追加装甲(大型)"
-    },
-    "増設バルジ(中型艦)": {
-      "id": 72,
-      "typeId": 27,
-      "typeName": "追加装甲(中型)"
-    },
-    "大発動艇": {
-      "id": 68,
-      "typeId": 24,
-      "typeName": "上陸用舟艇"
-    },
-    "探照灯": {
-      "id": 74,
-      "typeId": 29,
-      "typeName": "探照灯"
-    },
-    "天山一二型(友永隊)": {
-      "id": 94,
-      "typeId": 8,
-      "typeName": "艦上攻撃機"
-    },
-    "特二式内火艇": {
-      "id": 167,
-      "typeId": 46,
-      "typeName": "特型内火艇"
-    },
-    "二式水戦改(熟練)": {
-      "id": 216,
-      "typeId": 45,
-      "typeName": "水上戦闘機"
-    },
-    "発煙装置(煙幕)": {
-      "id": 500,
-      "typeId": 54,
-      "typeName": "水上艦装備"
-    },
-    "噴式景雲改": {
-      "id": 199,
-      "typeId": 57,
-      "typeName": "噴式戦闘爆撃機"
-    },
-    "夜間作戦航空要員": {
-      "id": 258,
-      "typeId": 35,
-      "typeName": "航空要員"
-    },
-    "遊撃部隊 艦隊司令部": {
-      "id": 272,
-      "typeId": 34,
-      "typeName": "司令部施設"
-    },
-    "洋上補給": {
-      "id": 146,
-      "typeId": 44,
-      "typeName": "補給物資"
-    },
-    "雷電": {
-      "id": 175,
-      "typeId": 48,
-      "typeName": "局地戦闘機"
+    "152mm/55 三連装速射砲改": {
+      "id": 341,
+      "typeId": 2,
+      "typeName": "中口径主砲"
     },
     "流星改(一航戦)": {
       "id": 342,
@@ -6714,25 +8009,1215 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "typeId": 8,
       "typeName": "艦上攻撃機"
     },
-    "零式艦戦53型(岩本隊)": {
-      "id": 157,
+    "九七式艦攻改 試製三号戊型(空六号電探改装備機)": {
+      "id": 344,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "九七式艦攻改(熟練) 試製三号戊型(空六号電探改装備機)": {
+      "id": 345,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "二式12cm迫撃砲改": {
+      "id": 346,
+      "typeId": 15,
+      "typeName": "爆雷"
+    },
+    "二式12cm迫撃砲改 集中配備": {
+      "id": 347,
+      "typeId": 15,
+      "typeName": "爆雷"
+    },
+    "艦載型 四式20cm対地噴進砲": {
+      "id": 348,
+      "typeId": 37,
+      "typeName": "対地装備"
+    },
+    "四式20cm対地噴進砲 集中配備": {
+      "id": 349,
+      "typeId": 37,
+      "typeName": "対地装備"
+    },
+    "Me163B": {
+      "id": 350,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "試製 秋水": {
+      "id": 351,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "秋水": {
+      "id": 352,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "Fw190 A-5改(熟練)": {
+      "id": 353,
       "typeId": 6,
       "typeName": "艦上戦闘機"
     },
-    "零式水上偵察機11型乙(熟練)": {
-      "id": 239,
+    "Fw190 D-9": {
+      "id": 354,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "M4A1 DD": {
+      "id": 355,
+      "typeId": 24,
+      "typeName": "上陸用舟艇"
+    },
+    "8inch三連装砲 Mk.9": {
+      "id": 356,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "8inch三連装砲 Mk.9 mod.2": {
+      "id": 357,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "5inch 単装高角砲群": {
+      "id": 358,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "6inch 連装速射砲 Mk.XXI": {
+      "id": 359,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "Bofors 15cm連装速射砲 Mk.9 Model 1938": {
+      "id": 360,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "Bofors 15cm連装速射砲 Mk.9改+単装速射砲 Mk.10改 Model 1938": {
+      "id": 361,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "5inch連装両用砲(集中配備)": {
+      "id": 362,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "GFCS Mk.37+5inch連装両用砲(集中配備)": {
+      "id": 363,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "甲標的 丁型改(蛟龍改)": {
+      "id": 364,
+      "typeId": 22,
+      "typeName": "特殊潜航艇"
+    },
+    "一式徹甲弾改": {
+      "id": 365,
+      "typeId": 19,
+      "typeName": "対艦強化弾"
+    },
+    "12.7cm連装砲D型改三": {
+      "id": 366,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "Swordfish(水上機型)": {
+      "id": 367,
+      "typeId": 11,
+      "typeName": "水上爆撃機"
+    },
+    "Swordfish Mk.III改(水上機型)": {
+      "id": 368,
+      "typeId": 11,
+      "typeName": "水上爆撃機"
+    },
+    "Swordfish Mk.III改(水上機型/熟練)": {
+      "id": 369,
+      "typeId": 11,
+      "typeName": "水上爆撃機"
+    },
+    "Swordfish Mk.II改(水偵型)": {
+      "id": 370,
       "typeId": 10,
       "typeName": "水上偵察機"
     },
-    "烈風(六〇一空)": {
-      "id": 110,
+    "Fairey Seafox改": {
+      "id": 371,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "天山一二型甲": {
+      "id": 372,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "天山一二型甲改(空六号電探改装備機)": {
+      "id": 373,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "天山一二型甲改(熟練/空六号電探改装備機)": {
+      "id": 374,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "XF5U": {
+      "id": 375,
       "typeId": 6,
       "typeName": "艦上戦闘機"
     },
-    "彗星(江草隊)": {
-      "id": 100,
+    "533mm五連装魚雷(後期型)": {
+      "id": 376,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "RUR-4A Weapon Alpha改": {
+      "id": 377,
+      "typeId": 15,
+      "typeName": "爆雷"
+    },
+    "対潜短魚雷(試作初期型)": {
+      "id": 378,
+      "typeId": 15,
+      "typeName": "爆雷"
+    },
+    "12.7cm単装高角砲改二": {
+      "id": 379,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "12.7cm連装高角砲改二": {
+      "id": 380,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "16inch三連装砲 Mk.6": {
+      "id": 381,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "12cm単装高角砲E型": {
+      "id": 382,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "後期型53cm艦首魚雷(8門)": {
+      "id": 383,
+      "typeId": 32,
+      "typeName": "潜水艦魚雷"
+    },
+    "後期型潜水艦搭載電探&逆探": {
+      "id": 384,
+      "typeId": 51,
+      "typeName": "潜水艦装備"
+    },
+    "16inch三連装砲 Mk.6 mod.2": {
+      "id": 385,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "6inch三連装速射砲 Mk.16": {
+      "id": 386,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "6inch三連装速射砲 Mk.16 mod.2": {
+      "id": 387,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "銀河(江草隊)": {
+      "id": 388,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "TBM-3W+3S": {
+      "id": 389,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "16inch三連装砲 Mk.6+GFCS": {
+      "id": 390,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "九九式艦爆二二型": {
+      "id": 391,
       "typeId": 7,
       "typeName": "艦上爆撃機"
+    },
+    "九九式艦爆二二型(熟練)": {
+      "id": 392,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "120mm/50 連装砲 mod.1936": {
+      "id": 393,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "120mm/50 連装砲改 A.mod.1937": {
+      "id": 394,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "深山": {
+      "id": 395,
+      "typeId": 53,
+      "typeName": "大型陸上機"
+    },
+    "深山改": {
+      "id": 396,
+      "typeId": 53,
+      "typeName": "大型陸上機"
+    },
+    "現地改装12.7cm連装高角砲": {
+      "id": 397,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "現地改装10cm連装高角砲": {
+      "id": 398,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "6inch Mk.XXIII三連装砲": {
+      "id": 399,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "533mm 三連装魚雷(53-39型)": {
+      "id": 400,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "Do 17 Z-2": {
+      "id": 401,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "寒冷地装備&甲板要員": {
+      "id": 402,
+      "typeId": 35,
+      "typeName": "航空要員"
+    },
+    "四式重爆 飛龍": {
+      "id": 403,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "四式重爆 飛龍(熟練)": {
+      "id": 404,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "Do 217 E-5+Hs293初期型": {
+      "id": 405,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "Do 217 K-2+Fritz-X": {
+      "id": 406,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "15.2cm連装砲改二": {
+      "id": 407,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "装甲艇(AB艇)": {
+      "id": 408,
+      "typeId": 24,
+      "typeName": "上陸用舟艇"
+    },
+    "武装大発": {
+      "id": 409,
+      "typeId": 24,
+      "typeName": "上陸用舟艇"
+    },
+    "21号対空電探改二": {
+      "id": 410,
+      "typeId": 13,
+      "typeName": "大型電探"
+    },
+    "42号対空電探改二": {
+      "id": 411,
+      "typeId": 13,
+      "typeName": "大型電探"
+    },
+    "水雷戦隊 熟練見張員": {
+      "id": 412,
+      "typeId": 39,
+      "typeName": "水上艦要員"
+    },
+    "精鋭水雷戦隊 司令部": {
+      "id": 413,
+      "typeId": 34,
+      "typeName": "司令部施設"
+    },
+    "SOC Seagull": {
+      "id": 414,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "SO3C Seamew改": {
+      "id": 415,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "零式艦戦21型(台南空)": {
+      "id": 416,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "零式艦戦32型(台南空)": {
+      "id": 417,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "零式艦戦22型(251空)": {
+      "id": 418,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "SBD-5": {
+      "id": 419,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "SB2C-3": {
+      "id": 420,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "SB2C-5": {
+      "id": 421,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "FR-1 Fireball": {
+      "id": 422,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "Fulmar(戦闘偵察/熟練)": {
+      "id": 423,
+      "typeId": 9,
+      "typeName": "艦上偵察機"
+    },
+    "Barracuda Mk.II": {
+      "id": 424,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "Barracuda Mk.III": {
+      "id": 425,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "305mm/46 連装砲": {
+      "id": 426,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "305mm/46 三連装砲": {
+      "id": 427,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "320mm/44 連装砲": {
+      "id": 428,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "320mm/44 三連装砲": {
+      "id": 429,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "65mm/64 単装速射砲改": {
+      "id": 430,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "SM.79": {
+      "id": 431,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "SM.79 bis": {
+      "id": 432,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "SM.79 bis(熟練)": {
+      "id": 433,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "Corsair Mk.II": {
+      "id": 434,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "Corsair Mk.II(Ace)": {
+      "id": 435,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "大発動艇(II号戦車/北アフリカ仕様)": {
+      "id": 436,
+      "typeId": 24,
+      "typeName": "上陸用舟艇"
+    },
+    "試製 陣風": {
+      "id": 437,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "三式水中探信儀改": {
+      "id": 438,
+      "typeId": 14,
+      "typeName": "ソナー"
+    },
+    "Hedgehog(初期型)": {
+      "id": 439,
+      "typeId": 15,
+      "typeName": "爆雷"
+    },
+    "21inch艦首魚雷発射管6門(初期型)": {
+      "id": 440,
+      "typeId": 32,
+      "typeName": "潜水艦魚雷"
+    },
+    "21inch艦首魚雷発射管6門(後期型)": {
+      "id": 441,
+      "typeId": 32,
+      "typeName": "潜水艦魚雷"
+    },
+    "潜水艦後部魚雷発射管4門(初期型)": {
+      "id": 442,
+      "typeId": 32,
+      "typeName": "潜水艦魚雷"
+    },
+    "潜水艦後部魚雷発射管4門(後期型)": {
+      "id": 443,
+      "typeId": 32,
+      "typeName": "潜水艦魚雷"
+    },
+    "四式重爆 飛龍+イ号一型甲 誘導弾": {
+      "id": 444,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "二式複戦 屠龍": {
+      "id": 445,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "二式複戦 屠龍 丙型": {
+      "id": 446,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "零式艦戦64型(複座KMX搭載機)": {
+      "id": 447,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "特大発動艇+一式砲戦車": {
+      "id": 449,
+      "typeId": 24,
+      "typeName": "上陸用舟艇"
+    },
+    "13号対空電探改(後期型)": {
+      "id": 450,
+      "typeId": 12,
+      "typeName": "小型電探"
+    },
+    "三式指揮連絡機改": {
+      "id": 451,
+      "typeId": 26,
+      "typeName": "対潜哨戒機"
+    },
+    "キ96": {
+      "id": 452,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "キ102乙": {
+      "id": 453,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "キ102乙改+イ号一型乙 誘導弾": {
+      "id": 454,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "試製 長12.7cm連装砲A型改四": {
+      "id": 455,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "SG レーダー(後期型)": {
+      "id": 456,
+      "typeId": 12,
+      "typeName": "小型電探"
+    },
+    "後期型艦首魚雷(4門)": {
+      "id": 457,
+      "typeId": 32,
+      "typeName": "潜水艦魚雷"
+    },
+    "後期型電探&逆探+シュノーケル装備": {
+      "id": 458,
+      "typeId": 51,
+      "typeName": "潜水艦装備"
+    },
+    "B-25": {
+      "id": 459,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "15m二重測距儀改+21号電探改二+熟練射撃指揮所": {
+      "id": 460,
+      "typeId": 13,
+      "typeName": "大型電探"
+    },
+    "熟練聴音員+後期型艦首魚雷(4門)": {
+      "id": 461,
+      "typeId": 32,
+      "typeName": "潜水艦魚雷"
+    },
+    "15.5cm三連装副砲改二": {
+      "id": 463,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "10cm連装高角砲群 集中配備": {
+      "id": 464,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "試製51cm三連装砲": {
+      "id": 465,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "流星改(熟練)": {
+      "id": 466,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "5inch連装砲(副砲配置) 集中配備": {
+      "id": 467,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "38cm四連装砲改 deux": {
+      "id": 468,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "零式水上偵察機11型乙改(夜偵)": {
+      "id": 469,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "12.7cm連装砲C型改三": {
+      "id": 470,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "Loire 130M": {
+      "id": 471,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "Mk.32 対潜魚雷(Mk.2落射機)": {
+      "id": 472,
+      "typeId": 15,
+      "typeName": "爆雷"
+    },
+    "F4U-2 Night Corsair": {
+      "id": 473,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "F4U-4": {
+      "id": 474,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "AU-1": {
+      "id": 475,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "F4U-7": {
+      "id": 476,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "熟練甲板要員": {
+      "id": 477,
+      "typeId": 35,
+      "typeName": "航空要員"
+    },
+    "熟練甲板要員+航空整備員": {
+      "id": 478,
+      "typeId": 35,
+      "typeName": "航空要員"
+    },
+    "Mosquito FB Mk.VI": {
+      "id": 479,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "Mosquito PR Mk.IV": {
+      "id": 480,
+      "typeId": 49,
+      "typeName": "陸上偵察機"
+    },
+    "Mosquito TR Mk.33": {
+      "id": 481,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "特大発動艇+Ⅲ号戦車(北アフリカ仕様)": {
+      "id": 482,
+      "typeId": 24,
+      "typeName": "上陸用舟艇"
+    },
+    "三式弾改二": {
+      "id": 483,
+      "typeId": 18,
+      "typeName": "対空強化弾"
+    },
+    "四式重爆 飛龍(熟練)+イ号一型甲 誘導弾": {
+      "id": 484,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "強風改二": {
+      "id": 485,
+      "typeId": 45,
+      "typeName": "水上戦闘機"
+    },
+    "零式艦戦64型(制空戦闘機仕様)": {
+      "id": 486,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "零式艦戦64型(熟練爆戦)": {
+      "id": 487,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "二式爆雷改二": {
+      "id": 488,
+      "typeId": 15,
+      "typeName": "爆雷"
+    },
+    "一式戦 隼II型改(20戦隊)": {
+      "id": 489,
+      "typeId": 26,
+      "typeName": "対潜哨戒機"
+    },
+    "試製 夜間瑞雲(攻撃装備)": {
+      "id": 490,
+      "typeId": 11,
+      "typeName": "水上爆撃機"
+    },
+    "一式戦 隼III型改(熟練/20戦隊)": {
+      "id": 491,
+      "typeId": 26,
+      "typeName": "対潜哨戒機"
+    },
+    "零戦52型丙(八幡部隊)": {
+      "id": 492,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "一式陸攻(八幡部隊)": {
+      "id": 493,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "特大発動艇+チハ": {
+      "id": 494,
+      "typeId": 24,
+      "typeName": "上陸用舟艇"
+    },
+    "特大発動艇+チハ改": {
+      "id": 495,
+      "typeId": 24,
+      "typeName": "上陸用舟艇"
+    },
+    "陸軍歩兵部隊": {
+      "id": 496,
+      "typeId": 52,
+      "typeName": "陸戦部隊"
+    },
+    "九七式中戦車(チハ)": {
+      "id": 497,
+      "typeId": 52,
+      "typeName": "陸戦部隊"
+    },
+    "九七式中戦車 新砲塔(チハ改)": {
+      "id": 498,
+      "typeId": 52,
+      "typeName": "陸戦部隊"
+    },
+    "陸軍歩兵部隊+チハ改": {
+      "id": 499,
+      "typeId": 52,
+      "typeName": "陸戦部隊"
+    },
+    "発煙装置(煙幕)": {
+      "id": 500,
+      "typeId": 54,
+      "typeName": "水上艦装備"
+    },
+    "発煙装置改(煙幕)": {
+      "id": 501,
+      "typeId": 54,
+      "typeName": "水上艦装備"
+    },
+    "35.6cm連装砲改三(ダズル迷彩仕様)": {
+      "id": 502,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "35.6cm連装砲改四": {
+      "id": 503,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "銀河(熟練)": {
+      "id": 504,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "25mm対空機銃増備": {
+      "id": 505,
+      "typeId": 21,
+      "typeName": "対空機銃"
+    },
+    "電探装備マスト(13号改+22号電探改四)": {
+      "id": 506,
+      "typeId": 12,
+      "typeName": "小型電探"
+    },
+    "14inch/45 連装砲": {
+      "id": 507,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "14inch/45 三連装砲": {
+      "id": 508,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "12cm単装高角砲E型改": {
+      "id": 509,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "Walrus": {
+      "id": 510,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "21inch艦首魚雷発射管4門(初期型)": {
+      "id": 511,
+      "typeId": 32,
+      "typeName": "潜水艦魚雷"
+    },
+    "21inch艦首魚雷発射管4門(後期型)": {
+      "id": 512,
+      "typeId": 32,
+      "typeName": "潜水艦魚雷"
+    },
+    "阻塞気球": {
+      "id": 513,
+      "typeId": 54,
+      "typeName": "水上艦装備"
+    },
+    "特大発動艇+Ⅲ号戦車J型": {
+      "id": 514,
+      "typeId": 24,
+      "typeName": "上陸用舟艇"
+    },
+    "Sea Otter": {
+      "id": 515,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "Me 262 A-1a/R1": {
+      "id": 516,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "逆探(E27)+22号対水上電探改四(後期調整型)": {
+      "id": 517,
+      "typeId": 12,
+      "typeName": "小型電探"
+    },
+    "14cm連装砲改二": {
+      "id": 518,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "SJレーダー+潜水艦司令塔装備": {
+      "id": 519,
+      "typeId": 51,
+      "typeName": "潜水艦装備"
+    },
+    "試製20.3cm(4号)連装砲": {
+      "id": 520,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "紫雲(熟練)": {
+      "id": 521,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "零式小型水上機": {
+      "id": 522,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "零式小型水上機(熟練)": {
+      "id": 523,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "12cm単装高角砲+25mm機銃増備": {
+      "id": 524,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "特四式内火艇": {
+      "id": 525,
+      "typeId": 46,
+      "typeName": "特型内火艇"
+    },
+    "特四式内火艇改": {
+      "id": 526,
+      "typeId": 46,
+      "typeName": "特型内火艇"
+    },
+    "Type281 レーダー": {
+      "id": 527,
+      "typeId": 13,
+      "typeName": "大型電探"
+    },
+    "Type274 射撃管制レーダー": {
+      "id": 528,
+      "typeId": 13,
+      "typeName": "大型電探"
+    },
+    "12.7cm連装砲C型改三H": {
+      "id": 529,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "35.6cm連装砲改三丙": {
+      "id": 530,
+      "typeId": 3,
+      "typeName": "大口径主砲"
+    },
+    "艦隊通信アンテナ": {
+      "id": 531,
+      "typeId": 34,
+      "typeName": "司令部施設"
+    },
+    "通信装置&要員": {
+      "id": 532,
+      "typeId": 34,
+      "typeName": "司令部施設"
+    },
+    "10cm連装高角砲改+高射装置改": {
+      "id": 533,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "13.8cm連装砲": {
+      "id": 534,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "13.8cm連装砲改": {
+      "id": 535,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "15.2cm三連装主砲": {
+      "id": 536,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "15.2cm三連装主砲改": {
+      "id": 537,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "Loire 130M改(熟練)": {
+      "id": 538,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "SOC Seagull 後期型(熟練)": {
+      "id": 539,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "零式水上偵察機11型甲改二": {
+      "id": 540,
+      "typeId": 10,
+      "typeName": "水上偵察機"
+    },
+    "SBD(Yellow Wings)": {
+      "id": 541,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "TBD(Yellow Wings)": {
+      "id": 542,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "SBD VS-2(偵察飛行隊)": {
+      "id": 543,
+      "typeId": 9,
+      "typeName": "艦上偵察機"
+    },
+    "SBD VB-2(爆撃飛行隊)": {
+      "id": 544,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "天山一二型甲改二(村田隊/電探装備)": {
+      "id": 545,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "試製 震電(局地戦闘機)": {
+      "id": 546,
+      "typeId": 48,
+      "typeName": "局地戦闘機"
+    },
+    "震電改二(艦戦型改二)": {
+      "id": 547,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "震電改三(試製 噴式震電)": {
+      "id": 548,
+      "typeId": 56,
+      "typeName": "噴式戦闘機"
+    },
+    "三式指揮連絡機改二": {
+      "id": 549,
+      "typeId": 26,
+      "typeName": "対潜哨戒機"
+    },
+    "試製 明星(増加試作機)": {
+      "id": 550,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "明星改": {
+      "id": 551,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "九九式練爆二二型改(夜間装備実験機)": {
+      "id": 552,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "10cm連装高角砲改": {
+      "id": 553,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "九七式艦攻改(北東海軍航空隊)": {
+      "id": 554,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "18cm/57 三連装主砲": {
+      "id": 555,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "10cm/56 単装高角砲(集中配備)": {
+      "id": 556,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "零式艦戦62型改(夜間爆戦)": {
+      "id": 557,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "零式艦戦62型改(熟練/夜間爆戦)": {
+      "id": 558,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "Ju87 D-4(Fliegerass)": {
+      "id": 559,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "Bf109 T-3(G)": {
+      "id": 560,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "Ho229": {
+      "id": 561,
+      "typeId": 57,
+      "typeName": "噴式戦闘爆撃機"
+    },
+    "Do 217 E-5+TV誘導型 Hs293D": {
+      "id": 562,
+      "typeId": 47,
+      "typeName": "陸上攻撃機"
+    },
+    "21cm単装主砲": {
+      "id": 564,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "15cm単装副砲": {
+      "id": 565,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "10.2cm三連装副砲": {
+      "id": 566,
+      "typeId": 4,
+      "typeName": "副砲"
+    },
+    "Sea Gladiator": {
+      "id": 567,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
+    },
+    "強風改二(熟練)": {
+      "id": 568,
+      "typeId": 45,
+      "typeName": "水上戦闘機"
+    },
+    "三式爆雷投射機改": {
+      "id": 569,
+      "typeId": 15,
+      "typeName": "爆雷"
+    },
+    "流星改(友永隊)": {
+      "id": 570,
+      "typeId": 8,
+      "typeName": "艦上攻撃機"
+    },
+    "53cm連装魚雷改(酸素魚雷)": {
+      "id": 571,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "12.7cm単装高角砲改三": {
+      "id": 572,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "試製 23号電探改三": {
+      "id": 573,
+      "typeId": 12,
+      "typeName": "小型電探"
+    },
+    "SCレーダー改(後期調整型)": {
+      "id": 574,
+      "typeId": 12,
+      "typeName": "小型電探"
+    },
+    "25mm連装機銃(熟練機銃員分隊)": {
+      "id": 575,
+      "typeId": 21,
+      "typeName": "対空機銃"
+    },
+    "大発動艇(R35&フランス兵)": {
+      "id": 576,
+      "typeId": 24,
+      "typeName": "上陸用舟艇"
+    },
+    "61cm四連装(酸素)魚雷五型改三": {
+      "id": 577,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "SB2U-2": {
+      "id": 578,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "13.8cm単装砲 Modèle 1927": {
+      "id": 579,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "55cm三連装魚雷 Modèle 1924": {
+      "id": 580,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "55cm複合配置五連装魚雷 Modèle 1932": {
+      "id": 581,
+      "typeId": 5,
+      "typeName": "魚雷"
+    },
+    "20.3cm/50 連装砲 Modèle 1931": {
+      "id": 582,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "20.3cm/50 連装砲改(SHS改良弾)": {
+      "id": 583,
+      "typeId": 2,
+      "typeName": "中口径主砲"
+    },
+    "Bofors 12cm単装両用砲": {
+      "id": 584,
+      "typeId": 1,
+      "typeName": "小口径主砲"
+    },
+    "PL101(偵察)": {
+      "id": 585,
+      "typeId": 9,
+      "typeName": "艦上偵察機"
+    },
+    "PL101(爆装)": {
+      "id": 586,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "V-156F(SB2U輸出型)": {
+      "id": 587,
+      "typeId": 7,
+      "typeName": "艦上爆撃機"
+    },
+    "G-36A(F4F輸出型)": {
+      "id": 588,
+      "typeId": 6,
+      "typeName": "艦上戦闘機"
     }
   },
   "exslotBaseTypeIds": [
