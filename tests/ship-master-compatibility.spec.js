@@ -5446,3 +5446,37 @@ test('sortie readiness warnings link to resolution targets', async ({ page }) =>
   expect(rows.some(x=>x.action==='tab:gear')).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('sortie readiness collapses OK auto checks', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-guide-view-v1', JSON.stringify({world:'5',map:'5-5',filter:'map',query:'5-5'}));
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({'5-5':[
+      {id:'fleet-collapse',name:'ゲーム同期｜第1艦隊',source:'kancolle-import',sourceDeckId:1,sourceSyncedAt:Date.now(),ships:[
+        {ship:'加賀改',gear:'烈風 / 彩雲',nowHp:70,maxHp:79,cond:55}
+      ]}
+    ]}));
+    localStorage.setItem('harbordesk-sortie-selection-v1', JSON.stringify({'5-5':'fleet-collapse'}));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'1',name:'加賀改',level:94,tags:[]}]));
+  });
+  await boot(page,errors);
+  await page.evaluate(()=>{
+    if(typeof selectedMap!=='undefined')selectedMap='5-5';
+    document.querySelector('[data-map-tab="mine"]')?.click();
+    window.hdRenderSortieReadiness?.();
+  });
+  const data=await page.evaluate(()=>{
+    const details=document.querySelector('#hdSortieReadiness .hd-sortie-auto-ok');
+    const outside=[...document.querySelectorAll('#hdSortieReadiness .hd-sortie-auto > .hd-sortie-auto-row')];
+    const inside=[...details?.querySelectorAll('.hd-sortie-auto-row')||[]];
+    return {exists:!!details,open:!!details?.open,summary:details?.querySelector('summary')?.textContent||'',outsideStates:outside.map(x=>x.className),insideStates:inside.map(x=>x.className)};
+  });
+  expect(data.exists).toBe(true);
+  expect(data.open).toBe(false);
+  expect(data.summary).toContain('OK項目');
+  expect(data.insideStates.length).toBeGreaterThan(0);
+  expect(data.insideStates.every(x=>x.includes(' ok'))).toBe(true);
+  expect(data.outsideStates.every(x=>!x.includes(' ok'))).toBe(true);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
