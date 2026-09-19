@@ -826,6 +826,9 @@ test('ship thumbnails reuse one object URL across roster and fleet surfaces', as
     document.body.appendChild(wrap);
     await window.hdShipImageHydrate?.(wrap);
 
+    // The silent import intentionally suppresses global refresh. Refresh existing
+    // database cards too before comparing all surfaces (including remote cards).
+    await window.hdShipImageHydrate?.(document);
     const all = [...document.querySelectorAll('[data-hd-ship-image-host="541"] img')];
     const srcs = all.map(x => x.getAttribute('src') || '');
     const unique = [...new Set(srcs.filter(Boolean))];
