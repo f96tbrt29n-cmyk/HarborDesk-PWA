@@ -75,6 +75,28 @@ function hdWSConsumeUpdateReturn(){
  hdWSClearPin();hdWSApply(saved.group,saved.section,{restoreScroll:true,ignorePin:true});
  return true;
 }
+let hdWSStartupContextHandled=false;
+function hdWSOpenAnchorId(id,scroll=true){
+ id=String(id||'').trim();if(!id||id.startsWith('kcimport='))return false;
+ const el=document.getElementById(id);if(!el)return false;
+ const section=hdWSManagedSectionFor(el);if(!section)return false;
+ const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
+ hdWSClearPin();hdWSApply(group,section.id,{ignorePin:true});
+ if(scroll)setTimeout(()=>el.scrollIntoView({behavior:'auto',block:'start'}),0);
+ return true;
+}
+function hdWSInitialAnchorId(){
+ const raw=String(location.hash||'').replace(/^#/,'');if(!raw||raw.startsWith('kcimport='))return '';
+ try{return decodeURIComponent(raw)}catch{return raw}
+}
+function hdWSRestoreStartupContext(){
+ if(hdWSStartupContextHandled)return false;hdWSStartupContextHandled=true;
+ const anchor=hdWSInitialAnchorId();
+ if(anchor&&hdWSOpenAnchorId(anchor,true)){try{sessionStorage.removeItem(HD_WS_UPDATE_RETURN_KEY)}catch{}return true}
+ if(hdWSConsumeUpdateReturn())return true;
+ const id=hdWSCurrentSectionId();return !!id&&hdWSRestoreScroll(id);
+}
+
 function hdWSRestoreScroll(sectionId){
  const section=document.getElementById(sectionId),saved=Number(hdWSScrollLoad()[sectionId]);if(!section||!Number.isFinite(saved))return false;
  const top=section.getBoundingClientRect().top+window.scrollY;window.scrollTo({top:Math.max(0,top+saved),behavior:'auto'});return true;
@@ -416,7 +438,7 @@ function hdWSMutationAddsSection(ms){return ms.some(m=>[...m.addedNodes].some(n=
 function hdWSScheduleRefresh(){clearTimeout(hdWSRefreshTimer);const delay=Math.max(60,hdWSNavLockUntil-Date.now()+20);hdWSRefreshTimer=setTimeout(hdWSRefresh,delay)}
 function hdWSInstall(){
  hdWSEnsureUI();hdWSInstallKeyboardTracking();hdWSInstallScrollCompact();hdWSRefresh();
- setTimeout(()=>hdWSConsumeUpdateReturn(),80);
+ setTimeout(()=>hdWSRestoreStartupContext(),80);
  if(!hdWSObserver){hdWSObserver=new MutationObserver(ms=>{if(hdWSMutationAddsSection(ms))hdWSScheduleRefresh()});const main=document.querySelector('main');if(main)hdWSObserver.observe(main,{childList:true,subtree:true})}
 }
 function hdWSHorizontalScroller(el){for(let n=el;n&&n!==document.body;n=n.parentElement){if(n.scrollWidth>n.clientWidth+12){const s=getComputedStyle(n);if(['auto','scroll'].includes(s.overflowX))return true}}return false}
@@ -439,7 +461,7 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('touchstart',hdWSTouchStart,{passive:true});
 document.addEventListener('touchend',hdWSTouchEnd,{passive:true});
-window.addEventListener('hashchange',()=>{const id=location.hash.slice(1);if(id)setTimeout(()=>hdWSShowElement(id,false),0)});
+window.addEventListener('hashchange',()=>{const id=hdWSInitialAnchorId();if(id)setTimeout(()=>hdWSOpenAnchorId(id,true),0)});
 window.addEventListener('resize',hdWSUpdateTopbarHeight,{passive:true});
 window.addEventListener('storage',e=>{hdWSUpdateBadges();if(!e||e.key==='harbordesk-kancolle-sync-v1')hdWSUpdateSyncStatus()});
 window.addEventListener('hd:kancolle-sync',hdWSUpdateSyncStatus);
@@ -455,6 +477,7 @@ window.addEventListener('hd:workspace-refresh',hdWSUpdateBadges);
 window.addEventListener('hd:quick-nav-updated',hdWSUpdatePinButton);
 window.addEventListener('load',()=>setTimeout(()=>{hdWSInstall();hdWSEnsureGameReturnAction();hdWSUpdateGameReturnAction()},900));
 window.addEventListener('pageshow',hdWSUpdateGameReturnAction);
+window.addEventListener('pagehide',hdWSSaveCurrentScroll,{passive:true});
 setInterval(hdWSUpdateBadges,10000);
 setInterval(hdWSUpdateSyncStatus,60000);
 setTimeout(hdWSInstall,1700);
