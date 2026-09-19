@@ -99,6 +99,10 @@ async function hdShipImageImportBackup(file){
 function hdShipImageRevoke(id){
  const old=HD_SHIP_IMAGE_OBJECT_URLS.get(Number(id));if(old){try{URL.revokeObjectURL(old)}catch{}HD_SHIP_IMAGE_OBJECT_URLS.delete(Number(id))}
 }
+function hdShipImageObjectUrl(id,blob){
+ const key=Number(id),old=HD_SHIP_IMAGE_OBJECT_URLS.get(key);if(old)return old;
+ const url=URL.createObjectURL(blob);HD_SHIP_IMAGE_OBJECT_URLS.set(key,url);return url;
+}
 function hdShipImageRemoteUrl(id){
  const t=hdShipImageConfig().remoteTemplate;if(!t)return '';
  return t.includes('{id}')?t.replaceAll('{id}',String(id)):t.replace(/\/$/,'')+'/'+id+'.png';
@@ -107,15 +111,18 @@ function hdShipImageCardHtml(ref){
  const row=hdShipImageResolve(ref);if(!row)return '';
  return `<figure class="hd-ship-image-card" data-hd-ship-image-host="${row.id}"><div class="hd-ship-image-stage"><div class="hd-ship-image-fallback"><b>画像未登録</b><span>${hdShipImageEsc(row.name||'艦娘')} / ID ${row.id}</span></div><img alt="${hdShipImageEsc(row.name||'艦娘')} 艦娘画像" loading="lazy" decoding="async"></div><figcaption><span>MASTER ID ${row.id}</span><div><button type="button" class="ghost small" data-hd-ship-image-upload="${row.id}">画像を登録</button><button type="button" class="ghost small" data-hd-ship-image-delete="${row.id}" hidden>削除</button></div></figcaption></figure>`;
 }
+function hdShipImageThumbHtml(ref,context=''){
+ const row=hdShipImageResolve(ref);if(!row)return '';
+ return `<div class="hd-ship-image-thumb ${hdShipImageEsc(context)}" data-hd-ship-image-host="${row.id}"><div class="hd-ship-image-thumb-fallback">ID ${row.id}</div><img alt="${hdShipImageEsc(row.name||'艦娘')} 画像" loading="lazy" decoding="async"></div>`;
+}
 async function hdShipImageHydrate(root=document){
  const hosts=[...root.querySelectorAll?.('[data-hd-ship-image-host]')||[]];
  await Promise.all(hosts.map(async host=>{
   const id=Number(host.dataset.hdShipImageHost),img=host.querySelector('img'),del=host.querySelector('[data-hd-ship-image-delete]'),upload=host.querySelector('[data-hd-ship-image-upload]');if(!id||!img)return;
   host.classList.remove('loaded','remote','missing');img.removeAttribute('src');
-  hdShipImageRevoke(id);
   const local=await hdShipImageGet(id);
   if(local?.blob){
-   const url=URL.createObjectURL(local.blob);HD_SHIP_IMAGE_OBJECT_URLS.set(id,url);img.src=url;host.classList.add('loaded');if(del)del.hidden=false;if(upload)upload.textContent='画像を変更';return;
+   const url=hdShipImageObjectUrl(id,local.blob);img.src=url;host.classList.add('loaded');if(del)del.hidden=false;if(upload)upload.textContent='画像を変更';return;
   }
   if(del)del.hidden=true;if(upload)upload.textContent='画像を登録';
   const remote=hdShipImageRemoteUrl(id);
