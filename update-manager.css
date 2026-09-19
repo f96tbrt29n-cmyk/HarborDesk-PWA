@@ -23,3 +23,11 @@
  .hd-header-more .hd-update-check{width:auto;height:auto;padding:7px 9px}
  .hd-header-more .hd-update-check b{display:inline;font-size:10px}
 }
+
+.hd-version-menu .hd-notify-btn{display:inline-flex;align-items:center;gap:6px}
+@media(max-width:560px){
+ .hd-version-menu .hd-notify-btn{width:auto;height:auto;padding:7px 9px;justify-content:flex-start;border-radius:10px}
+ .hd-version-menu .hd-notify-btn b{display:inline;font-size:10px}
+ .hd-version-menu .hd-notify-btn span{font-size:13px}
+ .topbar>#notifyBtn{display:none!important}
+}
