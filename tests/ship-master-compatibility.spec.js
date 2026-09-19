@@ -2992,3 +2992,33 @@ test('global game sync status reflects freshness', async ({ page }) => {
   expect(data.fresh).toBe(true);
   expect(data.title).toContain('艦娘 206');
 });
+
+
+test('reset actions enable only when filters are active', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const initial=await page.evaluate(()=>{
+    window.renderShipRoster?.();window.hdEnsureShipDatabase?.();window.hdEnsureEquipmentCatalog?.();
+    return {
+      roster:document.querySelector('[data-roster-reset]')?.disabled,
+      ship:document.querySelector('[data-hd-shipdb-reset]')?.disabled,
+      equip:document.querySelector('[data-hd-equip-reset]')?.disabled
+    };
+  });
+  expect(initial.roster).toBe(true);
+  expect(initial.ship).toBe(true);
+  expect(initial.equip).toBe(true);
+  const active=await page.evaluate(()=>{
+    const r=document.getElementById('shipRosterSearch');r.value='加賀';r.dispatchEvent(new Event('input',{bubbles:true}));
+    const s=document.getElementById('hdShipDbSearch');s.value='榛名';s.dispatchEvent(new Event('input',{bubbles:true}));
+    const e=document.getElementById('hdEquipCatalogSearch');e.value='電探';e.dispatchEvent(new Event('input',{bubbles:true}));
+    return {
+      roster:document.querySelector('[data-roster-reset]')?.classList.contains('is-active'),
+      ship:document.querySelector('[data-hd-shipdb-reset]')?.classList.contains('is-active'),
+      equip:document.querySelector('[data-hd-equip-reset]')?.classList.contains('is-active')
+    };
+  });
+  expect(active.roster).toBe(true);
+  expect(active.ship).toBe(true);
+  expect(active.equip).toBe(true);
+});
