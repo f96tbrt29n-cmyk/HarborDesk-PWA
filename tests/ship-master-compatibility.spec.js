@@ -6109,3 +6109,32 @@ test('mobile update banner clears the two-row dock', async ({ page }) => {
   expect(data.dockHeight).toBeGreaterThan(70);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('forced update return restores workspace location', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    window.hdWSApply?.('fleet','roster',{ignorePin:true});
+    const before={group:window.hdWSState?.group||'',section:window.hdWSState?.sections?.fleet||''};
+    const saved=window.hdWSPrepareUpdateReturn?.();
+    window.hdWSApply?.('home','home',{ignorePin:true});
+    const marker=JSON.parse(sessionStorage.getItem('harbordesk-update-return-v1')||'null');
+    const restored=window.hdWSConsumeUpdateReturn?.();
+    await new Promise(r=>setTimeout(r,30));
+    return {
+      before,saved:!!saved,marker,
+      restored:!!restored,
+      after:{group:window.hdWSState?.group||'',section:window.hdWSState?.sections?.fleet||''},
+      markerGone:sessionStorage.getItem('harbordesk-update-return-v1')===null
+    };
+  });
+  expect(data.saved).toBe(true);
+  expect(data.marker.group).toBe('fleet');
+  expect(data.marker.section).toBe('roster');
+  expect(data.restored).toBe(true);
+  expect(data.after.group).toBe('fleet');
+  expect(data.after.section).toBe('roster');
+  expect(data.markerGone).toBe(true);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
