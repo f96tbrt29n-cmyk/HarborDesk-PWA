@@ -66,7 +66,7 @@ function hdQNTogglePin(id){const pins=hdQNLoadPins(),set=new Set(pins);set.has(i
 function hdQNEnsureMobileDock(){
  if(document.getElementById('hdMobileDock'))return;
  const dock=document.createElement('nav');dock.id='hdMobileDock';dock.className='hd-mobile-dock';dock.setAttribute('aria-label','主要操作');
- dock.innerHTML='<button type="button" data-hd-mobile-home><span>⌂</span><b>ホーム</b><em data-hd-mobile-home-badge hidden>0</em></button><button type="button" data-hd-mobile-search><span>⌕</span><b>検索</b></button><button type="button" data-hd-mobile-sync><span>↻</span><b>同期</b><i aria-hidden="true"></i></button><button type="button" data-hd-mobile-menu><span>☰</span><b>機能</b></button>';
+ dock.innerHTML='<button type="button" class="hd-mobile-location" data-hd-mobile-location><span data-hd-mobile-location-group>ホーム</span><b data-hd-mobile-location-section>今日の司令部</b><i>›</i></button><button type="button" data-hd-mobile-home><span>⌂</span><b>ホーム</b><em data-hd-mobile-home-badge hidden>0</em></button><button type="button" data-hd-mobile-search><span>⌕</span><b>検索</b></button><button type="button" data-hd-mobile-sync><span>↻</span><b>同期</b><i aria-hidden="true"></i></button><button type="button" data-hd-mobile-menu><span>☰</span><b>機能</b></button>';
  document.body.appendChild(dock);hdQNEnsureAttentionDialog();hdQNUpdateMobileDock();
 }
 function hdQNMobileAttentionItems(){
@@ -136,7 +136,7 @@ function hdQNMobileHome(){
 }
 function hdQNUpdateMobileDock(){
  const dock=document.getElementById('hdMobileDock');if(!dock)return;
- const home=dock.querySelector('[data-hd-mobile-home]'),search=dock.querySelector('[data-hd-mobile-search]'),sync=dock.querySelector('[data-hd-mobile-sync]'),menu=dock.querySelector('[data-hd-mobile-menu]'),badge=dock.querySelector('[data-hd-mobile-home-badge]'),activeGroup=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'';
+ const home=dock.querySelector('[data-hd-mobile-home]'),search=dock.querySelector('[data-hd-mobile-search]'),sync=dock.querySelector('[data-hd-mobile-sync]'),menu=dock.querySelector('[data-hd-mobile-menu]'),badge=dock.querySelector('[data-hd-mobile-home-badge]'),locationBtn=dock.querySelector('[data-hd-mobile-location]'),activeGroup=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'';
  const searchOpen=!!document.getElementById('hdGlobalSearchDialog')?.open,menuOpen=!!document.getElementById('hdQuickNavDialog')?.open;
  home?.classList.toggle('active',activeGroup==='home'&&!searchOpen&&!menuOpen);
  search?.classList.toggle('active',searchOpen);
@@ -146,6 +146,18 @@ function hdQNUpdateMobileDock(){
   if(icon)icon.textContent=meta.icon;if(label)label.textContent=meta.label;
   menu.classList.toggle('has-context',!!activeGroup&&activeGroup!=='home');
   menu.setAttribute('aria-label',activeGroup&&activeGroup!=='home'?`${meta.label}・機能一覧を開く`:'機能一覧を開く');
+ }
+ if(locationBtn){
+  const meta=hdQNMobileGroupMeta(activeGroup);
+  const select=document.getElementById('hdWorkspaceSectionSelect');
+  const option=select?.selectedOptions?.[0];
+  const activeTab=document.querySelector('[data-hd-ws-section].active');
+  const sectionLabel=String(option?.textContent||activeTab?.textContent||meta.label||'機能').trim();
+  const groupLabel=meta.label||'機能';
+  const g=locationBtn.querySelector('[data-hd-mobile-location-group]'),s=locationBtn.querySelector('[data-hd-mobile-location-section]');
+  if(g)g.textContent=groupLabel;if(s)s.textContent=sectionLabel;
+  locationBtn.setAttribute('aria-label',`${groupLabel}、${sectionLabel}。カテゴリ内機能を開く`);
+  locationBtn.title=`${groupLabel} › ${sectionLabel}`;
  }
  const attention=hdQNMobileAttentionMeta();if(badge){badge.textContent=String(attention.count);badge.hidden=attention.count<=0;badge.setAttribute('aria-label',attention.count?`要対応 ${attention.count}件`:'要対応なし')}
  if(home){const detail=attention.reasons.join('・');home.setAttribute('aria-label',attention.count?('ホーム・確認項目 '+detail):'ホーム');home.title=detail}
@@ -190,6 +202,7 @@ document.addEventListener('click',e=>{
   if(e.target.closest?.('[data-hd-mobile-home-badge]')){hdQNOpenAttention();return}
   if(e.target.closest?.('[data-hd-attention-close]')){hdQNCloseAttention();return}
   const attentionJump=e.target.closest?.('[data-hd-attention-jump]');if(attentionJump){const id=attentionJump.dataset.hdAttentionJump;hdQNCloseAttention();if(typeof hdWSShowElement==='function')hdWSShowElement(id,true);else document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});return}
+  if(e.target.closest?.('[data-hd-mobile-location]')){hdQNOpen();return}
   if(e.target.closest?.('[data-hd-mobile-home]')){hdQNMobileHome();return}
   if(e.target.closest?.('[data-hd-mobile-search]')){if(typeof hdGSOpen==='function')hdGSOpen();return}
   if(e.target.closest?.('[data-hd-mobile-sync]')){
