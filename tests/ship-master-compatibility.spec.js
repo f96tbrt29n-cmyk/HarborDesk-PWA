@@ -3552,3 +3552,20 @@ test('mobile header moves notification into overflow menu', async ({ page }) => 
   expect(data.notifyDirect).toBe(false);
   expect(data.notifyLabel).toContain('通知');
 });
+
+
+test('Kancolle sync offers direct next-step navigation', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({syncedAt:Date.now(),ships:206,equipment:93,materials:8,decks:4,quests:1,sorties:1}));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdKcEnsureImport?.();
+    window.hdKcRenderSyncStatus?.();
+    const box=document.getElementById('hdKcNextActions');
+    return {hidden:!!box?.hidden,ids:[...box?.querySelectorAll('[data-hd-kc-jump]')||[]].map(x=>x.dataset.hdKcJump)};
+  });
+  expect(data.hidden).toBe(false);
+  expect(data.ids).toEqual(expect.arrayContaining(['roster','equipmentBook','quests','sortieLog']));
+});
