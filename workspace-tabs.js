@@ -85,13 +85,20 @@ function hdWSEnsureSwipeHint(){
 }
 function hdWSSyncInfo(){
  const sync=hdWSJson('harbordesk-kancolle-sync-v1',null);
- if(!sync?.syncedAt)return {sync:null,state:'missing',label:'未同期',detail:'ゲームデータ未同期'};
+ if(!sync?.syncedAt)return {sync:null,state:'missing',label:'未同期',shortLabel:'未同期',detail:'ゲームデータ未同期',missing:[]};
  const age=Math.max(0,Date.now()-Number(sync.syncedAt||0));
- let label='たった今';
- if(age>=86400000)label=Math.floor(age/86400000)+'日前';
- else if(age>=3600000)label=Math.floor(age/3600000)+'時間前';
- else if(age>=60000)label=Math.floor(age/60000)+'分前';
- return {sync,state:age>21600000?'stale':'fresh',label,detail:`艦娘 ${Number(sync.ships)||0} / 装備 ${Number(sync.equipment)||0} / 艦隊 ${Number(sync.decks)||0}`};
+ let ageLabel='たった今';
+ if(age>=86400000)ageLabel=Math.floor(age/86400000)+'日前';
+ else if(age>=3600000)ageLabel=Math.floor(age/3600000)+'時間前';
+ else if(age>=60000)ageLabel=Math.floor(age/60000)+'分前';
+ const labels={ships:'艦娘',equipment:'装備',resources:'資源',fleets:'艦隊',quests:'任務',docks:'入渠'};
+ const coverage=sync.coverage&&typeof sync.coverage==='object'?sync.coverage:null;
+ const missing=coverage?Object.keys(labels).filter(k=>!coverage[k]):[];
+ const partial=missing.length>0,state=partial?'partial':(age>21600000?'stale':'fresh');
+ const label=ageLabel+(partial?'・一部未取得':'');
+ const shortLabel=ageLabel+(partial?'・一部':'');
+ const detail=(partial?'未取得: '+missing.map(k=>labels[k]).join(' / ')+' ｜ ':'')+`艦娘 ${Number(sync.ships)||0} / 装備 ${Number(sync.equipment)||0} / 艦隊 ${Number(sync.decks)||0}`;
+ return {sync,state,label,shortLabel,detail,missing};
 }
 function hdWSEnsureNetworkStatus(){
  if(document.getElementById('hdNetworkStatus'))return;
@@ -117,8 +124,8 @@ function hdWSEnsureSyncStatus(){
 }
 function hdWSUpdateSyncStatus(){
  const btn=document.getElementById('hdGlobalSyncStatus');if(!btn)return;
- const info=hdWSSyncInfo();btn.classList.remove('fresh','stale','missing');btn.classList.add(info.state);
- btn.innerHTML=`<span>ゲーム同期</span><b>${hdWSEsc(info.label)}</b>`;
+ const info=hdWSSyncInfo();btn.classList.remove('fresh','stale','partial','missing');btn.classList.add(info.state);
+ btn.innerHTML=`<span>ゲーム同期</span><b>${hdWSEsc(info.shortLabel||info.label)}</b>`;
  btn.title=info.detail;btn.setAttribute('aria-label',`ゲーム同期 ${info.label}。タップで同期画面を開く`);
 }
 function hdWSTitle(el){return el?.querySelector(':scope > .section-head h2,:scope > .section-head h3,:scope > h2,:scope > h3')?.textContent?.trim()||el?.querySelector('h2,h3')?.textContent?.trim()||el?.id||'機能'}
