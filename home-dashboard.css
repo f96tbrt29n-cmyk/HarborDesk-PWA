@@ -56,7 +56,7 @@ button.home-next-main{cursor:pointer}
 
 .home-pinned-label button{font-size:9px;padding:5px 7px;color:var(--text)}
 
-.home-order-controls{display:inline-flex;gap:3px}
+.home-order-controls{display:none;gap:3px}.home-dashboard.home-editing .home-order-controls{display:inline-flex}
 .home-move-btn{width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;font-size:12px}
 @media(max-width:520px){
  .home-order-controls{gap:2px}
@@ -122,3 +122,11 @@ button.home-next-main{cursor:pointer}
 .home-sync-delta{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)}
 .home-sync-delta span{font-size:9px;color:var(--muted);font-weight:800}
 .home-sync-delta b{font-size:9px;padding:4px 6px;border-radius:999px;background:#12344c;border:1px solid #2a5877;color:#d8f2ff}
+
+.home-dashboard.home-editing [data-home-order-item]{outline:1px dashed rgba(127,200,255,.28);outline-offset:2px}
+.home-dashboard.home-editing [data-home-order-reset]{display:inline-flex}
+.home-head-actions [data-home-edit-toggle]{font-size:9px;padding:6px 8px}
+@media(max-width:520px){
+ .home-head-actions [data-home-edit-toggle]{padding:5px 7px}
+ .home-dashboard.home-editing .home-card-actions{flex-wrap:wrap}
+}
