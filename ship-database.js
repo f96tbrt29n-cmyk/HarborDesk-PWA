@@ -9314,7 +9314,7 @@ function hdEnsureShipDatabase(){
  if(include){include.checked=hdShipDbIncludeMaster;include.addEventListener('change',e=>{hdShipDbIncludeMaster=e.target.checked;hdShipDbViewSave({includeMaster:hdShipDbIncludeMaster});hdRenderShipDatabase()})}
  document.querySelectorAll('[data-hd-shipdb-filter]').forEach(b=>b.classList.toggle('active',b.dataset.hdShipdbFilter===hdShipDbType));
  document.querySelectorAll('[data-hd-shipdb-image-filter]').forEach(b=>b.classList.toggle('active',(b.dataset.hdShipdbImageFilter||'all')===hdShipDbImageFilter));
- const compact=!!view.compact,compactBtn=document.querySelector('[data-hd-shipdb-compact]'),list=document.getElementById('hdShipDbList');
+ const compact=view.compact==null?!!window.matchMedia?.('(max-width:680px)')?.matches:!!view.compact,compactBtn=document.querySelector('[data-hd-shipdb-compact]'),list=document.getElementById('hdShipDbList');
  list?.classList.toggle('hd-compact',compact);if(compactBtn)compactBtn.textContent=compact?'詳細表示':'コンパクト';
  hdRenderShipDatabase();hdShipDbUpdateImageCoverage();
 }
