@@ -3132,3 +3132,24 @@ test('mobile header hides version controls behind more menu', async ({ page }) =
   expect(data.version).toContain('v');
   expect(data.update).toBe(true);
 });
+
+
+test('mobile workspace picker shows group context and top action', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  await page.setViewportSize({width:390,height:844});
+  const data=await page.evaluate(()=>{
+    window.hdWSApply?.('fleet','roster');
+    const picker=document.getElementById('hdWorkspaceMobilePicker');
+    return {
+      hidden:!!picker?.hidden,
+      group:document.getElementById('hdWorkspaceContextGroup')?.textContent||'',
+      section:document.getElementById('hdWorkspaceSectionSelect')?.value||'',
+      top:!!picker?.querySelector('[data-hd-ws-group-top]')
+    };
+  });
+  expect(data.hidden).toBe(false);
+  expect(data.group).toBe('艦隊');
+  expect(data.section).toBe('roster');
+  expect(data.top).toBe(true);
+});
