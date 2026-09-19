@@ -3066,3 +3066,19 @@ test('home dashboard promotes the next timer', async ({ page }) => {
   expect(data.text).toContain('次に終わる');
   expect(data.urgent).toBe(true);
 });
+
+
+test('quick nav remembers workspace history and goes back', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdQNRecordHistory?.('roster');
+    window.hdQNRecordHistory?.('equipmentBook');
+    const before=window.hdQNLoadHistory?.()||[];
+    const hasBack=!!document.querySelector('[data-hd-qn-back]');
+    return {before,hasBack,fn:typeof window.hdQNBack};
+  });
+  expect(data.before.slice(-2)).toEqual(['roster','equipmentBook']);
+  expect(data.hasBack).toBe(true);
+  expect(data.fn).toBe('function');
+});
