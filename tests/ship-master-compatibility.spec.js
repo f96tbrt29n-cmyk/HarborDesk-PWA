@@ -6230,3 +6230,16 @@ test('current HarborDesk view can be shared from header menu', async ({ page }) 
   expect(data.sharedUrl).toContain('#roster');
   expect(data.sharedTitle).toContain('HarborDesk');
 });
+
+
+test('header overflow menu closes on Escape', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  await page.evaluate(()=>window.hdEnsureUpdateUI?.());
+  const menu=page.locator('.hd-header-more');
+  await menu.locator('summary').click();
+  await expect(menu).toHaveAttribute('open','');
+  await page.keyboard.press('Escape');
+  await expect(menu).not.toHaveAttribute('open','');
+  await expect(menu.locator('summary')).toBeFocused();
+});
