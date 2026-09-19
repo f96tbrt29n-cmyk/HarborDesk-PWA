@@ -3222,3 +3222,24 @@ test('mobile dialogs keep actions reachable and inputs zoom-safe', async ({ page
   expect(data.actionPosition).toBe('sticky');
   expect(data.inputFont).toBe('16px');
 });
+
+
+test('global toast gives save feedback without blocking', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const host=window.hdToast?.('保存したよ','ok',5000);
+    return {
+      exists:!!host,
+      text:host?.textContent||'',
+      live:host?.getAttribute('aria-live')||'',
+      show:host?.classList.contains('show')||false,
+      pointer:getComputedStyle(host).pointerEvents
+    };
+  });
+  expect(data.exists).toBe(true);
+  expect(data.text).toBe('保存したよ');
+  expect(data.live).toBe('polite');
+  expect(data.show).toBe(true);
+  expect(data.pointer).toBe('none');
+});
