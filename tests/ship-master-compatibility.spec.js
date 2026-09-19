@@ -5603,3 +5603,22 @@ test('Home sortie next action links directly to fix', async ({ page }) => {
   expect(data.text).toContain('ゲーム同期');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('sortie manual checks invalidate when fleet changes', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const source=await fetch('./sortie-readiness.js',{cache:'no-store'}).then(r=>r.text());
+    return {
+      fingerprint:source.includes('function hdSortieFleetFingerprint'),
+      sourceSync:source.includes('sourceSyncedAt'),
+      resetReason:source.includes('_resetReason'),
+      safeMerge:source.includes("prev._fingerprint===fingerprint?prev:{}")
+    };
+  });
+  expect(data.fingerprint).toBe(true);
+  expect(data.sourceSync).toBe(true);
+  expect(data.resetReason).toBe(true);
+  expect(data.safeMerge).toBe(true);
+});
