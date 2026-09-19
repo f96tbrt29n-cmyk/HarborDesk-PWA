@@ -29,6 +29,12 @@ function homeSyncInfo(){
  const age=Date.now()-Number(s.syncedAt||0);
  return {sync:s,label:homeRelative(s.syncedAt),state:age>21600000?'warn':'ok',age};
 }
+function homeRecentFunctionRows(){
+ let recent=[];try{recent=JSON.parse(localStorage.getItem('harbordesk-quick-nav-recent-v1')||'[]')||[]}catch{}
+ const sections=typeof hdQNSections==='function'?hdQNSections():[...document.querySelectorAll('section[id]')].map(el=>({id:el.id,title:el.querySelector('h2,h3')?.textContent?.trim()||el.id}));
+ const titleMap=new Map(sections.map(x=>[x.id,x.title]));
+ return recent.filter(x=>x?.id&&x.id!=='home'&&titleMap.has(x.id)).slice(0,4).map(x=>({id:x.id,title:titleMap.get(x.id)}));
+}
 
 function ensureHomeDashboard(){
  const main=document.querySelector('main');
@@ -50,7 +56,7 @@ function ensureHomeDashboard(){
   <article class="home-card home-collapsible" data-home-panel="procurement"><div class="home-card-title"><strong>次の装備調達</strong><div class="home-card-actions"><button type="button" class="ghost small" data-home-procurement-open>調達リストへ</button><button type="button" class="ghost small home-collapse-btn" data-home-collapse="procurement" aria-label="装備調達カードを折りたたむ" aria-expanded="true">−</button></div></div><div data-home-panel-body><div id="homeProcurement"></div></div></article>
   <article class="home-card"><div class="home-card-title"><strong>クイックアクセス</strong><span class="muted">1〜2タップで移動</span></div><div class="home-shortcuts">
     <a href="#kancolleImport">🎮 ゲーム同期</a><a href="#guide">🗺️ 攻略</a><a href="#roster">⚓ 艦隊</a><a href="#equipmentBook">🧰 装備</a><a href="#quests">✅ 任務</a><a href="#expeditions">⏱️ 遠征</a>
-  </div></article>
+  </div><div id="homeRecentFunctions" class="home-recent-functions"></div></article>
   <article class="home-card home-collapsible" data-home-panel="recent"><div class="home-card-title"><strong>最近見た海域</strong><div class="home-card-actions"><span class="muted">タップで攻略</span><button type="button" class="ghost small home-collapse-btn" data-home-collapse="recent" aria-label="最近見た海域を折りたたむ" aria-expanded="true">−</button></div></div><div data-home-panel-body><div id="homeRecentMaps" class="home-recent-maps"></div></div></article>`;
  hero.insertAdjacentElement('afterend',section);
  renderHomeDashboard();homeApplyPanelState();
@@ -107,6 +113,8 @@ function renderHomeDashboard(){
   }
   procurement.innerHTML=html;
  }
+ const recentFunctions=document.getElementById('homeRecentFunctions'),recentRows=homeRecentFunctionRows();
+ if(recentFunctions)recentFunctions.innerHTML=recentRows.length?`<div class="home-recent-label">最近使った機能</div><div class="home-recent-function-list">${recentRows.map(x=>`<button type="button" data-home-jump="${homeEsc(x.id)}">${homeEsc(x.title)}</button>`).join('')}</div>`:'';
  const recent=loadRecentMaps();
  document.getElementById('homeRecentMaps').innerHTML=recent.length?recent.map(m=>`<button class="recent-map-btn" data-home-map="${m}">${m}</button>`).join(''):'<div class="home-empty">海域を見るとここに履歴が出るよ</div>';
 }
@@ -120,6 +128,7 @@ document.addEventListener('click',e=>{
  const jump=e.target.closest('[data-home-jump]');
  if(jump){
   const id=jump.dataset.homeJump;
+  if(typeof hdQNRecordRecent==='function')hdQNRecordRecent(id);
   if(typeof hdWSShowElement==='function')hdWSShowElement(id,true);
   else{const target=document.getElementById(id);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});else location.hash=id}
   return;
@@ -137,6 +146,7 @@ window.addEventListener('hd:equipment-changed',renderHomeDashboard);
 window.addEventListener('hd:procurement-changed',renderHomeDashboard);
 window.addEventListener('hd:kancolle-sync',renderHomeDashboard);
 window.addEventListener('hd:workspace-refresh',renderHomeDashboard);
+window.addEventListener('hd:quick-nav-updated',renderHomeDashboard);
 setInterval(renderHomeDashboard,5000);
 window.addEventListener('load',()=>setTimeout(renderHomeDashboard,300));
 ensureHomeDashboard();
