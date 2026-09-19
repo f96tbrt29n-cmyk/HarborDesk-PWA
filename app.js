@@ -123,6 +123,7 @@ function renderGuide(){
 document.addEventListener('click',e=>{
  const filter=e.target.closest('[data-core-filter-kind]');if(filter){const kind=filter.dataset.coreFilterKind,value=filter.dataset.coreFilter;coreListFilterSave(kind,value);kind==='quest'?renderQuests():renderTimers(kind);return}
  const showAll=e.target.closest('[data-core-filter-show-all]');if(showAll){const kind=showAll.dataset.coreFilterShowAll;coreListFilterSave(kind,'all');kind==='quest'?renderQuests():renderTimers(kind);return}
+ const cleanup=e.target.closest('[data-core-cleanup]');if(cleanup){coreCleanupDone(cleanup.dataset.coreCleanup);return}
 
  const world=e.target.closest('[data-world]');if(world){selectedWorld=world.dataset.world;selectedMap='';renderMapPicker();return}
  const map=e.target.closest('[data-map]');if(map){selectedMap=map.dataset.map;selectedWorld=selectedMap.split('-')[0];renderMapPicker();document.getElementById('selectedMapCard').scrollIntoView({behavior:'smooth',block:'center'});return}
@@ -148,6 +149,24 @@ function coreListFilterRender(kind,shown,total){
  bar.querySelectorAll('[data-core-filter]').forEach(b=>b.classList.toggle('active',b.dataset.coreFilter===coreListFilters[kind]));
  const count=document.getElementById(kind==='expedition'?'expeditionFilterCount':kind==='dock'?'dockFilterCount':'questFilterCount');
  if(count)count.textContent=shown===total?`${total}件`:`${shown} / ${total}件`;
+ const now=Date.now(),arr=kind==='expedition'?state.expeditions:kind==='dock'?state.docks:state.quests;
+ const doneCount=kind==='quest'?arr.filter(x=>x.done).length:arr.filter(x=>Number(x.endsAt)<=now).length;
+ const cleanup=bar.querySelector('[data-core-cleanup]');if(cleanup){cleanup.hidden=doneCount===0;cleanup.textContent=doneCount?`完了を整理 ${doneCount}`:'完了を整理'}
+}
+function coreCleanupDone(kind){
+ const now=Date.now(),arr=kind==='expedition'?state.expeditions:kind==='dock'?state.docks:kind==='quest'?state.quests:null;if(!arr)return false;
+ const isDone=kind==='quest'?(x=>!!x.done):(x=>Number(x.endsAt)<=now);
+ const removed=arr.map((item,index)=>({item,index})).filter(x=>isDone(x.item));if(!removed.length)return false;
+ const keep=arr.filter(x=>!isDone(x));
+ if(kind==='expedition')state.expeditions=keep;else if(kind==='dock')state.docks=keep;else state.quests=keep;
+ save();kind==='quest'?renderQuests():renderTimers(kind);
+ const label=kind==='expedition'?'遠征':kind==='dock'?'入渠':'任務';
+ hdToastAction(`${label}の完了済み ${removed.length}件を整理したよ`,'元に戻す',()=>{
+  const target=kind==='expedition'?state.expeditions:kind==='dock'?state.docks:state.quests;
+  for(const row of removed.sort((a,b)=>a.index-b.index)){if(!target.some(x=>x.id===row.item.id))target.splice(Math.min(row.index,target.length),0,row.item)}
+  save();kind==='quest'?renderQuests():renderTimers(kind);hdToast('元に戻したよ');
+ });
+ return true;
 }
 function coreFilteredEmpty(kind,label){
  const mode=coreListFilters[kind],text=mode==='done'?'完了済み':kind==='quest'?'未完了':'稼働中';
