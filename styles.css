@@ -130,3 +130,18 @@ button:active,.primary:active,.ghost:active,.guide-link:active,.map-button:activ
   scroll-behavior:auto!important
  }
 }
+
+/* lightweight boot feedback */
+body.hd-booting::before{
+ content:'';position:fixed;left:0;top:0;z-index:10000;width:38%;height:2px;
+ background:linear-gradient(90deg,transparent,var(--accent),transparent);
+ animation:hdBootSlide 1.1s ease-in-out infinite;pointer-events:none
+}
+body.hd-booting::after{
+ content:'HarborDeskを準備中…';position:fixed;right:10px;top:calc(env(safe-area-inset-top) + 58px);z-index:9999;
+ padding:5px 8px;border:1px solid rgba(127,200,255,.24);border-radius:9px;
+ background:rgba(8,24,38,.88);color:var(--muted);font-size:9px;font-weight:800;
+ backdrop-filter:blur(10px);pointer-events:none
+}
+@keyframes hdBootSlide{0%{transform:translateX(-120%)}100%{transform:translateX(360%)}}
+@media(max-width:560px){body.hd-booting::after{top:calc(env(safe-area-inset-top) + 54px)}}
