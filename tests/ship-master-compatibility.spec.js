@@ -3989,3 +3989,26 @@ test('quest dialog shows recent manual quest names', async ({ page }) => {
   expect(data.buttons).toContain('デイリー演習');
   expect(data.value).toBe('デイリー演習');
 });
+
+
+test('timer dialog offers recent timer presets', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-timer-recent-v1', JSON.stringify({
+      expedition:[{name:'東京急行',minutes:165},{name:'海上護衛任務',minutes:90}],
+      dock:[{name:'赤城改',minutes:45}]
+    }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    openTimer('expedition');
+    const buttons=[...document.querySelectorAll('[data-timer-recent]')].map(x=>x.textContent);
+    document.querySelector('[data-timer-recent="1"]')?.click();
+    const result={name:document.getElementById('timerName')?.value||'',minutes:document.getElementById('timerMinutes')?.value||'',buttons};
+    document.getElementById('timerDialog')?.close();
+    return result;
+  });
+  expect(data.buttons.length).toBe(2);
+  expect(data.name).toBe('海上護衛任務');
+  expect(data.minutes).toBe('90');
+});
