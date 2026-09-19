@@ -111,3 +111,12 @@
  .hd-update-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
  .hd-update-actions button{width:100%}
 }
+
+.hd-header-share{display:inline-flex;align-items:center;gap:5px}
+.hd-header-share span{font-size:13px}
+.hd-header-share b{font-size:10px}
+@media(min-width:561px){.hd-header-share{display:none}}
+@media(max-width:560px){
+ .hd-header-more .hd-version-menu .hd-header-share{display:flex}
+ .hd-header-more .hd-version-menu .hd-header-share b{display:inline;font-size:10px}
+}
