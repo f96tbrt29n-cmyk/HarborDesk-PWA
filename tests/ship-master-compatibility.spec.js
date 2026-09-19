@@ -4682,3 +4682,28 @@ test('mobile workspace shows one-time swipe hint', async ({ page }) => {
   expect(after.shown).toBe(false);
   expect(after.saved).toBe('1');
 });
+
+
+test('mobile databases default to compact until user chooses otherwise', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.removeItem('harbordesk-session-roster-view-v1');
+    sessionStorage.removeItem('harbordesk-session-shipdb-view-v1');
+    sessionStorage.removeItem('harbordesk-session-equip-catalog-view-v1');
+  });
+  await boot(page,errors);
+  await page.setViewportSize({width:390,height:844});
+  const data=await page.evaluate(()=>{
+    window.initShipRoster?.();
+    window.hdEnsureShipDatabase?.();
+    window.hdEnsureEquipmentCatalog?.();
+    return {
+      roster:document.getElementById('roster')?.classList.contains('roster-compact')||false,
+      ship:document.getElementById('hdShipDbList')?.classList.contains('hd-compact')||false,
+      equip:document.getElementById('hdEquipCatalogList')?.classList.contains('hd-compact')||false
+    };
+  });
+  expect(data.roster).toBe(true);
+  expect(data.ship).toBe(true);
+  expect(data.equip).toBe(true);
+});
