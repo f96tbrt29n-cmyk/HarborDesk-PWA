@@ -3510,3 +3510,18 @@ test('boot feedback clears when modules initialize', async ({ page }) => {
   expect(data.booting).toBe(false);
   expect(data.ready).toBe('1');
 });
+
+
+test('pinned home shortcuts open pin manager', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-quick-nav-pins-v1', JSON.stringify(['roster']));
+  });
+  await boot(page,errors);
+  await page.evaluate(()=>window.renderHomeDashboard?.());
+  const manage=page.locator('[data-home-pins-manage]');
+  await expect(manage).toHaveCount(1);
+  await manage.click();
+  await expect(page.locator('#hdQuickNavDialog')).toBeVisible();
+  await expect(page.locator('#hdQuickNavDialog .hd-qn-row.pinned')).toHaveCount(1);
+});
