@@ -4481,3 +4481,26 @@ test('notification UI guides iPhone Home Screen setup', async ({ page }) => {
   expect(data.granted).toBe('granted');
   expect(data.denied).toBe('denied');
 });
+
+
+test('Kancolle sync coverage distinguishes captured zero from missing', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now(),sources:['/kcsapi/api_port/port','/kcsapi/api_get_member/questlist'],
+      coverage:{ships:true,equipment:false,resources:true,fleets:true,quests:true,docks:true,sorties:false},
+      ships:206,equipment:0,materials:8,decks:4,quests:0,docks:0,sorties:0
+    }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdKcEnsureImport?.();window.hdKcRenderSyncStatus?.();
+    return {
+      coverage:document.getElementById('hdKcSyncCoverage')?.textContent||'',
+      recommendation:document.getElementById('hdKcSyncRecommendation')?.textContent||''
+    };
+  });
+  expect(data.coverage).toContain('任務 取得済み・0');
+  expect(data.coverage).toContain('装備 未取得');
+  expect(data.recommendation).toContain('装備画面を一度開く');
+});
