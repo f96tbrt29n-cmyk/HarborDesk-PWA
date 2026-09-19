@@ -3709,3 +3709,26 @@ test('advanced empty states provide direct actions', async ({ page }) => {
   expect(data.event).toBe(true);
   expect(data.resource).toBe(true);
 });
+
+
+test('equipment ledger preserves search and shows filtered count', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-equipment-ledger-view-v1', JSON.stringify({query:'電探'}));
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      {id:'1',name:'13号対空電探改',category:'電探',count:2,star:0,targetStar:10,assigned:'',memo:''},
+      {id:'2',name:'零式艦戦53型(岩本隊)',category:'艦戦',count:1,star:10,targetStar:10,assigned:'',memo:''}
+    ]));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>({
+    query:document.getElementById('equipmentSearch')?.value||'',
+    count:document.getElementById('equipmentLedgerCount')?.textContent||'',
+    clearDisabled:!!document.querySelector('[data-eq-search-clear]')?.disabled,
+    cards:document.querySelectorAll('#equipmentList .advanced-card').length
+  }));
+  expect(data.query).toBe('電探');
+  expect(data.count).toBe('1 / 2件');
+  expect(data.clearDisabled).toBe(false);
+  expect(data.cards).toBe(1);
+});
