@@ -29,3 +29,17 @@ Settings → Pages → Build and deployment → Source を `GitHub Actions` に�
 - Actionsでは最新mainのコミットSHAとrunのHEADが一致すること、テストとDeployの両ステップが成功したことを確認します。古いrunのcancelledは最新runの結果とは別です。
 - iPhoneでは公開後に「更新確認」→「今すぐ更新」で反映できます。Mac・Xcodeは不要です。
 - ローカル検証時は `npm install --no-save --no-package-lock @playwright/test@1.55.0`、`npx playwright install --with-deps chromium webkit` を実行し、別ターミナルで `python3 -m http.server 4173`、続いて `npx playwright test` を実行します。
+
+
+## 艦これゲーム内データ取込
+
+HarborDeskの「ゲーム同期」から、艦これAPIレスポンスJSONを端末内で解析して以下を反映できます。
+
+- 艦娘: MASTER ID、艦名、Lv、HP、cond、ロック状態、装備メモ
+- 装備: 装備MASTER ID、所持個数、改修★、熟練度分布
+- 資源: 燃料、弾薬、鋼材、ボーキ、高速建造材、高速修復材、開発資材、改修資材
+- 現在艦隊: 艦隊名、所属艦、Lv
+
+対応入力は `svdata={...}` の単一レスポンス、または複数レスポンスを `endpoints` / `records` にまとめたJSONです。主に `/kcsapi/api_port/port`、`/kcsapi/api_get_member/ship2`、`/kcsapi/api_get_member/slot_item`、`require_info` 内の `api_slot_item`、`api_material` を扱います。
+
+DMMのID・パスワード・Cookie・`api_token` はHarborDeskへ保存しません。貼り付けた生レスポンスも保存せず、必要なゲーム情報だけをHarborDesk形式へ変換して端末内に保存します。
