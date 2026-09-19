@@ -4,6 +4,7 @@ function hdFEEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').repl
 function hdFECatalog(){return typeof hdFLCatalog==='function'?hdFLCatalog():(typeof HD_EQUIPMENT_CATALOG!=='undefined'?HD_EQUIPMENT_CATALOG:[])}
 function hdFEFind(name){return hdFECatalog().find(x=>x.name===name)||null}
 function hdFEFindShip(name){
+ if(typeof hdShipDbResolveShip==='function')return hdShipDbResolveShip(String(name||'').trim());
  const rows=typeof HD_SHIP_DATABASE!=='undefined'?HD_SHIP_DATABASE:[];
  return rows.find(x=>x.final===name||x.base===name)||null;
 }
