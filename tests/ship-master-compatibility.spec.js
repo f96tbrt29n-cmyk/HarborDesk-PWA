@@ -4110,3 +4110,26 @@ test('Home next action can complete first quest directly', async ({ page }) => {
   expect(data.button).toBe(true);
   expect(data.afterDone).toBe(true);
 });
+
+
+test('recent timer and quest suggestions can be removed', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-timer-recent-v1', JSON.stringify({expedition:[{name:'東京急行',minutes:165},{name:'海上護衛任務',minutes:90}]}));
+    localStorage.setItem('harbordesk-quest-recent-v1', JSON.stringify(['デイリー演習','補給艦3隻']));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    openTimer('expedition');
+    document.querySelector('[data-timer-recent-remove="0"]')?.click();
+    const timerRows=JSON.parse(localStorage.getItem('harbordesk-timer-recent-v1')||'{}').expedition||[];
+    document.getElementById('timerDialog')?.close();
+    openQuestDialog();
+    document.querySelector('[data-quest-recent-remove="デイリー演習"]')?.click();
+    const questRows=JSON.parse(localStorage.getItem('harbordesk-quest-recent-v1')||'[]');
+    document.getElementById('questDialog')?.close();
+    return {timerRows,questRows};
+  });
+  expect(data.timerRows.map(x=>x.name)).toEqual(['海上護衛任務']);
+  expect(data.questRows).toEqual(['補給艦3隻']);
+});
