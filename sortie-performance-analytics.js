@@ -55,6 +55,27 @@ function hdSPARouteStats(rows){
  }
  return [...routes.values()].map(x=>({...x,bossRate:hdSPAPct(x.boss,x.n),retreatRate:hdSPAPct(x.retreats,x.n),sRate:hdSPAPct(x.s,x.n),winRate:hdSPAPct(x.wins,x.n),dropRate:hdSPAPct(x.drops,x.n)})).sort((a,b)=>b.n-a.n||b.bossRate-a.bossRate||a.map.localeCompare(b.map,undefined,{numeric:true})||a.route.localeCompare(b.route,'ja'));
 }
+function hdSPAStructuralRoute(map){
+ const g=typeof HD_MAP_GRAPHS!=='undefined'?HD_MAP_GRAPHS?.[String(map||'')]:null;if(!g||!Array.isArray(g.edges))return [];
+ const labels=[...new Set(g.edges.flat())],starts=labels.filter(x=>x==='S'||x==='S1'||x==='S2'),target=g.boss||g.goal;if(!starts.length||!target)return [];
+ const q=starts.map(s=>[s,[s]]),seen=new Set(starts);
+ while(q.length){const [node,path]=q.shift();if(node===target)return path.filter(x=>x!=='S'&&x!=='S1'&&x!=='S2');for(const [a,b] of g.edges){if(a===node&&!seen.has(b)){seen.add(b);q.push([b,[...path,b]])}}}
+ return [];
+}
+function hdSPANodeTrend(rows,windowSize=hdSPAWindow()){
+ const sorted=[...(rows||[])].sort((a,b)=>(Number(b.at)||0)-(Number(a.at)||0)),recent=sorted.slice(0,windowSize),previous=sorted.slice(windowSize,windowSize*2);
+ if(recent.length<windowSize||previous.length<windowSize)return {ready:false,windowSize,recentCount:recent.length,previousCount:previous.length,items:[]};
+ const a=new Map(hdSPANodeStats(recent).map(x=>[x.key,x])),b=new Map(hdSPANodeStats(previous).map(x=>[x.key,x])),items=[];
+ for(const [key,cur] of a){const prev=b.get(key);if(!prev||!cur.visits||!prev.visits)continue;const delta=cur.retreatRate-prev.retreatRate;items.push({key,map:cur.map,node:cur.node,delta,recentRate:cur.retreatRate,previousRate:prev.retreatRate,recentVisits:cur.visits,previousVisits:prev.visits,recentRetreats:cur.retreats,previousRetreats:prev.retreats})}
+ items.sort((x,y)=>y.delta-x.delta||y.recentRetreats-x.recentRetreats||y.recentVisits-x.recentVisits);
+ return {ready:true,windowSize,recentCount:recent.length,previousCount:previous.length,items};
+}
+function hdSPARouteComparison(maps,routeStats){
+ const list=(maps||[]).filter(Boolean);if(list.length!==1)return null;const map=list[0],reference=hdSPAStructuralRoute(map);if(!reference.length)return null;
+ const referenceRoute=reference.join('→'),routes=Array.isArray(routeStats)?routeStats:[],actual=routes[0]||null,referenceStats=routes.find(x=>x.route===referenceRoute)||null;
+ return {map,reference,referenceRoute,actual,referenceStats,matches:!!actual&&actual.route===referenceRoute};
+}
+function hdSPADangerNodes(nodeStats){return (nodeStats||[]).filter(x=>x.retreats>0).sort((a,b)=>b.retreats-a.retreats||b.retreatRate-a.retreatRate||b.visits-a.visits).slice(0,5)}
 function hdSPAStrategyLabel(id,row){
  if(row?.strategyLabel)return row.strategyLabel;
  if(typeof HD_SPM_STRATEGIES!=='undefined'&&HD_SPM_STRATEGIES[id])return HD_SPM_STRATEGIES[id].label;
@@ -174,7 +195,7 @@ function hdSPARows(){
   if(!groups.has(key))groups.set(key,{key,label:hdSPAGroupLabel(row,mode),strategy:row.strategy||'manual',rows:[],maps:new Set()});
   const g=groups.get(key);g.rows.push(row);g.maps.add(row.map);
  }
- const out=[...groups.values()].map(g=>({...g,metrics:hdSPAMetrics(g.rows),dropStats:hdSPADropStats(g.rows),nodeStats:hdSPANodeStats(g.rows),routeStats:hdSPARouteStats(g.rows),trend:hdSPATrend(g.rows),recentRef:hdSPARecentRef(g.rows),maps:[...g.maps]}));
+ const out=[...groups.values()].map(g=>{const maps=[...g.maps],nodeStats=hdSPANodeStats(g.rows),routeStats=hdSPARouteStats(g.rows);return {...g,metrics:hdSPAMetrics(g.rows),dropStats:hdSPADropStats(g.rows),nodeStats,routeStats,dangerNodes:hdSPADangerNodes(nodeStats),nodeTrend:hdSPANodeTrend(g.rows),routeComparison:hdSPARouteComparison(maps,routeStats),trend:hdSPATrend(g.rows),recentRef:hdSPARecentRef(g.rows),maps}});
  out.sort((a,b)=>{
   if(mode==='strategy'){const ai=HD_SPA_STRATEGY_ORDER.indexOf(a.strategy),bi=HD_SPA_STRATEGY_ORDER.indexOf(b.strategy);if(ai!==bi)return (ai<0?99:ai)-(bi<0?99:bi)}
   return b.metrics.n-a.metrics.n||a.label.localeCompare(b.label,'ja');
@@ -225,10 +246,20 @@ function hdSPANodeRouteHtml(row){
  const routeHtml=routes.length?'<div class="hd-spa-route-panel"><div class="hd-spa-detail-head"><strong>ルート別分析</strong><span>ゲーム同期で取得した経路</span></div><div class="hd-spa-route-list">'+routes.map(x=>'<div><div><b>'+hdSPAEsc((multi?x.map+' ':'')+x.route)+'</b><small>'+x.n+'周'+(x.drops?' / Drop '+x.drops:'')+'</small></div><span>ボス '+x.bossRate+'%｜撤退 '+x.retreatRate+'%｜S '+x.sRate+'%</span></div>').join('')+'</div></div>':'';
  return '<div class="hd-spa-route-node">'+nodeHtml+routeHtml+'</div>';
 }
+function hdSPAInsightHtml(row){
+ const danger=(row.dangerNodes||[]).slice(0,3),nt=row.nodeTrend,compare=row.routeComparison,multi=(row.maps||[]).length>1;
+ const dangerHtml=danger.length?'<div class="hd-spa-insight-block danger"><strong>危険マス</strong><div>'+danger.map(x=>'<span><b>'+hdSPAEsc((multi?x.map+' ':'')+x.node)+'</b> 撤退 '+x.retreats+'/'+x.visits+'（'+x.retreatRate+'%）</span>').join('')+'</div></div>':'<div class="hd-spa-insight-block"><strong>危険マス</strong><small>撤退記録なし</small></div>';
+ let trendHtml='';
+ if(!nt?.ready)trendHtml='<div class="hd-spa-insight-block"><strong>最近の悪化</strong><small>直近'+(nt?.windowSize||hdSPAWindow())+'周と前'+(nt?.windowSize||hdSPAWindow())+'周の比較待ち</small></div>';
+ else{const worse=(nt.items||[]).filter(x=>x.delta>0).slice(0,3);trendHtml=worse.length?'<div class="hd-spa-insight-block warn"><strong>最近の悪化</strong><div>'+worse.map(x=>'<span><b>'+hdSPAEsc((multi?x.map+' ':'')+x.node)+'</b> +'+x.delta+'pt <small>('+x.previousRate+'%→'+x.recentRate+'%)</small></span>').join('')+'</div></div>':'<div class="hd-spa-insight-block"><strong>最近の悪化</strong><small>撤退率の悪化は検出していないよ</small></div>'}
+ let routeHtml='';
+ if(compare){const actual=compare.actual,refStats=compare.referenceStats;routeHtml='<div class="hd-spa-insight-block route"><strong>ルート差分</strong><span>構造図最短（参考） <b>'+hdSPAEsc(compare.referenceRoute)+'</b>'+(refStats?' <small>実績 '+refStats.n+'周 / ボス'+refStats.bossRate+'%</small>':' <small>実績なし</small>')+'</span>'+(actual?'<span>最多実績 <b>'+hdSPAEsc(actual.route)+'</b> <small>'+actual.n+'周 / ボス'+actual.bossRate+'% / 撤退'+actual.retreatRate+'%</small></span>':'<span>実績ルートなし</span>')+'<em class="'+(compare.matches?'match':'diff')+'">'+(compare.matches?'最多実績ルートは構造図最短と一致':'最多実績ルートは構造図最短と異なる')+'</em></div>';}
+ if(!dangerHtml&&!trendHtml&&!routeHtml)return '';return '<div class="hd-spa-insights"><div class="hd-spa-detail-head"><strong>攻略インサイト</strong><span>実戦ログから自動検出</span></div>'+dangerHtml+trendHtml+routeHtml+'<small class="hd-spa-insight-note">構造図最短はHarborDesk内の海域グラフ上の参考経路。艦これの固定条件・確率分岐を含む「推奨ルート」判定ではないよ。</small></div>';
+}
 function hdSPACard(row){
  const m=row.metrics,sample=m.n<3?'<div class="hd-spa-sample warn">サンプル少なめ</div>':'<div class="hd-spa-sample">記録 '+m.n+'周</div>',badges=row.badges.length?'<div class="hd-spa-badges">'+row.badges.map(x=>'<span>'+hdSPAEsc(x)+'</span>').join('')+'</div>':'';
  const reopen=row.recentRef?.available?'<button type="button" class="ghost small" data-hd-spa-reopen="'+hdSPAEsc(row.key)+'">この編成を準備表へ</button>':'';
- return `<article class="hd-spa-card" data-hd-spa-card="${hdSPAEsc(row.key)}">${badges}<div class="hd-spa-card-head"><div><strong>${hdSPAEsc(row.label)}</strong><small>${hdSPAEsc(row.maps.join(' / '))}</small></div>${sample}</div>${hdSPASourceHtml(m)}<div class="hd-spa-metrics"><span>ボス到達 <b>${m.bossRate}%</b></span><span>S勝利 <b>${m.sRate}%</b></span><span>B以上勝利 <b>${m.winRate}%</b></span><span>撤退 <b>${m.retreatRate}%</b></span><span>ドロップ <b>${m.dropRate}%</b></span><span>ドロップ種類 <b>${m.uniqueDrops}</b></span><span>平均資源 <b>${m.avgResource==null?'—':m.avgResource}</b></span><span>平均バケツ <b>${m.avgBuckets==null?'—':m.avgBuckets}</b></span><span>平均時間 <b>${m.avgDurationMin==null?'—':m.avgDurationMin+'分'}</b></span><span>開始時確認 <b>${m.avgReadiness==null?'—':m.avgReadiness+'%'}</b></span></div>${hdSPADropHtml(row)}${hdSPANodeRouteHtml(row)}${hdSPATrendHtml(row)}${hdSPARecommendationHtml(row)}${reopen?'<div class="hd-spa-actions">'+reopen+'</div>':''}</article>`;
+ return `<article class="hd-spa-card" data-hd-spa-card="${hdSPAEsc(row.key)}">${badges}<div class="hd-spa-card-head"><div><strong>${hdSPAEsc(row.label)}</strong><small>${hdSPAEsc(row.maps.join(' / '))}</small></div>${sample}</div>${hdSPASourceHtml(m)}<div class="hd-spa-metrics"><span>ボス到達 <b>${m.bossRate}%</b></span><span>S勝利 <b>${m.sRate}%</b></span><span>B以上勝利 <b>${m.winRate}%</b></span><span>撤退 <b>${m.retreatRate}%</b></span><span>ドロップ <b>${m.dropRate}%</b></span><span>ドロップ種類 <b>${m.uniqueDrops}</b></span><span>平均資源 <b>${m.avgResource==null?'—':m.avgResource}</b></span><span>平均バケツ <b>${m.avgBuckets==null?'—':m.avgBuckets}</b></span><span>平均時間 <b>${m.avgDurationMin==null?'—':m.avgDurationMin+'分'}</b></span><span>開始時確認 <b>${m.avgReadiness==null?'—':m.avgReadiness+'%'}</b></span></div>${hdSPADropHtml(row)}${hdSPAInsightHtml(row)}${hdSPANodeRouteHtml(row)}${hdSPATrendHtml(row)}${hdSPARecommendationHtml(row)}${reopen?'<div class="hd-spa-actions">'+reopen+'</div>':''}</article>`;
 }
 function hdSPAHtml(){
  const mode=hdSPAMode(),map=hdSPAMap(),windowSize=hdSPAWindow(),rows=hdSPARows(),maps=hdSPAMaps();
