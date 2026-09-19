@@ -9088,12 +9088,36 @@ function hdShipDbMasterExslotCheck(row,equipName,star=0,normalInfo=null){
  if((snap.exslotBaseTypeIds||[]).includes(Number(typeId))&&!blocked.has(Number(typeId)))return {allowed:true,mode:'common',reason:`共通増設カテゴリ: ${HD_EXSLOT_TYPE_LABELS[typeId]||HD_EQUIP_TYPE_LABELS[typeId]||meta.typeName||('#'+typeId)}`,reqStar:0};
  return starShort||{allowed:false,mode:'none',reason:blocked.has(Number(typeId))?'この艦では該当増設カテゴリが制限対象':'補強増設対象外',reqStar:0};
 }
+function hdShipDbMasterReverseCompatibility(equipName,star=0,ownedOnly=false){
+ const rows=[];
+ for(const row of hdShipDbMasterRows()){
+  const normal=hdShipDbMasterNormalCheck(row,equipName);
+  const ex=hdShipDbMasterExslotCheck(row,equipName,star,normal);
+  if(!normal.allowed&&!ex.allowed)continue;
+  const owned=hdShipDbMasterOwned(row);
+  if(ownedOnly&&!owned)continue;
+  rows.push({row,normal,ex,owned});
+ }
+ rows.sort((a,b)=>(!!b.owned-!!a.owned)||((a.row.sortno||99999)-(b.row.sortno||99999))||a.row.id-b.row.id);
+ return rows;
+}
+function hdShipDbReverseHtml(equipName,star=0,ownedOnly=false){
+ const meta=hdShipDbMasterEquipmentMeta(equipName);if(!meta)return '';
+ const rows=hdShipDbMasterReverseCompatibility(meta.name,star,ownedOnly),normalCount=rows.filter(x=>x.normal.allowed).length,exCount=rows.filter(x=>x.ex.allowed).length,shown=rows.slice(0,80),rest=Math.max(0,rows.length-shown.length);
+ const cards=shown.map(({row,normal,ex,owned})=>{
+  const slots=normal.allowed?(normal.allowedSlots||[]).map(x=>`第${x.index+1}`).join('・'):'';
+  const badges=[normal.allowed?`通常 ${slots||'可'}`:'',ex.allowed?`増設 ${ex.mode==='common'?'共通':ex.mode==='global'?'全艦':'個別'}${ex.reqStar?` ★${ex.reqStar}+`:''}`:''].filter(Boolean);
+  return `<button type="button" class="hd-equip-reverse-row" data-hd-equip-check-ship="${row.id}"><span><b>${hdShipDbEsc(row.name)}</b><small>${hdShipDbEsc(row.type)}・${hdShipDbMasterSpeed(row.speed)}${owned?`・所持Lv.${Number(owned.level)||0}`:''}</small></span><span>${badges.map(x=>`<i>${hdShipDbEsc(x)}</i>`).join('')}</span></button>`;
+ }).join('');
+ return `<details class="hd-equip-reverse" open><summary>この装備を積める艦 <span>${rows.length}形態</span></summary><div class="hd-equip-reverse-summary"><span>通常枠 <b>${normalCount}</b></span><span>補強増設 <b>${exCount}</b></span>${ownedOnly?'<span>台帳の所持艦だけ</span>':''}</div><div class="hd-equip-reverse-list">${cards||'<div class="hd-equip-check-empty">条件に合う艦がないよ</div>'}</div>${rest?`<small class="hd-equip-reverse-rest">ほか ${rest}形態。艦名を絞るか「所持艦だけ」を使ってね。</small>`:''}</details>`;
+}
 function hdShipDbEquipCheckHtml(row,equipName,star=0){
  const normal=hdShipDbMasterNormalCheck(row,equipName),ex=hdShipDbMasterExslotCheck(row,equipName,star,normal);
  if(!row)return '<div class="hd-equip-check-empty">艦娘を選んでね</div>';
  if(!normal.meta)return `<div class="hd-equip-check-empty"><b>${hdShipDbEsc(equipName||'装備未選択')}</b><span>${hdShipDbEsc(normal.reason)}</span></div>`;
  const slotHtml=(normal.slots||[]).length?normal.slots.map(x=>`<span class="${x.blocked?'blocked':'ok'}"><i>第${x.index+1}</i><b>${x.blocked?'×':'○'}</b><small>${x.cap}機</small></span>`).join(''):'<span class="blocked"><b>通常枠なし</b></span>';
- return `<div class="hd-equip-check-result"><div class="hd-equip-check-title"><div><b>${hdShipDbEsc(row.name)}</b><span>× ${hdShipDbEsc(normal.meta.name)}${Number(star)?` ★${Number(star)}`:''}</span></div><small>${hdShipDbEsc(normal.meta.typeName||('装備種#'+normal.typeId))} / ID ${normal.meta.id}</small></div><div class="hd-equip-check-judge"><article class="${normal.allowed?'ok':'ng'}"><b>通常スロット ${normal.allowed?'○':'×'}</b><span>${hdShipDbEsc(normal.reason)}</span><div class="hd-equip-check-slots">${slotHtml}</div></article><article class="${ex.allowed?'ok':ex.reqStar?'warn':'ng'}"><b>補強増設 ${ex.allowed?'○':'×'}</b><span>${hdShipDbEsc(ex.reason)}</span>${ex.reqStar?`<small>必要改修: ★${ex.reqStar}以上 / 入力 ★${Number(star)||0}</small>`:''}</article></div><p>判定元: api_start2 通常装備/補強増設マスター＋装備picker位置制限。艦これ更新時はHarborDeskの自動同期で更新されるよ。</p></div>`;
+ const ownedOnly=!!document.getElementById('hdShipEquipCheckOwnedOnly')?.checked;
+ return `<div class="hd-equip-check-result"><div class="hd-equip-check-title"><div><b>${hdShipDbEsc(row.name)}</b><span>× ${hdShipDbEsc(normal.meta.name)}${Number(star)?` ★${Number(star)}`:''}</span></div><small>${hdShipDbEsc(normal.meta.typeName||('装備種#'+normal.typeId))} / ID ${normal.meta.id}</small></div><div class="hd-equip-check-judge"><article class="${normal.allowed?'ok':'ng'}"><b>通常スロット ${normal.allowed?'○':'×'}</b><span>${hdShipDbEsc(normal.reason)}</span><div class="hd-equip-check-slots">${slotHtml}</div></article><article class="${ex.allowed?'ok':ex.reqStar?'warn':'ng'}"><b>補強増設 ${ex.allowed?'○':'×'}</b><span>${hdShipDbEsc(ex.reason)}</span>${ex.reqStar?`<small>必要改修: ★${ex.reqStar}以上 / 入力 ★${Number(star)||0}</small>`:''}</article></div><p>判定元: api_start2 通常装備/補強増設マスター＋装備picker位置制限。艦これ更新時はHarborDeskの自動同期で更新されるよ。</p>${hdShipDbReverseHtml(normal.meta.name,star,ownedOnly)}</div>`;
 }
 function hdShipDbRenderEquipChecker(){
  const host=document.getElementById('hdShipEquipCheckResult');if(!host)return;
@@ -9104,9 +9128,9 @@ function hdShipDbEnsureEquipChecker(){
  let d=document.getElementById('hdShipEquipCheckDialog');if(d)return d;
  const rows=hdShipDbMasterRows().slice().sort((a,b)=>(a.sortno||99999)-(b.sortno||99999)||a.id-b.id),equipment=Object.keys(hdShipDbMasterSnapshot().equipment||{}).sort((a,b)=>a.localeCompare(b,'ja'));
  d=document.createElement('dialog');d.id='hdShipEquipCheckDialog';d.className='hd-ship-equip-check-dialog';
- d.innerHTML=`<div class="hd-equip-check-head"><div><div class="eyebrow">EQUIPMENT COMPATIBILITY</div><h3>装備可否チェッカー</h3></div><button type="button" class="icon-btn" data-hd-equip-check-close>×</button></div><p class="muted">全プレイヤー艦形態を公式マスターで判定。通常枠・位置制限・補強増設・改修★条件まで確認できるよ。</p><div class="hd-equip-check-form"><label>艦娘<input id="hdShipEquipCheckShip" list="hdShipEquipCheckShipList" placeholder="例: 大和改二"></label><label>装備<input id="hdShipEquipCheckEquip" list="hdShipEquipCheckEquipList" placeholder="装備名を入力"></label><label>改修★<input id="hdShipEquipCheckStar" type="number" min="0" max="10" value="0"></label><button type="button" class="primary" data-hd-equip-check-run>判定</button></div><datalist id="hdShipEquipCheckShipList">${rows.map(x=>`<option value="${hdShipDbEsc(x.name)}"></option>`).join('')}</datalist><datalist id="hdShipEquipCheckEquipList">${equipment.map(x=>`<option value="${hdShipDbEsc(x)}"></option>`).join('')}</datalist><div id="hdShipEquipCheckResult" class="hd-equip-check-result-host"><div class="hd-equip-check-empty">艦娘と装備を選んで「判定」を押してね</div></div>`;
+ d.innerHTML=`<div class="hd-equip-check-head"><div><div class="eyebrow">EQUIPMENT COMPATIBILITY</div><h3>装備可否チェッカー</h3></div><button type="button" class="icon-btn" data-hd-equip-check-close>×</button></div><p class="muted">全プレイヤー艦形態を公式マスターで判定。通常枠・位置制限・補強増設・改修★条件まで確認できるよ。</p><div class="hd-equip-check-form"><label>艦娘<input id="hdShipEquipCheckShip" list="hdShipEquipCheckShipList" placeholder="例: 大和改二"></label><label>装備<input id="hdShipEquipCheckEquip" list="hdShipEquipCheckEquipList" placeholder="装備名を入力"></label><label>改修★<input id="hdShipEquipCheckStar" type="number" min="0" max="10" value="0"></label><button type="button" class="primary" data-hd-equip-check-run>判定</button><label class="hd-equip-check-owned"><input id="hdShipEquipCheckOwnedOnly" type="checkbox"> 台帳の所持艦だけ逆引き</label></div><datalist id="hdShipEquipCheckShipList">${rows.map(x=>`<option value="${hdShipDbEsc(x.name)}"></option>`).join('')}</datalist><datalist id="hdShipEquipCheckEquipList">${equipment.map(x=>`<option value="${hdShipDbEsc(x)}"></option>`).join('')}</datalist><div id="hdShipEquipCheckResult" class="hd-equip-check-result-host"><div class="hd-equip-check-empty">艦娘と装備を選んで「判定」を押してね</div></div>`;
  document.body.appendChild(d);
- d.querySelectorAll('#hdShipEquipCheckShip,#hdShipEquipCheckEquip,#hdShipEquipCheckStar').forEach(el=>el.addEventListener('change',hdShipDbRenderEquipChecker));
+ d.querySelectorAll('#hdShipEquipCheckShip,#hdShipEquipCheckEquip,#hdShipEquipCheckStar,#hdShipEquipCheckOwnedOnly').forEach(el=>el.addEventListener('change',hdShipDbRenderEquipChecker));
  return d;
 }
 function hdShipDbOpenEquipChecker(ref){
@@ -9217,6 +9241,7 @@ document.addEventListener('click',e=>{
  const checkerId=e.target.closest?.('[data-hd-ship-equip-check-id]');if(checkerId){hdShipDbOpenEquipChecker(checkerId.dataset.hdShipEquipCheckId);return}
  const checkerName=e.target.closest?.('[data-hd-ship-equip-check-name]');if(checkerName){hdShipDbOpenEquipChecker(checkerName.dataset.hdShipEquipCheckName);return}
  if(e.target.closest?.('[data-hd-open-equip-check]')){hdShipDbOpenEquipChecker('');return}
+ const reverseShip=e.target.closest?.('[data-hd-equip-check-ship]');if(reverseShip){const row=hdShipDbMasterSnapshot().allShips?.[String(reverseShip.dataset.hdEquipCheckShip)],ship=document.getElementById('hdShipEquipCheckShip');if(row&&ship)ship.value=row.name;hdShipDbRenderEquipChecker();return}
  if(e.target.closest?.('[data-hd-equip-check-run]')){hdShipDbRenderEquipChecker();return}
  if(e.target.closest?.('[data-hd-equip-check-close]')){document.getElementById('hdShipEquipCheckDialog')?.close();return}
 });
