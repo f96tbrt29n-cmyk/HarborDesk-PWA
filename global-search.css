@@ -12,3 +12,9 @@
 .hd-gs-cats{scroll-padding-inline:14px}
 
 .hd-gs-history-title button{flex:0 0 auto;font-size:10px;padding:6px 8px}.hd-gs-history button{min-height:38px}
+
+.hd-gs-history-item{display:inline-grid;grid-template-columns:auto 30px;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:#10263a}
+.hd-gs-history-item>[data-hd-gs-history]{border:0;border-radius:0;background:transparent;padding:7px 9px}
+.hd-gs-history-remove{border:0;border-left:1px solid var(--line);background:transparent;color:var(--muted);font-size:16px;line-height:1}
+.hd-gs-history-remove:active{background:#3a252c;color:#ffd8df}
+@media(max-width:560px){.hd-gs-history{gap:6px}.hd-gs-history-item>[data-hd-gs-history]{max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
