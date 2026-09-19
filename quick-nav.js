@@ -43,7 +43,7 @@ function hdQNTogglePin(id){const pins=hdQNLoadPins(),set=new Set(pins);set.has(i
 function hdQNEnsure(){
   if(document.getElementById('hdQuickNavButton'))return;
   const btn=document.createElement('button');btn.id='hdQuickNavButton';btn.type='button';btn.className='hd-qn-fab';btn.innerHTML='<span>☰</span><b>機能</b>';btn.addEventListener('click',hdQNOpen);document.body.appendChild(btn);
-  const d=document.createElement('dialog');d.id='hdQuickNavDialog';d.className='hd-qn-dialog';d.innerHTML=`<div class="hd-qn-head"><div><div class="eyebrow">QUICK NAV</div><h3>機能をすぐ開く</h3></div><button type="button" class="ghost small" data-hd-qn-close>閉じる</button></div><div class="hd-qn-tools"><input id="hdQNSearch" type="search" placeholder="機能名で検索"><button type="button" class="ghost small" data-hd-qn-top>ページ上部</button></div><div id="hdQNList" class="hd-qn-list"></div><div class="hd-qn-foot">★を付けた機能は上に固定するよ。</div>`;document.body.appendChild(d);
+  const d=document.createElement('dialog');d.id='hdQuickNavDialog';d.className='hd-qn-dialog';d.innerHTML=`<div class="hd-qn-head"><div><div class="eyebrow">QUICK NAV</div><h3>機能をすぐ開く</h3></div><button type="button" class="ghost small" data-hd-qn-close>閉じる</button></div><div class="hd-qn-actions"><button type="button" data-hd-qn-home><span>⌂</span><b>ホーム</b></button><button type="button" data-hd-qn-sync><span>↻</span><b>ゲーム同期</b></button><a href="https://play.games.dmm.com/game/kancolle"><span>⚓</span><b>艦これ</b></a><button type="button" data-hd-qn-top><span>↑</span><b>上へ</b></button></div><div class="hd-qn-tools"><input id="hdQNSearch" type="search" placeholder="機能名で検索"></div><div id="hdQNList" class="hd-qn-list"></div><div class="hd-qn-foot">★を付けた機能は上に固定するよ。</div>`;document.body.appendChild(d);
   d.addEventListener('click',e=>{if(e.target===d)hdQNClose()});
   document.getElementById('hdQNSearch')?.addEventListener('input',e=>hdQNRenderList(e.target.value));
   hdQNRenderList();
@@ -59,6 +59,8 @@ function hdQNLoadDiagnostics(){
 
 document.addEventListener('click',e=>{
   if(e.target.closest?.('[data-hd-qn-close]')){hdQNClose();return}
+  if(e.target.closest?.('[data-hd-qn-home]')){hdQNClose();if(typeof hdWSShowElement==='function')hdWSShowElement('home',true);else document.getElementById('home')?.scrollIntoView({behavior:'smooth',block:'start'});return}
+  if(e.target.closest?.('[data-hd-qn-sync]')){hdQNJump('kancolleImport');return}
   if(e.target.closest?.('[data-hd-qn-top]')){hdQNClose();window.scrollTo({top:0,behavior:'smooth'});return}
   const jump=e.target.closest?.('[data-hd-qn-jump]');if(jump){hdQNJump(jump.dataset.hdQnJump);return}
   const pin=e.target.closest?.('[data-hd-qn-pin]');if(pin){hdQNTogglePin(pin.dataset.hdQnPin);return}
