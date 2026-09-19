@@ -1723,9 +1723,9 @@ test('partial KanColle equipment sync keeps previously synced untouched stacks',
 
   expect(data.stacks).toEqual(expect.arrayContaining([
     expect.objectContaining({name:'41cm連装砲',star:6,count:1,masterEquipId:8}),
-    expect.objectContaining({name:'41cm連装砲',star:4,count:1,masterEquipId:8}),
     expect.objectContaining({name:'46cm三連装砲',star:0,count:2,masterEquipId:9})
   ]));
+  expect(data.stacks.some(x=>x.name==='41cm連装砲'&&Number(x.star)===4)).toBeFalsy();
   expect(data.details).toEqual(expect.arrayContaining([
     expect.objectContaining({gameEquipId:5001,masterEquipId:8,star:6}),
     expect.objectContaining({gameEquipId:6001,masterEquipId:9,star:0}),
