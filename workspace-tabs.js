@@ -112,7 +112,11 @@ function hdWSDefaultSection(group){
 }
 function hdWSGroupLabel(group){return HD_WS_GROUPS.find(x=>x.key===group)?.label||group}
 function hdWSResolveSection(group,preferred){const rows=hdWSVisibleSections(group);if(!rows.length)return null;if(preferred&&rows.some(x=>x.id===preferred))return preferred;const stored=hdWSState.sections?.[group];if(stored&&rows.some(x=>x.id===stored))return stored;return hdWSDefaultSection(group)}
-function hdWSUpdateTopbarHeight(){const h=document.querySelector('.topbar')?.getBoundingClientRect().height||68;document.documentElement.style.setProperty('--hd-topbar-h',`${Math.ceil(h)}px`)}
+function hdWSUpdateTopbarHeight(){
+ const h=document.querySelector('.topbar')?.getBoundingClientRect().height||68,nav=document.getElementById('hdWorkspaceNav')?.getBoundingClientRect().height||0;
+ document.documentElement.style.setProperty('--hd-topbar-h',`${Math.ceil(h)}px`);
+ document.documentElement.style.setProperty('--hd-workspace-nav-h',`${Math.ceil(nav)}px`);
+}
 function hdWSBadgeCounts(){
  const now=Date.now();let expeditions=0,docks=0,quests=0,construction=0,errors=0;
  try{if(typeof state!=='undefined'){
@@ -139,6 +143,7 @@ function hdWSRenderSubtabs(group,selected){
  if(rows.length<=1){host.hidden=true;host.innerHTML='';return}
  host.hidden=false;host.innerHTML=rows.map(el=>`<button type="button" role="tab" class="${el.id===selected?'active':''}" aria-selected="${el.id===selected?'true':'false'}" data-hd-ws-section="${hdWSEsc(el.id)}">${hdWSEsc(hdWSTitle(el))}</button>`).join('');
  const active=host.querySelector('.active');active?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+ requestAnimationFrame(hdWSUpdateTopbarHeight);
 }
 function hdWSUpdateWrappers(){
  const wrap=document.getElementById('advancedToolsWrap');if(wrap){const sections=[...wrap.querySelectorAll(':scope > section')];wrap.classList.toggle('hd-ws-wrapper-hidden',sections.length>0&&sections.every(x=>x.classList.contains('hd-ws-hidden')))}
