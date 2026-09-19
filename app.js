@@ -117,7 +117,7 @@ function renderGuide(){
  filters.innerHTML=Object.entries(guideLabels).map(([k,v])=>`<button class="guide-chip ${guideFilter===k?'active':''}" data-guide-filter="${k}">${v}</button>`).join('');
  const q=document.getElementById('guideQuery').value.trim().toLowerCase();
  const rows=GUIDE.filter(x=>(guideFilter==='all'||(guideFilter==='fav'?guideFavs.has(x.id):x.type===guideFilter))&&(!q||`${x.title} ${x.subtitle} ${x.summary} ${x.keywords}`.toLowerCase().includes(q)));
- document.getElementById('guideResults').innerHTML=rows.length?rows.map(x=>`<article class="guide-card"><div class="guide-card-top"><div><span class="guide-tag">${guideLabels[x.type]}</span><h3>${esc(x.title)}</h3><div class="muted">${esc(x.subtitle)}</div></div><button class="guide-fav" data-guide-fav="${x.id}" aria-label="お気に入り">${guideFavs.has(x.id)?'★':'☆'}</button></div><p>${esc(x.summary)}</p><a class="guide-link" href="${x.url}" target="_blank" rel="noopener">攻略Wikiで詳しく見る ↗</a></article>`).join(''):'<div class="empty">該当する攻略情報がないよ</div>';
+ document.getElementById('guideResults').innerHTML=rows.length?rows.map(x=>`<article class="guide-card"><div class="guide-card-top"><div><span class="guide-tag">${guideLabels[x.type]}</span><h3>${esc(x.title)}</h3><div class="muted">${esc(x.subtitle)}</div></div><button class="guide-fav" data-guide-fav="${x.id}" aria-label="お気に入り">${guideFavs.has(x.id)?'★':'☆'}</button></div><p>${esc(x.summary)}</p><a class="guide-link" href="${x.url}" target="_blank" rel="noopener">攻略Wikiで詳しく見る ↗</a></article>`).join(''):`<div class="empty empty-action"><strong>該当する攻略情報がないよ</strong><p>${q?`「${esc(q)}」の検索結果は0件`:guideFilter==='fav'?'お気に入り登録した攻略情報がまだないよ':`${guideLabels[guideFilter]||'現在の条件'}では0件`}</p><div class="empty-action-buttons">${q?'<button type="button" class="ghost small" data-guide-clear-query>検索をクリア</button>':''}${guideFilter!=='all'?'<button type="button" class="ghost small" data-guide-show-all>すべて表示</button>':''}</div></div>`;
 }
 
 document.addEventListener('click',e=>{
@@ -127,7 +127,9 @@ document.addEventListener('click',e=>{
 
  const world=e.target.closest('[data-world]');if(world){selectedWorld=world.dataset.world;selectedMap='';renderMapPicker();return}
  const map=e.target.closest('[data-map]');if(map){selectedMap=map.dataset.map;selectedWorld=selectedMap.split('-')[0];renderMapPicker();document.getElementById('selectedMapCard').scrollIntoView({behavior:'smooth',block:'center'});return}
- const gf=e.target.closest('[data-guide-filter]');if(gf){guideFilter=gf.dataset.guideFilter;renderGuide();return}
+ const clearGuideQuery=e.target.closest('[data-guide-clear-query]');if(clearGuideQuery){const input=document.getElementById('guideQuery');if(input)input.value='';renderGuide();input?.focus();return}
+ if(e.target.closest('[data-guide-show-all]')){guideFilter='all';renderGuide();return}
+  const gf=e.target.closest('[data-guide-filter]');if(gf){guideFilter=gf.dataset.guideFilter;renderGuide();return}
  const fav=e.target.closest('[data-guide-fav]');if(fav){const id=fav.dataset.guideFav;guideFavs.has(id)?guideFavs.delete(id):guideFavs.add(id);localStorage.setItem(FAV_KEY,JSON.stringify([...guideFavs]));renderGuide();return}
  const emptyTimer=e.target.closest('[data-empty-add-timer]');if(emptyTimer){openTimer(emptyTimer.dataset.emptyAddTimer);return}
  if(e.target.closest('[data-empty-add-quest]')){document.getElementById('questName').value='';document.getElementById('questDialog').showModal();return}
