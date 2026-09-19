@@ -72,3 +72,16 @@ dialog input,dialog select,dialog textarea{font-size:16px}
  }
  .dialog-actions button{flex:1;min-height:44px}
 }
+
+.hd-toast-region{
+ position:fixed;left:50%;bottom:calc(78px + env(safe-area-inset-bottom));z-index:5000;
+ max-width:min(360px,calc(100vw - 28px));transform:translate(-50%,14px);opacity:0;pointer-events:none;
+ padding:10px 14px;border:1px solid rgba(99,216,151,.46);border-radius:12px;background:rgba(16,53,39,.96);color:#dff8e8;
+ box-shadow:0 12px 28px rgba(0,0,0,.34);backdrop-filter:blur(12px);font-size:12px;font-weight:800;text-align:center;
+ transition:opacity .16s ease,transform .16s ease
+}
+.hd-toast-region.show{opacity:1;transform:translate(-50%,0)}
+.hd-toast-region.info{border-color:rgba(100,185,235,.5);background:rgba(18,54,79,.96);color:#e4f6ff}
+.hd-toast-region.warn{border-color:rgba(239,191,93,.55);background:rgba(78,57,20,.96);color:#ffe6ad}
+.hd-toast-region.error{border-color:rgba(238,118,118,.55);background:rgba(77,31,34,.97);color:#ffd8da}
+@media(max-width:560px){.hd-toast-region{bottom:calc(72px + env(safe-area-inset-bottom));font-size:11px;padding:9px 12px}}
