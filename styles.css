@@ -286,3 +286,13 @@ body.hd-booting::after{
   flex:0 0 auto;
  }
 }
+
+/* mobile topbar single-row UX */
+@media(max-width:560px){
+ .topbar{display:flex;flex-wrap:nowrap;align-items:center;padding:8px 10px;gap:7px;min-height:50px}
+ .topbar>div:first-child{flex:1 1 auto;min-width:0}
+ .topbar>div:first-child .eyebrow{display:none}
+ .topbar h1{font-size:20px;line-height:1.1;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .topbar .hd-global-sync-status{flex:0 0 auto}
+ .topbar .hd-header-more{flex:0 0 auto}
+}
