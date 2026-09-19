@@ -62,6 +62,7 @@ async function bumpHarborDeskVersion(sourceCommit,pickerCommit,changes=null){
  app.version=version;app.build=build;app.releasedAt=jstIsoNow();
  const shipDiff=changes?(changes.ships.added.length+changes.ships.removed.length+changes.ships.changed.length):0,equipAdd=changes?.equipment?.added?.length||0,equipChanged=changes?(changes.equipment.removed.length+changes.equipment.changed.length):0,exDiff=changes?(changes.exslot?.itemRulesChanged||0)+(changes.exslot?.limitShipsChanged||0):0;
  app.notes=`艦これマスター自動同期。api_start2 ${String(sourceCommit||'').slice(0,7)} / 装備picker ${String(pickerCommit||'').slice(0,7)} を反映。艦娘変更 ${shipDiff}件 / 新装備 ${equipAdd}件 / 装備変更 ${equipChanged}件 / 増設ルール ${exDiff}件${changes?.picker?.changed?' / picker位置制限変更':''}。`;
+ app.masterChanges=changes||null;
  const nextUpdate=update.replace(/const HD_APP_VERSION='[^']+';/,`const HD_APP_VERSION='${version}';`).replace(/const HD_APP_BUILD=\d+;/,`const HD_APP_BUILD=${build};`);
  const nextSw=sw.replace(/const CACHE='harbordesk-pwa-v\d+';/,`const CACHE='harbordesk-pwa-v${build}';`);
  if(nextUpdate===update)throw new Error('update-manager version marker not found');
