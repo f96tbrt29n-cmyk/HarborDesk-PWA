@@ -2871,3 +2871,17 @@ test('roster sort and compact mode persist in session', async ({ page }) => {
   expect(data.first).toBe('赤城改');
   expect(data.button).toContain('詳細');
 });
+
+
+test('mobile roster toolbar stays sticky', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  await page.setViewportSize({width:390,height:844});
+  const data=await page.evaluate(()=>{
+    const el=document.querySelector('#roster .roster-toolbar');
+    const s=el?getComputedStyle(el):null;
+    return {position:s?.position||'',top:s?.top||''};
+  });
+  expect(data.position).toBe('sticky');
+  expect(data.top).not.toBe('auto');
+});
