@@ -202,3 +202,10 @@ body.hd-booting::after{
 .timer-recent button{display:grid;gap:1px;flex:0 0 auto;max-width:190px;text-align:left;padding:7px 9px}
 .timer-recent button span{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .timer-recent button small{font-size:9px;color:var(--accent2)}
+
+.timer-recent-item,.quest-recent-item{display:inline-grid;grid-template-columns:minmax(0,1fr) 26px;align-items:stretch;flex:0 0 auto;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#10263a}
+.timer-recent-item>.ghost,.quest-recent-item>.ghost{border:0;border-radius:0;background:transparent}
+.timer-recent-remove,.quest-recent-remove{width:26px;border:0;border-left:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--muted);font-size:15px}
+.timer-recent-remove:active,.quest-recent-remove:active{background:rgba(255,120,120,.14);color:#ffd1d1}
+.timer-recent-item button[data-timer-recent]{max-width:180px}
+.quest-recent-item button[data-quest-recent]{max-width:190px}
