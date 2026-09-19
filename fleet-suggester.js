@@ -26,9 +26,9 @@ const HD_FS_TYPE_ALIASES={
 function hdFSEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function hdFSMap(){return typeof selectedMap!=='undefined'?selectedMap:''}
 function hdFSRoster(){try{return typeof rosterLoad==='function'?rosterLoad():JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')}catch(e){return []}}
-function hdFSDbFor(name){var n=String(name||'').trim();if(!n)return null;if(typeof hdShipDbResolveShip==='function')return hdShipDbResolveShip(n);if(typeof HD_SHIP_DATABASE==='undefined')return null;return HD_SHIP_DATABASE.find(function(x){return n===x.base||n===x.final||n.startsWith(x.base)})||null}
-function hdFSType(row){if(row&&row.type)return row.type;var db=hdFSDbFor(row&&row.name);return db&&db.type||''}
-function hdFSProfile(row){var db=hdFSDbFor(row.name),type=hdFSType(row),roles=db&&db.roles||[],tags=row.tags||[],master=db&&db._masterOnly?db._masterRow:null;return {row:row,db:db,master:master,type:type,roles:roles,tags:tags,level:Number(row.level)||0,speed:db&&db.speed||((type==='高速戦艦')?'高速':''),masterBacked:!!db}}
+function hdFSDbFor(input){var row=typeof input==='object'?input:null,n=String(row?.name||input||'').trim();if(!n)return null;if(typeof hdShipDbResolveShip==='function')return hdShipDbResolveShip({name:n,masterId:Number(row?.masterId)||0});if(typeof HD_SHIP_DATABASE==='undefined')return null;return HD_SHIP_DATABASE.find(function(x){return n===x.base||n===x.final||n.startsWith(x.base)})||null}
+function hdFSType(row){if(row&&row.type)return row.type;var db=hdFSDbFor(row);return db&&db.type||''}
+function hdFSProfile(row){var db=hdFSDbFor(row),type=hdFSType(row),roles=db&&db.roles||[],tags=row.tags||[],master=db&&db._masterOnly?db._masterRow:null;return {row:row,db:db,master:master,type:type,roles:roles,tags:tags,level:Number(row.level)||0,speed:db&&db.speed||((type==='高速戦艦')?'高速':''),masterBacked:!!db}}
 function hdFSTypeMatches(p,token){
  if(token==='対潜艦')return p.roles.some(function(r){return ['対潜','自動先制対潜','対潜補助','対潜護衛'].includes(r)})||['海防艦','駆逐艦','軽巡洋艦'].includes(p.type);
  var allowed=HD_FS_TYPE_ALIASES[token]||[token];return allowed.includes(p.type);
@@ -77,7 +77,7 @@ function hdFSPlans(map){
 function hdFSShipHtml(slot,i){
  if(!slot.profile)return '<div class="hd-fs-ship missing"><span>'+(i+1)+'</span><div><strong>'+hdFSEsc(slot.required||'自由枠')+' が不足</strong><small>艦隊台帳に候補を追加してね</small></div></div>';
  var p=slot.profile,r=p.row,meta=(p.type||'艦種未設定')+(r.level?' ・ Lv.'+r.level:'')+(p.speed?' ・ '+p.speed:'')+(p.db&&p.db._masterOnly?' ・ MASTER':'');
- var image=typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(r.name,'fleet-thumb'):'';
+ var image=typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(Number(r.masterId)>0?{id:Number(r.masterId),name:r.name}:r.name,'fleet-thumb'):'';
  return '<div class="hd-fs-ship"><span>'+(i+1)+'</span>'+image+'<div><strong>'+hdFSEsc(r.name)+'</strong><small>'+hdFSEsc(meta)+'</small><em>'+(slot.required?'担当: '+hdFSEsc(slot.required):'自由枠')+(r.gear?' ・ '+hdFSEsc(r.gear):'')+'</em></div></div>';
 }
 function hdFSMissingGearHtml(s){
@@ -108,7 +108,7 @@ function hdFSEnsure(){
 }
 function hdFSSave(index){
  var map=hdFSMap(),s=hdFSPlans(map)[Number(index)];if(!map||!s)return;var all=typeof loadCustomFleets==='function'?loadCustomFleets():{};all[map]=all[map]||[];
- var name=map+' 自動提案｜'+(s.preset.name||('候補'+(s.index+1))),ships=Array.from({length:6},function(_,i){var slot=s.slots[i],r=slot&&slot.profile&&slot.profile.row;return {ship:r&&r.name||'',gear:r&&r.gear||''}});
+ var name=map+' 自動提案｜'+(s.preset.name||('候補'+(s.index+1))),ships=Array.from({length:6},function(_,i){var slot=s.slots[i],p=slot&&slot.profile,r=p&&p.row,mid=Number(r&&r.masterId)||Number(p&&p.master&&p.master.id)||Number(typeof hdShipImageResolve==='function'&&r?.name?hdShipImageResolve(r.name)?.id:0)||0;return {ship:r&&r.name||'',masterId:mid,gear:r&&r.gear||''}});
  var memo='HarborDesk自動提案。'+(s.preset.use||'通常攻略')+'。アプリ内編成例を基にした候補で、ルート固定を保証しません。';
  var old=all[map].find(function(x){return x.name===name}),id=old&&old.id||(typeof cfUid==='function'?cfUid():'fs-'+Date.now()+'-'+Math.random().toString(16).slice(2));
  var item={id:id,name:name,ships:ships,memo:memo,createdAt:old&&old.createdAt||Date.now(),updatedAt:Date.now()};all[map]=old?all[map].map(function(x){return x.id===id?item:x}):all[map].concat(item);
