@@ -1,13 +1,15 @@
 // ==UserScript==
 // @name         HarborDesk 艦これ連携
 // @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
-// @version      1.0.0
+// @version      1.0.1
 // @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
 // @match        http://*.dmm.com/*
 // @match        https://*.dmm.com/*
 // @match        http://*.dmm.co.jp/*
 // @match        https://*.dmm.co.jp/*
-// @include      /^https?:\/\/203\.104\.\d{1,3}\.\d{1,3}\//
+// @match        http://*.kancolle-server.com/*
+// @match        https://*.kancolle-server.com/*
+// @include      /^https?:\/\/(?:203\.104|125\.6)\.\d{1,3}\.\d{1,3}\//
 // @run-at       document-start
 // @inject-into  page
 // @weight       999
@@ -19,7 +21,7 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.0';
+const HD_VERSION='1.0.1';
 const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/#kancolleImport';
 const HARBOR_ORIGIN='https://f96tbrt29n-cmyk.github.io';
 const RECORD_MESSAGE='harbordesk-kancolle-frame-record-v1';
