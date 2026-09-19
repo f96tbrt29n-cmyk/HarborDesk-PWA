@@ -3840,3 +3840,15 @@ test('home empty states offer direct add actions', async ({ page }) => {
   expect(await page.locator('#timerDialog').evaluate(el=>el.open)).toBe(true);
   expect(await page.locator('#timerDialogTitle').textContent()).toContain('遠征');
 });
+
+
+test('guide empty search can reset conditions', async ({ page }) => {
+  await boot(page,[]);
+  await page.fill('#guideQuery','絶対に存在しない検索語XYZ123');
+  await page.click('#guideSearchBtn');
+  await page.waitForSelector('[data-guide-clear-query]');
+  expect(await page.locator('#guideResults').textContent()).toContain('0件');
+  await page.click('[data-guide-clear-query]');
+  expect(await page.inputValue('#guideQuery')).toBe('');
+  expect(await page.locator('#guideResults .guide-card').count()).toBeGreaterThan(0);
+});
