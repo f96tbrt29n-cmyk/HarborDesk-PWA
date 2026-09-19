@@ -3285,3 +3285,24 @@ test('equipment delete can be undone from action toast', async ({ page }) => {
   expect(rows).toHaveLength(1);
   expect(rows[0].name).toBe('22号対水上電探');
 });
+
+test('global search is one tap from header and shows destination hints', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'1',name:'加賀改',level:94,tags:[]}]));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdGSEnsure?.();
+    window.hdGSAttachLaunchers?.();
+    const header=document.getElementById('hdGlobalSearchHeader');
+    const input=document.getElementById('hdGSSearch');
+    if(input){input.value='加賀';window.hdGSRender?.()}
+    const first=document.querySelector('.hd-gs-result');
+    return {header:!!header,aria:header?.getAttribute('aria-label')||'',dest:first?.querySelector('.hd-gs-dest')?.textContent||'',owned:first?.classList.contains('owned')||false};
+  });
+  expect(data.header).toBe(true);
+  expect(data.aria).toContain('全体検索');
+  expect(data.dest.length).toBeGreaterThan(0);
+  expect(data.owned).toBe(true);
+});
