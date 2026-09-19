@@ -4,14 +4,29 @@ const HD_SPA_WINDOW_KEY='harbordesk-sortie-analytics-window-v1';
 const HD_SPA_STRATEGY_ORDER=['stable','firepower','route','boss','reserve','manual'];
 
 function hdSPAEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function hdSPAMode(){try{return localStorage.getItem(HD_SPA_MODE_KEY)||'strategy'}catch{return 'strategy'}}
+function hdSPAMode(){try{const v=localStorage.getItem(HD_SPA_MODE_KEY)||'map';return ['map','strategy','fleet'].includes(v)?v:'map'}catch{return 'map'}}
 function hdSPASetMode(v){try{localStorage.setItem(HD_SPA_MODE_KEY,v)}catch{}}
 function hdSPAMap(){try{return localStorage.getItem(HD_SPA_MAP_KEY)||'all'}catch{return 'all'}}
 function hdSPASetMap(v){try{localStorage.setItem(HD_SPA_MAP_KEY,v)}catch{}}
 function hdSPAWindow(){try{const n=Number(localStorage.getItem(HD_SPA_WINDOW_KEY)||5);return [3,5,10].includes(n)?n:5}catch{return 5}}
 function hdSPASetWindow(v){try{const n=Number(v);localStorage.setItem(HD_SPA_WINDOW_KEY,[3,5,10].includes(n)?String(n):'5')}catch{}}
 function hdSPALogs(){
- try{return (typeof hdSLLoad==='function'?hdSLLoad():JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]')).filter(x=>x&&x.sessionId&&x.fleetId)}catch{return []}
+ try{return (typeof hdSLLoad==='function'?hdSLLoad():JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]')).filter(x=>x&&String(x.map||'').trim())}catch{return []}
+}
+function hdSPAMapName(map){
+ const sources=[typeof MAP_DETAILS!=='undefined'?MAP_DETAILS:null,typeof MAP_DETAILS_34!=='undefined'?MAP_DETAILS_34:null,typeof MAP_DETAILS_57!=='undefined'?MAP_DETAILS_57:null];
+ for(const src of sources){if(src?.[map]?.name)return src[map].name}return '';
+}
+function hdSPASourceKind(row){if(row?.source==='kancolle-import')return 'game';if(row?.sessionId||row?.fleetId)return 'session';return 'manual'}
+function hdSPASourceStats(rows){
+ const out={game:0,session:0,manual:0};for(const row of rows||[])out[hdSPASourceKind(row)]++;return out;
+}
+function hdSPADropStats(rows){
+ const drops=(rows||[]).filter(x=>String(x?.drop||'').trim()).sort((a,b)=>(Number(b.at)||0)-(Number(a.at)||0)),counts=new Map();
+ for(const row of drops){const ship=String(row.drop).trim();counts.set(ship,(counts.get(ship)||0)+1)}
+ const top=[...counts.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'ja')).slice(0,6).map(([ship,count])=>({ship,count}));
+ const recent=drops.slice(0,6).map(x=>({ship:String(x.drop).trim(),map:x.map||'',node:x.node||x.gameNodeLabel||'',result:x.result||'',at:Number(x.at)||0,source:hdSPASourceKind(x)}));
+ return {count:drops.length,unique:counts.size,top,recent};
 }
 function hdSPAStrategyLabel(id,row){
  if(row?.strategyLabel)return row.strategyLabel;
@@ -21,16 +36,19 @@ function hdSPAStrategyLabel(id,row){
 function hdSPAPct(n,d){return d?Math.round(n/d*100):0}
 function hdSPANum(v){return Math.max(0,Number(v)||0)}
 function hdSPAMetrics(rows){
- const n=rows.length,boss=rows.filter(x=>x.boss).length,s=rows.filter(x=>x.result==='S').length,wins=rows.filter(x=>['S','A','B'].includes(x.result)).length,retreat=rows.filter(x=>x.retreat||x.result==='撤退').length;
- const totalResource=rows.reduce((a,x)=>a+hdSPANum(x.fuel)+hdSPANum(x.ammo)+hdSPANum(x.steel)+hdSPANum(x.bauxite),0);
- const buckets=rows.reduce((a,x)=>a+hdSPANum(x.buckets),0);
+ const n=rows.length,boss=rows.filter(x=>x.boss).length,s=rows.filter(x=>x.result==='S').length,wins=rows.filter(x=>['S','A','B'].includes(x.result)).length,retreat=rows.filter(x=>x.retreat||x.result==='撤退').length,drops=rows.filter(x=>String(x.drop||'').trim()).length;
+ const resourceRows=rows.filter(x=>x.source!=='kancolle-import'||[x.fuel,x.ammo,x.steel,x.bauxite,x.buckets].some(v=>Number(v)>0));
+ const totalResource=resourceRows.reduce((a,x)=>a+hdSPANum(x.fuel)+hdSPANum(x.ammo)+hdSPANum(x.steel)+hdSPANum(x.bauxite),0);
+ const buckets=resourceRows.reduce((a,x)=>a+hdSPANum(x.buckets),0);
  const durations=rows.map(x=>hdSPANum(x.durationMs)).filter(x=>x>0);
  const readiness=rows.map(x=>{const r=x.readinessSnapshot||{},den=(Number(r.autoTotal)||0)+(Number(r.manualTotal)||0),num=(Number(r.autoOk)||0)+(Number(r.manualDone)||0);return den?num/den:null}).filter(x=>x!=null);
+ const dropStats=hdSPADropStats(rows),sourceStats=hdSPASourceStats(rows);
  return {
-  n,bossRate:hdSPAPct(boss,n),sRate:hdSPAPct(s,n),winRate:hdSPAPct(wins,n),retreatRate:hdSPAPct(retreat,n),
-  avgResource:n?Math.round(totalResource/n):0,avgBuckets:n?Number((buckets/n).toFixed(2)):0,
+  n,bossRate:hdSPAPct(boss,n),sRate:hdSPAPct(s,n),winRate:hdSPAPct(wins,n),retreatRate:hdSPAPct(retreat,n),dropRate:hdSPAPct(drops,n),drops,uniqueDrops:dropStats.unique,
+  avgResource:resourceRows.length?Math.round(totalResource/resourceRows.length):null,avgBuckets:resourceRows.length?Number((buckets/resourceRows.length).toFixed(2)):null,
   avgDurationMin:durations.length?Number((durations.reduce((a,b)=>a+b,0)/durations.length/60000).toFixed(1)):null,
-  avgReadiness:readiness.length?Math.round(readiness.reduce((a,b)=>a+b,0)/readiness.length*100):null
+  avgReadiness:readiness.length?Math.round(readiness.reduce((a,b)=>a+b,0)/readiness.length*100):null,
+  sourceStats
  };
 }
 function hdSPADelta(a,b){return a==null||b==null?null:Number((a-b).toFixed(1))}
@@ -112,11 +130,15 @@ function hdSPAReview(key,action,mode){
 }
 
 function hdSPAGroupKey(row,mode){
- if(mode==='fleet')return row.fleetId||row.fleetName||'unknown';
- return row.strategy||'manual';
+ if(mode==='map')return String(row.map||'unknown');
+ if(mode==='fleet')return row.fleetId||row.fleetName||(hdSPASourceKind(row)==='game'?'game-sync':'manual-log');
+ return row.strategy||(hdSPASourceKind(row)==='game'?'game-sync':'manual-log');
 }
 function hdSPAGroupLabel(row,mode){
- return mode==='fleet'?(row.fleetName||'名称なし'):hdSPAStrategyLabel(row.strategy||'manual',row);
+ if(mode==='map'){const map=String(row.map||'');const name=hdSPAMapName(map);return name?map+' '+name:map||'海域不明'}
+ if(mode==='fleet'){if(row.fleetName)return row.fleetName;return hdSPASourceKind(row)==='game'?'ゲーム同期（編成未紐付け）':'手動ログ（編成未紐付け）'}
+ if(row.strategy)return hdSPAStrategyLabel(row.strategy,row);
+ return hdSPASourceKind(row)==='game'?'ゲーム同期':'手動ログ';
 }
 function hdSPARows(){
  const mode=hdSPAMode(),map=hdSPAMap(),logs=hdSPALogs().filter(x=>map==='all'||x.map===map),groups=new Map();
@@ -125,7 +147,7 @@ function hdSPARows(){
   if(!groups.has(key))groups.set(key,{key,label:hdSPAGroupLabel(row,mode),strategy:row.strategy||'manual',rows:[],maps:new Set()});
   const g=groups.get(key);g.rows.push(row);g.maps.add(row.map);
  }
- const out=[...groups.values()].map(g=>({...g,metrics:hdSPAMetrics(g.rows),trend:hdSPATrend(g.rows),recentRef:hdSPARecentRef(g.rows),maps:[...g.maps]}));
+ const out=[...groups.values()].map(g=>({...g,metrics:hdSPAMetrics(g.rows),dropStats:hdSPADropStats(g.rows),trend:hdSPATrend(g.rows),recentRef:hdSPARecentRef(g.rows),maps:[...g.maps]}));
  out.sort((a,b)=>{
   if(mode==='strategy'){const ai=HD_SPA_STRATEGY_ORDER.indexOf(a.strategy),bi=HD_SPA_STRATEGY_ORDER.indexOf(b.strategy);if(ai!==bi)return (ai<0?99:ai)-(bi<0?99:bi)}
   return b.metrics.n-a.metrics.n||a.label.localeCompare(b.label,'ja');
@@ -134,9 +156,10 @@ function hdSPARows(){
 }
 function hdSPABadges(rows){
  if(!rows.length)return rows;
- const eligible=rows.filter(x=>x.metrics.n>0),maxBoss=Math.max(...eligible.map(x=>x.metrics.bossRate)),maxS=Math.max(...eligible.map(x=>x.metrics.sRate)),minRetreat=Math.min(...eligible.map(x=>x.metrics.retreatRate)),minResource=Math.min(...eligible.map(x=>x.metrics.avgResource));
+ const eligible=rows.filter(x=>x.metrics.n>0),maxBoss=Math.max(...eligible.map(x=>x.metrics.bossRate)),maxS=Math.max(...eligible.map(x=>x.metrics.sRate)),minRetreat=Math.min(...eligible.map(x=>x.metrics.retreatRate)),maxDrop=Math.max(...eligible.map(x=>x.metrics.dropRate));
+ const resource=eligible.filter(x=>x.metrics.avgResource!=null),minResource=resource.length?Math.min(...resource.map(x=>x.metrics.avgResource)):null;
  const timed=eligible.filter(x=>x.metrics.avgDurationMin!=null),minDuration=timed.length?Math.min(...timed.map(x=>x.metrics.avgDurationMin)):null;
- return rows.map(x=>{const b=[];if(x.metrics.bossRate===maxBoss)b.push('ボス到達率最大');if(x.metrics.sRate===maxS)b.push('S率最大');if(x.metrics.retreatRate===minRetreat)b.push('撤退率最小');if(x.metrics.avgResource===minResource)b.push('資源消費最小');if(minDuration!=null&&x.metrics.avgDurationMin===minDuration)b.push('平均時間最短');return {...x,badges:b}});
+ return rows.map(x=>{const b=[];if(x.metrics.bossRate===maxBoss)b.push('ボス到達率最大');if(x.metrics.sRate===maxS)b.push('S率最大');if(x.metrics.retreatRate===minRetreat)b.push('撤退率最小');if(x.metrics.dropRate===maxDrop&&x.metrics.drops>0)b.push('ドロップ率最大');if(minResource!=null&&x.metrics.avgResource===minResource)b.push('資源消費最小');if(minDuration!=null&&x.metrics.avgDurationMin===minDuration)b.push('平均時間最短');return {...x,badges:b}});
 }
 function hdSPAMaps(){
  const maps=[...new Set(hdSPALogs().map(x=>x.map).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
@@ -157,15 +180,26 @@ function hdSPATrendHtml(row){
   hdSPATrendDelta('資源',d.avgResource,'','down')+hdSPATrendDelta('時間',d.avgDurationMin,'分','down')+hdSPATrendDelta('確認',d.avgReadiness,'pt','up')+
   '</div>'+(signals.length?'<ul class="hd-spa-signals">'+signals.join('')+'</ul>':'<div class="hd-spa-steady">大きな変化は検出していないよ。</div>')+'</div>';
 }
+function hdSPAFmtAt(ts){if(!Number(ts))return '';try{return new Date(Number(ts)).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}catch{return ''}}
+function hdSPASourceHtml(metrics){
+ const s=metrics?.sourceStats||{},parts=[];if(s.game)parts.push('ゲーム同期 '+s.game);if(s.session)parts.push('実戦モード '+s.session);if(s.manual)parts.push('手動 '+s.manual);
+ return parts.length?'<div class="hd-spa-sources">'+parts.map(x=>'<span>'+hdSPAEsc(x)+'</span>').join('')+'</div>':'';
+}
+function hdSPADropHtml(row){
+ const d=row.dropStats;if(!d?.count)return '<div class="hd-spa-drops empty"><strong>ドロップ履歴</strong><span>この集計範囲ではまだドロップ記録なし</span></div>';
+ const top=d.top.map(x=>'<span><b>'+hdSPAEsc(x.ship)+'</b> ×'+x.count+'</span>').join('');
+ const recent=d.recent.map(x=>'<li><div><b>'+hdSPAEsc(x.ship)+'</b><span>'+hdSPAEsc([x.map,x.node,x.result].filter(Boolean).join(' '))+'</span></div><small>'+hdSPAEsc(hdSPAFmtAt(x.at))+'</small></li>').join('');
+ return '<div class="hd-spa-drops"><div class="hd-spa-drop-head"><strong>ドロップ履歴</strong><span>'+d.count+'件 / '+d.unique+'種類</span></div><div class="hd-spa-drop-top">'+top+'</div><ul>'+recent+'</ul></div>';
+}
 function hdSPACard(row){
  const m=row.metrics,sample=m.n<3?'<div class="hd-spa-sample warn">サンプル少なめ</div>':'<div class="hd-spa-sample">記録 '+m.n+'周</div>',badges=row.badges.length?'<div class="hd-spa-badges">'+row.badges.map(x=>'<span>'+hdSPAEsc(x)+'</span>').join('')+'</div>':'';
  const reopen=row.recentRef?.available?'<button type="button" class="ghost small" data-hd-spa-reopen="'+hdSPAEsc(row.key)+'">この編成を準備表へ</button>':'';
- return `<article class="hd-spa-card" data-hd-spa-card="${hdSPAEsc(row.key)}">${badges}<div class="hd-spa-card-head"><div><strong>${hdSPAEsc(row.label)}</strong><small>${hdSPAEsc(row.maps.join(' / '))}</small></div>${sample}</div><div class="hd-spa-metrics"><span>ボス到達 <b>${m.bossRate}%</b></span><span>S勝利 <b>${m.sRate}%</b></span><span>B以上勝利 <b>${m.winRate}%</b></span><span>撤退 <b>${m.retreatRate}%</b></span><span>平均資源 <b>${m.avgResource}</b></span><span>平均バケツ <b>${m.avgBuckets}</b></span><span>平均時間 <b>${m.avgDurationMin==null?'—':m.avgDurationMin+'分'}</b></span><span>開始時確認 <b>${m.avgReadiness==null?'—':m.avgReadiness+'%'}</b></span></div>${hdSPATrendHtml(row)}${hdSPARecommendationHtml(row)}${reopen?'<div class="hd-spa-actions">'+reopen+'</div>':''}</article>`;
+ return `<article class="hd-spa-card" data-hd-spa-card="${hdSPAEsc(row.key)}">${badges}<div class="hd-spa-card-head"><div><strong>${hdSPAEsc(row.label)}</strong><small>${hdSPAEsc(row.maps.join(' / '))}</small></div>${sample}</div>${hdSPASourceHtml(m)}<div class="hd-spa-metrics"><span>ボス到達 <b>${m.bossRate}%</b></span><span>S勝利 <b>${m.sRate}%</b></span><span>B以上勝利 <b>${m.winRate}%</b></span><span>撤退 <b>${m.retreatRate}%</b></span><span>ドロップ <b>${m.dropRate}%</b></span><span>ドロップ種類 <b>${m.uniqueDrops}</b></span><span>平均資源 <b>${m.avgResource==null?'—':m.avgResource}</b></span><span>平均バケツ <b>${m.avgBuckets==null?'—':m.avgBuckets}</b></span><span>平均時間 <b>${m.avgDurationMin==null?'—':m.avgDurationMin+'分'}</b></span><span>開始時確認 <b>${m.avgReadiness==null?'—':m.avgReadiness+'%'}</b></span></div>${hdSPADropHtml(row)}${hdSPATrendHtml(row)}${hdSPARecommendationHtml(row)}${reopen?'<div class="hd-spa-actions">'+reopen+'</div>':''}</article>`;
 }
 function hdSPAHtml(){
  const mode=hdSPAMode(),map=hdSPAMap(),windowSize=hdSPAWindow(),rows=hdSPARows(),maps=hdSPAMaps();
- if(!hdSPALogs().length)return '<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>実戦データ分析</strong><span>実戦モードで帰還結果を記録すると、ここに方針別の実績が出るよ。</span></div></div></section>';
- return `<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>実戦データ分析</strong><span>実際の出撃結果を方針・保存編成ごとに比較</span></div><div class="hd-spa-controls"><select data-hd-spa-mode><option value="strategy" ${mode==='strategy'?'selected':''}>方針別</option><option value="fleet" ${mode==='fleet'?'selected':''}>保存編成別</option></select><select data-hd-spa-map><option value="all">全海域</option>${maps.map(x=>`<option value="${hdSPAEsc(x)}" ${map===x?'selected':''}>${hdSPAEsc(x)}</option>`).join('')}</select><select data-hd-spa-window><option value="3" ${windowSize===3?'selected':''}>直近3周比較</option><option value="5" ${windowSize===5?'selected':''}>直近5周比較</option><option value="10" ${windowSize===10?'selected':''}>直近10周比較</option></select></div></div>${rows.length?'<div class="hd-spa-grid">'+rows.map(hdSPACard).join('')+'</div>':'<div class="hd-spa-empty">この条件に一致する実戦ログはまだないよ。</div>'}<p class="hd-spa-note">※各バッジはその表示範囲内の指標最大・最小を示すだけ。トレンドは直近N周とその前N周の比較で、閾値を超えた変化だけを見直し候補として表示。通常フォームから手入力した旧ログは方針情報がないため、この比較には含めないよ。</p></section>`;
+ if(!hdSPALogs().length)return '<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>出撃データ分析</strong><span>ゲーム同期または出撃ログを記録すると、海域別の実績とドロップ履歴がここに出るよ。</span></div></div></section>';
+ return `<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>出撃データ分析</strong><span>ゲーム同期・実戦モード・手動ログをまとめて自動集計</span></div><div class="hd-spa-controls"><select data-hd-spa-mode><option value="map" ${mode==='map'?'selected':''}>海域別</option><option value="strategy" ${mode==='strategy'?'selected':''}>方針別</option><option value="fleet" ${mode==='fleet'?'selected':''}>保存編成別</option></select><select data-hd-spa-map><option value="all">全海域</option>${maps.map(x=>`<option value="${hdSPAEsc(x)}" ${map===x?'selected':''}>${hdSPAEsc(x)} ${hdSPAEsc(hdSPAMapName(x))}</option>`).join('')}</select><select data-hd-spa-window><option value="3" ${windowSize===3?'selected':''}>直近3周比較</option><option value="5" ${windowSize===5?'selected':''}>直近5周比較</option><option value="10" ${windowSize===10?'selected':''}>直近10周比較</option></select></div></div>${rows.length?'<div class="hd-spa-grid">'+rows.map(hdSPACard).join('')+'</div>':'<div class="hd-spa-empty">この条件に一致する出撃ログはまだないよ。</div>'}<p class="hd-spa-note">※ゲーム同期・実戦モード・手動ログを海域別集計に含める。資源/バケツ・時間・開始時確認は値を持つログだけで平均する。トレンドは直近N周とその前N周を比較し、ドロップ履歴は記録済みの艦名を集計する。</p></section>`;
 }
 function hdSPARender(){
  const root=document.getElementById('sortieLog');if(!root)return;
