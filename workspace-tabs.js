@@ -94,6 +94,23 @@ function hdWSReflectLocationHash(sectionId){
  const hash='#'+encodeURIComponent(sectionId);if(location.hash===hash)return true;
  try{history.replaceState(null,'',location.pathname+location.search+hash);return true}catch{return false}
 }
+function hdWSCurrentShareUrl(){
+ const id=hdWSCurrentSectionId();if(id)hdWSReflectLocationHash(id);
+ return location.origin+location.pathname+location.search+location.hash;
+}
+async function hdWSShareCurrentLocation(){
+ const url=hdWSCurrentShareUrl(),section=document.getElementById(hdWSCurrentSectionId()),title=section?hdWSTitle(section):'HarborDesk';
+ document.querySelector('.hd-header-more')?.removeAttribute('open');
+ try{
+  if(typeof navigator.share==='function'){await navigator.share({title:`HarborDesk - ${title}`,text:title,url});return true}
+ }catch(err){if(err?.name==='AbortError')return false}
+ try{
+  await navigator.clipboard.writeText(url);
+  window.hdToast?.('この画面のリンクをコピーしたよ','success',1500);
+  return true;
+ }catch{}
+ try{prompt('この画面のリンクをコピーしてね',url);return true}catch{return false}
+}
 function hdWSRestoreStartupContext(){
  if(hdWSStartupContextHandled)return false;hdWSStartupContextHandled=true;
  const anchor=hdWSInitialAnchorId();
@@ -453,6 +470,7 @@ function hdWSTouchStart(e){if(e.touches?.length!==1||hdWSSwipeBlocked(e.target))
 function hdWSTouchEnd(e){if(!hdWSTouch)return;const t=e.changedTouches?.[0],start=hdWSTouch;hdWSTouch=null;if(!t)return;const dx=t.clientX-start.x,dy=t.clientY-start.y,dt=Date.now()-start.at;if(dt>800||Math.abs(dx)<72||Math.abs(dx)<Math.abs(dy)*1.35)return;hdWSMoveGroup(dx<0?1:-1)}
 
 document.addEventListener('click',e=>{
+ const share=e.target.closest?.('[data-hd-header-share]');if(share){hdWSShareCurrentLocation();return}
  const pin=e.target.closest?.('[data-hd-ws-pin]');if(pin){hdWSToggleCurrentPin();return}
  const back=e.target.closest?.('[data-hd-ws-back]');if(back){hdWSGoBack();return}
  const top=e.target.closest?.('[data-hd-ws-group-top]');if(top){hdWSPushHistory();hdWSClearPin();const target=hdWSDefaultSection(hdWSState.group);hdWSApply(hdWSState.group,target,{scrollTop:true,ignorePin:true});return}
