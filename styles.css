@@ -188,3 +188,7 @@ body.hd-booting::after{
  .timer-actions [data-restart-timer]{min-height:36px}
  .timer-actions .icon-btn{min-width:36px;min-height:36px}
 }
+
+.timer-preset-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.timer-preset-grid button{min-height:38px;padding:7px 8px;font-size:11px}
+@media(max-width:420px){.timer-preset-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.timer-preset-grid button{min-height:40px}}
