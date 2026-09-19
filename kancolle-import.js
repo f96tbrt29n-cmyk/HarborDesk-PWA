@@ -30,7 +30,7 @@ function hdKcMasterEquipMap(){
  for(const [name,row] of Object.entries(rows))if(Number(row?.id)>0)map.set(Number(row.id),{id:Number(row.id),name,typeName:String(row.typeName||'')});
  return map;
 }
-function hdKcImportEmpty(){return {ships:new Map(),slotItems:new Map(),materials:new Map(),decks:new Map(),ndocks:new Map(),quests:new Map(),questPages:new Set(),questPageCount:0,sortieEvents:[],captureId:'',sources:new Set(),completeShips:false,completeSlotItems:false,completeDecks:false,completeNdocks:false,completeQuests:false}}
+function hdKcImportEmpty(){return {ships:new Map(),slotItems:new Map(),materials:new Map(),decks:new Map(),ndocks:new Map(),quests:new Map(),questPages:new Set(),questPageCount:0,sortieEvents:[],captureId:'',bridgeSource:'',sources:new Set(),completeShips:false,completeSlotItems:false,completeDecks:false,completeNdocks:false,completeQuests:false}}
 function hdKcSortieEventData(h,data){
  if(/api_req_map\/(?:start|next)/.test(h))return {mapareaId:Number(data?.api_maparea_id)||0,mapinfoNo:Number(data?.api_mapinfo_no)||0,nodeNo:Number(data?.api_no)||0,colorNo:Number(data?.api_color_no)||0,eventId:Number(data?.api_event_id)||0,eventKind:Number(data?.api_event_kind)||0,bossCellNo:Number(data?.api_bosscell_no)||0};
  if(/api_req_(?:sortie|combined_battle)\/battleresult/.test(h))return {winRank:String(data?.api_win_rank||''),questName:String(data?.api_quest_name||''),dropShipId:Number(data?.api_get_ship?.api_ship_id)||0,dropShipName:String(data?.api_get_ship?.api_ship_name||'')};
@@ -74,17 +74,64 @@ function hdKcImportAdd(out,hint,payload,meta={}){
  if(Array.isArray(data)&&data.length&&'api_slotitem_id' in (data.find(Boolean)||{})&&!h)out.completeSlotItems=true;
  if(Array.isArray(data)&&data.length&&'api_ship_id' in (data.find(Boolean)||{})&&!h)out.completeShips=true;
 }
+function hdKcStableCaptureId(raw,prefix='ext'){
+ const text=typeof raw==='string'?raw:JSON.stringify(raw??'');let h=2166136261;
+ for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)}
+ return prefix+'-'+(h>>>0).toString(36);
+}
+function hdKcExternalEndpoint(value){
+ let s=String(value||'').trim();if(!s)return '';
+ try{if(/^https?:\/\//i.test(s))s=new URL(s).pathname}catch{}
+ const pos=s.indexOf('/kcsapi/');if(pos>=0)s=s.slice(pos);
+ if(!s.startsWith('/kcsapi/')){s=s.replace(/^\/+/, '');if(/^api_/.test(s))s='/kcsapi/'+s}
+ s=s.split(/[?#]/)[0];
+ return /\/kcsapi\/(?:api_port\/port|api_get_member\/(?:ship2|slot_item|require_info|material|ndock|questlist)|api_req_map\/(?:start|next)|api_req_(?:sortie|combined_battle)\/battleresult)$/.test(s)?s:'';
+}
+function hdKcDecodeExternalText(text,encoding=''){
+ const s=String(text??'');if(String(encoding||'').toLowerCase()!=='base64')return s;
+ try{const bin=atob(s),bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));return typeof TextDecoder!=='undefined'?new TextDecoder().decode(bytes):bin}catch{return s}
+}
+function hdKcExternalAt(row,index=0){
+ const candidates=[row?.at,row?.timestamp,row?.time,row?.startedAt,row?.startedDateTime,row?.date,row?.createdAt];
+ for(const v of candidates){if(v==null||v==='')continue;const n=Number(v);if(Number.isFinite(n)&&n>0)return n;const d=Date.parse(String(v));if(Number.isFinite(d))return d}
+ return index;
+}
+function hdKcExternalRecord(row,index=0){
+ if(!row||typeof row!=='object')return null;
+ const endpoint=hdKcExternalEndpoint(row.endpoint||row.path||row.url||row.request?.url||row.requestUrl||row.apiUrl||row.api_url);if(!endpoint)return null;
+ let payload=row.payload??row.responseBody??row.responseText??row.body??row.text??row.data;
+ if(payload==null&&row.response?.content?.text!=null)payload=hdKcDecodeExternalText(row.response.content.text,row.response.content.encoding);
+ if(payload==null&&row.response?.body!=null)payload=row.response.body;
+ if(payload==null&&row.response?.text!=null)payload=row.response.text;
+ if(payload==null&&row.response?.data!=null)payload=row.response.data;
+ if(payload==null&&row.response&&typeof row.response==='object'&&('api_result' in row.response||'api_data' in row.response))payload=row.response;
+ if(payload==null)return null;
+ return {endpoint,payload,at:hdKcExternalAt(row,index),index};
+}
+function hdKcNormalizeExternalRoot(root,raw=''){
+ if(!root||typeof root!=='object')return root;
+ if(root.format==='harbordesk-kancolle-import'&&(root.endpoints||root.records))return root;
+ let rows=null,kind='';
+ if(Array.isArray(root?.log?.entries)){rows=root.log.entries;kind='HAR'}
+ else{for(const key of ['records','entries','logs','history','requests','responses']){if(Array.isArray(root?.[key])){rows=root[key];kind=key;break}}}
+ if(!rows&&Array.isArray(root)&&root.some(x=>x&&typeof x==='object'&&(x.url||x.endpoint||x.path||x.request?.url))){rows=root;kind='array'}
+ if(!rows)return root;
+ const records=rows.map((x,i)=>hdKcExternalRecord(x,i)).filter(Boolean);if(!records.length)return root;
+ return {format:'harbordesk-kancolle-import',bridgeSource:'ConningTowerLite互換/'+kind,captureId:String(root.captureId||root.id||hdKcStableCaptureId(raw||root,'ct')),createdAt:root.createdAt||Date.now(),records};
+}
 function hdKcParseImport(raw){
- const root=hdKcReadJson(raw),out=hdKcImportEmpty();
+ const rawText=typeof raw==='string'?raw:JSON.stringify(raw??{}),root=hdKcNormalizeExternalRoot(hdKcReadJson(raw),rawText),out=hdKcImportEmpty();
+ out.bridgeSource=String(root?.bridgeSource||'');
  if(root?.format==='harbordesk-kancolle-import'&&root.endpoints&&typeof root.endpoints==='object'){
+  out.captureId=String(root?.captureId||root?.createdAt||hdKcStableCaptureId(rawText,'bundle'));
   for(const [k,v] of Object.entries(root.endpoints))hdKcImportAdd(out,k,v);
  }else if(Array.isArray(root?.records)){
-  out.captureId=String(root?.captureId||root?.createdAt||'');
-  root.records.forEach((r,i)=>hdKcImportAdd(out,r?.endpoint||r?.path||'',r?.payload??r?.response??r?.data,{at:r?.at,index:i}));
+  out.captureId=String(root?.captureId||root?.createdAt||hdKcStableCaptureId(rawText,'bundle'));
+  root.records.forEach((r,i)=>hdKcImportAdd(out,hdKcExternalEndpoint(r?.endpoint||r?.path||r?.url)||r?.endpoint||r?.path||'',r?.payload??r?.response??r?.data,{at:r?.at,index:i}));
  }else if(root&&typeof root==='object'&&!Array.isArray(root)&&!('api_result' in root)&&!('api_ship' in root)&&!('api_ship_data' in root)&&!('api_slot_item' in root)&&!('api_material' in root)&&!('api_ndock' in root)&&!('api_list' in root)){
   let matched=false;
   for(const [k,v] of Object.entries(root)){
-   if(/api_(port|api_get_member|kcsapi)|\/kcsapi\//.test(k)||/^(port|ship2|slot_item|material|require_info|ndock|questlist)$/.test(k)){hdKcImportAdd(out,k,v);matched=true}
+   if(/api_(port|api_get_member|kcsapi)|\/kcsapi\//.test(k)||/^(port|ship2|slot_item|material|require_info|ndock|questlist)$/.test(k)){hdKcImportAdd(out,hdKcExternalEndpoint(k)||k,v);matched=true}
   }
   if(!matched)hdKcImportAdd(out,'',root);
  }else hdKcImportAdd(out,'',root);
@@ -110,6 +157,7 @@ function hdKcPreviewData(parsed){
   unknownEquip:unknownEquip.length,
   completeShips:!!parsed.completeShips,
   completeSlotItems:!!parsed.completeSlotItems,
+  bridgeSource:String(parsed.bridgeSource||''),
   sources:[...parsed.sources].filter(Boolean)
  };
 }
@@ -359,7 +407,7 @@ function hdKcSyncStatus(){
 }
 function hdKcPreviewHtml(p){
  if(!p)return '<div class="hd-kc-import-empty">JSONを読み込むと内容をここで確認できるよ</div>';
- return `<div class="hd-kc-import-stats"><div><span>艦娘</span><strong>${p.ships}</strong><small>${p.completeShips?'全件同期候補':'部分データ'}</small></div><div><span>装備個体</span><strong>${p.slotItems}</strong><small>${p.completeSlotItems?'全件同期候補':'部分データ'}</small></div><div><span>資源</span><strong>${p.materials}</strong></div><div><span>艦隊</span><strong>${p.decks}</strong></div><div><span>遠征中</span><strong>${p.expeditions||0}</strong></div><div><span>入渠中</span><strong>${p.docks||0}</strong></div><div><span>任務</span><strong>${p.activeQuests||0}</strong><small>${p.completeQuests?'全ページ取得':'取得ページ内'}</small></div><div><span>出撃</span><strong>${p.sortieStarts||0}</strong><small>戦闘結果 ${p.battleResults||0}</small></div></div>${p.unknownShips||p.unknownEquip?`<div class="hd-kc-import-warn">未解決: 艦娘 ${p.unknownShips} / 装備 ${p.unknownEquip}</div>`:''}<small>検出元: ${p.sources.map(hdKcEsc).join(' / ')||'自動判定'}</small>`;
+ return `<div class="hd-kc-import-stats"><div><span>艦娘</span><strong>${p.ships}</strong><small>${p.completeShips?'全件同期候補':'部分データ'}</small></div><div><span>装備個体</span><strong>${p.slotItems}</strong><small>${p.completeSlotItems?'全件同期候補':'部分データ'}</small></div><div><span>資源</span><strong>${p.materials}</strong></div><div><span>艦隊</span><strong>${p.decks}</strong></div><div><span>遠征中</span><strong>${p.expeditions||0}</strong></div><div><span>入渠中</span><strong>${p.docks||0}</strong></div><div><span>任務</span><strong>${p.activeQuests||0}</strong><small>${p.completeQuests?'全ページ取得':'取得ページ内'}</small></div><div><span>出撃</span><strong>${p.sortieStarts||0}</strong><small>戦闘結果 ${p.battleResults||0}</small></div></div>${p.unknownShips||p.unknownEquip?`<div class="hd-kc-import-warn">未解決: 艦娘 ${p.unknownShips} / 装備 ${p.unknownEquip}</div>`:''}<small>${p.bridgeSource?`入力形式: ${hdKcEsc(p.bridgeSource)} ・ `:''}検出元: ${p.sources.map(hdKcEsc).join(' / ')||'自動判定'}</small>`;
 }
 function hdKcRenderSyncStatus(){
  const el=document.getElementById('hdKcSyncLast');if(!el)return;const s=hdKcSyncStatus();
@@ -421,6 +469,7 @@ function hdKcEnsureImport(){
  <div class="hd-kc-import card">
   <div class="hd-kc-import-note"><strong>DMMのID・パスワード・Cookieは不要</strong><p>艦これAPIレスポンスから艦娘・装備・資源・現在艦隊・遠征/入渠・任務・出撃結果を抽出してHarborDeskへ反映する。貼り付けた生JSONは保存しないよ。</p></div>
   <div class="hd-kc-import-actions"><label class="ghost hd-kc-import-file">JSONファイルを選ぶ<input id="hdKcImportFile" type="file" accept=".json,.txt,application/json,text/plain"></label><button type="button" class="ghost" data-hd-kc-paste>クリップボードから貼る</button></div>
+  <details class="hd-kc-conning-guide" open><summary>ConningTowerLiteから取り込む（試験機能）</summary><div><p>ConningTowerLite側で通信ログ・APIレスポンスをコピーできる、またはJSON/HAR/テキストとして書き出せる場合、その内容をHarborDesk形式へ自動変換して解析するよ。</p><div class="hd-kc-import-actions"><button type="button" class="primary" data-hd-kc-ct-paste>コピー内容を解析</button><label class="ghost hd-kc-import-file">ログファイルを選ぶ<input id="hdKcConningFile" type="file" accept=".json,.txt,.har,application/json,text/plain"></label></div><small><b>対応候補:</b> HAR、records / logs / history / requests / responses 配列、url / path / endpoint と responseBody / body / text / payload の組み合わせ。URLのクエリは破棄して <code>/kcsapi/</code> の対応APIだけ読む。</small><small>HarborDeskからConningTowerLiteのアプリ領域を直接読むことはしない。ConningTowerLite側にコピー/共有/書き出し機能が無い場合は、この連携だけでは自動取得できないよ。</small></div></details>
   <details class="hd-kc-capture-guide"><summary>iPhone / Safariでゲーム通信を拾う（試験機能）</summary><div><p>SafariのブックマークURLとしてキャプチャ補助コードを登録すると、実行後の <code>/kcsapi/</code> レスポンスだけを端末内で拾ってHarborDesk用JSONにできる。DMM側のページ/iframe構成によっては動作しない場合があるよ。</p><button type="button" class="ghost" data-hd-kc-copy-capture>Safari用コードをコピー</button><ol><li>Safariで適当なページをブックマーク</li><li>そのブックマークを編集し、URLをコピーしたコードへ置換</li><li>艦これを開いてブックマークを実行</li><li>母港や装備画面を操作して取得件数を増やす</li><li>「JSONをコピー」→ HarborDeskの「クリップボードから貼る」</li></ol><small>補助コードはレスポンスを必要項目だけに縮小して保持し、リクエスト本文・api_token・Cookieは記録しない。</small></div></details>
   <textarea id="hdKcImportText" spellcheck="false" placeholder="svdata={...} または複数APIをまとめたJSONを貼り付け"></textarea>
   <div class="hd-kc-import-actions"><button type="button" class="primary" data-hd-kc-parse>内容を解析</button><button type="button" class="ghost" data-hd-kc-clear>入力を消す</button></div>
@@ -438,6 +487,7 @@ async function hdKcReadAndPreview(raw){
  const p=hdKcPreviewData(hdKcParseImport(raw));HD_KC_IMPORT_PREVIEW=p;const el=document.getElementById('hdKcImportPreview');if(el)el.innerHTML=hdKcPreviewHtml(p);const btn=document.querySelector('[data-hd-kc-apply]');if(btn)btn.disabled=false;return p;
 }
 document.addEventListener('click',async e=>{
+ if(e.target.closest?.('[data-hd-kc-ct-paste]')){try{const raw=await navigator.clipboard.readText();const ta=document.getElementById('hdKcImportText');if(ta)ta.value=raw;const p=await hdKcReadAndPreview(raw);document.getElementById('hdKcImportResult').textContent=(p.bridgeSource?'ConningTowerLite互換ログ':'コピー内容')+'を解析したよ。内容を確認して同期してね。'}catch(err){document.getElementById('hdKcImportResult').textContent='ConningTowerLite連携の解析に失敗: '+String(err?.message||err)}return}
  if(e.target.closest?.('[data-hd-kc-copy-capture]')){const ok=await hdKcCopyCaptureHelper();document.getElementById('hdKcImportResult').textContent=ok?'Safari用キャプチャコードをコピーしたよ。下の手順でブックマークURLへ貼ってね。':'コピーできなかったので、このブラウザではJSONファイル/貼り付け取込を使ってね。';return}
  const deck=e.target.closest?.('[data-hd-kc-copy-deck]');if(deck){try{const row=hdKcCopyFleetToCustom(deck.dataset.hdKcCopyDeck);document.getElementById('hdKcImportResult').textContent=`${row.name} を ${typeof selectedMap!=='undefined'?selectedMap:''} の自分用編成へコピーしたよ`}catch(err){document.getElementById('hdKcImportResult').textContent='コピーできなかった: '+String(err?.message||err)}return}
  if(e.target.closest?.('[data-hd-kc-parse]')){const raw=document.getElementById('hdKcImportText')?.value||'';try{await hdKcReadAndPreview(raw);document.getElementById('hdKcImportResult').textContent='解析できたよ。反映する項目を確認して「HarborDeskへ同期」を押してね。'}catch(err){HD_KC_IMPORT_PREVIEW=null;document.getElementById('hdKcImportResult').textContent='解析失敗: '+String(err?.message||err)}return}
@@ -446,8 +496,12 @@ document.addEventListener('click',async e=>{
  if(e.target.closest?.('[data-hd-kc-apply]')){try{const s=hdKcApplyImport(HD_KC_IMPORT_PREVIEW,{ships:document.getElementById('hdKcApplyShips')?.checked,equipment:document.getElementById('hdKcApplyEquipment')?.checked,resources:document.getElementById('hdKcApplyResources')?.checked,fleets:document.getElementById('hdKcApplyFleets')?.checked,timers:document.getElementById('hdKcApplyTimers')?.checked,quests:document.getElementById('hdKcApplyQuests')?.checked,sorties:document.getElementById('hdKcApplySorties')?.checked});document.getElementById('hdKcImportResult').textContent=`同期完了: 艦娘 ${s.ships} / 装備 ${s.equipment} / 資源 ${s.materials} / 艦隊 ${s.decks} / 遠征 ${s.expeditions||0} / 入渠 ${s.docks||0} / 任務 ${s.quests||0} / 出撃 ${s.sorties||0}`;const ta=document.getElementById('hdKcImportText');if(ta)ta.value='';HD_KC_IMPORT_PREVIEW=null;hdKcRenderSyncStatus();if(typeof renderAllAdvanced==='function')renderAllAdvanced()}catch(err){document.getElementById('hdKcImportResult').textContent='同期失敗: '+String(err?.message||err)}return}
 });
 document.addEventListener('change',async e=>{
- if(e.target.id==='hdKcImportFile'){const file=e.target.files?.[0];if(!file)return;try{const raw=await file.text();document.getElementById('hdKcImportText').value=raw;await hdKcReadAndPreview(raw);document.getElementById('hdKcImportResult').textContent=`${file.name} を解析したよ`}catch(err){document.getElementById('hdKcImportResult').textContent='ファイルを読めなかった: '+String(err?.message||err)}finally{e.target.value=''}}
+ if(e.target.id==='hdKcImportFile'||e.target.id==='hdKcConningFile'){const file=e.target.files?.[0];if(!file)return;try{const raw=await file.text();document.getElementById('hdKcImportText').value=raw;const p=await hdKcReadAndPreview(raw);document.getElementById('hdKcImportResult').textContent=`${file.name} を解析したよ${p.bridgeSource?'（'+p.bridgeSource+'）':''}`}catch(err){document.getElementById('hdKcImportResult').textContent='ファイルを読めなかった: '+String(err?.message||err)}finally{e.target.value=''}}
 });
-window.addEventListener('message',e=>{if(e?.data?.type!=='harbordesk-kancolle-import')return;try{hdKcEnsureImport();const raw=e.data.payload;hdKcReadAndPreview(raw);document.getElementById('hdKcImportResult').textContent='外部取込ブリッジからデータを受信したよ'}catch{}});
+async function hdKcBridgeImport(payload,source='外部取込ブリッジ'){
+ hdKcEnsureImport();const raw=typeof payload==='string'?payload:JSON.stringify(payload??{});const ta=document.getElementById('hdKcImportText');if(ta)ta.value=raw;const p=await hdKcReadAndPreview(raw);const result=document.getElementById('hdKcImportResult');if(result)result.textContent=source+'からデータを受信・解析したよ'+(p.bridgeSource?'（'+p.bridgeSource+'）':'');return p;
+}
+window.HarborDeskKancolleBridge={version:1,import:(payload)=>hdKcBridgeImport(payload,'ConningTowerLite/外部ブリッジ')};
+window.addEventListener('message',e=>{const type=String(e?.data?.type||'');if(!['harbordesk-kancolle-import','conningtowerlite-kancolle-import','conningtower-kancolle-import'].includes(type))return;hdKcBridgeImport(e.data.payload,type.startsWith('conning')?'ConningTowerLite':'外部取込ブリッジ').catch(()=>{})});
 window.addEventListener('load',()=>setTimeout(hdKcEnsureImport,450));
 hdKcEnsureImport();
