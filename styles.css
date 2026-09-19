@@ -174,3 +174,10 @@ body.hd-booting::after{
 @media(max-width:560px){
  .core-list-filter .core-list-cleanup{margin-left:0}
 }
+
+#guideResetBtn[hidden]{display:none}
+@media(max-width:560px){
+ .guide-search{display:grid;grid-template-columns:minmax(0,1fr) auto auto}
+ .guide-search input{min-width:0}
+ .guide-search button{padding-left:10px;padding-right:10px}
+}
