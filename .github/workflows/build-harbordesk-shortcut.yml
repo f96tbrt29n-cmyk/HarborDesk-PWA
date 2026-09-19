@@ -1,0 +1,84 @@
+name: Build HarborDesk Shortcut
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-harbordesk-shortcut.yml"
+
+jobs:
+  build-shortcut:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate unsigned shortcut
+        shell: bash
+        run: |
+          mkdir -p build
+          python3 - <<'PY'
+          import plistlib, uuid, pathlib
+          js = r"""try{
+            var d=document.getElementById('hd-kc-shortcut-test');
+            if(d)d.remove();
+            d=document.createElement('div');
+            d.id='hd-kc-shortcut-test';
+            d.textContent='HarborDesk ショートカット実行OK';
+            d.style.cssText='position:fixed;z-index:2147483647;left:12px;right:12px;top:12px;padding:16px;border-radius:12px;background:#0b2235;color:#fff;border:2px solid #74d4ff;font:700 16px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center';
+            (document.documentElement||document.body).appendChild(d);
+            completion('HarborDesk診断OK: '+location.href)
+          }catch(e){
+            completion('HarborDesk診断エラー: '+String(e&&e.message||e))
+          }"""
+          workflow = {
+              "WFWorkflowActions": [{
+                  "WFWorkflowActionIdentifier": "is.workflow.actions.runjavascriptonwebpage",
+                  "WFWorkflowActionParameters": {
+                      "UUID": str(uuid.uuid4()).upper(),
+                      "WFJavaScript": js,
+                      "WFInput": {
+                          "Value": {"Type": "ExtensionInput"},
+                          "WFSerializationType": "WFTextTokenAttachment"
+                      }
+                  }
+              }],
+              "WFWorkflowClientVersion": "1302.1.3",
+              "WFWorkflowHasOutputFallback": False,
+              "WFWorkflowHasShortcutInputVariables": True,
+              "WFWorkflowIcon": {
+                  "WFWorkflowIconGlyphNumber": 59511,
+                  "WFWorkflowIconStartColor": 4282601983
+              },
+              "WFWorkflowImportQuestions": [],
+              "WFWorkflowInputContentItemClasses": ["WFWebPageContentItem"],
+              "WFWorkflowMinimumClientVersion": 900,
+              "WFWorkflowMinimumClientVersionString": "900",
+              "WFWorkflowName": "HarborDeskキャプチャ",
+              "WFWorkflowOutputContentItemClasses": [],
+              "WFWorkflowTypes": ["ActionExtension"]
+          }
+          out = pathlib.Path("build/HarborDesk-Capture-unsigned.shortcut")
+          with out.open("wb") as f:
+              plistlib.dump(workflow, f, fmt=plistlib.FMT_BINARY, sort_keys=False)
+          print(out, out.stat().st_size)
+          PY
+          plutil -lint build/HarborDesk-Capture-unsigned.shortcut
+
+      - name: Sign shortcut for anyone
+        shell: bash
+        run: |
+          which shortcuts
+          shortcuts sign --mode anyone \
+            --input build/HarborDesk-Capture-unsigned.shortcut \
+            --output build/HarborDesk-Capture.shortcut
+          test -s build/HarborDesk-Capture.shortcut
+          file build/HarborDesk-Capture.shortcut
+          ls -lh build/HarborDesk-Capture.shortcut
+
+      - name: Upload shortcut
+        uses: actions/upload-artifact@v4
+        with:
+          name: HarborDesk-Capture
+          path: build/HarborDesk-Capture.shortcut
+          if-no-files-found: error
+          retention-days: 14
