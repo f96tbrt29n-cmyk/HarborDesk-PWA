@@ -31,3 +31,11 @@
  .hd-version-menu .hd-notify-btn span{font-size:13px}
  .topbar>#notifyBtn{display:none!important}
 }
+
+/* compact mobile header menu */
+@media(max-width:560px){
+ .hd-header-more{margin-left:0}
+ .hd-header-more>summary{width:32px;height:32px}
+ .hd-global-sync-status{min-height:32px;padding:5px 7px}
+ .hd-global-sync-status b{font-size:10px}
+}
