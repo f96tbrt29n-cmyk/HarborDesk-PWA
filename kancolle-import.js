@@ -414,6 +414,40 @@ function hdKcCaptureBookmarklet(){return 'javascript:'+hdKcCaptureSource().repla
 async function hdKcCopyCaptureHelper(){
  const code=hdKcCaptureBookmarklet();try{await navigator.clipboard.writeText(code);return true}catch{return false}
 }
+function hdKcBase64UrlBytes(text){
+ const s=String(text||'').replace(/-/g,'+').replace(/_/g,'/');const pad=s+'='.repeat((4-s.length%4)%4),bin=atob(pad),out=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);return out;
+}
+async function hdKcDecodeHandoff(token){
+ const dot=String(token||'').indexOf('.');if(dot<1)throw new Error('連携データ形式が不正です');
+ const mode=token.slice(0,dot),bytes=hdKcBase64UrlBytes(token.slice(dot+1));let raw=bytes;
+ if(mode==='g'){
+  if(typeof DecompressionStream!=='function')throw new Error('このSafariは圧縮連携データの展開に対応していません');
+  const ds=new DecompressionStream('gzip'),writer=ds.writable.getWriter();await writer.write(bytes);await writer.close();raw=new Uint8Array(await new Response(ds.readable).arrayBuffer());
+ }else if(mode!=='j')throw new Error('未知の連携データ形式です');
+ return new TextDecoder().decode(raw);
+}
+let HD_KC_HASH_IMPORT_CONSUMED=false;
+async function hdKcConsumeHashImport(){
+ if(HD_KC_HASH_IMPORT_CONSUMED)return false;
+ const m=String(location.hash||'').match(/^#kcimport=([gj]\.[A-Za-z0-9_-]+)$/);if(!m)return false;
+ HD_KC_HASH_IMPORT_CONSUMED=true;
+ try{history.replaceState(null,'',location.pathname+location.search+'#kancolleImport')}catch{}
+ try{
+  const raw=await hdKcDecodeHandoff(m[1]);
+  hdKcEnsureImport();
+  const preview=await hdKcReadAndPreview(raw);
+  const sync=hdKcApplyImport(preview,{ships:true,equipment:true,resources:true,fleets:true,timers:true,quests:true,sorties:true});
+  const result=document.getElementById('hdKcImportResult');
+  if(result)result.textContent=`Userscriptsから自動同期完了: 艦娘 ${sync.ships} / 装備 ${sync.equipment} / 資源 ${sync.materials} / 艦隊 ${sync.decks} / 遠征 ${sync.expeditions||0} / 入渠 ${sync.docks||0} / 任務 ${sync.quests||0} / 出撃 ${sync.sorties||0}`;
+  const sec=document.getElementById('kancolleImport');if(sec)sec.scrollIntoView({block:'start'});
+  HD_KC_IMPORT_PREVIEW=null;hdKcRenderSyncStatus();if(typeof renderAllAdvanced==='function')renderAllAdvanced();
+  return true;
+ }catch(err){
+  hdKcEnsureImport();
+  const result=document.getElementById('hdKcImportResult');if(result)result.textContent='Userscripts連携データの取込失敗: '+String(err?.message||err);
+  return false;
+ }
+}
 function hdKcEnsureImport(){
  const wrap=document.getElementById('advancedToolsWrap'),backup=document.getElementById('backup');if(!wrap||!backup||document.getElementById('kancolleImport'))return;
  const sec=document.createElement('section');sec.id='kancolleImport';sec.className='advanced-section';sec.innerHTML=`
@@ -421,7 +455,7 @@ function hdKcEnsureImport(){
  <div class="hd-kc-import card">
   <div class="hd-kc-import-note"><strong>DMMのID・パスワード・Cookieは不要</strong><p>艦これAPIレスポンスから艦娘・装備・資源・現在艦隊・遠征/入渠・任務・出撃結果を抽出してHarborDeskへ反映する。貼り付けた生JSONは保存しないよ。</p></div>
   <div class="hd-kc-import-actions"><label class="ghost hd-kc-import-file">JSONファイルを選ぶ<input id="hdKcImportFile" type="file" accept=".json,.txt,application/json,text/plain"></label><button type="button" class="ghost" data-hd-kc-paste>クリップボードから貼る</button></div>
-  <details class="hd-kc-capture-guide" open><summary>おすすめ: Userscriptsで自動連携</summary><div><p>iPhoneのSafari拡張「Userscripts」を使うと、艦これを開くだけで対応APIを自動取得できる。ゲーム画面に出る「HarborDeskへ送る」を押せば直接取り込めるよ。</p><div class="hd-kc-import-actions"><a class="primary" href="./HarborDesk-Kancolle.user.js" target="_blank" rel="noopener">Userscripts版をインストール</a></div><ol><li>上のボタンで <code>HarborDesk-Kancolle.user.js</code> をSafariで開く</li><li>Safariの機能拡張ボタン → Userscripts を開く</li><li>表示されたインストール案内から追加</li><li>艦これを開き直す</li><li>画面右下の「HarborDeskへ送る」を押す</li></ol><small>スクリプトは対応する <code>/kcsapi/</code> レスポンスだけを必要項目へ縮小して保持し、リクエスト本文・api_token・Cookie・DMMログイン情報は保存しない。</small></div></details>
+  <details class="hd-kc-capture-guide" open><summary>おすすめ: Userscriptsで自動連携</summary><div><p>iPhoneのSafari拡張「Userscripts」を使うと、艦これを開くだけで対応APIを自動取得できる。ゲーム画面に出る「HarborDeskへ送る」を押すと同じタブでHarborDeskへ移動し、そのまま自動同期するよ。</p><div class="hd-kc-import-actions"><a class="primary" href="./HarborDesk-Kancolle.user.js" target="_blank" rel="noopener">Userscripts版をインストール</a></div><ol><li>上のボタンで <code>HarborDesk-Kancolle.user.js</code> をSafariで開く</li><li>Safariの機能拡張ボタン → Userscripts を開く</li><li>表示されたインストール案内から追加</li><li>艦これを開き直す</li><li>画面右下の「HarborDeskへ送る」を押す</li><li>HarborDeskへ移動して自動同期完了</li></ol><small>スクリプトは対応する <code>/kcsapi/</code> レスポンスだけを必要項目へ縮小して保持し、リクエスト本文・api_token・Cookie・DMMログイン情報は保存しない。</small></div></details>
   <details class="hd-kc-capture-guide"><summary>Safariブックマーク方式（予備）</summary><div><p>SafariのブックマークURLとしてキャプチャ補助コードを登録すると、実行後の <code>/kcsapi/</code> レスポンスだけを端末内で拾ってHarborDesk用JSONにできる。DMM側のページ/iframe構成によっては動作しない場合があるよ。</p><button type="button" class="ghost" data-hd-kc-copy-capture>Safari用コードをコピー</button><ol><li>Safariで適当なページをブックマーク</li><li>そのブックマークを編集し、URLをコピーしたコードへ置換</li><li>艦これを開いてブックマークを実行</li><li>母港や装備画面を操作して取得件数を増やす</li><li>「JSONをコピー」→ HarborDeskの「クリップボードから貼る」</li></ol><small>補助コードはレスポンスを必要項目だけに縮小して保持し、リクエスト本文・api_token・Cookieは記録しない。</small></div></details>
   <textarea id="hdKcImportText" spellcheck="false" placeholder="svdata={...} または複数APIをまとめたJSONを貼り付け"></textarea>
   <div class="hd-kc-import-actions"><button type="button" class="primary" data-hd-kc-parse>内容を解析</button><button type="button" class="ghost" data-hd-kc-clear>入力を消す</button></div>
@@ -450,5 +484,5 @@ document.addEventListener('change',async e=>{
  if(e.target.id==='hdKcImportFile'){const file=e.target.files?.[0];if(!file)return;try{const raw=await file.text();document.getElementById('hdKcImportText').value=raw;await hdKcReadAndPreview(raw);document.getElementById('hdKcImportResult').textContent=`${file.name} を解析したよ`}catch(err){document.getElementById('hdKcImportResult').textContent='ファイルを読めなかった: '+String(err?.message||err)}finally{e.target.value=''}}
 });
 window.addEventListener('message',e=>{if(e?.data?.type!=='harbordesk-kancolle-import')return;try{hdKcEnsureImport();const raw=e.data.payload;hdKcReadAndPreview(raw);document.getElementById('hdKcImportResult').textContent='外部取込ブリッジからデータを受信したよ'}catch{}});
-window.addEventListener('load',()=>setTimeout(hdKcEnsureImport,450));
-hdKcEnsureImport();
+window.addEventListener('load',()=>setTimeout(async()=>{hdKcEnsureImport();await hdKcConsumeHashImport()},450));
+hdKcEnsureImport();setTimeout(()=>hdKcConsumeHashImport(),80);
