@@ -4221,3 +4221,26 @@ test('manual timer and quest additions expose undo actions', async ({ page }) =>
   expect(data.timerUndo).toBe(true);
   expect(data.questUndo).toBe(true);
 });
+
+
+test('manual timers and quests can be edited', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    const now=Date.now();
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
+      expeditions:[{id:'t1',name:'東京急行',startedAt:now,endsAt:now+3600000,durationMinutes:60}],
+      docks:[],
+      quests:[{id:'q1',name:'あ号作戦',done:false}],
+      resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
+    }));
+  });
+  await boot(page,errors);
+  const timerEdit=page.locator('[data-edit-timer="t1"]');
+  await timerEdit.click();
+  expect(await page.locator('#timerDialogTitle').textContent()).toContain('編集');
+  expect(await page.locator('#timerName').inputValue()).toBe('東京急行');
+  await page.locator('#timerDialog').evaluate(d=>d.close());
+  await page.locator('[data-edit-quest="q1"]').click();
+  expect(await page.locator('#questDialogTitle').textContent()).toContain('編集');
+  expect(await page.locator('#questName').inputValue()).toBe('あ号作戦');
+});
