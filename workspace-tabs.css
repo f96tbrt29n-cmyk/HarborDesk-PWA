@@ -79,3 +79,9 @@
 
 .hd-global-sync-status.partial{border-color:rgba(239,191,93,.58);background:rgba(96,68,23,.34)}
 .hd-global-sync-status.partial b{color:#f3d58d}
+
+@media(max-width:560px){
+ body.hd-header-compact .hd-ws-shell{padding-top:4px;padding-bottom:5px}
+ body.hd-header-compact .hd-ws-primary button{padding-top:7px;padding-bottom:7px}
+ body.hd-header-compact .hd-ws-mobile-picker{margin-top:4px;padding-top:4px}
+}
