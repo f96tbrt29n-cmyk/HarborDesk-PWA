@@ -5946,21 +5946,29 @@ test('quick nav surfaces current workspace sections', async ({ page }) => {
 
 test('mobile attention prioritizes completed timers', async ({ page }) => {
   const errors=[];
+  await page.addInitScript(() => {
+    const now=Date.now();
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
+      quests:[{id:'q1',name:'任務A',done:false}],
+      expeditions:[{id:'e1',name:'遠征A',endsAt:now-60000,durationMinutes:30}],
+      docks:[{id:'d1',name:'入渠A',endsAt:now+10*60000,durationMinutes:30}],
+      resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
+    }));
+    localStorage.removeItem('harbordesk-kancolle-sync-v1');
+  });
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    const now=Date.now();
-    window.state=window.state||{};
-    window.state.quests=[{id:'q1',name:'任務A',done:false}];
-    window.state.expeditions=[{id:'e1',name:'遠征A',endsAt:now-60000}];
-    window.state.docks=[{id:'d1',name:'入渠A',endsAt:now+10*60000}];
-    localStorage.removeItem('harbordesk-kancolle-sync-v1');
     const rows=window.hdQNMobileAttentionItems?.()||[];
-    return rows.map(x=>({id:x.id,title:x.title,priority:x.priority,tone:x.tone}));
+    return {
+      rows:rows.map(x=>({id:x.id,title:x.title,priority:x.priority,tone:x.tone})),
+      state:window.hdGetAppState?.()
+    };
   });
-  expect(data[0].title).toContain('帰投済み');
-  expect(data[0].tone).toBe('urgent');
-  expect(data.some(x=>x.title.includes('入渠まもなく完了'))).toBe(true);
-  expect(data[data.length-1].id).toBe('quests');
+  expect(data.state.quests).toHaveLength(1);
+  expect(data.rows[0].title).toContain('帰投済み');
+  expect(data.rows[0].tone).toBe('urgent');
+  expect(data.rows.some(x=>x.title.includes('入渠まもなく完了'))).toBe(true);
+  expect(data.rows[data.rows.length-1].id).toBe('quests');
 });
 
 
@@ -5985,4 +5993,25 @@ test('mobile sync dock becomes return-to-game after handoff', async ({ page }) =
   expect(data.normal.cls).toBe(false);
   expect(data.normal.label).toBe('同期');
   expect(data.normal.icon).toBe('↻');
+});
+
+
+test('core state save broadcasts mobile attention refresh', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    let count=0,last=null;
+    window.addEventListener('hd:state-changed',e=>{count++;last=e.detail},{once:true});
+    document.getElementById('addQuest')?.click();
+    const input=document.getElementById('questName');
+    if(input)input.value='テスト任務';
+    const form=document.getElementById('questForm');
+    const saveBtn=document.getElementById('questSave');
+    form?.dispatchEvent(new SubmitEvent('submit',{bubbles:true,cancelable:true,submitter:saveBtn}));
+    await new Promise(r=>setTimeout(r,30));
+    return {count,last,live:window.hdGetAppState?.()};
+  });
+  expect(data.count).toBeGreaterThan(0);
+  expect(data.last.quests.some(x=>x.name==='テスト任務')).toBe(true);
+  expect(data.live.quests.some(x=>x.name==='テスト任務')).toBe(true);
 });
