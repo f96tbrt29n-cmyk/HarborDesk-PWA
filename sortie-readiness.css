@@ -5,3 +5,11 @@
 .hd-sortie-overview.note{border-color:rgba(240,185,90,.38);background:rgba(240,185,90,.08)}
 .hd-sortie-overview.warn{border-color:rgba(239,109,114,.45);background:rgba(239,109,114,.09)}
 @media(max-width:520px){.hd-sortie-overview{position:sticky;top:calc(var(--hd-topbar-h,58px) + 108px);z-index:5;backdrop-filter:blur(10px)}}
+
+.hd-sortie-auto-row{grid-template-columns:auto minmax(0,1fr) auto;align-items:center}
+.hd-sortie-auto-action{justify-self:end;white-space:nowrap;padding:6px 8px;font-size:10px}
+.hd-sortie-auto-row.ok .hd-sortie-auto-action{display:none}
+@media(max-width:520px){
+ .hd-sortie-auto-row{grid-template-columns:auto minmax(0,1fr)}
+ .hd-sortie-auto-action{grid-column:2;justify-self:start;margin-top:4px;min-height:34px}
+}
