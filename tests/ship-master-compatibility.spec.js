@@ -5555,3 +5555,22 @@ test('sortie manual checks prioritize incomplete items', async ({ page }) => {
   expect(data.sub).toContain('残り');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('home next action prioritizes sortie readiness', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const source=await fetch('./home-dashboard.js',{cache:'no-store'}).then(r=>r.text());
+    return {
+      hasNextAuto:source.includes('nextAuto'),
+      hasSortiePriority:source.includes("sortieNeedsAttention?'sortie'"),
+      hasFirstFix:source.includes("const label=sortieInfo.nextAuto?'まず直す'"),
+      hasOpen:source.includes('data-home-sortie-open')
+    };
+  });
+  expect(data.hasNextAuto).toBe(true);
+  expect(data.hasSortiePriority).toBe(true);
+  expect(data.hasFirstFix).toBe(true);
+  expect(data.hasOpen).toBe(true);
+});
