@@ -5083,3 +5083,25 @@ test('home distinguishes uncaptured quest and dock data from zero', async ({ pag
   expect(data.next).toContain('次に開く');
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
+
+
+test('mobile header compacts on downward scroll and restores upward', async ({ page }) => {
+  const errors=[];
+  await page.setViewportSize({width:390,height:844});
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdWSInstallScrollCompact?.();
+    Object.defineProperty(window,'scrollY',{value:180,writable:true,configurable:true});
+    window.hdWSLastScrollY=120;
+    window.hdWSUpdateScrollCompact?.();
+    const compactDown=document.body.classList.contains('hd-header-compact');
+    window.scrollY=130;
+    window.hdWSLastScrollY=180;
+    window.hdWSUpdateScrollCompact?.();
+    const compactUp=document.body.classList.contains('hd-header-compact');
+    return {compactDown,compactUp};
+  });
+  expect(data.compactDown).toBe(true);
+  expect(data.compactUp).toBe(false);
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
