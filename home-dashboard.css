@@ -161,3 +161,12 @@ button.home-next-main{cursor:pointer}
 .home-fleet-ships>button.warn small{color:#f0cf82}
 .home-fleet-ships>button.danger{border-color:rgba(244,116,116,.62);background:rgba(90,34,39,.34)}
 .home-fleet-ships>button.danger small{color:#ffb1b1;font-weight:800}
+
+.home-fleet-meta-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.home-fleet-ships em{display:block;margin-top:3px;color:#9fbfd2;font-size:9px;line-height:1.45;font-style:normal;white-space:normal;overflow-wrap:anywhere}
+.home-fleet-ships.show-gear>button{align-items:flex-start}
+@media(max-width:520px){
+ .home-fleet-meta{align-items:flex-start;display:grid}
+ .home-fleet-meta-actions{justify-content:flex-start}
+ .home-fleet-meta-actions button{min-height:36px}
+}
