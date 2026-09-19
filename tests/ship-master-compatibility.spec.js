@@ -2675,12 +2675,14 @@ test('Userscripts gzip hash handoff auto-syncs', async ({ page }) => {
     location.hash='#kcimport='+token;
     const ok=await window.hdKcConsumeHashImport();
     const materials=JSON.parse(localStorage.getItem('harbordesk-kancolle-materials-v1')||'{}');
-    return {ok,materials,hash:location.hash,result:document.getElementById('hdKcImportResult')?.textContent||''};
+    return {ok,materials,hash:location.hash,result:document.getElementById('hdKcImportResult')?.textContent||'',returnVisible:!document.querySelector('[data-hd-kc-return-game]')?.hidden,returnFlag:sessionStorage.getItem('harbordesk-kc-return-game-v1')||''};
   });
   expect(data.ok).toBe(true);
   expect(data.materials).toEqual(expect.objectContaining({fuel:54321,ammo:43210,steel:32109,bauxite:21098}));
   expect(data.hash).toBe('#kancolleImport');
   expect(data.result).toContain('Userscriptsから自動同期完了');
+  expect(data.returnFlag).toBe('1');
+  expect(data.returnVisible).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
 
