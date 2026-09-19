@@ -27,16 +27,31 @@ function hdGSIndex(){
 }
 function hdGSScore(row,q){const title=hdGSNorm(row.title),subtitle=hdGSNorm(row.subtitle),text=hdGSNorm(row.text);if(!q)return 0;if(title===q)return 120;if(title.startsWith(q))return 100;if(title.includes(q))return 80;if(subtitle.includes(q))return 55;if(text.includes(q))return 35;const words=q.split(' ').filter(Boolean);if(words.length>1&&words.every(w=>text.includes(w)))return 25;return -1}
 function hdGSLabel(type){return {feature:'機能',map:'海域',ship:'艦娘',equipment:'装備',quest:'任務',expedition:'遠征'}[type]||type}
+function hdGSDestination(row){
+ const a=row?.action||{};
+ if(a.kind==='map')return '攻略へ';
+ if(a.kind==='ship')return row?.meta?.owned?'艦隊/DB':'艦娘DB';
+ if(a.kind==='roster')return '艦隊へ';
+ if(a.kind==='equipment')return row?.meta?.owned?'装備/DB':'装備DB';
+ if(a.kind==='ledger')return '装備台帳';
+ if(a.kind==='quest')return '任務DB';
+ if(a.kind==='expedition')return '遠征DB';
+ return '開く';
+}
 function hdGSRender(){
  const host=document.getElementById('hdGSResults');if(!host)return;const input=document.getElementById('hdGSSearch'),q=hdGSNorm(input?.value||'');
  if(!q){const history=hdGSHistory();host.innerHTML=history.length?`<div class="hd-gs-history-title">最近の検索</div><div class="hd-gs-history">${history.map(x=>`<button type="button" class="ghost small" data-hd-gs-history="${hdGSEsc(x)}">${hdGSEsc(x)}</button>`).join('')}</div><div class="hd-gs-empty">2文字以上入力すると、HarborDesk全体から探せるよ。</div>`:'<div class="hd-gs-empty">艦娘・装備・海域・任務・遠征・機能名をまとめて検索できるよ。</div>';return}
  const rows=hdGSIndex().filter(r=>hdGSCategory==='all'||r.type===hdGSCategory).map(r=>({...r,score:hdGSScore(r,q)})).filter(r=>r.score>=0).sort((a,b)=>b.score-a.score||a.title.localeCompare(b.title,'ja')).slice(0,60);hdGSResults=new Map(rows.map(x=>[x.key,x]));
- host.innerHTML=rows.length?`<div class="hd-gs-count">${rows.length}件${rows.length===60?'（上位60件）':''}</div>${rows.map(r=>`<button type="button" class="hd-gs-result" data-hd-gs-result="${r.key}"><span class="hd-gs-kind">${hdGSLabel(r.type)}</span><span class="hd-gs-main"><b>${hdGSEsc(r.title)}</b><small>${hdGSEsc(r.subtitle)}</small></span><span class="hd-gs-arrow">›</span></button>`).join('')}`:'<div class="hd-gs-empty">一致する項目がないよ。別のキーワードも試してみて。</div>';
+ host.innerHTML=rows.length?`<div class="hd-gs-count">${rows.length}件${rows.length===60?'（上位60件）':''}</div>${rows.map(r=>`<button type="button" class="hd-gs-result ${r.meta?.owned?'owned':''}" data-hd-gs-result="${r.key}"><span class="hd-gs-kind">${hdGSLabel(r.type)}</span><span class="hd-gs-main"><b>${hdGSEsc(r.title)}</b><small>${hdGSEsc(r.subtitle)}</small></span><span class="hd-gs-dest">${hdGSEsc(hdGSDestination(r))}</span><span class="hd-gs-arrow">›</span></button>`).join('')}`:'<div class="hd-gs-empty">一致する項目がないよ。別のキーワードも試してみて。</div>';
 }
 function hdGSSetCategory(cat){hdGSCategory=cat;document.querySelectorAll('[data-hd-gs-cat]').forEach(b=>b.classList.toggle('active',b.dataset.hdGsCat===cat));hdGSRender()}
 function hdGSAttachLaunchers(){
  const qn=document.querySelector('#hdQuickNavDialog .hd-qn-tools');if(qn&&!qn.querySelector('[data-hd-gs-open]')){const b=document.createElement('button');b.type='button';b.className='primary small';b.dataset.hdGsOpen='1';b.textContent='全体検索';qn.appendChild(b)}
  const ph=document.querySelector('#hdPersonalHome .section-head');if(ph&&!ph.querySelector('[data-hd-gs-open]')){const b=document.createElement('button');b.type='button';b.className='ghost small';b.dataset.hdGsOpen='1';b.textContent='⌕ 全体検索';ph.appendChild(b)}
+ const top=document.querySelector('.topbar');if(top&&!document.getElementById('hdGlobalSearchHeader')){
+  const b=document.createElement('button');b.id='hdGlobalSearchHeader';b.type='button';b.className='ghost hd-gs-header-btn';b.dataset.hdGsOpen='1';b.setAttribute('aria-label','HarborDesk全体検索');b.innerHTML='<span aria-hidden="true">⌕</span><b>検索</b>';
+  const before=top.querySelector('#hdGlobalSyncStatus,#notifyBtn,.hd-header-more');before?top.insertBefore(b,before):top.appendChild(b);
+ }
 }
 function hdGSEnsure(){
  let d=document.getElementById('hdGlobalSearchDialog');
