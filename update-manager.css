@@ -105,3 +105,9 @@
   overflow:auto
  }
 }
+
+.hd-update-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+@media(max-width:560px){
+ .hd-update-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
+ .hd-update-actions button{width:100%}
+}
