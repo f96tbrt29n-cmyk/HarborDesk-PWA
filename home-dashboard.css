@@ -110,3 +110,11 @@ button.home-next-main{cursor:pointer}
  .home-next-action.sync,.home-next-action.task{display:grid;grid-template-columns:minmax(0,1fr) auto}
  .home-next-game,.home-next-done{min-height:38px;align-self:center}
 }
+
+.home-quest-recent,.home-timer-recent{display:grid;gap:6px;margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,.07)}
+.home-quest-recent>small,.home-timer-recent>small{font-size:9px;color:var(--muted);font-weight:800}
+.home-quest-recent>div,.home-timer-recent>div{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.home-quest-recent button,.home-timer-recent button{flex:0 0 auto;display:flex;align-items:center;gap:6px;max-width:220px}
+.home-quest-recent button b,.home-timer-recent button b{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.home-quest-recent button span,.home-timer-recent button span{font-size:9px;color:var(--accent2);white-space:nowrap}
+.home-dock-recent button span{color:#b9d7ff}
