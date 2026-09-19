@@ -3820,3 +3820,23 @@ test('home task can complete quest with undo', async ({ page }) => {
   expect(state.quests[0].done).toBe(false);
   expect(await page.locator('#homeTodo').textContent()).toContain('ホーム確認任務');
 });
+
+
+test('home empty states offer direct add actions', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-v2', JSON.stringify({
+      expeditions:[],docks:[],quests:[],
+      resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
+    }));
+  });
+  await boot(page,[]);
+  await page.waitForSelector('[data-home-add-quest]');
+  expect(await page.locator('[data-home-add-timer="expedition"]').count()).toBe(1);
+  expect(await page.locator('[data-home-add-timer="dock"]').count()).toBe(1);
+  await page.click('[data-home-add-quest]');
+  expect(await page.locator('#questDialog').evaluate(el=>el.open)).toBe(true);
+  await page.locator('#questDialog [value="cancel"]').click();
+  await page.click('[data-home-add-timer="expedition"]');
+  expect(await page.locator('#timerDialog').evaluate(el=>el.open)).toBe(true);
+  expect(await page.locator('#timerDialogTitle').textContent()).toContain('遠征');
+});
