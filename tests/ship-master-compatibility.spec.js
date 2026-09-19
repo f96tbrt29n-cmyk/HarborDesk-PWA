@@ -1307,3 +1307,164 @@ test('exact-star equipment stacks prevent normal and expansion double use', asyn
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('star-gated expansion rebalances lower-star normal copy before procurement', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      { name: 'FuMO25 レーダー', category: '大型電探', count: 1, star: 7 },
+      { name: 'FuMO25 レーダー', category: '大型電探', count: 1, star: 0 }
+    ]));
+
+    const inv = window.hdFLInventory?.();
+    const key7 = window.hdFLInventoryStackKey?.('FuMO25 レーダー', 7);
+    const key0 = window.hdFLInventoryStackKey?.('FuMO25 レーダー', 0);
+    const remaining = new Map([...inv].map(([k,v]) => [k, v.count]));
+    remaining.set(key7, 0);
+    remaining.set(key0, 1);
+
+    const master = window.hdShipDbMasterRowByName?.('Bismarck drei');
+    const sourceSlot = {
+      profile: {
+        row: { name: 'Bismarck drei', masterId: master?.id || 0, gear: '' },
+        type: master?.type || '戦艦',
+        roles: [],
+        master
+      }
+    };
+    const suggestion = { slots: [sourceSlot] };
+    const ships = [{
+      ship: 'Bismarck drei',
+      masterId: master?.id || 0,
+      items: [{
+        name: 'FuMO25 レーダー',
+        star: 7,
+        stackKey: key7,
+        norm: window.hdFLNorm?.('FuMO25 レーダー'),
+        category: '大型電探',
+        kind: 'utility',
+        slotIndex: 3
+      }],
+      expansion: null
+    }];
+    const ship = window.hdFLShipDbItem?.(sourceSlot);
+    const moved = window.hdFLRebalanceExpansion?.(inv, remaining, suggestion, ships, 0, ship, '電探');
+    const after = window.hdShipDbExpansionCandidates?.(ship, remaining, '電探') || [];
+
+    localStorage.setItem('harbordesk-equipment-v1', '[]');
+
+    return {
+      moved: !!moved,
+      normalStar: ships[0].items[0].star,
+      normalKey: ships[0].items[0].stackKey,
+      remaining7: remaining.get(key7) || 0,
+      remaining0: remaining.get(key0) || 0,
+      expansionName: after[0]?.own?.name || '',
+      expansionStar: after[0]?.own?.maxStar || 0,
+      reqStar: after[0]?.info?.reqStar || 0
+    };
+  });
+
+  expect(data.moved).toBeTruthy();
+  expect(data.normalStar).toBe(0);
+  expect(data.remaining7).toBe(1);
+  expect(data.remaining0).toBe(0);
+  expect(data.expansionName).toBe('FuMO25 レーダー');
+  expect(data.expansionStar).toBe(7);
+  expect(data.reqStar).toBe(7);
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
+
+test('expansion procurement tracks total copies and one star-qualified copy separately', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-equipment-procurement-v1');
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      { name: 'FuMO25 レーダー', category: '大型電探', count: 2, star: 0 }
+    ]));
+
+    const added = window.hdPLAddExpansionRequirement?.(
+      '増設調達テスト',
+      'Bismarck drei',
+      window.hdShipDbMasterRowByName?.('Bismarck drei')?.id || 0,
+      'FuMO25 レーダー',
+      7,
+      '改修★7以上が必要',
+      2
+    );
+    const source = (window.hdPLLoad?.() || []).find(x => x.map === '増設調達テスト');
+    const before = (window.hdPLDemandRows?.(source?.gearItems || []) || [])[0];
+
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      { name: 'FuMO25 レーダー', category: '大型電探', count: 1, star: 7 },
+      { name: 'FuMO25 レーダー', category: '大型電探', count: 1, star: 0 }
+    ]));
+    const ready = (window.hdPLDemandRows?.(source?.gearItems || []) || [])[0];
+
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      { name: 'FuMO25 レーダー', category: '大型電探', count: 1, star: 7 }
+    ]));
+    const totalShort = (window.hdPLDemandRows?.(source?.gearItems || []) || [])[0];
+
+    localStorage.removeItem('harbordesk-equipment-procurement-v1');
+    localStorage.setItem('harbordesk-equipment-v1', '[]');
+
+    return {
+      added,
+      before: before ? {
+        reqStar: before.reqStar,
+        needed: before.needed,
+        qualifiedNeeded: before.qualifiedNeeded,
+        ownedTotal: before.ownedTotal,
+        ownedQualified: before.ownedQualified,
+        totalShortfall: before.totalShortfall,
+        starShortfall: before.starShortfall,
+        shortfall: before.shortfall,
+        methodKey: before.methodKey
+      } : null,
+      ready: ready ? {
+        ownedTotal: ready.ownedTotal,
+        ownedQualified: ready.ownedQualified,
+        shortfall: ready.shortfall,
+        status: ready.status
+      } : null,
+      totalShort: totalShort ? {
+        ownedTotal: totalShort.ownedTotal,
+        ownedQualified: totalShort.ownedQualified,
+        totalShortfall: totalShort.totalShortfall,
+        starShortfall: totalShort.starShortfall,
+        shortfall: totalShort.shortfall
+      } : null
+    };
+  });
+
+  expect(data.added).toBeTruthy();
+  expect(data.before.reqStar).toBe(7);
+  expect(data.before.needed).toBe(2);
+  expect(data.before.qualifiedNeeded).toBe(1);
+  expect(data.before.ownedTotal).toBe(2);
+  expect(data.before.ownedQualified).toBe(0);
+  expect(data.before.totalShortfall).toBe(0);
+  expect(data.before.starShortfall).toBe(1);
+  expect(data.before.shortfall).toBe(1);
+  expect(data.before.methodKey).toBe('improve');
+
+  expect(data.ready.ownedTotal).toBe(2);
+  expect(data.ready.ownedQualified).toBe(1);
+  expect(data.ready.shortfall).toBe(0);
+  expect(data.ready.status).toBe('ready');
+
+  expect(data.totalShort.ownedTotal).toBe(1);
+  expect(data.totalShort.ownedQualified).toBe(1);
+  expect(data.totalShort.totalShortfall).toBe(1);
+  expect(data.totalShort.starShortfall).toBe(0);
+  expect(data.totalShort.shortfall).toBe(1);
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
