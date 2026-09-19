@@ -5830,3 +5830,24 @@ test('mobile dock home badge shows attention count', async ({ page }) => {
   expect(Number(data.text)).toBeGreaterThanOrEqual(3);
   expect(data.count).toBeGreaterThanOrEqual(3);
 });
+
+
+test('mobile Home button jumps to next action when already home', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    if(typeof state!=='undefined')state.quests=[{id:'q1',name:'任務A',done:false}];
+    window.hdWSShowElement?.('home',false);
+    window.hdQNEnsure?.();window.hdQNUpdateMobileDock?.();
+    const meta=window.hdQNMobileAttentionMeta?.();
+    const home=document.querySelector('[data-hd-mobile-home]');
+    const label=home?.getAttribute('aria-label')||'';
+    const ok=window.hdQNMobileHome?.();
+    return {count:meta?.count||0,reasons:meta?.reasons||[],label,ok:!!ok};
+  });
+  expect(data.count).toBeGreaterThan(0);
+  expect(data.reasons).toContain('未完了任務');
+  expect(data.label).toContain('未完了任務');
+  expect(data.ok).toBe(true);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
