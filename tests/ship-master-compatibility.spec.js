@@ -3902,3 +3902,26 @@ test('guide view restores query filter and selected map in session', async ({ pa
   expect(resetState.filter).toBe('all');
   expect(resetState.map).toBe('');
 });
+
+
+test('timer dialog remembers last input per kind', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-timer-last-v1', JSON.stringify({
+      expedition:{name:'東京急行',minutes:165},
+      dock:{name:'加賀改',minutes:45}
+    }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    openTimer('expedition');
+    const expedition={name:document.getElementById('timerName')?.value||'',minutes:document.getElementById('timerMinutes')?.value||''};
+    document.getElementById('timerDialog')?.close();
+    openTimer('dock');
+    const dock={name:document.getElementById('timerName')?.value||'',minutes:document.getElementById('timerMinutes')?.value||''};
+    document.getElementById('timerDialog')?.close();
+    return {expedition,dock};
+  });
+  expect(data.expedition).toEqual({name:'東京急行',minutes:'165'});
+  expect(data.dock).toEqual({name:'加賀改',minutes:'45'});
+});
