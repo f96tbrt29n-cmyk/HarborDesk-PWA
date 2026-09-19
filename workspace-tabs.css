@@ -55,3 +55,10 @@
  .hd-ws-mobile-picker:not([hidden]){grid-template-columns:auto minmax(0,1fr) auto}
  .hd-ws-mobile-picker>#hdWorkspaceContextGroup{display:none}
 }
+
+@media(max-width:760px){
+ body.hd-keyboard-open{--hd-topbar-h:0px}
+ body.hd-keyboard-open .topbar{position:relative}
+ body.hd-keyboard-open .hd-ws-shell{padding-top:4px;padding-bottom:4px}
+ body.hd-keyboard-open .hd-ws-mobile-picker{display:none!important}
+}
