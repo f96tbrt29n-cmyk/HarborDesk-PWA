@@ -37,3 +37,38 @@
  .topbar>div:first-child h1{font-size:18px}
  .topbar .hd-global-sync-status{padding-left:6px;padding-right:6px}
 }
+
+dialog{
+ max-height:min(88dvh,760px);
+ overflow:auto;
+ overscroll-behavior:contain;
+ -webkit-overflow-scrolling:touch;
+}
+dialog form{min-height:0}
+dialog input,dialog select,dialog textarea{font-size:16px}
+.dialog-actions{
+ position:sticky;
+ bottom:-20px;
+ z-index:6;
+ margin:8px -20px -20px;
+ padding:12px 20px calc(12px + env(safe-area-inset-bottom));
+ border-top:1px solid rgba(255,255,255,.08);
+ background:linear-gradient(180deg,rgba(12,27,42,.86),#0c1b2a 24%);
+ backdrop-filter:blur(12px);
+}
+@media(max-width:560px){
+ dialog{
+  width:calc(100vw - 16px);
+  max-height:calc(100dvh - 18px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin:auto 8px;
+  padding:14px;
+  border-radius:16px;
+ }
+ dialog form{gap:12px}
+ .dialog-actions{
+  bottom:-14px;
+  margin:8px -14px -14px;
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+ }
+ .dialog-actions button{flex:1;min-height:44px}
+}
