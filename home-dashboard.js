@@ -95,6 +95,15 @@ function homeTimerDurationLabel(minutes){
  const m=Number(minutes)||0;if(m>0&&m%60===0)return (m/60)+'時間';if(m>=60)return Math.floor(m/60)+'時間'+(m%60)+'分';return m+'分';
 }
 
+function homeSyncDeltaHtml(sync){
+ const d=sync?.delta;if(!d?.baseline)return '';
+ const labels={fuel:'燃料',ammo:'弾薬',steel:'鋼材',bauxite:'ボーキ',instantBuild:'高速建造',bucket:'バケツ',devMaterial:'開発資材',screw:'ネジ'};
+ const signed=n=>{const v=Number(n)||0;return v>0?'+'+v.toLocaleString('ja-JP'):v.toLocaleString('ja-JP')};
+ const parts=[];if(Number(d.ships))parts.push('艦娘 '+signed(d.ships));if(Number(d.equipment))parts.push('装備 '+signed(d.equipment));
+ for(const k of ['fuel','ammo','steel','bauxite','bucket','devMaterial','screw'])if(Number(d.resources?.[k]))parts.push(labels[k]+' '+signed(d.resources[k]));
+ return parts.length?'<div class="home-sync-delta"><span>前回から</span>'+parts.slice(0,5).map(x=>'<b>'+homeEsc(x)+'</b>').join('')+'</div>':'';
+}
+
 function ensureHomeDashboard(){
  const main=document.querySelector('main');
  const hero=document.querySelector('.hero');
@@ -141,7 +150,7 @@ function renderHomeDashboard(){
  const syncHost=document.getElementById('homeGameSync');
  if(syncHost){
   syncHost.className='home-sync-card '+syncInfo.state;
-  syncHost.innerHTML=sync?`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>${homeEsc(syncInfo.label)}</strong><small>艦娘 ${Number(sync.ships)||0} / 装備 ${Number(sync.equipment)||0} / 艦隊 ${Number(sync.decks)||0}</small></div><div class="home-sync-actions"><a class="ghost small" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面へ</button></div></div>${syncInfo.state==='warn'?'<div class="home-sync-note">少し時間が空いてるよ。艦これを開いた時にもう一度同期すると最新状態になる。</div>':''}`:`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>まだ同期してないよ</strong><small>艦娘・装備・資源・現在艦隊をまとめて取り込める</small></div><div class="home-sync-actions"><a class="primary small" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面</button></div></div>`;
+  syncHost.innerHTML=sync?`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>${homeEsc(syncInfo.label)}</strong><small>艦娘 ${Number(sync.ships)||0} / 装備 ${Number(sync.equipment)||0} / 艦隊 ${Number(sync.decks)||0}</small></div><div class="home-sync-actions"><a class="ghost small" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面へ</button></div></div>${homeSyncDeltaHtml(sync)}${syncInfo.state==='warn'?'<div class="home-sync-note">少し時間が空いてるよ。艦これを開いた時にもう一度同期すると最新状態になる。</div>':''}`:`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>まだ同期してないよ</strong><small>艦娘・装備・資源・現在艦隊をまとめて取り込める</small></div><div class="home-sync-actions"><a class="primary small" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面</button></div></div>`;
  }
  const nextHost=document.getElementById('homeNextAction');
  if(nextHost){
