@@ -3627,3 +3627,22 @@ test('home order can reset to default without touching panel state', async ({ pa
   expect(data.panels.resources).toBe(true);
   expect(data.dom).toEqual(['resources','procurement','quick','recent']);
 });
+
+
+test('mobile secretary panel stays compact', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  await page.setViewportSize({width:390,height:844});
+  const data=await page.evaluate(()=>{
+    const hero=document.querySelector('.hero'),eyebrow=hero?.querySelector('.eyebrow'),secretary=document.getElementById('secretaryText');
+    return {
+      height:hero?.getBoundingClientRect().height||999,
+      eyebrow:getComputedStyle(eyebrow).display,
+      font:parseFloat(getComputedStyle(secretary).fontSize||'0'),
+      lines:getComputedStyle(secretary).webkitLineClamp||''
+    };
+  });
+  expect(data.height).toBeLessThan(90);
+  expect(data.eyebrow).toBe('none');
+  expect(data.font).toBeLessThanOrEqual(13);
+});
