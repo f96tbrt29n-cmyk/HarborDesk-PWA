@@ -158,3 +158,13 @@ body.hd-booting::after{
  }
  .hero .round{width:34px;height:34px;min-width:34px;min-height:34px;padding:0;font-size:15px}
 }
+
+.core-list-filter{display:flex;align-items:center;gap:6px;overflow-x:auto;padding:0 0 9px;scrollbar-width:none}
+.core-list-filter::-webkit-scrollbar{display:none}
+.core-list-filter button{flex:0 0 auto;white-space:nowrap;padding:7px 9px;font-size:11px}
+.core-list-filter button.active{border-color:#65bdf0;background:#15344d;color:#fff}
+.core-list-filter .muted{margin-left:auto;flex:0 0 auto;white-space:nowrap}
+@media(max-width:560px){
+ .core-list-filter{position:sticky;top:calc(var(--hd-topbar-h,58px) + var(--hd-workspace-nav-h,66px));z-index:5;margin:0 -4px 8px;padding:6px 4px;background:rgba(7,21,33,.96);backdrop-filter:blur(10px)}
+ .core-list-filter button{min-height:38px}
+}
