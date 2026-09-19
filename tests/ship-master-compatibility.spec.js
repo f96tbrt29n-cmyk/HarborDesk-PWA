@@ -2078,12 +2078,15 @@ test('KanColle quest sync merges active quest pages while preserving manual ques
 });
 
 
-test('KanColle sortie sync reconstructs one run and avoids duplicate import', async ({ page }) => {
+test('KanColle sortie sync maps node letters, links drop hunt, and avoids duplicate import', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
 
   const data = await page.evaluate(() => {
     localStorage.setItem('harbordesk-sortie-log-v1','[]');
+    localStorage.setItem('harbordesk-drop-hunts-v1', JSON.stringify([
+      {id:'hunt-ooi-23e',ship:'大井',map:'2-3',node:'E',runs:0,s:0,a:0,obtained:false}
+    ]));
 
     const bundle = {
       format:'harbordesk-kancolle-import',
@@ -2177,8 +2180,14 @@ test('KanColle sortie sync reconstructs one run and avoids duplicate import', as
     const first = window.hdKcApplyImport?.(preview,opts);
     const second = window.hdKcApplyImport?.(preview,opts);
     const rows = JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]');
+    const hunts = JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1')||'[]');
 
     const result = {
+      labels:{
+        map23node5:window.hdKcNodeLabel?.('2-3',5),
+        map35node1:window.hdKcNodeLabel?.('3-5',1),
+        map61node1:window.hdKcNodeLabel?.('6-1',1)
+      },
       preview:{sortieStarts:preview?.sortieStarts||0,battleResults:preview?.battleResults||0},
       firstSorties:first?.sorties||0,
       secondSorties:second?.sorties||0,
@@ -2190,41 +2199,63 @@ test('KanColle sortie sync reconstructs one run and avoids duplicate import', as
         retreat:x.retreat,
         battles:x.battles,
         drop:x.drop,
+        huntId:x.huntId,
+        huntShip:x.huntShip,
+        targetObtained:x.targetObtained,
         source:x.source,
         gameSortieKey:x.gameSortieKey,
         gameNodeNo:x.gameNodeNo,
+        gameNodeLabel:x.gameNodeLabel,
         gameBossCellNo:x.gameBossCellNo,
+        gameBossCellLabel:x.gameBossCellLabel,
         gameRouteNodes:x.gameRouteNodes,
+        gameRouteLabels:x.gameRouteLabels,
         gameBattleResults:x.gameBattleResults
-      }))
+      })),
+      hunt:hunts[0]||null
     };
 
     localStorage.setItem('harbordesk-sortie-log-v1','[]');
+    localStorage.setItem('harbordesk-drop-hunts-v1','[]');
     return result;
   });
 
+  expect(data.labels).toEqual({map23node5:'E',map35node1:'B',map61node1:'B'});
   expect(data.preview).toEqual({sortieStarts:1,battleResults:2});
   expect(data.firstSorties).toBe(1);
   expect(data.secondSorties).toBe(0);
   expect(data.rows).toHaveLength(1);
   expect(data.rows[0]).toEqual(expect.objectContaining({
     map:'2-3',
-    node:'#5',
+    node:'E',
     result:'A',
     boss:false,
     retreat:true,
     battles:2,
     drop:'大井',
+    huntId:'hunt-ooi-23e',
+    huntShip:'大井',
+    targetObtained:true,
     source:'kancolle-import',
     gameSortieKey:'kc-sortie-at-1000',
     gameNodeNo:5,
-    gameBossCellNo:10
+    gameNodeLabel:'E',
+    gameBossCellNo:10,
+    gameBossCellLabel:'J'
   }));
   expect(data.rows[0].gameRouteNodes).toEqual([1,5]);
+  expect(data.rows[0].gameRouteLabels).toEqual(['A','E']);
   expect(data.rows[0].gameBattleResults).toEqual([
-    expect.objectContaining({nodeNo:1,rank:'S',drop:''}),
-    expect.objectContaining({nodeNo:5,rank:'A',drop:'大井',dropShipId:24})
+    expect.objectContaining({nodeNo:1,nodeLabel:'A',rank:'S',drop:''}),
+    expect.objectContaining({nodeNo:5,nodeLabel:'E',rank:'A',drop:'大井',dropShipId:24})
   ]);
+  expect(data.hunt).toEqual(expect.objectContaining({
+    id:'hunt-ooi-23e',
+    runs:1,
+    s:0,
+    a:1,
+    obtained:true
+  }));
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
