@@ -106,8 +106,8 @@ function hdPLAddMasterLoadout(shipId,loadoutName,map=''){
 
 function hdPLAddExpansionRequirement(map,shipName,masterId,target,reqStar=0,reason='',requiredTotal=1){
  if(!target)return false;const sourceMap=map||(typeof selectedMap!=='undefined'&&selectedMap?selectedMap:'自動編成'),req=Math.max(0,Number(reqStar)||0),total=Math.max(1,Number(requiredTotal)||1),qualifiedNeeded=req?1:0;
- const resolved=hdPLResolveWanted(target),item=resolved.item,baseMethod=hdPLMethodMeta(item),baseOwned=hdPLOwnedCount(target,0),qualifiedOwned=req?hdPLOwnedCount(target,req):baseOwned;
- const method=req&&baseOwned>qualifiedOwned?{key:'improve',label:`改修★${req}+`,rank:2}:baseMethod;
+ const resolved=hdPLResolveWanted(target),item=resolved.item,baseMethod=hdPLMethodMeta(item),baseOwned=hdPLOwnedCount(target,0),qualifiedOwned=req?hdPLOwnedCount(target,req):baseOwned,countShort=Math.max(0,total-baseOwned),starShort=req?Math.max(0,qualifiedNeeded-qualifiedOwned):0;
+ const method=req&&starShort>0&&countShort===0?{key:'improve',label:`改修★${req}+`,rank:2}:baseMethod;
  const added={map:sourceMap,ship:String(shipName||''),masterId:Number(masterId)||0,loadout:'補強増設',wanted:target,target:item?.name||target,kind:'補強増設',exact:true,reqStar:req,qualifiedNeeded,requiredTotal:total,methodKey:method.key,methodLabel:method.label,rank:method.rank,needed:1,reason:String(reason||''),sources:[String(shipName||'補強増設')],createdAt:Date.now()};
  const list=hdPLLoad(),old=list.find(x=>x.map===sourceMap),next={id:old?.id||`pl-${Date.now()}-${Math.random().toString(16).slice(2)}`,map:sourceMap,kinds:old?.kinds||[],gearItems:hdPLMergeGearItems([...(old?.gearItems||[]),added]),createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};
  hdPLSave(old?list.map(x=>x.map===sourceMap?next:x):[next,...list]);return true;
