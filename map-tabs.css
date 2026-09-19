@@ -1,1 +1,16 @@
 .map-tabs-shell{display:grid;gap:12px}.map-tabs-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.map-tabs-head h3{margin:5px 0 2px}.map-wiki-link{white-space:nowrap}.map-tab-bar{display:flex;gap:7px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}.map-tab-bar::-webkit-scrollbar{display:none}.map-tab-btn{border:1px solid var(--line);background:#0c2031;color:var(--muted);border-radius:999px;padding:9px 12px;font:inherit;font-size:12px;white-space:nowrap}.map-tab-btn.active{background:var(--accent);color:#04131e;border-color:var(--accent);font-weight:700}.map-tab-pane{display:none;animation:mapTabIn .16s ease}.map-tab-pane.active{display:grid;gap:10px}.map-tab-card{background:#0e2234;border:1px solid var(--line);border-radius:14px;padding:13px;display:grid;gap:6px;line-height:1.55}.map-tab-card-title{font-weight:700}.map-tab-card p{margin:0}.map-tab-card.warn{border-color:#705935;background:#211b13}.quest-tab-card{grid-template-columns:auto 1fr;align-items:flex-start}.map-tab-pane .custom-fleet-section{margin-top:0}.map-tab-pane .custom-fleet-title{margin-top:0}@keyframes mapTabIn{from{opacity:.55;transform:translateY(2px)}to{opacity:1;transform:none}}@media(max-width:520px){.map-tabs-head{align-items:center}.map-wiki-link{font-size:12px}.map-tab-btn{padding:8px 11px}}
+@media(max-width:560px){
+ .map-tab-bar{
+  position:sticky;
+  top:calc(var(--hd-topbar-h,58px) + var(--hd-workspace-nav-h,82px));
+  z-index:7;
+  margin:0 -4px;
+  padding:7px 4px;
+  background:rgba(8,24,38,.97);
+  border-top:1px solid rgba(255,255,255,.05);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(12px);
+  scroll-padding-inline:36px;
+ }
+ .map-tab-btn{min-height:38px}
+}
