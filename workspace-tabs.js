@@ -106,7 +106,12 @@ function hdWSManagedSectionFor(el){
  return null;
 }
 function hdWSVisibleSections(group){return hdWSSections().filter(el=>el.dataset.hdWorkspaceGroup===group&&el.id!=='hdWorkspaceHero')}
-function hdWSResolveSection(group,preferred){const rows=hdWSVisibleSections(group);if(!rows.length)return null;if(preferred&&rows.some(x=>x.id===preferred))return preferred;const stored=hdWSState.sections?.[group];if(stored&&rows.some(x=>x.id===stored))return stored;const preferredIds={home:'home',guide:'guide',fleet:'roster',quest:'quests',expedition:'expeditions',arsenal:'equipmentBook',records:'sortieLog',settings:'diagnosticsCenter'};return rows.find(x=>x.id===preferredIds[group])?.id||rows[0].id}
+function hdWSDefaultSection(group){
+ const rows=hdWSVisibleSections(group),preferredIds={home:'home',guide:'guide',fleet:'roster',quest:'quests',expedition:'expeditions',arsenal:'equipmentBook',records:'sortieLog',settings:'diagnosticsCenter'};
+ return rows.find(x=>x.id===preferredIds[group])?.id||rows[0]?.id||null;
+}
+function hdWSGroupLabel(group){return HD_WS_GROUPS.find(x=>x.key===group)?.label||group}
+function hdWSResolveSection(group,preferred){const rows=hdWSVisibleSections(group);if(!rows.length)return null;if(preferred&&rows.some(x=>x.id===preferred))return preferred;const stored=hdWSState.sections?.[group];if(stored&&rows.some(x=>x.id===stored))return stored;return hdWSDefaultSection(group)}
 function hdWSUpdateTopbarHeight(){const h=document.querySelector('.topbar')?.getBoundingClientRect().height||68;document.documentElement.style.setProperty('--hd-topbar-h',`${Math.ceil(h)}px`)}
 function hdWSBadgeCounts(){
  const now=Date.now();let expeditions=0,docks=0,quests=0,construction=0,errors=0;
@@ -123,13 +128,14 @@ function hdWSUpdateBadges(){const counts=hdWSBadgeCounts();for(const g of HD_WS_
 function hdWSEnsureUI(){
  if(document.getElementById('hdWorkspaceNav'))return;
  const top=document.querySelector('.topbar');if(!top)return;
- const nav=document.createElement('div');nav.id='hdWorkspaceNav';nav.className='hd-ws-shell';nav.innerHTML=`<div class="hd-ws-primary" role="tablist" aria-label="HarborDeskカテゴリ">${HD_WS_GROUPS.map(g=>`<button type="button" role="tab" data-hd-ws-group="${g.key}"><span>${g.label}</span><em data-hd-ws-badge hidden>0</em></button>`).join('')}</div><label id="hdWorkspaceMobilePicker" class="hd-ws-mobile-picker" hidden><span>機能</span><select id="hdWorkspaceSectionSelect" aria-label="カテゴリ内機能"></select></label><div id="hdWorkspaceSubtabs" class="hd-ws-secondary" role="tablist" aria-label="カテゴリ内機能"></div>`;
+ const nav=document.createElement('div');nav.id='hdWorkspaceNav';nav.className='hd-ws-shell';nav.innerHTML=`<div class="hd-ws-primary" role="tablist" aria-label="HarborDeskカテゴリ">${HD_WS_GROUPS.map(g=>`<button type="button" role="tab" data-hd-ws-group="${g.key}"><span>${g.label}</span><em data-hd-ws-badge hidden>0</em></button>`).join('')}</div><div id="hdWorkspaceMobilePicker" class="hd-ws-mobile-picker" hidden><span id="hdWorkspaceContextGroup">ホーム</span><select id="hdWorkspaceSectionSelect" aria-label="カテゴリ内機能"></select><button type="button" class="ghost small" data-hd-ws-group-top>先頭</button></div><div id="hdWorkspaceSubtabs" class="hd-ws-secondary" role="tablist" aria-label="カテゴリ内機能"></div>`;
  top.insertAdjacentElement('afterend',nav);document.body.classList.add('hd-workspace-mode');hdWSEnsureSyncStatus();hdWSUpdateTopbarHeight();hdWSUpdateBadges();hdWSUpdateSyncStatus();
 }
 function hdWSRenderSubtabs(group,selected){
- const host=document.getElementById('hdWorkspaceSubtabs'),picker=document.getElementById('hdWorkspaceMobilePicker'),select=document.getElementById('hdWorkspaceSectionSelect');if(!host)return;const rows=hdWSVisibleSections(group);
+ const host=document.getElementById('hdWorkspaceSubtabs'),picker=document.getElementById('hdWorkspaceMobilePicker'),select=document.getElementById('hdWorkspaceSectionSelect'),context=document.getElementById('hdWorkspaceContextGroup');if(!host)return;const rows=hdWSVisibleSections(group);
+ if(context)context.textContent=hdWSGroupLabel(group);
  if(select){select.innerHTML=rows.map(el=>`<option value="${hdWSEsc(el.id)}">${hdWSEsc(hdWSTitle(el))}</option>`).join('');if(selected)select.value=selected}
- if(picker)picker.hidden=rows.length<=1;
+ if(picker)picker.hidden=rows.length===0;
  if(rows.length<=1){host.hidden=true;host.innerHTML='';return}
  host.hidden=false;host.innerHTML=rows.map(el=>`<button type="button" role="tab" class="${el.id===selected?'active':''}" aria-selected="${el.id===selected?'true':'false'}" data-hd-ws-section="${hdWSEsc(el.id)}">${hdWSEsc(hdWSTitle(el))}</button>`).join('');
  const active=host.querySelector('.active');active?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
@@ -205,6 +211,7 @@ function hdWSTouchStart(e){if(e.touches?.length!==1||hdWSSwipeBlocked(e.target))
 function hdWSTouchEnd(e){if(!hdWSTouch)return;const t=e.changedTouches?.[0],start=hdWSTouch;hdWSTouch=null;if(!t)return;const dx=t.clientX-start.x,dy=t.clientY-start.y,dt=Date.now()-start.at;if(dt>800||Math.abs(dx)<72||Math.abs(dx)<Math.abs(dy)*1.35)return;hdWSMoveGroup(dx<0?1:-1)}
 
 document.addEventListener('click',e=>{
+ const top=e.target.closest?.('[data-hd-ws-group-top]');if(top){hdWSSaveCurrentScroll();hdWSClearPin();const target=hdWSDefaultSection(hdWSState.group);hdWSApply(hdWSState.group,target,{scrollTop:true,ignorePin:true});return}
  const g=e.target.closest?.('[data-hd-ws-group]');if(g){hdWSSaveCurrentScroll();hdWSClearPin();hdWSApply(g.dataset.hdWsGroup,null,{restoreScroll:true,ignorePin:true});return}
  const s=e.target.closest?.('[data-hd-ws-section]');if(s){hdWSSaveCurrentScroll();hdWSClearPin();hdWSApply(hdWSState.group,s.dataset.hdWsSection,{restoreScroll:true,ignorePin:true});return}
  const a=e.target.closest?.('a[href^="#"]');if(a&&hdWSHandleAnchor(a)){e.preventDefault();history.replaceState(null,'',a.getAttribute('href'))}
