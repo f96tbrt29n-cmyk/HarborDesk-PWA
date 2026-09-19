@@ -6206,3 +6206,27 @@ test('workspace navigation reflects current feature in URL', async ({ page }) =>
   expect(data.historyLength).toBeGreaterThan(0);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('current HarborDesk view can be shared from header menu', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    window.hdWSShowElement?.('roster',false);
+    let shared=null;
+    try{Object.defineProperty(navigator,'share',{configurable:true,value:async payload=>{shared=payload}})}catch{}
+    const ok=await window.hdWSShareCurrentLocation?.();
+    return {
+      ok,
+      button:!!document.querySelector('[data-hd-header-share]'),
+      hash:location.hash,
+      sharedUrl:shared?.url||'',
+      sharedTitle:shared?.title||''
+    };
+  });
+  expect(data.ok).toBe(true);
+  expect(data.button).toBe(true);
+  expect(data.hash).toBe('#roster');
+  expect(data.sharedUrl).toContain('#roster');
+  expect(data.sharedTitle).toContain('HarborDesk');
+});
