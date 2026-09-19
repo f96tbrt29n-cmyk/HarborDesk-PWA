@@ -112,7 +112,7 @@ function ensureHomeDashboard(){
  section.id='home';
  section.className='home-dashboard';
  section.innerHTML=`
-  <div class="section-head"><div><div class="eyebrow">HOME</div><h2>今日の司令部</h2></div><div class="home-head-actions"><span class="muted" id="homeUpdated"></span><button type="button" class="ghost small" data-home-order-reset>配置を戻す</button></div></div>
+  <div class="section-head"><div><div class="eyebrow">HOME</div><h2>今日の司令部</h2></div><div class="home-head-actions"><span class="muted" id="homeUpdated"></span><button type="button" class="ghost small" data-home-edit-toggle aria-pressed="false">ホーム編集</button><button type="button" class="ghost small" data-home-order-reset hidden>配置を戻す</button></div></div>
   <article id="homeGameSync" class="home-sync-card"></article>
   <article id="homeInstallTip" class="home-install-tip" hidden><div><span>iPhoneでさらに使いやすく</span><strong>HarborDeskをホーム画面に追加</strong><small>Safariの共有ボタン →「ホーム画面に追加」で、アプリみたいにすぐ開けるよ。</small></div><button type="button" class="ghost small" data-home-install-dismiss>閉じる</button></article>
   <article id="homeNextAction" class="home-next-action"></article>
@@ -206,6 +206,7 @@ function renderHomeDashboard(){
 }
 
 document.addEventListener('click',e=>{
+ const edit=e.target.closest('[data-home-edit-toggle]');if(edit){const root=document.getElementById('home'),next=!root?.classList.contains('home-editing');root?.classList.toggle('home-editing',next);edit.textContent=next?'編集完了':'ホーム編集';edit.setAttribute('aria-pressed',next?'true':'false');const reset=root?.querySelector('[data-home-order-reset]');if(reset)reset.hidden=!next;return}
  const dismissInstall=e.target.closest('[data-home-install-dismiss]');if(dismissInstall){try{localStorage.setItem(HOME_INSTALL_TIP_KEY,'1')}catch{};const tip=document.getElementById('homeInstallTip');if(tip)tip.hidden=true;return}
  const addQuest=e.target.closest('[data-home-add-quest]');if(addQuest){if(typeof openQuestDialog==='function')openQuestDialog();else{const input=document.getElementById('questName');if(input)input.value='';document.getElementById('questDialog')?.showModal()}return}
  const quickQuest=e.target.closest('[data-home-quest-start]');if(quickQuest){
