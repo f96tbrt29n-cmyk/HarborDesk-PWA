@@ -161,8 +161,9 @@ function homeSortieReadiness(map){
  try{
   if(typeof hdSortieFleets!=='function'||typeof hdSortieSelection!=='function'||typeof hdSortieAutoChecks!=='function'||typeof hdSortieManualChecks!=='function'||typeof hdSortieState!=='function'||typeof hdSortieSummary!=='function')return null;
   const fleets=hdSortieFleets(target),id=hdSortieSelection(target),fleet=fleets.find(x=>x.id===id)||fleets[0];if(!fleet)return null;
-  const autoInfo=hdSortieAutoChecks(target,fleet),manual=hdSortieManualChecks(target,autoInfo.adv),state=hdSortieState(target,fleet.id),sum=hdSortieSummary(manual,state,autoInfo.checks);
-  return {map:target,fleetId:fleet.id,name:fleet.name||'',...sum};
+  const autoInfo=hdSortieAutoChecks(target,fleet),manual=hdSortieManualChecks(target,autoInfo.adv),state=hdSortieState(target,fleet.id),sum=hdSortieSummary(manual,state,autoInfo.checks),sorted=typeof hdSortieSortedChecks==='function'?hdSortieSortedChecks(autoInfo.checks):autoInfo.checks;
+  const nextAuto=(sorted||[]).find(x=>x.state!=='ok')||null,manualLeft=Math.max(0,sum.total-sum.done);
+  return {map:target,fleetId:fleet.id,name:fleet.name||'',nextAuto,manualLeft,ready:!nextAuto&&manualLeft===0,...sum};
  }catch{return null}
 }
 function homeOpenFleetShip(name){
@@ -239,7 +240,8 @@ function renderHomeDashboard(){
  if(nextHost){
   const urgentTimer=nextTimer&&nextMs<=60*60*1000;
   const syncNeedsAttention=syncInfo.state==='missing'||syncInfo.state==='partial'||syncInfo.state==='warn';
-  const actionState=urgentTimer?(nextMs<=15*60*1000?'urgent':'soon'):syncNeedsAttention?'sync':todo.length?'task':nextTimer?'normal':'clear';
+  const sortieInfo=homeSortieReadiness(homeSelectedMap()),sortieNeedsAttention=!!(sortieInfo&&!sortieInfo.ready);
+  const actionState=urgentTimer?(nextMs<=15*60*1000?'urgent':'soon'):syncNeedsAttention?'sync':sortieNeedsAttention?'sortie':todo.length?'task':nextTimer?'normal':'clear';
   nextHost.className='home-next-action '+actionState;
   if(urgentTimer){
    const mins=Math.ceil(nextMs/60000),timeText=typeof fmt==='function'?fmt(nextMs):(mins<60?mins+'分':Math.floor(mins/60)+'時間');
@@ -247,6 +249,11 @@ function renderHomeDashboard(){
   }else if(syncNeedsAttention){
    const missingText=syncInfo.state==='partial'&&syncInfo.missing.length?`次に開く: ${homeSyncMissingGuide(syncInfo.missing).join(' → ')||'母港'}`:'艦娘・装備・資源を最新状態にしよう';
    nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="kancolleImport"><span>${syncInfo.state==='partial'?'同期を補完する':'先に更新しておく'}</span><strong>ゲーム同期 ${homeEsc(syncInfo.label)}</strong><small>${homeEsc(missingText)}</small></button><a class="ghost small home-next-game" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a>`;
+  }else if(sortieNeedsAttention){
+   const label=sortieInfo.nextAuto?'まず直す':'出撃直前チェック';
+   const title=sortieInfo.nextAuto?(sortieInfo.nextAuto.label||'出撃準備を確認'):`手動確認 あと ${sortieInfo.manualLeft}件`;
+   const detail=sortieInfo.nextAuto?(sortieInfo.nextAuto.detail||`${sortieInfo.map} の出撃準備`):`${sortieInfo.map}・${sortieInfo.name||'使用編成'}`;
+   nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-sortie-open><span>${homeEsc(sortieInfo.map)} 出撃準備・${homeEsc(label)}</span><strong>${homeEsc(title)}</strong><small>${homeEsc(detail)}</small></button><button type="button" class="primary small" data-home-sortie-open>準備を見る</button>`;
   }else if(todo.length){
    const first=todo[0];
    nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="quests"><span>次にやること・残り ${todo.length}件</span><strong>${homeEsc(first.name||'任務を確認')}</strong><small>タップで任務一覧へ</small></button><button type="button" class="ghost small home-next-done" data-home-quest-done="${homeEsc(first.id)}">完了</button>`;
