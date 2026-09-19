@@ -22,3 +22,18 @@
  .hd-notify-btn b{display:none}
  .hd-notify-btn span{font-size:13px}
 }
+
+@media(max-width:560px){
+ .topbar{flex-wrap:nowrap;min-height:54px}
+ .topbar>div:first-child{min-width:0}
+ .topbar>div:first-child h1{font-size:20px;white-space:nowrap}
+ .topbar>div:first-child .eyebrow{font-size:8px;white-space:nowrap}
+ .topbar .hd-global-sync-status{flex:0 0 auto}
+ .topbar .hd-notify-btn{flex:0 0 auto}
+ .topbar .hd-header-more{flex:0 0 auto}
+}
+@media(max-width:390px){
+ .topbar{padding-left:9px;padding-right:9px;gap:6px}
+ .topbar>div:first-child h1{font-size:18px}
+ .topbar .hd-global-sync-status{padding-left:6px;padding-right:6px}
+}
