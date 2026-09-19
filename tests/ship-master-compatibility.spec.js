@@ -5336,3 +5336,26 @@ test('Home fleet readiness quick check summarizes risks', async ({ page }) => {
   expect(data.text).toContain('疲労 1隻');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('Home current fleet shows sortie readiness summary', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-guide-view-v1', JSON.stringify({world:'5',map:'5-5',filter:'map',query:'5-5'}));
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
+      {deckId:1,name:'第1艦隊',mission:[0,0,0,0],ships:[{name:'加賀改',level:94,nowHp:70,maxHp:79,cond:55,gear:'烈風 / 彩雲'}]}
+    ]));
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({'5-5':[
+      {id:'fleet-test',name:'ゲーム同期｜第1艦隊',ships:[{ship:'加賀改',gear:'烈風 / 彩雲'}],source:'kancolle-import',sourceDeckId:1}
+    ]}));
+    localStorage.setItem('harbordesk-sortie-selection-v1', JSON.stringify({'5-5':'fleet-test'}));
+    localStorage.setItem('harbordesk-sortie-readiness-v1', JSON.stringify({'5-5:fleet-test':{supply:true,damage:true}}));
+  });
+  await boot(page,errors);
+  await page.evaluate(()=>window.renderHomeDashboard?.());
+  const text=await page.locator('[data-home-sortie-open]').textContent();
+  expect(text).toContain('出撃準備');
+  expect(text).toContain('手動 2/');
+  expect(text).toContain('自動');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
