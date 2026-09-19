@@ -85,3 +85,10 @@ body.hd-workspace-mode{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
  .hd-qn-context{padding-left:10px;padding-right:10px}
  .hd-qn-context-grid button{min-height:38px;max-width:150px}
 }
+
+.hd-mobile-attention-list>button.tone-urgent{border-color:rgba(239,116,116,.55);background:linear-gradient(90deg,rgba(120,40,44,.28),#0d2234 36%)}
+.hd-mobile-attention-list>button.tone-urgent>span{background:#5a2930;color:#ffd6da}
+.hd-mobile-attention-list>button.tone-soon{border-color:rgba(239,191,93,.48);background:linear-gradient(90deg,rgba(105,75,23,.24),#0d2234 36%)}
+.hd-mobile-attention-list>button.tone-soon>span{background:#513f1d;color:#ffe0a1}
+.hd-mobile-attention-list>button.tone-sync{border-color:rgba(91,188,243,.42)}
+.hd-mobile-attention-list>button.tone-sync>span{background:#17445f;color:#cceeff}
