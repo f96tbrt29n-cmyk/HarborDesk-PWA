@@ -2,6 +2,8 @@ const KEY='harbordesk-pwa-v1';
 const FAV_KEY='harbordesk-guide-favs-v1';
 const state=load();
 let timerKind='expedition';
+let timerEditId='';
+let questEditId='';
 let notified=new Set();
 const GUIDE_VIEW_KEY='harbordesk-session-guide-view-v1';
 const TIMER_LAST_KEY='harbordesk-timer-last-v1';
@@ -42,9 +44,13 @@ function renderQuestRecent(){
  const rows=questRecentLoad();host.innerHTML=rows.length?rows.map(x=>`<span class="quest-recent-item"><button type="button" class="ghost small" data-quest-recent="${esc(x)}">${esc(x)}</button><button type="button" class="quest-recent-run" data-quest-recent-run="${esc(x)}" aria-label="${esc(x)}を追加">＋</button><button type="button" class="quest-recent-remove" data-quest-recent-remove="${esc(x)}" aria-label="${esc(x)}を候補から削除">×</button></span>`).join(''):'';
  host.hidden=!rows.length;
 }
-function openQuestDialog(){
- const input=document.getElementById('questName'),dialog=document.getElementById('questDialog');if(!input||!dialog)return;
- input.value='';renderQuestRecent();dialog.showModal();try{input.focus({preventScroll:true})}catch{input.focus()}
+function openQuestDialog(editId=''){
+ const input=document.getElementById('questName'),dialog=document.getElementById('questDialog'),title=document.getElementById('questDialogTitle'),saveBtn=document.getElementById('questSave');if(!input||!dialog)return;
+ questEditId=String(editId||'');const item=questEditId?state.quests.find(x=>String(x.id)===questEditId):null;if(!item)questEditId='';
+ input.value=item?String(item.name||''):'';
+ renderQuestRecent();const recent=document.getElementById('questRecent');if(recent&&item)recent.hidden=true;
+ if(title)title.textContent=item?'任務を編集':'任務を追加';if(saveBtn)saveBtn.textContent=item?'保存':'追加';
+ dialog.showModal();try{input.focus({preventScroll:true});if(item)input.select()}catch{input.focus()}
 }
 function timerLastLoad(){try{return JSON.parse(localStorage.getItem(TIMER_LAST_KEY)||'{}')||{}}catch{return {}}}
 function timerLastSave(kind,name,minutes){
@@ -189,6 +195,8 @@ document.addEventListener('click',e=>{
  const fav=e.target.closest('[data-guide-fav]');if(fav){const id=fav.dataset.guideFav;guideFavs.has(id)?guideFavs.delete(id):guideFavs.add(id);localStorage.setItem(FAV_KEY,JSON.stringify([...guideFavs]));renderGuide();return}
  const emptyTimer=e.target.closest('[data-empty-add-timer]');if(emptyTimer){openTimer(emptyTimer.dataset.emptyAddTimer);return}
  if(e.target.closest('[data-empty-add-quest]')){openQuestDialog();return}
+ const editTimer=e.target.closest('[data-edit-timer]');if(editTimer){openTimer(editTimer.dataset.kind,editTimer.dataset.editTimer);return}
+ const editQuest=e.target.closest('[data-edit-quest]');if(editQuest){openQuestDialog(editQuest.dataset.editQuest);return}
  const adjust=e.target.closest('[data-adjust-timer]');if(adjust){
   const k=adjust.dataset.kind==='dock'?'dock':'expedition',arr=k==='expedition'?state.expeditions:state.docks,item=arr.find(x=>String(x.id)===String(adjust.dataset.adjustTimer)),delta=Number(adjust.dataset.minutes)||0;
   if(!item||delta<=0)return;
@@ -254,7 +262,7 @@ function renderTimers(kind){
  const rows=[...arr].filter(t=>mode==='all'||(mode==='active'?Number(t.endsAt)>now:Number(t.endsAt)<=now)).sort((a,b)=>a.endsAt-b.endsAt);
  coreListFilterRender(kind,rows.length,arr.length);
  if(!rows.length){el.innerHTML=coreFilteredEmpty(kind,label+'タイマー');return}
- el.innerHTML=rows.map(t=>{const done=Number(t.endsAt)<=now,duration=Number(t.durationMinutes)||0;return `<div class="timer ${done?'done':''}"><div class="timer-main"><div class="timer-name">${esc(t.name)}</div><div class="timer-time" data-end="${t.endsAt}">${fmt(t.endsAt-now)}</div></div><div class="timer-actions">${!done?`<button type="button" class="ghost small timer-adjust" data-adjust-timer="${t.id}" data-kind="${kind}" data-minutes="15">+15</button><button type="button" class="ghost small timer-adjust" data-adjust-timer="${t.id}" data-kind="${kind}" data-minutes="30">+30</button>`:''}${done&&duration>0?`<button type="button" class="ghost small" data-restart-timer="${t.id}" data-kind="${kind}">もう一度</button>`:''}<button class="icon-btn" data-delete-timer="${t.id}" data-kind="${kind}" aria-label="削除">×</button></div></div>`}).join('');
+ el.innerHTML=rows.map(t=>{const done=Number(t.endsAt)<=now,duration=Number(t.durationMinutes)||0;return `<div class="timer ${done?'done':''}"><div class="timer-main"><div class="timer-name">${esc(t.name)}</div><div class="timer-time" data-end="${t.endsAt}">${fmt(t.endsAt-now)}</div></div><div class="timer-actions">${!done?`<button type="button" class="ghost small" data-edit-timer="${t.id}" data-kind="${kind}">編集</button><button type="button" class="ghost small timer-adjust" data-adjust-timer="${t.id}" data-kind="${kind}" data-minutes="15">+15</button><button type="button" class="ghost small timer-adjust" data-adjust-timer="${t.id}" data-kind="${kind}" data-minutes="30">+30</button>`:''}${done&&duration>0?`<button type="button" class="ghost small" data-restart-timer="${t.id}" data-kind="${kind}">もう一度</button>`:''}<button class="icon-btn" data-delete-timer="${t.id}" data-kind="${kind}" aria-label="削除">×</button></div></div>`}).join('');
 }
 function renderQuests(){
  const el=document.getElementById('questList');
@@ -262,7 +270,7 @@ function renderQuests(){
  const mode=coreListFilters.quest||'active',rows=state.quests.filter(q=>mode==='all'||(mode==='active'?!q.done:!!q.done));
  coreListFilterRender('quest',rows.length,state.quests.length);
  if(!rows.length){el.innerHTML=coreFilteredEmpty('quest','任務');return}
- el.innerHTML=rows.map(q=>`<div class="quest"><input type="checkbox" data-quest-check="${q.id}" ${q.done?'checked':''}><div class="quest-main"><div class="quest-name" style="${q.done?'text-decoration:line-through;opacity:.6':''}">${esc(q.name)}</div></div><button class="icon-btn" data-delete-quest="${q.id}">×</button></div>`).join('');
+ el.innerHTML=rows.map(q=>`<div class="quest"><input type="checkbox" data-quest-check="${q.id}" ${q.done?'checked':''}><div class="quest-main"><div class="quest-name" style="${q.done?'text-decoration:line-through;opacity:.6':''}">${esc(q.name)}</div></div><button type="button" class="ghost small" data-edit-quest="${q.id}">編集</button><button class="icon-btn" data-delete-quest="${q.id}">×</button></div>`).join('');
 }
 function renderResources(){['fuel','ammo','steel','bauxite'].forEach(k=>document.getElementById(k).value=state.resources[k]??'');document.getElementById('resourceSaved').textContent=state.resources.savedAt?`最終保存: ${new Date(state.resources.savedAt).toLocaleString('ja-JP')}`:''}
 function render(){renderGuide();renderTimers('expedition');renderTimers('dock');renderQuests();renderResources()}
@@ -280,15 +288,18 @@ function questAddRecent(name){
  const item={id:uid(),name:value,done:false};questRecentSave(value);state.quests.push(item);save();renderQuests();document.getElementById('questDialog')?.close();
  hdToastAction(`${value} を追加したよ`,'元に戻す',()=>{const i=state.quests.findIndex(x=>String(x.id)===String(item.id));if(i>=0)state.quests.splice(i,1);save();renderQuests();hdToast('元に戻したよ')},6500);return true;
 }
-function openTimer(kind){
- timerKind=kind;
- const saved=timerLastLoad()[kind]||{};
- document.getElementById('timerDialogTitle').textContent=kind==='expedition'?'遠征タイマー追加':'入渠タイマー追加';
- document.getElementById('timerName').value=String(saved.name||'');
- document.getElementById('timerMinutes').value=String(Number(saved.minutes)||30);
- renderTimerRecent(kind);
+function openTimer(kind,editId=''){
+ timerKind=kind==='dock'?'dock':'expedition';timerEditId=String(editId||'');
+ const arr=timerKind==='expedition'?state.expeditions:state.docks,item=timerEditId?arr.find(x=>String(x.id)===timerEditId):null,saved=timerLastLoad()[timerKind]||{};
+ if(!item)timerEditId='';
+ const title=document.getElementById('timerDialogTitle'),saveBtn=document.getElementById('timerSave'),name=document.getElementById('timerName'),mins=document.getElementById('timerMinutes');
+ if(title)title.textContent=item?(timerKind==='expedition'?'遠征タイマー編集':'入渠タイマー編集'):(timerKind==='expedition'?'遠征タイマー追加':'入渠タイマー追加');
+ if(name)name.value=item?String(item.name||''):String(saved.name||'');
+ const remaining=item?Math.max(1,Math.ceil((Number(item.endsAt||0)-Date.now())/60000)):Number(saved.minutes)||30;if(mins)mins.value=String(remaining);
+ renderTimerRecent(timerKind);const recent=document.getElementById('timerRecent');if(recent&&item)recent.hidden=true;
+ if(saveBtn)saveBtn.textContent=item?'保存':'開始';
  const dialog=document.getElementById('timerDialog');dialog.showModal();
- const name=document.getElementById('timerName');try{name.focus({preventScroll:true});if(name.value)name.select()}catch{}
+ try{name?.focus({preventScroll:true});if(name?.value)name.select()}catch{}
 }
 
 document.addEventListener('click',e=>{
@@ -305,8 +316,8 @@ document.addEventListener('click',e=>{
  const recent=e.target.closest?.('[data-quest-recent]');if(recent){const input=document.getElementById('questName');if(input){input.value=recent.dataset.questRecent||recent.textContent||'';try{input.focus({preventScroll:true});input.select()}catch{input.focus()}}}
 });
 document.getElementById('addExpedition').onclick=()=>openTimer('expedition');document.getElementById('addDock').onclick=()=>openTimer('dock');document.getElementById('addQuest').onclick=openQuestDialog;
-document.getElementById('timerForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const name=document.getElementById('timerName').value.trim(),mins=Number(document.getElementById('timerMinutes').value);if(!name||!mins)return;const startedAt=Date.now(),target=timerKind==='expedition'?state.expeditions:state.docks,item={id:uid(),name,startedAt,durationMinutes:mins,endsAt:startedAt+mins*60000};timerLastSave(timerKind,name,mins);target.push(item);save();render();hdToastAction(`${name} を開始したよ`,'元に戻す',()=>{const i=target.findIndex(x=>String(x.id)===String(item.id));if(i>=0)target.splice(i,1);save();render();hdToast('元に戻したよ')},6500)});
-document.getElementById('questForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const name=document.getElementById('questName').value.trim();if(!name)return;if(state.quests.some(q=>!q.done&&String(q.name||'').trim()===name)){e.preventDefault();hdToast(`${name} は未完了で登録済みだよ`,'warn',2400);return}const item={id:uid(),name,done:false};questRecentSave(name);state.quests.push(item);save();renderQuests();hdToastAction(`${name} を追加したよ`,'元に戻す',()=>{const i=state.quests.findIndex(x=>String(x.id)===String(item.id));if(i>=0)state.quests.splice(i,1);save();renderQuests();hdToast('元に戻したよ')},6500)});
+document.getElementById('timerForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel'){timerEditId='';return}const name=document.getElementById('timerName').value.trim(),mins=Number(document.getElementById('timerMinutes').value);if(!name||!mins)return;const target=timerKind==='expedition'?state.expeditions:state.docks,editing=timerEditId?target.find(x=>String(x.id)===String(timerEditId)):null;if(editing){const before={...editing};const startedAt=Date.now();editing.name=name;editing.startedAt=startedAt;editing.durationMinutes=mins;editing.endsAt=startedAt+mins*60000;timerLastSave(timerKind,name,mins);timerEditId='';save();render();hdToastAction(`${name} を更新したよ`,'元に戻す',()=>{Object.assign(editing,before);save();render();hdToast('元に戻したよ')},6500);return}const startedAt=Date.now(),item={id:uid(),name,startedAt,durationMinutes:mins,endsAt:startedAt+mins*60000};timerLastSave(timerKind,name,mins);target.push(item);save();render();hdToastAction(`${name} を開始したよ`,'元に戻す',()=>{const i=target.findIndex(x=>String(x.id)===String(item.id));if(i>=0)target.splice(i,1);save();render();hdToast('元に戻したよ')},6500)});
+document.getElementById('questForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel'){questEditId='';return}const name=document.getElementById('questName').value.trim();if(!name)return;const editing=questEditId?state.quests.find(x=>String(x.id)===String(questEditId)):null;if(state.quests.some(q=>q!==editing&&!q.done&&String(q.name||'').trim()===name)){e.preventDefault();hdToast(`${name} は未完了で登録済みだよ`,'warn',2400);return}if(editing){const before=editing.name;editing.name=name;questRecentSave(name);questEditId='';save();renderQuests();hdToastAction(`${name} に変更したよ`,'元に戻す',()=>{editing.name=before;save();renderQuests();hdToast('元に戻したよ')},6500);return}const item={id:uid(),name,done:false};questRecentSave(name);state.quests.push(item);save();renderQuests();hdToastAction(`${name} を追加したよ`,'元に戻す',()=>{const i=state.quests.findIndex(x=>String(x.id)===String(item.id));if(i>=0)state.quests.splice(i,1);save();renderQuests();hdToast('元に戻したよ')},6500)});
 document.addEventListener('change',e=>{if(e.target.matches('[data-quest-check]')){const q=state.quests.find(x=>x.id===e.target.dataset.questCheck);if(q){q.done=e.target.checked;save();renderQuests()}}});
 document.getElementById('saveResources').onclick=()=>{['fuel','ammo','steel','bauxite'].forEach(k=>state.resources[k]=document.getElementById(k).value);state.resources.savedAt=Date.now();save();renderResources();hdToast('資源を保存したよ')};
 
