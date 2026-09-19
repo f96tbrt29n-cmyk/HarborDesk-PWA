@@ -4734,3 +4734,14 @@ test('mobile layout includes horizontal safe-area guards', async ({ page }) => {
   expect(css.workspace).toContain('safe-area-inset-left');
   expect(css.quick).toContain('safe-area-inset-left');
 });
+
+
+test('mobile dialogs keep action buttons reachable', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const css=await page.evaluate(()=>getComputedStyle(document.querySelector('dialog')||document.body));
+  const source=await page.evaluate(()=>fetch('./styles.css').then(r=>r.text()));
+  expect(source).toContain('mobile dialog keyboard UX');
+  expect(source).toContain('position:sticky');
+  expect(source).toContain('100dvh');
+});
