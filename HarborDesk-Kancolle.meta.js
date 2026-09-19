@@ -1,0 +1,17 @@
+// ==UserScript==
+// @name         HarborDesk 艦これ連携
+// @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
+// @version      1.0.0
+// @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
+// @match        http://*.dmm.com/*
+// @match        https://*.dmm.com/*
+// @match        http://*.dmm.co.jp/*
+// @match        https://*.dmm.co.jp/*
+// @include      /^https?:\/\/203\.104\.\d{1,3}\.\d{1,3}\//
+// @run-at       document-start
+// @inject-into  page
+// @weight       999
+// @grant        none
+// @downloadURL  https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/HarborDesk-Kancolle.user.js
+// @updateURL    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/HarborDesk-Kancolle.meta.js
+// ==/UserScript==
