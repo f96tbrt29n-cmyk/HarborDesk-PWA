@@ -25,3 +25,7 @@ body.hd-workspace-mode{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 @media(max-width:760px){
  body.hd-keyboard-open .hd-qn-fab{opacity:0;pointer-events:none;transform:translateY(12px)}
 }
+
+@supports(padding:max(0px)){
+ .hd-qn-dialog{max-width:calc(100vw - max(16px,env(safe-area-inset-left) + env(safe-area-inset-right) + 12px))}
+}
