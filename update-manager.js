@@ -77,6 +77,7 @@ function hdInitLoadedModules(){
   try{if(typeof hdSPMInstall==='function')hdSPMInstall();if(typeof hdSPMRender==='function')hdSPMRender()}catch{}
   try{if(typeof hdSSInstall==='function')hdSSInstall();if(typeof hdSSRender==='function')hdSSRender()}catch{}
   try{if(typeof hdSPAInstall==='function')hdSPAInstall();if(typeof hdSPARender==='function')hdSPARender()}catch{}
+  document.body?.classList.remove('hd-booting');document.body?.setAttribute('data-hd-ready','1');
   window.dispatchEvent(new CustomEvent('hd:modules-ready',{detail:{status:{...window.HD_MODULE_STATUS}}}));
 }
 async function hdLoadCurrentAssets(){
