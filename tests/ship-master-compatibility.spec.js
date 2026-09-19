@@ -3852,3 +3852,28 @@ test('guide empty search can reset conditions', async ({ page }) => {
   expect(await page.inputValue('#guideQuery')).toBe('');
   expect(await page.locator('#guideResults .guide-card').count()).toBeGreaterThan(0);
 });
+
+
+test('home timer cancel supports undo', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const now=Date.now();
+    state.expeditions=[{id:'ex1',name:'海上護衛',endsAt:now+3600000}];
+    state.docks=[];
+    save();render();renderHomeDashboard();
+    const btn=document.querySelector('[data-home-timer-cancel="ex1"]');
+    const before=state.expeditions.length;
+    btn?.click();
+    return {
+      before,
+      after:state.expeditions.length,
+      homeText:document.getElementById('homeTimers')?.textContent||'',
+      resourceSync:!!document.querySelector('[data-home-panel="resources"] [data-home-jump="kancolleImport"]')
+    };
+  });
+  expect(data.before).toBe(1);
+  expect(data.after).toBe(0);
+  expect(data.homeText).toContain('動いているタイマーはない');
+  expect(data.resourceSync).toBe(true);
+});
