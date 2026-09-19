@@ -66,6 +66,28 @@ function hdWSRestoreScroll(sectionId){
  const top=section.getBoundingClientRect().top+window.scrollY;window.scrollTo({top:Math.max(0,top+saved),behavior:'auto'});return true;
 }
 function hdWSEsc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function hdWSCanReturnGame(){try{return sessionStorage.getItem('harbordesk-kc-return-game-v1')==='1'}catch{return false}}
+function hdWSUpdateGameReturnAction(){
+ const btn=document.querySelector('[data-hd-header-game-return]');if(btn)btn.hidden=!hdWSCanReturnGame();
+}
+function hdWSReturnToGame(){
+ try{sessionStorage.removeItem('harbordesk-kc-return-game-v1')}catch{}
+ hdWSUpdateGameReturnAction();
+ const host=location.hostname;
+ try{history.back()}catch{}
+ setTimeout(()=>{if(location.hostname===host&&/github\.io$/.test(location.hostname))location.href='https://play.games.dmm.com/game/kancolle'},700);
+}
+function hdWSEnsureGameReturnAction(){
+ const menu=document.querySelector('.hd-header-more .hd-version-menu');if(!menu)return false;
+ let btn=menu.querySelector('[data-hd-header-game-return]');
+ if(!btn){
+  btn=document.createElement('button');btn.type='button';btn.className='ghost small hd-header-game-return';btn.dataset.hdHeaderGameReturn='1';
+  btn.innerHTML='<span aria-hidden="true">⚓</span><b>艦これへ戻る</b>';
+  btn.addEventListener('click',()=>{document.querySelector('.hd-header-more')?.removeAttribute('open');hdWSReturnToGame()});
+  menu.prepend(btn);
+ }
+ hdWSUpdateGameReturnAction();return true;
+}
 function hdWSJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}}
 function hdWSShouldShowSwipeHint(){
  if(window.matchMedia?.('(min-width:561px)')?.matches)return false;
@@ -209,7 +231,7 @@ function hdWSEnsureUI(){
  if(document.getElementById('hdWorkspaceNav'))return;
  const top=document.querySelector('.topbar');if(!top)return;
  const nav=document.createElement('div');nav.id='hdWorkspaceNav';nav.className='hd-ws-shell';nav.innerHTML=`<div class="hd-ws-primary" role="tablist" aria-label="HarborDeskカテゴリ">${HD_WS_GROUPS.map(g=>`<button type="button" role="tab" data-hd-ws-group="${g.key}"><span>${g.label}</span><em data-hd-ws-badge hidden>0</em></button>`).join('')}</div><div id="hdWorkspaceMobilePicker" class="hd-ws-mobile-picker" hidden><button type="button" class="ghost small hd-ws-back" data-hd-ws-back aria-label="ひとつ前の機能へ戻る" title="戻る">←</button><span id="hdWorkspaceContextGroup">ホーム</span><select id="hdWorkspaceSectionSelect" aria-label="カテゴリ内機能"></select><button type="button" class="ghost small" data-hd-ws-group-top>先頭</button></div><div id="hdWorkspaceSubtabs" class="hd-ws-secondary" role="tablist" aria-label="カテゴリ内機能"></div>`;
- top.insertAdjacentElement('afterend',nav);document.body.classList.add('hd-workspace-mode');hdWSEnsureSyncStatus();hdWSEnsureNetworkStatus();hdWSEnsureSwipeHint();hdWSUpdateTopbarHeight();hdWSUpdateBadges();hdWSUpdateSyncStatus();
+ top.insertAdjacentElement('afterend',nav);document.body.classList.add('hd-workspace-mode');hdWSEnsureSyncStatus();hdWSEnsureNetworkStatus();hdWSEnsureSwipeHint();hdWSEnsureGameReturnAction();hdWSUpdateTopbarHeight();hdWSUpdateBadges();hdWSUpdateSyncStatus();
 }
 function hdWSRenderSubtabs(group,selected){
  const host=document.getElementById('hdWorkspaceSubtabs'),picker=document.getElementById('hdWorkspaceMobilePicker'),select=document.getElementById('hdWorkspaceSectionSelect'),context=document.getElementById('hdWorkspaceContextGroup');if(!host)return;const rows=hdWSVisibleSections(group);
@@ -309,11 +331,13 @@ window.addEventListener('hashchange',()=>{const id=location.hash.slice(1);if(id)
 window.addEventListener('resize',hdWSUpdateTopbarHeight,{passive:true});
 window.addEventListener('storage',e=>{hdWSUpdateBadges();if(!e||e.key==='harbordesk-kancolle-sync-v1')hdWSUpdateSyncStatus()});
 window.addEventListener('hd:kancolle-sync',hdWSUpdateSyncStatus);
+window.addEventListener('hd:kancolle-return-ready',()=>{hdWSEnsureGameReturnAction();hdWSUpdateGameReturnAction()});
 window.addEventListener('online',hdWSUpdateNetworkStatus);
 window.addEventListener('offline',hdWSUpdateNetworkStatus);
-window.addEventListener('hd:modules-ready',()=>setTimeout(hdWSInstall,0));
+window.addEventListener('hd:modules-ready',()=>setTimeout(()=>{hdWSInstall();hdWSEnsureGameReturnAction();hdWSUpdateGameReturnAction()},0));
 window.addEventListener('hd:workspace-refresh',hdWSUpdateBadges);
-window.addEventListener('load',()=>setTimeout(hdWSInstall,900));
+window.addEventListener('load',()=>setTimeout(()=>{hdWSInstall();hdWSEnsureGameReturnAction();hdWSUpdateGameReturnAction()},900));
+window.addEventListener('pageshow',hdWSUpdateGameReturnAction);
 setInterval(hdWSUpdateBadges,10000);
 setInterval(hdWSUpdateSyncStatus,60000);
 setTimeout(hdWSInstall,1700);
