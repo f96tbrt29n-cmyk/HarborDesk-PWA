@@ -9287,6 +9287,7 @@ function hdRenderShipDatabase(){
   masterRows.sort((a,b)=>(a.sortno||99999)-(b.sortno||99999)||a.id-b.id);
  }
  const shown=masterRows.slice(0,80),masterHtml=shown.length?`<div class="hd-shipdb-master-group"><div class="hd-shipdb-master-group-head"><div><div class="eyebrow">OFFICIAL MASTER</div><strong>公式マスター参照</strong></div><span>${masterRows.length}件${masterRows.length>80?'・先頭80件表示':''}</span></div>${shown.map(hdShipDbMasterCardHtml).join('')}</div>`:'';
+ const reset=document.querySelector('[data-hd-shipdb-reset]'),dirty=!!q||hdShipDbType!=='すべて'||hdShipDbMissingOnly||!hdShipDbIncludeMaster||hdShipDbImageFilter!=='all';if(reset){reset.disabled=!dirty;reset.classList.toggle('is-active',dirty)}
  const count=document.getElementById('hdShipDbCount');if(count)count.textContent=(q||hdShipDbImageFilter!=='all')&&hdShipDbIncludeMaster?`詳細 ${rows.length} / マスター ${masterRows.length}`:`詳細 ${rows.length}隻`;
  list.innerHTML=(detailedHtml||masterHtml)?detailedHtml+masterHtml:'<div class="empty">条件に合う艦娘がいないよ</div>';
  if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(list);
