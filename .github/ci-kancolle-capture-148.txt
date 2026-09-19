@@ -1,0 +1,1 @@
+Verify HarborDesk passive KanColle capture and incremental sync
