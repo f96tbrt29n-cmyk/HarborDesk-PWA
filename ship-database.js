@@ -9315,6 +9315,7 @@ document.addEventListener('click',e=>{
 });
 window.addEventListener('hd:modules-ready',()=>setTimeout(()=>hdShipDbRefreshOwnedFits(document),0));
 window.addEventListener('storage',e=>{if(e.key==='harbordesk-equipment-v1')hdShipDbRefreshOwnedFits(document)});
+window.addEventListener('hd:equipment-changed',()=>hdShipDbRefreshOwnedFits(document));
 setTimeout(()=>hdShipDbRefreshOwnedFits(document),900);
 document.addEventListener('click',e=>{const jump=e.target.closest?.('[data-hd-shipdb-jump]');if(jump){hdShipDbJumpTo(jump.dataset.hdShipdbJump);return}});
 document.addEventListener('click',e=>{
