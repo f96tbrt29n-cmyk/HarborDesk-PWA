@@ -1,4 +1,5 @@
 const HD_KC_SYNC_KEY='harbordesk-kancolle-sync-v1';
+const HD_KC_USERSCRIPT_VERSION='1.0.6';
 const HD_KC_FLEETS_KEY='harbordesk-kancolle-fleets-v1';
 const HD_KC_MATERIALS_KEY='harbordesk-kancolle-materials-v1';
 const HD_KC_NODE_LABEL_SOURCE='KC3Kai edges.json @ 6b0534d291c27220da1b6fe454e91fc96a6a7b27';
@@ -30,7 +31,7 @@ function hdKcMasterEquipMap(){
  for(const [name,row] of Object.entries(rows))if(Number(row?.id)>0)map.set(Number(row.id),{id:Number(row.id),name,typeName:String(row.typeName||'')});
  return map;
 }
-function hdKcImportEmpty(){return {ships:new Map(),slotItems:new Map(),materials:new Map(),decks:new Map(),ndocks:new Map(),quests:new Map(),questPages:new Set(),questPageCount:0,sortieEvents:[],captureId:'',sources:new Set(),completeShips:false,completeSlotItems:false,completeDecks:false,completeNdocks:false,completeQuests:false}}
+function hdKcImportEmpty(){return {ships:new Map(),slotItems:new Map(),materials:new Map(),decks:new Map(),ndocks:new Map(),quests:new Map(),questPages:new Set(),questPageCount:0,sortieEvents:[],captureId:'',userscriptVersion:'',sources:new Set(),completeShips:false,completeSlotItems:false,completeDecks:false,completeNdocks:false,completeQuests:false}}
 function hdKcSortieEventData(h,data){
  if(/api_req_map\/(?:start|next)/.test(h))return {mapareaId:Number(data?.api_maparea_id)||0,mapinfoNo:Number(data?.api_mapinfo_no)||0,nodeNo:Number(data?.api_no)||0,colorNo:Number(data?.api_color_no)||0,eventId:Number(data?.api_event_id)||0,eventKind:Number(data?.api_event_kind)||0,bossCellNo:Number(data?.api_bosscell_no)||0};
  if(/api_req_(?:sortie|combined_battle)\/battleresult/.test(h))return {winRank:String(data?.api_win_rank||''),questName:String(data?.api_quest_name||''),dropShipId:Number(data?.api_get_ship?.api_ship_id)||0,dropShipName:String(data?.api_get_ship?.api_ship_name||'')};
@@ -80,6 +81,7 @@ function hdKcParseImport(raw){
   for(const [k,v] of Object.entries(root.endpoints))hdKcImportAdd(out,k,v);
  }else if(Array.isArray(root?.records)){
   out.captureId=String(root?.captureId||root?.createdAt||'');
+  out.userscriptVersion=String(root?.userscriptVersion||'');
   root.records.forEach((r,i)=>hdKcImportAdd(out,r?.endpoint||r?.path||'',r?.payload??r?.response??r?.data,{at:r?.at,index:i}));
  }else if(root&&typeof root==='object'&&!Array.isArray(root)&&!('api_result' in root)&&!('api_ship' in root)&&!('api_ship_data' in root)&&!('api_slot_item' in root)&&!('api_material' in root)&&!('api_ndock' in root)&&!('api_list' in root)){
   let matched=false;
@@ -110,7 +112,8 @@ function hdKcPreviewData(parsed){
   unknownEquip:unknownEquip.length,
   completeShips:!!parsed.completeShips,
   completeSlotItems:!!parsed.completeSlotItems,
-  sources:[...parsed.sources].filter(Boolean)
+  sources:[...parsed.sources].filter(Boolean),
+  userscriptVersion:String(parsed.userscriptVersion||'')
  };
 }
 function hdKcCoverageFromSources(sources=[],parsed=null){
@@ -415,9 +418,24 @@ function hdKcApplyImport(preview,opts={}){
  if(opts.quests!==false&&parsed.quests.size)result.quests=hdKcApplyQuests(parsed);
  if(opts.sorties!==false&&parsed.sortieEvents.length)result.sorties=hdKcApplySorties(parsed);
  const snapshot=hdKcStateSnapshot(),delta=hdKcSyncDelta(before,snapshot,parsed,opts,!!previous),coverage=hdKcCoverageFromSources(preview.sources,parsed);
- const sync={syncedAt:Date.now(),sources:preview.sources,coverage,ships:result.ships,equipment:result.equipment,materials:result.materials,decks:result.decks,expeditions:result.expeditions,docks:result.docks,quests:result.quests,sorties:result.sorties,unknownShips:preview.unknownShips,unknownEquip:preview.unknownEquip,snapshot,delta};
+ const sync={syncedAt:Date.now(),sources:preview.sources,userscriptVersion:String(preview.userscriptVersion||''),coverage,ships:result.ships,equipment:result.equipment,materials:result.materials,decks:result.decks,expeditions:result.expeditions,docks:result.docks,quests:result.quests,sorties:result.sorties,unknownShips:preview.unknownShips,unknownEquip:preview.unknownEquip,snapshot,delta};
  localStorage.setItem(HD_KC_SYNC_KEY,JSON.stringify(sync));window.dispatchEvent(new CustomEvent('hd:kancolle-sync',{detail:sync}));hdKcRenderCurrentFleets();
  return sync;
+}
+function hdKcVersionCompare(a,b){
+ const pa=String(a||'').split('.').map(x=>Number(x)||0),pb=String(b||'').split('.').map(x=>Number(x)||0),n=Math.max(pa.length,pb.length);
+ for(let i=0;i<n;i++){const d=(pa[i]||0)-(pb[i]||0);if(d)return d>0?1:-1}
+ return 0;
+}
+function hdKcRenderUserscriptStatus(sync){
+ const el=document.getElementById('hdKcUserscriptStatus');if(!el)return;
+ const v=String(sync?.userscriptVersion||'');
+ if(!sync){el.hidden=true;return}
+ el.hidden=false;
+ if(!v){el.className='hd-kc-userscript-status unknown';el.innerHTML='<span>Userscript</span><strong>バージョン不明</strong><small>次回同期すると確認できるよ。</small>';return}
+ const old=hdKcVersionCompare(v,HD_KC_USERSCRIPT_VERSION)<0;
+ el.className='hd-kc-userscript-status '+(old?'outdated':'current');
+ el.innerHTML=old?`<span>Userscript</span><strong>v${hdKcEsc(v)} → v${HD_KC_USERSCRIPT_VERSION}</strong><small>連携スクリプトの更新があります。</small><a class="ghost small" href="./HarborDesk-Kancolle.user.js" target="_blank" rel="noopener">更新する</a>`:`<span>Userscript</span><strong>v${hdKcEsc(v)} 最新</strong><small>連携スクリプトは最新だよ。</small>`;
 }
 function hdKcSyncStatus(){
  try{return JSON.parse(localStorage.getItem(HD_KC_SYNC_KEY)||'null')}catch{return null}
@@ -446,6 +464,7 @@ function hdKcRenderSyncStatus(){
   else{const r=hdKcNextCaptureHint(s);recommendation.hidden=false;recommendation.className='hd-kc-sync-recommendation '+r.state;recommendation.innerHTML=`<span>次のおすすめ</span><strong>${hdKcEsc(r.title)}</strong><small>${hdKcEsc(r.detail)}</small>`;}
  }
  const back=document.querySelector('[data-hd-kc-return-game]');if(back)back.hidden=sessionStorage.getItem('harbordesk-kc-return-game-v1')!=='1';
+ hdKcRenderUserscriptStatus(s);
  const next=document.getElementById('hdKcNextActions');if(next)next.hidden=!s;
 }
 function hdKcCaptureBootstrap(){
@@ -557,7 +576,7 @@ function hdKcEnsureImport(){
  const sec=document.createElement('section');sec.id='kancolleImport';sec.className='advanced-section';sec.innerHTML=`
  <div class="section-head"><div><div class="eyebrow">GAME DATA IMPORT</div><h2>艦これゲーム内データ取込</h2></div><span class="muted">端末内処理</span></div>
  <div class="hd-kc-import card">
-  <div class="hd-kc-sync-overview"><div><span>連携状態</span><strong id="hdKcSyncHeadline">確認中…</strong></div><div class="hd-kc-sync-side"><div id="hdKcSyncLast" class="muted"></div><button type="button" class="ghost small" data-hd-kc-return-game hidden>艦これへ戻る</button></div></div><div id="hdKcSyncDelta" class="hd-kc-sync-delta"></div><div id="hdKcSyncCoverage" class="hd-kc-sync-coverage"></div><div id="hdKcSyncRecommendation" class="hd-kc-sync-recommendation" hidden></div><div id="hdKcNextActions" class="hd-kc-next-actions" hidden><span>次に見る</span><div><button type="button" class="ghost small" data-hd-kc-jump="roster">艦隊</button><button type="button" class="ghost small" data-hd-kc-jump="equipmentBook">装備</button><button type="button" class="ghost small" data-hd-kc-jump="quests">任務</button><button type="button" class="ghost small" data-hd-kc-jump="sortieLog">出撃記録</button></div></div>
+  <div class="hd-kc-sync-overview"><div><span>連携状態</span><strong id="hdKcSyncHeadline">確認中…</strong></div><div class="hd-kc-sync-side"><div id="hdKcSyncLast" class="muted"></div><button type="button" class="ghost small" data-hd-kc-return-game hidden>艦これへ戻る</button></div></div><div id="hdKcSyncDelta" class="hd-kc-sync-delta"></div><div id="hdKcSyncCoverage" class="hd-kc-sync-coverage"></div><div id="hdKcSyncRecommendation" class="hd-kc-sync-recommendation" hidden></div><div id="hdKcUserscriptStatus" class="hd-kc-userscript-status" hidden></div><div id="hdKcNextActions" class="hd-kc-next-actions" hidden><span>次に見る</span><div><button type="button" class="ghost small" data-hd-kc-jump="roster">艦隊</button><button type="button" class="ghost small" data-hd-kc-jump="equipmentBook">装備</button><button type="button" class="ghost small" data-hd-kc-jump="quests">任務</button><button type="button" class="ghost small" data-hd-kc-jump="sortieLog">出撃記録</button></div></div>
   <div id="hdKcImportResult" class="hd-kc-import-result muted" aria-live="polite"></div>
   <details class="hd-kc-capture-guide" data-hd-kc-auto-guide open><summary>Userscripts 自動連携</summary><div><p>艦これを開くだけで対応APIを自動取得。ゲーム画面の「HarborDeskへ送る」でそのまま同期できるよ。</p><div class="hd-kc-import-actions"><a class="primary" href="./HarborDesk-Kancolle.user.js" target="_blank" rel="noopener">Userscripts版を確認・更新</a></div><ol><li>Userscriptsを有効にする</li><li>艦これを開き直す</li><li>母港・装備・任務などを一度開く</li><li>「HarborDeskへ送る」を押す</li></ol><small>リクエスト本文・api_token・Cookie・DMMログイン情報は保存しない。</small></div></details>
   <details class="hd-kc-capture-guide"><summary>その他の取込方法</summary><div>
