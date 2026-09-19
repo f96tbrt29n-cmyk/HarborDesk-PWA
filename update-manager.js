@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.163';
-const HD_APP_BUILD=163;
+const HD_APP_VERSION='1.0.164';
+const HD_APP_BUILD=164;
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
 
