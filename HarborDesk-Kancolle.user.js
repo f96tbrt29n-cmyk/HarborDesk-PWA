@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HarborDesk 艦これ連携
 // @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
-// @version      1.0.3
+// @version      1.0.4
 // @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
 // @match        http://*.dmm.com/*
 // @match        https://*.dmm.com/*
@@ -21,7 +21,7 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.3';
+const HD_VERSION='1.0.4';
 const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/';
 const RECORD_MESSAGE='harbordesk-kancolle-frame-record-v1';
 const STATUS_MESSAGE='harbordesk-kancolle-frame-status-v1';
@@ -42,24 +42,44 @@ function minimize(path,obj){
   if(!obj||typeof obj!=='object')return null;
   const data=obj.api_data;
   const base={api_result:Number(obj.api_result)||1,api_result_msg:String(obj.api_result_msg||'成功')};
+  const ship=x=>x&&typeof x==='object'?{
+    api_id:Number(x.api_id)||0,api_ship_id:Number(x.api_ship_id)||0,api_lv:Number(x.api_lv)||0,
+    api_nowhp:Number(x.api_nowhp)||0,api_maxhp:Number(x.api_maxhp)||0,api_cond:Number(x.api_cond)||0,
+    api_locked:Number(x.api_locked)||0,api_sally_area:Number(x.api_sally_area)||0,
+    api_slot:Array.isArray(x.api_slot)?x.api_slot.map(Number):[],api_slot_ex:Number(x.api_slot_ex)||0
+  }:null;
+  const deck=x=>x&&typeof x==='object'?{
+    api_id:Number(x.api_id)||0,api_name:String(x.api_name||''),
+    api_mission:Array.isArray(x.api_mission)?x.api_mission.slice(0,4).map(Number):[],
+    api_ship:Array.isArray(x.api_ship)?x.api_ship.map(Number):[]
+  }:null;
+  const ndock=x=>x&&typeof x==='object'?{
+    api_id:Number(x.api_id)||0,api_state:Number(x.api_state)||0,api_ship_id:Number(x.api_ship_id)||0,
+    api_complete_time:Number(x.api_complete_time)||0
+  }:null;
+  const material=x=>x&&typeof x==='object'?{api_id:Number(x.api_id)||0,api_value:Number(x.api_value)||0}:null;
+  const slot=x=>x&&typeof x==='object'?{
+    api_id:Number(x.api_id)||0,api_slotitem_id:Number(x.api_slotitem_id)||0,
+    api_level:Number(x.api_level)||0,api_alv:Number(x.api_alv)||0
+  }:null;
   if(/\/api_port\/port$/.test(path)){
     base.api_data={
-      api_ship:Array.isArray(data?.api_ship)?data.api_ship:[],
-      api_deck_port:Array.isArray(data?.api_deck_port)?data.api_deck_port:[],
-      api_ndock:Array.isArray(data?.api_ndock)?data.api_ndock:[],
-      api_material:Array.isArray(data?.api_material)?data.api_material:[]
+      api_ship:(Array.isArray(data?.api_ship)?data.api_ship:[]).map(ship).filter(Boolean),
+      api_deck_port:(Array.isArray(data?.api_deck_port)?data.api_deck_port:[]).map(deck).filter(Boolean),
+      api_ndock:(Array.isArray(data?.api_ndock)?data.api_ndock:[]).map(ndock).filter(Boolean),
+      api_material:(Array.isArray(data?.api_material)?data.api_material:[]).map(material).filter(Boolean)
     };return base;
   }
   if(/\/api_get_member\/ship2$/.test(path)){
     base.api_data={
-      api_ship_data:Array.isArray(data?.api_ship_data)?data.api_ship_data:(Array.isArray(data)?data:[]),
-      api_deck_data:Array.isArray(data?.api_deck_data)?data.api_deck_data:[]
+      api_ship_data:(Array.isArray(data?.api_ship_data)?data.api_ship_data:(Array.isArray(data)?data:[])).map(ship).filter(Boolean),
+      api_deck_data:(Array.isArray(data?.api_deck_data)?data.api_deck_data:[]).map(deck).filter(Boolean)
     };return base;
   }
-  if(/\/api_get_member\/slot_item$/.test(path)){base.api_data=Array.isArray(data)?data:[];return base}
-  if(/\/api_get_member\/require_info$/.test(path)){base.api_data={api_slot_item:Array.isArray(data?.api_slot_item)?data.api_slot_item:[]};return base}
-  if(/\/api_get_member\/material$/.test(path)){base.api_data=Array.isArray(data)?data:[];return base}
-  if(/\/api_get_member\/ndock$/.test(path)){base.api_data=Array.isArray(data)?data:[];return base}
+  if(/\/api_get_member\/slot_item$/.test(path)){base.api_data=(Array.isArray(data)?data:[]).map(slot).filter(Boolean);return base}
+  if(/\/api_get_member\/require_info$/.test(path)){base.api_data={api_slot_item:(Array.isArray(data?.api_slot_item)?data.api_slot_item:[]).map(slot).filter(Boolean)};return base}
+  if(/\/api_get_member\/material$/.test(path)){base.api_data=(Array.isArray(data)?data:[]).map(material).filter(Boolean);return base}
+  if(/\/api_get_member\/ndock$/.test(path)){base.api_data=(Array.isArray(data)?data:[]).map(ndock).filter(Boolean);return base}
   if(/\/api_get_member\/questlist$/.test(path)){
     const rows=(Array.isArray(data?.api_list)?data.api_list:[])
       .filter(q=>q&&typeof q==='object'&&Number(q.api_no)>0)
@@ -195,7 +215,7 @@ function ensurePanel(){
   panel=document.createElement('div');
   panel.id='hd-kc-userscript-panel';
   panel.style.cssText='position:fixed;z-index:2147483647;right:8px;bottom:8px;width:min(350px,calc(100vw - 16px));padding:10px;border:1px solid #5f7892;border-radius:12px;background:#071521;color:#eef6ff;font:12px/1.45 -apple-system,BlinkMacSystemFont,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.45)';
-  panel.innerHTML='<div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>HarborDesk 艦これ連携</b><button data-hd-hide style="background:none;border:0;color:#9eb7cb;font-size:18px">×</button></div>'+
+  panel.innerHTML='<div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>HarborDesk 艦これ連携 <small style="color:#7f9aae">v'+HD_VERSION+'</small></b><button data-hd-hide style="background:none;border:0;color:#9eb7cb;font-size:18px">×</button></div>'+
     '<div style="margin:6px 0;color:#aac0d1"><b data-hd-status style="color:#9fe0b7">通信待機中</b><br>取得 <b data-hd-count>0</b>件 / 検出フレーム <b data-hd-frames>0</b><br><small>母港・装備・任務などを開くと自動で取得するよ。</small></div>'+
     '<div style="display:flex;gap:6px;flex-wrap:wrap"><button data-hd-send style="font-weight:700">HarborDeskへ送る</button><button data-hd-copy>JSONをコピー</button><button data-hd-clear>クリア</button></div>'+
     '<div style="margin-top:7px;color:#7f9aae"><small>api_token・Cookie・DMMログイン情報・リクエスト本文は保存しません。</small></div>';
@@ -236,9 +256,22 @@ async function send(){
     return;
   }
   try{
-    if(statusEl)statusEl.textContent='HarborDeskへ移動中';
-    window.name='HARBORDESK_KC_IMPORT_V1:'+JSON.stringify(exportObject());
-    location.href=HARBOR_URL+'#kancolleImport';
+    if(statusEl)statusEl.textContent='データ準備中';
+    const payload='HARBORDESK_KC_IMPORT_V1:'+JSON.stringify(exportObject());
+    window.name=payload;
+    if(statusEl)statusEl.textContent='保存OK → HarborDeskへ移動';
+    const a=document.createElement('a');
+    a.href=HARBOR_URL+'#kancolleImport';
+    a.target='_self';
+    a.rel='noreferrer';
+    a.style.display='none';
+    document.documentElement.appendChild(a);
+    a.click();
+    setTimeout(()=>{
+      if(location.hostname.includes('dmm.')||location.hostname.includes('games.dmm')){
+        try{window.top.location.assign(HARBOR_URL+'#kancolleImport')}catch{}
+      }
+    },250);
   }catch(err){
     if(statusEl)statusEl.textContent='送信失敗';
     alert('HarborDeskへの受け渡しに失敗したよ: '+String(err&&err.message||err));
