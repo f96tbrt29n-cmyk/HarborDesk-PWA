@@ -96,9 +96,9 @@ document.addEventListener('click',e=>{
   if(edit&&selectedMap){const item=(loadCustomFleets()[selectedMap]||[]).find(x=>x.id===edit.dataset.cfEdit);if(item)openCustomFleetDialog(item);return}
   const del=e.target.closest('[data-cf-delete]');
   if(del&&selectedMap){
-    const all=loadCustomFleets();
-    all[selectedMap]=(all[selectedMap]||[]).filter(x=>x.id!==del.dataset.cfDelete);
-    saveCustomFleets(all);renderCustomFleets(selectedMap);
+    const map=selectedMap,all=loadCustomFleets(),list=all[map]||[],i=list.findIndex(x=>x.id===del.dataset.cfDelete);if(i<0)return;
+    const [item]=list.splice(i,1);all[map]=list;saveCustomFleets(all);renderCustomFleets(map);
+    window.hdToastAction?.(`${item.name||'自分用編成'} を削除したよ`,'元に戻す',()=>{const current=loadCustomFleets(),rows=current[map]||[];if(!rows.some(x=>x.id===item.id)){rows.splice(Math.min(i,rows.length),0,item);current[map]=rows;saveCustomFleets(current);if(selectedMap===map)renderCustomFleets(map);window.hdToast?.('元に戻したよ')}});
   }
 });
 
