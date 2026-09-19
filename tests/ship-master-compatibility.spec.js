@@ -2595,6 +2595,7 @@ test('Safari capture helper sends data directly to HarborDesk', async ({ page })
     return {
       shortcutStartsWithFunction: shortcut.startsWith('('),
       shortcutHasJavascriptPrefix: shortcut.startsWith('javascript:'),
+      shortcutHasCompletion: shortcut.includes("completion('HarborDeskキャプチャを開始したよ')"),
       bookmarkletPrefix: bookmarklet.startsWith('javascript:'),
       sent,
       recordCount,
@@ -2615,6 +2616,7 @@ test('Safari capture helper sends data directly to HarborDesk', async ({ page })
 
   expect(data.shortcutStartsWithFunction).toBe(true);
   expect(data.shortcutHasJavascriptPrefix).toBe(false);
+  expect(data.shortcutHasCompletion).toBe(true);
   expect(data.bookmarkletPrefix).toBe(true);
   expect(data.sent).toBe(true);
   expect(data.recordCount).toBe(1);
