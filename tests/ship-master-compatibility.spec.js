@@ -2557,3 +2557,79 @@ test('Sortie analytics highlights risk trends and route differences', async ({ p
   });
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('Safari capture helper sends data directly to HarborDesk', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    const posted = [];
+    const originalOpen = window.open;
+    window.open = () => ({
+      postMessage(message, origin){
+        posted.push({message, origin});
+      }
+    });
+
+    const shortcut = window.hdKcCaptureShortcutScript?.() || '';
+    const bookmarklet = window.hdKcCaptureBookmarklet?.() || '';
+
+    window.hdKcCaptureBootstrap?.();
+    const cap = window.__HD_KC_CAPTURE;
+    cap?.capture(
+      '/kcsapi/api_get_member/material?api_token=SECRET',
+      'svdata=' + JSON.stringify({
+        api_result:1,
+        api_data:[{api_id:1,api_value:7654}]
+      })
+    );
+    const sent = cap?.send?.() || false;
+    await new Promise(r => setTimeout(r, 450));
+
+    const panelText = document.getElementById('hd-kc-capture-panel')?.textContent || '';
+    const recordCount = cap?.records?.length || 0;
+    cap?.restore?.();
+    window.open = originalOpen;
+
+    return {
+      shortcutStartsWithFunction: shortcut.startsWith('('),
+      shortcutHasJavascriptPrefix: shortcut.startsWith('javascript:'),
+      bookmarkletPrefix: bookmarklet.startsWith('javascript:'),
+      sent,
+      recordCount,
+      panelHasDirectSend: panelText.includes('HarborDeskへ送る'),
+      posted: posted.map(x => ({
+        origin:x.origin,
+        type:x.message?.type,
+        format:x.message?.payload?.format,
+        endpoint:x.message?.payload?.records?.[0]?.endpoint || '',
+        material:x.message?.payload?.records?.[0]?.payload?.api_data?.[0]?.api_value || 0
+      })),
+      ui:{
+        shortcutButton:!!document.querySelector('[data-hd-kc-copy-shortcut]'),
+        guideText:document.querySelector('.hd-kc-capture-guide')?.textContent || ''
+      }
+    };
+  });
+
+  expect(data.shortcutStartsWithFunction).toBe(true);
+  expect(data.shortcutHasJavascriptPrefix).toBe(false);
+  expect(data.bookmarkletPrefix).toBe(true);
+  expect(data.sent).toBe(true);
+  expect(data.recordCount).toBe(1);
+  expect(data.panelHasDirectSend).toBe(true);
+  expect(data.posted.length).toBeGreaterThan(0);
+  expect(data.posted[0]).toEqual({
+    origin:'https://f96tbrt29n-cmyk.github.io',
+    type:'harbordesk-kancolle-import',
+    format:'harbordesk-kancolle-import',
+    endpoint:'/kcsapi/api_get_member/material',
+    material:7654
+  });
+  expect(data.ui.shortcutButton).toBe(true);
+  expect(data.ui.guideText).toContain('共有 → HarborDeskキャプチャ');
+  expect(data.ui.guideText).toContain('クリップボード貼り付けは不要');
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
