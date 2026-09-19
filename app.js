@@ -121,6 +121,9 @@ function renderGuide(){
 }
 
 document.addEventListener('click',e=>{
+ const filter=e.target.closest('[data-core-filter-kind]');if(filter){const kind=filter.dataset.coreFilterKind,value=filter.dataset.coreFilter;coreListFilterSave(kind,value);kind==='quest'?renderQuests():renderTimers(kind);return}
+ const showAll=e.target.closest('[data-core-filter-show-all]');if(showAll){const kind=showAll.dataset.coreFilterShowAll;coreListFilterSave(kind,'all');kind==='quest'?renderQuests():renderTimers(kind);return}
+
  const world=e.target.closest('[data-world]');if(world){selectedWorld=world.dataset.world;selectedMap='';renderMapPicker();return}
  const map=e.target.closest('[data-map]');if(map){selectedMap=map.dataset.map;selectedWorld=selectedMap.split('-')[0];renderMapPicker();document.getElementById('selectedMapCard').scrollIntoView({behavior:'smooth',block:'center'});return}
  const gf=e.target.closest('[data-guide-filter]');if(gf){guideFilter=gf.dataset.guideFilter;renderGuide();return}
@@ -133,8 +136,40 @@ document.addEventListener('click',e=>{
 document.getElementById('guideQuery').addEventListener('input',renderGuide);
 document.getElementById('guideSearchBtn').onclick=renderGuide;
 
-function renderTimers(kind){const arr=kind==='expedition'?state.expeditions:state.docks;const el=document.getElementById(kind==='expedition'?'expeditionList':'dockList');if(!arr.length){const label=kind==='expedition'?'遠征':'入渠';el.innerHTML=`<div class="empty empty-action"><strong>${label}タイマーはまだないよ</strong><p>必要になったらここからすぐ追加できるよ。</p><button type="button" class="primary small" data-empty-add-timer="${kind}">＋ ${label}タイマーを追加</button></div>`;return}const now=Date.now();el.innerHTML=arr.sort((a,b)=>a.endsAt-b.endsAt).map(t=>`<div class="timer ${t.endsAt<=now?'done':''}"><div class="timer-main"><div class="timer-name">${esc(t.name)}</div><div class="timer-time" data-end="${t.endsAt}">${fmt(t.endsAt-now)}</div></div><button class="icon-btn" data-delete-timer="${t.id}" data-kind="${kind}">×</button></div>`).join('')}
-function renderQuests(){const el=document.getElementById('questList');if(!state.quests.length){el.innerHTML='<div class="empty empty-action"><strong>任務はまだないよ</strong><p>手動で残したい任務をここから追加できるよ。</p><button type="button" class="primary small" data-empty-add-quest>＋ 任務を追加</button></div>';return}el.innerHTML=state.quests.map(q=>`<div class="quest"><input type="checkbox" data-quest-check="${q.id}" ${q.done?'checked':''}><div class="quest-main"><div class="quest-name" style="${q.done?'text-decoration:line-through;opacity:.6':''}">${esc(q.name)}</div></div><button class="icon-btn" data-delete-quest="${q.id}">×</button></div>`).join('')}
+const CORE_LIST_FILTER_KEY='harbordesk-core-list-filters-v1';
+function coreListFiltersLoad(){try{const v=JSON.parse(localStorage.getItem(CORE_LIST_FILTER_KEY)||'{}')||{};return {expedition:v.expedition||'active',dock:v.dock||'active',quest:v.quest||'active'}}catch{return {expedition:'active',dock:'active',quest:'active'}}}
+let coreListFilters=coreListFiltersLoad();
+function coreListFilterSave(kind,value){
+ if(!['expedition','dock','quest'].includes(kind)||!['active','all','done'].includes(value))return;
+ coreListFilters={...coreListFilters,[kind]:value};try{localStorage.setItem(CORE_LIST_FILTER_KEY,JSON.stringify(coreListFilters))}catch{}
+}
+function coreListFilterRender(kind,shown,total){
+ const bar=document.querySelector(`[data-core-filter-bar="${kind}"]`);if(!bar)return;
+ bar.querySelectorAll('[data-core-filter]').forEach(b=>b.classList.toggle('active',b.dataset.coreFilter===coreListFilters[kind]));
+ const count=document.getElementById(kind==='expedition'?'expeditionFilterCount':kind==='dock'?'dockFilterCount':'questFilterCount');
+ if(count)count.textContent=shown===total?`${total}件`:`${shown} / ${total}件`;
+}
+function coreFilteredEmpty(kind,label){
+ const mode=coreListFilters[kind],text=mode==='done'?'完了済み':kind==='quest'?'未完了':'稼働中';
+ return `<div class="empty empty-action"><strong>${label}の${text}はないよ</strong><p>保存済みの項目は「すべて」で確認できるよ。</p><button type="button" class="ghost small" data-core-filter-show-all="${kind}">すべて表示</button></div>`;
+}
+function renderTimers(kind){
+ const arr=kind==='expedition'?state.expeditions:state.docks,el=document.getElementById(kind==='expedition'?'expeditionList':'dockList'),label=kind==='expedition'?'遠征':'入渠';
+ if(!arr.length){coreListFilterRender(kind,0,0);el.innerHTML=`<div class="empty empty-action"><strong>${label}タイマーはまだないよ</strong><p>必要になったらここからすぐ追加できるよ。</p><button type="button" class="primary small" data-empty-add-timer="${kind}">＋ ${label}タイマーを追加</button></div>`;return}
+ const now=Date.now(),mode=coreListFilters[kind]||'active';
+ const rows=[...arr].filter(t=>mode==='all'||(mode==='active'?Number(t.endsAt)>now:Number(t.endsAt)<=now)).sort((a,b)=>a.endsAt-b.endsAt);
+ coreListFilterRender(kind,rows.length,arr.length);
+ if(!rows.length){el.innerHTML=coreFilteredEmpty(kind,label+'タイマー');return}
+ el.innerHTML=rows.map(t=>`<div class="timer ${t.endsAt<=now?'done':''}"><div class="timer-main"><div class="timer-name">${esc(t.name)}</div><div class="timer-time" data-end="${t.endsAt}">${fmt(t.endsAt-now)}</div></div><button class="icon-btn" data-delete-timer="${t.id}" data-kind="${kind}">×</button></div>`).join('');
+}
+function renderQuests(){
+ const el=document.getElementById('questList');
+ if(!state.quests.length){coreListFilterRender('quest',0,0);el.innerHTML='<div class="empty empty-action"><strong>任務はまだないよ</strong><p>手動で残したい任務をここから追加できるよ。</p><button type="button" class="primary small" data-empty-add-quest>＋ 任務を追加</button></div>';return}
+ const mode=coreListFilters.quest||'active',rows=state.quests.filter(q=>mode==='all'||(mode==='active'?!q.done:!!q.done));
+ coreListFilterRender('quest',rows.length,state.quests.length);
+ if(!rows.length){el.innerHTML=coreFilteredEmpty('quest','任務');return}
+ el.innerHTML=rows.map(q=>`<div class="quest"><input type="checkbox" data-quest-check="${q.id}" ${q.done?'checked':''}><div class="quest-main"><div class="quest-name" style="${q.done?'text-decoration:line-through;opacity:.6':''}">${esc(q.name)}</div></div><button class="icon-btn" data-delete-quest="${q.id}">×</button></div>`).join('');
+}
 function renderResources(){['fuel','ammo','steel','bauxite'].forEach(k=>document.getElementById(k).value=state.resources[k]??'');document.getElementById('resourceSaved').textContent=state.resources.savedAt?`最終保存: ${new Date(state.resources.savedAt).toLocaleString('ja-JP')}`:''}
 function render(){renderGuide();renderTimers('expedition');renderTimers('dock');renderQuests();renderResources()}
 function openTimer(kind){timerKind=kind;document.getElementById('timerDialogTitle').textContent=kind==='expedition'?'遠征タイマー追加':'入渠タイマー追加';document.getElementById('timerName').value='';document.getElementById('timerMinutes').value='30';document.getElementById('timerDialog').showModal()}
