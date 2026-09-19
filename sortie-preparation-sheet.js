@@ -10,7 +10,17 @@ function hdSPSFleet(map){
  return fleets.find(x=>x.id===id)||fleets[0];
 }
 function hdSPSRosterMatch(name){return typeof hdSortieRosterMatch==='function'?hdSortieRosterMatch(name):null}
+function hdSPSRosterMatchShip(row){
+ const id=Number(row?.masterId)||0,name=String(row?.ship||'').trim();
+ if(id&&typeof rosterLoad==='function'){const hit=rosterLoad().find(x=>Number(x.masterId)===id);if(hit)return hit}
+ return name?hdSPSRosterMatch(name):null;
+}
 function hdSPSDb(name){return typeof hdSortieDb==='function'?hdSortieDb(name):null}
+function hdSPSDbShip(row){
+ const name=String(row?.ship||'').trim(),id=Number(row?.masterId)||0;
+ if(typeof hdShipDbResolveShip==='function'&&name)return hdShipDbResolveShip({name,masterId:id});
+ return name?hdSPSDb(name):null;
+}
 function hdSPSPlan(map){
  const p=typeof MAP_PLANS!=='undefined'?MAP_PLANS[map]:null;
  return p?.presets?.[0]||null;
@@ -32,7 +42,7 @@ function hdSPSFleetInfo(map){
  const fleet=hdSPSFleet(map);
  if(!fleet)return {fleet:null,ships:[],registered:0,gearChecks:[],manual:[],manualState:{},manualDone:0,manualTotal:0};
  const ships=(fleet.ships||[]).filter(x=>String(x.ship||'').trim()||String(x.gear||'').trim());
- const registered=ships.filter(x=>x.ship&&hdSPSRosterMatch(x.ship)).length;
+ const registered=ships.filter(x=>x.ship&&hdSPSRosterMatchShip(x)).length;
  let auto={checks:[],adv:{}};
  try{if(typeof hdSortieAutoChecks==='function')auto=hdSortieAutoChecks(map,fleet)}catch{}
  let manual=[];
@@ -50,8 +60,8 @@ function hdSPSFleetHtml(map,info){
    <button type="button" class="primary small" data-hd-sps-tab="mine">自分用編成を作る</button></section>`;
  }
  const rows=info.ships.map((s,i)=>{
-  const roster=s.ship?hdSPSRosterMatch(s.ship):null,db=s.ship?hdSPSDb(s.ship):null;
-  const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(s.ship,'sortie-prep-thumb'):'';
+  const roster=s.ship?hdSPSRosterMatchShip(s):null,db=s.ship?hdSPSDbShip(s):null;
+  const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(Number(s.masterId)>0?{id:Number(s.masterId),name:s.ship}:s.ship,'sortie-prep-thumb'):'';
   return `<div class="hd-sps-ship ${s.ship&&roster?'ok':s.ship?'warn':'note'}"><span>${i+1}</span>${image}<div><strong>${hdSPSEsc(s.ship||'艦娘未入力')}</strong><small>${roster?`Lv.${hdSPSEsc(roster.level||'?')}${roster.remodel?` ・ ${hdSPSEsc(roster.remodel)}`:''}`:'艦隊台帳に未登録'}${db?.speed?` ・ ${hdSPSEsc(db.speed)}`:''}</small><em>${hdSPSEsc(s.gear||'装備メモなし')}</em></div></div>`;
  }).join('');
  const fleetState=info.ships.length&&info.registered===info.ships.length?'ok':info.ships.length?'warn':'bad';
