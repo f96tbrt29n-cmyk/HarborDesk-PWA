@@ -375,6 +375,7 @@ function hdKcRenderSyncStatus(){
   }
  }
  const back=document.querySelector('[data-hd-kc-return-game]');if(back)back.hidden=sessionStorage.getItem('harbordesk-kc-return-game-v1')!=='1';
+ const next=document.getElementById('hdKcNextActions');if(next)next.hidden=!s;
 }
 function hdKcCaptureBootstrap(){
  if(window.__HD_KC_CAPTURE?.show){window.__HD_KC_CAPTURE.show();return}
@@ -485,7 +486,7 @@ function hdKcEnsureImport(){
  const sec=document.createElement('section');sec.id='kancolleImport';sec.className='advanced-section';sec.innerHTML=`
  <div class="section-head"><div><div class="eyebrow">GAME DATA IMPORT</div><h2>艦これゲーム内データ取込</h2></div><span class="muted">端末内処理</span></div>
  <div class="hd-kc-import card">
-  <div class="hd-kc-sync-overview"><div><span>連携状態</span><strong id="hdKcSyncHeadline">確認中…</strong></div><div class="hd-kc-sync-side"><div id="hdKcSyncLast" class="muted"></div><button type="button" class="ghost small" data-hd-kc-return-game hidden>艦これへ戻る</button></div></div><div id="hdKcSyncCoverage" class="hd-kc-sync-coverage"></div>
+  <div class="hd-kc-sync-overview"><div><span>連携状態</span><strong id="hdKcSyncHeadline">確認中…</strong></div><div class="hd-kc-sync-side"><div id="hdKcSyncLast" class="muted"></div><button type="button" class="ghost small" data-hd-kc-return-game hidden>艦これへ戻る</button></div></div><div id="hdKcSyncCoverage" class="hd-kc-sync-coverage"></div><div id="hdKcNextActions" class="hd-kc-next-actions" hidden><span>次に見る</span><div><button type="button" class="ghost small" data-hd-kc-jump="roster">艦隊</button><button type="button" class="ghost small" data-hd-kc-jump="equipmentBook">装備</button><button type="button" class="ghost small" data-hd-kc-jump="quests">任務</button><button type="button" class="ghost small" data-hd-kc-jump="sortieLog">出撃記録</button></div></div>
   <div id="hdKcImportResult" class="hd-kc-import-result muted" aria-live="polite"></div>
   <details class="hd-kc-capture-guide" data-hd-kc-auto-guide open><summary>Userscripts 自動連携</summary><div><p>艦これを開くだけで対応APIを自動取得。ゲーム画面の「HarborDeskへ送る」でそのまま同期できるよ。</p><div class="hd-kc-import-actions"><a class="primary" href="./HarborDesk-Kancolle.user.js" target="_blank" rel="noopener">Userscripts版を確認・更新</a></div><ol><li>Userscriptsを有効にする</li><li>艦これを開き直す</li><li>母港・装備・任務などを一度開く</li><li>「HarborDeskへ送る」を押す</li></ol><small>リクエスト本文・api_token・Cookie・DMMログイン情報は保存しない。</small></div></details>
   <details class="hd-kc-capture-guide"><summary>その他の取込方法</summary><div>
@@ -508,6 +509,7 @@ async function hdKcReadAndPreview(raw){
  const p=hdKcPreviewData(hdKcParseImport(raw));HD_KC_IMPORT_PREVIEW=p;const el=document.getElementById('hdKcImportPreview');if(el)el.innerHTML=hdKcPreviewHtml(p);const btn=document.querySelector('[data-hd-kc-apply]');if(btn)btn.disabled=false;return p;
 }
 document.addEventListener('click',async e=>{
+ const jump=e.target.closest?.('[data-hd-kc-jump]');if(jump){const id=jump.dataset.hdKcJump;if(typeof hdQNRecordRecent==='function')hdQNRecordRecent(id);if(typeof hdWSShowElement==='function')hdWSShowElement(id,true);else document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});return}
  if(e.target.closest?.('[data-hd-kc-return-game]')){
   sessionStorage.removeItem('harbordesk-kc-return-game-v1');
   const here=location.href;
