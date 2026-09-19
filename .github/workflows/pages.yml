@@ -109,6 +109,9 @@ jobs:
           console.log('OK runtime JS/CSS graph');
           NODE
 
+      - name: Validate Kancolle master semantics
+        run: node scripts/validate-kancolle-master.mjs
+
       - name: Install browser test runtime
         run: |
           npm install --no-save --no-package-lock @playwright/test@1.55.0
