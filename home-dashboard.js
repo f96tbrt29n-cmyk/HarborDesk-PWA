@@ -127,6 +127,7 @@ function homeCurrentFleetId(rows=homeCurrentFleetRows()){
 function homeCurrentFleetSave(id){try{localStorage.setItem(HD_HOME_FLEET_KEY,String(Number(id)||0))}catch{}}
 function homeCurrentFleetGearVisible(){try{return localStorage.getItem(HD_HOME_FLEET_GEAR_KEY)==='1'}catch{return false}}
 function homeCurrentFleetGearSave(show){try{localStorage.setItem(HD_HOME_FLEET_GEAR_KEY,show?'1':'0')}catch{}}
+function homeSelectedMap(){try{return typeof selectedMap!=='undefined'?String(selectedMap||'').trim():''}catch{return ''}}
 function homeOpenFleetShip(name){
  const ship=String(name||'').trim();if(!ship)return false;
  if(typeof hdKcOpenShipFromFleet==='function')return hdKcOpenShipFromFleet(ship);
@@ -242,7 +243,7 @@ function renderHomeDashboard(){
    const selectedId=homeCurrentFleetId(fleetRows),deck=fleetRows.find(x=>Number(x.deckId)===selectedId)||fleetRows[0],mission=Array.isArray(deck?.mission)?deck.mission:[],away=Number(mission[0])>0,ships=Array.isArray(deck.ships)?deck.ships:[];
    const hp25=ships.filter(s=>Number(s.maxHp)>0&&Number(s.nowHp)/Number(s.maxHp)<=.25).length,hp50=ships.filter(s=>Number(s.maxHp)>0&&Number(s.nowHp)/Number(s.maxHp)<=.5&&Number(s.nowHp)/Number(s.maxHp)>.25).length;
    const hpAlert=hp25?`・HP25%以下 ${hp25}隻`:hp50?`・HP50%以下 ${hp50}隻`:'',showGear=homeCurrentFleetGearVisible();
-   fleetHost.innerHTML=`<div class="home-fleet-tabs">${fleetRows.map(x=>`<button type="button" class="${Number(x.deckId)===Number(deck.deckId)?'active':''}" data-home-fleet-tab="${Number(x.deckId)}">第${Number(x.deckId)}艦隊</button>`).join('')}</div><div class="home-fleet-meta"><div><strong>${homeEsc(deck.name||('第'+deck.deckId+'艦隊'))}</strong><small class="${hp25?'danger':hp50?'warn':''}">${ships.length}隻${away?'・遠征中':''}${hpAlert}</small></div><div class="home-fleet-meta-actions"><button type="button" class="ghost small" data-home-fleet-gear-toggle aria-pressed="${showGear?'true':'false'}">${showGear?'装備を隠す':'装備を表示'}</button><button type="button" class="ghost small" data-home-jump="roster">艦隊台帳</button></div></div><div class="home-fleet-ships ${showGear?'show-gear':''}">${ships.map((s,i)=>{const max=Number(s.maxHp)||0,now=Number(s.nowHp)||0,ratio=max>0?now/max:1,cls=max>0?(ratio<=.25?'danger':ratio<=.5?'warn':''):'',hp=max>0?`・HP ${now}/${max}`:'',gear=String(s.gear||'').trim();return `<button type="button" class="${cls}" data-home-fleet-ship="${homeEsc(s.name||'')}" title="${homeEsc(gear)}"><span>${i+1}</span><div><b>${homeEsc(s.name||'未解決')}</b><small>Lv.${Number(s.level)||0}${hp}</small>${showGear?`<em>${homeEsc(gear||'装備データなし')}</em>`:''}</div><i aria-hidden="true">›</i></button>`}).join('')||'<div class="home-empty">艦娘データなし</div>'}</div>`;
+   fleetHost.innerHTML=`<div class="home-fleet-tabs">${fleetRows.map(x=>`<button type="button" class="${Number(x.deckId)===Number(deck.deckId)?'active':''}" data-home-fleet-tab="${Number(x.deckId)}">第${Number(x.deckId)}艦隊</button>`).join('')}</div><div class="home-fleet-meta"><div><strong>${homeEsc(deck.name||('第'+deck.deckId+'艦隊'))}</strong><small class="${hp25?'danger':hp50?'warn':''}">${ships.length}隻${away?'・遠征中':''}${hpAlert}</small></div><div class="home-fleet-meta-actions">${homeSelectedMap()?`<button type="button" class="primary small" data-home-fleet-copy="${Number(deck.deckId)}">${homeEsc(homeSelectedMap())}へコピー</button>`:'<button type="button" class="ghost small" data-home-jump="guide">海域を選ぶ</button>'}<button type="button" class="ghost small" data-home-fleet-gear-toggle aria-pressed="${showGear?'true':'false'}">${showGear?'装備を隠す':'装備を表示'}</button><button type="button" class="ghost small" data-home-jump="roster">艦隊台帳</button></div></div><div class="home-fleet-ships ${showGear?'show-gear':''}">${ships.map((s,i)=>{const max=Number(s.maxHp)||0,now=Number(s.nowHp)||0,ratio=max>0?now/max:1,cls=max>0?(ratio<=.25?'danger':ratio<=.5?'warn':''):'',hp=max>0?`・HP ${now}/${max}`:'',gear=String(s.gear||'').trim();return `<button type="button" class="${cls}" data-home-fleet-ship="${homeEsc(s.name||'')}" title="${homeEsc(gear)}"><span>${i+1}</span><div><b>${homeEsc(s.name||'未解決')}</b><small>Lv.${Number(s.level)||0}${hp}</small>${showGear?`<em>${homeEsc(gear||'装備データなし')}</em>`:''}</div><i aria-hidden="true">›</i></button>`}).join('')||'<div class="home-empty">艦娘データなし</div>'}</div>`;
   }
  }
  const res=[['燃料',resources.fuel],['弾薬',resources.ammo],['鋼材',resources.steel],['ボーキ',resources.bauxite]];
@@ -270,6 +271,17 @@ function renderHomeDashboard(){
 document.addEventListener('click',e=>{
  const fleetTab=e.target.closest('[data-home-fleet-tab]');if(fleetTab){homeCurrentFleetSave(fleetTab.dataset.homeFleetTab);renderHomeDashboard();return}
  const fleetGear=e.target.closest('[data-home-fleet-gear-toggle]');if(fleetGear){homeCurrentFleetGearSave(!homeCurrentFleetGearVisible());renderHomeDashboard();return}
+ const fleetCopy=e.target.closest('[data-home-fleet-copy]');if(fleetCopy){
+  const map=homeSelectedMap();if(!map){if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);return}
+  try{
+   if(typeof hdKcCopyFleetToCustom!=='function')throw new Error('艦隊コピー機能がまだ読み込まれていない');
+   const row=hdKcCopyFleetToCustom(fleetCopy.dataset.homeFleetCopy,map);
+   if(typeof hdToast==='function')hdToast(`${row.name} を ${map} へコピーしたよ`,'success',2200);
+   if(typeof hdQNRecordRecent==='function')hdQNRecordRecent('guide');
+   if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);else document.getElementById('guide')?.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(err){if(typeof hdToast==='function')hdToast('コピーできなかった: '+String(err?.message||err),'warn',2600)}
+  return;
+ }
  const fleetShip=e.target.closest('[data-home-fleet-ship]');if(fleetShip){homeOpenFleetShip(fleetShip.dataset.homeFleetShip);return}
  const edit=e.target.closest('[data-home-edit-toggle]');if(edit){homeSetEditing(!document.getElementById('home')?.classList.contains('home-editing'));return}
  const dismissInstall=e.target.closest('[data-home-install-dismiss]');if(dismissInstall){try{localStorage.setItem(HOME_INSTALL_TIP_KEY,'1')}catch{};const tip=document.getElementById('homeInstallTip');if(tip)tip.hidden=true;return}
