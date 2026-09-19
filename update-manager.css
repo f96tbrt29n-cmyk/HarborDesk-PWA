@@ -95,3 +95,13 @@
   font-size:10px;
  }
 }
+
+@media(max-width:560px){
+ .hd-update-banner{
+  bottom:calc(118px + env(safe-area-inset-bottom));
+  left:max(8px,env(safe-area-inset-left));
+  right:max(8px,env(safe-area-inset-right));
+  max-height:calc(100dvh - 150px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow:auto
+ }
+}
