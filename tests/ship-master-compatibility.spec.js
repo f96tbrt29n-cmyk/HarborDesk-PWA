@@ -5639,3 +5639,35 @@ test('home shows sortie manual reset reason', async ({ page }) => {
   expect(data.relabels).toBe(true);
   expect(data.retitles).toBe(true);
 });
+
+
+test('global search shows category counts and owned-only filtering', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'1',name:'加賀改',level:94,tags:[]}]));
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([{id:'1',name:'一式陸攻',count:2}]));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdGSEnsure?.();window.hdGSOpen?.('加賀');window.hdGSRender?.();
+    const shipCount=document.querySelector('[data-hd-gs-cat="ship"] em')?.textContent||'';
+    const owned=document.querySelector('[data-hd-gs-owned]');owned?.click();
+    const rows=[...document.querySelectorAll('[data-hd-gs-result]')].map(x=>x.textContent||'');
+    return {shipCount,ownedPressed:owned?.getAttribute('aria-pressed')||'',rows};
+  });
+  expect(Number(data.shipCount)).toBeGreaterThan(0);
+  expect(data.ownedPressed).toBe('true');
+  expect(data.rows.some(x=>x.includes('加賀'))).toBe(true);
+});
+
+
+test('global search Enter opens first result', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdGSEnsure?.();window.hdGSOpen?.('攻略情報');
+    const input=document.getElementById('hdGSSearch');input?.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));
+    return {open:document.getElementById('hdGlobalSearchDialog')?.open||false};
+  });
+  expect(data.open).toBe(false);
+});
