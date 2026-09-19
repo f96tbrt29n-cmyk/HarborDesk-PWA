@@ -2781,3 +2781,50 @@ test('roster count follows search result', async ({ page }) => {
   expect(data.before).toBe('3隻');
   expect(data.after).toBe('1 / 3隻');
 });
+
+
+test('session view state restores roster equipment and ship database filters', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-roster-view-v1', JSON.stringify({query:'加賀',filter:'主力'}));
+    sessionStorage.setItem('harbordesk-session-equip-catalog-view-v1', JSON.stringify({query:'電探',filter:'小型水上電探'}));
+    sessionStorage.setItem('harbordesk-session-shipdb-view-v1', JSON.stringify({query:'榛名',type:'高速戦艦',missingOnly:true,includeMaster:false,imageFilter:'all'}));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdEnsureEquipmentCatalog?.();
+    window.hdEnsureShipDatabase?.();
+    return {
+      rosterQuery:document.getElementById('shipRosterSearch')?.value||'',
+      rosterFilter:document.querySelector('[data-roster-filter].active')?.dataset.rosterFilter||'',
+      equipQuery:document.getElementById('hdEquipCatalogSearch')?.value||'',
+      equipFilter:document.querySelector('[data-hd-equip-filter].active')?.dataset.hdEquipFilter||'',
+      shipQuery:document.getElementById('hdShipDbSearch')?.value||'',
+      shipType:document.querySelector('[data-hd-shipdb-filter].active')?.dataset.hdShipdbFilter||'',
+      shipMissing:!!document.getElementById('hdShipDbMissingOnly')?.checked,
+      shipMaster:!!document.getElementById('hdShipDbIncludeMaster')?.checked
+    };
+  });
+  expect(data.rosterQuery).toBe('加賀');
+  expect(data.rosterFilter).toBe('主力');
+  expect(data.equipQuery).toBe('電探');
+  expect(data.equipFilter).toBe('小型水上電探');
+  expect(data.shipQuery).toBe('榛名');
+  expect(data.shipType).toBe('高速戦艦');
+  expect(data.shipMissing).toBe(true);
+  expect(data.shipMaster).toBe(false);
+});
+
+
+test('workspace remembers per-section scroll offset', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    sessionStorage.setItem('harbordesk-session-workspace-scroll-v1', JSON.stringify({roster:420}));
+    const saved=window.hdWSScrollLoad?.()||{};
+    return {saved:saved.roster,hasSave:typeof window.hdWSSaveCurrentScroll==='function',hasRestore:typeof window.hdWSRestoreScroll==='function'};
+  });
+  expect(data.saved).toBe(420);
+  expect(data.hasSave).toBe(true);
+  expect(data.hasRestore).toBe(true);
+});
