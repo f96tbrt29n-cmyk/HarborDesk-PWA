@@ -10222,5 +10222,31 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         ]
       }
     ]
+  ,
+  "changes": {
+    "baseline": true,
+    "from": null,
+    "to": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
+    "at": "2026-09-19T02:50:00.000Z",
+    "ships": {
+      "added": [],
+      "removed": [],
+      "changed": []
+    },
+    "equipment": {
+      "added": [],
+      "removed": [],
+      "changed": []
+    },
+    "exslot": {
+      "changed": false,
+      "itemRulesChanged": 0,
+      "limitShipsChanged": 0
+    },
+    "picker": {
+      "changed": false,
+      "slotRulesChanged": 0,
+      "overrideChanged": 0
+    }
   }
 };
