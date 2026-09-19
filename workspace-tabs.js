@@ -77,7 +77,8 @@ function hdWSEnsureSyncStatus(){
  const top=document.querySelector('.topbar');if(!top)return;
  const btn=document.createElement('button');btn.id='hdGlobalSyncStatus';btn.type='button';btn.className='hd-global-sync-status';btn.innerHTML='<span>同期</span><b>確認中</b>';
  btn.addEventListener('click',()=>{if(typeof hdWSShowElement==='function'&&hdWSShowElement('kancolleImport',true))return;document.getElementById('kancolleImport')?.scrollIntoView({behavior:'smooth',block:'start'})});
- const notify=top.querySelector('#notifyBtn');notify?top.insertBefore(btn,notify):top.appendChild(btn);
+ const anchor=top.querySelector('.hd-header-more')||top.querySelector('#notifyBtn');
+ if(anchor&&anchor.parentElement===top)top.insertBefore(btn,anchor);else top.appendChild(btn);
  hdWSUpdateSyncStatus();
 }
 function hdWSUpdateSyncStatus(){
