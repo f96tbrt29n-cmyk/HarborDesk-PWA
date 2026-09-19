@@ -4012,3 +4012,26 @@ test('timer dialog offers recent timer presets', async ({ page }) => {
   expect(data.name).toBe('海上護衛任務');
   expect(data.minutes).toBe('90');
 });
+
+
+test('home can start a recent expedition in one tap', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-timer-recent-v1', JSON.stringify({
+      expedition:[{name:'東京急行',minutes:165},{name:'海上護衛任務',minutes:90}]
+    }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    renderHomeDashboard();
+    const buttons=[...document.querySelectorAll('[data-home-timer-start]')].map(x=>x.textContent);
+    document.querySelector('[data-home-timer-start="0"]')?.click();
+    return {
+      buttons,
+      timers:state.expeditions.map(x=>({name:x.name,durationMinutes:x.durationMinutes,active:x.endsAt>Date.now()}))
+    };
+  });
+  expect(data.buttons.length).toBeGreaterThan(0);
+  expect(data.timers).toHaveLength(1);
+  expect(data.timers[0]).toEqual(expect.objectContaining({name:'東京急行',durationMinutes:165,active:true}));
+});
