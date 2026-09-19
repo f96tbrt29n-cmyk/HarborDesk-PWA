@@ -4301,3 +4301,26 @@ test('active filter summaries describe current list conditions', async ({ page }
   expect(data.equip).toContain('カテゴリ: 小型水上電探');
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
+
+
+test('global search history supports individual undoable removal', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-global-search-history-v1', JSON.stringify(['矢矧','6-5','東海']));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdGSEnsure?.();window.hdGSRender?.();
+    return {
+      items:document.querySelectorAll('[data-hd-gs-history]').length,
+      removes:document.querySelectorAll('[data-hd-gs-history-remove]').length,
+      removeFn:String(window.hdGSRemoveHistory||''),
+      clearFn:String(window.hdGSClearHistory||'')
+    };
+  });
+  expect(data.items).toBe(3);
+  expect(data.removes).toBe(3);
+  expect(data.removeFn).toContain('元に戻す');
+  expect(data.clearFn).toContain('元に戻す');
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
