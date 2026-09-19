@@ -4342,3 +4342,41 @@ test('mobile dialog actions stay reachable', async ({ page }) => {
   expect(data.dialogMax).not.toBe('none');
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
+
+
+test('Kancolle sync stores and renders deltas', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({syncedAt:Date.now()-60000,ships:0,equipment:0,materials:8,decks:0}));
+    localStorage.setItem('harbordesk-kancolle-materials-v1', JSON.stringify({fuel:1000,ammo:2000,steel:3000,bauxite:4000,bucket:50,devMaterial:20,screw:10,syncedAt:Date.now()-60000}));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const parsed={
+      ships:new Map(),slotItems:new Map(),materials:new Map([
+        [1,{api_id:1,api_value:1120}],[2,{api_id:2,api_value:1950}],[3,{api_id:3,api_value:3000}],[4,{api_id:4,api_value:4100}],
+        [6,{api_id:6,api_value:52}],[7,{api_id:7,api_value:20}],[8,{api_id:8,api_value:9}]
+      ]),
+      decks:new Map(),ndocks:new Map(),quests:new Map(),sortieEvents:[],completeShips:false,completeSlotItems:false,completeDecks:false,completeQuests:false,captureId:'delta-test'
+    };
+    const sync=window.hdKcApplyImport({parsed,sources:['test'],unknownShips:0,unknownEquip:0},{ships:true,equipment:true,resources:true,fleets:true,timers:true,quests:true,sorties:true});
+    window.hdKcEnsureImport?.();window.hdKcRenderSyncStatus?.();
+    return {
+      fuel:sync.delta?.resources?.fuel,
+      ammo:sync.delta?.resources?.ammo,
+      bauxite:sync.delta?.resources?.bauxite,
+      bucket:sync.delta?.resources?.bucket,
+      screw:sync.delta?.resources?.screw,
+      baseline:sync.delta?.baseline,
+      html:document.getElementById('hdKcSyncDelta')?.textContent||''
+    };
+  });
+  expect(data.baseline).toBe(true);
+  expect(data.fuel).toBe(120);
+  expect(data.ammo).toBe(-50);
+  expect(data.bauxite).toBe(100);
+  expect(data.bucket).toBe(2);
+  expect(data.screw).toBe(-1);
+  expect(data.html).toContain('燃料 +120');
+  expect(data.html).toContain('弾薬 -50');
+});
