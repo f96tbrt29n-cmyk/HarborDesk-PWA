@@ -1,7 +1,7 @@
 {
   "version": "1.0.231",
   "build": 231,
-  "releasedAt": "2026-09-20T00:52:00+09:00",
-  "notes": "Userscripts連携の使い勝手修正。現在のgzip/URLフラグメント方式でHarborDeskへ同期した場合も『艦これへ戻る』を確実に表示し、艦これ→HarborDesk→艦これの往復を1タップで行えるよう修正。",
+  "releasedAt": "2026-09-20T00:36:00+09:00",
+  "notes": "モバイルUI改善。iPhoneの上部ヘッダーを1行化し、HarborDesk・ゲーム同期状態・メニューだけを常時表示。補助ラベルを隠して縦幅を削減し、カテゴリナビと本文の表示領域を広げた。",
   "masterChanges": null
 }
