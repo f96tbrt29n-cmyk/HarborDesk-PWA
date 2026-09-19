@@ -51,3 +51,8 @@
 .hd-header-settings{display:inline-flex;align-items:center;gap:5px}
 .hd-header-settings span{font-size:13px}
 .hd-header-settings b{font-size:10px}
+
+.hd-header-search{display:inline-flex;align-items:center;gap:5px}
+.hd-header-search span{font-size:15px}
+.hd-header-search b{font-size:10px}
+@media(min-width:561px){.hd-header-search{display:none}}
