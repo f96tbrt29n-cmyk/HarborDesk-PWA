@@ -196,3 +196,7 @@ button.home-next-main{cursor:pointer}
 .home-fleet-issues button.danger small{color:#ffb1b1;font-weight:800}
 .home-fleet-issues button:active{transform:scale(.988)}
 @media(max-width:520px){.home-fleet-issues button{min-height:42px}}
+
+.home-next-action.sortie{border-color:rgba(240,185,90,.46);background:linear-gradient(135deg,rgba(240,185,90,.1),rgba(10,30,47,.92))}
+.home-next-action.sortie .home-next-main>span{color:#f1cb80}
+.home-next-action.sortie .home-next-main>strong{color:#fff1c9}
