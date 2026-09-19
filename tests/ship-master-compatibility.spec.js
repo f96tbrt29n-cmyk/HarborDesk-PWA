@@ -2837,12 +2837,14 @@ test('quick nav exposes one-tap mobile actions', async ({ page }) => {
     window.hdQNEnsure?.();
     return {
       home:!!document.querySelector('[data-hd-qn-home]'),
+      search:!!document.querySelector('#hdQuickNavDialog [data-hd-gs-open]'),
       sync:!!document.querySelector('[data-hd-qn-sync]'),
       game:document.querySelector('.hd-qn-actions a')?.getAttribute('href')||'',
       top:!!document.querySelector('[data-hd-qn-top]')
     };
   });
   expect(data.home).toBe(true);
+  expect(data.search).toBe(true);
   expect(data.sync).toBe(true);
   expect(data.game).toContain('play.games.dmm.com/game/kancolle');
   expect(data.top).toBe(true);
@@ -3435,4 +3437,23 @@ test('home shows recently used functions from quick nav history', async ({ page 
   });
   expect(data.map(x=>x.id)).toEqual(expect.arrayContaining(['roster','equipmentBook','quests']));
   expect(data.length).toBeLessThanOrEqual(4);
+});
+
+
+test('global search history can be cleared', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-global-search-history-v1', JSON.stringify(['加賀','6-5','東海']));
+  });
+  await boot(page,errors);
+  await page.evaluate(()=>{window.hdGSEnsure?.();window.hdGSOpen?.('')});
+  await expect(page.locator('[data-hd-gs-history-clear]')).toHaveCount(1);
+  await expect(page.locator('[data-hd-gs-history]')).toHaveCount(3);
+  await page.locator('[data-hd-gs-history-clear]').click();
+  const data=await page.evaluate(()=>({
+    history:JSON.parse(localStorage.getItem('harbordesk-global-search-history-v1')||'[]'),
+    clear:!!document.querySelector('[data-hd-gs-history-clear]')
+  }));
+  expect(data.history).toEqual([]);
+  expect(data.clear).toBe(false);
 });
