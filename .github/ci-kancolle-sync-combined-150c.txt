@@ -1,0 +1,1 @@
+Verify HarborDesk 1.0.150 with deterministic external-network isolation
