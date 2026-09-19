@@ -25,7 +25,7 @@ function ensureAdvancedSections(){
     <article class="tool-card"><h3>遠征効率計算</h3><div class="calc-grid"><label>時間(分)<input id="effMinutes" type="number" min="1" value="30"></label><label>燃料<input id="effFuel" type="number" min="0" value="0"></label><label>弾薬<input id="effAmmo" type="number" min="0" value="0"></label><label>鋼材<input id="effSteel" type="number" min="0" value="0"></label><label>ボーキ<input id="effBauxite" type="number" min="0" value="0"></label></div><div id="effResult" class="tool-result"></div></article>
    </div>
  </section>
- <section id="backup" class="advanced-section"><div class="section-head"><div><div class="eyebrow">DATA</div><h2>バックアップ / 復元</h2></div><span class="muted">HarborDeskデータ</span></div><div class="backup-actions"><button id="exportBackup" class="primary">バックアップを書き出す</button><label class="ghost backup-file">バックアップを読み込む<input id="importBackup" type="file" accept="application/json,.json"></label></div><p class="muted">艦隊台帳、自分用編成、装備、イベント、資源履歴、任務、タイマーなどHarborDeskの端末内データをJSONで保存・復元できる。</p></section>`;
+ <section id="backup" class="advanced-section"><div class="section-head"><div><div class="eyebrow">DATA</div><h2>バックアップ / 復元</h2></div><span class="muted">HarborDeskデータ</span></div><div class="backup-actions"><button id="exportBackup" class="primary">バックアップを書き出す</button><label class="ghost backup-file">バックアップを読み込む<input id="importBackup" type="file" accept="application/json,.json"></label></div><p class="muted">艦隊台帳、自分用編成、装備、イベント、資源履歴、任務、タイマーなどHarborDeskの端末内データをJSONで保存・復元できる。<b>艦娘画像は容量が大きいため別バックアップ</b>。艦娘DBの「艦娘画像」から書き出してね。</p></section>`;
  main.insertBefore(wrap,resources);
  ensureAdvancedDialogs();
  renderAllAdvanced();
