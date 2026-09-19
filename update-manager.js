@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.264';
-const HD_APP_BUILD=264;
+const HD_APP_VERSION='1.0.265';
+const HD_APP_BUILD=265;
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
 
