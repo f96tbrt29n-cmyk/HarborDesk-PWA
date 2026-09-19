@@ -1,0 +1,1 @@
+Verify HarborDesk KanColle expedition and repair timer sync
