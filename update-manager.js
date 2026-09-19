@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.118';
-const HD_APP_BUILD=118;
+const HD_APP_VERSION='1.0.119';
+const HD_APP_BUILD=119;
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
 
@@ -140,20 +140,51 @@ async function hdLoadCurrentAssets(){
 function hdEnsureUpdateUI(){
   if(document.getElementById('hdUpdateBanner'))return;
   const banner=document.createElement('div');banner.id='hdUpdateBanner';banner.className='hd-update-banner';banner.hidden=true;
-  banner.innerHTML=`<div><strong>HarborDeskの最新版があります</strong><div id="hdUpdateText" class="muted"></div></div><button id="hdUpdateNow" class="primary small">今すぐ更新</button>`;
+  banner.innerHTML=`<div class="hd-update-main"><strong>HarborDeskの最新版があります</strong><div id="hdUpdateText" class="muted"></div><div id="hdUpdateChanges" class="hd-update-changes" hidden></div></div><button id="hdUpdateNow" class="primary small">今すぐ更新</button>`;
   document.body.appendChild(banner);
   const header=document.querySelector('.topbar');
   if(header&&!document.getElementById('hdUpdateCheck')){const controls=document.createElement('div');controls.className='hd-version-controls';controls.innerHTML=`<span class="hd-version-badge">v${HD_APP_VERSION}</span><button id="hdUpdateCheck" class="ghost small">更新確認</button>`;header.appendChild(controls)}
   document.getElementById('hdUpdateNow')?.addEventListener('click',hdForceUpdate);
   document.getElementById('hdUpdateCheck')?.addEventListener('click',()=>hdCheckForUpdate(true));
 }
+function hdUpdateEsc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function hdUpdateMasterChangeView(changes){
+ if(!changes||changes.baseline)return null;
+ const ships=changes.ships||{},eq=changes.equipment||{},ex=changes.exslot||{},picker=changes.picker||{};
+ const shipCount=(ships.added?.length||0)+(ships.removed?.length||0)+(ships.changed?.length||0);
+ const eqCount=(eq.added?.length||0)+(eq.removed?.length||0)+(eq.changed?.length||0);
+ const parts=[];
+ if(shipCount)parts.push(`艦娘 ${shipCount}件`);
+ if(eq.added?.length)parts.push(`新装備 ${eq.added.length}件`);
+ const eqOther=(eq.removed?.length||0)+(eq.changed?.length||0);if(eqOther)parts.push(`装備変更 ${eqOther}件`);
+ const exCount=(ex.itemRulesChanged||0)+(ex.limitShipsChanged||0);if(exCount)parts.push(`増設ルール ${exCount}件`);
+ if(picker.changed)parts.push('装備位置制限変更');
+ const examples=[
+  ...(ships.added||[]).map(x=>`艦追加: ${x}`),
+  ...(ships.changed||[]).map(x=>`艦変更: ${x}`),
+  ...(ships.removed||[]).map(x=>`艦削除: ${x}`),
+  ...(eq.added||[]).map(x=>`装備追加: ${x}`),
+  ...(eq.changed||[]).map(x=>`装備変更: ${x}`),
+  ...(eq.removed||[]).map(x=>`装備削除: ${x}`)
+ ].slice(0,8);
+ if(!parts.length&&!examples.length)return null;
+ return {summary:parts.join(' / '),examples};
+}
 async function hdCheckForUpdate(showResult=false){
   hdEnsureUpdateUI();const btn=document.getElementById('hdUpdateCheck');
   try{
     if(btn){btn.disabled=true;btn.textContent='確認中…'}
-    const latest=await hdFetchLatestVersion(),newer=Number(latest.build||0)>HD_APP_BUILD,banner=document.getElementById('hdUpdateBanner'),text=document.getElementById('hdUpdateText');
-    if(newer){if(text)text.textContent=`v${HD_APP_VERSION} → v${latest.version}${latest.notes?`｜${latest.notes}`:''}`;if(banner)banner.hidden=false}
-    else{if(banner)banner.hidden=true;if(showResult)alert(`HarborDesk v${HD_APP_VERSION} は最新版だよ`)}
+    const latest=await hdFetchLatestVersion(),newer=Number(latest.build||0)>HD_APP_BUILD,banner=document.getElementById('hdUpdateBanner'),text=document.getElementById('hdUpdateText'),changes=document.getElementById('hdUpdateChanges');
+    if(newer){
+      if(text)text.textContent=`v${HD_APP_VERSION} → v${latest.version}${latest.notes?`｜${latest.notes}`:''}`;
+      const master=hdUpdateMasterChangeView(latest.masterChanges);
+      if(changes){
+        if(master){changes.hidden=false;changes.innerHTML=`<b>艦これデータ更新</b><span>${hdUpdateEsc(master.summary)}</span>${master.examples.length?`<small>${master.examples.map(hdUpdateEsc).join(' / ')}</small>`:''}`}
+        else{changes.hidden=true;changes.innerHTML=''}
+      }
+      if(banner)banner.hidden=false
+    }
+    else{if(banner)banner.hidden=true;if(changes){changes.hidden=true;changes.innerHTML=''}if(showResult)alert(`HarborDesk v${HD_APP_VERSION} は最新版だよ`)}
   }catch{if(showResult)alert('更新情報を確認できなかったよ。通信状態を確認してもう一度試してね。')}
   finally{if(btn){btn.disabled=false;btn.textContent='更新確認'}}
 }
