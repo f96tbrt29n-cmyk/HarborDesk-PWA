@@ -100,3 +100,4 @@ document.addEventListener('click',e=>{
 window.addEventListener('storage',e=>{
   if(e.key===HD_OWNED_EQUIP_KEY&&typeof hdRenderMapEquipmentRecommendations==='function')hdRenderMapEquipmentRecommendations();
 });
+window.addEventListener('hd:equipment-changed',()=>{if(typeof hdRenderMapEquipmentRecommendations==='function')hdRenderMapEquipmentRecommendations()});
