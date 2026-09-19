@@ -6139,3 +6139,27 @@ test('forced update return restores workspace location', async ({ page }) => {
   expect(data.markerGone).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('update banner can be snoozed for the session', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdEnsureUpdateUI?.();
+    const banner=document.getElementById('hdUpdateBanner');
+    if(banner)banner.hidden=false;
+    const hasLater=!!document.getElementById('hdUpdateLater');
+    const ok=window.hdSnoozeUpdate?.(60000);
+    const hidden=!!banner?.hidden;
+    const snoozed=window.hdUpdateSnoozed?.();
+    window.hdClearUpdateSnooze?.();
+    const cleared=window.hdUpdateSnoozed?.()===false;
+    return {hasLater,ok:!!ok,hidden,snoozed:!!snoozed,cleared};
+  });
+  expect(data.hasLater).toBe(true);
+  expect(data.ok).toBe(true);
+  expect(data.hidden).toBe(true);
+  expect(data.snoozed).toBe(true);
+  expect(data.cleared).toBe(true);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
