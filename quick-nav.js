@@ -33,9 +33,10 @@ function hdQNOpen(){
   hdQNEnsure();const d=document.getElementById('hdQuickNavDialog');if(!d)return;
   const input=document.getElementById('hdQNSearch');if(input)input.value='';hdQNRenderList('');
   if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');
+  hdQNUpdateMobileDock();
   setTimeout(()=>input?.focus(),50);
 }
-function hdQNClose(){const d=document.getElementById('hdQuickNavDialog');if(!d)return;if(typeof d.close==='function'&&d.open)d.close();else d.removeAttribute('open')}
+function hdQNClose(){const d=document.getElementById('hdQuickNavDialog');if(!d)return;if(typeof d.close==='function'&&d.open)d.close();else d.removeAttribute('open');hdQNUpdateMobileDock()}
 function hdQNJump(id){
  const target=document.getElementById(id);if(!target)return false;
  hdQNRecordRecent(id);hdQNClose();
@@ -81,8 +82,11 @@ function hdQNMobileHome(){
 }
 function hdQNUpdateMobileDock(){
  const dock=document.getElementById('hdMobileDock');if(!dock)return;
- const home=dock.querySelector('[data-hd-mobile-home]'),sync=dock.querySelector('[data-hd-mobile-sync]'),badge=dock.querySelector('[data-hd-mobile-home-badge]'),activeGroup=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'';
- home?.classList.toggle('active',activeGroup==='home');
+ const home=dock.querySelector('[data-hd-mobile-home]'),search=dock.querySelector('[data-hd-mobile-search]'),sync=dock.querySelector('[data-hd-mobile-sync]'),menu=dock.querySelector('[data-hd-mobile-menu]'),badge=dock.querySelector('[data-hd-mobile-home-badge]'),activeGroup=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'';
+ const searchOpen=!!document.getElementById('hdGlobalSearchDialog')?.open,menuOpen=!!document.getElementById('hdQuickNavDialog')?.open;
+ home?.classList.toggle('active',activeGroup==='home'&&!searchOpen&&!menuOpen);
+ search?.classList.toggle('active',searchOpen);
+ menu?.classList.toggle('active',menuOpen);
  const attention=hdQNMobileAttentionMeta();if(badge){badge.textContent=String(attention.count);badge.hidden=attention.count<=0}
  if(home){const detail=attention.reasons.join('・');home.setAttribute('aria-label',attention.count?('ホーム・確認項目 '+detail):'ホーム');home.title=detail}
  if(sync){sync.classList.remove('fresh','stale','partial','missing');let state='missing';try{state=typeof hdWSSyncInfo==='function'?(hdWSSyncInfo().state||'missing'):'missing'}catch{}sync.classList.add(state)}
@@ -131,3 +135,6 @@ window.addEventListener('hd:state-changed',hdQNUpdateMobileDock);
 window.addEventListener('hd:quest-changed',hdQNUpdateMobileDock);
 window.addEventListener('hd:timer-changed',hdQNUpdateMobileDock);
 setInterval(hdQNUpdateMobileDock,60000);
+
+window.addEventListener('hd:global-search-open',hdQNUpdateMobileDock);
+window.addEventListener('hd:global-search-close',hdQNUpdateMobileDock);
