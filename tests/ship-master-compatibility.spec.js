@@ -6090,3 +6090,22 @@ test('mobile dock exposes direct back action', async ({ page }) => {
   expect(data.active).toBe('home');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('mobile update banner clears the two-row dock', async ({ page }) => {
+  const errors=[];
+  await page.setViewportSize({width:390,height:844});
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdEnsureUpdateUI?.();
+    window.hdQNEnsure?.();
+    const banner=document.getElementById('hdUpdateBanner');
+    if(banner)banner.hidden=false;
+    const dock=document.getElementById('hdMobileDock');
+    const bs=banner?getComputedStyle(banner):null,ds=dock?getBoundingClientRect():null;
+    return {bottom:parseFloat(bs?.bottom||'0'),dockHeight:ds?.height||0};
+  });
+  expect(data.bottom).toBeGreaterThanOrEqual(100);
+  expect(data.dockHeight).toBeGreaterThan(70);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
