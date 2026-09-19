@@ -3264,3 +3264,24 @@ test('action toast can undo destructive actions', async ({ page }) => {
   expect(rows).toHaveLength(1);
   expect(rows[0].name).toBe('加賀改');
 });
+
+
+test('equipment delete can be undone from action toast', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([{id:'eq-undo-1',name:'22号対水上電探',category:'電探',count:1,star:0,targetStar:0}]));
+  });
+  await boot(page,errors);
+  await page.evaluate(()=>window.renderEquipment?.());
+  const del=page.locator('[data-eq-delete="eq-undo-1"]');
+  await expect(del).toHaveCount(1);
+  await del.click();
+  let rows=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]'));
+  expect(rows).toHaveLength(0);
+  const undo=page.locator('#hdToastRegion .hd-toast-action');
+  await expect(undo).toBeVisible();
+  await undo.click();
+  rows=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]'));
+  expect(rows).toHaveLength(1);
+  expect(rows[0].name).toBe('22号対水上電探');
+});
