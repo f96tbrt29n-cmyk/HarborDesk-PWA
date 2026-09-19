@@ -17,10 +17,41 @@ function hdGSIndex(){
  const out=[];let seq=0;const add=(type,title,subtitle,text,action,meta={})=>out.push({key:`${type}:${seq++}`,type,title,subtitle,text:`${title} ${subtitle} ${text}`,action,meta});
  for(const s of hdGSSections())add('feature',s.title,'機能',s.id,{kind:'feature',id:s.id});
  if(typeof MAPS!=='undefined')for(const maps of Object.values(MAPS))for(const map of maps){const d=typeof MAP_DETAILS!=='undefined'?MAP_DETAILS[map]:null;add('map',`${map} ${d?.name||'攻略'}`,'海域',`${d?.overview||''} ${d?.route||''} ${d?.air||''}`,{kind:'map',map});}
- if(typeof HD_SHIP_DATABASE!=='undefined')for(const s of HD_SHIP_DATABASE){const own=hdGSOwnedShip(s.base)||hdGSOwnedShip(s.final);add('ship',s.final||s.base,`${s.type||'艦娘'}${own?`・所持 Lv${Number(own.level)||'-'}`:'・DB'}`,`${s.base} ${(s.roles||[]).join(' ')} ${s.path||''} ${s.note||''}`,{kind:'ship',name:s.base||s.final},{owned:!!own});}
- const dbShipNames=new Set(typeof HD_SHIP_DATABASE!=='undefined'?HD_SHIP_DATABASE.flatMap(x=>[hdGSNorm(x.base),hdGSNorm(x.final)]):[]);for(const s of hdGSRoster()){if(!s?.name||dbShipNames.has(hdGSNorm(s.name)))continue;add('ship',s.name,`艦隊台帳・Lv${Number(s.level)||'-'}`,`${s.type||''} ${s.memo||''}`,{kind:'roster',name:s.name},{owned:true});}
- if(typeof HD_EQUIPMENT_CATALOG!=='undefined')for(const e of HD_EQUIPMENT_CATALOG){const count=hdGSOwnedEquipment(e.name);add('equipment',e.name,`${e.category||'装備'}${count?`・所持${count}`:'・DB'}`,`${(e.tags||[]).join(' ')} ${e.role||''} ${e.obtain||''}`,{kind:'equipment',name:e.name},{owned:count>0});}
- const dbEqNames=new Set(typeof HD_EQUIPMENT_CATALOG!=='undefined'?HD_EQUIPMENT_CATALOG.map(x=>hdGSNorm(x.name)):[]);for(const e of hdGSLedger()){if(!e?.name||dbEqNames.has(hdGSNorm(e.name)))continue;add('equipment',e.name,`装備台帳・所持${Number(e.count)||0}`,`${e.category||''} ${e.assigned||''} ${e.memo||''}`,{kind:'ledger',name:e.name},{owned:true});}
+ const snap=window.HD_KANCOLLE_MASTER_SNAPSHOT||{};
+ const indexedShipNames=new Set();
+ if(typeof HD_SHIP_DATABASE!=='undefined')for(const s of HD_SHIP_DATABASE){
+  const own=hdGSOwnedShip(s.base)||hdGSOwnedShip(s.final);
+  add('ship',s.final||s.base,`${s.type||'艦娘'}${own?`・所持 Lv${Number(own.level)||'-'}`:'・DB'}`,`${s.base} ${(s.roles||[]).join(' ')} ${s.path||''} ${s.note||''}`,{kind:'ship',name:s.base||s.final},{owned:!!own});
+  indexedShipNames.add(hdGSNorm(s.base));indexedShipNames.add(hdGSNorm(s.final));
+ }
+ for(const s of hdGSRoster()){
+  const norm=hdGSNorm(s?.name);if(!s?.name||indexedShipNames.has(norm))continue;
+  add('ship',s.name,`艦隊台帳・Lv${Number(s.level)||'-'}`,`${s.type||''} ${s.memo||''}`,{kind:'roster',name:s.name},{owned:true});
+  indexedShipNames.add(norm);
+ }
+ for(const s of Object.values(snap.allShips||{})){
+  const norm=hdGSNorm(s?.name);if(!s?.name||indexedShipNames.has(norm))continue;
+  const own=hdGSOwnedShip(s.name);
+  add('ship',s.name,`${s.type||'艦娘'}${own?`・所持 Lv${Number(own.level)||'-'}`:'・公式マスター'}`,`MASTER ID ${Number(s.id)||0} 艦種 ${s.type||''} 改装Lv ${Number(s.afterLv)||0}`,{kind:'ship',name:s.name},{owned:!!own,master:true});
+  indexedShipNames.add(norm);
+ }
+ const indexedEquipmentNames=new Set();
+ if(typeof HD_EQUIPMENT_CATALOG!=='undefined')for(const e of HD_EQUIPMENT_CATALOG){
+  const count=hdGSOwnedEquipment(e.name);
+  add('equipment',e.name,`${e.category||'装備'}${count?`・所持${count}`:'・DB'}`,`${(e.tags||[]).join(' ')} ${e.role||''} ${e.obtain||''}`,{kind:'equipment',name:e.name},{owned:count>0});
+  indexedEquipmentNames.add(hdGSNorm(e.name));
+ }
+ for(const e of hdGSLedger()){
+  const norm=hdGSNorm(e?.name);if(!e?.name||indexedEquipmentNames.has(norm))continue;
+  add('equipment',e.name,`装備台帳・所持${Number(e.count)||0}`,`${e.category||''} ${e.assigned||''} ${e.memo||''}`,{kind:'ledger',name:e.name},{owned:true});
+  indexedEquipmentNames.add(norm);
+ }
+ for(const [name,e] of Object.entries(snap.equipment||{})){
+  const norm=hdGSNorm(name);if(!name||indexedEquipmentNames.has(norm))continue;
+  const count=hdGSOwnedEquipment(name);
+  add('equipment',name,`${e?.typeName||'装備'}${count?`・所持${count}`:'・公式マスター'}`,`MASTER ID ${Number(e?.id)||0} ${e?.typeName||''}`,{kind:count?'ledger':'masterEquipment',name},{owned:count>0,master:true});
+  indexedEquipmentNames.add(norm);
+ }
  if(typeof HD_QUESTS!=='undefined')for(const q of HD_QUESTS)add('quest',q.name,`${q.id}・${typeof HD_QUEST_CYCLE_LABEL!=='undefined'?(HD_QUEST_CYCLE_LABEL[q.cycle]||q.cycle):q.cycle}・${q.type}`,`${q.condition||''} ${q.reward||''} ${q.prereq||''}`,{kind:'quest',id:q.id,cycle:q.cycle,name:q.name});
  if(typeof HD_EXPEDITIONS!=='undefined')for(const x of HD_EXPEDITIONS)add('expedition',`${x.id} ${x.name}`,`遠征・${Math.floor(x.minutes/60)}:${String(x.minutes%60).padStart(2,'0')}`,`${x.required||''} ${x.special||''} ${(x.tags||[]).join(' ')}`,{kind:'expedition',id:x.id,name:x.name});
  return out;
@@ -33,6 +64,7 @@ function hdGSDestination(row){
  if(a.kind==='ship')return row?.meta?.owned?'艦隊/DB':'艦娘DB';
  if(a.kind==='roster')return '艦隊へ';
  if(a.kind==='equipment')return row?.meta?.owned?'装備/DB':'装備DB';
+ if(a.kind==='masterEquipment')return '装備可否';
  if(a.kind==='ledger')return '装備台帳';
  if(a.kind==='quest')return '任務DB';
  if(a.kind==='expedition')return '遠征DB';
@@ -83,10 +115,11 @@ function hdGSOpenResult(row){
   hdGSClose();const seq=hdGSNavSeq;
   setTimeout(()=>{if(seq!==hdGSNavSeq)return;document.getElementById('selectedMapCard')?.scrollIntoView({behavior:'smooth',block:'start'})},60);
  }catch{}return}
- if(a.kind==='ship'){try{if(typeof hdEnsureShipDatabase==='function')hdEnsureShipDatabase();hdShipDbType='すべて';hdShipDbMissingOnly=false;const cb=document.getElementById('hdShipDbMissingOnly');if(cb)cb.checked=false;const i=document.getElementById('hdShipDbSearch');if(i)i.value=a.name;if(typeof hdRenderShipDatabase==='function')hdRenderShipDatabase();hdGSScroll('shipDatabase')}catch{}return}
+ if(a.kind==='ship'){try{if(typeof hdEnsureShipDatabase==='function')hdEnsureShipDatabase();hdShipDbType='すべて';hdShipDbMissingOnly=false;hdShipDbIncludeMaster=true;hdShipDbImageFilter='all';const cb=document.getElementById('hdShipDbMissingOnly'),master=document.getElementById('hdShipDbIncludeMaster');if(cb)cb.checked=false;if(master)master.checked=true;document.querySelectorAll('[data-hd-shipdb-image-filter]').forEach(b=>b.classList.toggle('active',(b.dataset.hdShipdbImageFilter||'all')==='all'));const i=document.getElementById('hdShipDbSearch');if(i)i.value=a.name;if(typeof hdShipDbViewSave==='function')hdShipDbViewSave({query:a.name,type:'すべて',missingOnly:false,includeMaster:true,imageFilter:'all'});if(typeof hdRenderShipDatabase==='function')hdRenderShipDatabase();hdGSScroll('shipDatabase')}catch{}return}
  if(a.kind==='roster'){hdGSScroll('roster');return}
  if(a.kind==='equipment'){try{if(typeof hdEnsureEquipmentCatalog==='function')hdEnsureEquipmentCatalog();hdEquipCatalogFilter='すべて';const i=document.getElementById('hdEquipCatalogSearch');if(i)i.value=a.name;if(typeof hdRenderEquipmentCatalog==='function')hdRenderEquipmentCatalog();hdGSScroll('equipmentBook')}catch{}return}
  if(a.kind==='ledger'){try{const i=document.getElementById('equipmentSearch');if(i){i.value=a.name;if(typeof renderEquipment==='function')renderEquipment()}hdGSScroll('equipmentBook')}catch{}return}
+ if(a.kind==='masterEquipment'){try{hdGSClose();if(typeof hdShipDbOpenEquipChecker==='function')hdShipDbOpenEquipChecker('');const i=document.getElementById('hdShipEquipCheckEquip');if(i)i.value=a.name;if(typeof hdShipDbRenderEquipChecker==='function')hdShipDbRenderEquipChecker()}catch{}return}
  if(a.kind==='quest'){try{if(typeof hdEnsureQuestDb==='function')hdEnsureQuestDb();hdQuestCycle=a.cycle;hdQuestType='すべて';document.querySelectorAll('[data-hd-quest-cycle]').forEach(b=>b.classList.toggle('active',b.dataset.hdQuestCycle===a.cycle));document.querySelectorAll('[data-hd-quest-type]').forEach(b=>b.classList.toggle('active',b.dataset.hdQuestType==='すべて'));const i=document.getElementById('hdQuestDbSearch');if(i)i.value=a.id;if(typeof hdRenderQuestDb==='function')hdRenderQuestDb();hdGSScroll('questDatabase')}catch{}return}
  if(a.kind==='expedition'){try{if(typeof hdEnsureExpeditionDb==='function')hdEnsureExpeditionDb();hdExpGoal='all';hdExpSearch=a.id;const i=document.getElementById('hdExpSearch');if(i)i.value=a.id;document.querySelectorAll('[data-hd-exp-goal]').forEach(b=>b.classList.toggle('active',b.dataset.hdExpGoal==='all'));if(typeof hdRenderExpeditionDb==='function')hdRenderExpeditionDb();hdGSScroll('expeditions')}catch{}return}
 }
