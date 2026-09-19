@@ -5152,3 +5152,17 @@ test('current fleet cards expose direct navigation actions', async ({ page }) =>
   expect(data.ship).toBe('加賀改');
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
+
+
+test('fleet ship jump persists ship database query', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdKcOpenShipFromFleet?.('加賀改');
+    let view={};try{view=JSON.parse(sessionStorage.getItem('harbordesk-session-shipdb-view-v1')||'{}')}catch{}
+    return {query:view.query||'',input:document.getElementById('hdShipDbSearch')?.value||''};
+  });
+  expect(data.query).toBe('加賀改');
+  expect(data.input).toBe('加賀改');
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
