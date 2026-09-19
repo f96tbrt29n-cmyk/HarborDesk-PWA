@@ -1792,3 +1792,85 @@ test('passive KanColle capture records minimized response without request token'
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('synced in-game fleet keeps gear and copies into selected map custom fleet', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-kancolle-fleets-v1');
+    localStorage.removeItem('harbordesk-custom-fleets-v1');
+
+    const parsed = window.hdKcParseImport?.(JSON.stringify({
+      format:'harbordesk-kancolle-import',
+      endpoints:{
+        '/kcsapi/api_port/port':{
+          api_result:1,
+          api_result_msg:'成功',
+          api_data:{
+            api_ship:[{
+              api_id:9001,
+              api_ship_id:541,
+              api_lv:99,
+              api_slot:[5001,-1,-1,-1,-1],
+              api_slot_ex:-1
+            }],
+            api_deck_port:[{
+              api_id:1,
+              api_name:'第一艦隊',
+              api_mission:[0,0,0,0],
+              api_ship:[9001,-1,-1,-1,-1,-1]
+            }],
+            api_material:[]
+          }
+        },
+        '/kcsapi/api_get_member/slot_item':{
+          api_result:1,
+          api_result_msg:'成功',
+          api_data:[
+            {api_id:5001,api_slotitem_id:8,api_level:4,api_alv:0}
+          ]
+        }
+      }
+    }));
+
+    const count = window.hdKcApplyDecks?.(parsed);
+    const gameFleets = window.hdKcCurrentFleets?.() || [];
+    const copied = window.hdKcCopyFleetToCustom?.(1,'5-5');
+    const custom = JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1')||'{}');
+
+    const result = {
+      count,
+      gameFleet:gameFleets[0]||null,
+      copied,
+      customFleet:custom['5-5']?.[0]||null
+    };
+
+    localStorage.removeItem('harbordesk-kancolle-fleets-v1');
+    localStorage.removeItem('harbordesk-custom-fleets-v1');
+    return result;
+  });
+
+  expect(data.count).toBe(1);
+  expect(data.gameFleet.name).toBe('第一艦隊');
+  expect(data.gameFleet.ships[0]).toEqual(expect.objectContaining({
+    name:'長門改二',
+    masterId:541,
+    level:99
+  }));
+  expect(data.gameFleet.ships[0].gear).toContain('41cm連装砲 ★4');
+
+  expect(data.customFleet).toEqual(expect.objectContaining({
+    name:'ゲーム同期｜第一艦隊',
+    source:'kancolle-import',
+    sourceDeckId:1
+  }));
+  expect(data.customFleet.ships[0]).toEqual(expect.objectContaining({
+    ship:'長門改二',
+    masterId:541
+  }));
+  expect(data.customFleet.ships[0].gear).toContain('41cm連装砲 ★4');
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
