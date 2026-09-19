@@ -198,7 +198,16 @@ async function hdShipImageImportBackup(file){
  return {ok,total:parsed.items.length,manifest:parsed.manifest};
 }
 function hdShipImageRevoke(id){
- const old=HD_SHIP_IMAGE_OBJECT_URLS.get(Number(id));if(old){try{URL.revokeObjectURL(old)}catch{}HD_SHIP_IMAGE_OBJECT_URLS.delete(Number(id))}
+ const old=HD_SHIP_IMAGE_OBJECT_URLS.get(Number(id));if(old){
+  // Cancel pending lazy loads before revoking a replaced/deleted local image.
+  for(const img of document.querySelectorAll('[data-hd-ship-image-host] img')){
+   if(img.getAttribute('src')!==old)continue;
+   img.onload=null;img.onerror=null;img.removeAttribute('src');
+   const host=img.closest('[data-hd-ship-image-host]');
+   if(host){host.dataset.hdShipHydrateSeq=String((Number(host.dataset.hdShipHydrateSeq)||0)+1);host.classList.remove('loaded')}
+  }
+  try{URL.revokeObjectURL(old)}catch{}HD_SHIP_IMAGE_OBJECT_URLS.delete(Number(id))
+ }
 }
 function hdShipImageObjectUrl(id,blob){
  const key=Number(id),old=HD_SHIP_IMAGE_OBJECT_URLS.get(key);if(old)return old;
