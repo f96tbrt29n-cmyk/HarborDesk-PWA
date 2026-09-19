@@ -1,7 +1,7 @@
 {
-  "version": "1.0.157",
-  "build": 157,
+  "version": "1.0.158",
+  "build": 158,
   "releasedAt": "2026-09-19T19:21:00+09:00",
-  "notes": "出撃分析に攻略インサイトを追加。マス別実績から撤退回数と撤退率を使って危険マス上位を表示し、設定した直近N周とその前N周のマス別撤退率を比較して悪化したマスをpt差で検出。単一海域ではHarborDesk海域グラフの構造上の最短経路を参考ルートとして算出し、実際に最も多く通ったルートと比較、両ルートの周回数・ボス到達率・撤退率を確認可能。構造上の最短経路は固定条件や確率分岐を含む推奨ルート判定ではない旨を明示。回帰テスト追加・JavaScript構文検証済み。",
+  "notes": "ConningTowerLite連携の試験機能を追加。ConningTowerLite側でコピー/共有/書き出しできた通信ログを、HarborDesk側でHAR・records/logs/history/requests/responses配列・url/path/endpoint＋responseBody/body/text/payload形式から自動変換して艦これAPI取込へ流せるようにした。URLはクエリを破棄し対応する/kcsapi/エンドポイントだけを使用するためapi_token等を保存しない。専用のクリップボード解析・ログファイル選択UIと外部ブリッジAPIを追加。同じ出撃ログ再取込の重複防止を維持。回帰テスト追加・JavaScript構文検証済み。",
   "masterChanges": null
 }
