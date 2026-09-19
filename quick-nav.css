@@ -110,3 +110,17 @@ body.hd-workspace-mode{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
  .hd-mobile-location:active{background:rgba(91,188,243,.08)!important}
  body.hd-workspace-mode{padding-bottom:calc(108px + env(safe-area-inset-bottom))}
 }
+
+@media(max-width:560px){
+ .hd-mobile-dock .hd-mobile-back{
+  grid-column:1;grid-row:1;min-height:25px;height:25px;padding:0;border-radius:9px;
+  font-size:20px;line-height:1;color:var(--muted);background:transparent
+ }
+ .hd-mobile-dock .hd-mobile-back.available{color:#d8e9f5;background:rgba(91,188,243,.07)}
+ .hd-mobile-dock .hd-mobile-back:disabled{opacity:.3}
+ .hd-mobile-dock .hd-mobile-location{grid-column:2/-1;grid-row:1}
+ .hd-mobile-dock [data-hd-mobile-home],
+ .hd-mobile-dock [data-hd-mobile-search],
+ .hd-mobile-dock [data-hd-mobile-sync],
+ .hd-mobile-dock [data-hd-mobile-menu]{grid-row:2}
+}
