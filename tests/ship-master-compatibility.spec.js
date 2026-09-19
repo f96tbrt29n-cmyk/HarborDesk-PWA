@@ -3153,3 +3153,25 @@ test('mobile workspace picker shows group context and top action', async ({ page
   expect(data.section).toBe('roster');
   expect(data.top).toBe(true);
 });
+
+
+test('home secondary panels remember collapsed state', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-home-panels-v1', JSON.stringify({resources:true,procurement:false,recent:true}));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.homeApplyPanelState?.();
+    const get=name=>{
+      const card=document.querySelector('[data-home-panel="'+name+'"]'),body=card?.querySelector('[data-home-panel-body]'),btn=card?.querySelector('[data-home-collapse]');
+      return {collapsed:card?.classList.contains('is-collapsed')||false,hidden:!!body?.hidden,expanded:btn?.getAttribute('aria-expanded')||''};
+    };
+    return {resources:get('resources'),procurement:get('procurement'),recent:get('recent')};
+  });
+  expect(data.resources.collapsed).toBe(true);
+  expect(data.resources.hidden).toBe(true);
+  expect(data.resources.expanded).toBe('false');
+  expect(data.procurement.collapsed).toBe(false);
+  expect(data.recent.collapsed).toBe(true);
+});
