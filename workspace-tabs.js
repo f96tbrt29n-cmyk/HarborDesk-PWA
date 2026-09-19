@@ -49,6 +49,30 @@ function hdWSRestoreScroll(sectionId){
 }
 function hdWSEsc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdWSJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}}
+function hdWSSyncInfo(){
+ const sync=hdWSJson('harbordesk-kancolle-sync-v1',null);
+ if(!sync?.syncedAt)return {sync:null,state:'missing',label:'未同期',detail:'ゲームデータ未同期'};
+ const age=Math.max(0,Date.now()-Number(sync.syncedAt||0));
+ let label='たった今';
+ if(age>=86400000)label=Math.floor(age/86400000)+'日前';
+ else if(age>=3600000)label=Math.floor(age/3600000)+'時間前';
+ else if(age>=60000)label=Math.floor(age/60000)+'分前';
+ return {sync,state:age>21600000?'stale':'fresh',label,detail:`艦娘 ${Number(sync.ships)||0} / 装備 ${Number(sync.equipment)||0} / 艦隊 ${Number(sync.decks)||0}`};
+}
+function hdWSEnsureSyncStatus(){
+ if(document.getElementById('hdGlobalSyncStatus'))return;
+ const top=document.querySelector('.topbar');if(!top)return;
+ const btn=document.createElement('button');btn.id='hdGlobalSyncStatus';btn.type='button';btn.className='hd-global-sync-status';btn.innerHTML='<span>同期</span><b>確認中</b>';
+ btn.addEventListener('click',()=>{if(typeof hdWSShowElement==='function'&&hdWSShowElement('kancolleImport',true))return;document.getElementById('kancolleImport')?.scrollIntoView({behavior:'smooth',block:'start'})});
+ const notify=top.querySelector('#notifyBtn');notify?top.insertBefore(btn,notify):top.appendChild(btn);
+ hdWSUpdateSyncStatus();
+}
+function hdWSUpdateSyncStatus(){
+ const btn=document.getElementById('hdGlobalSyncStatus');if(!btn)return;
+ const info=hdWSSyncInfo();btn.classList.remove('fresh','stale','missing');btn.classList.add(info.state);
+ btn.innerHTML=`<span>ゲーム同期</span><b>${hdWSEsc(info.label)}</b>`;
+ btn.title=info.detail;btn.setAttribute('aria-label',`ゲーム同期 ${info.label}。タップで同期画面を開く`);
+}
 function hdWSTitle(el){return el?.querySelector(':scope > .section-head h2,:scope > .section-head h3,:scope > h2,:scope > h3')?.textContent?.trim()||el?.querySelector('h2,h3')?.textContent?.trim()||el?.id||'機能'}
 function hdWSGroupForSection(el){
  const id=el.id||'';
@@ -100,7 +124,7 @@ function hdWSEnsureUI(){
  if(document.getElementById('hdWorkspaceNav'))return;
  const top=document.querySelector('.topbar');if(!top)return;
  const nav=document.createElement('div');nav.id='hdWorkspaceNav';nav.className='hd-ws-shell';nav.innerHTML=`<div class="hd-ws-primary" role="tablist" aria-label="HarborDeskカテゴリ">${HD_WS_GROUPS.map(g=>`<button type="button" role="tab" data-hd-ws-group="${g.key}"><span>${g.label}</span><em data-hd-ws-badge hidden>0</em></button>`).join('')}</div><label id="hdWorkspaceMobilePicker" class="hd-ws-mobile-picker" hidden><span>機能</span><select id="hdWorkspaceSectionSelect" aria-label="カテゴリ内機能"></select></label><div id="hdWorkspaceSubtabs" class="hd-ws-secondary" role="tablist" aria-label="カテゴリ内機能"></div>`;
- top.insertAdjacentElement('afterend',nav);document.body.classList.add('hd-workspace-mode');hdWSUpdateTopbarHeight();hdWSUpdateBadges();
+ top.insertAdjacentElement('afterend',nav);document.body.classList.add('hd-workspace-mode');hdWSEnsureSyncStatus();hdWSUpdateTopbarHeight();hdWSUpdateBadges();hdWSUpdateSyncStatus();
 }
 function hdWSRenderSubtabs(group,selected){
  const host=document.getElementById('hdWorkspaceSubtabs'),picker=document.getElementById('hdWorkspaceMobilePicker'),select=document.getElementById('hdWorkspaceSectionSelect');if(!host)return;const rows=hdWSVisibleSections(group);
@@ -193,9 +217,11 @@ document.addEventListener('touchstart',hdWSTouchStart,{passive:true});
 document.addEventListener('touchend',hdWSTouchEnd,{passive:true});
 window.addEventListener('hashchange',()=>{const id=location.hash.slice(1);if(id)setTimeout(()=>hdWSShowElement(id,false),0)});
 window.addEventListener('resize',hdWSUpdateTopbarHeight,{passive:true});
-window.addEventListener('storage',()=>{hdWSUpdateBadges()});
+window.addEventListener('storage',e=>{hdWSUpdateBadges();if(!e||e.key==='harbordesk-kancolle-sync-v1')hdWSUpdateSyncStatus()});
+window.addEventListener('hd:kancolle-sync',hdWSUpdateSyncStatus);
 window.addEventListener('hd:modules-ready',()=>setTimeout(hdWSInstall,0));
 window.addEventListener('hd:workspace-refresh',hdWSUpdateBadges);
 window.addEventListener('load',()=>setTimeout(hdWSInstall,900));
 setInterval(hdWSUpdateBadges,10000);
+setInterval(hdWSUpdateSyncStatus,60000);
 setTimeout(hdWSInstall,1700);
