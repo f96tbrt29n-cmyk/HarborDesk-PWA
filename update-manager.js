@@ -1,5 +1,6 @@
 const HD_APP_VERSION='1.0.287';
 const HD_APP_BUILD=287;
+const HD_UPDATE_SNOOZE_KEY='harbordesk-update-snooze-v1';
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
 
@@ -138,10 +139,20 @@ async function hdLoadCurrentAssets(){
   hdInitLoadedModules();
 }
 
+function hdUpdateSnoozed(){
+  try{return Number(sessionStorage.getItem(HD_UPDATE_SNOOZE_KEY)||0)>Date.now()}catch{return false}
+}
+function hdSnoozeUpdate(ms=2*60*60*1000){
+  try{sessionStorage.setItem(HD_UPDATE_SNOOZE_KEY,String(Date.now()+ms))}catch{}
+  const banner=document.getElementById('hdUpdateBanner');if(banner)banner.hidden=true;
+  window.hdToast?.('更新通知をあとで表示するよ','info',1400);
+  return true;
+}
+function hdClearUpdateSnooze(){try{sessionStorage.removeItem(HD_UPDATE_SNOOZE_KEY)}catch{}}
 function hdEnsureUpdateUI(){
   if(document.getElementById('hdUpdateBanner'))return;
   const banner=document.createElement('div');banner.id='hdUpdateBanner';banner.className='hd-update-banner';banner.hidden=true;
-  banner.innerHTML=`<div class="hd-update-main"><strong>HarborDeskの最新版があります</strong><div id="hdUpdateText" class="muted"></div><div id="hdUpdateChanges" class="hd-update-changes" hidden></div></div><button id="hdUpdateNow" type="button" class="primary small" onclick="hdForceUpdate()">今すぐ更新</button>`;
+  banner.innerHTML=`<div class="hd-update-main"><strong>HarborDeskの最新版があります</strong><div id="hdUpdateText" class="muted"></div><div id="hdUpdateChanges" class="hd-update-changes" hidden></div></div><div class="hd-update-actions"><button id="hdUpdateLater" type="button" class="ghost small">あとで</button><button id="hdUpdateNow" type="button" class="primary small" onclick="hdForceUpdate()">今すぐ更新</button></div>`;
   document.body.appendChild(banner);
   const header=document.querySelector('.topbar');
   if(header&&!document.getElementById('hdUpdateCheck')){
@@ -152,7 +163,8 @@ function hdEnsureUpdateUI(){
   const notify=document.getElementById('notifyBtn'),menu=document.querySelector('.hd-header-more .hd-version-menu');
   if(notify&&menu&&notify.parentElement!==menu){notify.classList.add('hd-notify-btn');menu.prepend(notify)}
   document.getElementById('hdUpdateNow')?.addEventListener('click',hdForceUpdate);
-  document.getElementById('hdUpdateCheck')?.addEventListener('click',()=>{hdCheckForUpdate(true);document.querySelector('.hd-header-more')?.removeAttribute('open')});
+  document.getElementById('hdUpdateLater')?.addEventListener('click',()=>hdSnoozeUpdate());
+  document.getElementById('hdUpdateCheck')?.addEventListener('click',()=>{hdClearUpdateSnooze();hdCheckForUpdate(true);document.querySelector('.hd-header-more')?.removeAttribute('open')});
 }
 function hdUpdateEsc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdUpdateMasterChangeView(changes){
@@ -190,7 +202,7 @@ async function hdCheckForUpdate(showResult=false){
         if(master){changes.hidden=false;changes.innerHTML=`<b>艦これデータ更新</b><span>${hdUpdateEsc(master.summary)}</span>${master.examples.length?`<small>${master.examples.map(hdUpdateEsc).join(' / ')}</small>`:''}`}
         else{changes.hidden=true;changes.innerHTML=''}
       }
-      if(banner)banner.hidden=false
+      if(banner)banner.hidden=!showResult&&hdUpdateSnoozed()
     }
     else{document.querySelector('.hd-header-more')?.classList.remove('has-update');if(banner)banner.hidden=true;if(changes){changes.hidden=true;changes.innerHTML=''}if(showResult)alert(`HarborDesk v${HD_APP_VERSION} は最新版だよ`)}
   }catch{if(showResult)alert('更新情報を確認できなかったよ。通信状態を確認してもう一度試してね。')}
@@ -232,6 +244,7 @@ async function hdForceUpdate(){
 }
 document.addEventListener('click',e=>{
   if(e.target?.closest?.('#hdUpdateNow')){e.preventDefault();hdForceUpdate();return}
+  if(e.target?.closest?.('#hdUpdateLater')){e.preventDefault();hdSnoozeUpdate();return}
   if(e.target?.closest?.('[data-hd-header-settings]')){
     document.querySelector('.hd-header-more')?.removeAttribute('open');
     if(typeof hdWSShowElement==='function')hdWSShowElement('diagnosticsCenter',true);
