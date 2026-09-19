@@ -157,7 +157,7 @@ function renderHomeDashboard(){
 }
 
 document.addEventListener('click',e=>{
- const addQuest=e.target.closest('[data-home-add-quest]');if(addQuest){const input=document.getElementById('questName');if(input)input.value='';document.getElementById('questDialog')?.showModal();return}
+ const addQuest=e.target.closest('[data-home-add-quest]');if(addQuest){if(typeof openQuestDialog==='function')openQuestDialog();else{const input=document.getElementById('questName');if(input)input.value='';document.getElementById('questDialog')?.showModal()}return}
  const addTimer=e.target.closest('[data-home-add-timer]');if(addTimer){if(typeof openTimer==='function')openTimer(addTimer.dataset.homeAddTimer);return}
  const cancelTimer=e.target.closest('[data-home-timer-cancel]');if(cancelTimer){
   const kind=cancelTimer.dataset.kind==='dock'?'dock':'expedition',arr=(typeof state!=='undefined')?(kind==='dock'?state.docks:state.expeditions):null;
