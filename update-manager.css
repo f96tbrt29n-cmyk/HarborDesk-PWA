@@ -39,3 +39,15 @@
  .hd-global-sync-status{min-height:32px;padding:5px 7px}
  .hd-global-sync-status b{font-size:10px}
 }
+
+.hd-header-more.has-update>summary{position:relative;border-color:#5bbcf3}
+.hd-header-more.has-update>summary::after{content:'';position:absolute;right:4px;top:4px;width:7px;height:7px;border-radius:999px;background:#78d1ff;box-shadow:0 0 0 2px rgba(8,24,38,.95)}
+@media(max-width:560px){
+ .hd-version-menu{flex-wrap:wrap}
+ .hd-version-menu>*{flex:0 0 auto}
+ .hd-header-more .hd-version-menu{min-width:190px}
+}
+
+.hd-header-settings{display:inline-flex;align-items:center;gap:5px}
+.hd-header-settings span{font-size:13px}
+.hd-header-settings b{font-size:10px}
