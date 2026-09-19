@@ -23,6 +23,7 @@ const HD_EQUIP_CATALOG_VIEW_KEY='harbordesk-session-equip-catalog-view-v1';
 function hdEquipCatalogViewLoad(){try{return JSON.parse(sessionStorage.getItem(HD_EQUIP_CATALOG_VIEW_KEY)||'{}')||{}}catch{return {}}}
 function hdEquipCatalogViewSave(patch={}){const next={...hdEquipCatalogViewLoad(),...patch};try{sessionStorage.setItem(HD_EQUIP_CATALOG_VIEW_KEY,JSON.stringify(next))}catch{}return next}
 let hdEquipCatalogFilter='すべて';
+let hdEquipCatalogRenderTimer=0;
 function hdEquipWikiUrl(name){return `https://wikiwiki.jp/kancolle/${encodeURIComponent(name)}`}
 function hdEquipStatText(item){const parts=Object.entries(item.stats||{}).map(([k,v])=>`${k}+${v}`);if(item.range)parts.push(`射程 ${item.range}`);if(item.radius!=null)parts.push(`半径 ${item.radius}`);return parts}
 function hdEnsureEquipmentCatalog(){
@@ -33,11 +34,12 @@ function hdEnsureEquipmentCatalog(){
  const cats=['すべて',...new Set(HD_EQUIPMENT_CATALOG.map(x=>x.category))],view=hdEquipCatalogViewLoad();
  hdEquipCatalogFilter=cats.includes(view.filter)?view.filter:'すべて';
  document.getElementById('hdEquipCatalogFilters').innerHTML=cats.map(c=>`<button class="ghost small${c===hdEquipCatalogFilter?' active':''}" type="button" data-hd-equip-filter="${hdEsc(c)}">${hdEsc(c)}</button>`).join('');
- const search=document.getElementById('hdEquipCatalogSearch');if(search){search.value=String(view.query||'');search.addEventListener('input',()=>{hdEquipCatalogViewSave({query:search.value});hdRenderEquipmentCatalog()})}
+ const search=document.getElementById('hdEquipCatalogSearch');if(search){search.value=String(view.query||'');search.addEventListener('input',()=>{hdEquipCatalogViewSave({query:search.value});hdEquipCatalogScheduleRender()})}
  const compact=!!view.compact,list=document.getElementById('hdEquipCatalogList'),compactBtn=document.querySelector('[data-hd-equip-compact]');
  list?.classList.toggle('hd-compact',compact);if(compactBtn)compactBtn.textContent=compact?'詳細表示':'コンパクト';
  hdRenderEquipmentCatalog();
 }
+function hdEquipCatalogScheduleRender(delay=90){clearTimeout(hdEquipCatalogRenderTimer);hdEquipCatalogRenderTimer=setTimeout(hdRenderEquipmentCatalog,Math.max(0,Number(delay)||0))}
 function hdRenderEquipmentCatalog(){
  const list=document.getElementById('hdEquipCatalogList');if(!list)return;
  const q=(document.getElementById('hdEquipCatalogSearch')?.value||'').trim().toLowerCase();
