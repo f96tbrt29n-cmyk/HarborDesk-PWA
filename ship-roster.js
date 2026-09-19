@@ -17,6 +17,14 @@ function rosterMigrateMasterIds(){
  if(changed)localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));return changed;
 }
 function rosterSave(items){localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(items));renderShipRoster();refreshShipRosterOptions()}
+function rosterSyncCanonical(id){
+ const rows=rosterLoad(),idx=rows.findIndex(x=>String(x.id)===String(id));if(idx<0)return false;
+ const status=typeof hdShipIdentityStatus==='function'?hdShipIdentityStatus({name:rows[idx].name,masterId:rows[idx].masterId}):null;
+ if(!status?.master)return false;
+ rows[idx]={...rows[idx],name:String(status.master.name||rows[idx].name),masterId:Number(status.master.id)||Number(rows[idx].masterId)||0,updatedAt:Date.now()};
+ rosterSave(rows);window.dispatchEvent(new CustomEvent('hd:ship-identity-changed',{detail:{source:'roster',id:rows[idx].id,masterId:rows[idx].masterId}}));return true;
+}
+
 function rosterEsc(s){return typeof esc==='function'?esc(s):String(s)}
 function rosterUid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)}
 
@@ -63,7 +71,7 @@ function renderShipRoster(){
  const q=(document.getElementById('shipRosterSearch')?.value||'').trim().toLowerCase();
  const active=document.querySelector('[data-roster-filter].active')?.dataset.rosterFilter||'all';
  const rows=rosterLoad().filter(x=>(active==='all'||(x.tags||[]).includes(active))&&(!q||`${x.name} ${x.remodel||''} ${(x.tags||[]).join(' ')} ${x.memo||''}`.toLowerCase().includes(q))).sort((a,b)=>Number(b.level||0)-Number(a.level||0)||a.name.localeCompare(b.name,'ja'));
- host.innerHTML=rows.length?rows.map(x=>{const image=typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(x.masterId?{id:x.masterId,name:x.name}:x.name,'roster-thumb'):'';return `<article class="roster-card"><div class="roster-card-head">${image}<div class="roster-card-main"><div><strong>${rosterEsc(x.name)}</strong><div class="muted">${x.type?`${rosterEsc(x.type)} ・ `:''}${x.level?`Lv.${rosterEsc(x.level)}`:''}${x.remodel?` ・ ${rosterEsc(x.remodel)}`:''}</div></div><div class="roster-actions"><button class="ghost small" data-roster-edit="${x.id}">編集</button><button class="ghost small" data-roster-delete="${x.id}">削除</button></div></div></div><div class="roster-badges">${(x.tags||[]).map(t=>`<span>${rosterEsc(t)}</span>`).join('')}</div>${x.gear?`<div class="roster-note"><b>装備:</b> ${rosterEsc(x.gear)}</div>`:''}${x.memo?`<div class="roster-note"><b>メモ:</b> ${rosterEsc(x.memo)}</div>`:''}</article>`}).join(''):'<div class="empty">まだ艦娘が登録されてないよ。「＋艦娘を登録」から追加してね。</div>';
+ host.innerHTML=rows.length?rows.map(x=>{const identity=typeof hdShipIdentityStatus==='function'?hdShipIdentityStatus({name:x.name,masterId:x.masterId}):null,image=typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(identity?.master?{id:identity.master.id,name:identity.master.name}:x.masterId?{id:x.masterId,name:x.name}:x.name,'roster-thumb'):'';const identityBadge=identity?.master?`<span class="roster-master-id ${identity.status}">MASTER ID ${identity.master.id}</span>`:x.masterId?`<span class="roster-master-id invalid">MASTER ID ${rosterEsc(x.masterId)}?</span>`:'<span class="roster-master-id missing">MASTER ID 未設定</span>';const mismatch=identity?.status==='mismatch'?`<div class="roster-identity-warning"><span>登録名「${rosterEsc(x.name)}」 / マスター名「${rosterEsc(identity.canonical)}」</span><button type="button" class="ghost small" data-roster-master-sync="${x.id}">公式名へ同期</button></div>`:'';return `<article class="roster-card"><div class="roster-card-head">${image}<div class="roster-card-main"><div><strong>${rosterEsc(x.name)}</strong><div class="muted">${x.type?`${rosterEsc(x.type)} ・ `:''}${x.level?`Lv.${rosterEsc(x.level)}`:''}${x.remodel?` ・ ${rosterEsc(x.remodel)}`:''}</div></div><div class="roster-actions"><button class="ghost small" data-roster-edit="${x.id}">編集</button><button class="ghost small" data-roster-delete="${x.id}">削除</button></div></div></div><div class="roster-badges">${identityBadge}${(x.tags||[]).map(t=>`<span>${rosterEsc(t)}</span>`).join('')}</div>${mismatch}${x.gear?`<div class="roster-note"><b>装備:</b> ${rosterEsc(x.gear)}</div>`:''}${x.memo?`<div class="roster-note"><b>メモ:</b> ${rosterEsc(x.memo)}</div>`:''}</article>`}).join(''):'<div class="empty">まだ艦娘が登録されてないよ。「＋艦娘を登録」から追加してね。</div>';
  if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
 }
 
@@ -76,6 +84,7 @@ function initShipRoster(){
 
 document.addEventListener('click',e=>{
  const f=e.target.closest('[data-roster-filter]');if(f){document.querySelectorAll('[data-roster-filter]').forEach(x=>x.classList.remove('active'));f.classList.add('active');renderShipRoster();return}
+ const sync=e.target.closest('[data-roster-master-sync]');if(sync){rosterSyncCanonical(sync.dataset.rosterMasterSync);return}
  const ed=e.target.closest('[data-roster-edit]');if(ed){const item=rosterLoad().find(x=>x.id===ed.dataset.rosterEdit);if(item)openShipRosterDialog(item);return}
  const del=e.target.closest('[data-roster-delete]');if(del){rosterSave(rosterLoad().filter(x=>x.id!==del.dataset.rosterDelete));}
 });
