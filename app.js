@@ -16,10 +16,15 @@ function timerRecentSave(kind,name,minutes){
  const next=[{name:n,minutes:m},...rows.filter(x=>String(x?.name)!==n||Number(x?.minutes)!==m)].slice(0,6);
  all[kind]=next;try{localStorage.setItem(TIMER_RECENT_KEY,JSON.stringify(all))}catch{}return next;
 }
+function timerRecentRemove(kind,index){
+ const all=timerRecentLoad(),rows=Array.isArray(all[kind])?[...all[kind]]:[],i=Number(index);
+ if(!Number.isInteger(i)||i<0||i>=rows.length)return rows;
+ rows.splice(i,1);all[kind]=rows;try{localStorage.setItem(TIMER_RECENT_KEY,JSON.stringify(all))}catch{}renderTimerRecent(kind);return rows;
+}
 function renderTimerRecent(kind){
  const host=document.getElementById('timerRecent');if(!host)return;
  const rows=Array.isArray(timerRecentLoad()[kind])?timerRecentLoad()[kind]:[];
- host.innerHTML=rows.map((x,i)=>`<button type="button" class="ghost small" data-timer-recent="${i}"><span>${esc(x.name)}</span><small>${timerDurationLabel(x.minutes)}</small></button>`).join('');
+ host.innerHTML=rows.map((x,i)=>`<span class="timer-recent-item"><button type="button" class="ghost small" data-timer-recent="${i}"><span>${esc(x.name)}</span><small>${timerDurationLabel(x.minutes)}</small></button><button type="button" class="timer-recent-remove" data-timer-recent-remove="${i}" aria-label="${esc(x.name)}を候補から削除">×</button></span>`).join('');
  host.hidden=!rows.length;
 }
 const QUEST_RECENT_KEY='harbordesk-quest-recent-v1';
@@ -29,9 +34,12 @@ function questRecentSave(name){
  const rows=questRecentLoad().filter(x=>x!==value);rows.unshift(value);
  const next=rows.slice(0,6);try{localStorage.setItem(QUEST_RECENT_KEY,JSON.stringify(next))}catch{}return next;
 }
+function questRecentRemove(name){
+ const value=String(name||''),rows=questRecentLoad().filter(x=>x!==value);try{localStorage.setItem(QUEST_RECENT_KEY,JSON.stringify(rows))}catch{}renderQuestRecent();return rows;
+}
 function renderQuestRecent(){
  const host=document.getElementById('questRecent');if(!host)return;
- const rows=questRecentLoad();host.innerHTML=rows.length?rows.map(x=>`<button type="button" class="ghost small" data-quest-recent="${esc(x)}">${esc(x)}</button>`).join(''):'';
+ const rows=questRecentLoad();host.innerHTML=rows.length?rows.map(x=>`<span class="quest-recent-item"><button type="button" class="ghost small" data-quest-recent="${esc(x)}">${esc(x)}</button><button type="button" class="quest-recent-remove" data-quest-recent-remove="${esc(x)}" aria-label="${esc(x)}を候補から削除">×</button></span>`).join(''):'';
  host.hidden=!rows.length;
 }
 function openQuestDialog(){
@@ -263,6 +271,8 @@ function openTimer(kind){
 }
 
 document.addEventListener('click',e=>{
+ const timerRemove=e.target.closest?.('[data-timer-recent-remove]');if(timerRemove){timerRecentRemove(timerKind,timerRemove.dataset.timerRecentRemove);return}
+ const questRemove=e.target.closest?.('[data-quest-recent-remove]');if(questRemove){questRecentRemove(questRemove.dataset.questRecentRemove);return}
  const timerRecent=e.target.closest?.('[data-timer-recent]');if(timerRecent){
   const rows=timerRecentLoad()[timerKind]||[],row=rows[Number(timerRecent.dataset.timerRecent)];
   if(row){const name=document.getElementById('timerName'),mins=document.getElementById('timerMinutes');if(name)name.value=String(row.name||'');if(mins)mins.value=String(Number(row.minutes)||30);try{name?.focus({preventScroll:true});name?.select()}catch{}}
