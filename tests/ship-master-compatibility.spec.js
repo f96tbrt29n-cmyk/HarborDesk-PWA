@@ -4257,3 +4257,22 @@ test('mobile timer actions can wrap', async ({ page }) => {
   expect(data.hasTimerActions).toBe(true);
   expect(data.hasWrap).toBe(true);
 });
+
+
+test('recent suggestions and drop hunts support undo', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const appText=[window.timerRecentRemove,window.questRecentRemove].map(fn=>String(fn||'')).join('\n');
+    const dropHandlers=[...document.scripts].some(()=>false);
+    return {
+      timerUndo:appText.includes('元に戻す')&&appText.includes('TIMER_RECENT_KEY'),
+      questUndo:appText.includes('元に戻す')&&appText.includes('QUEST_RECENT_KEY'),
+      hasDrop:typeof window.hdDropHunts==='function'
+    };
+  });
+  expect(data.timerUndo).toBe(true);
+  expect(data.questUndo).toBe(true);
+  expect(data.hasDrop).toBe(true);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
