@@ -301,3 +301,59 @@ test('procurement demand sums total copies across multiple ships', async ({ page
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('procurement priority favors broad reusable and near-complete equipment', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    const broad = window.hdPLPriorityMeta?.({
+      target: '41cm連装砲',
+      methodKey: 'develop',
+      methodLabel: '開発候補',
+      maps: ['5-5', '6-5'],
+      ships: ['長門改二', '陸奥改二', 'Bismarck drei'],
+      loadouts: ['昼戦', 'ボス'],
+      owned: 1,
+      shortfall: 1
+    });
+    const narrow = window.hdPLPriorityMeta?.({
+      target: '限定装備',
+      methodKey: 'limited',
+      methodLabel: '限定入手',
+      maps: ['7-5'],
+      ships: ['艦A'],
+      loadouts: ['特殊'],
+      owned: 0,
+      shortfall: 2
+    });
+    const html = window.hdPLPriorityQueueHtml?.([
+      {
+        id: 'priority-test',
+        map: '優先テスト',
+        kinds: [],
+        gearItems: [
+          { map: '優先テスト', ship: '長門改二', loadout: '昼戦', wanted: '大口径主砲', target: '41cm連装砲', kind: '主砲', methodKey: 'develop', methodLabel: '開発候補', rank: 1, needed: 1, requiredTotal: 2 },
+          { map: '優先テスト', ship: '陸奥改二', loadout: '昼戦', wanted: '大口径主砲', target: '41cm連装砲', kind: '主砲', methodKey: 'develop', methodLabel: '開発候補', rank: 1, needed: 1, requiredTotal: 2 }
+        ]
+      }
+    ]) || '';
+    return {
+      broadScore: broad?.score || 0,
+      broadLabel: broad?.label || '',
+      narrowScore: narrow?.score || 0,
+      reasons: broad?.reasons || [],
+      html
+    };
+  });
+
+  expect(data.broadScore).toBeGreaterThan(data.narrowScore);
+  expect(['最優先', '優先']).toContain(data.broadLabel);
+  expect(data.reasons).toEqual(expect.arrayContaining(['3隻で使用', '2計画で共用', 'あと1個', '開発候補']));
+  expect(data.html).toContain('先に揃える候補');
+  expect(data.html).toContain('41cm連装砲');
+  expect(data.html).toContain('#1');
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
