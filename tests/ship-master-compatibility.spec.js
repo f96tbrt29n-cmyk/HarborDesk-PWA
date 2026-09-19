@@ -3107,3 +3107,28 @@ test('Kancolle sync coverage distinguishes captured and zero sections', async ({
   expect(data.ok).toBeGreaterThan(0);
   expect(data.zero).toBeGreaterThan(0);
 });
+
+
+test('mobile header hides version controls behind more menu', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  await page.setViewportSize({width:390,height:844});
+  const data=await page.evaluate(()=>{
+    window.hdEnsureUpdateUI?.();
+    const details=document.querySelector('.hd-header-more');
+    const summary=details?.querySelector('summary');
+    const menu=details?.querySelector('.hd-version-menu');
+    return {
+      details:!!details,
+      summary:!!summary,
+      menu:!!menu,
+      version:menu?.querySelector('.hd-version-badge')?.textContent||'',
+      update:!!menu?.querySelector('#hdUpdateCheck')
+    };
+  });
+  expect(data.details).toBe(true);
+  expect(data.summary).toBe(true);
+  expect(data.menu).toBe(true);
+  expect(data.version).toContain('v');
+  expect(data.update).toBe(true);
+});
