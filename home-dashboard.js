@@ -21,7 +21,7 @@ function ensureHomeDashboard(){
   <article class="home-card"><div class="home-card-title"><strong>資源</strong><a href="#resources">記録へ</a></div><div id="homeResources" class="home-resource-grid"></div></article>
   <article class="home-card"><div class="home-card-title"><strong>次の装備調達</strong><button type="button" class="ghost small" data-home-procurement-open>調達リストへ</button></div><div id="homeProcurement"></div></article>
   <article class="home-card"><div class="home-card-title"><strong>クイックアクセス</strong><span class="muted">1〜2タップで移動</span></div><div class="home-shortcuts">
-    <a href="#guide">🗺️ 攻略</a><a href="#roster">⚓ 艦隊</a><a href="#equipmentBook">🧰 装備</a><a href="#eventLog">🎯 イベント</a><a href="#calculators">🧮 計算</a><a href="#backup">💾 保存</a>
+    <a href="#guide">🗺️ 攻略</a><a href="#roster">⚓ 艦隊</a><a href="#equipmentBook">🧰 装備</a><a href="#kancolleImport">🎮 ゲーム同期</a><a href="#eventLog">🎯 イベント</a><a href="#calculators">🧮 計算</a><a href="#backup">💾 保存</a>
   </div></article>
   <article class="home-card"><div class="home-card-title"><strong>最近見た海域</strong><span class="muted">タップで攻略を開く</span></div><div id="homeRecentMaps" class="home-recent-maps"></div></article>`;
  hero.insertAdjacentElement('afterend',section);
