@@ -189,6 +189,13 @@ document.addEventListener('click',e=>{
  const fav=e.target.closest('[data-guide-fav]');if(fav){const id=fav.dataset.guideFav;guideFavs.has(id)?guideFavs.delete(id):guideFavs.add(id);localStorage.setItem(FAV_KEY,JSON.stringify([...guideFavs]));renderGuide();return}
  const emptyTimer=e.target.closest('[data-empty-add-timer]');if(emptyTimer){openTimer(emptyTimer.dataset.emptyAddTimer);return}
  if(e.target.closest('[data-empty-add-quest]')){openQuestDialog();return}
+ const adjust=e.target.closest('[data-adjust-timer]');if(adjust){
+  const k=adjust.dataset.kind==='dock'?'dock':'expedition',arr=k==='expedition'?state.expeditions:state.docks,item=arr.find(x=>String(x.id)===String(adjust.dataset.adjustTimer)),delta=Number(adjust.dataset.minutes)||0;
+  if(!item||delta<=0)return;
+  const before=Number(item.endsAt)||Date.now();item.endsAt=before+delta*60000;save();renderTimers(k);tick();try{if(typeof renderHomeDashboard==='function')renderHomeDashboard()}catch{}
+  hdToastAction(`${item.name} を ${delta}分延長したよ`,'元に戻す',()=>{item.endsAt=before;save();renderTimers(k);tick();try{if(typeof renderHomeDashboard==='function')renderHomeDashboard()}catch{};hdToast('元に戻したよ')});
+  return
+ }
  const restart=e.target.closest('[data-restart-timer]');if(restart){
   const k=restart.dataset.kind==='dock'?'dock':'expedition',arr=k==='expedition'?state.expeditions:state.docks,item=arr.find(x=>String(x.id)===String(restart.dataset.restartTimer));
   if(!item)return;
@@ -247,7 +254,7 @@ function renderTimers(kind){
  const rows=[...arr].filter(t=>mode==='all'||(mode==='active'?Number(t.endsAt)>now:Number(t.endsAt)<=now)).sort((a,b)=>a.endsAt-b.endsAt);
  coreListFilterRender(kind,rows.length,arr.length);
  if(!rows.length){el.innerHTML=coreFilteredEmpty(kind,label+'タイマー');return}
- el.innerHTML=rows.map(t=>{const done=Number(t.endsAt)<=now,duration=Number(t.durationMinutes)||0;return `<div class="timer ${done?'done':''}"><div class="timer-main"><div class="timer-name">${esc(t.name)}</div><div class="timer-time" data-end="${t.endsAt}">${fmt(t.endsAt-now)}</div></div><div class="timer-actions">${done&&duration>0?`<button type="button" class="ghost small" data-restart-timer="${t.id}" data-kind="${kind}">もう一度</button>`:''}<button class="icon-btn" data-delete-timer="${t.id}" data-kind="${kind}" aria-label="削除">×</button></div></div>`}).join('');
+ el.innerHTML=rows.map(t=>{const done=Number(t.endsAt)<=now,duration=Number(t.durationMinutes)||0;return `<div class="timer ${done?'done':''}"><div class="timer-main"><div class="timer-name">${esc(t.name)}</div><div class="timer-time" data-end="${t.endsAt}">${fmt(t.endsAt-now)}</div></div><div class="timer-actions">${!done?`<button type="button" class="ghost small timer-adjust" data-adjust-timer="${t.id}" data-kind="${kind}" data-minutes="15">+15</button><button type="button" class="ghost small timer-adjust" data-adjust-timer="${t.id}" data-kind="${kind}" data-minutes="30">+30</button>`:''}${done&&duration>0?`<button type="button" class="ghost small" data-restart-timer="${t.id}" data-kind="${kind}">もう一度</button>`:''}<button class="icon-btn" data-delete-timer="${t.id}" data-kind="${kind}" aria-label="削除">×</button></div></div>`}).join('');
 }
 function renderQuests(){
  const el=document.getElementById('questList');
