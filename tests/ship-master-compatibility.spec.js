@@ -5418,3 +5418,31 @@ test('sortie readiness warnings are shown first', async ({ page }) => {
   expect(data.sum).toEqual(expect.objectContaining({autoWarn:1,autoNote:1,autoOk:1,autoTotal:3}));
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('sortie readiness warnings link to resolution targets', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-guide-view-v1', JSON.stringify({world:'5',map:'5-5',filter:'map',query:'5-5'}));
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({'5-5':[
+      {id:'fleet-action',name:'ゲーム同期｜第1艦隊',source:'kancolle-import',sourceDeckId:1,sourceSyncedAt:Date.now()-3600000,ships:[
+        {ship:'加賀改',gear:'',nowHp:10,maxHp:40,cond:32}
+      ]}
+    ]}));
+    localStorage.setItem('harbordesk-sortie-selection-v1', JSON.stringify({'5-5':'fleet-action'}));
+  });
+  await boot(page,errors);
+  await page.evaluate(()=>{
+    if(typeof selectedMap!=='undefined')selectedMap='5-5';
+    document.querySelector('[data-map-tab="mine"]')?.click();
+    window.hdRenderSortieReadiness?.();
+  });
+  const rows=await page.evaluate(()=>[...document.querySelectorAll('#hdSortieReadiness [data-hd-sortie-action]')].map(x=>({
+    action:x.dataset.hdSortieAction,label:x.textContent.trim(),row:x.closest('.hd-sortie-auto-row')?.textContent||''
+  })));
+  expect(rows.some(x=>x.action==='kancolleImport'&&x.label.includes('再同期'))).toBe(true);
+  expect(rows.some(x=>x.action==='home'&&x.row.includes('耐久'))).toBe(true);
+  expect(rows.some(x=>x.action==='home'&&x.row.includes('疲労'))).toBe(true);
+  expect(rows.some(x=>x.action==='tab:gear')).toBe(true);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
