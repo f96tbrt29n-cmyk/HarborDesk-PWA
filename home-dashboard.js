@@ -12,7 +12,8 @@ function homeShowInstallTip(){
 }
 const HD_HOME_PANELS_KEY='harbordesk-home-panels-v1';
 const HD_HOME_ORDER_KEY='harbordesk-home-order-v1';
-const HD_HOME_ORDER_DEFAULT=['resources','procurement','quick','recent'];
+const HD_HOME_ORDER_DEFAULT=['fleet','resources','procurement','quick','recent'];
+const HD_HOME_FLEET_KEY='harbordesk-home-current-fleet-v1';
 
 function homeEsc(s){return typeof esc==='function'?esc(s):String(s??'')}
 function loadRecentMaps(){try{return JSON.parse(localStorage.getItem(HD_RECENT_MAPS_KEY))||[]}catch{return []}}
@@ -113,6 +114,25 @@ function homeTimerDurationLabel(minutes){
  const m=Number(minutes)||0;if(m>0&&m%60===0)return (m/60)+'時間';if(m>=60)return Math.floor(m/60)+'時間'+(m%60)+'分';return m+'分';
 }
 
+function homeCurrentFleetRows(){
+ const rows=homeJson('harbordesk-kancolle-fleets-v1',[]);
+ return Array.isArray(rows)?rows.filter(x=>x&&Number(x.deckId)>0).sort((a,b)=>Number(a.deckId)-Number(b.deckId)):[];
+}
+function homeCurrentFleetId(rows=homeCurrentFleetRows()){
+ let id=0;try{id=Number(localStorage.getItem(HD_HOME_FLEET_KEY)||0)}catch{}
+ if(!rows.some(x=>Number(x.deckId)===id))id=Number(rows[0]?.deckId)||0;
+ return id;
+}
+function homeCurrentFleetSave(id){try{localStorage.setItem(HD_HOME_FLEET_KEY,String(Number(id)||0))}catch{}}
+function homeOpenFleetShip(name){
+ const ship=String(name||'').trim();if(!ship)return false;
+ if(typeof hdKcOpenShipFromFleet==='function')return hdKcOpenShipFromFleet(ship);
+ try{sessionStorage.setItem('harbordesk-session-shipdb-view-v1',JSON.stringify({query:ship}))}catch{}
+ if(typeof hdWSShowElement==='function')hdWSShowElement('shipDatabase',true);
+ else document.getElementById('shipDatabase')?.scrollIntoView({behavior:'smooth',block:'start'});
+ setTimeout(()=>{const input=document.getElementById('hdShipDbSearch');if(input){input.value=ship;input.dispatchEvent(new Event('input',{bubbles:true}))}},80);
+ return true;
+}
 function homeSyncDeltaHtml(sync){
  const d=sync?.delta;if(!d?.baseline)return '';
  const labels={fuel:'燃料',ammo:'弾薬',steel:'鋼材',bauxite:'ボーキ',instantBuild:'高速建造',bucket:'バケツ',devMaterial:'開発資材',screw:'ネジ'};
@@ -139,6 +159,7 @@ function ensureHomeDashboard(){
    <article class="home-card"><div class="home-card-title"><strong>今日やること</strong><a href="#quests">任務へ</a></div><div id="homeTodo"></div></article>
    <article class="home-card"><div class="home-card-title"><strong>進行中タイマー</strong><a href="#expeditions">遠征へ</a></div><div id="homeTimers"></div></article>
   </div>
+  <article class="home-card home-collapsible home-current-fleet-card" data-home-panel="fleet" data-home-order-item="fleet"><div class="home-card-title"><strong>現在艦隊</strong><div class="home-card-actions"><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面</button><span class="home-order-controls"><button type="button" class="ghost small home-move-btn" data-home-move="up" aria-label="現在艦隊を上へ">↑</button><button type="button" class="ghost small home-move-btn" data-home-move="down" aria-label="現在艦隊を下へ">↓</button></span><button type="button" class="ghost small home-collapse-btn" data-home-collapse="fleet" aria-label="現在艦隊カードを折りたたむ" aria-expanded="true">−</button></div></div><div data-home-panel-body><div id="homeCurrentFleet"></div></div></article>
   <article class="home-card home-collapsible" data-home-panel="resources" data-home-order-item="resources"><div class="home-card-title"><strong>資源</strong><div class="home-card-actions"><button type="button" class="ghost small" data-home-jump="kancolleImport">ゲーム同期</button><a href="#resources">記録へ</a><span class="home-order-controls"><button type="button" class="ghost small home-move-btn" data-home-move="up" aria-label="資源を上へ">↑</button><button type="button" class="ghost small home-move-btn" data-home-move="down" aria-label="資源を下へ">↓</button></span><button type="button" class="ghost small home-collapse-btn" data-home-collapse="resources" aria-label="資源カードを折りたたむ" aria-expanded="true">−</button></div></div><div data-home-panel-body><div id="homeResources" class="home-resource-grid"></div></div></article>
   <article class="home-card home-collapsible" data-home-panel="procurement" data-home-order-item="procurement"><div class="home-card-title"><strong>次の装備調達</strong><div class="home-card-actions"><button type="button" class="ghost small" data-home-procurement-open>調達リストへ</button><span class="home-order-controls"><button type="button" class="ghost small home-move-btn" data-home-move="up" aria-label="装備調達を上へ">↑</button><button type="button" class="ghost small home-move-btn" data-home-move="down" aria-label="装備調達を下へ">↓</button></span><button type="button" class="ghost small home-collapse-btn" data-home-collapse="procurement" aria-label="装備調達カードを折りたたむ" aria-expanded="true">−</button></div></div><div data-home-panel-body><div id="homeProcurement"></div></div></article>
   <article class="home-card" data-home-order-item="quick"><div class="home-card-title"><strong>クイックアクセス</strong><div class="home-card-actions"><span class="muted">1〜2タップで移動</span><span class="home-order-controls"><button type="button" class="ghost small home-move-btn" data-home-move="up" aria-label="クイックアクセスを上へ">↑</button><button type="button" class="ghost small home-move-btn" data-home-move="down" aria-label="クイックアクセスを下へ">↓</button></span></div></div><div class="home-shortcuts">
@@ -210,6 +231,15 @@ function renderHomeDashboard(){
  const recentExpHtml=recentExpeditions.length?`<div class="home-timer-recent"><small>最近の遠征</small><div>${recentExpeditions.map((x,i)=>`<button type="button" class="ghost small" data-home-timer-start="${i}" data-kind="expedition"><b>${homeEsc(x.name)}</b><span>${homeEsc(homeTimerDurationLabel(x.minutes))}</span></button>`).join('')}</div></div>`:'';
  const recentDockHtml=recentDocks.length?`<div class="home-timer-recent home-dock-recent"><small>最近の入渠</small><div>${recentDocks.map((x,i)=>`<button type="button" class="ghost small" data-home-timer-start="${i}" data-kind="dock"><b>${homeEsc(x.name)}</b><span>${homeEsc(homeTimerDurationLabel(x.minutes))}</span></button>`).join('')}</div></div>`:'';
  document.getElementById('homeTimers').innerHTML=runningHtml+recentExpHtml+recentDockHtml;
+ const fleetHost=document.getElementById('homeCurrentFleet'),fleetRows=homeCurrentFleetRows();
+ if(fleetHost){
+  if(!fleetRows.length){
+   fleetHost.innerHTML='<div class="home-empty home-empty-action"><span>現在艦隊はまだ同期されてないよ</span><button type="button" class="ghost small" data-home-jump="kancolleImport">ゲーム同期へ</button></div>';
+  }else{
+   const selectedId=homeCurrentFleetId(fleetRows),deck=fleetRows.find(x=>Number(x.deckId)===selectedId)||fleetRows[0],mission=Array.isArray(deck?.mission)?deck.mission:[],away=Number(mission[0])>0;
+   fleetHost.innerHTML=`<div class="home-fleet-tabs">${fleetRows.map(x=>`<button type="button" class="${Number(x.deckId)===Number(deck.deckId)?'active':''}" data-home-fleet-tab="${Number(x.deckId)}">第${Number(x.deckId)}艦隊</button>`).join('')}</div><div class="home-fleet-meta"><div><strong>${homeEsc(deck.name||('第'+deck.deckId+'艦隊'))}</strong><small>${deck.ships?.length||0}隻${away?'・遠征中':''}</small></div><button type="button" class="ghost small" data-home-jump="roster">艦隊台帳</button></div><div class="home-fleet-ships">${(deck.ships||[]).map((s,i)=>`<button type="button" data-home-fleet-ship="${homeEsc(s.name||'')}" title="${homeEsc(s.gear||'')}"><span>${i+1}</span><div><b>${homeEsc(s.name||'未解決')}</b><small>Lv.${Number(s.level)||0}</small></div><i aria-hidden="true">›</i></button>`).join('')||'<div class="home-empty">艦娘データなし</div>'}</div>`;
+  }
+ }
  const res=[['燃料',resources.fuel],['弾薬',resources.ammo],['鋼材',resources.steel],['ボーキ',resources.bauxite]];
  document.getElementById('homeResources').innerHTML=res.map(([name,val])=>`<div><span>${name}</span><strong>${val!==''&&val!=null?Number(val).toLocaleString():'-'}</strong></div>`).join('');
  const procurement=document.getElementById('homeProcurement');
@@ -233,6 +263,8 @@ function renderHomeDashboard(){
 }
 
 document.addEventListener('click',e=>{
+ const fleetTab=e.target.closest('[data-home-fleet-tab]');if(fleetTab){homeCurrentFleetSave(fleetTab.dataset.homeFleetTab);renderHomeDashboard();return}
+ const fleetShip=e.target.closest('[data-home-fleet-ship]');if(fleetShip){homeOpenFleetShip(fleetShip.dataset.homeFleetShip);return}
  const edit=e.target.closest('[data-home-edit-toggle]');if(edit){homeSetEditing(!document.getElementById('home')?.classList.contains('home-editing'));return}
  const dismissInstall=e.target.closest('[data-home-install-dismiss]');if(dismissInstall){try{localStorage.setItem(HOME_INSTALL_TIP_KEY,'1')}catch{};const tip=document.getElementById('homeInstallTip');if(tip)tip.hidden=true;return}
  const addQuest=e.target.closest('[data-home-add-quest]');if(addQuest){if(typeof openQuestDialog==='function')openQuestDialog();else{const input=document.getElementById('questName');if(input)input.value='';document.getElementById('questDialog')?.showModal()}return}
