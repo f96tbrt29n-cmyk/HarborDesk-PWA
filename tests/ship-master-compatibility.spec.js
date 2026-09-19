@@ -271,3 +271,33 @@ test('master procurement counts total required copies, not only missing slots', 
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('procurement demand sums total copies across multiple ships', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      { name: '41cm連装砲', category: '大口径主砲', count: 1, star: 0 }
+    ]));
+    const rows = window.hdPLDemandRows?.([
+      { map: '艦隊テスト', ship: '長門改二', loadout: '昼戦', wanted: '大口径主砲', target: '41cm連装砲', kind: '主砲', methodKey: 'develop', needed: 1, requiredTotal: 2 },
+      { map: '艦隊テスト', ship: '陸奥改二', loadout: '昼戦', wanted: '大口径主砲', target: '41cm連装砲', kind: '主砲', methodKey: 'develop', needed: 1, requiredTotal: 2 }
+    ]) || [];
+    const target = rows.find(x => x.target === '41cm連装砲');
+    return {
+      needed: target?.needed || 0,
+      owned: target?.owned || 0,
+      shortfall: target?.shortfall || 0,
+      ships: target?.ships || []
+    };
+  });
+
+  expect(data.needed).toBe(4);
+  expect(data.owned).toBe(1);
+  expect(data.shortfall).toBe(3);
+  expect(data.ships).toEqual(expect.arrayContaining(['長門改二', '陸奥改二']));
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
