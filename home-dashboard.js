@@ -84,6 +84,12 @@ function homeRecentTimerRows(kind='expedition'){
   return rows.filter(x=>String(x?.name||'').trim()&&Number(x?.minutes)>0).slice(0,3).map(x=>({name:String(x.name),minutes:Number(x.minutes)}));
  }catch{return []}
 }
+function homeRecentQuestRows(){
+ try{
+  const rows=JSON.parse(localStorage.getItem('harbordesk-quest-recent-v1')||'[]')||[];
+  return (Array.isArray(rows)?rows:[]).map(x=>String(x||'').trim()).filter(Boolean).slice(0,3);
+ }catch{return []}
+}
 function homeTimerDurationLabel(minutes){
  if(typeof timerDurationLabel==='function')return timerDurationLabel(minutes);
  const m=Number(minutes)||0;if(m>0&&m%60===0)return (m/60)+'時間';if(m>=60)return Math.floor(m/60)+'時間'+(m%60)+'分';return m+'分';
@@ -159,11 +165,15 @@ function renderHomeDashboard(){
    <button type="button" class="home-summary-item" data-home-jump="roster"><span>艦娘</span><strong>${rosterCount}</strong><small>艦隊へ</small></button>
    <button type="button" class="home-summary-item" data-home-jump="equipmentBook"><span>装備</span><strong>${equipCount}</strong><small>装備へ</small></button>
    <button type="button" class="home-summary-item" data-home-jump="kancolleImport"><span>最終同期</span><strong class="home-sync-age">${homeEsc(syncInfo.label)}</strong><small>更新</small></button>`;
- document.getElementById('homeTodo').innerHTML=todo.length?todo.slice(0,5).map(q=>`<div class="home-row home-task-row"><span>${homeEsc(q.name)}</span><button type="button" class="ghost small home-task-done" data-home-quest-done="${homeEsc(q.id)}">完了</button></div>`).join(''):'<div class="home-empty home-empty-action"><span>未完了の任務はないよ</span><button type="button" class="ghost small" data-home-add-quest>＋ 任務を追加</button></div>';
- const recentExpeditions=homeRecentTimerRows('expedition');
+ const recentQuests=homeRecentQuestRows();
+ const todoHtml=todo.length?todo.slice(0,5).map(q=>`<div class="home-row home-task-row"><span>${homeEsc(q.name)}</span><button type="button" class="ghost small home-task-done" data-home-quest-done="${homeEsc(q.id)}">完了</button></div>`).join(''):'<div class="home-empty home-empty-action"><span>未完了の任務はないよ</span><button type="button" class="ghost small" data-home-add-quest>＋ 任務を追加</button></div>';
+ const recentQuestHtml=recentQuests.length?`<div class="home-quest-recent"><small>最近の任務</small><div>${recentQuests.map((x,i)=>`<button type="button" class="ghost small" data-home-quest-start="${i}"><b>${homeEsc(x)}</b><span>＋</span></button>`).join('')}</div></div>`:'';
+ document.getElementById('homeTodo').innerHTML=todoHtml+recentQuestHtml;
+ const recentExpeditions=homeRecentTimerRows('expedition'),recentDocks=homeRecentTimerRows('dock');
  const runningHtml=running.length?running.slice(0,5).map(t=>`<div class="home-row home-timer-row"><span><b>${t.kind}</b> ${homeEsc(t.name)}</span><div class="home-timer-actions"><small>${typeof fmt==='function'?fmt(t.endsAt-now):''}</small><button type="button" class="ghost small" data-home-timer-cancel="${homeEsc(t.id)}" data-kind="${homeEsc(t.sourceKind)}">取消</button></div></div>`).join(''):'<div class="home-empty home-empty-action"><span>動いているタイマーはないよ</span><div><button type="button" class="ghost small" data-home-add-timer="expedition">＋ 遠征</button><button type="button" class="ghost small" data-home-add-timer="dock">＋ 入渠</button></div></div>';
- const recentTimerHtml=recentExpeditions.length?`<div class="home-timer-recent"><small>最近の遠征</small><div>${recentExpeditions.map((x,i)=>`<button type="button" class="ghost small" data-home-timer-start="${i}" data-kind="expedition"><b>${homeEsc(x.name)}</b><span>${homeEsc(homeTimerDurationLabel(x.minutes))}</span></button>`).join('')}</div></div>`:'';
- document.getElementById('homeTimers').innerHTML=runningHtml+recentTimerHtml;
+ const recentExpHtml=recentExpeditions.length?`<div class="home-timer-recent"><small>最近の遠征</small><div>${recentExpeditions.map((x,i)=>`<button type="button" class="ghost small" data-home-timer-start="${i}" data-kind="expedition"><b>${homeEsc(x.name)}</b><span>${homeEsc(homeTimerDurationLabel(x.minutes))}</span></button>`).join('')}</div></div>`:'';
+ const recentDockHtml=recentDocks.length?`<div class="home-timer-recent home-dock-recent"><small>最近の入渠</small><div>${recentDocks.map((x,i)=>`<button type="button" class="ghost small" data-home-timer-start="${i}" data-kind="dock"><b>${homeEsc(x.name)}</b><span>${homeEsc(homeTimerDurationLabel(x.minutes))}</span></button>`).join('')}</div></div>`:'';
+ document.getElementById('homeTimers').innerHTML=runningHtml+recentExpHtml+recentDockHtml;
  const res=[['燃料',resources.fuel],['弾薬',resources.ammo],['鋼材',resources.steel],['ボーキ',resources.bauxite]];
  document.getElementById('homeResources').innerHTML=res.map(([name,val])=>`<div><span>${name}</span><strong>${val!==''&&val!=null?Number(val).toLocaleString():'-'}</strong></div>`).join('');
  const procurement=document.getElementById('homeProcurement');
@@ -189,6 +199,17 @@ function renderHomeDashboard(){
 document.addEventListener('click',e=>{
  const dismissInstall=e.target.closest('[data-home-install-dismiss]');if(dismissInstall){try{localStorage.setItem(HOME_INSTALL_TIP_KEY,'1')}catch{};const tip=document.getElementById('homeInstallTip');if(tip)tip.hidden=true;return}
  const addQuest=e.target.closest('[data-home-add-quest]');if(addQuest){if(typeof openQuestDialog==='function')openQuestDialog();else{const input=document.getElementById('questName');if(input)input.value='';document.getElementById('questDialog')?.showModal()}return}
+ const quickQuest=e.target.closest('[data-home-quest-start]');if(quickQuest){
+  const rows=homeRecentQuestRows(),name=rows[Number(quickQuest.dataset.homeQuestStart)],arr=(typeof state!=='undefined'&&Array.isArray(state.quests))?state.quests:null;
+  if(!name||!arr)return;
+  if(arr.some(q=>!q.done&&String(q.name||'').trim()===name)){if(typeof hdToast==='function')hdToast(`${name} は未完了で登録済みだよ`,'warn',2400);return}
+  const item={id:typeof uid==='function'?uid():String(Date.now()),name,done:false};arr.push(item);
+  try{if(typeof questRecentSave==='function')questRecentSave(name)}catch{};try{if(typeof save==='function')save()}catch{};
+  try{if(typeof renderQuests==='function')renderQuests()}catch{};renderHomeDashboard();
+  if(typeof hdToastAction==='function')hdToastAction(`${name} を追加したよ`,'元に戻す',()=>{const i=arr.findIndex(x=>String(x.id)===String(item.id));if(i>=0)arr.splice(i,1);try{if(typeof save==='function')save()}catch{};try{if(typeof renderQuests==='function')renderQuests()}catch{};renderHomeDashboard()},6500);
+  else if(typeof hdToast==='function')hdToast(`${name} を追加したよ`);
+  return;
+ }
  const quickTimer=e.target.closest('[data-home-timer-start]');if(quickTimer){
   const kind=quickTimer.dataset.kind==='dock'?'dock':'expedition',rows=homeRecentTimerRows(kind),row=rows[Number(quickTimer.dataset.homeTimerStart)];
   const arr=(typeof state!=='undefined')?(kind==='dock'?state.docks:state.expeditions):null;if(!row||!Array.isArray(arr))return;
