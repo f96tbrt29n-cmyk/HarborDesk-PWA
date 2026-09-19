@@ -362,8 +362,10 @@ function hdKcPreviewHtml(p){
  return `<div class="hd-kc-import-stats"><div><span>艦娘</span><strong>${p.ships}</strong><small>${p.completeShips?'全件同期候補':'部分データ'}</small></div><div><span>装備個体</span><strong>${p.slotItems}</strong><small>${p.completeSlotItems?'全件同期候補':'部分データ'}</small></div><div><span>資源</span><strong>${p.materials}</strong></div><div><span>艦隊</span><strong>${p.decks}</strong></div><div><span>遠征中</span><strong>${p.expeditions||0}</strong></div><div><span>入渠中</span><strong>${p.docks||0}</strong></div><div><span>任務</span><strong>${p.activeQuests||0}</strong><small>${p.completeQuests?'全ページ取得':'取得ページ内'}</small></div><div><span>出撃</span><strong>${p.sortieStarts||0}</strong><small>戦闘結果 ${p.battleResults||0}</small></div></div>${p.unknownShips||p.unknownEquip?`<div class="hd-kc-import-warn">未解決: 艦娘 ${p.unknownShips} / 装備 ${p.unknownEquip}</div>`:''}<small>検出元: ${p.sources.map(hdKcEsc).join(' / ')||'自動判定'}</small>`;
 }
 function hdKcRenderSyncStatus(){
- const el=document.getElementById('hdKcSyncLast');if(!el)return;const s=hdKcSyncStatus();
- el.textContent=s?`最終同期 ${new Date(s.syncedAt).toLocaleString('ja-JP')} ・ 艦娘${s.ships} / 装備${s.equipment} / 資源${s.materials} / 艦隊${s.decks} / 遠征${s.expeditions||0} / 入渠${s.docks||0} / 任務${s.quests||0} / 出撃${s.sorties||0}`:'まだ同期してないよ';
+ const el=document.getElementById('hdKcSyncLast'),headline=document.getElementById('hdKcSyncHeadline'),box=document.querySelector('.hd-kc-sync-overview'),s=hdKcSyncStatus();
+ if(el)el.textContent=s?`最終同期 ${new Date(s.syncedAt).toLocaleString('ja-JP')} ・ 艦娘${s.ships} / 装備${s.equipment} / 資源${s.materials} / 艦隊${s.decks} / 遠征${s.expeditions||0} / 入渠${s.docks||0} / 任務${s.quests||0} / 出撃${s.sorties||0}`:'まだ同期してないよ';
+ if(headline)headline.textContent=s?'艦これデータは同期済み':'まず艦これから同期しよう';
+ if(box)box.classList.toggle('is-synced',!!s);
 }
 function hdKcCaptureBootstrap(){
  if(window.__HD_KC_CAPTURE?.show){window.__HD_KC_CAPTURE.show();return}
@@ -468,24 +470,28 @@ async function hdKcConsumeHashImport(){
 }
 function hdKcEnsureImport(){
  const wrap=document.getElementById('advancedToolsWrap'),backup=document.getElementById('backup');if(!wrap||!backup||document.getElementById('kancolleImport'))return;
+ const synced=!!hdKcSyncStatus();
  const sec=document.createElement('section');sec.id='kancolleImport';sec.className='advanced-section';sec.innerHTML=`
  <div class="section-head"><div><div class="eyebrow">GAME DATA IMPORT</div><h2>艦これゲーム内データ取込</h2></div><span class="muted">端末内処理</span></div>
  <div class="hd-kc-import card">
-  <div class="hd-kc-import-note"><strong>DMMのID・パスワード・Cookieは不要</strong><p>艦これAPIレスポンスから艦娘・装備・資源・現在艦隊・遠征/入渠・任務・出撃結果を抽出してHarborDeskへ反映する。貼り付けた生JSONは保存しないよ。</p></div>
-  <div class="hd-kc-import-actions"><label class="ghost hd-kc-import-file">JSONファイルを選ぶ<input id="hdKcImportFile" type="file" accept=".json,.txt,application/json,text/plain"></label><button type="button" class="ghost" data-hd-kc-paste>クリップボードから貼る</button></div>
-  <details class="hd-kc-capture-guide" open><summary>おすすめ: Userscriptsで自動連携</summary><div><p>iPhoneのSafari拡張「Userscripts」を使うと、艦これを開くだけで対応APIを自動取得できる。ゲーム画面に出る「HarborDeskへ送る」を押すと同じタブでHarborDeskへ移動し、そのまま自動同期するよ。</p><div class="hd-kc-import-actions"><a class="primary" href="./HarborDesk-Kancolle.user.js" target="_blank" rel="noopener">Userscripts版をインストール</a></div><ol><li>上のボタンで <code>HarborDesk-Kancolle.user.js</code> をSafariで開く</li><li>Safariの機能拡張ボタン → Userscripts を開く</li><li>表示されたインストール案内から追加</li><li>艦これを開き直す</li><li>画面右下の「HarborDeskへ送る」を押す</li><li>HarborDeskへ移動して自動同期完了</li></ol><small>スクリプトは対応する <code>/kcsapi/</code> レスポンスだけを必要項目へ縮小して保持し、リクエスト本文・api_token・Cookie・DMMログイン情報は保存しない。</small></div></details>
-  <details class="hd-kc-capture-guide"><summary>Safariブックマーク方式（予備）</summary><div><p>SafariのブックマークURLとしてキャプチャ補助コードを登録すると、実行後の <code>/kcsapi/</code> レスポンスだけを端末内で拾ってHarborDesk用JSONにできる。DMM側のページ/iframe構成によっては動作しない場合があるよ。</p><button type="button" class="ghost" data-hd-kc-copy-capture>Safari用コードをコピー</button><ol><li>Safariで適当なページをブックマーク</li><li>そのブックマークを編集し、URLをコピーしたコードへ置換</li><li>艦これを開いてブックマークを実行</li><li>母港や装備画面を操作して取得件数を増やす</li><li>「JSONをコピー」→ HarborDeskの「クリップボードから貼る」</li></ol><small>補助コードはレスポンスを必要項目だけに縮小して保持し、リクエスト本文・api_token・Cookieは記録しない。</small></div></details>
-  <textarea id="hdKcImportText" spellcheck="false" placeholder="svdata={...} または複数APIをまとめたJSONを貼り付け"></textarea>
-  <div class="hd-kc-import-actions"><button type="button" class="primary" data-hd-kc-parse>内容を解析</button><button type="button" class="ghost" data-hd-kc-clear>入力を消す</button></div>
-  <div id="hdKcImportPreview" class="hd-kc-import-preview">${hdKcPreviewHtml(null)}</div>
-  <div class="hd-kc-import-options"><label><input type="checkbox" id="hdKcApplyShips" checked>艦隊台帳</label><label><input type="checkbox" id="hdKcApplyEquipment" checked>装備台帳</label><label><input type="checkbox" id="hdKcApplyResources" checked>資源</label><label><input type="checkbox" id="hdKcApplyFleets" checked>現在艦隊</label><label><input type="checkbox" id="hdKcApplyTimers" checked>遠征/入渠タイマー</label><label><input type="checkbox" id="hdKcApplyQuests" checked>任務</label><label><input type="checkbox" id="hdKcApplySorties" checked>出撃ログ</label></div>
-  <button type="button" class="primary full" data-hd-kc-apply disabled>HarborDeskへ同期</button>
-  <div id="hdKcImportResult" class="hd-kc-import-result muted"></div>
-  <div class="hd-kc-import-supported"><b>対応:</b> 母港/艦娘/装備/資源/入渠/任務に加え、api_req_map/start・next、通常/連合艦隊のbattleresult。<br><b>保存しない:</b> api_token、Cookie、DMM認証情報、貼り付けた生レスポンス。</div>
-  <div id="hdKcSyncLast" class="muted"></div>
+  <div class="hd-kc-sync-overview"><div><span>連携状態</span><strong id="hdKcSyncHeadline">確認中…</strong></div><div id="hdKcSyncLast" class="muted"></div></div>
+  <div id="hdKcImportResult" class="hd-kc-import-result muted" aria-live="polite"></div>
+  <details class="hd-kc-capture-guide" data-hd-kc-auto-guide open><summary>Userscripts 自動連携</summary><div><p>艦これを開くだけで対応APIを自動取得。ゲーム画面の「HarborDeskへ送る」でそのまま同期できるよ。</p><div class="hd-kc-import-actions"><a class="primary" href="./HarborDesk-Kancolle.user.js" target="_blank" rel="noopener">Userscripts版を確認・更新</a></div><ol><li>Userscriptsを有効にする</li><li>艦これを開き直す</li><li>母港・装備・任務などを一度開く</li><li>「HarborDeskへ送る」を押す</li></ol><small>リクエスト本文・api_token・Cookie・DMMログイン情報は保存しない。</small></div></details>
+  <details class="hd-kc-capture-guide"><summary>その他の取込方法</summary><div>
+   <div class="hd-kc-import-actions"><label class="ghost hd-kc-import-file">JSONファイルを選ぶ<input id="hdKcImportFile" type="file" accept=".json,.txt,application/json,text/plain"></label><button type="button" class="ghost" data-hd-kc-paste>クリップボードから貼る</button></div>
+   <details class="hd-kc-manual-panel"><summary>手動JSON取込の詳細</summary><div>
+    <textarea id="hdKcImportText" spellcheck="false" placeholder="svdata={...} または複数APIをまとめたJSONを貼り付け"></textarea>
+    <div class="hd-kc-import-actions"><button type="button" class="primary" data-hd-kc-parse>内容を解析</button><button type="button" class="ghost" data-hd-kc-clear>入力を消す</button></div>
+    <div id="hdKcImportPreview" class="hd-kc-import-preview">${hdKcPreviewHtml(null)}</div>
+    <div class="hd-kc-import-options"><label><input type="checkbox" id="hdKcApplyShips" checked>艦隊台帳</label><label><input type="checkbox" id="hdKcApplyEquipment" checked>装備台帳</label><label><input type="checkbox" id="hdKcApplyResources" checked>資源</label><label><input type="checkbox" id="hdKcApplyFleets" checked>現在艦隊</label><label><input type="checkbox" id="hdKcApplyTimers" checked>遠征/入渠タイマー</label><label><input type="checkbox" id="hdKcApplyQuests" checked>任務</label><label><input type="checkbox" id="hdKcApplySorties" checked>出撃ログ</label></div>
+    <button type="button" class="primary full" data-hd-kc-apply disabled>HarborDeskへ同期</button>
+   </div></details>
+  </div></details>
+  <details class="hd-kc-capture-guide"><summary>Safariブックマーク方式（予備）</summary><div><p>Userscriptsが使えない時だけ使う予備方式。</p><button type="button" class="ghost" data-hd-kc-copy-capture>Safari用コードをコピー</button></div></details>
+  <div class="hd-kc-import-supported"><b>対応:</b> 母港/艦娘/装備/資源/入渠/任務、出撃開始・進行、通常/連合艦隊の戦闘結果。<br><b>保存しない:</b> api_token、Cookie、DMM認証情報、生レスポンス。</div>
   <div class="hd-kc-current"><div class="hd-kc-current-head"><strong>ゲーム現在艦隊</strong><small>同期した第1〜第4艦隊</small></div><div id="hdKcCurrentFleets"></div></div>
  </div>`;
- wrap.insertBefore(sec,backup);hdKcRenderSyncStatus();hdKcRenderCurrentFleets();
+ wrap.insertBefore(sec,backup);if(synced)sec.querySelector('[data-hd-kc-auto-guide]')?.removeAttribute('open');hdKcRenderSyncStatus();hdKcRenderCurrentFleets();
 }
 async function hdKcReadAndPreview(raw){
  const p=hdKcPreviewData(hdKcParseImport(raw));HD_KC_IMPORT_PREVIEW=p;const el=document.getElementById('hdKcImportPreview');if(el)el.innerHTML=hdKcPreviewHtml(p);const btn=document.querySelector('[data-hd-kc-apply]');if(btn)btn.disabled=false;return p;
