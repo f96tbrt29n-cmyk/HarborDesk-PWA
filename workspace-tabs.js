@@ -1,5 +1,6 @@
 const HD_WS_KEY='harbordesk-workspace-tabs-v1';
 const HD_WS_SCROLL_KEY='harbordesk-session-workspace-scroll-v1';
+const HD_WS_HISTORY_KEY='harbordesk-session-workspace-history-v1';
 const HD_WS_GROUPS=[
  {key:'home',label:'ホーム'},
  {key:'guide',label:'攻略'},
@@ -38,6 +39,22 @@ function hdWSActivePin(){
 function hdWSLoad(){try{const v=JSON.parse(localStorage.getItem(HD_WS_KEY)||'{}');return {group:v.group||'home',sections:v.sections||{}}}catch{return {group:'home',sections:{}}}}
 function hdWSSave(){localStorage.setItem(HD_WS_KEY,JSON.stringify(hdWSState))}
 function hdWSScrollLoad(){try{return JSON.parse(sessionStorage.getItem(HD_WS_SCROLL_KEY)||'{}')||{}}catch{return {}}}
+function hdWSHistoryLoad(){try{return JSON.parse(sessionStorage.getItem(HD_WS_HISTORY_KEY)||'[]')||[]}catch{return []}}
+function hdWSHistorySave(rows){try{sessionStorage.setItem(HD_WS_HISTORY_KEY,JSON.stringify(rows.slice(-20)))}catch{}}
+function hdWSCurrentLocation(){const group=hdWSState.group,section=hdWSState.sections?.[group]||hdWSDefaultSection(group);return section?{group,section}:null}
+function hdWSPushHistory(){
+ hdWSSaveCurrentScroll();const cur=hdWSCurrentLocation();if(!cur)return;
+ const rows=hdWSHistoryLoad(),last=rows[rows.length-1];
+ if(last?.group===cur.group&&last?.section===cur.section)return;
+ rows.push(cur);hdWSHistorySave(rows);hdWSUpdateBackButton();
+}
+function hdWSUpdateBackButton(){const b=document.querySelector('[data-hd-ws-back]');if(b)b.disabled=hdWSHistoryLoad().length===0}
+function hdWSGoBack(){
+ const rows=hdWSHistoryLoad();let prev=null;
+ while(rows.length&&!prev){const x=rows.pop(),el=document.getElementById(x?.section||'');if(x&&el)prev=x}
+ hdWSHistorySave(rows);hdWSUpdateBackButton();if(!prev)return false;
+ hdWSSaveCurrentScroll();hdWSClearPin();hdWSApply(prev.group,prev.section,{restoreScroll:true,ignorePin:true});return true;
+}
 function hdWSSaveCurrentScroll(){
  const section=hdWSVisibleSections(hdWSState.group).find(x=>!x.classList.contains('hd-ws-hidden'));if(!section)return;
  const top=section.getBoundingClientRect().top+window.scrollY,offset=Math.max(0,Math.round(window.scrollY-top));
@@ -146,7 +163,7 @@ function hdWSUpdateBadges(){const counts=hdWSBadgeCounts();for(const g of HD_WS_
 function hdWSEnsureUI(){
  if(document.getElementById('hdWorkspaceNav'))return;
  const top=document.querySelector('.topbar');if(!top)return;
- const nav=document.createElement('div');nav.id='hdWorkspaceNav';nav.className='hd-ws-shell';nav.innerHTML=`<div class="hd-ws-primary" role="tablist" aria-label="HarborDeskカテゴリ">${HD_WS_GROUPS.map(g=>`<button type="button" role="tab" data-hd-ws-group="${g.key}"><span>${g.label}</span><em data-hd-ws-badge hidden>0</em></button>`).join('')}</div><div id="hdWorkspaceMobilePicker" class="hd-ws-mobile-picker" hidden><span id="hdWorkspaceContextGroup">ホーム</span><select id="hdWorkspaceSectionSelect" aria-label="カテゴリ内機能"></select><button type="button" class="ghost small" data-hd-ws-group-top>先頭</button></div><div id="hdWorkspaceSubtabs" class="hd-ws-secondary" role="tablist" aria-label="カテゴリ内機能"></div>`;
+ const nav=document.createElement('div');nav.id='hdWorkspaceNav';nav.className='hd-ws-shell';nav.innerHTML=`<div class="hd-ws-primary" role="tablist" aria-label="HarborDeskカテゴリ">${HD_WS_GROUPS.map(g=>`<button type="button" role="tab" data-hd-ws-group="${g.key}"><span>${g.label}</span><em data-hd-ws-badge hidden>0</em></button>`).join('')}</div><div id="hdWorkspaceMobilePicker" class="hd-ws-mobile-picker" hidden><button type="button" class="ghost small hd-ws-back" data-hd-ws-back aria-label="ひとつ前の機能へ戻る" title="戻る">←</button><span id="hdWorkspaceContextGroup">ホーム</span><select id="hdWorkspaceSectionSelect" aria-label="カテゴリ内機能"></select><button type="button" class="ghost small" data-hd-ws-group-top>先頭</button></div><div id="hdWorkspaceSubtabs" class="hd-ws-secondary" role="tablist" aria-label="カテゴリ内機能"></div>`;
  top.insertAdjacentElement('afterend',nav);document.body.classList.add('hd-workspace-mode');hdWSEnsureSyncStatus();hdWSEnsureNetworkStatus();hdWSUpdateTopbarHeight();hdWSUpdateBadges();hdWSUpdateSyncStatus();
 }
 function hdWSRenderSubtabs(group,selected){
@@ -154,6 +171,7 @@ function hdWSRenderSubtabs(group,selected){
  if(context)context.textContent=hdWSGroupLabel(group);
  if(select){select.innerHTML=rows.map(el=>`<option value="${hdWSEsc(el.id)}">${hdWSEsc(hdWSTitle(el))}</option>`).join('');if(selected)select.value=selected}
  if(picker)picker.hidden=rows.length===0;
+ hdWSUpdateBackButton();
  if(rows.length<=1){host.hidden=true;host.innerHTML='';return}
  host.hidden=false;host.innerHTML=rows.map(el=>`<button type="button" role="tab" class="${el.id===selected?'active':''}" aria-selected="${el.id===selected?'true':'false'}" data-hd-ws-section="${hdWSEsc(el.id)}">${hdWSEsc(hdWSTitle(el))}</button>`).join('');
  const active=host.querySelector('.active');active?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
@@ -187,7 +205,7 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
  }finally{hdWSApplying=false}
 }
 function hdWSShowElement(target,scroll=true){
- hdWSSaveCurrentScroll();
+ hdWSPushHistory();
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
  const section=hdWSManagedSectionFor(el);if(!section)return false;
  const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
@@ -225,19 +243,20 @@ function hdWSInstall(){
 }
 function hdWSHorizontalScroller(el){for(let n=el;n&&n!==document.body;n=n.parentElement){if(n.scrollWidth>n.clientWidth+12){const s=getComputedStyle(n);if(['auto','scroll'].includes(s.overflowX))return true}}return false}
 function hdWSSwipeBlocked(target){return !!target?.closest?.('input,textarea,select,button,a,dialog,[contenteditable="true"],.hd-ws-primary,.hd-ws-secondary')||hdWSHorizontalScroller(target)}
-function hdWSMoveGroup(dir){const i=HD_WS_GROUPS.findIndex(x=>x.key===hdWSState.group),next=HD_WS_GROUPS[i+dir];if(!next)return false;hdWSSaveCurrentScroll();hdWSClearPin();hdWSApply(next.key,null,{restoreScroll:true,ignorePin:true});return true}
+function hdWSMoveGroup(dir){const i=HD_WS_GROUPS.findIndex(x=>x.key===hdWSState.group),next=HD_WS_GROUPS[i+dir];if(!next)return false;hdWSPushHistory();hdWSClearPin();hdWSApply(next.key,null,{restoreScroll:true,ignorePin:true});return true}
 function hdWSTouchStart(e){if(e.touches?.length!==1||hdWSSwipeBlocked(e.target))return;const t=e.touches[0];if(t.clientX<24||t.clientX>window.innerWidth-24)return;hdWSTouch={x:t.clientX,y:t.clientY,at:Date.now()}}
 function hdWSTouchEnd(e){if(!hdWSTouch)return;const t=e.changedTouches?.[0],start=hdWSTouch;hdWSTouch=null;if(!t)return;const dx=t.clientX-start.x,dy=t.clientY-start.y,dt=Date.now()-start.at;if(dt>800||Math.abs(dx)<72||Math.abs(dx)<Math.abs(dy)*1.35)return;hdWSMoveGroup(dx<0?1:-1)}
 
 document.addEventListener('click',e=>{
- const top=e.target.closest?.('[data-hd-ws-group-top]');if(top){hdWSSaveCurrentScroll();hdWSClearPin();const target=hdWSDefaultSection(hdWSState.group);hdWSApply(hdWSState.group,target,{scrollTop:true,ignorePin:true});return}
- const g=e.target.closest?.('[data-hd-ws-group]');if(g){hdWSSaveCurrentScroll();hdWSClearPin();hdWSApply(g.dataset.hdWsGroup,null,{restoreScroll:true,ignorePin:true});return}
- const s=e.target.closest?.('[data-hd-ws-section]');if(s){hdWSSaveCurrentScroll();hdWSClearPin();hdWSApply(hdWSState.group,s.dataset.hdWsSection,{restoreScroll:true,ignorePin:true});return}
+ const back=e.target.closest?.('[data-hd-ws-back]');if(back){hdWSGoBack();return}
+ const top=e.target.closest?.('[data-hd-ws-group-top]');if(top){hdWSPushHistory();hdWSClearPin();const target=hdWSDefaultSection(hdWSState.group);hdWSApply(hdWSState.group,target,{scrollTop:true,ignorePin:true});return}
+ const g=e.target.closest?.('[data-hd-ws-group]');if(g){hdWSPushHistory();hdWSClearPin();hdWSApply(g.dataset.hdWsGroup,null,{restoreScroll:true,ignorePin:true});return}
+ const s=e.target.closest?.('[data-hd-ws-section]');if(s){hdWSPushHistory();hdWSClearPin();hdWSApply(hdWSState.group,s.dataset.hdWsSection,{restoreScroll:true,ignorePin:true});return}
  const a=e.target.closest?.('a[href^="#"]');if(a&&hdWSHandleAnchor(a)){e.preventDefault();history.replaceState(null,'',a.getAttribute('href'))}
 },true);
 document.addEventListener('change',e=>{
  const select=e.target.closest?.('#hdWorkspaceSectionSelect');if(!select)return;
- hdWSSaveCurrentScroll();hdWSClearPin();hdWSApply(hdWSState.group,select.value,{restoreScroll:true,ignorePin:true});
+ hdWSPushHistory();hdWSClearPin();hdWSApply(hdWSState.group,select.value,{restoreScroll:true,ignorePin:true});
 });
 document.addEventListener('touchstart',hdWSTouchStart,{passive:true});
 document.addEventListener('touchend',hdWSTouchEnd,{passive:true});
