@@ -8580,6 +8580,19 @@ const HD_SLOT_EXCLUSION_RULES=[
  {shipIds:[961,1035],slot:3,exclude:[1,5]},
  {shipIds:[743,744,745],slot:3,allowOnly:[21,43]}
 ];
+(function hdApplyKancolleMasterSnapshot(){
+ const snap=window.HD_KANCOLLE_MASTER_SNAPSHOT;
+ window.HD_SHIP_MASTER_RUNTIME_SYNCED=!!(snap&&snap.ships);
+ window.HD_SHIP_MASTER_RUNTIME_SOURCE=snap?.source||HD_SHIP_MASTER_SOURCE;
+ if(!snap?.ships)return;
+ const replaceObj=(target,source)=>{for(const k of Object.keys(target))delete target[k];Object.assign(target,source||{})};
+ replaceObj(HD_SHIP_SLOT_PROFILES,snap.ships);
+ replaceObj(HD_EQUIPMENT_MASTER_META_BY_NAME,snap.equipment);
+ HD_EXSLOT_BASE_TYPE_IDS.splice(0,HD_EXSLOT_BASE_TYPE_IDS.length,...(snap.exslotBaseTypeIds||[]));
+ HD_EXSLOT_GLOBAL_ITEM_IDS.splice(0,HD_EXSLOT_GLOBAL_ITEM_IDS.length,...(snap.exslotGlobalItemIds||[]));
+ replaceObj(HD_EXSLOT_ITEM_RULES,snap.exslotItemRules);
+ replaceObj(HD_EXSLOT_LIMIT_TYPE_IDS,snap.exslotLimitTypeIds);
+})();
 const HD_EQUIP_TYPE_LABELS={1:'小口径主砲',2:'中口径主砲',3:'大口径主砲',5:'魚雷',12:'小型電探',13:'大型電探',21:'対空機銃',22:'特殊潜航艇',43:'戦闘糧食',38:'大口径主砲(II)',91:'噴式戦闘爆撃機(II)',93:'大型電探(II)',94:'艦上偵察機(II)',95:'副砲(II)'};
 const HD_EQUIPMENT_MASTER_NAME_BY_ID=Object.fromEntries(Object.entries(HD_EQUIPMENT_MASTER_META_BY_NAME).map(([name,v])=>[String(v.id),name]));
 const HD_EXSLOT_TYPE_LABELS={16:'追加装甲',21:'対空機銃',23:'応急修理要員',27:'追加装甲(中型)',28:'追加装甲(大型)',36:'高射装置',39:'水上艦要員',43:'戦闘糧食',44:'補給物資'};
@@ -8718,7 +8731,7 @@ function hdShipDbMasterAudit(){
  const ships=HD_SHIP_DATABASE.map(x=>x.final),missingProfiles=ships.filter(x=>!HD_SHIP_SLOT_PROFILES[x]);
  const badSlots=ships.filter(x=>{const p=HD_SHIP_SLOT_PROFILES[x];return p&&(!Array.isArray(p.slots)||p.slots.length!==p.count&&p.count!=null)});
  const ruleCount=Object.keys(HD_EXSLOT_ITEM_RULES||{}).length,starRuleCount=Object.values(HD_EXSLOT_ITEM_RULES||{}).filter(x=>Number(x.reqStar||0)>0).length;
- return {ships:ships.length,profiles:ships.length-missingProfiles.length,missingProfiles,badSlots,exslotRules:ruleCount,starRules:starRuleCount,source:HD_SHIP_MASTER_SOURCE};
+ return {ships:ships.length,profiles:ships.length-missingProfiles.length,missingProfiles,badSlots,exslotRules:ruleCount,starRules:starRuleCount,snapshotLoaded:window.HD_SHIP_MASTER_RUNTIME_SYNCED===true,source:window.HD_SHIP_MASTER_RUNTIME_SOURCE||HD_SHIP_MASTER_SOURCE};
 }
 window.HD_SHIP_MASTER_AUDIT=hdShipDbMasterAudit();
 function hdShipDbMapCandidates(detail){
