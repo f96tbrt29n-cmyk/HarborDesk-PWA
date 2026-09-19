@@ -49,13 +49,31 @@ function hdQNTogglePin(id){const pins=hdQNLoadPins(),set=new Set(pins);set.has(i
 function hdQNEnsureMobileDock(){
  if(document.getElementById('hdMobileDock'))return;
  const dock=document.createElement('nav');dock.id='hdMobileDock';dock.className='hd-mobile-dock';dock.setAttribute('aria-label','主要操作');
- dock.innerHTML='<button type="button" data-hd-mobile-home><span>⌂</span><b>ホーム</b></button><button type="button" data-hd-mobile-search><span>⌕</span><b>検索</b></button><button type="button" data-hd-mobile-sync><span>↻</span><b>同期</b><i aria-hidden="true"></i></button><button type="button" data-hd-mobile-menu><span>☰</span><b>機能</b></button>';
+ dock.innerHTML='<button type="button" data-hd-mobile-home><span>⌂</span><b>ホーム</b><em data-hd-mobile-home-badge hidden>0</em></button><button type="button" data-hd-mobile-search><span>⌕</span><b>検索</b></button><button type="button" data-hd-mobile-sync><span>↻</span><b>同期</b><i aria-hidden="true"></i></button><button type="button" data-hd-mobile-menu><span>☰</span><b>機能</b></button>';
  document.body.appendChild(dock);hdQNUpdateMobileDock();
+}
+function hdQNMobileAttentionCount(){
+ let count=0,now=Date.now();
+ try{
+  const appState=window.state||{};
+  const quests=Array.isArray(appState.quests)?appState.quests:[];
+  const expeditions=Array.isArray(appState.expeditions)?appState.expeditions:[];
+  const docks=Array.isArray(appState.docks)?appState.docks:[];
+  if(quests.some(x=>!x.done))count++;
+  if(expeditions.some(x=>Number(x.endsAt)>now&&Number(x.endsAt)-now<=15*60*1000))count++;
+  if(docks.some(x=>Number(x.endsAt)>now&&Number(x.endsAt)-now<=15*60*1000))count++;
+ }catch{}
+ try{
+  const syncState=typeof hdWSSyncInfo==='function'?hdWSSyncInfo().state:'missing';
+  if(syncState&&syncState!=='fresh')count++;
+ }catch{count++}
+ return Math.min(9,count);
 }
 function hdQNUpdateMobileDock(){
  const dock=document.getElementById('hdMobileDock');if(!dock)return;
- const home=dock.querySelector('[data-hd-mobile-home]'),sync=dock.querySelector('[data-hd-mobile-sync]'),activeGroup=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'';
+ const home=dock.querySelector('[data-hd-mobile-home]'),sync=dock.querySelector('[data-hd-mobile-sync]'),badge=dock.querySelector('[data-hd-mobile-home-badge]'),activeGroup=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'';
  home?.classList.toggle('active',activeGroup==='home');
+ const attention=hdQNMobileAttentionCount();if(badge){badge.textContent=String(attention);badge.hidden=attention<=0}
  if(sync){sync.classList.remove('fresh','stale','partial','missing');let state='missing';try{state=typeof hdWSSyncInfo==='function'?(hdWSSyncInfo().state||'missing'):'missing'}catch{}sync.classList.add(state)}
 }
 function hdQNEnsure(){
@@ -97,3 +115,8 @@ window.addEventListener('load',()=>setTimeout(()=>{const id=window.hdWSState?.se
 window.addEventListener('hd:workspace-changed',hdQNUpdateMobileDock);
 window.addEventListener('hd:kancolle-sync',hdQNUpdateMobileDock);
 window.addEventListener('storage',e=>{if(!e||e.key==='harbordesk-kancolle-sync-v1')hdQNUpdateMobileDock()});
+
+window.addEventListener('hd:state-changed',hdQNUpdateMobileDock);
+window.addEventListener('hd:quest-changed',hdQNUpdateMobileDock);
+window.addEventListener('hd:timer-changed',hdQNUpdateMobileDock);
+setInterval(hdQNUpdateMobileDock,60000);
