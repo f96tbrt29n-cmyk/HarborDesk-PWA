@@ -2885,3 +2885,29 @@ test('mobile roster toolbar stays sticky', async ({ page }) => {
   expect(data.position).toBe('sticky');
   expect(data.top).not.toBe('auto');
 });
+
+
+test('ship and equipment database compact modes restore from session', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-shipdb-view-v1', JSON.stringify({compact:true}));
+    sessionStorage.setItem('harbordesk-session-equip-catalog-view-v1', JSON.stringify({compact:true,query:'電探'}));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdEnsureShipDatabase?.();
+    window.hdEnsureEquipmentCatalog?.();
+    return {
+      shipCompact:document.getElementById('hdShipDbList')?.classList.contains('hd-compact')||false,
+      shipButton:document.querySelector('[data-hd-shipdb-compact]')?.textContent||'',
+      equipCompact:document.getElementById('hdEquipCatalogList')?.classList.contains('hd-compact')||false,
+      equipButton:document.querySelector('[data-hd-equip-compact]')?.textContent||'',
+      equipCount:document.getElementById('hdEquipCatalogCount')?.textContent||''
+    };
+  });
+  expect(data.shipCompact).toBe(true);
+  expect(data.shipButton).toContain('詳細');
+  expect(data.equipCompact).toBe(true);
+  expect(data.equipButton).toContain('詳細');
+  expect(data.equipCount).toContain('/');
+});
