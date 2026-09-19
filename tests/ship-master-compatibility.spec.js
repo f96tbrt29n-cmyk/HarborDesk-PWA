@@ -4906,3 +4906,32 @@ test('global sync status flags partial capture coverage', async ({ page }) => {
   expect(data.missing).toEqual(expect.arrayContaining(['quests','docks']));
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
+
+
+test('mobile header overflow menu uses touch-friendly action grid', async ({ page }) => {
+  const errors=[];
+  await page.setViewportSize({width:390,height:844});
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdEnsureUpdateUI?.();
+    const menu=document.querySelector('.hd-header-more .hd-version-menu');
+    const details=document.querySelector('.hd-header-more');
+    details?.setAttribute('open','');
+    const cs=menu?getComputedStyle(menu):null;
+    const buttons=menu?[...menu.querySelectorAll('button')]:[];
+    const badge=menu?.querySelector('.hd-version-badge');
+    return {
+      display:cs?.display||'',
+      columns:cs?.gridTemplateColumns||'',
+      buttonHeights:buttons.map(b=>b.getBoundingClientRect().height),
+      badgeWidth:badge?.getBoundingClientRect().width||0,
+      menuWidth:menu?.getBoundingClientRect().width||0
+    };
+  });
+  expect(data.display).toBe('grid');
+  expect(data.columns.split(' ').length).toBe(2);
+  expect(data.buttonHeights.length).toBeGreaterThanOrEqual(3);
+  expect(Math.min(...data.buttonHeights)).toBeGreaterThanOrEqual(40);
+  expect(data.badgeWidth).toBeGreaterThan(data.menuWidth*0.8);
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
