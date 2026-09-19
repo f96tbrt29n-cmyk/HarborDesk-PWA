@@ -69,8 +69,7 @@ jobs:
               data=body,
               headers={
                   "Content-Type":"application/json",
-                  "Origin":"https://routinehub.co",
-                  "Referer":"https://routinehub.co/"
+                  "User-Agent":"cherri/0.2.7-beta"
               },
               method="POST"
           )
