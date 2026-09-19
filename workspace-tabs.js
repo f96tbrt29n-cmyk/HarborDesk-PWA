@@ -154,11 +154,35 @@ function hdWSUpdateNetworkStatus(){
  if(online&&window.hdToast&&bar.dataset.wasOffline==='1')window.hdToast('オンラインに戻ったよ','info',1400);
  bar.dataset.wasOffline=online?'0':'1';
 }
+function hdWSSyncMissingGuide(missing=[]){
+ const set=new Set(missing||[]),steps=[];
+ if(set.has('ships')||set.has('resources')||set.has('fleets'))steps.push('母港');
+ if(set.has('equipment'))steps.push('装備・改装');
+ if(set.has('quests'))steps.push('任務');
+ if(set.has('docks'))steps.push('入渠');
+ return [...new Set(steps)];
+}
+function hdWSEnsureSyncDialog(){
+ if(document.getElementById('hdSyncStatusDialog'))return document.getElementById('hdSyncStatusDialog');
+ const d=document.createElement('dialog');d.id='hdSyncStatusDialog';d.className='hd-sync-status-dialog';
+ d.innerHTML='<div class="hd-sync-status-head"><div><div class="eyebrow">GAME SYNC</div><h3>ゲーム同期の状態</h3></div><button type="button" class="ghost small" data-hd-sync-close>閉じる</button></div><div id="hdSyncStatusBody" class="hd-sync-status-body"></div><div class="hd-sync-status-actions"><a class="primary" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost" data-hd-sync-import>取込画面へ</button></div>';
+ document.body.appendChild(d);d.addEventListener('click',e=>{if(e.target===d)d.close?.()});return d;
+}
+function hdWSOpenSyncStatus(){
+ const info=hdWSSyncInfo();
+ if(info.state==='fresh'){if(typeof hdWSShowElement==='function'&&hdWSShowElement('kancolleImport',true))return true;document.getElementById('kancolleImport')?.scrollIntoView({behavior:'smooth',block:'start'});return true}
+ const d=hdWSEnsureSyncDialog(),body=document.getElementById('hdSyncStatusBody'),labels={ships:'艦娘',equipment:'装備',resources:'資源',fleets:'艦隊',quests:'任務',docks:'入渠'},steps=hdWSSyncMissingGuide(info.missing);
+ const missingHtml=info.missing?.length?'<div class="hd-sync-missing"><b>未取得</b><div>'+info.missing.map(k=>'<span>'+hdWSEsc(labels[k]||k)+'</span>').join('')+'</div></div>':'';
+ const guideHtml=steps.length?'<div class="hd-sync-guide"><b>艦これで一度開く</b><p>'+steps.map(hdWSEsc).join(' → ')+'</p><small>画面を開いたあと、艦これ右下の「HarborDeskへ送る」を押してね。</small></div>':'';
+ const statusText=info.state==='missing'?'まだゲームデータを同期してないよ':info.state==='stale'?'前回同期から時間が空いてるよ':'一部のデータがまだ取れてないよ';
+ if(body)body.innerHTML='<strong>'+hdWSEsc(statusText)+'</strong><p>'+hdWSEsc(info.detail||'')+'</p>'+missingHtml+guideHtml;
+ if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');return true;
+}
 function hdWSEnsureSyncStatus(){
  if(document.getElementById('hdGlobalSyncStatus'))return;
  const top=document.querySelector('.topbar');if(!top)return;
  const btn=document.createElement('button');btn.id='hdGlobalSyncStatus';btn.type='button';btn.className='hd-global-sync-status';btn.innerHTML='<span>同期</span><b>確認中</b>';
- btn.addEventListener('click',()=>{if(typeof hdWSShowElement==='function'&&hdWSShowElement('kancolleImport',true))return;document.getElementById('kancolleImport')?.scrollIntoView({behavior:'smooth',block:'start'})});
+ btn.addEventListener('click',hdWSOpenSyncStatus);
  const anchor=top.querySelector('.hd-header-more')||top.querySelector('#notifyBtn');
  if(anchor&&anchor.parentElement===top)top.insertBefore(btn,anchor);else top.appendChild(btn);
  hdWSUpdateSyncStatus();
@@ -379,6 +403,10 @@ window.addEventListener('hashchange',()=>{const id=location.hash.slice(1);if(id)
 window.addEventListener('resize',hdWSUpdateTopbarHeight,{passive:true});
 window.addEventListener('storage',e=>{hdWSUpdateBadges();if(!e||e.key==='harbordesk-kancolle-sync-v1')hdWSUpdateSyncStatus()});
 window.addEventListener('hd:kancolle-sync',hdWSUpdateSyncStatus);
+document.addEventListener('click',e=>{
+ if(e.target.closest?.('[data-hd-sync-close]')){const d=document.getElementById('hdSyncStatusDialog');if(d?.open)d.close();else d?.removeAttribute('open');return}
+ if(e.target.closest?.('[data-hd-sync-import]')){const d=document.getElementById('hdSyncStatusDialog');if(d?.open)d.close();else d?.removeAttribute('open');if(typeof hdWSShowElement==='function')hdWSShowElement('kancolleImport',true);else document.getElementById('kancolleImport')?.scrollIntoView({behavior:'smooth',block:'start'});return}
+});
 window.addEventListener('hd:kancolle-return-ready',()=>{hdWSEnsureGameReturnAction();hdWSUpdateGameReturnAction()});
 window.addEventListener('online',hdWSUpdateNetworkStatus);
 window.addEventListener('offline',hdWSUpdateNetworkStatus);
