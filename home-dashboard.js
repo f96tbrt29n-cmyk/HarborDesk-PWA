@@ -67,9 +67,9 @@ function homeRelative(ts){
 }
 function homeSyncInfo(){
  const s=homeJson('harbordesk-kancolle-sync-v1',null);
- if(!s)return {sync:null,label:'未同期',state:'missing',age:Infinity,missing:['艦娘','装備','資源','艦隊']};
+ if(!s)return {sync:null,label:'未同期',state:'missing',age:Infinity,missing:['艦娘','装備','資源','艦隊','任務','入渠']};
  const age=Date.now()-Number(s.syncedAt||0),coverage=s.coverage&&typeof s.coverage==='object'?s.coverage:null;
- const required=[['ships','艦娘'],['equipment','装備'],['resources','資源'],['fleets','艦隊']];
+ const required=[['ships','艦娘'],['equipment','装備'],['resources','資源'],['fleets','艦隊'],['quests','任務'],['docks','入渠']];
  const missing=coverage?required.filter(([key])=>coverage[key]===false).map(([,label])=>label):[];
  const state=missing.length?'partial':age>21600000?'warn':'ok';
  return {sync:s,label:state==='partial'?'一部未取得・'+homeRelative(s.syncedAt):homeRelative(s.syncedAt),state,age,missing};
@@ -78,6 +78,8 @@ function homeSyncMissingGuide(missing=[]){
  const set=new Set(missing||[]),steps=[];
  if(set.has('艦娘')||set.has('資源')||set.has('艦隊'))steps.push('母港');
  if(set.has('装備'))steps.push('装備・改装');
+ if(set.has('任務'))steps.push('任務');
+ if(set.has('入渠'))steps.push('入渠');
  return [...new Set(steps)];
 }
 function homeFunctionTitleMap(){
