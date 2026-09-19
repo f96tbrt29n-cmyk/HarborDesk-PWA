@@ -1,7 +1,7 @@
 {
-  "version": "1.0.165",
-  "build": 165,
-  "releasedAt": "2026-09-19T20:47:00+09:00",
-  "notes": "iPhone/Safariショートカット切り分け用の最小診断JSを追加。長いキャプチャコードを使わず、Safariページへ「HarborDesk ショートカット実行OK」を表示してcompletion()でURLを返すだけの短いスクリプトをワンタップでコピーできる。共有シート/JavaScript実行自体が動いているかを先に確認できる。",
+  "version": "1.0.166",
+  "build": 166,
+  "releasedAt": "2026-09-19T21:29:00+09:00",
+  "notes": "iPhone/Safariのショートカット式艦これ通信キャプチャ実験を撤去。HarborDeskの通常の艦これJSON取込・既存キャプチャ/同期機能は維持し、ショートカット用UI、診断コード、配布ページ、生成Workflow、署名済みショートカットファイルを削除。",
   "masterChanges": null
 }
