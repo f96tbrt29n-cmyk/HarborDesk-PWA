@@ -3569,3 +3569,21 @@ test('Kancolle sync offers direct next-step navigation', async ({ page }) => {
   expect(data.hidden).toBe(false);
   expect(data.ids).toEqual(expect.arrayContaining(['roster','equipmentBook','quests','sortieLog']));
 });
+
+
+test('home reorder controls persist card order', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-home-order-v1', JSON.stringify(['quick','resources','recent','procurement']));
+  });
+  await boot(page,errors);
+  const before=await page.evaluate(()=>[...document.querySelectorAll('#home [data-home-order-item]')].map(x=>x.dataset.homeOrderItem));
+  expect(before).toEqual(['quick','resources','recent','procurement']);
+  await page.locator('[data-home-order-item="recent"] [data-home-move="up"]').click();
+  const after=await page.evaluate(()=>({
+    dom:[...document.querySelectorAll('#home [data-home-order-item]')].map(x=>x.dataset.homeOrderItem),
+    saved:JSON.parse(localStorage.getItem('harbordesk-home-order-v1')||'[]')
+  }));
+  expect(after.dom).toEqual(['quick','recent','resources','procurement']);
+  expect(after.saved).toEqual(after.dom);
+});
