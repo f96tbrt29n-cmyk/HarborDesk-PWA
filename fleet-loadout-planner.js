@@ -133,6 +133,50 @@ function hdFLPick(inv,remaining,slot,slotIndex,kind,needTags,gearMemo){
  const best=candidates[0];if(!best)return null;
  remaining.set(best.own.key,(remaining.get(best.own.key)||0)-1);return best.own;
 }
+function hdFLRebalanceExpansion(inv,remaining,suggestion,ships,targetIndex,ship,context=''){
+ if(typeof hdShipDbExpansionInfo!=='function')return null;const candidates=[];
+ for(let si=0;si<ships.length;si++){
+  const sourceSlot=suggestion.slots[si];if(!sourceSlot?.profile)continue;
+  for(const normal of (ships[si].items||[])){
+   const own=inv.get(normal.stackKey);if(!own)continue;
+   const info=hdShipDbExpansionInfo(own.item,ship,own.maxStar||0);
+   if(!info.allowed||!(Number(info.reqStar)>0))continue;
+   const replacements=[...inv.values()].filter(rep=>rep.key!==own.key&&rep.norm===own.norm&&(remaining.get(rep.key)||0)>0&&rep.maxStar<own.maxStar&&hdFLCompatibleAt(rep.item,sourceSlot,normal.slotIndex)&&hdFLKindMatch(rep.item,normal.kind));
+   replacements.sort((a,b)=>b.maxStar-a.maxStar||a.name.localeCompare(b.name,'ja'));
+   const replacement=replacements[0];if(!replacement)continue;
+   const bonus=info.mode==='special'?24:info.mode==='global'?16:0,score=(typeof hdShipDbEquipPower==='function'?hdShipDbEquipPower(own.item,context):hdFLScoreBase(own.item,own))+(own.maxStar||0)*2+bonus-(own.maxStar-replacement.maxStar)*.25;
+   candidates.push({sourceIndex:si,normal,own,replacement,info,score});
+  }
+ }
+ candidates.sort((a,b)=>b.score-a.score||b.own.maxStar-a.own.maxStar||b.replacement.maxStar-a.replacement.maxStar);
+ const best=candidates[0];if(!best)return null;
+ remaining.set(best.replacement.key,Math.max(0,(remaining.get(best.replacement.key)||0)-1));
+ remaining.set(best.own.key,(remaining.get(best.own.key)||0)+1);
+ best.normal.name=best.replacement.name;best.normal.star=best.replacement.maxStar||0;best.normal.stackKey=best.replacement.key;best.normal.norm=best.replacement.norm;best.normal.category=best.replacement.item.category||best.normal.category||'';
+ return best;
+}
+function hdFLExpansionMissingCandidate(ship,context=''){
+ if(!ship||typeof hdShipDbExpansionInfo!=='function')return null;const rows=[];
+ for(const item of hdFLCatalog()){
+  let info=hdShipDbExpansionInfo(item,ship,0),reqStar=0;
+  if(!info.allowed&&Number(info.reqStar)>0){reqStar=Number(info.reqStar)||0;info=hdShipDbExpansionInfo(item,ship,reqStar)}
+  if(!info.allowed)continue;
+  const bonus=info.mode==='special'?24:info.mode==='global'?16:0,score=(typeof hdShipDbEquipPower==='function'?hdShipDbEquipPower(item,context):0)+bonus-reqStar*.3;
+  rows.push({name:item.name,item,reqStar,reason:info.reason||'',mode:info.mode||'',score});
+ }
+ rows.sort((a,b)=>b.score-a.score||a.reqStar-b.reqStar||a.name.localeCompare(b.name,'ja'));return rows[0]||null;
+}
+function hdFLRequiredTotalForName(ships,name){
+ const key=hdFLNorm(name);if(!key)return 1;let n=0;
+ for(const row of ships){for(const x of (row.items||[]))if(hdFLNorm(x.name)===key)n++;if(row.expansion&&hdFLNorm(row.expansion.name)===key)n++}
+ return n+1;
+}
+function hdFLProcureExpansion(planIndex,shipIndex){
+ const map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+planIndex,plan=HD_FL_CACHE[key]||hdFLGenerate(planIndex),row=plan?.ships?.[Number(shipIndex)],miss=row?.expansionMissing;if(!map||!row||!miss)return false;
+ if(typeof hdPLAddExpansionRequirement!=='function')return false;
+ const ok=hdPLAddExpansionRequirement(map,row.ship,row.masterId,miss.name,miss.reqStar,miss.reason,miss.requiredTotal||1);
+ if(ok&&typeof hdPLOpenList==='function')hdPLOpenList();return ok;
+}
 function hdFLGenerate(index){
  const map=typeof hdFSMap==='function'?hdFSMap():'',suggestion=typeof hdFSPlans==='function'?hdFSPlans(map)[Number(index)]:null;if(!map||!suggestion)return null;
  const inv=hdFLInventory(),remaining=new Map([...inv].map(([k,v])=>[k,v.count])),needTags=hdFLNeedTags(suggestion.needs),ships=[],missing=[];
@@ -141,20 +185,24 @@ function hdFLGenerate(index){
   const count=hdFLSlotCount(slot),items=[],slotMissing=[],memo=slot.profile.row.gear||'',master=hdFLMasterProfile(slot);
   for(let n=0;n<count;n++){
    const kind=hdFLSlotKind(slot,n),picked=hdFLPick(inv,remaining,slot,n,kind,needTags,memo),capacity=hdFLSlotCapacity(slot,n);
-   if(picked)items.push({name:picked.name,star:picked.maxStar,category:picked.item.category||'',kind,slotIndex:n,capacity});
+   if(picked)items.push({name:picked.name,star:picked.maxStar,stackKey:picked.key,norm:picked.norm,category:picked.item.category||'',kind,slotIndex:n,capacity});
    else{slotMissing.push(kind);missing.push({ship:slot.profile.row.name,kind,slotIndex:n,capacity})}
   }
-  ships.push({ship:slot.profile.row.name,masterId:Number(slot.profile.row.masterId)||Number(master?.id)||0,type:slot.profile.type||'',items,missing:slotMissing,master:!!master,expansion:null});
+  ships.push({ship:slot.profile.row.name,masterId:Number(slot.profile.row.masterId)||Number(master?.id)||0,type:slot.profile.type||'',items,missing:slotMissing,master:!!master,expansion:null,expansionMissing:null});
  });
  // Optional expansion-slot suggestions, only after every normal slot has been allocated.
  ships.forEach((row,i)=>{
   const slot=suggestion.slots[i],ship=hdFLShipDbItem(slot);
   if(!ship||typeof hdShipDbExpansionCandidates!=='function')return;
   const context=[...(suggestion.needs||[]).map(x=>x.kind||''),slot?.profile?.row?.gear||''].join(' ');
-  const pick=hdShipDbExpansionCandidates(ship,remaining,context)[0];
-  if(!pick||!(Number(pick.score)>0))return;
-  row.expansion={name:pick.own.name,star:pick.own.maxStar||0,reason:pick.info?.reason||'',mode:pick.info?.mode||''};
-  remaining.set(pick.own.key,Math.max(0,(remaining.get(pick.own.key)||0)-1));
+  let pick=hdShipDbExpansionCandidates(ship,remaining,context)[0],rebalance=null;
+  if(!pick){rebalance=hdFLRebalanceExpansion(inv,remaining,suggestion,ships,i,ship,context);if(rebalance){const rows=hdShipDbExpansionCandidates(ship,remaining,context);pick=rows.find(x=>x.own.key===rebalance.own.key)||rows[0]||null}}
+  if(pick&&Number(pick.score)>0){
+   const moved=rebalance&&pick.own.key===rebalance.own.key?`・★条件のため${ships[rebalance.sourceIndex].ship}の通常枠を★${rebalance.replacement.maxStar||0}へ自動入替`:'';
+   row.expansion={name:pick.own.name,star:pick.own.maxStar||0,stackKey:pick.own.key,reason:(pick.info?.reason||'')+moved,mode:pick.info?.mode||'',rebalanced:!!moved};
+   remaining.set(pick.own.key,Math.max(0,(remaining.get(pick.own.key)||0)-1));return;
+  }
+  const miss=hdFLExpansionMissingCandidate(ship,context);if(miss)row.expansionMissing={...miss,requiredTotal:hdFLRequiredTotalForName(ships,miss.name)};
  });
  const used={};for(const s of ships){for(const x of s.items)used[x.name]=(used[x.name]||0)+1;if(s.expansion)used[s.expansion.name]=(used[s.expansion.name]||0)+1}
  const owned={};for(const x of inv.values())owned[x.name]=(owned[x.name]||0)+x.count;
@@ -166,7 +214,7 @@ function hdFLPlanHtml(plan){
  return `<div class="hd-fl-plan">
   <div class="hd-fl-summary"><div><strong>手持ち装備の自動配備</strong><span>所持数＋艦別装備可否＋実スロット制限を反映</span></div><b class="${plan.missing.length?'warn':'ok'}">${plan.missing.length?`未配備 ${plan.missing.length}枠`:'主要枠を配備'}</b></div>
   <div class="hd-fl-master-status">マスター同期 ${plan.masterBacked||0}/${plan.ships.filter(x=>x.ship).length}隻</div>
-  <div class="hd-fl-ships">${plan.ships.map((s,i)=>{const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(Number(s.masterId)>0?{id:Number(s.masterId),name:s.ship}:s.ship,'loadout-thumb'):'';return `<div class="hd-fl-ship"><div class="hd-fl-ship-head"><span>${i+1}</span>${image}<div><strong>${hdFLEsc(s.ship||'艦娘未選択')}</strong><small>${hdFLEsc(s.type||'')}${s.master?'・マスター判定':''}</small></div></div><div class="hd-fl-items">${s.items.map(x=>`<span>${hdFLEsc(x.name)}${x.star?` ★${x.star}`:''}<small>第${(x.slotIndex??0)+1}スロ${x.capacity!=null?`・${x.capacity}機`:''}</small></span>`).join('')||'<em>配備なし</em>'}</div>${s.expansion?`<div class="hd-fl-expansion"><i>増設候補</i><b>${hdFLEsc(s.expansion.name)}${s.expansion.star?` ★${s.expansion.star}`:''}</b><small>${hdFLEsc(s.expansion.reason)}</small></div>`:''}${s.missing.length?`<small class="hd-fl-missing">未配備: ${s.missing.map(hdFLKindLabel).join(' / ')}</small>`:''}</div>`}).join('')}</div>
+  <div class="hd-fl-ships">${plan.ships.map((s,i)=>{const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(Number(s.masterId)>0?{id:Number(s.masterId),name:s.ship}:s.ship,'loadout-thumb'):'';return `<div class="hd-fl-ship"><div class="hd-fl-ship-head"><span>${i+1}</span>${image}<div><strong>${hdFLEsc(s.ship||'艦娘未選択')}</strong><small>${hdFLEsc(s.type||'')}${s.master?'・マスター判定':''}</small></div></div><div class="hd-fl-items">${s.items.map(x=>`<span>${hdFLEsc(x.name)}${x.star?` ★${x.star}`:''}<small>第${(x.slotIndex??0)+1}スロ${x.capacity!=null?`・${x.capacity}機`:''}</small></span>`).join('')||'<em>配備なし</em>'}</div>${s.expansion?`<div class="hd-fl-expansion"><i>増設候補</i><b>${hdFLEsc(s.expansion.name)}${s.expansion.star?` ★${s.expansion.star}`:''}</b><small>${hdFLEsc(s.expansion.reason)}</small></div>`:''}${s.expansionMissing?`<div class="hd-fl-expansion missing"><i>増設不足</i><b>${hdFLEsc(s.expansionMissing.name)}${s.expansionMissing.reqStar?` ★${s.expansionMissing.reqStar}+`:''}</b><small>${hdFLEsc(s.expansionMissing.reason)}</small><button type="button" class="ghost small" data-hd-fl-procure-expansion="${plan.index}" data-hd-fl-ship-index="${i}">調達リストへ</button></div>`:''}${s.missing.length?`<small class="hd-fl-missing">未配備: ${s.missing.map(hdFLKindLabel).join(' / ')}</small>`:''}</div>`}).join('')}</div>
   ${used?`<div class="hd-fl-usage"><b>在庫使用:</b> ${used}</div>`:''}
   <div class="hd-fl-actions"><button type="button" class="primary small" data-hd-fl-save="${plan.index}">この装備込みで保存</button><button type="button" class="ghost small" data-hd-fl-regenerate="${plan.index}">再配備</button><button type="button" class="ghost small" data-hd-fl-ledger>装備台帳</button></div>
   <p class="hd-fl-note">※詳細100隻に加え、公式マスター全865形態も通常スロット数・搭載数・装備カテゴリ可否を反映。位置別制限・補強増設ルールもマスターIDが解決できる艦は同じ判定を使う。</p>
@@ -202,6 +250,7 @@ document.addEventListener('click',e=>{
  const gen=e.target.closest?.('[data-hd-fl-generate]');if(gen){hdFLRender(gen.dataset.hdFlGenerate,gen.closest('.hd-fs-card'));return}
  const regen=e.target.closest?.('[data-hd-fl-regenerate]');if(regen){hdFLRender(regen.dataset.hdFlRegenerate,regen.closest('.hd-fs-card'));return}
  const save=e.target.closest?.('[data-hd-fl-save]');if(save){hdFLSave(save.dataset.hdFlSave);return}
+ const procure=e.target.closest?.('[data-hd-fl-procure-expansion]');if(procure){hdFLProcureExpansion(procure.dataset.hdFlProcureExpansion,procure.dataset.hdFlShipIndex);return}
  if(e.target.closest?.('[data-hd-fl-ledger]')){if(typeof hdWSShowElement==='function')hdWSShowElement('equipmentBook',true);return}
 });
 window.addEventListener('storage',e=>{if(e.key===HD_FL_KEY){for(const k of Object.keys(HD_FL_CACHE))delete HD_FL_CACHE[k]}});
