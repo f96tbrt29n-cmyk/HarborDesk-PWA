@@ -52,28 +52,39 @@ function hdQNEnsureMobileDock(){
  dock.innerHTML='<button type="button" data-hd-mobile-home><span>⌂</span><b>ホーム</b><em data-hd-mobile-home-badge hidden>0</em></button><button type="button" data-hd-mobile-search><span>⌕</span><b>検索</b></button><button type="button" data-hd-mobile-sync><span>↻</span><b>同期</b><i aria-hidden="true"></i></button><button type="button" data-hd-mobile-menu><span>☰</span><b>機能</b></button>';
  document.body.appendChild(dock);hdQNUpdateMobileDock();
 }
-function hdQNMobileAttentionCount(){
- let count=0,now=Date.now();
+function hdQNMobileAttentionMeta(){
+ const reasons=[],now=Date.now();
  try{
   const appState=window.state||{};
   const quests=Array.isArray(appState.quests)?appState.quests:[];
   const expeditions=Array.isArray(appState.expeditions)?appState.expeditions:[];
   const docks=Array.isArray(appState.docks)?appState.docks:[];
-  if(quests.some(x=>!x.done))count++;
-  if(expeditions.some(x=>Number(x.endsAt)>now&&Number(x.endsAt)-now<=15*60*1000))count++;
-  if(docks.some(x=>Number(x.endsAt)>now&&Number(x.endsAt)-now<=15*60*1000))count++;
+  if(quests.some(x=>!x.done))reasons.push('未完了任務');
+  if(expeditions.some(x=>Number(x.endsAt)>now&&Number(x.endsAt)-now<=15*60*1000))reasons.push('遠征まもなく終了');
+  if(docks.some(x=>Number(x.endsAt)>now&&Number(x.endsAt)-now<=15*60*1000))reasons.push('入渠まもなく終了');
  }catch{}
  try{
   const syncState=typeof hdWSSyncInfo==='function'?hdWSSyncInfo().state:'missing';
-  if(syncState&&syncState!=='fresh')count++;
- }catch{count++}
- return Math.min(9,count);
+  if(syncState&&syncState!=='fresh')reasons.push('ゲーム同期確認');
+ }catch{reasons.push('ゲーム同期確認')}
+ return {count:Math.min(9,reasons.length),reasons};
+}
+function hdQNMobileAttentionCount(){return hdQNMobileAttentionMeta().count}
+function hdQNMobileHome(){
+ const active=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup==='home',attention=hdQNMobileAttentionMeta();
+ if(active&&attention.count>0){
+  const target=document.getElementById('homeNextAction');if(target){target.scrollIntoView({behavior:'smooth',block:'center'});target.classList.add('hd-qn-flash');setTimeout(()=>target.classList.remove('hd-qn-flash'),900);return true}
+ }
+ if(typeof hdWSShowElement==='function')return hdWSShowElement('home',true);
+ const home=document.getElementById('home');if(home){home.scrollIntoView({behavior:'smooth',block:'start'});return true}
+ return false;
 }
 function hdQNUpdateMobileDock(){
  const dock=document.getElementById('hdMobileDock');if(!dock)return;
  const home=dock.querySelector('[data-hd-mobile-home]'),sync=dock.querySelector('[data-hd-mobile-sync]'),badge=dock.querySelector('[data-hd-mobile-home-badge]'),activeGroup=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'';
  home?.classList.toggle('active',activeGroup==='home');
- const attention=hdQNMobileAttentionCount();if(badge){badge.textContent=String(attention);badge.hidden=attention<=0}
+ const attention=hdQNMobileAttentionMeta();if(badge){badge.textContent=String(attention.count);badge.hidden=attention.count<=0}
+ if(home){const detail=attention.reasons.join('・');home.setAttribute('aria-label',attention.count?('ホーム・確認項目 '+detail):'ホーム');home.title=detail}
  if(sync){sync.classList.remove('fresh','stale','partial','missing');let state='missing';try{state=typeof hdWSSyncInfo==='function'?(hdWSSyncInfo().state||'missing'):'missing'}catch{}sync.classList.add(state)}
 }
 function hdQNEnsure(){
@@ -94,7 +105,7 @@ function hdQNLoadDiagnostics(){
 }
 
 document.addEventListener('click',e=>{
-  if(e.target.closest?.('[data-hd-mobile-home]')){if(typeof hdWSShowElement==='function')hdWSShowElement('home',true);else document.getElementById('home')?.scrollIntoView({behavior:'smooth',block:'start'});return}
+  if(e.target.closest?.('[data-hd-mobile-home]')){hdQNMobileHome();return}
   if(e.target.closest?.('[data-hd-mobile-search]')){if(typeof hdGSOpen==='function')hdGSOpen();return}
   if(e.target.closest?.('[data-hd-mobile-sync]')){if(typeof hdWSOpenSyncStatus==='function')hdWSOpenSyncStatus();else hdQNJump('kancolleImport');return}
   if(e.target.closest?.('[data-hd-mobile-menu]')){hdQNOpen();return}
