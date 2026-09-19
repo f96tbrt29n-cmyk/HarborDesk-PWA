@@ -5851,3 +5851,21 @@ test('mobile Home button jumps to next action when already home', async ({ page 
   expect(data.ok).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('mobile dock highlights open search and feature menu', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdQNEnsure?.();
+    window.hdGSOpen?.('');
+    const searchActive=document.querySelector('[data-hd-mobile-search]')?.classList.contains('active')||false;
+    window.hdGSClose?.();
+    window.hdQNOpen?.();
+    const menuActive=document.querySelector('[data-hd-mobile-menu]')?.classList.contains('active')||false;
+    window.hdQNClose?.();
+    return {searchActive,menuActive};
+  });
+  expect(data.searchActive).toBe(true);
+  expect(data.menuActive).toBe(true);
+});
