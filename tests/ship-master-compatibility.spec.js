@@ -3364,3 +3364,20 @@ test('accessibility styles support reduced motion and visible focus', async ({ p
   expect(data.reduced).toBe(true);
   expect(data.tap).toBe(true);
 });
+
+
+test('offline status explains unavailable network actions', async ({ page, context }) => {
+  const errors=[];
+  await boot(page,errors);
+  await page.evaluate(()=>window.hdWSEnsureNetworkStatus?.());
+  await context.setOffline(true);
+  await page.evaluate(()=>window.dispatchEvent(new Event('offline')));
+  const offline=await page.evaluate(()=>{
+    const bar=document.getElementById('hdNetworkStatus');
+    return {hidden:!!bar?.hidden,text:bar?.textContent||'',body:document.body.classList.contains('hd-offline')};
+  });
+  expect(offline.hidden).toBe(false);
+  expect(offline.text).toContain('オフライン');
+  expect(offline.body).toBe(true);
+  await context.setOffline(false);
+});
