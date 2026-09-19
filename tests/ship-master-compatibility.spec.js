@@ -3587,3 +3587,22 @@ test('home reorder controls persist card order', async ({ page }) => {
   expect(after.dom).toEqual(['quick','recent','resources','procurement']);
   expect(after.saved).toEqual(after.dom);
 });
+
+
+test('workspace back returns to previous function', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    window.hdWSInstall?.();
+    window.hdWSShowElement?.('roster',false);
+    window.hdWSShowElement?.('equipmentBook',false);
+    const before={group:window.hdWSState?.group||'',section:window.hdWSState?.sections?.[window.hdWSState?.group]||'',history:window.hdWSHistoryLoad?.().length||0};
+    const ok=window.hdWSGoBack?.();
+    const after={group:window.hdWSState?.group||'',section:window.hdWSState?.sections?.[window.hdWSState?.group]||'',history:window.hdWSHistoryLoad?.().length||0,disabled:!!document.querySelector('[data-hd-ws-back]')?.disabled};
+    return {before,after,ok};
+  });
+  expect(data.before.section).toBe('equipmentBook');
+  expect(data.before.history).toBeGreaterThan(0);
+  expect(data.ok).toBe(true);
+  expect(data.after.section).toBe('roster');
+});
