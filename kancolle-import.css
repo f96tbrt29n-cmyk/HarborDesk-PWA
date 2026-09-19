@@ -27,3 +27,9 @@
 .hd-kc-coverage-chips span.ok{background:rgba(29,92,60,.3);border-color:rgba(110,224,159,.35);color:#bcefd0}
 .hd-kc-coverage-chips span.zero{background:rgba(92,72,29,.18);border-color:rgba(230,191,94,.24);color:#d9c99d}
 .hd-kc-sync-coverage small{font-size:9px;line-height:1.5;color:var(--muted)}
+
+.hd-kc-next-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:#081725}
+.hd-kc-next-actions[hidden]{display:none}
+.hd-kc-next-actions>span{font-size:10px;color:var(--muted);font-weight:800;white-space:nowrap}
+.hd-kc-next-actions>div{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:560px){.hd-kc-next-actions{display:grid}.hd-kc-next-actions>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch}.hd-kc-next-actions button{min-height:40px}}
