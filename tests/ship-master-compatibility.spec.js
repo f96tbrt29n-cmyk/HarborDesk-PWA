@@ -1002,3 +1002,77 @@ test('legacy roster and saved fleets migrate to exact master IDs and survive nam
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('ship identity diagnostics detects and repairs master ID drift', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      { id: 'drift-roster', name: '長門改二（誤記）', masterId: 541, type: '戦艦', level: 99, tags: [] },
+      { id: 'missing-id-roster', name: '陸奥改二', type: '戦艦', level: 99, tags: [] }
+    ]));
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({
+      '5-5': [{
+        id: 'drift-fleet',
+        name: '整合性テスト',
+        ships: [
+          { ship: '長門改二（別表記）', masterId: 541, gear: '' },
+          { ship: '陸奥改二', gear: '' }
+        ],
+        memo: ''
+      }]
+    }));
+
+    const before = window.hdDXShipIdentityHealth?.();
+    const oldConfirm = window.confirm;
+    window.confirm = () => true;
+    const changed = window.hdDXRepairShipIdentity?.();
+    window.confirm = oldConfirm;
+    const after = window.hdDXShipIdentityHealth?.();
+
+    const roster = JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1') || '[]');
+    const fleets = JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1') || '{}');
+
+    const perCard = (() => {
+      localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+        { id: 'card-sync', name: '長門改二 typo', masterId: 541, type: '戦艦', level: 99, tags: [] }
+      ]));
+      const ok = window.rosterSyncCanonical?.('card-sync');
+      const row = JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1') || '[]')[0] || {};
+      return { ok, row };
+    })();
+
+    localStorage.setItem('harbordesk-ship-roster-v1', '[]');
+    localStorage.setItem('harbordesk-custom-fleets-v1', '{}');
+    window.renderShipRoster?.();
+
+    return {
+      before,
+      changed,
+      after,
+      roster: roster.map(x => ({ name: x.name, masterId: x.masterId })),
+      fleetShips: (fleets['5-5']?.[0]?.ships || []).map(x => ({ ship: x.ship, masterId: x.masterId })),
+      perCard
+    };
+  });
+
+  expect(data.before.mismatch).toBeGreaterThanOrEqual(2);
+  expect(data.before['missing-id']).toBeGreaterThanOrEqual(2);
+  expect(data.before.issues).toBeGreaterThanOrEqual(4);
+  expect(data.changed).toBeGreaterThanOrEqual(4);
+  expect(data.after.mismatch).toBe(0);
+  expect(data.after['missing-id']).toBe(0);
+  expect(data.after['invalid-id']).toBe(0);
+  expect(data.after.unresolved).toBe(0);
+  expect(data.roster[0]).toEqual(expect.objectContaining({ name: '長門改二', masterId: 541 }));
+  expect(data.roster[1]).toEqual(expect.objectContaining({ name: '陸奥改二', masterId: 573 }));
+  expect(data.fleetShips[0]).toEqual(expect.objectContaining({ ship: '長門改二', masterId: 541 }));
+  expect(data.fleetShips[1]).toEqual(expect.objectContaining({ ship: '陸奥改二', masterId: 573 }));
+  expect(data.perCard.ok).toBeTruthy();
+  expect(data.perCard.row.name).toBe('長門改二');
+  expect(data.perCard.row.masterId).toBe(541);
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
