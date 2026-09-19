@@ -213,7 +213,7 @@ function hdKcRenderCurrentFleets(){
  if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
 }
 function hdKcExpeditionName(id){
- const row=(typeof HD_EXPEDITIONS!=='undefined'?HD_EXPEDITIONS:[]).find(x=>String(x.id)===String(id));
+ const row=(typeof HD_EXPEDITIONS!=='undefined'?HD_EXPEDITIONS:[]).find(x=>String(x.id)===String(id)||Number(x.id)===Number(id));
  return row?`${row.id} ${row.name}`:`遠征 ${id}`;
 }
 function hdKcShipNameByGameId(parsed,gameShipId){
