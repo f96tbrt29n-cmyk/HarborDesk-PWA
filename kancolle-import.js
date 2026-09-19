@@ -25,25 +25,30 @@ function hdKcMasterEquipMap(){
  for(const [name,row] of Object.entries(rows))if(Number(row?.id)>0)map.set(Number(row.id),{id:Number(row.id),name,typeName:String(row.typeName||'')});
  return map;
 }
-function hdKcImportEmpty(){return {ships:new Map(),slotItems:new Map(),materials:new Map(),decks:new Map(),sources:new Set(),completeShips:false,completeSlotItems:false}}
+function hdKcImportEmpty(){return {ships:new Map(),slotItems:new Map(),materials:new Map(),decks:new Map(),ndocks:new Map(),sources:new Set(),completeShips:false,completeSlotItems:false,completeDecks:false,completeNdocks:false}}
 function hdKcImportAdd(out,hint,payload){
  const h=String(hint||''),data=hdKcApiData(payload);if(data==null)return;
  out.sources.add(h||'auto');
  const shipRows=Array.isArray(data?.api_ship)?data.api_ship:Array.isArray(data?.api_ship_data)?data.api_ship_data:null;
  const deckRows=Array.isArray(data?.api_deck_port)?data.api_deck_port:Array.isArray(data?.api_deck_data)?data.api_deck_data:null;
+ const dockRows=Array.isArray(data?.api_ndock)?data.api_ndock:null;
  const matRows=Array.isArray(data?.api_material)?data.api_material:null;
  const slotRows=Array.isArray(data?.api_slot_item)?data.api_slot_item:null;
  if(shipRows)for(const x of shipRows)if(Number(x?.api_id)>0&&Number(x?.api_ship_id)>0)out.ships.set(Number(x.api_id),x);
  if(deckRows)for(const x of deckRows)if(Number(x?.api_id)>0)out.decks.set(Number(x.api_id),x);
+ if(dockRows)for(const x of dockRows)if(Number(x?.api_id)>0)out.ndocks.set(Number(x.api_id),x);
  if(matRows)for(const x of matRows)if(Number(x?.api_id)>0)out.materials.set(Number(x.api_id),x);
  if(slotRows)for(const x of slotRows)if(Number(x?.api_id)>0&&Number(x?.api_slotitem_id)>0)out.slotItems.set(Number(x.api_id),x);
  if(Array.isArray(data)){
   const first=data.find(Boolean)||{};
   if('api_slotitem_id' in first){for(const x of data)if(Number(x?.api_id)>0&&Number(x?.api_slotitem_id)>0)out.slotItems.set(Number(x.api_id),x)}
+  else if('api_complete_time' in first&&'api_state' in first&&'api_ship_id' in first){for(const x of data)if(Number(x?.api_id)>0)out.ndocks.set(Number(x.api_id),x)}
   else if('api_ship_id' in first){for(const x of data)if(Number(x?.api_id)>0&&Number(x?.api_ship_id)>0)out.ships.set(Number(x.api_id),x)}
   else if('api_value' in first){for(const x of data)if(Number(x?.api_id)>0)out.materials.set(Number(x.api_id),x)}
  }
  if(/api_port\/port/.test(h)||/api_get_member\/ship2/.test(h)||(!h&&shipRows&&deckRows))out.completeShips=true;
+ if(/api_port\/port/.test(h)||(/api_get_member\/ship2/.test(h)&&deckRows))out.completeDecks=true;
+ if(/api_port\/port/.test(h)||/api_get_member\/ndock/.test(h))out.completeNdocks=true;
  if(/api_get_member\/slot_item/.test(h)||(/require_info/.test(h)&&slotRows))out.completeSlotItems=true;
  if(Array.isArray(data)&&data.length&&'api_slotitem_id' in (data.find(Boolean)||{})&&!h)out.completeSlotItems=true;
  if(Array.isArray(data)&&data.length&&'api_ship_id' in (data.find(Boolean)||{})&&!h)out.completeShips=true;
@@ -54,14 +59,14 @@ function hdKcParseImport(raw){
   for(const [k,v] of Object.entries(root.endpoints))hdKcImportAdd(out,k,v);
  }else if(Array.isArray(root?.records)){
   for(const r of root.records)hdKcImportAdd(out,r?.endpoint||r?.path||'',r?.payload??r?.response??r?.data);
- }else if(root&&typeof root==='object'&&!Array.isArray(root)&&!('api_result' in root)&&!('api_ship' in root)&&!('api_ship_data' in root)&&!('api_slot_item' in root)&&!('api_material' in root)){
+ }else if(root&&typeof root==='object'&&!Array.isArray(root)&&!('api_result' in root)&&!('api_ship' in root)&&!('api_ship_data' in root)&&!('api_slot_item' in root)&&!('api_material' in root)&&!('api_ndock' in root)){
   let matched=false;
   for(const [k,v] of Object.entries(root)){
-   if(/api_(port|api_get_member|kcsapi)|\/kcsapi\//.test(k)||/^(port|ship2|slot_item|material|require_info)$/.test(k)){hdKcImportAdd(out,k,v);matched=true}
+   if(/api_(port|api_get_member|kcsapi)|\/kcsapi\//.test(k)||/^(port|ship2|slot_item|material|require_info|ndock)$/.test(k)){hdKcImportAdd(out,k,v);matched=true}
   }
   if(!matched)hdKcImportAdd(out,'',root);
  }else hdKcImportAdd(out,'',root);
- if(!out.ships.size&&!out.slotItems.size&&!out.materials.size&&!out.decks.size)throw new Error('艦娘・装備・資源・艦隊データを見つけられませんでした');
+ if(!out.ships.size&&!out.slotItems.size&&!out.materials.size&&!out.decks.size&&!out.ndocks.size)throw new Error('艦娘・装備・資源・艦隊・入渠データを見つけられませんでした');
  return out;
 }
 function hdKcPreviewData(parsed){
@@ -72,6 +77,8 @@ function hdKcPreviewData(parsed){
   slotItems:parsed.slotItems.size,
   materials:parsed.materials.size,
   decks:parsed.decks.size,
+  expeditions:[...parsed.decks.values()].filter(x=>Array.isArray(x?.api_mission)&&Number(x.api_mission[0])>0&&Number(x.api_mission[1])>0&&Number(x.api_mission[2])>0).length,
+  docks:[...parsed.ndocks.values()].filter(x=>Number(x?.api_state)===1&&Number(x?.api_complete_time)>0).length,
   unknownShips:unknownShips.length,
   unknownEquip:unknownEquip.length,
   completeShips:!!parsed.completeShips,
