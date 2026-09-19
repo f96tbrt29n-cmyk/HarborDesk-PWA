@@ -23,6 +23,22 @@ function hdQNSections(){
   }
   return rows;
 }
+function hdQNContextRows(){
+ const group=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'';
+ if(!group||group==='home')return [];
+ try{
+  const rows=typeof hdWSVisibleSections==='function'?hdWSVisibleSections(group):[...document.querySelectorAll(`section[data-hd-workspace-group="${group}"]`)];
+  return rows.filter(x=>x?.id).map(x=>({id:x.id,title:typeof hdWSTitle==='function'?hdWSTitle(x):(x.querySelector('h2,h3')?.textContent?.trim()||x.id)}));
+ }catch{return []}
+}
+function hdQNRenderContext(){
+ const host=document.getElementById('hdQNContext');if(!host)return;
+ const rows=hdQNContextRows(),group=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'',meta=hdQNMobileGroupMeta(group);
+ if(!rows.length){host.hidden=true;host.innerHTML='';return}
+ const selected=window.hdWSState?.sections?.[group]||'';
+ host.hidden=false;
+ host.innerHTML=`<div class="hd-qn-context-head"><span>このカテゴリ</span><b>${hdQNEsc(meta.label)}</b></div><div class="hd-qn-context-grid">${rows.map(x=>`<button type="button" class="${x.id===selected?'active':''}" data-hd-qn-context="${hdQNEsc(x.id)}">${hdQNEsc(x.title)}</button>`).join('')}</div>`;
+}
 function hdQNRenderList(filter=''){
   const host=document.getElementById('hdQNList');if(!host)return;
   const q=String(filter||'').trim().toLowerCase(),pins=hdQNLoadPins(),pinSet=new Set(pins),recent=hdQNLoadRecent(),recentMap=new Map(recent.map(x=>[x.id,Number(x.at)||0])),rows=hdQNSections().filter(x=>!q||x.title.toLowerCase().includes(q)||x.id.toLowerCase().includes(q));
@@ -31,7 +47,7 @@ function hdQNRenderList(filter=''){
 }
 function hdQNOpen(){
   hdQNEnsure();const d=document.getElementById('hdQuickNavDialog');if(!d)return;
-  const input=document.getElementById('hdQNSearch');if(input)input.value='';hdQNRenderList('');
+  const input=document.getElementById('hdQNSearch');if(input)input.value='';hdQNRenderContext();hdQNRenderList('');
   if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');
   hdQNUpdateMobileDock();
   setTimeout(()=>input?.focus(),50);
@@ -133,7 +149,7 @@ function hdQNUpdateMobileDock(){
 function hdQNEnsure(){
   if(document.getElementById('hdQuickNavButton')){hdQNEnsureMobileDock();return;}
   const btn=document.createElement('button');btn.id='hdQuickNavButton';btn.type='button';btn.className='hd-qn-fab';btn.innerHTML='<span>☰</span><b>機能</b>';btn.addEventListener('click',hdQNOpen);document.body.appendChild(btn);
-  const d=document.createElement('dialog');d.id='hdQuickNavDialog';d.className='hd-qn-dialog';d.innerHTML=`<div class="hd-qn-head"><div><div class="eyebrow">QUICK NAV</div><h3>機能をすぐ開く</h3></div><button type="button" class="ghost small" data-hd-qn-close>閉じる</button></div><div class="hd-qn-actions"><button type="button" data-hd-qn-back><span>‹</span><b>戻る</b></button><button type="button" data-hd-qn-home><span>⌂</span><b>ホーム</b></button><button type="button" data-hd-gs-open><span>⌕</span><b>検索</b></button><button type="button" data-hd-qn-sync><span>↻</span><b>同期</b></button><a href="https://play.games.dmm.com/game/kancolle"><span>⚓</span><b>艦これ</b></a><button type="button" data-hd-qn-top><span>↑</span><b>上へ</b></button></div><div class="hd-qn-tools"><input id="hdQNSearch" type="search" placeholder="機能名で検索"></div><div id="hdQNList" class="hd-qn-list"></div><div class="hd-qn-foot">★を付けた機能は上に固定するよ。</div>`;document.body.appendChild(d);
+  const d=document.createElement('dialog');d.id='hdQuickNavDialog';d.className='hd-qn-dialog';d.innerHTML=`<div class="hd-qn-head"><div><div class="eyebrow">QUICK NAV</div><h3>機能をすぐ開く</h3></div><button type="button" class="ghost small" data-hd-qn-close>閉じる</button></div><div class="hd-qn-actions"><button type="button" data-hd-qn-back><span>‹</span><b>戻る</b></button><button type="button" data-hd-qn-home><span>⌂</span><b>ホーム</b></button><button type="button" data-hd-gs-open><span>⌕</span><b>検索</b></button><button type="button" data-hd-qn-sync><span>↻</span><b>同期</b></button><a href="https://play.games.dmm.com/game/kancolle"><span>⚓</span><b>艦これ</b></a><button type="button" data-hd-qn-top><span>↑</span><b>上へ</b></button></div><div id="hdQNContext" class="hd-qn-context" hidden></div><div class="hd-qn-tools"><input id="hdQNSearch" type="search" placeholder="機能名で検索"></div><div id="hdQNList" class="hd-qn-list"></div><div class="hd-qn-foot">★を付けた機能は上に固定するよ。</div>`;document.body.appendChild(d);
   d.addEventListener('click',e=>{if(e.target===d)hdQNClose()});
   document.getElementById('hdQNSearch')?.addEventListener('input',e=>hdQNRenderList(e.target.value));
   hdQNRenderList();hdQNEnsureMobileDock();
@@ -160,6 +176,7 @@ document.addEventListener('click',e=>{
   if(e.target.closest?.('[data-hd-qn-home]')){hdQNClose();if(typeof hdWSShowElement==='function')hdWSShowElement('home',true);else document.getElementById('home')?.scrollIntoView({behavior:'smooth',block:'start'});return}
   if(e.target.closest?.('[data-hd-qn-sync]')){hdQNJump('kancolleImport');return}
   if(e.target.closest?.('[data-hd-qn-top]')){hdQNClose();window.scrollTo({top:0,behavior:'smooth'});return}
+  const context=e.target.closest?.('[data-hd-qn-context]');if(context){hdQNJump(context.dataset.hdQnContext);return}
   const jump=e.target.closest?.('[data-hd-qn-jump]');if(jump){hdQNJump(jump.dataset.hdQnJump);return}
   const pin=e.target.closest?.('[data-hd-qn-pin]');if(pin){hdQNTogglePin(pin.dataset.hdQnPin);return}
 });
@@ -169,7 +186,7 @@ setTimeout(()=>{hdQNEnsure();hdQNLoadDiagnostics()},1200);
 window.addEventListener('hd:workspace-changed',e=>{const id=e.detail?.section;if(id)hdQNRecordHistory(id)});
 window.addEventListener('load',()=>setTimeout(()=>{const id=window.hdWSState?.sections?.[window.hdWSState?.group];if(id)hdQNRecordHistory(id)},1300));
 
-window.addEventListener('hd:workspace-changed',hdQNUpdateMobileDock);
+window.addEventListener('hd:workspace-changed',()=>{hdQNUpdateMobileDock();if(document.getElementById('hdQuickNavDialog')?.open)hdQNRenderContext()});
 window.addEventListener('hd:kancolle-sync',hdQNUpdateMobileDock);
 window.addEventListener('storage',e=>{if(!e||e.key==='harbordesk-kancolle-sync-v1')hdQNUpdateMobileDock()});
 
