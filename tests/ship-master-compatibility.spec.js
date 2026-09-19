@@ -142,3 +142,53 @@ test('picker slot exclusions and star-gated expansion rules are enforced', async
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('master recommendations resolve exact owned equipment variants without inflating stars', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const resolved = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      { name: '41cm連装砲', category: '大口径主砲', count: 1, star: 6 },
+      { name: '41cm連装砲', category: '大口径主砲', count: 1, star: 2 },
+      { name: '零式水上偵察機11型乙(熟練)', category: '水上偵察機', count: 1, star: 0 },
+      { name: 'FuMO25 レーダー', category: '大型電探', count: 1, star: 7 }
+    ]));
+    const row = window.hdShipDbMasterRowByName?.('Bismarck drei');
+    const plan = window.hdShipDbMasterSuggestedLoadouts?.(row)?.find(x => x.name === '昼戦・連撃');
+    const result = window.hdShipDbMasterResolveOwnedPlan?.(row, plan);
+    const html = window.hdShipDbMasterOwnedPlanHtml?.(row, plan) || '';
+    return {
+      ship: row?.name || '',
+      gear: plan?.gear || [],
+      filled: result?.filled || 0,
+      total: result?.total || 0,
+      names: result?.slots?.map(x => x.name) || [],
+      stars: result?.slots?.map(x => x.star) || [],
+      ownedTotals: result?.slots?.map(x => x.ownedTotal) || [],
+      slotIndexes: result?.slots?.filter(x => x.found).map(x => x.slotIndex) || [],
+      html
+    };
+  });
+
+  expect(resolved.ship).toBe('Bismarck drei');
+  expect(resolved.gear).toEqual(['大口径主砲', '大口径主砲', '水上偵察機', '大型電探']);
+  expect(resolved.filled).toBe(4);
+  expect(resolved.total).toBe(4);
+  expect(resolved.names).toEqual([
+    '41cm連装砲',
+    '41cm連装砲',
+    '零式水上偵察機11型乙(熟練)',
+    'FuMO25 レーダー'
+  ]);
+  expect(resolved.stars).toEqual([6, 2, 0, 7]);
+  expect(resolved.ownedTotals.slice(0, 2)).toEqual([2, 2]);
+  expect(new Set(resolved.slotIndexes).size).toBe(4);
+  expect(resolved.html).toContain('★6');
+  expect(resolved.html).toContain('★2');
+  expect(resolved.html).toContain('FuMO25 レーダー');
+  expect(resolved.html).toContain('所持2');
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
