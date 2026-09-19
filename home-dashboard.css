@@ -14,3 +14,7 @@
  .home-sync-main{align-items:flex-start}
  .home-sync-main button{flex:0 0 auto}
 }
+
+.home-sync-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.home-sync-actions a{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+@media(max-width:620px){.home-sync-actions{justify-content:flex-start}.home-sync-main{display:grid}.home-sync-actions a,.home-sync-actions button{min-height:38px}}
