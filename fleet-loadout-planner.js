@@ -24,8 +24,9 @@ function hdFLIsBattleship(type){return ['戦艦','高速戦艦','航空戦艦'].
 function hdFLIsCruiser(type){return ['軽巡洋艦','重雷装巡洋艦','重巡洋艦','航空巡洋艦','練習巡洋艦'].includes(type)}
 function hdFLIsDestroyer(type){return ['駆逐艦','海防艦'].includes(type)}
 function hdFLShipDbItem(slot){
- const name=String(slot?.profile?.row?.name||'').trim();
- if(!name||typeof HD_SHIP_DATABASE==='undefined')return null;
+ const name=String(slot?.profile?.row?.name||'').trim();if(!name)return null;
+ if(typeof hdShipDbResolveShip==='function')return hdShipDbResolveShip({name,type:slot?.profile?.type||'',masterId:slot?.profile?.master?.id},slot?.profile?.roles||[]);
+ if(typeof HD_SHIP_DATABASE==='undefined')return null;
  return HD_SHIP_DATABASE.find(x=>x.final===name)||null;
 }
 function hdFLMasterProfile(slot){
@@ -167,7 +168,7 @@ function hdFLPlanHtml(plan){
   <div class="hd-fl-ships">${plan.ships.map((s,i)=>`<div class="hd-fl-ship"><div class="hd-fl-ship-head"><span>${i+1}</span><div><strong>${hdFLEsc(s.ship||'艦娘未選択')}</strong><small>${hdFLEsc(s.type||'')}${s.master?'・マスター判定':''}</small></div></div><div class="hd-fl-items">${s.items.map(x=>`<span>${hdFLEsc(x.name)}${x.star?` ★${x.star}`:''}<small>第${(x.slotIndex??0)+1}スロ${x.capacity!=null?`・${x.capacity}機`:''}</small></span>`).join('')||'<em>配備なし</em>'}</div>${s.expansion?`<div class="hd-fl-expansion"><i>増設候補</i><b>${hdFLEsc(s.expansion.name)}${s.expansion.star?` ★${s.expansion.star}`:''}</b><small>${hdFLEsc(s.expansion.reason)}</small></div>`:''}${s.missing.length?`<small class="hd-fl-missing">未配備: ${s.missing.map(hdFLKindLabel).join(' / ')}</small>`:''}</div>`).join('')}</div>
   ${used?`<div class="hd-fl-usage"><b>在庫使用:</b> ${used}</div>`:''}
   <div class="hd-fl-actions"><button type="button" class="primary small" data-hd-fl-save="${plan.index}">この装備込みで保存</button><button type="button" class="ghost small" data-hd-fl-regenerate="${plan.index}">再配備</button><button type="button" class="ghost small" data-hd-fl-ledger>装備台帳</button></div>
-  <p class="hd-fl-note">※収録100隻の最終改装形態はapi_start2＋現行クライアント判定に基づき、通常スロット数・搭載数・位置別制限・補強増設可否を反映。艦名が最終形態と一致しない艦は従来判定へフォールバック。</p>
+  <p class="hd-fl-note">※詳細100隻に加え、公式マスター全865形態も通常スロット数・搭載数・装備カテゴリ可否を反映。位置別制限・補強増設ルールもマスターIDが解決できる艦は同じ判定を使う。</p>
  </div>`;
 }
 function hdFLRender(index,card){
@@ -189,7 +190,7 @@ function hdFLSave(index){
  const s=plan.suggestion,all=typeof loadCustomFleets==='function'?loadCustomFleets():{};all[map]=all[map]||[];
  const name=map+' 自動提案＋装備｜'+(s.preset.name||('候補'+(s.index+1)));
  const ships=Array.from({length:6},(_,i)=>{const slot=s.slots[i],r=slot?.profile?.row,p=plan.ships[i];const normal=(p?.items||[]).map(x=>x.name+(x.star?` ★${x.star}`:''));if(p?.expansion)normal.push(`[増設] ${p.expansion.name}${p.expansion.star?` ★${p.expansion.star}`:''}`);return {ship:r?.name||'',gear:normal.join(' / ')}});
- const memo='HarborDesk手持ち装備自動配備。所持数に加え、100隻マスターの通常スロット数・搭載数・位置別装備制限・補強増設可否を反映。';
+ const memo='HarborDesk手持ち装備自動配備。所持数に加え、詳細100隻＋公式マスター全865形態の通常スロット数・搭載数・装備可否を反映。';
  const old=all[map].find(x=>x.name===name),id=old?.id||(typeof cfUid==='function'?cfUid():'fl-'+Date.now()+'-'+Math.random().toString(16).slice(2));
  const item={id,name,ships,memo,createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};all[map]=old?all[map].map(x=>x.id===id?item:x):all[map].concat(item);
  if(typeof saveCustomFleets==='function')saveCustomFleets(all);else localStorage.setItem('harbordesk-custom-fleets-v1',JSON.stringify(all));
