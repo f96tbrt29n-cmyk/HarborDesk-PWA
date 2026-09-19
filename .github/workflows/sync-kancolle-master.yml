@@ -31,6 +31,7 @@ jobs:
       - name: Validate generated runtime
         shell: bash
         run: |
+          node --check scripts/sync-kancolle-master.mjs
           node --check ship-master-snapshot.js
           node --check update-manager.js
           node --check sw.js
