@@ -5808,3 +5808,25 @@ test('mobile dock reflects current workspace and sync state', async ({ page }) =
   expect(data.activeAfter).toBe(false);
   expect(data.syncFresh).toBe(true);
 });
+
+
+test('mobile dock home badge shows attention count', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.state=window.state||{};
+    window.state.quests=[{id:'q1',name:'任務',done:false}];
+    window.state.expeditions=[{id:'e1',name:'遠征',endsAt:Date.now()+10*60*1000}];
+    window.state.docks=[];
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now()-8*3600000,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true}
+    }));
+    window.hdQNEnsure?.();window.hdQNUpdateMobileDock?.();
+    const badge=document.querySelector('[data-hd-mobile-home-badge]');
+    return {hidden:!!badge?.hidden,text:badge?.textContent||'',count:window.hdQNMobileAttentionCount?.()};
+  });
+  expect(data.hidden).toBe(false);
+  expect(Number(data.text)).toBeGreaterThanOrEqual(3);
+  expect(data.count).toBeGreaterThanOrEqual(3);
+});
