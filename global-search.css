@@ -46,3 +46,7 @@
  .hd-gs-filter-row{padding:0 14px 10px}
  .hd-gs-owned-toggle{min-height:36px;padding:7px 9px;font-size:10px}
 }
+
+.hd-gs-empty{display:grid;gap:8px;justify-items:start}
+.hd-gs-empty>small{color:var(--muted)}
+.hd-gs-empty>button{min-height:34px}
