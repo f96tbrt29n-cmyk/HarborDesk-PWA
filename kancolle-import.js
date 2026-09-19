@@ -427,6 +427,23 @@ async function hdKcDecodeHandoff(token){
  return new TextDecoder().decode(raw);
 }
 let HD_KC_HASH_IMPORT_CONSUMED=false;
+async function hdKcConsumeWindowNameImport(){
+ const prefix='HARBORDESK_KC_IMPORT_V1:';const value=String(window.name||'');if(!value.startsWith(prefix))return false;
+ window.name='';
+ try{
+  hdKcEnsureImport();
+  const preview=await hdKcReadAndPreview(value.slice(prefix.length));
+  const sync=hdKcApplyImport(preview,{ships:true,equipment:true,resources:true,fleets:true,timers:true,quests:true,sorties:true});
+  const result=document.getElementById('hdKcImportResult');
+  if(result)result.textContent=`Userscriptsから自動同期完了: 艦娘 ${sync.ships} / 装備 ${sync.equipment} / 資源 ${sync.materials} / 艦隊 ${sync.decks} / 遠征 ${sync.expeditions||0} / 入渠 ${sync.docks||0} / 任務 ${sync.quests||0} / 出撃 ${sync.sorties||0}`;
+  const sec=document.getElementById('kancolleImport');if(sec)sec.scrollIntoView({block:'start'});
+  HD_KC_IMPORT_PREVIEW=null;hdKcRenderSyncStatus();if(typeof renderAllAdvanced==='function')renderAllAdvanced();
+  return true;
+ }catch(err){
+  const result=document.getElementById('hdKcImportResult');if(result)result.textContent='Userscripts連携データの取込失敗: '+String(err?.message||err);
+  return false;
+ }
+}
 async function hdKcConsumeHashImport(){
  if(HD_KC_HASH_IMPORT_CONSUMED)return false;
  const m=String(location.hash||'').match(/^#kcimport=([gj]\.[A-Za-z0-9_-]+)$/);if(!m)return false;
@@ -484,5 +501,5 @@ document.addEventListener('change',async e=>{
  if(e.target.id==='hdKcImportFile'){const file=e.target.files?.[0];if(!file)return;try{const raw=await file.text();document.getElementById('hdKcImportText').value=raw;await hdKcReadAndPreview(raw);document.getElementById('hdKcImportResult').textContent=`${file.name} を解析したよ`}catch(err){document.getElementById('hdKcImportResult').textContent='ファイルを読めなかった: '+String(err?.message||err)}finally{e.target.value=''}}
 });
 window.addEventListener('message',e=>{if(e?.data?.type!=='harbordesk-kancolle-import')return;try{hdKcEnsureImport();const raw=e.data.payload;hdKcReadAndPreview(raw);document.getElementById('hdKcImportResult').textContent='外部取込ブリッジからデータを受信したよ'}catch{}});
-window.addEventListener('load',()=>setTimeout(async()=>{hdKcEnsureImport();await hdKcConsumeHashImport()},450));
-hdKcEnsureImport();setTimeout(()=>hdKcConsumeHashImport(),80);
+window.addEventListener('load',()=>setTimeout(async()=>{hdKcEnsureImport();if(!(await hdKcConsumeWindowNameImport()))await hdKcConsumeHashImport()},450));
+hdKcEnsureImport();setTimeout(async()=>{if(!(await hdKcConsumeWindowNameImport()))await hdKcConsumeHashImport()},80);
