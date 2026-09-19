@@ -3381,3 +3381,39 @@ test('offline status explains unavailable network actions', async ({ page, conte
   expect(offline.body).toBe(true);
   await context.setOffline(false);
 });
+
+
+test('global search indexes official master-only ships and equipment', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const rows=window.hdGSIndex?.()||[];
+    const ship=rows.find(x=>x.type==='ship'&&x.title==='大和改二重');
+    const catalog=new Set((window.HD_EQUIPMENT_CATALOG||[]).map(x=>String(x.name||'')));
+    const masterNames=Object.keys(window.HD_KANCOLLE_MASTER_SNAPSHOT?.equipment||{});
+    const masterOnlyName=masterNames.find(name=>!catalog.has(name))||'';
+    const equipment=rows.find(x=>x.type==='equipment'&&x.title===masterOnlyName);
+    return {
+      ship:ship?{title:ship.title,master:!!ship.meta?.master,kind:ship.action?.kind,subtitle:ship.subtitle}:null,
+      equipment:equipment?{title:equipment.title,master:!!equipment.meta?.master,kind:equipment.action?.kind,subtitle:equipment.subtitle}:null,
+      masterOnlyName
+    };
+  });
+  expect(data.ship).not.toBeNull();
+  expect(data.ship.master).toBe(true);
+  expect(data.ship.kind).toBe('ship');
+  expect(data.masterOnlyName.length).toBeGreaterThan(0);
+  expect(data.equipment).not.toBeNull();
+  expect(data.equipment.master).toBe(true);
+  expect(['masterEquipment','ledger']).toContain(data.equipment.kind);
+
+  await page.evaluate(()=>{
+    const rows=window.hdGSIndex?.()||[];
+    const catalog=new Set((window.HD_EQUIPMENT_CATALOG||[]).map(x=>String(x.name||'')));
+    const name=Object.keys(window.HD_KANCOLLE_MASTER_SNAPSHOT?.equipment||{}).find(x=>!catalog.has(x));
+    const row=rows.find(x=>x.type==='equipment'&&x.title===name);
+    if(row?.action?.kind==='masterEquipment')window.hdGSOpenResult?.(row);
+  });
+  const equipInput=page.locator('#hdShipEquipCheckEquip');
+  if(await equipInput.count())await expect(equipInput).not.toHaveValue('');
+});
