@@ -46,8 +46,10 @@ function ensureCustomFleetDialog(){
     }else{
       all[selectedMap].push({id:cfUid(),name,ships,memo,createdAt:Date.now(),updatedAt:Date.now()});
     }
+    const editing=!!customFleetEditId;
     saveCustomFleets(all);
     customFleetEditId=null;
+    window.hdToast?.(editing?'自分用編成を更新したよ':'自分用編成を保存したよ');
     setTimeout(()=>renderCustomFleets(selectedMap),0);
   });
 }
