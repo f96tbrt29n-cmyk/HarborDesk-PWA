@@ -4763,3 +4763,42 @@ test('global search empty state shows pinned and recent features', async ({ page
   expect(data.some(x=>x.id==='roster'&&x.text.includes('★'))).toBe(true);
   expect(data.some(x=>x.id==='equipmentBook')).toBe(true);
 });
+
+
+test('global search focuses roster result and records recent destination', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'r1',name:'加賀改',level:94,tags:[]}]));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdGSEnsure?.();
+    const row={action:{kind:'roster',name:'加賀改'},title:'加賀改'};
+    window.hdGSOpenResult?.(row);
+    let recent=[];try{recent=JSON.parse(localStorage.getItem('harbordesk-quick-nav-recent-v1')||'[]')}catch{}
+    let view={};try{view=JSON.parse(sessionStorage.getItem('harbordesk-session-roster-view-v1')||'{}')}catch{}
+    return {
+      query:document.getElementById('shipRosterSearch')?.value||'',
+      savedQuery:view.query||'',
+      recent:recent.map(x=>x.id)
+    };
+  });
+  expect(data.query).toBe('加賀改');
+  expect(data.savedQuery).toBe('加賀改');
+  expect(data.recent).toContain('roster');
+});
+
+
+test('global search equipment result persists target query', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdGSEnsure?.();
+    window.hdGSOpenResult?.({action:{kind:'equipment',name:'試製東海'},title:'試製東海'});
+    let view={};try{view=JSON.parse(sessionStorage.getItem('harbordesk-session-equip-catalog-view-v1')||'{}')}catch{}
+    return {query:document.getElementById('hdEquipCatalogSearch')?.value||'',savedQuery:view.query||'',filter:view.filter||''};
+  });
+  expect(data.query).toBe('試製東海');
+  expect(data.savedQuery).toBe('試製東海');
+  expect(data.filter).toBe('すべて');
+});
