@@ -4,6 +4,10 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '17 18 * * *'
+  push:
+    paths:
+      - 'scripts/sync-kancolle-master.mjs'
+      - '.github/workflows/sync-kancolle-master.yml'
 
 permissions:
   contents: write
@@ -15,6 +19,7 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
