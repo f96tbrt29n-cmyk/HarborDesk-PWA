@@ -204,5 +204,6 @@ document.addEventListener('click',e=>{
  if(e.target.closest?.('[data-hd-fl-ledger]')){if(typeof hdWSShowElement==='function')hdWSShowElement('equipmentBook',true);return}
 });
 window.addEventListener('storage',e=>{if(e.key===HD_FL_KEY){for(const k of Object.keys(HD_FL_CACHE))delete HD_FL_CACHE[k]}});
+window.addEventListener('hd:equipment-changed',()=>{for(const k of Object.keys(HD_FL_CACHE))delete HD_FL_CACHE[k]});
 window.addEventListener('load',()=>setTimeout(()=>{if(!hdFLInstall())setTimeout(hdFLInstall,500)},650));
 hdFLInstall();
