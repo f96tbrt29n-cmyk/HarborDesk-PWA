@@ -1,7 +1,7 @@
 {
   "version": "1.0.143",
   "build": 143,
-  "releasedAt": "2026-09-19T14:51:00+09:00",
+  "releasedAt": "2026-09-19T14:52:00+09:00",
   "notes": "GitHub Actionsの実ブラウザ回帰テストを導入。Playwright Chromiumでmain/PR更新時に自動実行し、失敗時はスクリーンショット・動画・traceを14日間保存。初回実行で2件の問題を検出し、画像フィルタテストの誤検知と同時hydrate競合を修正。修正後の再実行で20/20ケース成功を確認。",
   "masterChanges": null
 }
