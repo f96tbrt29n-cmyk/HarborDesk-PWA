@@ -1,6 +1,7 @@
 const HD_SHIP_IMAGE_DB='harbordesk-ship-images-v1';
 const HD_SHIP_IMAGE_STORE='images';
 const HD_SHIP_IMAGE_CONFIG_KEY='harbordesk-ship-image-config-v1';
+const HD_SHIP_IMAGE_VERIFY_KEY='harbordesk-ship-image-verify-v1';
 let HD_SHIP_IMAGE_DB_PROMISE=null;
 const HD_SHIP_IMAGE_OBJECT_URLS=new Map();
 const HD_SHIP_IMAGE_LOCAL_IDS=new Set();
@@ -41,6 +42,40 @@ function hdShipImageConfig(){
  try{const x=JSON.parse(localStorage.getItem(HD_SHIP_IMAGE_CONFIG_KEY)||'{}');return {remoteTemplate:String(x.remoteTemplate||'').trim()}}catch{return {remoteTemplate:''}}
 }
 function hdShipImageSaveConfig(v){localStorage.setItem(HD_SHIP_IMAGE_CONFIG_KEY,JSON.stringify({remoteTemplate:String(v?.remoteTemplate||'').trim()}));window.dispatchEvent(new CustomEvent('hd:ship-images-changed'))}
+function hdShipImageVerifyLoad(){
+ try{
+  const raw=JSON.parse(localStorage.getItem(HD_SHIP_IMAGE_VERIFY_KEY)||'null');
+  const hashes={};
+  if(raw?.hashes&&typeof raw.hashes==='object')for(const [id,h] of Object.entries(raw.hashes)){const hash=String(h||'').toLowerCase().trim();if(/^\d+$/.test(id)&&/^[0-9a-f]{64}$/.test(hash))hashes[String(Number(id))]=hash}
+  if(Array.isArray(raw?.entries))for(const x of raw.entries||[]){const id=Number(x?.id),hash=String(x?.sha256||x?.hash||'').toLowerCase().trim();if(id&&/^[0-9a-f]{64}$/.test(hash))hashes[String(id)]=hash}
+  return {format:'harbordesk-ship-image-hashes',version:1,source:String(raw?.source||''),updatedAt:String(raw?.updatedAt||''),hashes};
+ }catch{return {format:'harbordesk-ship-image-hashes',version:1,source:'',updatedAt:'',hashes:{}}}
+}
+function hdShipImageVerifySave(v){
+ const hashes={};for(const [id,h] of Object.entries(v?.hashes||{})){const hash=String(h||'').toLowerCase().trim();if(/^\d+$/.test(id)&&/^[0-9a-f]{64}$/.test(hash))hashes[String(Number(id))]=hash}
+ const out={format:'harbordesk-ship-image-hashes',version:1,source:String(v?.source||''),updatedAt:String(v?.updatedAt||new Date().toISOString()),hashes};
+ localStorage.setItem(HD_SHIP_IMAGE_VERIFY_KEY,JSON.stringify(out));window.dispatchEvent(new CustomEvent('hd:ship-images-changed',{detail:{verifyManifest:true,count:Object.keys(hashes).length}}));return out;
+}
+function hdShipImageVerifyStatus(id,hash=''){
+ const manifest=hdShipImageVerifyLoad(),expected=manifest.hashes[String(Number(id))]||'',actual=String(hash||'').toLowerCase();
+ if(!expected)return {status:'unverified',expected:'',actual,source:manifest.source||''};
+ if(!actual)return {status:'pending',expected,actual:'',source:manifest.source||''};
+ return {status:actual===expected?'verified':'mismatch',expected,actual,source:manifest.source||''};
+}
+async function hdShipImageImportVerifyManifest(file){
+ if(!file)throw new Error('検証表ファイルがない');
+ const text=await file.text();let raw;try{raw=JSON.parse(text)}catch{throw new Error('JSONとして読めない')}
+ const hashes={};
+ if(raw?.hashes&&typeof raw.hashes==='object')for(const [id,h] of Object.entries(raw.hashes)){const hash=String(h||'').toLowerCase().trim();if(/^\d+$/.test(id)&&/^[0-9a-f]{64}$/.test(hash))hashes[String(Number(id))]=hash}
+ if(Array.isArray(raw?.entries))for(const x of raw.entries){const id=Number(x?.id),hash=String(x?.sha256||x?.hash||'').toLowerCase().trim();if(id&&/^[0-9a-f]{64}$/.test(hash))hashes[String(id)]=hash}
+ if(!Object.keys(hashes).length)throw new Error('有効なID→SHA-256が見つからない');
+ return hdShipImageVerifySave({hashes,source:raw?.source||file.name,updatedAt:raw?.updatedAt||new Date().toISOString()});
+}
+function hdShipImageExportVerifyTemplate(){
+ const rows=hdShipImageRows().sort((a,b)=>Number(a.id)-Number(b.id)).map(x=>({id:Number(x.id),name:String(x.name||''),sha256:''}));
+ const out={format:'harbordesk-ship-image-hashes',version:1,source:'user-supplied-reference',updatedAt:new Date().toISOString(),entries:rows};
+ const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='HarborDesk-ship-image-hash-template.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200);
+}
 function hdShipImageOpenDb(){
  if(HD_SHIP_IMAGE_DB_PROMISE)return HD_SHIP_IMAGE_DB_PROMISE;
  HD_SHIP_IMAGE_DB_PROMISE=new Promise((resolve,reject)=>{
@@ -109,12 +144,15 @@ async function hdShipImageIntegrityAudit(deep=false){
  }
  if(changed.length)await hdShipImagePersistAuditMeta(changed);
  const duplicates=[...byHash.entries()].filter(([,items])=>items.length>1).map(([hash,items])=>({hash,items}));
- const out={at:Date.now(),deep,total:rows.length,bytes,invalidId,empty,badType,nameMismatch,unhashed,duplicates,issues:invalidId.length+empty.length+badType.length};
+ const verify=hdShipImageVerifyLoad(),verified=[],mismatch=[],unverified=[];
+ for(const row of rows){const v=hdShipImageVerifyStatus(row.id,row.hash||'');if(v.status==='verified')verified.push({id:Number(row.id),name:String(master[String(row.id)]?.name||row.name||'')});else if(v.status==='mismatch')mismatch.push({id:Number(row.id),name:String(master[String(row.id)]?.name||row.name||''),expected:v.expected,actual:v.actual});else unverified.push({id:Number(row.id),name:String(master[String(row.id)]?.name||row.name||''),status:v.status})}
+ const out={at:Date.now(),deep,total:rows.length,bytes,invalidId,empty,badType,nameMismatch,unhashed,duplicates,verifyEntries:Object.keys(verify.hashes||{}).length,verified,mismatch,unverified,issues:invalidId.length+empty.length+badType.length+mismatch.length};
  window.__hdShipImageIntegrityLast=out;return out;
 }
 function hdShipImageIntegritySummary(a){
  if(!a)return '未確認';
  const parts=[`${a.total}形態`,`壊れ/無効 ${a.issues}件`];
+ if(a.verifyEntries)parts.push(`一致 ${a.verified.length} / 不一致 ${a.mismatch.length} / 未検証 ${a.unverified.length}`);
  if(a.deep)parts.push(`同一画像候補 ${a.duplicates.length}組`);
  else if(a.unhashed.length)parts.push(`指紋未確認 ${a.unhashed.length}件`);
  return parts.join('・');
@@ -179,10 +217,10 @@ async function hdShipImageHydrate(root=document){
  const hosts=[...root.querySelectorAll?.('[data-hd-ship-image-host]')||[]];
  await Promise.all(hosts.map(async host=>{
   const id=Number(host.dataset.hdShipImageHost),img=host.querySelector('img'),del=host.querySelector('[data-hd-ship-image-delete]'),upload=host.querySelector('[data-hd-ship-image-upload]');if(!id||!img)return;
-  host.classList.remove('loaded','remote','missing');img.removeAttribute('src');
+  host.classList.remove('loaded','remote','missing','verify-verified','verify-mismatch','verify-unverified','verify-pending');delete host.dataset.hdShipImageVerify;img.removeAttribute('src');
   const local=await hdShipImageGet(id);
   if(local?.blob){
-   const url=hdShipImageObjectUrl(id,local.blob);img.src=url;host.classList.add('loaded');if(del)del.hidden=false;if(upload)upload.textContent='画像を変更';return;
+   const url=hdShipImageObjectUrl(id,local.blob),v=hdShipImageVerifyStatus(id,local.hash||'');img.src=url;host.classList.add('loaded','verify-'+v.status);host.dataset.hdShipImageVerify=v.status;if(del)del.hidden=false;if(upload)upload.textContent='画像を変更';return;
   }
   if(del)del.hidden=true;if(upload)upload.textContent='画像を登録';
   const remote=hdShipImageRemoteUrl(id);
@@ -197,13 +235,13 @@ function hdShipImageEnsurePicker(){
 function hdShipImageEnsureDialog(){
  let d=document.getElementById('hdShipImageDialog');if(d)return d;
  d=document.createElement('dialog');d.id='hdShipImageDialog';d.className='hd-ship-image-dialog';
- d.innerHTML=`<div class="hd-ship-image-dialog-head"><div><div class="eyebrow">SHIP IMAGE LIBRARY</div><h3>艦娘画像</h3></div><button type="button" class="icon-btn" data-hd-ship-image-close>×</button></div><p>画像はこの端末のブラウザ内に保存するよ。公式マスターIDで紐づけるから、通常・改・改二など別形態を取り違えない。</p><div class="hd-ship-image-dialog-grid"><article><strong>一括取り込み</strong><p><code>541.png</code> のように「艦ID.拡張子」、または正確な艦名をファイル名にして複数選択。PNG/JPEG/WebP対応。</p><label class="primary hd-ship-image-file">画像を複数選択<input id="hdShipImageBulkInput" type="file" accept="image/png,image/jpeg,image/webp" multiple></label><span id="hdShipImageImportStatus"></span></article><article><strong>許諾済み画像URL</strong><p>自分で利用権を確認した画像サーバーがある場合だけ設定。<code>{id}</code> を艦IDに置換する。</p><input id="hdShipImageRemoteTemplate" type="url" placeholder="https://example.com/card/{id}.png"><button type="button" class="ghost" data-hd-ship-image-save-remote>URL設定を保存</button></article></div><div class="hd-ship-image-integrity"><div><strong>画像整合性</strong><p>壊れた画像・存在しないMASTER IDを確認。詳細確認ではSHA-256で同一画像候補も探すよ。</p></div><button type="button" class="ghost" data-hd-ship-image-audit>画像整合性を詳細確認</button><div id="hdShipImageIntegrityStatus" class="muted">未確認</div></div><div class="hd-ship-image-backup"><div><strong>画像ライブラリのバックアップ</strong><p>端末保存の画像をMASTER IDのまま1ファイルへ保存。復元は既存画像へ上書き統合するよ。</p></div><div><button type="button" class="ghost" data-hd-ship-image-export>バックアップを書き出す</button><label class="ghost hd-ship-image-backup-file">バックアップを復元<input id="hdShipImageBackupInput" type="file" accept=".hdshipimg,application/x-harbordesk-ship-images"></label></div><span id="hdShipImageBackupStatus"></span></div><div class="hd-ship-image-dialog-status"><b>端末保存</b><span id="hdShipImageCount">確認中…</span></div><small>ゲーム内画像そのものを公開リポジトリへ同梱する機能ではないよ。利用する画像の権利・利用条件は画像提供元に従ってね。</small>`;
+ d.innerHTML=`<div class="hd-ship-image-dialog-head"><div><div class="eyebrow">SHIP IMAGE LIBRARY</div><h3>艦娘画像</h3></div><button type="button" class="icon-btn" data-hd-ship-image-close>×</button></div><p>画像はこの端末のブラウザ内に保存するよ。公式マスターIDで紐づけるから、通常・改・改二など別形態を取り違えない。</p><div class="hd-ship-image-dialog-grid"><article><strong>一括取り込み</strong><p><code>541.png</code> のように「艦ID.拡張子」、または正確な艦名をファイル名にして複数選択。PNG/JPEG/WebP対応。</p><label class="primary hd-ship-image-file">画像を複数選択<input id="hdShipImageBulkInput" type="file" accept="image/png,image/jpeg,image/webp" multiple></label><span id="hdShipImageImportStatus"></span></article><article><strong>許諾済み画像URL</strong><p>自分で利用権を確認した画像サーバーがある場合だけ設定。<code>{id}</code> を艦IDに置換する。</p><input id="hdShipImageRemoteTemplate" type="url" placeholder="https://example.com/card/{id}.png"><button type="button" class="ghost" data-hd-ship-image-save-remote>URL設定を保存</button></article></div><div class="hd-ship-image-integrity"><div><strong>画像整合性</strong><p>壊れた画像・存在しないMASTER IDを確認。詳細確認ではSHA-256で同一画像候補も探すよ。</p></div><button type="button" class="ghost" data-hd-ship-image-audit>画像整合性を詳細確認</button><div id="hdShipImageIntegrityStatus" class="muted">未確認</div></div><div class="hd-ship-image-verify"><div><strong>正解指紋表</strong><p>自分で用意した「MASTER ID → SHA-256」JSONを読み込むと、画像を 一致 / 不一致 / 未検証 で判定できる。</p></div><div><label class="ghost hd-ship-image-verify-file">検証表を読み込む<input id="hdShipImageVerifyInput" type="file" accept=".json,application/json"></label><button type="button" class="ghost" data-hd-ship-image-verify-template>空テンプレート</button><button type="button" class="ghost" data-hd-ship-image-verify-clear>検証表を解除</button></div><span id="hdShipImageVerifyStatus"></span></div><div class="hd-ship-image-backup"><div><strong>画像ライブラリのバックアップ</strong><p>端末保存の画像をMASTER IDのまま1ファイルへ保存。復元は既存画像へ上書き統合するよ。</p></div><div><button type="button" class="ghost" data-hd-ship-image-export>バックアップを書き出す</button><label class="ghost hd-ship-image-backup-file">バックアップを復元<input id="hdShipImageBackupInput" type="file" accept=".hdshipimg,application/x-harbordesk-ship-images"></label></div><span id="hdShipImageBackupStatus"></span></div><div class="hd-ship-image-dialog-status"><b>端末保存</b><span id="hdShipImageCount">確認中…</span></div><small>ゲーム内画像そのものを公開リポジトリへ同梱する機能ではないよ。利用する画像の権利・利用条件は画像提供元に従ってね。</small>`;
  document.body.appendChild(d);
  d.querySelector('#hdShipImageRemoteTemplate').value=hdShipImageConfig().remoteTemplate;
  return d;
 }
 async function hdShipImageOpenDialog(){
- const d=hdShipImageEnsureDialog(),[c,a]=await Promise.all([hdShipImageCoverage(),hdShipImageIntegrityAudit(false)]);d.querySelector('#hdShipImageCount').textContent=`${c.local}/${c.total}形態・未登録${c.missing}`;const status=d.querySelector('#hdShipImageIntegrityStatus');if(status)status.textContent=hdShipImageIntegritySummary(a);if(!d.open)d.showModal();
+ const d=hdShipImageEnsureDialog(),[c,a]=await Promise.all([hdShipImageCoverage(),hdShipImageIntegrityAudit(false)]);d.querySelector('#hdShipImageCount').textContent=`${c.local}/${c.total}形態・未登録${c.missing}`;const status=d.querySelector('#hdShipImageIntegrityStatus');if(status)status.textContent=hdShipImageIntegritySummary(a);const manifest=hdShipImageVerifyLoad(),vs=d.querySelector('#hdShipImageVerifyStatus');if(vs)vs.textContent=Object.keys(manifest.hashes||{}).length?`検証表 ${Object.keys(manifest.hashes).length}件・${manifest.source||'source不明'}`:'検証表なし';if(!d.open)d.showModal();
 }
 async function hdShipImageImportFiles(files,targetId=0){
  let ok=0,skip=0;const skipped=[];
@@ -226,6 +264,8 @@ document.addEventListener('click',async e=>{
  if(e.target.closest?.('[data-hd-ship-image-settings]')){await hdShipImageOpenDialog();return}
  if(e.target.closest?.('[data-hd-ship-image-close]')){document.getElementById('hdShipImageDialog')?.close();return}
  if(e.target.closest?.('[data-hd-ship-image-audit]')){const d=hdShipImageEnsureDialog(),status=d.querySelector('#hdShipImageIntegrityStatus');if(status)status.textContent='画像指紋を確認中…';try{const a=await hdShipImageIntegrityAudit(true);if(status)status.innerHTML=`<b>${hdShipImageEsc(hdShipImageIntegritySummary(a))}</b>${a.duplicates.length?`<small>${a.duplicates.slice(0,8).map(g=>`同一候補: ${g.items.map(x=>`${hdShipImageEsc(x.name)}(ID ${x.id})`).join(' / ')}`).join('<br>')}${a.duplicates.length>8?`<br>ほか${a.duplicates.length-8}組`:''}</small>`:''}`}catch(err){if(status)status.textContent='確認に失敗: '+String(err?.message||err)}return}
+ if(e.target.closest?.('[data-hd-ship-image-verify-template]')){hdShipImageExportVerifyTemplate();return}
+ if(e.target.closest?.('[data-hd-ship-image-verify-clear]')){localStorage.removeItem(HD_SHIP_IMAGE_VERIFY_KEY);window.dispatchEvent(new CustomEvent('hd:ship-images-changed',{detail:{verifyManifest:true,cleared:true}}));const d=hdShipImageEnsureDialog(),s=d.querySelector('#hdShipImageVerifyStatus');if(s)s.textContent='検証表なし';return}
  if(e.target.closest?.('[data-hd-ship-image-export]')){const d=hdShipImageEnsureDialog(),status=d.querySelector('#hdShipImageBackupStatus');try{const ok=await hdShipImageExportBackup();if(status&&ok)status.textContent='バックアップを書き出したよ'}catch(err){if(status)status.textContent='書き出しに失敗: '+String(err?.message||err)}return}
  if(e.target.closest?.('[data-hd-ship-image-save-remote]')){const d=hdShipImageEnsureDialog(),input=d.querySelector('#hdShipImageRemoteTemplate');hdShipImageSaveConfig({remoteTemplate:input?.value||''});return}
 });
@@ -237,6 +277,10 @@ document.addEventListener('change',async e=>{
   const d=hdShipImageEnsureDialog(),status=d.querySelector('#hdShipImageImportStatus'),res=await hdShipImageImportFiles(e.target.files),c=await hdShipImageCoverage();
   if(status)status.innerHTML=`<b>取込 ${res.ok}件 / スキップ ${res.skip}件</b>${res.skipped.length?`<small>${res.skipped.slice(0,12).map(x=>`${hdShipImageEsc(x.file)}: ${hdShipImageEsc(x.reason)}`).join('<br>')}${res.skipped.length>12?`<br>ほか${res.skipped.length-12}件`:''}</small>`:''}`;
   const count=d.querySelector('#hdShipImageCount');if(count)count.textContent=`${c.local}/${c.total}形態・未登録${c.missing}`;await hdShipImageHydrate(document);return;
+ }
+ if(e.target.id==='hdShipImageVerifyInput'){
+  const d=hdShipImageEnsureDialog(),status=d.querySelector('#hdShipImageVerifyStatus'),file=e.target.files?.[0];if(!file)return;
+  try{const m=await hdShipImageImportVerifyManifest(file);if(status)status.textContent=`検証表 ${Object.keys(m.hashes||{}).length}件を読込`;await hdShipImageIntegrityAudit(true);await hdShipImageHydrate(document)}catch(err){if(status)status.textContent='読込失敗: '+String(err?.message||err)}finally{e.target.value=''}return;
  }
  if(e.target.id==='hdShipImageBackupInput'){
   const d=hdShipImageEnsureDialog(),status=d.querySelector('#hdShipImageBackupStatus'),file=e.target.files?.[0];if(!file)return;
