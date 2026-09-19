@@ -165,7 +165,7 @@ function hdFLPlanHtml(plan){
  return `<div class="hd-fl-plan">
   <div class="hd-fl-summary"><div><strong>手持ち装備の自動配備</strong><span>所持数＋艦別装備可否＋実スロット制限を反映</span></div><b class="${plan.missing.length?'warn':'ok'}">${plan.missing.length?`未配備 ${plan.missing.length}枠`:'主要枠を配備'}</b></div>
   <div class="hd-fl-master-status">マスター同期 ${plan.masterBacked||0}/${plan.ships.filter(x=>x.ship).length}隻</div>
-  <div class="hd-fl-ships">${plan.ships.map((s,i)=>`<div class="hd-fl-ship"><div class="hd-fl-ship-head"><span>${i+1}</span><div><strong>${hdFLEsc(s.ship||'艦娘未選択')}</strong><small>${hdFLEsc(s.type||'')}${s.master?'・マスター判定':''}</small></div></div><div class="hd-fl-items">${s.items.map(x=>`<span>${hdFLEsc(x.name)}${x.star?` ★${x.star}`:''}<small>第${(x.slotIndex??0)+1}スロ${x.capacity!=null?`・${x.capacity}機`:''}</small></span>`).join('')||'<em>配備なし</em>'}</div>${s.expansion?`<div class="hd-fl-expansion"><i>増設候補</i><b>${hdFLEsc(s.expansion.name)}${s.expansion.star?` ★${s.expansion.star}`:''}</b><small>${hdFLEsc(s.expansion.reason)}</small></div>`:''}${s.missing.length?`<small class="hd-fl-missing">未配備: ${s.missing.map(hdFLKindLabel).join(' / ')}</small>`:''}</div>`).join('')}</div>
+  <div class="hd-fl-ships">${plan.ships.map((s,i)=>{const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(s.ship,'loadout-thumb'):'';return `<div class="hd-fl-ship"><div class="hd-fl-ship-head"><span>${i+1}</span>${image}<div><strong>${hdFLEsc(s.ship||'艦娘未選択')}</strong><small>${hdFLEsc(s.type||'')}${s.master?'・マスター判定':''}</small></div></div><div class="hd-fl-items">${s.items.map(x=>`<span>${hdFLEsc(x.name)}${x.star?` ★${x.star}`:''}<small>第${(x.slotIndex??0)+1}スロ${x.capacity!=null?`・${x.capacity}機`:''}</small></span>`).join('')||'<em>配備なし</em>'}</div>${s.expansion?`<div class="hd-fl-expansion"><i>増設候補</i><b>${hdFLEsc(s.expansion.name)}${s.expansion.star?` ★${s.expansion.star}`:''}</b><small>${hdFLEsc(s.expansion.reason)}</small></div>`:''}${s.missing.length?`<small class="hd-fl-missing">未配備: ${s.missing.map(hdFLKindLabel).join(' / ')}</small>`:''}</div>`}).join('')}</div>
   ${used?`<div class="hd-fl-usage"><b>在庫使用:</b> ${used}</div>`:''}
   <div class="hd-fl-actions"><button type="button" class="primary small" data-hd-fl-save="${plan.index}">この装備込みで保存</button><button type="button" class="ghost small" data-hd-fl-regenerate="${plan.index}">再配備</button><button type="button" class="ghost small" data-hd-fl-ledger>装備台帳</button></div>
   <p class="hd-fl-note">※詳細100隻に加え、公式マスター全865形態も通常スロット数・搭載数・装備カテゴリ可否を反映。位置別制限・補強増設ルールもマスターIDが解決できる艦は同じ判定を使う。</p>
@@ -174,7 +174,7 @@ function hdFLPlanHtml(plan){
 function hdFLRender(index,card){
  const plan=hdFLGenerate(index);if(!plan||!card)return;
  let host=card.querySelector('.hd-fl-host');if(!host){host=document.createElement('div');host.className='hd-fl-host';card.appendChild(host)}
- host.innerHTML=hdFLPlanHtml(plan);host.scrollIntoView({behavior:'smooth',block:'nearest'});
+ host.innerHTML=hdFLPlanHtml(plan);if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);host.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function hdFLInstall(){
  if(window.__hdFleetLoadoutInstalled||typeof hdFSSuggestionHtml!=='function')return false;window.__hdFleetLoadoutInstalled=true;
@@ -204,6 +204,7 @@ document.addEventListener('click',e=>{
  if(e.target.closest?.('[data-hd-fl-ledger]')){if(typeof hdWSShowElement==='function')hdWSShowElement('equipmentBook',true);return}
 });
 window.addEventListener('storage',e=>{if(e.key===HD_FL_KEY){for(const k of Object.keys(HD_FL_CACHE))delete HD_FL_CACHE[k]}});
+window.addEventListener('hd:ship-images-changed',()=>{document.querySelectorAll('.hd-fl-host').forEach(host=>{if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host)})});
 window.addEventListener('hd:equipment-changed',()=>{for(const k of Object.keys(HD_FL_CACHE))delete HD_FL_CACHE[k]});
 window.addEventListener('load',()=>setTimeout(()=>{if(!hdFLInstall())setTimeout(hdFLInstall,500)},650));
 hdFLInstall();
