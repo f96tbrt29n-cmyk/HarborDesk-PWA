@@ -221,3 +221,11 @@ body.hd-booting::after{
 .timer-recent-remove,.quest-recent-remove{color:#e9a6aa}
 .timer-recent-item,.quest-recent-item{display:inline-flex;align-items:center;gap:4px}
 @media(max-width:560px){.timer-recent-run,.quest-recent-run,.timer-recent-remove,.quest-recent-remove{min-width:36px;height:36px}}
+
+@media(max-width:560px){
+ .timer{align-items:flex-start}
+ .timer-actions{max-width:148px;justify-content:flex-end;flex-wrap:wrap}
+ .timer-actions .small{padding:7px 9px;font-size:11px}
+ .quest{align-items:flex-start}
+ .quest .ghost.small{padding:7px 9px;font-size:11px}
+}
