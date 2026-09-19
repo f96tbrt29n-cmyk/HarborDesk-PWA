@@ -41,15 +41,15 @@ function hdPLDemandRows(items=[]){
  const m=new Map();
  for(const x of items){
   const target=x.target||x.wanted||'',key=[x.map||'',target,x.methodKey||'',x.kind||''].join('|');
-  const cur=m.get(key)||{...x,target,needed:0,requiredTotal:0,ships:[],loadouts:[],sources:[]};
-  cur.needed+=(x.needed||1);cur.requiredTotal=Math.max(Number(cur.requiredTotal)||0,Number(x.requiredTotal)||0);
+  const cur=m.get(key)||{...x,target,needed:0,ships:[],loadouts:[],sources:[]};
+  cur.needed+=Math.max(Number(x.needed)||1,Number(x.requiredTotal)||0);
   cur.ships=[...new Set([...cur.ships,x.ship].filter(Boolean))];
   cur.loadouts=[...new Set([...cur.loadouts,x.loadout].filter(Boolean))];
   cur.sources=[...new Set([...(cur.sources||[]),...(x.sources||[])])];
   m.set(key,cur);
  }
  return [...m.values()].map(x=>{
-  const needed=Math.max(Number(x.needed)||0,Number(x.requiredTotal)||0),owned=x.target?hdPLOwnedCount(x.target):0,shortfall=Math.max(0,needed-owned);
+  const needed=Math.max(0,Number(x.needed)||0),owned=x.target?hdPLOwnedCount(x.target):0,shortfall=Math.max(0,needed-owned);
   return {...x,needed,owned,shortfall,status:shortfall===0?'ready':owned>0?'partial':'missing'};
  }).sort((a,b)=>{
   if((a.shortfall===0)!==(b.shortfall===0))return a.shortfall===0?1:-1;
