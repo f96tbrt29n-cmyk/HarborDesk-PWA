@@ -70,27 +70,32 @@ function hdQNEnsureMobileDock(){
  document.body.appendChild(dock);hdQNEnsureAttentionDialog();hdQNUpdateMobileDock();
 }
 function hdQNMobileAttentionItems(){
- const items=[],now=Date.now();
+ const items=[],now=Date.now(),RECENT_DONE=2*60*60*1000;
  try{
   const appState=window.state||{};
   const quests=Array.isArray(appState.quests)?appState.quests:[];
   const expeditions=Array.isArray(appState.expeditions)?appState.expeditions:[];
   const docks=Array.isArray(appState.docks)?appState.docks:[];
-  const todo=quests.filter(x=>!x.done);
-  if(todo.length)items.push({id:'quests',reason:'未完了任務',icon:'✓',title:`未完了任務 ${todo.length}件`,detail:String(todo[0]?.name||'任務一覧を確認')});
+  const doneExp=expeditions.filter(x=>Number(x.endsAt)>0&&Number(x.endsAt)<=now&&now-Number(x.endsAt)<=RECENT_DONE).sort((a,b)=>Number(b.endsAt)-Number(a.endsAt));
+  if(doneExp.length)items.push({id:'expeditions',priority:100,tone:'urgent',reason:'遠征帰投済み',icon:'!',title:`遠征が帰投済み ${doneExp.length}件`,detail:String(doneExp[0]?.name||'遠征結果を確認')});
+  const doneDock=docks.filter(x=>Number(x.endsAt)>0&&Number(x.endsAt)<=now&&now-Number(x.endsAt)<=RECENT_DONE).sort((a,b)=>Number(b.endsAt)-Number(a.endsAt));
+  if(doneDock.length)items.push({id:'docks',priority:95,tone:'urgent',reason:'入渠完了',icon:'✓',title:`入渠が完了 ${doneDock.length}件`,detail:String(doneDock[0]?.name||'入渠一覧を確認')});
   const nearExp=expeditions.filter(x=>Number(x.endsAt)>now&&Number(x.endsAt)-now<=15*60*1000).sort((a,b)=>Number(a.endsAt)-Number(b.endsAt));
-  if(nearExp.length){const m=Math.max(1,Math.ceil((Number(nearExp[0].endsAt)-now)/60000));items.push({id:'expeditions',reason:'遠征まもなく終了',icon:'↗',title:`遠征まもなく帰投 ${nearExp.length}件`,detail:`${nearExp[0].name||'遠征'}・あと約${m}分`})}
+  if(nearExp.length){const m=Math.max(1,Math.ceil((Number(nearExp[0].endsAt)-now)/60000));items.push({id:'expeditions',priority:80,tone:'soon',reason:'遠征まもなく終了',icon:'↗',title:`遠征まもなく帰投 ${nearExp.length}件`,detail:`${nearExp[0].name||'遠征'}・あと約${m}分`})}
   const nearDock=docks.filter(x=>Number(x.endsAt)>now&&Number(x.endsAt)-now<=15*60*1000).sort((a,b)=>Number(a.endsAt)-Number(b.endsAt));
-  if(nearDock.length){const m=Math.max(1,Math.ceil((Number(nearDock[0].endsAt)-now)/60000));items.push({id:'docks',reason:'入渠まもなく終了',icon:'♨',title:`入渠まもなく完了 ${nearDock.length}件`,detail:`${nearDock[0].name||'入渠'}・あと約${m}分`})}
+  if(nearDock.length){const m=Math.max(1,Math.ceil((Number(nearDock[0].endsAt)-now)/60000));items.push({id:'docks',priority:75,tone:'soon',reason:'入渠まもなく終了',icon:'♨',title:`入渠まもなく完了 ${nearDock.length}件`,detail:`${nearDock[0].name||'入渠'}・あと約${m}分`})}
+  const todo=quests.filter(x=>!x.done);
+  if(todo.length)items.push({id:'quests',priority:20,tone:'normal',reason:'未完了任務',icon:'✓',title:`未完了任務 ${todo.length}件`,detail:String(todo[0]?.name||'任務一覧を確認')});
  }catch{}
  try{
   const info=typeof hdWSSyncInfo==='function'?hdWSSyncInfo():{state:'missing',label:'未同期'};
   if(info.state&&info.state!=='fresh'){
-   const title=info.state==='missing'?'ゲームデータ未同期':info.state==='partial'?'ゲーム同期を補完':'ゲーム同期が古い';
-   items.push({id:'kancolleImport',reason:'ゲーム同期確認',icon:'↻',title,detail:String(info.label||'同期画面を確認')});
+   const missing=info.state==='missing',partial=info.state==='partial';
+   const title=missing?'ゲームデータ未同期':partial?'ゲーム同期を補完':'ゲーム同期が古い';
+   items.push({id:'kancolleImport',priority:missing?65:partial?55:45,tone:'sync',reason:'ゲーム同期確認',icon:'↻',title,detail:String(info.label||'同期画面を確認')});
   }
- }catch{items.push({id:'kancolleImport',reason:'ゲーム同期確認',icon:'↻',title:'ゲーム同期を確認',detail:'同期画面を開く'})}
- return items;
+ }catch{items.push({id:'kancolleImport',priority:45,tone:'sync',reason:'ゲーム同期確認',icon:'↻',title:'ゲーム同期を確認',detail:'同期画面を開く'})}
+ return items.sort((a,b)=>Number(b.priority||0)-Number(a.priority||0));
 }
 function hdQNMobileAttentionMeta(){const items=hdQNMobileAttentionItems();return {count:Math.min(9,items.length),reasons:items.map(x=>x.reason),items}}
 function hdQNMobileAttentionCount(){return hdQNMobileAttentionMeta().count}
@@ -117,7 +122,7 @@ function hdQNOpenAttention(){
  hdQNEnsureAttentionDialog();
  const d=document.getElementById('hdMobileAttentionDialog'),host=document.getElementById('hdMobileAttentionList');if(!d||!host)return false;
  const items=hdQNMobileAttentionItems();
- host.innerHTML=items.length?items.map(x=>`<button type="button" data-hd-attention-jump="${hdQNEsc(x.id)}"><span>${hdQNEsc(x.icon)}</span><div><strong>${hdQNEsc(x.title)}</strong><small>${hdQNEsc(x.detail)}</small></div><i>›</i></button>`).join(''):'<div class="empty">今すぐ対応が必要な項目はないよ。</div>';
+ host.innerHTML=items.length?items.map(x=>`<button type="button" class="tone-${hdQNEsc(x.tone||'normal')}" data-hd-attention-jump="${hdQNEsc(x.id)}"><span>${hdQNEsc(x.icon)}</span><div><strong>${hdQNEsc(x.title)}</strong><small>${hdQNEsc(x.detail)}</small></div><i>›</i></button>`).join(''):'<div class="empty">今すぐ対応が必要な項目はないよ。</div>';
  if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');
  return true;
 }
