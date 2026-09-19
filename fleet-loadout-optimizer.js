@@ -28,7 +28,12 @@ function hdFOItemMeta(item){
  return meta||{name:item&&item.name||'',category:item&&item.category||'',stats:{},tags:[]};
 }
 function hdFOAssignedUsage(plan){
- const used={};for(const s of plan&&plan.ships||[])for(const x of s.items||[])used[x.name]=(used[x.name]||0)+1;return used;
+ const used={};
+ for(const s of plan&&plan.ships||[]){
+  for(const x of s.items||[])used[x.name]=(used[x.name]||0)+1;
+  if(s.expansion?.name)used[s.expansion.name]=(used[s.expansion.name]||0)+1;
+ }
+ return used;
 }
 function hdFORefreshUsage(plan){
  const inv=typeof hdFLInventory==='function'?hdFLInventory():new Map(),used=hdFOAssignedUsage(plan),owned={};
@@ -74,9 +79,11 @@ function hdFOCanUse(plan,candidate,shipIndex,itemIndex){
  const used=usage[candidate.name]||0,returned=removed&&removed.name===candidate.name?1:0;
  return used-returned<candidate.count;
 }
-function hdFOCompatible(plan,candidate,shipIndex){
+function hdFOCompatible(plan,candidate,shipIndex,itemIndex){
  const slot=plan.suggestion&&plan.suggestion.slots&&plan.suggestion.slots[shipIndex],meta=candidate.item||candidate;
- return !slot||typeof hdFLCompatible!=='function'||hdFLCompatible(meta,slot);
+ if(!slot)return true;
+ if(typeof hdFLCompatibleAt==='function')return hdFLCompatibleAt(meta,slot,itemIndex);
+ return typeof hdFLCompatible!=='function'||hdFLCompatible(meta,slot);
 }
 function hdFOProtectedPenalty(item){
  const kind=item&&item.kind||'',meta=hdFOItemMeta(item);let p=0;
@@ -94,11 +101,12 @@ function hdFOBestSwap(plan,focusKind,mode){
  const cfg=hdFOMode(mode),before=hdFOCoverage(plan),baseScore=hdFOReqScore(before.evaluation,cfg.id),baseCombat=hdFOCombatScore(before.evaluation),candidates=hdFOCandidateRows(focusKind,cfg.id);let best=null;
  for(const cand of candidates){
   for(let si=0;si<(plan.ships||[]).length;si++){
-   const ship=plan.ships[si];if(!ship||!ship.ship||!hdFOCompatible(plan,cand,si))continue;
+   const ship=plan.ships[si];if(!ship||!ship.ship)continue;
    for(let ii=0;ii<(ship.items||[]).length;ii++){
+    if(!hdFOCompatible(plan,cand,si,ii))continue;
     const old=ship.items[ii];if(old&&old.name===cand.name||!hdFOCanUse(plan,cand,si,ii))continue;
     const trial=hdFOClone(plan);
-    trial.ships[si].items[ii]={name:cand.name,star:cand.maxStar||0,category:cand.item&&cand.item.category||'',kind:old&&old.kind||'utility'};
+    trial.ships[si].items[ii]={name:cand.name,star:cand.maxStar||0,category:cand.item&&cand.item.category||'',kind:old&&old.kind||'utility',slotIndex:old&&old.slotIndex,capacity:old&&old.capacity};
     hdFORefreshUsage(trial);
     const after=hdFOCoverage(trial),afterScore=hdFOReqScore(after.evaluation,cfg.id),afterCombat=hdFOCombatScore(after.evaluation),focusBefore=before.map[focusKind],focusAfter=after.map[focusKind];
     if(!focusBefore||!focusAfter)continue;
@@ -239,7 +247,7 @@ function hdFOSavePreset(index,mode,button){
  const selected=hdFOMode(mode).id,plan=hdFOOptimize(base,selected),label=hdFOMode(selected).label,suggestion=plan.suggestion||{},preset=suggestion.preset||{},all=typeof loadCustomFleets==='function'?loadCustomFleets():{};
  all[map]=all[map]||[];
  const name=(map+' '+label+'｜'+(preset.name||('候補'+(Number(index)+1)))).slice(0,40);
- const ships=Array.from({length:6},function(_,i){const p=plan.ships&&plan.ships[i]||{};return {ship:p.ship||'',gear:(p.items||[]).map(function(x){return hdFOItemLabel(x)}).join(' / ')}});
+ const ships=Array.from({length:6},function(_,i){const p=plan.ships&&plan.ships[i]||{},gear=(p.items||[]).map(function(x){return hdFOItemLabel(x)});if(p.expansion)gear.push('[増設] '+p.expansion.name+(p.expansion.star?' ★'+p.expansion.star:''));return {ship:p.ship||'',gear:gear.join(' / ')}});
  const e=plan.optimization&&plan.optimization.after||hdFEEvaluate(plan),memo='HarborDesk '+label+'比較案。条件充足 '+(e&&e.ready||0)+'/'+(e&&e.requirements&&e.requirements.length||0)+'、交換 '+(plan.optimization&&plan.optimization.changes.length||0)+'件。比較ビューから保存。ゲーム側で最終確認。';
  const old=all[map].find(function(x){return x.name===name}),id=old&&old.id||(typeof cfUid==='function'?cfUid():'fo-'+Date.now()+'-'+Math.random().toString(16).slice(2)),item={id:id,name:name,ships:ships,memo:memo,source:'optimizer-preset',strategy:selected,strategyLabel:label,map:map,createdAt:old&&old.createdAt||Date.now(),updatedAt:Date.now()};
  all[map]=old?all[map].map(function(x){return x.id===id?item:x}):all[map].concat(item);
