@@ -4035,3 +4035,24 @@ test('home can start a recent expedition in one tap', async ({ page }) => {
   expect(data.timers).toHaveLength(1);
   expect(data.timers[0]).toEqual(expect.objectContaining({name:'東京急行',durationMinutes:165,active:true}));
 });
+
+
+test('iPhone Safari gets dismissible home-screen install tip', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    try{Object.defineProperty(navigator,'userAgent',{configurable:true,value:'Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) AppleWebKit/605.1.15 Version/26.0 Mobile/15E148 Safari/604.1'})}catch{}
+    try{Object.defineProperty(navigator,'standalone',{configurable:true,value:false})}catch{}
+    localStorage.removeItem('harbordesk-install-tip-dismissed-v1');
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.renderHomeDashboard?.();
+    const tip=document.getElementById('homeInstallTip');
+    const before=!!tip&&!tip.hidden;
+    tip?.querySelector('[data-home-install-dismiss]')?.click();
+    return {before,after:!!tip&&!tip.hidden,dismissed:localStorage.getItem('harbordesk-install-tip-dismissed-v1')};
+  });
+  expect(data.before).toBe(true);
+  expect(data.after).toBe(false);
+  expect(data.dismissed).toBe('1');
+});
