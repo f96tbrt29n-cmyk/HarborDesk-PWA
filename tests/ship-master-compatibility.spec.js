@@ -5962,3 +5962,27 @@ test('mobile attention prioritizes completed timers', async ({ page }) => {
   expect(data.some(x=>x.title.includes('入渠まもなく完了'))).toBe(true);
   expect(data[data.length-1].id).toBe('quests');
 });
+
+
+test('mobile sync dock becomes return-to-game after handoff', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdQNEnsure?.();
+    sessionStorage.setItem('harbordesk-kc-return-game-v1','1');
+    window.hdQNUpdateMobileDock?.();
+    const b=document.querySelector('[data-hd-mobile-sync]');
+    const ready={cls:b?.classList.contains('return-game')||false,label:b?.querySelector('b')?.textContent||'',icon:b?.querySelector('span')?.textContent||'',aria:b?.getAttribute('aria-label')||''};
+    sessionStorage.removeItem('harbordesk-kc-return-game-v1');
+    window.hdQNUpdateMobileDock?.();
+    const normal={cls:b?.classList.contains('return-game')||false,label:b?.querySelector('b')?.textContent||'',icon:b?.querySelector('span')?.textContent||''};
+    return {ready,normal};
+  });
+  expect(data.ready.cls).toBe(true);
+  expect(data.ready.label).toBe('艦これ');
+  expect(data.ready.icon).toBe('⚓');
+  expect(data.ready.aria).toContain('戻る');
+  expect(data.normal.cls).toBe(false);
+  expect(data.normal.label).toBe('同期');
+  expect(data.normal.icon).toBe('↻');
+});
