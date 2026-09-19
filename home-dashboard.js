@@ -145,6 +145,15 @@ function homeFleetReadinessMeta({away=false,hp25=0,hp50=0,fatigue=0}={}){
  return {cls:'ok',label:'簡易チェックOK',detail:'HP・疲労に大きな注意なし'};
 }
 function homeSelectedMap(){try{return typeof selectedMap!=='undefined'?String(selectedMap||'').trim():''}catch{return ''}}
+function homeSortieReadiness(map){
+ const target=String(map||'').trim();if(!target)return null;
+ try{
+  if(typeof hdSortieFleets!=='function'||typeof hdSortieSelection!=='function'||typeof hdSortieAutoChecks!=='function'||typeof hdSortieManualChecks!=='function'||typeof hdSortieState!=='function'||typeof hdSortieSummary!=='function')return null;
+  const fleets=hdSortieFleets(target),id=hdSortieSelection(target),fleet=fleets.find(x=>x.id===id)||fleets[0];if(!fleet)return null;
+  const autoInfo=hdSortieAutoChecks(target,fleet),manual=hdSortieManualChecks(target,autoInfo.adv),state=hdSortieState(target,fleet.id),sum=hdSortieSummary(manual,state,autoInfo.checks);
+  return {map:target,fleetId:fleet.id,name:fleet.name||'',...sum};
+ }catch{return null}
+}
 function homeOpenFleetShip(name){
  const ship=String(name||'').trim();if(!ship)return false;
  if(typeof hdKcOpenShipFromFleet==='function')return hdKcOpenShipFromFleet(ship);
@@ -289,6 +298,12 @@ function renderHomeDashboard(){
 document.addEventListener('click',e=>{
  const fleetTab=e.target.closest('[data-home-fleet-tab]');if(fleetTab){homeCurrentFleetSave(fleetTab.dataset.homeFleetTab);renderHomeDashboard();return}
  const fleetGear=e.target.closest('[data-home-fleet-gear-toggle]');if(fleetGear){homeCurrentFleetGearSave(!homeCurrentFleetGearVisible());renderHomeDashboard();return}
+ const sortieOpen=e.target.closest('[data-home-sortie-open]');if(sortieOpen){
+  const map=homeSelectedMap();if(!map){if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);return}
+  if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);else document.getElementById('guide')?.scrollIntoView({behavior:'smooth',block:'start'});
+  setTimeout(()=>{const mine=document.querySelector('[data-map-tab="mine"]');if(mine)mine.click();if(typeof hdRenderSortieReadiness==='function')hdRenderSortieReadiness()},90);
+  return;
+ }
  const fleetCopy=e.target.closest('[data-home-fleet-copy]');if(fleetCopy){
   const map=homeSelectedMap();if(!map){if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);return}
   try{
