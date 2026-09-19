@@ -51,6 +51,8 @@ jobs:
           if(v.version!==uv||Number(v.build)!==ub||Number(v.build)!==sb)throw new Error('Version mismatch');
           console.log('Runtime aligned:',v.version,v.build);
           NODE
+      - name: Validate Kancolle master semantics
+        run: node scripts/validate-kancolle-master.mjs
       - name: Commit if master changed
         shell: bash
         run: |
