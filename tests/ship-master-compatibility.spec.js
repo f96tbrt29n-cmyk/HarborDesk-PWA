@@ -4133,3 +4133,28 @@ test('recent timer and quest suggestions can be removed', async ({ page }) => {
   expect(data.timerRows.map(x=>x.name)).toEqual(['海上護衛任務']);
   expect(data.questRows).toEqual(['補給艦3隻']);
 });
+
+
+test('active manual timer can be extended in one tap', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const start=Date.now();
+    state.expeditions=[{id:'adjust1',name:'東京急行',startedAt:start,durationMinutes:165,endsAt:start+165*60000}];
+    coreListFilters.expedition='active';
+    save();renderTimers('expedition');
+    const before=state.expeditions[0].endsAt;
+    const buttons=document.querySelectorAll('[data-adjust-timer="adjust1"]');
+    document.querySelector('[data-adjust-timer="adjust1"][data-minutes="15"]')?.click();
+    return {
+      count:buttons.length,
+      delta:state.expeditions[0].endsAt-before,
+      duration:state.expeditions[0].durationMinutes,
+      active:state.expeditions[0].endsAt>Date.now()
+    };
+  });
+  expect(data.count).toBe(2);
+  expect(data.delta).toBe(15*60000);
+  expect(data.duration).toBe(165);
+  expect(data.active).toBe(true);
+});
