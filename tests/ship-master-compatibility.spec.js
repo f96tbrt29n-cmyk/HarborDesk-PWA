@@ -3082,3 +3082,28 @@ test('quick nav remembers workspace history and goes back', async ({ page }) => 
   expect(data.hasBack).toBe(true);
   expect(data.fn).toBe('function');
 });
+
+
+test('Kancolle sync coverage distinguishes captured and zero sections', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now(),ships:206,equipment:93,materials:8,decks:4,expeditions:0,docks:0,quests:0,sorties:0
+    }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdKcRenderSyncStatus?.();
+    const box=document.getElementById('hdKcSyncCoverage');
+    return {
+      text:box?.textContent||'',
+      ok:box?.querySelectorAll('.ok').length||0,
+      zero:box?.querySelectorAll('.zero').length||0
+    };
+  });
+  expect(data.text).toContain('艦娘');
+  expect(data.text).toContain('任務');
+  expect(data.text).toContain('未取得/なし');
+  expect(data.ok).toBeGreaterThan(0);
+  expect(data.zero).toBeGreaterThan(0);
+});
