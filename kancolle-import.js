@@ -264,9 +264,9 @@ function hdKcCopyFleetToCustom(deckId,map=''){
  if(!target)throw new Error('先に攻略海域を選んでね');
  const all=typeof loadCustomFleets==='function'?loadCustomFleets():(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1')||'{}')||{}}catch{return {}}})();
  all[target]=all[target]||[];
- const ships=Array.from({length:6},(_,i)=>{const s=deck.ships?.[i];return {ship:String(s?.name||''),masterId:Number(s?.masterId)||0,gear:String(s?.gear||'')}});
+ const ships=Array.from({length:6},(_,i)=>{const s=deck.ships?.[i];return {ship:String(s?.name||''),masterId:Number(s?.masterId)||0,level:Number(s?.level)||0,nowHp:Number(s?.nowHp)||0,maxHp:Number(s?.maxHp)||0,cond:s?.cond==null?null:Number(s.cond),gear:String(s?.gear||'')}});
  const existing=all[target].findIndex(x=>Number(x.sourceDeckId)===Number(deck.deckId)&&x.source==='kancolle-import');
- const row={id:existing>=0?all[target][existing].id:(typeof cfUid==='function'?cfUid():`kc-fleet-${deck.deckId}-${Date.now()}`),name:`ゲーム同期｜${deck.name}`,ships,memo:`艦これゲーム内の${deck.name}から同期`,source:'kancolle-import',sourceDeckId:Number(deck.deckId),createdAt:existing>=0?all[target][existing].createdAt:Date.now(),updatedAt:Date.now()};
+ const row={id:existing>=0?all[target][existing].id:(typeof cfUid==='function'?cfUid():`kc-fleet-${deck.deckId}-${Date.now()}`),name:`ゲーム同期｜${deck.name}`,ships,memo:`艦これゲーム内の${deck.name}から同期`,source:'kancolle-import',sourceDeckId:Number(deck.deckId),sourceSyncedAt:Number(deck.syncedAt)||Date.now(),createdAt:existing>=0?all[target][existing].createdAt:Date.now(),updatedAt:Date.now()};
  if(existing>=0)all[target][existing]=row;else all[target].push(row);
  if(typeof saveCustomFleets==='function')saveCustomFleets(all);else localStorage.setItem('harbordesk-custom-fleets-v1',JSON.stringify(all));
  if(typeof renderCustomFleets==='function')renderCustomFleets(target);
