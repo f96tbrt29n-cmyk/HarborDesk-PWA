@@ -3,6 +3,21 @@ const HD_RECENT_MAPS_KEY='harbordesk-recent-maps-v1';
 function homeEsc(s){return typeof esc==='function'?esc(s):String(s??'')}
 function loadRecentMaps(){try{return JSON.parse(localStorage.getItem(HD_RECENT_MAPS_KEY))||[]}catch{return []}}
 function saveRecentMap(map){if(!map)return;const rows=loadRecentMaps().filter(x=>x!==map);rows.unshift(map);localStorage.setItem(HD_RECENT_MAPS_KEY,JSON.stringify(rows.slice(0,6)))}
+function homeJson(key,fallback=null){try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}}
+function homeRelative(ts){
+ const d=Math.max(0,Date.now()-Number(ts||0));
+ if(!ts)return '未同期';
+ if(d<60000)return 'たった今';
+ if(d<3600000)return Math.floor(d/60000)+'分前';
+ if(d<86400000)return Math.floor(d/3600000)+'時間前';
+ return Math.floor(d/86400000)+'日前';
+}
+function homeSyncInfo(){
+ const s=homeJson('harbordesk-kancolle-sync-v1',null);
+ if(!s)return {sync:null,label:'未同期',state:'warn',age:Infinity};
+ const age=Date.now()-Number(s.syncedAt||0);
+ return {sync:s,label:homeRelative(s.syncedAt),state:age>21600000?'warn':'ok',age};
+}
 
 function ensureHomeDashboard(){
  const main=document.querySelector('main');
@@ -13,6 +28,7 @@ function ensureHomeDashboard(){
  section.className='home-dashboard';
  section.innerHTML=`
   <div class="section-head"><div><div class="eyebrow">HOME</div><h2>今日の司令部</h2></div><span class="muted" id="homeUpdated"></span></div>
+  <article id="homeGameSync" class="home-sync-card"></article>
   <div id="homeSummary" class="home-summary"></div>
   <div class="home-grid">
    <article class="home-card"><div class="home-card-title"><strong>今日やること</strong><a href="#quests">任務へ</a></div><div id="homeTodo"></div></article>
@@ -21,7 +37,7 @@ function ensureHomeDashboard(){
   <article class="home-card"><div class="home-card-title"><strong>資源</strong><a href="#resources">記録へ</a></div><div id="homeResources" class="home-resource-grid"></div></article>
   <article class="home-card"><div class="home-card-title"><strong>次の装備調達</strong><button type="button" class="ghost small" data-home-procurement-open>調達リストへ</button></div><div id="homeProcurement"></div></article>
   <article class="home-card"><div class="home-card-title"><strong>クイックアクセス</strong><span class="muted">1〜2タップで移動</span></div><div class="home-shortcuts">
-    <a href="#guide">🗺️ 攻略</a><a href="#roster">⚓ 艦隊</a><a href="#equipmentBook">🧰 装備</a><a href="#kancolleImport">🎮 ゲーム同期</a><a href="#eventLog">🎯 イベント</a><a href="#calculators">🧮 計算</a><a href="#backup">💾 保存</a>
+    <a href="#kancolleImport">🎮 ゲーム同期</a><a href="#guide">🗺️ 攻略</a><a href="#roster">⚓ 艦隊</a><a href="#equipmentBook">🧰 装備</a><a href="#quests">✅ 任務</a><a href="#expeditions">⏱️ 遠征</a>
   </div></article>
   <article class="home-card"><div class="home-card-title"><strong>最近見た海域</strong><span class="muted">タップで攻略を開く</span></div><div id="homeRecentMaps" class="home-recent-maps"></div></article>`;
  hero.insertAdjacentElement('afterend',section);
@@ -40,12 +56,18 @@ function renderHomeDashboard(){
  try{equipCount=JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]').length}catch{}
  try{eventCount=JSON.parse(localStorage.getItem('harbordesk-events-v1')||'[]').length}catch{}
  document.getElementById('homeUpdated').textContent=new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+ const syncInfo=homeSyncInfo(),sync=syncInfo.sync;
+ const syncHost=document.getElementById('homeGameSync');
+ if(syncHost){
+  syncHost.className='home-sync-card '+syncInfo.state;
+  syncHost.innerHTML=sync?`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>${homeEsc(syncInfo.label)}</strong><small>艦娘 ${Number(sync.ships)||0} / 装備 ${Number(sync.equipment)||0} / 艦隊 ${Number(sync.decks)||0}</small></div><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面へ</button></div>${syncInfo.state==='warn'?'<div class="home-sync-note">少し時間が空いてるよ。艦これを開いた時にもう一度同期すると最新状態になる。</div>':''}`:`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>まだ同期してないよ</strong><small>艦娘・装備・資源・現在艦隊をまとめて取り込める</small></div><button type="button" class="primary small" data-home-jump="kancolleImport">同期する</button></div>`;
+ }
  document.getElementById('homeSummary').innerHTML=`
-   <div><span>未完了任務</span><strong>${todo.length}</strong></div>
-   <div><span>稼働中</span><strong>${running.length}</strong></div>
-   <div><span>艦娘</span><strong>${rosterCount}</strong></div>
-   <div><span>装備</span><strong>${equipCount}</strong></div>
-   <div><span>イベント記録</span><strong>${eventCount}</strong></div>`;
+   <button type="button" class="home-summary-item" data-home-jump="quests"><span>未完了任務</span><strong>${todo.length}</strong><small>任務へ</small></button>
+   <button type="button" class="home-summary-item" data-home-jump="expeditions"><span>稼働中</span><strong>${running.length}</strong><small>タイマーへ</small></button>
+   <button type="button" class="home-summary-item" data-home-jump="roster"><span>艦娘</span><strong>${rosterCount}</strong><small>艦隊へ</small></button>
+   <button type="button" class="home-summary-item" data-home-jump="equipmentBook"><span>装備</span><strong>${equipCount}</strong><small>装備へ</small></button>
+   <button type="button" class="home-summary-item" data-home-jump="kancolleImport"><span>最終同期</span><strong class="home-sync-age">${homeEsc(syncInfo.label)}</strong><small>更新</small></button>`;
  document.getElementById('homeTodo').innerHTML=todo.length?todo.slice(0,5).map(q=>`<div class="home-row"><span>${homeEsc(q.name)}</span><small>未完了</small></div>`).join(''):'<div class="home-empty">未完了の任務はないよ</div>';
  document.getElementById('homeTimers').innerHTML=running.length?running.slice(0,5).map(t=>`<div class="home-row"><span><b>${t.kind}</b> ${homeEsc(t.name)}</span><small>${typeof fmt==='function'?fmt(t.endsAt-now):''}</small></div>`).join(''):'<div class="home-empty">動いているタイマーはないよ</div>';
  const res=[['燃料',resources.fuel],['弾薬',resources.ammo],['鋼材',resources.steel],['ボーキ',resources.bauxite]];
@@ -64,6 +86,13 @@ function renderHomeDashboard(){
 }
 
 document.addEventListener('click',e=>{
+ const jump=e.target.closest('[data-home-jump]');
+ if(jump){
+  const id=jump.dataset.homeJump;
+  if(typeof hdWSShowElement==='function')hdWSShowElement(id,true);
+  else{const target=document.getElementById(id);if(target)target.scrollIntoView({behavior:'smooth',block:'start'});else location.hash=id}
+  return;
+ }
  const mapButton=e.target.closest('[data-map]');
  if(mapButton?.dataset.map){saveRecentMap(mapButton.dataset.map);setTimeout(renderHomeDashboard,0)}
  const recent=e.target.closest('[data-home-map]');
@@ -75,6 +104,8 @@ window.addEventListener('storage',renderHomeDashboard);
 window.addEventListener('hd:modules-ready',renderHomeDashboard);
 window.addEventListener('hd:equipment-changed',renderHomeDashboard);
 window.addEventListener('hd:procurement-changed',renderHomeDashboard);
+window.addEventListener('hd:kancolle-sync',renderHomeDashboard);
+window.addEventListener('hd:workspace-refresh',renderHomeDashboard);
 setInterval(renderHomeDashboard,5000);
 window.addEventListener('load',()=>setTimeout(renderHomeDashboard,300));
 ensureHomeDashboard();
