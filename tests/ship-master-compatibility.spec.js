@@ -4745,3 +4745,21 @@ test('mobile dialogs keep action buttons reachable', async ({ page }) => {
   expect(source).toContain('position:sticky');
   expect(source).toContain('100dvh');
 });
+
+
+test('global search empty state shows pinned and recent features', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-quick-nav-pins-v1', JSON.stringify(['roster']));
+    localStorage.setItem('harbordesk-quick-nav-recent-v1', JSON.stringify([{id:'equipmentBook',at:Date.now()},{id:'roster',at:Date.now()-1}]));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdGSEnsure?.();
+    const input=document.getElementById('hdGSSearch');if(input)input.value='';
+    window.hdGSRender?.();
+    return [...document.querySelectorAll('[data-hd-gs-recent-feature]')].map(x=>({id:x.dataset.hdGsRecentFeature,text:x.textContent||''}));
+  });
+  expect(data.some(x=>x.id==='roster'&&x.text.includes('★'))).toBe(true);
+  expect(data.some(x=>x.id==='equipmentBook')).toBe(true);
+});
