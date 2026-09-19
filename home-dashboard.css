@@ -49,3 +49,7 @@ button.home-next-main{cursor:pointer}
 .home-recent-function-list::-webkit-scrollbar{display:none}
 .home-recent-function-list button{flex:0 0 auto;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:7px 9px;border:1px solid var(--line);border-radius:10px;background:#0d2234;color:var(--text);font:inherit;font-size:10px}
 .home-recent-function-list button:active{background:#17344c}
+
+.home-pinned-label{color:#f2cf70}
+.home-pinned-function-list button{border-color:rgba(242,207,112,.48);background:linear-gradient(180deg,rgba(87,68,22,.36),#0d2234)}
+.home-pinned-function-list button::before{content:'★ ';color:#f2cf70}
