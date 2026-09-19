@@ -251,10 +251,11 @@ function hdKcCurrentFleets(){
 }
 function hdKcOpenShipFromFleet(name){
  const ship=String(name||'').trim();if(!ship)return false;
+ if(typeof hdQNRecordRecent==='function')hdQNRecordRecent('shipDatabase');
  if(typeof hdShipDbJumpTo==='function'){hdShipDbJumpTo(ship);return true}
  if(typeof hdWSShowElement==='function')hdWSShowElement('shipDatabase',true);
  else document.getElementById('shipDatabase')?.scrollIntoView({behavior:'smooth',block:'start'});
- setTimeout(()=>{const input=document.getElementById('hdShipDbSearch');if(input){input.value=ship;input.dispatchEvent(new Event('input',{bubbles:true}))}},80);
+ setTimeout(()=>{const input=document.getElementById('hdShipDbSearch');if(input){input.value=ship;if(typeof hdShipDbViewSave==='function')hdShipDbViewSave({query:ship});input.dispatchEvent(new Event('input',{bubbles:true}))}},80);
  return true;
 }
 function hdKcCopyFleetToCustom(deckId,map=''){
