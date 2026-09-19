@@ -1,24 +1,26 @@
 name: Build HarborDesk Shortcut
 
 on:
-  workflow_dispatch:
   push:
     paths:
       - ".github/workflows/build-harbordesk-shortcut.yml"
 
+permissions:
+  contents: write
+
 jobs:
   build-shortcut:
-    runs-on: macos-15
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Generate unsigned shortcut
+      - name: Generate shortcut plist
         shell: bash
         run: |
-          mkdir -p build
+          mkdir -p build downloads
           python3 - <<'PY'
-          import plistlib, uuid, pathlib
-          js = r"""try{
+          import plistlib, pathlib
+          js = """try{
             var d=document.getElementById('hd-kc-shortcut-test');
             if(d)d.remove();
             d=document.createElement('div');
@@ -33,16 +35,9 @@ jobs:
           workflow = {
               "WFWorkflowActions": [{
                   "WFWorkflowActionIdentifier": "is.workflow.actions.runjavascriptonwebpage",
-                  "WFWorkflowActionParameters": {
-                      "UUID": str(uuid.uuid4()).upper(),
-                      "WFJavaScript": js,
-                      "WFInput": {
-                          "Value": {"Type": "ExtensionInput"},
-                          "WFSerializationType": "WFTextTokenAttachment"
-                      }
-                  }
+                  "WFWorkflowActionParameters": {"WFJavaScript": js}
               }],
-              "WFWorkflowClientVersion": "1302.1.3",
+              "WFWorkflowClientVersion": "4000.0",
               "WFWorkflowHasOutputFallback": False,
               "WFWorkflowHasShortcutInputVariables": True,
               "WFWorkflowIcon": {
@@ -50,35 +45,62 @@ jobs:
                   "WFWorkflowIconStartColor": 4282601983
               },
               "WFWorkflowImportQuestions": [],
-              "WFWorkflowInputContentItemClasses": ["WFWebPageContentItem"],
-              "WFWorkflowMinimumClientVersion": 900,
-              "WFWorkflowMinimumClientVersionString": "900",
+              "WFWorkflowInputContentItemClasses": ["WFSafariWebPageContentItem"],
+              "WFWorkflowMinimumClientVersion": 1100,
+              "WFWorkflowMinimumClientVersionString": "1100",
               "WFWorkflowName": "HarborDeskキャプチャ",
               "WFWorkflowOutputContentItemClasses": [],
               "WFWorkflowTypes": ["ActionExtension"]
           }
-          out = pathlib.Path("build/HarborDesk-Capture-unsigned.shortcut")
-          with out.open("wb") as f:
-              plistlib.dump(workflow, f, fmt=plistlib.FMT_BINARY, sort_keys=False)
-          print(out, out.stat().st_size)
+          with open("build/HarborDesk-Capture.xml","wb") as f:
+              plistlib.dump(workflow,f,fmt=plistlib.FMT_XML,sort_keys=False)
+          print(pathlib.Path("build/HarborDesk-Capture.xml").read_text())
           PY
-          plutil -lint build/HarborDesk-Capture-unsigned.shortcut
 
-      - name: Sign shortcut for anyone
+      - name: Sign through HubSign
         shell: bash
         run: |
-          which shortcuts
-          shortcuts sign --mode anyone \
-            --input build/HarborDesk-Capture-unsigned.shortcut \
-            --output build/HarborDesk-Capture.shortcut
-          test -s build/HarborDesk-Capture.shortcut
-          file build/HarborDesk-Capture.shortcut
-          ls -lh build/HarborDesk-Capture.shortcut
+          python3 - <<'PY'
+          import json, pathlib, urllib.request
+          xml=pathlib.Path("build/HarborDesk-Capture.xml").read_text()
+          body=json.dumps({"shortcutName":"HarborDeskキャプチャ","shortcut":xml},ensure_ascii=False).encode()
+          req=urllib.request.Request(
+              "https://hubsign.routinehub.services/sign",
+              data=body,
+              headers={
+                  "Content-Type":"application/json",
+                  "Origin":"https://routinehub.co",
+                  "Referer":"https://routinehub.co/"
+              },
+              method="POST"
+          )
+          with urllib.request.urlopen(req,timeout=60) as res:
+              data=res.read()
+              print("STATUS",res.status,"BYTES",len(data),"MAGIC",data[:4])
+          if data[:4] != b"AEA1":
+              raise SystemExit("HubSign response is not an AEA1 signed shortcut")
+          pathlib.Path("downloads/HarborDesk-Capture.shortcut").write_bytes(data)
+          PY
+          test -s downloads/HarborDesk-Capture.shortcut
+          xxd -l 16 downloads/HarborDesk-Capture.shortcut
 
-      - name: Upload shortcut
+      - name: Publish signed shortcut file
+        shell: bash
+        run: |
+          git config user.name "HarborDesk Actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add downloads/HarborDesk-Capture.shortcut
+          if git diff --cached --quiet; then
+            echo "No shortcut binary change"
+          else
+            git commit -m "Publish signed HarborDesk shortcut"
+            git push
+          fi
+
+      - name: Upload signed shortcut artifact
         uses: actions/upload-artifact@v4
         with:
           name: HarborDesk-Capture
-          path: build/HarborDesk-Capture.shortcut
+          path: downloads/HarborDesk-Capture.shortcut
           if-no-files-found: error
           retention-days: 14
