@@ -4707,3 +4707,15 @@ test('mobile databases default to compact until user chooses otherwise', async (
   expect(data.ship).toBe(true);
   expect(data.equip).toBe(true);
 });
+
+
+test('roster search uses deferred rendering', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>({
+    hasScheduler:typeof window.rosterScheduleRender==='function',
+    inputExists:!!document.getElementById('shipRosterSearch')
+  }));
+  expect(data.hasScheduler).toBe(true);
+  expect(data.inputExists).toBe(true);
+});
