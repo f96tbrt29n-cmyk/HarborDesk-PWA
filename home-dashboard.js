@@ -84,7 +84,7 @@ function ensureHomeDashboard(){
    <article class="home-card"><div class="home-card-title"><strong>今日やること</strong><a href="#quests">任務へ</a></div><div id="homeTodo"></div></article>
    <article class="home-card"><div class="home-card-title"><strong>進行中タイマー</strong><a href="#expeditions">遠征へ</a></div><div id="homeTimers"></div></article>
   </div>
-  <article class="home-card home-collapsible" data-home-panel="resources" data-home-order-item="resources"><div class="home-card-title"><strong>資源</strong><div class="home-card-actions"><a href="#resources">記録へ</a><span class="home-order-controls"><button type="button" class="ghost small home-move-btn" data-home-move="up" aria-label="資源を上へ">↑</button><button type="button" class="ghost small home-move-btn" data-home-move="down" aria-label="資源を下へ">↓</button></span><button type="button" class="ghost small home-collapse-btn" data-home-collapse="resources" aria-label="資源カードを折りたたむ" aria-expanded="true">−</button></div></div><div data-home-panel-body><div id="homeResources" class="home-resource-grid"></div></div></article>
+  <article class="home-card home-collapsible" data-home-panel="resources" data-home-order-item="resources"><div class="home-card-title"><strong>資源</strong><div class="home-card-actions"><button type="button" class="ghost small" data-home-jump="kancolleImport">ゲーム同期</button><a href="#resources">記録へ</a><span class="home-order-controls"><button type="button" class="ghost small home-move-btn" data-home-move="up" aria-label="資源を上へ">↑</button><button type="button" class="ghost small home-move-btn" data-home-move="down" aria-label="資源を下へ">↓</button></span><button type="button" class="ghost small home-collapse-btn" data-home-collapse="resources" aria-label="資源カードを折りたたむ" aria-expanded="true">−</button></div></div><div data-home-panel-body><div id="homeResources" class="home-resource-grid"></div></div></article>
   <article class="home-card home-collapsible" data-home-panel="procurement" data-home-order-item="procurement"><div class="home-card-title"><strong>次の装備調達</strong><div class="home-card-actions"><button type="button" class="ghost small" data-home-procurement-open>調達リストへ</button><span class="home-order-controls"><button type="button" class="ghost small home-move-btn" data-home-move="up" aria-label="装備調達を上へ">↑</button><button type="button" class="ghost small home-move-btn" data-home-move="down" aria-label="装備調達を下へ">↓</button></span><button type="button" class="ghost small home-collapse-btn" data-home-collapse="procurement" aria-label="装備調達カードを折りたたむ" aria-expanded="true">−</button></div></div><div data-home-panel-body><div id="homeProcurement"></div></div></article>
   <article class="home-card" data-home-order-item="quick"><div class="home-card-title"><strong>クイックアクセス</strong><div class="home-card-actions"><span class="muted">1〜2タップで移動</span><span class="home-order-controls"><button type="button" class="ghost small home-move-btn" data-home-move="up" aria-label="クイックアクセスを上へ">↑</button><button type="button" class="ghost small home-move-btn" data-home-move="down" aria-label="クイックアクセスを下へ">↓</button></span></div></div><div class="home-shortcuts">
     <a href="#kancolleImport">🎮 ゲーム同期</a><a href="#guide">🗺️ 攻略</a><a href="#roster">⚓ 艦隊</a><a href="#equipmentBook">🧰 装備</a><a href="#quests">✅ 任務</a><a href="#expeditions">⏱️ 遠征</a>
@@ -99,7 +99,7 @@ function renderHomeDashboard(){
  const now=Date.now();
  let expeditions=[],docks=[],quests=[],resources={fuel:'',ammo:'',steel:'',bauxite:''};
  try{if(typeof state!=='undefined'){expeditions=state.expeditions||[];docks=state.docks||[];quests=state.quests||[];resources=state.resources||resources}}catch{}
- const running=[...expeditions.map(x=>({...x,kind:'遠征'})),...docks.map(x=>({...x,kind:'入渠'}))].filter(x=>x.endsAt>now).sort((a,b)=>a.endsAt-b.endsAt);
+ const running=[...expeditions.map(x=>({...x,kind:'遠征',sourceKind:'expedition'})),...docks.map(x=>({...x,kind:'入渠',sourceKind:'dock'}))].filter(x=>x.endsAt>now).sort((a,b)=>a.endsAt-b.endsAt);
  const todo=quests.filter(x=>!x.done);
  const nextTimer=running[0]||null,nextMs=nextTimer?Math.max(0,nextTimer.endsAt-now):Infinity;
  const nextState=nextTimer?(nextMs<=15*60*1000?'urgent':nextMs<=60*60*1000?'soon':'normal'):(todo.length?'task':'clear');
@@ -133,7 +133,7 @@ function renderHomeDashboard(){
    <button type="button" class="home-summary-item" data-home-jump="equipmentBook"><span>装備</span><strong>${equipCount}</strong><small>装備へ</small></button>
    <button type="button" class="home-summary-item" data-home-jump="kancolleImport"><span>最終同期</span><strong class="home-sync-age">${homeEsc(syncInfo.label)}</strong><small>更新</small></button>`;
  document.getElementById('homeTodo').innerHTML=todo.length?todo.slice(0,5).map(q=>`<div class="home-row home-task-row"><span>${homeEsc(q.name)}</span><button type="button" class="ghost small home-task-done" data-home-quest-done="${homeEsc(q.id)}">完了</button></div>`).join(''):'<div class="home-empty home-empty-action"><span>未完了の任務はないよ</span><button type="button" class="ghost small" data-home-add-quest>＋ 任務を追加</button></div>';
- document.getElementById('homeTimers').innerHTML=running.length?running.slice(0,5).map(t=>`<div class="home-row"><span><b>${t.kind}</b> ${homeEsc(t.name)}</span><small>${typeof fmt==='function'?fmt(t.endsAt-now):''}</small></div>`).join(''):'<div class="home-empty home-empty-action"><span>動いているタイマーはないよ</span><div><button type="button" class="ghost small" data-home-add-timer="expedition">＋ 遠征</button><button type="button" class="ghost small" data-home-add-timer="dock">＋ 入渠</button></div></div>';
+ document.getElementById('homeTimers').innerHTML=running.length?running.slice(0,5).map(t=>`<div class="home-row home-timer-row"><span><b>${t.kind}</b> ${homeEsc(t.name)}</span><div class="home-timer-actions"><small>${typeof fmt==='function'?fmt(t.endsAt-now):''}</small><button type="button" class="ghost small" data-home-timer-cancel="${homeEsc(t.id)}" data-kind="${homeEsc(t.sourceKind)}">取消</button></div></div>`).join(''):'<div class="home-empty home-empty-action"><span>動いているタイマーはないよ</span><div><button type="button" class="ghost small" data-home-add-timer="expedition">＋ 遠征</button><button type="button" class="ghost small" data-home-add-timer="dock">＋ 入渠</button></div></div>';
  const res=[['燃料',resources.fuel],['弾薬',resources.ammo],['鋼材',resources.steel],['ボーキ',resources.bauxite]];
  document.getElementById('homeResources').innerHTML=res.map(([name,val])=>`<div><span>${name}</span><strong>${val!==''&&val!=null?Number(val).toLocaleString():'-'}</strong></div>`).join('');
  const procurement=document.getElementById('homeProcurement');
@@ -159,6 +159,26 @@ function renderHomeDashboard(){
 document.addEventListener('click',e=>{
  const addQuest=e.target.closest('[data-home-add-quest]');if(addQuest){const input=document.getElementById('questName');if(input)input.value='';document.getElementById('questDialog')?.showModal();return}
  const addTimer=e.target.closest('[data-home-add-timer]');if(addTimer){if(typeof openTimer==='function')openTimer(addTimer.dataset.homeAddTimer);return}
+ const cancelTimer=e.target.closest('[data-home-timer-cancel]');if(cancelTimer){
+  const kind=cancelTimer.dataset.kind==='dock'?'dock':'expedition',arr=(typeof state!=='undefined')?(kind==='dock'?state.docks:state.expeditions):null;
+  if(!Array.isArray(arr))return;
+  const i=arr.findIndex(x=>String(x.id)===String(cancelTimer.dataset.homeTimerCancel));if(i<0)return;
+  const [item]=arr.splice(i,1);
+  try{if(typeof save==='function')save()}catch{}
+  try{if(typeof renderTimers==='function')renderTimers(kind)}catch{}
+  renderHomeDashboard();
+  const label=kind==='dock'?'入渠':'遠征';
+  if(typeof hdToastAction==='function')hdToastAction(`${label}「${item.name}」を取り消したよ`,'元に戻す',()=>{
+   const target=kind==='dock'?state.docks:state.expeditions;
+   if(!target.some(x=>String(x.id)===String(item.id)))target.splice(Math.min(i,target.length),0,item);
+   try{if(typeof save==='function')save()}catch{}
+   try{if(typeof renderTimers==='function')renderTimers(kind)}catch{}
+   renderHomeDashboard();
+   if(typeof hdToast==='function')hdToast('元に戻したよ');
+  },6500);
+  else if(typeof hdToast==='function')hdToast(`${label}を取り消したよ`);
+  return;
+ }
   const done=e.target.closest('[data-home-quest-done]');if(done){
   const id=done.dataset.homeQuestDone,q=(typeof state!=='undefined'&&Array.isArray(state.quests))?state.quests.find(x=>String(x.id)===String(id)):null;
   if(!q)return;
