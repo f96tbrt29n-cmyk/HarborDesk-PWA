@@ -124,7 +124,7 @@ function renderHomeDashboard(){
  const recentFunctions=document.getElementById('homeRecentFunctions'),pinnedRows=homePinnedFunctionRows(),pinnedSet=new Set(pinnedRows.map(x=>x.id)),recentRows=homeRecentFunctionRows(pinnedSet);
  if(recentFunctions){
   const parts=[];
-  if(pinnedRows.length)parts.push(`<div class="home-recent-label home-pinned-label">★ ピン留め</div><div class="home-recent-function-list home-pinned-function-list">${pinnedRows.map(x=>`<button type="button" data-home-jump="${homeEsc(x.id)}">${homeEsc(x.title)}</button>`).join('')}</div>`);
+  if(pinnedRows.length)parts.push(`<div class="home-recent-label home-pinned-label"><span>★ ピン留め</span><button type="button" class="ghost small" data-home-pins-manage>編集</button></div><div class="home-recent-function-list home-pinned-function-list">${pinnedRows.map(x=>`<button type="button" data-home-jump="${homeEsc(x.id)}">${homeEsc(x.title)}</button>`).join('')}</div>`);
   if(recentRows.length)parts.push(`<div class="home-recent-label">最近使った機能</div><div class="home-recent-function-list">${recentRows.map(x=>`<button type="button" data-home-jump="${homeEsc(x.id)}">${homeEsc(x.title)}</button>`).join('')}</div>`);
   recentFunctions.innerHTML=parts.join('');
  }
@@ -133,6 +133,7 @@ function renderHomeDashboard(){
 }
 
 document.addEventListener('click',e=>{
+ const managePins=e.target.closest('[data-home-pins-manage]');if(managePins){if(typeof hdQNOpen==='function')hdQNOpen();return}
  const collapse=e.target.closest('[data-home-collapse]');
  if(collapse){
   const card=collapse.closest('[data-home-panel]'),name=card?.dataset.homePanel;if(!card||!name)return;
