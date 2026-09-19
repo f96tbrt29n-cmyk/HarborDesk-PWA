@@ -8739,7 +8739,7 @@ function hdShipDbMasterAudit(){
  const ships=HD_SHIP_DATABASE.map(x=>x.final),missingProfiles=ships.filter(x=>!HD_SHIP_SLOT_PROFILES[x]);
  const badSlots=ships.filter(x=>{const p=HD_SHIP_SLOT_PROFILES[x];return p&&(!Array.isArray(p.slots)||p.slots.length!==p.count&&p.count!=null)});
  const ruleCount=Object.keys(HD_EXSLOT_ITEM_RULES||{}).length,starRuleCount=Object.values(HD_EXSLOT_ITEM_RULES||{}).filter(x=>Number(x.reqStar||0)>0).length;
- return {ships:ships.length,profiles:ships.length-missingProfiles.length,missingProfiles,badSlots,exslotRules:ruleCount,starRules:starRuleCount,slotRules:HD_SLOT_EXCLUSION_RULES.length,pickerOverrides:Object.keys(HD_PICKER_TYPE_SP_OVERRIDES||{}).length+Object.keys(HD_PICKER_TYPE_OVERRIDES||{}).length,snapshotLoaded:window.HD_SHIP_MASTER_RUNTIME_SYNCED===true,pickerRulesLoaded:window.HD_SHIP_PICKER_RUNTIME_SYNCED===true,source:window.HD_SHIP_MASTER_RUNTIME_SOURCE||HD_SHIP_MASTER_SOURCE,pickerSource:window.HD_SHIP_PICKER_RUNTIME_SOURCE||null};
+ return {ships:ships.length,profiles:ships.length-missingProfiles.length,missingProfiles,badSlots,equipmentMasterCount:Object.keys(HD_EQUIPMENT_MASTER_META_BY_NAME||{}).length,exslotRules:ruleCount,starRules:starRuleCount,slotRules:HD_SLOT_EXCLUSION_RULES.length,pickerOverrides:Object.keys(HD_PICKER_TYPE_SP_OVERRIDES||{}).length+Object.keys(HD_PICKER_TYPE_OVERRIDES||{}).length,snapshotLoaded:window.HD_SHIP_MASTER_RUNTIME_SYNCED===true,pickerRulesLoaded:window.HD_SHIP_PICKER_RUNTIME_SYNCED===true,source:window.HD_SHIP_MASTER_RUNTIME_SOURCE||HD_SHIP_MASTER_SOURCE,pickerSource:window.HD_SHIP_PICKER_RUNTIME_SOURCE||null};
 }
 window.HD_SHIP_MASTER_AUDIT=hdShipDbMasterAudit();
 function hdShipDbMapCandidates(detail){
