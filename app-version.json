@@ -1,7 +1,7 @@
 {
-  "version": "1.0.152",
-  "build": 152,
+  "version": "1.0.153",
+  "build": 153,
   "releasedAt": "2026-09-19T17:31:00+09:00",
-  "notes": "ゲーム同期に任務を追加。api_get_member/questlist の受託中・達成任務、任務名、進捗フラグをHarborDeskの任務一覧へ反映。複数ページは取得済みページを追跡し、全ページが揃った時だけゲーム由来任務を全置換、部分取得時は該当任務だけ差分更新するため手動任務や未取得ページを壊さない。Safari受動キャプチャもquestlistを必要項目だけに縮小して対応。回帰テスト追加・JavaScript構文検証済み。",
+  "notes": "艦これゲーム同期を出撃ログまで拡張。api_req_map/start・next と通常/連合艦隊 battleresult、母港帰投を時系列で再構成し、1出撃を1件として海域・最終APIマス番号・勝敗・戦闘数・ドロップ艦・通過ルート・ボス判定・帰投/撤退状態を保存。同一キャプチャ再取込はgameSortieKeyで重複防止。Safari受動キャプチャは出撃系レスポンスを必要項目だけに縮小し、api_token・Cookie・DMM認証情報は保存しない。回帰テスト追加・JavaScript構文検証済み。",
   "masterChanges": null
 }
