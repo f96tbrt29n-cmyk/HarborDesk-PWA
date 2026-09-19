@@ -43,3 +43,21 @@ HarborDeskの「ゲーム同期」から、艦これAPIレスポンスJSONを端
 対応入力は `svdata={...}` の単一レスポンス、または複数レスポンスを `endpoints` / `records` にまとめたJSONです。主に `/kcsapi/api_port/port`、`/kcsapi/api_get_member/ship2`、`/kcsapi/api_get_member/slot_item`、`require_info` 内の `api_slot_item`、`api_material` を扱います。
 
 DMMのID・パスワード・Cookie・`api_token` はHarborDeskへ保存しません。貼り付けた生レスポンスも保存せず、必要なゲーム情報だけをHarborDesk形式へ変換して端末内に保存します。
+
+
+### iPhone / Safari 受動キャプチャ（試験機能）
+
+HarborDeskの「ゲーム同期」には、Safari用キャプチャ補助コードをコピーする機能があります。
+
+1. Safariで任意のページをブックマークします。
+2. HarborDeskの「ゲーム同期」→「iPhone / Safariでゲーム通信を拾う」を開き、「Safari用コードをコピー」を押します。
+3. 先ほどのブックマークを編集し、URL欄をコピーした `javascript:` コードへ置き換えます。
+4. 艦これを開き、そのブックマークを実行します。
+5. 母港や装備画面などを操作すると、実行後の対応 `/kcsapi/` レスポンスを端末内で収集します。
+6. キャプチャパネルの「JSONをコピー」または「JSON保存」からHarborDeskへ持ち込みます。
+
+キャプチャ補助は **レスポンスだけ** を読み取り、HarborDeskで必要な艦娘・装備・資源・艦隊部分へ縮小して保持します。リクエスト本文、`api_token`、Cookie、DMMログイン情報は記録しません。
+
+DMM側のページやiframe構成によってはSafariのブックマークレットからゲーム通信へ届かない場合があります。その場合はJSONファイル/貼り付け取込を利用してください。
+
+部分的な装備レスポンスを複数回取り込んだ場合も、HarborDeskは装備個体IDを使って既存同期データと差分マージします。たとえば同じ装備個体が★4から★6へ改修された場合、★4を残して別物として増やすのではなく、同じ個体を★6スタックへ移動します。
