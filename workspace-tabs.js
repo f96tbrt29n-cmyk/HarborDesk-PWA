@@ -143,6 +143,27 @@ function hdWSDefaultSection(group){
 }
 function hdWSGroupLabel(group){return HD_WS_GROUPS.find(x=>x.key===group)?.label||group}
 function hdWSResolveSection(group,preferred){const rows=hdWSVisibleSections(group);if(!rows.length)return null;if(preferred&&rows.some(x=>x.id===preferred))return preferred;const stored=hdWSState.sections?.[group];if(stored&&rows.some(x=>x.id===stored))return stored;return hdWSDefaultSection(group)}
+let hdWSViewportBaseline=window.visualViewport?.height||window.innerHeight||0;
+function hdWSShouldTreatKeyboardOpen(base,current,editable){
+ return !!editable&&Number(base)>0&&Number(current)>0&&(Number(base)-Number(current))>120;
+}
+function hdWSUpdateKeyboardState(){
+ const vv=window.visualViewport;if(!vv)return false;
+ const active=document.activeElement,editable=!!active?.matches?.('input,textarea,select,[contenteditable="true"]');
+ if(!editable)hdWSViewportBaseline=vv.height||window.innerHeight||hdWSViewportBaseline;
+ const open=hdWSShouldTreatKeyboardOpen(hdWSViewportBaseline,vv.height,editable);
+ document.body.classList.toggle('hd-keyboard-open',open);
+ return open;
+}
+function hdWSInstallKeyboardTracking(){
+ if(window.__HD_WS_KEYBOARD_TRACKING)return;window.__HD_WS_KEYBOARD_TRACKING=true;
+ const update=()=>requestAnimationFrame(hdWSUpdateKeyboardState);
+ window.visualViewport?.addEventListener('resize',update,{passive:true});
+ window.visualViewport?.addEventListener('scroll',update,{passive:true});
+ document.addEventListener('focusin',()=>setTimeout(update,60),true);
+ document.addEventListener('focusout',()=>setTimeout(update,120),true);
+ window.addEventListener('orientationchange',()=>setTimeout(()=>{hdWSViewportBaseline=window.visualViewport?.height||window.innerHeight||hdWSViewportBaseline;update()},250),{passive:true});
+}
 function hdWSUpdateTopbarHeight(){
  const h=document.querySelector('.topbar')?.getBoundingClientRect().height||68,nav=document.getElementById('hdWorkspaceNav')?.getBoundingClientRect().height||0;
  document.documentElement.style.setProperty('--hd-topbar-h',`${Math.ceil(h)}px`);
@@ -238,7 +259,7 @@ function hdWSRefresh(){if(Date.now()<hdWSNavLockUntil){hdWSScheduleRefresh();ret
 function hdWSMutationAddsSection(ms){return ms.some(m=>[...m.addedNodes].some(n=>n?.nodeType===1&&(n.matches?.('section')||n.querySelector?.('section'))))}
 function hdWSScheduleRefresh(){clearTimeout(hdWSRefreshTimer);const delay=Math.max(60,hdWSNavLockUntil-Date.now()+20);hdWSRefreshTimer=setTimeout(hdWSRefresh,delay)}
 function hdWSInstall(){
- hdWSEnsureUI();hdWSRefresh();
+ hdWSEnsureUI();hdWSInstallKeyboardTracking();hdWSRefresh();
  if(!hdWSObserver){hdWSObserver=new MutationObserver(ms=>{if(hdWSMutationAddsSection(ms))hdWSScheduleRefresh()});const main=document.querySelector('main');if(main)hdWSObserver.observe(main,{childList:true,subtree:true})}
 }
 function hdWSHorizontalScroller(el){for(let n=el;n&&n!==document.body;n=n.parentElement){if(n.scrollWidth>n.clientWidth+12){const s=getComputedStyle(n);if(['auto','scroll'].includes(s.overflowX))return true}}return false}
