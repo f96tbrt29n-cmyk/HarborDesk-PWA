@@ -9289,7 +9289,7 @@ function hdRenderShipDatabase(){
  const shown=masterRows.slice(0,80),masterHtml=shown.length?`<div class="hd-shipdb-master-group"><div class="hd-shipdb-master-group-head"><div><div class="eyebrow">OFFICIAL MASTER</div><strong>公式マスター参照</strong></div><span>${masterRows.length}件${masterRows.length>80?'・先頭80件表示':''}</span></div>${shown.map(hdShipDbMasterCardHtml).join('')}</div>`:'';
  const reset=document.querySelector('[data-hd-shipdb-reset]'),dirty=!!q||hdShipDbType!=='すべて'||hdShipDbMissingOnly||!hdShipDbIncludeMaster||hdShipDbImageFilter!=='all';if(reset){reset.disabled=!dirty;reset.classList.toggle('is-active',dirty)}
  const count=document.getElementById('hdShipDbCount');if(count)count.textContent=(q||hdShipDbImageFilter!=='all')&&hdShipDbIncludeMaster?`詳細 ${rows.length} / マスター ${masterRows.length}`:`詳細 ${rows.length}隻`;
- list.innerHTML=(detailedHtml||masterHtml)?detailedHtml+masterHtml:'<div class="empty">条件に合う艦娘がいないよ</div>';
+ list.innerHTML=(detailedHtml||masterHtml)?detailedHtml+masterHtml:'<div class="empty empty-action"><strong>条件に合う艦娘がいないよ</strong><p>検索・艦種・所持・画像条件を一度戻してみて。</p><button type="button" class="ghost small" data-hd-shipdb-empty-reset>条件をクリア</button></div>';
  if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(list);
 }
 function hdEnsureShipDatabase(){
@@ -9348,6 +9348,7 @@ window.addEventListener('hd:ship-images-ready',()=>{hdShipDbUpdateImageCoverage(
 setTimeout(()=>hdShipDbRefreshOwnedFits(document),900);
 document.addEventListener('click',e=>{const jump=e.target.closest?.('[data-hd-shipdb-jump]');if(jump){hdShipDbJumpTo(jump.dataset.hdShipdbJump);return}});
 document.addEventListener('click',e=>{
+ if(e.target.closest?.('[data-hd-shipdb-empty-reset]')){document.querySelector('[data-hd-shipdb-reset]')?.click();return}
  const reset=e.target.closest?.('[data-hd-shipdb-reset]');if(reset){
   const search=document.getElementById('hdShipDbSearch'),missing=document.getElementById('hdShipDbMissingOnly'),include=document.getElementById('hdShipDbIncludeMaster'),list=document.getElementById('hdShipDbList');
   if(search)search.value='';if(missing)missing.checked=false;if(include)include.checked=true;
