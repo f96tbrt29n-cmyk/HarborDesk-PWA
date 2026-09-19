@@ -71,3 +71,7 @@ button.home-next-main{cursor:pointer}
 .home-task-row{grid-template-columns:minmax(0,1fr) auto;align-items:center}
 .home-task-row .home-task-done{min-width:58px;padding:6px 9px;font-size:10px;color:#bff2cf;border-color:rgba(89,197,133,.36)}
 @media(max-width:520px){.home-task-row .home-task-done{min-height:36px}}
+
+.home-empty-action{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.home-empty-action>div{display:flex;gap:6px;flex-wrap:wrap}
+@media(max-width:520px){.home-empty-action{align-items:stretch;flex-direction:column}.home-empty-action>div{display:grid;grid-template-columns:1fr 1fr}.home-empty-action button{min-height:38px}}
