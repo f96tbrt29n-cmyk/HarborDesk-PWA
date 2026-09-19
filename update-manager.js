@@ -143,9 +143,13 @@ function hdEnsureUpdateUI(){
   banner.innerHTML=`<div class="hd-update-main"><strong>HarborDeskの最新版があります</strong><div id="hdUpdateText" class="muted"></div><div id="hdUpdateChanges" class="hd-update-changes" hidden></div></div><button id="hdUpdateNow" type="button" class="primary small" onclick="hdForceUpdate()">今すぐ更新</button>`;
   document.body.appendChild(banner);
   const header=document.querySelector('.topbar');
-  if(header&&!document.getElementById('hdUpdateCheck')){const controls=document.createElement('div');controls.className='hd-version-controls';controls.innerHTML=`<span class="hd-version-badge" title="HarborDesk バージョン">v${HD_APP_VERSION}</span><button id="hdUpdateCheck" class="ghost small hd-update-check" aria-label="更新確認"><span aria-hidden="true">↻</span><b>更新確認</b></button>`;header.appendChild(controls)}
+  if(header&&!document.getElementById('hdUpdateCheck')){
+    const controls=document.createElement('details');controls.className='hd-version-controls hd-header-more';
+    controls.innerHTML=`<summary aria-label="HarborDeskメニュー" title="バージョン・更新"><span aria-hidden="true">•••</span></summary><div class="hd-version-menu"><span class="hd-version-badge" title="HarborDesk バージョン">v${HD_APP_VERSION}</span><button id="hdUpdateCheck" class="ghost small hd-update-check" aria-label="更新確認"><span aria-hidden="true">↻</span><b>更新確認</b></button></div>`;
+    header.appendChild(controls)
+  }
   document.getElementById('hdUpdateNow')?.addEventListener('click',hdForceUpdate);
-  document.getElementById('hdUpdateCheck')?.addEventListener('click',()=>hdCheckForUpdate(true));
+  document.getElementById('hdUpdateCheck')?.addEventListener('click',()=>{hdCheckForUpdate(true);document.querySelector('.hd-header-more')?.removeAttribute('open')});
 }
 function hdUpdateEsc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdUpdateMasterChangeView(changes){
