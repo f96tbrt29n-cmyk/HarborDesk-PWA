@@ -2580,6 +2580,7 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
       hasDirectSend:text.includes("#kcimport="),
       usesSelfLink:text.includes("a.target='_self'"),
       hasVisibleVersion:text.includes("HD_VERSION+'</small>"),
+      userscriptShowsCoverage:text.includes('data-hd-coverage')&&text.includes('function captureCoverage()'),
       hasCompressionStream:text.includes("CompressionStream('gzip')"),
       usesPopup:text.includes('window.open('),
       hasTokenStorage:text.includes('api_token=') || text.includes('Cookie='),
@@ -2599,6 +2600,7 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
   expect(data.hasDirectSend).toBe(true);
   expect(data.usesSelfLink).toBe(true);
   expect(data.hasVisibleVersion).toBe(true);
+  expect(data.userscriptShowsCoverage).toBe(true);
   expect(data.hasCompressionStream).toBe(true);
   expect(data.usesPopup).toBe(false);
   expect(data.hasTokenStorage).toBe(false);
@@ -4518,4 +4520,29 @@ test('mobile keyboard state hides floating UI', async ({ page }) => {
   expect(data.open).toBe(true);
   expect(data.noInput).toBe(false);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
+
+
+test('Userscript coverage reports captured Kancolle areas', async ({ page }) => {
+  await page.goto(baseURL);
+  const script=await page.evaluate(()=>fetch('./HarborDesk-Kancolle.user.js',{cache:'no-store'}).then(r=>r.text()));
+  const result=await page.evaluate(async script=>{
+    history.replaceState(null,'','/netgame/social/-/gadgets/=/app_id=854854/');
+    (0,eval)(script);
+    const api=window.__HARBORDESK_KANCOLLE_USERSCRIPT__;
+    api.records.push(
+      {endpoint:'/kcsapi/api_port/port',payload:{},at:1},
+      {endpoint:'/kcsapi/api_get_member/questlist',payload:{},at:2}
+    );
+    api.show();
+    const c=api.captureCoverage();
+    const text=document.querySelector('[data-hd-coverage]')?.textContent||'';
+    return {c,text};
+  },script);
+  expect(result.c.port).toBe(true);
+  expect(result.c.quests).toBe(true);
+  expect(result.c.equipment).toBe(false);
+  expect(result.text).toContain('母港');
+  expect(result.text).toContain('任務');
+  expect(result.text).toContain('装備');
 });
