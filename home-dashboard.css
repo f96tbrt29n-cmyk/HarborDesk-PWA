@@ -170,3 +170,8 @@ button.home-next-main{cursor:pointer}
  .home-fleet-meta-actions{justify-content:flex-start}
  .home-fleet-meta-actions button{min-height:36px}
 }
+
+.home-fleet-state-line{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.home-fleet-state-line mark{display:inline-flex;align-items:center;padding:2px 5px;border-radius:999px;border:1px solid transparent;background:transparent;font:inherit;font-size:8px;font-weight:900;line-height:1.2}
+.home-fleet-state-line mark.kira{border-color:rgba(255,211,91,.48);background:rgba(118,86,18,.34);color:#ffe58e}
+.home-fleet-state-line mark.fatigue{border-color:rgba(236,147,85,.5);background:rgba(105,52,22,.32);color:#ffc18c}
