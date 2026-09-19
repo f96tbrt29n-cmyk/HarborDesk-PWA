@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HarborDesk 艦これ連携
 // @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
-// @version      1.0.7
+// @version      1.0.8
 // @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
 // @match        http://*.dmm.com/*
 // @match        https://*.dmm.com/*
@@ -21,11 +21,12 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.7';
+const HD_VERSION='1.0.8';
 const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/';
 const RECORD_MESSAGE='harbordesk-kancolle-frame-record-v1';
 const STATUS_MESSAGE='harbordesk-kancolle-frame-status-v1';
 const MAX_RECORDS=120;
+const HD_PANEL_MIN_KEY='harbordesk-kc-panel-minimized-v1';
 
 function wanted(url){
   return /\/kcsapi\/(?:api_port\/port|api_get_member\/(?:ship2|slot_item|require_info|material|ndock|questlist)|api_req_map\/(?:start|next)|api_req_(?:sortie|combined_battle)\/battleresult)(?:$|[?#])/.test(String(url||''));
@@ -252,10 +253,14 @@ function ensurePanel(){
   panel.querySelector('[data-hd-clear]').onclick=()=>{records.length=0;signatures.clear();render()};
   panel.querySelector('[data-hd-copy]').onclick=copy;
   panel.querySelector('[data-hd-send]').onclick=send;
+  let savedMinimized=false;try{savedMinimized=localStorage.getItem(HD_PANEL_MIN_KEY)==='1'}catch{}
+  setMinimized(savedMinimized,false);
   render();
 }
-function setMinimized(next){
-  minimized=!!next;if(!panel)return minimized;
+function setMinimized(next,persist=true){
+  minimized=!!next;
+  if(persist){try{localStorage.setItem(HD_PANEL_MIN_KEY,minimized?'1':'0')}catch{}}
+  if(!panel)return minimized;
   if(panelBodyEl)panelBodyEl.hidden=minimized;
   panel.style.width=minimized?'auto':'min(350px,calc(100vw - 16px))';
   panel.style.padding=minimized?'7px 8px':'10px';
