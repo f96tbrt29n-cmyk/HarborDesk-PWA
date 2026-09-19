@@ -5762,3 +5762,28 @@ test('mobile dock exposes four primary actions', async ({ page }) => {
   expect(data.actions.join(' ')).toContain('機能');
   expect(data.fabDisplay).toBe('none');
 });
+
+
+test('sync dialog renders numbered completion checklist', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now()-120000,ships:206,equipment:93,decks:4,
+      coverage:{ships:true,equipment:false,resources:true,fleets:true,quests:false,docks:false}
+    }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdWSEnsureSyncStatus?.();window.hdWSOpenSyncStatus?.();
+    const box=document.querySelector('.hd-sync-checklist');
+    const rows=[...document.querySelectorAll('.hd-sync-checklist li')].map(x=>x.textContent||'');
+    return {exists:!!box,rows,text:box?.textContent||''};
+  });
+  expect(data.exists).toBe(true);
+  expect(data.text).toContain('同期を完了する手順');
+  expect(data.rows.some(x=>x.includes('装備・改装'))).toBe(true);
+  expect(data.rows.some(x=>x.includes('任務'))).toBe(true);
+  expect(data.rows.some(x=>x.includes('入渠'))).toBe(true);
+  expect(data.rows.at(-1)).toContain('HarborDeskへ送る');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
