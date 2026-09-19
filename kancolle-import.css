@@ -17,3 +17,6 @@
  .hd-kc-deck{padding:8px}
  .hd-kc-deck-ships{gap:5px}
 }
+
+.hd-kc-sync-side{display:grid;gap:7px;justify-items:end}
+@media(max-width:560px){.hd-kc-sync-side{justify-items:start}.hd-kc-sync-side [data-hd-kc-return-game]{width:100%}}
