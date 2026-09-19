@@ -9138,6 +9138,32 @@ function hdShipDbOpenEquipChecker(ref){
  const ship=document.getElementById('hdShipEquipCheckShip');if(ship&&row)ship.value=row.name;
  hdShipDbRenderEquipChecker();if(!d.open)d.showModal();
 }
+function hdShipDbMasterSuggestedLoadouts(row){
+ const types=new Set(hdShipDbMasterAllowedTypes(row)),roles=new Set(hdShipDbMasterRoles(row)),slots=Math.max(1,(row.slots||[]).length),out=[];
+ const has=x=>types.has(x),first=(...xs)=>xs.find(has)||'',repeat=(x,n)=>x?Array.from({length:n},()=>x):[];
+ const add=(name,gear,note)=>{
+  gear=(gear||[]).filter(Boolean).slice(0,slots);
+  if(!gear.length)return;
+  const key=gear.join('|');if(out.some(x=>x.key===key))return;
+  out.push({name,gear,note,key});
+ };
+ const main=first('大口径主砲','中口径主砲','小口径主砲'),radar=first('大型電探','小型電探');
+ if(main)add('昼戦・連撃',[main,main,has('水上偵察機')?'水上偵察機':'',radar],'主砲系を軸にした汎用構成。弾着対応艦は水上偵察機を優先。');
+ if(has('艦上戦闘機'))add('制空優先',[...repeat('艦上戦闘機',2),has('艦上攻撃機')?'艦上攻撃機':'',has('艦上偵察機')?'艦上偵察機':''],'制空を取りつつ航空攻撃も残す基本案。搭載数の大きいスロットを優先。');
+ if(has('艦上攻撃機')||has('艦上爆撃機'))add('航空火力',[has('艦上攻撃機')?'艦上攻撃機':'',has('艦上爆撃機')?'艦上爆撃機':'',has('艦上戦闘機')?'艦上戦闘機':'',has('艦上偵察機')?'艦上偵察機':''],'攻撃機中心の汎用案。実戦では海域の必要制空値に合わせて艦戦数を調整。');
+ if(has('水上戦闘機')||has('水上爆撃機'))add('水上機運用',[has('水上戦闘機')?'水上戦闘機':'',has('水上爆撃機')?'水上爆撃機':'',has('水上偵察機')?'水上偵察機':'',main],'制空補助・弾着・航空火力を兼ねる水上機運用案。');
+ if(has('ソナー')&&has('爆雷'))add('対潜',['ソナー','爆雷',main||radar,has('大型ソナー')?'大型ソナー':''],'対潜値と先制対潜条件を意識した基本案。艦のLv・素対潜も確認してね。');
+ if(has('魚雷'))add(roles.has('高運')?'夜戦CI':'雷撃・夜戦',['魚雷','魚雷',radar||main,roles.has('高運')?'魚雷':''],'魚雷カットイン/雷撃寄りの案。運が低い艦は連撃構成も候補。');
+ if(has('潜水艦魚雷'))add('潜水艦魚雷CI',repeat('潜水艦魚雷',slots),'潜水艦の夜戦カットインを意識した基本案。');
+ if(has('上陸用舟艇')||has('特型内火艇')||has('対地装備'))add('輸送・対地',[has('上陸用舟艇')?'上陸用舟艇':'',has('特型内火艇')?'特型内火艇':'',has('対地装備')?'対地装備':'',main||radar],'輸送・対地を優先する案。敵編成やTP条件に合わせて入れ替え。');
+ if(main&&has('対空機銃'))add('対空寄り',[main,main,radar,'対空機銃'],'通常火力を保ちつつ対空装備を足す汎用案。');
+ if(!out.length)add('汎用',Array.from(types).slice(0,slots),'公式マスターで装備可能なカテゴリから組んだ入口用の構成。');
+ return out.slice(0,4).map(({key,...x})=>x);
+}
+function hdShipDbMasterSuggestedHtml(row){
+ const plans=hdShipDbMasterSuggestedLoadouts(row);if(!plans.length)return '';
+ return `<details class="hd-shipdb-master-equip hd-shipdb-master-suggest"><summary>汎用おすすめ装備 ${plans.length}案</summary><div class="hd-shipdb-master-suggest-list">${plans.map(p=>`<div><b>${hdShipDbEsc(p.name)}</b><div class="hd-shipdb-roles">${p.gear.map(g=>`<span>${hdShipDbEsc(g)}</span>`).join('')}</div><small>${hdShipDbEsc(p.note)}</small></div>`).join('')}</div><p>カテゴリ単位の自動提案。実際の装備名・改修値・スロット位置は「装備可否」で確認してね。</p></details>`;
+}
 function hdShipDbMasterNext(row){return hdShipDbMasterSnapshot().allShips?.[String(row.afterId)]?.name||''}
 function hdShipDbMasterOwned(row){
  const rows=hdShipDbRoster().filter(x=>String(x.name||'').trim()===row.name);
@@ -9153,7 +9179,7 @@ function hdShipDbMasterMatchesType(row,type){
 function hdShipDbMasterCardHtml(row){
  const next=hdShipDbMasterNext(row),owned=hdShipDbMasterOwned(row),types=hdShipDbMasterAllowedTypes(row),showTypes=types.slice(0,12),rest=Math.max(0,types.length-showTypes.length),s=row.stats||{};
  const remodel=next&&row.afterLv?`Lv.${row.afterLv} → ${next}`:'改装先なし / 最終形態';
- return `<article class="hd-shipdb-card hd-shipdb-master-card"><div class="hd-shipdb-head"><div><strong>${hdShipDbEsc(row.name)}</strong><span>${hdShipDbEsc(row.type)}・${hdShipDbMasterSpeed(row.speed)}・${hdShipDbMasterRange(row.range)}</span></div><div class="hd-shipdb-master-badge"><b>MASTER</b><small>ID ${row.id}</small></div></div><div class="hd-shipdb-path">${hdShipDbEsc(remodel)}</div><div class="hd-shipdb-master-mini"><span>耐久 <b>${s.hp||0}</b></span><span>火力上限 <b>${s.fire||0}</b></span><span>雷装上限 <b>${s.torp||0}</b></span><span>対空上限 <b>${s.aa||0}</b></span><span>装甲上限 <b>${s.armor||0}</b></span><span>運上限 <b>${s.luck||0}</b></span></div><div class="hd-shipdb-master-slots">${(row.slots||[]).map((n,i)=>`<span><i>第${i+1}</i><b>${n}</b><small>機</small></span>`).join('')||'<span><b>通常スロットなし</b></span>'}</div><div class="hd-shipdb-substats"><span>燃料 <b>${row.fuel||0}</b></span><span>弾薬 <b>${row.ammo||0}</b></span><span>艦種ID <b>${row.stype}</b></span>${owned?`<span>台帳 <b>Lv.${Number(owned.level)||0}</b></span>`:''}</div><details class="hd-shipdb-master-equip"><summary>公式装備カテゴリ ${types.length}種</summary><div class="hd-shipdb-roles">${showTypes.map(x=>`<span>${hdShipDbEsc(x)}</span>`).join('')}${rest?`<span>ほか${rest}種</span>`:''}</div></details><p>api_start2自動同期の公式マスター参照。詳細な育成方針・用途別装備は詳細攻略DB収録艦のみ対応。</p><div class="hd-shipdb-actions"><button class="primary small" type="button" data-hd-shipmaster-add="${row.id}">台帳へ追加</button><button class="ghost small" type="button" data-hd-ship-equip-check-id="${row.id}">装備可否</button><a class="guide-link" href="https://wikiwiki.jp/kancolle/${encodeURIComponent(row.name)}" target="_blank" rel="noopener">Wiki ↗</a></div></article>`;
+ return `<article class="hd-shipdb-card hd-shipdb-master-card"><div class="hd-shipdb-head"><div><strong>${hdShipDbEsc(row.name)}</strong><span>${hdShipDbEsc(row.type)}・${hdShipDbMasterSpeed(row.speed)}・${hdShipDbMasterRange(row.range)}</span></div><div class="hd-shipdb-master-badge"><b>MASTER</b><small>ID ${row.id}</small></div></div><div class="hd-shipdb-path">${hdShipDbEsc(remodel)}</div><div class="hd-shipdb-master-mini"><span>耐久 <b>${s.hp||0}</b></span><span>火力上限 <b>${s.fire||0}</b></span><span>雷装上限 <b>${s.torp||0}</b></span><span>対空上限 <b>${s.aa||0}</b></span><span>装甲上限 <b>${s.armor||0}</b></span><span>運上限 <b>${s.luck||0}</b></span></div><div class="hd-shipdb-master-slots">${(row.slots||[]).map((n,i)=>`<span><i>第${i+1}</i><b>${n}</b><small>機</small></span>`).join('')||'<span><b>通常スロットなし</b></span>'}</div><div class="hd-shipdb-substats"><span>燃料 <b>${row.fuel||0}</b></span><span>弾薬 <b>${row.ammo||0}</b></span><span>艦種ID <b>${row.stype}</b></span>${owned?`<span>台帳 <b>Lv.${Number(owned.level)||0}</b></span>`:''}</div><details class="hd-shipdb-master-equip"><summary>公式装備カテゴリ ${types.length}種</summary><div class="hd-shipdb-roles">${showTypes.map(x=>`<span>${hdShipDbEsc(x)}</span>`).join('')}${rest?`<span>ほか${rest}種</span>`:''}</div></details>${hdShipDbMasterSuggestedHtml(row)}<p>api_start2自動同期の公式マスター参照。公式マスターだけの艦形態でも、艦種・役割・装備可能カテゴリから汎用おすすめ構成を表示。個別装備名までの詳細チューニングは詳細攻略DB収録艦を優先してね。</p><div class="hd-shipdb-actions"><button class="primary small" type="button" data-hd-shipmaster-add="${row.id}">台帳へ追加</button><button class="ghost small" type="button" data-hd-ship-equip-check-id="${row.id}">装備可否</button><a class="guide-link" href="https://wikiwiki.jp/kancolle/${encodeURIComponent(row.name)}" target="_blank" rel="noopener">Wiki ↗</a></div></article>`;
 }
 
 let hdShipDbIncludeMaster=true;
