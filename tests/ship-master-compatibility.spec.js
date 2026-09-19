@@ -219,3 +219,52 @@ test('master acquisition candidates are filtered by the selected ship compatibil
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('master procurement counts total required copies, not only missing slots', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-equipment-procurement-v1');
+    const row = window.hdShipDbMasterRowByName?.('Bismarck drei');
+    const candidate = window.hdAGMasterCandidates?.(row?.id, '大口径主砲')?.[0];
+    if (!row || !candidate) return { ok: false };
+
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      { name: candidate.name, category: candidate.category || '大口径主砲', count: 1, star: 0 }
+    ]));
+
+    const plan = window.hdShipDbMasterSuggestedLoadouts?.(row)?.find(x => x.name === '昼戦・連撃');
+    const before = window.hdShipDbMasterResolveOwnedPlan?.(row, plan);
+    const added = window.hdPLAddMasterLoadout?.(row.id, plan?.name || '', '艦娘DBテスト');
+    const list = window.hdPLLoad?.() || [];
+    const source = list.find(x => x.map === '艦娘DBテスト');
+    const demand = window.hdPLDemandRows?.(source?.gearItems || []) || [];
+    const target = demand.find(x => x.target === candidate.name);
+    const html = window.hdShipDbMasterOwnedPlanHtml?.(row, plan) || '';
+
+    return {
+      ok: true,
+      candidate: candidate.name,
+      filledBefore: before?.filled || 0,
+      totalBefore: before?.total || 0,
+      added: !!added,
+      needed: target?.needed || 0,
+      owned: target?.owned || 0,
+      shortfall: target?.shortfall || 0,
+      hasProcureButton: html.includes('data-hd-master-procure')
+    };
+  });
+
+  expect(data.ok).toBeTruthy();
+  expect(data.filledBefore).toBe(1);
+  expect(data.totalBefore).toBe(4);
+  expect(data.added).toBeTruthy();
+  expect(data.needed).toBe(2);
+  expect(data.owned).toBe(1);
+  expect(data.shortfall).toBe(1);
+  expect(data.hasProcureButton).toBeTruthy();
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
