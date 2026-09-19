@@ -1,10 +1,16 @@
 const HD_QN_PIN_KEY='harbordesk-quick-nav-pins-v1';
 const HD_QN_RECENT_KEY='harbordesk-quick-nav-recent-v1';
+const HD_QN_HISTORY_KEY='harbordesk-session-quick-nav-history-v1';
+let hdQNHistoryLock=false;
 
 function hdQNLoadPins(){try{return JSON.parse(localStorage.getItem(HD_QN_PIN_KEY)||'[]')||[]}catch{return []}}
 function hdQNSavePins(v){localStorage.setItem(HD_QN_PIN_KEY,JSON.stringify(v))}
 function hdQNLoadRecent(){try{return JSON.parse(localStorage.getItem(HD_QN_RECENT_KEY)||'[]')||[]}catch{return []}}
 function hdQNSaveRecent(v){localStorage.setItem(HD_QN_RECENT_KEY,JSON.stringify(v))}
+function hdQNLoadHistory(){try{return JSON.parse(sessionStorage.getItem(HD_QN_HISTORY_KEY)||'[]')||[]}catch{return []}}
+function hdQNSaveHistory(v){try{sessionStorage.setItem(HD_QN_HISTORY_KEY,JSON.stringify(v.slice(-20)))}catch{}}
+function hdQNRecordHistory(id){if(hdQNHistoryLock||!id)return;const rows=hdQNLoadHistory();if(rows[rows.length-1]===id)return;rows.push(id);hdQNSaveHistory(rows)}
+function hdQNBack(){const rows=hdQNLoadHistory();if(rows.length<2)return false;rows.pop();const prev=rows.pop();hdQNSaveHistory(rows);hdQNHistoryLock=true;hdQNClose();const ok=typeof hdWSShowElement==='function'?hdWSShowElement(prev,true):false;setTimeout(()=>{hdQNHistoryLock=false;if(ok)hdQNRecordHistory(prev)},120);return !!ok}
 function hdQNRecordRecent(id){const rows=hdQNLoadRecent().filter(x=>x&&x.id!==id);rows.unshift({id,at:Date.now()});hdQNSaveRecent(rows.slice(0,12));window.dispatchEvent(new CustomEvent('hd:quick-nav-updated'))}
 function hdQNEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdQNSections(){
@@ -43,7 +49,7 @@ function hdQNTogglePin(id){const pins=hdQNLoadPins(),set=new Set(pins);set.has(i
 function hdQNEnsure(){
   if(document.getElementById('hdQuickNavButton'))return;
   const btn=document.createElement('button');btn.id='hdQuickNavButton';btn.type='button';btn.className='hd-qn-fab';btn.innerHTML='<span>☰</span><b>機能</b>';btn.addEventListener('click',hdQNOpen);document.body.appendChild(btn);
-  const d=document.createElement('dialog');d.id='hdQuickNavDialog';d.className='hd-qn-dialog';d.innerHTML=`<div class="hd-qn-head"><div><div class="eyebrow">QUICK NAV</div><h3>機能をすぐ開く</h3></div><button type="button" class="ghost small" data-hd-qn-close>閉じる</button></div><div class="hd-qn-actions"><button type="button" data-hd-qn-home><span>⌂</span><b>ホーム</b></button><button type="button" data-hd-qn-sync><span>↻</span><b>ゲーム同期</b></button><a href="https://play.games.dmm.com/game/kancolle"><span>⚓</span><b>艦これ</b></a><button type="button" data-hd-qn-top><span>↑</span><b>上へ</b></button></div><div class="hd-qn-tools"><input id="hdQNSearch" type="search" placeholder="機能名で検索"></div><div id="hdQNList" class="hd-qn-list"></div><div class="hd-qn-foot">★を付けた機能は上に固定するよ。</div>`;document.body.appendChild(d);
+  const d=document.createElement('dialog');d.id='hdQuickNavDialog';d.className='hd-qn-dialog';d.innerHTML=`<div class="hd-qn-head"><div><div class="eyebrow">QUICK NAV</div><h3>機能をすぐ開く</h3></div><button type="button" class="ghost small" data-hd-qn-close>閉じる</button></div><div class="hd-qn-actions"><button type="button" data-hd-qn-back><span>‹</span><b>戻る</b></button><button type="button" data-hd-qn-home><span>⌂</span><b>ホーム</b></button><button type="button" data-hd-qn-sync><span>↻</span><b>同期</b></button><a href="https://play.games.dmm.com/game/kancolle"><span>⚓</span><b>艦これ</b></a><button type="button" data-hd-qn-top><span>↑</span><b>上へ</b></button></div><div class="hd-qn-tools"><input id="hdQNSearch" type="search" placeholder="機能名で検索"></div><div id="hdQNList" class="hd-qn-list"></div><div class="hd-qn-foot">★を付けた機能は上に固定するよ。</div>`;document.body.appendChild(d);
   d.addEventListener('click',e=>{if(e.target===d)hdQNClose()});
   document.getElementById('hdQNSearch')?.addEventListener('input',e=>hdQNRenderList(e.target.value));
   hdQNRenderList();
@@ -59,6 +65,7 @@ function hdQNLoadDiagnostics(){
 
 document.addEventListener('click',e=>{
   if(e.target.closest?.('[data-hd-qn-close]')){hdQNClose();return}
+  if(e.target.closest?.('[data-hd-qn-back]')){if(!hdQNBack())hdQNClose();return}
   if(e.target.closest?.('[data-hd-qn-home]')){hdQNClose();if(typeof hdWSShowElement==='function')hdWSShowElement('home',true);else document.getElementById('home')?.scrollIntoView({behavior:'smooth',block:'start'});return}
   if(e.target.closest?.('[data-hd-qn-sync]')){hdQNJump('kancolleImport');return}
   if(e.target.closest?.('[data-hd-qn-top]')){hdQNClose();window.scrollTo({top:0,behavior:'smooth'});return}
@@ -67,3 +74,6 @@ document.addEventListener('click',e=>{
 });
 window.addEventListener('load',()=>setTimeout(()=>{hdQNEnsure();hdQNLoadDiagnostics()},500));
 setTimeout(()=>{hdQNEnsure();hdQNLoadDiagnostics()},1200);
+
+window.addEventListener('hd:workspace-changed',e=>{const id=e.detail?.section;if(id)hdQNRecordHistory(id)});
+window.addEventListener('load',()=>setTimeout(()=>{const id=window.hdWSState?.sections?.[window.hdWSState?.group];if(id)hdQNRecordHistory(id)},1300));
