@@ -27,6 +27,9 @@ function homeMoveOrder(id,dir){
  const j=dir==='up'?i-1:i+1;if(j<0||j>=rows.length)return false;
  [rows[i],rows[j]]=[rows[j],rows[i]];homeOrderSave(rows);homeApplyOrder();return true;
 }
+function homeResetOrder(){
+ homeOrderSave([...HD_HOME_ORDER_DEFAULT]);homeApplyOrder();window.hdToast?.('ホーム配置を初期状態に戻したよ','info',1400);return true;
+}
 function homeApplyPanelState(){
  const state=homePanelState();
  document.querySelectorAll('[data-home-panel]').forEach(card=>{
@@ -73,7 +76,7 @@ function ensureHomeDashboard(){
  section.id='home';
  section.className='home-dashboard';
  section.innerHTML=`
-  <div class="section-head"><div><div class="eyebrow">HOME</div><h2>今日の司令部</h2></div><span class="muted" id="homeUpdated"></span></div>
+  <div class="section-head"><div><div class="eyebrow">HOME</div><h2>今日の司令部</h2></div><div class="home-head-actions"><span class="muted" id="homeUpdated"></span><button type="button" class="ghost small" data-home-order-reset>配置を戻す</button></div></div>
   <article id="homeGameSync" class="home-sync-card"></article>
   <article id="homeNextAction" class="home-next-action"></article>
   <div id="homeSummary" class="home-summary"></div>
@@ -154,6 +157,7 @@ function renderHomeDashboard(){
 }
 
 document.addEventListener('click',e=>{
+ const resetOrder=e.target.closest('[data-home-order-reset]');if(resetOrder){homeResetOrder();return}
  const move=e.target.closest('[data-home-move]');if(move){const card=move.closest('[data-home-order-item]');if(card)homeMoveOrder(card.dataset.homeOrderItem,move.dataset.homeMove);return}
  const managePins=e.target.closest('[data-home-pins-manage]');if(managePins){if(typeof hdQNOpen==='function')hdQNOpen();return}
  const collapse=e.target.closest('[data-home-collapse]');
