@@ -97,6 +97,12 @@ function initShipRoster(){
 }
 
 document.addEventListener('click',e=>{
+ const reset=e.target.closest('[data-roster-reset]');if(reset){
+  const search=document.getElementById('shipRosterSearch'),sort=document.getElementById('shipRosterSort');
+  if(search)search.value='';if(sort)sort.value='level';
+  document.querySelectorAll('[data-roster-filter]').forEach(b=>b.classList.toggle('active',b.dataset.rosterFilter==='all'));
+  rosterViewSave({query:'',filter:'all',sort:'level'});renderShipRoster();return
+ }
  const compact=e.target.closest('[data-roster-compact]');if(compact){const section=document.getElementById('roster'),next=!section?.classList.contains('roster-compact');section?.classList.toggle('roster-compact',next);rosterViewSave({compact:next});compact.textContent=next?'詳細表示':'コンパクト';return}
  const f=e.target.closest('[data-roster-filter]');if(f){document.querySelectorAll('[data-roster-filter]').forEach(x=>x.classList.remove('active'));f.classList.add('active');rosterViewSave({filter:f.dataset.rosterFilter||'all'});renderShipRoster();return}
  const sync=e.target.closest('[data-roster-master-sync]');if(sync){rosterSyncCanonical(sync.dataset.rosterMasterSync);return}
