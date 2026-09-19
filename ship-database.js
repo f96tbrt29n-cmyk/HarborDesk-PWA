@@ -9062,20 +9062,19 @@ function hdShipDbMasterSlotBlocked(row,index,typeId){
 }
 function hdShipDbMasterNormalCheck(row,equipName){
  const meta=hdShipDbMasterEquipmentMeta(equipName);
- if(!row)return {allowed:false,known:false,reason:'艦娘を選んでね',slots:[],meta:null,typeId:0};
- if(!meta)return {allowed:false,known:false,reason:'公式装備マスターに一致する装備名がない',slots:[],meta:null,typeId:0};
+ if(!row)return {allowed:false,baseAllowed:false,known:false,reason:'艦娘を選んでね',slots:[],meta:null,typeId:0};
+ if(!meta)return {allowed:false,baseAllowed:false,known:false,reason:'公式装備マスターに一致する装備名がない',slots:[],meta:null,typeId:0};
  const typeId=hdShipDbMasterPickerTypeId(meta),rules=hdShipDbMasterEquipRules(row),key=String(typeId);
- if(!typeId||!Object.prototype.hasOwnProperty.call(rules,key))return {allowed:false,known:true,reason:'この艦では通常装備不可',slots:[],meta,typeId};
+ if(!typeId||!Object.prototype.hasOwnProperty.call(rules,key))return {allowed:false,baseAllowed:false,known:true,reason:'この艦では通常装備不可',slots:[],meta,typeId};
  const rule=rules[key];
- if(Array.isArray(rule)&&!rule.includes(Number(meta.id)))return {allowed:false,known:true,reason:'装備カテゴリは対応しているが、この装備IDは個別許可対象外',slots:[],meta,typeId};
+ if(Array.isArray(rule)&&!rule.includes(Number(meta.id)))return {allowed:false,baseAllowed:false,known:true,reason:'装備カテゴリは対応しているが、この装備IDは個別許可対象外',slots:[],meta,typeId};
  const slots=(row.slots||[]).map((cap,index)=>({index,cap,blocked:hdShipDbMasterSlotBlocked(row,index,typeId)}));
  const allowed=slots.filter(x=>!x.blocked);
- return {allowed:allowed.length>0,known:true,reason:allowed.length?'通常スロット装備可':'装備位置制限により全通常スロットで不可',slots,allowedSlots:allowed,meta,typeId,individual:Array.isArray(rule)};
+ return {allowed:allowed.length>0,baseAllowed:true,known:true,reason:allowed.length?'通常スロット装備可':slots.length?'装備位置制限により全通常スロットで不可':'通常装備カテゴリ対応・通常スロットなし',slots,allowedSlots:allowed,meta,typeId,individual:Array.isArray(rule)};
 }
 function hdShipDbMasterExslotCheck(row,equipName,star=0,normalInfo=null){
  const snap=hdShipDbMasterSnapshot(),normal=normalInfo||hdShipDbMasterNormalCheck(row,equipName),meta=normal.meta||hdShipDbMasterEquipmentMeta(equipName);
  if(!row||!meta)return {allowed:false,mode:'none',reason:normal.reason||'判定不可',reqStar:0};
- if(!normal.allowed)return {allowed:false,mode:'none',reason:'通常スロット装備不可のため増設判定対象外',reqStar:0};
  const typeId=normal.typeId||hdShipDbMasterPickerTypeId(meta),rule=snap.exslotItemRules?.[String(meta.id)];
  let starShort=null;
  if(rule&&hdShipDbExpansionRuleApplies(rule,row)){
@@ -9083,9 +9082,9 @@ function hdShipDbMasterExslotCheck(row,equipName,star=0,normalInfo=null){
   if(Number(star||0)>=req)return {allowed:true,mode:(rule.stypes||[]).includes(99)?'global':'special',reason:(rule.stypes||[]).includes(99)?'全艦個別許可':'艦/艦級/艦種別の個別許可',reqStar:req};
   starShort={allowed:false,mode:'special',reason:`改修★${req}以上が必要`,reqStar:req};
  }
- if((snap.exslotGlobalItemIds||[]).includes(Number(meta.id)))return {allowed:true,mode:'global',reason:'全艦個別許可',reqStar:0};
+ if(!rule&&(snap.exslotGlobalItemIds||[]).includes(Number(meta.id)))return {allowed:true,mode:'global',reason:'全艦個別許可',reqStar:0};
  const blocked=new Set(snap.exslotLimitTypeIds?.[String(row.id)]||[]);
- if((snap.exslotBaseTypeIds||[]).includes(Number(typeId))&&!blocked.has(Number(typeId)))return {allowed:true,mode:'common',reason:`共通増設カテゴリ: ${HD_EXSLOT_TYPE_LABELS[typeId]||HD_EQUIP_TYPE_LABELS[typeId]||meta.typeName||('#'+typeId)}`,reqStar:0};
+ if(normal.baseAllowed&&(snap.exslotBaseTypeIds||[]).includes(Number(typeId))&&!blocked.has(Number(typeId)))return {allowed:true,mode:'common',reason:`共通増設カテゴリ: ${HD_EXSLOT_TYPE_LABELS[typeId]||HD_EQUIP_TYPE_LABELS[typeId]||meta.typeName||('#'+typeId)}`,reqStar:0};
  return starShort||{allowed:false,mode:'none',reason:blocked.has(Number(typeId))?'この艦では該当増設カテゴリが制限対象':'補強増設対象外',reqStar:0};
 }
 function hdShipDbMasterReverseCompatibility(equipName,star=0,ownedOnly=false){
