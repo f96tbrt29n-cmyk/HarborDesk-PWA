@@ -192,3 +192,7 @@ body.hd-booting::after{
 .timer-preset-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
 .timer-preset-grid button{min-height:38px;padding:7px 8px;font-size:11px}
 @media(max-width:420px){.timer-preset-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.timer-preset-grid button{min-height:40px}}
+
+.quest-recent{display:flex;gap:6px;overflow-x:auto;padding:2px 0 1px;scrollbar-width:none}
+.quest-recent::-webkit-scrollbar{display:none}
+.quest-recent button{flex:0 0 auto;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;padding:7px 9px}
