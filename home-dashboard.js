@@ -166,6 +166,17 @@ function homeSortieReadiness(map){
   return {map:target,fleetId:fleet.id,name:fleet.name||'',nextAuto,manualLeft,ready:!nextAuto&&manualLeft===0,...sum};
  }catch{return null}
 }
+function homeOpenSortieFix(action){
+ const value=String(action||'');if(!value)return false;
+ if(value==='home'){document.querySelector('.home-current-fleet-card')?.scrollIntoView({behavior:'smooth',block:'start'});return true}
+ if(value.startsWith('tab:')){
+  if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);else document.getElementById('guide')?.scrollIntoView({behavior:'smooth',block:'start'});
+  const tab=value.slice(4);setTimeout(()=>document.querySelector(`[data-map-tab="${tab}"]`)?.click(),90);return true;
+ }
+ if(typeof hdWSShowElement==='function')return hdWSShowElement(value,true);
+ const target=document.getElementById(value);if(target){target.scrollIntoView({behavior:'smooth',block:'start'});return true}
+ return false;
+}
 function homeOpenFleetShip(name){
  const ship=String(name||'').trim();if(!ship)return false;
  if(typeof hdKcOpenShipFromFleet==='function')return hdKcOpenShipFromFleet(ship);
@@ -253,7 +264,8 @@ function renderHomeDashboard(){
    const label=sortieInfo.nextAuto?'まず直す':'出撃直前チェック';
    const title=sortieInfo.nextAuto?(sortieInfo.nextAuto.label||'出撃準備を確認'):`手動確認 あと ${sortieInfo.manualLeft}件`;
    const detail=sortieInfo.nextAuto?(sortieInfo.nextAuto.detail||`${sortieInfo.map} の出撃準備`):`${sortieInfo.map}・${sortieInfo.name||'使用編成'}`;
-   nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-sortie-open><span>${homeEsc(sortieInfo.map)} 出撃準備・${homeEsc(label)}</span><strong>${homeEsc(title)}</strong><small>${homeEsc(detail)}</small></button><button type="button" class="primary small" data-home-sortie-open>準備を見る</button>`;
+   const fix=String(sortieInfo.nextAuto?.action||''),fixLabel=String(sortieInfo.nextAuto?.actionLabel||'確認');
+   nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-sortie-open><span>${homeEsc(sortieInfo.map)} 出撃準備・${homeEsc(label)}</span><strong>${homeEsc(title)}</strong><small>${homeEsc(detail)}</small></button>${fix?`<button type="button" class="primary small home-next-fix" data-home-sortie-fix="${homeEsc(fix)}">${homeEsc(fixLabel)}</button>`:'<button type="button" class="primary small" data-home-sortie-open>準備を見る</button>'}`;
   }else if(todo.length){
    const first=todo[0];
    nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="quests"><span>次にやること・残り ${todo.length}件</span><strong>${homeEsc(first.name||'任務を確認')}</strong><small>タップで任務一覧へ</small></button><button type="button" class="ghost small home-next-done" data-home-quest-done="${homeEsc(first.id)}">完了</button>`;
@@ -317,6 +329,7 @@ function renderHomeDashboard(){
 document.addEventListener('click',e=>{
  const fleetTab=e.target.closest('[data-home-fleet-tab]');if(fleetTab){homeCurrentFleetSave(fleetTab.dataset.homeFleetTab);renderHomeDashboard();return}
  const fleetGear=e.target.closest('[data-home-fleet-gear-toggle]');if(fleetGear){homeCurrentFleetGearSave(!homeCurrentFleetGearVisible());renderHomeDashboard();return}
+ const sortieFix=e.target.closest('[data-home-sortie-fix]');if(sortieFix){homeOpenSortieFix(sortieFix.dataset.homeSortieFix);return}
  const sortieOpen=e.target.closest('[data-home-sortie-open]');if(sortieOpen){
   const map=homeSelectedMap();if(!map){if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);return}
   if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);else document.getElementById('guide')?.scrollIntoView({behavior:'smooth',block:'start'});
