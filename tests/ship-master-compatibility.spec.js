@@ -4552,7 +4552,7 @@ test('Kancolle import reports outdated Userscript version', async ({ page }) => 
   const errors=[];
   await page.addInitScript(() => {
     localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
-      syncedAt:Date.now(),userscriptVersion:'1.0.5',sources:[],coverage:{},ships:0,equipment:0,materials:0,decks:0
+      syncedAt:Date.now(),userscriptVersion:'1.0.7',sources:[],coverage:{},ships:0,equipment:0,materials:0,decks:0
     }));
   });
   await boot(page,errors);
@@ -4562,7 +4562,7 @@ test('Kancolle import reports outdated Userscript version', async ({ page }) => 
     return {text:el?.textContent||'',link:el?.querySelector('a')?.getAttribute('href')||'',cls:el?.className||''};
   });
   expect(data.text).toContain('v1.0.5');
-  expect(data.text).toContain('v1.0.6');
+  expect(data.text).toContain('v1.0.8');
   expect(data.link).toContain('HarborDesk-Kancolle.user.js');
   expect(data.cls).toContain('outdated');
 });
