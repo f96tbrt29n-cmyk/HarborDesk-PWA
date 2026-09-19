@@ -11,3 +11,20 @@
 .hd-equip-catalog-list.hd-compact .hd-equip-ref-head strong{font-size:14px}
 .hd-equip-catalog-list.hd-compact .hd-equip-tags span,.hd-equip-catalog-list.hd-compact .hd-equip-stats span{font-size:10px;padding:3px 5px}
 @media(max-width:520px){.hd-equip-head-actions{justify-content:flex-start}}
+
+.hd-equip-search{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+@media(max-width:520px){
+ .hd-equip-search{
+  position:sticky;
+  top:calc(var(--hd-topbar-h,58px) + 66px);
+  z-index:7;
+  padding:7px;
+  margin:0 -4px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:rgba(8,24,38,.97);
+  backdrop-filter:blur(12px);
+  box-shadow:0 7px 22px rgba(0,0,0,.18);
+ }
+ .hd-equip-search input,.hd-equip-search button{min-height:42px}
+}
