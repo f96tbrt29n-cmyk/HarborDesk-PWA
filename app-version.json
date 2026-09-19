@@ -1,7 +1,7 @@
 {
-  "version": "1.0.171",
-  "build": 171,
-  "releasedAt": "2026-09-19T22:41:00+09:00",
-  "notes": "Userscripts連携のHarborDesk遷移を強制self-link方式へ変更し、Safariでlocation.hrefが進まないケースへ対応。送信前データもHarborDeskが実際に使う項目だけへ縮小し、window.name受け渡しサイズを削減。パネルにUserscriptバージョンを表示。",
+  "version": "1.0.172",
+  "build": 172,
+  "releasedAt": "2026-09-19T22:53:00+09:00",
+  "notes": "Userscripts艦これ連携の受け渡しをgzip圧縮URLフラグメント方式へ変更。Safariのクロスサイト移動でwindow.nameが消える問題を回避し、圧縮/展開はstream.pipeThrough方式でデッドロックを避ける。HarborDesk到着後にフラグメントを消して自動同期する。",
   "masterChanges": null
 }
