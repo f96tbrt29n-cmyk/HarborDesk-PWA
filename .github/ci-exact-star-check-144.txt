@@ -1,0 +1,1 @@
+Verify exact-star equipment allocation and expansion-slot inventory sharing
