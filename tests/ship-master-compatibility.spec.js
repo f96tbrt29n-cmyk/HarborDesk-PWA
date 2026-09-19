@@ -4566,3 +4566,28 @@ test('Kancolle import reports outdated Userscript version', async ({ page }) => 
   expect(data.link).toContain('HarborDesk-Kancolle.user.js');
   expect(data.cls).toContain('outdated');
 });
+
+
+test('mobile header keeps primary controls compact', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  await page.setViewportSize({width:390,height:844});
+  const data=await page.evaluate(()=>{
+    window.hdEnsureUpdateUI?.();
+    window.hdWSEnsureSyncStatus?.();
+    const top=document.querySelector('.topbar');
+    const more=document.querySelector('.hd-header-more');
+    return {
+      hasSync:!!document.getElementById('hdGlobalSyncStatus'),
+      hasMore:!!more,
+      hasSettings:!!document.querySelector('[data-hd-header-settings]'),
+      notifyInMenu:document.getElementById('notifyBtn')?.closest('.hd-version-menu')===document.querySelector('.hd-version-menu'),
+      topChildren:top?[...top.children].length:0
+    };
+  });
+  expect(data.hasSync).toBe(true);
+  expect(data.hasMore).toBe(true);
+  expect(data.hasSettings).toBe(true);
+  expect(data.notifyInMenu).toBe(true);
+  expect(data.topChildren).toBeLessThanOrEqual(3);
+});
