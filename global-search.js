@@ -1,5 +1,6 @@
 const HD_GS_HISTORY_KEY='harbordesk-global-search-history-v1';
 let hdGSCategory='all';
+let hdGSOwnedOnly=false;
 let hdGSResults=new Map();
 let hdGSNavSeq=0;
 let hdGSRenderTimer=0;
@@ -86,6 +87,25 @@ function hdGSIndex(){
 }
 function hdGSScore(row,q){const title=hdGSNorm(row.title),subtitle=hdGSNorm(row.subtitle),text=hdGSNorm(row.text);if(!q)return 0;if(title===q)return 120;if(title.startsWith(q))return 100;if(title.includes(q))return 80;if(subtitle.includes(q))return 55;if(text.includes(q))return 35;const words=q.split(' ').filter(Boolean);if(words.length>1&&words.every(w=>text.includes(w)))return 25;return -1}
 function hdGSLabel(type){return {feature:'機能',map:'海域',ship:'艦娘',equipment:'装備',quest:'任務',expedition:'遠征'}[type]||type}
+function hdGSFilteredRows(q){
+ const all=hdGSIndex().map(r=>({...r,score:hdGSScore(r,q)})).filter(r=>r.score>=0);
+ return hdGSOwnedOnly?all.filter(r=>!['ship','equipment'].includes(r.type)||r.meta?.owned):all;
+}
+function hdGSCategoryCounts(rows){
+ const counts={all:rows.length,map:0,ship:0,equipment:0,quest:0,expedition:0,feature:0};
+ for(const r of rows)if(Object.prototype.hasOwnProperty.call(counts,r.type))counts[r.type]++;
+ return counts;
+}
+function hdGSUpdateCategoryCounts(counts={}){
+ document.querySelectorAll('[data-hd-gs-cat]').forEach(b=>{
+  const key=b.dataset.hdGsCat,count=Number(counts[key])||0,label=b.dataset.hdGsLabel||b.textContent.replace(/\s*\d+$/,'');
+  b.dataset.hdGsLabel=label;b.innerHTML='<span>'+hdGSEsc(label)+'</span><em>'+count+'</em>';
+ });
+}
+function hdGSUpdateOwnedToggle(){
+ const b=document.querySelector('[data-hd-gs-owned]');if(!b)return;
+ b.classList.toggle('active',hdGSOwnedOnly);b.setAttribute('aria-pressed',hdGSOwnedOnly?'true':'false');b.textContent=hdGSOwnedOnly?'所持だけ ✓':'所持だけ';
+}
 function hdGSDestination(row){
  const a=row?.action||{};
  if(a.kind==='map')return '攻略へ';
