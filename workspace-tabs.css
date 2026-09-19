@@ -102,3 +102,14 @@
 .hd-sync-status-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
 .hd-sync-status-actions a{text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center}
 @media(max-width:420px){.hd-sync-status-dialog{width:calc(100vw - 12px)}.hd-sync-status-actions{grid-template-columns:1fr}.hd-sync-status-actions a,.hd-sync-status-actions button{min-height:44px}}
+
+.hd-sync-checklist{display:grid;gap:8px;padding:10px;border:1px solid rgba(91,196,255,.28);border-radius:12px;background:rgba(15,58,87,.18)}
+.hd-sync-checklist>b{font-size:10px;color:var(--accent2)}
+.hd-sync-checklist ol{list-style:none;display:grid;gap:7px;margin:0;padding:0}
+.hd-sync-checklist li{display:grid;grid-template-columns:25px minmax(0,1fr);gap:8px;align-items:center}
+.hd-sync-checklist li>span{display:grid;place-items:center;width:25px;height:25px;border-radius:999px;background:#173b55;border:1px solid rgba(91,196,255,.28);color:#d8f2ff;font-size:10px;font-weight:900}
+.hd-sync-checklist li>div{display:grid;gap:1px}
+.hd-sync-checklist li b{font-size:11px}
+.hd-sync-checklist li small{font-size:9px;color:var(--muted);line-height:1.35}
+.hd-sync-checklist li.send>span{background:rgba(56,128,83,.34);border-color:rgba(99,216,151,.42);color:#c7f2d5}
+.hd-sync-checklist li.send b{color:#c7f2d5}
