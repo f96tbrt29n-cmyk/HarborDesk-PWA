@@ -5745,3 +5745,20 @@ test('fresh sync status opens dialog instead of navigating', async ({ page }) =>
   expect(data.text).toContain('ゲームデータは最新だよ');
   expect(data.text).toContain('このまま使ってOK');
 });
+
+
+test('mobile dock exposes four primary actions', async ({ page }) => {
+  const errors=[];
+  await page.setViewportSize({width:390,height:844});
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdQNEnsure?.();const d=document.getElementById('hdMobileDock');return {exists:!!d,actions:[...d.querySelectorAll('button')].map(b=>b.textContent.trim()),fabDisplay:getComputedStyle(document.getElementById('hdQuickNavButton')).display};
+  });
+  expect(data.exists).toBe(true);
+  expect(data.actions).toHaveLength(4);
+  expect(data.actions.join(' ')).toContain('ホーム');
+  expect(data.actions.join(' ')).toContain('検索');
+  expect(data.actions.join(' ')).toContain('同期');
+  expect(data.actions.join(' ')).toContain('機能');
+  expect(data.fabDisplay).toBe('none');
+});
