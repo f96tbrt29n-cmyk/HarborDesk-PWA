@@ -5027,3 +5027,29 @@ test('home flags fresh partial Kancolle sync', async ({ page }) => {
   expect(data.card).toContain('未取得: 装備');
   expect(data.next).toContain('同期を補完する');
 });
+
+
+test('home partial sync tells user which Kancolle screen to open', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now()-120000,
+      ships:206,equipment:0,decks:4,
+      coverage:{ships:true,equipment:false,resources:true,fleets:true}
+    }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.renderHomeDashboard?.();
+    return {
+      card:document.getElementById('homeGameSync')?.textContent||'',
+      next:document.getElementById('homeNextAction')?.textContent||'',
+      guide:window.homeSyncMissingGuide?.(['装備'])||[]
+    };
+  });
+  expect(data.card).toContain('装備・改装');
+  expect(data.next).toContain('次に開く');
+  expect(data.next).toContain('装備・改装');
+  expect(data.guide).toEqual(['装備・改装']);
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
