@@ -4179,3 +4179,27 @@ test('recent timer and quest suggestions support one-tap reuse', async ({ page }
   expect(data.questRun).toBe(true);
   expect(data.questLabel).toContain('追加');
 });
+
+
+test('home exposes recent dock and quest one-tap actions', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-timer-recent-v1', JSON.stringify({
+      expedition:[{name:'海上護衛任務',minutes:90}],
+      dock:[{name:'入渠 30分',minutes:30}]
+    }));
+    localStorage.setItem('harbordesk-quest-recent-v1', JSON.stringify(['あ号作戦']));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.renderHomeDashboard?.();
+    return {
+      dock:document.querySelector('[data-home-timer-start][data-kind="dock"]')?.textContent||'',
+      quest:document.querySelector('[data-home-quest-start]')?.textContent||'',
+      expedition:document.querySelector('[data-home-timer-start][data-kind="expedition"]')?.textContent||''
+    };
+  });
+  expect(data.dock).toContain('入渠 30分');
+  expect(data.quest).toContain('あ号作戦');
+  expect(data.expedition).toContain('海上護衛任務');
+});
