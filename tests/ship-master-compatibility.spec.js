@@ -415,3 +415,72 @@ test('next procurement action routes to the correct workflow', async ({ page }) 
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('same-tab equipment save immediately advances procurement state', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    const equipKey = 'harbordesk-equipment-v1';
+    const procKey = 'harbordesk-equipment-procurement-v1';
+
+    localStorage.setItem(equipKey, JSON.stringify([
+      { id: 'eq-1', name: '41cm連装砲', category: '大口径主砲', count: 1, star: 0, targetStar: 10 }
+    ]));
+    localStorage.setItem(procKey, JSON.stringify([
+      {
+        id: 'proc-1',
+        map: '自動更新テスト',
+        kinds: [],
+        gearItems: [
+          {
+            map: '自動更新テスト',
+            ship: '長門改二',
+            loadout: '昼戦',
+            wanted: '大口径主砲',
+            target: '41cm連装砲',
+            kind: '主砲',
+            methodKey: 'develop',
+            methodLabel: '開発候補',
+            rank: 1,
+            needed: 1,
+            requiredTotal: 2,
+            sources: ['長門改二']
+          }
+        ]
+      }
+    ]));
+
+    window.hdPLRender?.();
+    const before = {
+      next: document.querySelector('#hdProcurementNextAction')?.textContent || '',
+      demand: window.hdPLDemandRows?.(window.hdPLLoad?.()[0]?.gearItems || [])?.[0] || null
+    };
+
+    window.hdSave?.(equipKey, [
+      { id: 'eq-1', name: '41cm連装砲', category: '大口径主砲', count: 2, star: 0, targetStar: 10 }
+    ]);
+
+    const after = {
+      next: document.querySelector('#hdProcurementNextAction')?.textContent || '',
+      nextCards: document.querySelectorAll('#hdProcurementNextAction .hd-pl-next-action').length,
+      demand: window.hdPLDemandRows?.(window.hdPLLoad?.()[0]?.gearItems || [])?.[0] || null
+    };
+
+    return { before, after };
+  });
+
+  expect(data.before.next).toContain('41cm連装砲');
+  expect(data.before.demand.needed).toBe(2);
+  expect(data.before.demand.owned).toBe(1);
+  expect(data.before.demand.shortfall).toBe(1);
+
+  expect(data.after.nextCards).toBe(0);
+  expect(data.after.next).not.toContain('41cm連装砲');
+  expect(data.after.demand.needed).toBe(2);
+  expect(data.after.demand.owned).toBe(2);
+  expect(data.after.demand.shortfall).toBe(0);
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
