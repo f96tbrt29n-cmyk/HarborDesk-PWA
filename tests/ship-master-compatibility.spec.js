@@ -2758,3 +2758,26 @@ test('navigation keeps daily home separate from backup safety', async ({ page })
   expect(data.group).toBe('settings');
   expect(data.returnButton).toBe(true);
 });
+
+
+test('roster count follows search result', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      {id:'1',name:'加賀改',level:94,tags:[]},
+      {id:'2',name:'赤城改',level:90,tags:[]},
+      {id:'3',name:'翔鶴改二甲',level:99,tags:[]}
+    ]));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.renderShipRoster?.();
+    const before=document.getElementById('shipRosterCount')?.textContent||'';
+    const input=document.getElementById('shipRosterSearch');
+    input.value='加賀';
+    input.dispatchEvent(new Event('input',{bubbles:true}));
+    return {before,after:document.getElementById('shipRosterCount')?.textContent||''};
+  });
+  expect(data.before).toBe('3隻');
+  expect(data.after).toBe('1 / 3隻');
+});
