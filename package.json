@@ -1,7 +1,7 @@
 {
   "name": "harbordesk-pwa",
   "private": true,
-  "version": "1.0.229",
+  "version": "1.0.230",
   "scripts": {
     "test:browser": "playwright test tests/ship-master-compatibility.spec.js"
   },
