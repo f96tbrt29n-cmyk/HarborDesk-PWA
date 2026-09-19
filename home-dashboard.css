@@ -63,3 +63,7 @@ button.home-next-main{cursor:pointer}
  .home-move-btn{width:30px;height:30px}
  .home-card-title{align-items:flex-start}
 }
+
+.home-head-actions{display:flex;align-items:center;gap:7px}
+.home-head-actions [data-home-order-reset]{font-size:9px;padding:6px 8px}
+@media(max-width:520px){.home-head-actions{gap:5px}.home-head-actions [data-home-order-reset]{padding:5px 7px}}
