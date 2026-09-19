@@ -4546,3 +4546,23 @@ test('Userscript coverage reports captured Kancolle areas', async ({ page }) => 
   expect(result.text).toContain('任務');
   expect(result.text).toContain('装備');
 });
+
+
+test('Kancolle import reports outdated Userscript version', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now(),userscriptVersion:'1.0.5',sources:[],coverage:{},ships:0,equipment:0,materials:0,decks:0
+    }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdKcEnsureImport?.();window.hdKcRenderSyncStatus?.();
+    const el=document.getElementById('hdKcUserscriptStatus');
+    return {text:el?.textContent||'',link:el?.querySelector('a')?.getAttribute('href')||'',cls:el?.className||''};
+  });
+  expect(data.text).toContain('v1.0.5');
+  expect(data.text).toContain('v1.0.6');
+  expect(data.link).toContain('HarborDesk-Kancolle.user.js');
+  expect(data.cls).toContain('outdated');
+});
