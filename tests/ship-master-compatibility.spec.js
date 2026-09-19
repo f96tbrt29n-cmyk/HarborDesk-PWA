@@ -1767,6 +1767,7 @@ test('passive KanColle capture records minimized response without request token'
       api_data:{
         api_ship:[{api_id:9001,api_ship_id:541,api_lv:99,api_slot:[],api_slot_ex:-1}],
         api_deck_port:[{api_id:1,api_name:'第一艦隊',api_ship:[9001,-1,-1,-1,-1,-1],api_mission:[0,0,0,0]}],
+        api_ndock:[{api_id:1,api_state:1,api_ship_id:9001,api_complete_time:Date.now()+60000}],
         api_material:[{api_id:1,api_value:999}],
         api_basic:{api_nickname:'SHOULD_BE_DROPPED'},
         api_extra_secret:'SHOULD_BE_DROPPED'
@@ -1796,7 +1797,8 @@ test('passive KanColle capture records minimized response without request token'
       keys:Object.keys(payload).sort(),
       ships:preview?.ships||0,
       materials:preview?.materials||0,
-      decks:preview?.decks||0
+      decks:preview?.decks||0,
+      docks:preview?.docks||0
     };
   });
 
@@ -1804,10 +1806,11 @@ test('passive KanColle capture records minimized response without request token'
   expect(data.endpoint).toBe('/kcsapi/api_port/port');
   expect(data.hasSecret).toBeFalsy();
   expect(data.hasNickname).toBeFalsy();
-  expect(data.keys).toEqual(['api_deck_port','api_material','api_ship']);
+  expect(data.keys).toEqual(['api_deck_port','api_material','api_ndock','api_ship']);
   expect(data.ships).toBe(1);
   expect(data.materials).toBe(1);
   expect(data.decks).toBe(1);
+  expect(data.docks).toBe(1);
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
@@ -1890,6 +1893,98 @@ test('synced in-game fleet keeps gear and copies into selected map custom fleet'
     masterId:541
   }));
   expect(data.customFleet.ships[0].gear).toContain('41cm連装砲 ★4');
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
+
+
+test('KanColle timer sync imports expeditions and repair docks while preserving manual timers', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    const now = Date.now();
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
+      expeditions:[{id:'manual-exp',name:'手動遠征',endsAt:now+900000}],
+      docks:[{id:'manual-dock',name:'手動入渠',endsAt:now+1200000}],
+      quests:[],
+      resources:{}
+    }));
+
+    const bundle = {
+      format:'harbordesk-kancolle-import',
+      endpoints:{
+        '/kcsapi/api_port/port':{
+          api_result:1,
+          api_result_msg:'成功',
+          api_data:{
+            api_ship:[{
+              api_id:9001,
+              api_ship_id:541,
+              api_lv:99,
+              api_slot:[],
+              api_slot_ex:-1
+            }],
+            api_deck_port:[
+              {api_id:1,api_name:'第一艦隊',api_ship:[9001,-1,-1,-1,-1,-1],api_mission:[0,0,0,0]},
+              {api_id:2,api_name:'第二艦隊',api_ship:[-1,-1,-1,-1,-1,-1],api_mission:[1,5,now+1800000,0]}
+            ],
+            api_ndock:[
+              {api_id:1,api_state:1,api_ship_id:9001,api_complete_time:now+600000},
+              {api_id:2,api_state:0,api_ship_id:0,api_complete_time:0}
+            ],
+            api_material:[]
+          }
+        }
+      }
+    };
+
+    const parsed = window.hdKcParseImport?.(JSON.stringify(bundle));
+    const preview = window.hdKcPreviewData?.(parsed);
+    const sync = window.hdKcApplyImport?.(preview,{
+      ships:false,
+      equipment:false,
+      resources:false,
+      fleets:false,
+      timers:true
+    });
+
+    const app = JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}');
+    const gameExp = (app.expeditions||[]).find(x=>x.source==='kancolle-import');
+    const gameDock = (app.docks||[]).find(x=>x.source==='kancolle-import');
+
+    const result = {
+      preview:{
+        expeditions:preview?.expeditions||0,
+        docks:preview?.docks||0
+      },
+      sync,
+      expeditions:(app.expeditions||[]).map(x=>({id:x.id,name:x.name,fleetNo:x.fleetNo,expeditionId:x.expeditionId,source:x.source||'',endsAt:x.endsAt})),
+      docks:(app.docks||[]).map(x=>({id:x.id,name:x.name,dockNo:x.dockNo,gameShipId:x.gameShipId,source:x.source||'',endsAt:x.endsAt})),
+      gameExp,
+      gameDock
+    };
+
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({expeditions:[],docks:[],quests:[],resources:{}}));
+    return result;
+  });
+
+  expect(data.preview.expeditions).toBe(1);
+  expect(data.preview.docks).toBe(1);
+  expect(data.sync.expeditions).toBe(1);
+  expect(data.sync.docks).toBe(1);
+
+  expect(data.expeditions).toEqual(expect.arrayContaining([
+    expect.objectContaining({id:'manual-exp',name:'手動遠征'}),
+    expect.objectContaining({id:'kc-exp-2',fleetNo:2,source:'kancolle-import'})
+  ]));
+  expect(data.gameExp.name).toContain('海上護衛任務');
+
+  expect(data.docks).toEqual(expect.arrayContaining([
+    expect.objectContaining({id:'manual-dock',name:'手動入渠'}),
+    expect.objectContaining({id:'kc-dock-1',dockNo:1,gameShipId:9001,source:'kancolle-import'})
+  ]));
+  expect(data.gameDock.name).toContain('長門改二');
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
