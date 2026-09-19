@@ -45,7 +45,7 @@ function hdWSSaveCurrentScroll(){
 }
 function hdWSRestoreScroll(sectionId){
  const section=document.getElementById(sectionId),saved=Number(hdWSScrollLoad()[sectionId]);if(!section||!Number.isFinite(saved))return false;
- const top=section.getBoundingClientRect().top+window.scrollY;window.scrollTo({top:Math.max(0,top+saved),behavior:'instant'});return true;
+ const top=section.getBoundingClientRect().top+window.scrollY;window.scrollTo({top:Math.max(0,top+saved),behavior:'auto'});return true;
 }
 function hdWSEsc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdWSJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}}
