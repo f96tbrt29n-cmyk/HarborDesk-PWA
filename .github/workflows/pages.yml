@@ -87,7 +87,7 @@ jobs:
             throw new Error(`Version mismatch: app-version=${version.version}/${version.build}, update-manager=${updateVersion}/${updateBuild}, sw=v${cacheBuild}`);
           }
           const cacheSet=new Set(assets.map(x=>x.replace(/^\.\//,'')));
-          const runtimeFiles=fs.readdirSync('.').filter(f=>fs.statSync(f).isFile()&&(f.endsWith('.js')||f.endsWith('.css'))&&f!=='sw.js');
+          const runtimeFiles=fs.readdirSync('.').filter(f=>fs.statSync(f).isFile()&&(f.endsWith('.js')||f.endsWith('.css'))&&f!=='sw.js'&&f!=='playwright.config.js');
           const uncached=runtimeFiles.filter(f=>!cacheSet.has(f));
           if(uncached.length)throw new Error(`Runtime assets missing from SW cache: ${uncached.join(', ')}`);
           console.log(`OK version alignment: v${version.version} build ${version.build}`);
@@ -101,13 +101,16 @@ jobs:
           const fs=require('fs');
           const sources=['index.html','update-manager.js','quick-nav.js'].map(f=>fs.readFileSync(f,'utf8')).join('\n');
           const top=fs.readdirSync('.').filter(f=>fs.statSync(f).isFile());
-          const orphanJs=top.filter(f=>f.endsWith('.js')&&f!=='sw.js'&&!sources.includes(f));
+          const orphanJs=top.filter(f=>f.endsWith('.js')&&f!=='sw.js'&&f!=='playwright.config.js'&&!sources.includes(f));
           const orphanCss=top.filter(f=>f.endsWith('.css')&&!sources.includes(f));
           if(orphanJs.length||orphanCss.length){
             throw new Error('Unconnected runtime assets: '+[...orphanJs,...orphanCss].join(', '));
           }
           console.log('OK runtime JS/CSS graph');
           NODE
+
+      - name: Validate ship image source
+        run: node --test tests/ship-image-source.test.cjs
 
       - name: Validate Kancolle master semantics
         run: node scripts/validate-kancolle-master.mjs
