@@ -18,3 +18,8 @@
 .hd-gs-history-remove{border:0;border-left:1px solid var(--line);background:transparent;color:var(--muted);font-size:16px;line-height:1}
 .hd-gs-history-remove:active{background:#3a252c;color:#ffd8df}
 @media(max-width:560px){.hd-gs-history{gap:6px}.hd-gs-history-item>[data-hd-gs-history]{max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+
+/* mobile search lives in header menu */
+@media(max-width:560px){
+ .topbar>.hd-gs-header-btn{display:none!important}
+}
