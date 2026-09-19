@@ -74,7 +74,7 @@ function hdPLAddShipLoadout(map,shipName,loadoutName){
   return {map,ship:ship.final,loadout:set.name,wanted:slot.wanted,target:r.item?.name||'',kind:r.kind||'',exact:r.exact,methodKey:method.key,methodLabel:method.label,rank:method.rank,needed:1,sources:[ship.final],createdAt:Date.now()};
  });
  added=hdPLApplyRequiredTotals(added,plan.slots);
- const list=hdPLLoad(),old=list.find(x=>x.map===map),next={id:old?.id||`pl-${Date.now()}-${Math.random().toString(16).slice(2)}`,map,kinds:old?.kinds||[],gearItems:hdPLMergeGearItems([...(old?.gearItems||[]),...added]),createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};
+ const list=hdPLLoad(),old=list.find(x=>x.map===map),base=(old?.gearItems||[]).filter(x=>!(x.ship===ship.final&&x.loadout===set.name)),next={id:old?.id||`pl-${Date.now()}-${Math.random().toString(16).slice(2)}`,map,kinds:old?.kinds||[],gearItems:hdPLMergeGearItems([...base,...added]),createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};
  hdPLSave(old?list.map(x=>x.map===map?next:x):[next,...list]);return true;
 }
 function hdPLResolveMasterWanted(shipId,wanted){
@@ -92,7 +92,7 @@ function hdPLAddMasterLoadout(shipId,loadoutName,map=''){
   return {map:sourceMap,ship:row.name,loadout:set.name,wanted:slot.wanted,target:item?.name||'',kind:r.kind||'',exact:false,methodKey:method.key,methodLabel:method.label,rank:method.rank,needed:1,sources:[row.name],createdAt:Date.now()};
  });
  added=hdPLApplyRequiredTotals(added,plan.slots);
- const list=hdPLLoad(),old=list.find(x=>x.map===sourceMap),next={id:old?.id||`pl-${Date.now()}-${Math.random().toString(16).slice(2)}`,map:sourceMap,kinds:old?.kinds||[],gearItems:hdPLMergeGearItems([...(old?.gearItems||[]),...added]),createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};
+ const list=hdPLLoad(),old=list.find(x=>x.map===sourceMap),base=(old?.gearItems||[]).filter(x=>!(x.ship===row.name&&x.loadout===set.name)),next={id:old?.id||`pl-${Date.now()}-${Math.random().toString(16).slice(2)}`,map:sourceMap,kinds:old?.kinds||[],gearItems:hdPLMergeGearItems([...base,...added]),createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};
  hdPLSave(old?list.map(x=>x.map===sourceMap?next:x):[next,...list]);return true;
 }
 
