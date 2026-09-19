@@ -3686,3 +3686,26 @@ test('core quest and timer filters keep completed items out of the way', async (
   await expect(page.locator('#expeditionList')).toContainText('稼働遠征');
   await expect(page.locator('#expeditionList')).toContainText('完了遠征');
 });
+
+
+test('advanced empty states provide direct actions', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    localStorage.removeItem('harbordesk-equipment-v1');
+    localStorage.removeItem('harbordesk-events-v1');
+    localStorage.removeItem('harbordesk-resource-history-v1');
+    const q=document.getElementById('equipmentSearch');if(q)q.value='';
+    window.renderEquipment?.();window.renderEvents?.();window.renderResourceHistory?.();
+    return {
+      equipment:!!document.querySelector('[data-empty-add-equipment]'),
+      sync:!!document.querySelector('[data-empty-open-sync]'),
+      event:!!document.querySelector('[data-empty-add-event]'),
+      resource:!!document.querySelector('[data-empty-resource-snapshot]')
+    };
+  });
+  expect(data.equipment).toBe(true);
+  expect(data.sync).toBe(true);
+  expect(data.event).toBe(true);
+  expect(data.resource).toBe(true);
+});
