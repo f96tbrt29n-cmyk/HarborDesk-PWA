@@ -2716,3 +2716,29 @@ test('mobile synced import UI is compact', async ({ page }) => {
   expect(data.resultLive).toBe('polite');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('home dashboard surfaces game sync and one-tap jumps', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now()-120000,ships:206,equipment:93,materials:8,decks:4,expeditions:0,docks:0,quests:0,sorties:0
+    }));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify(Array.from({length:206},(_,i)=>({id:String(i+1),name:'艦'+i}))));
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify(Array.from({length:93},(_,i)=>({id:String(i+1),name:'装備'+i}))));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.renderHomeDashboard?.();
+    return {
+      sync:document.getElementById('homeGameSync')?.textContent||'',
+      buttons:[...document.querySelectorAll('#homeSummary [data-home-jump]')].map(x=>x.dataset.homeJump),
+      summary:document.getElementById('homeSummary')?.textContent||''
+    };
+  });
+  expect(data.sync).toContain('ゲーム同期');
+  expect(data.sync).toContain('2分前');
+  expect(data.summary).toContain('206');
+  expect(data.summary).toContain('93');
+  expect(data.buttons).toEqual(expect.arrayContaining(['quests','expeditions','roster','equipmentBook','kancolleImport']));
+});
