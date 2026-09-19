@@ -18,6 +18,15 @@ function hdSPSPlan(map){
 function hdSPSNeeds(map){return typeof hdSEChecks==='function'?hdSEChecks(map):{rows:[],adv:{}}}
 function hdSPSStatusLabel(status){return status==='ready'?'準備あり':status==='partial'?'一部あり':'不足'}
 function hdSPSStatusClass(status){return status==='ready'?'ok':status==='partial'?'warn':'bad'}
+function hdSPSAssignedEval(map,info){
+ if(!info?.fleet||typeof hdFEPlanFromSavedFleet!=='function'||typeof hdFEEvaluate!=='function')return null;
+ try{return hdFEEvaluate(hdFEPlanFromSavedFleet(map,info.fleet))}catch{return null}
+}
+function hdSPSEquipmentInfo(map,fleetInfo){
+ const assigned=hdSPSAssignedEval(map,fleetInfo);
+ if(assigned&&assigned.items.length)return {rows:assigned.requirements||[],adv:(typeof hdSPSNeeds==='function'?hdSPSNeeds(map).adv:{}),assigned,source:'assigned'};
+ const raw=hdSPSNeeds(map);return {rows:raw.rows||[],adv:raw.adv||{},assigned:null,source:'inventory'};
+}
 
 function hdSPSFleetInfo(map){
  const fleet=hdSPSFleet(map);
@@ -51,11 +60,14 @@ function hdSPSFleetHtml(map,info){
   <div class="hd-sps-card-actions"><button type="button" class="ghost small" data-hd-sps-tab="mine">編成・出撃前チェック</button><button type="button" class="ghost small" data-hd-sps-workspace="roster">艦隊台帳</button></div></section>`;
 }
 
-function hdSPSEquipmentHtml(map){
- const info=hdSPSNeeds(map),rows=info.rows||[];
- if(!rows.length)return `<section class="hd-sps-card"><div class="hd-sps-card-head"><div><span>装備</span><strong>特殊要求は少なめ</strong></div><b class="ok">確認</b></div><p class="muted">海域データ上、強い特殊装備要求は検出されていないよ。</p></section>`;
- const ready=rows.filter(x=>x.status==='ready').length;
- return `<section class="hd-sps-card"><div class="hd-sps-card-head"><div><span>装備</span><strong>主要カテゴリ ${ready}/${rows.length} 準備あり</strong></div><b class="${ready===rows.length?'ok':'warn'}">${ready===rows.length?'主要装備OK':'不足あり'}</b></div>
+function hdSPSEquipmentHtml(map,fleetInfo){
+ const info=hdSPSEquipmentInfo(map,fleetInfo),rows=info.rows||[],assigned=info.assigned;
+ if(!rows.length)return `<section class="hd-sps-card"><div class="hd-sps-card-head"><div><span>装備</span><strong>特殊要求は少なめ</strong></div><b class="ok">確認</b></div><p class="muted">${assigned?'選択艦隊の実配備をマスター判定済み。':'海域データ上、強い特殊装備要求は検出されていないよ。'}</p></section>`;
+ const ready=rows.filter(x=>x.status==='ready').length,master=assigned?.master||null,validationOk=!master||master.valid;
+ const badge=ready===rows.length&&validationOk?'実配備OK':master?.invalid?.length?'装備不可あり':master?.unresolved?.length?'要確認':'不足あり';
+ const cls=ready===rows.length&&validationOk?'ok':'warn';
+ return `<section class="hd-sps-card"><div class="hd-sps-card-head"><div><span>装備</span><strong>${assigned?'実配備':'所持台帳'} ${ready}/${rows.length} 準備あり</strong></div><b class="${cls}">${badge}</b></div>
+  ${assigned?`<div class="hd-sps-master-check ${master?.invalid?.length?'bad':master?.unresolved?.length?'warn':'ok'}"><b>マスター可否 ${master?.valid?'正常':'要確認'}</b><span>通常枠＋増設 ${master?.checked||0}件検証｜違反 ${master?.invalid?.length||0} / 未解決 ${master?.unresolved?.length||0}｜基礎制空 ${assigned.air?.basePower||0}</span></div>`:''}
   <div class="hd-sps-equip-grid">${rows.map(x=>`<div class="hd-sps-equip ${hdSPSStatusClass(x.status)}"><div><strong>${hdSPSEsc(x.label||x.kind)}</strong><small>${hdSPSEsc(x.detail||'')}</small></div><b>${hdSPSStatusLabel(x.status)}</b>${x.status!=='ready'? `<button type="button" class="ghost small" data-hd-sps-acquire="${hdSPSEsc(x.kind)}">入手ルート</button>`:''}</div>`).join('')}</div>
   <div class="hd-sps-card-actions"><button type="button" class="ghost small" data-hd-sps-tab="gear">装備タブ</button><button type="button" class="ghost small" data-hd-sps-workspace="hdEquipmentProcurement">調達リスト</button></div></section>`;
 }
@@ -97,9 +109,10 @@ function hdSPSManualHtml(map,info){
 }
 
 function hdSPSSummaryText(map){
- const d=hdSPSMapDetail(map),fleet=hdSPSFleetInfo(map),eq=hdSPSNeeds(map),base=hdSPSBaseInfo(map);
+ const d=hdSPSMapDetail(map),fleet=hdSPSFleetInfo(map),eq=hdSPSEquipmentInfo(map,fleet),base=hdSPSBaseInfo(map);
  const lines=[`HarborDesk 出撃準備表｜${map} ${d.name||''}`,fleet.fleet?`艦隊: ${fleet.fleet.name}（台帳確認 ${fleet.registered}/${fleet.ships.length}）`:'艦隊: 自分用編成なし'];
  for(const x of eq.rows||[])lines.push(`装備: ${x.label||x.kind} = ${hdSPSStatusLabel(x.status)}（${x.detail||''}）`);
+ if(eq.assigned){lines.push(`装備マスター可否: ${eq.assigned.master?.valid?'正常':`要確認（違反${eq.assigned.master?.invalid?.length||0}/未解決${eq.assigned.master?.unresolved?.length||0}）`}`);lines.push(`基礎制空（熟練度なし）: ${eq.assigned.air?.basePower||0}`)}
  if(base.available){lines.push(`基地航空隊: ${base.sortieReady?'設定確認':'要確認'}`);for(const c of base.corps)lines.push(`第${c.index}: ${c.mode} ${c.configured}/4中隊 半径${c.radius??'?'} 制空${c.power}`)}
  if(fleet.manualTotal)lines.push(`出撃直前チェック: ${fleet.manualDone}/${fleet.manualTotal}`);
  return lines.join('\n');
@@ -114,14 +127,14 @@ function hdSPSRender(){
  const map=hdSPSMap();if(!map){if(title)title.textContent='海域未選択';host.innerHTML='<div class="empty">攻略タブで海域を選ぶと、艦隊・装備・基地航空隊をまとめた準備表を作るよ。</div>';return}
  const d=hdSPSMapDetail(map),fleet=hdSPSFleetInfo(map);
  if(title)title.textContent=`${map} ${d.name||''}`;
- const eq=hdSPSNeeds(map),base=hdSPSBaseInfo(map);
+ const eq=hdSPSEquipmentInfo(map,fleet),base=hdSPSBaseInfo(map);
  const fleetReady=!!fleet.fleet&&fleet.ships.length>0&&fleet.registered===fleet.ships.length;
- const eqReady=(eq.rows||[]).every(x=>x.status==='ready');
+ const eqReady=(eq.rows||[]).every(x=>x.status==='ready')&&(!eq.assigned||eq.assigned.master?.valid);
  const baseReady=!base.available||base.sortieReady;
  const manualReady=!fleet.manualTotal||fleet.manualDone===fleet.manualTotal;
  const score=[fleetReady,eqReady,baseReady,manualReady].filter(Boolean).length;
  host.innerHTML=`<div class="hd-sps-overview"><div><strong>準備状況 ${score}/4</strong><span>艦隊・装備・基地航空隊・出撃直前チェックを統合</span></div><div class="hd-sps-actions"><button type="button" class="ghost small" data-hd-sps-refresh>再判定</button><button type="button" class="ghost small" data-hd-sps-copy>準備表をコピー</button><button type="button" class="ghost small" data-hd-sps-guide>海域攻略へ戻る</button></div></div>
-  <div class="hd-sps-grid">${hdSPSFleetHtml(map,fleet)}${hdSPSEquipmentHtml(map)}${hdSPSBaseHtml(map)}${hdSPSManualHtml(map,fleet)}</div>
+  <div class="hd-sps-grid">${hdSPSFleetHtml(map,fleet)}${hdSPSEquipmentHtml(map,fleet)}${hdSPSBaseHtml(map)}${hdSPSManualHtml(map,fleet)}</div>
   <div class="hd-sps-foot">※これはHarborDesk内に登録したデータから作る準備表。実際の耐久・疲労・補給、敵編成変化、索敵スコア、艦載機熟練度などは出撃前にゲーム画面で最終確認してね。</div>`;
 }
 function hdSPSEnsure(){
