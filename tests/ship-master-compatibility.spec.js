@@ -15,6 +15,17 @@ async function boot(page, errors = []) {
       localStorage.setItem('harbordesk-ship-image-config-v1', JSON.stringify({ remoteTemplate: '', autoSource: false }));
     }
   });
+  await page.route('**/*', async route => {
+    const req = route.request();
+    let url;
+    try { url = new URL(req.url()); } catch { return route.continue(); }
+    if (url.hostname === '127.0.0.1' || url.hostname === 'localhost' || url.protocol === 'blob:' || url.protocol === 'data:') return route.continue();
+    if (req.resourceType() === 'image') {
+      const pixel = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=', 'base64');
+      return route.fulfill({ status: 200, contentType: 'image/png', body: pixel });
+    }
+    return route.fulfill({ status: 204, body: '' });
+  });
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
   await expect(page.locator('#shipDatabase')).toHaveCount(1, { timeout: 20000 });
