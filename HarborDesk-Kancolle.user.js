@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HarborDesk 艦これ連携
 // @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
-// @version      1.0.4
+// @version      1.0.5
 // @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
 // @match        http://*.dmm.com/*
 // @match        https://*.dmm.com/*
@@ -21,7 +21,7 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.4';
+const HD_VERSION='1.0.5';
 const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/';
 const RECORD_MESSAGE='harbordesk-kancolle-frame-record-v1';
 const STATUS_MESSAGE='harbordesk-kancolle-frame-status-v1';
@@ -250,28 +250,37 @@ async function copy(){
     prompt('このJSONをコピーしてHarborDeskへ貼り付けてね',text);
   }
 }
+function bytesToBase64Url(bytes){
+  let binary='';
+  for(let i=0;i<bytes.length;i+=0x8000){
+    binary+=String.fromCharCode(...bytes.subarray(i,Math.min(bytes.length,i+0x8000)));
+  }
+  return btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+async function encodeHandoff(value){
+  const raw=new TextEncoder().encode(JSON.stringify(value));
+  if(typeof CompressionStream==='function'){
+    const compressedStream=new Blob([raw]).stream().pipeThrough(new CompressionStream('gzip'));
+    const compressed=new Uint8Array(await new Response(compressedStream).arrayBuffer());
+    return 'g.'+bytesToBase64Url(compressed);
+  }
+  return 'j.'+bytesToBase64Url(raw);
+}
 async function send(){
   if(!records.length){
     alert('まだ取得データがないよ。母港・装備・任務などを一度開いてからもう一度押してね。');
     return;
   }
   try{
-    if(statusEl)statusEl.textContent='データ準備中';
-    const payload='HARBORDESK_KC_IMPORT_V1:'+JSON.stringify(exportObject());
-    window.name=payload;
-    if(statusEl)statusEl.textContent='保存OK → HarborDeskへ移動';
+    if(statusEl)statusEl.textContent='データ圧縮中';
+    const token=await encodeHandoff(exportObject());
+    if(statusEl)statusEl.textContent='送信OK → HarborDeskへ移動';
     const a=document.createElement('a');
-    a.href=HARBOR_URL+'#kancolleImport';
+    a.href=HARBOR_URL+'#kcimport='+token;
     a.target='_self';
-    a.rel='noreferrer';
     a.style.display='none';
     document.documentElement.appendChild(a);
     a.click();
-    setTimeout(()=>{
-      if(location.hostname.includes('dmm.')||location.hostname.includes('games.dmm')){
-        try{window.top.location.assign(HARBOR_URL+'#kancolleImport')}catch{}
-      }
-    },250);
   }catch(err){
     if(statusEl)statusEl.textContent='送信失敗';
     alert('HarborDeskへの受け渡しに失敗したよ: '+String(err&&err.message||err));
