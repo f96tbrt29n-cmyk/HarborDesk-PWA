@@ -4425,3 +4425,37 @@ test('home edit mode closes when leaving Home', async ({ page }) => {
   expect(data.label).toContain('ホーム編集');
   expect(data.resetHidden).toBe(true);
 });
+
+
+test('mobile header stays on one compact row', async ({ page }) => {
+  const errors=[];
+  await page.setViewportSize({width:390,height:844});
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdWSEnsureSyncStatus?.();
+    const top=document.querySelector('.topbar');
+    const brand=top?.querySelector('h1');
+    const eyebrow=top?.querySelector(':scope > div:first-child .eyebrow');
+    const sync=document.getElementById('hdGlobalSyncStatus');
+    const more=document.querySelector('.hd-header-more');
+    const r=top?.getBoundingClientRect();
+    return {
+      height:r?.height||0,
+      scrollWidth:top?.scrollWidth||0,
+      clientWidth:top?.clientWidth||0,
+      brand:brand?.textContent||'',
+      eyebrowDisplay:eyebrow?getComputedStyle(eyebrow).display:'',
+      sync:!!sync,
+      more:!!more,
+      wrap:getComputedStyle(top).flexWrap
+    };
+  });
+  expect(data.brand).toBe('HarborDesk');
+  expect(data.eyebrowDisplay).toBe('none');
+  expect(data.sync).toBe(true);
+  expect(data.more).toBe(true);
+  expect(data.wrap).toBe('nowrap');
+  expect(data.height).toBeLessThanOrEqual(58);
+  expect(data.scrollWidth).toBeLessThanOrEqual(data.clientWidth+1);
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
