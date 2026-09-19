@@ -76,3 +76,6 @@
  .hd-ws-shell{padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right))}
  .hd-network-status{padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}
 }
+
+.hd-global-sync-status.partial{border-color:rgba(239,191,93,.58);background:rgba(96,68,23,.34)}
+.hd-global-sync-status.partial b{color:#f3d58d}
