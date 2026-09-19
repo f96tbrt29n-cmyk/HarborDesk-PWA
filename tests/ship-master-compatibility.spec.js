@@ -5499,3 +5499,22 @@ test('sortie readiness highlights one next action', async ({ page }) => {
   expect(data.hasRemaining).toBe(true);
   expect(data.collapsesOk).toBe(true);
 });
+
+
+test('sortie readiness exposes final ready state', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const source=await fetch('./sortie-readiness.js',{cache:'no-store'}).then(r=>r.text());
+    return {
+      helper:source.includes('function hdSortieFinalHtml'),
+      ready:source.includes('準備チェック完了'),
+      game:source.includes('https://play.games.dmm.com/game/kancolle'),
+      pending:source.includes('手動確認')
+    };
+  });
+  expect(data.helper).toBe(true);
+  expect(data.ready).toBe(true);
+  expect(data.game).toBe(true);
+  expect(data.pending).toBe(true);
+});
