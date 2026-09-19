@@ -259,3 +259,30 @@ body.hd-booting::after{
  }
  dialog .dialog-actions button{min-height:42px}
 }
+
+/* mobile single-line header */
+@media(max-width:560px){
+ .topbar{
+  min-height:48px;
+  padding:7px 10px;
+  gap:7px;
+  flex-wrap:nowrap!important;
+ }
+ .topbar>div:first-child{
+  min-width:0;
+  flex:1 1 auto;
+ }
+ .topbar>div:first-child .eyebrow{display:none}
+ .topbar h1{
+  margin:0;
+  font-size:18px;
+  line-height:1.1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+ }
+ .topbar .hd-global-sync-status,
+ .topbar .hd-header-more{
+  flex:0 0 auto;
+ }
+}
