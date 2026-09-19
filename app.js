@@ -5,6 +5,22 @@ let timerKind='expedition';
 let notified=new Set();
 const GUIDE_VIEW_KEY='harbordesk-session-guide-view-v1';
 const TIMER_LAST_KEY='harbordesk-timer-last-v1';
+const QUEST_RECENT_KEY='harbordesk-quest-recent-v1';
+function questRecentLoad(){try{return JSON.parse(localStorage.getItem(QUEST_RECENT_KEY)||'[]')||[]}catch{return []}}
+function questRecentSave(name){
+ const value=String(name||'').trim();if(!value)return questRecentLoad();
+ const rows=questRecentLoad().filter(x=>x!==value);rows.unshift(value);
+ const next=rows.slice(0,6);try{localStorage.setItem(QUEST_RECENT_KEY,JSON.stringify(next))}catch{}return next;
+}
+function renderQuestRecent(){
+ const host=document.getElementById('questRecent');if(!host)return;
+ const rows=questRecentLoad();host.innerHTML=rows.length?rows.map(x=>`<button type="button" class="ghost small" data-quest-recent="${esc(x)}">${esc(x)}</button>`).join(''):'';
+ host.hidden=!rows.length;
+}
+function openQuestDialog(){
+ const input=document.getElementById('questName'),dialog=document.getElementById('questDialog');if(!input||!dialog)return;
+ input.value='';renderQuestRecent();dialog.showModal();try{input.focus({preventScroll:true})}catch{input.focus()}
+}
 function timerLastLoad(){try{return JSON.parse(localStorage.getItem(TIMER_LAST_KEY)||'{}')||{}}catch{return {}}}
 function timerLastSave(kind,name,minutes){
  const all=timerLastLoad();all[kind]={name:String(name||''),minutes:Number(minutes)||30};
@@ -146,7 +162,7 @@ document.addEventListener('click',e=>{
  const gf=e.target.closest('[data-guide-filter]');if(gf){guideFilter=gf.dataset.guideFilter;guideViewSave({filter:guideFilter});renderGuide();return}
  const fav=e.target.closest('[data-guide-fav]');if(fav){const id=fav.dataset.guideFav;guideFavs.has(id)?guideFavs.delete(id):guideFavs.add(id);localStorage.setItem(FAV_KEY,JSON.stringify([...guideFavs]));renderGuide();return}
  const emptyTimer=e.target.closest('[data-empty-add-timer]');if(emptyTimer){openTimer(emptyTimer.dataset.emptyAddTimer);return}
- if(e.target.closest('[data-empty-add-quest]')){document.getElementById('questName').value='';document.getElementById('questDialog').showModal();return}
+ if(e.target.closest('[data-empty-add-quest]')){openQuestDialog();return}
  const restart=e.target.closest('[data-restart-timer]');if(restart){
   const k=restart.dataset.kind==='dock'?'dock':'expedition',arr=k==='expedition'?state.expeditions:state.docks,item=arr.find(x=>String(x.id)===String(restart.dataset.restartTimer));
   if(!item)return;
@@ -227,10 +243,13 @@ function openTimer(kind){
  const name=document.getElementById('timerName');try{name.focus({preventScroll:true});if(name.value)name.select()}catch{}
 }
 
-document.addEventListener('click',e=>{const preset=e.target.closest?.('[data-timer-minutes]');if(preset){const input=document.getElementById('timerMinutes');if(input){input.value=preset.dataset.timerMinutes;try{input.focus({preventScroll:true})}catch{input.focus()}}}});
-document.getElementById('addExpedition').onclick=()=>openTimer('expedition');document.getElementById('addDock').onclick=()=>openTimer('dock');document.getElementById('addQuest').onclick=()=>{document.getElementById('questName').value='';document.getElementById('questDialog').showModal()};
+document.addEventListener('click',e=>{
+ const preset=e.target.closest?.('[data-timer-minutes]');if(preset){const input=document.getElementById('timerMinutes');if(input){input.value=preset.dataset.timerMinutes;try{input.focus({preventScroll:true})}catch{input.focus()}}return}
+ const recent=e.target.closest?.('[data-quest-recent]');if(recent){const input=document.getElementById('questName');if(input){input.value=recent.dataset.questRecent||recent.textContent||'';try{input.focus({preventScroll:true});input.select()}catch{input.focus()}}}
+});
+document.getElementById('addExpedition').onclick=()=>openTimer('expedition');document.getElementById('addDock').onclick=()=>openTimer('dock');document.getElementById('addQuest').onclick=openQuestDialog;
 document.getElementById('timerForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const name=document.getElementById('timerName').value.trim(),mins=Number(document.getElementById('timerMinutes').value);if(!name||!mins)return;const startedAt=Date.now();timerLastSave(timerKind,name,mins);(timerKind==='expedition'?state.expeditions:state.docks).push({id:uid(),name,startedAt,durationMinutes:mins,endsAt:startedAt+mins*60000});save();render();hdToast(`${name} を開始したよ`)});
-document.getElementById('questForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const name=document.getElementById('questName').value.trim();if(!name)return;state.quests.push({id:uid(),name,done:false});save();renderQuests();hdToast(`${name} を追加したよ`)});
+document.getElementById('questForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const name=document.getElementById('questName').value.trim();if(!name)return;questRecentSave(name);state.quests.push({id:uid(),name,done:false});save();renderQuests();hdToast(`${name} を追加したよ`)});
 document.addEventListener('change',e=>{if(e.target.matches('[data-quest-check]')){const q=state.quests.find(x=>x.id===e.target.dataset.questCheck);if(q){q.done=e.target.checked;save();renderQuests()}}});
 document.getElementById('saveResources').onclick=()=>{['fuel','ammo','steel','bauxite'].forEach(k=>state.resources[k]=document.getElementById(k).value);state.resources.savedAt=Date.now();save();renderResources();hdToast('資源を保存したよ')};
 
