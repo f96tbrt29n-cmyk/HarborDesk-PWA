@@ -1,5 +1,5 @@
 const HD_KC_SYNC_KEY='harbordesk-kancolle-sync-v1';
-const HD_KC_USERSCRIPT_VERSION='1.0.7';
+const HD_KC_USERSCRIPT_VERSION='1.0.8';
 const HD_KC_FLEETS_KEY='harbordesk-kancolle-fleets-v1';
 const HD_KC_MATERIALS_KEY='harbordesk-kancolle-materials-v1';
 const HD_KC_NODE_LABEL_SOURCE='KC3Kai edges.json @ 6b0534d291c27220da1b6fe454e91fc96a6a7b27';
