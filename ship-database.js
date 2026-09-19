@@ -8605,9 +8605,13 @@ const HD_EQUIP_TYPE_LABELS={1:'小口径主砲',2:'中口径主砲',3:'大口径
 const HD_EQUIPMENT_MASTER_NAME_BY_ID=Object.fromEntries(Object.entries(HD_EQUIPMENT_MASTER_META_BY_NAME).map(([name,v])=>[String(v.id),name]));
 const HD_EXSLOT_TYPE_LABELS={16:'追加装甲',21:'対空機銃',23:'応急修理要員',27:'追加装甲(中型)',28:'追加装甲(大型)',36:'高射装置',39:'水上艦要員',43:'戦闘糧食',44:'補給物資'};
 function hdShipDbSlotProfile(ship){
- const name=typeof ship==='string'?ship:ship?.final;
- const p=HD_SHIP_SLOT_PROFILES[name];if(!p)return null;
- return {...p,total:p.slots.reduce((s,n)=>s+n,0),count:p.slots.length};
+ const name=typeof ship==='string'?ship:(ship?.final||ship?.name||ship?.base||ship?.row?.name);
+ const p=HD_SHIP_SLOT_PROFILES[name];
+ if(p)return {...p,total:p.slots.reduce((s,n)=>s+n,0),count:p.slots.length,masterOnly:false};
+ const row=typeof hdShipDbMasterRowFor==='function'?hdShipDbMasterRowFor(ship):null;if(!row)return null;
+ const snap=window.HD_KANCOLLE_MASTER_SNAPSHOT||{},equipRules=snap.shipEquipOverrides?.[String(row.id)]||snap.stypeEquipRules?.[String(row.stype)]||{};
+ const names=typeof hdShipDbMasterTypeMap==='function'?hdShipDbMasterTypeMap():new Map(),allowedTypes=Object.keys(equipRules).map(id=>names.get(String(id))||'').filter(Boolean);
+ return {id:row.id,ctype:row.ctype,stype:row.stype,slots:[...(row.slots||[])],equipRules,allowedTypes,flags:[],total:(row.slots||[]).reduce((s,n)=>s+n,0),count:(row.slots||[]).length,masterOnly:true};
 }
 function hdShipDbMasterMeta(item){
  return HD_EQUIPMENT_MASTER_META_BY_NAME[String(item?.name||'')]||null;
@@ -8980,6 +8984,45 @@ function hdShipDbLoadoutsHtml(item){
 
 function hdShipDbMasterSnapshot(){return window.HD_KANCOLLE_MASTER_SNAPSHOT||{}}
 function hdShipDbMasterRows(){return Object.values(hdShipDbMasterSnapshot().allShips||{})}
+const HD_SHIP_MASTER_NAME_CACHE=new Map();
+function hdShipDbMasterRowFor(input){
+ const directId=Number(input?.masterId||input?._masterId||input?._masterRow?.id)||0,snap=hdShipDbMasterSnapshot();
+ if(directId&&snap.allShips?.[String(directId)])return snap.allShips[String(directId)];
+ if(input?._masterRow?.id)return input._masterRow;
+ const name=String(typeof input==='string'?input:(input?.final||input?.name||input?.base||input?.row?.name||'')).trim();if(!name)return null;
+ if(!HD_SHIP_MASTER_NAME_CACHE.size){
+  for(const row of hdShipDbMasterRows()){const a=HD_SHIP_MASTER_NAME_CACHE.get(row.name)||[];a.push(row);HD_SHIP_MASTER_NAME_CACHE.set(row.name,a)}
+  for(const rows of HD_SHIP_MASTER_NAME_CACHE.values())rows.sort((a,b)=>Number(b.id)-Number(a.id));
+ }
+ const rows=HD_SHIP_MASTER_NAME_CACHE.get(name)||[];if(!rows.length)return null;
+ const type=String(input?.type||input?.row?.type||'');
+ return (type&&rows.find(x=>x.type===type))||rows[0];
+}
+function hdShipDbMasterRoles(row){
+ if(!row)return [];
+ const types=hdShipDbMasterAllowedTypes(row),set=new Set(types),roles=[],add=x=>{if(x&&!roles.includes(x))roles.push(x)};
+ if(['駆逐艦','海防艦','軽巡洋艦','練習巡洋艦'].includes(row.type))add('対潜');
+ if(set.has('艦上戦闘機')){add('制空');add('航空火力')}
+ if(set.has('水上戦闘機')){add('水戦');add('制空補助')}
+ if(set.has('上陸用舟艇')){add('輸送');add('大発')}
+ if(set.has('特型内火艇'))add('対地');
+ if(set.has('特殊潜航艇'))add('先制雷撃');
+ if(Number(row.stats?.luck)>=30){add('高運');add('夜戦CI')}
+ if(Number(row.stats?.fire)>=80)add('高火力');
+ return roles;
+}
+function hdShipDbMasterAdapter(input,extraRoles=[]){
+ const row=hdShipDbMasterRowFor(input);if(!row)return null;
+ return {base:row.name,final:row.name,type:row.type,speed:hdShipDbMasterSpeed(row.speed),roles:[...new Set([...hdShipDbMasterRoles(row),...(extraRoles||[])])],masterId:row.id,_masterRow:row,_masterOnly:true};
+}
+function hdShipDbResolveShip(input,extraRoles=[]){
+ const name=String(typeof input==='string'?input:(input?.name||input?.final||input?.base||input?.row?.name||'')).trim();if(!name)return null;
+ const rows=typeof HD_SHIP_DATABASE!=='undefined'?HD_SHIP_DATABASE:[];
+ const exact=rows.find(x=>name===x.final||name===x.base);if(exact)return exact;
+ const master=hdShipDbMasterAdapter(input,extraRoles);if(master)return master;
+ return rows.find(x=>name.startsWith(x.base))||null;
+}
+
 function hdShipDbMasterSpeed(code){return ({5:'低速',10:'高速',15:'高速+',20:'最速'})[Number(code)]||`速力${Number(code)||0}`}
 function hdShipDbMasterRange(code){return ({0:'無',1:'短',2:'中',3:'長',4:'超長'})[Number(code)]||`射程${Number(code)||0}`}
 function hdShipDbMasterTypeMap(){
