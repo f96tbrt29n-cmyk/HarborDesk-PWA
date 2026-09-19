@@ -21,7 +21,9 @@ function timerRecentSave(kind,name,minutes){
 function timerRecentRemove(kind,index){
  const all=timerRecentLoad(),rows=Array.isArray(all[kind])?[...all[kind]]:[],i=Number(index);
  if(!Number.isInteger(i)||i<0||i>=rows.length)return rows;
- rows.splice(i,1);all[kind]=rows;try{localStorage.setItem(TIMER_RECENT_KEY,JSON.stringify(all))}catch{}renderTimerRecent(kind);return rows;
+ const [item]=rows.splice(i,1);all[kind]=rows;try{localStorage.setItem(TIMER_RECENT_KEY,JSON.stringify(all))}catch{}renderTimerRecent(kind);
+ hdToastAction?.(`${item?.name||'候補'} を候補から削除したよ`,'元に戻す',()=>{const cur=timerRecentLoad(),list=Array.isArray(cur[kind])?[...cur[kind]]:[];if(!list.some(x=>x?.name===item?.name&&Number(x?.minutes)===Number(item?.minutes))){list.splice(Math.min(i,list.length),0,item);cur[kind]=list;try{localStorage.setItem(TIMER_RECENT_KEY,JSON.stringify(cur))}catch{}renderTimerRecent(kind);hdToast('元に戻したよ')}},6500);
+ return rows;
 }
 function renderTimerRecent(kind){
  const host=document.getElementById('timerRecent');if(!host)return;
@@ -37,7 +39,9 @@ function questRecentSave(name){
  const next=rows.slice(0,6);try{localStorage.setItem(QUEST_RECENT_KEY,JSON.stringify(next))}catch{}return next;
 }
 function questRecentRemove(name){
- const value=String(name||''),rows=questRecentLoad().filter(x=>x!==value);try{localStorage.setItem(QUEST_RECENT_KEY,JSON.stringify(rows))}catch{}renderQuestRecent();return rows;
+ const value=String(name||''),before=questRecentLoad(),i=before.indexOf(value),rows=before.filter(x=>x!==value);try{localStorage.setItem(QUEST_RECENT_KEY,JSON.stringify(rows))}catch{}renderQuestRecent();
+ if(i>=0)hdToastAction?.(`${value} を候補から削除したよ`,'元に戻す',()=>{const cur=questRecentLoad();if(!cur.includes(value)){cur.splice(Math.min(i,cur.length),0,value);try{localStorage.setItem(QUEST_RECENT_KEY,JSON.stringify(cur))}catch{}renderQuestRecent();hdToast('元に戻したよ')}},6500);
+ return rows;
 }
 function renderQuestRecent(){
  const host=document.getElementById('questRecent');if(!host)return;
