@@ -4056,3 +4056,39 @@ test('iPhone Safari gets dismissible home-screen install tip', async ({ page }) 
   expect(data.after).toBe(false);
   expect(data.dismissed).toBe('1');
 });
+
+
+test('home next action prioritizes stale sync over quests', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({syncedAt:Date.now()-8*3600000,ships:206,equipment:93,decks:4}));
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({expeditions:[],docks:[],quests:[{id:'q1',name:'デイリー演習',done:false}],resources:{}}));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    renderHomeDashboard();
+    const host=document.getElementById('homeNextAction');
+    return {text:host?.textContent||'',sync:host?.classList.contains('sync')||false,done:!!host?.querySelector('[data-home-quest-done]')};
+  });
+  expect(data.sync).toBe(true);
+  expect(data.text).toContain('ゲーム同期');
+  expect(data.done).toBe(false);
+});
+
+test('home next action can complete first quest when sync is fresh', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({syncedAt:Date.now()-120000,ships:206,equipment:93,decks:4}));
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({expeditions:[],docks:[],quests:[{id:'q1',name:'デイリー演習',done:false},{id:'q2',name:'補給',done:false}],resources:{}}));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    renderHomeDashboard();
+    const before=document.getElementById('homeNextAction')?.textContent||'';
+    document.querySelector('#homeNextAction [data-home-quest-done="q1"]')?.click();
+    return {before,done:state.quests.find(x=>x.id==='q1')?.done===true,after:document.getElementById('homeNextAction')?.textContent||''};
+  });
+  expect(data.before).toContain('デイリー演習');
+  expect(data.done).toBe(true);
+  expect(data.after).toContain('補給');
+});
