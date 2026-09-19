@@ -342,6 +342,7 @@ document.addEventListener('click',e=>{
  const prune=e.target.closest?.('[data-hd-pl-prune]');if(prune){hdPLPruneReady(prune.dataset.hdPlPrune);return}
 });
 window.addEventListener('storage',e=>{if(e.key===HD_PROCUREMENT_KEY||e.key==='harbordesk-equipment-v1')hdPLRender()});
+window.addEventListener('hd:equipment-changed',()=>hdPLRender());
 window.addEventListener('hd:workspace-refresh',hdPLRender);
 window.addEventListener('hd:map-rendered',hdPLRender);
 window.addEventListener('load',()=>setTimeout(()=>{hdPLEnsure();if(!hdPLInstallSortieButton())setTimeout(hdPLInstallSortieButton,500)},380));
