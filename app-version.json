@@ -1,7 +1,7 @@
 {
-  "version": "1.0.166",
-  "build": 166,
-  "releasedAt": "2026-09-19T21:29:00+09:00",
-  "notes": "iPhone/Safariのショートカット式艦これ通信キャプチャ実験を撤去。HarborDeskの通常の艦これJSON取込・既存キャプチャ/同期機能は維持し、ショートカット用UI、診断コード、配布ページ、生成Workflow、署名済みショートカットファイルを削除。",
+  "version": "1.0.167",
+  "build": 167,
+  "releasedAt": "2026-09-19T21:42:00+09:00",
+  "notes": "iPhone/Safari向けUserscripts連携を追加。DMM外側ページ・osapi.dmm.com・203.104.*側フレームでdocument-start/page context実行し、対応kcsapiレスポンスをフレーム横断で集約。ゲーム画面のHarborDeskパネルから直接HarborDeskへ送信できる。JSONコピーは予備手段として残す。",
   "masterChanges": null
 }
