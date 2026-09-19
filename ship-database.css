@@ -43,3 +43,17 @@
 @supports(content-visibility:auto){
  .hd-shipdb-card,.hd-shipdb-master-card,.hd-equip-reverse-row{content-visibility:auto;contain-intrinsic-size:190px}
 }
+
+.hd-shipdb-list.hd-compact .hd-shipdb-card{padding:9px;gap:6px}
+.hd-shipdb-list.hd-compact .hd-shipdb-card p,
+.hd-shipdb-list.hd-compact .hd-shipdb-path,
+.hd-shipdb-list.hd-compact .hd-shipdb-require,
+.hd-shipdb-list.hd-compact .hd-shipdb-roles,
+.hd-shipdb-list.hd-compact .hd-shipdb-detail,
+.hd-shipdb-list.hd-compact .hd-shipdb-master-mini,
+.hd-shipdb-list.hd-compact .hd-shipdb-master-slots,
+.hd-shipdb-list.hd-compact .hd-shipdb-substats,
+.hd-shipdb-list.hd-compact .hd-shipdb-master-equip{display:none}
+.hd-shipdb-list.hd-compact .hd-shipdb-actions .guide-link{display:none}
+.hd-shipdb-list.hd-compact .hd-shipdb-head strong{font-size:13px}
+@media(max-width:680px){.hd-shipdb-toolbar [data-hd-shipdb-compact]{order:3}}
