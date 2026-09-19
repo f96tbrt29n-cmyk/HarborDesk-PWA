@@ -92,3 +92,12 @@ button.home-next-main{cursor:pointer}
 .home-timer-recent button{flex:0 0 auto;display:grid;gap:1px;text-align:left;max-width:190px;padding:7px 9px}
 .home-timer-recent button b{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .home-timer-recent button span{font-size:9px;color:var(--accent2)}
+
+.home-install-tip{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid rgba(96,177,230,.38);border-radius:16px;background:linear-gradient(180deg,rgba(27,79,112,.28),rgba(9,23,37,.92))}
+.home-install-tip[hidden]{display:none}
+.home-install-tip>div{display:grid;gap:2px;min-width:0}
+.home-install-tip span{font-size:9px;color:var(--accent);font-weight:800}
+.home-install-tip strong{font-size:14px}
+.home-install-tip small{font-size:10px;line-height:1.5;color:var(--muted)}
+.home-install-tip button{flex:0 0 auto}
+@media(max-width:520px){.home-install-tip{align-items:stretch}.home-install-tip button{align-self:center;min-height:38px}}
