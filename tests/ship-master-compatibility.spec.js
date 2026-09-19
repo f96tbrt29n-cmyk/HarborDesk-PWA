@@ -2578,6 +2578,8 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
       hasLegacyServerInclude:text.includes('125\\.6'),
       hasKcsapiFilter:text.includes('/kcsapi/'),
       hasDirectSend:text.includes("HARBORDESK_KC_IMPORT_V1:"),
+      usesSelfLink:text.includes("a.target='_self'"),
+      hasVisibleVersion:text.includes("HD_VERSION+'</small>"),
       usesPopup:text.includes('window.open('),
       hasTokenStorage:text.includes('api_token=') || text.includes('Cookie='),
       hasNoFrames:text.includes('@noframes')
@@ -2594,6 +2596,8 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
   expect(data.hasLegacyServerInclude).toBe(true);
   expect(data.hasKcsapiFilter).toBe(true);
   expect(data.hasDirectSend).toBe(true);
+  expect(data.usesSelfLink).toBe(true);
+  expect(data.hasVisibleVersion).toBe(true);
   expect(data.usesPopup).toBe(false);
   expect(data.hasTokenStorage).toBe(false);
   expect(data.hasNoFrames).toBe(false);
