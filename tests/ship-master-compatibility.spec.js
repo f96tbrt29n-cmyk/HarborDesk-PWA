@@ -5281,3 +5281,32 @@ test('Home current fleet copies to selected map', async ({ page }) => {
   expect(saved.ships[1].ship).toBe('榛名改二');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('Home current fleet shows morale and sparkle status', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
+      {deckId:1,name:'第1艦隊',mission:[0,0,0,0],ships:[
+        {name:'加賀改',level:94,nowHp:70,maxHp:79,cond:55,gear:'烈風'},
+        {name:'赤城改',level:90,nowHp:75,maxHp:77,cond:32,gear:'流星'},
+        {name:'翔鶴改二甲',level:99,nowHp:78,maxHp:78,cond:49,gear:'村田隊'}
+      ]}
+    ]));
+  });
+  await boot(page,errors);
+  await page.evaluate(()=>window.renderHomeDashboard?.());
+  const data=await page.evaluate(()=>({
+    text:document.getElementById('homeCurrentFleet')?.textContent||'',
+    kira:document.querySelectorAll('#homeCurrentFleet mark.kira').length,
+    fatigue:document.querySelectorAll('#homeCurrentFleet mark.fatigue').length,
+    conds:[...document.querySelectorAll('#homeCurrentFleet .home-fleet-state-line')].map(x=>x.textContent)
+  }));
+  expect(data.text).toContain('疲労 1隻');
+  expect(data.text).toContain('キラ 1隻');
+  expect(data.kira).toBe(1);
+  expect(data.fatigue).toBe(1);
+  expect(data.conds.join(' ')).toContain('cond 55');
+  expect(data.conds.join(' ')).toContain('cond 32');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
