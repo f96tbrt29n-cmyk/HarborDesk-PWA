@@ -143,7 +143,7 @@ function hdEnsureUpdateUI(){
   banner.innerHTML=`<div class="hd-update-main"><strong>HarborDeskの最新版があります</strong><div id="hdUpdateText" class="muted"></div><div id="hdUpdateChanges" class="hd-update-changes" hidden></div></div><button id="hdUpdateNow" type="button" class="primary small" onclick="hdForceUpdate()">今すぐ更新</button>`;
   document.body.appendChild(banner);
   const header=document.querySelector('.topbar');
-  if(header&&!document.getElementById('hdUpdateCheck')){const controls=document.createElement('div');controls.className='hd-version-controls';controls.innerHTML=`<span class="hd-version-badge">v${HD_APP_VERSION}</span><button id="hdUpdateCheck" class="ghost small">更新確認</button>`;header.appendChild(controls)}
+  if(header&&!document.getElementById('hdUpdateCheck')){const controls=document.createElement('div');controls.className='hd-version-controls';controls.innerHTML=`<span class="hd-version-badge" title="HarborDesk バージョン">v${HD_APP_VERSION}</span><button id="hdUpdateCheck" class="ghost small hd-update-check" aria-label="更新確認"><span aria-hidden="true">↻</span><b>更新確認</b></button>`;header.appendChild(controls)}
   document.getElementById('hdUpdateNow')?.addEventListener('click',hdForceUpdate);
   document.getElementById('hdUpdateCheck')?.addEventListener('click',()=>hdCheckForUpdate(true));
 }
@@ -173,7 +173,7 @@ function hdUpdateMasterChangeView(changes){
 async function hdCheckForUpdate(showResult=false){
   hdEnsureUpdateUI();const btn=document.getElementById('hdUpdateCheck');
   try{
-    if(btn){btn.disabled=true;btn.textContent='確認中…'}
+    if(btn){btn.disabled=true;const b=btn.querySelector('b');if(b)b.textContent='確認中…'}
     const latest=await hdFetchLatestVersion(),newer=Number(latest.build||0)>HD_APP_BUILD,banner=document.getElementById('hdUpdateBanner'),text=document.getElementById('hdUpdateText'),changes=document.getElementById('hdUpdateChanges');
     if(newer){
       if(text)text.textContent=`v${HD_APP_VERSION} → v${latest.version}${latest.notes?`｜${latest.notes}`:''}`;
@@ -186,7 +186,7 @@ async function hdCheckForUpdate(showResult=false){
     }
     else{if(banner)banner.hidden=true;if(changes){changes.hidden=true;changes.innerHTML=''}if(showResult)alert(`HarborDesk v${HD_APP_VERSION} は最新版だよ`)}
   }catch{if(showResult)alert('更新情報を確認できなかったよ。通信状態を確認してもう一度試してね。')}
-  finally{if(btn){btn.disabled=false;btn.textContent='更新確認'}}
+  finally{if(btn){btn.disabled=false;const b=btn.querySelector('b');if(b)b.textContent='更新確認'}}
 }
 let HD_FORCE_UPDATE_BUSY=false;
 async function hdForceUpdate(){
