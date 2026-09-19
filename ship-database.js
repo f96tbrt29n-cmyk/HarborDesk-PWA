@@ -9247,6 +9247,7 @@ let hdShipDbIncludeMaster=true;
 let hdShipDbType='すべて';
 let hdShipDbMissingOnly=false;
 let hdShipDbImageFilter='all';
+let hdShipDbRenderTimer=0;
 function hdShipDbImageMatches(ref){
  if(hdShipDbImageFilter==='all')return true;
  const has=typeof hdShipImageHasLocalSync==='function'&&hdShipImageHasLocalSync(ref);
@@ -9272,6 +9273,7 @@ function hdShipDbStatus(item){
  if(lv>=item.targetLv)return {label:'Lv条件達成',cls:'ready',detail:`${own.name} Lv.${lv}`};
  return {label:'育成中',cls:'owned',detail:`${own.name}${lv?` Lv.${lv} / あと${Math.max(0,item.targetLv-lv)}Lv`:''}`};
 }
+function hdShipDbScheduleRender(delay=90){clearTimeout(hdShipDbRenderTimer);hdShipDbRenderTimer=setTimeout(hdRenderShipDatabase,Math.max(0,Number(delay)||0))}
 function hdRenderShipDatabase(){
  const list=document.getElementById('hdShipDbList');if(!list)return;
  const q=(document.getElementById('hdShipDbSearch')?.value||'').trim().toLowerCase();
@@ -9305,7 +9307,7 @@ function hdEnsureShipDatabase(){
  sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">SHIP DATABASE</div><h2>艦娘データベース・改装計画</h2></div><span id="hdShipDbCount" class="muted"></span></div><div class="hd-shipdb-note">詳細攻略DB ${HD_SHIP_DATABASE.length}隻＋公式マスター参照 ${masterCount}形態。詳細DBはLv99最大値・育成・用途別装備まで対応し、公式マスターはapi_start2自動同期で全形態の艦種・改装・スロット・搭載・装備可能カテゴリを検索できるよ。</div><div class="hd-shipdb-search-row"><input id="hdShipDbSearch" type="search" placeholder="艦名・艦種・役割で検索"><button class="ghost small" type="button" data-hd-shipdb-compact>コンパクト</button></div><div class="hd-shipdb-toolbar"><label><input id="hdShipDbMissingOnly" type="checkbox"> 未所持だけ</label><label><input id="hdShipDbIncludeMaster" type="checkbox" checked> 全艦マスターも検索</label><button class="ghost small" type="button" data-hd-shipdb-reset>条件クリア</button><button class="ghost small" type="button" data-hd-ship-image-settings>艦娘画像</button><button class="ghost small" type="button" data-hd-open-equip-check>装備可否チェッカー</button></div><div class="hd-shipdb-image-filter-bar"><span id="hdShipDbImageCoverage" class="muted">画像確認中…</span><div><button class="ghost small active" type="button" data-hd-shipdb-image-filter="all">画像すべて</button><button class="ghost small" type="button" data-hd-shipdb-image-filter="registered">登録済み</button><button class="ghost small" type="button" data-hd-shipdb-image-filter="missing">未登録</button></div></div><div class="hd-shipdb-filters">${types.map((t,i)=>`<button class="ghost small${i===0?' active':''}" type="button" data-hd-shipdb-filter="${hdShipDbEsc(t)}">${hdShipDbEsc(t)}</button>`).join('')}</div><div id="hdShipDbList" class="hd-shipdb-list"></div><div><a class="guide-link" href="https://wikiwiki.jp/kancolle/%E6%94%B9%E9%80%A0/%E8%89%A6%E7%A8%AE%E5%88%A5%E4%B8%80%E8%A6%A7" target="_blank" rel="noopener">攻略Wiki 改造一覧で最新情報 ↗</a></div>`;
  roster.insertAdjacentElement('beforebegin',sec);
  const search=document.getElementById('hdShipDbSearch'),missing=document.getElementById('hdShipDbMissingOnly'),include=document.getElementById('hdShipDbIncludeMaster');
- if(search){search.value=String(view.query||'');search.addEventListener('input',()=>{hdShipDbViewSave({query:search.value});hdRenderShipDatabase()})}
+ if(search){search.value=String(view.query||'');search.addEventListener('input',()=>{hdShipDbViewSave({query:search.value});hdShipDbScheduleRender()})}
  if(missing){missing.checked=hdShipDbMissingOnly;missing.addEventListener('change',e=>{hdShipDbMissingOnly=e.target.checked;hdShipDbViewSave({missingOnly:hdShipDbMissingOnly});hdRenderShipDatabase()})}
  if(include){include.checked=hdShipDbIncludeMaster;include.addEventListener('change',e=>{hdShipDbIncludeMaster=e.target.checked;hdShipDbViewSave({includeMaster:hdShipDbIncludeMaster});hdRenderShipDatabase()})}
  document.querySelectorAll('[data-hd-shipdb-filter]').forEach(b=>b.classList.toggle('active',b.dataset.hdShipdbFilter===hdShipDbType));
