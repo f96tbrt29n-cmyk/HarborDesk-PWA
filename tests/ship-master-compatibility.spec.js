@@ -638,3 +638,56 @@ test('ship image library binds exact master IDs and keeps remodel forms separate
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('ship image coverage filter finds registered and missing exact forms', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    await window.hdShipImageDelete?.(541);
+    const good = new File([new Uint8Array([1,2,3,4])], '541.png', { type: 'image/png' });
+    const bad = new File([new Uint8Array([5,6,7])], 'unknown-ship.png', { type: 'image/png' });
+    const imported = await window.hdShipImageImportFiles?.([good, bad]);
+    const coverage = await window.hdShipImageCoverage?.();
+    const hasNagato = window.hdShipImageHasLocalSync?.('長門改二');
+
+    window.hdEnsureShipDatabase?.();
+    const search = document.getElementById('hdShipDbSearch');
+    if (search) {
+      search.value = '長門改二';
+      search.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    document.querySelector('[data-hd-shipdb-image-filter="missing"]')?.click();
+    const missingText = document.getElementById('hdShipDbList')?.textContent || '';
+
+    document.querySelector('[data-hd-shipdb-image-filter="registered"]')?.click();
+    const registeredText = document.getElementById('hdShipDbList')?.textContent || '';
+    const coverageText = document.getElementById('hdShipDbImageCoverage')?.textContent || '';
+
+    await window.hdShipImageDelete?.(541);
+
+    return {
+      imported,
+      coverage,
+      hasNagato,
+      missingText,
+      registeredText,
+      coverageText
+    };
+  });
+
+  expect(data.imported.ok).toBe(1);
+  expect(data.imported.skip).toBe(1);
+  expect(data.imported.skipped[0].file).toBe('unknown-ship.png');
+  expect(data.imported.skipped[0].reason).toContain('解決');
+  expect(data.coverage.local).toBeGreaterThanOrEqual(1);
+  expect(data.coverage.total).toBeGreaterThan(data.coverage.local);
+  expect(data.hasNagato).toBeTruthy();
+  expect(data.missingText).not.toContain('長門改二');
+  expect(data.registeredText).toContain('長門改二');
+  expect(data.coverageText).toContain('画像');
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
