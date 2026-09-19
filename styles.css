@@ -99,3 +99,9 @@ dialog input,dialog select,dialog textarea{font-size:16px}
  .history-row [data-history-delete]{min-width:44px;min-height:44px}
  .hd-toast-action{min-height:40px;padding-inline:11px}
 }
+
+.empty.empty-action{display:grid;gap:9px;place-items:center;padding:20px 14px}
+.empty.empty-action strong{color:var(--text);font-size:14px}
+.empty.empty-action p{margin:0;max-width:34em;line-height:1.5;color:var(--muted)}
+.empty.empty-action .primary,.empty.empty-action .ghost{min-height:40px}
+@media(max-width:560px){.empty.empty-action{padding:18px 12px}.empty.empty-action .primary,.empty.empty-action .ghost{min-height:44px;min-width:148px}}
