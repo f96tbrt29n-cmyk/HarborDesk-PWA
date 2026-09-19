@@ -4459,3 +4459,25 @@ test('mobile header stays on one compact row', async ({ page }) => {
   expect(data.scrollWidth).toBeLessThanOrEqual(data.clientWidth+1);
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
+
+
+test('notification UI guides iPhone Home Screen setup', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>({
+    iphone:window.hdNotifyIsIOS?.('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)',5),
+    ipadDesktop:window.hdNotifyIsIOS?.('Mozilla/5.0 (Macintosh; Intel Mac OS X)',5),
+    desktop:window.hdNotifyIsIOS?.('Mozilla/5.0 (Macintosh; Intel Mac OS X)',0),
+    needInstall:window.hdNotifyUiState?.({ios:true,standalone:false,supported:true,permission:'default'}),
+    ready:window.hdNotifyUiState?.({ios:true,standalone:true,supported:true,permission:'default'}),
+    granted:window.hdNotifyUiState?.({ios:true,standalone:true,supported:true,permission:'granted'}),
+    denied:window.hdNotifyUiState?.({ios:true,standalone:true,supported:true,permission:'denied'})
+  }));
+  expect(data.iphone).toBe(true);
+  expect(data.ipadDesktop).toBe(true);
+  expect(data.desktop).toBe(false);
+  expect(data.needInstall).toBe('needs-install');
+  expect(data.ready).toBe('default');
+  expect(data.granted).toBe('granted');
+  expect(data.denied).toBe('denied');
+});
