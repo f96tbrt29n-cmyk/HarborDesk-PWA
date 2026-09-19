@@ -49,9 +49,10 @@ function ensureShipRosterDialog(){
   const name=document.getElementById('rosterName').value.trim();if(!name)return;
   const items=rosterLoad();
   const payload={name,masterId:rosterMasterId(name),type:document.getElementById('rosterType')?.value||'',level:document.getElementById('rosterLevel').value.trim(),remodel:document.getElementById('rosterRemodel').value.trim(),gear:document.getElementById('rosterGear').value.trim(),memo:document.getElementById('rosterMemo').value.trim(),tags:[...document.querySelectorAll('#rosterTagBox input:checked')].map(x=>x.value),updatedAt:Date.now()};
+  const editing=!!shipRosterEditId;
   if(shipRosterEditId){const i=items.findIndex(x=>x.id===shipRosterEditId);if(i>=0)items[i]={...items[i],...payload}}
   else items.push({id:rosterUid(),createdAt:Date.now(),...payload});
-  shipRosterEditId=null;rosterSave(items);
+  shipRosterEditId=null;rosterSave(items);window.hdToast?.(editing?'艦娘情報を更新したよ':'艦娘を登録したよ');
  });
 }
 
