@@ -366,6 +366,14 @@ function hdKcRenderSyncStatus(){
  if(el)el.textContent=s?`最終同期 ${new Date(s.syncedAt).toLocaleString('ja-JP')} ・ 艦娘${s.ships} / 装備${s.equipment} / 資源${s.materials} / 艦隊${s.decks} / 遠征${s.expeditions||0} / 入渠${s.docks||0} / 任務${s.quests||0} / 出撃${s.sorties||0}`:'まだ同期してないよ';
  if(headline)headline.textContent=s?'艦これデータは同期済み':'まず艦これから同期しよう';
  if(box)box.classList.toggle('is-synced',!!s);
+ const coverage=document.getElementById('hdKcSyncCoverage');
+ if(coverage){
+  if(!s)coverage.innerHTML='<span class="muted">同期すると取得状況がここに出るよ</span>';
+  else{
+   const rows=[['艦娘',s.ships,'母港'],['装備',s.equipment,'装備/母港'],['資源',s.materials,'母港'],['艦隊',s.decks,'編成/母港'],['任務',s.quests,'任務画面'],['遠征',s.expeditions,'母港'],['入渠',s.docks,'入渠/母港'],['出撃',s.sorties,'出撃後']];
+   coverage.innerHTML='<div class="hd-kc-coverage-chips">'+rows.map(([name,count,hint])=>{const n=Number(count)||0;return `<span class="${n>0?'ok':'zero'}"><b>${name}</b> ${n>0?n:'0（未取得/なし）'}</span>`}).join('')+'</div><small>0の項目を取り込みたい時は、艦これで該当画面を一度開いてから再送してね。任務→任務画面、出撃→実際の出撃後。</small>';
+  }
+ }
  const back=document.querySelector('[data-hd-kc-return-game]');if(back)back.hidden=sessionStorage.getItem('harbordesk-kc-return-game-v1')!=='1';
 }
 function hdKcCaptureBootstrap(){
@@ -477,7 +485,7 @@ function hdKcEnsureImport(){
  const sec=document.createElement('section');sec.id='kancolleImport';sec.className='advanced-section';sec.innerHTML=`
  <div class="section-head"><div><div class="eyebrow">GAME DATA IMPORT</div><h2>艦これゲーム内データ取込</h2></div><span class="muted">端末内処理</span></div>
  <div class="hd-kc-import card">
-  <div class="hd-kc-sync-overview"><div><span>連携状態</span><strong id="hdKcSyncHeadline">確認中…</strong></div><div class="hd-kc-sync-side"><div id="hdKcSyncLast" class="muted"></div><button type="button" class="ghost small" data-hd-kc-return-game hidden>艦これへ戻る</button></div></div>
+  <div class="hd-kc-sync-overview"><div><span>連携状態</span><strong id="hdKcSyncHeadline">確認中…</strong></div><div class="hd-kc-sync-side"><div id="hdKcSyncLast" class="muted"></div><button type="button" class="ghost small" data-hd-kc-return-game hidden>艦これへ戻る</button></div></div><div id="hdKcSyncCoverage" class="hd-kc-sync-coverage"></div>
   <div id="hdKcImportResult" class="hd-kc-import-result muted" aria-live="polite"></div>
   <details class="hd-kc-capture-guide" data-hd-kc-auto-guide open><summary>Userscripts 自動連携</summary><div><p>艦これを開くだけで対応APIを自動取得。ゲーム画面の「HarborDeskへ送る」でそのまま同期できるよ。</p><div class="hd-kc-import-actions"><a class="primary" href="./HarborDesk-Kancolle.user.js" target="_blank" rel="noopener">Userscripts版を確認・更新</a></div><ol><li>Userscriptsを有効にする</li><li>艦これを開き直す</li><li>母港・装備・任務などを一度開く</li><li>「HarborDeskへ送る」を押す</li></ol><small>リクエスト本文・api_token・Cookie・DMMログイン情報は保存しない。</small></div></details>
   <details class="hd-kc-capture-guide"><summary>その他の取込方法</summary><div>
