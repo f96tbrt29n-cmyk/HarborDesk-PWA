@@ -413,7 +413,7 @@ function hdKcCaptureBootstrap(){
 }
 function hdKcCaptureSource(){return '('+hdKcCaptureBootstrap.toString()+')()'}
 function hdKcCaptureBookmarklet(){return 'javascript:'+hdKcCaptureSource().replace(/[\r\n]+/g,' ')}
-function hdKcCaptureShortcutScript(){return hdKcCaptureSource()}
+function hdKcCaptureShortcutScript(){return `try{${hdKcCaptureSource()};completion('HarborDeskキャプチャを開始したよ')}catch(e){completion('HarborDeskキャプチャ失敗: '+String(e&&e.message||e))}`}
 async function hdKcCopyCaptureShortcut(){const code=hdKcCaptureShortcutScript();try{await navigator.clipboard.writeText(code);return true}catch{return false}}
 async function hdKcCopyCaptureHelper(){
  const code=hdKcCaptureBookmarklet();try{await navigator.clipboard.writeText(code);return true}catch{return false}
