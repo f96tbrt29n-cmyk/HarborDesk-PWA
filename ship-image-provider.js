@@ -161,7 +161,7 @@ function hdShipImageIntegritySummary(a){
 async function hdShipImageBuildBackup(){
  const rows=(await hdShipImageAll()).filter(x=>x?.blob&&Number(x.id)>0).sort((a,b)=>Number(a.id)-Number(b.id));
  const entries=rows.map(x=>({id:Number(x.id),name:String(x.name||''),type:String(x.type||x.blob.type||'application/octet-stream'),size:Number(x.blob.size)||0}));
- const manifest={format:'harbordesk-ship-images',version:1,createdAt:new Date().toISOString(),masterSource:window.HD_KANCOLLE_MASTER_SNAPSHOT?.source||null,config:hdShipImageConfig(),entries};
+ const manifest={format:'harbordesk-ship-images',version:1,createdAt:new Date().toISOString(),masterSource:window.HD_KANCOLLE_MASTER_SNAPSHOT?.source||null,config:hdShipImageConfig(),verify:hdShipImageVerifyLoad(),entries};
  const enc=new TextEncoder(),magic=enc.encode('HDSI1\n'),meta=enc.encode(JSON.stringify(manifest)),len=new Uint8Array(4);new DataView(len.buffer).setUint32(0,meta.byteLength,true);
  return {blob:new Blob([magic,len,meta,...rows.map(x=>x.blob)],{type:'application/x-harbordesk-ship-images'}),manifest};
 }
@@ -191,6 +191,7 @@ async function hdShipImageImportBackup(file){
  const parsed=await hdShipImageReadBackup(file);let ok=0;
  for(const x of parsed.items){if(await hdShipImagePut(x.id,x.blob,x.name,true))ok++}
  if(parsed.manifest?.config?.remoteTemplate!=null)localStorage.setItem(HD_SHIP_IMAGE_CONFIG_KEY,JSON.stringify({remoteTemplate:String(parsed.manifest.config.remoteTemplate||'')}));
+ if(parsed.manifest?.verify?.hashes)hdShipImageVerifySave(parsed.manifest.verify);
  await hdShipImageRefreshLocalIds();window.dispatchEvent(new CustomEvent('hd:ship-images-changed',{detail:{restore:true,ok,total:parsed.items.length}}));
  return {ok,total:parsed.items.length,manifest:parsed.manifest};
 }
