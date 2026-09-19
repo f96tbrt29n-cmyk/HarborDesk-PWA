@@ -17,3 +17,25 @@
  .roster-toolbar [data-roster-compact]{white-space:nowrap}
  .roster-toolbar #addShipRoster{grid-column:1/-1}
 }
+
+@media(max-width:620px){
+ .roster-section .roster-toolbar{
+  position:sticky;
+  top:calc(var(--hd-topbar-h,58px) + 66px);
+  z-index:6;
+  padding:8px;
+  margin:0 -4px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:rgba(8,24,38,.96);
+  backdrop-filter:blur(12px);
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+ }
+ .roster-section .roster-filters{
+  position:sticky;
+  top:calc(var(--hd-topbar-h,58px) + 194px);
+  z-index:5;
+  padding:6px 4px;
+  background:linear-gradient(180deg,rgba(7,21,33,.98),rgba(7,21,33,.9));
+ }
+}
