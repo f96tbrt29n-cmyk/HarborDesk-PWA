@@ -8787,14 +8787,15 @@ function hdShipDbEquipCatalog(){
  const cat=Array.isArray(window.HD_EQUIPMENT_CATALOG)?window.HD_EQUIPMENT_CATALOG:(typeof HD_EQUIPMENT_CATALOG!=='undefined'?HD_EQUIPMENT_CATALOG:[]);
  return Array.isArray(cat)?cat:[];
 }
+function hdShipDbOwnedEquipStackKey(name,star=0){return hdShipDbEquipNorm(name)+'@@'+Math.max(0,Number(star)||0)}
 function hdShipDbOwnedEquipInventory(){
  let rows=[];try{const x=JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]');rows=Array.isArray(x)?x:[]}catch{}
  const cat=hdShipDbEquipCatalog(),byName=new Map(cat.map(x=>[hdShipDbEquipNorm(x.name),x])),m=new Map();
  for(const row of rows){
-  const key=hdShipDbEquipNorm(row.name),count=Math.max(0,Number(row.count)||0);if(!key||!count)continue;
-  const item=byName.get(key)||{name:row.name,category:row.category||'',stats:{},tags:[],role:''};
-  const cur=m.get(key)||{key,name:row.name,count:0,maxStar:0,item};
-  cur.count+=count;cur.maxStar=Math.max(cur.maxStar,Math.max(0,Number(row.star)||0));m.set(key,cur);
+  const norm=hdShipDbEquipNorm(row.name),star=Math.max(0,Number(row.star)||0),key=hdShipDbOwnedEquipStackKey(row.name,star),count=Math.max(0,Number(row.count)||0);if(!norm||!count)continue;
+  const item=byName.get(norm)||{name:row.name,category:row.category||'',stats:{},tags:[],role:''};
+  const cur=m.get(key)||{key,norm,name:row.name,count:0,star,maxStar:star,item};
+  cur.count+=count;m.set(key,cur);
  }
  return m;
 }
