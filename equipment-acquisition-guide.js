@@ -65,6 +65,29 @@ function hdAGCandidates(kind){
   return hdAGScore(b)-hdAGScore(a);
  }).slice(0,8);
 }
+function hdAGMasterCandidates(shipId,wanted){
+ const row=window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips?.[String(shipId)];if(!row)return [];
+ const rows=hdAGCatalog().filter(item=>{
+  if(typeof hdShipDbMasterEquipmentMeta!=='function'||typeof hdShipDbMasterWantedMatch!=='function'||typeof hdShipDbMasterNormalCheck!=='function')return false;
+  const meta=hdShipDbMasterEquipmentMeta(item.name);if(!hdShipDbMasterWantedMatch(meta,wanted))return false;
+  return !!hdShipDbMasterNormalCheck(row,item.name)?.allowed;
+ });
+ const unique=[...new Map(rows.map(x=>[x.name,x])).values()];
+ return unique.sort((a,b)=>{
+  const am=hdAGMethod(a),bm=hdAGMethod(b),rank={develop:1,improve:2,quest:3,other:4,limited:5};
+  const ar=rank[am.key]||4,br=rank[bm.key]||4;if(ar!==br)return ar-br;
+  return hdAGScore(b)-hdAGScore(a);
+ }).slice(0,10);
+}
+function hdAGOpenMaster(shipId,wanted){
+ hdAGEnsureDialog();
+ const row=window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips?.[String(shipId)],d=document.getElementById('hdAcquisitionDialog'),list=document.getElementById('hdAcquisitionList'),title=document.getElementById('hdAcquisitionTitle'),note=document.getElementById('hdAcquisitionNote');
+ if(title)title.textContent=`${row?.name||'艦娘'}｜${wanted} の入手候補`;
+ if(note)note.textContent='公式マスターでこの艦の通常スロットに装備できる候補だけを表示。入手しやすさを優先して並べているよ。';
+ const rows=hdAGMasterCandidates(shipId,wanted);
+ if(list)list.innerHTML=rows.map(hdAGCandidateHtml).join('')||'<div class="empty">この条件で装備図鑑に登録済みの入手候補がないよ。</div>';
+ if(d&&!d.open)d.showModal();
+}
 function hdAGRecipeHtml(r,target=''){
  return `<div class="hd-ag-recipe"><strong>${hdAGEsc(r.title)}</strong><span>燃${r.fuel} / 弾${r.ammo} / 鋼${r.steel} / ボ${r.bauxite}</span><small>秘書艦: ${hdAGEsc(r.secretary)}｜${hdAGEsc(r.rates||'')}</small><button type="button" class="ghost small" data-hd-ag-development="${hdAGEsc(target||(r.targets||[])[0]||'')}">開発レシピへ</button></div>`;
 }
@@ -153,6 +176,7 @@ function hdAGInstall(){
 }
 document.addEventListener('click',e=>{
  const kind=e.target.closest?.('[data-hd-ag-kind]');if(kind){hdAGOpen(kind.dataset.hdAgKind,typeof selectedMap!=='undefined'?selectedMap:'');return}
+ const master=e.target.closest?.('[data-hd-master-acquire]');if(master){hdAGOpenMaster(master.dataset.hdMasterAcquire,master.dataset.hdMasterWanted||'');return}
  const direct=e.target.closest?.('[data-hd-ag-item]');if(direct){hdAGOpenItem(direct.dataset.hdAgItem,typeof selectedMap!=='undefined'?selectedMap:'');return}
  const dev=e.target.closest?.('[data-hd-ag-development]');if(dev){hdAGOpenDevelopment(dev.dataset.hdAgDevelopment);return}
  const imp=e.target.closest?.('[data-hd-ag-improvement]');if(imp){hdAGOpenImprovement(imp.dataset.hdAgImprovement);return}
