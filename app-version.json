@@ -1,7 +1,7 @@
 {
   "version": "1.0.148",
   "build": 148,
-  "releasedAt": "2026-09-19T16:24:00+09:00",
+  "releasedAt": "2026-09-19T16:26:00+09:00",
   "notes": "艦これゲーム同期を強化。Safariブックマークから実行できる受動キャプチャ補助を追加し、対象kcsapiレスポンスだけをHarborDesk用JSONへ縮小してコピー/保存可能。リクエスト本文・api_token・Cookie・DMM認証情報は記録しない。部分slot_item同期は既存装備へ安全に差分マージし、同じ装備個体の★変更はゲーム内装備個体IDで旧★スタックから新★スタックへ移動。Playwright実ブラウザ27/27ケース成功を確認。",
   "masterChanges": null
 }
