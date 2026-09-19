@@ -369,6 +369,21 @@ function hdKcCaptureBootstrap(){
  if(window.__HD_KC_CAPTURE?.show){window.__HD_KC_CAPTURE.show();return}
  const records=[],MAX_RECORDS=80,captureId='kc-cap-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8),origFetch=window.fetch,proto=window.XMLHttpRequest?.prototype,origOpen=proto?.open,origSend=proto?.send;
  const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/#kancolleImport',HARBOR_ORIGIN='https://f96tbrt29n-cmyk.github.io';
+ const frameInfo=()=>{
+  const rows=[...document.querySelectorAll('iframe')].map((frame,index)=>{
+   let src='';try{src=String(frame.getAttribute('src')||frame.src||'')}catch{}
+   let url=null;try{url=src?new URL(src,location.href):null}catch{}
+   const id=String(frame.id||''),name=String(frame.name||''),hint=(id+' '+name+' '+src).toLowerCase();
+   let area=0;try{const r=frame.getBoundingClientRect();area=Math.max(0,r.width)*Math.max(0,r.height)}catch{}
+   const likely=/game[_-]?frame|kancolle|app_id.?=.?854854|gadgets|osapi\.dmm|\/game\//i.test(hint);
+   const cross=!!(url&&url.origin!==location.origin);
+   return {index,frame,src,url,likely,cross,area,id,name};
+  });
+  rows.sort((a,b)=>(Number(b.likely)-Number(a.likely))||(b.area-a.area));
+  return {rows,candidate:rows.find(x=>x.likely&&x.url)||null};
+ };
+ const frameState=frameInfo();
+ const outerCandidate=frameState.candidate?.cross?frameState.candidate:null;
  const wanted=url=>/\/kcsapi\/(?:api_port\/port|api_get_member\/(?:ship2|slot_item|require_info|material|ndock|questlist)|api_req_map\/(?:start|next)|api_req_(?:sortie|combined_battle)\/battleresult)(?:$|[?#])/.test(String(url||''));
  const pathOf=url=>{try{return new URL(String(url||''),location.href).pathname}catch{return String(url||'').split(/[?#]/)[0]}};
  const parse=text=>{let t=String(text??'').trim();if(t.startsWith('svdata='))t=t.slice(7);try{return JSON.parse(t)}catch{return null}};
@@ -389,8 +404,10 @@ function hdKcCaptureBootstrap(){
   return null;
  };
  const exportObject=()=>({format:'harbordesk-kancolle-import',version:2,captureId,createdAt:new Date().toISOString(),records:records.map(x=>({endpoint:x.endpoint,payload:x.payload,at:x.at}))});
- let box=null,count=null;
- const render=()=>{if(count)count.textContent=String(records.length)};
+ let box=null,count=null,traffic=null,observer=null;
+ let trafficCount=(()=>{try{return performance.getEntriesByType('resource').filter(x=>/\/kcsapi\//.test(String(x?.name||''))).length}catch{return 0}})();
+ const render=()=>{if(count)count.textContent=String(records.length);if(traffic)traffic.textContent=String(trafficCount)};
+ const observeTraffic=()=>{try{if(typeof PerformanceObserver==='undefined')return;observer=new PerformanceObserver(list=>{let n=0;for(const e of list.getEntries())if(/\/kcsapi\//.test(String(e?.name||'')))n++;if(n){trafficCount+=n;render()}});observer.observe({type:'resource',buffered:false})}catch{}};
  const capture=(url,text)=>{
   if(!wanted(url))return;const path=pathOf(url),obj=parse(text),payload=minimize(path,obj);if(!payload)return;
   records.push({endpoint:path,payload,at:Date.now()});while(records.length>MAX_RECORDS)records.shift();render();
@@ -400,16 +417,24 @@ function hdKcCaptureBootstrap(){
  const download=()=>{const blob=new Blob([JSON.stringify(exportObject(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='HarborDesk-kancolle-capture.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200)};
  const show=()=>{
   if(box){box.hidden=false;return}
-  box=document.createElement('div');box.id='hd-kc-capture-panel';box.style.cssText='position:fixed;z-index:2147483647;right:8px;bottom:8px;width:min(330px,calc(100vw - 16px));padding:10px;border:1px solid #5f7892;border-radius:12px;background:#071521;color:#eef6ff;font:12px/1.45 -apple-system,BlinkMacSystemFont,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.45)';
-  box.innerHTML='<div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>HarborDesk 艦これ受動キャプチャ</b><button data-hd-hide style="background:none;border:0;color:#9eb7cb;font-size:18px">×</button></div><div style="margin:6px 0;color:#aac0d1">取得済みレスポンス <b data-hd-count>0</b> 件<br><small>リクエスト本文・api_token・Cookieは記録しません。</small></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button data-hd-send style="font-weight:700">HarborDeskへ送る</button><button data-hd-copy>JSONをコピー</button><button data-hd-download>JSON保存</button><button data-hd-clear>クリア</button></div>';
-  document.documentElement.appendChild(box);count=box.querySelector('[data-hd-count]');box.querySelector('[data-hd-send]').onclick=send;box.querySelector('[data-hd-copy]').onclick=copy;box.querySelector('[data-hd-download]').onclick=download;box.querySelector('[data-hd-clear]').onclick=()=>{records.length=0;render()};box.querySelector('[data-hd-hide]').onclick=()=>{box.hidden=true};render();
+  box=document.createElement('div');box.id='hd-kc-capture-panel';box.style.cssText='position:fixed;z-index:2147483647;right:8px;bottom:8px;width:min(350px,calc(100vw - 16px));padding:10px;border:1px solid #5f7892;border-radius:12px;background:#071521;color:#eef6ff;font:12px/1.45 -apple-system,BlinkMacSystemFont,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.45)';
+  if(outerCandidate){
+   const host=outerCandidate.url?.host||'別ドメイン';
+   box.innerHTML='<div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>HarborDesk 接続チェック</b><button data-hd-hide style="background:none;border:0;color:#9eb7cb;font-size:18px">×</button></div><div style="margin:7px 0;color:#aac0d1"><b style="color:#eef6ff">DMMの外側ページを検出したよ</b><br>このページからは艦これ本体の通信を直接読めない可能性が高い。<br><small>現在: '+location.host+' / 本体候補: '+host+' / iframe '+frameState.rows.length+'個</small></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button data-hd-open-game style="font-weight:700">ゲーム本体を開く</button></div><div style="margin-top:7px;color:#aac0d1"><small>本体を開いたあと、もう一度「共有 → HarborDeskキャプチャ」を実行してね。</small></div>';
+   document.documentElement.appendChild(box);box.querySelector('[data-hd-open-game]').onclick=()=>{location.href=outerCandidate.url.href};box.querySelector('[data-hd-hide]').onclick=()=>{box.hidden=true};return;
+  }
+  box.innerHTML='<div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>HarborDesk 艦これキャプチャ</b><button data-hd-hide style="background:none;border:0;color:#9eb7cb;font-size:18px">×</button></div><div style="margin:6px 0;color:#aac0d1"><b style="color:#9fe0b7">キャプチャ待機中</b><br>API通信検出 <b data-hd-traffic>0</b> / 取得済みレスポンス <b data-hd-count>0</b> 件<br><small>現在: '+location.host+' / iframe '+frameState.rows.length+'個</small><br><small>リクエスト本文・api_token・Cookieは記録しません。</small></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button data-hd-send style="font-weight:700">HarborDeskへ送る</button><button data-hd-copy>JSONをコピー</button><button data-hd-download>JSON保存</button><button data-hd-clear>クリア</button></div>';
+  document.documentElement.appendChild(box);count=box.querySelector('[data-hd-count]');traffic=box.querySelector('[data-hd-traffic]');box.querySelector('[data-hd-send]').onclick=send;box.querySelector('[data-hd-copy]').onclick=copy;box.querySelector('[data-hd-download]').onclick=download;box.querySelector('[data-hd-clear]').onclick=()=>{records.length=0;render()};box.querySelector('[data-hd-hide]').onclick=()=>{box.hidden=true};render();
  };
- if(typeof origFetch==='function')window.fetch=async function(...args){const res=await origFetch.apply(this,args);try{const url=typeof args[0]==='string'?args[0]:args[0]?.url;if(wanted(url))res.clone().text().then(t=>capture(url,t)).catch(()=>{})}catch{}return res};
- if(proto&&origOpen&&origSend){proto.open=function(method,url,...rest){this.__hdKcCaptureUrl=url;return origOpen.call(this,method,url,...rest)};proto.send=function(...args){if(wanted(this.__hdKcCaptureUrl))this.addEventListener('load',()=>{try{const text=this.responseType==='json'?JSON.stringify(this.response):this.responseText;capture(this.__hdKcCaptureUrl,text)}catch{}},{once:true});return origSend.apply(this,args)}}
- const restore=()=>{if(typeof origFetch==='function')window.fetch=origFetch;if(proto&&origOpen)proto.open=origOpen;if(proto&&origSend)proto.send=origSend;if(box)box.remove();delete window.__HD_KC_CAPTURE};
- window.__HD_KC_CAPTURE={records,exportObject,show,send,clear:()=>{records.length=0;render()},restore,capture};
+ if(!outerCandidate){
+  if(typeof origFetch==='function')window.fetch=async function(...args){const res=await origFetch.apply(this,args);try{const url=typeof args[0]==='string'?args[0]:args[0]?.url;if(wanted(url))res.clone().text().then(t=>capture(url,t)).catch(()=>{})}catch{}return res};
+  if(proto&&origOpen&&origSend){proto.open=function(method,url,...rest){this.__hdKcCaptureUrl=url;return origOpen.call(this,method,url,...rest)};proto.send=function(...args){if(wanted(this.__hdKcCaptureUrl))this.addEventListener('load',()=>{try{const text=this.responseType==='json'?JSON.stringify(this.response):this.responseText;capture(this.__hdKcCaptureUrl,text)}catch{}},{once:true});return origSend.apply(this,args)}}
+  observeTraffic();
+ }
+ const restore=()=>{if(typeof origFetch==='function')window.fetch=origFetch;if(proto&&origOpen)proto.open=origOpen;if(proto&&origSend)proto.send=origSend;try{observer?.disconnect()}catch{}if(box)box.remove();delete window.__HD_KC_CAPTURE};
+ window.__HD_KC_CAPTURE={records,exportObject,show,send,mode:outerCandidate?'outer':'capture',frameCount:frameState.rows.length,frameUrl:outerCandidate?.url?.href||'',clear:()=>{records.length=0;render()},restore,capture};
  show();
- for(const frame of document.querySelectorAll('iframe')){try{const w=frame.contentWindow;if(w&&w!==window&&!w.__HD_KC_CAPTURE)w.eval('('+hdKcCaptureBootstrap.toString()+')()')}catch{}}
+ if(!outerCandidate)for(const frame of document.querySelectorAll('iframe')){try{const w=frame.contentWindow;if(w&&w!==window&&!w.__HD_KC_CAPTURE)w.eval('('+hdKcCaptureBootstrap.toString()+')()')}catch{}}
 }
 function hdKcCaptureSource(){return '('+hdKcCaptureBootstrap.toString()+')()'}
 function hdKcCaptureBookmarklet(){return 'javascript:'+hdKcCaptureSource().replace(/[\r\n]+/g,' ')}
@@ -425,7 +450,7 @@ function hdKcEnsureImport(){
  <div class="hd-kc-import card">
   <div class="hd-kc-import-note"><strong>DMMのID・パスワード・Cookieは不要</strong><p>艦これAPIレスポンスから艦娘・装備・資源・現在艦隊・遠征/入渠・任務・出撃結果を抽出してHarborDeskへ反映する。貼り付けた生JSONは保存しないよ。</p></div>
   <div class="hd-kc-import-actions"><label class="ghost hd-kc-import-file">JSONファイルを選ぶ<input id="hdKcImportFile" type="file" accept=".json,.txt,application/json,text/plain"></label><button type="button" class="ghost" data-hd-kc-paste>クリップボードから貼る</button></div>
-  <details class="hd-kc-capture-guide" open><summary>iPhone / Safariでゲーム通信を拾う（かんたん設定）</summary><div><p><b>おすすめ:</b> iPhoneの「ショートカット」に1回だけ登録すると、以後は艦これ画面で「共有 → HarborDeskキャプチャ」を押すだけで開始できる。取得後はゲーム画面の「HarborDeskへ送る」で直接転送できるよ。</p><div class="hd-kc-import-actions"><button type="button" class="primary" data-hd-kc-copy-shortcut>ショートカット用JSをコピー</button><button type="button" class="ghost" data-hd-kc-copy-capture>従来のブックマーク用コード</button></div><ol><li>「ショートカット用JSをコピー」</li><li>ショートカットAppで新規作成 → 「WebページでJavaScriptを実行」を追加して貼る</li><li>詳細で「共有シートに表示」をON、受け入れを「SafariのWebページ」にする</li><li>艦これをSafariで開き、共有 → 作ったショートカットを実行</li><li>プレイ後、画面に出た「HarborDeskへ送る」を押す</li></ol><small>HarborDeskが別タブで開き、取得データを直接受信して解析する。クリップボード貼り付けは不要。DMM側のページ/iframe構成によっては取得できない場合があるよ。リクエスト本文・api_token・Cookieは記録しない。</small></div></details>
+  <details class="hd-kc-capture-guide" open><summary>iPhone / Safariでゲーム通信を拾う（かんたん設定）</summary><div><p><b>おすすめ:</b> iPhoneの「ショートカット」に1回だけ登録すると、以後は艦これ画面で「共有 → HarborDeskキャプチャ」を押すだけで開始できる。取得後はゲーム画面の「HarborDeskへ送る」で直接転送できるよ。</p><div class="hd-kc-import-actions"><button type="button" class="primary" data-hd-kc-copy-shortcut>ショートカット用JSをコピー</button><button type="button" class="ghost" data-hd-kc-copy-capture>従来のブックマーク用コード</button></div><ol><li>「ショートカット用JSをコピー」</li><li>ショートカットAppで「WebページでJavaScriptを実行」へ貼る</li><li>「共有シートに表示」をON、受け入れを「SafariのWebページ」にする</li><li>艦これをSafariで開き、共有 → HarborDeskキャプチャ</li><li>「DMMの外側ページ」と出たら「ゲーム本体を開く」→ 本体側でもう一度共有 → HarborDeskキャプチャ</li><li>「キャプチャ待機中」になったら母港/装備/任務などを操作し、「HarborDeskへ送る」</li></ol><small>HarborDeskが別タブで開き、取得データを直接受信して解析する。クリップボード貼り付けは不要。DMM側のページ/iframe構成によっては取得できない場合があるよ。リクエスト本文・api_token・Cookieは記録しない。</small></div></details>
   <textarea id="hdKcImportText" spellcheck="false" placeholder="svdata={...} または複数APIをまとめたJSONを貼り付け"></textarea>
   <div class="hd-kc-import-actions"><button type="button" class="primary" data-hd-kc-parse>内容を解析</button><button type="button" class="ghost" data-hd-kc-clear>入力を消す</button></div>
   <div id="hdKcImportPreview" class="hd-kc-import-preview">${hdKcPreviewHtml(null)}</div>
