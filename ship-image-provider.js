@@ -15,6 +15,28 @@ function hdShipImageResolve(ref){
  const row=hdShipImageRows().find(x=>String(x.name||'').trim()===raw);
  return row?{id:Number(row.id),name:String(row.name||'')}:null;
 }
+function hdShipIdentityStatus(input){
+ const name=String(input?.name??input?.ship??(typeof input==='string'?input:'')).trim(),id=Number(input?.masterId??input?.id)||0;
+ const byId=id?window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips?.[String(id)]||null:null;
+ const byName=name?hdShipImageRows().find(x=>String(x.name||'').trim()===name)||null:null;
+ if(id&&byId){
+  const canonical=String(byId.name||'');
+  return {status:name&&name!==canonical?'mismatch':'exact',id:Number(byId.id),name,canonical,resolved:true,master:byId};
+ }
+ if(id&&!byId){
+  return {status:byName?'invalid-id':'unresolved',id,name,canonical:String(byName?.name||''),resolved:!!byName,master:byName||null,suggestedId:Number(byName?.id)||0};
+ }
+ if(!id&&byName){
+  return {status:'missing-id',id:0,name,canonical:String(byName.name||''),resolved:true,master:byName,suggestedId:Number(byName.id)||0};
+ }
+ return {status:'unresolved',id,name,canonical:'',resolved:false,master:null,suggestedId:0};
+}
+function hdShipIdentityRef(input){
+ const s=hdShipIdentityStatus(input);
+ if(s.id&&s.master)return {id:s.id,name:s.canonical||s.name};
+ if(s.suggestedId&&s.master)return {id:s.suggestedId,name:s.canonical||s.name};
+ return s.name||'';
+}
 function hdShipImageConfig(){
  try{const x=JSON.parse(localStorage.getItem(HD_SHIP_IMAGE_CONFIG_KEY)||'{}');return {remoteTemplate:String(x.remoteTemplate||'').trim()}}catch{return {remoteTemplate:''}}
 }
