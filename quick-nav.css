@@ -66,3 +66,8 @@ body.hd-workspace-mode{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 .hd-mobile-attention-list small{font-size:9px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hd-mobile-attention-list i{font-style:normal;color:var(--accent2);font-size:18px}
 @media(min-width:561px){.hd-mobile-attention-dialog{display:none}}
+
+@media(max-width:560px){
+ .hd-mobile-dock [data-hd-mobile-menu].has-context:not(.active){color:#c9e8fb}
+ .hd-mobile-dock [data-hd-mobile-menu].has-context:not(.active) span{filter:saturate(.9)}
+}
