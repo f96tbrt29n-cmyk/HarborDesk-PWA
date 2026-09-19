@@ -162,6 +162,31 @@ function hdWSSyncMissingGuide(missing=[]){
  if(set.has('docks'))steps.push('入渠');
  return [...new Set(steps)];
 }
+function hdWSSyncChecklistRows(info){
+ const labels={ships:'艦娘',equipment:'装備',resources:'資源',fleets:'艦隊',quests:'任務',docks:'入渠'};
+ if(info?.state==='fresh')return [];
+ if(info?.state==='missing')return [
+  {screen:'母港',gets:'艦娘・資源・現在艦隊'},
+  {screen:'装備・改装',gets:'装備'},
+  {screen:'任務',gets:'任務'},
+  {screen:'入渠',gets:'入渠'}
+ ];
+ const missing=Array.isArray(info?.missing)?info.missing:[],set=new Set(missing),rows=[];
+ if(set.has('ships')||set.has('resources')||set.has('fleets')){
+  const gets=['ships','resources','fleets'].filter(k=>set.has(k)).map(k=>labels[k]);rows.push({screen:'母港',gets:gets.join('・')||'艦娘・資源・現在艦隊'});
+ }
+ if(set.has('equipment'))rows.push({screen:'装備・改装',gets:'装備'});
+ if(set.has('quests'))rows.push({screen:'任務',gets:'任務'});
+ if(set.has('docks'))rows.push({screen:'入渠',gets:'入渠'});
+ if(info?.state==='stale'&&!rows.length)rows.push({screen:'母港',gets:'現在の艦隊・資源状態'});
+ return rows;
+}
+function hdWSSyncChecklistHtml(info){
+ const rows=hdWSSyncChecklistRows(info);if(!rows.length)return '';
+ const items=rows.map((x,i)=>`<li><span>${i+1}</span><div><b>${hdWSEsc(x.screen)}を開く</b><small>${hdWSEsc(x.gets)}を更新</small></div></li>`).join('');
+ const last=rows.length+1;
+ return `<div class="hd-sync-checklist"><b>同期を完了する手順</b><ol>${items}<li class="send"><span>${last}</span><div><b>HarborDeskへ送る</b><small>艦これ右下のボタンを押せば完了</small></div></li></ol></div>`;
+}
 function hdWSEnsureSyncDialog(){
  if(document.getElementById('hdSyncStatusDialog'))return document.getElementById('hdSyncStatusDialog');
  const d=document.createElement('dialog');d.id='hdSyncStatusDialog';d.className='hd-sync-status-dialog';
@@ -170,12 +195,12 @@ function hdWSEnsureSyncDialog(){
 }
 function hdWSOpenSyncStatus(){
  const info=hdWSSyncInfo();
- const d=hdWSEnsureSyncDialog(),body=document.getElementById('hdSyncStatusBody'),labels={ships:'艦娘',equipment:'装備',resources:'資源',fleets:'艦隊',quests:'任務',docks:'入渠'},steps=hdWSSyncMissingGuide(info.missing);
+ const d=hdWSEnsureSyncDialog(),body=document.getElementById('hdSyncStatusBody'),labels={ships:'艦娘',equipment:'装備',resources:'資源',fleets:'艦隊',quests:'任務',docks:'入渠'};
  const missingHtml=info.missing?.length?'<div class="hd-sync-missing"><b>未取得</b><div>'+info.missing.map(k=>'<span>'+hdWSEsc(labels[k]||k)+'</span>').join('')+'</div></div>':'';
- const guideHtml=steps.length?'<div class="hd-sync-guide"><b>艦これで一度開く</b><p>'+steps.map(hdWSEsc).join(' → ')+'</p><small>画面を開いたあと、艦これ右下の「HarborDeskへ送る」を押してね。</small></div>':'';
+ const checklistHtml=hdWSSyncChecklistHtml(info);
  const statusText=info.state==='missing'?'まだゲームデータを同期してないよ':info.state==='stale'?'前回同期から時間が空いてるよ':info.state==='partial'?'一部のデータがまだ取れてないよ':'ゲームデータは最新だよ';
  const freshHtml=info.state==='fresh'?'<div class="hd-sync-guide"><b>最新状態</b><p>このまま使ってOK</p><small>艦これでプレイを進めたあと、必要な時だけ再同期してね。</small></div>':'';
- if(body)body.innerHTML='<strong>'+hdWSEsc(statusText)+'</strong><p>'+hdWSEsc(info.detail||'')+'</p>'+missingHtml+guideHtml+freshHtml;
+ if(body)body.innerHTML='<strong>'+hdWSEsc(statusText)+'</strong><p>'+hdWSEsc(info.detail||'')+'</p>'+missingHtml+checklistHtml+freshHtml;
  if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');return true;
 }
 function hdWSEnsureSyncStatus(){
