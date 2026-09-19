@@ -5199,3 +5199,37 @@ test('home current fleet card switches decks and opens ships', async ({ page }) 
   expect(after.text).toContain('遠征中');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('synced fleet preserves hp and Home highlights low hp', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const parsed={
+      ships:new Map([
+        [101,{api_ship_id:0,api_lv:88,api_nowhp:10,api_maxhp:40,api_cond:49,api_slot:[],api_slot_ex:0}],
+        [102,{api_ship_id:0,api_lv:70,api_nowhp:20,api_maxhp:40,api_cond:40,api_slot:[],api_slot_ex:0}]
+      ]),
+      slotItems:new Map(),
+      decks:new Map([[1,{api_id:1,api_name:'第1艦隊',api_mission:[0,0,0,0],api_ship:[101,102,-1,-1,-1,-1]}]])
+    };
+    window.hdKcApplyDecks?.(parsed);
+    const rows=JSON.parse(localStorage.getItem('harbordesk-kancolle-fleets-v1')||'[]');
+    rows[0].ships[0].name='加賀改';rows[0].ships[1].name='赤城改';
+    localStorage.setItem('harbordesk-kancolle-fleets-v1',JSON.stringify(rows));
+    window.renderHomeDashboard?.();
+    return {
+      stored:rows[0].ships.map(x=>({nowHp:x.nowHp,maxHp:x.maxHp,cond:x.cond})),
+      danger:document.querySelectorAll('#homeCurrentFleet .home-fleet-ships>button.danger').length,
+      warn:document.querySelectorAll('#homeCurrentFleet .home-fleet-ships>button.warn').length,
+      text:document.getElementById('homeCurrentFleet')?.textContent||''
+    };
+  });
+  expect(data.stored[0]).toEqual({nowHp:10,maxHp:40,cond:49});
+  expect(data.stored[1]).toEqual({nowHp:20,maxHp:40,cond:40});
+  expect(data.danger).toBe(1);
+  expect(data.warn).toBe(1);
+  expect(data.text).toContain('HP25%以下 1隻');
+  expect(data.text).toContain('HP 10/40');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
