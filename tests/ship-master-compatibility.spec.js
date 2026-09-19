@@ -4324,3 +4324,21 @@ test('global search history supports individual undoable removal', async ({ page
   expect(data.clearFn).toContain('元に戻す');
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
+
+
+test('mobile dialog actions stay reachable', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  await page.setViewportSize({width:390,height:844});
+  const data=await page.evaluate(()=>{
+    const dialog=document.getElementById('timerDialog');
+    if(dialog && !dialog.open)dialog.showModal();
+    const actions=dialog?.querySelector('.dialog-actions');
+    const ds=dialog?getComputedStyle(dialog):null,as=actions?getComputedStyle(actions):null;
+    return {dialogMax:ds?.maxHeight||'',dialogOverflow:ds?.overflowY||ds?.overflow||'',actionPosition:as?.position||'',actionBottom:as?.bottom||''};
+  });
+  expect(data.actionPosition).toBe('sticky');
+  expect(data.actionBottom).toBe('0px');
+  expect(data.dialogMax).not.toBe('none');
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
