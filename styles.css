@@ -196,3 +196,9 @@ body.hd-booting::after{
 .quest-recent{display:flex;gap:6px;overflow-x:auto;padding:2px 0 1px;scrollbar-width:none}
 .quest-recent::-webkit-scrollbar{display:none}
 .quest-recent button{flex:0 0 auto;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;padding:7px 9px}
+
+.timer-recent{display:flex;gap:6px;overflow-x:auto;padding:1px 0 3px;scrollbar-width:none}
+.timer-recent::-webkit-scrollbar{display:none}
+.timer-recent button{display:grid;gap:1px;flex:0 0 auto;max-width:190px;text-align:left;padding:7px 9px}
+.timer-recent button span{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.timer-recent button small{font-size:9px;color:var(--accent2)}
