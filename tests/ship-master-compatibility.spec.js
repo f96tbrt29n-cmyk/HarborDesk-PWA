@@ -453,8 +453,10 @@ test('same-tab equipment save immediately advances procurement state', async ({ 
     ]));
 
     window.hdPLRender?.();
+    window.renderHomeDashboard?.();
     const before = {
       next: document.querySelector('#hdProcurementNextAction')?.textContent || '',
+      homeNext: document.querySelector('#homeProcurement')?.textContent || '',
       demand: window.hdPLDemandRows?.(window.hdPLLoad?.()[0]?.gearItems || [])?.[0] || null
     };
 
@@ -465,6 +467,7 @@ test('same-tab equipment save immediately advances procurement state', async ({ 
     const after = {
       next: document.querySelector('#hdProcurementNextAction')?.textContent || '',
       nextCards: document.querySelectorAll('#hdProcurementNextAction .hd-pl-next-action').length,
+      homeNext: document.querySelector('#homeProcurement')?.textContent || '',
       demand: window.hdPLDemandRows?.(window.hdPLLoad?.()[0]?.gearItems || [])?.[0] || null
     };
 
@@ -472,12 +475,14 @@ test('same-tab equipment save immediately advances procurement state', async ({ 
   });
 
   expect(data.before.next).toContain('41cm連装砲');
+  expect(data.before.homeNext).toContain('41cm連装砲');
   expect(data.before.demand.needed).toBe(2);
   expect(data.before.demand.owned).toBe(1);
   expect(data.before.demand.shortfall).toBe(1);
 
   expect(data.after.nextCards).toBe(0);
   expect(data.after.next).not.toContain('41cm連装砲');
+  expect(data.after.homeNext).not.toContain('41cm連装砲');
   expect(data.after.demand.needed).toBe(2);
   expect(data.after.demand.owned).toBe(2);
   expect(data.after.demand.shortfall).toBe(0);
