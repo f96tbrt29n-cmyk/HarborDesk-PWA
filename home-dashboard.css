@@ -200,3 +200,6 @@ button.home-next-main{cursor:pointer}
 .home-next-action.sortie{border-color:rgba(240,185,90,.46);background:linear-gradient(135deg,rgba(240,185,90,.1),rgba(10,30,47,.92))}
 .home-next-action.sortie .home-next-main>span{color:#f1cb80}
 .home-next-action.sortie .home-next-main>strong{color:#fff1c9}
+
+.home-next-fix{white-space:nowrap;align-self:center}
+@media(max-width:520px){.home-next-fix{width:100%;min-height:40px}}
