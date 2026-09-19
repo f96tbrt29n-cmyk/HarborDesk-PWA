@@ -3345,3 +3345,22 @@ test('empty states provide direct next actions', async ({ page }) => {
   expect(filtered.shipReset).toBe(true);
   expect(filtered.equipReset).toBe(true);
 });
+
+
+test('accessibility styles support reduced motion and visible focus', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const sheets=[...document.styleSheets];
+    let css='';
+    for(const sheet of sheets){try{css += [...sheet.cssRules].map(r=>r.cssText).join('\n')}catch{}}
+    return {
+      focus:css.includes(':focus-visible'),
+      reduced:css.includes('prefers-reduced-motion'),
+      tap:css.includes('touch-action: manipulation')||css.includes('touch-action:manipulation')
+    };
+  });
+  expect(data.focus).toBe(true);
+  expect(data.reduced).toBe(true);
+  expect(data.tap).toBe(true);
+});
