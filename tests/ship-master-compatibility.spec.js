@@ -2577,7 +2577,7 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
       hasKancolleServerMatch:text.includes('@match        https://*.kancolle-server.com/*'),
       hasLegacyServerInclude:text.includes('125\\.6'),
       hasKcsapiFilter:text.includes('/kcsapi/'),
-      hasDirectSend:text.includes("#kcimport="),
+      hasDirectSend:text.includes("HARBORDESK_KC_IMPORT_V1:"),
       usesPopup:text.includes('window.open('),
       hasTokenStorage:text.includes('api_token=') || text.includes('Cookie='),
       hasNoFrames:text.includes('@noframes')
@@ -2624,6 +2624,29 @@ test('Userscripts same-tab handoff auto-syncs', async ({ page }) => {
   expect(data.materials).toEqual(expect.objectContaining({fuel:12345,ammo:23456,steel:34567,bauxite:45678}));
   expect(data.sync.materials).toBe(4);
   expect(data.hash).toBe('#kancolleImport');
+  expect(data.result).toContain('Userscriptsから自動同期完了');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
+
+
+test('Userscripts window.name handoff auto-syncs', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const payload={
+      format:'harbordesk-kancolle-import',version:2,source:'userscripts',captureId:'test-window-name',
+      records:[{endpoint:'/kcsapi/api_get_member/material',at:1,payload:{api_result:1,api_data:[
+        {api_id:1,api_value:11111},{api_id:2,api_value:22222},{api_id:3,api_value:33333},{api_id:4,api_value:44444}
+      ]}}]
+    };
+    window.name='HARBORDESK_KC_IMPORT_V1:'+JSON.stringify(payload);
+    const ok=await window.hdKcConsumeWindowNameImport();
+    const materials=JSON.parse(localStorage.getItem('harbordesk-kancolle-materials-v1')||'{}');
+    return {ok,materials,name:window.name,result:document.getElementById('hdKcImportResult')?.textContent||''};
+  });
+  expect(data.ok).toBe(true);
+  expect(data.materials).toEqual(expect.objectContaining({fuel:11111,ammo:22222,steel:33333,bauxite:44444}));
+  expect(data.name).toBe('');
   expect(data.result).toContain('Userscriptsから自動同期完了');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
