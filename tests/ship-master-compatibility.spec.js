@@ -4504,3 +4504,18 @@ test('Kancolle sync coverage distinguishes captured zero from missing', async ({
   expect(data.coverage).toContain('装備 未取得');
   expect(data.recommendation).toContain('装備画面を一度開く');
 });
+
+
+test('mobile keyboard state hides floating UI', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>({
+    closed:window.hdWSShouldTreatKeyboardOpen?.(700,680,true),
+    open:window.hdWSShouldTreatKeyboardOpen?.(700,430,true),
+    noInput:window.hdWSShouldTreatKeyboardOpen?.(700,430,false)
+  }));
+  expect(data.closed).toBe(false);
+  expect(data.open).toBe(true);
+  expect(data.noInput).toBe(false);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
