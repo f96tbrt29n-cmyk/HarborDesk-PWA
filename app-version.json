@@ -1,7 +1,7 @@
 {
-  "version": "1.0.151",
-  "build": 151,
-  "releasedAt": "2026-09-19T17:30:00+09:00",
-  "notes": "ゲーム同期をさらに統合。同期した現在艦隊を自分用編成へ再利用でき、ゲーム内の遠征状態と入渠ドック状態をHarborDeskのタイマーへ反映。iPhone/Safari受動キャプチャ、部分slot_item差分同期、同一装備個体の改修★移動追跡も維持。Browser Regressionは外部ネットワーク依存を隔離し、最新mainでPlaywright実ブラウザ29/29ケース成功を確認。",
+  "version": "1.0.152",
+  "build": 152,
+  "releasedAt": "2026-09-19T17:31:00+09:00",
+  "notes": "ゲーム同期に任務を追加。api_get_member/questlist の受託中・達成任務、任務名、進捗フラグをHarborDeskの任務一覧へ反映。複数ページは取得済みページを追跡し、全ページが揃った時だけゲーム由来任務を全置換、部分取得時は該当任務だけ差分更新するため手動任務や未取得ページを壊さない。Safari受動キャプチャもquestlistを必要項目だけに縮小して対応。回帰テスト追加・JavaScript構文検証済み。",
   "masterChanges": null
 }
