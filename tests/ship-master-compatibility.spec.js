@@ -3306,3 +3306,42 @@ test('global search is one tap from header and shows destination hints', async (
   expect(data.dest.length).toBeGreaterThan(0);
   expect(data.owned).toBe(true);
 });
+
+
+test('empty states provide direct next actions', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({expeditions:[],docks:[],quests:[],resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}}));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([]));
+  });
+  await boot(page,errors);
+  const first=await page.evaluate(()=>{
+    window.render?.();window.renderShipRoster?.();
+    return {
+      expedition:!!document.querySelector('#expeditionList [data-empty-add-timer="expedition"]'),
+      dock:!!document.querySelector('#dockList [data-empty-add-timer="dock"]'),
+      quest:!!document.querySelector('#questList [data-empty-add-quest]'),
+      roster:!!document.querySelector('#shipRosterList [data-empty-roster-add]')
+    };
+  });
+  expect(first.expedition).toBe(true);
+  expect(first.dock).toBe(true);
+  expect(first.quest).toBe(true);
+  expect(first.roster).toBe(true);
+
+  const filtered=await page.evaluate(()=>{
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'a',name:'加賀改',level:94,tags:[]}]));
+    window.renderShipRoster?.();
+    const input=document.getElementById('shipRosterSearch');if(input){input.value='存在しない艦';input.dispatchEvent(new Event('input',{bubbles:true}))}
+    window.hdEnsureShipDatabase?.();const shipInput=document.getElementById('hdShipDbSearch');if(shipInput){shipInput.value='存在しない艦';shipInput.dispatchEvent(new Event('input',{bubbles:true}))}
+    window.hdEnsureEquipmentCatalog?.();const equipInput=document.getElementById('hdEquipCatalogSearch');if(equipInput){equipInput.value='存在しない装備';equipInput.dispatchEvent(new Event('input',{bubbles:true}))}
+    return {
+      rosterReset:!!document.querySelector('#shipRosterList [data-empty-roster-reset]'),
+      shipReset:!!document.querySelector('#hdShipDbList [data-hd-shipdb-empty-reset]'),
+      equipReset:!!document.querySelector('#hdEquipCatalogList [data-hd-equip-reset]')
+    };
+  });
+  expect(filtered.rosterReset).toBe(true);
+  expect(filtered.shipReset).toBe(true);
+  expect(filtered.equipReset).toBe(true);
+});
