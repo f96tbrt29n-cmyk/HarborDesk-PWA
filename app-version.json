@@ -2,6 +2,6 @@
   "version": "1.0.147",
   "build": 147,
   "releasedAt": "2026-09-19T16:00:00+09:00",
-  "notes": "艦これゲーム内データ取込ブリッジを追加。api_port/port・ship2・slot_item・require_info内slot_item・api_materialのJSONを端末内で解析し、艦隊台帳へMASTER ID/Lv/HP/cond/装備、装備台帳へ所持個数/改修★/熟練度分布、資源、現在艦隊を同期。svdata=形式・複数APIバンドル・JSONファイル・クリップボード入力に対応。DMM認証情報やapi_token、生レスポンスは保存しない。Playwright実ブラウザ25/25ケース成功を確認。",
+  "notes": "艦これゲーム内データ取込ブリッジを追加。port・ship2・slot_item・require_info内slot_item・materialのJSONを端末内で解析し、艦隊台帳へMASTER ID/Lv/HP/cond/装備、装備台帳へ所持個数/改修★/熟練度分布、資源、現在艦隊を同期。svdata形式・複数APIバンドル・JSONファイル・クリップボード入力に対応。DMMのログイン情報やCookie、生レスポンスは保存しない。Playwright実ブラウザ25/25ケース成功を確認。",
   "masterChanges": null
 }
