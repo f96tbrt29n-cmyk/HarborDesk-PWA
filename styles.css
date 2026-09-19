@@ -296,3 +296,10 @@ body.hd-booting::after{
  .topbar .hd-global-sync-status{flex:0 0 auto}
  .topbar .hd-header-more{flex:0 0 auto}
 }
+
+/* iPhone landscape safe-area */
+@supports(padding:max(0px)){
+ .topbar{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
+ main{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
+ dialog{max-width:calc(100vw - max(24px,env(safe-area-inset-left) + env(safe-area-inset-right) + 16px))}
+}
