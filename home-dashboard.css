@@ -182,3 +182,17 @@ button.home-next-main{cursor:pointer}
 .home-fleet-readiness.ok b{border-color:rgba(91,205,143,.5);background:rgba(26,91,60,.3);color:#bdf1cf}
 .home-fleet-readiness.warn b{border-color:rgba(239,191,93,.52);background:rgba(96,68,23,.3);color:#f1d28a}
 .home-fleet-readiness.check b{border-color:rgba(239,126,126,.5);background:rgba(92,38,42,.3);color:#ffb6ba}
+
+.home-fleet-issues{display:grid;gap:6px;padding:8px 9px;border:1px solid rgba(239,191,93,.24);border-radius:11px;background:rgba(74,51,18,.18)}
+.home-fleet-issues>span{font-size:9px;color:#e8c97f;font-weight:800}
+.home-fleet-issues>div{display:grid;gap:5px}
+.home-fleet-issues button{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"name arrow" "state arrow";gap:1px 8px;align-items:center;width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:#0c2131;color:var(--text);text-align:left}
+.home-fleet-issues button b{grid-area:name;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.home-fleet-issues button small{grid-area:state;font-size:9px;color:var(--muted)}
+.home-fleet-issues button i{grid-area:arrow;font-style:normal;color:var(--accent2);font-size:15px}
+.home-fleet-issues button.warn{border-color:rgba(239,191,93,.5);background:rgba(86,62,22,.24)}
+.home-fleet-issues button.warn small{color:#f0cf82}
+.home-fleet-issues button.danger{border-color:rgba(244,116,116,.58);background:rgba(90,34,39,.28)}
+.home-fleet-issues button.danger small{color:#ffb1b1;font-weight:800}
+.home-fleet-issues button:active{transform:scale(.988)}
+@media(max-width:520px){.home-fleet-issues button{min-height:42px}}
