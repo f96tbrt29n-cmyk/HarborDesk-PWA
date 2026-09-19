@@ -2936,3 +2936,39 @@ test('mobile workspace uses compact section picker', async ({ page }) => {
   expect(data.value).toBe('home');
   expect(data.secondaryDisplay).toBe('none');
 });
+
+
+test('database condition reset buttons clear active filters', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-roster-view-v1', JSON.stringify({query:'加賀',filter:'主力',sort:'name'}));
+    sessionStorage.setItem('harbordesk-session-shipdb-view-v1', JSON.stringify({query:'榛名',type:'高速戦艦',missingOnly:true,includeMaster:false,imageFilter:'missing'}));
+    sessionStorage.setItem('harbordesk-session-equip-catalog-view-v1', JSON.stringify({query:'電探',filter:'小型水上電探'}));
+  });
+  await boot(page,errors);
+  await page.evaluate(()=>{
+    document.querySelector('[data-roster-reset]')?.click();
+    window.hdEnsureShipDatabase?.();document.querySelector('[data-hd-shipdb-reset]')?.click();
+    window.hdEnsureEquipmentCatalog?.();document.querySelector('[data-hd-equip-reset]')?.click();
+  });
+  const data=await page.evaluate(()=>({
+    rosterQuery:document.getElementById('shipRosterSearch')?.value||'',
+    rosterFilter:document.querySelector('[data-roster-filter].active')?.dataset.rosterFilter||'',
+    rosterSort:document.getElementById('shipRosterSort')?.value||'',
+    shipQuery:document.getElementById('hdShipDbSearch')?.value||'',
+    shipType:document.querySelector('[data-hd-shipdb-filter].active')?.dataset.hdShipdbFilter||'',
+    shipMissing:!!document.getElementById('hdShipDbMissingOnly')?.checked,
+    shipMaster:!!document.getElementById('hdShipDbIncludeMaster')?.checked,
+    equipQuery:document.getElementById('hdEquipCatalogSearch')?.value||'',
+    equipFilter:document.querySelector('[data-hd-equip-filter].active')?.dataset.hdEquipFilter||''
+  }));
+  expect(data.rosterQuery).toBe('');
+  expect(data.rosterFilter).toBe('all');
+  expect(data.rosterSort).toBe('level');
+  expect(data.shipQuery).toBe('');
+  expect(data.shipType).toBe('すべて');
+  expect(data.shipMissing).toBe(false);
+  expect(data.shipMaster).toBe(true);
+  expect(data.equipQuery).toBe('');
+  expect(data.equipFilter).toBe('すべて');
+});
