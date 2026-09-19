@@ -4619,3 +4619,24 @@ test('Userscript panel can minimize without disappearing', async ({ page }) => {
   expect(data.full.button).toBe('−');
   expect(data.full.state).toBe(false);
 });
+
+
+test('mobile global search lives inside header menu', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  await page.setViewportSize({width:390,height:844});
+  const data=await page.evaluate(()=>{
+    window.hdEnsureUpdateUI?.();
+    window.hdGSEnsure?.();
+    const topSearch=document.querySelector('.topbar>.hd-gs-header-btn');
+    const menuSearch=document.querySelector('.hd-header-more [data-hd-gs-open]');
+    return {
+      topSearchDisplay:topSearch?getComputedStyle(topSearch).display:'missing',
+      menuSearch:!!menuSearch,
+      menuText:menuSearch?.textContent||''
+    };
+  });
+  expect(data.topSearchDisplay).toBe('none');
+  expect(data.menuSearch).toBe(true);
+  expect(data.menuText).toContain('全体検索');
+});
