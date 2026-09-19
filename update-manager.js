@@ -149,6 +149,8 @@ function hdEnsureUpdateUI(){
     controls.innerHTML=`<summary aria-label="HarborDeskメニュー" title="バージョン・更新"><span aria-hidden="true">•••</span></summary><div class="hd-version-menu"><span class="hd-version-badge" title="HarborDesk バージョン">v${HD_APP_VERSION}</span><button id="hdUpdateCheck" class="ghost small hd-update-check" aria-label="更新確認"><span aria-hidden="true">↻</span><b>更新確認</b></button></div>`;
     header.appendChild(controls)
   }
+  const notify=document.getElementById('notifyBtn'),menu=document.querySelector('.hd-header-more .hd-version-menu');
+  if(notify&&menu&&notify.parentElement!==menu){notify.classList.add('hd-notify-btn');menu.prepend(notify)}
   document.getElementById('hdUpdateNow')?.addEventListener('click',hdForceUpdate);
   document.getElementById('hdUpdateCheck')?.addEventListener('click',()=>{hdCheckForUpdate(true);document.querySelector('.hd-header-more')?.removeAttribute('open')});
 }
