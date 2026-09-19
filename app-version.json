@@ -1,7 +1,7 @@
 {
-  "version": "1.0.172",
-  "build": 172,
-  "releasedAt": "2026-09-19T22:53:00+09:00",
-  "notes": "Userscripts艦これ連携の受け渡しをgzip圧縮URLフラグメント方式へ変更。Safariのクロスサイト移動でwindow.nameが消える問題を回避し、圧縮/展開はstream.pipeThrough方式でデッドロックを避ける。HarborDesk到着後にフラグメントを消して自動同期する。",
+  "version": "1.0.173",
+  "build": 173,
+  "releasedAt": "2026-09-19T23:01:00+09:00",
+  "notes": "更新バナーの『今すぐ更新』を強化。クリック処理を直接onclickと捕捉イベントで二重化し、HarborDeskのService Worker登録解除・PWAキャッシュ削除・キャッシュバスター付き再読込を行う強制更新方式へ変更。",
   "masterChanges": null
 }
