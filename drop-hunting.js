@@ -315,7 +315,7 @@ document.addEventListener('click',e=>{
  const add=e.target.closest?.('[data-hd-drop-target]');if(add){hdAddDropTarget(add.dataset.hdDropTarget,add.dataset.hdDropMap,add.dataset.hdDropNode);return}
  const inc=e.target.closest?.('[data-hd-hunt-add]');if(inc){const rows=hdDropHunts(),h=rows.find(x=>x.id===inc.dataset.hdHuntAdd);if(h){h.runs=(h.runs||0)+1;if(inc.dataset.field==='s')h.s=(h.s||0)+1;if(inc.dataset.field==='a')h.a=(h.a||0)+1;hdDropSave(rows)}return}
  const got=e.target.closest?.('[data-hd-hunt-obtained]');if(got){const rows=hdDropHunts(),h=rows.find(x=>x.id===got.dataset.hdHuntObtained);if(h){h.obtained=!h.obtained;h.obtainedAt=h.obtained?Date.now():null;hdDropSave(rows)}return}
- const del=e.target.closest?.('[data-hd-hunt-delete]');if(del){hdDropSave(hdDropHunts().filter(x=>x.id!==del.dataset.hdHuntDelete));return}
+ const del=e.target.closest?.('[data-hd-hunt-delete]');if(del){const rows=hdDropHunts(),i=rows.findIndex(x=>String(x.id)===String(del.dataset.hdHuntDelete));if(i<0)return;const [item]=rows.splice(i,1);hdDropSave(rows);window.hdToastAction?.(`${item.ship||'掘り目標'} を削除したよ`,'元に戻す',()=>{const current=hdDropHunts();if(!current.some(x=>String(x.id)===String(item.id))){current.splice(Math.min(i,current.length),0,item);hdDropSave(current);window.hdToast?.('元に戻したよ')}},6500);return}
  const rr=e.target.closest?.('[data-hd-hunt-roster]');if(rr){const h=hdDropHunts().find(x=>x.id===rr.dataset.hdHuntRoster);if(h&&typeof openShipRosterDialog==='function'){openShipRosterDialog({name:h.ship,memo:`${h.map} ${h.node}で入手。HarborDesk掘り記録 ${h.runs||0}周。`})}}
 });
 window.addEventListener('load',()=>setTimeout(hdEnsureDropDb,340));setTimeout(hdEnsureDropDb,520);
