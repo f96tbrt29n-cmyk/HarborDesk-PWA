@@ -1,12 +1,15 @@
 const HD_EQUIP_KEY='harbordesk-equipment-v1';
 const HD_EVENT_KEY='harbordesk-events-v1';
 const HD_RESOURCE_HISTORY_KEY='harbordesk-resource-history-v1';
+const HD_EQUIP_LEDGER_VIEW_KEY='harbordesk-session-equipment-ledger-view-v1';
 
 function hdLoad(key,fallback=[]){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
 function hdSave(key,value){localStorage.setItem(key,JSON.stringify(value));if(key===HD_EQUIP_KEY)window.dispatchEvent(new CustomEvent('hd:equipment-changed',{detail:{key,at:Date.now()}}))}
 function hdEsc(s){return typeof esc==='function'?esc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdUid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)}
 function hdFmtDate(ts){return new Date(ts).toLocaleString('ja-JP')}
+function hdEquipLedgerViewLoad(){try{return JSON.parse(sessionStorage.getItem(HD_EQUIP_LEDGER_VIEW_KEY)||'{}')||{}}catch{return {}}}
+function hdEquipLedgerViewSave(patch={}){const next={...hdEquipLedgerViewLoad(),...patch};try{sessionStorage.setItem(HD_EQUIP_LEDGER_VIEW_KEY,JSON.stringify(next))}catch{}return next}
 
 function ensureAdvancedSections(){
  const main=document.querySelector('main');
@@ -16,7 +19,7 @@ function ensureAdvancedSections(){
  wrap.id='advancedToolsWrap';
  wrap.innerHTML=`
  <section id="dashboard" class="advanced-section"><div class="section-head"><div><div class="eyebrow">COMMAND BOARD</div><h2>司令部ダッシュボード</h2></div><span class="muted">端末内データ集計</span></div><div id="dashboardCards" class="dashboard-grid"></div></section>
- <section id="equipmentBook" class="advanced-section"><div class="section-head"><div><div class="eyebrow">EQUIPMENT BOOK</div><h2>装備台帳・改修目標</h2></div><button id="addEquipment" class="primary small">＋装備</button></div><div class="advanced-toolbar"><input id="equipmentSearch" type="search" placeholder="装備名・カテゴリ・担当艦・メモで検索"></div><div id="equipmentList" class="advanced-list"></div></section>
+ <section id="equipmentBook" class="advanced-section"><div class="section-head"><div><div class="eyebrow">EQUIPMENT BOOK</div><h2>装備台帳・改修目標</h2></div><div class="advanced-head-actions"><span id="equipmentLedgerCount" class="muted">0件</span><button id="addEquipment" class="primary small">＋装備</button></div></div><div class="advanced-toolbar equipment-ledger-toolbar"><input id="equipmentSearch" type="search" placeholder="装備名・カテゴリ・担当艦・メモで検索"><button type="button" class="ghost small" data-eq-search-clear disabled>クリア</button></div><div id="equipmentList" class="advanced-list"></div></section>
  <section id="resourceHistory" class="advanced-section"><div class="section-head"><div><div class="eyebrow">RESOURCE LOG</div><h2>資源履歴</h2></div><button id="snapshotResources" class="ghost small">現在値を記録</button></div><div id="resourceTrend" class="dashboard-grid"></div><div id="resourceHistoryList" class="advanced-list"></div></section>
  <section id="eventLog" class="advanced-section"><div class="section-head"><div><div class="eyebrow">EVENT LOG</div><h2>イベント記録</h2></div><button id="addEventLog" class="primary small">＋記録</button></div><div id="eventLogList" class="advanced-list"></div></section>
  <section id="calculators" class="advanced-section"><div class="section-head"><div><div class="eyebrow">TOOLS</div><h2>計算ツール</h2></div><span class="muted">制空・遠征効率</span></div>
@@ -28,6 +31,7 @@ function ensureAdvancedSections(){
  <section id="backup" class="advanced-section"><div class="section-head"><div><div class="eyebrow">DATA</div><h2>バックアップ / 復元</h2></div><span class="muted">HarborDeskデータ</span></div><div class="backup-actions"><button id="exportBackup" class="primary">バックアップを書き出す</button><label class="ghost backup-file">バックアップを読み込む<input id="importBackup" type="file" accept="application/json,.json"></label></div><p class="muted">艦隊台帳、自分用編成、装備、イベント、資源履歴、任務、タイマーなどHarborDeskの端末内データをJSONで保存・復元できる。<b>艦娘画像は容量が大きいため別バックアップ</b>。艦娘DBの「艦娘画像」から書き出してね。</p></section>`;
  main.insertBefore(wrap,resources);
  ensureAdvancedDialogs();
+ const eqView=hdEquipLedgerViewLoad(),eqSearch=document.getElementById('equipmentSearch');if(eqSearch)eqSearch.value=String(eqView.query||'');
  renderAllAdvanced();
  bindAdvancedEvents();
 }
@@ -53,6 +57,8 @@ function renderDashboard(){
 function renderEquipment(){
  const el=document.getElementById('equipmentList');if(!el)return;const q=(document.getElementById('equipmentSearch')?.value||'').toLowerCase(),all=hdLoad(HD_EQUIP_KEY,[]);
  const rows=all.filter(x=>!q||`${x.name} ${x.category} ${x.assigned} ${x.memo}`.toLowerCase().includes(q));
+ const count=document.getElementById('equipmentLedgerCount');if(count)count.textContent=rows.length===all.length?`${all.length}件`:`${rows.length} / ${all.length}件`;
+ const clear=document.querySelector('[data-eq-search-clear]');if(clear)clear.disabled=!q;
  const empty=all.length===0
   ?'<div class="empty empty-action"><strong>装備はまだ登録されてないよ</strong><p>ゲーム同期で取り込むか、ここから手動で追加できるよ。</p><div><button type="button" class="primary small" data-empty-add-equipment>＋ 装備を追加</button> <button type="button" class="ghost small" data-empty-open-sync>ゲーム同期</button></div></div>'
   :'<div class="empty empty-action"><strong>条件に合う装備がないよ</strong><p>検索語を消すと装備一覧へ戻れるよ。</p><button type="button" class="ghost small" data-empty-eq-reset>検索をクリア</button></div>';
@@ -83,13 +89,13 @@ function hdApplyBackupLocalStorage(storage){if(!storage||typeof storage!=='objec
 async function importBackup(file){try{const obj=JSON.parse(await file.text());if(!obj?.localStorage)throw new Error();hdApplyBackupLocalStorage(obj.localStorage);alert('バックアップ時点のHarborDeskデータへ復元したよ。画面を再読み込みするね。');location.reload()}catch{alert('HarborDeskのバックアップJSONを読み込めなかったよ')}}
 
 function bindAdvancedEvents(){
- document.getElementById('addEquipment').onclick=()=>openEquipment();document.getElementById('equipmentSearch').addEventListener('input',renderEquipment);
+ document.getElementById('addEquipment').onclick=()=>openEquipment();document.getElementById('equipmentSearch').addEventListener('input',e=>{hdEquipLedgerViewSave({query:e.target.value});renderEquipment()});
  document.getElementById('equipmentForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const rows=hdLoad(HD_EQUIP_KEY,[]),id=document.getElementById('equipmentId').value||hdUid();const item={id,name:document.getElementById('equipmentName').value.trim(),category:document.getElementById('equipmentCategory').value.trim(),count:Number(document.getElementById('equipmentCount').value)||0,star:Number(document.getElementById('equipmentStar').value)||0,targetStar:Number(document.getElementById('equipmentTargetStar').value)||0,assigned:document.getElementById('equipmentAssigned').value.trim(),memo:document.getElementById('equipmentMemo').value.trim(),updatedAt:Date.now()};const i=rows.findIndex(x=>x.id===id);if(i>=0)rows[i]={...rows[i],...item};else rows.unshift({...item,createdAt:Date.now()});hdSave(HD_EQUIP_KEY,rows);setTimeout(()=>{renderEquipment();renderDashboard()},0)});
  document.getElementById('snapshotResources').onclick=snapshotResources;const sr=document.getElementById('saveResources');if(sr)sr.addEventListener('click',()=>setTimeout(snapshotResources,0));
  document.getElementById('addEventLog').onclick=()=>openEvent();document.getElementById('eventForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const rows=hdLoad(HD_EVENT_KEY,[]),id=document.getElementById('eventId').value||hdUid();const item={id,eventName:document.getElementById('eventName').value.trim(),map:document.getElementById('eventMap').value.trim(),difficulty:document.getElementById('eventDifficulty').value,status:document.getElementById('eventStatus').value,drop:document.getElementById('eventDrop').value.trim(),fleet:document.getElementById('eventFleet').value.trim(),memo:document.getElementById('eventMemo').value.trim(),updatedAt:Date.now()};const i=rows.findIndex(x=>x.id===id);if(i>=0)rows[i]={...rows[i],...item};else rows.unshift({...item,createdAt:Date.now()});hdSave(HD_EVENT_KEY,rows);setTimeout(()=>{renderEvents();renderDashboard()},0)});
  document.addEventListener('click',e=>{
  if(e.target.closest('[data-empty-add-equipment]')){openEquipment();return}
- if(e.target.closest('[data-empty-eq-reset]')){const input=document.getElementById('equipmentSearch');if(input)input.value='';renderEquipment();return}
+ if(e.target.closest('[data-eq-search-clear]')||e.target.closest('[data-empty-eq-reset]')){const input=document.getElementById('equipmentSearch');if(input)input.value='';hdEquipLedgerViewSave({query:''});renderEquipment();return}
  if(e.target.closest('[data-empty-open-sync]')){if(typeof hdWSShowElement==='function')hdWSShowElement('kancolleImport',true);else document.getElementById('kancolleImport')?.scrollIntoView({behavior:'smooth',block:'start'});return}
  if(e.target.closest('[data-empty-resource-snapshot]')){snapshotResources();return}
  if(e.target.closest('[data-empty-add-event]')){openEvent();return}
