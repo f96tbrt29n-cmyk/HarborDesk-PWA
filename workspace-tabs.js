@@ -170,12 +170,12 @@ function hdWSEnsureSyncDialog(){
 }
 function hdWSOpenSyncStatus(){
  const info=hdWSSyncInfo();
- if(info.state==='fresh'){if(typeof hdWSShowElement==='function'&&hdWSShowElement('kancolleImport',true))return true;document.getElementById('kancolleImport')?.scrollIntoView({behavior:'smooth',block:'start'});return true}
  const d=hdWSEnsureSyncDialog(),body=document.getElementById('hdSyncStatusBody'),labels={ships:'艦娘',equipment:'装備',resources:'資源',fleets:'艦隊',quests:'任務',docks:'入渠'},steps=hdWSSyncMissingGuide(info.missing);
  const missingHtml=info.missing?.length?'<div class="hd-sync-missing"><b>未取得</b><div>'+info.missing.map(k=>'<span>'+hdWSEsc(labels[k]||k)+'</span>').join('')+'</div></div>':'';
  const guideHtml=steps.length?'<div class="hd-sync-guide"><b>艦これで一度開く</b><p>'+steps.map(hdWSEsc).join(' → ')+'</p><small>画面を開いたあと、艦これ右下の「HarborDeskへ送る」を押してね。</small></div>':'';
- const statusText=info.state==='missing'?'まだゲームデータを同期してないよ':info.state==='stale'?'前回同期から時間が空いてるよ':'一部のデータがまだ取れてないよ';
- if(body)body.innerHTML='<strong>'+hdWSEsc(statusText)+'</strong><p>'+hdWSEsc(info.detail||'')+'</p>'+missingHtml+guideHtml;
+ const statusText=info.state==='missing'?'まだゲームデータを同期してないよ':info.state==='stale'?'前回同期から時間が空いてるよ':info.state==='partial'?'一部のデータがまだ取れてないよ':'ゲームデータは最新だよ';
+ const freshHtml=info.state==='fresh'?'<div class="hd-sync-guide"><b>最新状態</b><p>このまま使ってOK</p><small>艦これでプレイを進めたあと、必要な時だけ再同期してね。</small></div>':'';
+ if(body)body.innerHTML='<strong>'+hdWSEsc(statusText)+'</strong><p>'+hdWSEsc(info.detail||'')+'</p>'+missingHtml+guideHtml+freshHtml;
  if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');return true;
 }
 function hdWSEnsureSyncStatus(){
