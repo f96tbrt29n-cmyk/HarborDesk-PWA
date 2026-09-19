@@ -62,3 +62,12 @@
  body.hd-keyboard-open .hd-ws-shell{padding-top:4px;padding-bottom:4px}
  body.hd-keyboard-open .hd-ws-mobile-picker{display:none!important}
 }
+
+.hd-ws-swipe-hint{display:none}
+@media(max-width:560px){
+ .hd-ws-swipe-hint{width:100%;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:5px;padding:5px 8px;border:0;border-radius:9px;background:rgba(50,116,158,.2);color:#bfe7ff;font:inherit}
+ .hd-ws-swipe-hint span{font-size:13px}
+ .hd-ws-swipe-hint b{font-size:9px}
+ .hd-ws-swipe-hint small{font-size:11px;color:var(--muted)}
+ body.hd-keyboard-open .hd-ws-swipe-hint{display:none}
+}
