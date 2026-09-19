@@ -9211,11 +9211,11 @@ function hdShipDbMasterResolveOwnedPlan(row,plan){
  return {slots,filled:slots.filter(x=>x.found).length,total:slots.length,inventoryCount:stacks.reduce((s,x)=>s+x.count,0),freeSlots:[...free]};
 }
 function hdShipDbMasterOwnedPlanHtml(row,plan){
- const r=hdShipDbMasterResolveOwnedPlan(row,plan);
- if(!r.inventoryCount)return '<div class="hd-master-owned-plan empty"><b>手持ち装備</b><span>装備台帳が空。登録すると実物装備へ自動変換するよ。</span></div>';
+ const r=hdShipDbMasterResolveOwnedPlan(row,plan),procure=`<button type="button" class="primary small hd-master-procure" data-hd-master-procure="${row.id}" data-hd-master-plan="${hdShipDbEsc(plan?.name||'')}">不足を調達リストへ</button>`;
+ if(!r.inventoryCount)return `<div class="hd-master-owned-plan empty"><b>手持ち装備</b><span>装備台帳が空。登録すると実物装備へ自動変換するよ。</span>${procure}</div>`;
  const cls=r.filled===r.total?'complete':r.filled?'partial':'missing';
  const rows=[...r.slots].sort((a,b)=>(a.slotIndex??99)-(b.slotIndex??99));
- return `<div class="hd-master-owned-plan ${cls}"><div class="hd-master-owned-head"><b>手持ちで組む</b><span>${r.filled}/${r.total}枠</span></div><div class="hd-master-owned-items">${rows.map(x=>x.found?`<span class="owned"><i>✓</i><b>${hdShipDbEsc(x.name)}${x.star?` ★${x.star}`:''}</b><small>第${x.slotIndex+1}スロ・${x.capacity}機｜所持${x.ownedTotal}</small></span>`:`<span class="missing"><i>!</i><b>不足: ${hdShipDbEsc(x.wanted)}</b><small>装備台帳に候補なし</small><button type="button" class="ghost small" data-hd-master-acquire="${row.id}" data-hd-master-wanted="${hdShipDbEsc(x.wanted)}">この艦に積める入手候補</button></span>`).join('')}</div></div>`;
+ return `<div class="hd-master-owned-plan ${cls}"><div class="hd-master-owned-head"><b>手持ちで組む</b><span>${r.filled}/${r.total}枠</span></div><div class="hd-master-owned-items">${rows.map(x=>x.found?`<span class="owned"><i>✓</i><b>${hdShipDbEsc(x.name)}${x.star?` ★${x.star}`:''}</b><small>第${x.slotIndex+1}スロ・${x.capacity}機｜所持${x.ownedTotal}</small></span>`:`<span class="missing"><i>!</i><b>不足: ${hdShipDbEsc(x.wanted)}</b><small>装備台帳に候補なし</small><button type="button" class="ghost small" data-hd-master-acquire="${row.id}" data-hd-master-wanted="${hdShipDbEsc(x.wanted)}">この艦に積める入手候補</button></span>`).join('')}</div>${r.filled<r.total?procure:''}</div>`;
 }
 function hdShipDbMasterSuggestedHtml(row){
  const plans=hdShipDbMasterSuggestedLoadouts(row);if(!plans.length)return '';
