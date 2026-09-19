@@ -124,6 +124,15 @@ document.getElementById('saveResources').onclick=()=>{['fuel','ammo','steel','ba
 
 const secretaryLines=['提督、3-2・5-5・6-5・7-5はアプリ内で攻略要点まで見られるようにしたよ。','攻略で迷ったら上の海域ボタンから選んで。必要なところだけ一緒に見よ。','遠征の帰投時刻はこっちで見てるよ。焦らずいこう。','任務、ひとつずつ片付けよ。全部いっぺんにやらなくていいから。','資源の記録、あとで効いてくるよ。今日の分だけ残しておこ。'];
 document.getElementById('secretaryRefresh').onclick=()=>{document.getElementById('secretaryText').textContent=secretaryLines[Math.floor(Math.random()*secretaryLines.length)]};
-document.getElementById('notifyBtn').onclick=async()=>{if(!('Notification'in window)){alert('このブラウザでは通知APIが使えないみたい');return}const result=await Notification.requestPermission();document.getElementById('notifyBtn').textContent=result==='granted'?'通知ON':'通知OFF'};
+function updateNotifyButton(){
+ const btn=document.getElementById('notifyBtn');if(!btn)return;
+ let state='unsupported';if('Notification'in window)state=Notification.permission||'default';
+ btn.dataset.notifyState=state;
+ const label=state==='granted'?'通知ON':state==='denied'?'通知OFF':state==='default'?'通知':'通知不可';
+ btn.innerHTML=`<span aria-hidden="true">${state==='granted'?'🔔':state==='denied'?'🔕':'🔔'}</span><b>${label}</b>`;
+ btn.setAttribute('aria-label',state==='granted'?'通知は許可済み':state==='denied'?'通知はブロックされています':'通知を設定');
+}
+document.getElementById('notifyBtn').onclick=async()=>{if(!('Notification'in window)){alert('このブラウザでは通知APIが使えないみたい');return}await Notification.requestPermission();updateNotifyButton()};
+updateNotifyButton();
 function tick(){const now=Date.now();document.querySelectorAll('.timer-time').forEach(el=>{const end=Number(el.dataset.end);el.textContent=fmt(end-now);el.closest('.timer')?.classList.toggle('done',end<=now)});for(const [kind,arr] of [['遠征',state.expeditions],['入渠',state.docks]])for(const t of arr){if(t.endsAt<=now&&!notified.has(t.id)){notified.add(t.id);if(Notification.permission==='granted')new Notification(`HarborDesk: ${kind}完了`,{body:`${t.name} が完了したよ`})}}}
 setInterval(tick,1000);if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));render();tick();
