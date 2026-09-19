@@ -119,28 +119,41 @@ function hdKcMergeEquipment(parsed){
  const equipMap=hdKcMasterEquipMap(),idByName=new Map([...equipMap.values()].map(x=>[String(x.name||''),Number(x.id)||0])),existing=(()=>{try{const x=JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]');return Array.isArray(x)?x:[]}catch{return []}})();
  const rowKey=row=>`${Number(row?.masterEquipId)||idByName.get(String(row?.name||''))||0}@@${Math.max(0,Number(row?.star)||0)}`,meta=new Map();
  for(const row of existing)meta.set(rowKey(row),row);
- const groups=new Map(),details=[];
+
+ let oldDetails=[];try{const x=JSON.parse(localStorage.getItem('harbordesk-kancolle-equipment-detail-v1')||'[]');oldDetails=Array.isArray(x)?x:[]}catch{}
+ const oldById=new Map(oldDetails.map(x=>[Number(x?.gameEquipId)||0,x]).filter(([id])=>id)),incoming=[];
  for(const item of parsed.slotItems.values()){
-  const mid=Number(item.api_slotitem_id),star=Math.max(0,Number(item.api_level)||0),master=equipMap.get(mid),name=master?.name||`装備ID ${mid}`,category=master?.typeName||'未解決',key=`${mid}@@${star}`;
-  const cur=groups.get(key)||{masterEquipId:mid,name,category,star,count:0,proficiency:{}};
-  cur.count++;const alv=Math.max(0,Number(item.api_alv)||0);cur.proficiency[alv]=(cur.proficiency[alv]||0)+1;groups.set(key,cur);
-  details.push({gameEquipId:Number(item.api_id),masterEquipId:mid,star,alv});
+  const mid=Number(item.api_slotitem_id),star=Math.max(0,Number(item.api_level)||0),alv=Math.max(0,Number(item.api_alv)||0);
+  incoming.push({gameEquipId:Number(item.api_id),masterEquipId:mid,star,alv});
  }
- const next=[],touched=new Set(groups.keys());
+ let mergedDetails=incoming;
+ const changedOldKeys=new Set();
+ if(!parsed.completeSlotItems){
+  const byId=new Map(oldDetails.map(x=>[Number(x?.gameEquipId)||0,x]).filter(([id])=>id));
+  for(const x of incoming){
+   const old=oldById.get(Number(x.gameEquipId)||0);if(old)changedOldKeys.add(`${Number(old.masterEquipId)||0}@@${Math.max(0,Number(old.star)||0)}`);
+   byId.set(Number(x.gameEquipId)||0,x);
+  }
+  mergedDetails=[...byId.values()];
+ }
+
+ const groups=new Map();
+ for(const x of mergedDetails){
+  const mid=Number(x.masterEquipId),star=Math.max(0,Number(x.star)||0),master=equipMap.get(mid),name=master?.name||`装備ID ${mid}`,category=master?.typeName||'未解決',key=`${mid}@@${star}`;
+  const cur=groups.get(key)||{masterEquipId:mid,name,category,star,count:0,proficiency:{}};
+  cur.count++;const alv=Math.max(0,Number(x.alv)||0);cur.proficiency[alv]=(cur.proficiency[alv]||0)+1;groups.set(key,cur);
+ }
+
+ const next=[],represented=new Set(groups.keys());
  for(const [key,g] of groups){
   const old=meta.get(key)||{};
   next.push({...old,id:old.id||`kc-equip-${g.masterEquipId}-${g.star}`,name:g.name,category:g.category,count:g.count,star:g.star,targetStar:Number.isFinite(Number(old.targetStar))?Number(old.targetStar):g.star,assigned:old.assigned||'',memo:old.memo||'',masterEquipId:g.masterEquipId,source:'kancolle-import',syncedAt:Date.now(),proficiency:g.proficiency});
  }
  if(!parsed.completeSlotItems){
-  for(const row of existing)if(!touched.has(rowKey(row)))next.push(row);
+  for(const row of existing){const key=rowKey(row);if(!represented.has(key)&&!changedOldKeys.has(key))next.push(row)}
  }
+
  if(typeof hdSave==='function')hdSave('harbordesk-equipment-v1',next);else{localStorage.setItem('harbordesk-equipment-v1',JSON.stringify(next));window.dispatchEvent(new CustomEvent('hd:equipment-changed'))}
- let mergedDetails=details;
- if(!parsed.completeSlotItems){
-  let oldDetails=[];try{const x=JSON.parse(localStorage.getItem('harbordesk-kancolle-equipment-detail-v1')||'[]');oldDetails=Array.isArray(x)?x:[]}catch{}
-  const incomingIds=new Set(details.map(x=>Number(x.gameEquipId)||0));
-  mergedDetails=[...details,...oldDetails.filter(x=>!incomingIds.has(Number(x?.gameEquipId)||0))];
- }
  localStorage.setItem('harbordesk-kancolle-equipment-detail-v1',JSON.stringify(mergedDetails));
  return next.length;
 }
