@@ -5053,3 +5053,33 @@ test('home partial sync tells user which Kancolle screen to open', async ({ page
   expect(data.guide).toEqual(['装備・改装']);
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
+
+
+test('home distinguishes uncaptured quest and dock data from zero', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now()-60000,
+      ships:206,equipment:93,materials:8,decks:4,quests:0,docks:0,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:false,docks:false}
+    }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.renderHomeDashboard?.();
+    const info=window.homeSyncInfo?.();
+    return {
+      state:info?.state||'',
+      missing:info?.missing||[],
+      guide:window.homeSyncMissingGuide?.(info?.missing||[])||[],
+      card:document.getElementById('homeGameSync')?.textContent||'',
+      next:document.getElementById('homeNextAction')?.textContent||''
+    };
+  });
+  expect(data.state).toBe('partial');
+  expect(data.missing).toEqual(expect.arrayContaining(['任務','入渠']));
+  expect(data.guide).toEqual(expect.arrayContaining(['任務','入渠']));
+  expect(data.card).toContain('未取得: 任務・入渠');
+  expect(data.next).toContain('次に開く');
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
