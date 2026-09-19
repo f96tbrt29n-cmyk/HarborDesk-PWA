@@ -240,7 +240,7 @@ function hdKcApplyDecks(parsed){
   ships:(Array.isArray(deck.api_ship)?deck.api_ship:[]).filter(id=>Number(id)>0).map(id=>{
    const s=ships.get(Number(id)),m=s?hdKcMasterShip(s.api_ship_id):null,slotIds=[...(Array.isArray(s?.api_slot)?s.api_slot:[])];if(Number(s?.api_slot_ex)>0)slotIds.push(Number(s.api_slot_ex));
    const gear=slotIds.filter(x=>Number(x)>0).map(x=>parsed.slotItems.get(Number(x))).filter(Boolean).map(x=>hdKcEquipLabel(x,equipMap)).join(' / ');
-   return {gameShipId:Number(id),masterId:Number(s?.api_ship_id)||0,name:String(m?.name||''),level:Number(s?.api_lv)||0,gear}
+   return {gameShipId:Number(id),masterId:Number(s?.api_ship_id)||0,name:String(m?.name||''),level:Number(s?.api_lv)||0,nowHp:Number(s?.api_nowhp)||0,maxHp:Number(s?.api_maxhp)||0,cond:Number(s?.api_cond)||0,gear}
   }),
   syncedAt:Date.now()
  }));
