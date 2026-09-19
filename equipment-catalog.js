@@ -19,6 +19,9 @@ const HD_EQUIPMENT_CATALOG=[
  {name:'発煙装置(煙幕)',category:'艦載発煙装置',stats:{回避:1},tags:['煙幕','道中対策','回避'],improve:'改修可',obtain:'開発可能。任務等。',update:'上位の発煙装置改(煙幕)あり。',role:'煙幕システム用。複数搭載で展開成功・煙幕強度を高めやすい。敵電探装備には注意。'}
 ];
 
+const HD_EQUIP_CATALOG_VIEW_KEY='harbordesk-session-equip-catalog-view-v1';
+function hdEquipCatalogViewLoad(){try{return JSON.parse(sessionStorage.getItem(HD_EQUIP_CATALOG_VIEW_KEY)||'{}')||{}}catch{return {}}}
+function hdEquipCatalogViewSave(patch={}){const next={...hdEquipCatalogViewLoad(),...patch};try{sessionStorage.setItem(HD_EQUIP_CATALOG_VIEW_KEY,JSON.stringify(next))}catch{}return next}
 let hdEquipCatalogFilter='すべて';
 function hdEquipWikiUrl(name){return `https://wikiwiki.jp/kancolle/${encodeURIComponent(name)}`}
 function hdEquipStatText(item){const parts=Object.entries(item.stats||{}).map(([k,v])=>`${k}+${v}`);if(item.range)parts.push(`射程 ${item.range}`);if(item.radius!=null)parts.push(`半径 ${item.radius}`);return parts}
@@ -27,9 +30,10 @@ function hdEnsureEquipmentCatalog(){
  const sec=document.createElement('div');sec.id='hdEquipmentCatalog';sec.className='hd-equipment-catalog';
  sec.innerHTML=`<div class="hd-equip-catalog-head"><div><div class="eyebrow">EQUIPMENT DATABASE</div><h3>攻略装備データベース</h3><p class="muted">性能・用途・改修・入手をまとめて確認。データは攻略Wikiの現行情報を要約。</p></div><span id="hdEquipCatalogCount" class="muted"></span></div><div class="hd-equip-search"><input id="hdEquipCatalogSearch" type="search" placeholder="装備名・用途・カテゴリで検索"></div><div id="hdEquipCatalogFilters" class="hd-equip-filters"></div><div id="hdEquipCatalogList" class="hd-equip-catalog-list"></div>`;
  const toolbar=book.querySelector('.advanced-toolbar');if(toolbar)book.insertBefore(sec,toolbar);else book.appendChild(sec);
- const cats=['すべて',...new Set(HD_EQUIPMENT_CATALOG.map(x=>x.category))];
- document.getElementById('hdEquipCatalogFilters').innerHTML=cats.map(c=>`<button class="ghost small${c==='すべて'?' active':''}" type="button" data-hd-equip-filter="${hdEsc(c)}">${hdEsc(c)}</button>`).join('');
- document.getElementById('hdEquipCatalogSearch').addEventListener('input',hdRenderEquipmentCatalog);
+ const cats=['すべて',...new Set(HD_EQUIPMENT_CATALOG.map(x=>x.category))],view=hdEquipCatalogViewLoad();
+ hdEquipCatalogFilter=cats.includes(view.filter)?view.filter:'すべて';
+ document.getElementById('hdEquipCatalogFilters').innerHTML=cats.map(c=>`<button class="ghost small${c===hdEquipCatalogFilter?' active':''}" type="button" data-hd-equip-filter="${hdEsc(c)}">${hdEsc(c)}</button>`).join('');
+ const search=document.getElementById('hdEquipCatalogSearch');if(search){search.value=String(view.query||'');search.addEventListener('input',()=>{hdEquipCatalogViewSave({query:search.value});hdRenderEquipmentCatalog()})}
  hdRenderEquipmentCatalog();
 }
 function hdRenderEquipmentCatalog(){
@@ -40,7 +44,7 @@ function hdRenderEquipmentCatalog(){
  list.innerHTML=rows.map(x=>`<article class="hd-equip-ref-card"><div class="hd-equip-ref-head"><div><strong>${hdEsc(x.name)}</strong><div class="muted">${hdEsc(x.category)}</div></div><button class="primary small" type="button" data-hd-equip-add="${hdEsc(x.name)}">台帳へ追加</button></div><div class="hd-equip-stats">${hdEquipStatText(x).map(s=>`<span>${hdEsc(s)}</span>`).join('')||'<span>特殊効果装備</span>'}</div><div class="hd-equip-tags">${(x.tags||[]).map(t=>`<span>${hdEsc(t)}</span>`).join('')}</div><p>${hdEsc(x.role)}</p><div class="hd-equip-ref-grid"><div><span>改修</span><strong>${hdEsc(x.improve)}</strong></div><div><span>入手</span><strong>${hdEsc(x.obtain)}</strong></div><div class="wide"><span>更新・補足</span><strong>${hdEsc(x.update)}</strong></div></div><a class="guide-link" href="${hdEquipWikiUrl(x.name)}" target="_blank" rel="noopener">攻略Wikiで詳細 ↗</a></article>`).join('')||'<div class="empty">条件に合う装備がないよ</div>';
 }
 document.addEventListener('click',e=>{
- const f=e.target.closest('[data-hd-equip-filter]');if(f){hdEquipCatalogFilter=f.dataset.hdEquipFilter;document.querySelectorAll('[data-hd-equip-filter]').forEach(b=>b.classList.toggle('active',b===f));hdRenderEquipmentCatalog();return}
+ const f=e.target.closest('[data-hd-equip-filter]');if(f){hdEquipCatalogFilter=f.dataset.hdEquipFilter;hdEquipCatalogViewSave({filter:hdEquipCatalogFilter});document.querySelectorAll('[data-hd-equip-filter]').forEach(b=>b.classList.toggle('active',b===f));hdRenderEquipmentCatalog();return}
  const a=e.target.closest('[data-hd-equip-add]');if(!a)return;const item=HD_EQUIPMENT_CATALOG.find(x=>x.name===a.dataset.hdEquipAdd);if(!item||typeof openEquipment!=='function')return;openEquipment({name:item.name,category:item.category,count:1,star:0,targetStar:item.improve.includes('可')?10:0,assigned:'',memo:`用途: ${item.role}\n入手: ${item.obtain}\n${item.update}`});
 });
 window.addEventListener('load',()=>setTimeout(hdEnsureEquipmentCatalog,80));
