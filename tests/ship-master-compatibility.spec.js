@@ -5270,7 +5270,7 @@ test('Home current fleet copies to selected map', async ({ page }) => {
   await boot(page,errors);
   await page.evaluate(()=>window.renderHomeDashboard?.());
   const copy=page.locator('[data-home-fleet-copy="1"]');
-  await expect(copy).toContainText('5-5へコピー');
+  await expect(copy).toContainText('5-5 出撃準備');
   await copy.click();
   const saved=await page.evaluate(()=>{
     const all=JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1')||'{}');
@@ -5279,6 +5279,8 @@ test('Home current fleet copies to selected map', async ({ page }) => {
   expect(saved).toBeTruthy();
   expect(saved.ships[0].ship).toBe('加賀改');
   expect(saved.ships[1].ship).toBe('榛名改二');
+  const selected=await page.evaluate(()=>typeof hdSortieSelection==='function'?hdSortieSelection('5-5'):'');
+  expect(selected).toBe(saved.id);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
 
