@@ -94,6 +94,7 @@ test('master-only ship forms are searchable from the ship database', async ({ pa
   const card = page.locator('.hd-shipdb-master-card').filter({ hasText: '大和改二重' }).first();
   await expect(card).toBeVisible();
   await expect(card).toContainText('MASTER');
+  await expect(card).toContainText('汎用おすすめ装備');
   await expect(card.locator('[data-hd-ship-equip-check-id]')).toHaveCount(1);
 
   await card.locator('[data-hd-ship-equip-check-id]').click();
@@ -101,4 +102,43 @@ test('master-only ship forms are searchable from the ship database', async ({ pa
   await expect(page.locator('#hdShipEquipCheckShip')).toHaveValue('大和改二重');
 
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
+
+
+test('picker slot exclusions and star-gated expansion rules are enforced', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const checks = await page.evaluate(() => {
+    const ise = window.hdShipDbMasterRowByName?.('伊勢改二');
+    const iseGun = window.hdShipDbMasterNormalCheck?.(ise, '46cm三連装砲');
+
+    const bismarck = window.hdShipDbMasterRowByName?.('Bismarck drei');
+    const fumoNormal = window.hdShipDbMasterNormalCheck?.(bismarck, 'FuMO25 レーダー');
+    const fumo0 = window.hdShipDbMasterExslotCheck?.(bismarck, 'FuMO25 レーダー', 0, fumoNormal);
+    const fumo7 = window.hdShipDbMasterExslotCheck?.(bismarck, 'FuMO25 レーダー', 7, fumoNormal);
+
+    return {
+      iseAllowed: !!iseGun?.allowed,
+      iseAllowedSlots: iseGun?.allowedSlots?.map(x => x.index) || [],
+      iseBlockedSlots: iseGun?.slots?.filter(x => x.blocked).map(x => x.index) || [],
+      fumoNormal: !!fumoNormal?.allowed,
+      fumo0: { allowed: !!fumo0?.allowed, reqStar: Number(fumo0?.reqStar || 0), reason: fumo0?.reason || '' },
+      fumo7: { allowed: !!fumo7?.allowed, reqStar: Number(fumo7?.reqStar || 0), mode: fumo7?.mode || '' }
+    };
+  });
+
+  expect(checks.iseAllowed).toBeTruthy();
+  expect(checks.iseAllowedSlots).toEqual([0, 1]);
+  expect(checks.iseBlockedSlots).toEqual([2, 3, 4]);
+
+  expect(checks.fumoNormal).toBeTruthy();
+  expect(checks.fumo0.allowed).toBeFalsy();
+  expect(checks.fumo0.reqStar).toBe(7);
+  expect(checks.fumo0.reason).toContain('★7');
+  expect(checks.fumo7.allowed).toBeTruthy();
+  expect(checks.fumo7.reqStar).toBe(7);
+  expect(checks.fumo7.mode).toBe('special');
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
