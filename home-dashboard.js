@@ -67,9 +67,12 @@ function homeRelative(ts){
 }
 function homeSyncInfo(){
  const s=homeJson('harbordesk-kancolle-sync-v1',null);
- if(!s)return {sync:null,label:'未同期',state:'warn',age:Infinity};
- const age=Date.now()-Number(s.syncedAt||0);
- return {sync:s,label:homeRelative(s.syncedAt),state:age>21600000?'warn':'ok',age};
+ if(!s)return {sync:null,label:'未同期',state:'missing',age:Infinity,missing:['艦娘','装備','資源','艦隊']};
+ const age=Date.now()-Number(s.syncedAt||0),coverage=s.coverage&&typeof s.coverage==='object'?s.coverage:null;
+ const required=[['ships','艦娘'],['equipment','装備'],['resources','資源'],['fleets','艦隊']];
+ const missing=coverage?required.filter(([key])=>coverage[key]===false).map(([,label])=>label):[];
+ const state=missing.length?'partial':age>21600000?'warn':'ok';
+ return {sync:s,label:state==='partial'?'一部未取得・'+homeRelative(s.syncedAt):homeRelative(s.syncedAt),state,age,missing};
 }
 function homeFunctionTitleMap(){
  const sections=typeof hdQNSections==='function'?hdQNSections():[...document.querySelectorAll('section[id]')].map(el=>({id:el.id,title:el.querySelector('h2,h3')?.textContent?.trim()||el.id}));
@@ -157,20 +160,29 @@ function renderHomeDashboard(){
  const syncHost=document.getElementById('homeGameSync');
  if(syncHost){
   syncHost.className='home-sync-card '+syncInfo.state;
-  syncHost.innerHTML=sync?`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>${homeEsc(syncInfo.label)}</strong><small>艦娘 ${Number(sync.ships)||0} / 装備 ${Number(sync.equipment)||0} / 艦隊 ${Number(sync.decks)||0}</small></div><div class="home-sync-actions"><a class="ghost small" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面へ</button></div></div>${homeSyncDeltaHtml(sync)}${syncInfo.state==='warn'?'<div class="home-sync-note">少し時間が空いてるよ。艦これを開いた時にもう一度同期すると最新状態になる。</div>':''}`:`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>まだ同期してないよ</strong><small>艦娘・装備・資源・現在艦隊をまとめて取り込める</small></div><div class="home-sync-actions"><a class="primary small" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面</button></div></div>`;
+  const syncNote=syncInfo.state==='partial'
+   ?`<div class="home-sync-note">未取得: ${homeEsc(syncInfo.missing.join('・'))}。艦これで該当画面を開いてからもう一度送ると補完できるよ。</div>`
+   :syncInfo.state==='warn'?'<div class="home-sync-note">少し時間が空いてるよ。艦これを開いた時にもう一度同期すると最新状態になる。</div>':'';
+  syncHost.innerHTML=sync?`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>${homeEsc(syncInfo.label)}</strong><small>艦娘 ${Number(sync.ships)||0} / 装備 ${Number(sync.equipment)||0} / 艦隊 ${Number(sync.decks)||0}</small></div><div class="home-sync-actions"><a class="ghost small" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面へ</button></div></div>${homeSyncDeltaHtml(sync)}${syncNote}`:`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>まだ同期してないよ</strong><small>艦娘・装備・資源・現在艦隊をまとめて取り込める</small></div><div class="home-sync-actions"><a class="primary small" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面</button></div></div>`;
  }
  const nextHost=document.getElementById('homeNextAction');
  if(nextHost){
-  const actionState=nextTimer?(nextMs<=15*60*1000?'urgent':nextMs<=60*60*1000?'soon':'normal'):(syncInfo.state==='warn'?'sync':todo.length?'task':'clear');
+  const urgentTimer=nextTimer&&nextMs<=60*60*1000;
+  const syncNeedsAttention=syncInfo.state==='missing'||syncInfo.state==='partial'||syncInfo.state==='warn';
+  const actionState=urgentTimer?(nextMs<=15*60*1000?'urgent':'soon'):syncNeedsAttention?'sync':todo.length?'task':nextTimer?'normal':'clear';
   nextHost.className='home-next-action '+actionState;
-  if(nextTimer){
+  if(urgentTimer){
    const mins=Math.ceil(nextMs/60000),timeText=typeof fmt==='function'?fmt(nextMs):(mins<60?mins+'分':Math.floor(mins/60)+'時間');
-   nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="expeditions"><span>次に終わる</span><strong>${homeEsc(nextTimer.kind)}・${homeEsc(nextTimer.name||'タイマー')}</strong><small>あと ${homeEsc(timeText)}</small></button><button type="button" class="ghost small" data-home-jump="expeditions">タイマーを見る</button>`;
-  }else if(syncInfo.state==='warn'){
-   nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="kancolleImport"><span>先に更新しておく</span><strong>ゲーム同期 ${homeEsc(syncInfo.label)}</strong><small>艦娘・装備・資源を最新状態にしよう</small></button><a class="ghost small home-next-game" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a>`;
+   nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="expeditions"><span>もうすぐ終わる</span><strong>${homeEsc(nextTimer.kind)}・${homeEsc(nextTimer.name||'タイマー')}</strong><small>あと ${homeEsc(timeText)}</small></button><button type="button" class="ghost small" data-home-jump="expeditions">タイマーを見る</button>`;
+  }else if(syncNeedsAttention){
+   const missingText=syncInfo.state==='partial'&&syncInfo.missing.length?`未取得: ${syncInfo.missing.join('・')}`:'艦娘・装備・資源を最新状態にしよう';
+   nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="kancolleImport"><span>${syncInfo.state==='partial'?'同期を補完する':'先に更新しておく'}</span><strong>ゲーム同期 ${homeEsc(syncInfo.label)}</strong><small>${homeEsc(missingText)}</small></button><a class="ghost small home-next-game" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a>`;
   }else if(todo.length){
    const first=todo[0];
    nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="quests"><span>次にやること・残り ${todo.length}件</span><strong>${homeEsc(first.name||'任務を確認')}</strong><small>タップで任務一覧へ</small></button><button type="button" class="ghost small home-next-done" data-home-quest-done="${homeEsc(first.id)}">完了</button>`;
+  }else if(nextTimer){
+   const mins=Math.ceil(nextMs/60000),timeText=typeof fmt==='function'?fmt(nextMs):(mins<60?mins+'分':Math.floor(mins/60)+'時間');
+   nextHost.innerHTML=`<button type="button" class="home-next-main" data-home-jump="expeditions"><span>次の予定</span><strong>${homeEsc(nextTimer.kind)}・${homeEsc(nextTimer.name||'タイマー')}</strong><small>あと ${homeEsc(timeText)}</small></button><button type="button" class="ghost small" data-home-jump="expeditions">タイマーを見る</button>`;
   }else{
    nextHost.innerHTML='<div class="home-next-main"><span>次にやること</span><strong>急ぎの項目はないよ</strong><small>ホームから各機能へすぐ移動できる</small></div>';
   }
