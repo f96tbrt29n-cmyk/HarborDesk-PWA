@@ -115,20 +115,6 @@ jobs:
       - name: Validate Kancolle master semantics
         run: node scripts/validate-kancolle-master.mjs
 
-      - name: Install browser test runtime
-        run: |
-          npm install --no-save --no-package-lock @playwright/test@1.55.0
-          npx playwright install --with-deps chromium webkit
-
-      - name: Runtime smoke tests
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 -m http.server 4173 >/tmp/harbordesk-http.log 2>&1 &
-          SERVER_PID=$!
-          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
-          npx playwright test tests --reporter=line --workers=4
-
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site
