@@ -1,7 +1,7 @@
 {
-  "version": "1.0.167",
-  "build": 167,
-  "releasedAt": "2026-09-19T21:42:00+09:00",
-  "notes": "iPhone/Safari向けUserscripts連携を追加。DMM外側ページ・osapi.dmm.com・203.104.*側フレームでdocument-start/page context実行し、対応kcsapiレスポンスをフレーム横断で集約。ゲーム画面のHarborDeskパネルから直接HarborDeskへ送信できる。JSONコピーは予備手段として残す。",
+  "version": "1.0.168",
+  "build": 168,
+  "releasedAt": "2026-09-19T21:55:00+09:00",
+  "notes": "Userscripts艦これ連携の対象ドメインを拡張。現在のkancolle-server.com系ゲームサーバーと125.6.*.*系旧サーバーにもdocument-start/page-contextで注入し、ゲーム本体フレームのkcsapi通信を取得できるよう修正。",
   "masterChanges": null
 }
