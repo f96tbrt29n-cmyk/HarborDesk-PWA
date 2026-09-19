@@ -75,3 +75,6 @@
  }
  .hd-shipdb-search-row input,.hd-shipdb-search-row button{min-height:42px}
 }
+
+[data-hd-shipdb-reset]:disabled{opacity:.42}
+[data-hd-shipdb-reset].is-active{border-color:#d9b45b;background:#3b2f16;color:#ffe9a8}
