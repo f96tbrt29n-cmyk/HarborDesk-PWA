@@ -1076,3 +1076,79 @@ test('ship identity diagnostics detects and repairs master ID drift', async ({ p
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('ship image integrity audit fingerprints duplicates and invalid master IDs', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    const allShips = window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips || {};
+    const legacyId = Object.keys(allShips).map(Number).find(id => id && id !== 541 && id !== 573) || 1;
+
+    await window.hdShipImageDelete?.(541);
+    await window.hdShipImageDelete?.(573);
+    await window.hdShipImageDelete?.(999999);
+    await window.hdShipImageDelete?.(legacyId);
+
+    const sameA = new File([new Uint8Array([11,22,33,44,55])], '541.png', { type: 'image/png' });
+    const sameB = new File([new Uint8Array([11,22,33,44,55])], '573.png', { type: 'image/png' });
+    const invalid = new File([new Uint8Array([99,88,77])], '999999.png', { type: 'image/png' });
+
+    await window.hdShipImagePut?.(541, sameA, '長門改二', true);
+    await window.hdShipImagePut?.(573, sameB, '陸奥改二', true);
+    await window.hdShipImagePut?.(999999, invalid, '存在しない艦', true);
+
+    const db = await window.hdShipImageOpenDb?.();
+    const legacyBlob = new Blob([new Uint8Array([1,3,5,7,9,11])], { type: 'image/png' });
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction('images', 'readwrite');
+      tx.objectStore('images').put({
+        id: legacyId,
+        name: allShips[String(legacyId)]?.name || 'legacy',
+        blob: legacyBlob,
+        type: 'image/png',
+        updatedAt: Date.now()
+      });
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+    });
+    await window.hdShipImageRefreshLocalIds?.();
+
+    const light = await window.hdShipImageIntegrityAudit?.(false);
+    const deep = await window.hdShipImageIntegrityAudit?.(true);
+    const legacyAfter = await window.hdShipImageGet?.(legacyId);
+
+    const duplicateIds = (deep.duplicates || []).flatMap(g => g.items.map(x => x.id));
+
+    await window.hdShipImageDelete?.(541);
+    await window.hdShipImageDelete?.(573);
+    await window.hdShipImageDelete?.(999999);
+    await window.hdShipImageDelete?.(legacyId);
+
+    return {
+      legacyId,
+      light: {
+        invalid: light.invalidId.map(x => x.id),
+        unhashed: light.unhashed.map(x => x.id),
+        duplicates: light.duplicates.map(g => g.items.map(x => x.id))
+      },
+      deep: {
+        invalid: deep.invalidId.map(x => x.id),
+        unhashed: deep.unhashed.map(x => x.id),
+        duplicates: deep.duplicates.map(g => g.items.map(x => x.id))
+      },
+      legacyHash: legacyAfter?.hash || '',
+      duplicateIds
+    };
+  });
+
+  expect(data.light.invalid).toContain(999999);
+  expect(data.light.unhashed).toContain(data.legacyId);
+  expect(data.deep.invalid).toContain(999999);
+  expect(data.deep.unhashed).not.toContain(data.legacyId);
+  expect(data.legacyHash).toMatch(/^[0-9a-f]{64}$/);
+  expect(data.duplicateIds).toEqual(expect.arrayContaining([541, 573]));
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
