@@ -419,7 +419,7 @@ function hdKcApplyImport(preview,opts={}){
  if(opts.sorties!==false&&parsed.sortieEvents.length)result.sorties=hdKcApplySorties(parsed);
  const snapshot=hdKcStateSnapshot(),delta=hdKcSyncDelta(before,snapshot,parsed,opts,!!previous),coverage=hdKcCoverageFromSources(preview.sources,parsed);
  const sync={syncedAt:Date.now(),sources:preview.sources,userscriptVersion:String(preview.userscriptVersion||''),coverage,ships:result.ships,equipment:result.equipment,materials:result.materials,decks:result.decks,expeditions:result.expeditions,docks:result.docks,quests:result.quests,sorties:result.sorties,unknownShips:preview.unknownShips,unknownEquip:preview.unknownEquip,snapshot,delta};
- localStorage.setItem(HD_KC_SYNC_KEY,JSON.stringify(sync));window.dispatchEvent(new CustomEvent('hd:kancolle-sync',{detail:sync}));hdKcRenderCurrentFleets();
+ localStorage.setItem(HD_KC_SYNC_KEY,JSON.stringify(sync));window.dispatchEvent(new CustomEvent('hd:kancolle-sync',{detail:sync}));hdKcRenderCurrentFleets();hdKcNotifySyncSuccess(sync);
  return sync;
 }
 function hdKcVersionCompare(a,b){
@@ -439,6 +439,16 @@ function hdKcRenderUserscriptStatus(sync){
 }
 function hdKcSyncStatus(){
  try{return JSON.parse(localStorage.getItem(HD_KC_SYNC_KEY)||'null')}catch{return null}
+}
+function hdKcNotifySyncSuccess(sync){
+ if(!sync)return;
+ const message=`同期完了：艦娘${Number(sync.ships)||0} / 装備${Number(sync.equipment)||0} / 艦隊${Number(sync.decks)||0}`;
+ const openRoster=()=>{
+  if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return;
+  document.getElementById('roster')?.scrollIntoView({behavior:'smooth',block:'start'});
+ };
+ if(typeof window.hdToastAction==='function')window.hdToastAction(message,'艦隊を見る',openRoster,6500);
+ else if(typeof window.hdToast==='function')window.hdToast(message,'ok',4000);
 }
 function hdKcPreviewHtml(p){
  if(!p)return '<div class="hd-kc-import-empty">JSONを読み込むと内容をここで確認できるよ</div>';
