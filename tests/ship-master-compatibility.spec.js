@@ -5400,3 +5400,21 @@ test('sortie readiness uses copied live fleet state', async ({ page }) => {
   expect(morale?.detail).toContain('赤城改');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('sortie readiness warnings are shown first', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const rows=window.hdSortieSortedChecks?.([
+      {label:'OK',state:'ok',detail:''},
+      {label:'注意',state:'note',detail:''},
+      {label:'危険',state:'warn',detail:''}
+    ])||[];
+    const sum=window.hdSortieSummary?.([{id:'a'}],{},rows);
+    return {order:rows.map(x=>x.state),sum};
+  });
+  expect(data.order).toEqual(['warn','note','ok']);
+  expect(data.sum).toEqual(expect.objectContaining({autoWarn:1,autoNote:1,autoOk:1,autoTotal:3}));
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
