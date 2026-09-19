@@ -927,3 +927,78 @@ test('saved fleets and sortie preparation show the same exact-ID ship image', as
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('legacy roster and saved fleets migrate to exact master IDs and survive name drift', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      { id: 'legacy-ship', name: '長門改二', type: '戦艦', level: 99, remodel: '改二', tags: [] }
+    ]));
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({
+      '5-5': [{
+        id: 'legacy-fleet',
+        name: '旧形式',
+        ships: [{ ship: '長門改二', gear: '' }],
+        memo: ''
+      }]
+    }));
+
+    const rosterChanged = window.rosterMigrateMasterIds?.();
+    const fleetChanged = window.cfMigrateMasterIds?.();
+    const roster = JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1') || '[]');
+    const fleets = JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1') || '{}');
+    const savedShip = fleets['5-5']?.[0]?.ships?.[0] || {};
+
+    const aliasRow = { ship: '表示名が変わってもOK', masterId: 541, gear: '' };
+    const rosterById = window.hdSPSRosterMatchShip?.(aliasRow);
+    const dbById = window.hdSPSDbShip?.(aliasRow);
+    const thumb = window.hdShipImageThumbHtml?.({ id: 541, name: aliasRow.ship }, 'id-stability-test') || '';
+
+    const fsDb = window.hdFSDbFor?.({ name: aliasRow.ship, masterId: 541 });
+    const flDb = window.hdFLShipDbItem?.({
+      profile: {
+        row: { name: aliasRow.ship, masterId: 541 },
+        type: '戦艦',
+        roles: [],
+        master: null
+      }
+    });
+
+    localStorage.setItem('harbordesk-ship-roster-v1', '[]');
+    localStorage.setItem('harbordesk-custom-fleets-v1', '{}');
+    window.renderShipRoster?.();
+
+    return {
+      rosterChanged,
+      fleetChanged,
+      rosterId: roster[0]?.masterId || 0,
+      fleetId: savedShip.masterId || 0,
+      rosterById: {
+        name: rosterById?.name || '',
+        masterId: rosterById?.masterId || 0
+      },
+      dbById: {
+        name: dbById?.final || dbById?.name || '',
+        masterId: dbById?._masterRow?.id || dbById?.masterId || 0
+      },
+      fsMasterId: fsDb?._masterRow?.id || fsDb?.masterId || 0,
+      flMasterId: flDb?._masterRow?.id || flDb?.masterId || 0,
+      thumb
+    };
+  });
+
+  expect(data.rosterChanged).toBeTruthy();
+  expect(data.fleetChanged).toBeTruthy();
+  expect(data.rosterId).toBe(541);
+  expect(data.fleetId).toBe(541);
+  expect(data.rosterById.masterId).toBe(541);
+  expect(data.dbById.masterId).toBe(541);
+  expect(data.fsMasterId).toBe(541);
+  expect(data.flMasterId).toBe(541);
+  expect(data.thumb).toContain('data-hd-ship-image-host="541"');
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
