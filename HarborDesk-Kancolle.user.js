@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HarborDesk 艦これ連携
 // @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
-// @version      1.0.1
+// @version      1.0.2
 // @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
 // @match        http://*.dmm.com/*
 // @match        https://*.dmm.com/*
@@ -21,9 +21,8 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.1';
-const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/#kancolleImport';
-const HARBOR_ORIGIN='https://f96tbrt29n-cmyk.github.io';
+const HD_VERSION='1.0.2';
+const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/';
 const RECORD_MESSAGE='harbordesk-kancolle-frame-record-v1';
 const STATUS_MESSAGE='harbordesk-kancolle-frame-status-v1';
 const MAX_RECORDS=120;
@@ -231,23 +230,37 @@ async function copy(){
     prompt('このJSONをコピーしてHarborDeskへ貼り付けてね',text);
   }
 }
-function send(){
+function bytesToBase64Url(bytes){
+  let binary='';
+  for(let i=0;i<bytes.length;i+=0x8000){
+    binary+=String.fromCharCode(...bytes.subarray(i,Math.min(bytes.length,i+0x8000)));
+  }
+  return btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+async function encodeHandoff(value){
+  const raw=new TextEncoder().encode(JSON.stringify(value));
+  if(typeof CompressionStream==='function'){
+    const cs=new CompressionStream('gzip');
+    const writer=cs.writable.getWriter();
+    await writer.write(raw);await writer.close();
+    const compressed=new Uint8Array(await new Response(cs.readable).arrayBuffer());
+    return 'g.'+bytesToBase64Url(compressed);
+  }
+  return 'j.'+bytesToBase64Url(raw);
+}
+async function send(){
   if(!records.length){
     alert('まだ取得データがないよ。母港・装備・任務などを一度開いてからもう一度押してね。');
     return;
   }
-  const target=window.open(HARBOR_URL,'harbordesk-kancolle-import');
-  if(!target){
-    alert('HarborDeskを開けなかったよ。Safariのポップアップ設定を確認してね。');
-    return;
+  try{
+    if(statusEl)statusEl.textContent='HarborDeskへ移動中';
+    const handoff=await encodeHandoff(exportObject());
+    location.href=HARBOR_URL+'#kcimport='+handoff;
+  }catch(err){
+    if(statusEl)statusEl.textContent='送信失敗';
+    alert('HarborDeskへの受け渡しに失敗したよ: '+String(err&&err.message||err));
   }
-  const message={type:'harbordesk-kancolle-import',payload:exportObject()};
-  let tries=0;
-  const timer=setInterval(()=>{
-    tries++;
-    try{target.postMessage(message,HARBOR_ORIGIN)}catch{}
-    if(tries>=20)clearInterval(timer);
-  },350);
 }
 window.addEventListener('message',e=>{
   const d=e?.data;
