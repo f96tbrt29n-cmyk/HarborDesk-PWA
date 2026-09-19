@@ -35,7 +35,7 @@ function hdEnsureEquipmentCatalog(){
  hdEquipCatalogFilter=cats.includes(view.filter)?view.filter:'すべて';
  document.getElementById('hdEquipCatalogFilters').innerHTML=cats.map(c=>`<button class="ghost small${c===hdEquipCatalogFilter?' active':''}" type="button" data-hd-equip-filter="${hdEsc(c)}">${hdEsc(c)}</button>`).join('');
  const search=document.getElementById('hdEquipCatalogSearch');if(search){search.value=String(view.query||'');search.addEventListener('input',()=>{hdEquipCatalogViewSave({query:search.value});hdEquipCatalogScheduleRender()})}
- const compact=!!view.compact,list=document.getElementById('hdEquipCatalogList'),compactBtn=document.querySelector('[data-hd-equip-compact]');
+ const compact=view.compact==null?!!window.matchMedia?.('(max-width:520px)')?.matches:!!view.compact,list=document.getElementById('hdEquipCatalogList'),compactBtn=document.querySelector('[data-hd-equip-compact]');
  list?.classList.toggle('hd-compact',compact);if(compactBtn)compactBtn.textContent=compact?'詳細表示':'コンパクト';
  hdRenderEquipmentCatalog();
 }
