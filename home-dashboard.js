@@ -29,11 +29,19 @@ function homeSyncInfo(){
  const age=Date.now()-Number(s.syncedAt||0);
  return {sync:s,label:homeRelative(s.syncedAt),state:age>21600000?'warn':'ok',age};
 }
-function homeRecentFunctionRows(){
- let recent=[];try{recent=JSON.parse(localStorage.getItem('harbordesk-quick-nav-recent-v1')||'[]')||[]}catch{}
+function homeFunctionTitleMap(){
  const sections=typeof hdQNSections==='function'?hdQNSections():[...document.querySelectorAll('section[id]')].map(el=>({id:el.id,title:el.querySelector('h2,h3')?.textContent?.trim()||el.id}));
- const titleMap=new Map(sections.map(x=>[x.id,x.title]));
- return recent.filter(x=>x?.id&&x.id!=='home'&&titleMap.has(x.id)).slice(0,4).map(x=>({id:x.id,title:titleMap.get(x.id)}));
+ return new Map(sections.map(x=>[x.id,x.title]));
+}
+function homePinnedFunctionRows(){
+ let pins=[];try{pins=JSON.parse(localStorage.getItem('harbordesk-quick-nav-pins-v1')||'[]')||[]}catch{}
+ const titleMap=homeFunctionTitleMap();
+ return pins.filter(id=>id&&id!=='home'&&titleMap.has(id)).slice(0,6).map(id=>({id,title:titleMap.get(id)}));
+}
+function homeRecentFunctionRows(exclude=new Set()){
+ let recent=[];try{recent=JSON.parse(localStorage.getItem('harbordesk-quick-nav-recent-v1')||'[]')||[]}catch{}
+ const titleMap=homeFunctionTitleMap();
+ return recent.filter(x=>x?.id&&x.id!=='home'&&!exclude.has(x.id)&&titleMap.has(x.id)).slice(0,4).map(x=>({id:x.id,title:titleMap.get(x.id)}));
 }
 
 function ensureHomeDashboard(){
@@ -113,8 +121,13 @@ function renderHomeDashboard(){
   }
   procurement.innerHTML=html;
  }
- const recentFunctions=document.getElementById('homeRecentFunctions'),recentRows=homeRecentFunctionRows();
- if(recentFunctions)recentFunctions.innerHTML=recentRows.length?`<div class="home-recent-label">最近使った機能</div><div class="home-recent-function-list">${recentRows.map(x=>`<button type="button" data-home-jump="${homeEsc(x.id)}">${homeEsc(x.title)}</button>`).join('')}</div>`:'';
+ const recentFunctions=document.getElementById('homeRecentFunctions'),pinnedRows=homePinnedFunctionRows(),pinnedSet=new Set(pinnedRows.map(x=>x.id)),recentRows=homeRecentFunctionRows(pinnedSet);
+ if(recentFunctions){
+  const parts=[];
+  if(pinnedRows.length)parts.push(`<div class="home-recent-label home-pinned-label">★ ピン留め</div><div class="home-recent-function-list home-pinned-function-list">${pinnedRows.map(x=>`<button type="button" data-home-jump="${homeEsc(x.id)}">${homeEsc(x.title)}</button>`).join('')}</div>`);
+  if(recentRows.length)parts.push(`<div class="home-recent-label">最近使った機能</div><div class="home-recent-function-list">${recentRows.map(x=>`<button type="button" data-home-jump="${homeEsc(x.id)}">${homeEsc(x.title)}</button>`).join('')}</div>`);
+  recentFunctions.innerHTML=parts.join('');
+ }
  const recent=loadRecentMaps();
  document.getElementById('homeRecentMaps').innerHTML=recent.length?recent.map(m=>`<button class="recent-map-btn" data-home-map="${m}">${m}</button>`).join(''):'<div class="home-empty">海域を見るとここに履歴が出るよ</div>';
 }
