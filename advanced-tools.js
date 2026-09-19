@@ -3,7 +3,7 @@ const HD_EVENT_KEY='harbordesk-events-v1';
 const HD_RESOURCE_HISTORY_KEY='harbordesk-resource-history-v1';
 
 function hdLoad(key,fallback=[]){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
-function hdSave(key,value){localStorage.setItem(key,JSON.stringify(value))}
+function hdSave(key,value){localStorage.setItem(key,JSON.stringify(value));if(key===HD_EQUIP_KEY)window.dispatchEvent(new CustomEvent('hd:equipment-changed',{detail:{key,at:Date.now()}}))}
 function hdEsc(s){return typeof esc==='function'?esc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdUid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)}
 function hdFmtDate(ts){return new Date(ts).toLocaleString('ja-JP')}
