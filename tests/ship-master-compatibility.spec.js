@@ -2742,3 +2742,19 @@ test('home dashboard surfaces game sync and one-tap jumps', async ({ page }) => 
   expect(data.summary).toContain('93');
   expect(data.buttons).toEqual(expect.arrayContaining(['quests','expeditions','roster','equipmentBook','kancolleImport']));
 });
+
+
+test('navigation keeps daily home separate from backup safety', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const personal=document.getElementById('personalHomeCenter');
+    const title=personal?.querySelector('h2')?.textContent||'';
+    const group=personal?.dataset.hdWorkspaceGroup||'';
+    const sync=document.querySelector('[data-hd-kc-return-game]');
+    return {title,group,returnButton:!!sync};
+  });
+  expect(data.title).toContain('データ保全');
+  expect(data.group).toBe('settings');
+  expect(data.returnButton).toBe(true);
+});
