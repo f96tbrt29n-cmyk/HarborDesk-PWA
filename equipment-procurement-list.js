@@ -219,6 +219,32 @@ function hdPLPriorityMeta(row){
 function hdPLPriorityRows(rows=hdPLLoad(),limit=6){
  return hdPLGlobalDemandRows(rows).filter(x=>x.shortfall>0).map(x=>({...x,priority:hdPLPriorityMeta(x)})).sort((a,b)=>b.priority.score-a.priority.score||(a.rank||9)-(b.rank||9)||(a.shortfall||0)-(b.shortfall||0)||(a.target||a.wanted).localeCompare(b.target||b.wanted,'ja')).slice(0,limit);
 }
+function hdPLNextActionMeta(row){
+ if(!row||!(Number(row.shortfall)>0))return null;
+ const target=row.target||row.wanted||'';
+ if(row.methodKey==='develop'){
+  const e=hdPLDevEstimate(row);
+  return {kind:'develop',label:'開発で狙う',title:target,detail:e?.recipe?.title||'開発レシピを確認',sub:e?.attempts?`期待 約${e.attempts}回｜燃${e.total?.fuel||0} 弾${e.total?.ammo||0} 鋼${e.total?.steel||0} ボ${e.total?.bauxite||0}`:'成功率データを確認',action:'開発レシピへ'};
+ }
+ if(row.methodKey==='improve'){
+  const e=hdPLImproveEstimate(row);
+  return {kind:'improve',label:'改修・更新で作る',title:target,detail:e?.source?.name?`${e.source.name} → ${target}`:'更新元を確認',sub:e?`ネジ ${e.screw} / 開発資材 ${e.dev}`:'必要素材を確認',action:'改修工廠へ'};
+ }
+ if(row.methodKey==='quest')return {kind:'quest',label:'任務・初期装備を確認',title:target,detail:'常設任務や初期装備の入手ルートを確認',sub:`不足 ${row.shortfall||0}個`,action:'入手ルートへ'};
+ if(row.methodKey==='limited')return {kind:'limited',label:'限定入手を確認',title:target,detail:'イベント・期間限定などの入手条件を確認',sub:`不足 ${row.shortfall||0}個`,action:'入手情報へ'};
+ return {kind:'other',label:'入手方法を確認',title:target,detail:'図鑑・入手ガイドから候補を確認',sub:`不足 ${row.shortfall||0}個`,action:'入手情報へ'};
+}
+function hdPLNextActionHtml(rows=hdPLLoad()){
+ const row=hdPLPriorityRows(rows,1)[0];if(!row)return '';
+ const a=hdPLNextActionMeta(row);if(!a)return '';
+ const map=(row.maps||[])[0]||'';
+ const action=a.kind==='develop'
+  ?`<button type="button" class="primary small" data-hd-ag-development="${hdPLEsc(row.target||row.wanted)}">${hdPLEsc(a.action)}</button>`
+  :a.kind==='improve'
+   ?`<button type="button" class="primary small" data-hd-ag-improvement="${hdPLEsc(row.target||row.wanted)}">${hdPLEsc(a.action)}</button>`
+   :`<button type="button" class="primary small" data-hd-pl-item-guide="${hdPLEsc(row.target||row.wanted)}" data-hd-pl-map="${hdPLEsc(map)}">${hdPLEsc(a.action)}</button>`;
+ return `<section class="hd-pl-next-action method-${hdPLEsc(a.kind)}"><div class="hd-pl-next-kicker"><span>NEXT ACTION</span><b>${hdPLEsc(row.priority?.label||'優先')}</b></div><div class="hd-pl-next-main"><div><small>${hdPLEsc(a.label)}</small><strong>${hdPLEsc(a.title)}</strong><p>${hdPLEsc(a.detail)}</p><span>${hdPLEsc(a.sub)}</span></div><div class="hd-pl-next-buttons">${action}<button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(row.target||row.wanted)}">図鑑</button></div></div><div class="hd-pl-next-why"><b>優先理由</b><span>${(row.priority?.reasons||[]).map(hdPLEsc).join('・')}</span></div></section>`;
+}
 function hdPLPriorityQueueHtml(rows=hdPLLoad()){
  const items=hdPLPriorityRows(rows,6);if(!items.length)return '';
  return `<section class="hd-pl-priority"><div class="hd-pl-priority-head"><div><div class="eyebrow">NEXT PROCUREMENT</div><strong>先に揃える候補</strong><small>使用艦数・共用範囲・所持状況・入手しやすさから自動整理</small></div><span>${items.length}件</span></div><div class="hd-pl-priority-list">${items.map((x,i)=>`<article><div class="hd-pl-priority-rank"><b>#${i+1}</b><span>${hdPLEsc(x.priority.label)}</span></div><div class="hd-pl-priority-main"><strong>${hdPLEsc(x.target||x.wanted)}</strong><small>${x.priority.reasons.map(hdPLEsc).join('・')}</small><div><span>必要 <b>${x.needed||0}</b></span><span>所持 <b>${x.owned||0}</b></span><span>あと <b>${x.shortfall||0}</b></span></div></div><div class="hd-pl-priority-actions">${x.target?`<button type="button" class="ghost small" data-hd-pl-item-guide="${hdPLEsc(x.target)}" data-hd-pl-map="${hdPLEsc((x.maps||[])[0]||'')}">入手方法</button><button type="button" class="ghost small" data-hd-pl-catalog="${hdPLEsc(x.target)}">図鑑</button>`:''}</div></article>`).join('')}</div><p>同じ装備を複数海域で使い回せる場合、海域間では最大同時必要数を基準にしているよ。限定装備は入手性を低めに評価。</p></section>`;
@@ -278,7 +304,7 @@ function hdPLMapHtml(row){
 }
 function hdPLRender(){
  const host=document.getElementById('hdProcurementList');if(!host)return;
- const rows=hdPLLoad(),budget=document.getElementById('hdProcurementBudget'),priority=document.getElementById('hdProcurementPriority');if(budget)budget.innerHTML=hdPLOverallBudgetHtml(rows);if(priority)priority.innerHTML=hdPLPriorityQueueHtml(rows);
+ const rows=hdPLLoad(),next=document.getElementById('hdProcurementNextAction'),budget=document.getElementById('hdProcurementBudget'),priority=document.getElementById('hdProcurementPriority');if(next)next.innerHTML=hdPLNextActionHtml(rows);if(budget)budget.innerHTML=hdPLOverallBudgetHtml(rows);if(priority)priority.innerHTML=hdPLPriorityQueueHtml(rows);
  host.innerHTML=rows.map(hdPLMapHtml).join('')||'<div class="empty">調達リストはまだないよ。海域の装備タブや艦娘DBのおすすめ装備から不足分を追加できる。</div>';
  const count=document.getElementById('hdProcurementCount');if(count)count.textContent=`${rows.length}件`;
  const add=document.getElementById('hdProcurementAddCurrent');if(add){const map=typeof selectedMap!=='undefined'?selectedMap:'';add.disabled=!map;add.textContent=map?`${map} の不足を追加`:'海域を選んでね'}
@@ -287,7 +313,7 @@ function hdPLEnsure(){
  if(document.getElementById('hdEquipmentProcurement'))return;
  const anchor=document.getElementById('hdEquipAnalyzer')||document.getElementById('equipmentBook');if(!anchor)return;
  const sec=document.createElement('section');sec.id='hdEquipmentProcurement';sec.className='advanced-section hd-pl-section';
- sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">PROCUREMENT LIST</div><h2>装備調達リスト</h2></div><span id="hdProcurementCount" class="muted"></span></div><div class="hd-pl-toolbar"><p>攻略予定の海域や艦娘ごとのおすすめ構成で足りない装備を保存。装備台帳を更新すると準備状況も自動で変わるよ。</p><button id="hdProcurementAddCurrent" type="button" class="primary small">海域を選んでね</button></div><div id="hdProcurementPriority"></div><div id="hdProcurementBudget"></div><div id="hdProcurementList" class="hd-pl-list"></div>`;
+ sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">PROCUREMENT LIST</div><h2>装備調達リスト</h2></div><span id="hdProcurementCount" class="muted"></span></div><div class="hd-pl-toolbar"><p>攻略予定の海域や艦娘ごとのおすすめ構成で足りない装備を保存。装備台帳を更新すると準備状況も自動で変わるよ。</p><button id="hdProcurementAddCurrent" type="button" class="primary small">海域を選んでね</button></div><div id="hdProcurementNextAction"></div><div id="hdProcurementPriority"></div><div id="hdProcurementBudget"></div><div id="hdProcurementList" class="hd-pl-list"></div>`;
  anchor.insertAdjacentElement('afterend',sec);document.getElementById('hdProcurementAddCurrent')?.addEventListener('click',()=>{if(typeof selectedMap!=='undefined'&&selectedMap)hdPLAddMap(selectedMap)});hdPLRender();
 }
 function hdPLInstallSortieButton(){
