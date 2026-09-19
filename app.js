@@ -134,7 +134,19 @@ const guideLabels={all:'すべて',map:'海域',quest:'任務',expedition:'遠�
 
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||blankState()}catch{return blankState()}}
 function blankState(){return{expeditions:[],docks:[],quests:[],resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}}}
-function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function hdAppStateSnapshot(){
+ return {
+  expeditions:Array.isArray(state.expeditions)?state.expeditions.map(x=>({...x})):[],
+  docks:Array.isArray(state.docks)?state.docks.map(x=>({...x})):[],
+  quests:Array.isArray(state.quests)?state.quests.map(x=>({...x})):[],
+  resources:{...(state.resources||{})}
+ };
+}
+window.hdGetAppState=hdAppStateSnapshot;
+function save(){
+ localStorage.setItem(KEY,JSON.stringify(state));
+ window.dispatchEvent(new CustomEvent('hd:state-changed',{detail:hdAppStateSnapshot()}));
+}
 function esc(s){return String(s).replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]||c))}
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)}
 let HD_TOAST_TIMER=0;
