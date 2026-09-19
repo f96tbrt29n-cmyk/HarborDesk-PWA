@@ -1680,3 +1680,115 @@ test('KanColle importer accepts raw svdata material response', async ({ page }) 
   expect(data.ammo).toBe(222);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('partial KanColle equipment sync keeps previously synced untouched stacks', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      { id:'kc-equip-8-4', name:'41cm連装砲', category:'大口径主砲', count:1, star:4, masterEquipId:8, source:'kancolle-import' },
+      { id:'kc-equip-9-0', name:'46cm三連装砲', category:'大口径主砲', count:2, star:0, masterEquipId:9, source:'kancolle-import' }
+    ]));
+    localStorage.setItem('harbordesk-kancolle-equipment-detail-v1', JSON.stringify([
+      {gameEquipId:5001,masterEquipId:8,star:4,alv:0},
+      {gameEquipId:6001,masterEquipId:9,star:0,alv:0},
+      {gameEquipId:6002,masterEquipId:9,star:0,alv:0}
+    ]));
+
+    const parsed = window.hdKcParseImport?.(JSON.stringify({
+      api_result:1,
+      api_result_msg:'成功',
+      api_data:[
+        {api_id:5001,api_slotitem_id:8,api_level:6,api_alv:0}
+      ]
+    }));
+    parsed.completeSlotItems = false;
+    const count = window.hdKcMergeEquipment?.(parsed);
+
+    const equipment = JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]');
+    const details = JSON.parse(localStorage.getItem('harbordesk-kancolle-equipment-detail-v1')||'[]');
+
+    const result = {
+      count,
+      stacks:equipment.map(x=>({name:x.name,star:x.star,count:x.count,masterEquipId:x.masterEquipId})).sort((a,b)=>a.masterEquipId-b.masterEquipId||a.star-b.star),
+      details:details.sort((a,b)=>a.gameEquipId-b.gameEquipId)
+    };
+
+    localStorage.setItem('harbordesk-equipment-v1','[]');
+    localStorage.removeItem('harbordesk-kancolle-equipment-detail-v1');
+    return result;
+  });
+
+  expect(data.stacks).toEqual(expect.arrayContaining([
+    expect.objectContaining({name:'41cm連装砲',star:6,count:1,masterEquipId:8}),
+    expect.objectContaining({name:'41cm連装砲',star:4,count:1,masterEquipId:8}),
+    expect.objectContaining({name:'46cm三連装砲',star:0,count:2,masterEquipId:9})
+  ]));
+  expect(data.details).toEqual(expect.arrayContaining([
+    expect.objectContaining({gameEquipId:5001,masterEquipId:8,star:6}),
+    expect.objectContaining({gameEquipId:6001,masterEquipId:9,star:0}),
+    expect.objectContaining({gameEquipId:6002,masterEquipId:9,star:0})
+  ]));
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
+
+test('passive KanColle capture records minimized response without request token', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    const realFetch = window.fetch;
+    const secret = 'SECRET_API_TOKEN_SHOULD_NOT_APPEAR';
+    window.fetch = async () => new Response('svdata=' + JSON.stringify({
+      api_result:1,
+      api_result_msg:'成功',
+      api_data:{
+        api_ship:[{api_id:9001,api_ship_id:541,api_lv:99,api_slot:[],api_slot_ex:-1}],
+        api_deck_port:[{api_id:1,api_name:'第一艦隊',api_ship:[9001,-1,-1,-1,-1,-1],api_mission:[0,0,0,0]}],
+        api_material:[{api_id:1,api_value:999}],
+        api_basic:{api_nickname:'SHOULD_BE_DROPPED'},
+        api_extra_secret:'SHOULD_BE_DROPPED'
+      }
+    }), {status:200,headers:{'content-type':'text/plain'}});
+
+    eval(window.hdKcCaptureSource?.() || '');
+    await window.fetch('/kcsapi/api_port/port', {
+      method:'POST',
+      body:'api_verno=1&api_token=' + encodeURIComponent(secret)
+    });
+    await new Promise(r=>setTimeout(r,20));
+
+    const bundle = window.__HD_KC_CAPTURE?.exportObject?.();
+    const text = JSON.stringify(bundle||{});
+    const preview = window.hdKcPreviewData?.(window.hdKcParseImport?.(text));
+    const payload = bundle?.records?.[0]?.payload?.api_data || {};
+
+    window.__HD_KC_CAPTURE?.restore?.();
+    window.fetch = realFetch;
+
+    return {
+      recordCount:bundle?.records?.length||0,
+      endpoint:bundle?.records?.[0]?.endpoint||'',
+      hasSecret:text.includes(secret),
+      hasNickname:text.includes('SHOULD_BE_DROPPED'),
+      keys:Object.keys(payload).sort(),
+      ships:preview?.ships||0,
+      materials:preview?.materials||0,
+      decks:preview?.decks||0
+    };
+  });
+
+  expect(data.recordCount).toBe(1);
+  expect(data.endpoint).toBe('/kcsapi/api_port/port');
+  expect(data.hasSecret).toBeFalsy();
+  expect(data.hasNickname).toBeFalsy();
+  expect(data.keys).toEqual(['api_deck_port','api_material','api_ship']);
+  expect(data.ships).toBe(1);
+  expect(data.materials).toBe(1);
+  expect(data.decks).toBe(1);
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
