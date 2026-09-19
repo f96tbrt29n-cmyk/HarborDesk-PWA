@@ -1242,3 +1242,68 @@ test('ship image verification manifest marks exact and mismatched fingerprints a
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('exact-star equipment stacks prevent normal and expansion double use', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      { name: 'FuMO25 レーダー', count: 1, star: 0 },
+      { name: 'FuMO25 レーダー', count: 1, star: 7 }
+    ]));
+
+    const dbInv = [...(window.hdShipDbOwnedEquipInventory?.().values() || [])]
+      .filter(x => x.name === 'FuMO25 レーダー')
+      .map(x => ({ key: x.key, count: x.count, star: x.maxStar }));
+    const flInv = [...(window.hdFLInventory?.().values() || [])]
+      .filter(x => x.name === 'FuMO25 レーダー')
+      .map(x => ({ key: x.key, count: x.count, star: x.maxStar }));
+
+    const ship = window.hdShipDbMasterAdapter?.({ name: 'Bismarck drei' });
+    const remaining = new Map((window.hdFLInventory?.() || new Map()).entries());
+    const counts = new Map([...remaining].map(([key, own]) => [key, own.count]));
+    const before = window.hdShipDbExpansionCandidates?.(ship, counts, '電探') || [];
+
+    const star7 = flInv.find(x => x.star === 7);
+    if (star7) counts.set(star7.key, 0);
+    const after = window.hdShipDbExpansionCandidates?.(ship, counts, '電探') || [];
+
+    const ex0 = window.hdShipDbMasterExslotCheck?.(
+      window.hdShipDbMasterRowByName?.('Bismarck drei'),
+      'FuMO25 レーダー',
+      0
+    );
+    const ex7 = window.hdShipDbMasterExslotCheck?.(
+      window.hdShipDbMasterRowByName?.('Bismarck drei'),
+      'FuMO25 レーダー',
+      7
+    );
+
+    localStorage.setItem('harbordesk-equipment-v1', '[]');
+
+    return {
+      dbInv,
+      flInv,
+      before: before.map(x => ({ key: x.own.key, star: x.own.maxStar, remain: x.remain })),
+      after: after.map(x => ({ key: x.own.key, star: x.own.maxStar, remain: x.remain })),
+      ex0: { allowed: !!ex0?.allowed, reqStar: ex0?.reqStar || 0 },
+      ex7: { allowed: !!ex7?.allowed, reqStar: ex7?.reqStar || 0 }
+    };
+  });
+
+  expect(data.dbInv).toHaveLength(2);
+  expect(data.flInv).toHaveLength(2);
+  expect(data.dbInv.map(x => x.star).sort((a,b)=>a-b)).toEqual([0, 7]);
+  expect(data.flInv.map(x => x.star).sort((a,b)=>a-b)).toEqual([0, 7]);
+  expect(new Set(data.dbInv.map(x => x.key)).size).toBe(2);
+  expect(new Set(data.flInv.map(x => x.key)).size).toBe(2);
+  expect(data.ex0.allowed).toBeFalsy();
+  expect(data.ex7.allowed).toBeTruthy();
+  expect(data.ex7.reqStar).toBeGreaterThan(0);
+  expect(data.before.some(x => x.star === 7)).toBeTruthy();
+  expect(data.after.some(x => x.star === 7)).toBeFalsy();
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
