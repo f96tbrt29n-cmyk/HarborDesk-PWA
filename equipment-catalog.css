@@ -28,3 +28,6 @@
  }
  .hd-equip-search input,.hd-equip-search button{min-height:42px}
 }
+
+[data-hd-equip-reset]:disabled{opacity:.42}
+[data-hd-equip-reset].is-active{border-color:#d9b45b;background:#3b2f16;color:#ffe9a8}
