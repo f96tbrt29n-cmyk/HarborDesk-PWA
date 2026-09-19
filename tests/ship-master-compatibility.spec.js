@@ -2972,3 +2972,23 @@ test('database condition reset buttons clear active filters', async ({ page }) =
   expect(data.equipQuery).toBe('');
   expect(data.equipFilter).toBe('すべて');
 });
+
+
+test('global game sync status reflects freshness', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now()-120000,ships:206,equipment:93,decks:4
+    }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdWSEnsureSyncStatus?.();
+    window.hdWSUpdateSyncStatus?.();
+    const b=document.getElementById('hdGlobalSyncStatus');
+    return {text:b?.textContent||'',fresh:b?.classList.contains('fresh')||false,title:b?.title||''};
+  });
+  expect(data.text).toContain('2分前');
+  expect(data.fresh).toBe(true);
+  expect(data.title).toContain('艦娘 206');
+});
