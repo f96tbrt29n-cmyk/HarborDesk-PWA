@@ -1,7 +1,7 @@
 {
-  "version": "1.0.170",
-  "build": 170,
-  "releasedAt": "2026-09-19T22:36:00+09:00",
-  "notes": "Userscripts連携の同一タブ受け渡しをwindow.name方式へ変更。圧縮処理や長いURLフラグメントを使わず、艦これ側で端末内の一時データをwindow.nameへ格納してHarborDeskへ遷移し、HarborDeskが読み取り後すぐ消去して自動同期する。",
+  "version": "1.0.171",
+  "build": 171,
+  "releasedAt": "2026-09-19T22:41:00+09:00",
+  "notes": "Userscripts連携のHarborDesk遷移を強制self-link方式へ変更し、Safariでlocation.hrefが進まないケースへ対応。送信前データもHarborDeskが実際に使う項目だけへ縮小し、window.name受け渡しサイズを削減。パネルにUserscriptバージョンを表示。",
   "masterChanges": null
 }
