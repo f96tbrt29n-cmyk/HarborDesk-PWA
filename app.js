@@ -147,6 +147,14 @@ document.addEventListener('click',e=>{
  const fav=e.target.closest('[data-guide-fav]');if(fav){const id=fav.dataset.guideFav;guideFavs.has(id)?guideFavs.delete(id):guideFavs.add(id);localStorage.setItem(FAV_KEY,JSON.stringify([...guideFavs]));renderGuide();return}
  const emptyTimer=e.target.closest('[data-empty-add-timer]');if(emptyTimer){openTimer(emptyTimer.dataset.emptyAddTimer);return}
  if(e.target.closest('[data-empty-add-quest]')){document.getElementById('questName').value='';document.getElementById('questDialog').showModal();return}
+ const restart=e.target.closest('[data-restart-timer]');if(restart){
+  const k=restart.dataset.kind==='dock'?'dock':'expedition',arr=k==='expedition'?state.expeditions:state.docks,item=arr.find(x=>String(x.id)===String(restart.dataset.restartTimer));
+  if(!item)return;
+  const mins=Number(item.durationMinutes)||0;if(mins<=0)return;
+  const startedAt=Date.now();item.startedAt=startedAt;item.endsAt=startedAt+mins*60000;
+  timerLastSave(k,item.name,mins);save();renderTimers(k);tick();
+  hdToast(`${item.name} をもう一度開始したよ`);return
+ }
  const del=e.target.closest('[data-delete-timer]');if(del){const k=del.dataset.kind,arr=k==='expedition'?state.expeditions:state.docks,i=arr.findIndex(x=>x.id===del.dataset.deleteTimer);if(i<0)return;const [item]=arr.splice(i,1);save();renderTimers(k);hdToastAction(`${item.name} を削除したよ`,'元に戻す',()=>{const target=k==='expedition'?state.expeditions:state.docks;if(!target.some(x=>x.id===item.id)){target.splice(Math.min(i,target.length),0,item);save();renderTimers(k);hdToast('元に戻したよ')}});return}
  const qd=e.target.closest('[data-delete-quest]');if(qd){const i=state.quests.findIndex(x=>x.id===qd.dataset.deleteQuest);if(i<0)return;const [item]=state.quests.splice(i,1);save();renderQuests();hdToastAction(`${item.name} を削除したよ`,'元に戻す',()=>{if(!state.quests.some(x=>x.id===item.id)){state.quests.splice(Math.min(i,state.quests.length),0,item);save();renderQuests();hdToast('元に戻したよ')}});return}
 });
@@ -197,7 +205,7 @@ function renderTimers(kind){
  const rows=[...arr].filter(t=>mode==='all'||(mode==='active'?Number(t.endsAt)>now:Number(t.endsAt)<=now)).sort((a,b)=>a.endsAt-b.endsAt);
  coreListFilterRender(kind,rows.length,arr.length);
  if(!rows.length){el.innerHTML=coreFilteredEmpty(kind,label+'タイマー');return}
- el.innerHTML=rows.map(t=>`<div class="timer ${t.endsAt<=now?'done':''}"><div class="timer-main"><div class="timer-name">${esc(t.name)}</div><div class="timer-time" data-end="${t.endsAt}">${fmt(t.endsAt-now)}</div></div><button class="icon-btn" data-delete-timer="${t.id}" data-kind="${kind}">×</button></div>`).join('');
+ el.innerHTML=rows.map(t=>{const done=Number(t.endsAt)<=now,duration=Number(t.durationMinutes)||0;return `<div class="timer ${done?'done':''}"><div class="timer-main"><div class="timer-name">${esc(t.name)}</div><div class="timer-time" data-end="${t.endsAt}">${fmt(t.endsAt-now)}</div></div><div class="timer-actions">${done&&duration>0?`<button type="button" class="ghost small" data-restart-timer="${t.id}" data-kind="${kind}">もう一度</button>`:''}<button class="icon-btn" data-delete-timer="${t.id}" data-kind="${kind}" aria-label="削除">×</button></div></div>`}).join('');
 }
 function renderQuests(){
  const el=document.getElementById('questList');
