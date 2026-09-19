@@ -83,6 +83,18 @@ function hdToast(message,type='ok',ms=1800){
  return host;
 }
 window.hdToast=hdToast;
+function hdToastAction(message,label,onAction,ms=5000){
+ let host=document.getElementById('hdToastRegion');
+ if(!host){host=document.createElement('div');host.id='hdToastRegion';host.className='hd-toast-region';host.setAttribute('role','status');host.setAttribute('aria-live','polite');host.setAttribute('aria-atomic','true');document.body.appendChild(host)}
+ clearTimeout(HD_TOAST_TIMER);host.className='hd-toast-region action warn';host.textContent='';
+ const text=document.createElement('span');text.textContent=String(message||'');
+ const btn=document.createElement('button');btn.type='button';btn.className='hd-toast-action';btn.textContent=String(label||'元に戻す');
+ btn.addEventListener('click',()=>{clearTimeout(HD_TOAST_TIMER);try{onAction?.()}finally{host.classList.remove('show')}},{once:true});
+ host.append(text,btn);host.classList.add('show');
+ HD_TOAST_TIMER=setTimeout(()=>host.classList.remove('show'),Math.max(1800,Number(ms)||5000));
+ return host;
+}
+window.hdToastAction=hdToastAction;
 function fmt(ms){if(ms<=0)return '完了';const sec=Math.ceil(ms/1000),h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return h>0?`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${m}:${String(s).padStart(2,'0')}`}
 function wikiMapUrl(map){const world=map.split('-')[0];return `https://wikiwiki.jp/kancolle/${encodeURIComponent(WORLD_NAMES[world])}/${map}`}
 
@@ -113,8 +125,8 @@ document.addEventListener('click',e=>{
  const map=e.target.closest('[data-map]');if(map){selectedMap=map.dataset.map;selectedWorld=selectedMap.split('-')[0];renderMapPicker();document.getElementById('selectedMapCard').scrollIntoView({behavior:'smooth',block:'center'});return}
  const gf=e.target.closest('[data-guide-filter]');if(gf){guideFilter=gf.dataset.guideFilter;renderGuide();return}
  const fav=e.target.closest('[data-guide-fav]');if(fav){const id=fav.dataset.guideFav;guideFavs.has(id)?guideFavs.delete(id):guideFavs.add(id);localStorage.setItem(FAV_KEY,JSON.stringify([...guideFavs]));renderGuide();return}
- const del=e.target.closest('[data-delete-timer]');if(del){const k=del.dataset.kind,arr=k==='expedition'?state.expeditions:state.docks;const i=arr.findIndex(x=>x.id===del.dataset.deleteTimer);if(i>=0)arr.splice(i,1);save();renderTimers(k);return}
- const qd=e.target.closest('[data-delete-quest]');if(qd){state.quests=state.quests.filter(x=>x.id!==qd.dataset.deleteQuest);save();renderQuests();}
+ const del=e.target.closest('[data-delete-timer]');if(del){const k=del.dataset.kind,arr=k==='expedition'?state.expeditions:state.docks,i=arr.findIndex(x=>x.id===del.dataset.deleteTimer);if(i<0)return;const [item]=arr.splice(i,1);save();renderTimers(k);hdToastAction(`${item.name} を削除したよ`,'元に戻す',()=>{const target=k==='expedition'?state.expeditions:state.docks;if(!target.some(x=>x.id===item.id)){target.splice(Math.min(i,target.length),0,item);save();renderTimers(k);hdToast('元に戻したよ')}});return}
+ const qd=e.target.closest('[data-delete-quest]');if(qd){const i=state.quests.findIndex(x=>x.id===qd.dataset.deleteQuest);if(i<0)return;const [item]=state.quests.splice(i,1);save();renderQuests();hdToastAction(`${item.name} を削除したよ`,'元に戻す',()=>{if(!state.quests.some(x=>x.id===item.id)){state.quests.splice(Math.min(i,state.quests.length),0,item);save();renderQuests();hdToast('元に戻したよ')}});return}
 });
 document.getElementById('guideQuery').addEventListener('input',renderGuide);
 document.getElementById('guideSearchBtn').onclick=renderGuide;
