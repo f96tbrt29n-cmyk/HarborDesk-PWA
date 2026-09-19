@@ -17,6 +17,9 @@ function hdMapTabSave(map,tab){
 function hdMapEmit(type,detail={}){
   try{window.dispatchEvent(new CustomEvent(type,{detail:{map:typeof selectedMap!=='undefined'?selectedMap:null,tab:typeof selectedMap!=='undefined'&&selectedMap?hdMapTabSaved(selectedMap):null,...detail}}))}catch{}
 }
+function hdMapTabsRevealActive(){
+ requestAnimationFrame(()=>document.querySelector('.map-tab-bar .map-tab-btn.active')?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'}));
+}
 function hdFleetHtml(map){
   const p=hdMapPlan(map);
   if(!(p.presets||[]).length)return '<div class="empty">編成例を準備中</div>';
@@ -58,6 +61,7 @@ function hdApplyMapTabs(){
     <div class="map-tab-pane ${active==='mine'?'active':''}" data-map-pane="mine"><section id="customFleetPanel" class="custom-fleet-section">${hdCustomFleetHtml(selectedMap)}</section></div>
   </article>`;
   const add=document.getElementById('addCustomFleet');if(add&&typeof openCustomFleetDialog==='function')add.onclick=()=>openCustomFleetDialog();
+  hdMapTabsRevealActive();
   hdMapEmit('hd:map-rendered',{map:selectedMap,tab:active});
 }
 
@@ -68,6 +72,7 @@ document.addEventListener('click',e=>{
   const tab=btn.dataset.mapTab;hdMapTabSave(selectedMap,tab);
   document.querySelectorAll('.map-tab-btn').forEach(x=>x.classList.toggle('active',x===btn));
   document.querySelectorAll('.map-tab-pane').forEach(x=>x.classList.toggle('active',x.dataset.mapPane===tab));
+  hdMapTabsRevealActive();
   hdMapEmit('hd:map-tab-changed',{map:selectedMap,tab});
 });
 
