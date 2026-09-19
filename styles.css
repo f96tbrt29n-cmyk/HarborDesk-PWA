@@ -90,3 +90,12 @@ dialog input,dialog select,dialog textarea{font-size:16px}
 .hd-toast-region.action>span{min-width:0;overflow-wrap:anywhere}
 .hd-toast-action{flex:0 0 auto;border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:7px 9px;background:rgba(255,255,255,.1);color:inherit;font:inherit;font-size:11px;font-weight:900}
 .hd-toast-action:active{transform:scale(.97)}
+
+/* mobile destructive-action targets */
+@media(max-width:560px){
+ .icon-btn,[data-roster-delete],[data-eq-delete],[data-event-delete]{
+  min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center
+ }
+ .history-row [data-history-delete]{min-width:44px;min-height:44px}
+ .hd-toast-action{min-height:40px;padding-inline:11px}
+}
