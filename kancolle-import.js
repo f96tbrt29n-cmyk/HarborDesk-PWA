@@ -170,12 +170,40 @@ function hdKcApplyMaterials(parsed){
  return Object.keys(values).length;
 }
 function hdKcApplyDecks(parsed){
- const ships=parsed.ships,rows=[...parsed.decks.values()].sort((a,b)=>Number(a.api_id)-Number(b.api_id)).map(deck=>({
+ const ships=parsed.ships,equipMap=hdKcMasterEquipMap(),rows=[...parsed.decks.values()].sort((a,b)=>Number(a.api_id)-Number(b.api_id)).map(deck=>({
   deckId:Number(deck.api_id),name:String(deck.api_name||`第${deck.api_id}艦隊`),mission:Array.isArray(deck.api_mission)?deck.api_mission.slice(0,4):[],
-  ships:(Array.isArray(deck.api_ship)?deck.api_ship:[]).filter(id=>Number(id)>0).map(id=>{const s=ships.get(Number(id)),m=s?hdKcMasterShip(s.api_ship_id):null;return {gameShipId:Number(id),masterId:Number(s?.api_ship_id)||0,name:String(m?.name||''),level:Number(s?.api_lv)||0}}),
+  ships:(Array.isArray(deck.api_ship)?deck.api_ship:[]).filter(id=>Number(id)>0).map(id=>{
+   const s=ships.get(Number(id)),m=s?hdKcMasterShip(s.api_ship_id):null,slotIds=[...(Array.isArray(s?.api_slot)?s.api_slot:[])];if(Number(s?.api_slot_ex)>0)slotIds.push(Number(s.api_slot_ex));
+   const gear=slotIds.filter(x=>Number(x)>0).map(x=>parsed.slotItems.get(Number(x))).filter(Boolean).map(x=>hdKcEquipLabel(x,equipMap)).join(' / ');
+   return {gameShipId:Number(id),masterId:Number(s?.api_ship_id)||0,name:String(m?.name||''),level:Number(s?.api_lv)||0,gear}
+  }),
   syncedAt:Date.now()
  }));
- localStorage.setItem(HD_KC_FLEETS_KEY,JSON.stringify(rows));return rows.length;
+ localStorage.setItem(HD_KC_FLEETS_KEY,JSON.stringify(rows));hdKcRenderCurrentFleets();return rows.length;
+}
+function hdKcCurrentFleets(){
+ try{const x=JSON.parse(localStorage.getItem(HD_KC_FLEETS_KEY)||'[]');return Array.isArray(x)?x:[]}catch{return []}
+}
+function hdKcCopyFleetToCustom(deckId,map=''){
+ const deck=hdKcCurrentFleets().find(x=>Number(x.deckId)===Number(deckId)),target=String(map||(typeof selectedMap!=='undefined'?selectedMap:'')||'').trim();
+ if(!deck)throw new Error('ゲーム艦隊が見つからない');
+ if(!target)throw new Error('先に攻略海域を選んでね');
+ const all=typeof loadCustomFleets==='function'?loadCustomFleets():(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1')||'{}')||{}}catch{return {}}})();
+ all[target]=all[target]||[];
+ const ships=Array.from({length:6},(_,i)=>{const s=deck.ships?.[i];return {ship:String(s?.name||''),masterId:Number(s?.masterId)||0,gear:String(s?.gear||'')}});
+ const existing=all[target].findIndex(x=>Number(x.sourceDeckId)===Number(deck.deckId)&&x.source==='kancolle-import');
+ const row={id:existing>=0?all[target][existing].id:(typeof cfUid==='function'?cfUid():`kc-fleet-${deck.deckId}-${Date.now()}`),name:`ゲーム同期｜${deck.name}`,ships,memo:`艦これゲーム内の${deck.name}から同期`,source:'kancolle-import',sourceDeckId:Number(deck.deckId),createdAt:existing>=0?all[target][existing].createdAt:Date.now(),updatedAt:Date.now()};
+ if(existing>=0)all[target][existing]=row;else all[target].push(row);
+ if(typeof saveCustomFleets==='function')saveCustomFleets(all);else localStorage.setItem('harbordesk-custom-fleets-v1',JSON.stringify(all));
+ if(typeof renderCustomFleets==='function')renderCustomFleets(target);
+ return row;
+}
+function hdKcRenderCurrentFleets(){
+ const host=document.getElementById('hdKcCurrentFleets');if(!host)return;const rows=hdKcCurrentFleets();
+ if(!rows.length){host.innerHTML='<div class="hd-kc-import-empty">現在艦隊はまだ同期されてないよ</div>';return}
+ const map=typeof selectedMap!=='undefined'?selectedMap:'';
+ host.innerHTML=rows.map(deck=>`<article class="hd-kc-deck"><div class="hd-kc-deck-head"><div><strong>${hdKcEsc(deck.name)}</strong><small>第${deck.deckId}艦隊 ・ ${deck.ships?.length||0}隻</small></div><button type="button" class="ghost small" data-hd-kc-copy-deck="${deck.deckId}">${map?`${hdKcEsc(map)}へコピー`:'海域を選んでコピー'}</button></div><div class="hd-kc-deck-ships">${(deck.ships||[]).map((s,i)=>{const image=s.name&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(Number(s.masterId)>0?{id:Number(s.masterId),name:s.name}:s.name,'kc-deck-thumb'):'';return `<div class="hd-kc-deck-ship"><span>${i+1}</span>${image}<div><b>${hdKcEsc(s.name||'未解決')}</b><small>Lv.${Number(s.level)||0}</small><em>${hdKcEsc(s.gear||'装備データなし')}</em></div></div>`}).join('')}</div></article>`).join('');
+ if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
 }
 function hdKcApplyImport(preview,opts={}){
  const parsed=preview?.parsed;if(!parsed)throw new Error('先にデータを解析してください');
@@ -185,7 +213,7 @@ function hdKcApplyImport(preview,opts={}){
  if(opts.resources!==false&&parsed.materials.size)result.materials=hdKcApplyMaterials(parsed);
  if(opts.fleets!==false&&parsed.decks.size)result.decks=hdKcApplyDecks(parsed);
  const sync={syncedAt:Date.now(),sources:preview.sources,ships:result.ships,equipment:result.equipment,materials:result.materials,decks:result.decks,unknownShips:preview.unknownShips,unknownEquip:preview.unknownEquip};
- localStorage.setItem(HD_KC_SYNC_KEY,JSON.stringify(sync));window.dispatchEvent(new CustomEvent('hd:kancolle-sync',{detail:sync}));
+ localStorage.setItem(HD_KC_SYNC_KEY,JSON.stringify(sync));window.dispatchEvent(new CustomEvent('hd:kancolle-sync',{detail:sync}));hdKcRenderCurrentFleets();
  return sync;
 }
 function hdKcSyncStatus(){
@@ -257,14 +285,16 @@ function hdKcEnsureImport(){
   <div id="hdKcImportResult" class="hd-kc-import-result muted"></div>
   <div class="hd-kc-import-supported"><b>対応:</b> api_port/port、api_get_member/ship2、api_get_member/slot_item、require_info内のapi_slot_item、api_material。<br><b>保存しない:</b> api_token、Cookie、DMM認証情報、貼り付けた生レスポンス。</div>
   <div id="hdKcSyncLast" class="muted"></div>
+  <div class="hd-kc-current"><div class="hd-kc-current-head"><strong>ゲーム現在艦隊</strong><small>同期した第1〜第4艦隊</small></div><div id="hdKcCurrentFleets"></div></div>
  </div>`;
- wrap.insertBefore(sec,backup);hdKcRenderSyncStatus();
+ wrap.insertBefore(sec,backup);hdKcRenderSyncStatus();hdKcRenderCurrentFleets();
 }
 async function hdKcReadAndPreview(raw){
  const p=hdKcPreviewData(hdKcParseImport(raw));HD_KC_IMPORT_PREVIEW=p;const el=document.getElementById('hdKcImportPreview');if(el)el.innerHTML=hdKcPreviewHtml(p);const btn=document.querySelector('[data-hd-kc-apply]');if(btn)btn.disabled=false;return p;
 }
 document.addEventListener('click',async e=>{
  if(e.target.closest?.('[data-hd-kc-copy-capture]')){const ok=await hdKcCopyCaptureHelper();document.getElementById('hdKcImportResult').textContent=ok?'Safari用キャプチャコードをコピーしたよ。下の手順でブックマークURLへ貼ってね。':'コピーできなかったので、このブラウザではJSONファイル/貼り付け取込を使ってね。';return}
+ const deck=e.target.closest?.('[data-hd-kc-copy-deck]');if(deck){try{const row=hdKcCopyFleetToCustom(deck.dataset.hdKcCopyDeck);document.getElementById('hdKcImportResult').textContent=`${row.name} を ${typeof selectedMap!=='undefined'?selectedMap:''} の自分用編成へコピーしたよ`}catch(err){document.getElementById('hdKcImportResult').textContent='コピーできなかった: '+String(err?.message||err)}return}
  if(e.target.closest?.('[data-hd-kc-parse]')){const raw=document.getElementById('hdKcImportText')?.value||'';try{await hdKcReadAndPreview(raw);document.getElementById('hdKcImportResult').textContent='解析できたよ。反映する項目を確認して「HarborDeskへ同期」を押してね。'}catch(err){HD_KC_IMPORT_PREVIEW=null;document.getElementById('hdKcImportResult').textContent='解析失敗: '+String(err?.message||err)}return}
  if(e.target.closest?.('[data-hd-kc-paste]')){try{const raw=await navigator.clipboard.readText();document.getElementById('hdKcImportText').value=raw;await hdKcReadAndPreview(raw);document.getElementById('hdKcImportResult').textContent='クリップボードから解析したよ'}catch(err){document.getElementById('hdKcImportResult').textContent='クリップボードを読めなかった: '+String(err?.message||err)}return}
  if(e.target.closest?.('[data-hd-kc-clear]')){HD_KC_IMPORT_PREVIEW=null;const ta=document.getElementById('hdKcImportText');if(ta)ta.value='';const p=document.getElementById('hdKcImportPreview');if(p)p.innerHTML=hdKcPreviewHtml(null);const b=document.querySelector('[data-hd-kc-apply]');if(b)b.disabled=true;return}
