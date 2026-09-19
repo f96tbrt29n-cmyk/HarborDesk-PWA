@@ -5166,3 +5166,36 @@ test('fleet ship jump persists ship database query', async ({ page }) => {
   expect(data.input).toBe('加賀改');
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
+
+
+test('home current fleet card switches decks and opens ships', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
+      {deckId:1,name:'第1艦隊',mission:[0,0,0,0],ships:[{name:'加賀改',level:94,gear:'烈風'}]},
+      {deckId:2,name:'第2艦隊',mission:[1,5,Date.now()+600000,0],ships:[{name:'榛名改二',level:98,gear:'主砲'}]}
+    ]));
+  });
+  await boot(page,errors);
+  const before=await page.evaluate(()=>{
+    window.renderHomeDashboard?.();
+    return {
+      tabs:[...document.querySelectorAll('[data-home-fleet-tab]')].map(x=>x.textContent),
+      active:document.querySelector('[data-home-fleet-tab].active')?.textContent||'',
+      ship:document.querySelector('[data-home-fleet-ship] b')?.textContent||''
+    };
+  });
+  expect(before.tabs).toEqual(['第1艦隊','第2艦隊']);
+  expect(before.active).toBe('第1艦隊');
+  expect(before.ship).toBe('加賀改');
+  await page.click('[data-home-fleet-tab="2"]');
+  const after=await page.evaluate(()=>({
+    active:document.querySelector('[data-home-fleet-tab].active')?.textContent||'',
+    ship:document.querySelector('[data-home-fleet-ship] b')?.textContent||'',
+    text:document.getElementById('homeCurrentFleet')?.textContent||''
+  }));
+  expect(after.active).toBe('第2艦隊');
+  expect(after.ship).toBe('榛名改二');
+  expect(after.text).toContain('遠征中');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
