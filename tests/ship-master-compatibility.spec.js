@@ -5254,3 +5254,30 @@ test('Home current fleet gear toggle works on mobile', async ({ page }) => {
   expect(stored).toBe('1');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('Home current fleet copies to selected map', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-guide-view-v1', JSON.stringify({world:'5',map:'5-5',filter:'map',query:'5-5'}));
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
+      {deckId:1,name:'第1艦隊',mission:[0,0,0,0],ships:[
+        {name:'加賀改',masterId:84,level:94,gear:'烈風 / 彩雲'},
+        {name:'榛名改二',masterId:149,level:98,gear:'主砲 / 主砲'}
+      ]}
+    ]));
+  });
+  await boot(page,errors);
+  await page.evaluate(()=>window.renderHomeDashboard?.());
+  const copy=page.locator('[data-home-fleet-copy="1"]');
+  await expect(copy).toContainText('5-5へコピー');
+  await copy.click();
+  const saved=await page.evaluate(()=>{
+    const all=JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1')||'{}');
+    return all['5-5']?.find(x=>x.source==='kancolle-import'&&Number(x.sourceDeckId)===1)||null;
+  });
+  expect(saved).toBeTruthy();
+  expect(saved.ships[0].ship).toBe('加賀改');
+  expect(saved.ships[1].ship).toBe('榛名改二');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
