@@ -51,7 +51,8 @@ function renderShipRoster(){
  const q=(document.getElementById('shipRosterSearch')?.value||'').trim().toLowerCase();
  const active=document.querySelector('[data-roster-filter].active')?.dataset.rosterFilter||'all';
  const rows=rosterLoad().filter(x=>(active==='all'||(x.tags||[]).includes(active))&&(!q||`${x.name} ${x.remodel||''} ${(x.tags||[]).join(' ')} ${x.memo||''}`.toLowerCase().includes(q))).sort((a,b)=>Number(b.level||0)-Number(a.level||0)||a.name.localeCompare(b.name,'ja'));
- host.innerHTML=rows.length?rows.map(x=>`<article class="roster-card"><div class="roster-card-head"><div><strong>${rosterEsc(x.name)}</strong><div class="muted">${x.type?`${rosterEsc(x.type)} ・ `:''}${x.level?`Lv.${rosterEsc(x.level)}`:''}${x.remodel?` ・ ${rosterEsc(x.remodel)}`:''}</div></div><div class="roster-actions"><button class="ghost small" data-roster-edit="${x.id}">編集</button><button class="ghost small" data-roster-delete="${x.id}">削除</button></div></div><div class="roster-badges">${(x.tags||[]).map(t=>`<span>${rosterEsc(t)}</span>`).join('')}</div>${x.gear?`<div class="roster-note"><b>装備:</b> ${rosterEsc(x.gear)}</div>`:''}${x.memo?`<div class="roster-note"><b>メモ:</b> ${rosterEsc(x.memo)}</div>`:''}</article>`).join(''):'<div class="empty">まだ艦娘が登録されてないよ。「＋艦娘を登録」から追加してね。</div>';
+ host.innerHTML=rows.length?rows.map(x=>{const image=typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(x.name,'roster-thumb'):'';return `<article class="roster-card"><div class="roster-card-head">${image}<div class="roster-card-main"><div><strong>${rosterEsc(x.name)}</strong><div class="muted">${x.type?`${rosterEsc(x.type)} ・ `:''}${x.level?`Lv.${rosterEsc(x.level)}`:''}${x.remodel?` ・ ${rosterEsc(x.remodel)}`:''}</div></div><div class="roster-actions"><button class="ghost small" data-roster-edit="${x.id}">編集</button><button class="ghost small" data-roster-delete="${x.id}">削除</button></div></div></div><div class="roster-badges">${(x.tags||[]).map(t=>`<span>${rosterEsc(t)}</span>`).join('')}</div>${x.gear?`<div class="roster-note"><b>装備:</b> ${rosterEsc(x.gear)}</div>`:''}${x.memo?`<div class="roster-note"><b>メモ:</b> ${rosterEsc(x.memo)}</div>`:''}</article>`}).join(''):'<div class="empty">まだ艦娘が登録されてないよ。「＋艦娘を登録」から追加してね。</div>';
+ if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
 }
 
 function initShipRoster(){
@@ -68,3 +69,5 @@ document.addEventListener('click',e=>{
 });
 
 document.addEventListener('DOMContentLoaded',initShipRoster);
+window.addEventListener('hd:ship-images-changed',renderShipRoster);
+window.addEventListener('hd:ship-images-ready',renderShipRoster);
