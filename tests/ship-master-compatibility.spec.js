@@ -5703,3 +5703,22 @@ test('global search restores session filters and resets empty results', async ({
   expect(data.saved).toEqual(expect.objectContaining({category:'all',ownedOnly:false}));
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('partial global sync status explains missing game screens', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({syncedAt:Date.now()-120000,ships:206,equipment:93,decks:4,coverage:{ships:true,equipment:false,resources:true,fleets:true,quests:false,docks:false}}));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdWSEnsureSyncStatus?.();window.hdWSUpdateSyncStatus?.();document.getElementById('hdGlobalSyncStatus')?.click();
+    const d=document.getElementById('hdSyncStatusDialog');return {open:!!d?.open,text:d?.textContent||'',state:document.getElementById('hdGlobalSyncStatus')?.className||''};
+  });
+  expect(data.open).toBe(true);
+  expect(data.state).toContain('partial');
+  expect(data.text).toContain('装備');
+  expect(data.text).toContain('任務');
+  expect(data.text).toContain('入渠');
+  expect(data.text).toContain('装備・改装');
+});
