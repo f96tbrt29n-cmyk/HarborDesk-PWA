@@ -2259,3 +2259,117 @@ test('KanColle sortie sync maps node letters, links drop hunt, and avoids duplic
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('Sortie analytics includes game sync and manual logs by map', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-sortie-analytics-mode-v1','map');
+    localStorage.setItem('harbordesk-sortie-analytics-map-v1','all');
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify([
+      {
+        id:'g1',at:3000,map:'2-3',node:'J ボス',result:'S',boss:true,retreat:false,battles:3,drop:'大井',
+        source:'kancolle-import',gameSortieKey:'g1',gameNodeLabel:'J',gameRouteLabels:['A','D','J'],
+        fuel:0,ammo:0,steel:0,bauxite:0,buckets:0
+      },
+      {
+        id:'g2',at:2000,map:'2-3',node:'J ボス',result:'A',boss:true,retreat:false,battles:3,drop:'',
+        source:'kancolle-import',gameSortieKey:'g2',gameNodeLabel:'J',gameRouteLabels:['B','E','J'],
+        fuel:0,ammo:0,steel:0,bauxite:0,buckets:0
+      },
+      {
+        id:'m1',at:1000,map:'2-3',node:'E',result:'撤退',boss:false,retreat:true,battles:2,drop:'',
+        fuel:50,ammo:40,steel:0,bauxite:0,buckets:1
+      },
+      {
+        id:'s1',at:4000,map:'3-5',node:'K ボス',result:'S',boss:true,retreat:false,battles:4,drop:'天津風',
+        sessionId:'ss1',fleetId:'fleet1',fleetName:'北方周回',strategy:'stable',strategyLabel:'安定重視',
+        durationMs:600000,readinessSnapshot:{autoOk:3,autoTotal:3,manualDone:2,manualTotal:2},
+        fuel:120,ammo:100,steel:10,bauxite:20,buckets:0
+      }
+    ]));
+
+    const logs = window.hdSPALogs?.() || [];
+    const rows = window.hdSPARows?.() || [];
+    const r23 = rows.find(x => x.key === '2-3');
+    const r35 = rows.find(x => x.key === '3-5');
+    const html = window.hdSPAHtml?.() || '';
+
+    const result = {
+      logCount: logs.length,
+      rowCount: rows.length,
+      r23: r23 ? {
+        label:r23.label,
+        maps:r23.maps,
+        metrics:r23.metrics,
+        drops:r23.dropStats
+      } : null,
+      r35: r35 ? {
+        label:r35.label,
+        metrics:r35.metrics,
+        drops:r35.dropStats
+      } : null,
+      htmlChecks:{
+        hasMapMode:html.includes('海域別'),
+        hasDropHistory:html.includes('ドロップ履歴'),
+        hasGameSync:html.includes('ゲーム同期'),
+        hasOoi:html.includes('大井'),
+        hasAmatsukaze:html.includes('天津風')
+      }
+    };
+
+    localStorage.removeItem('harbordesk-sortie-analytics-mode-v1');
+    localStorage.removeItem('harbordesk-sortie-analytics-map-v1');
+    localStorage.setItem('harbordesk-sortie-log-v1','[]');
+    return result;
+  });
+
+  expect(data.logCount).toBe(4);
+  expect(data.rowCount).toBe(2);
+  expect(data.r23.label).toContain('2-3');
+  expect(data.r23.maps).toEqual(['2-3']);
+  expect(data.r23.metrics).toEqual(expect.objectContaining({
+    n:3,
+    bossRate:67,
+    sRate:33,
+    winRate:67,
+    retreatRate:33,
+    dropRate:33,
+    drops:1,
+    uniqueDrops:1,
+    avgResource:90,
+    avgBuckets:1,
+    sourceStats:{game:2,session:0,manual:1}
+  }));
+  expect(data.r23.drops.count).toBe(1);
+  expect(data.r23.drops.unique).toBe(1);
+  expect(data.r23.drops.top).toEqual([{ship:'大井',count:1}]);
+  expect(data.r23.drops.recent[0]).toEqual(expect.objectContaining({ship:'大井',map:'2-3',result:'S',source:'game'}));
+
+  expect(data.r35.metrics).toEqual(expect.objectContaining({
+    n:1,
+    bossRate:100,
+    sRate:100,
+    winRate:100,
+    retreatRate:0,
+    dropRate:100,
+    uniqueDrops:1,
+    avgResource:250,
+    avgBuckets:0,
+    avgDurationMin:10,
+    avgReadiness:100,
+    sourceStats:{game:0,session:1,manual:0}
+  }));
+  expect(data.r35.drops.top).toEqual([{ship:'天津風',count:1}]);
+
+  expect(data.htmlChecks).toEqual({
+    hasMapMode:true,
+    hasDropHistory:true,
+    hasGameSync:true,
+    hasOoi:true,
+    hasAmatsukaze:true
+  });
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
