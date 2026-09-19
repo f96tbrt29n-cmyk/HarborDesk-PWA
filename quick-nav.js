@@ -46,13 +46,25 @@ function hdQNJump(id){
  return true;
 }
 function hdQNTogglePin(id){const pins=hdQNLoadPins(),set=new Set(pins);set.has(id)?set.delete(id):set.add(id);hdQNSavePins([...set]);hdQNRenderList(document.getElementById('hdQNSearch')?.value||'');window.dispatchEvent(new CustomEvent('hd:quick-nav-updated'))}
+function hdQNEnsureMobileDock(){
+ if(document.getElementById('hdMobileDock'))return;
+ const dock=document.createElement('nav');dock.id='hdMobileDock';dock.className='hd-mobile-dock';dock.setAttribute('aria-label','主要操作');
+ dock.innerHTML='<button type="button" data-hd-mobile-home><span>⌂</span><b>ホーム</b></button><button type="button" data-hd-mobile-search><span>⌕</span><b>検索</b></button><button type="button" data-hd-mobile-sync><span>↻</span><b>同期</b><i aria-hidden="true"></i></button><button type="button" data-hd-mobile-menu><span>☰</span><b>機能</b></button>';
+ document.body.appendChild(dock);hdQNUpdateMobileDock();
+}
+function hdQNUpdateMobileDock(){
+ const dock=document.getElementById('hdMobileDock');if(!dock)return;
+ const home=dock.querySelector('[data-hd-mobile-home]'),sync=dock.querySelector('[data-hd-mobile-sync]');
+ home?.classList.toggle('active',window.hdWSState?.group==='home');
+ if(sync){sync.classList.remove('fresh','stale','partial','missing');let state='missing';try{state=window.hdWSSyncInfo?.().state||'missing'}catch{}sync.classList.add(state)}
+}
 function hdQNEnsure(){
-  if(document.getElementById('hdQuickNavButton'))return;
+  if(document.getElementById('hdQuickNavButton')){hdQNEnsureMobileDock();return;}
   const btn=document.createElement('button');btn.id='hdQuickNavButton';btn.type='button';btn.className='hd-qn-fab';btn.innerHTML='<span>☰</span><b>機能</b>';btn.addEventListener('click',hdQNOpen);document.body.appendChild(btn);
   const d=document.createElement('dialog');d.id='hdQuickNavDialog';d.className='hd-qn-dialog';d.innerHTML=`<div class="hd-qn-head"><div><div class="eyebrow">QUICK NAV</div><h3>機能をすぐ開く</h3></div><button type="button" class="ghost small" data-hd-qn-close>閉じる</button></div><div class="hd-qn-actions"><button type="button" data-hd-qn-back><span>‹</span><b>戻る</b></button><button type="button" data-hd-qn-home><span>⌂</span><b>ホーム</b></button><button type="button" data-hd-gs-open><span>⌕</span><b>検索</b></button><button type="button" data-hd-qn-sync><span>↻</span><b>同期</b></button><a href="https://play.games.dmm.com/game/kancolle"><span>⚓</span><b>艦これ</b></a><button type="button" data-hd-qn-top><span>↑</span><b>上へ</b></button></div><div class="hd-qn-tools"><input id="hdQNSearch" type="search" placeholder="機能名で検索"></div><div id="hdQNList" class="hd-qn-list"></div><div class="hd-qn-foot">★を付けた機能は上に固定するよ。</div>`;document.body.appendChild(d);
   d.addEventListener('click',e=>{if(e.target===d)hdQNClose()});
   document.getElementById('hdQNSearch')?.addEventListener('input',e=>hdQNRenderList(e.target.value));
-  hdQNRenderList();
+  hdQNRenderList();hdQNEnsureMobileDock();
 }
 function hdQNLoadDiagnostics(){
   if(!document.querySelector('link[data-hd-diagnostics-css]')){const l=document.createElement('link');l.rel='stylesheet';l.href='./diagnostics-center.css';l.dataset.hdDiagnosticsCss='1';document.head.appendChild(l)}
@@ -64,6 +76,10 @@ function hdQNLoadDiagnostics(){
 }
 
 document.addEventListener('click',e=>{
+  if(e.target.closest?.('[data-hd-mobile-home]')){if(typeof hdWSShowElement==='function')hdWSShowElement('home',true);else document.getElementById('home')?.scrollIntoView({behavior:'smooth',block:'start'});return}
+  if(e.target.closest?.('[data-hd-mobile-search]')){if(typeof hdGSOpen==='function')hdGSOpen();return}
+  if(e.target.closest?.('[data-hd-mobile-sync]')){if(typeof hdWSOpenSyncStatus==='function')hdWSOpenSyncStatus();else hdQNJump('kancolleImport');return}
+  if(e.target.closest?.('[data-hd-mobile-menu]')){hdQNOpen();return}
   if(e.target.closest?.('[data-hd-qn-close]')){hdQNClose();return}
   if(e.target.closest?.('[data-hd-qn-back]')){if(!hdQNBack())hdQNClose();return}
   if(e.target.closest?.('[data-hd-qn-home]')){hdQNClose();if(typeof hdWSShowElement==='function')hdWSShowElement('home',true);else document.getElementById('home')?.scrollIntoView({behavior:'smooth',block:'start'});return}
@@ -77,3 +93,7 @@ setTimeout(()=>{hdQNEnsure();hdQNLoadDiagnostics()},1200);
 
 window.addEventListener('hd:workspace-changed',e=>{const id=e.detail?.section;if(id)hdQNRecordHistory(id)});
 window.addEventListener('load',()=>setTimeout(()=>{const id=window.hdWSState?.sections?.[window.hdWSState?.group];if(id)hdQNRecordHistory(id)},1300));
+
+window.addEventListener('hd:workspace-changed',hdQNUpdateMobileDock);
+window.addEventListener('hd:kancolle-sync',hdQNUpdateMobileDock);
+window.addEventListener('storage',e=>{if(!e||e.key==='harbordesk-kancolle-sync-v1')hdQNUpdateMobileDock()});
