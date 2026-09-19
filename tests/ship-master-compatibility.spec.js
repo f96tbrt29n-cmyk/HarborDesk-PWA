@@ -3606,3 +3606,24 @@ test('workspace back returns to previous function', async ({ page }) => {
   expect(data.ok).toBe(true);
   expect(data.after.section).toBe('roster');
 });
+
+
+test('home order can reset to default without touching panel state', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-home-order-v1', JSON.stringify(['recent','quick','procurement','resources']));
+    localStorage.setItem('harbordesk-home-panels-v1', JSON.stringify({resources:true}));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.homeResetOrder?.();
+    return {
+      order:JSON.parse(localStorage.getItem('harbordesk-home-order-v1')||'[]'),
+      panels:JSON.parse(localStorage.getItem('harbordesk-home-panels-v1')||'{}'),
+      dom:[...document.querySelectorAll('#home [data-home-order-item]')].map(x=>x.dataset.homeOrderItem)
+    };
+  });
+  expect(data.order).toEqual(['resources','procurement','quick','recent']);
+  expect(data.panels.resources).toBe(true);
+  expect(data.dom).toEqual(['resources','procurement','quick','recent']);
+});
