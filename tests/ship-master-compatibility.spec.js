@@ -4802,3 +4802,24 @@ test('global search equipment result persists target query', async ({ page }) =>
   expect(data.savedQuery).toBe('試製東海');
   expect(data.filter).toBe('すべて');
 });
+
+
+test('Kancolle sync shows compact success toast with roster action', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdKcNotifySyncSuccess?.({ships:206,equipment:93,decks:4});
+    const host=document.getElementById('hdToastRegion');
+    return {
+      text:host?.textContent||'',
+      action:host?.querySelector('.hd-toast-action')?.textContent||'',
+      shown:host?.classList.contains('show')||false
+    };
+  });
+  expect(data.text).toContain('同期完了');
+  expect(data.text).toContain('艦娘206');
+  expect(data.text).toContain('装備93');
+  expect(data.text).toContain('艦隊4');
+  expect(data.action).toBe('艦隊を見る');
+  expect(data.shown).toBe(true);
+});
