@@ -21,3 +21,7 @@ body.hd-workspace-mode{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 .hd-qn-jump:active,.hd-qn-pin:active{background:rgba(127,200,255,.08)}
 
 @media(max-width:420px){.hd-qn-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.hd-qn-actions button,.hd-qn-actions a{min-height:48px}.hd-qn-actions b{font-size:9px}}
+
+@media(max-width:760px){
+ body.hd-keyboard-open .hd-qn-fab{opacity:0;pointer-events:none;transform:translateY(12px)}
+}
