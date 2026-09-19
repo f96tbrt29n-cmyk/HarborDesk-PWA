@@ -2581,6 +2581,8 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
       usesSelfLink:text.includes("a.target='_self'"),
       hasVisibleVersion:text.includes("HD_VERSION+'</small>"),
       userscriptShowsCoverage:text.includes('data-hd-coverage')&&text.includes('function captureCoverage()'),
+      userscriptGuidesNextCapture:text.includes('data-hd-next-hint')&&text.includes('function nextCaptureHint('),
+      userscriptSendShowsCount:text.includes("HarborDeskへ送る（'+records.length+'件）"),
       hasCompressionStream:text.includes("CompressionStream('gzip')"),
       usesPopup:text.includes('window.open('),
       hasTokenStorage:text.includes('api_token=') || text.includes('Cookie='),
@@ -2601,6 +2603,8 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
   expect(data.usesSelfLink).toBe(true);
   expect(data.hasVisibleVersion).toBe(true);
   expect(data.userscriptShowsCoverage).toBe(true);
+  expect(data.userscriptGuidesNextCapture).toBe(true);
+  expect(data.userscriptSendShowsCount).toBe(true);
   expect(data.hasCompressionStream).toBe(true);
   expect(data.usesPopup).toBe(false);
   expect(data.hasTokenStorage).toBe(false);
