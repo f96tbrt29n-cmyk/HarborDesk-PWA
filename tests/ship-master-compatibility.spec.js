@@ -3022,3 +3022,27 @@ test('reset actions enable only when filters are active', async ({ page }) => {
   expect(active.ship).toBe(true);
   expect(active.equip).toBe(true);
 });
+
+
+test('mobile header keeps notification and update controls compact', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  await page.setViewportSize({width:390,height:844});
+  const data=await page.evaluate(()=>{
+    window.hdEnsureUpdateUI?.();
+    window.updateNotifyButton?.();
+    const notify=document.getElementById('notifyBtn'),update=document.getElementById('hdUpdateCheck'),version=document.querySelector('.hd-version-badge');
+    return {
+      notifyIcon:notify?.querySelector('span')?.textContent||'',
+      notifyLabel:notify?.querySelector('b')?.textContent||'',
+      updateIcon:update?.querySelector('span')?.textContent||'',
+      updateLabel:update?.querySelector('b')?.textContent||'',
+      version:version?.textContent||''
+    };
+  });
+  expect(data.notifyIcon).not.toBe('');
+  expect(data.notifyLabel).not.toBe('');
+  expect(data.updateIcon).toBe('↻');
+  expect(data.updateLabel).toContain('更新');
+  expect(data.version).toContain('v');
+});
