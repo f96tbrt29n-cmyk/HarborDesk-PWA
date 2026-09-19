@@ -9,6 +9,19 @@ function hdGSEsc(v){return typeof hdEsc==='function'?hdEsc(v):String(v??'').repl
 function hdGSLoadJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}}
 function hdGSHistory(){const v=hdGSLoadJson(HD_GS_HISTORY_KEY,[]);return Array.isArray(v)?v:[]}
 function hdGSSaveHistory(q){q=String(q||'').trim();if(q.length<2)return;const rows=hdGSHistory().filter(x=>hdGSNorm(x)!==hdGSNorm(q));rows.unshift(q);localStorage.setItem(HD_GS_HISTORY_KEY,JSON.stringify(rows.slice(0,8)))}
+function hdGSSetHistory(rows){try{localStorage.setItem(HD_GS_HISTORY_KEY,JSON.stringify((Array.isArray(rows)?rows:[]).slice(0,8)))}catch{}}
+function hdGSRemoveHistory(index){
+ const rows=hdGSHistory(),i=Number(index);if(!Number.isInteger(i)||i<0||i>=rows.length)return false;
+ const [item]=rows.splice(i,1);hdGSSetHistory(rows);hdGSRender();
+ window.hdToastAction?.(`${item} を検索履歴から削除したよ`,'元に戻す',()=>{const cur=hdGSHistory();if(!cur.some(x=>hdGSNorm(x)===hdGSNorm(item))){cur.splice(Math.min(i,cur.length),0,item);hdGSSetHistory(cur);hdGSRender();window.hdToast?.('元に戻したよ')}},6500);
+ return true;
+}
+function hdGSClearHistory(){
+ const before=hdGSHistory();if(!before.length)return false;
+ hdGSSetHistory([]);hdGSRender();
+ window.hdToastAction?.(`検索履歴 ${before.length}件を消したよ`,'元に戻す',()=>{hdGSSetHistory(before);hdGSRender();window.hdToast?.('元に戻したよ')},6500);
+ return true;
+}
 function hdGSSections(){return typeof hdQNSections==='function'?hdQNSections():[...document.querySelectorAll('section[id],#selectedMapCard')].map(el=>({id:el.id,title:el.querySelector('h2,h3,h4')?.textContent?.trim()||el.id})).filter(x=>x.id&&x.title)}
 function hdGSRoster(){return hdGSLoadJson('harbordesk-ship-roster-v1',[])}
 function hdGSLedger(){return hdGSLoadJson('harbordesk-equipment-v1',[])}
@@ -74,7 +87,7 @@ function hdGSDestination(row){
 function hdGSScheduleRender(delay=120){clearTimeout(hdGSRenderTimer);hdGSRenderTimer=setTimeout(hdGSRender,Math.max(0,Number(delay)||0))}
 function hdGSRender(){
  const host=document.getElementById('hdGSResults');if(!host)return;const input=document.getElementById('hdGSSearch'),q=hdGSNorm(input?.value||'');
- if(!q){const history=hdGSHistory();host.innerHTML=history.length?`<div class="hd-gs-history-title"><span>最近の検索</span><button type="button" class="ghost small" data-hd-gs-history-clear>履歴を消す</button></div><div class="hd-gs-history">${history.map(x=>`<button type="button" class="ghost small" data-hd-gs-history="${hdGSEsc(x)}">${hdGSEsc(x)}</button>`).join('')}</div><div class="hd-gs-empty">2文字以上入力すると、HarborDesk全体から探せるよ。</div>`:'<div class="hd-gs-empty">艦娘・装備・海域・任務・遠征・機能名をまとめて検索できるよ。</div>';return}
+ if(!q){const history=hdGSHistory();host.innerHTML=history.length?`<div class="hd-gs-history-title"><span>最近の検索</span><button type="button" class="ghost small" data-hd-gs-history-clear>履歴を消す</button></div><div class="hd-gs-history">${history.map((x,i)=>`<span class="hd-gs-history-item"><button type="button" class="ghost small" data-hd-gs-history="${hdGSEsc(x)}">${hdGSEsc(x)}</button><button type="button" class="hd-gs-history-remove" data-hd-gs-history-remove="${i}" aria-label="${hdGSEsc(x)}を検索履歴から削除">×</button></span>`).join('')}</div><div class="hd-gs-empty">2文字以上入力すると、HarborDesk全体から探せるよ。</div>`:'<div class="hd-gs-empty">艦娘・装備・海域・任務・遠征・機能名をまとめて検索できるよ。</div>';return}
  const rows=hdGSIndex().filter(r=>hdGSCategory==='all'||r.type===hdGSCategory).map(r=>({...r,score:hdGSScore(r,q)})).filter(r=>r.score>=0).sort((a,b)=>b.score-a.score||a.title.localeCompare(b.title,'ja')).slice(0,60);hdGSResults=new Map(rows.map(x=>[x.key,x]));
  host.innerHTML=rows.length?`<div class="hd-gs-count">${rows.length}件${rows.length===60?'（上位60件）':''}</div>${rows.map(r=>`<button type="button" class="hd-gs-result ${r.meta?.owned?'owned':''}" data-hd-gs-result="${r.key}"><span class="hd-gs-kind">${hdGSLabel(r.type)}</span><span class="hd-gs-main"><b>${hdGSEsc(r.title)}</b><small>${hdGSEsc(r.subtitle)}</small></span><span class="hd-gs-dest">${hdGSEsc(hdGSDestination(r))}</span><span class="hd-gs-arrow">›</span></button>`).join('')}`:'<div class="hd-gs-empty">一致する項目がないよ。別のキーワードも試してみて。</div>';
 }
@@ -125,7 +138,7 @@ function hdGSOpenResult(row){
  if(a.kind==='quest'){try{if(typeof hdEnsureQuestDb==='function')hdEnsureQuestDb();hdQuestCycle=a.cycle;hdQuestType='すべて';document.querySelectorAll('[data-hd-quest-cycle]').forEach(b=>b.classList.toggle('active',b.dataset.hdQuestCycle===a.cycle));document.querySelectorAll('[data-hd-quest-type]').forEach(b=>b.classList.toggle('active',b.dataset.hdQuestType==='すべて'));const i=document.getElementById('hdQuestDbSearch');if(i)i.value=a.id;if(typeof hdRenderQuestDb==='function')hdRenderQuestDb();hdGSScroll('questDatabase')}catch{}return}
  if(a.kind==='expedition'){try{if(typeof hdEnsureExpeditionDb==='function')hdEnsureExpeditionDb();hdExpGoal='all';hdExpSearch=a.id;const i=document.getElementById('hdExpSearch');if(i)i.value=a.id;document.querySelectorAll('[data-hd-exp-goal]').forEach(b=>b.classList.toggle('active',b.dataset.hdExpGoal==='all'));if(typeof hdRenderExpeditionDb==='function')hdRenderExpeditionDb();hdGSScroll('expeditions')}catch{}return}
 }
-document.addEventListener('click',e=>{if(e.target.closest?.('[data-hd-gs-open]')){hdGSOpen();return}if(e.target.closest?.('[data-hd-gs-close]')){hdGSClose();return}if(e.target.closest?.('[data-hd-gs-history-clear]')){localStorage.removeItem(HD_GS_HISTORY_KEY);hdGSRender();return}const c=e.target.closest?.('[data-hd-gs-cat]');if(c){hdGSSetCategory(c.dataset.hdGsCat);return}const h=e.target.closest?.('[data-hd-gs-history]');if(h){const i=document.getElementById('hdGSSearch');if(i)i.value=h.dataset.hdGsHistory;hdGSRender();return}const r=e.target.closest?.('[data-hd-gs-result]');if(r)hdGSOpenResult(hdGSResults.get(r.dataset.hdGsResult))});
+document.addEventListener('click',e=>{if(e.target.closest?.('[data-hd-gs-open]')){hdGSOpen();return}if(e.target.closest?.('[data-hd-gs-close]')){hdGSClose();return}if(e.target.closest?.('[data-hd-gs-history-clear]')){hdGSClearHistory();return}const remove=e.target.closest?.('[data-hd-gs-history-remove]');if(remove){hdGSRemoveHistory(remove.dataset.hdGsHistoryRemove);return}const c=e.target.closest?.('[data-hd-gs-cat]');if(c){hdGSSetCategory(c.dataset.hdGsCat);return}const h=e.target.closest?.('[data-hd-gs-history]');if(h){const i=document.getElementById('hdGSSearch');if(i)i.value=h.dataset.hdGsHistory;hdGSRender();return}const r=e.target.closest?.('[data-hd-gs-result]');if(r)hdGSOpenResult(hdGSResults.get(r.dataset.hdGsResult))});
 window.addEventListener('hd:quick-nav-updated',()=>hdGSAttachLaunchers());
 window.addEventListener('hd:modules-ready',()=>setTimeout(hdGSEnsure,0));
 window.addEventListener('load',()=>setTimeout(hdGSEnsure,1100));
