@@ -3525,3 +3525,30 @@ test('pinned home shortcuts open pin manager', async ({ page }) => {
   await expect(page.locator('#hdQuickNavDialog')).toBeVisible();
   await expect(page.locator('#hdQuickNavDialog .hd-qn-row.pinned')).toHaveCount(1);
 });
+
+
+test('mobile header moves notification into overflow menu', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  await page.setViewportSize({width:390,height:844});
+  const data=await page.evaluate(()=>{
+    window.hdEnsureUpdateUI?.();
+    window.hdWSEnsureSyncStatus?.();
+    const header=document.querySelector('.topbar');
+    const notify=document.getElementById('notifyBtn');
+    const more=document.querySelector('.hd-header-more');
+    const sync=document.getElementById('hdGlobalSyncStatus');
+    return {
+      notifyInMenu:!!notify?.closest('.hd-version-menu'),
+      moreDirect:more?.parentElement===header,
+      syncDirect:sync?.parentElement===header,
+      notifyDirect:notify?.parentElement===header,
+      notifyLabel:notify?.textContent||''
+    };
+  });
+  expect(data.notifyInMenu).toBe(true);
+  expect(data.moreDirect).toBe(true);
+  expect(data.syncDirect).toBe(true);
+  expect(data.notifyDirect).toBe(false);
+  expect(data.notifyLabel).toContain('通知');
+});
