@@ -4092,3 +4092,21 @@ test('home next action can complete first quest when sync is fresh', async ({ pa
   expect(data.done).toBe(true);
   expect(data.after).toContain('補給');
 });
+
+
+test('Home next action can complete first quest directly', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({syncedAt:Date.now(),ships:1,equipment:1,decks:1}));
+    state.expeditions=[];state.docks=[];state.quests=[{id:'q-next',name:'デイリー演習',done:false}];
+    save();render();renderHomeDashboard();
+    const before=document.getElementById('homeNextAction')?.textContent||'';
+    const btn=document.querySelector('#homeNextAction [data-home-quest-done="q-next"]');
+    btn?.click();
+    return {before,afterDone:!!state.quests[0]?.done,button:!!btn};
+  });
+  expect(data.before).toContain('デイリー演習');
+  expect(data.button).toBe(true);
+  expect(data.afterDone).toBe(true);
+});
