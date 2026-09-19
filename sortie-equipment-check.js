@@ -65,14 +65,19 @@ function hdSECard(row,adv){
    <div class="hd-se-owned-list">${examples.length?examples.map(x=>`<span>${hdSEEsc(x)}</span>`).join(''):'<span class="missing">該当装備の登録なし</span>'}</div>
   </article>`;
 }
+function hdSEAssignedSummary(map){
+ if(typeof hdSPSFleet!=='function'||typeof hdFEPlanFromSavedFleet!=='function'||typeof hdFEEvaluate!=='function')return null;
+ try{const fleet=hdSPSFleet(map);if(!fleet)return null;const e=hdFEEvaluate(hdFEPlanFromSavedFleet(map,fleet));if(!e.items.length)return null;return e}catch{return null}
+}
 function hdSortieEquipmentCheckHtml(map){
- const {rows,adv}=hdSEChecks(map);
+ const {rows,adv}=hdSEChecks(map),assigned=hdSEAssignedSummary(map);
  if(!rows.length)return `<div class="hd-se-panel"><div class="hd-se-summary"><div><strong>出撃装備チェック</strong><span>特殊装備の強い要求は検出されなかったよ</span></div></div></div>`;
  const ready=rows.filter(x=>x.status==='ready').length,partial=rows.filter(x=>x.status==='partial').length,missing=rows.filter(x=>x.status==='missing').length;
  const overall=missing?'不足あり':partial?'要確認':'準備あり';
+ const actual=assigned?`<div class="hd-se-assigned ${assigned.master?.invalid?.length?'bad':assigned.master?.unresolved?.length?'warn':'ok'}"><div><b>選択艦隊の実配備</b><span>海域要求 ${assigned.ready}/${assigned.requirements.length}｜マスター違反 ${assigned.master?.invalid?.length||0} / 未解決 ${assigned.master?.unresolved?.length||0}</span></div><strong>基礎制空 ${assigned.air?.basePower||0}</strong></div>`:'';
  return `<div class="hd-se-panel" data-hd-se-map="${hdSEEsc(map)}">
   <div class="hd-se-summary"><div><div class="eyebrow">SORTIE EQUIPMENT CHECK</div><strong>${hdSEEsc(map)} 出撃装備チェック</strong><span>主要カテゴリ ${rows.length}件｜準備あり ${ready} / 一部あり ${partial} / 不足 ${missing}</span></div><div class="hd-se-summary-actions"><b class="${missing?'missing':partial?'partial':'ready'}">${overall}</b><button type="button" class="ghost small" data-hd-se-refresh>再判定</button></div></div>
-  <p class="muted hd-se-note">装備台帳と海域データを突き合わせた準備目安。艦種・艦娘レベル・搭載数・敵編成・ルート条件まではこの判定だけでは確定しないよ。</p>
+  ${actual}<p class="muted hd-se-note">上段カードは装備台帳の所持目安。選択艦隊がある場合は実配備も100隻マスターのスロット・増設可否で再検証するよ。敵編成・疲労・熟練度などはゲーム画面で最終確認してね。</p>
   <div class="hd-se-grid">${rows.map(x=>hdSECard(x,adv)).join('')}</div>
   <div class="hd-se-footer"><button type="button" class="ghost small" data-hd-se-analyzer>装備戦力診断を開く</button>${adv?.los?'<button type="button" class="ghost small" data-hd-se-calculator>計算ツールを開く</button>':''}</div>
  </div>`;
