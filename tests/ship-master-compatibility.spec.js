@@ -3417,3 +3417,22 @@ test('global search indexes official master-only ships and equipment', async ({ 
   const equipInput=page.locator('#hdShipEquipCheckEquip');
   if(await equipInput.count())await expect(equipInput).not.toHaveValue('');
 });
+
+
+test('home shows recently used functions from quick nav history', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-quick-nav-recent-v1', JSON.stringify([
+      {id:'roster',at:Date.now()},
+      {id:'equipmentBook',at:Date.now()-1000},
+      {id:'quests',at:Date.now()-2000}
+    ]));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.renderHomeDashboard?.();
+    return [...document.querySelectorAll('#homeRecentFunctions [data-home-jump]')].map(x=>({id:x.dataset.homeJump,text:x.textContent}));
+  });
+  expect(data.map(x=>x.id)).toEqual(expect.arrayContaining(['roster','equipmentBook','quests']));
+  expect(data.length).toBeLessThanOrEqual(4);
+});
