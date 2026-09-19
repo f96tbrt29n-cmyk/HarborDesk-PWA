@@ -72,7 +72,7 @@ function hdQNEnsureMobileDock(){
 function hdQNMobileAttentionItems(){
  const items=[],now=Date.now(),RECENT_DONE=2*60*60*1000;
  try{
-  const appState=window.state||{};
+  const appState=typeof window.hdGetAppState==='function'?window.hdGetAppState():{};
   const quests=Array.isArray(appState.quests)?appState.quests:[];
   const expeditions=Array.isArray(appState.expeditions)?appState.expeditions:[];
   const docks=Array.isArray(appState.docks)?appState.docks:[];
