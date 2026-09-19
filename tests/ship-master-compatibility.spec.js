@@ -5518,3 +5518,40 @@ test('sortie readiness exposes final ready state', async ({ page }) => {
   expect(data.game).toBe(true);
   expect(data.pending).toBe(true);
 });
+
+
+test('sortie manual checks prioritize incomplete items', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-guide-view-v1', JSON.stringify({world:'5',map:'5-5',filter:'map',query:'5-5'}));
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({'5-5':[
+      {id:'fleet-manual',name:'ゲーム同期｜第1艦隊',source:'kancolle-import',sourceDeckId:1,sourceSyncedAt:Date.now(),ships:[
+        {ship:'加賀改',gear:'烈風 / 彩雲',nowHp:70,maxHp:79,cond:55}
+      ]}
+    ]}));
+    localStorage.setItem('harbordesk-sortie-selection-v1', JSON.stringify({'5-5':'fleet-manual'}));
+    localStorage.setItem('harbordesk-sortie-readiness-v1', JSON.stringify({'5-5:fleet-manual':{supply:true,damage:true}}));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'1',name:'加賀改',level:94,tags:[]}]));
+  });
+  await boot(page,errors);
+  await page.evaluate(()=>{
+    if(typeof selectedMap!=='undefined')selectedMap='5-5';
+    document.querySelector('[data-map-tab="mine"]')?.click();
+    window.hdRenderSortieReadiness?.();
+  });
+  const data=await page.evaluate(()=>{
+    const manual=document.querySelector('#hdSortieReadiness .hd-sortie-manual');
+    const details=manual?.querySelector('.hd-sortie-manual-done');
+    return {
+      pending:[...manual?.querySelectorAll(':scope > .hd-sortie-check')||[]].map(x=>x.textContent.trim()),
+      done:[...details?.querySelectorAll('.hd-sortie-check')||[]].map(x=>x.textContent.trim()),
+      open:!!details?.open,
+      sub:manual?.querySelector('.hd-sortie-subhead span')?.textContent||''
+    };
+  });
+  expect(data.pending.length).toBeGreaterThan(0);
+  expect(data.done.length).toBe(2);
+  expect(data.open).toBe(false);
+  expect(data.sub).toContain('残り');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
