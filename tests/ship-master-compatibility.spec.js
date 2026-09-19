@@ -4823,3 +4823,52 @@ test('Kancolle sync shows compact success toast with roster action', async ({ pa
   expect(data.action).toBe('艦隊を見る');
   expect(data.shown).toBe(true);
 });
+
+
+test('Kancolle sync toast prioritizes delta and next action', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const read=()=>{
+      const host=document.getElementById('hdToastRegion');
+      return {text:host?.querySelector('span')?.textContent||host?.textContent||'',button:host?.querySelector('button')?.textContent||''};
+    };
+    window.hdKcNotifySyncSuccess?.({
+      ships:206,equipment:93,decks:4,
+      delta:{baseline:true,ships:1,equipment:0,resources:{fuel:500}}
+    });
+    const ships=read();
+    window.hdKcNotifySyncSuccess?.({
+      ships:206,equipment:95,decks:4,
+      delta:{baseline:true,ships:0,equipment:2,resources:{}}
+    });
+    const equipment=read();
+    window.hdKcNotifySyncSuccess?.({
+      ships:206,equipment:95,decks:4,
+      delta:{baseline:true,ships:0,equipment:0,resources:{fuel:-120,ammo:40}}
+    });
+    const resources=read();
+    window.hdKcNotifySyncSuccess?.({
+      ships:206,equipment:95,decks:4,
+      delta:{baseline:true,ships:0,equipment:0,resources:{}}
+    });
+    const unchanged=read();
+    window.hdKcNotifySyncSuccess?.({
+      ships:206,equipment:95,decks:4,
+      delta:{baseline:false,ships:null,equipment:null,resources:{}}
+    });
+    const first=read();
+    return {ships,equipment,resources,unchanged,first};
+  });
+  expect(data.ships.text).toContain('艦娘 +1');
+  expect(data.ships.button).toBe('艦隊を見る');
+  expect(data.equipment.text).toContain('装備 +2');
+  expect(data.equipment.button).toBe('装備を見る');
+  expect(data.resources.text).toContain('燃料 -120');
+  expect(data.resources.button).toBe('資源を見る');
+  expect(data.unchanged.text).toContain('変化なし');
+  expect(data.unchanged.button).toBe('同期詳細');
+  expect(data.first.text).toContain('初回同期');
+  expect(data.first.button).toBe('同期詳細');
+  expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
+});
