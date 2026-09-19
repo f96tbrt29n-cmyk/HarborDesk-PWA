@@ -192,3 +192,30 @@ test('master recommendations resolve exact owned equipment variants without infl
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('master acquisition candidates are filtered by the selected ship compatibility', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    const row = window.hdShipDbMasterRowByName?.('Bismarck drei');
+    const rows = window.hdAGMasterCandidates?.(row?.id, '大口径主砲') || [];
+    return {
+      count: rows.length,
+      names: rows.map(x => x.name),
+      checks: rows.map(item => {
+        const meta = window.hdShipDbMasterEquipmentMeta?.(item.name);
+        const normal = window.hdShipDbMasterNormalCheck?.(row, item.name);
+        return { name: item.name, typeName: meta?.typeName || '', allowed: !!normal?.allowed };
+      })
+    };
+  });
+
+  expect(data.count).toBeGreaterThan(0);
+  expect(data.names).toContain('41cm連装砲');
+  expect(data.checks.every(x => x.typeName === '大口径主砲')).toBeTruthy();
+  expect(data.checks.every(x => x.allowed)).toBeTruthy();
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
