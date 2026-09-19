@@ -29,3 +29,15 @@ button.home-next-main{cursor:pointer}
 .home-next-action.soon{border-color:rgba(244,190,82,.5);background:linear-gradient(180deg,rgba(88,66,22,.3),#091725)}
 .home-next-action.task{border-color:rgba(87,180,235,.4)}
 @media(max-width:560px){.home-next-action{align-items:stretch}.home-next-action>.ghost{flex:0 0 auto}.home-next-main strong{font-size:14px}}
+
+.home-card-actions{display:flex;align-items:center;gap:7px;min-width:0}
+.home-card-actions .muted{white-space:nowrap}
+.home-collapse-btn{width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;font-size:15px;line-height:1}
+.home-collapsible.is-collapsed{padding-bottom:10px}
+.home-collapsible.is-collapsed .home-card-title{margin-bottom:0}
+.home-collapsible [data-home-panel-body][hidden]{display:none}
+@media(max-width:520px){
+ .home-card-actions{gap:5px}
+ .home-card-actions .muted{font-size:10px;max-width:90px;overflow:hidden;text-overflow:ellipsis}
+ .home-collapse-btn{width:32px;height:32px}
+}
