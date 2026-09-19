@@ -84,7 +84,25 @@ function bindAdvancedEvents(){
  document.getElementById('equipmentForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const rows=hdLoad(HD_EQUIP_KEY,[]),id=document.getElementById('equipmentId').value||hdUid();const item={id,name:document.getElementById('equipmentName').value.trim(),category:document.getElementById('equipmentCategory').value.trim(),count:Number(document.getElementById('equipmentCount').value)||0,star:Number(document.getElementById('equipmentStar').value)||0,targetStar:Number(document.getElementById('equipmentTargetStar').value)||0,assigned:document.getElementById('equipmentAssigned').value.trim(),memo:document.getElementById('equipmentMemo').value.trim(),updatedAt:Date.now()};const i=rows.findIndex(x=>x.id===id);if(i>=0)rows[i]={...rows[i],...item};else rows.unshift({...item,createdAt:Date.now()});hdSave(HD_EQUIP_KEY,rows);setTimeout(()=>{renderEquipment();renderDashboard()},0)});
  document.getElementById('snapshotResources').onclick=snapshotResources;const sr=document.getElementById('saveResources');if(sr)sr.addEventListener('click',()=>setTimeout(snapshotResources,0));
  document.getElementById('addEventLog').onclick=()=>openEvent();document.getElementById('eventForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const rows=hdLoad(HD_EVENT_KEY,[]),id=document.getElementById('eventId').value||hdUid();const item={id,eventName:document.getElementById('eventName').value.trim(),map:document.getElementById('eventMap').value.trim(),difficulty:document.getElementById('eventDifficulty').value,status:document.getElementById('eventStatus').value,drop:document.getElementById('eventDrop').value.trim(),fleet:document.getElementById('eventFleet').value.trim(),memo:document.getElementById('eventMemo').value.trim(),updatedAt:Date.now()};const i=rows.findIndex(x=>x.id===id);if(i>=0)rows[i]={...rows[i],...item};else rows.unshift({...item,createdAt:Date.now()});hdSave(HD_EVENT_KEY,rows);setTimeout(()=>{renderEvents();renderDashboard()},0)});
- document.addEventListener('click',e=>{const ee=e.target.closest('[data-eq-edit]');if(ee){openEquipment(hdLoad(HD_EQUIP_KEY,[]).find(x=>x.id===ee.dataset.eqEdit));return}const ed=e.target.closest('[data-eq-delete]');if(ed){hdSave(HD_EQUIP_KEY,hdLoad(HD_EQUIP_KEY,[]).filter(x=>x.id!==ed.dataset.eqDelete));renderEquipment();renderDashboard();return}const he=e.target.closest('[data-history-delete]');if(he){hdSave(HD_RESOURCE_HISTORY_KEY,hdLoad(HD_RESOURCE_HISTORY_KEY,[]).filter(x=>x.id!==he.dataset.historyDelete));renderResourceHistory();hdRefreshResourceConsumers();return}const ev=e.target.closest('[data-event-edit]');if(ev){openEvent(hdLoad(HD_EVENT_KEY,[]).find(x=>x.id===ev.dataset.eventEdit));return}const dv=e.target.closest('[data-event-delete]');if(dv){hdSave(HD_EVENT_KEY,hdLoad(HD_EVENT_KEY,[]).filter(x=>x.id!==dv.dataset.eventDelete));renderEvents();renderDashboard()}});
+ document.addEventListener('click',e=>{
+ const ee=e.target.closest('[data-eq-edit]');if(ee){openEquipment(hdLoad(HD_EQUIP_KEY,[]).find(x=>x.id===ee.dataset.eqEdit));return}
+ const ed=e.target.closest('[data-eq-delete]');if(ed){
+  const rows=hdLoad(HD_EQUIP_KEY,[]),i=rows.findIndex(x=>x.id===ed.dataset.eqDelete);if(i<0)return;const [item]=rows.splice(i,1);
+  hdSave(HD_EQUIP_KEY,rows);renderEquipment();renderDashboard();
+  window.hdToastAction?.(`${item.name||'装備'} を削除したよ`,'元に戻す',()=>{const current=hdLoad(HD_EQUIP_KEY,[]);if(!current.some(x=>x.id===item.id)){current.splice(Math.min(i,current.length),0,item);hdSave(HD_EQUIP_KEY,current);renderEquipment();renderDashboard();window.hdToast?.('元に戻したよ')}});return
+ }
+ const he=e.target.closest('[data-history-delete]');if(he){
+  const rows=hdLoad(HD_RESOURCE_HISTORY_KEY,[]),i=rows.findIndex(x=>x.id===he.dataset.historyDelete);if(i<0)return;const [item]=rows.splice(i,1);
+  hdSave(HD_RESOURCE_HISTORY_KEY,rows);renderResourceHistory();hdRefreshResourceConsumers();
+  window.hdToastAction?.('資源履歴を削除したよ','元に戻す',()=>{const current=hdLoad(HD_RESOURCE_HISTORY_KEY,[]);if(!current.some(x=>x.id===item.id)){current.splice(Math.min(i,current.length),0,item);hdSave(HD_RESOURCE_HISTORY_KEY,current);renderResourceHistory();hdRefreshResourceConsumers();window.hdToast?.('元に戻したよ')}});return
+ }
+ const ev=e.target.closest('[data-event-edit]');if(ev){openEvent(hdLoad(HD_EVENT_KEY,[]).find(x=>x.id===ev.dataset.eventEdit));return}
+ const dv=e.target.closest('[data-event-delete]');if(dv){
+  const rows=hdLoad(HD_EVENT_KEY,[]),i=rows.findIndex(x=>x.id===dv.dataset.eventDelete);if(i<0)return;const [item]=rows.splice(i,1);
+  hdSave(HD_EVENT_KEY,rows);renderEvents();renderDashboard();
+  window.hdToastAction?.(`${item.eventName||'イベント記録'} を削除したよ`,'元に戻す',()=>{const current=hdLoad(HD_EVENT_KEY,[]);if(!current.some(x=>x.id===item.id)){current.splice(Math.min(i,current.length),0,item);hdSave(HD_EVENT_KEY,current);renderEvents();renderDashboard();window.hdToast?.('元に戻したよ')}});return
+ }
+});
  document.getElementById('addAirRow').onclick=()=>addAirRow();['effMinutes','effFuel','effAmmo','effSteel','effBauxite'].forEach(id=>document.getElementById(id).addEventListener('input',calcEfficiency));
  document.getElementById('exportBackup').onclick=exportBackup;document.getElementById('importBackup').onchange=e=>{const f=e.target.files?.[0];if(f)importBackup(f)};
 }
