@@ -2373,3 +2373,109 @@ test('Sortie analytics includes game sync and manual logs by map', async ({ page
   });
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('Sortie analytics finds dangerous nodes and route performance', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-sortie-analytics-mode-v1','map');
+    localStorage.setItem('harbordesk-sortie-analytics-map-v1','2-3');
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify([
+      {
+        id:'route1',at:3000,map:'2-3',node:'J ボス',result:'S',boss:true,retreat:false,drop:'大井',
+        source:'kancolle-import',gameRouteLabels:['A','D','J'],
+        gameBattleResults:[
+          {nodeLabel:'A',rank:'S',drop:''},
+          {nodeLabel:'D',rank:'A',drop:''},
+          {nodeLabel:'J',rank:'S',drop:'大井',dropShipId:24}
+        ]
+      },
+      {
+        id:'route2',at:2000,map:'2-3',node:'E',result:'C',boss:false,retreat:true,drop:'',
+        source:'kancolle-import',gameRouteLabels:['A','D','E'],
+        gameBattleResults:[
+          {nodeLabel:'A',rank:'S',drop:''},
+          {nodeLabel:'D',rank:'B',drop:''},
+          {nodeLabel:'E',rank:'C',drop:''}
+        ]
+      },
+      {
+        id:'route3',at:1000,map:'2-3',node:'J ボス',result:'A',boss:true,retreat:false,drop:'',
+        source:'kancolle-import',gameRouteLabels:['B','E','J'],
+        gameBattleResults:[
+          {nodeLabel:'B',rank:'S',drop:''},
+          {nodeLabel:'E',rank:'A',drop:''},
+          {nodeLabel:'J',rank:'A',drop:''}
+        ]
+      }
+    ]));
+
+    const rows = window.hdSPARows?.() || [];
+    const row = rows[0] || null;
+    const html = window.hdSPAHtml?.() || '';
+
+    const result = {
+      nodeStats: row?.nodeStats || [],
+      routeStats: row?.routeStats || [],
+      htmlChecks:{
+        hasNodeTitle:html.includes('マス別分析'),
+        hasRouteTitle:html.includes('ルート別分析'),
+        hasDangerNode:html.includes('撤退 50%'),
+        hasRouteText:html.includes('A→D→J')
+      }
+    };
+
+    localStorage.removeItem('harbordesk-sortie-analytics-mode-v1');
+    localStorage.removeItem('harbordesk-sortie-analytics-map-v1');
+    localStorage.setItem('harbordesk-sortie-log-v1','[]');
+    return result;
+  });
+
+  const byNode = Object.fromEntries(data.nodeStats.map(x => [x.node, x]));
+  expect(byNode.E).toEqual(expect.objectContaining({
+    visits:2,
+    battles:2,
+    retreats:1,
+    retreatRate:50,
+    sRate:0,
+    aRate:50,
+    bRate:0
+  }));
+  expect(byNode.J).toEqual(expect.objectContaining({
+    visits:2,
+    battles:2,
+    retreats:0,
+    retreatRate:0,
+    sRate:50,
+    aRate:50,
+    drops:1
+  }));
+  expect(byNode.D).toEqual(expect.objectContaining({
+    visits:2,
+    battles:2,
+    sRate:0,
+    aRate:50,
+    bRate:50
+  }));
+
+  const byRoute = Object.fromEntries(data.routeStats.map(x => [x.route, x]));
+  expect(byRoute['A→D→J']).toEqual(expect.objectContaining({
+    n:1,bossRate:100,retreatRate:0,sRate:100,dropRate:100
+  }));
+  expect(byRoute['A→D→E']).toEqual(expect.objectContaining({
+    n:1,bossRate:0,retreatRate:100,sRate:0
+  }));
+  expect(byRoute['B→E→J']).toEqual(expect.objectContaining({
+    n:1,bossRate:100,retreatRate:0,sRate:0,winRate:100
+  }));
+
+  expect(data.htmlChecks).toEqual({
+    hasNodeTitle:true,
+    hasRouteTitle:true,
+    hasDangerNode:true,
+    hasRouteText:true
+  });
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
