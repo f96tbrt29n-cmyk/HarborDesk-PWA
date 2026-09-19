@@ -19,6 +19,7 @@ function ensureHomeDashboard(){
    <article class="home-card"><div class="home-card-title"><strong>進行中タイマー</strong><a href="#expeditions">遠征へ</a></div><div id="homeTimers"></div></article>
   </div>
   <article class="home-card"><div class="home-card-title"><strong>資源</strong><a href="#resources">記録へ</a></div><div id="homeResources" class="home-resource-grid"></div></article>
+  <article class="home-card"><div class="home-card-title"><strong>次の装備調達</strong><button type="button" class="ghost small" data-home-procurement-open>調達リストへ</button></div><div id="homeProcurement"></div></article>
   <article class="home-card"><div class="home-card-title"><strong>クイックアクセス</strong><span class="muted">1〜2タップで移動</span></div><div class="home-shortcuts">
     <a href="#guide">🗺️ 攻略</a><a href="#roster">⚓ 艦隊</a><a href="#equipmentBook">🧰 装備</a><a href="#eventLog">🎯 イベント</a><a href="#calculators">🧮 計算</a><a href="#backup">💾 保存</a>
   </div></article>
@@ -49,6 +50,15 @@ function renderHomeDashboard(){
  document.getElementById('homeTimers').innerHTML=running.length?running.slice(0,5).map(t=>`<div class="home-row"><span><b>${t.kind}</b> ${homeEsc(t.name)}</span><small>${typeof fmt==='function'?fmt(t.endsAt-now):''}</small></div>`).join(''):'<div class="home-empty">動いているタイマーはないよ</div>';
  const res=[['燃料',resources.fuel],['弾薬',resources.ammo],['鋼材',resources.steel],['ボーキ',resources.bauxite]];
  document.getElementById('homeResources').innerHTML=res.map(([name,val])=>`<div><span>${name}</span><strong>${val!==''&&val!=null?Number(val).toLocaleString():'-'}</strong></div>`).join('');
+ const procurement=document.getElementById('homeProcurement');
+ if(procurement){
+  let html='<div class="home-empty">不足装備を調達リストへ追加すると、次に揃える装備がここに出るよ</div>';
+  if(typeof hdPLPriorityRows==='function'&&typeof hdPLNextActionMeta==='function'){
+   const row=hdPLPriorityRows(undefined,1)?.[0],action=row?hdPLNextActionMeta(row):null;
+   if(row&&action)html=`<div class="home-procurement-next"><div><small>${homeEsc(action.label)}</small><strong>${homeEsc(action.title||row.target||row.wanted)}</strong><span>${homeEsc(action.sub||'')}</span></div><b>あと ${Number(row.shortfall)||0}</b></div><p class="home-procurement-reason">${(row.priority?.reasons||[]).map(homeEsc).join('・')}</p>`;
+  }
+  procurement.innerHTML=html;
+ }
  const recent=loadRecentMaps();
  document.getElementById('homeRecentMaps').innerHTML=recent.length?recent.map(m=>`<button class="recent-map-btn" data-home-map="${m}">${m}</button>`).join(''):'<div class="home-empty">海域を見るとここに履歴が出るよ</div>';
 }
@@ -58,9 +68,13 @@ document.addEventListener('click',e=>{
  if(mapButton?.dataset.map){saveRecentMap(mapButton.dataset.map);setTimeout(renderHomeDashboard,0)}
  const recent=e.target.closest('[data-home-map]');
  if(recent){const map=recent.dataset.homeMap;try{selectedWorld=map.split('-')[0];selectedMap=map;guideFilter='map';const q=document.getElementById('guideQuery');if(q)q.value=map;renderGuide();saveRecentMap(map);if(typeof hdWSShowElement==='function')hdWSShowElement('guide',false);else location.hash='guide';setTimeout(()=>document.getElementById('selectedMapCard')?.scrollIntoView({behavior:'smooth',block:'start'}),80)}catch{location.hash='guide'}}
+ if(e.target.closest('[data-home-procurement-open]')){if(typeof hdPLOpenList==='function')hdPLOpenList();else location.hash='equipmentBook'}
 });
 
 window.addEventListener('storage',renderHomeDashboard);
+window.addEventListener('hd:modules-ready',renderHomeDashboard);
+window.addEventListener('hd:equipment-changed',renderHomeDashboard);
+window.addEventListener('hd:procurement-changed',renderHomeDashboard);
 setInterval(renderHomeDashboard,5000);
 window.addEventListener('load',()=>setTimeout(renderHomeDashboard,300));
 ensureHomeDashboard();
