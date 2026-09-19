@@ -329,3 +329,18 @@ body.hd-booting::after{
   margin:4px auto;
  }
 }
+
+@media(max-width:560px){
+ .topbar{transition:padding .16s ease,background .16s ease,box-shadow .16s ease}
+ body.hd-header-compact .topbar{
+  padding-top:5px!important;
+  padding-bottom:5px!important;
+  min-height:42px;
+  background:rgba(7,17,28,.97);
+  box-shadow:0 4px 16px rgba(0,0,0,.2)
+ }
+ body.hd-header-compact .topbar>div:first-child .eyebrow{display:none}
+ body.hd-header-compact .topbar>div:first-child h1{font-size:17px;margin:0}
+ body.hd-header-compact .topbar .hd-global-sync-status{padding-top:4px;padding-bottom:4px}
+}
+@media(prefers-reduced-motion:reduce){.topbar{transition:none!important}}
