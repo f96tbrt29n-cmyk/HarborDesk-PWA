@@ -3761,3 +3761,41 @@ test('completed core items can be bulk cleaned and undone', async ({ page }) => 
   rows=await page.evaluate(()=>state.quests.map(x=>x.id));
   expect(rows).toEqual(['q-active','q-done']);
 });
+
+
+test('core completed cleanup supports undo', async ({ page }) => {
+  const now=Date.now();
+  await page.addInitScript(({now}) => {
+    localStorage.setItem('harbordesk-v2', JSON.stringify({
+      expeditions:[
+        {id:'e-done',name:'完了遠征',endsAt:now-1000},
+        {id:'e-active',name:'稼働遠征',endsAt:now+3600000}
+      ],
+      docks:[{id:'d-done',name:'完了入渠',endsAt:now-1000}],
+      quests:[
+        {id:'q-done',name:'完了任務',done:true},
+        {id:'q-active',name:'未完了任務',done:false}
+      ],
+      resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
+    }));
+  }, {now});
+  await boot(page,[]);
+  await page.waitForSelector('[data-core-cleanup="quest"]:not([hidden])');
+
+  const labels=await page.evaluate(()=>({
+    exp:document.querySelector('[data-core-cleanup="expedition"]')?.textContent||'',
+    dock:document.querySelector('[data-core-cleanup="dock"]')?.textContent||'',
+    quest:document.querySelector('[data-core-cleanup="quest"]')?.textContent||''
+  }));
+  expect(labels.exp).toContain('1');
+  expect(labels.dock).toContain('1');
+  expect(labels.quest).toContain('1');
+
+  await page.click('[data-core-cleanup="quest"]');
+  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  expect(state.quests.map(x=>x.id)).toEqual(['q-active']);
+
+  await page.click('#hdToastRegion .hd-toast-action');
+  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  expect(state.quests.map(x=>x.id)).toEqual(['q-done','q-active']);
+});
