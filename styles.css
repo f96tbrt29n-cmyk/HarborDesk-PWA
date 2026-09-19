@@ -168,3 +168,9 @@ body.hd-booting::after{
  .core-list-filter{position:sticky;top:calc(var(--hd-topbar-h,58px) + var(--hd-workspace-nav-h,66px));z-index:5;margin:0 -4px 8px;padding:6px 4px;background:rgba(7,21,33,.96);backdrop-filter:blur(10px)}
  .core-list-filter button{min-height:38px}
 }
+
+.core-list-cleanup{margin-left:2px;color:#ffd2d2;border-color:rgba(226,126,126,.34)}
+.core-list-cleanup[hidden]{display:none}
+@media(max-width:560px){
+ .core-list-filter .core-list-cleanup{margin-left:0}
+}
