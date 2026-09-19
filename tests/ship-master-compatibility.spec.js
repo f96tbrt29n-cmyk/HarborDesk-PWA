@@ -3494,3 +3494,19 @@ test('home prioritizes pinned functions over recent functions', async ({ page })
   expect(data.recent).toEqual(expect.arrayContaining(['quests','expeditions']));
   expect(data.recent).not.toContain('roster');
 });
+
+
+test('boot feedback clears when modules initialize', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    document.body.classList.add('hd-booting');
+    window.hdInitLoadedModules?.();
+    return {
+      booting:document.body.classList.contains('hd-booting'),
+      ready:document.body.getAttribute('data-hd-ready')||''
+    };
+  });
+  expect(data.booting).toBe(false);
+  expect(data.ready).toBe('1');
+});
