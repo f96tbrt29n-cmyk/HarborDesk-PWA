@@ -2,3 +2,12 @@
 @supports(content-visibility:auto){
  .hd-equip-ref-card{content-visibility:auto;contain-intrinsic-size:180px}
 }
+
+.hd-equip-head-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.hd-equip-catalog-list.hd-compact .hd-equip-ref-card{padding:9px;gap:6px}
+.hd-equip-catalog-list.hd-compact .hd-equip-ref-card p,
+.hd-equip-catalog-list.hd-compact .hd-equip-ref-grid,
+.hd-equip-catalog-list.hd-compact .hd-equip-ref-card .guide-link{display:none}
+.hd-equip-catalog-list.hd-compact .hd-equip-ref-head strong{font-size:14px}
+.hd-equip-catalog-list.hd-compact .hd-equip-tags span,.hd-equip-catalog-list.hd-compact .hd-equip-stats span{font-size:10px;padding:3px 5px}
+@media(max-width:520px){.hd-equip-head-actions{justify-content:flex-start}}
