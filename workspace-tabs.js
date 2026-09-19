@@ -210,6 +210,34 @@ function hdWSInstallKeyboardTracking(){
  document.addEventListener('focusout',()=>setTimeout(update,120),true);
  window.addEventListener('orientationchange',()=>setTimeout(()=>{hdWSViewportBaseline=window.visualViewport?.height||window.innerHeight||hdWSViewportBaseline;update()},250),{passive:true});
 }
+let hdWSLastScrollY=Math.max(0,window.scrollY||0),hdWSScrollTick=false;
+function hdWSSetHeaderCompact(compact){
+ const mobile=window.matchMedia?.('(max-width:560px)')?.matches!==false;
+ const blocked=document.body.classList.contains('hd-keyboard-open')||document.querySelector('.hd-header-more[open]');
+ const next=!!compact&&mobile&&!blocked&&Math.max(0,window.scrollY||0)>100;
+ if(document.body.classList.contains('hd-header-compact')===next)return next;
+ document.body.classList.toggle('hd-header-compact',next);
+ requestAnimationFrame(hdWSUpdateTopbarHeight);
+ return next;
+}
+function hdWSUpdateScrollCompact(){
+ hdWSScrollTick=false;
+ const y=Math.max(0,window.scrollY||0),delta=y-hdWSLastScrollY;
+ if(y<72)hdWSSetHeaderCompact(false);
+ else if(delta>12)hdWSSetHeaderCompact(true);
+ else if(delta<-6)hdWSSetHeaderCompact(false);
+ hdWSLastScrollY=y;
+}
+function hdWSInstallScrollCompact(){
+ if(window.__HD_WS_SCROLL_COMPACT)return;window.__HD_WS_SCROLL_COMPACT=true;
+ hdWSLastScrollY=Math.max(0,window.scrollY||0);
+ window.addEventListener('scroll',()=>{
+  if(hdWSScrollTick)return;hdWSScrollTick=true;requestAnimationFrame(hdWSUpdateScrollCompact);
+ },{passive:true});
+ document.addEventListener('focusin',()=>hdWSSetHeaderCompact(false),true);
+ document.addEventListener('toggle',e=>{if(e.target?.matches?.('.hd-header-more')&&e.target.open)hdWSSetHeaderCompact(false)},true);
+ window.addEventListener('resize',()=>{if(window.matchMedia?.('(min-width:561px)')?.matches)hdWSSetHeaderCompact(false)},{passive:true});
+}
 function hdWSUpdateTopbarHeight(){
  const h=document.querySelector('.topbar')?.getBoundingClientRect().height||68,nav=document.getElementById('hdWorkspaceNav')?.getBoundingClientRect().height||0;
  document.documentElement.style.setProperty('--hd-topbar-h',`${Math.ceil(h)}px`);
@@ -305,7 +333,7 @@ function hdWSRefresh(){if(Date.now()<hdWSNavLockUntil){hdWSScheduleRefresh();ret
 function hdWSMutationAddsSection(ms){return ms.some(m=>[...m.addedNodes].some(n=>n?.nodeType===1&&(n.matches?.('section')||n.querySelector?.('section'))))}
 function hdWSScheduleRefresh(){clearTimeout(hdWSRefreshTimer);const delay=Math.max(60,hdWSNavLockUntil-Date.now()+20);hdWSRefreshTimer=setTimeout(hdWSRefresh,delay)}
 function hdWSInstall(){
- hdWSEnsureUI();hdWSInstallKeyboardTracking();hdWSRefresh();
+ hdWSEnsureUI();hdWSInstallKeyboardTracking();hdWSInstallScrollCompact();hdWSRefresh();
  if(!hdWSObserver){hdWSObserver=new MutationObserver(ms=>{if(hdWSMutationAddsSection(ms))hdWSScheduleRefresh()});const main=document.querySelector('main');if(main)hdWSObserver.observe(main,{childList:true,subtree:true})}
 }
 function hdWSHorizontalScroller(el){for(let n=el;n&&n!==document.body;n=n.parentElement){if(n.scrollWidth>n.clientWidth+12){const s=getComputedStyle(n);if(['auto','scroll'].includes(s.overflowX))return true}}return false}
