@@ -3646,3 +3646,43 @@ test('mobile secretary panel stays compact', async ({ page }) => {
   expect(data.eyebrow).toBe('none');
   expect(data.font).toBeLessThanOrEqual(13);
 });
+
+
+test('core quest and timer filters keep completed items out of the way', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    const now=Date.now();
+    if(typeof state!=='undefined'){
+      state.expeditions=[{id:'e1',name:'稼働遠征',endsAt:now+3600000},{id:'e2',name:'完了遠征',endsAt:now-60000}];
+      state.docks=[{id:'d1',name:'入渠中',endsAt:now+1800000},{id:'d2',name:'入渠完了',endsAt:now-60000}];
+      state.quests=[{id:'q1',name:'未完了任務',done:false},{id:'q2',name:'完了任務',done:true}];
+    }
+    localStorage.removeItem('harbordesk-core-list-filters-v1');
+    window.coreListFilters={expedition:'active',dock:'active',quest:'active'};
+    window.renderTimers?.('expedition');window.renderTimers?.('dock');window.renderQuests?.();
+    return {
+      expedition:document.getElementById('expeditionList')?.textContent||'',
+      dock:document.getElementById('dockList')?.textContent||'',
+      quest:document.getElementById('questList')?.textContent||'',
+      expCount:document.getElementById('expeditionFilterCount')?.textContent||'',
+      questCount:document.getElementById('questFilterCount')?.textContent||''
+    };
+  });
+  expect(data.expedition).toContain('稼働遠征');
+  expect(data.expedition).not.toContain('完了遠征');
+  expect(data.dock).toContain('入渠中');
+  expect(data.dock).not.toContain('入渠完了');
+  expect(data.quest).toContain('未完了任務');
+  expect(data.quest).not.toContain('完了任務');
+  expect(data.expCount).toContain('1 / 2');
+  expect(data.questCount).toContain('1 / 2');
+
+  await page.locator('[data-core-filter-kind="quest"][data-core-filter="done"]').click();
+  await expect(page.locator('#questList')).toContainText('完了任務');
+  await expect(page.locator('#questList')).not.toContainText('未完了任務');
+
+  await page.locator('[data-core-filter-kind="expedition"][data-core-filter="all"]').click();
+  await expect(page.locator('#expeditionList')).toContainText('稼働遠征');
+  await expect(page.locator('#expeditionList')).toContainText('完了遠征');
+});
