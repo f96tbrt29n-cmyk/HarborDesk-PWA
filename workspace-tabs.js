@@ -66,6 +66,25 @@ function hdWSRestoreScroll(sectionId){
  const top=section.getBoundingClientRect().top+window.scrollY;window.scrollTo({top:Math.max(0,top+saved),behavior:'auto'});return true;
 }
 function hdWSEsc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function hdWSQuickPinIds(){try{return JSON.parse(localStorage.getItem('harbordesk-quick-nav-pins-v1')||'[]')||[]}catch{return []}}
+function hdWSCurrentSectionId(){return hdWSState.sections?.[hdWSState.group]||hdWSDefaultSection(hdWSState.group)||''}
+function hdWSUpdatePinButton(){
+ const b=document.querySelector('[data-hd-ws-pin]');if(!b)return;
+ const id=hdWSCurrentSectionId(),pinned=!!id&&hdWSQuickPinIds().includes(id);
+ b.textContent=pinned?'★':'☆';b.classList.toggle('active',pinned);
+ b.setAttribute('aria-label',pinned?'この機能の固定を外す':'この機能を固定');
+ b.title=pinned?'固定済み・タップで解除':'クイックナビに固定';
+}
+function hdWSToggleCurrentPin(){
+ const id=hdWSCurrentSectionId();if(!id)return false;
+ if(typeof hdQNTogglePin==='function')hdQNTogglePin(id);
+ else{
+  const rows=hdWSQuickPinIds(),set=new Set(rows);set.has(id)?set.delete(id):set.add(id);
+  try{localStorage.setItem('harbordesk-quick-nav-pins-v1',JSON.stringify([...set]))}catch{}
+  window.dispatchEvent(new CustomEvent('hd:quick-nav-updated'));
+ }
+ hdWSUpdatePinButton();return true;
+}
 function hdWSCanReturnGame(){try{return sessionStorage.getItem('harbordesk-kc-return-game-v1')==='1'}catch{return false}}
 function hdWSUpdateGameReturnAction(){
  const btn=document.querySelector('[data-hd-header-game-return]');if(btn)btn.hidden=!hdWSCanReturnGame();
@@ -258,7 +277,7 @@ function hdWSUpdateBadges(){const counts=hdWSBadgeCounts();for(const g of HD_WS_
 function hdWSEnsureUI(){
  if(document.getElementById('hdWorkspaceNav'))return;
  const top=document.querySelector('.topbar');if(!top)return;
- const nav=document.createElement('div');nav.id='hdWorkspaceNav';nav.className='hd-ws-shell';nav.innerHTML=`<div class="hd-ws-primary" role="tablist" aria-label="HarborDeskカテゴリ">${HD_WS_GROUPS.map(g=>`<button type="button" role="tab" data-hd-ws-group="${g.key}"><span>${g.label}</span><em data-hd-ws-badge hidden>0</em></button>`).join('')}</div><div id="hdWorkspaceMobilePicker" class="hd-ws-mobile-picker" hidden><button type="button" class="ghost small hd-ws-back" data-hd-ws-back aria-label="ひとつ前の機能へ戻る" title="戻る">←</button><span id="hdWorkspaceContextGroup">ホーム</span><select id="hdWorkspaceSectionSelect" aria-label="カテゴリ内機能"></select><button type="button" class="ghost small" data-hd-ws-group-top>先頭</button></div><div id="hdWorkspaceSubtabs" class="hd-ws-secondary" role="tablist" aria-label="カテゴリ内機能"></div>`;
+ const nav=document.createElement('div');nav.id='hdWorkspaceNav';nav.className='hd-ws-shell';nav.innerHTML=`<div class="hd-ws-primary" role="tablist" aria-label="HarborDeskカテゴリ">${HD_WS_GROUPS.map(g=>`<button type="button" role="tab" data-hd-ws-group="${g.key}"><span>${g.label}</span><em data-hd-ws-badge hidden>0</em></button>`).join('')}</div><div id="hdWorkspaceMobilePicker" class="hd-ws-mobile-picker" hidden><button type="button" class="ghost small hd-ws-back" data-hd-ws-back aria-label="ひとつ前の機能へ戻る" title="戻る">←</button><span id="hdWorkspaceContextGroup">ホーム</span><select id="hdWorkspaceSectionSelect" aria-label="カテゴリ内機能"></select><button type="button" class="ghost small hd-ws-pin" data-hd-ws-pin aria-label="この機能を固定" title="クイックナビに固定">☆</button><button type="button" class="ghost small" data-hd-ws-group-top>先頭</button></div><div id="hdWorkspaceSubtabs" class="hd-ws-secondary" role="tablist" aria-label="カテゴリ内機能"></div>`;
  top.insertAdjacentElement('afterend',nav);document.body.classList.add('hd-workspace-mode');hdWSEnsureSyncStatus();hdWSEnsureNetworkStatus();hdWSEnsureSwipeHint();hdWSEnsureGameReturnAction();hdWSUpdateTopbarHeight();hdWSUpdateBadges();hdWSUpdateSyncStatus();
 }
 function hdWSRenderSubtabs(group,selected){
@@ -266,7 +285,7 @@ function hdWSRenderSubtabs(group,selected){
  if(context)context.textContent=hdWSGroupLabel(group);
  if(select){select.innerHTML=rows.map(el=>`<option value="${hdWSEsc(el.id)}">${hdWSEsc(hdWSTitle(el))}</option>`).join('');if(selected)select.value=selected}
  if(picker)picker.hidden=rows.length===0;
- hdWSUpdateBackButton();
+ hdWSUpdateBackButton();hdWSUpdatePinButton();
  if(rows.length<=1){host.hidden=true;host.innerHTML='';return}
  host.hidden=false;host.innerHTML=rows.map(el=>`<button type="button" role="tab" class="${el.id===selected?'active':''}" aria-selected="${el.id===selected?'true':'false'}" data-hd-ws-section="${hdWSEsc(el.id)}">${hdWSEsc(hdWSTitle(el))}</button>`).join('');
  const active=host.querySelector('.active');active?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
@@ -343,6 +362,7 @@ function hdWSTouchStart(e){if(e.touches?.length!==1||hdWSSwipeBlocked(e.target))
 function hdWSTouchEnd(e){if(!hdWSTouch)return;const t=e.changedTouches?.[0],start=hdWSTouch;hdWSTouch=null;if(!t)return;const dx=t.clientX-start.x,dy=t.clientY-start.y,dt=Date.now()-start.at;if(dt>800||Math.abs(dx)<72||Math.abs(dx)<Math.abs(dy)*1.35)return;hdWSMoveGroup(dx<0?1:-1)}
 
 document.addEventListener('click',e=>{
+ const pin=e.target.closest?.('[data-hd-ws-pin]');if(pin){hdWSToggleCurrentPin();return}
  const back=e.target.closest?.('[data-hd-ws-back]');if(back){hdWSGoBack();return}
  const top=e.target.closest?.('[data-hd-ws-group-top]');if(top){hdWSPushHistory();hdWSClearPin();const target=hdWSDefaultSection(hdWSState.group);hdWSApply(hdWSState.group,target,{scrollTop:true,ignorePin:true});return}
  const g=e.target.closest?.('[data-hd-ws-group]');if(g){hdWSDismissSwipeHint();hdWSPushHistory();hdWSClearPin();hdWSApply(g.dataset.hdWsGroup,null,{restoreScroll:true,ignorePin:true});return}
@@ -364,6 +384,7 @@ window.addEventListener('online',hdWSUpdateNetworkStatus);
 window.addEventListener('offline',hdWSUpdateNetworkStatus);
 window.addEventListener('hd:modules-ready',()=>setTimeout(()=>{hdWSInstall();hdWSEnsureGameReturnAction();hdWSUpdateGameReturnAction()},0));
 window.addEventListener('hd:workspace-refresh',hdWSUpdateBadges);
+window.addEventListener('hd:quick-nav-updated',hdWSUpdatePinButton);
 window.addEventListener('load',()=>setTimeout(()=>{hdWSInstall();hdWSEnsureGameReturnAction();hdWSUpdateGameReturnAction()},900));
 window.addEventListener('pageshow',hdWSUpdateGameReturnAction);
 setInterval(hdWSUpdateBadges,10000);
