@@ -2076,3 +2076,155 @@ test('KanColle quest sync merges active quest pages while preserving manual ques
 
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('KanColle sortie sync reconstructs one run and avoids duplicate import', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-sortie-log-v1','[]');
+
+    const bundle = {
+      format:'harbordesk-kancolle-import',
+      version:2,
+      captureId:'test-capture-sortie-1',
+      createdAt:'2026-09-19T08:40:00.000Z',
+      records:[
+        {
+          endpoint:'/kcsapi/api_req_map/start',
+          at:1000,
+          payload:{
+            api_result:1,
+            api_result_msg:'成功',
+            api_data:{
+              api_maparea_id:2,
+              api_mapinfo_no:3,
+              api_no:1,
+              api_color_no:4,
+              api_event_id:4,
+              api_event_kind:1,
+              api_bosscell_no:10
+            }
+          }
+        },
+        {
+          endpoint:'/kcsapi/api_req_sortie/battleresult',
+          at:2000,
+          payload:{
+            api_result:1,
+            api_result_msg:'成功',
+            api_data:{
+              api_win_rank:'S',
+              api_quest_name:'東部オリョール海',
+              api_get_ship:null
+            }
+          }
+        },
+        {
+          endpoint:'/kcsapi/api_req_map/next',
+          at:3000,
+          payload:{
+            api_result:1,
+            api_result_msg:'成功',
+            api_data:{
+              api_maparea_id:2,
+              api_mapinfo_no:3,
+              api_no:5,
+              api_color_no:4,
+              api_event_id:4,
+              api_event_kind:1,
+              api_bosscell_no:10
+            }
+          }
+        },
+        {
+          endpoint:'/kcsapi/api_req_sortie/battleresult',
+          at:4000,
+          payload:{
+            api_result:1,
+            api_result_msg:'成功',
+            api_data:{
+              api_win_rank:'A',
+              api_quest_name:'東部オリョール海',
+              api_get_ship:{
+                api_ship_id:24,
+                api_ship_name:'大井'
+              }
+            }
+          }
+        },
+        {
+          endpoint:'/kcsapi/api_port/port',
+          at:5000,
+          payload:{
+            api_result:1,
+            api_result_msg:'成功',
+            api_data:{
+              api_ship:[],
+              api_deck_port:[],
+              api_ndock:[],
+              api_material:[]
+            }
+          }
+        }
+      ]
+    };
+
+    const parsed = window.hdKcParseImport?.(JSON.stringify(bundle));
+    const preview = window.hdKcPreviewData?.(parsed);
+    const opts = {ships:false,equipment:false,resources:false,fleets:false,timers:false,quests:false,sorties:true};
+    const first = window.hdKcApplyImport?.(preview,opts);
+    const second = window.hdKcApplyImport?.(preview,opts);
+    const rows = JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]');
+
+    const result = {
+      preview:{sortieStarts:preview?.sortieStarts||0,battleResults:preview?.battleResults||0},
+      firstSorties:first?.sorties||0,
+      secondSorties:second?.sorties||0,
+      rows:rows.map(x=>({
+        map:x.map,
+        node:x.node,
+        result:x.result,
+        boss:x.boss,
+        retreat:x.retreat,
+        battles:x.battles,
+        drop:x.drop,
+        source:x.source,
+        gameSortieKey:x.gameSortieKey,
+        gameNodeNo:x.gameNodeNo,
+        gameBossCellNo:x.gameBossCellNo,
+        gameRouteNodes:x.gameRouteNodes,
+        gameBattleResults:x.gameBattleResults
+      }))
+    };
+
+    localStorage.setItem('harbordesk-sortie-log-v1','[]');
+    return result;
+  });
+
+  expect(data.preview).toEqual({sortieStarts:1,battleResults:2});
+  expect(data.firstSorties).toBe(1);
+  expect(data.secondSorties).toBe(0);
+  expect(data.rows).toHaveLength(1);
+  expect(data.rows[0]).toEqual(expect.objectContaining({
+    map:'2-3',
+    node:'#5',
+    result:'A',
+    boss:false,
+    retreat:true,
+    battles:2,
+    drop:'大井',
+    source:'kancolle-import',
+    gameSortieKey:'kc-sortie-at-1000',
+    gameNodeNo:5,
+    gameBossCellNo:10
+  }));
+  expect(data.rows[0].gameRouteNodes).toEqual([1,5]);
+  expect(data.rows[0].gameBattleResults).toEqual([
+    expect.objectContaining({nodeNo:1,rank:'S',drop:''}),
+    expect.objectContaining({nodeNo:5,rank:'A',drop:'大井',dropShipId:24})
+  ]);
+
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
