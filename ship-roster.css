@@ -3,3 +3,17 @@
  .roster-card{content-visibility:auto;contain-intrinsic-size:150px}
 }
 @media(max-width:520px){.roster-filters .guide-chip{min-height:40px}.roster-toolbar input{min-height:44px}.roster-toolbar .primary{min-height:44px}}
+
+.roster-toolbar select{min-width:112px;background:#091725;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px;font:inherit}
+.roster-section.roster-compact .roster-card{padding:9px 10px}
+.roster-section.roster-compact .roster-note{display:none}
+.roster-section.roster-compact .roster-card-head strong{font-size:14px}
+.roster-section.roster-compact .roster-badges{margin:6px 0 0}
+.roster-section.roster-compact .roster-card-head>.hd-ship-image-thumb{transform:scale(.86);transform-origin:top left;margin-right:-6px;margin-bottom:-8px}
+@media(max-width:620px){
+ .roster-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px}
+ .roster-toolbar input{grid-column:1/-1}
+ .roster-toolbar select{min-width:0}
+ .roster-toolbar [data-roster-compact]{white-space:nowrap}
+ .roster-toolbar #addShipRoster{grid-column:1/-1}
+}
