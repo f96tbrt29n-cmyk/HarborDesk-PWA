@@ -7,6 +7,14 @@ async function boot(page, errors = []) {
   page.on('console', msg => {
     if (msg.type() === 'error') errors.push(`console: ${msg.text()}`);
   });
+  await page.addInitScript(() => {
+    try {
+      const raw = JSON.parse(localStorage.getItem('harbordesk-ship-image-config-v1') || '{}');
+      localStorage.setItem('harbordesk-ship-image-config-v1', JSON.stringify({ ...raw, autoSource: false }));
+    } catch {
+      localStorage.setItem('harbordesk-ship-image-config-v1', JSON.stringify({ remoteTemplate: '', autoSource: false }));
+    }
+  });
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
   await expect(page.locator('#shipDatabase')).toHaveCount(1, { timeout: 20000 });
