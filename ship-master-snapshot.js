@@ -10222,7 +10222,7 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         ]
       }
     ]
-  ,
+  },
   "changes": {
     "baseline": true,
     "from": null,
