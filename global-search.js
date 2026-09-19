@@ -2,6 +2,7 @@ const HD_GS_HISTORY_KEY='harbordesk-global-search-history-v1';
 let hdGSCategory='all';
 let hdGSResults=new Map();
 let hdGSNavSeq=0;
+let hdGSRenderTimer=0;
 
 function hdGSNorm(v){return String(v??'').normalize('NFKC').toLowerCase().replace(/\s+/g,' ').trim()}
 function hdGSEsc(v){return typeof hdEsc==='function'?hdEsc(v):String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -70,6 +71,7 @@ function hdGSDestination(row){
  if(a.kind==='expedition')return '遠征DB';
  return '開く';
 }
+function hdGSScheduleRender(delay=120){clearTimeout(hdGSRenderTimer);hdGSRenderTimer=setTimeout(hdGSRender,Math.max(0,Number(delay)||0))}
 function hdGSRender(){
  const host=document.getElementById('hdGSResults');if(!host)return;const input=document.getElementById('hdGSSearch'),q=hdGSNorm(input?.value||'');
  if(!q){const history=hdGSHistory();host.innerHTML=history.length?`<div class="hd-gs-history-title"><span>最近の検索</span><button type="button" class="ghost small" data-hd-gs-history-clear>履歴を消す</button></div><div class="hd-gs-history">${history.map(x=>`<button type="button" class="ghost small" data-hd-gs-history="${hdGSEsc(x)}">${hdGSEsc(x)}</button>`).join('')}</div><div class="hd-gs-empty">2文字以上入力すると、HarborDesk全体から探せるよ。</div>`:'<div class="hd-gs-empty">艦娘・装備・海域・任務・遠征・機能名をまとめて検索できるよ。</div>';return}
@@ -87,7 +89,7 @@ function hdGSAttachLaunchers(){
 }
 function hdGSEnsure(){
  let d=document.getElementById('hdGlobalSearchDialog');
- if(!d){d=document.createElement('dialog');d.id='hdGlobalSearchDialog';d.className='hd-gs-dialog';d.innerHTML=`<div class="hd-gs-head"><div><div class="eyebrow">GLOBAL SEARCH</div><h3>HarborDesk全体検索</h3></div><button type="button" class="ghost small" data-hd-gs-close>閉じる</button></div><div class="hd-gs-searchbox"><span>⌕</span><input id="hdGSSearch" type="search" autocomplete="off" placeholder="例：矢矧 / 6-5 / 東海 / あ号 / 東京急行"></div><div class="hd-gs-cats">${[['all','すべて'],['map','海域'],['ship','艦娘'],['equipment','装備'],['quest','任務'],['expedition','遠征'],['feature','機能']].map(([k,v])=>`<button type="button" class="ghost small${k==='all'?' active':''}" data-hd-gs-cat="${k}">${v}</button>`).join('')}</div><div id="hdGSResults" class="hd-gs-results"></div>`;document.body.appendChild(d);d.addEventListener('click',e=>{if(e.target===d)hdGSClose()});document.getElementById('hdGSSearch')?.addEventListener('input',hdGSRender)}
+ if(!d){d=document.createElement('dialog');d.id='hdGlobalSearchDialog';d.className='hd-gs-dialog';d.innerHTML=`<div class="hd-gs-head"><div><div class="eyebrow">GLOBAL SEARCH</div><h3>HarborDesk全体検索</h3></div><button type="button" class="ghost small" data-hd-gs-close>閉じる</button></div><div class="hd-gs-searchbox"><span>⌕</span><input id="hdGSSearch" type="search" autocomplete="off" placeholder="例：矢矧 / 6-5 / 東海 / あ号 / 東京急行"></div><div class="hd-gs-cats">${[['all','すべて'],['map','海域'],['ship','艦娘'],['equipment','装備'],['quest','任務'],['expedition','遠征'],['feature','機能']].map(([k,v])=>`<button type="button" class="ghost small${k==='all'?' active':''}" data-hd-gs-cat="${k}">${v}</button>`).join('')}</div><div id="hdGSResults" class="hd-gs-results"></div>`;document.body.appendChild(d);d.addEventListener('click',e=>{if(e.target===d)hdGSClose()});document.getElementById('hdGSSearch')?.addEventListener('input',()=>hdGSScheduleRender())}
  hdGSAttachLaunchers();hdGSRender();
 }
 function hdGSOpen(query=''){hdGSEnsure();if(typeof hdQNClose==='function')hdQNClose();const d=document.getElementById('hdGlobalSearchDialog'),i=document.getElementById('hdGSSearch');if(i)i.value=query;hdGSCategory='all';document.querySelectorAll('[data-hd-gs-cat]').forEach(b=>b.classList.toggle('active',b.dataset.hdGsCat==='all'));hdGSRender();if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');setTimeout(()=>i?.focus(),50)}
