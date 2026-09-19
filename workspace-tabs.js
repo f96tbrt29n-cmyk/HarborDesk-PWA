@@ -89,12 +89,17 @@ function hdWSInitialAnchorId(){
  const raw=String(location.hash||'').replace(/^#/,'');if(!raw||raw.startsWith('kcimport='))return '';
  try{return decodeURIComponent(raw)}catch{return raw}
 }
+function hdWSReflectLocationHash(sectionId){
+ sectionId=String(sectionId||'').trim();if(!sectionId||!hdWSStartupContextHandled)return false;
+ const hash='#'+encodeURIComponent(sectionId);if(location.hash===hash)return true;
+ try{history.replaceState(null,'',location.pathname+location.search+hash);return true}catch{return false}
+}
 function hdWSRestoreStartupContext(){
  if(hdWSStartupContextHandled)return false;hdWSStartupContextHandled=true;
  const anchor=hdWSInitialAnchorId();
- if(anchor&&hdWSOpenAnchorId(anchor,true)){try{sessionStorage.removeItem(HD_WS_UPDATE_RETURN_KEY)}catch{}return true}
- if(hdWSConsumeUpdateReturn())return true;
- const id=hdWSCurrentSectionId();return !!id&&hdWSRestoreScroll(id);
+ if(anchor&&hdWSOpenAnchorId(anchor,true)){try{sessionStorage.removeItem(HD_WS_UPDATE_RETURN_KEY)}catch{}hdWSReflectLocationHash(hdWSCurrentSectionId());return true}
+ if(hdWSConsumeUpdateReturn()){hdWSReflectLocationHash(hdWSCurrentSectionId());return true}
+ const id=hdWSCurrentSectionId(),restored=!!id&&hdWSRestoreScroll(id);if(id)hdWSReflectLocationHash(id);return restored;
 }
 
 function hdWSRestoreScroll(sectionId){
@@ -388,7 +393,7 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
   const pin=!opts.ignorePin?hdWSActivePin():null;
   if(pin){group=pin.group;sectionId=pin.sectionId}
   if(!HD_WS_GROUPS.some(x=>x.key===group))group='home';
-  const chosen=hdWSResolveSection(group,sectionId);hdWSState.group=group;if(chosen)hdWSState.sections[group]=chosen;hdWSSave();
+  const chosen=hdWSResolveSection(group,sectionId);hdWSState.group=group;if(chosen)hdWSState.sections[group]=chosen;hdWSSave();if(chosen)hdWSReflectLocationHash(chosen);
   document.querySelectorAll('[data-hd-ws-group]').forEach(b=>{const active=b.dataset.hdWsGroup===group;b.classList.toggle('active',active);b.setAttribute('aria-selected',active?'true':'false')});
   for(const el of hdWSSections()){
    const same=el.dataset.hdWorkspaceGroup===group;
@@ -412,7 +417,7 @@ function hdWSShowElement(target,scroll=true){
  hdWSNavLockUntil=Date.now()+900;hdWSSetPin(group,section.id,900);const navSeq=++hdWSNavSeq;
  const showNow=()=>{
   if(navSeq!==hdWSNavSeq)return false;
-  hdWSState.group=group;hdWSState.sections[group]=section.id;hdWSSave();
+  hdWSState.group=group;hdWSState.sections[group]=section.id;hdWSSave();hdWSReflectLocationHash(section.id);
   document.querySelectorAll('[data-hd-ws-group]').forEach(b=>{const active=b.dataset.hdWsGroup===group;b.classList.toggle('active',active);b.setAttribute('aria-selected',active?'true':'false')});
   for(const row of hdWSSections()){
    const same=row.dataset.hdWorkspaceGroup===group,hero=row.id==='hdWorkspaceHero';
