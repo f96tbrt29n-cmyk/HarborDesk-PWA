@@ -6332,3 +6332,39 @@ test('compact database cards peek one item at a time', async ({ page }) => {
   expect(data.equipFirstOpen).toBe(true);
   expect(data.equipOneOnly).toBe(true);
 });
+
+test('history navigation previews destination names', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdQNEnsure?.();
+    sessionStorage.setItem('harbordesk-session-workspace-history-v1',JSON.stringify([{group:'fleet',section:'roster'}]));
+    sessionStorage.setItem('harbordesk-session-workspace-forward-v1',JSON.stringify([{group:'arsenal',section:'equipmentBook'}]));
+    window.hdWSUpdateHistoryButtons?.();
+    window.hdQNUpdateHistoryActions?.();
+    window.hdQNUpdateMobileDock?.();
+    const meta=window.hdWSHistoryMeta?.();
+    const back=document.querySelector('[data-hd-qn-back]');
+    const forward=document.querySelector('[data-hd-qn-forward]');
+    const mobile=document.querySelector('[data-hd-mobile-back]');
+    return {
+      backLabel:meta?.backTarget?.label||'',
+      forwardLabel:meta?.forwardTarget?.label||'',
+      backTarget:back?.querySelector('[data-hd-qn-back-target]')?.textContent||'',
+      forwardTarget:forward?.querySelector('[data-hd-qn-forward-target]')?.textContent||'',
+      backTitle:back?.title||'',
+      forwardTitle:forward?.title||'',
+      mobileTitle:mobile?.title||'',
+      mobileAria:mobile?.getAttribute('aria-label')||''
+    };
+  });
+  expect(data.backLabel).toBeTruthy();
+  expect(data.forwardLabel).toBeTruthy();
+  expect(data.backTarget).toBe(data.backLabel);
+  expect(data.forwardTarget).toBe(data.forwardLabel);
+  expect(data.backTitle).toContain(data.backLabel);
+  expect(data.forwardTitle).toContain(data.forwardLabel);
+  expect(data.mobileTitle).toContain(data.backLabel);
+  expect(data.mobileAria).toContain(data.backLabel);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
