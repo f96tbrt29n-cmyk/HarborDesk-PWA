@@ -1564,6 +1564,14 @@ test('release smoke: shared mobile layout prevents chrome overlap across iPhone 
     await page.waitForFunction(() => document.body && !document.body.classList.contains('hd-booting'), null, { timeout: 30000 });
     await page.locator('[data-hd-ws-group="guide"]').click();
     await page.waitForTimeout(120);
+    if (size.width <= 560) {
+      await page.waitForFunction(() =>
+        document.querySelector('.hd-header-more')?.dataset?.hdInlineBound === '1' &&
+        !!document.getElementById('hdMobileHeaderMenuRow'),
+        null,
+        { timeout: 12000 }
+      );
+    }
 
     const before = await page.evaluate(() => {
       const top=document.querySelector('.topbar')?.getBoundingClientRect();
@@ -1663,51 +1671,63 @@ test('release smoke: internal snapshot restore shares the global restore lock', 
   await page.waitForFunction(() =>
     typeof window.hdPHCreateSnapshot === 'function' &&
     typeof window.hdPHRestoreSnapshot === 'function' &&
-    typeof window.hdPHGetSnapshots === 'function'
+    typeof window.hdPHGetSnapshots === 'function' &&
+    typeof window.hdPHWithRestoreLock === 'function' &&
+    typeof window.hdBuildBackupFile === 'function' &&
+    typeof window.importBackup === 'function'
   );
 
   const result = await page.evaluate(async () => {
-    window.alert = message => (window.__hdInternalRestoreAlerts ||= []).push(String(message||''));
-    window.confirm = () => true;
-    localStorage.setItem('harbordesk-internal-lock-test', JSON.stringify({value:'safe'}));
+    window.__hdInternalRestoreAlerts = [];
+    window.alert = message => window.__hdInternalRestoreAlerts.push(String(message || ''));
+    localStorage.setItem('harbordesk-internal-lock-test', JSON.stringify({ value: 'safe' }));
     await window.hdPHCreateSnapshot('lock-test');
-    const rows=await window.hdPHGetSnapshots();
-    const id=rows.find(x=>x.reason==='lock-test')?.id;
+    const rows = await window.hdPHGetSnapshots();
+    const id = rows.find(x => x.reason === 'lock-test')?.id;
 
-    window.__hdBackupRestoreBusy=true;
-    const blocked=await window.hdPHRestoreSnapshot(id);
-    const stayedOwned=window.__hdBackupRestoreBusy===true;
-    window.__hdBackupRestoreBusy=false;
+    let ownedAtConfirm = false;
+    window.confirm = () => {
+      ownedAtConfirm = window.__hdBackupRestoreBusy === true;
+      return false;
+    };
+    const cancelled = await window.hdPHRestoreSnapshot(id);
+    const clearedAfterCancel = window.__hdBackupRestoreBusy === false;
 
-    const originalCreate=window.hdPHCreateSnapshot;
-    let releaseSafety;
-    window.hdPHCreateSnapshot=()=>new Promise(resolve=>{releaseSafety=resolve});
-    const pending=window.hdPHRestoreSnapshot(id);
-    for(let i=0;i<100&&typeof releaseSafety!=='function';i++)await new Promise(resolve=>setTimeout(resolve,10));
-    const ownedWhilePending=window.__hdBackupRestoreBusy===true;
-    if(typeof releaseSafety!=='function')throw new Error('internal restore did not reach safety snapshot stage');
-    releaseSafety(false);
-    const aborted=await pending;
-    const clearedAfterAbort=window.__hdBackupRestoreBusy===false;
-    window.hdPHCreateSnapshot=originalCreate;
+    let releaseHold;
+    const held = window.hdPHWithRestoreLock(() => new Promise(resolve => { releaseHold = resolve; }));
+    await new Promise(resolve => setTimeout(resolve, 0));
+    const helperOwnsLock = window.__hdBackupRestoreBusy === true;
 
-    window.confirm=()=>false;
-    const cancelled=await window.hdPHRestoreSnapshot(id);
-    const clearedAfterCancel=window.__hdBackupRestoreBusy===false;
+    const built = window.hdBuildBackupFile();
+    const file = new File([JSON.stringify(built.data)], 'HarborDesk-shared-lock.json', { type: 'application/json' });
+    const externalBlocked = await window.importBackup(file);
+    const internalBlocked = await window.hdPHRestoreSnapshot(id);
+
+    releaseHold(false);
+    const heldResult = await held;
+    const clearedAfterHold = window.__hdBackupRestoreBusy === false;
 
     return {
-      blocked,stayedOwned,ownedWhilePending,aborted,clearedAfterAbort,cancelled,clearedAfterCancel,
-      alerts:window.__hdInternalRestoreAlerts||[]
+      cancelled,
+      ownedAtConfirm,
+      clearedAfterCancel,
+      helperOwnsLock,
+      externalBlocked,
+      internalBlocked,
+      heldResult,
+      clearedAfterHold,
+      alerts: window.__hdInternalRestoreAlerts || []
     };
   });
 
-  expect(result.blocked).toBe(false);
-  expect(result.stayedOwned).toBe(true);
-  expect(result.ownedWhilePending).toBe(true);
-  expect(result.aborted).toBe(false);
-  expect(result.clearedAfterAbort).toBe(true);
   expect(result.cancelled).toBe(false);
+  expect(result.ownedAtConfirm).toBe(true);
   expect(result.clearedAfterCancel).toBe(true);
+  expect(result.helperOwnsLock).toBe(true);
+  expect(result.externalBlocked).toBe(false);
+  expect(result.internalBlocked).toBe(false);
+  expect(result.heldResult).toBe(false);
+  expect(result.clearedAfterHold).toBe(true);
   expect(result.alerts.join(' ')).toContain('進行中');
   expect(errors).toEqual([]);
 });

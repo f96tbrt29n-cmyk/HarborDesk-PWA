@@ -186,10 +186,15 @@ function hdPHRestoreTransaction(payload,before=hdPHHarborData(),applyFn=hdPHAppl
   return {ok:false,error,validation:error?.validation||null,rollback}
  }
 }
-async function hdPHRestoreSnapshot(id){
+async function hdPHWithRestoreLock(task){
  if(window.__hdBackupRestoreBusy){alert('別の復元処理が進行中だよ。完了してからもう一度試してね。');return false}
  window.__hdBackupRestoreBusy=true;
- try{
+ try{return await task()}
+ finally{window.__hdBackupRestoreBusy=false}
+}
+window.hdPHWithRestoreLock=hdPHWithRestoreLock;
+async function hdPHRestoreSnapshot(id){
+ return hdPHWithRestoreLock(async()=>{
   const rows=await hdPHGetSnapshots(),row=rows.find(x=>x.id===id);if(!row)return false;
   if(!confirm(`${new Date(row.at).toLocaleString('ja-JP')} の端末内スナップショットへ戻す？\n現在のHarborDeskデータは復元前スナップショットとして先に保存するよ。`))return false;
   const safetyOk=await hdPHCreateSnapshot('復元直前');
@@ -202,7 +207,7 @@ async function hdPHRestoreSnapshot(id){
    return false
   }
   location.reload();return true
- }finally{window.__hdBackupRestoreBusy=false}
+ })
 }
 function hdPHSectionTitle(id){const el=document.getElementById(id);return el?.querySelector(':scope > .section-head h2, :scope h2, :scope h3, :scope h4')?.textContent?.trim()||id}
 function hdPHResumeRow(){
