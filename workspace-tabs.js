@@ -2,6 +2,7 @@ const HD_WS_KEY='harbordesk-workspace-tabs-v1';
 const HD_WS_SCROLL_KEY='harbordesk-session-workspace-scroll-v1';
 const HD_WS_UPDATE_RETURN_KEY='harbordesk-update-return-v1';
 const HD_WS_HISTORY_KEY='harbordesk-session-workspace-history-v1';
+const HD_WS_FORWARD_KEY='harbordesk-session-workspace-forward-v1';
 const HD_WS_SWIPE_HINT_KEY='harbordesk-workspace-swipe-hint-v1';
 const HD_WS_GROUPS=[
  {key:'home',label:'ホーム'},
@@ -43,19 +44,38 @@ function hdWSSave(){localStorage.setItem(HD_WS_KEY,JSON.stringify(hdWSState))}
 function hdWSScrollLoad(){try{return JSON.parse(sessionStorage.getItem(HD_WS_SCROLL_KEY)||'{}')||{}}catch{return {}}}
 function hdWSHistoryLoad(){try{return JSON.parse(sessionStorage.getItem(HD_WS_HISTORY_KEY)||'[]')||[]}catch{return []}}
 function hdWSHistorySave(rows){try{sessionStorage.setItem(HD_WS_HISTORY_KEY,JSON.stringify(rows.slice(-20)))}catch{}}
+function hdWSForwardLoad(){try{return JSON.parse(sessionStorage.getItem(HD_WS_FORWARD_KEY)||'[]')||[]}catch{return []}}
+function hdWSForwardSave(rows){try{sessionStorage.setItem(HD_WS_FORWARD_KEY,JSON.stringify(rows.slice(-20)))}catch{}}
+function hdWSClearForward(){hdWSForwardSave([]);hdWSUpdateHistoryButtons()}
 function hdWSCurrentLocation(){const group=hdWSState.group,section=hdWSState.sections?.[group]||hdWSDefaultSection(group);return section?{group,section}:null}
-function hdWSPushHistory(){
+function hdWSPushHistory(opts={}){
  hdWSSaveCurrentScroll();const cur=hdWSCurrentLocation();if(!cur)return;
  const rows=hdWSHistoryLoad(),last=rows[rows.length-1];
- if(last?.group===cur.group&&last?.section===cur.section)return;
- rows.push(cur);hdWSHistorySave(rows);hdWSUpdateBackButton();
+ if(!(last?.group===cur.group&&last?.section===cur.section)){rows.push(cur);hdWSHistorySave(rows)}
+ if(!opts.preserveForward)hdWSForwardSave([]);
+ hdWSUpdateHistoryButtons();
 }
-function hdWSUpdateBackButton(){const b=document.querySelector('[data-hd-ws-back]');if(b)b.disabled=hdWSHistoryLoad().length===0}
+function hdWSUpdateHistoryButtons(){
+ const back=document.querySelector('[data-hd-ws-back]'),forward=document.querySelector('[data-hd-ws-forward]');
+ if(back)back.disabled=hdWSHistoryLoad().length===0;
+ if(forward)forward.disabled=hdWSForwardLoad().length===0;
+}
+function hdWSUpdateBackButton(){hdWSUpdateHistoryButtons()}
 function hdWSGoBack(){
  const rows=hdWSHistoryLoad();let prev=null;
  while(rows.length&&!prev){const x=rows.pop(),el=document.getElementById(x?.section||'');if(x&&el)prev=x}
- hdWSHistorySave(rows);hdWSUpdateBackButton();if(!prev)return false;
- hdWSSaveCurrentScroll();hdWSClearPin();hdWSApply(prev.group,prev.section,{restoreScroll:true,ignorePin:true});return true;
+ if(!prev){hdWSHistorySave(rows);hdWSUpdateHistoryButtons();return false}
+ const cur=hdWSCurrentLocation(),forward=hdWSForwardLoad();
+ if(cur&&document.getElementById(cur.section||'')){const last=forward[forward.length-1];if(!(last?.group===cur.group&&last?.section===cur.section))forward.push(cur)}
+ hdWSHistorySave(rows);hdWSForwardSave(forward);hdWSSaveCurrentScroll();hdWSClearPin();hdWSApply(prev.group,prev.section,{restoreScroll:true,ignorePin:true});hdWSUpdateHistoryButtons();return true;
+}
+function hdWSGoForward(){
+ const forward=hdWSForwardLoad();let next=null;
+ while(forward.length&&!next){const x=forward.pop(),el=document.getElementById(x?.section||'');if(x&&el)next=x}
+ if(!next){hdWSForwardSave(forward);hdWSUpdateHistoryButtons();return false}
+ const cur=hdWSCurrentLocation(),rows=hdWSHistoryLoad();
+ if(cur&&document.getElementById(cur.section||'')){const last=rows[rows.length-1];if(!(last?.group===cur.group&&last?.section===cur.section))rows.push(cur)}
+ hdWSHistorySave(rows);hdWSForwardSave(forward);hdWSSaveCurrentScroll();hdWSClearPin();hdWSApply(next.group,next.section,{restoreScroll:true,ignorePin:true});hdWSUpdateHistoryButtons();return true;
 }
 function hdWSSaveCurrentScroll(){
  const section=hdWSVisibleSections(hdWSState.group).find(x=>!x.classList.contains('hd-ws-hidden'));if(!section)return;
@@ -384,7 +404,7 @@ function hdWSUpdateBadges(){const counts=hdWSBadgeCounts();for(const g of HD_WS_
 function hdWSEnsureUI(){
  if(document.getElementById('hdWorkspaceNav'))return;
  const top=document.querySelector('.topbar');if(!top)return;
- const nav=document.createElement('div');nav.id='hdWorkspaceNav';nav.className='hd-ws-shell';nav.innerHTML=`<div class="hd-ws-primary" role="tablist" aria-label="HarborDeskカテゴリ">${HD_WS_GROUPS.map(g=>`<button type="button" role="tab" data-hd-ws-group="${g.key}"><span>${g.label}</span><em data-hd-ws-badge hidden>0</em></button>`).join('')}</div><div id="hdWorkspaceMobilePicker" class="hd-ws-mobile-picker" hidden><button type="button" class="ghost small hd-ws-back" data-hd-ws-back aria-label="ひとつ前の機能へ戻る" title="戻る">←</button><span id="hdWorkspaceContextGroup">ホーム</span><select id="hdWorkspaceSectionSelect" aria-label="カテゴリ内機能"></select><button type="button" class="ghost small hd-ws-pin" data-hd-ws-pin aria-label="この機能を固定" title="クイックナビに固定">☆</button><button type="button" class="ghost small" data-hd-ws-group-top>先頭</button></div><div id="hdWorkspaceSubtabs" class="hd-ws-secondary" role="tablist" aria-label="カテゴリ内機能"></div>`;
+ const nav=document.createElement('div');nav.id='hdWorkspaceNav';nav.className='hd-ws-shell';nav.innerHTML=`<div class="hd-ws-primary" role="tablist" aria-label="HarborDeskカテゴリ">${HD_WS_GROUPS.map(g=>`<button type="button" role="tab" data-hd-ws-group="${g.key}"><span>${g.label}</span><em data-hd-ws-badge hidden>0</em></button>`).join('')}</div><div id="hdWorkspaceMobilePicker" class="hd-ws-mobile-picker" hidden><button type="button" class="ghost small hd-ws-back" data-hd-ws-back aria-label="ひとつ前の機能へ戻る" title="戻る">←</button><button type="button" class="ghost small hd-ws-forward" data-hd-ws-forward aria-label="ひとつ先の機能へ進む" title="進む">→</button><span id="hdWorkspaceContextGroup">ホーム</span><select id="hdWorkspaceSectionSelect" aria-label="カテゴリ内機能"></select><button type="button" class="ghost small hd-ws-pin" data-hd-ws-pin aria-label="この機能を固定" title="クイックナビに固定">☆</button><button type="button" class="ghost small" data-hd-ws-group-top>先頭</button></div><div id="hdWorkspaceSubtabs" class="hd-ws-secondary" role="tablist" aria-label="カテゴリ内機能"></div>`;
  top.insertAdjacentElement('afterend',nav);document.body.classList.add('hd-workspace-mode');hdWSEnsureSyncStatus();hdWSEnsureNetworkStatus();hdWSEnsureSwipeHint();hdWSEnsureGameReturnAction();hdWSUpdateTopbarHeight();hdWSUpdateBadges();hdWSUpdateSyncStatus();
 }
 function hdWSRenderSubtabs(group,selected){
@@ -473,6 +493,7 @@ document.addEventListener('click',e=>{
  const share=e.target.closest?.('[data-hd-header-share]');if(share){hdWSShareCurrentLocation();return}
  const pin=e.target.closest?.('[data-hd-ws-pin]');if(pin){hdWSToggleCurrentPin();return}
  const back=e.target.closest?.('[data-hd-ws-back]');if(back){hdWSGoBack();return}
+ const forward=e.target.closest?.('[data-hd-ws-forward]');if(forward){hdWSGoForward();return}
  const top=e.target.closest?.('[data-hd-ws-group-top]');if(top){hdWSPushHistory();hdWSClearPin();const target=hdWSDefaultSection(hdWSState.group);hdWSApply(hdWSState.group,target,{scrollTop:true,ignorePin:true});return}
  const g=e.target.closest?.('[data-hd-ws-group]');if(g){hdWSDismissSwipeHint();hdWSPushHistory();hdWSClearPin();hdWSApply(g.dataset.hdWsGroup,null,{restoreScroll:true,ignorePin:true});return}
  const s=e.target.closest?.('[data-hd-ws-section]');if(s){hdWSPushHistory();hdWSClearPin();hdWSApply(hdWSState.group,s.dataset.hdWsSection,{restoreScroll:true,ignorePin:true});return}
