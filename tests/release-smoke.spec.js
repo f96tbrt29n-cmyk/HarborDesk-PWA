@@ -2991,3 +2991,54 @@ test('release smoke: sortie prioritizes objective-connected next-node choices', 
   expect(labels).toEqual(['L','M']);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie requires second tap for off-route choices', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMSelectSuggestedNode === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-offroute-confirm-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-offroute-confirm-fleet',
+      fleetName:'逸れ確認テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-offroute-confirm-fleet',name:'逸れ確認テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'I',routeNodes:['B','G','I'],result:'S',memo:'',advanceGuard:{node:'I',safe:true,at:Date.now()}}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const off = page.locator('[data-hd-sm-next-node="M"]');
+  await off.click();
+  let draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
+  expect(draft.node).toBe('I');
+  await expect(page.locator('#hdToastRegion')).toContainText('逸れ候補');
+
+  await off.click();
+  draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
+  expect(draft.node).toBe('M');
+
+  await page.evaluate(() => {
+    const session=JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1'));
+    session.draft={node:'I',routeNodes:['B','G','I'],result:'S',memo:'',advanceGuard:{node:'I',safe:true,at:Date.now()}};
+    localStorage.setItem('harbordesk-active-sortie-session-v1',JSON.stringify(session));
+    window.hdSMRender();
+  });
+  await page.locator('[data-hd-sm-next-node="L"]').click();
+  draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
+  expect(draft.node).toBe('L');
+  expect(errors).toEqual([]);
+});
