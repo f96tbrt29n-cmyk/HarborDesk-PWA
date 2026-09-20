@@ -1,0 +1,52 @@
+name: Full Browser Regression
+
+on:
+  schedule:
+    - cron: '0 18 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: full-browser-regression
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  full-regression:
+    name: Full / ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, webkit]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install test dependencies
+        run: npm install --no-audit --no-fund --no-package-lock
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Run full browser regression
+        run: npm run test:browser:full -- --project=${{ matrix.browser }} --workers=1
+
+      - name: Upload Playwright diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-regression-${{ matrix.browser }}-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14
