@@ -199,6 +199,7 @@ function hdCoreMapAction(action){
  if(el){el.scrollIntoView({behavior:'smooth',block:'start'});return true}
  return false;
 }
+window.hdCoreMapToolsHtml=hdCoreMapToolsHtml;
 window.hdCoreMapAction=hdCoreMapAction;
 
 function renderMapPicker(){
