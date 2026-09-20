@@ -2472,10 +2472,11 @@ test('release smoke: sortie analytics summarizes structured retreat reasons', as
       {id:'r4',at:Date.now()-3000,map:'2-4',node:'O',result:'S',retreat:false,battles:5,boss:true}
     ]));
     window.hdSLRender?.();
+    window.hdWSShowElement?.('sortieLog', false);
   });
 
-  await page.waitForTimeout(50);
-  const card = page.locator('.hd-spa-card').first();
+  await page.waitForTimeout(150);
+  const card = page.locator('#sortieLog .hd-spa-card').first();
   await expect(card).toBeVisible();
   const reasons = card.locator('.hd-spa-retreat-reasons');
   await expect(reasons).toBeVisible();
