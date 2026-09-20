@@ -14,9 +14,13 @@ permissions:
 
 jobs:
   playwright:
-    name: Playwright / Chromium + WebKit
+    name: Playwright / ${{ matrix.browser }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, webkit]
 
     steps:
       - name: Checkout
@@ -30,17 +34,17 @@ jobs:
       - name: Install test dependencies
         run: npm install --no-audit --no-fund --no-package-lock
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium webkit
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run HarborDesk browser regression
-        run: npm run test:browser
+        run: npm run test:browser -- --project=${{ matrix.browser }}
 
       - name: Upload Playwright diagnostics
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-failure-${{ github.run_id }}
+          name: playwright-${{ matrix.browser }}-${{ github.run_id }}
           path: |
             playwright-report/
             test-results/
