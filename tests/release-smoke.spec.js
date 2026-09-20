@@ -455,3 +455,51 @@ test('release smoke: cancelling share sheet does not trigger fallback download',
   expect(errors).toEqual([]);
 });
 
+test('release smoke: backup warning follows latest game sync', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    const now = Date.now();
+    localStorage.setItem('harbordesk-last-external-backup-v1', String(now - 5 * 60 * 1000));
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt: now,
+      coverage: { ships:true, equipment:true, resources:true, fleets:true, quests:true, docks:true }
+    }));
+    await window.hdPHRender?.();
+    const stale = window.hdPHExternalText?.();
+    const staleText = document.querySelector('.hd-ph-backup-alert')?.textContent || '';
+
+    localStorage.setItem('harbordesk-last-external-backup-v1', String(now + 1000));
+    await window.hdPHRender?.();
+    const fresh = window.hdPHExternalText?.();
+    const freshAlert = document.querySelector('.hd-ph-backup-alert');
+
+    return {
+      stale: {
+        due: !!stale?.due,
+        afterSync: !!stale?.afterSync,
+        label: stale?.label || '',
+        title: stale?.title || '',
+        text: staleText
+      },
+      fresh: {
+        due: !!fresh?.due,
+        afterSync: !!fresh?.afterSync,
+        label: fresh?.label || '',
+        alertPresent: !!freshAlert
+      }
+    };
+  });
+
+  expect(data.stale.due).toBe(true);
+  expect(data.stale.afterSync).toBe(true);
+  expect(data.stale.label).toBe('同期後未保存');
+  expect(data.stale.title).toContain('同期後');
+  expect(data.stale.text).toContain('同期後');
+  expect(data.fresh.due).toBe(false);
+  expect(data.fresh.afterSync).toBe(false);
+  expect(data.fresh.label).toBe('今日');
+  expect(data.fresh.alertPresent).toBe(false);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
