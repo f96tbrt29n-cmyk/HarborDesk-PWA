@@ -2652,3 +2652,56 @@ test('release smoke: sortie skips damage confirmation on verified non-battle nod
   await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeDisabled();
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie derives effective node kinds from verified data', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMEffectiveNodeKind === 'function' &&
+    typeof window.hdSMNodeIntel === 'function' &&
+    typeof window.hdSMRender === 'function'
+  );
+
+  const kinds = await page.evaluate(() => ({
+    a: window.hdSMEffectiveNodeKind('2-4','A','normal'),
+    b: window.hdSMEffectiveNodeKind('2-4','B','normal'),
+    aIntel: window.hdSMNodeIntel('2-4',{label:'A',kind:'normal'}),
+    bIntel: window.hdSMNodeIntel('2-4',{label:'B',kind:'normal'})
+  }));
+
+  expect(kinds.a).toBe('item');
+  expect(kinds.b).toBe('normal');
+  expect(kinds.aIntel.kind).toBe('item');
+  expect(kinds.aIntel.formation).toBe('選択なし');
+  expect(kinds.aIntel.badge).toBe('非戦闘');
+  expect(kinds.bIntel.kind).toBe('normal');
+  expect(kinds.bIntel.formation).toBe('単縦陣');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-effective-kind-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-effective-kind-fleet',
+      fleetName:'マス分類テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-effective-kind-fleet',name:'マス分類テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active'
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const a = page.locator('[data-hd-sm-next-node="A"]');
+  await expect(a).toContainText('資源');
+  await expect(a).toContainText('基本陣形 選択なし');
+  await a.click();
+  await expect(page.locator('.hd-sm-hud')).toContainText('資源');
+  await expect(page.locator('.hd-sm-current-tactic')).toContainText('選択なし');
+  expect(errors).toEqual([]);
+});
