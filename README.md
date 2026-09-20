@@ -27,7 +27,7 @@ Settings → Pages → Build and deployment → Source を `GitHub Actions` に�
 - `app-version.json`、`update-manager.js`、`sw.js`、`package.json` のバージョンとbuildを揃えて更新します。
 - mainへのpushでは `.github/workflows/pages.yml` がまずJavaScript構文、PWAキャッシュ整合性、ランタイム資産、艦娘画像ソース、艦これMASTER意味検証を行います。成功後、PlaywrightのChromium / WebKitを別ジョブで並列実行します。
 - ChromiumとWebKitの両方が成功した場合だけPagesのアップロード/Deployへ進みます。公開ゲートでは各ブラウザで安定スモークテストを実行し、どちらかが失敗した場合は公開を止めます。失敗時は `playwright-report` と `test-results` をブラウザ別のActions artifactとして14日間保存します。
-- Pull Requestでは `.github/workflows/browser-regression.yml` がChromium / WebKitを同じく並列実行します。手動実行（workflow_dispatch）にも対応しています。mainへのpushはPages側で同じ回帰テストを行うため、重複実行しません。
+- Pull Requestでは `.github/workflows/browser-regression.yml` がChromium / WebKitのSmokeテストを実行します。Actionsの「Browser Regression」→「Run workflow」では `smoke` / `full` を選べ、`full` は216件の回帰テストを各ブラウザ1 workerで実行します。mainへのpushはPages側でSmokeを行うため、重複実行しません。
 - GitHubの「Actions」タブで最新mainの `Deploy HarborDesk PWA` を開き、`Run browser regression tests` と `Deploy` が成功していることを確認します。古いrunのcancelledは最新runの結果とは別です。
 - WebKitはSafari系エンジンの互換性確認であり、iPhone実機テストそのものではありません。
 - iPhoneでは公開後に「更新確認」→「今すぐ更新」で反映できます。Mac・Xcodeは不要です。
