@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, serviceWorkers: 'block' });
 
 async function boot(page, errors = []) {
   page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
