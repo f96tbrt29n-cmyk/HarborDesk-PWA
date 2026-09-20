@@ -223,6 +223,20 @@ function hdQNResourceThresholdAlert(){
   return {id:'resources',priority:70,tone:'urgent',reason:'資源最低ライン',icon:'!',title:`資源が最低ライン未満 ${low.length}件`,detail:low.slice(0,2).map(x=>`${x.label} ${Math.max(0,x.value).toLocaleString('ja-JP')} / ${x.threshold.toLocaleString('ja-JP')}`).join(' ・ ')};
  }catch{return null}
 }
+function hdQNBackupAttention(now=Date.now()){
+ try{
+  const backupAt=Math.max(0,Number(localStorage.getItem('harbordesk-last-external-backup-v1'))||0);
+  let syncAt=0;try{syncAt=Math.max(0,Number(JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')?.syncedAt)||0)}catch{}
+  if(!backupAt){
+   if(!syncAt)return null;
+   return {id:'backup',priority:60,tone:'sync',reason:'外部バックアップ未作成',icon:'⇩',title:'同期後のバックアップ未作成',detail:'艦これ同期データをJSONで保存しておこう'};
+  }
+  if(syncAt>backupAt)return {id:'backup',priority:60,tone:'sync',reason:'同期後バックアップ未保存',icon:'⇩',title:'同期後のバックアップ未保存',detail:'最新の同期内容をJSONへ書き出しておこう'};
+  const days=Math.max(0,Math.floor((Number(now)-backupAt)/86400000));
+  if(days>=14)return {id:'backup',priority:35,tone:'normal',reason:'外部バックアップ更新',icon:'⇩',title:'外部バックアップを更新',detail:`前回のJSON保存から${days}日`};
+  return null;
+ }catch{return null}
+}
 function hdQNMobileAttentionItems(){
  const items=[],now=Date.now(),RECENT_DONE=2*60*60*1000;
  try{
@@ -242,6 +256,7 @@ function hdQNMobileAttentionItems(){
   if(todo.length)items.push({id:'quests',priority:20,tone:'normal',reason:'未完了任務',icon:'✓',title:`未完了任務 ${todo.length}件`,detail:String(todo[0]?.name||'任務一覧を確認')});
  }catch{}
  const resourceAlert=hdQNResourceThresholdAlert();if(resourceAlert)items.push(resourceAlert);
+ const backupAlert=hdQNBackupAttention(now);if(backupAlert)items.push(backupAlert);
  try{
   const info=typeof hdWSSyncInfo==='function'?hdWSSyncInfo():{state:'missing',label:'未同期'};
   if(info.state&&info.state!=='fresh'){
@@ -395,7 +410,8 @@ window.addEventListener('load',()=>setTimeout(()=>{const id=window.hdWSState?.se
 window.addEventListener('hd:workspace-changed',()=>{hdQNUpdateMobileDock();if(document.getElementById('hdQuickNavDialog')?.open){hdQNRenderCategories();hdQNRenderContext()}});
 window.addEventListener('hd:kancolle-sync',hdQNUpdateMobileDock);
 window.addEventListener('hd:kancolle-return-ready',hdQNUpdateMobileDock);
-window.addEventListener('storage',e=>{if(!e||e.key==='harbordesk-kancolle-sync-v1'||e.key==='harbordesk-resource-thresholds-v1')hdQNUpdateMobileDock()});
+window.addEventListener('hd:backup-exported',hdQNUpdateMobileDock);
+window.addEventListener('storage',e=>{if(!e||e.key==='harbordesk-kancolle-sync-v1'||e.key==='harbordesk-resource-thresholds-v1'||e.key==='harbordesk-last-external-backup-v1')hdQNUpdateMobileDock()});
 
 window.addEventListener('hd:state-changed',hdQNUpdateMobileDock);
 window.addEventListener('hd:resource-thresholds',hdQNUpdateMobileDock);
