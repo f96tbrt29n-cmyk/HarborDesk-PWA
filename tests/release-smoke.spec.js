@@ -703,3 +703,42 @@ test('release smoke: backup integrity blocks tampered files', async ({ page }) =
   expect(JSON.parse(result.current).value).toBe('safe');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: restore aborts when safety snapshot fails', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdBuildBackupFile === 'function' &&
+    typeof window.hdBackupChecksum === 'function' &&
+    typeof window.importBackup === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-snapshot-guard', JSON.stringify({ value: 'safe' }));
+    const built = window.hdBuildBackupFile();
+    built.data.localStorage['harbordesk-snapshot-guard'] = JSON.stringify({ value: 'incoming' });
+    built.data.integrity.hash = window.hdBackupChecksum(built.data);
+    window.__hdSnapshotGuardAlerts = [];
+    window.alert = message => window.__hdSnapshotGuardAlerts.push(String(message || ''));
+    window.hdPHCreateSnapshot = async () => false;
+    const file = new File([JSON.stringify(built.data)], 'HarborDesk-snapshot-fail.json', { type: 'application/json' });
+    window.__hdSnapshotGuardPromise = window.importBackup(file);
+  });
+
+  const dialog = page.locator('#hdBackupRestorePreviewDialog');
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('[data-hd-backup-preview-compat]')).toContainText('整合性確認済み');
+  await dialog.locator('button[value="restore"]').click();
+
+  const result = await page.evaluate(async () => ({
+    imported: await window.__hdSnapshotGuardPromise,
+    current: localStorage.getItem('harbordesk-snapshot-guard'),
+    alerts: window.__hdSnapshotGuardAlerts || []
+  }));
+
+  expect(result.imported).toBe(false);
+  expect(JSON.parse(result.current).value).toBe('safe');
+  expect(result.alerts.join(' ')).toContain('スナップショット');
+  expect(errors).toEqual([]);
+});
