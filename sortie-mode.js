@@ -351,8 +351,22 @@ function hdSMSaveDraft(){
  return true;
 }
 function hdSMScheduleDraft(){clearTimeout(hdSMDraftTimer);hdSMDraftTimer=setTimeout(hdSMSaveDraft,180)}
+let hdSMOffrouteConfirm={label:'',until:0};
+function hdSMSelectSuggestedNode(label){
+ label=String(label||'').trim();const session=hdSMSession();if(!label||!session||session.status!=='active')return false;
+ const prev=session.draft&&typeof session.draft==='object'?session.draft:{},current=String(prev.node||'').trim(),guard=hdSMAdvanceGuard(session,prev);
+ if(current&&label!==current&&guard.required&&!guard.confirmed)return hdSMSetNode(label);
+ const reachable=hdSMCanReachBoss(session.map,label),now=Date.now();
+ if(reachable!==false){hdSMOffrouteConfirm={label:'',until:0};return hdSMSetNode(label)}
+ if(hdSMOffrouteConfirm.label===label&&hdSMOffrouteConfirm.until>=now){
+  hdSMOffrouteConfirm={label:'',until:0};return hdSMSetNode(label);
+ }
+ hdSMOffrouteConfirm={label,until:now+4000};
+ window.hdToast?.('構造図上では逸れ候補。もう一度押すと進むよ','warn',3200);
+ return false;
+}
 function hdSMSetNode(label){
- clearTimeout(hdSMDraftTimer);label=String(label||'').trim();const session=hdSMSession();if(!label||!session||session.status!=='active')return false;
+ clearTimeout(hdSMDraftTimer);hdSMOffrouteConfirm={label:'',until:0};label=String(label||'').trim();const session=hdSMSession();if(!label||!session||session.status!=='active')return false;
  const prev=session.draft&&typeof session.draft==='object'?session.draft:{},current=String(prev.node||'').trim(),guard=hdSMAdvanceGuard(session,prev);
  if(current&&label!==current&&guard.required&&!guard.confirmed){window.hdToast?.('進撃前に大破チェックを済ませてね','warn',1800);return false}
  const input=document.getElementById('hdSMNode'),boss=document.getElementById('hdSMBoss'),graph=hdSMGraph(session.map);
@@ -396,13 +410,13 @@ function hdSMInstall(){
 document.addEventListener('input',function(e){if(e.target?.closest?.('#hdSortieModeBody input, #hdSortieModeBody select'))hdSMScheduleDraft()});
 document.addEventListener('change',function(e){if(e.target?.closest?.('#hdSortieModeBody input, #hdSortieModeBody select'))hdSMScheduleDraft()});
 document.addEventListener('click',function(e){
- const nextNode=e.target.closest?.('[data-hd-sm-next-node]');if(nextNode){hdSMSetNode(nextNode.dataset.hdSmNextNode);return}
+ const nextNode=e.target.closest?.('[data-hd-sm-next-node]');if(nextNode){hdSMSelectSuggestedNode(nextNode.dataset.hdSmNextNode);return}
  const node=e.target.closest?.('[data-hd-sm-node]');if(node){hdSMSetNode(node.dataset.hdSmNode);return}
  if(e.target.closest?.('[data-hd-sm-route-undo]')){hdSMUndoNode();return}
  if(e.target.closest?.('[data-hd-sm-safe-confirm]')){hdSMSetAdvanceGuard(true);return}
  if(e.target.closest?.('[data-hd-sm-damage-retreat]')){hdSMSetAdvanceGuard(false);return}
  const hudJump=e.target.closest?.('[data-hd-sm-hud-jump]');if(hudJump){hdSMHudJump(hudJump.dataset.hdSmHudJump);return}
- const hudNode=e.target.closest?.('[data-hd-sm-hud-node]');if(hudNode){hdSMSetNode(hudNode.dataset.hdSmHudNode);return}
+ const hudNode=e.target.closest?.('[data-hd-sm-hud-node]');if(hudNode){hdSMSelectSuggestedNode(hudNode.dataset.hdSmHudNode);return}
  const quickResult=e.target.closest?.('[data-hd-sm-quick-result]');if(quickResult){hdSMQuickResult(quickResult.dataset.hdSmQuickResult);return}
  if(e.target.closest?.('[data-hd-sm-quick-boss]')){hdSMQuickBoss();return}
  if(e.target.closest?.('[data-hd-sm-quick-drop-none]')){hdSMQuickDropNone();return}
@@ -454,6 +468,7 @@ window.hdSMQuickBoss=hdSMQuickBoss;
 window.hdSMQuickDropNone=hdSMQuickDropNone;
 window.hdSMQuickBucket=hdSMQuickBucket;
 window.hdSMQuickRetreatReason=hdSMQuickRetreatReason;
+window.hdSMSelectSuggestedNode=hdSMSelectSuggestedNode;
 window.hdSMSetNode=hdSMSetNode;
 window.hdSMUndoNode=hdSMUndoNode;
 window.hdSMSaveDraft=hdSMSaveDraft;
