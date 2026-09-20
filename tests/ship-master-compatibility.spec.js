@@ -6455,3 +6455,36 @@ test('quick nav shows recently opened feature shortcuts', async ({ page }) => {
   expect(data.hasLabel).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('quick nav recent shortcuts can be cleared and prune stale entries', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    localStorage.setItem('harbordesk-quick-nav-recent-v1',JSON.stringify([
+      {id:'roster',at:Date.now()},
+      {id:'missingFeatureForTest',at:Date.now()-1000},
+      {id:'equipmentBook',at:Date.now()-2000}
+    ]));
+    window.hdQNEnsure?.();
+    const rows=window.hdQNRecentRows?.()||[];
+    const pruned=JSON.parse(localStorage.getItem('harbordesk-quick-nav-recent-v1')||'[]');
+    window.hdQNRenderRecent?.();
+    const hasClear=!!document.querySelector('[data-hd-qn-clear-recent]');
+    const cleared=window.hdQNClearRecent?.();
+    return {
+      rows:rows.map(x=>x.id),
+      pruned:pruned.map(x=>x.id),
+      hasClear,
+      cleared:!!cleared,
+      stored:JSON.parse(localStorage.getItem('harbordesk-quick-nav-recent-v1')||'[]'),
+      hidden:!!document.getElementById('hdQNRecent')?.hidden
+    };
+  });
+  expect(data.rows).not.toContain('missingFeatureForTest');
+  expect(data.pruned).not.toContain('missingFeatureForTest');
+  expect(data.hasClear).toBe(true);
+  expect(data.cleared).toBe(true);
+  expect(data.stored).toEqual([]);
+  expect(data.hidden).toBe(true);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
