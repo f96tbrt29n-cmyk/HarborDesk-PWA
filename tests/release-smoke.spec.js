@@ -909,6 +909,7 @@ test('release smoke: diagnostics verifies restore safety layer readiness', async
 
   const result = await page.evaluate(async () => {
     const healthy = await window.hdDXCollect(false);
+    const afterProbe = await window.hdPHGetSnapshots();
     const originalOpenDb = window.hdPHOpenDb;
     window.hdPHOpenDb = async () => { throw new Error('snapshot store unavailable'); };
     const broken = await window.hdDXCollect(false);
@@ -916,6 +917,8 @@ test('release smoke: diagnostics verifies restore safety layer readiness', async
     return {
       healthyReady: !!healthy.restoreSafety?.ready,
       healthyStore: !!healthy.restoreSafety?.storeReady,
+      healthyProbe: !!healthy.restoreSafety?.probeOk,
+      probeLeaks: afterProbe.filter(x => String(x?.id || '').startsWith('__hd-safety-probe-')).length,
       brokenReady: !!broken.restoreSafety?.ready,
       brokenError: broken.restoreSafety?.error || '',
       brokenIssues: broken.issues || []
@@ -924,6 +927,8 @@ test('release smoke: diagnostics verifies restore safety layer readiness', async
 
   expect(result.healthyReady).toBe(true);
   expect(result.healthyStore).toBe(true);
+  expect(result.healthyProbe).toBe(true);
+  expect(result.probeLeaks).toBe(0);
   expect(result.brokenReady).toBe(false);
   expect(result.brokenError).toContain('snapshot store unavailable');
   expect(result.brokenIssues.join(' ')).toContain('復元安全スナップショット');
