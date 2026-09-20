@@ -96,7 +96,7 @@ function hdKcParseImport(raw){
  }else if(root&&typeof root==='object'&&!Array.isArray(root)&&!('api_result' in root)&&!('api_ship' in root)&&!('api_ship_data' in root)&&!('api_slot_item' in root)&&!('api_material' in root)&&!('api_ndock' in root)&&!('api_list' in root)){
   let matched=false;
   for(const [k,v] of Object.entries(root)){
-   if(/api_(port|api_get_member|kcsapi)|\/kcsapi\//.test(k)||/^(port|ship2|slot_item|material|require_info|ndock|questlist)$/.test(k)){hdKcImportAdd(out,k,v);matched=true}
+   if(/api_(port|api_get_member|kcsapi)|\/kcsapi\//.test(k)||/^(port|ship2|slot_item|slotitem|material|require_info|ndock|questlist)$/.test(k)){hdKcImportAdd(out,k,v);matched=true}
   }
   if(!matched)hdKcImportAdd(out,'',root);
  }else hdKcImportAdd(out,'',root);
@@ -130,7 +130,7 @@ function hdKcCoverageFromSources(sources=[],parsed=null){
  const src=(Array.isArray(sources)?sources:[]).map(String),has=re=>src.some(x=>re.test(x));
  return {
   ships:!!parsed?.completeShips||has(/api_port\/port|api_get_member\/ship2/),
-  equipment:!!parsed?.completeSlotItems||has(/api_get_member\/(?:slot_item|require_info)/),
+  equipment:!!parsed?.completeSlotItems||has(/api_get_member\/(?:slot_item|slotitem|require_info)/),
   resources:has(/api_port\/port|api_get_member\/material/),
   fleets:!!parsed?.completeDecks||has(/api_port\/port|api_get_member\/ship2/),
   quests:has(/api_get_member\/questlist/),
