@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HarborDesk 艦これ連携
 // @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
-// @version      1.0.10
+// @version      1.0.11
 // @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
 // @match        http://*.dmm.com/*
 // @match        https://*.dmm.com/*
@@ -21,7 +21,7 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.10';
+const HD_VERSION='1.0.11';
 const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/';
 const RECORD_MESSAGE='harbordesk-kancolle-frame-record-v1';
 const STATUS_MESSAGE='harbordesk-kancolle-frame-status-v1';
@@ -215,12 +215,16 @@ function captureCoverage(){
   const endpoints=records.map(x=>String(x.endpoint||''));
   const has=re=>endpoints.some(x=>re.test(x));
   return {
-    port:has(/api_port\/port|api_get_member\/ship2|api_get_member\/material/),
+    port:has(/api_port\/port|api_get_member\/ship2/),
     equipment:has(/api_get_member\/(?:slot_item|slotitem|require_info)/),
+    resources:has(/api_port\/port|api_get_member\/material/),
     quests:has(/api_get_member\/questlist/),
     docks:has(/api_port\/port|api_get_member\/ndock/),
     sorties:has(/api_req_map\/(?:start|next)|api_req_(?:sortie|combined_battle)\/battleresult/)
   };
+}
+function ledgerReady(c=captureCoverage()){
+  return !!(c.port&&c.equipment);
 }
 function coverageHtml(){
   const c=captureCoverage(),rows=[['母港',c.port],['装備',c.equipment],['任務',c.quests],['入渠',c.docks],['出撃',c.sorties]];
@@ -228,12 +232,12 @@ function coverageHtml(){
 }
 
 function nextCaptureHint(c=captureCoverage()){
-  if(!c.port)return '次: 母港を一度表示すると、艦娘・資源・艦隊をまとめて取れるよ';
-  if(!c.equipment)return '次: 装備画面を一度開くと、装備と改修★を取れるよ';
-  if(!c.quests)return '次: 任務画面を一度開くと、任務状態も取れるよ';
-  if(!c.docks)return '次: 入渠画面を一度開くと、入渠タイマーも取れるよ';
-  if(!c.sorties)return '主要データOK。出撃後にもう一度送ると出撃記録も取れるよ';
-  return '主要データ取得済み。このままHarborDeskへ送ってOK';
+  if(!c.port)return '台帳同期に必要: 母港を一度表示して艦娘・艦隊データを取得してね';
+  if(!c.equipment)return '台帳同期に必要: 装備画面を一度開いて装備個体・改修★を取得してね';
+  if(!c.quests)return '艦隊台帳・装備台帳は同期OK。任務も入れるなら任務画面を開いてね';
+  if(!c.docks)return '台帳同期OK。入渠タイマーも入れるなら入渠画面を開いてね';
+  if(!c.sorties)return '台帳同期OK。出撃後にもう一度送ると出撃記録も追加できるよ';
+  return '台帳を含む主要データ取得済み。このままHarborDeskへ送ってOK';
 }
 
 function signature(r){
@@ -312,16 +316,16 @@ function setMinimized(next,persist=true){
   render();return minimized;
 }
 function render(){
-  const c=captureCoverage(),core=c.port&&c.equipment&&c.quests;
+  const c=captureCoverage(),ledger=ledgerReady(c),core=ledger&&c.quests;
   if(countEl)countEl.textContent=String(records.length);
-  if(miniCountEl){miniCountEl.textContent=records.length+(core?'件 ✓':'件');miniCountEl.style.color=core?'#9fe0b7':'#f0d590'}
+  if(miniCountEl){miniCountEl.textContent=records.length+(ledger?'件 ✓':'件');miniCountEl.style.color=ledger?'#9fe0b7':'#f0d590'}
   if(frameEl)frameEl.textContent=String(frameHits);
   if(coverageEl)coverageEl.innerHTML=coverageHtml();
-  if(hintEl){hintEl.textContent=records.length?nextCaptureHint(c):'母港・装備・任務などを開くと、ここに取得状況が出るよ';hintEl.style.color=core?'#bcefd0':'#f0d590'}
-  if(sendEl){sendEl.disabled=!records.length;sendEl.textContent=records.length?'HarborDeskへ送る（'+records.length+'件）':'HarborDeskへ送る';sendEl.style.opacity=records.length?'1':'.55'}
+  if(hintEl){hintEl.textContent=records.length?nextCaptureHint(c):'まず母港と装備画面を開いて、艦隊台帳・装備台帳の同期材料を揃えてね';hintEl.style.color=ledger?'#bcefd0':'#f0d590'}
+  if(sendEl){sendEl.disabled=!ledger;sendEl.textContent=ledger?'台帳をHarborDeskへ同期（'+records.length+'件）':'台帳データ待ち';sendEl.style.opacity=ledger?'1':'.55'}
   if(statusEl){
-    statusEl.textContent=records.length?(core?'基本データ取得済み':'取得中'):'通信待機中';
-    statusEl.style.color=core?'#9fe0b7':'#f0d590';
+    statusEl.textContent=records.length?(ledger?(core?'台帳＋基本データ取得済み':'台帳同期準備OK'):'台帳データ取得中'):'通信待機中';
+    statusEl.style.color=ledger?'#9fe0b7':'#f0d590';
   }
 }
 function show(){
@@ -354,8 +358,15 @@ async function encodeHandoff(value){
   return 'j.'+bytesToBase64Url(raw);
 }
 async function send(){
+  const c=captureCoverage();
   if(!records.length){
-    alert('まだ取得データがないよ。母港・装備・任務などを一度開いてからもう一度押してね。');
+    alert('まだ取得データがないよ。まず母港と装備画面を開いてね。');
+    return;
+  }
+  if(!ledgerReady(c)){
+    const missing=[!c.port?'母港（艦娘・艦隊）':'',!c.equipment?'装備':''].filter(Boolean).join(' と ');
+    if(statusEl)statusEl.textContent='台帳同期データ不足';
+    alert('艦隊台帳・装備台帳を埋めるため、'+missing+'のデータが必要だよ。ゲーム内で該当画面を一度開いてから再度同期してね。');
     return;
   }
   try{
@@ -383,6 +394,7 @@ window.__HARBORDESK_KANCOLLE_USERSCRIPT__={
   records,
   exportObject,
   captureCoverage,
+  ledgerReady,
   nextCaptureHint,
   setMinimized,
   isMinimized:()=>minimized,
