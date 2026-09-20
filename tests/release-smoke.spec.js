@@ -1109,3 +1109,48 @@ test('release smoke: backup reminder detects meaningful local data without sync'
   expect(result.coreTitle).toContain('バックアップ未作成');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: every map shows recommended level guidance', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdMapLevelGuide === 'function' &&
+    typeof window.renderMapPicker === 'function'
+  );
+
+  const result = await page.evaluate(() => {
+    const maps = Object.values(MAPS).flat();
+    const guides = maps.map(map => ({ map, ...window.hdMapLevelGuide(map) }));
+    const missing = guides.filter(x =>
+      !x.recommended || x.recommended === '個別確認' ||
+      !x.min || x.min === '目安なし' ||
+      !x.note
+    );
+
+    selectedWorld = '2';
+    selectedMap = '2-4';
+    window.renderMapPicker();
+    const card = document.getElementById('selectedMapCard')?.textContent || '';
+
+    return {
+      mapCount: maps.length,
+      missing,
+      sample: window.hdMapLevelGuide('2-4'),
+      hardSample: window.hdMapLevelGuide('5-6'),
+      hasLabel: card.includes('推奨練度'),
+      hasRecommended: card.includes('平均Lv40〜50'),
+      hasDisclaimer: card.includes('HarborDeskの攻略目安')
+    };
+  });
+
+  expect(result.mapCount).toBe(37);
+  expect(result.missing).toEqual([]);
+  expect(result.sample.recommended).toBe('平均Lv40〜50');
+  expect(result.sample.min).toBe('Lv30〜35');
+  expect(result.hardSample.recommended).toBe('平均Lv90〜110');
+  expect(result.hasLabel).toBe(true);
+  expect(result.hasRecommended).toBe(true);
+  expect(result.hasDisclaimer).toBe(true);
+  expect(errors).toEqual([]);
+});
