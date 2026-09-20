@@ -154,7 +154,9 @@ async function hdPHProbeSnapshotStore(){
   return {ok:false,error:String(err?.message||err||'snapshot store probe failed')}
  }finally{try{db?.close?.()}catch{}}
 }
-async function hdPHGetSnapshots(){try{const db=await hdPHOpenDb();return await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readonly'),req=tx.objectStore(HD_PH_STORE).getAll();req.onsuccess=()=>resolve((req.result||[]).sort((a,b)=>b.at-a.at));req.onerror=()=>reject(req.error)})}catch{return []}}
+function hdPHIsDiagnosticSnapshot(row){return !!(row?.probe===true||String(row?.id||'').startsWith('__hd-safety-probe-'))}
+window.hdPHIsDiagnosticSnapshot=hdPHIsDiagnosticSnapshot;
+async function hdPHGetSnapshots(){let db=null;try{db=await hdPHOpenDb();return await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readonly'),req=tx.objectStore(HD_PH_STORE).getAll();req.onsuccess=()=>resolve((req.result||[]).filter(x=>!hdPHIsDiagnosticSnapshot(x)).sort((a,b)=>b.at-a.at));req.onerror=()=>reject(req.error)})}catch{return []}finally{try{db?.close?.()}catch{}}}
 async function hdPHCreateSnapshot(reason='手動'){const payload=hdPHHarborData(),row={id:`${Date.now()}-${Math.random().toString(16).slice(2)}`,at:Date.now(),reason,payload,bytes:hdPHBytes(payload)};try{const db=await hdPHOpenDb();await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readwrite');tx.objectStore(HD_PH_STORE).put(row);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});const rows=await hdPHGetSnapshots();if(rows.length>HD_PH_MAX_SNAPSHOTS){await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readwrite'),store=tx.objectStore(HD_PH_STORE);rows.slice(HD_PH_MAX_SNAPSHOTS).forEach(x=>store.delete(x.id));tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}await hdPHRender();return true}catch{return false}}
 async function hdPHDeleteSnapshot(id){try{const db=await hdPHOpenDb();await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readwrite');tx.objectStore(HD_PH_STORE).delete(id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});await hdPHRender()}catch{}}
 function hdPHValidateHarborData(payload){
@@ -185,18 +187,22 @@ function hdPHRestoreTransaction(payload,before=hdPHHarborData(),applyFn=hdPHAppl
  }
 }
 async function hdPHRestoreSnapshot(id){
- const rows=await hdPHGetSnapshots(),row=rows.find(x=>x.id===id);if(!row)return false;
- if(!confirm(`${new Date(row.at).toLocaleString('ja-JP')} の端末内スナップショットへ戻す？\n現在のHarborDeskデータは復元前スナップショットとして先に保存するよ。`))return false;
- const safetyOk=await hdPHCreateSnapshot('復元直前');
- if(safetyOk===false){alert('復元前の安全スナップショットを保存できなかったため、復元を中止したよ。');return false}
- const before=hdPHHarborData(),result=hdPHRestoreTransaction(row.payload||{},before);
- if(!result.ok){
-  console.warn('snapshot restore validation failed',result);
-  if(result.rollback?.ok)alert('スナップショット復元後の検証で不一致を検出したため、直前のデータへ自動で戻したよ。');
-  else alert('スナップショット復元後の検証に失敗し、自動で元へ戻しきれなかったよ。保存済みの別スナップショットかJSONバックアップから復元してね。');
-  return false
- }
- location.reload();return true
+ if(window.__hdBackupRestoreBusy){alert('別の復元処理が進行中だよ。完了してからもう一度試してね。');return false}
+ window.__hdBackupRestoreBusy=true;
+ try{
+  const rows=await hdPHGetSnapshots(),row=rows.find(x=>x.id===id);if(!row)return false;
+  if(!confirm(`${new Date(row.at).toLocaleString('ja-JP')} の端末内スナップショットへ戻す？\n現在のHarborDeskデータは復元前スナップショットとして先に保存するよ。`))return false;
+  const safetyOk=await hdPHCreateSnapshot('復元直前');
+  if(safetyOk===false){alert('復元前の安全スナップショットを保存できなかったため、復元を中止したよ。');return false}
+  const before=hdPHHarborData(),result=hdPHRestoreTransaction(row.payload||{},before);
+  if(!result.ok){
+   console.warn('snapshot restore validation failed',result);
+   if(result.rollback?.ok)alert('スナップショット復元後の検証で不一致を検出したため、直前のデータへ自動で戻したよ。');
+   else alert('スナップショット復元後の検証に失敗し、自動で元へ戻しきれなかったよ。保存済みの別スナップショットかJSONバックアップから復元してね。');
+   return false
+  }
+  location.reload();return true
+ }finally{window.__hdBackupRestoreBusy=false}
 }
 function hdPHSectionTitle(id){const el=document.getElementById(id);return el?.querySelector(':scope > .section-head h2, :scope h2, :scope h3, :scope h4')?.textContent?.trim()||id}
 function hdPHResumeRow(){

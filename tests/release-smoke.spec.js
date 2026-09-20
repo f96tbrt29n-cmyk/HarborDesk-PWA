@@ -1606,3 +1606,99 @@ test('release smoke: shared mobile layout prevents chrome overlap across iPhone 
 
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: diagnostic snapshot rows never enter user snapshot lists', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdPHOpenDb === 'function' &&
+    typeof window.hdPHGetSnapshots === 'function' &&
+    typeof window.hdPHIsDiagnosticSnapshot === 'function'
+  );
+
+  const result = await page.evaluate(async () => {
+    const db=await window.hdPHOpenDb();
+    const probe={id:'__hd-safety-probe-stale-test',at:Date.now()+1000,reason:'診断プローブ',payload:{},bytes:0,probe:true};
+    const real={id:'hd-real-snapshot-test',at:Date.now(),reason:'手動',payload:{'harbordesk-test':'{}'},bytes:2};
+    await new Promise((resolve,reject)=>{
+      const tx=db.transaction('snapshots','readwrite'),store=tx.objectStore('snapshots');
+      store.put(probe);store.put(real);
+      tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
+    });
+    db.close();
+    const rows=await window.hdPHGetSnapshots();
+    const db2=await window.hdPHOpenDb();
+    await new Promise((resolve,reject)=>{
+      const tx=db2.transaction('snapshots','readwrite'),store=tx.objectStore('snapshots');
+      store.delete(probe.id);store.delete(real.id);
+      tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
+    });
+    db2.close();
+    return {
+      ids:rows.map(x=>x.id),
+      probeRecognized:window.hdPHIsDiagnosticSnapshot(probe),
+      realRecognized:window.hdPHIsDiagnosticSnapshot(real)
+    };
+  });
+
+  expect(result.probeRecognized).toBe(true);
+  expect(result.realRecognized).toBe(false);
+  expect(result.ids).toContain('hd-real-snapshot-test');
+  expect(result.ids).not.toContain('__hd-safety-probe-stale-test');
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: internal snapshot restore shares the global restore lock', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdPHCreateSnapshot === 'function' &&
+    typeof window.hdPHRestoreSnapshot === 'function' &&
+    typeof window.hdPHGetSnapshots === 'function'
+  );
+
+  const result = await page.evaluate(async () => {
+    window.alert = message => (window.__hdInternalRestoreAlerts ||= []).push(String(message||''));
+    window.confirm = () => true;
+    localStorage.setItem('harbordesk-internal-lock-test', JSON.stringify({value:'safe'}));
+    await window.hdPHCreateSnapshot('lock-test');
+    const rows=await window.hdPHGetSnapshots();
+    const id=rows.find(x=>x.reason==='lock-test')?.id;
+
+    window.__hdBackupRestoreBusy=true;
+    const blocked=await window.hdPHRestoreSnapshot(id);
+    const stayedOwned=window.__hdBackupRestoreBusy===true;
+    window.__hdBackupRestoreBusy=false;
+
+    const originalCreate=window.hdPHCreateSnapshot;
+    let releaseSafety;
+    window.hdPHCreateSnapshot=()=>new Promise(resolve=>{releaseSafety=resolve});
+    const pending=window.hdPHRestoreSnapshot(id);
+    await new Promise(resolve=>setTimeout(resolve,0));
+    const ownedWhilePending=window.__hdBackupRestoreBusy===true;
+    releaseSafety(false);
+    const aborted=await pending;
+    const clearedAfterAbort=window.__hdBackupRestoreBusy===false;
+    window.hdPHCreateSnapshot=originalCreate;
+
+    window.confirm=()=>false;
+    const cancelled=await window.hdPHRestoreSnapshot(id);
+    const clearedAfterCancel=window.__hdBackupRestoreBusy===false;
+
+    return {
+      blocked,stayedOwned,ownedWhilePending,aborted,clearedAfterAbort,cancelled,clearedAfterCancel,
+      alerts:window.__hdInternalRestoreAlerts||[]
+    };
+  });
+
+  expect(result.blocked).toBe(false);
+  expect(result.stayedOwned).toBe(true);
+  expect(result.ownedWhilePending).toBe(true);
+  expect(result.aborted).toBe(false);
+  expect(result.clearedAfterAbort).toBe(true);
+  expect(result.cancelled).toBe(false);
+  expect(result.clearedAfterCancel).toBe(true);
+  expect(result.alerts.join(' ')).toContain('進行中');
+  expect(errors).toEqual([]);
+});
