@@ -589,3 +589,67 @@ test('release smoke: backup restore preview can cancel without changing data', a
   expect(result.addedCandidate).toBeNull();
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: backup compatibility blocks newer formats', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdBuildBackupFile === 'function' &&
+    typeof window.hdAnalyzeBackupCompatibility === 'function' &&
+    typeof window.importBackup === 'function'
+  );
+
+  const metadata = await page.evaluate(() => {
+    const built = window.hdBuildBackupFile();
+    const current = window.hdAnalyzeBackupCompatibility(built.data);
+    const future = window.hdAnalyzeBackupCompatibility({
+      ...built.data,
+      version: 2
+    });
+    return {
+      name: built.data.app?.name || '',
+      version: built.data.app?.version || '',
+      build: built.data.app?.build,
+      currentBlocked: !!current.blocked,
+      futureBlocked: !!future.blocked,
+      futureReason: future.reason || ''
+    };
+  });
+
+  expect(metadata.name).toBe('HarborDesk');
+  expect(metadata.version).toMatch(/^1\.0\.\d+$/);
+  expect(Number(metadata.build)).toBeGreaterThan(0);
+  expect(metadata.currentBlocked).toBe(false);
+  expect(metadata.futureBlocked).toBe(true);
+  expect(metadata.futureReason).toContain('新しい形式');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-compat-keep', JSON.stringify({ value: 'safe' }));
+    const backup = {
+      version: 2,
+      exportedAt: new Date().toISOString(),
+      app: { name: 'HarborDesk', version: '9.9.9', build: 9999 },
+      localStorage: {
+        'harbordesk-compat-keep': JSON.stringify({ value: 'unsafe' })
+      }
+    };
+    const file = new File([JSON.stringify(backup)], 'HarborDesk-future.json', { type: 'application/json' });
+    window.__hdCompatImportPromise = window.importBackup(file);
+  });
+
+  const dialog = page.locator('#hdBackupRestorePreviewDialog');
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('[data-hd-backup-preview-compat]')).toContainText('復元できないバックアップ');
+  await expect(dialog.locator('[data-hd-backup-preview-compat]')).toContainText('新しい形式');
+  await expect(dialog.locator('button[value="restore"]')).toBeDisabled();
+  await dialog.locator('button[value="cancel"]').click();
+
+  const result = await page.evaluate(async () => ({
+    imported: await window.__hdCompatImportPromise,
+    keep: localStorage.getItem('harbordesk-compat-keep')
+  }));
+  expect(result.imported).toBe(false);
+  expect(JSON.parse(result.keep).value).toBe('safe');
+  expect(errors).toEqual([]);
+});
