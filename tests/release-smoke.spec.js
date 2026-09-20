@@ -503,3 +503,31 @@ test('release smoke: backup warning follows latest game sync', async ({ page }) 
   expect(data.fresh.alertPresent).toBe(false);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('release smoke: ship image backup exposes share action and records backup time', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    window.alert = () => {};
+    localStorage.removeItem('harbordesk-last-ship-image-backup-v1');
+    const dialog = window.hdShipImageEnsureDialog?.();
+    const name = window.hdShipImageBackupName?.() || '';
+    const at = window.hdShipImageMarkBackup?.() || 0;
+    return {
+      shareFn: typeof window.hdShipImageShareBackup,
+      shareButton: !!dialog?.querySelector('[data-hd-ship-image-share]'),
+      filename: name,
+      markedAt: at,
+      storedAt: Number(localStorage.getItem('harbordesk-last-ship-image-backup-v1') || 0)
+    };
+  });
+
+  expect(data.shareFn).toBe('function');
+  expect(data.shareButton).toBe(true);
+  expect(data.filename).toContain('HarborDesk-ship-images-');
+  expect(data.filename).toMatch(/\.hdshipimg$/);
+  expect(data.markedAt).toBeGreaterThan(0);
+  expect(data.storedAt).toBe(data.markedAt);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
