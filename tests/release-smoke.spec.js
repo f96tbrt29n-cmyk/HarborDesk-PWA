@@ -3487,3 +3487,64 @@ test('release smoke: sticky sortie HUD shows remaining structural path', async (
   await expect(path).toContainText('O');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie highlights shortest structural next node', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMObjectiveShortestPath === 'function' &&
+    typeof window.hdSMObjectiveRemainingPath === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-shortest-next-start',
+      map:'7-2',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-shortest-next-fleet',
+      fleetName:'最短候補テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-shortest-next-fleet',name:'最短候補テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{routeNodes:[],result:'S',memo:'',objectiveTarget:'G2'}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const a = page.locator('[data-hd-sm-next-node="A"]');
+  const d = page.locator('[data-hd-sm-next-node="D"]');
+  await expect(d).toHaveClass(/shortest/);
+  await expect(d).toContainText('最短経路');
+  await expect(a).not.toHaveClass(/shortest/);
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-shortest-next-hud',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-shortest-next-hud-fleet',
+      fleetName:'HUD最短候補テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-shortest-next-hud-fleet',name:'HUD最短候補テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'D',routeNodes:['A','D'],result:'S',memo:'',objectiveTarget:'O',advanceGuard:{node:'D',safe:true,at:Date.now()}}
+    }));
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const hudNext = page.locator('.hd-sm-hud [data-hd-sm-hud-node="H"]');
+  await expect(hudNext).toHaveClass(/shortest/);
+  await expect(hudNext).toContainText('最短');
+  expect(errors).toEqual([]);
+});
