@@ -78,3 +78,16 @@
 
 [data-hd-shipdb-reset]:disabled{opacity:.42}
 [data-hd-shipdb-reset].is-active{border-color:#d9b45b;background:#3b2f16;color:#ffe9a8}
+
+.hd-shipdb-list.hd-compact .hd-shipdb-card,.hd-shipdb-list.hd-compact .hd-shipdb-master-card{cursor:pointer}
+.hd-shipdb-list.hd-compact .hd-peek{padding:12px;gap:9px;border-color:rgba(111,198,247,.55);background:#0d2436;cursor:default}
+.hd-shipdb-list.hd-compact .hd-peek p,
+.hd-shipdb-list.hd-compact .hd-peek .hd-shipdb-path,
+.hd-shipdb-list.hd-compact .hd-peek .hd-shipdb-require,
+.hd-shipdb-list.hd-compact .hd-peek .hd-shipdb-detail{display:block}
+.hd-shipdb-list.hd-compact .hd-peek .hd-shipdb-roles,
+.hd-shipdb-list.hd-compact .hd-peek .hd-shipdb-substats{display:flex}
+.hd-shipdb-list.hd-compact .hd-peek .hd-shipdb-master-mini,
+.hd-shipdb-list.hd-compact .hd-peek .hd-shipdb-master-slots{display:grid}
+.hd-shipdb-list.hd-compact .hd-peek .hd-shipdb-master-equip{display:block}
+.hd-shipdb-list.hd-compact .hd-peek .hd-shipdb-actions .guide-link{display:inline-flex}
