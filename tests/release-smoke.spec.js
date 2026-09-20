@@ -3488,3 +3488,50 @@ test('release smoke: sortie highlights minimum-battle next route', async ({ page
   await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="F"]')).toContainText('最少戦闘');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie HUD shows minimum-battle route plan', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMBestRoutePlan === 'function'
+  );
+
+  const plan = await page.evaluate(() => window.hdSMBestRoutePlan('2-4','C','O'));
+  expect(plan.path).toEqual(['F','J','O']);
+  expect(plan.battles).toBe(3);
+  expect(plan.steps).toBe(3);
+  expect(plan.target).toBe('O');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-route-plan-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-route-plan-fleet',
+      fleetName:'ルート計画テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-route-plan-fleet',name:'ルート計画テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'C',routeNodes:['A','C'],result:'S',memo:'',objectiveTarget:'O',advanceGuard:{node:'C',safe:true,at:Date.now()}}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const planCard = page.locator('.hd-sm-route-plan');
+  await expect(planCard).toBeVisible();
+  await expect(planCard).toContainText('F → J → O');
+  await expect(planCard).toContainText('3戦 / 3マス');
+
+  const hudPlan = page.locator('.hd-sm-hud-route-plan');
+  await expect(hudPlan).toBeVisible();
+  await expect(hudPlan).toContainText('F → J → O');
+  await expect(hudPlan).toContainText('3戦 / 3マス');
+  expect(errors).toEqual([]);
+});
