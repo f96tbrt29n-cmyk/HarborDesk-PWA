@@ -3056,12 +3056,15 @@ test('release smoke: sortie log displays selected objective badge', async ({ pag
   );
   await page.evaluate(() => {
     localStorage.setItem('harbordesk-sortie-log-v1','[]');
+    window.hdSLEnsure?.();
     window.hdSLRecordEntry({
       id:'obj-badge-1',at:Date.now(),map:'7-2',node:'G2',result:'S',
       boss:true,battles:4,objectiveTarget:'G2'
     });
+    window.hdSLRender();
     window.hdWSShowElement?.('sortieLog', false);
   });
+  await expect(page.locator('#sortieLog')).toHaveCount(1);
   const row = page.locator('#sortieLog .hd-sl-row').first();
   await expect(row).toBeVisible();
   await expect(row.locator('.hd-sl-badge.objective')).toContainText('目標 G2');
@@ -3083,10 +3086,12 @@ test('release smoke: sortie analytics separates multi-target objectives', async 
       {id:'g2-2',at:Date.now()-3000,map:'7-2',node:'G2',result:'S',boss:true,battles:4,objectiveTarget:'G2'},
       {id:'old-1',at:Date.now()-4000,map:'7-2',node:'G1',result:'撤退',boss:false,retreat:true,battles:1}
     ]));
+    window.hdSLEnsure?.();
     window.hdSLRender();
     window.hdWSShowElement?.('sortieLog', false);
   });
 
+  await expect(page.locator('#sortieLog')).toHaveCount(1);
   await page.waitForTimeout(150);
   const cards = page.locator('#sortieLog .hd-spa-card');
   await expect(cards).toHaveCount(3);
@@ -3127,10 +3132,13 @@ test('release smoke: sortie log filters by selected objective', async ({ page })
       {id:'obj-filter-g2',at:Date.now()-1000,map:'7-2',node:'G2',result:'S',boss:true,battles:4,objectiveTarget:'G2'},
       {id:'obj-filter-other',at:Date.now()-2000,map:'2-4',node:'O',result:'S',boss:true,battles:4}
     ]));
+    window.hdSLEnsure?.();
     window.hdSLRender();
     window.hdWSShowElement?.('sortieLog', false);
   });
 
+  await expect(page.locator('#sortieLog')).toHaveCount(1);
+  await expect(page.locator('#sortieLog [data-hd-sl-filter="all"]')).toBeVisible();
   await page.locator('#sortieLog [data-hd-sl-filter="all"]').click();
   await expect(page.locator('#sortieLog .hd-sl-row')).toHaveCount(3);
 
@@ -3178,7 +3186,7 @@ test('release smoke: game sync populates ship and equipment ledgers', async ({ p
       format:'harbordesk-kancolle-import',
       version:2,
       source:'test',
-      userscriptVersion:'1.0.9',
+      userscriptVersion:'1.0.10',
       records:[
         {
           endpoint:'/kcsapi/api_port/port',
