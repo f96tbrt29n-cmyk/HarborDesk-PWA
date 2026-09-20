@@ -3148,3 +3148,107 @@ test('release smoke: sortie log filters by selected objective', async ({ page })
   await expect(page.locator('#sortieLog .hd-sl-row')).toContainText('目標 G2');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: game sync populates ship and equipment ledgers', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdKcParseImport === 'function' &&
+    typeof window.hdKcPreviewData === 'function' &&
+    typeof window.hdKcApplyImport === 'function' &&
+    typeof window.hdKcLedgerStatus === 'function'
+  );
+
+  const result = await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-ship-roster-v1');
+    localStorage.removeItem('harbordesk-equipment-v1');
+    localStorage.removeItem('harbordesk-kancolle-equipment-detail-v1');
+    localStorage.removeItem('harbordesk-kancolle-sync-v1');
+    sessionStorage.setItem('harbordesk-session-roster-view-v1', JSON.stringify({filter:'主力',sort:'updated'}));
+    sessionStorage.setItem('harbordesk-session-equipment-ledger-view-v1', JSON.stringify({query:'不存在'}));
+
+    const rosterSearch=document.getElementById('shipRosterSearch');
+    if(rosterSearch)rosterSearch.value='不存在';
+    document.querySelectorAll('[data-roster-filter]').forEach(x=>x.classList.toggle('active',x.dataset.rosterFilter==='主力'));
+    const equipmentSearch=document.getElementById('equipmentSearch');
+    if(equipmentSearch)equipmentSearch.value='不存在';
+
+    const raw = JSON.stringify({
+      format:'harbordesk-kancolle-import',
+      version:2,
+      source:'test',
+      userscriptVersion:'1.0.9',
+      records:[
+        {
+          endpoint:'/kcsapi/api_port/port',
+          payload:{
+            api_result:1,
+            api_data:{
+              api_ship:[
+                {api_id:1001,api_ship_id:1,api_lv:12,api_nowhp:13,api_maxhp:13,api_cond:49,api_locked:1,api_sally_area:0,api_slot:[5001,-1],api_slot_ex:0},
+                {api_id:1002,api_ship_id:999999,api_lv:7,api_nowhp:10,api_maxhp:10,api_cond:40,api_locked:0,api_sally_area:0,api_slot:[],api_slot_ex:0}
+              ],
+              api_deck_port:[
+                {api_id:1,api_name:'第一艦隊',api_mission:[0,0,0,0],api_ship:[1001,1002,-1,-1,-1,-1]}
+              ],
+              api_ndock:[],
+              api_material:[{api_id:1,api_value:1000},{api_id:2,api_value:900},{api_id:3,api_value:800},{api_id:4,api_value:700}]
+            }
+          }
+        },
+        {
+          endpoint:'/kcsapi/api_get_member/slot_item',
+          payload:{
+            api_result:1,
+            api_data:[
+              {api_id:5001,api_slotitem_id:1,api_level:3,api_alv:0}
+            ]
+          }
+        }
+      ]
+    });
+
+    const parsed=window.hdKcParseImport(raw);
+    const preview=window.hdKcPreviewData(parsed);
+    const sync=window.hdKcApplyImport(preview,{ships:true,equipment:true,resources:true,fleets:true,timers:true,quests:true,sorties:true});
+    const roster=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]');
+    const equipment=JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]');
+    const ledger=window.hdKcLedgerStatus(parsed);
+    return {
+      preview:{ships:preview.ships,slotItems:preview.slotItems,unknownShips:preview.unknownShips},
+      syncLedger:sync.ledger,
+      ledger,
+      roster,
+      equipment,
+      rosterSearch:document.getElementById('shipRosterSearch')?.value||'',
+      equipmentSearch:document.getElementById('equipmentSearch')?.value||'',
+      allFilterActive:document.querySelector('[data-roster-filter="all"]')?.classList.contains('active')||false,
+      rosterText:document.getElementById('shipRosterList')?.textContent||'',
+      equipmentText:document.getElementById('equipmentList')?.textContent||''
+    };
+  });
+
+  expect(result.preview).toEqual({ships:2,slotItems:1,unknownShips:1});
+  expect(result.syncLedger.ok).toBe(true);
+  expect(result.ledger.shipsStored).toBe(2);
+  expect(result.ledger.equipmentStored).toBe(1);
+  expect(result.roster).toHaveLength(2);
+  expect(result.roster.find(x=>x.gameShipId===1001)).toMatchObject({
+    name:'睦月',masterId:1,level:12,source:'kancolle-import',masterResolved:true
+  });
+  expect(result.roster.find(x=>x.gameShipId===1001).gear).toContain('12cm単装砲 ★3');
+  expect(result.roster.find(x=>x.gameShipId===1002)).toMatchObject({
+    name:'艦娘ID 999999',masterId:999999,level:7,source:'kancolle-import',masterResolved:false
+  });
+  expect(result.equipment).toHaveLength(1);
+  expect(result.equipment[0]).toMatchObject({
+    name:'12cm単装砲',masterEquipId:1,count:1,star:3,source:'kancolle-import'
+  });
+  expect(result.rosterSearch).toBe('');
+  expect(result.equipmentSearch).toBe('');
+  expect(result.allFilterActive).toBe(true);
+  expect(result.rosterText).toContain('睦月');
+  expect(result.equipmentText).toContain('12cm単装砲');
+  expect(errors).toEqual([]);
+});
