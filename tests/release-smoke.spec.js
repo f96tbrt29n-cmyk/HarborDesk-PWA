@@ -3114,3 +3114,37 @@ test('release smoke: sortie analytics separates multi-target objectives', async 
   await expect(strategyCards.first()).not.toContainText('目標 G2');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie log filters by selected objective', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdSLRender === 'function');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify([
+      {id:'obj-filter-g1',at:Date.now(),map:'7-2',node:'G1',result:'S',boss:false,battles:2,objectiveTarget:'G1'},
+      {id:'obj-filter-g2',at:Date.now()-1000,map:'7-2',node:'G2',result:'S',boss:true,battles:4,objectiveTarget:'G2'},
+      {id:'obj-filter-other',at:Date.now()-2000,map:'2-4',node:'O',result:'S',boss:true,battles:4}
+    ]));
+    window.hdSLRender();
+    window.hdWSShowElement?.('sortieLog', false);
+  });
+
+  await page.locator('#sortieLog [data-hd-sl-filter="all"]').click();
+  await expect(page.locator('#sortieLog .hd-sl-row')).toHaveCount(3);
+
+  const g1Filter=page.locator('#sortieLog [data-hd-sl-filter="objective:7-2:G1"]');
+  const g2Filter=page.locator('#sortieLog [data-hd-sl-filter="objective:7-2:G2"]');
+  await expect(g1Filter).toBeVisible();
+  await expect(g2Filter).toBeVisible();
+
+  await g1Filter.click();
+  await expect(page.locator('#sortieLog .hd-sl-row')).toHaveCount(1);
+  await expect(page.locator('#sortieLog .hd-sl-row')).toContainText('目標 G1');
+
+  await g2Filter.click();
+  await expect(page.locator('#sortieLog .hd-sl-row')).toHaveCount(1);
+  await expect(page.locator('#sortieLog .hd-sl-row')).toContainText('目標 G2');
+  expect(errors).toEqual([]);
+});
