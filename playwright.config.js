@@ -4,8 +4,8 @@ module.exports = defineConfig({
   testDir: './tests',
   timeout: 45000,
   expect: { timeout: 12000 },
-  fullyParallel: false,
-  workers: 1,
+  fullyParallel: !!process.env.CI,
+  workers: process.env.CI ? 4 : 1,
   retries: 1,
   reporter: [
     ['line'],
