@@ -51,13 +51,20 @@ function hdRenderEquipmentCatalog(){
  list.innerHTML=rows.map(x=>`<article class="hd-equip-ref-card"><div class="hd-equip-ref-head"><div><strong>${hdEsc(x.name)}</strong><div class="muted">${hdEsc(x.category)}</div></div><button class="primary small" type="button" data-hd-equip-add="${hdEsc(x.name)}">台帳へ追加</button></div><div class="hd-equip-stats">${hdEquipStatText(x).map(s=>`<span>${hdEsc(s)}</span>`).join('')||'<span>特殊効果装備</span>'}</div><div class="hd-equip-tags">${(x.tags||[]).map(t=>`<span>${hdEsc(t)}</span>`).join('')}</div><p>${hdEsc(x.role)}</p><div class="hd-equip-ref-grid"><div><span>改修</span><strong>${hdEsc(x.improve)}</strong></div><div><span>入手</span><strong>${hdEsc(x.obtain)}</strong></div><div class="wide"><span>更新・補足</span><strong>${hdEsc(x.update)}</strong></div></div><a class="guide-link" href="${hdEquipWikiUrl(x.name)}" target="_blank" rel="noopener">攻略Wikiで詳細 ↗</a></article>`).join('')||'<div class="empty empty-action"><strong>条件に合う装備がないよ</strong><p>検索語かカテゴリを戻すと一覧へ戻れるよ。</p><button type="button" class="ghost small" data-hd-equip-reset>条件をクリア</button></div>';
 }
 document.addEventListener('click',e=>{
+ const peekCard=e.target.closest?.('.hd-equip-ref-card'),peekList=document.getElementById('hdEquipCatalogList');
+ if(peekCard&&peekList?.classList.contains('hd-compact')&&!e.target.closest('button,a,input,label,summary,details,select,textarea')){
+  const open=!peekCard.classList.contains('hd-peek');
+  peekList.querySelectorAll('.hd-peek').forEach(x=>x.classList.remove('hd-peek'));
+  if(open)peekCard.classList.add('hd-peek');
+  return;
+ }
  const reset=e.target.closest('[data-hd-equip-reset]');if(reset){
   const search=document.getElementById('hdEquipCatalogSearch');if(search)search.value='';
   hdEquipCatalogFilter='すべて';
   document.querySelectorAll('[data-hd-equip-filter]').forEach(b=>b.classList.toggle('active',b.dataset.hdEquipFilter==='すべて'));
   hdEquipCatalogViewSave({query:'',filter:'すべて'});hdRenderEquipmentCatalog();return
  }
- const compact=e.target.closest('[data-hd-equip-compact]');if(compact){const list=document.getElementById('hdEquipCatalogList'),next=!list?.classList.contains('hd-compact');list?.classList.toggle('hd-compact',next);hdEquipCatalogViewSave({compact:next});compact.textContent=next?'詳細表示':'コンパクト';return}
+ const compact=e.target.closest('[data-hd-equip-compact]');if(compact){const list=document.getElementById('hdEquipCatalogList'),next=!list?.classList.contains('hd-compact');list?.querySelectorAll('.hd-peek').forEach(x=>x.classList.remove('hd-peek'));list?.classList.toggle('hd-compact',next);hdEquipCatalogViewSave({compact:next});compact.textContent=next?'詳細表示':'コンパクト';return}
  const f=e.target.closest('[data-hd-equip-filter]');if(f){hdEquipCatalogFilter=f.dataset.hdEquipFilter;hdEquipCatalogViewSave({filter:hdEquipCatalogFilter});document.querySelectorAll('[data-hd-equip-filter]').forEach(b=>b.classList.toggle('active',b===f));hdRenderEquipmentCatalog();return}
  const a=e.target.closest('[data-hd-equip-add]');if(!a)return;const item=HD_EQUIPMENT_CATALOG.find(x=>x.name===a.dataset.hdEquipAdd);if(!item||typeof openEquipment!=='function')return;openEquipment({name:item.name,category:item.category,count:1,star:0,targetStar:item.improve.includes('可')?10:0,assigned:'',memo:`用途: ${item.role}\n入手: ${item.obtain}\n${item.update}`});
 });
