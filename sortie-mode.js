@@ -327,13 +327,20 @@ function hdSMFleetHtml(session){
   return '<li><span>'+(i+1)+'</span><div><b>'+hdSMEsc(name)+'</b>'+(gear?'<small>'+hdSMEsc(gear)+'</small>':'<small>装備メモなし</small>')+'</div></li>';
  }).join('')+'</ol>';
 }
+function hdSMPrestartBundleHtml(map){
+ return hdSMObjectivePrestartHtml(map)+hdSMPrestartRoutePreviewHtml(map);
+}
+function hdSMStartButtonLabel(map){
+ const target=hdSMObjectivePreference(map);
+ return target?hdSMRouteTargetName(map,target)+'で出撃開始':'この編成で出撃開始';
+}
 function hdSMIdleHtml(){
  const map=hdSMMap();
  if(!map)return '<div class="hd-sm-empty"><div><strong>海域を選んで出撃準備を始めよう</strong><p>攻略画面で海域を選ぶと、ここから準備表と実戦セッションへつなげられるよ。</p></div><button type="button" class="primary" data-hd-sm-guide>海域攻略を開く</button></div>';
- const d=hdSMMapDetail(map),row=typeof window.hdSSSelectedSummary==='function'?window.hdSSSelectedSummary(map):null;
- if(!row)return '<div class="hd-sm-idle"><div class="hd-sm-map"><span>選択海域</span><strong>'+hdSMEsc(map)+' '+hdSMEsc(d.name||'')+'</strong></div><div class="hd-sm-empty compact"><p>この海域で使う編成がまだ選ばれてないよ。出撃準備表で編成を決めよう。</p></div><div class="hd-sm-actions"><button type="button" class="primary" data-hd-sm-prep>出撃準備表を開く</button><button type="button" class="ghost" data-hd-sm-guide>海域攻略へ</button></div></div>';
- const s=row.stats||{},ready=(!s.autoTotal||s.autoOk===s.autoTotal)&&(!s.manualTotal||s.manualDone===s.manualTotal);
- return '<div class="hd-sm-idle"><div class="hd-sm-map"><span>選択海域</span><strong>'+hdSMEsc(map)+' '+hdSMEsc(d.name||'')+'</strong></div>'+hdSMObjectivePrestartHtml(map)+hdSMPrestartRoutePreviewHtml(map)+'<div class="hd-sm-status '+(ready?'ready':'warn')+'"><div><span>'+hdSMEsc(row.strategyLabel||'手動編成')+'</span><strong>'+hdSMEsc(row.fleet&&row.fleet.name||'名称なし')+'</strong><small>'+(Number(s.shipCount)||0)+'隻</small></div><b>'+(ready?'出撃前確認済み':'未確認あり')+'</b></div>'+hdSMReadinessHtml({autoOk:s.autoOk,autoTotal:s.autoTotal,manualDone:s.manualDone,manualTotal:s.manualTotal,unresolved:s.unresolved})+'<div class="hd-sm-actions"><button type="button" class="primary" data-hd-sm-start>この編成で出撃開始</button><button type="button" class="ghost" data-hd-sm-prep>出撃準備表</button><button type="button" class="ghost" data-hd-sm-guide>海域攻略</button></div><p class="hd-sm-note">開始すると、その時点の艦隊・装備・確認状態を固定して出撃中画面へ切り替えるよ。</p></div>';
+ const d=hdSMMapDetail(map),row=typeof window.hdSSSelectedSummary==='function'?window.hdSSSelectedSummary(map):null,prestart=hdSMPrestartBundleHtml(map);
+ if(!row)return '<div class="hd-sm-idle"><div class="hd-sm-map"><span>選択海域</span><strong>'+hdSMEsc(map)+' '+hdSMEsc(d.name||'')+'</strong></div>'+prestart+'<div class="hd-sm-empty compact"><p>この海域で使う編成がまだ選ばれてないよ。出撃目標を先に決めてから、準備表で編成を選べるよ。</p></div><div class="hd-sm-actions"><button type="button" class="primary" data-hd-sm-prep>出撃準備表を開く</button><button type="button" class="ghost" data-hd-sm-guide>海域攻略へ</button></div></div>';
+ const s=row.stats||{},ready=(!s.autoTotal||s.autoOk===s.autoTotal)&&(!s.manualTotal||s.manualDone===s.manualTotal),startLabel=hdSMStartButtonLabel(map);
+ return '<div class="hd-sm-idle"><div class="hd-sm-map"><span>選択海域</span><strong>'+hdSMEsc(map)+' '+hdSMEsc(d.name||'')+'</strong></div>'+prestart+'<div class="hd-sm-status '+(ready?'ready':'warn')+'"><div><span>'+hdSMEsc(row.strategyLabel||'手動編成')+'</span><strong>'+hdSMEsc(row.fleet&&row.fleet.name||'名称なし')+'</strong><small>'+(Number(s.shipCount)||0)+'隻</small></div><b>'+(ready?'出撃前確認済み':'未確認あり')+'</b></div>'+hdSMReadinessHtml({autoOk:s.autoOk,autoTotal:s.autoTotal,manualDone:s.manualDone,manualTotal:s.manualTotal,unresolved:s.unresolved})+'<div class="hd-sm-actions"><button type="button" class="primary" data-hd-sm-start>'+hdSMEsc(startLabel)+'</button><button type="button" class="ghost" data-hd-sm-prep>出撃準備表</button><button type="button" class="ghost" data-hd-sm-guide>海域攻略</button></div><p class="hd-sm-note">開始すると、その時点の艦隊・装備・確認状態を固定して出撃中画面へ切り替えるよ。</p></div>';
 }
 function hdSMDraft(session){
  const d=session&&session.draft&&typeof session.draft==='object'?session.draft:{};
@@ -505,6 +512,9 @@ window.hdSMObjectivePreference=hdSMObjectivePreference;
 window.hdSMSaveObjectivePreference=hdSMSaveObjectivePreference;
 window.hdSMSetObjectivePreference=hdSMSetObjectivePreference;
 window.hdSMObjectivePrestartHtml=hdSMObjectivePrestartHtml;
+window.hdSMPrestartBundleHtml=hdSMPrestartBundleHtml;
+window.hdSMStartButtonLabel=hdSMStartButtonLabel;
+window.hdSMIdleHtml=hdSMIdleHtml;
 window.hdSMPrestartRoutePreviewHtml=hdSMPrestartRoutePreviewHtml;
 window.hdSMSelectedObjective=hdSMSelectedObjective;
 window.hdSMObjectivePickerHtml=hdSMObjectivePickerHtml;
