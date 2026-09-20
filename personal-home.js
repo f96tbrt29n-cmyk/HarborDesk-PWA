@@ -96,7 +96,7 @@ function hdPHSetCollapsed(key,collapsed){
  const state=hdPHCollapseLoad();state[String(key||'')]=!!collapsed;hdPHCollapseSave(state);hdPHApplyCollapsed();return !!collapsed;
 }
 function hdPHToggleCollapsed(key){const state=hdPHCollapseLoad();return hdPHSetCollapsed(key,!state[String(key||'')])}
-function hdPHExpandAll(){hdPHCollapseSave({});hdPHApplyCollapsed();window.hdToast?.('ホームのカードをすべて開いたよ','info',1100);return true}
+function hdPHExpandAll(){hdPHCollapseSave({});hdPHCompactSave({enabled:false,previous:null});hdPHApplyCollapsed();window.hdToast?.('ホームのカードをすべて開いたよ','info',1100);return true}
 function hdPHApplyCollapsed(){
  const host=document.getElementById('hdPersonalHome');if(!host)return;
  const state=hdPHCollapseLoad();
