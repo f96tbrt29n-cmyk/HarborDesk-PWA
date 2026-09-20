@@ -2844,3 +2844,51 @@ test('release smoke: sortie switches guide labels for non-battle nodes', async (
   await expect(battle).toContainText('単縦陣');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie marks boss-connected versus off-route next nodes', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMCanReachBoss === 'function'
+  );
+
+  const reach = await page.evaluate(() => ({
+    l: window.hdSMCanReachBoss('2-4','L'),
+    m: window.hdSMCanReachBoss('2-4','M'),
+    o: window.hdSMCanReachBoss('2-4','O')
+  }));
+  expect(reach.l).toBe(true);
+  expect(reach.m).toBe(false);
+  expect(reach.o).toBe(true);
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-route-reachability-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-route-reachability-fleet',
+      fleetName:'ボス接続テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-route-reachability-fleet',name:'ボス接続テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'I',routeNodes:['B','G','I'],result:'S',memo:'',advanceGuard:{node:'I',safe:true,at:Date.now()}}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const l = page.locator('[data-hd-sm-next-node="L"]');
+  const m = page.locator('[data-hd-sm-next-node="M"]');
+  await expect(l).toContainText('構造図上 ボス接続');
+  await expect(m).toContainText('構造図上 逸れ候補');
+  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="L"]')).toContainText('ボス接続');
+  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="M"]')).toContainText('逸れ候補');
+  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="M"]')).toHaveClass(/route-off/);
+  expect(errors).toEqual([]);
+});
