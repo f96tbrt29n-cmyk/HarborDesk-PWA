@@ -3058,6 +3058,7 @@ test('release smoke: sortie log displays selected objective badge', async ({ pag
     window.hdSLRender();
     window.hdWSShowElement?.('sortieLog', false);
   });
+  await page.locator('#sortieLog [data-hd-sl-filter="all"]').click();
   const row = page.locator('#sortieLog .hd-sl-row').first();
   await expect(row).toBeVisible();
   await expect(row.locator('.hd-sl-badge.objective')).toContainText('目標 G2');
