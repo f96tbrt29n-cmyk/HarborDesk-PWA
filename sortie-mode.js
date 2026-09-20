@@ -140,7 +140,9 @@ function hdSMHudHtml(session,draft){
  const current=String(draft?.node||'').trim();if(!current)return '';
  const graph=hdSMGraph(session?.map),kind=hdSMNodeKind(graph,current),intel=hdSMNodeIntel(session?.map,{label:current,kind}),guard=hdSMAdvanceGuard(session,draft);
  const state=guard.retreat?'stop':guard.confirmed?'ready':'warn',status=guard.retreat?'撤退':guard.confirmed?'大破確認済':'大破未確認',jump=guard.confirmed?'next':'guard';
- return '<div class="hd-sm-hud '+state+'"><div class="hd-sm-hud-node"><span>NOW</span><b>'+hdSMEsc(current)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(kind))+'</small></div><div class="hd-sm-hud-main"><span>基本陣形 <b>'+hdSMEsc(intel.formation)+'</b></span><strong>'+hdSMEsc(status)+'</strong></div><button type="button" class="ghost small" data-hd-sm-hud-jump="'+jump+'">'+(guard.confirmed?'次マスを見る':'確認する')+'</button></div>';
+ const next=guard.confirmed&&!guard.retreat?hdSMNextNodeRows(session?.map,draft):[];
+ const nextHtml=next.length?'<div class="hd-sm-hud-next"><span>NEXT</span><div>'+next.slice(0,3).map(x=>'<button type="button" data-hd-sm-hud-node="'+hdSMEsc(x.label)+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(x.kind))+'</small></button>').join('')+'</div>'+(next.length>3?'<em>+'+(next.length-3)+'</em>':'')+'</div>':'';
+ return '<div class="hd-sm-hud '+state+'"><div class="hd-sm-hud-node"><span>NOW</span><b>'+hdSMEsc(current)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(kind))+'</small></div><div class="hd-sm-hud-main"><span>基本陣形 <b>'+hdSMEsc(intel.formation)+'</b></span><strong>'+hdSMEsc(status)+'</strong></div><button type="button" class="ghost small" data-hd-sm-hud-jump="'+jump+'">'+(guard.confirmed?'詳細':'確認する')+'</button>'+nextHtml+'</div>';
 }
 function hdSMHudJump(target){
  const selector=target==='next'?'.hd-sm-next-wrap':'.hd-sm-advance-guard',el=document.querySelector('#hdSortieMode '+selector);
@@ -314,6 +316,7 @@ document.addEventListener('click',function(e){
  if(e.target.closest?.('[data-hd-sm-safe-confirm]')){hdSMSetAdvanceGuard(true);return}
  if(e.target.closest?.('[data-hd-sm-damage-retreat]')){hdSMSetAdvanceGuard(false);return}
  const hudJump=e.target.closest?.('[data-hd-sm-hud-jump]');if(hudJump){hdSMHudJump(hudJump.dataset.hdSmHudJump);return}
+ const hudNode=e.target.closest?.('[data-hd-sm-hud-node]');if(hudNode){hdSMSetNode(hudNode.dataset.hdSmHudNode);return}
  const quickResult=e.target.closest?.('[data-hd-sm-quick-result]');if(quickResult){hdSMQuickResult(quickResult.dataset.hdSmQuickResult);return}
  if(e.target.closest?.('[data-hd-sm-quick-boss]')){hdSMQuickBoss();return}
  if(e.target.closest?.('[data-hd-sm-quick-drop-none]')){hdSMQuickDropNone();return}
