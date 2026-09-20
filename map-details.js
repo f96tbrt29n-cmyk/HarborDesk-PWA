@@ -73,11 +73,9 @@ function hdMapFallbackToolsHtml(){
  </section>`;
 }
 
-renderMapPicker=function(){
- const world=document.getElementById('worldPicker'), maps=document.getElementById('mapPicker'), card=document.getElementById('selectedMapCard');
- if(!world||!maps||!card)return;
- world.innerHTML=Object.keys(MAPS).map(w=>`<button class="world-chip ${selectedWorld===w?'active':''}" data-world="${w}">${w}海域</button>`).join('');
- maps.innerHTML=MAPS[selectedWorld].map(m=>`<button class="map-button ${selectedMap===m?'active':''}" data-map="${m}">${m}</button>`).join('');
+function hdMapRenderFallback(){
+ const card=document.getElementById('selectedMapCard');
+ if(!card)return;
  if(!selectedMap){card.innerHTML='<div class="empty">海域を選ぶとここに攻略情報が出るよ</div>';return}
  const d=MAP_DETAILS[selectedMap];
  if(!d){card.innerHTML=`<article class="guide-card selected"><div class="guide-card-top"><div><span class="guide-tag">海域</span><h3>${selectedMap} 攻略</h3><div class="muted">攻略データ拡充中</div></div></div><p>この海域は現在アプリ内データを整備中。元Wikiでは最新のルート・敵編成・制空値を確認できるよ。</p><a class="guide-link" href="${wikiMapUrl(selectedMap)}" target="_blank" rel="noopener">${selectedMap} の攻略Wikiを見る ↗</a></article>`;return}
@@ -86,5 +84,4 @@ renderMapPicker=function(){
  const updated=d.updated||d.sourceDate||'参照日未設定';
  card.innerHTML=`<article class="guide-card selected map-detail-card"><div class="guide-card-top"><div><span class="guide-tag">${selectedMap}</span><h3>${esc(d.name||selectedMap)}</h3><div class="muted">アプリ内攻略要点・参照 ${esc(updated)}</div></div></div><p class="map-overview">${esc(d.overview||'')}</p>${hdMapFallbackToolsHtml()}<div class="map-detail-grid">${detailBlock('推奨練度',(()=>{const lv=hdMapLevelGuide(selectedMap);return lv.recommended+' / 最低目安 '+lv.min+'。'+lv.note})())}${detailBlock('おすすめ編成',fleet)}${detailBlock('ルート',d.route)}${detailBlock('制空・装備',d.air)}${detailBlock('注意点',note)}</div><div class="map-source-note">※推奨練度はHarborDeskの攻略目安。艦種・改造・近代化改修・装備・ルート条件によって必要Lvは変わります。攻略条件はアップデートで変化する場合があります。</div><a class="guide-link" href="${wikiMapUrl(selectedMap)}" target="_blank" rel="noopener">元Wikiで最新情報を確認 ↗</a></article>`;
 };
-
-renderGuide();
+window.hdMapRenderFallback=hdMapRenderFallback;

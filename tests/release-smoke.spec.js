@@ -1317,11 +1317,11 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=338',
-      'map-images.js?v=338',
-      'map-tabs.js?v=338',
-      'map-interactive.js?v=338',
-      'map-advanced-data.js?v=338'
+      'map-details.js?v=340',
+      'map-images.js?v=340',
+      'map-tabs.js?v=340',
+      'map-interactive.js?v=340',
+      'map-advanced-data.js?v=340'
     ];
     const requiredStyles = [
       'map-details.css?v=338',
@@ -1369,7 +1369,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=338');
+  expect(src).toBe('app.js?v=340');
   expect(errors).toEqual([]);
 });
 
@@ -1498,5 +1498,47 @@ test('release smoke: mobile update menu occupies its own row without covering攻
   await page.waitForTimeout(100);
   await expect(more).not.toHaveAttribute('open', '');
   await expect(row).toBeHidden();
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: one canonical map renderer owns primary and fallback paths', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await page.locator('[data-world="2"]').click();
+  await page.locator('[data-map="2-4"]').click();
+
+  const primary = await page.evaluate(() => ({
+    info: window.hdMapRendererInfo?.(),
+    mode: window.__HD_MAP_RENDER_STATE?.mode,
+    wrappers: {
+      base: typeof window.hdMapBaseRenderPicker === 'function',
+      tabs: typeof window.hdMapTabsCoreApply === 'function',
+      fallback: typeof window.hdMapRenderFallback === 'function',
+      plans: typeof window.hdRenderMapPlans === 'function'
+    }
+  }));
+  expect(primary.info?.installed).toBe(true);
+  expect(primary.mode).toBe('tabs');
+  expect(primary.wrappers).toEqual({base:true,tabs:true,fallback:true,plans:true});
+  await expect(page.locator('.map-tabs-shell')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: canonical map renderer falls back without override chains', async ({ page }) => {
+  const errors = [];
+  await page.route('**/map-tabs.js*', route => route.abort());
+  await boot(page, errors);
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await page.locator('[data-world="2"]').click();
+  await page.locator('[data-map="2-4"]').click();
+
+  const info = await page.evaluate(() => window.hdMapRendererInfo?.());
+  expect(info?.installed).toBe(true);
+  expect(info?.mode).toBe('fallback');
+  expect(info?.hasFallback).toBe(true);
+  await expect(page.locator('[data-hd-core-map-tools]')).toBeVisible();
+  await expect(page.locator('#mapExtraPanel')).toContainText('編成例');
   expect(errors).toEqual([]);
 });

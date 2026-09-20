@@ -112,6 +112,4 @@ document.addEventListener('click',e=>{
   hdMapEmit('hd:map-tab-changed',{map:selectedMap,tab});
 });
 
-const hdPrevRenderMapPicker=renderMapPicker;
-renderMapPicker=function(){hdPrevRenderMapPicker();hdApplyMapTabs()};
-if(typeof renderGuide==='function')renderGuide();
+window.hdApplyMapTabs=hdApplyMapTabs;

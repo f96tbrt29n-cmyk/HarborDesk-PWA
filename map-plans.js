@@ -71,5 +71,4 @@ function renderPlans(map){
  host.innerHTML=`<section class="map-extra-section"><h4>編成例</h4>${presets}<h4>関連任務</h4>${quests}</section>`;
 }
 
-const prevRenderMapPicker=renderMapPicker;
-renderMapPicker=function(){prevRenderMapPicker();const card=document.getElementById('selectedMapCard');if(!card)return;let extra=document.getElementById('mapExtraPanel');if(!extra){extra=document.createElement('div');extra.id='mapExtraPanel';card.appendChild(extra)}if(selectedMap)renderPlans(selectedMap)};
+window.hdRenderMapPlans=renderPlans;
