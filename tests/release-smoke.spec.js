@@ -1317,17 +1317,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=335',
-      'map-images.js?v=335',
-      'map-tabs.js?v=335',
-      'map-interactive.js?v=335',
-      'map-advanced-data.js?v=335'
+      'map-details.js?v=336',
+      'map-images.js?v=336',
+      'map-tabs.js?v=336',
+      'map-interactive.js?v=336',
+      'map-advanced-data.js?v=336'
     ];
     const requiredStyles = [
-      'map-details.css?v=335',
-      'map-tabs.css?v=335',
-      'map-images.css?v=335',
-      'map-interactive.css?v=335'
+      'map-details.css?v=336',
+      'map-tabs.css?v=336',
+      'map-images.css?v=336',
+      'map-interactive.css?v=336'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -1346,5 +1346,29 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     renderMapPicker();
   });
   await expect(page.locator('.hd-map-tools-overview')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await expect(page.locator('#guide')).toBeVisible();
+
+  await page.locator('[data-world="2"]').click();
+  await expect(page.locator('[data-map="2-4"]')).toBeVisible();
+  await page.locator('[data-map="2-4"]').click();
+
+  await expect(page.locator('#selectedMapCard')).toBeVisible();
+  await expect(page.locator('#selectedMapCard')).toContainText('2-4');
+  await expect(page.locator('#selectedMapCard')).toContainText('推奨練度');
+  await expect(page.locator('.hd-map-tools-overview')).toBeVisible();
+  await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="map"]')).toBeVisible();
+  await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
+
+  const src = await page.locator('script[src^="app.js"]').getAttribute('src');
+  expect(src).toBe('app.js?v=336');
   expect(errors).toEqual([]);
 });
