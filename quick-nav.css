@@ -124,3 +124,6 @@ body.hd-workspace-mode{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
  .hd-mobile-dock [data-hd-mobile-sync],
  .hd-mobile-dock [data-hd-mobile-menu]{grid-row:2}
 }
+
+.hd-qn-actions button:disabled{opacity:.34;filter:saturate(.45);pointer-events:none}
+.hd-qn-actions button:disabled b{color:var(--muted)}
