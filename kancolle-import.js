@@ -1,5 +1,5 @@
 const HD_KC_SYNC_KEY='harbordesk-kancolle-sync-v1';
-const HD_KC_USERSCRIPT_VERSION='1.0.9';
+const HD_KC_USERSCRIPT_VERSION='1.0.10';
 const HD_KC_FLEETS_KEY='harbordesk-kancolle-fleets-v1';
 const HD_KC_MATERIALS_KEY='harbordesk-kancolle-materials-v1';
 const HD_KC_NODE_LABEL_SOURCE='KC3Kai edges.json @ 6b0534d291c27220da1b6fe454e91fc96a6a7b27';
@@ -48,6 +48,16 @@ function hdKcImportAdd(out,hint,payload,meta={}){
  const matRows=Array.isArray(data?.api_material)?data.api_material:null;
  const slotRows=Array.isArray(data?.api_slot_item)?data.api_slot_item:null;
  const questRows=Array.isArray(data?.api_list)?data.api_list:null;
+ const fullShips=/api_port\/port/.test(h)||/api_get_member\/ship2/.test(h)||(!h&&shipRows&&deckRows);
+ const fullDecks=/api_port\/port/.test(h)||(/api_get_member\/ship2/.test(h)&&deckRows);
+ const fullDocks=/api_port\/port/.test(h)||/api_get_member\/ndock/.test(h);
+ const fullMaterials=/api_port\/port/.test(h)||/api_get_member\/material/.test(h);
+ const fullSlotItems=/api_get_member\/(?:slot_item|slotitem)/.test(h)||(/require_info/.test(h)&&slotRows);
+ if(fullShips&&shipRows)out.ships.clear();
+ if(fullDecks&&deckRows)out.decks.clear();
+ if(fullDocks&&dockRows)out.ndocks.clear();
+ if(fullMaterials&&(matRows||Array.isArray(data)))out.materials.clear();
+ if(fullSlotItems&&(slotRows||Array.isArray(data)))out.slotItems.clear();
  if(shipRows)for(const x of shipRows)if(Number(x?.api_id)>0&&Number(x?.api_ship_id)>0)out.ships.set(Number(x.api_id),x);
  if(deckRows)for(const x of deckRows)if(Number(x?.api_id)>0)out.decks.set(Number(x.api_id),x);
  if(dockRows)for(const x of dockRows)if(Number(x?.api_id)>0)out.ndocks.set(Number(x.api_id),x);
@@ -71,7 +81,7 @@ function hdKcImportAdd(out,hint,payload,meta={}){
  if(/api_port\/port/.test(h)||/api_get_member\/ship2/.test(h)||(!h&&shipRows&&deckRows))out.completeShips=true;
  if(/api_port\/port/.test(h)||(/api_get_member\/ship2/.test(h)&&deckRows))out.completeDecks=true;
  if(/api_port\/port/.test(h)||/api_get_member\/ndock/.test(h))out.completeNdocks=true;
- if(/api_get_member\/slot_item/.test(h)||(/require_info/.test(h)&&slotRows))out.completeSlotItems=true;
+ if(/api_get_member\/(?:slot_item|slotitem)/.test(h)||(/require_info/.test(h)&&slotRows))out.completeSlotItems=true;
  if(Array.isArray(data)&&data.length&&'api_slotitem_id' in (data.find(Boolean)||{})&&!h)out.completeSlotItems=true;
  if(Array.isArray(data)&&data.length&&'api_ship_id' in (data.find(Boolean)||{})&&!h)out.completeShips=true;
 }
@@ -152,7 +162,7 @@ function hdKcMergeRoster(parsed){
  const now=Date.now(),existing=(()=>{try{const x=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]');return Array.isArray(x)?x:[]}catch{return []}})(),equipMap=hdKcMasterEquipMap(),used=new Set(),gameIds=new Set(parsed.ships.keys()),next=[];
  const byGameId=new Map(existing.map((x,i)=>[Number(x.gameShipId)||0,i]).filter(([id])=>id));
  for(const ship of parsed.ships.values()){
-  const gameId=Number(ship.api_id),masterId=Number(ship.api_ship_id),master=hdKcMasterShip(masterId);if(!master)continue;
+  const gameId=Number(ship.api_id),masterId=Number(ship.api_ship_id),master=hdKcMasterShip(masterId);
   let idx=byGameId.get(gameId);
   if(idx==null){
    const same=existing.map((x,i)=>({x,i})).filter(({x,i})=>!used.has(i)&&!Number(x.gameShipId)&&Number(x.masterId)===masterId);
@@ -163,7 +173,7 @@ function hdKcMergeRoster(parsed){
   const slots=[...(Array.isArray(ship.api_slot)?ship.api_slot:[])];if(Number(ship.api_slot_ex)>0)slots.push(Number(ship.api_slot_ex));
   const labels=slots.filter(id=>Number(id)>0).map(id=>parsed.slotItems.get(Number(id))).filter(Boolean).map(x=>hdKcEquipLabel(x,equipMap));
   next.push({...old,
-   id:old.id||`kc-ship-${gameId}`,name:String(master.name||old.name||''),masterId,type:String(master.type||old.type||''),level:Number(ship.api_lv)||0,
+   id:old.id||`kc-ship-${gameId}`,name:String(master?.name||old.name||`艦娘ID ${masterId||'?'}`),masterId,type:String(master?.type||old.type||'未解決'),level:Number(ship.api_lv)||0,
    gear:parsed.slotItems.size?labels.join(' / '):(old.gear||''),tags:Array.isArray(old.tags)?old.tags:[],memo:old.memo||'',remodel:old.remodel||'',
    source:'kancolle-import',gameShipId:gameId,gameHp:Number(ship.api_nowhp)||0,gameMaxHp:Number(ship.api_maxhp)||0,gameCond:Number(ship.api_cond)||0,
    gameLocked:Number(ship.api_locked)||0,gameSallyArea:Number(ship.api_sally_area)||0,gameSlotEx:Number(ship.api_slot_ex)||0,syncedAt:now
@@ -220,6 +230,7 @@ function hdKcMergeEquipment(parsed){
 
  if(typeof hdSave==='function')hdSave('harbordesk-equipment-v1',next);else{localStorage.setItem('harbordesk-equipment-v1',JSON.stringify(next));window.dispatchEvent(new CustomEvent('hd:equipment-changed'))}
  localStorage.setItem('harbordesk-kancolle-equipment-detail-v1',JSON.stringify(mergedDetails));
+ if(typeof renderEquipment==='function')renderEquipment();if(typeof renderDashboard==='function')renderDashboard();
  return next.length;
 }
 function hdKcApplyMaterials(parsed){
@@ -653,3 +664,9 @@ document.addEventListener('change',async e=>{
 window.addEventListener('message',e=>{if(e?.data?.type!=='harbordesk-kancolle-import')return;try{hdKcEnsureImport();const raw=e.data.payload;hdKcReadAndPreview(raw);document.getElementById('hdKcImportResult').textContent='外部取込ブリッジからデータを受信したよ'}catch{}});
 window.addEventListener('load',()=>setTimeout(async()=>{hdKcEnsureImport();if(!(await hdKcConsumeWindowNameImport()))await hdKcConsumeHashImport()},450));
 hdKcEnsureImport();setTimeout(async()=>{if(!(await hdKcConsumeWindowNameImport()))await hdKcConsumeHashImport()},80);
+
+window.hdKcParseImport=hdKcParseImport;
+window.hdKcPreviewData=hdKcPreviewData;
+window.hdKcApplyImport=hdKcApplyImport;
+window.hdKcMergeRoster=hdKcMergeRoster;
+window.hdKcMergeEquipment=hdKcMergeEquipment;
