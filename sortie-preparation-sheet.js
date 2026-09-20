@@ -1,8 +1,29 @@
 const HD_SPS_EQUIP_KEY='harbordesk-equipment-v1';
+const HD_SPS_OBJECTIVE_PREF_KEY='harbordesk-sortie-objective-pref-v1';
 
 function hdSPSEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdSPSMap(){return typeof selectedMap!=='undefined'?selectedMap:''}
 function hdSPSMapDetail(map){return typeof MAP_DETAILS!=='undefined'?MAP_DETAILS[map]||{}:{}}
+function hdSPSObjectiveTarget(map){
+ try{
+  if(typeof window.hdSMObjectivePreference==='function')return String(window.hdSMObjectivePreference(map)||'').trim();
+  const prefs=JSON.parse(localStorage.getItem(HD_SPS_OBJECTIVE_PREF_KEY)||'{}')||{};
+  return String(prefs[String(map||'')]||'').trim();
+ }catch{return ''}
+}
+function hdSPSObjectiveLabel(map){
+ const target=hdSPSObjectiveTarget(map);
+ if(target){
+  if(typeof window.hdSMRouteTargetName==='function')return String(window.hdSMRouteTargetName(map,target)||target);
+  return target;
+ }
+ try{if(typeof window.hdSMObjectiveOptions==='function'&&window.hdSMObjectiveOptions(map).length>1)return '自動（攻略目標）'}catch{}
+ return '';
+}
+function hdSPSObjectiveHtml(map){
+ const label=hdSPSObjectiveLabel(map);if(!label)return '';
+ return '<div class="hd-sps-objective"><div><span>今回の攻略目標</span><strong>'+hdSPSEsc(label)+'</strong></div><small>出撃モードのOBJECTIVEと連動</small></div>';
+}
 function hdSPSFleets(map){try{return typeof hdSortieFleets==='function'?hdSortieFleets(map):(typeof loadCustomFleets==='function'?(loadCustomFleets()[map]||[]):[])}catch{return []}}
 function hdSPSFleet(map){
  const fleets=hdSPSFleets(map);if(!fleets.length)return null;
@@ -121,7 +142,9 @@ function hdSPSManualHtml(map,info){
 
 function hdSPSSummaryText(map){
  const d=hdSPSMapDetail(map),fleet=hdSPSFleetInfo(map),eq=hdSPSEquipmentInfo(map,fleet),base=hdSPSBaseInfo(map);
- const lines=[`HarborDesk 出撃準備表｜${map} ${d.name||''}`,fleet.fleet?`艦隊: ${fleet.fleet.name}（台帳確認 ${fleet.registered}/${fleet.ships.length}）`:'艦隊: 自分用編成なし'];
+ const objective=hdSPSObjectiveLabel(map),lines=[`HarborDesk 出撃準備表｜${map} ${d.name||''}`];
+ if(objective)lines.push(`攻略目標: ${objective}`);
+ lines.push(fleet.fleet?`艦隊: ${fleet.fleet.name}（台帳確認 ${fleet.registered}/${fleet.ships.length}）`:'艦隊: 自分用編成なし');
  for(const x of eq.rows||[])lines.push(`装備: ${x.label||x.kind} = ${hdSPSStatusLabel(x.status)}（${x.detail||''}）`);
  if(eq.assigned){lines.push(`装備マスター可否: ${eq.assigned.master?.valid?'正常':`要確認（違反${eq.assigned.master?.invalid?.length||0}/未解決${eq.assigned.master?.unresolved?.length||0}）`}`);lines.push(`基礎制空（熟練度なし）: ${eq.assigned.air?.basePower||0}`)}
  if(base.available){lines.push(`基地航空隊: ${base.sortieReady?'設定確認':'要確認'}`);for(const c of base.corps)lines.push(`第${c.index}: ${c.mode} ${c.configured}/4中隊 半径${c.radius??'?'} 制空${c.power}`)}
@@ -145,6 +168,7 @@ function hdSPSRender(){
  const manualReady=!fleet.manualTotal||fleet.manualDone===fleet.manualTotal;
  const score=[fleetReady,eqReady,baseReady,manualReady].filter(Boolean).length;
  host.innerHTML=`<div class="hd-sps-overview"><div><strong>準備状況 ${score}/4</strong><span>艦隊・装備・基地航空隊・出撃直前チェックを統合</span></div><div class="hd-sps-actions"><button type="button" class="ghost small" data-hd-sps-refresh>再判定</button><button type="button" class="ghost small" data-hd-sps-copy>準備表をコピー</button><button type="button" class="ghost small" data-hd-sps-guide>海域攻略へ戻る</button></div></div>
+  ${hdSPSObjectiveHtml(map)}
   <div class="hd-sps-grid">${hdSPSFleetHtml(map,fleet)}${hdSPSEquipmentHtml(map,fleet)}${hdSPSBaseHtml(map)}${hdSPSManualHtml(map,fleet)}</div>
   <div class="hd-sps-foot">※これはHarborDesk内に登録したデータから作る準備表。実際の耐久・疲労・補給、敵編成変化、索敵スコア、艦載機熟練度などは出撃前にゲーム画面で最終確認してね。</div>`;
  if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
@@ -180,5 +204,11 @@ window.addEventListener('hd:map-rendered',()=>{hdSPSMapButton();hdSPSRender()});
 window.addEventListener('hd:workspace-refresh',hdSPSRender);
 window.addEventListener('hd:ship-images-changed',hdSPSRender);
 window.addEventListener('hd:ship-images-ready',hdSPSRender);
-window.addEventListener('storage',e=>{if([HD_SPS_EQUIP_KEY,'harbordesk-ship-roster-v1','harbordesk-custom-fleets-v1','harbordesk-land-base-v1','harbordesk-sortie-readiness-v1'].includes(e.key))hdSPSRender()});
+window.addEventListener('storage',e=>{if([HD_SPS_EQUIP_KEY,HD_SPS_OBJECTIVE_PREF_KEY,'harbordesk-ship-roster-v1','harbordesk-custom-fleets-v1','harbordesk-land-base-v1','harbordesk-sortie-readiness-v1'].includes(e.key))hdSPSRender()});
+window.addEventListener('hd:sortie-objective-changed',hdSPSRender);
 window.addEventListener('load',()=>setTimeout(()=>{hdSPSEnsure();hdSPSMapButton();hdSPSRender()},500));
+
+window.hdSPSObjectiveTarget=hdSPSObjectiveTarget;
+window.hdSPSObjectiveLabel=hdSPSObjectiveLabel;
+window.hdSPSObjectiveHtml=hdSPSObjectiveHtml;
+window.hdSPSSummaryText=hdSPSSummaryText;
