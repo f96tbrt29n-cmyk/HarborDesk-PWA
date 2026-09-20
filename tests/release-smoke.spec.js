@@ -3201,70 +3201,7 @@ test('release smoke: sortie remembers selected objective per map', async ({ page
   expect(cleared.restored.draft).toBeUndefined();
   expect(errors).toEqual([]);
 });
-  await page.waitForFunction(() =>
-    typeof window.hdSMSetObjectiveTarget === 'function' &&
-    typeof window.hdSSStart === 'function' &&
-    typeof window.hdSSObjectivePref === 'function'
-  );
 
-  const selected = await page.evaluate(() => {
-    localStorage.removeItem('harbordesk-sortie-objective-pref-v1');
-    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
-      id:'sm-objective-memory-session',
-      map:'7-2',
-      startedAt:Date.now()-60000,
-      fleetId:'sm-objective-memory-fleet',
-      fleetName:'攻略目標記憶テスト艦隊',
-      strategy:'manual',
-      strategyLabel:'手動編成',
-      fleetSnapshot:{id:'sm-objective-memory-fleet',name:'攻略目標記憶テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
-      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
-      shipCount:1,
-      status:'active',
-      draft:{routeNodes:[],result:'S',memo:''}
-    }));
-    window.hdSMSetObjectiveTarget('G2');
-    return {
-      pref:window.hdSSObjectivePref('7-2'),
-      draft:JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft
-    };
-  });
-  expect(selected.pref).toBe('G2');
-  expect(selected.draft.objectiveTarget).toBe('G2');
-
-  const restored = await page.evaluate(() => {
-    localStorage.removeItem('harbordesk-active-sortie-session-v1');
-    const original=window.hdSSSnapshot;
-    window.hdSSSnapshot=map=>({
-      id:'sm-objective-memory-restored',
-      map,
-      startedAt:Date.now(),
-      fleetId:'sm-objective-memory-fleet',
-      fleetName:'攻略目標記憶テスト艦隊',
-      strategy:'manual',
-      strategyLabel:'手動編成',
-      fleetSnapshot:{id:'sm-objective-memory-fleet',name:'攻略目標記憶テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
-      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
-      shipCount:1,
-      status:'active'
-    });
-    const session=window.hdSSStart('7-2');
-    window.hdSSSnapshot=original;
-    return session;
-  });
-  expect(restored.draft.objectiveTarget).toBe('G2');
-
-  const cleared = await page.evaluate(() => {
-    window.hdSMSetObjectiveTarget('');
-    return {
-      pref:window.hdSSObjectivePref('7-2'),
-      draft:JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft
-    };
-  });
-  expect(cleared.pref).toBe('');
-  expect(cleared.draft.objectiveTarget).toBe('');
-  expect(errors).toEqual([]);
-});
 
 
 test('release smoke: pre-start objective selector persists map preference', async ({ page }) => {
