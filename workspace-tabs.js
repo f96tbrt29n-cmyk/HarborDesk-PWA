@@ -59,6 +59,7 @@ function hdWSUpdateHistoryButtons(){
  const back=document.querySelector('[data-hd-ws-back]'),forward=document.querySelector('[data-hd-ws-forward]');
  if(back)back.disabled=hdWSHistoryLoad().length===0;
  if(forward)forward.disabled=hdWSForwardLoad().length===0;
+ window.dispatchEvent(new CustomEvent('hd:workspace-history',{detail:{back:hdWSHistoryLoad().length,forward:hdWSForwardLoad().length}}));
 }
 function hdWSUpdateBackButton(){hdWSUpdateHistoryButtons()}
 function hdWSGoBack(){
