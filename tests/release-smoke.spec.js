@@ -2949,3 +2949,54 @@ test('release smoke: sortie progress uses nearest valid objective on multi-targe
   await expect(progress).toContainText('最少戦闘あと 0');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie objective selector changes route guidance on multi-target maps', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMSetObjectiveTarget === 'function' &&
+    typeof window.hdSMCanReachBoss === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-objective-selector-session',
+      map:'7-2',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-objective-selector-fleet',
+      fleetName:'攻略目標選択テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-objective-selector-fleet',name:'攻略目標選択テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{objectiveTarget:'G2',routeNodes:[],result:'S',memo:''}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const picker = page.locator('.hd-sm-objective-picker');
+  await expect(picker).toBeVisible();
+  await expect(picker.locator('[data-hd-sm-objective="G2"]')).toHaveClass(/active/);
+  await expect(page.locator('[data-hd-sm-next-node="A"]')).toContainText('構造図上 逸れ候補');
+  await expect(page.locator('[data-hd-sm-next-node="D"]')).toContainText('構造図上 G2ボス接続');
+
+  await picker.locator('[data-hd-sm-objective="G1"]').click();
+  await expect(picker.locator('[data-hd-sm-objective="G1"]')).toHaveClass(/active/);
+  await expect(page.locator('[data-hd-sm-next-node="A"]')).toContainText('構造図上 G1到達地点接続');
+  await expect(page.locator('[data-hd-sm-next-node="D"]')).toContainText('構造図上 逸れ候補');
+
+  let draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
+  expect(draft.objectiveTarget).toBe('G1');
+
+  await picker.locator('[data-hd-sm-objective=""]').click();
+  await expect(picker.locator('[data-hd-sm-objective=""]')).toHaveClass(/active/);
+  draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
+  expect(draft.objectiveTarget).toBe('');
+  expect(errors).toEqual([]);
+});
