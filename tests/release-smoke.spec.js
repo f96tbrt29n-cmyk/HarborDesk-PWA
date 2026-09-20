@@ -3242,3 +3242,41 @@ test('release smoke: pre-start objective selector persists map preference', asyn
   await expect(host.locator('[data-hd-sm-pre-objective=""]')).toHaveClass(/active/);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: pre-start route preview follows selected objective', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMPrestartRoutePreviewHtml === 'function' &&
+    typeof window.hdSMSaveObjectivePreference === 'function'
+  );
+
+  const result = await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-sortie-objective-pref-v1');
+
+    window.hdSMSaveObjectivePreference('7-2','G2');
+    const g2 = window.hdSMPrestartRoutePreviewHtml('7-2');
+
+    window.hdSMSaveObjectivePreference('7-2','G1');
+    const g1 = window.hdSMPrestartRoutePreviewHtml('7-2');
+
+    window.hdSMSaveObjectivePreference('7-2','');
+    const auto = window.hdSMPrestartRoutePreviewHtml('7-2');
+
+    return {g2,g1,auto};
+  });
+
+  expect(result.g2).toContain('G2ボス');
+  expect(result.g2).toContain('<b>A</b>');
+  expect(result.g2).toContain('<b>D</b>');
+  expect(result.g2).toMatch(/A[\s\S]*逸れ候補/);
+  expect(result.g2).toMatch(/D[\s\S]*接続/);
+
+  expect(result.g1).toContain('G1到達地点');
+  expect(result.g1).toMatch(/A[\s\S]*接続/);
+  expect(result.g1).toMatch(/D[\s\S]*逸れ候補/);
+
+  expect(result.auto).toContain('自動（攻略目標）');
+  expect(errors).toEqual([]);
+});
