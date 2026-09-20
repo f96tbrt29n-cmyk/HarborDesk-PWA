@@ -2532,3 +2532,36 @@ test('release smoke: sticky sortie HUD exposes confirmed next-node actions', asy
   expect(draft.advanceGuard).toBe(null);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sticky sortie HUD shows current route condition', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdSMRender === 'function' && typeof window.hdSMBranchHint === 'function');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-hud-route-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-hud-route-fleet',
+      fleetName:'HUD分岐テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-hud-route-fleet',name:'HUD分岐テスト艦隊',ships:[{ship:'時雨',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'G',routeNodes:['B','G'],result:'S',memo:'',advanceGuard:{node:'G',safe:false,at:Date.now()}}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const route = page.locator('.hd-sm-hud-branch');
+  await expect(route).toBeVisible();
+  await expect(route).toContainText('Gマスの分岐条件');
+  await expect(route).toContainText('I/K');
+  expect(errors).toEqual([]);
+});
