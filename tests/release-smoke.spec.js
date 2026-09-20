@@ -1958,7 +1958,6 @@ test('release smoke: sortie mode node picker records and rewinds route trail', a
 
   await expect(page.locator('[data-hd-sm-node]')).toHaveCount(15);
   await page.locator('[data-hd-sm-next-node="A"]').click();
-  await page.locator('[data-hd-sm-safe-confirm]').click();
   await page.locator('[data-hd-sm-next-node="D"]').click();
   await expect(page.locator('#hdSMNode')).toHaveValue('D');
   await expect(page.locator('.hd-sm-route-trail')).toContainText('A → D');
@@ -2025,15 +2024,14 @@ test('release smoke: sortie mode prioritizes graph-connected next nodes', async 
   await page.locator('[data-hd-sm-next-node="A"]').click();
   await expect(page.locator('#hdSMNode')).toHaveValue('A');
   await expect(page.locator('[data-hd-sm-next-node]')).toHaveCount(2);
-  await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeVisible();
-  await expect(page.locator('[data-hd-sm-next-node="D"]')).toBeVisible();
-  await expect(page.locator('[data-hd-sm-next-node="D"]')).toBeDisabled();
+  await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeEnabled();
+  await expect(page.locator('[data-hd-sm-next-node="D"]')).toBeEnabled();
 
-  await page.locator('[data-hd-sm-safe-confirm]').click();
   await page.locator('[data-hd-sm-next-node="D"]').click();
   await expect(page.locator('#hdSMNode')).toHaveValue('D');
   await expect(page.locator('[data-hd-sm-next-node]')).toHaveCount(1);
   await expect(page.locator('[data-hd-sm-next-node="H"]')).toBeVisible();
+  await expect(page.locator('[data-hd-sm-next-node="H"]')).toBeDisabled();
   await expect(page.locator('.hd-sm-route-trail')).toContainText('A → D');
 
   const nextRows = await page.evaluate(() => window.hdSMNextNodeRows('2-4',{node:'D'}).map(x=>x.label));
@@ -2213,23 +2211,25 @@ test('release smoke: sortie mode gates advancement behind damage confirmation', 
     window.hdSMOpen();
   });
 
-  await expect(page.locator('[data-hd-sm-next-node="A"]')).toBeEnabled();
-  await page.locator('[data-hd-sm-next-node="A"]').click();
+  await expect(page.locator('[data-hd-sm-next-node="B"]')).toBeEnabled();
+  await page.locator('[data-hd-sm-next-node="B"]').click();
 
   await expect(page.locator('.hd-sm-advance-guard')).toBeVisible();
   await expect(page.locator('.hd-sm-advance-guard')).toContainText('進撃前に大破確認');
   await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeDisabled();
-  await expect(page.locator('[data-hd-sm-next-node="D"]')).toBeDisabled();
+  await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeDisabled();
+  await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeDisabled();
 
   await page.locator('[data-hd-sm-safe-confirm]').click();
   await expect(page.locator('.hd-sm-advance-guard')).toContainText('大破なし確認済み');
   await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeEnabled();
-  await expect(page.locator('[data-hd-sm-next-node="D"]')).toBeEnabled();
+  await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeEnabled();
 
-  await page.locator('[data-hd-sm-next-node="D"]').click();
-  await expect(page.locator('[data-hd-sm-next-node="H"]')).toBeDisabled();
+  await page.locator('[data-hd-sm-next-node="G"]').click();
+  await expect(page.locator('[data-hd-sm-next-node="I"]')).toBeDisabled();
+  await expect(page.locator('[data-hd-sm-next-node="K"]')).toBeDisabled();
   const guard = await page.evaluate(() => window.hdSMAdvanceGuard(JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')), JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft));
-  expect(guard.current).toBe('D');
+  expect(guard.current).toBe('G');
   expect(guard.confirmed).toBe(false);
   expect(errors).toEqual([]);
 });
@@ -2252,7 +2252,7 @@ test('release smoke: damage retreat marks sortie draft as retreat', async ({ pag
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
       status:'active',
-      draft:{node:'A',routeNodes:['A'],result:'S',memo:''}
+      draft:{node:'B',routeNodes:['B'],result:'S',memo:''}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
@@ -2290,7 +2290,7 @@ test('release smoke: sortie damage guard blocks alternate node selection paths',
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
       status:'active',
-      draft:{node:'A',routeNodes:['A'],result:'S',memo:''}
+      draft:{node:'B',routeNodes:['B'],result:'S',memo:''}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
@@ -2301,8 +2301,8 @@ test('release smoke: sortie damage guard blocks alternate node selection paths',
   const blocked = await page.evaluate(() => window.hdSMSetNode('D'));
   expect(blocked).toBe(false);
   let draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
-  expect(draft.node).toBe('A');
-  expect(draft.routeNodes).toEqual(['A']);
+  expect(draft.node).toBe('B');
+  expect(draft.routeNodes).toEqual(['B']);
 
   await page.locator('[data-hd-sm-safe-confirm]').click();
   await expect(page.locator('[data-hd-sm-node="D"]')).toBeEnabled();
@@ -2310,7 +2310,7 @@ test('release smoke: sortie damage guard blocks alternate node selection paths',
   expect(moved).toBe(true);
   draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
   expect(draft.node).toBe('D');
-  expect(draft.routeNodes).toEqual(['A','D']);
+  expect(draft.routeNodes).toEqual(['B','D']);
   expect(errors).toEqual([]);
 });
 
@@ -2508,7 +2508,7 @@ test('release smoke: sticky sortie HUD exposes confirmed next-node actions', asy
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
       status:'active',
-      draft:{node:'A',routeNodes:['A'],result:'S',memo:'',advanceGuard:{node:'A',safe:true,at:Date.now()}}
+      draft:{node:'B',routeNodes:['B'],result:'S',memo:'',advanceGuard:{node:'B',safe:true,at:Date.now()}}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
@@ -2518,16 +2518,17 @@ test('release smoke: sticky sortie HUD exposes confirmed next-node actions', asy
   const hud = page.locator('.hd-sm-hud');
   await expect(hud).toContainText('大破確認済');
   await expect(hud.locator('[data-hd-sm-hud-node="C"]')).toBeVisible();
-  await expect(hud.locator('[data-hd-sm-hud-node="D"]')).toBeVisible();
+  await expect(hud.locator('[data-hd-sm-hud-node="G"]')).toBeVisible();
 
-  await hud.locator('[data-hd-sm-hud-node="D"]').click();
-  await expect(page.locator('#hdSMNode')).toHaveValue('D');
+  await hud.locator('[data-hd-sm-hud-node="G"]').click();
+  await expect(page.locator('#hdSMNode')).toHaveValue('G');
   await expect(page.locator('.hd-sm-hud')).toContainText('大破未確認');
   await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node]')).toHaveCount(0);
-  await expect(page.locator('[data-hd-sm-next-node="H"]')).toBeDisabled();
+  await expect(page.locator('[data-hd-sm-next-node="I"]')).toBeDisabled();
+  await expect(page.locator('[data-hd-sm-next-node="K"]')).toBeDisabled();
 
   const draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
-  expect(draft.node).toBe('D');
+  expect(draft.node).toBe('G');
   expect(draft.advanceGuard).toBe(null);
   expect(errors).toEqual([]);
 });
