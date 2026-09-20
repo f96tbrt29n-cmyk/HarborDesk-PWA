@@ -365,7 +365,7 @@ function hdSMOpen(){
 function hdSMNum(id){return Math.max(0,Number(document.getElementById(id)?.value)||0)}
 function hdSMFormData(){
  const result=document.getElementById('hdSMResult')?.value||'S',session=hdSMSession();
- return {result,node:document.getElementById('hdSMNode')?.value||'',battles:hdSMNum('hdSMBattles'),boss:!!document.getElementById('hdSMBoss')?.checked,drop:document.getElementById('hdSMDrop')?.value||'',buckets:hdSMNum('hdSMBuckets'),fuel:hdSMNum('hdSMFuel'),ammo:hdSMNum('hdSMAmmo'),steel:hdSMNum('hdSMSteel'),bauxite:hdSMNum('hdSMBauxite'),memo:document.getElementById('hdSMMemo')?.value||'',retreatReason:result==='撤退'?(document.getElementById('hdSMRetreatReason')?.value||''):'',objectiveTarget:String(session?.draft?.objectiveTarget||'')};
+ return {result,node:document.getElementById('hdSMNode')?.value||'',battles:hdSMNum('hdSMBattles'),boss:!!document.getElementById('hdSMBoss')?.checked,drop:document.getElementById('hdSMDrop')?.value||'',buckets:hdSMNum('hdSMBuckets'),fuel:hdSMNum('hdSMFuel'),ammo:hdSMNum('hdSMAmmo'),steel:hdSMNum('hdSMSteel'),bauxite:hdSMNum('hdSMBauxite'),memo:document.getElementById('hdSMMemo')?.value||'',retreatReason:result==='撤退'?(document.getElementById('hdSMRetreatReason')?.value||''):'',objectiveTarget:hdSMSelectedObjective(session?.map,session?.draft)};
 }
 let hdSMDraftTimer=0;
 function hdSMSaveDraft(){
