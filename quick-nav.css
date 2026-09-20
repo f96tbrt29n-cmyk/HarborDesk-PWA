@@ -77,7 +77,7 @@ body.hd-workspace-mode{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 .hd-qn-categories button{display:grid;gap:3px;min-width:0;padding:8px 7px;border:1px solid var(--line);border-radius:11px;background:#0d2234;color:var(--text);font:inherit;text-align:left}
 .hd-qn-categories button.active{border-color:#5bc4ff;background:#153b56}
 .hd-qn-categories b{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hd-qn-categories small{display:flex;gap:5px;min-width:0;color:var(--muted);font-size:8px;white-space:nowrap}
+.hd-qn-categories small{display:flex;flex-wrap:wrap;gap:2px 6px;min-width:0;color:var(--muted);font-size:8px;line-height:1.15}
 .hd-qn-categories small i{font-style:normal}
 .hd-qn-categories button.active small{color:#cceeff}
 .hd-qn-categories button:active{transform:scale(.98)}
