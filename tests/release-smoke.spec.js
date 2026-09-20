@@ -1041,3 +1041,71 @@ test('release smoke: mobile attention offers one-tap backup action', async ({ pa
   expect(result.calls).toBe(2);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: backup reminder detects meaningful local data without sync', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdQNHasMeaningfulBackupData === 'function' &&
+    typeof window.hdQNBackupAttention === 'function'
+  );
+
+  const result = await page.evaluate(() => {
+    const backupKey = 'harbordesk-last-external-backup-v1';
+    const syncKey = 'harbordesk-kancolle-sync-v1';
+    const contentKeys = window.HD_QN_BACKUP_CONTENT_KEYS || [
+      'harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-sortie-log-v1',
+      'harbordesk-drop-hunts-v1','harbordesk-activity-log-v1','harbordesk-quest-progress-v1',
+      'harbordesk-event-operations-v1','harbordesk-ship-profiles-v1','harbordesk-equipment-variants-v1',
+      'harbordesk-resource-goals-v1','harbordesk-resource-history-v1','harbordesk-custom-fleets-v1',
+      'harbordesk-training-plans-v1','harbordesk-exercise-routine-v1','harbordesk-equipment-procurement-v1',
+      'harbordesk-equipment-procurement-history-v1','harbordesk-material-stock-v1','harbordesk-material-goals-v1',
+      'harbordesk-sortie-selection-v1','harbordesk-sortie-readiness-v1'
+    ];
+
+    localStorage.removeItem(backupKey);
+    localStorage.removeItem(syncKey);
+    for (const key of contentKeys) localStorage.removeItem(key);
+
+    localStorage.setItem('harbordesk-quick-nav-recent-v1', JSON.stringify([{ id: 'home', at: Date.now() }]));
+    const blank = window.hdQNHasMeaningfulBackupData();
+    const blankAttention = window.hdQNBackupAttention();
+
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{ id: '1', name: 'テスト艦', level: 1 }]));
+    const roster = window.hdQNHasMeaningfulBackupData();
+    const rosterAttention = window.hdQNBackupAttention();
+
+    localStorage.removeItem('harbordesk-ship-roster-v1');
+    const originalState = window.hdGetAppState;
+    window.hdGetAppState = undefined;
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
+      expeditions: [],
+      docks: [],
+      quests: [{ id: 'q1', name: '手入力任務', done: false }],
+      resources: { fuel: '', ammo: '', steel: '', bauxite: '', savedAt: null }
+    }));
+    const core = window.hdQNHasMeaningfulBackupData();
+    const coreAttention = window.hdQNBackupAttention();
+    window.hdGetAppState = originalState;
+
+    return {
+      blankHasData: !!blank.hasData,
+      blankAttention: blankAttention?.title || '',
+      rosterHasData: !!roster.hasData,
+      rosterTitle: rosterAttention?.title || '',
+      rosterPriority: Number(rosterAttention?.priority) || 0,
+      coreHasData: !!core.hasData,
+      coreTitle: coreAttention?.title || ''
+    };
+  });
+
+  expect(result.blankHasData).toBe(false);
+  expect(result.blankAttention).toBe('');
+  expect(result.rosterHasData).toBe(true);
+  expect(result.rosterTitle).toContain('バックアップ未作成');
+  expect(result.rosterPriority).toBe(50);
+  expect(result.coreHasData).toBe(true);
+  expect(result.coreTitle).toContain('バックアップ未作成');
+  expect(errors).toEqual([]);
+});
