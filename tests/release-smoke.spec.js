@@ -653,3 +653,53 @@ test('release smoke: backup compatibility blocks newer formats', async ({ page }
   expect(JSON.parse(result.keep).value).toBe('safe');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: backup integrity blocks tampered files', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdBuildBackupFile === 'function' &&
+    typeof window.hdAnalyzeBackupIntegrity === 'function' &&
+    typeof window.importBackup === 'function'
+  );
+
+  const generated = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-integrity-target', JSON.stringify({ value: 'safe' }));
+    const built = window.hdBuildBackupFile();
+    const check = window.hdAnalyzeBackupIntegrity(built.data);
+    return {
+      algorithm: built.data.integrity?.algorithm || '',
+      hash: built.data.integrity?.hash || '',
+      state: check.state,
+      blocked: !!check.blocked
+    };
+  });
+
+  expect(generated.algorithm).toBe('fnv1a32');
+  expect(generated.hash).toMatch(/^[0-9a-f]{8}$/);
+  expect(generated.state).toBe('ok');
+  expect(generated.blocked).toBe(false);
+
+  await page.evaluate(() => {
+    const built = window.hdBuildBackupFile();
+    built.data.localStorage['harbordesk-integrity-target'] = JSON.stringify({ value: 'tampered' });
+    const file = new File([JSON.stringify(built.data)], 'HarborDesk-tampered.json', { type: 'application/json' });
+    window.__hdIntegrityImportPromise = window.importBackup(file);
+  });
+
+  const dialog = page.locator('#hdBackupRestorePreviewDialog');
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('[data-hd-backup-preview-compat]')).toContainText('復元できないバックアップ');
+  await expect(dialog.locator('[data-hd-backup-preview-compat]')).toContainText('チェックサム');
+  await expect(dialog.locator('button[value="restore"]')).toBeDisabled();
+  await dialog.locator('button[value="cancel"]').click();
+
+  const result = await page.evaluate(async () => ({
+    imported: await window.__hdIntegrityImportPromise,
+    current: localStorage.getItem('harbordesk-integrity-target')
+  }));
+  expect(result.imported).toBe(false);
+  expect(JSON.parse(result.current).value).toBe('safe');
+  expect(errors).toEqual([]);
+});
