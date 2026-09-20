@@ -7044,3 +7044,96 @@ test('home fleet condition summary flags low hp and low cond ships', async ({ pa
   expect(data.metrics.join(' ')).toContain('4隻');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('home sync coverage distinguishes core data from optional sortie capture', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({
+      syncedAt:Date.now(),
+      ships:120,
+      equipment:300,
+      materials:8,
+      decks:4,
+      quests:0,
+      docks:0,
+      sorties:0,
+      coverage:{
+        ships:true,
+        equipment:true,
+        resources:true,
+        fleets:true,
+        quests:false,
+        docks:false,
+        sorties:false
+      }
+    }));
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+    const partial=window.hdPHSyncCoverage?.();
+    const partialBlock=document.querySelector('.hd-ph-coverage-block');
+    const partialText=partialBlock?.textContent||'';
+
+    localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({
+      syncedAt:Date.now(),
+      ships:120,
+      equipment:300,
+      materials:8,
+      decks:4,
+      quests:0,
+      docks:0,
+      sorties:0,
+      coverage:{
+        ships:true,
+        equipment:true,
+        resources:true,
+        fleets:true,
+        quests:true,
+        docks:true,
+        sorties:false
+      }
+    }));
+    await window.hdPHRender?.();
+    const complete=window.hdPHSyncCoverage?.();
+    const completeBlock=document.querySelector('.hd-ph-coverage-block');
+    const chips=[...document.querySelectorAll('.hd-ph-coverage-chips > span')].map(x=>({
+      cls:x.className||'',
+      text:x.textContent||''
+    }));
+    return {
+      partial:{
+        coreDone:partial?.coreDone,
+        coreTotal:partial?.coreTotal,
+        complete:partial?.complete,
+        missingCore:partial?.missingCore||[],
+        text:partialText,
+        cls:partialBlock?.className||''
+      },
+      complete:{
+        coreDone:complete?.coreDone,
+        coreTotal:complete?.coreTotal,
+        complete:complete?.complete,
+        optionalSorties:complete?.optionalSorties,
+        cls:completeBlock?.className||'',
+        text:completeBlock?.textContent||'',
+        chips
+      }
+    };
+  });
+  expect(data.partial.coreDone).toBe(4);
+  expect(data.partial.coreTotal).toBe(6);
+  expect(data.partial.complete).toBe(false);
+  expect(data.partial.missingCore).toEqual(['quests','docks']);
+  expect(data.partial.cls).toContain('partial');
+  expect(data.partial.text).toContain('主要 4/6');
+  expect(data.partial.text).toContain('補完する');
+  expect(data.complete.coreDone).toBe(6);
+  expect(data.complete.complete).toBe(true);
+  expect(data.complete.optionalSorties).toBe(false);
+  expect(data.complete.cls).toContain('complete');
+  expect(data.complete.text).toContain('主要 6/6');
+  const sortie=data.complete.chips.find(x=>x.text.includes('出撃'));
+  expect(sortie?.cls||'').toContain('optional');
+  expect(sortie?.text||'').toContain('任意');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
