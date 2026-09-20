@@ -7194,3 +7194,50 @@ test('home cards remember collapsed state and can expand all', async ({ page }) 
   expect(data.allOpen.label).toBe('すべて開く');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('home operational cards remember custom order and reset cleanly', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    localStorage.removeItem('harbordesk-home-order-v1');
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+
+    const labels=()=>[...document.querySelectorAll('#hdPersonalHome > .hd-ph-block')].map(x=>x.dataset.phCollapseKey||'').filter(Boolean);
+    const initial=labels();
+
+    window.hdPHMoveOrder?.('resources',-1);
+    window.hdPHMoveOrder?.('resources',-1);
+    const moved=labels();
+    const savedAfterMove=JSON.parse(localStorage.getItem('harbordesk-home-order-v1')||'[]');
+
+    await window.hdPHRender?.();
+    const persisted=labels();
+
+    const resourceUp=document.querySelector('[data-ph-order-up="resources"]');
+    const resourceDown=document.querySelector('[data-ph-order-down="resources"]');
+    const controls={
+      up:!!resourceUp,
+      down:!!resourceDown,
+      upDisabled:!!resourceUp?.disabled,
+      downDisabled:!!resourceDown?.disabled
+    };
+
+    window.hdPHResetOrder?.();
+    const reset=labels();
+    const storedAfterReset=localStorage.getItem('harbordesk-home-order-v1');
+
+    return {initial,moved,savedAfterMove,persisted,controls,reset,storedAfterReset};
+  });
+
+  const defaultOrder=['coverage','attention','next','resources','fleets','condition'];
+  expect(data.initial.slice(0,6)).toEqual(defaultOrder);
+  expect(data.moved.slice(0,6)).toEqual(['coverage','resources','attention','next','fleets','condition']);
+  expect(data.savedAfterMove).toEqual(['coverage','resources','attention','next','fleets','condition']);
+  expect(data.persisted.slice(0,6)).toEqual(['coverage','resources','attention','next','fleets','condition']);
+  expect(data.controls.up).toBe(true);
+  expect(data.controls.down).toBe(true);
+  expect(data.reset.slice(0,6)).toEqual(defaultOrder);
+  expect(data.storedAfterReset).toBeNull();
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
