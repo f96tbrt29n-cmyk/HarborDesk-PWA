@@ -33,6 +33,7 @@ Settings → Pages → Build and deployment → Source を `GitHub Actions` に�
 - iPhoneでは公開後に「更新確認」→「今すぐ更新」で反映できます。Mac・Xcodeは不要です。
 - ローカル検証時は `npm install --no-save --no-package-lock`、`npx playwright install --with-deps chromium webkit`、`npm run test:browser` の順で実行します。Playwrightが内蔵HTTPサーバーを起動するため、別ターミナルでのサーバー起動は不要です。
 - `npm run test:browser` は公開ゲート用の安定スモークテストです。旧来の216件フル回帰は `npm run test:browser:full` で手動実行でき、現行UIに合わせて順次メンテナンスします。フル回帰の既知の古い期待値はPages公開を止めません。
+- `.github/workflows/full-regression.yml` は毎日03:00 JST（18:00 UTC）と手動実行で216件フル回帰をChromium / WebKitそれぞれ1 workerで実行します。これは品質監視用で、失敗してもPages公開済みバージョンを取り下げません。
 
 
 ## 艦これゲーム内データ取込
