@@ -1260,3 +1260,50 @@ test('release smoke: map攻略 tools survive tab redraws', async ({ page }) => {
   expect(result.headerActionsAfterRedraw).toBe(true);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: map overview exposes visible攻略 tool launcher', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdMapOpenTool === 'function' &&
+    typeof window.hdEnhanceMapPane === 'function' &&
+    typeof window.hdFCRender === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    selectedWorld = '5';
+    selectedMap = '5-6';
+    localStorage.setItem('harbordesk-map-tab-v1', JSON.stringify({'5-6':'overview'}));
+    renderMapPicker();
+  });
+
+  const launcher = page.locator('.hd-map-tools-overview');
+  await expect(launcher).toBeVisible();
+
+  for (const label of ['マップ詳細','編成','編成候補','出撃準備','装備・計算','ドロップ','自分用']) {
+    await expect(launcher.getByRole('button', { name: new RegExp(label) })).toBeVisible();
+  }
+
+  await launcher.getByRole('button', { name: /マップ詳細/ }).click();
+  await expect(page.locator('[data-map-pane="map"]')).toBeVisible();
+  await expect(page.locator('.hd-map-structure-guide > summary')).toBeVisible();
+
+  await page.locator('[data-map-tab="overview"]').click();
+  await expect(launcher).toBeVisible();
+
+  await launcher.getByRole('button', { name: /装備・計算/ }).click();
+  await expect(page.locator('[data-map-pane="gear"]')).toBeVisible();
+  await expect(page.locator('#hdFleetCalculator')).toBeVisible({ timeout: 5000 });
+
+  await page.locator('[data-map-tab="overview"]').click();
+  await expect(launcher).toBeVisible();
+
+  await launcher.getByRole('button', { name: /ドロップ/ }).click();
+  await expect(page.locator('[data-map-pane="drop"]')).toBeVisible();
+  await expect(page.locator('.hd-map-drop-panel')).toBeVisible();
+
+  expect(errors).toEqual([]);
+});
