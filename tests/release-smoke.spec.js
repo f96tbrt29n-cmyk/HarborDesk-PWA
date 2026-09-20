@@ -2457,3 +2457,34 @@ test('release smoke: sortie mode records structured retreat reason', async ({ pa
   expect(log.retreatReason).toBe('索敵不足');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie analytics summarizes structured retreat reasons', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSPARender === 'function' ||
+    typeof window.hdSPAInstall === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify([
+      {id:'r1',at:Date.now(),map:'2-4',node:'D',result:'撤退',retreat:true,retreatReason:'大破',battles:2},
+      {id:'r2',at:Date.now()-1000,map:'2-4',node:'G',result:'撤退',retreat:true,retreatReason:'大破',battles:3},
+      {id:'r3',at:Date.now()-2000,map:'2-4',node:'H',result:'撤退',retreat:true,retreatReason:'索敵不足',battles:3},
+      {id:'r4',at:Date.now()-3000,map:'2-4',node:'O',result:'S',retreat:false,battles:5,boss:true}
+    ]));
+    window.hdSPARender?.();
+  });
+
+  const card = page.locator('.hd-spa-card').first();
+  await expect(card).toBeVisible();
+  const reasons = card.locator('.hd-spa-retreat-reasons');
+  await expect(reasons).toBeVisible();
+  await expect(reasons).toContainText('撤退理由');
+  await expect(reasons).toContainText('大破');
+  await expect(reasons).toContainText('2回 / 67%');
+  await expect(reasons).toContainText('索敵不足');
+  await expect(reasons).toContainText('1回 / 33%');
+  expect(errors).toEqual([]);
+});
