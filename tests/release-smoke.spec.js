@@ -2488,3 +2488,46 @@ test('release smoke: sortie analytics summarizes structured retreat reasons', as
   await expect(card.locator('.hd-spa-review')).toContainText('大破撤退 2回');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sticky sortie HUD exposes confirmed next-node actions', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdSMRender === 'function' && typeof window.hdSMSetNode === 'function');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-hud-next-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-hud-next-fleet',
+      fleetName:'HUD次マステスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-hud-next-fleet',name:'HUD次マステスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'A',routeNodes:['A'],result:'S',memo:'',advanceGuard:{node:'A',safe:true,at:Date.now()}}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const hud = page.locator('.hd-sm-hud');
+  await expect(hud).toContainText('大破確認済');
+  await expect(hud.locator('[data-hd-sm-hud-node="C"]')).toBeVisible();
+  await expect(hud.locator('[data-hd-sm-hud-node="D"]')).toBeVisible();
+
+  await hud.locator('[data-hd-sm-hud-node="D"]').click();
+  await expect(page.locator('#hdSMNode')).toHaveValue('D');
+  await expect(page.locator('.hd-sm-hud')).toContainText('大破未確認');
+  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node]')).toHaveCount(0);
+  await expect(page.locator('[data-hd-sm-next-node="H"]')).toBeDisabled();
+
+  const draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
+  expect(draft.node).toBe('D');
+  expect(draft.advanceGuard).toBe(null);
+  expect(errors).toEqual([]);
+});
