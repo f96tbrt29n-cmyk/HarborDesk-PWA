@@ -6859,3 +6859,50 @@ test('home shows upcoming expedition and dock timers in finish order', async ({ 
   expect(data.blockText).toContain('3件表示');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('home resource summary combines saved resources and synced buckets', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const now=Date.now();
+    const base=JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}')||{};
+    base.expeditions=Array.isArray(base.expeditions)?base.expeditions:[];
+    base.docks=Array.isArray(base.docks)?base.docks:[];
+    base.quests=Array.isArray(base.quests)?base.quests:[];
+    base.resources={fuel:12345,ammo:23456,steel:34567,bauxite:45678,savedAt:now-5*60*1000};
+    localStorage.setItem('harbordesk-pwa-v1',JSON.stringify(base));
+    if(typeof state!=='undefined')state.resources={...base.resources};
+    localStorage.setItem('harbordesk-kancolle-materials-v1',JSON.stringify({bucket:321,syncedAt:now-2*60*1000}));
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+    const summary=window.hdPHResourceSummary?.();
+    const buttons=[...document.querySelectorAll('.hd-ph-resource-grid [data-ph-jump="resources"]')].map(x=>({
+      label:x.querySelector('small')?.textContent||'',
+      value:x.querySelector('strong')?.textContent||'',
+      cls:x.className||''
+    }));
+    const age=document.querySelector('.hd-ph-resource-block .hd-ph-sub .muted')?.textContent||'';
+    return {
+      values:(summary?.rows||[]).map(x=>[x.key,x.number]),
+      savedAt:Number(summary?.savedAt||0),
+      hasAny:!!summary?.hasAny,
+      buttons,
+      age
+    };
+  });
+  expect(data.values).toEqual([
+    ['fuel',12345],
+    ['ammo',23456],
+    ['steel',34567],
+    ['bauxite',45678],
+    ['bucket',321]
+  ]);
+  expect(data.hasAny).toBe(true);
+  expect(data.buttons).toHaveLength(5);
+  expect(data.buttons[0].label).toBe('燃料');
+  expect(data.buttons[0].value).toBe('12,345');
+  expect(data.buttons[4].label).toBe('バケツ');
+  expect(data.buttons[4].value).toBe('321');
+  expect(data.age).toContain('分前');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
