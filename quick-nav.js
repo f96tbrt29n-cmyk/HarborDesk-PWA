@@ -41,15 +41,24 @@ function hdQNRenderContext(){
 }
 function hdQNRecentRows(limit=5){
  const active=window.hdWSState?.sections?.[window.hdWSState?.group]||'';
- const sections=new Map(hdQNSections().map(x=>[x.id,x]));
- return hdQNLoadRecent().filter(x=>x?.id&&x.id!==active&&sections.has(x.id)).slice(0,limit).map(x=>({...x,title:sections.get(x.id).title}));
+ const sections=new Map(hdQNSections().map(x=>[x.id,x])),all=hdQNLoadRecent(),valid=all.filter(x=>x?.id&&sections.has(x.id));
+ if(valid.length!==all.length)hdQNSaveRecent(valid.slice(0,12));
+ return valid.filter(x=>x.id!==active).slice(0,limit).map(x=>({...x,title:sections.get(x.id).title}));
+}
+function hdQNClearRecent(){
+ try{localStorage.removeItem(HD_QN_RECENT_KEY)}catch{hdQNSaveRecent([])}
+ hdQNRenderRecent();
+ if(document.getElementById('hdQuickNavDialog')?.open)hdQNRenderList(document.getElementById('hdQNSearch')?.value||'');
+ window.hdToast?.('最近使った機能を消去したよ','info',1200);
+ window.dispatchEvent(new CustomEvent('hd:quick-nav-updated'));
+ return true;
 }
 function hdQNRenderRecent(){
  const host=document.getElementById('hdQNRecent');if(!host)return;
  const rows=hdQNRecentRows();
  if(!rows.length){host.hidden=true;host.innerHTML='';return}
  host.hidden=false;
- host.innerHTML=`<div class="hd-qn-recent-head"><span>最近使った機能</span><small>タップですぐ戻れるよ</small></div><div class="hd-qn-recent-grid">${rows.map(x=>`<button type="button" data-hd-qn-jump="${hdQNEsc(x.id)}" title="${hdQNEsc(x.title)}"><span>↶</span><b>${hdQNEsc(x.title)}</b></button>`).join('')}</div>`;
+ host.innerHTML=`<div class="hd-qn-recent-head"><span>最近使った機能</span><div><small>タップですぐ戻れるよ</small><button type="button" data-hd-qn-clear-recent aria-label="最近使った機能の履歴を消去">消去</button></div></div><div class="hd-qn-recent-grid">${rows.map(x=>`<button type="button" data-hd-qn-jump="${hdQNEsc(x.id)}" title="${hdQNEsc(x.title)}"><span>↶</span><b>${hdQNEsc(x.title)}</b></button>`).join('')}</div>`;
 }
 function hdQNRenderList(filter=''){
   const host=document.getElementById('hdQNList');if(!host)return;
@@ -253,6 +262,7 @@ document.addEventListener('click',e=>{
   if(e.target.closest?.('[data-hd-qn-home]')){hdQNClose();if(typeof hdWSShowElement==='function')hdWSShowElement('home',true);else document.getElementById('home')?.scrollIntoView({behavior:'smooth',block:'start'});return}
   if(e.target.closest?.('[data-hd-qn-sync]')){hdQNJump('kancolleImport');return}
   if(e.target.closest?.('[data-hd-qn-top]')){hdQNClose();window.scrollTo({top:0,behavior:'smooth'});return}
+  if(e.target.closest?.('[data-hd-qn-clear-recent]')){hdQNClearRecent();return}
   const context=e.target.closest?.('[data-hd-qn-context]');if(context){hdQNJump(context.dataset.hdQnContext);return}
   const jump=e.target.closest?.('[data-hd-qn-jump]');if(jump){hdQNJump(jump.dataset.hdQnJump);return}
   const pin=e.target.closest?.('[data-hd-qn-pin]');if(pin){hdQNTogglePin(pin.dataset.hdQnPin);return}
