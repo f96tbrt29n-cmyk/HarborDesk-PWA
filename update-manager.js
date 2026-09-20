@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.379';
-const HD_APP_BUILD=379;
+const HD_APP_VERSION='1.0.380';
+const HD_APP_BUILD=380;
 const HD_UPDATE_SNOOZE_KEY='harbordesk-update-snooze-v1';
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
@@ -20,10 +20,29 @@ async function hdEnsureServiceWorker(){
   }
 }
 
-async function hdFetchLatestVersion(){
-  const res=await fetch(`./app-version.json?t=${Date.now()}`,{cache:'no-store'});
+const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json';
+async function hdFetchVersionMeta(url){
+  const res=await fetch(url+(url.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});
   if(!res.ok)throw new Error('version fetch failed');
   return res.json();
+}
+async function hdFetchLatestVersion(){
+  const [sourceResult,publishedResult]=await Promise.allSettled([
+    hdFetchVersionMeta(HD_RELEASE_META_RAW),
+    hdFetchVersionMeta('./app-version.json')
+  ]);
+  const source=sourceResult.status==='fulfilled'?sourceResult.value:null;
+  const published=publishedResult.status==='fulfilled'?publishedResult.value:null;
+  if(!source&&!published)throw new Error('version fetch failed');
+  const latest=source||published;
+  return {
+    ...latest,
+    sourceBuild:Number(source?.build??latest?.build)||0,
+    sourceVersion:String(source?.version??latest?.version??''),
+    publishedBuild:Number(published?.build??0)||0,
+    publishedVersion:String(published?.version??''),
+    publishedReady:!!published&&Number(published.build||0)>=Number(latest.build||0)
+  };
 }
 
 function hdAppendStyle(attr,href){
@@ -277,21 +296,35 @@ function hdUpdateMasterChangeView(changes){
  return {summary:parts.join(' / '),examples};
 }
 async function hdCheckForUpdate(showResult=false){
-  hdEnsureUpdateUI();const btn=document.getElementById('hdUpdateCheck');
+  hdEnsureUpdateUI();const btn=document.getElementById('hdUpdateCheck'),updateBtn=document.getElementById('hdUpdateNow');
   try{
     if(btn){btn.disabled=true;const b=btn.querySelector('b');if(b)b.textContent='確認中…'}
-    const latest=await hdFetchLatestVersion(),newer=Number(latest.build||0)>HD_APP_BUILD,banner=document.getElementById('hdUpdateBanner'),text=document.getElementById('hdUpdateText'),changes=document.getElementById('hdUpdateChanges');
-    if(newer){
+    const latest=await hdFetchLatestVersion(),sourceBuild=Number(latest.sourceBuild||latest.build||0),publishedBuild=Number(latest.publishedBuild||0),sourceNewer=sourceBuild>HD_APP_BUILD,publishedNewer=publishedBuild>HD_APP_BUILD,banner=document.getElementById('hdUpdateBanner'),text=document.getElementById('hdUpdateText'),changes=document.getElementById('hdUpdateChanges');
+    if(sourceNewer){
       document.querySelector('.hd-header-more')?.classList.add('has-update');
-      if(text)text.textContent=`v${HD_APP_VERSION} → v${latest.version}${latest.notes?`｜${latest.notes}`:''}`;
+      const waiting=!publishedNewer;
+      if(updateBtn){updateBtn.disabled=waiting;updateBtn.textContent=waiting?'公開反映待ち':'今すぐ更新'}
+      if(text){
+        if(waiting)text.textContent=`v${HD_APP_VERSION} → v${latest.sourceVersion||latest.version} はGitHub mainに到着済み。公開サイトへの反映待ちです。`;
+        else{
+          const lag=sourceBuild>publishedBuild?`｜最新版 v${latest.sourceVersion||latest.version} は公開反映待ち`:'';
+          text.textContent=`v${HD_APP_VERSION} → 公開版 v${latest.publishedVersion||latest.version}${lag}${latest.notes?`｜${latest.notes}`:''}`;
+        }
+      }
       const master=hdUpdateMasterChangeView(latest.masterChanges);
       if(changes){
         if(master){changes.hidden=false;changes.innerHTML=`<b>艦これデータ更新</b><span>${hdUpdateEsc(master.summary)}</span>${master.examples.length?`<small>${master.examples.map(hdUpdateEsc).join(' / ')}</small>`:''}`}
         else{changes.hidden=true;changes.innerHTML=''}
       }
-      if(banner)banner.hidden=!showResult&&hdUpdateSnoozed()
+      if(banner)banner.hidden=!showResult&&hdUpdateSnoozed();
+      if(showResult&&waiting)alert(`HarborDesk v${latest.sourceVersion||latest.version} はGitHub mainにあるけど、公開サイトはまだ v${latest.publishedVersion||HD_APP_VERSION}。公開反映待ちだよ。`)
+    }else{
+      document.querySelector('.hd-header-more')?.classList.remove('has-update');
+      if(updateBtn){updateBtn.disabled=false;updateBtn.textContent='今すぐ更新'}
+      if(banner)banner.hidden=true;
+      if(changes){changes.hidden=true;changes.innerHTML=''}
+      if(showResult)alert(`HarborDesk v${HD_APP_VERSION} は最新版だよ`)
     }
-    else{document.querySelector('.hd-header-more')?.classList.remove('has-update');if(banner)banner.hidden=true;if(changes){changes.hidden=true;changes.innerHTML=''}if(showResult)alert(`HarborDesk v${HD_APP_VERSION} は最新版だよ`)}
   }catch{if(showResult)alert('更新情報を確認できなかったよ。通信状態を確認してもう一度試してね。')}
   finally{if(btn){btn.disabled=false;const b=btn.querySelector('b');if(b)b.textContent='更新確認'}}
 }
@@ -302,6 +335,14 @@ async function hdForceUpdate(){
   const btn=document.getElementById('hdUpdateNow');
   if(!navigator.onLine){HD_FORCE_UPDATE_BUSY=false;alert('オフライン中は更新できないよ。通信できる状態で試してね。');return false}
   try{
+    const latest=await hdFetchLatestVersion();
+    const sourceBuild=Number(latest.sourceBuild||latest.build||0),publishedBuild=Number(latest.publishedBuild||0);
+    if(sourceBuild>HD_APP_BUILD&&publishedBuild<=HD_APP_BUILD){
+      HD_FORCE_UPDATE_BUSY=false;
+      if(btn){btn.disabled=true;btn.textContent='公開反映待ち'}
+      alert(`v${latest.sourceVersion||latest.version} はGitHub mainにあるけど、公開サイトへの反映がまだだよ。反映後に更新できるようになる。`);
+      return false;
+    }
     if(btn){btn.disabled=true;btn.textContent='強制更新中…'}
     if(typeof hdWSPrepareUpdateReturn==='function')hdWSPrepareUpdateReturn();
     else{
