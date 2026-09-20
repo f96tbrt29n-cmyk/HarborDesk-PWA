@@ -142,7 +142,47 @@ function hdPHOpenDb(){return new Promise((resolve,reject)=>{if(!('indexedDB' in 
 async function hdPHGetSnapshots(){try{const db=await hdPHOpenDb();return await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readonly'),req=tx.objectStore(HD_PH_STORE).getAll();req.onsuccess=()=>resolve((req.result||[]).sort((a,b)=>b.at-a.at));req.onerror=()=>reject(req.error)})}catch{return []}}
 async function hdPHCreateSnapshot(reason='手動'){const payload=hdPHHarborData(),row={id:`${Date.now()}-${Math.random().toString(16).slice(2)}`,at:Date.now(),reason,payload,bytes:hdPHBytes(payload)};try{const db=await hdPHOpenDb();await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readwrite');tx.objectStore(HD_PH_STORE).put(row);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});const rows=await hdPHGetSnapshots();if(rows.length>HD_PH_MAX_SNAPSHOTS){await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readwrite'),store=tx.objectStore(HD_PH_STORE);rows.slice(HD_PH_MAX_SNAPSHOTS).forEach(x=>store.delete(x.id));tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}await hdPHRender();return true}catch{return false}}
 async function hdPHDeleteSnapshot(id){try{const db=await hdPHOpenDb();await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readwrite');tx.objectStore(HD_PH_STORE).delete(id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});await hdPHRender()}catch{}}
-async function hdPHRestoreSnapshot(id){const rows=await hdPHGetSnapshots(),row=rows.find(x=>x.id===id);if(!row)return;if(!confirm(`${new Date(row.at).toLocaleString('ja-JP')} の端末内スナップショットへ戻す？\n現在のHarborDeskデータは復元前スナップショットとして先に保存するよ。`))return;await hdPHCreateSnapshot('復元直前');const keep=new Set(Object.keys(row.payload||{}));for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&k.startsWith('harbordesk')&&!keep.has(k))localStorage.removeItem(k)}for(const [k,v] of Object.entries(row.payload||{}))if(k.startsWith('harbordesk')&&typeof v==='string')localStorage.setItem(k,v);location.reload()}
+function hdPHValidateHarborData(payload){
+ if(!payload||typeof payload!=='object'||Array.isArray(payload))return {ok:false,missing:[],mismatched:[],extra:[],reason:'invalid payload'};
+ const expected=new Map(Object.entries(payload).filter(([k,v])=>k.startsWith('harbordesk')&&typeof v==='string')),current=new Map(Object.entries(hdPHHarborData()));
+ const missing=[],mismatched=[],extra=[];
+ for(const [k,v] of expected){if(!current.has(k))missing.push(k);else if(current.get(k)!==v)mismatched.push(k)}
+ for(const k of current.keys())if(!expected.has(k))extra.push(k);
+ return {ok:missing.length===0&&mismatched.length===0&&extra.length===0,missing,mismatched,extra}
+}
+function hdPHApplyHarborData(payload){
+ if(!payload||typeof payload!=='object'||Array.isArray(payload))throw new Error('invalid snapshot payload');
+ const entries=Object.entries(payload).filter(([k,v])=>k.startsWith('harbordesk')&&typeof v==='string'),keep=new Set(entries.map(([k])=>k));
+ for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k?.startsWith('harbordesk')&&!keep.has(k))localStorage.removeItem(k)}
+ for(const [k,v] of entries)localStorage.setItem(k,v);
+ return entries.length
+}
+function hdPHRestoreTransaction(payload,before=hdPHHarborData(),applyFn=hdPHApplyHarborData){
+ try{
+  applyFn(payload);
+  const validation=hdPHValidateHarborData(payload);
+  if(!validation.ok)throw Object.assign(new Error('snapshot restore validation failed'),{validation});
+  return {ok:true,validation,rollback:null}
+ }catch(error){
+  let rollback={ok:false,missing:[],mismatched:[],extra:[]};
+  try{hdPHApplyHarborData(before);rollback=hdPHValidateHarborData(before)}catch(rollbackError){rollback={ok:false,error:rollbackError,missing:[],mismatched:[],extra:[]}}
+  return {ok:false,error,validation:error?.validation||null,rollback}
+ }
+}
+async function hdPHRestoreSnapshot(id){
+ const rows=await hdPHGetSnapshots(),row=rows.find(x=>x.id===id);if(!row)return false;
+ if(!confirm(`${new Date(row.at).toLocaleString('ja-JP')} の端末内スナップショットへ戻す？\n現在のHarborDeskデータは復元前スナップショットとして先に保存するよ。`))return false;
+ const safetyOk=await hdPHCreateSnapshot('復元直前');
+ if(safetyOk===false){alert('復元前の安全スナップショットを保存できなかったため、復元を中止したよ。');return false}
+ const before=hdPHHarborData(),result=hdPHRestoreTransaction(row.payload||{},before);
+ if(!result.ok){
+  console.warn('snapshot restore validation failed',result);
+  if(result.rollback?.ok)alert('スナップショット復元後の検証で不一致を検出したため、直前のデータへ自動で戻したよ。');
+  else alert('スナップショット復元後の検証に失敗し、自動で元へ戻しきれなかったよ。保存済みの別スナップショットかJSONバックアップから復元してね。');
+  return false
+ }
+ location.reload();return true
+}
 function hdPHSectionTitle(id){const el=document.getElementById(id);return el?.querySelector(':scope > .section-head h2, :scope h2, :scope h3, :scope h4')?.textContent?.trim()||id}
 function hdPHResumeRow(){
  const recent=typeof hdQNLoadRecent==='function'?hdQNLoadRecent():(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-quick-nav-recent-v1')||'[]')}catch{return []}})();
