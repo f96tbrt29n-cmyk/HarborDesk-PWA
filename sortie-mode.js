@@ -312,8 +312,8 @@ function hdSMFormData(){
 let hdSMDraftTimer=0;
 function hdSMSaveDraft(){
  const session=hdSMSession();if(!session||session.status!=='active'||!document.getElementById('hdSMResult'))return false;
- const prev=session.draft&&typeof session.draft==='object'?session.draft:{};
- const draft={...prev,...hdSMFormData(),routeNodes:Array.isArray(prev.routeNodes)?prev.routeNodes.map(String).filter(Boolean).slice(-40):[]};draft.updatedAt=Date.now();session.draft=draft;
+ const prev=session.draft&&typeof session.draft==='object'?session.draft:{},routeNodes=Array.isArray(prev.routeNodes)?prev.routeNodes.map(String).filter(Boolean).slice(-40):[],form=hdSMFormData();
+ const draft={...prev,...form,routeNodes,battles:routeNodes.length?hdSMBattleCount(session.map,routeNodes):form.battles};draft.updatedAt=Date.now();session.draft=draft;
  try{if(typeof window.hdSSSave==='function')window.hdSSSave(session);else localStorage.setItem(HD_SM_SESSION_KEY,JSON.stringify(session))}catch{return false}
  const status=document.querySelector('[data-hd-sm-draft-status]');if(status)status.textContent='保存 '+new Date(draft.updatedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
  try{window.dispatchEvent(new CustomEvent('hd:sortie-draft-saved',{detail:{sessionId:session.id,draft}}))}catch{}
@@ -321,7 +321,7 @@ function hdSMSaveDraft(){
 }
 function hdSMScheduleDraft(){clearTimeout(hdSMDraftTimer);hdSMDraftTimer=setTimeout(hdSMSaveDraft,180)}
 function hdSMSetNode(label){
- label=String(label||'').trim();const session=hdSMSession();if(!label||!session||session.status!=='active')return false;
+ clearTimeout(hdSMDraftTimer);label=String(label||'').trim();const session=hdSMSession();if(!label||!session||session.status!=='active')return false;
  const prev=session.draft&&typeof session.draft==='object'?session.draft:{},current=String(prev.node||'').trim(),guard=hdSMAdvanceGuard(session,prev);
  if(current&&label!==current&&guard.required&&!guard.confirmed){window.hdToast?.('進撃前に大破チェックを済ませてね','warn',1800);return false}
  const input=document.getElementById('hdSMNode'),boss=document.getElementById('hdSMBoss'),graph=hdSMGraph(session.map);
@@ -334,7 +334,7 @@ function hdSMSetNode(label){
  hdSMRender();return true;
 }
 function hdSMUndoNode(){
- const session=hdSMSession();if(!session||session.status!=='active')return false;
+ clearTimeout(hdSMDraftTimer);const session=hdSMSession();if(!session||session.status!=='active')return false;
  const prev=session.draft&&typeof session.draft==='object'?session.draft:{},route=Array.isArray(prev.routeNodes)?prev.routeNodes.map(String).filter(Boolean):[];
  if(!route.length)return false;route.pop();const node=route[route.length-1]||'',graph=hdSMGraph(session.map);
  session.draft={...prev,node,boss:!!(node&&graph&&graph.boss===node),battles:hdSMBattleCount(session.map,route),routeNodes:route.slice(-40),advanceGuard:null,updatedAt:Date.now()};
