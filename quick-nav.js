@@ -4,6 +4,8 @@ const HD_QN_HISTORY_KEY='harbordesk-session-quick-nav-history-v1';
 const HD_QN_ALL_OPEN_KEY='harbordesk-session-quick-nav-all-open-v1';
 const HD_QN_USAGE_KEY='harbordesk-quick-nav-usage-v1';
 let hdQNHistoryLock=false;
+let hdQNUsageLastId='';
+let hdQNUsageLastAt=0;
 
 function hdQNLoadPins(){try{return JSON.parse(localStorage.getItem(HD_QN_PIN_KEY)||'[]')||[]}catch{return []}}
 function hdQNSavePins(v){localStorage.setItem(HD_QN_PIN_KEY,JSON.stringify(v))}
@@ -13,12 +15,14 @@ function hdQNLoadUsage(){try{return JSON.parse(localStorage.getItem(HD_QN_USAGE_
 function hdQNSaveUsage(v){try{localStorage.setItem(HD_QN_USAGE_KEY,JSON.stringify(v||{}))}catch{}}
 function hdQNRecordUsage(id){
  id=String(id||'').trim();if(!id)return false;
+ const now=Date.now(),duplicate=id===hdQNUsageLastId&&(now-hdQNUsageLastAt)<1500;
+ hdQNUsageLastId=id;hdQNUsageLastAt=now;
  const usage=hdQNLoadUsage(),row=usage[id]&&typeof usage[id]==='object'?usage[id]:{};
- usage[id]={count:Math.max(0,Number(row.count)||0)+1,lastAt:Date.now()};
+ usage[id]={count:Math.max(0,Number(row.count)||0)+(duplicate?0:1),lastAt:now};
  const validIds=new Set(hdQNSections().map(x=>x.id));
  const entries=Object.entries(usage).filter(([key])=>validIds.has(key)).sort((a,b)=>(Number(b[1]?.lastAt)||0)-(Number(a[1]?.lastAt)||0)).slice(0,80);
  hdQNSaveUsage(Object.fromEntries(entries));
- return true;
+ return !duplicate;
 }
 function hdQNLoadHistory(){try{return JSON.parse(sessionStorage.getItem(HD_QN_HISTORY_KEY)||'[]')||[]}catch{return []}}
 function hdQNSaveHistory(v){try{sessionStorage.setItem(HD_QN_HISTORY_KEY,JSON.stringify(v.slice(-20)))}catch{}}
