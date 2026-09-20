@@ -6575,3 +6575,45 @@ test('quick nav category cards show usage counts and all-list collapse', async (
   expect(data.reopened).toEqual({cls:false,expanded:'true',text:'閉じる',saved:'1'});
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('quick nav ranks categories and context by real usage', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    localStorage.setItem('harbordesk-quick-nav-pins-v1',JSON.stringify(['customFleets']));
+    localStorage.setItem('harbordesk-quick-nav-recent-v1',JSON.stringify([
+      {id:'trainingPlanner',at:Date.now()-1000},
+      {id:'roster',at:Date.now()-2000},
+      {id:'equipmentBook',at:Date.now()-3000}
+    ]));
+    localStorage.setItem('harbordesk-quick-nav-usage-v1',JSON.stringify({
+      roster:{count:9,lastAt:Date.now()-2000},
+      trainingPlanner:{count:2,lastAt:Date.now()-1000},
+      equipmentBook:{count:4,lastAt:Date.now()-3000}
+    }));
+    window.hdWSApply?.('home','home',{ignorePin:true});
+    const categories=window.hdQNCategoryRows?.()||[];
+    const nonHome=categories.filter(x=>x.group!=='home').map(x=>({group:x.group,useCount:x.useCount}));
+    window.hdWSApply?.('fleet','roster',{ignorePin:true});
+    const context=(window.hdQNContextRows?.()||[]).map(x=>x.id);
+    localStorage.removeItem('harbordesk-quick-nav-usage-v1');
+    const first=window.hdQNRecordUsage?.('roster');
+    const second=window.hdQNRecordUsage?.('roster');
+    const usage=JSON.parse(localStorage.getItem('harbordesk-quick-nav-usage-v1')||'{}');
+    return {
+      nonHome,
+      context,
+      first:!!first,
+      second:!!second,
+      rosterCount:Number(usage.roster?.count||0)
+    };
+  });
+  expect(data.nonHome[0].group).toBe('fleet');
+  expect(data.nonHome[0].useCount).toBeGreaterThan(data.nonHome[1].useCount);
+  expect(data.context[0]).toBe('customFleets');
+  expect(data.context.indexOf('roster')).toBeLessThan(data.context.indexOf('trainingPlanner'));
+  expect(data.first).toBe(true);
+  expect(data.second).toBe(false);
+  expect(data.rosterCount).toBe(1);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
