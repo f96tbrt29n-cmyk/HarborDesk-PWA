@@ -7,8 +7,14 @@ async function boot(page, errors = []) {
   page.on('console', msg => {
     if (msg.type() !== 'error') return;
     const text = msg.text();
-    if (/Failed to load resource/i.test(text)) return;
-    errors.push(`console: ${text}`);
+    const source = String(msg.location?.().url || '');
+    if (/Failed to load resource/i.test(text) && source) {
+      try {
+        const host = new URL(source).hostname;
+        if (host !== '127.0.0.1' && host !== 'localhost') return;
+      } catch {}
+    }
+    errors.push(`console${source ? ' [' + source + ']' : ''}: ${text}`);
   });
   await page.addInitScript(() => {
     try {
