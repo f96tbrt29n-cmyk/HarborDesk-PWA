@@ -41,6 +41,29 @@ function hdSMBranchHintHtml(map,draft){
  const hint=hdSMBranchHint(map,draft);
  return '<div class="hd-sm-branch-hint"><div><span>ROUTE CONDITION</span><b>'+hdSMEsc(hint.title)+'</b></div><p>'+hdSMEsc(hint.text)+'</p>'+(hint.source?'<small>'+hdSMEsc(hint.source)+'</small>':'')+'</div>';
 }
+function hdSMNodeIntel(map,row){
+ row=row||{};const label=String(row.label||'').trim(),kind=String(row.kind||'normal');
+ let detail={};try{if(label&&typeof HD_NODE_DETAIL_OVERRIDES!=='undefined')detail=HD_NODE_DETAIL_OVERRIDES?.[map]?.[label]||{}}catch{}
+ const enemy=String(detail.enemy||'').trim(),air=String(detail.air||'').trim(),source=String(detail.source||'').trim();
+ const defaults={
+  boss:'ボス戦候補。決戦火力・制空・夜戦要員を確認。',
+  sub:'潜水マス候補。先制対潜とソナー・爆雷を確認。',
+  air:'航空戦候補。制空値と対空カットインを確認。',
+  night:'夜戦候補。大破進軍に注意し、夜戦装備を確認。',
+  vortex:'渦潮候補。電探で資源損失を軽減。',
+  item:'資源・アイテムマス候補。',
+  safe:'戦闘なし候補。',
+  goal:'到達地点候補。'
+ };
+ const summary=enemy||air||defaults[kind]||'通常戦候補。次マスの敵編成と制空を確認。';
+ const badge=kind==='boss'?'高危険':(kind==='sub'||kind==='air'||kind==='night')?'要対策':(kind==='item'||kind==='safe'||kind==='goal')?'非戦闘':'戦闘';
+ return {label,kind,badge,summary,enemy,air,source,hasDetail:!!(enemy||air)};
+}
+function hdSMNextNodeButtonHtml(map,row){
+ const intel=hdSMNodeIntel(map,row);
+ const detail=[intel.enemy?('敵 '+intel.enemy):'',intel.air?('制空 '+intel.air):''].filter(Boolean).join(' / ')||intel.summary;
+ return '<button type="button" class="hd-sm-next '+hdSMEsc(intel.kind)+'" data-hd-sm-next-node="'+hdSMEsc(intel.label)+'"><b>'+hdSMEsc(intel.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(intel.kind))+'</small><i>次へ</i><span class="hd-sm-next-risk">'+hdSMEsc(intel.badge)+'</span><em>'+hdSMEsc(detail)+'</em></button>';
+}
 function hdSMElapsed(ms){
  const total=Math.max(0,Math.floor((Number(ms)||0)/1000)),s=total%60,m=Math.floor(total/60)%60,h=Math.floor(total/3600);
  return h?h+'時間'+String(m).padStart(2,'0')+'分':m+'分'+String(s).padStart(2,'0')+'秒';
@@ -75,7 +98,7 @@ function hdSMNodePickerHtml(session,draft){
  const rows=hdSMNodeRows(session?.map),route=draft?.routeNodes||[],current=String(draft?.node||''),next=hdSMNextNodeRows(session?.map,draft);
  if(!rows.length)return '';
  const nextTitle=current?'次に進める候補':'最初の進行候補';
- const nextHtml=next.length?'<div class="hd-sm-next-wrap"><div class="hd-sm-next-head"><b>'+nextTitle+'</b><small>海域構造上の接続候補。実際の分岐条件は攻略情報を優先。</small></div><div class="hd-sm-next-grid">'+next.map(function(x){return '<button type="button" class="hd-sm-next '+hdSMEsc(x.kind)+'" data-hd-sm-next-node="'+hdSMEsc(x.label)+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(x.kind))+'</small><i>次へ</i></button>'}).join('')+'</div></div>':'<div class="hd-sm-next-done">'+(current?'このマスから先の接続候補は登録されていないよ。':'開始地点の候補を取得できないよ。')+'</div>';
+ const nextHtml=next.length?'<div class="hd-sm-next-wrap"><div class="hd-sm-next-head"><b>'+nextTitle+'</b><small>候補ごとに戦闘種別と、登録済みの敵・制空注意を表示するよ。</small></div><div class="hd-sm-next-grid">'+next.map(function(x){return hdSMNextNodeButtonHtml(session?.map,x)}).join('')+'</div></div>':'<div class="hd-sm-next-done">'+(current?'このマスから先の接続候補は登録されていないよ。':'開始地点の候補を取得できないよ。')+'</div>';
  return '<div class="hd-sm-panel hd-sm-node-panel"><div class="hd-sm-panel-head"><strong>現在マス</strong><span>普段は「次に進める候補」だけタップでOK</span></div>'+nextHtml+hdSMBranchHintHtml(session?.map,draft)+
   '<details class="hd-sm-all-nodes"><summary>全マスから選ぶ</summary><div class="hd-sm-node-grid">'+
   rows.map(function(x){const active=x.label===current;return '<button type="button" class="hd-sm-node '+hdSMEsc(x.kind)+(active?' active':'')+'" data-hd-sm-node="'+hdSMEsc(x.label)+'" aria-pressed="'+(active?'true':'false')+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(x.kind))+'</small></button>'}).join('')+
@@ -200,6 +223,7 @@ window.hdSMFormData=hdSMFormData;
 window.hdSMNodeRows=hdSMNodeRows;
 window.hdSMNextNodeRows=hdSMNextNodeRows;
 window.hdSMBranchHint=hdSMBranchHint;
+window.hdSMNodeIntel=hdSMNodeIntel;
 window.hdSMSetNode=hdSMSetNode;
 window.hdSMUndoNode=hdSMUndoNode;
 window.hdSMSaveDraft=hdSMSaveDraft;
