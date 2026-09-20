@@ -417,7 +417,10 @@ function hdWSEnsureUI(){
  if(document.getElementById('hdWorkspaceNav'))return;
  const top=document.querySelector('.topbar');if(!top)return;
  const nav=document.createElement('div');nav.id='hdWorkspaceNav';nav.className='hd-ws-shell';nav.innerHTML=`<div class="hd-ws-primary" role="tablist" aria-label="HarborDeskカテゴリ">${HD_WS_GROUPS.map(g=>`<button type="button" role="tab" data-hd-ws-group="${g.key}"><span>${g.label}</span><em data-hd-ws-badge hidden>0</em></button>`).join('')}</div><div id="hdWorkspaceMobilePicker" class="hd-ws-mobile-picker" hidden><button type="button" class="ghost small hd-ws-back" data-hd-ws-back aria-label="ひとつ前の機能へ戻る" title="戻る">←</button><button type="button" class="ghost small hd-ws-forward" data-hd-ws-forward aria-label="ひとつ先の機能へ進む" title="進む">→</button><span id="hdWorkspaceContextGroup">ホーム</span><select id="hdWorkspaceSectionSelect" aria-label="カテゴリ内機能"></select><button type="button" class="ghost small hd-ws-pin" data-hd-ws-pin aria-label="この機能を固定" title="クイックナビに固定">☆</button><button type="button" class="ghost small" data-hd-ws-group-top>先頭</button></div><div id="hdWorkspaceSubtabs" class="hd-ws-secondary" role="tablist" aria-label="カテゴリ内機能"></div>`;
- top.insertAdjacentElement('afterend',nav);document.body.classList.add('hd-workspace-mode');hdWSEnsureSyncStatus();hdWSEnsureNetworkStatus();hdWSEnsureSwipeHint();hdWSEnsureGameReturnAction();hdWSUpdateTopbarHeight();hdWSUpdateBadges();hdWSUpdateSyncStatus();
+ const headerMenuRow=document.getElementById('hdMobileHeaderMenuRow');
+ if(headerMenuRow)headerMenuRow.insertAdjacentElement('afterend',nav);
+ else top.insertAdjacentElement('afterend',nav);
+ document.body.classList.add('hd-workspace-mode');hdWSEnsureSyncStatus();hdWSEnsureNetworkStatus();hdWSEnsureSwipeHint();hdWSEnsureGameReturnAction();hdWSUpdateTopbarHeight();window.hdRefreshHeaderMenuMetrics?.();hdWSUpdateBadges();hdWSUpdateSyncStatus();
 }
 function hdWSRenderSubtabs(group,selected){
  const host=document.getElementById('hdWorkspaceSubtabs'),picker=document.getElementById('hdWorkspaceMobilePicker'),select=document.getElementById('hdWorkspaceSectionSelect'),context=document.getElementById('hdWorkspaceContextGroup');if(!host)return;const rows=hdWSVisibleSections(group);
