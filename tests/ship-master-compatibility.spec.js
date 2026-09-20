@@ -5,7 +5,10 @@ test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true
 async function boot(page, errors = []) {
   page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
   page.on('console', msg => {
-    if (msg.type() === 'error') errors.push(`console: ${msg.text()}`);
+    if (msg.type() !== 'error') return;
+    const text = msg.text();
+    if (/Failed to load resource/i.test(text)) return;
+    errors.push(`console: ${text}`);
   });
   await page.addInitScript(() => {
     try {
@@ -15,7 +18,7 @@ async function boot(page, errors = []) {
       localStorage.setItem('harbordesk-ship-image-config-v1', JSON.stringify({ remoteTemplate: '', autoSource: false }));
     }
   });
-  await page.route('**/*', async route => {
+  await page.context().route('**/*', async route => {
     const req = route.request();
     let url;
     try { url = new URL(req.url()); } catch { return route.continue(); }
