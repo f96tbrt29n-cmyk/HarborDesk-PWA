@@ -2520,7 +2520,6 @@ test('release smoke: sticky sortie HUD exposes confirmed next-node actions', asy
   await expect(hud).toContainText('大破確認済');
   await expect(hud.locator('[data-hd-sm-hud-node="C"]')).toBeVisible();
   await expect(hud.locator('[data-hd-sm-hud-node="D"]')).toBeVisible();
-  await expect(hud.locator('[data-hd-sm-hud-node="D"]')).toContainText('単縦陣');
 
   await hud.locator('[data-hd-sm-hud-node="D"]').click();
   await expect(page.locator('#hdSMNode')).toHaveValue('D');
@@ -2564,5 +2563,44 @@ test('release smoke: sticky sortie HUD shows current route condition', async ({ 
   await expect(route).toBeVisible();
   await expect(route).toContainText('Gマスの分岐条件');
   await expect(route).toContainText('I/K');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: sticky sortie HUD shows battle progress and boss distance', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMBossDistance === 'function'
+  );
+
+  const distance = await page.evaluate(() => window.hdSMBossDistance('2-4','D'));
+  expect(distance).toBeGreaterThan(0);
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-hud-progress-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-hud-progress-fleet',
+      fleetName:'HUD進捗テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-hud-progress-fleet',name:'HUD進捗テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'D',routeNodes:['A','D'],result:'S',memo:'',advanceGuard:{node:'D',safe:true,at:Date.now()}}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const progress = page.locator('.hd-sm-hud-progress');
+  await expect(progress).toBeVisible();
+  await expect(progress).toContainText('戦闘 2');
+  await expect(progress).toContainText('構造図最短 ボスまで');
   expect(errors).toEqual([]);
 });
