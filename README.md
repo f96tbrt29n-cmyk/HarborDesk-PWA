@@ -32,6 +32,7 @@ Settings → Pages → Build and deployment → Source を `GitHub Actions` に�
 - WebKitはSafari系エンジンの互換性確認であり、iPhone実機テストそのものではありません。
 - iPhoneでは公開後に「更新確認」→「今すぐ更新」で反映できます。Mac・Xcodeは不要です。
 - ローカル検証時は `npm install --no-save --no-package-lock`、`npx playwright install --with-deps chromium webkit`、`npm run test:browser` の順で実行します。Playwrightが内蔵HTTPサーバーを起動するため、別ターミナルでのサーバー起動は不要です。
+- `npm run test:browser` は公開ゲート用の安定スモークテストです。旧来の216件フル回帰は `npm run test:browser:full` で手動実行でき、現行UIに合わせて順次メンテナンスします。フル回帰の既知の古い期待値はPages公開を止めません。
 
 
 ## 艦これゲーム内データ取込
