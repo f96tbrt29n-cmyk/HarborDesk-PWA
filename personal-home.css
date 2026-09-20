@@ -4,6 +4,16 @@
 .hd-ph-resume>small{grid-area:meta;color:var(--muted);font-size:9px}
 .hd-ph-resume>i{grid-area:arrow;font-style:normal;font-size:22px;color:var(--accent2)}
 .hd-ph-resume:active{transform:scale(.99);background:linear-gradient(135deg,rgba(25,79,112,.95),rgba(12,32,49,.98))}
+.hd-ph-sync{width:100%;display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"tag value icon" "tag meta icon";align-items:center;gap:2px 10px;margin-top:8px;padding:10px 12px;border:1px solid var(--line);border-radius:13px;background:#0b1d2d;color:var(--text);text-align:left;font:inherit}
+.hd-ph-sync>span{grid-area:tag;font-size:9px;font-weight:900;color:var(--muted)}
+.hd-ph-sync>strong{grid-area:value;font-size:12px}
+.hd-ph-sync>small{grid-area:meta;font-size:9px;color:var(--muted)}
+.hd-ph-sync>i{grid-area:icon;font-style:normal;font-size:18px}
+.hd-ph-sync.fresh{border-color:rgba(65,180,120,.35)}.hd-ph-sync.fresh>strong,.hd-ph-sync.fresh>i{color:#bfe8ce}
+.hd-ph-sync.stale{border-color:rgba(255,185,60,.4)}.hd-ph-sync.stale>strong,.hd-ph-sync.stale>i{color:#ffd58a}
+.hd-ph-sync.partial{border-color:rgba(91,188,243,.42)}.hd-ph-sync.partial>strong,.hd-ph-sync.partial>i{color:#bfeaff}
+.hd-ph-sync.missing{border-color:rgba(239,116,116,.42)}.hd-ph-sync.missing>strong,.hd-ph-sync.missing>i{color:#ffd0d0}
+.hd-ph-sync:active{transform:scale(.99);background:#10283c}
 .hd-ph-sub{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.hd-ph-sub>div{display:flex;gap:6px;flex-wrap:wrap}.hd-ph-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.hd-ph-shortcut{display:grid;gap:3px;text-align:left;background:#0a1928;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px}.hd-ph-shortcut strong{font-size:12px}.hd-ph-shortcut small{font-size:9px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hd-ph-shortcut:active{transform:scale(.99)}.hd-ph-usual-block{border-color:rgba(91,188,243,.3);background:linear-gradient(180deg,rgba(18,57,82,.9),var(--panel))}
 .hd-ph-usual-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr))}
 .hd-ph-shortcut.hd-ph-usual{position:relative;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"rank title" "rank meta";align-items:center;column-gap:8px}
