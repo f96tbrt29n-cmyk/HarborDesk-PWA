@@ -6617,3 +6617,49 @@ test('quick nav ranks categories and context by real usage', async ({ page }) =>
   expect(data.rosterCount).toBe(1);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('home shows automatic usual shortcuts from usage history', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    localStorage.setItem('harbordesk-quick-nav-pins-v1',JSON.stringify(['equipmentBook']));
+    localStorage.setItem('harbordesk-quick-nav-recent-v1',JSON.stringify([
+      {id:'roster',at:Date.now()},
+      {id:'equipmentBook',at:Date.now()-1000},
+      {id:'expeditions',at:Date.now()-2000}
+    ]));
+    localStorage.setItem('harbordesk-quick-nav-usage-v1',JSON.stringify({
+      roster:{count:14,lastAt:Date.now()},
+      equipmentBook:{count:9,lastAt:Date.now()-1000},
+      quests:{count:6,lastAt:Date.now()-2000},
+      sortieLog:{count:3,lastAt:Date.now()-3000}
+    }));
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+    const rows=window.hdPHShortcutRows?.()||{};
+    const rendered=[...document.querySelectorAll('.hd-ph-usual-shortcuts [data-ph-jump]')].map(x=>({
+      id:x.dataset.phJump,
+      rank:x.querySelector('.hd-ph-rank')?.textContent||'',
+      meta:x.querySelector('small')?.textContent||''
+    }));
+    const recent=[...document.querySelectorAll('.hd-ph-block .hd-ph-shortcut[data-ph-jump]')].map(x=>x.dataset.phJump);
+    return {
+      usual:(rows.usual||[]).map(x=>({id:x.id,count:x.count})),
+      recentRows:rows.recent||[],
+      rendered,
+      title:document.querySelector('.hd-ph-usual-block')?.textContent||'',
+      recent
+    };
+  });
+  expect(data.usual.map(x=>x.id)).toEqual(['roster','equipmentBook','quests','sortieLog']);
+  expect(data.usual.map(x=>x.count)).toEqual([14,9,6,3]);
+  expect(data.rendered.map(x=>x.id)).toEqual(['roster','equipmentBook','quests','sortieLog']);
+  expect(data.rendered.map(x=>x.rank)).toEqual(['1','2','3','4']);
+  expect(data.rendered[0].meta).toContain('14回');
+  expect(data.title).toContain('いつもの機能');
+  expect(data.title).toContain('利用回数から自動選出');
+  expect(data.recentRows).toContain('expeditions');
+  expect(data.recentRows).not.toContain('roster');
+  expect(data.recentRows).not.toContain('equipmentBook');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
