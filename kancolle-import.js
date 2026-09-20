@@ -1,5 +1,5 @@
 const HD_KC_SYNC_KEY='harbordesk-kancolle-sync-v1';
-const HD_KC_USERSCRIPT_VERSION='1.0.9';
+const HD_KC_USERSCRIPT_VERSION='1.0.10';
 const HD_KC_FLEETS_KEY='harbordesk-kancolle-fleets-v1';
 const HD_KC_MATERIALS_KEY='harbordesk-kancolle-materials-v1';
 const HD_KC_NODE_LABEL_SOURCE='KC3Kai edges.json @ 6b0534d291c27220da1b6fe454e91fc96a6a7b27';
@@ -68,8 +68,8 @@ function hdKcImportAdd(out,hint,payload,meta={}){
   else if('api_ship_id' in first){for(const x of data)if(Number(x?.api_id)>0&&Number(x?.api_ship_id)>0)out.ships.set(Number(x.api_id),x)}
   else if('api_value' in first){for(const x of data)if(Number(x?.api_id)>0)out.materials.set(Number(x.api_id),x)}
  }
- if(/api_port\/port/.test(h)||/api_get_member\/ship2/.test(h)||(!h&&shipRows&&deckRows))out.completeShips=true;
- if(/api_port\/port/.test(h)||(/api_get_member\/ship2/.test(h)&&deckRows))out.completeDecks=true;
+ if(/api_port\/port/.test(h)||/api_get_member\/(?:ship2|ship3)/.test(h)||(!h&&shipRows&&deckRows))out.completeShips=true;
+ if(/api_port\/port/.test(h)||(/api_get_member\/(?:ship2|ship3)/.test(h)&&deckRows))out.completeDecks=true;
  if(/api_port\/port/.test(h)||/api_get_member\/ndock/.test(h))out.completeNdocks=true;
  if(/api_get_member\/slot_item/.test(h)||(/require_info/.test(h)&&slotRows))out.completeSlotItems=true;
  if(Array.isArray(data)&&data.length&&'api_slotitem_id' in (data.find(Boolean)||{})&&!h)out.completeSlotItems=true;
@@ -86,7 +86,7 @@ function hdKcParseImport(raw){
  }else if(root&&typeof root==='object'&&!Array.isArray(root)&&!('api_result' in root)&&!('api_ship' in root)&&!('api_ship_data' in root)&&!('api_slot_item' in root)&&!('api_material' in root)&&!('api_ndock' in root)&&!('api_list' in root)){
   let matched=false;
   for(const [k,v] of Object.entries(root)){
-   if(/api_(port|api_get_member|kcsapi)|\/kcsapi\//.test(k)||/^(port|ship2|slot_item|material|require_info|ndock|questlist)$/.test(k)){hdKcImportAdd(out,k,v);matched=true}
+   if(/api_(port|api_get_member|kcsapi)|\/kcsapi\//.test(k)||/^(port|ship2|ship3|slot_item|material|require_info|ndock|questlist)$/.test(k)){hdKcImportAdd(out,k,v);matched=true}
   }
   if(!matched)hdKcImportAdd(out,'',root);
  }else hdKcImportAdd(out,'',root);
@@ -119,10 +119,10 @@ function hdKcPreviewData(parsed){
 function hdKcCoverageFromSources(sources=[],parsed=null){
  const src=(Array.isArray(sources)?sources:[]).map(String),has=re=>src.some(x=>re.test(x));
  return {
-  ships:!!parsed?.completeShips||has(/api_port\/port|api_get_member\/ship2/),
+  ships:!!parsed?.completeShips||has(/api_port\/port|api_get_member\/(?:ship2|ship3)/),
   equipment:!!parsed?.completeSlotItems||has(/api_get_member\/(?:slot_item|require_info)/),
   resources:has(/api_port\/port|api_get_member\/material/),
-  fleets:!!parsed?.completeDecks||has(/api_port\/port|api_get_member\/ship2/),
+  fleets:!!parsed?.completeDecks||has(/api_port\/port|api_get_member\/(?:ship2|ship3)/),
   quests:has(/api_get_member\/questlist/),
   docks:!!parsed?.completeNdocks||has(/api_port\/port|api_get_member\/ndock/),
   sorties:has(/api_req_map\/(?:start|next)|api_req_(?:sortie|combined_battle)\/battleresult/)
