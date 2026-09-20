@@ -118,6 +118,12 @@ function hdSMObjectivePrestartHtml(map){
  const selected=hdSMObjectivePreference(map);
  return '<div class="hd-sm-objective-picker prestart"><div><span>OBJECTIVE</span><b>出撃目標</b><small>開始前に選択／次回も記憶</small></div><div><button type="button" class="'+(!selected?'active':'')+'" data-hd-sm-pre-objective="" data-hd-sm-objective-map="'+hdSMEsc(map)+'">自動</button>'+options.map(x=>'<button type="button" class="'+(selected===x.label?'active':'')+'" data-hd-sm-pre-objective="'+hdSMEsc(x.label)+'" data-hd-sm-objective-map="'+hdSMEsc(map)+'">'+hdSMEsc(x.name)+'</button>').join('')+'</div></div>';
 }
+function hdSMPrestartRoutePreviewHtml(map){
+ const options=hdSMObjectiveOptions(map);if(options.length<2)return '';
+ const target=hdSMObjectivePreference(map),targetName=hdSMRouteTargetName(map,target),next=hdSMNextNodeRows(map,{node:'',routeNodes:[]});
+ if(!next.length)return '';
+ return '<div class="hd-sm-pre-route"><div><span>START ROUTE</span><b>構造図上の開始候補</b><small>'+hdSMEsc(target?targetName:'自動（攻略目標）')+' 基準</small></div><div>'+next.map(x=>{const reachable=hdSMCanReachBoss(map,x.label,target),intel=hdSMNodeIntel(map,x),status=reachable===true?'接続':reachable===false?'逸れ候補':'経路不明';return '<span class="'+(reachable===false?'off':reachable===true?'on':'unknown')+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(intel.kind))+'</small><em>'+hdSMEsc(status)+'</em></span>'}).join('')+'</div><p>実際の分岐は編成・索敵・確率条件で変わるため、攻略概要の条件も確認してね。</p></div>';
+}
 function hdSMSelectedObjective(map,draft){
  const chosen=String(draft?.objectiveTarget||'').trim(),targets=hdSMObjectiveTargets(map);
  return targets.includes(chosen)?chosen:'';
@@ -327,7 +333,7 @@ function hdSMIdleHtml(){
  const d=hdSMMapDetail(map),row=typeof window.hdSSSelectedSummary==='function'?window.hdSSSelectedSummary(map):null;
  if(!row)return '<div class="hd-sm-idle"><div class="hd-sm-map"><span>選択海域</span><strong>'+hdSMEsc(map)+' '+hdSMEsc(d.name||'')+'</strong></div><div class="hd-sm-empty compact"><p>この海域で使う編成がまだ選ばれてないよ。出撃準備表で編成を決めよう。</p></div><div class="hd-sm-actions"><button type="button" class="primary" data-hd-sm-prep>出撃準備表を開く</button><button type="button" class="ghost" data-hd-sm-guide>海域攻略へ</button></div></div>';
  const s=row.stats||{},ready=(!s.autoTotal||s.autoOk===s.autoTotal)&&(!s.manualTotal||s.manualDone===s.manualTotal);
- return '<div class="hd-sm-idle"><div class="hd-sm-map"><span>選択海域</span><strong>'+hdSMEsc(map)+' '+hdSMEsc(d.name||'')+'</strong></div>'+hdSMObjectivePrestartHtml(map)+'<div class="hd-sm-status '+(ready?'ready':'warn')+'"><div><span>'+hdSMEsc(row.strategyLabel||'手動編成')+'</span><strong>'+hdSMEsc(row.fleet&&row.fleet.name||'名称なし')+'</strong><small>'+(Number(s.shipCount)||0)+'隻</small></div><b>'+(ready?'出撃前確認済み':'未確認あり')+'</b></div>'+hdSMReadinessHtml({autoOk:s.autoOk,autoTotal:s.autoTotal,manualDone:s.manualDone,manualTotal:s.manualTotal,unresolved:s.unresolved})+'<div class="hd-sm-actions"><button type="button" class="primary" data-hd-sm-start>この編成で出撃開始</button><button type="button" class="ghost" data-hd-sm-prep>出撃準備表</button><button type="button" class="ghost" data-hd-sm-guide>海域攻略</button></div><p class="hd-sm-note">開始すると、その時点の艦隊・装備・確認状態を固定して出撃中画面へ切り替えるよ。</p></div>';
+ return '<div class="hd-sm-idle"><div class="hd-sm-map"><span>選択海域</span><strong>'+hdSMEsc(map)+' '+hdSMEsc(d.name||'')+'</strong></div>'+hdSMObjectivePrestartHtml(map)+hdSMPrestartRoutePreviewHtml(map)+'<div class="hd-sm-status '+(ready?'ready':'warn')+'"><div><span>'+hdSMEsc(row.strategyLabel||'手動編成')+'</span><strong>'+hdSMEsc(row.fleet&&row.fleet.name||'名称なし')+'</strong><small>'+(Number(s.shipCount)||0)+'隻</small></div><b>'+(ready?'出撃前確認済み':'未確認あり')+'</b></div>'+hdSMReadinessHtml({autoOk:s.autoOk,autoTotal:s.autoTotal,manualDone:s.manualDone,manualTotal:s.manualTotal,unresolved:s.unresolved})+'<div class="hd-sm-actions"><button type="button" class="primary" data-hd-sm-start>この編成で出撃開始</button><button type="button" class="ghost" data-hd-sm-prep>出撃準備表</button><button type="button" class="ghost" data-hd-sm-guide>海域攻略</button></div><p class="hd-sm-note">開始すると、その時点の艦隊・装備・確認状態を固定して出撃中画面へ切り替えるよ。</p></div>';
 }
 function hdSMDraft(session){
  const d=session&&session.draft&&typeof session.draft==='object'?session.draft:{};
@@ -499,6 +505,7 @@ window.hdSMObjectivePreference=hdSMObjectivePreference;
 window.hdSMSaveObjectivePreference=hdSMSaveObjectivePreference;
 window.hdSMSetObjectivePreference=hdSMSetObjectivePreference;
 window.hdSMObjectivePrestartHtml=hdSMObjectivePrestartHtml;
+window.hdSMPrestartRoutePreviewHtml=hdSMPrestartRoutePreviewHtml;
 window.hdSMSelectedObjective=hdSMSelectedObjective;
 window.hdSMObjectivePickerHtml=hdSMObjectivePickerHtml;
 window.hdSMSetObjectiveTarget=hdSMSetObjectiveTarget;
