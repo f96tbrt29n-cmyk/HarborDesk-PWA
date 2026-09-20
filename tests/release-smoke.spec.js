@@ -2652,3 +2652,55 @@ test('release smoke: sortie skips damage confirmation on verified non-battle nod
   await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeDisabled();
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie uses effective non-battle kind in HUD and node intelligence', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMEffectiveKind === 'function' &&
+    typeof window.hdSMNodeIntel === 'function' &&
+    typeof window.hdSMRender === 'function'
+  );
+
+  const intel = await page.evaluate(() => ({
+    kind: window.hdSMEffectiveKind('2-4','A','normal'),
+    node: window.hdSMNodeIntel('2-4',{label:'A',kind:'normal'})
+  }));
+  expect(intel.kind).toBe('item');
+  expect(intel.node.kind).toBe('item');
+  expect(intel.node.badge).toBe('非戦闘');
+  expect(intel.node.formation).toBe('選択なし');
+  expect(intel.node.caution).toBe('戦闘なし');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-effective-kind-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-effective-kind-fleet',
+      fleetName:'実質マス種別テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-effective-kind-fleet',name:'実質マス種別テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active'
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const a = page.locator('[data-hd-sm-next-node="A"]');
+  await expect(a).toContainText('資源');
+  await expect(a).toContainText('非戦闘');
+  await expect(a).toContainText('選択なし');
+  await a.click();
+
+  const hud = page.locator('.hd-sm-hud');
+  await expect(hud).toContainText('資源');
+  await expect(hud).toContainText('基本陣形 選択なし');
+  await expect(hud).toContainText('非戦闘');
+  expect(errors).toEqual([]);
+});
