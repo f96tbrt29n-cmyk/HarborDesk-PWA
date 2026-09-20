@@ -1307,3 +1307,44 @@ test('release smoke: map overview exposes visible攻略 tool launcher', async ({
 
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: map攻略 critical assets are cache-busted', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
+    const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
+    const requiredScripts = [
+      'map-details.js?v=335',
+      'map-images.js?v=335',
+      'map-tabs.js?v=335',
+      'map-interactive.js?v=335',
+      'map-advanced-data.js?v=335'
+    ];
+    const requiredStyles = [
+      'map-details.css?v=335',
+      'map-tabs.css?v=335',
+      'map-images.css?v=335',
+      'map-interactive.css?v=335'
+    ];
+    return {
+      scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
+      styles: requiredStyles.map(x => ({ x, ok: styleHrefs.some(s => s.endsWith(x)) })),
+      launcher: !!document.querySelector('.hd-map-tools-overview')
+    };
+  });
+
+  expect(data.scripts.every(x => x.ok)).toBe(true);
+  expect(data.styles.every(x => x.ok)).toBe(true);
+
+  await page.evaluate(() => {
+    selectedWorld = '2';
+    selectedMap = '2-4';
+    localStorage.setItem('harbordesk-map-tab-v1', JSON.stringify({'2-4':'overview'}));
+    renderMapPicker();
+  });
+  await expect(page.locator('.hd-map-tools-overview')).toBeVisible();
+  expect(errors).toEqual([]);
+});
