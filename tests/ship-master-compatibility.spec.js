@@ -6488,3 +6488,37 @@ test('quick nav recent shortcuts can be cleared and prune stale entries', async 
   expect(data.hidden).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('quick nav shows pinned favorites separately', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    localStorage.setItem('harbordesk-quick-nav-pins-v1',JSON.stringify(['roster','missingPinnedFeature','equipmentBook']));
+    window.hdQNEnsure?.();
+    window.hdQNRenderFavorites?.();
+    const first=[...document.querySelectorAll('#hdQNFavorites [data-hd-qn-jump]')].map(x=>x.dataset.hdQnJump);
+    const pruned=JSON.parse(localStorage.getItem('harbordesk-quick-nav-pins-v1')||'[]');
+    const title=document.getElementById('hdQNFavorites')?.textContent||'';
+    window.hdQNTogglePin?.('roster');
+    window.hdQNRenderFavorites?.();
+    const after=[...document.querySelectorAll('#hdQNFavorites [data-hd-qn-jump]')].map(x=>x.dataset.hdQnJump);
+    return {
+      first,
+      pruned,
+      title,
+      after,
+      hidden:!!document.getElementById('hdQNFavorites')?.hidden,
+      allLabel:document.querySelector('.hd-qn-tools-head')?.textContent||''
+    };
+  });
+  expect(data.first).toContain('roster');
+  expect(data.first).toContain('equipmentBook');
+  expect(data.first).not.toContain('missingPinnedFeature');
+  expect(data.pruned).not.toContain('missingPinnedFeature');
+  expect(data.title).toContain('よく使う機能');
+  expect(data.after).not.toContain('roster');
+  expect(data.after).toContain('equipmentBook');
+  expect(data.hidden).toBe(false);
+  expect(data.allLabel).toContain('すべての機能');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
