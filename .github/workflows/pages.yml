@@ -11,7 +11,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: harbordesk-pages-${{ github.ref }}
+  group: harbordesk-pages-v2-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
