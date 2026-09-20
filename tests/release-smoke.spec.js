@@ -1557,8 +1557,10 @@ test('release smoke: shared mobile layout prevents chrome overlap across iPhone 
     { width: 844, height: 390 }
   ];
 
+  await page.waitForFunction(() => typeof window.hdInitUpdateManagerUI === 'function', null, { timeout: 30000 });
+  await page.evaluate(() => window.hdInitUpdateManagerUI());
   await page.waitForFunction(() =>
-    document.querySelector('.hd-header-more')?.dataset?.hdInlineBound === '1' &&
+    !!document.querySelector('.hd-header-more') &&
     !!document.getElementById('hdMobileHeaderMenuRow'),
     null,
     { timeout: 30000 }
@@ -1726,5 +1728,32 @@ test('release smoke: internal snapshot restore shares the global restore lock', 
   expect(result.heldResult).toBe(false);
   expect(result.clearedAfterHold).toBe(true);
   expect(result.alerts.join(' ')).toContain('進行中');
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: update menu bootstrap is available before async modules finish', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', err => errors.push(String(err?.message || err)));
+  await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
+
+  await page.waitForFunction(() => typeof window.hdInitUpdateManagerUI === 'function', null, { timeout: 12000 });
+  const result = await page.evaluate(() => {
+    const ok=window.hdInitUpdateManagerUI();
+    const row=document.getElementById('hdMobileHeaderMenuRow');
+    const more=document.querySelector('.hd-header-more');
+    return {
+      ok,
+      rowExists:!!row,
+      rowHidden:!!row?.hidden,
+      menuExists:!!more,
+      bound:more?.dataset?.hdInlineBound||''
+    };
+  });
+
+  expect(result.ok).toBe(true);
+  expect(result.rowExists).toBe(true);
+  expect(result.rowHidden).toBe(true);
+  expect(result.menuExists).toBe(true);
+  expect(result.bound).toBe('1');
   expect(errors).toEqual([]);
 });

@@ -201,6 +201,19 @@ function hdBindMobileHeaderMenu(){
     },{passive:true});
   }
 }
+function hdInitUpdateManagerUI(){
+  hdEnsureUpdateUI();
+  hdEnsureMobileHeaderMenuRow();
+  hdBindMobileHeaderMenu();
+  hdRefreshHeaderMenuMetrics();
+  return !!document.querySelector('.hd-header-more');
+}
+window.hdEnsureUpdateUI=hdEnsureUpdateUI;
+window.hdEnsureMobileHeaderMenuRow=hdEnsureMobileHeaderMenuRow;
+window.hdSyncMobileHeaderMenu=hdSyncMobileHeaderMenu;
+window.hdInitUpdateManagerUI=hdInitUpdateManagerUI;
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',hdInitUpdateManagerUI,{once:true});
+else queueMicrotask(hdInitUpdateManagerUI);
 
 function hdUpdateSnoozed(){
   try{return Number(sessionStorage.getItem(HD_UPDATE_SNOOZE_KEY)||0)>Date.now()}catch{return false}
@@ -325,7 +338,7 @@ document.addEventListener('keydown',e=>{
   const summary=menu.querySelector(':scope > summary');try{summary?.focus({preventScroll:true})}catch{summary?.focus()}
 });
 window.addEventListener('load',()=>{
-  hdEnsureServiceWorker();hdLoadCurrentAssets().catch(()=>{});hdEnsureUpdateUI();
+  hdEnsureServiceWorker();hdLoadCurrentAssets().catch(()=>{});hdInitUpdateManagerUI();
   if(new URL(location.href).searchParams.has('hd_update')){
     setTimeout(()=>{try{history.replaceState(null,'',location.pathname+location.hash)}catch{}},500);
   }
