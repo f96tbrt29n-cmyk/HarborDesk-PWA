@@ -143,8 +143,8 @@ function hdPHFleetCondition(){
  }catch{}
  const ships=fleets.flatMap(deck=>(Array.isArray(deck?.ships)?deck.ships:[]).map(ship=>({...ship,deckId:Number(deck?.deckId)||0,deckName:String(deck?.name||'')})));
  const hpLow=ships.filter(x=>Number(x?.maxHp)>0&&Number(x?.nowHp)>=0&&(Number(x.nowHp)/Number(x.maxHp))<0.5);
- const condLow=ships.filter(x=>Number.isFinite(Number(x?.cond))&&Number(x.cond)>0&&Number(x.cond)<30);
- const affected=[...new Map([...hpLow,...condLow].map(x=>[String(x?.gameShipId||x?.name||Math.random()),x])).values()];
+ const condLow=ships.filter(x=>x?.cond!=null&&Number.isFinite(Number(x.cond))&&Number(x.cond)<30);
+ const affected=[...new Map([...hpLow,...condLow].map(x=>[Number(x?.gameShipId)>0?'id:'+Number(x.gameShipId):'fleet:'+Number(x?.deckId||0)+':'+String(x?.name||''),x])).values()];
  return {fleetCount:fleets.length,shipCount:ships.length,hpLowCount:hpLow.length,condLowCount:condLow.length,affected:affected.slice(0,3).map(x=>({name:String(x?.name||'未取得'),deckId:Number(x?.deckId)||0,nowHp:Math.max(0,Number(x?.nowHp)||0),maxHp:Math.max(0,Number(x?.maxHp)||0),cond:Math.max(0,Number(x?.cond)||0)})),ready:ships.length>0&&hpLow.length===0&&condLow.length===0,hasData:ships.length>0};
 }
 function hdPHFleetConditionHtml(x){
