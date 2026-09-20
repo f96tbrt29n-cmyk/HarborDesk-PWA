@@ -3,7 +3,8 @@ const HD_PH_DB='HarborDeskSafety';
 const HD_PH_STORE='snapshots';
 const HD_PH_MAX_SNAPSHOTS=3;
 const HD_PH_COLLAPSE_KEY='harbordesk-home-collapse-v1';
-const HD_PH_ORDER_KEY='harbordesk-home-order-v1';
+const HD_PH_ORDER_KEY='harbordesk-personal-home-order-v1';
+const HD_PH_ORDER_LEGACY_KEY='harbordesk-home-order-v1';
 const HD_PH_COMPACT_KEY='harbordesk-home-compact-v1';
 const HD_PH_RESOURCE_THRESHOLD_KEY='harbordesk-resource-thresholds-v1';
 
@@ -56,7 +57,14 @@ function hdPHCollapseSpecs(){return [
 function hdPHOrderDefault(){return ['coverage','attention','next','resources','fleets','condition']}
 function hdPHOrderLoad(){
  const def=hdPHOrderDefault();try{
-  const x=JSON.parse(localStorage.getItem(HD_PH_ORDER_KEY)||'[]'),rows=Array.isArray(x)?x:[];
+  let rows=null;
+  try{const saved=JSON.parse(localStorage.getItem(HD_PH_ORDER_KEY)||'null');if(Array.isArray(saved))rows=saved}catch{}
+  if(!Array.isArray(rows)){
+   let legacy=[];try{const saved=JSON.parse(localStorage.getItem(HD_PH_ORDER_LEGACY_KEY)||'[]');legacy=Array.isArray(saved)?saved:[]}catch{}
+   const looksPersonal=legacy.some(x=>def.includes(x)&&x!=='resources');
+   rows=looksPersonal?legacy:[];
+   if(looksPersonal)try{localStorage.setItem(HD_PH_ORDER_KEY,JSON.stringify(rows))}catch{}
+  }
   const valid=rows.filter((x,i)=>def.includes(x)&&rows.indexOf(x)===i);
   return [...valid,...def.filter(x=>!valid.includes(x))];
  }catch{return def}
