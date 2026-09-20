@@ -7241,3 +7241,93 @@ test('home operational cards remember custom order and reset cleanly', async ({ 
   expect(data.storedAfterReset).toBeNull();
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('home compact mode hides calm cards but reopens new attention', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const now=Date.now();
+    localStorage.removeItem('harbordesk-home-collapse-v1');
+    localStorage.removeItem('harbordesk-home-compact-v1');
+    localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({
+      syncedAt:now,
+      ships:4,
+      equipment:10,
+      materials:8,
+      decks:2,
+      quests:0,
+      docks:0,
+      sorties:0,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true,sorties:false}
+    }));
+    localStorage.setItem('harbordesk-kancolle-fleets-v1',JSON.stringify([
+      {deckId:1,name:'第一艦隊',mission:[0,0,0,0],ships:[
+        {gameShipId:1,name:'赤城',level:99,nowHp:80,maxHp:80,cond:49},
+        {gameShipId:2,name:'加賀',level:98,nowHp:80,maxHp:80,cond:49}
+      ]},
+      {deckId:2,name:'第二艦隊',mission:[0,0,0,0],ships:[
+        {gameShipId:3,name:'長門',level:90,nowHp:90,maxHp:90,cond:49},
+        {gameShipId:4,name:'陸奥',level:88,nowHp:90,maxHp:90,cond:49}
+      ]}
+    ]));
+    window.hdGetAppState=()=>({expeditions:[],docks:[],quests:[],resources:{fuel:10000,ammo:10000,steel:10000,bauxite:10000,savedAt:now}});
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+
+    window.hdPHSetCollapsed?.('resources',true);
+    const before=JSON.parse(localStorage.getItem('harbordesk-home-collapse-v1')||'{}');
+    window.hdPHSetCompact?.(true);
+
+    const compact={
+      enabled:window.hdPHCompactLoad?.().enabled||false,
+      coverage:document.querySelector('.hd-ph-coverage-block')?.classList.contains('hd-ph-collapsed')||false,
+      attention:document.querySelector('.hd-ph-attention-block')?.classList.contains('hd-ph-collapsed')||false,
+      next:document.querySelector('.hd-ph-next-block')?.classList.contains('hd-ph-collapsed')||false,
+      resources:document.querySelector('.hd-ph-resource-block')?.classList.contains('hd-ph-collapsed')||false,
+      fleets:document.querySelector('.hd-ph-fleet-block')?.classList.contains('hd-ph-collapsed')||false,
+      condition:document.querySelector('.hd-ph-condition-block')?.classList.contains('hd-ph-collapsed')||false,
+      usual:document.querySelector('.hd-ph-usual-block')?.classList.contains('hd-ph-collapsed')||false,
+      label:document.querySelector('[data-ph-compact]')?.textContent||''
+    };
+
+    window.hdGetAppState=()=>({
+      expeditions:[{name:'東京急行',endsAt:Date.now()-60*1000}],
+      docks:[],
+      quests:[],
+      resources:{fuel:10000,ammo:10000,steel:10000,bauxite:10000,savedAt:now}
+    });
+    await window.hdPHRender?.();
+    const afterAlert={
+      attention:document.querySelector('.hd-ph-attention-block')?.classList.contains('hd-ph-collapsed')||false,
+      text:document.querySelector('.hd-ph-attention-block')?.textContent||''
+    };
+
+    window.hdPHSetCompact?.(false);
+    const restored={
+      enabled:window.hdPHCompactLoad?.().enabled||false,
+      resources:document.querySelector('.hd-ph-resource-block')?.classList.contains('hd-ph-collapsed')||false,
+      saved:JSON.parse(localStorage.getItem('harbordesk-home-collapse-v1')||'{}'),
+      label:document.querySelector('[data-ph-compact]')?.textContent||''
+    };
+
+    return {before,compact,afterAlert,restored};
+  });
+
+  expect(data.before.resources).toBe(true);
+  expect(data.compact.enabled).toBe(true);
+  expect(data.compact.coverage).toBe(true);
+  expect(data.compact.attention).toBe(true);
+  expect(data.compact.next).toBe(true);
+  expect(data.compact.resources).toBe(false);
+  expect(data.compact.fleets).toBe(true);
+  expect(data.compact.condition).toBe(true);
+  expect(data.compact.usual).toBe(true);
+  expect(data.compact.label).toBe('通常表示');
+  expect(data.afterAlert.attention).toBe(false);
+  expect(data.afterAlert.text).toContain('帰投済み');
+  expect(data.restored.enabled).toBe(false);
+  expect(data.restored.resources).toBe(true);
+  expect(data.restored.saved.resources).toBe(true);
+  expect(data.restored.label).toBe('コンパクト');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
