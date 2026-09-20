@@ -2902,3 +2902,50 @@ test('release smoke: sortie marks boss-connected versus off-route next nodes', a
   await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="M"]')).toHaveClass(/route-off/);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie progress uses nearest valid objective on multi-target maps', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMBossDistance === 'function' &&
+    typeof window.hdSMBossBattleDistance === 'function' &&
+    typeof window.hdSMRouteTargetName === 'function'
+  );
+
+  const metrics = await page.evaluate(() => ({
+    distance: window.hdSMBossDistance('7-2','C'),
+    battles: window.hdSMBossBattleDistance('7-2','C'),
+    target: window.hdSMRouteTargetName('7-2')
+  }));
+  expect(metrics.distance).toBe(1);
+  expect(metrics.battles).toBe(0);
+  expect(metrics.target).toBe('攻略目標');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-objective-distance-session',
+      map:'7-2',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-objective-distance-fleet',
+      fleetName:'攻略目標距離テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-objective-distance-fleet',name:'攻略目標距離テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'C',routeNodes:['A','B','C'],result:'S',memo:'',advanceGuard:{node:'C',safe:true,at:Date.now()}}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const progress = page.locator('.hd-sm-hud-progress');
+  await expect(progress).toBeVisible();
+  await expect(progress).toContainText('構造図最短 攻略目標まで 1マス');
+  await expect(progress).toContainText('最少戦闘あと 0');
+  expect(errors).toEqual([]);
+});
