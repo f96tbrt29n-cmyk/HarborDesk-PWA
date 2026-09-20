@@ -2802,3 +2802,45 @@ test('release smoke: sticky sortie HUD shows minimum remaining battles', async (
   await expect(progress).toContainText('最少戦闘あと 3');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie switches guide labels for non-battle nodes', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMSetNode === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-guide-label-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-guide-label-fleet',
+      fleetName:'ガイド見出しテスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-guide-label-fleet',name:'ガイド見出しテスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active'
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  await page.locator('[data-hd-sm-next-node="A"]').click();
+  const nonBattle = page.locator('.hd-sm-current-tactic');
+  await expect(nonBattle).toContainText('NODE GUIDE');
+  await expect(nonBattle).toContainText('確認ポイント');
+  await expect(nonBattle).toContainText('選択なし');
+
+  await page.locator('[data-hd-sm-next-node="D"]').click();
+  const battle = page.locator('.hd-sm-current-tactic');
+  await expect(battle).toContainText('BATTLE GUIDE');
+  await expect(battle).toContainText('警戒ポイント');
+  await expect(battle).toContainText('単縦陣');
+  expect(errors).toEqual([]);
+});
