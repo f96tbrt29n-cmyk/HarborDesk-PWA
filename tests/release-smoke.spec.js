@@ -2484,5 +2484,7 @@ test('release smoke: sortie analytics summarizes structured retreat reasons', as
   await expect(reasons).toContainText('2回 / 67%');
   await expect(reasons).toContainText('索敵不足');
   await expect(reasons).toContainText('1回 / 33%');
+  await expect(card.locator('.hd-spa-review')).toContainText('道中の安定性を見直す');
+  await expect(card.locator('.hd-spa-review')).toContainText('大破撤退 2回');
   expect(errors).toEqual([]);
 });
