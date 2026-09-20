@@ -139,6 +139,22 @@ function hdPHHarborData(){const data={};for(let i=0;i<localStorage.length;i++){c
 function hdPHBytes(data){try{return new Blob([JSON.stringify(data)]).size}catch{return 0}}
 function hdPHHealth(){const data=hdPHHarborData();let invalid=0;for(const [k,v] of Object.entries(data)){try{JSON.parse(v)}catch{if(k!==HD_PH_LAST_EXPORT_KEY)invalid++}}return {keys:Object.keys(data).length,bytes:hdPHBytes(data),invalid}}
 function hdPHOpenDb(){return new Promise((resolve,reject)=>{if(!('indexedDB' in window)){reject(new Error('IndexedDB unsupported'));return}const req=indexedDB.open(HD_PH_DB,1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(HD_PH_STORE)){const s=db.createObjectStore(HD_PH_STORE,{keyPath:'id'});s.createIndex('at','at')}};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
+async function hdPHProbeSnapshotStore(){
+ const id=`__hd-safety-probe-${Date.now()}-${Math.random().toString(16).slice(2)}`,row={id,at:Date.now(),reason:'診断プローブ',payload:{},bytes:0,probe:true};
+ let db=null;
+ const txDone=(mode,fn)=>new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,mode),store=tx.objectStore(HD_PH_STORE);try{fn(store,resolve,reject)}catch(err){reject(err);return}tx.onerror=()=>reject(tx.error||new Error('IndexedDB transaction failed'))});
+ try{
+  db=await hdPHOpenDb();
+  await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readwrite');tx.objectStore(HD_PH_STORE).put(row);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('probe write failed'))});
+  const found=await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readonly'),req=tx.objectStore(HD_PH_STORE).get(id);req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>reject(req.error||new Error('probe read failed'))});
+  if(!found||found.id!==id||found.probe!==true)throw new Error('probe readback mismatch');
+  await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readwrite');tx.objectStore(HD_PH_STORE).delete(id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('probe delete failed'))});
+  return {ok:true,error:''}
+ }catch(err){
+  if(db){try{await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readwrite');tx.objectStore(HD_PH_STORE).delete(id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}catch{}}
+  return {ok:false,error:String(err?.message||err||'snapshot store probe failed')}
+ }finally{try{db?.close?.()}catch{}}
+}
 async function hdPHGetSnapshots(){try{const db=await hdPHOpenDb();return await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readonly'),req=tx.objectStore(HD_PH_STORE).getAll();req.onsuccess=()=>resolve((req.result||[]).sort((a,b)=>b.at-a.at));req.onerror=()=>reject(req.error)})}catch{return []}}
 async function hdPHCreateSnapshot(reason='手動'){const payload=hdPHHarborData(),row={id:`${Date.now()}-${Math.random().toString(16).slice(2)}`,at:Date.now(),reason,payload,bytes:hdPHBytes(payload)};try{const db=await hdPHOpenDb();await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readwrite');tx.objectStore(HD_PH_STORE).put(row);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});const rows=await hdPHGetSnapshots();if(rows.length>HD_PH_MAX_SNAPSHOTS){await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readwrite'),store=tx.objectStore(HD_PH_STORE);rows.slice(HD_PH_MAX_SNAPSHOTS).forEach(x=>store.delete(x.id));tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}await hdPHRender();return true}catch{return false}}
 async function hdPHDeleteSnapshot(id){try{const db=await hdPHOpenDb();await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readwrite');tx.objectStore(HD_PH_STORE).delete(id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});await hdPHRender()}catch{}}
