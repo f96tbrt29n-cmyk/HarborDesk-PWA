@@ -3156,7 +3156,9 @@ test('release smoke: Kancolle sync fills fleet and equipment ledgers', async ({ 
     typeof window.hdKcParseImport === 'function' &&
     typeof window.hdKcPreviewData === 'function' &&
     typeof window.hdKcApplyImport === 'function' &&
-    !!window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips
+    !!window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips &&
+    !!document.getElementById('shipRosterList') &&
+    !!document.getElementById('equipmentList')
   );
 
   const result = await page.evaluate(() => {
