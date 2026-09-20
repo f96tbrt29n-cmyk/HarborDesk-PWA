@@ -3,7 +3,8 @@
   "private": true,
   "version": "1.0.315",
   "scripts": {
-    "test:browser": "playwright test tests/ship-master-compatibility.spec.js"
+    "test:browser": "playwright test tests/release-smoke.spec.js",
+    "test:browser:full": "playwright test tests/ship-master-compatibility.spec.js"
   },
   "devDependencies": {
     "@playwright/test": "1.55.0"
