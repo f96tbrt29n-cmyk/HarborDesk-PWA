@@ -223,8 +223,10 @@ test('release smoke: userscript blocks handoff until ship and equipment ledger d
     return res.text();
   });
 
-  expect(source).toContain('// @version      1.0.11');
-  expect(source).toContain("const HD_VERSION='1.0.11'");
+  expect(source).toContain('// @version      1.0.12');
+  expect(source).toContain("const HD_VERSION='1.0.12'");
+  expect(source).toContain('// @downloadURL  https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/HarborDesk-Kancolle.user.js');
+  expect(source).toContain('// @updateURL    https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/HarborDesk-Kancolle.meta.js');
   expect(source).toContain('function ledgerReady(c=captureCoverage())');
   expect(source).toContain('return !!(c.port&&c.equipment)');
   expect(source).toContain("port:has(/api_port\\/port|api_get_member\\/ship2/)");
