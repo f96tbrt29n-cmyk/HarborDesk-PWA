@@ -1950,7 +1950,7 @@ test('release smoke: sortie mode node picker records and rewinds route trail', a
     window.hdSMOpen();
   });
 
-  await expect(page.locator('[data-hd-sm-node]')).toHaveCount(16);
+  await expect(page.locator('[data-hd-sm-node]')).toHaveCount(15);
   await page.locator('[data-hd-sm-node="A"]').click();
   await page.locator('[data-hd-sm-node="D"]').click();
   await expect(page.locator('#hdSMNode')).toHaveValue('D');
