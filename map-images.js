@@ -156,7 +156,8 @@ function hdMapImageHtml(map,detail){
  ${hdMapStageHtml(map)}
  <button class="hd-map-image-button" type="button" data-hd-map-open="${hdMapEsc2(map)}" aria-label="${hdMapEsc2(map)}の海域マップを拡大表示">${hdMapReferenceImage(map,detail)}<span class="hd-map-zoom-label">タップで拡大</span></button>
  <div class="map-tab-card"><b>ルートメモ</b><p>${hdMapEsc2(detail?.route||'ルート情報を整理中')}</p></div>
- <div class="hd-map-image-note">KC3改の海域マップ画像。地形・マス・航路を画像のまま表示しています。小型画像のため、拡大時は粗く見える場合があります。複数ゲージの海域は掲載画像の開放段階を示します。</div>
+ <details class="hd-map-structure-guide"><summary><span>操作用の構造ガイド</span><small>マス詳細・最短経路を見る</small></summary><div class="hd-map-structure-body">${hdMapSvg(map,detail,false)}</div></details>
+ <div class="hd-map-image-note">KC3改の海域マップ画像を主表示にしているよ。下の構造ガイドはマス詳細や最短経路を操作するためのHarborDesk簡略図で、実際の地形・分岐は上の画像と最新攻略情報を優先してね。複数ゲージの海域は掲載画像の開放段階を示します。</div>
  <div><a class="guide-link" href="${HD_MAP_IMAGE_SOURCE}" target="_blank" rel="noopener">画像の出典 ↗</a> <a class="guide-link" href="${wikiMapUrl(map)}" target="_blank" rel="noopener">海域の攻略・開放条件 ↗</a></div>
  </section>`;
 }
