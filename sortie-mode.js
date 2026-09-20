@@ -150,7 +150,7 @@ function hdSMObjectiveRouteState(map,draft){
 }
 function hdSMObjectiveRouteWarningHtml(map,draft){
  const state=hdSMObjectiveRouteState(map,draft);if(!state.active)return '';
- return '<div class="hd-sm-objective-warning"><div><span>ROUTE ALERT</span><b>'+hdSMEsc(state.current)+'から'+hdSMEsc(state.targetName)+'へ構造図上接続なし</b></div><p>現在地から選択中の攻略目標へつながる経路が構造図上にないよ。実際の分岐条件も確認しつつ、目標を見直してね。</p><div>'+state.alternatives.map(x=>'<button type="button" data-hd-sm-objective="'+hdSMEsc(x.label)+'">'+hdSMEsc(x.name)+'へ切替</button>').join('')+'<button type="button" class="ghost" data-hd-sm-objective="">自動へ戻す</button></div></div>';
+ return '<div class="hd-sm-objective-warning"><div><span>ROUTE ALERT</span><b>'+hdSMEsc(state.current)+'から'+hdSMEsc(state.targetName)+'へ構造図上接続なし</b></div><p>現在地から選択中の攻略目標へつながる経路が構造図上にないよ。実際の分岐条件も確認しつつ、目標を見直してね。</p><div>'+state.alternatives.map(x=>'<button type="button" data-hd-sm-objective="'+hdSMEsc(x.label)+'">'+hdSMEsc(x.name)+'へ切替</button>').join('')+'<button type="button" class="ghost" data-hd-sm-objective="">自動へ戻す</button><button type="button" class="danger" data-hd-sm-retreat-reason="ルート逸れ">ルート逸れで撤退</button></div></div>';
 }
 function hdSMSetObjectiveTarget(target){
  const session=hdSMSession();if(!session||session.status!=='active')return false;
