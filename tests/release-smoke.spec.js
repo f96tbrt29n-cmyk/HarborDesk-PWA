@@ -107,6 +107,113 @@ test('release smoke: personalized home renders operational cards', async ({ page
   expect(errors).toEqual([]);
 });
 
+test('release smoke: game sync fills ship and equipment ledgers from latest snapshots', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdKcParseImport === 'function' &&
+    typeof window.hdKcPreviewData === 'function' &&
+    typeof window.hdKcApplyImport === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-ship-roster-v1');
+    localStorage.removeItem('harbordesk-equipment-v1');
+    localStorage.removeItem('harbordesk-kancolle-equipment-detail-v1');
+    localStorage.removeItem('harbordesk-kancolle-sync-v1');
+
+    const port = ships => ({
+      api_result: 1,
+      api_result_msg: '成功',
+      api_data: {
+        api_ship: ships,
+        api_deck_port: [{ api_id: 1, api_name: '第一艦隊', api_mission: [0,0,0,0], api_ship: ships.map(x => x.api_id) }],
+        api_ndock: [],
+        api_material: []
+      }
+    });
+    const ship = (gameId, masterId, level, slots = []) => ({
+      api_id: gameId,
+      api_ship_id: masterId,
+      api_lv: level,
+      api_nowhp: 13,
+      api_maxhp: 13,
+      api_cond: 49,
+      api_locked: 1,
+      api_sally_area: 0,
+      api_slot: slots,
+      api_slot_ex: 0
+    });
+    const slotPayload = rows => ({ api_result: 1, api_result_msg: '成功', api_data: rows });
+
+    const raw = {
+      format: 'harbordesk-kancolle-import',
+      version: 2,
+      source: 'userscripts',
+      userscriptVersion: '1.0.10',
+      records: [
+        { endpoint: '/kcsapi/api_port/port', payload: port([ship(101, 2, 10, [401])]), at: 1 },
+        { endpoint: '/kcsapi/api_get_member/slot_item', payload: slotPayload([{ api_id: 401, api_slotitem_id: 2, api_level: 0, api_alv: 0 }]), at: 2 },
+        { endpoint: '/kcsapi/api_port/port', payload: port([ship(201, 1, 25, [501]), ship(299, 999999, 7, [])]), at: 3 },
+        { endpoint: '/kcsapi/api_get_member/slot_item', payload: slotPayload([{ api_id: 501, api_slotitem_id: 1, api_level: 2, api_alv: 0 }]), at: 4 }
+      ]
+    };
+
+    const parsed = window.hdKcParseImport(JSON.stringify(raw));
+    const preview = window.hdKcPreviewData(parsed);
+    const sync = window.hdKcApplyImport(preview, {
+      ships: true,
+      equipment: true,
+      resources: false,
+      fleets: false,
+      timers: false,
+      quests: false,
+      sorties: false
+    });
+    const roster = JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1') || '[]');
+    const equipment = JSON.parse(localStorage.getItem('harbordesk-equipment-v1') || '[]');
+    return {
+      parsedShips: parsed.ships.size,
+      parsedEquipment: parsed.slotItems.size,
+      syncShips: sync.ships,
+      syncEquipment: sync.equipment,
+      roster: roster.map(x => ({ gameShipId: x.gameShipId, masterId: x.masterId, name: x.name, level: x.level, gear: x.gear, type: x.type })),
+      equipment: equipment.map(x => ({ masterEquipId: x.masterEquipId, name: x.name, count: x.count, star: x.star })),
+      rosterCountText: document.getElementById('shipRosterCount')?.textContent || '',
+      equipmentCountText: document.getElementById('equipmentLedgerCount')?.textContent || ''
+    };
+  });
+
+  expect(data.parsedShips).toBe(2);
+  expect(data.parsedEquipment).toBe(1);
+  expect(data.syncShips).toBe(2);
+  expect(data.syncEquipment).toBe(1);
+  expect(data.roster).toHaveLength(2);
+  expect(data.roster.find(x => x.gameShipId === 201)).toMatchObject({
+    masterId: 1,
+    name: '睦月',
+    level: 25
+  });
+  expect(data.roster.find(x => x.gameShipId === 201)?.gear).toContain('12cm単装砲 ★2');
+  expect(data.roster.find(x => x.gameShipId === 299)).toMatchObject({
+    masterId: 999999,
+    name: '艦娘ID 999999',
+    type: '未解決',
+    level: 7
+  });
+  expect(data.roster.some(x => x.gameShipId === 101)).toBe(false);
+  expect(data.equipment).toEqual([{
+    masterEquipId: 1,
+    name: '12cm単装砲',
+    count: 1,
+    star: 2
+  }]);
+  expect(data.rosterCountText).toContain('2');
+  expect(data.equipmentCountText).toContain('1');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: complete game sync reports six core areas', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
