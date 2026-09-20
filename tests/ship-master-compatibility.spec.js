@@ -6811,3 +6811,51 @@ test('home shows prioritized attention items and opens full attention list', asy
   expect(data.dialogText).toContain('入渠が完了');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('home shows upcoming expedition and dock timers in finish order', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const now=Date.now();
+    window.hdGetAppState=()=>({
+      expeditions:[
+        {name:'長距離練習航海',endsAt:now+10*60*1000},
+        {name:'東京急行',endsAt:now+70*60*1000}
+      ],
+      docks:[
+        {name:'加賀',endsAt:now+30*60*1000}
+      ],
+      quests:[]
+    });
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+    const rows=[...document.querySelectorAll('.hd-ph-next-list [data-ph-jump]')].map(x=>({
+      id:x.dataset.phJump||'',
+      cls:x.className||'',
+      title:x.querySelector('strong')?.textContent||'',
+      countdown:x.querySelector('[data-ph-countdown]')?.textContent||'',
+      endsAt:Number(x.querySelector('[data-ph-countdown]')?.dataset.endsAt||0)
+    }));
+    const firstCountdown=document.querySelector('.hd-ph-next-list [data-ph-countdown]');
+    if(firstCountdown)firstCountdown.dataset.endsAt=String(Date.now()+60*1000);
+    window.hdPHUpdateCountdowns?.();
+    const refreshed=firstCountdown?.textContent||'';
+    return {
+      rows,
+      refreshed,
+      blockText:document.querySelector('.hd-ph-next-block')?.textContent||''
+    };
+  });
+  expect(data.rows).toHaveLength(3);
+  expect(data.rows[0].id).toBe('expeditions');
+  expect(data.rows[0].title).toContain('長距離練習航海');
+  expect(data.rows[0].cls).toContain('next');
+  expect(data.rows[0].countdown).toContain('10分');
+  expect(data.rows[1].id).toBe('docks');
+  expect(data.rows[1].title).toContain('加賀');
+  expect(data.rows[2].title).toContain('東京急行');
+  expect(data.refreshed).toBe('あと1分');
+  expect(data.blockText).toContain('次の予定');
+  expect(data.blockText).toContain('3件表示');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
