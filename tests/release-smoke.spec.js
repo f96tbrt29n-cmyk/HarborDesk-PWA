@@ -1317,17 +1317,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=336',
-      'map-images.js?v=336',
-      'map-tabs.js?v=336',
-      'map-interactive.js?v=336',
-      'map-advanced-data.js?v=336'
+      'map-details.js?v=337',
+      'map-images.js?v=337',
+      'map-tabs.js?v=337',
+      'map-interactive.js?v=337',
+      'map-advanced-data.js?v=337'
     ];
     const requiredStyles = [
-      'map-details.css?v=336',
-      'map-tabs.css?v=336',
-      'map-images.css?v=336',
-      'map-interactive.css?v=336'
+      'map-details.css?v=337',
+      'map-tabs.css?v=337',
+      'map-images.css?v=337',
+      'map-interactive.css?v=337'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -1369,6 +1369,34 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=336');
+  expect(src).toBe('app.js?v=337');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: fallback map renderer still exposes攻略 tools when map tabs fail', async ({ page }) => {
+  const errors = [];
+  await page.route('**/map-tabs.js*', route => route.abort());
+  await boot(page, errors);
+
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await expect(page.locator('#guide')).toBeVisible();
+
+  await page.locator('[data-world="2"]').click();
+  await page.locator('[data-map="2-4"]').click();
+
+  const card = page.locator('#selectedMapCard');
+  await expect(card).toContainText('2-4');
+  await expect(card).toContainText('推奨練度');
+
+  const fallback = card.locator('[data-hd-core-map-tools]');
+  await expect(fallback).toBeVisible();
+  for (const action of ['map','fleet','suggest','prep','gear','drop','mine']) {
+    await expect(fallback.locator(`[data-hd-core-map-action="${action}"]`)).toBeVisible();
+  }
+
+  await fallback.locator('[data-hd-core-map-action="prep"]').click();
+  await expect(page.locator('#hdSortiePreparation')).toBeVisible({ timeout: 5000 });
+
   expect(errors).toEqual([]);
 });
