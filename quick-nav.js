@@ -24,6 +24,13 @@ function hdQNRecordUsage(id){
  hdQNSaveUsage(Object.fromEntries(entries));
  return !duplicate;
 }
+function hdQNClearUsage(){
+ try{localStorage.removeItem(HD_QN_USAGE_KEY)}catch{}
+ hdQNUsageLastId='';hdQNUsageLastAt=0;
+ window.dispatchEvent(new CustomEvent('hd:quick-nav-updated'));
+ return true;
+}
+
 function hdQNLoadHistory(){try{return JSON.parse(sessionStorage.getItem(HD_QN_HISTORY_KEY)||'[]')||[]}catch{return []}}
 function hdQNSaveHistory(v){try{sessionStorage.setItem(HD_QN_HISTORY_KEY,JSON.stringify(v.slice(-20)))}catch{}}
 function hdQNRecordHistory(id){if(hdQNHistoryLock||!id)return;const rows=hdQNLoadHistory();if(rows[rows.length-1]===id)return;rows.push(id);hdQNSaveHistory(rows)}
