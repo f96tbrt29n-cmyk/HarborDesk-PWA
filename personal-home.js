@@ -142,7 +142,6 @@ function hdPHOpenDb(){return new Promise((resolve,reject)=>{if(!('indexedDB' in 
 async function hdPHProbeSnapshotStore(){
  const id=`__hd-safety-probe-${Date.now()}-${Math.random().toString(16).slice(2)}`,row={id,at:Date.now(),reason:'診断プローブ',payload:{},bytes:0,probe:true};
  let db=null;
- const txDone=(mode,fn)=>new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,mode),store=tx.objectStore(HD_PH_STORE);try{fn(store,resolve,reject)}catch(err){reject(err);return}tx.onerror=()=>reject(tx.error||new Error('IndexedDB transaction failed'))});
  try{
   db=await hdPHOpenDb();
   await new Promise((resolve,reject)=>{const tx=db.transaction(HD_PH_STORE,'readwrite');tx.objectStore(HD_PH_STORE).put(row);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('probe write failed'))});
