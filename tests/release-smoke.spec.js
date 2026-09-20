@@ -398,3 +398,60 @@ test('release smoke: backup can be shared as a JSON file on supported devices', 
   expect(data.homeButton).toBe(true);
   expect(errors).toEqual([]);
 });
+
+test('release smoke: backup falls back to JSON export when sharing is unavailable', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    localStorage.removeItem('harbordesk-last-external-backup-v1');
+    window.__hdFallbackExports = 0;
+    try {
+      Object.defineProperty(navigator, 'share', { configurable: true, value: undefined });
+      Object.defineProperty(navigator, 'canShare', { configurable: true, value: undefined });
+    } catch {}
+    window.exportBackup = () => { window.__hdFallbackExports += 1; return true; };
+
+    const result = await window.shareBackup?.();
+    return {
+      result,
+      exports: window.__hdFallbackExports,
+      marked: Number(localStorage.getItem('harbordesk-last-external-backup-v1') || 0)
+    };
+  });
+
+  expect(data.result).toBe(true);
+  expect(data.exports).toBe(1);
+  expect(data.marked).toBeGreaterThan(0);
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: cancelling share sheet does not trigger fallback download', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    localStorage.removeItem('harbordesk-last-external-backup-v1');
+    window.__hdFallbackExports = 0;
+    try {
+      Object.defineProperty(navigator, 'canShare', { configurable: true, value: () => true });
+      Object.defineProperty(navigator, 'share', { configurable: true, value: async () => {
+        throw new DOMException('cancelled', 'AbortError');
+      }});
+    } catch {}
+    window.exportBackup = () => { window.__hdFallbackExports += 1; return true; };
+
+    const result = await window.shareBackup?.();
+    return {
+      result,
+      exports: window.__hdFallbackExports,
+      marked: localStorage.getItem('harbordesk-last-external-backup-v1')
+    };
+  });
+
+  expect(data.result).toBe(false);
+  expect(data.exports).toBe(0);
+  expect(data.marked).toBeNull();
+  expect(errors).toEqual([]);
+});
+
