@@ -173,6 +173,34 @@ window.hdToastAction=hdToastAction;
 function fmt(ms){if(ms<=0)return '完了';const sec=Math.ceil(ms/1000),h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return h>0?`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${m}:${String(s).padStart(2,'0')}`}
 function wikiMapUrl(map){const world=map.split('-')[0];return `https://wikiwiki.jp/kancolle/${encodeURIComponent(WORLD_NAMES[world])}/${map}`}
 
+function hdCoreMapToolsHtml(){
+ return `<section class="hd-core-map-tools" data-hd-core-map-tools>
+  <div class="hd-core-map-tools-head"><div><span class="eyebrow">攻略ツール</span><strong>この海域で使える機能</strong></div><small>必ず表示される基本入口</small></div>
+  <div class="hd-core-map-tools-grid">
+   <button type="button" data-hd-core-map-action="map">マップ詳細</button>
+   <button type="button" data-hd-core-map-action="fleet">編成</button>
+   <button type="button" data-hd-core-map-action="suggest">編成候補</button>
+   <button type="button" data-hd-core-map-action="prep">出撃準備</button>
+   <button type="button" data-hd-core-map-action="gear">装備・計算</button>
+   <button type="button" data-hd-core-map-action="drop">ドロップ</button>
+   <button type="button" data-hd-core-map-action="mine">自分用</button>
+  </div>
+ </section>`;
+}
+function hdCoreMapAction(action){
+ if(!action)return false;
+ if(typeof window.hdMapOpenTool==='function'&&window.hdMapOpenTool(action))return true;
+ if(action==='suggest'&&typeof window.hdFSOpen==='function'){window.hdFSOpen();return true}
+ if(action==='prep'&&typeof window.hdSPSOpen==='function'){window.hdSPSOpen();return true}
+ const tab=document.querySelector(`[data-map-tab="${action}"]`);
+ if(tab){tab.click();return true}
+ const targets={map:'selectedMapCard',fleet:'selectedMapCard',gear:'fleetCalculator',drop:'dropHunting',mine:'customFleets'};
+ const id=targets[action],el=id&&document.getElementById(id);
+ if(el){el.scrollIntoView({behavior:'smooth',block:'start'});return true}
+ return false;
+}
+window.hdCoreMapAction=hdCoreMapAction;
+
 function renderMapPicker(){
  document.getElementById('worldPicker').innerHTML=Object.keys(MAPS).map(w=>`<button class="world-chip ${selectedWorld===w?'active':''}" data-world="${w}">${w}海域</button>`).join('');
  document.getElementById('mapPicker').innerHTML=MAPS[selectedWorld].map(m=>`<button class="map-button ${selectedMap===m?'active':''}" data-map="${m}">${m}</button>`).join('');
@@ -183,7 +211,7 @@ function renderMapPicker(){
   card.innerHTML=`<article class="guide-card selected"><div class="guide-card-top"><div><span class="guide-tag">${WORLD_NAMES[selectedWorld]}</span><h3>${selectedMap} 攻略</h3><div class="muted">攻略データ拡充中</div></div></div><p>${selectedMap} の詳細攻略データは順次追加中。現在は元Wikiからルート・敵編成・制空・ドロップを確認できるよ。</p><a class="guide-link" href="${wikiMapUrl(selectedMap)}" target="_blank" rel="noopener">${selectedMap} の攻略Wikiを見る ↗</a></article>`;
   return;
  }
- card.innerHTML=`<article class="map-detail-card"><div class="map-detail-title"><div><span class="guide-tag">${WORLD_NAMES[selectedWorld]}</span><h3>${selectedMap} ${esc(d.name)}</h3><div class="muted">${esc(d.sourceDate)}</div></div></div><div class="map-detail-section"><strong>概要</strong><p>${esc(d.overview)}</p></div><div class="map-detail-grid"><div class="map-detail-section"><strong>おすすめ編成</strong><p>${esc(d.formation)}</p></div><div class="map-detail-section"><strong>主なルート</strong><p>${esc(d.route)}</p></div><div class="map-detail-section"><strong>制空・航空</strong><p>${esc(d.air)}</p></div><div class="map-detail-section warn"><strong>注意点</strong><p>${esc(d.caution)}</p></div></div><div class="map-detail-actions"><a class="guide-link" href="${wikiMapUrl(selectedMap)}" target="_blank" rel="noopener">最新の攻略Wikiを確認 ↗</a></div></article>`;
+ card.innerHTML=`<article class="map-detail-card"><div class="map-detail-title"><div><span class="guide-tag">${WORLD_NAMES[selectedWorld]}</span><h3>${selectedMap} ${esc(d.name)}</h3><div class="muted">${esc(d.sourceDate)}</div></div></div><div class="map-detail-section"><strong>概要</strong><p>${esc(d.overview)}</p></div>${hdCoreMapToolsHtml()}<div class="map-detail-grid"><div class="map-detail-section"><strong>おすすめ編成</strong><p>${esc(d.formation)}</p></div><div class="map-detail-section"><strong>主なルート</strong><p>${esc(d.route)}</p></div><div class="map-detail-section"><strong>制空・航空</strong><p>${esc(d.air)}</p></div><div class="map-detail-section warn"><strong>注意点</strong><p>${esc(d.caution)}</p></div></div><div class="map-detail-actions"><a class="guide-link" href="${wikiMapUrl(selectedMap)}" target="_blank" rel="noopener">最新の攻略Wikiを確認 ↗</a></div></article>`;
 }
 
 function renderGuide(){
@@ -205,6 +233,7 @@ document.addEventListener('click',e=>{
 
  const world=e.target.closest('[data-world]');if(world){selectedWorld=world.dataset.world;selectedMap='';guideViewSave({world:selectedWorld,map:''});renderGuide();return}
  const map=e.target.closest('[data-map]');if(map){selectedMap=map.dataset.map;selectedWorld=selectedMap.split('-')[0];guideViewSave({world:selectedWorld,map:selectedMap});renderGuide();document.getElementById('selectedMapCard').scrollIntoView({behavior:'smooth',block:'center'});return}
+ const coreMapAction=e.target.closest('[data-hd-core-map-action]');if(coreMapAction){hdCoreMapAction(coreMapAction.dataset.hdCoreMapAction);return}
  const clearGuideQuery=e.target.closest('[data-guide-clear-query]');if(clearGuideQuery){const input=document.getElementById('guideQuery');if(input)input.value='';guideViewSave({query:''});renderGuide();input?.focus();return}
  if(e.target.closest('[data-guide-show-all]')){guideFilter='all';guideViewSave({filter:'all'});renderGuide();return}
  const gf=e.target.closest('[data-guide-filter]');if(gf){guideFilter=gf.dataset.guideFilter;guideViewSave({filter:guideFilter});renderGuide();return}
