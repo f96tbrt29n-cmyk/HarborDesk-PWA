@@ -79,3 +79,8 @@
 .hd-sm-hud-main{min-width:0;display:grid;gap:2px}.hd-sm-hud-main>span{font-size:8px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hd-sm-hud-main>span b{color:var(--text)}.hd-sm-hud-main>strong{font-size:9px;color:#f0cf7d}.hd-sm-hud.ready .hd-sm-hud-main>strong{color:#9ce0ba}.hd-sm-hud.stop .hd-sm-hud-main>strong{color:#f0aaaa}
 .hd-sm-hud>button{min-height:34px;padding-inline:9px;white-space:nowrap}
 @media(max-width:360px){.hd-sm-hud{grid-template-columns:auto minmax(0,1fr)}.hd-sm-hud>button{grid-column:1/-1;width:100%;min-height:32px}}
+
+.hd-sm-result-quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-bottom:9px}
+.hd-sm-result-quick button{min-height:34px;padding:5px 4px;border:1px solid var(--line);border-radius:9px;background:#0d2234;color:var(--text);font:inherit;font-size:8px;font-weight:800}
+.hd-sm-result-quick button[data-hd-sm-quick-result="S"]{border-color:rgba(74,168,121,.4)}.hd-sm-result-quick button[data-hd-sm-quick-result="撤退"]{border-color:rgba(239,106,106,.38);color:#f0aaaa}.hd-sm-result-quick button[data-hd-sm-quick-boss]{border-color:rgba(213,166,60,.38);color:#f0cf7d}
+@media(max-width:360px){.hd-sm-result-quick{grid-template-columns:repeat(2,minmax(0,1fr))}}

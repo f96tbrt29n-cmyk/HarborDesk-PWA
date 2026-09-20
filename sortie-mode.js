@@ -146,6 +146,26 @@ function hdSMHudJump(target){
  const selector=target==='next'?'.hd-sm-next-wrap':'.hd-sm-advance-guard',el=document.querySelector('#hdSortieMode '+selector);
  if(!el)return false;try{el.scrollIntoView({behavior:'smooth',block:'center'})}catch{el.scrollIntoView()}return true;
 }
+function hdSMBattleCount(map,route){
+ const graph=hdSMGraph(map),nodes=Array.isArray(route)?route.map(String).filter(Boolean):[];
+ if(!graph)return nodes.length;
+ const battleKinds=new Set(['normal','boss','sub','air','night']);
+ return nodes.reduce((n,label)=>n+(battleKinds.has(hdSMNodeKind(graph,label))?1:0),0);
+}
+function hdSMQuickResult(result){
+ const el=document.getElementById('hdSMResult');if(!el)return false;el.value=String(result||'S');
+ if(el.value==='撤退'){const boss=document.getElementById('hdSMBoss');if(boss)boss.checked=false}
+ hdSMSaveDraft();return true;
+}
+function hdSMQuickBoss(){
+ const el=document.getElementById('hdSMBoss');if(!el)return false;el.checked=!el.checked;hdSMSaveDraft();hdSMRender();return true;
+}
+function hdSMQuickDropNone(){
+ const el=document.getElementById('hdSMDrop');if(!el)return false;el.value='なし';hdSMSaveDraft();return true;
+}
+function hdSMQuickBucket(delta=1){
+ const el=document.getElementById('hdSMBuckets');if(!el)return false;el.value=String(Math.max(0,(Number(el.value)||0)+Number(delta||0)));hdSMSaveDraft();return true;
+}
 function hdSMElapsed(ms){
  const total=Math.max(0,Math.floor((Number(ms)||0)/1000)),s=total%60,m=Math.floor(total/60)%60,h=Math.floor(total/3600);
  return h?h+'時間'+String(m).padStart(2,'0')+'分':m+'分'+String(s).padStart(2,'0')+'秒';
@@ -198,7 +218,7 @@ function hdSMActiveHtml(session){
  hdSMNodePickerHtml(session,draft)+
  '<div class="hd-sm-panel"><div class="hd-sm-panel-head"><strong>開始時の艦隊</strong><span>出撃中にプリセットを変えてもここは固定</span></div>'+hdSMFleetHtml(session)+'</div>'+
  '<div class="hd-sm-panel"><div class="hd-sm-panel-head"><strong>出撃中ショートカット</strong><span>必要な情報だけすぐ開く</span></div><div class="hd-sm-shortcuts"><button type="button" data-hd-sm-action="map">マップ</button><button type="button" data-hd-sm-action="overview">攻略概要</button><button type="button" data-hd-sm-action="gear">装備</button><button type="button" data-hd-sm-action="prep">準備表</button><button type="button" data-hd-sm-action="log">出撃ログ</button></div></div>'+
- '<div class="hd-sm-panel hd-sm-return"><div class="hd-sm-panel-head"><strong>帰還結果</strong><span data-hd-sm-draft-status>'+hdSMEsc(draftStatus)+'</span></div><div class="hd-sm-form"><label>結果<select id="hdSMResult">'+hdSMResultOptions(draft.result)+'</select></label><label>到達マス<input id="hdSMNode" value="'+hdSMEsc(draft.node)+'" placeholder="例 ボス / P"></label><label>戦闘数<input id="hdSMBattles" type="number" min="0" max="20" value="'+draft.battles+'"></label><label class="check"><input id="hdSMBoss" type="checkbox"'+(draft.boss?' checked':'')+'>ボス到達</label><label>ドロップ<input id="hdSMDrop" value="'+hdSMEsc(draft.drop)+'" placeholder="艦名など"></label><label>バケツ<input id="hdSMBuckets" type="number" min="0" value="'+draft.buckets+'"></label><label class="wide">メモ<input id="hdSMMemo" value="'+hdSMEsc(draft.memo)+'" placeholder="撤退原因、装備変更など"></label></div><details class="hd-sm-cost"'+((draft.fuel||draft.ammo||draft.steel||draft.bauxite)?' open':'')+'><summary>資源消費も記録</summary><div><label>燃料<input id="hdSMFuel" type="number" min="0" value="'+draft.fuel+'"></label><label>弾薬<input id="hdSMAmmo" type="number" min="0" value="'+draft.ammo+'"></label><label>鋼材<input id="hdSMSteel" type="number" min="0" value="'+draft.steel+'"></label><label>ボーキ<input id="hdSMBauxite" type="number" min="0" value="'+draft.bauxite+'"></label></div></details><div class="hd-sm-finish-actions"><button type="button" class="primary" data-hd-sm-finish>帰還結果を記録</button><button type="button" class="ghost" data-hd-sm-cancel>セッションを破棄</button></div></div><p class="hd-sm-note">入力内容はこの出撃セッションへ自動保存。iPhoneで画面を離れたり再読み込みされても、同じセッションなら続きから入力できるよ。</p></div>';
+ '<div class="hd-sm-panel hd-sm-return"><div class="hd-sm-panel-head"><strong>帰還結果</strong><span data-hd-sm-draft-status>'+hdSMEsc(draftStatus)+'</span></div><div class="hd-sm-result-quick"><button type="button" data-hd-sm-quick-result="S">S勝利</button><button type="button" data-hd-sm-quick-result="A">A勝利</button><button type="button" data-hd-sm-quick-result="B">B勝利</button><button type="button" data-hd-sm-quick-result="撤退">撤退</button><button type="button" data-hd-sm-quick-boss>ボス到達</button><button type="button" data-hd-sm-quick-drop-none>ドロップなし</button><button type="button" data-hd-sm-quick-bucket="+1">バケツ +1</button></div><div class="hd-sm-form"><label>結果<select id="hdSMResult">'+hdSMResultOptions(draft.result)+'</select></label><label>到達マス<input id="hdSMNode" value="'+hdSMEsc(draft.node)+'" placeholder="例 ボス / P"></label><label>戦闘数<input id="hdSMBattles" type="number" min="0" max="20" value="'+draft.battles+'"></label><label class="check"><input id="hdSMBoss" type="checkbox"'+(draft.boss?' checked':'')+'>ボス到達</label><label>ドロップ<input id="hdSMDrop" value="'+hdSMEsc(draft.drop)+'" placeholder="艦名など"></label><label>バケツ<input id="hdSMBuckets" type="number" min="0" value="'+draft.buckets+'"></label><label class="wide">メモ<input id="hdSMMemo" value="'+hdSMEsc(draft.memo)+'" placeholder="撤退原因、装備変更など"></label></div><details class="hd-sm-cost"'+((draft.fuel||draft.ammo||draft.steel||draft.bauxite)?' open':'')+'><summary>資源消費も記録</summary><div><label>燃料<input id="hdSMFuel" type="number" min="0" value="'+draft.fuel+'"></label><label>弾薬<input id="hdSMAmmo" type="number" min="0" value="'+draft.ammo+'"></label><label>鋼材<input id="hdSMSteel" type="number" min="0" value="'+draft.steel+'"></label><label>ボーキ<input id="hdSMBauxite" type="number" min="0" value="'+draft.bauxite+'"></label></div></details><div class="hd-sm-finish-actions"><button type="button" class="primary" data-hd-sm-finish>帰還結果を記録</button><button type="button" class="ghost" data-hd-sm-cancel>セッションを破棄</button></div></div><p class="hd-sm-note">入力内容はこの出撃セッションへ自動保存。戦闘数は通過した戦闘マスから自動更新するよ。</p></div>';
 }
 function hdSMEnsure(){
  let sec=document.getElementById('hdSortieMode');if(sec)return sec;
@@ -244,7 +264,7 @@ function hdSMSetNode(label){
  if(input)input.value=label;if(boss)boss.checked=!!(graph&&graph.boss===label);
  const route=Array.isArray(prev.routeNodes)?prev.routeNodes.map(String).filter(Boolean).slice(-39):[];
  if(route[route.length-1]!==label)route.push(label);
- session.draft={...prev,...hdSMFormData(),node:label,boss:!!(graph&&graph.boss===label),routeNodes:route,advanceGuard:null,updatedAt:Date.now()};
+ session.draft={...prev,...hdSMFormData(),node:label,boss:!!(graph&&graph.boss===label),battles:hdSMBattleCount(session.map,route),routeNodes:route,advanceGuard:null,updatedAt:Date.now()};
  try{if(typeof window.hdSSSave==='function')window.hdSSSave(session);else localStorage.setItem(HD_SM_SESSION_KEY,JSON.stringify(session))}catch{return false}
  try{window.dispatchEvent(new CustomEvent('hd:sortie-draft-saved',{detail:{sessionId:session.id,draft:session.draft}}))}catch{}
  hdSMRender();return true;
@@ -253,7 +273,7 @@ function hdSMUndoNode(){
  const session=hdSMSession();if(!session||session.status!=='active')return false;
  const prev=session.draft&&typeof session.draft==='object'?session.draft:{},route=Array.isArray(prev.routeNodes)?prev.routeNodes.map(String).filter(Boolean):[];
  if(!route.length)return false;route.pop();const node=route[route.length-1]||'',graph=hdSMGraph(session.map);
- session.draft={...prev,node,boss:!!(node&&graph&&graph.boss===node),routeNodes:route.slice(-40),advanceGuard:null,updatedAt:Date.now()};
+ session.draft={...prev,node,boss:!!(node&&graph&&graph.boss===node),battles:hdSMBattleCount(session.map,route),routeNodes:route.slice(-40),advanceGuard:null,updatedAt:Date.now()};
  try{if(typeof window.hdSSSave==='function')window.hdSSSave(session);else localStorage.setItem(HD_SM_SESSION_KEY,JSON.stringify(session))}catch{return false}
  try{window.dispatchEvent(new CustomEvent('hd:sortie-draft-saved',{detail:{sessionId:session.id,draft:session.draft}}))}catch{}
  hdSMRender();return true;
@@ -287,6 +307,10 @@ document.addEventListener('click',function(e){
  if(e.target.closest?.('[data-hd-sm-safe-confirm]')){hdSMSetAdvanceGuard(true);return}
  if(e.target.closest?.('[data-hd-sm-damage-retreat]')){hdSMSetAdvanceGuard(false);return}
  const hudJump=e.target.closest?.('[data-hd-sm-hud-jump]');if(hudJump){hdSMHudJump(hudJump.dataset.hdSmHudJump);return}
+ const quickResult=e.target.closest?.('[data-hd-sm-quick-result]');if(quickResult){hdSMQuickResult(quickResult.dataset.hdSmQuickResult);return}
+ if(e.target.closest?.('[data-hd-sm-quick-boss]')){hdSMQuickBoss();return}
+ if(e.target.closest?.('[data-hd-sm-quick-drop-none]')){hdSMQuickDropNone();return}
+ const quickBucket=e.target.closest?.('[data-hd-sm-quick-bucket]');if(quickBucket){hdSMQuickBucket(Number(quickBucket.dataset.hdSmQuickBucket)||1);return}
  if(e.target.closest?.('[data-hd-sm-start]')){const session=typeof window.hdSSStart==='function'?window.hdSSStart(hdSMMap()):null;if(session){hdSMRender();hdSMOpen()}else window.hdToast?.('出撃編成を選んでから開始してね','warn',1800);return}
  if(e.target.closest?.('[data-hd-sm-prep]')){hdSMAction('prep');return}
  if(e.target.closest?.('[data-hd-sm-guide]')){if(typeof window.hdWSShowElement==='function')window.hdWSShowElement('guide',true);return}
@@ -319,6 +343,11 @@ window.hdSMAdvanceGuard=hdSMAdvanceGuard;
 window.hdSMSetAdvanceGuard=hdSMSetAdvanceGuard;
 window.hdSMHudHtml=hdSMHudHtml;
 window.hdSMHudJump=hdSMHudJump;
+window.hdSMBattleCount=hdSMBattleCount;
+window.hdSMQuickResult=hdSMQuickResult;
+window.hdSMQuickBoss=hdSMQuickBoss;
+window.hdSMQuickDropNone=hdSMQuickDropNone;
+window.hdSMQuickBucket=hdSMQuickBucket;
 window.hdSMSetNode=hdSMSetNode;
 window.hdSMUndoNode=hdSMUndoNode;
 window.hdSMSaveDraft=hdSMSaveDraft;

@@ -2345,3 +2345,59 @@ test('release smoke: sortie mode keeps current battle status visible in sticky h
   await expect(page.locator('[data-hd-sm-hud-jump="next"]')).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie mode auto-counts battles and supports quick return entry', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMBattleCount === 'function' &&
+    typeof window.hdSMQuickResult === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-quick-return-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-quick-return-fleet',
+      fleetName:'帰還クイック入力テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-quick-return-fleet',name:'帰還クイック入力テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active'
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  await page.locator('[data-hd-sm-next-node="A"]').click();
+  await expect(page.locator('#hdSMBattles')).toHaveValue('1');
+  await page.locator('[data-hd-sm-safe-confirm]').click();
+  await page.locator('[data-hd-sm-next-node="D"]').click();
+  await expect(page.locator('#hdSMBattles')).toHaveValue('2');
+
+  await page.locator('[data-hd-sm-quick-result="A"]').click();
+  await expect(page.locator('#hdSMResult')).toHaveValue('A');
+  await page.locator('[data-hd-sm-quick-boss]').click();
+  await expect(page.locator('#hdSMBoss')).toBeChecked();
+  await page.locator('[data-hd-sm-quick-drop-none]').click();
+  await expect(page.locator('#hdSMDrop')).toHaveValue('なし');
+  await page.locator('[data-hd-sm-quick-bucket]').click();
+  await expect(page.locator('#hdSMBuckets')).toHaveValue('1');
+
+  const data = await page.evaluate(() => ({
+    count: window.hdSMBattleCount('2-4',['A','D']),
+    draft: JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft
+  }));
+  expect(data.count).toBe(2);
+  expect(data.draft.result).toBe('A');
+  expect(data.draft.boss).toBe(true);
+  expect(data.draft.drop).toBe('なし');
+  expect(data.draft.buckets).toBe(1);
+  expect(errors).toEqual([]);
+});
