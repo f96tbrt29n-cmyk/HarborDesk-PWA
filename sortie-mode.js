@@ -145,6 +145,22 @@ function hdSMObjectiveShortestPath(map,target){
  }
  return [];
 }
+function hdSMObjectiveRemainingPath(map,current,target){
+ const graph=hdSMGraph(map),from=String(current||'').trim(),targets=hdSMObjectiveTargets(map,target);
+ if(!graph||!Array.isArray(graph.edges)||!from||!targets.length)return [];
+ if(targets.includes(from))return [from];
+ const q=[{node:from,path:[from]}],seen=new Set([from]);
+ while(q.length){
+  const row=q.shift();
+  for(const [a,b] of graph.edges){
+   if(a!==row.node||seen.has(b))continue;
+   const path=[...row.path,b];
+   if(targets.includes(b))return path;
+   seen.add(b);q.push({node:b,path});
+  }
+ }
+ return [];
+}
 function hdSMObjectivePrefs(){
  try{const x=JSON.parse(localStorage.getItem(HD_SM_OBJECTIVE_PREF_KEY)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch{return {}}
 }
@@ -338,13 +354,14 @@ function hdSMHudHtml(session,draft){
  const current=String(draft?.node||'').trim();if(!current)return '';
  const graph=hdSMGraph(session?.map),rawKind=hdSMNodeKind(graph,current),intel=hdSMNodeIntel(session?.map,{label:current,kind:rawKind}),kind=intel.kind,guard=hdSMAdvanceGuard(session,draft),branch=hdSMBranchHint(session?.map,draft);
  const state=guard.retreat?'stop':guard.confirmed?'ready':'warn',status=guard.retreat?'撤退':guard.skipped?'非戦闘':guard.confirmed?'大破確認済':'大破未確認',jump=guard.confirmed?'next':'guard';
- const objectiveTarget=hdSMSelectedObjective(session?.map,draft),objectiveRoute=hdSMObjectiveRouteState(session?.map,draft),next=guard.confirmed&&!guard.retreat?hdSMNextNodeRows(session?.map,draft):[],battleCount=hdSMBattleCount(session?.map,draft?.routeNodes||[]),bossDistance=hdSMBossDistance(session?.map,current,objectiveTarget),bossBattles=hdSMBossBattleDistance(session?.map,current,objectiveTarget);
+ const objectiveTarget=hdSMSelectedObjective(session?.map,draft),objectiveRoute=hdSMObjectiveRouteState(session?.map,draft),remainingPath=hdSMObjectiveRemainingPath(session?.map,current,objectiveTarget),next=guard.confirmed&&!guard.retreat?hdSMNextNodeRows(session?.map,draft):[],battleCount=hdSMBattleCount(session?.map,draft?.routeNodes||[]),bossDistance=hdSMBossDistance(session?.map,current,objectiveTarget),bossBattles=hdSMBossBattleDistance(session?.map,current,objectiveTarget);
  const nextHtml=next.length?'<div class="hd-sm-hud-next"><span>NEXT</span><div>'+next.slice(0,3).map(x=>{const ni=hdSMNodeIntel(session?.map,x),reachable=hdSMCanReachBoss(session?.map,x.label,objectiveTarget),targetName=hdSMRouteTargetName(session?.map,objectiveTarget);return '<button type="button" class="'+(reachable===false?'route-off':reachable===true?'route-on':'')+'" data-hd-sm-hud-node="'+hdSMEsc(x.label)+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(ni.kind))+'・'+hdSMEsc(ni.formation)+'</small><em>'+(reachable===true?targetName+'接続':reachable===false?'逸れ候補':'経路不明')+'</em></button>'}).join('')+'</div>'+(next.length>3?'<em>+'+(next.length-3)+'</em>':'')+'</div>':'';
  const branchHtml=current&&branch?'<div class="hd-sm-hud-branch"><span>ROUTE</span><b>'+hdSMEsc(branch.title)+'</b><small>'+hdSMEsc(branch.text)+'</small></div>':'';
  const targetName=hdSMRouteTargetName(session?.map,objectiveTarget);
  const progressHtml='<div class="hd-sm-hud-progress"><span>戦闘 <b>'+battleCount+'</b></span><span>'+(bossDistance===0?targetName+'到達':bossDistance==null?targetName+'距離 —':'構造図最短 '+targetName+'まで <b>'+bossDistance+'マス</b>')+'</span><span>'+(bossBattles==null?'最少戦闘 —':bossBattles===0?'最少戦闘あと 0':'最少戦闘あと <b>'+bossBattles+'</b>')+'</span></div>';
+ const routePathHtml=!objectiveRoute.active&&remainingPath.length>1?'<div class="hd-sm-hud-path"><span>PATH</span><b>構造図最短</b><small>'+remainingPath.map(hdSMEsc).join(' → ')+'</small></div>':'';
  const objectiveAlertHtml=objectiveRoute.active?'<div class="hd-sm-hud-objective-alert"><span>ROUTE ALERT</span><b>'+hdSMEsc(objectiveRoute.targetName)+'へ接続なし</b><button type="button" class="ghost small" data-hd-sm-hud-jump="objective">見直す</button></div>':'';
- return '<div class="hd-sm-hud '+state+'"><div class="hd-sm-hud-node"><span>NOW</span><b>'+hdSMEsc(current)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(kind))+'</small></div><div class="hd-sm-hud-main"><span>基本陣形 <b>'+hdSMEsc(intel.formation)+'</b></span><strong>'+hdSMEsc(status)+'</strong></div><button type="button" class="ghost small" data-hd-sm-hud-jump="'+jump+'">'+(guard.confirmed?'詳細':'確認する')+'</button>'+progressHtml+objectiveAlertHtml+branchHtml+nextHtml+'</div>';
+ return '<div class="hd-sm-hud '+state+'"><div class="hd-sm-hud-node"><span>NOW</span><b>'+hdSMEsc(current)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(kind))+'</small></div><div class="hd-sm-hud-main"><span>基本陣形 <b>'+hdSMEsc(intel.formation)+'</b></span><strong>'+hdSMEsc(status)+'</strong></div><button type="button" class="ghost small" data-hd-sm-hud-jump="'+jump+'">'+(guard.confirmed?'詳細':'確認する')+'</button>'+progressHtml+routePathHtml+objectiveAlertHtml+branchHtml+nextHtml+'</div>';
 }
 function hdSMHudJump(target){
  const selector=target==='next'?'.hd-sm-next-wrap':target==='objective'?'.hd-sm-objective-warning':'.hd-sm-advance-guard',el=document.querySelector('#hdSortieMode '+selector);
@@ -571,6 +588,7 @@ window.hdSMSaveObjectivePreference=hdSMSaveObjectivePreference;
 window.hdSMSetObjectivePreference=hdSMSetObjectivePreference;
 window.hdSMObjectiveStartStats=hdSMObjectiveStartStats;
 window.hdSMObjectiveShortestPath=hdSMObjectiveShortestPath;
+window.hdSMObjectiveRemainingPath=hdSMObjectiveRemainingPath;
 window.hdSMObjectiveStatText=hdSMObjectiveStatText;
 window.hdSMObjectivePrestartHtml=hdSMObjectivePrestartHtml;
 window.hdSMPrestartRoutePreviewHtml=hdSMPrestartRoutePreviewHtml;
