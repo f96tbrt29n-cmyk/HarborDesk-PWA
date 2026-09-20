@@ -6906,3 +6906,82 @@ test('home resource summary combines saved resources and synced buckets', async 
   expect(data.age).toContain('分前');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('home fleet summary shows synced fleets and expedition state', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const now=Date.now();
+    localStorage.setItem('harbordesk-kancolle-fleets-v1',JSON.stringify([
+      {
+        deckId:1,
+        name:'第一艦隊',
+        mission:[0,0,0,0],
+        ships:[
+          {name:'赤城',level:99},
+          {name:'加賀',level:98}
+        ],
+        syncedAt:now
+      },
+      {
+        deckId:2,
+        name:'第二艦隊',
+        mission:[1,5,now+60*60*1000,0],
+        ships:[
+          {name:'長門',level:90},
+          {name:'陸奥',level:88},
+          {name:'金剛',level:85}
+        ],
+        syncedAt:now
+      }
+    ]));
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+    const summary=window.hdPHFleetSummary?.()||[];
+    const cards=[...document.querySelectorAll('.hd-ph-fleet-grid [data-ph-fleets]')].map(x=>({
+      cls:x.className||'',
+      text:x.textContent||''
+    }));
+    const opened=window.hdPHOpenGameFleets?.();
+    await new Promise(r=>setTimeout(r,30));
+    return {
+      summary:summary.map(x=>({
+        deckId:x.deckId,
+        flagship:x.flagship,
+        level:x.flagshipLevel,
+        shipCount:x.shipCount,
+        status:x.status,
+        onMission:x.onMission,
+        detail:x.detail
+      })),
+      cards,
+      opened:!!opened,
+      importExists:!!document.getElementById('kancolleImport'),
+      currentFleetHost:!!document.getElementById('hdKcCurrentFleets')
+    };
+  });
+  expect(data.summary).toHaveLength(2);
+  expect(data.summary[0]).toMatchObject({
+    deckId:1,
+    flagship:'赤城',
+    level:99,
+    shipCount:2,
+    status:'待機',
+    onMission:false
+  });
+  expect(data.summary[1].deckId).toBe(2);
+  expect(data.summary[1].flagship).toBe('長門');
+  expect(data.summary[1].shipCount).toBe(3);
+  expect(data.summary[1].status).toBe('遠征中');
+  expect(data.summary[1].onMission).toBe(true);
+  expect(data.summary[1].detail).toContain('あと');
+  expect(data.cards).toHaveLength(2);
+  expect(data.cards[0].text).toContain('赤城');
+  expect(data.cards[0].text).toContain('Lv.99');
+  expect(data.cards[1].cls).toContain('mission');
+  expect(data.cards[1].text).toContain('遠征中');
+  expect(data.opened).toBe(true);
+  expect(data.importExists).toBe(true);
+  expect(data.currentFleetHost).toBe(true);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
