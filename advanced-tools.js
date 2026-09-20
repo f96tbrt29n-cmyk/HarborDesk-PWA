@@ -180,7 +180,41 @@ function hdConfirmBackupRestore(obj,analysis,fileName=''){
  d.returnValue='';
  return new Promise(resolve=>{const done=()=>resolve(!compat.blocked&&d.returnValue==='restore');d.addEventListener('close',done,{once:true});if(typeof d.showModal==='function')d.showModal();else d.setAttribute('open','')});
 }
-function hdApplyBackupLocalStorage(storage){if(!storage||typeof storage!=='object'||Array.isArray(storage))throw new Error('invalid backup storage');const entries=Object.entries(storage).filter(([k,v])=>k.startsWith('harbordesk')&&typeof v==='string'),keep=new Set(entries.map(([k])=>k));for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k?.startsWith('harbordesk')&&!keep.has(k))localStorage.removeItem(k)}for(const [k,v] of entries)localStorage.setItem(k,v);return entries.length}
+function hdCaptureHarborLocalStorage(){
+ const data={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k?.startsWith('harbordesk'))data[k]=localStorage.getItem(k)}return data
+}
+function hdValidateBackupApplied(storage){
+ if(!storage||typeof storage!=='object'||Array.isArray(storage))return {ok:false,missing:[],mismatched:[],extra:[],reason:'invalid storage'};
+ const expected=new Map(Object.entries(storage).filter(([k,v])=>k.startsWith('harbordesk')&&typeof v==='string')),current=new Map();
+ for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k?.startsWith('harbordesk'))current.set(k,localStorage.getItem(k))}
+ const missing=[],mismatched=[],extra=[];
+ for(const [k,v] of expected){if(!current.has(k))missing.push(k);else if(current.get(k)!==v)mismatched.push(k)}
+ for(const k of current.keys())if(!expected.has(k))extra.push(k);
+ return {ok:missing.length===0&&mismatched.length===0&&extra.length===0,missing,mismatched,extra};
+}
+function hdApplyBackupLocalStorage(storage){
+ if(!storage||typeof storage!=='object'||Array.isArray(storage))throw new Error('invalid backup storage');
+ const entries=Object.entries(storage).filter(([k,v])=>k.startsWith('harbordesk')&&typeof v==='string'),keep=new Set(entries.map(([k])=>k));
+ for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k?.startsWith('harbordesk')&&!keep.has(k))localStorage.removeItem(k)}
+ for(const [k,v] of entries)localStorage.setItem(k,v);
+ return entries.length
+}
+function hdRestoreCapturedLocalStorage(storage){
+ hdApplyBackupLocalStorage(storage);
+ return hdValidateBackupApplied(storage);
+}
+function hdApplyBackupTransaction(storage,before=hdCaptureHarborLocalStorage(),applyFn=hdApplyBackupLocalStorage){
+ try{
+  applyFn(storage);
+  const validation=hdValidateBackupApplied(storage);
+  if(!validation.ok)throw Object.assign(new Error('post-restore validation failed'),{validation});
+  return {ok:true,validation,rollback:null};
+ }catch(error){
+  let rollback={ok:false,missing:[],mismatched:[],extra:[]};
+  try{rollback=hdRestoreCapturedLocalStorage(before)}catch(rollbackError){rollback={ok:false,error:rollbackError,missing:[],mismatched:[],extra:[]}}
+  return {ok:false,error,validation:error?.validation||null,rollback};
+ }
+}
 async function importBackup(file){
  try{
   const obj=JSON.parse(await file.text());if(!obj?.localStorage)throw new Error('missing localStorage');
@@ -190,7 +224,14 @@ async function importBackup(file){
    const snapshotOk=await hdPHCreateSnapshot('外部復元直前');
    if(snapshotOk===false){alert('復元前の安全スナップショットを保存できなかったため、復元を中止したよ。端末の空き容量やSafariのサイトデータ設定を確認してね。');return false}
   }
-  hdApplyBackupLocalStorage(obj.localStorage);alert('バックアップ時点のHarborDeskデータへ復元したよ。画面を再読み込みするね。');location.reload();return true
+  const before=hdCaptureHarborLocalStorage(),result=hdApplyBackupTransaction(obj.localStorage,before);
+  if(!result.ok){
+   console.warn('backup restore validation failed',result);
+   if(result.rollback?.ok)alert('復元後のデータ検証で不一致を検出したため、復元を中止して直前のデータへ自動で戻したよ。');
+   else alert('復元後のデータ検証に失敗し、自動で元へ戻しきれなかったよ。復元直前の端末内スナップショットから戻してね。');
+   return false
+  }
+  alert('バックアップ時点のHarborDeskデータへ復元し、内容一致も確認できたよ。画面を再読み込みするね。');location.reload();return true
  }catch(err){console.warn('backup import failed',err);alert('HarborDeskのバックアップJSONを読み込めなかったよ');return false}
 }
 
