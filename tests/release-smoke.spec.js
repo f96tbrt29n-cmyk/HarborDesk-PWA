@@ -3439,3 +3439,51 @@ test('release smoke: route alert can mark route-deviation retreat', async ({ pag
   expect(draft.node).toBe('C');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sticky sortie HUD shows remaining structural path', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMObjectiveRemainingPath === 'function'
+  );
+
+  const paths = await page.evaluate(() => ({
+    dToBoss: window.hdSMObjectiveRemainingPath('2-4','D','O'),
+    cToG1: window.hdSMObjectiveRemainingPath('7-2','C','G1'),
+    cToG2: window.hdSMObjectiveRemainingPath('7-2','C','G2')
+  }));
+  expect(paths.dToBoss[0]).toBe('D');
+  expect(paths.dToBoss.at(-1)).toBe('O');
+  expect(paths.dToBoss.length).toBeGreaterThan(1);
+  expect(paths.cToG1).toEqual(['C','G1']);
+  expect(paths.cToG2).toEqual([]);
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-hud-remaining-path',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-hud-remaining-path-fleet',
+      fleetName:'残りルートHUDテスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-hud-remaining-path-fleet',name:'残りルートHUDテスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'D',routeNodes:['A','D'],result:'S',memo:'',objectiveTarget:'O',advanceGuard:{node:'D',safe:true,at:Date.now()}}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const path = page.locator('.hd-sm-hud-path');
+  await expect(path).toBeVisible();
+  await expect(path).toContainText('構造図最短');
+  await expect(path).toContainText('D');
+  await expect(path).toContainText('O');
+  expect(errors).toEqual([]);
+});
