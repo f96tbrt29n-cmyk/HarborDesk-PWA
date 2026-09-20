@@ -23,6 +23,21 @@ function hdSMNextNodeRows(map,draft){
  const labels=[...new Set(graph.edges.filter(([a])=>from.includes(a)).map(([,b])=>b))];
  return labels.map(label=>({label,kind:hdSMNodeKind(graph,label)}));
 }
+function hdSMBossDistance(map,current){
+ const graph=hdSMGraph(map),from=String(current||'').trim(),target=String(graph?.boss||graph?.goal||'').trim();
+ if(!graph||!Array.isArray(graph.edges)||!from||!target)return null;
+ if(from===target)return 0;
+ const q=[[from,0]],seen=new Set([from]);
+ while(q.length){
+  const [node,d]=q.shift();
+  for(const [a,b] of graph.edges){
+   if(a!==node||seen.has(b))continue;
+   if(b===target)return d+1;
+   seen.add(b);q.push([b,d+1]);
+  }
+ }
+ return null;
+}
 function hdSMBranchHint(map,draft){
  const graph=hdSMGraph(map),current=String(draft?.node||'').trim(),next=hdSMNextNodeRows(map,draft);
  if(!graph)return {title:'分岐情報',text:'海域構造データを取得できないよ。',source:''};
@@ -140,10 +155,11 @@ function hdSMHudHtml(session,draft){
  const current=String(draft?.node||'').trim();if(!current)return '';
  const graph=hdSMGraph(session?.map),kind=hdSMNodeKind(graph,current),intel=hdSMNodeIntel(session?.map,{label:current,kind}),guard=hdSMAdvanceGuard(session,draft),branch=hdSMBranchHint(session?.map,draft);
  const state=guard.retreat?'stop':guard.confirmed?'ready':'warn',status=guard.retreat?'撤退':guard.confirmed?'大破確認済':'大破未確認',jump=guard.confirmed?'next':'guard';
- const next=guard.confirmed&&!guard.retreat?hdSMNextNodeRows(session?.map,draft):[];
+ const next=guard.confirmed&&!guard.retreat?hdSMNextNodeRows(session?.map,draft):[],battleCount=hdSMBattleCount(session?.map,draft?.routeNodes||[]),bossDistance=hdSMBossDistance(session?.map,current);
  const nextHtml=next.length?'<div class="hd-sm-hud-next"><span>NEXT</span><div>'+next.slice(0,3).map(x=>{const ni=hdSMNodeIntel(session?.map,x);return '<button type="button" data-hd-sm-hud-node="'+hdSMEsc(x.label)+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(x.kind))+'・'+hdSMEsc(ni.formation)+'</small></button>'}).join('')+'</div>'+(next.length>3?'<em>+'+(next.length-3)+'</em>':'')+'</div>':'';
  const branchHtml=current&&branch?'<div class="hd-sm-hud-branch"><span>ROUTE</span><b>'+hdSMEsc(branch.title)+'</b><small>'+hdSMEsc(branch.text)+'</small></div>':'';
- return '<div class="hd-sm-hud '+state+'"><div class="hd-sm-hud-node"><span>NOW</span><b>'+hdSMEsc(current)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(kind))+'</small></div><div class="hd-sm-hud-main"><span>基本陣形 <b>'+hdSMEsc(intel.formation)+'</b></span><strong>'+hdSMEsc(status)+'</strong></div><button type="button" class="ghost small" data-hd-sm-hud-jump="'+jump+'">'+(guard.confirmed?'詳細':'確認する')+'</button>'+branchHtml+nextHtml+'</div>';
+ const progressHtml='<div class="hd-sm-hud-progress"><span>戦闘 <b>'+battleCount+'</b></span><span>'+(bossDistance===0?'ボス到達':bossDistance==null?'ボス距離 —':'構造図最短 ボスまで <b>'+bossDistance+'マス</b>')+'</span></div>';
+ return '<div class="hd-sm-hud '+state+'"><div class="hd-sm-hud-node"><span>NOW</span><b>'+hdSMEsc(current)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(kind))+'</small></div><div class="hd-sm-hud-main"><span>基本陣形 <b>'+hdSMEsc(intel.formation)+'</b></span><strong>'+hdSMEsc(status)+'</strong></div><button type="button" class="ghost small" data-hd-sm-hud-jump="'+jump+'">'+(guard.confirmed?'詳細':'確認する')+'</button>'+progressHtml+branchHtml+nextHtml+'</div>';
 }
 function hdSMHudJump(target){
  const selector=target==='next'?'.hd-sm-next-wrap':'.hd-sm-advance-guard',el=document.querySelector('#hdSortieMode '+selector);
@@ -353,6 +369,7 @@ window.hdSMCurrentTacticHtml=hdSMCurrentTacticHtml;
 window.hdSMStartHpState=hdSMStartHpState;
 window.hdSMAdvanceGuard=hdSMAdvanceGuard;
 window.hdSMSetAdvanceGuard=hdSMSetAdvanceGuard;
+window.hdSMBossDistance=hdSMBossDistance;
 window.hdSMHudHtml=hdSMHudHtml;
 window.hdSMHudJump=hdSMHudJump;
 window.hdSMBattleCount=hdSMBattleCount;
