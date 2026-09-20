@@ -2,12 +2,24 @@ const HD_QN_PIN_KEY='harbordesk-quick-nav-pins-v1';
 const HD_QN_RECENT_KEY='harbordesk-quick-nav-recent-v1';
 const HD_QN_HISTORY_KEY='harbordesk-session-quick-nav-history-v1';
 const HD_QN_ALL_OPEN_KEY='harbordesk-session-quick-nav-all-open-v1';
+const HD_QN_USAGE_KEY='harbordesk-quick-nav-usage-v1';
 let hdQNHistoryLock=false;
 
 function hdQNLoadPins(){try{return JSON.parse(localStorage.getItem(HD_QN_PIN_KEY)||'[]')||[]}catch{return []}}
 function hdQNSavePins(v){localStorage.setItem(HD_QN_PIN_KEY,JSON.stringify(v))}
 function hdQNLoadRecent(){try{return JSON.parse(localStorage.getItem(HD_QN_RECENT_KEY)||'[]')||[]}catch{return []}}
 function hdQNSaveRecent(v){localStorage.setItem(HD_QN_RECENT_KEY,JSON.stringify(v))}
+function hdQNLoadUsage(){try{return JSON.parse(localStorage.getItem(HD_QN_USAGE_KEY)||'{}')||{}}catch{return {}}}
+function hdQNSaveUsage(v){try{localStorage.setItem(HD_QN_USAGE_KEY,JSON.stringify(v||{}))}catch{}}
+function hdQNRecordUsage(id){
+ id=String(id||'').trim();if(!id)return false;
+ const usage=hdQNLoadUsage(),row=usage[id]&&typeof usage[id]==='object'?usage[id]:{};
+ usage[id]={count:Math.max(0,Number(row.count)||0)+1,lastAt:Date.now()};
+ const validIds=new Set(hdQNSections().map(x=>x.id));
+ const entries=Object.entries(usage).filter(([key])=>validIds.has(key)).sort((a,b)=>(Number(b[1]?.lastAt)||0)-(Number(a[1]?.lastAt)||0)).slice(0,80);
+ hdQNSaveUsage(Object.fromEntries(entries));
+ return true;
+}
 function hdQNLoadHistory(){try{return JSON.parse(sessionStorage.getItem(HD_QN_HISTORY_KEY)||'[]')||[]}catch{return []}}
 function hdQNSaveHistory(v){try{sessionStorage.setItem(HD_QN_HISTORY_KEY,JSON.stringify(v.slice(-20)))}catch{}}
 function hdQNRecordHistory(id){if(hdQNHistoryLock||!id)return;const rows=hdQNLoadHistory();if(rows[rows.length-1]===id)return;rows.push(id);hdQNSaveHistory(rows)}
@@ -34,19 +46,31 @@ function hdQNSectionGroup(id){
 function hdQNCategoryRows(){
  try{if(typeof hdWSSections==='function')hdWSSections()}catch{}
  const groups=['home','guide','fleet','quest','expedition','arsenal','records','settings'];
- const pins=hdQNLoadPins(),recent=hdQNLoadRecent(),active=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'';
- return groups.map(group=>{
+ const pins=hdQNLoadPins(),recent=hdQNLoadRecent(),usage=hdQNLoadUsage(),active=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'';
+ const order=new Map(groups.map((g,i)=>[g,i]));
+ const rows=groups.map(group=>{
   const sections=typeof hdWSVisibleSections==='function'?hdWSVisibleSections(group):[];
   const label=typeof hdWSGroupLabel==='function'?hdWSGroupLabel(group):(group==='home'?'ホーム':hdQNMobileGroupMeta(group).label);
+  const ids=sections.map(x=>x.id);
   const pinCount=pins.filter(id=>hdQNSectionGroup(id)===group).length;
-  const recentCount=new Set(recent.filter(x=>x?.id&&hdQNSectionGroup(x.id)===group).map(x=>x.id)).size;
-  return {group,label,pinCount,recentCount,count:sections.length,active:group===active};
+  const recentRows=recent.filter(x=>x?.id&&hdQNSectionGroup(x.id)===group),recentCount=new Set(recentRows.map(x=>x.id)).size;
+  const useCount=ids.reduce((sum,id)=>sum+Math.max(0,Number(usage[id]?.count)||0),0);
+  const lastAt=Math.max(0,...ids.map(id=>Number(usage[id]?.lastAt)||0),...recentRows.map(x=>Number(x.at)||0));
+  return {group,label,pinCount,recentCount,useCount,lastAt,count:sections.length,active:group===active};
  }).filter(x=>x.count>0||x.group==='home');
+ rows.sort((a,b)=>{
+  if(a.active!==b.active)return a.active?-1:1;
+  if(a.useCount!==b.useCount)return b.useCount-a.useCount;
+  if(a.pinCount!==b.pinCount)return b.pinCount-a.pinCount;
+  if(a.lastAt!==b.lastAt)return b.lastAt-a.lastAt;
+  return (order.get(a.group)||0)-(order.get(b.group)||0);
+ });
+ return rows;
 }
 function hdQNRenderCategories(){
  const host=document.getElementById('hdQNCategories');if(!host)return;
  const rows=hdQNCategoryRows();
- host.innerHTML=rows.map(x=>`<button type="button" class="${x.active?'active':''}" data-hd-qn-group="${hdQNEsc(x.group)}" aria-label="${hdQNEsc(x.label)}。固定 ${x.pinCount}件、最近使用 ${x.recentCount}件"><b>${hdQNEsc(x.label)}</b><small><i>★ ${x.pinCount}</i><i>最近 ${x.recentCount}</i></small></button>`).join('');
+ host.innerHTML=rows.map(x=>`<button type="button" class="${x.active?'active':''}" data-hd-qn-group="${hdQNEsc(x.group)}" aria-label="${hdQNEsc(x.label)}。利用 ${x.useCount}回、固定 ${x.pinCount}件、最近使用 ${x.recentCount}件"><b>${hdQNEsc(x.label)}</b><small><i>利用 ${x.useCount}</i><i>★ ${x.pinCount}</i><i>最近 ${x.recentCount}</i></small></button>`).join('');
 }
 function hdQNJumpGroup(group){
  group=String(group||'');if(!group)return false;
@@ -69,8 +93,16 @@ function hdQNContextRows(){
  const group=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'';
  if(!group||group==='home')return [];
  try{
-  const rows=typeof hdWSVisibleSections==='function'?hdWSVisibleSections(group):[...document.querySelectorAll(`section[data-hd-workspace-group="${group}"]`)];
-  return rows.filter(x=>x?.id).map(x=>({id:x.id,title:typeof hdWSTitle==='function'?hdWSTitle(x):(x.querySelector('h2,h3')?.textContent?.trim()||x.id)}));
+  const sections=typeof hdWSVisibleSections==='function'?hdWSVisibleSections(group):[...document.querySelectorAll(`section[data-hd-workspace-group="${group}"]`)];
+  const pins=new Set(hdQNLoadPins()),recent=new Map(hdQNLoadRecent().map(x=>[x.id,Number(x.at)||0])),usage=hdQNLoadUsage();
+  const rows=sections.filter(x=>x?.id).map((x,index)=>({id:x.id,title:typeof hdWSTitle==='function'?hdWSTitle(x):(x.querySelector('h2,h3')?.textContent?.trim()||x.id),index}));
+  rows.sort((a,b)=>{
+   const ap=pins.has(a.id),bp=pins.has(b.id);if(ap!==bp)return bp-ap;
+   const au=Math.max(0,Number(usage[a.id]?.count)||0),bu=Math.max(0,Number(usage[b.id]?.count)||0);if(au!==bu)return bu-au;
+   const ar=recent.get(a.id)||0,br=recent.get(b.id)||0;if(ar!==br)return br-ar;
+   return a.index-b.index;
+  });
+  return rows;
  }catch{return []}
 }
 function hdQNRenderContext(){
@@ -326,8 +358,8 @@ document.addEventListener('click',e=>{
 window.addEventListener('load',()=>setTimeout(()=>{hdQNEnsure();hdQNLoadDiagnostics()},500));
 setTimeout(()=>{hdQNEnsure();hdQNLoadDiagnostics()},1200);
 
-window.addEventListener('hd:workspace-changed',e=>{const id=e.detail?.section;if(id){hdQNRecordHistory(id);hdQNRecordRecent(id)}});
-window.addEventListener('load',()=>setTimeout(()=>{const id=window.hdWSState?.sections?.[window.hdWSState?.group];if(id)hdQNRecordHistory(id)},1300));
+window.addEventListener('hd:workspace-changed',e=>{const id=e.detail?.section;if(id){hdQNRecordHistory(id);hdQNRecordUsage(id);hdQNRecordRecent(id)}});
+window.addEventListener('load',()=>setTimeout(()=>{const id=window.hdWSState?.sections?.[window.hdWSState?.group];if(id){hdQNRecordHistory(id);hdQNRecordUsage(id)}},1300));
 
 window.addEventListener('hd:workspace-changed',()=>{hdQNUpdateMobileDock();if(document.getElementById('hdQuickNavDialog')?.open){hdQNRenderCategories();hdQNRenderContext()}});
 window.addEventListener('hd:kancolle-sync',hdQNUpdateMobileDock);
