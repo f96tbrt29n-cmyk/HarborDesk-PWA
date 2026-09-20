@@ -24,11 +24,14 @@ Settings → Pages → Build and deployment → Source を `GitHub Actions` に�
 攻略情報はゲーム更新で変わる可能性があります。出撃・装備更新など重要な操作前はリンク先の最新版も確認してください。
 
 ## 開発・公開の確認
-- `app-version.json`、`update-manager.js`、`sw.js` のバージョンとbuildを揃えて更新します。
-- mainへのpushで構文・キャッシュ整合性・全テストをChromium / WebKitで確認し、成功後にPagesへ公開します。WebKitはSafari系の互換性確認であり、iPhone実機テストの代替ではありません。
-- Actionsでは最新mainのコミットSHAとrunのHEADが一致すること、テストとDeployの両ステップが成功したことを確認します。古いrunのcancelledは最新runの結果とは別です。
+- `app-version.json`、`update-manager.js`、`sw.js`、`package.json` のバージョンとbuildを揃えて更新します。
+- mainへのpushでは `.github/workflows/pages.yml` がJavaScript構文、PWAキャッシュ整合性、ランタイム資産、艦娘画像ソース、艦これMASTER意味検証に加えて、PlaywrightのChromium / WebKit回帰テストを実行します。
+- ブラウザ回帰テストが失敗した場合はPagesのアップロード/Deployへ進みません。失敗時の `playwright-report` と `test-results` はActionsのartifactとして7日間保存します。
+- Pull Requestでは `.github/workflows/browser-tests.yml` が同じChromium / WebKit回帰テストを実行します。手動実行（workflow_dispatch）にも対応しています。
+- GitHubの「Actions」タブで最新mainの `Deploy HarborDesk PWA` を開き、`Run browser regression tests` と `Deploy` が成功していることを確認します。古いrunのcancelledは最新runの結果とは別です。
+- WebKitはSafari系エンジンの互換性確認であり、iPhone実機テストそのものではありません。
 - iPhoneでは公開後に「更新確認」→「今すぐ更新」で反映できます。Mac・Xcodeは不要です。
-- ローカル検証時は `npm install --no-save --no-package-lock @playwright/test@1.55.0`、`npx playwright install --with-deps chromium webkit` を実行し、別ターミナルで `python3 -m http.server 4173`、続いて `npx playwright test` を実行します。
+- ローカル検証時は `npm install --no-save --no-package-lock`、`npx playwright install --with-deps chromium webkit`、`npm run test:browser` の順で実行します。Playwrightが内蔵HTTPサーバーを起動するため、別ターミナルでのサーバー起動は不要です。
 
 
 ## 艦これゲーム内データ取込
