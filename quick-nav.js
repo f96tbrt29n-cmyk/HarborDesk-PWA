@@ -1,6 +1,7 @@
 const HD_QN_PIN_KEY='harbordesk-quick-nav-pins-v1';
 const HD_QN_RECENT_KEY='harbordesk-quick-nav-recent-v1';
 const HD_QN_HISTORY_KEY='harbordesk-session-quick-nav-history-v1';
+const HD_QN_ALL_OPEN_KEY='harbordesk-session-quick-nav-all-open-v1';
 let hdQNHistoryLock=false;
 
 function hdQNLoadPins(){try{return JSON.parse(localStorage.getItem(HD_QN_PIN_KEY)||'[]')||[]}catch{return []}}
@@ -23,6 +24,47 @@ function hdQNSections(){
   }
   return rows;
 }
+function hdQNSectionGroup(id){
+ try{
+  const el=document.getElementById(id);if(!el)return '';
+  const section=typeof hdWSManagedSectionFor==='function'?hdWSManagedSectionFor(el):el.closest?.('section');
+  return section?.dataset?.hdWorkspaceGroup||(typeof hdWSGroupForSection==='function'?hdWSGroupForSection(section):'')||'';
+ }catch{return ''}
+}
+function hdQNCategoryRows(){
+ try{if(typeof hdWSSections==='function')hdWSSections()}catch{}
+ const groups=['home','guide','fleet','quest','expedition','arsenal','records','settings'];
+ const pins=hdQNLoadPins(),recent=hdQNLoadRecent(),active=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'';
+ return groups.map(group=>{
+  const sections=typeof hdWSVisibleSections==='function'?hdWSVisibleSections(group):[];
+  const label=typeof hdWSGroupLabel==='function'?hdWSGroupLabel(group):(group==='home'?'ホーム':hdQNMobileGroupMeta(group).label);
+  const pinCount=pins.filter(id=>hdQNSectionGroup(id)===group).length;
+  const recentCount=new Set(recent.filter(x=>x?.id&&hdQNSectionGroup(x.id)===group).map(x=>x.id)).size;
+  return {group,label,pinCount,recentCount,count:sections.length,active:group===active};
+ }).filter(x=>x.count>0||x.group==='home');
+}
+function hdQNRenderCategories(){
+ const host=document.getElementById('hdQNCategories');if(!host)return;
+ const rows=hdQNCategoryRows();
+ host.innerHTML=rows.map(x=>`<button type="button" class="${x.active?'active':''}" data-hd-qn-group="${hdQNEsc(x.group)}" aria-label="${hdQNEsc(x.label)}。固定 ${x.pinCount}件、最近使用 ${x.recentCount}件"><b>${hdQNEsc(x.label)}</b><small><i>★ ${x.pinCount}</i><i>最近 ${x.recentCount}</i></small></button>`).join('');
+}
+function hdQNJumpGroup(group){
+ group=String(group||'');if(!group)return false;
+ try{if(typeof hdWSPushHistory==='function')hdWSPushHistory()}catch{}
+ hdQNClose();
+ if(typeof hdWSApply==='function'){hdWSApply(group,null,{ignorePin:true,scrollTop:true});return true}
+ const b=document.querySelector(`[data-hd-ws-group="${CSS.escape(group)}"]`);if(b){b.click();return true}
+ return false;
+}
+function hdQNAllOpenLoad(){try{return sessionStorage.getItem(HD_QN_ALL_OPEN_KEY)!=='0'}catch{return true}}
+function hdQNSetAllOpen(open){
+ const d=document.getElementById('hdQuickNavDialog'),btn=document.querySelector('[data-hd-qn-toggle-all]');open=!!open;
+ try{sessionStorage.setItem(HD_QN_ALL_OPEN_KEY,open?'1':'0')}catch{}
+ d?.classList.toggle('hd-qn-all-collapsed',!open);
+ if(btn){btn.setAttribute('aria-expanded',open?'true':'false');btn.textContent=open?'閉じる':'開く'}
+ return open;
+}
+function hdQNToggleAll(){return hdQNSetAllOpen(!hdQNAllOpenLoad())}
 function hdQNContextRows(){
  const group=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup||'';
  if(!group||group==='home')return [];
@@ -97,7 +139,7 @@ function hdQNUpdateHistoryActions(){
 }
 function hdQNOpen(){
   hdQNEnsure();const d=document.getElementById('hdQuickNavDialog');if(!d)return;
-  const input=document.getElementById('hdQNSearch');if(input)input.value='';hdQNRenderFavorites();hdQNRenderRecent();hdQNRenderContext();hdQNRenderList('');hdQNUpdateHistoryActions();
+  const input=document.getElementById('hdQNSearch');if(input)input.value='';hdQNRenderCategories();hdQNRenderFavorites();hdQNRenderRecent();hdQNRenderContext();hdQNRenderList('');hdQNSetAllOpen(hdQNAllOpenLoad());hdQNUpdateHistoryActions();
   if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');
   hdQNUpdateMobileDock();
   setTimeout(()=>input?.focus(),50);
@@ -241,7 +283,7 @@ function hdQNUpdateMobileDock(){
 function hdQNEnsure(){
   if(document.getElementById('hdQuickNavButton')){hdQNEnsureMobileDock();return;}
   const btn=document.createElement('button');btn.id='hdQuickNavButton';btn.type='button';btn.className='hd-qn-fab';btn.innerHTML='<span>☰</span><b>機能</b>';btn.addEventListener('click',hdQNOpen);document.body.appendChild(btn);
-  const d=document.createElement('dialog');d.id='hdQuickNavDialog';d.className='hd-qn-dialog';d.innerHTML=`<div class="hd-qn-head"><div><div class="eyebrow">QUICK NAV</div><h3>機能をすぐ開く</h3></div><button type="button" class="ghost small" data-hd-qn-close>閉じる</button></div><div class="hd-qn-actions"><button type="button" data-hd-qn-back><span>‹</span><b>戻る</b><small data-hd-qn-back-target>履歴なし</small></button><button type="button" data-hd-qn-forward><span>›</span><b>進む</b><small data-hd-qn-forward-target>履歴なし</small></button><button type="button" data-hd-qn-home><span>⌂</span><b>ホーム</b></button><button type="button" data-hd-gs-open><span>⌕</span><b>検索</b></button><button type="button" data-hd-qn-sync><span>↻</span><b>同期</b></button><a href="https://play.games.dmm.com/game/kancolle"><span>⚓</span><b>艦これ</b></a><button type="button" data-hd-qn-top><span>↑</span><b>上へ</b></button></div><div id="hdQNFavorites" class="hd-qn-favorites" hidden></div><div id="hdQNRecent" class="hd-qn-recent" hidden></div><div id="hdQNContext" class="hd-qn-context" hidden></div><div class="hd-qn-tools"><div class="hd-qn-tools-head"><b>すべての機能</b><small>名前で検索</small></div><input id="hdQNSearch" type="search" placeholder="機能名で検索"></div><div id="hdQNList" class="hd-qn-list"></div><div class="hd-qn-foot">★を付けた機能は上に固定するよ。</div>`;document.body.appendChild(d);
+  const d=document.createElement('dialog');d.id='hdQuickNavDialog';d.className='hd-qn-dialog';d.innerHTML=`<div class="hd-qn-head"><div><div class="eyebrow">QUICK NAV</div><h3>機能をすぐ開く</h3></div><button type="button" class="ghost small" data-hd-qn-close>閉じる</button></div><div class="hd-qn-actions"><button type="button" data-hd-qn-back><span>‹</span><b>戻る</b><small data-hd-qn-back-target>履歴なし</small></button><button type="button" data-hd-qn-forward><span>›</span><b>進む</b><small data-hd-qn-forward-target>履歴なし</small></button><button type="button" data-hd-qn-home><span>⌂</span><b>ホーム</b></button><button type="button" data-hd-gs-open><span>⌕</span><b>検索</b></button><button type="button" data-hd-qn-sync><span>↻</span><b>同期</b></button><a href="https://play.games.dmm.com/game/kancolle"><span>⚓</span><b>艦これ</b></a><button type="button" data-hd-qn-top><span>↑</span><b>上へ</b></button></div><div id="hdQNCategories" class="hd-qn-categories"></div><div id="hdQNFavorites" class="hd-qn-favorites" hidden></div><div id="hdQNRecent" class="hd-qn-recent" hidden></div><div id="hdQNContext" class="hd-qn-context" hidden></div><div class="hd-qn-tools"><div class="hd-qn-tools-head"><div><b>すべての機能</b><small>名前で検索</small></div><button type="button" data-hd-qn-toggle-all aria-expanded="true">閉じる</button></div><input id="hdQNSearch" type="search" placeholder="機能名で検索"></div><div id="hdQNList" class="hd-qn-list"></div><div class="hd-qn-foot">★を付けた機能は上に固定するよ。</div>`;document.body.appendChild(d);
   d.addEventListener('click',e=>{if(e.target===d)hdQNClose()});
   document.getElementById('hdQNSearch')?.addEventListener('input',e=>hdQNRenderList(e.target.value));
   hdQNRenderList();hdQNEnsureMobileDock();
@@ -274,6 +316,8 @@ document.addEventListener('click',e=>{
   if(e.target.closest?.('[data-hd-qn-home]')){hdQNClose();if(typeof hdWSShowElement==='function')hdWSShowElement('home',true);else document.getElementById('home')?.scrollIntoView({behavior:'smooth',block:'start'});return}
   if(e.target.closest?.('[data-hd-qn-sync]')){hdQNJump('kancolleImport');return}
   if(e.target.closest?.('[data-hd-qn-top]')){hdQNClose();window.scrollTo({top:0,behavior:'smooth'});return}
+  if(e.target.closest?.('[data-hd-qn-toggle-all]')){hdQNToggleAll();return}
+  const groupJump=e.target.closest?.('[data-hd-qn-group]');if(groupJump){hdQNJumpGroup(groupJump.dataset.hdQnGroup);return}
   if(e.target.closest?.('[data-hd-qn-clear-recent]')){hdQNClearRecent();return}
   const context=e.target.closest?.('[data-hd-qn-context]');if(context){hdQNJump(context.dataset.hdQnContext);return}
   const jump=e.target.closest?.('[data-hd-qn-jump]');if(jump){hdQNJump(jump.dataset.hdQnJump);return}
@@ -285,7 +329,7 @@ setTimeout(()=>{hdQNEnsure();hdQNLoadDiagnostics()},1200);
 window.addEventListener('hd:workspace-changed',e=>{const id=e.detail?.section;if(id){hdQNRecordHistory(id);hdQNRecordRecent(id)}});
 window.addEventListener('load',()=>setTimeout(()=>{const id=window.hdWSState?.sections?.[window.hdWSState?.group];if(id)hdQNRecordHistory(id)},1300));
 
-window.addEventListener('hd:workspace-changed',()=>{hdQNUpdateMobileDock();if(document.getElementById('hdQuickNavDialog')?.open)hdQNRenderContext()});
+window.addEventListener('hd:workspace-changed',()=>{hdQNUpdateMobileDock();if(document.getElementById('hdQuickNavDialog')?.open){hdQNRenderCategories();hdQNRenderContext()}});
 window.addEventListener('hd:kancolle-sync',hdQNUpdateMobileDock);
 window.addEventListener('hd:kancolle-return-ready',hdQNUpdateMobileDock);
 window.addEventListener('storage',e=>{if(!e||e.key==='harbordesk-kancolle-sync-v1')hdQNUpdateMobileDock()});
@@ -301,4 +345,4 @@ window.addEventListener('hd:global-search-close',hdQNUpdateMobileDock);
 window.addEventListener('pageshow',hdQNUpdateMobileDock);
 
 window.addEventListener('hd:workspace-history',()=>{hdQNUpdateHistoryActions();hdQNUpdateMobileDock()});
-window.addEventListener('hd:quick-nav-updated',()=>{if(document.getElementById('hdQuickNavDialog')?.open){hdQNRenderFavorites();hdQNRenderRecent();hdQNRenderList(document.getElementById('hdQNSearch')?.value||'')}});
+window.addEventListener('hd:quick-nav-updated',()=>{if(document.getElementById('hdQuickNavDialog')?.open){hdQNRenderCategories();hdQNRenderFavorites();hdQNRenderRecent();hdQNRenderList(document.getElementById('hdQNSearch')?.value||'')}});
