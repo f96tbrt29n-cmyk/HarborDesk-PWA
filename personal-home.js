@@ -3,6 +3,7 @@ const HD_PH_DB='HarborDeskSafety';
 const HD_PH_STORE='snapshots';
 const HD_PH_MAX_SNAPSHOTS=3;
 const HD_PH_COLLAPSE_KEY='harbordesk-home-collapse-v1';
+const HD_PH_ORDER_KEY='harbordesk-home-order-v1';
 
 function hdPHCollapseLoad(){try{const x=JSON.parse(localStorage.getItem(HD_PH_COLLAPSE_KEY)||'{}');return x&&typeof x==='object'?x:{}}catch{return {}}}
 function hdPHCollapseSave(v){try{localStorage.setItem(HD_PH_COLLAPSE_KEY,JSON.stringify(v||{}))}catch{}}
@@ -18,6 +19,41 @@ function hdPHCollapseSpecs(){return [
  {key:'recent',title:'最近使った機能'},
  {key:'snapshots',title:'端末内セーフティスナップショット'}
 ]}
+function hdPHOrderDefault(){return ['coverage','attention','next','resources','fleets','condition']}
+function hdPHOrderLoad(){
+ const def=hdPHOrderDefault();try{
+  const x=JSON.parse(localStorage.getItem(HD_PH_ORDER_KEY)||'[]'),rows=Array.isArray(x)?x:[];
+  const valid=rows.filter((x,i)=>def.includes(x)&&rows.indexOf(x)===i);
+  return [...valid,...def.filter(x=>!valid.includes(x))];
+ }catch{return def}
+}
+function hdPHOrderSave(rows){try{localStorage.setItem(HD_PH_ORDER_KEY,JSON.stringify(Array.isArray(rows)?rows:hdPHOrderDefault()))}catch{}}
+function hdPHOrderSpecs(){const map=new Map(hdPHCollapseSpecs().map(x=>[x.key,x]));return hdPHOrderLoad().map(key=>map.get(key)).filter(Boolean)}
+function hdPHApplyOrder(){
+ const host=document.getElementById('hdPersonalHome');if(!host)return;
+ const anchor=hdPHFindBlock(hdPHCollapseSpecs().find(x=>x.key==='usual'),host);
+ if(!anchor)return;
+ const order=hdPHOrderLoad();
+ for(const key of order){const spec=hdPHCollapseSpecs().find(x=>x.key===key),block=hdPHFindBlock(spec,host);if(block)host.insertBefore(block,anchor)}
+ for(let i=0;i<order.length;i++){
+  const spec=hdPHCollapseSpecs().find(x=>x.key===order[i]),block=hdPHFindBlock(spec,host),actions=block?.querySelector(':scope > .hd-ph-sub > .hd-ph-collapse-actions');
+  if(!actions)continue;
+  let up=actions.querySelector('[data-ph-order-up]');if(!up){up=document.createElement('button');up.type='button';up.className='ghost small hd-ph-order-btn';up.dataset.phOrderUp=order[i];up.textContent='↑';actions.insertBefore(up,actions.querySelector('[data-ph-collapse]'))}
+  let down=actions.querySelector('[data-ph-order-down]');if(!down){down=document.createElement('button');down.type='button';down.className='ghost small hd-ph-order-btn';down.dataset.phOrderDown=order[i];down.textContent='↓';actions.insertBefore(down,actions.querySelector('[data-ph-collapse]'))}
+  up.dataset.phOrderUp=order[i];down.dataset.phOrderDown=order[i];up.disabled=i===0;down.disabled=i===order.length-1;
+  up.setAttribute('aria-label',(block.querySelector(':scope > .hd-ph-sub > strong')?.textContent?.trim()||'カード')+'を上へ');
+  down.setAttribute('aria-label',(block.querySelector(':scope > .hd-ph-sub > strong')?.textContent?.trim()||'カード')+'を下へ');
+ }
+ const top=host.querySelector(':scope > .section-head');
+ if(top&&!top.querySelector('[data-ph-reset-order]')){const b=document.createElement('button');b.type='button';b.className='ghost small hd-ph-reset-order';b.dataset.phResetOrder='1';b.textContent='並びを戻す';top.appendChild(b)}
+}
+function hdPHMoveOrder(key,delta){
+ const rows=hdPHOrderLoad(),i=rows.indexOf(String(key||'')),j=i+Number(delta||0);
+ if(i<0||j<0||j>=rows.length)return false;
+ [rows[i],rows[j]]=[rows[j],rows[i]];hdPHOrderSave(rows);hdPHApplyOrder();return true;
+}
+function hdPHResetOrder(){try{localStorage.removeItem(HD_PH_ORDER_KEY)}catch{}hdPHApplyOrder();window.hdToast?.('ホームの並び順を初期状態に戻したよ','info',1100);return true}
+
 function hdPHFindBlock(spec,host=document.getElementById('hdPersonalHome')){
  if(!host)return null;
  if(spec?.selector)return host.querySelector(spec.selector);
@@ -48,6 +84,7 @@ function hdPHApplyCollapsed(){
   const collapsed=!!state[spec.key];block.classList.toggle('hd-ph-collapsed',collapsed);btn.textContent=collapsed?'開く':'閉じる';btn.setAttribute('aria-expanded',collapsed?'false':'true');btn.setAttribute('aria-label',(head.querySelector('strong')?.textContent?.trim()||'カード')+(collapsed?'を開く':'を閉じる'));
  }
  const top=host.querySelector(':scope > .section-head');if(top&&!top.querySelector('[data-ph-expand-all]')){const b=document.createElement('button');b.type='button';b.className='ghost small hd-ph-expand-all';b.dataset.phExpandAll='1';b.textContent='すべて開く';top.appendChild(b)}
+ hdPHApplyOrder();
 }
 function hdPHEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdPHHarborData(){const data={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('harbordesk'))data[k]=localStorage.getItem(k)}return data}
@@ -249,7 +286,7 @@ function hdPHEnsure(){if(document.getElementById('personalHomeCenter')){hdPHRend
 async function hdPHAutoSnapshot(){const rows=await hdPHGetSnapshots();if(!rows.length||Date.now()-rows[0].at>20*3600000)await hdPHCreateSnapshot('自動（日次）')}
 function hdPHInstallBackupHooks(){if(window.__hdPHBackupHooks)return;window.__hdPHBackupHooks=true;const oldExport=window.exportBackup;if(typeof oldExport==='function'){window.exportBackup=function(){oldExport();localStorage.setItem(HD_PH_LAST_EXPORT_KEY,String(Date.now()));hdPHRender()};const b=document.getElementById('exportBackup');if(b)b.onclick=window.exportBackup}const oldImport=window.importBackup;if(typeof oldImport==='function'){window.importBackup=async function(file){await hdPHCreateSnapshot('外部復元直前');return oldImport(file)};const input=document.getElementById('importBackup');if(input)input.onchange=e=>{const f=e.target.files?.[0];if(f)window.importBackup(f)}}}
 
-document.addEventListener('click',e=>{const collapse=e.target.closest?.('[data-ph-collapse]');if(collapse){hdPHToggleCollapsed(collapse.dataset.phCollapse);return}if(e.target.closest?.('[data-ph-expand-all]')){hdPHExpandAll();return}const jump=e.target.closest?.('[data-ph-jump]');if(jump){if(typeof hdQNJump==='function')hdQNJump(jump.dataset.phJump);else document.getElementById(jump.dataset.phJump)?.scrollIntoView({behavior:'smooth',block:'start'});return}if(e.target.closest?.('[data-ph-open-nav]')){if(typeof hdQNOpen==='function')hdQNOpen();return}if(e.target.closest?.('[data-ph-clear-usage]')){hdPHClearUsage();return}if(e.target.closest?.('[data-ph-sync]')){hdPHOpenSync();return}const attentionItem=e.target.closest?.('[data-ph-attention]');if(attentionItem){hdPHOpenAttentionItem(attentionItem.dataset.phAttention);return}if(e.target.closest?.('[data-ph-attention-all]')){hdPHOpenAllAttention();return}if(e.target.closest?.('[data-ph-fleets]')){hdPHOpenGameFleets();return}if(e.target.closest?.('[data-ph-snapshot]')){hdPHCreateSnapshot('手動');return}if(e.target.closest?.('[data-ph-export]')){if(typeof window.exportBackup==='function')window.exportBackup();return}const restore=e.target.closest?.('[data-ph-restore]');if(restore){hdPHRestoreSnapshot(restore.dataset.phRestore);return}const del=e.target.closest?.('[data-ph-snap-delete]');if(del&&confirm('この端末内スナップショットを削除する？')){hdPHDeleteSnapshot(del.dataset.phSnapDelete);return}});
+document.addEventListener('click',e=>{const up=e.target.closest?.('[data-ph-order-up]');if(up){hdPHMoveOrder(up.dataset.phOrderUp,-1);return}const down=e.target.closest?.('[data-ph-order-down]');if(down){hdPHMoveOrder(down.dataset.phOrderDown,1);return}if(e.target.closest?.('[data-ph-reset-order]')){hdPHResetOrder();return}const collapse=e.target.closest?.('[data-ph-collapse]');if(collapse){hdPHToggleCollapsed(collapse.dataset.phCollapse);return}if(e.target.closest?.('[data-ph-expand-all]')){hdPHExpandAll();return}const jump=e.target.closest?.('[data-ph-jump]');if(jump){if(typeof hdQNJump==='function')hdQNJump(jump.dataset.phJump);else document.getElementById(jump.dataset.phJump)?.scrollIntoView({behavior:'smooth',block:'start'});return}if(e.target.closest?.('[data-ph-open-nav]')){if(typeof hdQNOpen==='function')hdQNOpen();return}if(e.target.closest?.('[data-ph-clear-usage]')){hdPHClearUsage();return}if(e.target.closest?.('[data-ph-sync]')){hdPHOpenSync();return}const attentionItem=e.target.closest?.('[data-ph-attention]');if(attentionItem){hdPHOpenAttentionItem(attentionItem.dataset.phAttention);return}if(e.target.closest?.('[data-ph-attention-all]')){hdPHOpenAllAttention();return}if(e.target.closest?.('[data-ph-fleets]')){hdPHOpenGameFleets();return}if(e.target.closest?.('[data-ph-snapshot]')){hdPHCreateSnapshot('手動');return}if(e.target.closest?.('[data-ph-export]')){if(typeof window.exportBackup==='function')window.exportBackup();return}const restore=e.target.closest?.('[data-ph-restore]');if(restore){hdPHRestoreSnapshot(restore.dataset.phRestore);return}const del=e.target.closest?.('[data-ph-snap-delete]');if(del&&confirm('この端末内スナップショットを削除する？')){hdPHDeleteSnapshot(del.dataset.phSnapDelete);return}});
 window.addEventListener('hd:quick-nav-updated',()=>hdPHRender());
 window.addEventListener('hd:kancolle-sync',()=>hdPHRender());
 window.addEventListener('hd:state-changed',()=>hdPHRender());
