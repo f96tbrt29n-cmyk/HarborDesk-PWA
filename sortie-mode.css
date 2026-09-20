@@ -94,3 +94,6 @@
 .hd-sm-hud-next>div{display:flex;gap:5px;min-width:0;overflow-x:auto;scrollbar-width:none}.hd-sm-hud-next>div::-webkit-scrollbar{display:none}
 .hd-sm-hud-next button{flex:0 0 auto;display:flex;align-items:baseline;gap:4px;min-height:29px;padding:4px 8px;border:1px solid rgba(84,188,236,.35);border-radius:8px;background:#0e2a3d;color:var(--text);font:inherit}
 .hd-sm-hud-next button b{font-size:11px}.hd-sm-hud-next button small{font-size:7px;color:var(--muted)}.hd-sm-hud-next>em{font-style:normal;font-size:8px;color:var(--muted)}
+
+.hd-sm-hud-branch{grid-column:1/-1;display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:5px;align-items:baseline;padding-top:5px;border-top:1px solid rgba(255,255,255,.05);min-width:0}
+.hd-sm-hud-branch>span{font-size:6px;letter-spacing:.09em;font-weight:900;color:#f0cf7d}.hd-sm-hud-branch>b{font-size:8px;white-space:nowrap}.hd-sm-hud-branch>small{min-width:0;font-size:7px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
