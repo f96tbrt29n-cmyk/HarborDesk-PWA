@@ -2218,7 +2218,6 @@ test('release smoke: sortie mode gates advancement behind damage confirmation', 
   await expect(page.locator('.hd-sm-advance-guard')).toContainText('進撃前に大破確認');
   await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeDisabled();
   await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeDisabled();
-  await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeDisabled();
 
   await page.locator('[data-hd-sm-safe-confirm]').click();
   await expect(page.locator('.hd-sm-advance-guard')).toContainText('大破なし確認済み');
