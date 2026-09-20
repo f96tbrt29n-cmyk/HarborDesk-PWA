@@ -36,12 +36,13 @@ function hdSSSnapshot(map){
   shipCount:stats.shipCount,status:'active'
  };
 }
+function hdSSEmit(action,detail={}){try{window.dispatchEvent(new CustomEvent('hd:sortie-session-changed',{detail:{action,...detail}}))}catch{}}
 function hdSSStart(map){
  if(hdSSLoad())return null;
  const session=hdSSSnapshot(map);if(!session||!session.shipCount)return null;
- hdSSSave(session);hdSSRender();return session;
+ hdSSSave(session);hdSSRender();hdSSEmit('start',{session});return session;
 }
-function hdSSClear(){hdSSSave(null);hdSSRender()}
+function hdSSClear(){const session=hdSSLoad();hdSSSave(null);hdSSRender();hdSSEmit('clear',{session});return true}
 function hdSSDuration(ms){
  const m=Math.max(0,Math.floor((Number(ms)||0)/60000)),h=Math.floor(m/60),r=m%60;
  return h?h+'時間'+r+'分':m+'分';
@@ -60,7 +61,7 @@ function hdSSFinish(data){
  });
  if(!entry)return null;
  hdSSSave(null);try{if(typeof hdSPSRender==='function')hdSPSRender();if(typeof hdSLRender==='function')hdSLRender()}catch{}
- return entry;
+ hdSSEmit('finish',{session,entry});return entry;
 }
 function hdSSSelectedSummary(map){
  const fleet=hdSSFleet(map);if(!fleet)return null;const stats=hdSSStats(map,fleet);
@@ -94,8 +95,23 @@ function hdSSInstall(){
  hdSPSRender=function(){const v=prev.apply(this,arguments);setTimeout(hdSSRender,0);return v};
  setTimeout(hdSSRender,0);return true;
 }
+window.hdSSLoad=hdSSLoad;
+window.hdSSSave=hdSSSave;
+window.hdSSMap=hdSSMap;
+window.hdSSFleet=hdSSFleet;
+window.hdSSStats=hdSSStats;
+window.hdSSSnapshot=hdSSSnapshot;
+window.hdSSStart=hdSSStart;
+window.hdSSClear=hdSSClear;
+window.hdSSFinish=hdSSFinish;
+window.hdSSDuration=hdSSDuration;
+window.hdSSSelectedSummary=hdSSSelectedSummary;
+window.hdSSRender=hdSSRender;
+window.hdSSFormData=hdSSFormData;
+window.hdSSInstall=hdSSInstall;
+
 document.addEventListener('click',function(e){
- if(e.target.closest?.('[data-hd-ss-start]')){hdSSStart(hdSSMap());return}
+ if(e.target.closest?.('[data-hd-ss-start]')){const session=hdSSStart(hdSSMap());if(session&&typeof window.hdSMOpen==='function')setTimeout(()=>window.hdSMOpen(),0);return}
  if(e.target.closest?.('[data-hd-ss-finish]')){hdSSFinish(hdSSFormData());return}
  if(e.target.closest?.('[data-hd-ss-cancel]')){hdSSClear();return}
  if(e.target.closest?.('[data-hd-ss-check]')){if(typeof hdSPSOpenMapTab==='function')hdSPSOpenMapTab('mine');return}

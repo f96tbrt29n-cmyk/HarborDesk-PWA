@@ -1757,3 +1757,102 @@ test('release smoke: update menu bootstrap is available before async modules fin
   expect(result.bound).toBe('1');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: dedicated sortie mode summarizes active session', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMEnsure === 'function' &&
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMOpen === 'function' &&
+    typeof window.hdQNMobileAttentionItems === 'function'
+  );
+
+  const startedAt = Date.now() - 5 * 60 * 1000;
+  await page.evaluate(startedAt => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-test-session',
+      map:'2-4',
+      startedAt,
+      fleetId:'sm-test-fleet',
+      fleetName:'テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-test-fleet',name:'テスト艦隊',ships:[
+        {ship:'吹雪',gear:'12.7cm連装砲 / 電探'},
+        {ship:'赤城',gear:'艦戦 / 艦攻'}
+      ]},
+      readinessSnapshot:{autoOk:2,autoTotal:3,manualDone:1,manualTotal:2,unresolved:[{label:'補給',state:'warn',detail:''}]},
+      shipCount:2,
+      status:'active'
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  }, startedAt);
+
+  await expect(page.locator('#hdSortieMode')).toBeVisible();
+  await expect(page.locator('#hdSortieModeBody')).toContainText('2-4');
+  await expect(page.locator('#hdSortieModeBody')).toContainText('テスト艦隊');
+  await expect(page.locator('#hdSortieModeBody')).toContainText('補給');
+  await expect(page.locator('[data-hd-sm-elapsed]')).not.toHaveText('');
+  await expect(page.locator('.hd-sm-shortcuts button')).toHaveCount(5);
+
+  const attention = await page.evaluate(() => window.hdQNMobileAttentionItems().find(x => x?.id === 'hdSortieMode'));
+  expect(attention?.title || '').toContain('2-4');
+  expect(attention?.reason || '').toContain('出撃');
+  expect(Number(attention?.priority) || 0).toBe(90);
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: sortie mode return recording clears active session', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMEnsure === 'function' &&
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSSFinish === 'function' &&
+    typeof window.hdSLRecordEntry === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-finish-session',
+      map:'3-2',
+      startedAt:Date.now()-120000,
+      fleetId:'sm-finish-fleet',
+      fleetName:'帰還テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-finish-fleet',name:'帰還テスト艦隊',ships:[{ship:'夕立',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active'
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  await expect(page.locator('#hdSortieMode')).toBeVisible();
+  await page.locator('#hdSMResult').selectOption('撤退');
+  await page.locator('#hdSMNode').fill('K');
+  await page.locator('#hdSMBattles').fill('3');
+  await page.locator('#hdSMMemo').fill('出撃モード記録テスト');
+  await page.locator('[data-hd-sm-finish]').click();
+
+  await page.waitForFunction(() => !localStorage.getItem('harbordesk-active-sortie-session-v1'));
+  const result = await page.evaluate(() => {
+    let rows=[];try{rows=JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]')||[]}catch{}
+    const hit=rows.find(x=>x.sessionId==='sm-finish-session');
+    return {active:localStorage.getItem('harbordesk-active-sortie-session-v1'),hit};
+  });
+  expect(result.active).toBeNull();
+  expect(result.hit?.map).toBe('3-2');
+  expect(result.hit?.result).toBe('撤退');
+  expect(result.hit?.node).toBe('K');
+  expect(result.hit?.battles).toBe(3);
+  expect(result.hit?.memo || '').toContain('出撃モード記録テスト');
+  expect(errors).toEqual([]);
+});
