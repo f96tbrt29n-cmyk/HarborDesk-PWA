@@ -816,3 +816,83 @@ test('release smoke: snapshot restore transaction rolls back partial writes', as
   expect(result.b).toBe(result.expectedB);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: restore refuses to run without safety snapshot layer', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdBuildBackupFile === 'function' &&
+    typeof window.importBackup === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-safety-layer', JSON.stringify({ value: 'safe' }));
+    const built = window.hdBuildBackupFile();
+    built.data.localStorage['harbordesk-safety-layer'] = JSON.stringify({ value: 'incoming' });
+    built.data.integrity.hash = window.hdBackupChecksum(built.data);
+    window.__hdSafetyLayerAlerts = [];
+    window.alert = message => window.__hdSafetyLayerAlerts.push(String(message || ''));
+    window.__hdOriginalSnapshotFn = window.hdPHCreateSnapshot;
+    window.hdPHCreateSnapshot = undefined;
+    const file = new File([JSON.stringify(built.data)], 'HarborDesk-no-safety-layer.json', { type: 'application/json' });
+    window.__hdSafetyLayerPromise = window.importBackup(file);
+  });
+
+  const dialog = page.locator('#hdBackupRestorePreviewDialog');
+  await expect(dialog).toBeVisible();
+  await dialog.locator('button[value="restore"]').click();
+
+  const result = await page.evaluate(async () => {
+    const imported = await window.__hdSafetyLayerPromise;
+    const current = localStorage.getItem('harbordesk-safety-layer');
+    const alerts = window.__hdSafetyLayerAlerts || [];
+    window.hdPHCreateSnapshot = window.__hdOriginalSnapshotFn;
+    delete window.__hdOriginalSnapshotFn;
+    return { imported, current, alerts };
+  });
+
+  expect(result.imported).toBe(false);
+  expect(JSON.parse(result.current).value).toBe('safe');
+  expect(result.alerts.join(' ')).toContain('安全スナップショット');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: concurrent backup restores are locked', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdBuildBackupFile === 'function' &&
+    typeof window.importBackup === 'function'
+  );
+
+  await page.evaluate(() => {
+    const built = window.hdBuildBackupFile();
+    window.__hdConcurrentAlerts = [];
+    window.alert = message => window.__hdConcurrentAlerts.push(String(message || ''));
+    const file1 = new File([JSON.stringify(built.data)], 'HarborDesk-first.json', { type: 'application/json' });
+    const file2 = new File([JSON.stringify(built.data)], 'HarborDesk-second.json', { type: 'application/json' });
+    window.__hdFirstRestorePromise = window.importBackup(file1);
+    window.__hdSecondRestorePromise = window.importBackup(file2);
+  });
+
+  const dialog = page.locator('#hdBackupRestorePreviewDialog');
+  await expect(dialog).toBeVisible();
+
+  const second = await page.evaluate(async () => await window.__hdSecondRestorePromise);
+  expect(second).toBe(false);
+
+  await dialog.locator('button[value="cancel"]').click();
+
+  const result = await page.evaluate(async () => ({
+    first: await window.__hdFirstRestorePromise,
+    busy: !!window.__hdBackupRestoreBusy,
+    alerts: window.__hdConcurrentAlerts || []
+  }));
+
+  expect(result.first).toBe(false);
+  expect(result.busy).toBe(false);
+  expect(result.alerts.join(' ')).toContain('進行中');
+  expect(errors).toEqual([]);
+});
