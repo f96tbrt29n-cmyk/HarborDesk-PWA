@@ -6368,3 +6368,26 @@ test('history navigation previews destination names', async ({ page }) => {
   expect(data.mobileAria).toContain(data.backLabel);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+
+test('compact database shows tap-for-detail hint', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-shipdb-view-v1',JSON.stringify({compact:true}));
+    sessionStorage.setItem('harbordesk-session-equip-catalog-view-v1',JSON.stringify({compact:true}));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdEnsureShipDatabase?.();window.hdEnsureEquipmentCatalog?.();
+    return {
+      shipHidden:document.getElementById('hdShipDbCompactHint')?.hidden,
+      equipHidden:document.getElementById('hdEquipCatalogCompactHint')?.hidden,
+      shipText:document.getElementById('hdShipDbCompactHint')?.textContent||'',
+      equipText:document.getElementById('hdEquipCatalogCompactHint')?.textContent||''
+    };
+  });
+  expect(data.shipHidden).toBe(false);
+  expect(data.equipHidden).toBe(false);
+  expect(data.shipText).toContain('タップ');
+  expect(data.equipText).toContain('タップ');
+});
