@@ -11,6 +11,7 @@ body.hd-workspace-mode{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 .hd-qn-actions button,.hd-qn-actions a{display:grid;place-items:center;gap:3px;min-height:54px;padding:7px 5px;border:1px solid var(--line);border-radius:12px;background:#0d2234;color:var(--text);text-decoration:none;font:inherit}
 .hd-qn-actions span{font-size:17px;line-height:1}
 .hd-qn-actions b{font-size:10px;white-space:nowrap}
+.hd-qn-actions small{display:block;max-width:100%;font-size:8px;line-height:1.15;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hd-qn-actions button:active,.hd-qn-actions a:active{transform:scale(.98);background:#14324a}
 @media(max-width:420px){.hd-qn-actions{gap:5px;padding-left:10px;padding-right:10px}.hd-qn-actions button,.hd-qn-actions a{min-height:50px}.hd-qn-actions b{font-size:9px}}
 
