@@ -108,7 +108,7 @@ function hdSMRouteTargetName(map,target){
 function hdSMObjectivePickerHtml(map,draft){
  const options=hdSMObjectiveOptions(map);if(options.length<2)return '';
  const selected=hdSMSelectedObjective(map,draft);
- return '<div class="hd-sm-objective-picker"><div><span>OBJECTIVE</span><b>今回の攻略目標</b><small>距離と経路判定に使用</small></div><div><button type="button" class="'+(!selected?'active':'')+'" data-hd-sm-objective="">自動</button>'+options.map(x=>'<button type="button" class="'+(selected===x.label?'active':'')+'" data-hd-sm-objective="'+hdSMEsc(x.label)+'">'+hdSMEsc(x.name)+'</button>').join('')+'</div></div>';
+ return '<div class="hd-sm-objective-picker"><div><span>OBJECTIVE</span><b>今回の攻略目標</b><small>距離・経路判定／次回も記憶</small></div><div><button type="button" class="'+(!selected?'active':'')+'" data-hd-sm-objective="">自動</button>'+options.map(x=>'<button type="button" class="'+(selected===x.label?'active':'')+'" data-hd-sm-objective="'+hdSMEsc(x.label)+'">'+hdSMEsc(x.name)+'</button>').join('')+'</div></div>';
 }
 function hdSMSetObjectiveTarget(target){
  const session=hdSMSession();if(!session||session.status!=='active')return false;
