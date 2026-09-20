@@ -6,6 +6,12 @@ function hdSSLoad(){try{return JSON.parse(localStorage.getItem(HD_SS_KEY)||'null
 function hdSSSave(v){if(v)localStorage.setItem(HD_SS_KEY,JSON.stringify(v));else localStorage.removeItem(HD_SS_KEY)}
 function hdSSObjectivePrefs(){try{const x=JSON.parse(localStorage.getItem(HD_SS_OBJECTIVE_PREF_KEY)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch{return {}}}
 function hdSSObjectivePref(map){return String(hdSSObjectivePrefs()[String(map||'')]||'').trim()}
+function hdSSApplyObjectivePref(session,map){
+ if(!session)return session;
+ const objectiveTarget=hdSSObjectivePref(map);
+ if(objectiveTarget)session.draft={...(session.draft||{}),objectiveTarget};
+ return session;
+}
 
 function hdSSUid(){return crypto.randomUUID?crypto.randomUUID():'ss-'+Date.now()+'-'+Math.random().toString(16).slice(2)}
 function hdSSMap(){return typeof hdSPSMap==='function'?hdSPSMap():(typeof selectedMap!=='undefined'?selectedMap:'')}
@@ -43,8 +49,7 @@ function hdSSSnapshot(map){
 function hdSSEmit(action,detail={}){try{window.dispatchEvent(new CustomEvent('hd:sortie-session-changed',{detail:{action,...detail}}))}catch{}}
 function hdSSStart(map){
  if(hdSSLoad())return null;
- const session=hdSSSnapshot(map);if(!session||!session.shipCount)return null;
- const objectiveTarget=hdSSObjectivePref(map);if(objectiveTarget)session.draft={...(session.draft||{}),objectiveTarget};
+ const session=hdSSApplyObjectivePref(hdSSSnapshot(map),map);if(!session||!session.shipCount)return null;
  hdSSSave(session);hdSSRender();hdSSEmit('start',{session});return session;
 }
 function hdSSClear(){const session=hdSSLoad();hdSSSave(null);hdSSRender();hdSSEmit('clear',{session});return true}
