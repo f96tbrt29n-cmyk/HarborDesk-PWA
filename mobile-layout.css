@@ -1,0 +1,66 @@
+:root{
+ --hd-layer-content:1;
+ --hd-layer-network:36;
+ --hd-layer-workspace:38;
+ --hd-layer-header-menu:39;
+ --hd-layer-topbar:40;
+ --hd-layer-dock:60;
+ --hd-mobile-gutter:12px;
+ --hd-mobile-dock-height:66px;
+ --hd-mobile-dock-gap:8px;
+ --hd-mobile-bottom-clearance:calc(var(--hd-mobile-dock-height) + var(--hd-mobile-dock-gap) + env(safe-area-inset-bottom) + 18px);
+}
+@media(max-width:560px){
+ html{
+  scroll-padding-top:calc(var(--hd-topbar-h,58px) + var(--hd-header-menu-h,0px) + var(--hd-workspace-nav-h,0px) + 10px);
+  scroll-padding-bottom:var(--hd-mobile-bottom-clearance);
+  overflow-x:hidden;
+ }
+ body{overflow-x:hidden}
+ body.hd-workspace-mode{padding-bottom:var(--hd-mobile-bottom-clearance)!important}
+ body.hd-workspace-mode main{
+  min-width:0;
+  padding-left:max(var(--hd-mobile-gutter),env(safe-area-inset-left));
+  padding-right:max(var(--hd-mobile-gutter),env(safe-area-inset-right));
+  padding-bottom:calc(var(--hd-mobile-dock-height) + 24px);
+ }
+ body.hd-workspace-mode main>*,body.hd-workspace-mode section{min-width:0;max-width:100%}
+ .topbar{z-index:var(--hd-layer-topbar)}
+ .hd-mobile-header-menu-row{z-index:var(--hd-layer-header-menu)!important}
+ .hd-ws-shell{
+  z-index:var(--hd-layer-workspace)!important;
+  top:calc(var(--hd-topbar-h,58px) + var(--hd-header-menu-h,0px))!important
+ }
+ .hd-network-status{
+  z-index:var(--hd-layer-network)!important;
+  top:calc(var(--hd-topbar-h,58px) + var(--hd-header-menu-h,0px) + var(--hd-workspace-nav-h,0px))!important
+ }
+ .hd-mobile-dock{
+  z-index:var(--hd-layer-dock)!important;
+  width:min(calc(100vw - (var(--hd-mobile-gutter) * 2)),430px)!important;
+  min-height:var(--hd-mobile-dock-height);
+  bottom:calc(var(--hd-mobile-dock-gap) + env(safe-area-inset-bottom))!important
+ }
+ body.hd-workspace-mode section,
+ body.hd-workspace-mode [id]{scroll-margin-top:calc(var(--hd-topbar-h,58px) + var(--hd-header-menu-h,0px) + var(--hd-workspace-nav-h,0px) + 12px)}
+ .hd-qn-dialog,.hd-mobile-attention-dialog,.hd-sync-status-dialog{
+  max-width:calc(100vw - (var(--hd-mobile-gutter) * 2) - env(safe-area-inset-left) - env(safe-area-inset-right))
+ }
+}
+@media(max-width:900px) and (max-height:500px){
+ :root{
+  --hd-mobile-dock-height:54px;
+  --hd-mobile-gutter:8px;
+  --hd-mobile-dock-gap:4px;
+ }
+ .topbar{padding-top:6px!important;padding-bottom:6px!important}
+ .topbar .eyebrow{display:none}
+ .topbar h1{font-size:18px!important}
+ .hd-ws-shell{padding-top:4px!important;padding-bottom:4px!important}
+ .hd-ws-primary button{padding-top:6px!important;padding-bottom:6px!important}
+ .hd-ws-mobile-picker{padding-top:4px!important;margin-top:4px!important}
+ .hd-mobile-dock{padding:4px!important}
+ .hd-mobile-dock button{min-height:42px!important}
+ .hd-mobile-dock button span{font-size:15px!important}
+ .hd-mobile-dock button b{font-size:8px!important}
+}

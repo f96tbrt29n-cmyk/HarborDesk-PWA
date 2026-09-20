@@ -1542,3 +1542,62 @@ test('release smoke: canonical map renderer falls back without override chains',
   await expect(page.locator('#mapExtraPanel')).toContainText('編成例');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: shared mobile layout prevents chrome overlap across iPhone sizes', async ({ page }) => {
+  const errors = [];
+  const sizes = [
+    { width: 375, height: 812 },
+    { width: 390, height: 844 },
+    { width: 430, height: 932 },
+    { width: 844, height: 390 }
+  ];
+
+  for (const size of sizes) {
+    await page.setViewportSize(size);
+    await page.goto('/');
+    await page.waitForFunction(() => document.body && !document.body.classList.contains('hd-booting'), null, { timeout: 30000 });
+    await page.locator('[data-hd-ws-group="guide"]').click();
+    await page.waitForTimeout(100);
+
+    const before = await page.evaluate(() => {
+      const top=document.querySelector('.topbar')?.getBoundingClientRect();
+      const nav=document.getElementById('hdWorkspaceNav')?.getBoundingClientRect();
+      const dock=document.getElementById('hdMobileDock')?.getBoundingClientRect();
+      const main=document.querySelector('main')?.getBoundingClientRect();
+      const css=getComputedStyle(document.documentElement);
+      return {
+        vw:window.innerWidth,
+        docWidth:document.documentElement.scrollWidth,
+        topBottom:Math.round(top?.bottom||0),
+        navTop:Math.round(nav?.top||0),
+        dockWidth:Math.round(dock?.width||0),
+        dockBottom:Math.round(dock?.bottom||0),
+        mainWidth:Math.round(main?.width||0),
+        clearance:css.getPropertyValue('--hd-mobile-bottom-clearance').trim()
+      };
+    });
+
+    expect(before.docWidth).toBeLessThanOrEqual(before.vw + 1);
+    expect(before.topBottom).toBeLessThanOrEqual(before.navTop + 2);
+    expect(before.dockWidth).toBeLessThanOrEqual(before.vw);
+    expect(before.mainWidth).toBeLessThanOrEqual(before.vw);
+    expect(before.clearance).not.toBe('');
+
+    if (size.width <= 560) {
+      const more=page.locator('.hd-header-more');
+      await more.locator(':scope > summary').click();
+      await expect(page.locator('#hdMobileHeaderMenuRow')).toBeVisible();
+      const open = await page.evaluate(() => {
+        const row=document.getElementById('hdMobileHeaderMenuRow')?.getBoundingClientRect();
+        const nav=document.getElementById('hdWorkspaceNav')?.getBoundingClientRect();
+        return {rowBottom:Math.round(row?.bottom||0),navTop:Math.round(nav?.top||0)};
+      });
+      expect(open.rowBottom).toBeLessThanOrEqual(open.navTop + 2);
+      more.evaluate(el => el.removeAttribute('open'));
+      await page.waitForTimeout(50);
+    }
+  }
+
+  expect(errors).toEqual([]);
+});
