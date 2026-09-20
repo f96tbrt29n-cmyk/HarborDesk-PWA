@@ -41,10 +41,20 @@ function hdSMBranchHintHtml(map,draft){
  const hint=hdSMBranchHint(map,draft);
  return '<div class="hd-sm-branch-hint"><div><span>ROUTE CONDITION</span><b>'+hdSMEsc(hint.title)+'</b></div><p>'+hdSMEsc(hint.text)+'</p>'+(hint.source?'<small>'+hdSMEsc(hint.source)+'</small>':'')+'</div>';
 }
+function hdSMFormationAdvice(kind,detail){
+ kind=String(kind||'normal');detail=detail||{};
+ if(kind==='sub')return {formation:'単横陣',formationReason:'対潜火力と対潜命中を優先する基本陣形。'};
+ if(kind==='air')return {formation:'輪形陣',formationReason:'空襲・航空戦で対空を重視。通常艦隊では5隻以上で選択可能。'};
+ if(kind==='night')return {formation:'単縦陣',formationReason:'夜戦での命中と殲滅を重視する基本案。'};
+ if(kind==='boss')return {formation:'単縦陣',formationReason:'ボス撃破の砲雷撃戦火力を優先する基本陣形。'};
+ if(kind==='vortex')return {formation:'選択なし',formationReason:'渦潮マスでは陣形選択なし。電探による損失軽減を確認。'};
+ if(kind==='item'||kind==='safe'||kind==='goal')return {formation:'選択なし',formationReason:'戦闘のないマスでは陣形選択なし。'};
+ return {formation:'単縦陣',formationReason:'通常戦の砲雷撃戦火力を優先する基本陣形。'};
+}
 function hdSMNodeIntel(map,row){
  row=row||{};const label=String(row.label||'').trim(),kind=String(row.kind||'normal');
  let detail={};try{if(label&&typeof HD_NODE_DETAIL_OVERRIDES!=='undefined')detail=HD_NODE_DETAIL_OVERRIDES?.[map]?.[label]||{}}catch{}
- const enemy=String(detail.enemy||'').trim(),air=String(detail.air||'').trim(),source=String(detail.source||'').trim();
+ const enemy=String(detail.enemy||'').trim(),air=String(detail.air||'').trim(),source=String(detail.source||'').trim(),formation=hdSMFormationAdvice(kind,detail);
  const defaults={
   boss:'ボス戦候補。決戦火力・制空・夜戦要員を確認。',
   sub:'潜水マス候補。先制対潜とソナー・爆雷を確認。',
@@ -56,13 +66,32 @@ function hdSMNodeIntel(map,row){
   goal:'到達地点候補。'
  };
  const summary=enemy||air||defaults[kind]||'通常戦候補。次マスの敵編成と制空を確認。';
- const badge=kind==='boss'?'高危険':(kind==='sub'||kind==='air'||kind==='night')?'要対策':(kind==='item'||kind==='safe'||kind==='goal')?'非戦闘':'戦闘';
- return {label,kind,badge,summary,enemy,air,source,hasDetail:!!(enemy||air)};
+ const badge=kind==='boss'?'高危険':(kind==='sub'||kind==='air'||kind==='night')?'要対策':(kind==='item'||kind==='safe'||kind==='goal'||kind==='vortex')?'非戦闘':'戦闘';
+ const all=(enemy+' '+air).trim();
+ let caution='砲雷撃戦 / 中大破確認';
+ if(kind==='sub')caution='先制対潜 / ソナー・爆雷';
+ else if(kind==='air')caution='防空 / 対空CI / 艦戦';
+ else if(kind==='night')caution='大破進軍注意 / 夜偵・照明弾';
+ else if(kind==='vortex')caution='電探で資源損失を軽減';
+ else if(kind==='item'||kind==='safe'||kind==='goal')caution='戦闘なし';
+ else if(kind==='boss'){
+  if(/陸上型|港湾棲姫|対地/.test(all))caution='対地装備 / 制空 / 決戦火力';
+  else if(/潜水/.test(all))caution='対潜 / 決戦火力';
+  else if(air&&!/制空不要|敵航空戦力なし/.test(air))caution='制空 / 決戦火力 / 夜戦要員';
+  else caution='決戦火力 / 夜戦要員';
+ }else if(/潜水/.test(all))caution='対潜装備 / 水上火力の両立';
+ else if(air&&!/制空不要|敵航空戦力なし/.test(air))caution='制空確認 / 弾着対策';
+ return {label,kind,badge,summary,enemy,air,source,caution,...formation,hasDetail:!!(enemy||air)};
 }
 function hdSMNextNodeButtonHtml(map,row){
  const intel=hdSMNodeIntel(map,row);
  const detail=[intel.enemy?('敵 '+intel.enemy):'',intel.air?('制空 '+intel.air):''].filter(Boolean).join(' / ')||intel.summary;
- return '<button type="button" class="hd-sm-next '+hdSMEsc(intel.kind)+'" data-hd-sm-next-node="'+hdSMEsc(intel.label)+'"><b>'+hdSMEsc(intel.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(intel.kind))+'</small><i>次へ</i><span class="hd-sm-next-risk">'+hdSMEsc(intel.badge)+'</span><em>'+hdSMEsc(detail)+'</em></button>';
+ return '<button type="button" class="hd-sm-next '+hdSMEsc(intel.kind)+'" data-hd-sm-next-node="'+hdSMEsc(intel.label)+'"><b>'+hdSMEsc(intel.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(intel.kind))+'</small><i>次へ</i><span class="hd-sm-next-risk">'+hdSMEsc(intel.badge)+'</span><span class="hd-sm-next-formation">基本陣形 '+hdSMEsc(intel.formation)+'</span><span class="hd-sm-next-caution">'+hdSMEsc(intel.caution)+'</span><em>'+hdSMEsc(detail)+'</em></button>';
+}
+function hdSMCurrentTacticHtml(map,draft){
+ const current=String(draft?.node||'').trim();if(!current)return '';
+ const graph=hdSMGraph(map),kind=hdSMNodeKind(graph,current),intel=hdSMNodeIntel(map,{label:current,kind});
+ return '<div class="hd-sm-current-tactic '+hdSMEsc(kind)+'"><div class="hd-sm-current-head"><span>BATTLE GUIDE</span><b>'+hdSMEsc(current)+'マス</b><small>'+hdSMEsc(hdSMNodeKindLabel(kind))+'</small></div><div class="hd-sm-current-grid"><div><span>基本陣形</span><strong>'+hdSMEsc(intel.formation)+'</strong><small>'+hdSMEsc(intel.formationReason)+'</small></div><div><span>警戒ポイント</span><strong>'+hdSMEsc(intel.caution)+'</strong><small>'+hdSMEsc(intel.summary)+'</small></div></div>'+(intel.source?'<footer>'+hdSMEsc(intel.source)+'</footer>':'')+'</div>';
 }
 function hdSMElapsed(ms){
  const total=Math.max(0,Math.floor((Number(ms)||0)/1000)),s=total%60,m=Math.floor(total/60)%60,h=Math.floor(total/3600);
@@ -99,7 +128,7 @@ function hdSMNodePickerHtml(session,draft){
  if(!rows.length)return '';
  const nextTitle=current?'次に進める候補':'最初の進行候補';
  const nextHtml=next.length?'<div class="hd-sm-next-wrap"><div class="hd-sm-next-head"><b>'+nextTitle+'</b><small>候補ごとに戦闘種別と、登録済みの敵・制空注意を表示するよ。</small></div><div class="hd-sm-next-grid">'+next.map(function(x){return hdSMNextNodeButtonHtml(session?.map,x)}).join('')+'</div></div>':'<div class="hd-sm-next-done">'+(current?'このマスから先の接続候補は登録されていないよ。':'開始地点の候補を取得できないよ。')+'</div>';
- return '<div class="hd-sm-panel hd-sm-node-panel"><div class="hd-sm-panel-head"><strong>現在マス</strong><span>普段は「次に進める候補」だけタップでOK</span></div>'+nextHtml+hdSMBranchHintHtml(session?.map,draft)+
+ return '<div class="hd-sm-panel hd-sm-node-panel"><div class="hd-sm-panel-head"><strong>現在マス</strong><span>普段は「次に進める候補」だけタップでOK</span></div>'+hdSMCurrentTacticHtml(session?.map,draft)+nextHtml+hdSMBranchHintHtml(session?.map,draft)+
   '<details class="hd-sm-all-nodes"><summary>全マスから選ぶ</summary><div class="hd-sm-node-grid">'+
   rows.map(function(x){const active=x.label===current;return '<button type="button" class="hd-sm-node '+hdSMEsc(x.kind)+(active?' active':'')+'" data-hd-sm-node="'+hdSMEsc(x.label)+'" aria-pressed="'+(active?'true':'false')+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(x.kind))+'</small></button>'}).join('')+
   '</div></details>'+(route.length?'<div class="hd-sm-route-trail"><div><span>通過</span><b>'+route.map(hdSMEsc).join(' → ')+'</b></div><button type="button" class="ghost small" data-hd-sm-route-undo>1つ戻す</button></div>':'<div class="hd-sm-route-empty">次候補を押すと、ここに通過履歴を残すよ。</div>')+'</div>';
@@ -223,7 +252,9 @@ window.hdSMFormData=hdSMFormData;
 window.hdSMNodeRows=hdSMNodeRows;
 window.hdSMNextNodeRows=hdSMNextNodeRows;
 window.hdSMBranchHint=hdSMBranchHint;
+window.hdSMFormationAdvice=hdSMFormationAdvice;
 window.hdSMNodeIntel=hdSMNodeIntel;
+window.hdSMCurrentTacticHtml=hdSMCurrentTacticHtml;
 window.hdSMSetNode=hdSMSetNode;
 window.hdSMUndoNode=hdSMUndoNode;
 window.hdSMSaveDraft=hdSMSaveDraft;

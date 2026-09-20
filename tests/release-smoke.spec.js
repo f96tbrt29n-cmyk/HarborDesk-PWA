@@ -2116,3 +2116,54 @@ test('release smoke: sortie mode previews next-node battle intelligence', async 
   expect(intel.enemy).toContain('重巡リ級elite');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie mode recommends formations and current-node cautions', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMEnsure === 'function' &&
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMFormationAdvice === 'function' &&
+    typeof window.hdSMNodeIntel === 'function'
+  );
+
+  const advice = await page.evaluate(() => ({
+    normal: window.hdSMFormationAdvice('normal',{}),
+    sub: window.hdSMFormationAdvice('sub',{}),
+    air: window.hdSMFormationAdvice('air',{})
+  }));
+  expect(advice.normal.formation).toBe('単縦陣');
+  expect(advice.sub.formation).toBe('単横陣');
+  expect(advice.air.formation).toBe('輪形陣');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-formation-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-formation-fleet',
+      fleetName:'陣形ガイドテスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-formation-fleet',name:'陣形ガイドテスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active'
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const b = page.locator('[data-hd-sm-next-node="B"]');
+  await expect(b.locator('.hd-sm-next-formation')).toContainText('単縦陣');
+  await expect(b.locator('.hd-sm-next-caution')).toContainText('砲雷撃戦');
+  await b.click();
+
+  await expect(page.locator('.hd-sm-current-tactic')).toBeVisible();
+  await expect(page.locator('.hd-sm-current-tactic')).toContainText('Bマス');
+  await expect(page.locator('.hd-sm-current-tactic')).toContainText('単縦陣');
+  await expect(page.locator('.hd-sm-current-tactic')).toContainText('警戒ポイント');
+  expect(errors).toEqual([]);
+});
