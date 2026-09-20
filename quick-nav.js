@@ -303,8 +303,8 @@ function hdQNMobileAttentionItems(){
  try{
   const sortie=JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')||'null');
   if(sortie&&sortie.status==='active'){
-   const mins=Math.max(0,Math.floor((now-(Number(sortie.startedAt)||now))/60000));
-   items.push({id:'hdSortieMode',priority:90,tone:'soon',reason:'出撃セッション進行中',icon:'⚓',title:`${String(sortie.map||'海域')} 出撃中`,detail:`${String(sortie.fleetName||'艦隊')}・開始から${mins}分`});
+   const mins=Math.max(0,Math.floor((now-(Number(sortie.startedAt)||now))/60000)),node=String(sortie.draft?.node||'').trim();
+   items.push({id:'hdSortieMode',priority:90,tone:'soon',reason:'出撃セッション進行中',icon:'⚓',title:`${String(sortie.map||'海域')} 出撃中`,detail:`${String(sortie.fleetName||'艦隊')}・${node?node+'到達・':''}開始から${mins}分`});
   }
  }catch{}
  const resourceAlert=hdQNResourceThresholdAlert();if(resourceAlert)items.push(resourceAlert);

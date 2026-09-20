@@ -1856,3 +1856,66 @@ test('release smoke: sortie mode return recording clears active session', async 
   expect(result.hit?.memo || '').toContain('出撃モード記録テスト');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie mode autosaves and restores in-progress draft', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMEnsure === 'function' &&
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMSaveDraft === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-draft-session',
+      map:'4-5',
+      startedAt:Date.now()-180000,
+      fleetId:'sm-draft-fleet',
+      fleetName:'下書きテスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-draft-fleet',name:'下書きテスト艦隊',ships:[{ship:'最上',gear:'三式弾'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active'
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  await page.locator('#hdSMResult').selectOption('A');
+  await page.locator('#hdSMNode').fill('K');
+  await page.locator('#hdSMBattles').fill('4');
+  await page.locator('#hdSMDrop').fill('テスト艦');
+  await page.locator('#hdSMBuckets').fill('2');
+  await page.locator('#hdSMMemo').fill('途中入力を保持');
+  await page.locator('#hdSMBoss').check();
+  await page.evaluate(() => window.hdSMSaveDraft());
+
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')||'null')?.draft || null);
+  expect(stored?.result).toBe('A');
+  expect(stored?.node).toBe('K');
+  expect(stored?.battles).toBe(4);
+  expect(stored?.boss).toBe(true);
+  expect(stored?.drop).toBe('テスト艦');
+  expect(stored?.buckets).toBe(2);
+  expect(stored?.memo).toBe('途中入力を保持');
+  expect(Number(stored?.updatedAt)||0).toBeGreaterThan(0);
+
+  await page.evaluate(() => window.hdSMRender());
+  await expect(page.locator('#hdSMResult')).toHaveValue('A');
+  await expect(page.locator('#hdSMNode')).toHaveValue('K');
+  await expect(page.locator('#hdSMBattles')).toHaveValue('4');
+  await expect(page.locator('#hdSMDrop')).toHaveValue('テスト艦');
+  await expect(page.locator('#hdSMBuckets')).toHaveValue('2');
+  await expect(page.locator('#hdSMMemo')).toHaveValue('途中入力を保持');
+  await expect(page.locator('#hdSMBoss')).toBeChecked();
+  await expect(page.locator('[data-hd-sm-draft-status]')).toContainText('保存');
+
+  const attention = await page.evaluate(() => window.hdQNMobileAttentionItems().find(x => x?.id === 'hdSortieMode'));
+  expect(attention?.detail || '').toContain('K到達');
+  expect(errors).toEqual([]);
+});
