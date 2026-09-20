@@ -2409,3 +2409,51 @@ test('release smoke: sortie mode auto-counts battles and supports quick return e
   expect(data.draft.buckets).toBe(1);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie mode records structured retreat reason', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMQuickRetreatReason === 'function' &&
+    typeof window.hdSSFinish === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-retreat-reason-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-retreat-reason-fleet',
+      fleetName:'撤退理由テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-retreat-reason-fleet',name:'撤退理由テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'A',routeNodes:['A'],result:'S',memo:'',battles:1}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  await page.locator('[data-hd-sm-quick-result="撤退"]').click();
+  await expect(page.locator('.hd-sm-retreat-reasons')).toBeVisible();
+  await page.locator('[data-hd-sm-retreat-reason="索敵不足"]').click();
+  await expect(page.locator('#hdSMResult')).toHaveValue('撤退');
+  await expect(page.locator('#hdSMRetreatReason')).toHaveValue('索敵不足');
+  await expect(page.locator('.hd-sm-retreat-reasons')).toContainText('選択中: 索敵不足');
+
+  const draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
+  expect(draft.retreatReason).toBe('索敵不足');
+
+  await page.locator('[data-hd-sm-finish]').click();
+  const log = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]')[0]);
+  expect(log.result).toBe('撤退');
+  expect(log.retreat).toBe(true);
+  expect(log.retreatReason).toBe('索敵不足');
+  expect(errors).toEqual([]);
+});
