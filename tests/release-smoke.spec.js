@@ -1957,19 +1957,24 @@ test('release smoke: sortie mode node picker records and rewinds route trail', a
   });
 
   await expect(page.locator('[data-hd-sm-node]')).toHaveCount(15);
-  await page.locator('[data-hd-sm-node="A"]').click();
-  await page.locator('[data-hd-sm-node="D"]').click();
+  await page.locator('[data-hd-sm-next-node="A"]').click();
+  await page.locator('[data-hd-sm-next-node="D"]').click();
   await expect(page.locator('#hdSMNode')).toHaveValue('D');
   await expect(page.locator('.hd-sm-route-trail')).toContainText('A → D');
 
-  await page.locator('[data-hd-sm-node="O"]').click();
+  await page.locator('[data-hd-sm-next-node="H"]').click();
+  await page.locator('[data-hd-sm-next-node="J"]').click();
+  await page.locator('[data-hd-sm-next-node="O"]').click();
   await expect(page.locator('#hdSMNode')).toHaveValue('O');
   await expect(page.locator('#hdSMBoss')).toBeChecked();
-  await expect(page.locator('.hd-sm-route-trail')).toContainText('A → D → O');
+  await expect(page.locator('.hd-sm-route-trail')).toContainText('A → D → H → J → O');
 
   await page.locator('[data-hd-sm-route-undo]').click();
-  await expect(page.locator('#hdSMNode')).toHaveValue('D');
+  await expect(page.locator('#hdSMNode')).toHaveValue('J');
   await expect(page.locator('#hdSMBoss')).not.toBeChecked();
+  await page.locator('[data-hd-sm-route-undo]').click();
+  await page.locator('[data-hd-sm-route-undo]').click();
+  await expect(page.locator('#hdSMNode')).toHaveValue('D');
   await expect(page.locator('.hd-sm-route-trail')).toContainText('A → D');
 
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')||'null')?.draft || null);
