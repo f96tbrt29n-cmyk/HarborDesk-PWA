@@ -6663,3 +6663,48 @@ test('home shows automatic usual shortcuts from usage history', async ({ page })
   expect(data.recentRows).not.toContain('equipmentBook');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('home resume shortcut skips home and usage history can be reset', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    localStorage.setItem('harbordesk-quick-nav-recent-v1',JSON.stringify([
+      {id:'home',at:Date.now()},
+      {id:'roster',at:Date.now()-1000},
+      {id:'equipmentBook',at:Date.now()-2000}
+    ]));
+    localStorage.setItem('harbordesk-quick-nav-usage-v1',JSON.stringify({
+      roster:{count:7,lastAt:Date.now()-1000},
+      equipmentBook:{count:4,lastAt:Date.now()-2000}
+    }));
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+    const resume=window.hdPHResumeRow?.();
+    const button=document.querySelector('.hd-ph-resume');
+    const before={
+      id:resume?.id||'',
+      text:button?.textContent||'',
+      target:button?.dataset.phJump||'',
+      usualCount:document.querySelectorAll('.hd-ph-usual-shortcuts [data-ph-jump]').length
+    };
+    const reset=window.hdPHClearUsage?.();
+    await new Promise(r=>setTimeout(r,60));
+    const stored=JSON.parse(localStorage.getItem('harbordesk-quick-nav-usage-v1')||'{}');
+    const after={
+      reset:!!reset,
+      stored,
+      usualCount:document.querySelectorAll('.hd-ph-usual-shortcuts [data-ph-jump]').length,
+      usualText:document.querySelector('.hd-ph-usual-shortcuts')?.textContent||''
+    };
+    return {before,after};
+  });
+  expect(data.before.id).toBe('roster');
+  expect(data.before.target).toBe('roster');
+  expect(data.before.text).toContain('続きから');
+  expect(data.before.usualCount).toBeGreaterThan(0);
+  expect(data.after.reset).toBe(true);
+  expect(data.after.stored).toEqual({});
+  expect(data.after.usualCount).toBe(0);
+  expect(data.after.usualText).toContain('使うほど');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
