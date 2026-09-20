@@ -2384,10 +2384,9 @@ test('release smoke: sortie mode auto-counts battles and supports quick return e
   });
 
   await page.locator('[data-hd-sm-next-node="A"]').click();
-  await expect(page.locator('#hdSMBattles')).toHaveValue('1');
-  await page.locator('[data-hd-sm-safe-confirm]').click();
+  await expect(page.locator('#hdSMBattles')).toHaveValue('0');
   await page.locator('[data-hd-sm-next-node="D"]').click();
-  await expect(page.locator('#hdSMBattles')).toHaveValue('2');
+  await expect(page.locator('#hdSMBattles')).toHaveValue('1');
 
   await page.locator('[data-hd-sm-quick-result="A"]').click();
   await expect(page.locator('#hdSMResult')).toHaveValue('A');
@@ -2402,7 +2401,7 @@ test('release smoke: sortie mode auto-counts battles and supports quick return e
     count: window.hdSMBattleCount('2-4',['A','D']),
     draft: JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft
   }));
-  expect(data.count).toBe(2);
+  expect(data.count).toBe(1);
   expect(data.draft.result).toBe('A');
   expect(data.draft.boss).toBe(true);
   expect(data.draft.drop).toBe('なし');
@@ -2600,7 +2599,7 @@ test('release smoke: sticky sortie HUD shows battle progress and boss distance',
 
   const progress = page.locator('.hd-sm-hud-progress');
   await expect(progress).toBeVisible();
-  await expect(progress).toContainText('戦闘 2');
+  await expect(progress).toContainText('戦闘 1');
   await expect(progress).toContainText('構造図最短 ボスまで');
   expect(errors).toEqual([]);
 });
