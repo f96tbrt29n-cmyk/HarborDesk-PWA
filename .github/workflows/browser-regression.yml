@@ -22,10 +22,11 @@ permissions:
   contents: read
 
 jobs:
-  playwright:
-    name: Playwright / ${{ matrix.browser }}
+  smoke:
+    name: Smoke / ${{ matrix.browser }}
+    if: github.event_name != 'workflow_dispatch' || inputs.suite == 'smoke'
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -47,18 +48,53 @@ jobs:
         run: npx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run smoke browser regression
-        if: github.event_name != 'workflow_dispatch' || inputs.suite == 'smoke'
         run: npm run test:browser -- --project=${{ matrix.browser }}
-
-      - name: Run full browser regression
-        if: github.event_name == 'workflow_dispatch' && inputs.suite == 'full'
-        run: npm run test:browser:full -- --project=${{ matrix.browser }} --workers=1
 
       - name: Upload Playwright diagnostics
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-${{ matrix.browser }}-${{ github.run_id }}
+          name: smoke-${{ matrix.browser }}-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  full:
+    name: Full / ${{ matrix.browser }} / shard ${{ matrix.shard }}
+    if: github.event_name == 'workflow_dispatch' && inputs.suite == 'full'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, webkit]
+        shard: [1, 2, 3, 4]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install test dependencies
+        run: npm install --no-audit --no-fund --no-package-lock
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Run full browser regression shard
+        run: npm run test:browser:full -- --project=${{ matrix.browser }} --workers=1 --shard=${{ matrix.shard }}/4
+
+      - name: Upload Playwright diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-${{ matrix.browser }}-shard-${{ matrix.shard }}-${{ github.run_id }}
           path: |
             playwright-report/
             test-results/
