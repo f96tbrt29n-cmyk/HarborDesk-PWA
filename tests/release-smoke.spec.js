@@ -3474,3 +3474,48 @@ test('release smoke: sortie preparation sheet reflects selected objective', asyn
   expect(result.g1.html).toContain('G1到達地点');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: objective change event updates linked preparation views', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMSetObjectivePreference === 'function' &&
+    typeof window.hdSMSetObjectiveTarget === 'function' &&
+    typeof window.hdSPSObjectiveLabel === 'function'
+  );
+
+  const result = await page.evaluate(() => {
+    const events=[];
+    const handler=e=>events.push({map:e.detail?.map||'',target:e.detail?.objectiveTarget||''});
+    window.addEventListener('hd:sortie-objective-changed',handler);
+
+    window.hdSMSetObjectivePreference('7-2','G2');
+    const preLabel=window.hdSPSObjectiveLabel('7-2');
+
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-objective-event-session',
+      map:'7-2',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-objective-event-fleet',
+      fleetName:'目標連携イベントテスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-objective-event-fleet',name:'目標連携イベントテスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{objectiveTarget:'G2',routeNodes:[],result:'S',memo:''}
+    }));
+    window.hdSMSetObjectiveTarget('G1');
+    const activeLabel=window.hdSPSObjectiveLabel('7-2');
+    window.removeEventListener('hd:sortie-objective-changed',handler);
+    return {events,preLabel,activeLabel};
+  });
+
+  expect(result.preLabel).toBe('G2ボス');
+  expect(result.activeLabel).toBe('G1到達地点');
+  expect(result.events.some(x=>x.map==='7-2'&&x.target==='G2')).toBe(true);
+  expect(result.events.some(x=>x.map==='7-2'&&x.target==='G1')).toBe(true);
+  expect(errors).toEqual([]);
+});
