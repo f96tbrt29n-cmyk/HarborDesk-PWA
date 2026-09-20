@@ -6261,3 +6261,24 @@ test('home offers one-tap resume to previous workspace', async ({ page }) => {
   expect(data.text).toContain('続きから');
   expect(data.button).toBe(true);
 });
+
+
+test('workspace supports back and forward navigation', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    sessionStorage.setItem('harbordesk-session-workspace-history-v1',JSON.stringify([{group:'fleet',section:'roster'}]));
+    sessionStorage.setItem('harbordesk-session-workspace-forward-v1',JSON.stringify([{group:'arsenal',section:'equipmentBook'}]));
+    window.hdWSUpdateHistoryButtons?.();
+    return {
+      hasForward:typeof window.hdWSGoForward==='function',
+      backDisabled:document.querySelector('[data-hd-ws-back]')?.disabled,
+      forwardDisabled:document.querySelector('[data-hd-ws-forward]')?.disabled,
+      menuForward:!!document.querySelector('[data-hd-qn-forward]')
+    };
+  });
+  expect(data.hasForward).toBe(true);
+  expect(data.backDisabled).toBe(false);
+  expect(data.forwardDisabled).toBe(false);
+  expect(data.menuForward).toBe(true);
+});
