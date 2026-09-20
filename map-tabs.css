@@ -25,3 +25,18 @@
 .hd-map-tools-overview-grid b{font-size:12px}
 .hd-map-tools-overview-grid small{font-size:10px;line-height:1.35;color:var(--muted)}
 @media(min-width:700px){.hd-map-tools-overview-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* mobile no-swipe map tabs v338 */
+@media(max-width:560px){
+ .map-tab-bar{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:6px;overflow:visible;scroll-padding-inline:0
+ }
+ .map-tab-btn{
+  box-sizing:border-box;min-width:0;width:100%;min-height:38px;
+  padding:8px 4px;white-space:normal;text-align:center;font-size:11px;line-height:1.2
+ }
+ .map-tabs-head{min-width:0}
+ .map-tabs-head>div{min-width:0}
+ .map-wiki-link{max-width:42%;white-space:normal;text-align:center}
+}

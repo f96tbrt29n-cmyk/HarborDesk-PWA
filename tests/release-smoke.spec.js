@@ -1317,17 +1317,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=337',
-      'map-images.js?v=337',
-      'map-tabs.js?v=337',
-      'map-interactive.js?v=337',
-      'map-advanced-data.js?v=337'
+      'map-details.js?v=338',
+      'map-images.js?v=338',
+      'map-tabs.js?v=338',
+      'map-interactive.js?v=338',
+      'map-advanced-data.js?v=338'
     ];
     const requiredStyles = [
-      'map-details.css?v=337',
-      'map-tabs.css?v=337',
-      'map-images.css?v=337',
-      'map-interactive.css?v=337'
+      'map-details.css?v=338',
+      'map-tabs.css?v=338',
+      'map-images.css?v=338',
+      'map-interactive.css?v=338'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -1369,7 +1369,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=337');
+  expect(src).toBe('app.js?v=338');
   expect(errors).toEqual([]);
 });
 
@@ -1398,5 +1398,64 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   await fallback.locator('[data-hd-core-map-action="prep"]').click();
   await expect(page.locator('#hdSortiePreparation')).toBeVisible({ timeout: 5000 });
 
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: map攻略 fits iPhone width without horizontal swiping', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await expect(page.locator('#guide')).toBeVisible();
+
+  await page.locator('[data-world="2"]').click();
+  await page.locator('[data-map="2-4"]').click();
+  await expect(page.locator('#selectedMapCard')).toContainText('推奨練度');
+
+  const first = await page.evaluate(() => {
+    const doc = document.documentElement;
+    const world = document.getElementById('worldPicker');
+    const card = document.getElementById('selectedMapCard');
+    const tabBar = document.querySelector('.map-tab-bar');
+    return {
+      viewport: window.innerWidth,
+      docWidth: doc.scrollWidth,
+      worldWidth: world?.scrollWidth || 0,
+      worldClient: world?.clientWidth || 0,
+      cardRight: Math.ceil(card?.getBoundingClientRect().right || 0),
+      tabWidth: tabBar?.scrollWidth || 0,
+      tabClient: tabBar?.clientWidth || 0
+    };
+  });
+
+  expect(first.docWidth).toBeLessThanOrEqual(first.viewport + 1);
+  expect(first.worldWidth).toBeLessThanOrEqual(first.worldClient + 1);
+  expect(first.cardRight).toBeLessThanOrEqual(first.viewport + 1);
+  expect(first.tabWidth).toBeLessThanOrEqual(first.tabClient + 1);
+
+  await page.locator('[data-world="5"]').click();
+  await page.locator('[data-map="5-6"]').click();
+  await page.locator('[data-map-tab="map"]').click();
+  await expect(page.locator('[data-map-pane="map"]')).toBeVisible();
+
+  const second = await page.evaluate(() => {
+    const doc = document.documentElement;
+    const stages = document.querySelector('.hd-map-stage-tabs');
+    const image = document.querySelector('.hd-map-reference-image');
+    return {
+      viewport: window.innerWidth,
+      docWidth: doc.scrollWidth,
+      stageWidth: stages?.scrollWidth || 0,
+      stageClient: stages?.clientWidth || 0,
+      imageWidth: Math.ceil(image?.getBoundingClientRect().width || 0),
+      imageRight: Math.ceil(image?.getBoundingClientRect().right || 0)
+    };
+  });
+
+  expect(second.docWidth).toBeLessThanOrEqual(second.viewport + 1);
+  expect(second.stageWidth).toBeLessThanOrEqual(second.stageClient + 1);
+  expect(second.imageWidth).toBeLessThanOrEqual(second.viewport);
+  expect(second.imageRight).toBeLessThanOrEqual(second.viewport + 1);
   expect(errors).toEqual([]);
 });
