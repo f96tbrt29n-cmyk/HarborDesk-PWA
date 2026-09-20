@@ -232,6 +232,25 @@ test('release smoke: game sync fills ship and equipment ledgers from latest snap
 });
 
 
+test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const source = await page.evaluate(async () => {
+    const res = await fetch('./update-manager.js', { cache: 'no-store' });
+    return res.text();
+  });
+
+  expect(source).toContain("const HD_APP_VERSION='1.0.380'");
+  expect(source).toContain("const HD_APP_BUILD=380");
+  expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
+  expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
+  expect(source).toContain("公開反映待ち");
+  expect(source).toContain("publishedBuild<=HD_APP_BUILD");
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: userscript blocks handoff until ship and equipment ledger data are captured', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
