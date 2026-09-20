@@ -21,7 +21,7 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.9';
+const HD_VERSION='1.0.10';
 const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/';
 const RECORD_MESSAGE='harbordesk-kancolle-frame-record-v1';
 const STATUS_MESSAGE='harbordesk-kancolle-frame-status-v1';
@@ -177,12 +177,34 @@ try{
 
 const records=[];
 const signatures=new Set();
+const essentialRecords=new Map();
+function essentialKey(record){
+  const endpoint=String(record?.endpoint||'');
+  if(/\/api_port\/port$/.test(endpoint))return 'port';
+  if(/\/api_get_member\/ship2$/.test(endpoint))return 'ship2';
+  if(/\/api_get_member\/slot_item$/.test(endpoint))return 'slot_item';
+  if(/\/api_get_member\/require_info$/.test(endpoint))return 'require_info';
+  if(/\/api_get_member\/material$/.test(endpoint))return 'material';
+  if(/\/api_get_member\/ndock$/.test(endpoint))return 'ndock';
+  if(/\/api_get_member\/questlist$/.test(endpoint)){
+    const page=Number(record?.payload?.api_data?.api_disp_page)||Number(record?.payload?.api_data?.api_page_no)||0;
+    return 'questlist:'+(page||'latest');
+  }
+  return '';
+}
+function captureRecords(){
+  const out=[],seen=new Set();
+  const push=r=>{if(!r)return;const sig=signature(r);if(seen.has(sig))return;seen.add(sig);out.push(r)};
+  for(const row of essentialRecords.values())push(row);
+  for(const row of records)push(row);
+  return out.sort((a,b)=>(Number(a.at)||0)-(Number(b.at)||0));
+}
 const captureId='kc-userscript-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
 let panel,countEl,statusEl,frameEl,coverageEl,hintEl,sendEl,miniCountEl,minimizeEl,panelBodyEl;
 let frameHits=0,minimized=false;
 
 function captureCoverage(){
-  const endpoints=records.map(x=>String(x.endpoint||''));
+  const endpoints=captureRecords().map(x=>String(x.endpoint||''));
   const has=re=>endpoints.some(x=>re.test(x));
   return {
     port:has(/api_port\/port|api_get_member\/ship2|api_get_member\/material/),
@@ -211,10 +233,13 @@ function signature(r){
 }
 function receiveRecord(r){
   if(!r||r.type!==RECORD_MESSAGE||!wanted(r.endpoint))return;
-  const sig=signature(r);
-  if(signatures.has(sig))return;
-  signatures.add(sig);
-  records.push({endpoint:r.endpoint,payload:r.payload,at:Number(r.at)||Date.now()});
+  const row={endpoint:r.endpoint,payload:r.payload,at:Number(r.at)||Date.now()},key=essentialKey(row);
+  if(key)essentialRecords.set(key,row);
+  const sig=signature(row);
+  if(!signatures.has(sig)){
+    signatures.add(sig);
+    records.push(row);
+  }
   while(records.length>MAX_RECORDS){
     const removed=records.shift();
     try{signatures.delete(signature(removed))}catch{}
@@ -230,7 +255,7 @@ function exportObject(){
     userscriptVersion:HD_VERSION,
     captureId,
     createdAt:new Date().toISOString(),
-    records:records.map(x=>({endpoint:x.endpoint,payload:x.payload,at:x.at}))
+    records:captureRecords().map(x=>({endpoint:x.endpoint,payload:x.payload,at:x.at}))
   };
 }
 function isGameShell(){
@@ -261,7 +286,7 @@ function ensurePanel(){
   panelBodyEl=panel.querySelector('[data-hd-panel-body]');
   minimizeEl.onclick=e=>{e.stopPropagation();setMinimized(!minimized)};
   panel.querySelector('[data-hd-panel-head]').onclick=e=>{if(minimized&&!e.target.closest('button'))setMinimized(false)};
-  panel.querySelector('[data-hd-clear]').onclick=()=>{records.length=0;signatures.clear();render()};
+  panel.querySelector('[data-hd-clear]').onclick=()=>{records.length=0;signatures.clear();essentialRecords.clear();render()};
   panel.querySelector('[data-hd-copy]').onclick=copy;
   panel.querySelector('[data-hd-send]').onclick=send;
   let savedMinimized=false;try{savedMinimized=localStorage.getItem(HD_PANEL_MIN_KEY)==='1'}catch{}
@@ -281,15 +306,15 @@ function setMinimized(next,persist=true){
   render();return minimized;
 }
 function render(){
-  const c=captureCoverage(),core=c.port&&c.equipment&&c.quests;
-  if(countEl)countEl.textContent=String(records.length);
-  if(miniCountEl){miniCountEl.textContent=records.length+(core?'件 ✓':'件');miniCountEl.style.color=core?'#9fe0b7':'#f0d590'}
+  const captured=captureRecords(),c=captureCoverage(),core=c.port&&c.equipment&&c.quests;
+  if(countEl)countEl.textContent=String(captured.length);
+  if(miniCountEl){miniCountEl.textContent=captured.length+(core?'件 ✓':'件');miniCountEl.style.color=core?'#9fe0b7':'#f0d590'}
   if(frameEl)frameEl.textContent=String(frameHits);
   if(coverageEl)coverageEl.innerHTML=coverageHtml();
-  if(hintEl){hintEl.textContent=records.length?nextCaptureHint(c):'母港・装備・任務などを開くと、ここに取得状況が出るよ';hintEl.style.color=core?'#bcefd0':'#f0d590'}
-  if(sendEl){sendEl.disabled=!records.length;sendEl.textContent=records.length?'HarborDeskへ送る（'+records.length+'件）':'HarborDeskへ送る';sendEl.style.opacity=records.length?'1':'.55'}
+  if(hintEl){hintEl.textContent=captured.length?nextCaptureHint(c):'母港・装備・任務などを開くと、ここに取得状況が出るよ';hintEl.style.color=core?'#bcefd0':'#f0d590'}
+  if(sendEl){sendEl.disabled=!captured.length;sendEl.textContent=captured.length?'HarborDeskへ送る（'+captured.length+'件）':'HarborDeskへ送る';sendEl.style.opacity=captured.length?'1':'.55'}
   if(statusEl){
-    statusEl.textContent=records.length?(core?'基本データ取得済み':'取得中'):'通信待機中';
+    statusEl.textContent=captured.length?(core?'基本データ取得済み':'取得中'):'通信待機中';
     statusEl.style.color=core?'#9fe0b7':'#f0d590';
   }
 }
