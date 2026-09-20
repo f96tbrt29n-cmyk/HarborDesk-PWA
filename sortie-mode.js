@@ -23,6 +23,24 @@ function hdSMNextNodeRows(map,draft){
  const labels=[...new Set(graph.edges.filter(([a])=>from.includes(a)).map(([,b])=>b))];
  return labels.map(label=>({label,kind:hdSMNodeKind(graph,label)}));
 }
+function hdSMBranchHint(map,draft){
+ const graph=hdSMGraph(map),current=String(draft?.node||'').trim(),next=hdSMNextNodeRows(map,draft);
+ if(!graph)return {title:'分岐情報',text:'海域構造データを取得できないよ。',source:''};
+ let override={};
+ try{if(current&&typeof HD_NODE_DETAIL_OVERRIDES!=='undefined')override=HD_NODE_DETAIL_OVERRIDES?.[map]?.[current]||{}}catch{}
+ if(override.branch)return {title:current+'マスの分岐条件',text:String(override.branch),source:String(override.source||'')};
+ if(!current){
+  let startOverride={};try{if(typeof HD_NODE_DETAIL_OVERRIDES!=='undefined'){for(const s of ['S','S1','S2']){const row=HD_NODE_DETAIL_OVERRIDES?.[map]?.[s];if(row?.branch){startOverride=row;break}}}}catch{}
+  if(startOverride.branch)return {title:'開始時の分岐条件',text:String(startOverride.branch),source:String(startOverride.source||'')};
+ }
+ if(next.length===1)return {title:(current||'開始地点')+'からの進行',text:next[0].label+'へ接続。固定条件・索敵・ランダム分岐などの詳細は攻略情報も確認してね。',source:''};
+ if(next.length>1)return {title:(current||'開始地点')+'からの分岐',text:next.map(x=>x.label).join(' / ')+'へ分岐。編成条件や確率分岐の詳細は「攻略概要」または「ルート」で確認してね。',source:''};
+ return {title:(current||'現在地')+'の先',text:'この先の接続候補は登録されていないよ。',source:''};
+}
+function hdSMBranchHintHtml(map,draft){
+ const hint=hdSMBranchHint(map,draft);
+ return '<div class="hd-sm-branch-hint"><div><span>ROUTE CONDITION</span><b>'+hdSMEsc(hint.title)+'</b></div><p>'+hdSMEsc(hint.text)+'</p>'+(hint.source?'<small>'+hdSMEsc(hint.source)+'</small>':'')+'</div>';
+}
 function hdSMElapsed(ms){
  const total=Math.max(0,Math.floor((Number(ms)||0)/1000)),s=total%60,m=Math.floor(total/60)%60,h=Math.floor(total/3600);
  return h?h+'時間'+String(m).padStart(2,'0')+'分':m+'分'+String(s).padStart(2,'0')+'秒';
@@ -58,7 +76,7 @@ function hdSMNodePickerHtml(session,draft){
  if(!rows.length)return '';
  const nextTitle=current?'次に進める候補':'最初の進行候補';
  const nextHtml=next.length?'<div class="hd-sm-next-wrap"><div class="hd-sm-next-head"><b>'+nextTitle+'</b><small>海域構造上の接続候補。実際の分岐条件は攻略情報を優先。</small></div><div class="hd-sm-next-grid">'+next.map(function(x){return '<button type="button" class="hd-sm-next '+hdSMEsc(x.kind)+'" data-hd-sm-next-node="'+hdSMEsc(x.label)+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(x.kind))+'</small><i>次へ</i></button>'}).join('')+'</div></div>':'<div class="hd-sm-next-done">'+(current?'このマスから先の接続候補は登録されていないよ。':'開始地点の候補を取得できないよ。')+'</div>';
- return '<div class="hd-sm-panel hd-sm-node-panel"><div class="hd-sm-panel-head"><strong>現在マス</strong><span>普段は「次に進める候補」だけタップでOK</span></div>'+nextHtml+
+ return '<div class="hd-sm-panel hd-sm-node-panel"><div class="hd-sm-panel-head"><strong>現在マス</strong><span>普段は「次に進める候補」だけタップでOK</span></div>'+nextHtml+hdSMBranchHintHtml(session?.map,draft)+
   '<details class="hd-sm-all-nodes"><summary>全マスから選ぶ</summary><div class="hd-sm-node-grid">'+
   rows.map(function(x){const active=x.label===current;return '<button type="button" class="hd-sm-node '+hdSMEsc(x.kind)+(active?' active':'')+'" data-hd-sm-node="'+hdSMEsc(x.label)+'" aria-pressed="'+(active?'true':'false')+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(x.kind))+'</small></button>'}).join('')+
   '</div></details>'+(route.length?'<div class="hd-sm-route-trail"><div><span>通過</span><b>'+route.map(hdSMEsc).join(' → ')+'</b></div><button type="button" class="ghost small" data-hd-sm-route-undo>1つ戻す</button></div>':'<div class="hd-sm-route-empty">次候補を押すと、ここに通過履歴を残すよ。</div>')+'</div>';
@@ -181,6 +199,7 @@ window.hdSMOpen=hdSMOpen;
 window.hdSMFormData=hdSMFormData;
 window.hdSMNodeRows=hdSMNodeRows;
 window.hdSMNextNodeRows=hdSMNextNodeRows;
+window.hdSMBranchHint=hdSMBranchHint;
 window.hdSMSetNode=hdSMSetNode;
 window.hdSMUndoNode=hdSMUndoNode;
 window.hdSMSaveDraft=hdSMSaveDraft;

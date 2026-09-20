@@ -2034,3 +2034,45 @@ test('release smoke: sortie mode prioritizes graph-connected next nodes', async 
   expect(nextRows).toEqual(['H']);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie mode shows current node branch guidance', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMEnsure === 'function' &&
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMBranchHint === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-branch-hint-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-branch-hint-fleet',
+      fleetName:'分岐ヒントテスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-branch-hint-fleet',name:'分岐ヒントテスト艦隊',ships:[{ship:'時雨',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active'
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  await expect(page.locator('.hd-sm-branch-hint')).toBeVisible();
+  await page.locator('[data-hd-sm-next-node="B"]').click();
+  await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeVisible();
+  await page.locator('[data-hd-sm-next-node="G"]').click();
+
+  await expect(page.locator('.hd-sm-branch-hint')).toContainText('Gマスの分岐条件');
+  await expect(page.locator('.hd-sm-branch-hint')).toContainText('I/K');
+  const hint = await page.evaluate(() => window.hdSMBranchHint('2-4',{node:'G'}));
+  expect(hint.text).toContain('I/K');
+  expect(hint.source).toContain('攻略Wiki');
+  expect(errors).toEqual([]);
+});
