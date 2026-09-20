@@ -99,7 +99,8 @@ function hdPHToggleCollapsed(key){const state=hdPHCollapseLoad();return hdPHSetC
 function hdPHExpandAll(){hdPHCollapseSave({});hdPHCompactSave({enabled:false,previous:null});hdPHApplyCollapsed();window.hdToast?.('ホームのカードをすべて開いたよ','info',1100);return true}
 function hdPHApplyCollapsed(){
  const host=document.getElementById('hdPersonalHome');if(!host)return;
- const state=hdPHCollapseLoad();
+ const compactMeta=hdPHCompactLoad(),state=compactMeta.enabled?hdPHCompactState():hdPHCollapseLoad();
+ if(compactMeta.enabled)hdPHCollapseSave(state);
  for(const spec of hdPHCollapseSpecs()){
   const block=hdPHFindBlock(spec,host);if(!block)continue;
   block.dataset.phCollapseKey=spec.key;
