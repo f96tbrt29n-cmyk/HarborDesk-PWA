@@ -51,7 +51,7 @@ function hdSLRecordEntry(input={}){
   boss:!!input.boss,retreat:input.retreat!=null?!!input.retreat:result==='撤退',
   battles:Math.max(0,Math.min(20,Number(input.battles)||0)),drop:String(input.drop||'').trim(),
   buckets:Math.max(0,Number(input.buckets)||0),fuel:Math.max(0,Number(input.fuel)||0),ammo:Math.max(0,Number(input.ammo)||0),
-  steel:Math.max(0,Number(input.steel)||0),bauxite:Math.max(0,Number(input.bauxite)||0),memo:String(input.memo||'').trim(),retreatReason:String(input.retreatReason||'').trim(),
+  steel:Math.max(0,Number(input.steel)||0),bauxite:Math.max(0,Number(input.bauxite)||0),memo:String(input.memo||'').trim(),retreatReason:String(input.retreatReason||'').trim(),objectiveTarget:String(input.objectiveTarget||'').trim(),
   huntId:String(input.huntId||''),huntShip:String(input.huntShip||''),targetObtained:!!input.targetObtained
  };
  for(const k of ['sessionId','fleetId','fleetName','strategy','strategyLabel','startedAt','durationMs','fleetSnapshot','readinessSnapshot','source','gameSortieKey','gameNodeNo','gameNodeLabel','gameBossCellNo','gameBossCellLabel','gameRouteNodes','gameRouteLabels','gameBattleResults']){
