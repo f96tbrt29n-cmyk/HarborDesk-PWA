@@ -3281,3 +3281,35 @@ test('release smoke: pre-start route preview follows selected objective', async 
   expect(result.auto).toContain('自動（攻略目標）');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: pre-start objective selector shows route stats', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMObjectivePrestartHtml === 'function' &&
+    typeof window.hdSMObjectiveStartStats === 'function'
+  );
+
+  const stats = await page.evaluate(() => ({
+    auto: window.hdSMObjectiveStartStats('7-2',''),
+    g1: window.hdSMObjectiveStartStats('7-2','G1'),
+    g2: window.hdSMObjectiveStartStats('7-2','G2')
+  }));
+  expect(stats.auto).toEqual({steps:4,battles:3});
+  expect(stats.g1).toEqual({steps:4,battles:3});
+  expect(stats.g2).toEqual({steps:5,battles:5});
+
+  await page.evaluate(() => {
+    const host=document.createElement('div');
+    host.id='hdPreObjectiveStatsTest';
+    host.innerHTML=window.hdSMObjectivePrestartHtml('7-2');
+    document.body.appendChild(host);
+  });
+
+  const host=page.locator('#hdPreObjectiveStatsTest');
+  await expect(host.locator('[data-hd-sm-pre-objective=""]')).toContainText('最短4マス・最少3戦');
+  await expect(host.locator('[data-hd-sm-pre-objective="G1"]')).toContainText('最短4マス・最少3戦');
+  await expect(host.locator('[data-hd-sm-pre-objective="G2"]')).toContainText('最短5マス・最少5戦');
+  expect(errors).toEqual([]);
+});
