@@ -3097,5 +3097,16 @@ test('release smoke: sortie analytics separates multi-target objectives', async 
   await expect(g1).toContainText('ボス到達 0%');
   await expect(g2).toContainText('ボス到達 100%');
   await expect(old).toContainText('撤退 100%');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-sortie-analytics-mode-v1','strategy');
+    localStorage.setItem('harbordesk-sortie-analytics-map-v1','all');
+    window.hdSLRender();
+  });
+  await page.waitForTimeout(150);
+  const strategyCards = page.locator('#sortieLog .hd-spa-card');
+  await expect(strategyCards).toHaveCount(1);
+  await expect(strategyCards.first()).not.toContainText('目標 G1');
+  await expect(strategyCards.first()).not.toContainText('目標 G2');
   expect(errors).toEqual([]);
 });
