@@ -136,6 +136,16 @@ function hdSMSetAdvanceGuard(safe){
  try{window.dispatchEvent(new CustomEvent('hd:sortie-draft-saved',{detail:{sessionId:session.id,draft:session.draft}}))}catch{}
  hdSMRender();return true;
 }
+function hdSMHudHtml(session,draft){
+ const current=String(draft?.node||'').trim();if(!current)return '';
+ const graph=hdSMGraph(session?.map),kind=hdSMNodeKind(graph,current),intel=hdSMNodeIntel(session?.map,{label:current,kind}),guard=hdSMAdvanceGuard(session,draft);
+ const state=guard.retreat?'stop':guard.confirmed?'ready':'warn',status=guard.retreat?'撤退':guard.confirmed?'大破確認済':'大破未確認',jump=guard.confirmed?'next':'guard';
+ return '<div class="hd-sm-hud '+state+'"><div class="hd-sm-hud-node"><span>NOW</span><b>'+hdSMEsc(current)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(kind))+'</small></div><div class="hd-sm-hud-main"><span>基本陣形 <b>'+hdSMEsc(intel.formation)+'</b></span><strong>'+hdSMEsc(status)+'</strong></div><button type="button" class="ghost small" data-hd-sm-hud-jump="'+jump+'">'+(guard.confirmed?'次マスを見る':'確認する')+'</button></div>';
+}
+function hdSMHudJump(target){
+ const selector=target==='next'?'.hd-sm-next-wrap':'.hd-sm-advance-guard',el=document.querySelector('#hdSortieMode '+selector);
+ if(!el)return false;try{el.scrollIntoView({behavior:'smooth',block:'center'})}catch{el.scrollIntoView()}return true;
+}
 function hdSMElapsed(ms){
  const total=Math.max(0,Math.floor((Number(ms)||0)/1000)),s=total%60,m=Math.floor(total/60)%60,h=Math.floor(total/3600);
  return h?h+'時間'+String(m).padStart(2,'0')+'分':m+'分'+String(s).padStart(2,'0')+'秒';
@@ -183,6 +193,7 @@ function hdSMActiveHtml(session){
  const d=hdSMMapDetail(session.map),started=Number(session.startedAt)||Date.now(),draft=hdSMDraft(session);
  const draftStatus=draft.updatedAt?'保存 '+new Date(draft.updatedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}):'入力は自動保存';
  return '<div class="hd-sm-active"><div class="hd-sm-command"><div><span>出撃中</span><strong>'+hdSMEsc(session.map)+' '+hdSMEsc(d.name||'')+'</strong><small>'+hdSMEsc(session.fleetName||'名称なし')+'｜'+hdSMEsc(session.strategyLabel||'手動編成')+'</small></div><div class="hd-sm-clock"><span>経過</span><b data-hd-sm-elapsed>'+hdSMElapsed(Date.now()-started)+'</b><small>'+hdSMEsc(new Date(started).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}))+'開始</small></div></div>'+
+ hdSMHudHtml(session,draft)+
  hdSMReadinessHtml(session.readinessSnapshot||{})+
  hdSMNodePickerHtml(session,draft)+
  '<div class="hd-sm-panel"><div class="hd-sm-panel-head"><strong>開始時の艦隊</strong><span>出撃中にプリセットを変えてもここは固定</span></div>'+hdSMFleetHtml(session)+'</div>'+
@@ -275,6 +286,7 @@ document.addEventListener('click',function(e){
  if(e.target.closest?.('[data-hd-sm-route-undo]')){hdSMUndoNode();return}
  if(e.target.closest?.('[data-hd-sm-safe-confirm]')){hdSMSetAdvanceGuard(true);return}
  if(e.target.closest?.('[data-hd-sm-damage-retreat]')){hdSMSetAdvanceGuard(false);return}
+ const hudJump=e.target.closest?.('[data-hd-sm-hud-jump]');if(hudJump){hdSMHudJump(hudJump.dataset.hdSmHudJump);return}
  if(e.target.closest?.('[data-hd-sm-start]')){const session=typeof window.hdSSStart==='function'?window.hdSSStart(hdSMMap()):null;if(session){hdSMRender();hdSMOpen()}else window.hdToast?.('出撃編成を選んでから開始してね','warn',1800);return}
  if(e.target.closest?.('[data-hd-sm-prep]')){hdSMAction('prep');return}
  if(e.target.closest?.('[data-hd-sm-guide]')){if(typeof window.hdWSShowElement==='function')window.hdWSShowElement('guide',true);return}
@@ -305,6 +317,8 @@ window.hdSMCurrentTacticHtml=hdSMCurrentTacticHtml;
 window.hdSMStartHpState=hdSMStartHpState;
 window.hdSMAdvanceGuard=hdSMAdvanceGuard;
 window.hdSMSetAdvanceGuard=hdSMSetAdvanceGuard;
+window.hdSMHudHtml=hdSMHudHtml;
+window.hdSMHudJump=hdSMHudJump;
 window.hdSMSetNode=hdSMSetNode;
 window.hdSMUndoNode=hdSMUndoNode;
 window.hdSMSaveDraft=hdSMSaveDraft;

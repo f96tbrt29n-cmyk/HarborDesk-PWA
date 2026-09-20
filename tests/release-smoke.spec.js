@@ -2305,3 +2305,43 @@ test('release smoke: sortie damage guard blocks alternate node selection paths',
   expect(draft.routeNodes).toEqual(['A','D']);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie mode keeps current battle status visible in sticky hud', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdSMRender === 'function' && typeof window.hdSMHudHtml === 'function');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-hud-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-hud-fleet',
+      fleetName:'出撃HUDテスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-hud-fleet',name:'出撃HUDテスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'A',routeNodes:['A'],result:'S',memo:''}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const hud = page.locator('.hd-sm-hud');
+  await expect(hud).toBeVisible();
+  await expect(hud).toContainText('A');
+  await expect(hud).toContainText('単縦陣');
+  await expect(hud).toContainText('大破未確認');
+  expect(await hud.evaluate(el => getComputedStyle(el).position)).toBe('sticky');
+
+  await page.locator('[data-hd-sm-safe-confirm]').click();
+  await expect(page.locator('.hd-sm-hud')).toContainText('大破確認済');
+  await expect(page.locator('.hd-sm-hud')).toHaveClass(/ready/);
+  await expect(page.locator('[data-hd-sm-hud-jump="next"]')).toBeVisible();
+  expect(errors).toEqual([]);
+});
