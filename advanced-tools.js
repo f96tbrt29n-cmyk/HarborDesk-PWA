@@ -105,8 +105,45 @@ async function shareBackup(){
  }catch(err){if(err?.name==='AbortError')return false}
  return exportBackup()!==false
 }
+function hdAnalyzeBackupLocalStorage(storage){
+ if(!storage||typeof storage!=='object'||Array.isArray(storage))throw new Error('invalid backup storage');
+ const raw=Object.entries(storage),entries=raw.filter(([k,v])=>k.startsWith('harbordesk')&&typeof v==='string');
+ const incoming=new Map(entries),current=new Map();
+ for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k?.startsWith('harbordesk'))current.set(k,localStorage.getItem(k))}
+ let added=0,updated=0,unchanged=0;
+ for(const [k,v] of incoming){if(!current.has(k))added++;else if(current.get(k)===v)unchanged++;else updated++}
+ let removed=0;for(const k of current.keys())if(!incoming.has(k))removed++;
+ return {total:entries.length,added,updated,unchanged,removed,ignored:raw.length-entries.length,bytes:new Blob([JSON.stringify(Object.fromEntries(entries))],{type:'application/json'}).size};
+}
+function hdEnsureBackupRestorePreview(){
+ let d=document.getElementById('hdBackupRestorePreviewDialog');if(d)return d;
+ d=document.createElement('dialog');d.id='hdBackupRestorePreviewDialog';d.className='hd-backup-preview-dialog';
+ d.innerHTML='<form method="dialog"><h3>バックアップを復元</h3><p class="muted" data-hd-backup-preview-meta></p><div class="hd-backup-preview-grid" data-hd-backup-preview-grid></div><div class="hd-backup-preview-warning" data-hd-backup-preview-warning></div><div class="dialog-actions"><button value="cancel" class="ghost">キャンセル</button><button value="restore" class="primary">この内容で復元</button></div></form>';
+ document.body.appendChild(d);return d;
+}
+function hdConfirmBackupRestore(obj,analysis,fileName=''){
+ const d=hdEnsureBackupRestorePreview(),exported=obj?.exportedAt?new Date(obj.exportedAt):null,validDate=exported&&!Number.isNaN(exported.getTime()),kb=(Number(analysis?.bytes)||0)/1024;
+ const meta=d.querySelector('[data-hd-backup-preview-meta]');if(meta)meta.textContent=(fileName||'バックアップJSON')+' ・ '+(validDate?exported.toLocaleString('ja-JP'):'保存日時不明')+' ・ '+kb.toFixed(1)+' KB';
+ const grid=d.querySelector('[data-hd-backup-preview-grid]');if(grid)grid.innerHTML=
+  '<div><span>復元対象</span><strong>'+Number(analysis?.total||0)+'件</strong></div>'+
+  '<div class="add"><span>追加</span><strong>'+Number(analysis?.added||0)+'件</strong></div>'+
+  '<div class="update"><span>更新</span><strong>'+Number(analysis?.updated||0)+'件</strong></div>'+
+  '<div class="remove"><span>削除予定</span><strong>'+Number(analysis?.removed||0)+'件</strong></div>';
+ const warning=d.querySelector('[data-hd-backup-preview-warning]');if(warning)warning.innerHTML=
+  '<strong>復元すると現在のHarborDeskデータをバックアップ時点へ置き換えるよ。</strong><small>変更なし '+Number(analysis?.unchanged||0)+'件'+(analysis?.ignored?' ・ 無視 '+Number(analysis.ignored)+'件':'')+'。確定直前に端末内スナップショットも自動保存する。</small>';
+ d.returnValue='';
+ return new Promise(resolve=>{const done=()=>resolve(d.returnValue==='restore');d.addEventListener('close',done,{once:true});if(typeof d.showModal==='function')d.showModal();else d.setAttribute('open','')});
+}
 function hdApplyBackupLocalStorage(storage){if(!storage||typeof storage!=='object'||Array.isArray(storage))throw new Error('invalid backup storage');const entries=Object.entries(storage).filter(([k,v])=>k.startsWith('harbordesk')&&typeof v==='string'),keep=new Set(entries.map(([k])=>k));for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k?.startsWith('harbordesk')&&!keep.has(k))localStorage.removeItem(k)}for(const [k,v] of entries)localStorage.setItem(k,v);return entries.length}
-async function importBackup(file){try{const obj=JSON.parse(await file.text());if(!obj?.localStorage)throw new Error();hdApplyBackupLocalStorage(obj.localStorage);alert('バックアップ時点のHarborDeskデータへ復元したよ。画面を再読み込みするね。');location.reload()}catch{alert('HarborDeskのバックアップJSONを読み込めなかったよ')}}
+async function importBackup(file){
+ try{
+  const obj=JSON.parse(await file.text());if(!obj?.localStorage)throw new Error('missing localStorage');
+  const analysis=hdAnalyzeBackupLocalStorage(obj.localStorage);if(!analysis.total)throw new Error('empty HarborDesk backup');
+  const confirmed=await hdConfirmBackupRestore(obj,analysis,file?.name||'');if(!confirmed)return false;
+  if(typeof hdPHCreateSnapshot==='function')await hdPHCreateSnapshot('外部復元直前');
+  hdApplyBackupLocalStorage(obj.localStorage);alert('バックアップ時点のHarborDeskデータへ復元したよ。画面を再読み込みするね。');location.reload();return true
+ }catch(err){console.warn('backup import failed',err);alert('HarborDeskのバックアップJSONを読み込めなかったよ');return false}
+}
 
 function bindAdvancedEvents(){
  document.getElementById('addEquipment').onclick=()=>openEquipment();document.getElementById('equipmentSearch').addEventListener('input',e=>{hdEquipLedgerViewSave({query:e.target.value});renderEquipment()});
