@@ -24,6 +24,7 @@ function hdEquipCatalogViewLoad(){try{return JSON.parse(sessionStorage.getItem(H
 function hdEquipCatalogViewSave(patch={}){const next={...hdEquipCatalogViewLoad(),...patch};try{sessionStorage.setItem(HD_EQUIP_CATALOG_VIEW_KEY,JSON.stringify(next))}catch{}return next}
 let hdEquipCatalogFilter='すべて';
 let hdEquipCatalogRenderTimer=0;
+let hdEquipCatalogPeekKey=String(hdEquipCatalogViewLoad().peekKey||'');
 function hdEquipWikiUrl(name){return `https://wikiwiki.jp/kancolle/${encodeURIComponent(name)}`}
 function hdEquipStatText(item){const parts=Object.entries(item.stats||{}).map(([k,v])=>`${k}+${v}`);if(item.range)parts.push(`射程 ${item.range}`);if(item.radius!=null)parts.push(`半径 ${item.radius}`);return parts}
 function hdEnsureEquipmentCatalog(){
@@ -48,13 +49,15 @@ function hdRenderEquipmentCatalog(){
  const summary=document.getElementById('hdEquipCatalogActiveFilters'),chips=[];if(q)chips.push('検索: '+q);if(hdEquipCatalogFilter!=='すべて')chips.push('カテゴリ: '+hdEquipCatalogFilter);
  if(summary){summary.hidden=!chips.length;summary.innerHTML=chips.length?chips.map(x=>`<span>${hdEsc(x)}</span>`).join('')+'<button type="button" class="ghost small" data-hd-equip-reset>クリア</button>':''}
  document.getElementById('hdEquipCatalogCount').textContent=rows.length===HD_EQUIPMENT_CATALOG.length?`${rows.length}件`:`${rows.length} / ${HD_EQUIPMENT_CATALOG.length}件`;
- list.innerHTML=rows.map(x=>`<article class="hd-equip-ref-card"><div class="hd-equip-ref-head"><div><strong>${hdEsc(x.name)}</strong><div class="muted">${hdEsc(x.category)}</div></div><button class="primary small" type="button" data-hd-equip-add="${hdEsc(x.name)}">台帳へ追加</button></div><div class="hd-equip-stats">${hdEquipStatText(x).map(s=>`<span>${hdEsc(s)}</span>`).join('')||'<span>特殊効果装備</span>'}</div><div class="hd-equip-tags">${(x.tags||[]).map(t=>`<span>${hdEsc(t)}</span>`).join('')}</div><p>${hdEsc(x.role)}</p><div class="hd-equip-ref-grid"><div><span>改修</span><strong>${hdEsc(x.improve)}</strong></div><div><span>入手</span><strong>${hdEsc(x.obtain)}</strong></div><div class="wide"><span>更新・補足</span><strong>${hdEsc(x.update)}</strong></div></div><a class="guide-link" href="${hdEquipWikiUrl(x.name)}" target="_blank" rel="noopener">攻略Wikiで詳細 ↗</a></article>`).join('')||'<div class="empty empty-action"><strong>条件に合う装備がないよ</strong><p>検索語かカテゴリを戻すと一覧へ戻れるよ。</p><button type="button" class="ghost small" data-hd-equip-reset>条件をクリア</button></div>';
+ list.innerHTML=rows.map(x=>{const peekKey=String(x.name||''),peek=hdEquipCatalogPeekKey===peekKey?' hd-peek':'';return `<article class="hd-equip-ref-card${peek}" data-hd-equip-peek-key="${hdEsc(peekKey)}"><div class="hd-equip-ref-head"><div><strong>${hdEsc(x.name)}</strong><div class="muted">${hdEsc(x.category)}</div></div><button class="primary small" type="button" data-hd-equip-add="${hdEsc(x.name)}">台帳へ追加</button></div><div class="hd-equip-stats">${hdEquipStatText(x).map(s=>`<span>${hdEsc(s)}</span>`).join('')||'<span>特殊効果装備</span>'}</div><div class="hd-equip-tags">${(x.tags||[]).map(t=>`<span>${hdEsc(t)}</span>`).join('')}</div><p>${hdEsc(x.role)}</p><div class="hd-equip-ref-grid"><div><span>改修</span><strong>${hdEsc(x.improve)}</strong></div><div><span>入手</span><strong>${hdEsc(x.obtain)}</strong></div><div class="wide"><span>更新・補足</span><strong>${hdEsc(x.update)}</strong></div></div><a class="guide-link" href="${hdEquipWikiUrl(x.name)}" target="_blank" rel="noopener">攻略Wikiで詳細 ↗</a></article>`}).join('')||'<div class="empty empty-action"><strong>条件に合う装備がないよ</strong><p>検索語かカテゴリを戻すと一覧へ戻れるよ。</p><button type="button" class="ghost small" data-hd-equip-reset>条件をクリア</button></div>';
 }
 document.addEventListener('click',e=>{
  const peekCard=e.target.closest?.('.hd-equip-ref-card'),peekList=document.getElementById('hdEquipCatalogList');
  if(peekCard&&peekList?.classList.contains('hd-compact')&&!e.target.closest('button,a,input,label,summary,details,select,textarea')){
-  const open=!peekCard.classList.contains('hd-peek');
+  const open=!peekCard.classList.contains('hd-peek'),key=String(peekCard.dataset.hdEquipPeekKey||'');
   peekList.querySelectorAll('.hd-peek').forEach(x=>x.classList.remove('hd-peek'));
+  hdEquipCatalogPeekKey=open?key:'';
+  hdEquipCatalogViewSave({peekKey:hdEquipCatalogPeekKey});
   if(open)peekCard.classList.add('hd-peek');
   return;
  }
