@@ -2076,3 +2076,43 @@ test('release smoke: sortie mode shows current node branch guidance', async ({ p
   expect(hint.source).toContain('攻略Wiki');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie mode previews next-node battle intelligence', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMEnsure === 'function' &&
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMNodeIntel === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-node-intel-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-node-intel-fleet',
+      fleetName:'次マス注意テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-node-intel-fleet',name:'次マス注意テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active'
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const b = page.locator('[data-hd-sm-next-node="B"]');
+  await expect(b).toBeVisible();
+  await expect(b.locator('.hd-sm-next-risk')).toContainText('戦闘');
+  await expect(b.locator('em')).toContainText('重巡リ級elite');
+
+  const intel = await page.evaluate(() => window.hdSMNodeIntel('2-4',{label:'B',kind:'normal'}));
+  expect(intel.hasDetail).toBe(true);
+  expect(intel.enemy).toContain('重巡リ級elite');
+  expect(errors).toEqual([]);
+});
