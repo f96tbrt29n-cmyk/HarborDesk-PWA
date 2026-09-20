@@ -135,8 +135,9 @@ function hdSMNextNodeButtonHtml(map,row,locked=false){
 }
 function hdSMCurrentTacticHtml(map,draft){
  const current=String(draft?.node||'').trim();if(!current)return '';
- const graph=hdSMGraph(map),rawKind=hdSMNodeKind(graph,current),intel=hdSMNodeIntel(map,{label:current,kind:rawKind}),kind=intel.kind;
- return '<div class="hd-sm-current-tactic '+hdSMEsc(kind)+'"><div class="hd-sm-current-head"><span>BATTLE GUIDE</span><b>'+hdSMEsc(current)+'マス</b><small>'+hdSMEsc(hdSMNodeKindLabel(kind))+'</small></div><div class="hd-sm-current-grid"><div><span>基本陣形</span><strong>'+hdSMEsc(intel.formation)+'</strong><small>'+hdSMEsc(intel.formationReason)+'</small></div><div><span>警戒ポイント</span><strong>'+hdSMEsc(intel.caution)+'</strong><small>'+hdSMEsc(intel.summary)+'</small></div></div>'+(intel.source?'<footer>'+hdSMEsc(intel.source)+'</footer>':'')+'</div>';
+ const graph=hdSMGraph(map),rawKind=hdSMNodeKind(graph,current),intel=hdSMNodeIntel(map,{label:current,kind:rawKind}),kind=intel.kind,nonBattle=['item','safe','vortex','goal'].includes(kind);
+ const guideLabel=nonBattle?'NODE GUIDE':'BATTLE GUIDE',pointLabel=nonBattle?'確認ポイント':'警戒ポイント';
+ return '<div class="hd-sm-current-tactic '+hdSMEsc(kind)+'"><div class="hd-sm-current-head"><span>'+guideLabel+'</span><b>'+hdSMEsc(current)+'マス</b><small>'+hdSMEsc(hdSMNodeKindLabel(kind))+'</small></div><div class="hd-sm-current-grid"><div><span>基本陣形</span><strong>'+hdSMEsc(intel.formation)+'</strong><small>'+hdSMEsc(intel.formationReason)+'</small></div><div><span>'+pointLabel+'</span><strong>'+hdSMEsc(intel.caution)+'</strong><small>'+hdSMEsc(intel.summary)+'</small></div></div>'+(intel.source?'<footer>'+hdSMEsc(intel.source)+'</footer>':'')+'</div>';
 }
 function hdSMStartHpState(session){
  const ships=(session?.fleetSnapshot?.ships||[]).filter(x=>Number(x?.maxHp)>0&&Number(x?.nowHp)>=0);
