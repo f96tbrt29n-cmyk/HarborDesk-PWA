@@ -6597,15 +6597,15 @@ test('quick nav ranks categories and context by real usage', async ({ page }) =>
     window.hdWSApply?.('fleet','roster',{ignorePin:true});
     const context=(window.hdQNContextRows?.()||[]).map(x=>x.id);
     localStorage.removeItem('harbordesk-quick-nav-usage-v1');
-    const first=window.hdQNRecordUsage?.('roster');
-    const second=window.hdQNRecordUsage?.('roster');
+    const first=window.hdQNRecordUsage?.('equipmentBook');
+    const second=window.hdQNRecordUsage?.('equipmentBook');
     const usage=JSON.parse(localStorage.getItem('harbordesk-quick-nav-usage-v1')||'{}');
     return {
       nonHome,
       context,
       first:!!first,
       second:!!second,
-      rosterCount:Number(usage.roster?.count||0)
+      equipmentBookCount:Number(usage.equipmentBook?.count||0)
     };
   });
   expect(data.nonHome[0].group).toBe('fleet');
@@ -6614,7 +6614,7 @@ test('quick nav ranks categories and context by real usage', async ({ page }) =>
   expect(data.context.indexOf('roster')).toBeLessThan(data.context.indexOf('trainingPlanner'));
   expect(data.first).toBe(true);
   expect(data.second).toBe(false);
-  expect(data.rosterCount).toBe(1);
+  expect(data.equipmentBookCount).toBe(1);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
 
