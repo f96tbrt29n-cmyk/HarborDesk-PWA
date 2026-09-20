@@ -177,10 +177,8 @@ function hdSMHudJump(target){
  if(!el)return false;try{el.scrollIntoView({behavior:'smooth',block:'center'})}catch{el.scrollIntoView()}return true;
 }
 function hdSMBattleCount(map,route){
- const graph=hdSMGraph(map),nodes=Array.isArray(route)?route.map(String).filter(Boolean):[];
- if(!graph)return nodes.length;
- const battleKinds=new Set(['normal','boss','sub','air','night']);
- return nodes.reduce((n,label)=>n+(battleKinds.has(hdSMNodeKind(graph,label))?1:0),0);
+ const nodes=Array.isArray(route)?route.map(String).filter(Boolean):[];
+ return nodes.reduce((n,label)=>n+(hdSMRequiresAdvanceCheck(map,label)?1:0),0);
 }
 function hdSMQuickResult(result){
  const el=document.getElementById('hdSMResult');if(!el)return false;el.value=String(result||'S');
