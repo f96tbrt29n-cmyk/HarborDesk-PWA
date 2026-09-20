@@ -229,11 +229,11 @@ function hdQNBackupAttention(now=Date.now()){
   let syncAt=0;try{syncAt=Math.max(0,Number(JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')?.syncedAt)||0)}catch{}
   if(!backupAt){
    if(!syncAt)return null;
-   return {id:'backup',priority:60,tone:'sync',reason:'外部バックアップ未作成',icon:'⇩',title:'同期後のバックアップ未作成',detail:'艦これ同期データをJSONで保存しておこう'};
+   return {id:'backup',priority:60,tone:'sync',reason:'外部バックアップ未作成',icon:'⇩',title:'同期後のバックアップ未作成',detail:'艦これ同期データをJSONで保存しておこう',action:'backup-now',actionLabel:'今すぐ保存'};
   }
-  if(syncAt>backupAt)return {id:'backup',priority:60,tone:'sync',reason:'同期後バックアップ未保存',icon:'⇩',title:'同期後のバックアップ未保存',detail:'最新の同期内容をJSONへ書き出しておこう'};
+  if(syncAt>backupAt)return {id:'backup',priority:60,tone:'sync',reason:'同期後バックアップ未保存',icon:'⇩',title:'同期後のバックアップ未保存',detail:'最新の同期内容をJSONへ書き出しておこう',action:'backup-now',actionLabel:'今すぐ保存'};
   const days=Math.max(0,Math.floor((Number(now)-backupAt)/86400000));
-  if(days>=14)return {id:'backup',priority:35,tone:'normal',reason:'外部バックアップ更新',icon:'⇩',title:'外部バックアップを更新',detail:`前回のJSON保存から${days}日`};
+  if(days>=14)return {id:'backup',priority:35,tone:'normal',reason:'外部バックアップ更新',icon:'⇩',title:'外部バックアップを更新',detail:`前回のJSON保存から${days}日`,action:'backup-now',actionLabel:'今すぐ保存'};
   return null;
  }catch{return null}
 }
@@ -292,11 +292,31 @@ function hdQNOpenAttention(){
  hdQNEnsureAttentionDialog();
  const d=document.getElementById('hdMobileAttentionDialog'),host=document.getElementById('hdMobileAttentionList');if(!d||!host)return false;
  const items=hdQNMobileAttentionItems();
- host.innerHTML=items.length?items.map(x=>`<button type="button" class="tone-${hdQNEsc(x.tone||'normal')}" data-hd-attention-jump="${hdQNEsc(x.id)}"><span>${hdQNEsc(x.icon)}</span><div><strong>${hdQNEsc(x.title)}</strong><small>${hdQNEsc(x.detail)}</small></div><i>›</i></button>`).join(''):'<div class="empty">今すぐ対応が必要な項目はないよ。</div>';
+ host.innerHTML=items.length?items.map(x=>`<button type="button" class="tone-${hdQNEsc(x.tone||'normal')}" data-hd-attention-jump="${hdQNEsc(x.id)}"><span>${hdQNEsc(x.icon)}</span><div><strong>${hdQNEsc(x.title)}</strong><small>${hdQNEsc(x.detail)}</small></div><i>›</i></button>${x.action?`<button type="button" class="hd-mobile-attention-action" data-hd-attention-action="${hdQNEsc(x.action)}" data-hd-attention-id="${hdQNEsc(x.id)}"><span>⇩</span><b>${hdQNEsc(x.actionLabel||'対応する')}</b></button>`:''}`).join(''):'<div class="empty">今すぐ対応が必要な項目はないよ。</div>';
  if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');
  return true;
 }
 function hdQNCloseAttention(){const d=document.getElementById('hdMobileAttentionDialog');if(!d)return;if(typeof d.close==='function'&&d.open)d.close();else d.removeAttribute('open')}
+async function hdQNRunAttentionAction(action,id){
+ action=String(action||'');id=String(id||'');
+ if(action==='backup-now'){
+  if(typeof window.shareBackup==='function'){
+   const ok=await window.shareBackup();
+   if(ok!==false){hdQNCloseAttention();hdQNUpdateMobileDock();return true}
+   return false
+  }
+  if(typeof window.exportBackup==='function'){
+   const ok=window.exportBackup();
+   if(ok!==false){hdQNCloseAttention();hdQNUpdateMobileDock();return true}
+   return false
+  }
+  hdQNCloseAttention();
+  if(typeof hdWSShowElement==='function')return !!hdWSShowElement(id||'backup',true);
+  const el=document.getElementById(id||'backup');if(el){el.scrollIntoView({behavior:'smooth',block:'start'});return true}
+  return false
+ }
+ return false
+}
 function hdQNMobileHome(){
  const active=document.querySelector('[data-hd-ws-group].active')?.dataset.hdWsGroup==='home',attention=hdQNMobileAttentionMeta();
  if(active&&attention.count>0)return hdQNOpenAttention();
@@ -378,6 +398,7 @@ function hdQNLoadDiagnostics(){
 document.addEventListener('click',e=>{
   if(e.target.closest?.('[data-hd-mobile-home-badge]')){hdQNOpenAttention();return}
   if(e.target.closest?.('[data-hd-attention-close]')){hdQNCloseAttention();return}
+  const attentionAction=e.target.closest?.('[data-hd-attention-action]');if(attentionAction){hdQNRunAttentionAction(attentionAction.dataset.hdAttentionAction,attentionAction.dataset.hdAttentionId);return}
   const attentionJump=e.target.closest?.('[data-hd-attention-jump]');if(attentionJump){const id=attentionJump.dataset.hdAttentionJump;hdQNCloseAttention();if(typeof hdWSShowElement==='function')hdWSShowElement(id,true);else document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});return}
   if(e.target.closest?.('[data-hd-mobile-back]')){if(typeof hdWSGoBack==='function'&&hdWSGoBack()){setTimeout(hdQNUpdateMobileDock,0)}return}
   if(e.target.closest?.('[data-hd-mobile-location]')){hdQNOpen();return}
