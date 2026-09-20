@@ -85,7 +85,8 @@ function calcAirPower(){let total=0;document.querySelectorAll('.air-row').forEac
 function calcEfficiency(){const m=Number(document.getElementById('effMinutes')?.value)||0;const el=document.getElementById('effResult');if(!el)return;if(m<=0){el.textContent='時間を入力';return}const f=60/m;const vals=[['燃料','effFuel'],['弾薬','effAmmo'],['鋼材','effSteel'],['ボーキ','effBauxite']].map(([n,id])=>`${n} ${(Number(document.getElementById(id).value)||0)*f}`);el.textContent='1時間あたり: '+vals.map(s=>s.replace(/(\d+\.\d{2,}).*/,m=>Number(parseFloat(m)).toFixed(1))).join(' / ')}
 
 function hdBuildBackupFile(){
- const data={version:1,exportedAt:new Date().toISOString(),localStorage:{}};
+ const appVersion=typeof HD_APP_VERSION==='string'?HD_APP_VERSION:'',appBuild=typeof HD_APP_BUILD==='number'?HD_APP_BUILD:null;
+ const data={version:1,exportedAt:new Date().toISOString(),app:{name:'HarborDesk',version:appVersion,build:appBuild},localStorage:{}};
  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('harbordesk'))data.localStorage[k]=localStorage.getItem(k)}
  const name=`HarborDesk-backup-${new Date().toISOString().slice(0,10)}.json`;
  const text=JSON.stringify(data,null,2),blob=new Blob([text],{type:'application/json'});
@@ -115,15 +116,39 @@ function hdAnalyzeBackupLocalStorage(storage){
  let removed=0;for(const k of current.keys())if(!incoming.has(k))removed++;
  return {total:entries.length,added,updated,unchanged,removed,ignored:raw.length-entries.length,bytes:new Blob([JSON.stringify(Object.fromEntries(entries))],{type:'application/json'}).size};
 }
+function hdAnalyzeBackupCompatibility(obj){
+ const rawSchema=obj?.version,schema=rawSchema==null?null:Number(rawSchema);
+ const currentBuild=typeof HD_APP_BUILD==='number'?HD_APP_BUILD:null,currentVersion=typeof HD_APP_VERSION==='string'?HD_APP_VERSION:'';
+ const rawSourceBuild=obj?.app?.build??obj?.appBuild,sourceBuild=rawSourceBuild==null?null:Number(rawSourceBuild);
+ const sourceVersion=String(obj?.app?.version??obj?.appVersion??'').trim();
+ const warnings=[];let blocked=false,reason='';
+ if(rawSchema!=null&&(!Number.isInteger(schema)||schema<1)){blocked=true;reason='バックアップ形式番号が正しくないため、安全のため復元できないよ。'}
+ else if(Number.isInteger(schema)&&schema>1){blocked=true;reason=`このバックアップは新しい形式(v${schema})だよ。HarborDeskを更新してから復元してね。`}
+ if(!blocked&&sourceBuild!=null&&Number.isFinite(sourceBuild)&&currentBuild!=null&&sourceBuild>currentBuild){
+  blocked=true;reason=`このバックアップは新しいHarborDesk (build ${sourceBuild}) で作成されているよ。現在のbuild ${currentBuild}を更新してから復元してね。`;
+ }
+ if(rawSchema==null)warnings.push('形式番号がない旧バックアップ');
+ if(sourceBuild==null||!Number.isFinite(sourceBuild))warnings.push('作成元バージョン不明');
+ else if(currentBuild!=null&&sourceBuild<currentBuild)warnings.push(`古いHarborDesk build ${sourceBuild} のバックアップ`);
+ const exported=obj?.exportedAt?new Date(obj.exportedAt):null;
+ if(exported&&!Number.isNaN(exported.getTime())&&exported.getTime()>Date.now()+5*60*1000)warnings.push('保存日時が端末時刻より未来');
+ const sourceLabel=sourceVersion?`HarborDesk v${sourceVersion}`:(Number.isFinite(sourceBuild)?`HarborDesk build ${sourceBuild}`:'作成元不明');
+ return {schema,sourceBuild:Number.isFinite(sourceBuild)?sourceBuild:null,sourceVersion,currentBuild,currentVersion,sourceLabel,warnings,blocked,reason};
+}
 function hdEnsureBackupRestorePreview(){
  let d=document.getElementById('hdBackupRestorePreviewDialog');if(d)return d;
  d=document.createElement('dialog');d.id='hdBackupRestorePreviewDialog';d.className='hd-backup-preview-dialog';
- d.innerHTML='<form method="dialog"><h3>バックアップを復元</h3><p class="muted" data-hd-backup-preview-meta></p><div class="hd-backup-preview-grid" data-hd-backup-preview-grid></div><div class="hd-backup-preview-warning" data-hd-backup-preview-warning></div><div class="dialog-actions"><button value="cancel" class="ghost">キャンセル</button><button value="restore" class="primary">この内容で復元</button></div></form>';
+ d.innerHTML='<form method="dialog"><h3>バックアップを復元</h3><p class="muted" data-hd-backup-preview-meta></p><div class="hd-backup-preview-compat" data-hd-backup-preview-compat></div><div class="hd-backup-preview-grid" data-hd-backup-preview-grid></div><div class="hd-backup-preview-warning" data-hd-backup-preview-warning></div><div class="dialog-actions"><button value="cancel" class="ghost">キャンセル</button><button value="restore" class="primary">この内容で復元</button></div></form>';
  document.body.appendChild(d);return d;
 }
 function hdConfirmBackupRestore(obj,analysis,fileName=''){
- const d=hdEnsureBackupRestorePreview(),exported=obj?.exportedAt?new Date(obj.exportedAt):null,validDate=exported&&!Number.isNaN(exported.getTime()),kb=(Number(analysis?.bytes)||0)/1024;
+ const d=hdEnsureBackupRestorePreview(),compat=hdAnalyzeBackupCompatibility(obj),exported=obj?.exportedAt?new Date(obj.exportedAt):null,validDate=exported&&!Number.isNaN(exported.getTime()),kb=(Number(analysis?.bytes)||0)/1024;
  const meta=d.querySelector('[data-hd-backup-preview-meta]');if(meta)meta.textContent=(fileName||'バックアップJSON')+' ・ '+(validDate?exported.toLocaleString('ja-JP'):'保存日時不明')+' ・ '+kb.toFixed(1)+' KB';
+ const compatibility=d.querySelector('[data-hd-backup-preview-compat]');
+ if(compatibility){
+  compatibility.className='hd-backup-preview-compat '+(compat.blocked?'blocked':compat.warnings.length?'warn':'ok');
+  compatibility.innerHTML='<strong>'+(compat.blocked?'復元できないバックアップ':compat.warnings.length?'互換性を確認':'互換性 OK')+'</strong><small>'+hdEsc(compat.sourceLabel)+(compat.currentVersion?' → 現在 v'+hdEsc(compat.currentVersion):'')+(compat.blocked?' ・ '+hdEsc(compat.reason):compat.warnings.length?' ・ '+compat.warnings.map(hdEsc).join(' / '):' ・ 現在のHarborDeskで復元できる')+'</small>';
+ }
  const grid=d.querySelector('[data-hd-backup-preview-grid]');if(grid)grid.innerHTML=
   '<div><span>復元対象</span><strong>'+Number(analysis?.total||0)+'件</strong></div>'+
   '<div class="add"><span>追加</span><strong>'+Number(analysis?.added||0)+'件</strong></div>'+
@@ -131,8 +156,9 @@ function hdConfirmBackupRestore(obj,analysis,fileName=''){
   '<div class="remove"><span>削除予定</span><strong>'+Number(analysis?.removed||0)+'件</strong></div>';
  const warning=d.querySelector('[data-hd-backup-preview-warning]');if(warning)warning.innerHTML=
   '<strong>復元すると現在のHarborDeskデータをバックアップ時点へ置き換えるよ。</strong><small>変更なし '+Number(analysis?.unchanged||0)+'件'+(analysis?.ignored?' ・ 無視 '+Number(analysis.ignored)+'件':'')+'。確定直前に端末内スナップショットも自動保存する。</small>';
+ const restore=d.querySelector('button[value="restore"]');if(restore){restore.disabled=!!compat.blocked;restore.title=compat.blocked?compat.reason:''}
  d.returnValue='';
- return new Promise(resolve=>{const done=()=>resolve(d.returnValue==='restore');d.addEventListener('close',done,{once:true});if(typeof d.showModal==='function')d.showModal();else d.setAttribute('open','')});
+ return new Promise(resolve=>{const done=()=>resolve(!compat.blocked&&d.returnValue==='restore');d.addEventListener('close',done,{once:true});if(typeof d.showModal==='function')d.showModal();else d.setAttribute('open','')});
 }
 function hdApplyBackupLocalStorage(storage){if(!storage||typeof storage!=='object'||Array.isArray(storage))throw new Error('invalid backup storage');const entries=Object.entries(storage).filter(([k,v])=>k.startsWith('harbordesk')&&typeof v==='string'),keep=new Set(entries.map(([k])=>k));for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k?.startsWith('harbordesk')&&!keep.has(k))localStorage.removeItem(k)}for(const [k,v] of entries)localStorage.setItem(k,v);return entries.length}
 async function importBackup(file){
