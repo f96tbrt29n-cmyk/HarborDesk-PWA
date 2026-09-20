@@ -128,6 +128,23 @@ function hdSMObjectiveStatText(map,target){
  const s=hdSMObjectiveStartStats(map,target);
  return (s.steps==null?'距離—':'最短'+s.steps+'マス')+'・'+(s.battles==null?'戦闘—':'最少'+s.battles+'戦');
 }
+function hdSMObjectiveShortestPath(map,target){
+ const graph=hdSMGraph(map),targets=hdSMObjectiveTargets(map,target);
+ if(!graph||!Array.isArray(graph.edges)||!targets.length)return [];
+ const starts=[...new Set(graph.edges.map(x=>x[0]).filter(x=>x==='S'||x==='S1'||x==='S2'))];
+ const q=starts.map(x=>({node:x,path:[]})),seen=new Set(starts);
+ while(q.length){
+  const row=q.shift();
+  if(targets.includes(row.node))return row.path;
+  for(const [a,b] of graph.edges){
+   if(a!==row.node||seen.has(b))continue;
+   const path=[...row.path,b];
+   if(targets.includes(b))return path;
+   seen.add(b);q.push({node:b,path});
+  }
+ }
+ return [];
+}
 function hdSMObjectivePrefs(){
  try{const x=JSON.parse(localStorage.getItem(HD_SM_OBJECTIVE_PREF_KEY)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch{return {}}
 }
@@ -154,9 +171,10 @@ function hdSMObjectivePrestartHtml(map){
 }
 function hdSMPrestartRoutePreviewHtml(map){
  const options=hdSMObjectiveOptions(map);if(options.length<2)return '';
- const target=hdSMObjectivePreference(map),targetName=hdSMRouteTargetName(map,target),next=hdSMNextNodeRows(map,{node:'',routeNodes:[]});
+ const target=hdSMObjectivePreference(map),targetName=hdSMRouteTargetName(map,target),next=hdSMNextNodeRows(map,{node:'',routeNodes:[]}),path=hdSMObjectiveShortestPath(map,target);
  if(!next.length)return '';
- return '<div class="hd-sm-pre-route"><div><span>START ROUTE</span><b>構造図上の開始候補</b><small>'+hdSMEsc(target?targetName:'自動（攻略目標）')+' 基準</small></div><div>'+next.map(x=>{const reachable=hdSMCanReachBoss(map,x.label,target),intel=hdSMNodeIntel(map,x),status=reachable===true?'接続':reachable===false?'逸れ候補':'経路不明';return '<span class="'+(reachable===false?'off':reachable===true?'on':'unknown')+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(intel.kind))+'</small><em>'+hdSMEsc(status)+'</em></span>'}).join('')+'</div><p>実際の分岐は編成・索敵・確率条件で変わるため、攻略概要の条件も確認してね。</p></div>';
+ const pathHtml=path.length?'<p class="hd-sm-pre-route-path"><b>構造図最短</b><span>'+path.map(hdSMEsc).join(' → ')+'</span></p>':'';
+ return '<div class="hd-sm-pre-route"><div><span>START ROUTE</span><b>構造図上の開始候補</b><small>'+hdSMEsc(target?targetName:'自動（攻略目標）')+' 基準</small></div><div>'+next.map(x=>{const reachable=hdSMCanReachBoss(map,x.label,target),intel=hdSMNodeIntel(map,x),status=reachable===true?'接続':reachable===false?'逸れ候補':'経路不明';return '<span class="'+(reachable===false?'off':reachable===true?'on':'unknown')+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(intel.kind))+'</small><em>'+hdSMEsc(status)+'</em></span>'}).join('')+'</div>'+pathHtml+'<p>実際の分岐は編成・索敵・確率条件で変わるため、攻略概要の条件も確認してね。</p></div>';
 }
 function hdSMSelectedObjective(map,draft){
  const chosen=String(draft?.objectiveTarget||'').trim(),targets=hdSMObjectiveTargets(map);
@@ -539,6 +557,7 @@ window.hdSMObjectivePreference=hdSMObjectivePreference;
 window.hdSMSaveObjectivePreference=hdSMSaveObjectivePreference;
 window.hdSMSetObjectivePreference=hdSMSetObjectivePreference;
 window.hdSMObjectiveStartStats=hdSMObjectiveStartStats;
+window.hdSMObjectiveShortestPath=hdSMObjectiveShortestPath;
 window.hdSMObjectiveStatText=hdSMObjectiveStatText;
 window.hdSMObjectivePrestartHtml=hdSMObjectivePrestartHtml;
 window.hdSMPrestartRoutePreviewHtml=hdSMPrestartRoutePreviewHtml;
