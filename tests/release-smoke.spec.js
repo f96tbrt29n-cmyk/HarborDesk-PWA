@@ -896,3 +896,36 @@ test('release smoke: concurrent backup restores are locked', async ({ page }) =>
   expect(result.alerts.join(' ')).toContain('進行中');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: diagnostics verifies restore safety layer readiness', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdDXCollect === 'function' &&
+    typeof window.hdPHOpenDb === 'function' &&
+    typeof window.hdPHCreateSnapshot === 'function'
+  );
+
+  const result = await page.evaluate(async () => {
+    const healthy = await window.hdDXCollect(false);
+    const originalOpenDb = window.hdPHOpenDb;
+    window.hdPHOpenDb = async () => { throw new Error('snapshot store unavailable'); };
+    const broken = await window.hdDXCollect(false);
+    window.hdPHOpenDb = originalOpenDb;
+    return {
+      healthyReady: !!healthy.restoreSafety?.ready,
+      healthyStore: !!healthy.restoreSafety?.storeReady,
+      brokenReady: !!broken.restoreSafety?.ready,
+      brokenError: broken.restoreSafety?.error || '',
+      brokenIssues: broken.issues || []
+    };
+  });
+
+  expect(result.healthyReady).toBe(true);
+  expect(result.healthyStore).toBe(true);
+  expect(result.brokenReady).toBe(false);
+  expect(result.brokenError).toContain('snapshot store unavailable');
+  expect(result.brokenIssues.join(' ')).toContain('復元安全スナップショット');
+  expect(errors).toEqual([]);
+});
