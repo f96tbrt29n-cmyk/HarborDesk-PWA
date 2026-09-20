@@ -94,6 +94,30 @@ function hdSMObjectiveOptions(map){
  if(boss&&boss!==goal)out.push({label:boss,type:'boss',name:boss+' ボス'});
  return out;
 }
+function hdSMObjectivePrefs(){
+ try{const x=JSON.parse(localStorage.getItem(HD_SM_OBJECTIVE_PREF_KEY)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch{return {}}
+}
+function hdSMObjectivePreference(map){
+ const chosen=String(hdSMObjectivePrefs()[String(map||'')]||'').trim(),allowed=hdSMObjectiveTargets(map);
+ return allowed.includes(chosen)?chosen:'';
+}
+function hdSMSaveObjectivePreference(map,target){
+ const key=String(map||''),chosen=String(target||'').trim(),allowed=hdSMObjectiveTargets(map),objectiveTarget=allowed.includes(chosen)?chosen:'';
+ try{
+  const prefs=hdSMObjectivePrefs();
+  if(objectiveTarget)prefs[key]=objectiveTarget;else delete prefs[key];
+  localStorage.setItem(HD_SM_OBJECTIVE_PREF_KEY,JSON.stringify(prefs));
+ }catch{return ''}
+ return objectiveTarget;
+}
+function hdSMSetObjectivePreference(map,target){
+ hdSMSaveObjectivePreference(map,target);hdSMRender();return true;
+}
+function hdSMObjectivePrestartHtml(map){
+ const options=hdSMObjectiveOptions(map);if(options.length<2)return '';
+ const selected=hdSMObjectivePreference(map);
+ return '<div class="hd-sm-objective-picker prestart"><div><span>OBJECTIVE</span><b>出撃目標</b><small>開始前に選択／次回も記憶</small></div><div><button type="button" class="'+(!selected?'active':'')+'" data-hd-sm-pre-objective="" data-hd-sm-objective-map="'+hdSMEsc(map)+'">自動</button>'+options.map(x=>'<button type="button" class="'+(selected===x.label?'active':'')+'" data-hd-sm-pre-objective="'+hdSMEsc(x.label)+'" data-hd-sm-objective-map="'+hdSMEsc(map)+'">'+hdSMEsc(x.name)+'</button>').join('')+'</div></div>';
+}
 function hdSMSelectedObjective(map,draft){
  const chosen=String(draft?.objectiveTarget||'').trim(),targets=hdSMObjectiveTargets(map);
  return targets.includes(chosen)?chosen:'';
@@ -112,14 +136,9 @@ function hdSMObjectivePickerHtml(map,draft){
 }
 function hdSMSetObjectiveTarget(target){
  const session=hdSMSession();if(!session||session.status!=='active')return false;
- const prev=session.draft&&typeof session.draft==='object'?session.draft:{},chosen=String(target||'').trim(),allowed=hdSMObjectiveTargets(session.map),objectiveTarget=allowed.includes(chosen)?chosen:'';
+ const prev=session.draft&&typeof session.draft==='object'?session.draft:{},objectiveTarget=hdSMSaveObjectivePreference(session.map,target);
  session.draft={...prev,objectiveTarget,updatedAt:Date.now()};
- try{
-  const prefs=JSON.parse(localStorage.getItem(HD_SM_OBJECTIVE_PREF_KEY)||'{}')||{},map=String(session.map||'');
-  if(objectiveTarget)prefs[map]=objectiveTarget;else delete prefs[map];
-  localStorage.setItem(HD_SM_OBJECTIVE_PREF_KEY,JSON.stringify(prefs));
-  if(typeof window.hdSSSave==='function')window.hdSSSave(session);else localStorage.setItem(HD_SM_SESSION_KEY,JSON.stringify(session));
- }catch{return false}
+ try{if(typeof window.hdSSSave==='function')window.hdSSSave(session);else localStorage.setItem(HD_SM_SESSION_KEY,JSON.stringify(session))}catch{return false}
  try{window.dispatchEvent(new CustomEvent('hd:sortie-draft-saved',{detail:{sessionId:session.id,draft:session.draft}}))}catch{}
  hdSMRender();return true;
 }
@@ -308,7 +327,7 @@ function hdSMIdleHtml(){
  const d=hdSMMapDetail(map),row=typeof window.hdSSSelectedSummary==='function'?window.hdSSSelectedSummary(map):null;
  if(!row)return '<div class="hd-sm-idle"><div class="hd-sm-map"><span>選択海域</span><strong>'+hdSMEsc(map)+' '+hdSMEsc(d.name||'')+'</strong></div><div class="hd-sm-empty compact"><p>この海域で使う編成がまだ選ばれてないよ。出撃準備表で編成を決めよう。</p></div><div class="hd-sm-actions"><button type="button" class="primary" data-hd-sm-prep>出撃準備表を開く</button><button type="button" class="ghost" data-hd-sm-guide>海域攻略へ</button></div></div>';
  const s=row.stats||{},ready=(!s.autoTotal||s.autoOk===s.autoTotal)&&(!s.manualTotal||s.manualDone===s.manualTotal);
- return '<div class="hd-sm-idle"><div class="hd-sm-map"><span>選択海域</span><strong>'+hdSMEsc(map)+' '+hdSMEsc(d.name||'')+'</strong></div><div class="hd-sm-status '+(ready?'ready':'warn')+'"><div><span>'+hdSMEsc(row.strategyLabel||'手動編成')+'</span><strong>'+hdSMEsc(row.fleet&&row.fleet.name||'名称なし')+'</strong><small>'+(Number(s.shipCount)||0)+'隻</small></div><b>'+(ready?'出撃前確認済み':'未確認あり')+'</b></div>'+hdSMReadinessHtml({autoOk:s.autoOk,autoTotal:s.autoTotal,manualDone:s.manualDone,manualTotal:s.manualTotal,unresolved:s.unresolved})+'<div class="hd-sm-actions"><button type="button" class="primary" data-hd-sm-start>この編成で出撃開始</button><button type="button" class="ghost" data-hd-sm-prep>出撃準備表</button><button type="button" class="ghost" data-hd-sm-guide>海域攻略</button></div><p class="hd-sm-note">開始すると、その時点の艦隊・装備・確認状態を固定して出撃中画面へ切り替えるよ。</p></div>';
+ return '<div class="hd-sm-idle"><div class="hd-sm-map"><span>選択海域</span><strong>'+hdSMEsc(map)+' '+hdSMEsc(d.name||'')+'</strong></div>'+hdSMObjectivePrestartHtml(map)+'<div class="hd-sm-status '+(ready?'ready':'warn')+'"><div><span>'+hdSMEsc(row.strategyLabel||'手動編成')+'</span><strong>'+hdSMEsc(row.fleet&&row.fleet.name||'名称なし')+'</strong><small>'+(Number(s.shipCount)||0)+'隻</small></div><b>'+(ready?'出撃前確認済み':'未確認あり')+'</b></div>'+hdSMReadinessHtml({autoOk:s.autoOk,autoTotal:s.autoTotal,manualDone:s.manualDone,manualTotal:s.manualTotal,unresolved:s.unresolved})+'<div class="hd-sm-actions"><button type="button" class="primary" data-hd-sm-start>この編成で出撃開始</button><button type="button" class="ghost" data-hd-sm-prep>出撃準備表</button><button type="button" class="ghost" data-hd-sm-guide>海域攻略</button></div><p class="hd-sm-note">開始すると、その時点の艦隊・装備・確認状態を固定して出撃中画面へ切り替えるよ。</p></div>';
 }
 function hdSMDraft(session){
  const d=session&&session.draft&&typeof session.draft==='object'?session.draft:{};
@@ -431,6 +450,7 @@ document.addEventListener('click',function(e){
  const hudJump=e.target.closest?.('[data-hd-sm-hud-jump]');if(hudJump){hdSMHudJump(hudJump.dataset.hdSmHudJump);return}
  const hudNode=e.target.closest?.('[data-hd-sm-hud-node]');if(hudNode){hdSMSetNode(hudNode.dataset.hdSmHudNode);return}
  const objective=e.target.closest?.('[data-hd-sm-objective]');if(objective){hdSMSetObjectiveTarget(objective.dataset.hdSmObjective);return}
+ const preObjective=e.target.closest?.('[data-hd-sm-pre-objective]');if(preObjective){hdSMSetObjectivePreference(preObjective.dataset.hdSmObjectiveMap,preObjective.dataset.hdSmPreObjective);return}
  const quickResult=e.target.closest?.('[data-hd-sm-quick-result]');if(quickResult){hdSMQuickResult(quickResult.dataset.hdSmQuickResult);return}
  if(e.target.closest?.('[data-hd-sm-quick-boss]')){hdSMQuickBoss();return}
  if(e.target.closest?.('[data-hd-sm-quick-drop-none]')){hdSMQuickDropNone();return}
@@ -474,6 +494,11 @@ window.hdSMCanReachBoss=hdSMCanReachBoss;
 window.hdSMRouteTargetName=hdSMRouteTargetName;
 window.hdSMObjectiveTargets=hdSMObjectiveTargets;
 window.hdSMObjectiveOptions=hdSMObjectiveOptions;
+window.hdSMObjectivePrefs=hdSMObjectivePrefs;
+window.hdSMObjectivePreference=hdSMObjectivePreference;
+window.hdSMSaveObjectivePreference=hdSMSaveObjectivePreference;
+window.hdSMSetObjectivePreference=hdSMSetObjectivePreference;
+window.hdSMObjectivePrestartHtml=hdSMObjectivePrestartHtml;
 window.hdSMSelectedObjective=hdSMSelectedObjective;
 window.hdSMObjectivePickerHtml=hdSMObjectivePickerHtml;
 window.hdSMSetObjectiveTarget=hdSMSetObjectiveTarget;
