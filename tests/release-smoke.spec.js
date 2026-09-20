@@ -328,3 +328,28 @@ test('release smoke: home shows return-to-game action only for sync handoff', as
   expect(data.hiddenAfter).toBe(true);
   expect(errors).toEqual([]);
 });
+
+test('release smoke: personal home order storage stays isolated', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(() => {
+    const legacy = ['quick', 'resources', 'recent', 'procurement'];
+    localStorage.setItem('harbordesk-home-order-v1', JSON.stringify(legacy));
+    localStorage.removeItem('harbordesk-personal-home-order-v1');
+
+    const initial = window.hdPHOrderLoad?.() || [];
+    window.hdPHOrderSave?.(['resources', 'coverage', 'attention', 'next', 'fleets', 'condition']);
+
+    return {
+      legacy: JSON.parse(localStorage.getItem('harbordesk-home-order-v1') || '[]'),
+      personal: JSON.parse(localStorage.getItem('harbordesk-personal-home-order-v1') || '[]'),
+      initial
+    };
+  });
+
+  expect(data.legacy).toEqual(['quick', 'resources', 'recent', 'procurement']);
+  expect(data.initial).toEqual(['coverage', 'attention', 'next', 'resources', 'fleets', 'condition']);
+  expect(data.personal).toEqual(['resources', 'coverage', 'attention', 'next', 'fleets', 'condition']);
+  expect(errors).toEqual([]);
+});
