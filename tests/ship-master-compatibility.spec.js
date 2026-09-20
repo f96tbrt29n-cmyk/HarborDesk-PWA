@@ -6756,3 +6756,58 @@ test('home shows game sync status and opens sync details', async ({ page }) => {
   expect(data.dialogOpen).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('home shows prioritized attention items and opens full attention list', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const now=Date.now();
+    localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({
+      syncedAt:now,
+      ships:100,
+      equipment:200,
+      decks:4,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true}
+    }));
+    window.hdGetAppState=()=>({
+      expeditions:[
+        {name:'東京急行',endsAt:now-60*1000},
+        {name:'北方鼠輸送作戦',endsAt:now+10*60*1000}
+      ],
+      docks:[{name:'赤城',endsAt:now-30*1000}],
+      quests:[{name:'演習任務',done:false}]
+    });
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+    const buttons=[...document.querySelectorAll('.hd-ph-attention-list [data-ph-attention]')].map(x=>({
+      id:x.dataset.phAttention||'',
+      cls:x.className||'',
+      text:x.textContent||''
+    }));
+    const block=document.querySelector('.hd-ph-attention-block');
+    const allButton=document.querySelector('[data-ph-attention-all]');
+    allButton?.click();
+    await new Promise(r=>setTimeout(r,30));
+    const dialog=document.getElementById('hdMobileAttentionDialog');
+    return {
+      count:buttons.length,
+      buttons,
+      blockText:block?.textContent||'',
+      allLabel:allButton?.textContent||'',
+      dialogOpen:!!dialog?.open||dialog?.hasAttribute('open')||false,
+      dialogText:document.getElementById('hdMobileAttentionList')?.textContent||''
+    };
+  });
+  expect(data.count).toBeGreaterThanOrEqual(4);
+  expect(data.buttons[0].id).toBe('expeditions');
+  expect(data.buttons[0].cls).toContain('tone-urgent');
+  expect(data.buttons[0].text).toContain('帰投済み');
+  expect(data.buttons[1].id).toBe('docks');
+  expect(data.buttons[1].cls).toContain('tone-urgent');
+  expect(data.blockText).toContain('要対応');
+  expect(data.allLabel).toContain('すべて確認');
+  expect(data.dialogOpen).toBe(true);
+  expect(data.dialogText).toContain('遠征が帰投済み');
+  expect(data.dialogText).toContain('入渠が完了');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
