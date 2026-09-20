@@ -177,10 +177,19 @@ test('release smoke: game sync fills ship and equipment ledgers from latest snap
       parsedEquipment: parsed.slotItems.size,
       syncShips: sync.ships,
       syncEquipment: sync.equipment,
+      syncEquipmentRows: sync.equipmentRows,
+      syncEquipmentItems: sync.equipmentItems,
+      syncIntegrity: sync.integrity,
       roster: roster.map(x => ({ gameShipId: x.gameShipId, masterId: x.masterId, name: x.name, level: x.level, gear: x.gear, type: x.type })),
       equipment: equipment.map(x => ({ masterEquipId: x.masterEquipId, name: x.name, count: x.count, star: x.star })),
       rosterCountText: document.getElementById('shipRosterCount')?.textContent || '',
-      equipmentCountText: document.getElementById('equipmentLedgerCount')?.textContent || ''
+      equipmentCountText: document.getElementById('equipmentLedgerCount')?.textContent || '',
+      syncStatusText: document.getElementById('hdKcSyncLast')?.textContent || '',
+      catalogAfterLedger: (() => {
+        const ledger = document.getElementById('equipmentList');
+        const catalog = document.getElementById('hdEquipmentCatalog');
+        return !!(ledger && catalog && (ledger.compareDocumentPosition(catalog) & Node.DOCUMENT_POSITION_FOLLOWING));
+      })()
     };
   });
 
@@ -188,6 +197,12 @@ test('release smoke: game sync fills ship and equipment ledgers from latest snap
   expect(data.parsedEquipment).toBe(1);
   expect(data.syncShips).toBe(2);
   expect(data.syncEquipment).toBe(1);
+  expect(data.syncEquipmentRows).toBe(1);
+  expect(data.syncEquipmentItems).toBe(1);
+  expect(data.syncIntegrity?.verified).toBe(true);
+  expect(data.syncIntegrity?.ok).toBe(true);
+  expect(data.syncIntegrity?.ships).toMatchObject({ source: 2, saved: 2, complete: true, ok: true });
+  expect(data.syncIntegrity?.equipment).toMatchObject({ source: 1, saved: 1, rows: 1, complete: true, ok: true });
   expect(data.roster).toHaveLength(2);
   expect(data.roster.find(x => x.gameShipId === 201)).toMatchObject({
     masterId: 1,
@@ -209,7 +224,10 @@ test('release smoke: game sync fills ship and equipment ledgers from latest snap
     star: 2
   }]);
   expect(data.rosterCountText).toContain('2');
-  expect(data.equipmentCountText).toContain('1');
+  expect(data.equipmentCountText).toContain('1種類');
+  expect(data.equipmentCountText).toContain('1個');
+  expect(data.syncStatusText).toContain('装備台帳1種類・1個');
+  expect(data.catalogAfterLedger).toBe(true);
   expect(errors).toEqual([]);
 });
 
