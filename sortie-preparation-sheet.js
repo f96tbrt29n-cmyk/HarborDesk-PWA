@@ -22,7 +22,10 @@ function hdSPSObjectiveLabel(map){
 }
 function hdSPSObjectiveHtml(map){
  const label=hdSPSObjectiveLabel(map);if(!label)return '';
- return '<div class="hd-sps-objective"><div><span>今回の攻略目標</span><strong>'+hdSPSEsc(label)+'</strong></div><small>出撃モードのOBJECTIVEと連動</small></div>';
+ let options=[];try{if(typeof window.hdSMObjectiveOptions==='function')options=window.hdSMObjectiveOptions(map)||[]}catch{}
+ const selected=hdSPSObjectiveTarget(map);
+ const buttons=options.length>1?'<div class="hd-sps-objective-actions"><button type="button" class="'+(!selected?'active':'')+'" data-hd-sps-objective="">自動</button>'+options.map(x=>'<button type="button" class="'+(selected===x.label?'active':'')+'" data-hd-sps-objective="'+hdSPSEsc(x.label)+'">'+hdSPSEsc(x.name)+'</button>').join('')+'</div>':'';
+ return '<div class="hd-sps-objective"><div class="hd-sps-objective-copy"><div><span>今回の攻略目標</span><strong>'+hdSPSEsc(label)+'</strong></div><small>出撃モードのOBJECTIVEと連動</small></div>'+buttons+'</div>';
 }
 function hdSPSFleets(map){try{return typeof hdSortieFleets==='function'?hdSortieFleets(map):(typeof loadCustomFleets==='function'?(loadCustomFleets()[map]||[]):[])}catch{return []}}
 function hdSPSFleet(map){
@@ -196,6 +199,7 @@ document.addEventListener('click',e=>{
  if(e.target.closest?.('[data-hd-sps-refresh]')){hdSPSRender();return}
  if(e.target.closest?.('[data-hd-sps-copy]')){const map=hdSPSMap();if(map)hdSPSCopy(map);return}
  if(e.target.closest?.('[data-hd-sps-guide]')){if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);return}
+ const objective=e.target.closest?.('[data-hd-sps-objective]');if(objective){const map=hdSPSMap();if(map&&typeof window.hdSMSetObjectivePreference==='function')window.hdSMSetObjectivePreference(map,objective.dataset.hdSpsObjective);else if(map){try{const prefs=JSON.parse(localStorage.getItem(HD_SPS_OBJECTIVE_PREF_KEY)||'{}')||{},target=String(objective.dataset.hdSpsObjective||'');if(target)prefs[map]=target;else delete prefs[map];localStorage.setItem(HD_SPS_OBJECTIVE_PREF_KEY,JSON.stringify(prefs));hdSPSRender()}catch{}}return}
  const tab=e.target.closest?.('[data-hd-sps-tab]');if(tab){hdSPSOpenMapTab(tab.dataset.hdSpsTab,tab.hasAttribute('data-hd-sps-focus-base'));return}
  const ws=e.target.closest?.('[data-hd-sps-workspace]');if(ws){if(typeof hdWSShowElement==='function')hdWSShowElement(ws.dataset.hdSpsWorkspace,true);return}
  const acq=e.target.closest?.('[data-hd-sps-acquire]');if(acq&&typeof hdAGOpen==='function'){hdAGOpen(acq.dataset.hdSpsAcquire,hdSPSMap());return}
