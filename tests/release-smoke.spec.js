@@ -3332,5 +3332,9 @@ test('release smoke: sortie warns when selected objective is unreachable from cu
 
   const draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
   expect(draft.objectiveTarget).toBe('G1');
+  expect(draft.node).toBe('C');
+  expect(draft.routeNodes).toEqual(['A','B','C']);
+  expect(draft.advanceGuard.node).toBe('C');
+  expect(draft.advanceGuard.safe).toBe(true);
   expect(errors).toEqual([]);
 });
