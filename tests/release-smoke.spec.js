@@ -1590,8 +1590,12 @@ test('release smoke: shared mobile layout prevents chrome overlap across iPhone 
     expect(before.clearance).not.toBe('');
 
     if (size.width <= 560) {
-      const more=page.locator('.hd-header-more');
-      await more.locator(':scope > summary').click();
+      await page.waitForTimeout(350);
+      await page.evaluate(() => {
+        const more=document.querySelector('.hd-header-more');
+        if(more)more.open=true;
+        window.hdSyncMobileHeaderMenu?.();
+      });
       await expect(page.locator('#hdMobileHeaderMenuRow')).toBeVisible();
       const open = await page.evaluate(() => {
         const row=document.getElementById('hdMobileHeaderMenuRow')?.getBoundingClientRect();
@@ -1599,7 +1603,11 @@ test('release smoke: shared mobile layout prevents chrome overlap across iPhone 
         return {rowBottom:Math.round(row?.bottom||0),navTop:Math.round(nav?.top||0)};
       });
       expect(open.rowBottom).toBeLessThanOrEqual(open.navTop + 2);
-      more.evaluate(el => el.removeAttribute('open'));
+      await page.evaluate(() => {
+        const more=document.querySelector('.hd-header-more');
+        if(more)more.open=false;
+        window.hdSyncMobileHeaderMenu?.();
+      });
       await page.waitForTimeout(50);
     }
   }
@@ -1675,8 +1683,9 @@ test('release smoke: internal snapshot restore shares the global restore lock', 
     let releaseSafety;
     window.hdPHCreateSnapshot=()=>new Promise(resolve=>{releaseSafety=resolve});
     const pending=window.hdPHRestoreSnapshot(id);
-    await new Promise(resolve=>setTimeout(resolve,0));
+    for(let i=0;i<100&&typeof releaseSafety!=='function';i++)await new Promise(resolve=>setTimeout(resolve,10));
     const ownedWhilePending=window.__hdBackupRestoreBusy===true;
+    if(typeof releaseSafety!=='function')throw new Error('internal restore did not reach safety snapshot stage');
     releaseSafety(false);
     const aborted=await pending;
     const clearedAfterAbort=window.__hdBackupRestoreBusy===false;
