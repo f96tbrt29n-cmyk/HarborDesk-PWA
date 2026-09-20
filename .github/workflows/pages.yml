@@ -59,7 +59,7 @@ jobs:
           node-version: 20
 
       - name: Install browser test dependencies
-        run: npm install --no-audit --no-fund
+        run: npm install --no-audit --no-fund --no-package-lock
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium webkit
@@ -140,6 +140,9 @@ jobs:
             test-results/
           if-no-files-found: ignore
           retention-days: 7
+
+      - name: Remove test-only files before Pages upload
+        run: rm -rf node_modules playwright-report test-results
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
