@@ -197,22 +197,36 @@ function hdSPAReview(key,action,mode){
  return false;
 }
 
-function hdSPAGroupKey(row,mode){
- if(mode==='map')return String(row.map||'unknown');
- if(mode==='fleet')return row.fleetId||row.fleetName||(hdSPASourceKind(row)==='game'?'game-sync':'manual-log');
- return row.strategy||(hdSPASourceKind(row)==='game'?'game-sync':'manual-log');
+function hdSPAObjectiveSplitMaps(logs){
+ const out=new Set();
+ for(const row of logs||[]){if(String(row?.objectiveTarget||'').trim())out.add(String(row.map||''))}
+ return out;
 }
-function hdSPAGroupLabel(row,mode){
- if(mode==='map'){const map=String(row.map||'');const name=hdSPAMapName(map);return name?map+' '+name:map||'海域不明'}
- if(mode==='fleet'){if(row.fleetName)return row.fleetName;return hdSPASourceKind(row)==='game'?'ゲーム同期（編成未紐付け）':'手動ログ（編成未紐付け）'}
- if(row.strategy)return hdSPAStrategyLabel(row.strategy,row);
- return hdSPASourceKind(row)==='game'?'ゲーム同期':'手動ログ';
+function hdSPAObjectiveLabel(row,split){
+ if(!split)return '';
+ const target=String(row?.objectiveTarget||'').trim();
+ return '｜目標 '+(target||'未記録');
+}
+function hdSPAGroupKey(row,mode,splitObjective=false){
+ let base;
+ if(mode==='map')base=String(row.map||'unknown');
+ else if(mode==='fleet')base=row.fleetId||row.fleetName||(hdSPASourceKind(row)==='game'?'game-sync':'manual-log');
+ else base=row.strategy||(hdSPASourceKind(row)==='game'?'game-sync':'manual-log');
+ return splitObjective?base+'|objective:'+(String(row.objectiveTarget||'').trim()||'unrecorded'):base;
+}
+function hdSPAGroupLabel(row,mode,splitObjective=false){
+ let base;
+ if(mode==='map'){const map=String(row.map||'');const name=hdSPAMapName(map);base=name?map+' '+name:map||'海域不明'}
+ else if(mode==='fleet'){base=row.fleetName?row.fleetName:(hdSPASourceKind(row)==='game'?'ゲーム同期（編成未紐付け）':'手動ログ（編成未紐付け）')}
+ else if(row.strategy)base=hdSPAStrategyLabel(row.strategy,row);
+ else base=hdSPASourceKind(row)==='game'?'ゲーム同期':'手動ログ';
+ return base+hdSPAObjectiveLabel(row,splitObjective);
 }
 function hdSPARows(){
- const mode=hdSPAMode(),map=hdSPAMap(),logs=hdSPALogs().filter(x=>map==='all'||x.map===map),groups=new Map();
+ const mode=hdSPAMode(),map=hdSPAMap(),logs=hdSPALogs().filter(x=>map==='all'||x.map===map),groups=new Map(),objectiveMaps=hdSPAObjectiveSplitMaps(logs);
  for(const row of logs){
-  const key=hdSPAGroupKey(row,mode);
-  if(!groups.has(key))groups.set(key,{key,label:hdSPAGroupLabel(row,mode),strategy:row.strategy||'manual',rows:[],maps:new Set()});
+  const splitObjective=objectiveMaps.has(String(row.map||'')),key=hdSPAGroupKey(row,mode,splitObjective);
+  if(!groups.has(key))groups.set(key,{key,label:hdSPAGroupLabel(row,mode,splitObjective),strategy:row.strategy||'manual',objectiveTarget:String(row.objectiveTarget||'').trim(),objectiveSplit:splitObjective,rows:[],maps:new Set()});
   const g=groups.get(key);g.rows.push(row);g.maps.add(row.map);
  }
  const out=[...groups.values()].map(g=>{const maps=[...g.maps],nodeStats=hdSPANodeStats(g.rows),routeStats=hdSPARouteStats(g.rows);return {...g,metrics:hdSPAMetrics(g.rows),dropStats:hdSPADropStats(g.rows),retreatReasonStats:hdSPARetreatReasonStats(g.rows),nodeStats,routeStats,dangerNodes:hdSPADangerNodes(nodeStats),nodeTrend:hdSPANodeTrend(g.rows),routeComparison:hdSPARouteComparison(maps,routeStats),trend:hdSPATrend(g.rows),recentRef:hdSPARecentRef(g.rows),maps}});
