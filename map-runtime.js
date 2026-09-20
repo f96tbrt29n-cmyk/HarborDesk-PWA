@@ -4,8 +4,25 @@ function hdMRCall(name){
   try{const fn=window[name];if(typeof fn==='function')fn()}catch(err){console.warn(`[HarborDesk] map renderer failed: ${name}`,err)}
 }
 function hdMRActiveTab(){return document.querySelector('.map-tab-btn.active')?.dataset.mapTab||null}
+function hdMRRestoreHeaderActions(){
+  hdMRCall('hdSPSMapButton');
+  hdMRCall('hdFSMapButton');
+}
+function hdMRRenderRouteRequirements(){
+  const pane=document.querySelector('[data-map-pane="route"]');if(!pane||typeof hdAdvancedHtml!=='function')return;
+  let host=pane.querySelector('#hdMapRouteRequirements');
+  if(!host){host=document.createElement('div');host.id='hdMapRouteRequirements';pane.appendChild(host)}
+  host.innerHTML=hdAdvancedHtml(selectedMap);
+}
 function hdMRRefresh(tab=hdMRActiveTab(),reason='event'){
   if(typeof selectedMap==='undefined'||!selectedMap)return;
+  hdMRRestoreHeaderActions();
+  if(tab==='map'){
+    hdMRCall('hdEnhanceMapPane');
+  }
+  if(tab==='route'){
+    hdMRRenderRouteRequirements();
+  }
   if(tab==='gear'){
     hdMRCall('hdRenderMapEquipmentRecommendations');
     hdMRCall('hdRenderLandBasePlanner');
