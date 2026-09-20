@@ -1958,12 +1958,16 @@ test('release smoke: sortie mode node picker records and rewinds route trail', a
 
   await expect(page.locator('[data-hd-sm-node]')).toHaveCount(15);
   await page.locator('[data-hd-sm-next-node="A"]').click();
+  await page.locator('[data-hd-sm-safe-confirm]').click();
   await page.locator('[data-hd-sm-next-node="D"]').click();
   await expect(page.locator('#hdSMNode')).toHaveValue('D');
   await expect(page.locator('.hd-sm-route-trail')).toContainText('A → D');
 
+  await page.locator('[data-hd-sm-safe-confirm]').click();
   await page.locator('[data-hd-sm-next-node="H"]').click();
+  await page.locator('[data-hd-sm-safe-confirm]').click();
   await page.locator('[data-hd-sm-next-node="J"]').click();
+  await page.locator('[data-hd-sm-safe-confirm]').click();
   await page.locator('[data-hd-sm-next-node="O"]').click();
   await expect(page.locator('#hdSMNode')).toHaveValue('O');
   await expect(page.locator('#hdSMBoss')).toBeChecked();
@@ -2023,7 +2027,9 @@ test('release smoke: sortie mode prioritizes graph-connected next nodes', async 
   await expect(page.locator('[data-hd-sm-next-node]')).toHaveCount(2);
   await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeVisible();
   await expect(page.locator('[data-hd-sm-next-node="D"]')).toBeVisible();
+  await expect(page.locator('[data-hd-sm-next-node="D"]')).toBeDisabled();
 
+  await page.locator('[data-hd-sm-safe-confirm]').click();
   await page.locator('[data-hd-sm-next-node="D"]').click();
   await expect(page.locator('#hdSMNode')).toHaveValue('D');
   await expect(page.locator('[data-hd-sm-next-node]')).toHaveCount(1);
@@ -2067,6 +2073,8 @@ test('release smoke: sortie mode shows current node branch guidance', async ({ p
   await expect(page.locator('.hd-sm-branch-hint')).toBeVisible();
   await page.locator('[data-hd-sm-next-node="B"]').click();
   await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeVisible();
+  await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeDisabled();
+  await page.locator('[data-hd-sm-safe-confirm]').click();
   await page.locator('[data-hd-sm-next-node="G"]').click();
 
   await expect(page.locator('.hd-sm-branch-hint')).toContainText('Gマスの分岐条件');
