@@ -1919,3 +1919,56 @@ test('release smoke: sortie mode autosaves and restores in-progress draft', asyn
   expect(attention?.detail || '').toContain('K到達');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie mode node picker records and rewinds route trail', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMEnsure === 'function' &&
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMSetNode === 'function' &&
+    typeof window.hdSMUndoNode === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-node-session',
+      map:'2-4',
+      startedAt:Date.now()-120000,
+      fleetId:'sm-node-fleet',
+      fleetName:'マス追跡テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-node-fleet',name:'マス追跡テスト艦隊',ships:[{ship:'島風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active'
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  await expect(page.locator('[data-hd-sm-node]')).toHaveCount(16);
+  await page.locator('[data-hd-sm-node="A"]').click();
+  await page.locator('[data-hd-sm-node="D"]').click();
+  await expect(page.locator('#hdSMNode')).toHaveValue('D');
+  await expect(page.locator('.hd-sm-route-trail')).toContainText('A → D');
+
+  await page.locator('[data-hd-sm-node="O"]').click();
+  await expect(page.locator('#hdSMNode')).toHaveValue('O');
+  await expect(page.locator('#hdSMBoss')).toBeChecked();
+  await expect(page.locator('.hd-sm-route-trail')).toContainText('A → D → O');
+
+  await page.locator('[data-hd-sm-route-undo]').click();
+  await expect(page.locator('#hdSMNode')).toHaveValue('D');
+  await expect(page.locator('#hdSMBoss')).not.toBeChecked();
+  await expect(page.locator('.hd-sm-route-trail')).toContainText('A → D');
+
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')||'null')?.draft || null);
+  expect(stored?.node).toBe('D');
+  expect(stored?.routeNodes).toEqual(['A','D']);
+  expect(stored?.boss).toBe(false);
+  expect(errors).toEqual([]);
+});

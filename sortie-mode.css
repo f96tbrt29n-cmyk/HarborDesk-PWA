@@ -20,3 +20,16 @@
 .hd-sm-finish-actions{display:grid;grid-template-columns:2fr 1fr;gap:7px;margin-top:9px}.hd-sm-finish-actions button{width:100%}
 @media(max-width:560px){.hd-sm-actions{display:grid;grid-template-columns:1fr 1fr}.hd-sm-actions .primary{grid-column:1/-1}.hd-sm-command{grid-template-columns:1fr auto}.hd-sm-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr))}.hd-sm-cost>div{grid-template-columns:1fr 1fr}.hd-sm-panel-head{display:grid}.hd-sm-finish-actions{grid-template-columns:1fr}}
 @media(max-width:360px){.hd-sm-command{grid-template-columns:1fr}.hd-sm-clock{justify-items:start}.hd-sm-form{grid-template-columns:1fr}.hd-sm-form .wide{grid-column:auto}.hd-sm-shortcuts{grid-template-columns:1fr 1fr}}
+
+.hd-sm-node-panel{display:grid;gap:8px}
+.hd-sm-node-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(52px,1fr));gap:6px}
+.hd-sm-node{min-width:0;min-height:48px;display:grid;place-items:center;align-content:center;gap:1px;padding:6px 3px;border:1px solid var(--line);border-radius:11px;background:#0d2234;color:var(--text);font:inherit}
+.hd-sm-node b{font-size:13px}.hd-sm-node small{font-size:8px;color:var(--muted)}
+.hd-sm-node.active{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:rgba(84,188,236,.12)}
+.hd-sm-node.boss{border-color:rgba(239,106,106,.45)}.hd-sm-node.boss small{color:#f0aaaa}
+.hd-sm-node.goal{border-color:rgba(99,216,151,.45)}.hd-sm-node.goal small{color:#9ce0ba}
+.hd-sm-node.air{border-color:rgba(120,174,255,.42)}.hd-sm-node.sub{border-color:rgba(96,199,211,.4)}.hd-sm-node.night{border-color:rgba(154,128,219,.45)}
+.hd-sm-route-trail{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 9px;border-radius:10px;background:rgba(255,255,255,.025)}
+.hd-sm-route-trail>div{display:grid;gap:2px;min-width:0}.hd-sm-route-trail span{font-size:8px;color:var(--muted)}.hd-sm-route-trail b{font-size:10px;line-height:1.45;overflow-wrap:anywhere}
+.hd-sm-route-empty{padding:7px 2px 0;color:var(--muted);font-size:9px}
+@media(max-width:360px){.hd-sm-node-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.hd-sm-route-trail{grid-template-columns:1fr}.hd-sm-route-trail button{width:100%}}
