@@ -3439,3 +3439,50 @@ test('release smoke: route alert can mark route-deviation retreat', async ({ pag
   expect(draft.node).toBe('C');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie highlights minimum-battle next route', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMNextRouteRank === 'function'
+  );
+
+  const rank = await page.evaluate(() =>
+    window.hdSMNextRouteRank('2-4',{node:'C',routeNodes:['A','C'],objectiveTarget:'O'},[
+      {label:'F',kind:'normal'},{label:'G',kind:'normal'}
+    ])
+  );
+  expect(rank.labels).toEqual(['F']);
+  expect(rank.score.battles).toBeLessThan(4);
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-best-next-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-best-next-fleet',
+      fleetName:'最少戦闘候補テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-best-next-fleet',name:'最少戦闘候補テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'C',routeNodes:['A','C'],result:'S',memo:'',objectiveTarget:'O',advanceGuard:{node:'C',safe:true,at:Date.now()}}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const f = page.locator('[data-hd-sm-next-node="F"]');
+  const g = page.locator('[data-hd-sm-next-node="G"]');
+  await expect(f).toHaveClass(/best-route/);
+  await expect(f).toContainText('最少戦闘候補');
+  await expect(g).not.toHaveClass(/best-route/);
+  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="F"]')).toHaveClass(/best-route/);
+  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="F"]')).toContainText('最少戦闘');
+  expect(errors).toEqual([]);
+});
