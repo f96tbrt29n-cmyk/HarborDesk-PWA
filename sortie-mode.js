@@ -172,8 +172,8 @@ function hdSMNodePickerHtml(session,draft){
  const nextTitle=current?'次に進める候補':'最初の進行候補';
  const nextHtml=next.length?'<div class="hd-sm-next-wrap '+(locked?'locked':'')+'"><div class="hd-sm-next-head"><b>'+nextTitle+'</b><small>'+(locked?'大破チェックを済ませると選べるよ。':'候補ごとに戦闘種別と、登録済みの敵・制空注意を表示するよ。')+'</small></div><div class="hd-sm-next-grid">'+next.map(function(x){return hdSMNextNodeButtonHtml(session?.map,x,locked)}).join('')+'</div></div>':'<div class="hd-sm-next-done">'+(current?'このマスから先の接続候補は登録されていないよ。':'開始地点の候補を取得できないよ。')+'</div>';
  return '<div class="hd-sm-panel hd-sm-node-panel"><div class="hd-sm-panel-head"><strong>現在マス</strong><span>普段は「次に進める候補」だけタップでOK</span></div>'+hdSMCurrentTacticHtml(session?.map,draft)+hdSMAdvanceGuardHtml(session,draft)+nextHtml+hdSMBranchHintHtml(session?.map,draft)+
-  '<details class="hd-sm-all-nodes"><summary>全マスから選ぶ</summary><div class="hd-sm-node-grid">'+
-  rows.map(function(x){const active=x.label===current;return '<button type="button" class="hd-sm-node '+hdSMEsc(x.kind)+(active?' active':'')+'" data-hd-sm-node="'+hdSMEsc(x.label)+'" aria-pressed="'+(active?'true':'false')+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(x.kind))+'</small></button>'}).join('')+
+  '<details class="hd-sm-all-nodes"><summary>'+(locked?'全マスから選ぶ（大破確認後）':'全マスから選ぶ')+'</summary><div class="hd-sm-node-grid">'+
+  rows.map(function(x){const active=x.label===current,nodeLocked=!!(locked&&!active);return '<button type="button" class="hd-sm-node '+hdSMEsc(x.kind)+(active?' active':'')+(nodeLocked?' locked':'')+'" data-hd-sm-node="'+hdSMEsc(x.label)+'" aria-pressed="'+(active?'true':'false')+'"'+(nodeLocked?' disabled aria-disabled="true"':'')+'><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(x.kind))+'</small></button>'}).join('')+
   '</div></details>'+(route.length?'<div class="hd-sm-route-trail"><div><span>通過</span><b>'+route.map(hdSMEsc).join(' → ')+'</b></div><button type="button" class="ghost small" data-hd-sm-route-undo>1つ戻す</button></div>':'<div class="hd-sm-route-empty">次候補を押すと、ここに通過履歴を残すよ。</div>')+'</div>';
 }
 function hdSMResultOptions(current){
@@ -227,9 +227,11 @@ function hdSMSaveDraft(){
 function hdSMScheduleDraft(){clearTimeout(hdSMDraftTimer);hdSMDraftTimer=setTimeout(hdSMSaveDraft,180)}
 function hdSMSetNode(label){
  label=String(label||'').trim();const session=hdSMSession();if(!label||!session||session.status!=='active')return false;
+ const prev=session.draft&&typeof session.draft==='object'?session.draft:{},current=String(prev.node||'').trim(),guard=hdSMAdvanceGuard(session,prev);
+ if(current&&label!==current&&guard.required&&!guard.confirmed){window.hdToast?.('進撃前に大破チェックを済ませてね','warn',1800);return false}
  const input=document.getElementById('hdSMNode'),boss=document.getElementById('hdSMBoss'),graph=hdSMGraph(session.map);
  if(input)input.value=label;if(boss)boss.checked=!!(graph&&graph.boss===label);
- const prev=session.draft&&typeof session.draft==='object'?session.draft:{},route=Array.isArray(prev.routeNodes)?prev.routeNodes.map(String).filter(Boolean).slice(-39):[];
+ const route=Array.isArray(prev.routeNodes)?prev.routeNodes.map(String).filter(Boolean).slice(-39):[];
  if(route[route.length-1]!==label)route.push(label);
  session.draft={...prev,...hdSMFormData(),node:label,boss:!!(graph&&graph.boss===label),routeNodes:route,advanceGuard:null,updatedAt:Date.now()};
  try{if(typeof window.hdSSSave==='function')window.hdSSSave(session);else localStorage.setItem(HD_SM_SESSION_KEY,JSON.stringify(session))}catch{return false}

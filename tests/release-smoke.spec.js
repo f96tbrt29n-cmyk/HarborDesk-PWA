@@ -2262,3 +2262,46 @@ test('release smoke: damage retreat marks sortie draft as retreat', async ({ pag
   expect(draft.advanceGuard.safe).toBe(false);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie damage guard blocks alternate node selection paths', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdSMRender === 'function' && typeof window.hdSMSetNode === 'function');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-damage-hard-lock-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-damage-hard-lock-fleet',
+      fleetName:'進撃ロックテスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-damage-hard-lock-fleet',name:'進撃ロックテスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'A',routeNodes:['A'],result:'S',memo:''}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  await expect(page.locator('[data-hd-sm-node="D"]')).toBeDisabled();
+  const blocked = await page.evaluate(() => window.hdSMSetNode('D'));
+  expect(blocked).toBe(false);
+  let draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
+  expect(draft.node).toBe('A');
+  expect(draft.routeNodes).toEqual(['A']);
+
+  await page.locator('[data-hd-sm-safe-confirm]').click();
+  await expect(page.locator('[data-hd-sm-node="D"]')).toBeEnabled();
+  const moved = await page.evaluate(() => window.hdSMSetNode('D'));
+  expect(moved).toBe(true);
+  draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
+  expect(draft.node).toBe('D');
+  expect(draft.routeNodes).toEqual(['A','D']);
+  expect(errors).toEqual([]);
+});
