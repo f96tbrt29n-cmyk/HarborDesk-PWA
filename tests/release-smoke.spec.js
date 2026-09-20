@@ -934,3 +934,59 @@ test('release smoke: diagnostics verifies restore safety layer readiness', async
   expect(result.brokenIssues.join(' ')).toContain('復元安全スナップショット');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: mobile attention tracks external backup freshness', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdQNBackupAttention === 'function' &&
+    typeof window.hdQNMobileAttentionItems === 'function'
+  );
+
+  const result = await page.evaluate(() => {
+    const now = Date.now();
+    const backupKey = 'harbordesk-last-external-backup-v1';
+    const syncKey = 'harbordesk-kancolle-sync-v1';
+
+    localStorage.removeItem(backupKey);
+    localStorage.setItem(syncKey, JSON.stringify({ syncedAt: now }));
+    const missing = window.hdQNBackupAttention(now);
+    const missingInAttention = window.hdQNMobileAttentionItems().some(x => x?.id === 'backup');
+
+    localStorage.setItem(backupKey, String(now + 1000));
+    const fresh = window.hdQNBackupAttention(now);
+    const freshInAttention = window.hdQNMobileAttentionItems().some(x => x?.id === 'backup');
+
+    localStorage.setItem(syncKey, JSON.stringify({ syncedAt: now - 16 * 86400000 }));
+    localStorage.setItem(backupKey, String(now - 15 * 86400000));
+    const old = window.hdQNBackupAttention(now);
+
+    localStorage.setItem(syncKey, JSON.stringify({ syncedAt: now }));
+    localStorage.setItem(backupKey, String(now - 60 * 1000));
+    const afterSync = window.hdQNBackupAttention(now);
+
+    return {
+      missingTitle: missing?.title || '',
+      missingPriority: Number(missing?.priority) || 0,
+      missingInAttention,
+      freshIsNull: fresh === null,
+      freshInAttention,
+      oldTitle: old?.title || '',
+      oldDetail: old?.detail || '',
+      afterSyncTitle: afterSync?.title || '',
+      afterSyncPriority: Number(afterSync?.priority) || 0
+    };
+  });
+
+  expect(result.missingTitle).toContain('バックアップ');
+  expect(result.missingPriority).toBe(60);
+  expect(result.missingInAttention).toBe(true);
+  expect(result.freshIsNull).toBe(true);
+  expect(result.freshInAttention).toBe(false);
+  expect(result.oldTitle).toContain('更新');
+  expect(result.oldDetail).toContain('15日');
+  expect(result.afterSyncTitle).toContain('同期後');
+  expect(result.afterSyncPriority).toBe(60);
+  expect(errors).toEqual([]);
+});
