@@ -37,7 +37,7 @@
 .hd-sm-next-wrap{display:grid;gap:7px;padding:9px;border:1px solid rgba(84,188,236,.28);border-radius:12px;background:rgba(84,188,236,.055)}
 .hd-sm-next-head{display:grid;gap:2px}.hd-sm-next-head b{font-size:11px;color:var(--accent2)}.hd-sm-next-head small{font-size:8px;line-height:1.45;color:var(--muted)}
 .hd-sm-next-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:6px}
-.hd-sm-next{min-width:0;min-height:116px;display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"node kind risk" "node go risk" "formation formation formation" "route route route" "remaining remaining remaining" "caution caution caution" "detail detail detail";align-items:center;column-gap:7px;row-gap:2px;padding:7px 9px;border:1px solid rgba(84,188,236,.38);border-radius:11px;background:#0e2a3d;color:var(--text);font:inherit;text-align:left}
+.hd-sm-next{min-width:0;min-height:116px;display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"node kind risk" "node go risk" "formation formation formation" "route route route" "remaining remaining remaining" "delta delta delta" "caution caution caution" "detail detail detail";align-items:center;column-gap:7px;row-gap:2px;padding:7px 9px;border:1px solid rgba(84,188,236,.38);border-radius:11px;background:#0e2a3d;color:var(--text);font:inherit;text-align:left}
 .hd-sm-next b{grid-area:node;font-size:18px}.hd-sm-next small{grid-area:kind;font-size:9px;color:var(--muted)}.hd-sm-next i{grid-area:go;font-style:normal;font-size:8px;color:var(--accent2)}
 .hd-sm-next-risk{grid-area:risk;align-self:start;padding:3px 5px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.045);font-size:7px;line-height:1;white-space:nowrap;color:var(--muted)}
 .hd-sm-next-formation{grid-area:formation;margin-top:4px;font-size:9px;font-weight:900;color:var(--accent2)}
@@ -128,3 +128,5 @@
 .hd-sm-hud-next button.best-route em{color:#f0cf7d}
 
 .hd-sm-next-remaining{grid-area:remaining;font-size:7px;font-weight:800;color:var(--muted)}
+.hd-sm-next-delta{grid-area:delta;font-size:7px;font-weight:900;color:#f0cf7d}
+.hd-sm-next-delta.best{color:#9ce0ba}
