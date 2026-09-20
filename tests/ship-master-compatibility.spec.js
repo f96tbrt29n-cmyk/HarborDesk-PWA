@@ -6302,3 +6302,33 @@ test('quick nav disables unavailable back and forward actions', async ({ page })
   expect(data.empty).toEqual({back:true,forward:true});
   expect(data.ready).toEqual({back:false,forward:false});
 });
+
+
+test('compact database cards peek one item at a time', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-shipdb-view-v1',JSON.stringify({compact:true}));
+    sessionStorage.setItem('harbordesk-session-equip-catalog-view-v1',JSON.stringify({compact:true}));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdEnsureShipDatabase?.();window.hdEnsureEquipmentCatalog?.();
+    const ships=[...document.querySelectorAll('#hdShipDbList .hd-shipdb-card')].slice(0,2);
+    const equips=[...document.querySelectorAll('#hdEquipCatalogList .hd-equip-ref-card')].slice(0,2);
+    ships[0]?.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+    const shipFirstOpen=!!ships[0]?.classList.contains('hd-peek');
+    ships[1]?.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+    const shipOneOnly=document.querySelectorAll('#hdShipDbList .hd-peek').length===1&&!!ships[1]?.classList.contains('hd-peek');
+    equips[0]?.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+    const equipFirstOpen=!!equips[0]?.classList.contains('hd-peek');
+    equips[1]?.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+    const equipOneOnly=document.querySelectorAll('#hdEquipCatalogList .hd-peek').length===1&&!!equips[1]?.classList.contains('hd-peek');
+    return {shipCount:ships.length,equipCount:equips.length,shipFirstOpen,shipOneOnly,equipFirstOpen,equipOneOnly};
+  });
+  expect(data.shipCount).toBeGreaterThanOrEqual(2);
+  expect(data.equipCount).toBeGreaterThanOrEqual(2);
+  expect(data.shipFirstOpen).toBe(true);
+  expect(data.shipOneOnly).toBe(true);
+  expect(data.equipFirstOpen).toBe(true);
+  expect(data.equipOneOnly).toBe(true);
+});
