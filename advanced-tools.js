@@ -28,7 +28,7 @@ function ensureAdvancedSections(){
     <article class="tool-card"><h3>遠征効率計算</h3><div class="calc-grid"><label>時間(分)<input id="effMinutes" type="number" min="1" value="30"></label><label>燃料<input id="effFuel" type="number" min="0" value="0"></label><label>弾薬<input id="effAmmo" type="number" min="0" value="0"></label><label>鋼材<input id="effSteel" type="number" min="0" value="0"></label><label>ボーキ<input id="effBauxite" type="number" min="0" value="0"></label></div><div id="effResult" class="tool-result"></div></article>
    </div>
  </section>
- <section id="backup" class="advanced-section"><div class="section-head"><div><div class="eyebrow">DATA</div><h2>バックアップ / 復元</h2></div><span class="muted">HarborDeskデータ</span></div><div class="backup-actions"><button id="exportBackup" class="primary">バックアップを書き出す</button><label class="ghost backup-file">バックアップを読み込む<input id="importBackup" type="file" accept="application/json,.json"></label></div><p class="muted">艦隊台帳、自分用編成、装備、イベント、資源履歴、任務、タイマーなどHarborDeskの端末内データをJSONで保存・復元できる。<b>艦娘画像は容量が大きいため別バックアップ</b>。艦娘DBの「艦娘画像」から書き出してね。</p></section>`;
+ <section id="backup" class="advanced-section"><div class="section-head"><div><div class="eyebrow">DATA</div><h2>バックアップ / 復元</h2></div><span class="muted">HarborDeskデータ</span></div><div class="backup-actions"><button id="shareBackup" class="ghost" type="button">共有して保存</button><button id="exportBackup" class="primary" type="button">バックアップを書き出す</button><label class="ghost backup-file">バックアップを読み込む<input id="importBackup" type="file" accept="application/json,.json"></label></div><p class="muted">艦隊台帳、自分用編成、装備、イベント、資源履歴、任務、タイマーなどHarborDeskの端末内データをJSONで保存・復元できる。<b>艦娘画像は容量が大きいため別バックアップ</b>。艦娘DBの「艦娘画像」から書き出してね。</p></section>`;
  main.insertBefore(wrap,resources);
  ensureAdvancedDialogs();
  const eqView=hdEquipLedgerViewLoad(),eqSearch=document.getElementById('equipmentSearch');if(eqSearch)eqSearch.value=String(eqView.query||'');
@@ -84,7 +84,27 @@ function addAirRow(values={aa:0,slot:18,bonus:0}){const host=document.getElement
 function calcAirPower(){let total=0;document.querySelectorAll('.air-row').forEach(r=>{const aa=Number(r.querySelector('.air-aa').value)||0,slot=Number(r.querySelector('.air-slot').value)||0,bonus=Number(r.querySelector('.air-bonus').value)||0;total+=Math.floor(aa*Math.sqrt(Math.max(0,slot))+bonus)});const el=document.getElementById('airPowerResult');if(el)el.textContent=total}
 function calcEfficiency(){const m=Number(document.getElementById('effMinutes')?.value)||0;const el=document.getElementById('effResult');if(!el)return;if(m<=0){el.textContent='時間を入力';return}const f=60/m;const vals=[['燃料','effFuel'],['弾薬','effAmmo'],['鋼材','effSteel'],['ボーキ','effBauxite']].map(([n,id])=>`${n} ${(Number(document.getElementById(id).value)||0)*f}`);el.textContent='1時間あたり: '+vals.map(s=>s.replace(/(\d+\.\d{2,}).*/,m=>Number(parseFloat(m)).toFixed(1))).join(' / ')}
 
-function exportBackup(){const data={version:1,exportedAt:new Date().toISOString(),localStorage:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('harbordesk'))data.localStorage[k]=localStorage.getItem(k)}const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`HarborDesk-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function hdBuildBackupFile(){
+ const data={version:1,exportedAt:new Date().toISOString(),localStorage:{}};
+ for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('harbordesk'))data.localStorage[k]=localStorage.getItem(k)}
+ const name=`HarborDesk-backup-${new Date().toISOString().slice(0,10)}.json`;
+ const text=JSON.stringify(data,null,2),blob=new Blob([text],{type:'application/json'});
+ return {data,name,text,blob};
+}
+function exportBackup(){
+ const {blob,name}=hdBuildBackupFile(),a=document.createElement('a'),url=URL.createObjectURL(blob);
+ a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);return true
+}
+async function shareBackup(){
+ const backup=hdBuildBackupFile();
+ try{
+  if(typeof File==='function'&&typeof navigator.share==='function'){
+   const file=new File([backup.blob],backup.name,{type:'application/json'}),payload={title:'HarborDesk バックアップ',files:[file]};
+   if(typeof navigator.canShare!=='function'||navigator.canShare(payload)){await navigator.share(payload);return true}
+  }
+ }catch(err){if(err?.name==='AbortError')return false}
+ exportBackup();return false
+}
 function hdApplyBackupLocalStorage(storage){if(!storage||typeof storage!=='object'||Array.isArray(storage))throw new Error('invalid backup storage');const entries=Object.entries(storage).filter(([k,v])=>k.startsWith('harbordesk')&&typeof v==='string'),keep=new Set(entries.map(([k])=>k));for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k?.startsWith('harbordesk')&&!keep.has(k))localStorage.removeItem(k)}for(const [k,v] of entries)localStorage.setItem(k,v);return entries.length}
 async function importBackup(file){try{const obj=JSON.parse(await file.text());if(!obj?.localStorage)throw new Error();hdApplyBackupLocalStorage(obj.localStorage);alert('バックアップ時点のHarborDeskデータへ復元したよ。画面を再読み込みするね。');location.reload()}catch{alert('HarborDeskのバックアップJSONを読み込めなかったよ')}}
 
@@ -118,7 +138,7 @@ function bindAdvancedEvents(){
  }
 });
  document.getElementById('addAirRow').onclick=()=>addAirRow();['effMinutes','effFuel','effAmmo','effSteel','effBauxite'].forEach(id=>document.getElementById(id).addEventListener('input',calcEfficiency));
- document.getElementById('exportBackup').onclick=exportBackup;document.getElementById('importBackup').onchange=e=>{const f=e.target.files?.[0];if(f)importBackup(f)};
+ document.getElementById('shareBackup').onclick=shareBackup;document.getElementById('exportBackup').onclick=exportBackup;document.getElementById('importBackup').onchange=e=>{const f=e.target.files?.[0];if(f)importBackup(f)};
 }
 function renderAllAdvanced(){renderDashboard();renderEquipment();renderResourceHistory();renderEvents();if(!document.querySelector('.air-row')){addAirRow({aa:10,slot:18,bonus:0});addAirRow({aa:10,slot:18,bonus:0})}calcEfficiency()}
 
