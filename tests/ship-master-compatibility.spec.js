@@ -7340,3 +7340,60 @@ test('home compact mode hides calm cards but reopens new attention', async ({ pa
   expect(data.restored.label).toBe('コンパクト');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('home warns when external backup is missing or stale and exports from warning', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const key='harbordesk-last-external-backup-v1';
+    localStorage.removeItem(key);
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+
+    const missingInfo=window.hdPHExternalText?.();
+    const missingAlert=document.querySelector('.hd-ph-backup-alert');
+    const missing={
+      due:!!missingInfo?.due,
+      state:missingInfo?.state||'',
+      title:missingInfo?.title||'',
+      text:missingAlert?.textContent||''
+    };
+
+    window.__backupClicked=0;
+    window.exportBackup=()=>{window.__backupClicked++};
+    missingAlert?.click();
+    const clicked=window.__backupClicked;
+
+    localStorage.setItem(key,String(Date.now()-15*86400000));
+    await window.hdPHRender?.();
+    const staleInfo=window.hdPHExternalText?.();
+    const staleText=document.querySelector('.hd-ph-backup-alert')?.textContent||'';
+
+    localStorage.setItem(key,String(Date.now()-2*86400000));
+    await window.hdPHRender?.();
+    const freshInfo=window.hdPHExternalText?.();
+    const freshAlert=!!document.querySelector('.hd-ph-backup-alert');
+    const metric=document.querySelector('.hd-ph-backup-metric');
+    return {
+      missing,
+      clicked,
+      stale:{due:!!staleInfo?.due,days:staleInfo?.days,text:staleText},
+      fresh:{due:!!freshInfo?.due,label:freshInfo?.label,alert:freshAlert,metricText:metric?.textContent||'',metricExport:metric?.hasAttribute('data-ph-export')||false}
+    };
+  });
+
+  expect(data.missing.due).toBe(true);
+  expect(data.missing.state).toBe('warn');
+  expect(data.missing.title).toContain('未作成');
+  expect(data.missing.text).toContain('JSON');
+  expect(data.clicked).toBe(1);
+  expect(data.stale.due).toBe(true);
+  expect(data.stale.days).toBeGreaterThanOrEqual(14);
+  expect(data.stale.text).toContain('更新');
+  expect(data.fresh.due).toBe(false);
+  expect(data.fresh.label).toContain('日前');
+  expect(data.fresh.alert).toBe(false);
+  expect(data.fresh.metricText).toContain('外部バックアップ');
+  expect(data.fresh.metricExport).toBe(true);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
