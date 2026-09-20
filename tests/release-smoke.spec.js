@@ -3340,3 +3340,40 @@ test('release smoke: pre-start route preview shows shortest structural path', as
   expect(html).toContain('D → E → F → I → G2');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie preparation sheet reflects selected objective', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSPSObjectiveLabel === 'function' &&
+    typeof window.hdSPSObjectiveHtml === 'function' &&
+    typeof window.hdSPSSummaryText === 'function' &&
+    typeof window.hdSMSaveObjectivePreference === 'function'
+  );
+
+  const result = await page.evaluate(() => {
+    window.hdSMSaveObjectivePreference('7-2','G2');
+    const g2={
+      label:window.hdSPSObjectiveLabel('7-2'),
+      html:window.hdSPSObjectiveHtml('7-2'),
+      summary:window.hdSPSSummaryText('7-2')
+    };
+
+    window.hdSMSaveObjectivePreference('7-2','G1');
+    const g1={
+      label:window.hdSPSObjectiveLabel('7-2'),
+      html:window.hdSPSObjectiveHtml('7-2')
+    };
+
+    return {g2,g1};
+  });
+
+  expect(result.g2.label).toBe('G2ボス');
+  expect(result.g2.html).toContain('今回の攻略目標');
+  expect(result.g2.html).toContain('G2ボス');
+  expect(result.g2.summary).toContain('攻略目標: G2ボス');
+  expect(result.g1.label).toBe('G1到達地点');
+  expect(result.g1.html).toContain('G1到達地点');
+  expect(errors).toEqual([]);
+});
