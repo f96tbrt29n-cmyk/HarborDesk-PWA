@@ -6708,3 +6708,51 @@ test('home resume shortcut skips home and usage history can be reset', async ({ 
   expect(data.after.usualText).toContain('使うほど');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('home shows game sync status and opens sync details', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    const now=Date.now();
+    localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({
+      syncedAt:now-8*60*60*1000,
+      ships:120,
+      equipment:340,
+      decks:4,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true}
+    }));
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+    const staleBtn=document.querySelector('.hd-ph-sync');
+    const stale={
+      cls:staleBtn?.className||'',
+      text:staleBtn?.textContent||'',
+      aria:staleBtn?.getAttribute('aria-label')||''
+    };
+    localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({
+      syncedAt:Date.now(),
+      ships:120,
+      equipment:340,
+      decks:4,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true}
+    }));
+    await window.hdPHRender?.();
+    const freshBtn=document.querySelector('.hd-ph-sync');
+    const fresh={cls:freshBtn?.className||'',text:freshBtn?.textContent||''};
+    freshBtn?.click();
+    await new Promise(r=>setTimeout(r,30));
+    const dialog=document.getElementById('hdSyncStatusDialog');
+    return {
+      stale,
+      fresh,
+      dialogOpen:!!dialog?.open||dialog?.hasAttribute('open')||false
+    };
+  });
+  expect(data.stale.cls).toContain('stale');
+  expect(data.stale.text).toContain('更新をおすすめ');
+  expect(data.stale.aria).toContain('ゲーム同期');
+  expect(data.fresh.cls).toContain('fresh');
+  expect(data.fresh.text).toContain('最新状態');
+  expect(data.dialogOpen).toBe(true);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
