@@ -2384,6 +2384,8 @@ test('release smoke: sortie mode auto-counts battles and supports quick return e
 
   await page.locator('[data-hd-sm-next-node="A"]').click();
   await expect(page.locator('#hdSMBattles')).toHaveValue('0');
+  const afterA = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
+  expect(window.Number(afterA.battles)).toBe(0);
   await page.locator('[data-hd-sm-next-node="D"]').click();
   await expect(page.locator('#hdSMBattles')).toHaveValue('1');
 
