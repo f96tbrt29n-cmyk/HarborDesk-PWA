@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HarborDesk 艦これ連携
 // @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
-// @version      1.0.9
+// @version      1.0.10
 // @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
 // @match        http://*.dmm.com/*
 // @match        https://*.dmm.com/*
@@ -21,15 +21,17 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.9';
+const HD_VERSION='1.0.10';
 const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/';
 const RECORD_MESSAGE='harbordesk-kancolle-frame-record-v1';
 const STATUS_MESSAGE='harbordesk-kancolle-frame-status-v1';
 const MAX_RECORDS=120;
 const HD_PANEL_MIN_KEY='harbordesk-kc-panel-minimized-v1';
+const HD_CAPTURE_STORE_KEY='harbordesk-kc-capture-v1';
+const HD_CAPTURE_MAX_AGE=6*60*60*1000;
 
 function wanted(url){
-  return /\/kcsapi\/(?:api_port\/port|api_get_member\/(?:ship2|slot_item|require_info|material|ndock|questlist)|api_req_map\/(?:start|next)|api_req_(?:sortie|combined_battle)\/battleresult)(?:$|[?#])/.test(String(url||''));
+  return /\/kcsapi\/(?:api_port\/port|api_get_member\/(?:ship2|slot_item|slotitem|require_info|material|ndock|questlist)|api_req_map\/(?:start|next)|api_req_(?:sortie|combined_battle)\/battleresult)(?:$|[?#])/.test(String(url||''));
 }
 function pathOf(url){
   try{return new URL(String(url||''),location.href).pathname}catch{return String(url||'').split(/[?#]/)[0]}
@@ -77,7 +79,7 @@ function minimize(path,obj){
       api_deck_data:(Array.isArray(data?.api_deck_data)?data.api_deck_data:[]).map(deck).filter(Boolean)
     };return base;
   }
-  if(/\/api_get_member\/slot_item$/.test(path)){base.api_data=(Array.isArray(data)?data:[]).map(slot).filter(Boolean);return base}
+  if(/\/api_get_member\/(?:slot_item|slotitem)$/.test(path)){base.api_data=(Array.isArray(data)?data:[]).map(slot).filter(Boolean);return base}
   if(/\/api_get_member\/require_info$/.test(path)){base.api_data={api_slot_item:(Array.isArray(data?.api_slot_item)?data.api_slot_item:[]).map(slot).filter(Boolean)};return base}
   if(/\/api_get_member\/material$/.test(path)){base.api_data=(Array.isArray(data)?data:[]).map(material).filter(Boolean);return base}
   if(/\/api_get_member\/ndock$/.test(path)){base.api_data=(Array.isArray(data)?data:[]).map(ndock).filter(Boolean);return base}
@@ -181,12 +183,40 @@ const captureId='kc-userscript-'+Date.now().toString(36)+'-'+Math.random().toStr
 let panel,countEl,statusEl,frameEl,coverageEl,hintEl,sendEl,miniCountEl,minimizeEl,panelBodyEl;
 let frameHits=0,minimized=false;
 
+function rebuildSignatures(){
+  signatures.clear();
+  for(const row of records)signatures.add(signature(row));
+}
+function latestSnapshotEndpoint(endpoint){
+  return /\/api_port\/port$|\/api_get_member\/(?:ship2|slot_item|slotitem|require_info|material|ndock)$/.test(String(endpoint||''));
+}
+function persistCapture(){
+  try{localStorage.setItem(HD_CAPTURE_STORE_KEY,JSON.stringify({savedAt:Date.now(),records:records.slice(-MAX_RECORDS)}))}catch{}
+}
+function restoreCapture(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(HD_CAPTURE_STORE_KEY)||'null');
+    if(!saved||!Array.isArray(saved.records)||Date.now()-Number(saved.savedAt||0)>HD_CAPTURE_MAX_AGE){
+      localStorage.removeItem(HD_CAPTURE_STORE_KEY);return 0;
+    }
+    for(const row of saved.records){
+      if(!row||!wanted(row.endpoint))continue;
+      records.push({endpoint:String(row.endpoint||''),payload:row.payload,at:Number(row.at)||Date.now()});
+    }
+    while(records.length>MAX_RECORDS)records.shift();
+    rebuildSignatures();return records.length;
+  }catch{return 0}
+}
+function clearCapture(){
+  records.length=0;signatures.clear();try{localStorage.removeItem(HD_CAPTURE_STORE_KEY)}catch{}
+}
+
 function captureCoverage(){
   const endpoints=records.map(x=>String(x.endpoint||''));
   const has=re=>endpoints.some(x=>re.test(x));
   return {
     port:has(/api_port\/port|api_get_member\/ship2|api_get_member\/material/),
-    equipment:has(/api_get_member\/(?:slot_item|require_info)/),
+    equipment:has(/api_get_member\/(?:slot_item|slotitem|require_info)/),
     quests:has(/api_get_member\/questlist/),
     docks:has(/api_port\/port|api_get_member\/ndock/),
     sorties:has(/api_req_map\/(?:start|next)|api_req_(?:sortie|combined_battle)\/battleresult/)
@@ -211,14 +241,15 @@ function signature(r){
 }
 function receiveRecord(r){
   if(!r||r.type!==RECORD_MESSAGE||!wanted(r.endpoint))return;
-  const sig=signature(r);
+  const endpoint=String(r.endpoint||''),row={endpoint,payload:r.payload,at:Number(r.at)||Date.now()},sig=signature(row);
   if(signatures.has(sig))return;
-  signatures.add(sig);
-  records.push({endpoint:r.endpoint,payload:r.payload,at:Number(r.at)||Date.now()});
-  while(records.length>MAX_RECORDS){
-    const removed=records.shift();
-    try{signatures.delete(signature(removed))}catch{}
+  if(latestSnapshotEndpoint(endpoint)){
+    for(let i=records.length-1;i>=0;i--)if(String(records[i]?.endpoint||'')===endpoint)records.splice(i,1);
+    rebuildSignatures();
   }
+  signatures.add(sig);records.push(row);
+  while(records.length>MAX_RECORDS)records.shift();
+  rebuildSignatures();persistCapture();
   render();
   show();
 }
@@ -261,7 +292,7 @@ function ensurePanel(){
   panelBodyEl=panel.querySelector('[data-hd-panel-body]');
   minimizeEl.onclick=e=>{e.stopPropagation();setMinimized(!minimized)};
   panel.querySelector('[data-hd-panel-head]').onclick=e=>{if(minimized&&!e.target.closest('button'))setMinimized(false)};
-  panel.querySelector('[data-hd-clear]').onclick=()=>{records.length=0;signatures.clear();render()};
+  panel.querySelector('[data-hd-clear]').onclick=()=>{clearCapture();render()};
   panel.querySelector('[data-hd-copy]').onclick=copy;
   panel.querySelector('[data-hd-send]').onclick=send;
   let savedMinimized=false;try{savedMinimized=localStorage.getItem(HD_PANEL_MIN_KEY)==='1'}catch{}
@@ -359,6 +390,7 @@ window.__HARBORDESK_KANCOLLE_USERSCRIPT__={
   send
 };
 
+restoreCapture();
 if(document.readyState==='loading'){
   document.addEventListener('DOMContentLoaded',()=>{if(isGameShell())show()},{once:true});
 }else if(isGameShell())show();
