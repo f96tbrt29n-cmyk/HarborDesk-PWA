@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: read
-  actions: write
   pages: write
   id-token: write
 
@@ -16,53 +15,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  validate:
+    name: Validate HarborDesk
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     steps:
-      - name: Cancel stale HarborDesk runs
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          node <<'NODE'
-          const repo=process.env.GITHUB_REPOSITORY;
-          const current=Number(process.env.GITHUB_RUN_ID);
-          const workflow=process.env.GITHUB_WORKFLOW;
-          const branch=process.env.GITHUB_REF_NAME;
-          const headers={
-            'Accept':'application/vnd.github+json',
-            'Authorization':`Bearer ${process.env.GITHUB_TOKEN}`,
-            'X-GitHub-Api-Version':'2022-11-28'
-          };
-          const url=`https://api.github.com/repos/${repo}/actions/runs?branch=${encodeURIComponent(branch)}&per_page=50`;
-          const res=await fetch(url,{headers});
-          if(!res.ok)throw new Error(`Failed to list workflow runs: ${res.status}`);
-          const data=await res.json();
-          for(const run of data.workflow_runs||[]){
-            if(Number(run.id)===current||run.name!==workflow||run.status==='completed')continue;
-            const cancel=await fetch(`https://api.github.com/repos/${repo}/actions/runs/${run.id}/cancel`,{method:'POST',headers});
-            if(cancel.ok||cancel.status===409)console.log(`Cancel stale run ${run.id}: ${cancel.status}`);
-            else console.warn(`Could not cancel stale run ${run.id}: ${cancel.status}`);
-          }
-          NODE
-
       - name: Checkout
         uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install browser test dependencies
-        run: npm install --no-audit --no-fund --no-package-lock
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium webkit
 
       - name: Validate JavaScript syntax
         shell: bash
@@ -127,29 +86,64 @@ jobs:
       - name: Validate Kancolle master semantics
         run: node scripts/validate-kancolle-master.mjs
 
-      - name: Run browser regression tests
-        run: npm run test:browser
+  browser:
+    name: Playwright / ${{ matrix.browser }}
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, webkit]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Upload Playwright report on failure
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install browser test dependencies
+        run: npm install --no-audit --no-fund --no-package-lock
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Run browser regression tests
+        run: npm run test:browser -- --project=${{ matrix.browser }}
+
+      - name: Upload Playwright diagnostics
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-${{ matrix.browser }}-${{ github.run_id }}
           path: |
             playwright-report/
             test-results/
           if-no-files-found: ignore
-          retention-days: 7
+          retention-days: 14
 
-      - name: Remove test-only files before Pages upload
-        run: rm -rf node_modules playwright-report test-results
+  deploy:
+    name: Deploy Pages
+    needs: browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
+
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
