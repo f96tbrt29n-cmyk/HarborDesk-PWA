@@ -84,10 +84,28 @@ function addAirRow(values={aa:0,slot:18,bonus:0}){const host=document.getElement
 function calcAirPower(){let total=0;document.querySelectorAll('.air-row').forEach(r=>{const aa=Number(r.querySelector('.air-aa').value)||0,slot=Number(r.querySelector('.air-slot').value)||0,bonus=Number(r.querySelector('.air-bonus').value)||0;total+=Math.floor(aa*Math.sqrt(Math.max(0,slot))+bonus)});const el=document.getElementById('airPowerResult');if(el)el.textContent=total}
 function calcEfficiency(){const m=Number(document.getElementById('effMinutes')?.value)||0;const el=document.getElementById('effResult');if(!el)return;if(m<=0){el.textContent='時間を入力';return}const f=60/m;const vals=[['燃料','effFuel'],['弾薬','effAmmo'],['鋼材','effSteel'],['ボーキ','effBauxite']].map(([n,id])=>`${n} ${(Number(document.getElementById(id).value)||0)*f}`);el.textContent='1時間あたり: '+vals.map(s=>s.replace(/(\d+\.\d{2,}).*/,m=>Number(parseFloat(m)).toFixed(1))).join(' / ')}
 
+function hdBackupCanonical(value){
+ if(value===null||typeof value!=='object')return JSON.stringify(value);
+ if(Array.isArray(value))return '['+value.map(hdBackupCanonical).join(',')+']';
+ return '{'+Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+hdBackupCanonical(value[k])).join(',')+'}';
+}
+function hdBackupChecksumPayload(obj){return {version:obj?.version??null,exportedAt:obj?.exportedAt??null,app:obj?.app??null,localStorage:obj?.localStorage??null}}
+function hdBackupFnv1a32(text){let hash=2166136261;for(let i=0;i<text.length;i++)hash=Math.imul(hash^text.charCodeAt(i),16777619)>>>0;return hash.toString(16).padStart(8,'0')}
+function hdBackupChecksum(obj){return hdBackupFnv1a32(hdBackupCanonical(hdBackupChecksumPayload(obj)))}
+function hdAnalyzeBackupIntegrity(obj){
+ const integrity=obj?.integrity;
+ if(!integrity)return {state:'missing',blocked:false,reason:'',label:'整合性チェック情報なし'};
+ const algorithm=String(integrity.algorithm||'').toLowerCase(),expected=String(integrity.hash||'').toLowerCase();
+ if(algorithm!=='fnv1a32')return {state:'unsupported',blocked:true,reason:'このバックアップの整合性チェック方式には対応していないよ。HarborDeskを更新してから復元してね。',label:'未対応の整合性方式'};
+ if(!/^[0-9a-f]{8}$/.test(expected))return {state:'invalid',blocked:true,reason:'バックアップの整合性情報が壊れているため、安全のため復元できないよ。',label:'整合性情報が不正'};
+ const actual=hdBackupChecksum(obj),ok=actual===expected;
+ return {state:ok?'ok':'mismatch',blocked:!ok,reason:ok?'':'バックアップのチェックサムが一致しないよ。保存後に内容が変わったか、ファイルが壊れている可能性があるため復元を止めたよ。',label:ok?'整合性確認済み':'チェックサム不一致',expected,actual};
+}
 function hdBuildBackupFile(){
  const appVersion=typeof HD_APP_VERSION==='string'?HD_APP_VERSION:'',appBuild=typeof HD_APP_BUILD==='number'?HD_APP_BUILD:null;
  const data={version:1,exportedAt:new Date().toISOString(),app:{name:'HarborDesk',version:appVersion,build:appBuild},localStorage:{}};
  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('harbordesk'))data.localStorage[k]=localStorage.getItem(k)}
+ data.integrity={algorithm:'fnv1a32',hash:hdBackupChecksum(data)};
  const name=`HarborDesk-backup-${new Date().toISOString().slice(0,10)}.json`;
  const text=JSON.stringify(data,null,2),blob=new Blob([text],{type:'application/json'});
  return {data,name,text,blob};
@@ -120,20 +138,22 @@ function hdAnalyzeBackupCompatibility(obj){
  const rawSchema=obj?.version,schema=rawSchema==null?null:Number(rawSchema);
  const currentBuild=typeof HD_APP_BUILD==='number'?HD_APP_BUILD:null,currentVersion=typeof HD_APP_VERSION==='string'?HD_APP_VERSION:'';
  const rawSourceBuild=obj?.app?.build??obj?.appBuild,sourceBuild=rawSourceBuild==null?null:Number(rawSourceBuild);
- const sourceVersion=String(obj?.app?.version??obj?.appVersion??'').trim();
+ const sourceVersion=String(obj?.app?.version??obj?.appVersion??'').trim(),integrity=hdAnalyzeBackupIntegrity(obj);
  const warnings=[];let blocked=false,reason='';
  if(rawSchema!=null&&(!Number.isInteger(schema)||schema<1)){blocked=true;reason='バックアップ形式番号が正しくないため、安全のため復元できないよ。'}
  else if(Number.isInteger(schema)&&schema>1){blocked=true;reason=`このバックアップは新しい形式(v${schema})だよ。HarborDeskを更新してから復元してね。`}
  if(!blocked&&sourceBuild!=null&&Number.isFinite(sourceBuild)&&currentBuild!=null&&sourceBuild>currentBuild){
   blocked=true;reason=`このバックアップは新しいHarborDesk (build ${sourceBuild}) で作成されているよ。現在のbuild ${currentBuild}を更新してから復元してね。`;
  }
+ if(!blocked&&integrity.blocked){blocked=true;reason=integrity.reason}
  if(rawSchema==null)warnings.push('形式番号がない旧バックアップ');
  if(sourceBuild==null||!Number.isFinite(sourceBuild))warnings.push('作成元バージョン不明');
  else if(currentBuild!=null&&sourceBuild<currentBuild)warnings.push(`古いHarborDesk build ${sourceBuild} のバックアップ`);
+ if(integrity.state==='missing')warnings.push(integrity.label);
  const exported=obj?.exportedAt?new Date(obj.exportedAt):null;
  if(exported&&!Number.isNaN(exported.getTime())&&exported.getTime()>Date.now()+5*60*1000)warnings.push('保存日時が端末時刻より未来');
  const sourceLabel=sourceVersion?`HarborDesk v${sourceVersion}`:(Number.isFinite(sourceBuild)?`HarborDesk build ${sourceBuild}`:'作成元不明');
- return {schema,sourceBuild:Number.isFinite(sourceBuild)?sourceBuild:null,sourceVersion,currentBuild,currentVersion,sourceLabel,warnings,blocked,reason};
+ return {schema,sourceBuild:Number.isFinite(sourceBuild)?sourceBuild:null,sourceVersion,currentBuild,currentVersion,sourceLabel,warnings,blocked,reason,integrity};
 }
 function hdEnsureBackupRestorePreview(){
  let d=document.getElementById('hdBackupRestorePreviewDialog');if(d)return d;
@@ -147,7 +167,7 @@ function hdConfirmBackupRestore(obj,analysis,fileName=''){
  const compatibility=d.querySelector('[data-hd-backup-preview-compat]');
  if(compatibility){
   compatibility.className='hd-backup-preview-compat '+(compat.blocked?'blocked':compat.warnings.length?'warn':'ok');
-  compatibility.innerHTML='<strong>'+(compat.blocked?'復元できないバックアップ':compat.warnings.length?'互換性を確認':'互換性 OK')+'</strong><small>'+hdEsc(compat.sourceLabel)+(compat.currentVersion?' → 現在 v'+hdEsc(compat.currentVersion):'')+(compat.blocked?' ・ '+hdEsc(compat.reason):compat.warnings.length?' ・ '+compat.warnings.map(hdEsc).join(' / '):' ・ 現在のHarborDeskで復元できる')+'</small>';
+  compatibility.innerHTML='<strong>'+(compat.blocked?'復元できないバックアップ':compat.warnings.length?'互換性を確認':'互換性 OK')+'</strong><small>'+hdEsc(compat.sourceLabel)+(compat.currentVersion?' → 現在 v'+hdEsc(compat.currentVersion):'')+(compat.blocked?' ・ '+hdEsc(compat.reason):compat.warnings.length?' ・ '+compat.warnings.map(hdEsc).join(' / '):' ・ 現在のHarborDeskで復元できる')+(compat.integrity?.state==='ok'?' ・ 整合性確認済み':'')+'</small>';
  }
  const grid=d.querySelector('[data-hd-backup-preview-grid]');if(grid)grid.innerHTML=
   '<div><span>復元対象</span><strong>'+Number(analysis?.total||0)+'件</strong></div>'+
