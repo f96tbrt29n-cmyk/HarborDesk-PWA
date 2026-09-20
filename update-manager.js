@@ -139,6 +139,69 @@ async function hdLoadCurrentAssets(){
   hdInitLoadedModules();
 }
 
+function hdEnsureMobileHeaderMenuRow(){
+  let row=document.getElementById('hdMobileHeaderMenuRow');
+  if(row)return row;
+  const top=document.querySelector('.topbar');if(!top)return null;
+  row=document.createElement('div');
+  row.id='hdMobileHeaderMenuRow';
+  row.className='hd-mobile-header-menu-row';
+  row.hidden=true;
+  top.insertAdjacentElement('afterend',row);
+  return row;
+}
+function hdRefreshHeaderMenuMetrics(){
+  const topH=document.querySelector('.topbar')?.getBoundingClientRect().height||58;
+  const row=document.getElementById('hdMobileHeaderMenuRow');
+  const rowH=!row?.hidden?(row.getBoundingClientRect().height||0):0;
+  document.documentElement.style.setProperty('--hd-topbar-h',`${Math.ceil(topH)}px`);
+  if(rowH>0)document.documentElement.style.setProperty('--hd-header-menu-h',`${Math.ceil(rowH)}px`);
+  else document.documentElement.style.removeProperty('--hd-header-menu-h');
+}
+function hdSyncMobileHeaderMenu(){
+  const details=document.querySelector('.hd-header-more');
+  const menu=document.querySelector('.hd-version-menu');
+  if(!details||!menu)return false;
+  const mobile=window.matchMedia?.('(max-width:560px)')?.matches??window.innerWidth<=560;
+  const row=hdEnsureMobileHeaderMenuRow();
+  if(details.open&&mobile&&row){
+    row.hidden=false;
+    if(menu.parentElement!==row)row.appendChild(menu);
+    document.body.classList.add('hd-header-menu-open');
+    window.__HD_HEADER_MENU_OPENED_AT=performance.now();
+    requestAnimationFrame(hdRefreshHeaderMenuMetrics);
+    return true;
+  }
+  if(menu.parentElement!==details)details.appendChild(menu);
+  if(row)row.hidden=true;
+  document.body.classList.remove('hd-header-menu-open');
+  requestAnimationFrame(hdRefreshHeaderMenuMetrics);
+  return false;
+}
+function hdBindMobileHeaderMenu(){
+  const details=document.querySelector('.hd-header-more');if(!details||details.dataset.hdInlineBound==='1')return;
+  details.dataset.hdInlineBound='1';
+  details.addEventListener('toggle',hdSyncMobileHeaderMenu);
+  if(!window.__HD_HEADER_MENU_RESIZE_BOUND){
+    window.__HD_HEADER_MENU_RESIZE_BOUND=true;
+    window.addEventListener('resize',()=>{
+      const open=document.querySelector('.hd-header-more')?.open;
+      if(open&&!window.matchMedia?.('(max-width:560px)')?.matches)document.querySelector('.hd-header-more')?.removeAttribute('open');
+      hdSyncMobileHeaderMenu();
+    },{passive:true});
+  }
+  if(!window.__HD_HEADER_MENU_SCROLL_BOUND){
+    window.__HD_HEADER_MENU_SCROLL_BOUND=true;
+    window.addEventListener('scroll',()=>{
+      const d=document.querySelector('.hd-header-more');
+      if(!d?.open||!window.matchMedia?.('(max-width:560px)')?.matches)return;
+      const opened=Number(window.__HD_HEADER_MENU_OPENED_AT||0);
+      if(performance.now()-opened<250)return;
+      d.removeAttribute('open');
+    },{passive:true});
+  }
+}
+
 function hdUpdateSnoozed(){
   try{return Number(sessionStorage.getItem(HD_UPDATE_SNOOZE_KEY)||0)>Date.now()}catch{return false}
 }
@@ -162,6 +225,7 @@ function hdEnsureUpdateUI(){
   }
   const notify=document.getElementById('notifyBtn'),menu=document.querySelector('.hd-header-more .hd-version-menu');
   if(notify&&menu&&notify.parentElement!==menu){notify.classList.add('hd-notify-btn');menu.prepend(notify)}
+  hdBindMobileHeaderMenu();
   document.getElementById('hdUpdateNow')?.addEventListener('click',hdForceUpdate);
   document.getElementById('hdUpdateLater')?.addEventListener('click',()=>hdSnoozeUpdate());
   document.getElementById('hdUpdateCheck')?.addEventListener('click',()=>{hdClearUpdateSnooze();hdCheckForUpdate(true);document.querySelector('.hd-header-more')?.removeAttribute('open')});
@@ -252,7 +316,7 @@ document.addEventListener('click',e=>{
     return;
   }
   const menu=document.querySelector('.hd-header-more');
-  if(menu?.open&&!e.target?.closest?.('.hd-header-more'))menu.removeAttribute('open');
+  if(menu?.open&&!e.target?.closest?.('.hd-header-more,.hd-mobile-header-menu-row'))menu.removeAttribute('open');
 },true);
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;

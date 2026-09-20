@@ -1459,3 +1459,44 @@ test('release smoke: map攻略 fits iPhone width without horizontal swiping', as
   expect(second.imageRight).toBeLessThanOrEqual(second.viewport + 1);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: mobile update menu occupies its own row without covering攻略', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await expect(page.locator('#guide')).toBeVisible();
+
+  const more = page.locator('.hd-header-more');
+  await more.locator(':scope > summary').click();
+  await expect(more).toHaveAttribute('open', '');
+  const row = page.locator('#hdMobileHeaderMenuRow');
+  await expect(row).toBeVisible();
+  await expect(row.locator('.hd-version-menu')).toBeVisible();
+
+  const layout = await page.evaluate(() => {
+    const top=document.querySelector('.topbar')?.getBoundingClientRect();
+    const row=document.getElementById('hdMobileHeaderMenuRow')?.getBoundingClientRect();
+    const nav=document.getElementById('hdWorkspaceNav')?.getBoundingClientRect();
+    const menu=document.querySelector('#hdMobileHeaderMenuRow .hd-version-menu')?.getBoundingClientRect();
+    return {
+      topBottom:Math.round(top?.bottom||0),
+      rowTop:Math.round(row?.top||0),
+      rowBottom:Math.round(row?.bottom||0),
+      navTop:Math.round(nav?.top||0),
+      menuWidth:Math.round(menu?.width||0),
+      viewport:window.innerWidth
+    };
+  });
+
+  expect(Math.abs(layout.rowTop-layout.topBottom)).toBeLessThanOrEqual(2);
+  expect(layout.rowBottom).toBeLessThanOrEqual(layout.navTop+2);
+  expect(layout.menuWidth).toBeLessThanOrEqual(layout.viewport);
+  
+  await page.waitForTimeout(300);
+  await page.evaluate(() => window.scrollBy(0, 160));
+  await page.waitForTimeout(100);
+  await expect(more).not.toHaveAttribute('open', '');
+  await expect(row).toBeHidden();
+  expect(errors).toEqual([]);
+});
