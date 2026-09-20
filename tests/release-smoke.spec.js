@@ -295,3 +295,36 @@ test('release smoke: resource minimums flag low stock in home and attention', as
   expect(data.attention?.detail).toContain('バケツ');
   expect(errors).toEqual([]);
 });
+
+test('release smoke: home shows return-to-game action only for sync handoff', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    sessionStorage.removeItem('harbordesk-kc-return-game-v1');
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+    const hiddenBefore = !document.querySelector('[data-ph-return-game]');
+
+    sessionStorage.setItem('harbordesk-kc-return-game-v1', '1');
+    window.dispatchEvent(new CustomEvent('hd:kancolle-return-ready'));
+    await new Promise(r => setTimeout(r, 20));
+    const button = document.querySelector('[data-ph-return-game]');
+    const shown = !!button;
+    const text = button?.textContent || '';
+    const helper = typeof window.hdPHReturnGame;
+
+    sessionStorage.removeItem('harbordesk-kc-return-game-v1');
+    await window.hdPHRender?.();
+    const hiddenAfter = !document.querySelector('[data-ph-return-game]');
+
+    return { hiddenBefore, shown, text, helper, hiddenAfter };
+  });
+
+  expect(data.hiddenBefore).toBe(true);
+  expect(data.shown).toBe(true);
+  expect(data.text).toContain('艦これへ戻る');
+  expect(data.helper).toBe('function');
+  expect(data.hiddenAfter).toBe(true);
+  expect(errors).toEqual([]);
+});
