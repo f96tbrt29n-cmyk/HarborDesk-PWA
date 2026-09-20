@@ -3063,3 +3063,39 @@ test('release smoke: sortie log displays selected objective badge', async ({ pag
   await expect(row.locator('.hd-sl-badge.objective')).toContainText('目標 G2');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie analytics separates multi-target objectives', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdSLRender === 'function');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-sortie-analytics-mode-v1','map');
+    localStorage.setItem('harbordesk-sortie-analytics-map-v1','7-2');
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify([
+      {id:'g1-1',at:Date.now(),map:'7-2',node:'G1',result:'S',boss:false,battles:2,objectiveTarget:'G1'},
+      {id:'g1-2',at:Date.now()-1000,map:'7-2',node:'G1',result:'A',boss:false,battles:2,objectiveTarget:'G1'},
+      {id:'g2-1',at:Date.now()-2000,map:'7-2',node:'G2',result:'S',boss:true,battles:4,objectiveTarget:'G2'},
+      {id:'g2-2',at:Date.now()-3000,map:'7-2',node:'G2',result:'S',boss:true,battles:4,objectiveTarget:'G2'},
+      {id:'old-1',at:Date.now()-4000,map:'7-2',node:'G1',result:'撤退',boss:false,retreat:true,battles:1}
+    ]));
+    window.hdSLRender();
+    window.hdWSShowElement?.('sortieLog', false);
+  });
+
+  await page.waitForTimeout(150);
+  const cards = page.locator('#sortieLog .hd-spa-card');
+  await expect(cards).toHaveCount(3);
+
+  const g1 = cards.filter({hasText:'目標 G1'});
+  const g2 = cards.filter({hasText:'目標 G2'});
+  const old = cards.filter({hasText:'目標 未記録'});
+  await expect(g1).toHaveCount(1);
+  await expect(g2).toHaveCount(1);
+  await expect(old).toHaveCount(1);
+  await expect(g1).toContainText('ボス到達 0%');
+  await expect(g2).toContainText('ボス到達 100%');
+  await expect(old).toContainText('撤退 100%');
+  expect(errors).toEqual([]);
+});
