@@ -9352,6 +9352,13 @@ window.addEventListener('hd:ship-images-ready',()=>{hdShipDbUpdateImageCoverage(
 setTimeout(()=>hdShipDbRefreshOwnedFits(document),900);
 document.addEventListener('click',e=>{const jump=e.target.closest?.('[data-hd-shipdb-jump]');if(jump){hdShipDbJumpTo(jump.dataset.hdShipdbJump);return}});
 document.addEventListener('click',e=>{
+ const peekCard=e.target.closest?.('.hd-shipdb-card,.hd-shipdb-master-card'),peekList=document.getElementById('hdShipDbList');
+ if(peekCard&&peekList?.classList.contains('hd-compact')&&!e.target.closest('button,a,input,label,summary,details,select,textarea')){
+  const open=!peekCard.classList.contains('hd-peek');
+  peekList.querySelectorAll('.hd-peek').forEach(x=>x.classList.remove('hd-peek'));
+  if(open)peekCard.classList.add('hd-peek');
+  return;
+ }
  if(e.target.closest?.('[data-hd-shipdb-empty-reset]')){document.querySelector('[data-hd-shipdb-reset]')?.click();return}
  const reset=e.target.closest?.('[data-hd-shipdb-reset]');if(reset){
   const search=document.getElementById('hdShipDbSearch'),missing=document.getElementById('hdShipDbMissingOnly'),include=document.getElementById('hdShipDbIncludeMaster'),list=document.getElementById('hdShipDbList');
@@ -9362,7 +9369,7 @@ document.addEventListener('click',e=>{
   hdShipDbViewSave({query:'',type:'すべて',missingOnly:false,includeMaster:true,imageFilter:'all'});
   hdRenderShipDatabase();return
  }
- const compact=e.target.closest?.('[data-hd-shipdb-compact]');if(compact){const list=document.getElementById('hdShipDbList'),next=!list?.classList.contains('hd-compact');list?.classList.toggle('hd-compact',next);hdShipDbViewSave({compact:next});compact.textContent=next?'詳細表示':'コンパクト';return}
+ const compact=e.target.closest?.('[data-hd-shipdb-compact]');if(compact){const list=document.getElementById('hdShipDbList'),next=!list?.classList.contains('hd-compact');list?.querySelectorAll('.hd-peek').forEach(x=>x.classList.remove('hd-peek'));list?.classList.toggle('hd-compact',next);hdShipDbViewSave({compact:next});compact.textContent=next?'詳細表示':'コンパクト';return}
  const imageFilter=e.target.closest?.('[data-hd-shipdb-image-filter]');if(imageFilter){hdShipDbImageFilter=imageFilter.dataset.hdShipdbImageFilter||'all';hdShipDbViewSave({imageFilter:hdShipDbImageFilter});document.querySelectorAll('[data-hd-shipdb-image-filter]').forEach(b=>b.classList.toggle('active',b===imageFilter));hdRenderShipDatabase();return}
  const f=e.target.closest?.('[data-hd-shipdb-filter]');if(f){hdShipDbType=f.dataset.hdShipdbFilter;hdShipDbViewSave({type:hdShipDbType});document.querySelectorAll('[data-hd-shipdb-filter]').forEach(b=>b.classList.toggle('active',b===f));hdRenderShipDatabase();return}
  const add=e.target.closest?.('[data-hd-shipdb-add]');if(add){hdShipDbAdd(add.dataset.hdShipdbAdd);return}
