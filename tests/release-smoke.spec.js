@@ -3201,3 +3201,44 @@ test('release smoke: sortie remembers selected objective per map', async ({ page
   expect(cleared.restored.draft).toBeUndefined();
   expect(errors).toEqual([]);
 });
+
+test('release smoke: pre-start objective selector persists map preference', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMObjectivePrestartHtml === 'function' &&
+    typeof window.hdSMObjectivePreference === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-sortie-objective-pref-v1');
+    const host=document.createElement('div');
+    host.id='hdPreObjectiveTest';
+    host.innerHTML=window.hdSMObjectivePrestartHtml('7-2');
+    document.body.appendChild(host);
+  });
+
+  const host=page.locator('#hdPreObjectiveTest');
+  await expect(host.locator('[data-hd-sm-pre-objective=""]')).toHaveClass(/active/);
+  await expect(host.locator('[data-hd-sm-pre-objective="G1"]')).toBeVisible();
+  await expect(host.locator('[data-hd-sm-pre-objective="G2"]')).toBeVisible();
+
+  await host.locator('[data-hd-sm-pre-objective="G2"]').click();
+  let pref=await page.evaluate(() => window.hdSMObjectivePreference('7-2'));
+  expect(pref).toBe('G2');
+
+  await page.evaluate(() => {
+    document.getElementById('hdPreObjectiveTest').innerHTML=window.hdSMObjectivePrestartHtml('7-2');
+  });
+  await expect(host.locator('[data-hd-sm-pre-objective="G2"]')).toHaveClass(/active/);
+
+  await host.locator('[data-hd-sm-pre-objective=""]').click();
+  pref=await page.evaluate(() => window.hdSMObjectivePreference('7-2'));
+  expect(pref).toBe('');
+
+  await page.evaluate(() => {
+    document.getElementById('hdPreObjectiveTest').innerHTML=window.hdSMObjectivePrestartHtml('7-2');
+  });
+  await expect(host.locator('[data-hd-sm-pre-objective=""]')).toHaveClass(/active/);
+  expect(errors).toEqual([]);
+});
