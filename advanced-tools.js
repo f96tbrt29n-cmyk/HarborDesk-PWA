@@ -216,14 +216,18 @@ function hdApplyBackupTransaction(storage,before=hdCaptureHarborLocalStorage(),a
  }
 }
 async function importBackup(file){
+ if(window.__hdBackupRestoreBusy){alert('バックアップの復元処理が進行中だよ。完了するまで別の復元は開始できないよ。');return false}
+ window.__hdBackupRestoreBusy=true;
  try{
   const obj=JSON.parse(await file.text());if(!obj?.localStorage)throw new Error('missing localStorage');
   const analysis=hdAnalyzeBackupLocalStorage(obj.localStorage);if(!analysis.total)throw new Error('empty HarborDesk backup');
   const confirmed=await hdConfirmBackupRestore(obj,analysis,file?.name||'');if(!confirmed)return false;
-  if(typeof hdPHCreateSnapshot==='function'){
-   const snapshotOk=await hdPHCreateSnapshot('外部復元直前');
-   if(snapshotOk===false){alert('復元前の安全スナップショットを保存できなかったため、復元を中止したよ。端末の空き容量やSafariのサイトデータ設定を確認してね。');return false}
+  if(typeof hdPHCreateSnapshot!=='function'){
+   alert('安全スナップショット機能を利用できないため、復元を中止したよ。ページを再読み込みしてHarborDeskの機能が揃ってからもう一度試してね。');
+   return false
   }
+  const snapshotOk=await hdPHCreateSnapshot('外部復元直前');
+  if(snapshotOk===false){alert('復元前の安全スナップショットを保存できなかったため、復元を中止したよ。端末の空き容量やSafariのサイトデータ設定を確認してね。');return false}
   const before=hdCaptureHarborLocalStorage(),result=hdApplyBackupTransaction(obj.localStorage,before);
   if(!result.ok){
    console.warn('backup restore validation failed',result);
@@ -233,6 +237,7 @@ async function importBackup(file){
   }
   alert('バックアップ時点のHarborDeskデータへ復元し、内容一致も確認できたよ。画面を再読み込みするね。');location.reload();return true
  }catch(err){console.warn('backup import failed',err);alert('HarborDeskのバックアップJSONを読み込めなかったよ');return false}
+ finally{window.__hdBackupRestoreBusy=false}
 }
 
 function bindAdvancedEvents(){
