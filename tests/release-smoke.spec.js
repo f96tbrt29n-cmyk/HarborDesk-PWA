@@ -3313,3 +3313,30 @@ test('release smoke: pre-start objective selector shows route stats', async ({ p
   await expect(host.locator('[data-hd-sm-pre-objective="G2"]')).toContainText('最短5マス・最少5戦');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: pre-start route preview shows shortest structural path', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMObjectiveShortestPath === 'function' &&
+    typeof window.hdSMPrestartRoutePreviewHtml === 'function'
+  );
+
+  const paths = await page.evaluate(() => ({
+    auto: window.hdSMObjectiveShortestPath('7-2',''),
+    g1: window.hdSMObjectiveShortestPath('7-2','G1'),
+    g2: window.hdSMObjectiveShortestPath('7-2','G2')
+  }));
+  expect(paths.auto).toEqual(['A','B','C','G1']);
+  expect(paths.g1).toEqual(['A','B','C','G1']);
+  expect(paths.g2).toEqual(['D','E','F','I','G2']);
+
+  const html = await page.evaluate(() => {
+    window.hdSMSaveObjectivePreference('7-2','G2');
+    return window.hdSMPrestartRoutePreviewHtml('7-2');
+  });
+  expect(html).toContain('構造図最短');
+  expect(html).toContain('D → E → F → I → G2');
+  expect(errors).toEqual([]);
+});
