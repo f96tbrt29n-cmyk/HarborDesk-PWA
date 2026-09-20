@@ -2757,3 +2757,48 @@ test('release smoke: sortie uses effective non-battle kind in HUD and node intel
   await expect(hud).toContainText('非戦闘');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sticky sortie HUD shows minimum remaining battles', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMBossBattleDistance === 'function'
+  );
+
+  const remaining = await page.evaluate(() => ({
+    d: window.hdSMBossBattleDistance('2-4','D'),
+    a: window.hdSMBossBattleDistance('2-4','A'),
+    boss: window.hdSMBossBattleDistance('2-4','O')
+  }));
+  expect(remaining.d).toBe(3);
+  expect(remaining.a).toBe(4);
+  expect(remaining.boss).toBe(0);
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-hud-battle-distance-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-hud-battle-distance-fleet',
+      fleetName:'HUD残戦闘テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-hud-battle-distance-fleet',name:'HUD残戦闘テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'D',routeNodes:['A','D'],result:'S',memo:'',advanceGuard:{node:'D',safe:true,at:Date.now()}}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const progress = page.locator('.hd-sm-hud-progress');
+  await expect(progress).toContainText('戦闘 1');
+  await expect(progress).toContainText('構造図最短 ボスまで');
+  await expect(progress).toContainText('最少戦闘あと 3');
+  expect(errors).toEqual([]);
+});
