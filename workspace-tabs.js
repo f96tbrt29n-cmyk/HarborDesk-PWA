@@ -55,11 +55,22 @@ function hdWSPushHistory(opts={}){
  if(!opts.preserveForward)hdWSForwardSave([]);
  hdWSUpdateHistoryButtons();
 }
+function hdWSHistoryPeek(rows){
+ for(let i=(rows?.length||0)-1;i>=0;i--){
+  const x=rows[i],el=document.getElementById(x?.section||'');
+  if(x&&el)return {group:x.group,section:x.section,label:hdWSTitle(el)};
+ }
+ return null;
+}
+function hdWSHistoryMeta(){
+ const backRows=hdWSHistoryLoad(),forwardRows=hdWSForwardLoad();
+ return {backCount:backRows.length,forwardCount:forwardRows.length,backTarget:hdWSHistoryPeek(backRows),forwardTarget:hdWSHistoryPeek(forwardRows)};
+}
 function hdWSUpdateHistoryButtons(){
- const back=document.querySelector('[data-hd-ws-back]'),forward=document.querySelector('[data-hd-ws-forward]');
- if(back)back.disabled=hdWSHistoryLoad().length===0;
- if(forward)forward.disabled=hdWSForwardLoad().length===0;
- window.dispatchEvent(new CustomEvent('hd:workspace-history',{detail:{back:hdWSHistoryLoad().length,forward:hdWSForwardLoad().length}}));
+ const back=document.querySelector('[data-hd-ws-back]'),forward=document.querySelector('[data-hd-ws-forward]'),meta=hdWSHistoryMeta();
+ if(back){back.disabled=!meta.backTarget;back.title=meta.backTarget?`戻る: ${meta.backTarget.label}`:'戻る履歴なし';back.setAttribute('aria-label',meta.backTarget?`${meta.backTarget.label}へ戻る`:'戻る履歴なし')}
+ if(forward){forward.disabled=!meta.forwardTarget;forward.title=meta.forwardTarget?`進む: ${meta.forwardTarget.label}`:'進む履歴なし';forward.setAttribute('aria-label',meta.forwardTarget?`${meta.forwardTarget.label}へ進む`:'進む履歴なし')}
+ window.dispatchEvent(new CustomEvent('hd:workspace-history',{detail:meta}));
 }
 function hdWSUpdateBackButton(){hdWSUpdateHistoryButtons()}
 function hdWSGoBack(){
