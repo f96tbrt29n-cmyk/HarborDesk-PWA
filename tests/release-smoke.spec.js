@@ -240,3 +240,58 @@ test('release smoke: quick navigation returns valid categories', async ({ page }
   expect(rows).toContain('guide');
   expect(errors).toEqual([]);
 });
+
+test('release smoke: resource minimums flag low stock in home and attention', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    const now = Date.now();
+    window.hdGetAppState = () => ({
+      expeditions: [],
+      docks: [],
+      quests: [],
+      resources: {
+        fuel: 5000,
+        ammo: 20000,
+        steel: 30000,
+        bauxite: 40000,
+        savedAt: now
+      }
+    });
+    localStorage.setItem('harbordesk-kancolle-materials-v1', JSON.stringify({ bucket: 40, syncedAt: now }));
+    localStorage.setItem('harbordesk-resource-thresholds-v1', JSON.stringify({
+      fuel: 10000,
+      ammo: 10000,
+      steel: 10000,
+      bauxite: 10000,
+      bucket: 100
+    }));
+
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+
+    const summary = window.hdPHResourceSummary?.();
+    const resourceAttention = (window.hdQNMobileAttentionItems?.() || []).find(x => x.id === 'resources');
+    return {
+      alerts: (summary?.alerts || []).map(x => x.key),
+      lowCards: [...document.querySelectorAll('.hd-ph-resource-grid > button.low')].map(x => x.querySelector('small')?.textContent || ''),
+      header: document.querySelector('.hd-ph-resource-block .hd-ph-sub')?.textContent || '',
+      attention: resourceAttention ? {
+        title: resourceAttention.title,
+        detail: resourceAttention.detail,
+        reason: resourceAttention.reason
+      } : null
+    };
+  });
+
+  expect(data.alerts).toEqual(['fuel', 'bucket']);
+  expect(data.lowCards).toContain('燃料');
+  expect(data.lowCards).toContain('バケツ');
+  expect(data.header).toContain('不足 2件');
+  expect(data.attention?.reason).toBe('資源最低ライン');
+  expect(data.attention?.title).toContain('2件');
+  expect(data.attention?.detail).toContain('燃料');
+  expect(data.attention?.detail).toContain('バケツ');
+  expect(errors).toEqual([]);
+});
