@@ -2462,10 +2462,7 @@ test('release smoke: sortie mode records structured retreat reason', async ({ pa
 test('release smoke: sortie analytics summarizes structured retreat reasons', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
-  await page.waitForFunction(() =>
-    typeof window.hdSPARender === 'function' ||
-    typeof window.hdSPAInstall === 'function'
-  );
+  await page.waitForFunction(() => typeof window.hdSLRender === 'function');
 
   await page.evaluate(() => {
     localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify([
@@ -2474,9 +2471,10 @@ test('release smoke: sortie analytics summarizes structured retreat reasons', as
       {id:'r3',at:Date.now()-2000,map:'2-4',node:'H',result:'撤退',retreat:true,retreatReason:'索敵不足',battles:3},
       {id:'r4',at:Date.now()-3000,map:'2-4',node:'O',result:'S',retreat:false,battles:5,boss:true}
     ]));
-    window.hdSPARender?.();
+    window.hdSLRender?.();
   });
 
+  await page.waitForTimeout(50);
   const card = page.locator('.hd-spa-card').first();
   await expect(card).toBeVisible();
   const reasons = card.locator('.hd-spa-retreat-reasons');
