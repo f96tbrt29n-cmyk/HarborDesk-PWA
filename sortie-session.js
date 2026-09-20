@@ -56,7 +56,7 @@ function hdSSFinish(data){
   map:session.map,node:data&&data.node||'',result:result,boss:!!(data&&data.boss),retreat:result==='撤退',
   battles:Math.max(0,Number(data&&data.battles)||0),drop:data&&data.drop||'',buckets:Math.max(0,Number(data&&data.buckets)||0),
   fuel:Math.max(0,Number(data&&data.fuel)||0),ammo:Math.max(0,Number(data&&data.ammo)||0),steel:Math.max(0,Number(data&&data.steel)||0),bauxite:Math.max(0,Number(data&&data.bauxite)||0),
-  memo:memoParts.join('｜'),retreatReason:String(data&&data.retreatReason||''),sessionId:session.id,fleetId:session.fleetId,fleetName:session.fleetName,strategy:session.strategy,strategyLabel:session.strategyLabel,
+  memo:memoParts.join('｜'),retreatReason:String(data&&data.retreatReason||''),objectiveTarget:String(data&&data.objectiveTarget||''),sessionId:session.id,fleetId:session.fleetId,fleetName:session.fleetName,strategy:session.strategy,strategyLabel:session.strategyLabel,
   startedAt:session.startedAt,durationMs:Math.max(0,at-session.startedAt),fleetSnapshot:session.fleetSnapshot,readinessSnapshot:session.readinessSnapshot
  });
  if(!entry)return null;
