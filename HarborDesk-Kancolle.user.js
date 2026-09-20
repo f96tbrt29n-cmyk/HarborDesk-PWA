@@ -21,7 +21,7 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.9';
+const HD_VERSION='1.0.10';
 const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/';
 const RECORD_MESSAGE='harbordesk-kancolle-frame-record-v1';
 const STATUS_MESSAGE='harbordesk-kancolle-frame-status-v1';
@@ -29,7 +29,7 @@ const MAX_RECORDS=120;
 const HD_PANEL_MIN_KEY='harbordesk-kc-panel-minimized-v1';
 
 function wanted(url){
-  return /\/kcsapi\/(?:api_port\/port|api_get_member\/(?:ship2|slot_item|require_info|material|ndock|questlist)|api_req_map\/(?:start|next)|api_req_(?:sortie|combined_battle)\/battleresult)(?:$|[?#])/.test(String(url||''));
+  return /\/kcsapi\/(?:api_port\/port|api_get_member\/(?:ship2|ship3|slot_item|require_info|material|ndock|questlist)|api_req_map\/(?:start|next)|api_req_(?:sortie|combined_battle)\/battleresult)(?:$|[?#])/.test(String(url||''));
 }
 function pathOf(url){
   try{return new URL(String(url||''),location.href).pathname}catch{return String(url||'').split(/[?#]/)[0]}
@@ -71,7 +71,7 @@ function minimize(path,obj){
       api_material:(Array.isArray(data?.api_material)?data.api_material:[]).map(material).filter(Boolean)
     };return base;
   }
-  if(/\/api_get_member\/ship2$/.test(path)){
+  if(/\/api_get_member\/(?:ship2|ship3)$/.test(path)){
     base.api_data={
       api_ship_data:(Array.isArray(data?.api_ship_data)?data.api_ship_data:(Array.isArray(data)?data:[])).map(ship).filter(Boolean),
       api_deck_data:(Array.isArray(data?.api_deck_data)?data.api_deck_data:[]).map(deck).filter(Boolean)
@@ -209,14 +209,26 @@ function nextCaptureHint(c=captureCoverage()){
 function signature(r){
   try{return r.endpoint+'|'+JSON.stringify(r.payload)}catch{return r.endpoint+'|'+r.at}
 }
+function isSnapshotEndpoint(endpoint){
+  return /\/kcsapi\/(?:api_port\/port|api_get_member\/(?:ship2|ship3|slot_item|require_info|material|ndock))$/.test(String(endpoint||''));
+}
 function receiveRecord(r){
   if(!r||r.type!==RECORD_MESSAGE||!wanted(r.endpoint))return;
   const sig=signature(r);
   if(signatures.has(sig))return;
+  if(isSnapshotEndpoint(r.endpoint)){
+    for(let i=records.length-1;i>=0;i--){
+      if(String(records[i]?.endpoint||'')!==String(r.endpoint||''))continue;
+      const removed=records.splice(i,1)[0];
+      try{signatures.delete(signature(removed))}catch{}
+    }
+  }
   signatures.add(sig);
   records.push({endpoint:r.endpoint,payload:r.payload,at:Number(r.at)||Date.now()});
   while(records.length>MAX_RECORDS){
-    const removed=records.shift();
+    let idx=records.findIndex(x=>!isSnapshotEndpoint(x?.endpoint));
+    if(idx<0)idx=0;
+    const removed=records.splice(idx,1)[0];
     try{signatures.delete(signature(removed))}catch{}
   }
   render();
