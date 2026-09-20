@@ -3148,3 +3148,141 @@ test('release smoke: sortie log filters by selected objective', async ({ page })
   await expect(page.locator('#sortieLog .hd-sl-row')).toContainText('目標 G2');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: Kancolle sync fills fleet and equipment ledgers', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdKcParseImport === 'function' &&
+    typeof window.hdKcPreviewData === 'function' &&
+    typeof window.hdKcApplyImport === 'function' &&
+    !!window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips
+  );
+
+  const result = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1','[]');
+    localStorage.setItem('harbordesk-equipment-v1','[]');
+    localStorage.setItem('harbordesk-kancolle-equipment-detail-v1','[]');
+    localStorage.removeItem('harbordesk-kancolle-sync-v1');
+    sessionStorage.removeItem('harbordesk-session-roster-view-v1');
+    sessionStorage.removeItem('harbordesk-session-equipment-ledger-view-v1');
+
+    const shipMaster = Object.values(window.HD_KANCOLLE_MASTER_SNAPSHOT.allShips).find(x => Number(x?.id) > 0 && x?.name);
+    const equipMaster = Object.values(window.HD_KANCOLLE_MASTER_SNAPSHOT.equipment || {}).find(x => Number(x?.id) > 0 && x?.name);
+    if(!shipMaster || !equipMaster) throw new Error('master snapshot missing test rows');
+
+    const payload = {
+      format:'harbordesk-kancolle-import',
+      version:2,
+      userscriptVersion:'1.0.10',
+      records:[
+        {
+          endpoint:'/kcsapi/api_port/port',
+          at:Date.now()-1000,
+          payload:{api_result:1,api_data:{
+            api_ship:[{
+              api_id:900001,api_ship_id:Number(shipMaster.id),api_lv:77,
+              api_nowhp:20,api_maxhp:30,api_cond:49,api_locked:1,api_sally_area:0,
+              api_slot:[800001,-1,-1,-1,-1],api_slot_ex:-1
+            }],
+            api_deck_port:[{api_id:1,api_name:'第1艦隊',api_mission:[0,0,0,0],api_ship:[900001,-1,-1,-1,-1,-1]}],
+            api_ndock:[],api_material:[]
+          }}
+        },
+        {
+          endpoint:'/kcsapi/api_get_member/slot_item',
+          at:Date.now(),
+          payload:{api_result:1,api_data:[
+            {api_id:800001,api_slotitem_id:Number(equipMaster.id),api_level:4,api_alv:0}
+          ]}
+        }
+      ]
+    };
+    const preview = window.hdKcPreviewData(window.hdKcParseImport(payload));
+    const sync = window.hdKcApplyImport(preview,{
+      ships:true,equipment:true,resources:false,fleets:true,timers:false,quests:false,sorties:false
+    });
+
+    const roster = JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]');
+    const equipment = JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]');
+    const details = JSON.parse(localStorage.getItem('harbordesk-kancolle-equipment-detail-v1')||'[]');
+
+    return {
+      shipName:shipMaster.name,
+      equipName:equipMaster.name,
+      roster,
+      equipment,
+      details,
+      ledger:sync.ledger
+    };
+  });
+
+  expect(result.roster).toHaveLength(1);
+  expect(result.roster[0].gameShipId).toBe(900001);
+  expect(result.roster[0].name).toBe(result.shipName);
+  expect(result.roster[0].level).toBe(77);
+  expect(result.equipment.some(x => x.name===result.equipName && Number(x.count)===1 && Number(x.star)===4)).toBe(true);
+  expect(result.details.some(x => Number(x.gameEquipId)===800001)).toBe(true);
+  expect(result.ledger.ships.ok).toBe(true);
+  expect(result.ledger.ships.missing).toBe(0);
+  expect(result.ledger.equipment.ok).toBe(true);
+  expect(result.ledger.equipment.missing).toBe(0);
+
+  await expect(page.locator('#shipRosterList .roster-card').first()).toContainText(result.shipName);
+  await expect(page.locator('#equipmentList .advanced-card').first()).toContainText(result.equipName);
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: Kancolle sync never drops an unresolved ship from fleet ledger', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdKcParseImport === 'function' &&
+    typeof window.hdKcPreviewData === 'function' &&
+    typeof window.hdKcApplyImport === 'function'
+  );
+
+  const row = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1','[]');
+    const payload={
+      format:'harbordesk-kancolle-import',
+      version:2,
+      userscriptVersion:'1.0.10',
+      records:[{
+        endpoint:'/kcsapi/api_port/port',
+        payload:{api_result:1,api_data:{
+          api_ship:[{api_id:900099,api_ship_id:999999,api_lv:12,api_nowhp:10,api_maxhp:10,api_cond:40,api_locked:0,api_sally_area:0,api_slot:[],api_slot_ex:-1}],
+          api_deck_port:[],api_ndock:[],api_material:[]
+        }}
+      }]
+    };
+    const preview=window.hdKcPreviewData(window.hdKcParseImport(payload));
+    const sync=window.hdKcApplyImport(preview,{ships:true,equipment:false,resources:false,fleets:false,timers:false,quests:false,sorties:false});
+    const roster=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]');
+    return {row:roster[0],ledger:sync.ledger};
+  });
+
+  expect(row.row.gameShipId).toBe(900099);
+  expect(row.row.masterId).toBe(999999);
+  expect(row.row.name).toContain('艦娘ID');
+  expect(row.row.masterResolved).toBe(false);
+  expect(row.ledger.ships.ok).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: Kancolle userscript preserves essential ledger snapshots', async ({ page }) => {
+  const source = await page.evaluate(async () => {
+    const [user,meta] = await Promise.all([
+      fetch('./HarborDesk-Kancolle.user.js',{cache:'no-store'}).then(r=>r.text()),
+      fetch('./HarborDesk-Kancolle.meta.js',{cache:'no-store'}).then(r=>r.text())
+    ]);
+    return {user,meta};
+  });
+  expect(source.user).toContain("const HD_VERSION='1.0.10'");
+  expect(source.meta).toContain('// @version      1.0.10');
+  expect(source.user).toContain('const essentialRecords=new Map()');
+  expect(source.user).toContain('function captureRecords()');
+  expect(source.user).toContain('records:captureRecords().map');
+  expect(source.user).toContain('essentialRecords.clear()');
+});
