@@ -434,7 +434,7 @@ function hdPHEnsure(){if(document.getElementById('personalHomeCenter')){hdPHRend
 async function hdPHAutoSnapshot(){const rows=await hdPHGetSnapshots();if(!rows.length||Date.now()-rows[0].at>20*3600000)await hdPHCreateSnapshot('自動（日次）')}
 function hdPHInstallBackupHooks(){
  if(window.__hdPHBackupHooks)return;window.__hdPHBackupHooks=true;
- const mark=()=>{localStorage.setItem(HD_PH_LAST_EXPORT_KEY,String(Date.now()));hdPHRender()};
+ const mark=()=>{localStorage.setItem(HD_PH_LAST_EXPORT_KEY,String(Date.now()));window.dispatchEvent(new CustomEvent('hd:backup-exported',{detail:{at:Date.now()}}));hdPHRender()};
  const oldExport=window.exportBackup;
  if(typeof oldExport==='function'){window.exportBackup=function(){const out=oldExport();mark();return out};const b=document.getElementById('exportBackup');if(b)b.onclick=window.exportBackup}
  const oldShare=window.shareBackup;
