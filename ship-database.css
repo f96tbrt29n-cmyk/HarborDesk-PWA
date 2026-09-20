@@ -91,3 +91,6 @@
 .hd-shipdb-list.hd-compact .hd-peek .hd-shipdb-master-slots{display:grid}
 .hd-shipdb-list.hd-compact .hd-peek .hd-shipdb-master-equip{display:block}
 .hd-shipdb-list.hd-compact .hd-peek .hd-shipdb-actions .guide-link{display:inline-flex}
+
+.hd-compact-hint{padding:6px 9px;border-radius:9px;background:rgba(79,163,211,.09);color:var(--muted);font-size:9px;line-height:1.4}
+.hd-compact-hint[hidden]{display:none}
