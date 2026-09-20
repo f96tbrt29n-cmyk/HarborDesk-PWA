@@ -6243,3 +6243,21 @@ test('header overflow menu closes on Escape', async ({ page }) => {
   await expect(menu).not.toHaveAttribute('open','');
   await expect(menu.locator('summary')).toBeFocused();
 });
+
+
+test('home offers one-tap resume to previous workspace', async ({ page }) => {
+  const errors=[];
+  await page.addInitScript(() => {
+    sessionStorage.setItem('harbordesk-session-workspace-history-v1', JSON.stringify([{group:'fleet',section:'roster'}]));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.renderHomeDashboard?.();
+    const card=document.getElementById('homeResume');
+    return {hidden:!!card?.hidden,text:card?.textContent||'',button:!!card?.querySelector('[data-home-resume]')};
+  });
+  expect(data.hidden).toBe(false);
+  expect(data.text).toContain('艦隊台帳');
+  expect(data.text).toContain('続きから');
+  expect(data.button).toBe(true);
+});
