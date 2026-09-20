@@ -103,7 +103,7 @@ async function shareBackup(){
    if(typeof navigator.canShare!=='function'||navigator.canShare(payload)){await navigator.share(payload);return true}
   }
  }catch(err){if(err?.name==='AbortError')return false}
- exportBackup();return false
+ return exportBackup()!==false
 }
 function hdApplyBackupLocalStorage(storage){if(!storage||typeof storage!=='object'||Array.isArray(storage))throw new Error('invalid backup storage');const entries=Object.entries(storage).filter(([k,v])=>k.startsWith('harbordesk')&&typeof v==='string'),keep=new Set(entries.map(([k])=>k));for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k?.startsWith('harbordesk')&&!keep.has(k))localStorage.removeItem(k)}for(const [k,v] of entries)localStorage.setItem(k,v);return entries.length}
 async function importBackup(file){try{const obj=JSON.parse(await file.text());if(!obj?.localStorage)throw new Error();hdApplyBackupLocalStorage(obj.localStorage);alert('バックアップ時点のHarborDeskデータへ復元したよ。画面を再読み込みするね。');location.reload()}catch{alert('HarborDeskのバックアップJSONを読み込めなかったよ')}}
