@@ -214,6 +214,27 @@ test('release smoke: game sync fills ship and equipment ledgers from latest snap
 });
 
 
+test('release smoke: userscript blocks handoff until ship and equipment ledger data are captured', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const source = await page.evaluate(async () => {
+    const res = await fetch('./HarborDesk-Kancolle.user.js', { cache: 'no-store' });
+    return res.text();
+  });
+
+  expect(source).toContain('// @version      1.0.11');
+  expect(source).toContain("const HD_VERSION='1.0.11'");
+  expect(source).toContain('function ledgerReady(c=captureCoverage())');
+  expect(source).toContain('return !!(c.port&&c.equipment)');
+  expect(source).toContain("port:has(/api_port\\/port|api_get_member\\/ship2/)");
+  expect(source).toContain("sendEl.disabled=!ledger");
+  expect(source).toContain("if(!ledgerReady(c))");
+  expect(source).toContain('艦隊台帳・装備台帳を埋めるため');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: complete game sync reports six core areas', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
