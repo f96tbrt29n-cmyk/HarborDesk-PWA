@@ -138,11 +138,12 @@ function hdSMSetAdvanceGuard(safe){
 }
 function hdSMHudHtml(session,draft){
  const current=String(draft?.node||'').trim();if(!current)return '';
- const graph=hdSMGraph(session?.map),kind=hdSMNodeKind(graph,current),intel=hdSMNodeIntel(session?.map,{label:current,kind}),guard=hdSMAdvanceGuard(session,draft);
+ const graph=hdSMGraph(session?.map),kind=hdSMNodeKind(graph,current),intel=hdSMNodeIntel(session?.map,{label:current,kind}),guard=hdSMAdvanceGuard(session,draft),branch=hdSMBranchHint(session?.map,draft);
  const state=guard.retreat?'stop':guard.confirmed?'ready':'warn',status=guard.retreat?'撤退':guard.confirmed?'大破確認済':'大破未確認',jump=guard.confirmed?'next':'guard';
  const next=guard.confirmed&&!guard.retreat?hdSMNextNodeRows(session?.map,draft):[];
  const nextHtml=next.length?'<div class="hd-sm-hud-next"><span>NEXT</span><div>'+next.slice(0,3).map(x=>'<button type="button" data-hd-sm-hud-node="'+hdSMEsc(x.label)+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(x.kind))+'</small></button>').join('')+'</div>'+(next.length>3?'<em>+'+(next.length-3)+'</em>':'')+'</div>':'';
- return '<div class="hd-sm-hud '+state+'"><div class="hd-sm-hud-node"><span>NOW</span><b>'+hdSMEsc(current)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(kind))+'</small></div><div class="hd-sm-hud-main"><span>基本陣形 <b>'+hdSMEsc(intel.formation)+'</b></span><strong>'+hdSMEsc(status)+'</strong></div><button type="button" class="ghost small" data-hd-sm-hud-jump="'+jump+'">'+(guard.confirmed?'詳細':'確認する')+'</button>'+nextHtml+'</div>';
+ const branchHtml=branch&&branch.current?'<div class="hd-sm-hud-branch"><span>ROUTE</span><b>'+hdSMEsc(branch.title)+'</b><small>'+hdSMEsc(branch.text)+'</small></div>':'';
+ return '<div class="hd-sm-hud '+state+'"><div class="hd-sm-hud-node"><span>NOW</span><b>'+hdSMEsc(current)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(kind))+'</small></div><div class="hd-sm-hud-main"><span>基本陣形 <b>'+hdSMEsc(intel.formation)+'</b></span><strong>'+hdSMEsc(status)+'</strong></div><button type="button" class="ghost small" data-hd-sm-hud-jump="'+jump+'">'+(guard.confirmed?'詳細':'確認する')+'</button>'+branchHtml+nextHtml+'</div>';
 }
 function hdSMHudJump(target){
  const selector=target==='next'?'.hd-sm-next-wrap':'.hd-sm-advance-guard',el=document.querySelector('#hdSortieMode '+selector);
