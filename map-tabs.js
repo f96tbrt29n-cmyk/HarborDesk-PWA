@@ -52,6 +52,15 @@ function hdMapOpenTool(tool){
  return false;
 }
 
+function hdMapRenderInlineTool(tab){
+ if(tab==='route'&&typeof window.hdAdvancedHtml==='function'){
+  const pane=document.querySelector('[data-map-pane="route"]');if(!pane)return;
+  let host=pane.querySelector('#hdMapRouteRequirements');
+  if(!host){host=document.createElement('div');host.id='hdMapRouteRequirements';pane.appendChild(host)}
+  host.innerHTML=window.hdAdvancedHtml(selectedMap);
+ }
+ if(tab==='map'&&typeof window.hdEnhanceMapPane==='function')window.hdEnhanceMapPane();
+}
 function hdCustomFleetHtml(map){
   if(typeof loadCustomFleets!=='function')return '<div class="empty">自分用編成機能を読み込み中</div>';
   const list=(loadCustomFleets()[map]||[]);
@@ -86,6 +95,7 @@ function hdApplyMapTabs(){
   </article>`;
   const add=document.getElementById('addCustomFleet');if(add&&typeof openCustomFleetDialog==='function')add.onclick=()=>openCustomFleetDialog();
   hdMapTabsRevealActive();
+  hdMapRenderInlineTool(active);
   hdMapEmit('hd:map-rendered',{map:selectedMap,tab:active});
 }
 
@@ -98,6 +108,7 @@ document.addEventListener('click',e=>{
   document.querySelectorAll('.map-tab-btn').forEach(x=>x.classList.toggle('active',x===btn));
   document.querySelectorAll('.map-tab-pane').forEach(x=>x.classList.toggle('active',x.dataset.mapPane===tab));
   hdMapTabsRevealActive();
+  hdMapRenderInlineTool(tab);
   hdMapEmit('hd:map-tab-changed',{map:selectedMap,tab});
 });
 
