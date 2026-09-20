@@ -33,7 +33,7 @@ function hdSMNextNodeRows(map,draft){
  const current=String(draft?.node||'').trim();
  const from=current?[current]:[...new Set(graph.edges.map(x=>x[0]).filter(x=>x==='S'||x==='S1'||x==='S2'))];
  const labels=[...new Set(graph.edges.filter(([a])=>from.includes(a)).map(([,b])=>b))];
- return labels.map(label=>({label,kind:hdSMEffectiveNodeKind(map,label,hdSMNodeKind(graph,label))}));
+ return hdSMSortNextNodeRows(map,labels.map(label=>({label,kind:hdSMEffectiveNodeKind(map,label,hdSMNodeKind(graph,label))})));
 }
 function hdSMBossDistance(map,current){
  const graph=hdSMGraph(map),from=String(current||'').trim(),targets=hdSMObjectiveTargets(map);
@@ -89,6 +89,12 @@ function hdSMObjectiveTargets(map){
 function hdSMRouteTargetName(map){
  const graph=hdSMGraph(map),hasBoss=!!String(graph?.boss||'').trim(),hasGoal=!!String(graph?.goal||'').trim();
  return hasBoss&&hasGoal?'攻略目標':hasBoss?'ボス':hasGoal?'到達地点':'目標';
+}
+function hdSMSortNextNodeRows(map,rows){
+ return [...(Array.isArray(rows)?rows:[])].sort((a,b)=>{
+  const rank=x=>{const v=hdSMCanReachBoss(map,x?.label);return v===true?0:v==null?1:2};
+  return rank(a)-rank(b);
+ });
 }
 function hdSMBranchHint(map,draft){
  const graph=hdSMGraph(map),current=String(draft?.node||'').trim(),next=hdSMNextNodeRows(map,draft);
@@ -437,6 +443,7 @@ window.hdSMSetAdvanceGuard=hdSMSetAdvanceGuard;
 window.hdSMBossDistance=hdSMBossDistance;
 window.hdSMBossBattleDistance=hdSMBossBattleDistance;
 window.hdSMCanReachBoss=hdSMCanReachBoss;
+window.hdSMSortNextNodeRows=hdSMSortNextNodeRows;
 window.hdSMRouteTargetName=hdSMRouteTargetName;
 window.hdSMObjectiveTargets=hdSMObjectiveTargets;
 window.hdSMHudHtml=hdSMHudHtml;
