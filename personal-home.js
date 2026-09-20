@@ -23,12 +23,10 @@ function hdPHResumeRow(){
  return {id:row.id,title:hdPHSectionTitle(row.id),group,groupLabel,at:Math.max(0,Number(row.at)||0)};
 }
 function hdPHClearUsage(){
- try{localStorage.removeItem('harbordesk-quick-nav-usage-v1')}catch{}
- if(typeof hdQNUsageLastId!=='undefined'){try{hdQNUsageLastId='';hdQNUsageLastAt=0}catch{}}
+ const ok=typeof hdQNClearUsage==='function'?hdQNClearUsage():(()=>{try{localStorage.removeItem('harbordesk-quick-nav-usage-v1');return true}catch{return false}})();
  hdPHRender();
  window.hdToast?.('利用回数をリセットしたよ','info',1200);
- window.dispatchEvent(new CustomEvent('hd:quick-nav-updated'));
- return true;
+ return !!ok;
 }
 function hdPHShortcutRows(){
  const pins=typeof hdQNLoadPins==='function'?hdQNLoadPins():(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-quick-nav-pins-v1')||'[]')}catch{return []}})();
