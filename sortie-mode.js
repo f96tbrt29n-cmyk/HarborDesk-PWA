@@ -192,6 +192,18 @@ function hdSMObjectivePickerHtml(map,draft){
  const selected=hdSMSelectedObjective(map,draft);
  return '<div class="hd-sm-objective-picker"><div><span>OBJECTIVE</span><b>今回の攻略目標</b><small>距離・経路判定／次回も記憶</small></div><div><button type="button" class="'+(!selected?'active':'')+'" data-hd-sm-objective="">自動</button>'+options.map(x=>'<button type="button" class="'+(selected===x.label?'active':'')+'" data-hd-sm-objective="'+hdSMEsc(x.label)+'">'+hdSMEsc(x.name)+'</button>').join('')+'</div></div>';
 }
+function hdSMObjectiveRouteState(map,draft){
+ const current=String(draft?.node||'').trim(),target=hdSMSelectedObjective(map,draft);
+ if(!current||!target)return {active:false,current,target,alternatives:[]};
+ const reachable=hdSMCanReachBoss(map,current,target);
+ if(reachable!==false)return {active:false,current,target,reachable,alternatives:[]};
+ const alternatives=hdSMObjectiveOptions(map).filter(x=>x.label!==target&&hdSMCanReachBoss(map,current,x.label)===true);
+ return {active:true,current,target,targetName:hdSMRouteTargetName(map,target),alternatives};
+}
+function hdSMObjectiveRouteWarningHtml(map,draft){
+ const state=hdSMObjectiveRouteState(map,draft);if(!state.active)return '';
+ return '<div class="hd-sm-objective-warning"><div><span>ROUTE ALERT</span><b>'+hdSMEsc(state.current)+'から'+hdSMEsc(state.targetName)+'へ構造図上接続なし</b></div><p>現在地から選択中の攻略目標へつながる経路が構造図上にないよ。実際の分岐条件も確認しつつ、目標を見直してね。</p><div>'+state.alternatives.map(x=>'<button type="button" data-hd-sm-objective="'+hdSMEsc(x.label)+'">'+hdSMEsc(x.name)+'へ切替</button>').join('')+'<button type="button" class="ghost" data-hd-sm-objective="">自動へ戻す</button><button type="button" class="danger" data-hd-sm-retreat-reason="ルート逸れ">ルート逸れで撤退</button></div></div>';
+}
 function hdSMSetObjectiveTarget(target){
  const session=hdSMSession();if(!session||session.status!=='active')return false;
  const prev=session.draft&&typeof session.draft==='object'?session.draft:{},objectiveTarget=hdSMSaveObjectivePreference(session.map,target);
@@ -326,15 +338,16 @@ function hdSMHudHtml(session,draft){
  const current=String(draft?.node||'').trim();if(!current)return '';
  const graph=hdSMGraph(session?.map),rawKind=hdSMNodeKind(graph,current),intel=hdSMNodeIntel(session?.map,{label:current,kind:rawKind}),kind=intel.kind,guard=hdSMAdvanceGuard(session,draft),branch=hdSMBranchHint(session?.map,draft);
  const state=guard.retreat?'stop':guard.confirmed?'ready':'warn',status=guard.retreat?'撤退':guard.skipped?'非戦闘':guard.confirmed?'大破確認済':'大破未確認',jump=guard.confirmed?'next':'guard';
- const objectiveTarget=hdSMSelectedObjective(session?.map,draft),next=guard.confirmed&&!guard.retreat?hdSMNextNodeRows(session?.map,draft):[],battleCount=hdSMBattleCount(session?.map,draft?.routeNodes||[]),bossDistance=hdSMBossDistance(session?.map,current,objectiveTarget),bossBattles=hdSMBossBattleDistance(session?.map,current,objectiveTarget);
+ const objectiveTarget=hdSMSelectedObjective(session?.map,draft),objectiveRoute=hdSMObjectiveRouteState(session?.map,draft),next=guard.confirmed&&!guard.retreat?hdSMNextNodeRows(session?.map,draft):[],battleCount=hdSMBattleCount(session?.map,draft?.routeNodes||[]),bossDistance=hdSMBossDistance(session?.map,current,objectiveTarget),bossBattles=hdSMBossBattleDistance(session?.map,current,objectiveTarget);
  const nextHtml=next.length?'<div class="hd-sm-hud-next"><span>NEXT</span><div>'+next.slice(0,3).map(x=>{const ni=hdSMNodeIntel(session?.map,x),reachable=hdSMCanReachBoss(session?.map,x.label,objectiveTarget),targetName=hdSMRouteTargetName(session?.map,objectiveTarget);return '<button type="button" class="'+(reachable===false?'route-off':reachable===true?'route-on':'')+'" data-hd-sm-hud-node="'+hdSMEsc(x.label)+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(ni.kind))+'・'+hdSMEsc(ni.formation)+'</small><em>'+(reachable===true?targetName+'接続':reachable===false?'逸れ候補':'経路不明')+'</em></button>'}).join('')+'</div>'+(next.length>3?'<em>+'+(next.length-3)+'</em>':'')+'</div>':'';
  const branchHtml=current&&branch?'<div class="hd-sm-hud-branch"><span>ROUTE</span><b>'+hdSMEsc(branch.title)+'</b><small>'+hdSMEsc(branch.text)+'</small></div>':'';
  const targetName=hdSMRouteTargetName(session?.map,objectiveTarget);
  const progressHtml='<div class="hd-sm-hud-progress"><span>戦闘 <b>'+battleCount+'</b></span><span>'+(bossDistance===0?targetName+'到達':bossDistance==null?targetName+'距離 —':'構造図最短 '+targetName+'まで <b>'+bossDistance+'マス</b>')+'</span><span>'+(bossBattles==null?'最少戦闘 —':bossBattles===0?'最少戦闘あと 0':'最少戦闘あと <b>'+bossBattles+'</b>')+'</span></div>';
- return '<div class="hd-sm-hud '+state+'"><div class="hd-sm-hud-node"><span>NOW</span><b>'+hdSMEsc(current)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(kind))+'</small></div><div class="hd-sm-hud-main"><span>基本陣形 <b>'+hdSMEsc(intel.formation)+'</b></span><strong>'+hdSMEsc(status)+'</strong></div><button type="button" class="ghost small" data-hd-sm-hud-jump="'+jump+'">'+(guard.confirmed?'詳細':'確認する')+'</button>'+progressHtml+branchHtml+nextHtml+'</div>';
+ const objectiveAlertHtml=objectiveRoute.active?'<div class="hd-sm-hud-objective-alert"><span>ROUTE ALERT</span><b>'+hdSMEsc(objectiveRoute.targetName)+'へ接続なし</b><button type="button" class="ghost small" data-hd-sm-hud-jump="objective">見直す</button></div>':'';
+ return '<div class="hd-sm-hud '+state+'"><div class="hd-sm-hud-node"><span>NOW</span><b>'+hdSMEsc(current)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(kind))+'</small></div><div class="hd-sm-hud-main"><span>基本陣形 <b>'+hdSMEsc(intel.formation)+'</b></span><strong>'+hdSMEsc(status)+'</strong></div><button type="button" class="ghost small" data-hd-sm-hud-jump="'+jump+'">'+(guard.confirmed?'詳細':'確認する')+'</button>'+progressHtml+objectiveAlertHtml+branchHtml+nextHtml+'</div>';
 }
 function hdSMHudJump(target){
- const selector=target==='next'?'.hd-sm-next-wrap':'.hd-sm-advance-guard',el=document.querySelector('#hdSortieMode '+selector);
+ const selector=target==='next'?'.hd-sm-next-wrap':target==='objective'?'.hd-sm-objective-warning':'.hd-sm-advance-guard',el=document.querySelector('#hdSortieMode '+selector);
  if(!el)return false;try{el.scrollIntoView({behavior:'smooth',block:'center'})}catch{el.scrollIntoView()}return true;
 }
 function hdSMBattleCount(map,route){
@@ -399,7 +412,7 @@ function hdSMNodePickerHtml(session,draft){
  if(!rows.length)return '';
  const nextTitle=current?'次に進める候補':'最初の進行候補';
  const nextHtml=next.length?'<div class="hd-sm-next-wrap '+(locked?'locked':'')+'"><div class="hd-sm-next-head"><b>'+nextTitle+'</b><small>'+(locked?'大破チェックを済ませると選べるよ。':'候補ごとに戦闘種別と、登録済みの敵・制空注意を表示するよ。')+'</small></div><div class="hd-sm-next-grid">'+next.map(function(x){return hdSMNextNodeButtonHtml(session?.map,x,locked,objectiveTarget)}).join('')+'</div></div>':'<div class="hd-sm-next-done">'+(current?'このマスから先の接続候補は登録されていないよ。':'開始地点の候補を取得できないよ。')+'</div>';
- return '<div class="hd-sm-panel hd-sm-node-panel"><div class="hd-sm-panel-head"><strong>現在マス</strong><span>普段は「次に進める候補」だけタップでOK</span></div>'+hdSMObjectivePickerHtml(session?.map,draft)+hdSMCurrentTacticHtml(session?.map,draft)+hdSMAdvanceGuardHtml(session,draft)+nextHtml+hdSMBranchHintHtml(session?.map,draft)+
+ return '<div class="hd-sm-panel hd-sm-node-panel"><div class="hd-sm-panel-head"><strong>現在マス</strong><span>普段は「次に進める候補」だけタップでOK</span></div>'+hdSMObjectivePickerHtml(session?.map,draft)+hdSMObjectiveRouteWarningHtml(session?.map,draft)+hdSMCurrentTacticHtml(session?.map,draft)+hdSMAdvanceGuardHtml(session,draft)+nextHtml+hdSMBranchHintHtml(session?.map,draft)+
   '<details class="hd-sm-all-nodes"><summary>'+(locked?'全マスから選ぶ（大破確認後）':'全マスから選ぶ')+'</summary><div class="hd-sm-node-grid">'+
   rows.map(function(x){const active=x.label===current,nodeLocked=!!(locked&&!active);return '<button type="button" class="hd-sm-node '+hdSMEsc(x.kind)+(active?' active':'')+(nodeLocked?' locked':'')+'" data-hd-sm-node="'+hdSMEsc(x.label)+'" aria-pressed="'+(active?'true':'false')+'"'+(nodeLocked?' disabled aria-disabled="true"':'')+'><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(x.kind))+'</small></button>'}).join('')+
   '</div></details>'+(route.length?'<div class="hd-sm-route-trail"><div><span>通過</span><b>'+route.map(hdSMEsc).join(' → ')+'</b></div><button type="button" class="ghost small" data-hd-sm-route-undo>1つ戻す</button></div>':'<div class="hd-sm-route-empty">次候補を押すと、ここに通過履歴を残すよ。</div>')+'</div>';
@@ -563,6 +576,8 @@ window.hdSMObjectivePrestartHtml=hdSMObjectivePrestartHtml;
 window.hdSMPrestartRoutePreviewHtml=hdSMPrestartRoutePreviewHtml;
 window.hdSMSelectedObjective=hdSMSelectedObjective;
 window.hdSMObjectivePickerHtml=hdSMObjectivePickerHtml;
+window.hdSMObjectiveRouteState=hdSMObjectiveRouteState;
+window.hdSMObjectiveRouteWarningHtml=hdSMObjectiveRouteWarningHtml;
 window.hdSMSetObjectiveTarget=hdSMSetObjectiveTarget;
 window.hdSMHudHtml=hdSMHudHtml;
 window.hdSMHudJump=hdSMHudJump;
