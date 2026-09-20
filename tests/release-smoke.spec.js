@@ -3338,3 +3338,46 @@ test('release smoke: sortie warns when selected objective is unreachable from cu
   expect(draft.advanceGuard.safe).toBe(true);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: route alert can mark route-deviation retreat', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMQuickRetreatReason === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-route-alert-retreat',
+      map:'7-2',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-route-alert-retreat-fleet',
+      fleetName:'ルート逸れ撤退テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-route-alert-retreat-fleet',name:'ルート逸れ撤退テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'C',routeNodes:['A','B','C'],result:'S',memo:'',objectiveTarget:'G2',advanceGuard:{node:'C',safe:true,at:Date.now()}}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const warning = page.locator('.hd-sm-objective-warning');
+  await expect(warning).toBeVisible();
+  await warning.locator('[data-hd-sm-retreat-reason="ルート逸れ"]').click();
+
+  await expect(page.locator('#hdSMResult')).toHaveValue('撤退');
+  await expect(page.locator('#hdSMRetreatReason')).toHaveValue('ルート逸れ');
+  const draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
+  expect(draft.result).toBe('撤退');
+  expect(draft.retreatReason).toBe('ルート逸れ');
+  expect(draft.objectiveTarget).toBe('G2');
+  expect(draft.node).toBe('C');
+  expect(errors).toEqual([]);
+});
