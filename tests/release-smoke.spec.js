@@ -2604,3 +2604,52 @@ test('release smoke: sticky sortie HUD shows battle progress and boss distance',
   await expect(progress).toContainText('構造図最短 ボスまで');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie skips damage confirmation on verified non-battle nodes', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMRequiresAdvanceCheck === 'function'
+  );
+
+  const checks = await page.evaluate(() => ({
+    itemA: window.hdSMRequiresAdvanceCheck('2-4','A'),
+    battleB: window.hdSMRequiresAdvanceCheck('2-4','B')
+  }));
+  expect(checks.itemA).toBe(false);
+  expect(checks.battleB).toBe(true);
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-nonbattle-guard-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-nonbattle-guard-fleet',
+      fleetName:'非戦闘確認テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-nonbattle-guard-fleet',name:'非戦闘確認テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active'
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  await page.locator('[data-hd-sm-next-node="A"]').click();
+  await expect(page.locator('.hd-sm-hud')).toContainText('非戦闘');
+  await expect(page.locator('.hd-sm-advance-guard')).toHaveCount(0);
+  await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeEnabled();
+  await expect(page.locator('[data-hd-sm-next-node="D"]')).toBeEnabled();
+
+  await page.locator('[data-hd-sm-next-node="C"]').click();
+  await expect(page.locator('.hd-sm-hud')).toContainText('大破未確認');
+  await expect(page.locator('.hd-sm-advance-guard')).toBeVisible();
+  await expect(page.locator('[data-hd-sm-next-node="F"]')).toBeDisabled();
+  await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeDisabled();
+  expect(errors).toEqual([]);
+});
