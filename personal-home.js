@@ -104,6 +104,33 @@ function hdPHResourceAgeLabel(at){
  if(age<86400000)return Math.floor(age/3600000)+'時間前';
  return Math.floor(age/86400000)+'日前';
 }
+function hdPHFleetSummary(){
+ let rows=[];try{
+  const raw=typeof hdKcCurrentFleets==='function'?hdKcCurrentFleets():JSON.parse(localStorage.getItem('harbordesk-kancolle-fleets-v1')||'[]');
+  rows=Array.isArray(raw)?raw:[];
+ }catch{}
+ const now=Date.now();
+ return rows.slice().sort((a,b)=>Number(a?.deckId||0)-Number(b?.deckId||0)).slice(0,4).map(deck=>{
+  const ships=Array.isArray(deck?.ships)?deck.ships:[],flag=ships[0]||{},mission=Array.isArray(deck?.mission)?deck.mission:[];
+  const stateCode=Number(mission[0])||0,missionId=Number(mission[1])||0,endsAt=Number(mission[2])||0;
+  const onMission=stateCode>0&&missionId>0;
+  let status='待機',detail=ships.length?ships.length+'隻':'編成なし';
+  if(onMission){
+   const name=typeof hdKcExpeditionName==='function'?hdKcExpeditionName(missionId):('遠征 '+missionId);
+   status=endsAt>now?'遠征中':'帰投確認';
+   detail=name+(endsAt>now?'・'+hdPHCountdownText(endsAt,now):'');
+  }
+  return {deckId:Number(deck?.deckId)||0,name:String(deck?.name||('第'+(Number(deck?.deckId)||'?')+'艦隊')),shipCount:ships.length,flagship:String(flag?.name||''),flagshipLevel:Math.max(0,Number(flag?.level)||0),status,detail,onMission,endsAt,syncedAt:Math.max(0,Number(deck?.syncedAt)||0)};
+ });
+}
+function hdPHOpenGameFleets(){
+ try{if(typeof hdKcEnsureImport==='function')hdKcEnsureImport()}catch{}
+ if(typeof hdQNRecordRecent==='function')hdQNRecordRecent('kancolleImport');
+ if(typeof hdWSShowElement==='function')hdWSShowElement('kancolleImport',true);
+ else document.getElementById('kancolleImport')?.scrollIntoView({behavior:'smooth',block:'start'});
+ setTimeout(()=>document.getElementById('hdKcCurrentFleets')?.scrollIntoView({behavior:'smooth',block:'start'}),100);
+ return true;
+}
 function hdPHShortcutRows(){
  const pins=typeof hdQNLoadPins==='function'?hdQNLoadPins():(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-quick-nav-pins-v1')||'[]')}catch{return []}})();
  const recent=typeof hdQNLoadRecent==='function'?hdQNLoadRecent():(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-quick-nav-recent-v1')||'[]')}catch{return []}})();
