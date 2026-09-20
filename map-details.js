@@ -57,6 +57,22 @@ window.hdMapLevelGuide=hdMapLevelGuide;
 
 function detailBlock(label,value){return `<div class="map-detail-row"><div class="map-detail-label">${label}</div><div class="map-detail-value">${esc(value??'')}</div></div>`}
 
+function hdMapFallbackToolsHtml(){
+ if(typeof window.hdCoreMapToolsHtml==='function')return window.hdCoreMapToolsHtml();
+ return `<section class="hd-core-map-tools" data-hd-core-map-tools>
+  <div class="hd-core-map-tools-head"><div><span class="eyebrow">攻略ツール</span><strong>この海域で使える機能</strong></div><small>基本入口</small></div>
+  <div class="hd-core-map-tools-grid">
+   <button type="button" data-hd-core-map-action="map">マップ詳細</button>
+   <button type="button" data-hd-core-map-action="fleet">編成</button>
+   <button type="button" data-hd-core-map-action="suggest">編成候補</button>
+   <button type="button" data-hd-core-map-action="prep">出撃準備</button>
+   <button type="button" data-hd-core-map-action="gear">装備・計算</button>
+   <button type="button" data-hd-core-map-action="drop">ドロップ</button>
+   <button type="button" data-hd-core-map-action="mine">自分用</button>
+  </div>
+ </section>`;
+}
+
 renderMapPicker=function(){
  const world=document.getElementById('worldPicker'), maps=document.getElementById('mapPicker'), card=document.getElementById('selectedMapCard');
  if(!world||!maps||!card)return;
@@ -68,7 +84,7 @@ renderMapPicker=function(){
  const fleet=d.fleet||d.formation||'';
  const note=d.note||d.caution||'';
  const updated=d.updated||d.sourceDate||'参照日未設定';
- card.innerHTML=`<article class="guide-card selected map-detail-card"><div class="guide-card-top"><div><span class="guide-tag">${selectedMap}</span><h3>${esc(d.name||selectedMap)}</h3><div class="muted">アプリ内攻略要点・参照 ${esc(updated)}</div></div></div><p class="map-overview">${esc(d.overview||'')}</p><div class="map-detail-grid">${detailBlock('推奨練度',(()=>{const lv=hdMapLevelGuide(selectedMap);return lv.recommended+' / 最低目安 '+lv.min+'。'+lv.note})())}${detailBlock('おすすめ編成',fleet)}${detailBlock('ルート',d.route)}${detailBlock('制空・装備',d.air)}${detailBlock('注意点',note)}</div><div class="map-source-note">※推奨練度はHarborDeskの攻略目安。艦種・改造・近代化改修・装備・ルート条件によって必要Lvは変わります。攻略条件はアップデートで変化する場合があります。</div><a class="guide-link" href="${wikiMapUrl(selectedMap)}" target="_blank" rel="noopener">元Wikiで最新情報を確認 ↗</a></article>`;
+ card.innerHTML=`<article class="guide-card selected map-detail-card"><div class="guide-card-top"><div><span class="guide-tag">${selectedMap}</span><h3>${esc(d.name||selectedMap)}</h3><div class="muted">アプリ内攻略要点・参照 ${esc(updated)}</div></div></div><p class="map-overview">${esc(d.overview||'')}</p>${hdMapFallbackToolsHtml()}<div class="map-detail-grid">${detailBlock('推奨練度',(()=>{const lv=hdMapLevelGuide(selectedMap);return lv.recommended+' / 最低目安 '+lv.min+'。'+lv.note})())}${detailBlock('おすすめ編成',fleet)}${detailBlock('ルート',d.route)}${detailBlock('制空・装備',d.air)}${detailBlock('注意点',note)}</div><div class="map-source-note">※推奨練度はHarborDeskの攻略目安。艦種・改造・近代化改修・装備・ルート条件によって必要Lvは変わります。攻略条件はアップデートで変化する場合があります。</div><a class="guide-link" href="${wikiMapUrl(selectedMap)}" target="_blank" rel="noopener">元Wikiで最新情報を確認 ↗</a></article>`;
 };
 
 renderGuide();
