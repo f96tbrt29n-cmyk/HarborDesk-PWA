@@ -3094,8 +3094,9 @@ test('release smoke: sortie analytics separates multi-target objectives', async 
   await expect(g1).toHaveCount(1);
   await expect(g2).toHaveCount(1);
   await expect(old).toHaveCount(1);
-  await expect(g1).toContainText('ボス到達 0%');
-  await expect(g2).toContainText('ボス到達 100%');
+  await expect(g1).toContainText('目標到達 100%');
+  await expect(g2).toContainText('目標到達 100%');
+  await expect(old).toContainText('ボス到達 0%');
   await expect(old).toContainText('撤退 100%');
 
   await page.evaluate(() => {
