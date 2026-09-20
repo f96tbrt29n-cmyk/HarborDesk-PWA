@@ -204,6 +204,25 @@ function hdQNEnsureMobileDock(){
  dock.innerHTML='<button type="button" class="hd-mobile-back" data-hd-mobile-back aria-label="ひとつ前の機能へ戻る">‹</button><button type="button" class="hd-mobile-location" data-hd-mobile-location><span data-hd-mobile-location-group>ホーム</span><b data-hd-mobile-location-section>今日の司令部</b><i>›</i></button><button type="button" data-hd-mobile-home><span>⌂</span><b>ホーム</b><em data-hd-mobile-home-badge hidden>0</em></button><button type="button" data-hd-mobile-search><span>⌕</span><b>検索</b></button><button type="button" data-hd-mobile-sync><span>↻</span><b>同期</b><i aria-hidden="true"></i></button><button type="button" data-hd-mobile-menu><span>☰</span><b>機能</b></button>';
  document.body.appendChild(dock);hdQNEnsureAttentionDialog();hdQNUpdateMobileDock();
 }
+function hdQNResourceThresholdAlert(){
+ try{
+  const thresholds=JSON.parse(localStorage.getItem('harbordesk-resource-thresholds-v1')||'{}')||{};
+  const appState=typeof window.hdGetAppState==='function'?window.hdGetAppState():{};
+  const resources=appState?.resources||{};
+  let materials={};try{materials=JSON.parse(localStorage.getItem('harbordesk-kancolle-materials-v1')||'{}')||{}}catch{}
+  const defs=[
+   ['fuel','燃料',resources.fuel],
+   ['ammo','弾薬',resources.ammo],
+   ['steel','鋼材',resources.steel],
+   ['bauxite','ボーキ',resources.bauxite],
+   ['bucket','バケツ',materials.bucket]
+  ];
+  const low=defs.map(([key,label,value])=>({key,label,value:Number(value),threshold:Math.max(0,Number(thresholds[key])||0)}))
+   .filter(x=>x.threshold>0&&Number.isFinite(x.value)&&x.value<x.threshold);
+  if(!low.length)return null;
+  return {id:'resources',priority:70,tone:'urgent',reason:'資源最低ライン',icon:'!',title:`資源が最低ライン未満 ${low.length}件`,detail:low.slice(0,2).map(x=>`${x.label} ${Math.max(0,x.value).toLocaleString('ja-JP')} / ${x.threshold.toLocaleString('ja-JP')}`).join(' ・ ')};
+ }catch{return null}
+}
 function hdQNMobileAttentionItems(){
  const items=[],now=Date.now(),RECENT_DONE=2*60*60*1000;
  try{
@@ -222,6 +241,7 @@ function hdQNMobileAttentionItems(){
   const todo=quests.filter(x=>!x.done);
   if(todo.length)items.push({id:'quests',priority:20,tone:'normal',reason:'未完了任務',icon:'✓',title:`未完了任務 ${todo.length}件`,detail:String(todo[0]?.name||'任務一覧を確認')});
  }catch{}
+ const resourceAlert=hdQNResourceThresholdAlert();if(resourceAlert)items.push(resourceAlert);
  try{
   const info=typeof hdWSSyncInfo==='function'?hdWSSyncInfo():{state:'missing',label:'未同期'};
   if(info.state&&info.state!=='fresh'){
@@ -375,9 +395,10 @@ window.addEventListener('load',()=>setTimeout(()=>{const id=window.hdWSState?.se
 window.addEventListener('hd:workspace-changed',()=>{hdQNUpdateMobileDock();if(document.getElementById('hdQuickNavDialog')?.open){hdQNRenderCategories();hdQNRenderContext()}});
 window.addEventListener('hd:kancolle-sync',hdQNUpdateMobileDock);
 window.addEventListener('hd:kancolle-return-ready',hdQNUpdateMobileDock);
-window.addEventListener('storage',e=>{if(!e||e.key==='harbordesk-kancolle-sync-v1')hdQNUpdateMobileDock()});
+window.addEventListener('storage',e=>{if(!e||e.key==='harbordesk-kancolle-sync-v1'||e.key==='harbordesk-resource-thresholds-v1')hdQNUpdateMobileDock()});
 
 window.addEventListener('hd:state-changed',hdQNUpdateMobileDock);
+window.addEventListener('hd:resource-thresholds',hdQNUpdateMobileDock);
 window.addEventListener('hd:quest-changed',hdQNUpdateMobileDock);
 window.addEventListener('hd:timer-changed',hdQNUpdateMobileDock);
 setInterval(hdQNUpdateMobileDock,60000);
