@@ -3481,6 +3481,8 @@ test('release smoke: sortie highlights minimum-battle next route', async ({ page
   const g = page.locator('[data-hd-sm-next-node="G"]');
   await expect(f).toHaveClass(/best-route/);
   await expect(f).toContainText('最少戦闘候補');
+  await expect(f).toContainText('残り 3戦 / 3マス');
+  await expect(g).toContainText('残り 4戦 / 4マス');
   await expect(g).not.toHaveClass(/best-route/);
   await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="F"]')).toHaveClass(/best-route/);
   await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="F"]')).toContainText('最少戦闘');
