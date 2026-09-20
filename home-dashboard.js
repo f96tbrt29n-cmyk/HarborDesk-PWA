@@ -93,6 +93,20 @@ function homePinnedFunctionRows(){
  const titleMap=homeFunctionTitleMap();
  return pins.filter(id=>id&&id!=='home'&&titleMap.has(id)).slice(0,6).map(id=>({id,title:titleMap.get(id)}));
 }
+function homeResumeLocation(){
+ try{
+  const rows=typeof hdWSHistoryLoad==='function'?hdWSHistoryLoad():JSON.parse(sessionStorage.getItem('harbordesk-session-workspace-history-v1')||'[]');
+  if(!Array.isArray(rows)||!rows.length)return null;
+  for(let i=rows.length-1;i>=0;i--){
+   const row=rows[i],id=String(row?.section||'');if(!id||id==='home')continue;
+   const el=document.getElementById(id);if(!el)continue;
+   const title=typeof hdWSTitle==='function'?hdWSTitle(el):(el.querySelector('h2,h3')?.textContent?.trim()||id);
+   const groups={guide:'攻略',fleet:'艦隊',quest:'任務',expedition:'遠征',arsenal:'工廠',records:'記録',settings:'設定',home:'ホーム'};
+   return {id,group:String(row?.group||''),groupLabel:groups[String(row?.group||'')]||'前の画面',title};
+  }
+ }catch{}
+ return null;
+}
 function homeRecentFunctionRows(exclude=new Set()){
  let recent=[];try{recent=JSON.parse(localStorage.getItem('harbordesk-quick-nav-recent-v1')||'[]')||[]}catch{}
  const titleMap=homeFunctionTitleMap();
@@ -206,6 +220,7 @@ function ensureHomeDashboard(){
   <div class="section-head"><div><div class="eyebrow">HOME</div><h2>今日の司令部</h2></div><div class="home-head-actions"><span class="muted" id="homeUpdated"></span><button type="button" class="ghost small" data-home-edit-toggle aria-pressed="false">ホーム編集</button><button type="button" class="ghost small" data-home-order-reset hidden>配置を戻す</button></div></div>
   <article id="homeGameSync" class="home-sync-card"></article>
   <article id="homeInstallTip" class="home-install-tip" hidden><div><span>iPhoneでさらに使いやすく</span><strong>HarborDeskをホーム画面に追加</strong><small>Safariの共有ボタン →「ホーム画面に追加」で、アプリみたいにすぐ開けるよ。</small></div><button type="button" class="ghost small" data-home-install-dismiss>閉じる</button></article>
+  <article id="homeResume" class="home-resume-card" hidden></article>
   <article id="homeNextAction" class="home-next-action"></article>
   <div id="homeSummary" class="home-summary"></div>
   <div class="home-grid">
@@ -238,6 +253,11 @@ function renderHomeDashboard(){
  try{eventCount=JSON.parse(localStorage.getItem('harbordesk-events-v1')||'[]').length}catch{}
  document.getElementById('homeUpdated').textContent=new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
  const installTip=document.getElementById('homeInstallTip');if(installTip)installTip.hidden=!homeShowInstallTip();
+ const resumeHost=document.getElementById('homeResume'),resume=homeResumeLocation();
+ if(resumeHost){
+  resumeHost.hidden=!resume;
+  resumeHost.innerHTML=resume?`<button type="button" data-home-resume><span>続きから</span><strong>${homeEsc(resume.title)}</strong><small>${homeEsc(resume.groupLabel)}へ戻る</small><i>›</i></button>`:'';
+ }
  const syncInfo=homeSyncInfo(),sync=syncInfo.sync;
  const syncHost=document.getElementById('homeGameSync');
  if(syncHost){
@@ -327,6 +347,11 @@ function renderHomeDashboard(){
 }
 
 document.addEventListener('click',e=>{
+ const resume=e.target.closest('[data-home-resume]');if(resume){
+  if(typeof hdWSGoBack==='function'&&hdWSGoBack())return;
+  const row=homeResumeLocation();if(row&&typeof hdWSShowElement==='function')hdWSShowElement(row.id,true);
+  return;
+ }
  const fleetTab=e.target.closest('[data-home-fleet-tab]');if(fleetTab){homeCurrentFleetSave(fleetTab.dataset.homeFleetTab);renderHomeDashboard();return}
  const fleetGear=e.target.closest('[data-home-fleet-gear-toggle]');if(fleetGear){homeCurrentFleetGearSave(!homeCurrentFleetGearVisible());renderHomeDashboard();return}
  const sortieFix=e.target.closest('[data-home-sortie-fix]');if(sortieFix){homeOpenSortieFix(sortieFix.dataset.homeSortieFix);return}
