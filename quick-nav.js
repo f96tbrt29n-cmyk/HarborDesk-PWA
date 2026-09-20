@@ -223,13 +223,58 @@ function hdQNResourceThresholdAlert(){
   return {id:'resources',priority:70,tone:'urgent',reason:'資源最低ライン',icon:'!',title:`資源が最低ライン未満 ${low.length}件`,detail:low.slice(0,2).map(x=>`${x.label} ${Math.max(0,x.value).toLocaleString('ja-JP')} / ${x.threshold.toLocaleString('ja-JP')}`).join(' ・ ')};
  }catch{return null}
 }
+const HD_QN_BACKUP_CONTENT_KEYS=[
+ 'harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-sortie-log-v1','harbordesk-drop-hunts-v1',
+ 'harbordesk-activity-log-v1','harbordesk-quest-progress-v1','harbordesk-event-operations-v1','harbordesk-ship-profiles-v1',
+ 'harbordesk-equipment-variants-v1','harbordesk-resource-goals-v1','harbordesk-resource-history-v1','harbordesk-custom-fleets-v1',
+ 'harbordesk-training-plans-v1','harbordesk-exercise-routine-v1','harbordesk-equipment-procurement-v1',
+ 'harbordesk-equipment-procurement-history-v1','harbordesk-material-stock-v1','harbordesk-material-goals-v1',
+ 'harbordesk-sortie-selection-v1','harbordesk-sortie-readiness-v1'
+];
+function hdQNBackupValueHasContent(value,depth=0){
+ if(depth>5||value==null)return false;
+ if(Array.isArray(value))return value.some(x=>hdQNBackupValueHasContent(x,depth+1));
+ if(typeof value==='object')return Object.values(value).some(x=>hdQNBackupValueHasContent(x,depth+1));
+ if(typeof value==='string')return value.trim().length>0;
+ if(typeof value==='number')return Number.isFinite(value)&&value!==0;
+ if(typeof value==='boolean')return value;
+ return false;
+}
+function hdQNHasMeaningfulBackupData(){
+ const sources=[];
+ try{
+  const appState=typeof window.hdGetAppState==='function'?window.hdGetAppState():null;
+  if(appState){
+   const hasCore=(Array.isArray(appState.expeditions)&&appState.expeditions.length>0)||(Array.isArray(appState.docks)&&appState.docks.length>0)||(Array.isArray(appState.quests)&&appState.quests.length>0);
+   const resources=appState.resources||{},hasResources=['fuel','ammo','steel','bauxite'].some(k=>String(resources[k]??'').trim()!=='')||Math.max(0,Number(resources.savedAt)||0)>0;
+   if(hasCore||hasResources)sources.push('基本データ');
+  }else{
+   try{
+    const raw=JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'null');
+    if(raw){
+     const hasCore=(Array.isArray(raw.expeditions)&&raw.expeditions.length>0)||(Array.isArray(raw.docks)&&raw.docks.length>0)||(Array.isArray(raw.quests)&&raw.quests.length>0);
+     const resources=raw.resources||{},hasResources=['fuel','ammo','steel','bauxite'].some(k=>String(resources[k]??'').trim()!=='')||Math.max(0,Number(resources.savedAt)||0)>0;
+     if(hasCore||hasResources)sources.push('基本データ');
+    }
+   }catch{}
+  }
+ }catch{}
+ for(const key of HD_QN_BACKUP_CONTENT_KEYS){
+  const raw=localStorage.getItem(key);if(raw==null||raw==='')continue;
+  let value=raw;try{value=JSON.parse(raw)}catch{}
+  if(hdQNBackupValueHasContent(value)){sources.push(key);break}
+ }
+ return {hasData:sources.length>0,sources};
+}
 function hdQNBackupAttention(now=Date.now()){
  try{
   const backupAt=Math.max(0,Number(localStorage.getItem('harbordesk-last-external-backup-v1'))||0);
   let syncAt=0;try{syncAt=Math.max(0,Number(JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')?.syncedAt)||0)}catch{}
   if(!backupAt){
-   if(!syncAt)return null;
-   return {id:'backup',priority:60,tone:'sync',reason:'外部バックアップ未作成',icon:'⇩',title:'同期後のバックアップ未作成',detail:'艦これ同期データをJSONで保存しておこう',action:'backup-now',actionLabel:'今すぐ保存'};
+   const localData=hdQNHasMeaningfulBackupData();
+   if(!syncAt&&!localData.hasData)return null;
+   if(syncAt)return {id:'backup',priority:60,tone:'sync',reason:'外部バックアップ未作成',icon:'⇩',title:'同期後のバックアップ未作成',detail:'艦これ同期データをJSONで保存しておこう',action:'backup-now',actionLabel:'今すぐ保存'};
+   return {id:'backup',priority:50,tone:'sync',reason:'外部バックアップ未作成',icon:'⇩',title:'外部バックアップ未作成',detail:'HarborDeskに保存したデータをJSONで退避しておこう',action:'backup-now',actionLabel:'今すぐ保存'};
   }
   if(syncAt>backupAt)return {id:'backup',priority:60,tone:'sync',reason:'同期後バックアップ未保存',icon:'⇩',title:'同期後のバックアップ未保存',detail:'最新の同期内容をJSONへ書き出しておこう',action:'backup-now',actionLabel:'今すぐ保存'};
   const days=Math.max(0,Math.floor((Number(now)-backupAt)/86400000));
