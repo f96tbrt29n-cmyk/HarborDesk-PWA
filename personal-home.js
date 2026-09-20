@@ -4,9 +4,42 @@ const HD_PH_STORE='snapshots';
 const HD_PH_MAX_SNAPSHOTS=3;
 const HD_PH_COLLAPSE_KEY='harbordesk-home-collapse-v1';
 const HD_PH_ORDER_KEY='harbordesk-home-order-v1';
+const HD_PH_COMPACT_KEY='harbordesk-home-compact-v1';
 
 function hdPHCollapseLoad(){try{const x=JSON.parse(localStorage.getItem(HD_PH_COLLAPSE_KEY)||'{}');return x&&typeof x==='object'?x:{}}catch{return {}}}
 function hdPHCollapseSave(v){try{localStorage.setItem(HD_PH_COLLAPSE_KEY,JSON.stringify(v||{}))}catch{}}
+function hdPHCompactLoad(){try{const x=JSON.parse(localStorage.getItem(HD_PH_COMPACT_KEY)||'null');return x&&typeof x==='object'?x:{enabled:false,previous:null}}catch{return {enabled:false,previous:null}}}
+function hdPHCompactSave(v){try{localStorage.setItem(HD_PH_COMPACT_KEY,JSON.stringify(v||{enabled:false,previous:null}))}catch{}}
+function hdPHCompactState(){
+ const coverage=hdPHSyncCoverage(),attention=hdPHAttentionItems(9),next=hdPHNextTimers(3),fleets=hdPHFleetSummary(),condition=hdPHFleetCondition();
+ return {
+  coverage:!!coverage.complete,
+  attention:attention.length===0,
+  next:next.length===0,
+  resources:false,
+  fleets:fleets.length===0||fleets.every(x=>!x.onMission),
+  condition:!!condition.ready,
+  usual:true,
+  favorites:true,
+  recent:true,
+  snapshots:true
+ };
+}
+function hdPHSetCompact(enabled){
+ const meta=hdPHCompactLoad();
+ if(enabled){
+  if(!meta.enabled)meta.previous=hdPHCollapseLoad();
+  meta.enabled=true;hdPHCompactSave(meta);hdPHCollapseSave(hdPHCompactState());
+  window.hdToast?.('ホームをコンパクト表示にしたよ','info',1100);
+ }else{
+  const previous=meta.previous&&typeof meta.previous==='object'?meta.previous:{};
+  hdPHCollapseSave(previous);hdPHCompactSave({enabled:false,previous:null});
+  window.hdToast?.('ホームを通常表示に戻したよ','info',1100);
+ }
+ hdPHApplyCollapsed();return !!enabled;
+}
+function hdPHToggleCompact(){return hdPHSetCompact(!hdPHCompactLoad().enabled)}
+
 function hdPHCollapseSpecs(){return [
  {key:'coverage',selector:'.hd-ph-coverage-block'},
  {key:'attention',selector:'.hd-ph-attention-block'},
@@ -83,7 +116,12 @@ function hdPHApplyCollapsed(){
   let btn=actions.querySelector('[data-ph-collapse]');if(!btn){btn=document.createElement('button');btn.type='button';btn.className='ghost small hd-ph-collapse-toggle';btn.dataset.phCollapse=spec.key;actions.appendChild(btn)}
   const collapsed=!!state[spec.key];block.classList.toggle('hd-ph-collapsed',collapsed);btn.textContent=collapsed?'開く':'閉じる';btn.setAttribute('aria-expanded',collapsed?'false':'true');btn.setAttribute('aria-label',(head.querySelector('strong')?.textContent?.trim()||'カード')+(collapsed?'を開く':'を閉じる'));
  }
- const top=host.querySelector(':scope > .section-head');if(top&&!top.querySelector('[data-ph-expand-all]')){const b=document.createElement('button');b.type='button';b.className='ghost small hd-ph-expand-all';b.dataset.phExpandAll='1';b.textContent='すべて開く';top.appendChild(b)}
+ const top=host.querySelector(':scope > .section-head');
+ if(top&&!top.querySelector('[data-ph-expand-all]')){const b=document.createElement('button');b.type='button';b.className='ghost small hd-ph-expand-all';b.dataset.phExpandAll='1';b.textContent='すべて開く';top.appendChild(b)}
+ if(top&&!top.querySelector('[data-ph-compact]')){const b=document.createElement('button');b.type='button';b.className='ghost small hd-ph-compact-toggle';b.dataset.phCompact='1';top.appendChild(b)}
+ const compactBtn=top?.querySelector('[data-ph-compact]'),compact=hdPHCompactLoad().enabled;
+ if(compactBtn){compactBtn.textContent=compact?'通常表示':'コンパクト';compactBtn.setAttribute('aria-pressed',compact?'true':'false')}
+ host.classList.toggle('hd-ph-compact-mode',compact);
  hdPHApplyOrder();
 }
 function hdPHEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -286,7 +324,7 @@ function hdPHEnsure(){if(document.getElementById('personalHomeCenter')){hdPHRend
 async function hdPHAutoSnapshot(){const rows=await hdPHGetSnapshots();if(!rows.length||Date.now()-rows[0].at>20*3600000)await hdPHCreateSnapshot('自動（日次）')}
 function hdPHInstallBackupHooks(){if(window.__hdPHBackupHooks)return;window.__hdPHBackupHooks=true;const oldExport=window.exportBackup;if(typeof oldExport==='function'){window.exportBackup=function(){oldExport();localStorage.setItem(HD_PH_LAST_EXPORT_KEY,String(Date.now()));hdPHRender()};const b=document.getElementById('exportBackup');if(b)b.onclick=window.exportBackup}const oldImport=window.importBackup;if(typeof oldImport==='function'){window.importBackup=async function(file){await hdPHCreateSnapshot('外部復元直前');return oldImport(file)};const input=document.getElementById('importBackup');if(input)input.onchange=e=>{const f=e.target.files?.[0];if(f)window.importBackup(f)}}}
 
-document.addEventListener('click',e=>{const up=e.target.closest?.('[data-ph-order-up]');if(up){hdPHMoveOrder(up.dataset.phOrderUp,-1);return}const down=e.target.closest?.('[data-ph-order-down]');if(down){hdPHMoveOrder(down.dataset.phOrderDown,1);return}if(e.target.closest?.('[data-ph-reset-order]')){hdPHResetOrder();return}const collapse=e.target.closest?.('[data-ph-collapse]');if(collapse){hdPHToggleCollapsed(collapse.dataset.phCollapse);return}if(e.target.closest?.('[data-ph-expand-all]')){hdPHExpandAll();return}const jump=e.target.closest?.('[data-ph-jump]');if(jump){if(typeof hdQNJump==='function')hdQNJump(jump.dataset.phJump);else document.getElementById(jump.dataset.phJump)?.scrollIntoView({behavior:'smooth',block:'start'});return}if(e.target.closest?.('[data-ph-open-nav]')){if(typeof hdQNOpen==='function')hdQNOpen();return}if(e.target.closest?.('[data-ph-clear-usage]')){hdPHClearUsage();return}if(e.target.closest?.('[data-ph-sync]')){hdPHOpenSync();return}const attentionItem=e.target.closest?.('[data-ph-attention]');if(attentionItem){hdPHOpenAttentionItem(attentionItem.dataset.phAttention);return}if(e.target.closest?.('[data-ph-attention-all]')){hdPHOpenAllAttention();return}if(e.target.closest?.('[data-ph-fleets]')){hdPHOpenGameFleets();return}if(e.target.closest?.('[data-ph-snapshot]')){hdPHCreateSnapshot('手動');return}if(e.target.closest?.('[data-ph-export]')){if(typeof window.exportBackup==='function')window.exportBackup();return}const restore=e.target.closest?.('[data-ph-restore]');if(restore){hdPHRestoreSnapshot(restore.dataset.phRestore);return}const del=e.target.closest?.('[data-ph-snap-delete]');if(del&&confirm('この端末内スナップショットを削除する？')){hdPHDeleteSnapshot(del.dataset.phSnapDelete);return}});
+document.addEventListener('click',e=>{if(e.target.closest?.('[data-ph-compact]')){hdPHToggleCompact();return}const up=e.target.closest?.('[data-ph-order-up]');if(up){hdPHMoveOrder(up.dataset.phOrderUp,-1);return}const down=e.target.closest?.('[data-ph-order-down]');if(down){hdPHMoveOrder(down.dataset.phOrderDown,1);return}if(e.target.closest?.('[data-ph-reset-order]')){hdPHResetOrder();return}const collapse=e.target.closest?.('[data-ph-collapse]');if(collapse){hdPHToggleCollapsed(collapse.dataset.phCollapse);return}if(e.target.closest?.('[data-ph-expand-all]')){hdPHExpandAll();return}const jump=e.target.closest?.('[data-ph-jump]');if(jump){if(typeof hdQNJump==='function')hdQNJump(jump.dataset.phJump);else document.getElementById(jump.dataset.phJump)?.scrollIntoView({behavior:'smooth',block:'start'});return}if(e.target.closest?.('[data-ph-open-nav]')){if(typeof hdQNOpen==='function')hdQNOpen();return}if(e.target.closest?.('[data-ph-clear-usage]')){hdPHClearUsage();return}if(e.target.closest?.('[data-ph-sync]')){hdPHOpenSync();return}const attentionItem=e.target.closest?.('[data-ph-attention]');if(attentionItem){hdPHOpenAttentionItem(attentionItem.dataset.phAttention);return}if(e.target.closest?.('[data-ph-attention-all]')){hdPHOpenAllAttention();return}if(e.target.closest?.('[data-ph-fleets]')){hdPHOpenGameFleets();return}if(e.target.closest?.('[data-ph-snapshot]')){hdPHCreateSnapshot('手動');return}if(e.target.closest?.('[data-ph-export]')){if(typeof window.exportBackup==='function')window.exportBackup();return}const restore=e.target.closest?.('[data-ph-restore]');if(restore){hdPHRestoreSnapshot(restore.dataset.phRestore);return}const del=e.target.closest?.('[data-ph-snap-delete]');if(del&&confirm('この端末内スナップショットを削除する？')){hdPHDeleteSnapshot(del.dataset.phSnapDelete);return}});
 window.addEventListener('hd:quick-nav-updated',()=>hdPHRender());
 window.addEventListener('hd:kancolle-sync',()=>hdPHRender());
 window.addEventListener('hd:state-changed',()=>hdPHRender());
