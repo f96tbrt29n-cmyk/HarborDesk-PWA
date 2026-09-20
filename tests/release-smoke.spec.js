@@ -1978,3 +1978,54 @@ test('release smoke: sortie mode node picker records and rewinds route trail', a
   expect(stored?.boss).toBe(false);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie mode prioritizes graph-connected next nodes', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMEnsure === 'function' &&
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMNextNodeRows === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-next-node-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-next-node-fleet',
+      fleetName:'次マステスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-next-node-fleet',name:'次マステスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active'
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  await expect(page.locator('[data-hd-sm-next-node]')).toHaveCount(2);
+  await expect(page.locator('[data-hd-sm-next-node="A"]')).toBeVisible();
+  await expect(page.locator('[data-hd-sm-next-node="B"]')).toBeVisible();
+  await expect(page.locator('[data-hd-sm-node]')).toHaveCount(15);
+
+  await page.locator('[data-hd-sm-next-node="A"]').click();
+  await expect(page.locator('#hdSMNode')).toHaveValue('A');
+  await expect(page.locator('[data-hd-sm-next-node]')).toHaveCount(2);
+  await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeVisible();
+  await expect(page.locator('[data-hd-sm-next-node="D"]')).toBeVisible();
+
+  await page.locator('[data-hd-sm-next-node="D"]').click();
+  await expect(page.locator('#hdSMNode')).toHaveValue('D');
+  await expect(page.locator('[data-hd-sm-next-node]')).toHaveCount(1);
+  await expect(page.locator('[data-hd-sm-next-node="H"]')).toBeVisible();
+  await expect(page.locator('.hd-sm-route-trail')).toContainText('A → D');
+
+  const nextRows = await page.evaluate(() => window.hdSMNextNodeRows('2-4',{node:'D'}).map(x=>x.label));
+  expect(nextRows).toEqual(['H']);
+  expect(errors).toEqual([]);
+});

@@ -16,6 +16,13 @@ function hdSMNodeRows(map){
  return labels.sort((a,b)=>(Number(level[a]??999)-Number(level[b]??999))||String(a).localeCompare(String(b),undefined,{numeric:true}))
   .map(label=>({label,kind:hdSMNodeKind(graph,label)}));
 }
+function hdSMNextNodeRows(map,draft){
+ const graph=hdSMGraph(map);if(!graph||!Array.isArray(graph.edges))return [];
+ const current=String(draft?.node||'').trim();
+ const from=current?[current]:[...new Set(graph.edges.map(x=>x[0]).filter(x=>x==='S'||x==='S1'||x==='S2'))];
+ const labels=[...new Set(graph.edges.filter(([a])=>from.includes(a)).map(([,b])=>b))];
+ return labels.map(label=>({label,kind:hdSMNodeKind(graph,label)}));
+}
 function hdSMElapsed(ms){
  const total=Math.max(0,Math.floor((Number(ms)||0)/1000)),s=total%60,m=Math.floor(total/60)%60,h=Math.floor(total/3600);
  return h?h+'時間'+String(m).padStart(2,'0')+'分':m+'分'+String(s).padStart(2,'0')+'秒';
@@ -47,11 +54,14 @@ function hdSMDraft(session){
  return {result:String(d.result||'S'),node:String(d.node||''),battles:Math.max(0,Number(d.battles)||1),boss:!!d.boss,drop:String(d.drop||''),buckets:Math.max(0,Number(d.buckets)||0),fuel:Math.max(0,Number(d.fuel)||0),ammo:Math.max(0,Number(d.ammo)||0),steel:Math.max(0,Number(d.steel)||0),bauxite:Math.max(0,Number(d.bauxite)||0),memo:String(d.memo||''),updatedAt:Math.max(0,Number(d.updatedAt)||0),routeNodes:Array.isArray(d.routeNodes)?d.routeNodes.map(String).filter(Boolean).slice(-40):[]};
 }
 function hdSMNodePickerHtml(session,draft){
- const rows=hdSMNodeRows(session?.map),route=draft?.routeNodes||[],current=String(draft?.node||'');
+ const rows=hdSMNodeRows(session?.map),route=draft?.routeNodes||[],current=String(draft?.node||''),next=hdSMNextNodeRows(session?.map,draft);
  if(!rows.length)return '';
- return '<div class="hd-sm-panel hd-sm-node-panel"><div class="hd-sm-panel-head"><strong>現在マス</strong><span>マスをタップすると到達地点を更新</span></div><div class="hd-sm-node-grid">'+
+ const nextTitle=current?'次に進める候補':'最初の進行候補';
+ const nextHtml=next.length?'<div class="hd-sm-next-wrap"><div class="hd-sm-next-head"><b>'+nextTitle+'</b><small>海域構造上の接続候補。実際の分岐条件は攻略情報を優先。</small></div><div class="hd-sm-next-grid">'+next.map(function(x){return '<button type="button" class="hd-sm-next '+hdSMEsc(x.kind)+'" data-hd-sm-next-node="'+hdSMEsc(x.label)+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(x.kind))+'</small><i>次へ</i></button>'}).join('')+'</div></div>':'<div class="hd-sm-next-done">'+(current?'このマスから先の接続候補は登録されていないよ。':'開始地点の候補を取得できないよ。')+'</div>';
+ return '<div class="hd-sm-panel hd-sm-node-panel"><div class="hd-sm-panel-head"><strong>現在マス</strong><span>普段は「次に進める候補」だけタップでOK</span></div>'+nextHtml+
+  '<details class="hd-sm-all-nodes"><summary>全マスから選ぶ</summary><div class="hd-sm-node-grid">'+
   rows.map(function(x){const active=x.label===current;return '<button type="button" class="hd-sm-node '+hdSMEsc(x.kind)+(active?' active':'')+'" data-hd-sm-node="'+hdSMEsc(x.label)+'" aria-pressed="'+(active?'true':'false')+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(x.kind))+'</small></button>'}).join('')+
-  '</div>'+(route.length?'<div class="hd-sm-route-trail"><div><span>通過</span><b>'+route.map(hdSMEsc).join(' → ')+'</b></div><button type="button" class="ghost small" data-hd-sm-route-undo>1つ戻す</button></div>':'<div class="hd-sm-route-empty">通過したマスを押すと、ここに履歴を残すよ。</div>')+'</div>';
+  '</div></details>'+(route.length?'<div class="hd-sm-route-trail"><div><span>通過</span><b>'+route.map(hdSMEsc).join(' → ')+'</b></div><button type="button" class="ghost small" data-hd-sm-route-undo>1つ戻す</button></div>':'<div class="hd-sm-route-empty">次候補を押すと、ここに通過履歴を残すよ。</div>')+'</div>';
 }
 function hdSMResultOptions(current){
  return ['S','A','B','C','D','撤退'].map(function(v){return '<option'+(current===v?' selected':'')+'>'+v+'</option>'}).join('');
@@ -145,6 +155,7 @@ function hdSMInstall(){
 document.addEventListener('input',function(e){if(e.target?.closest?.('#hdSortieModeBody input, #hdSortieModeBody select'))hdSMScheduleDraft()});
 document.addEventListener('change',function(e){if(e.target?.closest?.('#hdSortieModeBody input, #hdSortieModeBody select'))hdSMScheduleDraft()});
 document.addEventListener('click',function(e){
+ const nextNode=e.target.closest?.('[data-hd-sm-next-node]');if(nextNode){hdSMSetNode(nextNode.dataset.hdSmNextNode);return}
  const node=e.target.closest?.('[data-hd-sm-node]');if(node){hdSMSetNode(node.dataset.hdSmNode);return}
  if(e.target.closest?.('[data-hd-sm-route-undo]')){hdSMUndoNode();return}
  if(e.target.closest?.('[data-hd-sm-start]')){const session=typeof window.hdSSStart==='function'?window.hdSSStart(hdSMMap()):null;if(session){hdSMRender();hdSMOpen()}else window.hdToast?.('出撃編成を選んでから開始してね','warn',1800);return}
@@ -169,6 +180,7 @@ window.hdSMRender=hdSMRender;
 window.hdSMOpen=hdSMOpen;
 window.hdSMFormData=hdSMFormData;
 window.hdSMNodeRows=hdSMNodeRows;
+window.hdSMNextNodeRows=hdSMNextNodeRows;
 window.hdSMSetNode=hdSMSetNode;
 window.hdSMUndoNode=hdSMUndoNode;
 window.hdSMSaveDraft=hdSMSaveDraft;
