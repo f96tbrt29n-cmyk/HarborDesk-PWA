@@ -7208,7 +7208,7 @@ test('home operational cards remember custom order and reset cleanly', async ({ 
   const errors=[];
   await boot(page,errors);
   const data=await page.evaluate(async()=>{
-    localStorage.removeItem('harbordesk-home-order-v1');
+    localStorage.removeItem('harbordesk-personal-home-order-v1');
     window.hdPHEnsure?.();
     await window.hdPHRender?.();
 
@@ -7218,7 +7218,7 @@ test('home operational cards remember custom order and reset cleanly', async ({ 
     window.hdPHMoveOrder?.('resources',-1);
     window.hdPHMoveOrder?.('resources',-1);
     const moved=labels();
-    const savedAfterMove=JSON.parse(localStorage.getItem('harbordesk-home-order-v1')||'[]');
+    const savedAfterMove=JSON.parse(localStorage.getItem('harbordesk-personal-home-order-v1')||'[]');
 
     await window.hdPHRender?.();
     const persisted=labels();
@@ -7234,7 +7234,7 @@ test('home operational cards remember custom order and reset cleanly', async ({ 
 
     window.hdPHResetOrder?.();
     const reset=labels();
-    const storedAfterReset=localStorage.getItem('harbordesk-home-order-v1');
+    const storedAfterReset=localStorage.getItem('harbordesk-personal-home-order-v1');
 
     return {initial,moved,savedAfterMove,persisted,controls,reset,storedAfterReset};
   });
