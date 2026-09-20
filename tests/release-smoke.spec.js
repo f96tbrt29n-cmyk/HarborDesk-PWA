@@ -2167,3 +2167,98 @@ test('release smoke: sortie mode recommends formations and current-node cautions
   await expect(page.locator('.hd-sm-current-tactic')).toContainText('警戒ポイント');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie mode gates advancement behind damage confirmation', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMEnsure === 'function' &&
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMAdvanceGuard === 'function' &&
+    typeof window.hdSMSetAdvanceGuard === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-damage-guard-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-damage-guard-fleet',
+      fleetName:'大破チェックテスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{
+        id:'sm-damage-guard-fleet',
+        name:'大破チェックテスト艦隊',
+        ships:[
+          {ship:'雪風',nowHp:32,maxHp:32,gear:'主砲'},
+          {ship:'時雨',nowHp:31,maxHp:31,gear:'主砲'}
+        ]
+      },
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:2,
+      status:'active'
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  await expect(page.locator('[data-hd-sm-next-node="A"]')).toBeEnabled();
+  await page.locator('[data-hd-sm-next-node="A"]').click();
+
+  await expect(page.locator('.hd-sm-advance-guard')).toBeVisible();
+  await expect(page.locator('.hd-sm-advance-guard')).toContainText('進撃前に大破確認');
+  await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeDisabled();
+  await expect(page.locator('[data-hd-sm-next-node="D"]')).toBeDisabled();
+
+  await page.locator('[data-hd-sm-safe-confirm]').click();
+  await expect(page.locator('.hd-sm-advance-guard')).toContainText('大破なし確認済み');
+  await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeEnabled();
+  await expect(page.locator('[data-hd-sm-next-node="D"]')).toBeEnabled();
+
+  await page.locator('[data-hd-sm-next-node="D"]').click();
+  await expect(page.locator('[data-hd-sm-next-node="H"]')).toBeDisabled();
+  const guard = await page.evaluate(() => window.hdSMAdvanceGuard(JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')), JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft));
+  expect(guard.current).toBe('D');
+  expect(guard.confirmed).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: damage retreat marks sortie draft as retreat', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdSMRender === 'function' && typeof window.hdSMSetAdvanceGuard === 'function');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-damage-retreat-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-damage-retreat-fleet',
+      fleetName:'大破撤退テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-damage-retreat-fleet',name:'大破撤退テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'A',routeNodes:['A'],result:'S',memo:''}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  await page.locator('[data-hd-sm-damage-retreat]').click();
+  await expect(page.locator('.hd-sm-advance-guard')).toContainText('大破あり・撤退');
+  await expect(page.locator('#hdSMResult')).toHaveValue('撤退');
+  await expect(page.locator('#hdSMMemo')).toHaveValue(/大破撤退/);
+  await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeDisabled();
+
+  const draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
+  expect(draft.result).toBe('撤退');
+  expect(draft.advanceGuard.safe).toBe(false);
+  expect(errors).toEqual([]);
+});
