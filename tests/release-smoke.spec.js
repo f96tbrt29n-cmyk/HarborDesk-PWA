@@ -308,7 +308,7 @@ test('release smoke: home shows return-to-game action only for sync handoff', as
 
     sessionStorage.setItem('harbordesk-kc-return-game-v1', '1');
     window.dispatchEvent(new CustomEvent('hd:kancolle-return-ready'));
-    await new Promise(r => setTimeout(r, 20));
+    await window.hdPHRender?.();
     const button = document.querySelector('[data-ph-return-game]');
     const shown = !!button;
     const text = button?.textContent || '';
@@ -541,6 +541,10 @@ test('release smoke: backup restore preview can cancel without changing data', a
   );
 
   await page.evaluate(() => {
+    for(let i=localStorage.length-1;i>=0;i--){
+      const key=localStorage.key(i);
+      if(key?.startsWith('harbordesk'))localStorage.removeItem(key);
+    }
     localStorage.setItem('harbordesk-preview-keep', JSON.stringify({ value: 'old' }));
     localStorage.setItem('harbordesk-preview-remove', JSON.stringify({ remove: true }));
     const backup = {
