@@ -2949,3 +2949,45 @@ test('release smoke: sortie progress uses nearest valid objective on multi-targe
   await expect(progress).toContainText('最少戦闘あと 0');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie prioritizes objective-connected next-node choices', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMSortNextNodeRows === 'function' &&
+    typeof window.hdSMCanReachBoss === 'function'
+  );
+
+  const order = await page.evaluate(() =>
+    window.hdSMSortNextNodeRows('2-4',[
+      {label:'M',kind:'item'},
+      {label:'L',kind:'normal'}
+    ]).map(x=>x.label)
+  );
+  expect(order).toEqual(['L','M']);
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-route-priority-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-route-priority-fleet',
+      fleetName:'経路優先テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-route-priority-fleet',name:'経路優先テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'I',routeNodes:['B','G','I'],result:'S',memo:'',advanceGuard:{node:'I',safe:true,at:Date.now()}}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const labels = await page.locator('.hd-sm-next-grid [data-hd-sm-next-node]').evaluateAll(nodes => nodes.map(n => n.dataset.hdSmNextNode));
+  expect(labels).toEqual(['L','M']);
+  expect(errors).toEqual([]);
+});
