@@ -2863,11 +2863,15 @@ test('release smoke: sortie marks boss-connected versus off-route next nodes', a
   const reach = await page.evaluate(() => ({
     l: window.hdSMCanReachBoss('2-4','L'),
     m: window.hdSMCanReachBoss('2-4','M'),
-    o: window.hdSMCanReachBoss('2-4','O')
+    o: window.hdSMCanReachBoss('2-4','O'),
+    sevenTwoGoalRoute: window.hdSMCanReachBoss('7-2','C'),
+    sevenTwoTarget: window.hdSMRouteTargetName('7-2')
   }));
   expect(reach.l).toBe(true);
   expect(reach.m).toBe(false);
   expect(reach.o).toBe(true);
+  expect(reach.sevenTwoGoalRoute).toBe(true);
+  expect(reach.sevenTwoTarget).toBe('攻略目標');
 
   await page.evaluate(() => {
     localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
