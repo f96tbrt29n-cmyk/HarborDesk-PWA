@@ -7137,3 +7137,60 @@ test('home sync coverage distinguishes core data from optional sortie capture', 
   expect(sortie?.text||'').toContain('任意');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('home cards remember collapsed state and can expand all', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    localStorage.removeItem('harbordesk-home-collapse-v1');
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+    const initialButtons=document.querySelectorAll('[data-ph-collapse]').length;
+
+    window.hdPHSetCollapsed?.('resources',true);
+    const first={
+      collapsed:document.querySelector('.hd-ph-resource-block')?.classList.contains('hd-ph-collapsed')||false,
+      text:document.querySelector('[data-ph-collapse="resources"]')?.textContent||'',
+      expanded:document.querySelector('[data-ph-collapse="resources"]')?.getAttribute('aria-expanded')||'',
+      saved:JSON.parse(localStorage.getItem('harbordesk-home-collapse-v1')||'{}')
+    };
+
+    await window.hdPHRender?.();
+    const persisted={
+      collapsed:document.querySelector('.hd-ph-resource-block')?.classList.contains('hd-ph-collapsed')||false,
+      text:document.querySelector('[data-ph-collapse="resources"]')?.textContent||''
+    };
+
+    document.querySelector('[data-ph-collapse="resources"]')?.click();
+    const reopened={
+      collapsed:document.querySelector('.hd-ph-resource-block')?.classList.contains('hd-ph-collapsed')||false,
+      text:document.querySelector('[data-ph-collapse="resources"]')?.textContent||'',
+      saved:JSON.parse(localStorage.getItem('harbordesk-home-collapse-v1')||'{}')
+    };
+
+    window.hdPHSetCollapsed?.('resources',true);
+    window.hdPHSetCollapsed?.('fleets',true);
+    document.querySelector('[data-ph-expand-all]')?.click();
+    const allOpen={
+      resource:document.querySelector('.hd-ph-resource-block')?.classList.contains('hd-ph-collapsed')||false,
+      fleet:document.querySelector('.hd-ph-fleet-block')?.classList.contains('hd-ph-collapsed')||false,
+      saved:JSON.parse(localStorage.getItem('harbordesk-home-collapse-v1')||'{}'),
+      label:document.querySelector('[data-ph-expand-all]')?.textContent||''
+    };
+    return {initialButtons,first,persisted,reopened,allOpen};
+  });
+  expect(data.initialButtons).toBeGreaterThanOrEqual(9);
+  expect(data.first.collapsed).toBe(true);
+  expect(data.first.text).toBe('開く');
+  expect(data.first.expanded).toBe('false');
+  expect(data.first.saved.resources).toBe(true);
+  expect(data.persisted).toEqual({collapsed:true,text:'開く'});
+  expect(data.reopened.collapsed).toBe(false);
+  expect(data.reopened.text).toBe('閉じる');
+  expect(data.reopened.saved.resources).toBe(false);
+  expect(data.allOpen.resource).toBe(false);
+  expect(data.allOpen.fleet).toBe(false);
+  expect(data.allOpen.saved).toEqual({});
+  expect(data.allOpen.label).toBe('すべて開く');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
