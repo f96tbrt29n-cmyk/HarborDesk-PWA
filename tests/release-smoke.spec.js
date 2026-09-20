@@ -2902,3 +2902,54 @@ test('release smoke: sortie marks boss-connected versus off-route next nodes', a
   await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="M"]')).toHaveClass(/route-off/);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie next-node choices show remaining route-target distance', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMBossDistance === 'function' &&
+    typeof window.hdSMBossBattleDistance === 'function' &&
+    typeof window.hdSMRouteTargetName === 'function'
+  );
+
+  const targets = await page.evaluate(() => ({
+    oneSixName: window.hdSMRouteTargetName('1-6'),
+    oneSixGoalDistance: window.hdSMBossDistance('1-6','N'),
+    oneSixGoalBattles: window.hdSMBossBattleDistance('1-6','N'),
+    sevenTwoName: window.hdSMRouteTargetName('7-2')
+  }));
+  expect(targets.oneSixName).toBe('ゴール');
+  expect(targets.oneSixGoalDistance).toBe(0);
+  expect(targets.oneSixGoalBattles).toBe(0);
+  expect(targets.sevenTwoName).toBe('攻略目標');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-next-distance-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-next-distance-fleet',
+      fleetName:'次マス距離テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-next-distance-fleet',name:'次マス距離テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'I',routeNodes:['B','G','I'],result:'S',memo:'',advanceGuard:{node:'I',safe:true,at:Date.now()}}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const l = page.locator('[data-hd-sm-next-node="L"]');
+  const m = page.locator('[data-hd-sm-next-node="M"]');
+  await expect(l).toContainText('構造図上 ボス接続｜選択後 あと1マス・1戦');
+  await expect(m).toContainText('構造図上 逸れ候補｜ボス接続なし');
+  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="L"]')).toContainText('ボス接続・あと1マス/1戦');
+  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="M"]')).toContainText('逸れ候補・接続なし');
+  expect(errors).toEqual([]);
+});
