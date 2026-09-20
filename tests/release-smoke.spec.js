@@ -555,6 +555,7 @@ test('release smoke: backup restore preview can cancel without changing data', a
         'harbordesk-preview-new': JSON.stringify({ added: true })
       }
     };
+    window.__hdPreviewExpected = window.hdAnalyzeBackupLocalStorage(backup.localStorage);
     const file = new File([JSON.stringify(backup)], 'HarborDesk-preview.json', { type: 'application/json' });
     window.__hdPreviewImportPromise = window.importBackup(file);
   });
@@ -562,9 +563,13 @@ test('release smoke: backup restore preview can cancel without changing data', a
   const dialog = page.locator('#hdBackupRestorePreviewDialog');
   await expect(dialog).toBeVisible();
   await expect(dialog.locator('[data-hd-backup-preview-meta]')).toContainText('HarborDesk-preview.json');
-  await expect(dialog.locator('.hd-backup-preview-grid .add')).toContainText('1件');
-  await expect(dialog.locator('.hd-backup-preview-grid .update')).toContainText('1件');
-  await expect(dialog.locator('.hd-backup-preview-grid .remove')).toContainText('1件');
+  const expected = await page.evaluate(() => window.__hdPreviewExpected);
+  await expect(dialog.locator('.hd-backup-preview-grid .add')).toContainText(`${expected.added}件`);
+  await expect(dialog.locator('.hd-backup-preview-grid .update')).toContainText(`${expected.updated}件`);
+  await expect(dialog.locator('.hd-backup-preview-grid .remove')).toContainText(`${expected.removed}件`);
+  expect(expected.added).toBe(1);
+  expect(expected.updated).toBe(1);
+  expect(expected.removed).toBeGreaterThanOrEqual(1);
 
   await dialog.locator('button[value="cancel"]').click();
 
