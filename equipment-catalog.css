@@ -37,3 +37,6 @@
 .hd-equip-catalog-list.hd-compact .hd-equip-ref-card.hd-peek p{display:block}
 .hd-equip-catalog-list.hd-compact .hd-equip-ref-card.hd-peek .hd-equip-ref-grid{display:grid}
 .hd-equip-catalog-list.hd-compact .hd-equip-ref-card.hd-peek .guide-link{display:inline-flex}
+
+.hd-compact-hint{padding:6px 9px;border-radius:9px;background:rgba(79,163,211,.09);color:var(--muted);font-size:9px;line-height:1.4}
+.hd-compact-hint[hidden]{display:none}
