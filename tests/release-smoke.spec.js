@@ -1494,8 +1494,11 @@ test('release smoke: mobile update menu occupies its own row without covering攻
   expect(layout.menuWidth).toBeLessThanOrEqual(layout.viewport);
   
   await page.waitForTimeout(300);
-  await page.evaluate(() => window.scrollBy(0, 160));
-  await page.waitForTimeout(100);
+  await page.evaluate(() => {
+    window.scrollBy(0, 160);
+    window.dispatchEvent(new Event('scroll'));
+  });
+  await page.waitForTimeout(350);
   await expect(more).not.toHaveAttribute('open', '');
   await expect(row).toBeHidden();
   expect(errors).toEqual([]);
@@ -1546,6 +1549,7 @@ test('release smoke: canonical map renderer falls back without override chains',
 
 test('release smoke: shared mobile layout prevents chrome overlap across iPhone sizes', async ({ page }) => {
   const errors = [];
+  await boot(page, errors);
   const sizes = [
     { width: 375, height: 812 },
     { width: 390, height: 844 },
@@ -1555,10 +1559,11 @@ test('release smoke: shared mobile layout prevents chrome overlap across iPhone 
 
   for (const size of sizes) {
     await page.setViewportSize(size);
-    await page.goto('/');
+    await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 30000 });
     await page.waitForFunction(() => document.body && !document.body.classList.contains('hd-booting'), null, { timeout: 30000 });
     await page.locator('[data-hd-ws-group="guide"]').click();
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(120);
 
     const before = await page.evaluate(() => {
       const top=document.querySelector('.topbar')?.getBoundingClientRect();
