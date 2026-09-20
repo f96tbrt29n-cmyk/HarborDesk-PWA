@@ -144,15 +144,26 @@ function hdSPARecentRef(rows){
 }
 
 function hdSPARecommendations(row){
- const t=row?.trend;if(!t?.ready)return [];
- const d=t.delta||{},out=[],seen=new Set();
+ const t=row?.trend,d=t?.ready?(t.delta||{}):{},out=[],seen=new Set();
  const push=(id,title,reason,action,mode='')=>{const key=action==='optimize'?action+':'+mode:action+':'+id;if(seen.has(key))return;seen.add(key);out.push({id,title,reason,action,mode})};
- if(d.retreatRate!=null&&d.retreatRate>=15)push('route-retreat','道中突破重視を再検討','撤退率が'+d.retreatRate+'pt上昇','optimize','route');
- if(d.bossRate!=null&&d.bossRate<=-15)push('route-boss','道中到達を見直す','ボス到達率が'+Math.abs(d.bossRate)+'pt低下','optimize','route');
- if(d.sRate!=null&&d.sRate<=-15)push('boss-s','ボス重視を比較','S率が'+Math.abs(d.sRate)+'pt低下','optimize','boss');
- if(d.avgResourcePct!=null&&d.avgResourcePct>=20)push('reserve-resource','装備温存を比較','平均資源消費が'+d.avgResourcePct+'%増加','optimize','reserve');
- if(d.avgDurationPct!=null&&d.avgDurationPct>=20)push('route-time','周回時間を見直す','平均時間が'+d.avgDurationPct+'%増加','optimize','route');
- if(d.avgReadiness!=null&&d.avgReadiness<=-10)push('prep-readiness','出撃前チェックを見直す','開始時確認率が'+Math.abs(d.avgReadiness)+'pt低下','prep');
+ const reasons=(row?.retreatReasonStats?.items||[]).filter(x=>x.reason!=='理由未記録');
+ const top=reasons[0]||null;
+ if(top&&top.count>=2){
+  const why=top.reason+'撤退 '+top.count+'回（撤退内'+top.rate+'%）';
+  if(top.reason==='大破')push('reason-damage','道中の安定性を見直す',why,'optimize','route');
+  else if(top.reason==='索敵不足')push('reason-los','索敵装備を見直す',why,'prep');
+  else if(top.reason==='ルート逸れ')push('reason-route','ルート条件を見直す',why,'prep');
+  else if(top.reason==='火力不足')push('reason-firepower','ボス火力を比較する',why,'optimize','boss');
+  else if(top.reason==='制空不足')push('reason-air','制空・艦戦配分を見直す',why,'prep');
+ }
+ if(t?.ready){
+  if(d.retreatRate!=null&&d.retreatRate>=15)push('route-retreat','道中突破重視を再検討','撤退率が'+d.retreatRate+'pt上昇','optimize','route');
+  if(d.bossRate!=null&&d.bossRate<=-15)push('route-boss','道中到達を見直す','ボス到達率が'+Math.abs(d.bossRate)+'pt低下','optimize','route');
+  if(d.sRate!=null&&d.sRate<=-15)push('boss-s','ボス重視を比較','S率が'+Math.abs(d.sRate)+'pt低下','optimize','boss');
+  if(d.avgResourcePct!=null&&d.avgResourcePct>=20)push('reserve-resource','装備温存を比較','平均資源消費が'+d.avgResourcePct+'%増加','optimize','reserve');
+  if(d.avgDurationPct!=null&&d.avgDurationPct>=20)push('route-time','周回時間を見直す','平均時間が'+d.avgDurationPct+'%増加','optimize','route');
+  if(d.avgReadiness!=null&&d.avgReadiness<=-10)push('prep-readiness','出撃前チェックを見直す','開始時確認率が'+Math.abs(d.avgReadiness)+'pt低下','prep');
+ }
  return out.slice(0,4);
 }
 function hdSPARecommendationHtml(row){
