@@ -94,6 +94,40 @@ function hdSMObjectiveOptions(map){
  if(boss&&boss!==goal)out.push({label:boss,type:'boss',name:boss+' ボス'});
  return out;
 }
+function hdSMObjectiveStartStats(map,target){
+ const graph=hdSMGraph(map),targets=hdSMObjectiveTargets(map,target);
+ if(!graph||!Array.isArray(graph.edges)||!targets.length)return {steps:null,battles:null};
+ const starts=[...new Set(graph.edges.map(x=>x[0]).filter(x=>x==='S'||x==='S1'||x==='S2'))];
+ if(!starts.length)return {steps:null,battles:null};
+ let steps=null;
+ const q=starts.map(x=>[x,0]),seen=new Set(starts);
+ while(q.length){
+  const [node,d]=q.shift();
+  if(targets.includes(node)){steps=d;break}
+  for(const [a,b] of graph.edges){
+   if(a!==node||seen.has(b))continue;
+   if(targets.includes(b)){steps=d+1;q.length=0;break}
+   seen.add(b);q.push([b,d+1]);
+  }
+ }
+ const dist=new Map(starts.map(x=>[x,0])),open=[...starts];
+ let battles=null;
+ while(open.length){
+  open.sort((a,b)=>(dist.get(a)||0)-(dist.get(b)||0));
+  const node=open.shift(),base=dist.get(node)||0;
+  if(targets.includes(node)){battles=base;break}
+  for(const [a,b] of graph.edges){
+   if(a!==node)continue;
+   const next=base+(hdSMRequiresAdvanceCheck(map,b)?1:0),old=dist.get(b);
+   if(old==null||next<old){dist.set(b,next);open.push(b)}
+  }
+ }
+ return {steps,battles};
+}
+function hdSMObjectiveStatText(map,target){
+ const s=hdSMObjectiveStartStats(map,target);
+ return (s.steps==null?'距離—':'最短'+s.steps+'マス')+'・'+(s.battles==null?'戦闘—':'最少'+s.battles+'戦');
+}
 function hdSMObjectivePrefs(){
  try{const x=JSON.parse(localStorage.getItem(HD_SM_OBJECTIVE_PREF_KEY)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch{return {}}
 }
@@ -115,8 +149,8 @@ function hdSMSetObjectivePreference(map,target){
 }
 function hdSMObjectivePrestartHtml(map){
  const options=hdSMObjectiveOptions(map);if(options.length<2)return '';
- const selected=hdSMObjectivePreference(map);
- return '<div class="hd-sm-objective-picker prestart"><div><span>OBJECTIVE</span><b>出撃目標</b><small>開始前に選択／次回も記憶</small></div><div><button type="button" class="'+(!selected?'active':'')+'" data-hd-sm-pre-objective="" data-hd-sm-objective-map="'+hdSMEsc(map)+'">自動</button>'+options.map(x=>'<button type="button" class="'+(selected===x.label?'active':'')+'" data-hd-sm-pre-objective="'+hdSMEsc(x.label)+'" data-hd-sm-objective-map="'+hdSMEsc(map)+'">'+hdSMEsc(x.name)+'</button>').join('')+'</div></div>';
+ const selected=hdSMObjectivePreference(map),autoText=hdSMObjectiveStatText(map,'');
+ return '<div class="hd-sm-objective-picker prestart"><div><span>OBJECTIVE</span><b>出撃目標</b><small>開始前に選択／次回も記憶</small></div><div><button type="button" class="'+(!selected?'active':'')+'" data-hd-sm-pre-objective="" data-hd-sm-objective-map="'+hdSMEsc(map)+'"><b>自動</b><small>'+hdSMEsc(autoText)+'</small></button>'+options.map(x=>'<button type="button" class="'+(selected===x.label?'active':'')+'" data-hd-sm-pre-objective="'+hdSMEsc(x.label)+'" data-hd-sm-objective-map="'+hdSMEsc(map)+'"><b>'+hdSMEsc(x.name)+'</b><small>'+hdSMEsc(hdSMObjectiveStatText(map,x.label))+'</small></button>').join('')+'</div></div>';
 }
 function hdSMPrestartRoutePreviewHtml(map){
  const options=hdSMObjectiveOptions(map);if(options.length<2)return '';
@@ -504,6 +538,8 @@ window.hdSMObjectivePrefs=hdSMObjectivePrefs;
 window.hdSMObjectivePreference=hdSMObjectivePreference;
 window.hdSMSaveObjectivePreference=hdSMSaveObjectivePreference;
 window.hdSMSetObjectivePreference=hdSMSetObjectivePreference;
+window.hdSMObjectiveStartStats=hdSMObjectiveStartStats;
+window.hdSMObjectiveStatText=hdSMObjectiveStatText;
 window.hdSMObjectivePrestartHtml=hdSMObjectivePrestartHtml;
 window.hdSMPrestartRoutePreviewHtml=hdSMPrestartRoutePreviewHtml;
 window.hdSMSelectedObjective=hdSMSelectedObjective;
