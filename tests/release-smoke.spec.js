@@ -1283,25 +1283,25 @@ test('release smoke: map overview exposes visible攻略 tool launcher', async ({
   const launcher = page.locator('.hd-map-tools-overview');
   await expect(launcher).toBeVisible();
 
-  for (const label of ['マップ詳細','編成','編成候補','出撃準備','装備・計算','ドロップ','自分用']) {
-    await expect(launcher.getByRole('button', { name: new RegExp(label) })).toBeVisible();
+  for (const tool of ['map','fleet','suggest','prep','gear','drop','mine']) {
+    await expect(launcher.locator(`[data-hd-map-tool="${tool}"]`)).toBeVisible();
   }
 
-  await launcher.getByRole('button', { name: /マップ詳細/ }).click();
+  await launcher.locator('[data-hd-map-tool="map"]').click();
   await expect(page.locator('[data-map-pane="map"]')).toBeVisible();
   await expect(page.locator('.hd-map-structure-guide > summary')).toBeVisible();
 
   await page.locator('[data-map-tab="overview"]').click();
   await expect(launcher).toBeVisible();
 
-  await launcher.getByRole('button', { name: /装備・計算/ }).click();
+  await launcher.locator('[data-hd-map-tool="gear"]').click();
   await expect(page.locator('[data-map-pane="gear"]')).toBeVisible();
   await expect(page.locator('#hdFleetCalculator')).toBeVisible({ timeout: 5000 });
 
   await page.locator('[data-map-tab="overview"]').click();
   await expect(launcher).toBeVisible();
 
-  await launcher.getByRole('button', { name: /ドロップ/ }).click();
+  await launcher.locator('[data-hd-map-tool="drop"]').click();
   await expect(page.locator('[data-map-pane="drop"]')).toBeVisible();
   await expect(page.locator('.hd-map-drop-panel')).toBeVisible();
 
