@@ -1154,3 +1154,109 @@ test('release smoke: every map shows recommended level guidance', async ({ page 
   expect(result.hasDisclaimer).toBe(true);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: map攻略 tools survive tab redraws', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdEnhanceMapPane === 'function' &&
+    typeof window.hdRenderMapEquipmentRecommendations === 'function' &&
+    typeof window.hdRenderLandBasePlanner === 'function' &&
+    typeof window.hdFCRender === 'function' &&
+    typeof window.hdRenderSortieReadiness === 'function' &&
+    typeof window.hdSPRender === 'function' &&
+    typeof window.hdSPSMapButton === 'function' &&
+    typeof window.hdFSMapButton === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  const result = await page.evaluate(async () => {
+    const tick = ms => new Promise(resolve => setTimeout(resolve, ms));
+    const selectMap = async (world, map) => {
+      selectedWorld = world;
+      selectedMap = map;
+      renderMapPicker();
+      await tick(120);
+    };
+    const clickTab = async tab => {
+      document.querySelector(`[data-map-tab="${tab}"]`)?.click();
+      await tick(120);
+    };
+
+    await selectMap('5', '5-6');
+    await clickTab('map');
+    const tabs = [...document.querySelectorAll('.map-tab-btn')].map(x => x.dataset.mapTab);
+    const stageButtons = document.querySelectorAll('[data-hd-map-stage="5-6"]').length;
+    const structureNodes = document.querySelectorAll('.hd-map-structure-guide .hd-map-node').length;
+    const routeHighlight = !!document.getElementById('hdRouteHighlight');
+    const nodeInfo = !!document.getElementById('hdMapNodeInfo');
+    const prepButton = !!document.querySelector('[data-hd-sps-open]');
+    const fleetSuggestButton = !!document.querySelector('[data-hd-fs-open]');
+
+    await clickTab('drop');
+    const dropPanel = !!document.querySelector('.hd-map-drop-panel');
+
+    await clickTab('fleet');
+    const fleetCandidates = !!document.querySelector('.hd-map-ship-recommend');
+
+    await selectMap('6', '6-4');
+    await clickTab('route');
+    const routeRequirements = document.getElementById('hdMapRouteRequirements')?.textContent || '';
+
+    await clickTab('gear');
+    const equipRecommend = !!document.querySelector('#hdMapEquipRecommend .hd-map-equip-recommend');
+    const landBase = !!document.getElementById('hdLandBasePlanner');
+    const fleetCalc = !!document.getElementById('hdFleetCalculator');
+
+    await selectMap('5', '5-5');
+    await clickTab('mine');
+    const customFleet = !!document.getElementById('customFleetPanel');
+    const readiness = !!document.getElementById('hdSortieReadiness');
+    const support = !!document.getElementById('hdSupportPlanner');
+    const headerActionsAfterRedraw =
+      !!document.querySelector('[data-hd-sps-open]') &&
+      !!document.querySelector('[data-hd-fs-open]');
+
+    return {
+      tabs,
+      stageButtons,
+      structureNodes,
+      routeHighlight,
+      nodeInfo,
+      prepButton,
+      fleetSuggestButton,
+      dropPanel,
+      fleetCandidates,
+      routeRequirements,
+      equipRecommend,
+      landBase,
+      fleetCalc,
+      customFleet,
+      readiness,
+      support,
+      headerActionsAfterRedraw
+    };
+  });
+
+  expect(result.tabs).toEqual(['overview','map','fleet','route','gear','quest','drop','mine']);
+  expect(result.stageButtons).toBe(3);
+  expect(result.structureNodes).toBeGreaterThan(3);
+  expect(result.routeHighlight).toBe(true);
+  expect(result.nodeInfo).toBe(true);
+  expect(result.prepButton).toBe(true);
+  expect(result.fleetSuggestButton).toBe(true);
+  expect(result.dropPanel).toBe(true);
+  expect(result.fleetCandidates).toBe(true);
+  expect(result.routeRequirements).toContain('索敵');
+  expect(result.routeRequirements).toContain('基地航空隊');
+  expect(result.equipRecommend).toBe(true);
+  expect(result.landBase).toBe(true);
+  expect(result.fleetCalc).toBe(true);
+  expect(result.customFleet).toBe(true);
+  expect(result.readiness).toBe(true);
+  expect(result.support).toBe(true);
+  expect(result.headerActionsAfterRedraw).toBe(true);
+  expect(errors).toEqual([]);
+});
