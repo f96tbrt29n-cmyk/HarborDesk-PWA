@@ -2290,7 +2290,7 @@ test('release smoke: sortie damage guard blocks alternate node selection paths',
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
       status:'active',
-      draft:{node:'A',routeNodes:['A'],result:'S',memo:''}
+      draft:{node:'B',routeNodes:['B'],result:'S',memo:''}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
@@ -2333,7 +2333,7 @@ test('release smoke: sortie mode keeps current battle status visible in sticky h
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
       status:'active',
-      draft:{node:'A',routeNodes:['A'],result:'S',memo:''}
+      draft:{node:'B',routeNodes:['B'],result:'S',memo:''}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
