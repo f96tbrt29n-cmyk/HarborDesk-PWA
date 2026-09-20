@@ -3114,3 +3114,51 @@ test('release smoke: sortie analytics separates multi-target objectives', async 
   await expect(strategyCards.first()).not.toContainText('目標 G2');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie analytics filters by selected objective', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSLRender === 'function' &&
+    typeof window.hdSLRecordEntry === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-sortie-log-v1','[]');
+    localStorage.setItem('harbordesk-sortie-analytics-mode-v1','map');
+    localStorage.setItem('harbordesk-sortie-analytics-map-v1','7-2');
+    localStorage.setItem('harbordesk-sortie-analytics-objective-v1','all');
+
+    window.hdSLRecordEntry({id:'flt-g1-1',at:Date.now(),map:'7-2',node:'G1',result:'S',boss:false,battles:2,objectiveTarget:'G1'});
+    window.hdSLRecordEntry({id:'flt-g1-2',at:Date.now()-1000,map:'7-2',node:'C',result:'撤退',retreat:true,boss:false,battles:1,objectiveTarget:'G1'});
+    window.hdSLRecordEntry({id:'flt-g2-1',at:Date.now()-2000,map:'7-2',node:'G2',result:'S',boss:true,battles:4,objectiveTarget:'G2'});
+    window.hdSLRecordEntry({id:'flt-old-1',at:Date.now()-3000,map:'7-2',node:'C',result:'撤退',retreat:true,boss:false,battles:1});
+    window.hdSLRender();
+    window.hdWSShowElement?.('sortieLog', false);
+  });
+
+  await page.waitForTimeout(180);
+  const objective = page.locator('#sortieLog [data-hd-spa-objective]');
+  await expect(objective).toBeVisible();
+  await expect(objective.locator('option')).toHaveCount(4);
+
+  await objective.selectOption('G1');
+  await expect(page.locator('#sortieLog .hd-spa-card')).toHaveCount(1);
+  await expect(page.locator('#sortieLog .hd-spa-card')).toContainText('撤退 50%');
+  await expect(page.locator('#sortieLog .hd-spa-card')).toContainText('目標到達 50%');
+
+  await page.locator('#sortieLog [data-hd-spa-objective]').selectOption('G2');
+  await expect(page.locator('#sortieLog .hd-spa-card')).toHaveCount(1);
+  await expect(page.locator('#sortieLog .hd-spa-card')).toContainText('S勝利 100%');
+  await expect(page.locator('#sortieLog .hd-spa-card')).toContainText('目標到達 100%');
+
+  await page.locator('#sortieLog [data-hd-spa-objective]').selectOption('__unrecorded__');
+  await expect(page.locator('#sortieLog .hd-spa-card')).toHaveCount(1);
+  await expect(page.locator('#sortieLog .hd-spa-card')).toContainText('ボス到達 0%');
+  await expect(page.locator('#sortieLog .hd-spa-card')).toContainText('撤退 100%');
+
+  await page.locator('#sortieLog [data-hd-spa-objective]').selectOption('all');
+  await expect(page.locator('#sortieLog .hd-spa-card')).toHaveCount(3);
+  expect(errors).toEqual([]);
+});
