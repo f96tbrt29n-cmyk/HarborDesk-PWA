@@ -4,6 +4,7 @@ const HD_SHIP_IMAGE_DB='harbordesk-ship-images-v1';
 const HD_SHIP_IMAGE_STORE='images';
 const HD_SHIP_IMAGE_CONFIG_KEY='harbordesk-ship-image-config-v1';
 const HD_SHIP_IMAGE_VERIFY_KEY='harbordesk-ship-image-verify-v1';
+const HD_SHIP_IMAGE_LAST_BACKUP_KEY='harbordesk-last-ship-image-backup-v1';
 let HD_SHIP_IMAGE_DB_PROMISE=null;
 const HD_SHIP_IMAGE_OBJECT_URLS=new Map();
 const HD_SHIP_IMAGE_LOCAL_IDS=new Set();
@@ -167,9 +168,28 @@ async function hdShipImageBuildBackup(){
  const enc=new TextEncoder(),magic=enc.encode('HDSI1\n'),meta=enc.encode(JSON.stringify(manifest)),len=new Uint8Array(4);new DataView(len.buffer).setUint32(0,meta.byteLength,true);
  return {blob:new Blob([magic,len,meta,...rows.map(x=>x.blob)],{type:'application/x-harbordesk-ship-images'}),manifest};
 }
+function hdShipImageBackupName(){return `HarborDesk-ship-images-${new Date().toISOString().slice(0,10)}.hdshipimg`}
+function hdShipImageMarkBackup(){
+ const at=Date.now();try{localStorage.setItem(HD_SHIP_IMAGE_LAST_BACKUP_KEY,String(at))}catch{}
+ window.dispatchEvent(new CustomEvent('hd:ship-image-backup',{detail:{at}}));return at;
+}
+function hdShipImageDownloadBackup(out){
+ if(!out?.manifest?.entries?.length)return false;
+ const a=document.createElement('a'),url=URL.createObjectURL(out.blob);a.href=url;a.download=hdShipImageBackupName();document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);hdShipImageMarkBackup();return true;
+}
 async function hdShipImageExportBackup(){
  const out=await hdShipImageBuildBackup();if(!out.manifest.entries.length){alert?.('端末保存の艦娘画像がまだないよ');return false}
- const a=document.createElement('a'),url=URL.createObjectURL(out.blob),day=new Date().toISOString().slice(0,10);a.href=url;a.download=`HarborDesk-ship-images-${day}.hdshipimg`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);return true;
+ return hdShipImageDownloadBackup(out);
+}
+async function hdShipImageShareBackup(){
+ const out=await hdShipImageBuildBackup();if(!out.manifest.entries.length){alert?.('端末保存の艦娘画像がまだないよ');return false}
+ try{
+  if(typeof File==='function'&&typeof navigator.share==='function'){
+   const file=new File([out.blob],hdShipImageBackupName(),{type:'application/x-harbordesk-ship-images'}),payload={title:'HarborDesk 艦娘画像バックアップ',files:[file]};
+   if(typeof navigator.canShare!=='function'||navigator.canShare(payload)){await navigator.share(payload);hdShipImageMarkBackup();return true}
+  }
+ }catch(err){if(err?.name==='AbortError')return false}
+ return hdShipImageDownloadBackup(out);
 }
 async function hdShipImageReadBackup(file){
  if(!file||file.size<10)throw new Error('バックアップファイルが短すぎる');
@@ -253,7 +273,7 @@ function hdShipImageEnsurePicker(){
 function hdShipImageEnsureDialog(){
  let d=document.getElementById('hdShipImageDialog');if(d)return d;
  d=document.createElement('dialog');d.id='hdShipImageDialog';d.className='hd-ship-image-dialog';
- d.innerHTML=`<div class="hd-ship-image-dialog-head"><div><div class="eyebrow">SHIP IMAGE LIBRARY</div><h3>艦娘画像</h3></div><button type="button" class="icon-btn" data-hd-ship-image-close>×</button></div><p>画像はこの端末のブラウザ内に保存するよ。公式マスターIDで紐づけるから、通常・改・改二など別形態を取り違えない。</p><p>標準カード画像を艦娘IDごとに自動表示。<a href="https://github.com/Nishisonic/gkcoi" target="_blank" rel="noopener noreferrer">画像提供元：gkcoi</a>。提供元の画像をそのまま表示し、ゲームの最新絵柄との一致は未検証。端末に登録した画像を優先するよ。</p><label><input id="hdShipImageAutoSource" type="checkbox">標準カード画像を自動表示</label><div class="hd-ship-image-dialog-grid"><article><strong>一括取り込み</strong><p><code>541.png</code> のように「艦ID.拡張子」、または正確な艦名をファイル名にして複数選択。PNG/JPEG/WebP対応。</p><label class="primary hd-ship-image-file">画像を複数選択<input id="hdShipImageBulkInput" type="file" accept="image/png,image/jpeg,image/webp" multiple></label><span id="hdShipImageImportStatus"></span></article><article><strong>許諾済み画像URL</strong><p>自分で利用権を確認した画像サーバーがある場合だけ設定。<code>{id}</code> を艦IDに置換する。</p><input id="hdShipImageRemoteTemplate" type="url" placeholder="https://example.com/card/{id}.png"><button type="button" class="ghost" data-hd-ship-image-save-remote>URL設定を保存</button></article></div><div class="hd-ship-image-integrity"><div><strong>画像整合性</strong><p>壊れた画像・存在しないMASTER IDを確認。詳細確認ではSHA-256で同一画像候補も探すよ。</p></div><button type="button" class="ghost" data-hd-ship-image-audit>画像整合性を詳細確認</button><div id="hdShipImageIntegrityStatus" class="muted">未確認</div></div><div class="hd-ship-image-verify"><div><strong>正解指紋表</strong><p>自分で用意した「MASTER ID → SHA-256」JSONを読み込むと、画像を 一致 / 不一致 / 未検証 で判定できる。</p></div><div><label class="ghost hd-ship-image-verify-file">検証表を読み込む<input id="hdShipImageVerifyInput" type="file" accept=".json,application/json"></label><button type="button" class="ghost" data-hd-ship-image-verify-template>空テンプレート</button><button type="button" class="ghost" data-hd-ship-image-verify-clear>検証表を解除</button></div><span id="hdShipImageVerifyStatus"></span></div><div class="hd-ship-image-backup"><div><strong>画像ライブラリのバックアップ</strong><p>端末保存の画像をMASTER IDのまま1ファイルへ保存。復元は既存画像へ上書き統合するよ。</p></div><div><button type="button" class="ghost" data-hd-ship-image-export>バックアップを書き出す</button><label class="ghost hd-ship-image-backup-file">バックアップを復元<input id="hdShipImageBackupInput" type="file" accept=".hdshipimg,application/x-harbordesk-ship-images"></label></div><span id="hdShipImageBackupStatus"></span></div><div class="hd-ship-image-dialog-status"><b>端末保存</b><span id="hdShipImageCount">確認中…</span></div><small>ゲーム内画像そのものを公開リポジトリへ同梱する機能ではないよ。利用する画像の権利・利用条件は画像提供元に従ってね。</small>`;
+ d.innerHTML=`<div class="hd-ship-image-dialog-head"><div><div class="eyebrow">SHIP IMAGE LIBRARY</div><h3>艦娘画像</h3></div><button type="button" class="icon-btn" data-hd-ship-image-close>×</button></div><p>画像はこの端末のブラウザ内に保存するよ。公式マスターIDで紐づけるから、通常・改・改二など別形態を取り違えない。</p><p>標準カード画像を艦娘IDごとに自動表示。<a href="https://github.com/Nishisonic/gkcoi" target="_blank" rel="noopener noreferrer">画像提供元：gkcoi</a>。提供元の画像をそのまま表示し、ゲームの最新絵柄との一致は未検証。端末に登録した画像を優先するよ。</p><label><input id="hdShipImageAutoSource" type="checkbox">標準カード画像を自動表示</label><div class="hd-ship-image-dialog-grid"><article><strong>一括取り込み</strong><p><code>541.png</code> のように「艦ID.拡張子」、または正確な艦名をファイル名にして複数選択。PNG/JPEG/WebP対応。</p><label class="primary hd-ship-image-file">画像を複数選択<input id="hdShipImageBulkInput" type="file" accept="image/png,image/jpeg,image/webp" multiple></label><span id="hdShipImageImportStatus"></span></article><article><strong>許諾済み画像URL</strong><p>自分で利用権を確認した画像サーバーがある場合だけ設定。<code>{id}</code> を艦IDに置換する。</p><input id="hdShipImageRemoteTemplate" type="url" placeholder="https://example.com/card/{id}.png"><button type="button" class="ghost" data-hd-ship-image-save-remote>URL設定を保存</button></article></div><div class="hd-ship-image-integrity"><div><strong>画像整合性</strong><p>壊れた画像・存在しないMASTER IDを確認。詳細確認ではSHA-256で同一画像候補も探すよ。</p></div><button type="button" class="ghost" data-hd-ship-image-audit>画像整合性を詳細確認</button><div id="hdShipImageIntegrityStatus" class="muted">未確認</div></div><div class="hd-ship-image-verify"><div><strong>正解指紋表</strong><p>自分で用意した「MASTER ID → SHA-256」JSONを読み込むと、画像を 一致 / 不一致 / 未検証 で判定できる。</p></div><div><label class="ghost hd-ship-image-verify-file">検証表を読み込む<input id="hdShipImageVerifyInput" type="file" accept=".json,application/json"></label><button type="button" class="ghost" data-hd-ship-image-verify-template>空テンプレート</button><button type="button" class="ghost" data-hd-ship-image-verify-clear>検証表を解除</button></div><span id="hdShipImageVerifyStatus"></span></div><div class="hd-ship-image-backup"><div><strong>画像ライブラリのバックアップ</strong><p>端末保存の画像をMASTER IDのまま1ファイルへ保存。復元は既存画像へ上書き統合するよ。</p></div><div><button type="button" class="ghost" data-hd-ship-image-share>共有して保存</button><button type="button" class="ghost" data-hd-ship-image-export>バックアップを書き出す</button><label class="ghost hd-ship-image-backup-file">バックアップを復元<input id="hdShipImageBackupInput" type="file" accept=".hdshipimg,application/x-harbordesk-ship-images"></label></div><span id="hdShipImageBackupStatus"></span></div><div class="hd-ship-image-dialog-status"><b>端末保存</b><span id="hdShipImageCount">確認中…</span></div><small>ゲーム内画像そのものを公開リポジトリへ同梱する機能ではないよ。利用する画像の権利・利用条件は画像提供元に従ってね。</small>`;
  document.body.appendChild(d);
  d.querySelector('#hdShipImageRemoteTemplate').value=hdShipImageConfig().remoteTemplate;d.querySelector('#hdShipImageAutoSource').checked=hdShipImageConfig().autoSource;
  return d;
@@ -284,6 +304,7 @@ document.addEventListener('click',async e=>{
  if(e.target.closest?.('[data-hd-ship-image-audit]')){const d=hdShipImageEnsureDialog(),status=d.querySelector('#hdShipImageIntegrityStatus');if(status)status.textContent='画像指紋を確認中…';try{const a=await hdShipImageIntegrityAudit(true);if(status)status.innerHTML=`<b>${hdShipImageEsc(hdShipImageIntegritySummary(a))}</b>${a.duplicates.length?`<small>${a.duplicates.slice(0,8).map(g=>`同一候補: ${g.items.map(x=>`${hdShipImageEsc(x.name)}(ID ${x.id})`).join(' / ')}`).join('<br>')}${a.duplicates.length>8?`<br>ほか${a.duplicates.length-8}組`:''}</small>`:''}`}catch(err){if(status)status.textContent='確認に失敗: '+String(err?.message||err)}return}
  if(e.target.closest?.('[data-hd-ship-image-verify-template]')){hdShipImageExportVerifyTemplate();return}
  if(e.target.closest?.('[data-hd-ship-image-verify-clear]')){localStorage.removeItem(HD_SHIP_IMAGE_VERIFY_KEY);window.dispatchEvent(new CustomEvent('hd:ship-images-changed',{detail:{verifyManifest:true,cleared:true}}));const d=hdShipImageEnsureDialog(),s=d.querySelector('#hdShipImageVerifyStatus');if(s)s.textContent='検証表なし';return}
+ if(e.target.closest?.('[data-hd-ship-image-share]')){const d=hdShipImageEnsureDialog(),status=d.querySelector('#hdShipImageBackupStatus');try{const ok=await hdShipImageShareBackup();if(status&&ok)status.textContent='画像バックアップを保存したよ'}catch(err){if(status)status.textContent='共有に失敗: '+String(err?.message||err)}return}
  if(e.target.closest?.('[data-hd-ship-image-export]')){const d=hdShipImageEnsureDialog(),status=d.querySelector('#hdShipImageBackupStatus');try{const ok=await hdShipImageExportBackup();if(status&&ok)status.textContent='バックアップを書き出したよ'}catch(err){if(status)status.textContent='書き出しに失敗: '+String(err?.message||err)}return}
  if(e.target.closest?.('[data-hd-ship-image-save-remote]')){const d=hdShipImageEnsureDialog(),input=d.querySelector('#hdShipImageRemoteTemplate');hdShipImageSaveConfig({remoteTemplate:input?.value||''});return}
 });
