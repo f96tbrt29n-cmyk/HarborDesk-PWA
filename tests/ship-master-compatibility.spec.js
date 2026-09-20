@@ -6282,3 +6282,23 @@ test('workspace supports back and forward navigation', async ({ page }) => {
   expect(data.forwardDisabled).toBe(false);
   expect(data.menuForward).toBe(true);
 });
+
+
+test('quick nav disables unavailable back and forward actions', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    window.hdQNEnsure?.();
+    sessionStorage.setItem('harbordesk-session-workspace-history-v1','[]');
+    sessionStorage.setItem('harbordesk-session-workspace-forward-v1','[]');
+    window.hdQNUpdateHistoryActions?.();
+    const b=document.querySelector('[data-hd-qn-back]'),f=document.querySelector('[data-hd-qn-forward]');
+    const empty={back:!!b?.disabled,forward:!!f?.disabled};
+    sessionStorage.setItem('harbordesk-session-workspace-history-v1',JSON.stringify([{group:'fleet',section:'roster'}]));
+    sessionStorage.setItem('harbordesk-session-workspace-forward-v1',JSON.stringify([{group:'arsenal',section:'equipmentBook'}]));
+    window.hdQNUpdateHistoryActions?.();
+    return {empty,ready:{back:!!b?.disabled,forward:!!f?.disabled}};
+  });
+  expect(data.empty).toEqual({back:true,forward:true});
+  expect(data.ready).toEqual({back:false,forward:false});
+});
