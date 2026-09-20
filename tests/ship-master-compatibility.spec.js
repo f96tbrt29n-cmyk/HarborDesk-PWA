@@ -8,13 +8,26 @@ async function boot(page, errors = []) {
     if (msg.type() !== 'error') return;
     const text = msg.text();
     const source = String(msg.location?.().url || '');
-    if (/Failed to load resource/i.test(text) && source) {
-      try {
-        const host = new URL(source).hostname;
-        if (host !== '127.0.0.1' && host !== 'localhost') return;
-      } catch {}
+    if (/Failed to load resource/i.test(text)) {
+      if (!source && /status of 403/i.test(text)) return;
+      if (source) {
+        try {
+          const host = new URL(source).hostname;
+          if (host !== '127.0.0.1' && host !== 'localhost') return;
+        } catch {}
+      }
     }
     errors.push(`console${source ? ' [' + source + ']' : ''}: ${text}`);
+  });
+  page.on('response', response => {
+    const status = response.status();
+    if (status < 400) return;
+    try {
+      const url = new URL(response.url());
+      if (url.hostname === '127.0.0.1' || url.hostname === 'localhost') {
+        errors.push(`http ${status}: ${url.pathname}`);
+      }
+    } catch {}
   });
   await page.addInitScript(() => {
     try {
