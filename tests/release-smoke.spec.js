@@ -990,3 +990,54 @@ test('release smoke: mobile attention tracks external backup freshness', async (
   expect(result.afterSyncPriority).toBe(60);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: mobile attention offers one-tap backup action', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdQNOpenAttention === 'function' &&
+    typeof window.hdQNRunAttentionAction === 'function'
+  );
+
+  const result = await page.evaluate(async () => {
+    const now = Date.now();
+    localStorage.removeItem('harbordesk-last-external-backup-v1');
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({ syncedAt: now }));
+
+    window.hdQNOpenAttention();
+    const dialog = document.getElementById('hdMobileAttentionDialog');
+    const action = document.querySelector('[data-hd-attention-action="backup-now"]');
+    const label = action?.textContent || '';
+
+    const originalShare = window.shareBackup;
+    let calls = 0;
+    window.shareBackup = async () => { calls++; return false; };
+    const cancelled = await window.hdQNRunAttentionAction('backup-now', 'backup');
+    const openAfterCancel = !!dialog?.open;
+
+    window.shareBackup = async () => { calls++; return true; };
+    const saved = await window.hdQNRunAttentionAction('backup-now', 'backup');
+    const openAfterSave = !!dialog?.open;
+
+    window.shareBackup = originalShare;
+    return {
+      hasAction: !!action,
+      label,
+      cancelled,
+      saved,
+      openAfterCancel,
+      openAfterSave,
+      calls
+    };
+  });
+
+  expect(result.hasAction).toBe(true);
+  expect(result.label).toContain('今すぐ保存');
+  expect(result.cancelled).toBe(false);
+  expect(result.openAfterCancel).toBe(true);
+  expect(result.saved).toBe(true);
+  expect(result.openAfterSave).toBe(false);
+  expect(result.calls).toBe(2);
+  expect(errors).toEqual([]);
+});
