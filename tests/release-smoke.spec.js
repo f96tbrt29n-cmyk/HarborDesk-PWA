@@ -531,3 +531,52 @@ test('release smoke: ship image backup exposes share action and records backup t
   expect(data.storedAt).toBe(data.markedAt);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('release smoke: backup restore preview can cancel without changing data', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.importBackup === 'function' &&
+    typeof window.hdAnalyzeBackupLocalStorage === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-preview-keep', JSON.stringify({ value: 'old' }));
+    localStorage.setItem('harbordesk-preview-remove', JSON.stringify({ remove: true }));
+    const backup = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      localStorage: {
+        'harbordesk-preview-keep': JSON.stringify({ value: 'new' }),
+        'harbordesk-preview-new': JSON.stringify({ added: true })
+      }
+    };
+    const file = new File([JSON.stringify(backup)], 'HarborDesk-preview.json', { type: 'application/json' });
+    window.__hdPreviewImportPromise = window.importBackup(file);
+  });
+
+  const dialog = page.locator('#hdBackupRestorePreviewDialog');
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('[data-hd-backup-preview-meta]')).toContainText('HarborDesk-preview.json');
+  await expect(dialog.locator('.hd-backup-preview-grid .add')).toContainText('1件');
+  await expect(dialog.locator('.hd-backup-preview-grid .update')).toContainText('1件');
+  await expect(dialog.locator('.hd-backup-preview-grid .remove')).toContainText('1件');
+
+  await dialog.locator('button[value="cancel"]').click();
+
+  const result = await page.evaluate(async () => {
+    const imported = await window.__hdPreviewImportPromise;
+    return {
+      imported,
+      keep: localStorage.getItem('harbordesk-preview-keep'),
+      removedCandidate: localStorage.getItem('harbordesk-preview-remove'),
+      addedCandidate: localStorage.getItem('harbordesk-preview-new')
+    };
+  });
+
+  expect(result.imported).toBe(false);
+  expect(JSON.parse(result.keep).value).toBe('old');
+  expect(JSON.parse(result.removedCandidate).remove).toBe(true);
+  expect(result.addedCandidate).toBeNull();
+  expect(errors).toEqual([]);
+});
