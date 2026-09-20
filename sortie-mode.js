@@ -1,4 +1,5 @@
 const HD_SM_SESSION_KEY='harbordesk-active-sortie-session-v1';
+const HD_SM_OBJECTIVE_PREF_KEY='harbordesk-sortie-objective-pref-v1';
 
 function hdSMEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function hdSMSession(){try{return typeof window.hdSSLoad==='function'?window.hdSSLoad():JSON.parse(localStorage.getItem(HD_SM_SESSION_KEY)||'null')}catch{return null}}
@@ -111,9 +112,14 @@ function hdSMObjectivePickerHtml(map,draft){
 }
 function hdSMSetObjectiveTarget(target){
  const session=hdSMSession();if(!session||session.status!=='active')return false;
- const prev=session.draft&&typeof session.draft==='object'?session.draft:{},chosen=String(target||'').trim(),allowed=hdSMObjectiveTargets(session.map);
- session.draft={...prev,objectiveTarget:allowed.includes(chosen)?chosen:'',updatedAt:Date.now()};
- try{if(typeof window.hdSSSave==='function')window.hdSSSave(session);else localStorage.setItem(HD_SM_SESSION_KEY,JSON.stringify(session))}catch{return false}
+ const prev=session.draft&&typeof session.draft==='object'?session.draft:{},chosen=String(target||'').trim(),allowed=hdSMObjectiveTargets(session.map),objectiveTarget=allowed.includes(chosen)?chosen:'';
+ session.draft={...prev,objectiveTarget,updatedAt:Date.now()};
+ try{
+  const prefs=JSON.parse(localStorage.getItem(HD_SM_OBJECTIVE_PREF_KEY)||'{}')||{},map=String(session.map||'');
+  if(objectiveTarget)prefs[map]=objectiveTarget;else delete prefs[map];
+  localStorage.setItem(HD_SM_OBJECTIVE_PREF_KEY,JSON.stringify(prefs));
+  if(typeof window.hdSSSave==='function')window.hdSSSave(session);else localStorage.setItem(HD_SM_SESSION_KEY,JSON.stringify(session));
+ }catch{return false}
  try{window.dispatchEvent(new CustomEvent('hd:sortie-draft-saved',{detail:{sessionId:session.id,draft:session.draft}}))}catch{}
  hdSMRender();return true;
 }
