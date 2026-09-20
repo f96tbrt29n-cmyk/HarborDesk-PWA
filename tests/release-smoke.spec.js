@@ -742,3 +742,77 @@ test('release smoke: restore aborts when safety snapshot fails', async ({ page }
   expect(result.alerts.join(' ')).toContain('スナップショット');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: external restore transaction rolls back partial writes', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdCaptureHarborLocalStorage === 'function' &&
+    typeof window.hdApplyBackupTransaction === 'function'
+  );
+
+  const result = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-rollback-a', JSON.stringify({ value: 'safe-a' }));
+    localStorage.setItem('harbordesk-rollback-b', JSON.stringify({ value: 'safe-b' }));
+    const before = window.hdCaptureHarborLocalStorage();
+    const target = {
+      'harbordesk-rollback-a': JSON.stringify({ value: 'incoming' })
+    };
+    const tx = window.hdApplyBackupTransaction(target, before, () => {
+      localStorage.setItem('harbordesk-rollback-a', JSON.stringify({ value: 'partial' }));
+      localStorage.removeItem('harbordesk-rollback-b');
+    });
+    return {
+      ok: !!tx.ok,
+      rollbackOk: !!tx.rollback?.ok,
+      a: localStorage.getItem('harbordesk-rollback-a'),
+      b: localStorage.getItem('harbordesk-rollback-b'),
+      expectedA: before['harbordesk-rollback-a'],
+      expectedB: before['harbordesk-rollback-b']
+    };
+  });
+
+  expect(result.ok).toBe(false);
+  expect(result.rollbackOk).toBe(true);
+  expect(result.a).toBe(result.expectedA);
+  expect(result.b).toBe(result.expectedB);
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: snapshot restore transaction rolls back partial writes', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdPHHarborData === 'function' &&
+    typeof window.hdPHRestoreTransaction === 'function'
+  );
+
+  const result = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ph-rollback-a', JSON.stringify({ value: 'safe-a' }));
+    localStorage.setItem('harbordesk-ph-rollback-b', JSON.stringify({ value: 'safe-b' }));
+    const before = window.hdPHHarborData();
+    const target = {
+      'harbordesk-ph-rollback-a': JSON.stringify({ value: 'incoming' })
+    };
+    const tx = window.hdPHRestoreTransaction(target, before, () => {
+      localStorage.setItem('harbordesk-ph-rollback-a', JSON.stringify({ value: 'partial' }));
+      localStorage.removeItem('harbordesk-ph-rollback-b');
+    });
+    return {
+      ok: !!tx.ok,
+      rollbackOk: !!tx.rollback?.ok,
+      a: localStorage.getItem('harbordesk-ph-rollback-a'),
+      b: localStorage.getItem('harbordesk-ph-rollback-b'),
+      expectedA: before['harbordesk-ph-rollback-a'],
+      expectedB: before['harbordesk-ph-rollback-b']
+    };
+  });
+
+  expect(result.ok).toBe(false);
+  expect(result.rollbackOk).toBe(true);
+  expect(result.a).toBe(result.expectedA);
+  expect(result.b).toBe(result.expectedB);
+  expect(errors).toEqual([]);
+});
