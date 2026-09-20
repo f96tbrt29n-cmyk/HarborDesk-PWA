@@ -118,12 +118,23 @@ function hdSMStartHpState(session){
  });
  return {available:true,rows,critical:rows.filter(x=>x.state==='大破'||x.state==='轟沈'),damaged:rows.filter(x=>x.ratio<1)};
 }
+function hdSMRequiresAdvanceCheck(map,label){
+ const current=String(label||'').trim();if(!current)return false;
+ const graph=hdSMGraph(map),kind=hdSMNodeKind(graph,current);
+ if(['item','safe','vortex','goal'].includes(kind))return false;
+ let detail={};try{if(typeof HD_NODE_DETAIL_OVERRIDES!=='undefined')detail=HD_NODE_DETAIL_OVERRIDES?.[map]?.[current]||{}}catch{}
+ const enemy=String(detail.enemy||'').trim();
+ if(/^(戦闘なし|能動分岐|うずしお)/.test(enemy)||/気のせいだった|敵影を見ず/.test(enemy))return false;
+ return true;
+}
 function hdSMAdvanceGuard(session,draft){
  const current=String(draft?.node||'').trim();
- if(!current)return {required:false,current:'',confirmed:true,retreat:false,at:0,startHp:hdSMStartHpState(session)};
+ if(!current)return {required:false,current:'',confirmed:true,retreat:false,skipped:false,at:0,startHp:hdSMStartHpState(session)};
+ const required=hdSMRequiresAdvanceCheck(session?.map,current);
+ if(!required)return {required:false,current,confirmed:true,retreat:false,skipped:true,at:0,startHp:hdSMStartHpState(session)};
  const row=draft?.advanceGuard&&typeof draft.advanceGuard==='object'?draft.advanceGuard:{};
  const same=String(row.node||'')===current;
- return {required:true,current,confirmed:!!(same&&row.safe===true),retreat:!!(same&&row.safe===false),at:same?Math.max(0,Number(row.at)||0):0,startHp:hdSMStartHpState(session)};
+ return {required:true,current,confirmed:!!(same&&row.safe===true),retreat:!!(same&&row.safe===false),skipped:false,at:same?Math.max(0,Number(row.at)||0):0,startHp:hdSMStartHpState(session)};
 }
 function hdSMAdvanceGuardHtml(session,draft){
  const g=hdSMAdvanceGuard(session,draft);if(!g.required)return '';
@@ -154,7 +165,7 @@ function hdSMSetAdvanceGuard(safe){
 function hdSMHudHtml(session,draft){
  const current=String(draft?.node||'').trim();if(!current)return '';
  const graph=hdSMGraph(session?.map),kind=hdSMNodeKind(graph,current),intel=hdSMNodeIntel(session?.map,{label:current,kind}),guard=hdSMAdvanceGuard(session,draft),branch=hdSMBranchHint(session?.map,draft);
- const state=guard.retreat?'stop':guard.confirmed?'ready':'warn',status=guard.retreat?'撤退':guard.confirmed?'大破確認済':'大破未確認',jump=guard.confirmed?'next':'guard';
+ const state=guard.retreat?'stop':guard.confirmed?'ready':'warn',status=guard.retreat?'撤退':guard.skipped?'非戦闘':guard.confirmed?'大破確認済':'大破未確認',jump=guard.confirmed?'next':'guard';
  const next=guard.confirmed&&!guard.retreat?hdSMNextNodeRows(session?.map,draft):[],battleCount=hdSMBattleCount(session?.map,draft?.routeNodes||[]),bossDistance=hdSMBossDistance(session?.map,current);
  const nextHtml=next.length?'<div class="hd-sm-hud-next"><span>NEXT</span><div>'+next.slice(0,3).map(x=>{const ni=hdSMNodeIntel(session?.map,x);return '<button type="button" data-hd-sm-hud-node="'+hdSMEsc(x.label)+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(x.kind))+'・'+hdSMEsc(ni.formation)+'</small></button>'}).join('')+'</div>'+(next.length>3?'<em>+'+(next.length-3)+'</em>':'')+'</div>':'';
  const branchHtml=current&&branch?'<div class="hd-sm-hud-branch"><span>ROUTE</span><b>'+hdSMEsc(branch.title)+'</b><small>'+hdSMEsc(branch.text)+'</small></div>':'';
@@ -367,6 +378,7 @@ window.hdSMFormationAdvice=hdSMFormationAdvice;
 window.hdSMNodeIntel=hdSMNodeIntel;
 window.hdSMCurrentTacticHtml=hdSMCurrentTacticHtml;
 window.hdSMStartHpState=hdSMStartHpState;
+window.hdSMRequiresAdvanceCheck=hdSMRequiresAdvanceCheck;
 window.hdSMAdvanceGuard=hdSMAdvanceGuard;
 window.hdSMSetAdvanceGuard=hdSMSetAdvanceGuard;
 window.hdSMBossDistance=hdSMBossDistance;
