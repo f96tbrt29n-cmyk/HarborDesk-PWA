@@ -31,3 +31,9 @@
 
 [data-hd-equip-reset]:disabled{opacity:.42}
 [data-hd-equip-reset].is-active{border-color:#d9b45b;background:#3b2f16;color:#ffe9a8}
+
+.hd-equip-catalog-list.hd-compact .hd-equip-ref-card{cursor:pointer}
+.hd-equip-catalog-list.hd-compact .hd-equip-ref-card.hd-peek{padding:13px;gap:10px;border-color:rgba(111,198,247,.55);background:#10283b;cursor:default}
+.hd-equip-catalog-list.hd-compact .hd-equip-ref-card.hd-peek p{display:block}
+.hd-equip-catalog-list.hd-compact .hd-equip-ref-card.hd-peek .hd-equip-ref-grid{display:grid}
+.hd-equip-catalog-list.hd-compact .hd-equip-ref-card.hd-peek .guide-link{display:inline-flex}
