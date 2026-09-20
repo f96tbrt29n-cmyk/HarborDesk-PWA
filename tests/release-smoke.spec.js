@@ -2520,6 +2520,7 @@ test('release smoke: sticky sortie HUD exposes confirmed next-node actions', asy
   await expect(hud).toContainText('大破確認済');
   await expect(hud.locator('[data-hd-sm-hud-node="C"]')).toBeVisible();
   await expect(hud.locator('[data-hd-sm-hud-node="D"]')).toBeVisible();
+  await expect(hud.locator('[data-hd-sm-hud-node="D"]')).toContainText('単縦陣');
 
   await hud.locator('[data-hd-sm-hud-node="D"]').click();
   await expect(page.locator('#hdSMNode')).toHaveValue('D');
