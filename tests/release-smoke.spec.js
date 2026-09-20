@@ -2332,7 +2332,7 @@ test('release smoke: sortie mode keeps current battle status visible in sticky h
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
       status:'active',
-      draft:{node:'A',routeNodes:['A'],result:'S',memo:''}
+      draft:{node:'B',routeNodes:['B'],result:'S',memo:''}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
@@ -2341,7 +2341,7 @@ test('release smoke: sortie mode keeps current battle status visible in sticky h
 
   const hud = page.locator('.hd-sm-hud');
   await expect(hud).toBeVisible();
-  await expect(hud).toContainText('A');
+  await expect(hud).toContainText('B');
   await expect(hud).toContainText('単縦陣');
   await expect(hud).toContainText('大破未確認');
   expect(await hud.evaluate(el => getComputedStyle(el).position)).toBe('sticky');
@@ -2703,5 +2703,57 @@ test('release smoke: sortie derives effective node kinds from verified data', as
   await a.click();
   await expect(page.locator('.hd-sm-hud')).toContainText('資源');
   await expect(page.locator('.hd-sm-current-tactic')).toContainText('選択なし');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: sortie uses effective non-battle kind in HUD and node intelligence', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMEffectiveNodeKind === 'function' &&
+    typeof window.hdSMNodeIntel === 'function' &&
+    typeof window.hdSMRender === 'function'
+  );
+
+  const intel = await page.evaluate(() => ({
+    kind: window.hdSMEffectiveNodeKind('2-4','A','normal'),
+    node: window.hdSMNodeIntel('2-4',{label:'A',kind:'normal'})
+  }));
+  expect(intel.kind).toBe('item');
+  expect(intel.node.kind).toBe('item');
+  expect(intel.node.badge).toBe('非戦闘');
+  expect(intel.node.formation).toBe('選択なし');
+  expect(intel.node.caution).toBe('戦闘なし');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-effective-kind-session',
+      map:'2-4',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-effective-kind-fleet',
+      fleetName:'実質マス種別テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-effective-kind-fleet',name:'実質マス種別テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active'
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const a = page.locator('[data-hd-sm-next-node="A"]');
+  await expect(a).toContainText('資源');
+  await expect(a).toContainText('非戦闘');
+  await expect(a).toContainText('選択なし');
+  await a.click();
+
+  const hud = page.locator('.hd-sm-hud');
+  await expect(hud).toContainText('資源');
+  await expect(hud).toContainText('基本陣形 選択なし');
+  await expect(hud).toContainText('非戦闘');
   expect(errors).toEqual([]);
 });
