@@ -162,7 +162,9 @@ function hdSMSaveObjectivePreference(map,target){
  return objectiveTarget;
 }
 function hdSMSetObjectivePreference(map,target){
- hdSMSaveObjectivePreference(map,target);hdSMRender();return true;
+ const objectiveTarget=hdSMSaveObjectivePreference(map,target);
+ try{window.dispatchEvent(new CustomEvent('hd:sortie-objective-changed',{detail:{map:String(map||''),objectiveTarget}}))}catch{}
+ hdSMRender();return true;
 }
 function hdSMObjectivePrestartHtml(map){
  const options=hdSMObjectiveOptions(map);if(options.length<2)return '';
@@ -209,7 +211,7 @@ function hdSMSetObjectiveTarget(target){
  const prev=session.draft&&typeof session.draft==='object'?session.draft:{},objectiveTarget=hdSMSaveObjectivePreference(session.map,target);
  session.draft={...prev,objectiveTarget,updatedAt:Date.now()};
  try{if(typeof window.hdSSSave==='function')window.hdSSSave(session);else localStorage.setItem(HD_SM_SESSION_KEY,JSON.stringify(session))}catch{return false}
- try{window.dispatchEvent(new CustomEvent('hd:sortie-draft-saved',{detail:{sessionId:session.id,draft:session.draft}}))}catch{}
+ try{window.dispatchEvent(new CustomEvent('hd:sortie-draft-saved',{detail:{sessionId:session.id,draft:session.draft}}));window.dispatchEvent(new CustomEvent('hd:sortie-objective-changed',{detail:{map:String(session.map||''),objectiveTarget}}))}catch{}
  hdSMRender();return true;
 }
 function hdSMBranchHint(map,draft){
