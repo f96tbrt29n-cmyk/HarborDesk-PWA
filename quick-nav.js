@@ -39,6 +39,18 @@ function hdQNRenderContext(){
  host.hidden=false;
  host.innerHTML=`<div class="hd-qn-context-head"><span>このカテゴリ</span><b>${hdQNEsc(meta.label)}</b></div><div class="hd-qn-context-grid">${rows.map(x=>`<button type="button" class="${x.id===selected?'active':''}" data-hd-qn-context="${hdQNEsc(x.id)}">${hdQNEsc(x.title)}</button>`).join('')}</div>`;
 }
+function hdQNFavoriteRows(limit=8){
+ const sections=new Map(hdQNSections().map(x=>[x.id,x])),pins=hdQNLoadPins(),valid=pins.filter(id=>sections.has(id));
+ if(valid.length!==pins.length)hdQNSavePins(valid);
+ return valid.slice(0,limit).map(id=>sections.get(id));
+}
+function hdQNRenderFavorites(){
+ const host=document.getElementById('hdQNFavorites');if(!host)return;
+ const rows=hdQNFavoriteRows();
+ if(!rows.length){host.hidden=true;host.innerHTML='';return}
+ host.hidden=false;
+ host.innerHTML=`<div class="hd-qn-fav-head"><span>よく使う機能</span><small>★で固定した機能</small></div><div class="hd-qn-fav-grid">${rows.map(x=>`<button type="button" data-hd-qn-jump="${hdQNEsc(x.id)}" title="${hdQNEsc(x.title)}"><span>★</span><b>${hdQNEsc(x.title)}</b></button>`).join('')}</div>`;
+}
 function hdQNRecentRows(limit=5){
  const active=window.hdWSState?.sections?.[window.hdWSState?.group]||'';
  const sections=new Map(hdQNSections().map(x=>[x.id,x])),all=hdQNLoadRecent(),valid=all.filter(x=>x?.id&&sections.has(x.id));
@@ -85,7 +97,7 @@ function hdQNUpdateHistoryActions(){
 }
 function hdQNOpen(){
   hdQNEnsure();const d=document.getElementById('hdQuickNavDialog');if(!d)return;
-  const input=document.getElementById('hdQNSearch');if(input)input.value='';hdQNRenderContext();hdQNRenderRecent();hdQNRenderList('');hdQNUpdateHistoryActions();
+  const input=document.getElementById('hdQNSearch');if(input)input.value='';hdQNRenderFavorites();hdQNRenderRecent();hdQNRenderContext();hdQNRenderList('');hdQNUpdateHistoryActions();
   if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');
   hdQNUpdateMobileDock();
   setTimeout(()=>input?.focus(),50);
@@ -229,7 +241,7 @@ function hdQNUpdateMobileDock(){
 function hdQNEnsure(){
   if(document.getElementById('hdQuickNavButton')){hdQNEnsureMobileDock();return;}
   const btn=document.createElement('button');btn.id='hdQuickNavButton';btn.type='button';btn.className='hd-qn-fab';btn.innerHTML='<span>☰</span><b>機能</b>';btn.addEventListener('click',hdQNOpen);document.body.appendChild(btn);
-  const d=document.createElement('dialog');d.id='hdQuickNavDialog';d.className='hd-qn-dialog';d.innerHTML=`<div class="hd-qn-head"><div><div class="eyebrow">QUICK NAV</div><h3>機能をすぐ開く</h3></div><button type="button" class="ghost small" data-hd-qn-close>閉じる</button></div><div class="hd-qn-actions"><button type="button" data-hd-qn-back><span>‹</span><b>戻る</b><small data-hd-qn-back-target>履歴なし</small></button><button type="button" data-hd-qn-forward><span>›</span><b>進む</b><small data-hd-qn-forward-target>履歴なし</small></button><button type="button" data-hd-qn-home><span>⌂</span><b>ホーム</b></button><button type="button" data-hd-gs-open><span>⌕</span><b>検索</b></button><button type="button" data-hd-qn-sync><span>↻</span><b>同期</b></button><a href="https://play.games.dmm.com/game/kancolle"><span>⚓</span><b>艦これ</b></a><button type="button" data-hd-qn-top><span>↑</span><b>上へ</b></button></div><div id="hdQNContext" class="hd-qn-context" hidden></div><div id="hdQNRecent" class="hd-qn-recent" hidden></div><div class="hd-qn-tools"><input id="hdQNSearch" type="search" placeholder="機能名で検索"></div><div id="hdQNList" class="hd-qn-list"></div><div class="hd-qn-foot">★を付けた機能は上に固定するよ。</div>`;document.body.appendChild(d);
+  const d=document.createElement('dialog');d.id='hdQuickNavDialog';d.className='hd-qn-dialog';d.innerHTML=`<div class="hd-qn-head"><div><div class="eyebrow">QUICK NAV</div><h3>機能をすぐ開く</h3></div><button type="button" class="ghost small" data-hd-qn-close>閉じる</button></div><div class="hd-qn-actions"><button type="button" data-hd-qn-back><span>‹</span><b>戻る</b><small data-hd-qn-back-target>履歴なし</small></button><button type="button" data-hd-qn-forward><span>›</span><b>進む</b><small data-hd-qn-forward-target>履歴なし</small></button><button type="button" data-hd-qn-home><span>⌂</span><b>ホーム</b></button><button type="button" data-hd-gs-open><span>⌕</span><b>検索</b></button><button type="button" data-hd-qn-sync><span>↻</span><b>同期</b></button><a href="https://play.games.dmm.com/game/kancolle"><span>⚓</span><b>艦これ</b></a><button type="button" data-hd-qn-top><span>↑</span><b>上へ</b></button></div><div id="hdQNFavorites" class="hd-qn-favorites" hidden></div><div id="hdQNRecent" class="hd-qn-recent" hidden></div><div id="hdQNContext" class="hd-qn-context" hidden></div><div class="hd-qn-tools"><div class="hd-qn-tools-head"><b>すべての機能</b><small>名前で検索</small></div><input id="hdQNSearch" type="search" placeholder="機能名で検索"></div><div id="hdQNList" class="hd-qn-list"></div><div class="hd-qn-foot">★を付けた機能は上に固定するよ。</div>`;document.body.appendChild(d);
   d.addEventListener('click',e=>{if(e.target===d)hdQNClose()});
   document.getElementById('hdQNSearch')?.addEventListener('input',e=>hdQNRenderList(e.target.value));
   hdQNRenderList();hdQNEnsureMobileDock();
@@ -289,4 +301,4 @@ window.addEventListener('hd:global-search-close',hdQNUpdateMobileDock);
 window.addEventListener('pageshow',hdQNUpdateMobileDock);
 
 window.addEventListener('hd:workspace-history',()=>{hdQNUpdateHistoryActions();hdQNUpdateMobileDock()});
-window.addEventListener('hd:quick-nav-updated',()=>{if(document.getElementById('hdQuickNavDialog')?.open){hdQNRenderRecent();hdQNRenderList(document.getElementById('hdQNSearch')?.value||'')}});
+window.addEventListener('hd:quick-nav-updated',()=>{if(document.getElementById('hdQuickNavDialog')?.open){hdQNRenderFavorites();hdQNRenderRecent();hdQNRenderList(document.getElementById('hdQNSearch')?.value||'')}});
