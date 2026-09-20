@@ -6522,3 +6522,56 @@ test('quick nav shows pinned favorites separately', async ({ page }) => {
   expect(data.allLabel).toContain('すべての機能');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('quick nav category cards show usage counts and all-list collapse', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
+    localStorage.setItem('harbordesk-quick-nav-pins-v1',JSON.stringify(['roster','equipmentBook']));
+    localStorage.setItem('harbordesk-quick-nav-recent-v1',JSON.stringify([
+      {id:'roster',at:Date.now()},
+      {id:'equipmentBook',at:Date.now()-1000}
+    ]));
+    sessionStorage.removeItem('harbordesk-session-quick-nav-all-open-v1');
+    window.hdQNEnsure?.();
+    window.hdQNRenderCategories?.();
+    const fleet=document.querySelector('#hdQNCategories [data-hd-qn-group="fleet"]');
+    const arsenal=document.querySelector('#hdQNCategories [data-hd-qn-group="arsenal"]');
+    const initialOpen=window.hdQNAllOpenLoad?.();
+    window.hdQNSetAllOpen?.(false);
+    const dialog=document.getElementById('hdQuickNavDialog');
+    const toggle=document.querySelector('[data-hd-qn-toggle-all]');
+    const collapsed={
+      cls:!!dialog?.classList.contains('hd-qn-all-collapsed'),
+      expanded:toggle?.getAttribute('aria-expanded')||'',
+      text:toggle?.textContent||'',
+      saved:sessionStorage.getItem('harbordesk-session-quick-nav-all-open-v1')
+    };
+    window.hdQNToggleAll?.();
+    const reopened={
+      cls:!!dialog?.classList.contains('hd-qn-all-collapsed'),
+      expanded:toggle?.getAttribute('aria-expanded')||'',
+      text:toggle?.textContent||'',
+      saved:sessionStorage.getItem('harbordesk-session-quick-nav-all-open-v1')
+    };
+    return {
+      fleetText:fleet?.textContent||'',
+      fleetAria:fleet?.getAttribute('aria-label')||'',
+      arsenalText:arsenal?.textContent||'',
+      categories:document.querySelectorAll('#hdQNCategories [data-hd-qn-group]').length,
+      initialOpen,
+      collapsed,
+      reopened
+    };
+  });
+  expect(data.categories).toBeGreaterThanOrEqual(7);
+  expect(data.fleetText).toContain('★ 1');
+  expect(data.fleetText).toContain('最近 1');
+  expect(data.fleetAria).toContain('固定 1件');
+  expect(data.arsenalText).toContain('★ 1');
+  expect(data.arsenalText).toContain('最近 1');
+  expect(data.initialOpen).toBe(true);
+  expect(data.collapsed).toEqual({cls:true,expanded:'false',text:'開く',saved:'0'});
+  expect(data.reopened).toEqual({cls:false,expanded:'true',text:'閉じる',saved:'1'});
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
