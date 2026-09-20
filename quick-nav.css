@@ -66,6 +66,9 @@ body.hd-workspace-mode{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 .hd-mobile-attention-list strong{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hd-mobile-attention-list small{font-size:9px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hd-mobile-attention-list i{font-style:normal;color:var(--accent2);font-size:18px}
+.hd-mobile-attention-list>button.hd-mobile-attention-action{grid-template-columns:auto auto;justify-content:center;gap:7px;margin-top:-3px;padding:8px 10px;border-style:dashed;background:#102b3f;color:#dff4ff;text-align:center}
+.hd-mobile-attention-list>button.hd-mobile-attention-action>span{width:auto;height:auto;background:transparent;color:#7fd4ff;font-size:13px}
+.hd-mobile-attention-list>button.hd-mobile-attention-action>b{font-size:11px}
 @media(min-width:561px){.hd-mobile-attention-dialog{display:none}}
 
 @media(max-width:560px){
