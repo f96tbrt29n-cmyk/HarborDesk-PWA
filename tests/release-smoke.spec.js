@@ -3281,3 +3281,44 @@ test('release smoke: pre-start route preview follows selected objective', async 
   expect(result.auto).toContain('自動（攻略目標）');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: pre-start objective remains visible before fleet selection', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMIdleHtml === 'function' &&
+    typeof window.hdSMStartButtonLabel === 'function' &&
+    typeof window.hdSMSaveObjectivePreference === 'function'
+  );
+
+  const state = await page.evaluate(() => {
+    const oldMap=window.hdSSMap, oldSummary=window.hdSSSelectedSummary;
+    window.hdSMSaveObjectivePreference('7-2','G2');
+    window.hdSSMap=()=> '7-2';
+    window.hdSSSelectedSummary=()=>null;
+    const noFleet=window.hdSMIdleHtml();
+
+    window.hdSSSelectedSummary=()=>({
+      fleet:{name:'開始前目標テスト艦隊'},
+      strategyLabel:'手動編成',
+      stats:{autoTotal:0,autoOk:0,manualTotal:0,manualDone:0,shipCount:1,unresolved:[]}
+    });
+    const withFleet=window.hdSMIdleHtml();
+    const selectedLabel=window.hdSMStartButtonLabel('7-2');
+
+    window.hdSMSaveObjectivePreference('7-2','');
+    const autoLabel=window.hdSMStartButtonLabel('7-2');
+    window.hdSSMap=oldMap;window.hdSSSelectedSummary=oldSummary;
+    return {noFleet,withFleet,selectedLabel,autoLabel};
+  });
+
+  expect(state.noFleet).toContain('出撃目標');
+  expect(state.noFleet).toContain('START ROUTE');
+  expect(state.noFleet).toContain('G2 ボス');
+  expect(state.noFleet).toContain('出撃目標を先に決めてから');
+  expect(state.withFleet).toContain('G2ボスで出撃開始');
+  expect(state.selectedLabel).toBe('G2ボスで出撃開始');
+  expect(state.autoLabel).toBe('この編成で出撃開始');
+  expect(errors).toEqual([]);
+});
