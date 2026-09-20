@@ -1893,6 +1893,12 @@ test('release smoke: sortie mode autosaves and restores in-progress draft', asyn
   await page.locator('#hdSMBuckets').fill('2');
   await page.locator('#hdSMMemo').fill('途中入力を保持');
   await page.locator('#hdSMBoss').check();
+
+  // Repeated delayed bootstrap must not redraw an active form and erase unsaved controls.
+  await page.evaluate(() => window.hdSMInstall());
+  await expect(page.locator('#hdSMResult')).toHaveValue('A');
+  await expect(page.locator('#hdSMBoss')).toBeChecked();
+
   await page.evaluate(() => window.hdSMSaveDraft());
 
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')||'null')?.draft || null);

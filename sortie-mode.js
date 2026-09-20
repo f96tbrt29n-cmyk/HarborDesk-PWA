@@ -131,7 +131,16 @@ function hdSMAction(action){
  if(['map','overview','gear'].includes(action)&&typeof window.hdSPSOpenMapTab==='function'){window.hdSPSOpenMapTab(action);return true}
  return false;
 }
-function hdSMInstall(){hdSMEnsure();hdSMRender();return true}
+let hdSMInstalled=false;
+function hdSMInstall(){
+ hdSMEnsure();
+ if(hdSMInstalled){
+  const body=document.getElementById('hdSortieModeBody');
+  if(body&&!body.children.length)hdSMRender();
+  return true;
+ }
+ hdSMInstalled=true;hdSMRender();return true;
+}
 
 document.addEventListener('input',function(e){if(e.target?.closest?.('#hdSortieModeBody input, #hdSortieModeBody select'))hdSMScheduleDraft()});
 document.addEventListener('change',function(e){if(e.target?.closest?.('#hdSortieModeBody input, #hdSortieModeBody select'))hdSMScheduleDraft()});
