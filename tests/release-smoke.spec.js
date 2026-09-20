@@ -353,3 +353,48 @@ test('release smoke: personal home order storage stays isolated', async ({ page 
   expect(data.personal).toEqual(['resources', 'coverage', 'attention', 'next', 'fleets', 'condition']);
   expect(errors).toEqual([]);
 });
+
+test('release smoke: backup can be shared as a JSON file on supported devices', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    localStorage.setItem('harbordesk-share-smoke-v1', JSON.stringify({ ok: true }));
+    window.__hdSharePayload = null;
+    try {
+      Object.defineProperty(navigator, 'canShare', { configurable: true, value: payload => !!payload?.files?.length });
+      Object.defineProperty(navigator, 'share', { configurable: true, value: async payload => {
+        const file = payload?.files?.[0];
+        window.__hdSharePayload = file ? {
+          title: payload.title || '',
+          name: file.name || '',
+          type: file.type || '',
+          text: await file.text()
+        } : null;
+      }});
+    } catch {}
+
+    const result = await window.shareBackup?.();
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+
+    let parsed = null;
+    try { parsed = JSON.parse(window.__hdSharePayload?.text || 'null'); } catch {}
+    return {
+      result,
+      share: window.__hdSharePayload,
+      parsedValue: parsed?.localStorage?.['harbordesk-share-smoke-v1'] || '',
+      advancedButton: !!document.getElementById('shareBackup'),
+      homeButton: !!document.querySelector('[data-ph-share-backup]')
+    };
+  });
+
+  expect(data.result).toBe(true);
+  expect(data.share?.title || '').toContain('HarborDesk');
+  expect(data.share?.name || '').toMatch(/^HarborDesk-backup-\d{4}-\d{2}-\d{2}\.json$/);
+  expect(data.share?.type).toBe('application/json');
+  expect(data.parsedValue).toBe(JSON.stringify({ ok: true }));
+  expect(data.advancedButton).toBe(true);
+  expect(data.homeButton).toBe(true);
+  expect(errors).toEqual([]);
+});
