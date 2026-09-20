@@ -3281,3 +3281,56 @@ test('release smoke: pre-start route preview follows selected objective', async 
   expect(result.auto).toContain('自動（攻略目標）');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie warns when selected objective is unreachable from current node', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSMObjectiveRouteState === 'function' &&
+    typeof window.hdSMSetObjectiveTarget === 'function'
+  );
+
+  const state = await page.evaluate(() => window.hdSMObjectiveRouteState('7-2',{
+    node:'C',routeNodes:['A','B','C'],objectiveTarget:'G2'
+  }));
+  expect(state.active).toBe(true);
+  expect(state.target).toBe('G2');
+  expect(state.alternatives.map(x=>x.label)).toContain('G1');
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-objective-route-alert',
+      map:'7-2',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-objective-route-alert-fleet',
+      fleetName:'目標ルート警告テスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-objective-route-alert-fleet',name:'目標ルート警告テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'C',routeNodes:['A','B','C'],result:'S',memo:'',objectiveTarget:'G2',advanceGuard:{node:'C',safe:true,at:Date.now()}}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  const warning = page.locator('.hd-sm-objective-warning');
+  await expect(warning).toBeVisible();
+  await expect(warning).toContainText('CからG2ボスへ構造図上接続なし');
+  await expect(page.locator('.hd-sm-hud-objective-alert')).toContainText('G2ボスへ接続なし');
+  await expect(warning.locator('[data-hd-sm-objective="G1"]')).toContainText('G1 到達地点へ切替');
+
+  await warning.locator('[data-hd-sm-objective="G1"]').click();
+  await expect(page.locator('.hd-sm-objective-warning')).toHaveCount(0);
+  await expect(page.locator('.hd-sm-hud-objective-alert')).toHaveCount(0);
+  await expect(page.locator('.hd-sm-objective-picker [data-hd-sm-objective="G1"]')).toHaveClass(/active/);
+
+  const draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
+  expect(draft.objectiveTarget).toBe('G1');
+  expect(errors).toEqual([]);
+});
