@@ -3045,3 +3045,21 @@ test('release smoke: sortie log preserves selected objective', async ({ page }) 
   expect(entry.boss).toBe(true);
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie log displays selected objective badge', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdSLRender === 'function');
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify([
+      {id:'obj-badge-1',at:Date.now(),map:'7-2',node:'G2',result:'S',boss:true,battles:4,objectiveTarget:'G2'}
+    ]));
+    window.hdSLRender();
+    window.hdWSShowElement?.('sortieLog', false);
+  });
+  const row = page.locator('#sortieLog .hd-sl-row').first();
+  await expect(row).toBeVisible();
+  await expect(row.locator('.hd-sl-badge.objective')).toContainText('目標 G2');
+  expect(errors).toEqual([]);
+});
