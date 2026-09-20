@@ -36,29 +36,29 @@ function hdSMNextNodeRows(map,draft){
  return labels.map(label=>({label,kind:hdSMEffectiveNodeKind(map,label,hdSMNodeKind(graph,label))}));
 }
 function hdSMBossDistance(map,current){
- const graph=hdSMGraph(map),from=String(current||'').trim(),target=String(graph?.boss||graph?.goal||'').trim();
- if(!graph||!Array.isArray(graph.edges)||!from||!target)return null;
- if(from===target)return 0;
+ const graph=hdSMGraph(map),from=String(current||'').trim(),targets=hdSMObjectiveTargets(map);
+ if(!graph||!Array.isArray(graph.edges)||!from||!targets.length)return null;
+ if(targets.includes(from))return 0;
  const q=[[from,0]],seen=new Set([from]);
  while(q.length){
   const [node,d]=q.shift();
   for(const [a,b] of graph.edges){
    if(a!==node||seen.has(b))continue;
-   if(b===target)return d+1;
+   if(targets.includes(b))return d+1;
    seen.add(b);q.push([b,d+1]);
   }
  }
  return null;
 }
 function hdSMBossBattleDistance(map,current){
- const graph=hdSMGraph(map),from=String(current||'').trim(),target=String(graph?.boss||graph?.goal||'').trim();
- if(!graph||!Array.isArray(graph.edges)||!from||!target)return null;
- if(from===target)return 0;
+ const graph=hdSMGraph(map),from=String(current||'').trim(),targets=hdSMObjectiveTargets(map);
+ if(!graph||!Array.isArray(graph.edges)||!from||!targets.length)return null;
+ if(targets.includes(from))return 0;
  const dist=new Map([[from,0]]),queue=[from];
  while(queue.length){
   queue.sort((a,b)=>(dist.get(a)||0)-(dist.get(b)||0));
   const node=queue.shift(),base=dist.get(node)||0;
-  if(node===target)return base;
+  if(targets.includes(node))return base;
   for(const [a,b] of graph.edges){
    if(a!==node)continue;
    const next=base+(hdSMRequiresAdvanceCheck(map,b)?1:0),old=dist.get(b);
@@ -68,7 +68,7 @@ function hdSMBossBattleDistance(map,current){
  return null;
 }
 function hdSMCanReachBoss(map,label){
- const graph=hdSMGraph(map),from=String(label||'').trim(),targets=[...new Set([graph?.boss,graph?.goal].map(String).map(x=>x.trim()).filter(Boolean))];
+ const graph=hdSMGraph(map),from=String(label||'').trim(),targets=hdSMObjectiveTargets(map);
  if(!graph||!Array.isArray(graph.edges)||!from||!targets.length)return null;
  if(targets.includes(from))return true;
  const queue=[from],seen=new Set([from]);
@@ -81,6 +81,10 @@ function hdSMCanReachBoss(map,label){
   }
  }
  return false;
+}
+function hdSMObjectiveTargets(map){
+ const graph=hdSMGraph(map);
+ return [...new Set([graph?.boss,graph?.goal].map(String).map(x=>x.trim()).filter(Boolean))];
 }
 function hdSMRouteTargetName(map){
  const graph=hdSMGraph(map),hasBoss=!!String(graph?.boss||'').trim(),hasGoal=!!String(graph?.goal||'').trim();
@@ -215,7 +219,8 @@ function hdSMHudHtml(session,draft){
  const next=guard.confirmed&&!guard.retreat?hdSMNextNodeRows(session?.map,draft):[],battleCount=hdSMBattleCount(session?.map,draft?.routeNodes||[]),bossDistance=hdSMBossDistance(session?.map,current),bossBattles=hdSMBossBattleDistance(session?.map,current);
  const nextHtml=next.length?'<div class="hd-sm-hud-next"><span>NEXT</span><div>'+next.slice(0,3).map(x=>{const ni=hdSMNodeIntel(session?.map,x),reachable=hdSMCanReachBoss(session?.map,x.label),targetName=hdSMRouteTargetName(session?.map);return '<button type="button" class="'+(reachable===false?'route-off':reachable===true?'route-on':'')+'" data-hd-sm-hud-node="'+hdSMEsc(x.label)+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(ni.kind))+'・'+hdSMEsc(ni.formation)+'</small><em>'+(reachable===true?targetName+'接続':reachable===false?'逸れ候補':'経路不明')+'</em></button>'}).join('')+'</div>'+(next.length>3?'<em>+'+(next.length-3)+'</em>':'')+'</div>':'';
  const branchHtml=current&&branch?'<div class="hd-sm-hud-branch"><span>ROUTE</span><b>'+hdSMEsc(branch.title)+'</b><small>'+hdSMEsc(branch.text)+'</small></div>':'';
- const progressHtml='<div class="hd-sm-hud-progress"><span>戦闘 <b>'+battleCount+'</b></span><span>'+(bossDistance===0?'ボス到達':bossDistance==null?'ボス距離 —':'構造図最短 ボスまで <b>'+bossDistance+'マス</b>')+'</span><span>'+(bossBattles==null?'最少戦闘 —':bossBattles===0?'最少戦闘あと 0':'最少戦闘あと <b>'+bossBattles+'</b>')+'</span></div>';
+ const targetName=hdSMRouteTargetName(session?.map);
+ const progressHtml='<div class="hd-sm-hud-progress"><span>戦闘 <b>'+battleCount+'</b></span><span>'+(bossDistance===0?targetName+'到達':bossDistance==null?targetName+'距離 —':'構造図最短 '+targetName+'まで <b>'+bossDistance+'マス</b>')+'</span><span>'+(bossBattles==null?'最少戦闘 —':bossBattles===0?'最少戦闘あと 0':'最少戦闘あと <b>'+bossBattles+'</b>')+'</span></div>';
  return '<div class="hd-sm-hud '+state+'"><div class="hd-sm-hud-node"><span>NOW</span><b>'+hdSMEsc(current)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(kind))+'</small></div><div class="hd-sm-hud-main"><span>基本陣形 <b>'+hdSMEsc(intel.formation)+'</b></span><strong>'+hdSMEsc(status)+'</strong></div><button type="button" class="ghost small" data-hd-sm-hud-jump="'+jump+'">'+(guard.confirmed?'詳細':'確認する')+'</button>'+progressHtml+branchHtml+nextHtml+'</div>';
 }
 function hdSMHudJump(target){
@@ -433,6 +438,7 @@ window.hdSMBossDistance=hdSMBossDistance;
 window.hdSMBossBattleDistance=hdSMBossBattleDistance;
 window.hdSMCanReachBoss=hdSMCanReachBoss;
 window.hdSMRouteTargetName=hdSMRouteTargetName;
+window.hdSMObjectiveTargets=hdSMObjectiveTargets;
 window.hdSMHudHtml=hdSMHudHtml;
 window.hdSMHudJump=hdSMHudJump;
 window.hdSMBattleCount=hdSMBattleCount;
