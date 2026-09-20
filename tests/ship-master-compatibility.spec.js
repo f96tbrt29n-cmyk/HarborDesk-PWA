@@ -6985,3 +6985,62 @@ test('home fleet summary shows synced fleets and expedition state', async ({ pag
   expect(data.currentFleetHost).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
+
+test('home fleet condition summary flags low hp and low cond ships', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    localStorage.setItem('harbordesk-kancolle-fleets-v1',JSON.stringify([
+      {
+        deckId:1,
+        name:'第一艦隊',
+        mission:[0,0,0,0],
+        ships:[
+          {gameShipId:1,name:'赤城',level:99,nowHp:80,maxHp:80,cond:49},
+          {gameShipId:2,name:'加賀',level:98,nowHp:30,maxHp:80,cond:45}
+        ]
+      },
+      {
+        deckId:2,
+        name:'第二艦隊',
+        mission:[0,0,0,0],
+        ships:[
+          {gameShipId:3,name:'長門',level:90,nowHp:90,maxHp:90,cond:20},
+          {gameShipId:4,name:'陸奥',level:88,nowHp:70,maxHp:90,cond:55}
+        ]
+      }
+    ]));
+    window.hdPHEnsure?.();
+    await window.hdPHRender?.();
+    const summary=window.hdPHFleetCondition?.();
+    return {
+      summary:{
+        fleetCount:summary?.fleetCount,
+        shipCount:summary?.shipCount,
+        hpLowCount:summary?.hpLowCount,
+        condLowCount:summary?.condLowCount,
+        ready:summary?.ready,
+        affected:(summary?.affected||[]).map(x=>x.name)
+      },
+      blockClass:document.querySelector('.hd-ph-condition-block')?.className||'',
+      blockText:document.querySelector('.hd-ph-condition-block')?.textContent||'',
+      metrics:[...document.querySelectorAll('.hd-ph-condition-metric')].map(x=>x.textContent||'')
+    };
+  });
+  expect(data.summary).toMatchObject({
+    fleetCount:2,
+    shipCount:4,
+    hpLowCount:1,
+    condLowCount:1,
+    ready:false
+  });
+  expect(data.summary.affected).toContain('加賀');
+  expect(data.summary.affected).toContain('長門');
+  expect(data.blockClass).toContain('warn');
+  expect(data.blockText).toContain('HP50%未満');
+  expect(data.blockText).toContain('cond30未満');
+  expect(data.blockText).toContain('加賀');
+  expect(data.blockText).toContain('長門');
+  expect(data.metrics.join(' ')).toContain('4隻');
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
