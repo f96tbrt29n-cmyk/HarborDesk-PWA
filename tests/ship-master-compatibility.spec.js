@@ -6421,3 +6421,37 @@ test('compact peek survives database rerender', async ({ page }) => {
   expect(data.shipOpen).toBe(true);
   expect(data.equipOpen).toBe(true);
 });
+
+test('quick nav shows recently opened feature shortcuts', async ({ page }) => {
+  const errors=[];
+  await boot(page,errors);
+  const data=await page.evaluate(async()=>{
+    localStorage.setItem('harbordesk-quick-nav-recent-v1',JSON.stringify([
+      {id:'roster',at:Date.now()-1000},
+      {id:'equipmentBook',at:Date.now()-2000}
+    ]));
+    window.hdQNEnsure?.();
+    window.hdQNRenderRecent?.();
+    const before=[...document.querySelectorAll('#hdQNRecent [data-hd-qn-jump]')].map(x=>({id:x.dataset.hdQnJump,text:x.textContent.trim()}));
+    window.hdWSShowElement?.('roster',false);
+    await new Promise(r=>setTimeout(r,30));
+    const recent=JSON.parse(localStorage.getItem('harbordesk-quick-nav-recent-v1')||'[]');
+    window.hdQNRenderRecent?.();
+    const after=[...document.querySelectorAll('#hdQNRecent [data-hd-qn-jump]')].map(x=>x.dataset.hdQnJump);
+    return {
+      hidden:!!document.getElementById('hdQNRecent')?.hidden,
+      before,
+      latest:recent[0]?.id||'',
+      after,
+      hasLabel:(document.getElementById('hdQNRecent')?.textContent||'').includes('最近使った機能')
+    };
+  });
+  expect(data.before.map(x=>x.id)).toContain('roster');
+  expect(data.before.map(x=>x.id)).toContain('equipmentBook');
+  expect(data.latest).toBe('roster');
+  expect(data.after).not.toContain('roster');
+  expect(data.after).toContain('equipmentBook');
+  expect(data.hidden).toBe(false);
+  expect(data.hasLabel).toBe(true);
+  expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
+});
