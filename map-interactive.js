@@ -133,15 +133,18 @@ function hdOpenRouteTab(){
 function hdEnhanceMapPane(){
   const pane=document.querySelector('[data-map-pane="map"]');if(!pane||pane.dataset.hdEnhanced==='1')return;
   const imageSection=pane.querySelector('.hd-map-image-section');if(!imageSection)return;
+  const structure=imageSection.querySelector('.hd-map-structure-guide')||imageSection;
   pane.dataset.hdEnhanced='1';
-  // Source images have no verified clickable coordinates or graph overlay.
-  if(imageSection.hasAttribute('data-hd-map-reference'))return;
   const tools=document.createElement('div');tools.className='hd-map-tools';
   tools.innerHTML=`<div class="hd-map-legend"><span data-kind="normal">通常</span><span data-kind="sub">潜水</span><span data-kind="air">航空</span><span data-kind="night">夜戦</span><span data-kind="vortex">うずしお</span><span data-kind="item">資源</span><span data-kind="boss">ボス</span></div><button class="ghost small" type="button" id="hdRouteHighlight">最短経路を強調</button>`;
-  imageSection.prepend(tools);
-  tools.querySelector('#hdRouteHighlight')?.addEventListener('click',()=>hdHighlightShortest(hdInteractiveMap()));
+  const body=structure.querySelector?.('.hd-map-structure-body')||structure;
+  body.prepend(tools);
+  tools.querySelector('#hdRouteHighlight')?.addEventListener('click',()=>{
+    if(structure.tagName==='DETAILS')structure.open=true;
+    hdHighlightShortest(hdInteractiveMap());
+  });
   const host=hdEnsureNodeInfoHost();
-  if(host&&!host.innerHTML)host.innerHTML=`<div class="eyebrow">MAP GUIDE</div><p>マスをタップすると敵編成・制空・索敵・基地航空隊情報を表示するよ。</p>${hdAdvancedHtml(hdInteractiveMap())}`;
+  if(host&&!host.innerHTML)host.innerHTML=`<div class="eyebrow">MAP GUIDE</div><p>「操作用の構造ガイド」を開いてマスをタップすると、敵編成・制空・索敵・基地航空隊情報を表示するよ。</p>${hdAdvancedHtml(hdInteractiveMap())}`;
 }
 
 // Capture phase: node taps show details instead of triggering the parent map-zoom button.
