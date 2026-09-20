@@ -45,9 +45,16 @@ function hdQNRenderList(filter=''){
   rows.sort((a,b)=>{const ap=pinSet.has(a.id),bp=pinSet.has(b.id);if(ap!==bp)return bp-ap;const ar=recentMap.get(a.id)||0,br=recentMap.get(b.id)||0;if(ar!==br)return br-ar;return a.title.localeCompare(b.title,'ja')});
   host.innerHTML=rows.length?rows.map(x=>`<div class="hd-qn-row ${pinSet.has(x.id)?'pinned':''}"><button type="button" class="hd-qn-jump" data-hd-qn-jump="${hdQNEsc(x.id)}"><span>${hdQNEsc(x.title)}</span><small>${hdQNEsc(x.id)}${recentMap.has(x.id)?' ・ 最近使用':''}</small></button><button type="button" class="hd-qn-pin" data-hd-qn-pin="${hdQNEsc(x.id)}" aria-label="${pinSet.has(x.id)?'ピン解除':'ピン留め'}">${pinSet.has(x.id)?'★':'☆'}</button></div>`).join(''):'<div class="empty">該当する機能がないよ。</div>';
 }
+function hdQNUpdateHistoryActions(){
+ const back=document.querySelector('[data-hd-qn-back]'),forward=document.querySelector('[data-hd-qn-forward]');
+ const backCount=typeof hdWSHistoryLoad==='function'?hdWSHistoryLoad().length:Math.max(0,hdQNLoadHistory().length-1);
+ const forwardCount=typeof hdWSForwardLoad==='function'?hdWSForwardLoad().length:0;
+ if(back){back.disabled=backCount<=0;back.setAttribute('aria-label',backCount>0?`前の機能へ戻る・履歴 ${backCount}件`:'戻れる履歴なし')}
+ if(forward){forward.disabled=forwardCount<=0;forward.setAttribute('aria-label',forwardCount>0?`次の機能へ進む・履歴 ${forwardCount}件`:'進める履歴なし')}
+}
 function hdQNOpen(){
   hdQNEnsure();const d=document.getElementById('hdQuickNavDialog');if(!d)return;
-  const input=document.getElementById('hdQNSearch');if(input)input.value='';hdQNRenderContext();hdQNRenderList('');
+  const input=document.getElementById('hdQNSearch');if(input)input.value='';hdQNRenderContext();hdQNRenderList('');hdQNUpdateHistoryActions();
   if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');
   hdQNUpdateMobileDock();
   setTimeout(()=>input?.focus(),50);
@@ -217,8 +224,8 @@ document.addEventListener('click',e=>{
   }
   if(e.target.closest?.('[data-hd-mobile-menu]')){hdQNOpen();return}
   if(e.target.closest?.('[data-hd-qn-close]')){hdQNClose();return}
-  if(e.target.closest?.('[data-hd-qn-back]')){const ok=typeof hdWSGoBack==='function'?hdWSGoBack():hdQNBack();if(!ok)hdQNClose();return}
-  if(e.target.closest?.('[data-hd-qn-forward]')){const ok=typeof hdWSGoForward==='function'&&hdWSGoForward();if(!ok)hdQNClose();return}
+  if(e.target.closest?.('[data-hd-qn-back]')){const ok=typeof hdWSGoBack==='function'?hdWSGoBack():hdQNBack();hdQNUpdateHistoryActions();if(!ok)hdQNClose();return}
+  if(e.target.closest?.('[data-hd-qn-forward]')){const ok=typeof hdWSGoForward==='function'&&hdWSGoForward();hdQNUpdateHistoryActions();if(!ok)hdQNClose();return}
   if(e.target.closest?.('[data-hd-qn-home]')){hdQNClose();if(typeof hdWSShowElement==='function')hdWSShowElement('home',true);else document.getElementById('home')?.scrollIntoView({behavior:'smooth',block:'start'});return}
   if(e.target.closest?.('[data-hd-qn-sync]')){hdQNJump('kancolleImport');return}
   if(e.target.closest?.('[data-hd-qn-top]')){hdQNClose();window.scrollTo({top:0,behavior:'smooth'});return}
@@ -246,3 +253,5 @@ window.addEventListener('hd:global-search-open',hdQNUpdateMobileDock);
 window.addEventListener('hd:global-search-close',hdQNUpdateMobileDock);
 
 window.addEventListener('pageshow',hdQNUpdateMobileDock);
+
+window.addEventListener('hd:workspace-history',()=>{hdQNUpdateHistoryActions();hdQNUpdateMobileDock()});
