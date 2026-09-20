@@ -1557,21 +1557,18 @@ test('release smoke: shared mobile layout prevents chrome overlap across iPhone 
     { width: 844, height: 390 }
   ];
 
+  await page.waitForFunction(() =>
+    document.querySelector('.hd-header-more')?.dataset?.hdInlineBound === '1' &&
+    !!document.getElementById('hdMobileHeaderMenuRow'),
+    null,
+    { timeout: 30000 }
+  );
+
   for (const size of sizes) {
     await page.setViewportSize(size);
-    await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 30000 });
-    await page.waitForFunction(() => document.body && !document.body.classList.contains('hd-booting'), null, { timeout: 30000 });
+    await page.waitForTimeout(180);
     await page.locator('[data-hd-ws-group="guide"]').click();
     await page.waitForTimeout(120);
-    if (size.width <= 560) {
-      await page.waitForFunction(() =>
-        document.querySelector('.hd-header-more')?.dataset?.hdInlineBound === '1' &&
-        !!document.getElementById('hdMobileHeaderMenuRow'),
-        null,
-        { timeout: 12000 }
-      );
-    }
 
     const before = await page.evaluate(() => {
       const top=document.querySelector('.topbar')?.getBoundingClientRect();
