@@ -4,9 +4,18 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      suite:
+        description: Test suite
+        required: true
+        default: smoke
+        type: choice
+        options:
+          - smoke
+          - full
 
 concurrency:
-  group: browser-regression-${{ github.ref }}
+  group: browser-regression-${{ github.ref }}-${{ github.event_name == 'workflow_dispatch' && inputs.suite || 'smoke' }}
   cancel-in-progress: true
 
 permissions:
@@ -16,7 +25,7 @@ jobs:
   playwright:
     name: Playwright / ${{ matrix.browser }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
@@ -37,8 +46,13 @@ jobs:
       - name: Install Playwright browser
         run: npx playwright install --with-deps ${{ matrix.browser }}
 
-      - name: Run HarborDesk browser regression
+      - name: Run smoke browser regression
+        if: github.event_name != 'workflow_dispatch' || inputs.suite == 'smoke'
         run: npm run test:browser -- --project=${{ matrix.browser }}
+
+      - name: Run full browser regression
+        if: github.event_name == 'workflow_dispatch' && inputs.suite == 'full'
+        run: npm run test:browser:full -- --project=${{ matrix.browser }} --workers=1
 
       - name: Upload Playwright diagnostics
         if: failure()
