@@ -57,7 +57,8 @@ function renderDashboard(){
 function renderEquipment(){
  const el=document.getElementById('equipmentList');if(!el)return;const q=(document.getElementById('equipmentSearch')?.value||'').toLowerCase(),all=hdLoad(HD_EQUIP_KEY,[]);
  const rows=all.filter(x=>!q||`${x.name} ${x.category} ${x.assigned} ${x.memo}`.toLowerCase().includes(q));
- const count=document.getElementById('equipmentLedgerCount');if(count)count.textContent=rows.length===all.length?`${all.length}件`:`${rows.length} / ${all.length}件`;
+ const allItems=all.reduce((sum,x)=>sum+Math.max(0,Number(x?.count)||0),0),shownItems=rows.reduce((sum,x)=>sum+Math.max(0,Number(x?.count)||0),0);
+ const count=document.getElementById('equipmentLedgerCount');if(count)count.textContent=rows.length===all.length?`${all.length}種類 / ${allItems}個`:`${rows.length}種類・${shownItems}個 / 全${all.length}種類・${allItems}個`;
  const clear=document.querySelector('[data-eq-search-clear]');if(clear)clear.disabled=!q;
  const empty=all.length===0
   ?'<div class="empty empty-action"><strong>装備はまだ登録されてないよ</strong><p>ゲーム同期で取り込むか、ここから手動で追加できるよ。</p><div><button type="button" class="primary small" data-empty-add-equipment>＋ 装備を追加</button> <button type="button" class="ghost small" data-empty-open-sync>ゲーム同期</button></div></div>'
