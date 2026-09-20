@@ -3000,3 +3000,48 @@ test('release smoke: sortie objective selector changes route guidance on multi-t
   expect(draft.objectiveTarget).toBe('');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: sortie log preserves selected objective', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSMRender === 'function' &&
+    typeof window.hdSSFinish === 'function' &&
+    typeof window.hdSMFormData === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
+      id:'sm-objective-log-session',
+      map:'7-2',
+      startedAt:Date.now()-60000,
+      fleetId:'sm-objective-log-fleet',
+      fleetName:'攻略目標ログテスト艦隊',
+      strategy:'manual',
+      strategyLabel:'手動編成',
+      fleetSnapshot:{id:'sm-objective-log-fleet',name:'攻略目標ログテスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
+      shipCount:1,
+      status:'active',
+      draft:{node:'G2',routeNodes:['D','E','F','I','G2'],result:'S',memo:'',objectiveTarget:'G2',battles:4,boss:true}
+    }));
+    window.hdSMEnsure();
+    window.hdSMRender();
+    window.hdSMOpen();
+  });
+
+  await expect(page.locator('.hd-sm-objective-picker [data-hd-sm-objective="G2"]')).toHaveClass(/active/);
+
+  await page.evaluate(() => {
+    const data=window.hdSMFormData();
+    data.node='G2';data.result='S';data.boss=true;
+    window.hdSSFinish(data);
+  });
+
+  const entry = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]')[0]);
+  expect(entry.map).toBe('7-2');
+  expect(entry.objectiveTarget).toBe('G2');
+  expect(entry.boss).toBe(true);
+  expect(errors).toEqual([]);
+});
