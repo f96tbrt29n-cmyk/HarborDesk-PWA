@@ -37,8 +37,11 @@ function hdPHApplyCollapsed(){
   const head=block.querySelector(':scope > .hd-ph-sub');if(!head)continue;
   let actions=head.querySelector(':scope > .hd-ph-collapse-actions');
   if(!actions){actions=document.createElement('div');actions.className='hd-ph-collapse-actions';
-   const movable=[...head.children].find(x=>x.tagName==='DIV');
-   if(movable){while(movable.firstChild)actions.appendChild(movable.firstChild);movable.remove()}
+   for(const child of [...head.children]){
+    if(child===head.querySelector(':scope > strong'))continue;
+    if(child.tagName==='DIV'){while(child.firstChild)actions.appendChild(child.firstChild);child.remove()}
+    else actions.appendChild(child);
+   }
    head.appendChild(actions);
   }
   let btn=actions.querySelector('[data-ph-collapse]');if(!btn){btn=document.createElement('button');btn.type='button';btn.className='ghost small hd-ph-collapse-toggle';btn.dataset.phCollapse=spec.key;actions.appendChild(btn)}
