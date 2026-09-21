@@ -32,6 +32,7 @@ function hdSortieState(map,fleetId){
  const row=hdSortieLoad(HD_SORTIE_READY_KEY,{})[`${map}:${fleetId}`]||{},fleet=hdSortieFleetById(map,fleetId),fingerprint=hdSortieFleetFingerprint(fleet);
  if(!row.updatedAt)return row;
  if(!row._fingerprint||row._fingerprint!==fingerprint)return {_resetReason:'編成または同期状態が変わったため、手動チェックを再確認してね'};
+ if(Date.now()-Number(row.updatedAt)>2*60*60*1000)return {_resetReason:'前回の出撃前確認から2時間以上たったため、現在状態をもう一度確認してね'};
  return row;
 }
 function hdSortieSetCheck(map,fleetId,id,checked){
@@ -84,17 +85,30 @@ function hdSortieAutoChecks(map,fleet){
  return {checks:out,needs,adv};
 }
 function hdSortieManualChecks(map,adv){
- const rows=[
+ const fleet=hdSortieFleetById(map,hdSortieSelection(map)),gear=hdSortieGearText(fleet),rows=[
   {id:'supply',label:'燃料・弾薬を満タンまで補給した'},
   {id:'damage',label:'大破艦がいないことを確認した'},
   {id:'morale',label:'オレンジ/赤疲労がないことを確認した'},
+  {id:'loadout',label:'ゲーム側の編成・装備をこの予定どおりに合わせた'},
   {id:'mission',label:'任務・編成指定を確認した'}
  ];
+ if(/艦戦|艦攻|艦爆|水戦|水爆|偵察機|彩雲|瑞雲|烈風|零戦|飛龍|銀河|東海/i.test(gear))rows.splice(3,0,{id:'aircraft',label:'艦載機を補充して搭載数を確認した'});
  if(adv?.los)rows.push({id:'los',label:'索敵値・分岐条件を確認した'});
  if(adv?.base?.available)rows.push({id:'base',label:`基地航空隊（${adv.base.sorties||1}部隊・半径${adv.base.bossRadius??'要確認'}）を確認した`});
  const text=typeof hdMapEquipText==='function'?hdMapEquipText(map):'';
  if(/支援|決戦支援|道中支援/.test(text)||['5-5','6-5'].includes(map))rows.push({id:'support',label:'必要なら支援艦隊を準備した'});
  return rows;
+}
+function hdSortieOperationalConfirmation(map,fleetId){
+ const fleet=hdSortieFleetById(map,fleetId||hdSortieSelection(map));if(!fleet)return {valid:false,map,fleetId:'',updatedAt:0};
+ const state=hdSortieState(map,fleet.id),manual=hdSortieManualChecks(map,hdSortieNeeds(map)?.adv||{}),ids=new Set(manual.map(x=>x.id)),updatedAt=Number(state.updatedAt)||0,ageMinutes=updatedAt?Math.max(0,Math.floor((Date.now()-updatedAt)/60000)):null,valid=!!updatedAt&&!state._resetReason;
+ return {
+  valid,map,fleetId:fleet.id,updatedAt,ageMinutes,
+  supply:valid&&!!state.supply,damage:valid&&!!state.damage,morale:valid&&!!state.morale,
+  loadout:valid&&!!state.loadout,aircraft:valid&&(!ids.has('aircraft')||!!state.aircraft),
+  aircraftRequired:ids.has('aircraft'),
+  completeDynamic:valid&&!!state.supply&&!!state.damage&&!!state.morale&&!!state.loadout&&(!ids.has('aircraft')||!!state.aircraft)
+ };
 }
 function hdSortieSortedChecks(rows=[]){const rank={warn:0,note:1,ok:2};return [...rows].sort((a,b)=>(rank[a.state]??9)-(rank[b.state]??9))}
 function hdSortieSummary(manual,state,auto){const done=manual.filter(x=>state[x.id]).length,total=manual.length,autoOk=auto.filter(x=>x.state==='ok').length,autoWarn=auto.filter(x=>x.state==='warn').length,autoNote=auto.filter(x=>x.state==='note').length;return {done,total,pct:total?Math.round(done/total*100):0,autoOk,autoWarn,autoNote,autoTotal:auto.length}}
@@ -126,7 +140,7 @@ function hdSortieManualRowHtml(x,state){
 function hdSortieHtml(map){
  const fleets=hdSortieFleets(map);if(!fleets.length)return `<section id="hdSortieReadiness" class="hd-sortie-ready"><div class="hd-sortie-head"><div><div class="eyebrow">SORTIE READY</div><h4>出撃前チェック</h4></div></div><div class="empty">この海域の「自分用編成」を保存すると、編成と海域条件を照合して出撃前チェックを作れるよ。</div></section>`;
  const fleetId=hdSortieSelection(map),fleet=fleets.find(x=>x.id===fleetId)||fleets[0],autoInfo=hdSortieAutoChecks(map,fleet),manual=hdSortieManualChecks(map,autoInfo.adv),state=hdSortieState(map,fleet.id),sum=hdSortieSummary(manual,state,autoInfo.checks),sortedChecks=hdSortieSortedChecks(autoInfo.checks),problemChecks=sortedChecks.filter(x=>x.state!=='ok'),nextCheck=problemChecks[0]||null,remainingProblems=problemChecks.slice(1),okChecks=sortedChecks.filter(x=>x.state==='ok'),manualPending=manual.filter(x=>!state[x.id]),manualDone=manual.filter(x=>state[x.id]),autoState=sum.autoWarn?'warn':sum.autoNote?'note':'ok',autoLabel=sum.autoWarn?`要確認 ${sum.autoWarn}件`:sum.autoNote?`注意 ${sum.autoNote}件`:'自動確認OK';
- return `<section id="hdSortieReadiness" class="hd-sortie-ready"><div class="hd-sortie-head"><div><div class="eyebrow">SORTIE READY</div><h4>出撃前チェック</h4></div><span class="hd-sortie-score">手動 ${sum.done}/${sum.total}</span></div><div class="hd-sortie-overview ${autoState}"><strong>${autoLabel}</strong><span>自動 ${sum.autoOk}/${sum.autoTotal} OK</span></div><p class="muted">保存編成・装備メモに加え、ゲーム同期からコピーした艦隊は同期時点の耐久・疲労も自動確認。状態は変化するので、出撃直前はゲーム画面でも最終確認してね。</p><label class="hd-sortie-select">使用編成<select id="hdSortieFleetSelect">${fleets.map(x=>`<option value="${hdSortieEsc(x.id)}" ${x.id===fleet.id?'selected':''}>${hdSortieEsc(x.name)}</option>`).join('')}</select></label><div class="hd-sortie-progress"><progress max="100" value="${sum.pct}"></progress><span>${sum.pct}%</span></div><div class="hd-sortie-auto"><div class="hd-sortie-subhead"><strong>自動確認</strong><span>${sum.autoOk}/${sum.autoTotal}項目検出</span></div>${hdSortieNextActionHtml(nextCheck)}${remainingProblems.length?`<div class="hd-sortie-more-issues"><span>ほかの確認項目 ${remainingProblems.length}件</span>${remainingProblems.map(hdSortieAutoRowHtml).join('')}</div>`:''}${okChecks.length?`<details class="hd-sortie-auto-ok"><summary><span>OK項目</span><b>${okChecks.length}件</b></summary><div>${okChecks.map(hdSortieAutoRowHtml).join('')}</div></details>`:''}</div><div class="hd-sortie-manual"><div class="hd-sortie-subhead"><strong>出撃直前</strong><span>${manualPending.length?`残り ${manualPending.length}件`:'手動チェック完了'}</span></div>${state._resetReason?`<div class="hd-sortie-reset-note"><span>↻</span><div><b>チェックを再確認</b><small>${hdSortieEsc(state._resetReason)}</small></div></div>`:''}${manualPending.map(x=>hdSortieManualRowHtml(x,state)).join('')}${manualDone.length?`<details class="hd-sortie-manual-done"><summary><span>完了済み</span><b>${manualDone.length}件</b></summary><div>${manualDone.map(x=>hdSortieManualRowHtml(x,state)).join('')}</div></details>`:''}</div><div class="hd-sortie-actions"><button type="button" class="ghost small" data-hd-sortie-refresh>再判定</button><button type="button" class="ghost small" data-hd-sortie-gear>装備候補を見る</button><button type="button" class="ghost small" data-hd-sortie-reset>チェックをリセット</button></div>${hdSortieFinalHtml(sum)}</section>`;
+ return `<section id="hdSortieReadiness" class="hd-sortie-ready"><div class="hd-sortie-head"><div><div class="eyebrow">SORTIE READY</div><h4>出撃前チェック</h4></div><span class="hd-sortie-score">手動 ${sum.done}/${sum.total}</span></div><div class="hd-sortie-overview ${autoState}"><strong>${autoLabel}</strong><span>自動 ${sum.autoOk}/${sum.autoTotal} OK</span></div><p class="muted">同期は艦隊・装備台帳の基準点として使うよ。耐久・疲労・補給・艦載機・ゲーム側の編成/装備は、毎回の同期ではなく下の「出撃直前」チェックを最新状態として優先する。</p><label class="hd-sortie-select">使用編成<select id="hdSortieFleetSelect">${fleets.map(x=>`<option value="${hdSortieEsc(x.id)}" ${x.id===fleet.id?'selected':''}>${hdSortieEsc(x.name)}</option>`).join('')}</select></label><div class="hd-sortie-progress"><progress max="100" value="${sum.pct}"></progress><span>${sum.pct}%</span></div><div class="hd-sortie-auto"><div class="hd-sortie-subhead"><strong>自動確認</strong><span>${sum.autoOk}/${sum.autoTotal}項目検出</span></div>${hdSortieNextActionHtml(nextCheck)}${remainingProblems.length?`<div class="hd-sortie-more-issues"><span>ほかの確認項目 ${remainingProblems.length}件</span>${remainingProblems.map(hdSortieAutoRowHtml).join('')}</div>`:''}${okChecks.length?`<details class="hd-sortie-auto-ok"><summary><span>OK項目</span><b>${okChecks.length}件</b></summary><div>${okChecks.map(hdSortieAutoRowHtml).join('')}</div></details>`:''}</div><div class="hd-sortie-manual"><div class="hd-sortie-subhead"><strong>出撃直前</strong><span>${manualPending.length?`残り ${manualPending.length}件`:'手動チェック完了'}</span></div>${state._resetReason?`<div class="hd-sortie-reset-note"><span>↻</span><div><b>チェックを再確認</b><small>${hdSortieEsc(state._resetReason)}</small></div></div>`:''}${manualPending.map(x=>hdSortieManualRowHtml(x,state)).join('')}${manualDone.length?`<details class="hd-sortie-manual-done"><summary><span>完了済み</span><b>${manualDone.length}件</b></summary><div>${manualDone.map(x=>hdSortieManualRowHtml(x,state)).join('')}</div></details>`:''}</div><div class="hd-sortie-actions"><button type="button" class="ghost small" data-hd-sortie-refresh>再判定</button><button type="button" class="ghost small" data-hd-sortie-gear>装備候補を見る</button><button type="button" class="ghost small" data-hd-sortie-reset>チェックをリセット</button></div>${hdSortieFinalHtml(sum)}</section>`;
 }
 function hdRenderSortieReadiness(){
  if(typeof selectedMap==='undefined'||!selectedMap)return;const pane=document.querySelector('[data-map-pane="mine"]');if(!pane)return;pane.querySelector('#hdSortieReadiness')?.remove();pane.insertAdjacentHTML('beforeend',hdSortieHtml(selectedMap));
