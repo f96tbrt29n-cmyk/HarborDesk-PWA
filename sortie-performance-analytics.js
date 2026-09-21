@@ -353,7 +353,8 @@ function hdSPASeriesGoalStatus(row){
  const d=typeof hdSSSeriesDecision==='function'?hdSSSeriesDecision(s.seriesId):null;if(!d)return '';
  const g=d.goal,parts=[];if(g.maxCycles)parts.push('最大'+g.maxCycles+'周');if(g.maxResources)parts.push('資源'+g.maxResources);if(g.maxBuckets)parts.push('バケツ'+g.maxBuckets);if(g.maxElapsedMin)parts.push(g.maxElapsedMin+'分');if(g.target)parts.push('Drop '+g.target);
  if(!parts.length)return '';
- return '<div class="hd-spa-series-goal '+(d.stop?'stop':'active')+'"><div><span>終了条件</span><b>'+hdSPAEsc(parts.join(' / '))+'</b></div><strong>'+(d.stop?'到達・停止':'監視中')+'</strong>'+(d.reasons?.length?'<small>'+hdSPAEsc(d.reasons.join(' / '))+'</small>':'')+'</div>';
+ const recovery=d.stop&&typeof hdSSSeriesRecoveryPlan==='function'?hdSSSeriesRecoveryPlan(d):null,recoveryText=recovery?.items?.length?'再開: '+recovery.items.map(x=>x.label).join(' / ')+' を変更または解除':'';
+ return '<div class="hd-spa-series-goal '+(d.stop?'stop':'active')+'"><div><span>終了条件</span><b>'+hdSPAEsc(parts.join(' / '))+'</b></div><strong>'+(d.stop?'到達・停止':'監視中')+'</strong>'+(d.reasons?.length?'<small>'+hdSPAEsc(d.reasons.join(' / '))+(recoveryText?'<br>'+hdSPAEsc(recoveryText):'')+'</small>':'')+'</div>';
 }
 function hdSPASeriesHtml(row){
  const s=row?.seriesMeta;if(!s||s.cycles<2)return '';
