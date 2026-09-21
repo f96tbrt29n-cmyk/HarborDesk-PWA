@@ -50,15 +50,15 @@ function renderDashboard(){
  const roster=hdLoad('harbordesk-ship-roster-v1',[]), eq=hdLoad(HD_EQUIP_KEY,[]), events=hdLoad(HD_EVENT_KEY,[]);
  let activeTimers=0,unfinished=0,res={fuel:'',ammo:'',steel:'',bauxite:''};
  try{if(typeof state!=='undefined'){activeTimers=(state.expeditions||[]).filter(x=>x.endsAt>Date.now()).length+(state.docks||[]).filter(x=>x.endsAt>Date.now()).length;unfinished=(state.quests||[]).filter(x=>!x.done).length;res=state.resources||res}}catch{}
- const vals=[['燃料',Number(res.fuel)||0],['弾薬',Number(res.ammo)||0],['鋼材',Number(res.steel)||0],['ボーキ',Number(res.bauxite)||0]];const low=vals.filter(x=>x[1]>0).sort((a,b)=>a[1]-b[1])[0];
- el.innerHTML=`<div class="dash-card"><span>艦娘登録</span><strong>${roster.length}</strong></div><div class="dash-card"><span>装備種類</span><strong>${eq.length}</strong></div><div class="dash-card"><span>稼働タイマー</span><strong>${activeTimers}</strong></div><div class="dash-card"><span>未完了任務</span><strong>${unfinished}</strong></div><div class="dash-card"><span>イベント記録</span><strong>${events.length}</strong></div><div class="dash-card"><span>最少資源</span><strong>${low?`${low[0]} ${low[1].toLocaleString()}`:'未記録'}</strong></div>`;
+ const vals=[['燃料',Number(res.fuel)||0],['弾薬',Number(res.ammo)||0],['鋼材',Number(res.steel)||0],['ボーキ',Number(res.bauxite)||0]];const low=vals.filter(x=>x[1]>0).sort((a,b)=>a[1]-b[1])[0],ownedEquipTypes=eq.filter(x=>Math.max(0,Number(x?.count)||0)>0).length,equipPlans=eq.filter(x=>String(x?.source||'')==='equipment-plan').length;
+ el.innerHTML=`<div class="dash-card"><span>艦娘登録</span><strong>${roster.length}</strong></div><div class="dash-card"><span>装備種類</span><strong>${ownedEquipTypes}</strong>${equipPlans?`<small>計画 ${equipPlans}</small>`:''}</div><div class="dash-card"><span>稼働タイマー</span><strong>${activeTimers}</strong></div><div class="dash-card"><span>未完了任務</span><strong>${unfinished}</strong></div><div class="dash-card"><span>イベント記録</span><strong>${events.length}</strong></div><div class="dash-card"><span>最少資源</span><strong>${low?`${low[0]} ${low[1].toLocaleString()}`:'未記録'}</strong></div>`;
 }
 
 function renderEquipment(){
  const el=document.getElementById('equipmentList');if(!el)return;const q=(document.getElementById('equipmentSearch')?.value||'').toLowerCase(),all=hdLoad(HD_EQUIP_KEY,[]);
  const rows=all.filter(x=>!q||`${x.name} ${x.category} ${x.assigned} ${x.memo}`.toLowerCase().includes(q));
- const allItems=all.reduce((sum,x)=>sum+Math.max(0,Number(x?.count)||0),0),shownItems=rows.reduce((sum,x)=>sum+Math.max(0,Number(x?.count)||0),0);
- const count=document.getElementById('equipmentLedgerCount');if(count)count.textContent=rows.length===all.length?`${all.length}種類 / ${allItems}個`:`${rows.length}種類・${shownItems}個 / 全${all.length}種類・${allItems}個`;
+ const allItems=all.reduce((sum,x)=>sum+Math.max(0,Number(x?.count)||0),0),shownItems=rows.reduce((sum,x)=>sum+Math.max(0,Number(x?.count)||0),0),allOwned=all.filter(x=>Math.max(0,Number(x?.count)||0)>0).length,shownOwned=rows.filter(x=>Math.max(0,Number(x?.count)||0)>0).length,allPlans=all.filter(x=>String(x?.source||'')==='equipment-plan').length,shownPlans=rows.filter(x=>String(x?.source||'')==='equipment-plan').length;
+ const count=document.getElementById('equipmentLedgerCount');if(count)count.textContent=rows.length===all.length?`${allOwned}種類 / ${allItems}個${allPlans?` ・ 計画${allPlans}件`:''}`:`${shownOwned}種類・${shownItems}個${shownPlans?`・計画${shownPlans}件`:''} / 全${allOwned}種類・${allItems}個${allPlans?`・計画${allPlans}件`:''}`;
  const clear=document.querySelector('[data-eq-search-clear]');if(clear)clear.disabled=!q;
  const empty=all.length===0
   ?'<div class="empty empty-action"><strong>装備はまだ登録されてないよ</strong><p>ゲーム同期で取り込むか、ここから手動で追加できるよ。</p><div><button type="button" class="primary small" data-empty-add-equipment>＋ 装備を追加</button> <button type="button" class="ghost small" data-empty-open-sync>ゲーム同期</button></div></div>'
