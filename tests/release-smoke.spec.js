@@ -1274,6 +1274,64 @@ test('release smoke: post-sortie reprepare queue advances with reconciled game r
 });
 
 
+test('release smoke: completed post-sortie reprepare can continue into a safe repeat sortie', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSSPostRepeatStatus === 'function' &&
+    typeof window.hdSSPostRepeatStart === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const originals = {
+      fleets: window.hdSortieFleets,
+      stats: window.hdSSStats,
+      gate: window.hdSSGate
+    };
+    window.hdSortieFleets = () => [{ id:'fleet-a', name:'周回艦隊', ships:[{ship:'睦月'}] }];
+    window.hdSSStats = () => ({ manualTotal:0, manualDone:0, autoTotal:0, autoOk:0, shipCount:1, unresolved:[] });
+    window.hdSSGate = () => ({ state:'go', label:'出撃準備OK', detail:'問題なし', hardBlock:false, actions:[] });
+    window.hdSSSave(null);
+    window.hdSSPostSave({
+      version:1,status:'reviewed',sessionId:'session-2',entryId:'entry-2',
+      map:'1-1',fleetId:'fleet-a',fleetName:'周回艦隊',repeatIndex:2,
+      chainRootSessionId:'session-1',
+      review:{ gate:{state:'go'}, queue:[{id:'supply',status:'resolved',action:'補給する'}] }
+    });
+    const ready = window.hdSSPostRepeatStatus();
+
+    window.hdSSPostSave({
+      version:1,status:'reviewed',sessionId:'session-2',entryId:'entry-2',
+      map:'1-1',fleetId:'fleet-a',fleetName:'周回艦隊',repeatIndex:2,
+      chainRootSessionId:'session-1',
+      review:{ gate:{state:'hold'}, queue:[{id:'supply',status:'pending',action:'補給する'}] }
+    });
+    const pending = window.hdSSPostRepeatStatus();
+
+    window.hdSortieFleets = originals.fleets;
+    window.hdSSStats = originals.stats;
+    window.hdSSGate = originals.gate;
+    window.hdSSPostSave(null);
+    return { ready, pending };
+  });
+
+  expect(data.ready.state).toBe('ready');
+  expect(data.ready.map).toBe('1-1');
+  expect(data.ready.fleet.id).toBe('fleet-a');
+  expect(data.pending.state).toBe('pending');
+  expect(data.pending.queue.pending).toBe(1);
+
+  const source = await page.evaluate(async () => fetch('./sortie-session.js',{cache:'no-store'}).then(r=>r.text()));
+  const logSource = await page.evaluate(async () => fetch('./sortie-log.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain('data-hd-ss-repeat');
+  expect(source).toContain('同じ編成で再出撃');
+  expect(source).toContain("repeatIndex:(Number(post.repeatIndex)||1)+1");
+  expect(source).toContain("chainRootSessionId:String(post.chainRootSessionId||post.sessionId||'')");
+  expect(logSource).toContain("'repeatIndex','repeatFromSessionId','chainRootSessionId'");
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
