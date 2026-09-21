@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HarborDesk 艦これ連携
 // @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
-// @version      1.0.12
+// @version      1.0.13
 // @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
 // @match        http://*.dmm.com/*
 // @match        https://*.dmm.com/*
@@ -21,7 +21,7 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.12';
+const HD_VERSION='1.0.13';
 const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/';
 const RECORD_MESSAGE='harbordesk-kancolle-frame-record-v1';
 const STATUS_MESSAGE='harbordesk-kancolle-frame-status-v1';
@@ -49,6 +49,9 @@ function minimize(path,obj){
     api_id:Number(x.api_id)||0,api_ship_id:Number(x.api_ship_id)||0,api_lv:Number(x.api_lv)||0,
     api_nowhp:Number(x.api_nowhp)||0,api_maxhp:Number(x.api_maxhp)||0,api_cond:Number(x.api_cond)||0,
     api_locked:Number(x.api_locked)||0,api_sally_area:Number(x.api_sally_area)||0,
+    api_sakuteki:Array.isArray(x.api_sakuteki)?x.api_sakuteki.slice(0,2).map(Number):(Number.isFinite(Number(x.api_sakuteki))?Number(x.api_sakuteki):null),
+    api_onslot:Array.isArray(x.api_onslot)?x.api_onslot.map(Number):[],
+    api_fuel:Number(x.api_fuel)||0,api_bull:Number(x.api_bull)||0,
     api_slot:Array.isArray(x.api_slot)?x.api_slot.map(Number):[],api_slot_ex:Number(x.api_slot_ex)||0
   }:null;
   const deck=x=>x&&typeof x==='object'?{
@@ -67,6 +70,7 @@ function minimize(path,obj){
   }:null;
   if(/\/api_port\/port$/.test(path)){
     base.api_data={
+      api_basic:data?.api_basic&&typeof data.api_basic==='object'?{api_level:Number(data.api_basic.api_level)||0}:null,
       api_ship:(Array.isArray(data?.api_ship)?data.api_ship:[]).map(ship).filter(Boolean),
       api_deck_port:(Array.isArray(data?.api_deck_port)?data.api_deck_port:[]).map(deck).filter(Boolean),
       api_ndock:(Array.isArray(data?.api_ndock)?data.api_ndock:[]).map(ndock).filter(Boolean),
