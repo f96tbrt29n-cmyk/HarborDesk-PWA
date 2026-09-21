@@ -1,5 +1,7 @@
 name: Browser Regression
 
+# PR-triggered verification workflow; main pushes are validated by pages.yml.
+
 on:
   pull_request:
     branches: [main]
