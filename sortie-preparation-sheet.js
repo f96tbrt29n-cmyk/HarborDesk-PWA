@@ -177,6 +177,7 @@ document.addEventListener('click',e=>{
  const acq=e.target.closest?.('[data-hd-sps-acquire]');if(acq&&typeof hdAGOpen==='function'){hdAGOpen(acq.dataset.hdSpsAcquire,hdSPSMap());return}
 });
 window.addEventListener('hd:map-rendered',()=>{hdSPSMapButton();hdSPSRender()});
+window.addEventListener('hd:kancolle-sync',hdSPSRender);
 window.addEventListener('hd:workspace-refresh',hdSPSRender);
 window.addEventListener('hd:ship-images-changed',hdSPSRender);
 window.addEventListener('hd:ship-images-ready',hdSPSRender);
