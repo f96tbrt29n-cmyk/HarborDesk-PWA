@@ -26,12 +26,13 @@ function hdFEPlanFromSavedFleet(map,fleet){
  return {map,ships,missing:[],masterBacked:ships.filter(x=>x.master).length,createdAt:Date.now(),source:'saved-fleet',sourceFleet:fleet||null,preset,routeInfo};
 }
 function hdFEAssigned(plan){
- const rows=[];
+ const rows=[],confirmation=hdFEOperationalConfirmation(plan),freshness=hdFESyncFreshness(),preferConfirmedFull=!freshness.liveFresh&&confirmation.aircraft;
  for(const ship of plan?.ships||[]){
   const live=hdFERosterForShip(ship),liveSlots=Array.isArray(live?.gameOnslot)?live.gameOnslot:[];
   for(const item of ship.items||[]){
    const meta=hdFEFind(item.name)||{name:item.name,category:item.category||'',stats:{},tags:[]},slotIndex=Number.isFinite(Number(item.slotIndex))?Number(item.slotIndex):null,liveCap=slotIndex!=null&&Number.isFinite(Number(liveSlots[slotIndex]))?Math.max(0,Number(liveSlots[slotIndex])):null,masterCap=item.capacity==null?null:Math.max(0,Number(item.capacity));
-   rows.push({ship:ship.ship||'',name:item.name,star:Number(item.star)||0,kind:item.kind||'',slotIndex,capacity:liveCap!=null?liveCap:masterCap,masterCapacity:masterCap,capacitySource:liveCap!=null?'live':masterCap!=null?'master':'unknown',isExpansion:false,meta});
+   const useMaster=preferConfirmedFull&&masterCap!=null,capacity=useMaster?masterCap:(liveCap!=null?liveCap:masterCap),capacitySource=useMaster?'confirmed-full':liveCap!=null?'live':masterCap!=null?'master':'unknown';
+   rows.push({ship:ship.ship||'',name:item.name,star:Number(item.star)||0,kind:item.kind||'',slotIndex,capacity,masterCapacity:masterCap,capacitySource,isExpansion:false,meta});
   }
   if(ship.expansion?.name){
    const x=ship.expansion,meta=hdFEFind(x.name)||{name:x.name,category:'',stats:{},tags:[]};
@@ -132,6 +133,14 @@ function hdFERosterForShip(ship){
  const rows=hdFERoster(),gameId=Number(ship?.gameShipId)||0,id=Number(ship?.masterId)||0,name=String(ship?.ship||'').trim();
  return rows.find(x=>gameId&&Number(x?.gameShipId)===gameId)||rows.find(x=>id&&Number(x?.masterId)===id)||rows.find(x=>String(x?.name||'').trim()===name)||null;
 }
+function hdFEOperationalConfirmation(plan){
+ const map=String(plan?.map||''),fleetId=String(plan?.sourceFleet?.id||'');
+ if(typeof hdSortieOperationalConfirmation==='function'){try{return hdSortieOperationalConfirmation(map,fleetId)}catch{}}
+ try{
+  const selected=fleetId||(typeof hdSortieSelection==='function'?hdSortieSelection(map):''),state=typeof hdSortieState==='function'?hdSortieState(map,selected):{},updatedAt=Number(state?.updatedAt)||0,valid=!!updatedAt&&!state?._resetReason;
+  return {valid,map,fleetId:selected,updatedAt,supply:valid&&!!state.supply,damage:valid&&!!state.damage,morale:valid&&!!state.morale,loadout:valid&&!!state.loadout,aircraft:valid&&!!state.aircraft,aircraftRequired:false,completeDynamic:false};
+ }catch{return {valid:false,map,fleetId,updatedAt:0,supply:false,damage:false,morale:false,loadout:false,aircraft:false,aircraftRequired:false,completeDynamic:false}}
+}
 function hdFELiveFleet(plan){
  const state=typeof hdFSLiveState==='function'?hdFSLiveState():undefined,rows=(plan?.ships||[]).filter(x=>x?.ship).map(ship=>({ship,row:hdFERosterForShip(ship)})),details=[],reasons={};let blocked=0,caution=0;
  for(const x of rows){
@@ -197,9 +206,9 @@ function hdFEGameMatch(plan){
 function hdFESyncFreshness(){
  let sync=null;try{sync=JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')}catch{}
  const syncedAt=Number(sync?.syncedAt)||0;
- if(!syncedAt)return {status:'manual',syncedAt:0,ageMinutes:null,detail:'同期時刻が不明。出撃直前に艦これ同期を確認'};
- const ageMinutes=Math.max(0,Math.floor((Date.now()-syncedAt)/60000)),status=ageMinutes<=10?'ready':'partial';
- return {status,syncedAt,ageMinutes,detail:ageMinutes<1?'たった今同期':`同期から ${ageMinutes}分${ageMinutes>10?'。出撃直前は再同期推奨':''}`};
+ if(!syncedAt)return {status:'manual',advisory:true,liveFresh:false,syncedAt:0,ageMinutes:null,detail:'同期時刻不明。台帳は使えるけど、現在状態は出撃前チェックを優先'};
+ const ageMinutes=Math.max(0,Math.floor((Date.now()-syncedAt)/60000)),liveFresh=ageMinutes<=30,status=liveFresh?'ready':'manual';
+ return {status,advisory:true,liveFresh,syncedAt,ageMinutes,detail:ageMinutes<1?'たった今同期':`同期から ${ageMinutes}分。${liveFresh?'ライブ値を参考に判定':'台帳の基準点として使用・現在状態は手動チェック優先'}`};
 }
 function hdFEGameMatchHtml(match){
  if(!match)return '';
@@ -264,9 +273,18 @@ function hdFEScouting(plan,items){
  return {status,available:true,score,coef,hq,checks:rows,detail:`推定33式 ${score.toFixed(2)}（係数${coef} / 司令部Lv${hq}）`};
 }
 function hdFEAutoVerdict(plan,e){
- const live=hdFELiveFleet(plan),supply=hdFESupply(plan),freshness=hdFESyncFreshness(),gameMatch=hdFEGameMatch(plan),route=hdFERoute(plan),air=hdFEAirCheck(plan?.map,e.air),scouting=hdFEScouting(plan,e.items),equipment={status:e.missing?'missing':e.partial?'partial':'ready',detail:`海域装備 ${e.ready}/${e.requirements.length} 準備`},master={status:e.master.invalid.length?'missing':e.master.unresolved.length?'partial':'ready',detail:e.master.invalid.length?`装備不可 ${e.master.invalid.length}件`:e.master.unresolved.length?`未解決 ${e.master.unresolved.length}件`:'装備可否OK'},health={status:live.status,detail:live.blocked?`出撃不可候補 ${live.blocked}隻（${Object.entries(live.reasons).map(x=>x[0]+' '+x[1]).join(' / ')}）`:live.caution?`注意艦 ${live.caution}隻`:'艦状態OK'};
- const checks=[{id:'health',label:'艦状態',...health},{id:'supply',label:'補給',...supply},{id:'freshness',label:'同期鮮度',...freshness},{id:'gameMatch',label:'ゲーム反映',...gameMatch},{id:'route',label:'編成条件',...route},{id:'equipment',label:'装備',...equipment},{id:'air',label:'制空',...air},{id:'scouting',label:'索敵',...scouting},{id:'master',label:'装備可否',...master}],ranked={missing:3,partial:2,manual:1,ready:0},worst=checks.reduce((a,x)=>(ranked[x.status]??1)>(ranked[a.status]??0)?x:a,{status:'ready'});
- return {status:worst.status,checks,live,supply,freshness,gameMatch,route,air,scouting,master,equipment};
+ const live=hdFELiveFleet(plan),supply=hdFESupply(plan),freshness=hdFESyncFreshness(),confirmation=hdFEOperationalConfirmation(plan),gameRaw=hdFEGameMatch(plan),route=hdFERoute(plan),airRaw=hdFEAirCheck(plan?.map,e.air),scouting=hdFEScouting(plan,e.items),equipment={status:e.missing?'missing':e.partial?'partial':'ready',detail:`海域装備 ${e.ready}/${e.requirements.length} 準備`},master={status:e.master.invalid.length?'missing':e.master.unresolved.length?'partial':'ready',detail:e.master.invalid.length?`装備不可 ${e.master.invalid.length}件`:e.master.unresolved.length?`未解決 ${e.master.unresolved.length}件`:'装備可否OK'};
+ const timerBlocked=(live.details||[]).some(x=>(x.labels||[]).some(v=>v==='遠征中'||v==='入渠中'));
+ let health={status:live.status,detail:live.blocked?`出撃不可候補 ${live.blocked}隻（${Object.entries(live.reasons).map(x=>x[0]+' '+x[1]).join(' / ')}）`:live.caution?`注意艦 ${live.caution}隻`:'艦状態OK'};
+ let supplyCheck={...supply},gameMatch={...gameRaw},air={...airRaw};
+ if(!freshness.liveFresh){
+  health=timerBlocked?health:(confirmation.damage&&confirmation.morale?{status:'ready',detail:'大破なし・疲労なしを出撃前チェックで確認済み'}:{status:'manual',detail:'同期値は古いため、大破・疲労を出撃前チェックで確認'});
+  supplyCheck=confirmation.supply?{...supply,status:'ready',detail:'燃料・弾薬の満タンを出撃前チェックで確認済み'}:{...supply,status:'manual',detail:'同期値は古いため、補給状態を出撃前チェックで確認'};
+  gameMatch=confirmation.loadout?{...gameRaw,status:'ready',detail:'ゲーム側の編成・装備を手動確認済み'}:{...gameRaw,status:'manual',detail:'同期値は古いため、ゲーム側の編成・装備を出撃前チェックで確認'};
+  air=confirmation.aircraft?{...airRaw,detail:(airRaw.detail||'')+' / 艦載機補充を手動確認済み'}:{...airRaw,status:'manual',detail:'同期時の搭載数は参考。艦載機補充を出撃前チェックで確認'};
+ }
+ const checks=[{id:'health',label:'艦状態',...health},{id:'supply',label:'補給',...supplyCheck},{id:'freshness',label:'同期基準点',...freshness},{id:'gameMatch',label:'ゲーム反映',...gameMatch},{id:'route',label:'編成条件',...route},{id:'equipment',label:'装備',...equipment},{id:'air',label:'制空',...air},{id:'scouting',label:'索敵',...scouting},{id:'master',label:'装備可否',...master}],ranked={missing:3,partial:2,manual:1,ready:0},effective=checks.filter(x=>!x.advisory),worst=effective.reduce((a,x)=>(ranked[x.status]??1)>(ranked[a.status]??0)?x:a,{status:'ready'});
+ return {status:worst.status,checks,live,supply:supplyCheck,freshness,confirmation,gameMatch,route,air,scouting,master,equipment};
 }
 function hdFEAutoStatusLabel(s){return s==='ready'?'OK':s==='missing'?'不足/不可':s==='partial'?'注意':'要確認'}
 function hdFEActionForCheck(check){
@@ -274,7 +292,7 @@ function hdFEActionForCheck(check){
  const actions={
   health:check.status==='missing'?'大破・遠征中・入渠中の艦を編成から外す':'損傷・疲労している艦を確認する',
   supply:'燃料・弾薬を補給する',
-  freshness:'艦これ連携を再同期して最新状態にする',
+  freshness:'同期情報は基準点として参照する',
   gameMatch:'ゲーム側の艦隊順・装備をHarborDeskの予定と合わせる',
   route:check.status==='manual'?'攻略ルートの編成条件を確認する':'編成条件を満たすよう艦種・速力を直す',
   equipment:'不足している海域向け装備を準備する',
@@ -285,12 +303,12 @@ function hdFEActionForCheck(check){
  return actions[check.id]||(`${check.label||'項目'}を確認する`);
 }
 function hdFEGoNoGo(auto){
- const checks=auto?.checks||[],blockers=checks.filter(x=>x.status==='missing'),cautions=checks.filter(x=>x.status==='partial'||x.status==='manual'),state=blockers.length?'stop':cautions.length?'hold':'go';
+ const checks=auto?.checks||[],effective=checks.filter(x=>!x.advisory),blockers=effective.filter(x=>x.status==='missing'),cautions=effective.filter(x=>x.status==='partial'||x.status==='manual'),state=blockers.length?'stop':cautions.length?'hold':'go';
  const order={health:1,supply:2,gameMatch:3,route:4,equipment:5,air:6,scouting:7,master:8,freshness:9};
  const actionChecks=[...blockers,...cautions].sort((a,b)=>(order[a.id]||99)-(order[b.id]||99)),seen=new Set(),actions=[];
  for(const x of actionChecks){const action=hdFEActionForCheck(x);if(action&&!seen.has(action)){seen.add(action);actions.push({id:x.id,label:x.label,status:x.status,action,detail:x.detail||''})}}
- const label=state==='go'?'出撃準備OK':state==='stop'?'修正必要':'要確認',detail=state==='go'?'自動判定で未解決項目なし':state==='stop'?`修正が必要な項目 ${blockers.length}件`:`確認が必要な項目 ${cautions.length}件`;
- return {state,label,detail,blockers,cautions,actions};
+ const label=state==='go'?'出撃準備OK':state==='stop'?'修正必要':'要確認',detail=state==='go'?'自動判定と出撃前確認で未解決項目なし':state==='stop'?`修正が必要な項目 ${blockers.length}件`:`確認が必要な項目 ${cautions.length}件`;
+ return {state,label,detail,blockers,cautions,actions,advisories:checks.filter(x=>x.advisory)};
 }
 function hdFEFixActionInfo(id){
  const map={
