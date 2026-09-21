@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HarborDesk 艦これ連携
 // @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
-// @version      1.0.13
+// @version      1.0.14
 // @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
 // @match        http://*.dmm.com/*
 // @match        https://*.dmm.com/*
@@ -21,8 +21,12 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.13';
+const HD_VERSION='1.0.14';
 const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/';
+const HARBOR_ORIGIN=new URL(HARBOR_URL).origin;
+const BRIDGE_IMPORT_MESSAGE='harbordesk-kancolle-import';
+const BRIDGE_READY_MESSAGE='harbordesk-kancolle-import-ready-v1';
+const BRIDGE_ACK_MESSAGE='harbordesk-kancolle-import-ack-v1';
 const RECORD_MESSAGE='harbordesk-kancolle-frame-record-v1';
 const STATUS_MESSAGE='harbordesk-kancolle-frame-status-v1';
 const MAX_RECORDS=120;
@@ -373,9 +377,32 @@ async function send(){
     alert('艦隊台帳・装備台帳を埋めるため、'+missing+'のデータが必要だよ。ゲーム内で該当画面を一度開いてから再度同期してね。');
     return;
   }
+  const value=exportObject(),payload=JSON.stringify(value);
+  let target=null;
+  try{target=window.open(HARBOR_URL+'#kancolleImport','HarborDeskSync')}catch{}
+  if(target){
+    if(statusEl)statusEl.textContent='HarborDeskへ送信中';
+    let done=false;
+    const timers=[];
+    const cleanup=()=>{while(timers.length)clearTimeout(timers.pop());window.removeEventListener('message',onBridgeMessage)};
+    const post=()=>{if(done)return;try{target.postMessage({type:BRIDGE_IMPORT_MESSAGE,payload,captureId,userscriptVersion:HD_VERSION},HARBOR_ORIGIN)}catch{}};
+    const onBridgeMessage=e=>{
+      if(e.origin!==HARBOR_ORIGIN)return;
+      const d=e?.data||{};
+      if(d.type===BRIDGE_READY_MESSAGE){post();return}
+      if(d.type!==BRIDGE_ACK_MESSAGE||String(d.captureId||'')!==captureId)return;
+      done=true;cleanup();
+      if(statusEl)statusEl.textContent=d.ok?'HarborDesk同期完了':'HarborDesk受信失敗';
+      if(!d.ok)alert('HarborDesk側で同期できなかったよ: '+String(d.error||'受信エラー'));
+    };
+    window.addEventListener('message',onBridgeMessage);
+    [0,300,800,1600,2800,4500].forEach(ms=>timers.push(setTimeout(post,ms)));
+    timers.push(setTimeout(()=>{if(!done&&statusEl)statusEl.textContent='HarborDeskで同期結果を確認してね';cleanup()},15000));
+    return;
+  }
   try{
     if(statusEl)statusEl.textContent='データ圧縮中';
-    const token=await encodeHandoff(exportObject());
+    const token=await encodeHandoff(value);
     if(statusEl)statusEl.textContent='送信OK → HarborDeskへ移動';
     const a=document.createElement('a');
     a.href=HARBOR_URL+'#kcimport='+token;
