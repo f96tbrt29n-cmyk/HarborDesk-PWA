@@ -187,14 +187,27 @@ function hdCoreMapToolsHtml(){
   </div>
  </section>`;
 }
-function hdCoreMapAction(action){
+async function hdCoreMapAction(action){
  if(!action)return false;
- if(typeof window.hdMapOpenTool==='function'&&window.hdMapOpenTool(action))return true;
- if(action==='suggest'&&typeof window.hdFSOpen==='function'){window.hdFSOpen();return true}
- if(action==='prep'&&typeof window.hdSPSOpen==='function'){window.hdSPSOpen();return true}
+ if(typeof window.hdMapOpenTool==='function'){
+  try{if(await window.hdMapOpenTool(action))return true}catch{}
+ }
+ const lazy=action==='suggest'?['hdFSOpen','編成候補']:action==='prep'?['hdSPSOpen','出撃準備']:null;
+ if(lazy){
+  const [fn,label]=lazy;
+  const button=document.querySelector(`[data-hd-core-map-action="${action}"]`);
+  if(typeof window[fn]!=='function'&&typeof window.hdEnsureCurrentAssets==='function'){
+   button?.setAttribute('aria-busy','true');
+   try{await window.hdEnsureCurrentAssets()}catch{}
+   finally{button?.removeAttribute('aria-busy')}
+  }
+  if(typeof window[fn]==='function'){window[fn]();return true}
+  window.hdToast?.(`${label}を読み込めなかったよ。アプリ更新を試してね`,'warn');
+  return false;
+ }
  const tab=document.querySelector(`[data-map-tab="${action}"]`);
  if(tab){tab.click();return true}
- const targets={map:'selectedMapCard',fleet:'selectedMapCard',gear:'fleetCalculator',drop:'dropHunting',mine:'customFleets'};
+ const targets={map:'selectedMapCard',fleet:'selectedMapCard',gear:'hdFleetCalculator',drop:'dropHuntingDb',mine:'customFleetPanel'};
  const id=targets[action],el=id&&document.getElementById(id);
  if(el){el.scrollIntoView({behavior:'smooth',block:'start'});return true}
  return false;
@@ -236,7 +249,7 @@ document.addEventListener('click',e=>{
 
  const world=e.target.closest('[data-world]');if(world){selectedWorld=world.dataset.world;selectedMap='';guideViewSave({world:selectedWorld,map:''});renderGuide();return}
  const map=e.target.closest('[data-map]');if(map){selectedMap=map.dataset.map;selectedWorld=selectedMap.split('-')[0];guideViewSave({world:selectedWorld,map:selectedMap});renderGuide();document.getElementById('selectedMapCard').scrollIntoView({behavior:'smooth',block:'center'});return}
- const coreMapAction=e.target.closest('[data-hd-core-map-action]');if(coreMapAction){hdCoreMapAction(coreMapAction.dataset.hdCoreMapAction);return}
+ const coreMapAction=e.target.closest('[data-hd-core-map-action]');if(coreMapAction){hdCoreMapAction(coreMapAction.dataset.hdCoreMapAction).catch(()=>{});return}
  const clearGuideQuery=e.target.closest('[data-guide-clear-query]');if(clearGuideQuery){const input=document.getElementById('guideQuery');if(input)input.value='';guideViewSave({query:''});renderGuide();input?.focus();return}
  if(e.target.closest('[data-guide-show-all]')){guideFilter='all';guideViewSave({filter:'all'});renderGuide();return}
  const gf=e.target.closest('[data-guide-filter]');if(gf){guideFilter=gf.dataset.guideFilter;guideViewSave({filter:guideFilter});renderGuide();return}
