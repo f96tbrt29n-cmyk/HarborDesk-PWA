@@ -209,7 +209,10 @@ async function hdCoreMapAction(action){
  if(tab){tab.click();return true}
  const targets={map:'selectedMapCard',fleet:'selectedMapCard',gear:'hdFleetCalculator',drop:'dropHuntingDb',mine:'customFleetPanel'};
  const id=targets[action],el=id&&document.getElementById(id);
- if(el){el.scrollIntoView({behavior:'smooth',block:'start'});return true}
+ if(el){
+  if(typeof window.hdWSShowElement==='function'&&window.hdWSShowElement(el,true))return true;
+  el.scrollIntoView({behavior:'smooth',block:'start'});return true;
+ }
  return false;
 }
 window.hdCoreMapToolsHtml=hdCoreMapToolsHtml;
