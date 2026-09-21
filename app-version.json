@@ -1,7 +1,7 @@
 {
-  "version": "1.0.421",
-  "build": 421,
-  "releasedAt": "2026-09-22T04:28:00+09:00",
-  "notes": "ライブ台帳差異時の再同期案内を修正し、装備・艦娘台帳フィルター、Userscriptブリッジ、出撃後再準備の回帰テストを現在のUI/実装に合わせて更新。",
+  "version": "1.0.422",
+  "build": 422,
+  "releasedAt": "2026-09-22T04:37:00+09:00",
+  "notes": "UserscriptのpostMessage再送をcaptureIdで重複排除し、同一データは1回だけ台帳へ反映。異なるペイロードのcaptureId衝突を拒否し、重複再送の回帰テストを追加。",
   "masterChanges": null
 }
