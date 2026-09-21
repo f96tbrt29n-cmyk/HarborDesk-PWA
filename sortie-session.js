@@ -256,6 +256,46 @@ function hdSSPostStartReprepare(){
  if(typeof hdFEOpenFix==='function')return !!hdFEOpenFix(next.id);
  return false;
 }
+function hdSSPostFleet(post){
+ const map=String(post?.map||''),id=String(post?.fleetId||'');
+ if(!map||!id)return null;
+ try{
+  const fleets=typeof hdSortieFleets==='function'?hdSortieFleets(map):(typeof loadCustomFleets==='function'?(loadCustomFleets()[map]||[]):[]);
+  return fleets.find(x=>String(x?.id||'')===id)||null;
+ }catch{return null}
+}
+function hdSSPostPreflightState(post){
+ const fleet=hdSSPostFleet(post);if(!fleet)return {ready:false,state:'missing',detail:'前回使用編成が見つからない',fleet:null,stats:null,gate:null};
+ const stats=hdSSStats(post.map,fleet),gate=hdSSGate(post.map,fleet,stats),manualLeft=Math.max(0,(Number(stats?.manualTotal)||0)-(Number(stats?.manualDone)||0));
+ return {ready:gate.state==='go'&&!gate.hardBlock&&manualLeft===0,state:gate.state,detail:gate.detail||'',fleet,stats,gate,manualLeft};
+}
+function hdSSPostPrepareNextRound(){
+ const post=hdSSPostLoad();if(!post||post.status!=='reviewed')return false;
+ const q=hdSSPostQueueSummary(post.review?.queue||[]);if(q.pending)return false;
+ if(String(post.review?.gate?.state||'hold')!=='go')return false;
+ const fleet=hdSSPostFleet(post);if(!fleet)return false;
+ if(typeof hdSortieSetSelection==='function')hdSortieSetSelection(post.map,fleet.id);
+ if(typeof hdSortieReset==='function')hdSortieReset(post.map,fleet.id);
+ const now=Date.now(),next={...post,reprepare:{...(post.reprepare||{}),startedAt:Number(post.reprepare?.startedAt)||now,currentId:null,preflightAt:now,updatedAt:now}};
+ hdSSPostSave(next);hdSSEmit('next-preflight',{postReview:next,fleet});hdSSRender();
+ if(typeof hdSPSOpenMapTab==='function')setTimeout(()=>hdSPSOpenMapTab('mine'),0);
+ return true;
+}
+function hdSSPostStartNextRound(){
+ const post=hdSSPostLoad();if(!post||post.status!=='reviewed'||!Number(post.reprepare?.preflightAt))return null;
+ const q=hdSSPostQueueSummary(post.review?.queue||[]);if(q.pending)return null;
+ const fleet=hdSSPostFleet(post);if(!fleet)return null;
+ if(typeof hdSortieSetSelection==='function')hdSortieSetSelection(post.map,fleet.id);
+ const current=hdSSPostPreflightState(post);if(!current.ready)return null;
+ const session=hdSSStart(post.map,{
+  seriesId:String(post.seriesId||post.sessionId||''),
+  cycleIndex:Math.max(1,Number(post.cycleIndex)||1)+1,
+  previousSessionId:String(post.sessionId||''),
+  previousEntryId:String(post.entryId||'')
+ });
+ if(session)hdSSEmit('next-start',{session,previousSessionId:String(post.sessionId||''),previousEntryId:String(post.entryId||'')});
+ return session;
+}
 function hdSSPostHtml(map){
  const post=hdSSPostLoad();if(!post)return '';
  const sameMap=!map||String(post.map||'')===String(map||''),title=sameMap?'前回出撃後':'前回 '+String(post.map||'')+' 出撃後';
