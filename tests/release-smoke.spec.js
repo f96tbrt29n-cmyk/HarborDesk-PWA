@@ -3874,6 +3874,47 @@ test('release smoke: map quest tab links live quest data and checklist', async (
 });
 
 
+test('release smoke: 5-5 keeps start and boss S separate in map and sortie routes', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdEnhanceMapPane === 'function' &&
+    typeof window.hdSMNextNodeRows === 'function' &&
+    typeof window.hdSMNodeRows === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    selectedWorld = '5';
+    selectedMap = '5-5';
+    renderMapPicker();
+  });
+
+  await page.locator('[data-map-tab="map"]').click();
+  await page.locator('.hd-map-structure-guide > summary').click();
+  await expect(page.locator('#hdRouteHighlight')).toBeVisible();
+  await page.locator('#hdRouteHighlight').click();
+  await expect(page.locator('[data-map-pane="map"] .hd-map-route.highlight').first()).toBeVisible();
+  await expect(page.locator('#hdMapNodeInfo')).toContainText('構造上の最短経路');
+  await expect(page.locator('#hdMapNodeInfo')).toContainText('出撃');
+
+  const boss = page.locator('[data-map-pane="map"] .hd-map-node[data-hd-node-id="S"]');
+  await expect(boss).toBeVisible();
+  await boss.click();
+  await expect(page.locator('#hdMapNodeInfo')).toContainText('ボスマス');
+
+  const routeState = await page.evaluate(() => ({
+    next: window.hdSMNextNodeRows('5-5', {node:'',routeNodes:[]}).map(x => x.label).sort(),
+    boss: window.hdSMNodeRows('5-5').find(x => x.label === 'S')
+  }));
+  expect(routeState.next).toEqual(['A','B']);
+  expect(routeState.boss?.kind).toBe('boss');
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map overview exposes visible攻略 tool launcher', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
