@@ -517,6 +517,71 @@ test('release smoke: generated fleets persist the exact game ship id', async ({ 
 });
 
 
+test('release smoke: planned fleet is compared with synced game fleet and gear', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdFEGameMatch === 'function');
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      {
+        id:'a', name:'睦月', masterId:1, gameShipId:101,
+        gameGearSlots:['12cm単装砲','61cm三連装魚雷'], gameGearExpansion:''
+      },
+      {
+        id:'b', name:'如月', masterId:2, gameShipId:102,
+        gameGearSlots:[], gameGearExpansion:''
+      }
+    ]));
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
+      { deckId:1, name:'第一艦隊', ships:[{gameShipId:101},{gameShipId:102}] }
+    ]));
+    const matching = {
+      map:'1-1',
+      ships:[
+        {
+          ship:'睦月', gameShipId:101, masterId:1,
+          items:[
+            {name:'12cm単装砲',star:0,slotIndex:0},
+            {name:'61cm三連装魚雷',star:0,slotIndex:1}
+          ],
+          expansion:null
+        },
+        { ship:'如月', gameShipId:102, masterId:2, items:[], expansion:null }
+      ]
+    };
+    const ready = window.hdFEGameMatch(matching);
+    const gearDiffPlan = JSON.parse(JSON.stringify(matching));
+    gearDiffPlan.ships[0].items[1].name = '別装備';
+    const gearDiff = window.hdFEGameMatch(gearDiffPlan);
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
+      { deckId:1, name:'第一艦隊', ships:[{gameShipId:102},{gameShipId:101}] }
+    ]));
+    const orderDiff = window.hdFEGameMatch(matching);
+    return { ready, gearDiff, orderDiff };
+  });
+
+  expect(data.ready.status).toBe('ready');
+  expect(data.ready.fleetMatch).toBe(true);
+  expect(data.ready.gearMismatch).toBe(0);
+  expect(data.gearDiff.status).toBe('partial');
+  expect(data.gearDiff.gearMismatch).toBe(1);
+  expect(data.orderDiff.status).toBe('partial');
+  expect(data.orderDiff.deckOrderMismatch).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: game sync persists exact gear slots and copied game ship ids', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const source = await page.evaluate(async () => fetch('./kancolle-import.js', { cache:'no-store' }).then(r => r.text()));
+  expect(source).toContain('gameGearSlots:parsed.slotItems.size?gameGearSlots');
+  expect(source).toContain('gameGearExpansion:parsed.slotItems.size?gameGearExpansion');
+  expect(source).toContain('gameShipId:Number(s?.gameShipId)||0');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
