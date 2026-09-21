@@ -49,13 +49,13 @@ function hdSSGate(map,fleet,stats){
  }catch{}
  const base=raw||{state:'hold',label:'要確認',detail:'統合出撃判定を取得できないため手動確認',blockers:[],cautions:[],actions:[]};
  const blockers=Array.isArray(base.blockers)?base.blockers:[],hard=blockers.filter(x=>x?.id==='health'||x?.id==='supply'),actions=[...(Array.isArray(base.actions)?base.actions:[])];
- const manualLeft=Math.max(0,(Number(stats?.manualTotal)||0)-(Number(stats?.manualDone)||0)),post=hdSSPostLoad(),postAwaiting=!!(post&&post.status==='awaiting-sync'&&String(post.map||'')===String(map||'')&&(!post.fleetId||!fleet?.id||String(post.fleetId)===String(fleet.id)));
+ const manualLeft=Math.max(0,(Number(stats?.manualTotal)||0)-(Number(stats?.manualDone)||0)),post=hdSSPostLoad(),postAwaiting=!!(post&&['awaiting-review','awaiting-sync'].includes(String(post.status||''))&&String(post.map||'')===String(map||'')&&(!post.fleetId||!fleet?.id||String(post.fleetId)===String(fleet.id)));
  let state=base.state||'hold';
  if(manualLeft&&state==='go')state='hold';
  if(manualLeft)actions.push({id:'manual',label:'出撃直前チェック',status:'manual',action:'出撃直前の手動チェックを完了する',detail:`未確認 ${manualLeft}件`});
- if(postAwaiting){if(state==='go')state='hold';actions.unshift({id:'postSync',label:'帰還後同期',status:'manual',action:'艦これを再同期して帰還後の状態を確認',detail:'前回出撃後のライブ状態が未更新'});}
+ if(postAwaiting){if(state==='go')state='hold';actions.unshift({id:'postReview',label:'帰還後確認',status:'manual',action:'次の出撃前チェックで現在状態を確認',detail:'再同期なしで手動確認へ進める'});}
  const label=state==='go'?'出撃準備OK':state==='stop'?'修正必要':'要確認';
- const detail=hard.length?`安全上の修正が必要 ${hard.length}件`:postAwaiting&&state!=='stop'?'前回出撃後の再同期がまだ。次回出撃前にライブ状態を更新しよう':manualLeft&&state==='hold'?`手動確認が ${manualLeft}件残っている`:(base.detail||'確認が必要');
+ const detail=hard.length?`安全上の修正が必要 ${hard.length}件`:postAwaiting&&state!=='stop'?'前回出撃後の確認待ち。再同期せず出撃前チェックへ進める':manualLeft&&state==='hold'?`手動確認が ${manualLeft}件残っている`:(base.detail||'確認が必要');
  return {state,label,detail,hardBlock:hard.length>0,hardBlockers:hard,blockers,cautions:Array.isArray(base.cautions)?base.cautions:[],actions,postAwaiting};
 }
 function hdSSTelemetry(map,fleet){
@@ -122,7 +122,7 @@ function hdSSFinish(data){
  if(data?.huntId!=null)input.huntId=data.huntId;if(data?.huntShip!=null)input.huntShip=data.huntShip;if(data?.targetObtained!=null)input.targetObtained=!!data.targetObtained;
  const entry=hdSLRecordEntry(input);
  if(!entry)return null;
- hdSSPostSave({version:1,status:'awaiting-sync',sessionId:session.id,map:session.map,fleetId:session.fleetId,fleetName:session.fleetName,seriesId:String(session.seriesId||session.id),cycleIndex:Math.max(1,Number(session.cycleIndex)||1),previousSessionId:String(session.previousSessionId||''),previousEntryId:String(session.previousEntryId||''),finishedAt:at,entryId:String(entry.id||''),fleetSnapshot:session.fleetSnapshot,startTelemetry:session.telemetrySnapshot||null,gameMatched:!!data?.gameSortieKey});
+ hdSSPostSave({version:2,status:'awaiting-review',sessionId:session.id,map:session.map,fleetId:session.fleetId,fleetName:session.fleetName,seriesId:String(session.seriesId||session.id),cycleIndex:Math.max(1,Number(session.cycleIndex)||1),previousSessionId:String(session.previousSessionId||''),previousEntryId:String(session.previousEntryId||''),finishedAt:at,entryId:String(entry.id||''),fleetSnapshot:session.fleetSnapshot,startTelemetry:session.telemetrySnapshot||null,gameMatched:!!data?.gameSortieKey});
  hdSSSave(null);try{if(typeof hdSPSRender==='function')hdSPSRender();if(typeof hdSLRender==='function')hdSLRender()}catch{}
  hdSSEmit('finish',{session,entry,postReview:hdSSPostLoad(),gameMatched:!!data?.gameSortieKey});return entry;
 }
@@ -160,7 +160,7 @@ function hdSSIngestGameSortie(payload){
   return hdSSFinish({...payload,source:'session-game',autoGameResult:true});
  }
  const post=hdSSPostLoad();
- if(post&&['awaiting-sync','reviewed'].includes(String(post.status||''))&&String(post.map||'')===String(payload.map||'')){
+ if(post&&['awaiting-review','awaiting-sync','reviewed'].includes(String(post.status||''))&&String(post.map||'')===String(payload.map||'')){
   const merged=hdSSMergeGameSortieIntoLog(post,payload);
   if(merged){
    const next={...post,gameMatched:true,gameMatchedAt:Date.now(),gameSortieKey:String(payload.gameSortieKey||post.gameSortieKey||'')};
@@ -230,8 +230,15 @@ function hdSSPostQueueSummary(queue){
  const rows=Array.isArray(queue)?queue:[],resolved=rows.filter(x=>x?.status==='resolved').length,pending=rows.filter(x=>x?.status!=='resolved').length;
  return {total:rows.length,resolved,pending,next:rows.find(x=>x?.status!=='resolved')||null};
 }
+function hdSSPostManualReview(){
+ const post=hdSSPostLoad();if(!post||!['awaiting-review','awaiting-sync'].includes(String(post.status||'')))return post;
+ const delta={changed:false,ships:[],fuelUsed:0,ammoUsed:0,supplyKnown:0,airBefore:0,airAfter:0,airLoss:0,depletedBefore:0,depletedAfter:0,depletedAdded:0,newBlocked:0,newCaution:0,newSupply:0};
+ const gate={state:'go',label:'出撃前チェックへ',detail:'再同期は省略。次の周回はゲーム画面を見ながら手動チェックで現在状態を確認',actions:[]};
+ const next={...post,status:'reviewed',reviewMode:'manual',reviewedAt:Date.now(),review:{gate,live:null,supply:null,air:null,delta,queue:[]}};
+ hdSSPostSave(next);hdSSAttachReviewToLog(next);hdSSEmit('post-manual-review',{postReview:next});hdSSRender();return next;
+}
 function hdSSPostTryReview(sync){
- const post=hdSSPostLoad();if(!post||post.status!=='awaiting-sync')return post;
+ const post=hdSSPostLoad();if(!post||!['awaiting-review','awaiting-sync'].includes(String(post.status||'')))return post;
  const syncAt=Number(sync?.syncedAt)||(()=>{try{return Number(JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')?.syncedAt)||0}catch{return 0}})();
  if(!syncAt||syncAt<=Number(post.finishedAt||0))return post;
  const telemetry=hdSSTelemetry(post.map,post.fleetSnapshot);if(!telemetry)return post;
@@ -241,7 +248,7 @@ function hdSSPostTryReview(sync){
 }
 function hdSSPostRefreshReview(sync){
  const post=hdSSPostLoad();if(!post)return null;
- if(post.status==='awaiting-sync')return hdSSPostTryReview(sync);
+ if(['awaiting-review','awaiting-sync'].includes(String(post.status||'')))return hdSSPostTryReview(sync);
  if(post.status!=='reviewed')return post;
  const telemetry=hdSSTelemetry(post.map,post.fleetSnapshot);if(!telemetry)return post;
  const gate=telemetry.gate||{state:'hold',label:'要確認',detail:'帰還後判定を取得できない',actions:[]},queue=hdSSPostQueueBuild(gate,post.review?.queue||[]);
@@ -299,7 +306,7 @@ function hdSSPostStartNextRound(){
 function hdSSPostHtml(map){
  const post=hdSSPostLoad();if(!post)return '';
  const sameMap=!map||String(post.map||'')===String(map||''),title=sameMap?'前回出撃後':'前回 '+String(post.map||'')+' 出撃後';
- if(post.status==='awaiting-sync')return '<div class="hd-ss-post awaiting"><div><span>'+hdSSEsc(title)+'</span><strong>帰還後の再同期待ち</strong><small>艦状態・補給・艦載機損耗を更新すると、次の出撃可否を自動で再判定するよ。</small></div><div class="hd-ss-post-actions"><button type="button" class="primary small" data-hd-ss-post-sync>艦これ同期へ</button><button type="button" class="ghost small" data-hd-ss-post-clear>閉じる</button></div></div>';
+ if(['awaiting-review','awaiting-sync'].includes(String(post.status||'')))return '<div class="hd-ss-post awaiting"><div><span>'+hdSSEsc(title)+'</span><strong>帰還後チェック</strong><small>毎回の再同期は不要。ゲーム画面を見ながら次周の補給・大破・疲労・艦載機・編成装備を確認する方式で続けられるよ。</small></div><div class="hd-ss-post-actions"><button type="button" class="primary small" data-hd-ss-post-manual>再同期せず次の確認へ</button><button type="button" class="ghost small" data-hd-ss-post-sync>必要なら再同期</button><button type="button" class="ghost small" data-hd-ss-post-clear>閉じる</button></div></div>';
  const review=post.review||{},gate=review.gate||{},state=gate.state||'hold',headline=state==='go'?'再出撃準備OK':state==='stop'?'連続出撃は修正必要':'再出撃前に確認',delta=review.delta||null,queue=Array.isArray(review.queue)?review.queue:hdSSPostQueueBuild(gate,[]),q=hdSSPostQueueSummary(queue);
  const meta=[];if(review.live)meta.push('艦状態 '+(review.live.blocked?('NG '+review.live.blocked+'隻'):review.live.caution?('注意 '+review.live.caution+'隻'):'OK'));if(review.supply)meta.push('補給 '+(review.supply.empty?('空 '+review.supply.empty+'隻'):review.supply.low?('不足 '+review.supply.low+'隻'):'OK'));if(review.air&&Number(review.air.depletedSlots)>0)meta.push('艦載機損耗 '+review.air.depletedSlots+'スロ');
  const deltaBits=[];if(delta){if(delta.ships?.length)deltaBits.push('耐久/状態変化 '+delta.ships.length+'隻');if(delta.fuelUsed)deltaBits.push('燃料 -'+delta.fuelUsed);if(delta.ammoUsed)deltaBits.push('弾薬 -'+delta.ammoUsed);if(delta.airLoss)deltaBits.push('制空 -'+delta.airLoss);if(delta.depletedAdded)deltaBits.push('新規損耗 +'+delta.depletedAdded+'スロ')}
@@ -355,6 +362,7 @@ window.hdSSLoad=hdSSLoad;
 window.hdSSSave=hdSSSave;
 window.hdSSPostLoad=hdSSPostLoad;
 window.hdSSPostSave=hdSSPostSave;
+window.hdSSPostManualReview=hdSSPostManualReview;
 window.hdSSPostTryReview=hdSSPostTryReview;
 window.hdSSPostRefreshReview=hdSSPostRefreshReview;
 window.hdSSPostQueueBuild=hdSSPostQueueBuild;
@@ -386,6 +394,7 @@ document.addEventListener('click',function(e){
  if(e.target.closest?.('[data-hd-ss-finish]')){hdSSFinish(hdSSFormData());return}
  if(e.target.closest?.('[data-hd-ss-cancel]')){hdSSClear();return}
  if(e.target.closest?.('[data-hd-ss-check]')){if(typeof hdSPSOpenMapTab==='function')hdSPSOpenMapTab('mine');return}
+ if(e.target.closest?.('[data-hd-ss-post-manual]')){hdSSPostManualReview();return}
  if(e.target.closest?.('[data-hd-ss-post-sync]')){if(typeof hdWSShowElement==='function')hdWSShowElement('kancolleImport',true);else document.getElementById('kancolleImport')?.scrollIntoView({behavior:'smooth',block:'start'});return}
  const postFix=e.target.closest?.('[data-hd-ss-post-fix]');if(postFix){if(typeof hdFEOpenFix==='function')hdFEOpenFix(postFix.dataset.hdSsPostFix);return}
  if(e.target.closest?.('[data-hd-ss-reprep]')){hdSSPostStartReprepare();return}
