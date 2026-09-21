@@ -143,10 +143,10 @@ function hdSSMergeGameSortieIntoLog(post,payload){
  if(index<0)return null;
  const current=rows[index];
  if(!hdSSGameSortieMatches({map:current.map,startedAt:current.startedAt},payload))return null;
- const retreat=payload.retreat!=null?!!payload.retreat:String(payload.result||'')==='撤退',result=retreat?'撤退':String(payload.result||current.result||'不明');
+ const retreat=payload.retreat!=null?!!payload.retreat:String(payload.result||'')==='撤退',result=retreat?'撤退':String(payload.result||current.result||'不明'),mergedDrop=String(payload.drop||current.drop||'').trim(),target=String(post.objectiveTarget||current.objectiveTarget||'').trim(),matchedTarget=!!(target&&mergedDrop&&mergedDrop===target);
  const gameFields={};
  for(const k of ['gameSortieKey','gameNodeNo','gameNodeLabel','gameBossCellNo','gameBossCellLabel','gameRouteNodes','gameRouteLabels','gameBattleResults'])if(payload[k]!=null)gameFields[k]=payload[k];
- rows[index]={...current,...gameFields,source:'session-game',node:String(payload.node||current.node||''),result,boss:!!payload.boss,retreat,battles:Math.max(0,Number(payload.battles)||0),drop:String(payload.drop||''),gameMatchedAt:Date.now()};
+ rows[index]={...current,...gameFields,source:'session-game',node:String(payload.node||current.node||''),result,boss:!!payload.boss,retreat,battles:Math.max(0,Number(payload.battles)||0),drop:mergedDrop,objectiveTarget:target||String(current.objectiveTarget||''),targetObtained:!!current.targetObtained||matchedTarget,gameMatchedAt:Date.now()};
  if(payload.retreatReason)rows[index].retreatReason=String(payload.retreatReason);
  if(typeof hdSLSave==='function')hdSLSave(rows);else localStorage.setItem('harbordesk-sortie-log-v1',JSON.stringify(rows.slice(0,500)));
  try{if(typeof hdSLRender==='function')hdSLRender();if(typeof hdCCRender==='function')hdCCRender()}catch{}
@@ -163,7 +163,7 @@ function hdSSIngestGameSortie(payload){
  if(post&&['awaiting-sync','reviewed'].includes(String(post.status||''))&&String(post.map||'')===String(payload.map||'')){
   const merged=hdSSMergeGameSortieIntoLog(post,payload);
   if(merged){
-   const next={...post,gameMatched:true,gameMatchedAt:Date.now(),gameSortieKey:String(payload.gameSortieKey||post.gameSortieKey||'')};
+   const next={...post,gameMatched:true,gameMatchedAt:Date.now(),gameSortieKey:String(payload.gameSortieKey||post.gameSortieKey||''),drop:String(merged.drop||post.drop||''),objectiveTarget:String(merged.objectiveTarget||post.objectiveTarget||''),targetObtained:!!post.targetObtained||!!merged.targetObtained};
    hdSSPostSave(next);hdSSEmit('game-result-match',{entry:merged,postReview:next});return merged;
   }
  }
