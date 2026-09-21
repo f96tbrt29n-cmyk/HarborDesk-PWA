@@ -107,3 +107,5 @@ function hdSLEnsure(){
 document.addEventListener('click',e=>{if(e.target.closest?.('[data-hd-sl-save]')){hdSLRecord();return}const f=e.target.closest?.('[data-hd-sl-filter]');if(f){hdSLFilter=f.dataset.hdSlFilter;hdSLRender();return}const d=e.target.closest?.('[data-hd-sl-delete]');if(d){hdSLDelete(d.dataset.hdSlDelete);return}});
 document.addEventListener('change',e=>{if(e.target?.id==='hdSLHunt')hdSLFillFromHunt()});
 window.addEventListener('load',()=>setTimeout(()=>{hdSLEnsure();hdSLRender()},1400));setTimeout(hdSLEnsure,1900);window.addEventListener('storage',()=>setTimeout(hdSLRender,0));
+
+window.hdSLMarkHuntObtained=hdSLMarkHuntObtained;
