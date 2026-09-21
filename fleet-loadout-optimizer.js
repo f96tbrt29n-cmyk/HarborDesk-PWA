@@ -27,18 +27,24 @@ function hdFOItemMeta(item){
  const meta=typeof hdFEFind==='function'?hdFEFind(item&&item.name):null;
  return meta||{name:item&&item.name||'',category:item&&item.category||'',stats:{},tags:[]};
 }
+function hdFOStackKey(item){
+ if(!item)return '';
+ if(item.stackKey)return String(item.stackKey);
+ if(typeof hdFLInventoryStackKey==='function')return hdFLInventoryStackKey(item.name,item.star);
+ return String(item.name||'')+'@@'+Math.max(0,Number(item.star)||0);
+}
 function hdFOAssignedUsage(plan){
  const used={};
  for(const s of plan&&plan.ships||[]){
-  for(const x of s.items||[])used[x.name]=(used[x.name]||0)+1;
-  if(s.expansion?.name)used[s.expansion.name]=(used[s.expansion.name]||0)+1;
+  for(const x of s.items||[]){const key=hdFOStackKey(x);if(key)used[key]=(used[key]||0)+1}
+  if(s.expansion?.name){const key=hdFOStackKey(s.expansion);if(key)used[key]=(used[key]||0)+1}
  }
  return used;
 }
 function hdFORefreshUsage(plan){
- const inv=typeof hdFLInventory==='function'?hdFLInventory():new Map(),used=hdFOAssignedUsage(plan),owned={};
- for(const x of inv.values())owned[x.name]=x.count;
- plan.used=used;plan.owned=owned;return plan;
+ const inv=typeof hdFLInventory==='function'?hdFLInventory():new Map(),used=hdFOAssignedUsage(plan),owned={},ownedStacks={};
+ for(const x of inv.values()){owned[x.name]=(owned[x.name]||0)+x.count;ownedStacks[x.key]=x.count}
+ plan.used=used;plan.owned=owned;plan.ownedStacks=ownedStacks;return plan;
 }
 function hdFOReqScore(e,mode){
  if(!e)return -9999;
@@ -75,9 +81,9 @@ function hdFOCandidateRows(kind,mode){
  });
 }
 function hdFOCanUse(plan,candidate,shipIndex,itemIndex){
- const usage=hdFOAssignedUsage(plan),removed=plan.ships&&plan.ships[shipIndex]&&plan.ships[shipIndex].items&&plan.ships[shipIndex].items[itemIndex];
- const used=usage[candidate.name]||0,returned=removed&&removed.name===candidate.name?1:0;
- return used-returned<candidate.count;
+ const usage=hdFOAssignedUsage(plan),removed=plan.ships&&plan.ships[shipIndex]&&plan.ships[shipIndex].items&&plan.ships[shipIndex].items[itemIndex],key=String(candidate?.key||hdFOStackKey(candidate));
+ const used=usage[key]||0,returned=removed&&hdFOStackKey(removed)===key?1:0;
+ return used-returned<Math.max(0,Number(candidate?.count)||0);
 }
 function hdFOCompatible(plan,candidate,shipIndex,itemIndex){
  const slot=plan.suggestion&&plan.suggestion.slots&&plan.suggestion.slots[shipIndex],meta=candidate.item||candidate;
@@ -104,9 +110,9 @@ function hdFOBestSwap(plan,focusKind,mode){
    const ship=plan.ships[si];if(!ship||!ship.ship)continue;
    for(let ii=0;ii<(ship.items||[]).length;ii++){
     if(!hdFOCompatible(plan,cand,si,ii))continue;
-    const old=ship.items[ii];if(old&&old.name===cand.name||!hdFOCanUse(plan,cand,si,ii))continue;
+    const old=ship.items[ii];if(old&&hdFOStackKey(old)===cand.key||!hdFOCanUse(plan,cand,si,ii))continue;
     const trial=hdFOClone(plan);
-    trial.ships[si].items[ii]={name:cand.name,star:cand.maxStar||0,category:cand.item&&cand.item.category||'',kind:old&&old.kind||'utility',slotIndex:old&&old.slotIndex,capacity:old&&old.capacity};
+    trial.ships[si].items[ii]={name:cand.name,star:cand.maxStar||0,stackKey:cand.key,norm:cand.norm||'',category:cand.item&&cand.item.category||'',kind:old&&old.kind||'utility',slotIndex:old&&old.slotIndex,capacity:old&&old.capacity};
     hdFORefreshUsage(trial);
     const after=hdFOCoverage(trial),afterScore=hdFOReqScore(after.evaluation,cfg.id),afterCombat=hdFOCombatScore(after.evaluation),focusBefore=before.map[focusKind],focusAfter=after.map[focusKind];
     if(!focusBefore||!focusAfter)continue;
