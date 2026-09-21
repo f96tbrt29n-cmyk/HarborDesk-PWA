@@ -3819,6 +3819,61 @@ test('release smoke: map攻略 inner controls work end to end', async ({ page })
 });
 
 
+test('release smoke: map quest tab links live quest data and checklist', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdQuestRelatedToMap === 'function' &&
+    typeof window.hdQuestOpenFromMap === 'function' &&
+    typeof window.hdQuestAddFromMap === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    selectedWorld = '2';
+    selectedMap = '2-4';
+    renderMapPicker();
+  });
+
+  await page.locator('[data-map-tab="quest"]').click();
+  const bq1 = page.locator('[data-map-pane="quest"] [data-hd-map-quest-id="Bq1"]');
+  await expect(bq1).toBeVisible();
+  await expect(bq1).toContainText('沖ノ島海域迎撃戦');
+  await expect(bq1.locator('[data-hd-map-quest-open="Bq1"]')).toBeVisible();
+  await expect(bq1.locator('[data-hd-map-quest-add="Bq1"]')).toBeVisible();
+
+  await bq1.locator('[data-hd-map-quest-open="Bq1"]').click();
+  await expect(page.locator('#questDatabase')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#hdQuestDbSearch')).toHaveValue('沖ノ島海域迎撃戦');
+  await expect(page.locator('#questDatabase [data-hd-quest-id="Bq1"]')).toBeVisible();
+
+  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await page.evaluate(() => {
+    selectedWorld = '2';
+    selectedMap = '2-4';
+    renderMapPicker();
+  });
+  await page.locator('[data-map-tab="quest"]').click();
+
+  const add = page.locator('[data-map-pane="quest"] [data-hd-map-quest-add="Bq1"]');
+  await add.click();
+  await expect(page.locator('#quests')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#quests')).toContainText('沖ノ島海域迎撃戦');
+
+  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await page.evaluate(() => {
+    selectedWorld = '2';
+    selectedMap = '2-4';
+    renderMapPicker();
+  });
+  await page.locator('[data-map-tab="quest"]').click();
+  await expect(page.locator('[data-map-pane="quest"] [data-hd-map-quest-add="Bq1"]')).toHaveText('追加済み');
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map overview exposes visible攻略 tool launcher', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
