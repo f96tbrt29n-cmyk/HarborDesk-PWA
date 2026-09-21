@@ -213,3 +213,7 @@ button.home-next-main{cursor:pointer}
 .home-resume-card i{grid-area:arrow;font-style:normal;font-size:22px;color:var(--accent2)}
 .home-resume-card>button:active{background:rgba(104,190,239,.09)}
 @media(max-width:560px){.home-resume-card>button{min-height:62px}}
+
+.home-sync-card.drift{border-color:rgba(239,116,116,.55);background:rgba(108,36,36,.2)}
+.home-sync-card.drift .home-sync-main>div>strong{color:#ffb0b0}
+.home-sync-note.danger{color:#ffb0b0;border-top-color:rgba(239,116,116,.2)}
