@@ -527,6 +527,18 @@ function hdKcRenderUserscriptStatus(sync){
 function hdKcSyncStatus(){
  try{return JSON.parse(localStorage.getItem(HD_KC_SYNC_KEY)||'null')}catch{return null}
 }
+function hdKcLiveLedgerAudit(sync=hdKcSyncStatus()){
+ const integrity=sync?.integrity;if(!integrity?.verified)return {verified:false,ok:true,ships:null,equipment:null};
+ const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}};
+ const roster=read('harbordesk-ship-roster-v1',[]),equipment=read('harbordesk-equipment-v1',[]),details=read('harbordesk-kancolle-equipment-detail-v1',[]);
+ const shipSource=Math.max(0,Number(integrity?.ships?.source)||0),equipSource=Math.max(0,Number(integrity?.equipment?.source)||0);
+ const shipIds=new Set((Array.isArray(roster)?roster:[]).filter(x=>x?.source==='kancolle-import'&&Number(x?.gameShipId)>0).map(x=>Number(x.gameShipId)));
+ const equipItems=(Array.isArray(equipment)?equipment:[]).filter(x=>x?.source==='kancolle-import').reduce((sum,x)=>sum+Math.max(0,Number(x?.count)||0),0);
+ const detailItems=(Array.isArray(details)?details:[]).filter(x=>Number(x?.gameEquipId)>0).length;
+ const ships={source:shipSource,current:shipIds.size,ok:shipIds.size===shipSource};
+ const equipmentAudit={source:equipSource,current:equipItems,detail:detailItems,ok:equipItems===equipSource&&detailItems===equipSource};
+ return {verified:true,ok:ships.ok&&equipmentAudit.ok,ships,equipment:equipmentAudit};
+}
 function hdKcNotifySyncSuccess(sync){
  if(!sync)return;
  const delta=sync.delta,parts=hdKcDeltaParts(sync);
@@ -556,15 +568,15 @@ function hdKcRenderSyncStatus(){
  const el=document.getElementById('hdKcSyncLast'),headline=document.getElementById('hdKcSyncHeadline'),box=document.querySelector('.hd-kc-sync-overview'),s=hdKcSyncStatus();
  const equipRows=s?Number(s.equipmentOwnedRows??s.snapshot?.equipmentOwnedRows??s.equipmentRows??s.equipment)||0:0,equipPlans=s?Number(s.equipmentPlanRows??s.snapshot?.equipmentPlanRows)||0:0,equipItems=s?Number(s.equipmentItems??s.snapshot?.equipment??s.equipment)||0:0;
  if(el)el.textContent=s?`最終同期 ${new Date(s.syncedAt).toLocaleString('ja-JP')} ・ 艦娘${s.ships} / 装備台帳${equipRows}種類・${equipItems}個${equipPlans?`＋計画${equipPlans}`:''} / 資源${s.materials} / 艦隊${s.decks} / 遠征${s.expeditions||0} / 入渠${s.docks||0} / 任務${s.quests||0} / 出撃${s.sorties||0}`:'まだ同期してないよ';
- if(headline)headline.textContent=s?'艦これデータは同期済み':'まず艦これから同期しよう';
- if(box)box.classList.toggle('is-synced',!!s);
+ if(headline)headline.textContent=s?(audit.verified&&!audit.ok?'台帳に差異あり・再同期推奨':'艦これデータは同期済み'):'まず艦これから同期しよう';
+ if(box){box.classList.toggle('is-synced',!!s&&(!audit.verified||audit.ok));box.classList.toggle('has-ledger-drift',!!s&&audit.verified&&!audit.ok)}
  const delta=document.getElementById('hdKcSyncDelta');if(delta){delta.hidden=!s;delta.innerHTML=s?hdKcDeltaHtml(s):''}
  const coverage=document.getElementById('hdKcSyncCoverage');
  if(coverage){
   if(!s)coverage.innerHTML='<span class="muted">同期すると取得状況がここに出るよ</span>';
   else{
    const c=hdKcCoverageForSync(s),rows=[['艦娘','ships',s.ships],['装備','equipment',{rows:equipRows,items:equipItems}],['資源','resources',s.materials],['艦隊','fleets',s.decks],['任務','quests',s.quests],['入渠','docks',s.docks],['出撃','sorties',s.sorties]];
-   const integrity=s.integrity,check=integrity?.verified?(integrity.ok?`台帳反映確認: 艦隊 ${integrity.ships.saved}/${integrity.ships.source}隻・装備 ${integrity.equipment.saved}/${integrity.equipment.source}個 ✓`:`台帳反映に差異あり: 艦隊 ${integrity.ships.saved}/${integrity.ships.source}・装備 ${integrity.equipment.saved}/${integrity.equipment.source}`):'';
+   const integrity=s.integrity,check=audit.verified?(audit.ok?`現在の台帳確認: 艦娘 ${audit.ships.current}/${audit.ships.source}隻・装備 ${audit.equipment.current}/${audit.equipment.source}個 ✓`:`現在の台帳に差異あり: 艦娘 ${audit.ships.current}/${audit.ships.source}隻・装備 ${audit.equipment.current}/${audit.equipment.source}個（詳細 ${audit.equipment.detail}/${audit.equipment.source}）`):(integrity?.verified?(integrity.ok?`台帳反映確認: 艦隊 ${integrity.ships.saved}/${integrity.ships.source}隻・装備 ${integrity.equipment.saved}/${integrity.equipment.source}個 ✓`:`台帳反映に差異あり: 艦隊 ${integrity.ships.saved}/${integrity.ships.source}・装備 ${integrity.equipment.saved}/${integrity.equipment.source}`):'');
    coverage.innerHTML='<div class="hd-kc-coverage-chips">'+rows.map(([name,key,count])=>{const captured=!!c[key],isEquip=key==='equipment',n=isEquip?Number(count?.items)||0:Number(count)||0,label=!captured?'未取得':isEquip?(n>0?`${Number(count?.rows)||0}種類・${n}個${equipPlans?` / 計画${equipPlans}`:''}`:(equipPlans?`所持0 / 計画${equipPlans}`:'取得済み・0')):(n>0?String(n):'取得済み・0');return `<span class="${captured?'ok':'missing'}"><b>${name}</b> ${label}</span>`}).join('')+`</div><small>「取得済み・0」は通信を取得した上で該当データが0件。「未取得」はその画面の通信をまだ拾っていない状態だよ。${check?'<br>'+hdKcEsc(check):''}</small>`;
   }
  }
@@ -745,3 +757,8 @@ window.hdKcCurrentFleets=hdKcCurrentFleets;
 window.hdKcCopyFleetToCustom=hdKcCopyFleetToCustom;
 window.hdKcPrepareCurrentFleet=hdKcPrepareCurrentFleet;
 window.hdKcRefreshLinkedCustomFleets=hdKcRefreshLinkedCustomFleets;
+
+window.hdKcLiveLedgerAudit=hdKcLiveLedgerAudit;
+window.addEventListener('hd:equipment-changed',()=>hdKcRenderSyncStatus());
+window.addEventListener('hd:ship-identity-changed',()=>hdKcRenderSyncStatus());
+window.addEventListener('storage',e=>{if(['harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-kancolle-equipment-detail-v1'].includes(e.key))hdKcRenderSyncStatus()});
