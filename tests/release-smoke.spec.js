@@ -772,6 +772,62 @@ test('release smoke: sortie preparation exposes detailed game differences', asyn
 });
 
 
+test('release smoke: sortie gate prioritizes blockers and next actions', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFEGoNoGo === 'function' &&
+    typeof window.hdFEGateHtml === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const stop = window.hdFEGoNoGo({checks:[
+      {id:'freshness',label:'同期鮮度',status:'partial',detail:'同期から12分'},
+      {id:'health',label:'艦状態',status:'missing',detail:'大破 1隻'},
+      {id:'supply',label:'補給',status:'partial',detail:'未補給 1隻'},
+      {id:'gameMatch',label:'ゲーム反映',status:'partial',detail:'装備差 2件'}
+    ]});
+    const hold = window.hdFEGoNoGo({checks:[
+      {id:'freshness',label:'同期鮮度',status:'partial',detail:'同期から12分'},
+      {id:'health',label:'艦状態',status:'ready',detail:'艦状態OK'}
+    ]});
+    const go = window.hdFEGoNoGo({checks:[
+      {id:'freshness',label:'同期鮮度',status:'ready',detail:'たった今同期'},
+      {id:'health',label:'艦状態',status:'ready',detail:'艦状態OK'}
+    ]});
+    return {stop,hold,go,html:window.hdFEGateHtml({checks:[
+      {id:'health',label:'艦状態',status:'missing',detail:'大破 1隻'},
+      {id:'gameMatch',label:'ゲーム反映',status:'partial',detail:'装備差 2件'}
+    ]})};
+  });
+
+  expect(data.stop.state).toBe('stop');
+  expect(data.stop.label).toBe('修正必要');
+  expect(data.stop.actions[0].id).toBe('health');
+  expect(data.stop.actions[0].action).toContain('大破');
+  expect(data.stop.actions.some(x => x.id === 'gameMatch')).toBe(true);
+  expect(data.hold.state).toBe('hold');
+  expect(data.hold.label).toBe('要確認');
+  expect(data.go.state).toBe('go');
+  expect(data.go.label).toBe('出撃準備OK');
+  expect(data.go.actions).toHaveLength(0);
+  expect(data.html).toContain('修正必要');
+  expect(data.html).toContain('ゲーム側の艦隊順・装備');
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: sortie summary includes go-no-go and prioritized actions', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const source = await page.evaluate(async () => fetch('./sortie-preparation-sheet.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain("typeof hdFEGateHtml==='function'?hdFEGateHtml(auto):''");
+  expect(source).toContain("typeof hdFEGoNoGo==='function'?hdFEGoNoGo(eq.assigned.auto):null");
+  expect(source).toContain('出撃判定:');
+  expect(source).toContain('次:');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -781,8 +837,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.389'");
-  expect(source).toContain("const HD_APP_BUILD=389");
+  expect(source).toContain("const HD_APP_VERSION='1.0.390'");
+  expect(source).toContain("const HD_APP_BUILD=390");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -805,14 +861,14 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=389`);
+    expect(data.index).toContain(`${asset}?v=390`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=389");
+  expect(data.updater).toContain("const HD_APP_BUILD=390");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v389");
+  expect(data.sw).toContain("harbordesk-pwa-v390");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -825,7 +881,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=389');
+  expect(source).toContain('const BUILD=390');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -2065,17 +2121,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=389',
-      'map-images.js?v=389',
-      'map-tabs.js?v=389',
-      'map-interactive.js?v=389',
-      'map-advanced-data.js?v=389'
+      'map-details.js?v=390',
+      'map-images.js?v=390',
+      'map-tabs.js?v=390',
+      'map-interactive.js?v=390',
+      'map-advanced-data.js?v=390'
     ];
     const requiredStyles = [
-      'map-details.css?v=389',
-      'map-tabs.css?v=389',
-      'map-images.css?v=389',
-      'map-interactive.css?v=389'
+      'map-details.css?v=390',
+      'map-tabs.css?v=390',
+      'map-images.css?v=390',
+      'map-interactive.css?v=390'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -2117,7 +2173,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=389');
+  expect(src).toBe('app.js?v=390');
   expect(errors).toEqual([]);
 });
 

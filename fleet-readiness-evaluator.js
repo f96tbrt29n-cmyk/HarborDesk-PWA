@@ -269,8 +269,35 @@ function hdFEAutoVerdict(plan,e){
  return {status:worst.status,checks,live,supply,freshness,gameMatch,route,air,scouting,master,equipment};
 }
 function hdFEAutoStatusLabel(s){return s==='ready'?'OK':s==='missing'?'不足/不可':s==='partial'?'注意':'要確認'}
+function hdFEActionForCheck(check){
+ if(!check||check.status==='ready')return '';
+ const actions={
+  health:check.status==='missing'?'大破・遠征中・入渠中の艦を編成から外す':'損傷・疲労している艦を確認する',
+  supply:'燃料・弾薬を補給する',
+  freshness:'艦これ連携を再同期して最新状態にする',
+  gameMatch:'ゲーム側の艦隊順・装備をHarborDeskの予定と合わせる',
+  route:check.status==='manual'?'攻略ルートの編成条件を確認する':'編成条件を満たすよう艦種・速力を直す',
+  equipment:'不足している海域向け装備を準備する',
+  air:check.status==='manual'?'敵制空値・搭載数を確認する':'制空値を増やす',
+  scouting:check.status==='manual'?'索敵分岐条件を確認する':'索敵値を増やす',
+  master:check.status==='missing'?'装備不可の組み合わせを修正する':'未解決の装備可否を確認する'
+ };
+ return actions[check.id]||(`${check.label||'項目'}を確認する`);
+}
+function hdFEGoNoGo(auto){
+ const checks=auto?.checks||[],blockers=checks.filter(x=>x.status==='missing'),cautions=checks.filter(x=>x.status==='partial'||x.status==='manual'),state=blockers.length?'stop':cautions.length?'hold':'go';
+ const order={health:1,supply:2,gameMatch:3,route:4,equipment:5,air:6,scouting:7,master:8,freshness:9};
+ const actionChecks=[...blockers,...cautions].sort((a,b)=>(order[a.id]||99)-(order[b.id]||99)),seen=new Set(),actions=[];
+ for(const x of actionChecks){const action=hdFEActionForCheck(x);if(action&&!seen.has(action)){seen.add(action);actions.push({id:x.id,label:x.label,status:x.status,action,detail:x.detail||''})}}
+ const label=state==='go'?'出撃準備OK':state==='stop'?'修正必要':'要確認',detail=state==='go'?'自動判定で未解決項目なし':state==='stop'?`修正が必要な項目 ${blockers.length}件`:`確認が必要な項目 ${cautions.length}件`;
+ return {state,label,detail,blockers,cautions,actions};
+}
+function hdFEGateHtml(auto){
+ const gate=hdFEGoNoGo(auto),items=gate.actions.slice(0,6);
+ return `<div class="hd-fe-gate ${gate.state}"><div class="hd-fe-gate-head"><div><span>出撃判定</span><strong>${hdFEEsc(gate.label)}</strong></div><small>${hdFEEsc(gate.detail)}</small></div>${items.length?`<div class="hd-fe-gate-actions">${items.map((x,i)=>`<div class="${x.status}"><b>${i+1}. ${hdFEEsc(x.action)}</b><span>${hdFEEsc(x.label)}｜${hdFEEsc(x.detail)}</span></div>`).join('')}</div>`:'<div class="hd-fe-gate-clear">この判定範囲では追加作業なし</div>'}</div>`;
+}
 function hdFEAutoHtml(v){
- return `<div class="hd-fe-auto ${v.status}"><div class="hd-fe-auto-head"><div><b>出撃自動判定</b><span>艦状態・補給・同期鮮度・ゲーム反映・編成・装備・制空・索敵を統合</span></div><strong>${hdFEAutoStatusLabel(v.status)}</strong></div><div class="hd-fe-auto-grid">${v.checks.map(x=>`<div class="${x.status}"><span>${hdFEEsc(x.label)}</span><b>${hdFEAutoStatusLabel(x.status)}</b><small>${hdFEEsc(x.detail||'')}</small></div>`).join('')}</div>${hdFEGameMatchHtml(v.gameMatch)}${v.scouting?.available&&v.scouting.checks?.length?`<div class="hd-fe-auto-detail"><b>索敵分岐</b>${v.scouting.checks.map(x=>`<span class="${x.status}">${hdFEEsc(x.label)}：${v.scouting.score.toFixed(2)} / 安全域 ${x.safe}${x.failBelow?`（${x.failBelow}未満は逸れ域）`:''}</span>`).join('')}</div>`:''}</div>`;
+ return `<div class="hd-fe-auto ${v.status}">${hdFEGateHtml(v)}<div class="hd-fe-auto-head"><div><b>出撃自動判定</b><span>艦状態・補給・同期鮮度・ゲーム反映・編成・装備・制空・索敵を統合</span></div><strong>${hdFEAutoStatusLabel(v.status)}</strong></div><div class="hd-fe-auto-grid">${v.checks.map(x=>`<div class="${x.status}"><span>${hdFEEsc(x.label)}</span><b>${hdFEAutoStatusLabel(x.status)}</b><small>${hdFEEsc(x.detail||'')}</small></div>`).join('')}</div>${hdFEGameMatchHtml(v.gameMatch)}${v.scouting?.available&&v.scouting.checks?.length?`<div class="hd-fe-auto-detail"><b>索敵分岐</b>${v.scouting.checks.map(x=>`<span class="${x.status}">${hdFEEsc(x.label)}：${v.scouting.score.toFixed(2)} / 安全域 ${x.safe}${x.failBelow?`（${x.failBelow}未満は逸れ域）`:''}</span>`).join('')}</div>`:''}</div>`;
 }
 function hdFEEvaluate(plan){
  const map=plan?.map||'',items=hdFEAssigned(plan),stats=hdFEStats(items),air=hdFEAir(items),los=hdFELos(items,map),night=hdFENight(items,stats),master=hdFEMasterValidation(plan);
