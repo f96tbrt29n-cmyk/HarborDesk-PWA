@@ -3567,6 +3567,85 @@ test('release smoke: map攻略 tools survive tab redraws', async ({ page }) => {
 });
 
 
+test('release smoke: map mine readiness and support planner persist real changes', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdRenderSortieReadiness === 'function' &&
+    typeof window.hdSPRender === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-sortie-readiness-v1');
+    localStorage.removeItem('harbordesk-support-fleets-v1');
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({
+      '5-5': [{
+        id:'mine-e2e-fleet',
+        name:'5-5 実操作確認',
+        ships:[
+          {ship:'雪風改二',masterId:0,gear:'主砲 電探'},
+          {ship:'時雨改三',masterId:0,gear:'主砲 電探'},
+          {ship:'大和改二重',masterId:0,gear:'主砲 主砲'},
+          {ship:'武蔵改二',masterId:0,gear:'主砲 主砲'},
+          {ship:'赤城改二',masterId:0,gear:'艦戦 艦攻'},
+          {ship:'加賀改二',masterId:0,gear:'艦戦 艦攻'}
+        ],
+        memo:'回帰テスト',
+        createdAt:Date.now(),
+        updatedAt:Date.now()
+      }]
+    }));
+    selectedWorld='5';
+    selectedMap='5-5';
+    renderMapPicker();
+  });
+
+  await page.locator('[data-map-tab="mine"]').click();
+  await expect(page.locator('#hdSortieReadiness')).toBeVisible();
+  await expect(page.locator('#hdSupportPlanner')).toBeVisible();
+
+  const manual = page.locator('#hdSortieReadiness [data-hd-sortie-check]').first();
+  await expect(manual).toBeVisible();
+  const checkId = await manual.getAttribute('data-hd-sortie-check');
+  await manual.check();
+
+  const ready = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('harbordesk-sortie-readiness-v1') || '{}')
+  );
+  const readyRow = ready['5-5:mine-e2e-fleet'] || {};
+  expect(readyRow[checkId]).toBe(true);
+  expect(Number(readyRow.updatedAt)).toBeGreaterThan(0);
+
+  const first = page.locator('[data-hd-sp-name="vanguard"][data-i="0"]');
+  await first.fill('雪風改二');
+  await first.dispatchEvent('change');
+  const second = page.locator('[data-hd-sp-name="vanguard"][data-i="1"]');
+  await second.fill('時雨改三');
+  await second.dispatchEvent('change');
+
+  const support = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('harbordesk-support-fleets-v1') || '{}')
+  );
+  expect(support['5-5']?.vanguard?.ships?.[0]?.name).toBe('雪風改二');
+  expect(support['5-5']?.vanguard?.ships?.[1]?.name).toBe('時雨改三');
+
+  const start = page.locator('[data-hd-sp-start="vanguard"]');
+  await expect(start).toBeEnabled();
+  await start.click();
+
+  const timer = await page.evaluate(() =>
+    (state?.expeditions || []).find(x => x.support && x.supportKind === 'vanguard' && x.map === '5-5') || null
+  );
+  expect(timer).not.toBeNull();
+  expect(timer.expeditionId).toBe('33');
+  expect(Number(timer.endsAt)).toBeGreaterThan(Date.now());
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map fleet procurement action recovers failed lazy module', async ({ page }) => {
   const errors = [];
   let blockProcurement = true;
