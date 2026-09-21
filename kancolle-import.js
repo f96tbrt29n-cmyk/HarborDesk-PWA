@@ -229,8 +229,8 @@ function hdKcMergeEquipment(parsed){
 
  const next=[],represented=new Set(groups.keys());
  for(const [key,g] of groups){
-  const old=meta.get(key)||{};
-  next.push({...old,id:old.id||`kc-equip-${g.masterEquipId}-${g.star}`,name:g.name,category:g.category,count:g.count,star:g.star,targetStar:Number.isFinite(Number(old.targetStar))?Number(old.targetStar):g.star,assigned:old.assigned||'',memo:old.memo||'',masterEquipId:g.masterEquipId,source:'kancolle-import',syncedAt:Date.now(),proficiency:g.proficiency});
+  const old=meta.get(key)||{},oldMeta={...old};delete oldMeta.syncMissing;delete oldMeta.lastOwnedCount;
+  next.push({...oldMeta,id:old.id||`kc-equip-${g.masterEquipId}-${g.star}`,name:g.name,category:g.category,count:g.count,star:g.star,targetStar:Number.isFinite(Number(old.targetStar))?Number(old.targetStar):g.star,assigned:old.assigned||'',memo:old.memo||'',masterEquipId:g.masterEquipId,source:'kancolle-import',syncedAt:Date.now(),proficiency:g.proficiency});
  }
  if(!parsed.completeSlotItems){
   for(const row of existing){const key=rowKey(row);if(!represented.has(key)&&!changedOldKeys.has(key))next.push(row)}
