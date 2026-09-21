@@ -134,7 +134,12 @@ function hdSPATrend(rows,windowSize=hdSPAWindow()){
   retreatRate:hdSPADelta(a.retreatRate,b.retreatRate),avgResource:hdSPADelta(a.avgResource,b.avgResource),
   avgResourcePct:hdSPAPctChange(a.avgResource,b.avgResource),avgBuckets:hdSPADelta(a.avgBuckets,b.avgBuckets),
   avgDurationMin:hdSPADelta(a.avgDurationMin,b.avgDurationMin),avgDurationPct:hdSPAPctChange(a.avgDurationMin,b.avgDurationMin),
-  avgReadiness:hdSPADelta(a.avgReadiness,b.avgReadiness)
+  avgReadiness:hdSPADelta(a.avgReadiness,b.avgReadiness),
+  postDamageRate:hdSPADelta(a.postTelemetry?.damageRate,b.postTelemetry?.damageRate),
+  postAvgHpLoss:hdSPADelta(a.postTelemetry?.avgHpLoss,b.postTelemetry?.avgHpLoss),
+  postAvgAirLoss:hdSPADelta(a.postTelemetry?.avgAirLoss,b.postTelemetry?.avgAirLoss),
+  postAvgDepletedAdded:hdSPADelta(a.postTelemetry?.avgDepletedAdded,b.postTelemetry?.avgDepletedAdded),
+  postNeedsFixRate:hdSPADelta(a.postTelemetry?.needsFixRate,b.postTelemetry?.needsFixRate)
  };
  const issues=[],improvements=[];
  if(delta.bossRate!=null&&delta.bossRate<=-15)issues.push('ボス到達率が15pt以上低下');
@@ -143,12 +148,17 @@ function hdSPATrend(rows,windowSize=hdSPAWindow()){
  if(delta.avgResourcePct!=null&&delta.avgResourcePct>=20)issues.push('平均資源消費が20%以上増加');
  if(delta.avgDurationPct!=null&&delta.avgDurationPct>=20)issues.push('平均時間が20%以上増加');
  if(delta.avgReadiness!=null&&delta.avgReadiness<=-10)issues.push('開始時確認率が10pt以上低下');
+ if(delta.postDamageRate!=null&&delta.postDamageRate>=20)issues.push('帰還後の損傷発生率が20pt以上上昇');
+ if(delta.postAvgHpLoss!=null&&delta.postAvgHpLoss>=10)issues.push('1周あたりHP減少が10以上増加');
+ if(delta.postNeedsFixRate!=null&&delta.postNeedsFixRate>=20)issues.push('帰還後の再修正率が20pt以上上昇');
  if(delta.bossRate!=null&&delta.bossRate>=15)improvements.push('ボス到達率が改善');
  if(delta.sRate!=null&&delta.sRate>=15)improvements.push('S率が改善');
  if(delta.retreatRate!=null&&delta.retreatRate<=-15)improvements.push('撤退率が改善');
  if(delta.avgResourcePct!=null&&delta.avgResourcePct<=-20)improvements.push('資源効率が改善');
  if(delta.avgDurationPct!=null&&delta.avgDurationPct<=-20)improvements.push('平均時間が短縮');
  if(delta.avgReadiness!=null&&delta.avgReadiness>=10)improvements.push('開始時確認率が改善');
+ if(delta.postDamageRate!=null&&delta.postDamageRate<=-20)improvements.push('帰還後の損傷発生率が改善');
+ if(delta.postNeedsFixRate!=null&&delta.postNeedsFixRate<=-20)improvements.push('再修正が必要な周回が減少');
  return {ready:true,windowSize,recent,previous,recentMetrics:a,previousMetrics:b,delta,issues,improvements};
 }
 function hdSPARecentRef(rows){
