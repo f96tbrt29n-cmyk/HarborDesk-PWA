@@ -914,6 +914,48 @@ test('release smoke: userscript bridge deduplicates repeated capture ids', async
   expect(errors).toEqual([]);
 });
 
+test('release smoke: duplicate bridge retries apply one sync and reject mismatched payloads', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdKcBridgeImportOnce === 'function');
+
+  const data = await page.evaluate(async () => {
+    localStorage.removeItem('harbordesk-ship-roster-v1');
+    localStorage.removeItem('harbordesk-equipment-v1');
+    let syncEvents=0;
+    window.addEventListener('hd:kancolle-sync',()=>syncEvents++);
+    const raw=JSON.stringify({
+      format:'harbordesk-kancolle-import',version:2,userscriptVersion:'1.0.14',records:[
+        {endpoint:'/kcsapi/api_port/port',at:1,payload:{api_result:1,api_data:{
+          api_ship:[{api_id:201,api_ship_id:1,api_lv:30,api_nowhp:13,api_maxhp:13,api_cond:49,api_slot:[601,-1,-1],api_slot_ex:0}],
+          api_deck_port:[{api_id:1,api_name:'第一艦隊',api_ship:[201,-1,-1,-1,-1,-1],api_mission:[0,0,0,0]}],api_material:[]
+        }}},
+        {endpoint:'/kcsapi/api_get_member/slot_item',at:2,payload:{api_result:1,api_data:[{api_id:601,api_slotitem_id:1,api_level:0,api_alv:0}]}}
+      ]
+    });
+    const [a,b]=await Promise.all([
+      window.hdKcBridgeImportOnce('retry-same-1',raw),
+      window.hdKcBridgeImportOnce('retry-same-1',raw)
+    ]);
+    let mismatch='';
+    try{await window.hdKcBridgeImportOnce('retry-same-1',raw+' ')}catch(err){mismatch=String(err?.message||err)}
+    return {
+      same:a.syncedAt===b.syncedAt,
+      syncEvents,
+      roster:JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]'),
+      equipment:JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]'),
+      mismatch
+    };
+  });
+
+  expect(data.same).toBe(true);
+  expect(data.syncEvents).toBe(1);
+  expect(data.roster).toHaveLength(1);
+  expect(data.equipment.reduce((n,x)=>n+(Number(x.count)||0),0)).toBe(1);
+  expect(data.mismatch).toContain('同じcaptureIdで異なる同期データ');
+  expect(errors).toEqual([]);
+});
+
 test('release smoke: userscript prefers postMessage bridge and keeps hash fallback', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
