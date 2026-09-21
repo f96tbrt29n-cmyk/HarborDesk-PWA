@@ -18,6 +18,10 @@ function hdFLInventory(){
  }
  return m;
 }
+function hdFLInventoryStats(){
+ const rows=hdFLRows(),items=rows.reduce((sum,x)=>sum+Math.max(0,Number(x?.count)||0),0),synced=rows.filter(x=>x?.source==='kancolle-import');
+ return {rows:rows.length,items,syncedRows:synced.length,syncedItems:synced.reduce((sum,x)=>sum+Math.max(0,Number(x?.count)||0),0)};
+}
 function hdFLType(slot){return slot?.profile?.type||''}
 function hdFLRoles(slot){return slot?.profile?.roles||[]}
 function hdFLIsCarrier(type){return ['軽空母','正規空母','装甲空母'].includes(type)}
@@ -188,7 +192,7 @@ function hdFLGenerate(index){
    if(picked)items.push({name:picked.name,star:picked.maxStar,stackKey:picked.key,norm:picked.norm,category:picked.item.category||'',kind,slotIndex:n,capacity});
    else{slotMissing.push(kind);missing.push({ship:slot.profile.row.name,kind,slotIndex:n,capacity})}
   }
-  ships.push({ship:slot.profile.row.name,masterId:Number(slot.profile.row.masterId)||Number(master?.id)||0,type:slot.profile.type||'',items,missing:slotMissing,master:!!master,expansion:null,expansionMissing:null});
+  ships.push({ship:slot.profile.row.name,masterId:Number(slot.profile.row.masterId)||Number(master?.id)||0,gameShipId:Number(slot.profile.row.gameShipId)||0,type:slot.profile.type||'',items,missing:slotMissing,master:!!master,expansion:null,expansionMissing:null});
  });
  // Optional expansion-slot suggestions, only after every normal slot has been allocated.
  ships.forEach((row,i)=>{
@@ -206,13 +210,13 @@ function hdFLGenerate(index){
  });
  const used={};for(const s of ships){for(const x of s.items)used[x.name]=(used[x.name]||0)+1;if(s.expansion)used[s.expansion.name]=(used[s.expansion.name]||0)+1}
  const owned={};for(const x of inv.values())owned[x.name]=(owned[x.name]||0)+x.count;
- const plan={map,index:Number(index),suggestion,ships,missing,used,owned,masterBacked:ships.filter(x=>x.master).length,createdAt:Date.now()};HD_FL_CACHE[map+':'+index]=plan;return plan;
+ const plan={map,index:Number(index),suggestion,ships,missing,used,owned,inventory:hdFLInventoryStats(),masterBacked:ships.filter(x=>x.master).length,createdAt:Date.now()};HD_FL_CACHE[map+':'+index]=plan;return plan;
 }
 function hdFLKindLabel(k){return ({smallGun:'小口径主砲',mediumGun:'中口径主砲',smallMediumGun:'主砲',largeGun:'大口径主砲',torpedo:'魚雷',recon:'偵察/索敵',fighter:'艦戦',airAttack:'艦攻/艦爆',waterAir:'水上機',ap:'徹甲弾',utility:'海域向け装備'})[k]||k}
 function hdFLPlanHtml(plan){
  const used=Object.entries(plan.used).map(([n,c])=>`${hdFLEsc(n)} ×${c} / 所持${plan.owned[n]||0}`).join('、');
  return `<div class="hd-fl-plan">
-  <div class="hd-fl-summary"><div><strong>手持ち装備の自動配備</strong><span>所持数＋艦別装備可否＋実スロット制限を反映</span></div><b class="${plan.missing.length?'warn':'ok'}">${plan.missing.length?`未配備 ${plan.missing.length}枠`:'主要枠を配備'}</b></div>
+  <div class="hd-fl-summary"><div><strong>手持ち装備の自動配備</strong><span>装備台帳 ${plan.inventory?.rows||0}種類・${plan.inventory?.items||0}個から配備｜所持数＋艦別装備可否＋実スロット制限を反映</span></div><b class="${plan.missing.length?'warn':'ok'}">${plan.missing.length?`未配備 ${plan.missing.length}枠`:'主要枠を配備'}</b></div>
   <div class="hd-fl-master-status">マスター同期 ${plan.masterBacked||0}/${plan.ships.filter(x=>x.ship).length}隻</div>
   <div class="hd-fl-ships">${plan.ships.map((s,i)=>{const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(Number(s.masterId)>0?{id:Number(s.masterId),name:s.ship}:s.ship,'loadout-thumb'):'';return `<div class="hd-fl-ship"><div class="hd-fl-ship-head"><span>${i+1}</span>${image}<div><strong>${hdFLEsc(s.ship||'艦娘未選択')}</strong><small>${hdFLEsc(s.type||'')}${s.master?'・マスター判定':''}</small></div></div><div class="hd-fl-items">${s.items.map(x=>`<span>${hdFLEsc(x.name)}${x.star?` ★${x.star}`:''}<small>第${(x.slotIndex??0)+1}スロ${x.capacity!=null?`・${x.capacity}機`:''}</small></span>`).join('')||'<em>配備なし</em>'}</div>${s.expansion?`<div class="hd-fl-expansion"><i>増設候補</i><b>${hdFLEsc(s.expansion.name)}${s.expansion.star?` ★${s.expansion.star}`:''}</b><small>${hdFLEsc(s.expansion.reason)}</small></div>`:''}${s.expansionMissing?`<div class="hd-fl-expansion missing"><i>増設不足</i><b>${hdFLEsc(s.expansionMissing.name)}${s.expansionMissing.reqStar?` ★${s.expansionMissing.reqStar}+`:''}</b><small>${hdFLEsc(s.expansionMissing.reason)}</small><button type="button" class="ghost small" data-hd-fl-procure-expansion="${plan.index}" data-hd-fl-ship-index="${i}">調達リストへ</button></div>`:''}${s.missing.length?`<small class="hd-fl-missing">未配備: ${s.missing.map(hdFLKindLabel).join(' / ')}</small>`:''}</div>`}).join('')}</div>
   ${used?`<div class="hd-fl-usage"><b>在庫使用:</b> ${used}</div>`:''}
@@ -238,7 +242,7 @@ function hdFLSave(index){
  const map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+index,plan=HD_FL_CACHE[key]||hdFLGenerate(index);if(!map||!plan)return;
  const s=plan.suggestion,all=typeof loadCustomFleets==='function'?loadCustomFleets():{};all[map]=all[map]||[];
  const name=map+' 自動提案＋装備｜'+(s.preset.name||('候補'+(s.index+1)));
- const ships=Array.from({length:6},(_,i)=>{const slot=s.slots[i],r=slot?.profile?.row,p=plan.ships[i];const normal=(p?.items||[]).map(x=>x.name+(x.star?` ★${x.star}`:''));if(p?.expansion)normal.push(`[増設] ${p.expansion.name}${p.expansion.star?` ★${p.expansion.star}`:''}`);return {ship:r?.name||'',masterId:Number(p?.masterId)||Number(r?.masterId)||0,gear:normal.join(' / ')}});
+ const ships=Array.from({length:6},(_,i)=>{const slot=s.slots[i],r=slot?.profile?.row,p=plan.ships[i];const normal=(p?.items||[]).map(x=>x.name+(x.star?` ★${x.star}`:''));if(p?.expansion)normal.push(`[増設] ${p.expansion.name}${p.expansion.star?` ★${p.expansion.star}`:''}`);return {ship:r?.name||'',masterId:Number(p?.masterId)||Number(r?.masterId)||0,gameShipId:Number(p?.gameShipId)||Number(r?.gameShipId)||0,gear:normal.join(' / ')}});
  const memo='HarborDesk手持ち装備自動配備。所持数に加え、詳細100隻＋公式マスター全865形態の通常スロット数・搭載数・装備可否を反映。';
  const old=all[map].find(x=>x.name===name),id=old?.id||(typeof cfUid==='function'?cfUid():'fl-'+Date.now()+'-'+Math.random().toString(16).slice(2));
  const item={id,name,ships,memo,createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};all[map]=old?all[map].map(x=>x.id===id?item:x):all[map].concat(item);
@@ -255,6 +259,9 @@ document.addEventListener('click',e=>{
 });
 window.addEventListener('storage',e=>{if(e.key===HD_FL_KEY){for(const k of Object.keys(HD_FL_CACHE))delete HD_FL_CACHE[k]}});
 window.addEventListener('hd:ship-images-changed',()=>{document.querySelectorAll('.hd-fl-host').forEach(host=>{if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host)})});
-window.addEventListener('hd:equipment-changed',()=>{for(const k of Object.keys(HD_FL_CACHE))delete HD_FL_CACHE[k]});
+function hdFLClearCache(){for(const k of Object.keys(HD_FL_CACHE))delete HD_FL_CACHE[k]}
+window.addEventListener('hd:equipment-changed',hdFLClearCache);
+window.addEventListener('hd:kancolle-sync',hdFLClearCache);
+window.addEventListener('hd:ship-identity-changed',hdFLClearCache);
 window.addEventListener('load',()=>setTimeout(()=>{if(!hdFLInstall())setTimeout(hdFLInstall,500)},650));
 hdFLInstall();

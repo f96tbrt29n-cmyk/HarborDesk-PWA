@@ -36,7 +36,8 @@ function ensureCustomFleetDialog(){
     if(!selectedMap)return;
     const name=document.getElementById('customFleetName').value.trim();
     if(!name)return;
-    const ships=Array.from({length:6},(_,i)=>{const ship=document.getElementById(`cfShip${i}`).value.trim();return {ship,masterId:cfMasterId(ship),gear:document.getElementById(`cfGear${i}`).value.trim()}});
+    const oldFleet=customFleetEditId?(loadCustomFleets()[selectedMap]||[]).find(x=>x.id===customFleetEditId):null;
+    const ships=Array.from({length:6},(_,i)=>{const ship=document.getElementById(`cfShip${i}`).value.trim(),masterId=cfMasterId(ship),old=oldFleet?.ships?.[i],same=!!old&&String(old.ship||'')===ship&&Number(old.masterId||0)===Number(masterId||0);return {ship,masterId,gameShipId:same?(Number(old.gameShipId)||0):0,gear:document.getElementById(`cfGear${i}`).value.trim()}});
     const memo=document.getElementById('customFleetMemo').value.trim();
     const all=loadCustomFleets();
     all[selectedMap]=all[selectedMap]||[];

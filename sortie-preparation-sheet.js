@@ -11,8 +11,12 @@ function hdSPSFleet(map){
 }
 function hdSPSRosterMatch(name){return typeof hdSortieRosterMatch==='function'?hdSortieRosterMatch(name):null}
 function hdSPSRosterMatchShip(row){
- const id=Number(row?.masterId)||0,name=String(row?.ship||'').trim();
- if(id&&typeof rosterLoad==='function'){const hit=rosterLoad().find(x=>Number(x.masterId)===id);if(hit)return hit}
+ const gameId=Number(row?.gameShipId)||0,id=Number(row?.masterId)||0,name=String(row?.ship||'').trim();
+ if(typeof rosterLoad==='function'){
+  const roster=rosterLoad();
+  if(gameId){const exact=roster.find(x=>Number(x.gameShipId)===gameId);if(exact)return exact}
+  if(id){const hit=roster.find(x=>Number(x.masterId)===id);if(hit)return hit}
+ }
  return name?hdSPSRosterMatch(name):null;
 }
 function hdSPSDb(name){return typeof hdSortieDb==='function'?hdSortieDb(name):null}
@@ -178,6 +182,9 @@ document.addEventListener('click',e=>{
 });
 window.addEventListener('hd:map-rendered',()=>{hdSPSMapButton();hdSPSRender()});
 window.addEventListener('hd:workspace-refresh',hdSPSRender);
+window.addEventListener('hd:kancolle-sync',hdSPSRender);
+window.addEventListener('hd:ship-identity-changed',hdSPSRender);
+window.addEventListener('hd:equipment-changed',hdSPSRender);
 window.addEventListener('hd:ship-images-changed',hdSPSRender);
 window.addEventListener('hd:ship-images-ready',hdSPSRender);
 window.addEventListener('storage',e=>{if([HD_SPS_EQUIP_KEY,'harbordesk-ship-roster-v1','harbordesk-custom-fleets-v1','harbordesk-land-base-v1','harbordesk-sortie-readiness-v1'].includes(e.key))hdSPSRender()});
