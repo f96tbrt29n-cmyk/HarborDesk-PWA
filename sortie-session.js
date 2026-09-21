@@ -36,21 +36,44 @@ function hdSSStats(map,fleet){
  const ships=(fleet.ships||[]).filter(function(x){return String(x.ship||'').trim()||String(x.gear||'').trim()});
  return {ships:ships,shipCount:ships.filter(function(x){return String(x.ship||'').trim()}).length,auto:auto,autoOk:(auto.checks||[]).filter(function(x){return x.state==='ok'}).length,autoTotal:(auto.checks||[]).length,unresolved:(auto.checks||[]).filter(function(x){return x.state!=='ok'}),manual:manual,manualDone:manual.filter(function(x){return state[x.id]}).length,manualTotal:manual.length};
 }
+function hdSSGate(map,fleet,stats){
+ let raw=null;
+ try{
+  if(typeof hdFEPlanFromSavedFleet==='function'&&typeof hdFEEvaluate==='function'&&typeof hdFEGoNoGo==='function'){
+   const plan=hdFEPlanFromSavedFleet(map,fleet),evaluation=hdFEEvaluate(plan);
+   raw=hdFEGoNoGo(evaluation?.auto);
+  }
+ }catch{}
+ const base=raw||{state:'hold',label:'要確認',detail:'統合出撃判定を取得できないため手動確認',blockers:[],cautions:[],actions:[]};
+ const blockers=Array.isArray(base.blockers)?base.blockers:[],hard=blockers.filter(x=>x?.id==='health'||x?.id==='supply'),actions=[...(Array.isArray(base.actions)?base.actions:[])];
+ const manualLeft=Math.max(0,(Number(stats?.manualTotal)||0)-(Number(stats?.manualDone)||0));
+ let state=base.state||'hold';
+ if(manualLeft&&state==='go')state='hold';
+ if(manualLeft)actions.push({id:'manual',label:'出撃直前チェック',status:'manual',action:'出撃直前の手動チェックを完了する',detail:`未確認 ${manualLeft}件`});
+ const label=state==='go'?'出撃準備OK':state==='stop'?'修正必要':'要確認';
+ const detail=hard.length?`安全上の修正が必要 ${hard.length}件`:manualLeft&&state==='hold'?`手動確認が ${manualLeft}件残っている`:(base.detail||'確認が必要');
+ return {state,label,detail,hardBlock:hard.length>0,hardBlockers:hard,blockers,cautions:Array.isArray(base.cautions)?base.cautions:[],actions};
+}
 function hdSSSnapshot(map){
  const fleet=hdSSFleet(map);if(!fleet)return null;
- const stats=hdSSStats(map,fleet),strategy=hdSSStrategy(fleet);
+ const stats=hdSSStats(map,fleet),strategy=hdSSStrategy(fleet),gate=hdSSGate(map,fleet,stats);
  return {
   id:hdSSUid(),map:map,startedAt:Date.now(),fleetId:fleet.id,fleetName:fleet.name||'名称なし',strategy:strategy,strategyLabel:hdSSStrategyLabel(fleet),
   fleetSnapshot:{id:fleet.id,name:fleet.name||'',strategy:strategy,strategyLabel:hdSSStrategyLabel(fleet),ships:JSON.parse(JSON.stringify(fleet.ships||[])),memo:fleet.memo||''},
-  readinessSnapshot:{autoOk:stats.autoOk,autoTotal:stats.autoTotal,manualDone:stats.manualDone,manualTotal:stats.manualTotal,unresolved:(stats.unresolved||[]).map(function(x){return {label:x.label||'',state:x.state||'',detail:x.detail||''}})},
+  readinessSnapshot:{autoOk:stats.autoOk,autoTotal:stats.autoTotal,manualDone:stats.manualDone,manualTotal:stats.manualTotal,unresolved:(stats.unresolved||[]).map(function(x){return {label:x.label||'',state:x.state||'',detail:x.detail||''}}),gate:{state:gate.state,label:gate.label,detail:gate.detail,hardBlock:gate.hardBlock,actions:gate.actions.slice(0,8).map(x=>({id:x.id||'',action:x.action||'',detail:x.detail||''}))}},
   shipCount:stats.shipCount,status:'active'
  };
 }
 function hdSSEmit(action,detail={}){try{window.dispatchEvent(new CustomEvent('hd:sortie-session-changed',{detail:{action,...detail}}))}catch{}}
-function hdSSStart(map){
+function hdSSStart(map,options={}){
  if(hdSSLoad())return null;
+ const fleet=hdSSFleet(map);if(!fleet)return null;
+ const stats=hdSSStats(map,fleet),gate=hdSSGate(map,fleet,stats),force=!!options?.force;
+ if(gate.hardBlock)return null;
+ if(gate.state==='stop'&&!force)return null;
  const session=hdSSApplyObjectivePref(hdSSSnapshot(map),map);if(!session||!session.shipCount)return null;
- hdSSSave(session);hdSSRender();hdSSEmit('start',{session});return session;
+ if(force&&session.readinessSnapshot?.gate)session.readinessSnapshot.gate.overridden=true;
+ hdSSSave(session);hdSSRender();hdSSEmit('start',{session,gate,forced:force});return session;
 }
 function hdSSClear(){const session=hdSSLoad();hdSSSave(null);hdSSRender();hdSSEmit('clear',{session});return true}
 function hdSSDuration(ms){
@@ -80,12 +103,17 @@ function hdSSSelectedSummary(map){
 function hdSSIdleHtml(map){
  const row=hdSSSelectedSummary(map);
  if(!row)return '<section class="hd-ss"><div class="hd-ss-head"><div><div class="eyebrow">SORTIE SESSION</div><strong>実戦モード</strong><span>出撃編成を選ぶとセッションを開始できるよ。</span></div></div></section>';
- const s=row.stats,manualReady=!s.manualTotal||s.manualDone===s.manualTotal,autoReady=!s.autoTotal||s.autoOk===s.autoTotal,ready=manualReady&&autoReady;
- const unresolved=(s.unresolved||[]).map(function(x){return x.label}).filter(Boolean).join('、');
- return '<section class="hd-ss '+(ready?'ready':'warn')+'"><div class="hd-ss-head"><div><div class="eyebrow">SORTIE SESSION</div><strong>実戦モード</strong><span>選択中の編成を固定して出撃記録へつなぐ</span></div><b>'+(ready?'確認済み':'未確認あり')+'</b></div><div class="hd-ss-selected"><div><span>'+hdSSEsc(row.strategyLabel)+'</span><strong>'+hdSSEsc(row.fleet.name||'名称なし')+'</strong><small>'+s.shipCount+'隻</small></div><div class="hd-ss-readiness"><span>自動確認 <b>'+s.autoOk+'/'+s.autoTotal+'</b></span><span>手動確認 <b>'+s.manualDone+'/'+s.manualTotal+'</b></span></div></div>'+(unresolved?'<p class="hd-ss-warning">要確認: '+hdSSEsc(unresolved)+'</p>':'')+'<div class="hd-ss-actions"><button type="button" class="primary" data-hd-ss-start>この編成で出撃開始</button><button type="button" class="ghost small" data-hd-ss-check>出撃前チェックを見る</button></div><p class="hd-ss-note">開始時の編成・装備・確認状態をスナップショット保存。未確認が残っていても開始できるけど、ゲーム画面で最終確認してね。</p></section>';
+ const s=row.stats,gate=hdSSGate(map,row.fleet,s),manualReady=!s.manualTotal||s.manualDone===s.manualTotal,autoReady=!s.autoTotal||s.autoOk===s.autoTotal,ready=gate.state==='go'&&manualReady&&autoReady;
+ const unresolved=(s.unresolved||[]).map(function(x){return x.label}).filter(Boolean).join('、'),next=gate.actions?.[0]?.action||'';
+ const cls=gate.hardBlock||gate.state==='stop'?'stop':ready?'ready':'warn';
+ let startButtons='';
+ if(gate.hardBlock)startButtons='<button type="button" class="primary" disabled>安全確認が必要</button>';
+ else if(gate.state==='stop')startButtons='<button type="button" class="primary" disabled>修正してから開始</button><button type="button" class="ghost small" data-hd-ss-start-override>それでも記録開始</button>';
+ else startButtons='<button type="button" class="primary" data-hd-ss-start>'+(gate.state==='hold'?'要確認のまま出撃開始':'この編成で出撃開始')+'</button>';
+ return '<section class="hd-ss '+cls+'"><div class="hd-ss-head"><div><div class="eyebrow">SORTIE SESSION</div><strong>実戦モード</strong><span>選択中の編成を固定して出撃記録へつなぐ</span></div><b>'+hdSSEsc(gate.label)+'</b></div><div class="hd-ss-selected"><div><span>'+hdSSEsc(row.strategyLabel)+'</span><strong>'+hdSSEsc(row.fleet.name||'名称なし')+'</strong><small>'+s.shipCount+'隻</small></div><div class="hd-ss-readiness"><span>自動確認 <b>'+s.autoOk+'/'+s.autoTotal+'</b></span><span>手動確認 <b>'+s.manualDone+'/'+s.manualTotal+'</b></span></div></div><div class="hd-ss-gate '+hdSSEsc(gate.state)+'"><b>'+hdSSEsc(gate.detail)+'</b>'+(next?'<span>次: '+hdSSEsc(next)+'</span>':'')+'</div>'+(unresolved?'<p class="hd-ss-warning">要確認: '+hdSSEsc(unresolved)+'</p>':'')+'<div class="hd-ss-actions">'+startButtons+'<button type="button" class="ghost small" data-hd-ss-check>出撃前チェックを見る</button></div><p class="hd-ss-note">'+(gate.hardBlock?'大破・補給不足など安全上の修正が必要な間は、実戦セッションを開始しない。':gate.state==='stop'?'修正必要項目があるため通常開始は停止中。上書き開始は記録用途として明示的に選べる。':'開始時の編成・装備・判定状態をスナップショット保存する。')+'</p></section>';
 }
 function hdSSActiveHtml(session){
- const r=session.readinessSnapshot||{},unresolved=(r.unresolved||[]).map(function(x){return x.label}).filter(Boolean).join('、');
+ const r=session.readinessSnapshot||{},unresolved=(r.unresolved||[]).map(function(x){return x.label}).filter(Boolean).join('、'),gate=r.gate||null,gateText=gate?(gate.label+(gate.overridden?'・上書き開始':'')):'';
  return '<section class="hd-ss active"><div class="hd-ss-head"><div><div class="eyebrow">SORTIE IN PROGRESS</div><strong>出撃中</strong><span>'+hdSSEsc(session.map)+'｜'+hdSSEsc(session.fleetName)+'</span></div><b>'+hdSSEsc(session.strategyLabel||'手動編成')+'</b></div><div class="hd-ss-active-meta"><span>開始 '+hdSSEsc(new Date(session.startedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}))+'</span><span>自動 '+(r.autoOk||0)+'/'+(r.autoTotal||0)+'</span><span>手動 '+(r.manualDone||0)+'/'+(r.manualTotal||0)+'</span></div>'+(unresolved?'<p class="hd-ss-warning">開始時の要確認: '+hdSSEsc(unresolved)+'</p>':'')+'<div class="hd-ss-return"><div class="hd-ss-return-head"><strong>帰還結果</strong><span>記録すると既存の出撃ログ・任務連動へ反映</span></div><div class="hd-ss-form"><label>結果<select id="hdSSResult"><option>S</option><option>A</option><option>B</option><option>C</option><option>D</option><option>撤退</option></select></label><label>到達マス<input id="hdSSNode" placeholder="例 ボス / P"></label><label>戦闘数<input id="hdSSBattles" type="number" min="0" max="20" value="1"></label><label class="hd-ss-check"><input id="hdSSBoss" type="checkbox">ボス到達</label><label>ドロップ<input id="hdSSDrop" placeholder="艦名など"></label><label>バケツ<input id="hdSSBuckets" type="number" min="0" value="0"></label><label>燃料<input id="hdSSFuel" type="number" min="0" value="0"></label><label>弾薬<input id="hdSSAmmo" type="number" min="0" value="0"></label><label>鋼材<input id="hdSSSteel" type="number" min="0" value="0"></label><label>ボーキ<input id="hdSSBauxite" type="number" min="0" value="0"></label><label class="hd-ss-wide">メモ<input id="hdSSMemo" placeholder="撤退原因、装備変更など"></label></div><div class="hd-ss-actions"><button type="button" class="primary" data-hd-ss-finish>帰還結果を記録</button><button type="button" class="ghost small" data-hd-ss-cancel>このセッションを破棄</button></div></div><p class="hd-ss-note">出撃中に保存プリセットを切り替えても、このセッションは開始時の編成スナップショットを保持するよ。</p></section>';
 }
 function hdSSHtml(map){const active=hdSSLoad();return active?hdSSActiveHtml(active):hdSSIdleHtml(map)}
@@ -110,6 +138,7 @@ window.hdSSSave=hdSSSave;
 window.hdSSMap=hdSSMap;
 window.hdSSFleet=hdSSFleet;
 window.hdSSStats=hdSSStats;
+window.hdSSGate=hdSSGate;
 window.hdSSSnapshot=hdSSSnapshot;
 window.hdSSStart=hdSSStart;
 window.hdSSClear=hdSSClear;
@@ -122,6 +151,7 @@ window.hdSSInstall=hdSSInstall;
 
 document.addEventListener('click',function(e){
  if(e.target.closest?.('[data-hd-ss-start]')){const session=hdSSStart(hdSSMap());if(session&&typeof window.hdSMOpen==='function')setTimeout(()=>window.hdSMOpen(),0);return}
+ if(e.target.closest?.('[data-hd-ss-start-override]')){const session=hdSSStart(hdSSMap(),{force:true});if(session&&typeof window.hdSMOpen==='function')setTimeout(()=>window.hdSMOpen(),0);return}
  if(e.target.closest?.('[data-hd-ss-finish]')){hdSSFinish(hdSSFormData());return}
  if(e.target.closest?.('[data-hd-ss-cancel]')){hdSSClear();return}
  if(e.target.closest?.('[data-hd-ss-check]')){if(typeof hdSPSOpenMapTab==='function')hdSPSOpenMapTab('mine');return}
