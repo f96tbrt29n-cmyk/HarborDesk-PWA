@@ -2,6 +2,7 @@ const HD_SS_KEY='harbordesk-active-sortie-session-v1';
 const HD_SS_POST_KEY='harbordesk-post-sortie-review-v1';
 const HD_SS_OBJECTIVE_PREF_KEY='harbordesk-sortie-objective-pref-v1';
 const HD_SS_SERIES_GOALS_KEY='harbordesk-sortie-series-goals-v1';
+const HD_SS_SERIES_ARCHIVE_KEY='harbordesk-sortie-series-archive-v1';
 
 function hdSSEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function hdSSLoad(){try{return JSON.parse(localStorage.getItem(HD_SS_KEY)||'null')}catch{return null}}
@@ -70,6 +71,47 @@ function hdSSSeriesDecision(seriesId){
   if(targetHit)reasons.push(`目標ドロップ ${goal.target} 獲得`);
  }
  return {seriesId:id,goal,progress,targetHit,stop:reasons.length>0,reasons};
+}
+function hdSSSeriesArchives(){
+ try{const x=JSON.parse(localStorage.getItem(HD_SS_SERIES_ARCHIVE_KEY)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch{return {}}
+}
+function hdSSSeriesArchive(seriesId){
+ const id=String(seriesId||'').trim();if(!id)return null;return hdSSSeriesArchives()[id]||null;
+}
+function hdSSSeriesSummary(seriesId){
+ const id=String(seriesId||'').trim(),decision=hdSSSeriesDecision(id),p=decision.progress,rows=[...(p.rows||[])].sort((a,b)=>(Number(a?.cycleIndex)||0)-(Number(b?.cycleIndex)||0)||(Number(a?.startedAt)||Number(a?.at)||0)-(Number(b?.startedAt)||Number(b?.at)||0));
+ const first=rows[0]||{},last=rows[rows.length-1]||{},boss=rows.filter(x=>!!x?.boss).length,sWins=rows.filter(x=>String(x?.result||'')==='S').length,retreats=rows.filter(x=>!!x?.retreat||String(x?.result||'')==='撤退').length,drops=rows.map(x=>String(x?.drop||'').trim()).filter(Boolean);
+ return {
+  seriesId:id,map:String(first.map||last.map||''),fleetId:String(first.fleetId||last.fleetId||''),fleetName:String(first.fleetName||last.fleetName||''),strategy:String(first.strategy||last.strategy||''),strategyLabel:String(first.strategyLabel||last.strategyLabel||''),
+  cycles:p.cycles,resourceTotal:p.resourceTotal,buckets:p.buckets,elapsedMin:p.elapsedMin,startedAt:p.startedAt,endedAt:p.endedAt,boss,sWins,retreats,drops,targetHit:decision.targetHit,goal:decision.goal,reasons:[...decision.reasons],stop:decision.stop
+ };
+}
+function hdSSSeriesSummaryText(seriesId){
+ const s=hdSSSeriesSummary(seriesId),drops=s.drops.length?s.drops.join(' / '):'なし',reason=s.reasons.length?s.reasons.join(' / '):(s.stop?'終了条件到達':'手動完了');
+ return [
+  'HarborDesk 連続周回サマリー',
+  (s.map||'海域未記録')+(s.fleetName?'｜'+s.fleetName:'')+(s.strategyLabel?'｜'+s.strategyLabel:''),
+  '周回 '+s.cycles+' / ボス '+s.boss+' / S勝利 '+s.sWins+' / 撤退 '+s.retreats,
+  '総資源 '+s.resourceTotal+' / バケツ '+s.buckets+' / 経過 '+s.elapsedMin+'分',
+  'ドロップ '+drops,
+  '終了 '+reason
+ ].join('\n');
+}
+async function hdSSCopyText(text){
+ const value=String(text||'');if(!value)return false;
+ try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(value);return true}}catch{}
+ try{const ta=document.createElement('textarea');ta.value=value;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();const ok=document.execCommand?.('copy');ta.remove();return !!ok}catch{return false}
+}
+function hdSSSeriesClose(seriesId){
+ const id=String(seriesId||'').trim();if(!id)return null;const summary=hdSSSeriesSummary(id);if(!summary.cycles)return null;
+ const archive={...summary,closedAt:Date.now(),closeReason:summary.reasons.length?summary.reasons.join(' / '):'手動完了'},all=hdSSSeriesArchives();all[id]=archive;localStorage.setItem(HD_SS_SERIES_ARCHIVE_KEY,JSON.stringify(all));
+ hdSSSeriesGoalSave(id,{});
+ const post=hdSSPostLoad();if(post&&String(post.seriesId||post.sessionId||'')===id)hdSSPostSave(null);
+ hdSSRender();hdSSEmit('series-close',{seriesId:id,archive});return archive;
+}
+function hdSSSeriesCompletionHtml(post,decision){
+ if(!decision?.stop)return '';const id=String(post?.seriesId||post?.sessionId||''),s=hdSSSeriesSummary(id);
+ return '<div class="hd-ss-series-complete"><div><span>連続周回 完了</span><strong>'+s.cycles+'周・総資源'+s.resourceTotal+'・バケツ'+s.buckets+'・'+s.elapsedMin+'分</strong><small>'+hdSSEsc(decision.reasons.join(' / '))+'</small></div><div class="hd-ss-series-complete-actions"><button type="button" class="ghost small" data-hd-ss-series-copy="'+hdSSEsc(id)+'">結果をコピー</button><button type="button" class="primary small" data-hd-ss-series-close="'+hdSSEsc(id)+'">シリーズを完了</button></div></div>';
 }
 function hdSSSeriesGoalHtml(post,decision){
  const id=String(post?.seriesId||post?.sessionId||'').trim();if(!id)return '';
@@ -388,8 +430,8 @@ function hdSSPostHtml(map){
  else if(!seriesDecision.stop&&state==='go'&&!preflight)primary='<button type="button" class="primary small" data-hd-ss-next-preflight>第'+nextCycle+'周チェックを開始</button>';
  else if(!seriesDecision.stop&&state==='go'&&preflight?.ready)primary='<button type="button" class="primary small" data-hd-ss-next-start>第'+nextCycle+'周を開始</button>';
  else if(!seriesDecision.stop&&state==='go'&&preflight)primary='<button type="button" class="primary small" data-hd-ss-check>出撃前チェックを続ける</button>';
- const goalHtml=hdSSSeriesGoalHtml(post,seriesDecision),detail=seriesDecision.stop?seriesDecision.reasons.join(' / '):(gate.detail||'帰還後の状態を再判定済み');
- return '<div class="hd-ss-post '+hdSSEsc(displayState)+'"><div><span>'+hdSSEsc(title)+'</span><strong>'+hdSSEsc(headline)+'</strong><small>'+hdSSEsc(detail)+'</small>'+(meta.length?'<em>'+hdSSEsc(meta.join(' / '))+'</em>':'')+'</div>'+deltaHtml+queueHtml+goalHtml+cycleHtml+'<div class="hd-ss-post-actions">'+primary+'<button type="button" class="ghost small" data-hd-ss-post-recheck>再判定</button><button type="button" class="ghost small" data-hd-ss-post-clear>確認済み</button></div></div>';
+ const goalHtml=hdSSSeriesGoalHtml(post,seriesDecision),completeHtml=hdSSSeriesCompletionHtml(post,seriesDecision),detail=seriesDecision.stop?seriesDecision.reasons.join(' / '):(gate.detail||'帰還後の状態を再判定済み');
+ return '<div class="hd-ss-post '+hdSSEsc(displayState)+'"><div><span>'+hdSSEsc(title)+'</span><strong>'+hdSSEsc(headline)+'</strong><small>'+hdSSEsc(detail)+'</small>'+(meta.length?'<em>'+hdSSEsc(meta.join(' / '))+'</em>':'')+'</div>'+deltaHtml+queueHtml+goalHtml+completeHtml+cycleHtml+'<div class="hd-ss-post-actions">'+primary+'<button type="button" class="ghost small" data-hd-ss-post-recheck>再判定</button><button type="button" class="ghost small" data-hd-ss-post-clear>確認済み</button></div></div>';
 }
 function hdSSSelectedSummary(map){
  const fleet=hdSSFleet(map);if(!fleet)return null;const stats=hdSSStats(map,fleet);
@@ -448,6 +490,12 @@ window.hdSSSeriesRows=hdSSSeriesRows;
 window.hdSSSeriesProgress=hdSSSeriesProgress;
 window.hdSSSeriesDecision=hdSSSeriesDecision;
 window.hdSSSeriesGoalHtml=hdSSSeriesGoalHtml;
+window.hdSSSeriesArchives=hdSSSeriesArchives;
+window.hdSSSeriesArchive=hdSSSeriesArchive;
+window.hdSSSeriesSummary=hdSSSeriesSummary;
+window.hdSSSeriesSummaryText=hdSSSeriesSummaryText;
+window.hdSSSeriesClose=hdSSSeriesClose;
+window.hdSSSeriesCompletionHtml=hdSSSeriesCompletionHtml;
 window.hdSSPostDelta=hdSSPostDelta;
 window.hdSSTelemetry=hdSSTelemetry;
 window.hdSSMap=hdSSMap;
@@ -477,11 +525,13 @@ document.addEventListener('click',function(e){
  if(e.target.closest?.('[data-hd-ss-next-start]')){const session=hdSSPostStartNextRound();if(session&&typeof window.hdSMOpen==='function')setTimeout(()=>window.hdSMOpen(),0);return}
  const goalSave=e.target.closest?.('[data-hd-ss-goal-save]');if(goalSave){hdSSSeriesGoalSaveFromUi(goalSave.dataset.hdSsGoalSave);return}
  const goalClear=e.target.closest?.('[data-hd-ss-goal-clear]');if(goalClear){hdSSSeriesGoalSave(goalClear.dataset.hdSsGoalClear,{});hdSSRender();return}
+ const seriesCopy=e.target.closest?.('[data-hd-ss-series-copy]');if(seriesCopy){const text=hdSSSeriesSummaryText(seriesCopy.dataset.hdSsSeriesCopy);hdSSCopyText(text).then(ok=>{seriesCopy.textContent=ok?'コピーしたよ':'コピーできなかった';setTimeout(()=>seriesCopy.textContent='結果をコピー',1300)});return}
+ const seriesClose=e.target.closest?.('[data-hd-ss-series-close]');if(seriesClose){hdSSSeriesClose(seriesClose.dataset.hdSsSeriesClose);return}
  if(e.target.closest?.('[data-hd-ss-post-recheck]')){hdSSPostRefreshReview();hdSSRender();return}
  if(e.target.closest?.('[data-hd-fe-recheck]')){setTimeout(()=>{hdSSPostRefreshReview();hdSSRender()},140)}
  if(e.target.closest?.('[data-hd-ss-post-clear]')){hdSSPostSave(null);hdSSRender();return}
 });
-window.addEventListener('storage',function(e){if([HD_SS_KEY,HD_SS_SERIES_GOALS_KEY,'harbordesk-custom-fleets-v1','harbordesk-sortie-selection-v1','harbordesk-sortie-readiness-v1','harbordesk-sortie-log-v1'].includes(e.key))hdSSRender()});
+window.addEventListener('storage',function(e){if([HD_SS_KEY,HD_SS_SERIES_GOALS_KEY,HD_SS_SERIES_ARCHIVE_KEY,'harbordesk-custom-fleets-v1','harbordesk-sortie-selection-v1','harbordesk-sortie-readiness-v1','harbordesk-sortie-log-v1'].includes(e.key))hdSSRender()});
 window.addEventListener('hd:map-rendered',function(){setTimeout(hdSSRender,0)});
 window.addEventListener('hd:kancolle-sync',function(e){const post=hdSSPostLoad();if(post?.status==='reviewed')hdSSPostRefreshReview(e?.detail);else hdSSPostTryReview(e?.detail);setTimeout(hdSSRender,0)});
 ['hd:equipment-changed','hd:ship-identity-changed'].forEach(function(name){window.addEventListener(name,function(){if(hdSSPostLoad()?.status==='reviewed')hdSSPostRefreshReview();setTimeout(hdSSRender,0)})});
