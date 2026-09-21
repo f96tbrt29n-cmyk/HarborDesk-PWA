@@ -307,6 +307,67 @@ test('release smoke: optimizer keeps improvement-level equipment stacks separate
 });
 
 
+test('release smoke: fleet suggestions exclude ships unavailable for sortie', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFSLiveState === 'function' &&
+    typeof window.hdFSOperational === 'function' &&
+    typeof window.hdFSProfile === 'function' &&
+    typeof window.hdFSPickBest === 'function' &&
+    typeof window.hdFSOperationalSummary === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const future = Date.now() + 60 * 60 * 1000;
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
+      { deckId:2, mission:[1,5,future,0], ships:[{ gameShipId:1001 }] }
+    ]));
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
+      expeditions:[],
+      docks:[{ id:'kc-dock-1', gameShipId:1002, endsAt:future, source:'kancolle-import' }]
+    }));
+    const rows = [
+      { id:'exp', name:'睦月', type:'駆逐艦', level:99, gameShipId:1001, gameHp:13, gameMaxHp:13, gameCond:49 },
+      { id:'dock', name:'如月', type:'駆逐艦', level:98, gameShipId:1002, gameHp:13, gameMaxHp:13, gameCond:49 },
+      { id:'heavy', name:'吹雪', type:'駆逐艦', level:97, gameShipId:1003, gameHp:5, gameMaxHp:20, gameCond:49 },
+      { id:'fatigue', name:'白雪', type:'駆逐艦', level:90, gameShipId:1004, gameHp:20, gameMaxHp:20, gameCond:15 },
+      { id:'ready', name:'初雪', type:'駆逐艦', level:80, gameShipId:1005, gameHp:20, gameMaxHp:20, gameCond:49, gameSallyArea:3 },
+      { id:'sparkle', name:'深雪', type:'駆逐艦', level:70, gameShipId:1006, gameHp:20, gameMaxHp:20, gameCond:55 }
+    ];
+    const state = window.hdFSLiveState();
+    const profiles = rows.map(x => window.hdFSProfile(x, state));
+    const ops = Object.fromEntries(profiles.map(x => [x.row.id, x.operational]));
+    const best = window.hdFSPickBest(profiles, new Set(), null, { preferred:[], speedPreferred:false }, []);
+    const summary = window.hdFSOperationalSummary(profiles);
+    return {
+      ops,
+      best: best?.row?.id || '',
+      summary
+    };
+  });
+
+  expect(data.ops.exp.available).toBe(false);
+  expect(data.ops.exp.reasons).toContain('遠征中');
+  expect(data.ops.dock.available).toBe(false);
+  expect(data.ops.dock.reasons).toContain('入渠中');
+  expect(data.ops.heavy.available).toBe(false);
+  expect(data.ops.heavy.reasons).toContain('大破');
+  expect(data.ops.fatigue.available).toBe(true);
+  expect(data.ops.fatigue.labels).toContain('赤疲労');
+  expect(data.ops.sparkle.labels).toContain('キラ');
+  expect(data.ops.ready.labels).toContain('札3');
+  expect(data.best).toBe('ready');
+  expect(data.summary).toMatchObject({
+    total: 6,
+    available: 3,
+    blocked: 3,
+    counts: { '遠征中':1, '入渠中':1, '大破':1 }
+  });
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -316,8 +377,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.382'");
-  expect(source).toContain("const HD_APP_BUILD=382");
+  expect(source).toContain("const HD_APP_VERSION='1.0.383'");
+  expect(source).toContain("const HD_APP_BUILD=383");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -340,14 +401,14 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=382`);
+    expect(data.index).toContain(`${asset}?v=383`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=382");
+  expect(data.updater).toContain("const HD_APP_BUILD=383");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v382");
+  expect(data.sw).toContain("harbordesk-pwa-v383");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -360,7 +421,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=382');
+  expect(source).toContain('const BUILD=383');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -1600,17 +1661,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=382',
-      'map-images.js?v=382',
-      'map-tabs.js?v=382',
-      'map-interactive.js?v=382',
-      'map-advanced-data.js?v=382'
+      'map-details.js?v=383',
+      'map-images.js?v=383',
+      'map-tabs.js?v=383',
+      'map-interactive.js?v=383',
+      'map-advanced-data.js?v=383'
     ];
     const requiredStyles = [
-      'map-details.css?v=382',
-      'map-tabs.css?v=382',
-      'map-images.css?v=382',
-      'map-interactive.css?v=382'
+      'map-details.css?v=383',
+      'map-tabs.css?v=383',
+      'map-images.css?v=383',
+      'map-interactive.css?v=383'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -1652,7 +1713,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=382');
+  expect(src).toBe('app.js?v=383');
   expect(errors).toEqual([]);
 });
 
