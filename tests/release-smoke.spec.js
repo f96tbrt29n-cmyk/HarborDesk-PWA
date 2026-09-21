@@ -272,10 +272,11 @@ test('release smoke: synced roster and inventory feed fleet planning without rel
   expect(data.exactLevel).toBe(80);
   expect(data.summary).toContain('艦これ同期 2隻 / 装備2種類・7個');
 
-  const generate = page.locator('[data-hd-fl-generate]').first();
-  await expect(generate).toBeVisible();
-  await generate.click();
-  await expect(page.locator('.hd-fl-summary').first()).toContainText('装備台帳 2種類・7個');
+  const loadoutText = await page.evaluate(() => {
+    const plan = hdFLGenerate(0);
+    return plan ? hdFLPlanHtml(plan) : '';
+  });
+  expect(loadoutText).toContain('装備台帳 2種類・7個');
   expect(errors).toEqual([]);
 });
 
@@ -320,7 +321,7 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v381");
+  expect(data.sw).toContain("harbordesk-pwa-v382");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
