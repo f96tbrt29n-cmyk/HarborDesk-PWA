@@ -401,6 +401,7 @@ window.hdSSPostPrepareNextRound=hdSSPostPrepareNextRound;
 window.hdSSPostStartNextRound=hdSSPostStartNextRound;
 window.hdSSSeriesRows=hdSSSeriesRows;
 window.hdSSSeriesAdvice=hdSSSeriesAdvice;
+window.hdSSSeriesAdviceHtml=hdSSSeriesAdviceHtml;
 window.hdSSOpenSeriesAnalytics=hdSSOpenSeriesAnalytics;
 window.hdSSPostDelta=hdSSPostDelta;
 window.hdSSTelemetry=hdSSTelemetry;
