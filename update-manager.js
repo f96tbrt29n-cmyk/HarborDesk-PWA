@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.380';
-const HD_APP_BUILD=380;
+const HD_APP_VERSION='1.0.381';
+const HD_APP_BUILD=381;
 const HD_UPDATE_SNOOZE_KEY='harbordesk-update-snooze-v1';
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
@@ -8,7 +8,7 @@ async function hdEnsureServiceWorker(){
   if(!('serviceWorker' in navigator)){window.HD_SERVICE_WORKER_STATUS='unsupported';return null}
   try{
     window.HD_SERVICE_WORKER_STATUS='registering';
-    const reg=await navigator.serviceWorker.register('./sw.js',{scope:'./'});
+    const reg=await navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`,{scope:'./'});
     window.HD_SERVICE_WORKER_STATUS='registered';
     reg.update().catch(()=>{});
     navigator.serviceWorker.ready.then(()=>{window.HD_SERVICE_WORKER_STATUS='ready'}).catch(()=>{});
@@ -45,9 +45,14 @@ async function hdFetchLatestVersion(){
   };
 }
 
+function hdBuildAssetUrl(src){
+  const s=String(src||'');
+  if(!s||/^(?:https?:|data:|blob:)/i.test(s))return s;
+  return s+(s.includes('?')?'&':'?')+'v='+HD_APP_BUILD;
+}
 function hdAppendStyle(attr,href){
   if(document.querySelector(`link[${attr}]`))return;
-  const link=document.createElement('link');link.rel='stylesheet';link.href=href;link.setAttribute(attr,'1');document.head.appendChild(link);
+  const link=document.createElement('link');link.rel='stylesheet';link.href=hdBuildAssetUrl(href);link.setAttribute(attr,'1');document.head.appendChild(link);
 }
 function hdLoadScript(attr,src){
   return new Promise(resolve=>{
@@ -58,7 +63,7 @@ function hdLoadScript(attr,src){
       old.addEventListener('error',()=>{window.HD_MODULE_STATUS[src]='error';resolve(false)},{once:true});
       return;
     }
-    const script=document.createElement('script');script.src=src;script.async=false;script.setAttribute(attr,'1');window.HD_MODULE_STATUS[src]='loading';
+    const script=document.createElement('script');script.src=hdBuildAssetUrl(src);script.async=false;script.setAttribute(attr,'1');window.HD_MODULE_STATUS[src]='loading';
     script.onload=()=>{script.dataset.hdLoaded='1';window.HD_MODULE_STATUS[src]='ok';resolve(true)};
     script.onerror=()=>{window.HD_MODULE_STATUS[src]='error';resolve(false)};
     document.body.appendChild(script);
@@ -262,7 +267,7 @@ function hdEnsureUpdateUI(){
   const header=document.querySelector('.topbar');
   if(header&&!document.getElementById('hdUpdateCheck')){
     const controls=document.createElement('details');controls.className='hd-version-controls hd-header-more';
-    controls.innerHTML=`<summary aria-label="HarborDeskメニュー" title="バージョン・更新"><span aria-hidden="true">•••</span></summary><div class="hd-version-menu"><button type="button" class="ghost small hd-header-search" data-hd-gs-open><span aria-hidden="true">⌕</span><b>全体検索</b></button><button type="button" class="ghost small hd-header-share" data-hd-header-share><span aria-hidden="true">↗</span><b>この画面を共有</b></button><span class="hd-version-badge" title="HarborDesk バージョン">v${HD_APP_VERSION}</span><button id="hdUpdateCheck" class="ghost small hd-update-check" aria-label="更新確認"><span aria-hidden="true">↻</span><b>更新確認</b></button><button type="button" class="ghost small hd-header-settings" data-hd-header-settings><span aria-hidden="true">⚙</span><b>設定</b></button></div>`;
+    controls.innerHTML=`<summary aria-label="HarborDeskメニュー" title="バージョン・更新"><span aria-hidden="true">•••</span></summary><div class="hd-version-menu"><button type="button" class="ghost small hd-header-search" data-hd-gs-open><span aria-hidden="true">⌕</span><b>全体検索</b></button><button type="button" class="ghost small hd-header-share" data-hd-header-share><span aria-hidden="true">↗</span><b>この画面を共有</b></button><span class="hd-version-badge" title="HarborDesk バージョン">v${HD_APP_VERSION}</span><button id="hdUpdateCheck" class="ghost small hd-update-check" aria-label="更新確認"><span aria-hidden="true">↻</span><b>更新確認</b></button><a class="ghost small hd-update-reset" href="./refresh.html"><span aria-hidden="true">⟳</span><b>更新リセット</b></a><button type="button" class="ghost small hd-header-settings" data-hd-header-settings><span aria-hidden="true">⚙</span><b>設定</b></button></div>`;
     header.appendChild(controls)
   }
   const notify=document.getElementById('notifyBtn'),menu=document.querySelector('.hd-header-more .hd-version-menu');
