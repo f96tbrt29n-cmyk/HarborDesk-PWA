@@ -109,6 +109,30 @@ function hdSSSeriesClose(seriesId){
  const post=hdSSPostLoad();if(post&&String(post.seriesId||post.sessionId||'')===id)hdSSPostSave(null);
  hdSSRender();hdSSEmit('series-close',{seriesId:id,archive});return archive;
 }
+function hdSSSeriesRestart(seriesId){
+ const archive=hdSSSeriesArchive(seriesId);if(!archive?.map||!archive?.fleetId)return {started:false,reason:'archive-missing',archive:archive||null};
+ if(hdSSLoad())return {started:false,reason:'active-session',archive};
+ try{
+  if(typeof selectedWorld!=='undefined')selectedWorld=String(archive.map).split('-')[0];
+  if(typeof selectedMap!=='undefined')selectedMap=archive.map;
+  if(typeof renderMapPicker==='function')renderMapPicker();
+  if(typeof hdSPMSelect==='function')hdSPMSelect(archive.map,archive.fleetId);
+  else if(typeof hdSortieSetSelection==='function')hdSortieSetSelection(archive.map,archive.fleetId);
+ }catch{}
+ const fleet=hdSSFleet(archive.map);if(!fleet||String(fleet.id||'')!==String(archive.fleetId||'')){
+  if(typeof hdSPSOpen==='function')hdSPSOpen();else if(typeof hdWSShowElement==='function')hdWSShowElement('hdSortiePreparation',true);
+  return {started:false,reason:'fleet-missing',archive};
+ }
+ const stats=hdSSStats(archive.map,fleet),gate=hdSSGate(archive.map,fleet,stats),manualLeft=Math.max(0,(Number(stats?.manualTotal)||0)-(Number(stats?.manualDone)||0));
+ if(gate.hardBlock||gate.state!=='go'||manualLeft){
+  if(typeof hdSPSOpen==='function')hdSPSOpen();else if(typeof hdWSShowElement==='function')hdWSShowElement('hdSortiePreparation',true);
+  return {started:false,reason:'preflight',archive,gate,manualLeft};
+ }
+ const session=hdSSStart(archive.map);if(!session)return {started:false,reason:'start-failed',archive,gate};
+ const goal=archive.goal||{};if(goal.maxCycles||goal.maxResources||goal.maxBuckets||goal.maxElapsedMin||goal.target)hdSSSeriesGoalSave(session.seriesId,goal);
+ hdSSRender();hdSSEmit('series-restart',{fromSeriesId:String(seriesId||''),session,goal});
+ return {started:true,reason:'started',archive,session,goal};
+}
 function hdSSSeriesCompletionHtml(post,decision){
  if(!decision?.stop)return '';const id=String(post?.seriesId||post?.sessionId||''),s=hdSSSeriesSummary(id);
  return '<div class="hd-ss-series-complete"><div><span>連続周回 完了</span><strong>'+s.cycles+'周・総資源'+s.resourceTotal+'・バケツ'+s.buckets+'・'+s.elapsedMin+'分</strong><small>'+hdSSEsc(decision.reasons.join(' / '))+'</small></div><div class="hd-ss-series-complete-actions"><button type="button" class="ghost small" data-hd-ss-series-copy="'+hdSSEsc(id)+'">結果をコピー</button><button type="button" class="primary small" data-hd-ss-series-close="'+hdSSEsc(id)+'">シリーズを完了</button></div></div>';
@@ -495,6 +519,7 @@ window.hdSSSeriesArchive=hdSSSeriesArchive;
 window.hdSSSeriesSummary=hdSSSeriesSummary;
 window.hdSSSeriesSummaryText=hdSSSeriesSummaryText;
 window.hdSSSeriesClose=hdSSSeriesClose;
+window.hdSSSeriesRestart=hdSSSeriesRestart;
 window.hdSSSeriesCompletionHtml=hdSSSeriesCompletionHtml;
 window.hdSSPostDelta=hdSSPostDelta;
 window.hdSSTelemetry=hdSSTelemetry;
