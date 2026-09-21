@@ -1353,6 +1353,69 @@ test('release smoke: repeat sortie metadata survives finish and feeds the next c
 });
 
 
+test('release smoke: repeat-sortie series analytics groups linked cycles', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSPASeriesMeta === 'function' &&
+    typeof window.hdSPARows === 'function' &&
+    typeof window.hdSPASetMode === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const rows = [
+      {
+        id:'e1',at:61000,startedAt:1000,durationMs:60000,map:'1-1',
+        fleetId:'fleet-a',fleetName:'周回艦隊',strategy:'stable',result:'S',boss:true,
+        fuel:10,ammo:20,steel:0,bauxite:0,buckets:0,
+        seriesId:'series-a',cycleIndex:1,
+        postSortieReview:{gate:{state:'go'}}
+      },
+      {
+        id:'e2',at:151000,startedAt:91000,durationMs:60000,map:'1-1',
+        fleetId:'fleet-a',fleetName:'周回艦隊',strategy:'stable',result:'A',boss:true,
+        fuel:12,ammo:22,steel:0,bauxite:5,buckets:1,
+        seriesId:'series-a',cycleIndex:2,
+        postSortieReview:{gate:{state:'hold'}}
+      },
+      {
+        id:'single',at:200000,startedAt:180000,durationMs:20000,map:'1-1',
+        fleetId:'fleet-b',fleetName:'単発',strategy:'stable',result:'S',boss:true,
+        seriesId:'series-b',cycleIndex:1
+      }
+    ];
+    const meta = window.hdSPASeriesMeta(rows.slice(0,2));
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify(rows));
+    window.hdSPASetMode('series');
+    window.hdSPASetMap('all');
+    const groups = window.hdSPARows();
+    const html = window.hdSPAHtml();
+    return { meta, groups, html };
+  });
+
+  expect(data.meta).toMatchObject({
+    seriesId:'series-a',
+    cycles:2,
+    minCycle:1,
+    maxCycle:2,
+    missingCycles:0,
+    resourceTotal:69,
+    buckets:1,
+    reviewed:2,
+    needsFix:1,
+    stop:0
+  });
+  expect(data.meta.activeMin).toBe(2);
+  expect(data.meta.avgCycleMin).toBe(1);
+  expect(data.groups).toHaveLength(1);
+  expect(data.groups[0].seriesId).toBe('series-a');
+  expect(data.groups[0].seriesMeta.cycles).toBe(2);
+  expect(data.html).toContain('連続周回別');
+  expect(data.html).toContain('連続周回サマリー');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
