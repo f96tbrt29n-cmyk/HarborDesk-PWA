@@ -649,6 +649,26 @@ function hdKcBridgeOriginAllowed(origin){
   return h==='dmm.com'||h.endsWith('.dmm.com')||h==='dmm.co.jp'||h.endsWith('.dmm.co.jp')||h==='kancolle-server.com'||h.endsWith('.kancolle-server.com')||/^203\.104\.\d{1,3}\.\d{1,3}$/.test(h)||/^125\.6\.\d{1,3}\.\d{1,3}$/.test(h);
  }catch{return false}
 }
+const HD_KC_BRIDGE_IMPORTS=new Map();
+const HD_KC_BRIDGE_IMPORT_TTL=60000;
+function hdKcBridgePayloadKey(raw){
+ if(typeof raw==='string')return raw;
+ try{return JSON.stringify(raw)}catch{return String(raw)}
+}
+function hdKcBridgeImportOnce(captureId,raw){
+ const id=String(captureId||'').trim();
+ if(!id)return hdKcHandleBridgeImport(raw);
+ const payloadKey=hdKcBridgePayloadKey(raw),existing=HD_KC_BRIDGE_IMPORTS.get(id);
+ if(existing){
+  if(existing.payloadKey!==payloadKey)return Promise.reject(new Error('同じcaptureIdで異なる同期データを受信しました'));
+  return existing.promise;
+ }
+ const entry={payloadKey,promise:null};
+ entry.promise=Promise.resolve().then(()=>hdKcHandleBridgeImport(raw));
+ HD_KC_BRIDGE_IMPORTS.set(id,entry);
+ entry.promise.finally(()=>setTimeout(()=>{if(HD_KC_BRIDGE_IMPORTS.get(id)===entry)HD_KC_BRIDGE_IMPORTS.delete(id)},HD_KC_BRIDGE_IMPORT_TTL)).catch(()=>{});
+ return entry.promise;
+}
 async function hdKcHandleBridgeImport(raw){
  hdKcEnsureImport();
  const preview=await hdKcReadAndPreview(raw);
@@ -771,7 +791,7 @@ window.addEventListener('message',async e=>{
  if(e?.data?.type!==HD_KC_BRIDGE_IMPORT_MESSAGE||!hdKcBridgeOriginAllowed(e.origin))return;
  const captureId=String(e.data?.captureId||'');
  try{
-  const sync=await hdKcHandleBridgeImport(e.data.payload);
+  const sync=await hdKcBridgeImportOnce(captureId,e.data.payload);
   try{e.source?.postMessage({type:HD_KC_BRIDGE_ACK_MESSAGE,captureId,ok:true,ships:sync.ships,equipment:sync.equipment,equipmentItems:sync.equipmentItems},e.origin)}catch{}
  }catch(err){
   const result=document.getElementById('hdKcImportResult');if(result)result.textContent='外部取込ブリッジの同期失敗: '+String(err?.message||err);
@@ -783,6 +803,7 @@ hdKcEnsureImport();hdKcAnnounceBridgeReady();setTimeout(async()=>{if(!(await hdK
 
 window.hdKcBridgeOriginAllowed=hdKcBridgeOriginAllowed;
 window.hdKcHandleBridgeImport=hdKcHandleBridgeImport;
+window.hdKcBridgeImportOnce=hdKcBridgeImportOnce;
 window.hdKcParseImport=hdKcParseImport;
 window.hdKcPreviewData=hdKcPreviewData;
 window.hdKcApplyImport=hdKcApplyImport;
