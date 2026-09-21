@@ -722,7 +722,7 @@ test('release smoke: readiness reports sync freshness and exact game differences
     const now = Date.now();
     localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({ syncedAt: now - 2 * 60 * 1000 }));
     const fresh = window.hdFESyncFreshness();
-    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({ syncedAt: now - 22 * 60 * 1000 }));
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({ syncedAt: now - 45 * 60 * 1000 }));
     const stale = window.hdFESyncFreshness();
 
     localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
@@ -749,8 +749,10 @@ test('release smoke: readiness reports sync freshness and exact game differences
 
   expect(data.fresh.status).toBe('ready');
   expect(data.fresh.ageMinutes).toBeLessThanOrEqual(2);
-  expect(data.stale.status).toBe('partial');
-  expect(data.stale.detail).toContain('再同期推奨');
+  expect(data.stale.status).toBe('manual');
+  expect(data.stale.advisory).toBe(true);
+  expect(data.stale.liveFresh).toBe(false);
+  expect(data.stale.detail).toContain('手動チェック優先');
   expect(data.match.gearMismatch).toBe(1);
   expect(data.html).toContain('ゲームとの差分');
   expect(data.html).toContain('睦月');
@@ -788,7 +790,7 @@ test('release smoke: sortie gate prioritizes blockers and next actions', async (
       {id:'gameMatch',label:'ゲーム反映',status:'partial',detail:'装備差 2件'}
     ]});
     const hold = window.hdFEGoNoGo({checks:[
-      {id:'freshness',label:'同期鮮度',status:'partial',detail:'同期から12分'},
+      {id:'freshness',label:'同期基準点',status:'manual',advisory:true,detail:'同期から45分'},
       {id:'health',label:'艦状態',status:'ready',detail:'艦状態OK'}
     ]});
     const go = window.hdFEGoNoGo({checks:[
@@ -806,8 +808,8 @@ test('release smoke: sortie gate prioritizes blockers and next actions', async (
   expect(data.stop.actions[0].id).toBe('health');
   expect(data.stop.actions[0].action).toContain('大破');
   expect(data.stop.actions.some(x => x.id === 'gameMatch')).toBe(true);
-  expect(data.hold.state).toBe('hold');
-  expect(data.hold.label).toBe('要確認');
+  expect(data.hold.state).toBe('go');
+  expect(data.hold.label).toBe('出撃準備OK');
   expect(data.go.state).toBe('go');
   expect(data.go.label).toBe('出撃準備OK');
   expect(data.go.actions).toHaveLength(0);
@@ -907,57 +909,81 @@ test('release smoke: readiness gate actions navigate to the right tools', async 
 });
 
 
-test('release smoke: post-sortie state requires a fresh game sync before next clean go', async ({ page }) => {
+test('release smoke: post-sortie review can continue without a fresh game sync', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
   await page.waitForFunction(() =>
     typeof window.hdSSPostSave === 'function' &&
     typeof window.hdSSPostLoad === 'function' &&
-    typeof window.hdSSPostTryReview === 'function' &&
+    typeof window.hdSSPostManualReview === 'function' &&
     typeof window.hdSSGate === 'function'
   );
 
   const data = await page.evaluate(() => {
     const originalPlan=window.hdFEPlanFromSavedFleet,originalEval=window.hdFEEvaluate,originalGo=window.hdFEGoNoGo;
     window.hdFEPlanFromSavedFleet=()=>({map:'1-1',ships:[]});
-    window.hdFEEvaluate=()=>({auto:{
-      live:{status:'ready',blocked:0,caution:0,details:[]},
-      supply:{status:'ready',low:0,empty:0,rows:[]},
-      air:{status:'ready',ours:100,enemy:50,depletedSlots:0}
-    }});
+    window.hdFEEvaluate=()=>({auto:{}});
     window.hdFEGoNoGo=()=>({state:'go',label:'出撃準備OK',detail:'問題なし',blockers:[],cautions:[],actions:[]});
 
     window.hdSSPostSave({
-      version:1,status:'awaiting-sync',sessionId:'s1',map:'1-1',
+      version:2,status:'awaiting-review',sessionId:'s1',map:'1-1',
       fleetId:'fleet-1',fleetName:'第一艦隊',finishedAt:100,
       fleetSnapshot:{id:'fleet-1',ships:[]}
     });
 
     const gateBefore=window.hdSSGate('1-1',{id:'fleet-1',ships:[]},{manualTotal:0,manualDone:0});
-    const stale=window.hdSSPostTryReview({syncedAt:100});
-    const fresh=window.hdSSPostTryReview({syncedAt:200});
+    const reviewed=window.hdSSPostManualReview();
     const stored=window.hdSSPostLoad();
 
     window.hdFEPlanFromSavedFleet=originalPlan;window.hdFEEvaluate=originalEval;window.hdFEGoNoGo=originalGo;
-    return {gateBefore,stale,fresh,stored};
+    return {gateBefore,reviewed,stored};
   });
 
   expect(data.gateBefore.state).toBe('hold');
   expect(data.gateBefore.postAwaiting).toBe(true);
-  expect(data.gateBefore.actions[0]?.id).toBe('postSync');
-  expect(data.stale.status).toBe('awaiting-sync');
-  expect(data.fresh.status).toBe('reviewed');
-  expect(data.fresh.review.gate.state).toBe('go');
+  expect(data.gateBefore.actions[0]?.id).toBe('postReview');
+  expect(data.reviewed.status).toBe('reviewed');
+  expect(data.reviewed.reviewMode).toBe('manual');
+  expect(data.reviewed.review.gate.state).toBe('go');
   expect(data.stored.status).toBe('reviewed');
 
   const source = await page.evaluate(async () => fetch('./sortie-session.js',{cache:'no-store'}).then(r=>r.text()));
-  expect(source).toContain("const HD_SS_POST_KEY='harbordesk-post-sortie-review-v1'");
-  expect(source).toContain("status:'awaiting-sync'");
+  expect(source).toContain("status:'awaiting-review'");
+  expect(source).toContain('function hdSSPostManualReview()');
+  expect(source).toContain('再同期せず次の確認へ');
   expect(source).toContain("window.addEventListener('hd:kancolle-sync'");
-  expect(source).toContain('帰還後の再同期待ち');
   expect(errors).toEqual([]);
 });
 
+test('release smoke: stale sync is replaced by manual preflight for dynamic state', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSortieOperationalConfirmation === 'function' &&
+    typeof window.hdFEGoNoGo === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const stale = window.hdFEGoNoGo({checks:[
+      {id:'freshness',label:'同期基準点',status:'manual',advisory:true,detail:'同期から180分'},
+      {id:'health',label:'艦状態',status:'ready',detail:'大破なし・疲労なしを手動確認'},
+      {id:'supply',label:'補給',status:'ready',detail:'満タンを手動確認'},
+      {id:'gameMatch',label:'ゲーム反映',status:'ready',detail:'編成装備を手動確認'}
+    ]});
+    return { stale };
+  });
+
+  expect(data.stale.state).toBe('go');
+  expect(data.stale.cautions).toHaveLength(0);
+  expect(data.stale.advisories).toHaveLength(1);
+
+  const source = await page.evaluate(async () => fetch('./sortie-readiness.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain("id:'loadout'");
+  expect(source).toContain("id:'aircraft'");
+  expect(source).toContain('function hdSortieOperationalConfirmation(map,fleetId)');
+  expect(source).toContain('前回の出撃前確認から2時間以上');
+  expect(errors).toEqual([]);
+});
 
 test('release smoke: readiness fix workflow remembers target and confirms resolution', async ({ page }) => {
   const errors = [];
@@ -1170,7 +1196,7 @@ test('release smoke: synced game result auto-finishes an active sortie session w
     battles:4,drop:'浦波',gameSortieKey:'kc-auto-1'
   });
   expect(data.logs[0].gameRouteLabels).toEqual(['A','C','F','O']);
-  expect(data.post.status).toBe('awaiting-sync');
+  expect(data.post.status).toBe('awaiting-review');
   expect(data.post.gameMatched).toBe(true);
   expect(errors).toEqual([]);
 });
@@ -1336,7 +1362,7 @@ test('release smoke: repeat sortie metadata survives finish and feeds the next c
 
   expect(data.entry).toBeTruthy();
   expect(data.post).toMatchObject({
-    status:'awaiting-sync',
+    status:'awaiting-review',
     sessionId:'session-2',
     seriesId:'series-1',
     cycleIndex:2,
