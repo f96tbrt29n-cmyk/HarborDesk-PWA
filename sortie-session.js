@@ -230,6 +230,22 @@ function hdSSPostQueueSummary(queue){
  const rows=Array.isArray(queue)?queue:[],resolved=rows.filter(x=>x?.status==='resolved').length,pending=rows.filter(x=>x?.status!=='resolved').length;
  return {total:rows.length,resolved,pending,next:rows.find(x=>x?.status!=='resolved')||null};
 }
+function hdSSSeriesRows(post){
+ const seriesId=String(post?.seriesId||post?.sessionId||''),entryIds=new Set([String(post?.entryId||''),String(post?.previousEntryId||'')].filter(Boolean));
+ let rows=[];try{rows=typeof hdSLLoad==='function'?hdSLLoad():JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]')}catch{rows=[]}
+ return (Array.isArray(rows)?rows:[]).filter(x=>String(x?.seriesId||'')===seriesId||entryIds.has(String(x?.id||''))).sort((a,b)=>(Number(a?.cycleIndex)||9999)-(Number(b?.cycleIndex)||9999)||(Number(a?.at)||0)-(Number(b?.at)||0));
+}
+function hdSSSeriesSummary(post){
+ const rows=hdSSSeriesRows(post),runs=rows.length,boss=rows.filter(x=>!!x?.boss).length,s=rows.filter(x=>String(x?.result||'')==='S').length,retreat=rows.filter(x=>!!x?.retreat||String(x?.result||'')==='撤退').length,durationMs=rows.reduce((sum,x)=>sum+Math.max(0,Number(x?.durationMs)||0),0),resources={buckets:0,fuel:0,ammo:0,steel:0,bauxite:0};
+ for(const row of rows)for(const k of Object.keys(resources))resources[k]+=Math.max(0,Number(row?.[k])||0);
+ const objectiveTarget=String(post?.objectiveTarget||rows.find(x=>String(x?.objectiveTarget||'').trim())?.objectiveTarget||'').trim(),drops=rows.map(x=>String(x?.drop||'').trim()).filter(Boolean),targetObtained=!!post?.targetObtained||rows.some(x=>!!x?.targetObtained)||!!(objectiveTarget&&drops.includes(objectiveTarget));
+ return {seriesId:String(post?.seriesId||post?.sessionId||''),runs,boss,s,retreat,durationMs,avgDurationMs:runs?Math.round(durationMs/runs):0,resources,drops,lastDrop:drops[drops.length-1]||'',objectiveTarget,targetObtained,rows};
+}
+function hdSSSeriesHtml(series){
+ if(!series?.runs)return '';
+ const res=series.resources||{},resourceBits=[res.fuel?'燃料 '+res.fuel:'',res.ammo?'弾薬 '+res.ammo:'',res.steel?'鋼材 '+res.steel:'',res.bauxite?'ボーキ '+res.bauxite:'',res.buckets?'バケツ '+res.buckets:''].filter(Boolean),drops=[...new Set(series.drops||[])].slice(-4);
+ return '<div class="hd-ss-series '+(series.targetObtained?'done':'')+'"><div class="hd-ss-series-head"><div><span>周回シリーズ</span><strong>'+series.runs+'周 ・ ボス '+series.boss+' ・ S '+series.s+' ・ 撤退 '+series.retreat+'</strong></div><b>平均 '+hdSSEsc(hdSSDuration(series.avgDurationMs))+'</b></div>'+(series.objectiveTarget?'<div class="hd-ss-series-target"><span>目標 '+hdSSEsc(series.objectiveTarget)+'</span><b>'+(series.targetObtained?'入手 ✓':'継続中')+'</b></div>':'')+(resourceBits.length?'<div class="hd-ss-series-meta">'+resourceBits.map(x=>'<span>'+hdSSEsc(x)+'</span>').join('')+'</div>':'')+(drops.length?'<small>ドロップ: '+drops.map(hdSSEsc).join(' / ')+'</small>':'')+'</div>';
+}
 function hdSSPostTryReview(sync){
  const post=hdSSPostLoad();if(!post||post.status!=='awaiting-sync')return post;
  const syncAt=Number(sync?.syncedAt)||(()=>{try{return Number(JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')?.syncedAt)||0}catch{return 0}})();
