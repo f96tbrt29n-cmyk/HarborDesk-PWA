@@ -828,6 +828,37 @@ test('release smoke: sortie summary includes go-no-go and prioritized actions', 
 });
 
 
+test('release smoke: sortie gate actions navigate to the relevant repair tools', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFEGateHtml === 'function' &&
+    typeof window.hdFEOpenFix === 'function'
+  );
+
+  const data = await page.evaluate(async () => {
+    const html = window.hdFEGateHtml({checks:[
+      {id:'health',label:'艦状態',status:'missing',detail:'大破 1隻'},
+      {id:'freshness',label:'同期鮮度',status:'partial',detail:'同期から12分'},
+      {id:'route',label:'編成条件',status:'partial',detail:'条件要確認'},
+      {id:'air',label:'制空',status:'partial',detail:'制空不足'}
+    ]});
+    const source = await fetch('./fleet-readiness-evaluator.js',{cache:'no-store'}).then(r=>r.text());
+    return {html,source};
+  });
+
+  expect(data.html).toContain('data-hd-fe-fix="health"');
+  expect(data.html).toContain('data-hd-fe-fix="freshness"');
+  expect(data.html).toContain('data-hd-fe-fix="route"');
+  expect(data.html).toContain('data-hd-fe-fix="air"');
+  expect(data.html).toContain('開く ›');
+  expect(data.source).toContain("['freshness','health','supply','gameMatch'].includes(key)");
+  expect(data.source).toContain("hdFEOpenMapTool('route','hdMapRouteRequirements')");
+  expect(data.source).toContain("hdFEOpenMapTool('gear','hdFleetCalculator')");
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
