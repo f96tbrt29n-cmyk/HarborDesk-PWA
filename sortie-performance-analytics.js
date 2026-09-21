@@ -92,6 +92,19 @@ function hdSPAStrategyLabel(id,row){
 }
 function hdSPAPct(n,d){return d?Math.round(n/d*100):0}
 function hdSPANum(v){return Math.max(0,Number(v)||0)}
+function hdSPAPostTelemetry(rows){
+ const reviews=(rows||[]).map(x=>x?.postSortieReview).filter(x=>x&&x.delta);
+ if(!reviews.length)return {reviewed:0,coverageRate:0,damageRate:null,avgHpLoss:null,avgFuelUsed:null,avgAmmoUsed:null,avgAirLoss:null,avgDepletedAdded:null,needsFixRate:null,stopRate:null};
+ const deltas=reviews.map(x=>x.delta||{}),damageSorties=deltas.filter(d=>Array.isArray(d.ships)&&d.ships.some(x=>(Number(x?.hpLoss)||0)>0)).length,hpLoss=deltas.reduce((sum,d)=>sum+(Array.isArray(d.ships)?d.ships.reduce((a,x)=>a+(Number(x?.hpLoss)||0),0):0),0);
+ const supply=deltas.filter(d=>Number(d.supplyKnown)>0),air=deltas.filter(d=>Number(d.airBefore)>0||Number(d.airAfter)>0||Number(d.airLoss)>0||Number(d.depletedAdded)>0);
+ const fix=reviews.filter(x=>['hold','stop'].includes(String(x?.gate?.state||''))).length,stop=reviews.filter(x=>String(x?.gate?.state||'')==='stop').length;
+ const avg=(xs,key,digits=1)=>xs.length?Number((xs.reduce((s,x)=>s+(Number(x?.[key])||0),0)/xs.length).toFixed(digits)):null;
+ return {
+  reviewed:reviews.length,coverageRate:hdSPAPct(reviews.length,(rows||[]).length),damageRate:hdSPAPct(damageSorties,reviews.length),avgHpLoss:Number((hpLoss/reviews.length).toFixed(1)),
+  avgFuelUsed:avg(supply,'fuelUsed',1),avgAmmoUsed:avg(supply,'ammoUsed',1),avgAirLoss:avg(air,'airLoss',1),avgDepletedAdded:avg(air,'depletedAdded',2),
+  needsFixRate:hdSPAPct(fix,reviews.length),stopRate:hdSPAPct(stop,reviews.length)
+ };
+}
 function hdSPAMetrics(rows){
  const n=rows.length,boss=rows.filter(x=>x.boss).length,s=rows.filter(x=>x.result==='S').length,wins=rows.filter(x=>['S','A','B'].includes(x.result)).length,retreat=rows.filter(x=>x.retreat||x.result==='撤退').length,drops=rows.filter(x=>String(x.drop||'').trim()).length;
  const objectiveRows=rows.filter(x=>String(x?.objectiveTarget||'').trim()),objectiveTarget=objectiveRows.length?String(objectiveRows[0].objectiveTarget||'').trim():'';
@@ -101,13 +114,13 @@ function hdSPAMetrics(rows){
  const buckets=resourceRows.reduce((a,x)=>a+hdSPANum(x.buckets),0);
  const durations=rows.map(x=>hdSPANum(x.durationMs)).filter(x=>x>0);
  const readiness=rows.map(x=>{const r=x.readinessSnapshot||{},den=(Number(r.autoTotal)||0)+(Number(r.manualTotal)||0),num=(Number(r.autoOk)||0)+(Number(r.manualDone)||0);return den?num/den:null}).filter(x=>x!=null);
- const dropStats=hdSPADropStats(rows),sourceStats=hdSPASourceStats(rows);
+ const dropStats=hdSPADropStats(rows),sourceStats=hdSPASourceStats(rows),postTelemetry=hdSPAPostTelemetry(rows);
  return {
   n,bossRate:hdSPAPct(boss,n),objectiveTarget,objectiveReachedRate:objectiveTarget?hdSPAPct(objectiveReached,n):null,sRate:hdSPAPct(s,n),winRate:hdSPAPct(wins,n),retreatRate:hdSPAPct(retreat,n),dropRate:hdSPAPct(drops,n),drops,uniqueDrops:dropStats.unique,
   avgResource:resourceRows.length?Math.round(totalResource/resourceRows.length):null,avgBuckets:resourceRows.length?Number((buckets/resourceRows.length).toFixed(2)):null,
   avgDurationMin:durations.length?Number((durations.reduce((a,b)=>a+b,0)/durations.length/60000).toFixed(1)):null,
   avgReadiness:readiness.length?Math.round(readiness.reduce((a,b)=>a+b,0)/readiness.length*100):null,
-  sourceStats
+  sourceStats,postTelemetry
  };
 }
 function hdSPADelta(a,b){return a==null||b==null?null:Number((a-b).toFixed(1))}
