@@ -8933,10 +8933,15 @@ function hdShipDbAcquisitionKind(wanted){
 function hdShipDbOpenAcquire(wanted){
  const cat=hdShipDbEquipCatalog(),key=hdShipDbEquipNorm(wanted),exact=cat.find(x=>hdShipDbEquipNorm(x.name)===key);
  const map=typeof selectedMap!=='undefined'?selectedMap:'';
- if(exact&&typeof hdAGOpenItem==='function'){hdAGOpenItem(exact.name,map);return}
+ if(exact&&typeof hdAGOpenItem==='function'){hdAGOpenItem(exact.name,map);return true}
  const kind=hdShipDbAcquisitionKind(wanted);
- if(kind&&typeof hdAGOpen==='function'){hdAGOpen(kind,map);return}
- if(typeof hdAGOpenCatalog==='function')hdAGOpenCatalog(wanted);
+ if(kind&&typeof hdAGOpen==='function'){hdAGOpen(kind,map);return true}
+ if(typeof hdAGOpenCatalog==='function'){hdAGOpenCatalog(wanted);return true}
+ return false;
+}
+async function hdShipDbEnsureCurrentAssets(){
+ if(typeof window.hdEnsureCurrentAssets!=='function')return false;
+ try{await window.hdEnsureCurrentAssets();return true}catch{return false}
 }
 function hdShipDbRefreshOwnedFits(root=document){
  root.querySelectorAll?.('[data-hd-owned-fit]').forEach(host=>{
@@ -9337,13 +9342,28 @@ function hdShipDbAdd(base){
   if(name)name.value=item.base;if(remodel)remodel.value='育成中';if(memo) memo.value=`目標: ${item.final} / ${item.requirements}`;
  },0);
 }
-document.addEventListener('click',e=>{
+document.addEventListener('click',async e=>{
  if(e.target.closest?.('[data-hd-ship-owned-refresh]')){const card=e.target.closest('.hd-map-ship-candidate');if(card)hdShipDbRefreshOwnedFits(card);return}
- const procure=e.target.closest?.('[data-hd-ship-procure]');if(procure){const map=typeof selectedMap!=='undefined'?selectedMap:'';if(typeof hdPLAddShipLoadout==='function'&&hdPLAddShipLoadout(map,procure.dataset.hdShipProcure,procure.dataset.hdLoadoutName||'')){if(typeof hdPLOpenList==='function')hdPLOpenList()}return}
- const acquire=e.target.closest?.('[data-hd-ship-acquire]');if(acquire){hdShipDbOpenAcquire(acquire.dataset.hdShipAcquire);return}
+ const procure=e.target.closest?.('[data-hd-ship-procure]');
+ if(procure){
+  const map=typeof selectedMap!=='undefined'?selectedMap:'';
+  if(typeof hdPLAddShipLoadout!=='function'){
+   procure.setAttribute('aria-busy','true');await hdShipDbEnsureCurrentAssets();procure.removeAttribute('aria-busy');
+  }
+  if(typeof hdPLAddShipLoadout==='function'&&hdPLAddShipLoadout(map,procure.dataset.hdShipProcure,procure.dataset.hdLoadoutName||'')){if(typeof hdPLOpenList==='function')hdPLOpenList();return}
+  window.hdToast?.('調達リストを読み込めなかったよ。アプリ更新を試してね','warn');return;
+ }
+ const acquire=e.target.closest?.('[data-hd-ship-acquire]');
+ if(acquire){
+  if(!hdShipDbOpenAcquire(acquire.dataset.hdShipAcquire)){
+   acquire.setAttribute('aria-busy','true');await hdShipDbEnsureCurrentAssets();acquire.removeAttribute('aria-busy');
+   if(!hdShipDbOpenAcquire(acquire.dataset.hdShipAcquire))window.hdToast?.('入手方法を読み込めなかったよ。アプリ更新を試してね','warn');
+  }
+  return;
+ }
  if(e.target.closest?.('[data-hd-ship-equip-ledger]')){
   if(typeof hdOwnedOpenLedger==='function')hdOwnedOpenLedger('');
-  else{const target=document.getElementById('equipmentBook');if(target)target.scrollIntoView({behavior:'smooth',block:'start'})}
+  else{const target=document.getElementById('equipmentBook');if(target){if(typeof window.hdWSShowElement==='function')window.hdWSShowElement(target,true);else target.scrollIntoView({behavior:'smooth',block:'start'})}}
   return;
  }
 });
