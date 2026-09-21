@@ -959,6 +959,56 @@ test('release smoke: post-sortie state requires a fresh game sync before next cl
 });
 
 
+test('release smoke: synced sortie result closes the matching active session without duplicate log', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdKcApplySorties === 'function');
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-sortie-log-v1','[]');
+    const originalLoad=window.hdSSLoad,originalFinish=window.hdSSFinish,originalRecord=window.hdSLRecordEntry;
+    let sessionCalls=0,directCalls=0,captured=null;
+    window.hdSSLoad=()=>({status:'active',map:'1-1',startedAt:1000});
+    window.hdSSFinish=(input)=>{sessionCalls++;captured=input;return {id:'session-entry',gameSortieKey:input.gameSortieKey}};
+    window.hdSLRecordEntry=(input)=>{directCalls++;return {id:'direct-entry',gameSortieKey:input.gameSortieKey}};
+    const parsed={
+      captureId:'cap-1',
+      sortieEvents:[
+        {endpoint:'/kcsapi/api_req_map/start',at:2000,index:0,data:{mapareaId:1,mapinfoNo:1,nodeNo:1,eventId:1,eventKind:1,bossCellNo:3}},
+        {endpoint:'/kcsapi/api_req_map/next',at:2100,index:1,data:{nodeNo:3,eventId:5,eventKind:1,bossCellNo:3}},
+        {endpoint:'/kcsapi/api_req_sortie/battleresult',at:2200,index:2,data:{winRank:'S',dropShipId:9,dropShipName:'吹雪'}},
+        {endpoint:'/kcsapi/api_port/port',at:2300,index:3,data:{port:true}}
+      ]
+    };
+    const added=window.hdKcApplySorties(parsed);
+    window.hdSSLoad=originalLoad;window.hdSSFinish=originalFinish;window.hdSLRecordEntry=originalRecord;
+    return {added,sessionCalls,directCalls,captured};
+  });
+
+  expect(data.added).toBe(1);
+  expect(data.sessionCalls).toBe(1);
+  expect(data.directCalls).toBe(0);
+  expect(data.captured).toMatchObject({
+    map:'1-1',
+    result:'S',
+    boss:true,
+    battles:1,
+    drop:'吹雪',
+    source:'kancolle-import',
+    gameNodeNo:3,
+    gameBossCellNo:3
+  });
+  expect(data.captured.gameRouteNodes).toEqual([1,3]);
+  expect(data.captured.gameSortieKey).toBeTruthy();
+
+  const sessionSource = await page.evaluate(async () => fetch('./sortie-session.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(sessionSource).toContain("source:String(data&&data.source||'')");
+  expect(sessionSource).toContain("gameSortieKey:String(data&&data.gameSortieKey||'')");
+  expect(sessionSource).toContain('帰還後に艦これ同期すると結果を自動取込');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
