@@ -20,7 +20,7 @@ function hdFEPlanFromSavedFleet(map,fleet){
   const tokens=String(row.gear||'').split(/\s+\/\s+/).map(hdFEParseGearLabel).filter(x=>x.name);
   const normal=tokens.filter(x=>!x.expansion),ex=tokens.find(x=>x.expansion)||null;
   const items=normal.map((x,i)=>({name:x.name,star:x.star,slotIndex:i,capacity:profile?.slots?.[i]??null,category:hdFEFind(x.name)?.category||''}));
-  return {ship:String(row.ship||'').trim(),type:db?.type||'',items,expansion:ex?{name:ex.name,star:ex.star}:null,missing:[],master:!!profile};
+  return {ship:String(row.ship||'').trim(),gameShipId:Number(row.gameShipId)||0,masterId:Number(row.masterId)||Number(db?.id)||0,type:db?.type||'',items,expansion:ex?{name:ex.name,star:ex.star}:null,missing:[],master:!!profile};
  });
  const presets=typeof MAP_PLANS!=='undefined'?(MAP_PLANS[map]?.presets||[]):[],preset=presets.find(p=>String(fleet?.name||'').includes(String(p?.name||'')))||null,routeInfo=preset&&typeof hdFSPresetInfo==='function'?hdFSPresetInfo(preset):null;
  return {map,ships,missing:[],masterBacked:ships.filter(x=>x.master).length,createdAt:Date.now(),source:'saved-fleet',sourceFleet:fleet||null,preset,routeInfo};
@@ -129,8 +129,8 @@ function hdFERoster(){
  try{return typeof rosterLoad==='function'?rosterLoad():JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')}catch{return []}
 }
 function hdFERosterForShip(ship){
- const rows=hdFERoster(),id=Number(ship?.masterId)||0,name=String(ship?.ship||'').trim();
- return rows.find(x=>id&&Number(x?.masterId)===id)||rows.find(x=>String(x?.name||'').trim()===name)||null;
+ const rows=hdFERoster(),gameId=Number(ship?.gameShipId)||0,id=Number(ship?.masterId)||0,name=String(ship?.ship||'').trim();
+ return rows.find(x=>gameId&&Number(x?.gameShipId)===gameId)||rows.find(x=>id&&Number(x?.masterId)===id)||rows.find(x=>String(x?.name||'').trim()===name)||null;
 }
 function hdFELiveFleet(plan){
  const state=typeof hdFSLiveState==='function'?hdFSLiveState():undefined,rows=(plan?.ships||[]).filter(x=>x?.ship).map(ship=>({ship,row:hdFERosterForShip(ship)})),details=[],reasons={};let blocked=0,caution=0;
