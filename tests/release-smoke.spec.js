@@ -232,6 +232,81 @@ test('release smoke: game sync fills ship and equipment ledgers from latest snap
 });
 
 
+test('release smoke: synced fleet and equipment data refresh downstream planners', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    const [fleet, loadout, prep, analyzer] = await Promise.all([
+      fetch('./fleet-suggester.js', { cache: 'no-store' }).then(r => r.text()),
+      fetch('./fleet-loadout-planner.js', { cache: 'no-store' }).then(r => r.text()),
+      fetch('./sortie-preparation-sheet.js', { cache: 'no-store' }).then(r => r.text()),
+      fetch('./equipment-analyzer.js', { cache: 'no-store' }).then(r => r.text())
+    ]);
+    return { fleet, loadout, prep, analyzer };
+  });
+
+  expect(data.fleet).toContain("window.addEventListener('hd:kancolle-sync',hdFSRender)");
+  expect(data.fleet).toContain("window.addEventListener('hd:ship-identity-changed',hdFSRender)");
+  expect(data.fleet).toContain("艦これ同期 ");
+  expect(data.loadout).toContain("window.addEventListener('hd:kancolle-sync',hdFLInvalidate)");
+  expect(data.loadout).toContain("window.addEventListener('hd:ship-identity-changed',hdFLInvalidate)");
+  expect(data.loadout).toContain('data-hd-fl-prepare=');
+  expect(data.loadout).toContain('function hdFLSaveAndPrepare(index)');
+  expect(data.prep).toContain("window.addEventListener('hd:kancolle-sync',hdSPSRender)");
+  expect(data.analyzer).toContain("window.addEventListener('hd:kancolle-sync',()=>hdEArenderCoverage())");
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: optimizer keeps improvement-level equipment stacks separate', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFLInventory === 'function' &&
+    typeof window.hdFLInventoryStackKey === 'function' &&
+    typeof window.hdFOCanUse === 'function' &&
+    typeof window.hdFORefreshUsage === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      { id:'a', name:'12cm単装砲', category:'小口径主砲', count:1, star:0 },
+      { id:'b', name:'12cm単装砲', category:'小口径主砲', count:1, star:2 }
+    ]));
+    const inv = window.hdFLInventory();
+    const k0 = window.hdFLInventoryStackKey('12cm単装砲', 0);
+    const k2 = window.hdFLInventoryStackKey('12cm単装砲', 2);
+    const zero = inv.get(k0);
+    const two = inv.get(k2);
+    const plan = {
+      ships: [
+        { items:[{ name:'12cm単装砲', star:0, stackKey:k0 }], expansion:null },
+        { items:[{ name:'別装備', star:0, stackKey:'別装備@@0' }], expansion:null }
+      ]
+    };
+    const zeroAvailableForSecond = window.hdFOCanUse(plan, zero, 1, 0);
+    const twoAvailableForSecond = window.hdFOCanUse(plan, two, 1, 0);
+    window.hdFORefreshUsage(plan);
+    return {
+      zeroAvailableForSecond,
+      twoAvailableForSecond,
+      ownedTotal: plan.owned?.['12cm単装砲'],
+      owned0: plan.ownedStacks?.[k0],
+      owned2: plan.ownedStacks?.[k2],
+      usage0: plan.used?.[k0]
+    };
+  });
+
+  expect(data.zeroAvailableForSecond).toBe(false);
+  expect(data.twoAvailableForSecond).toBe(true);
+  expect(data.ownedTotal).toBe(2);
+  expect(data.owned0).toBe(1);
+  expect(data.owned2).toBe(1);
+  expect(data.usage0).toBe(1);
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
