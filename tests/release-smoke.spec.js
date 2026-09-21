@@ -860,6 +860,60 @@ test('release smoke: userscript bridge imports without URL payload limits', asyn
   expect(errors).toEqual([]);
 });
 
+test('release smoke: userscript bridge deduplicates repeated capture ids', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdKcBridgeImportOnce === 'function');
+
+  const data = await page.evaluate(async () => {
+    localStorage.removeItem('harbordesk-ship-roster-v1');
+    localStorage.removeItem('harbordesk-equipment-v1');
+    let syncEvents=0;
+    const onSync=()=>{syncEvents++};
+    window.addEventListener('hd:kancolle-sync',onSync);
+    const raw=JSON.stringify({
+      format:'harbordesk-kancolle-import',
+      version:2,
+      userscriptVersion:'1.0.14',
+      captureId:'bridge-dedupe-test',
+      records:[
+        {endpoint:'/kcsapi/api_port/port',at:1,payload:{api_result:1,api_data:{
+          api_ship:[{api_id:101,api_ship_id:1,api_lv:20,api_nowhp:13,api_maxhp:13,api_cond:49,api_slot:[501,-1,-1],api_slot_ex:0}],
+          api_deck_port:[{api_id:1,api_name:'第一艦隊',api_ship:[101,-1,-1,-1,-1,-1],api_mission:[0,0,0,0]}],
+          api_material:[]
+        }}},
+        {endpoint:'/kcsapi/api_get_member/slot_item',at:2,payload:{api_result:1,api_data:[
+          {api_id:501,api_slotitem_id:1,api_level:0,api_alv:0}
+        ]}}
+      ]
+    });
+    const [first,second]=await Promise.all([
+      window.hdKcBridgeImportOnce('bridge-dedupe-test',raw),
+      window.hdKcBridgeImportOnce('bridge-dedupe-test',raw)
+    ]);
+    let mismatch='';
+    try{
+      const changed=raw.replace('"userscriptVersion":"1.0.14"','"userscriptVersion":"9.9.9"');
+      await window.hdKcBridgeImportOnce('bridge-dedupe-test',changed);
+    }catch(err){mismatch=String(err?.message||err)}
+    window.removeEventListener('hd:kancolle-sync',onSync);
+    return {
+      syncEvents,
+      sameSyncedAt:first.syncedAt===second.syncedAt,
+      mismatch,
+      roster:JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]'),
+      equipment:JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]')
+    };
+  });
+
+  expect(data.syncEvents).toBe(1);
+  expect(data.sameSyncedAt).toBe(true);
+  expect(data.mismatch).toContain('captureId');
+  expect(data.roster).toHaveLength(1);
+  expect(data.equipment.reduce((n,x)=>n+(Number(x.count)||0),0)).toBe(1);
+  expect(errors).toEqual([]);
+});
+
 test('release smoke: userscript prefers postMessage bridge and keeps hash fallback', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
