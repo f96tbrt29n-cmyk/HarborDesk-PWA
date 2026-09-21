@@ -3567,6 +3567,34 @@ test('release smoke: map攻略 tools survive tab redraws', async ({ page }) => {
 });
 
 
+test('release smoke: map fleet candidate opens the visible ship database', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdShipDbJumpTo === 'function' &&
+    typeof window.hdWSShowElement === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    selectedWorld = '5';
+    selectedMap = '5-6';
+    renderMapPicker();
+  });
+
+  await page.locator('[data-map-tab="fleet"]').click();
+  const jump = page.locator('.hd-map-ship-candidate [data-hd-shipdb-jump]').first();
+  await expect(jump).toBeVisible();
+  const ship = await jump.getAttribute('data-hd-shipdb-jump');
+  await jump.click();
+
+  await expect(page.locator('#shipDatabase')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#hdShipDbSearch')).toHaveValue(ship || '');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: stale saved map攻略 tab falls back to overview', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
