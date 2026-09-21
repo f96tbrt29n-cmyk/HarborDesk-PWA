@@ -709,6 +709,58 @@ test('release smoke: game sync persists exact gear slots for comparison', async 
 });
 
 
+test('release smoke: readiness marks stale sync and renders exact game differences', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFEFreshness === 'function' &&
+    typeof window.hdFEGameMatchHtml === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const now=Date.now();
+    localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({syncedAt:now-2*60000}));
+    const fresh=window.hdFEFreshness(now);
+    localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({syncedAt:now-8*60000}));
+    const warning=window.hdFEFreshness(now);
+    localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({syncedAt:now-20*60000}));
+    const stale=window.hdFEFreshness(now);
+    localStorage.removeItem('harbordesk-kancolle-sync-v1');
+    const missing=window.hdFEFreshness(now);
+    const html=window.hdFEGameMatchHtml({
+      status:'partial',fleetMatch:false,deckOrderMismatch:true,
+      details:[{name:'睦月',status:'mismatch',mismatches:[
+        {slotIndex:1,planned:'61cm三連装魚雷',actual:'12cm単装砲'},
+        {slotIndex:'ex',planned:'応急修理要員',actual:''}
+      ]}]
+    });
+    return {fresh,warning,stale,missing,html};
+  });
+
+  expect(data.fresh.status).toBe('ready');
+  expect(data.warning.status).toBe('partial');
+  expect(data.stale.status).toBe('manual');
+  expect(data.missing.status).toBe('manual');
+  expect(data.html).toContain('艦隊順');
+  expect(data.html).toContain('睦月');
+  expect(data.html).toContain('第2スロ');
+  expect(data.html).toContain('61cm三連装魚雷');
+  expect(data.html).toContain('12cm単装砲');
+  expect(data.html).toContain('補強増設');
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: sortie preparation surfaces sync freshness and game-diff details', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const source = await page.evaluate(async () => fetch('./sortie-preparation-sheet.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain('同期鮮度・艦状態・補給・ゲーム反映');
+  expect(source).toContain("hdFEGameMatchHtml(auto.gameMatch)");
+  expect(source).toContain('同期が古い');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
