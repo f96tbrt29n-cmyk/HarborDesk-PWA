@@ -15,6 +15,18 @@ function cfMigrateMasterIds(){
 }
 function cfEsc(s){return typeof esc==='function'?esc(s):String(s)}
 function cfUid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)}
+function cfMergeEditedShips(previous=[],incoming=[]){
+ let changed=false;
+ const ships=Array.from({length:6},(_,i)=>{
+  const old=previous?.[i]||{},next=incoming?.[i]||{ship:'',masterId:0,gear:''};
+  const oldShip=String(old.ship||'').trim(),nextShip=String(next.ship||'').trim(),oldGear=String(old.gear||'').trim(),nextGear=String(next.gear||'').trim();
+  const sameShip=oldShip===nextShip,sameGear=oldGear===nextGear;
+  if(!sameShip||!sameGear)changed=true;
+  if(sameShip)return {...old,ship:nextShip,masterId:Number(next.masterId)||Number(old.masterId)||0,gear:nextGear};
+  return {ship:nextShip,masterId:Number(next.masterId)||0,gear:nextGear};
+ });
+ return {ships,changed};
+}
 
 function ensureCustomFleetDialog(){
   if(document.getElementById('customFleetDialog'))return;
@@ -36,20 +48,27 @@ function ensureCustomFleetDialog(){
     if(!selectedMap)return;
     const name=document.getElementById('customFleetName').value.trim();
     if(!name)return;
-    const ships=Array.from({length:6},(_,i)=>{const ship=document.getElementById(`cfShip${i}`).value.trim();return {ship,masterId:cfMasterId(ship),gear:document.getElementById(`cfGear${i}`).value.trim()}});
+    const inputShips=Array.from({length:6},(_,i)=>{const ship=document.getElementById(`cfShip${i}`).value.trim();return {ship,masterId:cfMasterId(ship),gear:document.getElementById(`cfGear${i}`).value.trim()}});
     const memo=document.getElementById('customFleetMemo').value.trim();
     const all=loadCustomFleets();
     all[selectedMap]=all[selectedMap]||[];
+    let detached=false;
     if(customFleetEditId){
       const idx=all[selectedMap].findIndex(x=>x.id===customFleetEditId);
-      if(idx>=0)all[selectedMap][idx]={...all[selectedMap][idx],name,ships,memo,updatedAt:Date.now()};
+      if(idx>=0){
+        const old=all[selectedMap][idx],merged=cfMergeEditedShips(old.ships||[],inputShips),next={...old,name,ships:merged.ships,memo,updatedAt:Date.now()};
+        if(merged.changed&&old.source==='kancolle-import'){
+          detached=true;next.source='manual';next.detachedFromSource='kancolle-import';next.detachedAt=Date.now();delete next.sourceDeckId;delete next.sourceSyncedAt;
+        }
+        all[selectedMap][idx]=next;
+      }
     }else{
-      all[selectedMap].push({id:cfUid(),name,ships,memo,createdAt:Date.now(),updatedAt:Date.now()});
+      all[selectedMap].push({id:cfUid(),name,ships:inputShips,memo,createdAt:Date.now(),updatedAt:Date.now()});
     }
     const editing=!!customFleetEditId;
     saveCustomFleets(all);
     customFleetEditId=null;
-    window.hdToast?.(editing?'自分用編成を更新したよ':'自分用編成を保存したよ');
+    window.hdToast?.(detached?'手動編集したのでゲーム同期の自動追従から切り離したよ':editing?'自分用編成を更新したよ':'自分用編成を保存したよ');
     setTimeout(()=>renderCustomFleets(selectedMap),0);
   });
 }
@@ -107,3 +126,5 @@ renderMapPicker=function(){prevRenderMapPickerCustom();renderCustomFleets(select
 cfMigrateMasterIds();ensureCustomFleetDialog();
 window.addEventListener('hd:ship-images-changed',()=>{if(typeof selectedMap!=='undefined'&&selectedMap)renderCustomFleets(selectedMap)});
 window.addEventListener('hd:ship-images-ready',()=>{if(typeof selectedMap!=='undefined'&&selectedMap)renderCustomFleets(selectedMap)});
+
+window.cfMergeEditedShips=cfMergeEditedShips;
