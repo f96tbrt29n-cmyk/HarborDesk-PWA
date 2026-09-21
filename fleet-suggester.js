@@ -99,7 +99,8 @@ function hdFSRender(){
  if(!map){if(label)label.textContent='海域未選択';host.innerHTML='<div class="empty">海域を選ぶと、艦隊台帳から編成候補を作るよ。</div>';return}
  if(label)label.textContent=map;var roster=hdFSRoster();
  if(!roster.length){host.innerHTML='<div class="empty">艦隊台帳が空だよ。艦娘を登録すると、Lv・艦種・役割から候補を自動生成できる。</div><button type="button" class="primary small" data-hd-fs-roster>艦隊台帳を開く</button>';return}
- var plans=hdFSPlans(map);host.innerHTML='<div class="hd-fs-summary"><div><strong>'+hdFSEsc(map)+' 自動編成候補</strong><span>艦隊台帳 '+roster.length+'隻から、詳細DB＋全865形態マスターで艦種・速力・役割を補完</span></div><button type="button" class="ghost small" data-hd-fs-refresh>再生成</button></div><div class="hd-fs-list">'+plans.map(hdFSSuggestionHtml).join('')+'</div><p class="hd-fs-note">※候補艦の艦種・速力・通常スロット/装備可否は公式マスターで補完。ルート固定・ランダム分岐、索敵スコア、イベント特効・札は出撃準備表と海域攻略情報で最終確認してね。</p>';
+ var plans=hdFSPlans(map),sync=(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')}catch{return null}})(),equipItems=Number(sync?.equipmentItems??sync?.snapshot?.equipment??0)||0;
+ host.innerHTML='<div class="hd-fs-summary"><div><strong>'+hdFSEsc(map)+' 自動編成候補</strong><span>艦隊台帳 '+roster.length+'隻から、詳細DB＋全865形態マスターで艦種・速力・役割を補完'+(sync?' ｜ 艦これ同期 '+(Number(sync.ships)||roster.length)+'隻・装備'+equipItems+'個':'')+'</span></div><button type="button" class="ghost small" data-hd-fs-refresh>再生成</button></div><div class="hd-fs-list">'+plans.map(hdFSSuggestionHtml).join('')+'</div><p class="hd-fs-note">※候補艦の艦種・速力・通常スロット/装備可否は公式マスターで補完。ルート固定・ランダム分岐、索敵スコア、イベント特効・札は出撃準備表と海域攻略情報で最終確認してね。</p>';
  if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
 }
 function hdFSEnsure(){
@@ -126,6 +127,8 @@ document.addEventListener('click',function(e){
  var acq=e.target.closest('[data-hd-fs-acquire]');if(acq&&typeof hdAGOpen==='function'){hdAGOpen(acq.getAttribute('data-hd-fs-acquire'),hdFSMap());return}
 });
 window.addEventListener('storage',function(e){if(['harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-custom-fleets-v1'].includes(e.key))hdFSRender()});
+window.addEventListener('hd:kancolle-sync',hdFSRender);
+window.addEventListener('hd:ship-identity-changed',hdFSRender);
 window.addEventListener('hd:workspace-refresh',hdFSRender);
 window.addEventListener('hd:ship-images-changed',hdFSRender);
 window.addEventListener('hd:ship-images-ready',hdFSRender);
