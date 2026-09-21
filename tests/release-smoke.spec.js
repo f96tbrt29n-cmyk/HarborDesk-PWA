@@ -1494,6 +1494,50 @@ test('release smoke: series analytics shows configured stop-goal status', async 
 });
 
 
+test('release smoke: stopped repeat-sortie series can be summarized and completed safely', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSSSeriesGoalSave === 'function' &&
+    typeof window.hdSSSeriesSummaryText === 'function' &&
+    typeof window.hdSSSeriesClose === 'function' &&
+    typeof window.hdSSSeriesArchive === 'function' &&
+    typeof window.hdSPASeriesGoalStatus === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const rows = [
+      {id:'c1',seriesId:'series-close',cycleIndex:1,map:'2-4',fleetId:'f1',fleetName:'周回艦隊',strategyLabel:'安定重視',startedAt:1000,at:61000,result:'S',boss:true,fuel:100,ammo:80,steel:0,bauxite:10,buckets:0,drop:'扶桑'},
+      {id:'c2',seriesId:'series-close',cycleIndex:2,map:'2-4',fleetId:'f1',fleetName:'周回艦隊',strategyLabel:'安定重視',startedAt:91000,at:151000,result:'A',boss:true,fuel:110,ammo:90,steel:0,bauxite:10,buckets:1,drop:'山城'}
+    ];
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify(rows));
+    localStorage.setItem('harbordesk-post-sortie-review-v1', JSON.stringify({status:'reviewed',seriesId:'series-close',sessionId:'s2',map:'2-4'}));
+    window.hdSSSeriesGoalSave('series-close',{maxCycles:2});
+    const before = window.hdSSSeriesDecision('series-close');
+    const text = window.hdSSSeriesSummaryText('series-close');
+    const archive = window.hdSSSeriesClose('series-close');
+    const saved = window.hdSSSeriesArchive('series-close');
+    const post = window.hdSSPostLoad();
+    const goal = window.hdSSSeriesGoal('series-close');
+    const logs = JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]');
+    const status = window.hdSPASeriesGoalStatus({seriesMeta:window.hdSPASeriesMeta(rows)});
+    return {before,text,archive,saved,post,goal,logs,status};
+  });
+
+  expect(data.before.stop).toBe(true);
+  expect(data.text).toContain('HarborDesk 連続周回サマリー');
+  expect(data.text).toContain('周回 2');
+  expect(data.text).toContain('総資源 400');
+  expect(data.archive).toMatchObject({seriesId:'series-close',cycles:2,resourceTotal:400,buckets:1});
+  expect(data.saved.closeReason).toContain('周回上限 2/2');
+  expect(data.post).toBeNull();
+  expect(data.goal.maxCycles).toBe(0);
+  expect(data.logs).toHaveLength(2);
+  expect(data.status).toContain('完了済み');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
