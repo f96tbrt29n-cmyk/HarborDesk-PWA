@@ -161,25 +161,59 @@ function hdSSAttachReviewToLog(postReview){
  try{window.dispatchEvent(new CustomEvent('hd:sortie-post-review-saved',{detail:{entryId:rows[index].id,postSortieReview:rows[index].postSortieReview}}))}catch{}
  return true;
 }
+function hdSSPostQueueBuild(gate,previous=[]){
+ const current=new Map((gate?.actions||[]).filter(x=>x?.id).slice(0,8).map(x=>[String(x.id),{id:String(x.id),action:String(x.action||''),detail:String(x.detail||'')}]))
+ const out=[],now=Date.now();
+ for(const old of Array.isArray(previous)?previous:[]){
+  const id=String(old?.id||'');if(!id)continue;
+  const hit=current.get(id);
+  if(hit){out.push({...old,...hit,status:'pending',resolvedAt:null});current.delete(id)}
+  else out.push({...old,status:'resolved',resolvedAt:Number(old?.resolvedAt)||now});
+ }
+ for(const hit of current.values())out.push({...hit,status:'pending',createdAt:now,resolvedAt:null});
+ return out.slice(0,8);
+}
+function hdSSPostQueueSummary(queue){
+ const rows=Array.isArray(queue)?queue:[],resolved=rows.filter(x=>x?.status==='resolved').length,pending=rows.filter(x=>x?.status!=='resolved').length;
+ return {total:rows.length,resolved,pending,next:rows.find(x=>x?.status!=='resolved')||null};
+}
 function hdSSPostTryReview(sync){
  const post=hdSSPostLoad();if(!post||post.status!=='awaiting-sync')return post;
  const syncAt=Number(sync?.syncedAt)||(()=>{try{return Number(JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')?.syncedAt)||0}catch{return 0}})();
  if(!syncAt||syncAt<=Number(post.finishedAt||0))return post;
  const telemetry=hdSSTelemetry(post.map,post.fleetSnapshot);if(!telemetry)return post;
- const gate=telemetry.gate||{state:'hold',label:'要確認',detail:'帰還後判定を取得できない',actions:[]};
- const delta=hdSSPostDelta(post.startTelemetry,telemetry),next={...post,status:'reviewed',reviewedAt:Date.now(),syncAt,review:{gate,live:telemetry.live,supply:telemetry.supply,air:telemetry.air,delta}};
+ const gate=telemetry.gate||{state:'hold',label:'要確認',detail:'帰還後判定を取得できない',actions:[]},queue=hdSSPostQueueBuild(gate,[]);
+ const delta=hdSSPostDelta(post.startTelemetry,telemetry),next={...post,status:'reviewed',reviewedAt:Date.now(),syncAt,review:{gate,live:telemetry.live,supply:telemetry.supply,air:telemetry.air,delta,queue}};
  hdSSPostSave(next);hdSSAttachReviewToLog(next);hdSSEmit('post-review',{postReview:next});return next;
+}
+function hdSSPostRefreshReview(sync){
+ const post=hdSSPostLoad();if(!post)return null;
+ if(post.status==='awaiting-sync')return hdSSPostTryReview(sync);
+ if(post.status!=='reviewed')return post;
+ const telemetry=hdSSTelemetry(post.map,post.fleetSnapshot);if(!telemetry)return post;
+ const gate=telemetry.gate||{state:'hold',label:'要確認',detail:'帰還後判定を取得できない',actions:[]},queue=hdSSPostQueueBuild(gate,post.review?.queue||[]);
+ const syncAt=Math.max(Number(post.syncAt)||0,Number(sync?.syncedAt)||0,Number(telemetry.syncAt)||0),delta=hdSSPostDelta(post.startTelemetry,telemetry);
+ const next={...post,reviewedAt:Date.now(),syncAt,review:{gate,live:telemetry.live,supply:telemetry.supply,air:telemetry.air,delta,queue}};
+ hdSSPostSave(next);hdSSEmit('post-refresh',{postReview:next});return next;
+}
+function hdSSPostStartReprepare(){
+ const post=hdSSPostLoad();if(!post||post.status!=='reviewed')return false;
+ const summary=hdSSPostQueueSummary(post.review?.queue||[]),next=summary.next;if(!next)return false;
+ hdSSPostSave({...post,reprepare:{startedAt:Number(post.reprepare?.startedAt)||Date.now(),currentId:next.id,updatedAt:Date.now()}});
+ if(typeof hdFEOpenFix==='function')return !!hdFEOpenFix(next.id);
+ return false;
 }
 function hdSSPostHtml(map){
  const post=hdSSPostLoad();if(!post)return '';
  const sameMap=!map||String(post.map||'')===String(map||''),title=sameMap?'前回出撃後':'前回 '+String(post.map||'')+' 出撃後';
  if(post.status==='awaiting-sync')return '<div class="hd-ss-post awaiting"><div><span>'+hdSSEsc(title)+'</span><strong>帰還後の再同期待ち</strong><small>艦状態・補給・艦載機損耗を更新すると、次の出撃可否を自動で再判定するよ。</small></div><div class="hd-ss-post-actions"><button type="button" class="primary small" data-hd-ss-post-sync>艦これ同期へ</button><button type="button" class="ghost small" data-hd-ss-post-clear>閉じる</button></div></div>';
- const review=post.review||{},gate=review.gate||{},state=gate.state||'hold',headline=state==='go'?'再出撃準備OK':state==='stop'?'連続出撃は修正必要':'再出撃前に確認',actions=(gate.actions||[]).slice(0,3),delta=review.delta||null;
+ const review=post.review||{},gate=review.gate||{},state=gate.state||'hold',headline=state==='go'?'再出撃準備OK':state==='stop'?'連続出撃は修正必要':'再出撃前に確認',delta=review.delta||null,queue=Array.isArray(review.queue)?review.queue:hdSSPostQueueBuild(gate,[]),q=hdSSPostQueueSummary(queue);
  const meta=[];if(review.live)meta.push('艦状態 '+(review.live.blocked?('NG '+review.live.blocked+'隻'):review.live.caution?('注意 '+review.live.caution+'隻'):'OK'));if(review.supply)meta.push('補給 '+(review.supply.empty?('空 '+review.supply.empty+'隻'):review.supply.low?('不足 '+review.supply.low+'隻'):'OK'));if(review.air&&Number(review.air.depletedSlots)>0)meta.push('艦載機損耗 '+review.air.depletedSlots+'スロ');
  const deltaBits=[];if(delta){if(delta.ships?.length)deltaBits.push('耐久/状態変化 '+delta.ships.length+'隻');if(delta.fuelUsed)deltaBits.push('燃料 -'+delta.fuelUsed);if(delta.ammoUsed)deltaBits.push('弾薬 -'+delta.ammoUsed);if(delta.airLoss)deltaBits.push('制空 -'+delta.airLoss);if(delta.depletedAdded)deltaBits.push('新規損耗 +'+delta.depletedAdded+'スロ')}
  const deltaHtml=delta&&delta.changed?'<div class="hd-ss-post-delta"><b>今回の出撃で変わったところ</b><div>'+deltaBits.map(x=>'<span>'+hdSSEsc(x)+'</span>').join('')+'</div>'+(delta.ships?.length?'<small>'+delta.ships.slice(0,4).map(x=>hdSSEsc(x.name)+' HP '+x.hpBefore+'→'+x.hpAfter+(x.statusAfter!==x.statusBefore?' / '+hdSSEsc(x.statusAfter):'')).join(' ・ ')+'</small>':'')+'</div>':'<div class="hd-ss-post-delta clear"><b>今回の差分</b><small>同期範囲では新しい損傷・補給減少・制空低下を検出していないよ。</small></div>';
- const actionHtml=actions.length?'<div class="hd-ss-post-fixes">'+actions.map((x,i)=>{const fix=typeof hdFEFixActionInfo==='function'?hdFEFixActionInfo(x.id):{label:'確認する'};return '<div><span><b>'+(i+1)+'. '+hdSSEsc(x.action||x.detail||'確認')+'</b><small>'+hdSSEsc(x.detail||'')+'</small></span><button type="button" class="ghost small" data-hd-ss-post-fix="'+hdSSEsc(x.id||'')+'">'+hdSSEsc(fix.label||'確認する')+'</button></div>'}).join('')+'</div>':'';
- return '<div class="hd-ss-post '+hdSSEsc(state)+'"><div><span>'+hdSSEsc(title)+'</span><strong>'+hdSSEsc(headline)+'</strong><small>'+hdSSEsc(gate.detail||'帰還後の状態を再判定済み')+'</small>'+(meta.length?'<em>'+hdSSEsc(meta.join(' / '))+'</em>':'')+'</div>'+deltaHtml+actionHtml+'<div class="hd-ss-post-actions"><button type="button" class="ghost small" data-hd-ss-post-clear>確認済み</button></div></div>';
+ const queueHtml=q.total?'<div class="hd-ss-reprep"><div class="hd-ss-reprep-head"><div><b>再出撃の再準備</b><span>'+q.resolved+'/'+q.total+' 完了'+(q.pending?' ・ 残り '+q.pending:'')+'</span></div>'+(q.pending?'<button type="button" class="primary small" data-hd-ss-reprep>'+(post.reprepare?'次の修正へ':'再準備を開始')+'</button>':'<b class="done">完了 ✓</b>')+'</div><div class="hd-ss-post-fixes">'+queue.map((x,i)=>{const done=x.status==='resolved',fix=typeof hdFEFixActionInfo==='function'?hdFEFixActionInfo(x.id):{label:'確認する'};return '<div class="'+(done?'resolved':'pending')+'"><span><b>'+(done?'✓ ':'')+(i+1)+'. '+hdSSEsc(x.action||x.detail||'確認')+'</b><small>'+hdSSEsc(done?'修正済み':(x.detail||''))+'</small></span>'+(done?'':'<button type="button" class="ghost small" data-hd-ss-post-fix="'+hdSSEsc(x.id||'')+'">'+hdSSEsc(fix.label||'確認する')+'</button>')+'</div>'}).join('')+'</div></div>':'';
+ const primary=q.pending?'<button type="button" class="primary small" data-hd-ss-reprep>再準備を続ける</button>':state==='go'?'<button type="button" class="primary small" data-hd-ss-check>出撃前チェックへ</button>':'';
+ return '<div class="hd-ss-post '+hdSSEsc(state)+'"><div><span>'+hdSSEsc(title)+'</span><strong>'+hdSSEsc(headline)+'</strong><small>'+hdSSEsc(gate.detail||'帰還後の状態を再判定済み')+'</small>'+(meta.length?'<em>'+hdSSEsc(meta.join(' / '))+'</em>':'')+'</div>'+deltaHtml+queueHtml+'<div class="hd-ss-post-actions">'+primary+'<button type="button" class="ghost small" data-hd-ss-post-recheck>再判定</button><button type="button" class="ghost small" data-hd-ss-post-clear>確認済み</button></div></div>';
 }
 function hdSSSelectedSummary(map){
  const fleet=hdSSFleet(map);if(!fleet)return null;const stats=hdSSStats(map,fleet);
@@ -223,6 +257,10 @@ window.hdSSSave=hdSSSave;
 window.hdSSPostLoad=hdSSPostLoad;
 window.hdSSPostSave=hdSSPostSave;
 window.hdSSPostTryReview=hdSSPostTryReview;
+window.hdSSPostRefreshReview=hdSSPostRefreshReview;
+window.hdSSPostQueueBuild=hdSSPostQueueBuild;
+window.hdSSPostQueueSummary=hdSSPostQueueSummary;
+window.hdSSPostStartReprepare=hdSSPostStartReprepare;
 window.hdSSPostDelta=hdSSPostDelta;
 window.hdSSTelemetry=hdSSTelemetry;
 window.hdSSMap=hdSSMap;
@@ -247,10 +285,14 @@ document.addEventListener('click',function(e){
  if(e.target.closest?.('[data-hd-ss-check]')){if(typeof hdSPSOpenMapTab==='function')hdSPSOpenMapTab('mine');return}
  if(e.target.closest?.('[data-hd-ss-post-sync]')){if(typeof hdWSShowElement==='function')hdWSShowElement('kancolleImport',true);else document.getElementById('kancolleImport')?.scrollIntoView({behavior:'smooth',block:'start'});return}
  const postFix=e.target.closest?.('[data-hd-ss-post-fix]');if(postFix){if(typeof hdFEOpenFix==='function')hdFEOpenFix(postFix.dataset.hdSsPostFix);return}
+ if(e.target.closest?.('[data-hd-ss-reprep]')){hdSSPostStartReprepare();return}
+ if(e.target.closest?.('[data-hd-ss-post-recheck]')){hdSSPostRefreshReview();hdSSRender();return}
+ if(e.target.closest?.('[data-hd-fe-recheck]')){setTimeout(()=>{hdSSPostRefreshReview();hdSSRender()},140)}
  if(e.target.closest?.('[data-hd-ss-post-clear]')){hdSSPostSave(null);hdSSRender();return}
 });
 window.addEventListener('storage',function(e){if([HD_SS_KEY,'harbordesk-custom-fleets-v1','harbordesk-sortie-selection-v1','harbordesk-sortie-readiness-v1'].includes(e.key))hdSSRender()});
 window.addEventListener('hd:map-rendered',function(){setTimeout(hdSSRender,0)});
-window.addEventListener('hd:kancolle-sync',function(e){hdSSPostTryReview(e?.detail);setTimeout(hdSSRender,0)});
-window.addEventListener('load',function(){hdSSPostTryReview();setTimeout(function(){if(!hdSSInstall())setTimeout(hdSSInstall,500)},1000)});
+window.addEventListener('hd:kancolle-sync',function(e){const post=hdSSPostLoad();if(post?.status==='reviewed')hdSSPostRefreshReview(e?.detail);else hdSSPostTryReview(e?.detail);setTimeout(hdSSRender,0)});
+['hd:equipment-changed','hd:ship-identity-changed'].forEach(function(name){window.addEventListener(name,function(){if(hdSSPostLoad()?.status==='reviewed')hdSSPostRefreshReview();setTimeout(hdSSRender,0)})});
+window.addEventListener('load',function(){const post=hdSSPostLoad();if(post?.status==='reviewed')hdSSPostRefreshReview();else hdSSPostTryReview();setTimeout(function(){if(!hdSSInstall())setTimeout(hdSSInstall,500)},1000)});
 hdSSInstall();
