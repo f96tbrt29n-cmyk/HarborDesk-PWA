@@ -828,6 +828,51 @@ test('release smoke: sortie summary includes go-no-go and prioritized actions', 
 });
 
 
+test('release smoke: sortie session honors integrated go/no-go gate', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdSSGate === 'function');
+
+  const data = await page.evaluate(() => {
+    const originalPlan=window.hdFEPlanFromSavedFleet,originalEval=window.hdFEEvaluate,originalGate=window.hdFEGoNoGo;
+    window.hdFEPlanFromSavedFleet=()=>({map:'1-1',ships:[]});
+    window.hdFEEvaluate=()=>({auto:{}});
+    window.hdFEGoNoGo=()=>({
+      state:'stop',label:'修正必要',detail:'修正が必要な項目 1件',
+      blockers:[{id:'health',label:'艦状態',status:'missing',detail:'大破 1隻'}],
+      cautions:[],
+      actions:[{id:'health',label:'艦状態',status:'missing',action:'大破艦を編成から外す',detail:'大破 1隻'}]
+    });
+    const hard=window.hdSSGate('1-1',{id:'f',ships:[]},{manualDone:0,manualTotal:0});
+    window.hdFEGoNoGo=()=>({
+      state:'stop',label:'修正必要',detail:'修正が必要な項目 1件',
+      blockers:[{id:'route',label:'編成条件',status:'missing',detail:'艦種不足'}],
+      cautions:[],
+      actions:[{id:'route',label:'編成条件',status:'missing',action:'編成条件を直す',detail:'艦種不足'}]
+    });
+    const overrideable=window.hdSSGate('1-1',{id:'f',ships:[]},{manualDone:0,manualTotal:0});
+    window.hdFEGoNoGo=()=>({state:'go',label:'出撃準備OK',detail:'未解決なし',blockers:[],cautions:[],actions:[]});
+    const manual=window.hdSSGate('1-1',{id:'f',ships:[]},{manualDone:1,manualTotal:2});
+    window.hdFEPlanFromSavedFleet=originalPlan;window.hdFEEvaluate=originalEval;window.hdFEGoNoGo=originalGate;
+    return {hard,overrideable,manual};
+  });
+
+  expect(data.hard.hardBlock).toBe(true);
+  expect(data.hard.state).toBe('stop');
+  expect(data.overrideable.hardBlock).toBe(false);
+  expect(data.overrideable.state).toBe('stop');
+  expect(data.manual.state).toBe('hold');
+  expect(data.manual.actions.some(x => x.id === 'manual')).toBe(true);
+
+  const source = await page.evaluate(async () => fetch('./sortie-session.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain("if(gate.hardBlock)return null");
+  expect(source).toContain("if(gate.state==='stop'&&!force)return null");
+  expect(source).toContain("data-hd-ss-start-override");
+  expect(source).toContain("disabled>安全確認が必要");
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
