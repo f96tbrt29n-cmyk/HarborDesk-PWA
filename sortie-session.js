@@ -66,7 +66,7 @@ function hdSSSeriesDecision(seriesId){
  if(goal.maxElapsedMin&&progress.elapsedMin>=goal.maxElapsedMin){reached.maxElapsedMin=true;reasons.push(`経過 ${progress.elapsedMin}/${goal.maxElapsedMin}分`)}
  let targetHit=false;
  if(goal.target){
-  targetHit=progress.rows.some(x=>norm(x?.drop)===norm(goal.target)||((x?.targetObtained===true||norm(x?.huntShip)===norm(goal.target)&&x?.targetObtained===true)));
+  targetHit=progress.rows.some(x=>norm(x?.drop)===norm(goal.target)||(norm(x?.huntShip)===norm(goal.target)&&x?.targetObtained===true));
   if(targetHit){reached.target=true;reasons.push(`目標ドロップ ${goal.target} 獲得`)}
  }
  return {seriesId:id,goal,progress,targetHit,reached,stop:reasons.length>0,reasons};
