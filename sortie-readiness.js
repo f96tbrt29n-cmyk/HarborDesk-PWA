@@ -145,4 +145,8 @@ if(typeof hdApplyMapTabs==='function'){
  const hdSortiePrevApply=hdApplyMapTabs;
  hdApplyMapTabs=function(){hdSortiePrevApply();setTimeout(hdRenderSortieReadiness,0)};
 }
+window.addEventListener('hd:custom-fleets-changed',hdRenderSortieReadiness);
+window.addEventListener('hd:kancolle-sync',hdRenderSortieReadiness);
+window.addEventListener('hd:workspace-refresh',hdRenderSortieReadiness);
+window.addEventListener('storage',e=>{if(['harbordesk-custom-fleets-v1','harbordesk-ship-roster-v1','harbordesk-sortie-readiness-v1'].includes(e.key))hdRenderSortieReadiness()});
 window.addEventListener('load',()=>setTimeout(hdRenderSortieReadiness,260));
