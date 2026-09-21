@@ -36,6 +36,11 @@ function hdSLApplyHunt(entry){
  if(entry.targetObtained&&!h.obtained){h.obtained=true;h.obtainedAt=entry.at;delta.obtainedChanged=true}
  hdSLSaveHunts(rows);return delta;
 }
+function hdSLMarkHuntObtained(huntId,at=Date.now()){
+ const id=String(huntId||'');if(!id)return false;const rows=hdSLHunts(),h=rows.find(x=>String(x?.id||'')===id);if(!h)return false;
+ if(!h.obtained){h.obtained=true;h.obtainedAt=Number(at)||Date.now();hdSLSaveHunts(rows)}
+ return true;
+}
 function hdSLUndoHunt(log,remaining){
  if(!log.huntId||!log.huntDelta)return;const rows=hdSLHunts(),h=rows.find(x=>x.id===log.huntId);if(!h)return;const d=log.huntDelta;h.runs=Math.max(0,(Number(h.runs)||0)-(Number(d.runs)||0));h.s=Math.max(0,(Number(h.s)||0)-(Number(d.s)||0));h.a=Math.max(0,(Number(h.a)||0)-(Number(d.a)||0));
  if(d.obtainedChanged&&!remaining.some(x=>x.huntId===log.huntId&&x.targetObtained)){h.obtained=false;delete h.obtainedAt}hdSLSaveHunts(rows);
@@ -54,7 +59,7 @@ function hdSLRecordEntry(input={}){
   steel:Math.max(0,Number(input.steel)||0),bauxite:Math.max(0,Number(input.bauxite)||0),memo:String(input.memo||'').trim(),retreatReason:String(input.retreatReason||'').trim(),objectiveTarget:String(input.objectiveTarget||'').trim(),
   huntId:String(input.huntId||''),huntShip:String(input.huntShip||''),targetObtained:!!input.targetObtained
  };
- for(const k of ['sessionId','fleetId','fleetName','strategy','strategyLabel','startedAt','durationMs','fleetSnapshot','readinessSnapshot','source','gameSortieKey','gameNodeNo','gameNodeLabel','gameBossCellNo','gameBossCellLabel','gameRouteNodes','gameRouteLabels','gameBattleResults']){
+ for(const k of ['sessionId','fleetId','fleetName','strategy','strategyLabel','seriesId','cycleIndex','previousSessionId','previousEntryId','startedAt','durationMs','fleetSnapshot','readinessSnapshot','source','gameSortieKey','gameNodeNo','gameNodeLabel','gameBossCellNo','gameBossCellLabel','gameRouteNodes','gameRouteLabels','gameBattleResults']){
   if(input[k]!=null)entry[k]=input[k];
  }
  entry.activityRefs=hdSLApplyActivity(entry);entry.activityLogIds=entry.activityRefs.map(x=>x.id);entry.huntDelta=hdSLApplyHunt(entry);
@@ -102,3 +107,5 @@ function hdSLEnsure(){
 document.addEventListener('click',e=>{if(e.target.closest?.('[data-hd-sl-save]')){hdSLRecord();return}const f=e.target.closest?.('[data-hd-sl-filter]');if(f){hdSLFilter=f.dataset.hdSlFilter;hdSLRender();return}const d=e.target.closest?.('[data-hd-sl-delete]');if(d){hdSLDelete(d.dataset.hdSlDelete);return}});
 document.addEventListener('change',e=>{if(e.target?.id==='hdSLHunt')hdSLFillFromHunt()});
 window.addEventListener('load',()=>setTimeout(()=>{hdSLEnsure();hdSLRender()},1400));setTimeout(hdSLEnsure,1900);window.addEventListener('storage',()=>setTimeout(hdSLRender,0));
+
+window.hdSLMarkHuntObtained=hdSLMarkHuntObtained;

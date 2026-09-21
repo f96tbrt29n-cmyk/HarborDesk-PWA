@@ -1353,6 +1353,142 @@ test('release smoke: repeat sortie metadata survives finish and feeds the next c
 });
 
 
+test('release smoke: sortie log preserves repeat-series linkage', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdSLRecordEntry === 'function');
+
+  const row = await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-sortie-log-v1');
+    return window.hdSLRecordEntry({
+      map:'1-1',result:'S',boss:true,battles:1,
+      sessionId:'session-3',seriesId:'series-a',cycleIndex:3,
+      previousSessionId:'session-2',previousEntryId:'entry-2'
+    });
+  });
+
+  expect(row).toMatchObject({
+    sessionId:'session-3',
+    seriesId:'series-a',
+    cycleIndex:3,
+    previousSessionId:'session-2',
+    previousEntryId:'entry-2'
+  });
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: repeat-series summary aggregates runs and target completion', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdSSSeriesSummary === 'function');
+
+  const summary = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify([
+      {id:'e3',sessionId:'s3',seriesId:'series-a',cycleIndex:3,map:'2-5',result:'S',boss:true,retreat:false,durationMs:180000,fuel:30,ammo:20,bauxite:10,buckets:1,drop:'瑞穂',objectiveTarget:'瑞穂',targetObtained:true},
+      {id:'e2',sessionId:'s2',seriesId:'series-a',cycleIndex:2,map:'2-5',result:'撤退',boss:false,retreat:true,durationMs:120000,fuel:20,ammo:15,bauxite:0,buckets:0,drop:''},
+      {id:'e1',sessionId:'s1',seriesId:'series-a',cycleIndex:1,map:'2-5',result:'S',boss:true,retreat:false,durationMs:60000,fuel:10,ammo:10,bauxite:5,buckets:0,drop:'浦波'}
+    ]));
+    return window.hdSSSeriesSummary({
+      seriesId:'series-a',sessionId:'s3',entryId:'e3',
+      objectiveTarget:'瑞穂',targetObtained:true
+    });
+  });
+
+  expect(summary.runs).toBe(3);
+  expect(summary.boss).toBe(2);
+  expect(summary.s).toBe(2);
+  expect(summary.retreat).toBe(1);
+  expect(summary.avgDurationMs).toBe(120000);
+  expect(summary.resources).toMatchObject({fuel:60,ammo:45,bauxite:15,buckets:1});
+  expect(summary.objectiveTarget).toBe('瑞穂');
+  expect(summary.targetObtained).toBe(true);
+  expect(summary.lastDrop).toBe('瑞穂');
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: matching target drop ends the repeat series automatically', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSSFinish === 'function' &&
+    typeof window.hdSSPostPrepareNextRound === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-sortie-log-v1');
+    window.hdSSSave({
+      id:'session-target',map:'2-5',startedAt:Date.now()-1000,
+      fleetId:'fleet-a',fleetName:'掘り艦隊',strategy:'stable',strategyLabel:'安定重視',
+      fleetSnapshot:{id:'fleet-a',name:'掘り艦隊',ships:[{ship:'睦月'}],memo:''},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:4,manualTotal:4,unresolved:[],gate:{state:'go',label:'出撃準備OK',detail:'OK',hardBlock:false,actions:[]}},
+      telemetrySnapshot:null,shipCount:1,status:'active',
+      draft:{objectiveTarget:'瑞穂'},
+      seriesId:'series-target',cycleIndex:4,previousSessionId:'session-prev',previousEntryId:'entry-prev'
+    });
+    const entry=window.hdSSFinish({result:'S',boss:true,battles:1,drop:'瑞穂'});
+    const post=window.hdSSPostLoad();
+    window.hdSSPostSave({...post,status:'reviewed',review:{gate:{state:'go',label:'出撃準備OK',detail:'OK',actions:[]},queue:[]}});
+    const prepare=window.hdSSPostPrepareNextRound();
+    const html=window.hdSSSeriesHtml(window.hdSSSeriesSummary(window.hdSSPostLoad()));
+    return {entry,post,prepare,html};
+  });
+
+  expect(data.entry.objectiveTarget).toBe('瑞穂');
+  expect(data.entry.targetObtained).toBe(true);
+  expect(data.entry.seriesId).toBe('series-target');
+  expect(data.entry.cycleIndex).toBe(4);
+  expect(data.post.objectiveTarget).toBe('瑞穂');
+  expect(data.post.targetObtained).toBe(true);
+  expect(data.prepare).toBe(false);
+  expect(data.html).toContain('入手 ✓');
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: reconciled game drop can complete a linked hunt without double-counting runs', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSSIngestGameSortie === 'function' &&
+    typeof window.hdSLMarkHuntObtained === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-drop-hunts-v1', JSON.stringify([
+      {id:'hunt-1',ship:'瑞穂',map:'2-5',runs:4,s:2,a:1,obtained:false}
+    ]));
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify([
+      {
+        id:'entry-target',sessionId:'session-target',seriesId:'series-target',cycleIndex:4,
+        at:Date.now()-1000,startedAt:Date.now()-5000,map:'2-5',result:'S',boss:true,
+        huntId:'hunt-1',huntShip:'瑞穂',objectiveTarget:'瑞穂',targetObtained:false,
+        huntDelta:{runs:1,s:1,a:0,obtainedChanged:false}
+      }
+    ]));
+    window.hdSSPostSave({
+      version:1,status:'reviewed',sessionId:'session-target',entryId:'entry-target',
+      map:'2-5',seriesId:'series-target',cycleIndex:4,objectiveTarget:'瑞穂',
+      targetObtained:false,finishedAt:Date.now()-500,
+      review:{gate:{state:'go',actions:[]},queue:[]}
+    });
+    const merged=window.hdSSIngestGameSortie({
+      map:'2-5',startedAt:Date.now()-4000,result:'S',boss:true,battles:3,
+      drop:'瑞穂',gameSortieKey:'kc-target'
+    });
+    const hunt=JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1')||'[]')[0];
+    const log=JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]')[0];
+    const post=window.hdSSPostLoad();
+    return {merged,hunt,log,post};
+  });
+
+  expect(data.merged.targetObtained).toBe(true);
+  expect(data.hunt.runs).toBe(4);
+  expect(data.hunt.obtained).toBe(true);
+  expect(data.log.huntDelta.obtainedChanged).toBe(true);
+  expect(data.post.targetObtained).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -1362,8 +1498,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.399'");
-  expect(source).toContain("const HD_APP_BUILD=399");
+  expect(source).toContain("const HD_APP_VERSION='1.0.400'");
+  expect(source).toContain("const HD_APP_BUILD=400");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -1386,14 +1522,14 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=399`);
+    expect(data.index).toContain(`${asset}?v=400`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=399");
+  expect(data.updater).toContain("const HD_APP_BUILD=400");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v399");
+  expect(data.sw).toContain("harbordesk-pwa-v400");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -1406,7 +1542,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=399');
+  expect(source).toContain('const BUILD=400');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -2646,17 +2782,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=399',
-      'map-images.js?v=399',
-      'map-tabs.js?v=399',
-      'map-interactive.js?v=399',
-      'map-advanced-data.js?v=399'
+      'map-details.js?v=400',
+      'map-images.js?v=400',
+      'map-tabs.js?v=400',
+      'map-interactive.js?v=400',
+      'map-advanced-data.js?v=400'
     ];
     const requiredStyles = [
-      'map-details.css?v=399',
-      'map-tabs.css?v=399',
-      'map-images.css?v=399',
-      'map-interactive.css?v=399'
+      'map-details.css?v=400',
+      'map-tabs.css?v=400',
+      'map-images.css?v=400',
+      'map-interactive.css?v=400'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -2698,7 +2834,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=399');
+  expect(src).toBe('app.js?v=400');
   expect(errors).toEqual([]);
 });
 
