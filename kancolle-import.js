@@ -1,5 +1,5 @@
 const HD_KC_SYNC_KEY='harbordesk-kancolle-sync-v1';
-const HD_KC_USERSCRIPT_VERSION='1.0.12';
+const HD_KC_USERSCRIPT_VERSION='1.0.13';
 const HD_KC_FLEETS_KEY='harbordesk-kancolle-fleets-v1';
 const HD_KC_MATERIALS_KEY='harbordesk-kancolle-materials-v1';
 const HD_KC_NODE_LABEL_SOURCE='KC3Kai edges.json @ 6b0534d291c27220da1b6fe454e91fc96a6a7b27';
@@ -31,7 +31,7 @@ function hdKcMasterEquipMap(){
  for(const [name,row] of Object.entries(rows))if(Number(row?.id)>0)map.set(Number(row.id),{id:Number(row.id),name,typeName:String(row.typeName||'')});
  return map;
 }
-function hdKcImportEmpty(){return {ships:new Map(),slotItems:new Map(),materials:new Map(),decks:new Map(),ndocks:new Map(),quests:new Map(),questPages:new Set(),questPageCount:0,sortieEvents:[],captureId:'',userscriptVersion:'',sources:new Set(),completeShips:false,completeSlotItems:false,completeDecks:false,completeNdocks:false,completeQuests:false}}
+function hdKcImportEmpty(){return {ships:new Map(),slotItems:new Map(),materials:new Map(),decks:new Map(),ndocks:new Map(),quests:new Map(),questPages:new Set(),questPageCount:0,sortieEvents:[],captureId:'',userscriptVersion:'',admiralLevel:0,sources:new Set(),completeShips:false,completeSlotItems:false,completeDecks:false,completeNdocks:false,completeQuests:false}}
 function hdKcSortieEventData(h,data){
  if(/api_req_map\/(?:start|next)/.test(h))return {mapareaId:Number(data?.api_maparea_id)||0,mapinfoNo:Number(data?.api_mapinfo_no)||0,nodeNo:Number(data?.api_no)||0,colorNo:Number(data?.api_color_no)||0,eventId:Number(data?.api_event_id)||0,eventKind:Number(data?.api_event_kind)||0,bossCellNo:Number(data?.api_bosscell_no)||0};
  if(/api_req_(?:sortie|combined_battle)\/battleresult/.test(h))return {winRank:String(data?.api_win_rank||''),questName:String(data?.api_quest_name||''),dropShipId:Number(data?.api_get_ship?.api_ship_id)||0,dropShipName:String(data?.api_get_ship?.api_ship_name||'')};
@@ -48,6 +48,7 @@ function hdKcImportAdd(out,hint,payload,meta={}){
  const matRows=Array.isArray(data?.api_material)?data.api_material:null;
  const slotRows=Array.isArray(data?.api_slot_item)?data.api_slot_item:null;
  const questRows=Array.isArray(data?.api_list)?data.api_list:null;
+ if(Number(data?.api_basic?.api_level)>0)out.admiralLevel=Number(data.api_basic.api_level);
  const fullShips=/api_port\/port/.test(h)||/api_get_member\/ship2/.test(h)||(!h&&shipRows&&deckRows);
  const fullDecks=/api_port\/port/.test(h)||(/api_get_member\/ship2/.test(h)&&deckRows);
  const fullDocks=/api_port\/port/.test(h)||/api_get_member\/ndock/.test(h);
@@ -176,6 +177,7 @@ function hdKcMergeRoster(parsed){
    id:old.id||`kc-ship-${gameId}`,name:String(master?.name||old.name||`艦娘ID ${masterId||'?'}`),masterId,type:String(master?.type||old.type||'未解決'),level:Number(ship.api_lv)||0,
    gear:parsed.slotItems.size?labels.join(' / '):(old.gear||''),tags:Array.isArray(old.tags)?old.tags:[],memo:old.memo||'',remodel:old.remodel||'',
    source:'kancolle-import',gameShipId:gameId,gameHp:Number(ship.api_nowhp)||0,gameMaxHp:Number(ship.api_maxhp)||0,gameCond:Number(ship.api_cond)||0,
+   gameLos:Array.isArray(ship.api_sakuteki)?Number(ship.api_sakuteki[0])||0:Number(ship.api_sakuteki)||0,gameOnslot:Array.isArray(ship.api_onslot)?ship.api_onslot.map(Number):[],gameFuel:Number(ship.api_fuel)||0,gameAmmo:Number(ship.api_bull)||0,
    gameLocked:Number(ship.api_locked)||0,gameSallyArea:Number(ship.api_sally_area)||0,gameSlotEx:Number(ship.api_slot_ex)||0,syncedAt:now
   });
  }
@@ -446,7 +448,7 @@ function hdKcApplyImport(preview,opts={}){
  };
  integrity.verified=integrity.ships.complete&&integrity.equipment.complete;
  integrity.ok=(!integrity.ships.complete||integrity.ships.ok)&&(!integrity.equipment.complete||integrity.equipment.ok);
- const sync={syncedAt:Date.now(),sources:preview.sources,userscriptVersion:String(preview.userscriptVersion||''),coverage,ships:result.ships,equipment:result.equipment,equipmentRows:snapshot.equipmentRows,equipmentItems:snapshot.equipment,materials:result.materials,decks:result.decks,expeditions:result.expeditions,docks:result.docks,quests:result.quests,sorties:result.sorties,unknownShips:preview.unknownShips,unknownEquip:preview.unknownEquip,snapshot,integrity,delta};
+ const sync={syncedAt:Date.now(),sources:preview.sources,userscriptVersion:String(preview.userscriptVersion||''),admiralLevel:Number(parsed.admiralLevel)||Number(previous?.admiralLevel)||0,coverage,ships:result.ships,equipment:result.equipment,equipmentRows:snapshot.equipmentRows,equipmentItems:snapshot.equipment,materials:result.materials,decks:result.decks,expeditions:result.expeditions,docks:result.docks,quests:result.quests,sorties:result.sorties,unknownShips:preview.unknownShips,unknownEquip:preview.unknownEquip,snapshot,integrity,delta};
  localStorage.setItem(HD_KC_SYNC_KEY,JSON.stringify(sync));window.dispatchEvent(new CustomEvent('hd:kancolle-sync',{detail:sync}));hdKcRenderSyncStatus();hdKcRenderCurrentFleets();hdKcNotifySyncSuccess(sync);
  return sync;
 }
