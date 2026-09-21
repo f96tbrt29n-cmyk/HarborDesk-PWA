@@ -286,7 +286,7 @@ function hdSSPostPreflightState(post){
  return {ready:gate.state==='go'&&!gate.hardBlock&&manualLeft===0,state:gate.state,detail:gate.detail||'',fleet,stats,gate,manualLeft};
 }
 function hdSSPostPrepareNextRound(){
- const post=hdSSPostLoad();if(!post||post.status!=='reviewed')return false;
+ const post=hdSSPostLoad();if(!post||post.status!=='reviewed'||hdSSSeriesSummary(post).targetObtained)return false;
  const q=hdSSPostQueueSummary(post.review?.queue||[]);if(q.pending)return false;
  if(String(post.review?.gate?.state||'hold')!=='go')return false;
  const fleet=hdSSPostFleet(post);if(!fleet)return false;
@@ -298,7 +298,7 @@ function hdSSPostPrepareNextRound(){
  return true;
 }
 function hdSSPostStartNextRound(){
- const post=hdSSPostLoad();if(!post||post.status!=='reviewed'||!Number(post.reprepare?.preflightAt))return null;
+ const post=hdSSPostLoad();if(!post||post.status!=='reviewed'||!Number(post.reprepare?.preflightAt)||hdSSSeriesSummary(post).targetObtained)return null;
  const q=hdSSPostQueueSummary(post.review?.queue||[]);if(q.pending)return null;
  const fleet=hdSSPostFleet(post);if(!fleet)return null;
  if(typeof hdSortieSetSelection==='function')hdSortieSetSelection(post.map,fleet.id);
