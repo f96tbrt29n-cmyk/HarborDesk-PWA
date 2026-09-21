@@ -329,6 +329,7 @@ function hdFEFixFlowSave(value){
  return value||null;
 }
 function hdFEStartFixFlow(id,auto=null){
+ auto=auto||window.__hdFELastAuto||null;
  const key=String(id||''),check=(auto?.checks||[]).find(x=>String(x.id)===key)||null;
  return hdFEFixFlowSave({id:key,map:hdFEFixFlowMap(),startedAt:Date.now(),beforeStatus:String(check?.status||''),beforeDetail:String(check?.detail||''),label:String(check?.label||'')});
 }
@@ -377,6 +378,7 @@ function hdFEOpenFix(id,auto=null){
  if(typeof hdSPSOpen==='function')hdSPSOpen();return true;
 }
 function hdFEGateHtml(auto){
+ window.__hdFELastAuto=auto||null;
  const gate=hdFEGoNoGo(auto),items=gate.actions.slice(0,6),flow=hdFEFixFlowHtml(auto);
  return `<div class="hd-fe-gate ${gate.state}"><div class="hd-fe-gate-head"><div><span>出撃判定</span><strong>${hdFEEsc(gate.label)}</strong></div><small>${hdFEEsc(gate.detail)}</small></div>${flow}${items.length?`<div class="hd-fe-gate-actions">${items.map((x,i)=>{const fix=hdFEFixActionInfo(x.id);return `<div class="${x.status}"><div><b>${i+1}. ${hdFEEsc(x.action)}</b><span>${hdFEEsc(x.label)}｜${hdFEEsc(x.detail)}</span></div><button type="button" class="ghost small" data-hd-fe-fix="${hdFEEsc(x.id)}">${hdFEEsc(fix.label)}</button></div>`}).join('')}</div>`:'<div class="hd-fe-gate-clear">この判定範囲では追加作業なし</div>'}</div>`;
 }
