@@ -261,7 +261,7 @@ test('release smoke: linked game fleets follow the latest sync', async ({ page }
       format: 'harbordesk-kancolle-import',
       version: 2,
       source: 'userscripts',
-      userscriptVersion: '1.0.13',
+      userscriptVersion: '1.0.14',
       records: [
         {
           endpoint: '/kcsapi/api_port/port',
@@ -811,6 +811,67 @@ test('release smoke: home rerenders when ship roster changes', async ({ page }) 
 });
 
 
+
+test('release smoke: userscript bridge imports without URL payload limits', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdKcHandleBridgeImport === 'function' &&
+    typeof window.hdKcBridgeOriginAllowed === 'function'
+  );
+
+  const data = await page.evaluate(async () => {
+    localStorage.removeItem('harbordesk-ship-roster-v1');
+    localStorage.removeItem('harbordesk-equipment-v1');
+    const raw=JSON.stringify({
+      format:'harbordesk-kancolle-import',
+      version:2,
+      userscriptVersion:'1.0.14',
+      records:[
+        {endpoint:'/kcsapi/api_port/port',at:1,payload:{api_result:1,api_data:{
+          api_ship:[{api_id:101,api_ship_id:1,api_lv:20,api_nowhp:13,api_maxhp:13,api_cond:49,api_slot:[501,-1,-1],api_slot_ex:0}],
+          api_deck_port:[{api_id:1,api_name:'第一艦隊',api_ship:[101,-1,-1,-1,-1,-1],api_mission:[0,0,0,0]}],
+          api_material:[]
+        }}},
+        {endpoint:'/kcsapi/api_get_member/slot_item',at:2,payload:{api_result:1,api_data:[
+          {api_id:501,api_slotitem_id:1,api_level:0,api_alv:0}
+        ]}}
+      ]
+    });
+    const sync=await window.hdKcHandleBridgeImport(raw);
+    return {
+      sync,
+      roster:JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]'),
+      equipment:JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]'),
+      allowed:window.hdKcBridgeOriginAllowed('https://play.games.dmm.com'),
+      denied:window.hdKcBridgeOriginAllowed('https://evil.example')
+    };
+  });
+
+  expect(data.allowed).toBe(true);
+  expect(data.denied).toBe(false);
+  expect(data.sync.userscriptVersion).toBe('1.0.14');
+  expect(data.roster).toHaveLength(1);
+  expect(data.roster[0]).toMatchObject({gameShipId:101,source:'kancolle-import'});
+  expect(data.equipment.reduce((n,x)=>n+(Number(x.count)||0),0)).toBe(1);
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: userscript prefers postMessage bridge and keeps hash fallback', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const source=await page.evaluate(async()=>fetch('./HarborDesk-Kancolle.user.js',{cache:'no-store'}).then(r=>r.text()));
+  const importer=await page.evaluate(async()=>fetch('./kancolle-import.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain("window.open(HARBOR_URL+'#kancolleImport','HarborDeskSync')");
+  expect(source).toContain("type:BRIDGE_IMPORT_MESSAGE");
+  expect(source).toContain("BRIDGE_ACK_MESSAGE");
+  expect(source).toContain("a.href=HARBOR_URL+'#kcimport='+token");
+  expect(importer).toContain("HD_KC_BRIDGE_READY_MESSAGE='harbordesk-kancolle-import-ready-v1'");
+  expect(importer).toContain("window.close();return");
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: synced fleet and equipment data refresh downstream planners', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -952,11 +1013,11 @@ test('release smoke: userscript captures scouting and admiral level for readines
   await boot(page, errors);
   const source = await page.evaluate(async () => fetch('./HarborDesk-Kancolle.user.js', { cache:'no-store' }).then(r => r.text()));
   const importer = await page.evaluate(async () => fetch('./kancolle-import.js', { cache:'no-store' }).then(r => r.text()));
-  expect(source).toContain("// @version      1.0.13");
+  expect(source).toContain("// @version      1.0.14");
   expect(source).toContain("api_sakuteki:Array.isArray(x.api_sakuteki)");
   expect(source).toContain("api_onslot:Array.isArray(x.api_onslot)");
   expect(source).toContain("api_basic:data?.api_basic");
-  expect(importer).toContain("HD_KC_USERSCRIPT_VERSION='1.0.13'");
+  expect(importer).toContain("HD_KC_USERSCRIPT_VERSION='1.0.14'");
   expect(importer).toContain("gameLos:Array.isArray(ship.api_sakuteki)");
   expect(importer).toContain("admiralLevel:Number(parsed.admiralLevel)");
   expect(errors).toEqual([]);
@@ -2222,8 +2283,8 @@ test('release smoke: userscript blocks handoff until ship and equipment ledger d
     return res.text();
   });
 
-  expect(source).toContain('// @version      1.0.13');
-  expect(source).toContain("const HD_VERSION='1.0.13'");
+  expect(source).toContain('// @version      1.0.14');
+  expect(source).toContain("const HD_VERSION='1.0.14'");
   expect(source).toContain('// @downloadURL  https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/HarborDesk-Kancolle.user.js');
   expect(source).toContain('// @updateURL    https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/HarborDesk-Kancolle.meta.js');
   expect(source).toContain('function ledgerReady(c=captureCoverage())');
