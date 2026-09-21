@@ -873,6 +873,58 @@ test('release smoke: sortie session honors integrated go/no-go gate', async ({ p
 });
 
 
+test('release smoke: post-sortie state requires a fresh game sync before next clean go', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSSPostSave === 'function' &&
+    typeof window.hdSSPostLoad === 'function' &&
+    typeof window.hdSSPostTryReview === 'function' &&
+    typeof window.hdSSGate === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const originalPlan=window.hdFEPlanFromSavedFleet,originalEval=window.hdFEEvaluate,originalGo=window.hdFEGoNoGo;
+    window.hdFEPlanFromSavedFleet=()=>({map:'1-1',ships:[]});
+    window.hdFEEvaluate=()=>({auto:{
+      live:{status:'ready',blocked:0,caution:0,details:[]},
+      supply:{status:'ready',low:0,empty:0,rows:[]},
+      air:{status:'ready',ours:100,enemy:50,depletedSlots:0}
+    }});
+    window.hdFEGoNoGo=()=>({state:'go',label:'出撃準備OK',detail:'問題なし',blockers:[],cautions:[],actions:[]});
+
+    window.hdSSPostSave({
+      version:1,status:'awaiting-sync',sessionId:'s1',map:'1-1',
+      fleetId:'fleet-1',fleetName:'第一艦隊',finishedAt:100,
+      fleetSnapshot:{id:'fleet-1',ships:[]}
+    });
+
+    const gateBefore=window.hdSSGate('1-1',{id:'fleet-1',ships:[]},{manualTotal:0,manualDone:0});
+    const stale=window.hdSSPostTryReview({syncedAt:100});
+    const fresh=window.hdSSPostTryReview({syncedAt:200});
+    const stored=window.hdSSPostLoad();
+
+    window.hdFEPlanFromSavedFleet=originalPlan;window.hdFEEvaluate=originalEval;window.hdFEGoNoGo=originalGo;
+    return {gateBefore,stale,fresh,stored};
+  });
+
+  expect(data.gateBefore.state).toBe('hold');
+  expect(data.gateBefore.postAwaiting).toBe(true);
+  expect(data.gateBefore.actions[0]?.id).toBe('postSync');
+  expect(data.stale.status).toBe('awaiting-sync');
+  expect(data.fresh.status).toBe('reviewed');
+  expect(data.fresh.review.gate.state).toBe('go');
+  expect(data.stored.status).toBe('reviewed');
+
+  const source = await page.evaluate(async () => fetch('./sortie-session.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain("const HD_SS_POST_KEY='harbordesk-post-sortie-review-v1'");
+  expect(source).toContain("status:'awaiting-sync'");
+  expect(source).toContain("window.addEventListener('hd:kancolle-sync'");
+  expect(source).toContain('帰還後の再同期待ち');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
