@@ -173,8 +173,9 @@ function hdFEGameMatch(plan){
   ids.push(Number(row.gameShipId));
   const mismatches=[],actualSlots=Array.isArray(row.gameGearSlots)?row.gameGearSlots:null;
   if(!actualSlots){unknown++;details.push({name:ship.ship,status:'unknown',mismatches});continue}
-  for(const item of ship.items||[]){
-   const idx=Number.isFinite(Number(item.slotIndex))?Number(item.slotIndex):0,planned=hdFEPlannedGearLabel(item),actual=hdFENormGearLabel(actualSlots[idx]||'');
+  const plannedBySlot=new Map((ship.items||[]).map(item=>[Number.isFinite(Number(item.slotIndex))?Number(item.slotIndex):0,hdFEPlannedGearLabel(item)])),maxPlanned=plannedBySlot.size?Math.max(...plannedBySlot.keys())+1:0,slotCount=Math.max(actualSlots.length,maxPlanned);
+  for(let idx=0;idx<slotCount;idx++){
+   const planned=plannedBySlot.get(idx)||'',actual=hdFENormGearLabel(actualSlots[idx]||'');
    if(planned!==actual)mismatches.push({slotIndex:idx,planned,actual});
   }
   const plannedExpansion=ship.expansion?.name?hdFEPlannedGearLabel(ship.expansion):'',actualExpansion=hdFENormGearLabel(row.gameGearExpansion||'');
