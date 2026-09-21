@@ -246,6 +246,37 @@ function hdKcApplyMaterials(parsed){
  if(typeof renderDashboard==='function')renderDashboard();if(typeof renderHomeDashboard==='function')renderHomeDashboard();window.dispatchEvent(new CustomEvent('hd:workspace-refresh'));
  return Object.keys(values).length;
 }
+function hdKcFleetShipsForCustom(deck){
+ return Array.from({length:6},(_,i)=>{
+  const s=deck?.ships?.[i];
+  return {ship:String(s?.name||''),gameShipId:Number(s?.gameShipId)||0,masterId:Number(s?.masterId)||0,level:Number(s?.level)||0,nowHp:Number(s?.nowHp)||0,maxHp:Number(s?.maxHp)||0,cond:s?.cond==null?null:Number(s.cond),gear:String(s?.gear||'')};
+ });
+}
+function hdKcRefreshLinkedCustomFleets(rows=[]){
+ const decks=new Map((Array.isArray(rows)?rows:[]).map(x=>[Number(x?.deckId)||0,x]).filter(([id])=>id));
+ if(!decks.size)return 0;
+ const all=typeof loadCustomFleets==='function'?loadCustomFleets():(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1')||'{}')||{}}catch{return {}}})();
+ let updated=0;
+ for(const list of Object.values(all||{})){
+  if(!Array.isArray(list))continue;
+  for(let i=0;i<list.length;i++){
+   const row=list[i];
+   if(row?.source!=='kancolle-import')continue;
+   const deck=decks.get(Number(row.sourceDeckId)||0);if(!deck)continue;
+   const ships=hdKcFleetShipsForCustom(deck),sourceSyncedAt=Number(deck.syncedAt)||Date.now();
+   const changed=JSON.stringify(Array.isArray(row.ships)?row.ships:[])!==JSON.stringify(ships);
+   if(!changed&&Number(row.sourceSyncedAt)===sourceSyncedAt)continue;
+   list[i]={...row,ships,sourceSyncedAt,updatedAt:changed?Date.now():(Number(row.updatedAt)||Date.now())};
+   updated++;
+  }
+ }
+ if(updated){
+  if(typeof saveCustomFleets==='function')saveCustomFleets(all);else localStorage.setItem('harbordesk-custom-fleets-v1',JSON.stringify(all));
+  try{if(typeof selectedMap!=='undefined'&&selectedMap&&typeof renderCustomFleets==='function')renderCustomFleets(selectedMap)}catch{}
+  window.dispatchEvent(new CustomEvent('hd:kancolle-linked-fleets-sync',{detail:{updated,deckIds:[...decks.keys()]}}));
+ }
+ return updated;
+}
 function hdKcApplyDecks(parsed){
  const ships=parsed.ships,equipMap=hdKcMasterEquipMap(),rows=[...parsed.decks.values()].sort((a,b)=>Number(a.api_id)-Number(b.api_id)).map(deck=>({
   deckId:Number(deck.api_id),name:String(deck.api_name||`第${deck.api_id}艦隊`),mission:Array.isArray(deck.api_mission)?deck.api_mission.slice(0,4):[],
@@ -255,7 +286,7 @@ function hdKcApplyDecks(parsed){
   }),
   syncedAt:Date.now()
  }));
- localStorage.setItem(HD_KC_FLEETS_KEY,JSON.stringify(rows));hdKcRenderCurrentFleets();return rows.length;
+ localStorage.setItem(HD_KC_FLEETS_KEY,JSON.stringify(rows));hdKcRefreshLinkedCustomFleets(rows);hdKcRenderCurrentFleets();return rows.length;
 }
 function hdKcCurrentFleets(){
  try{const x=JSON.parse(localStorage.getItem(HD_KC_FLEETS_KEY)||'[]');return Array.isArray(x)?x:[]}catch{return []}
@@ -275,7 +306,7 @@ function hdKcCopyFleetToCustom(deckId,map=''){
  if(!target)throw new Error('先に攻略海域を選んでね');
  const all=typeof loadCustomFleets==='function'?loadCustomFleets():(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1')||'{}')||{}}catch{return {}}})();
  all[target]=all[target]||[];
- const ships=Array.from({length:6},(_,i)=>{const s=deck.ships?.[i];return {ship:String(s?.name||''),gameShipId:Number(s?.gameShipId)||0,masterId:Number(s?.masterId)||0,level:Number(s?.level)||0,nowHp:Number(s?.nowHp)||0,maxHp:Number(s?.maxHp)||0,cond:s?.cond==null?null:Number(s.cond),gear:String(s?.gear||'')}});
+ const ships=hdKcFleetShipsForCustom(deck);
  const existing=all[target].findIndex(x=>Number(x.sourceDeckId)===Number(deck.deckId)&&x.source==='kancolle-import');
  const row={id:existing>=0?all[target][existing].id:(typeof cfUid==='function'?cfUid():`kc-fleet-${deck.deckId}-${Date.now()}`),name:`ゲーム同期｜${deck.name}`,ships,memo:`艦これゲーム内の${deck.name}から同期`,source:'kancolle-import',sourceDeckId:Number(deck.deckId),sourceSyncedAt:Number(deck.syncedAt)||Date.now(),createdAt:existing>=0?all[target][existing].createdAt:Date.now(),updatedAt:Date.now()};
  if(existing>=0)all[target][existing]=row;else all[target].push(row);
@@ -698,3 +729,4 @@ window.hdKcMergeEquipment=hdKcMergeEquipment;
 window.hdKcCurrentFleets=hdKcCurrentFleets;
 window.hdKcCopyFleetToCustom=hdKcCopyFleetToCustom;
 window.hdKcPrepareCurrentFleet=hdKcPrepareCurrentFleet;
+window.hdKcRefreshLinkedCustomFleets=hdKcRefreshLinkedCustomFleets;
