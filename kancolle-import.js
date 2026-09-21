@@ -1,7 +1,10 @@
 const HD_KC_SYNC_KEY='harbordesk-kancolle-sync-v1';
-const HD_KC_USERSCRIPT_VERSION='1.0.13';
+const HD_KC_USERSCRIPT_VERSION='1.0.14';
 const HD_KC_FLEETS_KEY='harbordesk-kancolle-fleets-v1';
 const HD_KC_MATERIALS_KEY='harbordesk-kancolle-materials-v1';
+const HD_KC_BRIDGE_IMPORT_MESSAGE='harbordesk-kancolle-import';
+const HD_KC_BRIDGE_READY_MESSAGE='harbordesk-kancolle-import-ready-v1';
+const HD_KC_BRIDGE_ACK_MESSAGE='harbordesk-kancolle-import-ack-v1';
 const HD_KC_NODE_LABEL_SOURCE='KC3Kai edges.json @ 6b0534d291c27220da1b6fe454e91fc96a6a7b27';
 const HD_KC_NODE_LABELS={"1-1":{"1":"A","2":"B","3":"C"},"1-2":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"E"},"1-3":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"E","12":"F","13":"J"},"1-4":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"D","14":"E","15":"H","16":"L","17":"L"},"1-5":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"J","12":"J"},"1-6":{"1":"A","2":"C","3":"E","4":"G","5":"H","6":"K","7":"M","8":"L","9":"J","10":"I","11":"D","12":"F","13":"B","14":"N","15":"K","16":"D","17":"N"},"2-1":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"D","10":"H","11":"H"},"2-2":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"H","13":"K","14":"K"},"2-3":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"M","14":"N","15":"D","16":"F","17":"F","18":"G","19":"K","20":"N"},"2-4":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"M","14":"N","15":"O","16":"P","17":"G","18":"L","19":"L","20":"M","21":"P"},"2-5":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"M","14":"N","15":"O","16":"E","17":"H","18":"I","19":"O","20":"O"},"3-1":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"F","9":"G"},"3-2":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"A","14":"F","15":"F"},"3-3":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"M","14":"G","15":"G","16":"M","17":"M"},"3-4":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"M","14":"N","15":"O","16":"P","17":"B","18":"G","19":"G","20":"H","21":"J","22":"J","23":"P","24":"P"},"3-5":{"1":"B","2":"A","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"J","10":"I","11":"K","12":"E","13":"F","14":"H","15":"K"},"4-1":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"D","12":"H","13":"J"},"4-2":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"C","14":"G","15":"G","16":"L"},"4-3":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"M","14":"N","15":"D","16":"D","17":"G","18":"H","19":"H","20":"I","21":"N","22":"N"},"4-4":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"A","13":"C","14":"E","15":"H","16":"I","17":"I"},"4-5":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"M","14":"N","15":"O","16":"P","17":"Q","18":"R","19":"S","20":"T","21":"D","22":"D","23":"H","24":"H","25":"K","26":"M","27":"N","28":"N","29":"N","30":"T","31":"T","32":"T"},"5-1":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"E","12":"G","13":"J"},"5-2":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"M","14":"N","15":"O","16":"B","17":"F","18":"K","19":"L","20":"O","21":"O"},"5-3":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"M","14":"N","15":"O","16":"P","17":"Q","18":"D","19":"E","20":"J","21":"K","22":"O","23":"O"},"5-4":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"M","14":"N","15":"O","16":"P","17":"D","18":"E","19":"F","20":"H","21":"L","22":"P"},"5-5":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"M","14":"N","15":"O","16":"P","17":"Q","18":"R","19":"S","20":"H","21":"L","22":"L","23":"M","24":"N","25":"O","26":"P","27":"P","28":"S"},"5-6":{"1":"A1","2":"A2","3":"A","4":"B","5":"C1","6":"C2","7":"C","8":"D","9":"E","10":"F","11":"G","12":"A2","13":"B","14":"C2","15":"C2","16":"C","17":"C","18":"H","19":"R","20":"I","21":"J","22":"K1","23":"K","24":"K2","25":"L","26":"M","27":"N","28":"O","29":"P","30":"Q","31":"Q1","32":"Q2","33":"K","34":"L","35":"Start 2","36":"S","37":"T","38":"U","39":"V","40":"W","41":"X","42":"Y","43":"Z","44":"X","45":"X","46":"Q2","47":"T","48":"W"},"6-1":{"1":"B","2":"A","3":"C","4":"D","5":"F","6":"G","7":"I","8":"H","9":"E","10":"J","11":"K","12":"F","13":"F"},"6-2":{"1":"B","2":"C","3":"A","4":"D","5":"F","6":"E","7":"H","8":"G","9":"I","10":"J","11":"K","12":"C","13":"D","14":"F","15":"G","16":"I","17":"K","18":"K"},"6-3":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"E","12":"H"},"6-4":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"M","14":"N","15":"D","16":"D","17":"D","18":"J","19":"I","20":"N","21":"N"},"6-5":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"M","14":"C","15":"G","16":"H","17":"I","18":"M"},"7-1":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"C","13":"C","14":"E","15":"G"},"7-2":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"B","9":"C","10":"H","11":"I","12":"J","13":"K","14":"L","15":"M","16":"I"},"7-3":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"C","8":"E","9":"G","10":"H","11":"I","12":"J","13":"K","14":"L","15":"M","16":"N","17":"O","18":"P","19":"I","20":"J","21":"M","22":"M","23":"P","24":"P","25":"P"},"7-4":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"L","13":"M","14":"N","15":"O","16":"P","17":"E","18":"J","19":"K","20":"L","21":"P","22":"P","23":"P"},"7-5":{"1":"A","2":"B","3":"C","4":"D","5":"E","6":"F","7":"G","8":"H","9":"I","10":"J","11":"K","12":"D","13":"F","14":"L","15":"M","16":"N","17":"O","18":"P","19":"Q","20":"M","21":"O","22":"R","23":"S","24":"T","25":"T"}};
 function hdKcNodeLabel(map,nodeNo){const n=Number(nodeNo)||0;if(!n)return '';return String(HD_KC_NODE_LABELS?.[String(map)]?.[String(n)]||`#${n}`)}
@@ -638,6 +641,26 @@ function hdKcCaptureBookmarklet(){return 'javascript:'+hdKcCaptureSource().repla
 async function hdKcCopyCaptureHelper(){
  const code=hdKcCaptureBookmarklet();try{await navigator.clipboard.writeText(code);return true}catch{return false}
 }
+function hdKcBridgeOriginAllowed(origin){
+ try{
+  const u=new URL(String(origin||'')),h=u.hostname.toLowerCase();
+  if(!/^https?:$/.test(u.protocol))return false;
+  return h==='dmm.com'||h.endsWith('.dmm.com')||h==='dmm.co.jp'||h.endsWith('.dmm.co.jp')||h==='kancolle-server.com'||h.endsWith('.kancolle-server.com')||/^203\.104\.\d{1,3}\.\d{1,3}$/.test(h)||/^125\.6\.\d{1,3}\.\d{1,3}$/.test(h);
+ }catch{return false}
+}
+async function hdKcHandleBridgeImport(raw){
+ hdKcEnsureImport();
+ const preview=await hdKcReadAndPreview(raw);
+ const sync=hdKcApplyImport(preview,{ships:true,equipment:true,resources:true,fleets:true,timers:true,quests:true,sorties:true});
+ const result=document.getElementById('hdKcImportResult');
+ if(result)result.textContent=`Userscriptsから自動同期完了: 艦娘 ${sync.ships} / 装備 ${sync.equipment} / 資源 ${sync.materials} / 艦隊 ${sync.decks} / 遠征 ${sync.expeditions||0} / 入渠 ${sync.docks||0} / 任務 ${sync.quests||0} / 出撃 ${sync.sorties||0}`;
+ const sec=document.getElementById('kancolleImport');if(sec)sec.scrollIntoView({block:'start'});
+ sessionStorage.setItem('harbordesk-kc-return-game-v1','1');
+ window.dispatchEvent(new CustomEvent('hd:kancolle-return-ready'));
+ HD_KC_IMPORT_PREVIEW=null;hdKcRenderSyncStatus();if(typeof renderAllAdvanced==='function')renderAllAdvanced();
+ return sync;
+}
+function hdKcAnnounceBridgeReady(){try{if(window.opener)window.opener.postMessage({type:HD_KC_BRIDGE_READY_MESSAGE,userscriptVersion:HD_KC_USERSCRIPT_VERSION},'*')}catch{}}
 function hdKcBase64UrlBytes(text){
  const s=String(text||'').replace(/-/g,'+').replace(/_/g,'/');const pad=s+'='.repeat((4-s.length%4)%4),bin=atob(pad),out=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);return out;
 }
@@ -743,10 +766,22 @@ document.addEventListener('click',async e=>{
 document.addEventListener('change',async e=>{
  if(e.target.id==='hdKcImportFile'){const file=e.target.files?.[0];if(!file)return;try{const raw=await file.text();document.getElementById('hdKcImportText').value=raw;await hdKcReadAndPreview(raw);document.getElementById('hdKcImportResult').textContent=`${file.name} を解析したよ`}catch(err){document.getElementById('hdKcImportResult').textContent='ファイルを読めなかった: '+String(err?.message||err)}finally{e.target.value=''}}
 });
-window.addEventListener('message',e=>{if(e?.data?.type!=='harbordesk-kancolle-import')return;try{hdKcEnsureImport();const raw=e.data.payload;hdKcReadAndPreview(raw);document.getElementById('hdKcImportResult').textContent='外部取込ブリッジからデータを受信したよ'}catch{}});
-window.addEventListener('load',()=>setTimeout(async()=>{hdKcEnsureImport();if(!(await hdKcConsumeWindowNameImport()))await hdKcConsumeHashImport()},450));
-hdKcEnsureImport();setTimeout(async()=>{if(!(await hdKcConsumeWindowNameImport()))await hdKcConsumeHashImport()},80);
+window.addEventListener('message',async e=>{
+ if(e?.data?.type!==HD_KC_BRIDGE_IMPORT_MESSAGE||!hdKcBridgeOriginAllowed(e.origin))return;
+ const captureId=String(e.data?.captureId||'');
+ try{
+  const sync=await hdKcHandleBridgeImport(e.data.payload);
+  try{e.source?.postMessage({type:HD_KC_BRIDGE_ACK_MESSAGE,captureId,ok:true,ships:sync.ships,equipment:sync.equipment,equipmentItems:sync.equipmentItems},e.origin)}catch{}
+ }catch(err){
+  const result=document.getElementById('hdKcImportResult');if(result)result.textContent='外部取込ブリッジの同期失敗: '+String(err?.message||err);
+  try{e.source?.postMessage({type:HD_KC_BRIDGE_ACK_MESSAGE,captureId,ok:false,error:String(err?.message||err)},e.origin)}catch{}
+ }
+});
+window.addEventListener('load',()=>setTimeout(async()=>{hdKcEnsureImport();hdKcAnnounceBridgeReady();if(!(await hdKcConsumeWindowNameImport()))await hdKcConsumeHashImport()},450));
+hdKcEnsureImport();hdKcAnnounceBridgeReady();setTimeout(async()=>{if(!(await hdKcConsumeWindowNameImport()))await hdKcConsumeHashImport()},80);
 
+window.hdKcBridgeOriginAllowed=hdKcBridgeOriginAllowed;
+window.hdKcHandleBridgeImport=hdKcHandleBridgeImport;
 window.hdKcParseImport=hdKcParseImport;
 window.hdKcPreviewData=hdKcPreviewData;
 window.hdKcApplyImport=hdKcApplyImport;
