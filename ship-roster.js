@@ -21,7 +21,7 @@ function rosterMigrateMasterIds(){
  for(const row of rows){if(Number(row.masterId)>0)continue;const id=rosterMasterId(row.name);if(id){row.masterId=id;changed=true}}
  if(changed)localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));return changed;
 }
-function rosterSave(items){localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(items));renderShipRoster();refreshShipRosterOptions()}
+function rosterSave(items){localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(items));renderShipRoster();refreshShipRosterOptions();window.dispatchEvent(new CustomEvent('hd:ship-identity-changed',{detail:{source:'roster-save',count:Array.isArray(items)?items.length:0}}))}
 function rosterSyncCanonical(id){
  const rows=rosterLoad(),idx=rows.findIndex(x=>String(x.id)===String(id));if(idx<0)return false;
  const status=typeof hdShipIdentityStatus==='function'?hdShipIdentityStatus({name:rows[idx].name,masterId:rows[idx].masterId}):null;
