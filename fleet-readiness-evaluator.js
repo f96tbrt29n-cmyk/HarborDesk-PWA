@@ -109,7 +109,17 @@ function hdFELos(items,map){
 function hdFEAir(items){
  const air=items.filter(x=>HD_FE_AIR_CATS.has(x.meta?.category));
  const rows=air.map(x=>{const aa=Number(x.meta?.stats?.対空)||0,cap=Math.max(0,Number(x.capacity)||0),power=cap>0&&aa>0?Math.floor(aa*Math.sqrt(cap)):0;return {...x,aa,cap,power}});
- return {count:air.length,antiAir:air.reduce((s,x)=>s+(Number(x.meta?.stats?.対空)||0),0),names:air.map(x=>x.name),basePower:rows.reduce((s,x)=>s+x.power,0),capacityKnown:rows.filter(x=>x.cap>0).length,rows};
+ return {
+  count:air.length,
+  antiAir:air.reduce((s,x)=>s+(Number(x.meta?.stats?.対空)||0),0),
+  names:air.map(x=>x.name),
+  basePower:rows.reduce((s,x)=>s+x.power,0),
+  capacityKnown:rows.filter(x=>x.capacitySource!=='unknown').length,
+  liveCapacityKnown:rows.filter(x=>x.capacitySource==='live').length,
+  masterCapacityKnown:rows.filter(x=>x.capacitySource==='master').length,
+  depletedSlots:rows.filter(x=>x.capacitySource==='live'&&Number(x.masterCapacity)>0&&x.cap<Number(x.masterCapacity)).map(x=>({ship:x.ship,name:x.name,slotIndex:x.slotIndex,live:x.cap,max:Number(x.masterCapacity),power:x.power})),
+  rows
+ };
 }
 function hdFENight(items,stats){
  const support=items.filter(x=>hdFEHasTag(x,'夜戦','魚雷CI','夜偵')||['探照灯','大型探照灯','照明弾'].includes(x.meta?.category)).length;
