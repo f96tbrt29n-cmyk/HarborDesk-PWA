@@ -606,6 +606,7 @@ test('release smoke: ship roster distinguishes synced and manual entries', async
     ]));
     window.initShipRoster?.();
     window.renderShipRoster?.();
+    window.hdWSShowElement?.('roster',true);
   });
 
   await expect(page.locator('[data-roster-source="sync"]')).toBeVisible();
@@ -693,6 +694,7 @@ test('release smoke: equipment ledger filters synced manual and plan rows', asyn
     ]));
     sessionStorage.removeItem('harbordesk-session-equipment-ledger-view-v1');
     window.renderEquipment?.();
+    window.hdWSShowElement?.('equipmentBook',true);
   });
 
   await expect(page.locator('[data-eq-source="sync"]')).toContainText('同期済み 1');
@@ -867,7 +869,8 @@ test('release smoke: userscript prefers postMessage bridge and keeps hash fallba
   expect(source).toContain("BRIDGE_ACK_MESSAGE");
   expect(source).toContain("a.href=HARBOR_URL+'#kcimport='+token");
   expect(importer).toContain("HD_KC_BRIDGE_READY_MESSAGE='harbordesk-kancolle-import-ready-v1'");
-  expect(importer).toContain("window.close();return");
+  expect(importer).toContain('function hdKcAnnounceBridgeReady()');
+  expect(importer).toContain('e.source?.postMessage({type:HD_KC_BRIDGE_ACK_MESSAGE');
   expect(errors).toEqual([]);
 });
 
@@ -1909,7 +1912,7 @@ test('release smoke: post-sortie reprepare queue advances with reconciled game r
   expect(source).toContain('function hdSSPostRefreshReview(sync)');
   expect(source).toContain('function hdSSIngestGameSortie(payload)');
   expect(source).toContain('hdSSAttachReviewToLog(next)');
-  expect(source).toContain("['hd:equipment-changed','hd:ship-identity-changed']");
+  expect(source).toContain("['hd:equipment-changed','hd:ship-identity-changed','hd:custom-fleets-changed']");
   expect(errors).toEqual([]);
 });
 
