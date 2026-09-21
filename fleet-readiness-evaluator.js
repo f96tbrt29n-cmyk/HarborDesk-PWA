@@ -468,6 +468,7 @@ window.hdFEStartFixFlow=hdFEStartFixFlow;
 window.hdFEFixFlowLoad=hdFEFixFlowLoad;
 window.hdFEFixFlowState=hdFEFixFlowState;
 window.hdFEFixFlowSave=hdFEFixFlowSave;
+window.hdFEGateHtml=hdFEGateHtml;
 window.hdFERecheckFixFlow=hdFERecheckFixFlow;
 ['hd:kancolle-sync','hd:equipment-changed','hd:ship-identity-changed'].forEach(evt=>window.addEventListener(evt,hdFERefreshPendingFix));
 window.addEventListener('load',()=>setTimeout(()=>{if(!hdFEInstall())setTimeout(hdFEInstall,500)},720));
