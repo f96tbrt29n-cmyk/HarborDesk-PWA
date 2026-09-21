@@ -1,6 +1,7 @@
 const HD_SS_KEY='harbordesk-active-sortie-session-v1';
 const HD_SS_POST_KEY='harbordesk-post-sortie-review-v1';
 const HD_SS_OBJECTIVE_PREF_KEY='harbordesk-sortie-objective-pref-v1';
+const HD_SS_SERIES_GOALS_KEY='harbordesk-sortie-series-goals-v1';
 
 function hdSSEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function hdSSLoad(){try{return JSON.parse(localStorage.getItem(HD_SS_KEY)||'null')}catch{return null}}
@@ -15,6 +16,79 @@ function hdSSApplyObjectivePref(session,map){
  if(objectiveTarget)session.draft={...(session.draft||{}),objectiveTarget};
  return session;
 }
+
+function hdSSSeriesGoals(){
+ try{const x=JSON.parse(localStorage.getItem(HD_SS_SERIES_GOALS_KEY)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch{return {}}
+}
+function hdSSSeriesGoal(seriesId){
+ const id=String(seriesId||'').trim(),all=hdSSSeriesGoals(),x=id&&all[id]&&typeof all[id]==='object'?all[id]:{};
+ return {
+  maxCycles:Math.max(0,Number(x.maxCycles)||0),
+  maxResources:Math.max(0,Number(x.maxResources)||0),
+  maxBuckets:Math.max(0,Number(x.maxBuckets)||0),
+  maxElapsedMin:Math.max(0,Number(x.maxElapsedMin)||0),
+  target:String(x.target||'').trim()
+ };
+}
+function hdSSSeriesGoalSave(seriesId,goal){
+ const id=String(seriesId||'').trim();if(!id)return false;
+ const next={
+  maxCycles:Math.max(0,Number(goal?.maxCycles)||0),
+  maxResources:Math.max(0,Number(goal?.maxResources)||0),
+  maxBuckets:Math.max(0,Number(goal?.maxBuckets)||0),
+  maxElapsedMin:Math.max(0,Number(goal?.maxElapsedMin)||0),
+  target:String(goal?.target||'').trim()
+ };
+ const all=hdSSSeriesGoals(),active=next.maxCycles||next.maxResources||next.maxBuckets||next.maxElapsedMin||next.target;
+ if(active)all[id]=next;else delete all[id];
+ localStorage.setItem(HD_SS_SERIES_GOALS_KEY,JSON.stringify(all));
+ try{window.dispatchEvent(new CustomEvent('hd:sortie-series-goal-changed',{detail:{seriesId:id,goal:active?next:null}}))}catch{}
+ return true;
+}
+function hdSSSeriesRows(seriesId){
+ const id=String(seriesId||'').trim();if(!id)return [];
+ try{
+  const rows=typeof hdSLLoad==='function'?hdSLLoad():JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]');
+  return (Array.isArray(rows)?rows:[]).filter(x=>String(x?.seriesId||'')===id);
+ }catch{return []}
+}
+function hdSSSeriesProgress(seriesId){
+ const rows=hdSSSeriesRows(seriesId),cycleNos=[...new Set(rows.map(x=>Math.max(1,Number(x?.cycleIndex)||1)))],cycles=cycleNos.length||rows.length;
+ const resourceTotal=rows.reduce((sum,x)=>sum+(Number(x?.fuel)||0)+(Number(x?.ammo)||0)+(Number(x?.steel)||0)+(Number(x?.bauxite)||0),0),buckets=rows.reduce((sum,x)=>sum+(Number(x?.buckets)||0),0);
+ const starts=rows.map(x=>Number(x?.startedAt)||Number(x?.at)||0).filter(Boolean),ends=rows.map(x=>Number(x?.at)||((Number(x?.startedAt)||0)+(Number(x?.durationMs)||0))).filter(Boolean),startedAt=starts.length?Math.min(...starts):0,endedAt=ends.length?Math.max(...ends):0;
+ return {rows,cycles,resourceTotal,buckets,startedAt,endedAt,elapsedMin:startedAt&&endedAt?Number(((endedAt-startedAt)/60000).toFixed(1)):0};
+}
+function hdSSSeriesDecision(seriesId){
+ const id=String(seriesId||'').trim(),goal=hdSSSeriesGoal(id),progress=hdSSSeriesProgress(id),reasons=[],norm=v=>String(v||'').replace(/\s+/g,'').toLowerCase();
+ if(goal.maxCycles&&progress.cycles>=goal.maxCycles)reasons.push(`周回上限 ${progress.cycles}/${goal.maxCycles}`);
+ if(goal.maxResources&&progress.resourceTotal>=goal.maxResources)reasons.push(`総資源 ${progress.resourceTotal}/${goal.maxResources}`);
+ if(goal.maxBuckets&&progress.buckets>=goal.maxBuckets)reasons.push(`バケツ ${progress.buckets}/${goal.maxBuckets}`);
+ if(goal.maxElapsedMin&&progress.elapsedMin>=goal.maxElapsedMin)reasons.push(`経過 ${progress.elapsedMin}/${goal.maxElapsedMin}分`);
+ let targetHit=false;
+ if(goal.target){
+  targetHit=progress.rows.some(x=>norm(x?.drop)===norm(goal.target)||((x?.targetObtained===true||norm(x?.huntShip)===norm(goal.target)&&x?.targetObtained===true)));
+  if(targetHit)reasons.push(`目標ドロップ ${goal.target} 獲得`);
+ }
+ return {seriesId:id,goal,progress,targetHit,stop:reasons.length>0,reasons};
+}
+function hdSSSeriesGoalHtml(post,decision){
+ const id=String(post?.seriesId||post?.sessionId||'').trim();if(!id)return '';
+ const d=decision||hdSSSeriesDecision(id),g=d.goal,p=d.progress,state=d.stop?'stop':'active',summary=d.stop?('終了条件: '+d.reasons.join(' / ')):`現在 ${p.cycles}周・総資源${p.resourceTotal}・バケツ${p.buckets}・経過${p.elapsedMin}分`;
+ return '<div class="hd-ss-series-goal '+state+'"><div class="hd-ss-series-goal-head"><div><span>周回終了条件</span><b>'+hdSSEsc(summary)+'</b></div>'+(d.stop?'<strong>STOP</strong>':'<strong>監視中</strong>')+'</div><div class="hd-ss-series-goal-grid">'+
+  '<label>最大周回<input type="number" min="0" inputmode="numeric" data-hd-ss-goal-cycles value="'+(g.maxCycles||'')+'" placeholder="例 20"></label>'+
+  '<label>総資源上限<input type="number" min="0" inputmode="numeric" data-hd-ss-goal-resources value="'+(g.maxResources||'')+'" placeholder="例 10000"></label>'+
+  '<label>バケツ上限<input type="number" min="0" inputmode="numeric" data-hd-ss-goal-buckets value="'+(g.maxBuckets||'')+'" placeholder="例 20"></label>'+
+  '<label>時間上限(分)<input type="number" min="0" inputmode="numeric" data-hd-ss-goal-minutes value="'+(g.maxElapsedMin||'')+'" placeholder="例 60"></label>'+
+  '<label class="wide">目標ドロップ<input data-hd-ss-goal-target value="'+hdSSEsc(g.target)+'" placeholder="例 明石"></label>'+
+  '</div><div class="hd-ss-series-goal-actions"><button type="button" class="ghost small" data-hd-ss-goal-save="'+hdSSEsc(id)+'">終了条件を保存</button><button type="button" class="ghost small" data-hd-ss-goal-clear="'+hdSSEsc(id)+'">条件を解除</button></div></div>';
+}
+function hdSSSeriesGoalSaveFromUi(seriesId){
+ const root=document.querySelector('.hd-ss-series-goal');if(!root)return false;
+ const num=sel=>Math.max(0,Number(root.querySelector(sel)?.value)||0),target=String(root.querySelector('[data-hd-ss-goal-target]')?.value||'').trim();
+ const ok=hdSSSeriesGoalSave(seriesId,{maxCycles:num('[data-hd-ss-goal-cycles]'),maxResources:num('[data-hd-ss-goal-resources]'),maxBuckets:num('[data-hd-ss-goal-buckets]'),maxElapsedMin:num('[data-hd-ss-goal-minutes]'),target});
+ if(ok)hdSSRender();return ok;
+}
+
 
 function hdSSUid(){return crypto.randomUUID?crypto.randomUUID():'ss-'+Date.now()+'-'+Math.random().toString(16).slice(2)}
 function hdSSMap(){return typeof hdSPSMap==='function'?hdSPSMap():(typeof selectedMap!=='undefined'?selectedMap:'')}
@@ -271,6 +345,7 @@ function hdSSPostPreflightState(post){
 }
 function hdSSPostPrepareNextRound(){
  const post=hdSSPostLoad();if(!post||post.status!=='reviewed')return false;
+ if(hdSSSeriesDecision(String(post.seriesId||post.sessionId||'')).stop)return false;
  const q=hdSSPostQueueSummary(post.review?.queue||[]);if(q.pending)return false;
  if(String(post.review?.gate?.state||'hold')!=='go')return false;
  const fleet=hdSSPostFleet(post);if(!fleet)return false;
@@ -283,6 +358,7 @@ function hdSSPostPrepareNextRound(){
 }
 function hdSSPostStartNextRound(){
  const post=hdSSPostLoad();if(!post||post.status!=='reviewed'||!Number(post.reprepare?.preflightAt))return null;
+ if(hdSSSeriesDecision(String(post.seriesId||post.sessionId||'')).stop)return null;
  const q=hdSSPostQueueSummary(post.review?.queue||[]);if(q.pending)return null;
  const fleet=hdSSPostFleet(post);if(!fleet)return null;
  if(typeof hdSortieSetSelection==='function')hdSortieSetSelection(post.map,fleet.id);
@@ -300,19 +376,20 @@ function hdSSPostHtml(map){
  const post=hdSSPostLoad();if(!post)return '';
  const sameMap=!map||String(post.map||'')===String(map||''),title=sameMap?'前回出撃後':'前回 '+String(post.map||'')+' 出撃後';
  if(post.status==='awaiting-sync')return '<div class="hd-ss-post awaiting"><div><span>'+hdSSEsc(title)+'</span><strong>帰還後の再同期待ち</strong><small>艦状態・補給・艦載機損耗を更新すると、次の出撃可否を自動で再判定するよ。</small></div><div class="hd-ss-post-actions"><button type="button" class="primary small" data-hd-ss-post-sync>艦これ同期へ</button><button type="button" class="ghost small" data-hd-ss-post-clear>閉じる</button></div></div>';
- const review=post.review||{},gate=review.gate||{},state=gate.state||'hold',headline=state==='go'?'再出撃準備OK':state==='stop'?'連続出撃は修正必要':'再出撃前に確認',delta=review.delta||null,queue=Array.isArray(review.queue)?review.queue:hdSSPostQueueBuild(gate,[]),q=hdSSPostQueueSummary(queue);
+ const review=post.review||{},gate=review.gate||{},state=gate.state||'hold',seriesDecision=hdSSSeriesDecision(String(post.seriesId||post.sessionId||'')),displayState=seriesDecision.stop?'stop':state,headline=seriesDecision.stop?'周回終了条件に到達':state==='go'?'再出撃準備OK':state==='stop'?'連続出撃は修正必要':'再出撃前に確認',delta=review.delta||null,queue=Array.isArray(review.queue)?review.queue:hdSSPostQueueBuild(gate,[]),q=hdSSPostQueueSummary(queue);
  const meta=[];if(review.live)meta.push('艦状態 '+(review.live.blocked?('NG '+review.live.blocked+'隻'):review.live.caution?('注意 '+review.live.caution+'隻'):'OK'));if(review.supply)meta.push('補給 '+(review.supply.empty?('空 '+review.supply.empty+'隻'):review.supply.low?('不足 '+review.supply.low+'隻'):'OK'));if(review.air&&Number(review.air.depletedSlots)>0)meta.push('艦載機損耗 '+review.air.depletedSlots+'スロ');
  const deltaBits=[];if(delta){if(delta.ships?.length)deltaBits.push('耐久/状態変化 '+delta.ships.length+'隻');if(delta.fuelUsed)deltaBits.push('燃料 -'+delta.fuelUsed);if(delta.ammoUsed)deltaBits.push('弾薬 -'+delta.ammoUsed);if(delta.airLoss)deltaBits.push('制空 -'+delta.airLoss);if(delta.depletedAdded)deltaBits.push('新規損耗 +'+delta.depletedAdded+'スロ')}
  const deltaHtml=delta&&delta.changed?'<div class="hd-ss-post-delta"><b>今回の出撃で変わったところ</b><div>'+deltaBits.map(x=>'<span>'+hdSSEsc(x)+'</span>').join('')+'</div>'+(delta.ships?.length?'<small>'+delta.ships.slice(0,4).map(x=>hdSSEsc(x.name)+' HP '+x.hpBefore+'→'+x.hpAfter+(x.statusAfter!==x.statusBefore?' / '+hdSSEsc(x.statusAfter):'')).join(' ・ ')+'</small>':'')+'</div>':'<div class="hd-ss-post-delta clear"><b>今回の差分</b><small>同期範囲では新しい損傷・補給減少・制空低下を検出していないよ。</small></div>';
  const queueHtml=q.total?'<div class="hd-ss-reprep"><div class="hd-ss-reprep-head"><div><b>再出撃の再準備</b><span>'+q.resolved+'/'+q.total+' 完了'+(q.pending?' ・ 残り '+q.pending:'')+'</span></div>'+(q.pending?'<button type="button" class="primary small" data-hd-ss-reprep>'+(post.reprepare?'次の修正へ':'再準備を開始')+'</button>':'<b class="done">完了 ✓</b>')+'</div><div class="hd-ss-post-fixes">'+queue.map((x,i)=>{const done=x.status==='resolved',fix=typeof hdFEFixActionInfo==='function'?hdFEFixActionInfo(x.id):{label:'確認する'};return '<div class="'+(done?'resolved':'pending')+'"><span><b>'+(done?'✓ ':'')+(i+1)+'. '+hdSSEsc(x.action||x.detail||'確認')+'</b><small>'+hdSSEsc(done?'修正済み':(x.detail||''))+'</small></span>'+(done?'':'<button type="button" class="ghost small" data-hd-ss-post-fix="'+hdSSEsc(x.id||'')+'">'+hdSSEsc(fix.label||'確認する')+'</button>')+'</div>'}).join('')+'</div></div>':'';
  const cycle=Math.max(1,Number(post.cycleIndex)||1),nextCycle=cycle+1,preflight=Number(post.reprepare?.preflightAt)?hdSSPostPreflightState(post):null;
- const cycleHtml=state==='go'&&!q.pending?'<div class="hd-ss-cycle '+(preflight?.ready?'ready':preflight?'checking':'')+'"><div><span>連続出撃</span><b>第'+cycle+'周 → 第'+nextCycle+'周</b></div><small>'+(preflight?(preflight.ready?'次周の出撃前チェック完了':'次周チェック中'+(preflight.manualLeft?' ・ 手動残り '+preflight.manualLeft+'件':'')):'次周は手動チェックを新しく確認してから開始')+'</small></div>':'';
+ const cycleHtml=!seriesDecision.stop&&state==='go'&&!q.pending?'<div class="hd-ss-cycle '+(preflight?.ready?'ready':preflight?'checking':'')+'"><div><span>連続出撃</span><b>第'+cycle+'周 → 第'+nextCycle+'周</b></div><small>'+(preflight?(preflight.ready?'次周の出撃前チェック完了':'次周チェック中'+(preflight.manualLeft?' ・ 手動残り '+preflight.manualLeft+'件':'')):'次周は手動チェックを新しく確認してから開始')+'</small></div>':'';
  let primary='';
- if(q.pending)primary='<button type="button" class="primary small" data-hd-ss-reprep>再準備を続ける</button>';
- else if(state==='go'&&!preflight)primary='<button type="button" class="primary small" data-hd-ss-next-preflight>第'+nextCycle+'周チェックを開始</button>';
- else if(state==='go'&&preflight?.ready)primary='<button type="button" class="primary small" data-hd-ss-next-start>第'+nextCycle+'周を開始</button>';
- else if(state==='go'&&preflight)primary='<button type="button" class="primary small" data-hd-ss-check>出撃前チェックを続ける</button>';
- return '<div class="hd-ss-post '+hdSSEsc(state)+'"><div><span>'+hdSSEsc(title)+'</span><strong>'+hdSSEsc(headline)+'</strong><small>'+hdSSEsc(gate.detail||'帰還後の状態を再判定済み')+'</small>'+(meta.length?'<em>'+hdSSEsc(meta.join(' / '))+'</em>':'')+'</div>'+deltaHtml+queueHtml+cycleHtml+'<div class="hd-ss-post-actions">'+primary+'<button type="button" class="ghost small" data-hd-ss-post-recheck>再判定</button><button type="button" class="ghost small" data-hd-ss-post-clear>確認済み</button></div></div>';
+ if(!seriesDecision.stop&&q.pending)primary='<button type="button" class="primary small" data-hd-ss-reprep>再準備を続ける</button>';
+ else if(!seriesDecision.stop&&state==='go'&&!preflight)primary='<button type="button" class="primary small" data-hd-ss-next-preflight>第'+nextCycle+'周チェックを開始</button>';
+ else if(!seriesDecision.stop&&state==='go'&&preflight?.ready)primary='<button type="button" class="primary small" data-hd-ss-next-start>第'+nextCycle+'周を開始</button>';
+ else if(!seriesDecision.stop&&state==='go'&&preflight)primary='<button type="button" class="primary small" data-hd-ss-check>出撃前チェックを続ける</button>';
+ const goalHtml=hdSSSeriesGoalHtml(post,seriesDecision),detail=seriesDecision.stop?seriesDecision.reasons.join(' / '):(gate.detail||'帰還後の状態を再判定済み');
+ return '<div class="hd-ss-post '+hdSSEsc(displayState)+'"><div><span>'+hdSSEsc(title)+'</span><strong>'+hdSSEsc(headline)+'</strong><small>'+hdSSEsc(detail)+'</small>'+(meta.length?'<em>'+hdSSEsc(meta.join(' / '))+'</em>':'')+'</div>'+deltaHtml+queueHtml+goalHtml+cycleHtml+'<div class="hd-ss-post-actions">'+primary+'<button type="button" class="ghost small" data-hd-ss-post-recheck>再判定</button><button type="button" class="ghost small" data-hd-ss-post-clear>確認済み</button></div></div>';
 }
 function hdSSSelectedSummary(map){
  const fleet=hdSSFleet(map);if(!fleet)return null;const stats=hdSSStats(map,fleet);
@@ -331,8 +408,8 @@ function hdSSIdleHtml(map){
  return '<section class="hd-ss '+cls+'"><div class="hd-ss-head"><div><div class="eyebrow">SORTIE SESSION</div><strong>実戦モード</strong><span>選択中の編成を固定して出撃記録へつなぐ</span></div><b>'+hdSSEsc(gate.label)+'</b></div>'+hdSSPostHtml(map)+'<div class="hd-ss-selected"><div><span>'+hdSSEsc(row.strategyLabel)+'</span><strong>'+hdSSEsc(row.fleet.name||'名称なし')+'</strong><small>'+s.shipCount+'隻</small></div><div class="hd-ss-readiness"><span>自動確認 <b>'+s.autoOk+'/'+s.autoTotal+'</b></span><span>手動確認 <b>'+s.manualDone+'/'+s.manualTotal+'</b></span></div></div><div class="hd-ss-gate '+hdSSEsc(gate.state)+'"><b>'+hdSSEsc(gate.detail)+'</b>'+(next?'<span>次: '+hdSSEsc(next)+'</span>':'')+'</div>'+(unresolved?'<p class="hd-ss-warning">要確認: '+hdSSEsc(unresolved)+'</p>':'')+'<div class="hd-ss-actions">'+startButtons+'<button type="button" class="ghost small" data-hd-ss-check>出撃前チェックを見る</button></div><p class="hd-ss-note">'+(gate.hardBlock?'大破・補給不足など安全上の修正が必要な間は、実戦セッションを開始しない。':gate.state==='stop'?'修正必要項目があるため通常開始は停止中。上書き開始は記録用途として明示的に選べる。':'開始時の編成・装備・判定状態をスナップショット保存する。')+'</p></section>';
 }
 function hdSSActiveHtml(session){
- const r=session.readinessSnapshot||{},unresolved=(r.unresolved||[]).map(function(x){return x.label}).filter(Boolean).join('、'),gate=r.gate||null,gateText=gate?(gate.label+(gate.overridden?'・上書き開始':'')):'';
- return '<section class="hd-ss active"><div class="hd-ss-head"><div><div class="eyebrow">SORTIE IN PROGRESS</div><strong>出撃中</strong><span>'+hdSSEsc(session.map)+'｜'+hdSSEsc(session.fleetName)+'</span></div><b>'+hdSSEsc(session.strategyLabel||'手動編成')+'</b></div><div class="hd-ss-active-meta">'+(Number(session.cycleIndex)>1?'<span>連続出撃 第'+Number(session.cycleIndex)+'周</span>':'')+(gateText?'<span>開始判定 '+hdSSEsc(gateText)+'</span>':'')+'<span>開始 '+hdSSEsc(new Date(session.startedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}))+'</span><span>自動 '+(r.autoOk||0)+'/'+(r.autoTotal||0)+'</span><span>手動 '+(r.manualDone||0)+'/'+(r.manualTotal||0)+'</span></div>'+(unresolved?'<p class="hd-ss-warning">開始時の要確認: '+hdSSEsc(unresolved)+'</p>':'')+'<div class="hd-ss-return"><div class="hd-ss-return-head"><strong>帰還結果</strong><span>記録すると既存の出撃ログ・任務連動へ反映</span></div><div class="hd-ss-form"><label>結果<select id="hdSSResult"><option>S</option><option>A</option><option>B</option><option>C</option><option>D</option><option>撤退</option></select></label><label>到達マス<input id="hdSSNode" placeholder="例 ボス / P"></label><label>戦闘数<input id="hdSSBattles" type="number" min="0" max="20" value="1"></label><label class="hd-ss-check"><input id="hdSSBoss" type="checkbox">ボス到達</label><label>ドロップ<input id="hdSSDrop" placeholder="艦名など"></label><label>バケツ<input id="hdSSBuckets" type="number" min="0" value="0"></label><label>燃料<input id="hdSSFuel" type="number" min="0" value="0"></label><label>弾薬<input id="hdSSAmmo" type="number" min="0" value="0"></label><label>鋼材<input id="hdSSSteel" type="number" min="0" value="0"></label><label>ボーキ<input id="hdSSBauxite" type="number" min="0" value="0"></label><label class="hd-ss-wide">メモ<input id="hdSSMemo" placeholder="撤退原因、装備変更など"></label></div><div class="hd-ss-actions"><button type="button" class="primary" data-hd-ss-finish>帰還結果を記録</button><button type="button" class="ghost small" data-hd-ss-cancel>このセッションを破棄</button></div></div><p class="hd-ss-note">出撃中に保存プリセットを切り替えても、このセッションは開始時の編成スナップショットを保持するよ。</p></section>';
+ const r=session.readinessSnapshot||{},unresolved=(r.unresolved||[]).map(function(x){return x.label}).filter(Boolean).join('、'),gate=r.gate||null,gateText=gate?(gate.label+(gate.overridden?'・上書き開始':'')):'',seriesGoal=hdSSSeriesGoal(session.seriesId),seriesGoalText=[seriesGoal.maxCycles?seriesGoal.maxCycles+'周':null,seriesGoal.maxResources?'資源'+seriesGoal.maxResources:null,seriesGoal.maxBuckets?'バケツ'+seriesGoal.maxBuckets:null,seriesGoal.maxElapsedMin?seriesGoal.maxElapsedMin+'分':null,seriesGoal.target?'Drop '+seriesGoal.target:null].filter(Boolean).join(' / ');
+ return '<section class="hd-ss active"><div class="hd-ss-head"><div><div class="eyebrow">SORTIE IN PROGRESS</div><strong>出撃中</strong><span>'+hdSSEsc(session.map)+'｜'+hdSSEsc(session.fleetName)+'</span></div><b>'+hdSSEsc(session.strategyLabel||'手動編成')+'</b></div><div class="hd-ss-active-meta">'+(Number(session.cycleIndex)>1?'<span>連続出撃 第'+Number(session.cycleIndex)+'周</span>':'')+(seriesGoalText?'<span>終了条件 '+hdSSEsc(seriesGoalText)+'</span>':'')+(gateText?'<span>開始判定 '+hdSSEsc(gateText)+'</span>':'')+'<span>開始 '+hdSSEsc(new Date(session.startedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}))+'</span><span>自動 '+(r.autoOk||0)+'/'+(r.autoTotal||0)+'</span><span>手動 '+(r.manualDone||0)+'/'+(r.manualTotal||0)+'</span></div>'+(unresolved?'<p class="hd-ss-warning">開始時の要確認: '+hdSSEsc(unresolved)+'</p>':'')+'<div class="hd-ss-return"><div class="hd-ss-return-head"><strong>帰還結果</strong><span>記録すると既存の出撃ログ・任務連動へ反映</span></div><div class="hd-ss-form"><label>結果<select id="hdSSResult"><option>S</option><option>A</option><option>B</option><option>C</option><option>D</option><option>撤退</option></select></label><label>到達マス<input id="hdSSNode" placeholder="例 ボス / P"></label><label>戦闘数<input id="hdSSBattles" type="number" min="0" max="20" value="1"></label><label class="hd-ss-check"><input id="hdSSBoss" type="checkbox">ボス到達</label><label>ドロップ<input id="hdSSDrop" placeholder="艦名など"></label><label>バケツ<input id="hdSSBuckets" type="number" min="0" value="0"></label><label>燃料<input id="hdSSFuel" type="number" min="0" value="0"></label><label>弾薬<input id="hdSSAmmo" type="number" min="0" value="0"></label><label>鋼材<input id="hdSSSteel" type="number" min="0" value="0"></label><label>ボーキ<input id="hdSSBauxite" type="number" min="0" value="0"></label><label class="hd-ss-wide">メモ<input id="hdSSMemo" placeholder="撤退原因、装備変更など"></label></div><div class="hd-ss-actions"><button type="button" class="primary" data-hd-ss-finish>帰還結果を記録</button><button type="button" class="ghost small" data-hd-ss-cancel>このセッションを破棄</button></div></div><p class="hd-ss-note">出撃中に保存プリセットを切り替えても、このセッションは開始時の編成スナップショットを保持するよ。</p></section>';
 }
 function hdSSHtml(map){const active=hdSSLoad();return active?hdSSActiveHtml(active):hdSSIdleHtml(map)}
 function hdSSRender(){
@@ -364,6 +441,13 @@ window.hdSSPostFleet=hdSSPostFleet;
 window.hdSSPostPreflightState=hdSSPostPreflightState;
 window.hdSSPostPrepareNextRound=hdSSPostPrepareNextRound;
 window.hdSSPostStartNextRound=hdSSPostStartNextRound;
+window.hdSSSeriesGoals=hdSSSeriesGoals;
+window.hdSSSeriesGoal=hdSSSeriesGoal;
+window.hdSSSeriesGoalSave=hdSSSeriesGoalSave;
+window.hdSSSeriesRows=hdSSSeriesRows;
+window.hdSSSeriesProgress=hdSSSeriesProgress;
+window.hdSSSeriesDecision=hdSSSeriesDecision;
+window.hdSSSeriesGoalHtml=hdSSSeriesGoalHtml;
 window.hdSSPostDelta=hdSSPostDelta;
 window.hdSSTelemetry=hdSSTelemetry;
 window.hdSSMap=hdSSMap;
@@ -391,11 +475,13 @@ document.addEventListener('click',function(e){
  if(e.target.closest?.('[data-hd-ss-reprep]')){hdSSPostStartReprepare();return}
  if(e.target.closest?.('[data-hd-ss-next-preflight]')){hdSSPostPrepareNextRound();return}
  if(e.target.closest?.('[data-hd-ss-next-start]')){const session=hdSSPostStartNextRound();if(session&&typeof window.hdSMOpen==='function')setTimeout(()=>window.hdSMOpen(),0);return}
+ const goalSave=e.target.closest?.('[data-hd-ss-goal-save]');if(goalSave){hdSSSeriesGoalSaveFromUi(goalSave.dataset.hdSsGoalSave);return}
+ const goalClear=e.target.closest?.('[data-hd-ss-goal-clear]');if(goalClear){hdSSSeriesGoalSave(goalClear.dataset.hdSsGoalClear,{});hdSSRender();return}
  if(e.target.closest?.('[data-hd-ss-post-recheck]')){hdSSPostRefreshReview();hdSSRender();return}
  if(e.target.closest?.('[data-hd-fe-recheck]')){setTimeout(()=>{hdSSPostRefreshReview();hdSSRender()},140)}
  if(e.target.closest?.('[data-hd-ss-post-clear]')){hdSSPostSave(null);hdSSRender();return}
 });
-window.addEventListener('storage',function(e){if([HD_SS_KEY,'harbordesk-custom-fleets-v1','harbordesk-sortie-selection-v1','harbordesk-sortie-readiness-v1'].includes(e.key))hdSSRender()});
+window.addEventListener('storage',function(e){if([HD_SS_KEY,HD_SS_SERIES_GOALS_KEY,'harbordesk-custom-fleets-v1','harbordesk-sortie-selection-v1','harbordesk-sortie-readiness-v1','harbordesk-sortie-log-v1'].includes(e.key))hdSSRender()});
 window.addEventListener('hd:map-rendered',function(){setTimeout(hdSSRender,0)});
 window.addEventListener('hd:kancolle-sync',function(e){const post=hdSSPostLoad();if(post?.status==='reviewed')hdSSPostRefreshReview(e?.detail);else hdSSPostTryReview(e?.detail);setTimeout(hdSSRender,0)});
 ['hd:equipment-changed','hd:ship-identity-changed'].forEach(function(name){window.addEventListener(name,function(){if(hdSSPostLoad()?.status==='reviewed')hdSSPostRefreshReview();setTimeout(hdSSRender,0)})});
