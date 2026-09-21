@@ -15,6 +15,22 @@ function cfMigrateMasterIds(){
 }
 function cfEsc(s){return typeof esc==='function'?esc(s):String(s)}
 function cfUid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)}
+function cfSyncedDecks(){try{const x=JSON.parse(localStorage.getItem('harbordesk-kancolle-fleets-v1')||'[]');return Array.isArray(x)?x:[]}catch{return []}}
+function cfShipsFromSyncedDeck(deck){
+ return Array.from({length:6},(_,i)=>{
+  const s=deck?.ships?.[i];
+  return {ship:String(s?.name||''),gameShipId:Number(s?.gameShipId)||0,masterId:Number(s?.masterId)||0,level:Number(s?.level)||0,nowHp:Number(s?.nowHp)||0,maxHp:Number(s?.maxHp)||0,cond:s?.cond==null?null:Number(s.cond),gear:String(s?.gear||'')};
+ });
+}
+function cfRelinkFleet(map,id){
+ const target=String(map||''),fleetId=String(id||'');if(!target||!fleetId)return {ok:false,reason:'missing'};
+ const all=loadCustomFleets(),list=all[target]||[],idx=list.findIndex(x=>String(x?.id||'')===fleetId);if(idx<0)return {ok:false,reason:'fleet-missing'};
+ const old=list[idx],deckId=Number(old?.detachedSourceDeckId)||0,deck=cfSyncedDecks().find(x=>Number(x?.deckId)===deckId);
+ if(!deckId||!deck)return {ok:false,reason:'deck-missing',deckId};
+ const next={...old,ships:cfShipsFromSyncedDeck(deck),source:'kancolle-import',sourceDeckId:deckId,sourceSyncedAt:Number(deck.syncedAt)||Date.now(),updatedAt:Date.now()};
+ delete next.detachedFromSource;delete next.detachedAt;delete next.detachedSourceDeckId;delete next.detachedSourceSyncedAt;
+ list[idx]=next;all[target]=list;saveCustomFleets(all);return {ok:true,row:next};
+}
 function cfMergeEditedShips(previous=[],incoming=[]){
  let changed=false;
  const ships=Array.from({length:6},(_,i)=>{
@@ -58,7 +74,7 @@ function ensureCustomFleetDialog(){
       if(idx>=0){
         const old=all[selectedMap][idx],merged=cfMergeEditedShips(old.ships||[],inputShips),next={...old,name,ships:merged.ships,memo,updatedAt:Date.now()};
         if(merged.changed&&old.source==='kancolle-import'){
-          detached=true;next.source='manual';next.detachedFromSource='kancolle-import';next.detachedAt=Date.now();delete next.sourceDeckId;delete next.sourceSyncedAt;
+          detached=true;next.source='manual';next.detachedFromSource='kancolle-import';next.detachedAt=Date.now();next.detachedSourceDeckId=Number(old.sourceDeckId)||0;next.detachedSourceSyncedAt=Number(old.sourceSyncedAt)||0;delete next.sourceDeckId;delete next.sourceSyncedAt;
         }
         all[selectedMap][idx]=next;
       }
@@ -98,7 +114,8 @@ function renderCustomFleets(map){
     const rows=(item.ships||[]).map((s,i)=>{if(!s.ship&&!s.gear)return '';const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(cfShipRef(s),'custom-fleet-thumb'):'';return `<div class="custom-fleet-saved-row"><span>${i+1}</span>${image}<div><b>${cfEsc(s.ship||'未入力')}</b><small>${cfEsc(s.gear||'装備メモなし')}</small></div></div>`}).join('');
     const linked=item.source==='kancolle-import'&&Number(item.sourceDeckId)>0,detached=item.detachedFromSource==='kancolle-import';
     const sourceMeta=linked?`<span class="custom-fleet-source sync">ゲーム同期・第${Number(item.sourceDeckId)}艦隊・自動追従</span>`:detached?'<span class="custom-fleet-source detached">手動編成・ゲーム同期から切り離し</span>':'<span class="custom-fleet-source manual">手動編成</span>';
-    return `<article class="custom-fleet-card" data-cf-id="${item.id}"><div class="custom-fleet-head"><div><strong>${cfEsc(item.name)}</strong><div class="custom-fleet-meta"><span class="muted">${new Date(item.updatedAt||item.createdAt).toLocaleString('ja-JP')} 更新</span>${sourceMeta}</div></div><div class="custom-fleet-actions"><button class="ghost small" data-cf-edit="${item.id}">編集</button><button class="ghost small" data-cf-delete="${item.id}">削除</button></div></div><div class="custom-fleet-saved-list">${rows||'<div class="muted">艦娘はまだ未入力</div>'}</div>${item.memo?`<p class="custom-fleet-memo">${cfEsc(item.memo)}</p>`:''}</article>`;
+    const relink=detached&&Number(item.detachedSourceDeckId)>0?`<button class="ghost small" data-cf-relink="${item.id}">ゲーム同期に戻す</button>`:'';
+    return `<article class="custom-fleet-card" data-cf-id="${item.id}"><div class="custom-fleet-head"><div><strong>${cfEsc(item.name)}</strong><div class="custom-fleet-meta"><span class="muted">${new Date(item.updatedAt||item.createdAt).toLocaleString('ja-JP')} 更新</span>${sourceMeta}</div></div><div class="custom-fleet-actions">${relink}<button class="ghost small" data-cf-edit="${item.id}">編集</button><button class="ghost small" data-cf-delete="${item.id}">削除</button></div></div><div class="custom-fleet-saved-list">${rows||'<div class="muted">艦娘はまだ未入力</div>'}</div>${item.memo?`<p class="custom-fleet-memo">${cfEsc(item.memo)}</p>`:''}</article>`;
   }).join(''):'<div class="muted">この海域の自分用編成はまだ保存されてないよ。</div>';
   host.innerHTML=`<div class="custom-fleet-title"><div><div class="eyebrow">MY FLEET</div><h4>自分用編成</h4></div><button class="primary small" id="addCustomFleet">＋ 編成を保存</button></div>${saved}`;
   if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
@@ -113,6 +130,8 @@ document.addEventListener('change',e=>{
 });
 
 document.addEventListener('click',e=>{
+  const relink=e.target.closest('[data-cf-relink]');
+  if(relink&&selectedMap){const result=cfRelinkFleet(selectedMap,relink.dataset.cfRelink);if(result.ok){renderCustomFleets(selectedMap);window.hdToast?.('最新のゲーム同期艦隊へ戻したよ')}else window.hdToast?.('同期元の現在艦隊が見つからないよ。先にゲーム同期してね','warn');return}
   const edit=e.target.closest('[data-cf-edit]');
   if(edit&&selectedMap){const item=(loadCustomFleets()[selectedMap]||[]).find(x=>x.id===edit.dataset.cfEdit);if(item)openCustomFleetDialog(item);return}
   const del=e.target.closest('[data-cf-delete]');
@@ -130,3 +149,5 @@ window.addEventListener('hd:ship-images-changed',()=>{if(typeof selectedMap!=='u
 window.addEventListener('hd:ship-images-ready',()=>{if(typeof selectedMap!=='undefined'&&selectedMap)renderCustomFleets(selectedMap)});
 
 window.cfMergeEditedShips=cfMergeEditedShips;
+
+window.cfRelinkFleet=cfRelinkFleet;
