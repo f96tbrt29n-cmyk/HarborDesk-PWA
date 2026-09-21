@@ -15,3 +15,12 @@
  #equipmentBook .equipment-ledger-toolbar input,#equipmentBook .equipment-ledger-toolbar button{min-height:42px}
  .advanced-head-actions{gap:6px}
 }
+
+.equipment-source-filters{display:flex;gap:8px;overflow:auto;padding:2px 0}
+.equipment-source-filters .guide-chip{white-space:nowrap}
+.equipment-card-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:3px}
+.equipment-source-badge{font-size:10px;padding:3px 7px;border-radius:999px;border:1px solid var(--line)}
+.equipment-source-badge.sync{background:#16372b;border-color:#2d6a4d;color:#b9efcf}
+.equipment-source-badge.manual{background:#2f2a1d;border-color:#655636;color:#f3d99a}
+.equipment-source-badge.plan{background:#1d2f48;border-color:#365f88;color:#b9dcff}
+@media(max-width:620px){.equipment-source-filters{position:sticky;top:calc(var(--hd-topbar-h,58px) + 112px);z-index:5;padding:6px 4px;background:linear-gradient(180deg,rgba(7,21,33,.98),rgba(7,21,33,.9))}}
