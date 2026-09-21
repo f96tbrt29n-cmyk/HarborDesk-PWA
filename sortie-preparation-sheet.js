@@ -200,6 +200,7 @@ document.addEventListener('click',e=>{
 });
 window.addEventListener('hd:map-rendered',()=>{hdSPSMapButton();hdSPSRender()});
 window.addEventListener('hd:kancolle-sync',hdSPSRender);
+window.addEventListener('hd:custom-fleets-changed',hdSPSRender);
 window.addEventListener('hd:workspace-refresh',hdSPSRender);
 window.addEventListener('hd:ship-images-changed',hdSPSRender);
 window.addEventListener('hd:ship-images-ready',hdSPSRender);
