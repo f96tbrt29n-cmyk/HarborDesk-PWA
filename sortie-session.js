@@ -360,6 +360,10 @@ window.hdSSPostRefreshReview=hdSSPostRefreshReview;
 window.hdSSPostQueueBuild=hdSSPostQueueBuild;
 window.hdSSPostQueueSummary=hdSSPostQueueSummary;
 window.hdSSPostStartReprepare=hdSSPostStartReprepare;
+window.hdSSPostFleet=hdSSPostFleet;
+window.hdSSPostPreflightState=hdSSPostPreflightState;
+window.hdSSPostPrepareNextRound=hdSSPostPrepareNextRound;
+window.hdSSPostStartNextRound=hdSSPostStartNextRound;
 window.hdSSPostDelta=hdSSPostDelta;
 window.hdSSTelemetry=hdSSTelemetry;
 window.hdSSMap=hdSSMap;
@@ -385,6 +389,8 @@ document.addEventListener('click',function(e){
  if(e.target.closest?.('[data-hd-ss-post-sync]')){if(typeof hdWSShowElement==='function')hdWSShowElement('kancolleImport',true);else document.getElementById('kancolleImport')?.scrollIntoView({behavior:'smooth',block:'start'});return}
  const postFix=e.target.closest?.('[data-hd-ss-post-fix]');if(postFix){if(typeof hdFEOpenFix==='function')hdFEOpenFix(postFix.dataset.hdSsPostFix);return}
  if(e.target.closest?.('[data-hd-ss-reprep]')){hdSSPostStartReprepare();return}
+ if(e.target.closest?.('[data-hd-ss-next-preflight]')){hdSSPostPrepareNextRound();return}
+ if(e.target.closest?.('[data-hd-ss-next-start]')){const session=hdSSPostStartNextRound();if(session&&typeof window.hdSMOpen==='function')setTimeout(()=>window.hdSMOpen(),0);return}
  if(e.target.closest?.('[data-hd-ss-post-recheck]')){hdSSPostRefreshReview();hdSSRender();return}
  if(e.target.closest?.('[data-hd-fe-recheck]')){setTimeout(()=>{hdSSPostRefreshReview();hdSSRender()},140)}
  if(e.target.closest?.('[data-hd-ss-post-clear]')){hdSSPostSave(null);hdSSRender();return}
