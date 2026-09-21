@@ -95,7 +95,7 @@ function hdShowNodeInfo(map,label){
   const branch=hdNodeBranchText(map,label,links.next,override);
   const source=override.source?`<div class="hd-node-source">データ出典: ${hdEscAdv(override.source)}</div>`:'';
   host.innerHTML=`<div class="eyebrow">MAP NODE DETAIL</div>
-    <div class="hd-map-node-info-title"><strong>${hdEscAdv(label)}</strong><span>${hdEscAdv(info.label)}</span></div>
+    <div class="hd-map-node-info-title"><strong>${hdEscAdv(label==='START'?'出撃地点':label)}</strong><span>${hdEscAdv(info.label)}</span></div>
     <p class="hd-node-summary">${hdEscAdv(info.hint)}</p>
     <div class="hd-node-detail-grid">
       <div><span>進入元</span><strong>${hdEscAdv(prev)}</strong></div>
@@ -111,7 +111,7 @@ function hdShowNodeInfo(map,label){
 }
 function hdShortestPath(map){
   const g=hdInteractiveGraph(map);if(!g)return [];
-  const starts=[...new Set(g.edges.flat())].filter(x=>x==='S'||x==='S1'||x==='S2');
+  const starts=typeof window.hdMapStartLabels==='function'?window.hdMapStartLabels(g):[...new Set(g.edges.map(x=>x[0]).filter(Boolean))];
   const target=g.boss||g.goal;if(!target)return [];
   const q=starts.map(s=>[s,[s]]),seen=new Set(starts);
   while(q.length){const [n,path]=q.shift();if(n===target)return path;for(const [a,b] of g.edges){if(a===n&&!seen.has(b)){seen.add(b);q.push([b,[...path,b]])}}}
@@ -124,7 +124,7 @@ function hdHighlightShortest(map){
   const paths=[...(pane?.querySelectorAll('.hd-map-route')||[])],g=hdInteractiveGraph(map);if(!g)return;
   const wanted=new Set(path.slice(0,-1).map((a,i)=>`${a}>${path[i+1]}`));
   paths.forEach((el,i)=>{const edge=g.edges[i];if(edge&&wanted.has(`${edge[0]}>${edge[1]}`))el.classList.add('highlight')});
-  const host=hdEnsureNodeInfoHost();if(host)host.innerHTML=`<div class="eyebrow">ROUTE GUIDE</div><div class="hd-map-node-info-title"><strong>${hdEscAdv(path.join(' → '))}</strong><span>構造上の最短経路</span></div><p>これはグラフ上の最短経路表示で、実際の固定条件や推奨編成を保証するものではないよ。出撃前に「ルート」タブも確認してね。</p>${hdAdvancedHtml(map)}<div class="hd-node-actions"><button class="ghost small" type="button" data-open-route-tab>ルート条件を見る</button></div>`;
+  const host=hdEnsureNodeInfoHost();if(host)host.innerHTML=`<div class="eyebrow">ROUTE GUIDE</div><div class="hd-map-node-info-title"><strong>${hdEscAdv(path.map(x=>x==='START'?'出撃':x).join(' → '))}</strong><span>構造上の最短経路</span></div><p>これはグラフ上の最短経路表示で、実際の固定条件や推奨編成を保証するものではないよ。出撃前に「ルート」タブも確認してね。</p>${hdAdvancedHtml(map)}<div class="hd-node-actions"><button class="ghost small" type="button" data-open-route-tab>ルート条件を見る</button></div>`;
 }
 function hdOpenRouteTab(){
   const btn=document.querySelector('[data-map-tab="route"]');if(!btn)return;
