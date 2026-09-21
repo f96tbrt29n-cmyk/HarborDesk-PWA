@@ -42,3 +42,5 @@
 
 [data-roster-reset]:disabled{opacity:.42}
 [data-roster-reset].is-active{border-color:#d9b45b;background:#3b2f16;color:#ffe9a8}
+
+.roster-source-filters{display:flex;gap:8px;overflow:auto;padding:2px 0}.roster-source-badge{font-size:10px!important;padding:3px 7px!important;border-radius:999px!important}.roster-source-badge.sync{background:#16372b!important;border-color:#2d6a4d!important;color:#b9efcf!important}.roster-source-badge.manual{background:#2f2a1d!important;border-color:#655636!important;color:#f3d99a!important}@media(max-width:620px){.roster-source-filters{position:sticky;top:calc(var(--hd-topbar-h,58px) + 194px);z-index:5;padding:6px 4px;background:linear-gradient(180deg,rgba(7,21,33,.98),rgba(7,21,33,.9))}.roster-section .roster-filters{top:calc(var(--hd-topbar-h,58px) + 240px)}}
