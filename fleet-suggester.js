@@ -26,6 +26,14 @@ const HD_FS_TYPE_ALIASES={
 function hdFSEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function hdFSMap(){return typeof selectedMap!=='undefined'?selectedMap:''}
 function hdFSRoster(){try{return typeof rosterLoad==='function'?rosterLoad():JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')}catch(e){return []}}
+function hdFSSyncMeta(){
+ try{
+  const roster=hdFSRoster(),equip=JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]'),sync=JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null');
+  const gameShips=roster.filter(function(x){return x&&x.source==='kancolle-import'&&Number(x.gameShipId)>0});
+  const gameEquip=(Array.isArray(equip)?equip:[]).filter(function(x){return x&&x.source==='kancolle-import'});
+  return {sync:sync,ships:gameShips.length,equipmentRows:gameEquip.length,equipmentItems:gameEquip.reduce(function(sum,x){return sum+Math.max(0,Number(x.count)||0)},0)};
+ }catch(e){return {sync:null,ships:0,equipmentRows:0,equipmentItems:0}}
+}
 function hdFSDbFor(input){var row=typeof input==='object'?input:null,n=String(row?.name||input||'').trim();if(!n)return null;if(typeof hdShipDbResolveShip==='function')return hdShipDbResolveShip({name:n,masterId:Number(row?.masterId)||0});if(typeof HD_SHIP_DATABASE==='undefined')return null;return HD_SHIP_DATABASE.find(function(x){return n===x.base||n===x.final||n.startsWith(x.base)})||null}
 function hdFSType(row){if(row&&row.type)return row.type;var db=hdFSDbFor(row);return db&&db.type||''}
 function hdFSProfile(row){var db=hdFSDbFor(row),type=hdFSType(row),roles=db&&db.roles||[],tags=row.tags||[],master=db&&db._masterOnly?db._masterRow:null;return {row:row,db:db,master:master,type:type,roles:roles,tags:tags,level:Number(row.level)||0,speed:db&&db.speed||((type==='高速戦艦')?'高速':''),masterBacked:!!db}}
@@ -99,7 +107,8 @@ function hdFSRender(){
  if(!map){if(label)label.textContent='海域未選択';host.innerHTML='<div class="empty">海域を選ぶと、艦隊台帳から編成候補を作るよ。</div>';return}
  if(label)label.textContent=map;var roster=hdFSRoster();
  if(!roster.length){host.innerHTML='<div class="empty">艦隊台帳が空だよ。艦娘を登録すると、Lv・艦種・役割から候補を自動生成できる。</div><button type="button" class="primary small" data-hd-fs-roster>艦隊台帳を開く</button>';return}
- var plans=hdFSPlans(map);host.innerHTML='<div class="hd-fs-summary"><div><strong>'+hdFSEsc(map)+' 自動編成候補</strong><span>艦隊台帳 '+roster.length+'隻から、詳細DB＋全865形態マスターで艦種・速力・役割を補完</span></div><button type="button" class="ghost small" data-hd-fs-refresh>再生成</button></div><div class="hd-fs-list">'+plans.map(hdFSSuggestionHtml).join('')+'</div><p class="hd-fs-note">※候補艦の艦種・速力・通常スロット/装備可否は公式マスターで補完。ルート固定・ランダム分岐、索敵スコア、イベント特効・札は出撃準備表と海域攻略情報で最終確認してね。</p>';
+ var plans=hdFSPlans(map),sync=hdFSSyncMeta(),syncText=(sync.ships||sync.equipmentItems)?'｜艦これ同期 '+sync.ships+'隻 / 装備'+sync.equipmentRows+'種類・'+sync.equipmentItems+'個':'';
+ host.innerHTML='<div class="hd-fs-summary"><div><strong>'+hdFSEsc(map)+' 自動編成候補</strong><span>艦隊台帳 '+roster.length+'隻から、詳細DB＋全865形態マスターで艦種・速力・役割を補完'+syncText+'</span></div><button type="button" class="ghost small" data-hd-fs-refresh>再生成</button></div><div class="hd-fs-list">'+plans.map(hdFSSuggestionHtml).join('')+'</div><p class="hd-fs-note">※候補艦の艦種・速力・通常スロット/装備可否は公式マスターで補完。ルート固定・ランダム分岐、索敵スコア、イベント特効・札は出撃準備表と海域攻略情報で最終確認してね。</p>';
  if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
 }
 function hdFSEnsure(){
@@ -108,7 +117,7 @@ function hdFSEnsure(){
 }
 function hdFSSave(index){
  var map=hdFSMap(),s=hdFSPlans(map)[Number(index)];if(!map||!s)return;var all=typeof loadCustomFleets==='function'?loadCustomFleets():{};all[map]=all[map]||[];
- var name=map+' 自動提案｜'+(s.preset.name||('候補'+(s.index+1))),ships=Array.from({length:6},function(_,i){var slot=s.slots[i],p=slot&&slot.profile,r=p&&p.row,mid=Number(r&&r.masterId)||Number(p&&p.master&&p.master.id)||Number(typeof hdShipImageResolve==='function'&&r?.name?hdShipImageResolve(r.name)?.id:0)||0;return {ship:r&&r.name||'',masterId:mid,gear:r&&r.gear||''}});
+ var name=map+' 自動提案｜'+(s.preset.name||('候補'+(s.index+1))),ships=Array.from({length:6},function(_,i){var slot=s.slots[i],p=slot&&slot.profile,r=p&&p.row,mid=Number(r&&r.masterId)||Number(p&&p.master&&p.master.id)||Number(typeof hdShipImageResolve==='function'&&r?.name?hdShipImageResolve(r.name)?.id:0)||0;return {ship:r&&r.name||'',masterId:mid,gameShipId:Number(r&&r.gameShipId)||0,gear:r&&r.gear||''}});
  var memo='HarborDesk自動提案。'+(s.preset.use||'通常攻略')+'。アプリ内編成例を基にした候補で、ルート固定を保証しません。';
  var old=all[map].find(function(x){return x.name===name}),id=old&&old.id||(typeof cfUid==='function'?cfUid():'fs-'+Date.now()+'-'+Math.random().toString(16).slice(2));
  var item={id:id,name:name,ships:ships,memo:memo,createdAt:old&&old.createdAt||Date.now(),updatedAt:Date.now()};all[map]=old?all[map].map(function(x){return x.id===id?item:x}):all[map].concat(item);
@@ -127,6 +136,9 @@ document.addEventListener('click',function(e){
 });
 window.addEventListener('storage',function(e){if(['harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-custom-fleets-v1'].includes(e.key))hdFSRender()});
 window.addEventListener('hd:workspace-refresh',hdFSRender);
+window.addEventListener('hd:kancolle-sync',hdFSRender);
+window.addEventListener('hd:ship-identity-changed',hdFSRender);
+window.addEventListener('hd:equipment-changed',hdFSRender);
 window.addEventListener('hd:ship-images-changed',hdFSRender);
 window.addEventListener('hd:ship-images-ready',hdFSRender);
 window.addEventListener('hd:map-rendered',function(){hdFSMapButton();hdFSRender()});
