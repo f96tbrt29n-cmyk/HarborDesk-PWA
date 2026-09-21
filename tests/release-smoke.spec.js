@@ -232,6 +232,54 @@ test('release smoke: game sync fills ship and equipment ledgers from latest snap
 });
 
 
+test('release smoke: synced roster and inventory feed fleet planning without reload', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFSSyncMeta === 'function' &&
+    typeof window.hdFLInventoryStats === 'function' &&
+    typeof window.hdSPSRosterMatchShip === 'function' &&
+    typeof window.hdFSRender === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      { id:'a', name:'睦月', masterId:1, gameShipId:701, type:'駆逐艦', level:10, source:'kancolle-import', gear:'' },
+      { id:'b', name:'睦月', masterId:1, gameShipId:702, type:'駆逐艦', level:80, source:'kancolle-import', gear:'' }
+    ]));
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      { id:'e1', name:'12cm単装砲', masterEquipId:1, star:0, count:4, source:'kancolle-import' },
+      { id:'e2', name:'12cm単装砲', masterEquipId:1, star:2, count:3, source:'kancolle-import' }
+    ]));
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({ syncedAt:Date.now(), ships:2, equipmentRows:2, equipmentItems:7 }));
+    selectedWorld='1';
+    selectedMap='1-1';
+    if (typeof hdFSEnsure === 'function') hdFSEnsure();
+    window.dispatchEvent(new CustomEvent('hd:kancolle-sync', { detail:{ ships:2, equipmentItems:7 } }));
+    const exact=hdSPSRosterMatchShip({ ship:'睦月', masterId:1, gameShipId:702 });
+    return {
+      sync: hdFSSyncMeta(),
+      inventory: hdFLInventoryStats(),
+      exactGameShipId: Number(exact?.gameShipId)||0,
+      exactLevel: Number(exact?.level)||0,
+      summary: document.getElementById('hdFleetSuggesterBody')?.textContent || ''
+    };
+  });
+
+  expect(data.sync).toMatchObject({ ships:2, equipmentRows:2, equipmentItems:7 });
+  expect(data.inventory).toMatchObject({ rows:2, items:7, syncedRows:2, syncedItems:7 });
+  expect(data.exactGameShipId).toBe(702);
+  expect(data.exactLevel).toBe(80);
+  expect(data.summary).toContain('艦これ同期 2隻 / 装備2種類・7個');
+
+  const generate = page.locator('[data-hd-fl-generate]').first();
+  await expect(generate).toBeVisible();
+  await generate.click();
+  await expect(page.locator('.hd-fl-summary').first()).toContainText('装備台帳 2種類・7個');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -241,8 +289,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.381'");
-  expect(source).toContain("const HD_APP_BUILD=381");
+  expect(source).toContain("const HD_APP_VERSION='1.0.382'");
+  expect(source).toContain("const HD_APP_BUILD=382");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -265,9 +313,9 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=381`);
+    expect(data.index).toContain(`${asset}?v=382`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=381");
+  expect(data.updater).toContain("const HD_APP_BUILD=382");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
@@ -1524,17 +1572,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=381',
-      'map-images.js?v=381',
-      'map-tabs.js?v=381',
-      'map-interactive.js?v=381',
-      'map-advanced-data.js?v=381'
+      'map-details.js?v=382',
+      'map-images.js?v=382',
+      'map-tabs.js?v=382',
+      'map-interactive.js?v=382',
+      'map-advanced-data.js?v=382'
     ];
     const requiredStyles = [
-      'map-details.css?v=381',
-      'map-tabs.css?v=381',
-      'map-images.css?v=381',
-      'map-interactive.css?v=381'
+      'map-details.css?v=382',
+      'map-tabs.css?v=382',
+      'map-images.css?v=382',
+      'map-interactive.css?v=382'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -1576,7 +1624,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=381');
+  expect(src).toBe('app.js?v=382');
   expect(errors).toEqual([]);
 });
 
