@@ -338,15 +338,35 @@ function hdFEFixFlowState(auto){
  const check=(auto?.checks||[]).find(x=>String(x.id)===String(flow.id))||null,status=String(check?.status||'manual'),resolved=status==='ready',changed=!!flow.beforeStatus&&flow.beforeStatus!==status;
  return {...flow,currentStatus:status,currentDetail:String(check?.detail||''),currentLabel:String(check?.label||flow.label||''),resolved,changed};
 }
+function hdFEFixQueueState(auto){
+ const flow=hdFEFixFlowState(auto),gate=hdFEGoNoGo(auto||{}),remaining=[...(gate.actions||[])],next=flow?.resolved?(remaining[0]||null):(remaining.find(x=>String(x.id)===String(flow?.id))||remaining[0]||null);
+ return {flow,gate,remaining,next,complete:gate.state==='go'&&remaining.length===0};
+}
 function hdFEFixFlowHtml(auto){
- const flow=hdFEFixFlowState(auto);if(!flow)return '';
- const info=hdFEFixActionInfo(flow.id),label=flow.currentLabel||flow.label||flow.id;
- if(flow.resolved)return `<div class="hd-fe-fix-return resolved"><div><b>修正反映済み ✓</b><span>${hdFEEsc(label)} がOKになったよ。次の判定へ進める。</span></div><div><button type="button" class="primary small" data-hd-fe-recheck>次を再判定</button><button type="button" class="ghost small" data-hd-fe-fix-dismiss>閉じる</button></div></div>`;
+ const queue=hdFEFixQueueState(auto),flow=queue.flow;if(!flow)return '';
+ const info=hdFEFixActionInfo(flow.id),label=flow.currentLabel||flow.label||flow.id,remaining=queue.remaining.length;
+ if(flow.resolved){
+  if(queue.complete)return `<div class="hd-fe-fix-return resolved complete"><div><b>修正キュー完了 ✓</b><span>${hdFEEsc(label)} もOK。自動判定の未解決項目はなくなったよ。</span></div><div><button type="button" class="primary small" data-hd-fe-fix-finish>出撃準備OKを確認</button><button type="button" class="ghost small" data-hd-fe-fix-dismiss>閉じる</button></div></div>`;
+  const next=queue.next,nextInfo=next?hdFEFixActionInfo(next.id):null;
+  return `<div class="hd-fe-fix-return resolved"><div><b>修正反映済み ✓</b><span>${hdFEEsc(label)} がOK。修正キュー残り ${remaining}件${next?'｜次: '+hdFEEsc(next.action):''}</span></div><div>${next?`<button type="button" class="primary small" data-hd-fe-fix-next="${hdFEEsc(next.id)}">${hdFEEsc(nextInfo?.label||'次の修正へ')}</button>`:''}<button type="button" class="ghost small" data-hd-fe-recheck>判定を見る</button><button type="button" class="ghost small" data-hd-fe-fix-dismiss>閉じる</button></div></div>`;
+ }
  const changedText=flow.changed?`状態が ${hdFEAutoStatusLabel(flow.beforeStatus)} → ${hdFEAutoStatusLabel(flow.currentStatus)} に変化`:`現在も ${hdFEAutoStatusLabel(flow.currentStatus)}`;
- return `<div class="hd-fe-fix-return pending"><div><b>${hdFEEsc(info.label)} の修正確認</b><span>${hdFEEsc(label)}｜${hdFEEsc(changedText)}${flow.currentDetail?'｜'+hdFEEsc(flow.currentDetail):''}</span></div><div><button type="button" class="primary small" data-hd-fe-recheck>再判定</button><button type="button" class="ghost small" data-hd-fe-fix-dismiss>閉じる</button></div></div>`;
+ return `<div class="hd-fe-fix-return pending"><div><b>${hdFEEsc(info.label)} の修正確認</b><span>${hdFEEsc(label)}｜${hdFEEsc(changedText)}${flow.currentDetail?'｜'+hdFEEsc(flow.currentDetail):''}｜修正キュー残り ${remaining}件</span></div><div><button type="button" class="primary small" data-hd-fe-recheck>再判定</button><button type="button" class="ghost small" data-hd-fe-fix-dismiss>閉じる</button></div></div>`;
 }
 function hdFERecheckFixFlow(){
  try{if(typeof hdSPSOpen==='function')hdSPSOpen();else if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true)}catch{}
+ setTimeout(()=>{try{if(typeof hdSPSRender==='function')hdSPSRender()}catch{}setTimeout(()=>document.querySelector('.hd-fe-gate')?.scrollIntoView({behavior:'smooth',block:'start'}),50)},40);
+ return true;
+}
+function hdFEAdvanceFixFlow(id,auto=null){
+ auto=auto||window.__hdFELastAuto||null;
+ const queue=hdFEFixQueueState(auto);if(!queue.flow?.resolved)return false;
+ const nextId=String(id||queue.next?.id||'');if(nextId)return hdFEOpenFix(nextId,auto);
+ return hdFEFinishFixFlow();
+}
+function hdFEFinishFixFlow(){
+ hdFEFixFlowSave(null);
+ try{if(typeof hdSPSOpen==='function')hdSPSOpen()}catch{}
  setTimeout(()=>{try{if(typeof hdSPSRender==='function')hdSPSRender()}catch{}setTimeout(()=>document.querySelector('.hd-fe-gate')?.scrollIntoView({behavior:'smooth',block:'start'}),50)},40);
  return true;
 }
@@ -453,6 +473,8 @@ function hdFEInstall(){
 }
 document.addEventListener('click',e=>{
  const fix=e.target.closest?.('[data-hd-fe-fix]');if(fix){hdFEOpenFix(fix.dataset.hdFeFix);return}
+ const next=e.target.closest?.('[data-hd-fe-fix-next]');if(next){hdFEAdvanceFixFlow(next.dataset.hdFeFixNext);return}
+ if(e.target.closest?.('[data-hd-fe-fix-finish]')){hdFEFinishFixFlow();return}
  if(e.target.closest?.('[data-hd-fe-recheck]')){hdFERecheckFixFlow();return}
  if(e.target.closest?.('[data-hd-fe-fix-dismiss]')){hdFEFixFlowSave(null);try{if(typeof hdSPSRender==='function')hdSPSRender()}catch{}return}
  if(e.target.closest?.('[data-hd-fe-calculator]')){
@@ -467,9 +489,12 @@ window.hdFEOpenFix=hdFEOpenFix;
 window.hdFEStartFixFlow=hdFEStartFixFlow;
 window.hdFEFixFlowLoad=hdFEFixFlowLoad;
 window.hdFEFixFlowState=hdFEFixFlowState;
+window.hdFEFixQueueState=hdFEFixQueueState;
 window.hdFEFixFlowSave=hdFEFixFlowSave;
 window.hdFEGateHtml=hdFEGateHtml;
 window.hdFERecheckFixFlow=hdFERecheckFixFlow;
+window.hdFEAdvanceFixFlow=hdFEAdvanceFixFlow;
+window.hdFEFinishFixFlow=hdFEFinishFixFlow;
 ['hd:kancolle-sync','hd:equipment-changed','hd:ship-identity-changed'].forEach(evt=>window.addEventListener(evt,hdFERefreshPendingFix));
 window.addEventListener('load',()=>setTimeout(()=>{if(!hdFEInstall())setTimeout(hdFEInstall,500)},720));
 hdFEInstall();
