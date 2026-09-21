@@ -191,6 +191,13 @@ function hdKcMergeRoster(parsed){
  window.dispatchEvent(new CustomEvent('hd:ship-identity-changed',{detail:{source:'kancolle-import',ships:parsed.ships.size}}));
  return next.filter(x=>x.source==='kancolle-import').length;
 }
+function hdKcEquipmentHasUserPlan(row){
+ if(!row||typeof row!=='object')return false;
+ const source=String(row.source||'');
+ const memo=String(row.memo||'').trim(),assigned=String(row.assigned||'').trim();
+ const star=Math.max(0,Number(row.star)||0),target=Number.isFinite(Number(row.targetStar))?Math.max(0,Number(row.targetStar)):star;
+ return source!=='kancolle-import'||!!memo||!!assigned||target!==star;
+}
 function hdKcMergeEquipment(parsed){
  const equipMap=hdKcMasterEquipMap(),idByName=new Map([...equipMap.values()].map(x=>[String(x.name||''),Number(x.id)||0])),existing=(()=>{try{const x=JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]');return Array.isArray(x)?x:[]}catch{return []}})();
  const rowKey=row=>`${Number(row?.masterEquipId)||idByName.get(String(row?.name||''))||0}@@${Math.max(0,Number(row?.star)||0)}`,meta=new Map();
@@ -227,6 +234,11 @@ function hdKcMergeEquipment(parsed){
  }
  if(!parsed.completeSlotItems){
   for(const row of existing){const key=rowKey(row);if(!represented.has(key)&&!changedOldKeys.has(key))next.push(row)}
+ }else{
+  for(const row of existing){
+   const key=rowKey(row);if(represented.has(key)||!hdKcEquipmentHasUserPlan(row))continue;
+   next.push({...row,count:0,source:'equipment-plan',syncMissing:true,lastOwnedCount:Math.max(0,Number(row?.count)||0),syncedAt:Date.now(),proficiency:{}});
+  }
  }
 
  if(typeof hdSave==='function')hdSave('harbordesk-equipment-v1',next);else{localStorage.setItem('harbordesk-equipment-v1',JSON.stringify(next));window.dispatchEvent(new CustomEvent('hd:equipment-changed'))}
@@ -726,6 +738,7 @@ window.hdKcPreviewData=hdKcPreviewData;
 window.hdKcApplyImport=hdKcApplyImport;
 window.hdKcMergeRoster=hdKcMergeRoster;
 window.hdKcMergeEquipment=hdKcMergeEquipment;
+window.hdKcEquipmentHasUserPlan=hdKcEquipmentHasUserPlan;
 window.hdKcCurrentFleets=hdKcCurrentFleets;
 window.hdKcCopyFleetToCustom=hdKcCopyFleetToCustom;
 window.hdKcPrepareCurrentFleet=hdKcPrepareCurrentFleet;
