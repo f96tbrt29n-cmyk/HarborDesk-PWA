@@ -1057,6 +1057,81 @@ test('release smoke: post-sortie review summarizes telemetry deltas and links in
 });
 
 
+test('release smoke: post-sortie review is persisted into its sortie log entry', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdSSAttachReviewToLog === 'function');
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify([
+      { id:'entry-1', sessionId:'session-1', at:100, map:'2-5', result:'S', fleetId:'fleet-a', strategy:'stable' }
+    ]));
+    const ok = window.hdSSAttachReviewToLog({
+      entryId:'entry-1', sessionId:'session-1', reviewedAt:250, syncAt:240,
+      review:{
+        gate:{state:'hold',label:'要確認',detail:'補給して再判定'},
+        delta:{
+          changed:true,
+          ships:[{name:'赤城',hpBefore:80,hpAfter:52,hpLoss:28,statusBefore:'ready',statusAfter:'caution'}],
+          fuelUsed:20,ammoUsed:22,supplyKnown:6,airBefore:300,airAfter:255,airLoss:45,
+          depletedBefore:0,depletedAfter:2,depletedAdded:2,newBlocked:0,newCaution:1,newSupply:2
+        },
+        live:{status:'partial',blocked:0,caution:1},
+        supply:{status:'partial',empty:0,low:2},
+        air:{status:'partial',ours:255,enemy:180,depletedSlots:2}
+      }
+    });
+    const row = JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]')[0];
+    return {ok,row};
+  });
+
+  expect(data.ok).toBe(true);
+  expect(data.row.postSortieReview.reviewedAt).toBe(250);
+  expect(data.row.postSortieReview.gate.state).toBe('hold');
+  expect(data.row.postSortieReview.delta.fuelUsed).toBe(20);
+  expect(data.row.postSortieReview.delta.airLoss).toBe(45);
+  expect(data.row.postSortieReview.delta.ships[0]).toMatchObject({name:'赤城',hpLoss:28,statusAfter:'caution'});
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: performance analytics learns from post-sortie telemetry', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSPAPostTelemetry === 'function' &&
+    typeof window.hdSPARecommendations === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const rows = [
+      { postSortieReview:{ gate:{state:'hold'}, delta:{ships:[{hpLoss:20}],fuelUsed:18,ammoUsed:20,supplyKnown:6,airBefore:300,airAfter:260,airLoss:40,depletedAdded:2} } },
+      { postSortieReview:{ gate:{state:'go'}, delta:{ships:[],fuelUsed:12,ammoUsed:14,supplyKnown:6,airBefore:300,airAfter:295,airLoss:5,depletedAdded:0} } }
+    ];
+    const post = window.hdSPAPostTelemetry(rows);
+    const recs = window.hdSPARecommendations({
+      metrics:{postTelemetry:post},
+      trend:{ready:false},
+      retreatReasonStats:{items:[]}
+    });
+    return {post,recs};
+  });
+
+  expect(data.post.reviewed).toBe(2);
+  expect(data.post.coverageRate).toBe(100);
+  expect(data.post.damageRate).toBe(50);
+  expect(data.post.avgHpLoss).toBe(10);
+  expect(data.post.avgFuelUsed).toBe(15);
+  expect(data.post.avgAmmoUsed).toBe(17);
+  expect(data.post.avgAirLoss).toBe(22.5);
+  expect(data.post.avgDepletedAdded).toBe(1);
+  expect(data.post.needsFixRate).toBe(50);
+  expect(data.recs.map(x=>x.id)).toContain('post-damage');
+  expect(data.recs.map(x=>x.id)).toContain('post-fix');
+  expect(data.recs.map(x=>x.id)).toContain('post-aircraft');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
