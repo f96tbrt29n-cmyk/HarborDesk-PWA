@@ -1132,6 +1132,102 @@ test('release smoke: performance analytics learns from post-sortie telemetry', a
 });
 
 
+test('release smoke: synced game result auto-finishes an active sortie session without a duplicate log', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSSSave === 'function' &&
+    typeof window.hdSSLoad === 'function' &&
+    typeof window.hdSSIngestGameSortie === 'function' &&
+    typeof window.hdSLLoad === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const now = Date.now();
+    localStorage.setItem('harbordesk-sortie-log-v1','[]');
+    window.hdSSPostSave?.(null);
+    window.hdSSSave({
+      id:'session-auto-1',map:'2-5',startedAt:now-60000,
+      fleetId:'fleet-a',fleetName:'自動編成',strategy:'stable',strategyLabel:'安定重視',
+      fleetSnapshot:{id:'fleet-a',name:'自動編成',ships:[]},readinessSnapshot:{},
+      telemetrySnapshot:null,shipCount:6,status:'active'
+    });
+    const entry = window.hdSSIngestGameSortie({
+      map:'2-5',startedAt:now-30000,node:'O ボス',result:'S',boss:true,retreat:false,battles:4,drop:'浦波',
+      gameSortieKey:'kc-auto-1',gameNodeNo:15,gameNodeLabel:'O',gameBossCellNo:15,gameBossCellLabel:'O',
+      gameRouteNodes:[1,3,6,15],gameRouteLabels:['A','C','F','O'],
+      gameBattleResults:[{nodeNo:15,nodeLabel:'O',rank:'S',drop:'浦波'}]
+    });
+    const logs=window.hdSLLoad(),post=window.hdSSPostLoad?.();
+    return {entry,logs,active:window.hdSSLoad(),post};
+  });
+
+  expect(data.active).toBeNull();
+  expect(data.logs).toHaveLength(1);
+  expect(data.entry.id).toBe(data.logs[0].id);
+  expect(data.logs[0]).toMatchObject({
+    sessionId:'session-auto-1',source:'session-game',result:'S',boss:true,retreat:false,
+    battles:4,drop:'浦波',gameSortieKey:'kc-auto-1'
+  });
+  expect(data.logs[0].gameRouteLabels).toEqual(['A','C','F','O']);
+  expect(data.post.status).toBe('awaiting-sync');
+  expect(data.post.gameMatched).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: game sync merges into a just-finished session log instead of creating another entry', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSSIngestGameSortie === 'function' &&
+    typeof window.hdSSPostSave === 'function' &&
+    typeof window.hdSLLoad === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const now=Date.now();
+    localStorage.setItem('harbordesk-sortie-log-v1',JSON.stringify([{
+      id:'entry-manual-1',sessionId:'session-manual-1',map:'2-5',startedAt:now-90000,
+      at:now-10000,result:'A',boss:false,retreat:false,battles:3,drop:'',
+      fleetId:'fleet-a',fleetName:'自動編成',strategy:'stable',source:'session'
+    }]));
+    window.hdSSSave?.(null);
+    window.hdSSPostSave({
+      version:1,status:'awaiting-sync',sessionId:'session-manual-1',map:'2-5',
+      fleetId:'fleet-a',fleetName:'自動編成',finishedAt:now-10000,entryId:'entry-manual-1',
+      fleetSnapshot:{ships:[]},startTelemetry:null
+    });
+    const merged=window.hdSSIngestGameSortie({
+      map:'2-5',startedAt:now-80000,node:'O ボス',result:'S',boss:true,retreat:false,battles:4,drop:'浦波',
+      gameSortieKey:'kc-merge-1',gameNodeNo:15,gameNodeLabel:'O',gameBossCellNo:15,gameBossCellLabel:'O',
+      gameRouteNodes:[1,3,6,15],gameRouteLabels:['A','C','F','O'],
+      gameBattleResults:[{nodeNo:15,nodeLabel:'O',rank:'S',drop:'浦波'}]
+    });
+    return {merged,logs:window.hdSLLoad(),post:window.hdSSPostLoad()};
+  });
+
+  expect(data.logs).toHaveLength(1);
+  expect(data.merged.id).toBe('entry-manual-1');
+  expect(data.logs[0]).toMatchObject({
+    id:'entry-manual-1',sessionId:'session-manual-1',source:'session-game',
+    result:'S',boss:true,battles:4,drop:'浦波',gameSortieKey:'kc-merge-1'
+  });
+  expect(data.post.gameMatched).toBe(true);
+  expect(data.post.gameSortieKey).toBe('kc-merge-1');
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: Kancolle sortie importer prefers session reconciliation before standalone logging', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const source = await page.evaluate(async () => fetch('./kancolle-import.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain("typeof hdSSIngestGameSortie==='function'?hdSSIngestGameSortie(payload):null");
+  expect(source).toContain("const entry=matched||hdSLRecordEntry(payload)");
+  expect(source).toContain("result:retreat?'撤退':(active.lastResult||'不明')");
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
