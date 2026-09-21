@@ -587,7 +587,7 @@ function hdKcRenderSyncStatus(){
  const recommendation=document.getElementById('hdKcSyncRecommendation');
  if(recommendation){
   if(!s)recommendation.hidden=true;
-  else{const r=hdKcNextCaptureHint(s);recommendation.hidden=false;recommendation.className='hd-kc-sync-recommendation '+r.state;recommendation.innerHTML=`<span>次のおすすめ</span><strong>${hdKcEsc(r.title)}</strong><small>${hdKcEsc(r.detail)}</small>`;}
+  else{const r=audit.verified&&!audit.ok?{state:'needed',title:'艦これを再同期',detail:'現在の艦隊台帳・装備台帳が前回の完全同期と一致していないよ。母港と装備画面を開いて、もう一度HarborDeskへ送ってね。'}:hdKcNextCaptureHint(s);recommendation.hidden=false;recommendation.className='hd-kc-sync-recommendation '+r.state;recommendation.innerHTML=`<span>次のおすすめ</span><strong>${hdKcEsc(r.title)}</strong><small>${hdKcEsc(r.detail)}</small>`;}
  }
  const back=document.querySelector('[data-hd-kc-return-game]');if(back)back.hidden=sessionStorage.getItem('harbordesk-kc-return-game-v1')!=='1';
  hdKcRenderUserscriptStatus(s);
