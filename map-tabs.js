@@ -43,10 +43,21 @@ function hdMapToolsOverviewHtml(){
   </div>
  </section>`;
 }
-function hdMapOpenTool(tool){
+async function hdMapOpenTool(tool){
  if(!tool)return false;
- if(tool==='suggest'&&typeof window.hdFSOpen==='function'){window.hdFSOpen();return true}
- if(tool==='prep'&&typeof window.hdSPSOpen==='function'){window.hdSPSOpen();return true}
+ const lazy=tool==='suggest'?['hdFSOpen','編成候補']:tool==='prep'?['hdSPSOpen','出撃準備']:null;
+ if(lazy){
+  const [fn,label]=lazy;
+  const button=document.querySelector(`[data-hd-map-tool="${tool}"]`);
+  if(typeof window[fn]!=='function'&&typeof window.hdEnsureCurrentAssets==='function'){
+   button?.setAttribute('aria-busy','true');
+   try{await window.hdEnsureCurrentAssets()}catch{}
+   finally{button?.removeAttribute('aria-busy')}
+  }
+  if(typeof window[fn]==='function'){window[fn]();return true}
+  window.hdToast?.(`${label}を読み込めなかったよ。アプリ更新を試してね`);
+  return false;
+ }
  const tab=document.querySelector(`[data-map-tab="${tool}"]`);
  if(tab){tab.click();return true}
  return false;

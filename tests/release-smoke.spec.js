@@ -2337,8 +2337,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.422'");
-  expect(source).toContain("const HD_APP_BUILD=422");
+  expect(source).toContain("const HD_APP_VERSION='1.0.423'");
+  expect(source).toContain("const HD_APP_BUILD=423");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -2361,14 +2361,14 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=422`);
+    expect(data.index).toContain(`${asset}?v=423`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=422");
+  expect(data.updater).toContain("const HD_APP_BUILD=423");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v422");
+  expect(data.sw).toContain("harbordesk-pwa-v423");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -2381,7 +2381,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=422');
+  expect(source).toContain('const BUILD=423');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -3621,17 +3621,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=422',
-      'map-images.js?v=422',
-      'map-tabs.js?v=422',
-      'map-interactive.js?v=422',
-      'map-advanced-data.js?v=422'
+      'map-details.js?v=423',
+      'map-images.js?v=423',
+      'map-tabs.js?v=423',
+      'map-interactive.js?v=423',
+      'map-advanced-data.js?v=423'
     ];
     const requiredStyles = [
-      'map-details.css?v=422',
-      'map-tabs.css?v=422',
-      'map-images.css?v=422',
-      'map-interactive.css?v=422'
+      'map-details.css?v=423',
+      'map-tabs.css?v=423',
+      'map-images.css?v=423',
+      'map-interactive.css?v=423'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -3673,7 +3673,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=422');
+  expect(src).toBe('app.js?v=423');
   expect(errors).toEqual([]);
 });
 
@@ -5793,5 +5793,38 @@ test('release smoke: sortie highlights minimum-battle next route', async ({ page
   await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="F"]')).toHaveClass(/best-route/);
   await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="F"]')).toContainText('最少');
   await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="G"]')).toContainText('差 +1戦/+1マス');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: failed dynamic module can recover on retry', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const result = await page.evaluate(async () => {
+    const attr = 'data-hd-module-retry-fixture';
+    const src = './tests/fixtures/module-loader-retry.js';
+    document.querySelector(`script[${attr}]`)?.remove();
+    const stale = document.createElement('script');
+    stale.setAttribute(attr, '1');
+    stale.dataset.hdError = '1';
+    document.body.appendChild(stale);
+    window.HD_MODULE_STATUS[src] = 'error';
+    delete window.__HD_MODULE_RETRY_FIXTURE;
+
+    const race = await Promise.race([
+      window.hdLoadScript(attr, src),
+      new Promise(resolve => setTimeout(() => resolve('timeout'), 1500))
+    ]);
+    const node = document.querySelector(`script[${attr}]`);
+    return {
+      race,
+      status: window.HD_MODULE_STATUS[src],
+      count: window.__HD_MODULE_RETRY_FIXTURE || 0,
+      loaded: node?.dataset.hdLoaded || ''
+    };
+  });
+
+  expect(result).toEqual({ race: true, status: 'ok', count: 1, loaded: '1' });
   expect(errors).toEqual([]);
 });

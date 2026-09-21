@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.422';
-const HD_APP_BUILD=422;
+const HD_APP_VERSION='1.0.423';
+const HD_APP_BUILD=423;
 const HD_UPDATE_SNOOZE_KEY='harbordesk-update-snooze-v1';
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
@@ -50,25 +50,82 @@ function hdBuildAssetUrl(src){
   if(!s||/^(?:https?:|data:|blob:)/i.test(s))return s;
   return s+(s.includes('?')?'&':'?')+'v='+HD_APP_BUILD;
 }
+const HD_SCRIPT_RETRY_LIMIT=1;
+const HD_SCRIPT_TIMEOUT_MS=12000;
+const HD_SCRIPT_LOADS=window.__HD_SCRIPT_LOADS=window.__HD_SCRIPT_LOADS||{};
+
 function hdAppendStyle(attr,href){
-  if(document.querySelector(`link[${attr}]`))return;
-  const link=document.createElement('link');link.rel='stylesheet';link.href=hdBuildAssetUrl(href);link.setAttribute(attr,'1');document.head.appendChild(link);
+  const old=document.querySelector(`link[${attr}]`);
+  if(old&&old.dataset.hdError!=='1')return old;
+  if(old)old.remove();
+  const link=document.createElement('link');
+  link.rel='stylesheet';link.href=hdBuildAssetUrl(href);link.setAttribute(attr,'1');
+  link.onload=()=>{link.dataset.hdLoaded='1';delete link.dataset.hdError};
+  link.onerror=()=>{link.dataset.hdError='1';link.remove()};
+  document.head.appendChild(link);
+  return link;
 }
-function hdLoadScript(attr,src){
+function hdScriptAssetUrl(src,attempt=0){
+  const base=hdBuildAssetUrl(src);
+  if(!attempt)return base;
+  return base+(base.includes('?')?'&':'?')+`retry=${attempt}&t=${Date.now()}`;
+}
+function hdLoadScriptAttempt(attr,src,attempt=0){
   return new Promise(resolve=>{
     const old=document.querySelector(`script[${attr}]`);
-    if(old){
-      if(old.dataset.hdLoaded==='1'){window.HD_MODULE_STATUS[src]='ok';resolve(true);return}
-      old.addEventListener('load',()=>{old.dataset.hdLoaded='1';window.HD_MODULE_STATUS[src]='ok';resolve(true)},{once:true});
-      old.addEventListener('error',()=>{window.HD_MODULE_STATUS[src]='error';resolve(false)},{once:true});
+    if(old?.dataset.hdLoaded==='1'){
+      window.HD_MODULE_STATUS[src]='ok';
+      resolve(true);
       return;
     }
-    const script=document.createElement('script');script.src=hdBuildAssetUrl(src);script.async=false;script.setAttribute(attr,'1');window.HD_MODULE_STATUS[src]='loading';
-    script.onload=()=>{script.dataset.hdLoaded='1';window.HD_MODULE_STATUS[src]='ok';resolve(true)};
-    script.onerror=()=>{window.HD_MODULE_STATUS[src]='error';resolve(false)};
+    if(old)old.remove();
+
+    const script=document.createElement('script');
+    script.src=hdScriptAssetUrl(src,attempt);
+    script.async=false;
+    script.setAttribute(attr,'1');
+    script.dataset.hdAttempt=String(attempt);
+    window.HD_MODULE_STATUS[src]=attempt?'retrying':'loading';
+
+    let settled=false;
+    let timer=0;
+    const finish=ok=>{
+      if(settled)return;
+      settled=true;
+      if(timer)clearTimeout(timer);
+      if(ok){
+        script.dataset.hdLoaded='1';
+        delete script.dataset.hdError;
+        window.HD_MODULE_STATUS[src]='ok';
+        resolve(true);
+        return;
+      }
+      script.dataset.hdError='1';
+      if(script.isConnected)script.remove();
+      if(attempt<HD_SCRIPT_RETRY_LIMIT){
+        window.HD_MODULE_STATUS[src]='retrying';
+        setTimeout(()=>hdLoadScriptAttempt(attr,src,attempt+1).then(resolve),80);
+        return;
+      }
+      window.HD_MODULE_STATUS[src]='error';
+      resolve(false);
+    };
+    timer=setTimeout(()=>finish(false),HD_SCRIPT_TIMEOUT_MS);
+    script.onload=()=>finish(true);
+    script.onerror=()=>finish(false);
     document.body.appendChild(script);
   });
 }
+function hdLoadScript(attr,src){
+  const key=`${attr}:${src}`;
+  if(HD_SCRIPT_LOADS[key])return HD_SCRIPT_LOADS[key];
+  const pending=hdLoadScriptAttempt(attr,src,0).finally(()=>{
+    if(HD_SCRIPT_LOADS[key]===pending)delete HD_SCRIPT_LOADS[key];
+  });
+  HD_SCRIPT_LOADS[key]=pending;
+  return pending;
+}
+window.hdLoadScript=hdLoadScript;
 function hdInitLoadedModules(){
   try{if(typeof hdRenderSortieReadiness==='function')hdRenderSortieReadiness()}catch{}
   try{if(typeof hdRenderLandBasePlanner==='function')hdRenderLandBasePlanner()}catch{}
@@ -106,6 +163,17 @@ function hdInitLoadedModules(){
   document.body?.classList.remove('hd-booting');document.body?.setAttribute('data-hd-ready','1');
   window.dispatchEvent(new CustomEvent('hd:modules-ready',{detail:{status:{...window.HD_MODULE_STATUS}}}));
 }
+let HD_CURRENT_ASSETS_PROMISE=null;
+function hdEnsureCurrentAssets(){
+  if(HD_CURRENT_ASSETS_PROMISE)return HD_CURRENT_ASSETS_PROMISE;
+  const pending=hdLoadCurrentAssets().finally(()=>{
+    if(HD_CURRENT_ASSETS_PROMISE===pending)HD_CURRENT_ASSETS_PROMISE=null;
+  });
+  HD_CURRENT_ASSETS_PROMISE=pending;
+  return pending;
+}
+window.hdEnsureCurrentAssets=hdEnsureCurrentAssets;
+
 async function hdLoadCurrentAssets(){
   [
    ['data-hd-sortie-ready','./sortie-readiness.css'],['data-hd-land-base','./land-base-planner.css'],['data-hd-fleet-calc','./fleet-calculator.css'],
@@ -394,7 +462,7 @@ document.addEventListener('keydown',e=>{
   const summary=menu.querySelector(':scope > summary');try{summary?.focus({preventScroll:true})}catch{summary?.focus()}
 });
 window.addEventListener('load',()=>{
-  hdEnsureServiceWorker();hdLoadCurrentAssets().catch(()=>{});hdInitUpdateManagerUI();
+  hdEnsureServiceWorker();hdEnsureCurrentAssets().catch(()=>{});hdInitUpdateManagerUI();
   if(new URL(location.href).searchParams.has('hd_update')){
     setTimeout(()=>{try{history.replaceState(null,'',location.pathname+location.hash)}catch{}},500);
   }
