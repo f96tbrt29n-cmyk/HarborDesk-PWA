@@ -1503,8 +1503,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.400'");
-  expect(source).toContain("const HD_APP_BUILD=400");
+  expect(source).toContain("const HD_APP_VERSION='1.0.401'");
+  expect(source).toContain("const HD_APP_BUILD=401");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -1527,14 +1527,14 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=400`);
+    expect(data.index).toContain(`${asset}?v=401`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=400");
+  expect(data.updater).toContain("const HD_APP_BUILD=401");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v400");
+  expect(data.sw).toContain("harbordesk-pwa-v401");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -1547,7 +1547,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=400');
+  expect(source).toContain('const BUILD=401');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -2787,17 +2787,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=400',
-      'map-images.js?v=400',
-      'map-tabs.js?v=400',
-      'map-interactive.js?v=400',
-      'map-advanced-data.js?v=400'
+      'map-details.js?v=401',
+      'map-images.js?v=401',
+      'map-tabs.js?v=401',
+      'map-interactive.js?v=401',
+      'map-advanced-data.js?v=401'
     ];
     const requiredStyles = [
-      'map-details.css?v=400',
-      'map-tabs.css?v=400',
-      'map-images.css?v=400',
-      'map-interactive.css?v=400'
+      'map-details.css?v=401',
+      'map-tabs.css?v=401',
+      'map-images.css?v=401',
+      'map-interactive.css?v=401'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -2839,7 +2839,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=400');
+  expect(src).toBe('app.js?v=401');
   expect(errors).toEqual([]);
 });
 
