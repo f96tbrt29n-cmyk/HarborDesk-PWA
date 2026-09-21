@@ -586,6 +586,77 @@ test('release smoke: current fleet panel exposes direct sortie preparation actio
 });
 
 
+test('release smoke: current fleet route inference only accepts strong unique preset matches', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFEInferRoute === 'function' &&
+    typeof window.hdFERoute === 'function' &&
+    typeof window.hdFSPresetInfo === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      {id:'cl',gameShipId:1,name:'軽巡A',type:'軽巡洋艦'},
+      {id:'dd1',gameShipId:2,name:'駆逐A',type:'駆逐艦'},
+      {id:'dd2',gameShipId:3,name:'駆逐B',type:'駆逐艦'},
+      {id:'dd3',gameShipId:4,name:'駆逐C',type:'駆逐艦'},
+      {id:'dd4',gameShipId:5,name:'駆逐D',type:'駆逐艦'},
+      {id:'dd5',gameShipId:6,name:'駆逐E',type:'駆逐艦'},
+      {id:'ca1',gameShipId:7,name:'航巡A',type:'航空巡洋艦'},
+      {id:'ca2',gameShipId:8,name:'航巡B',type:'航空巡洋艦'}
+    ]));
+
+    const plan32 = {
+      map:'3-2',
+      ships:[
+        {ship:'軽巡A',gameShipId:1},
+        {ship:'駆逐A',gameShipId:2},
+        {ship:'駆逐B',gameShipId:3},
+        {ship:'駆逐C',gameShipId:4},
+        {ship:'駆逐D',gameShipId:5},
+        {ship:'駆逐E',gameShipId:6}
+      ]
+    };
+    const plan25 = {
+      map:'2-5',
+      ships:[
+        {ship:'航巡A',gameShipId:7},
+        {ship:'航巡B',gameShipId:8},
+        {ship:'駆逐A',gameShipId:2},
+        {ship:'駆逐B',gameShipId:3},
+        {ship:'駆逐C',gameShipId:4},
+        {ship:'駆逐D',gameShipId:5}
+      ]
+    };
+
+    const infer32 = window.hdFEInferRoute(plan32);
+    const route32 = window.hdFERoute(plan32);
+    const infer25 = window.hdFEInferRoute(plan25);
+    const route25 = window.hdFERoute(plan25);
+    return {
+      infer32Status: infer32.status,
+      infer32Name: infer32.match?.preset?.name || '',
+      route32Status: route32.status,
+      route32Detail: route32.detail,
+      infer25Status: infer25.status,
+      route25Status: route25.status,
+      route25Detail: route25.detail
+    };
+  });
+
+  expect(data.infer32Status).toBe('matched');
+  expect(data.infer32Name).toBe('軽巡1＋駆逐5');
+  expect(data.route32Status).toBe('ready');
+  expect(data.route32Detail).toContain('自動照合');
+  expect(data.route32Detail).toContain('軽巡1＋駆逐5');
+  expect(data.infer25Status).toBe('none');
+  expect(data.route25Status).toBe('manual');
+  expect(data.route25Detail).not.toContain('自動照合:');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
