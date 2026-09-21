@@ -2365,7 +2365,8 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   }
   expect(data.updater).toContain("const HD_APP_BUILD=423");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
-  expect(data.updater).toContain("script.src=hdScriptAssetUrl(src,attempt)");\n  expect(data.updater).toContain("function hdScriptAssetUrl(src,attempt=0)");
+  expect(data.updater).toContain("script.src=hdScriptAssetUrl(src,attempt)");
+  expect(data.updater).toContain("function hdScriptAssetUrl(src,attempt=0)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
   expect(data.sw).toContain("harbordesk-pwa-v423");
