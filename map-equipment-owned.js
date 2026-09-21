@@ -13,7 +13,7 @@ function hdOwnedEquipSummary(name){
   const key=hdOwnedEquipNormalize(name);
   const rows=hdOwnedEquipRows().filter(x=>hdOwnedEquipNormalize(x.name)===key);
   const count=rows.reduce((sum,x)=>sum+Math.max(0,Number(x.count)||0),0);
-  const maxStar=rows.reduce((m,x)=>Math.max(m,Math.max(0,Number(x.star)||0)),0);
+  const maxStar=rows.reduce((m,x)=>Math.max(0,Number(x.count)||0)>0?Math.max(m,Math.max(0,Number(x.star)||0)):m,0);
   const targetStar=rows.reduce((m,x)=>Math.max(m,Math.max(0,Number(x.targetStar)||0)),0);
   return {owned:count>0,count,maxStar,targetStar,rows};
 }
