@@ -368,6 +368,74 @@ test('release smoke: fleet suggestions exclude ships unavailable for sortie', as
 });
 
 
+test('release smoke: userscript captures scouting and admiral level for readiness', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const source = await page.evaluate(async () => fetch('./HarborDesk-Kancolle.user.js', { cache:'no-store' }).then(r => r.text()));
+  const importer = await page.evaluate(async () => fetch('./kancolle-import.js', { cache:'no-store' }).then(r => r.text()));
+  expect(source).toContain("// @version      1.0.13");
+  expect(source).toContain("api_sakuteki:Array.isArray(x.api_sakuteki)");
+  expect(source).toContain("api_onslot:Array.isArray(x.api_onslot)");
+  expect(source).toContain("api_basic:data?.api_basic");
+  expect(importer).toContain("HD_KC_USERSCRIPT_VERSION='1.0.13'");
+  expect(importer).toContain("gameLos:Array.isArray(ship.api_sakuteki)");
+  expect(importer).toContain("admiralLevel:Number(parsed.admiralLevel)");
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: integrated readiness evaluates route air scouting and live ship state', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFEScouting === 'function' &&
+    typeof window.hdFEAirCheck === 'function' &&
+    typeof window.hdFERoute === 'function' &&
+    typeof window.hdFELiveFleet === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({ admiralLevel:120 }));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      { id:'1', name:'睦月', masterId:1, type:'駆逐艦', gameShipId:101, gameHp:13, gameMaxHp:13, gameCond:49, gameLos:100 },
+      { id:'2', name:'如月', masterId:2, type:'駆逐艦', gameShipId:102, gameHp:13, gameMaxHp:13, gameCond:49, gameLos:100 },
+      { id:'3', name:'吹雪', masterId:9, type:'駆逐艦', gameShipId:103, gameHp:13, gameMaxHp:13, gameCond:49, gameLos:100 },
+      { id:'4', name:'白雪', masterId:10, type:'駆逐艦', gameShipId:104, gameHp:13, gameMaxHp:13, gameCond:49, gameLos:100 },
+      { id:'5', name:'初雪', masterId:32, type:'駆逐艦', gameShipId:105, gameHp:13, gameMaxHp:13, gameCond:49, gameLos:100 },
+      { id:'6', name:'深雪', masterId:11, type:'駆逐艦', gameShipId:106, gameHp:13, gameMaxHp:13, gameCond:49, gameLos:100 }
+    ]));
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([]));
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({ expeditions:[], docks:[] }));
+    const plan = {
+      map:'2-5',
+      routeInfo:{ requirements:[{ token:'駆逐', count:2 }], speedRequired:false },
+      ships:[
+        {ship:'睦月',masterId:1,type:'駆逐艦'},
+        {ship:'如月',masterId:2,type:'駆逐艦'},
+        {ship:'吹雪',masterId:9,type:'駆逐艦'},
+        {ship:'白雪',masterId:10,type:'駆逐艦'},
+        {ship:'初雪',masterId:32,type:'駆逐艦'},
+        {ship:'深雪',masterId:11,type:'駆逐艦'}
+      ]
+    };
+    const items = Array.from({length:4}, (_,i) => ({ name:'偵察'+i, star:0, meta:{ category:'水上偵察機', stats:{索敵:10}, tags:[] } }));
+    const scouting = window.hdFEScouting(plan, items);
+    const route = window.hdFERoute(plan);
+    const live = window.hdFELiveFleet(plan);
+    const air = window.hdFEAirCheck('7-4', { basePower:300, capacityKnown:4, count:4 });
+    return { scouting, route, live, air };
+  });
+
+  expect(data.scouting.available).toBe(true);
+  expect(data.scouting.status).toBe('ready');
+  expect(data.scouting.score).toBeGreaterThanOrEqual(33);
+  expect(data.route.status).toBe('ready');
+  expect(data.live.status).toBe('ready');
+  expect(data.air.status).toBe('ready');
+  expect(data.air.enemy).toBeGreaterThan(0);
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -377,8 +445,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.383'");
-  expect(source).toContain("const HD_APP_BUILD=383");
+  expect(source).toContain("const HD_APP_VERSION='1.0.384'");
+  expect(source).toContain("const HD_APP_BUILD=384");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -401,14 +469,14 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=383`);
+    expect(data.index).toContain(`${asset}?v=384`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=383");
+  expect(data.updater).toContain("const HD_APP_BUILD=384");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v383");
+  expect(data.sw).toContain("harbordesk-pwa-v384");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -421,7 +489,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=383');
+  expect(source).toContain('const BUILD=384');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -437,8 +505,8 @@ test('release smoke: userscript blocks handoff until ship and equipment ledger d
     return res.text();
   });
 
-  expect(source).toContain('// @version      1.0.12');
-  expect(source).toContain("const HD_VERSION='1.0.12'");
+  expect(source).toContain('// @version      1.0.13');
+  expect(source).toContain("const HD_VERSION='1.0.13'");
   expect(source).toContain('// @downloadURL  https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/HarborDesk-Kancolle.user.js');
   expect(source).toContain('// @updateURL    https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/HarborDesk-Kancolle.meta.js');
   expect(source).toContain('function ledgerReady(c=captureCoverage())');
@@ -1661,17 +1729,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=383',
-      'map-images.js?v=383',
-      'map-tabs.js?v=383',
-      'map-interactive.js?v=383',
-      'map-advanced-data.js?v=383'
+      'map-details.js?v=384',
+      'map-images.js?v=384',
+      'map-tabs.js?v=384',
+      'map-interactive.js?v=384',
+      'map-advanced-data.js?v=384'
     ];
     const requiredStyles = [
-      'map-details.css?v=383',
-      'map-tabs.css?v=383',
-      'map-images.css?v=383',
-      'map-interactive.css?v=383'
+      'map-details.css?v=384',
+      'map-tabs.css?v=384',
+      'map-images.css?v=384',
+      'map-interactive.css?v=384'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -1713,7 +1781,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=383');
+  expect(src).toBe('app.js?v=384');
   expect(errors).toEqual([]);
 });
 
