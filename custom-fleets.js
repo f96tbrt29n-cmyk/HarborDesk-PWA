@@ -150,4 +150,13 @@ window.addEventListener('hd:ship-images-ready',()=>{if(typeof selectedMap!=='und
 
 window.cfMergeEditedShips=cfMergeEditedShips;
 
+function cfOpenMapPanel(){
+ if(typeof selectedMap==='undefined'||!selectedMap)return false;
+ renderCustomFleets(selectedMap);
+ const host=document.getElementById('customFleetPanel');if(!host)return false;
+ if(typeof window.hdWSShowElement==='function')window.hdWSShowElement(host,true);else host.scrollIntoView({behavior:'smooth',block:'start'});
+ return true;
+}
+window.cfOpenMapPanel=cfOpenMapPanel;
+
 window.cfRelinkFleet=cfRelinkFleet;
