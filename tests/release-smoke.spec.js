@@ -657,6 +657,58 @@ test('release smoke: current fleet route inference only accepts strong unique pr
 });
 
 
+test('release smoke: planned fleet is compared with synced game fleet and gear', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdFEGameMatch === 'function');
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      { id:'a', name:'睦月', masterId:1, gameShipId:101, gameGearSlots:['12cm単装砲','61cm三連装魚雷'], gameGearExpansion:'' },
+      { id:'b', name:'如月', masterId:2, gameShipId:102, gameGearSlots:[], gameGearExpansion:'' }
+    ]));
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
+      { deckId:1, name:'第一艦隊', ships:[{gameShipId:101},{gameShipId:102}] }
+    ]));
+    const matching = {
+      map:'1-1',
+      ships:[
+        { ship:'睦月', gameShipId:101, masterId:1, items:[{name:'12cm単装砲',star:0,slotIndex:0},{name:'61cm三連装魚雷',star:0,slotIndex:1}], expansion:null },
+        { ship:'如月', gameShipId:102, masterId:2, items:[], expansion:null }
+      ]
+    };
+    const ready = window.hdFEGameMatch(matching);
+    const gearDiffPlan = JSON.parse(JSON.stringify(matching));
+    gearDiffPlan.ships[0].items[1].name = '別装備';
+    const gearDiff = window.hdFEGameMatch(gearDiffPlan);
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
+      { deckId:1, name:'第一艦隊', ships:[{gameShipId:102},{gameShipId:101}] }
+    ]));
+    const orderDiff = window.hdFEGameMatch(matching);
+    return { ready, gearDiff, orderDiff };
+  });
+
+  expect(data.ready.status).toBe('ready');
+  expect(data.ready.fleetMatch).toBe(true);
+  expect(data.ready.gearMismatch).toBe(0);
+  expect(data.gearDiff.status).toBe('partial');
+  expect(data.gearDiff.gearMismatch).toBe(1);
+  expect(data.orderDiff.status).toBe('partial');
+  expect(data.orderDiff.deckOrderMismatch).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: game sync persists exact gear slots for comparison', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const source = await page.evaluate(async () => fetch('./kancolle-import.js', { cache:'no-store' }).then(r => r.text()));
+  expect(source).toContain('gameGearSlots:parsed.slotItems.size?gameGearSlots');
+  expect(source).toContain('gameGearExpansion:parsed.slotItems.size?gameGearExpansion');
+  expect(source).toContain('gearSlots,gearExpansion');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -666,8 +718,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.387'");
-  expect(source).toContain("const HD_APP_BUILD=387");
+  expect(source).toContain("const HD_APP_VERSION='1.0.388'");
+  expect(source).toContain("const HD_APP_BUILD=388");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -690,14 +742,14 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=387`);
+    expect(data.index).toContain(`${asset}?v=388`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=387");
+  expect(data.updater).toContain("const HD_APP_BUILD=388");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v387");
+  expect(data.sw).toContain("harbordesk-pwa-v388");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -710,7 +762,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=387');
+  expect(source).toContain('const BUILD=388');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -1950,17 +2002,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=387',
-      'map-images.js?v=387',
-      'map-tabs.js?v=387',
-      'map-interactive.js?v=387',
-      'map-advanced-data.js?v=387'
+      'map-details.js?v=388',
+      'map-images.js?v=388',
+      'map-tabs.js?v=388',
+      'map-interactive.js?v=388',
+      'map-advanced-data.js?v=388'
     ];
     const requiredStyles = [
-      'map-details.css?v=387',
-      'map-tabs.css?v=387',
-      'map-images.css?v=387',
-      'map-interactive.css?v=387'
+      'map-details.css?v=388',
+      'map-tabs.css?v=388',
+      'map-images.css?v=388',
+      'map-interactive.css?v=388'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -2002,7 +2054,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=387');
+  expect(src).toBe('app.js?v=388');
   expect(errors).toEqual([]);
 });
 
