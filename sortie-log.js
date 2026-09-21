@@ -36,6 +36,11 @@ function hdSLApplyHunt(entry){
  if(entry.targetObtained&&!h.obtained){h.obtained=true;h.obtainedAt=entry.at;delta.obtainedChanged=true}
  hdSLSaveHunts(rows);return delta;
 }
+function hdSLMarkHuntObtained(huntId,at=Date.now()){
+ const id=String(huntId||'');if(!id)return false;const rows=hdSLHunts(),h=rows.find(x=>String(x?.id||'')===id);if(!h)return false;
+ if(!h.obtained){h.obtained=true;h.obtainedAt=Number(at)||Date.now();hdSLSaveHunts(rows)}
+ return true;
+}
 function hdSLUndoHunt(log,remaining){
  if(!log.huntId||!log.huntDelta)return;const rows=hdSLHunts(),h=rows.find(x=>x.id===log.huntId);if(!h)return;const d=log.huntDelta;h.runs=Math.max(0,(Number(h.runs)||0)-(Number(d.runs)||0));h.s=Math.max(0,(Number(h.s)||0)-(Number(d.s)||0));h.a=Math.max(0,(Number(h.a)||0)-(Number(d.a)||0));
  if(d.obtainedChanged&&!remaining.some(x=>x.huntId===log.huntId&&x.targetObtained)){h.obtained=false;delete h.obtainedAt}hdSLSaveHunts(rows);
