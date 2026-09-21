@@ -624,6 +624,63 @@ test('release smoke: ship roster distinguishes synced and manual entries', async
 });
 
 
+
+test('release smoke: live sync audit detects ledger drift after complete sync', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdKcLiveLedgerAudit === 'function');
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now(),
+      integrity:{
+        verified:true,ok:true,
+        ships:{source:2,saved:2,complete:true,ok:true},
+        equipment:{source:3,saved:3,complete:true,ok:true}
+      },
+      coverage:{ships:true,equipment:true}
+    }));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      {id:'a',source:'kancolle-import',gameShipId:101,name:'睦月'},
+      {id:'b',source:'kancolle-import',gameShipId:102,name:'如月'},
+      {id:'m',source:'manual',name:'手動艦'}
+    ]));
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      {id:'e1',source:'kancolle-import',name:'12cm単装砲',count:2},
+      {id:'e2',source:'kancolle-import',name:'61cm三連装魚雷',count:1},
+      {id:'p1',source:'equipment-plan',name:'電探計画',count:0,targetStar:10}
+    ]));
+    localStorage.setItem('harbordesk-kancolle-equipment-detail-v1', JSON.stringify([
+      {gameEquipId:1},{gameEquipId:2},{gameEquipId:3}
+    ]));
+    const ok=window.hdKcLiveLedgerAudit();
+    const roster=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1'));roster.pop();roster.shift();
+    localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(roster));
+    const equip=JSON.parse(localStorage.getItem('harbordesk-equipment-v1'));equip[0].count=1;
+    localStorage.setItem('harbordesk-equipment-v1',JSON.stringify(equip));
+    const drift=window.hdKcLiveLedgerAudit();
+    window.hdKcRenderSyncStatus?.();
+    return {
+      ok,drift,
+      headline:document.getElementById('hdKcSyncHeadline')?.textContent||'',
+      coverage:document.getElementById('hdKcSyncCoverage')?.textContent||'',
+      recommendation:document.getElementById('hdKcSyncRecommendation')?.textContent||''
+    };
+  });
+
+  expect(data.ok.ok).toBe(true);
+  expect(data.ok.ships).toMatchObject({current:2,source:2,ok:true});
+  expect(data.ok.equipment).toMatchObject({current:3,source:3,detail:3,ok:true});
+  expect(data.drift.ok).toBe(false);
+  expect(data.drift.ships.current).toBe(1);
+  expect(data.drift.equipment.current).toBe(2);
+  expect(data.headline).toContain('差異あり');
+  expect(data.coverage).toContain('現在の台帳に差異あり');
+  expect(data.recommendation).toContain('再同期');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: synced fleet and equipment data refresh downstream planners', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -1975,8 +2032,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.413'");
-  expect(source).toContain("const HD_APP_BUILD=413");
+  expect(source).toContain("const HD_APP_VERSION='1.0.414'");
+  expect(source).toContain("const HD_APP_BUILD=414");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -1999,14 +2056,14 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=413`);
+    expect(data.index).toContain(`${asset}?v=414`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=413");
+  expect(data.updater).toContain("const HD_APP_BUILD=414");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v413");
+  expect(data.sw).toContain("harbordesk-pwa-v414");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -2019,7 +2076,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=413');
+  expect(source).toContain('const BUILD=414');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -3259,17 +3316,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=413',
-      'map-images.js?v=413',
-      'map-tabs.js?v=413',
-      'map-interactive.js?v=413',
-      'map-advanced-data.js?v=413'
+      'map-details.js?v=414',
+      'map-images.js?v=414',
+      'map-tabs.js?v=414',
+      'map-interactive.js?v=414',
+      'map-advanced-data.js?v=414'
     ];
     const requiredStyles = [
-      'map-details.css?v=413',
-      'map-tabs.css?v=413',
-      'map-images.css?v=413',
-      'map-interactive.css?v=413'
+      'map-details.css?v=414',
+      'map-tabs.css?v=414',
+      'map-images.css?v=414',
+      'map-interactive.css?v=414'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -3311,7 +3368,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=413');
+  expect(src).toBe('app.js?v=414');
   expect(errors).toEqual([]);
 });
 
