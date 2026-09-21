@@ -587,7 +587,12 @@ function hdKcRenderSyncStatus(){
  const recommendation=document.getElementById('hdKcSyncRecommendation');
  if(recommendation){
   if(!s)recommendation.hidden=true;
-  else{const r=hdKcNextCaptureHint(s);recommendation.hidden=false;recommendation.className='hd-kc-sync-recommendation '+r.state;recommendation.innerHTML=`<span>次のおすすめ</span><strong>${hdKcEsc(r.title)}</strong><small>${hdKcEsc(r.detail)}</small>`;}
+  else{
+   const r=audit.verified&&!audit.ok
+    ?{state:'warn',title:'艦これを再同期',detail:`台帳差異を検出。艦娘 ${audit.ships.current}/${audit.ships.source}隻・装備 ${audit.equipment.current}/${audit.equipment.source}個を最新のゲーム状態へ戻そう。`}
+    :hdKcNextCaptureHint(s);
+   recommendation.hidden=false;recommendation.className='hd-kc-sync-recommendation '+r.state;recommendation.innerHTML=`<span>次のおすすめ</span><strong>${hdKcEsc(r.title)}</strong><small>${hdKcEsc(r.detail)}</small>`;
+  }
  }
  const back=document.querySelector('[data-hd-kc-return-game]');if(back)back.hidden=sessionStorage.getItem('harbordesk-kc-return-game-v1')!=='1';
  hdKcRenderUserscriptStatus(s);
