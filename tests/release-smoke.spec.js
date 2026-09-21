@@ -756,6 +756,48 @@ test('release smoke: ship roster saves immediately refresh sync audit', async ({
 });
 
 
+
+test('release smoke: home surfaces live ledger drift and resync action', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdKcLiveLedgerAudit === 'function' &&
+    typeof window.renderHomeDashboard === 'function'
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now(),
+      ships:2,equipmentOwnedRows:1,equipmentItems:3,decks:1,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true},
+      integrity:{
+        verified:true,ok:true,
+        ships:{source:2,saved:2,complete:true,ok:true},
+        equipment:{source:3,saved:3,complete:true,ok:true}
+      }
+    }));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      {id:'a',source:'kancolle-import',gameShipId:101,name:'睦月'}
+    ]));
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      {id:'e1',source:'kancolle-import',name:'12cm単装砲',count:2}
+    ]));
+    localStorage.setItem('harbordesk-kancolle-equipment-detail-v1', JSON.stringify([
+      {gameEquipId:1},{gameEquipId:2}
+    ]));
+    window.renderHomeDashboard();
+  });
+
+  await expect(page.locator('#homeGameSync')).toHaveClass(/drift/);
+  await expect(page.locator('#homeGameSync')).toContainText('台帳差異');
+  await expect(page.locator('#homeGameSync')).toContainText('艦娘 1/2隻');
+  await expect(page.locator('#homeGameSync')).toContainText('装備 2/3個');
+  await expect(page.locator('#homeNextAction')).toContainText('台帳を再同期する');
+  await expect(page.locator('#homeNextAction')).toContainText('艦娘 1/2隻');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: synced fleet and equipment data refresh downstream planners', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
