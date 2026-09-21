@@ -569,6 +569,7 @@ function hdKcPreviewHtml(p){
 }
 function hdKcRenderSyncStatus(){
  const el=document.getElementById('hdKcSyncLast'),headline=document.getElementById('hdKcSyncHeadline'),box=document.querySelector('.hd-kc-sync-overview'),s=hdKcSyncStatus();
+ const audit=hdKcLiveLedgerAudit(s);
  const equipRows=s?Number(s.equipmentOwnedRows??s.snapshot?.equipmentOwnedRows??s.equipmentRows??s.equipment)||0:0,equipPlans=s?Number(s.equipmentPlanRows??s.snapshot?.equipmentPlanRows)||0:0,equipItems=s?Number(s.equipmentItems??s.snapshot?.equipment??s.equipment)||0:0;
  if(el)el.textContent=s?`最終同期 ${new Date(s.syncedAt).toLocaleString('ja-JP')} ・ 艦娘${s.ships} / 装備台帳${equipRows}種類・${equipItems}個${equipPlans?`＋計画${equipPlans}`:''} / 資源${s.materials} / 艦隊${s.decks} / 遠征${s.expeditions||0} / 入渠${s.docks||0} / 任務${s.quests||0} / 出撃${s.sorties||0}`:'まだ同期してないよ';
  if(headline)headline.textContent=s?(audit.verified&&!audit.ok?'台帳に差異あり・再同期推奨':'艦これデータは同期済み'):'まず艦これから同期しよう';
