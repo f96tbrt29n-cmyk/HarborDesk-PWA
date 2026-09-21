@@ -1538,6 +1538,42 @@ test('release smoke: stopped repeat-sortie series can be summarized and complete
 });
 
 
+test('release smoke: completed series restart never bypasses preflight safety', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSSSeriesRestart === 'function' &&
+    typeof window.hdSSSeriesArchive === 'function'
+  );
+
+  const data = await page.evaluate(async () => {
+    localStorage.setItem('harbordesk-sortie-series-archive-v1', JSON.stringify({
+      oldSeries:{
+        seriesId:'oldSeries',map:'2-4',fleetId:'missing-fleet',fleetName:'周回艦隊',
+        goal:{maxCycles:10,maxResources:5000,maxBuckets:5,maxElapsedMin:60,target:'大鯨'},
+        cycles:10,resourceTotal:1200,buckets:2,closedAt:Date.now()
+      }
+    }));
+    localStorage.removeItem('harbordesk-active-sortie-session-v1');
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({'2-4':[]}));
+    const result = window.hdSSSeriesRestart('oldSeries');
+    const active = window.hdSSLoad();
+    const sessionSource = await fetch('./sortie-session.js',{cache:'no-store'}).then(r=>r.text());
+    const analyticsSource = await fetch('./sortie-performance-analytics.js',{cache:'no-store'}).then(r=>r.text());
+    return {result,active,sessionSource,analyticsSource};
+  });
+
+  expect(data.result.started).toBe(false);
+  expect(data.result.reason).toBe('fleet-missing');
+  expect(data.active).toBeNull();
+  expect(data.sessionSource).toContain("gate.hardBlock||gate.state!=='go'||manualLeft");
+  expect(data.sessionSource).toContain("hdSSSeriesGoalSave(session.seriesId,goal)");
+  expect(data.analyticsSource).toContain('data-hd-spa-series-restart=');
+  expect(data.analyticsSource).toContain('同条件で新しい周回');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
