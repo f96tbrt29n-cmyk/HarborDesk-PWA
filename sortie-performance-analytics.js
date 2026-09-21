@@ -1,6 +1,7 @@
 const HD_SPA_MODE_KEY='harbordesk-sortie-analytics-mode-v1';
 const HD_SPA_MAP_KEY='harbordesk-sortie-analytics-map-v1';
 const HD_SPA_WINDOW_KEY='harbordesk-sortie-analytics-window-v1';
+const HD_SPA_EXPERIMENT_KEY='harbordesk-sortie-experiments-v1';
 const HD_SPA_STRATEGY_ORDER=['stable','firepower','route','boss','reserve','manual'];
 
 function hdSPAEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -12,6 +13,87 @@ function hdSPAWindow(){try{const n=Number(localStorage.getItem(HD_SPA_WINDOW_KEY
 function hdSPASetWindow(v){try{const n=Number(v);localStorage.setItem(HD_SPA_WINDOW_KEY,[3,5,10].includes(n)?String(n):'5')}catch{}}
 function hdSPALogs(){
  try{return (typeof hdSLLoad==='function'?hdSLLoad():JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]')).filter(x=>x&&String(x.map||'').trim())}catch{return []}
+}
+function hdSPAExperiments(){
+ try{const x=JSON.parse(localStorage.getItem(HD_SPA_EXPERIMENT_KEY)||'[]');return Array.isArray(x)?x:[]}catch{return []}
+}
+function hdSPASaveExperiments(rows){
+ try{localStorage.setItem(HD_SPA_EXPERIMENT_KEY,JSON.stringify((Array.isArray(rows)?rows:[]).slice(-30)));return true}catch{return false}
+}
+function hdSPAExperimentUid(){return crypto.randomUUID?crypto.randomUUID():'spa-exp-'+Date.now()+'-'+Math.random().toString(16).slice(2)}
+function hdSPAExperimentSnapshot(metrics){
+ const p=metrics?.postTelemetry||{};
+ return {
+  bossRate:metrics?.bossRate??null,sRate:metrics?.sRate??null,winRate:metrics?.winRate??null,retreatRate:metrics?.retreatRate??null,
+  avgResource:metrics?.avgResource??null,avgDurationMin:metrics?.avgDurationMin??null,avgReadiness:metrics?.avgReadiness??null,
+  postDamageRate:p.damageRate??null,postAvgHpLoss:p.avgHpLoss??null,postAvgAirLoss:p.avgAirLoss??null,
+  postAvgDepletedAdded:p.avgDepletedAdded??null,postNeedsFixRate:p.needsFixRate??null
+ };
+}
+function hdSPAExperimentTargets(rec){
+ const id=String(rec?.id||''),mode=String(rec?.mode||'');
+ if(/damage|retreat|route-boss/.test(id)||mode==='route')return [{key:'retreatRate',label:'撤退率',direction:'down'},{key:'bossRate',label:'ボス到達',direction:'up'},{key:'postDamageRate',label:'帰還損傷',direction:'down'}];
+ if(/firepower|boss-s/.test(id)||mode==='boss'||mode==='firepower')return [{key:'sRate',label:'S率',direction:'up'},{key:'bossRate',label:'ボス到達',direction:'up'}];
+ if(/air|aircraft/.test(id))return [{key:'postAvgDepletedAdded',label:'艦載機損耗',direction:'down'},{key:'postAvgAirLoss',label:'制空低下',direction:'down'},{key:'postNeedsFixRate',label:'再修正率',direction:'down'}];
+ if(/reserve-resource/.test(id)||mode==='reserve')return [{key:'avgResource',label:'平均資源',direction:'down'}];
+ if(/route-time/.test(id))return [{key:'avgDurationMin',label:'平均時間',direction:'down'},{key:'retreatRate',label:'撤退率',direction:'down'}];
+ if(/los|reason-route|prep-readiness|post-fix/.test(id)||rec?.action==='prep')return [{key:'retreatRate',label:'撤退率',direction:'down'},{key:'avgReadiness',label:'開始時確認',direction:'up'},{key:'postNeedsFixRate',label:'再修正率',direction:'down'}];
+ return [{key:'bossRate',label:'ボス到達',direction:'up'},{key:'retreatRate',label:'撤退率',direction:'down'},{key:'postNeedsFixRate',label:'再修正率',direction:'down'}];
+}
+function hdSPAExperimentThreshold(key,base){
+ if(['bossRate','sRate','winRate','retreatRate','avgReadiness','postDamageRate','postNeedsFixRate'].includes(key))return 10;
+ if(key==='avgResource')return Math.max(10,Math.abs(Number(base)||0)*.1);
+ if(key==='avgDurationMin')return .5;
+ if(key==='postAvgHpLoss')return 5;
+ if(key==='postAvgAirLoss')return 10;
+ if(key==='postAvgDepletedAdded')return .5;
+ return 1;
+}
+function hdSPAExperimentScopeRows(exp){
+ return hdSPALogs().filter(row=>{
+  if((Number(row?.at)||0)<=Number(exp?.startedAt||0))return false;
+  if(String(row?.map||'')!==String(exp?.map||''))return false;
+  if(exp?.objectiveTarget&&String(row?.objectiveTarget||'')!==String(exp.objectiveTarget))return false;
+  if(exp?.action==='optimize'&&exp?.mode)return String(row?.strategy||'')===String(exp.mode);
+  if(exp?.fleetId)return String(row?.fleetId||'')===String(exp.fleetId);
+  return true;
+ }).sort((a,b)=>(Number(a.at)||0)-(Number(b.at)||0));
+}
+function hdSPAExperimentOutcome(exp){
+ const needed=Math.max(1,Number(exp?.targetRuns)||3),rows=hdSPAExperimentScopeRows(exp),sample=rows.slice(0,needed),after=sample.length?hdSPAExperimentSnapshot(hdSPAMetrics(sample)):null,targets=Array.isArray(exp?.targets)&&exp.targets.length?exp.targets:hdSPAExperimentTargets(exp),deltas=[];let score=0,signals=0;
+ if(after){
+  for(const target of targets){
+   const before=exp?.baseline?.[target.key],next=after?.[target.key];if(before==null||next==null)continue;
+   const delta=Number((Number(next)-Number(before)).toFixed(2)),threshold=hdSPAExperimentThreshold(target.key,before),good=target.direction==='up'?delta>=threshold:delta<=-threshold,bad=target.direction==='up'?delta<=-threshold:delta>=threshold,signal=good?1:bad?-1:0;
+   score+=signal;signals++;deltas.push({...target,before,next,delta,threshold,signal});
+  }
+ }
+ let status='pending';if(sample.length>=needed){if(!signals)status='manual';else if(score>0)status='improved';else if(score<0)status='worse';else status='flat'}
+ return {status,needed,count:sample.length,rows:sample,after,deltas,score,signals};
+}
+function hdSPAExperimentStatusLabel(status){
+ return {pending:'検証中',improved:'暫定改善',worse:'要再検討',flat:'横ばい',manual:'データ不足'}[status]||'検証中';
+}
+function hdSPAStartExperiment(row,rec){
+ const ref=row?.recentRef;if(!row||!rec||!ref?.map)return null;
+ const baselineRows=[...(row.rows||[])].sort((a,b)=>(Number(b.at)||0)-(Number(a.at)||0)).slice(0,3),exp={
+  id:hdSPAExperimentUid(),recId:String(rec.id||''),title:String(rec.title||'改善案'),reason:String(rec.reason||''),action:String(rec.action||''),mode:String(rec.mode||''),
+  map:String(ref.map||''),fleetId:String(ref.fleetId||''),fleetName:String(ref.fleetName||''),objectiveTarget:String(row.objectiveTarget||''),sourceStrategy:String(row.strategy||''),
+  startedAt:Date.now(),targetRuns:3,baselineN:baselineRows.length,baseline:hdSPAExperimentSnapshot(hdSPAMetrics(baselineRows)),targets:hdSPAExperimentTargets(rec)
+ };
+ let rows=hdSPAExperiments().filter(x=>!(String(x?.map||'')===exp.map&&String(x?.recId||'')===exp.recId&&String(x?.fleetId||'')===exp.fleetId));
+ rows.push(exp);hdSPASaveExperiments(rows);return exp;
+}
+function hdSPADismissExperiment(id){
+ const next=hdSPAExperiments().filter(x=>String(x?.id||'')!==String(id||''));hdSPASaveExperiments(next);hdSPARender();return true;
+}
+function hdSPAExperimentDeltaText(row){
+ const sign=Number(row.delta)>0?'+':'',suffix=['bossRate','sRate','winRate','retreatRate','avgReadiness','postDamageRate','postNeedsFixRate'].includes(row.key)?'pt':row.key==='avgDurationMin'?'分':'';
+ return row.label+' '+sign+row.delta+suffix;
+}
+function hdSPAExperimentPanel(){
+ const exps=hdSPAExperiments().sort((a,b)=>(Number(b.startedAt)||0)-(Number(a.startedAt)||0)).slice(0,4);if(!exps.length)return '';
+ return '<div class="hd-spa-experiments"><div class="hd-spa-detail-head"><strong>改善案の追跡</strong><span>採用後3周で暫定比較</span></div>'+exps.map(exp=>{const out=hdSPAExperimentOutcome(exp),mode=exp.mode?' / '+hdSPAStrategyLabel(exp.mode):'',delta=out.deltas.length?out.deltas.map(hdSPAExperimentDeltaText).join(' / '):'比較できる指標を収集中';return '<div class="'+out.status+'"><div><b>'+hdSPAEsc(exp.title)+'</b><small>'+hdSPAEsc(exp.map+mode+' ｜ '+exp.reason)+'</small><em>'+hdSPAEsc(delta)+'</em></div><span><strong>'+hdSPAEsc(hdSPAExperimentStatusLabel(out.status))+'</strong><small>'+out.count+'/'+out.needed+'周</small><button type="button" class="ghost small" data-hd-spa-exp-dismiss="'+hdSPAEsc(exp.id)+'">終了</button></span></div>'}).join('')+'</div>';
 }
 function hdSPAMapName(map){
  const sources=[typeof MAP_DETAILS!=='undefined'?MAP_DETAILS:null,typeof MAP_DETAILS_34!=='undefined'?MAP_DETAILS_34:null,typeof MAP_DETAILS_57!=='undefined'?MAP_DETAILS_57:null];
@@ -199,7 +281,7 @@ function hdSPARecommendations(row){
 }
 function hdSPARecommendationHtml(row){
  const recs=hdSPARecommendations(row);if(!recs.length)return '';
- return '<div class="hd-spa-review"><div class="hd-spa-review-head"><strong>次の見直し候補</strong><span>トレンドから自動抽出</span></div><div class="hd-spa-review-list">'+recs.map(r=>'<div><div><strong>'+hdSPAEsc(r.title)+'</strong><small>'+hdSPAEsc(r.reason)+'</small></div><button type="button" class="ghost small" data-hd-spa-review="'+hdSPAEsc(row.key)+'" data-hd-spa-action="'+hdSPAEsc(r.action)+'" data-hd-spa-mode-target="'+hdSPAEsc(r.mode||'')+'">'+(r.action==='prep'?'準備表で確認':'再調整へ')+'</button></div>').join('')+'</div></div>';
+ return '<div class="hd-spa-review"><div class="hd-spa-review-head"><strong>次の見直し候補</strong><span>押すと改善テストも開始</span></div><div class="hd-spa-review-list">'+recs.map(r=>'<div><div><strong>'+hdSPAEsc(r.title)+'</strong><small>'+hdSPAEsc(r.reason)+'</small></div><button type="button" class="ghost small" data-hd-spa-review="'+hdSPAEsc(row.key)+'" data-hd-spa-action="'+hdSPAEsc(r.action)+'" data-hd-spa-mode-target="'+hdSPAEsc(r.mode||'')+'" data-hd-spa-rec-id="'+hdSPAEsc(r.id)+'" data-hd-spa-rec-title="'+hdSPAEsc(r.title)+'" data-hd-spa-rec-reason="'+hdSPAEsc(r.reason)+'">'+(r.action==='prep'?'確認して試す':'再調整して試す')+'</button></div>').join('')+'</div></div>';
 }
 function hdSPASelectContext(ref){
  if(!ref?.map)return false;
@@ -211,11 +293,12 @@ function hdSPASelectContext(ref){
   return true;
  }catch{return false}
 }
-function hdSPAReview(key,action,mode){
+function hdSPAReview(key,action,mode,recId='',title='',reason=''){
  if(!['prep','optimize'].includes(action))return false;
  if(action==='optimize'&&mode&&!['stable','firepower','route','boss','reserve'].includes(mode))return false;
  const row=hdSPARows().find(x=>x.key===key),ref=row?.recentRef;if(!row||!ref?.map)return false;
  if(!hdSPASelectContext(ref))return false;
+ if(recId)hdSPAStartExperiment(row,{id:recId,title:title||'改善案',reason,action,mode});
  if(action==='prep'){
   if(typeof hdSPSOpen==='function')hdSPSOpen();else if(typeof hdWSShowElement==='function')hdWSShowElement('hdSortiePreparation',true);
   return true;
@@ -341,7 +424,7 @@ function hdSPACard(row){
 function hdSPAHtml(){
  const mode=hdSPAMode(),map=hdSPAMap(),windowSize=hdSPAWindow(),rows=hdSPARows(),maps=hdSPAMaps();
  if(!hdSPALogs().length)return '<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>出撃データ分析</strong><span>ゲーム同期または出撃ログを記録すると、海域別の実績とドロップ履歴がここに出るよ。</span></div></div></section>';
- return `<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>出撃データ分析</strong><span>ゲーム同期・実戦モード・手動ログをまとめて自動集計</span></div><div class="hd-spa-controls"><select data-hd-spa-mode><option value="map" ${mode==='map'?'selected':''}>海域別</option><option value="strategy" ${mode==='strategy'?'selected':''}>方針別</option><option value="fleet" ${mode==='fleet'?'selected':''}>保存編成別</option></select><select data-hd-spa-map><option value="all">全海域</option>${maps.map(x=>`<option value="${hdSPAEsc(x)}" ${map===x?'selected':''}>${hdSPAEsc(x)} ${hdSPAEsc(hdSPAMapName(x))}</option>`).join('')}</select><select data-hd-spa-window><option value="3" ${windowSize===3?'selected':''}>直近3周比較</option><option value="5" ${windowSize===5?'selected':''}>直近5周比較</option><option value="10" ${windowSize===10?'selected':''}>直近10周比較</option></select></div></div>${rows.length?'<div class="hd-spa-grid">'+rows.map(hdSPACard).join('')+'</div>':'<div class="hd-spa-empty">この条件に一致する出撃ログはまだないよ。</div>'}<p class="hd-spa-note">※ゲーム同期・実戦モード・手動ログを海域別集計に含める。複数攻略目標を記録した海域は海域別、または海域を絞った方針/編成別で目標ごとに分離する。資源/バケツ・時間・開始時確認は値を持つログだけで平均する。帰還後テレメトリは実戦モード終了後に再同期できたログだけを対象にする。マス別の勝敗はゲーム同期の各戦闘結果を優先し、撤退率はそのマスへの到達数に対する撤退回数。ルート別分析はゲーム同期で取得できた通過ルートだけを対象にする。</p></section>`;
+ return `<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>出撃データ分析</strong><span>ゲーム同期・実戦モード・手動ログをまとめて自動集計</span></div><div class="hd-spa-controls"><select data-hd-spa-mode><option value="map" ${mode==='map'?'selected':''}>海域別</option><option value="strategy" ${mode==='strategy'?'selected':''}>方針別</option><option value="fleet" ${mode==='fleet'?'selected':''}>保存編成別</option></select><select data-hd-spa-map><option value="all">全海域</option>${maps.map(x=>`<option value="${hdSPAEsc(x)}" ${map===x?'selected':''}>${hdSPAEsc(x)} ${hdSPAEsc(hdSPAMapName(x))}</option>`).join('')}</select><select data-hd-spa-window><option value="3" ${windowSize===3?'selected':''}>直近3周比較</option><option value="5" ${windowSize===5?'selected':''}>直近5周比較</option><option value="10" ${windowSize===10?'selected':''}>直近10周比較</option></select></div></div>${hdSPAExperimentPanel()}${rows.length?'<div class="hd-spa-grid">'+rows.map(hdSPACard).join('')+'</div>':'<div class="hd-spa-empty">この条件に一致する出撃ログはまだないよ。</div>'}<p class="hd-spa-note">※ゲーム同期・実戦モード・手動ログを海域別集計に含める。複数攻略目標を記録した海域は海域別、または海域を絞った方針/編成別で目標ごとに分離する。資源/バケツ・時間・開始時確認は値を持つログだけで平均する。帰還後テレメトリは実戦モード終了後に再同期できたログだけを対象にする。マス別の勝敗はゲーム同期の各戦闘結果を優先し、撤退率はそのマスへの到達数に対する撤退回数。ルート別分析はゲーム同期で取得できた通過ルートだけを対象にする。</p></section>`;
 }
 function hdSPARender(){
  const root=document.getElementById('sortieLog');if(!root)return;
@@ -373,8 +456,9 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('click',e=>{
  const b=e.target.closest?.('[data-hd-spa-reopen]');if(b){hdSPAReopen(b.dataset.hdSpaReopen);return}
- const r=e.target.closest?.('[data-hd-spa-review]');if(r){hdSPAReview(r.dataset.hdSpaReview,r.dataset.hdSpaAction,r.dataset.hdSpaModeTarget);return}
+ const r=e.target.closest?.('[data-hd-spa-review]');if(r){hdSPAReview(r.dataset.hdSpaReview,r.dataset.hdSpaAction,r.dataset.hdSpaModeTarget,r.dataset.hdSpaRecId,r.dataset.hdSpaRecTitle,r.dataset.hdSpaRecReason);return}
+ const exp=e.target.closest?.('[data-hd-spa-exp-dismiss]');if(exp){hdSPADismissExperiment(exp.dataset.hdSpaExpDismiss);return}
 });
-window.addEventListener('storage',e=>{if(e.key==='harbordesk-sortie-log-v1')hdSPARender()});
+window.addEventListener('storage',e=>{if(e.key==='harbordesk-sortie-log-v1'||e.key===HD_SPA_EXPERIMENT_KEY)hdSPARender()});
 window.addEventListener('load',()=>setTimeout(()=>{if(!hdSPAInstall())setTimeout(hdSPAInstall,500)},1500));
 hdSPAInstall();
