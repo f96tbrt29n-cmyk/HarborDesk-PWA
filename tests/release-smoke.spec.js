@@ -1416,6 +1416,53 @@ test('release smoke: repeat-sortie series analytics groups linked cycles', async
 });
 
 
+test('release smoke: repeat-sortie analytics feed next-round guidance', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSSSeriesAdvice === 'function' &&
+    typeof window.hdSSOpenSeriesAnalytics === 'function' &&
+    typeof window.hdSPATrend === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const rows = [
+      {id:'e1',at:1000,map:'1-1',seriesId:'series-x',cycleIndex:1,result:'S',boss:true,fuel:50,ammo:50,durationMs:60000,postSortieReview:{gate:{state:'go'}}},
+      {id:'e2',at:2000,map:'1-1',seriesId:'series-x',cycleIndex:2,result:'S',boss:true,fuel:50,ammo:50,durationMs:60000,postSortieReview:{gate:{state:'go'}}},
+      {id:'e3',at:3000,map:'1-1',seriesId:'series-x',cycleIndex:3,result:'S',boss:true,fuel:50,ammo:50,durationMs:60000,postSortieReview:{gate:{state:'go'}}},
+      {id:'e4',at:4000,map:'1-1',seriesId:'series-x',cycleIndex:4,result:'撤退',retreat:true,boss:false,fuel:100,ammo:100,durationMs:90000,postSortieReview:{gate:{state:'hold'}}},
+      {id:'e5',at:5000,map:'1-1',seriesId:'series-x',cycleIndex:5,result:'撤退',retreat:true,boss:false,fuel:100,ammo:100,durationMs:90000,postSortieReview:{gate:{state:'hold'}}},
+      {id:'e6',at:6000,map:'1-1',seriesId:'series-x',cycleIndex:6,result:'A',boss:true,fuel:100,ammo:100,durationMs:90000,postSortieReview:{gate:{state:'go'}}}
+    ];
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify(rows));
+    const post={seriesId:'series-x',sessionId:'session-x',cycleIndex:6,map:'1-1'};
+    const advice=window.hdSSSeriesAdvice(post);
+    const html=window.hdSSSeriesAdviceHtml ? window.hdSSSeriesAdviceHtml(post) : '';
+    window.hdSSOpenSeriesAnalytics(post);
+    const mode=localStorage.getItem('harbordesk-sortie-analytics-mode-v1');
+    const map=localStorage.getItem('harbordesk-sortie-analytics-map-v1');
+
+    rows[5].targetObtained=true;
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify(rows));
+    const done=window.hdSSSeriesAdvice(post);
+    return {advice,html,mode,map,done};
+  });
+
+  expect(data.advice.state).toBe('warn');
+  expect(data.advice.rows).toBe(6);
+  expect(data.advice.recentFix).toBe(2);
+  expect(data.advice.issues.length).toBeGreaterThanOrEqual(2);
+  expect(data.advice.projection.resource).toBe(1000);
+  expect(data.html).toContain('連続周回の次周目安');
+  expect(data.html).toContain('周回分析を見る');
+  expect(data.mode).toBe('series');
+  expect(data.map).toBe('1-1');
+  expect(data.done.state).toBe('done');
+  expect(data.done.targetObtained).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
