@@ -101,20 +101,68 @@ function hdSSDuration(ms){
 }
 function hdSSFinish(data){
  const session=hdSSLoad();if(!session||typeof hdSLRecordEntry!=='function')return null;
- const at=Date.now(),result=data&&data.result||'S',memoParts=[];
+ const at=Date.now(),retreat=data?.retreat!=null?!!data.retreat:String(data?.result||'')==='撤退',result=retreat?'撤退':(data&&data.result||'S'),memoParts=[];
  if(session.strategyLabel)memoParts.push(session.strategyLabel);
  if(data&&String(data.memo||'').trim())memoParts.push(String(data.memo).trim());
- const entry=hdSLRecordEntry({
-  map:session.map,node:data&&data.node||'',result:result,boss:!!(data&&data.boss),retreat:result==='撤退',
+ const input={
+  map:session.map,node:data&&data.node||'',result,boss:!!(data&&data.boss),retreat,
   battles:Math.max(0,Number(data&&data.battles)||0),drop:data&&data.drop||'',buckets:Math.max(0,Number(data&&data.buckets)||0),
   fuel:Math.max(0,Number(data&&data.fuel)||0),ammo:Math.max(0,Number(data&&data.ammo)||0),steel:Math.max(0,Number(data&&data.steel)||0),bauxite:Math.max(0,Number(data&&data.bauxite)||0),
   memo:memoParts.join('｜'),retreatReason:String(data&&data.retreatReason||''),objectiveTarget:String(data&&data.objectiveTarget||''),sessionId:session.id,fleetId:session.fleetId,fleetName:session.fleetName,strategy:session.strategy,strategyLabel:session.strategyLabel,
   startedAt:session.startedAt,durationMs:Math.max(0,at-session.startedAt),fleetSnapshot:session.fleetSnapshot,readinessSnapshot:session.readinessSnapshot
- });
+ };
+ for(const k of ['source','gameSortieKey','gameNodeNo','gameNodeLabel','gameBossCellNo','gameBossCellLabel','gameRouteNodes','gameRouteLabels','gameBattleResults']){
+  if(data?.[k]!=null)input[k]=data[k];
+ }
+ if(data?.huntId!=null)input.huntId=data.huntId;if(data?.huntShip!=null)input.huntShip=data.huntShip;if(data?.targetObtained!=null)input.targetObtained=!!data.targetObtained;
+ const entry=hdSLRecordEntry(input);
  if(!entry)return null;
- hdSSPostSave({version:1,status:'awaiting-sync',sessionId:session.id,map:session.map,fleetId:session.fleetId,fleetName:session.fleetName,finishedAt:at,entryId:String(entry.id||''),fleetSnapshot:session.fleetSnapshot,startTelemetry:session.telemetrySnapshot||null});
+ hdSSPostSave({version:1,status:'awaiting-sync',sessionId:session.id,map:session.map,fleetId:session.fleetId,fleetName:session.fleetName,finishedAt:at,entryId:String(entry.id||''),fleetSnapshot:session.fleetSnapshot,startTelemetry:session.telemetrySnapshot||null,gameMatched:!!data?.gameSortieKey});
  hdSSSave(null);try{if(typeof hdSPSRender==='function')hdSPSRender();if(typeof hdSLRender==='function')hdSLRender()}catch{}
- hdSSEmit('finish',{session,entry,postReview:hdSSPostLoad()});return entry;
+ hdSSEmit('finish',{session,entry,postReview:hdSSPostLoad(),gameMatched:!!data?.gameSortieKey});return entry;
+}
+function hdSSGameSortieMatches(sessionLike,payload){
+ if(!sessionLike||!payload||String(sessionLike.map||'')!==String(payload.map||''))return false;
+ const sessionAt=Number(sessionLike.startedAt||sessionLike.fleetSnapshot?.startedAt)||0,gameAt=Number(payload.startedAt)||0;
+ if(!sessionAt||!gameAt)return true;
+ const diff=gameAt-sessionAt;
+ return diff>=-120000&&diff<=6*60*60*1000;
+}
+function hdSSMergeGameSortieIntoLog(post,payload){
+ if(!post||!payload)return null;
+ let rows=[];try{rows=typeof hdSLLoad==='function'?hdSLLoad():JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]')}catch{rows=[]}
+ if(!Array.isArray(rows)||!rows.length)return null;
+ const entryId=String(post.entryId||''),sessionId=String(post.sessionId||'');
+ let index=entryId?rows.findIndex(x=>String(x?.id||'')===entryId):-1;
+ if(index<0&&sessionId)index=rows.findIndex(x=>String(x?.sessionId||'')===sessionId);
+ if(index<0)return null;
+ const current=rows[index];
+ if(!hdSSGameSortieMatches({map:current.map,startedAt:current.startedAt},payload))return null;
+ const retreat=payload.retreat!=null?!!payload.retreat:String(payload.result||'')==='撤退',result=retreat?'撤退':String(payload.result||current.result||'不明');
+ const gameFields={};
+ for(const k of ['gameSortieKey','gameNodeNo','gameNodeLabel','gameBossCellNo','gameBossCellLabel','gameRouteNodes','gameRouteLabels','gameBattleResults'])if(payload[k]!=null)gameFields[k]=payload[k];
+ rows[index]={...current,...gameFields,source:'session-game',node:String(payload.node||current.node||''),result,boss:!!payload.boss,retreat,battles:Math.max(0,Number(payload.battles)||0),drop:String(payload.drop||''),gameMatchedAt:Date.now()};
+ if(payload.retreatReason)rows[index].retreatReason=String(payload.retreatReason);
+ if(typeof hdSLSave==='function')hdSLSave(rows);else localStorage.setItem('harbordesk-sortie-log-v1',JSON.stringify(rows.slice(0,500)));
+ try{if(typeof hdSLRender==='function')hdSLRender();if(typeof hdCCRender==='function')hdCCRender()}catch{}
+ try{window.dispatchEvent(new CustomEvent('hd:sortie-game-result-matched',{detail:{entry:rows[index],payload}}))}catch{}
+ return rows[index];
+}
+function hdSSIngestGameSortie(payload){
+ if(!payload?.map)return null;
+ const active=hdSSLoad();
+ if(active&&active.status==='active'&&hdSSGameSortieMatches(active,payload)){
+  return hdSSFinish({...payload,source:'session-game',autoGameResult:true});
+ }
+ const post=hdSSPostLoad();
+ if(post&&['awaiting-sync','reviewed'].includes(String(post.status||''))&&String(post.map||'')===String(payload.map||'')){
+  const merged=hdSSMergeGameSortieIntoLog(post,payload);
+  if(merged){
+   const next={...post,gameMatched:true,gameMatchedAt:Date.now(),gameSortieKey:String(payload.gameSortieKey||post.gameSortieKey||'')};
+   hdSSPostSave(next);hdSSEmit('game-result-match',{entry:merged,postReview:next});return merged;
+  }
+ }
+ return null;
 }
 function hdSSPostDelta(start,current){
  start=start||{};current=current||{};
