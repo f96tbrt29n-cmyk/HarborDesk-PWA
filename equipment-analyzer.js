@@ -19,7 +19,7 @@ function hdEAownedMap(){
   const k=hdEAnormalize(row.name);if(!k)continue;
   const cur=m.get(k)||{count:0,maxStar:0,targetStar:0};
   cur.count+=Math.max(0,Number(row.count)||0);
-  cur.maxStar=Math.max(cur.maxStar,Math.max(0,Number(row.star)||0));
+  if(Math.max(0,Number(row.count)||0)>0)cur.maxStar=Math.max(cur.maxStar,Math.max(0,Number(row.star)||0));
   cur.targetStar=Math.max(cur.targetStar,Math.max(0,Number(row.targetStar)||0));
   m.set(k,cur);
  }
