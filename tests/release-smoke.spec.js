@@ -3567,6 +3567,22 @@ test('release smoke: map攻略 tools survive tab redraws', async ({ page }) => {
 });
 
 
+test('release smoke: stale saved map攻略 tab falls back to overview', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-map-tab-v1', JSON.stringify({'5-6':'legacy-tab-that-no-longer-exists'}));
+    selectedWorld = '5';
+    selectedMap = '5-6';
+    renderMapPicker();
+  });
+  await expect(page.locator('[data-map-tab="overview"]')).toHaveClass(/active/);
+  await expect(page.locator('[data-map-pane="overview"]')).toBeVisible();
+  await expect(page.locator('#selectedMapCard')).toContainText('推奨練度');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map攻略 inner controls work end to end', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
