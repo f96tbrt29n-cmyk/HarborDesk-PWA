@@ -1583,7 +1583,7 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
     expect(data.index).toContain(`${asset}?v=402`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=401");
+  expect(data.updater).toContain("const HD_APP_BUILD=402");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
