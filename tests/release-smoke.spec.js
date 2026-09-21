@@ -274,6 +274,20 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
   expect(data.sw).toContain("harbordesk-pwa-v381");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
+  expect(data.sw).toContain("'./refresh.html'");
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: recovery page preserves local data while clearing app caches', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const source = await page.evaluate(async () => fetch('./refresh.html', { cache: 'no-store' }).then(r => r.text()));
+  expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
+  expect(source).toContain("navigator.serviceWorker.getRegistrations()");
+  expect(source).toContain("k.startsWith('harbordesk-pwa-')");
+  expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
+  expect(source).not.toContain('localStorage.clear');
+  expect(source).not.toContain('sessionStorage.clear');
   expect(errors).toEqual([]);
 });
 
