@@ -171,11 +171,10 @@ function hdKcMergeRoster(parsed){
   }
   if(idx!=null)used.add(idx);
   const old=idx!=null?existing[idx]:{};
-  const slots=[...(Array.isArray(ship.api_slot)?ship.api_slot:[])];if(Number(ship.api_slot_ex)>0)slots.push(Number(ship.api_slot_ex));
-  const labels=slots.filter(id=>Number(id)>0).map(id=>parsed.slotItems.get(Number(id))).filter(Boolean).map(x=>hdKcEquipLabel(x,equipMap));
+  const normalSlotIds=[...(Array.isArray(ship.api_slot)?ship.api_slot:[])],gameGearSlots=normalSlotIds.map(id=>{const item=Number(id)>0?parsed.slotItems.get(Number(id)):null;return item?hdKcEquipLabel(item,equipMap):''}),expansionItem=Number(ship.api_slot_ex)>0?parsed.slotItems.get(Number(ship.api_slot_ex)):null,gameGearExpansion=expansionItem?hdKcEquipLabel(expansionItem,equipMap):'',labels=[...gameGearSlots.filter(Boolean),gameGearExpansion].filter(Boolean);
   next.push({...old,
    id:old.id||`kc-ship-${gameId}`,name:String(master?.name||old.name||`艦娘ID ${masterId||'?'}`),masterId,type:String(master?.type||old.type||'未解決'),level:Number(ship.api_lv)||0,
-   gear:parsed.slotItems.size?labels.join(' / '):(old.gear||''),tags:Array.isArray(old.tags)?old.tags:[],memo:old.memo||'',remodel:old.remodel||'',
+   gear:parsed.slotItems.size?labels.join(' / '):(old.gear||''),gameGearSlots:parsed.slotItems.size?gameGearSlots:(Array.isArray(old.gameGearSlots)?old.gameGearSlots:[]),gameGearExpansion:parsed.slotItems.size?gameGearExpansion:String(old.gameGearExpansion||''),tags:Array.isArray(old.tags)?old.tags:[],memo:old.memo||'',remodel:old.remodel||'',
    source:'kancolle-import',gameShipId:gameId,gameHp:Number(ship.api_nowhp)||0,gameMaxHp:Number(ship.api_maxhp)||0,gameCond:Number(ship.api_cond)||0,
    gameLos:Array.isArray(ship.api_sakuteki)?Number(ship.api_sakuteki[0])||0:Number(ship.api_sakuteki)||0,gameOnslot:Array.isArray(ship.api_onslot)?ship.api_onslot.map(Number):[],gameFuel:ship.api_fuel==null?null:Number(ship.api_fuel)||0,gameAmmo:ship.api_bull==null?null:Number(ship.api_bull)||0,
    gameLocked:Number(ship.api_locked)||0,gameSallyArea:Number(ship.api_sally_area)||0,gameSlotEx:Number(ship.api_slot_ex)||0,syncedAt:now
@@ -251,9 +250,8 @@ function hdKcApplyDecks(parsed){
  const ships=parsed.ships,equipMap=hdKcMasterEquipMap(),rows=[...parsed.decks.values()].sort((a,b)=>Number(a.api_id)-Number(b.api_id)).map(deck=>({
   deckId:Number(deck.api_id),name:String(deck.api_name||`第${deck.api_id}艦隊`),mission:Array.isArray(deck.api_mission)?deck.api_mission.slice(0,4):[],
   ships:(Array.isArray(deck.api_ship)?deck.api_ship:[]).filter(id=>Number(id)>0).map(id=>{
-   const s=ships.get(Number(id)),m=s?hdKcMasterShip(s.api_ship_id):null,slotIds=[...(Array.isArray(s?.api_slot)?s.api_slot:[])];if(Number(s?.api_slot_ex)>0)slotIds.push(Number(s.api_slot_ex));
-   const gear=slotIds.filter(x=>Number(x)>0).map(x=>parsed.slotItems.get(Number(x))).filter(Boolean).map(x=>hdKcEquipLabel(x,equipMap)).join(' / ');
-   return {gameShipId:Number(id),masterId:Number(s?.api_ship_id)||0,name:String(m?.name||''),level:Number(s?.api_lv)||0,nowHp:Number(s?.api_nowhp)||0,maxHp:Number(s?.api_maxhp)||0,cond:Number(s?.api_cond)||0,gear}
+   const s=ships.get(Number(id)),m=s?hdKcMasterShip(s.api_ship_id):null,normalIds=[...(Array.isArray(s?.api_slot)?s.api_slot:[])],gearSlots=normalIds.map(x=>{const item=Number(x)>0?parsed.slotItems.get(Number(x)):null;return item?hdKcEquipLabel(item,equipMap):''}),expItem=Number(s?.api_slot_ex)>0?parsed.slotItems.get(Number(s.api_slot_ex)):null,gearExpansion=expItem?hdKcEquipLabel(expItem,equipMap):'',gear=[...gearSlots.filter(Boolean),gearExpansion].filter(Boolean).join(' / ');
+   return {gameShipId:Number(id),masterId:Number(s?.api_ship_id)||0,name:String(m?.name||''),level:Number(s?.api_lv)||0,nowHp:Number(s?.api_nowhp)||0,maxHp:Number(s?.api_maxhp)||0,cond:Number(s?.api_cond)||0,gear,gearSlots,gearExpansion}
   }),
   syncedAt:Date.now()
  }));
