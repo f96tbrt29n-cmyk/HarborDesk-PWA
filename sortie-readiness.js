@@ -36,7 +36,7 @@ function hdSortieState(map,fleetId){
 }
 function hdSortieSetCheck(map,fleetId,id,checked){
  const all=hdSortieLoad(HD_SORTIE_READY_KEY,{}),k=`${map}:${fleetId}`,fleet=hdSortieFleetById(map,fleetId),fingerprint=hdSortieFleetFingerprint(fleet),prev=all[k]||{},base=prev._fingerprint===fingerprint?prev:{};
- all[k]={...base,_fingerprint:fingerprint,[id]:checked,updatedAt:Date.now()};hdSortieSave(HD_SORTIE_READY_KEY,all);hdRenderSortieReadiness()
+ all[k]={...base,_fingerprint:fingerprint,[id]:checked,updatedAt:Date.now()};hdSortieSave(HD_SORTIE_READY_KEY,all);setTimeout(hdRenderSortieReadiness,0)
 }
 function hdSortieReset(map,fleetId){const all=hdSortieLoad(HD_SORTIE_READY_KEY,{});delete all[`${map}:${fleetId}`];hdSortieSave(HD_SORTIE_READY_KEY,all);hdRenderSortieReadiness()}
 function hdSortieRoster(){try{return JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')||[]}catch{return []}}
