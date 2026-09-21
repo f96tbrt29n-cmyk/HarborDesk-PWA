@@ -208,6 +208,7 @@ async function hdCoreMapAction(action){
  const tab=document.querySelector(`[data-map-tab="${action}"]`);
  if(tab){tab.click();return true}
  if(action==='gear'&&typeof window.hdFCOpenFallback==='function'&&window.hdFCOpenFallback())return true;
+ if(action==='mine'&&typeof window.cfOpenMapPanel==='function'&&window.cfOpenMapPanel())return true;
  const targets={map:'selectedMapCard',fleet:'selectedMapCard',gear:'hdFleetCalculator',drop:'dropHuntingDb',mine:'customFleetPanel'};
  const id=targets[action],el=id&&document.getElementById(id);
  if(el){
