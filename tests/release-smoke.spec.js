@@ -1463,6 +1463,59 @@ test('release smoke: repeat-sortie stop goals halt the next cycle at configured 
   expect(errors).toEqual([]);
 });
 
+test('release smoke: repeat-sortie recovery guide clears only reached stop conditions', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSSSeriesRecoveryPlan === 'function' &&
+    typeof window.hdSSSeriesClearReached === 'function' &&
+    typeof window.hdSSSeriesDecision === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const rows = [
+      {id:'r1',seriesId:'series-recover',cycleIndex:1,startedAt:1000,at:61000,fuel:100,ammo:100,buckets:0,drop:''},
+      {id:'r2',seriesId:'series-recover',cycleIndex:2,startedAt:91000,at:151000,fuel:100,ammo:100,buckets:1,drop:'明石'}
+    ];
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify(rows));
+    window.hdSSSeriesGoalSave('series-recover',{
+      maxCycles:2,
+      maxResources:9999,
+      maxBuckets:5,
+      maxElapsedMin:999,
+      target:'明石'
+    });
+    const before = window.hdSSSeriesDecision('series-recover');
+    const plan = window.hdSSSeriesRecoveryPlan(before);
+    const html = window.hdSSSeriesGoalHtml({seriesId:'series-recover',sessionId:'s'},before);
+    const after = window.hdSSSeriesClearReached('series-recover');
+    const goalAfter = window.hdSSSeriesGoal('series-recover');
+
+    window.hdSSSeriesGoalSave('series-target-scope',{target:'大淀'});
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify([
+      {id:'t1',seriesId:'series-target-scope',cycleIndex:1,startedAt:1,at:2,huntShip:'明石',targetObtained:true,drop:'明石'}
+    ]));
+    const unrelatedTarget = window.hdSSSeriesDecision('series-target-scope');
+    return { before, plan, html, after, goalAfter, unrelatedTarget };
+  });
+
+  expect(data.before.stop).toBe(true);
+  expect(data.before.reached).toMatchObject({ maxCycles:true, target:true });
+  expect(data.plan.items.map(x => x.key)).toEqual(['maxCycles','target']);
+  expect(data.html).toContain('再開ガイド');
+  expect(data.html).toContain('到達条件だけ解除');
+  expect(data.after.stop).toBe(false);
+  expect(data.goalAfter.maxCycles).toBe(0);
+  expect(data.goalAfter.target).toBe('');
+  expect(data.goalAfter.maxResources).toBe(9999);
+  expect(data.goalAfter.maxBuckets).toBe(5);
+  expect(data.goalAfter.maxElapsedMin).toBe(999);
+  expect(data.unrelatedTarget.targetHit).toBe(false);
+  expect(data.unrelatedTarget.stop).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: series analytics shows configured stop-goal status', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
