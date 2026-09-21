@@ -559,6 +559,6 @@ document.addEventListener('click',function(e){
 window.addEventListener('storage',function(e){if([HD_SS_KEY,HD_SS_SERIES_GOALS_KEY,HD_SS_SERIES_ARCHIVE_KEY,'harbordesk-custom-fleets-v1','harbordesk-sortie-selection-v1','harbordesk-sortie-readiness-v1','harbordesk-sortie-log-v1'].includes(e.key))hdSSRender()});
 window.addEventListener('hd:map-rendered',function(){setTimeout(hdSSRender,0)});
 window.addEventListener('hd:kancolle-sync',function(e){const post=hdSSPostLoad();if(post?.status==='reviewed')hdSSPostRefreshReview(e?.detail);else hdSSPostTryReview(e?.detail);setTimeout(hdSSRender,0)});
-['hd:equipment-changed','hd:ship-identity-changed'].forEach(function(name){window.addEventListener(name,function(){if(hdSSPostLoad()?.status==='reviewed')hdSSPostRefreshReview();setTimeout(hdSSRender,0)})});
+['hd:equipment-changed','hd:ship-identity-changed','hd:custom-fleets-changed'].forEach(function(name){window.addEventListener(name,function(){if(hdSSPostLoad()?.status==='reviewed')hdSSPostRefreshReview();setTimeout(hdSSRender,0)})});
 window.addEventListener('load',function(){const post=hdSSPostLoad();if(post?.status==='reviewed')hdSSPostRefreshReview();else hdSSPostTryReview();setTimeout(function(){if(!hdSSInstall())setTimeout(hdSSInstall,500)},1000)});
 hdSSInstall();
