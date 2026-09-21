@@ -5,7 +5,7 @@ function loadCustomFleets(){
   try{return JSON.parse(localStorage.getItem(CUSTOM_FLEET_KEY))||{}}
   catch{return {}}
 }
-function saveCustomFleets(data){localStorage.setItem(CUSTOM_FLEET_KEY,JSON.stringify(data))}
+function saveCustomFleets(data){localStorage.setItem(CUSTOM_FLEET_KEY,JSON.stringify(data));window.dispatchEvent(new CustomEvent('hd:custom-fleets-changed',{detail:{at:Date.now()}}))}
 function cfMasterId(name){return Number(typeof hdShipImageResolve==='function'?hdShipImageResolve(name)?.id:0)||0}
 function cfShipRef(row){return Number(row?.masterId)>0?{id:Number(row.masterId),name:String(row.ship||'')}:String(row?.ship||'')}
 function cfMigrateMasterIds(){
