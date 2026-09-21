@@ -294,7 +294,28 @@ function hdFEGoNoGo(auto){
 }
 function hdFEGateHtml(auto){
  const gate=hdFEGoNoGo(auto),items=gate.actions.slice(0,6);
- return `<div class="hd-fe-gate ${gate.state}"><div class="hd-fe-gate-head"><div><span>出撃判定</span><strong>${hdFEEsc(gate.label)}</strong></div><small>${hdFEEsc(gate.detail)}</small></div>${items.length?`<div class="hd-fe-gate-actions">${items.map((x,i)=>`<div class="${x.status}"><b>${i+1}. ${hdFEEsc(x.action)}</b><span>${hdFEEsc(x.label)}｜${hdFEEsc(x.detail)}</span></div>`).join('')}</div>`:'<div class="hd-fe-gate-clear">この判定範囲では追加作業なし</div>'}</div>`;
+ return `<div class="hd-fe-gate ${gate.state}"><div class="hd-fe-gate-head"><div><span>出撃判定</span><strong>${hdFEEsc(gate.label)}</strong></div><small>${hdFEEsc(gate.detail)}</small></div>${items.length?`<div class="hd-fe-gate-actions">${items.map((x,i)=>`<button type="button" class="hd-fe-gate-action ${x.status}" data-hd-fe-fix="${hdFEEsc(x.id)}"><span><b>${i+1}. ${hdFEEsc(x.action)}</b><small>${hdFEEsc(x.label)}｜${hdFEEsc(x.detail)}</small></span><i aria-hidden="true">開く ›</i></button>`).join('')}</div>`:'<div class="hd-fe-gate-clear">この判定範囲では追加作業なし</div>'}</div>`;
+}
+function hdFEOpenMapTool(tab,focusId=''){
+ if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);
+ setTimeout(()=>{
+  if(typeof hdMapOpenTool==='function')hdMapOpenTool(tab);else document.querySelector(`[data-map-tab="${tab}"]`)?.click();
+  if(focusId)setTimeout(()=>document.getElementById(focusId)?.scrollIntoView({behavior:'smooth',block:'start'}),100);
+ },70);
+ return true;
+}
+function hdFEOpenFix(id){
+ const key=String(id||'');
+ if(['freshness','health','supply','gameMatch'].includes(key)){
+  if(typeof hdWSShowElement==='function')hdWSShowElement('kancolleImport',true);
+  else document.getElementById('kancolleImport')?.scrollIntoView({behavior:'smooth',block:'start'});
+  if(key!=='freshness')setTimeout(()=>document.getElementById('hdKcCurrentFleets')?.scrollIntoView({behavior:'smooth',block:'start'}),100);
+  return true;
+ }
+ if(key==='route')return hdFEOpenMapTool('route','hdMapRouteRequirements');
+ if(key==='equipment'||key==='master')return hdFEOpenMapTool('gear',key==='equipment'?'hdEquipmentOwned':'');
+ if(key==='air'||key==='scouting')return hdFEOpenMapTool('gear','hdFleetCalculator');
+ return false;
 }
 function hdFEAutoHtml(v){
  return `<div class="hd-fe-auto ${v.status}">${hdFEGateHtml(v)}<div class="hd-fe-auto-head"><div><b>出撃自動判定</b><span>艦状態・補給・同期鮮度・ゲーム反映・編成・装備・制空・索敵を統合</span></div><strong>${hdFEAutoStatusLabel(v.status)}</strong></div><div class="hd-fe-auto-grid">${v.checks.map(x=>`<div class="${x.status}"><span>${hdFEEsc(x.label)}</span><b>${hdFEAutoStatusLabel(x.status)}</b><small>${hdFEEsc(x.detail||'')}</small></div>`).join('')}</div>${hdFEGameMatchHtml(v.gameMatch)}${v.scouting?.available&&v.scouting.checks?.length?`<div class="hd-fe-auto-detail"><b>索敵分岐</b>${v.scouting.checks.map(x=>`<span class="${x.status}">${hdFEEsc(x.label)}：${v.scouting.score.toFixed(2)} / 安全域 ${x.safe}${x.failBelow?`（${x.failBelow}未満は逸れ域）`:''}</span>`).join('')}</div>`:''}</div>`;
@@ -366,6 +387,7 @@ function hdFEInstall(){
  return true;
 }
 document.addEventListener('click',e=>{
+ const fix=e.target.closest?.('[data-hd-fe-fix]');if(fix){hdFEOpenFix(fix.dataset.hdFeFix);return}
  if(e.target.closest?.('[data-hd-fe-calculator]')){
   if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);
   setTimeout(()=>{document.querySelector('[data-map-tab="gear"]')?.click();setTimeout(()=>document.getElementById('hdFleetCalculator')?.scrollIntoView({behavior:'smooth',block:'start'}),80)},60);
