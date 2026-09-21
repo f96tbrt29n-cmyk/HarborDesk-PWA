@@ -3567,6 +3567,101 @@ test('release smoke: map攻略 tools survive tab redraws', async ({ page }) => {
 });
 
 
+test('release smoke: map攻略 inner controls work end to end', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdEnhanceMapPane === 'function' &&
+    typeof window.hdRenderMapEquipmentRecommendations === 'function' &&
+    typeof window.openCustomFleetDialog === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-custom-fleets-v1');
+    localStorage.removeItem('harbordesk-drop-hunts-v1');
+    selectedWorld = '5';
+    selectedMap = '5-6';
+    renderMapPicker();
+  });
+
+  await page.locator('[data-map-tab="map"]').click();
+  const stageButtons = page.locator('[data-hd-map-stage="5-6"]');
+  await expect(stageButtons).toHaveCount(3);
+  const beforeStage = await page.locator('.hd-map-stage-card').textContent();
+  await stageButtons.nth(1).click();
+  const afterStage = await page.locator('.hd-map-stage-card').textContent();
+  expect(afterStage).not.toBe(beforeStage);
+  const savedStage = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-map-stage-v1') || '{}')['5-6']);
+  expect(savedStage).toBeTruthy();
+
+  await page.locator('[data-hd-map-open="5-6"]').click();
+  await expect(page.locator('#hdMapImageDialog')).toBeVisible();
+  await page.locator('#hdMapDialogClose').click();
+  await expect(page.locator('#hdMapImageDialog')).not.toBeVisible();
+
+  await page.locator('.hd-map-structure-guide > summary').click();
+  const node = page.locator('[data-map-pane="map"] .hd-map-node').first();
+  await expect(node).toBeVisible();
+  await node.click();
+  await expect(page.locator('#hdMapNodeInfo')).toBeVisible();
+  await expect(page.locator('#hdMapNodeInfo')).toContainText('MAP NODE DETAIL');
+  await page.locator('#hdMapNodeInfo [data-open-route-tab]').click();
+  await expect(page.locator('[data-map-pane="route"]')).toBeVisible();
+  await expect(page.locator('#hdMapRouteRequirements')).toBeVisible();
+
+  await page.locator('[data-map-tab="gear"]').click();
+  const gearPanel = page.locator('#hdMapEquipRecommend .hd-map-equip-recommend');
+  await expect(gearPanel).toBeVisible();
+  const ownedOnly = gearPanel.locator('[data-hd-owned-only]');
+  await expect(ownedOnly).toBeVisible();
+  await ownedOnly.click();
+  await expect(gearPanel).toHaveClass(/hd-owned-only/);
+  await expect(ownedOnly).toHaveText('全候補を表示');
+  await ownedOnly.click();
+  await expect(gearPanel).not.toHaveClass(/hd-owned-only/);
+
+  const viewButton = gearPanel.locator('[data-hd-map-equip-view]').first();
+  const equipName = await viewButton.getAttribute('data-hd-map-equip-view');
+  await viewButton.click();
+  await expect(page.locator('#equipmentBook')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#hdEquipCatalogSearch')).toHaveValue(equipName || '');
+
+  await page.evaluate(() => {
+    window.hdWSShowElement?.('guide', false);
+    selectedWorld = '6';
+    selectedMap = '6-3';
+    renderMapPicker();
+  });
+  await page.locator('[data-map-tab="drop"]').click();
+  const dropChip = page.locator('[data-hd-map-drop-ship]').first();
+  await expect(dropChip).toBeVisible();
+  await dropChip.click();
+  const hunts = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1') || '[]'));
+  expect(hunts.length).toBeGreaterThan(0);
+  await expect(page.locator('[data-hd-map-drop-ship].hunting').first()).toBeVisible();
+
+  await page.evaluate(() => {
+    selectedWorld = '5';
+    selectedMap = '5-5';
+    renderMapPicker();
+  });
+  await page.locator('[data-map-tab="mine"]').click();
+  await page.locator('#addCustomFleet').click();
+  await expect(page.locator('#customFleetDialog')).toBeVisible();
+  await page.locator('#customFleetName').fill('回帰テスト編成');
+  await page.locator('#cfShip0').fill('赤城');
+  await page.locator('#cfGear0').fill('艦戦');
+  await page.locator('#customFleetDialog button[value="default"]').click();
+  await expect(page.locator('#customFleetPanel')).toContainText('回帰テスト編成');
+  const fleets = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1') || '{}')['5-5'] || []);
+  expect(fleets.some(x => x.name === '回帰テスト編成')).toBe(true);
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map overview exposes visible攻略 tool launcher', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
