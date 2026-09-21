@@ -1416,6 +1416,84 @@ test('release smoke: repeat-sortie series analytics groups linked cycles', async
 });
 
 
+test('release smoke: repeat-sortie stop goals halt the next cycle at configured limits', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSSSeriesGoalSave === 'function' &&
+    typeof window.hdSSSeriesDecision === 'function' &&
+    typeof window.hdSSSeriesGoalHtml === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const rows = [
+      {id:'e1',seriesId:'series-goal',cycleIndex:1,startedAt:1000,at:61000,fuel:100,ammo:100,steel:0,bauxite:0,buckets:0,drop:''},
+      {id:'e2',seriesId:'series-goal',cycleIndex:2,startedAt:91000,at:151000,fuel:110,ammo:100,steel:0,bauxite:0,buckets:1,drop:''},
+      {id:'e3',seriesId:'series-goal',cycleIndex:3,startedAt:181000,at:241000,fuel:120,ammo:100,steel:0,bauxite:0,buckets:1,drop:'明石'}
+    ];
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify(rows));
+    window.hdSSSeriesGoalSave('series-goal', {
+      maxCycles:3,
+      maxResources:1000,
+      maxBuckets:5,
+      maxElapsedMin:10,
+      target:'明石'
+    });
+    const decision = window.hdSSSeriesDecision('series-goal');
+    const html = window.hdSSSeriesGoalHtml({seriesId:'series-goal',sessionId:'session-x'}, decision);
+    window.hdSSSeriesGoalSave('series-goal', {});
+    const cleared = window.hdSSSeriesDecision('series-goal');
+    return { decision, html, cleared };
+  });
+
+  expect(data.decision.stop).toBe(true);
+  expect(data.decision.progress.cycles).toBe(3);
+  expect(data.decision.progress.resourceTotal).toBe(630);
+  expect(data.decision.progress.buckets).toBe(2);
+  expect(data.decision.targetHit).toBe(true);
+  expect(data.decision.reasons.join(' / ')).toContain('周回上限 3/3');
+  expect(data.decision.reasons.join(' / ')).toContain('目標ドロップ 明石 獲得');
+  expect(data.html).toContain('周回終了条件');
+  expect(data.html).toContain('STOP');
+  expect(data.cleared.stop).toBe(false);
+
+  const source = await page.evaluate(async () => fetch('./sortie-session.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain("if(hdSSSeriesDecision(String(post.seriesId||post.sessionId||'')).stop)return false");
+  expect(source).toContain("if(hdSSSeriesDecision(String(post.seriesId||post.sessionId||'')).stop)return null");
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: series analytics shows configured stop-goal status', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSPASeriesMeta === 'function' &&
+    typeof window.hdSPASeriesGoalStatus === 'function' &&
+    typeof window.hdSSSeriesGoalSave === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const rows = [
+      {id:'a1',seriesId:'series-a',cycleIndex:1,map:'1-1',startedAt:1000,at:61000,fuel:10,ammo:20,buckets:0},
+      {id:'a2',seriesId:'series-a',cycleIndex:2,map:'1-1',startedAt:91000,at:151000,fuel:12,ammo:22,buckets:1}
+    ];
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify(rows));
+    window.hdSSSeriesGoalSave('series-a',{maxCycles:2});
+    const row={seriesMeta:window.hdSPASeriesMeta(rows)};
+    return {
+      status: window.hdSPASeriesGoalStatus(row),
+      series: window.hdSPASeriesHtml(row)
+    };
+  });
+
+  expect(data.status).toContain('最大2周');
+  expect(data.status).toContain('到達・停止');
+  expect(data.series).toContain('連続周回サマリー');
+  expect(data.series).toContain('終了条件');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -1425,8 +1503,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.400'");
-  expect(source).toContain("const HD_APP_BUILD=400");
+  expect(source).toContain("const HD_APP_VERSION='1.0.401'");
+  expect(source).toContain("const HD_APP_BUILD=401");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -1449,14 +1527,14 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=400`);
+    expect(data.index).toContain(`${asset}?v=401`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=400");
+  expect(data.updater).toContain("const HD_APP_BUILD=401");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v400");
+  expect(data.sw).toContain("harbordesk-pwa-v401");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -1469,7 +1547,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=400');
+  expect(source).toContain('const BUILD=401');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -2709,17 +2787,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=400',
-      'map-images.js?v=400',
-      'map-tabs.js?v=400',
-      'map-interactive.js?v=400',
-      'map-advanced-data.js?v=400'
+      'map-details.js?v=401',
+      'map-images.js?v=401',
+      'map-tabs.js?v=401',
+      'map-interactive.js?v=401',
+      'map-advanced-data.js?v=401'
     ];
     const requiredStyles = [
-      'map-details.css?v=400',
-      'map-tabs.css?v=400',
-      'map-images.css?v=400',
-      'map-interactive.css?v=400'
+      'map-details.css?v=401',
+      'map-tabs.css?v=401',
+      'map-images.css?v=401',
+      'map-interactive.css?v=401'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -2761,7 +2839,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=400');
+  expect(src).toBe('app.js?v=401');
   expect(errors).toEqual([]);
 });
 
