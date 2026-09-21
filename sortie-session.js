@@ -146,7 +146,9 @@ function hdSSMergeGameSortieIntoLog(post,payload){
  const retreat=payload.retreat!=null?!!payload.retreat:String(payload.result||'')==='撤退',result=retreat?'撤退':String(payload.result||current.result||'不明'),mergedDrop=String(payload.drop||current.drop||'').trim(),target=String(post.objectiveTarget||current.objectiveTarget||'').trim(),matchedTarget=!!(target&&mergedDrop&&mergedDrop===target);
  const gameFields={};
  for(const k of ['gameSortieKey','gameNodeNo','gameNodeLabel','gameBossCellNo','gameBossCellLabel','gameRouteNodes','gameRouteLabels','gameBattleResults'])if(payload[k]!=null)gameFields[k]=payload[k];
- rows[index]={...current,...gameFields,source:'session-game',node:String(payload.node||current.node||''),result,boss:!!payload.boss,retreat,battles:Math.max(0,Number(payload.battles)||0),drop:mergedDrop,objectiveTarget:target||String(current.objectiveTarget||''),targetObtained:!!current.targetObtained||matchedTarget,gameMatchedAt:Date.now()};
+ const newlyObtained=matchedTarget&&!current.targetObtained,updatedHuntDelta=newlyObtained&&current.huntId?{...(current.huntDelta||{}),obtainedChanged:true}:current.huntDelta;
+ rows[index]={...current,...gameFields,source:'session-game',node:String(payload.node||current.node||''),result,boss:!!payload.boss,retreat,battles:Math.max(0,Number(payload.battles)||0),drop:mergedDrop,objectiveTarget:target||String(current.objectiveTarget||''),targetObtained:!!current.targetObtained||matchedTarget,huntDelta:updatedHuntDelta,gameMatchedAt:Date.now()};
+ if(newlyObtained&&current.huntId&&typeof hdSLMarkHuntObtained==='function')hdSLMarkHuntObtained(current.huntId,rows[index].at||Date.now());
  if(payload.retreatReason)rows[index].retreatReason=String(payload.retreatReason);
  if(typeof hdSLSave==='function')hdSLSave(rows);else localStorage.setItem('harbordesk-sortie-log-v1',JSON.stringify(rows.slice(0,500)));
  try{if(typeof hdSLRender==='function')hdSLRender();if(typeof hdCCRender==='function')hdCCRender()}catch{}
