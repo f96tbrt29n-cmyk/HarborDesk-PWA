@@ -4,7 +4,7 @@ const HD_SPA_WINDOW_KEY='harbordesk-sortie-analytics-window-v1';
 const HD_SPA_STRATEGY_ORDER=['stable','firepower','route','boss','reserve','manual'];
 
 function hdSPAEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function hdSPAMode(){try{const v=localStorage.getItem(HD_SPA_MODE_KEY)||'map';return ['map','strategy','fleet'].includes(v)?v:'map'}catch{return 'map'}}
+function hdSPAMode(){try{const v=localStorage.getItem(HD_SPA_MODE_KEY)||'map';return ['map','strategy','fleet','series'].includes(v)?v:'map'}catch{return 'map'}}
 function hdSPASetMode(v){try{localStorage.setItem(HD_SPA_MODE_KEY,v)}catch{}}
 function hdSPAMap(){try{return localStorage.getItem(HD_SPA_MAP_KEY)||'all'}catch{return 'all'}}
 function hdSPASetMap(v){try{localStorage.setItem(HD_SPA_MAP_KEY,v)}catch{}}
@@ -20,6 +20,23 @@ function hdSPAMapName(map){
 function hdSPASourceKind(row){if(row?.source==='kancolle-import')return 'game';if(row?.sessionId||row?.fleetId)return 'session';return 'manual'}
 function hdSPASourceStats(rows){
  const out={game:0,session:0,manual:0};for(const row of rows||[])out[hdSPASourceKind(row)]++;return out;
+}
+function hdSPASeriesMeta(rows){
+ const list=[...(rows||[])].filter(x=>x&&String(x.seriesId||'').trim());
+ if(!list.length)return null;
+ const cycleNos=[...new Set(list.map(x=>Math.max(1,Number(x.cycleIndex)||1)))].sort((a,b)=>a-b),maxCycle=cycleNos.length?Math.max(...cycleNos):list.length,minCycle=cycleNos.length?Math.min(...cycleNos):1;
+ const start=Math.min(...list.map(x=>Number(x.startedAt)||Number(x.at)||0).filter(Boolean)),end=Math.max(...list.map(x=>Number(x.at)||((Number(x.startedAt)||0)+(Number(x.durationMs)||0))).filter(Boolean));
+ const durationRows=list.map(x=>Math.max(0,Number(x.durationMs)||0)).filter(x=>x>0),durationTotal=durationRows.reduce((a,b)=>a+b,0);
+ const resourceTotal=list.reduce((sum,x)=>sum+(Number(x.fuel)||0)+(Number(x.ammo)||0)+(Number(x.steel)||0)+(Number(x.bauxite)||0),0),buckets=list.reduce((sum,x)=>sum+(Number(x.buckets)||0),0);
+ const reviewed=list.filter(x=>x.postSortieReview),needsFix=list.filter(x=>['hold','stop'].includes(String(x.postSortieReview?.gate?.state||''))).length,stop=list.filter(x=>String(x.postSortieReview?.gate?.state||'')==='stop').length;
+ const missingCycles=Math.max(0,(maxCycle-minCycle+1)-cycleNos.length);
+ return {
+  seriesId:String(list[0].seriesId||''),cycles:list.length,maxCycle,minCycle,missingCycles,
+  startedAt:start||0,endedAt:end||0,elapsedMin:start&&end?Number(((end-start)/60000).toFixed(1)):null,
+  activeMin:durationRows.length?Number((durationTotal/60000).toFixed(1)):null,
+  avgCycleMin:durationRows.length?Number((durationTotal/durationRows.length/60000).toFixed(1)):null,
+  resourceTotal,buckets,reviewed:reviewed.length,needsFix,stop,lastAt:end||0
+ };
 }
 function hdSPADropStats(rows){
  const drops=(rows||[]).filter(x=>String(x?.drop||'').trim()).sort((a,b)=>(Number(b.at)||0)-(Number(a.at)||0)),counts=new Map();
@@ -242,6 +259,7 @@ function hdSPAGroupKey(row,mode,splitObjective=false){
  let base;
  if(mode==='map')base=String(row.map||'unknown');
  else if(mode==='fleet')base=row.fleetId||row.fleetName||(hdSPASourceKind(row)==='game'?'game-sync':'manual-log');
+ else if(mode==='series')base=String(row.seriesId||row.sessionId||row.id||'series-unknown');
  else base=row.strategy||(hdSPASourceKind(row)==='game'?'game-sync':'manual-log');
  return splitObjective?base+'|objective:'+(String(row.objectiveTarget||'').trim()||'unrecorded'):base;
 }
@@ -249,19 +267,22 @@ function hdSPAGroupLabel(row,mode,splitObjective=false){
  let base;
  if(mode==='map'){const map=String(row.map||'');const name=hdSPAMapName(map);base=name?map+' '+name:map||'海域不明'}
  else if(mode==='fleet'){base=row.fleetName?row.fleetName:(hdSPASourceKind(row)==='game'?'ゲーム同期（編成未紐付け）':'手動ログ（編成未紐付け）')}
+ else if(mode==='series'){const map=String(row.map||''),name=hdSPAMapName(map),fleet=String(row.fleetName||'').trim();base=[name?map+' '+name:map||'海域不明',fleet||'保存編成'].filter(Boolean).join('｜')}
  else if(row.strategy)base=hdSPAStrategyLabel(row.strategy,row);
  else base=hdSPASourceKind(row)==='game'?'ゲーム同期':'手動ログ';
  return base;
 }
 function hdSPARows(){
- const mode=hdSPAMode(),map=hdSPAMap(),logs=hdSPALogs().filter(x=>map==='all'||x.map===map),groups=new Map(),objectiveMaps=hdSPAObjectiveSplitMaps(logs);
+ const mode=hdSPAMode(),map=hdSPAMap(),source=hdSPALogs().filter(x=>map==='all'||x.map===map),logs=mode==='series'?source.filter(x=>String(x.seriesId||'').trim()):source,groups=new Map(),objectiveMaps=hdSPAObjectiveSplitMaps(logs);
  for(const row of logs){
-  const splitObjective=objectiveMaps.has(String(row.map||''))&&(mode==='map'||map!=='all'),key=hdSPAGroupKey(row,mode,splitObjective);
-  if(!groups.has(key))groups.set(key,{key,label:hdSPAGroupLabel(row,mode,splitObjective),strategy:row.strategy||'manual',objectiveTarget:String(row.objectiveTarget||'').trim(),objectiveSplit:splitObjective,rows:[],maps:new Set()});
+  const splitObjective=mode!=='series'&&objectiveMaps.has(String(row.map||''))&&(mode==='map'||map!=='all'),key=hdSPAGroupKey(row,mode,splitObjective);
+  if(!groups.has(key))groups.set(key,{key,label:hdSPAGroupLabel(row,mode,splitObjective),strategy:row.strategy||'manual',seriesId:String(row.seriesId||''),objectiveTarget:String(row.objectiveTarget||'').trim(),objectiveSplit:splitObjective,rows:[],maps:new Set()});
   const g=groups.get(key);g.rows.push(row);g.maps.add(row.map);
  }
- const out=[...groups.values()].map(g=>{const maps=[...g.maps],nodeStats=hdSPANodeStats(g.rows),routeStats=hdSPARouteStats(g.rows);return {...g,metrics:hdSPAMetrics(g.rows),dropStats:hdSPADropStats(g.rows),retreatReasonStats:hdSPARetreatReasonStats(g.rows),nodeStats,routeStats,dangerNodes:hdSPADangerNodes(nodeStats),nodeTrend:hdSPANodeTrend(g.rows),routeComparison:hdSPARouteComparison(maps,routeStats),trend:hdSPATrend(g.rows),recentRef:hdSPARecentRef(g.rows),maps}});
+ let out=[...groups.values()].map(g=>{const maps=[...g.maps],nodeStats=hdSPANodeStats(g.rows),routeStats=hdSPARouteStats(g.rows);return {...g,metrics:hdSPAMetrics(g.rows),seriesMeta:hdSPASeriesMeta(g.rows),dropStats:hdSPADropStats(g.rows),retreatReasonStats:hdSPARetreatReasonStats(g.rows),nodeStats,routeStats,dangerNodes:hdSPADangerNodes(nodeStats),nodeTrend:hdSPANodeTrend(g.rows),routeComparison:hdSPARouteComparison(maps,routeStats),trend:hdSPATrend(g.rows),recentRef:hdSPARecentRef(g.rows),maps}});
+ if(mode==='series')out=out.filter(x=>(x.seriesMeta?.cycles||0)>=2);
  out.sort((a,b)=>{
+  if(mode==='series')return (Number(b.seriesMeta?.lastAt)||0)-(Number(a.seriesMeta?.lastAt)||0);
   if(mode==='strategy'){const ai=HD_SPA_STRATEGY_ORDER.indexOf(a.strategy),bi=HD_SPA_STRATEGY_ORDER.indexOf(b.strategy);if(ai!==bi)return (ai<0?99:ai)-(bi<0?99:bi)}
   return b.metrics.n-a.metrics.n||a.label.localeCompare(b.label,'ja');
  });
@@ -327,6 +348,20 @@ function hdSPAInsightHtml(row){
  if(compare){const actual=compare.actual,refStats=compare.referenceStats;routeHtml='<div class="hd-spa-insight-block route"><strong>ルート差分</strong><span>構造図最短（参考） <b>'+hdSPAEsc(compare.referenceRoute)+'</b>'+(refStats?' <small>実績 '+refStats.n+'周 / ボス'+refStats.bossRate+'%</small>':' <small>実績なし</small>')+'</span>'+(actual?'<span>最多実績 <b>'+hdSPAEsc(actual.route)+'</b> <small>'+actual.n+'周 / ボス'+actual.bossRate+'% / 撤退'+actual.retreatRate+'%</small></span>':'<span>実績ルートなし</span>')+'<em class="'+(compare.matches?'match':'diff')+'">'+(compare.matches?'最多実績ルートは構造図最短と一致':'最多実績ルートは構造図最短と異なる')+'</em></div>';}
  if(!dangerHtml&&!trendHtml&&!routeHtml)return '';return '<div class="hd-spa-insights"><div class="hd-spa-detail-head"><strong>攻略インサイト</strong><span>実戦ログから自動検出</span></div>'+dangerHtml+trendHtml+routeHtml+'<small class="hd-spa-insight-note">構造図最短はHarborDesk内の海域グラフ上の参考経路。艦これの固定条件・確率分岐を含む「推奨ルート」判定ではないよ。</small></div>';
 }
+function hdSPASeriesHtml(row){
+ const s=row?.seriesMeta;if(!s||s.cycles<2)return '';
+ const gap=s.missingCycles?'<span class="warn">欠番 <b>'+s.missingCycles+'</b></span>':'';
+ return '<div class="hd-spa-series"><div class="hd-spa-detail-head"><strong>連続周回サマリー</strong><span>'+s.cycles+'周 / cycle '+s.minCycle+'〜'+s.maxCycle+'</span></div><div>'+
+  '<span>経過 <b>'+(s.elapsedMin==null?'—':s.elapsedMin+'分')+'</b></span>'+
+  '<span>実戦時間 <b>'+(s.activeMin==null?'—':s.activeMin+'分')+'</b></span>'+
+  '<span>平均1周 <b>'+(s.avgCycleMin==null?'—':s.avgCycleMin+'分')+'</b></span>'+
+  '<span>総資源 <b>'+s.resourceTotal+'</b></span>'+
+  '<span>バケツ <b>'+s.buckets+'</b></span>'+
+  '<span>帰還照合 <b>'+s.reviewed+'/'+s.cycles+'</b></span>'+
+  '<span>再修正あり <b>'+s.needsFix+'周</b></span>'+
+  '<span>停止判定 <b>'+s.stop+'周</b></span>'+gap+
+ '</div></div>';
+}
 function hdSPAPostTelemetryHtml(metrics){
  const p=metrics?.postTelemetry;if(!p?.reviewed)return '';
  const fuel=p.avgFuelUsed==null?'—':p.avgFuelUsed,ammo=p.avgAmmoUsed==null?'—':p.avgAmmoUsed,air=p.avgAirLoss==null?'—':p.avgAirLoss,planes=p.avgDepletedAdded==null?'—':p.avgDepletedAdded;
@@ -336,12 +371,12 @@ function hdSPACard(row){
  const m=row.metrics,sample=m.n<3?'<div class="hd-spa-sample warn">サンプル少なめ</div>':'<div class="hd-spa-sample">記録 '+m.n+'周</div>',badges=row.badges.length?'<div class="hd-spa-badges">'+row.badges.map(x=>'<span>'+hdSPAEsc(x)+'</span>').join('')+'</div>':'';
  const objective=row.objectiveSplit?'<span class="hd-spa-objective">目標 '+hdSPAEsc(row.objectiveTarget||'未記録')+'</span>':'';
  const reopen=row.recentRef?.available?'<button type="button" class="ghost small" data-hd-spa-reopen="'+hdSPAEsc(row.key)+'">この編成を準備表へ</button>':'';
- return `<article class="hd-spa-card" data-hd-spa-card="${hdSPAEsc(row.key)}">${badges}<div class="hd-spa-card-head"><div><strong>${hdSPAEsc(row.label)}</strong><div class="hd-spa-card-meta">${objective}<small>${hdSPAEsc(row.maps.join(' / '))}</small></div></div>${sample}</div>${hdSPASourceHtml(m)}<div class="hd-spa-metrics"><span>${row.objectiveSplit&&row.objectiveTarget?'目標到達':'ボス到達'} <b>${row.objectiveSplit&&row.objectiveTarget?m.objectiveReachedRate:m.bossRate}%</b></span><span>S勝利 <b>${m.sRate}%</b></span><span>B以上勝利 <b>${m.winRate}%</b></span><span>撤退 <b>${m.retreatRate}%</b></span><span>ドロップ <b>${m.dropRate}%</b></span><span>ドロップ種類 <b>${m.uniqueDrops}</b></span><span>平均資源 <b>${m.avgResource==null?'—':m.avgResource}</b></span><span>平均バケツ <b>${m.avgBuckets==null?'—':m.avgBuckets}</b></span><span>平均時間 <b>${m.avgDurationMin==null?'—':m.avgDurationMin+'分'}</b></span><span>開始時確認 <b>${m.avgReadiness==null?'—':m.avgReadiness+'%'}</b></span></div>${hdSPAPostTelemetryHtml(m)}${hdSPARetreatReasonHtml(row)}${hdSPADropHtml(row)}${hdSPAInsightHtml(row)}${hdSPANodeRouteHtml(row)}${hdSPATrendHtml(row)}${hdSPARecommendationHtml(row)}${reopen?'<div class="hd-spa-actions">'+reopen+'</div>':''}</article>`;
+ return `<article class="hd-spa-card" data-hd-spa-card="${hdSPAEsc(row.key)}">${badges}<div class="hd-spa-card-head"><div><strong>${hdSPAEsc(row.label)}</strong><div class="hd-spa-card-meta">${objective}<small>${hdSPAEsc(row.maps.join(' / '))}</small></div></div>${sample}</div>${hdSPASourceHtml(m)}<div class="hd-spa-metrics"><span>${row.objectiveSplit&&row.objectiveTarget?'目標到達':'ボス到達'} <b>${row.objectiveSplit&&row.objectiveTarget?m.objectiveReachedRate:m.bossRate}%</b></span><span>S勝利 <b>${m.sRate}%</b></span><span>B以上勝利 <b>${m.winRate}%</b></span><span>撤退 <b>${m.retreatRate}%</b></span><span>ドロップ <b>${m.dropRate}%</b></span><span>ドロップ種類 <b>${m.uniqueDrops}</b></span><span>平均資源 <b>${m.avgResource==null?'—':m.avgResource}</b></span><span>平均バケツ <b>${m.avgBuckets==null?'—':m.avgBuckets}</b></span><span>平均時間 <b>${m.avgDurationMin==null?'—':m.avgDurationMin+'分'}</b></span><span>開始時確認 <b>${m.avgReadiness==null?'—':m.avgReadiness+'%'}</b></span></div>${hdSPASeriesHtml(row)}${hdSPAPostTelemetryHtml(m)}${hdSPARetreatReasonHtml(row)}${hdSPADropHtml(row)}${hdSPAInsightHtml(row)}${hdSPANodeRouteHtml(row)}${hdSPATrendHtml(row)}${hdSPARecommendationHtml(row)}${reopen?'<div class="hd-spa-actions">'+reopen+'</div>':''}</article>`;
 }
 function hdSPAHtml(){
  const mode=hdSPAMode(),map=hdSPAMap(),windowSize=hdSPAWindow(),rows=hdSPARows(),maps=hdSPAMaps();
  if(!hdSPALogs().length)return '<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>出撃データ分析</strong><span>ゲーム同期または出撃ログを記録すると、海域別の実績とドロップ履歴がここに出るよ。</span></div></div></section>';
- return `<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>出撃データ分析</strong><span>ゲーム同期・実戦モード・手動ログをまとめて自動集計</span></div><div class="hd-spa-controls"><select data-hd-spa-mode><option value="map" ${mode==='map'?'selected':''}>海域別</option><option value="strategy" ${mode==='strategy'?'selected':''}>方針別</option><option value="fleet" ${mode==='fleet'?'selected':''}>保存編成別</option></select><select data-hd-spa-map><option value="all">全海域</option>${maps.map(x=>`<option value="${hdSPAEsc(x)}" ${map===x?'selected':''}>${hdSPAEsc(x)} ${hdSPAEsc(hdSPAMapName(x))}</option>`).join('')}</select><select data-hd-spa-window><option value="3" ${windowSize===3?'selected':''}>直近3周比較</option><option value="5" ${windowSize===5?'selected':''}>直近5周比較</option><option value="10" ${windowSize===10?'selected':''}>直近10周比較</option></select></div></div>${rows.length?'<div class="hd-spa-grid">'+rows.map(hdSPACard).join('')+'</div>':'<div class="hd-spa-empty">この条件に一致する出撃ログはまだないよ。</div>'}<p class="hd-spa-note">※ゲーム同期・実戦モード・手動ログを海域別集計に含める。複数攻略目標を記録した海域は海域別、または海域を絞った方針/編成別で目標ごとに分離する。資源/バケツ・時間・開始時確認は値を持つログだけで平均する。帰還後テレメトリは実戦モード終了後に再同期できたログだけを対象にする。マス別の勝敗はゲーム同期の各戦闘結果を優先し、撤退率はそのマスへの到達数に対する撤退回数。ルート別分析はゲーム同期で取得できた通過ルートだけを対象にする。</p></section>`;
+ return `<section class="hd-spa"><div class="hd-spa-head"><div><div class="eyebrow">SORTIE PERFORMANCE</div><strong>出撃データ分析</strong><span>ゲーム同期・実戦モード・手動ログをまとめて自動集計</span></div><div class="hd-spa-controls"><select data-hd-spa-mode><option value="map" ${mode==='map'?'selected':''}>海域別</option><option value="strategy" ${mode==='strategy'?'selected':''}>方針別</option><option value="fleet" ${mode==='fleet'?'selected':''}>保存編成別</option><option value="series" ${mode==='series'?'selected':''}>連続周回別</option></select><select data-hd-spa-map><option value="all">全海域</option>${maps.map(x=>`<option value="${hdSPAEsc(x)}" ${map===x?'selected':''}>${hdSPAEsc(x)} ${hdSPAEsc(hdSPAMapName(x))}</option>`).join('')}</select><select data-hd-spa-window><option value="3" ${windowSize===3?'selected':''}>直近3周比較</option><option value="5" ${windowSize===5?'selected':''}>直近5周比較</option><option value="10" ${windowSize===10?'selected':''}>直近10周比較</option></select></div></div>${rows.length?'<div class="hd-spa-grid">'+rows.map(hdSPACard).join('')+'</div>':'<div class="hd-spa-empty">この条件に一致する出撃ログはまだないよ。</div>'}<p class="hd-spa-note">※ゲーム同期・実戦モード・手動ログを海域別集計に含める。複数攻略目標を記録した海域は海域別、または海域を絞った方針/編成別で目標ごとに分離する。資源/バケツ・時間・開始時確認は値を持つログだけで平均する。帰還後テレメトリは実戦モード終了後に再同期できたログだけを対象にする。マス別の勝敗はゲーム同期の各戦闘結果を優先し、撤退率はそのマスへの到達数に対する撤退回数。ルート別分析はゲーム同期で取得できた通過ルートだけを対象にする。</p></section>`;
 }
 function hdSPARender(){
  const root=document.getElementById('sortieLog');if(!root)return;
