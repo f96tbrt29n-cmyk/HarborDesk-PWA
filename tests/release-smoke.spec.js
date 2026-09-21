@@ -959,6 +959,54 @@ test('release smoke: post-sortie state requires a fresh game sync before next cl
 });
 
 
+test('release smoke: post-sortie review summarizes telemetry deltas and exposes repair actions', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdSSPostDelta === 'function');
+
+  const delta = await page.evaluate(() => window.hdSSPostDelta(
+    {
+      live:{blocked:0,caution:0,details:[
+        {name:'赤城',status:'ready',hp:80,maxHp:80,labels:[]},
+        {name:'加賀',status:'ready',hp:79,maxHp:79,labels:[]}
+      ]},
+      supply:{empty:0,low:0,rows:[
+        {name:'赤城',known:true,currentFuel:82,currentAmmo:82},
+        {name:'加賀',known:true,currentFuel:80,currentAmmo:80}
+      ]},
+      air:{ours:320,depletedSlots:0}
+    },
+    {
+      live:{blocked:0,caution:1,details:[
+        {name:'赤城',status:'caution',hp:46,maxHp:80,labels:['中破']},
+        {name:'加賀',status:'ready',hp:79,maxHp:79,labels:[]}
+      ]},
+      supply:{empty:0,low:2,rows:[
+        {name:'赤城',known:true,currentFuel:62,currentAmmo:60},
+        {name:'加賀',known:true,currentFuel:61,currentAmmo:59}
+      ]},
+      air:{ours:270,depletedSlots:2}
+    }
+  ));
+
+  expect(delta.changed).toBe(true);
+  expect(delta.ships).toHaveLength(1);
+  expect(delta.ships[0]).toMatchObject({name:'赤城',hpBefore:80,hpAfter:46,hpLoss:34,statusAfter:'caution'});
+  expect(delta.fuelUsed).toBe(39);
+  expect(delta.ammoUsed).toBe(43);
+  expect(delta.airLoss).toBe(50);
+  expect(delta.depletedAdded).toBe(2);
+  expect(delta.newCaution).toBe(1);
+  expect(delta.newSupply).toBe(2);
+
+  const source = await page.evaluate(async () => fetch('./sortie-session.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain('今回の出撃で変わったところ');
+  expect(source).toContain('data-hd-ss-post-fix=');
+  expect(source).toContain("typeof hdFEOpenFix==='function'");
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
