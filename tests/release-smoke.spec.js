@@ -1132,6 +1132,80 @@ test('release smoke: performance analytics learns from post-sortie telemetry', a
 });
 
 
+test('release smoke: recommendation experiments compare the next three sorties', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSPAStartExperiment === 'function' &&
+    typeof window.hdSPAExperimentOutcome === 'function' &&
+    typeof window.hdSPAExperimentPanel === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-sortie-experiments-v1');
+    const baseline = [
+      {id:'b1',at:100,map:'2-5',fleetId:'fleet-a',strategy:'stable',boss:false,result:'撤退',retreat:true},
+      {id:'b2',at:200,map:'2-5',fleetId:'fleet-a',strategy:'stable',boss:false,result:'撤退',retreat:true},
+      {id:'b3',at:300,map:'2-5',fleetId:'fleet-a',strategy:'stable',boss:true,result:'A',retreat:false}
+    ];
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify(baseline));
+    const row = {
+      key:'2-5',
+      strategy:'stable',
+      objectiveTarget:'',
+      rows:baseline,
+      recentRef:{map:'2-5',fleetId:'fleet-a',fleetName:'第一艦隊',available:true}
+    };
+    const exp = window.hdSPAStartExperiment(row, {
+      id:'route-retreat', title:'道中突破重視を再検討', reason:'撤退率が上昇',
+      action:'optimize', mode:'route'
+    });
+    const future = [
+      {id:'a1',at:exp.startedAt+10,map:'2-5',fleetId:'fleet-b',strategy:'route',boss:true,result:'S',retreat:false},
+      {id:'a2',at:exp.startedAt+20,map:'2-5',fleetId:'fleet-b',strategy:'route',boss:true,result:'S',retreat:false},
+      {id:'a3',at:exp.startedAt+30,map:'2-5',fleetId:'fleet-b',strategy:'route',boss:true,result:'A',retreat:false}
+    ];
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify([...baseline,...future]));
+    const outcome = window.hdSPAExperimentOutcome(exp);
+    const panel = window.hdSPAExperimentPanel();
+    const saved = window.hdSPAExperiments();
+    window.hdSPADismissExperiment(exp.id);
+    return {
+      exp,outcome,panel,savedCount:saved.length,
+      afterDismiss:window.hdSPAExperiments().length
+    };
+  });
+
+  expect(data.exp.targetRuns).toBe(3);
+  expect(data.exp.baselineN).toBe(3);
+  expect(data.exp.mode).toBe('route');
+  expect(data.outcome.count).toBe(3);
+  expect(data.outcome.status).toBe('improved');
+  expect(data.outcome.score).toBeGreaterThan(0);
+  expect(data.outcome.deltas.find(x=>x.key==='retreatRate')?.delta).toBeLessThan(0);
+  expect(data.outcome.deltas.find(x=>x.key==='bossRate')?.delta).toBeGreaterThan(0);
+  expect(data.panel).toContain('改善案の追跡');
+  expect(data.panel).toContain('暫定改善');
+  expect(data.panel).toContain('道中突破重視を再検討');
+  expect(data.savedCount).toBe(1);
+  expect(data.afterDismiss).toBe(0);
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: analytics recommendation buttons carry experiment metadata', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const source = await page.evaluate(async () => fetch('./sortie-performance-analytics.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain("const HD_SPA_EXPERIMENT_KEY='harbordesk-sortie-experiments-v1'");
+  expect(source).toContain('data-hd-spa-rec-id=');
+  expect(source).toContain('data-hd-spa-rec-title=');
+  expect(source).toContain('data-hd-spa-rec-reason=');
+  expect(source).toContain('押すと改善テストも開始');
+  expect(source).toContain("r.dataset.hdSpaRecId");
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
