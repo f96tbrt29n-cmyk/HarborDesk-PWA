@@ -241,8 +241,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.380'");
-  expect(source).toContain("const HD_APP_BUILD=380");
+  expect(source).toContain("const HD_APP_VERSION='1.0.381'");
+  expect(source).toContain("const HD_APP_BUILD=381");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -1524,17 +1524,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=340',
-      'map-images.js?v=340',
-      'map-tabs.js?v=340',
-      'map-interactive.js?v=340',
-      'map-advanced-data.js?v=340'
+      'map-details.js?v=381',
+      'map-images.js?v=381',
+      'map-tabs.js?v=381',
+      'map-interactive.js?v=381',
+      'map-advanced-data.js?v=381'
     ];
     const requiredStyles = [
-      'map-details.css?v=338',
-      'map-tabs.css?v=338',
-      'map-images.css?v=338',
-      'map-interactive.css?v=338'
+      'map-details.css?v=381',
+      'map-tabs.css?v=381',
+      'map-images.css?v=381',
+      'map-interactive.css?v=381'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -1576,7 +1576,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=340');
+  expect(src).toBe('app.js?v=381');
   expect(errors).toEqual([]);
 });
 
