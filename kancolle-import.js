@@ -381,8 +381,11 @@ function hdKcApplySorties(parsed){
   const route=active.route.filter(Boolean),routeLabels=route.map(n=>hdKcNodeLabel(active.map,n)),lastLabel=hdKcNodeLabel(active.map,active.lastNode),node=lastLabel?(lastLabel+(boss?' ボス':'')):'';
   const hunt=hdKcMatchingHunt(active.map,lastLabel),targetObtained=!!(hunt&&active.lastDrop&&String(hunt.ship||'')===String(active.lastDrop));
   const memo=[`ゲーム同期`,routeLabels.length?`ルート ${routeLabels.join('→')}`:'',retreat?'帰投/撤退':''].filter(Boolean).join('｜');
-  const entry=hdSLRecordEntry({map:active.map,node,result:active.lastResult||'不明',boss,retreat,battles:active.battles,drop:active.lastDrop||'',memo,huntId:hunt?.id||'',huntShip:hunt?.ship||'',targetObtained,source:'kancolle-import',gameSortieKey:key,gameNodeNo:active.lastNode,gameNodeLabel:lastLabel,gameBossCellNo:active.bossCellNo,gameBossCellLabel:hdKcNodeLabel(active.map,active.bossCellNo),gameRouteNodes:route,gameRouteLabels:routeLabels,gameBattleResults:active.results.map(x=>({...x,nodeLabel:hdKcNodeLabel(active.map,x.nodeNo)})),startedAt:active.startedAt||0});
-  if(entry){seen.add(key);added++}active=null;
+  const record={map:active.map,node,result:active.lastResult||'不明',boss,retreat,battles:active.battles,drop:active.lastDrop||'',memo,huntId:hunt?.id||'',huntShip:hunt?.ship||'',targetObtained,source:'kancolle-import',gameSortieKey:key,gameNodeNo:active.lastNode,gameNodeLabel:lastLabel,gameBossCellNo:active.bossCellNo,gameBossCellLabel:hdKcNodeLabel(active.map,active.bossCellNo),gameRouteNodes:route,gameRouteLabels:routeLabels,gameBattleResults:active.results.map(x=>({...x,nodeLabel:hdKcNodeLabel(active.map,x.nodeNo)})),startedAt:active.startedAt||0};
+  let entry=null;const session=typeof hdSSLoad==='function'?hdSSLoad():null,sessionMatches=!!(session&&session.status==='active'&&String(session.map||'')===String(active.map||'')&&(!active.startedAt||active.startedAt>=Number(session.startedAt||0)-60000));
+  if(sessionMatches&&typeof hdSSFinish==='function')entry=hdSSFinish(record);
+  else entry=hdSLRecordEntry(record);
+  if(entry){seen.add(key);added++;if(sessionMatches&&typeof window.hdToast==='function')window.hdToast('艦これの帰還結果を実戦セッションへ自動記録したよ','ok',4200)}active=null;
  };
  parsed.sortieEvents.forEach((e,i)=>{
   const h=String(e?.endpoint||''),d=e?.data||{};
