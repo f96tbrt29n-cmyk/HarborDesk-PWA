@@ -1,7 +1,7 @@
 {
-  "version": "1.0.380",
-  "build": 380,
-  "releasedAt": "2026-09-21T07:22:36.925+09:00",
-  "notes": "更新確認の誤判定を修正。GitHub Pages側の公開が遅れていてもGitHub mainのapp-version.jsonを最新情報として確認し、公開版がまだ古い場合は「最新版」ではなく「公開反映待ち」と表示する。公開前の版へ無駄な強制更新を繰り返さないようガードも追加。v1.0.379の装備台帳表示・同期整合性確認も継続。",
+  "version": "1.0.381",
+  "build": 381,
+  "releasedAt": "2026-09-21T11:13:56.328+09:00",
+  "notes": "ホーム画面版PWAが古いJS/CSSを掴み続ける問題を対策。index.htmlの主要ローカル資産にbuildクエリを付与し、動的ロード資産もbuild番号付きURLで取得。Service Workerもbuild付きURLで更新し、オフライン時はignoreSearchで既存キャッシュへフォールバック。v1.0.380の公開反映待ち判定とv1.0.379の装備台帳表示改善も継続。",
   "masterChanges": null
 }
