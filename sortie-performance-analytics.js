@@ -348,6 +348,13 @@ function hdSPAInsightHtml(row){
  if(compare){const actual=compare.actual,refStats=compare.referenceStats;routeHtml='<div class="hd-spa-insight-block route"><strong>ルート差分</strong><span>構造図最短（参考） <b>'+hdSPAEsc(compare.referenceRoute)+'</b>'+(refStats?' <small>実績 '+refStats.n+'周 / ボス'+refStats.bossRate+'%</small>':' <small>実績なし</small>')+'</span>'+(actual?'<span>最多実績 <b>'+hdSPAEsc(actual.route)+'</b> <small>'+actual.n+'周 / ボス'+actual.bossRate+'% / 撤退'+actual.retreatRate+'%</small></span>':'<span>実績ルートなし</span>')+'<em class="'+(compare.matches?'match':'diff')+'">'+(compare.matches?'最多実績ルートは構造図最短と一致':'最多実績ルートは構造図最短と異なる')+'</em></div>';}
  if(!dangerHtml&&!trendHtml&&!routeHtml)return '';return '<div class="hd-spa-insights"><div class="hd-spa-detail-head"><strong>攻略インサイト</strong><span>実戦ログから自動検出</span></div>'+dangerHtml+trendHtml+routeHtml+'<small class="hd-spa-insight-note">構造図最短はHarborDesk内の海域グラフ上の参考経路。艦これの固定条件・確率分岐を含む「推奨ルート」判定ではないよ。</small></div>';
 }
+function hdSPASeriesGoalStatus(row){
+ const s=row?.seriesMeta;if(!s?.seriesId)return '';
+ const d=typeof hdSSSeriesDecision==='function'?hdSSSeriesDecision(s.seriesId):null;if(!d)return '';
+ const g=d.goal,parts=[];if(g.maxCycles)parts.push('最大'+g.maxCycles+'周');if(g.maxResources)parts.push('資源'+g.maxResources);if(g.maxBuckets)parts.push('バケツ'+g.maxBuckets);if(g.maxElapsedMin)parts.push(g.maxElapsedMin+'分');if(g.target)parts.push('Drop '+g.target);
+ if(!parts.length)return '';
+ return '<div class="hd-spa-series-goal '+(d.stop?'stop':'active')+'"><div><span>終了条件</span><b>'+hdSPAEsc(parts.join(' / '))+'</b></div><strong>'+(d.stop?'到達・停止':'監視中')+'</strong>'+(d.reasons?.length?'<small>'+hdSPAEsc(d.reasons.join(' / '))+'</small>':'')+'</div>';
+}
 function hdSPASeriesHtml(row){
  const s=row?.seriesMeta;if(!s||s.cycles<2)return '';
  const gap=s.missingCycles?'<span class="warn">欠番 <b>'+s.missingCycles+'</b></span>':'';
@@ -360,7 +367,7 @@ function hdSPASeriesHtml(row){
   '<span>帰還照合 <b>'+s.reviewed+'/'+s.cycles+'</b></span>'+
   '<span>再修正あり <b>'+s.needsFix+'周</b></span>'+
   '<span>停止判定 <b>'+s.stop+'周</b></span>'+gap+
- '</div></div>';
+ '</div>'+hdSPASeriesGoalStatus(row)+'</div>';
 }
 function hdSPAPostTelemetryHtml(metrics){
  const p=metrics?.postTelemetry;if(!p?.reviewed)return '';
