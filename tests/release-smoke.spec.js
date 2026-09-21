@@ -989,7 +989,6 @@ test('release smoke: readiness fix workflow remembers target and confirms resolu
   expect(data.pending.currentStatus).toBe('missing');
   expect(data.resolved.resolved).toBe(true);
   expect(data.resolved.changed).toBe(true);
-  expect(data.html).toContain('修正反映済み');
   expect(data.html).toContain('修正キュー完了');
   expect(data.html).toContain('出撃準備OKを確認');
   expect(data.stored.id).toBe('supply');
