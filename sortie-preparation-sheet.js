@@ -101,7 +101,7 @@ function hdSPSGameDiffHtml(match){
 function hdSPSAutoHtml(auto){
  if(!auto)return '';
  const label=typeof hdFEAutoStatusLabel==='function'?hdFEAutoStatusLabel(auto.status):auto.status==='ready'?'OK':auto.status==='missing'?'不足/不可':'要確認',cls=auto.status==='ready'?'ok':auto.status==='missing'?'bad':'warn',gate=typeof hdFEGateHtml==='function'?hdFEGateHtml(auto):'';
- return `<section class="hd-sps-card hd-sps-auto"><div class="hd-sps-card-head"><div><span>自動判定</span><strong>艦状態・補給・同期鮮度・ゲーム反映・編成・装備・制空・索敵</strong></div><b class="${cls}">${hdSPSEsc(label)}</b></div>${gate}<div class="hd-sps-auto-grid">${(auto.checks||[]).map(x=>`<div class="${x.status}"><span>${hdSPSEsc(x.label)}</span><b>${hdSPSEsc(typeof hdFEAutoStatusLabel==='function'?hdFEAutoStatusLabel(x.status):x.status)}</b><small>${hdSPSEsc(x.detail||'')}</small></div>`).join('')}</div>${hdSPSGameDiffHtml(auto.gameMatch)}${auto.scouting?.available&&auto.scouting?.checks?.length?`<div class="hd-sps-auto-los">${auto.scouting.checks.map(x=>`<span class="${x.status}">${hdSPSEsc(x.label)}：推定33式 ${Number(auto.scouting.score).toFixed(2)} / 安全域 ${x.safe}</span>`).join('')}</div>`:''}<p class="muted">「要確認」はデータ不足または海域条件が分岐ごとに異なる項目。ゲーム側の最終確認を残すよ。</p></section>`;
+ return `<section class="hd-sps-card hd-sps-auto"><div class="hd-sps-card-head"><div><span>自動判定</span><strong>艦状態・補給・同期基準点・ゲーム反映・編成・装備・制空・索敵</strong></div><b class="${cls}">${hdSPSEsc(label)}</b></div>${gate}<div class="hd-sps-auto-grid">${(auto.checks||[]).map(x=>`<div class="${x.status}"><span>${hdSPSEsc(x.label)}</span><b>${hdSPSEsc(typeof hdFEAutoStatusLabel==='function'?hdFEAutoStatusLabel(x.status):x.status)}</b><small>${hdSPSEsc(x.detail||'')}</small></div>`).join('')}</div>${hdSPSGameDiffHtml(auto.gameMatch)}${auto.scouting?.available&&auto.scouting?.checks?.length?`<div class="hd-sps-auto-los">${auto.scouting.checks.map(x=>`<span class="${x.status}">${hdSPSEsc(x.label)}：推定33式 ${Number(auto.scouting.score).toFixed(2)} / 安全域 ${x.safe}</span>`).join('')}</div>`:''}<p class="muted">「要確認」はデータ不足または海域条件が分岐ごとに異なる項目。ゲーム側の最終確認を残すよ。</p></section>`;
 }
 
 function hdSPSBaseInfo(map){
@@ -168,7 +168,7 @@ function hdSPSRender(){
  host.innerHTML=`<div class="hd-sps-overview"><div><strong>準備状況 ${score}/4</strong><span>艦隊・装備・基地航空隊・出撃直前チェックを統合 ｜ 自動判定 ${hdSPSEsc(autoLabel)}</span></div><div class="hd-sps-actions"><button type="button" class="ghost small" data-hd-sps-refresh>再判定</button><button type="button" class="ghost small" data-hd-sps-copy>準備表をコピー</button><button type="button" class="ghost small" data-hd-sps-guide>海域攻略へ戻る</button></div></div>
   ${hdSPSAutoHtml(auto)}
   <div class="hd-sps-grid">${hdSPSFleetHtml(map,fleet)}${hdSPSEquipmentHtml(map,fleet)}${hdSPSBaseHtml(map)}${hdSPSManualHtml(map,fleet)}</div>
-  <div class="hd-sps-foot">※自動判定は同期済み艦状態・保存編成・実配備装備と登録済み海域閾値を照合する補助。敵編成変化、熟練度、イベント固有条件などはゲーム画面で最終確認してね。</div>`;
+  <div class="hd-sps-foot">※同期は艦隊・装備台帳の基準点。現在の耐久・疲労・補給・艦載機・ゲーム側の編成/装備は「出撃直前」チェックを優先して判定する。敵編成変化やイベント固有条件はゲーム画面で最終確認してね。</div>`;
  if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
 }
 function hdSPSEnsure(){
