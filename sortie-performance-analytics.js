@@ -350,6 +350,8 @@ function hdSPAInsightHtml(row){
 }
 function hdSPASeriesGoalStatus(row){
  const s=row?.seriesMeta;if(!s?.seriesId)return '';
+ const archived=typeof hdSSSeriesArchive==='function'?hdSSSeriesArchive(s.seriesId):null;
+ if(archived)return '<div class="hd-spa-series-goal stop"><div><span>周回シリーズ</span><b>'+Number(archived.cycles||0)+'周・総資源'+Number(archived.resourceTotal||0)+'・バケツ'+Number(archived.buckets||0)+'</b></div><strong>完了済み</strong><small>'+hdSPAEsc(archived.closeReason||'シリーズ完了')+'</small></div>';
  const d=typeof hdSSSeriesDecision==='function'?hdSSSeriesDecision(s.seriesId):null;if(!d)return '';
  const g=d.goal,parts=[];if(g.maxCycles)parts.push('最大'+g.maxCycles+'周');if(g.maxResources)parts.push('資源'+g.maxResources);if(g.maxBuckets)parts.push('バケツ'+g.maxBuckets);if(g.maxElapsedMin)parts.push(g.maxElapsedMin+'分');if(g.target)parts.push('Drop '+g.target);
  if(!parts.length)return '';
@@ -417,6 +419,6 @@ document.addEventListener('click',e=>{
  const b=e.target.closest?.('[data-hd-spa-reopen]');if(b){hdSPAReopen(b.dataset.hdSpaReopen);return}
  const r=e.target.closest?.('[data-hd-spa-review]');if(r){hdSPAReview(r.dataset.hdSpaReview,r.dataset.hdSpaAction,r.dataset.hdSpaModeTarget);return}
 });
-window.addEventListener('storage',e=>{if(e.key==='harbordesk-sortie-log-v1')hdSPARender()});
+window.addEventListener('storage',e=>{if(['harbordesk-sortie-log-v1','harbordesk-sortie-series-archive-v1'].includes(e.key))hdSPARender()});
 window.addEventListener('load',()=>setTimeout(()=>{if(!hdSPAInstall())setTimeout(hdSPAInstall,500)},1500));
 hdSPAInstall();
