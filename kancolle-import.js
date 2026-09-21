@@ -652,8 +652,9 @@ function hdKcBridgeOriginAllowed(origin){
 const HD_KC_BRIDGE_IMPORTS=new Map();
 const HD_KC_BRIDGE_IMPORT_TTL=60000;
 function hdKcBridgePayloadKey(raw){
- if(typeof raw==='string')return raw;
- try{return JSON.stringify(raw)}catch{return String(raw)}
+ let s='';try{s=typeof raw==='string'?raw:JSON.stringify(raw)}catch{s=String(raw)}
+ let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
+ return s.length+':'+(h>>>0).toString(16);
 }
 function hdKcBridgeImportOnce(captureId,raw){
  const id=String(captureId||'').trim();
