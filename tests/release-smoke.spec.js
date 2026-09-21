@@ -1538,6 +1538,53 @@ test('release smoke: stopped repeat-sortie series can be summarized and complete
 });
 
 
+test('release smoke: completed repeat-sortie series can be compared side by side', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSPASeriesComparison === 'function' &&
+    typeof window.hdSPASeriesComparisonHtml === 'function' &&
+    typeof window.hdSPASeriesComparisonText === 'function' &&
+    typeof window.hdSSSeriesClose === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const rows = [
+      {id:'a1',seriesId:'s-a',cycleIndex:1,map:'2-4',fleetId:'f-a',fleetName:'安定艦隊',startedAt:1000,at:61000,durationMs:60000,result:'S',boss:true,fuel:100,ammo:80,steel:0,bauxite:20,buckets:0},
+      {id:'a2',seriesId:'s-a',cycleIndex:2,map:'2-4',fleetId:'f-a',fleetName:'安定艦隊',startedAt:91000,at:151000,durationMs:60000,result:'S',boss:true,fuel:100,ammo:80,steel:0,bauxite:20,buckets:0},
+      {id:'b1',seriesId:'s-b',cycleIndex:1,map:'2-4',fleetId:'f-b',fleetName:'節約艦隊',startedAt:201000,at:291000,durationMs:90000,result:'A',boss:true,fuel:60,ammo:50,steel:0,bauxite:10,buckets:0},
+      {id:'b2',seriesId:'s-b',cycleIndex:2,map:'2-4',fleetId:'f-b',fleetName:'節約艦隊',startedAt:321000,at:411000,durationMs:90000,result:'撤退',boss:false,retreat:true,fuel:60,ammo:50,steel:0,bauxite:10,buckets:1}
+    ];
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify(rows));
+    localStorage.setItem('harbordesk-sortie-analytics-mode-v1','series');
+    window.hdSSSeriesClose('s-a');
+    const grouped = window.hdSPARows();
+    const compare = window.hdSPASeriesComparison(grouped);
+    const html = window.hdSPASeriesComparisonHtml(grouped);
+    const text = window.hdSPASeriesComparisonText(grouped);
+    return {compare,html,text};
+  });
+
+  expect(data.compare).toHaveLength(2);
+  const a = data.compare.find(x=>x.seriesId==='s-a');
+  const b = data.compare.find(x=>x.seriesId==='s-b');
+  expect(a.completed).toBe(true);
+  expect(a.resourcePerCycle).toBe(200);
+  expect(a.avgCycleMin).toBe(1);
+  expect(a.bossRate).toBe(100);
+  expect(b.resourcePerCycle).toBe(120);
+  expect(b.retreatRate).toBe(50);
+  expect(b.badges).toContain('資源/周 最小');
+  expect(a.badges).toContain('平均時間 最短');
+  expect(data.html).toContain('周回シリーズ比較');
+  expect(data.html).toContain('完了');
+  expect(data.html).toContain('進行中');
+  expect(data.text).toContain('HarborDesk 周回シリーズ比較');
+  expect(data.text).toContain('資源/周 120');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
