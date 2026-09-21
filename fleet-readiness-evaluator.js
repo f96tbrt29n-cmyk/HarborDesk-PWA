@@ -173,11 +173,10 @@ function hdFEEnemyAirCandidates(map){
  return [...vals].sort((a,b)=>a-b);
 }
 function hdFEAirCheck(map,air){
- const enemies=hdFEEnemyAirCandidates(map),enemy=enemies.length?Math.max(...enemies):0;
- if(!enemy)return {status:'manual',ours:Number(air?.basePower)||0,enemy:0,detail:'敵制空値の数値データなし'};
- const ours=Number(air?.basePower)||0,known=Number(air?.capacityKnown)||0,total=Number(air?.count)||0,ratio=enemy?ours/enemy:0;
- const status=known<total?'manual':ratio>=1.5?'ready':ratio>=2/3?'partial':'missing',label=ratio>=3?'確保圏':ratio>=1.5?'優勢圏':ratio>=2/3?'均衡圏':ratio>=1/3?'劣勢圏':'喪失圏';
- return {status,ours,enemy,ratio,detail:`基礎制空 ${ours} / 確認敵制空最大 ${enemy} → ${label}${known<total?'（搭載数未解決あり）':''}`};
+ const enemies=hdFEEnemyAirCandidates(map),enemy=enemies.length?Math.max(...enemies):0,ours=Number(air?.basePower)||0,known=Number(air?.capacityKnown)||0,total=Number(air?.count)||0,live=Number(air?.liveCapacityKnown)||0,depleted=Array.isArray(air?.depletedSlots)?air.depletedSlots.length:0;
+ if(!enemy)return {status:'manual',ours,enemy:0,liveCapacityKnown:live,depletedSlots:depleted,detail:`敵制空値の数値データなし${live?`（現在搭載 ${live}/${total}スロ反映）`:''}`};
+ const ratio=enemy?ours/enemy:0,status=known<total?'manual':ratio>=1.5?'ready':ratio>=2/3?'partial':'missing',label=ratio>=3?'確保圏':ratio>=1.5?'優勢圏':ratio>=2/3?'均衡圏':ratio>=1/3?'劣勢圏':'喪失圏',liveNote=live?` / 現在搭載 ${live}/${total}スロ`:'',lossNote=depleted?` / 損耗 ${depleted}スロ`:'';
+ return {status,ours,enemy,ratio,liveCapacityKnown:live,depletedSlots:depleted,detail:`制空 ${ours} / 確認敵制空最大 ${enemy} → ${label}${liveNote}${lossNote}${known<total?'（搭載数未解決あり）':''}`};
 }
 function hdFEScouting(plan,items){
  const map=String(plan?.map||''),adv=typeof HD_MAP_ADVANCED_DATA!=='undefined'?HD_MAP_ADVANCED_DATA[map]?.los:null,coef=Number(adv?.coef)||0,checks=Array.isArray(adv?.checks)?adv.checks:[];
