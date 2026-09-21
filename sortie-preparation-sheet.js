@@ -85,10 +85,23 @@ function hdSPSEquipmentHtml(map,fleetInfo){
   <div class="hd-sps-equip-grid">${rows.map(x=>`<div class="hd-sps-equip ${hdSPSStatusClass(x.status)}"><div><strong>${hdSPSEsc(x.label||x.kind)}</strong><small>${hdSPSEsc(x.detail||'')}</small></div><b>${hdSPSStatusLabel(x.status)}</b>${x.status!=='ready'? `<button type="button" class="ghost small" data-hd-sps-acquire="${hdSPSEsc(x.kind)}">入手ルート</button>`:''}</div>`).join('')}</div>
   <div class="hd-sps-card-actions"><button type="button" class="ghost small" data-hd-sps-tab="gear">装備タブ</button><button type="button" class="ghost small" data-hd-sps-workspace="hdEquipmentProcurement">調達リスト</button></div></section>`;
 }
+function hdSPSGameDiffHtml(match){
+ if(!match)return '';
+ const rows=[];
+ if(match.deckOrderMismatch)rows.push('<div class="warn"><b>艦隊順</b><span>同じ艦は揃っているけど、ゲーム側と並び順が違う</span></div>');
+ for(const ship of match.details||[]){
+  if(ship.status==='unknown')rows.push(`<div class="warn"><b>${hdSPSEsc(ship.name)}</b><span>ゲーム装備の同期データが不足</span></div>`);
+  for(const diff of ship.mismatches||[]){
+   const where=diff.slotIndex==='ex'?'補強増設':`第${Number(diff.slotIndex)+1}スロ`,planned=diff.planned||'空き',actual=diff.actual||'空き';
+   rows.push(`<div class="bad"><b>${hdSPSEsc(ship.name)}｜${hdSPSEsc(where)}</b><span>予定: ${hdSPSEsc(planned)} → ゲーム: ${hdSPSEsc(actual)}</span></div>`);
+  }
+ }
+ return rows.length?`<div class="hd-sps-game-diffs"><strong>ゲームとの差分</strong>${rows.join('')}</div>`:'';
+}
 function hdSPSAutoHtml(auto){
  if(!auto)return '';
  const label=typeof hdFEAutoStatusLabel==='function'?hdFEAutoStatusLabel(auto.status):auto.status==='ready'?'OK':auto.status==='missing'?'不足/不可':'要確認',cls=auto.status==='ready'?'ok':auto.status==='missing'?'bad':'warn';
- return `<section class="hd-sps-card hd-sps-auto"><div class="hd-sps-card-head"><div><span>自動判定</span><strong>艦状態・補給・ゲーム反映・編成・装備・制空・索敵</strong></div><b class="${cls}">${hdSPSEsc(label)}</b></div><div class="hd-sps-auto-grid">${(auto.checks||[]).map(x=>`<div class="${x.status}"><span>${hdSPSEsc(x.label)}</span><b>${hdSPSEsc(typeof hdFEAutoStatusLabel==='function'?hdFEAutoStatusLabel(x.status):x.status)}</b><small>${hdSPSEsc(x.detail||'')}</small></div>`).join('')}</div>${auto.scouting?.available&&auto.scouting?.checks?.length?`<div class="hd-sps-auto-los">${auto.scouting.checks.map(x=>`<span class="${x.status}">${hdSPSEsc(x.label)}：推定33式 ${Number(auto.scouting.score).toFixed(2)} / 安全域 ${x.safe}</span>`).join('')}</div>`:''}<p class="muted">「要確認」はデータ不足または海域条件が分岐ごとに異なる項目。ゲーム側の最終確認を残すよ。</p></section>`;
+ return `<section class="hd-sps-card hd-sps-auto"><div class="hd-sps-card-head"><div><span>自動判定</span><strong>艦状態・補給・同期鮮度・ゲーム反映・編成・装備・制空・索敵</strong></div><b class="${cls}">${hdSPSEsc(label)}</b></div><div class="hd-sps-auto-grid">${(auto.checks||[]).map(x=>`<div class="${x.status}"><span>${hdSPSEsc(x.label)}</span><b>${hdSPSEsc(typeof hdFEAutoStatusLabel==='function'?hdFEAutoStatusLabel(x.status):x.status)}</b><small>${hdSPSEsc(x.detail||'')}</small></div>`).join('')}</div>${hdSPSGameDiffHtml(auto.gameMatch)}${auto.scouting?.available&&auto.scouting?.checks?.length?`<div class="hd-sps-auto-los">${auto.scouting.checks.map(x=>`<span class="${x.status}">${hdSPSEsc(x.label)}：推定33式 ${Number(auto.scouting.score).toFixed(2)} / 安全域 ${x.safe}</span>`).join('')}</div>`:''}<p class="muted">「要確認」はデータ不足または海域条件が分岐ごとに異なる項目。ゲーム側の最終確認を残すよ。</p></section>`;
 }
 
 function hdSPSBaseInfo(map){
@@ -131,7 +144,7 @@ function hdSPSSummaryText(map){
  const d=hdSPSMapDetail(map),fleet=hdSPSFleetInfo(map),eq=hdSPSEquipmentInfo(map,fleet),base=hdSPSBaseInfo(map);
  const lines=[`HarborDesk 出撃準備表｜${map} ${d.name||''}`,fleet.fleet?`艦隊: ${fleet.fleet.name}（台帳確認 ${fleet.registered}/${fleet.ships.length}）`:'艦隊: 自分用編成なし'];
  for(const x of eq.rows||[])lines.push(`装備: ${x.label||x.kind} = ${hdSPSStatusLabel(x.status)}（${x.detail||''}）`);
- if(eq.assigned){lines.push(`装備マスター可否: ${eq.assigned.master?.valid?'正常':`要確認（違反${eq.assigned.master?.invalid?.length||0}/未解決${eq.assigned.master?.unresolved?.length||0}）`}`);lines.push(`基礎制空（熟練度なし）: ${eq.assigned.air?.basePower||0}`);if(eq.assigned.auto){lines.push(`自動判定: ${typeof hdFEAutoStatusLabel==='function'?hdFEAutoStatusLabel(eq.assigned.auto.status):eq.assigned.auto.status}`);for(const x of eq.assigned.auto.checks||[])lines.push(`  ${x.label}: ${typeof hdFEAutoStatusLabel==='function'?hdFEAutoStatusLabel(x.status):x.status}（${x.detail||''}）`)}}
+ if(eq.assigned){lines.push(`装備マスター可否: ${eq.assigned.master?.valid?'正常':`要確認（違反${eq.assigned.master?.invalid?.length||0}/未解決${eq.assigned.master?.unresolved?.length||0}）`}`);lines.push(`基礎制空（熟練度なし）: ${eq.assigned.air?.basePower||0}`);if(eq.assigned.auto){lines.push(`自動判定: ${typeof hdFEAutoStatusLabel==='function'?hdFEAutoStatusLabel(eq.assigned.auto.status):eq.assigned.auto.status}`);for(const x of eq.assigned.auto.checks||[])lines.push(`  ${x.label}: ${typeof hdFEAutoStatusLabel==='function'?hdFEAutoStatusLabel(x.status):x.status}（${x.detail||''}）`);for(const ship of eq.assigned.auto.gameMatch?.details||[])for(const diff of ship.mismatches||[])lines.push(`  差分: ${ship.name} ${diff.slotIndex==='ex'?'補強増設':`第${Number(diff.slotIndex)+1}スロ`}｜予定 ${diff.planned||'空き'} → ゲーム ${diff.actual||'空き'}`)}}
  if(base.available){lines.push(`基地航空隊: ${base.sortieReady?'設定確認':'要確認'}`);for(const c of base.corps)lines.push(`第${c.index}: ${c.mode} ${c.configured}/4中隊 半径${c.radius??'?'} 制空${c.power}`)}
  if(fleet.manualTotal)lines.push(`出撃直前チェック: ${fleet.manualDone}/${fleet.manualTotal}`);
  return lines.join('\n');
