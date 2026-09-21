@@ -828,6 +828,51 @@ test('release smoke: sortie summary includes go-no-go and prioritized actions', 
 });
 
 
+test('release smoke: sortie session honors integrated go/no-go gate', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdSSGate === 'function');
+
+  const data = await page.evaluate(() => {
+    const originalPlan=window.hdFEPlanFromSavedFleet,originalEval=window.hdFEEvaluate,originalGate=window.hdFEGoNoGo;
+    window.hdFEPlanFromSavedFleet=()=>({map:'1-1',ships:[]});
+    window.hdFEEvaluate=()=>({auto:{}});
+    window.hdFEGoNoGo=()=>({
+      state:'stop',label:'修正必要',detail:'修正が必要な項目 1件',
+      blockers:[{id:'health',label:'艦状態',status:'missing',detail:'大破 1隻'}],
+      cautions:[],
+      actions:[{id:'health',label:'艦状態',status:'missing',action:'大破艦を編成から外す',detail:'大破 1隻'}]
+    });
+    const hard=window.hdSSGate('1-1',{id:'f',ships:[]},{manualDone:0,manualTotal:0});
+    window.hdFEGoNoGo=()=>({
+      state:'stop',label:'修正必要',detail:'修正が必要な項目 1件',
+      blockers:[{id:'route',label:'編成条件',status:'missing',detail:'艦種不足'}],
+      cautions:[],
+      actions:[{id:'route',label:'編成条件',status:'missing',action:'編成条件を直す',detail:'艦種不足'}]
+    });
+    const overrideable=window.hdSSGate('1-1',{id:'f',ships:[]},{manualDone:0,manualTotal:0});
+    window.hdFEGoNoGo=()=>({state:'go',label:'出撃準備OK',detail:'未解決なし',blockers:[],cautions:[],actions:[]});
+    const manual=window.hdSSGate('1-1',{id:'f',ships:[]},{manualDone:1,manualTotal:2});
+    window.hdFEPlanFromSavedFleet=originalPlan;window.hdFEEvaluate=originalEval;window.hdFEGoNoGo=originalGate;
+    return {hard,overrideable,manual};
+  });
+
+  expect(data.hard.hardBlock).toBe(true);
+  expect(data.hard.state).toBe('stop');
+  expect(data.overrideable.hardBlock).toBe(false);
+  expect(data.overrideable.state).toBe('stop');
+  expect(data.manual.state).toBe('hold');
+  expect(data.manual.actions.some(x => x.id === 'manual')).toBe(true);
+
+  const source = await page.evaluate(async () => fetch('./sortie-session.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain("if(gate.hardBlock)return null");
+  expect(source).toContain("if(gate.state==='stop'&&!force)return null");
+  expect(source).toContain("data-hd-ss-start-override");
+  expect(source).toContain("disabled>安全確認が必要");
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -837,8 +882,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.390'");
-  expect(source).toContain("const HD_APP_BUILD=390");
+  expect(source).toContain("const HD_APP_VERSION='1.0.391'");
+  expect(source).toContain("const HD_APP_BUILD=391");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -861,14 +906,14 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=390`);
+    expect(data.index).toContain(`${asset}?v=391`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=390");
+  expect(data.updater).toContain("const HD_APP_BUILD=391");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v390");
+  expect(data.sw).toContain("harbordesk-pwa-v391");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -881,7 +926,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=390');
+  expect(source).toContain('const BUILD=391');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -2121,17 +2166,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=390',
-      'map-images.js?v=390',
-      'map-tabs.js?v=390',
-      'map-interactive.js?v=390',
-      'map-advanced-data.js?v=390'
+      'map-details.js?v=391',
+      'map-images.js?v=391',
+      'map-tabs.js?v=391',
+      'map-interactive.js?v=391',
+      'map-advanced-data.js?v=391'
     ];
     const requiredStyles = [
-      'map-details.css?v=390',
-      'map-tabs.css?v=390',
-      'map-images.css?v=390',
-      'map-interactive.css?v=390'
+      'map-details.css?v=391',
+      'map-tabs.css?v=391',
+      'map-images.css?v=391',
+      'map-interactive.css?v=391'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -2173,7 +2218,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=390');
+  expect(src).toBe('app.js?v=391');
   expect(errors).toEqual([]);
 });
 
