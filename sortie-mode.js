@@ -6,6 +6,13 @@ function hdSMSession(){try{return typeof window.hdSSLoad==='function'?window.hdS
 function hdSMMap(){try{return typeof window.hdSSMap==='function'?window.hdSSMap():(typeof selectedMap!=='undefined'?selectedMap:'')}catch{return ''}}
 function hdSMMapDetail(map){try{return typeof MAP_DETAILS!=='undefined'?(MAP_DETAILS[map]||{}):{}}catch{return {}}}
 function hdSMGraph(map){try{return typeof HD_MAP_GRAPHS!=='undefined'?(HD_MAP_GRAPHS[map]||null):null}catch{return null}}
+function hdSMStartLabels(graph){
+ try{
+  if(typeof window.hdMapStartLabels==='function')return window.hdMapStartLabels(graph);
+  const edges=Array.isArray(graph?.edges)?graph.edges:[],incoming=new Set(edges.map(x=>x[1]));
+  return [...new Set(edges.map(x=>x[0]).filter(Boolean))].filter(x=>!incoming.has(x));
+ }catch{return []}
+}
 function hdSMNodeKind(graph,label){
  try{return graph&&typeof hdMapKind==='function'?hdMapKind(graph,label):(graph?.boss===label?'boss':graph?.goal===label?'goal':'normal')}catch{return 'normal'}
 }
@@ -24,7 +31,7 @@ function hdSMEffectiveNodeKind(map,label,kind){
 }
 function hdSMNodeRows(map){
  const graph=hdSMGraph(map);if(!graph||!Array.isArray(graph.edges))return [];
- const starts=new Set(['S','S1','S2']),labels=[...new Set(graph.edges.flat())].filter(x=>!starts.has(x));
+ const starts=new Set(hdSMStartLabels(graph)),labels=[...new Set(graph.edges.flat())].filter(x=>!starts.has(x));
  let level={};try{if(typeof hdMapLevels==='function')level=hdMapLevels(graph).level||{}}catch{}
  return labels.sort((a,b)=>(Number(level[a]??999)-Number(level[b]??999))||String(a).localeCompare(String(b),undefined,{numeric:true}))
   .map(label=>({label,kind:hdSMEffectiveNodeKind(map,label,hdSMNodeKind(graph,label))}));
@@ -32,7 +39,7 @@ function hdSMNodeRows(map){
 function hdSMNextNodeRows(map,draft){
  const graph=hdSMGraph(map);if(!graph||!Array.isArray(graph.edges))return [];
  const current=String(draft?.node||'').trim();
- const from=current?[current]:[...new Set(graph.edges.map(x=>x[0]).filter(x=>x==='S'||x==='S1'||x==='S2'))];
+ const from=current?[current]:hdSMStartLabels(graph);
  const labels=[...new Set(graph.edges.filter(([a])=>from.includes(a)).map(([,b])=>b))];
  return labels.map(label=>({label,kind:hdSMEffectiveNodeKind(map,label,hdSMNodeKind(graph,label))}));
 }
@@ -97,7 +104,7 @@ function hdSMObjectiveOptions(map){
 function hdSMObjectiveStartStats(map,target){
  const graph=hdSMGraph(map),targets=hdSMObjectiveTargets(map,target);
  if(!graph||!Array.isArray(graph.edges)||!targets.length)return {steps:null,battles:null};
- const starts=[...new Set(graph.edges.map(x=>x[0]).filter(x=>x==='S'||x==='S1'||x==='S2'))];
+ const starts=hdSMStartLabels(graph);
  if(!starts.length)return {steps:null,battles:null};
  let steps=null;
  const q=starts.map(x=>[x,0]),seen=new Set(starts);
@@ -131,7 +138,7 @@ function hdSMObjectiveStatText(map,target){
 function hdSMObjectiveShortestPath(map,target){
  const graph=hdSMGraph(map),targets=hdSMObjectiveTargets(map,target);
  if(!graph||!Array.isArray(graph.edges)||!targets.length)return [];
- const starts=[...new Set(graph.edges.map(x=>x[0]).filter(x=>x==='S'||x==='S1'||x==='S2'))];
+ const starts=hdSMStartLabels(graph);
  const q=starts.map(x=>({node:x,path:[]})),seen=new Set(starts);
  while(q.length){
   const row=q.shift();
@@ -219,7 +226,7 @@ function hdSMBranchHint(map,draft){
  try{if(current&&typeof HD_NODE_DETAIL_OVERRIDES!=='undefined')override=HD_NODE_DETAIL_OVERRIDES?.[map]?.[current]||{}}catch{}
  if(override.branch)return {title:current+'マスの分岐条件',text:String(override.branch),source:String(override.source||'')};
  if(!current){
-  let startOverride={};try{if(typeof HD_NODE_DETAIL_OVERRIDES!=='undefined'){for(const s of ['S','S1','S2']){const row=HD_NODE_DETAIL_OVERRIDES?.[map]?.[s];if(row?.branch){startOverride=row;break}}}}catch{}
+  let startOverride={};try{if(typeof HD_NODE_DETAIL_OVERRIDES!=='undefined'){for(const s of hdSMStartLabels(graph)){const row=HD_NODE_DETAIL_OVERRIDES?.[map]?.[s];if(row?.branch){startOverride=row;break}}}}catch{}
   if(startOverride.branch)return {title:'開始時の分岐条件',text:String(startOverride.branch),source:String(startOverride.source||'')};
  }
  if(next.length===1)return {title:(current||'開始地点')+'からの進行',text:next[0].label+'へ接続。固定条件・索敵・ランダム分岐などの詳細は攻略情報も確認してね。',source:''};
