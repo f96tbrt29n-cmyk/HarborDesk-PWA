@@ -3567,6 +3567,40 @@ test('release smoke: map攻略 tools survive tab redraws', async ({ page }) => {
 });
 
 
+test('release smoke: map fleet procurement action recovers failed lazy module', async ({ page }) => {
+  const errors = [];
+  let blockProcurement = true;
+  await page.route('**/equipment-procurement-list.js*', route => blockProcurement ? route.abort() : route.continue());
+  await boot(page, errors);
+
+  await page.waitForFunction(() =>
+    window.HD_MODULE_STATUS?.['./equipment-procurement-list.js'] === 'error',
+    null,
+    { timeout: 30000 }
+  );
+  blockProcurement = false;
+
+  await page.evaluate(() => {
+    selectedWorld = '5';
+    selectedMap = '5-6';
+    renderMapPicker();
+  });
+  await page.locator('[data-map-tab="fleet"]').click();
+
+  const procure = page.locator('.hd-map-ship-candidate [data-hd-ship-procure]').first();
+  await expect(procure).toBeVisible();
+  await procure.click();
+
+  await expect(page.locator('#hdEquipmentProcurement')).toBeVisible({ timeout: 30000 });
+  const state = await page.evaluate(() => ({
+    fn: typeof window.hdPLAddShipLoadout,
+    status: window.HD_MODULE_STATUS?.['./equipment-procurement-list.js'] || ''
+  }));
+  expect(state).toEqual({ fn:'function', status:'ok' });
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map fleet candidate opens the visible ship database', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
