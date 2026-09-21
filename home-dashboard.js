@@ -247,9 +247,9 @@ function renderHomeDashboard(){
  const todo=quests.filter(x=>!x.done);
  const nextTimer=running[0]||null,nextMs=nextTimer?Math.max(0,nextTimer.endsAt-now):Infinity;
  const nextState=nextTimer?(nextMs<=15*60*1000?'urgent':nextMs<=60*60*1000?'soon':'normal'):(todo.length?'task':'clear');
- let rosterCount=0,equipCount=0,eventCount=0;
+ let rosterCount=0,equipCount=0,equipPlanCount=0,eventCount=0;
  try{rosterCount=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]').length}catch{}
- try{equipCount=JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]').length}catch{}
+ try{const eq=JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]');equipCount=eq.filter(x=>Math.max(0,Number(x?.count)||0)>0).length;equipPlanCount=eq.filter(x=>String(x?.source||'')==='equipment-plan').length}catch{}
  try{eventCount=JSON.parse(localStorage.getItem('harbordesk-events-v1')||'[]').length}catch{}
  document.getElementById('homeUpdated').textContent=new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
  const installTip=document.getElementById('homeInstallTip');if(installTip)installTip.hidden=!homeShowInstallTip();
@@ -265,7 +265,7 @@ function renderHomeDashboard(){
   const syncNote=syncInfo.state==='partial'
    ?`<div class="home-sync-note">未取得: ${homeEsc(syncInfo.missing.join('・'))}。次は艦これで <b>${homeEsc(homeSyncMissingGuide(syncInfo.missing).join(' → ')||'母港')}</b> を開いてから、もう一度HarborDeskへ送ると補完できるよ。</div>`
    :syncInfo.state==='warn'?'<div class="home-sync-note">少し時間が空いてるよ。艦これを開いた時にもう一度同期すると最新状態になる。</div>':'';
-  syncHost.innerHTML=sync?`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>${homeEsc(syncInfo.label)}</strong><small>艦娘 ${Number(sync.ships)||0} / 装備 ${Number(sync.equipmentRows??sync.equipment)||0}種類・${Number(sync.equipmentItems??sync.snapshot?.equipment??sync.equipment)||0}個 / 艦隊 ${Number(sync.decks)||0}</small></div><div class="home-sync-actions"><a class="ghost small" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面へ</button></div></div>${homeSyncDeltaHtml(sync)}${syncNote}`:`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>まだ同期してないよ</strong><small>艦娘・装備・資源・現在艦隊をまとめて取り込める</small></div><div class="home-sync-actions"><a class="primary small" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面</button></div></div>`;
+  syncHost.innerHTML=sync?`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>${homeEsc(syncInfo.label)}</strong><small>艦娘 ${Number(sync.ships)||0} / 装備 ${Number(sync.equipmentOwnedRows??sync.snapshot?.equipmentOwnedRows??sync.equipmentRows??sync.equipment)||0}種類・${Number(sync.equipmentItems??sync.snapshot?.equipment??sync.equipment)||0}個${Number(sync.equipmentPlanRows??sync.snapshot?.equipmentPlanRows)||0?`・計画${Number(sync.equipmentPlanRows??sync.snapshot?.equipmentPlanRows)||0}`:''} / 艦隊 ${Number(sync.decks)||0}</small></div><div class="home-sync-actions"><a class="ghost small" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面へ</button></div></div>${homeSyncDeltaHtml(sync)}${syncNote}`:`<div class="home-sync-main"><div><span>ゲーム同期</span><strong>まだ同期してないよ</strong><small>艦娘・装備・資源・現在艦隊をまとめて取り込める</small></div><div class="home-sync-actions"><a class="primary small" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost small" data-home-jump="kancolleImport">同期画面</button></div></div>`;
  }
  const nextHost=document.getElementById('homeNextAction');
  if(nextHost){
@@ -300,7 +300,7 @@ function renderHomeDashboard(){
    <button type="button" class="home-summary-item" data-home-jump="quests"><span>未完了任務</span><strong>${todo.length}</strong><small>任務へ</small></button>
    <button type="button" class="home-summary-item" data-home-jump="expeditions"><span>稼働中</span><strong>${running.length}</strong><small>タイマーへ</small></button>
    <button type="button" class="home-summary-item" data-home-jump="roster"><span>艦娘</span><strong>${rosterCount}</strong><small>艦隊へ</small></button>
-   <button type="button" class="home-summary-item" data-home-jump="equipmentBook"><span>装備</span><strong>${equipCount}</strong><small>装備へ</small></button>
+   <button type="button" class="home-summary-item" data-home-jump="equipmentBook"><span>装備</span><strong>${equipCount}</strong><small>${equipPlanCount?`計画${equipPlanCount}件`:'装備へ'}</small></button>
    <button type="button" class="home-summary-item" data-home-jump="kancolleImport"><span>最終同期</span><strong class="home-sync-age">${homeEsc(syncInfo.label)}</strong><small>更新</small></button>`;
  const recentQuests=homeRecentQuestRows();
  const todoHtml=todo.length?todo.slice(0,5).map(q=>`<div class="home-row home-task-row"><span>${homeEsc(q.name)}</span><button type="button" class="ghost small home-task-done" data-home-quest-done="${homeEsc(q.id)}">完了</button></div>`).join(''):'<div class="home-empty home-empty-action"><span>未完了の任務はないよ</span><button type="button" class="ghost small" data-home-add-quest>＋ 任務を追加</button></div>';
