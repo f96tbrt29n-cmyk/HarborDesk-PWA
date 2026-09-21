@@ -33,11 +33,48 @@ function hdQPSet(q,index,value){const all=hdQPStore(),key=hdQPPeriodKey(q),goals
 function hdQPNextReset(q){const now=new Date(),n=new Date(now);if(q.cycle==='daily'){n.setHours(5,0,0,0);if(now>=n)n.setDate(n.getDate()+1)}else if(q.cycle==='weekly'){n.setHours(5,0,0,0);const day=n.getDay();let add=(8-day)%7;if(day===1&&now.getHours()<5)add=0;else if(add===0)add=7;n.setDate(n.getDate()+add)}else if(q.cycle==='monthly'){n.setMonth(n.getMonth()+1,1);n.setHours(5,0,0,0)}else if(q.cycle==='quarterly'){const points=[2,5,8,11];let idx=points.find(x=>x>now.getMonth()||(x===now.getMonth()&&now.getDate()===1&&now.getHours()<5));let y=now.getFullYear();if(idx==null){idx=2;y++}n.setFullYear(y,idx,1);n.setHours(5,0,0,0)}else if(q.cycle==='yearly'){const sm=(Number(q.startMonth)||1)-1;let y=now.getFullYear();n.setFullYear(y,sm,1);n.setHours(5,0,0,0);if(now>=n)n.setFullYear(y+1)}return `${n.getMonth()+1}/${n.getDate()} ${hdQPPad(n.getHours())}:00`}
 function hdQPProgressHtml(q){const goals=hdQPGoals(q);if(!goals.length)return '';const row=hdQPEntry(q);const done=goals.every((g,i)=>(Number(row.values[i])||0)>=Number(g[1]));return `<div class="hd-qp-box ${done?'done':''}"><div class="hd-qp-title"><b>${done?'✓ 進捗完了':'進捗'}</b><span>次回リセット ${hdQPNextReset(q)}</span></div>${goals.map((g,i)=>{const v=Math.min(Number(g[1]),Number(row.values[i])||0);return `<div class="hd-qp-row"><span>${hdQuestEsc(g[0])}</span><progress max="${Number(g[1])}" value="${v}"></progress><b>${v}/${Number(g[1])}</b><button type="button" class="ghost small" data-hd-qp-minus="${q.id}" data-i="${i}">−1</button><button type="button" class="primary small" data-hd-qp-plus="${q.id}" data-i="${i}">＋1</button></div>`}).join('')}<button type="button" class="ghost small hd-qp-reset" data-hd-qp-reset="${q.id}">進捗を0に戻す</button></div>`}
 
+function hdQuestMapRefs(q){
+ const text=[q?.condition,q?.note,...(Array.isArray(q?.progress)?q.progress.map(x=>x?.[0]):[])].filter(Boolean).join(' ');
+ const refs=new Set();
+ for(const m of text.matchAll(/\b([1-7]-\d+)(?:-\d+)?\b/g))refs.add(m[1]);
+ return [...refs];
+}
+function hdQuestRelatedToMap(map){
+ const key=String(map||'').trim();if(!key)return [];
+ return (HD_QUESTS||[]).filter(q=>q?.type==='出撃'&&hdQuestMapRefs(q).includes(key));
+}
+function hdQuestMapChecklistLabel(id){
+ const q=(HD_QUESTS||[]).find(x=>x.id===id);return q?hdQuestChecklistButtonText(q):'チェックに追加';
+}
+function hdQuestOpenFromMap(id){
+ const q=(HD_QUESTS||[]).find(x=>x.id===id);if(!q)return false;
+ hdQuestCycle=q.cycle;hdQuestType='すべて';
+ if(typeof hdEnsureQuestDb==='function')hdEnsureQuestDb();
+ const search=document.getElementById('hdQuestDbSearch');if(search)search.value=q.name||q.id;
+ if(typeof hdRenderQuestDb==='function')hdRenderQuestDb();
+ const target=document.getElementById('questDatabase');
+ if(target&&typeof window.hdWSShowElement==='function')window.hdWSShowElement(target,true);
+ else target?.scrollIntoView({behavior:'smooth',block:'start'});
+ setTimeout(()=>document.querySelector(`#questDatabase [data-hd-quest-id="${id}"]`)?.scrollIntoView({behavior:'smooth',block:'center'}),80);
+ return true;
+}
+function hdQuestAddFromMap(id){
+ const q=(HD_QUESTS||[]).find(x=>x.id===id);if(!q)return false;
+ hdAddQuestToChecklist(q);
+ window.dispatchEvent(new CustomEvent('hd:quest-map-state-changed',{detail:{id,mapRefs:hdQuestMapRefs(q)}}));
+ return true;
+}
+window.hdQuestMapRefs=hdQuestMapRefs;
+window.hdQuestRelatedToMap=hdQuestRelatedToMap;
+window.hdQuestMapChecklistLabel=hdQuestMapChecklistLabel;
+window.hdQuestOpenFromMap=hdQuestOpenFromMap;
+window.hdQuestAddFromMap=hdQuestAddFromMap;
+
 function hdQPInstallData(){for(const q of HD_QUEST_EXTRA)if(!HD_QUESTS.some(x=>x.id===q.id))HD_QUESTS.push(q)}
 function hdQPEnsureCycleButtons(){const host=document.querySelector('#questDatabase .hd-quest-db-cycles');if(!host)return;for(const c of ['quarterly','yearly'])if(!host.querySelector(`[data-hd-quest-cycle="${c}"]`)){const b=document.createElement('button');b.className='ghost small';b.type='button';b.dataset.hdQuestCycle=c;b.textContent=HD_QUEST_CYCLE_LABEL[c];host.appendChild(b)}const warning=document.querySelector('#questDatabase .hd-quest-db-warning');if(warning)warning.textContent='定期任務は午前5時更新。日次/週次/月次/季節/年次の周期境界をまたぐと、このアプリの進捗カウンターも自動で0から始まるよ。'}
 
 const hdQPBaseRender=hdRenderQuestDb;
-hdRenderQuestDb=function(){hdQPEnsureCycleButtons();const host=document.getElementById('hdQuestDbList');if(!host)return;const text=(document.getElementById('hdQuestDbSearch')?.value||'').trim().toLowerCase();let rows=HD_QUESTS.filter(x=>x.cycle===hdQuestCycle&&(hdQuestType==='すべて'||x.type===hdQuestType)&&(!text||`${x.id} ${x.name} ${x.condition} ${x.reward} ${x.prereq||''}`.toLowerCase().includes(text)));const count=document.getElementById('hdQuestDbCount');if(count)count.textContent=`${rows.length}件｜${hdQuestCycle==='yearly'?'任務ごとに開始月が異なる':`次回リセット ${hdQuestResetText(hdQuestCycle)}`}`;host.innerHTML=rows.map(x=>`<article class="hd-quest-db-card"><div class="hd-quest-db-head"><div><span>${x.id}・${hdQuestEsc(x.type)}${x.cycle==='yearly'?`・年${x.startMonth}月〜`:''}</span><strong>${hdQuestEsc(x.name)}</strong></div><button class="${hdQuestInChecklist(x)?'ghost':'primary'} small" type="button" data-hd-quest-add="${x.id}">${hdQuestChecklistButtonText(x)}</button></div><div class="hd-quest-db-condition"><b>達成条件</b><p>${hdQuestEsc(x.condition)}</p></div>${hdQPProgressHtml(x)}<div class="hd-quest-db-reward"><b>報酬</b><span>${hdQuestEsc(x.reward)}</span></div>${x.prereq?`<div class="hd-quest-db-prereq"><b>前提</b><span>${hdQuestEsc(x.prereq)}</span></div>`:''}${x.note?`<p class="hd-quest-db-note">${hdQuestEsc(x.note)}</p>`:''}</article>`).join('')||'<div class="empty">条件に合う任務がないよ</div>'}
+hdRenderQuestDb=function(){hdQPEnsureCycleButtons();const host=document.getElementById('hdQuestDbList');if(!host)return;const text=(document.getElementById('hdQuestDbSearch')?.value||'').trim().toLowerCase();let rows=HD_QUESTS.filter(x=>x.cycle===hdQuestCycle&&(hdQuestType==='すべて'||x.type===hdQuestType)&&(!text||`${x.id} ${x.name} ${x.condition} ${x.reward} ${x.prereq||''}`.toLowerCase().includes(text)));const count=document.getElementById('hdQuestDbCount');if(count)count.textContent=`${rows.length}件｜${hdQuestCycle==='yearly'?'任務ごとに開始月が異なる':`次回リセット ${hdQuestResetText(hdQuestCycle)}`}`;host.innerHTML=rows.map(x=>`<article class="hd-quest-db-card" data-hd-quest-id="${x.id}"><div class="hd-quest-db-head"><div><span>${x.id}・${hdQuestEsc(x.type)}${x.cycle==='yearly'?`・年${x.startMonth}月〜`:''}</span><strong>${hdQuestEsc(x.name)}</strong></div><button class="${hdQuestInChecklist(x)?'ghost':'primary'} small" type="button" data-hd-quest-add="${x.id}">${hdQuestChecklistButtonText(x)}</button></div><div class="hd-quest-db-condition"><b>達成条件</b><p>${hdQuestEsc(x.condition)}</p></div>${hdQPProgressHtml(x)}<div class="hd-quest-db-reward"><b>報酬</b><span>${hdQuestEsc(x.reward)}</span></div>${x.prereq?`<div class="hd-quest-db-prereq"><b>前提</b><span>${hdQuestEsc(x.prereq)}</span></div>`:''}${x.note?`<p class="hd-quest-db-note">${hdQuestEsc(x.note)}</p>`:''}</article>`).join('')||'<div class="empty">条件に合う任務がないよ</div>'}
 
 document.addEventListener('click',e=>{let b=e.target.closest?.('[data-hd-qp-plus]');if(b){const q=HD_QUESTS.find(x=>x.id===b.dataset.hdQpPlus);if(q){const i=Number(b.dataset.i),row=hdQPEntry(q);hdQPSet(q,i,(row.values[i]||0)+1)}return}b=e.target.closest?.('[data-hd-qp-minus]');if(b){const q=HD_QUESTS.find(x=>x.id===b.dataset.hdQpMinus);if(q){const i=Number(b.dataset.i),row=hdQPEntry(q);hdQPSet(q,i,(row.values[i]||0)-1)}return}b=e.target.closest?.('[data-hd-qp-reset]');if(b){const q=HD_QUESTS.find(x=>x.id===b.dataset.hdQpReset);if(q){const all=hdQPStore();all[q.id]={periodKey:hdQPPeriodKey(q),values:Array(hdQPGoals(q).length).fill(0),updatedAt:Date.now()};hdQPSave(all);hdRenderQuestDb()}return}});
 
