@@ -772,6 +772,62 @@ test('release smoke: sortie preparation exposes detailed game differences', asyn
 });
 
 
+test('release smoke: sortie gate prioritizes blockers and next actions', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFEGoNoGo === 'function' &&
+    typeof window.hdFEGateHtml === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const stop = window.hdFEGoNoGo({checks:[
+      {id:'freshness',label:'同期鮮度',status:'partial',detail:'同期から12分'},
+      {id:'health',label:'艦状態',status:'missing',detail:'大破 1隻'},
+      {id:'supply',label:'補給',status:'partial',detail:'未補給 1隻'},
+      {id:'gameMatch',label:'ゲーム反映',status:'partial',detail:'装備差 2件'}
+    ]});
+    const hold = window.hdFEGoNoGo({checks:[
+      {id:'freshness',label:'同期鮮度',status:'partial',detail:'同期から12分'},
+      {id:'health',label:'艦状態',status:'ready',detail:'艦状態OK'}
+    ]});
+    const go = window.hdFEGoNoGo({checks:[
+      {id:'freshness',label:'同期鮮度',status:'ready',detail:'たった今同期'},
+      {id:'health',label:'艦状態',status:'ready',detail:'艦状態OK'}
+    ]});
+    return {stop,hold,go,html:window.hdFEGateHtml({checks:[
+      {id:'health',label:'艦状態',status:'missing',detail:'大破 1隻'},
+      {id:'gameMatch',label:'ゲーム反映',status:'partial',detail:'装備差 2件'}
+    ]})};
+  });
+
+  expect(data.stop.state).toBe('stop');
+  expect(data.stop.label).toBe('修正必要');
+  expect(data.stop.actions[0].id).toBe('health');
+  expect(data.stop.actions[0].action).toContain('大破');
+  expect(data.stop.actions.some(x => x.id === 'gameMatch')).toBe(true);
+  expect(data.hold.state).toBe('hold');
+  expect(data.hold.label).toBe('要確認');
+  expect(data.go.state).toBe('go');
+  expect(data.go.label).toBe('出撃準備OK');
+  expect(data.go.actions).toHaveLength(0);
+  expect(data.html).toContain('修正必要');
+  expect(data.html).toContain('ゲーム側の艦隊順・装備');
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: sortie summary includes go-no-go and prioritized actions', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const source = await page.evaluate(async () => fetch('./sortie-preparation-sheet.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain("typeof hdFEGateHtml==='function'?hdFEGateHtml(auto):''");
+  expect(source).toContain("typeof hdFEGoNoGo==='function'?hdFEGoNoGo(eq.assigned.auto):null");
+  expect(source).toContain('出撃判定:');
+  expect(source).toContain('次:');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
