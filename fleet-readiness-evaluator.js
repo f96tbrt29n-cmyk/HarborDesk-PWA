@@ -158,13 +158,29 @@ function hdFESupply(plan){
  const detail=status==='manual'?'補給量を同期できた艦のみ判定':empty.length?`燃料/弾薬0の艦 ${empty.length}隻`:low.length?`未補給 ${low.length}隻`:'全艦補給済み';
  return {status,rows,known:known.length,empty:empty.length,low:low.length,detail};
 }
+function hdFERouteShips(plan){
+ return (plan?.ships||[]).filter(x=>x?.ship).map(s=>{const row=hdFERosterForShip(s),db=hdFEFindShip(s.ship);return {ship:s,type:row?.type||db?.type||s.type||'',speed:db?.speed||''}});
+}
+function hdFEPresetRouteMatch(plan,preset,index=0){
+ if(typeof hdFSPresetInfo!=='function')return null;
+ const ships=hdFERouteShips(plan),info=hdFSPresetInfo(preset),reqs=(info.requirements||[]).map(req=>{const need=Number(req.count)||1,got=ships.filter(x=>typeof hdFSTypeMatches==='function'?hdFSTypeMatches({type:x.type,roles:[],tags:[]},req.token):x.type===req.token).length;return {token:req.token,need,got,ok:got>=need}}),required=reqs.reduce((n,x)=>n+x.need,0),coverage=ships.length?required/ships.length:0,explicitTotal=/\d+隻/.test(String(info.text||'')),totalOk=!explicitTotal||ships.length===Number(info.total),lows=info.speedRequired?ships.filter(x=>x.speed==='低速').map(x=>x.ship.ship):[],bad=reqs.filter(x=>!x.ok),strong=required>=2&&coverage>=.5;
+ return {preset,index,info,reqs,required,coverage,explicitTotal,totalOk,lows,bad,strong,exact:strong&&totalOk&&!bad.length&&!lows.length};
+}
+function hdFEInferRoute(plan){
+ const presets=typeof MAP_PLANS!=='undefined'?(MAP_PLANS[String(plan?.map||'')]?.presets||[]):[];
+ if(!presets.length||typeof hdFSPresetInfo!=='function')return {status:'none',matches:[],detail:'構造化された編成例なし'};
+ const rows=presets.map((p,i)=>hdFEPresetRouteMatch(plan,p,i)).filter(Boolean),matches=rows.filter(x=>x.exact);
+ if(matches.length===1)return {status:'matched',match:matches[0],matches,rows,detail:`編成から「${matches[0].preset?.name||'編成例'}」に一意一致`};
+ if(matches.length>1)return {status:'ambiguous',matches,rows,detail:`複数の編成例に一致: ${matches.map(x=>x.preset?.name||('候補'+(x.index+1))).join(' / ')}`};
+ const close=rows.filter(x=>x.strong&&x.totalOk).sort((a,b)=>a.bad.length-b.bad.length||b.coverage-a.coverage);
+ return {status:'none',matches:[],rows,closest:close[0]||null,detail:close[0]?`近い編成例: ${close[0].preset?.name||'候補'}（条件未一致）`:'編成条件の自動特定に必要な具体条件が不足'};
+}
 function hdFERoute(plan){
- const info=plan?.suggestion?.info||plan?.routeInfo||null;
- if(!info)return {status:'manual',detail:'保存編成のルート条件を特定できないため攻略ルートを確認',requirements:[]};
- const ships=(plan?.ships||[]).filter(x=>x?.ship).map(s=>{const row=hdFERosterForShip(s),db=hdFEFindShip(s.ship);return {ship:s,type:row?.type||db?.type||s.type||'',speed:db?.speed||''}});
- const reqs=(info.requirements||[]).map(req=>{const got=ships.filter(x=>typeof hdFSTypeMatches==='function'?hdFSTypeMatches({type:x.type,roles:[],tags:[]},req.token):x.type===req.token).length;return {token:req.token,need:Number(req.count)||1,got,ok:got>=(Number(req.count)||1)}});
- const lows=info.speedRequired?ships.filter(x=>x.speed==='低速').map(x=>x.ship.ship):[],bad=reqs.filter(x=>!x.ok);
- return {status:bad.length||lows.length?'missing':'ready',requirements:reqs,lowSpeed:lows,detail:bad.length?bad.map(x=>x.token+' '+x.got+'/'+x.need).join(' / '):(lows.length?'高速条件: 低速 '+lows.join('、'):'基本編成条件を満たす')};
+ let info=plan?.suggestion?.info||plan?.routeInfo||null,inferred=null,presetName=plan?.suggestion?.preset?.name||plan?.preset?.name||'';
+ if(!info){inferred=hdFEInferRoute(plan);if(inferred.status==='matched'){info=inferred.match.info;presetName=inferred.match.preset?.name||''}}
+ if(!info)return {status:'manual',detail:inferred?.detail||'保存編成のルート条件を特定できないため攻略ルートを確認',requirements:[],inference:inferred};
+ const ships=hdFERouteShips(plan),reqs=(info.requirements||[]).map(req=>{const got=ships.filter(x=>typeof hdFSTypeMatches==='function'?hdFSTypeMatches({type:x.type,roles:[],tags:[]},req.token):x.type===req.token).length;return {token:req.token,need:Number(req.count)||1,got,ok:got>=(Number(req.count)||1)}}),lows=info.speedRequired?ships.filter(x=>x.speed==='低速').map(x=>x.ship.ship):[],bad=reqs.filter(x=>!x.ok),prefix=inferred?.status==='matched'?`自動照合: ${presetName} / `:presetName?`${presetName} / `:'';
+ return {status:bad.length||lows.length?'missing':'ready',requirements:reqs,lowSpeed:lows,inference:inferred,presetName,detail:prefix+(bad.length?bad.map(x=>x.token+' '+x.got+'/'+x.need).join(' / '):(lows.length?'高速条件: 低速 '+lows.join('、'):'基本編成条件を満たす'))};
 }
 function hdFEEnemyAirCandidates(map){
  if(typeof hdFCMapEnemyAirCandidates==='function')return hdFCMapEnemyAirCandidates(map);
