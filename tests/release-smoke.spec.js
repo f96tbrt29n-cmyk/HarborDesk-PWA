@@ -307,6 +307,67 @@ test('release smoke: optimizer keeps improvement-level equipment stacks separate
 });
 
 
+test('release smoke: fleet suggestions exclude ships unavailable for sortie', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFSLiveState === 'function' &&
+    typeof window.hdFSOperational === 'function' &&
+    typeof window.hdFSProfile === 'function' &&
+    typeof window.hdFSPickBest === 'function' &&
+    typeof window.hdFSOperationalSummary === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const future = Date.now() + 60 * 60 * 1000;
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
+      { deckId:2, mission:[1,5,future,0], ships:[{ gameShipId:1001 }] }
+    ]));
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
+      expeditions:[],
+      docks:[{ id:'kc-dock-1', gameShipId:1002, endsAt:future, source:'kancolle-import' }]
+    }));
+    const rows = [
+      { id:'exp', name:'睦月', type:'駆逐艦', level:99, gameShipId:1001, gameHp:13, gameMaxHp:13, gameCond:49 },
+      { id:'dock', name:'如月', type:'駆逐艦', level:98, gameShipId:1002, gameHp:13, gameMaxHp:13, gameCond:49 },
+      { id:'heavy', name:'吹雪', type:'駆逐艦', level:97, gameShipId:1003, gameHp:5, gameMaxHp:20, gameCond:49 },
+      { id:'fatigue', name:'白雪', type:'駆逐艦', level:90, gameShipId:1004, gameHp:20, gameMaxHp:20, gameCond:15 },
+      { id:'ready', name:'初雪', type:'駆逐艦', level:80, gameShipId:1005, gameHp:20, gameMaxHp:20, gameCond:49, gameSallyArea:3 },
+      { id:'sparkle', name:'深雪', type:'駆逐艦', level:70, gameShipId:1006, gameHp:20, gameMaxHp:20, gameCond:55 }
+    ];
+    const state = window.hdFSLiveState();
+    const profiles = rows.map(x => window.hdFSProfile(x, state));
+    const ops = Object.fromEntries(profiles.map(x => [x.row.id, x.operational]));
+    const best = window.hdFSPickBest(profiles, new Set(), null, { preferred:[], speedPreferred:false }, []);
+    const summary = window.hdFSOperationalSummary(profiles);
+    return {
+      ops,
+      best: best?.row?.id || '',
+      summary
+    };
+  });
+
+  expect(data.ops.exp.available).toBe(false);
+  expect(data.ops.exp.reasons).toContain('遠征中');
+  expect(data.ops.dock.available).toBe(false);
+  expect(data.ops.dock.reasons).toContain('入渠中');
+  expect(data.ops.heavy.available).toBe(false);
+  expect(data.ops.heavy.reasons).toContain('大破');
+  expect(data.ops.fatigue.available).toBe(true);
+  expect(data.ops.fatigue.labels).toContain('赤疲労');
+  expect(data.ops.sparkle.labels).toContain('キラ');
+  expect(data.ops.ready.labels).toContain('札3');
+  expect(data.best).toBe('ready');
+  expect(data.summary).toMatchObject({
+    total: 6,
+    available: 3,
+    blocked: 3,
+    counts: { '遠征中':1, '入渠中':1, '大破':1 }
+  });
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
