@@ -24,7 +24,7 @@ const HD_MAP_GRAPHS={
 '5-2':{edges:[['S','A'],['S','B'],['A','C'],['B','C'],['C','D'],['C','E'],['D','F'],['E','F'],['F','G']],boss:'G'},
 '5-3':{edges:[['S','D'],['S','G'],['D','G'],['D','F'],['G','I'],['F','I'],['I','J'],['J','K'],['K','Q']],boss:'Q',night:['I','J','K']},
 '5-4':{edges:[['S','A'],['S','B'],['A','D'],['B','E'],['D','F'],['E','F'],['F','G'],['F','H'],['G','I'],['H','I'],['I','J']],boss:'J',night:['H']},
-'5-5':{edges:[['S','B'],['S','A'],['A','D'],['B','K'],['B','F'],['D','H'],['F','J'],['H','N'],['J','M'],['K','P'],['M','S'],['N','S'],['P','S']],boss:'S',night:['N','P']},
+'5-5':{edges:[['START','B'],['START','A'],['A','D'],['B','K'],['B','F'],['D','H'],['F','J'],['H','N'],['J','M'],['K','P'],['M','S'],['N','S'],['P','S']],boss:'S',night:['N','P']},
 '5-6':{edges:[['S','A'],['A','B'],['B','C'],['C','G1'],['G1','R'],['R','D'],['D','E'],['E','N'],['N','F'],['F','G'],['G','Z']],boss:'Z',goal:'G1',air:['R'],note:'輸送→R到達ギミック→第2戦力→最終戦力の段階攻略を簡略表示'},
 '6-1':{edges:[['S','A'],['S','B'],['A','C'],['B','D'],['C','E'],['D','E'],['E','F'],['E','G'],['F','K'],['G','K']],boss:'K'},
 '6-2':{edges:[['S','B'],['S','C'],['B','D'],['C','D'],['D','E'],['D','F'],['E','I'],['F','H'],['H','K'],['I','K']],boss:'K'},
@@ -39,8 +39,15 @@ const HD_MAP_GRAPHS={
 };
 
 function hdMapEsc2(s){return typeof esc==='function'?esc(s):String(s??'')}
+function hdMapStartLabels(graph){
+ const edges=Array.isArray(graph?.edges)?graph.edges:[],incoming=new Set(edges.map(x=>x[1]));
+ return [...new Set(edges.map(x=>x[0]).filter(Boolean))].filter(x=>!incoming.has(x));
+}
+function hdMapIsStartLabel(graph,label){return hdMapStartLabels(graph).includes(label)}
+window.hdMapStartLabels=hdMapStartLabels;
+window.hdMapIsStartLabel=hdMapIsStartLabel;
 function hdMapKind(graph,label){
- if(label==='S'||label==='S1'||label==='S2')return 'start';
+ if(hdMapIsStartLabel(graph,label))return 'start';
  if(graph.boss===label)return 'boss';
  if(graph.goal===label)return 'goal';
  if((graph.items||[]).includes(label))return 'item';
@@ -53,7 +60,7 @@ function hdMapKind(graph,label){
 }
 function hdMapLevels(graph){
  const labels=[...new Set(graph.edges.flat())];
- const starts=labels.filter(x=>x==='S'||x==='S1'||x==='S2');
+ const starts=hdMapStartLabels(graph);
  const level={};starts.forEach(s=>level[s]=0);
  for(let pass=0;pass<labels.length*2;pass++){
   let changed=false;
