@@ -158,6 +158,41 @@ function hdFESupply(plan){
  const detail=status==='manual'?'補給量を同期できた艦のみ判定':empty.length?`燃料/弾薬0の艦 ${empty.length}隻`:low.length?`未補給 ${low.length}隻`:'全艦補給済み';
  return {status,rows,known:known.length,empty:empty.length,low:low.length,detail};
 }
+function hdFENormGearLabel(value){
+ return String(value||'').replace(/^\[増設\]\s*/,'').replace(/\s+/g,' ').trim();
+}
+function hdFEPlannedGearLabel(item){
+ const name=String(item?.name||'').trim(),star=Math.max(0,Number(item?.star)||0);
+ return hdFENormGearLabel(name+(star?` ★${star}`:''));
+}
+function hdFEGameMatch(plan){
+ const ships=(plan?.ships||[]).filter(x=>x?.ship),fleets=(()=>{try{const x=JSON.parse(localStorage.getItem('harbordesk-kancolle-fleets-v1')||'[]');return Array.isArray(x)?x:[]}catch{return []}})(),details=[],ids=[];let unknown=0,gearMismatch=0;
+ for(const ship of ships){
+  const row=hdFERosterForShip(ship);
+  if(!row||!Number(row.gameShipId)){unknown++;details.push({name:ship.ship,status:'unknown',mismatches:[]});continue}
+  ids.push(Number(row.gameShipId));
+  const mismatches=[],actualSlots=Array.isArray(row.gameGearSlots)?row.gameGearSlots:null;
+  if(!actualSlots){unknown++;details.push({name:ship.ship,status:'unknown',mismatches});continue}
+  for(const item of ship.items||[]){
+   const idx=Number.isFinite(Number(item.slotIndex))?Number(item.slotIndex):0,planned=hdFEPlannedGearLabel(item),actual=hdFENormGearLabel(actualSlots[idx]||'');
+   if(planned!==actual)mismatches.push({slotIndex:idx,planned,actual});
+  }
+  const plannedExpansion=ship.expansion?.name?hdFEPlannedGearLabel(ship.expansion):'',actualExpansion=hdFENormGearLabel(row.gameGearExpansion||'');
+  if(plannedExpansion!==actualExpansion)mismatches.push({slotIndex:'ex',planned:plannedExpansion,actual:actualExpansion});
+  gearMismatch+=mismatches.length;details.push({name:ship.ship,status:mismatches.length?'mismatch':'ready',mismatches,gameShipId:Number(row.gameShipId)});
+ }
+ let deck=null,deckOrderMismatch=false;
+ if(ids.length===ships.length&&ids.length){
+  deck=fleets.find(d=>{const xs=(d.ships||[]).map(x=>Number(x.gameShipId)||0).filter(Boolean);return xs.length===ids.length&&xs.every((id,i)=>id===ids[i])})||null;
+  if(!deck){
+   const target=[...ids].sort((a,b)=>a-b).join(',');
+   deckOrderMismatch=fleets.some(d=>(d.ships||[]).map(x=>Number(x.gameShipId)||0).filter(Boolean).sort((a,b)=>a-b).join(',')===target);
+  }
+ }
+ const fleetKnown=fleets.length>0&&ids.length===ships.length&&ids.length>0,fleetMatch=!!deck,status=gearMismatch||(!fleetMatch&&fleetKnown)?'partial':unknown||!fleetKnown?'manual':'ready';
+ const parts=[];if(fleetMatch)parts.push(`${deck.name||'ゲーム艦隊'}一致`);else if(deckOrderMismatch)parts.push('同じ艦だが並び順が違う');else if(fleetKnown)parts.push('現在艦隊と不一致');else parts.push('現在艦隊の照合待ち');if(gearMismatch)parts.push(`装備差 ${gearMismatch}件`);else if(!unknown)parts.push('装備一致');
+ return {status,detail:parts.join(' / '),fleetMatch,deckId:Number(deck?.deckId)||0,deckName:String(deck?.name||''),deckOrderMismatch,gearMismatch,unknown,details};
+}
 function hdFERoute(plan){
  const info=plan?.suggestion?.info||plan?.routeInfo||null;
  if(!info)return {status:'manual',detail:'保存編成のルート条件を特定できないため攻略ルートを確認',requirements:[]};
@@ -191,13 +226,13 @@ function hdFEScouting(plan,items){
  return {status,available:true,score,coef,hq,checks:rows,detail:`推定33式 ${score.toFixed(2)}（係数${coef} / 司令部Lv${hq}）`};
 }
 function hdFEAutoVerdict(plan,e){
- const live=hdFELiveFleet(plan),supply=hdFESupply(plan),route=hdFERoute(plan),air=hdFEAirCheck(plan?.map,e.air),scouting=hdFEScouting(plan,e.items),equipment={status:e.missing?'missing':e.partial?'partial':'ready',detail:`海域装備 ${e.ready}/${e.requirements.length} 準備`},master={status:e.master.invalid.length?'missing':e.master.unresolved.length?'partial':'ready',detail:e.master.invalid.length?`装備不可 ${e.master.invalid.length}件`:e.master.unresolved.length?`未解決 ${e.master.unresolved.length}件`:'装備可否OK'},health={status:live.status,detail:live.blocked?`出撃不可候補 ${live.blocked}隻（${Object.entries(live.reasons).map(x=>x[0]+' '+x[1]).join(' / ')}）`:live.caution?`注意艦 ${live.caution}隻`:'艦状態OK'};
- const checks=[{id:'health',label:'艦状態',...health},{id:'supply',label:'補給',...supply},{id:'route',label:'編成条件',...route},{id:'equipment',label:'装備',...equipment},{id:'air',label:'制空',...air},{id:'scouting',label:'索敵',...scouting},{id:'master',label:'装備可否',...master}],ranked={missing:3,partial:2,manual:1,ready:0},worst=checks.reduce((a,x)=>(ranked[x.status]??1)>(ranked[a.status]??0)?x:a,{status:'ready'});
- return {status:worst.status,checks,live,supply,route,air,scouting,master,equipment};
+ const live=hdFELiveFleet(plan),supply=hdFESupply(plan),gameMatch=hdFEGameMatch(plan),route=hdFERoute(plan),air=hdFEAirCheck(plan?.map,e.air),scouting=hdFEScouting(plan,e.items),equipment={status:e.missing?'missing':e.partial?'partial':'ready',detail:`海域装備 ${e.ready}/${e.requirements.length} 準備`},master={status:e.master.invalid.length?'missing':e.master.unresolved.length?'partial':'ready',detail:e.master.invalid.length?`装備不可 ${e.master.invalid.length}件`:e.master.unresolved.length?`未解決 ${e.master.unresolved.length}件`:'装備可否OK'},health={status:live.status,detail:live.blocked?`出撃不可候補 ${live.blocked}隻（${Object.entries(live.reasons).map(x=>x[0]+' '+x[1]).join(' / ')}）`:live.caution?`注意艦 ${live.caution}隻`:'艦状態OK'};
+ const checks=[{id:'health',label:'艦状態',...health},{id:'supply',label:'補給',...supply},{id:'gameMatch',label:'ゲーム反映',...gameMatch},{id:'route',label:'編成条件',...route},{id:'equipment',label:'装備',...equipment},{id:'air',label:'制空',...air},{id:'scouting',label:'索敵',...scouting},{id:'master',label:'装備可否',...master}],ranked={missing:3,partial:2,manual:1,ready:0},worst=checks.reduce((a,x)=>(ranked[x.status]??1)>(ranked[a.status]??0)?x:a,{status:'ready'});
+ return {status:worst.status,checks,live,supply,gameMatch,route,air,scouting,master,equipment};
 }
 function hdFEAutoStatusLabel(s){return s==='ready'?'OK':s==='missing'?'不足/不可':s==='partial'?'注意':'要確認'}
 function hdFEAutoHtml(v){
- return `<div class="hd-fe-auto ${v.status}"><div class="hd-fe-auto-head"><div><b>出撃自動判定</b><span>艦状態・編成・装備・制空・索敵を統合</span></div><strong>${hdFEAutoStatusLabel(v.status)}</strong></div><div class="hd-fe-auto-grid">${v.checks.map(x=>`<div class="${x.status}"><span>${hdFEEsc(x.label)}</span><b>${hdFEAutoStatusLabel(x.status)}</b><small>${hdFEEsc(x.detail||'')}</small></div>`).join('')}</div>${v.scouting?.available&&v.scouting.checks?.length?`<div class="hd-fe-auto-detail"><b>索敵分岐</b>${v.scouting.checks.map(x=>`<span class="${x.status}">${hdFEEsc(x.label)}：${v.scouting.score.toFixed(2)} / 安全域 ${x.safe}${x.failBelow?`（${x.failBelow}未満は逸れ域）`:''}</span>`).join('')}</div>`:''}</div>`;
+ return `<div class="hd-fe-auto ${v.status}"><div class="hd-fe-auto-head"><div><b>出撃自動判定</b><span>艦状態・補給・ゲーム反映・編成・装備・制空・索敵を統合</span></div><strong>${hdFEAutoStatusLabel(v.status)}</strong></div><div class="hd-fe-auto-grid">${v.checks.map(x=>`<div class="${x.status}"><span>${hdFEEsc(x.label)}</span><b>${hdFEAutoStatusLabel(x.status)}</b><small>${hdFEEsc(x.detail||'')}</small></div>`).join('')}</div>${v.scouting?.available&&v.scouting.checks?.length?`<div class="hd-fe-auto-detail"><b>索敵分岐</b>${v.scouting.checks.map(x=>`<span class="${x.status}">${hdFEEsc(x.label)}：${v.scouting.score.toFixed(2)} / 安全域 ${x.safe}${x.failBelow?`（${x.failBelow}未満は逸れ域）`:''}</span>`).join('')}</div>`:''}</div>`;
 }
 function hdFEEvaluate(plan){
  const map=plan?.map||'',items=hdFEAssigned(plan),stats=hdFEStats(items),air=hdFEAir(items),los=hdFELos(items,map),night=hdFENight(items,stats),master=hdFEMasterValidation(plan);
