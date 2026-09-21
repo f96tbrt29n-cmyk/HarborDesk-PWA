@@ -150,7 +150,7 @@ function hdFESupply(plan){
  const rows=(plan?.ships||[]).filter(x=>x?.ship).map(ship=>{
   const row=hdFERosterForShip(ship),masterId=Number(row?.masterId)||Number(ship?.masterId)||0,master=window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips?.[String(masterId)]||null;
   const currentFuel=Number(row?.gameFuel),currentAmmo=Number(row?.gameAmmo),maxFuel=Number(master?.fuel),maxAmmo=Number(master?.ammo);
-  const known=!!row&&maxFuel>0&&maxAmmo>0&&Number.isFinite(currentFuel)&&Number.isFinite(currentAmmo),fuelRatio=known?currentFuel/maxFuel:null,ammoRatio=known?currentAmmo/maxAmmo:null;
+  const known=!!row&&row.gameFuel!=null&&row.gameAmmo!=null&&maxFuel>0&&maxAmmo>0&&Number.isFinite(currentFuel)&&Number.isFinite(currentAmmo),fuelRatio=known?currentFuel/maxFuel:null,ammoRatio=known?currentAmmo/maxAmmo:null;
   return {name:ship.ship,currentFuel,currentAmmo,maxFuel,maxAmmo,known,fuelRatio,ammoRatio};
  });
  const known=rows.filter(x=>x.known),empty=known.filter(x=>x.fuelRatio<=0||x.ammoRatio<=0),low=known.filter(x=>x.fuelRatio>0&&x.ammoRatio>0&&(x.fuelRatio<1||x.ammoRatio<1));
