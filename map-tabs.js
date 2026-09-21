@@ -1,4 +1,5 @@
 const HD_MAP_TAB_KEY='harbordesk-map-tab-v1';
+const HD_MAP_TAB_IDS=['overview','map','fleet','route','gear','quest','drop','mine'];
 
 function hdMapEsc(s){return typeof esc==='function'?esc(s):String(s??'')}
 function hdMapPlan(map){
@@ -8,9 +9,13 @@ function hdMapPlan(map){
   return {presets:[{name:'基本編成',ships:d.fleet||d.formation||'攻略情報を参照',gear:d.air||'装備条件を参照',use:'通常攻略'}],quests:[]};
 }
 function hdMapTabSaved(map){
-  try{return JSON.parse(localStorage.getItem(HD_MAP_TAB_KEY)||'{}')[map]||'overview'}catch{return 'overview'}
+  try{
+    const saved=JSON.parse(localStorage.getItem(HD_MAP_TAB_KEY)||'{}')[map];
+    return HD_MAP_TAB_IDS.includes(saved)?saved:'overview';
+  }catch{return 'overview'}
 }
 function hdMapTabSave(map,tab){
+  if(!HD_MAP_TAB_IDS.includes(tab))tab='overview';
   let data={};try{data=JSON.parse(localStorage.getItem(HD_MAP_TAB_KEY)||'{}')}catch{}
   data[map]=tab;localStorage.setItem(HD_MAP_TAB_KEY,JSON.stringify(data));
 }
