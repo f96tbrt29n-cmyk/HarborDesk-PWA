@@ -3592,6 +3592,16 @@ test('release smoke: map overview exposes visible攻略 tool launcher', async ({
     await expect(launcher.locator(`[data-hd-map-tool="${tool}"]`)).toBeVisible();
   }
 
+  await launcher.locator('[data-hd-map-tool="suggest"]').click();
+  await expect(page.locator('#hdFleetSuggester')).toBeVisible({ timeout: 5000 });
+  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await expect(launcher).toBeVisible();
+
+  await launcher.locator('[data-hd-map-tool="prep"]').click();
+  await expect(page.locator('#hdSortiePreparation')).toBeVisible({ timeout: 5000 });
+  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await expect(launcher).toBeVisible();
+
   await launcher.locator('[data-hd-map-tool="map"]').click();
   await expect(page.locator('[data-map-pane="map"]')).toBeVisible();
   await expect(page.locator('.hd-map-structure-guide > summary')).toBeVisible();
