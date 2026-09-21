@@ -8970,7 +8970,9 @@ function hdShipDbMapRecommendHtml(map,detail){
 function hdShipDbJumpTo(name){
  hdEnsureShipDatabase();
  const input=document.getElementById('hdShipDbSearch');if(input){input.value=name;hdShipDbViewSave({query:name});hdRenderShipDatabase()}
- const sec=document.getElementById('shipDatabase');if(sec){sec.scrollIntoView({behavior:'smooth',block:'start'})}
+ const sec=document.getElementById('shipDatabase');if(!sec)return false;
+ if(typeof window.hdWSShowElement==='function'&&window.hdWSShowElement(sec,true))return true;
+ sec.scrollIntoView({behavior:'smooth',block:'start'});return true;
 }
 
 function hdShipDbStatsHtml(item){
