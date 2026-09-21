@@ -868,6 +868,7 @@ test('release smoke: userscript bridge deduplicates repeated capture ids', async
   const data = await page.evaluate(async () => {
     localStorage.removeItem('harbordesk-ship-roster-v1');
     localStorage.removeItem('harbordesk-equipment-v1');
+    localStorage.removeItem('harbordesk-kancolle-bridge-status-v1');
     let syncEvents=0;
     const onSync=()=>{syncEvents++};
     window.addEventListener('hd:kancolle-sync',onSync);
@@ -891,16 +892,24 @@ test('release smoke: userscript bridge deduplicates repeated capture ids', async
       window.hdKcBridgeImportOnce('bridge-dedupe-test',raw),
       window.hdKcBridgeImportOnce('bridge-dedupe-test',raw)
     ]);
+    const appliedStatus=JSON.parse(localStorage.getItem('harbordesk-kancolle-bridge-status-v1')||'null');
+    const appliedText=document.getElementById('hdKcBridgeStatus')?.textContent||'';
     let mismatch='';
     try{
       const changed=raw.replace('"userscriptVersion":"1.0.14"','"userscriptVersion":"9.9.9"');
       await window.hdKcBridgeImportOnce('bridge-dedupe-test',changed);
     }catch(err){mismatch=String(err?.message||err)}
+    const errorStatus=JSON.parse(localStorage.getItem('harbordesk-kancolle-bridge-status-v1')||'null');
+    const errorText=document.getElementById('hdKcBridgeStatus')?.textContent||'';
     window.removeEventListener('hd:kancolle-sync',onSync);
     return {
       syncEvents,
       sameSyncedAt:first.syncedAt===second.syncedAt,
       mismatch,
+      appliedStatus,
+      appliedText,
+      errorStatus,
+      errorText,
       roster:JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]'),
       equipment:JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]')
     };
@@ -908,7 +917,12 @@ test('release smoke: userscript bridge deduplicates repeated capture ids', async
 
   expect(data.syncEvents).toBe(1);
   expect(data.sameSyncedAt).toBe(true);
+  expect(data.appliedStatus).toMatchObject({captureId:'bridge-dedupe-test',route:'postMessage',state:'applied',attempts:2});
+  expect(data.appliedText).toContain('台帳反映完了');
+  expect(data.appliedText).toContain('再送 1回');
   expect(data.mismatch).toContain('captureId');
+  expect(data.errorStatus).toMatchObject({captureId:'bridge-dedupe-test',route:'postMessage',state:'error',attempts:3});
+  expect(data.errorText).toContain('同期エラー');
   expect(data.roster).toHaveLength(1);
   expect(data.equipment.reduce((n,x)=>n+(Number(x.count)||0),0)).toBe(1);
   expect(errors).toEqual([]);
