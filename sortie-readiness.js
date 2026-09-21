@@ -84,8 +84,8 @@ function hdSortieAutoChecks(map,fleet){
  if(speedNeeded){const lows=ships.map(x=>({name:x.ship,db:hdSortieDb(x.ship)})).filter(x=>x.db?.speed==='低速');out.push({label:'速力',state:lows.length?'note':'ok',detail:lows.length?`低速艦 ${lows.map(x=>x.name).join('、')}。缶/タービン構成を確認`:'DB上の低速艦は未検出',action:lows.length?'tab:gear':'',actionLabel:'装備候補'});}
  return {checks:out,needs,adv};
 }
-function hdSortieManualChecks(map,adv){
- const fleet=hdSortieFleetById(map,hdSortieSelection(map)),gear=hdSortieGearText(fleet),rows=[
+function hdSortieManualChecks(map,adv,fleetOverride=null){
+ const fleet=fleetOverride||hdSortieFleetById(map,hdSortieSelection(map)),gear=hdSortieGearText(fleet),rows=[
   {id:'supply',label:'燃料・弾薬を満タンまで補給した'},
   {id:'damage',label:'大破艦がいないことを確認した'},
   {id:'morale',label:'オレンジ/赤疲労がないことを確認した'},
@@ -101,7 +101,7 @@ function hdSortieManualChecks(map,adv){
 }
 function hdSortieOperationalConfirmation(map,fleetId){
  const fleet=hdSortieFleetById(map,fleetId||hdSortieSelection(map));if(!fleet)return {valid:false,map,fleetId:'',updatedAt:0};
- const state=hdSortieState(map,fleet.id),manual=hdSortieManualChecks(map,hdSortieNeeds(map)?.adv||{}),ids=new Set(manual.map(x=>x.id)),updatedAt=Number(state.updatedAt)||0,ageMinutes=updatedAt?Math.max(0,Math.floor((Date.now()-updatedAt)/60000)):null,valid=!!updatedAt&&!state._resetReason;
+ const state=hdSortieState(map,fleet.id),manual=hdSortieManualChecks(map,hdSortieNeeds(map)?.adv||{},fleet),ids=new Set(manual.map(x=>x.id)),updatedAt=Number(state.updatedAt)||0,ageMinutes=updatedAt?Math.max(0,Math.floor((Date.now()-updatedAt)/60000)):null,valid=!!updatedAt&&!state._resetReason;
  return {
   valid,map,fleetId:fleet.id,updatedAt,ageMinutes,
   supply:valid&&!!state.supply,damage:valid&&!!state.damage,morale:valid&&!!state.morale,
