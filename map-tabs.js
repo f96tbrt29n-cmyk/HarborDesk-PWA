@@ -31,8 +31,24 @@ function hdFleetHtml(map){
   return p.presets.map((x,i)=>`<article class="map-tab-card"><div class="map-tab-card-title">編成例 ${i+1}｜${hdMapEsc(x.name)}</div><div><b>艦隊:</b> ${hdMapEsc(x.ships)}</div><div><b>装備:</b> ${hdMapEsc(x.gear)}</div><div><b>用途:</b> ${hdMapEsc(x.use)}</div></article>`).join('');
 }
 function hdQuestHtml(map){
-  const qs=hdMapPlan(map).quests||[];
-  return qs.length?qs.map(q=>`<article class="map-tab-card quest-tab-card"><span class="quest-kind">${hdMapEsc(q.kind)}</span><div><b>${hdMapEsc(q.name)}</b><p>${hdMapEsc(q.condition)}</p></div></article>`).join(''):'<div class="empty">この海域の関連任務は現在整理中だよ。</div>';
+  const planned=(hdMapPlan(map).quests||[]).map(q=>({...q,id:q.id||'',source:'plan'}));
+  const linked=typeof window.hdQuestRelatedToMap==='function'?(window.hdQuestRelatedToMap(map)||[]):[];
+  const rows=[],seen=new Set();
+  for(const q of linked){
+    const key=String(q.id||q.name||'');if(!key||seen.has(key))continue;seen.add(key);
+    rows.push({...q,kind:typeof HD_QUEST_CYCLE_LABEL!=='undefined'?(HD_QUEST_CYCLE_LABEL[q.cycle]||q.cycle):q.cycle,source:'database'});
+  }
+  for(const q of planned){
+    const key=String(q.id||q.name||'');if(!key||seen.has(key))continue;seen.add(key);rows.push(q);
+  }
+  if(!rows.length)return '<div class="empty">この海域に紐づく定期任務は、現在の任務データベースでは見つからないよ。</div>';
+  return rows.map(q=>{
+    const id=String(q.id||'');
+    const controls=id&&q.source==='database'
+      ?'<div class="quest-tab-actions"><button type="button" class="ghost small" data-hd-map-quest-open="'+hdMapEsc(id)+'">任務詳細</button><button type="button" class="primary small" data-hd-map-quest-add="'+hdMapEsc(id)+'">'+hdMapEsc(typeof window.hdQuestMapChecklistLabel==='function'?window.hdQuestMapChecklistLabel(id):'チェックに追加')+'</button></div>'
+      :'';
+    return '<article class="map-tab-card quest-tab-card" '+(id?'data-hd-map-quest-id="'+hdMapEsc(id)+'"':'')+'><span class="quest-kind">'+hdMapEsc(q.kind||q.cycle||'関連任務')+'</span><div><b>'+hdMapEsc(q.name)+'</b><p>'+hdMapEsc(q.condition)+'</p>'+controls+'</div></article>';
+  }).join('');
 }
 function hdMapToolsOverviewHtml(){
  return `<section class="hd-map-tools-overview">
@@ -76,6 +92,10 @@ function hdMapRenderInlineTool(tab){
   host.innerHTML=window.hdAdvancedHtml(selectedMap);
  }
  if(tab==='map'&&typeof window.hdEnhanceMapPane==='function')window.hdEnhanceMapPane();
+ if(tab==='quest'){
+  const pane=document.querySelector('[data-map-pane="quest"]');
+  if(pane)pane.innerHTML=hdQuestHtml(selectedMap);
+ }
 }
 function hdCustomFleetHtml(map){
   if(typeof loadCustomFleets!=='function')return '<div class="empty">自分用編成機能を読み込み中</div>';
@@ -119,6 +139,10 @@ window.hdMapTabsCoreApply=hdApplyMapTabs;
 
 document.addEventListener('click',e=>{
   const tool=e.target.closest('[data-hd-map-tool]');if(tool){hdMapOpenTool(tool.dataset.hdMapTool);return}
+  const questOpen=e.target.closest('[data-hd-map-quest-open]');
+  if(questOpen){if(typeof window.hdQuestOpenFromMap==='function')window.hdQuestOpenFromMap(questOpen.dataset.hdMapQuestOpen);return}
+  const questAdd=e.target.closest('[data-hd-map-quest-add]');
+  if(questAdd){if(typeof window.hdQuestAddFromMap==='function')window.hdQuestAddFromMap(questAdd.dataset.hdMapQuestAdd);setTimeout(()=>{const pane=document.querySelector('[data-map-pane="quest"]');if(pane&&selectedMap)pane.innerHTML=hdQuestHtml(selectedMap)},0);return}
   const btn=e.target.closest('[data-map-tab]');if(!btn||!selectedMap)return;
   const tab=btn.dataset.mapTab;hdMapTabSave(selectedMap,tab);
   document.querySelectorAll('.map-tab-btn').forEach(x=>x.classList.toggle('active',x===btn));
@@ -129,3 +153,6 @@ document.addEventListener('click',e=>{
 });
 
 window.hdApplyMapTabs=hdApplyMapTabs;
+
+window.addEventListener('hd:quest-map-state-changed',()=>{const pane=document.querySelector('[data-map-pane="quest"]');if(pane&&typeof selectedMap!=='undefined'&&selectedMap)pane.innerHTML=hdQuestHtml(selectedMap)});
+window.addEventListener('hd:modules-ready',()=>{if(typeof selectedMap!=='undefined'&&selectedMap&&hdMapTabSaved(selectedMap)==='quest'){const pane=document.querySelector('[data-map-pane="quest"]');if(pane)pane.innerHTML=hdQuestHtml(selectedMap)}});
