@@ -873,6 +873,40 @@ test('release smoke: sortie session honors integrated go/no-go gate', async ({ p
 });
 
 
+test('release smoke: readiness gate actions navigate to the right tools', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdFEFixActionInfo === 'function' && typeof window.hdFEOpenFix === 'function');
+
+  const data = await page.evaluate(() => ({
+    health: window.hdFEFixActionInfo('health'),
+    supply: window.hdFEFixActionInfo('supply'),
+    freshness: window.hdFEFixActionInfo('freshness'),
+    gameMatch: window.hdFEFixActionInfo('gameMatch'),
+    route: window.hdFEFixActionInfo('route'),
+    equipment: window.hdFEFixActionInfo('equipment'),
+    air: window.hdFEFixActionInfo('air'),
+    scouting: window.hdFEFixActionInfo('scouting')
+  }));
+
+  expect(data.health.target).toBe('kancolleImport');
+  expect(data.supply.target).toBe('kancolleImport');
+  expect(data.freshness.target).toBe('kancolleImport');
+  expect(data.gameMatch.target).toBe('kancolleImport');
+  expect(data.route.target).toBe('guide');
+  expect(data.equipment.target).toBe('equipmentBook');
+  expect(data.air.target).toBe('calculator');
+  expect(data.scouting.target).toBe('calculator');
+
+  const source = await page.evaluate(async () => fetch('./fleet-readiness-evaluator.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain('data-hd-fe-fix=');
+  expect(source).toContain("const fix=e.target.closest?.('[data-hd-fe-fix]')");
+  expect(source).toContain("document.getElementById('hdKcCurrentFleets')");
+  expect(source).toContain("document.getElementById('hdFleetCalculator')");
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
