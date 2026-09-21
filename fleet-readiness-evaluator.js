@@ -182,17 +182,18 @@ function hdFEGameMatch(plan){
   if(plannedExpansion!==actualExpansion)mismatches.push({slotIndex:'ex',planned:plannedExpansion,actual:actualExpansion});
   gearMismatch+=mismatches.length;details.push({name:ship.ship,status:mismatches.length?'mismatch':'ready',mismatches,gameShipId:Number(row.gameShipId)});
  }
- let deck=null,deckOrderMismatch=false;
+ let deck=null,orderDeck=null,deckOrderMismatch=false;
  if(ids.length===ships.length&&ids.length){
   deck=fleets.find(d=>{const xs=(d.ships||[]).map(x=>Number(x.gameShipId)||0).filter(Boolean);return xs.length===ids.length&&xs.every((id,i)=>id===ids[i])})||null;
   if(!deck){
    const target=[...ids].sort((a,b)=>a-b).join(',');
-   deckOrderMismatch=fleets.some(d=>(d.ships||[]).map(x=>Number(x.gameShipId)||0).filter(Boolean).sort((a,b)=>a-b).join(',')===target);
+   orderDeck=fleets.find(d=>(d.ships||[]).map(x=>Number(x.gameShipId)||0).filter(Boolean).sort((a,b)=>a-b).join(',')===target)||null;
+   deckOrderMismatch=!!orderDeck;
   }
  }
- const fleetKnown=fleets.length>0&&ids.length===ships.length&&ids.length>0,fleetMatch=!!deck,status=gearMismatch||(!fleetMatch&&fleetKnown)?'partial':unknown||!fleetKnown?'manual':'ready';
- const parts=[];if(fleetMatch)parts.push(`${deck.name||'ゲーム艦隊'}一致`);else if(deckOrderMismatch)parts.push('同じ艦だが並び順が違う');else if(fleetKnown)parts.push('現在艦隊と不一致');else parts.push('現在艦隊の照合待ち');if(gearMismatch)parts.push(`装備差 ${gearMismatch}件`);else if(!unknown)parts.push('装備一致');
- return {status,detail:parts.join(' / '),fleetMatch,deckId:Number(deck?.deckId)||0,deckName:String(deck?.name||''),deckOrderMismatch,gearMismatch,unknown,details};
+ const matchedDeck=deck||orderDeck,fleetKnown=fleets.length>0&&ids.length===ships.length&&ids.length>0,fleetMatch=!!deck,status=gearMismatch||(!fleetMatch&&fleetKnown)?'partial':unknown||!fleetKnown?'manual':'ready';
+ const parts=[];if(fleetMatch)parts.push(`${deck.name||'ゲーム艦隊'}一致`);else if(deckOrderMismatch)parts.push(`${orderDeck?.name||'ゲーム艦隊'}と同じ艦だが並び順が違う`);else if(fleetKnown)parts.push('現在艦隊と不一致');else parts.push('現在艦隊の照合待ち');if(gearMismatch)parts.push(`装備差 ${gearMismatch}件`);else if(!unknown)parts.push('装備一致');
+ return {status,detail:parts.join(' / '),fleetMatch,deckId:Number(matchedDeck?.deckId)||0,deckName:String(matchedDeck?.name||''),deckOrderMismatch,gearMismatch,unknown,details};
 }
 function hdFESyncFreshness(){
  let sync=null;try{sync=JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')}catch{}

@@ -85,6 +85,23 @@ function hdSPSEquipmentHtml(map,fleetInfo){
   <div class="hd-sps-equip-grid">${rows.map(x=>`<div class="hd-sps-equip ${hdSPSStatusClass(x.status)}"><div><strong>${hdSPSEsc(x.label||x.kind)}</strong><small>${hdSPSEsc(x.detail||'')}</small></div><b>${hdSPSStatusLabel(x.status)}</b>${x.status!=='ready'? `<button type="button" class="ghost small" data-hd-sps-acquire="${hdSPSEsc(x.kind)}">入手ルート</button>`:''}</div>`).join('')}</div>
   <div class="hd-sps-card-actions"><button type="button" class="ghost small" data-hd-sps-tab="gear">装備タブ</button><button type="button" class="ghost small" data-hd-sps-workspace="hdEquipmentProcurement">調達リスト</button></div></section>`;
 }
+function hdSPSGameDiffText(match){
+ if(!match)return '';
+ const lines=[];
+ if(match.deckOrderMismatch)lines.push(`艦隊順: ${match.deckName||'ゲーム艦隊'}と同じ艦だが並び順が違う`);
+ for(const ship of match.details||[]){
+  if(ship.status==='unknown')lines.push(`${ship.name}: ゲーム装備の同期データが不足`);
+  for(const diff of ship.mismatches||[]){
+   const where=diff.slotIndex==='ex'?'補強増設':`第${Number(diff.slotIndex)+1}スロ`;
+   lines.push(`${ship.name} ${where}: 予定 ${diff.planned||'空き'} → ゲーム ${diff.actual||'空き'}`);
+  }
+ }
+ return lines.join('\n');
+}
+async function hdSPSCopyGameDiffs(match){
+ const text=hdSPSGameDiffText(match);if(!text)return false;
+ try{await navigator.clipboard.writeText(text);return true}catch{try{prompt('ゲームとの差分をコピーしてね',text);return true}catch{return false}}
+}
 function hdSPSGameDiffHtml(match){
  if(!match)return '';
  const rows=[];
@@ -96,7 +113,8 @@ function hdSPSGameDiffHtml(match){
    rows.push(`<div class="bad"><b>${hdSPSEsc(ship.name)}｜${hdSPSEsc(where)}</b><span>予定: ${hdSPSEsc(planned)} → ゲーム: ${hdSPSEsc(actual)}</span></div>`);
   }
  }
- return rows.length?`<div class="hd-sps-game-diffs"><strong>ゲームとの差分</strong>${rows.join('')}</div>`:'';
+ if(!rows.length)return '';
+ return `<div class="hd-sps-game-diffs"><strong>ゲームとの差分</strong>${rows.join('')}<div class="hd-sps-game-diff-actions"><button type="button" class="ghost small" data-hd-sps-copy-game-diffs>差分だけコピー</button>${Number(match.deckId)>0?`<button type="button" class="primary small" data-hd-sps-adopt-deck="${Number(match.deckId)}">ゲーム現在艦隊を採用</button>`:''}</div></div>`;
 }
 function hdSPSAutoHtml(auto){
  if(!auto)return '';
@@ -185,6 +203,12 @@ function hdSPSOpenMapTab(tab,focusBase=false){
  if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);
  setTimeout(()=>{if(typeof hdSortieOpenTab==='function')hdSortieOpenTab(tab);else document.querySelector(`[data-map-tab="${tab}"]`)?.click();if(focusBase)setTimeout(()=>document.getElementById('hdLandBasePlanner')?.scrollIntoView({behavior:'smooth',block:'start'}),120)},80);
 }
+function hdSPSCurrentAuto(){
+ const map=hdSPSMap();if(!map)return null;
+ const fleet=hdSPSFleetInfo(map),eq=hdSPSEquipmentInfo(map,fleet);
+ return eq.assigned?.auto||null;
+}
+
 function hdSPSMapButton(){
  const head=document.querySelector('#selectedMapCard .map-tabs-head');if(!head||head.querySelector('[data-hd-sps-open]'))return;
  const b=document.createElement('button');b.type='button';b.className='primary small hd-sps-open';b.dataset.hdSpsOpen='1';b.textContent='出撃準備表';head.appendChild(b);
@@ -193,6 +217,8 @@ document.addEventListener('click',e=>{
  if(e.target.closest?.('[data-hd-sps-open]')){hdSPSOpen();return}
  if(e.target.closest?.('[data-hd-sps-refresh]')){hdSPSRender();return}
  if(e.target.closest?.('[data-hd-sps-copy]')){const map=hdSPSMap();if(map)hdSPSCopy(map);return}
+ if(e.target.closest?.('[data-hd-sps-copy-game-diffs]')){const auto=hdSPSCurrentAuto();if(auto?.gameMatch)hdSPSCopyGameDiffs(auto.gameMatch);return}
+ const adopt=e.target.closest?.('[data-hd-sps-adopt-deck]');if(adopt){const map=hdSPSMap(),deckId=Number(adopt.dataset.hdSpsAdoptDeck)||0;if(map&&deckId&&typeof hdKcPrepareCurrentFleet==='function'){hdKcPrepareCurrentFleet(deckId,map);setTimeout(hdSPSRender,80)}return}
  if(e.target.closest?.('[data-hd-sps-guide]')){if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);return}
  const tab=e.target.closest?.('[data-hd-sps-tab]');if(tab){hdSPSOpenMapTab(tab.dataset.hdSpsTab,tab.hasAttribute('data-hd-sps-focus-base'));return}
  const ws=e.target.closest?.('[data-hd-sps-workspace]');if(ws){if(typeof hdWSShowElement==='function')hdWSShowElement(ws.dataset.hdSpsWorkspace,true);return}
