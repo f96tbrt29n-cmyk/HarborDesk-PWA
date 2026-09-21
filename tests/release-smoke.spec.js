@@ -709,6 +709,69 @@ test('release smoke: game sync persists exact gear slots for comparison', async 
 });
 
 
+test('release smoke: readiness reports sync freshness and exact game differences', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFESyncFreshness === 'function' &&
+    typeof window.hdFEGameMatch === 'function' &&
+    typeof window.hdFEGameMatchHtml === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const now = Date.now();
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({ syncedAt: now - 2 * 60 * 1000 }));
+    const fresh = window.hdFESyncFreshness();
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({ syncedAt: now - 22 * 60 * 1000 }));
+    const stale = window.hdFESyncFreshness();
+
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      { id:'a', name:'睦月', masterId:1, gameShipId:101, gameGearSlots:['12cm単装砲','61cm三連装魚雷'], gameGearExpansion:'' }
+    ]));
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
+      { deckId:1, name:'第一艦隊', ships:[{gameShipId:101}] }
+    ]));
+    const plan = {
+      map:'1-1',
+      ships:[{
+        ship:'睦月', gameShipId:101, masterId:1,
+        items:[
+          {name:'12cm単装砲',star:0,slotIndex:0},
+          {name:'別装備',star:0,slotIndex:1}
+        ],
+        expansion:null
+      }]
+    };
+    const match = window.hdFEGameMatch(plan);
+    const html = window.hdFEGameMatchHtml(match);
+    return { fresh, stale, match, html };
+  });
+
+  expect(data.fresh.status).toBe('ready');
+  expect(data.fresh.ageMinutes).toBeLessThanOrEqual(2);
+  expect(data.stale.status).toBe('partial');
+  expect(data.stale.detail).toContain('再同期推奨');
+  expect(data.match.gearMismatch).toBe(1);
+  expect(data.html).toContain('ゲームとの差分');
+  expect(data.html).toContain('睦月');
+  expect(data.html).toContain('第2スロ');
+  expect(data.html).toContain('予定: 別装備');
+  expect(data.html).toContain('ゲーム: 61cm三連装魚雷');
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: sortie preparation exposes detailed game differences', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const source = await page.evaluate(async () => fetch('./sortie-preparation-sheet.js', { cache:'no-store' }).then(r => r.text()));
+  expect(source).toContain('function hdSPSGameDiffHtml(match)');
+  expect(source).toContain('ゲームとの差分');
+  expect(source).toContain('同期鮮度');
+  expect(source).toContain('差分:');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
