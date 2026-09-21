@@ -517,6 +517,75 @@ test('release smoke: generated fleets persist the exact game ship id', async ({ 
 });
 
 
+test('release smoke: synced current fleet opens sortie preparation in one action', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdKcCopyFleetToCustom === 'function' &&
+    typeof window.hdKcPrepareCurrentFleet === 'function' &&
+    typeof window.hdSPSRosterMatchShip === 'function'
+  );
+
+  const data = await page.evaluate(async () => {
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
+      {
+        deckId:1, name:'第一艦隊', mission:[0,0,0,0], syncedAt:Date.now(),
+        ships:[
+          { gameShipId:777, masterId:1, name:'睦月', level:80, nowHp:13, maxHp:13, cond:49, gear:'12cm単装砲' },
+          { gameShipId:778, masterId:2, name:'如月', level:70, nowHp:13, maxHp:13, cond:49, gear:'12cm単装砲' }
+        ]
+      }
+    ]));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      { id:'a', gameShipId:999, masterId:1, name:'睦月', level:10 },
+      { id:'b', gameShipId:777, masterId:1, name:'睦月', level:80 },
+      { id:'c', gameShipId:778, masterId:2, name:'如月', level:70 }
+    ]));
+    localStorage.removeItem('harbordesk-custom-fleets-v1');
+    localStorage.removeItem('harbordesk-sortie-selection-v1');
+
+    const copied = window.hdKcCopyFleetToCustom(1, '2-5');
+    const matched = window.hdSPSRosterMatchShip(copied.ships[0]);
+    window.__hdPrepOpened = false;
+    const originalOpen = window.hdSPSOpen;
+    window.hdSPSOpen = () => { window.__hdPrepOpened = true; };
+    const prepared = window.hdKcPrepareCurrentFleet(1, '2-5');
+    await new Promise(resolve => setTimeout(resolve, 80));
+    window.hdSPSOpen = originalOpen;
+
+    const custom = JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1') || '{}');
+    const selected = JSON.parse(localStorage.getItem('harbordesk-sortie-selection-v1') || '{}');
+    return {
+      copiedGameId: copied.ships[0].gameShipId,
+      copiedMasterId: copied.ships[0].masterId,
+      preparedId: prepared.id,
+      selectedId: selected['2-5'],
+      storedGameId: custom['2-5']?.[0]?.ships?.[0]?.gameShipId || 0,
+      matchedGameId: matched?.gameShipId || 0,
+      opened: window.__hdPrepOpened
+    };
+  });
+
+  expect(data.copiedGameId).toBe(777);
+  expect(data.copiedMasterId).toBe(1);
+  expect(data.storedGameId).toBe(777);
+  expect(data.matchedGameId).toBe(777);
+  expect(data.selectedId).toBe(data.preparedId);
+  expect(data.opened).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: current fleet panel exposes direct sortie preparation action', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const source = await page.evaluate(async () => fetch('./kancolle-import.js', { cache:'no-store' }).then(r => r.text()));
+  expect(source).toContain('data-hd-kc-prepare-deck=');
+  expect(source).toContain('この艦隊で出撃準備');
+  expect(source).toContain('function hdKcPrepareCurrentFleet(deckId,map=');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
