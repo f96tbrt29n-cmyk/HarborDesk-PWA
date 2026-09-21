@@ -3713,6 +3713,21 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   await fallback.locator('[data-hd-core-map-action="prep"]').click();
   await expect(page.locator('#hdSortiePreparation')).toBeVisible({ timeout: 5000 });
 
+  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await expect(fallback).toBeVisible();
+  await fallback.locator('[data-hd-core-map-action="gear"]').click();
+  await expect(page.locator('#hdFleetCalculator')).toBeVisible({ timeout: 5000 });
+
+  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await expect(fallback).toBeVisible();
+  await fallback.locator('[data-hd-core-map-action="drop"]').click();
+  await expect(page.locator('#dropHuntingDb')).toBeVisible({ timeout: 5000 });
+
+  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await expect(fallback).toBeVisible();
+  await fallback.locator('[data-hd-core-map-action="mine"]').click();
+  await expect(page.locator('#customFleetPanel')).toBeVisible({ timeout: 5000 });
+
   expect(errors).toEqual([]);
 });
 
