@@ -989,10 +989,50 @@ test('release smoke: readiness fix workflow remembers target and confirms resolu
   expect(data.pending.currentStatus).toBe('missing');
   expect(data.resolved.resolved).toBe(true);
   expect(data.resolved.changed).toBe(true);
-  expect(data.html).toContain('修正反映済み');
-  expect(data.html).toContain('次を再判定');
+  expect(data.html).toContain('修正キュー完了');
+  expect(data.html).toContain('出撃準備OKを確認');
   expect(data.stored.id).toBe('supply');
   expect(data.cleared).toBeNull();
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: readiness fix queue advances to the next unresolved action', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFEStartFixFlow === 'function' &&
+    typeof window.hdFEFixQueueState === 'function' &&
+    typeof window.hdFEGateHtml === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    sessionStorage.removeItem('harbordesk-sortie-fix-flow-v1');
+    const before = {
+      checks:[
+        {id:'supply',label:'補給',status:'missing',detail:'未補給 1隻'},
+        {id:'equipment',label:'装備',status:'missing',detail:'海域装備 0/1 準備'}
+      ]
+    };
+    window.hdFEStartFixFlow('supply', before);
+    const after = {
+      checks:[
+        {id:'supply',label:'補給',status:'ready',detail:'全艦補給済み'},
+        {id:'equipment',label:'装備',status:'missing',detail:'海域装備 0/1 準備'}
+      ]
+    };
+    const queue = window.hdFEFixQueueState(after);
+    const html = window.hdFEGateHtml(after);
+    window.hdFEFixFlowSave(null);
+    return { queue, html };
+  });
+
+  expect(data.queue.flow.resolved).toBe(true);
+  expect(data.queue.remaining).toHaveLength(1);
+  expect(data.queue.next.id).toBe('equipment');
+  expect(data.queue.complete).toBe(false);
+  expect(data.html).toContain('修正キュー残り 1件');
+  expect(data.html).toContain('不足している海域向け装備を準備する');
+  expect(data.html).toContain('data-hd-fe-fix-next="equipment"');
   expect(errors).toEqual([]);
 });
 
@@ -1003,6 +1043,8 @@ test('release smoke: pending fix workflow refreshes after sync and equipment cha
   expect(source).toContain("const HD_FE_FIX_FLOW_KEY='harbordesk-sortie-fix-flow-v1'");
   expect(source).toContain("['hd:kancolle-sync','hd:equipment-changed','hd:ship-identity-changed']");
   expect(source).toContain("data-hd-fe-recheck");
+  expect(source).toContain("data-hd-fe-fix-next");
+  expect(source).toContain("data-hd-fe-fix-finish");
   expect(source).toContain("data-hd-fe-fix-dismiss");
   expect(errors).toEqual([]);
 });
@@ -1017,8 +1059,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.394'");
-  expect(source).toContain("const HD_APP_BUILD=394");
+  expect(source).toContain("const HD_APP_VERSION='1.0.395'");
+  expect(source).toContain("const HD_APP_BUILD=395");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -1041,14 +1083,14 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=394`);
+    expect(data.index).toContain(`${asset}?v=395`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=394");
+  expect(data.updater).toContain("const HD_APP_BUILD=395");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v394");
+  expect(data.sw).toContain("harbordesk-pwa-v395");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -1061,7 +1103,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=394');
+  expect(source).toContain('const BUILD=395');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -2301,17 +2343,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=394',
-      'map-images.js?v=394',
-      'map-tabs.js?v=394',
-      'map-interactive.js?v=394',
-      'map-advanced-data.js?v=394'
+      'map-details.js?v=395',
+      'map-images.js?v=395',
+      'map-tabs.js?v=395',
+      'map-interactive.js?v=395',
+      'map-advanced-data.js?v=395'
     ];
     const requiredStyles = [
-      'map-details.css?v=394',
-      'map-tabs.css?v=394',
-      'map-images.css?v=394',
-      'map-interactive.css?v=394'
+      'map-details.css?v=395',
+      'map-tabs.css?v=395',
+      'map-images.css?v=395',
+      'map-interactive.css?v=395'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -2353,7 +2395,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=394');
+  expect(src).toBe('app.js?v=395');
   expect(errors).toEqual([]);
 });
 
