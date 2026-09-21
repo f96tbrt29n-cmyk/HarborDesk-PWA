@@ -110,5 +110,6 @@ function hdEAensure(){
 document.addEventListener('click',e=>{const pick=e.target.closest?.('[data-hd-ea-pick]');if(pick)hdEAselectForCompare(pick.dataset.hdEaPick)});
 window.addEventListener('storage',e=>{if(e.key==='harbordesk-equipment-v1')hdEArenderCoverage()});
 window.addEventListener('hd:equipment-changed',()=>hdEArenderCoverage());
+window.addEventListener('hd:kancolle-sync',()=>hdEArenderCoverage());
 window.addEventListener('hd:workspace-refresh',()=>hdEArenderCoverage());
 window.addEventListener('load',()=>setTimeout(hdEAensure,350));
