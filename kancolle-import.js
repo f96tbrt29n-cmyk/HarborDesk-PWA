@@ -451,10 +451,12 @@ function hdKcApplySorties(parsed){
 function hdKcStateSnapshot(){
  const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}};
  const roster=read('harbordesk-ship-roster-v1',[]),equipment=read('harbordesk-equipment-v1',[]),materials=read(HD_KC_MATERIALS_KEY,{});
- const equipRows=Array.isArray(equipment)?equipment:[];
+ const equipRows=Array.isArray(equipment)?equipment:[],ownedRows=equipRows.filter(x=>Math.max(0,Number(x?.count)||0)>0),planRows=equipRows.filter(x=>String(x?.source||'')==='equipment-plan');
  return {
   ships:Array.isArray(roster)?roster.length:0,
   equipmentRows:equipRows.length,
+  equipmentOwnedRows:ownedRows.length,
+  equipmentPlanRows:planRows.length,
   equipment:equipRows.reduce((sum,x)=>sum+Math.max(0,Number(x?.count)||0),0),
   resources:Object.fromEntries(['fuel','ammo','steel','bauxite','instantBuild','bucket','devMaterial','screw'].map(k=>[k,Number.isFinite(Number(materials?.[k]))?Number(materials[k]):null]))
  };
@@ -499,11 +501,11 @@ function hdKcApplyImport(preview,opts={}){
  const snapshot=hdKcStateSnapshot(),delta=hdKcSyncDelta(before,snapshot,parsed,opts,!!previous),coverage=hdKcCoverageFromSources(preview.sources,parsed);
  const integrity={
   ships:{source:parsed.ships.size,saved:result.ships,complete:!!parsed.completeShips,ok:!parsed.completeShips||result.ships===parsed.ships.size},
-  equipment:{source:parsed.slotItems.size,saved:snapshot.equipment,rows:snapshot.equipmentRows,complete:!!parsed.completeSlotItems,ok:!parsed.completeSlotItems||snapshot.equipment===parsed.slotItems.size}
+  equipment:{source:parsed.slotItems.size,saved:snapshot.equipment,rows:snapshot.equipmentOwnedRows,planRows:snapshot.equipmentPlanRows,complete:!!parsed.completeSlotItems,ok:!parsed.completeSlotItems||snapshot.equipment===parsed.slotItems.size}
  };
  integrity.verified=integrity.ships.complete&&integrity.equipment.complete;
  integrity.ok=(!integrity.ships.complete||integrity.ships.ok)&&(!integrity.equipment.complete||integrity.equipment.ok);
- const sync={syncedAt:Date.now(),sources:preview.sources,userscriptVersion:String(preview.userscriptVersion||''),admiralLevel:Number(parsed.admiralLevel)||Number(previous?.admiralLevel)||0,coverage,ships:result.ships,equipment:result.equipment,equipmentRows:snapshot.equipmentRows,equipmentItems:snapshot.equipment,materials:result.materials,decks:result.decks,expeditions:result.expeditions,docks:result.docks,quests:result.quests,sorties:result.sorties,unknownShips:preview.unknownShips,unknownEquip:preview.unknownEquip,snapshot,integrity,delta};
+ const sync={syncedAt:Date.now(),sources:preview.sources,userscriptVersion:String(preview.userscriptVersion||''),admiralLevel:Number(parsed.admiralLevel)||Number(previous?.admiralLevel)||0,coverage,ships:result.ships,equipment:result.equipment,equipmentRows:snapshot.equipmentRows,equipmentOwnedRows:snapshot.equipmentOwnedRows,equipmentPlanRows:snapshot.equipmentPlanRows,equipmentItems:snapshot.equipment,materials:result.materials,decks:result.decks,expeditions:result.expeditions,docks:result.docks,quests:result.quests,sorties:result.sorties,unknownShips:preview.unknownShips,unknownEquip:preview.unknownEquip,snapshot,integrity,delta};
  localStorage.setItem(HD_KC_SYNC_KEY,JSON.stringify(sync));window.dispatchEvent(new CustomEvent('hd:kancolle-sync',{detail:sync}));hdKcRenderSyncStatus();hdKcRenderCurrentFleets();hdKcNotifySyncSuccess(sync);
  return sync;
 }
@@ -552,8 +554,8 @@ function hdKcPreviewHtml(p){
 }
 function hdKcRenderSyncStatus(){
  const el=document.getElementById('hdKcSyncLast'),headline=document.getElementById('hdKcSyncHeadline'),box=document.querySelector('.hd-kc-sync-overview'),s=hdKcSyncStatus();
- const equipRows=s?Number(s.equipmentRows??s.equipment)||0:0,equipItems=s?Number(s.equipmentItems??s.snapshot?.equipment??s.equipment)||0:0;
- if(el)el.textContent=s?`最終同期 ${new Date(s.syncedAt).toLocaleString('ja-JP')} ・ 艦娘${s.ships} / 装備台帳${equipRows}種類・${equipItems}個 / 資源${s.materials} / 艦隊${s.decks} / 遠征${s.expeditions||0} / 入渠${s.docks||0} / 任務${s.quests||0} / 出撃${s.sorties||0}`:'まだ同期してないよ';
+ const equipRows=s?Number(s.equipmentOwnedRows??s.snapshot?.equipmentOwnedRows??s.equipmentRows??s.equipment)||0:0,equipPlans=s?Number(s.equipmentPlanRows??s.snapshot?.equipmentPlanRows)||0:0,equipItems=s?Number(s.equipmentItems??s.snapshot?.equipment??s.equipment)||0:0;
+ if(el)el.textContent=s?`最終同期 ${new Date(s.syncedAt).toLocaleString('ja-JP')} ・ 艦娘${s.ships} / 装備台帳${equipRows}種類・${equipItems}個${equipPlans?`＋計画${equipPlans}`:''} / 資源${s.materials} / 艦隊${s.decks} / 遠征${s.expeditions||0} / 入渠${s.docks||0} / 任務${s.quests||0} / 出撃${s.sorties||0}`:'まだ同期してないよ';
  if(headline)headline.textContent=s?'艦これデータは同期済み':'まず艦これから同期しよう';
  if(box)box.classList.toggle('is-synced',!!s);
  const delta=document.getElementById('hdKcSyncDelta');if(delta){delta.hidden=!s;delta.innerHTML=s?hdKcDeltaHtml(s):''}
@@ -563,7 +565,7 @@ function hdKcRenderSyncStatus(){
   else{
    const c=hdKcCoverageForSync(s),rows=[['艦娘','ships',s.ships],['装備','equipment',{rows:equipRows,items:equipItems}],['資源','resources',s.materials],['艦隊','fleets',s.decks],['任務','quests',s.quests],['入渠','docks',s.docks],['出撃','sorties',s.sorties]];
    const integrity=s.integrity,check=integrity?.verified?(integrity.ok?`台帳反映確認: 艦隊 ${integrity.ships.saved}/${integrity.ships.source}隻・装備 ${integrity.equipment.saved}/${integrity.equipment.source}個 ✓`:`台帳反映に差異あり: 艦隊 ${integrity.ships.saved}/${integrity.ships.source}・装備 ${integrity.equipment.saved}/${integrity.equipment.source}`):'';
-   coverage.innerHTML='<div class="hd-kc-coverage-chips">'+rows.map(([name,key,count])=>{const captured=!!c[key],isEquip=key==='equipment',n=isEquip?Number(count?.items)||0:Number(count)||0,label=!captured?'未取得':isEquip?(n>0?`${Number(count?.rows)||0}種類・${n}個`:'取得済み・0'):(n>0?String(n):'取得済み・0');return `<span class="${captured?'ok':'missing'}"><b>${name}</b> ${label}</span>`}).join('')+`</div><small>「取得済み・0」は通信を取得した上で該当データが0件。「未取得」はその画面の通信をまだ拾っていない状態だよ。${check?'<br>'+hdKcEsc(check):''}</small>`;
+   coverage.innerHTML='<div class="hd-kc-coverage-chips">'+rows.map(([name,key,count])=>{const captured=!!c[key],isEquip=key==='equipment',n=isEquip?Number(count?.items)||0:Number(count)||0,label=!captured?'未取得':isEquip?(n>0?`${Number(count?.rows)||0}種類・${n}個${equipPlans?` / 計画${equipPlans}`:''}`:(equipPlans?`所持0 / 計画${equipPlans}`:'取得済み・0')):(n>0?String(n):'取得済み・0');return `<span class="${captured?'ok':'missing'}"><b>${name}</b> ${label}</span>`}).join('')+`</div><small>「取得済み・0」は通信を取得した上で該当データが0件。「未取得」はその画面の通信をまだ拾っていない状態だよ。${check?'<br>'+hdKcEsc(check):''}</small>`;
   }
  }
  const recommendation=document.getElementById('hdKcSyncRecommendation');
