@@ -514,6 +514,51 @@ test('release smoke: zero-count equipment plans do not inflate owned improvement
 });
 
 
+
+test('release smoke: equipment plan returns to normal synced row when reacquired', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdKcMergeEquipment === 'function');
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      {
+        id:'planned-reacquire',
+        name:'12cm単装砲',
+        category:'小口径主砲',
+        count:0,
+        star:0,
+        targetStar:6,
+        memo:'再入手後に改修',
+        source:'equipment-plan',
+        syncMissing:true,
+        lastOwnedCount:2
+      }
+    ]));
+    localStorage.setItem('harbordesk-kancolle-equipment-detail-v1', '[]');
+    const parsed={
+      slotItems:new Map([[501,{api_id:501,api_slotitem_id:1,api_level:0,api_alv:0}]]),
+      completeSlotItems:true
+    };
+    window.hdKcMergeEquipment(parsed);
+    return JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]')[0];
+  });
+
+  expect(data).toMatchObject({
+    id:'planned-reacquire',
+    name:'12cm単装砲',
+    count:1,
+    star:0,
+    targetStar:6,
+    memo:'再入手後に改修',
+    source:'kancolle-import'
+  });
+  expect(data.syncMissing).toBeUndefined();
+  expect(data.lastOwnedCount).toBeUndefined();
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: synced fleet and equipment data refresh downstream planners', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -1865,8 +1910,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.410'");
-  expect(source).toContain("const HD_APP_BUILD=410");
+  expect(source).toContain("const HD_APP_VERSION='1.0.411'");
+  expect(source).toContain("const HD_APP_BUILD=411");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -1889,14 +1934,14 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=410`);
+    expect(data.index).toContain(`${asset}?v=411`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=410");
+  expect(data.updater).toContain("const HD_APP_BUILD=411");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v410");
+  expect(data.sw).toContain("harbordesk-pwa-v411");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -1909,7 +1954,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=410');
+  expect(source).toContain('const BUILD=411');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -3149,17 +3194,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=410',
-      'map-images.js?v=410',
-      'map-tabs.js?v=410',
-      'map-interactive.js?v=410',
-      'map-advanced-data.js?v=410'
+      'map-details.js?v=411',
+      'map-images.js?v=411',
+      'map-tabs.js?v=411',
+      'map-interactive.js?v=411',
+      'map-advanced-data.js?v=411'
     ];
     const requiredStyles = [
-      'map-details.css?v=410',
-      'map-tabs.css?v=410',
-      'map-images.css?v=410',
-      'map-interactive.css?v=410'
+      'map-details.css?v=411',
+      'map-tabs.css?v=411',
+      'map-images.css?v=411',
+      'map-interactive.css?v=411'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -3201,7 +3246,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=410');
+  expect(src).toBe('app.js?v=411');
   expect(errors).toEqual([]);
 });
 
