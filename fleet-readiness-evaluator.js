@@ -28,13 +28,14 @@ function hdFEPlanFromSavedFleet(map,fleet){
 function hdFEAssigned(plan){
  const rows=[];
  for(const ship of plan?.ships||[]){
+  const live=hdFERosterForShip(ship),liveSlots=Array.isArray(live?.gameOnslot)?live.gameOnslot:[];
   for(const item of ship.items||[]){
-   const meta=hdFEFind(item.name)||{name:item.name,category:item.category||'',stats:{},tags:[]};
-   rows.push({ship:ship.ship||'',name:item.name,star:Number(item.star)||0,kind:item.kind||'',slotIndex:Number.isFinite(Number(item.slotIndex))?Number(item.slotIndex):null,capacity:item.capacity==null?null:Number(item.capacity),isExpansion:false,meta});
+   const meta=hdFEFind(item.name)||{name:item.name,category:item.category||'',stats:{},tags:[]},slotIndex=Number.isFinite(Number(item.slotIndex))?Number(item.slotIndex):null,liveCap=slotIndex!=null&&Number.isFinite(Number(liveSlots[slotIndex]))?Math.max(0,Number(liveSlots[slotIndex])):null,masterCap=item.capacity==null?null:Math.max(0,Number(item.capacity));
+   rows.push({ship:ship.ship||'',name:item.name,star:Number(item.star)||0,kind:item.kind||'',slotIndex,capacity:liveCap!=null?liveCap:masterCap,masterCapacity:masterCap,capacitySource:liveCap!=null?'live':masterCap!=null?'master':'unknown',isExpansion:false,meta});
   }
   if(ship.expansion?.name){
    const x=ship.expansion,meta=hdFEFind(x.name)||{name:x.name,category:'',stats:{},tags:[]};
-   rows.push({ship:ship.ship||'',name:x.name,star:Number(x.star)||0,kind:'expansion',slotIndex:null,capacity:null,isExpansion:true,meta});
+   rows.push({ship:ship.ship||'',name:x.name,star:Number(x.star)||0,kind:'expansion',slotIndex:null,capacity:null,masterCapacity:null,capacitySource:'none',isExpansion:true,meta});
   }
  }
  return rows;
