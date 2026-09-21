@@ -681,6 +681,43 @@ test('release smoke: live sync audit detects ledger drift after complete sync', 
 });
 
 
+
+test('release smoke: equipment ledger filters synced manual and plan rows', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      {id:'sync',name:'12cm単装砲',category:'主砲',count:3,star:0,targetStar:0,source:'kancolle-import'},
+      {id:'manual',name:'手動電探',category:'電探',count:1,star:0,targetStar:0},
+      {id:'plan',name:'改修計画魚雷',category:'魚雷',count:0,star:2,targetStar:10,source:'equipment-plan'}
+    ]));
+    sessionStorage.removeItem('harbordesk-session-equipment-ledger-view-v1');
+    window.renderEquipment?.();
+  });
+
+  await expect(page.locator('[data-eq-source="sync"]')).toContainText('同期済み 1');
+  await expect(page.locator('[data-eq-source="manual"]')).toContainText('手動 1');
+  await expect(page.locator('[data-eq-source="plan"]')).toContainText('計画 1');
+  await expect(page.locator('.equipment-source-badge.sync')).toHaveCount(1);
+  await expect(page.locator('.equipment-source-badge.manual')).toHaveCount(1);
+  await expect(page.locator('.equipment-source-badge.plan')).toHaveCount(1);
+
+  await page.locator('[data-eq-source="sync"]').click();
+  await expect(page.locator('#equipmentList .advanced-card')).toHaveCount(1);
+  await expect(page.locator('#equipmentList')).toContainText('12cm単装砲');
+  await expect(page.locator('#equipmentList')).not.toContainText('手動電探');
+
+  await page.locator('[data-eq-source="plan"]').click();
+  await expect(page.locator('#equipmentList .advanced-card')).toHaveCount(1);
+  await expect(page.locator('#equipmentList')).toContainText('改修計画魚雷');
+  await expect(page.locator('#equipmentList')).not.toContainText('12cm単装砲');
+
+  await page.locator('[data-eq-source="manual"]').click();
+  await expect(page.locator('#equipmentList')).toContainText('手動電探');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: synced fleet and equipment data refresh downstream planners', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -2032,8 +2069,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.414'");
-  expect(source).toContain("const HD_APP_BUILD=414");
+  expect(source).toContain("const HD_APP_VERSION='1.0.415'");
+  expect(source).toContain("const HD_APP_BUILD=415");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -2056,14 +2093,14 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=414`);
+    expect(data.index).toContain(`${asset}?v=415`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=414");
+  expect(data.updater).toContain("const HD_APP_BUILD=415");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v414");
+  expect(data.sw).toContain("harbordesk-pwa-v415");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -2076,7 +2113,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=414');
+  expect(source).toContain('const BUILD=415');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -3316,17 +3353,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=414',
-      'map-images.js?v=414',
-      'map-tabs.js?v=414',
-      'map-interactive.js?v=414',
-      'map-advanced-data.js?v=414'
+      'map-details.js?v=415',
+      'map-images.js?v=415',
+      'map-tabs.js?v=415',
+      'map-interactive.js?v=415',
+      'map-advanced-data.js?v=415'
     ];
     const requiredStyles = [
-      'map-details.css?v=414',
-      'map-tabs.css?v=414',
-      'map-images.css?v=414',
-      'map-interactive.css?v=414'
+      'map-details.css?v=415',
+      'map-tabs.css?v=415',
+      'map-images.css?v=415',
+      'map-interactive.css?v=415'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -3368,7 +3405,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=414');
+  expect(src).toBe('app.js?v=415');
   expect(errors).toEqual([]);
 });
 
