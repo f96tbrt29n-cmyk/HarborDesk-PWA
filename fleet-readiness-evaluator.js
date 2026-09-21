@@ -20,7 +20,7 @@ function hdFEPlanFromSavedFleet(map,fleet){
   const tokens=String(row.gear||'').split(/\s+\/\s+/).map(hdFEParseGearLabel).filter(x=>x.name);
   const normal=tokens.filter(x=>!x.expansion),ex=tokens.find(x=>x.expansion)||null;
   const items=normal.map((x,i)=>({name:x.name,star:x.star,slotIndex:i,capacity:profile?.slots?.[i]??null,category:hdFEFind(x.name)?.category||''}));
-  return {ship:String(row.ship||'').trim(),type:db?.type||'',items,expansion:ex?{name:ex.name,star:ex.star}:null,missing:[],master:!!profile};
+  return {ship:String(row.ship||'').trim(),gameShipId:Number(row.gameShipId)||0,masterId:Number(row.masterId)||Number(db?.id)||0,type:db?.type||'',items,expansion:ex?{name:ex.name,star:ex.star}:null,missing:[],master:!!profile};
  });
  const presets=typeof MAP_PLANS!=='undefined'?(MAP_PLANS[map]?.presets||[]):[],preset=presets.find(p=>String(fleet?.name||'').includes(String(p?.name||'')))||null,routeInfo=preset&&typeof hdFSPresetInfo==='function'?hdFSPresetInfo(preset):null;
  return {map,ships,missing:[],masterBacked:ships.filter(x=>x.master).length,createdAt:Date.now(),source:'saved-fleet',sourceFleet:fleet||null,preset,routeInfo};
@@ -28,13 +28,14 @@ function hdFEPlanFromSavedFleet(map,fleet){
 function hdFEAssigned(plan){
  const rows=[];
  for(const ship of plan?.ships||[]){
+  const live=hdFERosterForShip(ship),liveSlots=Array.isArray(live?.gameOnslot)?live.gameOnslot:[];
   for(const item of ship.items||[]){
-   const meta=hdFEFind(item.name)||{name:item.name,category:item.category||'',stats:{},tags:[]};
-   rows.push({ship:ship.ship||'',name:item.name,star:Number(item.star)||0,kind:item.kind||'',slotIndex:Number.isFinite(Number(item.slotIndex))?Number(item.slotIndex):null,capacity:item.capacity==null?null:Number(item.capacity),isExpansion:false,meta});
+   const meta=hdFEFind(item.name)||{name:item.name,category:item.category||'',stats:{},tags:[]},slotIndex=Number.isFinite(Number(item.slotIndex))?Number(item.slotIndex):null,liveCap=slotIndex!=null&&Number.isFinite(Number(liveSlots[slotIndex]))?Math.max(0,Number(liveSlots[slotIndex])):null,masterCap=item.capacity==null?null:Math.max(0,Number(item.capacity));
+   rows.push({ship:ship.ship||'',name:item.name,star:Number(item.star)||0,kind:item.kind||'',slotIndex,capacity:liveCap!=null?liveCap:masterCap,masterCapacity:masterCap,capacitySource:liveCap!=null?'live':masterCap!=null?'master':'unknown',isExpansion:false,meta});
   }
   if(ship.expansion?.name){
    const x=ship.expansion,meta=hdFEFind(x.name)||{name:x.name,category:'',stats:{},tags:[]};
-   rows.push({ship:ship.ship||'',name:x.name,star:Number(x.star)||0,kind:'expansion',slotIndex:null,capacity:null,isExpansion:true,meta});
+   rows.push({ship:ship.ship||'',name:x.name,star:Number(x.star)||0,kind:'expansion',slotIndex:null,capacity:null,masterCapacity:null,capacitySource:'none',isExpansion:true,meta});
   }
  }
  return rows;
@@ -108,7 +109,17 @@ function hdFELos(items,map){
 function hdFEAir(items){
  const air=items.filter(x=>HD_FE_AIR_CATS.has(x.meta?.category));
  const rows=air.map(x=>{const aa=Number(x.meta?.stats?.対空)||0,cap=Math.max(0,Number(x.capacity)||0),power=cap>0&&aa>0?Math.floor(aa*Math.sqrt(cap)):0;return {...x,aa,cap,power}});
- return {count:air.length,antiAir:air.reduce((s,x)=>s+(Number(x.meta?.stats?.対空)||0),0),names:air.map(x=>x.name),basePower:rows.reduce((s,x)=>s+x.power,0),capacityKnown:rows.filter(x=>x.cap>0).length,rows};
+ return {
+  count:air.length,
+  antiAir:air.reduce((s,x)=>s+(Number(x.meta?.stats?.対空)||0),0),
+  names:air.map(x=>x.name),
+  basePower:rows.reduce((s,x)=>s+x.power,0),
+  capacityKnown:rows.filter(x=>x.capacitySource!=='unknown').length,
+  liveCapacityKnown:rows.filter(x=>x.capacitySource==='live').length,
+  masterCapacityKnown:rows.filter(x=>x.capacitySource==='master').length,
+  depletedSlots:rows.filter(x=>x.capacitySource==='live'&&Number(x.masterCapacity)>0&&x.cap<Number(x.masterCapacity)).map(x=>({ship:x.ship,name:x.name,slotIndex:x.slotIndex,live:x.cap,max:Number(x.masterCapacity),power:x.power})),
+  rows
+ };
 }
 function hdFENight(items,stats){
  const support=items.filter(x=>hdFEHasTag(x,'夜戦','魚雷CI','夜偵')||['探照灯','大型探照灯','照明弾'].includes(x.meta?.category)).length;
@@ -118,8 +129,8 @@ function hdFERoster(){
  try{return typeof rosterLoad==='function'?rosterLoad():JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')}catch{return []}
 }
 function hdFERosterForShip(ship){
- const rows=hdFERoster(),id=Number(ship?.masterId)||0,name=String(ship?.ship||'').trim();
- return rows.find(x=>id&&Number(x?.masterId)===id)||rows.find(x=>String(x?.name||'').trim()===name)||null;
+ const rows=hdFERoster(),gameId=Number(ship?.gameShipId)||0,id=Number(ship?.masterId)||0,name=String(ship?.ship||'').trim();
+ return rows.find(x=>gameId&&Number(x?.gameShipId)===gameId)||rows.find(x=>id&&Number(x?.masterId)===id)||rows.find(x=>String(x?.name||'').trim()===name)||null;
 }
 function hdFELiveFleet(plan){
  const state=typeof hdFSLiveState==='function'?hdFSLiveState():undefined,rows=(plan?.ships||[]).filter(x=>x?.ship).map(ship=>({ship,row:hdFERosterForShip(ship)})),details=[],reasons={};let blocked=0,caution=0;
@@ -134,6 +145,18 @@ function hdFELiveFleet(plan){
  }
  const status=blocked?'missing':caution?'partial':(details.length&&details.every(x=>x.status!=='unknown')?'ready':'manual');
  return {status,blocked,caution,reasons,details,total:rows.length};
+}
+function hdFESupply(plan){
+ const rows=(plan?.ships||[]).filter(x=>x?.ship).map(ship=>{
+  const row=hdFERosterForShip(ship),masterId=Number(row?.masterId)||Number(ship?.masterId)||0,master=window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips?.[String(masterId)]||null;
+  const currentFuel=Number(row?.gameFuel),currentAmmo=Number(row?.gameAmmo),maxFuel=Number(master?.fuel),maxAmmo=Number(master?.ammo);
+  const known=!!row&&row.gameFuel!=null&&row.gameAmmo!=null&&maxFuel>0&&maxAmmo>0&&Number.isFinite(currentFuel)&&Number.isFinite(currentAmmo),fuelRatio=known?currentFuel/maxFuel:null,ammoRatio=known?currentAmmo/maxAmmo:null;
+  return {name:ship.ship,currentFuel,currentAmmo,maxFuel,maxAmmo,known,fuelRatio,ammoRatio};
+ });
+ const known=rows.filter(x=>x.known),empty=known.filter(x=>x.fuelRatio<=0||x.ammoRatio<=0),low=known.filter(x=>x.fuelRatio>0&&x.ammoRatio>0&&(x.fuelRatio<1||x.ammoRatio<1));
+ const status=!rows.length||known.length<rows.length?'manual':empty.length?'missing':low.length?'partial':'ready';
+ const detail=status==='manual'?'補給量を同期できた艦のみ判定':empty.length?`燃料/弾薬0の艦 ${empty.length}隻`:low.length?`未補給 ${low.length}隻`:'全艦補給済み';
+ return {status,rows,known:known.length,empty:empty.length,low:low.length,detail};
 }
 function hdFERoute(plan){
  const info=plan?.suggestion?.info||plan?.routeInfo||null;
@@ -150,11 +173,10 @@ function hdFEEnemyAirCandidates(map){
  return [...vals].sort((a,b)=>a-b);
 }
 function hdFEAirCheck(map,air){
- const enemies=hdFEEnemyAirCandidates(map),enemy=enemies.length?Math.max(...enemies):0;
- if(!enemy)return {status:'manual',ours:Number(air?.basePower)||0,enemy:0,detail:'敵制空値の数値データなし'};
- const ours=Number(air?.basePower)||0,known=Number(air?.capacityKnown)||0,total=Number(air?.count)||0,ratio=enemy?ours/enemy:0;
- const status=known<total?'manual':ratio>=1.5?'ready':ratio>=2/3?'partial':'missing',label=ratio>=3?'確保圏':ratio>=1.5?'優勢圏':ratio>=2/3?'均衡圏':ratio>=1/3?'劣勢圏':'喪失圏';
- return {status,ours,enemy,ratio,detail:`基礎制空 ${ours} / 確認敵制空最大 ${enemy} → ${label}${known<total?'（搭載数未解決あり）':''}`};
+ const enemies=hdFEEnemyAirCandidates(map),enemy=enemies.length?Math.max(...enemies):0,ours=Number(air?.basePower)||0,known=Number(air?.capacityKnown)||0,total=Number(air?.count)||0,live=Number(air?.liveCapacityKnown)||0,depleted=Array.isArray(air?.depletedSlots)?air.depletedSlots.length:0;
+ if(!enemy)return {status:'manual',ours,enemy:0,liveCapacityKnown:live,depletedSlots:depleted,detail:`敵制空値の数値データなし${live?`（現在搭載 ${live}/${total}スロ反映）`:''}`};
+ const ratio=enemy?ours/enemy:0,status=known<total?'manual':ratio>=1.5?'ready':ratio>=2/3?'partial':'missing',label=ratio>=3?'確保圏':ratio>=1.5?'優勢圏':ratio>=2/3?'均衡圏':ratio>=1/3?'劣勢圏':'喪失圏',liveNote=live?` / 現在搭載 ${live}/${total}スロ`:'',lossNote=depleted?` / 損耗 ${depleted}スロ`:'';
+ return {status,ours,enemy,ratio,liveCapacityKnown:live,depletedSlots:depleted,detail:`制空 ${ours} / 確認敵制空最大 ${enemy} → ${label}${liveNote}${lossNote}${known<total?'（搭載数未解決あり）':''}`};
 }
 function hdFEScouting(plan,items){
  const map=String(plan?.map||''),adv=typeof HD_MAP_ADVANCED_DATA!=='undefined'?HD_MAP_ADVANCED_DATA[map]?.los:null,coef=Number(adv?.coef)||0,checks=Array.isArray(adv?.checks)?adv.checks:[];
@@ -169,9 +191,9 @@ function hdFEScouting(plan,items){
  return {status,available:true,score,coef,hq,checks:rows,detail:`推定33式 ${score.toFixed(2)}（係数${coef} / 司令部Lv${hq}）`};
 }
 function hdFEAutoVerdict(plan,e){
- const live=hdFELiveFleet(plan),route=hdFERoute(plan),air=hdFEAirCheck(plan?.map,e.air),scouting=hdFEScouting(plan,e.items),equipment={status:e.missing?'missing':e.partial?'partial':'ready',detail:`海域装備 ${e.ready}/${e.requirements.length} 準備`},master={status:e.master.invalid.length?'missing':e.master.unresolved.length?'partial':'ready',detail:e.master.invalid.length?`装備不可 ${e.master.invalid.length}件`:e.master.unresolved.length?`未解決 ${e.master.unresolved.length}件`:'装備可否OK'},health={status:live.status,detail:live.blocked?`出撃不可候補 ${live.blocked}隻（${Object.entries(live.reasons).map(x=>x[0]+' '+x[1]).join(' / ')}）`:live.caution?`注意艦 ${live.caution}隻`:'艦状態OK'};
- const checks=[{id:'health',label:'艦状態',...health},{id:'route',label:'編成条件',...route},{id:'equipment',label:'装備',...equipment},{id:'air',label:'制空',...air},{id:'scouting',label:'索敵',...scouting},{id:'master',label:'装備可否',...master}],ranked={missing:3,partial:2,manual:1,ready:0},worst=checks.reduce((a,x)=>(ranked[x.status]??1)>(ranked[a.status]??0)?x:a,{status:'ready'});
- return {status:worst.status,checks,live,route,air,scouting,master,equipment};
+ const live=hdFELiveFleet(plan),supply=hdFESupply(plan),route=hdFERoute(plan),air=hdFEAirCheck(plan?.map,e.air),scouting=hdFEScouting(plan,e.items),equipment={status:e.missing?'missing':e.partial?'partial':'ready',detail:`海域装備 ${e.ready}/${e.requirements.length} 準備`},master={status:e.master.invalid.length?'missing':e.master.unresolved.length?'partial':'ready',detail:e.master.invalid.length?`装備不可 ${e.master.invalid.length}件`:e.master.unresolved.length?`未解決 ${e.master.unresolved.length}件`:'装備可否OK'},health={status:live.status,detail:live.blocked?`出撃不可候補 ${live.blocked}隻（${Object.entries(live.reasons).map(x=>x[0]+' '+x[1]).join(' / ')}）`:live.caution?`注意艦 ${live.caution}隻`:'艦状態OK'};
+ const checks=[{id:'health',label:'艦状態',...health},{id:'supply',label:'補給',...supply},{id:'route',label:'編成条件',...route},{id:'equipment',label:'装備',...equipment},{id:'air',label:'制空',...air},{id:'scouting',label:'索敵',...scouting},{id:'master',label:'装備可否',...master}],ranked={missing:3,partial:2,manual:1,ready:0},worst=checks.reduce((a,x)=>(ranked[x.status]??1)>(ranked[a.status]??0)?x:a,{status:'ready'});
+ return {status:worst.status,checks,live,supply,route,air,scouting,master,equipment};
 }
 function hdFEAutoStatusLabel(s){return s==='ready'?'OK':s==='missing'?'不足/不可':s==='partial'?'注意':'要確認'}
 function hdFEAutoHtml(v){
