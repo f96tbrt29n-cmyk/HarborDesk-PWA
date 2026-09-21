@@ -1274,6 +1274,85 @@ test('release smoke: post-sortie reprepare queue advances with reconciled game r
 });
 
 
+test('release smoke: resolved reprepare queue starts a fresh next-round preflight', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSSPostPrepareNextRound === 'function' &&
+    typeof window.hdSSPostPreflightState === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({
+      '1-1': [{
+        id:'fleet-a', name:'周回艦隊', ships:[{ship:'睦月',gear:''}], memo:''
+      }]
+    }));
+    localStorage.setItem('harbordesk-sortie-readiness-v1', JSON.stringify({
+      '1-1:fleet-a': { supply:true, damage:true, morale:true, mission:true, updatedAt:Date.now(), _fingerprint:'old' }
+    }));
+    window.hdSSPostSave({
+      version:1,status:'reviewed',sessionId:'session-1',entryId:'entry-1',
+      seriesId:'series-1',cycleIndex:1,map:'1-1',fleetId:'fleet-a',fleetName:'周回艦隊',
+      review:{gate:{state:'go',label:'出撃準備OK',detail:'問題なし',actions:[]},queue:[]}
+    });
+    const ok = window.hdSSPostPrepareNextRound();
+    const selection = JSON.parse(localStorage.getItem('harbordesk-sortie-selection-v1')||'{}');
+    const readiness = JSON.parse(localStorage.getItem('harbordesk-sortie-readiness-v1')||'{}');
+    const post = window.hdSSPostLoad();
+    return { ok, selection, readiness, post };
+  });
+
+  expect(data.ok).toBe(true);
+  expect(data.selection['1-1']).toBe('fleet-a');
+  expect(data.readiness['1-1:fleet-a']).toBeUndefined();
+  expect(data.post.reprepare.preflightAt).toBeGreaterThan(0);
+  expect(data.post.reprepare.currentId).toBeNull();
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: repeat sortie metadata survives finish and feeds the next cycle', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSSFinish === 'function' &&
+    typeof window.hdSSPostStartNextRound === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-sortie-log-v1');
+    window.hdSSSave({
+      id:'session-2', map:'1-1', startedAt:Date.now()-1000,
+      fleetId:'fleet-a', fleetName:'周回艦隊', strategy:'stable', strategyLabel:'安定重視',
+      fleetSnapshot:{id:'fleet-a',name:'周回艦隊',ships:[{ship:'睦月'}],memo:''},
+      readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:4,manualTotal:4,unresolved:[],gate:{state:'go',label:'出撃準備OK',detail:'OK',hardBlock:false,actions:[]}},
+      telemetrySnapshot:null, shipCount:1, status:'active',
+      seriesId:'series-1', cycleIndex:2, previousSessionId:'session-1', previousEntryId:'entry-1'
+    });
+    const entry = window.hdSSFinish({result:'S',boss:true,battles:1});
+    const post = window.hdSSPostLoad();
+    return { entry, post };
+  });
+
+  expect(data.entry).toBeTruthy();
+  expect(data.post).toMatchObject({
+    status:'awaiting-sync',
+    sessionId:'session-2',
+    seriesId:'series-1',
+    cycleIndex:2,
+    previousSessionId:'session-1',
+    previousEntryId:'entry-1'
+  });
+
+  const source = await page.evaluate(async () => fetch('./sortie-session.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain('function hdSSPostStartNextRound()');
+  expect(source).toContain('data-hd-ss-next-preflight');
+  expect(source).toContain('data-hd-ss-next-start');
+  expect(source).toContain("cycleIndex:Math.max(1,Number(post.cycleIndex)||1)+1");
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
