@@ -232,6 +232,106 @@ test('release smoke: game sync fills ship and equipment ledgers from latest snap
 });
 
 
+
+test('release smoke: linked game fleets follow the latest sync', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdKcParseImport === 'function' &&
+    typeof window.hdKcPreviewData === 'function' &&
+    typeof window.hdKcApplyImport === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({
+      '1-1': [{
+        id: 'linked-fleet-1',
+        name: 'ゲーム同期｜第一艦隊',
+        ships: [{ ship: '古い艦', gameShipId: 999, masterId: 999, level: 1, nowHp: 1, maxHp: 1, cond: 1, gear: '古い装備' }],
+        memo: '同期追従テスト',
+        source: 'kancolle-import',
+        sourceDeckId: 1,
+        sourceSyncedAt: 1,
+        createdAt: 1,
+        updatedAt: 1
+      }]
+    }));
+
+    const raw = {
+      format: 'harbordesk-kancolle-import',
+      version: 2,
+      source: 'userscripts',
+      userscriptVersion: '1.0.13',
+      records: [
+        {
+          endpoint: '/kcsapi/api_port/port',
+          at: 10,
+          payload: {
+            api_result: 1,
+            api_result_msg: '成功',
+            api_data: {
+              api_ship: [{
+                api_id: 201,
+                api_ship_id: 1,
+                api_lv: 37,
+                api_nowhp: 9,
+                api_maxhp: 13,
+                api_cond: 58,
+                api_locked: 1,
+                api_sally_area: 0,
+                api_slot: [501],
+                api_slot_ex: 0
+              }],
+              api_deck_port: [{ api_id: 1, api_name: '第一艦隊', api_mission: [0,0,0,0], api_ship: [201] }],
+              api_ndock: [],
+              api_material: []
+            }
+          }
+        },
+        {
+          endpoint: '/kcsapi/api_get_member/slot_item',
+          at: 11,
+          payload: {
+            api_result: 1,
+            api_result_msg: '成功',
+            api_data: [{ api_id: 501, api_slotitem_id: 1, api_level: 4, api_alv: 0 }]
+          }
+        }
+      ]
+    };
+
+    const preview = window.hdKcPreviewData(window.hdKcParseImport(JSON.stringify(raw)));
+    const sync = window.hdKcApplyImport(preview, {
+      ships: true,
+      equipment: true,
+      resources: false,
+      fleets: true,
+      timers: false,
+      quests: false,
+      sorties: false
+    });
+    const linked = JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1') || '{}')['1-1']?.[0];
+    return { decks: sync.decks, linked };
+  });
+
+  expect(data.decks).toBe(1);
+  expect(data.linked?.sourceDeckId).toBe(1);
+  expect(data.linked?.sourceSyncedAt).toBeGreaterThan(1);
+  expect(data.linked?.ships).toHaveLength(6);
+  expect(data.linked?.ships?.[0]).toMatchObject({
+    ship: '睦月',
+    gameShipId: 201,
+    masterId: 1,
+    level: 37,
+    nowHp: 9,
+    maxHp: 13,
+    cond: 58
+  });
+  expect(data.linked?.ships?.[0]?.gear).toContain('12cm単装砲 ★4');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: synced fleet and equipment data refresh downstream planners', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -1583,8 +1683,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.403'");
-  expect(source).toContain("const HD_APP_BUILD=403");
+  expect(source).toContain("const HD_APP_VERSION='1.0.404'");
+  expect(source).toContain("const HD_APP_BUILD=404");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -1607,14 +1707,14 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=403`);
+    expect(data.index).toContain(`${asset}?v=404`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=403");
+  expect(data.updater).toContain("const HD_APP_BUILD=404");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v403");
+  expect(data.sw).toContain("harbordesk-pwa-v404");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -1627,7 +1727,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=403');
+  expect(source).toContain('const BUILD=404');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -2867,17 +2967,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=403',
-      'map-images.js?v=403',
-      'map-tabs.js?v=403',
-      'map-interactive.js?v=403',
-      'map-advanced-data.js?v=403'
+      'map-details.js?v=404',
+      'map-images.js?v=404',
+      'map-tabs.js?v=404',
+      'map-interactive.js?v=404',
+      'map-advanced-data.js?v=404'
     ];
     const requiredStyles = [
-      'map-details.css?v=403',
-      'map-tabs.css?v=403',
-      'map-images.css?v=403',
-      'map-interactive.css?v=403'
+      'map-details.css?v=404',
+      'map-tabs.css?v=404',
+      'map-images.css?v=404',
+      'map-interactive.css?v=404'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -2919,7 +3019,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=403');
+  expect(src).toBe('app.js?v=404');
   expect(errors).toEqual([]);
 });
 
