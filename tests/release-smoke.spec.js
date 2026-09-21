@@ -251,6 +251,32 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
 });
 
 
+test('release smoke: build version cache-busts core and runtime assets', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const data = await page.evaluate(async () => {
+    const [index, updater, sw] = await Promise.all([
+      fetch('./index.html', { cache: 'no-store' }).then(r => r.text()),
+      fetch('./update-manager.js', { cache: 'no-store' }).then(r => r.text()),
+      fetch('./sw.js', { cache: 'no-store' }).then(r => r.text())
+    ]);
+    return { index, updater, sw };
+  });
+
+  for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
+    expect(data.index).toContain(`${asset}?v=381`);
+  }
+  expect(data.updater).toContain("const HD_APP_BUILD=381");
+  expect(data.updater).toContain("function hdBuildAssetUrl(src)");
+  expect(data.updater).toContain("script.src=hdBuildAssetUrl(src)");
+  expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
+  expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
+  expect(data.sw).toContain("harbordesk-pwa-v381");
+  expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
+  expect(errors).toEqual([]);
+});
+
 test('release smoke: userscript blocks handoff until ship and equipment ledger data are captured', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
