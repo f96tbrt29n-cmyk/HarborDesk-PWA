@@ -59,17 +59,41 @@ function hdSSSeriesProgress(seriesId){
  return {rows,cycles,resourceTotal,buckets,startedAt,endedAt,elapsedMin:startedAt&&endedAt?Number(((endedAt-startedAt)/60000).toFixed(1)):0};
 }
 function hdSSSeriesDecision(seriesId){
- const id=String(seriesId||'').trim(),goal=hdSSSeriesGoal(id),progress=hdSSSeriesProgress(id),reasons=[],norm=v=>String(v||'').replace(/\s+/g,'').toLowerCase();
- if(goal.maxCycles&&progress.cycles>=goal.maxCycles)reasons.push(`周回上限 ${progress.cycles}/${goal.maxCycles}`);
- if(goal.maxResources&&progress.resourceTotal>=goal.maxResources)reasons.push(`総資源 ${progress.resourceTotal}/${goal.maxResources}`);
- if(goal.maxBuckets&&progress.buckets>=goal.maxBuckets)reasons.push(`バケツ ${progress.buckets}/${goal.maxBuckets}`);
- if(goal.maxElapsedMin&&progress.elapsedMin>=goal.maxElapsedMin)reasons.push(`経過 ${progress.elapsedMin}/${goal.maxElapsedMin}分`);
+ const id=String(seriesId||'').trim(),goal=hdSSSeriesGoal(id),progress=hdSSSeriesProgress(id),reasons=[],reached={},norm=v=>String(v||'').replace(/\s+/g,'').toLowerCase();
+ if(goal.maxCycles&&progress.cycles>=goal.maxCycles){reached.maxCycles=true;reasons.push(`周回上限 ${progress.cycles}/${goal.maxCycles}`)}
+ if(goal.maxResources&&progress.resourceTotal>=goal.maxResources){reached.maxResources=true;reasons.push(`総資源 ${progress.resourceTotal}/${goal.maxResources}`)}
+ if(goal.maxBuckets&&progress.buckets>=goal.maxBuckets){reached.maxBuckets=true;reasons.push(`バケツ ${progress.buckets}/${goal.maxBuckets}`)}
+ if(goal.maxElapsedMin&&progress.elapsedMin>=goal.maxElapsedMin){reached.maxElapsedMin=true;reasons.push(`経過 ${progress.elapsedMin}/${goal.maxElapsedMin}分`)}
  let targetHit=false;
  if(goal.target){
-  targetHit=progress.rows.some(x=>norm(x?.drop)===norm(goal.target)||((x?.targetObtained===true||norm(x?.huntShip)===norm(goal.target)&&x?.targetObtained===true)));
-  if(targetHit)reasons.push(`目標ドロップ ${goal.target} 獲得`);
+  targetHit=progress.rows.some(x=>norm(x?.drop)===norm(goal.target)||(norm(x?.huntShip)===norm(goal.target)&&x?.targetObtained===true));
+  if(targetHit){reached.target=true;reasons.push(`目標ドロップ ${goal.target} 獲得`)}
  }
- return {seriesId:id,goal,progress,targetHit,stop:reasons.length>0,reasons};
+ return {seriesId:id,goal,progress,targetHit,reached,stop:reasons.length>0,reasons};
+}
+function hdSSSeriesRecoveryPlan(input){
+ const d=typeof input==='string'?hdSSSeriesDecision(input):input;if(!d?.stop)return {seriesId:String(d?.seriesId||''),stop:false,items:[],summary:''};
+ const g=d.goal||{},p=d.progress||{},r=d.reached||{},items=[];
+ if(r.maxCycles)items.push({key:'maxCycles',label:'周回上限',detail:`${p.cycles}/${g.maxCycles}周に到達`,next:'最大周回を増やすか、この条件だけ解除すると再開できる'});
+ if(r.maxResources)items.push({key:'maxResources',label:'総資源上限',detail:`${p.resourceTotal}/${g.maxResources}消費`,next:'資源残量を確認して上限を見直すか、この条件だけ解除'});
+ if(r.maxBuckets)items.push({key:'maxBuckets',label:'バケツ上限',detail:`${p.buckets}/${g.maxBuckets}個使用`,next:'バケツ残量を確認して上限を見直すか、この条件だけ解除'});
+ if(r.maxElapsedMin)items.push({key:'maxElapsedMin',label:'時間上限',detail:`${p.elapsedMin}/${g.maxElapsedMin}分`,next:'時間上限を延長するか、この条件だけ解除'});
+ if(r.target)items.push({key:'target',label:'目標ドロップ達成',detail:String(g.target||'')+' を獲得',next:'周回を終えるか、次の目標へ変更すると再開できる',success:true});
+ return {seriesId:String(d.seriesId||''),stop:true,items,summary:items.some(x=>x.success)?'目標達成を含む終了条件に到達。続けるなら到達条件を変更してね。':'到達した終了条件を変更または解除すると次周を再開できる。'};
+}
+function hdSSSeriesClearReached(seriesId){
+ const d=hdSSSeriesDecision(seriesId);if(!d.stop)return d;
+ const next={...d.goal};for(const item of hdSSSeriesRecoveryPlan(d).items){if(item.key==='target')next.target='';else next[item.key]=0}
+ hdSSSeriesGoalSave(seriesId,next);return hdSSSeriesDecision(seriesId);
+}
+function hdSSSeriesRecoveryHtml(decision){
+ const plan=hdSSSeriesRecoveryPlan(decision);if(!plan.stop||!plan.items.length)return '';
+ return '<div class="hd-ss-series-recovery"><div class="hd-ss-series-recovery-head"><div><span>再開ガイド</span><b>'+hdSSEsc(plan.summary)+'</b></div><strong>'+plan.items.length+'条件</strong></div><div class="hd-ss-series-recovery-list">'+plan.items.map(x=>'<div class="'+(x.success?'success':'stop')+'"><span><b>'+hdSSEsc(x.label)+'</b><small>'+hdSSEsc(x.detail)+'</small></span><em>'+hdSSEsc(x.next)+'</em></div>').join('')+'</div><div class="hd-ss-series-recovery-actions"><button type="button" class="primary small" data-hd-ss-goal-focus="'+hdSSEsc(plan.seriesId)+'">到達条件を編集</button><button type="button" class="ghost small" data-hd-ss-goal-clear-reached="'+hdSSEsc(plan.seriesId)+'">到達条件だけ解除</button></div></div>';
+}
+function hdSSSeriesFocusReached(seriesId){
+ const d=hdSSSeriesDecision(seriesId),plan=hdSSSeriesRecoveryPlan(d),root=document.querySelector('.hd-ss-series-goal');if(!root||!plan.items.length)return false;
+ const selectors={maxCycles:'[data-hd-ss-goal-cycles]',maxResources:'[data-hd-ss-goal-resources]',maxBuckets:'[data-hd-ss-goal-buckets]',maxElapsedMin:'[data-hd-ss-goal-minutes]',target:'[data-hd-ss-goal-target]'},el=root.querySelector(selectors[plan.items[0].key]||'input');
+ if(!el)return false;el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>el.focus(),180);return true;
 }
 function hdSSSeriesGoalHtml(post,decision){
  const id=String(post?.seriesId||post?.sessionId||'').trim();if(!id)return '';
@@ -80,7 +104,7 @@ function hdSSSeriesGoalHtml(post,decision){
   '<label>バケツ上限<input type="number" min="0" inputmode="numeric" data-hd-ss-goal-buckets value="'+(g.maxBuckets||'')+'" placeholder="例 20"></label>'+
   '<label>時間上限(分)<input type="number" min="0" inputmode="numeric" data-hd-ss-goal-minutes value="'+(g.maxElapsedMin||'')+'" placeholder="例 60"></label>'+
   '<label class="wide">目標ドロップ<input data-hd-ss-goal-target value="'+hdSSEsc(g.target)+'" placeholder="例 明石"></label>'+
-  '</div><div class="hd-ss-series-goal-actions"><button type="button" class="ghost small" data-hd-ss-goal-save="'+hdSSEsc(id)+'">終了条件を保存</button><button type="button" class="ghost small" data-hd-ss-goal-clear="'+hdSSEsc(id)+'">条件を解除</button></div></div>';
+  '</div><div class="hd-ss-series-goal-actions"><button type="button" class="ghost small" data-hd-ss-goal-save="'+hdSSEsc(id)+'">終了条件を保存</button><button type="button" class="ghost small" data-hd-ss-goal-clear="'+hdSSEsc(id)+'">条件を解除</button></div>'+hdSSSeriesRecoveryHtml(d)+'</div>';
 }
 function hdSSSeriesGoalSaveFromUi(seriesId){
  const root=document.querySelector('.hd-ss-series-goal');if(!root)return false;
@@ -447,6 +471,10 @@ window.hdSSSeriesGoalSave=hdSSSeriesGoalSave;
 window.hdSSSeriesRows=hdSSSeriesRows;
 window.hdSSSeriesProgress=hdSSSeriesProgress;
 window.hdSSSeriesDecision=hdSSSeriesDecision;
+window.hdSSSeriesRecoveryPlan=hdSSSeriesRecoveryPlan;
+window.hdSSSeriesClearReached=hdSSSeriesClearReached;
+window.hdSSSeriesRecoveryHtml=hdSSSeriesRecoveryHtml;
+window.hdSSSeriesFocusReached=hdSSSeriesFocusReached;
 window.hdSSSeriesGoalHtml=hdSSSeriesGoalHtml;
 window.hdSSPostDelta=hdSSPostDelta;
 window.hdSSTelemetry=hdSSTelemetry;
@@ -476,6 +504,8 @@ document.addEventListener('click',function(e){
  if(e.target.closest?.('[data-hd-ss-next-preflight]')){hdSSPostPrepareNextRound();return}
  if(e.target.closest?.('[data-hd-ss-next-start]')){const session=hdSSPostStartNextRound();if(session&&typeof window.hdSMOpen==='function')setTimeout(()=>window.hdSMOpen(),0);return}
  const goalSave=e.target.closest?.('[data-hd-ss-goal-save]');if(goalSave){hdSSSeriesGoalSaveFromUi(goalSave.dataset.hdSsGoalSave);return}
+ const goalFocus=e.target.closest?.('[data-hd-ss-goal-focus]');if(goalFocus){hdSSSeriesFocusReached(goalFocus.dataset.hdSsGoalFocus);return}
+ const clearReached=e.target.closest?.('[data-hd-ss-goal-clear-reached]');if(clearReached){hdSSSeriesClearReached(clearReached.dataset.hdSsGoalClearReached);hdSSRender();return}
  const goalClear=e.target.closest?.('[data-hd-ss-goal-clear]');if(goalClear){hdSSSeriesGoalSave(goalClear.dataset.hdSsGoalClear,{});hdSSRender();return}
  if(e.target.closest?.('[data-hd-ss-post-recheck]')){hdSSPostRefreshReview();hdSSRender();return}
  if(e.target.closest?.('[data-hd-fe-recheck]')){setTimeout(()=>{hdSSPostRefreshReview();hdSSRender()},140)}
