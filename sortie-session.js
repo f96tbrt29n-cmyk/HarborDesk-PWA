@@ -131,6 +131,36 @@ function hdSSPostDelta(start,current){
  const changed=!!(ships.length||fuelUsed||ammoUsed||airLoss||depletedAdded||newBlocked||newCaution||newSupply);
  return {changed,ships,fuelUsed,ammoUsed,supplyKnown,airBefore,airAfter,airLoss,depletedBefore,depletedAfter,depletedAdded,newBlocked,newCaution,newSupply};
 }
+function hdSSAttachReviewToLog(postReview){
+ if(!postReview)return false;
+ const entryId=String(postReview.entryId||''),sessionId=String(postReview.sessionId||'');
+ let rows=[];
+ try{rows=typeof hdSLLoad==='function'?hdSLLoad():JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]')}catch{rows=[]}
+ if(!Array.isArray(rows)||!rows.length)return false;
+ let index=entryId?rows.findIndex(x=>String(x?.id||'')===entryId):-1;
+ if(index<0&&sessionId)index=rows.findIndex(x=>String(x?.sessionId||'')===sessionId);
+ if(index<0)return false;
+ const review=postReview.review||{},gate=review.gate||{},delta=review.delta||{};
+ rows[index]={...rows[index],postSortieReview:{
+  reviewedAt:Number(postReview.reviewedAt)||Date.now(),syncAt:Number(postReview.syncAt)||0,
+  gate:{state:String(gate.state||'hold'),label:String(gate.label||''),detail:String(gate.detail||'')},
+  delta:{
+   changed:!!delta.changed,
+   ships:Array.isArray(delta.ships)?delta.ships.map(x=>({name:String(x?.name||''),hpBefore:Number(x?.hpBefore)||0,hpAfter:Number(x?.hpAfter)||0,hpLoss:Number(x?.hpLoss)||0,statusBefore:String(x?.statusBefore||''),statusAfter:String(x?.statusAfter||'')})):[],
+   fuelUsed:Number(delta.fuelUsed)||0,ammoUsed:Number(delta.ammoUsed)||0,supplyKnown:Number(delta.supplyKnown)||0,
+   airBefore:Number(delta.airBefore)||0,airAfter:Number(delta.airAfter)||0,airLoss:Number(delta.airLoss)||0,
+   depletedBefore:Number(delta.depletedBefore)||0,depletedAfter:Number(delta.depletedAfter)||0,depletedAdded:Number(delta.depletedAdded)||0,
+   newBlocked:Number(delta.newBlocked)||0,newCaution:Number(delta.newCaution)||0,newSupply:Number(delta.newSupply)||0
+  },
+  live:review.live?{blocked:Number(review.live.blocked)||0,caution:Number(review.live.caution)||0,status:String(review.live.status||'')}:null,
+  supply:review.supply?{empty:Number(review.supply.empty)||0,low:Number(review.supply.low)||0,status:String(review.supply.status||'')}:null,
+  air:review.air?{ours:Number(review.air.ours)||0,enemy:Number(review.air.enemy)||0,depletedSlots:Number(review.air.depletedSlots)||0,status:String(review.air.status||'')}:null
+ }};
+ if(typeof hdSLSave==='function')hdSLSave(rows);else localStorage.setItem('harbordesk-sortie-log-v1',JSON.stringify(rows.slice(0,500)));
+ try{if(typeof hdSLRender==='function')hdSLRender();if(typeof hdCCRender==='function')hdCCRender()}catch{}
+ try{window.dispatchEvent(new CustomEvent('hd:sortie-post-review-saved',{detail:{entryId:rows[index].id,postSortieReview:rows[index].postSortieReview}}))}catch{}
+ return true;
+}
 function hdSSPostTryReview(sync){
  const post=hdSSPostLoad();if(!post||post.status!=='awaiting-sync')return post;
  const syncAt=Number(sync?.syncedAt)||(()=>{try{return Number(JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')?.syncedAt)||0}catch{return 0}})();
@@ -138,7 +168,7 @@ function hdSSPostTryReview(sync){
  const telemetry=hdSSTelemetry(post.map,post.fleetSnapshot);if(!telemetry)return post;
  const gate=telemetry.gate||{state:'hold',label:'要確認',detail:'帰還後判定を取得できない',actions:[]};
  const delta=hdSSPostDelta(post.startTelemetry,telemetry),next={...post,status:'reviewed',reviewedAt:Date.now(),syncAt,review:{gate,live:telemetry.live,supply:telemetry.supply,air:telemetry.air,delta}};
- hdSSPostSave(next);hdSSEmit('post-review',{postReview:next});return next;
+ hdSSPostSave(next);hdSSAttachReviewToLog(next);hdSSEmit('post-review',{postReview:next});return next;
 }
 function hdSSPostHtml(map){
  const post=hdSSPostLoad();if(!post)return '';
