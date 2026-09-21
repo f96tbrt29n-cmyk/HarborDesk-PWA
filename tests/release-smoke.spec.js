@@ -1132,6 +1132,50 @@ test('release smoke: performance analytics learns from post-sortie telemetry', a
 });
 
 
+test('release smoke: post-sortie reprepare queue advances while preserving post-sortie learning', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSSPostQueueBuild === 'function' &&
+    typeof window.hdSSPostQueueSummary === 'function' &&
+    typeof window.hdSSPostStartReprepare === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const first = window.hdSSPostQueueBuild({
+      actions:[
+        {id:'supply',action:'補給する',detail:'未補給 2隻'},
+        {id:'air',action:'制空を調整',detail:'優勢未達'}
+      ]
+    },[]);
+    const second = window.hdSSPostQueueBuild({
+      actions:[{id:'air',action:'制空を調整',detail:'まだ不足'}]
+    },first);
+    const third = window.hdSSPostQueueBuild({actions:[]},second);
+    return {
+      first, second, third,
+      firstSummary:window.hdSSPostQueueSummary(first),
+      secondSummary:window.hdSSPostQueueSummary(second),
+      thirdSummary:window.hdSSPostQueueSummary(third)
+    };
+  });
+
+  expect(data.firstSummary).toMatchObject({total:2,resolved:0,pending:2});
+  expect(data.secondSummary).toMatchObject({total:2,resolved:1,pending:1});
+  expect(data.second.find(x=>x.id==='supply')?.status).toBe('resolved');
+  expect(data.second.find(x=>x.id==='air')?.status).toBe('pending');
+  expect(data.thirdSummary).toMatchObject({total:2,resolved:2,pending:0});
+
+  const source = await page.evaluate(async () => fetch('./sortie-session.js',{cache:'no-store'}).then(r=>r.text()));
+  expect(source).toContain('再出撃の再準備');
+  expect(source).toContain('data-hd-ss-reprep');
+  expect(source).toContain('function hdSSPostRefreshReview(sync)');
+  expect(source).toContain('hdSSAttachReviewToLog(next)');
+  expect(source).toContain("['hd:equipment-changed','hd:ship-identity-changed']");
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
