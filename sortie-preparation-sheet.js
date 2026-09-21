@@ -11,8 +11,11 @@ function hdSPSFleet(map){
 }
 function hdSPSRosterMatch(name){return typeof hdSortieRosterMatch==='function'?hdSortieRosterMatch(name):null}
 function hdSPSRosterMatchShip(row){
- const id=Number(row?.masterId)||0,name=String(row?.ship||'').trim();
- if(id&&typeof rosterLoad==='function'){const hit=rosterLoad().find(x=>Number(x.masterId)===id);if(hit)return hit}
+ const gameId=Number(row?.gameShipId)||0,id=Number(row?.masterId)||0,name=String(row?.ship||'').trim();
+ if(typeof rosterLoad==='function'){
+  const rows=rosterLoad();if(gameId){const hit=rows.find(x=>Number(x.gameShipId)===gameId);if(hit)return hit}
+  if(id){const hit=rows.find(x=>Number(x.masterId)===id);if(hit)return hit}
+ }
  return name?hdSPSRosterMatch(name):null;
 }
 function hdSPSDb(name){return typeof hdSortieDb==='function'?hdSortieDb(name):null}
