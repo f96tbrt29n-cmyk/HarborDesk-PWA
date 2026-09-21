@@ -146,6 +146,18 @@ function hdFELiveFleet(plan){
  const status=blocked?'missing':caution?'partial':(details.length&&details.every(x=>x.status!=='unknown')?'ready':'manual');
  return {status,blocked,caution,reasons,details,total:rows.length};
 }
+function hdFESupply(plan){
+ const rows=(plan?.ships||[]).filter(x=>x?.ship).map(ship=>{
+  const row=hdFERosterForShip(ship),masterId=Number(row?.masterId)||Number(ship?.masterId)||0,master=window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips?.[String(masterId)]||null;
+  const currentFuel=Number(row?.gameFuel),currentAmmo=Number(row?.gameAmmo),maxFuel=Number(master?.fuel),maxAmmo=Number(master?.ammo);
+  const known=!!row&&maxFuel>0&&maxAmmo>0&&Number.isFinite(currentFuel)&&Number.isFinite(currentAmmo),fuelRatio=known?currentFuel/maxFuel:null,ammoRatio=known?currentAmmo/maxAmmo:null;
+  return {name:ship.ship,currentFuel,currentAmmo,maxFuel,maxAmmo,known,fuelRatio,ammoRatio};
+ });
+ const known=rows.filter(x=>x.known),empty=known.filter(x=>x.fuelRatio<=0||x.ammoRatio<=0),low=known.filter(x=>x.fuelRatio>0&&x.ammoRatio>0&&(x.fuelRatio<1||x.ammoRatio<1));
+ const status=!rows.length||known.length<rows.length?'manual':empty.length?'missing':low.length?'partial':'ready';
+ const detail=status==='manual'?'補給量を同期できた艦のみ判定':empty.length?`燃料/弾薬0の艦 ${empty.length}隻`:low.length?`未補給 ${low.length}隻`:'全艦補給済み';
+ return {status,rows,known:known.length,empty:empty.length,low:low.length,detail};
+}
 function hdFERoute(plan){
  const info=plan?.suggestion?.info||plan?.routeInfo||null;
  if(!info)return {status:'manual',detail:'保存編成のルート条件を特定できないため攻略ルートを確認',requirements:[]};
