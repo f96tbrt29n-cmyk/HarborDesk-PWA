@@ -575,6 +575,7 @@ test('release smoke: equipment plan counts stay separate from owned inventory', 
       snapshot:{equipment:2,equipmentRows:2,equipmentOwnedRows:1,equipmentPlanRows:1}
     }));
     window.renderDashboard?.();
+    window.renderEquipment?.();
     window.renderHomeDashboard?.();
     window.hdKcRenderSyncStatus?.();
     return {
