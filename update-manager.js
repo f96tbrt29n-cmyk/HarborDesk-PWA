@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.420';
-const HD_APP_BUILD=420;
+const HD_APP_VERSION='1.0.421';
+const HD_APP_BUILD=421;
 const HD_UPDATE_SNOOZE_KEY='harbordesk-update-snooze-v1';
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
