@@ -990,9 +990,50 @@ test('release smoke: readiness fix workflow remembers target and confirms resolu
   expect(data.resolved.resolved).toBe(true);
   expect(data.resolved.changed).toBe(true);
   expect(data.html).toContain('修正反映済み');
-  expect(data.html).toContain('次を再判定');
+  expect(data.html).toContain('修正キュー完了');
+  expect(data.html).toContain('出撃準備OKを確認');
   expect(data.stored.id).toBe('supply');
   expect(data.cleared).toBeNull();
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: readiness fix queue advances to the next unresolved action', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFEStartFixFlow === 'function' &&
+    typeof window.hdFEFixQueueState === 'function' &&
+    typeof window.hdFEGateHtml === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    sessionStorage.removeItem('harbordesk-sortie-fix-flow-v1');
+    const before = {
+      checks:[
+        {id:'supply',label:'補給',status:'missing',detail:'未補給 1隻'},
+        {id:'equipment',label:'装備',status:'missing',detail:'海域装備 0/1 準備'}
+      ]
+    };
+    window.hdFEStartFixFlow('supply', before);
+    const after = {
+      checks:[
+        {id:'supply',label:'補給',status:'ready',detail:'全艦補給済み'},
+        {id:'equipment',label:'装備',status:'missing',detail:'海域装備 0/1 準備'}
+      ]
+    };
+    const queue = window.hdFEFixQueueState(after);
+    const html = window.hdFEGateHtml(after);
+    window.hdFEFixFlowSave(null);
+    return { queue, html };
+  });
+
+  expect(data.queue.flow.resolved).toBe(true);
+  expect(data.queue.remaining).toHaveLength(1);
+  expect(data.queue.next.id).toBe('equipment');
+  expect(data.queue.complete).toBe(false);
+  expect(data.html).toContain('修正キュー残り 1件');
+  expect(data.html).toContain('不足している海域向け装備を準備する');
+  expect(data.html).toContain('data-hd-fe-fix-next="equipment"');
   expect(errors).toEqual([]);
 });
 
@@ -1003,6 +1044,8 @@ test('release smoke: pending fix workflow refreshes after sync and equipment cha
   expect(source).toContain("const HD_FE_FIX_FLOW_KEY='harbordesk-sortie-fix-flow-v1'");
   expect(source).toContain("['hd:kancolle-sync','hd:equipment-changed','hd:ship-identity-changed']");
   expect(source).toContain("data-hd-fe-recheck");
+  expect(source).toContain("data-hd-fe-fix-next");
+  expect(source).toContain("data-hd-fe-fix-finish");
   expect(source).toContain("data-hd-fe-fix-dismiss");
   expect(errors).toEqual([]);
 });
