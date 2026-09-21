@@ -73,8 +73,9 @@ function homeSyncInfo(){
  const age=Date.now()-Number(s.syncedAt||0),coverage=s.coverage&&typeof s.coverage==='object'?s.coverage:null;
  const required=[['ships','艦娘'],['equipment','装備'],['resources','資源'],['fleets','艦隊'],['quests','任務'],['docks','入渠']];
  const missing=coverage?required.filter(([key])=>coverage[key]===false).map(([,label])=>label):[];
- const state=missing.length?'partial':age>21600000?'warn':'ok';
- return {sync:s,label:state==='partial'?'一部未取得・'+homeRelative(s.syncedAt):homeRelative(s.syncedAt),state,age,missing};
+ const audit=typeof hdKcLiveLedgerAudit==='function'?hdKcLiveLedgerAudit(s):{verified:false,ok:true},state=audit?.verified&&!audit.ok?'drift':missing.length?'partial':age>21600000?'warn':'ok';
+ const label=state==='drift'?'台帳差異・'+homeRelative(s.syncedAt):state==='partial'?'一部未取得・'+homeRelative(s.syncedAt):homeRelative(s.syncedAt);
+ return {sync:s,label,state,age,missing,audit};
 }
 function homeSyncMissingGuide(missing=[]){
  const set=new Set(missing||[]),steps=[];
