@@ -469,6 +469,7 @@ document.addEventListener('click',e=>{
 window.addEventListener('storage',renderHomeDashboard);
 window.addEventListener('hd:modules-ready',renderHomeDashboard);
 window.addEventListener('hd:equipment-changed',renderHomeDashboard);
+window.addEventListener('hd:ship-identity-changed',renderHomeDashboard);
 window.addEventListener('hd:procurement-changed',renderHomeDashboard);
 window.addEventListener('hd:kancolle-sync',renderHomeDashboard);
 window.addEventListener('hd:workspace-refresh',renderHomeDashboard);
