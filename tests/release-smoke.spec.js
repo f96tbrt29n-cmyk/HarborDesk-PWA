@@ -4120,6 +4120,30 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
     await expect(fallback.locator(`[data-hd-core-map-action="${action}"]`)).toBeVisible();
   }
 
+  await fallback.locator('[data-hd-core-map-action="map"]').click();
+  const fallbackMap = page.locator('#hdFallbackMapTools');
+  await expect(fallbackMap).toBeVisible();
+  await expect(fallbackMap.locator('.hd-map-image-section')).toBeVisible();
+  await fallbackMap.locator('.hd-map-structure-guide > summary').click();
+  const fallbackNode = fallbackMap.locator('.hd-map-node').first();
+  await expect(fallbackNode).toBeVisible();
+  await fallbackNode.click();
+  await expect(fallbackMap.locator('#hdMapNodeInfo')).toBeVisible();
+  await fallbackMap.locator('#hdMapNodeInfo [data-open-route-tab]').click();
+  const fallbackRoute = page.locator('#hdFallbackRouteTools');
+  await expect(fallbackRoute).toBeVisible();
+  await expect(fallbackRoute.locator('#hdMapRouteRequirements')).toBeVisible();
+
+  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await expect(fallback).toBeVisible();
+  await fallback.locator('[data-hd-core-map-action="fleet"]').click();
+  const fallbackFleet = page.locator('#hdFallbackFleetTools');
+  await expect(fallbackFleet).toBeVisible();
+  await expect(fallbackFleet).toContainText('編成例');
+  await expect(fallbackMap).toBeHidden();
+
+  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="prep"]').click();
   await expect(page.locator('#hdSortiePreparation')).toBeVisible({ timeout: 5000 });
 
