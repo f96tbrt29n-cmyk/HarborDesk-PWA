@@ -464,12 +464,15 @@ function hdWSRevealElement(target,scroll=true,opts={}){
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
  const section=hdWSManagedSectionFor(el);if(!section)return false;
  const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
- // Legacy scrollIntoView compatibility may try to reopen a section that just
- // became hidden while a newer explicit navigation is still settling.
- // Passive reveals must never steal that newer navigation.
- if(opts.passive&&Date.now()<hdWSNavLockUntil){
+ // Legacy scrollIntoView compatibility is passive: it may repair visibility
+ // inside the workspace that is already selected, but it must never navigate to
+ // a different group/section. Delayed scrollIntoView calls can fire long after
+ // an explicit攻略 navigation, so a time-based lock is not sufficient here.
+ if(opts.passive){
   const current=hdWSCurrentLocation();
-  if(current&&(current.group!==group||current.section!==section.id))return false;
+  if(!current||current.group!==group||current.section!==section.id)return false;
+  section.hidden=false;section.classList.remove('hd-ws-hidden');hdWSUnhideAncestors(section);
+  return true;
  }
  // A direct navigation request is newer than deferred startup restoration.
  // Mark startup context handled before changing workspace state so slower WebKit
