@@ -60,7 +60,7 @@ function hdSPSFleetHtml(map,info){
   const preset=hdSPSPlan(map);
   return `<section class="hd-sps-card hd-sps-fleet"><div class="hd-sps-card-head"><div><span>艦隊</span><strong>自分用編成が未登録</strong></div><b class="warn">要準備</b></div>
    ${preset?`<div class="hd-sps-preset"><span>海域の基本案</span><strong>${hdSPSEsc(preset.name)}</strong><p>${hdSPSEsc(preset.ships)}<br>${hdSPSEsc(preset.gear)}</p></div>`:''}
-   <button type="button" class="primary small" data-hd-sps-tab="mine">自分用編成を作る</button></section>`;
+   <div class="hd-sps-card-actions"><button type="button" class="primary small" data-hd-sps-tab="mine">自分用編成を作る</button><button type="button" class="ghost small" data-hd-sps-workspace="roster">艦隊台帳</button></div></section>`;
  }
  const rows=info.ships.map((s,i)=>{
   const roster=s.ship?hdSPSRosterMatchShip(s):null,db=s.ship?hdSPSDbShip(s):null;
