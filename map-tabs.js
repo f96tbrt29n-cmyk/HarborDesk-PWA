@@ -66,6 +66,19 @@ function hdMapToolsOverviewHtml(){
   </div>
  </section>`;
 }
+function hdMapActivateTab(tab,btn=null){
+ if(typeof selectedMap==='undefined'||!selectedMap||!HD_MAP_TAB_IDS.includes(tab))return false;
+ btn=btn||document.querySelector(`[data-map-tab="${tab}"]`);if(!btn)return false;
+ hdMapTabSave(selectedMap,tab);
+ document.querySelectorAll('.map-tab-btn').forEach(x=>x.classList.toggle('active',x===btn));
+ document.querySelectorAll('.map-tab-pane').forEach(x=>x.classList.toggle('active',x.dataset.mapPane===tab));
+ hdMapTabsRevealActive();
+ hdMapRenderInlineTool(tab);
+ hdMapEmit('hd:map-tab-changed',{map:selectedMap,tab});
+ return true;
+}
+window.hdMapActivateTab=hdMapActivateTab;
+
 async function hdMapOpenTool(tool){
  if(!tool)return false;
  const lazy=tool==='suggest'?['hdFSOpen','編成候補']:tool==='prep'?['hdSPSOpen','出撃準備']:null;
@@ -82,7 +95,7 @@ async function hdMapOpenTool(tool){
   return false;
  }
  const tab=document.querySelector(`[data-map-tab="${tool}"]`);
- if(tab){tab.click();return true}
+ if(tab)return hdMapActivateTab(tool,tab);
  return false;
 }
 
@@ -156,12 +169,7 @@ document.addEventListener('click',e=>{
   const questAdd=e.target.closest('[data-hd-map-quest-add]');
   if(questAdd){if(typeof window.hdQuestAddFromMap==='function')window.hdQuestAddFromMap(questAdd.dataset.hdMapQuestAdd);setTimeout(()=>{const pane=document.querySelector('[data-map-pane="quest"]');if(pane&&selectedMap)pane.innerHTML=hdQuestHtml(selectedMap)},0);return}
   const btn=e.target.closest('[data-map-tab]');if(!btn||!selectedMap)return;
-  const tab=btn.dataset.mapTab;hdMapTabSave(selectedMap,tab);
-  document.querySelectorAll('.map-tab-btn').forEach(x=>x.classList.toggle('active',x===btn));
-  document.querySelectorAll('.map-tab-pane').forEach(x=>x.classList.toggle('active',x.dataset.mapPane===tab));
-  hdMapTabsRevealActive();
-  hdMapRenderInlineTool(tab);
-  hdMapEmit('hd:map-tab-changed',{map:selectedMap,tab});
+  hdMapActivateTab(btn.dataset.mapTab,btn);
 });
 
 window.hdApplyMapTabs=hdApplyMapTabs;
