@@ -56,9 +56,11 @@ function hdMapToolsOverviewHtml(){
   <div class="hd-map-tools-overview-grid">
    <button type="button" data-hd-map-tool="map"><b>マップ詳細</b><small>段階・マス詳細・最短経路</small></button>
    <button type="button" data-hd-map-tool="fleet"><b>編成</b><small>編成例・艦娘候補・装備例</small></button>
+   <button type="button" data-hd-map-tool="route"><b>ルート</b><small>分岐条件・索敵・基地航空隊</small></button>
    <button type="button" data-hd-map-tool="suggest"><b>編成候補</b><small>手持ち艦隊から自動提案</small></button>
    <button type="button" data-hd-map-tool="prep"><b>出撃準備</b><small>準備表・保存編成・確認</small></button>
    <button type="button" data-hd-map-tool="gear"><b>装備・計算</b><small>装備候補・制空・索敵・基地航空隊</small></button>
+   <button type="button" data-hd-map-tool="quest"><b>任務</b><small>関連任務・達成条件・チェック</small></button>
    <button type="button" data-hd-map-tool="drop"><b>ドロップ</b><small>ドロップ艦・未所持・掘り目標</small></button>
    <button type="button" data-hd-map-tool="mine"><b>自分用</b><small>保存編成・出撃前チェック・支援艦隊</small></button>
   </div>
