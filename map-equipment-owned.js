@@ -1,4 +1,5 @@
 const HD_OWNED_EQUIP_KEY='harbordesk-equipment-v1';
+let hdOwnedOnlyEnabled=false;
 
 function hdOwnedEquipNormalize(name){
   return String(name||'').normalize('NFKC').replace(/\s+/g,'').replace(/･/g,'・');
@@ -63,8 +64,8 @@ if(typeof hdMapEquipRecommendationsHtml==='function'){
     let html=hdOwnedPrevRecommendationsHtml(map);
     const owned=(html.match(/data-hd-owned="yes"/g)||[]).length;
     const missing=(html.match(/data-hd-owned="no"/g)||[]).length;
-    const summary=`<div class="hd-owned-summary"><div><strong>手持ち装備で判定</strong><span>候補 ${owned+missing}件中、所持 ${owned}件 / 未所持 ${missing}件</span></div><div class="hd-owned-summary-actions"><button class="ghost small" type="button" data-hd-owned-only>手持ちだけ</button><button class="ghost small" type="button" data-hd-owned-refresh>再判定</button></div></div>`;
-    return html.replace('<section class="hd-map-equip-recommend">',`<section class="hd-map-equip-recommend">${summary}`);
+    const summary=`<div class="hd-owned-summary"><div><strong>手持ち装備で判定</strong><span>候補 ${owned+missing}件中、所持 ${owned}件 / 未所持 ${missing}件</span></div><div class="hd-owned-summary-actions"><button class="ghost small${hdOwnedOnlyEnabled?' active':''}" type="button" data-hd-owned-only>${hdOwnedOnlyEnabled?'全候補を表示':'手持ちだけ'}</button><button class="ghost small" type="button" data-hd-owned-refresh>再判定</button></div></div>`;
+    return html.replace('<section class="hd-map-equip-recommend">',`<section class="hd-map-equip-recommend${hdOwnedOnlyEnabled?' hd-owned-only':''}">${summary}`);
   };
 }
 
@@ -90,9 +91,10 @@ document.addEventListener('click',e=>{
   if(only){
     const root=only.closest('.hd-map-equip-recommend');
     if(root){
-      const active=root.classList.toggle('hd-owned-only');
-      only.classList.toggle('active',active);
-      only.textContent=active?'全候補を表示':'手持ちだけ';
+      hdOwnedOnlyEnabled=!root.classList.contains('hd-owned-only');
+      root.classList.toggle('hd-owned-only',hdOwnedOnlyEnabled);
+      only.classList.toggle('active',hdOwnedOnlyEnabled);
+      only.textContent=hdOwnedOnlyEnabled?'全候補を表示':'手持ちだけ';
     }
     return;
   }
