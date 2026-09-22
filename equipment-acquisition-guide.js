@@ -136,13 +136,22 @@ function hdAGOpenItem(name,map=''){
  if(list)list.innerHTML=item?hdAGCandidateHtml(item):`<div class="empty">${hdAGEsc(name)} は装備図鑑の登録情報を確認してね。</div>`;
  if(d&&!d.open)d.showModal();
 }
+function hdAGForceReveal(target){
+ if(!target)return false;
+ for(let node=target;node&&node!==document.body;node=node.parentElement){
+  node.hidden=false;
+  node.classList?.remove('hd-ws-hidden','hd-ws-wrapper-hidden');
+  if(node.getAttribute?.('aria-hidden')==='true')node.setAttribute('aria-hidden','false');
+ }
+ target.scrollIntoView({behavior:'smooth',block:'start'});return true;
+}
 function hdAGShowElement(id){
  const target=document.getElementById(id);if(!target)return false;
  let opened=false;
  if(typeof window.hdRevealWorkspaceTarget==='function')opened=window.hdRevealWorkspaceTarget(target,true)!==false;
  if(!opened&&typeof hdWSShowElement==='function')opened=hdWSShowElement(target,true)!==false;
  if(!opened&&typeof hdQNJump==='function')opened=hdQNJump(id)!==false;
- if(!opened){target.hidden=false;target.classList?.remove('hd-ws-hidden');target.scrollIntoView({behavior:'smooth',block:'start'});opened=true}
+ if(!opened)opened=hdAGForceReveal(target);
  return opened;
 }
 function hdAGOpenDevelopment(name){
