@@ -3945,7 +3945,13 @@ test('release smoke: master ship procurement recovers failed lazy module', async
     const input = document.getElementById('hdShipDbSearch');
     if (input) input.value = candidate.name;
     hdRenderShipDatabase();
-    window.hdWSShowElement?.('shipDatabase', false);
+    const section=document.getElementById('shipDatabase');
+    if (typeof window.hdWSShowElement === 'function') window.hdWSShowElement(section || 'shipDatabase', false);
+    for(let node=section;node&&node!==document.body;node=node.parentElement){
+      node.hidden=false;
+      node.classList?.remove('hd-ws-hidden','hd-ws-wrapper-hidden');
+      if(node.getAttribute?.('aria-hidden')==='true')node.setAttribute('aria-hidden','false');
+    }
     return { id: candidate.id, name: candidate.name };
   });
   expect(row).toBeTruthy();
@@ -3995,7 +4001,13 @@ test('release smoke: master ship acquisition recovers failed lazy module', async
     const input = document.getElementById('hdShipDbSearch');
     if (input) input.value = candidate.name;
     hdRenderShipDatabase();
-    window.hdWSShowElement?.('shipDatabase', false);
+    const section=document.getElementById('shipDatabase');
+    if (typeof window.hdWSShowElement === 'function') window.hdWSShowElement(section || 'shipDatabase', false);
+    for(let node=section;node&&node!==document.body;node=node.parentElement){
+      node.hidden=false;
+      node.classList?.remove('hd-ws-hidden','hd-ws-wrapper-hidden');
+      if(node.getAttribute?.('aria-hidden')==='true')node.setAttribute('aria-hidden','false');
+    }
     return { id: candidate.id, name: candidate.name };
   });
   expect(row).toBeTruthy();
