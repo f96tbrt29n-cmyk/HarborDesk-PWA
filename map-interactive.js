@@ -127,8 +127,9 @@ function hdHighlightShortest(map){
   const host=hdEnsureNodeInfoHost();if(host)host.innerHTML=`<div class="eyebrow">ROUTE GUIDE</div><div class="hd-map-node-info-title"><strong>${hdEscAdv(path.map(x=>x==='START'?'出撃':x).join(' → '))}</strong><span>構造上の最短経路</span></div><p>これはグラフ上の最短経路表示で、実際の固定条件や推奨編成を保証するものではないよ。出撃前に「ルート」タブも確認してね。</p>${hdAdvancedHtml(map)}<div class="hd-node-actions"><button class="ghost small" type="button" data-open-route-tab>ルート条件を見る</button></div>`;
 }
 function hdOpenRouteTab(){
-  const btn=document.querySelector('[data-map-tab="route"]');if(!btn)return;
-  btn.click();
+  const btn=document.querySelector('[data-map-tab="route"]');if(btn){btn.click();return true}
+  if(typeof window.hdCoreOpenRouteFallback==='function')return !!window.hdCoreOpenRouteFallback();
+  return false;
 }
 function hdEnhanceMapPane(){
   const pane=document.querySelector('[data-map-pane="map"]');if(!pane||pane.dataset.hdEnhanced==='1')return;
