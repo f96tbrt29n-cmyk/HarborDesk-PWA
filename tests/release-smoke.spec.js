@@ -1661,6 +1661,41 @@ test('release smoke: readiness gate actions navigate to the right tools', async 
 });
 
 
+test('release smoke: readiness calculator and prep buttons survive missing map tabs', async ({ page }) => {
+  const errors = [];
+  await page.route('**/map-tabs.js*', route => route.abort());
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFEOpenCalculator === 'function' &&
+    typeof window.hdFEOpenPreparation === 'function' &&
+    typeof window.hdFCOpenFallback === 'function' &&
+    typeof window.hdSPSOpen === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await expect(page.locator('#guide')).toBeVisible();
+  await page.locator('[data-world="6"]').click();
+  await page.locator('[data-map="6-5"]').click();
+
+  await page.evaluate(() => {
+    const host=document.createElement('div');
+    host.id='hdReadinessActionHarness';
+    host.innerHTML='<button type="button" data-hd-fe-calculator>計算機</button><button type="button" data-hd-fe-prep>準備表</button>';
+    document.body.appendChild(host);
+  });
+
+  await page.locator('#hdReadinessActionHarness [data-hd-fe-calculator]').click();
+  await expect(page.locator('#hdFallbackGearTools #hdFleetCalculator')).toBeVisible({ timeout: 10000 });
+
+  await page.locator('#hdReadinessActionHarness [data-hd-fe-prep]').click();
+  await expect(page.locator('#hdSortiePreparation')).toBeVisible({ timeout: 10000 });
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: readiness fix navigation survives missing map tabs and workspace helper failure', async ({ page }) => {
   const errors = [];
   await page.route('**/map-tabs.js*', route => route.abort());
