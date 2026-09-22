@@ -4116,7 +4116,7 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
 
   const fallback = card.locator('[data-hd-core-map-tools]');
   await expect(fallback).toBeVisible();
-  for (const action of ['map','fleet','suggest','prep','gear','drop','mine']) {
+  for (const action of ['map','fleet','route','suggest','prep','gear','quest','drop','mine']) {
     await expect(fallback.locator(`[data-hd-core-map-action="${action}"]`)).toBeVisible();
   }
 
@@ -4141,6 +4141,41 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   await expect(fallbackFleet).toBeVisible();
   await expect(fallbackFleet).toContainText('編成例');
   await expect(fallbackMap).toBeHidden();
+
+  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await expect(fallback).toBeVisible();
+  await fallback.locator('[data-hd-core-map-action="route"]').click();
+  await expect(fallbackRoute).toBeVisible();
+  await expect(fallbackRoute.locator('#hdMapRouteRequirements')).toBeVisible();
+  await expect(fallbackFleet).toBeHidden();
+
+  await page.waitForFunction(() =>
+    typeof window.hdQuestRelatedToMap === 'function' &&
+    typeof window.hdQuestAddFromMap === 'function' &&
+    typeof window.hdQuestOpenFromMap === 'function',
+    null,
+    { timeout: 30000 }
+  );
+  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await expect(fallback).toBeVisible();
+  await fallback.locator('[data-hd-core-map-action="quest"]').click();
+  const fallbackQuest = page.locator('#hdFallbackQuestTools');
+  await expect(fallbackQuest).toBeVisible();
+  await expect(fallbackQuest).toContainText('2-4 関連任務');
+  const questCard = fallbackQuest.locator('[data-hd-core-quest-id]').first();
+  await expect(questCard).toBeVisible();
+  const questId = await questCard.getAttribute('data-hd-core-quest-id');
+  const questName = await questCard.locator('b').innerText();
+  await questCard.locator('[data-hd-core-quest-add="' + questId + '"]').click();
+  await expect.poll(async () => page.evaluate(id => state.quests.some(x => x.sourceId === id), questId)).toBe(true);
+
+  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await expect(fallback).toBeVisible();
+  await fallback.locator('[data-hd-core-map-action="quest"]').click();
+  await expect(fallbackQuest.locator('[data-hd-core-quest-add="' + questId + '"]')).toContainText('追加済み');
+  await fallbackQuest.locator('[data-hd-core-quest-open="' + questId + '"]').click();
+  await expect(page.locator('#questDatabase')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#hdQuestDbSearch')).toHaveValue(questName);
 
   await page.evaluate(() => window.hdWSShowElement?.('guide', false));
   await expect(fallback).toBeVisible();
