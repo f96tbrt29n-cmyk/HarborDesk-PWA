@@ -11,6 +11,12 @@ const HD_MAP_EQUIP_PRIORITY={
   '煙幕':['発煙装置(煙幕)']
 };
 
+function hdMapEquipEsc(s){
+  if(typeof hdMapEsc==='function')return hdMapEquipEsc(s);
+  if(typeof esc==='function')return esc(s);
+  return String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]||ch));
+}
+
 function hdMapEquipText(map){
   const d=typeof MAP_DETAILS!=='undefined'?MAP_DETAILS[map]||{}:{};
   const nodes=typeof HD_NODE_DETAIL_OVERRIDES!=='undefined'?HD_NODE_DETAIL_OVERRIDES[map]||{}:{};
@@ -66,7 +72,7 @@ function hdMapBasePick(map,limit=5){
 }
 function hdMapEquipCard(item,reason){
   const stats=typeof hdEquipStatText==='function'?hdEquipStatText(item):[];
-  return `<article class="hd-map-equip-card"><div class="hd-map-equip-card-head"><div><strong>${hdMapEsc(item.name)}</strong><span>${hdMapEsc(item.category||'')}</span></div><button class="ghost small" type="button" data-hd-map-equip-view="${hdMapEsc(item.name)}">図鑑で見る</button></div>${stats.length?`<div class="hd-map-equip-stats">${stats.slice(0,7).map(s=>`<span>${hdMapEsc(s)}</span>`).join('')}</div>`:''}<p>${hdMapEsc(reason||item.role||'')}</p><div class="hd-map-equip-actions"><button class="primary small" type="button" data-hd-equip-add="${hdMapEsc(item.name)}">台帳へ追加</button></div></article>`;
+  return `<article class="hd-map-equip-card"><div class="hd-map-equip-card-head"><div><strong>${hdMapEquipEsc(item.name)}</strong><span>${hdMapEquipEsc(item.category||'')}</span></div><button class="ghost small" type="button" data-hd-map-equip-view="${hdMapEquipEsc(item.name)}">図鑑で見る</button></div>${stats.length?`<div class="hd-map-equip-stats">${stats.slice(0,7).map(s=>`<span>${hdMapEquipEsc(s)}</span>`).join('')}</div>`:''}<p>${hdMapEquipEsc(reason||item.role||'')}</p><div class="hd-map-equip-actions"><button class="primary small" type="button" data-hd-equip-add="${hdMapEquipEsc(item.name)}">台帳へ追加</button></div></article>`;
 }
 function hdMapEquipRecommendationsHtml(map){
   if(typeof HD_EQUIPMENT_CATALOG==='undefined')return '<div class="empty">装備データベースを読み込み中</div>';
@@ -80,8 +86,8 @@ function hdMapEquipRecommendationsHtml(map){
   if(!groups.length){
     groups.push({label:'基本装備',reason:'この海域は特殊装備要求が比較的少ないため、火力・命中・制空を編成に合わせて調整。',items:hdMapEquipPick('索敵',3)});
   }
-  const los=adv.los?`<div class="hd-map-equip-alert"><b>索敵条件</b><span>${adv.los.coef!=null?`分岐点係数 ${adv.los.coef}｜`:''}${hdMapEsc(adv.los.summary||'')}</span></div>`:'';
-  return `<section class="hd-map-equip-recommend"><div class="hd-map-equip-title"><div><div class="eyebrow">MAP × EQUIPMENT</div><h4>この海域の装備候補</h4></div><button class="ghost small" type="button" data-hd-open-equip-db>装備図鑑を開く</button></div><p class="muted hd-map-equip-note">海域データから自動抽出した候補。固定の必須装備ではなく、編成・ルート・所持装備に合わせて調整してね。</p>${los}${groups.map(g=>`<div class="hd-map-equip-group"><div class="hd-map-equip-group-head"><strong>${hdMapEsc(g.label)}</strong><p>${hdMapEsc(g.reason)}</p></div><div class="hd-map-equip-grid">${g.items.map(x=>hdMapEquipCard(x,x.role)).join('')||'<div class="empty">候補装備を準備中</div>'}</div></div>`).join('')}</section>`;
+  const los=adv.los?`<div class="hd-map-equip-alert"><b>索敵条件</b><span>${adv.los.coef!=null?`分岐点係数 ${adv.los.coef}｜`:''}${hdMapEquipEsc(adv.los.summary||'')}</span></div>`:'';
+  return `<section class="hd-map-equip-recommend"><div class="hd-map-equip-title"><div><div class="eyebrow">MAP × EQUIPMENT</div><h4>この海域の装備候補</h4></div><button class="ghost small" type="button" data-hd-open-equip-db>装備図鑑を開く</button></div><p class="muted hd-map-equip-note">海域データから自動抽出した候補。固定の必須装備ではなく、編成・ルート・所持装備に合わせて調整してね。</p>${los}${groups.map(g=>`<div class="hd-map-equip-group"><div class="hd-map-equip-group-head"><strong>${hdMapEquipEsc(g.label)}</strong><p>${hdMapEquipEsc(g.reason)}</p></div><div class="hd-map-equip-grid">${g.items.map(x=>hdMapEquipCard(x,x.role)).join('')||'<div class="empty">候補装備を準備中</div>'}</div></div>`).join('')}</section>`;
 }
 function hdMapEquipRenderHost(){
   const fallback=document.querySelector('#hdFallbackGearTools #hdMapEquipRecommend');
