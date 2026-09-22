@@ -52,15 +52,17 @@ function hdQuestOpenFromMap(id){
  if(typeof hdEnsureQuestDb==='function')hdEnsureQuestDb();
  const search=document.getElementById('hdQuestDbSearch');if(search)search.value=q.name||q.id;
  if(typeof hdRenderQuestDb==='function')hdRenderQuestDb();
- const target=document.getElementById('questDatabase');
- if(target&&typeof window.hdWSShowElement==='function')window.hdWSShowElement(target,true);
- else target?.scrollIntoView({behavior:'smooth',block:'start'});
+ const target=document.getElementById('questDatabase');if(!target)return false;
+ let opened=false;
+ if(typeof window.hdRevealWorkspaceTarget==='function')opened=window.hdRevealWorkspaceTarget(target,true)!==false;
+ if(!opened&&typeof window.hdWSShowElement==='function')opened=window.hdWSShowElement(target,true)!==false;
+ if(!opened){target.hidden=false;target.classList?.remove('hd-ws-hidden');for(let p=target.parentElement;p&&p!==document.body;p=p.parentElement)p.classList?.remove('hd-ws-wrapper-hidden');target.scrollIntoView?.({behavior:'smooth',block:'start'});opened=true}
  setTimeout(()=>{
   const db=document.getElementById('questDatabase');
   if(!db||db.hidden||db.classList.contains('hd-ws-hidden'))return;
   document.querySelector(`#questDatabase [data-hd-quest-id="${id}"]`)?.scrollIntoView({behavior:'smooth',block:'center'});
  },80);
- return true;
+ return opened;
 }
 function hdQuestAddFromMap(id){
  const q=(HD_QUESTS||[]).find(x=>x.id===id);if(!q)return false;
