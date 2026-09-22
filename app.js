@@ -209,6 +209,7 @@ function hdCoreActivateFallbackPane(host){
  const card=document.getElementById('selectedMapCard');
  card?.querySelectorAll('[data-hd-core-fallback-pane]').forEach(x=>{const on=x===host;x.classList.toggle('active',on);x.hidden=!on});
  host.hidden=false;host.classList.add('active');
+ for(let p=host.parentElement;p&&p!==document.body;p=p.parentElement)p.classList?.remove('hd-ws-wrapper-hidden');
  hdCoreFallbackActive=String(host.dataset.mapPane||'');
  const guide=document.getElementById('guide');
  if(guide&&(guide.classList.contains('hd-ws-hidden')||guide.hidden)&&typeof window.hdWSShowElement==='function')window.hdWSShowElement('guide',false);
@@ -341,6 +342,10 @@ window.hdCoreActivateFallbackPane=hdCoreActivateFallbackPane;
 window.hdCoreClearFallbackState=hdCoreClearFallbackState;
 window.hdCoreScheduleFallbackRestore=hdCoreScheduleFallbackRestore;
 window.hdCoreRestoreFallback=hdCoreRestoreFallback;
+window.addEventListener('hd:workspace-changed',e=>{
+ const detail=e?.detail||{};
+ if((detail.group==='guide'||detail.section==='guide')&&hdCoreFallbackActive&&!document.querySelector('[data-map-tab]'))hdCoreScheduleFallbackRestore();
+});
 window.hdCoreOpenMapFallback=hdCoreOpenMapFallback;
 window.hdCoreOpenFleetFallback=hdCoreOpenFleetFallback;
 window.hdCoreOpenRouteFallback=hdCoreOpenRouteFallback;
