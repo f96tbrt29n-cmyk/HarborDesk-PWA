@@ -9347,6 +9347,21 @@ function hdShipDbAdd(base){
 }
 document.addEventListener('click',async e=>{
  if(e.target.closest?.('[data-hd-ship-owned-refresh]')){const card=e.target.closest('.hd-map-ship-candidate');if(card)hdShipDbRefreshOwnedFits(card);return}
+ const masterProcure=e.target.closest?.('[data-hd-master-procure]');
+ if(masterProcure&&typeof hdPLAddMasterLoadout!=='function'){
+  e.stopImmediatePropagation();
+  masterProcure.setAttribute('aria-busy','true');await hdShipDbEnsureCurrentAssets();masterProcure.removeAttribute('aria-busy');
+  const map=masterProcure.dataset.hdMasterMap||(typeof selectedMap!=='undefined'?selectedMap:'');
+  if(typeof hdPLAddMasterLoadout==='function'&&hdPLAddMasterLoadout(masterProcure.dataset.hdMasterProcure,masterProcure.dataset.hdMasterPlan||'',map)){if(typeof hdPLOpenList==='function')hdPLOpenList();return}
+  window.hdToast?.('調達リストを読み込めなかったよ。アプリ更新を試してね','warn');return;
+ }
+ const masterAcquire=e.target.closest?.('[data-hd-master-acquire]');
+ if(masterAcquire&&typeof hdAGOpenMaster!=='function'){
+  e.stopImmediatePropagation();
+  masterAcquire.setAttribute('aria-busy','true');await hdShipDbEnsureCurrentAssets();masterAcquire.removeAttribute('aria-busy');
+  if(typeof hdAGOpenMaster==='function'){hdAGOpenMaster(masterAcquire.dataset.hdMasterAcquire,masterAcquire.dataset.hdMasterWanted||'');return}
+  window.hdToast?.('入手候補を読み込めなかったよ。アプリ更新を試してね','warn');return;
+ }
  const procure=e.target.closest?.('[data-hd-ship-procure]');
  if(procure){
   const map=typeof selectedMap!=='undefined'?selectedMap:'';
