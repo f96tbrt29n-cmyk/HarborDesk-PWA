@@ -3738,6 +3738,7 @@ test('release smoke: map攻略 inner controls work end to end', async ({ page })
   await page.evaluate(() => {
     localStorage.removeItem('harbordesk-custom-fleets-v1');
     localStorage.removeItem('harbordesk-drop-hunts-v1');
+    localStorage.removeItem('harbordesk-equipment-v1');
     selectedWorld = '5';
     selectedMap = '5-6';
     renderMapPicker();
@@ -3779,6 +3780,19 @@ test('release smoke: map攻略 inner controls work end to end', async ({ page })
   await ownedOnly.click();
   await expect(gearPanel).not.toHaveClass(/hd-owned-only/);
 
+  const addEquip = gearPanel.locator('[data-hd-equip-add]').first();
+  await expect(addEquip).toBeVisible();
+  const addedEquipName = await addEquip.getAttribute('data-hd-equip-add');
+  await addEquip.click();
+  await expect(page.locator('#equipmentDialog')).toBeVisible();
+  await expect(page.locator('#equipmentName')).toHaveValue(addedEquipName || '');
+  await page.locator('#equipmentDialog button[value="default"]').click();
+  await expect.poll(async () => page.evaluate(name => {
+    const rows = JSON.parse(localStorage.getItem('harbordesk-equipment-v1') || '[]');
+    return rows.some(x => x.name === name && Number(x.count) > 0);
+  }, addedEquipName)).toBe(true);
+  await expect(gearPanel.locator('.hd-owned-card').filter({ hasText: addedEquipName || '' }).first()).toBeVisible();
+
   const viewButton = gearPanel.locator('[data-hd-map-equip-view]').first();
   const equipName = await viewButton.getAttribute('data-hd-map-equip-view');
   await viewButton.click();
@@ -3799,7 +3813,25 @@ test('release smoke: map攻略 inner controls work end to end', async ({ page })
   expect(hunts.length).toBeGreaterThan(0);
   await expect(page.locator('[data-hd-map-drop-ship].hunting').first()).toBeVisible();
 
+  await page.evaluate(() => window.hdWSShowElement?.('dropHuntingDb', true));
+  const huntCard = page.locator('#hdDropHuntList .hd-hunt-card').first();
+  await expect(huntCard).toBeVisible();
+  await huntCard.locator('[data-hd-hunt-add][data-field="runs"]').click();
+  await huntCard.locator('[data-hd-hunt-add][data-field="s"]').click();
+  await huntCard.locator('[data-hd-hunt-add][data-field="a"]').click();
+  let huntState = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1') || '[]')[0]);
+  expect(huntState.runs).toBe(3);
+  expect(huntState.s).toBe(1);
+  expect(huntState.a).toBe(1);
+  await huntCard.locator('[data-hd-hunt-obtained]').click();
+  huntState = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1') || '[]')[0]);
+  expect(huntState.obtained).toBe(true);
+  await expect(page.locator('#hdDropHuntList .hd-hunt-card').first()).toHaveClass(/done/);
+  await page.locator('#hdDropHuntList .hd-hunt-card').first().locator('[data-hd-hunt-delete]').click();
+  await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1') || '[]').length)).toBe(0);
+
   await page.evaluate(() => {
+    window.hdWSShowElement?.('guide', false);
     selectedWorld = '5';
     selectedMap = '5-5';
     renderMapPicker();
@@ -3812,8 +3844,23 @@ test('release smoke: map攻略 inner controls work end to end', async ({ page })
   await page.locator('#cfGear0').fill('艦戦');
   await page.locator('#customFleetDialog button[value="default"]').click();
   await expect(page.locator('#customFleetPanel')).toContainText('回帰テスト編成');
-  const fleets = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1') || '{}')['5-5'] || []);
+  let fleets = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1') || '{}')['5-5'] || []);
   expect(fleets.some(x => x.name === '回帰テスト編成')).toBe(true);
+
+  const createdFleet = page.locator('#customFleetPanel .custom-fleet-card').filter({ hasText: '回帰テスト編成' }).first();
+  await createdFleet.locator('[data-cf-edit]').click();
+  await expect(page.locator('#customFleetDialog')).toBeVisible();
+  await page.locator('#customFleetName').fill('回帰テスト編成・編集済み');
+  await page.locator('#customFleetDialog button[value="default"]').click();
+  await expect(page.locator('#customFleetPanel')).toContainText('回帰テスト編成・編集済み');
+  fleets = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1') || '{}')['5-5'] || []);
+  expect(fleets.some(x => x.name === '回帰テスト編成・編集済み')).toBe(true);
+
+  const editedFleet = page.locator('#customFleetPanel .custom-fleet-card').filter({ hasText: '回帰テスト編成・編集済み' }).first();
+  await editedFleet.locator('[data-cf-delete]').click();
+  await expect(page.locator('#customFleetPanel')).not.toContainText('回帰テスト編成・編集済み');
+  fleets = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1') || '{}')['5-5'] || []);
+  expect(fleets.some(x => x.name === '回帰テスト編成・編集済み')).toBe(false);
 
   expect(errors).toEqual([]);
 });
