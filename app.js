@@ -179,9 +179,11 @@ function hdCoreMapToolsHtml(){
   <div class="hd-core-map-tools-grid">
    <button type="button" data-hd-core-map-action="map">マップ詳細</button>
    <button type="button" data-hd-core-map-action="fleet">編成</button>
+   <button type="button" data-hd-core-map-action="route">ルート</button>
    <button type="button" data-hd-core-map-action="suggest">編成候補</button>
    <button type="button" data-hd-core-map-action="prep">出撃準備</button>
    <button type="button" data-hd-core-map-action="gear">装備・計算</button>
+   <button type="button" data-hd-core-map-action="quest">任務</button>
    <button type="button" data-hd-core-map-action="drop">ドロップ</button>
    <button type="button" data-hd-core-map-action="mine">自分用</button>
   </div>
@@ -228,6 +230,39 @@ function hdCoreOpenRouteFallback(){
  const req=host.querySelector('#hdMapRouteRequirements');if(req&&typeof window.hdAdvancedHtml==='function')req.innerHTML=window.hdAdvancedHtml(selectedMap);
  return hdCoreActivateFallbackPane(host);
 }
+function hdCoreQuestRows(map){
+ const rows=[],seen=new Set(),add=q=>{if(!q?.name)return;const key=String(q.id||q.name);if(seen.has(key))return;seen.add(key);rows.push(q)};
+ const plan=typeof MAP_PLANS!=='undefined'?MAP_PLANS[map]:null;
+ for(const q of plan?.quests||[])add({...q,source:'plan'});
+ const linked=typeof window.hdQuestRelatedToMap==='function'?(window.hdQuestRelatedToMap(map)||[]):[];
+ for(const q of linked){
+  const kind=typeof HD_QUEST_CYCLE_LABEL!=='undefined'?(HD_QUEST_CYCLE_LABEL[q.cycle]||q.cycle):q.cycle;
+  add({...q,kind,source:'database'});
+ }
+ return rows;
+}
+function hdCoreQuestHtml(map){
+ const rows=hdCoreQuestRows(map);
+ if(!rows.length)return '<div class="empty">この海域に紐づく任務は現在のデータでは見つからないよ。</div>';
+ return rows.map(q=>{
+  const id=String(q.id||''),controls=id?`<div class="quest-tab-actions"><button type="button" class="ghost small" data-hd-core-quest-open="${esc(id)}">任務詳細</button><button type="button" class="primary small" data-hd-core-quest-add="${esc(id)}">${esc(typeof window.hdQuestMapChecklistLabel==='function'?window.hdQuestMapChecklistLabel(id):'チェックに追加')}</button></div>`:'';
+  return `<article class="map-tab-card quest-tab-card" ${id?`data-hd-core-quest-id="${esc(id)}"`:''}><span class="quest-kind">${esc(q.kind||q.cycle||'関連任務')}</span><div><b>${esc(q.name)}</b><p>${esc(q.condition||'達成条件を確認')}</p>${controls}</div></article>`;
+ }).join('');
+}
+function hdCoreOpenQuestFallback(){
+ if(!selectedMap)return false;
+ const host=hdCoreFallbackHost('hdFallbackQuestTools','quest');if(!host)return false;
+ host.innerHTML=`<div class="map-tab-card"><b>${esc(selectedMap)} 関連任務</b><p>この海域に関係する任務を確認して、チェックリストへ追加できるよ。</p></div>${hdCoreQuestHtml(selectedMap)}`;
+ return hdCoreActivateFallbackPane(host);
+}
+async function hdCoreQuestAction(kind,id){
+ const fn=kind==='open'?'hdQuestOpenFromMap':'hdQuestAddFromMap';
+ if(typeof window[fn]!=='function'&&typeof window.hdEnsureCurrentAssets==='function'){try{await window.hdEnsureCurrentAssets()}catch{}}
+ if(typeof window[fn]!=='function'){window.hdToast?.('任務機能を読み込めなかったよ。アプリ更新を試してね','warn');return false}
+ const ok=window[fn](id);
+ if(kind==='add'&&selectedMap)setTimeout(()=>{const host=document.getElementById('hdFallbackQuestTools');if(host)host.innerHTML=`<div class="map-tab-card"><b>${esc(selectedMap)} 関連任務</b><p>この海域に関係する任務を確認して、チェックリストへ追加できるよ。</p></div>${hdCoreQuestHtml(selectedMap)}`},0);
+ return ok!==false;
+}
 async function hdCoreMapAction(action){
  if(!action)return false;
  if(typeof window.hdMapOpenTool==='function'){
@@ -250,7 +285,9 @@ async function hdCoreMapAction(action){
  if(tab){tab.click();return true}
  if(action==='map'&&hdCoreOpenMapFallback())return true;
  if(action==='fleet'&&hdCoreOpenFleetFallback())return true;
+ if(action==='route'&&hdCoreOpenRouteFallback())return true;
  if(action==='gear'&&typeof window.hdFCOpenFallback==='function'&&window.hdFCOpenFallback())return true;
+ if(action==='quest'&&hdCoreOpenQuestFallback())return true;
  if(action==='drop'&&typeof window.hdDropOpenMapPanel==='function'&&window.hdDropOpenMapPanel())return true;
  if(action==='mine'&&typeof window.cfOpenMapPanel==='function'&&window.cfOpenMapPanel())return true;
  const targets={gear:'hdFleetCalculator',drop:'dropHuntingDb',mine:'customFleetPanel'};
@@ -266,6 +303,8 @@ window.hdCoreActivateFallbackPane=hdCoreActivateFallbackPane;
 window.hdCoreOpenMapFallback=hdCoreOpenMapFallback;
 window.hdCoreOpenFleetFallback=hdCoreOpenFleetFallback;
 window.hdCoreOpenRouteFallback=hdCoreOpenRouteFallback;
+window.hdCoreOpenQuestFallback=hdCoreOpenQuestFallback;
+window.hdCoreQuestAction=hdCoreQuestAction;
 window.hdCoreMapAction=hdCoreMapAction;
 
 function renderMapPicker(){
@@ -303,6 +342,8 @@ document.addEventListener('click',e=>{
  const world=e.target.closest('[data-world]');if(world){selectedWorld=world.dataset.world;selectedMap='';guideViewSave({world:selectedWorld,map:''});renderGuide();return}
  const map=e.target.closest('[data-map]');if(map){selectedMap=map.dataset.map;selectedWorld=selectedMap.split('-')[0];guideViewSave({world:selectedWorld,map:selectedMap});renderGuide();document.getElementById('selectedMapCard').scrollIntoView({behavior:'smooth',block:'center'});return}
  const coreMapAction=e.target.closest('[data-hd-core-map-action]');if(coreMapAction){hdCoreMapAction(coreMapAction.dataset.hdCoreMapAction).catch(()=>{});return}
+ const coreQuestOpen=e.target.closest('[data-hd-core-quest-open]');if(coreQuestOpen){hdCoreQuestAction('open',coreQuestOpen.dataset.hdCoreQuestOpen).catch(()=>{});return}
+ const coreQuestAdd=e.target.closest('[data-hd-core-quest-add]');if(coreQuestAdd){hdCoreQuestAction('add',coreQuestAdd.dataset.hdCoreQuestAdd).catch(()=>{});return}
  const clearGuideQuery=e.target.closest('[data-guide-clear-query]');if(clearGuideQuery){const input=document.getElementById('guideQuery');if(input)input.value='';guideViewSave({query:''});renderGuide();input?.focus();return}
  if(e.target.closest('[data-guide-show-all]')){guideFilter='all';guideViewSave({filter:'all'});renderGuide();return}
  const gf=e.target.closest('[data-guide-filter]');if(gf){guideFilter=gf.dataset.guideFilter;guideViewSave({filter:guideFilter});renderGuide();return}
