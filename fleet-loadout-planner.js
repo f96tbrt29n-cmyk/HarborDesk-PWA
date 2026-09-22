@@ -45,7 +45,10 @@ function hdFLSlotCapacity(slot,index){
 }
 function hdFLCompatible(item,slot){
  const exact=hdFLShipDbItem(slot);
- if(exact&&typeof hdShipDbEquipCompatible==='function')return hdShipDbEquipCompatible(item,exact);
+ if(exact&&typeof hdShipDbMasterCompatible==='function'){
+  const master=hdShipDbMasterCompatible(item,exact);
+  if(master!==null)return master;
+ }
  const type=hdFLType(slot),cat=String(item.category||''),roles=hdFLRoles(slot);
  if(/陸上攻撃機|陸軍戦闘機|局地戦闘機/.test(cat))return false;
  if(/艦上戦闘機|艦上攻撃機|艦上爆撃機|艦上偵察機/.test(cat))return hdFLIsCarrier(type);
