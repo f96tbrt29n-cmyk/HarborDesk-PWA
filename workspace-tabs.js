@@ -461,9 +461,13 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
  }finally{hdWSApplying=false}
 }
 function hdWSRevealElement(target,scroll=true,opts={}){
- if(opts.history!==false)hdWSPushHistory();
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
  const section=hdWSManagedSectionFor(el);if(!section)return false;
+ // A direct navigation request is newer than deferred startup restoration.
+ // Mark startup context handled before changing workspace state so slower WebKit
+ // cannot restore the initial guide section over the user's requested target.
+ if(!hdWSStartupContextHandled)hdWSStartupContextHandled=true;
+ if(opts.history!==false)hdWSPushHistory();
  const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
  clearTimeout(hdWSRefreshTimer);
  hdWSNavLockUntil=Date.now()+900;hdWSSetPin(group,section.id,900);const navSeq=++hdWSNavSeq;
