@@ -4202,7 +4202,15 @@ test('release smoke:攻略 secondary navigation survives workspace helper outage
   await expect.poll(() => page.evaluate(() => window.__hdCopiedPrep || '')).toContain('6-5');
 
   await prep.locator('[data-hd-sps-workspace="roster"]').click();
+  await expect.poll(() => page.evaluate(() => window.__hdFallbackScrollTargets)).toContain('roster');
+
+  await page.evaluate(() => window.hdSPSOpen());
+  await expect(prep).toBeVisible();
   await prep.locator('[data-hd-sps-workspace="hdEquipmentProcurement"]').click();
+  await expect.poll(() => page.evaluate(() => window.__hdFallbackScrollTargets)).toContain('hdEquipmentProcurement');
+
+  await page.evaluate(() => window.hdSPSOpen());
+  await expect(prep).toBeVisible();
   await prep.locator('[data-hd-sps-guide]').click();
 
   const targets = await page.evaluate(() => window.__hdFallbackScrollTargets);
@@ -5235,7 +5243,7 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   await expect(fallbackRoute).toBeVisible();
   await expect(fallbackRoute.locator('#hdMapRouteRequirements')).toBeVisible();
 
-  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="fleet"]').click();
   const fallbackFleet = page.locator('#hdFallbackFleetTools');
@@ -5243,7 +5251,7 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   await expect(fallbackFleet).toContainText('編成例');
   await expect(fallbackMap).toBeHidden();
 
-  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="route"]').click();
   await expect(fallbackRoute).toBeVisible();
@@ -5257,7 +5265,7 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
     null,
     { timeout: 30000 }
   );
-  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="quest"]').click();
   const fallbackQuest = page.locator('#hdFallbackQuestTools');
@@ -5270,7 +5278,7 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   await questCard.locator('[data-hd-core-quest-add="' + questId + '"]').click();
   await expect.poll(async () => page.evaluate(id => state.quests.some(x => x.sourceId === id), questId)).toBe(true);
 
-  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="quest"]').click();
   await expect(fallbackQuest.locator('[data-hd-core-quest-add="' + questId + '"]')).toContainText('追加済み');
@@ -5278,22 +5286,22 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   await expect(page.locator('#questDatabase')).toBeVisible({ timeout: 5000 });
   await expect(page.locator('#hdQuestDbSearch')).toHaveValue(questName);
 
-  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="suggest"]').click();
   await expect(page.locator('#hdFleetSuggester')).toBeVisible({ timeout: 5000 });
 
-  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="prep"]').click();
   await expect(page.locator('#hdSortiePreparation')).toBeVisible({ timeout: 5000 });
 
-  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="gear"]').click();
   await expect(page.locator('#hdFleetCalculator')).toBeVisible({ timeout: 5000 });
 
-  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="drop"]').click();
   const fallbackDrop = page.locator('#hdFallbackDropTools');
@@ -5309,7 +5317,7 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   expect(hunts.some(x => x.map === '2-4')).toBe(true);
   await expect(fallbackDrop.locator('[data-hd-map-drop-ship].hunting').first()).toBeVisible();
 
-  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="mine"]').click();
   await expect(page.locator('#customFleetPanel')).toBeVisible({ timeout: 5000 });
