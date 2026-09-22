@@ -4762,6 +4762,39 @@ test('release smoke: fallback prep action recovers a failed lazy攻略 module', 
 });
 
 
+test('release smoke: sortie preparation opens fallback gear without readiness tab helper', async ({ page }) => {
+  const errors = [];
+  await page.route('**/map-tabs.js*', route => route.abort());
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSPSOpen === 'function' &&
+    typeof window.hdFCOpenFallback === 'function' &&
+    typeof window.hdCoreMapAction === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await expect(page.locator('#guide')).toBeVisible();
+  await page.locator('[data-world="6"]').click();
+  await page.locator('[data-map="6-5"]').click();
+
+  const fallback = page.locator('#selectedMapCard [data-hd-core-map-tools]');
+  await expect(fallback).toBeVisible();
+  await fallback.locator('[data-hd-core-map-action="prep"]').click();
+  await expect(page.locator('#hdSortiePreparation')).toBeVisible({ timeout: 5000 });
+
+  await page.evaluate(() => { window.hdSortieOpenTab = undefined; });
+  const gearAction = page.locator('#hdSortiePreparation [data-hd-sps-tab="gear"]').first();
+  await expect(gearAction).toBeVisible();
+  await gearAction.click();
+
+  await expect(page.locator('#hdFallbackGearTools')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#hdFallbackGearTools #hdFleetCalculator')).toBeVisible({ timeout: 5000 });
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: fallback suggestion action recovers a failed lazy攻略 module', async ({ page }) => {
   const errors = [];
   let blockSuggest = true;
