@@ -190,6 +190,12 @@ function hdCoreMapToolsHtml(){
  </section>`;
 }
 let hdCoreFallbackActive='';
+let hdCoreFallbackRestoreSeq=0;
+function hdCoreClearFallbackState(){
+ hdCoreFallbackActive='';
+ hdCoreFallbackRestoreSeq++;
+ return true;
+}
 function hdCoreFallbackHost(id,pane){
  const card=document.getElementById('selectedMapCard');if(!card)return null;
  let host=document.getElementById(id);
@@ -224,8 +230,13 @@ function hdCoreRestoreFallback(){
  const fn=openers[hdCoreFallbackActive];return typeof fn==='function'?!!fn():false;
 }
 function hdCoreScheduleFallbackRestore(){
- if(!hdCoreFallbackActive||document.querySelector('[data-map-tab]'))return;
- setTimeout(()=>{if(hdCoreFallbackActive&&!document.querySelector('[data-map-tab]'))hdCoreRestoreFallback()},0);
+ if(!hdCoreFallbackActive||document.querySelector('[data-map-tab]'))return false;
+ const map=String(selectedMap||''),seq=++hdCoreFallbackRestoreSeq;
+ setTimeout(()=>{
+  if(seq!==hdCoreFallbackRestoreSeq||String(selectedMap||'')!==map||document.querySelector('[data-map-tab]'))return;
+  hdCoreRestoreFallback();
+ },0);
+ return true;
 }
 function hdCoreOpenMapFallback(){
  if(!selectedMap)return false;
@@ -322,6 +333,8 @@ async function hdCoreMapAction(action){
 }
 window.hdCoreMapToolsHtml=hdCoreMapToolsHtml;
 window.hdCoreActivateFallbackPane=hdCoreActivateFallbackPane;
+window.hdCoreClearFallbackState=hdCoreClearFallbackState;
+window.hdCoreScheduleFallbackRestore=hdCoreScheduleFallbackRestore;
 window.hdCoreRestoreFallback=hdCoreRestoreFallback;
 window.hdCoreOpenMapFallback=hdCoreOpenMapFallback;
 window.hdCoreOpenFleetFallback=hdCoreOpenFleetFallback;
@@ -341,7 +354,7 @@ function renderMapPicker(){
   return;
  }
  card.innerHTML=`<article class="map-detail-card"><div class="map-detail-title"><div><span class="guide-tag">${WORLD_NAMES[selectedWorld]}</span><h3>${selectedMap} ${esc(d.name)}</h3><div class="muted">${esc(d.sourceDate)}</div></div></div><div class="map-detail-section"><strong>概要</strong><p>${esc(d.overview)}</p></div>${hdCoreMapToolsHtml()}<div class="map-detail-grid"><div class="map-detail-section"><strong>おすすめ編成</strong><p>${esc(d.formation)}</p></div><div class="map-detail-section"><strong>主なルート</strong><p>${esc(d.route)}</p></div><div class="map-detail-section"><strong>制空・航空</strong><p>${esc(d.air)}</p></div><div class="map-detail-section warn"><strong>注意点</strong><p>${esc(d.caution)}</p></div></div><div class="map-detail-actions"><a class="guide-link" href="${wikiMapUrl(selectedMap)}" target="_blank" rel="noopener">最新の攻略Wikiを確認 ↗</a></div></article>`;
- hdCoreScheduleFallbackRestore();
+ 
 }
 
 window.hdMapBaseRenderPicker=renderMapPicker;
