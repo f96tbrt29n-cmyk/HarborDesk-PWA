@@ -3588,6 +3588,55 @@ test('release smoke: every map shows recommended level guidance', async ({ page 
 });
 
 
+test('release smoke: every map opens every攻略 tab with usable content', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdMapActivateTab === 'function' &&
+    typeof window.renderMapPicker === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  const result = await page.evaluate(() => {
+    const maps = Object.values(MAPS).flat();
+    const tabs = ['overview','map','fleet','route','gear','quest','drop','mine'];
+    const failures = [];
+
+    for (const map of maps) {
+      selectedWorld = String(map).split('-')[0];
+      selectedMap = map;
+      window.renderMapPicker();
+
+      for (const tab of tabs) {
+        const btn = document.querySelector(`[data-map-tab="${tab}"]`);
+        const pane = document.querySelector(`[data-map-pane="${tab}"]`);
+        if (!btn || !pane) {
+          failures.push({ map, tab, reason: !btn ? 'missing button' : 'missing pane' });
+          continue;
+        }
+        const opened = window.hdMapActivateTab(tab, btn);
+        const text = String(pane.textContent || '').replace(/\\s+/g, ' ').trim();
+        if (!opened || !pane.classList.contains('active')) {
+          failures.push({ map, tab, reason: 'did not activate' });
+        } else if (!text) {
+          failures.push({ map, tab, reason: 'empty pane' });
+        }
+      }
+    }
+
+    selectedWorld = '2';
+    selectedMap = '2-4';
+    window.renderMapPicker();
+    return { mapCount: maps.length, failures };
+  });
+
+  expect(result.mapCount).toBe(37);
+  expect(result.failures).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map攻略 tools survive tab redraws', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
