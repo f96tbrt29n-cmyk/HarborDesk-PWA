@@ -183,7 +183,7 @@ function hdSPSOpen(){
 }
 function hdSPSOpenMapTab(tab,focusBase=false){
  if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);
- setTimeout(()=>{if(typeof hdSortieOpenTab==='function')hdSortieOpenTab(tab);else document.querySelector(`[data-map-tab="${tab}"]`)?.click();if(focusBase)setTimeout(()=>document.getElementById('hdLandBasePlanner')?.scrollIntoView({behavior:'smooth',block:'start'}),120)},80);
+ setTimeout(()=>{if(typeof hdSortieOpenTab==='function')hdSortieOpenTab(tab);else if(typeof window.hdCoreMapAction==='function')Promise.resolve(window.hdCoreMapAction(tab)).catch(()=>{});else document.querySelector(`[data-map-tab="${tab}"]`)?.click();if(focusBase)setTimeout(()=>document.getElementById('hdLandBasePlanner')?.scrollIntoView({behavior:'smooth',block:'start'}),120)},80);
 }
 function hdSPSMapButton(){
  const head=document.querySelector('#selectedMapCard .map-tabs-head');if(!head||head.querySelector('[data-hd-sps-open]'))return;
