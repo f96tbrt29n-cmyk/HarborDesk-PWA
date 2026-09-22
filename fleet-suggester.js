@@ -161,12 +161,22 @@ function hdFSReveal(target){
 function hdFSOpen(){hdFSEnsure();var target=document.getElementById('hdFleetSuggester');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdFleetSuggester',true)))hdFSReveal(target);setTimeout(hdFSRender,30)}
 function hdFSOpenRoster(){if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return true;return hdFSReveal(document.getElementById('roster'))}
 function hdFSMapButton(){var head=document.querySelector('#selectedMapCard .map-tabs-head');if(!head||head.querySelector('[data-hd-fs-open]'))return;var b=document.createElement('button');b.type='button';b.className='ghost small';b.setAttribute('data-hd-fs-open','1');b.textContent='編成候補';head.appendChild(b)}
+async function hdFSOpenAcquire(kind,button){
+ if(!kind)return false;
+ if(typeof hdAGOpen!=='function'&&typeof window.hdEnsureCurrentAssets==='function'){
+  button&&button.setAttribute('aria-busy','true');
+  try{await window.hdEnsureCurrentAssets()}catch(e){}
+  finally{button&&button.removeAttribute('aria-busy')}
+ }
+ if(typeof hdAGOpen==='function'){hdAGOpen(kind,hdFSMap());return true}
+ window.hdToast?.('入手ルートを読み込めなかったよ。アプリ更新を試してね','warn');return false;
+}
 document.addEventListener('click',function(e){
  if(e.target.closest('[data-hd-fs-open]')){hdFSOpen();return}
  if(e.target.closest('[data-hd-fs-refresh]')){hdFSRender();return}
  var save=e.target.closest('[data-hd-fs-save]');if(save){hdFSSave(save.getAttribute('data-hd-fs-save'));return}
  if(e.target.closest('[data-hd-fs-roster]')){hdFSOpenRoster();return}
- var acq=e.target.closest('[data-hd-fs-acquire]');if(acq&&typeof hdAGOpen==='function'){hdAGOpen(acq.getAttribute('data-hd-fs-acquire'),hdFSMap());return}
+ var acq=e.target.closest('[data-hd-fs-acquire]');if(acq){hdFSOpenAcquire(acq.getAttribute('data-hd-fs-acquire'),acq);return}
 });
 window.addEventListener('storage',function(e){if(['harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-custom-fleets-v1'].includes(e.key))hdFSRender()});
 window.addEventListener('hd:kancolle-sync',hdFSRender);
