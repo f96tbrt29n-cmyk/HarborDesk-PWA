@@ -296,6 +296,7 @@ function hdMapDropRefreshCurrent(){
  const host=document.getElementById('hdFallbackDropTools');
  if(host&&typeof selectedMap!=='undefined'&&selectedMap){
   host.innerHTML=hdMapDropHtml(selectedMap);
+  if(!document.querySelector('[data-map-tab]')&&typeof window.hdCoreActivateFallbackPane==='function')window.hdCoreActivateFallbackPane(host);
   return true;
  }
  if(typeof hdApplyMapTabs==='function'){hdApplyMapTabs();return true}
