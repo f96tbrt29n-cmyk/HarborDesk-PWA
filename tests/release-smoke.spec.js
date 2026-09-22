@@ -4103,6 +4103,57 @@ test('release smoke: map fleet owned-loadout opens ledger and refreshes from equ
 });
 
 
+test('release smoke: map tab selection persists independently per map', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdMapActivateTab === 'function' &&
+    typeof window.renderMapPicker === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-map-tab-v1');
+    selectedWorld = '2';
+    selectedMap = '2-4';
+    renderMapPicker();
+  });
+  await page.locator('[data-map-tab="drop"]').click();
+  await expect(page.locator('[data-map-pane="drop"]')).toBeVisible();
+
+  await page.evaluate(() => {
+    selectedWorld = '5';
+    selectedMap = '5-5';
+    renderMapPicker();
+  });
+  await expect(page.locator('[data-map-tab="overview"]')).toHaveClass(/active/);
+  await page.locator('[data-map-tab="mine"]').click();
+  await expect(page.locator('[data-map-pane="mine"]')).toBeVisible();
+
+  await page.evaluate(() => {
+    selectedWorld = '2';
+    selectedMap = '2-4';
+    renderMapPicker();
+  });
+  await expect(page.locator('[data-map-tab="drop"]')).toHaveClass(/active/);
+  await expect(page.locator('[data-map-pane="drop"]')).toBeVisible();
+
+  await page.evaluate(() => {
+    selectedWorld = '5';
+    selectedMap = '5-5';
+    renderMapPicker();
+  });
+  await expect(page.locator('[data-map-tab="mine"]')).toHaveClass(/active/);
+  await expect(page.locator('[data-map-pane="mine"]')).toBeVisible();
+
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-map-tab-v1') || '{}'));
+  expect(stored['2-4']).toBe('drop');
+  expect(stored['5-5']).toBe('mine');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: stale saved map攻略 tab falls back to overview', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
