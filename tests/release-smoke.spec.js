@@ -3945,6 +3945,14 @@ test('release smoke: master ship procurement recovers failed lazy module', async
     const input = document.getElementById('hdShipDbSearch');
     if (input) input.value = candidate.name;
     hdRenderShipDatabase();
+    const list=document.getElementById('hdShipDbList');
+    list?.classList.remove('hd-compact');
+    const compactBtn=document.querySelector('[data-hd-shipdb-compact]');
+    if(compactBtn)compactBtn.textContent='コンパクト';
+    try{
+      const view=JSON.parse(sessionStorage.getItem('harbordesk-session-shipdb-view-v1')||'{}');
+      sessionStorage.setItem('harbordesk-session-shipdb-view-v1',JSON.stringify({...view,compact:false,query:candidate.name,includeMaster:true}));
+    }catch{}
     const section=document.getElementById('shipDatabase');
     if (typeof window.hdWSShowElement === 'function') window.hdWSShowElement(section || 'shipDatabase', false);
     for(let node=section;node&&node!==document.body;node=node.parentElement){
@@ -4001,6 +4009,14 @@ test('release smoke: master ship acquisition recovers failed lazy module', async
     const input = document.getElementById('hdShipDbSearch');
     if (input) input.value = candidate.name;
     hdRenderShipDatabase();
+    const list=document.getElementById('hdShipDbList');
+    list?.classList.remove('hd-compact');
+    const compactBtn=document.querySelector('[data-hd-shipdb-compact]');
+    if(compactBtn)compactBtn.textContent='コンパクト';
+    try{
+      const view=JSON.parse(sessionStorage.getItem('harbordesk-session-shipdb-view-v1')||'{}');
+      sessionStorage.setItem('harbordesk-session-shipdb-view-v1',JSON.stringify({...view,compact:false,query:candidate.name,includeMaster:true}));
+    }catch{}
     const section=document.getElementById('shipDatabase');
     if (typeof window.hdWSShowElement === 'function') window.hdWSShowElement(section || 'shipDatabase', false);
     for(let node=section;node&&node!==document.body;node=node.parentElement){
