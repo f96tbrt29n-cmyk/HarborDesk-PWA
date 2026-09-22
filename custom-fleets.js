@@ -156,12 +156,13 @@ function cfOpenMapPanel(){
  let pane=document.getElementById('hdFallbackMineTools');
  if(!pane){pane=document.createElement('div');pane.id='hdFallbackMineTools';card.appendChild(pane)}
  pane.className='custom-fleet-fallback map-tab-pane active';
- pane.dataset.mapPane='mine';
+ pane.dataset.mapPane='mine';pane.dataset.hdCoreFallbackPane='1';
  renderCustomFleets(selectedMap);
  const fleet=document.getElementById('customFleetPanel');
  if(fleet&&fleet.parentElement!==pane)pane.appendChild(fleet);
  if(typeof window.hdRenderSortieReadiness==='function')window.hdRenderSortieReadiness();
  if(typeof window.hdSPRender==='function')window.hdSPRender();
+ if(typeof window.hdCoreActivateFallbackPane==='function')return !!window.hdCoreActivateFallbackPane(pane);
  if(typeof window.hdWSShowElement==='function')window.hdWSShowElement(pane,true);else pane.scrollIntoView({behavior:'smooth',block:'start'});
  return true;
 }
