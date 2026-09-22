@@ -200,6 +200,16 @@ function hdSPSMapButton(){
  const head=document.querySelector('#selectedMapCard .map-tabs-head');if(!head||head.querySelector('[data-hd-sps-open]'))return;
  const b=document.createElement('button');b.type='button';b.className='primary small hd-sps-open';b.dataset.hdSpsOpen='1';b.textContent='出撃準備表';head.appendChild(b);
 }
+async function hdSPSOpenAcquire(kind,button=null){
+ if(!kind)return false;
+ if(typeof hdAGOpen!=='function'&&typeof window.hdEnsureCurrentAssets==='function'){
+  button?.setAttribute('aria-busy','true');
+  try{await window.hdEnsureCurrentAssets()}catch{}
+  finally{button?.removeAttribute('aria-busy')}
+ }
+ if(typeof hdAGOpen==='function'){hdAGOpen(kind,hdSPSMap());return true}
+ window.hdToast?.('入手ルートを読み込めなかったよ。アプリ更新を試してね','warn');return false;
+}
 document.addEventListener('click',e=>{
  if(e.target.closest?.('[data-hd-sps-open]')){hdSPSOpen();return}
  if(e.target.closest?.('[data-hd-sps-refresh]')){hdSPSRender();return}
@@ -207,7 +217,7 @@ document.addEventListener('click',e=>{
  if(e.target.closest?.('[data-hd-sps-guide]')){hdSPSOpenWorkspace('guide');return}
  const tab=e.target.closest?.('[data-hd-sps-tab]');if(tab){hdSPSOpenMapTab(tab.dataset.hdSpsTab,tab.hasAttribute('data-hd-sps-focus-base'));return}
  const ws=e.target.closest?.('[data-hd-sps-workspace]');if(ws){hdSPSOpenWorkspace(ws.dataset.hdSpsWorkspace);return}
- const acq=e.target.closest?.('[data-hd-sps-acquire]');if(acq&&typeof hdAGOpen==='function'){hdAGOpen(acq.dataset.hdSpsAcquire,hdSPSMap());return}
+ const acq=e.target.closest?.('[data-hd-sps-acquire]');if(acq){hdSPSOpenAcquire(acq.dataset.hdSpsAcquire,acq);return}
 });
 window.addEventListener('hd:map-rendered',()=>{hdSPSMapButton();hdSPSRender()});
 window.addEventListener('hd:kancolle-sync',hdSPSRender);
