@@ -346,7 +346,11 @@ async function hdCoreMapAction(action){
   return false;
  }
  const tab=document.querySelector(`[data-map-tab="${action}"]`);
- if(tab){hdCoreFallbackActive='';tab.click();return true}
+ if(tab){
+  hdCoreFallbackActive='';
+  if(typeof window.hdMapActivateTab==='function'&&window.hdMapActivateTab(action,tab))return true;
+  tab.click();return true;
+ }
  const fallbackNeeds={gear:'hdFCOpenFallback',drop:'hdDropOpenMapPanel',mine:'cfOpenMapPanel',quest:'hdQuestRelatedToMap'};
  const fallbackFn=fallbackNeeds[action];
  if(fallbackFn&&typeof window[fallbackFn]!=='function'&&typeof window.hdEnsureCurrentAssets==='function'){
