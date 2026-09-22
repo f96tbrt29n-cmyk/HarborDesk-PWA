@@ -3967,6 +3967,121 @@ test('release smoke: map gear calculators persist detailed controls', async ({ p
 });
 
 
+test('release smoke: map mine readiness and support controls persist and run', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdRenderSortieReadiness === 'function' &&
+    typeof window.hdSPRender === 'function' &&
+    typeof window.hdGetAppState === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-sortie-readiness-v1');
+    localStorage.removeItem('harbordesk-sortie-selection-v1');
+    localStorage.removeItem('harbordesk-support-fleets-v1');
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      {id:'mine-roster-yukikaze',name:'雪風',level:88,gear:'主砲 電探'},
+      {id:'mine-roster-shigure',name:'時雨',level:77,gear:'主砲 電探'}
+    ]));
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({
+      '5-5': [{
+        id:'mine-controls-fleet',
+        name:'自分用操作確認艦隊',
+        ships:[
+          {ship:'雪風',gear:'主砲 電探'},
+          {ship:'時雨',gear:'主砲 電探'},
+          {ship:'大和',gear:'主砲 主砲'},
+          {ship:'武蔵',gear:'主砲 主砲'},
+          {ship:'赤城',gear:'艦戦 艦攻'},
+          {ship:'加賀',gear:'艦戦 艦攻'}
+        ],
+        memo:'mine controls regression',
+        createdAt:Date.now(),
+        updatedAt:Date.now()
+      }]
+    }));
+    selectedWorld = '5';
+    selectedMap = '5-5';
+    renderMapPicker();
+  });
+
+  await page.locator('[data-map-tab="mine"]').click();
+  const ready = page.locator('[data-map-pane="mine"] #hdSortieReadiness');
+  const support = page.locator('[data-map-pane="mine"] #hdSupportPlanner');
+  await expect(ready).toBeVisible();
+  await expect(support).toBeVisible();
+
+  const manual = ready.locator('[data-hd-sortie-check]').first();
+  const checkId = await manual.getAttribute('data-hd-sortie-check');
+  expect(checkId).toBeTruthy();
+  await manual.check();
+  let readyState = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-sortie-readiness-v1') || '{}'));
+  expect(readyState['5-5:mine-controls-fleet']?.[checkId]).toBe(true);
+
+  await ready.locator('[data-hd-sortie-refresh]').click();
+  await expect(ready.locator('[data-hd-sortie-check="' + checkId + '"]')).toBeChecked();
+  await ready.locator('[data-hd-sortie-reset]').click();
+  readyState = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-sortie-readiness-v1') || '{}'));
+  expect(readyState['5-5:mine-controls-fleet']).toBeUndefined();
+  await expect(ready.locator('[data-hd-sortie-check="' + checkId + '"]')).not.toBeChecked();
+
+  const vanguard = support.locator('.hd-sp-card').filter({ hasText:'前衛支援（道中）' });
+  await expect(vanguard).toBeVisible();
+
+  await vanguard.locator('[data-hd-sp-fleet="vanguard"]').selectOption('2');
+
+  const firstName = vanguard.locator('[data-hd-sp-name="vanguard"][data-i="0"]');
+  await firstName.fill('雪風');
+  await firstName.dispatchEvent('change');
+  const secondName = vanguard.locator('[data-hd-sp-name="vanguard"][data-i="1"]');
+  await secondName.fill('時雨');
+  await secondName.dispatchEvent('change');
+
+  await vanguard.locator('[data-hd-sp-lv="vanguard"][data-i="0"]').fill('1');
+  await vanguard.locator('[data-hd-sp-lv="vanguard"][data-i="0"]').dispatchEvent('change');
+  await vanguard.locator('[data-hd-sp-lv="vanguard"][data-i="1"]').fill('1');
+  await vanguard.locator('[data-hd-sp-lv="vanguard"][data-i="1"]').dispatchEvent('change');
+  await vanguard.locator('[data-hd-sp-copy="vanguard"]').click();
+
+  await expect(vanguard.locator('[data-hd-sp-lv="vanguard"][data-i="0"]')).toHaveValue('88');
+  await expect(vanguard.locator('[data-hd-sp-lv="vanguard"][data-i="1"]')).toHaveValue('77');
+
+  await vanguard.locator('[data-hd-sp-fp="vanguard"][data-i="0"]').fill('90');
+  await vanguard.locator('[data-hd-sp-fp="vanguard"][data-i="0"]').dispatchEvent('change');
+  await vanguard.locator('[data-hd-sp-acc="vanguard"][data-i="0"]').fill('12');
+  await vanguard.locator('[data-hd-sp-acc="vanguard"][data-i="0"]').dispatchEvent('change');
+  await vanguard.locator('[data-hd-sp-kira="vanguard"][data-i="0"]').check();
+  await vanguard.locator('[data-hd-sp-asw="vanguard"]').check();
+
+  let supportState = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-support-fleets-v1') || '{}')['5-5']?.vanguard);
+  expect(supportState.fleetNo).toBe(2);
+  expect(supportState.ships[0].name).toBe('雪風');
+  expect(supportState.ships[1].name).toBe('時雨');
+  expect(supportState.ships[0].level).toBe(88);
+  expect(supportState.ships[1].level).toBe(77);
+  expect(supportState.ships[0].firepower).toBe(90);
+  expect(supportState.ships[0].accuracy).toBe(12);
+  expect(supportState.ships[0].kira).toBe(true);
+  expect(supportState.aswConfirmed).toBe(true);
+
+  const start = vanguard.locator('[data-hd-sp-start="vanguard"]');
+  await expect(start).toBeEnabled();
+  await start.click();
+
+  const appState = await page.evaluate(() => window.hdGetAppState());
+  const timer = appState.expeditions.find(x => x.support && x.supportKind === 'vanguard' && x.map === '5-5');
+  expect(timer).toBeTruthy();
+  expect(timer.expeditionId).toBe('33');
+  expect(timer.fleetNo).toBe(2);
+  await expect(support.locator('.hd-sp-active')).toContainText('第2艦隊は遠征中');
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map quest tab links live quest data and checklist', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
