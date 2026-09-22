@@ -4155,7 +4155,18 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   await page.evaluate(() => window.hdWSShowElement?.('guide', false));
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="drop"]').click();
-  await expect(page.locator('#dropHuntingDb')).toBeVisible({ timeout: 5000 });
+  const fallbackDrop = page.locator('#hdFallbackDropTools');
+  await expect(fallbackDrop).toBeVisible({ timeout: 5000 });
+  await expect(fallbackDrop.locator('.hd-map-drop-panel')).toContainText('2-4 ドロップ艦娘');
+  const featured = fallbackDrop.locator('[data-hd-map-drop-view="featured"]');
+  await featured.click();
+  await expect(fallbackDrop.locator('[data-hd-map-drop-view="featured"]')).toHaveClass(/active/);
+  const dropShip = fallbackDrop.locator('[data-hd-map-drop-ship]').first();
+  await expect(dropShip).toBeVisible();
+  await dropShip.click();
+  const hunts = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1') || '[]'));
+  expect(hunts.some(x => x.map === '2-4')).toBe(true);
+  await expect(fallbackDrop.locator('[data-hd-map-drop-ship].hunting').first()).toBeVisible();
 
   await page.evaluate(() => window.hdWSShowElement?.('guide', false));
   await expect(fallback).toBeVisible();
