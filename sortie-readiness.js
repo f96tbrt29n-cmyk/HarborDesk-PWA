@@ -98,7 +98,12 @@ function hdSortieManualChecks(map,adv){
 }
 function hdSortieSortedChecks(rows=[]){const rank={warn:0,note:1,ok:2};return [...rows].sort((a,b)=>(rank[a.state]??9)-(rank[b.state]??9))}
 function hdSortieSummary(manual,state,auto){const done=manual.filter(x=>state[x.id]).length,total=manual.length,autoOk=auto.filter(x=>x.state==='ok').length,autoWarn=auto.filter(x=>x.state==='warn').length,autoNote=auto.filter(x=>x.state==='note').length;return {done,total,pct:total?Math.round(done/total*100):0,autoOk,autoWarn,autoNote,autoTotal:auto.length}}
-function hdSortieOpenTab(tab){const btn=document.querySelector(`[data-map-tab="${tab}"]`);if(btn)btn.click()}
+function hdSortieOpenTab(tab){
+ const btn=document.querySelector(`[data-map-tab="${tab}"]`);if(btn){btn.click();return true}
+ if(tab==='gear'&&typeof window.hdFCOpenFallback==='function')return !!window.hdFCOpenFallback();
+ if(tab==='mine'&&typeof window.cfOpenMapPanel==='function')return !!window.cfOpenMapPanel();
+ return false;
+}
 function hdSortieOpenAction(action){
  const value=String(action||'');if(!value)return false;
  if(value.startsWith('tab:')){hdSortieOpenTab(value.slice(4));return true}
