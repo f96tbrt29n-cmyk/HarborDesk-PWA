@@ -4218,6 +4218,69 @@ test('release smoke:攻略 secondary navigation survives workspace helper outage
 });
 
 
+test('release smoke:攻略 navigation falls back when workspace helper returns false', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFSOpen === 'function' &&
+    typeof window.hdSPSOpen === 'function' &&
+    typeof window.hdQNJump === 'function' &&
+    typeof window.hdRenderSortieReadiness === 'function' &&
+    typeof window.hdRevealWorkspaceTarget === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    selectedWorld='6';
+    selectedMap='6-5';
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({
+      '6-5': [{
+        id:'false-helper-fleet',
+        name:'補助失敗テスト',
+        ships:[{ship:'未登録テスト艦',gear:''}],
+        memo:'',
+        createdAt:Date.now(),
+        updatedAt:Date.now()
+      }]
+    }));
+    renderMapPicker();
+    window.__hdSavedWSFalseTest = window.hdWSShowElement;
+    window.hdWSShowElement = () => false;
+  });
+
+  await page.evaluate(() => window.hdFSOpen());
+  await expect(page.locator('#hdFleetSuggester')).toBeVisible();
+
+  await page.evaluate(() => window.hdSPSOpen());
+  await expect(page.locator('#hdSortiePreparation')).toBeVisible();
+
+  await page.evaluate(() => {
+    const book=document.getElementById('equipmentBook');
+    book?.classList.add('hd-ws-hidden');
+    window.hdQNJump('equipmentBook');
+  });
+  await expect(page.locator('#equipmentBook')).toBeVisible();
+
+  await page.evaluate(() => {
+    window.hdRevealWorkspaceTarget('guide', false);
+    document.querySelector('[data-map-tab="mine"]')?.click();
+    window.hdRenderSortieReadiness();
+  });
+  const rosterAction=page.locator('#hdSortieReadiness [data-hd-sortie-action="roster"]').first();
+  await expect(rosterAction).toBeVisible();
+  await page.evaluate(() => document.getElementById('roster')?.classList.add('hd-ws-hidden'));
+  await rosterAction.click();
+  await expect(page.locator('#roster')).toBeVisible();
+
+  await page.evaluate(() => {
+    window.hdWSShowElement = window.__hdSavedWSFalseTest;
+    delete window.__hdSavedWSFalseTest;
+  });
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: remaining map攻略 action controls open and persist', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
