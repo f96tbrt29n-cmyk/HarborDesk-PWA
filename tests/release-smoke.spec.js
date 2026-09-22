@@ -110,6 +110,35 @@ test('release smoke: explicit workspace navigation wins over deferred startup re
 });
 
 
+test('release smoke: passive workspace scroll reveals target without stealing攻略 location', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdWSRevealElement === 'function' &&
+    typeof window.hdWSCurrentLocation === 'function' &&
+    !!document.getElementById('equipmentBook'),
+    null,
+    { timeout: 30000 }
+  );
+
+  const result = await page.evaluate(async () => {
+    window.hdWSRevealElement('guide', false, { history: false });
+    await new Promise(resolve => setTimeout(resolve, 1800));
+    const before = window.hdWSCurrentLocation?.();
+    const passive = window.hdWSRevealElement('equipmentBook', false, { history: false, passive: true });
+    const after = window.hdWSCurrentLocation?.();
+    return { before, passive, after };
+  });
+
+  expect(result.before).toMatchObject({ group: 'guide', section: 'guide' });
+  expect(result.passive).toBe(true);
+  expect(result.after).toMatchObject({ group: 'guide', section: 'guide' });
+  await expect(page.locator('#guide')).toBeVisible();
+  await expect(page.locator('#equipmentBook')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: personalized home renders operational cards', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
