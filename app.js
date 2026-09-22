@@ -251,6 +251,7 @@ async function hdCoreMapAction(action){
  if(action==='map'&&hdCoreOpenMapFallback())return true;
  if(action==='fleet'&&hdCoreOpenFleetFallback())return true;
  if(action==='gear'&&typeof window.hdFCOpenFallback==='function'&&window.hdFCOpenFallback())return true;
+ if(action==='drop'&&typeof window.hdDropOpenMapPanel==='function'&&window.hdDropOpenMapPanel())return true;
  if(action==='mine'&&typeof window.cfOpenMapPanel==='function'&&window.cfOpenMapPanel())return true;
  const targets={gear:'hdFleetCalculator',drop:'dropHuntingDb',mine:'customFleetPanel'};
  const id=targets[action],el=id&&document.getElementById(id);
