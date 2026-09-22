@@ -3929,6 +3929,82 @@ test('release smoke: map攻略 inner controls work end to end', async ({ page })
 });
 
 
+test('release smoke: map quest actions add, open, count and reset progress', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdQuestOpenFromMap === 'function' &&
+    typeof window.hdQuestAddFromMap === 'function' &&
+    typeof window.hdWSShowElement === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-quest-progress-v1');
+    if (typeof state !== 'undefined' && state) {
+      state.quests = [];
+      if (typeof save === 'function') save();
+      if (typeof renderQuests === 'function') renderQuests();
+    }
+    selectedWorld = '2';
+    selectedMap = '2-4';
+    renderMapPicker();
+  });
+
+  await page.locator('[data-map-tab="quest"]').click();
+  const card = page.locator('[data-map-pane="quest"] [data-hd-map-quest-id="Bq1"]');
+  await expect(card).toBeVisible();
+
+  const add = card.locator('[data-hd-map-quest-add="Bq1"]');
+  await expect(add).toHaveText('チェックに追加');
+  await add.click();
+
+  const checklist = await page.evaluate(() => (window.hdGetAppState?.().quests || []).filter(x => x.sourceId === 'Bq1' && !x.done));
+  expect(checklist).toHaveLength(1);
+
+  await page.evaluate(() => {
+    window.hdWSShowElement?.('guide', false);
+    selectedWorld = '2';
+    selectedMap = '2-4';
+    renderMapPicker();
+  });
+  await page.locator('[data-map-tab="quest"]').click();
+  const cardAfter = page.locator('[data-map-pane="quest"] [data-hd-map-quest-id="Bq1"]');
+  await expect(cardAfter.locator('[data-hd-map-quest-add="Bq1"]')).toHaveText('追加済み');
+
+  await cardAfter.locator('[data-hd-map-quest-open="Bq1"]').click();
+  await expect(page.locator('#questDatabase')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#hdQuestDbSearch')).toHaveValue(/沖ノ島海域迎撃戦/);
+
+  const dbCard = page.locator('#questDatabase [data-hd-quest-id="Bq1"]');
+  await expect(dbCard).toBeVisible();
+  const plus = dbCard.locator('[data-hd-qp-plus="Bq1"]');
+  const minus = dbCard.locator('[data-hd-qp-minus="Bq1"]');
+  const reset = dbCard.locator('[data-hd-qp-reset="Bq1"]');
+
+  await plus.click();
+  let progress = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-quest-progress-v1') || '{}').Bq1?.values?.[0]);
+  expect(progress).toBe(1);
+  await minus.click();
+  progress = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-quest-progress-v1') || '{}').Bq1?.values?.[0]);
+  expect(progress).toBe(0);
+
+  await plus.click();
+  await plus.click();
+  await expect(dbCard.locator('.hd-qp-box')).toHaveClass(/done/);
+  progress = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-quest-progress-v1') || '{}').Bq1?.values?.[0]);
+  expect(progress).toBe(2);
+
+  await reset.click();
+  progress = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-quest-progress-v1') || '{}').Bq1?.values?.[0]);
+  expect(progress).toBe(0);
+  await expect(dbCard.locator('.hd-qp-box')).not.toHaveClass(/done/);
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map gear calculators persist detailed controls', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
