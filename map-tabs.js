@@ -104,7 +104,17 @@ function hdCustomFleetHtml(map){
   const list=(loadCustomFleets()[map]||[]);
   const saved=list.length?list.map(item=>{
     const rows=(item.ships||[]).map((s,i)=>s.ship||s.gear?`<div class="custom-fleet-saved-row"><span>${i+1}</span><b>${hdMapEsc(s.ship||'未入力')}</b><small>${hdMapEsc(s.gear||'装備メモなし')}</small></div>`:'').join('');
-    return `<article class="custom-fleet-card" data-cf-id="${item.id}"><div class="custom-fleet-head"><div><strong>${hdMapEsc(item.name)}</strong><div class="muted">${new Date(item.updatedAt||item.createdAt).toLocaleString('ja-JP')} 更新</div></div><div class="custom-fleet-actions"><button class="ghost small" data-cf-edit="${item.id}">編集</button><button class="ghost small" data-cf-delete="${item.id}">削除</button></div></div><div class="custom-fleet-saved-list">${rows||'<div class="muted">艦娘はまだ未入力</div>'}</div>${item.memo?`<p class="custom-fleet-memo">${hdMapEsc(item.memo)}</p>`:''}</article>`;
+    const linked=item.source==='kancolle-import'&&Number(item.sourceDeckId)>0;
+    const detached=item.detachedFromSource==='kancolle-import';
+    const sourceMeta=linked
+      ?`<span class="custom-fleet-source sync">ゲーム同期・第${Number(item.sourceDeckId)}艦隊・自動追従</span>`
+      :detached
+        ?'<span class="custom-fleet-source detached">手動編成・ゲーム同期から切り離し</span>'
+        :'<span class="custom-fleet-source manual">手動編成</span>';
+    const relink=detached&&Number(item.detachedSourceDeckId)>0
+      ?`<button class="ghost small" data-cf-relink="${hdMapEsc(item.id)}">ゲーム同期に戻す</button>`
+      :'';
+    return `<article class="custom-fleet-card" data-cf-id="${hdMapEsc(item.id)}"><div class="custom-fleet-head"><div><strong>${hdMapEsc(item.name)}</strong><div class="custom-fleet-meta"><span class="muted">${new Date(item.updatedAt||item.createdAt).toLocaleString('ja-JP')} 更新</span>${sourceMeta}</div></div><div class="custom-fleet-actions">${relink}<button class="ghost small" data-cf-edit="${hdMapEsc(item.id)}">編集</button><button class="ghost small" data-cf-delete="${hdMapEsc(item.id)}">削除</button></div></div><div class="custom-fleet-saved-list">${rows||'<div class="muted">艦娘はまだ未入力</div>'}</div>${item.memo?`<p class="custom-fleet-memo">${hdMapEsc(item.memo)}</p>`:''}</article>`;
   }).join(''):'<div class="empty">この海域の自分用編成はまだ保存されてないよ。</div>';
   return `<div class="custom-fleet-title"><div><div class="eyebrow">MY FLEET</div><h4>自分用編成</h4></div><button class="primary small" id="addCustomFleet">＋ 編成を保存</button></div>${saved}`;
 }
