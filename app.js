@@ -204,10 +204,11 @@ function hdCoreActivateFallbackPane(host){
  card?.querySelectorAll('[data-hd-core-fallback-pane]').forEach(x=>{const on=x===host;x.classList.toggle('active',on);x.hidden=!on});
  host.hidden=false;host.classList.add('active');
  hdCoreFallbackActive=String(host.dataset.mapPane||'');
- const guide=host.closest('#guide');
- if(guide&&!guide.classList.contains('hd-ws-hidden')&&!guide.hidden){host.scrollIntoView({behavior:'smooth',block:'start'});return true}
- if(typeof window.hdWSShowElement==='function'&&window.hdWSShowElement(host,true))return true;
- host.scrollIntoView({behavior:'smooth',block:'start'});return true;
+ const guide=document.getElementById('guide');
+ if(guide&&(guide.classList.contains('hd-ws-hidden')||guide.hidden)&&typeof window.hdWSShowElement==='function')window.hdWSShowElement('guide',false);
+ host.hidden=false;host.classList.add('active');
+ requestAnimationFrame(()=>{if(document.contains(host))host.scrollIntoView({behavior:'smooth',block:'start'})});
+ return true;
 }
 function hdCoreRestoreFallback(){
  if(!hdCoreFallbackActive||!selectedMap||document.querySelector('[data-map-tab]'))return false;
