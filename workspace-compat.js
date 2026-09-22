@@ -11,7 +11,10 @@
         try{
           let node=this.closest?.('section')||null,hidden=false;
           while(node){if(node.classList?.contains('hd-ws-hidden')){hidden=true;break}node=node.parentElement?.closest?.('section')||null}
-          if(hidden)window.hdWSShowElement(this,false);
+          if(hidden){
+            const reveal=typeof window.hdWSRevealElement==='function'?window.hdWSRevealElement:window.hdWSShowElement;
+            reveal?.(this,false,{history:false,passive:true});
+          }
         }catch{}
         return original.apply(this,args);
       };

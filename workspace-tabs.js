@@ -463,14 +463,21 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
 function hdWSRevealElement(target,scroll=true,opts={}){
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
  const section=hdWSManagedSectionFor(el);if(!section)return false;
+ const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
+ // Legacy scrollIntoView compatibility may try to reopen a section that just
+ // became hidden while a newer explicit navigation is still settling.
+ // Passive reveals must never steal that newer navigation.
+ if(opts.passive&&Date.now()<hdWSNavLockUntil){
+  const current=hdWSCurrentLocation();
+  if(current&&(current.group!==group||current.section!==section.id))return false;
+ }
  // A direct navigation request is newer than deferred startup restoration.
  // Mark startup context handled before changing workspace state so slower WebKit
  // cannot restore the initial guide section over the user's requested target.
- if(!hdWSStartupContextHandled)hdWSStartupContextHandled=true;
- if(opts.history!==false)hdWSPushHistory();
- const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
+ if(!opts.passive&&!hdWSStartupContextHandled)hdWSStartupContextHandled=true;
+ if(opts.history!==false&&!opts.passive)hdWSPushHistory();
  clearTimeout(hdWSRefreshTimer);
- hdWSNavLockUntil=Date.now()+900;hdWSSetPin(group,section.id,900);const navSeq=++hdWSNavSeq;
+ hdWSNavLockUntil=Date.now()+1600;hdWSSetPin(group,section.id,1600);const navSeq=++hdWSNavSeq;
  const showNow=()=>{
   if(navSeq!==hdWSNavSeq)return false;
   hdWSState.group=group;hdWSState.sections[group]=section.id;hdWSSave();hdWSReflectLocationHash(section.id);
@@ -491,9 +498,10 @@ function hdWSRevealElement(target,scroll=true,opts={}){
  setTimeout(()=>{if(navSeq===hdWSNavSeq)showNow()},360);
  return true;
 }
-function hdWSShowElement(target,scroll=true){
- return hdWSRevealElement(target,scroll);
+function hdWSShowElement(target,scroll=true,opts={}){
+ return hdWSRevealElement(target,scroll,opts);
 }
+window.hdWSShowElement=hdWSShowElement;
 window.hdWSRevealElement=hdWSRevealElement;
 function hdWSPatchQuickNav(){
  window.__hdWSQuickPatched=true;
