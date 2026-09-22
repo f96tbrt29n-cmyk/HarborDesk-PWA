@@ -37,9 +37,14 @@ function hdFCOpenFallback(){
  if(typeof selectedMap==='undefined'||!selectedMap)return false;
  const card=document.getElementById('selectedMapCard');if(!card)return false;
  let host=document.getElementById('hdFallbackGearTools');
- if(!host){host=document.createElement('div');host.id='hdFallbackGearTools';host.className='hd-fc-fallback';card.appendChild(host)}
- host.innerHTML=hdFCHtml(selectedMap);
- const sel=host.querySelector('#hdFCFleetSelect');if(sel)sel.addEventListener('change',e=>hdFCSetSelection(selectedMap,e.target.value));
+ if(!host){host=document.createElement('div');host.id='hdFallbackGearTools';card.appendChild(host)}
+ host.className='hd-fc-fallback map-tab-pane active';
+ host.dataset.mapPane='gear';
+ const d=typeof MAP_DETAILS!=='undefined'?MAP_DETAILS[selectedMap]:null;
+ host.innerHTML=`<div class="map-tab-card"><b>制空・装備</b><p>${hdFCEsc(d?.air||'装備情報を整理中')}</p></div><div id="hdMapEquipRecommend"></div>`;
+ if(typeof window.hdRenderMapEquipmentRecommendations==='function')window.hdRenderMapEquipmentRecommendations();
+ hdFCRender();
+ if(typeof window.hdRenderLandBasePlanner==='function')window.hdRenderLandBasePlanner();
  if(typeof window.hdWSShowElement==='function')window.hdWSShowElement(host,true);else host.scrollIntoView({behavior:'smooth',block:'start'});
  return true;
 }
