@@ -181,6 +181,11 @@ function hdSPSEnsure(){
 function hdSPSOpen(){
  hdSPSEnsure();if(typeof hdWSShowElement==='function')hdWSShowElement('hdSortiePreparation',true);else document.getElementById('hdSortiePreparation')?.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(hdSPSRender,40);
 }
+function hdSPSOpenWorkspace(id){
+ if(typeof hdWSShowElement==='function'&&hdWSShowElement(id,true))return true;
+ const target=document.getElementById(id);if(target){target.scrollIntoView({behavior:'smooth',block:'start'});return true}
+ return false;
+}
 function hdSPSOpenMapTab(tab,focusBase=false){
  if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);
  setTimeout(()=>{if(typeof hdSortieOpenTab==='function')hdSortieOpenTab(tab);else if(typeof window.hdCoreMapAction==='function')Promise.resolve(window.hdCoreMapAction(tab)).catch(()=>{});else document.querySelector(`[data-map-tab="${tab}"]`)?.click();if(focusBase)setTimeout(()=>document.getElementById('hdLandBasePlanner')?.scrollIntoView({behavior:'smooth',block:'start'}),120)},80);
@@ -193,9 +198,9 @@ document.addEventListener('click',e=>{
  if(e.target.closest?.('[data-hd-sps-open]')){hdSPSOpen();return}
  if(e.target.closest?.('[data-hd-sps-refresh]')){hdSPSRender();return}
  if(e.target.closest?.('[data-hd-sps-copy]')){const map=hdSPSMap();if(map)hdSPSCopy(map);return}
- if(e.target.closest?.('[data-hd-sps-guide]')){if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);return}
+ if(e.target.closest?.('[data-hd-sps-guide]')){hdSPSOpenWorkspace('guide');return}
  const tab=e.target.closest?.('[data-hd-sps-tab]');if(tab){hdSPSOpenMapTab(tab.dataset.hdSpsTab,tab.hasAttribute('data-hd-sps-focus-base'));return}
- const ws=e.target.closest?.('[data-hd-sps-workspace]');if(ws){if(typeof hdWSShowElement==='function')hdWSShowElement(ws.dataset.hdSpsWorkspace,true);return}
+ const ws=e.target.closest?.('[data-hd-sps-workspace]');if(ws){hdSPSOpenWorkspace(ws.dataset.hdSpsWorkspace);return}
  const acq=e.target.closest?.('[data-hd-sps-acquire]');if(acq&&typeof hdAGOpen==='function'){hdAGOpen(acq.dataset.hdSpsAcquire,hdSPSMap());return}
 });
 window.addEventListener('hd:map-rendered',()=>{hdSPSMapButton();hdSPSRender()});
