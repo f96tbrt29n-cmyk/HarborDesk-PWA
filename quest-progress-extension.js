@@ -55,7 +55,11 @@ function hdQuestOpenFromMap(id){
  const target=document.getElementById('questDatabase');
  if(target&&typeof window.hdWSShowElement==='function')window.hdWSShowElement(target,true);
  else target?.scrollIntoView({behavior:'smooth',block:'start'});
- setTimeout(()=>document.querySelector(`#questDatabase [data-hd-quest-id="${id}"]`)?.scrollIntoView({behavior:'smooth',block:'center'}),80);
+ setTimeout(()=>{
+  const db=document.getElementById('questDatabase');
+  if(!db||db.hidden||db.classList.contains('hd-ws-hidden'))return;
+  document.querySelector(`#questDatabase [data-hd-quest-id="${id}"]`)?.scrollIntoView({behavior:'smooth',block:'center'});
+ },80);
  return true;
 }
 function hdQuestAddFromMap(id){
