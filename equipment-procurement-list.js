@@ -377,8 +377,13 @@ function hdPLInstallSortieButton(){
  if(typeof hdRenderMapEquipmentRecommendations==='function')setTimeout(hdRenderMapEquipmentRecommendations,0);return true;
 }
 function hdPLOpenList(){
- hdPLEnsure();const target=document.getElementById('hdEquipmentProcurement');if(!target)return;
- if(typeof hdWSShowElement==='function')hdWSShowElement('hdEquipmentProcurement',true);else target.scrollIntoView({behavior:'smooth',block:'start'});
+ hdPLEnsure();const target=document.getElementById('hdEquipmentProcurement');if(!target)return false;
+ let opened=false;
+ if(typeof window.hdRevealWorkspaceTarget==='function')opened=window.hdRevealWorkspaceTarget(target,true)!==false;
+ if(!opened&&typeof hdWSShowElement==='function')opened=hdWSShowElement(target,true)!==false;
+ if(!opened&&typeof hdQNJump==='function')opened=hdQNJump('hdEquipmentProcurement')!==false;
+ if(!opened){target.hidden=false;target.classList?.remove('hd-ws-hidden');target.scrollIntoView({behavior:'smooth',block:'start'});opened=true}
+ return opened;
 }
 document.addEventListener('click',e=>{
  const add=e.target.closest?.('[data-hd-pl-add-current]');if(add){if(hdPLAddMap(add.dataset.hdPlAddCurrent))hdPLOpenList();return}
