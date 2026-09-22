@@ -43,11 +43,18 @@ function hdFCBindSelect(pane){
  const sel=pane?.querySelector('#hdFCFleetSelect');
  if(sel)sel.addEventListener('change',e=>hdFCSetSelection(selectedMap,e.target.value));
 }
+function hdFCReplaceSection(pane,selector,html){
+ if(!pane||!html)return null;
+ const template=document.createElement('template');template.innerHTML=String(html).trim();
+ const next=template.content.firstElementChild;if(!next)return null;
+ const old=pane.querySelector(selector);
+ if(old&&old.parentNode)old.parentNode.replaceChild(next,old);else pane.appendChild(next);
+ return next;
+}
 function hdFCRender(){
  if(typeof selectedMap==='undefined'||!selectedMap)return;
  const pane=hdFCGearPane();if(!pane)return;
- pane.querySelector('#hdFleetCalculator')?.remove();
- pane.insertAdjacentHTML('beforeend',hdFCHtml(selectedMap));
+ hdFCReplaceSection(pane,'#hdFleetCalculator',hdFCHtml(selectedMap));
  hdFCBindSelect(pane);
 }
 function hdFCRenderFallbackHost(host,map){
