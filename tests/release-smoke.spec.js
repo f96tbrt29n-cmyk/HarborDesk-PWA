@@ -3929,6 +3929,226 @@ test('release smoke: map攻略 inner controls work end to end', async ({ page })
 });
 
 
+test('release smoke: secondary map gear and readiness controls work', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdRenderMapEquipmentRecommendations === 'function' &&
+    typeof window.hdFCRender === 'function' &&
+    typeof window.hdRenderLandBasePlanner === 'function' &&
+    typeof window.hdRenderSortieReadiness === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-equipment-v1');
+    localStorage.removeItem('harbordesk-fleet-calculator-v1');
+    localStorage.removeItem('harbordesk-fleet-calculator-selection-v1');
+    localStorage.removeItem('harbordesk-land-base-v1');
+    localStorage.removeItem('harbordesk-sortie-readiness-v1');
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([]));
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({
+      '6-5': [{
+        id:'secondary-controls-fleet',
+        name:'副操作確認艦隊',
+        ships:[
+          {ship:'赤城',gear:''},
+          {ship:'加賀',gear:''},
+          {ship:'大和',gear:''},
+          {ship:'武蔵',gear:''},
+          {ship:'雪風',gear:''},
+          {ship:'時雨',gear:''}
+        ],
+        createdAt:Date.now(),
+        updatedAt:Date.now()
+      }]
+    }));
+    selectedWorld = '6';
+    selectedMap = '6-5';
+    renderMapPicker();
+  });
+
+  await page.locator('[data-map-tab="gear"]').click();
+  const recommend = page.locator('[data-map-pane="gear"] #hdMapEquipRecommend .hd-map-equip-recommend');
+  await expect(recommend).toBeVisible();
+
+  const add = recommend.locator('[data-hd-equip-add]').first();
+  await expect(add).toBeVisible();
+  const equipName = await add.getAttribute('data-hd-equip-add');
+  await add.click();
+  await expect(page.locator('#equipmentDialog')).toBeVisible();
+  await page.locator('#equipmentDialog button[value="default"]').click();
+
+  await expect(recommend.locator('[data-hd-owned-open]').filter({ hasText:'台帳で確認' }).first()).toBeVisible();
+  await recommend.locator('[data-hd-owned-open]').filter({ hasText:'台帳で確認' }).first().click();
+  await expect(page.locator('#equipmentBook')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#equipmentSearch')).toHaveValue(equipName || '');
+
+  await page.evaluate(() => {
+    window.hdWSShowElement?.('guide', false);
+    selectedWorld = '6';
+    selectedMap = '6-5';
+    renderMapPicker();
+  });
+  await page.locator('[data-map-tab="gear"]').click();
+  const recommendAgain = page.locator('[data-map-pane="gear"] #hdMapEquipRecommend .hd-map-equip-recommend');
+  await recommendAgain.locator('[data-hd-owned-refresh]').click();
+  await expect(recommendAgain).toBeVisible();
+
+  const fc = page.locator('[data-map-pane="gear"] #hdFleetCalculator');
+  await expect(fc).toBeVisible();
+  await expect(fc.locator('#hdFCFleetSelect')).toHaveValue('secondary-controls-fleet');
+  await fc.locator('[data-hd-fc-ship-los="0"]').fill('44');
+  await fc.locator('[data-hd-fc-ship-los="0"]').dispatchEvent('change');
+
+  await page.evaluate(() => {
+    const all = JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1') || '{}');
+    all['6-5'][0].ships[0].ship = '翔鶴';
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify(all));
+  });
+  await fc.locator('[data-hd-fc-sync]').click();
+  await expect(fc.locator('.hd-fc-ships label').first()).toContainText('翔鶴');
+  let calc = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-fleet-calculator-v1') || '{}')['6-5:secondary-controls-fleet']);
+  expect(calc.ships[0].name).toBe('翔鶴');
+  expect(calc.ships[0].los).toBe(44);
+
+  const enemyChip = fc.locator('[data-hd-fc-enemy-chip]').first();
+  if (await enemyChip.count()) {
+    const value = Number(await enemyChip.getAttribute('data-hd-fc-enemy-chip'));
+    await enemyChip.click();
+    calc = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-fleet-calculator-v1') || '{}')['6-5:secondary-controls-fleet']);
+    expect(calc.enemyAir).toBe(value);
+  }
+
+  const lb = page.locator('[data-map-pane="gear"] #hdLandBasePlanner');
+  await expect(lb).toBeVisible();
+  const plane = lb.locator('[data-hd-lb-plane="0"][data-squad="0"]');
+  const planeName = await plane.locator('option').evaluateAll(opts => opts.map(o => o.value).find(Boolean) || '');
+  expect(planeName).not.toBe('');
+  await plane.selectOption(planeName);
+  await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-land-base-v1') || '{}')['6-5']?.corps?.[0]?.squads?.[0]?.name || '')).toBe(planeName);
+
+  await page.locator('[data-map-tab="mine"]').click();
+  const ready = page.locator('[data-map-pane="mine"] #hdSortieReadiness');
+  await expect(ready).toBeVisible();
+  const rosterAction = ready.locator('[data-hd-sortie-action="roster"]').first();
+  await expect(rosterAction).toBeVisible();
+  await rosterAction.click();
+  await expect(page.locator('#roster')).toBeVisible({ timeout: 5000 });
+
+  await page.evaluate(() => {
+    window.hdWSShowElement?.('guide', false);
+    selectedWorld = '6';
+    selectedMap = '6-5';
+    renderMapPicker();
+  });
+  await page.locator('[data-map-tab="mine"]').click();
+  const readyAgain = page.locator('[data-map-pane="mine"] #hdSortieReadiness');
+  await readyAgain.locator('[data-hd-sortie-gear]').click();
+  await expect(page.locator('[data-map-pane="gear"]')).toBeVisible();
+  await expect(page.locator('[data-map-pane="gear"] #hdFleetCalculator')).toBeVisible();
+
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: secondary drop and synced custom fleet controls work', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.cfRelinkFleet === 'function' &&
+    typeof window.hdDropOpenMapPanel === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-drop-hunts-v1');
+    localStorage.removeItem('harbordesk-map-drop-view-v1');
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([]));
+    selectedWorld = '6';
+    selectedMap = '6-3';
+    renderMapPicker();
+  });
+
+  await page.locator('[data-map-tab="drop"]').click();
+  const drop = page.locator('[data-map-pane="drop"] .hd-map-drop-panel');
+  await expect(drop).toBeVisible();
+  const featured = drop.locator('[data-hd-map-drop-view="featured"]');
+  await featured.click();
+  await expect(featured).toHaveClass(/active/);
+  let view = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-map-drop-view-v1') || '{}')['6-3']);
+  expect(view).toBe('featured');
+
+  await drop.locator('[data-hd-map-drop-view="all"]').click();
+  view = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-map-drop-view-v1') || '{}')['6-3']);
+  expect(view).toBe('all');
+
+  await page.evaluate(() => window.hdWSShowElement?.('dropHuntingDb', true));
+  const filter = page.locator('#dropHuntingDb [data-hd-drop-mapfilter="6-3"]');
+  await expect(filter).toBeVisible();
+  await filter.click();
+  await expect(filter).toHaveClass(/active/);
+
+  const target = page.locator('#dropHuntingDb [data-hd-drop-target]').first();
+  await expect(target).toBeVisible();
+  const targetShip = await target.getAttribute('data-hd-drop-target');
+  await target.click();
+  const hunt = page.locator('#hdDropHuntList .hd-hunt-card').first();
+  await expect(hunt).toContainText(targetShip || '');
+  await hunt.locator('[data-hd-hunt-obtained]').click();
+  await expect(hunt.locator('[data-hd-hunt-roster]')).toBeVisible();
+  await hunt.locator('[data-hd-hunt-roster]').click();
+  await expect(page.locator('#shipRosterDialog')).toBeVisible();
+  await expect(page.locator('#rosterName')).toHaveValue(targetShip || '');
+  await page.locator('#shipRosterDialog button[value="cancel"]').click();
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([{
+      deckId:2,
+      syncedAt:Date.now(),
+      ships:[
+        {name:'雪風',gameShipId:101,masterId:20,level:90,nowHp:35,maxHp:35,cond:49,gear:'主砲 電探'},
+        {name:'時雨',gameShipId:102,masterId:145,level:88,nowHp:31,maxHp:31,cond:49,gear:'主砲 電探'}
+      ]
+    }]));
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({
+      '5-5':[{
+        id:'detached-sync-fleet',
+        name:'同期へ戻す確認',
+        source:'manual',
+        detachedFromSource:'kancolle-import',
+        detachedSourceDeckId:2,
+        detachedAt:Date.now(),
+        ships:[{ship:'赤城',gear:'艦戦'}],
+        createdAt:Date.now(),
+        updatedAt:Date.now()
+      }]
+    }));
+    window.hdWSShowElement?.('guide', false);
+    selectedWorld = '5';
+    selectedMap = '5-5';
+    renderMapPicker();
+  });
+
+  await page.locator('[data-map-tab="mine"]').click();
+  const relink = page.locator('#customFleetPanel [data-cf-relink="detached-sync-fleet"]');
+  await expect(relink).toBeVisible();
+  await relink.click();
+
+  const fleet = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1') || '{}')['5-5']?.find(x => x.id === 'detached-sync-fleet'));
+  expect(fleet.source).toBe('kancolle-import');
+  expect(fleet.sourceDeckId).toBe(2);
+  expect(fleet.detachedFromSource).toBeUndefined();
+  expect(fleet.ships[0].ship).toBe('雪風');
+  expect(fleet.ships[1].ship).toBe('時雨');
+  await expect(page.locator('#customFleetPanel')).toContainText('ゲーム同期・第2艦隊・自動追従');
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map quest actions add, open, count and reset progress', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
