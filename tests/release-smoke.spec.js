@@ -4332,9 +4332,37 @@ test('release smoke: map overview exposes visible攻略 tool launcher', async ({
   const launcher = page.locator('.hd-map-tools-overview');
   await expect(launcher).toBeVisible();
 
-  for (const tool of ['map','fleet','suggest','prep','gear','drop','mine']) {
+  for (const tool of ['map','fleet','route','suggest','prep','gear','quest','drop','mine']) {
     await expect(launcher.locator(`[data-hd-map-tool="${tool}"]`)).toBeVisible();
   }
+
+  await launcher.locator('[data-hd-map-tool="fleet"]').click();
+  await expect(page.locator('[data-map-pane="fleet"]')).toBeVisible();
+  await expect(page.locator('[data-map-pane="fleet"] .map-tab-card').first()).toBeVisible();
+
+  await page.locator('[data-map-tab="overview"]').click();
+  await expect(launcher).toBeVisible();
+
+  await launcher.locator('[data-hd-map-tool="route"]').click();
+  await expect(page.locator('[data-map-pane="route"]')).toBeVisible();
+  await expect(page.locator('#hdMapRouteRequirements')).toBeVisible();
+
+  await page.locator('[data-map-tab="overview"]').click();
+  await expect(launcher).toBeVisible();
+
+  await launcher.locator('[data-hd-map-tool="quest"]').click();
+  await expect(page.locator('[data-map-pane="quest"]')).toBeVisible();
+  await expect(page.locator('[data-map-pane="quest"]')).not.toBeEmpty();
+
+  await page.locator('[data-map-tab="overview"]').click();
+  await expect(launcher).toBeVisible();
+
+  await launcher.locator('[data-hd-map-tool="mine"]').click();
+  await expect(page.locator('[data-map-pane="mine"]')).toBeVisible();
+  await expect(page.locator('[data-map-pane="mine"] #customFleetPanel')).toBeVisible();
+
+  await page.locator('[data-map-tab="overview"]').click();
+  await expect(launcher).toBeVisible();
 
   await launcher.locator('[data-hd-map-tool="suggest"]').click();
   await expect(page.locator('#hdFleetSuggester')).toBeVisible({ timeout: 5000 });
