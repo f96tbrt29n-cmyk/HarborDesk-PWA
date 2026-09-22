@@ -3866,6 +3866,107 @@ test('release smoke: map攻略 inner controls work end to end', async ({ page })
 });
 
 
+test('release smoke: map gear calculators persist detailed controls', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFCRender === 'function' &&
+    typeof window.hdRenderLandBasePlanner === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-fleet-calculator-v1');
+    localStorage.removeItem('harbordesk-fleet-calculator-selection-v1');
+    localStorage.removeItem('harbordesk-land-base-v1');
+    selectedWorld = '6';
+    selectedMap = '6-5';
+    renderMapPicker();
+  });
+
+  await page.locator('[data-map-tab="gear"]').click();
+  const fc = page.locator('[data-map-pane="gear"] #hdFleetCalculator');
+  const lb = page.locator('[data-map-pane="gear"] #hdLandBasePlanner');
+  await expect(fc).toBeVisible();
+  await expect(lb).toBeVisible();
+
+  await fc.locator('[data-hd-fc-hq]').fill('99');
+  await fc.locator('[data-hd-fc-hq]').dispatchEvent('change');
+  await fc.locator('[data-hd-fc-coef]').fill('2');
+  await fc.locator('[data-hd-fc-coef]').dispatchEvent('change');
+  await fc.locator('[data-hd-fc-count]').fill('4');
+  await fc.locator('[data-hd-fc-count]').dispatchEvent('change');
+  await fc.locator('[data-hd-fc-ship-los="0"]').fill('50');
+  await fc.locator('[data-hd-fc-ship-los="0"]').dispatchEvent('change');
+  await fc.locator('[data-hd-fc-enemy]').fill('100');
+  await fc.locator('[data-hd-fc-enemy]').dispatchEvent('change');
+
+  const firstGear = fc.locator('[data-hd-fc-gear="0"]');
+  const gearName = await firstGear.locator('option').evaluateAll(opts => opts.map(o => o.value).find(Boolean) || '');
+  expect(gearName).not.toBe('');
+  await firstGear.selectOption(gearName);
+  await fc.locator('[data-hd-fc-slot="0"]').fill('18');
+  await fc.locator('[data-hd-fc-slot="0"]').dispatchEvent('change');
+  await fc.locator('[data-hd-fc-star="0"]').fill('6');
+  await fc.locator('[data-hd-fc-star="0"]').dispatchEvent('change');
+  await fc.locator('[data-hd-fc-prof="0"]').check();
+
+  await fc.locator('[data-hd-fc-add]').click();
+  await expect(fc.locator('[data-hd-fc-gear]')).toHaveCount(2);
+
+  let calc = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-fleet-calculator-v1') || '{}')['6-5:manual']);
+  expect(calc.hqLevel).toBe(99);
+  expect(calc.branchCoef).toBe(2);
+  expect(calc.shipCount).toBe(4);
+  expect(calc.ships[0].los).toBe(50);
+  expect(calc.enemyAir).toBe(100);
+  expect(calc.gear[0].name).toBe(gearName);
+  expect(calc.gear[0].slot).toBe(18);
+  expect(calc.gear[0].star).toBe(6);
+  expect(calc.gear[0].maxProf).toBe(true);
+  expect(calc.gear).toHaveLength(2);
+
+  await fc.locator('[data-hd-fc-remove="1"]').click();
+  calc = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-fleet-calculator-v1') || '{}')['6-5:manual']);
+  expect(calc.gear).toHaveLength(1);
+
+  const firstCorps = lb.locator('.hd-lb-corps').first();
+  await firstCorps.locator('[data-hd-lb-auto="0"]').click();
+  let base = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-land-base-v1') || '{}')['6-5']);
+  expect(base.corps[0].squads.some(x => x.name)).toBe(true);
+
+  await firstCorps.locator('[data-hd-lb-mode="0"]').selectOption('standby');
+  await firstCorps.locator('[data-hd-lb-target="0"]').fill('8');
+  await firstCorps.locator('[data-hd-lb-target="0"]').dispatchEvent('change');
+  await firstCorps.locator('[data-hd-lb-slot="0"][data-squad="0"]').fill('12');
+  await firstCorps.locator('[data-hd-lb-slot="0"][data-squad="0"]').dispatchEvent('change');
+  await firstCorps.locator('[data-hd-lb-star="0"][data-squad="0"]').fill('4');
+  await firstCorps.locator('[data-hd-lb-star="0"][data-squad="0"]').dispatchEvent('change');
+  await firstCorps.locator('[data-hd-lb-prof="0"][data-squad="0"]').check();
+
+  base = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-land-base-v1') || '{}')['6-5']);
+  expect(base.corps[0].mode).toBe('standby');
+  expect(base.corps[0].targetRadius).toBe(8);
+  expect(base.corps[0].squads[0].slot).toBe(12);
+  expect(base.corps[0].squads[0].star).toBe(4);
+  expect(base.corps[0].squads[0].maxProf).toBe(true);
+
+  await lb.locator('.hd-lb-corps').first().locator('[data-hd-lb-clear="0"]').click();
+  base = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-land-base-v1') || '{}')['6-5']);
+  expect(base.corps[0].squads.every(x => !x.name)).toBe(true);
+
+  page.once('dialog', dialog => dialog.accept());
+  await fc.locator('[data-hd-fc-reset]').click();
+  calc = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-fleet-calculator-v1') || '{}')['6-5:manual']);
+  expect(calc.hqLevel).toBe(120);
+  expect(calc.enemyAir).toBe(0);
+  expect(calc.gear).toHaveLength(1);
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map quest tab links live quest data and checklist', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
