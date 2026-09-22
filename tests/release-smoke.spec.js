@@ -4041,9 +4041,19 @@ test('release smoke: secondary map gear and readiness controls work', async ({ p
   await page.locator('#equipmentDialog button[value="default"]').click();
 
   await expect(recommend.locator('[data-hd-owned-open]').filter({ hasText:'台帳で確認' }).first()).toBeVisible();
+  await page.evaluate(() => {
+    const book=document.getElementById('equipmentBook');
+    book?.classList.add('hd-ws-hidden');
+    window.__hdSavedOwnedWSShowElement=window.hdWSShowElement;
+    window.hdWSShowElement=()=>false;
+  });
   await recommend.locator('[data-hd-owned-open]').filter({ hasText:'台帳で確認' }).first().click();
   await expect(page.locator('#equipmentBook')).toBeVisible({ timeout: 5000 });
   await expect(page.locator('#equipmentSearch')).toHaveValue(equipName || '');
+  await page.evaluate(() => {
+    window.hdWSShowElement=window.__hdSavedOwnedWSShowElement;
+    delete window.__hdSavedOwnedWSShowElement;
+  });
 
   await page.evaluate(() => {
     window.hdWSShowElement?.('guide', false);
