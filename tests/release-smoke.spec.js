@@ -4142,6 +4142,68 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
 });
 
 
+test('release smoke: fallback gear workspace keeps recommendations calculators and land base interactive', async ({ page }) => {
+  const errors = [];
+  await page.route('**/map-tabs.js*', route => route.abort());
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFCOpenFallback === 'function' &&
+    typeof window.hdRenderMapEquipmentRecommendations === 'function' &&
+    typeof window.hdRenderLandBasePlanner === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-fleet-calculator-v1');
+    localStorage.removeItem('harbordesk-fleet-calculator-selection-v1');
+    localStorage.removeItem('harbordesk-land-base-v1');
+  });
+
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await expect(page.locator('#guide')).toBeVisible();
+  await page.locator('[data-world="6"]').click();
+  await page.locator('[data-map="6-5"]').click();
+
+  const fallback = page.locator('#selectedMapCard [data-hd-core-map-tools]');
+  await expect(fallback).toBeVisible();
+  await fallback.locator('[data-hd-core-map-action="gear"]').click();
+
+  const gear = page.locator('#hdFallbackGearTools');
+  await expect(gear).toBeVisible();
+  await expect(gear.locator('#hdMapEquipRecommend .hd-map-equip-recommend')).toBeVisible();
+  await expect(gear.locator('#hdFleetCalculator')).toBeVisible();
+  await expect(gear.locator('#hdLandBasePlanner')).toBeVisible();
+
+  const hq = gear.locator('[data-hd-fc-hq]');
+  await hq.fill('99');
+  await hq.dispatchEvent('change');
+  await expect(gear.locator('[data-hd-fc-hq]')).toHaveValue('99');
+
+  const target = gear.locator('[data-hd-lb-target="0"]');
+  await target.fill('9');
+  await target.dispatchEvent('change');
+  await expect(gear.locator('[data-hd-lb-target="0"]')).toHaveValue('9');
+
+  const mode = gear.locator('[data-hd-lb-mode="0"]');
+  await mode.selectOption('defense');
+  await expect(gear.locator('[data-hd-lb-mode="0"]')).toHaveValue('defense');
+
+  const saved = await page.evaluate(() => ({
+    calc: JSON.parse(localStorage.getItem('harbordesk-fleet-calculator-v1') || '{}')['6-5:manual'] || null,
+    base: JSON.parse(localStorage.getItem('harbordesk-land-base-v1') || '{}')['6-5'] || null
+  }));
+  expect(saved.calc?.hqLevel).toBe(99);
+  expect(saved.base?.corps?.[0]?.targetRadius).toBe(9);
+  expect(saved.base?.corps?.[0]?.mode).toBe('defense');
+
+  await gear.locator('[data-hd-open-equip-db]').click();
+  await expect(page.locator('#equipmentBook')).toBeVisible({ timeout: 5000 });
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: fallback prep action recovers a failed lazy攻略 module', async ({ page }) => {
   const errors = [];
   let blockPrep = true;
