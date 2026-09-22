@@ -5019,6 +5019,105 @@ test('release smoke: remaining map攻略 action controls open and persist', asyn
 });
 
 
+test('release smoke: fleet suggestion acquisition recovers failed lazy guide', async ({ page }) => {
+  const errors = [];
+  let blockGuide = true;
+  await page.route('**/equipment-acquisition-guide.js*', route => blockGuide ? route.abort() : route.continue());
+  await boot(page, errors);
+
+  await page.waitForFunction(() =>
+    window.HD_MODULE_STATUS?.['./equipment-acquisition-guide.js'] === 'error',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([]));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      {id:'fsr1',name:'赤城',type:'正規空母',level:95,gear:''},
+      {id:'fsr2',name:'加賀',type:'正規空母',level:94,gear:''},
+      {id:'fsr3',name:'大和',type:'戦艦',level:96,gear:''},
+      {id:'fsr4',name:'武蔵',type:'戦艦',level:95,gear:''},
+      {id:'fsr5',name:'雪風',type:'駆逐艦',level:90,gear:''},
+      {id:'fsr6',name:'時雨',type:'駆逐艦',level:89,gear:''}
+    ]));
+    selectedWorld='6';
+    selectedMap='6-5';
+    renderMapPicker();
+    window.hdFSOpen();
+  });
+
+  const acquire = page.locator('#hdFleetSuggester [data-hd-fs-acquire]').first();
+  await expect(acquire).toBeVisible({ timeout: 5000 });
+
+  blockGuide = false;
+  await acquire.click();
+
+  await expect(page.locator('#hdAcquisitionDialog')).toBeVisible({ timeout: 30000 });
+  const state = await page.evaluate(() => ({
+    fn: typeof window.hdAGOpen,
+    status: window.HD_MODULE_STATUS?.['./equipment-acquisition-guide.js'] || ''
+  }));
+  expect(state).toEqual({ fn:'function', status:'ok' });
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: sortie preparation acquisition recovers failed lazy guide', async ({ page }) => {
+  const errors = [];
+  let blockGuide = true;
+  await page.route('**/equipment-acquisition-guide.js*', route => blockGuide ? route.abort() : route.continue());
+  await boot(page, errors);
+
+  await page.waitForFunction(() =>
+    window.HD_MODULE_STATUS?.['./equipment-acquisition-guide.js'] === 'error',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([]));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      {id:'spsr1',name:'赤城',type:'正規空母',level:95,gear:''},
+      {id:'spsr2',name:'加賀',type:'正規空母',level:94,gear:''},
+      {id:'spsr3',name:'大和',type:'戦艦',level:96,gear:''},
+      {id:'spsr4',name:'武蔵',type:'戦艦',level:95,gear:''},
+      {id:'spsr5',name:'雪風',type:'駆逐艦',level:90,gear:''},
+      {id:'spsr6',name:'時雨',type:'駆逐艦',level:89,gear:''}
+    ]));
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({
+      '6-5': [{
+        id:'sps-recovery-fleet',
+        name:'入手ガイド復旧確認艦隊',
+        ships:[
+          {ship:'赤城',gear:''},{ship:'加賀',gear:''},{ship:'大和',gear:''},
+          {ship:'武蔵',gear:''},{ship:'雪風',gear:''},{ship:'時雨',gear:''}
+        ],
+        createdAt:Date.now(),updatedAt:Date.now()
+      }]
+    }));
+    selectedWorld='6';
+    selectedMap='6-5';
+    renderMapPicker();
+    window.hdSPSOpen();
+  });
+
+  const acquire = page.locator('#hdSortiePreparation [data-hd-sps-acquire]').first();
+  await expect(acquire).toBeVisible({ timeout: 5000 });
+
+  blockGuide = false;
+  await acquire.click();
+
+  await expect(page.locator('#hdAcquisitionDialog')).toBeVisible({ timeout: 30000 });
+  const state = await page.evaluate(() => ({
+    fn: typeof window.hdAGOpen,
+    status: window.HD_MODULE_STATUS?.['./equipment-acquisition-guide.js'] || ''
+  }));
+  expect(state).toEqual({ fn:'function', status:'ok' });
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: empty sortie preparation can open roster', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
