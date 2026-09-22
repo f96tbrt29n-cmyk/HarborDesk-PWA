@@ -4297,9 +4297,24 @@ test('release smoke: secondary map gear and readiness controls work', async ({ p
   });
   await page.locator('[data-map-tab="mine"]').click();
   const readyAgain = page.locator('[data-map-pane="mine"] #hdSortieReadiness');
+  await page.evaluate(() => {
+    const gearTab=document.querySelector('.map-tabs-shell [data-map-tab="gear"]');
+    if(gearTab){
+      window.__hdGearTabNativeClick=gearTab.click;
+      window.__hdGearTabSyntheticClickUsed=false;
+      gearTab.click=()=>{window.__hdGearTabSyntheticClickUsed=true;throw new Error('synthetic map-tab click should not be required')};
+    }
+  });
   await readyAgain.locator('[data-hd-sortie-gear]').click();
   await expect(page.locator('[data-map-pane="gear"]')).toBeVisible();
   await expect(page.locator('[data-map-pane="gear"] #hdFleetCalculator')).toBeVisible();
+  expect(await page.evaluate(() => window.__hdGearTabSyntheticClickUsed)).toBe(false);
+  await page.evaluate(() => {
+    const gearTab=document.querySelector('.map-tabs-shell [data-map-tab="gear"]');
+    if(gearTab&&window.__hdGearTabNativeClick)gearTab.click=window.__hdGearTabNativeClick;
+    delete window.__hdGearTabNativeClick;
+    delete window.__hdGearTabSyntheticClickUsed;
+  });
 
   expect(errors).toEqual([]);
 });
