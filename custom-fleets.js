@@ -152,9 +152,17 @@ window.cfMergeEditedShips=cfMergeEditedShips;
 
 function cfOpenMapPanel(){
  if(typeof selectedMap==='undefined'||!selectedMap)return false;
+ const card=document.getElementById('selectedMapCard');if(!card)return false;
+ let pane=document.getElementById('hdFallbackMineTools');
+ if(!pane){pane=document.createElement('div');pane.id='hdFallbackMineTools';card.appendChild(pane)}
+ pane.className='custom-fleet-fallback map-tab-pane active';
+ pane.dataset.mapPane='mine';
  renderCustomFleets(selectedMap);
- const host=document.getElementById('customFleetPanel');if(!host)return false;
- if(typeof window.hdWSShowElement==='function')window.hdWSShowElement(host,true);else host.scrollIntoView({behavior:'smooth',block:'start'});
+ const fleet=document.getElementById('customFleetPanel');
+ if(fleet&&fleet.parentElement!==pane)pane.appendChild(fleet);
+ if(typeof window.hdRenderSortieReadiness==='function')window.hdRenderSortieReadiness();
+ if(typeof window.hdSPRender==='function')window.hdSPRender();
+ if(typeof window.hdWSShowElement==='function')window.hdWSShowElement(pane,true);else pane.scrollIntoView({behavior:'smooth',block:'start'});
  return true;
 }
 window.cfOpenMapPanel=cfOpenMapPanel;
