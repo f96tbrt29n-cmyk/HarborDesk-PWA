@@ -217,8 +217,13 @@ function hdCoreActivateFallbackPane(host){
  requestAnimationFrame(()=>{if(document.contains(host))host.scrollIntoView({behavior:'smooth',block:'start'})});
  return true;
 }
+function hdCoreActiveFallbackPane(){
+ if(!hdCoreFallbackActive)return null;
+ return [...document.querySelectorAll('[data-hd-core-fallback-pane]')].find(x=>String(x.dataset.mapPane||'')===String(hdCoreFallbackActive)&&!x.hidden&&x.classList.contains('active'))||null;
+}
 function hdCoreRestoreFallback(){
  if(!hdCoreFallbackActive||!selectedMap||document.querySelector('[data-map-tab]'))return false;
+ if(hdCoreActiveFallbackPane())return true;
  const openers={
   map:()=>hdCoreOpenMapFallback(),
   fleet:()=>hdCoreOpenFleetFallback(),
@@ -232,6 +237,7 @@ function hdCoreRestoreFallback(){
 }
 function hdCoreScheduleFallbackRestore(){
  if(!hdCoreFallbackActive||document.querySelector('[data-map-tab]'))return false;
+ if(hdCoreActiveFallbackPane())return true;
  const map=String(selectedMap||''),seq=++hdCoreFallbackRestoreSeq;
  setTimeout(()=>{
   if(seq!==hdCoreFallbackRestoreSeq||String(selectedMap||'')!==map||document.querySelector('[data-map-tab]'))return;
@@ -339,6 +345,7 @@ async function hdCoreMapAction(action){
 }
 window.hdCoreMapToolsHtml=hdCoreMapToolsHtml;
 window.hdCoreActivateFallbackPane=hdCoreActivateFallbackPane;
+window.hdCoreActiveFallbackPane=hdCoreActiveFallbackPane;
 window.hdCoreClearFallbackState=hdCoreClearFallbackState;
 window.hdCoreScheduleFallbackRestore=hdCoreScheduleFallbackRestore;
 window.hdCoreRestoreFallback=hdCoreRestoreFallback;
