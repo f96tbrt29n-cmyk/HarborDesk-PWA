@@ -187,6 +187,47 @@ function hdCoreMapToolsHtml(){
   </div>
  </section>`;
 }
+function hdCoreFallbackHost(id,pane){
+ const card=document.getElementById('selectedMapCard');if(!card)return null;
+ let host=document.getElementById(id);
+ if(!host){host=document.createElement('div');host.id=id;card.appendChild(host)}
+ host.className='map-tab-pane active hd-core-fallback-pane';
+ host.dataset.mapPane=pane;host.dataset.hdCoreFallbackPane='1';host.hidden=false;
+ return host;
+}
+function hdCoreActivateFallbackPane(host){
+ if(!host)return false;
+ const card=document.getElementById('selectedMapCard');
+ card?.querySelectorAll('[data-hd-core-fallback-pane]').forEach(x=>{const on=x===host;x.classList.toggle('active',on);x.hidden=!on});
+ host.hidden=false;host.classList.add('active');
+ if(typeof window.hdWSShowElement==='function'&&window.hdWSShowElement(host,true))return true;
+ host.scrollIntoView({behavior:'smooth',block:'start'});return true;
+}
+function hdCoreOpenMapFallback(){
+ if(!selectedMap)return false;
+ const d=typeof MAP_DETAILS!=='undefined'?MAP_DETAILS[selectedMap]:null,host=hdCoreFallbackHost('hdFallbackMapTools','map');if(!host)return false;
+ host.innerHTML=typeof hdMapImageHtml==='function'?hdMapImageHtml(selectedMap,d):`<div class="map-tab-card"><b>マップ詳細</b><p>${esc(d?.route||'マップ情報を読み込み中')}</p></div>`;
+ hdCoreActivateFallbackPane(host);
+ setTimeout(()=>{if(typeof window.hdEnhanceMapPane==='function')window.hdEnhanceMapPane()},0);
+ return true;
+}
+function hdCoreOpenFleetFallback(){
+ if(!selectedMap)return false;
+ const d=typeof MAP_DETAILS!=='undefined'?MAP_DETAILS[selectedMap]:null,host=hdCoreFallbackHost('hdFallbackFleetTools','fleet');if(!host)return false;
+ const plan=typeof MAP_PLANS!=='undefined'?MAP_PLANS[selectedMap]:null;
+ const presets=(plan?.presets?.length?plan.presets:[{name:'基本編成',ships:d?.fleet||d?.formation||'攻略情報を確認',gear:d?.air||'装備条件を確認',use:'通常攻略'}]);
+ const examples=presets.map((x,i)=>`<article class="map-tab-card"><div class="map-tab-card-title">編成例 ${i+1}｜${esc(x.name||'基本編成')}</div><div><b>艦隊:</b> ${esc(x.ships||'')}</div><div><b>装備:</b> ${esc(x.gear||'')}</div><div><b>用途:</b> ${esc(x.use||'')}</div></article>`).join('');
+ const rec=typeof hdShipDbMapRecommendHtml==='function'?hdShipDbMapRecommendHtml(selectedMap,d):'';
+ host.innerHTML=`${examples}${rec}${d?.formation?`<div class="map-tab-card"><b>基本方針</b><p>${esc(d.formation)}</p></div>`:''}`;
+ return hdCoreActivateFallbackPane(host);
+}
+function hdCoreOpenRouteFallback(){
+ if(!selectedMap)return false;
+ const d=typeof MAP_DETAILS!=='undefined'?MAP_DETAILS[selectedMap]:null,host=hdCoreFallbackHost('hdFallbackRouteTools','route');if(!host)return false;
+ host.innerHTML=`<div class="map-tab-card"><b>主なルート</b><p>${esc(d?.route||'ルート情報を整理中')}</p></div><div id="hdMapRouteRequirements"></div>`;
+ const req=host.querySelector('#hdMapRouteRequirements');if(req&&typeof window.hdAdvancedHtml==='function')req.innerHTML=window.hdAdvancedHtml(selectedMap);
+ return hdCoreActivateFallbackPane(host);
+}
 async function hdCoreMapAction(action){
  if(!action)return false;
  if(typeof window.hdMapOpenTool==='function'){
@@ -207,9 +248,11 @@ async function hdCoreMapAction(action){
  }
  const tab=document.querySelector(`[data-map-tab="${action}"]`);
  if(tab){tab.click();return true}
+ if(action==='map'&&hdCoreOpenMapFallback())return true;
+ if(action==='fleet'&&hdCoreOpenFleetFallback())return true;
  if(action==='gear'&&typeof window.hdFCOpenFallback==='function'&&window.hdFCOpenFallback())return true;
  if(action==='mine'&&typeof window.cfOpenMapPanel==='function'&&window.cfOpenMapPanel())return true;
- const targets={map:'selectedMapCard',fleet:'selectedMapCard',gear:'hdFleetCalculator',drop:'dropHuntingDb',mine:'customFleetPanel'};
+ const targets={gear:'hdFleetCalculator',drop:'dropHuntingDb',mine:'customFleetPanel'};
  const id=targets[action],el=id&&document.getElementById(id);
  if(el){
   if(typeof window.hdWSShowElement==='function'&&window.hdWSShowElement(el,true))return true;
@@ -218,6 +261,10 @@ async function hdCoreMapAction(action){
  return false;
 }
 window.hdCoreMapToolsHtml=hdCoreMapToolsHtml;
+window.hdCoreActivateFallbackPane=hdCoreActivateFallbackPane;
+window.hdCoreOpenMapFallback=hdCoreOpenMapFallback;
+window.hdCoreOpenFleetFallback=hdCoreOpenFleetFallback;
+window.hdCoreOpenRouteFallback=hdCoreOpenRouteFallback;
 window.hdCoreMapAction=hdCoreMapAction;
 
 function renderMapPicker(){
