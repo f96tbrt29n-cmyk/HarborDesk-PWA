@@ -3979,6 +3979,9 @@ test('release smoke: master ship acquisition recovers failed lazy module', async
   );
 
   const row = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      { id:'master-acquire-seed', name:'12cm単装砲', count:1, star:0, targetStar:0 }
+    ]));
     const detailed = new Set(HD_SHIP_DATABASE.map(x => x.final));
     const candidate = Object.values(window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips || {}).find(x =>
       !detailed.has(x.name) &&
