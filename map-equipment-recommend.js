@@ -95,10 +95,19 @@ function hdMapEquipRenderHost(){
   if(fallback&&!document.querySelector('[data-map-tab="gear"]'))return fallback;
   return normal||fallback||document.getElementById('hdMapEquipRecommend');
 }
+function hdRenderMapEquipmentRecommendationsInto(host,map){
+  if(!host||!map)return false;
+  try{
+    host.innerHTML=hdMapEquipRecommendationsHtml(map);
+    return !!host.querySelector('.hd-map-equip-recommend');
+  }catch{
+    return false;
+  }
+}
 function hdRenderMapEquipmentRecommendations(){
   const host=hdMapEquipRenderHost();
-  if(!host||typeof selectedMap==='undefined'||!selectedMap)return;
-  host.innerHTML=hdMapEquipRecommendationsHtml(selectedMap);
+  if(!host||typeof selectedMap==='undefined'||!selectedMap)return false;
+  return hdRenderMapEquipmentRecommendationsInto(host,selectedMap);
 }
 function hdOpenEquipmentDb(name=''){
   const target=document.getElementById('equipmentBook');
@@ -127,6 +136,7 @@ window.addEventListener('hd:map-rendered',()=>hdMapEquipScheduleRender(0));
 window.addEventListener('hd:workspace-refresh',()=>hdMapEquipScheduleRender(0));
 
 window.hdMapEquipRecommendationsHtml=hdMapEquipRecommendationsHtml;
+window.hdRenderMapEquipmentRecommendationsInto=hdRenderMapEquipmentRecommendationsInto;
 window.hdRenderMapEquipmentRecommendations=hdRenderMapEquipmentRecommendations;
 window.hdMapEquipScheduleRender=hdMapEquipScheduleRender;
 hdMapEquipScheduleRender(0);
