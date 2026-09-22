@@ -3871,9 +3871,18 @@ test('release smoke: map攻略 inner controls work end to end', async ({ page })
   await page.locator('[data-map-tab="drop"]').click();
   const dropChip = page.locator('[data-hd-map-drop-ship]').first();
   await expect(dropChip).toBeVisible();
+  const dropMeta = {
+    ship: await dropChip.getAttribute('data-hd-map-drop-ship'),
+    map: await dropChip.getAttribute('data-hd-map-drop-map'),
+    node: await dropChip.getAttribute('data-hd-map-drop-node')
+  };
+  expect(dropMeta.ship).toBeTruthy();
+  expect(dropMeta.map).toBe('6-3');
+  expect(dropMeta.node).toBeTruthy();
   await dropChip.click();
   const hunts = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1') || '[]'));
   expect(hunts.length).toBeGreaterThan(0);
+  expect(hunts[0]).toMatchObject(dropMeta);
   await expect(page.locator('[data-hd-map-drop-ship].hunting').first()).toBeVisible();
 
   await page.evaluate(() => window.hdWSShowElement?.('dropHuntingDb', true));
@@ -4145,6 +4154,66 @@ test('release smoke: secondary drop and synced custom fleet controls work', asyn
   expect(fleet.ships[1].ship).toBe('時雨');
   await expect(page.locator('#customFleetPanel')).toContainText('ゲーム同期・第2艦隊・自動追従');
 
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke:攻略 secondary navigation survives workspace helper outage', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFSOpen === 'function' &&
+    typeof window.hdSPSOpen === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      {id:'fallback-akagi',name:'赤城',type:'正規空母',level:90,gear:''}
+    ]));
+    selectedWorld='6';
+    selectedMap='6-5';
+    renderMapPicker();
+
+    window.__hdFallbackScrollTargets = [];
+    HTMLElement.prototype.scrollIntoView = function(){
+      window.__hdFallbackScrollTargets.push(this.id || '');
+    };
+    window.__hdSavedWSShowElement = window.hdWSShowElement;
+    window.hdWSShowElement = undefined;
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async text => { window.__hdCopiedPrep = text; } }
+    });
+  });
+
+  await page.evaluate(() => window.hdFSOpen());
+  const suggester = page.locator('#hdFleetSuggester');
+  await expect(suggester).toBeVisible();
+  await suggester.locator('[data-hd-fs-roster]').first().click();
+  await expect.poll(() => page.evaluate(() => window.__hdFallbackScrollTargets)).toContain('roster');
+
+  await page.evaluate(() => window.hdSPSOpen());
+  const prep = page.locator('#hdSortiePreparation');
+  await expect(prep).toBeVisible();
+
+  await prep.locator('[data-hd-sps-copy]').click();
+  await expect.poll(() => page.evaluate(() => window.__hdCopiedPrep || '')).toContain('6-5');
+
+  await prep.locator('[data-hd-sps-workspace="roster"]').click();
+  await prep.locator('[data-hd-sps-workspace="hdEquipmentProcurement"]').click();
+  await prep.locator('[data-hd-sps-guide]').click();
+
+  const targets = await page.evaluate(() => window.__hdFallbackScrollTargets);
+  expect(targets).toContain('roster');
+  expect(targets).toContain('hdEquipmentProcurement');
+  expect(targets).toContain('guide');
+
+  await page.evaluate(() => {
+    window.hdWSShowElement = window.__hdSavedWSShowElement;
+    delete window.__hdSavedWSShowElement;
+  });
   expect(errors).toEqual([]);
 });
 
