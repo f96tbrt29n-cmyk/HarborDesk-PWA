@@ -470,16 +470,33 @@ function hdFEInstall(){
  };
  return true;
 }
+function hdFEOpenCalculator(){
+ hdFERevealTarget('guide',false);
+ setTimeout(()=>{
+  let opened=false;
+  if(typeof window.hdCoreMapAction==='function'){
+   try{
+    const result=window.hdCoreMapAction('gear');
+    if(result&&typeof result.then==='function')result.catch(()=>{});
+    opened=result!==false;
+   }catch{}
+  }
+  if(!opened&&typeof hdSortieOpenTab==='function')opened=hdSortieOpenTab('gear')!==false;
+  if(!opened){const btn=document.querySelector('[data-map-tab="gear"]');if(btn){btn.click();opened=true}}
+  setTimeout(()=>document.getElementById('hdFleetCalculator')?.scrollIntoView({behavior:'smooth',block:'start'}),80);
+ },60);
+ return true;
+}
+function hdFEOpenPreparation(){
+ if(typeof hdSPSOpen==='function'){hdSPSOpen();return true}
+ return hdFERevealTarget('guide',true);
+}
 document.addEventListener('click',e=>{
  const fix=e.target.closest?.('[data-hd-fe-fix]');if(fix){hdFEOpenFix(fix.dataset.hdFeFix);return}
  if(e.target.closest?.('[data-hd-fe-recheck]')){hdFERecheckFixFlow();return}
  if(e.target.closest?.('[data-hd-fe-fix-dismiss]')){hdFEFixFlowSave(null);try{if(typeof hdSPSRender==='function')hdSPSRender()}catch{}return}
- if(e.target.closest?.('[data-hd-fe-calculator]')){
-  if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);
-  setTimeout(()=>{document.querySelector('[data-map-tab="gear"]')?.click();setTimeout(()=>document.getElementById('hdFleetCalculator')?.scrollIntoView({behavior:'smooth',block:'start'}),80)},60);
-  return;
- }
- if(e.target.closest?.('[data-hd-fe-prep]')){if(typeof hdSPSOpen==='function')hdSPSOpen();return}
+ if(e.target.closest?.('[data-hd-fe-calculator]')){hdFEOpenCalculator();return}
+ if(e.target.closest?.('[data-hd-fe-prep]')){hdFEOpenPreparation();return}
 });
 window.hdFEFixActionInfo=hdFEFixActionInfo;
 window.hdFEOpenFix=hdFEOpenFix;
@@ -489,6 +506,8 @@ window.hdFEFixFlowState=hdFEFixFlowState;
 window.hdFEFixFlowSave=hdFEFixFlowSave;
 window.hdFEGateHtml=hdFEGateHtml;
 window.hdFERecheckFixFlow=hdFERecheckFixFlow;
+window.hdFEOpenCalculator=hdFEOpenCalculator;
+window.hdFEOpenPreparation=hdFEOpenPreparation;
 ['hd:kancolle-sync','hd:equipment-changed','hd:ship-identity-changed'].forEach(evt=>window.addEventListener(evt,hdFERefreshPendingFix));
 window.addEventListener('load',()=>setTimeout(()=>{if(!hdFEInstall())setTimeout(hdFEInstall,500)},720));
 hdFEInstall();
