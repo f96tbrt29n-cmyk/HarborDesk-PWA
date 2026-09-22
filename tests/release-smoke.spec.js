@@ -84,6 +84,32 @@ test('release smoke: workspace navigation changes location and returns home', as
   expect(errors).toEqual([]);
 });
 
+test('release smoke: explicit workspace navigation wins over deferred startup restore', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+
+  const result = await page.evaluate(() => {
+    sessionStorage.setItem('harbordesk-update-return-v1', JSON.stringify({
+      group: 'guide',
+      section: 'guide',
+      at: Date.now()
+    }));
+    const opened = window.hdWSRevealElement?.('equipmentBook', false, { history: false });
+    const before = window.hdWSCurrentLocation?.();
+    const restored = window.hdWSRestoreStartupContext?.();
+    const after = window.hdWSCurrentLocation?.();
+    return { opened, before, restored, after };
+  });
+
+  expect(result.opened).toBe(true);
+  expect(result.before).toMatchObject({ group: 'arsenal', section: 'equipmentBook' });
+  expect(result.restored).toBe(false);
+  expect(result.after).toMatchObject({ group: 'arsenal', section: 'equipmentBook' });
+  await expect(page.locator('#equipmentBook')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: personalized home renders operational cards', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
