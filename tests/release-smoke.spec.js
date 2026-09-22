@@ -4397,13 +4397,16 @@ test('release smoke: empty sortie preparation can open roster', async ({ page })
     { timeout: 30000 }
   );
 
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await expect(page.locator('#guide')).toBeVisible();
+
   await page.evaluate(() => {
     localStorage.removeItem('harbordesk-custom-fleets-v1');
     selectedWorld = '2';
     selectedMap = '2-4';
     renderMapPicker();
-    window.hdSPSOpen();
   });
+  await page.evaluate(() => window.hdSPSOpen());
 
   const prep = page.locator('#hdSortiePreparation');
   await expect(prep).toBeVisible({ timeout: 5000 });
