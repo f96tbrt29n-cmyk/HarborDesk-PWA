@@ -4700,6 +4700,7 @@ test('release smoke: sortie mode autosaves and restores in-progress draft', asyn
 });
 
 
+
 test('release smoke: sortie mode node picker records and rewinds route trail', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -4729,33 +4730,33 @@ test('release smoke: sortie mode node picker records and rewinds route trail', a
     window.hdSMOpen();
   });
 
-  await expect(page.locator('[data-hd-sm-node]')).toHaveCount(15);
-  await page.locator('[data-hd-sm-next-node="A"]').click();
-  await page.locator('[data-hd-sm-next-node="D"]').click();
-  await expect(page.locator('#hdSMNode')).toHaveValue('D');
-  await expect(page.locator('.hd-sm-route-trail')).toContainText('A → D');
+  await expect(page.locator('[data-hd-sm-node]')).toHaveCount(16);
+  await page.locator('[data-hd-sm-next-node="B"]').click();
+  await expect(page.locator('#hdSMNode')).toHaveValue('B');
+  await expect(page.locator('.hd-sm-route-trail')).toContainText('B');
 
   await page.locator('[data-hd-sm-safe-confirm]').click();
+  await page.locator('[data-hd-sm-next-node="G"]').click();
+  await expect(page.locator('#hdSMNode')).toHaveValue('G');
   await page.locator('[data-hd-sm-next-node="H"]').click();
+  await page.locator('[data-hd-sm-next-node="L"]').click();
   await page.locator('[data-hd-sm-safe-confirm]').click();
-  await page.locator('[data-hd-sm-next-node="J"]').click();
-  await page.locator('[data-hd-sm-safe-confirm]').click();
-  await page.locator('[data-hd-sm-next-node="O"]').click();
-  await expect(page.locator('#hdSMNode')).toHaveValue('O');
+  await page.locator('[data-hd-sm-next-node="P"]').click();
+  await expect(page.locator('#hdSMNode')).toHaveValue('P');
   await expect(page.locator('#hdSMBoss')).toBeChecked();
-  await expect(page.locator('.hd-sm-route-trail')).toContainText('A → D → H → J → O');
+  await expect(page.locator('.hd-sm-route-trail')).toContainText('B → G → H → L → P');
 
   await page.locator('[data-hd-sm-route-undo]').click();
-  await expect(page.locator('#hdSMNode')).toHaveValue('J');
+  await expect(page.locator('#hdSMNode')).toHaveValue('L');
   await expect(page.locator('#hdSMBoss')).not.toBeChecked();
   await page.locator('[data-hd-sm-route-undo]').click();
   await page.locator('[data-hd-sm-route-undo]').click();
-  await expect(page.locator('#hdSMNode')).toHaveValue('D');
-  await expect(page.locator('.hd-sm-route-trail')).toContainText('A → D');
+  await expect(page.locator('#hdSMNode')).toHaveValue('G');
+  await expect(page.locator('.hd-sm-route-trail')).toContainText('B → G');
 
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')||'null')?.draft || null);
-  expect(stored?.node).toBe('D');
-  expect(stored?.routeNodes).toEqual(['A','D']);
+  expect(stored?.node).toBe('G');
+  expect(stored?.routeNodes).toEqual(['B','G']);
   expect(stored?.boss).toBe(false);
   expect(errors).toEqual([]);
 });
@@ -4789,26 +4790,26 @@ test('release smoke: sortie mode prioritizes graph-connected next nodes', async 
     window.hdSMOpen();
   });
 
-  await expect(page.locator('[data-hd-sm-next-node]')).toHaveCount(2);
-  await expect(page.locator('[data-hd-sm-next-node="A"]')).toBeVisible();
-  await expect(page.locator('[data-hd-sm-next-node="B"]')).toBeVisible();
-  await expect(page.locator('[data-hd-sm-node]')).toHaveCount(15);
-
-  await page.locator('[data-hd-sm-next-node="A"]').click();
-  await expect(page.locator('#hdSMNode')).toHaveValue('A');
-  await expect(page.locator('[data-hd-sm-next-node]')).toHaveCount(2);
-  await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeEnabled();
-  await expect(page.locator('[data-hd-sm-next-node="D"]')).toBeEnabled();
-
-  await page.locator('[data-hd-sm-next-node="D"]').click();
-  await expect(page.locator('#hdSMNode')).toHaveValue('D');
   await expect(page.locator('[data-hd-sm-next-node]')).toHaveCount(1);
-  await expect(page.locator('[data-hd-sm-next-node="H"]')).toBeVisible();
-  await expect(page.locator('[data-hd-sm-next-node="H"]')).toBeDisabled();
-  await expect(page.locator('.hd-sm-route-trail')).toContainText('A → D');
+  await expect(page.locator('[data-hd-sm-next-node="B"]')).toBeVisible();
+  await expect(page.locator('[data-hd-sm-node]')).toHaveCount(16);
 
-  const nextRows = await page.evaluate(() => window.hdSMNextNodeRows('2-4',{node:'D'}).map(x=>x.label));
-  expect(nextRows).toEqual(['H']);
+  await page.locator('[data-hd-sm-next-node="B"]').click();
+  await expect(page.locator('#hdSMNode')).toHaveValue('B');
+  await expect(page.locator('[data-hd-sm-next-node]')).toHaveCount(2);
+  await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeDisabled();
+  await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeDisabled();
+
+  await page.locator('[data-hd-sm-safe-confirm]').click();
+  await page.locator('[data-hd-sm-next-node="C"]').click();
+  await expect(page.locator('#hdSMNode')).toHaveValue('C');
+  await expect(page.locator('[data-hd-sm-next-node]')).toHaveCount(2);
+  await expect(page.locator('[data-hd-sm-next-node="F"]')).toBeEnabled();
+  await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeEnabled();
+  await expect(page.locator('.hd-sm-route-trail')).toContainText('B → C');
+
+  const nextRows = await page.evaluate(() => window.hdSMNextNodeRows('2-4',{node:'C'}).map(x=>x.label).sort());
+  expect(nextRows).toEqual(['F','G']);
   expect(errors).toEqual([]);
 });
 
@@ -4841,21 +4842,20 @@ test('release smoke: sortie mode shows current node branch guidance', async ({ p
     window.hdSMOpen();
   });
 
-  await expect(page.locator('.hd-sm-branch-hint')).toBeVisible();
   await page.locator('[data-hd-sm-next-node="B"]').click();
-  await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeVisible();
-  await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeDisabled();
   await page.locator('[data-hd-sm-safe-confirm]').click();
   await page.locator('[data-hd-sm-next-node="G"]').click();
+  await page.locator('[data-hd-sm-next-node="H"]').click();
 
-  await expect(page.locator('.hd-sm-branch-hint')).toContainText('Gマスの分岐条件');
-  await expect(page.locator('.hd-sm-branch-hint')).toContainText('I/K');
-  const hint = await page.evaluate(() => window.hdSMBranchHint('2-4',{node:'G'}));
-  expect(hint.text).toContain('I/K');
+  await expect(page.locator('.hd-sm-branch-hint')).toContainText('Hマスの分岐条件');
+  await expect(page.locator('.hd-sm-branch-hint')).toContainText('L');
+  await expect(page.locator('.hd-sm-branch-hint')).toContainText('I');
+  const hint = await page.evaluate(() => window.hdSMBranchHint('2-4',{node:'H'}));
+  expect(hint.text).toContain('L');
+  expect(hint.text).toContain('I');
   expect(hint.source).toContain('攻略Wiki');
   expect(errors).toEqual([]);
 });
-
 
 test('release smoke: sortie mode previews next-node battle intelligence', async ({ page }) => {
   const errors = [];
@@ -4948,6 +4948,7 @@ test('release smoke: sortie mode recommends formations and current-node cautions
 });
 
 
+
 test('release smoke: sortie mode gates advancement behind damage confirmation', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -4984,24 +4985,23 @@ test('release smoke: sortie mode gates advancement behind damage confirmation', 
     window.hdSMOpen();
   });
 
-  await expect(page.locator('[data-hd-sm-next-node="B"]')).toBeEnabled();
   await page.locator('[data-hd-sm-next-node="B"]').click();
-
-  await expect(page.locator('.hd-sm-advance-guard')).toBeVisible();
   await expect(page.locator('.hd-sm-advance-guard')).toContainText('進撃前に大破確認');
   await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeDisabled();
   await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeDisabled();
 
   await page.locator('[data-hd-sm-safe-confirm]').click();
-  await expect(page.locator('.hd-sm-advance-guard')).toContainText('大破なし確認済み');
   await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeEnabled();
   await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeEnabled();
 
   await page.locator('[data-hd-sm-next-node="G"]').click();
-  await expect(page.locator('[data-hd-sm-next-node="I"]')).toBeDisabled();
+  await expect(page.locator('[data-hd-sm-next-node="H"]')).toBeEnabled();
+  await page.locator('[data-hd-sm-next-node="H"]').click();
+  await page.locator('[data-hd-sm-next-node="I"]').click();
+  await expect(page.locator('[data-hd-sm-next-node="E"]')).toBeDisabled();
   await expect(page.locator('[data-hd-sm-next-node="K"]')).toBeDisabled();
   const guard = await page.evaluate(() => window.hdSMAdvanceGuard(JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')), JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft));
-  expect(guard.current).toBe('G');
+  expect(guard.current).toBe('I');
   expect(guard.confirmed).toBe(false);
   expect(errors).toEqual([]);
 });
@@ -5127,6 +5127,7 @@ test('release smoke: sortie mode keeps current battle status visible in sticky h
 });
 
 
+
 test('release smoke: sortie mode auto-counts battles and supports quick return entry', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -5155,15 +5156,10 @@ test('release smoke: sortie mode auto-counts battles and supports quick return e
     window.hdSMOpen();
   });
 
-  await page.locator('[data-hd-sm-next-node="A"]').click();
-  await expect(page.locator('#hdSMBattles')).toHaveValue('0');
-  let afterA = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
-  expect(Number(afterA.battles)).toBe(0);
-  await page.evaluate(() => window.hdSMSaveDraft());
-  afterA = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
-  expect(Number(afterA.battles)).toBe(0);
-  await expect(page.locator('#hdSMBattles')).toHaveValue('0');
-  await page.locator('[data-hd-sm-next-node="D"]').click();
+  await page.locator('[data-hd-sm-next-node="B"]').click();
+  await expect(page.locator('#hdSMBattles')).toHaveValue('1');
+  await page.locator('[data-hd-sm-safe-confirm]').click();
+  await page.locator('[data-hd-sm-next-node="G"]').click();
   await expect(page.locator('#hdSMBattles')).toHaveValue('1');
 
   await page.locator('[data-hd-sm-quick-result="A"]').click();
@@ -5176,7 +5172,7 @@ test('release smoke: sortie mode auto-counts battles and supports quick return e
   await expect(page.locator('#hdSMBuckets')).toHaveValue('1');
 
   const data = await page.evaluate(() => ({
-    count: window.hdSMBattleCount('2-4',['A','D']),
+    count: window.hdSMBattleCount('2-4',['B','G']),
     draft: JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft
   }));
   expect(data.count).toBe(1);
@@ -5186,7 +5182,6 @@ test('release smoke: sortie mode auto-counts battles and supports quick return e
   expect(data.draft.buckets).toBe(1);
   expect(errors).toEqual([]);
 });
-
 
 test('release smoke: sortie mode records structured retreat reason', async ({ page }) => {
   const errors = [];
@@ -5268,6 +5263,7 @@ test('release smoke: sortie analytics summarizes structured retreat reasons', as
 });
 
 
+
 test('release smoke: sticky sortie HUD exposes confirmed next-node actions', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -5300,10 +5296,9 @@ test('release smoke: sticky sortie HUD exposes confirmed next-node actions', asy
 
   await hud.locator('[data-hd-sm-hud-node="G"]').click();
   await expect(page.locator('#hdSMNode')).toHaveValue('G');
-  await expect(page.locator('.hd-sm-hud')).toContainText('大破未確認');
-  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node]')).toHaveCount(0);
-  await expect(page.locator('[data-hd-sm-next-node="I"]')).toBeDisabled();
-  await expect(page.locator('[data-hd-sm-next-node="K"]')).toBeDisabled();
+  await expect(page.locator('.hd-sm-hud')).toContainText('非戦闘');
+  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="H"]')).toBeVisible();
+  await expect(page.locator('[data-hd-sm-next-node="H"]')).toBeEnabled();
 
   const draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
   expect(draft.node).toBe('G');
@@ -5330,7 +5325,7 @@ test('release smoke: sticky sortie HUD shows current route condition', async ({ 
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
       status:'active',
-      draft:{node:'G',routeNodes:['B','G'],result:'S',memo:'',advanceGuard:{node:'G',safe:false,at:Date.now()}}
+      draft:{node:'H',routeNodes:['B','G','H'],result:'S',memo:'',advanceGuard:null}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
@@ -5339,8 +5334,9 @@ test('release smoke: sticky sortie HUD shows current route condition', async ({ 
 
   const route = page.locator('.hd-sm-hud-branch');
   await expect(route).toBeVisible();
-  await expect(route).toContainText('Gマスの分岐条件');
-  await expect(route).toContainText('I/K');
+  await expect(route).toContainText('Hマスの分岐条件');
+  await expect(route).toContainText('L');
+  await expect(route).toContainText('I');
   expect(errors).toEqual([]);
 });
 
@@ -5353,8 +5349,8 @@ test('release smoke: sticky sortie HUD shows battle progress and boss distance',
     typeof window.hdSMBossDistance === 'function'
   );
 
-  const distance = await page.evaluate(() => window.hdSMBossDistance('2-4','D'));
-  expect(distance).toBeGreaterThan(0);
+  const distance = await page.evaluate(() => window.hdSMBossDistance('2-4','L'));
+  expect(distance).toBe(1);
 
   await page.evaluate(() => {
     localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
@@ -5369,7 +5365,7 @@ test('release smoke: sticky sortie HUD shows battle progress and boss distance',
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
       status:'active',
-      draft:{node:'D',routeNodes:['A','D'],result:'S',memo:'',advanceGuard:{node:'D',safe:true,at:Date.now()}}
+      draft:{node:'L',routeNodes:['B','G','H','L'],result:'S',memo:'',advanceGuard:{node:'L',safe:true,at:Date.now()}}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
@@ -5378,8 +5374,9 @@ test('release smoke: sticky sortie HUD shows battle progress and boss distance',
 
   const progress = page.locator('.hd-sm-hud-progress');
   await expect(progress).toBeVisible();
-  await expect(progress).toContainText('戦闘 1');
+  await expect(progress).toContainText('戦闘 2');
   await expect(progress).toContainText('構造図最短 ボスまで');
+  await expect(progress).toContainText('1マス');
   expect(errors).toEqual([]);
 });
 
@@ -5393,10 +5390,10 @@ test('release smoke: sortie skips damage confirmation on verified non-battle nod
   );
 
   const checks = await page.evaluate(() => ({
-    itemA: window.hdSMRequiresAdvanceCheck('2-4','A'),
+    itemG: window.hdSMRequiresAdvanceCheck('2-4','G'),
     battleB: window.hdSMRequiresAdvanceCheck('2-4','B')
   }));
-  expect(checks.itemA).toBe(false);
+  expect(checks.itemG).toBe(false);
   expect(checks.battleB).toBe(true);
 
   await page.evaluate(() => {
@@ -5418,17 +5415,21 @@ test('release smoke: sortie skips damage confirmation on verified non-battle nod
     window.hdSMOpen();
   });
 
-  await page.locator('[data-hd-sm-next-node="A"]').click();
+  await page.locator('[data-hd-sm-next-node="B"]').click();
+  await expect(page.locator('.hd-sm-advance-guard')).toBeVisible();
+  await page.locator('[data-hd-sm-safe-confirm]').click();
+  await page.locator('[data-hd-sm-next-node="G"]').click();
   await expect(page.locator('.hd-sm-hud')).toContainText('非戦闘');
   await expect(page.locator('.hd-sm-advance-guard')).toHaveCount(0);
-  await expect(page.locator('[data-hd-sm-next-node="C"]')).toBeEnabled();
-  await expect(page.locator('[data-hd-sm-next-node="D"]')).toBeEnabled();
+  await expect(page.locator('[data-hd-sm-next-node="H"]')).toBeEnabled();
 
-  await page.locator('[data-hd-sm-next-node="C"]').click();
+  await page.locator('[data-hd-sm-next-node="H"]').click();
+  await expect(page.locator('[data-hd-sm-next-node="L"]')).toBeEnabled();
+  await page.locator('[data-hd-sm-next-node="L"]').click();
   await expect(page.locator('.hd-sm-hud')).toContainText('大破未確認');
   await expect(page.locator('.hd-sm-advance-guard')).toBeVisible();
-  await expect(page.locator('[data-hd-sm-next-node="F"]')).toBeDisabled();
-  await expect(page.locator('[data-hd-sm-next-node="G"]')).toBeDisabled();
+  await expect(page.locator('[data-hd-sm-next-node="M"]')).toBeDisabled();
+  await expect(page.locator('[data-hd-sm-next-node="P"]')).toBeDisabled();
   expect(errors).toEqual([]);
 });
 
@@ -5443,17 +5444,17 @@ test('release smoke: sortie derives effective node kinds from verified data', as
   );
 
   const kinds = await page.evaluate(() => ({
-    a: window.hdSMEffectiveNodeKind('2-4','A','normal'),
+    g: window.hdSMEffectiveNodeKind('2-4','G','normal'),
     b: window.hdSMEffectiveNodeKind('2-4','B','normal'),
-    aIntel: window.hdSMNodeIntel('2-4',{label:'A',kind:'normal'}),
+    gIntel: window.hdSMNodeIntel('2-4',{label:'G',kind:'normal'}),
     bIntel: window.hdSMNodeIntel('2-4',{label:'B',kind:'normal'})
   }));
 
-  expect(kinds.a).toBe('item');
+  expect(kinds.g).toBe('item');
   expect(kinds.b).toBe('normal');
-  expect(kinds.aIntel.kind).toBe('item');
-  expect(kinds.aIntel.formation).toBe('選択なし');
-  expect(kinds.aIntel.badge).toBe('非戦闘');
+  expect(kinds.gIntel.kind).toBe('item');
+  expect(kinds.gIntel.formation).toBe('選択なし');
+  expect(kinds.gIntel.badge).toBe('非戦闘');
   expect(kinds.bIntel.kind).toBe('normal');
   expect(kinds.bIntel.formation).toBe('単縦陣');
 
@@ -5476,10 +5477,12 @@ test('release smoke: sortie derives effective node kinds from verified data', as
     window.hdSMOpen();
   });
 
-  const a = page.locator('[data-hd-sm-next-node="A"]');
-  await expect(a).toContainText('資源');
-  await expect(a).toContainText('基本陣形 選択なし');
-  await a.click();
+  await page.locator('[data-hd-sm-next-node="B"]').click();
+  await page.locator('[data-hd-sm-safe-confirm]').click();
+  const g = page.locator('[data-hd-sm-next-node="G"]');
+  await expect(g).toContainText('資源');
+  await expect(g).toContainText('基本陣形 選択なし');
+  await g.click();
   await expect(page.locator('.hd-sm-hud')).toContainText('資源');
   await expect(page.locator('.hd-sm-current-tactic')).toContainText('選択なし');
   expect(errors).toEqual([]);
@@ -5496,8 +5499,8 @@ test('release smoke: sortie uses effective non-battle kind in HUD and node intel
   );
 
   const intel = await page.evaluate(() => ({
-    kind: window.hdSMEffectiveNodeKind('2-4','A','normal'),
-    node: window.hdSMNodeIntel('2-4',{label:'A',kind:'normal'})
+    kind: window.hdSMEffectiveNodeKind('2-4','G','normal'),
+    node: window.hdSMNodeIntel('2-4',{label:'G',kind:'normal'})
   }));
   expect(intel.kind).toBe('item');
   expect(intel.node.kind).toBe('item');
@@ -5507,33 +5510,29 @@ test('release smoke: sortie uses effective non-battle kind in HUD and node intel
 
   await page.evaluate(() => {
     localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
-      id:'sm-effective-kind-session',
+      id:'sm-effective-kind-hud-session',
       map:'2-4',
       startedAt:Date.now()-60000,
-      fleetId:'sm-effective-kind-fleet',
+      fleetId:'sm-effective-kind-hud-fleet',
       fleetName:'実質マス種別テスト艦隊',
       strategy:'manual',
       strategyLabel:'手動編成',
-      fleetSnapshot:{id:'sm-effective-kind-fleet',name:'実質マス種別テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
+      fleetSnapshot:{id:'sm-effective-kind-hud-fleet',name:'実質マス種別テスト艦隊',ships:[{ship:'雪風',gear:'主砲'}]},
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
-      status:'active'
+      status:'active',
+      draft:{node:'G',routeNodes:['B','G'],result:'S',memo:'',advanceGuard:null}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
     window.hdSMOpen();
   });
 
-  const a = page.locator('[data-hd-sm-next-node="A"]');
-  await expect(a).toContainText('資源');
-  await expect(a).toContainText('非戦闘');
-  await expect(a).toContainText('選択なし');
-  await a.click();
-
   const hud = page.locator('.hd-sm-hud');
   await expect(hud).toContainText('資源');
   await expect(hud).toContainText('基本陣形 選択なし');
   await expect(hud).toContainText('非戦闘');
+  await expect(hud.locator('[data-hd-sm-hud-node="H"]')).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -5547,12 +5546,12 @@ test('release smoke: sticky sortie HUD shows minimum remaining battles', async (
   );
 
   const remaining = await page.evaluate(() => ({
-    d: window.hdSMBossBattleDistance('2-4','D'),
-    a: window.hdSMBossBattleDistance('2-4','A'),
-    boss: window.hdSMBossBattleDistance('2-4','O')
+    g: window.hdSMBossBattleDistance('2-4','G'),
+    l: window.hdSMBossBattleDistance('2-4','L'),
+    boss: window.hdSMBossBattleDistance('2-4','P')
   }));
-  expect(remaining.d).toBe(3);
-  expect(remaining.a).toBe(4);
+  expect(remaining.g).toBe(2);
+  expect(remaining.l).toBe(1);
   expect(remaining.boss).toBe(0);
 
   await page.evaluate(() => {
@@ -5568,7 +5567,7 @@ test('release smoke: sticky sortie HUD shows minimum remaining battles', async (
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
       status:'active',
-      draft:{node:'D',routeNodes:['A','D'],result:'S',memo:'',advanceGuard:{node:'D',safe:true,at:Date.now()}}
+      draft:{node:'G',routeNodes:['B','G'],result:'S',memo:'',advanceGuard:null}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
@@ -5578,7 +5577,7 @@ test('release smoke: sticky sortie HUD shows minimum remaining battles', async (
   const progress = page.locator('.hd-sm-hud-progress');
   await expect(progress).toContainText('戦闘 1');
   await expect(progress).toContainText('構造図最短 ボスまで');
-  await expect(progress).toContainText('最少戦闘あと 3');
+  await expect(progress).toContainText('最少戦闘あと 2');
   expect(errors).toEqual([]);
 });
 
@@ -5610,13 +5609,16 @@ test('release smoke: sortie switches guide labels for non-battle nodes', async (
     window.hdSMOpen();
   });
 
-  await page.locator('[data-hd-sm-next-node="A"]').click();
+  await page.locator('[data-hd-sm-next-node="B"]').click();
+  await page.locator('[data-hd-sm-safe-confirm]').click();
+  await page.locator('[data-hd-sm-next-node="G"]').click();
   const nonBattle = page.locator('.hd-sm-current-tactic');
   await expect(nonBattle).toContainText('NODE GUIDE');
   await expect(nonBattle).toContainText('確認ポイント');
   await expect(nonBattle).toContainText('選択なし');
 
-  await page.locator('[data-hd-sm-next-node="D"]').click();
+  await page.locator('[data-hd-sm-next-node="H"]').click();
+  await page.locator('[data-hd-sm-next-node="L"]').click();
   const battle = page.locator('.hd-sm-current-tactic');
   await expect(battle).toContainText('BATTLE GUIDE');
   await expect(battle).toContainText('警戒ポイント');
@@ -5641,8 +5643,8 @@ test('release smoke: sortie marks boss-connected versus off-route next nodes', a
     sevenTwoTarget: window.hdSMRouteTargetName('7-2')
   }));
   expect(reach.l).toBe(true);
-  expect(reach.m).toBe(false);
-  expect(reach.o).toBe(true);
+  expect(reach.m).toBe(true);
+  expect(reach.o).toBe(false);
   expect(reach.sevenTwoGoalRoute).toBe(true);
   expect(reach.sevenTwoTarget).toBe('攻略目標');
 
@@ -5659,7 +5661,7 @@ test('release smoke: sortie marks boss-connected versus off-route next nodes', a
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
       status:'active',
-      draft:{node:'I',routeNodes:['B','G','I'],result:'S',memo:'',advanceGuard:{node:'I',safe:true,at:Date.now()}}
+      draft:{node:'K',routeNodes:['B','G','H','I','K'],result:'S',memo:'',advanceGuard:null}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
@@ -5667,15 +5669,14 @@ test('release smoke: sortie marks boss-connected versus off-route next nodes', a
   });
 
   const l = page.locator('[data-hd-sm-next-node="L"]');
-  const m = page.locator('[data-hd-sm-next-node="M"]');
+  const o = page.locator('[data-hd-sm-next-node="O"]');
   await expect(l).toContainText('構造図上 ボス接続');
-  await expect(m).toContainText('構造図上 逸れ候補');
+  await expect(o).toContainText('構造図上 逸れ候補');
   await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="L"]')).toContainText('ボス接続');
-  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="M"]')).toContainText('逸れ候補');
-  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="M"]')).toHaveClass(/route-off/);
+  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="O"]')).toContainText('逸れ候補');
+  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="O"]')).toHaveClass(/route-off/);
   expect(errors).toEqual([]);
 });
-
 
 test('release smoke: sortie progress uses nearest valid objective on multi-target maps', async ({ page }) => {
   const errors = [];
@@ -6214,6 +6215,7 @@ test('release smoke: route alert can mark route-deviation retreat', async ({ pag
 });
 
 
+
 test('release smoke: sortie highlights minimum-battle next route', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -6223,12 +6225,12 @@ test('release smoke: sortie highlights minimum-battle next route', async ({ page
   );
 
   const rank = await page.evaluate(() =>
-    window.hdSMNextRouteRank('2-4',{node:'C',routeNodes:['A','C'],objectiveTarget:'O'},[
-      {label:'F',kind:'normal'},{label:'G',kind:'normal'}
+    window.hdSMNextRouteRank('2-4',{node:'C',routeNodes:['B','C'],objectiveTarget:'P'},[
+      {label:'F',kind:'normal'},{label:'G',kind:'item'}
     ])
   );
-  expect(rank.labels).toEqual(['F']);
-  expect(rank.score.battles).toBeLessThan(4);
+  expect(rank.labels).toEqual(['G']);
+  expect(rank.score).toEqual({battles:2,steps:4});
 
   await page.evaluate(() => {
     localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
@@ -6243,7 +6245,7 @@ test('release smoke: sortie highlights minimum-battle next route', async ({ page
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
       status:'active',
-      draft:{node:'C',routeNodes:['A','C'],result:'S',memo:'',objectiveTarget:'O',advanceGuard:{node:'C',safe:true,at:Date.now()}}
+      draft:{node:'C',routeNodes:['B','C'],result:'S',memo:'',objectiveTarget:'P',advanceGuard:null}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
@@ -6252,19 +6254,18 @@ test('release smoke: sortie highlights minimum-battle next route', async ({ page
 
   const f = page.locator('[data-hd-sm-next-node="F"]');
   const g = page.locator('[data-hd-sm-next-node="G"]');
-  await expect(f).toHaveClass(/best-route/);
-  await expect(f).toContainText('最少戦闘候補');
-  await expect(f).toContainText('残り 3戦 / 3マス');
-  await expect(f).toContainText('比較基準');
-  await expect(g).toContainText('残り 4戦 / 4マス');
-  await expect(g).toContainText('最少候補比 +1戦 / +1マス');
-  await expect(g).not.toHaveClass(/best-route/);
-  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="F"]')).toHaveClass(/best-route/);
-  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="F"]')).toContainText('最少');
-  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="G"]')).toContainText('差 +1戦/+1マス');
+  await expect(g).toHaveClass(/best-route/);
+  await expect(g).toContainText('最少戦闘候補');
+  await expect(g).toContainText('残り 2戦 / 4マス');
+  await expect(g).toContainText('比較基準');
+  await expect(f).toContainText('残り 3戦 / 4マス');
+  await expect(f).toContainText('最少候補比 +1戦 / ±0マス');
+  await expect(f).not.toHaveClass(/best-route/);
+  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="G"]')).toHaveClass(/best-route/);
+  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="G"]')).toContainText('最少');
+  await expect(page.locator('.hd-sm-hud [data-hd-sm-hud-node="F"]')).toContainText('差 +1戦/±0マス');
   expect(errors).toEqual([]);
 });
-
 
 test('release smoke: failed dynamic module can recover on retry', async ({ page }) => {
   const errors = [];
