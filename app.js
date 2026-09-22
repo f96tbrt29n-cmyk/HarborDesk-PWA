@@ -172,15 +172,18 @@ function hdToastAction(message,label,onAction,ms=5000){
 window.hdToastAction=hdToastAction;
 function hdRevealWorkspaceTarget(target,scroll=true){
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
+ let routed=false;
  if(typeof window.hdWSRevealElement==='function'){
-  try{if(window.hdWSRevealElement(el,scroll,{history:false}))return true}catch{}
+  try{routed=!!window.hdWSRevealElement(el,scroll,{history:false})}catch{}
  }
+ // Even when workspace routing reports success, guarantee the concrete target itself
+ // and its wrappers are visible. This covers nested/late workspace redraw races.
  el.hidden=false;el.classList?.remove('hd-ws-hidden','hd-ws-wrapper-hidden');
  for(let p=el.parentElement;p&&p!==document.body;p=p.parentElement){
   p.classList?.remove('hd-ws-wrapper-hidden');
   if(p.matches?.('section')&&p.classList?.contains('hd-ws-hidden'))p.classList.remove('hd-ws-hidden');
  }
- if(scroll)requestAnimationFrame(()=>{if(document.contains(el))el.scrollIntoView({behavior:'smooth',block:'start'})});
+ if(scroll&&!routed)requestAnimationFrame(()=>{if(document.contains(el))el.scrollIntoView({behavior:'smooth',block:'start'})});
  return true;
 }
 window.hdRevealWorkspaceTarget=hdRevealWorkspaceTarget;
