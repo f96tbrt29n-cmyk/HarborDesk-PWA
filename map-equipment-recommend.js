@@ -118,7 +118,16 @@ if(typeof hdApplyMapTabs==='function'){
   const hdMapEquipPrevApply=hdApplyMapTabs;
   hdApplyMapTabs=function(){hdMapEquipPrevApply();setTimeout(hdRenderMapEquipmentRecommendations,0)};
 }
-window.addEventListener('load',()=>setTimeout(hdRenderMapEquipmentRecommendations,180));
+function hdMapEquipScheduleRender(delay=0){
+  setTimeout(()=>{try{hdRenderMapEquipmentRecommendations()}catch{}},Math.max(0,Number(delay)||0));
+}
+window.addEventListener('load',()=>hdMapEquipScheduleRender(180));
+window.addEventListener('hd:modules-ready',()=>hdMapEquipScheduleRender(0));
+window.addEventListener('hd:map-rendered',()=>hdMapEquipScheduleRender(0));
+window.addEventListener('hd:workspace-refresh',()=>hdMapEquipScheduleRender(0));
 
 window.hdMapEquipRecommendationsHtml=hdMapEquipRecommendationsHtml;
 window.hdRenderMapEquipmentRecommendations=hdRenderMapEquipmentRecommendations;
+window.hdMapEquipScheduleRender=hdMapEquipScheduleRender;
+hdMapEquipScheduleRender(0);
+hdMapEquipScheduleRender(350);
