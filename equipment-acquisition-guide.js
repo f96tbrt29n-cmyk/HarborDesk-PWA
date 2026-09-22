@@ -138,8 +138,12 @@ function hdAGOpenItem(name,map=''){
 }
 function hdAGShowElement(id){
  const target=document.getElementById(id);if(!target)return false;
- if(typeof hdWSShowElement==='function')return hdWSShowElement(id,true);
- target.scrollIntoView({behavior:'smooth',block:'start'});return true;
+ let opened=false;
+ if(typeof window.hdRevealWorkspaceTarget==='function')opened=window.hdRevealWorkspaceTarget(target,true)!==false;
+ if(!opened&&typeof hdWSShowElement==='function')opened=hdWSShowElement(target,true)!==false;
+ if(!opened&&typeof hdQNJump==='function')opened=hdQNJump(id)!==false;
+ if(!opened){target.hidden=false;target.classList?.remove('hd-ws-hidden');target.scrollIntoView({behavior:'smooth',block:'start'});opened=true}
+ return opened;
 }
 function hdAGOpenDevelopment(name){
  document.getElementById('hdAcquisitionDialog')?.close();hdAGShowElement('developmentLab');
@@ -152,7 +156,13 @@ function hdAGOpenImprovement(name){
 }
 function hdAGOpenCatalog(name){
  document.getElementById('hdAcquisitionDialog')?.close();
- if(typeof hdOpenEquipmentDb==='function')hdOpenEquipmentDb(name);else hdAGShowElement('equipmentBook');
+ let opened=false;
+ if(typeof hdOpenEquipmentDb==='function')opened=hdOpenEquipmentDb(name)!==false;
+ if(!opened){
+  opened=hdAGShowElement('equipmentBook');
+  if(opened&&name)setTimeout(()=>{const q=document.getElementById('hdEquipCatalogSearch')||document.getElementById('equipmentSearch');if(q){q.value=name;q.dispatchEvent(new Event('input',{bubbles:true}));q.focus()}},180);
+ }
+ return opened;
 }
 function hdAGAdd(name){
  const item=hdAGItemByName(name);if(!item||typeof openEquipment!=='function')return;
