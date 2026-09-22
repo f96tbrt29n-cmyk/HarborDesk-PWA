@@ -151,8 +151,14 @@ function hdFSSave(index){
  if(typeof hdSortieSetSelection==='function')hdSortieSetSelection(map,id);if(typeof renderCustomFleets==='function')renderCustomFleets(map);if(typeof hdSPSRender==='function')hdSPSRender();
  var btn=document.querySelector('[data-hd-fs-save="'+index+'"]');if(btn){btn.textContent='保存したよ';setTimeout(function(){btn.textContent='この候補を自分用編成に保存'},1300)}
 }
-function hdFSOpen(){hdFSEnsure();if(typeof hdWSShowElement==='function')hdWSShowElement('hdFleetSuggester',true);else document.getElementById('hdFleetSuggester')?.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(hdFSRender,30)}
-function hdFSOpenRoster(){if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return true;const target=document.getElementById('roster');if(target){target.scrollIntoView({behavior:'smooth',block:'start'});return true}return false}
+function hdFSReveal(target){
+ if(!target)return false;
+ target.classList?.remove('hd-ws-hidden');
+ for(var p=target.parentElement;p&&p!==document.body;p=p.parentElement)p.classList?.remove('hd-ws-wrapper-hidden');
+ target.scrollIntoView?.({behavior:'smooth',block:'start'});return true;
+}
+function hdFSOpen(){hdFSEnsure();var target=document.getElementById('hdFleetSuggester');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdFleetSuggester',true)))hdFSReveal(target);setTimeout(hdFSRender,30)}
+function hdFSOpenRoster(){if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return true;return hdFSReveal(document.getElementById('roster'))}
 function hdFSMapButton(){var head=document.querySelector('#selectedMapCard .map-tabs-head');if(!head||head.querySelector('[data-hd-fs-open]'))return;var b=document.createElement('button');b.type='button';b.className='ghost small';b.setAttribute('data-hd-fs-open','1');b.textContent='編成候補';head.appendChild(b)}
 document.addEventListener('click',function(e){
  if(e.target.closest('[data-hd-fs-open]')){hdFSOpen();return}
