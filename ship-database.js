@@ -8909,7 +8909,10 @@ function hdShipDbResolveOwnedLoadout(ship,set){
 function hdShipDbOwnedFitHtml(ship,set){
  if(!set)return '';
  const plan=hdShipDbResolveOwnedLoadout(ship,set);
- if(!plan.inventoryCount)return '<div class="hd-map-owned-fit empty-fit"><b>手持ち装備案</b><span>装備台帳が空だよ。装備を登録するとここに自動配備する。</span></div>';
+ if(!plan.inventoryCount){
+  const rows=[...plan.slots].sort((a,b)=>(a.slotIndex??99)-(b.slotIndex??99));
+  return `<div class="hd-map-owned-fit empty-fit"><div class="hd-map-owned-fit-head"><div><b>手持ち装備案</b><small>装備台帳が空。必要装備の入手方法をここから確認できるよ。</small></div></div><div class="hd-map-owned-slots">${rows.map(x=>{const slot=plan.profile?`第${(x.slotIndex??0)+1}スロ・${x.capacity}機`:`装備枠${(x.slotIndex??0)+1}`;return `<span class="missing"><i>!</i><b>不足</b><small>${slot}｜${hdShipDbEsc(x.wanted)}</small><button type="button" class="ghost small" data-hd-ship-acquire="${hdShipDbEsc(x.wanted)}">入手方法</button></span>`}).join('')}</div><button type="button" class="ghost small" data-hd-ship-equip-ledger>装備台帳を開く</button></div>`;
+ }
  const cls=plan.filled===plan.total?'complete':plan.filled?'partial':'missing';
  const rows=[...plan.slots].sort((a,b)=>(a.slotIndex??99)-(b.slotIndex??99));
  const slotNote=plan.profile?'<small>搭載数を考慮して航空装備を自動配置</small>':'<small>装備可否・性能から自動配備</small>';
