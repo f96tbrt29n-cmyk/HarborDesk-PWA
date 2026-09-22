@@ -189,6 +189,7 @@ function hdCoreMapToolsHtml(){
   </div>
  </section>`;
 }
+let hdCoreFallbackActive='';
 function hdCoreFallbackHost(id,pane){
  const card=document.getElementById('selectedMapCard');if(!card)return null;
  let host=document.getElementById(id);
@@ -202,8 +203,28 @@ function hdCoreActivateFallbackPane(host){
  const card=document.getElementById('selectedMapCard');
  card?.querySelectorAll('[data-hd-core-fallback-pane]').forEach(x=>{const on=x===host;x.classList.toggle('active',on);x.hidden=!on});
  host.hidden=false;host.classList.add('active');
+ hdCoreFallbackActive=String(host.dataset.mapPane||'');
+ const guide=host.closest('#guide');
+ if(guide&&!guide.classList.contains('hd-ws-hidden')&&!guide.hidden){host.scrollIntoView({behavior:'smooth',block:'start'});return true}
  if(typeof window.hdWSShowElement==='function'&&window.hdWSShowElement(host,true))return true;
  host.scrollIntoView({behavior:'smooth',block:'start'});return true;
+}
+function hdCoreRestoreFallback(){
+ if(!hdCoreFallbackActive||!selectedMap||document.querySelector('[data-map-tab]'))return false;
+ const openers={
+  map:()=>hdCoreOpenMapFallback(),
+  fleet:()=>hdCoreOpenFleetFallback(),
+  route:()=>hdCoreOpenRouteFallback(),
+  gear:()=>typeof window.hdFCOpenFallback==='function'&&window.hdFCOpenFallback(),
+  quest:()=>hdCoreOpenQuestFallback(),
+  drop:()=>typeof window.hdDropOpenMapPanel==='function'&&window.hdDropOpenMapPanel(),
+  mine:()=>typeof window.cfOpenMapPanel==='function'&&window.cfOpenMapPanel()
+ };
+ const fn=openers[hdCoreFallbackActive];return typeof fn==='function'?!!fn():false;
+}
+function hdCoreScheduleFallbackRestore(){
+ if(!hdCoreFallbackActive||document.querySelector('[data-map-tab]'))return;
+ setTimeout(()=>{if(hdCoreFallbackActive&&!document.querySelector('[data-map-tab]'))hdCoreRestoreFallback()},0);
 }
 function hdCoreOpenMapFallback(){
  if(!selectedMap)return false;
@@ -266,7 +287,7 @@ async function hdCoreQuestAction(kind,id){
 async function hdCoreMapAction(action){
  if(!action)return false;
  if(typeof window.hdMapOpenTool==='function'){
-  try{if(await window.hdMapOpenTool(action))return true}catch{}
+  try{if(await window.hdMapOpenTool(action)){hdCoreFallbackActive='';return true}}catch{}
  }
  const lazy=action==='suggest'?['hdFSOpen','編成候補']:action==='prep'?['hdSPSOpen','出撃準備']:null;
  if(lazy){
@@ -277,12 +298,12 @@ async function hdCoreMapAction(action){
    try{await window.hdEnsureCurrentAssets()}catch{}
    finally{button?.removeAttribute('aria-busy')}
   }
-  if(typeof window[fn]==='function'){window[fn]();return true}
+  if(typeof window[fn]==='function'){hdCoreFallbackActive='';window[fn]();return true}
   window.hdToast?.(`${label}を読み込めなかったよ。アプリ更新を試してね`,'warn');
   return false;
  }
  const tab=document.querySelector(`[data-map-tab="${action}"]`);
- if(tab){tab.click();return true}
+ if(tab){hdCoreFallbackActive='';tab.click();return true}
  if(action==='map'&&hdCoreOpenMapFallback())return true;
  if(action==='fleet'&&hdCoreOpenFleetFallback())return true;
  if(action==='route'&&hdCoreOpenRouteFallback())return true;
@@ -300,6 +321,7 @@ async function hdCoreMapAction(action){
 }
 window.hdCoreMapToolsHtml=hdCoreMapToolsHtml;
 window.hdCoreActivateFallbackPane=hdCoreActivateFallbackPane;
+window.hdCoreRestoreFallback=hdCoreRestoreFallback;
 window.hdCoreOpenMapFallback=hdCoreOpenMapFallback;
 window.hdCoreOpenFleetFallback=hdCoreOpenFleetFallback;
 window.hdCoreOpenRouteFallback=hdCoreOpenRouteFallback;
@@ -318,6 +340,7 @@ function renderMapPicker(){
   return;
  }
  card.innerHTML=`<article class="map-detail-card"><div class="map-detail-title"><div><span class="guide-tag">${WORLD_NAMES[selectedWorld]}</span><h3>${selectedMap} ${esc(d.name)}</h3><div class="muted">${esc(d.sourceDate)}</div></div></div><div class="map-detail-section"><strong>概要</strong><p>${esc(d.overview)}</p></div>${hdCoreMapToolsHtml()}<div class="map-detail-grid"><div class="map-detail-section"><strong>おすすめ編成</strong><p>${esc(d.formation)}</p></div><div class="map-detail-section"><strong>主なルート</strong><p>${esc(d.route)}</p></div><div class="map-detail-section"><strong>制空・航空</strong><p>${esc(d.air)}</p></div><div class="map-detail-section warn"><strong>注意点</strong><p>${esc(d.caution)}</p></div></div><div class="map-detail-actions"><a class="guide-link" href="${wikiMapUrl(selectedMap)}" target="_blank" rel="noopener">最新の攻略Wikiを確認 ↗</a></div></article>`;
+ hdCoreScheduleFallbackRestore();
 }
 
 window.hdMapBaseRenderPicker=renderMapPicker;
