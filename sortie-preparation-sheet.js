@@ -186,7 +186,9 @@ function hdSPSReveal(target,scroll=true){
  if(scroll)target.scrollIntoView?.({behavior:'smooth',block:'start'});return true;
 }
 function hdSPSOpen(){
- hdSPSEnsure();const target=document.getElementById('hdSortiePreparation');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdSortiePreparation',true)))hdSPSReveal(target);setTimeout(hdSPSRender,40);
+ hdSPSEnsure();const target=document.getElementById('hdSortiePreparation');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdSortiePreparation',true)))hdSPSReveal(target);
+ setTimeout(()=>{hdSPSReveal(target,false);hdSPSRender()},70);
+ setTimeout(()=>{hdSPSReveal(target,false);hdSPSRender()},430);
 }
 function hdSPSOpenWorkspace(id){
  if(typeof hdWSShowElement==='function'&&hdWSShowElement(id,true))return true;
