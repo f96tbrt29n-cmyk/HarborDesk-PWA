@@ -4106,6 +4106,137 @@ test('release smoke: map gear calculators persist detailed controls', async ({ p
 });
 
 
+test('release smoke: land base owned-only filter and manual aircraft selection work', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdRenderLandBasePlanner === 'function', null, { timeout: 30000 });
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-land-base-v1');
+    localStorage.removeItem('harbordesk-equipment-v1');
+    selectedWorld = '6';
+    selectedMap = '6-5';
+    renderMapPicker();
+  });
+
+  await page.locator('[data-map-tab="gear"]').click();
+  const planner = page.locator('[data-map-pane="gear"] #hdLandBasePlanner');
+  await expect(planner).toBeVisible();
+
+  const firstPlane = planner.locator('[data-hd-lb-plane="0"][data-squad="0"]');
+  const aircraft = await firstPlane.locator('option').evaluateAll(opts =>
+    opts.map(o => o.value).filter(Boolean)
+  );
+  expect(aircraft.length).toBeGreaterThan(2);
+  const ownedName = aircraft[0];
+
+  await page.evaluate(name => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      { id:'lb-owned-test', name, count:2, star:3 }
+    ]));
+  }, ownedName);
+
+  await planner.locator('#hdLBOnlyOwned').check();
+  await expect(planner.locator('#hdLBOnlyOwned')).toBeChecked();
+
+  const filtered = await planner.locator('[data-hd-lb-plane="0"][data-squad="0"] option').evaluateAll(opts =>
+    opts.map(o => o.value).filter(Boolean)
+  );
+  expect(filtered).toEqual([ownedName]);
+
+  await planner.locator('[data-hd-lb-plane="0"][data-squad="0"]').selectOption(ownedName);
+  const state = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-land-base-v1') || '{}')['6-5']);
+  expect(state.corps[0].squads[0].name).toBe(ownedName);
+  expect(state.corps[0].squads[0].star).toBe(3);
+  expect(Number(state.corps[0].squads[0].slot)).toBeGreaterThan(0);
+
+  await planner.locator('#hdLBOnlyOwned').uncheck();
+  await expect(planner.locator('#hdLBOnlyOwned')).not.toBeChecked();
+  const restored = await planner.locator('[data-hd-lb-plane="0"][data-squad="0"] option').evaluateAll(opts =>
+    opts.map(o => o.value).filter(Boolean)
+  );
+  expect(restored.length).toBeGreaterThan(2);
+  expect(restored).toContain(ownedName);
+
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: map drop filters and reverse lookup controls work', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdMapDropHtml === 'function' &&
+    typeof window.hdWSShowElement === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-drop-hunts-v1');
+    localStorage.removeItem('harbordesk-ship-roster-v1');
+    selectedWorld = '2';
+    selectedMap = '2-4';
+    renderMapPicker();
+  });
+
+  await page.locator('[data-map-tab="drop"]').click();
+  let panel = page.locator('[data-map-pane="drop"] .hd-map-drop-panel');
+  await expect(panel).toBeVisible();
+
+  const firstChip = panel.locator('[data-hd-map-drop-ship]').first();
+  const ownedName = await firstChip.getAttribute('data-hd-map-drop-ship');
+  expect(ownedName).toBeTruthy();
+
+  await page.evaluate(name => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      { id:'drop-owned-test', name, level:1, gear:'' }
+    ]));
+    renderMapPicker();
+  }, ownedName);
+
+  await page.locator('[data-map-tab="drop"]').click();
+  panel = page.locator('[data-map-pane="drop"] .hd-map-drop-panel');
+  await expect(panel.locator('[data-hd-map-drop-owned="1"]')).toHaveCount(1);
+
+  await panel.locator('[data-hd-map-drop-view="missing"]').click();
+  await expect(panel.locator('[data-hd-map-drop-view="missing"]')).toHaveClass(/active/);
+  expect(await panel.locator('[data-hd-map-drop-owned="1"]').count()).toBe(0);
+
+  await panel.locator('[data-hd-map-drop-view="featured"]').click();
+  await expect(panel.locator('[data-hd-map-drop-view="featured"]')).toHaveClass(/active/);
+  const featuredFlags = await panel.locator('[data-hd-map-drop-ship]').evaluateAll(nodes =>
+    nodes.map(n => n.getAttribute('data-hd-map-drop-featured'))
+  );
+  expect(featuredFlags.length).toBeGreaterThan(0);
+  expect(featuredFlags.every(v => v === '1')).toBe(true);
+
+  await panel.locator('[data-hd-map-drop-view="all"]').click();
+  await page.evaluate(() => window.hdWSShowElement?.('dropHuntingDb', true));
+  const db = page.locator('#dropHuntingDb');
+  await expect(db).toBeVisible({ timeout: 5000 });
+
+  await db.locator('#hdDropSearch').fill(ownedName || '');
+  await expect(db.locator('#hdDropDbList .hd-drop-card')).toHaveCount(1);
+  await expect(db.locator('#hdDropDbList')).toContainText(ownedName || '');
+
+  await db.locator('#hdDropSearch').fill('');
+  await db.locator('[data-hd-drop-mapfilter="2-4"]').click();
+  await expect(db.locator('[data-hd-drop-mapfilter="2-4"]')).toHaveClass(/active/);
+  const locationMaps = await db.locator('#hdDropDbList .hd-drop-location strong').allTextContents();
+  expect(locationMaps.length).toBeGreaterThan(0);
+  expect(locationMaps.every(x => x.startsWith('2-4 '))).toBe(true);
+
+  await db.locator('#hdDropSearch').fill(ownedName || '');
+  await db.locator('#hdDropMissingOnly').check();
+  await expect(db.locator('#hdDropDbList')).toContainText('条件に合うドロップ候補がないよ');
+  await db.locator('#hdDropMissingOnly').uncheck();
+  await expect(db.locator('#hdDropDbList')).toContainText(ownedName || '');
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map mine readiness and support controls persist and run', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
