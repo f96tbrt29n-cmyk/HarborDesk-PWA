@@ -3964,7 +3964,12 @@ test('release smoke: master ship procurement recovers failed lazy module', async
   });
   expect(row).toBeTruthy();
 
-  const master = page.locator(`.hd-shipdb-master-card [data-hd-master-procure="${row.id}"]`).first();
+  const masterCard = page.locator('.hd-shipdb-master-card').filter({has: page.locator(`[data-hd-master-procure="${row.id}"]`)}).first();
+  await expect(masterCard).toBeVisible({ timeout: 5000 });
+  const suggested = masterCard.locator('.hd-shipdb-master-suggest > summary');
+  await expect(suggested).toBeVisible({ timeout: 5000 });
+  await suggested.click();
+  const master = masterCard.locator(`[data-hd-master-procure="${row.id}"]`).first();
   await expect(master).toBeVisible({ timeout: 5000 });
 
   blockProcurement = false;
@@ -4452,15 +4457,16 @@ test('release smoke: map攻略 inner controls work end to end', async ({ page })
   const huntCard = page.locator('#hdDropHuntList .hd-hunt-card').first();
   await expect(huntCard).toBeVisible();
   await huntCard.locator('[data-hd-hunt-add][data-field="runs"]').click();
+  await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1') || '[]')[0]?.runs || 0)).toBe(1);
   await huntCard.locator('[data-hd-hunt-add][data-field="s"]').click();
+  await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1') || '[]')[0]?.runs || 0)).toBe(2);
   await huntCard.locator('[data-hd-hunt-add][data-field="a"]').click();
+  await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1') || '[]')[0]?.runs || 0)).toBe(3);
   let huntState = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1') || '[]')[0]);
-  expect(huntState.runs).toBe(3);
   expect(huntState.s).toBe(1);
   expect(huntState.a).toBe(1);
   await huntCard.locator('[data-hd-hunt-obtained]').click();
-  huntState = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1') || '[]')[0]);
-  expect(huntState.obtained).toBe(true);
+  await expect.poll(async () => page.evaluate(() => !!JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1') || '[]')[0]?.obtained)).toBe(true);
   await expect(page.locator('#hdDropHuntList .hd-hunt-card').first()).toHaveClass(/done/);
   await page.locator('#hdDropHuntList .hd-hunt-card').first().locator('[data-hd-hunt-delete]').click();
   await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1') || '[]').length)).toBe(0);
@@ -5125,6 +5131,7 @@ test('release smoke: fleet suggestion acquisition recovers failed lazy guide', a
     selectedMap='6-5';
     renderMapPicker();
     window.hdFSOpen();
+    window.hdWSShowElement?.('hdFleetSuggester', false);
   });
 
   const acquire = page.locator('#hdFleetSuggester [data-hd-fs-acquire]').first();
@@ -5180,6 +5187,7 @@ test('release smoke: sortie preparation acquisition recovers failed lazy guide',
     selectedMap='6-5';
     renderMapPicker();
     window.hdSPSOpen();
+    window.hdWSShowElement?.('hdSortiePreparation', false);
   });
 
   const acquire = page.locator('#hdSortiePreparation [data-hd-sps-acquire]').first();
