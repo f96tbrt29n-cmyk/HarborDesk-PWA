@@ -170,6 +170,17 @@ function hdToastAction(message,label,onAction,ms=5000){
  return host;
 }
 window.hdToastAction=hdToastAction;
+function hdRevealWorkspaceTarget(target,scroll=true){
+ const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
+ el.hidden=false;el.classList?.remove('hd-ws-hidden','hd-ws-wrapper-hidden');
+ for(let p=el.parentElement;p&&p!==document.body;p=p.parentElement){
+  p.classList?.remove('hd-ws-wrapper-hidden');
+  if(p.matches?.('section')&&p.classList?.contains('hd-ws-hidden'))p.classList.remove('hd-ws-hidden');
+ }
+ if(scroll)requestAnimationFrame(()=>{if(document.contains(el))el.scrollIntoView({behavior:'smooth',block:'start'})});
+ return true;
+}
+window.hdRevealWorkspaceTarget=hdRevealWorkspaceTarget;
 function fmt(ms){if(ms<=0)return '完了';const sec=Math.ceil(ms/1000),h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return h>0?`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${m}:${String(s).padStart(2,'0')}`}
 function wikiMapUrl(map){const world=map.split('-')[0];return `https://wikiwiki.jp/kancolle/${encodeURIComponent(WORLD_NAMES[world])}/${map}`}
 

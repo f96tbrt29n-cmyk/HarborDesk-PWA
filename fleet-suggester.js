@@ -153,7 +153,8 @@ function hdFSSave(index){
 }
 function hdFSReveal(target){
  if(!target)return false;
- target.classList?.remove('hd-ws-hidden');
+ if(typeof window.hdRevealWorkspaceTarget==='function')return !!window.hdRevealWorkspaceTarget(target,true);
+ target.hidden=false;target.classList?.remove('hd-ws-hidden');
  for(var p=target.parentElement;p&&p!==document.body;p=p.parentElement)p.classList?.remove('hd-ws-wrapper-hidden');
  target.scrollIntoView?.({behavior:'smooth',block:'start'});return true;
 }

@@ -117,8 +117,9 @@ function hdSortieOpenTab(tab){
 function hdSortieOpenAction(action){
  const value=String(action||'');if(!value)return false;
  if(value.startsWith('tab:')){hdSortieOpenTab(value.slice(4));return true}
- if(typeof hdWSShowElement==='function')return hdWSShowElement(value,true);
- const target=document.getElementById(value);if(target){target.scrollIntoView({behavior:'smooth',block:'start'});return true}
+ if(typeof hdWSShowElement==='function'&&hdWSShowElement(value,true))return true;
+ if(typeof window.hdRevealWorkspaceTarget==='function')return !!window.hdRevealWorkspaceTarget(value,true);
+ const target=document.getElementById(value);if(target){target.hidden=false;target.classList?.remove('hd-ws-hidden');target.scrollIntoView({behavior:'smooth',block:'start'});return true}
  return false;
 }
 function hdSortieAutoRowHtml(x){

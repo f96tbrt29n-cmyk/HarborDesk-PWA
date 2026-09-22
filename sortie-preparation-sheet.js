@@ -178,11 +178,12 @@ function hdSPSEnsure(){
  sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">SORTIE PREPARATION SHEET</div><h2>出撃準備表</h2></div><span id="hdSortiePreparationMap" class="muted">海域未選択</span></div><div id="hdSortiePreparationBody"></div>`;
  guide.insertAdjacentElement('afterend',sec);hdSPSRender();
 }
-function hdSPSReveal(target){
+function hdSPSReveal(target,scroll=true){
  if(!target)return false;
- target.classList?.remove('hd-ws-hidden');
+ if(typeof window.hdRevealWorkspaceTarget==='function')return !!window.hdRevealWorkspaceTarget(target,scroll);
+ target.hidden=false;target.classList?.remove('hd-ws-hidden');
  for(let p=target.parentElement;p&&p!==document.body;p=p.parentElement)p.classList?.remove('hd-ws-wrapper-hidden');
- target.scrollIntoView?.({behavior:'smooth',block:'start'});return true;
+ if(scroll)target.scrollIntoView?.({behavior:'smooth',block:'start'});return true;
 }
 function hdSPSOpen(){
  hdSPSEnsure();const target=document.getElementById('hdSortiePreparation');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdSortiePreparation',true)))hdSPSReveal(target);setTimeout(hdSPSRender,40);
@@ -192,7 +193,7 @@ function hdSPSOpenWorkspace(id){
  return hdSPSReveal(document.getElementById(id));
 }
 function hdSPSOpenMapTab(tab,focusBase=false){
- if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);
+ if(!(typeof hdWSShowElement==='function'&&hdWSShowElement('guide',true)))hdSPSReveal(document.getElementById('guide'),false);
  setTimeout(()=>{if(typeof hdSortieOpenTab==='function')hdSortieOpenTab(tab);else if(typeof window.hdCoreMapAction==='function')Promise.resolve(window.hdCoreMapAction(tab)).catch(()=>{});else document.querySelector(`[data-map-tab="${tab}"]`)?.click();if(focusBase)setTimeout(()=>document.getElementById('hdLandBasePlanner')?.scrollIntoView({behavior:'smooth',block:'start'}),120)},80);
 }
 function hdSPSMapButton(){

@@ -71,7 +71,9 @@ if(typeof hdMapEquipRecommendationsHtml==='function'){
 function hdOwnedOpenLedger(name){
   const target=document.getElementById('equipmentBook');
   if(!target)return;
-  if(typeof hdWSShowElement==='function')hdWSShowElement('equipmentBook',true);else if(typeof hdQNJump==='function')hdQNJump('equipmentBook');else target.scrollIntoView({behavior:'smooth',block:'start'});
+  let opened=typeof hdWSShowElement==='function'&&hdWSShowElement('equipmentBook',true);
+  if(!opened&&typeof hdQNJump==='function')opened=hdQNJump('equipmentBook')!==false;
+  if(!opened){if(typeof window.hdRevealWorkspaceTarget==='function')window.hdRevealWorkspaceTarget(target,true);else{target.hidden=false;target.classList?.remove('hd-ws-hidden');target.scrollIntoView({behavior:'smooth',block:'start'})}}
   setTimeout(()=>{
     const input=document.getElementById('equipmentSearch');
     if(input){input.value=name;input.dispatchEvent(new Event('input',{bubbles:true}));input.focus()}
