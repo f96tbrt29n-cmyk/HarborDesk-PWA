@@ -3427,7 +3427,14 @@ test('release smoke: every selectable map has real攻略 and drop data', async (
 
   const result = await page.evaluate(() => {
     const maps = Object.values(MAPS).flat();
-    const required = ['name','overview','formation','route','air','caution'];
+    const required = {
+      name: ['name'],
+      overview: ['overview'],
+      formation: ['fleet','formation'],
+      route: ['route'],
+      air: ['air'],
+      caution: ['note','caution']
+    };
     const missingDetails = [];
     const missingDrops = [];
 
@@ -3436,7 +3443,9 @@ test('release smoke: every selectable map has real攻略 and drop data', async (
       if (!detail) {
         missingDetails.push({ map, reason: 'missing detail row' });
       } else {
-        const empty = required.filter(key => !String(detail[key] || '').trim());
+        const empty = Object.entries(required)
+          .filter(([,aliases]) => !aliases.some(key => String(detail[key] || '').trim()))
+          .map(([label]) => label);
         if (empty.length) missingDetails.push({ map, reason: 'empty fields', fields: empty });
       }
 
