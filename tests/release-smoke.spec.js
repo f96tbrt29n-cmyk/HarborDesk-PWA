@@ -4053,6 +4053,56 @@ test('release smoke: map fleet candidate opens the visible ship database', async
 });
 
 
+test('release smoke: map fleet owned-loadout opens ledger and refreshes from equipment changes', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdShipDbMapRecommendHtml === 'function' &&
+    typeof window.hdWSShowElement === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-equipment-v1');
+    selectedWorld = '5';
+    selectedMap = '5-6';
+    renderMapPicker();
+  });
+
+  await page.locator('[data-map-tab="fleet"]').click();
+  const candidate = page.locator('.hd-map-ship-candidate').first();
+  await expect(candidate).toBeVisible();
+
+  const ledger = candidate.locator('[data-hd-ship-equip-ledger]');
+  await expect(ledger).toBeVisible();
+  const wanted = await candidate.locator('[data-hd-ship-acquire]').first().getAttribute('data-hd-ship-acquire');
+  expect(wanted).toBeTruthy();
+
+  await ledger.click();
+  await expect(page.locator('#equipmentBook')).toBeVisible({ timeout: 5000 });
+
+  await page.evaluate((name) => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      { id:'map-owned-refresh-test', name, count:1, star:0, targetStar:0 }
+    ]));
+    window.dispatchEvent(new CustomEvent('hd:equipment-changed'));
+    window.hdWSShowElement?.('guide', false);
+  }, wanted);
+
+  await expect(page.locator('[data-map-pane="fleet"]')).toBeVisible({ timeout: 5000 });
+  const refreshed = page.locator('.hd-map-ship-candidate').first();
+  await expect(refreshed.locator('.hd-map-owned-fit')).toBeVisible();
+  await expect(refreshed.locator('.hd-map-owned-fit')).not.toHaveClass(/empty-fit/);
+  const refresh = refreshed.locator('[data-hd-ship-owned-refresh]');
+  await expect(refresh).toBeVisible();
+  await refresh.click();
+  await expect(refreshed.locator('.hd-map-owned-fit')).not.toHaveClass(/empty-fit/);
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: stale saved map攻略 tab falls back to overview', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
