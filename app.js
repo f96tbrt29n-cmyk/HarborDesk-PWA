@@ -172,6 +172,9 @@ function hdToastAction(message,label,onAction,ms=5000){
 window.hdToastAction=hdToastAction;
 function hdRevealWorkspaceTarget(target,scroll=true){
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
+ if(typeof window.hdWSRevealElement==='function'){
+  try{if(window.hdWSRevealElement(el,scroll,{history:false}))return true}catch{}
+ }
  el.hidden=false;el.classList?.remove('hd-ws-hidden','hd-ws-wrapper-hidden');
  for(let p=el.parentElement;p&&p!==document.body;p=p.parentElement){
   p.classList?.remove('hd-ws-wrapper-hidden');
