@@ -1661,6 +1661,47 @@ test('release smoke: readiness gate actions navigate to the right tools', async 
 });
 
 
+test('release smoke: readiness fix navigation survives missing map tabs and workspace helper failure', async ({ page }) => {
+  const errors = [];
+  await page.route('**/map-tabs.js*', route => route.abort());
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFEOpenFix === 'function' &&
+    typeof window.hdCoreMapAction === 'function' &&
+    typeof window.hdFCOpenFallback === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await expect(page.locator('#guide')).toBeVisible();
+  await page.locator('[data-world="6"]').click();
+  await page.locator('[data-map="6-5"]').click();
+
+  await page.evaluate(() => window.hdFEOpenFix('air', {
+    checks:[{id:'air',label:'制空',status:'missing',detail:'制空不足'}]
+  }));
+  await expect(page.locator('#hdFallbackGearTools #hdFleetCalculator')).toBeVisible({ timeout: 10000 });
+
+  await page.evaluate(() => {
+    const book=document.getElementById('equipmentBook');
+    book?.classList.add('hd-ws-hidden');
+    window.__hdSavedFEWSShowElement=window.hdWSShowElement;
+    window.hdWSShowElement=()=>false;
+    window.hdFEOpenFix('equipment', {
+      checks:[{id:'equipment',label:'装備',status:'missing',detail:'装備不足'}]
+    });
+  });
+  await expect(page.locator('#equipmentBook')).toBeVisible({ timeout: 5000 });
+
+  await page.evaluate(() => {
+    window.hdWSShowElement=window.__hdSavedFEWSShowElement;
+    delete window.__hdSavedFEWSShowElement;
+  });
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: post-sortie state requires a fresh game sync before next clean go', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
