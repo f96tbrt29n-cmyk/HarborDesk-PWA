@@ -57,18 +57,24 @@ function hdFCRender(){
  hdFCReplaceSection(pane,'#hdFleetCalculator',hdFCHtml(selectedMap));
  hdFCBindSelect(pane);
 }
+function hdFCHydrateFallbackExtras(host,map){
+ if(!host||!map)return false;
+ let rec=host.querySelector('#hdMapEquipRecommend');
+ if(!rec){rec=document.createElement('div');rec.id='hdMapEquipRecommend';host.prepend(rec)}
+ if(!rec.querySelector('.hd-map-equip-recommend')&&typeof window.hdMapEquipRecommendationsHtml==='function')rec.innerHTML=window.hdMapEquipRecommendationsHtml(map);
+ else if(!rec.querySelector('.hd-map-equip-recommend')&&typeof window.hdRenderMapEquipmentRecommendations==='function')window.hdRenderMapEquipmentRecommendations();
+ if(!host.querySelector('#hdLandBasePlanner')&&typeof window.hdLBHtml==='function'){
+  const html=window.hdLBHtml(map);if(html)host.insertAdjacentHTML('beforeend',html);
+ }else if(!host.querySelector('#hdLandBasePlanner')&&typeof window.hdRenderLandBasePlanner==='function')window.hdRenderLandBasePlanner();
+ return true;
+}
 function hdFCRenderFallbackHost(host,map){
  if(!host||!map)return false;
  const d=typeof MAP_DETAILS!=='undefined'?MAP_DETAILS[map]:null;
  host.innerHTML=`<div class="map-tab-card"><b>制空・装備</b><p>${hdFCEsc(d?.air||'装備情報を整理中')}</p></div><div id="hdMapEquipRecommend"></div>`;
- const rec=host.querySelector('#hdMapEquipRecommend');
- if(rec&&typeof window.hdMapEquipRecommendationsHtml==='function')rec.innerHTML=window.hdMapEquipRecommendationsHtml(map);
- else if(typeof window.hdRenderMapEquipmentRecommendations==='function')window.hdRenderMapEquipmentRecommendations();
  host.insertAdjacentHTML('beforeend',hdFCHtml(map));
  hdFCBindSelect(host);
- if(typeof window.hdLBHtml==='function'){
-  const html=window.hdLBHtml(map);if(html)host.insertAdjacentHTML('beforeend',html);
- }else if(typeof window.hdRenderLandBasePlanner==='function')window.hdRenderLandBasePlanner();
+ hdFCHydrateFallbackExtras(host,map);
  return true;
 }
 function hdFCOpenFallback(){
@@ -98,5 +104,6 @@ document.addEventListener('change',e=>{if(typeof selectedMap==='undefined'||!sel
 document.addEventListener('click',e=>{if(typeof selectedMap==='undefined'||!selectedMap)return;const fleetId=hdFCSelection(selectedMap);if(e.target.closest?.('[data-hd-fc-add]'))return hdFCAddGear(selectedMap,fleetId);const rem=e.target.closest?.('[data-hd-fc-remove]');if(rem)return hdFCRemoveGear(selectedMap,fleetId,Number(rem.dataset.hdFcRemove));const chip=e.target.closest?.('[data-hd-fc-enemy-chip]');if(chip)return hdFCMutate(selectedMap,fleetId,s=>s.enemyAir=Number(chip.dataset.hdFcEnemyChip)||0);if(e.target.closest?.('[data-hd-fc-sync]'))return hdFCSyncFleet(selectedMap,fleetId);if(e.target.closest?.('[data-hd-fc-reset]')){if(confirm('この編成の制空・索敵入力をリセットする？'))hdFCReset(selectedMap,fleetId);return}if(e.target.closest?.('[data-map-tab="gear"]'))setTimeout(hdFCRender,0)});
 if(typeof hdApplyMapTabs==='function'){const hdFCPrevApply=hdApplyMapTabs;hdApplyMapTabs=function(){hdFCPrevApply();setTimeout(hdFCRender,0)}}
 window.addEventListener('load',()=>setTimeout(hdFCRender,420));
+window.addEventListener('hd:modules-ready',()=>{const host=document.getElementById('hdFallbackGearTools');if(host&&!host.hidden&&host.classList.contains('active')&&typeof selectedMap!=='undefined'&&selectedMap)hdFCHydrateFallbackExtras(host,selectedMap)});
 window.hdFCHtml=hdFCHtml;
 window.hdFCRender=hdFCRender;
