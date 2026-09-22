@@ -4089,9 +4089,28 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('#selectedMapCard')).toBeVisible();
   await expect(page.locator('#selectedMapCard')).toContainText('2-4');
   await expect(page.locator('#selectedMapCard')).toContainText('推奨練度');
-  await expect(page.locator('.hd-map-tools-overview')).toBeVisible();
-  await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="map"]')).toBeVisible();
-  await expect(page.locator('.hd-map-tools-overview [data-hd-map-tool="prep"]')).toBeVisible();
+  const launcher = page.locator('.hd-map-tools-overview');
+  await expect(launcher).toBeVisible();
+  for (const tool of ['map','fleet','route','suggest','prep','gear','quest','drop','mine']) {
+    await expect(launcher.locator(`[data-hd-map-tool="${tool}"]`)).toBeVisible();
+  }
+
+  await launcher.locator('[data-hd-map-tool="fleet"]').click();
+  await expect(page.locator('[data-map-pane="fleet"]')).toBeVisible();
+  await expect(page.locator('[data-map-pane="fleet"]')).toContainText('編成例');
+
+  await page.locator('[data-map-tab="overview"]').click();
+  await launcher.locator('[data-hd-map-tool="route"]').click();
+  await expect(page.locator('[data-map-pane="route"]')).toBeVisible();
+  await expect(page.locator('#hdMapRouteRequirements')).toBeVisible();
+
+  await page.locator('[data-map-tab="overview"]').click();
+  await launcher.locator('[data-hd-map-tool="quest"]').click();
+  await expect(page.locator('[data-map-pane="quest"]')).toBeVisible();
+
+  await page.locator('[data-map-tab="overview"]').click();
+  await launcher.locator('[data-hd-map-tool="mine"]').click();
+  await expect(page.locator('[data-map-pane="mine"] #customFleetPanel')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
   expect(src).toBe('app.js?v=427');
