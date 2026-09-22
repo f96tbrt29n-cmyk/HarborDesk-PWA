@@ -4613,9 +4613,19 @@ test('release smoke: map quest actions add, open, count and reset progress', asy
   const cardAfter = page.locator('[data-map-pane="quest"] [data-hd-map-quest-id="Bq1"]');
   await expect(cardAfter.locator('[data-hd-map-quest-add="Bq1"]')).toHaveText('追加済み');
 
+  await page.evaluate(() => {
+    const db=document.getElementById('questDatabase');
+    db?.classList.add('hd-ws-hidden');
+    window.__hdSavedQuestWSShowElement=window.hdWSShowElement;
+    window.hdWSShowElement=()=>false;
+  });
   await cardAfter.locator('[data-hd-map-quest-open="Bq1"]').click();
   await expect(page.locator('#questDatabase')).toBeVisible({ timeout: 5000 });
   await expect(page.locator('#hdQuestDbSearch')).toHaveValue(/沖ノ島海域迎撃戦/);
+  await page.evaluate(() => {
+    window.hdWSShowElement=window.__hdSavedQuestWSShowElement;
+    delete window.__hdSavedQuestWSShowElement;
+  });
 
   const dbCard = page.locator('#questDatabase [data-hd-quest-id="Bq1"]');
   await expect(dbCard).toBeVisible();
