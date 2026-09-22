@@ -3915,6 +3915,68 @@ test('release smoke: 5-5 keeps start and boss S separate in map and sortie route
 });
 
 
+test('release smoke: 1-3 1-4 and 2-4 route graphs keep current starts and node roles', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdMapStartLabels === 'function' &&
+    typeof window.hdSMNextNodeRows === 'function' &&
+    typeof window.hdSMNodeRows === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  const state = await page.evaluate(() => {
+    const graphState = map => {
+      const graph = HD_MAP_GRAPHS[map];
+      return {
+        starts: window.hdMapStartLabels(graph),
+        boss: graph.boss || '',
+        items: [...(graph.items || [])].sort(),
+        vortex: [...(graph.vortex || [])].sort(),
+        safe: [...(graph.safe || [])].sort(),
+        next: window.hdSMNextNodeRows(map, {node:'', routeNodes:[]}).map(x => x.label).sort(),
+        rows: Object.fromEntries(window.hdSMNodeRows(map).map(x => [x.label, x.kind]))
+      };
+    };
+    return {
+      m13: graphState('1-3'),
+      m14: graphState('1-4'),
+      m24: graphState('2-4')
+    };
+  });
+
+  expect(state.m13.starts).toEqual(['S']);
+  expect(state.m13.next).toEqual(['A','C']);
+  expect(state.m13.boss).toBe('J');
+  expect(state.m13.items).toEqual(['D','G']);
+  expect(state.m13.vortex).toEqual(['H']);
+  expect(state.m13.safe).toEqual(['A','B','I']);
+  expect(state.m13.rows.J).toBe('boss');
+  expect(state.m13.rows.H).toBe('vortex');
+
+  expect(state.m14.starts).toEqual(['S']);
+  expect(state.m14.next).toEqual(['A','B']);
+  expect(state.m14.boss).toBe('L');
+  expect(state.m14.items).toEqual(['C','E','G']);
+  expect(state.m14.safe).toEqual(['A','F','K']);
+  expect(state.m14.rows.L).toBe('boss');
+  expect(state.m14.rows.F).toBe('safe');
+
+  expect(state.m24.starts).toEqual(['S']);
+  expect(state.m24.next).toEqual(['B']);
+  expect(state.m24.boss).toBe('P');
+  expect(state.m24.items).toEqual(['A','D','G','N']);
+  expect(state.m24.vortex).toEqual(['C']);
+  expect(state.m24.safe).toEqual(['H','J','K','O']);
+  expect(state.m24.rows.P).toBe('boss');
+  expect(state.m24.rows.C).toBe('vortex');
+  expect(state.m24.rows.O).toBe('safe');
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map overview exposes visible攻略 tool launcher', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
