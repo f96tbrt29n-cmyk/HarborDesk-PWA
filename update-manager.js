@@ -192,10 +192,10 @@ async function hdLoadCurrentAssets(){
   const equipmentProcurementP=equipmentAcquisitionGuideP.then(()=>hdLoadScript('data-hd-equipment-procurement-list','./equipment-procurement-list.js'));
   const sortiePreparationP=equipmentProcurementP.then(()=>hdLoadScript('data-hd-sortie-preparation-sheet','./sortie-preparation-sheet.js'));
   const fleetSuggesterP=sortiePreparationP.then(()=>hdLoadScript('data-hd-fleet-suggester','./fleet-suggester.js'));
-  const fleetLoadoutP=fleetSuggesterP.then(ok=>ok?hdLoadScript('data-hd-fleet-loadout','./fleet-loadout-planner.js'):false);
-  const fleetEvaluatorP=fleetLoadoutP.then(ok=>ok?hdLoadScript('data-hd-fleet-evaluator','./fleet-readiness-evaluator.js'):false);
-  const fleetOptimizerP=fleetEvaluatorP.then(ok=>ok?hdLoadScript('data-hd-fleet-optimizer','./fleet-loadout-optimizer.js'):false);
-  const sortiePresetManagerP=fleetOptimizerP.then(ok=>ok?hdLoadScript('data-hd-sortie-preset-manager','./sortie-preset-manager.js'):false);
+  const fleetLoadoutP=fleetSuggesterP.then(()=>hdLoadScript('data-hd-fleet-loadout','./fleet-loadout-planner.js'));
+  const fleetEvaluatorP=fleetLoadoutP.then(()=>hdLoadScript('data-hd-fleet-evaluator','./fleet-readiness-evaluator.js'));
+  const fleetOptimizerP=fleetEvaluatorP.then(()=>hdLoadScript('data-hd-fleet-optimizer','./fleet-loadout-optimizer.js'));
+  const sortiePresetManagerP=fleetOptimizerP.then(()=>hdLoadScript('data-hd-sortie-preset-manager','./sortie-preset-manager.js'));
   const sortieP=hdLoadScript('data-hd-sortie-ready','./sortie-readiness.js');
   const landP=hdLoadScript('data-hd-land-base','./land-base-planner.js');
   const fleetP=hdLoadScript('data-hd-fleet-calc','./fleet-calculator.js').then(ok=>ok?hdLoadScript('data-hd-fleet-calc-fix','./fleet-calculator-fix.js'):false);
