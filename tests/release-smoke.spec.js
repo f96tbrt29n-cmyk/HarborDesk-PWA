@@ -3619,11 +3619,12 @@ test('release smoke: every selectable map renders every攻略 tab', async ({ pag
       }
     }
 
-    return { failures, checkedMaps, checkedTabs };
+    const selectableMaps = Object.values(MAPS).reduce((sum, rows) => sum + rows.length, 0);
+    return { failures, checkedMaps, checkedTabs, selectableMaps };
   });
 
-  expect(result.checkedMaps).toBe(36);
-  expect(result.checkedTabs).toBe(36 * 8);
+  expect(result.checkedMaps).toBe(result.selectableMaps);
+  expect(result.checkedTabs).toBe(result.selectableMaps * 8);
   expect(result.failures).toEqual([]);
   expect(errors).toEqual([]);
 });
