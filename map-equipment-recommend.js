@@ -83,8 +83,14 @@ function hdMapEquipRecommendationsHtml(map){
   const los=adv.los?`<div class="hd-map-equip-alert"><b>索敵条件</b><span>${adv.los.coef!=null?`分岐点係数 ${adv.los.coef}｜`:''}${hdMapEsc(adv.los.summary||'')}</span></div>`:'';
   return `<section class="hd-map-equip-recommend"><div class="hd-map-equip-title"><div><div class="eyebrow">MAP × EQUIPMENT</div><h4>この海域の装備候補</h4></div><button class="ghost small" type="button" data-hd-open-equip-db>装備図鑑を開く</button></div><p class="muted hd-map-equip-note">海域データから自動抽出した候補。固定の必須装備ではなく、編成・ルート・所持装備に合わせて調整してね。</p>${los}${groups.map(g=>`<div class="hd-map-equip-group"><div class="hd-map-equip-group-head"><strong>${hdMapEsc(g.label)}</strong><p>${hdMapEsc(g.reason)}</p></div><div class="hd-map-equip-grid">${g.items.map(x=>hdMapEquipCard(x,x.role)).join('')||'<div class="empty">候補装備を準備中</div>'}</div></div>`).join('')}</section>`;
 }
+function hdMapEquipRenderHost(){
+  const fallback=document.querySelector('#hdFallbackGearTools #hdMapEquipRecommend');
+  const normal=document.querySelector('[data-map-pane="gear"]:not(#hdFallbackGearTools) #hdMapEquipRecommend');
+  if(fallback&&!document.querySelector('[data-map-tab="gear"]'))return fallback;
+  return normal||fallback||document.getElementById('hdMapEquipRecommend');
+}
 function hdRenderMapEquipmentRecommendations(){
-  const host=document.getElementById('hdMapEquipRecommend');
+  const host=hdMapEquipRenderHost();
   if(!host||typeof selectedMap==='undefined'||!selectedMap)return;
   host.innerHTML=hdMapEquipRecommendationsHtml(selectedMap);
 }
@@ -107,3 +113,6 @@ if(typeof hdApplyMapTabs==='function'){
   hdApplyMapTabs=function(){hdMapEquipPrevApply();setTimeout(hdRenderMapEquipmentRecommendations,0)};
 }
 window.addEventListener('load',()=>setTimeout(hdRenderMapEquipmentRecommendations,180));
+
+window.hdMapEquipRecommendationsHtml=hdMapEquipRecommendationsHtml;
+window.hdRenderMapEquipmentRecommendations=hdRenderMapEquipmentRecommendations;
