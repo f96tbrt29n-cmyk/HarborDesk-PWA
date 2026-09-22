@@ -105,7 +105,10 @@ function hdSortieOpenTab(tab){
   return true;
  }
  const btn=document.querySelector(`.map-tabs-shell [data-map-tab="${tab}"]`);
- if(btn&&btn.getClientRects().length){btn.click();return true}
+ if(btn&&btn.getClientRects().length){
+  if(typeof window.hdMapActivateTab==='function'&&window.hdMapActivateTab(tab,btn))return true;
+  btn.click();return true;
+ }
  if(typeof window.hdCoreMapAction==='function'){
   Promise.resolve(window.hdCoreMapAction(tab)).catch(()=>{});
   return true;
