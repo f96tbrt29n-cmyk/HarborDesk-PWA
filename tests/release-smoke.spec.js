@@ -4082,6 +4082,77 @@ test('release smoke: map mine readiness and support controls persist and run', a
 });
 
 
+test('release smoke: fleet suggestion saves and flows into sortie preparation', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFSOpen === 'function' &&
+    typeof window.hdSPSOpen === 'function' &&
+    typeof window.hdSortieSelection === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-custom-fleets-v1');
+    localStorage.removeItem('harbordesk-sortie-selection-v1');
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      {id:'fs1',name:'雪風',type:'駆逐艦',level:90,gear:'主砲 電探'},
+      {id:'fs2',name:'時雨',type:'駆逐艦',level:85,gear:'主砲 電探'},
+      {id:'fs3',name:'矢矧',type:'軽巡洋艦',level:95,gear:'主砲 水偵'},
+      {id:'fs4',name:'最上',type:'重巡洋艦',level:90,gear:'主砲 水偵'},
+      {id:'fs5',name:'赤城',type:'正規空母',level:98,gear:'艦戦 艦攻'},
+      {id:'fs6',name:'加賀',type:'正規空母',level:97,gear:'艦戦 艦攻'},
+      {id:'fs7',name:'大和',type:'戦艦',level:99,gear:'主砲 主砲'},
+      {id:'fs8',name:'武蔵',type:'戦艦',level:99,gear:'主砲 主砲'}
+    ]));
+    selectedWorld = '2';
+    selectedMap = '2-4';
+    renderMapPicker();
+  });
+
+  await page.locator('.hd-map-tools-overview [data-hd-map-tool="suggest"]').click();
+  const suggester = page.locator('#hdFleetSuggester');
+  await expect(suggester).toBeVisible({ timeout: 5000 });
+  await expect(suggester.locator('.hd-fs-card').first()).toBeVisible();
+
+  await suggester.locator('[data-hd-fs-refresh]').click();
+  const save = suggester.locator('[data-hd-fs-save="0"]');
+  await expect(save).toBeVisible();
+  await save.click();
+  await expect(save).toHaveText('保存したよ');
+
+  const saved = await page.evaluate(() => {
+    const all = JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1') || '{}');
+    const selection = JSON.parse(localStorage.getItem('harbordesk-sortie-selection-v1') || '{}');
+    const fleet = (all['2-4'] || [])[0] || null;
+    return {
+      fleet,
+      selection: selection['2-4'] || '',
+      selectedByApi: window.hdSortieSelection('2-4')
+    };
+  });
+  expect(saved.fleet).toBeTruthy();
+  expect(saved.fleet.name).toContain('2-4 自動提案');
+  expect(saved.selection).toBe(saved.fleet.id);
+  expect(saved.selectedByApi).toBe(saved.fleet.id);
+
+  await page.evaluate(() => window.hdSPSOpen());
+  const prep = page.locator('#hdSortiePreparation');
+  await expect(prep).toBeVisible({ timeout: 5000 });
+  await expect(prep.locator('#hdSortiePreparationBody')).toContainText(saved.fleet.name);
+
+  await prep.locator('[data-hd-sps-refresh]').click();
+  await expect(prep.locator('#hdSortiePreparationBody')).toContainText(saved.fleet.name);
+
+  await prep.locator('[data-hd-sps-tab="mine"]').first().click();
+  await expect(page.locator('[data-map-pane="mine"]')).toBeVisible();
+  await expect(page.locator('[data-map-pane="mine"] #customFleetPanel')).toContainText(saved.fleet.name);
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map quest tab links live quest data and checklist', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
