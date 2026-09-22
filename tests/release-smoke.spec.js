@@ -3416,6 +3416,48 @@ test('release smoke: backup reminder detects meaningful local data without sync'
 });
 
 
+test('release smoke: every selectable map has real攻略 and drop data', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof MAPS !== 'undefined' &&
+    typeof MAP_DETAILS !== 'undefined' &&
+    typeof HD_MAP_DROP_DATA !== 'undefined'
+  );
+
+  const result = await page.evaluate(() => {
+    const maps = Object.values(MAPS).flat();
+    const required = ['name','overview','formation','route','air','caution'];
+    const missingDetails = [];
+    const missingDrops = [];
+
+    for (const map of maps) {
+      const detail = MAP_DETAILS[map];
+      if (!detail) {
+        missingDetails.push({ map, reason: 'missing detail row' });
+      } else {
+        const empty = required.filter(key => !String(detail[key] || '').trim());
+        if (empty.length) missingDetails.push({ map, reason: 'empty fields', fields: empty });
+      }
+
+      const drop = HD_MAP_DROP_DATA[map];
+      if (!drop || !Array.isArray(drop.nodes) || !drop.nodes.length) {
+        missingDrops.push({ map, reason: 'missing drop nodes' });
+      } else if (drop.nodes.some(node => !String(node?.node || '').trim() || !String(node?.ships || '').trim())) {
+        missingDrops.push({ map, reason: 'empty drop node data' });
+      }
+    }
+
+    return { count: maps.length, missingDetails, missingDrops };
+  });
+
+  expect(result.count).toBe(37);
+  expect(result.missingDetails).toEqual([]);
+  expect(result.missingDrops).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: every map shows recommended level guidance', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
