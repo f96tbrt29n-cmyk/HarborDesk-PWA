@@ -16,6 +16,7 @@
     hdMapAttachFallbackPlans();
     window.__HD_MAP_RENDER_STATE={mode:'fallback',reason,map:String(selectedMap||''),at:Date.now()};
     window.dispatchEvent(new CustomEvent('hd:map-rendered',{detail:{map:selectedMap||'',tab:null,mode:'fallback',reason}}));
+    if(typeof window.hdCoreScheduleFallbackRestore==='function')window.hdCoreScheduleFallbackRestore();
     return 'fallback';
   }
 
@@ -27,6 +28,7 @@
     }
     if(typeof window.hdMapTabsCoreApply==='function'){
       try{
+        if(typeof window.hdCoreClearFallbackState==='function')window.hdCoreClearFallbackState();
         window.hdMapTabsCoreApply();
         window.__HD_MAP_RENDER_STATE={mode:'tabs',reason:'primary',map:String(selectedMap),at:Date.now()};
         return 'tabs';
