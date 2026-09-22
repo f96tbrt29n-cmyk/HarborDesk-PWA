@@ -4204,6 +4204,72 @@ test('release smoke: fallback gear workspace keeps recommendations calculators a
 });
 
 
+test('release smoke: fallback mine workspace keeps saved fleet readiness and support tools interactive', async ({ page }) => {
+  const errors = [];
+  await page.route('**/map-tabs.js*', route => route.abort());
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.cfOpenMapPanel === 'function' &&
+    typeof window.hdRenderSortieReadiness === 'function' &&
+    typeof window.hdSPRender === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-sortie-readiness-v1');
+    localStorage.removeItem('harbordesk-support-fleets-v1');
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({
+      '5-5': [{
+        id:'fallback-mine-fleet',
+        name:'フォールバック確認艦隊',
+        ships:[
+          {ship:'雪風改二',masterId:0,gear:'主砲 電探'},
+          {ship:'時雨改三',masterId:0,gear:'主砲 電探'},
+          {ship:'大和改二重',masterId:0,gear:'主砲 主砲'},
+          {ship:'武蔵改二',masterId:0,gear:'主砲 主砲'},
+          {ship:'赤城改二',masterId:0,gear:'艦戦 艦攻'},
+          {ship:'加賀改二',masterId:0,gear:'艦戦 艦攻'}
+        ],
+        memo:'fallback regression',
+        createdAt:Date.now(),
+        updatedAt:Date.now()
+      }]
+    }));
+  });
+
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await expect(page.locator('#guide')).toBeVisible();
+  await page.locator('[data-world="5"]').click();
+  await page.locator('[data-map="5-5"]').click();
+
+  const fallback = page.locator('#selectedMapCard [data-hd-core-map-tools]');
+  await expect(fallback).toBeVisible();
+  await fallback.locator('[data-hd-core-map-action="mine"]').click();
+
+  const mine = page.locator('#hdFallbackMineTools');
+  await expect(mine).toBeVisible();
+  await expect(mine.locator('#customFleetPanel')).toContainText('フォールバック確認艦隊');
+  await expect(mine.locator('#hdSortieReadiness')).toBeVisible();
+  await expect(mine.locator('#hdSupportPlanner')).toBeVisible();
+
+  const manual = mine.locator('#hdSortieReadiness [data-hd-sortie-check]').first();
+  await expect(manual).toBeVisible();
+  const checkId = await manual.getAttribute('data-hd-sortie-check');
+  await manual.check();
+
+  const ready = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('harbordesk-sortie-readiness-v1') || '{}')
+  );
+  expect(ready['5-5:fallback-mine-fleet']?.[checkId]).toBe(true);
+
+  await mine.locator('[data-hd-sortie-gear]').click();
+  await expect(page.locator('#hdFallbackGearTools #hdFleetCalculator')).toBeVisible({ timeout: 5000 });
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: fallback prep action recovers a failed lazy攻略 module', async ({ page }) => {
   const errors = [];
   let blockPrep = true;
