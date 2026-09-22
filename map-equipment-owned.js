@@ -51,9 +51,9 @@ if(typeof hdMapEquipCard==='function'){
       ?`<span class="hd-owned-badge owned">所持 ${own.count}${own.maxStar>0?` ・ 最高★${own.maxStar}`:''}</span>`
       :'<span class="hd-owned-badge missing">未所持</span>';
     const action=own.owned
-      ?`<button class="ghost small" type="button" data-hd-owned-open="${hdMapEsc(item.name)}">台帳で確認</button>`
-      :`<button class="primary small" type="button" data-hd-equip-add="${hdMapEsc(item.name)}">台帳へ追加</button>`;
-    return `<article class="hd-map-equip-card ${own.owned?'hd-owned-card':'hd-missing-card'}" data-hd-owned="${own.owned?'yes':'no'}"><div class="hd-map-equip-card-head"><div><strong>${hdMapEsc(item.name)}</strong><span>${hdMapEsc(item.category||'')}</span></div><button class="ghost small" type="button" data-hd-map-equip-view="${hdMapEsc(item.name)}">図鑑で見る</button></div><div class="hd-owned-status">${status}</div>${stats.length?`<div class="hd-map-equip-stats">${stats.slice(0,7).map(s=>`<span>${hdMapEsc(s)}</span>`).join('')}</div>`:''}<p>${hdMapEsc(reason||item.role||'')}</p><div class="hd-map-equip-actions">${action}</div></article>`;
+      ?`<button class="ghost small" type="button" data-hd-owned-open="${hdMapEquipEsc(item.name)}">台帳で確認</button>`
+      :`<button class="primary small" type="button" data-hd-equip-add="${hdMapEquipEsc(item.name)}">台帳へ追加</button>`;
+    return `<article class="hd-map-equip-card ${own.owned?'hd-owned-card':'hd-missing-card'}" data-hd-owned="${own.owned?'yes':'no'}"><div class="hd-map-equip-card-head"><div><strong>${hdMapEquipEsc(item.name)}</strong><span>${hdMapEquipEsc(item.category||'')}</span></div><button class="ghost small" type="button" data-hd-map-equip-view="${hdMapEquipEsc(item.name)}">図鑑で見る</button></div><div class="hd-owned-status">${status}</div>${stats.length?`<div class="hd-map-equip-stats">${stats.slice(0,7).map(s=>`<span>${hdMapEquipEsc(s)}</span>`).join('')}</div>`:''}<p>${hdMapEquipEsc(reason||item.role||'')}</p><div class="hd-map-equip-actions">${action}</div></article>`;
   };
 }
 
