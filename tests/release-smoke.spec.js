@@ -3919,6 +3919,103 @@ test('release smoke: map fleet procurement action recovers failed lazy module', 
 });
 
 
+test('release smoke: master ship procurement recovers failed lazy module', async ({ page }) => {
+  const errors = [];
+  let blockProcurement = true;
+  await page.route('**/equipment-procurement-list.js*', route => blockProcurement ? route.abort() : route.continue());
+  await boot(page, errors);
+
+  await page.waitForFunction(() =>
+    window.HD_MODULE_STATUS?.['./equipment-procurement-list.js'] === 'error',
+    null,
+    { timeout: 30000 }
+  );
+
+  const row = await page.evaluate(() => {
+    const detailed = new Set(HD_SHIP_DATABASE.map(x => x.final));
+    const candidate = Object.values(window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips || {}).find(x =>
+      !detailed.has(x.name) &&
+      Array.isArray(x.slots) &&
+      x.slots.length > 0 &&
+      typeof hdShipDbMasterSuggestedLoadouts === 'function' &&
+      hdShipDbMasterSuggestedLoadouts(x).length > 0
+    );
+    if (!candidate) return null;
+    hdEnsureShipDatabase();
+    const input = document.getElementById('hdShipDbSearch');
+    if (input) input.value = candidate.name;
+    hdRenderShipDatabase();
+    window.hdWSShowElement?.('shipDatabase', false);
+    return { id: candidate.id, name: candidate.name };
+  });
+  expect(row).toBeTruthy();
+
+  const master = page.locator(`.hd-shipdb-master-card [data-hd-master-procure="${row.id}"]`).first();
+  await expect(master).toBeVisible({ timeout: 5000 });
+
+  blockProcurement = false;
+  await master.click();
+
+  await expect(page.locator('#hdEquipmentProcurement')).toBeVisible({ timeout: 30000 });
+  const state = await page.evaluate(() => ({
+    fn: typeof window.hdPLAddMasterLoadout,
+    status: window.HD_MODULE_STATUS?.['./equipment-procurement-list.js'] || ''
+  }));
+  expect(state).toEqual({ fn:'function', status:'ok' });
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: master ship acquisition recovers failed lazy module', async ({ page }) => {
+  const errors = [];
+  let blockGuide = true;
+  await page.route('**/equipment-acquisition-guide.js*', route => blockGuide ? route.abort() : route.continue());
+  await boot(page, errors);
+
+  await page.waitForFunction(() =>
+    window.HD_MODULE_STATUS?.['./equipment-acquisition-guide.js'] === 'error',
+    null,
+    { timeout: 30000 }
+  );
+
+  const row = await page.evaluate(() => {
+    const detailed = new Set(HD_SHIP_DATABASE.map(x => x.final));
+    const candidate = Object.values(window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips || {}).find(x =>
+      !detailed.has(x.name) &&
+      Array.isArray(x.slots) &&
+      x.slots.length > 0 &&
+      typeof hdShipDbMasterSuggestedLoadouts === 'function' &&
+      hdShipDbMasterSuggestedLoadouts(x).length > 0
+    );
+    if (!candidate) return null;
+    hdEnsureShipDatabase();
+    const input = document.getElementById('hdShipDbSearch');
+    if (input) input.value = candidate.name;
+    hdRenderShipDatabase();
+    window.hdWSShowElement?.('shipDatabase', false);
+    return { id: candidate.id, name: candidate.name };
+  });
+  expect(row).toBeTruthy();
+
+  const details = page.locator('.hd-shipdb-master-card .hd-shipdb-master-suggest').first();
+  await expect(details).toBeVisible({ timeout: 5000 });
+  await details.locator('summary').click();
+  const acquire = page.locator(`.hd-shipdb-master-card [data-hd-master-acquire="${row.id}"]`).first();
+  await expect(acquire).toBeVisible({ timeout: 5000 });
+
+  blockGuide = false;
+  await acquire.click();
+
+  await expect(page.locator('#hdAcquisitionDialog')).toBeVisible({ timeout: 30000 });
+  const state = await page.evaluate(() => ({
+    fn: typeof window.hdAGOpenMaster,
+    status: window.HD_MODULE_STATUS?.['./equipment-acquisition-guide.js'] || ''
+  }));
+  expect(state).toEqual({ fn:'function', status:'ok' });
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map fleet procurement opens even when workspace routing refuses target', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
