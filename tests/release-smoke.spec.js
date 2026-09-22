@@ -4472,6 +4472,46 @@ test('release smoke: sortie preparation base adjustment opens land-base planner 
 });
 
 
+test('release smoke: quest database type filter works after map quest navigation', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdQuestOpenFromMap === 'function' &&
+    !!document.getElementById('questDatabase'),
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => window.hdQuestOpenFromMap('Bq1'));
+  await expect(page.locator('#questDatabase')).toBeVisible({ timeout: 5000 });
+
+  const quarterly = page.locator('#questDatabase [data-hd-quest-cycle="quarterly"]');
+  await expect(quarterly).toBeVisible();
+  await quarterly.click();
+
+  const allType = page.locator('#questDatabase [data-hd-quest-type="すべて"]');
+  const sortieType = page.locator('#questDatabase [data-hd-quest-type="出撃"]');
+  await expect(sortieType).toBeVisible();
+  const before = await page.locator('#hdQuestDbList .hd-quest-db-card').count();
+
+  await sortieType.click();
+  await expect(sortieType).toHaveClass(/active/);
+  const filtered = page.locator('#hdQuestDbList .hd-quest-db-card');
+  await expect(filtered.first()).toBeVisible();
+  const filteredCount = await filtered.count();
+  expect(filteredCount).toBeGreaterThan(0);
+  expect(filteredCount).toBeLessThanOrEqual(before);
+  const labels = await filtered.locator('.hd-quest-db-head span').allTextContents();
+  expect(labels.every(x => x.includes('出撃'))).toBe(true);
+
+  await allType.click();
+  await expect(allType).toHaveClass(/active/);
+  expect(await page.locator('#hdQuestDbList .hd-quest-db-card').count()).toBeGreaterThanOrEqual(filteredCount);
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: remaining map攻略 action controls open and persist', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
