@@ -484,6 +484,7 @@ function hdWSRevealElement(target,scroll=true,opts={}){
  showNow();
  if(scroll)el.scrollIntoView({behavior:'smooth',block:'start'});
  setTimeout(()=>{if(navSeq===hdWSNavSeq){showNow();hdWSScheduleRefresh()}},120);
+ setTimeout(()=>{if(navSeq===hdWSNavSeq)showNow()},360);
  return true;
 }
 function hdWSShowElement(target,scroll=true){

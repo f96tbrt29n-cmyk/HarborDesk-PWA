@@ -220,6 +220,7 @@ function hdCoreFallbackHost(id,pane){
 }
 function hdCoreRevealWorkspaceTarget(target){
  if(!target)return false;
+ if(typeof hdRevealWorkspaceTarget==='function')return hdRevealWorkspaceTarget(target,false);
  target.hidden=false;target.classList?.remove('hd-ws-hidden');
  for(let p=target.parentElement;p&&p!==document.body;p=p.parentElement)p.classList?.remove('hd-ws-wrapper-hidden');
  return true;
