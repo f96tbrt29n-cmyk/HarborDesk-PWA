@@ -4171,6 +4171,44 @@ test('release smoke: map攻略 inner controls work end to end', async ({ page })
 });
 
 
+test('release smoke: core攻略 navigation activates map tabs without synthetic click', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdCoreMapAction === 'function' &&
+    typeof window.hdMapActivateTab === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    selectedWorld = '5';
+    selectedMap = '5-6';
+    renderMapPicker();
+    const routeTab=document.querySelector('.map-tabs-shell [data-map-tab="route"]');
+    if(routeTab){
+      window.__hdRouteTabNativeClick=routeTab.click;
+      window.__hdRouteTabSyntheticClickUsed=false;
+      routeTab.click=()=>{window.__hdRouteTabSyntheticClickUsed=true;throw new Error('synthetic core map-tab click should not be required')};
+    }
+  });
+
+  const opened = await page.evaluate(() => window.hdCoreMapAction('route'));
+  expect(opened).toBe(true);
+  await expect(page.locator('[data-map-pane="route"]')).toBeVisible();
+  await expect(page.locator('#hdMapRouteRequirements')).toBeVisible();
+  expect(await page.evaluate(() => window.__hdRouteTabSyntheticClickUsed)).toBe(false);
+
+  await page.evaluate(() => {
+    const routeTab=document.querySelector('.map-tabs-shell [data-map-tab="route"]');
+    if(routeTab&&window.__hdRouteTabNativeClick)routeTab.click=window.__hdRouteTabNativeClick;
+    delete window.__hdRouteTabNativeClick;
+    delete window.__hdRouteTabSyntheticClickUsed;
+  });
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: secondary map gear and readiness controls work', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
