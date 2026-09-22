@@ -3567,6 +3567,68 @@ test('release smoke: map攻略 tools survive tab redraws', async ({ page }) => {
 });
 
 
+test('release smoke: every selectable map renders every攻略 tab', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdMapTabsCoreApply === 'function' &&
+    typeof window.hdEnhanceMapPane === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  const result = await page.evaluate(async () => {
+    const tick = ms => new Promise(resolve => setTimeout(resolve, ms));
+    const failures = [];
+    const tabIds = ['overview','map','fleet','route','gear','quest','drop','mine'];
+    let checkedMaps = 0;
+    let checkedTabs = 0;
+
+    for (const [world, maps] of Object.entries(MAPS)) {
+      for (const map of maps) {
+        selectedWorld = world;
+        selectedMap = map;
+        renderMapPicker();
+        await tick(20);
+        checkedMaps++;
+
+        if (!document.querySelector('#selectedMapCard .map-tabs-shell')) {
+          failures.push({ map, tab:'shell', reason:'missing map tabs shell' });
+          continue;
+        }
+
+        for (const tab of tabIds) {
+          const button = document.querySelector(`#selectedMapCard [data-map-tab="${tab}"]`);
+          if (!button) {
+            failures.push({ map, tab, reason:'missing tab button' });
+            continue;
+          }
+          button.click();
+          await tick(20);
+          checkedTabs++;
+
+          const pane = document.querySelector(`#selectedMapCard [data-map-pane="${tab}"]`);
+          if (!pane || !pane.classList.contains('active')) {
+            failures.push({ map, tab, reason:'pane did not activate' });
+            continue;
+          }
+          if (!String(pane.textContent || '').trim() && !pane.querySelector('svg,img,canvas')) {
+            failures.push({ map, tab, reason:'active pane is empty' });
+          }
+        }
+      }
+    }
+
+    return { failures, checkedMaps, checkedTabs };
+  });
+
+  expect(result.checkedMaps).toBe(36);
+  expect(result.checkedTabs).toBe(36 * 8);
+  expect(result.failures).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map mine readiness and support planner persist real changes', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
