@@ -280,6 +280,30 @@ function hdMapDropHtml(map){
  return `<section class="hd-map-drop-panel"><div class="hd-map-drop-intro"><div><div class="eyebrow">MAP DROPS</div><h4>${hdDropEsc(map)} ドロップ艦娘</h4><p>ボス・主要マスで確認されている主なドロップ。艦名をタップすると掘り目標へ追加できるよ。</p></div><a class="guide-link" href="${hdMapDropWikiUrl(map)}" target="_blank" rel="noopener">Wiki全表 ↗</a></div><div class="hd-map-drop-summary"><div class="hd-map-drop-progress"><div><strong>収録艦 所持率</strong><b>${stats.owned} / ${stats.total}隻・${stats.rate}%</b></div><div class="hd-map-drop-progress-bar" aria-label="収録艦所持率 ${stats.rate}%"><span style="width:${stats.rate}%"></span></div></div><div class="hd-map-drop-summary-stats"><span>未所持 <b>${stats.missing}</b></span><span>注目艦 <b>${stats.featured}</b></span></div></div><div class="hd-map-drop-view" role="group" aria-label="ドロップ表示フィルタ">${filters.map(([id,label])=>`<button type="button" class="ghost small ${view===id?'active':''}" data-hd-map-drop-view="${id}" data-hd-map-drop-view-map="${hdDropEsc(map)}">${label}</button>`).join('')}</div>${data.note?`<div class="hd-drop-warning">${hdDropEsc(data.note)}</div>`:''}<div class="hd-map-drop-nodes">${nodeHtml||'<div class="empty">この条件に合うドロップ艦はいないよ。</div>'}</div><div class="hd-map-drop-foot">所持率はこのタブに収録した艦娘を基準に計算｜確認 ${HD_MAP_DROP_CHECKED}｜ドロップテーブルは告知なく変わる場合があるため、限定艦を狙う前は最新Wikiも確認してね。</div></section>`;
 }
 
+function hdDropOpenMapPanel(){
+ if(typeof selectedMap==='undefined'||!selectedMap)return false;
+ const card=document.getElementById('selectedMapCard');if(!card)return false;
+ let host=document.getElementById('hdFallbackDropTools');
+ if(!host){host=document.createElement('div');host.id='hdFallbackDropTools';card.appendChild(host)}
+ host.className='map-tab-pane active hd-drop-fallback';
+ host.dataset.mapPane='drop';host.dataset.hdCoreFallbackPane='1';
+ host.innerHTML=hdMapDropHtml(selectedMap);
+ if(typeof window.hdCoreActivateFallbackPane==='function')return !!window.hdCoreActivateFallbackPane(host);
+ if(typeof window.hdWSShowElement==='function'&&window.hdWSShowElement(host,true))return true;
+ host.scrollIntoView({behavior:'smooth',block:'start'});return true;
+}
+function hdMapDropRefreshCurrent(){
+ const host=document.getElementById('hdFallbackDropTools');
+ if(host&&typeof selectedMap!=='undefined'&&selectedMap){
+  host.innerHTML=hdMapDropHtml(selectedMap);
+  return true;
+ }
+ if(typeof hdApplyMapTabs==='function'){hdApplyMapTabs();return true}
+ return false;
+}
+window.hdMapDropHtml=hdMapDropHtml;
+window.hdDropOpenMapPanel=hdDropOpenMapPanel;
+
 let hdDropMap='すべて';
 let hdDropMissingOnly=false;
 function hdDropEsc(s){return typeof esc==='function'?esc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -309,8 +333,8 @@ function hdEnsureDropDb(){
  document.getElementById('hdDropSearch').addEventListener('input',hdRenderDropDb);document.getElementById('hdDropMissingOnly').addEventListener('change',e=>{hdDropMissingOnly=e.target.checked;hdRenderDropDb()});hdRenderDropHunts();hdRenderDropDb();
 }
 document.addEventListener('click',e=>{
- const mapView=e.target.closest?.('[data-hd-map-drop-view]');if(mapView){hdMapDropSetView(mapView.dataset.hdMapDropViewMap,mapView.dataset.hdMapDropView);if(typeof hdApplyMapTabs==='function')hdApplyMapTabs();return}
- const mapShip=e.target.closest?.('[data-hd-map-drop-ship]');if(mapShip){hdAddDropTarget(mapShip.dataset.hdMapDropShip,mapShip.dataset.hdMapDropMap,mapShip.dataset.hdMapDropNode);if(typeof hdApplyMapTabs==='function')hdApplyMapTabs();return}
+ const mapView=e.target.closest?.('[data-hd-map-drop-view]');if(mapView){hdMapDropSetView(mapView.dataset.hdMapDropViewMap,mapView.dataset.hdMapDropView);hdMapDropRefreshCurrent();return}
+ const mapShip=e.target.closest?.('[data-hd-map-drop-ship]');if(mapShip){hdAddDropTarget(mapShip.dataset.hdMapDropShip,mapShip.dataset.hdMapDropMap,mapShip.dataset.hdMapDropNode);hdMapDropRefreshCurrent();return}
  const mf=e.target.closest?.('[data-hd-drop-mapfilter]');if(mf){hdDropMap=mf.dataset.hdDropMapfilter;document.querySelectorAll('[data-hd-drop-mapfilter]').forEach(b=>b.classList.toggle('active',b===mf));hdRenderDropDb();return}
  const add=e.target.closest?.('[data-hd-drop-target]');if(add){hdAddDropTarget(add.dataset.hdDropTarget,add.dataset.hdDropMap,add.dataset.hdDropNode);return}
  const inc=e.target.closest?.('[data-hd-hunt-add]');if(inc){const rows=hdDropHunts(),h=rows.find(x=>x.id===inc.dataset.hdHuntAdd);if(h){h.runs=(h.runs||0)+1;if(inc.dataset.field==='s')h.s=(h.s||0)+1;if(inc.dataset.field==='a')h.a=(h.a||0)+1;hdDropSave(rows)}return}
