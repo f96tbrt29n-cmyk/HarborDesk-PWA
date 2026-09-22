@@ -355,24 +355,43 @@ function hdFERefreshPendingFix(){
  setTimeout(()=>{try{if(document.querySelector('.hd-sps-auto')&&typeof hdSPSRender==='function')hdSPSRender()}catch{}},80);
  return true;
 }
+function hdFERevealTarget(target,scroll=true){
+ const el=typeof target==='string'?document.getElementById(target):target;
+ if(!el)return false;
+ let opened=false;
+ if(typeof window.hdRevealWorkspaceTarget==='function')opened=window.hdRevealWorkspaceTarget(el,scroll)!==false;
+ if(!opened&&typeof hdWSShowElement==='function')opened=hdWSShowElement(el,scroll)!==false;
+ if(!opened){
+  el.hidden=false;el.classList?.remove('hd-ws-hidden');
+  for(let p=el.parentElement;p&&p!==document.body;p=p.parentElement)p.classList?.remove('hd-ws-wrapper-hidden');
+  if(scroll)el.scrollIntoView?.({behavior:'smooth',block:'start'});
+  opened=true;
+ }
+ return opened;
+}
 function hdFEOpenFix(id,auto=null){
  hdFEStartFixFlow(id,auto);
  const info=hdFEFixActionInfo(id),target=info.target;
  if(target==='calculator'){
-  if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);
-  setTimeout(()=>{document.querySelector('[data-map-tab="gear"]')?.click();setTimeout(()=>document.getElementById('hdFleetCalculator')?.scrollIntoView({behavior:'smooth',block:'start'}),80)},60);
+  hdFERevealTarget('guide',false);
+  setTimeout(()=>{
+   const open=typeof window.hdCoreMapAction==='function'
+    ?Promise.resolve(window.hdCoreMapAction('gear')).catch(()=>false)
+    :Promise.resolve((()=>{if(typeof hdSortieOpenTab==='function')return hdSortieOpenTab('gear');document.querySelector('[data-map-tab="gear"]')?.click();return true})());
+   open.finally(()=>setTimeout(()=>document.getElementById('hdFleetCalculator')?.scrollIntoView({behavior:'smooth',block:'start'}),80));
+  },60);
   return true;
  }
  if(target==='guide'){
-  if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);
+  hdFERevealTarget('guide',true);
   setTimeout(()=>document.getElementById('selectedMapCard')?.scrollIntoView({behavior:'smooth',block:'start'}),60);return true;
  }
  if(target==='kancolleImport'){
-  if(typeof hdWSShowElement==='function')hdWSShowElement('kancolleImport',true);
+  hdFERevealTarget('kancolleImport',true);
   setTimeout(()=>{const focus=String(id)==='gameMatch'?document.getElementById('hdKcCurrentFleets'):document.getElementById('hdKcSyncStatus');(focus||document.getElementById('kancolleImport'))?.scrollIntoView({behavior:'smooth',block:'start'})},60);return true;
  }
  if(target==='equipmentBook'){
-  if(typeof hdWSShowElement==='function')hdWSShowElement('equipmentBook',true);
+  hdFERevealTarget('equipmentBook',true);
   setTimeout(()=>document.getElementById('equipmentBook')?.scrollIntoView({behavior:'smooth',block:'start'}),60);return true;
  }
  if(typeof hdSPSOpen==='function')hdSPSOpen();return true;
