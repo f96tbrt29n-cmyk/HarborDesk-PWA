@@ -4181,6 +4181,58 @@ test('release smoke: map fleet candidate opens the visible ship database', async
 });
 
 
+test('release smoke: map fleet candidate opens equipment compatibility checker end to end', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdShipDbJumpTo === 'function' &&
+    typeof window.hdWSShowElement === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    selectedWorld = '5';
+    selectedMap = '5-6';
+    renderMapPicker();
+  });
+
+  await page.locator('[data-map-tab="fleet"]').click();
+  const jump = page.locator('.hd-map-ship-candidate [data-hd-shipdb-jump]').first();
+  await expect(jump).toBeVisible();
+  const ship = await jump.getAttribute('data-hd-shipdb-jump');
+  expect(ship).toBeTruthy();
+  await jump.click();
+
+  await expect(page.locator('#shipDatabase')).toBeVisible({ timeout: 5000 });
+  await page.evaluate(() => {
+    const list=document.getElementById('hdShipDbList');
+    list?.classList.remove('hd-compact');
+  });
+
+  const checker = page.locator(`[data-hd-ship-equip-check-name="${ship}"]`).first();
+  await expect(checker).toBeVisible({ timeout: 5000 });
+  await checker.click();
+
+  const dialog = page.locator('#hdShipEquipCheckDialog');
+  await expect(dialog).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#hdShipEquipCheckShip')).toHaveValue(ship || '');
+
+  const equipment = await page.locator('#hdShipEquipCheckEquipList option').first().getAttribute('value');
+  expect(equipment).toBeTruthy();
+  await page.locator('#hdShipEquipCheckEquip').fill(equipment || '');
+  await page.locator('[data-hd-equip-check-run]').click();
+
+  const result = page.locator('#hdShipEquipCheckResult');
+  await expect(result).toContainText(ship || '');
+  await expect(result).toContainText(equipment || '');
+
+  await page.locator('[data-hd-equip-check-close]').click();
+  await expect(dialog).not.toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map fleet owned-loadout opens ledger and refreshes from equipment changes', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
