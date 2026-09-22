@@ -4686,6 +4686,37 @@ test('release smoke: fallback mine workspace keeps saved fleet readiness and sup
   );
   expect(ready['5-5:fallback-mine-fleet']?.[checkId]).toBe(true);
 
+  const support = mine.locator('#hdSupportPlanner');
+  await support.locator('[data-hd-sp-name="vanguard"][data-i="0"]').fill('雪風改二');
+  await support.locator('[data-hd-sp-name="vanguard"][data-i="0"]').dispatchEvent('change');
+  await expect(support.locator('[data-hd-sp-name="vanguard"][data-i="0"]')).toHaveValue('雪風改二');
+
+  await support.locator('[data-hd-sp-name="vanguard"][data-i="1"]').fill('時雨改三');
+  await support.locator('[data-hd-sp-name="vanguard"][data-i="1"]').dispatchEvent('change');
+  await expect(support.locator('[data-hd-sp-name="vanguard"][data-i="1"]')).toHaveValue('時雨改三');
+
+  await support.locator('[data-hd-sp-kira="vanguard"][data-i="0"]').check();
+  await support.locator('[data-hd-sp-fp="vanguard"][data-i="0"]').fill('88');
+  await support.locator('[data-hd-sp-fp="vanguard"][data-i="0"]').dispatchEvent('change');
+
+  const supportSaved = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('harbordesk-support-fleets-v1') || '{}')
+  );
+  expect(supportSaved['5-5']?.vanguard?.ships?.[0]?.name).toBe('雪風改二');
+  expect(supportSaved['5-5']?.vanguard?.ships?.[1]?.name).toBe('時雨改三');
+  expect(supportSaved['5-5']?.vanguard?.ships?.[0]?.kira).toBe(true);
+  expect(supportSaved['5-5']?.vanguard?.ships?.[0]?.firepower).toBe(88);
+
+  const supportStart = support.locator('[data-hd-sp-start="vanguard"]');
+  await expect(supportStart).toBeEnabled();
+  await supportStart.click();
+  const supportTimer = await page.evaluate(() =>
+    (JSON.parse(localStorage.getItem('harbordesk-pwa-v1') || '{}').expeditions || [])
+      .find(x => x.support && x.supportKind === 'vanguard' && x.map === '5-5')
+  );
+  expect(supportTimer?.expeditionId).toBe('33');
+  expect(Number(supportTimer?.fleetNo)).toBe(3);
+
   await mine.locator('[data-hd-sortie-gear]').click();
   await expect(page.locator('#hdFallbackGearTools #hdFleetCalculator')).toBeVisible({ timeout: 5000 });
 
