@@ -70,14 +70,19 @@ if(typeof hdMapEquipRecommendationsHtml==='function'){
 
 function hdOwnedOpenLedger(name){
   const target=document.getElementById('equipmentBook');
-  if(!target)return;
-  let opened=typeof hdWSShowElement==='function'&&hdWSShowElement('equipmentBook',true);
+  if(!target)return false;
+  let opened=false;
+  if(typeof window.hdRevealWorkspaceTarget==='function')opened=window.hdRevealWorkspaceTarget(target,true)!==false;
+  if(!opened&&typeof hdWSShowElement==='function')opened=hdWSShowElement(target,true)!==false;
   if(!opened&&typeof hdQNJump==='function')opened=hdQNJump('equipmentBook')!==false;
-  if(!opened){if(typeof window.hdRevealWorkspaceTarget==='function')window.hdRevealWorkspaceTarget(target,true);else{target.hidden=false;target.classList?.remove('hd-ws-hidden');target.scrollIntoView({behavior:'smooth',block:'start'})}}
+  if(!opened){target.hidden=false;target.classList?.remove('hd-ws-hidden');target.scrollIntoView({behavior:'smooth',block:'start'});opened=true}
   setTimeout(()=>{
+    const loc=typeof window.hdWSCurrentLocation==='function'?window.hdWSCurrentLocation():null;
+    if(loc?.group==='arsenal'&&(target.hidden||target.classList.contains('hd-ws-hidden')))window.hdRevealWorkspaceTarget?.(target,true);
     const input=document.getElementById('equipmentSearch');
-    if(input){input.value=name;input.dispatchEvent(new Event('input',{bubbles:true}));input.focus()}
-  },250);
+    if(input&&name){input.value=name;input.dispatchEvent(new Event('input',{bubbles:true}));input.focus()}
+  },180);
+  return opened;
 }
 
 document.addEventListener('click',e=>{
