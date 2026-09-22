@@ -460,8 +460,8 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
   window.dispatchEvent(new CustomEvent('hd:workspace-changed',{detail:{group,section:chosen}}));
  }finally{hdWSApplying=false}
 }
-function hdWSShowElement(target,scroll=true){
- hdWSPushHistory();
+function hdWSRevealElement(target,scroll=true,opts={}){
+ if(opts.history!==false)hdWSPushHistory();
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
  const section=hdWSManagedSectionFor(el);if(!section)return false;
  const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
@@ -475,7 +475,7 @@ function hdWSShowElement(target,scroll=true){
    const same=row.dataset.hdWorkspaceGroup===group,hero=row.id==='hdWorkspaceHero';
    row.classList.toggle('hd-ws-hidden',!(same&&(hero||row.id===section.id)));
   }
-  section.classList.remove('hd-ws-hidden');hdWSUnhideAncestors(section);
+  section.hidden=false;section.classList.remove('hd-ws-hidden');hdWSUnhideAncestors(section);
   hdWSRenderSubtabs(group,section.id);hdWSUpdateWrappers();hdWSUpdateBadges();
   return true;
  };
@@ -486,6 +486,10 @@ function hdWSShowElement(target,scroll=true){
  setTimeout(()=>{if(navSeq===hdWSNavSeq){showNow();hdWSScheduleRefresh()}},120);
  return true;
 }
+function hdWSShowElement(target,scroll=true){
+ return hdWSRevealElement(target,scroll);
+}
+window.hdWSRevealElement=hdWSRevealElement;
 function hdWSPatchQuickNav(){
  window.__hdWSQuickPatched=true;
 }
