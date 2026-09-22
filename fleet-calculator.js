@@ -66,8 +66,13 @@ function hdFCHydrateFallbackExtras(host,map){
  if(!host||!map)return false;
  let rec=host.querySelector('#hdMapEquipRecommend');
  if(!rec){rec=document.createElement('div');rec.id='hdMapEquipRecommend';host.prepend(rec)}
- if(!rec.querySelector('.hd-map-equip-recommend')&&typeof window.hdMapEquipRecommendationsHtml==='function')rec.innerHTML=window.hdMapEquipRecommendationsHtml(map);
- else if(!rec.querySelector('.hd-map-equip-recommend')&&typeof window.hdRenderMapEquipmentRecommendations==='function')window.hdRenderMapEquipmentRecommendations();
+ if(!rec.querySelector('.hd-map-equip-recommend')&&typeof window.hdRenderMapEquipmentRecommendationsInto==='function'){
+  window.hdRenderMapEquipmentRecommendationsInto(rec,map);
+ }else if(!rec.querySelector('.hd-map-equip-recommend')&&typeof window.hdMapEquipRecommendationsHtml==='function'){
+  try{rec.innerHTML=window.hdMapEquipRecommendationsHtml(map)}catch{}
+ }else if(!rec.querySelector('.hd-map-equip-recommend')&&typeof window.hdRenderMapEquipmentRecommendations==='function'){
+  window.hdRenderMapEquipmentRecommendations();
+ }
  if(!host.querySelector('#hdLandBasePlanner')&&typeof window.hdLBHtml==='function'){
   const html=window.hdLBHtml(map);if(html)host.insertAdjacentHTML('beforeend',html);
  }else if(!host.querySelector('#hdLandBasePlanner')&&typeof window.hdRenderLandBasePlanner==='function')window.hdRenderLandBasePlanner();
