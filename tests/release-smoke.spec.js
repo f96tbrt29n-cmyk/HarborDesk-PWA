@@ -3870,6 +3870,112 @@ test('release smoke: map fleet procurement action recovers failed lazy module', 
 });
 
 
+test('release smoke: map fleet procurement opens even when workspace routing refuses target', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdPLOpenList === 'function' &&
+    typeof window.hdPLEnsure === 'function' &&
+    typeof window.hdShipDbMapRecommendHtml === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    selectedWorld = '5';
+    selectedMap = '5-6';
+    renderMapPicker();
+  });
+  await page.locator('[data-map-tab="fleet"]').click();
+
+  await page.evaluate(() => {
+    window.hdPLEnsure();
+    const target=document.getElementById('hdEquipmentProcurement');
+    target?.classList.add('hd-ws-hidden');
+    window.__hdSavedProcReveal=window.hdRevealWorkspaceTarget;
+    window.__hdSavedProcWS=window.hdWSShowElement;
+    window.__hdSavedProcQN=window.hdQNJump;
+    window.hdRevealWorkspaceTarget=()=>false;
+    window.hdWSShowElement=()=>false;
+    window.hdQNJump=()=>false;
+  });
+
+  const procure = page.locator('.hd-map-ship-candidate [data-hd-ship-procure]').first();
+  await expect(procure).toBeVisible();
+  await procure.click();
+  await expect(page.locator('#hdEquipmentProcurement')).toBeVisible({ timeout: 5000 });
+
+  await page.evaluate(() => {
+    window.hdRevealWorkspaceTarget=window.__hdSavedProcReveal;
+    window.hdWSShowElement=window.__hdSavedProcWS;
+    window.hdQNJump=window.__hdSavedProcQN;
+    delete window.__hdSavedProcReveal;
+    delete window.__hdSavedProcWS;
+    delete window.__hdSavedProcQN;
+  });
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: map fleet acquisition catalog falls back when workspace routing fails', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdAGOpenCatalog === 'function' &&
+    typeof window.hdShipDbMapRecommendHtml === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-equipment-v1');
+    selectedWorld = '5';
+    selectedMap = '5-6';
+    renderMapPicker();
+  });
+  await page.locator('[data-map-tab="fleet"]').click();
+
+  const acquire = page.locator('.hd-map-ship-candidate [data-hd-ship-acquire]').first();
+  await expect(acquire).toBeVisible();
+  await acquire.click();
+  await expect(page.locator('#hdAcquisitionDialog')).toBeVisible({ timeout: 5000 });
+
+  const catalog = page.locator('#hdAcquisitionDialog [data-hd-ag-catalog]').first();
+  await expect(catalog).toBeVisible();
+  const equipName = await catalog.getAttribute('data-hd-ag-catalog');
+
+  await page.evaluate(() => {
+    const book=document.getElementById('equipmentBook');
+    book?.classList.add('hd-ws-hidden');
+    window.__hdSavedAgOpenDb=window.hdOpenEquipmentDb;
+    window.__hdSavedAgReveal=window.hdRevealWorkspaceTarget;
+    window.__hdSavedAgWS=window.hdWSShowElement;
+    window.__hdSavedAgQN=window.hdQNJump;
+    window.hdOpenEquipmentDb=()=>false;
+    window.hdRevealWorkspaceTarget=()=>false;
+    window.hdWSShowElement=()=>false;
+    window.hdQNJump=()=>false;
+  });
+
+  await catalog.click();
+  await expect(page.locator('#equipmentBook')).toBeVisible({ timeout: 5000 });
+  const search = page.locator('#hdEquipCatalogSearch');
+  if (await search.count()) await expect(search).toHaveValue(equipName || '');
+
+  await page.evaluate(() => {
+    window.hdOpenEquipmentDb=window.__hdSavedAgOpenDb;
+    window.hdRevealWorkspaceTarget=window.__hdSavedAgReveal;
+    window.hdWSShowElement=window.__hdSavedAgWS;
+    window.hdQNJump=window.__hdSavedAgQN;
+    delete window.__hdSavedAgOpenDb;
+    delete window.__hdSavedAgReveal;
+    delete window.__hdSavedAgWS;
+    delete window.__hdSavedAgQN;
+  });
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map fleet candidate opens the visible ship database', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
