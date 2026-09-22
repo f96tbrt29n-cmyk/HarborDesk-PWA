@@ -4628,6 +4628,13 @@ test('release smoke: fallback gear workspace keeps recommendations calculators a
   await gear.locator('[data-hd-open-equip-db]').click();
   await expect(page.locator('#equipmentBook')).toBeVisible({ timeout: 5000 });
 
+  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await expect(page.locator('#guide')).toBeVisible({ timeout: 5000 });
+  await expect(gear).toBeVisible({ timeout: 5000 });
+  await expect(gear.locator('[data-hd-fc-hq]')).toHaveValue('99');
+  await expect(gear.locator('[data-hd-lb-target="0"]')).toHaveValue('9');
+  await expect(gear.locator('[data-hd-lb-mode="0"]')).toHaveValue('defense');
+
   expect(errors).toEqual([]);
 });
 
