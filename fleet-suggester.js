@@ -151,13 +151,14 @@ function hdFSSave(index){
  if(typeof hdSortieSetSelection==='function')hdSortieSetSelection(map,id);if(typeof renderCustomFleets==='function')renderCustomFleets(map);if(typeof hdSPSRender==='function')hdSPSRender();
  var btn=document.querySelector('[data-hd-fs-save="'+index+'"]');if(btn){btn.textContent='保存したよ';setTimeout(function(){btn.textContent='この候補を自分用編成に保存'},1300)}
 }
-function hdFSOpen(){hdFSEnsure();if(typeof hdWSShowElement==='function')hdWSShowElement('hdFleetSuggester',true);else document.getElementById('hdFleetSuggester').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(hdFSRender,30)}
+function hdFSOpen(){hdFSEnsure();if(typeof hdWSShowElement==='function')hdWSShowElement('hdFleetSuggester',true);else document.getElementById('hdFleetSuggester')?.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(hdFSRender,30)}
+function hdFSOpenRoster(){if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return true;const target=document.getElementById('roster');if(target){target.scrollIntoView({behavior:'smooth',block:'start'});return true}return false}
 function hdFSMapButton(){var head=document.querySelector('#selectedMapCard .map-tabs-head');if(!head||head.querySelector('[data-hd-fs-open]'))return;var b=document.createElement('button');b.type='button';b.className='ghost small';b.setAttribute('data-hd-fs-open','1');b.textContent='編成候補';head.appendChild(b)}
 document.addEventListener('click',function(e){
  if(e.target.closest('[data-hd-fs-open]')){hdFSOpen();return}
  if(e.target.closest('[data-hd-fs-refresh]')){hdFSRender();return}
  var save=e.target.closest('[data-hd-fs-save]');if(save){hdFSSave(save.getAttribute('data-hd-fs-save'));return}
- if(e.target.closest('[data-hd-fs-roster]')){if(typeof hdWSShowElement==='function')hdWSShowElement('roster',true);return}
+ if(e.target.closest('[data-hd-fs-roster]')){hdFSOpenRoster();return}
  var acq=e.target.closest('[data-hd-fs-acquire]');if(acq&&typeof hdAGOpen==='function'){hdAGOpen(acq.getAttribute('data-hd-fs-acquire'),hdFSMap());return}
 });
 window.addEventListener('storage',function(e){if(['harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-custom-fleets-v1'].includes(e.key))hdFSRender()});
