@@ -186,10 +186,12 @@ async function hdLoadCurrentAssets(){
 
   const equipmentAnalyzerP=hdLoadScript('data-hd-equipment-analyzer','./equipment-analyzer.js');
   const sortieEquipmentCheckP=hdLoadScript('data-hd-sortie-equipment-check','./sortie-equipment-check.js');
-  const equipmentAcquisitionGuideP=sortieEquipmentCheckP.then(ok=>ok?hdLoadScript('data-hd-equipment-acquisition-guide','./equipment-acquisition-guide.js'):false);
-  const equipmentProcurementP=equipmentAcquisitionGuideP.then(ok=>ok?hdLoadScript('data-hd-equipment-procurement-list','./equipment-procurement-list.js'):false);
-  const sortiePreparationP=equipmentProcurementP.then(ok=>ok?hdLoadScript('data-hd-sortie-preparation-sheet','./sortie-preparation-sheet.js'):false);
-  const fleetSuggesterP=sortiePreparationP.then(ok=>ok?hdLoadScript('data-hd-fleet-suggester','./fleet-suggester.js'):false);
+  // Keep攻略 tools available even when one optional equipment helper fails.
+  // Each downstream module already guards optional cross-module calls and can recover missing helpers on demand.
+  const equipmentAcquisitionGuideP=sortieEquipmentCheckP.then(()=>hdLoadScript('data-hd-equipment-acquisition-guide','./equipment-acquisition-guide.js'));
+  const equipmentProcurementP=equipmentAcquisitionGuideP.then(()=>hdLoadScript('data-hd-equipment-procurement-list','./equipment-procurement-list.js'));
+  const sortiePreparationP=equipmentProcurementP.then(()=>hdLoadScript('data-hd-sortie-preparation-sheet','./sortie-preparation-sheet.js'));
+  const fleetSuggesterP=sortiePreparationP.then(()=>hdLoadScript('data-hd-fleet-suggester','./fleet-suggester.js'));
   const fleetLoadoutP=fleetSuggesterP.then(ok=>ok?hdLoadScript('data-hd-fleet-loadout','./fleet-loadout-planner.js'):false);
   const fleetEvaluatorP=fleetLoadoutP.then(ok=>ok?hdLoadScript('data-hd-fleet-evaluator','./fleet-readiness-evaluator.js'):false);
   const fleetOptimizerP=fleetEvaluatorP.then(ok=>ok?hdLoadScript('data-hd-fleet-optimizer','./fleet-loadout-optimizer.js'):false);
