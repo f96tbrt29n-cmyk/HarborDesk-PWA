@@ -4149,6 +4149,104 @@ test('release smoke: secondary drop and synced custom fleet controls work', asyn
 });
 
 
+test('release smoke: remaining map攻略 action controls open and persist', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFSOpen === 'function' &&
+    typeof window.hdSPSOpen === 'function' &&
+    typeof window.hdAGOpen === 'function' &&
+    typeof window.hdSPRender === 'function' &&
+    typeof window.hdWSShowElement === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([]));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
+      {id:'audit-akagi',name:'赤城',type:'正規空母',level:95,gear:''},
+      {id:'audit-kaga',name:'加賀',type:'正規空母',level:94,gear:''},
+      {id:'audit-yamato',name:'大和',type:'戦艦',level:96,gear:''},
+      {id:'audit-musashi',name:'武蔵',type:'戦艦',level:95,gear:''},
+      {id:'audit-yukikaze',name:'雪風',type:'駆逐艦',level:90,gear:''},
+      {id:'audit-shigure',name:'時雨',type:'駆逐艦',level:89,gear:''}
+    ]));
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({
+      '6-5': [{
+        id:'audit-fleet',
+        name:'未検証操作確認艦隊',
+        ships:[
+          {ship:'赤城',gear:''},{ship:'加賀',gear:''},{ship:'大和',gear:''},
+          {ship:'武蔵',gear:''},{ship:'雪風',gear:''},{ship:'時雨',gear:''}
+        ],
+        createdAt:Date.now(),updatedAt:Date.now()
+      }]
+    }));
+    selectedWorld='6';
+    selectedMap='6-5';
+    renderMapPicker();
+  });
+
+  await page.evaluate(() => window.hdFSOpen());
+  const suggester=page.locator('#hdFleetSuggester');
+  await expect(suggester).toBeVisible();
+  const fsAcquire=suggester.locator('[data-hd-fs-acquire]').first();
+  await expect(fsAcquire).toBeVisible();
+  await fsAcquire.click();
+  await expect(page.locator('#hdAcquisitionDialog')).toBeVisible();
+  await expect(page.locator('#hdAcquisitionTitle')).toContainText('6-5｜');
+  await page.locator('#hdAcquisitionDialog [data-hd-ag-close]').click();
+
+  await page.evaluate(() => window.hdSPSOpen());
+  const prep=page.locator('#hdSortiePreparation');
+  await expect(prep).toBeVisible();
+  const prepAcquire=prep.locator('[data-hd-sps-acquire]').first();
+  await expect(prepAcquire).toBeVisible();
+  await prepAcquire.click();
+  await expect(page.locator('#hdAcquisitionDialog')).toBeVisible();
+  await expect(page.locator('#hdAcquisitionTitle')).toContainText('6-5｜');
+  await page.locator('#hdAcquisitionDialog [data-hd-ag-close]').click();
+
+  await prep.locator('[data-hd-sps-workspace="roster"]').click();
+  await expect(page.locator('#roster')).toBeVisible({ timeout: 5000 });
+
+  await page.evaluate(() => window.hdSPSOpen());
+  await expect(prep).toBeVisible();
+  await prep.locator('[data-hd-sps-workspace="hdEquipmentProcurement"]').click();
+  await expect(page.locator('#hdEquipmentProcurement')).toBeVisible({ timeout: 5000 });
+
+  await page.evaluate(() => {
+    window.hdWSShowElement?.('guide', false);
+    selectedWorld='5';
+    selectedMap='5-5';
+    renderMapPicker();
+  });
+  await page.locator('[data-map-tab="mine"]').click();
+  const support=page.locator('[data-map-pane="mine"] #hdSupportPlanner');
+  await expect(support).toBeVisible();
+  const type=support.locator('[data-hd-sp-type="vanguard"][data-i="0"]');
+  await type.selectOption({label:'戦艦'});
+  const supportState=await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-support-fleets-v1') || '{}')['5-5']);
+  expect(supportState.vanguard.ships[0].type).toBe('戦艦');
+
+  await page.evaluate(() => window.hdWSShowElement?.('questDatabase', true));
+  const quarterly=page.locator('#questDatabase [data-hd-quest-cycle="quarterly"]');
+  await expect(quarterly).toBeVisible();
+  await quarterly.click();
+  await expect(quarterly).toHaveClass(/active/);
+  const qcard=page.locator('#questDatabase [data-hd-quest-id="Bq1"]');
+  await expect(qcard).toBeVisible();
+  const add=qcard.locator('[data-hd-quest-add="Bq1"]');
+  await expect(add).toBeVisible();
+  await add.click();
+  const checklist=await page.evaluate(() => (window.hdGetAppState?.().quests || []).filter(x => x.sourceId === 'Bq1' && !x.done));
+  expect(checklist).toHaveLength(1);
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map quest actions add, open, count and reset progress', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
