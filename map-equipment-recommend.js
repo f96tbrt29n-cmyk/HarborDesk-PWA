@@ -12,7 +12,7 @@ const HD_MAP_EQUIP_PRIORITY={
 };
 
 function hdMapEquipEsc(s){
-  if(typeof hdMapEsc==='function')return hdMapEquipEsc(s);
+  if(typeof hdMapEsc==='function')return hdMapEsc(s);
   if(typeof esc==='function')return esc(s);
   return String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]||ch));
 }
