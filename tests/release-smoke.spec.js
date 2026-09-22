@@ -4391,6 +4391,52 @@ test('release smoke:攻略 navigation falls back when workspace helper returns f
 });
 
 
+test('release smoke: sortie preparation base adjustment opens land-base planner even without map tabs', async ({ page }) => {
+  const errors = [];
+  await page.route('**/map-tabs.js*', route => route.abort());
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSPSOpen === 'function' &&
+    typeof window.hdSortieOpenTab === 'function' &&
+    typeof window.hdFCOpenFallback === 'function' &&
+    typeof window.hdLBHtml === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    window.__hdBaseFocusScrollTargets = [];
+    const original = Element.prototype.scrollIntoView;
+    window.__hdOriginalScrollIntoViewForBaseFocus = original;
+    Element.prototype.scrollIntoView = function(...args){
+      window.__hdBaseFocusScrollTargets.push(this.id || '');
+      return original?.apply(this,args);
+    };
+    selectedWorld='6';
+    selectedMap='6-5';
+    renderMapPicker();
+  });
+
+  await page.evaluate(() => window.hdSPSOpen());
+  const prep = page.locator('#hdSortiePreparation');
+  await expect(prep).toBeVisible();
+  const adjust = prep.locator('[data-hd-sps-focus-base]');
+  await expect(adjust).toBeVisible();
+  await adjust.click();
+
+  const fallback = page.locator('#hdFallbackGearTools');
+  await expect(fallback).toBeVisible({ timeout: 10000 });
+  await expect(fallback.locator('#hdLandBasePlanner')).toBeVisible({ timeout: 10000 });
+  await expect.poll(() => page.evaluate(() => window.__hdBaseFocusScrollTargets || [])).toContain('hdLandBasePlanner');
+
+  await page.evaluate(() => {
+    if(window.__hdOriginalScrollIntoViewForBaseFocus)Element.prototype.scrollIntoView=window.__hdOriginalScrollIntoViewForBaseFocus;
+    delete window.__hdOriginalScrollIntoViewForBaseFocus;
+  });
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: remaining map攻略 action controls open and persist', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
