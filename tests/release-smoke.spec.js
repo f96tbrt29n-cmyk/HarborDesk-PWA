@@ -6370,6 +6370,42 @@ test('release smoke: fallback攻略 state clears when map selection is reset', a
 });
 
 
+test('release smoke: map deselection emits empty render state to dependent攻略 tools', async ({ page }) => {
+  const errors = [];
+  await page.route('**/map-tabs.js*', route => route.abort());
+  await boot(page, errors);
+
+  await page.evaluate(() => {
+    window.__HD_EMPTY_RENDER_EVENTS = [];
+    window.addEventListener('hd:map-rendered', event => {
+      const detail = event?.detail || {};
+      if (detail.mode === 'empty') window.__HD_EMPTY_RENDER_EVENTS.push(detail);
+    });
+  });
+
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await expect(page.locator('#guide')).toBeVisible();
+  await page.locator('[data-world="2"]').click();
+  await page.locator('[data-map="2-4"]').click();
+
+  await page.waitForFunction(() => window.__HD_MAP_RENDER_STATE?.mode === 'fallback' && window.__HD_MAP_RENDER_STATE?.map === '2-4');
+
+  await page.locator('[data-world="3"]').click();
+  await expect(page.locator('#selectedMapCard')).toContainText('海域を選ぶと');
+
+  const empty = await page.evaluate(() => ({
+    state: window.__HD_MAP_RENDER_STATE || null,
+    events: window.__HD_EMPTY_RENDER_EVENTS || []
+  }));
+  expect(empty.state?.mode).toBe('empty');
+  expect(empty.state?.map).toBe('');
+  expect(empty.events.length).toBeGreaterThan(0);
+  expect(empty.events.at(-1)?.map).toBe('');
+  expect(empty.events.at(-1)?.reason).toBe('no-map');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: fallback攻略 state clears through world deselection', async ({ page }) => {
   const errors = [];
   await page.route('**/map-tabs.js*', route => route.abort());
