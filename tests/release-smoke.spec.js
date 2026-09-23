@@ -6621,6 +6621,28 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
 });
 
 
+test('release smoke: saved gear tab hydrates calculators without an extra tap', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-map-tab-v1', JSON.stringify({'6-5':'gear'}));
+  });
+
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await expect(page.locator('#guide')).toBeVisible();
+  await page.locator('[data-world="6"]').click();
+  await page.locator('[data-map="6-5"]').click();
+
+  const gear = page.locator('[data-map-pane="gear"].active');
+  await expect(gear).toBeVisible();
+  await expect(gear.locator('#hdMapEquipRecommend .hd-map-equip-recommend')).toBeVisible({ timeout: 5000 });
+  await expect(gear.locator('#hdFleetCalculator')).toBeVisible({ timeout: 5000 });
+  await expect(gear.locator('#hdLandBasePlanner')).toBeVisible({ timeout: 5000 });
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: fallback gear workspace keeps recommendations calculators and land base interactive', async ({ page }) => {
   const errors = [];
   await page.route('**/map-tabs.js*', route => route.abort());
