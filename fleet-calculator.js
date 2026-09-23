@@ -114,6 +114,7 @@ document.addEventListener('change',e=>{if(typeof selectedMap==='undefined'||!sel
 document.addEventListener('click',e=>{if(typeof selectedMap==='undefined'||!selectedMap)return;const fleetId=hdFCSelection(selectedMap);if(e.target.closest?.('[data-hd-fc-add]'))return hdFCAddGear(selectedMap,fleetId);const rem=e.target.closest?.('[data-hd-fc-remove]');if(rem)return hdFCRemoveGear(selectedMap,fleetId,Number(rem.dataset.hdFcRemove));const chip=e.target.closest?.('[data-hd-fc-enemy-chip]');if(chip)return hdFCMutate(selectedMap,fleetId,s=>s.enemyAir=Number(chip.dataset.hdFcEnemyChip)||0);if(e.target.closest?.('[data-hd-fc-sync]'))return hdFCSyncFleet(selectedMap,fleetId);if(e.target.closest?.('[data-hd-fc-reset]')){if(confirm('この編成の制空・索敵入力をリセットする？'))hdFCReset(selectedMap,fleetId);return}if(e.target.closest?.('[data-map-tab="gear"]'))setTimeout(hdFCRender,0)});
 if(typeof hdApplyMapTabs==='function'){const hdFCPrevApply=hdApplyMapTabs;hdApplyMapTabs=function(){hdFCPrevApply();setTimeout(hdFCRender,0)}}
 window.addEventListener('load',()=>setTimeout(hdFCRender,420));
+window.addEventListener('hd:map-rendered',e=>{const d=e?.detail||{};if(d.mode==='empty'||!d.map)return;hdFCScheduleRender()});
 window.addEventListener('hd:modules-ready',()=>{const host=document.getElementById('hdFallbackGearTools');if(host&&!host.hidden&&host.classList.contains('active')&&typeof selectedMap!=='undefined'&&selectedMap)hdFCHydrateFallbackExtras(host,selectedMap)});
 window.hdFCHtml=hdFCHtml;
 window.hdFCRender=hdFCRender;
