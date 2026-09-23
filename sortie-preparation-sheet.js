@@ -185,10 +185,17 @@ function hdSPSReveal(target,scroll=true){
  for(let p=target.parentElement;p&&p!==document.body;p=p.parentElement)p.classList?.remove('hd-ws-wrapper-hidden');
  if(scroll)target.scrollIntoView?.({behavior:'smooth',block:'start'});return true;
 }
+function hdSPSStillSelected(target){
+ try{
+  const state=JSON.parse(localStorage.getItem('harbordesk-workspace-tabs-v1')||'{}');
+  const section=state?.sections?.guide;
+  return !section||section===target?.id;
+ }catch{return true}
+}
 function hdSPSOpen(){
  hdSPSEnsure();const target=document.getElementById('hdSortiePreparation');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdSortiePreparation',true)))hdSPSReveal(target);
- setTimeout(()=>{hdSPSReveal(target,false);hdSPSRender()},70);
- setTimeout(()=>{hdSPSReveal(target,false);hdSPSRender()},430);
+ setTimeout(()=>{if(hdSPSStillSelected(target))hdSPSReveal(target,false);hdSPSRender()},70);
+ setTimeout(()=>{if(hdSPSStillSelected(target))hdSPSReveal(target,false);hdSPSRender()},430);
 }
 function hdSPSOpenWorkspace(id){
  if(typeof hdWSShowElement==='function'&&hdWSShowElement(id,true))return true;
