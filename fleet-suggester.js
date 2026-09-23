@@ -161,9 +161,9 @@ function hdFSReveal(target){
 function hdFSStillSelected(target){
  try{
   var state=JSON.parse(localStorage.getItem('harbordesk-workspace-tabs-v1')||'{}');
-  var section=state&&state.sections&&state.sections.guide;
-  return !section||section===(target&&target.id);
- }catch(e){return true}
+  if(!state||!state.group)return !!target&&!target.hidden&&!target.classList.contains('hd-ws-hidden');
+  return state.group==='guide'&&state.sections&&state.sections.guide===(target&&target.id);
+ }catch(e){return !!target&&!target.hidden&&!target.classList.contains('hd-ws-hidden')}
 }
 function hdFSOpen(){hdFSEnsure();var target=document.getElementById('hdFleetSuggester');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdFleetSuggester',true)))hdFSReveal(target);setTimeout(function(){if(hdFSStillSelected(target))hdFSReveal(target);hdFSRender()},60);setTimeout(function(){if(hdFSStillSelected(target))hdFSReveal(target);hdFSRender()},420)}
 function hdFSOpenRoster(){if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return true;return hdFSReveal(document.getElementById('roster'))}
