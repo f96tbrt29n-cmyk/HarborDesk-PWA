@@ -43,6 +43,11 @@ async function boot(page, errors = []) {
   );
 }
 
+async function openGuideWorkspace(page) {
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await expect(page.locator('#guide')).toBeVisible({ timeout: 5000 });
+}
+
 test('release smoke: app boots with core modules and master data', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -3891,6 +3896,7 @@ test('release smoke: every selectable map renders every攻略 tab', async ({ pag
 test('release smoke: map mine readiness and support planner persist real changes', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdRenderSortieReadiness === 'function' &&
     typeof window.hdSPRender === 'function',
@@ -3972,6 +3978,7 @@ test('release smoke: map fleet procurement action recovers failed lazy module', 
   let blockProcurement = true;
   await page.route('**/equipment-procurement-list.js*', route => blockProcurement ? route.abort() : route.continue());
   await boot(page, errors);
+  await openGuideWorkspace(page);
 
   await page.waitForFunction(() =>
     window.HD_MODULE_STATUS?.['./equipment-procurement-list.js'] === 'error',
@@ -4137,6 +4144,7 @@ test('release smoke: master ship acquisition recovers failed lazy module', async
 test('release smoke: map fleet procurement opens even when workspace routing refuses target', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdPLOpenList === 'function' &&
     typeof window.hdPLEnsure === 'function' &&
@@ -4184,6 +4192,7 @@ test('release smoke: map fleet procurement opens even when workspace routing ref
 test('release smoke: map fleet acquisition catalog falls back when workspace routing fails', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdAGOpenCatalog === 'function' &&
     typeof window.hdShipDbMapRecommendHtml === 'function',
@@ -4243,6 +4252,7 @@ test('release smoke: map fleet acquisition catalog falls back when workspace rou
 test('release smoke: map fleet candidate opens the visible ship database', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdShipDbJumpTo === 'function' &&
     typeof window.hdWSShowElement === 'function',
@@ -4271,6 +4281,7 @@ test('release smoke: map fleet candidate opens the visible ship database', async
 test('release smoke: map fleet candidate opens equipment compatibility checker end to end', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdShipDbJumpTo === 'function' &&
     typeof window.hdWSShowElement === 'function',
@@ -4323,6 +4334,7 @@ test('release smoke: map fleet candidate opens equipment compatibility checker e
 test('release smoke: map fleet owned-loadout opens ledger and refreshes from equipment changes', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdShipDbMapRecommendHtml === 'function' &&
     typeof window.hdWSShowElement === 'function',
@@ -4373,6 +4385,7 @@ test('release smoke: map fleet owned-loadout opens ledger and refreshes from equ
 test('release smoke: map tab selection persists independently per map', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdMapActivateTab === 'function' &&
     typeof window.renderMapPicker === 'function',
@@ -4424,6 +4437,7 @@ test('release smoke: map tab selection persists independently per map', async ({
 test('release smoke: stale saved map攻略 tab falls back to overview', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.evaluate(() => {
     localStorage.setItem('harbordesk-map-tab-v1', JSON.stringify({'5-6':'legacy-tab-that-no-longer-exists'}));
     selectedWorld = '5';
@@ -4440,6 +4454,7 @@ test('release smoke: stale saved map攻略 tab falls back to overview', async ({
 test('release smoke: map攻略 inner controls work end to end', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdEnhanceMapPane === 'function' &&
     typeof window.hdRenderMapEquipmentRecommendations === 'function' &&
@@ -4592,6 +4607,7 @@ test('release smoke: map攻略 inner controls work end to end', async ({ page })
 test('release smoke: core攻略 navigation activates map tabs without synthetic click', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdCoreMapAction === 'function' &&
     typeof window.hdMapActivateTab === 'function',
@@ -4630,6 +4646,7 @@ test('release smoke: core攻略 navigation activates map tabs without synthetic 
 test('release smoke: secondary map gear and readiness controls work', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdRenderMapEquipmentRecommendations === 'function' &&
     typeof window.hdFCRender === 'function' &&
@@ -4779,6 +4796,7 @@ test('release smoke: secondary map gear and readiness controls work', async ({ p
 test('release smoke: secondary drop and synced custom fleet controls work', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.cfRelinkFleet === 'function' &&
     typeof window.hdDropOpenMapPanel === 'function',
@@ -5325,6 +5343,7 @@ test('release smoke: empty sortie preparation can open roster', async ({ page })
 test('release smoke: map quest actions add, open, count and reset progress', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdQuestOpenFromMap === 'function' &&
     typeof window.hdQuestAddFromMap === 'function' &&
@@ -5411,6 +5430,7 @@ test('release smoke: map quest actions add, open, count and reset progress', asy
 test('release smoke: map gear calculators persist detailed controls', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdFCRender === 'function' &&
     typeof window.hdRenderLandBasePlanner === 'function',
@@ -5512,6 +5532,7 @@ test('release smoke: map gear calculators persist detailed controls', async ({ p
 test('release smoke: land base owned-only filter and manual aircraft selection work', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() => typeof window.hdRenderLandBasePlanner === 'function', null, { timeout: 30000 });
 
   await page.evaluate(() => {
@@ -5568,6 +5589,7 @@ test('release smoke: land base owned-only filter and manual aircraft selection w
 test('release smoke: map drop filters and reverse lookup controls work', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdMapDropHtml === 'function' &&
     typeof window.hdWSShowElement === 'function',
@@ -5643,6 +5665,7 @@ test('release smoke: map drop filters and reverse lookup controls work', async (
 test('release smoke: map mine readiness and support controls persist and run', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdRenderSortieReadiness === 'function' &&
     typeof window.hdSPRender === 'function' &&
@@ -5758,6 +5781,7 @@ test('release smoke: map mine readiness and support controls persist and run', a
 test('release smoke: fleet suggestion saves and flows into sortie preparation', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdFSOpen === 'function' &&
     typeof window.hdSPSOpen === 'function' &&
@@ -5829,6 +5853,7 @@ test('release smoke: fleet suggestion saves and flows into sortie preparation', 
 test('release smoke: map quest tab links live quest data and checklist', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdQuestRelatedToMap === 'function' &&
     typeof window.hdQuestOpenFromMap === 'function' &&
@@ -5884,6 +5909,7 @@ test('release smoke: map quest tab links live quest data and checklist', async (
 test('release smoke: 5-5 keeps start and boss S separate in map and sortie routes', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdEnhanceMapPane === 'function' &&
     typeof window.hdSMNextNodeRows === 'function' &&
@@ -5987,6 +6013,7 @@ test('release smoke: 1-3 1-4 and 2-4 route graphs keep current starts and node r
 test('release smoke: map overview exposes visible攻略 tool launcher', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
   await page.waitForFunction(() =>
     typeof window.hdMapOpenTool === 'function' &&
     typeof window.hdEnhanceMapPane === 'function' &&
@@ -6072,6 +6099,7 @@ test('release smoke: map overview exposes visible攻略 tool launcher', async ({
 test('release smoke: map攻略 critical assets are cache-busted', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await openGuideWorkspace(page);
 
   const data = await page.evaluate(() => {
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
