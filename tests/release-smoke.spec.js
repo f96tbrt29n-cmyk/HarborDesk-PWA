@@ -110,6 +110,62 @@ test('release smoke: explicit workspace navigation wins over deferred startup re
 });
 
 
+test('release smoke: workspace target staged before tabs load is restored after late startup', async ({ page }) => {
+  const errors = [];
+  let releaseWorkspace = false;
+
+  page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
+  page.on('console', msg => {
+    if (msg.type() !== 'error') return;
+    const text = msg.text();
+    if (/Failed to load resource/i.test(text)) return;
+    errors.push(`console: ${text}`);
+  });
+
+  await page.route('**/workspace-tabs.js*', async route => {
+    while (!releaseWorkspace) await new Promise(resolve => setTimeout(resolve, 25));
+    await route.continue();
+  });
+
+  await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() =>
+    typeof window.hdRevealWorkspaceTarget === 'function' &&
+    !!document.getElementById('equipmentBook') &&
+    typeof window.hdWSApply !== 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  const staged = await page.evaluate(() => {
+    const opened = window.hdRevealWorkspaceTarget('equipmentBook', false);
+    return {
+      opened,
+      pending: window.__HD_PENDING_WORKSPACE_TARGET,
+      saved: JSON.parse(localStorage.getItem('harbordesk-workspace-tabs-v1') || '{}')
+    };
+  });
+
+  expect(staged.opened).toBe(true);
+  expect(staged.pending).toMatchObject({ group: 'arsenal', section: 'equipmentBook' });
+  expect(staged.saved).toMatchObject({ group: 'arsenal' });
+  expect(staged.saved.sections?.arsenal).toBe('equipmentBook');
+
+  releaseWorkspace = true;
+  await page.waitForFunction(() =>
+    typeof window.hdWSApply === 'function' &&
+    window.hdWSCurrentLocation?.().group === 'arsenal' &&
+    window.hdWSCurrentLocation?.().section === 'equipmentBook',
+    null,
+    { timeout: 30000 }
+  );
+
+  await expect(page.locator('#equipmentBook')).toBeVisible({ timeout: 5000 });
+  const pending = await page.evaluate(() => window.__HD_PENDING_WORKSPACE_TARGET || null);
+  expect(pending).toBeNull();
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: personalized home renders operational cards', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
