@@ -24,7 +24,8 @@ test('guide: steps open the right screen and survive a reload', async ({ page })
 
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {
   await openApp(page);
-  await page.evaluate(() => { hdEnsureShipDatabase(); hdRenderShipDatabase(); });
+  await page.evaluate(() => { hdEnsureShipDatabase(); window.hdWSShowElement?.('shipDatabase', true); hdRenderShipDatabase(); });
+  await expect(page.locator('#shipDatabase')).toBeVisible();
   const search = page.locator('#hdShipDbSearch');
   await search.fill('明石');
   const drops = page.locator('#hdShipDbList .hd-shipdb-acquisition').first();
