@@ -326,12 +326,12 @@ function hdCoreOpenRouteFallback(){
 function hdCoreQuestRows(map){
  const rows=[],seen=new Set(),add=q=>{if(!q?.name)return;const key=String(q.id||q.name);if(seen.has(key))return;seen.add(key);rows.push(q)};
  const plan=typeof MAP_PLANS!=='undefined'?MAP_PLANS[map]:null;
- for(const q of plan?.quests||[])add({...q,source:'plan'});
  const linked=typeof window.hdQuestRelatedToMap==='function'?(window.hdQuestRelatedToMap(map)||[]):[];
  for(const q of linked){
   const kind=typeof HD_QUEST_CYCLE_LABEL!=='undefined'?(HD_QUEST_CYCLE_LABEL[q.cycle]||q.cycle):q.cycle;
   add({...q,kind,source:'database'});
  }
+ for(const q of plan?.quests||[])add({...q,source:'plan'});
  return rows;
 }
 function hdCoreQuestHtml(map){
