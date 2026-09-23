@@ -2603,8 +2603,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.443'");
-  expect(source).toContain("const HD_APP_BUILD=443");
+  expect(source).toContain("const HD_APP_VERSION='1.0.444'");
+  expect(source).toContain("const HD_APP_BUILD=444");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -2627,15 +2627,15 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=443`);
+    expect(data.index).toContain(`${asset}?v=444`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=443");
+  expect(data.updater).toContain("const HD_APP_BUILD=444");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdScriptAssetUrl(src,attempt)");
   expect(data.updater).toContain("function hdScriptAssetUrl(src,attempt=0)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v443");
+  expect(data.sw).toContain("harbordesk-pwa-v444");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -2648,7 +2648,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=443');
+  expect(source).toContain('const BUILD=444');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -6208,17 +6208,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=443',
-      'map-images.js?v=443',
-      'map-tabs.js?v=443',
-      'map-interactive.js?v=443',
-      'map-advanced-data.js?v=443'
+      'map-details.js?v=444',
+      'map-images.js?v=444',
+      'map-tabs.js?v=444',
+      'map-interactive.js?v=444',
+      'map-advanced-data.js?v=444'
     ];
     const requiredStyles = [
-      'map-details.css?v=443',
-      'map-tabs.css?v=443',
-      'map-images.css?v=443',
-      'map-interactive.css?v=443'
+      'map-details.css?v=444',
+      'map-tabs.css?v=444',
+      'map-images.css?v=444',
+      'map-interactive.css?v=444'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -6279,7 +6279,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('[data-map-pane="mine"] #customFleetPanel')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=443');
+  expect(src).toBe('app.js?v=444');
   expect(errors).toEqual([]);
 });
 
@@ -7009,6 +7009,35 @@ test('release smoke: map攻略 fits iPhone width without horizontal swiping', as
   expect(second.stageWidth).toBeLessThanOrEqual(second.stageClient + 1);
   expect(second.imageWidth).toBeLessThanOrEqual(second.viewport);
   expect(second.imageRight).toBeLessThanOrEqual(second.viewport + 1);
+  expect(errors).toEqual([]);
+});
+
+test('release smoke:攻略 tabs stay readable, selected and keyboard operable on a narrow phone', async ({ page }) => {
+  const errors = [];
+  await page.setViewportSize({ width:320, height:740 });
+  await boot(page, errors);
+  await openGuideWorkspace(page);
+  await page.locator('[data-world="2"]').click();
+  await page.locator('[data-map="2-4"]').click();
+
+  const tabs = page.locator('#selectedMapCard [role="tab"]');
+  await expect(tabs).toHaveCount(8);
+  const layout = await page.evaluate(() => {
+    const bar = document.querySelector('#selectedMapCard [role="tablist"]');
+    return { scroll:bar.scrollWidth-bar.clientWidth, font:parseFloat(getComputedStyle(bar.querySelector('[role="tab"]')).fontSize) };
+  });
+  expect(layout.scroll).toBeLessThanOrEqual(1);
+  expect(layout.font).toBeGreaterThanOrEqual(14);
+
+  await expect(page.locator('[data-map-tab="overview"]')).toHaveAttribute('aria-selected','true');
+  await page.locator('[data-map-tab="overview"]').focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('[data-map-tab="map"]')).toHaveAttribute('aria-selected','true');
+  await expect(page.locator('[data-map-pane="map"]')).toBeVisible();
+  await expect(page.locator('[data-map-tab="map"]')).toBeFocused();
+  await page.keyboard.press('End');
+  await expect(page.locator('[data-map-tab="mine"]')).toHaveAttribute('aria-selected','true');
+  await expect(page.locator('[data-map-pane="mine"]')).toBeVisible();
   expect(errors).toEqual([]);
 });
 
