@@ -24,10 +24,15 @@ test('guide: steps open the right screen and survive a reload', async ({ page })
 
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {
   await openApp(page);
+  await expect(page.locator('#hdWorkspaceNav')).toBeVisible();
+  await page.locator('[data-hd-ws-group="fleet"]').click();
   await page.evaluate(() => { hdEnsureShipDatabase(); window.hdWSShowElement?.('shipDatabase', true); hdRenderShipDatabase(); });
   await expect(page.locator('#shipDatabase')).toBeVisible();
+  await page.locator('[data-hd-shipdb-compact]').click();
+  await expect(page.locator('#hdShipDbList')).not.toHaveClass(/hd-compact/);
   const search = page.locator('#hdShipDbSearch');
   await search.fill('明石');
+  await expect(page.locator('#hdShipDbList .hd-shipdb-head strong').first()).toContainText('明石');
   const drops = page.locator('#hdShipDbList .hd-shipdb-acquisition').first();
   await expect(drops).toBeVisible();
   await drops.locator('summary').click();
@@ -37,6 +42,7 @@ test('ship database: acquisition shows sourced drops and exact construction reci
   await expect(page.locator('#hdDropSearch')).toHaveValue('明石');
   await page.evaluate(() => window.hdWSShowElement?.('shipDatabase', true));
   await search.fill('大和');
+  await expect(page.locator('#hdShipDbList .hd-shipdb-head strong').first()).toContainText('大和');
   const build = page.locator('#hdShipDbList .hd-shipdb-acquisition').first();
   await build.locator('summary').click();
   await expect(build).toContainText('大型・大和型');
