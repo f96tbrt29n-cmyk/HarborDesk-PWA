@@ -1103,6 +1103,105 @@ test('release smoke: synced fleet and equipment data refresh downstream planners
   expect(errors).toEqual([]);
 });
 
+test('release smoke: expansion shortage procurement action adds demand and opens list', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFLGenerate === 'function' &&
+    typeof window.hdFLPlanHtml === 'function' &&
+    typeof window.hdPLAddExpansionRequirement === 'function' &&
+    typeof window.hdPLOpenList === 'function'
+  );
+
+  const setup = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-equipment-v1', '[]');
+    localStorage.removeItem('harbordesk-equipment-procurement-v1');
+
+    window.hdFSMap = () => '2-4';
+    window.hdFSPlans = () => [{
+      index: 0,
+      preset: { name: '増設調達テスト', use: '回帰テスト' },
+      needs: [],
+      slots: [{
+        profile: {
+          row: { name: 'テスト駆逐', masterId: 999999, gear: '' },
+          type: '駆逐艦',
+          roles: [],
+          master: { id: 999999 }
+        }
+      }]
+    }];
+    window.hdShipDbResolveShip = () => ({ id: 999999, final: 'テスト駆逐', type: '駆逐艦' });
+    window.hdShipDbSlotProfile = () => ({ count: 1, slots: [0] });
+    window.hdShipDbMasterCompatible = () => true;
+    window.hdShipDbSlotRejects = () => false;
+    window.hdShipDbExpansionCandidates = () => [];
+    window.hdShipDbExpansionInfo = (item, ship, star = 0) => {
+      if (item?.name !== '12cm単装砲') return { allowed: false, reqStar: 0, reason: '', mode: '' };
+      return Number(star) >= 2
+        ? { allowed: true, reqStar: 2, reason: '★2以上で増設可', mode: 'special' }
+        : { allowed: false, reqStar: 2, reason: '★2以上で増設可', mode: 'special' };
+    };
+    window.hdShipDbEquipPower = () => 10;
+    window.HD_EQUIPMENT_CATALOG = [{
+      name: '12cm単装砲',
+      category: '小口径主砲',
+      stats: { 火力: 1 },
+      tags: []
+    }];
+
+    const plan = window.hdFLGenerate(0);
+    document.getElementById('hdExpansionProcureTestHost')?.remove();
+    const host = document.createElement('div');
+    host.id = 'hdExpansionProcureTestHost';
+    host.innerHTML = window.hdFLPlanHtml(plan);
+    document.body.appendChild(host);
+
+    return {
+      missing: plan?.ships?.[0]?.expansionMissing?.name || '',
+      reqStar: Number(plan?.ships?.[0]?.expansionMissing?.reqStar) || 0,
+      hasButton: !!host.querySelector('[data-hd-fl-procure-expansion="0"]')
+    };
+  });
+
+  expect(setup).toEqual({ missing: '12cm単装砲', reqStar: 2, hasButton: true });
+
+  await page.locator('#hdExpansionProcureTestHost [data-hd-fl-procure-expansion="0"]').click();
+
+  await page.waitForFunction(() => {
+    const rows = JSON.parse(localStorage.getItem('harbordesk-equipment-procurement-v1') || '[]');
+    return rows.some(row => (row.gearItems || []).some(item =>
+      item.loadout === '補強増設' &&
+      item.target === '12cm単装砲' &&
+      Number(item.reqStar) === 2
+    ));
+  });
+
+  const result = await page.evaluate(() => {
+    const rows = JSON.parse(localStorage.getItem('harbordesk-equipment-procurement-v1') || '[]');
+    const item = rows.flatMap(row => row.gearItems || []).find(x => x.loadout === '補強増設');
+    const panel = document.getElementById('hdEquipmentProcurement');
+    return {
+      map: rows[0]?.map || '',
+      ship: item?.ship || '',
+      target: item?.target || '',
+      reqStar: Number(item?.reqStar) || 0,
+      requiredTotal: Number(item?.requiredTotal) || 0,
+      visible: !!panel && getComputedStyle(panel).display !== 'none' && !panel.hidden
+    };
+  });
+
+  expect(result).toMatchObject({
+    map: '2-4',
+    ship: 'テスト駆逐',
+    target: '12cm単装砲',
+    reqStar: 2,
+    requiredTotal: 1,
+    visible: true
+  });
+  expect(errors).toEqual([]);
+});
+
 test('release smoke: optimizer keeps improvement-level equipment stacks separate', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
