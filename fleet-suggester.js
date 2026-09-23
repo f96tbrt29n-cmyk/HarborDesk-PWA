@@ -158,7 +158,14 @@ function hdFSReveal(target){
  for(var p=target.parentElement;p&&p!==document.body;p=p.parentElement)p.classList?.remove('hd-ws-wrapper-hidden');
  target.scrollIntoView?.({behavior:'smooth',block:'start'});return true;
 }
-function hdFSOpen(){hdFSEnsure();var target=document.getElementById('hdFleetSuggester');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdFleetSuggester',true)))hdFSReveal(target);setTimeout(function(){hdFSReveal(target);hdFSRender()},60);setTimeout(function(){hdFSReveal(target);hdFSRender()},420)}
+function hdFSStillSelected(target){
+ try{
+  var state=JSON.parse(localStorage.getItem('harbordesk-workspace-tabs-v1')||'{}');
+  var section=state&&state.sections&&state.sections.guide;
+  return !section||section===(target&&target.id);
+ }catch(e){return true}
+}
+function hdFSOpen(){hdFSEnsure();var target=document.getElementById('hdFleetSuggester');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdFleetSuggester',true)))hdFSReveal(target);setTimeout(function(){if(hdFSStillSelected(target))hdFSReveal(target);hdFSRender()},60);setTimeout(function(){if(hdFSStillSelected(target))hdFSReveal(target);hdFSRender()},420)}
 function hdFSOpenRoster(){if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return true;return hdFSReveal(document.getElementById('roster'))}
 function hdFSMapButton(){var head=document.querySelector('#selectedMapCard .map-tabs-head');if(!head||head.querySelector('[data-hd-fs-open]'))return;var b=document.createElement('button');b.type='button';b.className='ghost small';b.setAttribute('data-hd-fs-open','1');b.textContent='編成候補';head.appendChild(b)}
 async function hdFSOpenAcquire(kind,button){
