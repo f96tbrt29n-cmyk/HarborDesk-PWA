@@ -6336,6 +6336,40 @@ test('release smoke: fallback攻略 state resets when switching maps', async ({ 
 });
 
 
+test('release smoke: fallback攻略 state clears when map selection is reset', async ({ page }) => {
+  const errors = [];
+  await page.route('**/map-tabs.js*', route => route.abort());
+  await boot(page, errors);
+
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await expect(page.locator('#guide')).toBeVisible();
+  await page.locator('[data-world="2"]').click();
+  await page.locator('[data-map="2-4"]').click();
+
+  const fallback = page.locator('#selectedMapCard [data-hd-core-map-tools]');
+  await expect(fallback).toBeVisible();
+  await fallback.locator('[data-hd-core-map-action="route"]').click();
+  await expect(page.locator('#hdFallbackRouteTools')).toBeVisible();
+
+  await page.evaluate(() => {
+    selectedMap = '';
+    renderMapPicker();
+  });
+
+  await expect(page.locator('#selectedMapCard')).toContainText('海域を選ぶと');
+  await expect(page.locator('#selectedMapCard [data-hd-core-fallback-pane]')).toHaveCount(0);
+
+  const state = await page.evaluate(() => ({
+    active: window.hdCoreActiveFallbackPane?.() || null,
+    render: window.__HD_MAP_RENDER_STATE || null
+  }));
+  expect(state.active).toBeNull();
+  expect(state.render?.mode).toBe('empty');
+  expect(state.render?.map).toBe('');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: fallback map renderer still exposes攻略 tools when map tabs fail', async ({ page }) => {
   const errors = [];
   await page.route('**/map-tabs.js*', route => route.abort());
