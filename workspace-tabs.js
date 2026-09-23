@@ -150,6 +150,19 @@ function hdWSRestoreStartupContext(){
  if(hdWSConsumeUpdateReturn()){hdWSReflectLocationHash(hdWSCurrentSectionId());return true}
  const id=hdWSCurrentSectionId(),restored=!!id&&hdWSRestoreScroll(id);if(id)hdWSReflectLocationHash(id);return restored;
 }
+function hdWSConsumePendingTarget(){
+ const pending=window.__HD_PENDING_WORKSPACE_TARGET;
+ if(!pending?.section)return false;
+ if(Number(pending.at)>0&&Date.now()-Number(pending.at)>30000){delete window.__HD_PENDING_WORKSPACE_TARGET;return false}
+ const el=document.getElementById(String(pending.section||''));if(!el){delete window.__HD_PENDING_WORKSPACE_TARGET;return false}
+ const section=hdWSManagedSectionFor(el);if(!section){delete window.__HD_PENDING_WORKSPACE_TARGET;return false}
+ const group=HD_WS_GROUPS.some(x=>x.key===pending.group)?pending.group:(section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section));
+ delete window.__HD_PENDING_WORKSPACE_TARGET;
+ hdWSStartupContextHandled=true;
+ try{sessionStorage.removeItem(HD_WS_UPDATE_RETURN_KEY)}catch{}
+ hdWSClearPin();hdWSState.group=group;hdWSState.sections[group]=section.id;hdWSSave();
+ return true;
+}
 
 function hdWSRestoreScroll(sectionId){
  const section=document.getElementById(sectionId),saved=Number(hdWSScrollLoad()[sectionId]);if(!section||!Number.isFinite(saved))return false;
@@ -503,7 +516,7 @@ function hdWSRefresh(){if(Date.now()<hdWSNavLockUntil){hdWSScheduleRefresh();ret
 function hdWSMutationAddsSection(ms){return ms.some(m=>[...m.addedNodes].some(n=>n?.nodeType===1&&(n.matches?.('section')||n.querySelector?.('section'))))}
 function hdWSScheduleRefresh(){clearTimeout(hdWSRefreshTimer);const delay=Math.max(60,hdWSNavLockUntil-Date.now()+20);hdWSRefreshTimer=setTimeout(hdWSRefresh,delay)}
 function hdWSInstall(){
- hdWSEnsureUI();hdWSInstallKeyboardTracking();hdWSInstallScrollCompact();hdWSRefresh();
+ hdWSEnsureUI();hdWSInstallKeyboardTracking();hdWSInstallScrollCompact();hdWSConsumePendingTarget();hdWSRefresh();
  setTimeout(()=>hdWSRestoreStartupContext(),80);
  if(!hdWSObserver){hdWSObserver=new MutationObserver(ms=>{if(hdWSMutationAddsSection(ms))hdWSScheduleRefresh()});const main=document.querySelector('main');if(main)hdWSObserver.observe(main,{childList:true,subtree:true})}
 }
