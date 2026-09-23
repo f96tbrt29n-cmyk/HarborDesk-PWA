@@ -9,9 +9,13 @@
       Object.defineProperty(Element.prototype,'__hdOriginalScrollIntoView',{value:original,configurable:true});
       Element.prototype.scrollIntoView=function(...args){
         try{
-          let node=this.closest?.('section')||null,hidden=false;
-          while(node){if(node.classList?.contains('hd-ws-hidden')){hidden=true;break}node=node.parentElement?.closest?.('section')||null}
-          if(hidden)window.hdWSShowElement(this,false);
+          const section=this.matches?.('section')?this:null;
+          const managed=!!section&&!section.parentElement?.closest?.('section');
+          const hidden=managed&&section.classList?.contains('hd-ws-hidden');
+          // Only treat an explicit scroll to a top-level workspace section as navigation.
+          // Nested controls often scroll themselves for layout (for example map-tab centering);
+          // routing those background scrolls can steal the active workspace from the user.
+          if(hidden)window.hdWSShowElement(section,false);
         }catch{}
         return original.apply(this,args);
       };
