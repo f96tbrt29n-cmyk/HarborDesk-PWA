@@ -22,6 +22,20 @@ test('guide: steps open the right screen and survive a reload', async ({ page })
   await expect(page.locator('#kancolleImport')).toBeVisible();
 });
 
+test('guide: shows selected map and restarts only the per-map steps', async ({ page }) => {
+  await openApp(page);
+  await page.evaluate(() => { selectedMap = '2-4'; homeGuideRender(); });
+  await expect(page.locator('.home-guide-map')).toContainText('2-4');
+  await expect(page.locator('#homeGuideSteps .home-guide-step').nth(4)).toContainText('任務');
+  for(const button of await page.locator('[data-home-guide-toggle]').all()) await button.dispatchEvent('click');
+  await expect(page.locator('#homeGuideCount')).toHaveText('7/7 完了');
+  await page.locator('[data-home-guide-restart]').click();
+  await expect(page.locator('#homeGuideCount')).toHaveText('2/7 完了');
+  await expect(page.locator('#homeGuideSteps .home-guide-step.current')).toContainText('海域');
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#homeGuideCount')).toHaveText('2/7 完了');
+});
+
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {
   await openApp(page);
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible();
@@ -48,6 +62,11 @@ test('ship database: acquisition shows sourced drops and exact construction reci
   await expect(build).toContainText('大型・大和型');
   await build.locator('[data-hd-shipdb-acquire-build]').click();
   await expect(page.locator('#hdConstructionSearch')).toHaveValue('大和');
+  await page.evaluate(() => window.hdWSShowElement?.('shipDatabase', true));
+  await search.fill('1-5');
+  await expect(page.locator('#hdShipDbList .hd-shipdb-head strong').filter({ hasText: '明石' }).first()).toContainText('明石');
+  await search.fill('大和型・大型戦艦');
+  await expect(page.locator('#hdShipDbList .hd-shipdb-head strong').filter({ hasText: '大和' }).first()).toContainText('大和');
   const rows = await page.evaluate(() => ({ known: hdShipDbAcquisitionRows('明石').drop?.ship, unknown: hdShipDbAcquisitionRows('未収録艦名').drop, hasBuild: hdShipDbAcquisitionRows('大和').recipes.length > 0 }));
   expect(rows).toEqual({ known: '明石', unknown: null, hasBuild: true });
 });
