@@ -510,6 +510,7 @@ function hdWSRevealElement(target,scroll=true,opts={}){
 function hdWSShowElement(target,scroll=true){
  return hdWSRevealElement(target,scroll);
 }
+window.hdWSShowElement=hdWSShowElement;
 window.hdWSRevealElement=hdWSRevealElement;
 function hdWSPatchQuickNav(){
  window.__hdWSQuickPatched=true;
