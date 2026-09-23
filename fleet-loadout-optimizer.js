@@ -42,9 +42,10 @@ function hdFOAssignedUsage(plan){
  return used;
 }
 function hdFORefreshUsage(plan){
- const inv=typeof hdFLInventory==='function'?hdFLInventory():new Map(),used=hdFOAssignedUsage(plan),owned={},ownedStacks={};
+ const inv=typeof hdFLInventory==='function'?hdFLInventory():new Map(),used={},usedStacks=hdFOAssignedUsage(plan),owned={},ownedStacks={};
+ for(const ship of plan.ships||[]){for(const item of ship.items||[])if(item?.name)used[item.name]=(used[item.name]||0)+1;if(ship.expansion?.name)used[ship.expansion.name]=(used[ship.expansion.name]||0)+1}
  for(const x of inv.values()){owned[x.name]=(owned[x.name]||0)+x.count;ownedStacks[x.key]=x.count}
- plan.used=used;plan.owned=owned;plan.ownedStacks=ownedStacks;return plan;
+ plan.used=used;plan.usedStacks=usedStacks;plan.owned=owned;plan.ownedStacks=ownedStacks;return plan;
 }
 function hdFOReqScore(e,mode){
  if(!e)return -9999;

@@ -72,6 +72,9 @@ test('optimizer improves 3-2 speed and radar requirements without exceeding inve
   for (const [name, used] of Object.entries(result.optimized.used)) {
     expect(used, `${name} usage exceeds inventory`).toBeLessThanOrEqual(result.optimized.owned[name] || 0);
   }
+  for (const [stack, used] of Object.entries(result.optimized.usedStacks)) {
+    expect(used, `${stack} stack usage exceeds inventory`).toBeLessThanOrEqual(result.optimized.ownedStacks[stack] || 0);
+  }
 });
 
 test('optimizer leaves unresolved requirements visible when inventory cannot satisfy them', async ({ page }) => {
@@ -129,6 +132,8 @@ test('optimizer UI shows swaps and optimized loadout can be saved', async ({ pag
   await expect(card.locator('.hd-fo-result')).toBeVisible();
   await expect(card.locator('.hd-fo-result')).toContainText('安定重視で自動最適化');
   await expect(card.locator('[data-hd-fo-reset="0"]')).toBeVisible();
+  await expect(card.locator('.hd-fl-usage')).not.toContainText('所持0');
+  await expect(card.locator('.hd-fl-usage')).not.toContainText('@@');
 
   await card.locator('[data-hd-fl-save="0"]').click();
   const saved=await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1')||'{}'));

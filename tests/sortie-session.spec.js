@@ -66,7 +66,8 @@ test('starting a sortie session snapshots the selected fleet and readiness state
   await openPreparation(page);
 
   await expect(page.locator('.hd-ss')).toContainText('3-2 安定重視');
-  await page.locator('[data-hd-ss-start]').click();
+  await page.locator('[data-hd-ss-start-override]').click();
+  await page.evaluate(() => window.hdWSShowElement?.('hdSortiePreparation', true));
 
   await expect(page.locator('.hd-ss.active')).toBeVisible();
   await expect(page.locator('.hd-ss.active')).toContainText('出撃中');
@@ -78,14 +79,15 @@ test('starting a sortie session snapshots the selected fleet and readiness state
   expect(session.strategy).toBe('stable');
   expect(session.strategyLabel).toBe('安定重視');
   expect(session.fleetSnapshot.ships[0].ship).toBe('矢矧改二乙');
-  expect(session.readinessSnapshot.manualDone).toBe(2);
+  expect(session.readinessSnapshot.manualDone).toBe(0);
+  expect(session.readinessSnapshot.gate.overridden).toBe(true);
 });
 
 test('switching the selected preset during a sortie does not mutate the session snapshot', async ({ page }) => {
   await boot(page);
   await seed(page);
   await openPreparation(page);
-  await page.locator('[data-hd-ss-start]').click();
+  await page.locator('[data-hd-ss-start-override]').click();
 
   await page.evaluate(() => hdSPMSelect('3-2','boss1'));
   const current=await page.evaluate(() => ({
@@ -104,8 +106,9 @@ test('return result writes one existing sortie log entry with session metadata t
   await boot(page);
   await seed(page);
   await openPreparation(page);
-  await page.locator('[data-hd-ss-start]').click();
+  await page.locator('[data-hd-ss-start-override]').click();
   await page.evaluate(() => hdSPMSelect('3-2','boss1'));
+  await page.evaluate(() => window.hdWSShowElement?.('hdSortiePreparation', true));
 
   await page.locator('#hdSSResult').selectOption('A');
   await page.locator('#hdSSNode').fill('ボス');
@@ -119,7 +122,7 @@ test('return result writes one existing sortie log entry with session metadata t
   await page.locator('[data-hd-ss-finish]').click();
 
   await expect(page.locator('.hd-ss.active')).toHaveCount(0);
-  await expect(page.locator('[data-hd-ss-start]')).toBeVisible();
+  await expect(page.locator('[data-hd-ss-start-override]')).toBeVisible();
 
   const data=await page.evaluate(() => ({
     active: localStorage.getItem('harbordesk-active-sortie-session-v1'),
@@ -149,7 +152,7 @@ test('only one active sortie session can exist at a time', async ({ page }) => {
   await boot(page);
   await seed(page);
   await openPreparation(page);
-  await page.locator('[data-hd-ss-start]').click();
+  await page.locator('[data-hd-ss-start-override]').click();
 
   const result=await page.evaluate(() => {
     const before=JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')||'null');

@@ -165,7 +165,7 @@ function hdFSStillSelected(target){
   return state.group==='guide'&&state.sections&&state.sections.guide===(target&&target.id);
  }catch(e){return !!target&&!target.hidden&&!target.classList.contains('hd-ws-hidden')}
 }
-function hdFSOpen(){hdFSEnsure();var target=document.getElementById('hdFleetSuggester');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdFleetSuggester',true)))hdFSReveal(target);setTimeout(function(){if(hdFSStillSelected(target))hdFSReveal(target);hdFSRender()},60);setTimeout(function(){if(hdFSStillSelected(target))hdFSReveal(target);hdFSRender()},420)}
+function hdFSOpen(){hdFSEnsure();var target=document.getElementById('hdFleetSuggester');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdFleetSuggester',true)))hdFSReveal(target);hdFSRender();setTimeout(function(){if(hdFSStillSelected(target))hdFSReveal(target)},60);setTimeout(function(){if(hdFSStillSelected(target))hdFSReveal(target)},420)}
 function hdFSOpenRoster(){if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return true;return hdFSReveal(document.getElementById('roster'))}
 function hdFSMapButton(){var head=document.querySelector('#selectedMapCard .map-tabs-head');if(!head||head.querySelector('[data-hd-fs-open]'))return;var b=document.createElement('button');b.type='button';b.className='ghost small';b.setAttribute('data-hd-fs-open','1');b.textContent='編成候補';head.appendChild(b)}
 async function hdFSOpenAcquire(kind,button){

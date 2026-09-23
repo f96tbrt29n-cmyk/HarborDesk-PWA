@@ -58,6 +58,8 @@ test('generated loadout can be saved into the custom fleet gear fields', async (
   const card = page.locator('.hd-fs-card').first();
   await card.locator('[data-hd-fl-generate="0"]').click();
   await expect(card.locator('.hd-fl-plan')).toBeVisible();
+  await page.waitForTimeout(650);
+  await expect(card.locator('.hd-fl-plan')).toBeVisible();
   await expect(card.locator('.hd-fl-usage')).toContainText('所持');
 
   await card.locator('[data-hd-fl-save="0"]').click();
