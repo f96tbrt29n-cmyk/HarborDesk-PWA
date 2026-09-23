@@ -210,6 +210,28 @@ function homeSyncDeltaHtml(sync){
  return parts.length?'<div class="home-sync-delta"><span>前回から</span>'+parts.slice(0,5).map(x=>'<b>'+homeEsc(x)+'</b>').join('')+'</div>':'';
 }
 
+const HD_HOME_GUIDE_KEY='harbordesk-guide-steps-v1';
+const HD_HOME_GUIDE_STEPS=[
+ {id:'sync',title:'手持ちを登録する',detail:'ゲーム同期で艦娘・装備・資源を取り込む。同期できない場合は艦隊台帳へ手入力しても進められる。',target:'kancolleImport',action:'ゲーム同期へ'},
+ {id:'fleet',title:'出撃する艦隊を決める',detail:'艦隊台帳で6隻の育成状況と損傷を確認。最初は手持ちの艦で進め、足りない艦種を把握する。',target:'roster',action:'艦隊台帳へ'},
+ {id:'map',title:'次の海域とルートを確認する',detail:'攻略画面で挑む海域を選び、ルート条件・敵編成・ボスへの到達方法を読む。迷ったら未クリアの通常海域から。',target:'guide',action:'海域攻略へ'},
+ {id:'gear',title:'必要な装備を揃える',detail:'海域の制空・対潜・索敵条件に合わせて装備を確認。不足品は装備台帳や入手方法から調べる。',target:'equipmentBook',action:'装備台帳へ'},
+ {id:'sortie',title:'出撃して結果を記録する',detail:'大破した艦を出撃させないことを確認し、攻略画面の出撃モードで進行とボス結果を記録する。',target:'guide',action:'出撃画面へ'},
+ {id:'quests',title:'並行する任務を選ぶ',detail:'同じ海域で進む任務をチェックしてから出撃すると、周回をまとめやすい。',target:'quests',action:'任務へ'},
+ {id:'expeditions',title:'資源を回復して次に備える',detail:'遠征と入渠のタイマーを設定。目標達成後は次の海域を確認して手順を繰り返す。',target:'expeditions',action:'遠征へ'}
+];
+function homeGuideDone(){try{const rows=JSON.parse(localStorage.getItem(HD_HOME_GUIDE_KEY)||'[]');return new Set(Array.isArray(rows)?rows.filter(id=>HD_HOME_GUIDE_STEPS.some(step=>step.id===id)):[])}catch{return new Set()}}
+let homeGuideLastState='';
+function homeGuideRender(){
+ const host=document.getElementById('homeGuideSteps');if(!host)return;
+ const done=homeGuideDone(),next=HD_HOME_GUIDE_STEPS.find(step=>!done.has(step.id));
+ const signature=HD_HOME_GUIDE_STEPS.map(step=>done.has(step.id)?'1':'0').join('');
+ if(host.children.length&&homeGuideLastState===signature)return;
+ homeGuideLastState=signature;
+ document.getElementById('homeGuideCount').textContent=`${done.size}/${HD_HOME_GUIDE_STEPS.length} 完了`;
+ host.innerHTML=HD_HOME_GUIDE_STEPS.map((step,i)=>`<div class="home-guide-step${done.has(step.id)?' done':''}${next===step?' current':''}"><button type="button" class="home-guide-check" data-home-guide-toggle="${step.id}" aria-pressed="${done.has(step.id)}" aria-label="${homeEsc(step.title)}を${done.has(step.id)?'未完了に戻す':'完了にする'}">${done.has(step.id)?'✓':i+1}</button><div><strong>${homeEsc(step.title)}</strong><p>${homeEsc(step.detail)}</p><button type="button" class="ghost small" data-home-jump="${step.target}">${homeEsc(step.action)} →</button></div></div>`).join('');
+}
+
 function ensureHomeDashboard(){
  const main=document.querySelector('main');
  const hero=document.querySelector('.hero');
@@ -224,6 +246,7 @@ function ensureHomeDashboard(){
   <article id="homeResume" class="home-resume-card" hidden></article>
   <article id="homeNextAction" class="home-next-action"></article>
   <div id="homeSummary" class="home-summary"></div>
+  <article class="home-card home-guide-card"><div class="home-card-title"><strong>攻略のやることリスト</strong><span id="homeGuideCount" class="muted"></span></div><p class="home-guide-intro">上から進めて、終えたら番号をタップ。進捗はこの端末に保存するよ。</p><div id="homeGuideSteps"></div></article>
   <div class="home-grid">
    <article class="home-card"><div class="home-card-title"><strong>今日やること</strong><a href="#quests">任務へ</a></div><div id="homeTodo"></div></article>
    <article class="home-card"><div class="home-card-title"><strong>進行中タイマー</strong><a href="#expeditions">遠征へ</a></div><div id="homeTimers"></div></article>
@@ -241,6 +264,7 @@ function ensureHomeDashboard(){
 
 function renderHomeDashboard(){
  if(!document.getElementById('home'))return;
+ homeGuideRender();
  const now=Date.now();
  let expeditions=[],docks=[],quests=[],resources={fuel:'',ammo:'',steel:'',bauxite:''};
  try{if(typeof state!=='undefined'){expeditions=state.expeditions||[];docks=state.docks||[];quests=state.quests||[];resources=state.resources||resources}}catch{}
@@ -353,6 +377,7 @@ function renderHomeDashboard(){
 }
 
 document.addEventListener('click',e=>{
+ const guideToggle=e.target.closest('[data-home-guide-toggle]');if(guideToggle){const done=homeGuideDone(),id=guideToggle.dataset.homeGuideToggle;if(done.has(id))done.delete(id);else done.add(id);try{localStorage.setItem(HD_HOME_GUIDE_KEY,JSON.stringify([...done]))}catch{}homeGuideRender();return}
  const resume=e.target.closest('[data-home-resume]');if(resume){
   if(typeof hdWSGoBack==='function'&&hdWSGoBack())return;
   const row=homeResumeLocation();if(row&&typeof hdWSShowElement==='function')hdWSShowElement(row.id,true);
