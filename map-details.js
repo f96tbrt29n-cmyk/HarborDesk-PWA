@@ -64,9 +64,11 @@ function hdMapFallbackToolsHtml(){
   <div class="hd-core-map-tools-grid">
    <button type="button" data-hd-core-map-action="map">マップ詳細</button>
    <button type="button" data-hd-core-map-action="fleet">編成</button>
+   <button type="button" data-hd-core-map-action="route">ルート</button>
    <button type="button" data-hd-core-map-action="suggest">編成候補</button>
    <button type="button" data-hd-core-map-action="prep">出撃準備</button>
    <button type="button" data-hd-core-map-action="gear">装備・計算</button>
+   <button type="button" data-hd-core-map-action="quest">任務</button>
    <button type="button" data-hd-core-map-action="drop">ドロップ</button>
    <button type="button" data-hd-core-map-action="mine">自分用</button>
   </div>
