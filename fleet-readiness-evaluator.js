@@ -320,7 +320,7 @@ function hdFEFixFlowLoad(){
   const x=JSON.parse(sessionStorage.getItem(HD_FE_FIX_FLOW_KEY)||'null');
   if(!x||!x.id)return null;
   if(Date.now()-Number(x.startedAt||0)>45*60*1000){sessionStorage.removeItem(HD_FE_FIX_FLOW_KEY);return null}
-  const map=hdFEFixFlowMap();if(x.map&&map&&x.map!==map)return null;
+  const map=hdFEFixFlowMap();if(x.map&&x.map!==map)return null;
   return x;
  }catch{return null}
 }
