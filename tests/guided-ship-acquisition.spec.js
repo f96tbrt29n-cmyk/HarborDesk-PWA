@@ -22,18 +22,35 @@ test('guide: steps open the right screen and survive a reload', async ({ page })
   await expect(page.locator('#kancolleImport')).toBeVisible();
 });
 
-test('guide: shows selected map and restarts only the per-map steps', async ({ page }) => {
+test('guide: completed map advances to the next map and restarts per-map steps', async ({ page }) => {
   await openApp(page);
-  await page.evaluate(() => { selectedMap = '2-4'; homeGuideRender(); });
+  await page.evaluate(() => { hdSelectGuideMap('2-4'); homeGuideRender(); });
   await expect(page.locator('.home-guide-map')).toContainText('2-4');
   await expect(page.locator('#homeGuideSteps .home-guide-step').nth(4)).toContainText('任務');
   for(const button of await page.locator('[data-home-guide-toggle]').all()) await button.dispatchEvent('click');
   await expect(page.locator('#homeGuideCount')).toHaveText('7/7 完了');
+  await expect(page.locator('[data-home-guide-restart]')).toContainText('2-5');
   await page.locator('[data-home-guide-restart]').click();
   await expect(page.locator('#homeGuideCount')).toHaveText('2/7 完了');
+  await expect(page.locator('.home-guide-map')).toContainText('2-5');
   await expect(page.locator('#homeGuideSteps .home-guide-step.current')).toContainText('海域');
   await page.reload({ waitUntil: 'domcontentloaded' });
   await expect(page.locator('#homeGuideCount')).toHaveText('2/7 完了');
+  await expect(page.locator('.home-guide-map')).toContainText('2-5');
+});
+
+test('guide: next-map progression crosses world boundaries', async ({ page }) => {
+  await openApp(page);
+  await page.evaluate(() => {
+    hdSelectGuideMap('1-6');
+    localStorage.setItem('harbordesk-guide-steps-v1', JSON.stringify(['sync','fleet','map','gear','quests','sortie','expeditions']));
+    homeGuideRender();
+  });
+  await expect(page.locator('[data-home-guide-restart]')).toContainText('2-1');
+  await page.locator('[data-home-guide-restart]').click();
+  await expect(page.locator('.home-guide-map')).toContainText('2-1');
+  await expect(page.locator('#worldPicker .world-chip.active')).toHaveAttribute('data-world','2');
+  await expect(page.locator('#mapPicker .map-button.active')).toHaveAttribute('data-map','2-1');
 });
 
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {
