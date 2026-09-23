@@ -112,3 +112,26 @@ test('3-2 does not falsely require air-power gear from the phrase 航空戦力�
   expect(needs).toContain('高速化');
   expect(needs).toContain('電探');
 });
+
+test('unknown ship condition is shown as unverified in sortie verdict', async ({ page }) => {
+  await boot(page);
+  const health = await page.evaluate(() => {
+    localStorage.removeItem('harbordesk-ship-roster-v1');
+    const result = hdFEEvaluate({ map:'3-2', ships:[{ ship:'未同期の艦', items:[] }] });
+    return result.auto.checks.find(x => x.id === 'health');
+  });
+  expect(health.status).toBe('manual');
+  expect(health.detail).toContain('同期状態不明 1隻');
+  expect(health.detail).not.toContain('艦状態OK');
+});
+
+test('future-dated game sync is not treated as fresh', async ({ page }) => {
+  await boot(page);
+  const freshness = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({ syncedAt:Date.now()+3600000 }));
+    return hdFESyncFreshness();
+  });
+  expect(freshness.status).toBe('manual');
+  expect(freshness.ageMinutes).toBeNull();
+  expect(freshness.detail).toContain('時計設定');
+});

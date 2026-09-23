@@ -198,6 +198,7 @@ function hdFESyncFreshness(){
  let sync=null;try{sync=JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')}catch{}
  const syncedAt=Number(sync?.syncedAt)||0;
  if(!syncedAt)return {status:'manual',syncedAt:0,ageMinutes:null,detail:'同期時刻が不明。出撃直前に艦これ同期を確認'};
+ if(syncedAt>Date.now()+60000)return {status:'manual',syncedAt,ageMinutes:null,detail:'同期時刻が端末の現在時刻より未来。時計設定とゲーム連携を確認'};
  const ageMinutes=Math.max(0,Math.floor((Date.now()-syncedAt)/60000)),status=ageMinutes<=10?'ready':'partial';
  return {status,syncedAt,ageMinutes,detail:ageMinutes<1?'たった今同期':`同期から ${ageMinutes}分${ageMinutes>10?'。出撃直前は再同期推奨':''}`};
 }
@@ -264,7 +265,7 @@ function hdFEScouting(plan,items){
  return {status,available:true,score,coef,hq,checks:rows,detail:`推定33式 ${score.toFixed(2)}（係数${coef} / 司令部Lv${hq}）`};
 }
 function hdFEAutoVerdict(plan,e){
- const live=hdFELiveFleet(plan),supply=hdFESupply(plan),freshness=hdFESyncFreshness(),gameMatch=hdFEGameMatch(plan),route=hdFERoute(plan),air=hdFEAirCheck(plan?.map,e.air),scouting=hdFEScouting(plan,e.items),equipment={status:e.missing?'missing':e.partial?'partial':'ready',detail:`海域装備 ${e.ready}/${e.requirements.length} 準備`},master={status:e.master.invalid.length?'missing':e.master.unresolved.length?'partial':'ready',detail:e.master.invalid.length?`装備不可 ${e.master.invalid.length}件`:e.master.unresolved.length?`未解決 ${e.master.unresolved.length}件`:'装備可否OK'},health={status:live.status,detail:live.blocked?`出撃不可候補 ${live.blocked}隻（${Object.entries(live.reasons).map(x=>x[0]+' '+x[1]).join(' / ')}）`:live.caution?`注意艦 ${live.caution}隻`:'艦状態OK'};
+ const live=hdFELiveFleet(plan),supply=hdFESupply(plan),freshness=hdFESyncFreshness(),gameMatch=hdFEGameMatch(plan),route=hdFERoute(plan),air=hdFEAirCheck(plan?.map,e.air),scouting=hdFEScouting(plan,e.items),equipment={status:e.missing?'missing':e.partial?'partial':'ready',detail:`海域装備 ${e.ready}/${e.requirements.length} 準備`},master={status:e.master.invalid.length?'missing':e.master.unresolved.length?'partial':'ready',detail:e.master.invalid.length?`装備不可 ${e.master.invalid.length}件`:e.master.unresolved.length?`未解決 ${e.master.unresolved.length}件`:'装備可否OK'},unknownHealth=live.details.filter(x=>x.status==='unknown').length,health={status:live.status,detail:live.blocked?`出撃不可候補 ${live.blocked}隻（${Object.entries(live.reasons).map(x=>x[0]+' '+x[1]).join(' / ')}）`:live.caution?`注意艦 ${live.caution}隻${unknownHealth?` / 同期状態不明 ${unknownHealth}隻`:''}`:unknownHealth?`同期状態不明 ${unknownHealth}隻。ゲーム連携を確認`:'艦状態OK'};
  const checks=[{id:'health',label:'艦状態',...health},{id:'supply',label:'補給',...supply},{id:'freshness',label:'同期鮮度',...freshness},{id:'gameMatch',label:'ゲーム反映',...gameMatch},{id:'route',label:'編成条件',...route},{id:'equipment',label:'装備',...equipment},{id:'air',label:'制空',...air},{id:'scouting',label:'索敵',...scouting},{id:'master',label:'装備可否',...master}],ranked={missing:3,partial:2,manual:1,ready:0},worst=checks.reduce((a,x)=>(ranked[x.status]??1)>(ranked[a.status]??0)?x:a,{status:'ready'});
  return {status:worst.status,checks,live,supply,freshness,gameMatch,route,air,scouting,master,equipment};
 }
