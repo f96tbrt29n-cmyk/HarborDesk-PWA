@@ -4,6 +4,7 @@ test.use({
   viewport: { width: 390, height: 844 },
   hasTouch: true,
   isMobile: true,
+  serviceWorkers: 'block',
 });
 
 async function boot(page) {
@@ -134,6 +135,12 @@ test('optimizer UI shows swaps and optimized loadout can be saved', async ({ pag
   await expect(card.locator('[data-hd-fo-reset="0"]')).toBeVisible();
   await expect(card.locator('.hd-fl-usage')).not.toContainText('所持0');
   await expect(card.locator('.hd-fl-usage')).not.toContainText('@@');
+  await page.evaluate(() => {
+    window.dispatchEvent(new Event('hd:ship-images-ready'));
+    window.dispatchEvent(new Event('hd:map-rendered'));
+  });
+  await expect(card.locator('.hd-fo-result')).toBeVisible();
+  await expect(card.locator('.hd-fl-usage')).not.toContainText('所持0');
 
   await card.locator('[data-hd-fl-save="0"]').click();
   const saved=await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1')||'{}'));

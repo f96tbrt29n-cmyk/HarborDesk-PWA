@@ -128,13 +128,15 @@ function hdFSSuggestionHtml(s){
  '<div class="hd-fs-source"><b>アプリ内編成例:</b> '+hdFSEsc(s.preset.ships||'')+'<br><b>装備メモ:</b> '+hdFSEsc(s.preset.gear||'')+'</div>'+
  '<div class="hd-fs-actions"><button type="button" class="primary small" data-hd-fs-save="'+s.index+'">この候補を自分用編成に保存</button><button type="button" class="ghost small" data-hd-fs-roster>艦隊台帳を確認</button></div></article>';
 }
-function hdFSRender(){
+function hdFSRender(preserveLoadouts=false){
  var host=document.getElementById('hdFleetSuggesterBody'),label=document.getElementById('hdFleetSuggesterMap');if(!host)return;var map=hdFSMap();
  if(!map){if(label)label.textContent='海域未選択';host.innerHTML='<div class="empty">海域を選ぶと、艦隊台帳から編成候補を作るよ。</div>';return}
+ const saved=preserveLoadouts===true&&label?.textContent===map?[...host.querySelectorAll('.hd-fs-card')].map(card=>({index:card.querySelector('[data-hd-fl-generate]')?.getAttribute('data-hd-fl-generate'),plan:card.querySelector('.hd-fl-host')})).filter(x=>x.index!=null&&x.plan?.querySelector('.hd-fl-plan')):[];
  if(label)label.textContent=map;var roster=hdFSRoster();
  if(!roster.length){host.innerHTML='<div class="empty">艦隊台帳が空だよ。艦娘を登録すると、Lv・艦種・役割から候補を自動生成できる。</div><button type="button" class="primary small" data-hd-fs-roster>艦隊台帳を開く</button>';return}
  var plans=hdFSPlans(map),sync=(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')}catch{return null}})(),equipItems=Number(sync?.equipmentItems??sync?.snapshot?.equipment??0)||0,op=plans[0]?.operational||{available:roster.length,total:roster.length};
  host.innerHTML='<div class="hd-fs-summary"><div><strong>'+hdFSEsc(map)+' 自動編成候補</strong><span>出撃候補 '+op.available+'/'+op.total+'隻（遠征中・入渠中・大破は自動除外）'+(sync?' ｜ 艦これ同期 装備'+equipItems+'個':'')+'</span></div><button type="button" class="ghost small" data-hd-fs-refresh>再生成</button></div><div class="hd-fs-list">'+plans.map(hdFSSuggestionHtml).join('')+'</div><p class="hd-fs-note">※中破・疲労艦は候補順位を下げ、遠征中・入渠中・大破艦は候補から外す。札は表示のみで、イベント海域の出撃可否はゲーム側で最終確認してね。</p>';
+ for(const row of saved){const button=[...host.querySelectorAll('[data-hd-fl-generate]')].find(x=>x.getAttribute('data-hd-fl-generate')===row.index),placeholder=button?.closest('.hd-fs-card')?.querySelector('.hd-fl-host');if(placeholder)placeholder.replaceWith(row.plan)}
  if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
 }
 function hdFSEnsure(){
@@ -165,7 +167,7 @@ function hdFSStillSelected(target){
   return state.group==='guide'&&state.sections&&state.sections.guide===(target&&target.id);
  }catch(e){return !!target&&!target.hidden&&!target.classList.contains('hd-ws-hidden')}
 }
-function hdFSOpen(){hdFSEnsure();var target=document.getElementById('hdFleetSuggester');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdFleetSuggester',true)))hdFSReveal(target);hdFSRender();setTimeout(function(){if(hdFSStillSelected(target))hdFSReveal(target)},60);setTimeout(function(){if(hdFSStillSelected(target))hdFSReveal(target)},420)}
+function hdFSOpen(){hdFSEnsure();var target=document.getElementById('hdFleetSuggester');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdFleetSuggester',true)))hdFSReveal(target);hdFSRender(true);setTimeout(function(){if(hdFSStillSelected(target))hdFSReveal(target)},60);setTimeout(function(){if(hdFSStillSelected(target))hdFSReveal(target)},420)}
 function hdFSOpenRoster(){if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return true;return hdFSReveal(document.getElementById('roster'))}
 function hdFSMapButton(){var head=document.querySelector('#selectedMapCard .map-tabs-head');if(!head||head.querySelector('[data-hd-fs-open]'))return;var b=document.createElement('button');b.type='button';b.className='ghost small';b.setAttribute('data-hd-fs-open','1');b.textContent='編成候補';head.appendChild(b)}
 async function hdFSOpenAcquire(kind,button){
@@ -189,7 +191,7 @@ window.addEventListener('storage',function(e){if(['harbordesk-ship-roster-v1','h
 window.addEventListener('hd:kancolle-sync',hdFSRender);
 window.addEventListener('hd:ship-identity-changed',hdFSRender);
 window.addEventListener('hd:workspace-refresh',hdFSRender);
-window.addEventListener('hd:ship-images-changed',hdFSRender);
-window.addEventListener('hd:ship-images-ready',hdFSRender);
-window.addEventListener('hd:map-rendered',function(){hdFSMapButton();hdFSRender()});
-window.addEventListener('load',function(){setTimeout(function(){hdFSEnsure();hdFSMapButton();hdFSRender()},560)});
+window.addEventListener('hd:ship-images-changed',()=>hdFSRender(true));
+window.addEventListener('hd:ship-images-ready',()=>hdFSRender(true));
+window.addEventListener('hd:map-rendered',function(){hdFSMapButton();hdFSRender(true)});
+window.addEventListener('load',function(){setTimeout(function(){hdFSEnsure();hdFSMapButton();hdFSRender(true)},560)});
