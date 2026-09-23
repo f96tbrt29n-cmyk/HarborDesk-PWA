@@ -1237,7 +1237,8 @@ test('release smoke: optimizer keeps improvement-level equipment stacks separate
       ownedTotal: plan.owned?.['12cm単装砲'],
       owned0: plan.ownedStacks?.[k0],
       owned2: plan.ownedStacks?.[k2],
-      usage0: plan.used?.[k0]
+      usage0: plan.usedStacks?.[k0],
+      usageTotal: plan.used?.['12cm単装砲']
     };
   });
 
@@ -1247,6 +1248,7 @@ test('release smoke: optimizer keeps improvement-level equipment stacks separate
   expect(data.owned0).toBe(1);
   expect(data.owned2).toBe(1);
   expect(data.usage0).toBe(1);
+  expect(data.usageTotal).toBe(1);
   expect(errors).toEqual([]);
 });
 
