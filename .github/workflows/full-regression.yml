@@ -1,6 +1,8 @@
 name: Full Browser Regression
 
 on:
+  push:
+    branches: [ci/full-regression-v449-audit]
   schedule:
     - cron: '0 18 * * *'
   workflow_dispatch:
