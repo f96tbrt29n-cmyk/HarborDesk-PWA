@@ -6370,6 +6370,45 @@ test('release smoke: fallback攻略 state clears when map selection is reset', a
 });
 
 
+test('release smoke: map-specific readiness fix flow pauses while no area is selected', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFEFixFlowSave === 'function' &&
+    typeof window.hdFEFixFlowLoad === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  const state = await page.evaluate(() => {
+    selectedWorld = '2';
+    selectedMap = '2-4';
+    renderMapPicker();
+    window.hdFEFixFlowSave({ id:'air', map:'2-4', startedAt:Date.now() });
+    const selected = window.hdFEFixFlowLoad();
+
+    selectedMap = '';
+    renderMapPicker();
+    const empty = window.hdFEFixFlowLoad();
+
+    selectedWorld = '2';
+    selectedMap = '2-4';
+    renderMapPicker();
+    const restored = window.hdFEFixFlowLoad();
+    window.hdFEFixFlowSave(null);
+
+    return {
+      selected: selected?.map || '',
+      empty: empty === null,
+      restored: restored?.map || ''
+    };
+  });
+
+  expect(state).toEqual({ selected:'2-4', empty:true, restored:'2-4' });
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: map deselection emits empty render state to dependent攻略 tools', async ({ page }) => {
   const errors = [];
   await page.route('**/map-tabs.js*', route => route.abort());
