@@ -6498,6 +6498,7 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   const duplicateQuestId = await page.evaluate(() => {
     const linked = (window.hdQuestRelatedToMap?.('2-4') || []).find(q => q?.id && q?.name);
     if (!linked) return '';
+    MAP_PLANS['2-4'] = MAP_PLANS['2-4'] || { presets: [], quests: [] };
     MAP_PLANS['2-4'].quests = [
       ...(MAP_PLANS['2-4'].quests || []),
       {
