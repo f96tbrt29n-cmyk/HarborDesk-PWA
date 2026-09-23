@@ -6439,6 +6439,10 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   const fallbackFleet = page.locator('#hdFallbackFleetTools');
   await expect(fallbackFleet).toBeVisible();
   await expect(fallbackFleet).toContainText('編成例');
+  await expect(fallbackFleet).toContainText('基本方針');
+  const expectedFleetPolicy = await page.evaluate(() => MAP_DETAILS['2-4'].fleet || MAP_DETAILS['2-4'].formation || '');
+  expect(expectedFleetPolicy).not.toBe('');
+  await expect(fallbackFleet).toContainText(expectedFleetPolicy);
   await expect(fallbackMap).toBeHidden();
 
   await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
@@ -6455,13 +6459,24 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
     null,
     { timeout: 30000 }
   );
+  await page.evaluate(() => {
+    MAP_PLANS['2-4'].quests = [...(MAP_PLANS['2-4'].quests || []), {
+      id: 'hd-plan-only-test',
+      name: '計画データだけの任務',
+      kind: 'テスト',
+      condition: '任務DB未登録'
+    }];
+  });
   await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="quest"]').click();
   const fallbackQuest = page.locator('#hdFallbackQuestTools');
   await expect(fallbackQuest).toBeVisible();
   await expect(fallbackQuest).toContainText('2-4 関連任務');
-  const questCard = fallbackQuest.locator('[data-hd-core-quest-id]').first();
+  const plannedOnly = fallbackQuest.locator('[data-hd-core-quest-id="hd-plan-only-test"]');
+  await expect(plannedOnly).toBeVisible();
+  await expect(plannedOnly.locator('.quest-tab-actions')).toHaveCount(0);
+  const questCard = fallbackQuest.locator('[data-hd-core-quest-id]').filter({ has: page.locator('.quest-tab-actions') }).first();
   await expect(questCard).toBeVisible();
   const questId = await questCard.getAttribute('data-hd-core-quest-id');
   const questName = await questCard.locator('b').innerText();
