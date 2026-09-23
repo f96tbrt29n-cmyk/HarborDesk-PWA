@@ -25,6 +25,7 @@
   function hdRenderMapPickerCanonical(){
     try{base?.()}catch(err){console.error('map base render failed',err)}
     if(!selectedMap){
+      if(typeof window.hdCoreClearFallbackState==='function')window.hdCoreClearFallbackState();
       window.__HD_MAP_RENDER_STATE={mode:'empty',reason:'no-map',map:'',at:Date.now()};
       return 'empty';
     }
