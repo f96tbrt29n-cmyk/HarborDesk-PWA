@@ -70,7 +70,7 @@ function hdMapActivateTab(tab,btn=null){
  if(typeof selectedMap==='undefined'||!selectedMap||!HD_MAP_TAB_IDS.includes(tab))return false;
  btn=btn||document.querySelector(`[data-map-tab="${tab}"]`);if(!btn)return false;
  hdMapTabSave(selectedMap,tab);
- document.querySelectorAll('.map-tab-btn').forEach(x=>x.classList.toggle('active',x===btn));
+ document.querySelectorAll('.map-tab-btn').forEach(x=>{const active=x===btn;x.classList.toggle('active',active);x.setAttribute('aria-selected',String(active));x.tabIndex=active?0:-1});
  document.querySelectorAll('.map-tab-pane').forEach(x=>x.classList.toggle('active',x.dataset.mapPane===tab));
  hdMapTabsRevealActive();
  hdMapRenderInlineTool(tab);
@@ -144,15 +144,15 @@ function hdApplyMapTabs(){
   const mapHtml=typeof hdMapImageHtml==='function'?hdMapImageHtml(selectedMap,d):'<div class="empty">マップ画像を読み込み中</div>';
   card.innerHTML=`<article class="map-tabs-shell">
     <div class="map-tabs-head"><div><span class="guide-tag">${selectedMap}</span><h3>${hdMapEsc(d.name||selectedMap)}</h3><div class="muted">アプリ内攻略要点・参照 ${hdMapEsc(updated)}</div></div><a class="guide-link map-wiki-link" href="${wikiMapUrl(selectedMap)}" target="_blank" rel="noopener">Wiki ↗</a></div>
-    <div class="map-tab-bar" role="tablist">${tabs.map(([id,label])=>`<button class="map-tab-btn ${active===id?'active':''}" data-map-tab="${id}" role="tab">${label}</button>`).join('')}</div>
-    <div class="map-tab-pane ${active==='overview'?'active':''}" data-map-pane="overview"><p class="map-overview">${hdMapEsc(d.overview||'')}</p><div class="map-tab-card"><b>推奨練度</b><p><strong>${hdMapEsc(level.recommended)}</strong> / 最低目安 ${hdMapEsc(level.min)}</p><small>${hdMapEsc(level.note)}</small></div>${hdMapToolsOverviewHtml()}<div class="map-tab-card warn"><b>注意点</b><p>${hdMapEsc(note||'特記事項なし')}</p></div><div class="map-source-note">※推奨練度はHarborDeskの攻略目安。艦種・改造・近代化改修・装備・ルート条件によって必要Lvは変わります。攻略条件はアップデートで変化する場合があります。</div></div>
-    <div class="map-tab-pane ${active==='map'?'active':''}" data-map-pane="map">${mapHtml}</div>
-    <div class="map-tab-pane ${active==='fleet'?'active':''}" data-map-pane="fleet">${hdFleetHtml(selectedMap)}${typeof hdShipDbMapRecommendHtml==='function'?hdShipDbMapRecommendHtml(selectedMap,d):''}${fleet?`<div class="map-tab-card"><b>基本方針</b><p>${hdMapEsc(fleet)}</p></div>`:''}</div>
-    <div class="map-tab-pane ${active==='route'?'active':''}" data-map-pane="route"><div class="map-tab-card"><b>主なルート</b><p>${hdMapEsc(d.route||'ルート情報を整理中')}</p></div></div>
-    <div class="map-tab-pane ${active==='gear'?'active':''}" data-map-pane="gear"><div class="map-tab-card"><b>制空・装備</b><p>${hdMapEsc(d.air||'装備情報を整理中')}</p></div><div id="hdMapEquipRecommend"></div></div>
-    <div class="map-tab-pane ${active==='quest'?'active':''}" data-map-pane="quest">${hdQuestHtml(selectedMap)}</div>
-    <div class="map-tab-pane ${active==='drop'?'active':''}" data-map-pane="drop">${typeof hdMapDropHtml==='function'?hdMapDropHtml(selectedMap):'<div class="empty">ドロップ情報を読み込み中</div>'}</div>
-    <div class="map-tab-pane ${active==='mine'?'active':''}" data-map-pane="mine"><section id="customFleetPanel" class="custom-fleet-section">${hdCustomFleetHtml(selectedMap)}</section></div>
+    <div class="map-tab-bar" role="tablist" aria-label="${selectedMap} 攻略情報">${tabs.map(([id,label])=>`<button id="hdMapTab-${id}" class="map-tab-btn ${active===id?'active':''}" data-map-tab="${id}" role="tab" aria-controls="hdMapPane-${id}" aria-selected="${active===id}" tabindex="${active===id?0:-1}">${label}</button>`).join('')}</div>
+    <div id="hdMapPane-overview" role="tabpanel" aria-labelledby="hdMapTab-overview" class="map-tab-pane ${active==='overview'?'active':''}" data-map-pane="overview"><p class="map-overview">${hdMapEsc(d.overview||'')}</p><div class="map-tab-card"><b>推奨練度</b><p><strong>${hdMapEsc(level.recommended)}</strong> / 最低目安 ${hdMapEsc(level.min)}</p><small>${hdMapEsc(level.note)}</small></div>${hdMapToolsOverviewHtml()}<div class="map-tab-card warn"><b>注意点</b><p>${hdMapEsc(note||'特記事項なし')}</p></div><div class="map-source-note">※推奨練度はHarborDeskの攻略目安。艦種・改造・近代化改修・装備・ルート条件によって必要Lvは変わります。攻略条件はアップデートで変化する場合があります。</div></div>
+    <div id="hdMapPane-map" role="tabpanel" aria-labelledby="hdMapTab-map" class="map-tab-pane ${active==='map'?'active':''}" data-map-pane="map">${mapHtml}</div>
+    <div id="hdMapPane-fleet" role="tabpanel" aria-labelledby="hdMapTab-fleet" class="map-tab-pane ${active==='fleet'?'active':''}" data-map-pane="fleet">${hdFleetHtml(selectedMap)}${typeof hdShipDbMapRecommendHtml==='function'?hdShipDbMapRecommendHtml(selectedMap,d):''}${fleet?`<div class="map-tab-card"><b>基本方針</b><p>${hdMapEsc(fleet)}</p></div>`:''}</div>
+    <div id="hdMapPane-route" role="tabpanel" aria-labelledby="hdMapTab-route" class="map-tab-pane ${active==='route'?'active':''}" data-map-pane="route"><div class="map-tab-card"><b>主なルート</b><p>${hdMapEsc(d.route||'ルート情報を整理中')}</p></div></div>
+    <div id="hdMapPane-gear" role="tabpanel" aria-labelledby="hdMapTab-gear" class="map-tab-pane ${active==='gear'?'active':''}" data-map-pane="gear"><div class="map-tab-card"><b>制空・装備</b><p>${hdMapEsc(d.air||'装備情報を整理中')}</p></div><div id="hdMapEquipRecommend"></div></div>
+    <div id="hdMapPane-quest" role="tabpanel" aria-labelledby="hdMapTab-quest" class="map-tab-pane ${active==='quest'?'active':''}" data-map-pane="quest">${hdQuestHtml(selectedMap)}</div>
+    <div id="hdMapPane-drop" role="tabpanel" aria-labelledby="hdMapTab-drop" class="map-tab-pane ${active==='drop'?'active':''}" data-map-pane="drop">${typeof hdMapDropHtml==='function'?hdMapDropHtml(selectedMap):'<div class="empty">ドロップ情報を読み込み中</div>'}</div>
+    <div id="hdMapPane-mine" role="tabpanel" aria-labelledby="hdMapTab-mine" class="map-tab-pane ${active==='mine'?'active':''}" data-map-pane="mine"><section id="customFleetPanel" class="custom-fleet-section">${hdCustomFleetHtml(selectedMap)}</section></div>
   </article>`;
   const add=document.getElementById('addCustomFleet');if(add&&typeof openCustomFleetDialog==='function')add.onclick=()=>openCustomFleetDialog();
   hdMapTabsRevealActive();
@@ -170,6 +170,16 @@ document.addEventListener('click',e=>{
   if(questAdd){if(typeof window.hdQuestAddFromMap==='function')window.hdQuestAddFromMap(questAdd.dataset.hdMapQuestAdd);setTimeout(()=>{const pane=document.querySelector('[data-map-pane="quest"]');if(pane&&selectedMap)pane.innerHTML=hdQuestHtml(selectedMap)},0);return}
   const btn=e.target.closest('[data-map-tab]');if(!btn||!selectedMap)return;
   hdMapActivateTab(btn.dataset.mapTab,btn);
+});
+
+document.addEventListener('keydown',e=>{
+ const btn=e.target.closest?.('#selectedMapCard [data-map-tab]');
+ if(!btn||!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+ const tabs=[...btn.closest('[role="tablist"]').querySelectorAll('[data-map-tab]')];
+ const index=tabs.indexOf(btn),next=e.key==='Home'?0:e.key==='End'?tabs.length-1:(index+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
+ if(index<0||!tabs[next])return;
+ e.preventDefault();
+ if(hdMapActivateTab(tabs[next].dataset.mapTab,tabs[next]))tabs[next].focus();
 });
 
 window.hdApplyMapTabs=hdApplyMapTabs;
