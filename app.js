@@ -312,7 +312,8 @@ function hdCoreOpenFleetFallback(){
  const presets=(plan?.presets?.length?plan.presets:[{name:'基本編成',ships:d?.fleet||d?.formation||'攻略情報を確認',gear:d?.air||'装備条件を確認',use:'通常攻略'}]);
  const examples=presets.map((x,i)=>`<article class="map-tab-card"><div class="map-tab-card-title">編成例 ${i+1}｜${esc(x.name||'基本編成')}</div><div><b>艦隊:</b> ${esc(x.ships||'')}</div><div><b>装備:</b> ${esc(x.gear||'')}</div><div><b>用途:</b> ${esc(x.use||'')}</div></article>`).join('');
  const rec=typeof hdShipDbMapRecommendHtml==='function'?hdShipDbMapRecommendHtml(selectedMap,d):'';
- host.innerHTML=`${examples}${rec}${d?.formation?`<div class="map-tab-card"><b>基本方針</b><p>${esc(d.formation)}</p></div>`:''}`;
+ const basic=d?.fleet||d?.formation||'';
+ host.innerHTML=`${examples}${rec}${basic?`<div class="map-tab-card"><b>基本方針</b><p>${esc(basic)}</p></div>`:''}`;
  return hdCoreActivateFallbackPane(host);
 }
 function hdCoreOpenRouteFallback(){
@@ -337,7 +338,7 @@ function hdCoreQuestHtml(map){
  const rows=hdCoreQuestRows(map);
  if(!rows.length)return '<div class="empty">この海域に紐づく任務は現在のデータでは見つからないよ。</div>';
  return rows.map(q=>{
-  const id=String(q.id||''),controls=id?`<div class="quest-tab-actions"><button type="button" class="ghost small" data-hd-core-quest-open="${esc(id)}">任務詳細</button><button type="button" class="primary small" data-hd-core-quest-add="${esc(id)}">${esc(typeof window.hdQuestMapChecklistLabel==='function'?window.hdQuestMapChecklistLabel(id):'チェックに追加')}</button></div>`:'';
+  const id=String(q.id||''),controls=id&&q.source==='database'?`<div class="quest-tab-actions"><button type="button" class="ghost small" data-hd-core-quest-open="${esc(id)}">任務詳細</button><button type="button" class="primary small" data-hd-core-quest-add="${esc(id)}">${esc(typeof window.hdQuestMapChecklistLabel==='function'?window.hdQuestMapChecklistLabel(id):'チェックに追加')}</button></div>`:'';
   return `<article class="map-tab-card quest-tab-card" ${id?`data-hd-core-quest-id="${esc(id)}"`:''}><span class="quest-kind">${esc(q.kind||q.cycle||'関連任務')}</span><div><b>${esc(q.name)}</b><p>${esc(q.condition||'達成条件を確認')}</p>${controls}</div></article>`;
  }).join('');
 }
