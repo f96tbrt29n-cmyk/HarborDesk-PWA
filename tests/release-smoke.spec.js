@@ -6459,14 +6459,27 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
     null,
     { timeout: 30000 }
   );
-  await page.evaluate(() => {
-    MAP_PLANS['2-4'].quests = [...(MAP_PLANS['2-4'].quests || []), {
-      id: 'hd-plan-only-test',
-      name: '計画データだけの任務',
-      kind: 'テスト',
-      condition: '任務DB未登録'
-    }];
+  const duplicateQuestId = await page.evaluate(() => {
+    const linked = (window.hdQuestRelatedToMap?.('2-4') || []).find(q => q?.id && q?.name);
+    if (!linked) return '';
+    MAP_PLANS['2-4'].quests = [
+      ...(MAP_PLANS['2-4'].quests || []),
+      {
+        id: 'hd-plan-only-test',
+        name: '計画データだけの任務',
+        kind: 'テスト',
+        condition: '任務DB未登録'
+      },
+      {
+        id: linked.id,
+        name: linked.name,
+        kind: '計画重複',
+        condition: 'DBと同じ任務を計画側にも登録'
+      }
+    ];
+    return String(linked.id);
   });
+  expect(duplicateQuestId).not.toBe('');
   await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="quest"]').click();
@@ -6476,8 +6489,9 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   const plannedOnly = fallbackQuest.locator('[data-hd-core-quest-id="hd-plan-only-test"]');
   await expect(plannedOnly).toBeVisible();
   await expect(plannedOnly.locator('.quest-tab-actions')).toHaveCount(0);
-  const questCard = fallbackQuest.locator('[data-hd-core-quest-id]').filter({ has: page.locator('.quest-tab-actions') }).first();
+  const questCard = fallbackQuest.locator('[data-hd-core-quest-id="' + duplicateQuestId + '"]');
   await expect(questCard).toBeVisible();
+  await expect(questCard.locator('.quest-tab-actions')).toBeVisible();
   const questId = await questCard.getAttribute('data-hd-core-quest-id');
   const questName = await questCard.locator('b').innerText();
   await questCard.locator('[data-hd-core-quest-add="' + questId + '"]').click();
