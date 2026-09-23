@@ -170,12 +170,37 @@ function hdToastAction(message,label,onAction,ms=5000){
  return host;
 }
 window.hdToastAction=hdToastAction;
+function hdWorkspaceGroupHint(section){
+ const id=String(section?.id||'');
+ if(['guide','hdSortiePreparation','hdFleetSuggester','eoTracker','sortieReadiness','eventOperationsCenter','eventOperations','grandOperations','landBasePlanner'].includes(id))return 'guide';
+ if(['shipDatabase','roster','shipProfilesPlus','trainingPlanner','customFleets','fleetCalculator','supportFleetPlanner'].includes(id))return 'fleet';
+ if(['questDatabase','quests','exerciseRoutine','activityLogger'].includes(id))return 'quest';
+ if(['expeditions','hdExpeditionDb','expeditionFleetManager','expeditionOptimizer'].includes(id))return 'expedition';
+ if(['equipmentBook','hdEquipAnalyzer','hdEquipmentProcurement','equipmentVariants','developmentLab','developmentRecipes','constructionDb','improvementWorkshop','optimizationImprovement','materialPlanner'].includes(id))return 'arsenal';
+ if(['sortieLog','sortieCostForecast','dropHunting','dropHuntingDb','farmingAnalytics','eventLog','rankingTracker','rankingTrackerCenter','farmAnalysis'].includes(id))return 'records';
+ if(['personalHomeCenter','calculators','backup','diagnosticsCenter','notificationCenter','dataQualityAudit'].includes(id))return 'settings';
+ return 'home';
+}
+function hdStageWorkspaceTarget(target,groupHint=''){
+ const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
+ const section=el.matches?.('section')?el:el.closest?.('section');const id=String(section?.id||el.id||'');if(!id)return false;
+ const group=String(groupHint||section?.dataset?.hdWorkspaceGroup||hdWorkspaceGroupHint(section||el)||'home');
+ const pending={group,section:id,at:Date.now()};window.__HD_PENDING_WORKSPACE_TARGET=pending;
+ try{
+  const state=JSON.parse(localStorage.getItem('harbordesk-workspace-tabs-v1')||'{}')||{};
+  state.group=group;state.sections={...(state.sections||{}),[group]:id};
+  localStorage.setItem('harbordesk-workspace-tabs-v1',JSON.stringify(state));
+ }catch{}
+ return true;
+}
+window.hdStageWorkspaceTarget=hdStageWorkspaceTarget;
 function hdRevealWorkspaceTarget(target,scroll=true){
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
  let routed=false;
  if(typeof window.hdWSRevealElement==='function'){
   try{routed=!!window.hdWSRevealElement(el,scroll,{history:false})}catch{}
  }
+ if(!routed)hdStageWorkspaceTarget(el);
  // Even when workspace routing reports success, guarantee the concrete target itself
  // and its wrappers are visible. This covers nested/late workspace redraw races.
  el.hidden=false;el.classList?.remove('hd-ws-hidden','hd-ws-wrapper-hidden');
