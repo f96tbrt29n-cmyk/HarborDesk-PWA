@@ -417,6 +417,31 @@ window.hdCoreOpenQuestFallback=hdCoreOpenQuestFallback;
 window.hdCoreQuestAction=hdCoreQuestAction;
 window.hdCoreMapAction=hdCoreMapAction;
 
+function hdGuideMapSequence(){
+ return Object.keys(MAPS).sort((a,b)=>Number(a)-Number(b)).flatMap(world=>Array.isArray(MAPS[world])?MAPS[world]:[]);
+}
+function hdGuideNextMap(map=selectedMap){
+ const rows=hdGuideMapSequence(),current=String(map||'').trim(),index=rows.indexOf(current);
+ return index>=0&&index+1<rows.length?rows[index+1]:'';
+}
+function hdSelectGuideMap(map,options={}){
+ const target=String(map||'').trim(),world=target.split('-')[0];
+ if(!target||!Array.isArray(MAPS[world])||!MAPS[world].includes(target))return false;
+ hdCoreClearFallbackState();
+ selectedWorld=world;selectedMap=target;
+ if(options.filter&&['all','map','quest','expedition','fav'].includes(options.filter))guideFilter=options.filter;
+ const input=document.getElementById('guideQuery');
+ if(input&&Object.prototype.hasOwnProperty.call(options,'query'))input.value=String(options.query??'');
+ guideViewSave({world:selectedWorld,map:selectedMap,filter:guideFilter,query:input?.value||''});
+ renderGuide();
+ window.dispatchEvent(new CustomEvent('hd:guide-map-changed',{detail:{map:selectedMap,world:selectedWorld}}));
+ if(options.scroll)setTimeout(()=>document.getElementById('selectedMapCard')?.scrollIntoView({behavior:'smooth',block:'center'}),0);
+ return true;
+}
+window.hdGuideMapSequence=hdGuideMapSequence;
+window.hdGuideNextMap=hdGuideNextMap;
+window.hdSelectGuideMap=hdSelectGuideMap;
+
 function renderMapPicker(){
  document.getElementById('worldPicker').innerHTML=Object.keys(MAPS).map(w=>`<button class="world-chip ${selectedWorld===w?'active':''}" data-world="${w}">${w}海域</button>`).join('');
  document.getElementById('mapPicker').innerHTML=MAPS[selectedWorld].map(m=>`<button class="map-button ${selectedMap===m?'active':''}" data-map="${m}">${m}</button>`).join('');
@@ -451,7 +476,7 @@ document.addEventListener('click',e=>{
  const cleanup=e.target.closest('[data-core-cleanup]');if(cleanup){coreCleanupDone(cleanup.dataset.coreCleanup);return}
 
  const world=e.target.closest('[data-world]');if(world){selectedWorld=world.dataset.world;selectedMap='';guideViewSave({world:selectedWorld,map:''});renderGuide();return}
- const map=e.target.closest('[data-map]');if(map){selectedMap=map.dataset.map;selectedWorld=selectedMap.split('-')[0];guideViewSave({world:selectedWorld,map:selectedMap});renderGuide();document.getElementById('selectedMapCard').scrollIntoView({behavior:'smooth',block:'center'});return}
+ const map=e.target.closest('[data-map]');if(map){hdSelectGuideMap(map.dataset.map,{scroll:true});return}
  const coreMapAction=e.target.closest('[data-hd-core-map-action]');if(coreMapAction){hdCoreMapAction(coreMapAction.dataset.hdCoreMapAction).catch(()=>{});return}
  const coreQuestOpen=e.target.closest('[data-hd-core-quest-open]');if(coreQuestOpen){hdCoreQuestAction('open',coreQuestOpen.dataset.hdCoreQuestOpen).catch(()=>{});return}
  const coreQuestAdd=e.target.closest('[data-hd-core-quest-add]');if(coreQuestAdd){hdCoreQuestAction('add',coreQuestAdd.dataset.hdCoreQuestAdd).catch(()=>{});return}
