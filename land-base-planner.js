@@ -51,6 +51,7 @@ document.addEventListener('change',e=>{if(typeof selectedMap==='undefined'||!sel
 document.addEventListener('click',e=>{if(typeof selectedMap==='undefined'||!selectedMap)return;const auto=e.target.closest?.('[data-hd-lb-auto]');if(auto){hdLBAutoFill(selectedMap,Number(auto.dataset.hdLbAuto));return}const clear=e.target.closest?.('[data-hd-lb-clear]');if(clear){hdLBMutate(selectedMap,Number(clear.dataset.hdLbClear),c=>{c.squads=Array.from({length:4},()=>({name:'',slot:18,star:0,maxProf:false}))});return}if(e.target.closest?.('[data-map-tab="gear"]'))setTimeout(hdRenderLandBasePlanner,0)});
 if(typeof hdApplyMapTabs==='function'){const hdLBPrevApply=hdApplyMapTabs;hdApplyMapTabs=function(){hdLBPrevApply();setTimeout(hdRenderLandBasePlanner,0)}}
 window.addEventListener('load',()=>setTimeout(hdRenderLandBasePlanner,360));
+window.addEventListener('hd:map-rendered',e=>{const d=e?.detail||{};if(d.mode==='empty'||!d.map)return;hdLBScheduleRender()});
 
 window.hdLBHtml=hdLBHtml;
 window.hdRenderLandBasePlanner=hdRenderLandBasePlanner;
