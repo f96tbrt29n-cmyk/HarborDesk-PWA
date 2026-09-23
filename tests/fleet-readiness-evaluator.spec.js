@@ -76,7 +76,7 @@ test('generated loadout displays numeric readiness scorecard', async ({ page }) 
   await expect(panel).toContainText('海域要求との照合');
   await expect(panel).toContainText('電探');
   await expect(panel).toContainText('高速化セット');
-  await expect(panel).toContainText('制空値そのものは未計算');
+  await expect(panel).toContainText('最終判定は艦隊制空・索敵プランナーで確認');
 });
 
 test('equipment-only scouting contribution is calculated without pretending to be final 33式', async ({ page }) => {

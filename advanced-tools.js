@@ -199,7 +199,9 @@ function hdValidateBackupApplied(storage){
 function hdApplyBackupLocalStorage(storage){
  if(!storage||typeof storage!=='object'||Array.isArray(storage))throw new Error('invalid backup storage');
  const entries=Object.entries(storage).filter(([k,v])=>k.startsWith('harbordesk')&&typeof v==='string'),keep=new Set(entries.map(([k])=>k));
- for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k?.startsWith('harbordesk')&&!keep.has(k))localStorage.removeItem(k)}
+ const obsolete=[];
+ for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k?.startsWith('harbordesk')&&!keep.has(k))obsolete.push(k)}
+ for(const k of obsolete)localStorage.removeItem(k);
  for(const [k,v] of entries)localStorage.setItem(k,v);
  return entries.length
 }
