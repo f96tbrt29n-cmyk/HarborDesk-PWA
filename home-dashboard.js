@@ -229,7 +229,8 @@ function homeGuideRender(){
  if(host.children.length&&homeGuideLastState===signature)return;
  homeGuideLastState=signature;
  document.getElementById('homeGuideCount').textContent=`${done.size}/${HD_HOME_GUIDE_STEPS.length} 完了`;
- host.innerHTML=`<div class="home-guide-map">${map?`いまの攻略海域 <b>${homeEsc(map)}</b>`:'攻略海域を選ぶと、ここに表示するよ'}</div>`+HD_HOME_GUIDE_STEPS.map((step,i)=>`<div class="home-guide-step${done.has(step.id)?' done':''}${next===step?' current':''}"><button type="button" class="home-guide-check" data-home-guide-toggle="${step.id}" aria-pressed="${done.has(step.id)}" aria-label="${homeEsc(step.title)}を${done.has(step.id)?'未完了に戻す':'完了にする'}">${done.has(step.id)?'✓':i+1}</button><div><strong>${homeEsc(step.title)}</strong><p>${homeEsc(step.detail)}</p><button type="button" class="ghost small" data-home-jump="${step.target}">${homeEsc(step.action)} →</button></div></div>`).join('')+(done.size===HD_HOME_GUIDE_STEPS.length?'<button type="button" class="ghost small home-guide-restart" data-home-guide-restart>次の海域に進む・攻略手順を再開</button>':'');
+ const following=map&&typeof hdGuideNextMap==='function'?hdGuideNextMap(map):'';
+ host.innerHTML=`<div class="home-guide-map">${map?`いまの攻略海域 <b>${homeEsc(map)}</b>`:'攻略海域を選ぶと、ここに表示するよ'}</div>`+HD_HOME_GUIDE_STEPS.map((step,i)=>`<div class="home-guide-step${done.has(step.id)?' done':''}${next===step?' current':''}"><button type="button" class="home-guide-check" data-home-guide-toggle="${step.id}" aria-pressed="${done.has(step.id)}" aria-label="${homeEsc(step.title)}を${done.has(step.id)?'未完了に戻す':'完了にする'}">${done.has(step.id)?'✓':i+1}</button><div><strong>${homeEsc(step.title)}</strong><p>${homeEsc(step.detail)}</p><button type="button" class="ghost small" data-home-jump="${step.target}">${homeEsc(step.action)} →</button></div></div>`).join('')+(done.size===HD_HOME_GUIDE_STEPS.length?`<button type="button" class="ghost small home-guide-restart" data-home-guide-restart>${following?`次の海域 ${homeEsc(following)} へ進む・攻略手順を再開`:'この海域の攻略手順を再開'}</button>`:'');
 }
 
 function ensureHomeDashboard(){
@@ -378,7 +379,7 @@ function renderHomeDashboard(){
 
 document.addEventListener('click',e=>{
  const guideToggle=e.target.closest('[data-home-guide-toggle]');if(guideToggle){const done=homeGuideDone(),id=guideToggle.dataset.homeGuideToggle;if(done.has(id))done.delete(id);else done.add(id);try{localStorage.setItem(HD_HOME_GUIDE_KEY,JSON.stringify([...done]))}catch{}homeGuideRender();return}
- if(e.target.closest('[data-home-guide-restart]')){const done=homeGuideDone();for(const id of ['map','gear','quests','sortie','expeditions'])done.delete(id);try{localStorage.setItem(HD_HOME_GUIDE_KEY,JSON.stringify([...done]))}catch{}homeGuideRender();return}
+ if(e.target.closest('[data-home-guide-restart]')){const done=homeGuideDone(),current=homeSelectedMap(),following=current&&typeof hdGuideNextMap==='function'?hdGuideNextMap(current):'';for(const id of ['map','gear','quests','sortie','expeditions'])done.delete(id);try{localStorage.setItem(HD_HOME_GUIDE_KEY,JSON.stringify([...done]))}catch{}if(following&&typeof hdSelectGuideMap==='function'){hdSelectGuideMap(following);saveRecentMap(following);if(typeof hdToast==='function')hdToast(`${following} に進んだよ。攻略手順を再開したよ`,'success',2200)}homeGuideRender();return}
  const resume=e.target.closest('[data-home-resume]');if(resume){
   if(typeof hdWSGoBack==='function'&&hdWSGoBack())return;
   const row=homeResumeLocation();if(row&&typeof hdWSShowElement==='function')hdWSShowElement(row.id,true);
@@ -488,7 +489,7 @@ document.addEventListener('click',e=>{
  const mapButton=e.target.closest('[data-map]');
  if(mapButton?.dataset.map){saveRecentMap(mapButton.dataset.map);setTimeout(renderHomeDashboard,0)}
  const recent=e.target.closest('[data-home-map]');
- if(recent){const map=recent.dataset.homeMap;try{selectedWorld=map.split('-')[0];selectedMap=map;guideFilter='map';const q=document.getElementById('guideQuery');if(q)q.value=map;renderGuide();saveRecentMap(map);if(typeof hdWSShowElement==='function')hdWSShowElement('guide',false);else location.hash='guide';setTimeout(()=>document.getElementById('selectedMapCard')?.scrollIntoView({behavior:'smooth',block:'start'}),80)}catch{location.hash='guide'}}
+ if(recent){const map=recent.dataset.homeMap;try{if(typeof hdSelectGuideMap==='function')hdSelectGuideMap(map,{filter:'map',query:map});else{selectedWorld=map.split('-')[0];selectedMap=map;guideFilter='map';const q=document.getElementById('guideQuery');if(q)q.value=map;renderGuide()}saveRecentMap(map);if(typeof hdWSShowElement==='function')hdWSShowElement('guide',false);else location.hash='guide';setTimeout(()=>document.getElementById('selectedMapCard')?.scrollIntoView({behavior:'smooth',block:'start'}),80)}catch{location.hash='guide'}}
  if(e.target.closest('[data-home-procurement-open]')){if(typeof hdPLOpenList==='function')hdPLOpenList();else location.hash='equipmentBook'}
 });
 
