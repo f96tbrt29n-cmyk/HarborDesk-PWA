@@ -188,9 +188,9 @@ function hdSPSReveal(target,scroll=true){
 function hdSPSStillSelected(target){
  try{
   const state=JSON.parse(localStorage.getItem('harbordesk-workspace-tabs-v1')||'{}');
-  const section=state?.sections?.guide;
-  return !section||section===target?.id;
- }catch{return true}
+  if(!state?.group)return !!target&&!target.hidden&&!target.classList.contains('hd-ws-hidden');
+  return state.group==='guide'&&state?.sections?.guide===target?.id;
+ }catch{return !!target&&!target.hidden&&!target.classList.contains('hd-ws-hidden')}
 }
 function hdSPSOpen(){
  hdSPSEnsure();const target=document.getElementById('hdSortiePreparation');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdSortiePreparation',true)))hdSPSReveal(target);
