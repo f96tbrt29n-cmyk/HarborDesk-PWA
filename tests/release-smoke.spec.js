@@ -6712,6 +6712,52 @@ test('release smoke: fallback gear workspace keeps recommendations calculators a
 });
 
 
+test('release smoke: saved mine tab hydrates readiness and support tools without an extra tap', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdRenderSortieReadiness === 'function' &&
+    typeof window.hdSPRender === 'function',
+    null,
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-map-tab-v1', JSON.stringify({'5-5':'mine'}));
+    localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({
+      '5-5': [{
+        id:'saved-mine-fleet',
+        name:'保存タブ復元確認艦隊',
+        ships:[
+          {ship:'雪風改二',masterId:0,gear:'主砲 電探'},
+          {ship:'時雨改三',masterId:0,gear:'主砲 電探'},
+          {ship:'大和改二重',masterId:0,gear:'主砲 主砲'},
+          {ship:'武蔵改二',masterId:0,gear:'主砲 主砲'},
+          {ship:'赤城改二',masterId:0,gear:'艦戦 艦攻'},
+          {ship:'加賀改二',masterId:0,gear:'艦戦 艦攻'}
+        ],
+        memo:'saved mine tab regression',
+        createdAt:Date.now(),
+        updatedAt:Date.now()
+      }]
+    }));
+  });
+
+  await page.locator('[data-hd-ws-group="guide"]').click();
+  await expect(page.locator('#guide')).toBeVisible();
+  await page.locator('[data-world="5"]').click();
+  await page.locator('[data-map="5-5"]').click();
+
+  const mine = page.locator('[data-map-pane="mine"].active');
+  await expect(mine).toBeVisible();
+  await expect(mine.locator('#customFleetPanel')).toContainText('保存タブ復元確認艦隊');
+  await expect(mine.locator('#hdSortieReadiness')).toBeVisible({ timeout: 5000 });
+  await expect(mine.locator('#hdSupportPlanner')).toBeVisible({ timeout: 5000 });
+
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: fallback mine workspace keeps saved fleet readiness and support tools interactive', async ({ page }) => {
   const errors = [];
   await page.route('**/map-tabs.js*', route => route.abort());
