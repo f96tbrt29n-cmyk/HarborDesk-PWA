@@ -57,6 +57,8 @@ test('release smoke: app boots with core modules and master data', async ({ page
     allShips: Object.keys(window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips || {}).length,
     equipment: Object.keys(window.HD_KANCOLLE_MASTER_SNAPSHOT?.equipment || {}).length,
     workspace: typeof window.hdWSApply,
+    workspaceShow: typeof window.hdWSShowElement,
+    workspaceReveal: typeof window.hdWSRevealElement,
     quickNav: typeof window.hdQNCategoryRows,
     personalHome: typeof window.hdPHRender,
     importer: typeof window.hdKcCurrentFleets
@@ -66,6 +68,8 @@ test('release smoke: app boots with core modules and master data', async ({ page
   expect(data.allShips).toBeGreaterThanOrEqual(800);
   expect(data.equipment).toBeGreaterThanOrEqual(500);
   expect(data.workspace).toBe('function');
+  expect(data.workspaceShow).toBe('function');
+  expect(data.workspaceReveal).toBe('function');
   expect(data.quickNav).toBe('function');
   expect(data.personalHome).toBe('function');
   expect(data.importer).toBe('function');
@@ -2500,8 +2504,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.435'");
-  expect(source).toContain("const HD_APP_BUILD=435");
+  expect(source).toContain("const HD_APP_VERSION='1.0.436'");
+  expect(source).toContain("const HD_APP_BUILD=436");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -2524,15 +2528,15 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=435`);
+    expect(data.index).toContain(`${asset}?v=436`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=435");
+  expect(data.updater).toContain("const HD_APP_BUILD=436");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdScriptAssetUrl(src,attempt)");
   expect(data.updater).toContain("function hdScriptAssetUrl(src,attempt=0)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v435");
+  expect(data.sw).toContain("harbordesk-pwa-v436");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -2545,7 +2549,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=435');
+  expect(source).toContain('const BUILD=436');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -6105,17 +6109,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=435',
-      'map-images.js?v=435',
-      'map-tabs.js?v=435',
-      'map-interactive.js?v=435',
-      'map-advanced-data.js?v=435'
+      'map-details.js?v=436',
+      'map-images.js?v=436',
+      'map-tabs.js?v=436',
+      'map-interactive.js?v=436',
+      'map-advanced-data.js?v=436'
     ];
     const requiredStyles = [
-      'map-details.css?v=435',
-      'map-tabs.css?v=435',
-      'map-images.css?v=435',
-      'map-interactive.css?v=435'
+      'map-details.css?v=436',
+      'map-tabs.css?v=436',
+      'map-images.css?v=436',
+      'map-interactive.css?v=436'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -6176,7 +6180,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('[data-map-pane="mine"] #customFleetPanel')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=435');
+  expect(src).toBe('app.js?v=436');
   expect(errors).toEqual([]);
 });
 
