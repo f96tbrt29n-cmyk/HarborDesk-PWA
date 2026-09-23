@@ -6284,6 +6284,32 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
 });
 
 
+test('release smoke: standalone map fallback keeps all攻略 tool entries', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await openGuideWorkspace(page);
+  await page.waitForFunction(() =>
+    typeof window.hdMapRenderFallback === 'function' &&
+    typeof window.hdCoreMapAction === 'function'
+  );
+
+  const result = await page.evaluate(() => {
+    const original = window.hdCoreMapToolsHtml;
+    window.hdCoreMapToolsHtml = undefined;
+    selectedWorld = '2';
+    selectedMap = '2-4';
+    window.hdMapRenderFallback();
+    const actions = [...document.querySelectorAll('#selectedMapCard [data-hd-core-map-action]')]
+      .map(x => x.dataset.hdCoreMapAction);
+    window.hdCoreMapToolsHtml = original;
+    return actions;
+  });
+
+  expect(result).toEqual(['map','fleet','route','suggest','prep','gear','quest','drop','mine']);
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: fallback map renderer still exposes攻略 tools when map tabs fail', async ({ page }) => {
   const errors = [];
   await page.route('**/map-tabs.js*', route => route.abort());
