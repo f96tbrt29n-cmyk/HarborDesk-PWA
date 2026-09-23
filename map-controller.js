@@ -12,10 +12,12 @@
   }
 
   function hdMapFallback(reason='fallback'){
+    const map=String(selectedMap||''),previous=String(window.__HD_MAP_RENDER_STATE?.map||'');
+    if(previous&&previous!==map&&typeof window.hdCoreClearFallbackState==='function')window.hdCoreClearFallbackState();
     if(typeof window.hdMapRenderFallback==='function')window.hdMapRenderFallback();
     hdMapAttachFallbackPlans();
-    window.__HD_MAP_RENDER_STATE={mode:'fallback',reason,map:String(selectedMap||''),at:Date.now()};
-    window.dispatchEvent(new CustomEvent('hd:map-rendered',{detail:{map:selectedMap||'',tab:null,mode:'fallback',reason}}));
+    window.__HD_MAP_RENDER_STATE={mode:'fallback',reason,map,at:Date.now()};
+    window.dispatchEvent(new CustomEvent('hd:map-rendered',{detail:{map,tab:null,mode:'fallback',reason}}));
     if(typeof window.hdCoreScheduleFallbackRestore==='function')window.hdCoreScheduleFallbackRestore();
     return 'fallback';
   }
