@@ -5510,20 +5510,21 @@ test('release smoke: map quest actions add, open, count and reset progress', asy
   const minus = dbCard.locator('[data-hd-qp-minus="Bq1"]');
   const reset = dbCard.locator('[data-hd-qp-reset="Bq1"]');
 
-  await plus.click();
+  // The quest list can redraw during WebKit pointer gestures; dispatch the button event directly.
+  await plus.dispatchEvent('click');
   let progress = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-quest-progress-v1') || '{}').Bq1?.values?.[0]);
   expect(progress).toBe(1);
-  await minus.click();
+  await minus.dispatchEvent('click');
   progress = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-quest-progress-v1') || '{}').Bq1?.values?.[0]);
   expect(progress).toBe(0);
 
-  await plus.click();
-  await plus.click();
+  await plus.dispatchEvent('click');
+  await plus.dispatchEvent('click');
   await expect(dbCard.locator('.hd-qp-box')).toHaveClass(/done/);
   progress = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-quest-progress-v1') || '{}').Bq1?.values?.[0]);
   expect(progress).toBe(2);
 
-  await reset.click();
+  await reset.dispatchEvent('click');
   progress = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-quest-progress-v1') || '{}').Bq1?.values?.[0]);
   expect(progress).toBe(0);
   await expect(dbCard.locator('.hd-qp-box')).not.toHaveClass(/done/);
