@@ -2605,8 +2605,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.450'");
-  expect(source).toContain("const HD_APP_BUILD=450");
+  expect(source).toContain("const HD_APP_VERSION='1.0.455'");
+  expect(source).toContain("const HD_APP_BUILD=455");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -2629,15 +2629,15 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=450`);
+    expect(data.index).toContain(`${asset}?v=455`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=450");
+  expect(data.updater).toContain("const HD_APP_BUILD=455");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdScriptAssetUrl(src,attempt)");
   expect(data.updater).toContain("function hdScriptAssetUrl(src,attempt=0)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v450");
+  expect(data.sw).toContain("harbordesk-pwa-v455");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -2650,7 +2650,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=450');
+  expect(source).toContain('const BUILD=455');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -6211,17 +6211,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=450',
-      'map-images.js?v=450',
-      'map-tabs.js?v=450',
-      'map-interactive.js?v=450',
-      'map-advanced-data.js?v=450'
+      'map-details.js?v=455',
+      'map-images.js?v=455',
+      'map-tabs.js?v=455',
+      'map-interactive.js?v=455',
+      'map-advanced-data.js?v=455'
     ];
     const requiredStyles = [
-      'map-details.css?v=450',
-      'map-tabs.css?v=450',
-      'map-images.css?v=450',
-      'map-interactive.css?v=450'
+      'map-details.css?v=455',
+      'map-tabs.css?v=455',
+      'map-images.css?v=455',
+      'map-interactive.css?v=455'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -6282,7 +6282,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('[data-map-pane="mine"] #customFleetPanel')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=450');
+  expect(src).toBe('app.js?v=455');
   expect(errors).toEqual([]);
 });
 
@@ -9195,5 +9195,206 @@ test('release smoke: Quick Nav sees current workspace state and back history', a
   expect(result.back).toBe(true);
   expect(result.after).toBe('roster');
   expect(result.activeContext).toBe('roster');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: mobile dialog actions stay on the visible bottom edge', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const data = await page.evaluate(() => {
+    const dialog=document.getElementById('timerDialog');
+    if(dialog&&!dialog.open)dialog.showModal();
+    const actions=dialog?.querySelector('.dialog-actions');
+    const style=actions?getComputedStyle(actions):null;
+    return {position:style?.position||'',bottom:style?.bottom||''};
+  });
+  expect(data.position).toBe('sticky');
+  expect(data.bottom).toBe('0px');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: compact header avoids duplicate global search launcher', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.setViewportSize({width:390,height:844});
+  const data = await page.evaluate(() => {
+    window.hdEnsureUpdateUI?.();
+    window.hdGSEnsure?.();
+    window.hdWSEnsureSyncStatus?.();
+    window.hdGSAttachLaunchers?.();
+    const top=document.querySelector('.topbar');
+    return {
+      children:top?[...top.children].map(x=>x.id||x.className||x.tagName):[],
+      menuSearch:!!top?.querySelector('.hd-header-more [data-hd-gs-open]'),
+      headerSearch:!!document.getElementById('hdGlobalSearchHeader')
+    };
+  });
+  expect(data.menuSearch).toBe(true);
+  expect(data.headerSearch).toBe(false);
+  expect(data.children.length).toBeLessThanOrEqual(3);
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: mobile menu reparenting does not resurrect duplicate global search', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.setViewportSize({width:390,height:844});
+  await page.waitForFunction(() =>
+    typeof window.hdEnsureUpdateUI === 'function' &&
+    typeof window.hdGSEnsure === 'function' &&
+    typeof window.hdSyncMobileHeaderMenu === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    window.hdEnsureUpdateUI();
+    window.hdGSEnsure();
+
+    const details=document.querySelector('.hd-header-more');
+    const menu=document.querySelector('.hd-version-menu');
+    const before={
+      direct:document.querySelectorAll('.topbar > #hdGlobalSearchHeader').length,
+      menu:document.querySelectorAll('.hd-version-menu [data-hd-gs-open]').length
+    };
+
+    if(details)details.open=true;
+    window.hdSyncMobileHeaderMenu();
+    window.hdGSEnsure();
+
+    const during={
+      menuParent:menu?.parentElement?.id||'',
+      direct:document.querySelectorAll('.topbar > #hdGlobalSearchHeader').length,
+      menu:document.querySelectorAll('.hd-version-menu [data-hd-gs-open]').length
+    };
+
+    if(details)details.open=false;
+    window.hdSyncMobileHeaderMenu();
+    window.hdGSEnsure();
+
+    const after={
+      direct:document.querySelectorAll('.topbar > #hdGlobalSearchHeader').length,
+      menu:document.querySelectorAll('.hd-version-menu [data-hd-gs-open]').length
+    };
+    return {before,during,after};
+  });
+
+  expect(data.before).toEqual({direct:0,menu:1});
+  expect(data.during.menuParent).toBe('hdMobileHeaderMenuRow');
+  expect(data.during.direct).toBe(0);
+  expect(data.during.menu).toBe(1);
+  expect(data.after).toEqual({direct:0,menu:1});
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: ship image IndexedDB round-trip works in browser', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdShipImagePut === 'function' &&
+    typeof window.hdShipImageGet === 'function' &&
+    typeof window.hdShipImageDelete === 'function'
+  );
+
+  const data = await page.evaluate(async () => {
+    await window.hdShipImageDelete(541);
+    let result;
+    try {
+      const file=new File([new Uint8Array([1,2,3,4,5])],'541.png',{type:'image/png'});
+      const ok=await window.hdShipImagePut(541,file,'長門改二',true);
+      const row=await window.hdShipImageGet(541);
+      result={
+        ok:!!ok,
+        id:Number(row?.id)||0,
+        name:String(row?.name||''),
+        size:Number(row?.blob?.size)||0,
+        type:String(row?.type||row?.blob?.type||''),
+        error:''
+      };
+    } catch (err) {
+      result={ok:false,id:0,name:'',size:0,type:'',error:String(err?.message||err||'unknown')};
+    } finally {
+      await window.hdShipImageDelete(541);
+    }
+    return result;
+  });
+
+  expect(data.error).toBe('');
+  expect(data.ok).toBe(true);
+  expect(data.id).toBe(541);
+  expect(data.name).toBe('長門改二');
+  expect(data.size).toBe(5);
+  expect(data.type).toBe('image/png');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: enhanced equipment catalog preserves reset and compact peek state', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const data = await page.evaluate(() => {
+    window.hdEnsureEquipmentCatalog?.();
+    window.hdRenderEquipmentCatalog?.();
+    const reset=document.querySelector('.hd-equip-search [data-hd-equip-reset]');
+    const list=document.getElementById('hdEquipCatalogList');
+    list?.classList.add('hd-compact');
+    let card=list?.querySelector('.hd-equip-ref-card');
+    card?.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+    const key=card?.dataset.hdEquipPeekKey||'';
+    const openBefore=!!card?.classList.contains('hd-peek');
+    window.hdRenderEquipmentCatalog?.();
+    card=[...document.querySelectorAll('#hdEquipCatalogList .hd-equip-ref-card')].find(x=>x.dataset.hdEquipPeekKey===key);
+    const search=document.getElementById('hdEquipCatalogSearch');
+    if(search)search.value='電探';
+    window.hdRenderEquipmentCatalog?.();
+    return {
+      initialResetDisabled:!!reset?.disabled,
+      key,
+      openBefore,
+      openAfter:!!card?.classList.contains('hd-peek'),
+      activeReset:document.querySelector('.hd-equip-search [data-hd-equip-reset]')?.classList.contains('is-active')||false,
+      activeResetDisabled:!!document.querySelector('.hd-equip-search [data-hd-equip-reset]')?.disabled
+    };
+  });
+  expect(data.initialResetDisabled).toBe(true);
+  expect(data.key).not.toBe('');
+  expect(data.openBefore).toBe(true);
+  expect(data.openAfter).toBe(true);
+  expect(data.activeReset).toBe(true);
+  expect(data.activeResetDisabled).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: diagnostics center is loaded and registered', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    window.HD_MODULE_STATUS?.['./diagnostics-center.js'] === 'ok' &&
+    typeof window.hdDXEnsure === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    window.hdDXEnsure();
+    const section=document.getElementById('diagnosticsCenter');
+    const body=document.getElementById('hdDiagnosticsCenter');
+    return {
+      module:window.HD_MODULE_STATUS?.['./diagnostics-center.js']||'',
+      section:!!section,
+      body:!!body,
+      text:body?.textContent||'',
+      group:section?.dataset.hdWorkspaceGroup||'',
+      settings:!!document.querySelector('[data-hd-ws-group="settings"]')
+    };
+  });
+
+  expect(data.module).toBe('ok');
+  expect(data.section).toBe(true);
+  expect(data.body).toBe(true);
+  expect(data.settings).toBe(true);
+  expect(data.group).toBe('settings');
+  expect(data.text.length).toBeGreaterThan(0);
   expect(errors).toEqual([]);
 });
