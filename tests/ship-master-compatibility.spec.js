@@ -3289,7 +3289,7 @@ test('action toast can undo destructive actions', async ({ page }) => {
     localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'undo-1',name:'加賀改',level:94,tags:[]}]));
   });
   await boot(page,errors);
-  await page.evaluate(()=>window.renderShipRoster?.());
+  await page.evaluate(()=>{window.hdWSShowElement?.('roster',false);window.renderShipRoster?.()});
   const deleteButton=page.locator('[data-roster-delete="undo-1"]');
   await expect(deleteButton).toHaveCount(1);
   await deleteButton.click();
@@ -3310,7 +3310,7 @@ test('equipment delete can be undone from action toast', async ({ page }) => {
     localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([{id:'eq-undo-1',name:'22号対水上電探',category:'電探',count:1,star:0,targetStar:0}]));
   });
   await boot(page,errors);
-  await page.evaluate(()=>window.renderEquipment?.());
+  await page.evaluate(()=>{window.hdWSShowElement?.('equipmentBook',false);window.renderEquipment?.()});
   const del=page.locator('[data-eq-delete="eq-undo-1"]');
   await expect(del).toHaveCount(1);
   await del.click();
@@ -3788,6 +3788,7 @@ test('completed core items can be bulk cleaned and undone', async ({ page }) => 
   expect(data.expCleanup).toBe(true);
   expect(data.questCleanup).toBe(true);
 
+  await page.evaluate(()=>window.hdWSShowElement?.('quests',false));
   await page.locator('[data-core-cleanup="quest"]').click();
   let rows=await page.evaluate(()=>state.quests.map(x=>x.id));
   expect(rows).toEqual(['q-active']);
@@ -3816,6 +3817,7 @@ test('core completed cleanup supports undo', async ({ page }) => {
     }));
   }, {now});
   await boot(page,[]);
+  await page.evaluate(()=>window.hdWSShowElement?.('quests',false));
   await page.waitForSelector('[data-core-cleanup="quest"]:not([hidden])');
 
   const labels=await page.evaluate(()=>({
