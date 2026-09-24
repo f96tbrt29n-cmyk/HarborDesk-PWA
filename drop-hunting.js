@@ -311,7 +311,11 @@ function hdDropEsc(s){return typeof esc==='function'?esc(s):String(s??'').replac
 function hdDropRosterNames(){try{return new Set((JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')||[]).map(x=>String(x.name||'').trim()).filter(Boolean))}catch{return new Set()}}
 function hdDropOwned(ship){const names=hdDropRosterNames();return [...names].some(n=>n===ship||n.startsWith(ship))}
 function hdDropHunts(){try{return JSON.parse(localStorage.getItem(HD_DROP_HUNT_KEY)||'[]')||[]}catch{return []}}
-function hdDropSave(v){localStorage.setItem(HD_DROP_HUNT_KEY,JSON.stringify(v));hdRenderDropHunts();hdRenderDropDb()}
+function hdDropSave(v){
+ localStorage.setItem(HD_DROP_HUNT_KEY,JSON.stringify(v));hdRenderDropHunts();hdRenderDropDb();
+ const refresh=()=>{hdEnsureDropDb();hdRenderDropHunts()};
+ requestAnimationFrame(refresh);setTimeout(refresh,80);setTimeout(refresh,360);
+}
 function hdDropUid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)}
 function hdRenderDropDb(){
  const host=document.getElementById('hdDropDbList');if(!host)return;
