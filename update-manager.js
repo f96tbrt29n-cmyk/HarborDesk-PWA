@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.455';
-const HD_APP_BUILD=455;
+const HD_APP_VERSION='1.0.456';
+const HD_APP_BUILD=456;
 const HD_UPDATE_SNOOZE_KEY='harbordesk-update-snooze-v1';
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
@@ -182,7 +182,7 @@ async function hdLoadCurrentAssets(){
    ['data-hd-quest-progress','./quest-progress-extension.css'],['data-hd-command-center','./command-center.css'],['data-hd-resource-budget','./resource-budget.css'],
    ['data-hd-exercise-routine','./exercise-routine.css'],['data-hd-activity-logger','./activity-logger.css'],['data-hd-sortie-log','./sortie-log.css'],
    ['data-hd-grand-ops','./grand-operations.css'],['data-hd-quick-nav','./quick-nav.css'],['data-hd-personal-home','./personal-home.css'],['data-hd-global-search','./global-search.css'],
-   ['data-hd-workspace-tabs','./workspace-tabs.css'],['data-hd-equipment-analyzer','./equipment-analyzer.css'],['data-hd-sortie-equipment-check','./sortie-equipment-check.css'],['data-hd-equipment-acquisition-guide','./equipment-acquisition-guide.css'],['data-hd-equipment-procurement-list','./equipment-procurement-list.css'],['data-hd-sortie-preparation-sheet','./sortie-preparation-sheet.css'],['data-hd-fleet-suggester','./fleet-suggester.css'],['data-hd-fleet-loadout','./fleet-loadout-planner.css'],['data-hd-fleet-evaluator','./fleet-readiness-evaluator.css'],['data-hd-fleet-optimizer','./fleet-loadout-optimizer.css'],['data-hd-sortie-preset-manager','./sortie-preset-manager.css'],['data-hd-sortie-session','./sortie-session.css'],['data-hd-sortie-mode','./sortie-mode.css'],['data-hd-sortie-performance','./sortie-performance-analytics.css']
+   ['data-hd-diagnostics-center','./diagnostics-center.css'],['data-hd-workspace-tabs','./workspace-tabs.css'],['data-hd-equipment-analyzer','./equipment-analyzer.css'],['data-hd-sortie-equipment-check','./sortie-equipment-check.css'],['data-hd-equipment-acquisition-guide','./equipment-acquisition-guide.css'],['data-hd-equipment-procurement-list','./equipment-procurement-list.css'],['data-hd-sortie-preparation-sheet','./sortie-preparation-sheet.css'],['data-hd-fleet-suggester','./fleet-suggester.css'],['data-hd-fleet-loadout','./fleet-loadout-planner.css'],['data-hd-fleet-evaluator','./fleet-readiness-evaluator.css'],['data-hd-fleet-optimizer','./fleet-loadout-optimizer.css'],['data-hd-sortie-preset-manager','./sortie-preset-manager.css'],['data-hd-sortie-session','./sortie-session.css'],['data-hd-sortie-mode','./sortie-mode.css'],['data-hd-sortie-performance','./sortie-performance-analytics.css']
   ].forEach(([a,h])=>hdAppendStyle(a,h));
 
   const equipmentAnalyzerP=hdLoadScript('data-hd-equipment-analyzer','./equipment-analyzer.js');
