@@ -175,6 +175,10 @@ function hdFSOpenRecoveryAllowed(target){
  return state&&state.group==='guide'&&(!section||section==='guide');
 }
 function hdFSOpen(){
+ // Opening the suggester leaves the map fallback context on purpose.
+ // Cancel any already-scheduled fallback restore so it cannot steal the
+ // workspace back to the guide root after the user chose this tool.
+ try{window.hdCoreClearFallbackState?.()}catch(e){}
  hdFSEnsure();var target=document.getElementById('hdFleetSuggester');if(!target)return false;
  var opened=typeof hdWSShowElement==='function'&&hdWSShowElement(target,true)!==false;
  if(!opened)opened=hdFSReveal(target);
