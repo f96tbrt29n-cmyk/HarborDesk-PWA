@@ -137,7 +137,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-${{ matrix.browser }}-${{ github.run_id }}
+          name: playwright-${{ matrix.browser }}-shard-${{ matrix.shard }}-of-${{ matrix.shards }}-${{ github.run_id }}
           path: |
             playwright-report/
             test-results/
