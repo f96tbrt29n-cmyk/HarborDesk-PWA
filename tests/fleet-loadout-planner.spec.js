@@ -76,6 +76,38 @@ test('automatic loadout never consumes more equipment than owned', async ({ page
   expect(plan.ships.filter(x => x.ship)).toHaveLength(6);
 });
 
+test('fleet suggester recovers after a redraw later than the old 3.6s window', async ({ page }) => {
+  await boot(page);
+  await prepare32(page, false);
+
+  await page.waitForTimeout(4200);
+  const before = await page.evaluate(() => {
+    const epoch = Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH) || 0;
+    window.hdWSApply?.('guide', 'guide', { ignorePin:true });
+    const el=document.getElementById('hdFleetSuggester');
+    return {
+      epoch,
+      section:window.hdWSState?.sections?.guide||'',
+      visible:!!el&&!el.hidden&&!el.classList.contains('hd-ws-hidden')
+    };
+  });
+
+  expect(before.section).toBe('guide');
+  expect(before.visible).toBe(false);
+
+  await expect.poll(
+    () => page.evaluate(() => {
+      const el=document.getElementById('hdFleetSuggester');
+      return {
+        epoch:Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0,
+        section:window.hdWSState?.sections?.guide||'',
+        visible:!!el&&!el.hidden&&!el.classList.contains('hd-ws-hidden')
+      };
+    }),
+    { timeout: 5000 }
+  ).toEqual({ epoch:before.epoch, section:'hdFleetSuggester', visible:true });
+});
+
 test('generated loadout can be saved into the custom fleet gear fields', async ({ page }) => {
   await boot(page);
   await prepare32(page, false);
