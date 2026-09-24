@@ -9,9 +9,12 @@ test.use({
 
 async function boot(page) {
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
-  await expect.poll(() => page.evaluate(() => window.HD_MODULE_STATUS?.['./fleet-loadout-optimizer.js'] || '')).toBe('ok');
   await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
+  await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 30000 });
+  await expect.poll(
+    () => page.evaluate(() => window.HD_MODULE_STATUS?.['./fleet-loadout-optimizer.js'] || ''),
+    { timeout: 30000 }
+  ).toBe('ok');
 }
 
 async function seedOptimizerInventory(page) {
@@ -118,8 +121,26 @@ async function prepareUi(page) {
   await page.evaluate(() => window.hdWSShowElement?.('guide', false));
   await page.locator('[data-world="3"]').click();
   await page.locator('[data-map="3-2"]').click();
+  await expect.poll(
+    () => page.evaluate(() => typeof hdFSMap === 'function' ? hdFSMap() : ''),
+    { timeout: 15000 }
+  ).toBe('3-2');
   await page.locator('[data-hd-fs-open]').click();
-  await page.locator('.hd-fs-card').first().locator('[data-hd-fl-generate="0"]').click();
+  await expect(page.locator('#hdFleetSuggester')).toHaveCount(1);
+  await expect.poll(
+    () => page.evaluate(() => {
+      const el=document.getElementById('hdFleetSuggester');
+      return {
+        section:window.hdWSState?.sections?.guide||'',
+        visible:!!el&&!el.hidden&&!el.classList.contains('hd-ws-hidden')
+      };
+    }),
+    { timeout: 15000 }
+  ).toEqual({ section:'hdFleetSuggester', visible:true });
+  const card=page.locator('.hd-fs-card').first();
+  await card.locator('[data-hd-fl-generate="0"]').click();
+  await expect(card.locator('.hd-fl-plan')).toBeVisible({ timeout: 15000 });
+  await expect(card.locator('[data-hd-fo-optimize="0"]')).toBeVisible({ timeout: 15000 });
 }
 
 test('optimizer UI shows swaps and optimized loadout can be saved', async ({ page }) => {

@@ -45,7 +45,7 @@ function hdRenderEquipmentCatalog(){
  const list=document.getElementById('hdEquipCatalogList');if(!list)return;
  const q=(document.getElementById('hdEquipCatalogSearch')?.value||'').trim().toLowerCase();
  const rows=HD_EQUIPMENT_CATALOG.filter(x=>(hdEquipCatalogFilter==='すべて'||x.category===hdEquipCatalogFilter)&&(!q||`${x.name} ${x.category} ${(x.tags||[]).join(' ')} ${x.role} ${x.obtain} ${x.update}`.toLowerCase().includes(q)));
- const reset=document.querySelector('[data-hd-equip-reset]'),dirty=!!q||hdEquipCatalogFilter!=='すべて';if(reset){reset.disabled=!dirty;reset.classList.toggle('is-active',dirty)}
+ const reset=document.querySelector('.hd-equip-search [data-hd-equip-reset]'),dirty=!!q||hdEquipCatalogFilter!=='すべて';if(reset){reset.disabled=!dirty;reset.classList.toggle('is-active',dirty)}
  const summary=document.getElementById('hdEquipCatalogActiveFilters'),chips=[];if(q)chips.push('検索: '+q);if(hdEquipCatalogFilter!=='すべて')chips.push('カテゴリ: '+hdEquipCatalogFilter);
  if(summary){summary.hidden=!chips.length;summary.innerHTML=chips.length?chips.map(x=>`<span>${hdEsc(x)}</span>`).join('')+'<button type="button" class="ghost small" data-hd-equip-reset>クリア</button>':''}
  document.getElementById('hdEquipCatalogCount').textContent=rows.length===HD_EQUIPMENT_CATALOG.length?`${rows.length}件`:`${rows.length} / ${HD_EQUIPMENT_CATALOG.length}件`;

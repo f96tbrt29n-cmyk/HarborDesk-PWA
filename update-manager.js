@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.450';
-const HD_APP_BUILD=450;
+const HD_APP_VERSION='1.0.456';
+const HD_APP_BUILD=456;
 const HD_UPDATE_SNOOZE_KEY='harbordesk-update-snooze-v1';
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
@@ -146,6 +146,7 @@ function hdInitLoadedModules(){
   try{if(typeof hdQNEnsure==='function')hdQNEnsure()}catch{}
   try{if(typeof hdPHEnsure==='function')hdPHEnsure();if(typeof hdPHInstallBackupHooks==='function')hdPHInstallBackupHooks()}catch{}
   try{if(typeof hdGSEnsure==='function')hdGSEnsure()}catch{}
+  try{if(typeof hdDXEnsure==='function')hdDXEnsure()}catch{}
   try{if(typeof hdWSInstall==='function')hdWSInstall()}catch{}
   try{if(typeof hdEAensure==='function')hdEAensure();if(typeof hdEArenderCoverage==='function')hdEArenderCoverage()}catch{}
   try{if(typeof hdSEInstall==='function')hdSEInstall();if(typeof hdRenderMapEquipmentRecommendations==='function')hdRenderMapEquipmentRecommendations()}catch{}
@@ -181,7 +182,7 @@ async function hdLoadCurrentAssets(){
    ['data-hd-quest-progress','./quest-progress-extension.css'],['data-hd-command-center','./command-center.css'],['data-hd-resource-budget','./resource-budget.css'],
    ['data-hd-exercise-routine','./exercise-routine.css'],['data-hd-activity-logger','./activity-logger.css'],['data-hd-sortie-log','./sortie-log.css'],
    ['data-hd-grand-ops','./grand-operations.css'],['data-hd-quick-nav','./quick-nav.css'],['data-hd-personal-home','./personal-home.css'],['data-hd-global-search','./global-search.css'],
-   ['data-hd-workspace-tabs','./workspace-tabs.css'],['data-hd-equipment-analyzer','./equipment-analyzer.css'],['data-hd-sortie-equipment-check','./sortie-equipment-check.css'],['data-hd-equipment-acquisition-guide','./equipment-acquisition-guide.css'],['data-hd-equipment-procurement-list','./equipment-procurement-list.css'],['data-hd-sortie-preparation-sheet','./sortie-preparation-sheet.css'],['data-hd-fleet-suggester','./fleet-suggester.css'],['data-hd-fleet-loadout','./fleet-loadout-planner.css'],['data-hd-fleet-evaluator','./fleet-readiness-evaluator.css'],['data-hd-fleet-optimizer','./fleet-loadout-optimizer.css'],['data-hd-sortie-preset-manager','./sortie-preset-manager.css'],['data-hd-sortie-session','./sortie-session.css'],['data-hd-sortie-mode','./sortie-mode.css'],['data-hd-sortie-performance','./sortie-performance-analytics.css']
+   ['data-hd-diagnostics-center','./diagnostics-center.css'],['data-hd-workspace-tabs','./workspace-tabs.css'],['data-hd-equipment-analyzer','./equipment-analyzer.css'],['data-hd-sortie-equipment-check','./sortie-equipment-check.css'],['data-hd-equipment-acquisition-guide','./equipment-acquisition-guide.css'],['data-hd-equipment-procurement-list','./equipment-procurement-list.css'],['data-hd-sortie-preparation-sheet','./sortie-preparation-sheet.css'],['data-hd-fleet-suggester','./fleet-suggester.css'],['data-hd-fleet-loadout','./fleet-loadout-planner.css'],['data-hd-fleet-evaluator','./fleet-readiness-evaluator.css'],['data-hd-fleet-optimizer','./fleet-loadout-optimizer.css'],['data-hd-sortie-preset-manager','./sortie-preset-manager.css'],['data-hd-sortie-session','./sortie-session.css'],['data-hd-sortie-mode','./sortie-mode.css'],['data-hd-sortie-performance','./sortie-performance-analytics.css']
   ].forEach(([a,h])=>hdAppendStyle(a,h));
 
   const equipmentAnalyzerP=hdLoadScript('data-hd-equipment-analyzer','./equipment-analyzer.js');
@@ -228,10 +229,11 @@ async function hdLoadCurrentAssets(){
   const quickNavP=Promise.all([eventP,optimizeP,dailyP]).then(()=>hdLoadScript('data-hd-quick-nav','./quick-nav.js'));
   const personalHomeP=Promise.all([quickNavP,dailyP,stabilityP]).then(()=>hdLoadScript('data-hd-personal-home','./personal-home.js'));
   const globalSearchP=Promise.all([quickNavP,personalHomeP,questP,expP]).then(()=>hdLoadScript('data-hd-global-search','./global-search.js'));
-  const workspaceP=Promise.all([globalSearchP,mapRuntimeP,personalHomeP]).then(()=>hdLoadScript('data-hd-workspace-tabs','./workspace-tabs.js'));
+  const diagnosticsP=Promise.all([personalHomeP,globalSearchP]).then(()=>hdLoadScript('data-hd-diagnostics-center','./diagnostics-center.js'));
+  const workspaceP=Promise.all([globalSearchP,mapRuntimeP,personalHomeP,diagnosticsP]).then(()=>hdLoadScript('data-hd-workspace-tabs','./workspace-tabs.js'));
   const workspaceCompatP=workspaceP.then(()=>hdLoadScript('data-hd-workspace-compat','./workspace-compat.js'));
 
-  await Promise.all([equipmentAnalyzerP,sortieEquipmentCheckP,equipmentAcquisitionGuideP,equipmentProcurementP,sortiePreparationP,fleetSuggesterP,fleetLoadoutP,fleetEvaluatorP,fleetOptimizerP,sortiePresetManagerP,sortieSessionP,sortieModeP,sortiePerformanceP,sortieP,landP,fleetP,questP,commandP,eventP,expP,resourceP,exerciseP,guardP,activityP,sortieLogP,optimizeP,dailyP,stabilityP,mapRuntimeP,quickNavP,personalHomeP,globalSearchP,workspaceP,workspaceCompatP]);
+  await Promise.all([equipmentAnalyzerP,sortieEquipmentCheckP,equipmentAcquisitionGuideP,equipmentProcurementP,sortiePreparationP,fleetSuggesterP,fleetLoadoutP,fleetEvaluatorP,fleetOptimizerP,sortiePresetManagerP,sortieSessionP,sortieModeP,sortiePerformanceP,sortieP,landP,fleetP,questP,commandP,eventP,expP,resourceP,exerciseP,guardP,activityP,sortieLogP,optimizeP,dailyP,stabilityP,mapRuntimeP,quickNavP,personalHomeP,globalSearchP,diagnosticsP,workspaceP,workspaceCompatP]);
   hdInitLoadedModules();
 }
 
@@ -337,7 +339,7 @@ function hdEnsureUpdateUI(){
   const header=document.querySelector('.topbar');
   if(header&&!document.getElementById('hdUpdateCheck')){
     const controls=document.createElement('details');controls.className='hd-version-controls hd-header-more';
-    controls.innerHTML=`<summary aria-label="HarborDeskメニュー" title="バージョン・更新"><span aria-hidden="true">•••</span></summary><div class="hd-version-menu"><button type="button" class="ghost small hd-header-search" data-hd-gs-open><span aria-hidden="true">⌕</span><b>全体検索</b></button><button type="button" class="ghost small hd-header-share" data-hd-header-share><span aria-hidden="true">↗</span><b>この画面を共有</b></button><span class="hd-version-badge" title="HarborDesk バージョン">v${HD_APP_VERSION}</span><button id="hdUpdateCheck" class="ghost small hd-update-check" aria-label="更新確認"><span aria-hidden="true">↻</span><b>更新確認</b></button><a class="ghost small hd-update-reset" href="./refresh.html"><span aria-hidden="true">⟳</span><b>更新リセット</b></a><button type="button" class="ghost small hd-header-settings" data-hd-header-settings><span aria-hidden="true">⚙</span><b>設定</b></button></div>`;
+    controls.innerHTML=`<summary aria-label="HarborDeskメニュー" title="バージョン・更新"><span aria-hidden="true">•••</span></summary><div class="hd-version-menu"><button type="button" class="ghost small hd-header-search" data-hd-gs-open aria-label="全体検索"><span aria-hidden="true">⌕</span><b>全体検索</b></button><button type="button" class="ghost small hd-header-share" data-hd-header-share><span aria-hidden="true">↗</span><b>この画面を共有</b></button><span class="hd-version-badge" title="HarborDesk バージョン">v${HD_APP_VERSION}</span><button id="hdUpdateCheck" class="ghost small hd-update-check" aria-label="更新確認"><span aria-hidden="true">↻</span><b>更新確認</b></button><a class="ghost small hd-update-reset" href="./refresh.html"><span aria-hidden="true">⟳</span><b>更新リセット</b></a><button type="button" class="ghost small hd-header-settings" data-hd-header-settings><span aria-hidden="true">⚙</span><b>設定</b></button></div>`;
     header.appendChild(controls)
   }
   const notify=document.getElementById('notifyBtn'),menu=document.querySelector('.hd-header-more .hd-version-menu');

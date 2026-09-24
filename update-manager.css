@@ -153,7 +153,7 @@
  }
  .hd-mobile-header-menu-row .hd-version-menu>*{min-width:0!important}
  .hd-mobile-header-menu-row .hd-version-badge{
-  grid-column:auto!important;
+  grid-column:1/-1!important;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -165,7 +165,7 @@
  .hd-mobile-header-menu-row .hd-version-menu button{
   width:100%!important;
   min-width:0!important;
-  min-height:38px!important;
+  min-height:42px!important;
   padding:6px 4px!important;
   justify-content:center!important;
   gap:4px!important

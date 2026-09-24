@@ -333,6 +333,30 @@ function hdEnsureDropDb(){
  const sec=document.createElement('section');sec.id='dropHuntingDb';sec.className='advanced-section';sec.innerHTML=`<div class="section-head"><div><div class="eyebrow">DROP / FARMING</div><h2>全海域ドロップ逆引き・掘り記録</h2></div><span id="hdDropCount" class="muted"></span></div><div class="hd-drop-warning">1-1〜7-5（5-6含む）37海域のドロップタブ収録データを艦娘名から逆引きできるよ。限定・条件付きドロップは変わる場合があるので最新Wikiも確認してね。</div><div class="hd-drop-toolbar"><input id="hdDropSearch" type="search" placeholder="艦名・海域・マスで検索"><label><input id="hdDropMissingOnly" type="checkbox"> 未所持だけ</label></div><div class="hd-drop-filters">${maps.map(m=>`<button class="ghost small${m==='すべて'?' active':''}" type="button" data-hd-drop-mapfilter="${m}">${m}</button>`).join('')}</div><div class="hd-hunt-title"><strong>掘り目標</strong><span class="muted">周回・勝利数を端末内保存</span></div><div id="hdDropHuntList" class="hd-hunt-list"></div><div id="hdDropDbList" class="hd-drop-list"></div><div><a class="guide-link" href="https://wikiwiki.jp/kancolle/%E9%80%86%E5%BC%95%E3%81%8D%E8%89%A6%E5%A8%98%E3%83%89%E3%83%AD%E3%83%83%E3%83%97%E8%A1%A8" target="_blank" rel="noopener">攻略Wiki ドロップ逆引きで最新情報 ↗</a></div>`;anchor.insertAdjacentElement('afterend',sec);
  document.getElementById('hdDropSearch').addEventListener('input',hdRenderDropDb);document.getElementById('hdDropMissingOnly').addEventListener('change',e=>{hdDropMissingOnly=e.target.checked;hdRenderDropDb()});hdRenderDropHunts();hdRenderDropDb();
 }
+function hdDropOpenSearch(query='',scroll=true){
+ const value=String(query||'').trim();
+ hdEnsureDropDb();
+ const apply=(restoreOnly=false)=>{
+  const input=document.getElementById('hdDropSearch');if(!input)return false;
+  if(!restoreOnly||input.value===''){
+   input.value=value;
+   hdRenderDropDb();
+  }
+  return true;
+ };
+ if(!apply(false))return false;
+ let opened=true;
+ if(typeof window.hdWSShowElement==='function')opened=window.hdWSShowElement('dropHuntingDb',scroll)!==false;
+ else document.getElementById('dropHuntingDb')?.scrollIntoView({behavior:scroll?'smooth':'auto',block:'start'});
+ // WebKit can complete a deferred workspace refresh after the click handler.
+ // Restore only when that refresh cleared the query; never overwrite user typing.
+ requestAnimationFrame(()=>apply(true));
+ setTimeout(()=>apply(true),80);
+ setTimeout(()=>apply(true),360);
+ return opened;
+}
+window.hdDropOpenSearch=hdDropOpenSearch;
+
 document.addEventListener('click',e=>{
  const mapView=e.target.closest?.('[data-hd-map-drop-view]');if(mapView){hdMapDropSetView(mapView.dataset.hdMapDropViewMap,mapView.dataset.hdMapDropView);hdMapDropRefreshCurrent();return}
  const mapShip=e.target.closest?.('[data-hd-map-drop-ship]');if(mapShip){hdAddDropTarget(mapShip.dataset.hdMapDropShip,mapShip.dataset.hdMapDropMap,mapShip.dataset.hdMapDropNode);hdMapDropRefreshCurrent();return}

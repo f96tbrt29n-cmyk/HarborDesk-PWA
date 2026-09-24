@@ -112,6 +112,7 @@ function hdRenderMapEquipmentRecommendations(){
 function hdOpenEquipmentDb(name=''){
   const target=document.getElementById('equipmentBook');
   if(!target)return false;
+  window.hdCoreClearFallbackState?.();
   let opened=false;
   if(typeof window.hdRevealWorkspaceTarget==='function')opened=window.hdRevealWorkspaceTarget(target,true)!==false;
   if(!opened&&typeof hdWSShowElement==='function')opened=hdWSShowElement(target,true)!==false;

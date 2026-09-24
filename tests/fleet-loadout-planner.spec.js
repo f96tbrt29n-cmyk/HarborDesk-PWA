@@ -8,9 +8,12 @@ test.use({
 
 async function boot(page) {
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
-  await expect.poll(() => page.evaluate(() => window.HD_MODULE_STATUS?.['./fleet-loadout-planner.js'] || '')).toBe('ok');
   await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
+  await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 30000 });
+  await expect.poll(
+    () => page.evaluate(() => window.HD_MODULE_STATUS?.['./fleet-loadout-planner.js'] || ''),
+    { timeout: 30000 }
+  ).toBe('ok');
 }
 
 async function prepare32(page, sparse = false) {
@@ -35,7 +38,17 @@ async function prepare32(page, sparse = false) {
   await page.locator('[data-world="3"]').click();
   await page.locator('[data-map="3-2"]').click();
   await page.locator('[data-hd-fs-open]').click();
-  await expect(page.locator('#hdFleetSuggester')).toBeVisible();
+  await expect(page.locator('#hdFleetSuggester')).toHaveCount(1);
+  await expect.poll(
+    () => page.evaluate(() => {
+      const el=document.getElementById('hdFleetSuggester');
+      return {
+        section:window.hdWSState?.sections?.guide||'',
+        visible:!!el&&!el.hidden&&!el.classList.contains('hd-ws-hidden')
+      };
+    }),
+    { timeout: 15000 }
+  ).toEqual({ section:'hdFleetSuggester', visible:true });
 }
 
 test('automatic loadout never consumes more equipment than owned', async ({ page }) => {
@@ -90,3 +103,19 @@ test('sparse inventory is shown as unfilled loadout slots instead of invented ge
     expect(used).toBeLessThanOrEqual(data.owned[name] || 0);
   }
 });
+
+test('generated loadout survives fleet rerender after ship images become ready', async ({ page }) => {
+  await boot(page);
+  await prepare32(page, true);
+
+  const card = page.locator('.hd-fs-card').first();
+  await card.locator('[data-hd-fl-generate="0"]').click();
+  await expect(card.locator('.hd-fl-plan')).toBeVisible();
+  await expect(card.locator('.hd-fl-plan')).toContainText('未配備');
+
+  await page.evaluate(() => window.dispatchEvent(new Event('hd:ship-images-ready')));
+
+  await expect(page.locator('.hd-fs-card').first().locator('.hd-fl-plan')).toBeVisible();
+  await expect(page.locator('.hd-fs-card').first().locator('.hd-fl-plan')).toContainText('未配備');
+});
+

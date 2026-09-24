@@ -14,7 +14,7 @@ function hdQNSaveRecent(v){localStorage.setItem(HD_QN_RECENT_KEY,JSON.stringify(
 function hdQNLoadUsage(){try{return JSON.parse(localStorage.getItem(HD_QN_USAGE_KEY)||'{}')||{}}catch{return {}}}
 function hdQNSaveUsage(v){try{localStorage.setItem(HD_QN_USAGE_KEY,JSON.stringify(v||{}))}catch{}}
 function hdQNRecordUsage(id){
- id=String(id||'').trim();if(!id)return false;
+ id=String(id||'').trim();if(!id||id==='home')return false;
  const now=Date.now(),duplicate=id===hdQNUsageLastId&&(now-hdQNUsageLastAt)<1500;
  hdQNUsageLastId=id;hdQNUsageLastAt=now;
  const usage=hdQNLoadUsage(),row=usage[id]&&typeof usage[id]==='object'?usage[id]:{};
@@ -442,13 +442,26 @@ function hdQNEnsure(){
   document.getElementById('hdQNSearch')?.addEventListener('input',e=>hdQNRenderList(e.target.value));
   hdQNRenderList();hdQNEnsureMobileDock();
 }
-function hdQNLoadDiagnostics(){
-  if(!document.querySelector('link[data-hd-diagnostics-css]')){const l=document.createElement('link');l.rel='stylesheet';l.href='./diagnostics-center.css';l.dataset.hdDiagnosticsCss='1';document.head.appendChild(l)}
-  if(document.querySelector('script[data-hd-diagnostics]'))return;
-  const s=document.createElement('script');s.src='./diagnostics-center.js';s.dataset.hdDiagnostics='1';if(window.HD_MODULE_STATUS)window.HD_MODULE_STATUS['./diagnostics-center.js']='loading';
-  s.onload=()=>{if(window.HD_MODULE_STATUS)window.HD_MODULE_STATUS['./diagnostics-center.js']='ok';try{if(typeof hdDXEnsure==='function')hdDXEnsure()}catch{}};
-  s.onerror=()=>{if(window.HD_MODULE_STATUS)window.HD_MODULE_STATUS['./diagnostics-center.js']='error'};
-  document.body.appendChild(s);
+async function hdQNLoadDiagnostics(){
+  if(typeof hdDXEnsure==='function'){try{hdDXEnsure()}catch{}return true}
+  const src='./diagnostics-center.js';
+  const status=()=>String(window.HD_MODULE_STATUS?.[src]||'');
+  const existing=()=>document.querySelector('script[data-hd-diagnostics-center],script[data-hd-diagnostics]');
+  if(existing()||['loading','retrying'].includes(status())){
+    for(let i=0;i<50&&typeof hdDXEnsure!=='function'&&status()!=='error';i++)await new Promise(r=>setTimeout(r,40));
+    if(typeof hdDXEnsure==='function'){try{hdDXEnsure()}catch{}return true}
+    return status()!=='error';
+  }
+  if(typeof window.hdLoadScript==='function'){
+    const ok=await window.hdLoadScript('data-hd-diagnostics-center',src);
+    if(ok)try{if(typeof hdDXEnsure==='function')hdDXEnsure()}catch{}
+    return !!ok
+  }
+  // update-manager owns runtime module injection. Avoid inserting the same classic
+  // script independently while the app is still booting (WebKit treats duplicate
+  // top-level lexical declarations as a hard runtime error).
+  window.addEventListener('hd:modules-ready',()=>{try{if(typeof hdDXEnsure==='function')hdDXEnsure()}catch{}},{once:true});
+  return false
 }
 
 document.addEventListener('click',e=>{

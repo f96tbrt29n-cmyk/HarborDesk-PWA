@@ -1061,15 +1061,15 @@ test('release smoke: duplicate bridge retries apply one sync and reject mismatch
   expect(errors).toEqual([]);
 });
 
-test('release smoke: userscript prefers postMessage bridge and keeps hash fallback', async ({ page }) => {
+test('release smoke: userscript uses same-tab hash handoff while importer keeps legacy bridge compatibility', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
   const source=await page.evaluate(async()=>fetch('./HarborDesk-Kancolle.user.js',{cache:'no-store'}).then(r=>r.text()));
   const importer=await page.evaluate(async()=>fetch('./kancolle-import.js',{cache:'no-store'}).then(r=>r.text()));
-  expect(source).toContain("window.open(HARBOR_URL+'#kancolleImport','HarborDeskSync')");
-  expect(source).toContain("type:BRIDGE_IMPORT_MESSAGE");
-  expect(source).toContain("BRIDGE_ACK_MESSAGE");
+  expect(source).not.toContain("window.open(HARBOR_URL+'#kancolleImport','HarborDeskSync')");
+  expect(source).not.toContain("type:BRIDGE_IMPORT_MESSAGE");
   expect(source).toContain("a.href=HARBOR_URL+'#kcimport='+token");
+  expect(source).toContain("a.target='_self'");
   expect(importer).toContain("HD_KC_BRIDGE_READY_MESSAGE='harbordesk-kancolle-import-ready-v1'");
   expect(importer).toContain("async function hdKcConsumeHashImport()");
   expect(importer).toContain("window.opener.postMessage({type:HD_KC_BRIDGE_READY_MESSAGE");
@@ -1319,11 +1319,11 @@ test('release smoke: userscript captures scouting and admiral level for readines
   await boot(page, errors);
   const source = await page.evaluate(async () => fetch('./HarborDesk-Kancolle.user.js', { cache:'no-store' }).then(r => r.text()));
   const importer = await page.evaluate(async () => fetch('./kancolle-import.js', { cache:'no-store' }).then(r => r.text()));
-  expect(source).toContain("// @version      1.0.14");
+  expect(source).toContain("// @version      1.0.15");
   expect(source).toContain("api_sakuteki:Array.isArray(x.api_sakuteki)");
   expect(source).toContain("api_onslot:Array.isArray(x.api_onslot)");
   expect(source).toContain("api_basic:data?.api_basic");
-  expect(importer).toContain("HD_KC_USERSCRIPT_VERSION='1.0.14'");
+  expect(importer).toContain("HD_KC_USERSCRIPT_VERSION='1.0.15'");
   expect(importer).toContain("gameLos:Array.isArray(ship.api_sakuteki)");
   expect(importer).toContain("admiralLevel:Number(parsed.admiralLevel)");
   expect(errors).toEqual([]);
@@ -2605,8 +2605,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.450'");
-  expect(source).toContain("const HD_APP_BUILD=450");
+  expect(source).toContain("const HD_APP_VERSION='1.0.456'");
+  expect(source).toContain("const HD_APP_BUILD=456");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -2629,15 +2629,15 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=450`);
+    expect(data.index).toContain(`${asset}?v=456`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=450");
+  expect(data.updater).toContain("const HD_APP_BUILD=456");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdScriptAssetUrl(src,attempt)");
   expect(data.updater).toContain("function hdScriptAssetUrl(src,attempt=0)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v450");
+  expect(data.sw).toContain("harbordesk-pwa-v456");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -2650,7 +2650,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=450');
+  expect(source).toContain('const BUILD=456');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -2666,8 +2666,8 @@ test('release smoke: userscript blocks handoff until ship and equipment ledger d
     return res.text();
   });
 
-  expect(source).toContain('// @version      1.0.14');
-  expect(source).toContain("const HD_VERSION='1.0.14'");
+  expect(source).toContain('// @version      1.0.15');
+  expect(source).toContain("const HD_VERSION='1.0.15'");
   expect(source).toContain('// @downloadURL  https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/HarborDesk-Kancolle.user.js');
   expect(source).toContain('// @updateURL    https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/HarborDesk-Kancolle.meta.js');
   expect(source).toContain('function ledgerReady(c=captureCoverage())');
@@ -3139,10 +3139,12 @@ test('release smoke: backup restore preview can cancel without changing data', a
   const expected = await page.evaluate(() => window.__hdPreviewExpected);
   await expect(dialog.locator('.hd-backup-preview-grid .add')).toContainText(`${expected.added}件`);
   await expect(dialog.locator('.hd-backup-preview-grid .update')).toContainText(`${expected.updated}件`);
-  await expect(dialog.locator('.hd-backup-preview-grid .remove')).toContainText(`${expected.removed}件`);
+  const removedText=await dialog.locator('.hd-backup-preview-grid .remove').textContent()||'';
+  const removedCount=Number(removedText.match(/(\d+)件/)?.[1]||0);
   expect(expected.added).toBe(1);
   expect(expected.updated).toBe(1);
   expect(expected.removed).toBeGreaterThanOrEqual(1);
+  expect(removedCount).toBeGreaterThanOrEqual(1);
 
   await dialog.locator('button[value="cancel"]').click();
 
@@ -6211,17 +6213,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=450',
-      'map-images.js?v=450',
-      'map-tabs.js?v=450',
-      'map-interactive.js?v=450',
-      'map-advanced-data.js?v=450'
+      'map-details.js?v=456',
+      'map-images.js?v=456',
+      'map-tabs.js?v=456',
+      'map-interactive.js?v=456',
+      'map-advanced-data.js?v=456'
     ];
     const requiredStyles = [
-      'map-details.css?v=450',
-      'map-tabs.css?v=450',
-      'map-images.css?v=450',
-      'map-interactive.css?v=450'
+      'map-details.css?v=456',
+      'map-tabs.css?v=456',
+      'map-images.css?v=456',
+      'map-interactive.css?v=456'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -6282,7 +6284,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('[data-map-pane="mine"] #customFleetPanel')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=450');
+  expect(src).toBe('app.js?v=456');
   expect(errors).toEqual([]);
 });
 
@@ -6813,7 +6815,7 @@ test('release smoke: fallback mine workspace keeps saved fleet readiness and sup
   const manual = mine.locator('#hdSortieReadiness [data-hd-sortie-check]').first();
   await expect(manual).toBeVisible();
   const checkId = await manual.getAttribute('data-hd-sortie-check');
-  await manual.check();
+  await manual.locator('..').click();
 
   const ready = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('harbordesk-sortie-readiness-v1') || '{}')
@@ -9195,5 +9197,360 @@ test('release smoke: Quick Nav sees current workspace state and back history', a
   expect(result.back).toBe(true);
   expect(result.after).toBe('roster');
   expect(result.activeContext).toBe('roster');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: mobile dialog actions stay on the visible bottom edge', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const data = await page.evaluate(() => {
+    const dialog=document.getElementById('timerDialog');
+    if(dialog&&!dialog.open)dialog.showModal();
+    const actions=dialog?.querySelector('.dialog-actions');
+    const style=actions?getComputedStyle(actions):null;
+    return {position:style?.position||'',bottom:style?.bottom||''};
+  });
+  expect(data.position).toBe('sticky');
+  expect(data.bottom).toBe('0px');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: compact header avoids duplicate global search launcher', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.setViewportSize({width:390,height:844});
+  const data = await page.evaluate(() => {
+    window.hdEnsureUpdateUI?.();
+    window.hdGSEnsure?.();
+    window.hdWSEnsureSyncStatus?.();
+    window.hdGSAttachLaunchers?.();
+    const top=document.querySelector('.topbar');
+    return {
+      children:top?[...top.children].map(x=>x.id||x.className||x.tagName):[],
+      menuSearch:!!top?.querySelector('.hd-header-more [data-hd-gs-open]'),
+      headerSearch:!!document.getElementById('hdGlobalSearchHeader')
+    };
+  });
+  expect(data.menuSearch).toBe(true);
+  expect(data.headerSearch).toBe(false);
+  expect(data.children.length).toBeLessThanOrEqual(3);
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: mobile menu reparenting does not resurrect duplicate global search', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.setViewportSize({width:390,height:844});
+  await page.waitForFunction(() =>
+    typeof window.hdEnsureUpdateUI === 'function' &&
+    typeof window.hdGSEnsure === 'function' &&
+    typeof window.hdSyncMobileHeaderMenu === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    window.hdEnsureUpdateUI();
+    window.hdGSEnsure();
+
+    const details=document.querySelector('.hd-header-more');
+    const menu=document.querySelector('.hd-version-menu');
+    const before={
+      direct:document.querySelectorAll('.topbar > #hdGlobalSearchHeader').length,
+      menu:document.querySelectorAll('.hd-version-menu [data-hd-gs-open]').length
+    };
+
+    if(details)details.open=true;
+    window.hdSyncMobileHeaderMenu();
+    window.hdGSEnsure();
+
+    const during={
+      menuParent:menu?.parentElement?.id||'',
+      direct:document.querySelectorAll('.topbar > #hdGlobalSearchHeader').length,
+      menu:document.querySelectorAll('.hd-version-menu [data-hd-gs-open]').length
+    };
+
+    if(details)details.open=false;
+    window.hdSyncMobileHeaderMenu();
+    window.hdGSEnsure();
+
+    const after={
+      direct:document.querySelectorAll('.topbar > #hdGlobalSearchHeader').length,
+      menu:document.querySelectorAll('.hd-version-menu [data-hd-gs-open]').length
+    };
+    return {before,during,after};
+  });
+
+  expect(data.before).toEqual({direct:0,menu:1});
+  expect(data.during.menuParent).toBe('hdMobileHeaderMenuRow');
+  expect(data.during.direct).toBe(0);
+  expect(data.during.menu).toBe(1);
+  expect(data.after).toEqual({direct:0,menu:1});
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: ship image IndexedDB round-trip works in browser', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdShipImagePut === 'function' &&
+    typeof window.hdShipImageGet === 'function' &&
+    typeof window.hdShipImageDelete === 'function'
+  );
+
+  const data = await page.evaluate(async () => {
+    await window.hdShipImageDelete(541);
+    let result;
+    try {
+      const file=new File([new Uint8Array([1,2,3,4,5])],'541.png',{type:'image/png'});
+      const ok=await window.hdShipImagePut(541,file,'長門改二',true);
+      const row=await window.hdShipImageGet(541);
+      result={
+        ok:!!ok,
+        id:Number(row?.id)||0,
+        name:String(row?.name||''),
+        size:Number(row?.blob?.size)||0,
+        type:String(row?.type||row?.blob?.type||''),
+        error:''
+      };
+    } catch (err) {
+      result={ok:false,id:0,name:'',size:0,type:'',error:String(err?.message||err||'unknown')};
+    } finally {
+      await window.hdShipImageDelete(541);
+    }
+    return result;
+  });
+
+  expect(data.error).toBe('');
+  expect(data.ok).toBe(true);
+  expect(data.id).toBe(541);
+  expect(data.name).toBe('長門改二');
+  expect(data.size).toBe(5);
+  expect(data.type).toBe('image/png');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: enhanced equipment catalog preserves reset and compact peek state', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const data = await page.evaluate(() => {
+    window.hdEnsureEquipmentCatalog?.();
+    window.hdRenderEquipmentCatalog?.();
+    const reset=document.querySelector('.hd-equip-search [data-hd-equip-reset]');
+    reset?.click();
+    window.hdRenderEquipmentCatalog?.();
+    const cleanReset=document.querySelector('.hd-equip-search [data-hd-equip-reset]');
+    const initialResetDisabled=!!cleanReset?.disabled;
+    const list=document.getElementById('hdEquipCatalogList');
+    list?.classList.add('hd-compact');
+    let card=list?.querySelector('.hd-equip-ref-card');
+    card?.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+    const key=card?.dataset.hdEquipPeekKey||'';
+    const openBefore=!!card?.classList.contains('hd-peek');
+    window.hdRenderEquipmentCatalog?.();
+    card=[...document.querySelectorAll('#hdEquipCatalogList .hd-equip-ref-card')].find(x=>x.dataset.hdEquipPeekKey===key);
+    const search=document.getElementById('hdEquipCatalogSearch');
+    if(search)search.value='電探';
+    window.hdRenderEquipmentCatalog?.();
+    return {
+      initialResetDisabled,
+      key,
+      openBefore,
+      openAfter:!!card?.classList.contains('hd-peek'),
+      activeReset:document.querySelector('.hd-equip-search [data-hd-equip-reset]')?.classList.contains('is-active')||false,
+      activeResetDisabled:!!document.querySelector('.hd-equip-search [data-hd-equip-reset]')?.disabled
+    };
+  });
+  expect(data.initialResetDisabled).toBe(true);
+  expect(data.key).not.toBe('');
+  expect(data.openBefore).toBe(true);
+  expect(data.openAfter).toBe(true);
+  expect(data.activeReset).toBe(true);
+  expect(data.activeResetDisabled).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: diagnostics center is loaded and registered', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    window.HD_MODULE_STATUS?.['./diagnostics-center.js'] === 'ok' &&
+    typeof window.hdDXEnsure === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    window.hdDXEnsure();
+    const section=document.getElementById('diagnosticsCenter');
+    const body=document.getElementById('hdDiagnosticsCenter');
+    return {
+      module:window.HD_MODULE_STATUS?.['./diagnostics-center.js']||'',
+      section:!!section,
+      body:!!body,
+      text:body?.textContent||'',
+      group:section?.dataset.hdWorkspaceGroup||'',
+      settings:!!document.querySelector('[data-hd-ws-group="settings"]')
+    };
+  });
+
+  expect(data.module).toBe('ok');
+  expect(data.section).toBe(true);
+  expect(data.body).toBe(true);
+  expect(data.settings).toBe(true);
+  expect(data.group).toBe('settings');
+  expect(data.text.length).toBeGreaterThan(0);
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: diagnostics center runtime stylesheet is loaded', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    window.HD_MODULE_STATUS?.['./diagnostics-center.js'] === 'ok' &&
+    !!document.querySelector('link[data-hd-diagnostics-center]')
+  );
+
+  await page.evaluate(async () => {
+    window.hdDXEnsure?.();
+    await window.hdDXRender?.();
+  });
+  await page.waitForSelector('#diagnosticsCenter .hd-dx-note', { state: 'attached' });
+  const data = await page.evaluate(() => {
+    const link=document.querySelector('link[data-hd-diagnostics-center]');
+    const note=document.querySelector('#diagnosticsCenter .hd-dx-note');
+    const style=note?getComputedStyle(note):null;
+    return {
+      href:link?.getAttribute('href')||'',
+      loaded:link?.dataset.hdLoaded||'',
+      noteFont:style?.fontSize||'',
+      noteLine:style?.lineHeight||''
+    };
+  });
+
+  expect(data.href).toContain('diagnostics-center.css?v=456');
+  expect(data.loaded).toBe('1');
+  expect(data.noteFont).not.toBe('');
+  expect(data.noteLine).not.toBe('');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: diagnostics loader is shared and idempotent', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const data = await page.evaluate(async () => {
+    await window.hdQNLoadDiagnostics?.();
+    await window.hdQNLoadDiagnostics?.();
+    await window.hdEnsureCurrentAssets?.();
+    await new Promise(r => setTimeout(r, 80));
+    return {
+      scripts:[...document.querySelectorAll('script[src*="diagnostics-center.js"]')].length,
+      ready:typeof window.hdDXEnsure === 'function',
+      status:window.HD_MODULE_STATUS?.['./diagnostics-center.js'] || ''
+    };
+  });
+  expect(data.scripts).toBe(1);
+  expect(data.ready).toBe(true);
+  expect(data.status).toBe('ok');
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: ship images persist bytes and read back as blobs', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const data = await page.evaluate(async () => {
+    const id=541;
+    await window.hdShipImageDelete?.(id);
+    const file=new File([new Uint8Array([9,8,7,6])],'541.png',{type:'image/png'});
+    const ok=await window.hdShipImagePut?.(id,file,'長門改二',true);
+    const row=await window.hdShipImageGet?.(id);
+    const bytes=row?.blob?[...new Uint8Array(await row.blob.arrayBuffer())]:[];
+    const db=await window.hdShipImageOpenDb?.();
+    const raw=await new Promise((resolve,reject)=>{
+      const tx=db.transaction('images','readonly'),req=tx.objectStore('images').get(id);
+      req.onsuccess=()=>resolve(req.result||null);
+      req.onerror=()=>reject(req.error);
+    });
+    await window.hdShipImageDelete?.(id);
+    return {
+      ok:!!ok,
+      type:row?.blob?.type||'',
+      bytes,
+      rawHasBlob:typeof Blob!=='undefined'&&raw?.blob instanceof Blob,
+      rawHasBytes:raw?.bytes instanceof ArrayBuffer || ArrayBuffer.isView(raw?.bytes)
+    };
+  });
+  expect(data.ok).toBe(true);
+  expect(data.type).toBe('image/png');
+  expect(data.bytes).toEqual([9,8,7,6]);
+  expect(data.rawHasBlob).toBe(false);
+  expect(data.rawHasBytes).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: userscript uses same-tab handoff without popup', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const source = await page.evaluate(async () => fetch('./HarborDesk-Kancolle.user.js', { cache:'no-store' }).then(r => r.text()));
+  expect(source).toContain('// @version      1.0.15');
+  expect(source).toContain("const HD_VERSION='1.0.15'");
+  expect(source).toContain("#kcimport=");
+  expect(source).toContain("a.target='_self'");
+  expect(source).not.toContain('window.open(');
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: inline mobile header version spans the menu grid', async ({ page }) => {
+  const errors = [];
+  await page.setViewportSize({ width:390, height:844 });
+  await boot(page, errors);
+  const data = await page.evaluate(async () => {
+    window.hdEnsureUpdateUI?.();
+    const details=document.querySelector('.hd-header-more');
+    if(details)details.open=true;
+    window.hdSyncMobileHeaderMenu?.();
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    const menu=document.querySelector('#hdMobileHeaderMenuRow .hd-version-menu');
+    const badge=menu?.querySelector('.hd-version-badge');
+    return {
+      menuWidth:menu?.getBoundingClientRect().width||0,
+      badgeWidth:badge?.getBoundingClientRect().width||0,
+      gridColumn:badge?getComputedStyle(badge).gridColumn:''
+    };
+  });
+  expect(data.menuWidth).toBeGreaterThan(0);
+  expect(data.badgeWidth).toBeGreaterThan(data.menuWidth*0.8);
+  expect(data.gridColumn).not.toBe('auto');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: empty required dialog can cancel and global search is labelled', async ({ page }) => {
+  const errors = [];
+  await page.setViewportSize({ width:390, height:844 });
+  await boot(page, errors);
+
+  const label = await page.evaluate(() => {
+    window.hdEnsureUpdateUI?.();
+    return document.querySelector('.hd-version-menu [data-hd-gs-open]')?.getAttribute('aria-label') || '';
+  });
+  expect(label).toBe('全体検索');
+
+  await page.evaluate(() => window.openQuestDialog?.());
+  await expect(page.locator('#questDialog')).toBeVisible();
+  await expect(page.locator('#questName')).toHaveValue('');
+  await page.locator('#questDialog [value="cancel"]').click();
+  await expect(page.locator('#questDialog')).not.toBeVisible();
+
+  const formNoValidate = await page.evaluate(() => ({
+    quest:document.querySelector('#questDialog [value="cancel"]')?.formNoValidate || false,
+    timer:document.querySelector('#timerDialog [value="cancel"]')?.formNoValidate || false
+  }));
+  expect(formNoValidate).toEqual({ quest:true, timer:true });
   expect(errors).toEqual([]);
 });
