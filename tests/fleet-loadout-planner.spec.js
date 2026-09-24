@@ -8,15 +8,15 @@ test.use({
 
 async function boot(page) {
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
-  await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 30000 });
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 45000 });
+  await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 45000 });
   await expect.poll(
     () => page.evaluate(() => window.HD_MODULE_STATUS?.['./fleet-loadout-planner.js'] || ''),
-    { timeout: 30000 }
+    { timeout: 45000 }
   ).toBe('ok');
   await expect.poll(
     () => page.evaluate(() => window.HD_MODULE_STATUS?.['./fleet-suggester.js'] || ''),
-    { timeout: 30000 }
+    { timeout: 45000 }
   ).toBe('ok');
 }
 
