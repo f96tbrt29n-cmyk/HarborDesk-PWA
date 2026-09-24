@@ -487,7 +487,7 @@ function hdWSRevealElement(target,scroll=true,opts={}){
  if(opts.history!==false)hdWSPushHistory();
  const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
  clearTimeout(hdWSRefreshTimer);
- hdWSNavLockUntil=Date.now()+900;hdWSSetPin(group,section.id,900);const navSeq=++hdWSNavSeq;
+ hdWSNavLockUntil=Date.now()+2200;hdWSSetPin(group,section.id,2200);const navSeq=++hdWSNavSeq;
  const showNow=()=>{
   if(navSeq!==hdWSNavSeq)return false;
   hdWSState.group=group;hdWSState.sections[group]=section.id;hdWSSave();hdWSReflectLocationHash(section.id);
@@ -506,6 +506,8 @@ function hdWSRevealElement(target,scroll=true,opts={}){
  if(scroll)el.scrollIntoView({behavior:'smooth',block:'start'});
  setTimeout(()=>{if(navSeq===hdWSNavSeq){showNow();hdWSScheduleRefresh()}},120);
  setTimeout(()=>{if(navSeq===hdWSNavSeq)showNow()},360);
+ setTimeout(()=>{if(navSeq===hdWSNavSeq)showNow()},900);
+ setTimeout(()=>{if(navSeq===hdWSNavSeq)showNow()},1800);
  return true;
 }
 function hdWSShowElement(target,scroll=true){
