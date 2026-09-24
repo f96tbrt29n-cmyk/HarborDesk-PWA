@@ -2245,7 +2245,7 @@ test('release smoke: Kancolle sortie importer prefers session reconciliation bef
   const source = await page.evaluate(async () => fetch('./kancolle-import.js',{cache:'no-store'}).then(r=>r.text()));
   expect(source).toContain("typeof hdSSIngestGameSortie==='function'?hdSSIngestGameSortie(payload):null");
   expect(source).toContain("const entry=matched||hdSLRecordEntry(payload)");
-  expect(source).toContain("result:retreat?'撤退':(active.lastResult||'不明')");
+  expect(source).toContain("result:active.lastResult||(retreat?'撤退':'不明')");
   expect(errors).toEqual([]);
 });
 
