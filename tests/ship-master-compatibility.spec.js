@@ -3120,11 +3120,13 @@ test('quick nav remembers workspace history and goes back', async ({ page }) => 
 });
 
 
-test('Kancolle sync coverage distinguishes captured and zero sections', async ({ page }) => {
+test('Kancolle sync coverage distinguishes captured zero sections from uncaptured sections', async ({ page }) => {
   const errors=[];
   await page.addInitScript(() => {
     localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
-      syncedAt:Date.now(),ships:206,equipment:93,materials:8,decks:4,expeditions:0,docks:0,quests:0,sorties:0
+      syncedAt:Date.now(),
+      ships:206,equipment:93,materials:8,decks:4,expeditions:0,docks:0,quests:0,sorties:0,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true,sorties:false}
     }));
   });
   await boot(page,errors);
@@ -3134,14 +3136,15 @@ test('Kancolle sync coverage distinguishes captured and zero sections', async ({
     return {
       text:box?.textContent||'',
       ok:box?.querySelectorAll('.ok').length||0,
-      zero:box?.querySelectorAll('.zero').length||0
+      missing:box?.querySelectorAll('.missing').length||0
     };
   });
   expect(data.text).toContain('艦娘');
-  expect(data.text).toContain('任務');
-  expect(data.text).toContain('未取得/なし');
+  expect(data.text).toContain('任務 取得済み・0');
+  expect(data.text).toContain('出撃 未取得');
+  expect(data.text).toContain('「取得済み・0」は通信を取得した上で該当データが0件');
   expect(data.ok).toBeGreaterThan(0);
-  expect(data.zero).toBeGreaterThan(0);
+  expect(data.missing).toBeGreaterThan(0);
 });
 
 
