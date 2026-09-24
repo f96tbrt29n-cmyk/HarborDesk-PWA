@@ -90,3 +90,19 @@ test('sparse inventory is shown as unfilled loadout slots instead of invented ge
     expect(used).toBeLessThanOrEqual(data.owned[name] || 0);
   }
 });
+
+test('generated loadout survives fleet rerender after ship images become ready', async ({ page }) => {
+  await boot(page);
+  await prepare32(page, true);
+
+  const card = page.locator('.hd-fs-card').first();
+  await card.locator('[data-hd-fl-generate="0"]').click();
+  await expect(card.locator('.hd-fl-plan')).toBeVisible();
+  await expect(card.locator('.hd-fl-plan')).toContainText('未配備');
+
+  await page.evaluate(() => window.dispatchEvent(new Event('hd:ship-images-ready')));
+
+  await expect(page.locator('.hd-fs-card').first().locator('.hd-fl-plan')).toBeVisible();
+  await expect(page.locator('.hd-fs-card').first().locator('.hd-fl-plan')).toContainText('未配備');
+});
+
