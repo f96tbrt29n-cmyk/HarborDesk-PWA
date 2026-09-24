@@ -2245,7 +2245,7 @@ test('release smoke: Kancolle sortie importer prefers session reconciliation bef
   const source = await page.evaluate(async () => fetch('./kancolle-import.js',{cache:'no-store'}).then(r=>r.text()));
   expect(source).toContain("typeof hdSSIngestGameSortie==='function'?hdSSIngestGameSortie(payload):null");
   expect(source).toContain("const entry=matched||hdSLRecordEntry(payload)");
-  expect(source).toContain("result:retreat?'撤退':(active.lastResult||'不明')");
+  expect(source).toContain("result:active.lastResult||(retreat?'撤退':'不明')");
   expect(errors).toEqual([]);
 });
 
@@ -2605,8 +2605,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.449'");
-  expect(source).toContain("const HD_APP_BUILD=449");
+  expect(source).toContain("const HD_APP_VERSION='1.0.450'");
+  expect(source).toContain("const HD_APP_BUILD=450");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -2629,15 +2629,15 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=449`);
+    expect(data.index).toContain(`${asset}?v=450`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=449");
+  expect(data.updater).toContain("const HD_APP_BUILD=450");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdScriptAssetUrl(src,attempt)");
   expect(data.updater).toContain("function hdScriptAssetUrl(src,attempt=0)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v449");
+  expect(data.sw).toContain("harbordesk-pwa-v450");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -2650,7 +2650,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=449');
+  expect(source).toContain('const BUILD=450');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -6211,17 +6211,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=449',
-      'map-images.js?v=449',
-      'map-tabs.js?v=449',
-      'map-interactive.js?v=449',
-      'map-advanced-data.js?v=449'
+      'map-details.js?v=450',
+      'map-images.js?v=450',
+      'map-tabs.js?v=450',
+      'map-interactive.js?v=450',
+      'map-advanced-data.js?v=450'
     ];
     const requiredStyles = [
-      'map-details.css?v=449',
-      'map-tabs.css?v=449',
-      'map-images.css?v=449',
-      'map-interactive.css?v=449'
+      'map-details.css?v=450',
+      'map-tabs.css?v=450',
+      'map-images.css?v=450',
+      'map-interactive.css?v=450'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -6282,7 +6282,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('[data-map-pane="mine"] #customFleetPanel')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=449');
+  expect(src).toBe('app.js?v=450');
   expect(errors).toEqual([]);
 });
 
@@ -9107,5 +9107,93 @@ test('release smoke: failed dynamic module can recover on retry', async ({ page 
   });
 
   expect(result).toEqual({ race: true, status: 'ok', count: 1, loaded: '1' });
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: sortie sync preserves battle rank separately from later retreat', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdKcParseImport === 'function' &&
+    typeof window.hdKcPreviewData === 'function' &&
+    typeof window.hdKcApplyImport === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-sortie-log-v1','[]');
+    const bundle = {
+      format:'harbordesk-kancolle-import',
+      version:2,
+      captureId:'smoke-sortie-retreat-rank',
+      createdAt:new Date().toISOString(),
+      records:[
+        {
+          endpoint:'/kcsapi/api_req_map/start',
+          at:1000,
+          payload:{api_result:1,api_data:{api_maparea_id:2,api_mapinfo_no:3,api_no:1,api_event_id:4,api_event_kind:1,api_bosscell_no:10}}
+        },
+        {
+          endpoint:'/kcsapi/api_req_sortie/battleresult',
+          at:2000,
+          payload:{api_result:1,api_data:{api_win_rank:'A',api_quest_name:'東部オリョール海',api_get_ship:null}}
+        },
+        {
+          endpoint:'/kcsapi/api_port/port',
+          at:3000,
+          payload:{api_result:1,api_data:{api_ship:[],api_deck_port:[],api_ndock:[],api_material:[]}}
+        }
+      ]
+    };
+    const parsed=window.hdKcParseImport(JSON.stringify(bundle));
+    const preview=window.hdKcPreviewData(parsed);
+    window.hdKcApplyImport(preview,{ships:false,equipment:false,resources:false,fleets:false,timers:false,quests:false,sorties:true});
+    const row=(JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]')||[])[0]||null;
+    localStorage.setItem('harbordesk-sortie-log-v1','[]');
+    return row&&{result:row.result,retreat:row.retreat,battles:row.battles};
+  });
+
+  expect(data).toEqual({result:'A',retreat:true,battles:1});
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: Quick Nav sees current workspace state and back history', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdWSShowElement === 'function' &&
+    typeof window.hdWSGoBack === 'function' &&
+    typeof window.hdQNEnsure === 'function' &&
+    typeof window.hdQNRenderContext === 'function'
+  );
+
+  const result = await page.evaluate(() => {
+    window.hdWSShowElement('roster', false);
+    window.hdWSShowElement('equipmentBook', false);
+    const before = {
+      group: window.hdWSState?.group || '',
+      section: window.hdWSState?.sections?.[window.hdWSState?.group] || '',
+      history: window.hdWSHistoryLoad?.().length || 0
+    };
+    const back = window.hdWSGoBack();
+    window.hdQNEnsure();
+    window.hdQNRenderContext();
+    const group = window.hdWSState?.group || '';
+    return {
+      exposed: !!window.hdWSState,
+      before,
+      back,
+      after: window.hdWSState?.sections?.[group] || '',
+      activeContext: document.querySelector('[data-hd-qn-context].active')?.dataset.hdQnContext || ''
+    };
+  });
+
+  expect(result.exposed).toBe(true);
+  expect(result.before.section).toBe('equipmentBook');
+  expect(result.before.history).toBeGreaterThan(0);
+  expect(result.back).toBe(true);
+  expect(result.after).toBe('roster');
+  expect(result.activeContext).toBe('roster');
   expect(errors).toEqual([]);
 });

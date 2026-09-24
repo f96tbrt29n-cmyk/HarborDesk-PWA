@@ -5,6 +5,7 @@ test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true
 async function openApp(page) {
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => typeof homeGuideRender === 'function' && typeof hdShipDbAcquisitionRows === 'function' && typeof hdDropAllTargets === 'function' && typeof HD_CONSTRUCTION_RECIPES !== 'undefined', null, { timeout: 30000 });
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
 }
 
 test('guide: steps open the right screen and survive a reload', async ({ page }) => {
@@ -15,6 +16,7 @@ test('guide: steps open the right screen and survive a reload', async ({ page })
   await steps.first().locator('[data-home-guide-toggle]').click();
   await expect(page.locator('#homeGuideCount')).toHaveText('1/7 完了');
   await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
   await expect(page.locator('#homeGuideCount')).toHaveText('1/7 完了');
   await steps.first().locator('[data-home-guide-toggle]').click();
   await expect(page.locator('#homeGuideCount')).toHaveText('0/7 完了');
@@ -35,6 +37,7 @@ test('guide: completed map advances to the next map and restarts per-map steps',
   await expect(page.locator('.home-guide-map')).toContainText('2-5');
   await expect(page.locator('#homeGuideSteps .home-guide-step.current')).toContainText('海域');
   await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
   await expect(page.locator('#homeGuideCount')).toHaveText('2/7 完了');
   await expect(page.locator('.home-guide-map')).toContainText('2-5');
 });
