@@ -66,7 +66,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: smoke-${{ matrix.browser }}-${{ github.run_id }}
+          name: smoke-${{ matrix.browser }}-shard-${{ matrix.shard }}-of-${{ matrix.shards }}-${{ github.run_id }}
           path: |
             playwright-report/
             test-results/
