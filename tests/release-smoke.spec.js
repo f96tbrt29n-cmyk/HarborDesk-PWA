@@ -2656,6 +2656,41 @@ test('release smoke: completed repeat-sortie series can be compared side by side
 });
 
 
+test('release smoke: series comparison treats missing resource telemetry as unknown', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSPASeriesComparison === 'function' &&
+    typeof window.hdSPASeriesComparisonHtml === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const rows = [
+      {id:'known-1',seriesId:'known',cycleIndex:1,map:'2-4',source:'session',at:1000,result:'S',boss:true,fuel:100,ammo:50,buckets:1},
+      {id:'known-2',seriesId:'known',cycleIndex:2,map:'2-4',source:'session',at:2000,result:'S',boss:true,fuel:100,ammo:50,buckets:0},
+      {id:'unknown-1',seriesId:'unknown',cycleIndex:1,map:'2-4',source:'kancolle-import',at:3000,result:'A',boss:true,fuel:0,ammo:0,steel:0,bauxite:0,buckets:0},
+      {id:'unknown-2',seriesId:'unknown',cycleIndex:2,map:'2-4',source:'kancolle-import',at:4000,result:'A',boss:true,fuel:0,ammo:0,steel:0,bauxite:0,buckets:0}
+    ];
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify(rows));
+    localStorage.setItem('harbordesk-sortie-analytics-mode-v1','series');
+    const grouped=window.hdSPARows();
+    const compare=window.hdSPASeriesComparison(grouped);
+    return {compare,html:window.hdSPASeriesComparisonHtml(grouped)};
+  });
+
+  const known=data.compare.find(x=>x.seriesId==='known');
+  const unknown=data.compare.find(x=>x.seriesId==='unknown');
+  expect(known.resourcePerCycle).toBe(150);
+  expect(known.bucketsPerCycle).toBe(0.5);
+  expect(unknown.resourcePerCycle).toBeNull();
+  expect(unknown.bucketsPerCycle).toBeNull();
+  expect(unknown.badges).not.toContain('資源/周 最小');
+  expect(unknown.badges).not.toContain('バケツ/周 最小');
+  expect(data.html).toContain('資源/周 <b>—</b>');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
