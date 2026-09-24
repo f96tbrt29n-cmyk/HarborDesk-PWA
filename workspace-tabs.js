@@ -113,6 +113,7 @@ function hdWSOpenAnchorId(id,scroll=true){
  id=String(id||'').trim();if(!id||id.startsWith('kcimport='))return false;
  const el=document.getElementById(id);if(!el)return false;
  const section=hdWSManagedSectionFor(el);if(!section)return false;
+ window.__HD_WORKSPACE_DIRECT_NAV_EPOCH=(Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0)+1;
  const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
  hdWSClearPin();hdWSApply(group,section.id,{ignorePin:true});
  if(scroll)setTimeout(()=>el.scrollIntoView({behavior:'auto',block:'start'}),0);
