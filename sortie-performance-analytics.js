@@ -301,8 +301,10 @@ function hdSPASeriesComparison(rows){
   return {
    key:row.key,seriesId:s.seriesId,label:row.label,map:(row.maps||[])[0]||'',completed:!!archive,closeReason:String(archive?.closeReason||''),
    cycles,resourceTotal:Number(s.resourceTotal)||0,buckets:Number(s.buckets)||0,
-   resourcePerCycle:Number(((Number(s.resourceTotal)||0)/cycles).toFixed(1)),
-   bucketsPerCycle:Number(((Number(s.buckets)||0)/cycles).toFixed(2)),
+   // Keep comparison semantics aligned with the main analytics metrics: missing
+   // resource telemetry is unknown, not a free/zero-cost sortie.
+   resourcePerCycle:m.avgResource==null?null:Number(m.avgResource),
+   bucketsPerCycle:m.avgBuckets==null?null:Number(m.avgBuckets),
    avgCycleMin:s.avgCycleMin==null?m.avgDurationMin:Number(s.avgCycleMin),
    bossRate:Number(m.bossRate)||0,sRate:Number(m.sRate)||0,retreatRate:Number(m.retreatRate)||0,dropRate:Number(m.dropRate)||0,
    lastAt:Number(s.lastAt)||0,badges:[]
@@ -323,8 +325,8 @@ function hdSPASeriesComparisonText(rows){
   'ボス'+x.bossRate+'%',
   'S'+x.sRate+'%',
   '撤退'+x.retreatRate+'%',
-  '資源/周 '+x.resourcePerCycle,
-  'バケツ/周 '+x.bucketsPerCycle,
+  '資源/周 '+(x.resourcePerCycle==null?'—':x.resourcePerCycle),
+  'バケツ/周 '+(x.bucketsPerCycle==null?'—':x.bucketsPerCycle),
   '平均 '+(x.avgCycleMin==null?'—':x.avgCycleMin+'分')
  ].join(' / '))].join('\n');
 }
@@ -335,7 +337,7 @@ function hdSPASeriesComparisonHtml(rows){
  return '<section class="hd-spa-series-compare"><div class="hd-spa-series-compare-head"><div><strong>周回シリーズ比較</strong><span>'+items.length+'シリーズを比較</span></div><button type="button" class="ghost small" data-hd-spa-series-compare-copy>比較をコピー</button></div><div class="hd-spa-series-compare-list">'+items.map(x=>
   '<article class="'+(x.completed?'done':'active')+'"><div class="hd-spa-series-compare-title"><div><strong>'+hdSPAEsc(x.label)+'</strong><small>'+x.cycles+'周'+(x.closeReason?'｜'+hdSPAEsc(x.closeReason):'')+'</small></div><em>'+(x.completed?'完了':'進行中')+'</em></div>'+
   (x.badges.length?'<div class="hd-spa-series-compare-badges">'+x.badges.map(b=>'<span>'+hdSPAEsc(b)+'</span>').join('')+'</div>':'')+
-  '<div class="hd-spa-series-compare-metrics"><span>ボス <b>'+x.bossRate+'%</b></span><span>S勝利 <b>'+x.sRate+'%</b></span><span>撤退 <b>'+x.retreatRate+'%</b></span><span>資源/周 <b>'+x.resourcePerCycle+'</b></span><span>バケツ/周 <b>'+x.bucketsPerCycle+'</b></span><span>平均時間 <b>'+(x.avgCycleMin==null?'—':x.avgCycleMin+'分')+'</b></span></div></article>'
+  '<div class="hd-spa-series-compare-metrics"><span>ボス <b>'+x.bossRate+'%</b></span><span>S勝利 <b>'+x.sRate+'%</b></span><span>撤退 <b>'+x.retreatRate+'%</b></span><span>資源/周 <b>'+(x.resourcePerCycle==null?'—':x.resourcePerCycle)+'</b></span><span>バケツ/周 <b>'+(x.bucketsPerCycle==null?'—':x.bucketsPerCycle)+'</b></span><span>平均時間 <b>'+(x.avgCycleMin==null?'—':x.avgCycleMin+'分')+'</b></span></div></article>'
  ).join('')+'</div><p>同じ海域でも編成・方針・周回条件が違う場合があるため、比較値は実戦記録として見るよ。</p></section>';
 }
 function hdSPAMaps(){
