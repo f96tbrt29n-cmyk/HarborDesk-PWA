@@ -1149,18 +1149,20 @@ test('ship image integrity audit fingerprints duplicates and invalid master IDs'
     await window.hdShipImagePut?.(999999, invalid, '存在しない艦', true);
 
     const db = await window.hdShipImageOpenDb?.();
-    const legacyBlob = new Blob([new Uint8Array([1,3,5,7,9,11])], { type: 'image/png' });
+    const legacyBytes = new Uint8Array([1,3,5,7,9,11]).buffer;
     await new Promise((resolve, reject) => {
       const tx = db.transaction('images', 'readwrite');
       tx.objectStore('images').put({
         id: legacyId,
         name: allShips[String(legacyId)]?.name || 'legacy',
-        blob: legacyBlob,
+        bytes: legacyBytes,
         type: 'image/png',
+        hash: '',
         updatedAt: Date.now()
       });
       tx.oncomplete = resolve;
-      tx.onerror = () => reject(tx.error);
+      tx.onerror = () => reject(tx.error || new Error('ship image legacy-row write failed'));
+      tx.onabort = () => reject(tx.error || new Error('ship image legacy-row write aborted'));
     });
     await window.hdShipImageRefreshLocalIds?.();
 
