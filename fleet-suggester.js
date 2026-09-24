@@ -189,7 +189,7 @@ function hdFSOpen(){
   else hdFSReveal(target);
   navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||navEpoch;
  };
- requestAnimationFrame(settle);setTimeout(settle,80);setTimeout(settle,420);setTimeout(settle,1200);setTimeout(settle,1900);setTimeout(settle,3600);
+ requestAnimationFrame(settle);[80,420,1200,1900,3600,6500,9500,13500].forEach(function(ms){setTimeout(settle,ms)});
  return !!opened;
 }
 function hdFSOpenRoster(){if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return true;return hdFSReveal(document.getElementById('roster'))}
