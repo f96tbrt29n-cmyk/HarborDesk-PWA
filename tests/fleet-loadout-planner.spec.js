@@ -76,10 +76,12 @@ test('automatic loadout never consumes more equipment than owned', async ({ page
   expect(plan.ships.filter(x => x.ship)).toHaveLength(6);
 });
 
-test('fleet suggester recovers after a redraw later than the old 3.6s window', async ({ page }) => {
+test('fleet suggester recovers after a late redraw and yields to newer guide navigation', async ({ page }) => {
   await boot(page);
   await prepare32(page, false);
 
+  // The old recovery window ended at 3.6s. Force a non-user redraw after that
+  // point and verify the new 6.5s settle pass restores the fleet suggester.
   await page.waitForTimeout(4200);
   const before = await page.evaluate(() => {
     const epoch = Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH) || 0;
@@ -99,13 +101,39 @@ test('fleet suggester recovers after a redraw later than the old 3.6s window', a
     () => page.evaluate(() => {
       const el=document.getElementById('hdFleetSuggester');
       return {
-        epoch:Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0,
         section:window.hdWSState?.sections?.guide||'',
         visible:!!el&&!el.hidden&&!el.classList.contains('hd-ws-hidden')
       };
     }),
     { timeout: 5000 }
-  ).toEqual({ epoch:before.epoch, section:'hdFleetSuggester', visible:true });
+  ).toEqual({ section:'hdFleetSuggester', visible:true });
+
+  // A later explicit move inside the same guide workspace must cancel the
+  // remaining 9.5s / 13.5s recovery passes instead of reopening the suggester.
+  const explicit = await page.evaluate(() => {
+    const recoveredEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0;
+    window.hdWSShowElement?.('guide', false);
+    return {
+      recoveredEpoch,
+      epoch:Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0,
+      section:window.hdWSState?.sections?.guide||''
+    };
+  });
+  expect(explicit.epoch).toBeGreaterThan(explicit.recoveredEpoch);
+  expect(explicit.section).toBe('guide');
+
+  await page.waitForTimeout(3600);
+  const after = await page.evaluate(() => {
+    const el=document.getElementById('hdFleetSuggester');
+    return {
+      epoch:Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0,
+      section:window.hdWSState?.sections?.guide||'',
+      visible:!!el&&!el.hidden&&!el.classList.contains('hd-ws-hidden')
+    };
+  });
+  expect(after.epoch).toBe(explicit.epoch);
+  expect(after.section).toBe('guide');
+  expect(after.visible).toBe(false);
 });
 
 test('generated loadout can be saved into the custom fleet gear fields', async ({ page }) => {
