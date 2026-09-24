@@ -1,4 +1,5 @@
 const HD_CONSTRUCTION_TIMER_KEY='harbordesk-construction-timers-v1';
+const HD_CONSTRUCTION_VIEW_KEY='harbordesk-session-construction-view-v1';
 
 const HD_CONSTRUCTION_RECIPES=[
  {id:'n-min',type:'normal',group:'駆逐・軽巡',fuel:30,ammo:30,steel:30,bauxite:30,target:['駆逐艦','軽巡洋艦'],note:'最低値。主に駆逐・軽巡。レア駆逐・レア軽巡・潜水艦は対象外。'},
@@ -54,6 +55,12 @@ const HD_CONSTRUCTION_TIMES=[
 ];
 
 let hdConstructionMode='normal';
+function hdConstructionViewLoad(){try{return JSON.parse(sessionStorage.getItem(HD_CONSTRUCTION_VIEW_KEY)||'{}')||{}}catch{return {}}}
+function hdConstructionViewSave(patch={}){const next={...hdConstructionViewLoad(),...patch};try{sessionStorage.setItem(HD_CONSTRUCTION_VIEW_KEY,JSON.stringify(next))}catch{}return next}
+{
+ const saved=hdConstructionViewLoad(),mode=String(saved.mode||'');
+ if(['normal','large','time'].includes(mode))hdConstructionMode=mode;
+}
 
 function hdConstructionEsc(s){return typeof esc==='function'?esc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdConstructionOwnedSet(){
@@ -75,8 +82,25 @@ function hdEnsureConstructionSection(){
  <div class="hd-construction-warning">建造レシピは結果を保証しないよ。特に大型建造の集計値は有志報告の比率で、実際の出現確率ではない。資源に余裕を持って使ってね。</div>
  <div class="hd-construction-toolbar"><div class="hd-construction-tabs"><button class="active" data-hd-build-mode="normal">通常建造</button><button data-hd-build-mode="large">大型艦建造</button><button data-hd-build-mode="time">建造時間</button></div><input id="hdConstructionSearch" type="search" placeholder="艦名・艦種・レシピで検索"></div>
  <div id="hdConstructionBody"></div><div id="hdConstructionTimers" class="hd-build-timers"></div>`;
- anchor.insertAdjacentElement('afterend',s);renderConstructionDb();
+ anchor.insertAdjacentElement('afterend',s);
+ const view=hdConstructionViewLoad(),input=s.querySelector('#hdConstructionSearch');
+ if(['normal','large','time'].includes(String(view.mode||'')))hdConstructionMode=String(view.mode);
+ if(input)input.value=String(view.query||'');
+ renderConstructionDb();
 }
+function hdConstructionOpenSearch(query,mode='normal'){
+ hdEnsureConstructionSection();
+ if(['normal','large','time'].includes(String(mode||'')))hdConstructionMode=String(mode);
+ const input=document.getElementById('hdConstructionSearch'),target=document.getElementById('constructionDb');
+ if(!input||!target)return false;
+ input.value=String(query||'');
+ hdConstructionViewSave({query:input.value,mode:hdConstructionMode});
+ renderConstructionDb();
+ if(typeof window.hdWSShowElement==='function')window.hdWSShowElement(target,true);
+ else target.scrollIntoView?.({behavior:'smooth',block:'start'});
+ return true;
+}
+window.hdConstructionOpenSearch=hdConstructionOpenSearch;
 function renderConstructionDb(){
  const body=document.getElementById('hdConstructionBody');if(!body)return;
  const q=(document.getElementById('hdConstructionSearch')?.value||'').trim().toLowerCase();
@@ -101,12 +125,12 @@ async function hdCopyConstructionRecipe(id){
  const r=HD_CONSTRUCTION_RECIPES.find(x=>x.id===id);if(!r)return;const text=hdConstructionCost(r);try{await navigator.clipboard.writeText(text)}catch{};alert(`コピーしたよ: ${text}`)
 }
 document.addEventListener('click',e=>{
- const mode=e.target.closest?.('[data-hd-build-mode]');if(mode){hdConstructionMode=mode.dataset.hdBuildMode;renderConstructionDb();return}
+ const mode=e.target.closest?.('[data-hd-build-mode]');if(mode){hdConstructionMode=mode.dataset.hdBuildMode;hdConstructionViewSave({mode:hdConstructionMode});renderConstructionDb();return}
  const copy=e.target.closest?.('[data-hd-copy-build]');if(copy){hdCopyConstructionRecipe(copy.dataset.hdCopyBuild);return}
  const timer=e.target.closest?.('[data-hd-build-timer]');if(timer){hdStartConstructionTimer(timer.dataset.hdBuildTimer,timer.dataset.hdBuildLabel);return}
  const del=e.target.closest?.('[data-hd-build-delete]');if(del){hdSaveConstructionTimers(hdConstructionTimers().filter(x=>x.id!==del.dataset.hdBuildDelete));renderConstructionTimers();hdConstructionNotify();return}
 });
-document.addEventListener('input',e=>{if(e.target.id==='hdConstructionSearch')renderConstructionDb()});
+document.addEventListener('input',e=>{if(e.target.id==='hdConstructionSearch'){hdConstructionViewSave({query:e.target.value});renderConstructionDb()}});
 setInterval(()=>{
  document.querySelectorAll('[data-hd-build-end]').forEach(el=>{const left=Number(el.dataset.hdBuildEnd)-Date.now();el.textContent=hdConstructionFmt(left);el.closest('.hd-build-timer-row')?.classList.toggle('done',left<=0)})
 },1000);
