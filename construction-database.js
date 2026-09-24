@@ -89,15 +89,24 @@ function hdEnsureConstructionSection(){
  renderConstructionDb();
 }
 function hdConstructionOpenSearch(query,mode='normal'){
+ const wantedQuery=String(query||''),wantedMode=['normal','large','time'].includes(String(mode||''))?String(mode):'normal';
  hdEnsureConstructionSection();
- if(['normal','large','time'].includes(String(mode||'')))hdConstructionMode=String(mode);
- const input=document.getElementById('hdConstructionSearch'),target=document.getElementById('constructionDb');
+ hdConstructionMode=wantedMode;
+ let input=document.getElementById('hdConstructionSearch'),target=document.getElementById('constructionDb');
  if(!input||!target)return false;
- input.value=String(query||'');
- hdConstructionViewSave({query:input.value,mode:hdConstructionMode});
- renderConstructionDb();
- if(typeof window.hdWSShowElement==='function')window.hdWSShowElement(target,true);
+ hdConstructionViewSave({query:wantedQuery,mode:wantedMode});
+ const apply=()=>{
+  const saved=hdConstructionViewLoad();
+  if(String(saved.query||'')!==wantedQuery||String(saved.mode||'')!==wantedMode)return false;
+  hdEnsureConstructionSection();
+  input=document.getElementById('hdConstructionSearch');target=document.getElementById('constructionDb');
+  if(!input||!target)return false;
+  hdConstructionMode=wantedMode;input.value=wantedQuery;renderConstructionDb();return true;
+ };
+ apply();
+ if(typeof window.hdWSShowElement==='function')window.hdWSShowElement(target,true,{lockMs:6500});
  else target.scrollIntoView?.({behavior:'smooth',block:'start'});
+ requestAnimationFrame(apply);[80,320,900,1800].forEach(ms=>setTimeout(apply,ms));
  return true;
 }
 window.hdConstructionOpenSearch=hdConstructionOpenSearch;
