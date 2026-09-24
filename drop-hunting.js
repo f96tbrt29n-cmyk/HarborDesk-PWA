@@ -311,7 +311,12 @@ function hdDropEsc(s){return typeof esc==='function'?esc(s):String(s??'').replac
 function hdDropRosterNames(){try{return new Set((JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')||[]).map(x=>String(x.name||'').trim()).filter(Boolean))}catch{return new Set()}}
 function hdDropOwned(ship){const names=hdDropRosterNames();return [...names].some(n=>n===ship||n.startsWith(ship))}
 function hdDropHunts(){try{return JSON.parse(localStorage.getItem(HD_DROP_HUNT_KEY)||'[]')||[]}catch{return []}}
-function hdDropSave(v){localStorage.setItem(HD_DROP_HUNT_KEY,JSON.stringify(v));hdRenderDropHunts();hdRenderDropDb()}
+function hdDropSave(v){
+ localStorage.setItem(HD_DROP_HUNT_KEY,JSON.stringify(v));hdRenderDropHunts();hdRenderDropDb();
+ const refresh=()=>{hdEnsureDropDb();hdRenderDropHunts();hdRenderDropDb()};
+ requestAnimationFrame(refresh);setTimeout(refresh,80);setTimeout(refresh,360);setTimeout(refresh,900);setTimeout(refresh,1800);
+ window.dispatchEvent(new CustomEvent('hd:drop-hunts-changed',{detail:{count:Array.isArray(v)?v.length:0}}));
+}
 function hdDropUid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)}
 function hdRenderDropDb(){
  const host=document.getElementById('hdDropDbList');if(!host)return;
@@ -326,7 +331,7 @@ function hdRenderDropHunts(){
  const host=document.getElementById('hdDropHuntList');if(!host)return;const rows=hdDropHunts();
  host.innerHTML=rows.length?rows.map(h=>`<article class="hd-hunt-card${h.obtained?' done':''}"><div class="hd-hunt-head"><div><strong>${hdDropEsc(h.ship)}</strong><span>${hdDropEsc(h.map)} ${hdDropEsc(h.node)}</span></div><button class="ghost small" type="button" data-hd-hunt-delete="${h.id}">削除</button></div><div class="hd-hunt-stats"><span>周回 <b>${h.runs||0}</b></span><span>S <b>${h.s||0}</b></span><span>A <b>${h.a||0}</b></span></div><div class="hd-hunt-actions"><button class="ghost small" data-hd-hunt-add="${h.id}" data-field="runs">＋1周</button><button class="ghost small" data-hd-hunt-add="${h.id}" data-field="s">＋S</button><button class="ghost small" data-hd-hunt-add="${h.id}" data-field="a">＋A</button><button class="primary small" data-hd-hunt-obtained="${h.id}">${h.obtained?'入手済み ✓':'入手した！'}</button></div>${h.obtained&&!hdDropOwned(h.ship)?`<button class="ghost small" data-hd-hunt-roster="${h.id}">艦隊台帳へ追加</button>`:''}</article>`).join(''):'<div class="empty">掘り目標はまだないよ。下の逆引きから追加できる。</div>';
 }
-function hdAddDropTarget(ship,map,node){const rows=hdDropHunts();if(rows.some(x=>x.ship===ship&&x.map===map&&x.node===node&&!x.obtained)){document.getElementById('hdDropHuntList')?.scrollIntoView({behavior:'smooth',block:'center'});return}rows.unshift({id:hdDropUid(),ship,map,node,runs:0,s:0,a:0,obtained:false,createdAt:Date.now()});hdDropSave(rows);document.getElementById('hdDropHuntList')?.scrollIntoView({behavior:'smooth',block:'center'})}
+function hdAddDropTarget(ship,map,node){const rows=hdDropHunts();if(rows.some(x=>x.ship===ship&&x.map===map&&x.node===node&&!x.obtained)){hdEnsureDropDb();hdRenderDropHunts();document.getElementById('hdDropHuntList')?.scrollIntoView({behavior:'smooth',block:'center'});return}rows.unshift({id:hdDropUid(),ship,map,node,runs:0,s:0,a:0,obtained:false,createdAt:Date.now()});hdDropSave(rows);document.getElementById('hdDropHuntList')?.scrollIntoView({behavior:'smooth',block:'center'})}
 function hdEnsureDropDb(){
  if(document.getElementById('dropHuntingDb'))return;const anchor=document.getElementById('shipDatabase')||document.getElementById('roster');if(!anchor)return;
  const maps=['すべて',...Object.keys(HD_MAP_DROP_DATA)].sort((a,b)=>a==='すべて'?-1:a.localeCompare(b,undefined,{numeric:true}));

@@ -387,11 +387,15 @@ function hdPLForceReveal(target){
 }
 function hdPLOpenList(){
  hdPLEnsure();const target=document.getElementById('hdEquipmentProcurement');if(!target)return false;
- let opened=false;
+ let opened=false,fallback=false;
  if(typeof window.hdRevealWorkspaceTarget==='function')opened=window.hdRevealWorkspaceTarget(target,true)!==false;
  if(!opened&&typeof hdWSShowElement==='function')opened=hdWSShowElement(target,true)!==false;
  if(!opened&&typeof hdQNJump==='function')opened=hdQNJump('hdEquipmentProcurement')!==false;
- if(!opened)opened=hdPLForceReveal(target);
+ if(!opened){opened=hdPLForceReveal(target);fallback=opened}
+ if(fallback){
+  const keep=()=>{if(document.contains(target)&&(target.hidden||target.classList.contains('hd-ws-hidden')||target.closest('.hd-ws-wrapper-hidden')))hdPLForceReveal(target)};
+  requestAnimationFrame(keep);setTimeout(keep,80);setTimeout(keep,360);
+ }
  return opened;
 }
 document.addEventListener('click',e=>{

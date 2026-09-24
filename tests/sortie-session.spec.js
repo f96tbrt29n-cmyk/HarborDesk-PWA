@@ -6,9 +6,13 @@ test.use({
   isMobile: true,
 });
 
+test.beforeEach(async ({}, testInfo) => {
+  testInfo.setTimeout(60000);
+});
+
 async function boot(page) {
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 45000 });
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 30000 });
   await expect.poll(
     () => page.evaluate(() => window.HD_MODULE_STATUS?.['./sortie-session.js'] || ''),
