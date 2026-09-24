@@ -23,7 +23,7 @@ permissions:
 
 jobs:
   smoke:
-    name: Smoke / ${{ matrix.browser }}
+    name: Smoke / ${{ matrix.browser }} / shard ${{ matrix.shard }} of ${{ matrix.shards }}
     if: github.event_name != 'workflow_dispatch' || inputs.suite == 'smoke'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -33,8 +33,16 @@ jobs:
         include:
           - browser: chromium
             workers: 2
+            shard: 1
+            shards: 1
           - browser: webkit
             workers: 1
+            shard: 1
+            shards: 2
+          - browser: webkit
+            workers: 1
+            shard: 2
+            shards: 2
 
     steps:
       - name: Checkout
@@ -52,7 +60,7 @@ jobs:
         run: npx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run smoke browser regression
-        run: npm run test:browser -- --project=${{ matrix.browser }} --workers=${{ matrix.workers }}
+        run: npm run test:browser -- --project=${{ matrix.browser }} --workers=${{ matrix.workers }} --shard=${{ matrix.shard }}/${{ matrix.shards }}
 
       - name: Upload Playwright diagnostics
         if: failure()
