@@ -2719,7 +2719,8 @@ test('mobile synced import UI is compact', async ({ page }) => {
   const errors=[];
   await page.addInitScript(() => {
     localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
-      syncedAt:Date.now(),ships:206,equipment:93,materials:8,decks:4,expeditions:0,docks:0,quests:0,sorties:0
+      syncedAt:Date.now(),ships:206,equipment:93,materials:8,decks:4,expeditions:0,docks:0,quests:0,sorties:0,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true,sorties:true}
     }));
   });
   await boot(page,errors);
@@ -3131,14 +3132,14 @@ test('Kancolle sync coverage distinguishes captured and zero sections', async ({
     return {
       text:box?.textContent||'',
       ok:box?.querySelectorAll('.ok').length||0,
-      zero:box?.querySelectorAll('.zero').length||0
+      capturedZero:[...box?.querySelectorAll('.ok')||[]].filter(x=>(x.textContent||'').includes('取得済み・0')).length||0
     };
   });
   expect(data.text).toContain('艦娘');
   expect(data.text).toContain('任務');
-  expect(data.text).toContain('未取得/なし');
+  expect(data.text).toContain('取得済み・0');
   expect(data.ok).toBeGreaterThan(0);
-  expect(data.zero).toBeGreaterThan(0);
+  expect(data.capturedZero).toBeGreaterThan(0);
 });
 
 
@@ -3216,7 +3217,7 @@ test('map tabs stay usable with sticky mobile navigation', async ({ page }) => {
   const data=await page.evaluate(()=>{
     if(typeof MAP_DETAILS==='undefined')return {ok:false};
     const key=Object.keys(MAP_DETAILS)[0];
-    window.selectedMap=key;
+    window.hdSelectGuideMap?.(key,{filter:'map'});
     window.hdApplyMapTabs?.();
     const bar=document.querySelector('.map-tab-bar'),buttons=[...document.querySelectorAll('.map-tab-btn')];
     const gear=buttons.find(x=>x.dataset.mapTab==='gear');
@@ -3284,7 +3285,7 @@ test('action toast can undo destructive actions', async ({ page }) => {
     localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'undo-1',name:'加賀改',level:94,tags:[]}]));
   });
   await boot(page,errors);
-  await page.evaluate(()=>window.renderShipRoster?.());
+  await page.evaluate(()=>{window.renderShipRoster?.();window.hdWSShowElement?.('roster',false)});
   const deleteButton=page.locator('[data-roster-delete="undo-1"]');
   await expect(deleteButton).toHaveCount(1);
   await deleteButton.click();
@@ -3305,7 +3306,7 @@ test('equipment delete can be undone from action toast', async ({ page }) => {
     localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([{id:'eq-undo-1',name:'22号対水上電探',category:'電探',count:1,star:0,targetStar:0}]));
   });
   await boot(page,errors);
-  await page.evaluate(()=>window.renderEquipment?.());
+  await page.evaluate(()=>{window.renderEquipment?.();window.hdWSShowElement?.('equipmentBook',false)});
   const del=page.locator('[data-eq-delete="eq-undo-1"]');
   await expect(del).toHaveCount(1);
   await del.click();
@@ -3362,12 +3363,13 @@ test('empty states provide direct next actions', async ({ page }) => {
   expect(first.quest).toBe(true);
   expect(first.roster).toBe(true);
 
-  const filtered=await page.evaluate(()=>{
+  const filtered=await page.evaluate(async()=>{
     localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'a',name:'加賀改',level:94,tags:[]}]));
     window.renderShipRoster?.();
     const input=document.getElementById('shipRosterSearch');if(input){input.value='存在しない艦';input.dispatchEvent(new Event('input',{bubbles:true}))}
     window.hdEnsureShipDatabase?.();const shipInput=document.getElementById('hdShipDbSearch');if(shipInput){shipInput.value='存在しない艦';shipInput.dispatchEvent(new Event('input',{bubbles:true}))}
     window.hdEnsureEquipmentCatalog?.();const equipInput=document.getElementById('hdEquipCatalogSearch');if(equipInput){equipInput.value='存在しない装備';equipInput.dispatchEvent(new Event('input',{bubbles:true}))}
+    await new Promise(r=>setTimeout(r,140));
     return {
       rosterReset:!!document.querySelector('#shipRosterList [data-empty-roster-reset]'),
       shipReset:!!document.querySelector('#hdShipDbList [data-hd-shipdb-empty-reset]'),
@@ -3609,13 +3611,13 @@ test('home reorder controls persist card order', async ({ page }) => {
   });
   await boot(page,errors);
   const before=await page.evaluate(()=>[...document.querySelectorAll('#home [data-home-order-item]')].map(x=>x.dataset.homeOrderItem));
-  expect(before).toEqual(['quick','resources','recent','procurement']);
+  expect(before).toEqual(['quick','resources','recent','procurement','fleet']);
   await page.locator('[data-home-order-item="recent"] [data-home-move="up"]').click();
   const after=await page.evaluate(()=>({
     dom:[...document.querySelectorAll('#home [data-home-order-item]')].map(x=>x.dataset.homeOrderItem),
     saved:JSON.parse(localStorage.getItem('harbordesk-home-order-v1')||'[]')
   }));
-  expect(after.dom).toEqual(['quick','recent','resources','procurement']);
+  expect(after.dom).toEqual(['quick','recent','resources','procurement','fleet']);
   expect(after.saved).toEqual(after.dom);
 });
 
@@ -3654,9 +3656,9 @@ test('home order can reset to default without touching panel state', async ({ pa
       dom:[...document.querySelectorAll('#home [data-home-order-item]')].map(x=>x.dataset.homeOrderItem)
     };
   });
-  expect(data.order).toEqual(['resources','procurement','quick','recent']);
+  expect(data.order).toEqual(['fleet','resources','procurement','quick','recent']);
   expect(data.panels.resources).toBe(true);
-  expect(data.dom).toEqual(['resources','procurement','quick','recent']);
+  expect(data.dom).toEqual(['fleet','resources','procurement','quick','recent']);
 });
 
 
@@ -3696,6 +3698,7 @@ test('core quest and timer filters keep completed items out of the way', async (
       expedition:document.getElementById('expeditionList')?.textContent||'',
       dock:document.getElementById('dockList')?.textContent||'',
       quest:document.getElementById('questList')?.textContent||'',
+      questNames:[...document.querySelectorAll('#questList .quest-name')].map(x=>x.textContent||''),
       expCount:document.getElementById('expeditionFilterCount')?.textContent||'',
       questCount:document.getElementById('questFilterCount')?.textContent||''
     };
@@ -3704,8 +3707,8 @@ test('core quest and timer filters keep completed items out of the way', async (
   expect(data.expedition).not.toContain('完了遠征');
   expect(data.dock).toContain('入渠中');
   expect(data.dock).not.toContain('入渠完了');
-  expect(data.quest).toContain('未完了任務');
-  expect(data.quest).not.toContain('完了任務');
+  expect(data.questNames).toContain('未完了任務');
+  expect(data.questNames).not.toContain('完了任務');
   expect(data.expCount).toContain('1 / 2');
   expect(data.questCount).toContain('1 / 2');
 
@@ -3759,7 +3762,7 @@ test('equipment ledger preserves search and shows filtered count', async ({ page
     cards:document.querySelectorAll('#equipmentList .advanced-card').length
   }));
   expect(data.query).toBe('電探');
-  expect(data.count).toBe('1 / 2件');
+  expect(data.count).toBe('1種類・2個 / 全2種類・3個');
   expect(data.clearDisabled).toBe(false);
   expect(data.cards).toBe(1);
 });
@@ -3783,6 +3786,7 @@ test('completed core items can be bulk cleaned and undone', async ({ page }) => 
   expect(data.expCleanup).toBe(true);
   expect(data.questCleanup).toBe(true);
 
+  await page.evaluate(()=>window.hdWSShowElement?.('quests',false));
   await page.locator('[data-core-cleanup="quest"]').click();
   let rows=await page.evaluate(()=>state.quests.map(x=>x.id));
   expect(rows).toEqual(['q-active']);
@@ -3797,7 +3801,7 @@ test('completed core items can be bulk cleaned and undone', async ({ page }) => 
 test('core completed cleanup supports undo', async ({ page }) => {
   const now=Date.now();
   await page.addInitScript(({now}) => {
-    localStorage.setItem('harbordesk-v2', JSON.stringify({
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
       expeditions:[
         {id:'e-done',name:'完了遠征',endsAt:now-1000},
         {id:'e-active',name:'稼働遠征',endsAt:now+3600000}
@@ -3811,6 +3815,7 @@ test('core completed cleanup supports undo', async ({ page }) => {
     }));
   }, {now});
   await boot(page,[]);
+  await page.evaluate(()=>window.hdWSShowElement?.('quests',false));
   await page.waitForSelector('[data-core-cleanup="quest"]:not([hidden])');
 
   const labels=await page.evaluate(()=>({
@@ -3823,18 +3828,18 @@ test('core completed cleanup supports undo', async ({ page }) => {
   expect(labels.quest).toContain('1');
 
   await page.click('[data-core-cleanup="quest"]');
-  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests.map(x=>x.id)).toEqual(['q-active']);
 
   await page.click('#hdToastRegion .hd-toast-action');
-  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests.map(x=>x.id)).toEqual(['q-done','q-active']);
 });
 
 
 test('home task can complete quest with undo', async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('harbordesk-v2', JSON.stringify({
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
       expeditions:[],docks:[],
       quests:[{id:'q-home',name:'ホーム確認任務',done:false}],
       resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
@@ -3843,11 +3848,11 @@ test('home task can complete quest with undo', async ({ page }) => {
   await boot(page,[]);
   await page.waitForSelector('[data-home-quest-done="q-home"]');
   await page.click('[data-home-quest-done="q-home"]');
-  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests[0].done).toBe(true);
   expect(await page.locator('#homeTodo').textContent()).toContain('未完了の任務はないよ');
   await page.click('#hdToastRegion .hd-toast-action');
-  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests[0].done).toBe(false);
   expect(await page.locator('#homeTodo').textContent()).toContain('ホーム確認任務');
 });
@@ -3855,7 +3860,7 @@ test('home task can complete quest with undo', async ({ page }) => {
 
 test('home empty states offer direct add actions', async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('harbordesk-v2', JSON.stringify({
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
       expeditions:[],docks:[],quests:[],
       resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
     }));
@@ -3875,6 +3880,7 @@ test('home empty states offer direct add actions', async ({ page }) => {
 
 test('guide empty search can reset conditions', async ({ page }) => {
   await boot(page,[]);
+  await page.evaluate(()=>window.hdWSShowElement?.('guide',false));
   await page.fill('#guideQuery','絶対に存在しない検索語XYZ123');
   await page.click('#guideSearchBtn');
   await page.waitForSelector('[data-guide-clear-query]');
@@ -3927,6 +3933,7 @@ test('guide view restores query filter and selected map in session', async ({ pa
   expect(data.filter).toBe('expedition');
   expect(data.selected).toBe('5-5');
   expect(data.resetHidden).toBe(false);
+  await page.evaluate(()=>window.hdWSShowElement?.('guide',false));
   await page.click('#guideResetBtn');
   expect(await page.inputValue('#guideQuery')).toBe('');
   const resetState=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('harbordesk-session-guide-view-v1')||'{}'));
@@ -4266,11 +4273,13 @@ test('manual timers and quests can be edited', async ({ page }) => {
     }));
   });
   await boot(page,errors);
+  await page.evaluate(()=>window.hdWSShowElement?.('expeditions',false));
   const timerEdit=page.locator('[data-edit-timer="t1"]');
   await timerEdit.click();
   expect(await page.locator('#timerDialogTitle').textContent()).toContain('編集');
   expect(await page.locator('#timerName').inputValue()).toBe('東京急行');
   await page.locator('#timerDialog').evaluate(d=>d.close());
+  await page.evaluate(()=>window.hdWSShowElement?.('quests',false));
   await page.locator('[data-edit-quest="q1"]').click();
   expect(await page.locator('#questDialogTitle').textContent()).toContain('編集');
   expect(await page.locator('#questName').inputValue()).toBe('あ号作戦');
