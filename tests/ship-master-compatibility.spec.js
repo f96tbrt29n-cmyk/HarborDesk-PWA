@@ -5838,16 +5838,21 @@ test('mobile dock reflects current workspace and sync state', async ({ page }) =
 
 test('mobile dock home badge shows attention count', async ({ page }) => {
   const errors=[];
-  await boot(page,errors);
-  const data=await page.evaluate(()=>{
-    window.state=window.state||{};
-    window.state.quests=[{id:'q1',name:'任務',done:false}];
-    window.state.expeditions=[{id:'e1',name:'遠征',endsAt:Date.now()+10*60*1000}];
-    window.state.docks=[];
+  await page.addInitScript(() => {
+    const now=Date.now();
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
+      quests:[{id:'q1',name:'任務',done:false}],
+      expeditions:[{id:'e1',name:'遠征',endsAt:now+10*60*1000,durationMinutes:30}],
+      docks:[],
+      resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
+    }));
     localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
-      syncedAt:Date.now()-8*3600000,
+      syncedAt:now-8*3600000,
       coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true}
     }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
     window.hdQNEnsure?.();window.hdQNUpdateMobileDock?.();
     const badge=document.querySelector('[data-hd-mobile-home-badge]');
     return {hidden:!!badge?.hidden,text:badge?.textContent||'',count:window.hdQNMobileAttentionCount?.()};
@@ -5860,9 +5865,15 @@ test('mobile dock home badge shows attention count', async ({ page }) => {
 
 test('mobile Home button jumps to next action when already home', async ({ page }) => {
   const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
+      quests:[{id:'q1',name:'任務A',done:false}],
+      expeditions:[],docks:[],
+      resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
+    }));
+  });
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    if(typeof state!=='undefined')state.quests=[{id:'q1',name:'任務A',done:false}];
     window.hdWSShowElement?.('home',false);
     window.hdQNEnsure?.();window.hdQNUpdateMobileDock?.();
     const meta=window.hdQNMobileAttentionMeta?.();
@@ -5900,14 +5911,17 @@ test('mobile dock highlights open search and feature menu', async ({ page }) => 
 test('mobile attention sheet lists actionable reasons', async ({ page }) => {
   const errors=[];
   await page.addInitScript(() => {
-    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({syncedAt:Date.now()-8*60*60*1000,ships:206,equipment:93,decks:4}));
+    const now=Date.now();
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
+      quests:[{id:'q1',name:'デイリー任務',done:false}],
+      expeditions:[{id:'e1',name:'海上護衛任務',endsAt:now+5*60*1000,durationMinutes:30}],
+      docks:[],
+      resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
+    }));
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({syncedAt:now-8*60*60*1000,ships:206,equipment:93,decks:4}));
   });
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    window.state=window.state||{};
-    window.state.quests=[{id:'q1',name:'デイリー任務',done:false}];
-    window.state.expeditions=[{id:'e1',name:'海上護衛任務',endsAt:Date.now()+5*60*1000}];
-    window.state.docks=[];
     window.hdQNEnsure?.();
     window.hdQNUpdateMobileDock?.();
     window.hdQNOpenAttention?.();
