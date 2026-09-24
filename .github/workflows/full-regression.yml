@@ -1,12 +1,14 @@
 name: Full Browser Regression
 
 on:
+  push:
+    branches: ['test/full-regression-v458-pr97-clean']
   schedule:
     - cron: '0 18 * * *'
   workflow_dispatch:
 
 concurrency:
-  group: full-browser-regression
+  group: full-browser-regression-v458-pr97-clean
   cancel-in-progress: false
 
 permissions:
