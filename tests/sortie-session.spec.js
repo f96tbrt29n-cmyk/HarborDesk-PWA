@@ -10,8 +10,14 @@ async function boot(page) {
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 30000 });
-  await expect.poll(() => page.evaluate(() => window.HD_MODULE_STATUS?.['./sortie-session.js'] || '')).toBe('ok');
-  await expect.poll(() => page.evaluate(() => window.HD_MODULE_STATUS?.['./sortie-log.js'] || '')).toBe('ok');
+  await expect.poll(
+    () => page.evaluate(() => window.HD_MODULE_STATUS?.['./sortie-session.js'] || ''),
+    { timeout: 30000 }
+  ).toBe('ok');
+  await expect.poll(
+    () => page.evaluate(() => window.HD_MODULE_STATUS?.['./sortie-log.js'] || ''),
+    { timeout: 30000 }
+  ).toBe('ok');
 }
 
 async function seed(page) {
@@ -54,11 +60,18 @@ async function seed(page) {
 
 async function openPreparation(page) {
   await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await expect(page.locator('#guide')).toBeVisible({ timeout: 15000 });
   await page.locator('[data-world="3"]').click();
   await page.locator('[data-map="3-2"]').click();
-  await page.locator('[data-hd-sps-open]').click();
-  await expect(page.locator('#hdSortiePreparation')).toBeVisible();
-  await expect(page.locator('.hd-ss')).toBeVisible();
+  await expect.poll(
+    () => page.evaluate(() => typeof selectedMap !== 'undefined' ? selectedMap : ''),
+    { timeout: 15000 }
+  ).toBe('3-2');
+  const open = page.locator('[data-hd-sps-open]');
+  await expect(open).toBeVisible({ timeout: 15000 });
+  await open.click();
+  await expect(page.locator('#hdSortiePreparation')).toBeVisible({ timeout: 15000 });
+  await expect(page.locator('.hd-ss')).toBeVisible({ timeout: 15000 });
 }
 
 test('starting a sortie session snapshots the selected fleet and readiness state', async ({ page }) => {

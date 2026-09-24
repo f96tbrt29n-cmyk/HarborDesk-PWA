@@ -2606,8 +2606,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.456'");
-  expect(source).toContain("const HD_APP_BUILD=456");
+  expect(source).toContain("const HD_APP_VERSION='1.0.457'");
+  expect(source).toContain("const HD_APP_BUILD=457");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -2630,15 +2630,15 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=456`);
+    expect(data.index).toContain(`${asset}?v=457`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=456");
+  expect(data.updater).toContain("const HD_APP_BUILD=457");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdScriptAssetUrl(src,attempt)");
   expect(data.updater).toContain("function hdScriptAssetUrl(src,attempt=0)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v456");
+  expect(data.sw).toContain("harbordesk-pwa-v457");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -2651,7 +2651,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=456');
+  expect(source).toContain('const BUILD=457');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -3431,6 +3431,33 @@ test('release smoke: restore refuses to run without safety snapshot layer', asyn
   expect(result.imported).toBe(false);
   expect(JSON.parse(result.current).value).toBe('safe');
   expect(result.alerts.join(' ')).toContain('安全スナップショット');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: scheduled snapshot tolerates unavailable snapshot creator', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdPHAutoSnapshot === 'function' &&
+    typeof window.hdPHGetSnapshots === 'function' &&
+    typeof window.hdPHCreateSnapshot === 'function'
+  );
+
+  const result = await page.evaluate(async () => {
+    const originalGet = window.hdPHGetSnapshots;
+    const originalCreate = window.hdPHCreateSnapshot;
+    window.hdPHGetSnapshots = async () => [];
+    window.hdPHCreateSnapshot = undefined;
+    try {
+      return await window.hdPHAutoSnapshot();
+    } finally {
+      window.hdPHGetSnapshots = originalGet;
+      window.hdPHCreateSnapshot = originalCreate;
+    }
+  });
+
+  expect(result).toBe(false);
   expect(errors).toEqual([]);
 });
 
@@ -4759,7 +4786,8 @@ test('release smoke: secondary map gear and readiness controls work', async ({ p
     typeof window.hdRenderMapEquipmentRecommendations === 'function' &&
     typeof window.hdFCRender === 'function' &&
     typeof window.hdRenderLandBasePlanner === 'function' &&
-    typeof window.hdRenderSortieReadiness === 'function',
+    typeof window.hdRenderSortieReadiness === 'function' &&
+    typeof window.openEquipment === 'function',
     null,
     { timeout: 30000 }
   );
@@ -4799,8 +4827,16 @@ test('release smoke: secondary map gear and readiness controls work', async ({ p
   const add = recommend.locator('[data-hd-equip-add]').first();
   await expect(add).toBeVisible();
   const equipName = await add.getAttribute('data-hd-equip-add');
+  await page.evaluate(() => {
+    window.__hdDelayedOpenEquipment = window.openEquipment;
+    window.openEquipment = undefined;
+    setTimeout(() => {
+      window.openEquipment = window.__hdDelayedOpenEquipment;
+      delete window.__hdDelayedOpenEquipment;
+    }, 160);
+  });
   await add.click();
-  await expect(page.locator('#equipmentDialog')).toBeVisible();
+  await expect(page.locator('#equipmentDialog')).toBeVisible({ timeout: 5000 });
   await page.locator('#equipmentDialog button[value="default"]').click();
 
   await expect(recommend.locator('[data-hd-owned-open]').filter({ hasText:'台帳で確認' }).first()).toBeVisible();
@@ -6214,17 +6250,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=456',
-      'map-images.js?v=456',
-      'map-tabs.js?v=456',
-      'map-interactive.js?v=456',
-      'map-advanced-data.js?v=456'
+      'map-details.js?v=457',
+      'map-images.js?v=457',
+      'map-tabs.js?v=457',
+      'map-interactive.js?v=457',
+      'map-advanced-data.js?v=457'
     ];
     const requiredStyles = [
-      'map-details.css?v=456',
-      'map-tabs.css?v=456',
-      'map-images.css?v=456',
-      'map-interactive.css?v=456'
+      'map-details.css?v=457',
+      'map-tabs.css?v=457',
+      'map-images.css?v=457',
+      'map-interactive.css?v=457'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -6285,7 +6321,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('[data-map-pane="mine"] #customFleetPanel')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=456');
+  expect(src).toBe('app.js?v=457');
   expect(errors).toEqual([]);
 });
 
@@ -9432,7 +9468,7 @@ test('release smoke: diagnostics center runtime stylesheet is loaded', async ({ 
     };
   });
 
-  expect(data.href).toContain('diagnostics-center.css?v=456');
+  expect(data.href).toContain('diagnostics-center.css?v=457');
   expect(data.loaded).toBe('1');
   expect(data.noteFont).not.toBe('');
   expect(data.noteLine).not.toBe('');
