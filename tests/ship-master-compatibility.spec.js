@@ -3095,7 +3095,7 @@ test('home dashboard promotes the next timer', async ({ page }) => {
     return {text:el?.textContent||'',urgent:el?.classList.contains('urgent')||false};
   });
   expect(data.text).toContain('東京急行');
-  expect(data.text).toContain('次に終わる');
+  expect(data.text).toContain('もうすぐ終わる');
   expect(data.urgent).toBe(true);
 });
 
