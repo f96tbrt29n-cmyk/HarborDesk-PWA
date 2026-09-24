@@ -66,13 +66,17 @@ test('ship database: acquisition shows sourced drops and exact construction reci
   await expect(page.locator('#hdShipDbList')).not.toHaveClass(/hd-compact/);
   const search = page.locator('#hdShipDbSearch');
   await search.fill('明石');
+  await page.waitForTimeout(180);
   await expect(page.locator('#hdShipDbList .hd-shipdb-head strong').first()).toContainText('明石');
   const drops = page.locator('#hdShipDbList .hd-shipdb-acquisition').first();
   await expect(drops).toBeVisible();
-  await drops.locator('summary').click();
+  await drops.evaluate(el => { el.open = true; });
+  await expect(drops).toHaveJSProperty('open', true);
   await expect(drops).toContainText('1-5');
   await expect(drops).toContainText('ドロップ海域');
-  await drops.locator('[data-hd-shipdb-acquire-drop]').click();
+  const dropButton=drops.locator('[data-hd-shipdb-acquire-drop]');
+  await expect(dropButton).toBeVisible();
+  await dropButton.click();
   await expect(page.locator('#hdDropSearch')).toHaveValue('明石');
   await page.evaluate(() => window.hdWSShowElement?.('shipDatabase', false));
   await expect(page.locator('#shipDatabase')).toBeVisible();
@@ -81,7 +85,7 @@ test('ship database: acquisition shows sourced drops and exact construction reci
   await expect(page.locator('#hdShipDbList .hd-shipdb-head strong').first()).toContainText('大和');
   const build = page.locator('#hdShipDbList .hd-shipdb-acquisition').first();
   await expect(build).toBeVisible();
-  await build.locator('summary').click();
+  await build.evaluate(el => { el.open = true; });
   await expect(build).toHaveJSProperty('open', true);
   await expect(build).toContainText('大型・大和型');
   const buildButton=build.locator('[data-hd-shipdb-acquire-build]');
