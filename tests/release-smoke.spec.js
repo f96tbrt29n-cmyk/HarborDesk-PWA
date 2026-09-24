@@ -9423,6 +9423,54 @@ test('release smoke: enhanced equipment catalog preserves reset and compact peek
 });
 
 
+test('release smoke: equipment catalog ensure reapplies persisted view state', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const data = await page.evaluate(() => {
+    window.hdEnsureEquipmentCatalog?.();
+    sessionStorage.setItem('harbordesk-session-equip-catalog-view-v1', JSON.stringify({
+      query:'電探',
+      filter:'小型水上電探',
+      compact:true,
+      peekKey:''
+    }));
+    const search=document.getElementById('hdEquipCatalogSearch');
+    if(search)search.value='';
+    document.querySelectorAll('[data-hd-equip-filter]').forEach(b=>b.classList.toggle('active',b.dataset.hdEquipFilter==='すべて'));
+    document.getElementById('hdEquipCatalogList')?.classList.remove('hd-compact');
+    window.hdEnsureEquipmentCatalog?.();
+    return {
+      query:document.getElementById('hdEquipCatalogSearch')?.value||'',
+      filter:document.querySelector('[data-hd-equip-filter].active')?.dataset.hdEquipFilter||'',
+      compact:document.getElementById('hdEquipCatalogList')?.classList.contains('hd-compact')||false,
+      resetActive:document.querySelector('.hd-equip-search [data-hd-equip-reset]')?.classList.contains('is-active')||false
+    };
+  });
+  expect(data.query).toBe('電探');
+  expect(data.filter).toBe('小型水上電探');
+  expect(data.compact).toBe(true);
+  expect(data.resetActive).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: Home counts legacy equipment ledger rows without count', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const count = await page.evaluate(() => {
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([
+      {id:'legacy-1',name:'旧形式装備'},
+      {id:'modern-1',name:'現行装備',count:2},
+      {id:'zero-1',name:'在庫なし',count:0}
+    ]));
+    window.renderHomeDashboard?.();
+    return document.querySelector('#homeSummary [data-home-jump="equipmentBook"] strong')?.textContent||'';
+  });
+  expect(count).toBe('2');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: diagnostics center is loaded and registered', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
