@@ -1,6 +1,8 @@
 name: Browser Regression
 
 on:
+  push:
+    branches: [test/smoke-v457-final]
   pull_request:
     branches: [main]
   workflow_dispatch:
