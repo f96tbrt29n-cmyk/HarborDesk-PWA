@@ -28,7 +28,19 @@ let hdEquipCatalogPeekKey=String(hdEquipCatalogViewLoad().peekKey||'');
 function hdEquipWikiUrl(name){return `https://wikiwiki.jp/kancolle/${encodeURIComponent(name)}`}
 function hdEquipStatText(item){const parts=Object.entries(item.stats||{}).map(([k,v])=>`${k}+${v}`);if(item.range)parts.push(`射程 ${item.range}`);if(item.radius!=null)parts.push(`半径 ${item.radius}`);return parts}
 function hdEnsureEquipmentCatalog(){
- const book=document.getElementById('equipmentBook');if(!book||document.getElementById('hdEquipmentCatalog'))return;
+ const book=document.getElementById('equipmentBook');if(!book)return;
+ if(document.getElementById('hdEquipmentCatalog')){
+  const cats=['すべて',...new Set(HD_EQUIPMENT_CATALOG.map(x=>x.category))],view=hdEquipCatalogViewLoad();
+  hdEquipCatalogFilter=cats.includes(view.filter)?view.filter:'すべて';
+  const search=document.getElementById('hdEquipCatalogSearch');if(search)search.value=String(view.query||'');
+  document.querySelectorAll('[data-hd-equip-filter]').forEach(b=>b.classList.toggle('active',b.dataset.hdEquipFilter===hdEquipCatalogFilter));
+  const list=document.getElementById('hdEquipCatalogList'),compactBtn=document.querySelector('[data-hd-equip-compact]');
+  if(view.compact!=null)list?.classList.toggle('hd-compact',!!view.compact);
+  const compact=!!list?.classList.contains('hd-compact');if(compactBtn)compactBtn.textContent=compact?'詳細表示':'コンパクト';
+  const hint=document.getElementById('hdEquipCatalogCompactHint');if(hint)hint.hidden=!compact;
+  hdEquipCatalogPeekKey=String(view.peekKey||'');
+  hdRenderEquipmentCatalog();return;
+ }
  const sec=document.createElement('div');sec.id='hdEquipmentCatalog';sec.className='hd-equipment-catalog';
  sec.innerHTML=`<div class="hd-equip-catalog-head"><div><div class="eyebrow">EQUIPMENT DATABASE</div><h3>攻略装備データベース</h3><p class="muted">性能・用途・改修・入手をまとめて確認。データは攻略Wikiの現行情報を要約。</p></div><div class="hd-equip-head-actions"><span id="hdEquipCatalogCount" class="muted"></span></div></div><div class="hd-equip-search"><input id="hdEquipCatalogSearch" type="search" placeholder="装備名・用途・カテゴリで検索"><button class="ghost small" type="button" data-hd-equip-compact>コンパクト</button><button class="ghost small" type="button" data-hd-equip-reset>条件クリア</button></div><div id="hdEquipCatalogActiveFilters" class="hd-active-filters" hidden></div><div id="hdEquipCatalogFilters" class="hd-equip-filters"></div><div id="hdEquipCatalogCompactHint" class="hd-compact-hint" hidden>カードをタップすると、その1件だけ詳細を開けるよ</div><div id="hdEquipCatalogList" class="hd-equip-catalog-list"></div>`;
  const ledgerList=book.querySelector('#equipmentList');if(ledgerList)ledgerList.insertAdjacentElement('afterend',sec);else book.appendChild(sec);
