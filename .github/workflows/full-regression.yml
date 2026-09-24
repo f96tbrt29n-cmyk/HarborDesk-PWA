@@ -2,7 +2,7 @@ name: Full Browser Regression
 
 on:
   push:
-    branches: [test/full-regression-modernize-v451, test/full-regression-v451-final]
+    branches: [test/full-regression-v451-final]
   schedule:
     - cron: '0 18 * * *'
   workflow_dispatch:
