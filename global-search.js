@@ -141,7 +141,7 @@ function hdGSSetCategory(cat){hdGSCategory=cat;hdGSViewSave({category:cat});docu
 function hdGSAttachLaunchers(){
  const qnDialog=document.getElementById('hdQuickNavDialog'),qnTools=qnDialog?.querySelector('.hd-qn-tools');if(qnTools&&!qnDialog.querySelector('[data-hd-gs-open]')){const b=document.createElement('button');b.type='button';b.className='primary small';b.dataset.hdGsOpen='1';b.textContent='全体検索';qnTools.appendChild(b)}
  const ph=document.querySelector('#hdPersonalHome .section-head');if(ph&&!ph.querySelector('[data-hd-gs-open]')){const b=document.createElement('button');b.type='button';b.className='ghost small';b.dataset.hdGsOpen='1';b.textContent='⌕ 全体検索';ph.appendChild(b)}
- const top=document.querySelector('.topbar'),menuSearch=top?.querySelector('.hd-header-more [data-hd-gs-open]'),headerSearch=document.getElementById('hdGlobalSearchHeader');
+ const top=document.querySelector('.topbar'),menuSearch=document.querySelector('.hd-version-menu [data-hd-gs-open]'),headerSearch=document.getElementById('hdGlobalSearchHeader');
  if(menuSearch){
   headerSearch?.remove();
  }else if(top&&!headerSearch){
