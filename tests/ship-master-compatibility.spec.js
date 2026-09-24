@@ -4550,7 +4550,7 @@ test('mobile keyboard state hides floating UI', async ({ page }) => {
 
 
 test('Userscript coverage reports captured Kancolle areas', async ({ page }) => {
-  await page.goto(baseURL);
+  await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
   const script=await page.evaluate(()=>fetch('./HarborDesk-Kancolle.user.js',{cache:'no-store'}).then(r=>r.text()));
   const result=await page.evaluate(async script=>{
     history.replaceState(null,'','/netgame/social/-/gadgets/=/app_id=854854/');
