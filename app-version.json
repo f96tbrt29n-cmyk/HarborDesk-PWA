@@ -1,7 +1,7 @@
 {
-  "version": "1.0.456",
-  "build": 456,
-  "releasedAt": "2026-09-24T09:52:00+09:00",
-  "notes": "v1.0.450以降の安定化修正を統合し、モバイルUI・全体検索・Safari艦娘画像DB・装備DB状態保持・診断センターruntime復旧に加えて diagnostics-center.css も確実に読み込むよう修正。",
+  "version": "1.0.457",
+  "build": 457,
+  "releasedAt": "2026-09-24T13:50:00+09:00",
+  "notes": "起動直後の装備追加操作を取りこぼさないようにし、自動セーフティスナップショットの競合を防止。WebKit向け出撃準備の待機も強化。",
   "masterChanges": null
 }
