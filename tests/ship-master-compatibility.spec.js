@@ -5464,7 +5464,9 @@ test('sortie readiness warnings link to resolution targets', async ({ page }) =>
     window.hdRenderSortieReadiness?.();
   });
   const rows=await page.evaluate(()=>[...document.querySelectorAll('#hdSortieReadiness [data-hd-sortie-action]')].map(x=>({
-    action:x.dataset.hdSortieAction,label:x.textContent.trim(),row:x.closest('.hd-sortie-auto-row')?.textContent||''
+    action:x.dataset.hdSortieAction,
+    label:x.textContent.trim(),
+    row:x.closest('.hd-sortie-auto-row, .hd-sortie-next')?.textContent||''
   })));
   expect(rows.some(x=>x.action==='kancolleImport'&&x.label.includes('再同期'))).toBe(true);
   expect(rows.some(x=>x.action==='home'&&x.row.includes('耐久'))).toBe(true);
