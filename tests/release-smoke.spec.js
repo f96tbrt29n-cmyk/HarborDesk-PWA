@@ -5088,6 +5088,7 @@ test('release smoke:攻略 secondary navigation survives workspace helper outage
   await page.evaluate(() => window.hdSPSOpen());
   const prep = page.locator('#hdSortiePreparation');
   await expect(prep).toBeVisible();
+  await expect(page.locator('#hdSortiePreparationMap')).toContainText('6-5', { timeout: 15000 });
 
   await prep.locator('[data-hd-sps-copy]').click();
   await expect.poll(() => page.evaluate(() => window.__hdCopiedPrep || '')).toContain('6-5');
