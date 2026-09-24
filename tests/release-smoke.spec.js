@@ -9213,3 +9213,26 @@ test('release smoke: mobile dialog actions stay on the visible bottom edge', asy
   expect(data.bottom).toBe('0px');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: compact header avoids duplicate global search launcher', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.setViewportSize({width:390,height:844});
+  const data = await page.evaluate(() => {
+    window.hdEnsureUpdateUI?.();
+    window.hdGSEnsure?.();
+    window.hdWSEnsureSyncStatus?.();
+    window.hdGSAttachLaunchers?.();
+    const top=document.querySelector('.topbar');
+    return {
+      children:top?[...top.children].map(x=>x.id||x.className||x.tagName):[],
+      menuSearch:!!top?.querySelector('.hd-header-more [data-hd-gs-open]'),
+      headerSearch:!!document.getElementById('hdGlobalSearchHeader')
+    };
+  });
+  expect(data.menuSearch).toBe(true);
+  expect(data.headerSearch).toBe(false);
+  expect(data.children.length).toBeLessThanOrEqual(3);
+  expect(errors).toEqual([]);
+});
