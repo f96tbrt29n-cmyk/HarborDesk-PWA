@@ -3401,7 +3401,12 @@ test('release smoke: restore refuses to run without safety snapshot layer', asyn
     typeof window.importBackup === 'function'
   );
 
-  await page.evaluate(() => {
+  await page.evaluate(async () => {
+    // Seed one snapshot first so the scheduled daily snapshot cannot race while
+    // this test temporarily removes the snapshot API.
+    if (typeof window.hdPHCreateSnapshot === 'function') {
+      await window.hdPHCreateSnapshot('テスト準備');
+    }
     localStorage.setItem('harbordesk-safety-layer', JSON.stringify({ value: 'safe' }));
     const built = window.hdBuildBackupFile();
     built.data.localStorage['harbordesk-safety-layer'] = JSON.stringify({ value: 'incoming' });
@@ -4758,7 +4763,8 @@ test('release smoke: secondary map gear and readiness controls work', async ({ p
     typeof window.hdRenderMapEquipmentRecommendations === 'function' &&
     typeof window.hdFCRender === 'function' &&
     typeof window.hdRenderLandBasePlanner === 'function' &&
-    typeof window.hdRenderSortieReadiness === 'function',
+    typeof window.hdRenderSortieReadiness === 'function' &&
+    typeof window.openEquipment === 'function',
     null,
     { timeout: 30000 }
   );
