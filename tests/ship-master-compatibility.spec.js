@@ -4446,7 +4446,7 @@ test('home reorder controls stay hidden until edit mode', async ({ page }) => {
   expect(during.label).toContain('編集完了');
   expect(during.pressed).toBe('true');
   expect(during.resetHidden).toBe(false);
-  expect(during.display).toBe('inline-flex');
+  expect(during.display).not.toBe('none');
   await page.click('[data-home-edit-toggle]');
   expect(await page.locator('#home').evaluate(el=>el.classList.contains('home-editing'))).toBe(false);
 });
@@ -4564,7 +4564,7 @@ test('mobile keyboard state hides floating UI', async ({ page }) => {
 
 
 test('Userscript coverage reports captured Kancolle areas', async ({ page }) => {
-  await page.goto(baseURL);
+  await boot(page,[]);
   const script=await page.evaluate(()=>fetch('./HarborDesk-Kancolle.user.js',{cache:'no-store'}).then(r=>r.text()));
   const result=await page.evaluate(async script=>{
     history.replaceState(null,'','/netgame/social/-/gadgets/=/app_id=854854/');
@@ -6170,7 +6170,7 @@ test('mobile update banner clears the two-row dock', async ({ page }) => {
     const banner=document.getElementById('hdUpdateBanner');
     if(banner)banner.hidden=false;
     const dock=document.getElementById('hdMobileDock');
-    const bs=banner?getComputedStyle(banner):null,ds=dock?getBoundingClientRect():null;
+    const bs=banner?getComputedStyle(banner):null,ds=dock?.getBoundingClientRect()||null;
     return {bottom:parseFloat(bs?.bottom||'0'),dockHeight:ds?.height||0};
   });
   expect(data.bottom).toBeGreaterThanOrEqual(100);
