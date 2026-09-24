@@ -1,0 +1,27 @@
+name: Diagnose Sortie Readiness
+
+on:
+  push:
+    branches: [diag/sortie-readiness-v456]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund --no-package-lock
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Run targeted sortie readiness diagnostic
+        run: npx playwright test tests/diag-sortie-readiness.spec.js --project=${{ matrix.browser }} --workers=1 --reporter=line
