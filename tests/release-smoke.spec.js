@@ -3435,6 +3435,33 @@ test('release smoke: restore refuses to run without safety snapshot layer', asyn
 });
 
 
+test('release smoke: scheduled snapshot tolerates unavailable snapshot creator', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdPHAutoSnapshot === 'function' &&
+    typeof window.hdPHGetSnapshots === 'function' &&
+    typeof window.hdPHCreateSnapshot === 'function'
+  );
+
+  const result = await page.evaluate(async () => {
+    const originalGet = window.hdPHGetSnapshots;
+    const originalCreate = window.hdPHCreateSnapshot;
+    window.hdPHGetSnapshots = async () => [];
+    window.hdPHCreateSnapshot = undefined;
+    try {
+      return await window.hdPHAutoSnapshot();
+    } finally {
+      window.hdPHGetSnapshots = originalGet;
+      window.hdPHCreateSnapshot = originalCreate;
+    }
+  });
+
+  expect(result).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: concurrent backup restores are locked', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -4759,7 +4786,8 @@ test('release smoke: secondary map gear and readiness controls work', async ({ p
     typeof window.hdRenderMapEquipmentRecommendations === 'function' &&
     typeof window.hdFCRender === 'function' &&
     typeof window.hdRenderLandBasePlanner === 'function' &&
-    typeof window.hdRenderSortieReadiness === 'function',
+    typeof window.hdRenderSortieReadiness === 'function' &&
+    typeof window.openEquipment === 'function',
     null,
     { timeout: 30000 }
   );
@@ -4799,8 +4827,16 @@ test('release smoke: secondary map gear and readiness controls work', async ({ p
   const add = recommend.locator('[data-hd-equip-add]').first();
   await expect(add).toBeVisible();
   const equipName = await add.getAttribute('data-hd-equip-add');
+  await page.evaluate(() => {
+    window.__hdDelayedOpenEquipment = window.openEquipment;
+    window.openEquipment = undefined;
+    setTimeout(() => {
+      window.openEquipment = window.__hdDelayedOpenEquipment;
+      delete window.__hdDelayedOpenEquipment;
+    }, 160);
+  });
   await add.click();
-  await expect(page.locator('#equipmentDialog')).toBeVisible();
+  await expect(page.locator('#equipmentDialog')).toBeVisible({ timeout: 5000 });
   await page.locator('#equipmentDialog button[value="default"]').click();
 
   await expect(recommend.locator('[data-hd-owned-open]').filter({ hasText:'台帳で確認' }).first()).toBeVisible();
