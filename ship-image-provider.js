@@ -79,13 +79,25 @@ function hdShipImageExportVerifyTemplate(){
  const out={format:'harbordesk-ship-image-hashes',version:1,source:'user-supplied-reference',updatedAt:new Date().toISOString(),entries:rows};
  const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='HarborDesk-ship-image-hash-template.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200);
 }
+function hdShipImageDbError(err,fallback='艦娘画像DBでエラーが発生しました'){
+ if(err instanceof Error)return err;
+ const message=String(err?.message||err||fallback).trim()||fallback;
+ return new Error(message);
+}
 function hdShipImageOpenDb(){
  if(HD_SHIP_IMAGE_DB_PROMISE)return HD_SHIP_IMAGE_DB_PROMISE;
- HD_SHIP_IMAGE_DB_PROMISE=new Promise((resolve,reject)=>{
-  const req=indexedDB.open(HD_SHIP_IMAGE_DB,1);
+ const pending=new Promise((resolve,reject)=>{
+  let req;
+  try{req=indexedDB.open(HD_SHIP_IMAGE_DB,1)}catch(err){reject(hdShipImageDbError(err,'艦娘画像DBを開けません'));return}
   req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(HD_SHIP_IMAGE_STORE))db.createObjectStore(HD_SHIP_IMAGE_STORE,{keyPath:'id'})};
-  req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
+  req.onsuccess=()=>{
+   const db=req.result;
+   db.onversionchange=()=>{try{db.close()}catch{}HD_SHIP_IMAGE_DB_PROMISE=null};
+   resolve(db);
+  };
+  req.onerror=()=>reject(hdShipImageDbError(req.error,'艦娘画像DBを開けません'));
  });
+ HD_SHIP_IMAGE_DB_PROMISE=pending.catch(err=>{HD_SHIP_IMAGE_DB_PROMISE=null;throw hdShipImageDbError(err,'艦娘画像DBを開けません')});
  return HD_SHIP_IMAGE_DB_PROMISE;
 }
 async function hdShipImageGet(id){
@@ -108,7 +120,19 @@ async function hdShipImageCoverage(){
 async function hdShipImagePut(id,file,name='',silent=false){
  const row=hdShipImageResolve(id)||{id:Number(id),name:String(name||'')};if(!row?.id||!file)return false;
  const hash=await hdShipImageHash(file),db=await hdShipImageOpenDb();
- await new Promise((resolve,reject)=>{const tx=db.transaction(HD_SHIP_IMAGE_STORE,'readwrite');tx.objectStore(HD_SHIP_IMAGE_STORE).put({id:Number(row.id),name:row.name||String(name||''),blob:file,type:file.type||'',hash,updatedAt:Date.now()});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
+ await new Promise((resolve,reject)=>{
+  let settled=false;
+  const fail=err=>{if(settled)return;settled=true;reject(hdShipImageDbError(err,'艦娘画像の保存に失敗しました'))};
+  let tx,req;
+  try{
+   tx=db.transaction(HD_SHIP_IMAGE_STORE,'readwrite');
+   req=tx.objectStore(HD_SHIP_IMAGE_STORE).put({id:Number(row.id),name:row.name||String(name||''),blob:file,type:file.type||'',hash,updatedAt:Date.now()});
+  }catch(err){fail(err);return}
+  req.onerror=()=>fail(req.error||tx?.error);
+  tx.onerror=()=>fail(tx.error||req?.error);
+  tx.onabort=()=>fail(tx.error||req?.error);
+  tx.oncomplete=()=>{if(settled)return;settled=true;resolve()};
+ });
  HD_SHIP_IMAGE_LOCAL_IDS.add(Number(row.id));HD_SHIP_IMAGE_LOCAL_IDS_READY=true;hdShipImageRevoke(row.id);if(!silent)window.dispatchEvent(new CustomEvent('hd:ship-images-changed',{detail:{id:row.id,name:row.name}}));return true;
 }
 async function hdShipImageDelete(id){
