@@ -409,7 +409,10 @@ window.hdCoreScheduleFallbackRestore=hdCoreScheduleFallbackRestore;
 window.hdCoreRestoreFallback=hdCoreRestoreFallback;
 window.addEventListener('hd:workspace-changed',e=>{
  const detail=e?.detail||{};
- if((detail.group==='guide'||detail.section==='guide')&&hdCoreFallbackActive&&!document.querySelector('[data-map-tab]'))hdCoreScheduleFallbackRestore();
+ // Restore the legacy map fallback only when the actual guide root is active.
+ // Other sections in the guide workspace (fleet suggester, sortie prep, etc.)
+ // are explicit destinations and must never be pulled back to the map root.
+ if(detail.section==='guide'&&hdCoreFallbackActive&&!document.querySelector('[data-map-tab]'))hdCoreScheduleFallbackRestore();
 });
 window.hdCoreOpenMapFallback=hdCoreOpenMapFallback;
 window.hdCoreOpenFleetFallback=hdCoreOpenFleetFallback;
