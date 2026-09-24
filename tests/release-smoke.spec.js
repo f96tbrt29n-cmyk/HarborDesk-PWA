@@ -9250,6 +9250,35 @@ test('release smoke: Quick Nav sees current workspace state and back history', a
 });
 
 
+test('release smoke: Quick Nav group jump marks explicit workspace navigation', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdWSShowElement === 'function' &&
+    typeof window.hdQNJumpGroup === 'function' &&
+    typeof window.hdWSApply === 'function'
+  );
+
+  const result = await page.evaluate(() => {
+    window.hdWSShowElement('roster', false);
+    const beforeEpoch = Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH) || 0;
+    const ok = window.hdQNJumpGroup('guide');
+    const afterEpoch = Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH) || 0;
+    return {
+      ok,
+      beforeEpoch,
+      afterEpoch,
+      group:window.hdWSState?.group || ''
+    };
+  });
+
+  expect(result.ok).toBe(true);
+  expect(result.afterEpoch).toBeGreaterThan(result.beforeEpoch);
+  expect(result.group).toBe('guide');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: mobile dialog actions stay on the visible bottom edge', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
