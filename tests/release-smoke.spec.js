@@ -9341,6 +9341,7 @@ test('release smoke: enhanced equipment catalog preserves reset and compact peek
     reset?.click();
     window.hdRenderEquipmentCatalog?.();
     const cleanReset=document.querySelector('.hd-equip-search [data-hd-equip-reset]');
+    const initialResetDisabled=!!cleanReset?.disabled;
     const list=document.getElementById('hdEquipCatalogList');
     list?.classList.add('hd-compact');
     let card=list?.querySelector('.hd-equip-ref-card');
@@ -9353,7 +9354,7 @@ test('release smoke: enhanced equipment catalog preserves reset and compact peek
     if(search)search.value='電探';
     window.hdRenderEquipmentCatalog?.();
     return {
-      initialResetDisabled:!!cleanReset?.disabled,
+      initialResetDisabled,
       key,
       openBefore,
       openAfter:!!card?.classList.contains('hd-peek'),
