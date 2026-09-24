@@ -1319,11 +1319,11 @@ test('release smoke: userscript captures scouting and admiral level for readines
   await boot(page, errors);
   const source = await page.evaluate(async () => fetch('./HarborDesk-Kancolle.user.js', { cache:'no-store' }).then(r => r.text()));
   const importer = await page.evaluate(async () => fetch('./kancolle-import.js', { cache:'no-store' }).then(r => r.text()));
-  expect(source).toContain("// @version      1.0.14");
+  expect(source).toContain("// @version      1.0.15");
   expect(source).toContain("api_sakuteki:Array.isArray(x.api_sakuteki)");
   expect(source).toContain("api_onslot:Array.isArray(x.api_onslot)");
   expect(source).toContain("api_basic:data?.api_basic");
-  expect(importer).toContain("HD_KC_USERSCRIPT_VERSION='1.0.14'");
+  expect(importer).toContain("HD_KC_USERSCRIPT_VERSION='1.0.15'");
   expect(importer).toContain("gameLos:Array.isArray(ship.api_sakuteki)");
   expect(importer).toContain("admiralLevel:Number(parsed.admiralLevel)");
   expect(errors).toEqual([]);
@@ -2666,8 +2666,8 @@ test('release smoke: userscript blocks handoff until ship and equipment ledger d
     return res.text();
   });
 
-  expect(source).toContain('// @version      1.0.14');
-  expect(source).toContain("const HD_VERSION='1.0.14'");
+  expect(source).toContain('// @version      1.0.15');
+  expect(source).toContain("const HD_VERSION='1.0.15'");
   expect(source).toContain('// @downloadURL  https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/HarborDesk-Kancolle.user.js');
   expect(source).toContain('// @updateURL    https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/HarborDesk-Kancolle.meta.js');
   expect(source).toContain('function ledgerReady(c=captureCoverage())');
@@ -9489,5 +9489,42 @@ test('release smoke: ship images persist bytes and read back as blobs', async ({
   expect(data.bytes).toEqual([9,8,7,6]);
   expect(data.rawHasBlob).toBe(false);
   expect(data.rawHasBytes).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: userscript uses same-tab handoff without popup', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const source = await page.evaluate(async () => fetch('./HarborDesk-Kancolle.user.js', { cache:'no-store' }).then(r => r.text()));
+  expect(source).toContain('// @version      1.0.15');
+  expect(source).toContain("const HD_VERSION='1.0.15'");
+  expect(source).toContain("#kcimport=");
+  expect(source).toContain("a.target='_self'");
+  expect(source).not.toContain('window.open(');
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: inline mobile header version spans the menu grid', async ({ page }) => {
+  const errors = [];
+  await page.setViewportSize({ width:390, height:844 });
+  await boot(page, errors);
+  const data = await page.evaluate(async () => {
+    window.hdEnsureUpdateUI?.();
+    const details=document.querySelector('.hd-header-more');
+    if(details)details.open=true;
+    window.hdSyncMobileHeaderMenu?.();
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    const menu=document.querySelector('#hdMobileHeaderMenuRow .hd-version-menu');
+    const badge=menu?.querySelector('.hd-version-badge');
+    return {
+      menuWidth:menu?.getBoundingClientRect().width||0,
+      badgeWidth:badge?.getBoundingClientRect().width||0,
+      gridColumn:badge?getComputedStyle(badge).gridColumn:''
+    };
+  });
+  expect(data.menuWidth).toBeGreaterThan(0);
+  expect(data.badgeWidth).toBeGreaterThan(data.menuWidth*0.8);
+  expect(data.gridColumn).not.toBe('auto');
   expect(errors).toEqual([]);
 });
