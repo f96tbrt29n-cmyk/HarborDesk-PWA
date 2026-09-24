@@ -2598,13 +2598,13 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
       hasDmmMatch:text.includes('@match        https://*.dmm.com/*'),
       hasKancolleServerMatch:text.includes('@match        https://*.kancolle-server.com/*'),
       hasLegacyServerInclude:text.includes('125\\.6'),
-      hasKcsapiFilter:text.includes('/kcsapi/'),
+      hasKcsapiFilter:text.includes('\\/kcsapi\\/'),
       hasDirectSend:text.includes("#kcimport="),
       usesSelfLink:text.includes("a.target='_self'"),
       hasVisibleVersion:text.includes("HD_VERSION+'</small>"),
       userscriptShowsCoverage:text.includes('data-hd-coverage')&&text.includes('function captureCoverage()'),
       userscriptGuidesNextCapture:text.includes('data-hd-next-hint')&&text.includes('function nextCaptureHint('),
-      userscriptSendShowsCount:text.includes("HarborDeskへ送る（'+records.length+'件）"),
+      userscriptSendShowsCount:text.includes("台帳をHarborDeskへ同期（'+records.length+'件）"),
       hasCompressionStream:text.includes("CompressionStream('gzip')"),
       usesPopup:text.includes('window.open('),
       hasTokenStorage:text.includes('api_token=') || text.includes('Cookie='),
@@ -3099,7 +3099,7 @@ test('home dashboard promotes the next timer', async ({ page }) => {
     return {text:el?.textContent||'',urgent:el?.classList.contains('urgent')||false};
   });
   expect(data.text).toContain('東京急行');
-  expect(data.text).toContain('次の予定');
+  expect(data.text).toContain('もうすぐ終わる');
   expect(data.urgent).toBe(true);
 });
 
