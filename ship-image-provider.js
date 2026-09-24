@@ -107,8 +107,9 @@ async function hdShipImageCoverage(){
 }
 async function hdShipImagePut(id,file,name='',silent=false){
  const row=hdShipImageResolve(id)||{id:Number(id),name:String(name||'')};if(!row?.id||!file)return false;
- const hash=await hdShipImageHash(file),db=await hdShipImageOpenDb();
- await new Promise((resolve,reject)=>{const tx=db.transaction(HD_SHIP_IMAGE_STORE,'readwrite');tx.objectStore(HD_SHIP_IMAGE_STORE).put({id:Number(row.id),name:row.name||String(name||''),blob:file,type:file.type||'',hash,updatedAt:Date.now()});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
+ const type=String(file.type||'application/octet-stream'),blob=file instanceof Blob?file.slice(0,file.size,type):new Blob([file],{type});
+ const hash=await hdShipImageHash(blob),db=await hdShipImageOpenDb();
+ await new Promise((resolve,reject)=>{const tx=db.transaction(HD_SHIP_IMAGE_STORE,'readwrite');tx.objectStore(HD_SHIP_IMAGE_STORE).put({id:Number(row.id),name:row.name||String(name||''),blob,type:blob.type||type,hash,updatedAt:Date.now()});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('ship image IndexedDB write failed'));tx.onabort=()=>reject(tx.error||new Error('ship image IndexedDB write aborted'))});
  HD_SHIP_IMAGE_LOCAL_IDS.add(Number(row.id));HD_SHIP_IMAGE_LOCAL_IDS_READY=true;hdShipImageRevoke(row.id);if(!silent)window.dispatchEvent(new CustomEvent('hd:ship-images-changed',{detail:{id:row.id,name:row.name}}));return true;
 }
 async function hdShipImageDelete(id){
