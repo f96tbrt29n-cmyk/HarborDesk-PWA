@@ -9376,18 +9376,23 @@ test('release smoke: Quick Nav group jump marks explicit workspace navigation', 
   const result = await page.evaluate(() => {
     window.hdWSShowElement('roster', false);
     const beforeEpoch = Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH) || 0;
+    const beforeUserEpoch = Number(window.__HD_WORKSPACE_USER_NAV_EPOCH) || 0;
     const ok = window.hdQNJumpGroup('guide');
     const afterEpoch = Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH) || 0;
+    const afterUserEpoch = Number(window.__HD_WORKSPACE_USER_NAV_EPOCH) || 0;
     return {
       ok,
       beforeEpoch,
       afterEpoch,
+      beforeUserEpoch,
+      afterUserEpoch,
       group:window.hdWSState?.group || ''
     };
   });
 
   expect(result.ok).toBe(true);
   expect(result.afterEpoch).toBeGreaterThan(result.beforeEpoch);
+  expect(result.afterUserEpoch).toBeGreaterThan(result.beforeUserEpoch);
   expect(result.group).toBe('guide');
   expect(errors).toEqual([]);
 });
