@@ -84,30 +84,6 @@ function hdShipImageDbError(err,fallback='艦娘画像DBでエラーが発生し
  const message=String(err?.message||err||fallback).trim()||fallback;
  return new Error(message);
 }
-function hdShipImageStoredBlob(row){
- if(!row)return null;
- if(typeof Blob!=='undefined'&&row.blob instanceof Blob)return row.blob;
- const bytes=row.bytes;
- if(bytes instanceof ArrayBuffer)return new Blob([bytes],{type:String(row.type||'application/octet-stream')});
- if(ArrayBuffer.isView(bytes)){
-  const copy=bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength);
-  return new Blob([copy],{type:String(row.type||'application/octet-stream')})
- }
- return null;
-}
-function hdShipImageNormalizeStoredRow(row){
- if(!row)return null;
- const blob=hdShipImageStoredBlob(row);
- return blob?{...row,blob}:row;
-}
-async function hdShipImageStorageRow(row){
- if(!row)return row;
- const blob=hdShipImageStoredBlob(row),out={...row};
- if(blob)out.bytes=await blob.arrayBuffer();
- else if(ArrayBuffer.isView(out.bytes))out.bytes=out.bytes.buffer.slice(out.bytes.byteOffset,out.bytes.byteOffset+out.bytes.byteLength);
- delete out.blob;
- return out;
-}
 function hdShipImageOpenDb(){
  if(HD_SHIP_IMAGE_DB_PROMISE)return HD_SHIP_IMAGE_DB_PROMISE;
  const pending=new Promise((resolve,reject)=>{
