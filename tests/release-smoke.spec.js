@@ -2605,8 +2605,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.452'");
-  expect(source).toContain("const HD_APP_BUILD=452");
+  expect(source).toContain("const HD_APP_VERSION='1.0.453'");
+  expect(source).toContain("const HD_APP_BUILD=453");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -2629,15 +2629,15 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=452`);
+    expect(data.index).toContain(`${asset}?v=453`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=452");
+  expect(data.updater).toContain("const HD_APP_BUILD=453");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdScriptAssetUrl(src,attempt)");
   expect(data.updater).toContain("function hdScriptAssetUrl(src,attempt=0)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v452");
+  expect(data.sw).toContain("harbordesk-pwa-v453");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -2650,7 +2650,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=452');
+  expect(source).toContain('const BUILD=453');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -6211,17 +6211,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=452',
-      'map-images.js?v=452',
-      'map-tabs.js?v=452',
-      'map-interactive.js?v=452',
-      'map-advanced-data.js?v=452'
+      'map-details.js?v=453',
+      'map-images.js?v=453',
+      'map-tabs.js?v=453',
+      'map-interactive.js?v=453',
+      'map-advanced-data.js?v=453'
     ];
     const requiredStyles = [
-      'map-details.css?v=452',
-      'map-tabs.css?v=452',
-      'map-images.css?v=452',
-      'map-interactive.css?v=452'
+      'map-details.css?v=453',
+      'map-tabs.css?v=453',
+      'map-images.css?v=453',
+      'map-interactive.css?v=453'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -6282,7 +6282,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('[data-map-pane="mine"] #customFleetPanel')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=452');
+  expect(src).toBe('app.js?v=453');
   expect(errors).toEqual([]);
 });
 
@@ -9285,5 +9285,42 @@ test('release smoke: mobile menu reparenting does not resurrect duplicate global
   expect(data.during.direct).toBe(0);
   expect(data.during.menu).toBe(1);
   expect(data.after).toEqual({direct:0,menu:1});
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: enhanced equipment catalog preserves reset and compact peek state', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const data = await page.evaluate(() => {
+    window.hdEnsureEquipmentCatalog?.();
+    window.hdRenderEquipmentCatalog?.();
+    const reset=document.querySelector('.hd-equip-search [data-hd-equip-reset]');
+    const list=document.getElementById('hdEquipCatalogList');
+    list?.classList.add('hd-compact');
+    let card=list?.querySelector('.hd-equip-ref-card');
+    card?.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+    const key=card?.dataset.hdEquipPeekKey||'';
+    const openBefore=!!card?.classList.contains('hd-peek');
+    window.hdRenderEquipmentCatalog?.();
+    card=[...document.querySelectorAll('#hdEquipCatalogList .hd-equip-ref-card')].find(x=>x.dataset.hdEquipPeekKey===key);
+    const search=document.getElementById('hdEquipCatalogSearch');
+    if(search)search.value='電探';
+    window.hdRenderEquipmentCatalog?.();
+    return {
+      initialResetDisabled:!!reset?.disabled,
+      key,
+      openBefore,
+      openAfter:!!card?.classList.contains('hd-peek'),
+      activeReset:document.querySelector('.hd-equip-search [data-hd-equip-reset]')?.classList.contains('is-active')||false,
+      activeResetDisabled:!!document.querySelector('.hd-equip-search [data-hd-equip-reset]')?.disabled
+    };
+  });
+  expect(data.initialResetDisabled).toBe(true);
+  expect(data.key).not.toBe('');
+  expect(data.openBefore).toBe(true);
+  expect(data.openAfter).toBe(true);
+  expect(data.activeReset).toBe(true);
+  expect(data.activeResetDisabled).toBe(false);
   expect(errors).toEqual([]);
 });
