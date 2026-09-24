@@ -3607,20 +3607,20 @@ test('Kancolle sync offers direct next-step navigation', async ({ page }) => {
 });
 
 
-test('home reorder controls persist card order', async ({ page }) => {
+test('home reorder controls persist card order and append newly added cards', async ({ page }) => {
   const errors=[];
   await page.addInitScript(() => {
     localStorage.setItem('harbordesk-home-order-v1', JSON.stringify(['quick','resources','recent','procurement']));
   });
   await boot(page,errors);
   const before=await page.evaluate(()=>[...document.querySelectorAll('#home [data-home-order-item]')].map(x=>x.dataset.homeOrderItem));
-  expect(before).toEqual(['quick','resources','recent','procurement']);
+  expect(before).toEqual(['quick','resources','recent','procurement','fleet']);
   await page.locator('[data-home-order-item="recent"] [data-home-move="up"]').click();
   const after=await page.evaluate(()=>({
     dom:[...document.querySelectorAll('#home [data-home-order-item]')].map(x=>x.dataset.homeOrderItem),
     saved:JSON.parse(localStorage.getItem('harbordesk-home-order-v1')||'[]')
   }));
-  expect(after.dom).toEqual(['quick','recent','resources','procurement']);
+  expect(after.dom).toEqual(['quick','recent','resources','procurement','fleet']);
   expect(after.saved).toEqual(after.dom);
 });
 
@@ -3644,7 +3644,7 @@ test('workspace back returns to previous function', async ({ page }) => {
 });
 
 
-test('home order can reset to default without touching panel state', async ({ page }) => {
+test('home order can reset to current default without touching panel state', async ({ page }) => {
   const errors=[];
   await page.addInitScript(() => {
     localStorage.setItem('harbordesk-home-order-v1', JSON.stringify(['recent','quick','procurement','resources']));
@@ -3659,9 +3659,10 @@ test('home order can reset to default without touching panel state', async ({ pa
       dom:[...document.querySelectorAll('#home [data-home-order-item]')].map(x=>x.dataset.homeOrderItem)
     };
   });
-  expect(data.order).toEqual(['resources','procurement','quick','recent']);
+  const currentDefault=['fleet','resources','procurement','quick','recent'];
+  expect(data.order).toEqual(currentDefault);
   expect(data.panels.resources).toBe(true);
-  expect(data.dom).toEqual(['resources','procurement','quick','recent']);
+  expect(data.dom).toEqual(currentDefault);
 });
 
 
