@@ -564,7 +564,7 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('touchstart',hdWSTouchStart,{passive:true});
 document.addEventListener('touchend',hdWSTouchEnd,{passive:true});
-window.addEventListener('hashchange',()=>{const id=hdWSInitialAnchorId();if(id)setTimeout(()=>hdWSOpenAnchorId(id,true),0)});
+window.addEventListener('hashchange',()=>{const id=hdWSInitialAnchorId();if(id){hdWSMarkUserNavigation();setTimeout(()=>hdWSOpenAnchorId(id,true),0)}});
 window.addEventListener('resize',hdWSUpdateTopbarHeight,{passive:true});
 window.addEventListener('storage',e=>{hdWSUpdateBadges();if(!e||e.key==='harbordesk-kancolle-sync-v1')hdWSUpdateSyncStatus()});
 window.addEventListener('hd:kancolle-sync',hdWSUpdateSyncStatus);
