@@ -9419,7 +9419,7 @@ document.addEventListener('click',e=>{
   if(open)peekCard.classList.add('hd-peek');
   return;
  }
- const dropLink=e.target.closest?.('[data-hd-shipdb-acquire-drop]');if(dropLink){hdEnsureDropDb?.();const input=document.getElementById('hdDropSearch');if(input){input.value=dropLink.dataset.hdShipdbAcquireDrop;hdRenderDropDb()}window.hdWSShowElement?.('dropHuntingDb',true);return}
+ const dropLink=e.target.closest?.('[data-hd-shipdb-acquire-drop]');if(dropLink){const query=dropLink.dataset.hdShipdbAcquireDrop||'';if(typeof window.hdDropOpenSearch==='function'){window.hdDropOpenSearch(query,true);return}hdEnsureDropDb?.();const input=document.getElementById('hdDropSearch');if(input){input.value=query;hdRenderDropDb()}window.hdWSShowElement?.('dropHuntingDb',true);return}
  const buildLink=e.target.closest?.('[data-hd-shipdb-acquire-build]');if(buildLink){hdEnsureConstructionSection?.();hdConstructionMode=buildLink.dataset.hdShipdbBuildMode==='large'?'large':'normal';const input=document.getElementById('hdConstructionSearch');if(input)input.value=buildLink.dataset.hdShipdbAcquireBuild;renderConstructionDb?.();window.hdWSShowElement?.('constructionDb',true);return}
  if(e.target.closest?.('[data-hd-shipdb-empty-reset]')){document.querySelector('[data-hd-shipdb-reset]')?.click();return}
  const reset=e.target.closest?.('[data-hd-shipdb-reset]');if(reset){
