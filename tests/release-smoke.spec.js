@@ -9323,6 +9323,42 @@ test('release smoke: sortie sync preserves battle rank separately from later ret
 });
 
 
+test('release smoke: extended workspace reveal lock survives internal redraw but yields to explicit navigation', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdWSRevealElement === 'function' &&
+    typeof window.hdWSShowElement === 'function' &&
+    typeof window.hdWSApply === 'function' &&
+    typeof window.hdFSEnsure === 'function'
+  );
+
+  const locked = await page.evaluate(() => {
+    window.hdFSEnsure();
+    const target=document.getElementById('hdFleetSuggester');
+    window.hdWSRevealElement(target,false,{lockMs:5000});
+    window.hdWSApply('guide','guide');
+    return {
+      section:window.hdWSState?.sections?.guide||'',
+      visible:!!target&&!target.hidden&&!target.classList.contains('hd-ws-hidden')
+    };
+  });
+  expect(locked).toEqual({section:'hdFleetSuggester',visible:true});
+
+  const explicit = await page.evaluate(() => {
+    window.hdWSShowElement('guide',false);
+    const target=document.getElementById('hdFleetSuggester');
+    return {
+      section:window.hdWSState?.sections?.guide||'',
+      visible:!!target&&!target.hidden&&!target.classList.contains('hd-ws-hidden')
+    };
+  });
+  expect(explicit.section).toBe('guide');
+  expect(explicit.visible).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: Quick Nav sees current workspace state and back history', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
