@@ -2755,7 +2755,7 @@ test('home dashboard surfaces game sync and one-tap jumps', async ({ page }) => 
       syncedAt:Date.now()-120000,ships:206,equipment:93,materials:8,decks:4,expeditions:0,docks:0,quests:0,sorties:0
     }));
     localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify(Array.from({length:206},(_,i)=>({id:String(i+1),name:'艦'+i}))));
-    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify(Array.from({length:93},(_,i)=>({id:String(i+1),name:'装備'+i}))));
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify(Array.from({length:93},(_,i)=>({id:String(i+1),name:'装備'+i,count:1}))));
   });
   await boot(page,errors);
   const data=await page.evaluate(()=>{
