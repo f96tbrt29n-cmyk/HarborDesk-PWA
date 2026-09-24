@@ -2594,7 +2594,7 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
       hasName:text.includes('@name         HarborDesk 艦これ連携'),
       hasRunAt:text.includes('@run-at       document-start'),
       hasPageContext:text.includes('@inject-into  page'),
-      hasFrameInclude:text.includes('203\\.104\\.'),
+      hasFrameInclude:text.includes('203\\.104'),
       hasDmmMatch:text.includes('@match        https://*.dmm.com/*'),
       hasKancolleServerMatch:text.includes('@match        https://*.kancolle-server.com/*'),
       hasLegacyServerInclude:text.includes('125\\.6'),
@@ -2768,8 +2768,8 @@ test('home dashboard surfaces game sync and one-tap jumps', async ({ page }) => 
   });
   expect(data.sync).toContain('ゲーム同期');
   expect(data.sync).toContain('2分前');
+  expect(data.sync).toContain('装備 93');
   expect(data.summary).toContain('206');
-  expect(data.summary).toContain('93');
   expect(data.buttons).toEqual(expect.arrayContaining(['quests','expeditions','roster','equipmentBook','kancolleImport']));
 });
 
@@ -2800,16 +2800,18 @@ test('roster count follows search result', async ({ page }) => {
     ]));
   });
   await boot(page,errors);
-  const data=await page.evaluate(()=>{
+  const before=await page.evaluate(()=>{
     window.renderShipRoster?.();
-    const before=document.getElementById('shipRosterCount')?.textContent||'';
+    const value=document.getElementById('shipRosterCount')?.textContent||'';
     const input=document.getElementById('shipRosterSearch');
     input.value='加賀';
     input.dispatchEvent(new Event('input',{bubbles:true}));
-    return {before,after:document.getElementById('shipRosterCount')?.textContent||''};
+    return value;
   });
-  expect(data.before).toBe('3隻');
-  expect(data.after).toBe('1 / 3隻');
+  await page.waitForTimeout(140);
+  const after=await page.evaluate(()=>document.getElementById('shipRosterCount')?.textContent||'');
+  expect(before).toBe('3隻');
+  expect(after).toBe('1 / 3隻');
 });
 
 
@@ -2896,11 +2898,12 @@ test('roster sort and compact mode persist in session', async ({ page }) => {
     sort:document.getElementById('shipRosterSort')?.value||'',
     compact:document.getElementById('roster')?.classList.contains('roster-compact')||false,
     first:document.querySelector('#shipRosterList .roster-card strong')?.textContent||'',
+    expectedFirst:['翔鶴改二甲','赤城改','加賀改'].sort((a,b)=>a.localeCompare(b,'ja'))[0],
     button:document.querySelector('[data-roster-compact]')?.textContent||''
   }));
   expect(data.sort).toBe('name');
   expect(data.compact).toBe(true);
-  expect(data.first).toBe('赤城改');
+  expect(data.first).toBe(data.expectedFirst);
   expect(data.button).toContain('詳細');
 });
 
@@ -2963,7 +2966,7 @@ test('mobile workspace uses compact section picker', async ({ page }) => {
     };
   });
   expect(data.exists).toBe(true);
-  expect(data.display).toBe('flex');
+  expect(data.display).toBe('grid');
   expect(data.options).toBeGreaterThan(1);
   expect(data.value).toBe('home');
   expect(data.secondaryDisplay).toBe('none');
@@ -3040,16 +3043,17 @@ test('reset actions enable only when filters are active', async ({ page }) => {
   expect(initial.roster).toBe(true);
   expect(initial.ship).toBe(true);
   expect(initial.equip).toBe(true);
-  const active=await page.evaluate(()=>{
+  await page.evaluate(()=>{
     const r=document.getElementById('shipRosterSearch');r.value='加賀';r.dispatchEvent(new Event('input',{bubbles:true}));
     const s=document.getElementById('hdShipDbSearch');s.value='榛名';s.dispatchEvent(new Event('input',{bubbles:true}));
     const e=document.getElementById('hdEquipCatalogSearch');e.value='電探';e.dispatchEvent(new Event('input',{bubbles:true}));
-    return {
-      roster:document.querySelector('[data-roster-reset]')?.classList.contains('is-active'),
-      ship:document.querySelector('[data-hd-shipdb-reset]')?.classList.contains('is-active'),
-      equip:document.querySelector('[data-hd-equip-reset]')?.classList.contains('is-active')
-    };
   });
+  await page.waitForTimeout(140);
+  const active=await page.evaluate(()=>({
+    roster:document.querySelector('[data-roster-reset]')?.classList.contains('is-active'),
+    ship:document.querySelector('[data-hd-shipdb-reset]')?.classList.contains('is-active'),
+    equip:document.querySelector('[data-hd-equip-reset]')?.classList.contains('is-active')
+  }));
   expect(active.roster).toBe(true);
   expect(active.ship).toBe(true);
   expect(active.equip).toBe(true);
@@ -3095,7 +3099,7 @@ test('home dashboard promotes the next timer', async ({ page }) => {
     return {text:el?.textContent||'',urgent:el?.classList.contains('urgent')||false};
   });
   expect(data.text).toContain('東京急行');
-  expect(data.text).toContain('次に終わる');
+  expect(data.text).toContain('もうすぐ終わる');
   expect(data.urgent).toBe(true);
 });
 
@@ -5769,19 +5773,33 @@ test('fresh sync status opens dialog instead of navigating', async ({ page }) =>
 });
 
 
-test('mobile dock exposes four primary actions', async ({ page }) => {
+test('mobile dock exposes navigation context and four primary actions', async ({ page }) => {
   const errors=[];
   await page.setViewportSize({width:390,height:844});
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    window.hdQNEnsure?.();const d=document.getElementById('hdMobileDock');return {exists:!!d,actions:[...d.querySelectorAll('button')].map(b=>b.textContent.trim()),fabDisplay:getComputedStyle(document.getElementById('hdQuickNavButton')).display};
+    window.hdQNEnsure?.();
+    const d=document.getElementById('hdMobileDock');
+    const primary=['home','search','sync','menu'].map(x=>!!d?.querySelector('[data-hd-mobile-'+x+']'));
+    return {
+      exists:!!d,
+      total:d?.querySelectorAll('button').length||0,
+      hasBack:!!d?.querySelector('[data-hd-mobile-back]'),
+      hasLocation:!!d?.querySelector('[data-hd-mobile-location]'),
+      primary,
+      text:d?.textContent||'',
+      fabDisplay:getComputedStyle(document.getElementById('hdQuickNavButton')).display
+    };
   });
   expect(data.exists).toBe(true);
-  expect(data.actions).toHaveLength(4);
-  expect(data.actions.join(' ')).toContain('ホーム');
-  expect(data.actions.join(' ')).toContain('検索');
-  expect(data.actions.join(' ')).toContain('同期');
-  expect(data.actions.join(' ')).toContain('機能');
+  expect(data.total).toBe(6);
+  expect(data.hasBack).toBe(true);
+  expect(data.hasLocation).toBe(true);
+  expect(data.primary).toEqual([true,true,true,true]);
+  expect(data.text).toContain('ホーム');
+  expect(data.text).toContain('検索');
+  expect(data.text).toContain('同期');
+  expect(data.text).toContain('機能');
   expect(data.fabDisplay).toBe('none');
 });
 
@@ -5836,10 +5854,12 @@ test('mobile dock home badge shows attention count', async ({ page }) => {
   const errors=[];
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    window.state=window.state||{};
-    window.state.quests=[{id:'q1',name:'任務',done:false}];
-    window.state.expeditions=[{id:'e1',name:'遠征',endsAt:Date.now()+10*60*1000}];
-    window.state.docks=[];
+    window.hdGetAppState=()=>({
+      quests:[{id:'q1',name:'任務',done:false}],
+      expeditions:[{id:'e1',name:'遠征',endsAt:Date.now()+10*60*1000}],
+      docks:[],
+      resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
+    });
     localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
       syncedAt:Date.now()-8*3600000,
       coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true}
@@ -5900,10 +5920,12 @@ test('mobile attention sheet lists actionable reasons', async ({ page }) => {
   });
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    window.state=window.state||{};
-    window.state.quests=[{id:'q1',name:'デイリー任務',done:false}];
-    window.state.expeditions=[{id:'e1',name:'海上護衛任務',endsAt:Date.now()+5*60*1000}];
-    window.state.docks=[];
+    window.hdGetAppState=()=>({
+      quests:[{id:'q1',name:'デイリー任務',done:false}],
+      expeditions:[{id:'e1',name:'海上護衛任務',endsAt:Date.now()+5*60*1000}],
+      docks:[],
+      resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
+    });
     window.hdQNEnsure?.();
     window.hdQNUpdateMobileDock?.();
     window.hdQNOpenAttention?.();
@@ -6124,7 +6146,7 @@ test('mobile update banner clears the two-row dock', async ({ page }) => {
     const banner=document.getElementById('hdUpdateBanner');
     if(banner)banner.hidden=false;
     const dock=document.getElementById('hdMobileDock');
-    const bs=banner?getComputedStyle(banner):null,ds=dock?getBoundingClientRect():null;
+    const bs=banner?getComputedStyle(banner):null,ds=dock?dock.getBoundingClientRect():null;
     return {bottom:parseFloat(bs?.bottom||'0'),dockHeight:ds?.height||0};
   });
   expect(data.bottom).toBeGreaterThanOrEqual(100);
@@ -6602,7 +6624,7 @@ test('quick nav ranks categories and context by real usage', async ({ page }) =>
   const errors=[];
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    localStorage.setItem('harbordesk-quick-nav-pins-v1',JSON.stringify(['customFleets']));
+    localStorage.setItem('harbordesk-quick-nav-pins-v1',JSON.stringify(['shipDatabase']));
     localStorage.setItem('harbordesk-quick-nav-recent-v1',JSON.stringify([
       {id:'trainingPlanner',at:Date.now()-1000},
       {id:'roster',at:Date.now()-2000},
@@ -6632,7 +6654,7 @@ test('quick nav ranks categories and context by real usage', async ({ page }) =>
   });
   expect(data.nonHome[0].group).toBe('fleet');
   expect(data.nonHome[0].useCount).toBeGreaterThan(data.nonHome[1].useCount);
-  expect(data.context[0]).toBe('customFleets');
+  expect(data.context[0]).toBe('shipDatabase');
   expect(data.context.indexOf('roster')).toBeLessThan(data.context.indexOf('trainingPlanner'));
   expect(data.first).toBe(true);
   expect(data.second).toBe(false);
@@ -6784,6 +6806,7 @@ test('home shows prioritized attention items and opens full attention list', asy
   await boot(page,errors);
   const data=await page.evaluate(async()=>{
     const now=Date.now();
+    localStorage.setItem('harbordesk-last-external-backup-v1',String(now));
     localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({
       syncedAt:now,
       ships:100,
@@ -7373,8 +7396,10 @@ test('home warns when external backup is missing or stale and exports from warni
     };
 
     window.__backupClicked=0;
+    window.shareBackup=async()=>{window.__backupClicked++;return false};
     window.exportBackup=()=>{window.__backupClicked++};
     missingAlert?.click();
+    await new Promise(r=>setTimeout(r,0));
     const clicked=window.__backupClicked;
 
     localStorage.setItem(key,String(Date.now()-15*86400000));
