@@ -9411,7 +9411,10 @@ test('release smoke: diagnostics center runtime stylesheet is loaded', async ({ 
     !!document.querySelector('link[data-hd-diagnostics-center]')
   );
 
-  await page.evaluate(() => window.hdDXEnsure?.());
+  await page.evaluate(async () => {
+    window.hdDXEnsure?.();
+    await window.hdDXRender?.();
+  });
   await page.waitForSelector('#diagnosticsCenter .hd-dx-note', { state: 'attached' });
   const data = await page.evaluate(() => {
     const link=document.querySelector('link[data-hd-diagnostics-center]');
