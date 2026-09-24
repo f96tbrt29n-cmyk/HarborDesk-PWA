@@ -1061,15 +1061,15 @@ test('release smoke: duplicate bridge retries apply one sync and reject mismatch
   expect(errors).toEqual([]);
 });
 
-test('release smoke: userscript prefers postMessage bridge and keeps hash fallback', async ({ page }) => {
+test('release smoke: userscript uses same-tab hash handoff while importer keeps legacy bridge compatibility', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
   const source=await page.evaluate(async()=>fetch('./HarborDesk-Kancolle.user.js',{cache:'no-store'}).then(r=>r.text()));
   const importer=await page.evaluate(async()=>fetch('./kancolle-import.js',{cache:'no-store'}).then(r=>r.text()));
-  expect(source).toContain("window.open(HARBOR_URL+'#kancolleImport','HarborDeskSync')");
-  expect(source).toContain("type:BRIDGE_IMPORT_MESSAGE");
-  expect(source).toContain("BRIDGE_ACK_MESSAGE");
+  expect(source).not.toContain("window.open(HARBOR_URL+'#kancolleImport','HarborDeskSync')");
+  expect(source).not.toContain("type:BRIDGE_IMPORT_MESSAGE");
   expect(source).toContain("a.href=HARBOR_URL+'#kcimport='+token");
+  expect(source).toContain("a.target='_self'");
   expect(importer).toContain("HD_KC_BRIDGE_READY_MESSAGE='harbordesk-kancolle-import-ready-v1'");
   expect(importer).toContain("async function hdKcConsumeHashImport()");
   expect(importer).toContain("window.opener.postMessage({type:HD_KC_BRIDGE_READY_MESSAGE");
