@@ -2772,8 +2772,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.465'");
-  expect(source).toContain("const HD_APP_BUILD=465");
+  expect(source).toContain("const HD_APP_VERSION='1.0.466'");
+  expect(source).toContain("const HD_APP_BUILD=466");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -2796,15 +2796,15 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=465`);
+    expect(data.index).toContain(`${asset}?v=466`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=465");
+  expect(data.updater).toContain("const HD_APP_BUILD=466");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdScriptAssetUrl(src,attempt)");
   expect(data.updater).toContain("function hdScriptAssetUrl(src,attempt=0)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v465");
+  expect(data.sw).toContain("harbordesk-pwa-v466");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -2817,7 +2817,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=465');
+  expect(source).toContain('const BUILD=466');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -6426,17 +6426,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=465',
-      'map-images.js?v=465',
-      'map-tabs.js?v=465',
-      'map-interactive.js?v=465',
-      'map-advanced-data.js?v=465'
+      'map-details.js?v=466',
+      'map-images.js?v=466',
+      'map-tabs.js?v=466',
+      'map-interactive.js?v=466',
+      'map-advanced-data.js?v=466'
     ];
     const requiredStyles = [
-      'map-details.css?v=465',
-      'map-tabs.css?v=465',
-      'map-images.css?v=465',
-      'map-interactive.css?v=465'
+      'map-details.css?v=466',
+      'map-tabs.css?v=466',
+      'map-images.css?v=466',
+      'map-interactive.css?v=466'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -6497,7 +6497,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('[data-map-pane="mine"] #customFleetPanel')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=465');
+  expect(src).toBe('app.js?v=466');
   expect(errors).toEqual([]);
 });
 
@@ -9794,7 +9794,7 @@ test('release smoke: diagnostics center runtime stylesheet is loaded', async ({ 
     };
   });
 
-  expect(data.href).toContain('diagnostics-center.css?v=465');
+  expect(data.href).toContain('diagnostics-center.css?v=466');
   expect(data.loaded).toBe('1');
   expect(data.noteFont).not.toBe('');
   expect(data.noteLine).not.toBe('');
@@ -9915,5 +9915,22 @@ test('release smoke: empty required dialog can cancel and global search is label
     timer:document.querySelector('#timerDialog [value="cancel"]')?.formNoValidate || false
   }));
   expect(formNoValidate).toEqual({ quest:true, timer:true });
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: leveling maps and fleet examples are available without a roster', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await expect(page.locator('#trainingPlanner')).toHaveCount(1, { timeout: 30000 });
+  await page.evaluate(() => window.hdWSShowElement('trainingPlanner', true));
+  const cards = page.locator('.hd-training-map-card');
+  await expect(cards).toHaveCount(6);
+  await expect(cards.nth(0)).toContainText('育成艦1＋対潜随伴3');
+  await expect(cards.nth(1)).toContainText('駆逐/海防');
+  await expect(cards.nth(3)).toContainText('夜戦装備');
+  await expect(cards.nth(4)).toContainText('軽巡1＋駆逐4');
+  await expect(page.locator('#hdTrainingList')).toContainText('艦隊台帳');
+  await cards.nth(0).getByRole('button', { name: '海域情報を見る' }).click();
+  await expect(page.locator('#guide')).toBeVisible();
   expect(errors).toEqual([]);
 });
