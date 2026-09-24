@@ -352,6 +352,7 @@ async function hdCoreQuestAction(kind,id){
  const fn=kind==='open'?'hdQuestOpenFromMap':'hdQuestAddFromMap';
  if(typeof window[fn]!=='function'&&typeof window.hdEnsureCurrentAssets==='function'){try{await window.hdEnsureCurrentAssets()}catch{}}
  if(typeof window[fn]!=='function'){window.hdToast?.('任務機能を読み込めなかったよ。アプリ更新を試してね','warn');return false}
+ if(kind==='open')hdCoreClearFallbackState();
  const ok=window[fn](id);
  if(kind==='add'&&selectedMap)setTimeout(()=>{const host=document.getElementById('hdFallbackQuestTools');if(host)host.innerHTML=`<div class="map-tab-card"><b>${esc(selectedMap)} 関連任務</b><p>この海域に関係する任務を確認して、チェックリストへ追加できるよ。</p></div>${hdCoreQuestHtml(selectedMap)}`},0);
  return ok!==false;
