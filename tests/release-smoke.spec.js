@@ -77,6 +77,18 @@ test('release smoke: app boots with core modules and master data', async ({ page
   expect(errors).toEqual([]);
 });
 
+test('release smoke: 5-6 stays registered when extended map details fail to load', async ({ page }) => {
+  const errors = [];
+  await page.route('**/map-details-57.js*', route => route.abort());
+  await boot(page, errors);
+
+  await openGuideWorkspace(page);
+  await page.locator('[data-world="5"]').click();
+
+  await expect(page.locator('[data-map="5-6"]')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
+
 test('release smoke: workspace navigation changes location and returns home', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
