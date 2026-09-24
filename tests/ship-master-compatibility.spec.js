@@ -4582,13 +4582,16 @@ test('Kancolle import reports outdated Userscript version', async ({ page }) => 
     }));
   });
   await boot(page,errors);
-  const data=await page.evaluate(()=>{
+  const data=await page.evaluate(async()=>{
     window.hdKcEnsureImport?.();window.hdKcRenderSyncStatus?.();
     const el=document.getElementById('hdKcUserscriptStatus');
-    return {text:el?.textContent||'',link:el?.querySelector('a')?.getAttribute('href')||'',cls:el?.className||''};
+    const script=await fetch('./HarborDesk-Kancolle.user.js',{cache:'no-store'}).then(r=>r.text());
+    const latest=script.match(/^\/\/ @version\s+(\S+)/m)?.[1]||'';
+    return {text:el?.textContent||'',link:el?.querySelector('a')?.getAttribute('href')||'',cls:el?.className||'',latest};
   });
-  expect(data.text).toContain('v1.0.5');
-  expect(data.text).toContain('v1.0.8');
+  expect(data.latest).not.toBe('');
+  expect(data.text).toContain('v1.0.7');
+  expect(data.text).toContain('v'+data.latest);
   expect(data.link).toContain('HarborDesk-Kancolle.user.js');
   expect(data.cls).toContain('outdated');
 });
