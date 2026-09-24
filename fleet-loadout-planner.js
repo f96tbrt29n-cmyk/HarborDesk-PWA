@@ -228,12 +228,16 @@ function hdFLRender(index,card){
  let host=card.querySelector('.hd-fl-host');if(!host){host=document.createElement('div');host.className='hd-fl-host';card.appendChild(host)}
  host.innerHTML=hdFLPlanHtml(plan);if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);host.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
+function hdFLCachedPlan(index){
+ const map=typeof hdFSMap==='function'?hdFSMap():'';
+ return map?HD_FL_CACHE[map+':'+index]||null:null;
+}
 function hdFLInstall(){
  if(window.__hdFleetLoadoutInstalled||typeof hdFSSuggestionHtml!=='function')return false;window.__hdFleetLoadoutInstalled=true;
  const prev=hdFSSuggestionHtml;hdFSSuggestionHtml=function(s){
   let html=prev(s);
-  const btn=`<button type="button" class="ghost small" data-hd-fl-generate="${s.index}">手持ち装備を自動配備</button>`;
-  html=html.replace('</div></article>',`${btn}</div><div class="hd-fl-host"></div></article>`);return html;
+  const btn=`<button type="button" class="ghost small" data-hd-fl-generate="${s.index}">手持ち装備を自動配備</button>`,cached=hdFLCachedPlan(s.index),planHtml=cached?hdFLPlanHtml(cached):'';
+  html=html.replace('</div></article>',`${btn}</div><div class="hd-fl-host">${planHtml}</div></article>`);return html;
  };
  if(typeof hdFSRender==='function')hdFSRender();return true;
 }
