@@ -39,7 +39,7 @@ function hdWSActivePin(){
  if(!hdWSPin.sectionId||Date.now()>=hdWSPin.until){if(hdWSPin.sectionId)hdWSClearPin();return null}
  return hdWSPin;
 }
-function hdWSMarkDirectNavigation(){window.__HD_WORKSPACE_DIRECT_NAV_EPOCH=(Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0)+1;return window.__HD_WORKSPACE_DIRECT_NAV_EPOCH}
+function hdWSMarkDirectNavigation(){hdWSNavLockUntil=0;hdWSClearPin();window.__HD_WORKSPACE_DIRECT_NAV_EPOCH=(Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0)+1;return window.__HD_WORKSPACE_DIRECT_NAV_EPOCH}
 
 function hdWSLoad(){try{const v=JSON.parse(localStorage.getItem(HD_WS_KEY)||'{}');return {group:v.group||'home',sections:v.sections||{}}}catch{return {group:'home',sections:{}}}}
 function hdWSSave(){localStorage.setItem(HD_WS_KEY,JSON.stringify(hdWSState))}
