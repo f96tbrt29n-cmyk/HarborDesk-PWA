@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: full-browser-regression
+  group: full-browser-regression-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
