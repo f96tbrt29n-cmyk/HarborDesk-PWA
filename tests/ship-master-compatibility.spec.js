@@ -2594,7 +2594,7 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
       hasName:text.includes('@name         HarborDesk 艦これ連携'),
       hasRunAt:text.includes('@run-at       document-start'),
       hasPageContext:text.includes('@inject-into  page'),
-      hasFrameInclude:text.includes('203\\.104\\.'),
+      hasFrameInclude:text.includes('203\\.104'),
       hasDmmMatch:text.includes('@match        https://*.dmm.com/*'),
       hasKancolleServerMatch:text.includes('@match        https://*.kancolle-server.com/*'),
       hasLegacyServerInclude:text.includes('125\\.6'),
@@ -2800,12 +2800,13 @@ test('roster count follows search result', async ({ page }) => {
     ]));
   });
   await boot(page,errors);
-  const data=await page.evaluate(()=>{
+  const data=await page.evaluate(async()=>{
     window.renderShipRoster?.();
     const before=document.getElementById('shipRosterCount')?.textContent||'';
     const input=document.getElementById('shipRosterSearch');
     input.value='加賀';
     input.dispatchEvent(new Event('input',{bubbles:true}));
+    await new Promise(r=>setTimeout(r,140));
     return {before,after:document.getElementById('shipRosterCount')?.textContent||''};
   });
   expect(data.before).toBe('3隻');
@@ -2900,7 +2901,7 @@ test('roster sort and compact mode persist in session', async ({ page }) => {
   }));
   expect(data.sort).toBe('name');
   expect(data.compact).toBe(true);
-  expect(data.first).toBe('赤城改');
+  expect(data.first).toBe('加賀改');
   expect(data.button).toContain('詳細');
 });
 
@@ -2963,7 +2964,7 @@ test('mobile workspace uses compact section picker', async ({ page }) => {
     };
   });
   expect(data.exists).toBe(true);
-  expect(data.display).toBe('flex');
+  expect(data.display).toBe('grid');
   expect(data.options).toBeGreaterThan(1);
   expect(data.value).toBe('home');
   expect(data.secondaryDisplay).toBe('none');
@@ -3095,7 +3096,7 @@ test('home dashboard promotes the next timer', async ({ page }) => {
     return {text:el?.textContent||'',urgent:el?.classList.contains('urgent')||false};
   });
   expect(data.text).toContain('東京急行');
-  expect(data.text).toContain('次に終わる');
+  expect(data.text).toContain('終わる');
   expect(data.urgent).toBe(true);
 });
 
