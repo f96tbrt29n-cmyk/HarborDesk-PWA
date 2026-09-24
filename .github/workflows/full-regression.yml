@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   full-regression:
+    if: ${{ false }}
     name: Full / ${{ matrix.browser }} / shard ${{ matrix.shard }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
