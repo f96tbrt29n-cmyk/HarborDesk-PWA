@@ -197,9 +197,25 @@ function hdSPSOpen(){
  setTimeout(()=>{if(hdSPSStillSelected(target))hdSPSReveal(target,false);hdSPSRender()},70);
  setTimeout(()=>{if(hdSPSStillSelected(target))hdSPSReveal(target,false);hdSPSRender()},430);
 }
+function hdSPSWorkspaceTargetSelected(target){
+ if(!target)return false;
+ const group=String(target.dataset?.hdWorkspaceGroup||'');
+ try{
+  const state=JSON.parse(localStorage.getItem('harbordesk-workspace-tabs-v1')||'{}')||{};
+  if(group&&state.group===group)return !state.sections?.[group]||state.sections[group]===target.id;
+ }catch{}
+ return !target.hidden&&!target.classList.contains('hd-ws-hidden')&&!target.closest('.hd-ws-wrapper-hidden');
+}
 function hdSPSOpenWorkspace(id){
- if(typeof hdWSShowElement==='function'&&hdWSShowElement(id,true))return true;
- return hdSPSReveal(document.getElementById(id));
+ const target=document.getElementById(id);if(!target)return false;
+ if(typeof hdWSShowElement==='function'&&hdWSShowElement(target,true))return true;
+ const opened=hdSPSReveal(target,true);if(!opened)return false;
+ const keep=()=>{
+  if(!document.contains(target)||!hdSPSWorkspaceTargetSelected(target))return;
+  if(target.hidden||target.classList.contains('hd-ws-hidden')||target.closest('.hd-ws-wrapper-hidden'))hdSPSReveal(target,false);
+ };
+ requestAnimationFrame(keep);setTimeout(keep,80);setTimeout(keep,360);setTimeout(keep,1200);setTimeout(keep,1900);
+ return true;
 }
 function hdSPSOpenMapTab(tab,focusBase=false){
  if(!(typeof hdWSShowElement==='function'&&hdWSShowElement('guide',true)))hdSPSReveal(document.getElementById('guide'),false);
