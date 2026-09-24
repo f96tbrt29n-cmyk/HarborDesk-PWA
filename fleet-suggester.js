@@ -175,6 +175,10 @@ function hdFSOpenRecoveryAllowed(target){
  return state&&state.group==='guide'&&(!section||section==='guide');
 }
 function hdFSOpen(){
+ // Opening the suggester leaves the map fallback context on purpose.
+ // Cancel any already-scheduled fallback restore so it cannot steal the
+ // workspace back to the guide root after the user chose this tool.
+ try{window.hdCoreClearFallbackState?.()}catch(e){}
  hdFSEnsure();var target=document.getElementById('hdFleetSuggester');if(!target)return false;
  var opened=typeof hdWSShowElement==='function'&&hdWSShowElement(target,true)!==false;
  if(!opened)opened=hdFSReveal(target);
@@ -184,12 +188,12 @@ function hdFSOpen(){
   if((Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0)!==navEpoch)return;
   if(hdFSStillSelected(target)){hdFSReveal(target);navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||navEpoch;return}
   if(!hdFSOpenRecoveryAllowed(target))return;
-  if(typeof window.hdWSRevealElement==='function')window.hdWSRevealElement(target,true,{history:false});
+  if(typeof window.hdWSRevealElement==='function')window.hdWSRevealElement(target,true,{history:false,direct:false});
   else if(typeof hdWSShowElement==='function')hdWSShowElement(target,true);
   else hdFSReveal(target);
   navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||navEpoch;
  };
- requestAnimationFrame(settle);setTimeout(settle,80);setTimeout(settle,420);setTimeout(settle,1200);setTimeout(settle,1900);setTimeout(settle,3600);
+ requestAnimationFrame(settle);[80,420,1200,1900,3600,6500,9500,13500].forEach(function(ms){setTimeout(settle,ms)});
  return !!opened;
 }
 function hdFSOpenRoster(){if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return true;return hdFSReveal(document.getElementById('roster'))}

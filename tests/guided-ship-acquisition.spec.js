@@ -92,6 +92,17 @@ test('ship database: acquisition shows sourced drops and exact construction reci
   await expect(buildButton).toBeVisible();
   await buildButton.click();
   await expect(page.locator('#hdConstructionSearch')).toHaveValue('大和');
+  await expect(page.locator('[data-hd-build-mode="large"]')).toHaveClass(/active/);
+
+  await page.evaluate(() => {
+    document.getElementById('constructionDb')?.remove();
+    window.hdEnsureConstructionSection?.();
+  });
+  await expect(page.locator('#hdConstructionSearch')).toHaveValue('大和');
+  await expect(page.locator('[data-hd-build-mode="large"]')).toHaveClass(/active/);
+  const savedConstructionView = await page.evaluate(() => JSON.parse(sessionStorage.getItem('harbordesk-session-construction-view-v1') || '{}'));
+  expect(savedConstructionView).toMatchObject({ query:'大和', mode:'large' });
+
   await page.evaluate(() => window.hdWSShowElement?.('shipDatabase', true));
   await search.fill('1-5');
   await expect(page.locator('#hdShipDbList .hd-shipdb-head strong').filter({ hasText: '明石' }).first()).toContainText('明石');
