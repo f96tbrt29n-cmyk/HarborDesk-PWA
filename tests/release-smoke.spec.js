@@ -3401,12 +3401,7 @@ test('release smoke: restore refuses to run without safety snapshot layer', asyn
     typeof window.importBackup === 'function'
   );
 
-  await page.evaluate(async () => {
-    // Seed one snapshot first so the scheduled daily snapshot cannot race while
-    // this test temporarily removes the snapshot API.
-    if (typeof window.hdPHCreateSnapshot === 'function') {
-      await window.hdPHCreateSnapshot('テスト準備');
-    }
+  await page.evaluate(() => {
     localStorage.setItem('harbordesk-safety-layer', JSON.stringify({ value: 'safe' }));
     const built = window.hdBuildBackupFile();
     built.data.localStorage['harbordesk-safety-layer'] = JSON.stringify({ value: 'incoming' });
@@ -4804,8 +4799,16 @@ test('release smoke: secondary map gear and readiness controls work', async ({ p
   const add = recommend.locator('[data-hd-equip-add]').first();
   await expect(add).toBeVisible();
   const equipName = await add.getAttribute('data-hd-equip-add');
+  await page.evaluate(() => {
+    window.__hdDelayedOpenEquipment = window.openEquipment;
+    window.openEquipment = undefined;
+    setTimeout(() => {
+      window.openEquipment = window.__hdDelayedOpenEquipment;
+      delete window.__hdDelayedOpenEquipment;
+    }, 160);
+  });
   await add.click();
-  await expect(page.locator('#equipmentDialog')).toBeVisible();
+  await expect(page.locator('#equipmentDialog')).toBeVisible({ timeout: 5000 });
   await page.locator('#equipmentDialog button[value="default"]').click();
 
   await expect(recommend.locator('[data-hd-owned-open]').filter({ hasText:'台帳で確認' }).first()).toBeVisible();
