@@ -2691,6 +2691,38 @@ test('release smoke: series comparison treats missing resource telemetry as unkn
 });
 
 
+test('release smoke: series comparison only awards best badges within the same map', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSPASeriesComparison === 'function' &&
+    typeof window.hdSPASeriesComparisonHtml === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const rows = [
+      {id:'a1',seriesId:'map-a',cycleIndex:1,map:'2-4',source:'session',at:1000,result:'S',boss:true,fuel:120,ammo:80,buckets:1,durationMs:60000},
+      {id:'a2',seriesId:'map-a',cycleIndex:2,map:'2-4',source:'session',at:2000,result:'S',boss:true,fuel:120,ammo:80,buckets:1,durationMs:60000},
+      {id:'b1',seriesId:'map-b',cycleIndex:1,map:'3-2',source:'session',at:3000,result:'S',boss:true,fuel:20,ammo:20,buckets:0,durationMs:30000},
+      {id:'b2',seriesId:'map-b',cycleIndex:2,map:'3-2',source:'session',at:4000,result:'S',boss:true,fuel:20,ammo:20,buckets:0,durationMs:30000}
+    ];
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify(rows));
+    localStorage.setItem('harbordesk-sortie-analytics-mode-v1','series');
+    const grouped=window.hdSPARows();
+    const compare=window.hdSPASeriesComparison(grouped);
+    return {compare,html:window.hdSPASeriesComparisonHtml(grouped),text:window.hdSPASeriesComparisonText(grouped)};
+  });
+
+  expect(data.compare).toHaveLength(2);
+  expect(data.compare.every(x=>x.badges.length===0)).toBe(true);
+  expect(data.html).toContain('2-4｜2周');
+  expect(data.html).toContain('3-2｜2周');
+  expect(data.text).toContain('[2-4]');
+  expect(data.text).toContain('[3-2]');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
