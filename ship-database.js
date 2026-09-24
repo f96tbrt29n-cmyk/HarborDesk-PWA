@@ -9302,8 +9302,33 @@ function hdShipDbStatus(item){
  return {label:'育成中',cls:'owned',detail:`${own.name}${lv?` Lv.${lv} / あと${Math.max(0,item.targetLv-lv)}Lv`:''}`};
 }
 function hdShipDbScheduleRender(delay=90){clearTimeout(hdShipDbRenderTimer);hdShipDbRenderTimer=setTimeout(hdRenderShipDatabase,Math.max(0,Number(delay)||0))}
+function hdShipDbDetailStateKind(details){
+ if(details?.classList?.contains('hd-shipdb-master-suggest'))return 'master-suggest';
+ if(details?.classList?.contains('hd-shipdb-master-equip'))return 'master-equip';
+ if(details?.classList?.contains('hd-shipdb-acquisition'))return 'acquisition';
+ if(details?.classList?.contains('hd-shipdb-detail'))return 'detail';
+ return '';
+}
+function hdShipDbOpenDetailsSnapshot(list){
+ return [...(list?.querySelectorAll?.('details[open]')||[])].map(details=>{
+  const card=details.closest?.('[data-hd-shipdb-peek-key]'),cardKey=String(card?.dataset?.hdShipdbPeekKey||''),kind=hdShipDbDetailStateKind(details);
+  return cardKey&&kind?{cardKey,kind}:null;
+ }).filter(Boolean);
+}
+function hdShipDbRestoreOpenDetails(list,rows){
+ for(const row of rows||[]){
+  const card=[...(list?.querySelectorAll?.('[data-hd-shipdb-peek-key]')||[])].find(x=>String(x.dataset?.hdShipdbPeekKey||'')===String(row?.cardKey||''));
+  if(!card)continue;
+  const selector=row.kind==='master-suggest'?'details.hd-shipdb-master-suggest'
+   :row.kind==='master-equip'?'details.hd-shipdb-master-equip:not(.hd-shipdb-master-suggest)'
+   :row.kind==='acquisition'?'details.hd-shipdb-acquisition'
+   :row.kind==='detail'?'details.hd-shipdb-detail':'';
+  const details=selector?card.querySelector(selector):null;if(details)details.open=true;
+ }
+}
 function hdRenderShipDatabase(){
  const list=document.getElementById('hdShipDbList');if(!list)return;
+ const openDetails=hdShipDbOpenDetailsSnapshot(list);
  const q=(document.getElementById('hdShipDbSearch')?.value||'').trim().toLowerCase();
  let rows=HD_SHIP_DATABASE.filter(x=>(hdShipDbType==='すべて'||x.type===hdShipDbType)&&(!q||`${x.base} ${x.final} ${x.type} ${x.roles.join(' ')} ${x.note} ${x.path} ${(HD_SHIP_LOADOUTS[x.final]||[]).flatMap(y=>[y.name,...y.gear,y.memo]).join(' ')}`.toLowerCase().includes(q)||hdShipDbAcquisitionMatches(x.base,q)));
  if(hdShipDbMissingOnly)rows=rows.filter(x=>!hdShipDbOwned(x));
@@ -9322,6 +9347,7 @@ function hdRenderShipDatabase(){
  if(summary){summary.hidden=!chips.length;summary.innerHTML=chips.length?chips.map(x=>`<span>${hdShipDbEsc(x)}</span>`).join('')+'<button type="button" class="ghost small" data-hd-shipdb-reset>クリア</button>':''}
  const count=document.getElementById('hdShipDbCount');if(count)count.textContent=(q||hdShipDbImageFilter!=='all')&&hdShipDbIncludeMaster?`詳細 ${rows.length} / マスター ${masterRows.length}`:`詳細 ${rows.length}隻`;
  list.innerHTML=(detailedHtml||masterHtml)?detailedHtml+masterHtml:'<div class="empty empty-action"><strong>条件に合う艦娘がいないよ</strong><p>検索・艦種・所持・画像条件を一度戻してみて。</p><button type="button" class="ghost small" data-hd-shipdb-empty-reset>条件をクリア</button></div>';
+ hdShipDbRestoreOpenDetails(list,openDetails);
  if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(list);
 }
 function hdEnsureShipDatabase(){
