@@ -167,7 +167,28 @@ function hdFSStillSelected(target){
   return state.group==='guide'&&state.sections&&state.sections.guide===(target&&target.id);
  }catch(e){return !!target&&!target.hidden&&!target.classList.contains('hd-ws-hidden')}
 }
-function hdFSOpen(){hdFSEnsure();var target=document.getElementById('hdFleetSuggester');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdFleetSuggester',true)))hdFSReveal(target);hdFSRender(true);setTimeout(function(){if(hdFSStillSelected(target))hdFSReveal(target)},60);setTimeout(function(){if(hdFSStillSelected(target))hdFSReveal(target)},420)}
+function hdFSOpenRecoveryAllowed(target){
+ if(!target||!document.contains(target)||hdFSStillSelected(target))return false;
+ var state=window.hdWSState;
+ if(!state||typeof state!=='object'){try{state=JSON.parse(localStorage.getItem('harbordesk-workspace-tabs-v1')||'{}')}catch(e){state={}}}
+ var section=state&&state.sections&&state.sections.guide||'';
+ return state&&state.group==='guide'&&(!section||section==='guide');
+}
+function hdFSOpen(){
+ hdFSEnsure();var target=document.getElementById('hdFleetSuggester');if(!target)return false;
+ var opened=typeof hdWSShowElement==='function'&&hdWSShowElement(target,true)!==false;
+ if(!opened)opened=hdFSReveal(target);
+ hdFSRender(true);
+ var settle=function(){
+  if(hdFSStillSelected(target)){hdFSReveal(target);return}
+  if(!hdFSOpenRecoveryAllowed(target))return;
+  if(typeof window.hdWSRevealElement==='function')window.hdWSRevealElement(target,true,{history:false});
+  else if(typeof hdWSShowElement==='function')hdWSShowElement(target,true);
+  else hdFSReveal(target);
+ };
+ requestAnimationFrame(settle);setTimeout(settle,80);setTimeout(settle,420);
+ return !!opened;
+}
 function hdFSOpenRoster(){if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return true;return hdFSReveal(document.getElementById('roster'))}
 function hdFSMapButton(){var head=document.querySelector('#selectedMapCard .map-tabs-head');if(!head||head.querySelector('[data-hd-fs-open]'))return;var b=document.createElement('button');b.type='button';b.className='ghost small';b.setAttribute('data-hd-fs-open','1');b.textContent='編成候補';head.appendChild(b)}
 async function hdFSOpenAcquire(kind,button){
