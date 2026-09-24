@@ -311,16 +311,22 @@ function hdSPASeriesComparison(rows){
   };
  });
  if(items.length<2)return items;
- const num=(key)=>items.filter(x=>x[key]!=null&&Number.isFinite(Number(x[key])));
- const min=(key)=>{const xs=num(key);return xs.length?Math.min(...xs.map(x=>Number(x[key]))):null};
- const max=(key)=>{const xs=num(key);return xs.length?Math.max(...xs.map(x=>Number(x[key]))):null};
- const best={resourcePerCycle:min('resourcePerCycle'),bucketsPerCycle:min('bucketsPerCycle'),avgCycleMin:min('avgCycleMin'),bossRate:max('bossRate'),sRate:max('sRate'),retreatRate:min('retreatRate')};
- return items.map(x=>{const b=[];if(best.resourcePerCycle!=null&&x.resourcePerCycle===best.resourcePerCycle)b.push('資源/周 最小');if(best.bucketsPerCycle!=null&&x.bucketsPerCycle===best.bucketsPerCycle)b.push('バケツ/周 最小');if(best.avgCycleMin!=null&&x.avgCycleMin===best.avgCycleMin)b.push('平均時間 最短');if(x.bossRate===best.bossRate)b.push('ボス到達 最高');if(x.sRate===best.sRate)b.push('S率 最高');if(x.retreatRate===best.retreatRate)b.push('撤退率 最低');return {...x,badges:b}});
+ const groups=new Map();
+ for(const item of items){const key=String(item.map||'');if(!groups.has(key))groups.set(key,[]);groups.get(key).push(item)}
+ const finite=(group,key)=>group.filter(x=>x[key]!=null&&Number.isFinite(Number(x[key])));
+ const min=(group,key)=>{const xs=finite(group,key);return xs.length?Math.min(...xs.map(x=>Number(x[key]))):null};
+ const max=(group,key)=>{const xs=finite(group,key);return xs.length?Math.max(...xs.map(x=>Number(x[key]))):null};
+ const bestByMap=new Map();
+ for(const [map,group] of groups){
+  if(group.length<2){bestByMap.set(map,null);continue}
+  bestByMap.set(map,{resourcePerCycle:min(group,'resourcePerCycle'),bucketsPerCycle:min(group,'bucketsPerCycle'),avgCycleMin:min(group,'avgCycleMin'),bossRate:max(group,'bossRate'),sRate:max(group,'sRate'),retreatRate:min(group,'retreatRate')});
+ }
+ return items.map(x=>{const best=bestByMap.get(String(x.map||''));if(!best)return {...x,badges:[]};const b=[];if(best.resourcePerCycle!=null&&x.resourcePerCycle===best.resourcePerCycle)b.push('資源/周 最小');if(best.bucketsPerCycle!=null&&x.bucketsPerCycle===best.bucketsPerCycle)b.push('バケツ/周 最小');if(best.avgCycleMin!=null&&x.avgCycleMin===best.avgCycleMin)b.push('平均時間 最短');if(x.bossRate===best.bossRate)b.push('ボス到達 最高');if(x.sRate===best.sRate)b.push('S率 最高');if(x.retreatRate===best.retreatRate)b.push('撤退率 最低');return {...x,badges:b}});
 }
 function hdSPASeriesComparisonText(rows){
  const items=hdSPASeriesComparison(rows);if(!items.length)return '';
  return ['HarborDesk 周回シリーズ比較',...items.map(x=>[
-  x.label+(x.completed?' [完了]':' [進行中]'),
+  x.label+(x.map?' ['+x.map+']':'')+(x.completed?' [完了]':' [進行中]'),
   x.cycles+'周',
   'ボス'+x.bossRate+'%',
   'S'+x.sRate+'%',
@@ -335,7 +341,7 @@ function hdSPASeriesComparisonHtml(rows){
  if(!items.length)return '';
  if(items.length<2)return '<section class="hd-spa-series-compare pending"><div class="hd-spa-series-compare-head"><div><strong>周回シリーズ比較</strong><span>シリーズごとの効率を横並びで比較</span></div></div><p>2シリーズ以上たまると、資源・時間・ボス到達・撤退率を比較できるよ。</p></section>';
  return '<section class="hd-spa-series-compare"><div class="hd-spa-series-compare-head"><div><strong>周回シリーズ比較</strong><span>'+items.length+'シリーズを比較</span></div><button type="button" class="ghost small" data-hd-spa-series-compare-copy>比較をコピー</button></div><div class="hd-spa-series-compare-list">'+items.map(x=>
-  '<article class="'+(x.completed?'done':'active')+'"><div class="hd-spa-series-compare-title"><div><strong>'+hdSPAEsc(x.label)+'</strong><small>'+x.cycles+'周'+(x.closeReason?'｜'+hdSPAEsc(x.closeReason):'')+'</small></div><em>'+(x.completed?'完了':'進行中')+'</em></div>'+
+  '<article class="'+(x.completed?'done':'active')+'"><div class="hd-spa-series-compare-title"><div><strong>'+hdSPAEsc(x.label)+'</strong><small>'+(x.map?hdSPAEsc(x.map)+'｜':'')+x.cycles+'周'+(x.closeReason?'｜'+hdSPAEsc(x.closeReason):'')+'</small></div><em>'+(x.completed?'完了':'進行中')+'</em></div>'+
   (x.badges.length?'<div class="hd-spa-series-compare-badges">'+x.badges.map(b=>'<span>'+hdSPAEsc(b)+'</span>').join('')+'</div>':'')+
   '<div class="hd-spa-series-compare-metrics"><span>ボス <b>'+x.bossRate+'%</b></span><span>S勝利 <b>'+x.sRate+'%</b></span><span>撤退 <b>'+x.retreatRate+'%</b></span><span>資源/周 <b>'+(x.resourcePerCycle==null?'—':x.resourcePerCycle)+'</b></span><span>バケツ/周 <b>'+(x.bucketsPerCycle==null?'—':x.bucketsPerCycle)+'</b></span><span>平均時間 <b>'+(x.avgCycleMin==null?'—':x.avgCycleMin+'分')+'</b></span></div></article>'
  ).join('')+'</div><p>同じ海域でも編成・方針・周回条件が違う場合があるため、比較値は実戦記録として見るよ。</p></section>';
