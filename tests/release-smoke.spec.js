@@ -9156,3 +9156,44 @@ test('release smoke: sortie sync preserves battle rank separately from later ret
   expect(data).toEqual({result:'A',retreat:true,battles:1});
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: Quick Nav sees current workspace state and back history', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdWSShowElement === 'function' &&
+    typeof window.hdWSGoBack === 'function' &&
+    typeof window.hdQNEnsure === 'function' &&
+    typeof window.hdQNRenderContext === 'function'
+  );
+
+  const result = await page.evaluate(() => {
+    window.hdWSShowElement('roster', false);
+    window.hdWSShowElement('equipmentBook', false);
+    const before = {
+      group: window.hdWSState?.group || '',
+      section: window.hdWSState?.sections?.[window.hdWSState?.group] || '',
+      history: window.hdWSHistoryLoad?.().length || 0
+    };
+    const back = window.hdWSGoBack();
+    window.hdQNEnsure();
+    window.hdQNRenderContext();
+    const group = window.hdWSState?.group || '';
+    return {
+      exposed: !!window.hdWSState,
+      before,
+      back,
+      after: window.hdWSState?.sections?.[group] || '',
+      activeContext: document.querySelector('[data-hd-qn-context].active')?.dataset.hdQnContext || ''
+    };
+  });
+
+  expect(result.exposed).toBe(true);
+  expect(result.before.section).toBe('equipmentBook');
+  expect(result.before.history).toBeGreaterThan(0);
+  expect(result.back).toBe(true);
+  expect(result.after).toBe('roster');
+  expect(result.activeContext).toBe('roster');
+  expect(errors).toEqual([]);
+});
