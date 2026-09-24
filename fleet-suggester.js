@@ -179,17 +179,23 @@ function hdFSOpen(){
  var opened=typeof hdWSShowElement==='function'&&hdWSShowElement(target,true)!==false;
  if(!opened)opened=hdFSReveal(target);
  hdFSRender(true);
- var navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0;
+ var navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0,active=true,recovering=false;
+ var stop=function(){if(!active)return;active=false;window.removeEventListener('hd:workspace-changed',onWorkspace)};
  var settle=function(){
-  if((Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0)!==navEpoch)return;
+  if(!active)return;
+  if((Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0)!==navEpoch){stop();return}
   if(hdFSStillSelected(target)){hdFSReveal(target);navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||navEpoch;return}
   if(!hdFSOpenRecoveryAllowed(target))return;
+  recovering=true;
   if(typeof window.hdWSRevealElement==='function')window.hdWSRevealElement(target,true,{history:false});
   else if(typeof hdWSShowElement==='function')hdWSShowElement(target,true);
   else hdFSReveal(target);
   navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||navEpoch;
+  recovering=false;
  };
- requestAnimationFrame(settle);setTimeout(settle,80);setTimeout(settle,420);setTimeout(settle,1200);setTimeout(settle,1900);setTimeout(settle,3600);
+ var onWorkspace=function(){if(!active||recovering)return;requestAnimationFrame(settle)};
+ window.addEventListener('hd:workspace-changed',onWorkspace);
+ requestAnimationFrame(settle);setTimeout(settle,80);setTimeout(settle,420);setTimeout(settle,1200);setTimeout(settle,1900);setTimeout(settle,3600);setTimeout(settle,6000);setTimeout(settle,9000);setTimeout(stop,10000);
  return !!opened;
 }
 function hdFSOpenRoster(){if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return true;return hdFSReveal(document.getElementById('roster'))}
