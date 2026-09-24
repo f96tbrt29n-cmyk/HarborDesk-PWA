@@ -442,13 +442,24 @@ function hdQNEnsure(){
   document.getElementById('hdQNSearch')?.addEventListener('input',e=>hdQNRenderList(e.target.value));
   hdQNRenderList();hdQNEnsureMobileDock();
 }
-function hdQNLoadDiagnostics(){
-  if(!document.querySelector('link[data-hd-diagnostics-css]')){const l=document.createElement('link');l.rel='stylesheet';l.href='./diagnostics-center.css';l.dataset.hdDiagnosticsCss='1';document.head.appendChild(l)}
-  if(document.querySelector('script[data-hd-diagnostics]'))return;
-  const s=document.createElement('script');s.src='./diagnostics-center.js';s.dataset.hdDiagnostics='1';if(window.HD_MODULE_STATUS)window.HD_MODULE_STATUS['./diagnostics-center.js']='loading';
-  s.onload=()=>{if(window.HD_MODULE_STATUS)window.HD_MODULE_STATUS['./diagnostics-center.js']='ok';try{if(typeof hdDXEnsure==='function')hdDXEnsure()}catch{}};
-  s.onerror=()=>{if(window.HD_MODULE_STATUS)window.HD_MODULE_STATUS['./diagnostics-center.js']='error'};
-  document.body.appendChild(s);
+async function hdQNLoadDiagnostics(){
+  if(typeof hdDXEnsure==='function'){try{hdDXEnsure()}catch{}return true}
+  if(!document.querySelector('link[data-hd-diagnostics-center],link[data-hd-diagnostics-css]')){
+    const l=document.createElement('link');l.rel='stylesheet';l.href='./diagnostics-center.css';l.dataset.hdDiagnosticsCenter='1';document.head.appendChild(l)
+  }
+  if(typeof window.hdLoadScript==='function'){
+    const ok=await window.hdLoadScript('data-hd-diagnostics-center','./diagnostics-center.js');
+    if(ok)try{if(typeof hdDXEnsure==='function')hdDXEnsure()}catch{}
+    return !!ok
+  }
+  if(document.querySelector('script[data-hd-diagnostics-center],script[data-hd-diagnostics]'))return true;
+  return await new Promise(resolve=>{
+    const s=document.createElement('script');s.src='./diagnostics-center.js';s.dataset.hdDiagnosticsCenter='1';
+    if(window.HD_MODULE_STATUS)window.HD_MODULE_STATUS['./diagnostics-center.js']='loading';
+    s.onload=()=>{if(window.HD_MODULE_STATUS)window.HD_MODULE_STATUS['./diagnostics-center.js']='ok';try{if(typeof hdDXEnsure==='function')hdDXEnsure()}catch{}resolve(true)};
+    s.onerror=()=>{if(window.HD_MODULE_STATUS)window.HD_MODULE_STATUS['./diagnostics-center.js']='error';resolve(false)};
+    document.body.appendChild(s)
+  })
 }
 
 document.addEventListener('click',e=>{
