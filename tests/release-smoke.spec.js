@@ -6815,7 +6815,7 @@ test('release smoke: fallback mine workspace keeps saved fleet readiness and sup
   const manual = mine.locator('#hdSortieReadiness [data-hd-sortie-check]').first();
   await expect(manual).toBeVisible();
   const checkId = await manual.getAttribute('data-hd-sortie-check');
-  await manual.check();
+  await manual.locator('..').click();
 
   const ready = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('harbordesk-sortie-readiness-v1') || '{}')
