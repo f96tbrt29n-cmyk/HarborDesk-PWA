@@ -3802,7 +3802,7 @@ test('completed core items can be bulk cleaned and undone', async ({ page }) => 
 test('core completed cleanup supports undo', async ({ page }) => {
   const now=Date.now();
   await page.addInitScript(({now}) => {
-    localStorage.setItem('harbordesk-v2', JSON.stringify({
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
       expeditions:[
         {id:'e-done',name:'完了遠征',endsAt:now-1000},
         {id:'e-active',name:'稼働遠征',endsAt:now+3600000}
@@ -3828,18 +3828,18 @@ test('core completed cleanup supports undo', async ({ page }) => {
   expect(labels.quest).toContain('1');
 
   await page.click('[data-core-cleanup="quest"]');
-  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests.map(x=>x.id)).toEqual(['q-active']);
 
   await page.click('#hdToastRegion .hd-toast-action');
-  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests.map(x=>x.id)).toEqual(['q-done','q-active']);
 });
 
 
 test('home task can complete quest with undo', async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('harbordesk-v2', JSON.stringify({
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
       expeditions:[],docks:[],
       quests:[{id:'q-home',name:'ホーム確認任務',done:false}],
       resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
@@ -3848,11 +3848,11 @@ test('home task can complete quest with undo', async ({ page }) => {
   await boot(page,[]);
   await page.waitForSelector('[data-home-quest-done="q-home"]');
   await page.click('[data-home-quest-done="q-home"]');
-  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests[0].done).toBe(true);
   expect(await page.locator('#homeTodo').textContent()).toContain('未完了の任務はないよ');
   await page.click('#hdToastRegion .hd-toast-action');
-  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests[0].done).toBe(false);
   expect(await page.locator('#homeTodo').textContent()).toContain('ホーム確認任務');
 });
@@ -3860,7 +3860,7 @@ test('home task can complete quest with undo', async ({ page }) => {
 
 test('home empty states offer direct add actions', async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('harbordesk-v2', JSON.stringify({
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
       expeditions:[],docks:[],quests:[],
       resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
     }));
