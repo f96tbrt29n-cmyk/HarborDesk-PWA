@@ -25,6 +25,7 @@ const HD_WS_EXPLICIT={
  settings:new Set(['personalHomeCenter','calculators','backup','diagnosticsCenter','notificationCenter','dataQualityAudit'])
 };
 let hdWSState=hdWSLoad();
+window.hdWSState=hdWSState;
 let hdWSObserver=null;
 let hdWSApplying=false;
 let hdWSRefreshTimer=0;
