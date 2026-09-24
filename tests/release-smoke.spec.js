@@ -9427,3 +9427,57 @@ test('release smoke: diagnostics center runtime stylesheet is loaded', async ({ 
   expect(data.noteLine).not.toBe('');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: diagnostics loader is shared and idempotent', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const data = await page.evaluate(async () => {
+    await window.hdQNLoadDiagnostics?.();
+    await window.hdQNLoadDiagnostics?.();
+    await window.hdEnsureCurrentAssets?.();
+    await new Promise(r => setTimeout(r, 80));
+    return {
+      scripts:[...document.querySelectorAll('script[src*="diagnostics-center.js"]')].length,
+      ready:typeof window.hdDXEnsure === 'function',
+      status:window.HD_MODULE_STATUS?.['./diagnostics-center.js'] || ''
+    };
+  });
+  expect(data.scripts).toBe(1);
+  expect(data.ready).toBe(true);
+  expect(data.status).toBe('ok');
+  expect(errors).toEqual([]);
+});
+
+test('release smoke: ship images persist bytes and read back as blobs', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  const data = await page.evaluate(async () => {
+    const id=541;
+    await window.hdShipImageDelete?.(id);
+    const file=new File([new Uint8Array([9,8,7,6])],'541.png',{type:'image/png'});
+    const ok=await window.hdShipImagePut?.(id,file,'長門改二',true);
+    const row=await window.hdShipImageGet?.(id);
+    const bytes=row?.blob?[...new Uint8Array(await row.blob.arrayBuffer())]:[];
+    const db=await window.hdShipImageOpenDb?.();
+    const raw=await new Promise((resolve,reject)=>{
+      const tx=db.transaction('images','readonly'),req=tx.objectStore('images').get(id);
+      req.onsuccess=()=>resolve(req.result||null);
+      req.onerror=()=>reject(req.error);
+    });
+    await window.hdShipImageDelete?.(id);
+    return {
+      ok:!!ok,
+      type:row?.blob?.type||'',
+      bytes,
+      rawHasBlob:typeof Blob!=='undefined'&&raw?.blob instanceof Blob,
+      rawHasBytes:raw?.bytes instanceof ArrayBuffer || ArrayBuffer.isView(raw?.bytes)
+    };
+  });
+  expect(data.ok).toBe(true);
+  expect(data.type).toBe('image/png');
+  expect(data.bytes).toEqual([9,8,7,6]);
+  expect(data.rawHasBlob).toBe(false);
+  expect(data.rawHasBytes).toBe(true);
+  expect(errors).toEqual([]);
+});
