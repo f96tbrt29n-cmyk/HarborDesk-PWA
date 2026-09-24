@@ -1,13 +1,15 @@
 name: Full Browser Regression
 
 on:
+  push:
+    branches: [test/full-regression-v456-webkit-nav-final]
   schedule:
     - cron: '0 18 * * *'
   workflow_dispatch:
 
 concurrency:
-  group: full-browser-regression
-  cancel-in-progress: false
+  group: full-browser-regression-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
