@@ -102,7 +102,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, webkit]
+        include:
+          - browser: chromium
+            workers: 2
+          - browser: webkit
+            workers: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
@@ -119,7 +123,7 @@ jobs:
         run: npx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run browser regression tests
-        run: npm run test:browser -- --project=${{ matrix.browser }}
+        run: npm run test:browser -- --project=${{ matrix.browser }} --workers=${{ matrix.workers }}
 
       - name: Upload Playwright diagnostics
         if: failure()
