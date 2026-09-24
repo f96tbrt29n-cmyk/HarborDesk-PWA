@@ -3219,8 +3219,8 @@ test('map tabs stay usable with sticky mobile navigation', async ({ page }) => {
   const data=await page.evaluate(()=>{
     if(typeof MAP_DETAILS==='undefined')return {ok:false};
     const key=Object.keys(MAP_DETAILS)[0];
-    window.selectedMap=key;
-    window.hdApplyMapTabs?.();
+    if(typeof window.hdSelectGuideMap==='function')window.hdSelectGuideMap(key);
+    else if(typeof selectedMap!=='undefined'){selectedMap=key;window.hdApplyMapTabs?.()}
     const bar=document.querySelector('.map-tab-bar'),buttons=[...document.querySelectorAll('.map-tab-btn')];
     const gear=buttons.find(x=>x.dataset.mapTab==='gear');
     gear?.click();
