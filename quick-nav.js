@@ -14,7 +14,7 @@ function hdQNSaveRecent(v){localStorage.setItem(HD_QN_RECENT_KEY,JSON.stringify(
 function hdQNLoadUsage(){try{return JSON.parse(localStorage.getItem(HD_QN_USAGE_KEY)||'{}')||{}}catch{return {}}}
 function hdQNSaveUsage(v){try{localStorage.setItem(HD_QN_USAGE_KEY,JSON.stringify(v||{}))}catch{}}
 function hdQNRecordUsage(id){
- id=String(id||'').trim();if(!id)return false;
+ id=String(id||'').trim();if(!id||id==='home')return false;
  const now=Date.now(),duplicate=id===hdQNUsageLastId&&(now-hdQNUsageLastAt)<1500;
  hdQNUsageLastId=id;hdQNUsageLastAt=now;
  const usage=hdQNLoadUsage(),row=usage[id]&&typeof usage[id]==='object'?usage[id]:{};
