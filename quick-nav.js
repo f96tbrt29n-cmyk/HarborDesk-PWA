@@ -482,7 +482,7 @@ window.addEventListener('load',()=>setTimeout(()=>{hdQNEnsure();hdQNLoadDiagnost
 setTimeout(()=>{hdQNEnsure();hdQNLoadDiagnostics()},1200);
 
 window.addEventListener('hd:workspace-changed',e=>{const id=e.detail?.section;if(id){hdQNRecordHistory(id);hdQNRecordUsage(id);hdQNRecordRecent(id)}});
-window.addEventListener('load',()=>setTimeout(()=>{const id=window.hdWSState?.sections?.[window.hdWSState?.group];if(id){hdQNRecordHistory(id);hdQNRecordUsage(id)}},1300));
+window.addEventListener('load',()=>setTimeout(()=>{const id=window.hdWSState?.sections?.[window.hdWSState?.group];if(id){hdQNRecordHistory(id);if(id!=='home')hdQNRecordUsage(id)}},1300));
 
 window.addEventListener('hd:workspace-changed',()=>{hdQNUpdateMobileDock();if(document.getElementById('hdQuickNavDialog')?.open){hdQNRenderCategories();hdQNRenderContext()}});
 window.addEventListener('hd:kancolle-sync',hdQNUpdateMobileDock);
