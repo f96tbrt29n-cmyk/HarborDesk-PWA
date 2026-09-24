@@ -3714,10 +3714,12 @@ test('core quest and timer filters keep completed items out of the way', async (
   expect(data.expCount).toContain('1 / 2');
   expect(data.questCount).toContain('1 / 2');
 
+  await page.evaluate(()=>window.hdWSShowElement?.('quests',false));
   await page.locator('[data-core-filter-kind="quest"][data-core-filter="done"]').click();
   await expect(page.locator('#questList')).toContainText('完了任務');
   await expect(page.locator('#questList')).not.toContainText('未完了任務');
 
+  await page.evaluate(()=>window.hdWSShowElement?.('expeditions',false));
   await page.locator('[data-core-filter-kind="expedition"][data-core-filter="all"]').click();
   await expect(page.locator('#expeditionList')).toContainText('稼働遠征');
   await expect(page.locator('#expeditionList')).toContainText('完了遠征');
@@ -4273,11 +4275,13 @@ test('manual timers and quests can be edited', async ({ page }) => {
     }));
   });
   await boot(page,errors);
+  await page.evaluate(()=>window.hdWSShowElement?.('expeditions',false));
   const timerEdit=page.locator('[data-edit-timer="t1"]');
   await timerEdit.click();
   expect(await page.locator('#timerDialogTitle').textContent()).toContain('編集');
   expect(await page.locator('#timerName').inputValue()).toBe('東京急行');
   await page.locator('#timerDialog').evaluate(d=>d.close());
+  await page.evaluate(()=>window.hdWSShowElement?.('quests',false));
   await page.locator('[data-edit-quest="q1"]').click();
   expect(await page.locator('#questDialogTitle').textContent()).toContain('編集');
   expect(await page.locator('#questName').inputValue()).toBe('あ号作戦');
