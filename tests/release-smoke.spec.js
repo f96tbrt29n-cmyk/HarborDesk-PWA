@@ -9528,3 +9528,29 @@ test('release smoke: inline mobile header version spans the menu grid', async ({
   expect(data.gridColumn).not.toBe('auto');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: empty required dialog can cancel and global search is labelled', async ({ page }) => {
+  const errors = [];
+  await page.setViewportSize({ width:390, height:844 });
+  await boot(page, errors);
+
+  const label = await page.evaluate(() => {
+    window.hdEnsureUpdateUI?.();
+    return document.querySelector('.hd-version-menu [data-hd-gs-open]')?.getAttribute('aria-label') || '';
+  });
+  expect(label).toBe('全体検索');
+
+  await page.evaluate(() => window.openQuestDialog?.());
+  await expect(page.locator('#questDialog')).toBeVisible();
+  await expect(page.locator('#questName')).toHaveValue('');
+  await page.locator('#questDialog [value="cancel"]').click();
+  await expect(page.locator('#questDialog')).not.toBeVisible();
+
+  const formNoValidate = await page.evaluate(() => ({
+    quest:document.querySelector('#questDialog [value="cancel"]')?.formNoValidate || false,
+    timer:document.querySelector('#timerDialog [value="cancel"]')?.formNoValidate || false
+  }));
+  expect(formNoValidate).toEqual({ quest:true, timer:true });
+  expect(errors).toEqual([]);
+});
