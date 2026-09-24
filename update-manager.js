@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.454';
-const HD_APP_BUILD=454;
+const HD_APP_VERSION='1.0.455';
+const HD_APP_BUILD=455;
 const HD_UPDATE_SNOOZE_KEY='harbordesk-update-snooze-v1';
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
@@ -146,6 +146,7 @@ function hdInitLoadedModules(){
   try{if(typeof hdQNEnsure==='function')hdQNEnsure()}catch{}
   try{if(typeof hdPHEnsure==='function')hdPHEnsure();if(typeof hdPHInstallBackupHooks==='function')hdPHInstallBackupHooks()}catch{}
   try{if(typeof hdGSEnsure==='function')hdGSEnsure()}catch{}
+  try{if(typeof hdDXEnsure==='function')hdDXEnsure()}catch{}
   try{if(typeof hdWSInstall==='function')hdWSInstall()}catch{}
   try{if(typeof hdEAensure==='function')hdEAensure();if(typeof hdEArenderCoverage==='function')hdEArenderCoverage()}catch{}
   try{if(typeof hdSEInstall==='function')hdSEInstall();if(typeof hdRenderMapEquipmentRecommendations==='function')hdRenderMapEquipmentRecommendations()}catch{}
@@ -228,10 +229,11 @@ async function hdLoadCurrentAssets(){
   const quickNavP=Promise.all([eventP,optimizeP,dailyP]).then(()=>hdLoadScript('data-hd-quick-nav','./quick-nav.js'));
   const personalHomeP=Promise.all([quickNavP,dailyP,stabilityP]).then(()=>hdLoadScript('data-hd-personal-home','./personal-home.js'));
   const globalSearchP=Promise.all([quickNavP,personalHomeP,questP,expP]).then(()=>hdLoadScript('data-hd-global-search','./global-search.js'));
-  const workspaceP=Promise.all([globalSearchP,mapRuntimeP,personalHomeP]).then(()=>hdLoadScript('data-hd-workspace-tabs','./workspace-tabs.js'));
+  const diagnosticsP=Promise.all([personalHomeP,globalSearchP]).then(()=>hdLoadScript('data-hd-diagnostics-center','./diagnostics-center.js'));
+  const workspaceP=Promise.all([globalSearchP,mapRuntimeP,personalHomeP,diagnosticsP]).then(()=>hdLoadScript('data-hd-workspace-tabs','./workspace-tabs.js'));
   const workspaceCompatP=workspaceP.then(()=>hdLoadScript('data-hd-workspace-compat','./workspace-compat.js'));
 
-  await Promise.all([equipmentAnalyzerP,sortieEquipmentCheckP,equipmentAcquisitionGuideP,equipmentProcurementP,sortiePreparationP,fleetSuggesterP,fleetLoadoutP,fleetEvaluatorP,fleetOptimizerP,sortiePresetManagerP,sortieSessionP,sortieModeP,sortiePerformanceP,sortieP,landP,fleetP,questP,commandP,eventP,expP,resourceP,exerciseP,guardP,activityP,sortieLogP,optimizeP,dailyP,stabilityP,mapRuntimeP,quickNavP,personalHomeP,globalSearchP,workspaceP,workspaceCompatP]);
+  await Promise.all([equipmentAnalyzerP,sortieEquipmentCheckP,equipmentAcquisitionGuideP,equipmentProcurementP,sortiePreparationP,fleetSuggesterP,fleetLoadoutP,fleetEvaluatorP,fleetOptimizerP,sortiePresetManagerP,sortieSessionP,sortieModeP,sortiePerformanceP,sortieP,landP,fleetP,questP,commandP,eventP,expP,resourceP,exerciseP,guardP,activityP,sortieLogP,optimizeP,dailyP,stabilityP,mapRuntimeP,quickNavP,personalHomeP,globalSearchP,diagnosticsP,workspaceP,workspaceCompatP]);
   hdInitLoadedModules();
 }
 
