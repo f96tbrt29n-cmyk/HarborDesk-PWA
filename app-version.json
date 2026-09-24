@@ -1,7 +1,7 @@
 {
-  "version": "1.0.453",
-  "build": 453,
-  "releasedAt": "2026-09-24T09:27:00+09:00",
-  "notes": "Safari/WebKitで艦娘画像IndexedDBの失敗理由がnullになる問題を防ぎ、失敗した接続の再試行と画像保存トランザクションのエラー処理を堅牢化。",
+  "version": "1.0.454",
+  "build": 454,
+  "releasedAt": "2026-09-24T09:34:00+09:00",
+  "notes": "未読込になっていた診断センターを正式なruntime moduleへ戻し、設定カテゴリから診断・キャッシュ確認・復旧操作を利用できるよう修正。",
   "masterChanges": null
 }
