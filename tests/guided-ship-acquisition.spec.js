@@ -91,6 +91,10 @@ test('ship database: acquisition shows sourced drops and exact construction reci
   const buildButton=build.locator('[data-hd-shipdb-acquire-build]');
   await expect(buildButton).toBeVisible();
   await buildButton.click();
+  await expect.poll(
+    () => page.evaluate(() => JSON.parse(sessionStorage.getItem('harbordesk-session-construction-view-v1') || '{}')),
+    { timeout: 12000 }
+  ).toMatchObject({ query:'大和', mode:'large' });
   await expect(page.locator('#hdConstructionSearch')).toHaveValue('大和');
   await expect(page.locator('[data-hd-build-mode="large"]')).toHaveClass(/active/);
 
