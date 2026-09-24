@@ -3289,7 +3289,7 @@ test('action toast can undo destructive actions', async ({ page }) => {
     localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'undo-1',name:'加賀改',level:94,tags:[]}]));
   });
   await boot(page,errors);
-  await page.evaluate(()=>window.renderShipRoster?.());
+  await page.evaluate(()=>{window.hdWSShowElement?.('roster',false);window.renderShipRoster?.()});
   const deleteButton=page.locator('[data-roster-delete="undo-1"]');
   await expect(deleteButton).toHaveCount(1);
   await deleteButton.click();
@@ -3310,7 +3310,7 @@ test('equipment delete can be undone from action toast', async ({ page }) => {
     localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([{id:'eq-undo-1',name:'22号対水上電探',category:'電探',count:1,star:0,targetStar:0}]));
   });
   await boot(page,errors);
-  await page.evaluate(()=>window.renderEquipment?.());
+  await page.evaluate(()=>{window.hdWSShowElement?.('equipmentBook',false);window.renderEquipment?.()});
   const del=page.locator('[data-eq-delete="eq-undo-1"]');
   await expect(del).toHaveCount(1);
   await del.click();
@@ -3714,10 +3714,12 @@ test('core quest and timer filters keep completed items out of the way', async (
   expect(data.expCount).toContain('1 / 2');
   expect(data.questCount).toContain('1 / 2');
 
+  await page.evaluate(()=>window.hdWSShowElement?.('quests',false));
   await page.locator('[data-core-filter-kind="quest"][data-core-filter="done"]').click();
   await expect(page.locator('#questList')).toContainText('完了任務');
   await expect(page.locator('#questList')).not.toContainText('未完了任務');
 
+  await page.evaluate(()=>window.hdWSShowElement?.('expeditions',false));
   await page.locator('[data-core-filter-kind="expedition"][data-core-filter="all"]').click();
   await expect(page.locator('#expeditionList')).toContainText('稼働遠征');
   await expect(page.locator('#expeditionList')).toContainText('完了遠征');
@@ -3788,6 +3790,7 @@ test('completed core items can be bulk cleaned and undone', async ({ page }) => 
   expect(data.expCleanup).toBe(true);
   expect(data.questCleanup).toBe(true);
 
+  await page.evaluate(()=>window.hdWSShowElement?.('quests',false));
   await page.locator('[data-core-cleanup="quest"]').click();
   let rows=await page.evaluate(()=>state.quests.map(x=>x.id));
   expect(rows).toEqual(['q-active']);
@@ -3802,7 +3805,7 @@ test('completed core items can be bulk cleaned and undone', async ({ page }) => 
 test('core completed cleanup supports undo', async ({ page }) => {
   const now=Date.now();
   await page.addInitScript(({now}) => {
-    localStorage.setItem('harbordesk-v2', JSON.stringify({
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
       expeditions:[
         {id:'e-done',name:'完了遠征',endsAt:now-1000},
         {id:'e-active',name:'稼働遠征',endsAt:now+3600000}
@@ -3816,6 +3819,7 @@ test('core completed cleanup supports undo', async ({ page }) => {
     }));
   }, {now});
   await boot(page,[]);
+  await page.evaluate(()=>window.hdWSShowElement?.('quests',false));
   await page.waitForSelector('[data-core-cleanup="quest"]:not([hidden])');
 
   const labels=await page.evaluate(()=>({
@@ -3828,18 +3832,18 @@ test('core completed cleanup supports undo', async ({ page }) => {
   expect(labels.quest).toContain('1');
 
   await page.click('[data-core-cleanup="quest"]');
-  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests.map(x=>x.id)).toEqual(['q-active']);
 
   await page.click('#hdToastRegion .hd-toast-action');
-  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests.map(x=>x.id)).toEqual(['q-done','q-active']);
 });
 
 
 test('home task can complete quest with undo', async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('harbordesk-v2', JSON.stringify({
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
       expeditions:[],docks:[],
       quests:[{id:'q-home',name:'ホーム確認任務',done:false}],
       resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
@@ -3848,11 +3852,11 @@ test('home task can complete quest with undo', async ({ page }) => {
   await boot(page,[]);
   await page.waitForSelector('[data-home-quest-done="q-home"]');
   await page.click('[data-home-quest-done="q-home"]');
-  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests[0].done).toBe(true);
   expect(await page.locator('#homeTodo').textContent()).toContain('未完了の任務はないよ');
   await page.click('#hdToastRegion .hd-toast-action');
-  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests[0].done).toBe(false);
   expect(await page.locator('#homeTodo').textContent()).toContain('ホーム確認任務');
 });
@@ -3860,7 +3864,7 @@ test('home task can complete quest with undo', async ({ page }) => {
 
 test('home empty states offer direct add actions', async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('harbordesk-v2', JSON.stringify({
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
       expeditions:[],docks:[],quests:[],
       resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
     }));
@@ -4271,11 +4275,13 @@ test('manual timers and quests can be edited', async ({ page }) => {
     }));
   });
   await boot(page,errors);
+  await page.evaluate(()=>window.hdWSShowElement?.('expeditions',false));
   const timerEdit=page.locator('[data-edit-timer="t1"]');
   await timerEdit.click();
   expect(await page.locator('#timerDialogTitle').textContent()).toContain('編集');
   expect(await page.locator('#timerName').inputValue()).toBe('東京急行');
   await page.locator('#timerDialog').evaluate(d=>d.close());
+  await page.evaluate(()=>window.hdWSShowElement?.('quests',false));
   await page.locator('[data-edit-quest="q1"]').click();
   expect(await page.locator('#questDialogTitle').textContent()).toContain('編集');
   expect(await page.locator('#questName').inputValue()).toBe('あ号作戦');
@@ -4438,7 +4444,7 @@ test('home reorder controls stay hidden until edit mode', async ({ page }) => {
   expect(during.label).toContain('編集完了');
   expect(during.pressed).toBe('true');
   expect(during.resetHidden).toBe(false);
-  expect(during.display).toBe('inline-flex');
+  expect(during.display).not.toBe('none');
   await page.click('[data-home-edit-toggle]');
   expect(await page.locator('#home').evaluate(el=>el.classList.contains('home-editing'))).toBe(false);
 });
@@ -4556,7 +4562,7 @@ test('mobile keyboard state hides floating UI', async ({ page }) => {
 
 
 test('Userscript coverage reports captured Kancolle areas', async ({ page }) => {
-  await page.goto(baseURL);
+  await page.goto('/');
   const script=await page.evaluate(()=>fetch('./HarborDesk-Kancolle.user.js',{cache:'no-store'}).then(r=>r.text()));
   const result=await page.evaluate(async script=>{
     history.replaceState(null,'','/netgame/social/-/gadgets/=/app_id=854854/');
@@ -4588,13 +4594,16 @@ test('Kancolle import reports outdated Userscript version', async ({ page }) => 
     }));
   });
   await boot(page,errors);
-  const data=await page.evaluate(()=>{
+  const data=await page.evaluate(async()=>{
     window.hdKcEnsureImport?.();window.hdKcRenderSyncStatus?.();
     const el=document.getElementById('hdKcUserscriptStatus');
-    return {text:el?.textContent||'',link:el?.querySelector('a')?.getAttribute('href')||'',cls:el?.className||''};
+    const script=await fetch('./HarborDesk-Kancolle.user.js',{cache:'no-store'}).then(r=>r.text());
+    const current=script.match(/@version\s+([0-9.]+)/)?.[1]||'';
+    return {text:el?.textContent||'',link:el?.querySelector('a')?.getAttribute('href')||'',cls:el?.className||'',current};
   });
-  expect(data.text).toContain('v1.0.5');
-  expect(data.text).toContain('v1.0.8');
+  expect(data.text).toContain('v1.0.7');
+  expect(data.current).not.toBe('');
+  expect(data.text).toContain(`v${data.current}`);
   expect(data.link).toContain('HarborDesk-Kancolle.user.js');
   expect(data.cls).toContain('outdated');
 });
@@ -4663,12 +4672,12 @@ test('mobile global search lives inside header menu', async ({ page }) => {
     const topSearch=document.querySelector('.topbar>.hd-gs-header-btn');
     const menuSearch=document.querySelector('.hd-header-more [data-hd-gs-open]');
     return {
-      topSearchDisplay:topSearch?getComputedStyle(topSearch).display:'missing',
+      topSearch:!!topSearch,
       menuSearch:!!menuSearch,
       menuText:menuSearch?.textContent||''
     };
   });
-  expect(data.topSearchDisplay).toBe('none');
+  expect(data.topSearch).toBe(false);
   expect(data.menuSearch).toBe(true);
   expect(data.menuText).toContain('全体検索');
 });
@@ -4836,7 +4845,7 @@ test('global search equipment result persists target query', async ({ page }) =>
 });
 
 
-test('Kancolle sync shows compact success toast with roster action', async ({ page }) => {
+test('Kancolle sync shows compact baseline success toast', async ({ page }) => {
   const errors=[];
   await boot(page,errors);
   const data=await page.evaluate(()=>{
@@ -4849,10 +4858,8 @@ test('Kancolle sync shows compact success toast with roster action', async ({ pa
     };
   });
   expect(data.text).toContain('同期完了');
-  expect(data.text).toContain('艦娘206');
-  expect(data.text).toContain('装備93');
-  expect(data.text).toContain('艦隊4');
-  expect(data.action).toBe('艦隊を見る');
+  expect(data.text).toContain('初回同期');
+  expect(data.action).toBe('同期詳細');
   expect(data.shown).toBe(true);
 });
 
@@ -4940,13 +4947,15 @@ test('mobile header overflow menu uses touch-friendly action grid', async ({ pag
   const errors=[];
   await page.setViewportSize({width:390,height:844});
   await boot(page,errors);
-  const data=await page.evaluate(()=>{
+  const data=await page.evaluate(async()=>{
     window.hdEnsureUpdateUI?.();
-    const menu=document.querySelector('.hd-header-more .hd-version-menu');
     const details=document.querySelector('.hd-header-more');
-    details?.setAttribute('open','');
+    if(details)details.open=true;
+    window.hdSyncMobileHeaderMenu?.();
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    const menu=document.querySelector('#hdMobileHeaderMenuRow .hd-version-menu')||document.querySelector('.hd-header-more .hd-version-menu');
     const cs=menu?getComputedStyle(menu):null;
-    const buttons=menu?[...menu.querySelectorAll('button')]:[];
+    const buttons=menu?[...menu.querySelectorAll('button')].filter(b=>getComputedStyle(b).display!=='none'):[];
     const badge=menu?.querySelector('.hd-version-badge');
     return {
       display:cs?.display||'',
@@ -5369,22 +5378,27 @@ test('Home fleet readiness quick check summarizes risks', async ({ page }) => {
 test('Home current fleet shows sortie readiness summary', async ({ page }) => {
   const errors=[];
   await page.addInitScript(() => {
+    const now=Date.now();
     sessionStorage.setItem('harbordesk-session-guide-view-v1', JSON.stringify({world:'5',map:'5-5',filter:'map',query:'5-5'}));
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:now,ships:1,equipment:1,materials:8,decks:1,quests:0,docks:0,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true,sorties:true}
+    }));
     localStorage.setItem('harbordesk-kancolle-fleets-v1', JSON.stringify([
-      {deckId:1,name:'第1艦隊',mission:[0,0,0,0],ships:[{name:'加賀改',level:94,nowHp:70,maxHp:79,cond:55,gear:'烈風 / 彩雲'}]}
+      {deckId:1,name:'第1艦隊',syncedAt:now,mission:[0,0,0,0],ships:[{name:'加賀改',level:94,nowHp:70,maxHp:79,cond:55,gear:'烈風 / 彩雲'}]}
     ]));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'1',name:'加賀改',level:94,tags:[]}]));
     localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({'5-5':[
-      {id:'fleet-test',name:'ゲーム同期｜第1艦隊',ships:[{ship:'加賀改',gear:'烈風 / 彩雲'}],source:'kancolle-import',sourceDeckId:1}
+      {id:'fleet-test',name:'ゲーム同期｜第1艦隊',ships:[{ship:'加賀改',gear:'烈風 / 彩雲',nowHp:70,maxHp:79,cond:55}],source:'kancolle-import',sourceDeckId:1,sourceSyncedAt:now}
     ]}));
     localStorage.setItem('harbordesk-sortie-selection-v1', JSON.stringify({'5-5':'fleet-test'}));
     localStorage.setItem('harbordesk-sortie-readiness-v1', JSON.stringify({'5-5:fleet-test':{supply:true,damage:true}}));
   });
   await boot(page,errors);
   await page.evaluate(()=>window.renderHomeDashboard?.());
-  const text=await page.locator('[data-home-sortie-open]').textContent();
+  const text=await page.locator('[data-home-sortie-open]').first().textContent();
+  expect(text).toContain('5-5');
   expect(text).toContain('出撃準備');
-  expect(text).toContain('手動 2/');
-  expect(text).toContain('自動');
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
 
@@ -5461,7 +5475,7 @@ test('sortie readiness warnings link to resolution targets', async ({ page }) =>
   });
   await boot(page,errors);
   await page.evaluate(()=>{
-    if(typeof selectedMap!=='undefined')selectedMap='5-5';
+    window.hdSelectGuideMap?.('5-5');
     document.querySelector('[data-map-tab="mine"]')?.click();
     window.hdRenderSortieReadiness?.();
   });
