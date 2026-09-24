@@ -9435,6 +9435,47 @@ test('release smoke: Quick Nav group jump marks explicit workspace navigation', 
 });
 
 
+test('release smoke: hash navigation cancels stale fleet-suggester recovery', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFSOpen === 'function' &&
+    typeof window.hdWSOpenAnchorId === 'function' &&
+    typeof window.hdWSMarkUserNavigation === 'function'
+  );
+
+  const before = await page.evaluate(() => {
+    window.hdFSOpen();
+    return {
+      section: window.hdWSState?.sections?.guide || '',
+      userEpoch: Number(window.__HD_WORKSPACE_USER_NAV_EPOCH) || 0
+    };
+  });
+  expect(before.section).toBe('hdFleetSuggester');
+
+  await page.evaluate(() => { location.hash = '#guide'; });
+  await expect.poll(
+    () => page.evaluate(() => ({
+      section: window.hdWSState?.sections?.guide || '',
+      userEpoch: Number(window.__HD_WORKSPACE_USER_NAV_EPOCH) || 0
+    })),
+    { timeout: 3000 }
+  ).toEqual({section:'guide',userEpoch:before.userEpoch+1});
+
+  await page.waitForTimeout(700);
+  const after = await page.evaluate(() => {
+    const fleet=document.getElementById('hdFleetSuggester');
+    return {
+      section: window.hdWSState?.sections?.guide || '',
+      fleetVisible: !!fleet && !fleet.hidden && !fleet.classList.contains('hd-ws-hidden')
+    };
+  });
+  expect(after.section).toBe('guide');
+  expect(after.fleetVisible).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: mobile dialog actions stay on the visible bottom edge', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
