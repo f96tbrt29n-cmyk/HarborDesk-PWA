@@ -85,6 +85,10 @@ function hdQNRenderCategories(){
 }
 function hdQNJumpGroup(group){
  group=String(group||'');if(!group)return false;
+ // Quick Nav category jumps are explicit user navigation. Mark them before
+ // calling hdWSApply directly so any delayed tool-open recovery stops yielding
+ // to stale intent just like normal workspace tabs, back/forward and swipes.
+ try{if(typeof hdWSMarkDirectNavigation==='function')hdWSMarkDirectNavigation()}catch{}
  try{if(typeof hdWSPushHistory==='function')hdWSPushHistory()}catch{}
  hdQNClose();
  if(typeof hdWSApply==='function'){hdWSApply(group,null,{ignorePin:true,scrollTop:true});return true}
