@@ -2605,8 +2605,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.455'");
-  expect(source).toContain("const HD_APP_BUILD=455");
+  expect(source).toContain("const HD_APP_VERSION='1.0.456'");
+  expect(source).toContain("const HD_APP_BUILD=456");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -2629,15 +2629,15 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=455`);
+    expect(data.index).toContain(`${asset}?v=456`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=455");
+  expect(data.updater).toContain("const HD_APP_BUILD=456");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdScriptAssetUrl(src,attempt)");
   expect(data.updater).toContain("function hdScriptAssetUrl(src,attempt=0)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v455");
+  expect(data.sw).toContain("harbordesk-pwa-v456");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -2650,7 +2650,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=455');
+  expect(source).toContain('const BUILD=456');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -6211,17 +6211,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=455',
-      'map-images.js?v=455',
-      'map-tabs.js?v=455',
-      'map-interactive.js?v=455',
-      'map-advanced-data.js?v=455'
+      'map-details.js?v=456',
+      'map-images.js?v=456',
+      'map-tabs.js?v=456',
+      'map-interactive.js?v=456',
+      'map-advanced-data.js?v=456'
     ];
     const requiredStyles = [
-      'map-details.css?v=455',
-      'map-tabs.css?v=455',
-      'map-images.css?v=455',
-      'map-interactive.css?v=455'
+      'map-details.css?v=456',
+      'map-tabs.css?v=456',
+      'map-images.css?v=456',
+      'map-interactive.css?v=456'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -6282,7 +6282,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('[data-map-pane="mine"] #customFleetPanel')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=455');
+  expect(src).toBe('app.js?v=456');
   expect(errors).toEqual([]);
 });
 
@@ -9396,5 +9396,34 @@ test('release smoke: diagnostics center is loaded and registered', async ({ page
   expect(data.settings).toBe(true);
   expect(data.group).toBe('settings');
   expect(data.text.length).toBeGreaterThan(0);
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: diagnostics center runtime stylesheet is loaded', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    window.HD_MODULE_STATUS?.['./diagnostics-center.js'] === 'ok' &&
+    !!document.querySelector('link[data-hd-diagnostics-center]')
+  );
+
+  const data = await page.evaluate(() => {
+    const link=document.querySelector('link[data-hd-diagnostics-center]');
+    window.hdDXEnsure?.();
+    const note=document.querySelector('#diagnosticsCenter .hd-dx-note');
+    const style=note?getComputedStyle(note):null;
+    return {
+      href:link?.getAttribute('href')||'',
+      loaded:link?.dataset.hdLoaded||'',
+      noteFont:style?.fontSize||'',
+      noteLine:style?.lineHeight||''
+    };
+  });
+
+  expect(data.href).toContain('diagnostics-center.css?v=456');
+  expect(data.loaded).toBe('1');
+  expect(data.noteFont).not.toBe('');
+  expect(data.noteLine).not.toBe('');
   expect(errors).toEqual([]);
 });
