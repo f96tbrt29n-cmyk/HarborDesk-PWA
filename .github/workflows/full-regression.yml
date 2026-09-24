@@ -1,6 +1,8 @@
 name: Full Browser Regression
 
 on:
+  push:
+    branches: [test/full-regression-v458-final-webkit-stability]
   schedule:
     - cron: '0 18 * * *'
   workflow_dispatch:
