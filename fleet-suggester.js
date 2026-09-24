@@ -210,7 +210,11 @@ async function hdFSOpenAcquire(kind,button){
  window.hdToast?.('入手ルートを読み込めなかったよ。アプリ更新を試してね','warn');return false;
 }
 document.addEventListener('click',function(e){
- if(e.target.closest('[data-hd-fs-open]')){hdFSOpen();return}
+ var open=e.target.closest&&e.target.closest('[data-hd-fs-open]');
+ if(open&&hdFSOpen())e.__hdFSOpenHandled=true;
+},true);
+document.addEventListener('click',function(e){
+ if(e.target.closest('[data-hd-fs-open]')){if(e.__hdFSOpenHandled)return;hdFSOpen();return}
  if(e.target.closest('[data-hd-fs-refresh]')){hdFSRender();return}
  var save=e.target.closest('[data-hd-fs-save]');if(save){hdFSSave(save.getAttribute('data-hd-fs-save'));return}
  if(e.target.closest('[data-hd-fs-roster]')){hdFSOpenRoster();return}
