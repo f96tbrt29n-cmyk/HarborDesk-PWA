@@ -275,7 +275,7 @@ function renderHomeDashboard(){
  const nextState=nextTimer?(nextMs<=15*60*1000?'urgent':nextMs<=60*60*1000?'soon':'normal'):(todo.length?'task':'clear');
  let rosterCount=0,equipCount=0,equipPlanCount=0,eventCount=0;
  try{rosterCount=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]').length}catch{}
- try{const eq=JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]');equipCount=eq.filter(x=>Math.max(0,Number(x?.count)||0)>0).length;equipPlanCount=eq.filter(x=>String(x?.source||'')==='equipment-plan').length}catch{}
+ try{const eq=JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]');equipCount=eq.filter(x=>x&&typeof x==='object'&&(!Object.prototype.hasOwnProperty.call(x,'count')||Math.max(0,Number(x.count)||0)>0)).length;equipPlanCount=eq.filter(x=>String(x?.source||'')==='equipment-plan').length}catch{}
  try{eventCount=JSON.parse(localStorage.getItem('harbordesk-events-v1')||'[]').length}catch{}
  document.getElementById('homeUpdated').textContent=new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
  const installTip=document.getElementById('homeInstallTip');if(installTip)installTip.hidden=!homeShowInstallTip();
