@@ -2609,6 +2609,120 @@ test('release smoke: completed series restart never bypasses preflight safety', 
 });
 
 
+test('release smoke: completed repeat-sortie series can be compared side by side', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSPASeriesComparison === 'function' &&
+    typeof window.hdSPASeriesComparisonHtml === 'function' &&
+    typeof window.hdSPASeriesComparisonText === 'function' &&
+    typeof window.hdSSSeriesClose === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const rows = [
+      {id:'a1',seriesId:'s-a',cycleIndex:1,map:'2-4',fleetId:'f-a',fleetName:'安定艦隊',startedAt:1000,at:61000,durationMs:60000,result:'S',boss:true,fuel:100,ammo:80,steel:0,bauxite:20,buckets:0},
+      {id:'a2',seriesId:'s-a',cycleIndex:2,map:'2-4',fleetId:'f-a',fleetName:'安定艦隊',startedAt:91000,at:151000,durationMs:60000,result:'S',boss:true,fuel:100,ammo:80,steel:0,bauxite:20,buckets:0},
+      {id:'b1',seriesId:'s-b',cycleIndex:1,map:'2-4',fleetId:'f-b',fleetName:'節約艦隊',startedAt:201000,at:291000,durationMs:90000,result:'A',boss:true,fuel:60,ammo:50,steel:0,bauxite:10,buckets:0},
+      {id:'b2',seriesId:'s-b',cycleIndex:2,map:'2-4',fleetId:'f-b',fleetName:'節約艦隊',startedAt:321000,at:411000,durationMs:90000,result:'撤退',boss:false,retreat:true,fuel:60,ammo:50,steel:0,bauxite:10,buckets:1}
+    ];
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify(rows));
+    localStorage.setItem('harbordesk-sortie-analytics-mode-v1','series');
+    window.hdSSSeriesClose('s-a');
+    const grouped = window.hdSPARows();
+    const compare = window.hdSPASeriesComparison(grouped);
+    const html = window.hdSPASeriesComparisonHtml(grouped);
+    const text = window.hdSPASeriesComparisonText(grouped);
+    return {compare,html,text};
+  });
+
+  expect(data.compare).toHaveLength(2);
+  const a = data.compare.find(x=>x.seriesId==='s-a');
+  const b = data.compare.find(x=>x.seriesId==='s-b');
+  expect(a.completed).toBe(true);
+  expect(a.resourcePerCycle).toBe(200);
+  expect(a.avgCycleMin).toBe(1);
+  expect(a.bossRate).toBe(100);
+  expect(b.resourcePerCycle).toBe(120);
+  expect(b.retreatRate).toBe(50);
+  expect(b.badges).toContain('資源/周 最小');
+  expect(a.badges).toContain('平均時間 最短');
+  expect(data.html).toContain('周回シリーズ比較');
+  expect(data.html).toContain('完了');
+  expect(data.html).toContain('進行中');
+  expect(data.text).toContain('HarborDesk 周回シリーズ比較');
+  expect(data.text).toContain('資源/周 120');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: series comparison treats missing resource telemetry as unknown', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSPASeriesComparison === 'function' &&
+    typeof window.hdSPASeriesComparisonHtml === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const rows = [
+      {id:'known-1',seriesId:'known',cycleIndex:1,map:'2-4',source:'session',at:1000,result:'S',boss:true,fuel:100,ammo:50,buckets:1},
+      {id:'known-2',seriesId:'known',cycleIndex:2,map:'2-4',source:'session',at:2000,result:'S',boss:true,fuel:100,ammo:50,buckets:0},
+      {id:'unknown-1',seriesId:'unknown',cycleIndex:1,map:'2-4',source:'kancolle-import',at:3000,result:'A',boss:true,fuel:0,ammo:0,steel:0,bauxite:0,buckets:0},
+      {id:'unknown-2',seriesId:'unknown',cycleIndex:2,map:'2-4',source:'kancolle-import',at:4000,result:'A',boss:true,fuel:0,ammo:0,steel:0,bauxite:0,buckets:0}
+    ];
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify(rows));
+    localStorage.setItem('harbordesk-sortie-analytics-mode-v1','series');
+    const grouped=window.hdSPARows();
+    const compare=window.hdSPASeriesComparison(grouped);
+    return {compare,html:window.hdSPASeriesComparisonHtml(grouped)};
+  });
+
+  const known=data.compare.find(x=>x.seriesId==='known');
+  const unknown=data.compare.find(x=>x.seriesId==='unknown');
+  expect(known.resourcePerCycle).toBe(150);
+  expect(known.bucketsPerCycle).toBe(0.5);
+  expect(unknown.resourcePerCycle).toBeNull();
+  expect(unknown.bucketsPerCycle).toBeNull();
+  expect(unknown.badges).not.toContain('資源/周 最小');
+  expect(unknown.badges).not.toContain('バケツ/周 最小');
+  expect(data.html).toContain('資源/周 <b>—</b>');
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: series comparison only awards best badges within the same map', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdSPASeriesComparison === 'function' &&
+    typeof window.hdSPASeriesComparisonHtml === 'function'
+  );
+
+  const data = await page.evaluate(() => {
+    const rows = [
+      {id:'a1',seriesId:'map-a',cycleIndex:1,map:'2-4',source:'session',at:1000,result:'S',boss:true,fuel:120,ammo:80,buckets:1,durationMs:60000},
+      {id:'a2',seriesId:'map-a',cycleIndex:2,map:'2-4',source:'session',at:2000,result:'S',boss:true,fuel:120,ammo:80,buckets:1,durationMs:60000},
+      {id:'b1',seriesId:'map-b',cycleIndex:1,map:'3-2',source:'session',at:3000,result:'S',boss:true,fuel:20,ammo:20,buckets:0,durationMs:30000},
+      {id:'b2',seriesId:'map-b',cycleIndex:2,map:'3-2',source:'session',at:4000,result:'S',boss:true,fuel:20,ammo:20,buckets:0,durationMs:30000}
+    ];
+    localStorage.setItem('harbordesk-sortie-log-v1', JSON.stringify(rows));
+    localStorage.setItem('harbordesk-sortie-analytics-mode-v1','series');
+    const grouped=window.hdSPARows();
+    const compare=window.hdSPASeriesComparison(grouped);
+    return {compare,html:window.hdSPASeriesComparisonHtml(grouped),text:window.hdSPASeriesComparisonText(grouped)};
+  });
+
+  expect(data.compare).toHaveLength(2);
+  expect(data.compare.every(x=>x.badges.length===0)).toBe(true);
+  expect(data.html).toContain('2-4｜2周');
+  expect(data.html).toContain('3-2｜2周');
+  expect(data.text).toContain('[2-4]');
+  expect(data.text).toContain('[3-2]');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: updater uses GitHub main as release truth and exposes publish lag', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
@@ -2618,8 +2732,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.460'");
-  expect(source).toContain("const HD_APP_BUILD=460");
+  expect(source).toContain("const HD_APP_VERSION='1.0.461'");
+  expect(source).toContain("const HD_APP_BUILD=461");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -2642,15 +2756,15 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=460`);
+    expect(data.index).toContain(`${asset}?v=461`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=460");
+  expect(data.updater).toContain("const HD_APP_BUILD=461");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdScriptAssetUrl(src,attempt)");
   expect(data.updater).toContain("function hdScriptAssetUrl(src,attempt=0)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v460");
+  expect(data.sw).toContain("harbordesk-pwa-v461");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -2663,7 +2777,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=460');
+  expect(source).toContain('const BUILD=461');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -6262,17 +6376,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=460',
-      'map-images.js?v=460',
-      'map-tabs.js?v=460',
-      'map-interactive.js?v=460',
-      'map-advanced-data.js?v=460'
+      'map-details.js?v=461',
+      'map-images.js?v=461',
+      'map-tabs.js?v=461',
+      'map-interactive.js?v=461',
+      'map-advanced-data.js?v=461'
     ];
     const requiredStyles = [
-      'map-details.css?v=460',
-      'map-tabs.css?v=460',
-      'map-images.css?v=460',
-      'map-interactive.css?v=460'
+      'map-details.css?v=461',
+      'map-tabs.css?v=461',
+      'map-images.css?v=461',
+      'map-interactive.css?v=461'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -6333,7 +6447,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('[data-map-pane="mine"] #customFleetPanel')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=460');
+  expect(src).toBe('app.js?v=461');
   expect(errors).toEqual([]);
 });
 
@@ -9557,7 +9671,7 @@ test('release smoke: diagnostics center runtime stylesheet is loaded', async ({ 
     };
   });
 
-  expect(data.href).toContain('diagnostics-center.css?v=460');
+  expect(data.href).toContain('diagnostics-center.css?v=461');
   expect(data.loaded).toBe('1');
   expect(data.noteFont).not.toBe('');
   expect(data.noteLine).not.toBe('');
