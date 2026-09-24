@@ -1,7 +1,7 @@
 {
-  "version": "1.0.456",
-  "build": 456,
-  "releasedAt": "2026-09-24T09:52:00+09:00",
-  "notes": "v1.0.450以降の安定化修正を統合し、モバイルUI・全体検索・Safari艦娘画像DB・装備DB状態保持・診断センターruntime復旧に加えて diagnostics-center.css も確実に読み込むよう修正。",
+  "version": "1.0.457",
+  "build": 457,
+  "releasedAt": "2026-09-24T13:35:27+09:00",
+  "notes": "5-6をコア海域一覧へ登録し、詳細モジュールの読み込み失敗時でも海域選択肢から消えないよう堅牢化。",
   "masterChanges": null
 }
