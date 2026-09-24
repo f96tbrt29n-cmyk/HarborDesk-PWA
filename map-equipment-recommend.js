@@ -109,6 +109,20 @@ function hdRenderMapEquipmentRecommendations(){
   if(!host||typeof selectedMap==='undefined'||!selectedMap)return false;
   return hdRenderMapEquipmentRecommendationsInto(host,selectedMap);
 }
+function hdMapEquipOpenAdd(name=''){
+  const item=hdMapEquipFindByName(String(name||''));
+  if(!item||typeof openEquipment!=='function')return false;
+  openEquipment({
+    name:item.name,
+    category:item.category,
+    count:1,
+    star:0,
+    targetStar:String(item.improve||'').includes('可')?10:0,
+    assigned:'',
+    memo:[`用途: ${item.role||''}`,item.equip?`主な搭載: ${item.equip}`:'',item.special?`特殊効果・注意: ${item.special}`:'',`入手: ${item.obtain||''}`,item.update||''].filter(Boolean).join('\n')
+  });
+  return true;
+}
 function hdOpenEquipmentDb(name=''){
   const target=document.getElementById('equipmentBook');
   if(!target)return false;
@@ -127,6 +141,8 @@ function hdOpenEquipmentDb(name=''){
   return opened;
 }
 document.addEventListener('click',e=>{
+  const add=e.target.closest?.('.hd-map-equip-recommend [data-hd-equip-add]');
+  if(add&&hdMapEquipOpenAdd(add.dataset.hdEquipAdd)){e.preventDefault();e.stopImmediatePropagation();return}
   const view=e.target.closest?.('[data-hd-map-equip-view]');if(view){hdOpenEquipmentDb(view.dataset.hdMapEquipView);return}
   if(e.target.closest?.('[data-hd-open-equip-db]')){hdOpenEquipmentDb();return}
   if(e.target.closest?.('[data-map-tab="gear"]'))setTimeout(hdRenderMapEquipmentRecommendations,0);
@@ -147,5 +163,6 @@ window.hdMapEquipRecommendationsHtml=hdMapEquipRecommendationsHtml;
 window.hdRenderMapEquipmentRecommendationsInto=hdRenderMapEquipmentRecommendationsInto;
 window.hdRenderMapEquipmentRecommendations=hdRenderMapEquipmentRecommendations;
 window.hdMapEquipScheduleRender=hdMapEquipScheduleRender;
+window.hdMapEquipOpenAdd=hdMapEquipOpenAdd;
 hdMapEquipScheduleRender(0);
 hdMapEquipScheduleRender(350);
