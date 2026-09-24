@@ -253,8 +253,19 @@ function hdCoreRevealWorkspaceTarget(target){
  for(let p=target.parentElement;p&&p!==document.body;p=p.parentElement)p.classList?.remove('hd-ws-wrapper-hidden');
  return true;
 }
+function hdCoreFallbackWorkspaceEligible(){
+ const state=window.hdWSState;
+ if(!state||typeof state!=='object')return true;
+ if(state.group!=='guide')return false;
+ const section=String(state.sections?.guide||'');
+ return !section||section==='guide';
+}
 function hdCoreActivateFallbackPane(host){
  if(!host)return false;
+ if(!hdCoreFallbackWorkspaceEligible()){
+  host.hidden=true;host.classList.remove('active');
+  return false;
+ }
  const card=document.getElementById('selectedMapCard');
  card?.querySelectorAll('[data-hd-core-fallback-pane]').forEach(x=>{const on=x===host;x.classList.toggle('active',on);x.hidden=!on});
  host.hidden=false;host.classList.add('active');
@@ -274,7 +285,7 @@ function hdCoreActiveFallbackPane(){
  return [...document.querySelectorAll('[data-hd-core-fallback-pane]')].find(x=>String(x.dataset.mapPane||'')===String(hdCoreFallbackActive)&&!x.hidden&&x.classList.contains('active'))||null;
 }
 function hdCoreRestoreFallback(){
- if(!hdCoreFallbackActive||!selectedMap||document.querySelector('[data-map-tab]'))return false;
+ if(!hdCoreFallbackWorkspaceEligible()||!hdCoreFallbackActive||!selectedMap||document.querySelector('[data-map-tab]'))return false;
  if(hdCoreActiveFallbackPane())return true;
  const openers={
   map:()=>hdCoreOpenMapFallback(),
