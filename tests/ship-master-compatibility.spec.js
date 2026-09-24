@@ -2963,7 +2963,7 @@ test('mobile workspace uses compact section picker', async ({ page }) => {
     };
   });
   expect(data.exists).toBe(true);
-  expect(data.display).toBe('flex');
+  expect(data.display).toBe('grid');
   expect(data.options).toBeGreaterThan(1);
   expect(data.value).toBe('home');
   expect(data.secondaryDisplay).toBe('none');
