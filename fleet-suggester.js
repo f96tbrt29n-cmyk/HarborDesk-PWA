@@ -180,7 +180,8 @@ function hdFSOpen(){
  // workspace back to the guide root after the user chose this tool.
  try{window.hdCoreClearFallbackState?.()}catch(e){}
  hdFSEnsure();var target=document.getElementById('hdFleetSuggester');if(!target)return false;
- var opened=typeof hdWSShowElement==='function'&&hdWSShowElement(target,true)!==false;
+ var opened=typeof window.hdWSRevealElement==='function'&&window.hdWSRevealElement(target,true,{lockMs:15000})!==false;
+ if(!opened&&typeof hdWSShowElement==='function')opened=hdWSShowElement(target,true,{lockMs:15000})!==false;
  if(!opened)opened=hdFSReveal(target);
  hdFSRender(true);
  var navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0;
@@ -188,7 +189,7 @@ function hdFSOpen(){
   if((Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0)!==navEpoch)return;
   if(hdFSStillSelected(target)){hdFSReveal(target);navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||navEpoch;return}
   if(!hdFSOpenRecoveryAllowed(target))return;
-  if(typeof window.hdWSRevealElement==='function')window.hdWSRevealElement(target,true,{history:false,direct:false});
+  if(typeof window.hdWSRevealElement==='function')window.hdWSRevealElement(target,true,{history:false,direct:false,lockMs:6500});
   else if(typeof hdWSShowElement==='function')hdWSShowElement(target,true);
   else hdFSReveal(target);
   navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||navEpoch;
