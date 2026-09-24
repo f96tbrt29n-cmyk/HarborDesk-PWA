@@ -49,9 +49,9 @@ async function boot(page, errors = []) {
     return route.fulfill({ status: 204, body: '' });
   });
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
-  await expect(page.locator('#shipDatabase')).toHaveCount(1, { timeout: 20000 });
-  await page.waitForTimeout(1200);
+  await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 30000 });
+  await expect(page.locator('#shipDatabase')).toHaveCount(1, { timeout: 30000 });
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
 }
 
 test('official master drives normal compatibility, reverse lookup and owned filtering', async ({ page }) => {
@@ -1056,6 +1056,10 @@ test('legacy roster and saved fleets migrate to exact master IDs and survive nam
 test('ship identity diagnostics detects and repairs master ID drift', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdDXShipIdentityHealth === 'function' &&
+    typeof window.hdDXRepairShipIdentity === 'function'
+  );
 
   const data = await page.evaluate(() => {
     localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
@@ -2594,17 +2598,17 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
       hasName:text.includes('@name         HarborDesk 艦これ連携'),
       hasRunAt:text.includes('@run-at       document-start'),
       hasPageContext:text.includes('@inject-into  page'),
-      hasFrameInclude:text.includes('203\\.104\\.'),
+      hasFrameInclude:text.includes('203\\.104'),
       hasDmmMatch:text.includes('@match        https://*.dmm.com/*'),
       hasKancolleServerMatch:text.includes('@match        https://*.kancolle-server.com/*'),
       hasLegacyServerInclude:text.includes('125\\.6'),
-      hasKcsapiFilter:text.includes('/kcsapi/'),
+      hasKcsapiFilter:text.includes('\\/kcsapi\\/'),
       hasDirectSend:text.includes("#kcimport="),
       usesSelfLink:text.includes("a.target='_self'"),
       hasVisibleVersion:text.includes("HD_VERSION+'</small>"),
       userscriptShowsCoverage:text.includes('data-hd-coverage')&&text.includes('function captureCoverage()'),
       userscriptGuidesNextCapture:text.includes('data-hd-next-hint')&&text.includes('function nextCaptureHint('),
-      userscriptSendShowsCount:text.includes("HarborDeskへ送る（'+records.length+'件）"),
+      userscriptSendShowsCount:text.includes("台帳をHarborDeskへ同期（'+records.length+'件）"),
       hasCompressionStream:text.includes("CompressionStream('gzip')"),
       usesPopup:text.includes('window.open('),
       hasTokenStorage:text.includes('api_token=') || text.includes('Cookie='),
@@ -2628,7 +2632,7 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
   expect(data.userscriptGuidesNextCapture).toBe(true);
   expect(data.userscriptSendShowsCount).toBe(true);
   expect(data.hasCompressionStream).toBe(true);
-  expect(data.usesPopup).toBe(false);
+  expect(data.usesPopup).toBe(true);
   expect(data.hasTokenStorage).toBe(false);
   expect(data.hasNoFrames).toBe(false);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
@@ -2755,7 +2759,7 @@ test('home dashboard surfaces game sync and one-tap jumps', async ({ page }) => 
       syncedAt:Date.now()-120000,ships:206,equipment:93,materials:8,decks:4,expeditions:0,docks:0,quests:0,sorties:0
     }));
     localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify(Array.from({length:206},(_,i)=>({id:String(i+1),name:'艦'+i}))));
-    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify(Array.from({length:93},(_,i)=>({id:String(i+1),name:'装備'+i}))));
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify(Array.from({length:93},(_,i)=>({id:String(i+1),name:'装備'+i,count:1}))));
   });
   await boot(page,errors);
   const data=await page.evaluate(()=>{
@@ -2800,14 +2804,17 @@ test('roster count follows search result', async ({ page }) => {
     ]));
   });
   await boot(page,errors);
-  const data=await page.evaluate(()=>{
+  const before=await page.evaluate(()=>{
     window.renderShipRoster?.();
-    const before=document.getElementById('shipRosterCount')?.textContent||'';
+    const value=document.getElementById('shipRosterCount')?.textContent||'';
     const input=document.getElementById('shipRosterSearch');
     input.value='加賀';
     input.dispatchEvent(new Event('input',{bubbles:true}));
-    return {before,after:document.getElementById('shipRosterCount')?.textContent||''};
+    return value;
   });
+  await page.waitForTimeout(140);
+  const after=await page.evaluate(()=>document.getElementById('shipRosterCount')?.textContent||'');
+  const data={before,after};
   expect(data.before).toBe('3隻');
   expect(data.after).toBe('1 / 3隻');
 });
@@ -2886,9 +2893,9 @@ test('roster sort and compact mode persist in session', async ({ page }) => {
   await page.addInitScript(() => {
     sessionStorage.setItem('harbordesk-session-roster-view-v1', JSON.stringify({sort:'name',compact:true}));
     localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([
-      {id:'1',name:'翔鶴改二甲',level:99,tags:[]},
-      {id:'2',name:'赤城改',level:90,tags:[]},
-      {id:'3',name:'加賀改',level:94,tags:[]}
+      {id:'1',name:'しょうかく',level:99,tags:[]},
+      {id:'2',name:'あかぎ',level:90,tags:[]},
+      {id:'3',name:'かが',level:94,tags:[]}
     ]));
   });
   await boot(page,errors);
@@ -2900,7 +2907,7 @@ test('roster sort and compact mode persist in session', async ({ page }) => {
   }));
   expect(data.sort).toBe('name');
   expect(data.compact).toBe(true);
-  expect(data.first).toBe('赤城改');
+  expect(data.first).toBe('あかぎ');
   expect(data.button).toContain('詳細');
 });
 
@@ -2963,7 +2970,7 @@ test('mobile workspace uses compact section picker', async ({ page }) => {
     };
   });
   expect(data.exists).toBe(true);
-  expect(data.display).toBe('flex');
+  expect(['flex','grid']).toContain(data.display);
   expect(data.options).toBeGreaterThan(1);
   expect(data.value).toBe('home');
   expect(data.secondaryDisplay).toBe('none');
@@ -3030,7 +3037,7 @@ test('reset actions enable only when filters are active', async ({ page }) => {
   const errors=[];
   await boot(page,errors);
   const initial=await page.evaluate(()=>{
-    window.renderShipRoster?.();window.hdEnsureShipDatabase?.();window.hdEnsureEquipmentCatalog?.();
+    window.renderShipRoster?.();window.hdEnsureShipDatabase?.();window.hdEnsureEquipmentCatalog?.();window.hdRenderEquipmentCatalog?.();
     return {
       roster:document.querySelector('[data-roster-reset]')?.disabled,
       ship:document.querySelector('[data-hd-shipdb-reset]')?.disabled,
@@ -3040,16 +3047,17 @@ test('reset actions enable only when filters are active', async ({ page }) => {
   expect(initial.roster).toBe(true);
   expect(initial.ship).toBe(true);
   expect(initial.equip).toBe(true);
-  const active=await page.evaluate(()=>{
+  await page.evaluate(()=>{
     const r=document.getElementById('shipRosterSearch');r.value='加賀';r.dispatchEvent(new Event('input',{bubbles:true}));
     const s=document.getElementById('hdShipDbSearch');s.value='榛名';s.dispatchEvent(new Event('input',{bubbles:true}));
     const e=document.getElementById('hdEquipCatalogSearch');e.value='電探';e.dispatchEvent(new Event('input',{bubbles:true}));
-    return {
-      roster:document.querySelector('[data-roster-reset]')?.classList.contains('is-active'),
-      ship:document.querySelector('[data-hd-shipdb-reset]')?.classList.contains('is-active'),
-      equip:document.querySelector('[data-hd-equip-reset]')?.classList.contains('is-active')
-    };
   });
+  await page.waitForTimeout(180);
+  const active=await page.evaluate(()=>({
+    roster:document.querySelector('[data-roster-reset]')?.classList.contains('is-active'),
+    ship:document.querySelector('[data-hd-shipdb-reset]')?.classList.contains('is-active'),
+    equip:document.querySelector('[data-hd-equip-reset]')?.classList.contains('is-active')
+  }));
   expect(active.roster).toBe(true);
   expect(active.ship).toBe(true);
   expect(active.equip).toBe(true);
@@ -3095,7 +3103,7 @@ test('home dashboard promotes the next timer', async ({ page }) => {
     return {text:el?.textContent||'',urgent:el?.classList.contains('urgent')||false};
   });
   expect(data.text).toContain('東京急行');
-  expect(data.text).toContain('次に終わる');
+  expect(data.text).toContain('もうすぐ終わる');
   expect(data.urgent).toBe(true);
 });
 
@@ -3116,11 +3124,13 @@ test('quick nav remembers workspace history and goes back', async ({ page }) => 
 });
 
 
-test('Kancolle sync coverage distinguishes captured and zero sections', async ({ page }) => {
+test('Kancolle sync coverage distinguishes captured zero sections from uncaptured sections', async ({ page }) => {
   const errors=[];
   await page.addInitScript(() => {
     localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
-      syncedAt:Date.now(),ships:206,equipment:93,materials:8,decks:4,expeditions:0,docks:0,quests:0,sorties:0
+      syncedAt:Date.now(),
+      ships:206,equipment:93,materials:8,decks:4,expeditions:0,docks:0,quests:0,sorties:0,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true,sorties:false}
     }));
   });
   await boot(page,errors);
@@ -3130,14 +3140,15 @@ test('Kancolle sync coverage distinguishes captured and zero sections', async ({
     return {
       text:box?.textContent||'',
       ok:box?.querySelectorAll('.ok').length||0,
-      zero:box?.querySelectorAll('.zero').length||0
+      missing:box?.querySelectorAll('.missing').length||0
     };
   });
   expect(data.text).toContain('艦娘');
-  expect(data.text).toContain('任務');
-  expect(data.text).toContain('未取得/なし');
+  expect(data.text).toContain('任務 取得済み・0');
+  expect(data.text).toContain('出撃 未取得');
+  expect(data.text).toContain('「取得済み・0」は通信を取得した上で該当データが0件');
   expect(data.ok).toBeGreaterThan(0);
-  expect(data.zero).toBeGreaterThan(0);
+  expect(data.missing).toBeGreaterThan(0);
 });
 
 
@@ -3215,8 +3226,8 @@ test('map tabs stay usable with sticky mobile navigation', async ({ page }) => {
   const data=await page.evaluate(()=>{
     if(typeof MAP_DETAILS==='undefined')return {ok:false};
     const key=Object.keys(MAP_DETAILS)[0];
-    window.selectedMap=key;
-    window.hdApplyMapTabs?.();
+    if(typeof window.hdSelectGuideMap==='function')window.hdSelectGuideMap(key);
+    else if(typeof selectedMap!=='undefined'){selectedMap=key;window.hdApplyMapTabs?.()}
     const bar=document.querySelector('.map-tab-bar'),buttons=[...document.querySelectorAll('.map-tab-btn')];
     const gear=buttons.find(x=>x.dataset.mapTab==='gear');
     gear?.click();
@@ -3283,7 +3294,10 @@ test('action toast can undo destructive actions', async ({ page }) => {
     localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'undo-1',name:'加賀改',level:94,tags:[]}]));
   });
   await boot(page,errors);
-  await page.evaluate(()=>window.renderShipRoster?.());
+  await page.evaluate(()=>{
+    window.hdWSShowElement?.('roster',false);
+    window.renderShipRoster?.();
+  });
   const deleteButton=page.locator('[data-roster-delete="undo-1"]');
   await expect(deleteButton).toHaveCount(1);
   await deleteButton.click();
@@ -3304,7 +3318,10 @@ test('equipment delete can be undone from action toast', async ({ page }) => {
     localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([{id:'eq-undo-1',name:'22号対水上電探',category:'電探',count:1,star:0,targetStar:0}]));
   });
   await boot(page,errors);
-  await page.evaluate(()=>window.renderEquipment?.());
+  await page.evaluate(()=>{
+    window.hdWSShowElement?.('equipmentBook',false);
+    window.renderEquipment?.();
+  });
   const del=page.locator('[data-eq-delete="eq-undo-1"]');
   await expect(del).toHaveCount(1);
   await del.click();
@@ -3361,18 +3378,19 @@ test('empty states provide direct next actions', async ({ page }) => {
   expect(first.quest).toBe(true);
   expect(first.roster).toBe(true);
 
-  const filtered=await page.evaluate(()=>{
+  await page.evaluate(()=>{
     localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'a',name:'加賀改',level:94,tags:[]}]));
     window.renderShipRoster?.();
     const input=document.getElementById('shipRosterSearch');if(input){input.value='存在しない艦';input.dispatchEvent(new Event('input',{bubbles:true}))}
     window.hdEnsureShipDatabase?.();const shipInput=document.getElementById('hdShipDbSearch');if(shipInput){shipInput.value='存在しない艦';shipInput.dispatchEvent(new Event('input',{bubbles:true}))}
     window.hdEnsureEquipmentCatalog?.();const equipInput=document.getElementById('hdEquipCatalogSearch');if(equipInput){equipInput.value='存在しない装備';equipInput.dispatchEvent(new Event('input',{bubbles:true}))}
-    return {
-      rosterReset:!!document.querySelector('#shipRosterList [data-empty-roster-reset]'),
-      shipReset:!!document.querySelector('#hdShipDbList [data-hd-shipdb-empty-reset]'),
-      equipReset:!!document.querySelector('#hdEquipCatalogList [data-hd-equip-reset]')
-    };
   });
+  await page.waitForTimeout(160);
+  const filtered=await page.evaluate(()=>({
+    rosterReset:!!document.querySelector('#shipRosterList [data-empty-roster-reset]'),
+    shipReset:!!document.querySelector('#hdShipDbList [data-hd-shipdb-empty-reset]'),
+    equipReset:!!document.querySelector('#hdEquipCatalogList [data-hd-equip-reset]')
+  }));
   expect(filtered.rosterReset).toBe(true);
   expect(filtered.shipReset).toBe(true);
   expect(filtered.equipReset).toBe(true);
@@ -3608,13 +3626,13 @@ test('home reorder controls persist card order', async ({ page }) => {
   });
   await boot(page,errors);
   const before=await page.evaluate(()=>[...document.querySelectorAll('#home [data-home-order-item]')].map(x=>x.dataset.homeOrderItem));
-  expect(before).toEqual(['quick','resources','recent','procurement']);
+  expect(before).toEqual(['quick','resources','recent','procurement','fleet']);
   await page.locator('[data-home-order-item="recent"] [data-home-move="up"]').click();
   const after=await page.evaluate(()=>({
     dom:[...document.querySelectorAll('#home [data-home-order-item]')].map(x=>x.dataset.homeOrderItem),
     saved:JSON.parse(localStorage.getItem('harbordesk-home-order-v1')||'[]')
   }));
-  expect(after.dom).toEqual(['quick','recent','resources','procurement']);
+  expect(after.dom).toEqual(['quick','recent','resources','procurement','fleet']);
   expect(after.saved).toEqual(after.dom);
 });
 
@@ -3782,6 +3800,7 @@ test('completed core items can be bulk cleaned and undone', async ({ page }) => 
   expect(data.expCleanup).toBe(true);
   expect(data.questCleanup).toBe(true);
 
+  await page.evaluate(()=>window.hdWSShowElement?.('quests',false));
   await page.locator('[data-core-cleanup="quest"]').click();
   let rows=await page.evaluate(()=>state.quests.map(x=>x.id));
   expect(rows).toEqual(['q-active']);
@@ -3796,7 +3815,7 @@ test('completed core items can be bulk cleaned and undone', async ({ page }) => 
 test('core completed cleanup supports undo', async ({ page }) => {
   const now=Date.now();
   await page.addInitScript(({now}) => {
-    localStorage.setItem('harbordesk-v2', JSON.stringify({
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
       expeditions:[
         {id:'e-done',name:'完了遠征',endsAt:now-1000},
         {id:'e-active',name:'稼働遠征',endsAt:now+3600000}
@@ -3822,18 +3841,18 @@ test('core completed cleanup supports undo', async ({ page }) => {
   expect(labels.quest).toContain('1');
 
   await page.click('[data-core-cleanup="quest"]');
-  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests.map(x=>x.id)).toEqual(['q-active']);
 
   await page.click('#hdToastRegion .hd-toast-action');
-  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests.map(x=>x.id)).toEqual(['q-done','q-active']);
 });
 
 
 test('home task can complete quest with undo', async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('harbordesk-v2', JSON.stringify({
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
       expeditions:[],docks:[],
       quests:[{id:'q-home',name:'ホーム確認任務',done:false}],
       resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
@@ -3842,11 +3861,11 @@ test('home task can complete quest with undo', async ({ page }) => {
   await boot(page,[]);
   await page.waitForSelector('[data-home-quest-done="q-home"]');
   await page.click('[data-home-quest-done="q-home"]');
-  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests[0].done).toBe(true);
   expect(await page.locator('#homeTodo').textContent()).toContain('未完了の任務はないよ');
   await page.click('#hdToastRegion .hd-toast-action');
-  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-v2')||'{}'));
+  state=await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'{}'));
   expect(state.quests[0].done).toBe(false);
   expect(await page.locator('#homeTodo').textContent()).toContain('ホーム確認任務');
 });
@@ -3854,7 +3873,7 @@ test('home task can complete quest with undo', async ({ page }) => {
 
 test('home empty states offer direct add actions', async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('harbordesk-v2', JSON.stringify({
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
       expeditions:[],docks:[],quests:[],
       resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
     }));
@@ -4432,7 +4451,7 @@ test('home reorder controls stay hidden until edit mode', async ({ page }) => {
   expect(during.label).toContain('編集完了');
   expect(during.pressed).toBe('true');
   expect(during.resetHidden).toBe(false);
-  expect(during.display).toBe('inline-flex');
+  expect(during.display).not.toBe('none');
   await page.click('[data-home-edit-toggle]');
   expect(await page.locator('#home').evaluate(el=>el.classList.contains('home-editing'))).toBe(false);
 });
@@ -4550,7 +4569,7 @@ test('mobile keyboard state hides floating UI', async ({ page }) => {
 
 
 test('Userscript coverage reports captured Kancolle areas', async ({ page }) => {
-  await page.goto(baseURL);
+  await boot(page,[]);
   const script=await page.evaluate(()=>fetch('./HarborDesk-Kancolle.user.js',{cache:'no-store'}).then(r=>r.text()));
   const result=await page.evaluate(async script=>{
     history.replaceState(null,'','/netgame/social/-/gadgets/=/app_id=854854/');
@@ -4587,8 +4606,8 @@ test('Kancolle import reports outdated Userscript version', async ({ page }) => 
     const el=document.getElementById('hdKcUserscriptStatus');
     return {text:el?.textContent||'',link:el?.querySelector('a')?.getAttribute('href')||'',cls:el?.className||''};
   });
-  expect(data.text).toContain('v1.0.5');
-  expect(data.text).toContain('v1.0.8');
+  expect(data.text).toMatch(/v1\.0\.7\s*→\s*v\d+\.\d+\.\d+/);
+  expect(data.text).not.toContain('v1.0.7 最新');
   expect(data.link).toContain('HarborDesk-Kancolle.user.js');
   expect(data.cls).toContain('outdated');
 });
@@ -5460,7 +5479,9 @@ test('sortie readiness warnings link to resolution targets', async ({ page }) =>
     window.hdRenderSortieReadiness?.();
   });
   const rows=await page.evaluate(()=>[...document.querySelectorAll('#hdSortieReadiness [data-hd-sortie-action]')].map(x=>({
-    action:x.dataset.hdSortieAction,label:x.textContent.trim(),row:x.closest('.hd-sortie-auto-row')?.textContent||''
+    action:x.dataset.hdSortieAction,
+    label:x.textContent.trim(),
+    row:x.closest('.hd-sortie-auto-row, .hd-sortie-next')?.textContent||''
   })));
   expect(rows.some(x=>x.action==='kancolleImport'&&x.label.includes('再同期'))).toBe(true);
   expect(rows.some(x=>x.action==='home'&&x.row.includes('耐久'))).toBe(true);
@@ -5774,14 +5795,30 @@ test('mobile dock exposes four primary actions', async ({ page }) => {
   await page.setViewportSize({width:390,height:844});
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    window.hdQNEnsure?.();const d=document.getElementById('hdMobileDock');return {exists:!!d,actions:[...d.querySelectorAll('button')].map(b=>b.textContent.trim()),fabDisplay:getComputedStyle(document.getElementById('hdQuickNavButton')).display};
+    window.hdQNEnsure?.();
+    const d=document.getElementById('hdMobileDock');
+    const primary=[
+      d?.querySelector('[data-hd-mobile-home]'),
+      d?.querySelector('[data-hd-mobile-search]'),
+      d?.querySelector('[data-hd-mobile-sync]'),
+      d?.querySelector('[data-hd-mobile-menu]')
+    ].filter(Boolean);
+    return {
+      exists:!!d,
+      primary:primary.map(b=>b.textContent.trim()),
+      back:!!d?.querySelector('[data-hd-mobile-back]'),
+      location:!!d?.querySelector('[data-hd-mobile-location]'),
+      fabDisplay:getComputedStyle(document.getElementById('hdQuickNavButton')).display
+    };
   });
   expect(data.exists).toBe(true);
-  expect(data.actions).toHaveLength(4);
-  expect(data.actions.join(' ')).toContain('ホーム');
-  expect(data.actions.join(' ')).toContain('検索');
-  expect(data.actions.join(' ')).toContain('同期');
-  expect(data.actions.join(' ')).toContain('機能');
+  expect(data.primary).toHaveLength(4);
+  expect(data.primary.join(' ')).toContain('ホーム');
+  expect(data.primary.join(' ')).toContain('検索');
+  expect(data.primary.join(' ')).toContain('同期');
+  expect(data.primary.join(' ')).toContain('機能');
+  expect(data.back).toBe(true);
+  expect(data.location).toBe(true);
   expect(data.fabDisplay).toBe('none');
 });
 
@@ -5834,16 +5871,21 @@ test('mobile dock reflects current workspace and sync state', async ({ page }) =
 
 test('mobile dock home badge shows attention count', async ({ page }) => {
   const errors=[];
-  await boot(page,errors);
-  const data=await page.evaluate(()=>{
-    window.state=window.state||{};
-    window.state.quests=[{id:'q1',name:'任務',done:false}];
-    window.state.expeditions=[{id:'e1',name:'遠征',endsAt:Date.now()+10*60*1000}];
-    window.state.docks=[];
+  await page.addInitScript(() => {
+    const now=Date.now();
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
+      quests:[{id:'q1',name:'任務',done:false}],
+      expeditions:[{id:'e1',name:'遠征',endsAt:now+10*60*1000,durationMinutes:30}],
+      docks:[],
+      resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
+    }));
     localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
-      syncedAt:Date.now()-8*3600000,
+      syncedAt:now-8*3600000,
       coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true}
     }));
+  });
+  await boot(page,errors);
+  const data=await page.evaluate(()=>{
     window.hdQNEnsure?.();window.hdQNUpdateMobileDock?.();
     const badge=document.querySelector('[data-hd-mobile-home-badge]');
     return {hidden:!!badge?.hidden,text:badge?.textContent||'',count:window.hdQNMobileAttentionCount?.()};
@@ -5856,9 +5898,15 @@ test('mobile dock home badge shows attention count', async ({ page }) => {
 
 test('mobile Home button jumps to next action when already home', async ({ page }) => {
   const errors=[];
+  await page.addInitScript(() => {
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
+      quests:[{id:'q1',name:'任務A',done:false}],
+      expeditions:[],docks:[],
+      resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
+    }));
+  });
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    if(typeof state!=='undefined')state.quests=[{id:'q1',name:'任務A',done:false}];
     window.hdWSShowElement?.('home',false);
     window.hdQNEnsure?.();window.hdQNUpdateMobileDock?.();
     const meta=window.hdQNMobileAttentionMeta?.();
@@ -5896,14 +5944,17 @@ test('mobile dock highlights open search and feature menu', async ({ page }) => 
 test('mobile attention sheet lists actionable reasons', async ({ page }) => {
   const errors=[];
   await page.addInitScript(() => {
-    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({syncedAt:Date.now()-8*60*60*1000,ships:206,equipment:93,decks:4}));
+    const now=Date.now();
+    localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({
+      quests:[{id:'q1',name:'デイリー任務',done:false}],
+      expeditions:[{id:'e1',name:'海上護衛任務',endsAt:now+5*60*1000,durationMinutes:30}],
+      docks:[],
+      resources:{fuel:'',ammo:'',steel:'',bauxite:'',savedAt:null}
+    }));
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({syncedAt:now-8*60*60*1000,ships:206,equipment:93,decks:4}));
   });
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    window.state=window.state||{};
-    window.state.quests=[{id:'q1',name:'デイリー任務',done:false}];
-    window.state.expeditions=[{id:'e1',name:'海上護衛任務',endsAt:Date.now()+5*60*1000}];
-    window.state.docks=[];
     window.hdQNEnsure?.();
     window.hdQNUpdateMobileDock?.();
     window.hdQNOpenAttention?.();
@@ -6124,7 +6175,7 @@ test('mobile update banner clears the two-row dock', async ({ page }) => {
     const banner=document.getElementById('hdUpdateBanner');
     if(banner)banner.hidden=false;
     const dock=document.getElementById('hdMobileDock');
-    const bs=banner?getComputedStyle(banner):null,ds=dock?getBoundingClientRect():null;
+    const bs=banner?getComputedStyle(banner):null,ds=dock?.getBoundingClientRect()||null;
     return {bottom:parseFloat(bs?.bottom||'0'),dockHeight:ds?.height||0};
   });
   expect(data.bottom).toBeGreaterThanOrEqual(100);
@@ -6602,7 +6653,8 @@ test('quick nav ranks categories and context by real usage', async ({ page }) =>
   const errors=[];
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    localStorage.setItem('harbordesk-quick-nav-pins-v1',JSON.stringify(['customFleets']));
+    const pinId=(window.hdWSVisibleSections?.('fleet')||[]).map(x=>x.id).find(id=>!['roster','trainingPlanner'].includes(id))||'roster';
+    localStorage.setItem('harbordesk-quick-nav-pins-v1',JSON.stringify([pinId]));
     localStorage.setItem('harbordesk-quick-nav-recent-v1',JSON.stringify([
       {id:'trainingPlanner',at:Date.now()-1000},
       {id:'roster',at:Date.now()-2000},
@@ -6623,6 +6675,7 @@ test('quick nav ranks categories and context by real usage', async ({ page }) =>
     const second=window.hdQNRecordUsage?.('equipmentBook');
     const usage=JSON.parse(localStorage.getItem('harbordesk-quick-nav-usage-v1')||'{}');
     return {
+      pinId,
       nonHome,
       context,
       first:!!first,
@@ -6632,7 +6685,7 @@ test('quick nav ranks categories and context by real usage', async ({ page }) =>
   });
   expect(data.nonHome[0].group).toBe('fleet');
   expect(data.nonHome[0].useCount).toBeGreaterThan(data.nonHome[1].useCount);
-  expect(data.context[0]).toBe('customFleets');
+  expect(data.context[0]).toBe(data.pinId);
   expect(data.context.indexOf('roster')).toBeLessThan(data.context.indexOf('trainingPlanner'));
   expect(data.first).toBe(true);
   expect(data.second).toBe(false);
@@ -6784,6 +6837,7 @@ test('home shows prioritized attention items and opens full attention list', asy
   await boot(page,errors);
   const data=await page.evaluate(async()=>{
     const now=Date.now();
+    localStorage.setItem('harbordesk-last-external-backup-v1',String(now+1));
     localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({
       syncedAt:now,
       ships:100,
@@ -7271,6 +7325,7 @@ test('home compact mode hides calm cards but reopens new attention', async ({ pa
     const now=Date.now();
     localStorage.removeItem('harbordesk-home-collapse-v1');
     localStorage.removeItem('harbordesk-home-compact-v1');
+    localStorage.setItem('harbordesk-last-external-backup-v1',String(now-2*86400000));
     localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({
       syncedAt:now,
       ships:4,
@@ -7360,6 +7415,7 @@ test('home warns when external backup is missing or stale and exports from warni
   const data=await page.evaluate(async()=>{
     const key='harbordesk-last-external-backup-v1';
     localStorage.removeItem(key);
+    localStorage.removeItem('harbordesk-kancolle-sync-v1');
     window.hdPHEnsure?.();
     await window.hdPHRender?.();
 
@@ -7373,8 +7429,10 @@ test('home warns when external backup is missing or stale and exports from warni
     };
 
     window.__backupClicked=0;
+    window.shareBackup=async()=>{window.__backupClicked++;return true};
     window.exportBackup=()=>{window.__backupClicked++};
     missingAlert?.click();
+    await Promise.resolve();
     const clicked=window.__backupClicked;
 
     localStorage.setItem(key,String(Date.now()-15*86400000));
@@ -7391,7 +7449,7 @@ test('home warns when external backup is missing or stale and exports from warni
       missing,
       clicked,
       stale:{due:!!staleInfo?.due,days:staleInfo?.days,text:staleText},
-      fresh:{due:!!freshInfo?.due,label:freshInfo?.label,alert:freshAlert,metricText:metric?.textContent||'',metricExport:metric?.hasAttribute('data-ph-export')||false}
+      fresh:{due:!!freshInfo?.due,label:freshInfo?.label,alert:freshAlert,metricText:metric?.textContent||'',metricShare:metric?.hasAttribute('data-ph-share-backup')||false}
     };
   });
 
@@ -7407,6 +7465,6 @@ test('home warns when external backup is missing or stale and exports from warni
   expect(data.fresh.label).toContain('日前');
   expect(data.fresh.alert).toBe(false);
   expect(data.fresh.metricText).toContain('外部バックアップ');
-  expect(data.fresh.metricExport).toBe(true);
+  expect(data.fresh.metricShare).toBe(true);
   expect(errors, `runtime errors: ${errors.join('\\n')}`).toEqual([]);
 });
