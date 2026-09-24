@@ -9279,6 +9279,60 @@ test('release smoke: Quick Nav group jump marks explicit workspace navigation', 
 });
 
 
+test('release smoke: fleet suggester recovers from a deferred guide workspace rollback', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() =>
+    typeof window.hdFSEnsure === 'function' &&
+    typeof window.hdFSOpen === 'function' &&
+    typeof window.hdWSApply === 'function'
+  );
+
+  await page.evaluate(() => {
+    window.hdFSEnsure();
+    window.hdFSOpen();
+    setTimeout(() => window.hdWSApply('guide','guide',{ignorePin:true}), 520);
+  });
+  await page.waitForTimeout(760);
+
+  const state = await page.evaluate(() => {
+    const el=document.getElementById('hdFleetSuggester');
+    return {
+      section:window.hdWSState?.sections?.guide||'',
+      visible:!!el&&!el.hidden&&!el.classList.contains('hd-ws-hidden')
+    };
+  });
+  expect(state).toEqual({section:'hdFleetSuggester',visible:true});
+  expect(errors).toEqual([]);
+});
+
+
+test('release smoke: construction search restores a query cleared by deferred rendering', async ({ page }) => {
+  const errors = [];
+  await boot(page, errors);
+  await page.waitForFunction(() => typeof window.hdConstructionOpenSearch === 'function');
+
+  await page.evaluate(() => {
+    window.hdConstructionOpenSearch('大和','large',false);
+    setTimeout(() => {
+      const input=document.getElementById('hdConstructionSearch');
+      if(input)input.value='';
+    }, 120);
+  });
+  await page.waitForTimeout(520);
+
+  const state = await page.evaluate(() => ({
+    value:document.getElementById('hdConstructionSearch')?.value||'',
+    mode:typeof hdConstructionMode!=='undefined'?hdConstructionMode:'',
+    section:window.hdWSState?.sections?.arsenal||''
+  }));
+  expect(state.value).toBe('大和');
+  expect(state.mode).toBe('large');
+  expect(state.section).toBe('constructionDb');
+  expect(errors).toEqual([]);
+});
+
+
 test('release smoke: mobile dialog actions stay on the visible bottom edge', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
