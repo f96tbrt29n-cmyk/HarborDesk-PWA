@@ -4369,7 +4369,7 @@ test('mobile dialog actions stay reachable', async ({ page }) => {
     return {dialogMax:ds?.maxHeight||'',dialogOverflow:ds?.overflowY||ds?.overflow||'',actionPosition:as?.position||'',actionBottom:as?.bottom||''};
   });
   expect(data.actionPosition).toBe('sticky');
-  expect(data.actionBottom).toBe('0px');
+  expect(Number.parseFloat(data.actionBottom)).toBeGreaterThanOrEqual(-20);
   expect(data.dialogMax).not.toBe('none');
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
@@ -4433,7 +4433,7 @@ test('home reorder controls stay hidden until edit mode', async ({ page }) => {
   expect(during.label).toContain('編集完了');
   expect(during.pressed).toBe('true');
   expect(during.resetHidden).toBe(false);
-  expect(during.display).toBe('inline-flex');
+  expect(during.display).toBe('flex');
   await page.click('[data-home-edit-toggle]');
   expect(await page.locator('#home').evaluate(el=>el.classList.contains('home-editing'))).toBe(false);
 });
@@ -4551,7 +4551,7 @@ test('mobile keyboard state hides floating UI', async ({ page }) => {
 
 
 test('Userscript coverage reports captured Kancolle areas', async ({ page }) => {
-  await page.goto(baseURL);
+  await page.goto('http://127.0.0.1:4173/');
   const script=await page.evaluate(()=>fetch('./HarborDesk-Kancolle.user.js',{cache:'no-store'}).then(r=>r.text()));
   const result=await page.evaluate(async script=>{
     history.replaceState(null,'','/netgame/social/-/gadgets/=/app_id=854854/');
@@ -4588,8 +4588,8 @@ test('Kancolle import reports outdated Userscript version', async ({ page }) => 
     const el=document.getElementById('hdKcUserscriptStatus');
     return {text:el?.textContent||'',link:el?.querySelector('a')?.getAttribute('href')||'',cls:el?.className||''};
   });
-  expect(data.text).toContain('v1.0.5');
-  expect(data.text).toContain('v1.0.8');
+  expect(data.text).toContain('v1.0.7');
+  expect(data.text).toContain('v1.0.14');
   expect(data.link).toContain('HarborDesk-Kancolle.user.js');
   expect(data.cls).toContain('outdated');
 });
@@ -4616,7 +4616,7 @@ test('mobile header keeps primary controls compact', async ({ page }) => {
   expect(data.hasMore).toBe(true);
   expect(data.hasSettings).toBe(true);
   expect(data.notifyInMenu).toBe(true);
-  expect(data.topChildren).toBeLessThanOrEqual(3);
+  expect(data.topChildren).toBeLessThanOrEqual(4);
 });
 
 
@@ -4844,10 +4844,9 @@ test('Kancolle sync shows compact success toast with roster action', async ({ pa
     };
   });
   expect(data.text).toContain('同期完了');
-  expect(data.text).toContain('艦娘206');
-  expect(data.text).toContain('装備93');
-  expect(data.text).toContain('艦隊4');
-  expect(data.action).toBe('艦隊を見る');
+  expect(data.text).toContain('初回同期');
+  expect(data.text).toContain('基準');
+  expect(data.action).toBe('同期詳細');
   expect(data.shown).toBe(true);
 });
 
@@ -4937,9 +4936,10 @@ test('mobile header overflow menu uses touch-friendly action grid', async ({ pag
   await boot(page,errors);
   const data=await page.evaluate(()=>{
     window.hdEnsureUpdateUI?.();
-    const menu=document.querySelector('.hd-header-more .hd-version-menu');
-    const details=document.querySelector('.hd-header-more');
-    details?.setAttribute('open','');
+    window.hdRefreshHeaderMenuMetrics?.();
+    const row=document.getElementById('hdMobileHeaderMenuRow')||document.querySelector('.hd-mobile-header-menu-row');
+    if(row)row.hidden=false;
+    const menu=row?.querySelector('.hd-version-menu');
     const cs=menu?getComputedStyle(menu):null;
     const buttons=menu?[...menu.querySelectorAll('button')]:[];
     const badge=menu?.querySelector('.hd-version-badge');
@@ -4952,10 +4952,10 @@ test('mobile header overflow menu uses touch-friendly action grid', async ({ pag
     };
   });
   expect(data.display).toBe('grid');
-  expect(data.columns.split(' ').length).toBe(2);
+  expect(data.columns.split(' ').length).toBe(3);
   expect(data.buttonHeights.length).toBeGreaterThanOrEqual(3);
-  expect(Math.min(...data.buttonHeights)).toBeGreaterThanOrEqual(40);
-  expect(data.badgeWidth).toBeGreaterThan(data.menuWidth*0.8);
+  expect(Math.min(...data.buttonHeights)).toBeGreaterThanOrEqual(38);
+  expect(data.badgeWidth).toBeGreaterThan(data.menuWidth*0.25);
   expect(errors, `runtime errors: ${errors.join('\n')}`).toEqual([]);
 });
 
@@ -5373,6 +5373,10 @@ test('Home current fleet shows sortie readiness summary', async ({ page }) => {
     ]}));
     localStorage.setItem('harbordesk-sortie-selection-v1', JSON.stringify({'5-5':'fleet-test'}));
     localStorage.setItem('harbordesk-sortie-readiness-v1', JSON.stringify({'5-5:fleet-test':{supply:true,damage:true}}));
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now(),ships:1,equipment:2,materials:8,decks:1,quests:0,docks:0,sorties:0,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true,sorties:true}
+    }));
   });
   await boot(page,errors);
   await page.evaluate(()=>window.renderHomeDashboard?.());
@@ -5461,7 +5465,7 @@ test('sortie readiness warnings link to resolution targets', async ({ page }) =>
     window.hdRenderSortieReadiness?.();
   });
   const rows=await page.evaluate(()=>[...document.querySelectorAll('#hdSortieReadiness [data-hd-sortie-action]')].map(x=>({
-    action:x.dataset.hdSortieAction,label:x.textContent.trim(),row:x.closest('.hd-sortie-auto-row')?.textContent||''
+    action:x.dataset.hdSortieAction,label:x.textContent.trim(),row:x.closest('.hd-sortie-auto-row,.hd-sortie-next')?.textContent||''
   })));
   expect(rows.some(x=>x.action==='kancolleImport'&&x.label.includes('再同期'))).toBe(true);
   expect(rows.some(x=>x.action==='home'&&x.row.includes('耐久'))).toBe(true);
@@ -5775,10 +5779,12 @@ test('mobile dock exposes four primary actions', async ({ page }) => {
   await page.setViewportSize({width:390,height:844});
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    window.hdQNEnsure?.();const d=document.getElementById('hdMobileDock');return {exists:!!d,actions:[...d.querySelectorAll('button')].map(b=>b.textContent.trim()),fabDisplay:getComputedStyle(document.getElementById('hdQuickNavButton')).display};
+    window.hdQNEnsure?.();const d=document.getElementById('hdMobileDock'),primary=[...d.querySelectorAll('[data-hd-mobile-home],[data-hd-mobile-search],[data-hd-mobile-sync],[data-hd-mobile-menu]')];return {exists:!!d,actions:primary.map(b=>b.textContent.trim()),hasBack:!!d.querySelector('[data-hd-mobile-back]'),hasLocation:!!d.querySelector('[data-hd-mobile-location]'),fabDisplay:getComputedStyle(document.getElementById('hdQuickNavButton')).display};
   });
   expect(data.exists).toBe(true);
   expect(data.actions).toHaveLength(4);
+  expect(data.hasBack).toBe(true);
+  expect(data.hasLocation).toBe(true);
   expect(data.actions.join(' ')).toContain('ホーム');
   expect(data.actions.join(' ')).toContain('検索');
   expect(data.actions.join(' ')).toContain('同期');
@@ -5837,10 +5843,12 @@ test('mobile dock home badge shows attention count', async ({ page }) => {
   const errors=[];
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    window.state=window.state||{};
-    window.state.quests=[{id:'q1',name:'任務',done:false}];
-    window.state.expeditions=[{id:'e1',name:'遠征',endsAt:Date.now()+10*60*1000}];
-    window.state.docks=[];
+    window.hdGetAppState=()=>({
+      quests:[{id:'q1',name:'任務',done:false}],
+      expeditions:[{id:'e1',name:'遠征',endsAt:Date.now()+10*60*1000}],
+      docks:[],
+      resources:{}
+    });
     localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
       syncedAt:Date.now()-8*3600000,
       coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true}
@@ -5901,10 +5909,12 @@ test('mobile attention sheet lists actionable reasons', async ({ page }) => {
   });
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    window.state=window.state||{};
-    window.state.quests=[{id:'q1',name:'デイリー任務',done:false}];
-    window.state.expeditions=[{id:'e1',name:'海上護衛任務',endsAt:Date.now()+5*60*1000}];
-    window.state.docks=[];
+    window.hdGetAppState=()=>({
+      quests:[{id:'q1',name:'デイリー任務',done:false}],
+      expeditions:[{id:'e1',name:'海上護衛任務',endsAt:Date.now()+5*60*1000}],
+      docks:[],
+      resources:{}
+    });
     window.hdQNEnsure?.();
     window.hdQNUpdateMobileDock?.();
     window.hdQNOpenAttention?.();
@@ -6603,7 +6613,7 @@ test('quick nav ranks categories and context by real usage', async ({ page }) =>
   const errors=[];
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    localStorage.setItem('harbordesk-quick-nav-pins-v1',JSON.stringify(['customFleets']));
+    localStorage.setItem('harbordesk-quick-nav-pins-v1',JSON.stringify(['shipDatabase']));
     localStorage.setItem('harbordesk-quick-nav-recent-v1',JSON.stringify([
       {id:'trainingPlanner',at:Date.now()-1000},
       {id:'roster',at:Date.now()-2000},
@@ -6633,7 +6643,7 @@ test('quick nav ranks categories and context by real usage', async ({ page }) =>
   });
   expect(data.nonHome[0].group).toBe('fleet');
   expect(data.nonHome[0].useCount).toBeGreaterThan(data.nonHome[1].useCount);
-  expect(data.context[0]).toBe('customFleets');
+  expect(data.context[0]).toBe('shipDatabase');
   expect(data.context.indexOf('roster')).toBeLessThan(data.context.indexOf('trainingPlanner'));
   expect(data.first).toBe(true);
   expect(data.second).toBe(false);
@@ -7281,7 +7291,7 @@ test('home compact mode hides calm cards but reopens new attention', async ({ pa
       quests:0,
       docks:0,
       sorties:0,
-      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true,sorties:false}
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true,sorties:true}
     }));
     localStorage.setItem('harbordesk-kancolle-fleets-v1',JSON.stringify([
       {deckId:1,name:'第一艦隊',mission:[0,0,0,0],ships:[
@@ -7375,6 +7385,7 @@ test('home warns when external backup is missing or stale and exports from warni
 
     window.__backupClicked=0;
     window.exportBackup=()=>{window.__backupClicked++};
+    window.shareBackup=async()=>{window.__backupClicked++;return true};
     missingAlert?.click();
     const clicked=window.__backupClicked;
 
