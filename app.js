@@ -172,7 +172,7 @@ function hdToastAction(message,label,onAction,ms=5000){
 window.hdToastAction=hdToastAction;
 function hdWorkspaceGroupHint(section){
  const id=String(section?.id||'');
- if(['guide','hdSortiePreparation','hdFleetSuggester','eoTracker','sortieReadiness','eventOperationsCenter','eventOperations','grandOperations','landBasePlanner'].includes(id))return 'guide';
+ if(['guide','mapStrategyNavigator','hdSortiePreparation','hdFleetSuggester','eoTracker','sortieReadiness','eventOperationsCenter','eventOperations','grandOperations','landBasePlanner'].includes(id))return 'guide';
  if(['shipDatabase','roster','shipProfilesPlus','trainingPlanner','customFleets','fleetCalculator','supportFleetPlanner'].includes(id))return 'fleet';
  if(['questDatabase','quests','exerciseRoutine','activityLogger'].includes(id))return 'quest';
  if(['expeditions','hdExpeditionDb','expeditionFleetManager','expeditionOptimizer'].includes(id))return 'expedition';

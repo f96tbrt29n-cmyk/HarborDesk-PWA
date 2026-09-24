@@ -9,35 +9,36 @@
   <meta name="apple-mobile-web-app-title" content="HarborDesk">
   <title>HarborDesk - 艦これ提督補助</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="alternate" href="HarborDesk-Kancolle.user.js?v=466" type="application/javascript" title="HarborDesk 艦これ Userscript">
-  <link rel="alternate" href="HarborDesk-Kancolle.meta.js?v=466" type="application/javascript" title="HarborDesk 艦これ Userscript metadata">
-  <link rel="stylesheet" href="styles.css?v=466">
-  <link rel="stylesheet" href="map-details.css?v=466">
-  <link rel="stylesheet" href="map-plans.css?v=466">
-  <link rel="stylesheet" href="custom-fleets.css?v=466">
-  <link rel="stylesheet" href="ship-roster.css?v=466">
-  <link rel="stylesheet" href="ship-database.css?v=466">
-  <link rel="stylesheet" href="ship-image-provider.css?v=466">
-  <link rel="stylesheet" href="training-planner.css?v=466">
-  <link rel="stylesheet" href="drop-hunting.css?v=466">
-  <link rel="stylesheet" href="material-planner.css?v=466">
-  <link rel="stylesheet" href="eo-tracker.css?v=466">
-  <link rel="stylesheet" href="advanced-tools.css?v=466">
-  <link rel="stylesheet" href="kancolle-import.css?v=466">
-  <link rel="stylesheet" href="home-dashboard.css?v=466">
-  <link rel="stylesheet" href="map-tabs.css?v=466">
-  <link rel="stylesheet" href="map-images.css?v=466">
-  <link rel="stylesheet" href="map-interactive.css?v=466">
-  <link rel="stylesheet" href="equipment-catalog.css?v=466">
-  <link rel="stylesheet" href="map-equipment-recommend.css?v=466">
-  <link rel="stylesheet" href="map-equipment-owned.css?v=466">
-  <link rel="stylesheet" href="expedition-database.css?v=466">
-  <link rel="stylesheet" href="development-recipes.css?v=466">
-  <link rel="stylesheet" href="construction-database.css?v=466">
-  <link rel="stylesheet" href="improvement-workshop.css?v=466">
-  <link rel="stylesheet" href="quest-database.css?v=466">
-  <link rel="stylesheet" href="update-manager.css?v=466">
-  <link rel="stylesheet" href="mobile-layout.css?v=466">
+  <link rel="alternate" href="HarborDesk-Kancolle.user.js?v=467" type="application/javascript" title="HarborDesk 艦これ Userscript">
+  <link rel="alternate" href="HarborDesk-Kancolle.meta.js?v=467" type="application/javascript" title="HarborDesk 艦これ Userscript metadata">
+  <link rel="stylesheet" href="styles.css?v=467">
+  <link rel="stylesheet" href="map-details.css?v=467">
+  <link rel="stylesheet" href="map-plans.css?v=467">
+  <link rel="stylesheet" href="custom-fleets.css?v=467">
+  <link rel="stylesheet" href="ship-roster.css?v=467">
+  <link rel="stylesheet" href="ship-database.css?v=467">
+  <link rel="stylesheet" href="ship-image-provider.css?v=467">
+  <link rel="stylesheet" href="training-planner.css?v=467">
+  <link rel="stylesheet" href="map-strategy-navigator.css?v=467">
+  <link rel="stylesheet" href="drop-hunting.css?v=467">
+  <link rel="stylesheet" href="material-planner.css?v=467">
+  <link rel="stylesheet" href="eo-tracker.css?v=467">
+  <link rel="stylesheet" href="advanced-tools.css?v=467">
+  <link rel="stylesheet" href="kancolle-import.css?v=467">
+  <link rel="stylesheet" href="home-dashboard.css?v=467">
+  <link rel="stylesheet" href="map-tabs.css?v=467">
+  <link rel="stylesheet" href="map-images.css?v=467">
+  <link rel="stylesheet" href="map-interactive.css?v=467">
+  <link rel="stylesheet" href="equipment-catalog.css?v=467">
+  <link rel="stylesheet" href="map-equipment-recommend.css?v=467">
+  <link rel="stylesheet" href="map-equipment-owned.css?v=467">
+  <link rel="stylesheet" href="expedition-database.css?v=467">
+  <link rel="stylesheet" href="development-recipes.css?v=467">
+  <link rel="stylesheet" href="construction-database.css?v=467">
+  <link rel="stylesheet" href="improvement-workshop.css?v=467">
+  <link rel="stylesheet" href="quest-database.css?v=467">
+  <link rel="stylesheet" href="update-manager.css?v=467">
+  <link rel="stylesheet" href="mobile-layout.css?v=467">
 </head>
 <body id="top" class="hd-booting">
   <header class="topbar"><div><div class="eyebrow">艦これ 提督補助</div><h1>HarborDesk</h1></div><button id="notifyBtn" class="ghost hd-notify-btn" data-notify-state="default" aria-label="通知を設定"><span aria-hidden="true">🔔</span><b>通知</b></button></header>
@@ -45,6 +46,7 @@
   <main>
     <section class="hero card"><div><div class="eyebrow">秘書パネル</div><p id="secretaryText" class="secretary">提督、今日も無理しすぎないで。遠征と任務は私が横で見てるから。</p></div><button id="secretaryRefresh" class="round">↻</button></section>
     <section id="guide"><div class="section-head"><div><div class="eyebrow">攻略データベース</div><h2>攻略情報を探す</h2></div><span class="muted">海域・任務・遠征</span></div><div class="map-picker card"><div class="eyebrow">通常海域</div><h3>攻略海域を選択</h3><p class="muted map-picker-note">海域をタップすると、概要・マップ・編成・ルート・装備・任務・自分用編成をタブで切り替えて見られるよ。</p><div id="worldPicker" class="world-picker"></div><div id="mapPicker" class="map-grid"></div><div id="selectedMapCard" class="selected-map-card"></div></div><div class="guide-search"><input id="guideQuery" type="search" placeholder="例：5-5 / 海上護衛 / あ号 / ボーキ"><button id="guideSearchBtn" class="primary">検索</button><button id="guideResetBtn" type="button" class="ghost" hidden>条件クリア</button></div><div id="guideFilters" class="guide-filters"></div><div id="guideResults" class="guide-results"></div></section>
+    <section id="mapStrategyNavigator" class="advanced-section hd-msn"><div class="section-head"><div><div class="eyebrow">MAP STRATEGY</div><h2>海域攻略ナビ</h2></div><span class="muted">海域・編成・出撃前の差分</span></div><label>攻略する海域<select id="hdMapStrategyMap" aria-label="攻略する海域"><option value="">攻略する海域を選ぶ</option></select></label><div id="hdMapStrategyBody"></div></section>
     <section id="expeditions"><div class="section-head"><h2>遠征タイマー</h2><button id="addExpedition" class="primary small">＋追加</button></div><div class="core-list-filter" data-core-filter-bar="expedition"><button type="button" class="ghost small active" data-core-filter-kind="expedition" data-core-filter="active">稼働中</button><button type="button" class="ghost small" data-core-filter-kind="expedition" data-core-filter="all">すべて</button><button type="button" class="ghost small" data-core-filter-kind="expedition" data-core-filter="done">完了</button><span id="expeditionFilterCount" class="muted"></span><button type="button" class="ghost small core-list-cleanup" data-core-cleanup="expedition" hidden>完了を整理</button></div><div id="expeditionList" class="stack"></div></section>
     <section id="docks"><div class="section-head"><h2>入渠タイマー</h2><button id="addDock" class="primary small">＋追加</button></div><div class="core-list-filter" data-core-filter-bar="dock"><button type="button" class="ghost small active" data-core-filter-kind="dock" data-core-filter="active">稼働中</button><button type="button" class="ghost small" data-core-filter-kind="dock" data-core-filter="all">すべて</button><button type="button" class="ghost small" data-core-filter-kind="dock" data-core-filter="done">完了</button><span id="dockFilterCount" class="muted"></span><button type="button" class="ghost small core-list-cleanup" data-core-cleanup="dock" hidden>完了を整理</button></div><div id="dockList" class="stack"></div></section>
     <section id="quests"><div class="section-head"><h2>任務チェック</h2><button id="addQuest" class="primary small">＋追加</button></div><div class="core-list-filter" data-core-filter-bar="quest"><button type="button" class="ghost small active" data-core-filter-kind="quest" data-core-filter="active">未完了</button><button type="button" class="ghost small" data-core-filter-kind="quest" data-core-filter="all">すべて</button><button type="button" class="ghost small" data-core-filter-kind="quest" data-core-filter="done">完了</button><span id="questFilterCount" class="muted"></span><button type="button" class="ghost small core-list-cleanup" data-core-cleanup="quest" hidden>完了を整理</button></div><div id="questList" class="stack"></div></section>
@@ -55,11 +57,11 @@
   <nav class="bottom-nav"><a href="#home">ホーム</a><a href="#guide">攻略</a><a href="#roster">艦隊</a><a href="#expeditions">遠征</a><a href="#dashboard">管理</a></nav>
   <dialog id="timerDialog"><form method="dialog" id="timerForm"><h3 id="timerDialogTitle">タイマー追加</h3><label>名前<input id="timerName" required maxlength="40" placeholder="例：東京急行"></label><label>時間（分）<input id="timerMinutes" required type="number" min="1" max="14400" value="30"></label><div id="timerRecent" class="timer-recent" hidden></div><div class="timer-preset-grid" aria-label="時間プリセット"><button type="button" class="ghost small" data-timer-minutes="15">15分</button><button type="button" class="ghost small" data-timer-minutes="30">30分</button><button type="button" class="ghost small" data-timer-minutes="60">1時間</button><button type="button" class="ghost small" data-timer-minutes="120">2時間</button><button type="button" class="ghost small" data-timer-minutes="180">3時間</button><button type="button" class="ghost small" data-timer-minutes="360">6時間</button></div><div class="dialog-actions"><button value="cancel" formnovalidate class="ghost">キャンセル</button><button id="timerSave" value="default" class="primary">開始</button></div></form></dialog>
   <dialog id="questDialog"><form method="dialog" id="questForm"><h3 id="questDialogTitle">任務を追加</h3><label>任務名<input id="questName" required maxlength="60" placeholder="例：デイリー演習"></label><div id="questRecent" class="quest-recent" hidden></div><div class="dialog-actions"><button value="cancel" formnovalidate class="ghost">キャンセル</button><button id="questSave" value="default" class="primary">追加</button></div></form></dialog>
-  <script src="app.js?v=466"></script>
-  <script src="map-details.js?v=466"></script><script src="map-details-34.js?v=466"></script><script src="map-details-57.js?v=466"></script>
-  <script src="map-plans.js?v=466"></script><script src="ship-roster.js?v=466"></script><script src="ship-master-snapshot.js?v=466"></script><script src="ship-image-provider.js?v=466"></script><script src="ship-database.js?v=466"></script><script src="training-planner.js?v=466"></script><script src="drop-hunting.js?v=466"></script><script src="custom-fleets.js?v=466"></script><script src="map-images.js?v=466"></script><script src="map-tabs.js?v=466"></script><script src="map-interactive.js?v=466"></script><script src="map-node-data-1.js?v=466"></script><script src="map-node-data-2-7.js?v=466"></script><script src="map-advanced-data.js?v=466"></script><script src="map-controller.js?v=466"></script><script src="advanced-tools.js?v=466"></script><script src="kancolle-import.js?v=466"></script>
-  <script src="equipment-catalog.js?v=466"></script><script src="equipment-catalog-extra.js?v=466"></script><script src="equipment-catalog-extra2.js?v=466"></script><script src="equipment-catalog-extra3.js?v=466"></script><script src="equipment-catalog-extra4.js?v=466"></script><script src="equipment-catalog-ui-patch.js?v=466"></script><script src="map-equipment-recommend.js?v=466"></script><script src="map-equipment-owned.js?v=466"></script><script src="development-recipes.js?v=466"></script><script src="construction-database.js?v=466"></script><script src="improvement-workshop.js?v=466"></script><script src="material-planner.js?v=466"></script><script src="eo-tracker.js?v=466"></script><script src="quest-database.js?v=466"></script>
-  <script src="expedition-database.js?v=466"></script>
-  <script src="home-dashboard.js?v=466"></script><script src="update-manager.js?v=466"></script>
+  <script src="app.js?v=467"></script>
+  <script src="map-details.js?v=467"></script><script src="map-details-34.js?v=467"></script><script src="map-details-57.js?v=467"></script>
+  <script src="map-plans.js?v=467"></script><script src="ship-roster.js?v=467"></script><script src="ship-master-snapshot.js?v=467"></script><script src="ship-image-provider.js?v=467"></script><script src="ship-database.js?v=467"></script><script src="training-planner.js?v=467"></script><script src="drop-hunting.js?v=467"></script><script src="custom-fleets.js?v=467"></script><script src="map-images.js?v=467"></script><script src="map-tabs.js?v=467"></script><script src="map-interactive.js?v=467"></script><script src="map-node-data-1.js?v=467"></script><script src="map-node-data-2-7.js?v=467"></script><script src="map-advanced-data.js?v=467"></script><script src="map-controller.js?v=467"></script><script src="advanced-tools.js?v=467"></script><script src="kancolle-import.js?v=467"></script>
+  <script src="equipment-catalog.js?v=467"></script><script src="equipment-catalog-extra.js?v=467"></script><script src="equipment-catalog-extra2.js?v=467"></script><script src="equipment-catalog-extra3.js?v=467"></script><script src="equipment-catalog-extra4.js?v=467"></script><script src="equipment-catalog-ui-patch.js?v=467"></script><script src="map-equipment-recommend.js?v=467"></script><script src="map-equipment-owned.js?v=467"></script><script src="development-recipes.js?v=467"></script><script src="construction-database.js?v=467"></script><script src="improvement-workshop.js?v=467"></script><script src="material-planner.js?v=467"></script><script src="eo-tracker.js?v=467"></script><script src="quest-database.js?v=467"></script>
+  <script src="expedition-database.js?v=467"></script>
+  <script src="home-dashboard.js?v=467"></script><script src="update-manager.js?v=467"></script><script src="map-strategy-navigator.js?v=467"></script>
 </body>
 </html>
