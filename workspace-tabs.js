@@ -16,7 +16,7 @@ const HD_WS_GROUPS=[
 ];
 const HD_WS_EXPLICIT={
  home:new Set(['home','dailyOpsCenter','dashboard','resources','resourceHistory','docks','resourceBudget']),
- guide:new Set(['guide','hdSortiePreparation','hdFleetSuggester','eoTracker','sortieReadiness','eventOperationsCenter','eventOperations','grandOperations','landBasePlanner']),
+ guide:new Set(['guide','mapStrategyNavigator','hdSortiePreparation','hdFleetSuggester','eoTracker','sortieReadiness','eventOperationsCenter','eventOperations','grandOperations','landBasePlanner']),
  fleet:new Set(['shipDatabase','roster','shipProfilesPlus','trainingPlanner','customFleets','fleetCalculator','supportFleetPlanner']),
  quest:new Set(['questDatabase','quests','exerciseRoutine','activityLogger']),
  expedition:new Set(['expeditions','hdExpeditionDb','expeditionFleetManager','expeditionOptimizer']),
