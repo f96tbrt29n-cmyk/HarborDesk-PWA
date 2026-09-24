@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: full-browser-regression
+  group: full-browser-regression-v457-pr94-clean
   cancel-in-progress: false
 
 permissions:
