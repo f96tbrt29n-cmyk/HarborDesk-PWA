@@ -85,10 +85,14 @@ test('fleet suggester recovers after a late redraw and yields to newer guide nav
   await page.waitForTimeout(4200);
   const before = await page.evaluate(() => {
     const epoch = Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH) || 0;
+    const userEpoch = Number(window.__HD_WORKSPACE_USER_NAV_EPOCH) || 0;
+    window.hdWSMarkDirectNavigation?.();
     window.hdWSApply?.('guide', 'guide', { ignorePin:true });
     const el=document.getElementById('hdFleetSuggester');
     return {
       epoch,
+      userEpoch,
+      directEpoch:Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0,
       section:window.hdWSState?.sections?.guide||'',
       visible:!!el&&!el.hidden&&!el.classList.contains('hd-ws-hidden')
     };
@@ -112,14 +116,19 @@ test('fleet suggester recovers after a late redraw and yields to newer guide nav
   // remaining 9.5s / 13.5s recovery passes instead of reopening the suggester.
   const explicit = await page.evaluate(() => {
     const recoveredEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0;
+    const recoveredUserEpoch=Number(window.__HD_WORKSPACE_USER_NAV_EPOCH)||0;
+    window.hdWSMarkUserNavigation?.();
     window.hdWSShowElement?.('guide', false);
     return {
       recoveredEpoch,
+      recoveredUserEpoch,
       epoch:Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0,
+      userEpoch:Number(window.__HD_WORKSPACE_USER_NAV_EPOCH)||0,
       section:window.hdWSState?.sections?.guide||''
     };
   });
   expect(explicit.epoch).toBeGreaterThan(explicit.recoveredEpoch);
+  expect(explicit.userEpoch).toBeGreaterThan(explicit.recoveredUserEpoch);
   expect(explicit.section).toBe('guide');
 
   await page.waitForTimeout(3600);
