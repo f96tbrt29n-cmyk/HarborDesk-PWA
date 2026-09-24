@@ -3221,7 +3221,7 @@ test('map tabs stay usable with sticky mobile navigation', async ({ page }) => {
   const data=await page.evaluate(()=>{
     if(typeof MAP_DETAILS==='undefined')return {ok:false};
     const key=Object.keys(MAP_DETAILS)[0];
-    window.selectedMap=key;
+    window.hdSelectGuideMap?.(key);
     window.hdApplyMapTabs?.();
     const bar=document.querySelector('.map-tab-bar'),buttons=[...document.querySelectorAll('.map-tab-btn')];
     const gear=buttons.find(x=>x.dataset.mapTab==='gear');
@@ -5504,7 +5504,7 @@ test('sortie readiness collapses OK auto checks', async ({ page }) => {
   });
   await boot(page,errors);
   await page.evaluate(()=>{
-    if(typeof selectedMap!=='undefined')selectedMap='5-5';
+    window.hdSelectGuideMap?.('5-5');
     document.querySelector('[data-map-tab="mine"]')?.click();
     window.hdRenderSortieReadiness?.();
   });
@@ -5577,7 +5577,7 @@ test('sortie manual checks prioritize incomplete items', async ({ page }) => {
   });
   await boot(page,errors);
   await page.evaluate(()=>{
-    if(typeof selectedMap!=='undefined')selectedMap='5-5';
+    window.hdSelectGuideMap?.('5-5');
     document.querySelector('[data-map-tab="mine"]')?.click();
     window.hdRenderSortieReadiness?.();
   });
@@ -5622,7 +5622,10 @@ test('Home sortie next action links directly to fix', async ({ page }) => {
   const errors=[];
   await page.addInitScript(() => {
     sessionStorage.setItem('harbordesk-session-guide-view-v1', JSON.stringify({world:'5',map:'5-5',filter:'map',query:'5-5'}));
-    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({syncedAt:Date.now(),ships:1,equipment:1,materials:8,decks:1,expeditions:0,docks:0,quests:0,sorties:0}));
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt:Date.now(),ships:1,equipment:1,materials:8,decks:1,expeditions:0,docks:0,quests:0,sorties:0,
+      coverage:{ships:true,equipment:true,resources:true,fleets:true,quests:true,docks:true,sorties:true}
+    }));
     localStorage.setItem('harbordesk-custom-fleets-v1', JSON.stringify({'5-5':[
       {id:'fleet-home-fix',name:'ゲーム同期｜第1艦隊',source:'kancolle-import',sourceDeckId:1,sourceSyncedAt:Date.now()-3600000,ships:[
         {ship:'加賀改',gear:'烈風 / 彩雲',nowHp:70,maxHp:79,cond:55}
@@ -5633,7 +5636,7 @@ test('Home sortie next action links directly to fix', async ({ page }) => {
   });
   await boot(page,errors);
   await page.evaluate(()=>{
-    if(typeof selectedMap!=='undefined')selectedMap='5-5';
+    window.hdSelectGuideMap?.('5-5');
     window.renderHomeDashboard?.();
   });
   const data=await page.evaluate(()=>{
