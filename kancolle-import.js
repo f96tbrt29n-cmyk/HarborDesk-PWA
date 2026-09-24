@@ -1,5 +1,5 @@
 const HD_KC_SYNC_KEY='harbordesk-kancolle-sync-v1';
-const HD_KC_USERSCRIPT_VERSION='1.0.14';
+const HD_KC_USERSCRIPT_VERSION='1.0.15';
 const HD_KC_FLEETS_KEY='harbordesk-kancolle-fleets-v1';
 const HD_KC_MATERIALS_KEY='harbordesk-kancolle-materials-v1';
 const HD_KC_BRIDGE_IMPORT_MESSAGE='harbordesk-kancolle-import';
