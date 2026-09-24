@@ -100,6 +100,34 @@ function hdStartConstructionTimer(min,label){
 async function hdCopyConstructionRecipe(id){
  const r=HD_CONSTRUCTION_RECIPES.find(x=>x.id===id);if(!r)return;const text=hdConstructionCost(r);try{await navigator.clipboard.writeText(text)}catch{};alert(`コピーしたよ: ${text}`)
 }
+function hdConstructionOpenSearch(query='',mode='normal',scroll=true){
+ const value=String(query||'').trim(),wantedMode=['normal','large','time'].includes(mode)?mode:'normal',token=(window.__HD_CONSTRUCTION_OPEN_TOKEN=Number(window.__HD_CONSTRUCTION_OPEN_TOKEN||0)+1);
+ hdEnsureConstructionSection();
+ let userEdited=false,observed=null;
+ const onInput=e=>{if(e.isTrusted&&token===window.__HD_CONSTRUCTION_OPEN_TOKEN)userEdited=true};
+ const bind=()=>{
+  const input=document.getElementById('hdConstructionSearch');if(input&&input!==observed){observed?.removeEventListener('input',onInput,true);observed=input;observed.addEventListener('input',onInput,true)}return input;
+ };
+ const apply=(restoreOnly=false)=>{
+  if(token!==window.__HD_CONSTRUCTION_OPEN_TOKEN||userEdited)return false;
+  const input=bind();if(!input)return false;
+  if(!restoreOnly||input.value===''){
+   hdConstructionMode=wantedMode;input.value=value;renderConstructionDb();
+  }
+  return true;
+ };
+ if(!apply(false))return false;
+ let opened=true;
+ if(typeof window.hdWSShowElement==='function')opened=window.hdWSShowElement('constructionDb',scroll)!==false;
+ else document.getElementById('constructionDb')?.scrollIntoView({behavior:scroll?'smooth':'auto',block:'start'});
+ // WebKit may finish deferred module/workspace rendering after the click.
+ // Restore only a cleared query, and stop as soon as the user edits the field.
+ requestAnimationFrame(()=>apply(true));setTimeout(()=>apply(true),80);setTimeout(()=>apply(true),360);setTimeout(()=>apply(true),900);setTimeout(()=>apply(true),1800);setTimeout(()=>apply(true),3600);setTimeout(()=>apply(true),6000);
+ setTimeout(()=>{observed?.removeEventListener('input',onInput,true)},6500);
+ return opened;
+}
+window.hdConstructionOpenSearch=hdConstructionOpenSearch;
+
 document.addEventListener('click',e=>{
  const mode=e.target.closest?.('[data-hd-build-mode]');if(mode){hdConstructionMode=mode.dataset.hdBuildMode;renderConstructionDb();return}
  const copy=e.target.closest?.('[data-hd-copy-build]');if(copy){hdCopyConstructionRecipe(copy.dataset.hdCopyBuild);return}
