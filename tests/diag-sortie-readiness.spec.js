@@ -62,8 +62,7 @@ test('diagnose synced fleet HP and cond through sortie readiness', async ({ page
       selectedId,
       selectedFleet,
       checks:auto?.checks || [],
-      dom,
-      errors
+      dom
     };
   });
   console.log('SORTIE_DIAG '+JSON.stringify(diag));
