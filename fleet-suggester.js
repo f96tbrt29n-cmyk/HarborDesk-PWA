@@ -186,7 +186,7 @@ function hdFSOpen(){
   else if(typeof hdWSShowElement==='function')hdWSShowElement(target,true);
   else hdFSReveal(target);
  };
- requestAnimationFrame(settle);setTimeout(settle,80);setTimeout(settle,420);
+ requestAnimationFrame(settle);setTimeout(settle,80);setTimeout(settle,420);setTimeout(settle,1200);setTimeout(settle,1900);setTimeout(settle,3600);
  return !!opened;
 }
 function hdFSOpenRoster(){if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return true;return hdFSReveal(document.getElementById('roster'))}
