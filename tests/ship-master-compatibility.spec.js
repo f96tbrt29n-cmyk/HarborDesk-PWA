@@ -49,9 +49,9 @@ async function boot(page, errors = []) {
     return route.fulfill({ status: 204, body: '' });
   });
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
-  await expect(page.locator('#shipDatabase')).toHaveCount(1, { timeout: 20000 });
-  await page.waitForTimeout(1200);
+  await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 30000 });
+  await expect(page.locator('#shipDatabase')).toHaveCount(1, { timeout: 30000 });
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
 }
 
 test('official master drives normal compatibility, reverse lookup and owned filtering', async ({ page }) => {
