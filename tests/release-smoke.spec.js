@@ -31,6 +31,7 @@ async function boot(page, errors = []) {
   });
 
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 30000 });
   await expect(page.locator('#shipDatabase')).toHaveCount(1, { timeout: 30000 });
   await page.waitForFunction(() =>
