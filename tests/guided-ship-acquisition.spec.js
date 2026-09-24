@@ -5,6 +5,7 @@ test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true
 async function openApp(page) {
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => typeof homeGuideRender === 'function' && typeof hdShipDbAcquisitionRows === 'function' && typeof hdDropAllTargets === 'function' && typeof HD_CONSTRUCTION_RECIPES !== 'undefined', null, { timeout: 30000 });
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
 }
 
 test('guide: steps open the right screen and survive a reload', async ({ page }) => {
