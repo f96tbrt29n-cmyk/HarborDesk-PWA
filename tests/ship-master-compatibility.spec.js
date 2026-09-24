@@ -4601,8 +4601,8 @@ test('Kancolle import reports outdated Userscript version', async ({ page }) => 
     const el=document.getElementById('hdKcUserscriptStatus');
     return {text:el?.textContent||'',link:el?.querySelector('a')?.getAttribute('href')||'',cls:el?.className||''};
   });
-  expect(data.text).toContain('v1.0.5');
-  expect(data.text).toContain('v1.0.8');
+  expect(data.text).toMatch(/v1\.0\.7\s*→\s*v\d+\.\d+\.\d+/);
+  expect(data.text).not.toContain('v1.0.7 最新');
   expect(data.link).toContain('HarborDesk-Kancolle.user.js');
   expect(data.cls).toContain('outdated');
 });
