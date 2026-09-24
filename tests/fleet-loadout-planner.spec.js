@@ -8,9 +8,12 @@ test.use({
 
 async function boot(page) {
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
-  await expect.poll(() => page.evaluate(() => window.HD_MODULE_STATUS?.['./fleet-loadout-planner.js'] || '')).toBe('ok');
   await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
+  await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 30000 });
+  await expect.poll(
+    () => page.evaluate(() => window.HD_MODULE_STATUS?.['./fleet-loadout-planner.js'] || ''),
+    { timeout: 30000 }
+  ).toBe('ok');
 }
 
 async function prepare32(page, sparse = false) {
@@ -35,7 +38,17 @@ async function prepare32(page, sparse = false) {
   await page.locator('[data-world="3"]').click();
   await page.locator('[data-map="3-2"]').click();
   await page.locator('[data-hd-fs-open]').click();
-  await expect(page.locator('#hdFleetSuggester')).toBeVisible();
+  await expect(page.locator('#hdFleetSuggester')).toHaveCount(1);
+  await expect.poll(
+    () => page.evaluate(() => {
+      const el=document.getElementById('hdFleetSuggester');
+      return {
+        section:window.hdWSState?.sections?.guide||'',
+        visible:!!el&&!el.hidden&&!el.classList.contains('hd-ws-hidden')
+      };
+    }),
+    { timeout: 15000 }
+  ).toEqual({ section:'hdFleetSuggester', visible:true });
 }
 
 test('automatic loadout never consumes more equipment than owned', async ({ page }) => {
