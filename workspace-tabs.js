@@ -39,6 +39,7 @@ function hdWSActivePin(){
  if(!hdWSPin.sectionId||Date.now()>=hdWSPin.until){if(hdWSPin.sectionId)hdWSClearPin();return null}
  return hdWSPin;
 }
+function hdWSMarkDirectNavigation(){window.__HD_WORKSPACE_DIRECT_NAV_EPOCH=(Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0)+1;return window.__HD_WORKSPACE_DIRECT_NAV_EPOCH}
 
 function hdWSLoad(){try{const v=JSON.parse(localStorage.getItem(HD_WS_KEY)||'{}');return {group:v.group||'home',sections:v.sections||{}}}catch{return {group:'home',sections:{}}}}
 function hdWSSave(){localStorage.setItem(HD_WS_KEY,JSON.stringify(hdWSState))}
@@ -75,6 +76,7 @@ function hdWSUpdateHistoryButtons(){
 }
 function hdWSUpdateBackButton(){hdWSUpdateHistoryButtons()}
 function hdWSGoBack(){
+ hdWSMarkDirectNavigation();
  const rows=hdWSHistoryLoad();let prev=null;
  while(rows.length&&!prev){const x=rows.pop(),el=document.getElementById(x?.section||'');if(x&&el)prev=x}
  if(!prev){hdWSHistorySave(rows);hdWSUpdateHistoryButtons();return false}
@@ -83,6 +85,7 @@ function hdWSGoBack(){
  hdWSHistorySave(rows);hdWSForwardSave(forward);hdWSSaveCurrentScroll();hdWSClearPin();hdWSApply(prev.group,prev.section,{restoreScroll:true,ignorePin:true});hdWSUpdateHistoryButtons();return true;
 }
 function hdWSGoForward(){
+ hdWSMarkDirectNavigation();
  const forward=hdWSForwardLoad();let next=null;
  while(forward.length&&!next){const x=forward.pop(),el=document.getElementById(x?.section||'');if(x&&el)next=x}
  if(!next){hdWSForwardSave(forward);hdWSUpdateHistoryButtons();return false}
@@ -113,7 +116,7 @@ function hdWSOpenAnchorId(id,scroll=true){
  id=String(id||'').trim();if(!id||id.startsWith('kcimport='))return false;
  const el=document.getElementById(id);if(!el)return false;
  const section=hdWSManagedSectionFor(el);if(!section)return false;
- window.__HD_WORKSPACE_DIRECT_NAV_EPOCH=(Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0)+1;
+ hdWSMarkDirectNavigation();
  const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
  hdWSClearPin();hdWSApply(group,section.id,{ignorePin:true});
  if(scroll)setTimeout(()=>el.scrollIntoView({behavior:'auto',block:'start'}),0);
@@ -478,7 +481,7 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
 function hdWSRevealElement(target,scroll=true,opts={}){
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
  const section=hdWSManagedSectionFor(el);if(!section)return false;
- window.__HD_WORKSPACE_DIRECT_NAV_EPOCH=(Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0)+1;
+ hdWSMarkDirectNavigation();
  // A successful direct navigation is newer than any target staged while the
  // workspace runtime was unavailable. Never let a later install replay stale intent.
  if(window.__HD_PENDING_WORKSPACE_TARGET)delete window.__HD_PENDING_WORKSPACE_TARGET;
@@ -531,7 +534,7 @@ function hdWSInstall(){
 }
 function hdWSHorizontalScroller(el){for(let n=el;n&&n!==document.body;n=n.parentElement){if(n.scrollWidth>n.clientWidth+12){const s=getComputedStyle(n);if(['auto','scroll'].includes(s.overflowX))return true}}return false}
 function hdWSSwipeBlocked(target){return !!target?.closest?.('input,textarea,select,button,a,dialog,[contenteditable="true"],.hd-ws-primary,.hd-ws-secondary')||hdWSHorizontalScroller(target)}
-function hdWSMoveGroup(dir){const i=HD_WS_GROUPS.findIndex(x=>x.key===hdWSState.group),next=HD_WS_GROUPS[i+dir];if(!next)return false;hdWSDismissSwipeHint();hdWSPushHistory();hdWSClearPin();hdWSApply(next.key,null,{restoreScroll:true,ignorePin:true});window.hdToast?.(next.label,'info',900);return true}
+function hdWSMoveGroup(dir){hdWSMarkDirectNavigation();const i=HD_WS_GROUPS.findIndex(x=>x.key===hdWSState.group),next=HD_WS_GROUPS[i+dir];if(!next)return false;hdWSDismissSwipeHint();hdWSPushHistory();hdWSClearPin();hdWSApply(next.key,null,{restoreScroll:true,ignorePin:true});window.hdToast?.(next.label,'info',900);return true}
 function hdWSTouchStart(e){if(e.touches?.length!==1||hdWSSwipeBlocked(e.target))return;const t=e.touches[0];if(t.clientX<24||t.clientX>window.innerWidth-24)return;hdWSTouch={x:t.clientX,y:t.clientY,at:Date.now()}}
 function hdWSTouchEnd(e){if(!hdWSTouch)return;const t=e.changedTouches?.[0],start=hdWSTouch;hdWSTouch=null;if(!t)return;const dx=t.clientX-start.x,dy=t.clientY-start.y,dt=Date.now()-start.at;if(dt>800||Math.abs(dx)<72||Math.abs(dx)<Math.abs(dy)*1.35)return;hdWSMoveGroup(dx<0?1:-1)}
 
@@ -540,14 +543,14 @@ document.addEventListener('click',e=>{
  const pin=e.target.closest?.('[data-hd-ws-pin]');if(pin){hdWSToggleCurrentPin();return}
  const back=e.target.closest?.('[data-hd-ws-back]');if(back){hdWSGoBack();return}
  const forward=e.target.closest?.('[data-hd-ws-forward]');if(forward){hdWSGoForward();return}
- const top=e.target.closest?.('[data-hd-ws-group-top]');if(top){hdWSPushHistory();hdWSClearPin();const target=hdWSDefaultSection(hdWSState.group);hdWSApply(hdWSState.group,target,{scrollTop:true,ignorePin:true});return}
- const g=e.target.closest?.('[data-hd-ws-group]');if(g){hdWSDismissSwipeHint();hdWSPushHistory();hdWSClearPin();hdWSApply(g.dataset.hdWsGroup,null,{restoreScroll:true,ignorePin:true});return}
- const s=e.target.closest?.('[data-hd-ws-section]');if(s){hdWSPushHistory();hdWSClearPin();hdWSApply(hdWSState.group,s.dataset.hdWsSection,{restoreScroll:true,ignorePin:true});return}
+ const top=e.target.closest?.('[data-hd-ws-group-top]');if(top){hdWSMarkDirectNavigation();hdWSPushHistory();hdWSClearPin();const target=hdWSDefaultSection(hdWSState.group);hdWSApply(hdWSState.group,target,{scrollTop:true,ignorePin:true});return}
+ const g=e.target.closest?.('[data-hd-ws-group]');if(g){hdWSMarkDirectNavigation();hdWSDismissSwipeHint();hdWSPushHistory();hdWSClearPin();hdWSApply(g.dataset.hdWsGroup,null,{restoreScroll:true,ignorePin:true});return}
+ const s=e.target.closest?.('[data-hd-ws-section]');if(s){hdWSMarkDirectNavigation();hdWSPushHistory();hdWSClearPin();hdWSApply(hdWSState.group,s.dataset.hdWsSection,{restoreScroll:true,ignorePin:true});return}
  const a=e.target.closest?.('a[href^="#"]');if(a&&hdWSHandleAnchor(a)){e.preventDefault();history.replaceState(null,'',a.getAttribute('href'))}
 },true);
 document.addEventListener('change',e=>{
  const select=e.target.closest?.('#hdWorkspaceSectionSelect');if(!select)return;
- hdWSPushHistory();hdWSClearPin();hdWSApply(hdWSState.group,select.value,{restoreScroll:true,ignorePin:true});
+ hdWSMarkDirectNavigation();hdWSPushHistory();hdWSClearPin();hdWSApply(hdWSState.group,select.value,{restoreScroll:true,ignorePin:true});
 });
 document.addEventListener('touchstart',hdWSTouchStart,{passive:true});
 document.addEventListener('touchend',hdWSTouchEnd,{passive:true});
