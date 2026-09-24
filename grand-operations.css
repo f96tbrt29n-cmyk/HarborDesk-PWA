@@ -8,3 +8,9 @@
 .hd-opt-exp-presets button{min-height:40px;font-size:14px}
 .hd-opt-exp-presets button.active{background:var(--accent);color:#04131e;border-color:var(--accent)}
 .hd-opt-exp-summary{margin:8px 0 0;font-size:14px}
+.hd-opt-exp-conditions{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.hd-opt-exp-conditions>div{display:grid;gap:3px}
+.hd-opt-exp-conditions span{font-size:13px;color:var(--muted)}
+.hd-opt-exp-conditions b{font-size:14px;font-weight:600;line-height:1.45;overflow-wrap:anywhere}
+.hd-opt-exp-conditions p{grid-column:1/-1;margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+@media(max-width:760px){.hd-opt-exp-conditions{grid-template-columns:1fr}}
