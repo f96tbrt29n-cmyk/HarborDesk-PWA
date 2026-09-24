@@ -141,7 +141,10 @@ function hdGSSetCategory(cat){hdGSCategory=cat;hdGSViewSave({category:cat});docu
 function hdGSAttachLaunchers(){
  const qnDialog=document.getElementById('hdQuickNavDialog'),qnTools=qnDialog?.querySelector('.hd-qn-tools');if(qnTools&&!qnDialog.querySelector('[data-hd-gs-open]')){const b=document.createElement('button');b.type='button';b.className='primary small';b.dataset.hdGsOpen='1';b.textContent='全体検索';qnTools.appendChild(b)}
  const ph=document.querySelector('#hdPersonalHome .section-head');if(ph&&!ph.querySelector('[data-hd-gs-open]')){const b=document.createElement('button');b.type='button';b.className='ghost small';b.dataset.hdGsOpen='1';b.textContent='⌕ 全体検索';ph.appendChild(b)}
- const top=document.querySelector('.topbar');if(top&&!document.getElementById('hdGlobalSearchHeader')){
+ const top=document.querySelector('.topbar'),menuSearch=top?.querySelector('.hd-header-more [data-hd-gs-open]'),headerSearch=document.getElementById('hdGlobalSearchHeader');
+ if(menuSearch){
+  headerSearch?.remove();
+ }else if(top&&!headerSearch){
   const b=document.createElement('button');b.id='hdGlobalSearchHeader';b.type='button';b.className='ghost hd-gs-header-btn';b.dataset.hdGsOpen='1';b.setAttribute('aria-label','HarborDesk全体検索');b.innerHTML='<span aria-hidden="true">⌕</span><b>検索</b>';
   const before=top.querySelector('#hdGlobalSyncStatus,#notifyBtn,.hd-header-more');before?top.insertBefore(b,before):top.appendChild(b);
  }
