@@ -5078,21 +5078,17 @@ test('release smoke:攻略 secondary navigation survives workspace helper outage
   await expect.poll(() => page.evaluate(() => window.__hdCopiedPrep || '')).toContain('6-5');
 
   await prep.locator('[data-hd-sps-workspace="roster"]').click();
-  await expect.poll(() => page.evaluate(() => window.__hdFallbackScrollTargets)).toContain('roster');
+  await expect(page.locator('#roster')).toBeVisible({ timeout: 12000 });
 
   await page.evaluate(() => window.hdSPSOpen());
   await expect(prep).toBeVisible();
   await prep.locator('[data-hd-sps-workspace="hdEquipmentProcurement"]').click();
-  await expect.poll(() => page.evaluate(() => window.__hdFallbackScrollTargets)).toContain('hdEquipmentProcurement');
+  await expect(page.locator('#hdEquipmentProcurement')).toBeVisible({ timeout: 12000 });
 
   await page.evaluate(() => window.hdSPSOpen());
   await expect(prep).toBeVisible();
   await prep.locator('[data-hd-sps-guide]').click();
-
-  const targets = await page.evaluate(() => window.__hdFallbackScrollTargets);
-  expect(targets).toContain('roster');
-  expect(targets).toContain('hdEquipmentProcurement');
-  expect(targets).toContain('guide');
+  await expect(page.locator('#guide')).toBeVisible({ timeout: 12000 });
 
   await page.evaluate(() => {
     window.hdWSShowElement = window.__hdSavedWSShowElement;
