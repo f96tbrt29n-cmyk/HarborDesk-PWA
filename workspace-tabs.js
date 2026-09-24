@@ -478,6 +478,7 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
 function hdWSRevealElement(target,scroll=true,opts={}){
  const el=typeof target==='string'?document.getElementById(target):target;if(!el)return false;
  const section=hdWSManagedSectionFor(el);if(!section)return false;
+ window.__HD_WORKSPACE_DIRECT_NAV_EPOCH=(Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0)+1;
  // A successful direct navigation is newer than any target staged while the
  // workspace runtime was unavailable. Never let a later install replay stale intent.
  if(window.__HD_PENDING_WORKSPACE_TARGET)delete window.__HD_PENDING_WORKSPACE_TARGET;
