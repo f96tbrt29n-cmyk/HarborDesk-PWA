@@ -444,22 +444,24 @@ function hdQNEnsure(){
 }
 async function hdQNLoadDiagnostics(){
   if(typeof hdDXEnsure==='function'){try{hdDXEnsure()}catch{}return true}
-  if(!document.querySelector('link[data-hd-diagnostics-center],link[data-hd-diagnostics-css]')){
-    const l=document.createElement('link');l.rel='stylesheet';l.href='./diagnostics-center.css';l.dataset.hdDiagnosticsCenter='1';document.head.appendChild(l)
+  const src='./diagnostics-center.js';
+  const status=()=>String(window.HD_MODULE_STATUS?.[src]||'');
+  const existing=()=>document.querySelector('script[data-hd-diagnostics-center],script[data-hd-diagnostics]');
+  if(existing()||['loading','retrying'].includes(status())){
+    for(let i=0;i<50&&typeof hdDXEnsure!=='function'&&status()!=='error';i++)await new Promise(r=>setTimeout(r,40));
+    if(typeof hdDXEnsure==='function'){try{hdDXEnsure()}catch{}return true}
+    return status()!=='error';
   }
   if(typeof window.hdLoadScript==='function'){
-    const ok=await window.hdLoadScript('data-hd-diagnostics-center','./diagnostics-center.js');
+    const ok=await window.hdLoadScript('data-hd-diagnostics-center',src);
     if(ok)try{if(typeof hdDXEnsure==='function')hdDXEnsure()}catch{}
     return !!ok
   }
-  if(document.querySelector('script[data-hd-diagnostics-center],script[data-hd-diagnostics]'))return true;
-  return await new Promise(resolve=>{
-    const s=document.createElement('script');s.src='./diagnostics-center.js';s.dataset.hdDiagnosticsCenter='1';
-    if(window.HD_MODULE_STATUS)window.HD_MODULE_STATUS['./diagnostics-center.js']='loading';
-    s.onload=()=>{if(window.HD_MODULE_STATUS)window.HD_MODULE_STATUS['./diagnostics-center.js']='ok';try{if(typeof hdDXEnsure==='function')hdDXEnsure()}catch{}resolve(true)};
-    s.onerror=()=>{if(window.HD_MODULE_STATUS)window.HD_MODULE_STATUS['./diagnostics-center.js']='error';resolve(false)};
-    document.body.appendChild(s)
-  })
+  // update-manager owns runtime module injection. Avoid inserting the same classic
+  // script independently while the app is still booting (WebKit treats duplicate
+  // top-level lexical declarations as a hard runtime error).
+  window.addEventListener('hd:modules-ready',()=>{try{if(typeof hdDXEnsure==='function')hdDXEnsure()}catch{}},{once:true});
+  return false
 }
 
 document.addEventListener('click',e=>{
