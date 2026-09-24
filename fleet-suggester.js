@@ -179,12 +179,15 @@ function hdFSOpen(){
  var opened=typeof hdWSShowElement==='function'&&hdWSShowElement(target,true)!==false;
  if(!opened)opened=hdFSReveal(target);
  hdFSRender(true);
+ var navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0;
  var settle=function(){
+  if((Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0)!==navEpoch)return;
   if(hdFSStillSelected(target)){hdFSReveal(target);return}
   if(!hdFSOpenRecoveryAllowed(target))return;
   if(typeof window.hdWSRevealElement==='function')window.hdWSRevealElement(target,true,{history:false});
   else if(typeof hdWSShowElement==='function')hdWSShowElement(target,true);
   else hdFSReveal(target);
+  navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||navEpoch;
  };
  requestAnimationFrame(settle);setTimeout(settle,80);setTimeout(settle,420);setTimeout(settle,1200);setTimeout(settle,1900);setTimeout(settle,3600);
  return !!opened;
