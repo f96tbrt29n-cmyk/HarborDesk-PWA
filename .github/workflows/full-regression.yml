@@ -2,13 +2,13 @@ name: Full Browser Regression
 
 on:
   push:
-    branches: [test/full-regression-modernize-v451]
+    branches: [test/full-regression-modernize-v451, test/full-regression-v451-final]
   schedule:
     - cron: '0 18 * * *'
   workflow_dispatch:
 
 concurrency:
-  group: full-browser-regression
+  group: full-browser-regression-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
