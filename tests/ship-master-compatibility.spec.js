@@ -2600,7 +2600,7 @@ test('HarborDesk Userscript is installable and page-context ready', async ({ pag
       hasDmmMatch:text.includes('@match        https://*.dmm.com/*'),
       hasKancolleServerMatch:text.includes('@match        https://*.kancolle-server.com/*'),
       hasLegacyServerInclude:text.includes('125\\.6'),
-      hasKcsapiFilter:text.includes('/kcsapi/'),
+      hasKcsapiFilter:text.includes('function wanted(url)')&&text.includes('kcsapi'),
       hasDirectSend:text.includes("#kcimport="),
       usesSelfLink:text.includes("a.target='_self'"),
       hasVisibleVersion:text.includes("HD_VERSION+'</small>"),
