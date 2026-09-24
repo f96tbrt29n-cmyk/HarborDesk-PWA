@@ -182,7 +182,7 @@ function hdFSOpen(){
  var navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0;
  var settle=function(){
   if((Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0)!==navEpoch)return;
-  if(hdFSStillSelected(target)){hdFSReveal(target);return}
+  if(hdFSStillSelected(target)){hdFSReveal(target);navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||navEpoch;return}
   if(!hdFSOpenRecoveryAllowed(target))return;
   if(typeof window.hdWSRevealElement==='function')window.hdWSRevealElement(target,true,{history:false});
   else if(typeof hdWSShowElement==='function')hdWSShowElement(target,true);
