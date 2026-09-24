@@ -183,15 +183,15 @@ function hdFSOpen(){
  var opened=typeof hdWSShowElement==='function'&&hdWSShowElement(target,true)!==false;
  if(!opened)opened=hdFSReveal(target);
  hdFSRender(true);
- var navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0;
+ var userNavEpoch=Number(window.__HD_WORKSPACE_USER_NAV_EPOCH)||0;
  var settle=function(){
-  if((Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0)!==navEpoch)return;
-  if(hdFSStillSelected(target)){hdFSReveal(target);navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||navEpoch;return}
+  if((Number(window.__HD_WORKSPACE_USER_NAV_EPOCH)||0)!==userNavEpoch)return;
+  if(hdFSStillSelected(target)){hdFSReveal(target);return}
   if(!hdFSOpenRecoveryAllowed(target))return;
   if(typeof window.hdWSRevealElement==='function')window.hdWSRevealElement(target,true,{history:false,direct:false});
   else if(typeof hdWSShowElement==='function')hdWSShowElement(target,true);
   else hdFSReveal(target);
-  navEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||navEpoch;
+  userNavEpoch=Number(window.__HD_WORKSPACE_USER_NAV_EPOCH)||userNavEpoch;
  };
  requestAnimationFrame(settle);[80,420,1200,1900,3600,6500,9500,13500].forEach(function(ms){setTimeout(settle,ms)});
  return !!opened;
@@ -209,7 +209,13 @@ async function hdFSOpenAcquire(kind,button){
  window.hdToast?.('入手ルートを読み込めなかったよ。アプリ更新を試してね','warn');return false;
 }
 document.addEventListener('click',function(e){
- if(e.target.closest('[data-hd-fs-open]')){hdFSOpen();return}
+ var open=e.target.closest&&e.target.closest('[data-hd-fs-open]');
+ if(!open)return;
+ try{window.hdWSMarkUserNavigation?.()}catch(err){}
+ if(hdFSOpen())e.__hdFSOpenHandled=true;
+},true);
+document.addEventListener('click',function(e){
+ if(e.target.closest('[data-hd-fs-open]')){if(e.__hdFSOpenHandled)return;try{window.hdWSMarkUserNavigation?.()}catch(err){}hdFSOpen();return}
  if(e.target.closest('[data-hd-fs-refresh]')){hdFSRender();return}
  var save=e.target.closest('[data-hd-fs-save]');if(save){hdFSSave(save.getAttribute('data-hd-fs-save'));return}
  if(e.target.closest('[data-hd-fs-roster]')){hdFSOpenRoster();return}

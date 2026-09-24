@@ -2732,8 +2732,8 @@ test('release smoke: updater uses GitHub main as release truth and exposes publi
     return res.text();
   });
 
-  expect(source).toContain("const HD_APP_VERSION='1.0.461'");
-  expect(source).toContain("const HD_APP_BUILD=461");
+  expect(source).toContain("const HD_APP_VERSION='1.0.462'");
+  expect(source).toContain("const HD_APP_BUILD=462");
   expect(source).toContain("const HD_RELEASE_META_RAW='https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json'");
   expect(source).toContain("publishedBuild:Number(published?.build??0)||0");
   expect(source).toContain("公開反映待ち");
@@ -2756,15 +2756,15 @@ test('release smoke: build version cache-busts core and runtime assets', async (
   });
 
   for (const asset of ['advanced-tools.js', 'kancolle-import.js', 'equipment-catalog.js', 'home-dashboard.js', 'update-manager.js']) {
-    expect(data.index).toContain(`${asset}?v=461`);
+    expect(data.index).toContain(`${asset}?v=462`);
   }
-  expect(data.updater).toContain("const HD_APP_BUILD=461");
+  expect(data.updater).toContain("const HD_APP_BUILD=462");
   expect(data.updater).toContain("function hdBuildAssetUrl(src)");
   expect(data.updater).toContain("script.src=hdScriptAssetUrl(src,attempt)");
   expect(data.updater).toContain("function hdScriptAssetUrl(src,attempt=0)");
   expect(data.updater).toContain("link.href=hdBuildAssetUrl(href)");
   expect(data.updater).toContain("navigator.serviceWorker.register(`./sw.js?v=${HD_APP_BUILD}`");
-  expect(data.sw).toContain("harbordesk-pwa-v461");
+  expect(data.sw).toContain("harbordesk-pwa-v462");
   expect(data.sw).toContain("caches.match(req,{ignoreSearch:true})");
   expect(data.sw).toContain("'./refresh.html'");
   expect(errors).toEqual([]);
@@ -2777,7 +2777,7 @@ test('release smoke: recovery page preserves local data while clearing app cache
   expect(source).toContain('艦隊台帳・装備台帳などの端末内データは消しません');
   expect(source).toContain("navigator.serviceWorker.getRegistrations()");
   expect(source).toContain("k.startsWith('harbordesk-pwa-')");
-  expect(source).toContain('const BUILD=461');
+  expect(source).toContain('const BUILD=462');
   expect(source).toContain("url.searchParams.set('hd_rescue',String(BUILD))");
   expect(source).not.toContain('localStorage.clear');
   expect(source).not.toContain('sessionStorage.clear');
@@ -5445,6 +5445,7 @@ test('release smoke: remaining map攻略 action controls open and persist', asyn
   await expect(page.locator('#hdEquipmentProcurement')).toBeVisible({ timeout: 5000 });
 
   await page.evaluate(() => {
+    window.hdWSMarkUserNavigation?.();
     window.hdWSShowElement?.('guide', false);
     selectedWorld='5';
     selectedMap='5-5';
@@ -5846,8 +5847,11 @@ test('release smoke: land base owned-only filter and manual aircraft selection w
   expect(Number(state.corps[0].squads[0].slot)).toBeGreaterThan(0);
 
   await planner.locator('#hdLBOnlyOwned').uncheck();
-  await expect(planner.locator('#hdLBOnlyOwned')).not.toBeChecked();
-  const restored = await planner.locator('[data-hd-lb-plane="0"][data-squad="0"] option').evaluateAll(opts =>
+  await expect(page.locator('#hdLandBasePlanner #hdLBOnlyOwned')).not.toBeChecked();
+  await expect.poll(
+    () => page.locator('#hdLandBasePlanner [data-hd-lb-plane="0"][data-squad="0"] option').count()
+  ).toBeGreaterThan(2);
+  const restored = await page.locator('#hdLandBasePlanner [data-hd-lb-plane="0"][data-squad="0"] option').evaluateAll(opts =>
     opts.map(o => o.value).filter(Boolean)
   );
   expect(restored.length).toBeGreaterThan(2);
@@ -6337,12 +6341,18 @@ test('release smoke: map overview exposes visible攻略 tool launcher', async ({
 
   await launcher.locator('[data-hd-map-tool="suggest"]').click();
   await expect(page.locator('#hdFleetSuggester')).toBeVisible({ timeout: 5000 });
-  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await page.evaluate(() => {
+    window.hdWSMarkUserNavigation?.();
+    window.hdWSShowElement?.('guide', false);
+  });
   await expect(launcher).toBeVisible();
 
   await launcher.locator('[data-hd-map-tool="prep"]').click();
   await expect(page.locator('#hdSortiePreparation')).toBeVisible({ timeout: 5000 });
-  await page.evaluate(() => window.hdWSShowElement?.('guide', false));
+  await page.evaluate(() => {
+    window.hdWSMarkUserNavigation?.();
+    window.hdWSShowElement?.('guide', false);
+  });
   await expect(launcher).toBeVisible();
 
   await launcher.locator('[data-hd-map-tool="map"]').click();
@@ -6376,17 +6386,17 @@ test('release smoke: map攻略 critical assets are cache-busted', async ({ page 
     const scriptSrcs = [...document.scripts].map(x => x.getAttribute('src') || '');
     const styleHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map(x => x.getAttribute('href') || '');
     const requiredScripts = [
-      'map-details.js?v=461',
-      'map-images.js?v=461',
-      'map-tabs.js?v=461',
-      'map-interactive.js?v=461',
-      'map-advanced-data.js?v=461'
+      'map-details.js?v=462',
+      'map-images.js?v=462',
+      'map-tabs.js?v=462',
+      'map-interactive.js?v=462',
+      'map-advanced-data.js?v=462'
     ];
     const requiredStyles = [
-      'map-details.css?v=461',
-      'map-tabs.css?v=461',
-      'map-images.css?v=461',
-      'map-interactive.css?v=461'
+      'map-details.css?v=462',
+      'map-tabs.css?v=462',
+      'map-images.css?v=462',
+      'map-interactive.css?v=462'
     ];
     return {
       scripts: requiredScripts.map(x => ({ x, ok: scriptSrcs.some(s => s.endsWith(x)) })),
@@ -6447,7 +6457,7 @@ test('release smoke: real iPhone flow opens map攻略 tools', async ({ page }) =
   await expect(page.locator('[data-map-pane="mine"] #customFleetPanel')).toBeVisible();
 
   const src = await page.locator('script[src^="app.js"]').getAttribute('src');
-  expect(src).toBe('app.js?v=461');
+  expect(src).toBe('app.js?v=462');
   expect(errors).toEqual([]);
 });
 
@@ -6676,7 +6686,10 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   await expect(fallbackRoute).toBeVisible();
   await expect(fallbackRoute.locator('#hdMapRouteRequirements')).toBeVisible();
 
-  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
+  await page.evaluate(() => {
+    window.hdWSMarkUserNavigation?.();
+    window.hdRevealWorkspaceTarget?.('guide', false);
+  });
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="fleet"]').click();
   const fallbackFleet = page.locator('#hdFallbackFleetTools');
@@ -6688,7 +6701,10 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   await expect(fallbackFleet).toContainText(expectedFleetPolicy);
   await expect(fallbackMap).toBeHidden();
 
-  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
+  await page.evaluate(() => {
+    window.hdWSMarkUserNavigation?.();
+    window.hdRevealWorkspaceTarget?.('guide', false);
+  });
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="route"]').click();
   await expect(fallbackRoute).toBeVisible();
@@ -6724,7 +6740,10 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
     return String(linked.id);
   });
   expect(duplicateQuestId).not.toBe('');
-  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
+  await page.evaluate(() => {
+    window.hdWSMarkUserNavigation?.();
+    window.hdRevealWorkspaceTarget?.('guide', false);
+  });
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="quest"]').click();
   const fallbackQuest = page.locator('#hdFallbackQuestTools');
@@ -6741,7 +6760,10 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   await questCard.locator('[data-hd-core-quest-add="' + questId + '"]').click();
   await expect.poll(async () => page.evaluate(id => state.quests.some(x => x.sourceId === id), questId)).toBe(true);
 
-  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
+  await page.evaluate(() => {
+    window.hdWSMarkUserNavigation?.();
+    window.hdRevealWorkspaceTarget?.('guide', false);
+  });
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="quest"]').click();
   await expect(fallbackQuest.locator('[data-hd-core-quest-add="' + questId + '"]')).toContainText('追加済み');
@@ -6749,22 +6771,34 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   await expect(page.locator('#questDatabase')).toBeVisible({ timeout: 5000 });
   await expect(page.locator('#hdQuestDbSearch')).toHaveValue(questName);
 
-  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
+  await page.evaluate(() => {
+    window.hdWSMarkUserNavigation?.();
+    window.hdRevealWorkspaceTarget?.('guide', false);
+  });
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="suggest"]').click();
   await expect(page.locator('#hdFleetSuggester')).toBeVisible({ timeout: 5000 });
 
-  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
+  await page.evaluate(() => {
+    window.hdWSMarkUserNavigation?.();
+    window.hdRevealWorkspaceTarget?.('guide', false);
+  });
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="prep"]').click();
   await expect(page.locator('#hdSortiePreparation')).toBeVisible({ timeout: 5000 });
 
-  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
+  await page.evaluate(() => {
+    window.hdWSMarkUserNavigation?.();
+    window.hdRevealWorkspaceTarget?.('guide', false);
+  });
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="gear"]').click();
   await expect(page.locator('#hdFleetCalculator')).toBeVisible({ timeout: 5000 });
 
-  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
+  await page.evaluate(() => {
+    window.hdWSMarkUserNavigation?.();
+    window.hdRevealWorkspaceTarget?.('guide', false);
+  });
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="drop"]').click();
   const fallbackDrop = page.locator('#hdFallbackDropTools');
@@ -6780,7 +6814,10 @@ test('release smoke: fallback map renderer still exposes攻略 tools when map ta
   expect(hunts.some(x => x.map === '2-4')).toBe(true);
   await expect(fallbackDrop.locator('[data-hd-map-drop-ship].hunting').first()).toBeVisible();
 
-  await page.evaluate(() => window.hdRevealWorkspaceTarget?.('guide', false));
+  await page.evaluate(() => {
+    window.hdWSMarkUserNavigation?.();
+    window.hdRevealWorkspaceTarget?.('guide', false);
+  });
   await expect(fallback).toBeVisible();
   await fallback.locator('[data-hd-core-map-action="mine"]').click();
   await expect(page.locator('#customFleetPanel')).toBeVisible({ timeout: 5000 });
@@ -9376,18 +9413,23 @@ test('release smoke: Quick Nav group jump marks explicit workspace navigation', 
   const result = await page.evaluate(() => {
     window.hdWSShowElement('roster', false);
     const beforeEpoch = Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH) || 0;
+    const beforeUserEpoch = Number(window.__HD_WORKSPACE_USER_NAV_EPOCH) || 0;
     const ok = window.hdQNJumpGroup('guide');
     const afterEpoch = Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH) || 0;
+    const afterUserEpoch = Number(window.__HD_WORKSPACE_USER_NAV_EPOCH) || 0;
     return {
       ok,
       beforeEpoch,
       afterEpoch,
+      beforeUserEpoch,
+      afterUserEpoch,
       group:window.hdWSState?.group || ''
     };
   });
 
   expect(result.ok).toBe(true);
   expect(result.afterEpoch).toBeGreaterThan(result.beforeEpoch);
+  expect(result.afterUserEpoch).toBeGreaterThan(result.beforeUserEpoch);
   expect(result.group).toBe('guide');
   expect(errors).toEqual([]);
 });
@@ -9671,7 +9713,7 @@ test('release smoke: diagnostics center runtime stylesheet is loaded', async ({ 
     };
   });
 
-  expect(data.href).toContain('diagnostics-center.css?v=461');
+  expect(data.href).toContain('diagnostics-center.css?v=462');
   expect(data.loaded).toBe('1');
   expect(data.noteFont).not.toBe('');
   expect(data.noteLine).not.toBe('');

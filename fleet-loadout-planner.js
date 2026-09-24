@@ -264,8 +264,15 @@ function hdFLInvalidate(){
  for(const k of Object.keys(HD_FL_CACHE))delete HD_FL_CACHE[k];
 }
 document.addEventListener('click',e=>{
- const gen=e.target.closest?.('[data-hd-fl-generate]');if(gen){hdFLRender(gen.dataset.hdFlGenerate,gen.closest('.hd-fs-card'));return}
- const regen=e.target.closest?.('[data-hd-fl-regenerate]');if(regen){hdFLRender(regen.dataset.hdFlRegenerate,regen.closest('.hd-fs-card'));return}
+ const gen=e.target.closest?.('[data-hd-fl-generate]'),regen=e.target.closest?.('[data-hd-fl-regenerate]');
+ const trigger=gen||regen;
+ if(!trigger)return;
+ const index=gen?gen.dataset.hdFlGenerate:regen.dataset.hdFlRegenerate,card=trigger.closest('.hd-fs-card');
+ if(card){hdFLRender(index,card);e.__hdFLRenderHandled=true}
+},true);
+document.addEventListener('click',e=>{
+ const gen=e.target.closest?.('[data-hd-fl-generate]');if(gen){if(e.__hdFLRenderHandled)return;hdFLRender(gen.dataset.hdFlGenerate,gen.closest('.hd-fs-card'));return}
+ const regen=e.target.closest?.('[data-hd-fl-regenerate]');if(regen){if(e.__hdFLRenderHandled)return;hdFLRender(regen.dataset.hdFlRegenerate,regen.closest('.hd-fs-card'));return}
  const save=e.target.closest?.('[data-hd-fl-save]');if(save){hdFLSave(save.dataset.hdFlSave);return}
  const prepare=e.target.closest?.('[data-hd-fl-prepare]');if(prepare){hdFLSaveAndPrepare(prepare.dataset.hdFlPrepare);return}
  const procure=e.target.closest?.('[data-hd-fl-procure-expansion]');if(procure){hdFLProcureExpansion(procure.dataset.hdFlProcureExpansion,procure.dataset.hdFlShipIndex);return}

@@ -88,7 +88,7 @@ function hdQNJumpGroup(group){
  // Quick Nav category jumps are explicit user navigation. Mark them before
  // calling hdWSApply directly so any delayed tool-open recovery stops yielding
  // to stale intent just like normal workspace tabs, back/forward and swipes.
- try{if(typeof hdWSMarkDirectNavigation==='function')hdWSMarkDirectNavigation()}catch{}
+ try{if(typeof hdWSMarkUserNavigation==='function')hdWSMarkUserNavigation()}catch{}
  try{if(typeof hdWSPushHistory==='function')hdWSPushHistory()}catch{}
  hdQNClose();
  if(typeof hdWSApply==='function'){hdWSApply(group,null,{ignorePin:true,scrollTop:true});return true}
@@ -194,6 +194,7 @@ function hdQNOpen(){
 function hdQNClose(){const d=document.getElementById('hdQuickNavDialog');if(!d)return;if(typeof d.close==='function'&&d.open)d.close();else d.removeAttribute('open');hdQNUpdateMobileDock()}
 function hdQNJump(id){
  const target=document.getElementById(id);if(!target)return false;
+ try{if(typeof hdWSMarkUserNavigation==='function')hdWSMarkUserNavigation()}catch{}
  hdQNRecordRecent(id);hdQNClose();
  if(typeof hdGSClose==='function')hdGSClose();
  const opened=typeof hdWSShowElement==='function'&&hdWSShowElement(target,false);
