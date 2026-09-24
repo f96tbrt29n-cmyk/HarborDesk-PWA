@@ -29,7 +29,12 @@ function hdEquipWikiUrl(name){return `https://wikiwiki.jp/kancolle/${encodeURICo
 function hdEquipStatText(item){const parts=Object.entries(item.stats||{}).map(([k,v])=>`${k}+${v}`);if(item.range)parts.push(`射程 ${item.range}`);if(item.radius!=null)parts.push(`半径 ${item.radius}`);return parts}
 function hdEnsureEquipmentCatalog(){
  const book=document.getElementById('equipmentBook');if(!book)return;
- if(document.getElementById('hdEquipmentCatalog')){hdRenderEquipmentCatalog();return;}
+ if(document.getElementById('hdEquipmentCatalog')){
+  const view=hdEquipCatalogViewLoad(),search=document.getElementById('hdEquipCatalogSearch');
+  if(typeof view.filter==='string')hdEquipCatalogFilter=view.filter||'すべて';
+  if(search&&typeof view.query==='string'&&search.value!==view.query)search.value=view.query;
+  hdRenderEquipmentCatalog();return;
+ }
  const sec=document.createElement('div');sec.id='hdEquipmentCatalog';sec.className='hd-equipment-catalog';
  sec.innerHTML=`<div class="hd-equip-catalog-head"><div><div class="eyebrow">EQUIPMENT DATABASE</div><h3>攻略装備データベース</h3><p class="muted">性能・用途・改修・入手をまとめて確認。データは攻略Wikiの現行情報を要約。</p></div><div class="hd-equip-head-actions"><span id="hdEquipCatalogCount" class="muted"></span></div></div><div class="hd-equip-search"><input id="hdEquipCatalogSearch" type="search" placeholder="装備名・用途・カテゴリで検索"><button class="ghost small" type="button" data-hd-equip-compact>コンパクト</button><button class="ghost small" type="button" data-hd-equip-reset>条件クリア</button></div><div id="hdEquipCatalogActiveFilters" class="hd-active-filters" hidden></div><div id="hdEquipCatalogFilters" class="hd-equip-filters"></div><div id="hdEquipCatalogCompactHint" class="hd-compact-hint" hidden>カードをタップすると、その1件だけ詳細を開けるよ</div><div id="hdEquipCatalogList" class="hd-equip-catalog-list"></div>`;
  const ledgerList=book.querySelector('#equipmentList');if(ledgerList)ledgerList.insertAdjacentElement('afterend',sec);else book.appendChild(sec);
