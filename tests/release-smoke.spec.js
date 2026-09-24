@@ -4166,6 +4166,9 @@ test('release smoke: master ship procurement recovers failed lazy module', async
   const suggested = masterCard.locator('.hd-shipdb-master-suggest > summary');
   await expect(suggested).toBeVisible({ timeout: 5000 });
   await suggested.click();
+  await expect.poll(() => suggested.evaluate(el => !!el.parentElement?.open)).toBe(true);
+  await page.evaluate(() => hdRenderShipDatabase());
+  await expect.poll(() => suggested.evaluate(el => !!el.parentElement?.open)).toBe(true);
   const master = masterCard.locator(`[data-hd-master-procure="${row.id}"]`).first();
   await expect(master).toBeVisible({ timeout: 5000 });
 
