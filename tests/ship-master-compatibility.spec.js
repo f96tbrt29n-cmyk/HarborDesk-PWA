@@ -5790,14 +5790,30 @@ test('mobile dock exposes four primary actions', async ({ page }) => {
   await page.setViewportSize({width:390,height:844});
   await boot(page,errors);
   const data=await page.evaluate(()=>{
-    window.hdQNEnsure?.();const d=document.getElementById('hdMobileDock');return {exists:!!d,actions:[...d.querySelectorAll('button')].map(b=>b.textContent.trim()),fabDisplay:getComputedStyle(document.getElementById('hdQuickNavButton')).display};
+    window.hdQNEnsure?.();
+    const d=document.getElementById('hdMobileDock');
+    const primary=[
+      d?.querySelector('[data-hd-mobile-home]'),
+      d?.querySelector('[data-hd-mobile-search]'),
+      d?.querySelector('[data-hd-mobile-sync]'),
+      d?.querySelector('[data-hd-mobile-menu]')
+    ].filter(Boolean);
+    return {
+      exists:!!d,
+      primary:primary.map(b=>b.textContent.trim()),
+      back:!!d?.querySelector('[data-hd-mobile-back]'),
+      location:!!d?.querySelector('[data-hd-mobile-location]'),
+      fabDisplay:getComputedStyle(document.getElementById('hdQuickNavButton')).display
+    };
   });
   expect(data.exists).toBe(true);
-  expect(data.actions).toHaveLength(4);
-  expect(data.actions.join(' ')).toContain('ホーム');
-  expect(data.actions.join(' ')).toContain('検索');
-  expect(data.actions.join(' ')).toContain('同期');
-  expect(data.actions.join(' ')).toContain('機能');
+  expect(data.primary).toHaveLength(4);
+  expect(data.primary.join(' ')).toContain('ホーム');
+  expect(data.primary.join(' ')).toContain('検索');
+  expect(data.primary.join(' ')).toContain('同期');
+  expect(data.primary.join(' ')).toContain('機能');
+  expect(data.back).toBe(true);
+  expect(data.location).toBe(true);
   expect(data.fabDisplay).toBe('none');
 });
 
@@ -6814,6 +6830,7 @@ test('home shows prioritized attention items and opens full attention list', asy
   await boot(page,errors);
   const data=await page.evaluate(async()=>{
     const now=Date.now();
+    localStorage.setItem('harbordesk-last-external-backup-v1',String(now+1));
     localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({
       syncedAt:now,
       ships:100,
@@ -7390,6 +7407,7 @@ test('home warns when external backup is missing or stale and exports from warni
   const data=await page.evaluate(async()=>{
     const key='harbordesk-last-external-backup-v1';
     localStorage.removeItem(key);
+    localStorage.removeItem('harbordesk-kancolle-sync-v1');
     window.hdPHEnsure?.();
     await window.hdPHRender?.();
 
@@ -7403,8 +7421,10 @@ test('home warns when external backup is missing or stale and exports from warni
     };
 
     window.__backupClicked=0;
+    window.shareBackup=async()=>{window.__backupClicked++;return true};
     window.exportBackup=()=>{window.__backupClicked++};
     missingAlert?.click();
+    await Promise.resolve();
     const clicked=window.__backupClicked;
 
     localStorage.setItem(key,String(Date.now()-15*86400000));
