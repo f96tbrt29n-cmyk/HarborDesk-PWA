@@ -220,3 +220,27 @@ button.home-next-main{cursor:pointer}
 
 .home-guide-intro{color:var(--muted);font-size:12px;margin:0 0 10px}.home-guide-card #homeGuideSteps{display:grid;gap:8px}.home-guide-step{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:start;gap:10px;padding:11px;border:1px solid var(--line);border-radius:12px;background:#0c2030}.home-guide-step.current{border-color:var(--accent2)}.home-guide-step.done{opacity:.72}.home-guide-check{width:34px;height:34px;border-radius:50%;border:1px solid var(--accent2);background:#15394a;color:var(--text);font:inherit;font-weight:800}.home-guide-step.done .home-guide-check{background:#235b43;border-color:#6bba83}.home-guide-step strong{display:block;font-size:13px}.home-guide-step p{margin:4px 0 8px;color:var(--muted);font-size:11px;line-height:1.5}.home-guide-step .ghost{font-size:10px}
 .home-guide-map{padding:8px 10px;border-radius:10px;background:#102d3d;color:var(--muted);font-size:11px}.home-guide-map b{color:var(--accent2);font-size:13px}.home-guide-restart{justify-self:start;margin-top:3px}
+
+/* 攻略のやることリスト */
+.home-guide-card #homeGuideSteps{gap:10px}
+.home-guide-card .home-guide-map{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px}
+.home-guide-map label{font-weight:700;color:var(--text)}
+.home-guide-map select{min-width:98px;max-width:140px;padding:7px;border-radius:8px}
+.home-guide-map small{width:100%;line-height:1.5}
+.home-guide-group{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#0c2030}
+.home-guide-group>summary{cursor:pointer;display:flex;justify-content:space-between;gap:10px;padding:13px;align-items:center;list-style:none}
+.home-guide-group>summary::-webkit-details-marker{display:none}
+.home-guide-group>summary strong{font-size:13px}
+.home-guide-group>summary span{font-size:12px;color:var(--accent2);white-space:nowrap}
+.home-guide-group>summary:focus-visible,.home-guide-check:focus-visible{outline:2px solid var(--accent2);outline-offset:-2px}
+.home-guide-group-body{display:grid;gap:8px;padding:0 10px 12px}
+.home-guide-group .home-guide-step{background:#112b3a;padding:10px}
+.home-guide-group .home-guide-step p{margin-bottom:0}
+.home-guide-check{cursor:pointer;min-width:34px}
+.home-guide-group .home-guide-delete{margin-top:7px}
+.home-guide-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding:2px}
+.home-guide-actions small{width:100%;color:var(--muted);line-height:1.5}
+.home-guide-add{display:flex;gap:6px;flex-wrap:wrap}
+.home-guide-add input{flex:1 1 180px;min-width:0}
+.home-guide-add select{flex:0 1 130px;min-width:110px}
+.home-guide-add input,.home-guide-add select{border-radius:8px;padding:7px;font-size:12px}

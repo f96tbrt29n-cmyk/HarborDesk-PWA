@@ -210,27 +210,68 @@ function homeSyncDeltaHtml(sync){
  return parts.length?'<div class="home-sync-delta"><span>前回から</span>'+parts.slice(0,5).map(x=>'<b>'+homeEsc(x)+'</b>').join('')+'</div>':'';
 }
 
-const HD_HOME_GUIDE_KEY='harbordesk-guide-steps-v1';
-const HD_HOME_GUIDE_STEPS=[
- {id:'sync',title:'手持ちを登録する',detail:'ゲーム同期で艦娘・装備・資源を取り込む。同期できない場合は艦隊台帳へ手入力しても進められる。',target:'kancolleImport',action:'ゲーム同期へ'},
- {id:'fleet',title:'出撃する艦隊を決める',detail:'艦隊台帳で6隻の育成状況と損傷を確認。最初は手持ちの艦で進め、足りない艦種を把握する。',target:'roster',action:'艦隊台帳へ'},
- {id:'map',title:'次の海域とルートを確認する',detail:'攻略画面で挑む海域を選び、ルート条件・敵編成・ボスへの到達方法を読む。迷ったら未クリアの通常海域から。',target:'guide',action:'海域攻略へ'},
- {id:'gear',title:'必要な装備を揃える',detail:'海域の制空・対潜・索敵条件に合わせて装備を確認。不足品は装備台帳や入手方法から調べる。',target:'equipmentBook',action:'装備台帳へ'},
- {id:'quests',title:'並行する任務を選ぶ',detail:'同じ海域で進む任務をチェックしてから出撃すると、周回をまとめやすい。',target:'quests',action:'任務へ'},
- {id:'sortie',title:'出撃して結果を記録する',detail:'大破した艦を出撃させないことを確認し、攻略画面の出撃モードで進行とボス結果を記録する。',target:'guide',action:'出撃画面へ'},
- {id:'expeditions',title:'資源を回復して次に備える',detail:'遠征と入渠のタイマーを設定。目標達成後は次の海域を確認して手順を繰り返す。',target:'expeditions',action:'遠征へ'}
+const HD_HOME_GUIDE_KEY='harbordesk-strategy-todo-v1';
+const HD_HOME_GUIDE_GROUPS=[
+ {id:'map',title:'未攻略海域を進める',target:'mapStrategyNavigator',action:'海域攻略ナビ',steps:[
+  ['route','開放条件とルート分岐を確認','前の海域のクリア状況、必要な艦種・速力・索敵を確認する。'],
+  ['fleet','編成と装備を決める','海域攻略ナビで編成例と手持ちとの差を確認する。'],
+  ['sortie','道中・ボス到達を試す','撤退したマスと不足した対策を確認し、編成を調整する。'],
+  ['boss','ボス撃破・ゲージを進める','ゲージがある海域は必要回数と最終編成を確認する。'] ]},
+ {id:'gear',title:'攻略に必要な装備を揃える',target:'equipmentBook',action:'装備台帳',steps:[
+  ['air','制空用の艦戦・水戦・基地航空隊を確認','攻略予定海域の制空目標に合わせて必要数を決める。'],
+  ['los','索敵用の電探・偵察機を確認','分岐条件を確認し、必要な索敵装備を用意する。'],
+  ['asw','対潜装備を揃える','ソナー・爆雷と先制対潜できる艦を確認する。'],
+  ['land','対地・夜戦用の装備を揃える','陸上型の敵、夜戦の有無に応じて必要な装備を確認する。'],
+  ['improve','入手・改修・更新の順番を決める','不足装備の入手先や改修に必要な資材を整理する。'] ]},
+ {id:'quest',title:'定期任務以外の任務を進める',target:'quests',action:'任務チェック',steps:[
+  ['onetime','単発任務の前提と報酬を確認','海域開放や必要装備・艦娘につながる任務を優先する。'],
+  ['sortie','未達成の単発出撃任務を進める','攻略海域と重なる任務は同時に進められるか確認する。'],
+  ['factory','単発の工廠・編成・改装任務を進める','指定装備や指定艦が必要な任務を洗い出す。'],
+  ['quarterly','クォータリー任務を確認','期限と報酬を確認し、攻略準備に役立つものを選ぶ。'],
+  ['yearly','イヤーリー・期間限定任務を確認','期限を確認し、取り逃したくない報酬を優先する。'] ]},
+ {id:'level',title:'攻略に必要な艦娘を育てる',target:'roster',action:'艦隊台帳',steps:[
+  ['types','必要な艦種・指定艦を洗い出す','ルート固定、任務、基地や支援に必要な艦を確認する。'],
+  ['targets','艦ごとの目標レベルを決める','改造・改二・先制対潜など、必要な到達点を設定する。'],
+  ['train','育成海域と編成を決める','レベリング候補から手持ちで回せる場所を選ぶ。'],
+  ['modernize','改造・近代化改修を済ませる','火力・雷装・装甲など攻略に必要な改修を確認する。'] ]},
+ {id:'formation',title:'出撃前の戦力を整える',target:'guide',action:'出撃準備',steps:[
+  ['support','支援艦隊・基地航空隊を準備','必要な海域だけ支援・基地の編成と配備を確認する。'],
+  ['readiness','制空・索敵・対潜とルートを再確認','保存編成で不足条件を確認する。'],
+  ['damage','入渠・疲労・大破を確認','出撃する艦の状態を確認する。'] ]},
+ {id:'resources',title:'資源・継続攻略を準備する',target:'expeditions',action:'遠征・資源',steps:[
+  ['stock','燃料・弾薬・鋼材・ボーキ・バケツを確保','目標海域の挑戦回数に合わせて不足分を見積もる。'],
+  ['expedition','必要な資源を遠征で補充','不足資源に合う遠征を選んで回す。'],
+  ['review','攻略失敗の原因を記録して次を決める','大破・ボス未到達・火力不足などから次の改善項目を決める。'] ]}
 ];
-function homeGuideDone(){try{const rows=JSON.parse(localStorage.getItem(HD_HOME_GUIDE_KEY)||'[]');return new Set(Array.isArray(rows)?rows.filter(id=>HD_HOME_GUIDE_STEPS.some(step=>step.id===id)):[])}catch{return new Set()}}
-let homeGuideLastState='';
+function homeGuideState(){
+ try{const data=JSON.parse(localStorage.getItem(HD_HOME_GUIDE_KEY)||'{}');return {done:Array.isArray(data.done)?data.done.filter(x=>typeof x==='string'):[],cleared:Array.isArray(data.cleared)?data.cleared.filter(x=>typeof x==='string'):[],custom:Array.isArray(data.custom)?data.custom.filter(x=>x&&typeof x.id==='string'&&typeof x.title==='string'&&HD_HOME_GUIDE_GROUPS.some(g=>g.id===x.category)):[]}}catch{return {done:[],cleared:[],custom:[]}}
+}
+function homeGuideSave(state){try{localStorage.setItem(HD_HOME_GUIDE_KEY,JSON.stringify(state))}catch{}homeGuideRender()}
+function homeGuideItemKey(group,id,map,scope){return (scope==='map'?'map:'+map:'global')+':'+group+':'+id}
+function homeGuideActiveMap(){return homeSelectedMap()||(typeof hdGuideMapSequence==='function'?hdGuideMapSequence()[0]:'')||''}
+let homeGuideLastSignature='';
 function homeGuideRender(){
  const host=document.getElementById('homeGuideSteps');if(!host)return;
- const done=homeGuideDone(),next=HD_HOME_GUIDE_STEPS.find(step=>!done.has(step.id)),map=homeSelectedMap();
- const signature=map+':'+HD_HOME_GUIDE_STEPS.map(step=>done.has(step.id)?'1':'0').join('');
- if(host.children.length&&homeGuideLastState===signature)return;
- homeGuideLastState=signature;
- document.getElementById('homeGuideCount').textContent=`${done.size}/${HD_HOME_GUIDE_STEPS.length} 完了`;
- const following=map&&typeof hdGuideNextMap==='function'?hdGuideNextMap(map):'';
- host.innerHTML=`<div class="home-guide-map">${map?`いまの攻略海域 <b>${homeEsc(map)}</b>`:'攻略海域を選ぶと、ここに表示するよ'}</div>`+HD_HOME_GUIDE_STEPS.map((step,i)=>`<div class="home-guide-step${done.has(step.id)?' done':''}${next===step?' current':''}"><button type="button" class="home-guide-check" data-home-guide-toggle="${step.id}" aria-pressed="${done.has(step.id)}" aria-label="${homeEsc(step.title)}を${done.has(step.id)?'未完了に戻す':'完了にする'}">${done.has(step.id)?'✓':i+1}</button><div><strong>${homeEsc(step.title)}</strong><p>${homeEsc(step.detail)}</p><button type="button" class="ghost small" data-home-jump="${step.target}">${homeEsc(step.action)} →</button></div></div>`).join('')+(done.size===HD_HOME_GUIDE_STEPS.length?`<button type="button" class="ghost small home-guide-restart" data-home-guide-restart>${following?`次の海域 ${homeEsc(following)} へ進む・攻略手順を再開`:'この海域の攻略手順を再開'}</button>`:'');
+ const state=homeGuideState(),map=homeGuideActiveMap(),maps=typeof hdGuideMapSequence==='function'?hdGuideMapSequence():[],cleared=new Set(state.cleared.filter(x=>maps.includes(x))),done=new Set(state.done);
+ const signature=map+JSON.stringify(state);if(host.children.length&&homeGuideLastSignature===signature)return;homeGuideLastSignature=signature;
+ const opened=new Set([...host.querySelectorAll('details.home-guide-group[open]')].map(el=>el.dataset.group));
+ const firstRender=!host.children.length;
+  const total=HD_HOME_GUIDE_GROUPS.reduce((n,g)=>n+g.steps.length,0)+state.custom.filter(x=>x.scope!=='map'||x.map===map).length;
+ const completed=HD_HOME_GUIDE_GROUPS.reduce((n,g)=>n+g.steps.filter(([id])=>done.has(homeGuideItemKey(g.id,id,map,g.id==='map'?'map':'global'))).length,0)+state.custom.filter(x=>(x.scope!=='map'||x.map===map)&&done.has(homeGuideItemKey(x.category,x.id,x.map,x.scope))).length;
+ document.getElementById('homeGuideCount').textContent=`目標 ${completed}/${total}・海域 ${cleared.size}/${maps.length} クリア`;
+ const next=maps.find(x=>!cleared.has(x));
+ const item=(group,id,title,detail,scope,custom=false,assignedMap=map)=>{
+  const key=homeGuideItemKey(group.id,id,assignedMap,scope),checked=done.has(key);
+  return `<div class="home-guide-step${checked?' done':''}"><button type="button" class="home-guide-check" data-home-guide-toggle="${homeEsc(key)}" aria-pressed="${checked}" aria-label="${homeEsc(title)}を${checked?'未完了に戻す':'完了にする'}">${checked?'✓':'○'}</button><div><strong>${homeEsc(title)}</strong>${detail?`<p>${homeEsc(detail)}</p>`:''}${custom?`<button type="button" class="ghost small home-guide-delete" data-home-guide-delete="${homeEsc(id)}" aria-label="${homeEsc(title)}を削除">削除</button>`:''}</div></div>`;
+ };
+ host.innerHTML=`<div class="home-guide-map"><label for="homeGuideMapSelect">攻略対象の海域</label><select id="homeGuideMapSelect" aria-label="攻略対象の海域">${maps.map(x=>`<option value="${x}"${x===map?' selected':''}>${x}${cleared.has(x)?' ✓ クリア':''}</option>`).join('')}</select><button type="button" class="ghost small" data-home-guide-next ${next?'':'disabled'}>未攻略 ${homeEsc(next||'なし')} へ</button><button type="button" class="${cleared.has(map)?'ghost':'primary'} small" data-home-guide-clear ${map?'':'disabled'} aria-pressed="${cleared.has(map)}">${cleared.has(map)?'クリアを取り消す':'この海域をクリア済みにする'}</button><small>海域のクリアは手動で記録します。海域を変えても進捗は残ります。</small></div>`+
+ HD_HOME_GUIDE_GROUPS.map(group=>{
+  const own=state.custom.filter(x=>x.category===group.id&&(x.scope!=='map'||x.map===map));
+  const rows=group.steps.map(([id,title,detail])=>item(group,id,title,detail,group.id==='map'?'map':'global'));
+  for(const x of own)rows.push(item(group,x.id,x.title,x.scope==='map'?`${x.map} 向けの目標`:'自分で追加した目標',x.scope,true,x.map));
+  const count=group.steps.filter(([id])=>done.has(homeGuideItemKey(group.id,id,map,group.id==='map'?'map':'global'))).length+own.filter(x=>done.has(homeGuideItemKey(group.id,x.id,x.map,x.scope))).length;
+  return `<details class="home-guide-group" data-group="${group.id}" ${(firstRender?group.id==='map':opened.has(group.id))?'open':''}><summary><strong>${homeEsc(group.title)}</strong><span>${count}/${group.steps.length+own.length}</span></summary><div class="home-guide-group-body">${rows.join('')}<div class="home-guide-actions"><button type="button" class="ghost small" data-home-jump="${group.target}">${homeEsc(group.action)}を開く →</button>${group.id==='gear'?'<button type="button" class="ghost small" data-home-jump="hdEquipmentProcurement">装備の入手計画 →</button>':''}${group.id==='level'?'<button type="button" class="ghost small" data-home-jump="trainingPlanner">レベリング候補 →</button>':''}${group.id==='quest'?'<small>デイリー・ウィークリー・マンスリーは「今日やること」で管理します。</small>':''}</div><form class="home-guide-add" data-home-guide-add="${group.id}"><input name="title" required maxlength="100" aria-label="${homeEsc(group.title)}の目標を追加" placeholder="具体的な目標を追加"><select name="scope" aria-label="目標の対象"><option value="map">${homeEsc(map||'選択海域')} 向け</option><option value="global"${group.id==='map'?'':' selected'}>全海域共通</option></select><button type="submit" class="ghost small">追加</button></form></div></details>`;
+ }).join('');
 }
 
 function ensureHomeDashboard(){
@@ -247,7 +288,7 @@ function ensureHomeDashboard(){
   <article id="homeResume" class="home-resume-card" hidden></article>
   <article id="homeNextAction" class="home-next-action"></article>
   <div id="homeSummary" class="home-summary"></div>
-  <article class="home-card home-guide-card"><div class="home-card-title"><strong>攻略のやることリスト</strong><span id="homeGuideCount" class="muted"></span></div><p class="home-guide-intro">上から進めて、終えたら番号をタップ。進捗はこの端末に保存するよ。</p><div id="homeGuideSteps"></div></article>
+  <article class="home-card home-guide-card"><div class="home-card-title"><strong>攻略のやることリスト</strong><span id="homeGuideCount" class="muted"></span></div><p class="home-guide-intro">海域のクリア、必要な装備・艦娘・単発任務などを分けて管理。目標は追加でき、進捗はこの端末に保存します。</p><div id="homeGuideSteps"></div></article>
   <div class="home-grid">
    <article class="home-card"><div class="home-card-title"><strong>今日やること</strong><a href="#quests">任務へ</a></div><div id="homeTodo"></div></article>
    <article class="home-card"><div class="home-card-title"><strong>進行中タイマー</strong><a href="#expeditions">遠征へ</a></div><div id="homeTimers"></div></article>
@@ -378,8 +419,10 @@ function renderHomeDashboard(){
 }
 
 document.addEventListener('click',e=>{
- const guideToggle=e.target.closest('[data-home-guide-toggle]');if(guideToggle){const done=homeGuideDone(),id=guideToggle.dataset.homeGuideToggle;if(done.has(id))done.delete(id);else done.add(id);try{localStorage.setItem(HD_HOME_GUIDE_KEY,JSON.stringify([...done]))}catch{}homeGuideRender();return}
- if(e.target.closest('[data-home-guide-restart]')){const done=homeGuideDone(),current=homeSelectedMap(),following=current&&typeof hdGuideNextMap==='function'?hdGuideNextMap(current):'';for(const id of ['map','gear','quests','sortie','expeditions'])done.delete(id);try{localStorage.setItem(HD_HOME_GUIDE_KEY,JSON.stringify([...done]))}catch{}if(following&&typeof hdSelectGuideMap==='function'){hdSelectGuideMap(following);saveRecentMap(following);if(typeof hdToast==='function')hdToast(`${following} に進んだよ。攻略手順を再開したよ`,'success',2200)}homeGuideRender();return}
+ const guideToggle=e.target.closest('[data-home-guide-toggle]');if(guideToggle){const state=homeGuideState(),key=guideToggle.dataset.homeGuideToggle;state.done=state.done.includes(key)?state.done.filter(x=>x!==key):[...state.done,key];homeGuideSave(state);return}
+ const guideClear=e.target.closest('[data-home-guide-clear]');if(guideClear){const map=homeGuideActiveMap();if(map){const state=homeGuideState();state.cleared=state.cleared.includes(map)?state.cleared.filter(x=>x!==map):[...state.cleared,map];homeGuideSave(state)}return}
+ const guideNext=e.target.closest('[data-home-guide-next]');if(guideNext){const state=homeGuideState(),next=hdGuideMapSequence().find(x=>!state.cleared.includes(x));if(next&&typeof hdSelectGuideMap==='function'){hdSelectGuideMap(next);homeGuideRender()}return}
+ const guideDelete=e.target.closest('[data-home-guide-delete]');if(guideDelete){const state=homeGuideState(),id=guideDelete.dataset.homeGuideDelete;state.custom=state.custom.filter(x=>x.id!==id);state.done=state.done.filter(x=>!x.endsWith(':'+id));homeGuideSave(state);return}
  const resume=e.target.closest('[data-home-resume]');if(resume){
   if(typeof hdWSGoBack==='function'&&hdWSGoBack())return;
   const row=homeResumeLocation();if(row&&typeof hdWSShowElement==='function')hdWSShowElement(row.id,true);
@@ -505,3 +548,7 @@ window.addEventListener('hd:workspace-changed',e=>{if(e.detail?.group!=='home')h
 setInterval(renderHomeDashboard,5000);
 window.addEventListener('load',()=>setTimeout(renderHomeDashboard,300));
 ensureHomeDashboard();
+
+document.addEventListener('change',e=>{if(e.target.id==='homeGuideMapSelect'&&typeof hdSelectGuideMap==='function'){hdSelectGuideMap(e.target.value);homeGuideRender()}});
+document.addEventListener('submit',e=>{const form=e.target.closest('[data-home-guide-add]');if(!form)return;e.preventDefault();const title=form.elements.title.value.trim(),category=form.dataset.homeGuideAdd,map=homeGuideActiveMap(),scope=form.elements.scope.value;if(!title||!HD_HOME_GUIDE_GROUPS.some(g=>g.id===category)||scope==='map'&&!map)return;const state=homeGuideState();state.custom.push({id:'custom-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),category,title,scope,map:scope==='map'?map:''});homeGuideSave(state)});
+window.addEventListener('hd:guide-map-changed',()=>homeGuideRender());
