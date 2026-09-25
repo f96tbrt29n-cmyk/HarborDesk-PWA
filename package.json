@@ -1,7 +1,7 @@
 {
   "name": "harbordesk-pwa",
   "private": true,
-  "version": "1.0.473",
+  "version": "1.0.474",
   "scripts": {
     "test:browser": "playwright test tests/release-smoke.spec.js tests/backup.spec.js tests/fleet-loadout-planner.spec.js tests/fleet-loadout-optimizer.spec.js tests/sortie-session.spec.js tests/guided-ship-acquisition.spec.js",
     "test:browser:full": "playwright test tests/ship-master-compatibility.spec.js"

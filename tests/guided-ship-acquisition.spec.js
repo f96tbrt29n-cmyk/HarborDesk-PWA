@@ -197,6 +197,36 @@ test('strategy integration: prerequisite checkbox and cleared map share one comp
   expect(await page.evaluate(() => homeGuideState().cleared.includes('6-4'))).toBe(false);
 });
 
+test('strategy integration: 5-6 monthly clear confirmation expires at the JST month boundary', async ({ page }) => {
+  await openApp(page);
+  const keys=await page.evaluate(() => {
+    const task=hdStrategyCandidates('5-6').find(x=>x.source==='unlock'&&x.ref==='5-5');
+    return {
+      september:homeGuideGoalKey(task,Date.parse('2026-09-30T14:59:59Z')),
+      october:homeGuideGoalKey(task,Date.parse('2026-09-30T15:00:00Z')),
+      old:homeGuideItemKey(task.category,task.id,task.map,task.scope)
+    };
+  });
+  expect(keys.september).toMatch(/:2026-09$/);
+  expect(keys.october).toMatch(/:2026-10$/);
+  expect(keys.old).not.toBe(keys.september);
+  await page.locator('#homeGuideMapSelect').selectOption('5-6');
+  await page.locator('[data-hd-strategy-import-all="5-6"]').click();
+  const toggle=page.locator('[data-group="map"] .home-guide-step').filter({hasText:'5-5 のクリアを確認'}).locator('[data-home-guide-toggle]');
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-pressed','true');
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, {timeout:30000});
+  await expect(toggle).toHaveAttribute('aria-pressed','true');
+  await page.evaluate(() => {
+    const task=homeGuideState().custom.find(x=>x.map==='5-6'&&x.source==='unlock');
+    const state=homeGuideState();
+    state.done=[homeGuideItemKey(task.category,task.id,task.map,task.scope)];
+    homeGuideSave(state);
+  });
+  await expect(toggle).toHaveAttribute('aria-pressed','false');
+});
+
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {
   await openApp(page);
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible();
