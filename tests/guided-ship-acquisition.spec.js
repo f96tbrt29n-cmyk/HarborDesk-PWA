@@ -257,6 +257,27 @@ test('strategy integration: training candidates belong to the selected saved fle
   expect(result).toEqual({first:['吹雪'],unrelated:[],second:['綾波'],empty:[],setup:true});
 });
 
+test('strategy integration: base squad opening splits prerequisite missions, item and completion', async ({ page }) => {
+  await openApp(page);
+  const rows=await page.evaluate(() => ({
+    central:hdStrategyCandidates('6-5').filter(x=>['oneTimeQuest','basePrep'].includes(x.source)).map(x=>({ref:x.ref,detail:x.detail})),
+    southwest:hdStrategyCandidates('7-4').filter(x=>['oneTimeQuest','basePrep'].includes(x.source)).map(x=>({ref:x.ref,detail:x.detail}))
+  }));
+  expect(rows.central.map(x=>x.ref)).toEqual(['F38','B62','F43-setup','F43-materials','F43']);
+  expect(rows.southwest.map(x=>x.ref)).toEqual(['B113','B131','B175-setup','B175']);
+  expect(rows.central.at(-1).detail).toContain('ボーキサイト3,000');
+  expect(rows.southwest.at(-1).detail).toContain('7-4/O');
+  await page.locator('#homeGuideMapSelect').selectOption('6-5');
+  await page.locator('[data-hd-strategy-import-all="6-5"]').click();
+  await page.locator('[data-group=quest] summary').click();
+  await expect(page.locator('[data-group=quest]')).toContainText('設営隊を1個確保');
+  await expect(page.locator('[data-group=quest]')).toContainText('「陸攻」隊の増勢');
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, {timeout:30000});
+  await page.locator('[data-group=quest] summary').click();
+  await expect(page.locator('[data-group=quest]')).toContainText('F43 の資源とドラム缶を準備');
+});
+
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {
   await openApp(page);
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible();
