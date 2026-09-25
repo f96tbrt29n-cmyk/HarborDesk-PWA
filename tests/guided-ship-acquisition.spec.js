@@ -105,6 +105,7 @@ test('strategy integration: equipment counts and ship levels refresh imported go
     }]));
     localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{id:'strategy-test-ship',name:'吹雪',level:42,type:'駆逐艦'}]));
     localStorage.setItem('harbordesk-training-plans-v1',JSON.stringify({'strategy-test-ship':{active:true,target:70,priority:3}}));
+    localStorage.setItem('harbordesk-custom-fleets-v1',JSON.stringify({'3-2':[{id:'strategy-fleet',ships:[{ship:'吹雪'}]}]}));
     hdSelectGuideMap('3-2');homeGuideRender();
   });
   await expect(page.locator('.hd-strategy-preview')).toContainText('あと 28');
@@ -225,6 +226,35 @@ test('strategy integration: 5-6 monthly clear confirmation expires at the JST mo
     homeGuideSave(state);
   });
   await expect(toggle).toHaveAttribute('aria-pressed','false');
+});
+
+test('strategy integration: training candidates belong to the selected saved fleet', async ({ page }) => {
+  await openApp(page);
+  const result=await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([
+      {id:'strategy-fubuki',name:'吹雪',level:42,type:'駆逐艦'},
+      {id:'strategy-ayanami',name:'綾波',level:35,type:'駆逐艦'}
+    ]));
+    localStorage.setItem('harbordesk-training-plans-v1',JSON.stringify({
+      'strategy-fubuki':{active:true,target:70},'strategy-ayanami':{active:true,target:80}
+    }));
+    localStorage.setItem('harbordesk-custom-fleets-v1',JSON.stringify({
+      '3-2':[{id:'one',ships:[{ship:'吹雪'}]}]
+    }));
+    const first=hdStrategyTrainingRows('3-2').map(x=>x.ship.name);
+    const unrelated=hdStrategyTrainingRows('7-1').map(x=>x.ship.name);
+    localStorage.setItem('harbordesk-custom-fleets-v1',JSON.stringify({
+      '3-2':[{id:'one',ships:[{ship:'綾波'}]}]
+    }));
+    const second=hdStrategyTrainingRows('3-2').map(x=>x.ship.name);
+    localStorage.setItem('harbordesk-custom-fleets-v1',JSON.stringify({
+      '3-2':[{id:'one',ships:[{ship:''}]}]
+    }));
+    const empty=hdStrategyTrainingRows('3-2').map(x=>x.ship.name);
+    const setup=hdStrategyCandidates('3-2').some(x=>x.source==='fleetSetup');
+    return {first,unrelated,second,empty,setup};
+  });
+  expect(result).toEqual({first:['吹雪'],unrelated:[],second:['綾波'],empty:[],setup:true});
 });
 
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {
