@@ -38,15 +38,19 @@ function hdStrategyGearRows(map){
  try{const entry=hdPLLoad().find(x=>x.map===map);return entry&&typeof hdPLDemandRows==='function'?hdPLDemandRows(entry.gearItems||[]):[]}catch{return []}
 }
 function hdStrategyGearChecks(map){try{return typeof hdSEChecks==='function'?(hdSEChecks(map).rows||[]):[]}catch{return []}}
+function hdStrategyFleetHasShips(map){
+ try{return hdMSNFleets(map).some(fleet=>(fleet.ships||[]).some(ship=>String(ship.ship||ship.name||'').trim()))}catch{return false}
+}
 function hdStrategyTrainingRows(map){
  try{
-  const fleet=hdMSNFleets(map).find(x=>String(x.id)===String(hdMSNFleetId(map,hdMSNFleets(map))));
+  const fleets=hdMSNFleets(map),fleet=fleets.find(x=>String(x.id)===String(hdMSNFleetId(map,fleets)));
   const names=new Set((fleet?.ships||[]).map(x=>String(x.ship||x.name||'').trim()).filter(Boolean));
+  if(!names.size)return [];
   return hdTrainingRoster().map(ship=>{
    const plan=hdTrainingPlanFor(ship),lv=Math.max(1,Number(ship.level)||1);
-   const inFleet=names.has(ship.name),target=plan.active?plan.target:inFleet?Number(plan.db?.targetLv)||0:0;
-   return {ship,plan,lv,target,inFleet,gap:Math.max(0,target-lv)};
-  }).filter(x=>x.target>0&&x.gap>0).sort((a,b)=>Number(b.inFleet)-Number(a.inFleet)||Number(b.plan.active)-Number(a.plan.active)||a.gap-b.gap).slice(0,10);
+   const target=plan.active?plan.target:Number(plan.db?.targetLv)||0;
+   return {ship,plan,lv,target,inFleet:names.has(ship.name),gap:Math.max(0,target-lv)};
+  }).filter(x=>x.inFleet&&x.target>0&&x.gap>0).sort((a,b)=>Number(b.plan.active)-Number(a.plan.active)||a.gap-b.gap).slice(0,10);
  }catch{return []}
 }
 function hdStrategyRelatedQuests(map){
@@ -79,7 +83,7 @@ function hdStrategyCandidates(map){
  for(const id of new Set([...(unlock?.quests||[]),...Object.keys(HD_STRATEGY_UNLOCK_QUESTS).filter(k=>HD_STRATEGY_UNLOCK_QUESTS[k].maps.test(map))])){
   const q=HD_STRATEGY_UNLOCK_QUESTS[id];add(hdStrategyCandidate(map,'quest','oneTimeQuest',id,`${q.name}を確認`,`${q.needs}。完了はゲーム画面で確認。`,{prereq:q.needs,sourceUrl:q.url}));
  }
- if(typeof hdMSNFleets==='function'&&!hdMSNFleets(map).length)
+ if(!hdStrategyFleetHasShips(map))
   add(hdStrategyCandidate(map,'formation','fleetSetup','saved',`${map} の保存編成を作る`,'艦隊と装備を保存すると、攻略ナビでルート・制空・索敵の差分を判定できます。'));
  for(const check of hdStrategyNavChecks(map).filter(x=>x.status!=='ready')){
   const category=['equipment','air','scouting','master'].includes(check.id)?'gear':'formation';
@@ -122,7 +126,7 @@ function hdStrategyTaskView(task,candidates,cleared){
   const check=hdStrategyGearChecks(task.map).find(x=>String(x.kind)===String(task.ref));
   if(check)return {detail:check.detail||task.detail,ready:check.status==='ready',status:check.status==='ready'?'装備台帳で準備済み':'装備不足'};
  }
- if(task.source==='fleetSetup')return {detail:task.detail,ready:typeof hdMSNFleets==='function'&&hdMSNFleets(task.map).length>0,status:typeof hdMSNFleets==='function'&&hdMSNFleets(task.map).length>0?'保存編成あり':'保存編成なし'};
+ if(task.source==='fleetSetup')return {detail:task.detail,ready:hdStrategyFleetHasShips(task.map),status:hdStrategyFleetHasShips(task.map)?'保存編成あり':'保存編成なし'};
  if(task.source==='gear'){
   const gear=hdStrategyGearRows(task.map).find(x=>String(typeof hdPLDemandKey==='function'?hdPLDemandKey(x,task.map):x.target)===String(task.ref));
   if(gear)return {detail:`必要 ${gear.needed} / 所持 ${gear.owned} / あと ${gear.shortfall}。${gear.methodLabel||'入手方法を確認'}`,ready:gear.shortfall===0,status:gear.shortfall===0?'所持数の目標達成':'装備不足'};
