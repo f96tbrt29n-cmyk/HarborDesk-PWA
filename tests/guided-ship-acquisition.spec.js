@@ -8,50 +8,54 @@ async function openApp(page) {
   await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
 }
 
-test('guide: steps open the right screen and survive a reload', async ({ page }) => {
+test('strategy goals: categories, custom goals and completion survive reload', async ({ page }) => {
   await openApp(page);
-  const steps = page.locator('#homeGuideSteps .home-guide-step');
-  await expect(steps).toHaveCount(7);
-  await expect(page.locator('#homeGuideCount')).toHaveText('0/7 完了');
-  await steps.first().locator('[data-home-guide-toggle]').click();
-  await expect(page.locator('#homeGuideCount')).toHaveText('1/7 完了');
+  const groups=page.locator('#homeGuideSteps details.home-guide-group');
+  await expect(groups).toHaveCount(6);
+  await expect(groups.nth(0)).toContainText('未攻略海域');
+  await expect(groups.nth(1)).toContainText('必要な装備');
+  await expect(groups.nth(2)).toContainText('単発任務');
+  await expect(groups.nth(3)).toContainText('艦娘を育てる');
+  await expect(page.locator('#homeGuideCount')).toContainText('目標 0/');
+  await groups.first().locator('[data-home-guide-toggle]').first().click();
+  await expect(page.locator('#homeGuideCount')).toContainText('目標 1/');
+  await groups.nth(1).locator('summary').click();
+  await groups.nth(1).locator('input[name=title]').fill('水戦を2機用意');
+  await groups.nth(1).locator('select[name=scope]').selectOption('map');
+  await groups.nth(1).locator('button[type=submit]').click();
+  await expect(groups.nth(1)).toContainText('水戦を2機用意');
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
-  await expect(page.locator('#homeGuideCount')).toHaveText('1/7 完了');
-  await steps.first().locator('[data-home-guide-toggle]').click();
-  await expect(page.locator('#homeGuideCount')).toHaveText('0/7 完了');
-  await steps.first().locator('[data-home-jump="kancolleImport"]').click();
-  await expect(page.locator('#kancolleImport')).toBeVisible();
+  await expect(page.locator('#homeGuideCount')).toContainText('目標 1/');
+  await groups.nth(1).locator('summary').click();
+  await expect(groups.nth(1)).toContainText('水戦を2機用意');
+  await groups.first().locator('[data-home-guide-toggle]').first().click();
+  await expect(page.locator('#homeGuideCount')).toContainText('目標 0/');
 });
 
-test('guide: completed map advances to the next map and restarts per-map steps', async ({ page }) => {
+test('strategy goals: per-map progress and cleared maps remain separate', async ({ page }) => {
   await openApp(page);
-  await page.evaluate(() => { hdSelectGuideMap('2-4'); homeGuideRender(); });
-  await expect(page.locator('.home-guide-map')).toContainText('2-4');
-  await expect(page.locator('#homeGuideSteps .home-guide-step').nth(4)).toContainText('任務');
-  for(const button of await page.locator('[data-home-guide-toggle]').all()) await button.dispatchEvent('click');
-  await expect(page.locator('#homeGuideCount')).toHaveText('7/7 完了');
-  await expect(page.locator('[data-home-guide-restart]')).toContainText('2-5');
-  await page.locator('[data-home-guide-restart]').click();
-  await expect(page.locator('#homeGuideCount')).toHaveText('2/7 完了');
-  await expect(page.locator('.home-guide-map')).toContainText('2-5');
-  await expect(page.locator('#homeGuideSteps .home-guide-step.current')).toContainText('海域');
+  await page.locator('#homeGuideMapSelect').selectOption('2-4');
+  await page.locator('[data-group=map] [data-home-guide-toggle]').first().click();
+  await page.locator('[data-home-guide-clear]').click();
+  await expect(page.locator('#homeGuideCount')).toContainText('海域 1/');
+  await page.locator('#homeGuideMapSelect').selectOption('2-5');
+  await expect(page.locator('[data-group=map] [data-home-guide-toggle]').first()).toHaveAttribute('aria-pressed','false');
+  await page.locator('#homeGuideMapSelect').selectOption('2-4');
+  await expect(page.locator('[data-group=map] [data-home-guide-toggle]').first()).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('[data-home-guide-clear]')).toHaveAttribute('aria-pressed','true');
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
-  await expect(page.locator('#homeGuideCount')).toHaveText('2/7 完了');
-  await expect(page.locator('.home-guide-map')).toContainText('2-5');
+  await expect(page.locator('#homeGuideMapSelect')).toHaveValue('2-4');
+  await expect(page.locator('[data-home-guide-clear]')).toHaveAttribute('aria-pressed','true');
 });
 
-test('guide: next-map progression crosses world boundaries', async ({ page }) => {
+test('strategy goals: next uncleared map crosses world boundaries', async ({ page }) => {
   await openApp(page);
-  await page.evaluate(() => {
-    hdSelectGuideMap('1-6');
-    localStorage.setItem('harbordesk-guide-steps-v1', JSON.stringify(['sync','fleet','map','gear','quests','sortie','expeditions']));
-    homeGuideRender();
-  });
-  await expect(page.locator('[data-home-guide-restart]')).toContainText('2-1');
-  await page.locator('[data-home-guide-restart]').click();
-  await expect(page.locator('.home-guide-map')).toContainText('2-1');
+  await page.evaluate(() => {const state=homeGuideState();state.cleared=['1-1','1-2','1-3','1-4','1-5','1-6'];homeGuideSave(state)});
+  await expect(page.locator('[data-home-guide-next]')).toContainText('2-1');
+  await page.locator('[data-home-guide-next]').click();
+  await expect(page.locator('#homeGuideMapSelect')).toHaveValue('2-1');
   await expect(page.locator('#worldPicker .world-chip.active')).toHaveAttribute('data-world','2');
   await expect(page.locator('#mapPicker .map-button.active')).toHaveAttribute('data-map','2-1');
 });
