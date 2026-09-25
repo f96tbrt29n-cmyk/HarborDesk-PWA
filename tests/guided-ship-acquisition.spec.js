@@ -263,7 +263,7 @@ test('strategy integration: base squad opening splits prerequisite missions, ite
     central:hdStrategyCandidates('6-5').filter(x=>['oneTimeQuest','basePrep'].includes(x.source)).map(x=>({ref:x.ref,detail:x.detail})),
     southwest:hdStrategyCandidates('7-4').filter(x=>['oneTimeQuest','basePrep'].includes(x.source)).map(x=>({ref:x.ref,detail:x.detail}))
   }));
-  expect(rows.central.map(x=>x.ref)).toEqual(['F38','B62','F43-setup','F43-materials','F43']);
+  expect(rows.central.map(x=>x.ref)).toEqual(['F37','B77','F38','B62','F43-setup','F43-materials','F43']);
   expect(rows.southwest.map(x=>x.ref)).toEqual(['B113','B131','B175-setup','B175']);
   expect(rows.central.at(-1).detail).toContain('ボーキサイト3,000');
   expect(rows.southwest.at(-1).detail).toContain('7-4/O');
@@ -276,6 +276,24 @@ test('strategy integration: base squad opening splits prerequisite missions, ite
   await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, {timeout:30000});
   await page.locator('[data-group=quest] summary').click();
   await expect(page.locator('[data-group=quest]')).toContainText('F43 の資源とドラム缶を準備');
+});
+
+test('strategy integration: B175 sorties can be tracked separately and open their maps', async ({ page }) => {
+  await openApp(page);
+  const conditions=await page.evaluate(() => hdStrategyCandidates('7-4').filter(x=>x.source==='baseSortie').map(x=>[x.ref,x.targetMap]));
+  expect(conditions).toEqual([['B175-2-1','2-1'],['B175-2-2','2-2'],['B175-2-3','2-3'],['B175-7-3','7-3'],['B175-7-4','7-4']]);
+  await page.locator('#homeGuideMapSelect').selectOption('7-4');
+  await page.locator('[data-hd-strategy-import="7-4:baseSortie:B175-7-3"]').click();
+  await page.locator('[data-group=quest] summary').click();
+  const task=page.locator('[data-group=quest] .home-guide-step').filter({hasText:'B175：7-3 第2ボス/P S勝利'});
+  await expect(task).toBeVisible();
+  await task.locator('[data-home-guide-toggle]').click();
+  await expect(task.locator('[data-home-guide-toggle]')).toHaveAttribute('aria-pressed','true');
+  await expect(task.locator('[data-hd-strategy-open-map="7-3"]')).toBeVisible();
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, {timeout:30000});
+  await page.locator('[data-group=quest] summary').click();
+  await expect(task.locator('[data-home-guide-toggle]')).toHaveAttribute('aria-pressed','true');
 });
 
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {

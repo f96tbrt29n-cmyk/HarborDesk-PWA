@@ -17,11 +17,16 @@ const HD_STRATEGY_UNLOCKS={
 };
 const HD_STRATEGY_UNLOCK_QUESTS={
  F43:{name:'中部海域「基地航空隊」展開！',needs:'ドラム缶(輸送用)2個を廃棄し、燃料1,200・ボーキサイト3,000・設営隊1個を消費。任務 F38・B62 達成後に出現。',maps:/^6-[4-5]$/,url:'https://wikiwiki.jp/kancolle/%E4%BB%BB%E5%8B%99/%E5%B7%A5%E5%BB%A0%E4%BB%BB%E5%8B%99#id-F43',steps:[
+  {ref:'F37',name:'「航空基地設営」事前準備',detail:'ドラム缶(輸送用)2個を廃棄し、7.7mm機銃・九六式艦戦を各2個準備。前提は B56。',url:'https://wikiwiki.jp/kancolle/%E4%BB%BB%E5%8B%99/%E5%B7%A5%E5%BB%A0%E4%BB%BB%E5%8B%99#id-F37'},
+  {ref:'B77',name:'水雷戦隊、南西諸島海域を哨戒せよ！',detail:'軽巡級旗艦・駆逐4隻・自由1隻で 2-2 と 2-3 のボスへ。各 S 勝利を目安に確認（A 勝利達成報告あり、要検証）。',url:'https://wikiwiki.jp/kancolle/%E4%BB%BB%E5%8B%99/%E5%87%BA%E6%92%83%E4%BB%BB%E5%8B%99#id-B77'},
   {ref:'F38',name:'「陸攻」隊の増勢',detail:'7.7mm機銃と九九式艦爆を各2個準備。出現には F37 と B77 の達成が必要。',url:'https://wikiwiki.jp/kancolle/%E4%BB%BB%E5%8B%99/%E5%B7%A5%E5%BB%A0%E4%BB%BB%E5%8B%99#id-F38'},
-  {ref:'B62',name:'強襲上陸作戦用戦力を増強せよ！',detail:'F43 の前提任務。達成条件と出現状況をゲーム・任務一覧で確認。',url:'https://wikiwiki.jp/kancolle/%E4%BB%BB%E5%8B%99/%E5%87%BA%E6%92%83%E4%BB%BB%E5%8B%99#id-B62'}]},
+  {ref:'B62',name:'強襲上陸作戦用戦力を増強せよ！',detail:'6-3 ボス B 勝利以上。任務の出現には週任務 Bw9 と D19（検証中）の達成状況も確認。',url:'https://wikiwiki.jp/kancolle/%E4%BB%BB%E5%8B%99/%E5%87%BA%E6%92%83%E4%BB%BB%E5%8B%99#id-B62'}]},
  B175:{name:'南西海域「基地航空隊」開設！',needs:'任務を受領し 2-1・2-2・2-3・7-3-2/P ボスを各1回 S勝利、7-4/O マスに到達。設営隊1個を消費。',maps:/^7-[4-5]$/,url:'https://wikiwiki.jp/kancolle/%E4%BB%BB%E5%8B%99/%E5%87%BA%E6%92%83%E4%BB%BB%E5%8B%99#id-B175',steps:[
   {ref:'B113',name:'松輸送作戦、継続実施せよ！',detail:'B175 の出現条件として掲載（検証中）。未出現なら達成状況を確認。',url:'https://wikiwiki.jp/kancolle/%E4%BB%BB%E5%8B%99/%E5%87%BA%E6%92%83%E4%BB%BB%E5%8B%99#id-B113'},
-  {ref:'B131',name:'航空戦艦戦隊、戦闘哨戒！',detail:'B175 の出現条件として掲載（検証中）。未出現なら達成状況を確認。',url:'https://wikiwiki.jp/kancolle/%E4%BB%BB%E5%8B%99/%E5%87%BA%E6%92%83%E4%BB%BB%E5%8B%99#id-B131'}]}
+  {ref:'B131',name:'航空戦艦戦隊、戦闘哨戒！',detail:'B175 の出現条件として掲載（検証中）。未出現なら達成状況を確認。',url:'https://wikiwiki.jp/kancolle/%E4%BB%BB%E5%8B%99/%E5%87%BA%E6%92%83%E4%BB%BB%E5%8B%99#id-B131'}],sorties:[
+  {map:'2-1',node:'ボス',result:'S勝利'}, {map:'2-2',node:'ボス',result:'S勝利'},
+  {map:'2-3',node:'ボス',result:'S勝利'}, {map:'7-3',node:'第2ボス/P',result:'S勝利'},
+  {map:'7-4',node:'Oマス',result:'到達'}]}
 };
 const HD_STRATEGY_QUEST_EDGES={Bq10:['Bq2'],By7:['By6'],By8:['By6'],By9:['By8'],By10:['By9']};
 function hdStrategyEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -88,6 +93,7 @@ function hdStrategyCandidates(map){
   const q=HD_STRATEGY_UNLOCK_QUESTS[id];
   for(const step of q.steps)add(hdStrategyCandidate(map,'quest','oneTimeQuest',step.ref,`${step.name}を確認`,`${step.detail}完了はゲーム画面で確認。`,{sourceUrl:step.url}));
   add(hdStrategyCandidate(map,'quest','basePrep',`${id}-setup`,'設営隊を1個確保','開設任務で1個消費。B80「飛行場設営の準備を実施せよ！」などの報酬・手持ちを確認。B80 は 6-3 ボス S 勝利で達成。',{sourceUrl:'https://wikiwiki.jp/kancolle/%E3%82%A2%E3%82%A4%E3%83%86%E3%83%A0#ConstructionCorps'}));
+  for(const sortie of q.sorties||[])add(hdStrategyCandidate(map,'quest','baseSortie',`${id}-${sortie.map}`,`${id}：${sortie.map} ${sortie.node} ${sortie.result}`,`任務「${q.name}」を受領してから ${sortie.map} ${sortie.node} ${sortie.result}を確認。任務進捗と達成はゲーム画面で確認。`,{targetMap:sortie.map,sourceUrl:q.url}));
   if(id==='F43')add(hdStrategyCandidate(map,'quest','basePrep','F43-materials','F43 の資源とドラム缶を準備','ドラム缶(輸送用)2個を廃棄。燃料1,200・ボーキサイト3,000 を消費。',{sourceUrl:q.url}));
   add(hdStrategyCandidate(map,'quest','oneTimeQuest',id,`${q.name}を確認`,`${q.needs}完了はゲーム画面で確認。`,{prereq:q.needs,sourceUrl:q.url}));
  }
@@ -142,9 +148,10 @@ function hdStrategyTaskView(task,candidates,cleared){
  }
  if(task.source==='periodicQuest'&&live)return {detail:live.detail,ready:false,status:'今周期の進捗を確認'};
  if(task.source==='nav'&&live)return {detail:live.detail,ready:false,status:'不足・要確認'};
- return {detail:live?.detail||task.detail||'',ready:false,status:task.source==='oneTimeQuest'?'ゲームで確認':''};
+ return {detail:live?.detail||task.detail||'',ready:false,status:['oneTimeQuest','baseSortie','basePrep'].includes(task.source)?'ゲームで確認':''};
 }
 function hdStrategyTaskActions(task){
+ if(task.source==='baseSortie')return `<button type="button" class="ghost small" data-hd-strategy-open-map="${hdStrategyEsc(task.targetMap)}">出撃先を見る →</button><a class="ghost small" href="${hdStrategyEsc(task.sourceUrl)}" target="_blank" rel="noopener">任務の条件 ↗</a>`;
  if(['oneTimeQuest','basePrep'].includes(task.source)&&task.sourceUrl)return `<a class="ghost small" href="${hdStrategyEsc(task.sourceUrl)}" target="_blank" rel="noopener">条件の詳細 ↗</a>`;
  if(task.source==='periodicQuest')return `<button type="button" class="ghost small" data-hd-strategy-open-quest="${hdStrategyEsc(task.ref)}">任務の条件・前提 →</button>`;
  if(task.source==='training')return `<button type="button" class="ghost small" data-hd-strategy-open-training="${hdStrategyEsc(task.shipId||task.ref)}">育成計画 →</button>`;
@@ -177,7 +184,7 @@ function hdStrategyPendingPath(map,state){
 function hdStrategyPreview(map,state){
  if(!map)return '';
  const rows=hdStrategyCandidates(map),existing=new Set(state.custom.filter(x=>x.map===map).map(x=>x.sourceKey)),pending=rows.filter(x=>!existing.has(x.sourceKey)&&!hdStrategyCandidateReady(x,state)),path=hdStrategyPendingPath(map,state),grouped={unlock:[],nav:[],gear:[],level:[],quest:[]};
- for(const row of rows){const group=['unlock','oneTimeQuest','basePrep'].includes(row.source)?'unlock':row.source==='training'?'level':row.source==='periodicQuest'?'quest':row.source==='nav'?'nav':'gear';grouped[group].push(row)}
+ for(const row of rows){const group=['unlock','oneTimeQuest','basePrep','baseSortie'].includes(row.source)?'unlock':row.source==='training'?'level':row.source==='periodicQuest'?'quest':row.source==='nav'?'nav':'gear';grouped[group].push(row)}
  const sections=[['unlock','前提海域・関連する単発任務'],['nav','保存編成との差分'],['gear','必要な装備'],['level','育成が必要な艦娘'],['quest','関連する定期任務']];
  return `<div class="hd-strategy-preview"><div class="hd-strategy-preview-head"><strong>${hdStrategyEsc(map)} の目標候補</strong><button type="button" class="primary small" data-hd-strategy-import-all="${hdStrategyEsc(map)}" ${pending.length?'':'disabled'}>未追加の目標をまとめて追加（${pending.length}件）</button></div>${path.length?`<div class="hd-strategy-preview-item"><div><b>前提海域の攻略順：${hdStrategyEsc(path.join(' → '))} → ${hdStrategyEsc(map)}</b><small>${map==='5-6'?'5-5 は今月のゲージ破壊をゲーム画面で確認。':'クリア記録をもとに未攻略の前提海域を表示。'} 次は ${hdStrategyEsc(path[0])} を確認。</small></div><button type="button" class="ghost small" data-hd-strategy-next-map="${hdStrategyEsc(path[0])}">${hdStrategyEsc(path[0])} を見る →</button></div>`:''}<small>保存編成・装備台帳・育成計画と攻略情報から作成。達成はゲーム画面でも確認してください。</small>${sections.map(([id,label])=>`<details class="hd-strategy-preview-section" ${id==='unlock'||id==='nav'?'open':''}><summary>${label}<span>${grouped[id].length}件</span></summary>${grouped[id].length?grouped[id].map(x=>`<div class="hd-strategy-preview-item"><div><b>${hdStrategyEsc(x.title)}</b><small>${hdStrategyEsc(x.detail)}</small></div><button type="button" class="ghost small" data-hd-strategy-import="${hdStrategyEsc(x.sourceKey)}" ${existing.has(x.sourceKey)||hdStrategyCandidateReady(x,state)?'disabled':''}>${existing.has(x.sourceKey)?'追加済み':hdStrategyCandidateReady(x,state)?'クリア記録済み':'追加'}</button></div>`).join(''):'<p class="muted">現在の登録データから候補はありません。</p>'}</details>`).join('')}<div class="hd-strategy-preview-tools"><button type="button" class="ghost small" data-hd-strategy-procurement="${hdStrategyEsc(map)}">装備計画に不足種別を登録</button><button type="button" class="ghost small" data-home-jump="trainingPlanner">育成計画へ</button><a href="https://wikiwiki.jp/kancolle/%E4%BB%BB%E5%8B%99" target="_blank" rel="noopener">任務の前提をWikiで確認 ↗</a></div></div>`;
 }
