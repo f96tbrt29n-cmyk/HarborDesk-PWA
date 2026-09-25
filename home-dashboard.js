@@ -244,12 +244,24 @@ const HD_HOME_GUIDE_GROUPS=[
   ['review','攻略失敗の原因を記録して次を決める','大破・ボス未到達・火力不足などから次の改善項目を決める。'] ]}
 ];
 function homeGuideState(){
- try{const data=JSON.parse(localStorage.getItem(HD_HOME_GUIDE_KEY)||'{}');return {done:Array.isArray(data.done)?data.done.filter(x=>typeof x==='string'):[],cleared:Array.isArray(data.cleared)?data.cleared.filter(x=>typeof x==='string'):[],custom:Array.isArray(data.custom)?data.custom.filter(x=>x&&typeof x.id==='string'&&typeof x.title==='string'&&HD_HOME_GUIDE_GROUPS.some(g=>g.id===x.category)):[]}}catch{return {done:[],cleared:[],custom:[]}}
+ try{
+  const data=JSON.parse(localStorage.getItem(HD_HOME_GUIDE_KEY)||'{}');
+  const custom=Array.isArray(data.custom)?data.custom.filter(x=>x&&typeof x.id==='string'&&typeof x.title==='string'&&HD_HOME_GUIDE_GROUPS.some(g=>g.id===x.category)):[];
+  const done=Array.isArray(data.done)?data.done.filter(x=>typeof x==='string'):[];
+  const legacy=new Set(),shared=new Set();
+  for(const task of custom){
+   if(!['oneTimeQuest','baseSortie','basePrep'].includes(task.source))continue;
+   const old=homeGuideItemKey(task.category,task.id,task.map,task.scope);
+   if(done.includes(old)){legacy.add(old);shared.add(homeGuideGoalKey(task))}
+  }
+  return {done:[...new Set([...done.filter(key=>!legacy.has(key)),...shared])],cleared:Array.isArray(data.cleared)?data.cleared.filter(x=>typeof x==='string'):[],custom};
+ }catch{return {done:[],cleared:[],custom:[]}}
 }
 function homeGuideSave(state){try{localStorage.setItem(HD_HOME_GUIDE_KEY,JSON.stringify(state))}catch{}homeGuideRender()}
 function homeGuideItemKey(group,id,map,scope){return (scope==='map'?'map:'+map:'global')+':'+group+':'+id}
 function homeGuideJstMonth(now=Date.now()){return new Date(now+9*60*60*1000).toISOString().slice(0,7)}
 function homeGuideGoalKey(task,now=Date.now()){
+ if(['oneTimeQuest','baseSortie','basePrep'].includes(task.source))return `shared:${task.source}:${task.ref}`;
  const key=homeGuideItemKey(task.category,task.id,task.map,task.scope);
  return task.source==='unlock'&&task.map==='5-6'&&task.ref==='5-5'?`${key}:${homeGuideJstMonth(now)}`:key;
 }
@@ -272,7 +284,7 @@ function homeGuideRender(){
   if(view){detail=view.detail||detail;}
   return `<div class="home-guide-step${checked?' done':''}${view?.ready?' ready-from-data':''}"><button type="button" class="home-guide-check" data-home-guide-toggle="${homeEsc(key)}" aria-pressed="${checked}" aria-label="${homeEsc(title)}を${checked?'未完了に戻す':'完了にする'}">${checked?'✓':'○'}</button><div><strong>${homeEsc(title)}</strong>${detail?`<p>${homeEsc(detail)}</p>`:''}${view?.status?`<small class="home-guide-live-state${view.ready?' ready':''}">${homeEsc(view.status)}</small>`:''}${custom&&typeof hdStrategyTaskActions==='function'?hdStrategyTaskActions(custom):''}${custom?`<button type="button" class="ghost small home-guide-delete" data-home-guide-delete="${homeEsc(id)}" aria-label="${homeEsc(title)}を削除">削除</button>`:''}</div></div>`;
  };
- host.innerHTML=`<div class="home-guide-map"><label for="homeGuideMapSelect">攻略対象の海域</label><select id="homeGuideMapSelect" aria-label="攻略対象の海域">${maps.map(x=>`<option value="${x}"${x===map?' selected':''}>${x}${cleared.has(x)?' ✓ クリア':''}</option>`).join('')}</select><button type="button" class="ghost small" data-home-guide-next ${next?'':'disabled'}>未攻略 ${homeEsc(next||'なし')} へ</button><button type="button" class="${cleared.has(map)?'ghost':'primary'} small" data-home-guide-clear ${map?'':'disabled'} aria-pressed="${cleared.has(map)}">${cleared.has(map)?'クリアを取り消す':'この海域をクリア済みにする'}</button><small>海域のクリアは手動で記録します。海域を変えても進捗は残ります。</small></div>`+(typeof hdStrategyPreview==='function'?hdStrategyPreview(map,state):'')+
+ host.innerHTML=`<div class="home-guide-map"><label for="homeGuideMapSelect">攻略対象の海域</label><select id="homeGuideMapSelect" aria-label="攻略対象の海域">${maps.map(x=>`<option value="${x}"${x===map?' selected':''}>${x}${cleared.has(x)?' ✓ クリア':''}</option>`).join('')}</select><button type="button" class="ghost small" data-home-guide-next ${next?'':'disabled'}>未攻略 ${homeEsc(next||'なし')} へ</button><button type="button" class="${cleared.has(map)?'ghost':'primary'} small" data-home-guide-clear ${map?'':'disabled'} aria-pressed="${cleared.has(map)}">${cleared.has(map)?'クリアを取り消す':'この海域をクリア済みにする'}</button><small>海域のクリアは手動で記録します。基地航空隊の同じ任務は海域間で完了状態を共有します。</small></div>`+(typeof hdStrategyPreview==='function'?hdStrategyPreview(map,state):'')+
  HD_HOME_GUIDE_GROUPS.map(group=>{
   const own=state.custom.filter(x=>x.category===group.id&&(x.scope!=='map'||x.map===map));
   const rows=group.steps.map(([id,title,detail])=>item(group,id,title,detail,group.id==='map'?'map':'global'));

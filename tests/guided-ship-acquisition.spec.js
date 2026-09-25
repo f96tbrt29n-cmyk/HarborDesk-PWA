@@ -296,6 +296,41 @@ test('strategy integration: B175 sorties can be tracked separately and open thei
   await expect(task.locator('[data-home-guide-toggle]')).toHaveAttribute('aria-pressed','true');
 });
 
+test('strategy integration: base squad completion carries to other maps and migrates saved progress', async ({ page }) => {
+  await openApp(page);
+  const keys=await page.evaluate(() => {
+    hdStrategyImportMap('7-4');
+    hdStrategyImportMap('7-5');
+    const state=homeGuideState();
+    const first=state.custom.find(x=>x.map==='7-4'&&x.source==='baseSortie'&&x.ref==='B175-7-3');
+    const second=state.custom.find(x=>x.map==='7-5'&&x.source==='baseSortie'&&x.ref==='B175-7-3');
+    const central4=hdStrategyCandidates('6-4').find(x=>x.source==='oneTimeQuest'&&x.ref==='F43');
+    const central5=hdStrategyCandidates('6-5').find(x=>x.source==='oneTimeQuest'&&x.ref==='F43');
+    const old=homeGuideItemKey(first.category,first.id,first.map,first.scope);
+    state.done=[old];
+    localStorage.setItem(HD_HOME_GUIDE_KEY,JSON.stringify(state));
+    return {old,shared:homeGuideGoalKey(first),next:homeGuideGoalKey(second),centralEqual:homeGuideGoalKey(central4)===homeGuideGoalKey(central5)};
+  });
+  expect(keys.shared).toBe(keys.next);
+  expect(keys.centralEqual).toBe(true);
+  const migrated=await page.evaluate(() => homeGuideState().done);
+  expect(migrated).toContain(keys.shared);
+  expect(migrated).not.toContain(keys.old);
+  await page.locator('#homeGuideMapSelect').selectOption('7-5');
+  await page.locator('[data-group=quest] summary').click();
+  const task=page.locator('[data-group=quest] .home-guide-step').filter({hasText:'B175：7-3 第2ボス/P S勝利'}).locator('[data-home-guide-toggle]');
+  await expect(task).toHaveAttribute('aria-pressed','true');
+  await task.click();
+  await expect(task).toHaveAttribute('aria-pressed','false');
+  await page.locator('#homeGuideMapSelect').selectOption('7-4');
+  await expect(task).toHaveAttribute('aria-pressed','false');
+  await task.click();
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, {timeout:30000});
+  await page.locator('[data-group=quest] summary').click();
+  await expect(task).toHaveAttribute('aria-pressed','true');
+});
+
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {
   await openApp(page);
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible();
