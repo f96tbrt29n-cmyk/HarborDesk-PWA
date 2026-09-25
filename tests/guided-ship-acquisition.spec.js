@@ -60,6 +60,66 @@ test('strategy goals: next uncleared map crosses world boundaries', async ({ pag
   await expect(page.locator('#mapPicker .map-button.active')).toHaveAttribute('data-map','2-1');
 });
 
+test('strategy integration: prerequisite maps and quests are specific to the selected map', async ({ page }) => {
+  await openApp(page);
+  const prerequisites=await page.evaluate(() => ({
+    west:hdStrategyCandidates('4-5').filter(x=>x.source==='unlock').map(x=>x.ref),
+    center:hdStrategyCandidates('6-5').filter(x=>x.source==='oneTimeQuest').map(x=>x.ref),
+    southwest:hdStrategyCandidates('7-4').filter(x=>x.source==='oneTimeQuest').map(x=>x.ref),
+    quests:hdStrategyCandidates('6-5').filter(x=>x.source==='periodicQuest').map(x=>x.ref)
+  }));
+  expect(prerequisites.west).toEqual(['4-4','5-1']);
+  expect(prerequisites.center).toContain('F43');
+  expect(prerequisites.southwest).toContain('B175');
+  expect(prerequisites.quests).toEqual(expect.arrayContaining(['Bq2','Bq10']));
+  await page.locator('#homeGuideMapSelect').selectOption('4-5');
+  await expect(page.locator('.hd-strategy-preview')).toContainText('5-1 のクリアを確認');
+  await expect(page.locator('.hd-strategy-preview')).not.toContainText('中部海域「基地航空隊」展開！');
+});
+
+test('strategy integration: navigator imports goals once and preserves them on reload', async ({ page }) => {
+  await openApp(page);
+  await page.evaluate(() => { hdMSNOpen('6-5'); });
+  await expect(page.locator('[data-hd-msn-to-todo="6-5"]')).toBeVisible();
+  await page.locator('[data-hd-msn-to-todo="6-5"]').click();
+  await expect(page.locator('#homeGuideMapSelect')).toHaveValue('6-5');
+  const first=await page.evaluate(() => homeGuideState().custom.filter(x=>x.map==='6-5').map(x=>x.sourceKey));
+  expect(first).toContain('6-5:oneTimeQuest:F43');
+  expect(new Set(first).size).toBe(first.length);
+  await page.locator('[data-hd-strategy-import-all="6-5"]').click();
+  const second=await page.evaluate(() => homeGuideState().custom.filter(x=>x.map==='6-5').map(x=>x.sourceKey));
+  expect(second).toEqual(first);
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
+  await expect(page.locator('#homeGuideMapSelect')).toHaveValue('6-5');
+  await page.locator('[data-group=quest] summary').click();
+  await expect(page.locator('[data-group=quest]')).toContainText('中部海域「基地航空隊」展開！');
+});
+
+test('strategy integration: equipment counts and ship levels refresh imported goals', async ({ page }) => {
+  await openApp(page);
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-equipment-procurement-v1',JSON.stringify([{
+      map:'3-2',gearItems:[{target:'22号対水上電探',wanted:'22号対水上電探',needed:2,kind:'電探',methodKey:'develop'}],kinds:[]
+    }]));
+    localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{id:'strategy-test-ship',name:'吹雪',level:42,type:'駆逐艦'}]));
+    localStorage.setItem('harbordesk-training-plans-v1',JSON.stringify({'strategy-test-ship':{active:true,target:70,priority:3}}));
+    hdSelectGuideMap('3-2');homeGuideRender();
+  });
+  await expect(page.locator('.hd-strategy-preview')).toContainText('あと 28');
+  await expect(page.locator('.hd-strategy-preview')).toContainText('22号対水上電探');
+  await page.locator('[data-hd-strategy-import-all="3-2"]').click();
+  await page.locator('[data-group=level] summary').click();
+  await expect(page.locator('[data-group=level]')).toContainText('現在 Lv.42 / 目標 Lv.70');
+  await page.evaluate(() => {
+    const ships=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1'));ships[0].level=70;
+    localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(ships));homeGuideRender();
+  });
+  await expect(page.locator('[data-group=level] .home-guide-live-state.ready')).toContainText('Lv目標達成');
+  const gear=await page.evaluate(() => hdStrategyGearRows('3-2').find(x=>x.target==='22号対水上電探'));
+  expect(gear).toMatchObject({needed:2,shortfall:2});
+});
+
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {
   await openApp(page);
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible();
