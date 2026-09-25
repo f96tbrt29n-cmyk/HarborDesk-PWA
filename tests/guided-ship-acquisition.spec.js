@@ -86,7 +86,8 @@ test('strategy integration: navigator imports goals once and preserves them on r
   const first=await page.evaluate(() => homeGuideState().custom.filter(x=>x.map==='6-5').map(x=>x.sourceKey));
   expect(first).toContain('6-5:oneTimeQuest:F43');
   expect(new Set(first).size).toBe(first.length);
-  await page.locator('[data-hd-strategy-import-all="6-5"]').click();
+  await expect(page.locator('[data-hd-strategy-import-all="6-5"]')).toBeDisabled();
+  await page.evaluate(() => hdStrategyImportMap('6-5'));
   const second=await page.evaluate(() => homeGuideState().custom.filter(x=>x.map==='6-5').map(x=>x.sourceKey));
   expect(second).toEqual(first);
   await page.reload({ waitUntil: 'domcontentloaded' });
