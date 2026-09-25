@@ -248,10 +248,11 @@ function homeGuideState(){
 }
 function homeGuideSave(state){try{localStorage.setItem(HD_HOME_GUIDE_KEY,JSON.stringify(state))}catch{}homeGuideRender()}
 function homeGuideItemKey(group,id,map,scope){return (scope==='map'?'map:'+map:'global')+':'+group+':'+id}
+function homeGuideActiveMap(){return homeSelectedMap()||(typeof hdGuideMapSequence==='function'?hdGuideMapSequence()[0]:'')||''}
 let homeGuideLastSignature='';
 function homeGuideRender(){
  const host=document.getElementById('homeGuideSteps');if(!host)return;
- const state=homeGuideState(),map=homeSelectedMap(),maps=typeof hdGuideMapSequence==='function'?hdGuideMapSequence():[],cleared=new Set(state.cleared.filter(x=>maps.includes(x))),done=new Set(state.done);
+ const state=homeGuideState(),map=homeGuideActiveMap(),maps=typeof hdGuideMapSequence==='function'?hdGuideMapSequence():[],cleared=new Set(state.cleared.filter(x=>maps.includes(x))),done=new Set(state.done);
  const signature=map+JSON.stringify(state);if(host.children.length&&homeGuideLastSignature===signature)return;homeGuideLastSignature=signature;
  const opened=new Set([...host.querySelectorAll('details.home-guide-group[open]')].map(el=>el.dataset.group));
  const firstRender=!host.children.length;
@@ -419,7 +420,7 @@ function renderHomeDashboard(){
 
 document.addEventListener('click',e=>{
  const guideToggle=e.target.closest('[data-home-guide-toggle]');if(guideToggle){const state=homeGuideState(),key=guideToggle.dataset.homeGuideToggle;state.done=state.done.includes(key)?state.done.filter(x=>x!==key):[...state.done,key];homeGuideSave(state);return}
- const guideClear=e.target.closest('[data-home-guide-clear]');if(guideClear){const map=homeSelectedMap();if(map){const state=homeGuideState();state.cleared=state.cleared.includes(map)?state.cleared.filter(x=>x!==map):[...state.cleared,map];homeGuideSave(state)}return}
+ const guideClear=e.target.closest('[data-home-guide-clear]');if(guideClear){const map=homeGuideActiveMap();if(map){const state=homeGuideState();state.cleared=state.cleared.includes(map)?state.cleared.filter(x=>x!==map):[...state.cleared,map];homeGuideSave(state)}return}
  const guideNext=e.target.closest('[data-home-guide-next]');if(guideNext){const state=homeGuideState(),next=hdGuideMapSequence().find(x=>!state.cleared.includes(x));if(next&&typeof hdSelectGuideMap==='function'){hdSelectGuideMap(next);homeGuideRender()}return}
  const guideDelete=e.target.closest('[data-home-guide-delete]');if(guideDelete){const state=homeGuideState(),id=guideDelete.dataset.homeGuideDelete;state.custom=state.custom.filter(x=>x.id!==id);state.done=state.done.filter(x=>!x.endsWith(':'+id));homeGuideSave(state);return}
  const resume=e.target.closest('[data-home-resume]');if(resume){
@@ -549,5 +550,5 @@ window.addEventListener('load',()=>setTimeout(renderHomeDashboard,300));
 ensureHomeDashboard();
 
 document.addEventListener('change',e=>{if(e.target.id==='homeGuideMapSelect'&&typeof hdSelectGuideMap==='function'){hdSelectGuideMap(e.target.value);homeGuideRender()}});
-document.addEventListener('submit',e=>{const form=e.target.closest('[data-home-guide-add]');if(!form)return;e.preventDefault();const title=form.elements.title.value.trim(),category=form.dataset.homeGuideAdd,map=homeSelectedMap(),scope=form.elements.scope.value;if(!title||!HD_HOME_GUIDE_GROUPS.some(g=>g.id===category)||scope==='map'&&!map)return;const state=homeGuideState();state.custom.push({id:'custom-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),category,title,scope,map:scope==='map'?map:''});homeGuideSave(state)});
+document.addEventListener('submit',e=>{const form=e.target.closest('[data-home-guide-add]');if(!form)return;e.preventDefault();const title=form.elements.title.value.trim(),category=form.dataset.homeGuideAdd,map=homeGuideActiveMap(),scope=form.elements.scope.value;if(!title||!HD_HOME_GUIDE_GROUPS.some(g=>g.id===category)||scope==='map'&&!map)return;const state=homeGuideState();state.custom.push({id:'custom-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),category,title,scope,map:scope==='map'?map:''});homeGuideSave(state)});
 window.addEventListener('hd:guide-map-changed',()=>homeGuideRender());
