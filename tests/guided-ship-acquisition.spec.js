@@ -331,6 +331,32 @@ test('strategy integration: base squad completion carries to other maps and migr
   await expect(task).toHaveAttribute('aria-pressed','true');
 });
 
+test('strategy integration: completed shared tasks stay out of bulk imports but can be restored', async ({ page }) => {
+  await openApp(page);
+  await page.evaluate(() => {
+    hdStrategyImportMap('7-4');
+    const state=homeGuideState();
+    const task=state.custom.find(x=>x.map==='7-4'&&x.source==='baseSortie'&&x.ref==='B175-7-3');
+    state.done.push(homeGuideGoalKey(task));
+    homeGuideSave(state);
+    hdSelectGuideMap('7-5');
+  });
+  const candidate=page.locator('[data-hd-strategy-import="7-5:baseSortie:B175-7-3"]');
+  await expect(candidate).toContainText('達成済みを表示');
+  await expect(candidate).toBeEnabled();
+  const before=await page.evaluate(() => hdStrategyCandidates('7-5').filter(x=>!hdStrategyCandidateReady(x,homeGuideState())).length);
+  await expect(page.locator('[data-hd-strategy-import-all="7-5"]')).toContainText(`（${before}件）`);
+  await page.locator('[data-hd-strategy-import-all="7-5"]').click();
+  expect(await page.evaluate(() => homeGuideState().custom.some(x=>x.map==='7-5'&&x.ref==='B175-7-3'))).toBe(false);
+  await candidate.click();
+  await page.locator('[data-group=quest] summary').click();
+  const task=page.locator('[data-group=quest] .home-guide-step').filter({hasText:'B175：7-3 第2ボス/P S勝利'}).locator('[data-home-guide-toggle]');
+  await expect(task).toHaveAttribute('aria-pressed','true');
+  await task.click();
+  await page.locator('#homeGuideMapSelect').selectOption('7-4');
+  await expect(task).toHaveAttribute('aria-pressed','false');
+});
+
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {
   await openApp(page);
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible();
