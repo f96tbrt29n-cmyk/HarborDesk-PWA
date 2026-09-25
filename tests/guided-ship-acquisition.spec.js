@@ -86,7 +86,8 @@ test('strategy integration: navigator imports goals once and preserves them on r
   const first=await page.evaluate(() => homeGuideState().custom.filter(x=>x.map==='6-5').map(x=>x.sourceKey));
   expect(first).toContain('6-5:oneTimeQuest:F43');
   expect(new Set(first).size).toBe(first.length);
-  await page.locator('[data-hd-strategy-import-all="6-5"]').click();
+  await expect(page.locator('[data-hd-strategy-import-all="6-5"]')).toBeDisabled();
+  await page.evaluate(() => hdStrategyImportMap('6-5'));
   const second=await page.evaluate(() => homeGuideState().custom.filter(x=>x.map==='6-5').map(x=>x.sourceKey));
   expect(second).toEqual(first);
   await page.reload({ waitUntil: 'domcontentloaded' });
@@ -118,6 +119,32 @@ test('strategy integration: equipment counts and ship levels refresh imported go
   await expect(page.locator('[data-group=level] .home-guide-live-state.ready')).toContainText('Lv目標達成');
   const gear=await page.evaluate(() => hdStrategyGearRows('3-2').find(x=>x.target==='22号対水上電探'));
   expect(gear).toMatchObject({needed:2,shortfall:2});
+});
+
+test('strategy integration: verified map prerequisites skip recorded clears', async ({ page }) => {
+  await openApp(page);
+  expect(await page.evaluate(() => hdStrategyCandidates('3-2').filter(x=>x.source==='unlock').map(x=>x.ref))).toEqual(['3-1','1-5']);
+  expect(await page.evaluate(() => hdStrategyCandidates('7-5').filter(x=>x.source==='unlock').map(x=>x.ref))).toEqual(['7-4']);
+  await page.evaluate(() => {
+    const state=homeGuideState();state.cleared=['1-5'];homeGuideSave(state);hdSelectGuideMap('3-2');
+  });
+  await expect(page.locator('[data-hd-strategy-import="3-2:unlock:1-5"]')).toBeDisabled();
+  await expect(page.locator('[data-hd-strategy-import="3-2:unlock:1-5"]')).toContainText('クリア記録済み');
+  await page.locator('[data-hd-strategy-import-all="3-2"]').click();
+  const refs=await page.evaluate(() => homeGuideState().custom.filter(x=>x.map==='3-2'&&x.source==='unlock').map(x=>x.ref));
+  expect(refs).toEqual(['3-1']);
+});
+
+test('strategy integration: monthly 5-6 prerequisite is not satisfied by past clear', async ({ page }) => {
+  await openApp(page);
+  const result=await page.evaluate(() => {
+    const task=hdStrategyCandidates('5-6').find(x=>x.source==='unlock');
+    return {ref:task.ref,detail:task.detail,view:hdStrategyTaskView(task,hdStrategyCandidates('5-6'),['5-5'])};
+  });
+  expect(result.ref).toBe('5-5');
+  expect(result.detail).toContain('今月');
+  expect(result.view.ready).toBe(false);
+  expect(result.view.status).toContain('今月');
 });
 
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {
