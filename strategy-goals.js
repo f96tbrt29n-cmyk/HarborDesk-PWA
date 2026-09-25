@@ -1,8 +1,13 @@
 /* 海域攻略ナビと長期目標の接続。ゲーム内での達成は手動で確認する。 */
 const HD_STRATEGY_UNLOCKS={
  '3-2':{maps:['3-1','1-5']},
+ '3-3':{maps:['3-2','2-4']},
  '4-5':{maps:['4-4','5-1']},
  '5-6':{maps:['5-5']},
+ '6-1':{maps:['5-4']},
+ '6-2':{maps:['6-1']},
+ '6-3':{maps:['6-2']},
+ '6-4':{maps:['6-3']},
  '6-5':{maps:['6-4'],quests:['F43']},
  '7-1':{maps:['2-4']},
  '7-2':{maps:['7-1']},
@@ -130,12 +135,27 @@ function hdStrategyFingerprint(map){
 function hdStrategyCandidateReady(row,state){
  return row.source==='unlock'&&row.map!=='5-6'&&state.cleared.includes(row.ref);
 }
+function hdStrategyPendingPath(map,state){
+ const cleared=new Set(state.cleared||[]),visited=new Set(),path=[];
+ function visit(current){
+  if(visited.has(current))return;
+  visited.add(current);
+  for(const previous of HD_STRATEGY_UNLOCKS[current]?.maps||[]){
+   if(!cleared.has(previous)||current==='5-6'){
+    visit(previous);
+    if(!path.includes(previous))path.push(previous);
+   }
+  }
+ }
+ visit(map);
+ return path;
+}
 function hdStrategyPreview(map,state){
  if(!map)return '';
- const rows=hdStrategyCandidates(map),existing=new Set(state.custom.filter(x=>x.map===map).map(x=>x.sourceKey)),pending=rows.filter(x=>!existing.has(x.sourceKey)&&!hdStrategyCandidateReady(x,state)),grouped={unlock:[],nav:[],gear:[],level:[],quest:[]};
+ const rows=hdStrategyCandidates(map),existing=new Set(state.custom.filter(x=>x.map===map).map(x=>x.sourceKey)),pending=rows.filter(x=>!existing.has(x.sourceKey)&&!hdStrategyCandidateReady(x,state)),path=hdStrategyPendingPath(map,state),grouped={unlock:[],nav:[],gear:[],level:[],quest:[]};
  for(const row of rows){const group=['unlock','oneTimeQuest'].includes(row.source)?'unlock':row.source==='training'?'level':row.source==='periodicQuest'?'quest':row.source==='nav'?'nav':'gear';grouped[group].push(row)}
  const sections=[['unlock','前提海域・関連する単発任務'],['nav','保存編成との差分'],['gear','必要な装備'],['level','育成が必要な艦娘'],['quest','関連する定期任務']];
- return `<div class="hd-strategy-preview"><div class="hd-strategy-preview-head"><strong>${hdStrategyEsc(map)} の目標候補</strong><button type="button" class="primary small" data-hd-strategy-import-all="${hdStrategyEsc(map)}" ${pending.length?'':'disabled'}>未追加の目標をまとめて追加（${pending.length}件）</button></div><small>保存編成・装備台帳・育成計画と攻略情報から作成。達成はゲーム画面でも確認してください。</small>${sections.map(([id,label])=>`<details class="hd-strategy-preview-section" ${id==='unlock'||id==='nav'?'open':''}><summary>${label}<span>${grouped[id].length}件</span></summary>${grouped[id].length?grouped[id].map(x=>`<div class="hd-strategy-preview-item"><div><b>${hdStrategyEsc(x.title)}</b><small>${hdStrategyEsc(x.detail)}</small></div><button type="button" class="ghost small" data-hd-strategy-import="${hdStrategyEsc(x.sourceKey)}" ${existing.has(x.sourceKey)||hdStrategyCandidateReady(x,state)?'disabled':''}>${existing.has(x.sourceKey)?'追加済み':hdStrategyCandidateReady(x,state)?'クリア記録済み':'追加'}</button></div>`).join(''):'<p class="muted">現在の登録データから候補はありません。</p>'}</details>`).join('')}<div class="hd-strategy-preview-tools"><button type="button" class="ghost small" data-hd-strategy-procurement="${hdStrategyEsc(map)}">装備計画に不足種別を登録</button><button type="button" class="ghost small" data-home-jump="trainingPlanner">育成計画へ</button><a href="https://wikiwiki.jp/kancolle/%E4%BB%BB%E5%8B%99" target="_blank" rel="noopener">任務の前提をWikiで確認 ↗</a></div></div>`;
+ return `<div class="hd-strategy-preview"><div class="hd-strategy-preview-head"><strong>${hdStrategyEsc(map)} の目標候補</strong><button type="button" class="primary small" data-hd-strategy-import-all="${hdStrategyEsc(map)}" ${pending.length?'':'disabled'}>未追加の目標をまとめて追加（${pending.length}件）</button></div>${path.length?`<div class="hd-strategy-preview-item"><div><b>前提海域の攻略順：${hdStrategyEsc(path.join(' → '))} → ${hdStrategyEsc(map)}</b><small>${map==='5-6'?'5-5 は今月のゲージ破壊をゲーム画面で確認。':'クリア記録をもとに未攻略の前提海域を表示。'} 次は ${hdStrategyEsc(path[0])} を確認。</small></div><button type="button" class="ghost small" data-hd-strategy-next-map="${hdStrategyEsc(path[0])}">${hdStrategyEsc(path[0])} を見る →</button></div>`:''}<small>保存編成・装備台帳・育成計画と攻略情報から作成。達成はゲーム画面でも確認してください。</small>${sections.map(([id,label])=>`<details class="hd-strategy-preview-section" ${id==='unlock'||id==='nav'?'open':''}><summary>${label}<span>${grouped[id].length}件</span></summary>${grouped[id].length?grouped[id].map(x=>`<div class="hd-strategy-preview-item"><div><b>${hdStrategyEsc(x.title)}</b><small>${hdStrategyEsc(x.detail)}</small></div><button type="button" class="ghost small" data-hd-strategy-import="${hdStrategyEsc(x.sourceKey)}" ${existing.has(x.sourceKey)||hdStrategyCandidateReady(x,state)?'disabled':''}>${existing.has(x.sourceKey)?'追加済み':hdStrategyCandidateReady(x,state)?'クリア記録済み':'追加'}</button></div>`).join(''):'<p class="muted">現在の登録データから候補はありません。</p>'}</details>`).join('')}<div class="hd-strategy-preview-tools"><button type="button" class="ghost small" data-hd-strategy-procurement="${hdStrategyEsc(map)}">装備計画に不足種別を登録</button><button type="button" class="ghost small" data-home-jump="trainingPlanner">育成計画へ</button><a href="https://wikiwiki.jp/kancolle/%E4%BB%BB%E5%8B%99" target="_blank" rel="noopener">任務の前提をWikiで確認 ↗</a></div></div>`;
 }
 function hdStrategyImportMap(map,onlyKey=''){
  if(typeof homeGuideState!=='function'||typeof homeGuideSave!=='function')return 0;
@@ -149,6 +169,10 @@ function hdStrategyImportMap(map,onlyKey=''){
  return added;
 }
 document.addEventListener('click',e=>{
+ const next=e.target.closest?.('[data-hd-strategy-next-map]');if(next){
+  if(typeof hdSelectGuideMap==='function')hdSelectGuideMap(next.dataset.hdStrategyNextMap);
+  document.getElementById('homeGuideSteps')?.scrollIntoView({behavior:'smooth',block:'start'});return;
+ }
  const q=e.target.closest?.('[data-hd-strategy-open-quest]');if(q){
   const id=q.dataset.hdStrategyOpenQuest,quest=HD_QUESTS.find(x=>x.id===id);
   if(quest&&typeof hdEnsureQuestDb==='function'){

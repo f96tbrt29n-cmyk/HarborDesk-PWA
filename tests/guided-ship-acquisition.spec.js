@@ -147,6 +147,20 @@ test('strategy integration: monthly 5-6 prerequisite is not satisfied by past cl
   expect(result.view.status).toContain('今月');
 });
 
+test('strategy integration: prerequisite path leads to the first uncleared map', async ({ page }) => {
+  await openApp(page);
+  await page.locator('#homeGuideMapSelect').selectOption('6-5');
+  expect(await page.evaluate(() => hdStrategyPendingPath('6-5',{cleared:[]}))).toEqual(['5-4','6-1','6-2','6-3','6-4']);
+  await expect(page.locator('.hd-strategy-preview')).toContainText('5-4 → 6-1 → 6-2 → 6-3 → 6-4 → 6-5');
+  await page.locator('[data-hd-strategy-next-map="5-4"]').click();
+  await expect(page.locator('#homeGuideMapSelect')).toHaveValue('5-4');
+  await page.evaluate(() => {
+    const state=homeGuideState();state.cleared=['5-4','6-1'];homeGuideSave(state);hdSelectGuideMap('6-5');
+  });
+  await expect(page.locator('[data-hd-strategy-next-map="6-2"]')).toBeVisible();
+  expect(await page.evaluate(() => hdStrategyPendingPath('5-6',{cleared:['5-5']}))).toEqual(['5-5']);
+});
+
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {
   await openApp(page);
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible();
