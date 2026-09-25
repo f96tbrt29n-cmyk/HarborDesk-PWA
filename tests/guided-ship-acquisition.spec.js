@@ -177,6 +177,26 @@ test('strategy integration: bulk goals include the prerequisite chain without re
   expect(await page.evaluate(() => homeGuideState().custom.filter(x=>x.map==='6-5'&&x.source==='unlock').map(x=>x.ref))).toEqual(imported);
 });
 
+test('strategy integration: prerequisite checkbox and cleared map share one completion state', async ({ page }) => {
+  await openApp(page);
+  await page.locator('#homeGuideMapSelect').selectOption('6-5');
+  await page.locator('[data-hd-strategy-import-all="6-5"]').click();
+  const unlock=page.locator('[data-group="map"] .home-guide-step').filter({hasText:'6-4 のクリアを確認'}).locator('[data-home-guide-toggle]');
+  await expect(unlock).toHaveAttribute('aria-pressed','false');
+  await unlock.click();
+  expect(await page.evaluate(() => homeGuideState().cleared.includes('6-4'))).toBe(true);
+  await expect(unlock).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('.hd-strategy-preview')).not.toContainText('6-4 → 6-5');
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, {timeout:30000});
+  await expect(unlock).toHaveAttribute('aria-pressed','true');
+  await page.locator('#homeGuideMapSelect').selectOption('6-4');
+  await page.locator('[data-home-guide-clear]').click();
+  await page.locator('#homeGuideMapSelect').selectOption('6-5');
+  await expect(unlock).toHaveAttribute('aria-pressed','false');
+  expect(await page.evaluate(() => homeGuideState().cleared.includes('6-4'))).toBe(false);
+});
+
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {
   await openApp(page);
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible();
