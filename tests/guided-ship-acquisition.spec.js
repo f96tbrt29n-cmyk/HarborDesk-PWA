@@ -124,7 +124,7 @@ test('strategy integration: equipment counts and ship levels refresh imported go
 test('strategy integration: verified map prerequisites skip recorded clears', async ({ page }) => {
   await openApp(page);
   expect(await page.evaluate(() => hdStrategyCandidates('3-2').filter(x=>x.source==='unlock').map(x=>x.ref))).toEqual(['3-1','1-5']);
-  expect(await page.evaluate(() => hdStrategyCandidates('7-5').filter(x=>x.source==='unlock').map(x=>x.ref))).toEqual(['7-4']);
+  expect(await page.evaluate(() => hdStrategyCandidates('7-5').filter(x=>x.source==='unlock').map(x=>x.ref))).toEqual(['2-4','7-1','7-2','7-3','7-4']);
   await page.evaluate(() => {
     const state=homeGuideState();state.cleared=['1-5'];homeGuideSave(state);hdSelectGuideMap('3-2');
   });
@@ -159,6 +159,22 @@ test('strategy integration: prerequisite path leads to the first uncleared map',
   });
   await expect(page.locator('[data-hd-strategy-next-map="6-2"]')).toBeVisible();
   expect(await page.evaluate(() => hdStrategyPendingPath('5-6',{cleared:['5-5']}))).toEqual(['5-5']);
+});
+
+test('strategy integration: bulk goals include the prerequisite chain without recorded clears', async ({ page }) => {
+  await openApp(page);
+  const chain=await page.evaluate(() => hdStrategyCandidates('6-5').filter(x=>x.source==='unlock').map(x=>x.ref));
+  expect(chain).toEqual(['5-4','6-1','6-2','6-3','6-4']);
+  await page.evaluate(() => {
+    const state=homeGuideState();state.cleared=['5-4'];homeGuideSave(state);hdSelectGuideMap('6-5');
+  });
+  await expect(page.locator('[data-hd-strategy-import="6-5:unlock:5-4"]')).toBeDisabled();
+  await page.locator('[data-hd-strategy-import-all="6-5"]').click();
+  const imported=await page.evaluate(() => homeGuideState().custom.filter(x=>x.map==='6-5'&&x.source==='unlock').map(x=>x.ref));
+  expect(imported).toEqual(['6-1','6-2','6-3','6-4']);
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
+  expect(await page.evaluate(() => homeGuideState().custom.filter(x=>x.map==='6-5'&&x.source==='unlock').map(x=>x.ref))).toEqual(imported);
 });
 
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {

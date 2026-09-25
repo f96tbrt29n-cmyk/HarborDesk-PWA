@@ -59,11 +59,23 @@ function hdStrategyQuestProgress(q){
   return `${count}/${goals.length} 条件達成（任務の受領・報酬はゲームで確認）`;
  }catch{return '進捗を任務画面で確認'}
 }
+function hdStrategyPrerequisiteMaps(map){
+ const seen=new Set([map]),rows=[];
+ function visit(current){
+  for(const previous of HD_STRATEGY_UNLOCKS[current]?.maps||[]){
+   if(seen.has(previous))continue;
+   seen.add(previous);visit(previous);
+   rows.push({map:previous,direct:current===map});
+  }
+ }
+ visit(map);
+ return rows;
+}
 function hdStrategyCandidates(map){
  if(!map)return [];
  const rows=[],add=x=>{if(!rows.some(r=>r.sourceKey===x.sourceKey))rows.push(x)};
  const unlock=HD_STRATEGY_UNLOCKS[map];
- for(const previous of unlock?.maps||[])add(hdStrategyCandidate(map,'map','unlock',previous,`${previous} のクリアを確認`,map==='5-6'?'5-6 の出撃には今月の 5-5 ゲージ破壊が必要。クリア記録とは別にゲーム画面で確認。':`${map} の開放に関わる海域。クリア状態は手動記録。`,{dependsOn:previous}));
+ for(const {map:previous,direct} of hdStrategyPrerequisiteMaps(map))add(hdStrategyCandidate(map,'map','unlock',previous,`${previous} のクリアを確認`,map==='5-6'&&direct?'5-6 の出撃には今月の 5-5 ゲージ破壊が必要。クリア記録とは別にゲーム画面で確認。':direct?`${map} の開放に関わる海域。クリア状態は手動記録。`:`${map} の攻略に向けて先に進める海域。クリア状態は手動記録。`,{dependsOn:previous}));
  for(const id of new Set([...(unlock?.quests||[]),...Object.keys(HD_STRATEGY_UNLOCK_QUESTS).filter(k=>HD_STRATEGY_UNLOCK_QUESTS[k].maps.test(map))])){
   const q=HD_STRATEGY_UNLOCK_QUESTS[id];add(hdStrategyCandidate(map,'quest','oneTimeQuest',id,`${q.name}を確認`,`${q.needs}。完了はゲーム画面で確認。`,{prereq:q.needs,sourceUrl:q.url}));
  }
