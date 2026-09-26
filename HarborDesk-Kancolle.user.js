@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HarborDesk 艦これ連携
 // @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
-// @version      1.0.17
+// @version      1.0.18
 // @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
 // @match        http://*.dmm.com/*
 // @match        https://*.dmm.com/*
@@ -21,7 +21,7 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.17';
+const HD_VERSION='1.0.18';
 const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/';
 const HARBOR_ORIGIN=new URL(HARBOR_URL).origin;
 const BRIDGE_IMPORT_MESSAGE='harbordesk-kancolle-import';
@@ -299,7 +299,7 @@ function ensurePanel(){
       '<div style="margin:6px 0;color:#aac0d1"><b data-hd-status style="color:#9fe0b7">通信待機中</b><br>取得 <b data-hd-count>0</b>件 / 検出フレーム <b data-hd-frames>0</b><br><small>母港・装備・任務などを開くと自動で取得するよ。</small></div>'+
       '<div data-hd-coverage style="display:flex;gap:4px;flex-wrap:wrap;margin:7px 0 7px"></div>'+
       '<div data-hd-next-hint style="margin:0 0 9px;padding:7px 8px;border-radius:9px;background:rgba(255,255,255,.05);color:#d8e8f5;font-size:11px"></div>'+
-      '<div style="display:flex;gap:6px;flex-wrap:wrap"><button data-hd-send style="font-weight:700">HarborDeskへ送る</button><button data-hd-resend hidden>前回の送信をやり直す</button><button data-hd-copy>JSONをコピー</button><button data-hd-clear>クリア</button></div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap"><button data-hd-home-send style="font-weight:700">ホーム画面へ送る</button><button data-hd-send>Safari版へ送る</button><button data-hd-resend hidden>前回の送信をやり直す</button><button data-hd-copy>JSONをコピー</button><button data-hd-clear>クリア</button></div>'+
       '<div style="margin-top:7px;color:#7f9aae"><small>api_token・Cookie・DMMログイン情報・リクエスト本文は保存しません。</small></div>'+
     '</div>';
   document.documentElement.appendChild(panel);
@@ -317,6 +317,7 @@ function ensurePanel(){
   panel.querySelector('[data-hd-clear]').onclick=()=>{clearCapture();render()};
   panel.querySelector('[data-hd-copy]').onclick=copy;
   panel.querySelector('[data-hd-send]').onclick=()=>send();
+  panel.querySelector('[data-hd-home-send]').onclick=()=>sendHome();
   panel.querySelector('[data-hd-resend]').onclick=()=>send(records.slice());
   let savedMinimized=false;try{savedMinimized=localStorage.getItem(HD_PANEL_MIN_KEY)==='1'}catch{}
   setMinimized(savedMinimized,false);
@@ -345,7 +346,8 @@ function render(){
   if(frameEl)frameEl.textContent=String(frameHits);
   if(coverageEl)coverageEl.innerHTML=coverageHtml();
   if(hintEl){hintEl.textContent=count?(resumed?'前回の未送信データを引き継いだよ。'+(stale?'古い取得内容なので、送る前に母港と装備を開き直すと安心。':''):'')+nextCaptureHint(c):legacyCapture?'旧版で取得したデータが残っているよ。内容を確かめてから送るか、母港と装備を開き直してね':lastSentAt?'前回のデータは送信済み。新しい同期には母港と装備を開いてね':'まず母港と装備画面を開いて、同期するデータを取得してね';hintEl.style.color=ledger?'#bcefd0':'#f0d590'}
-  if(sendEl){sendEl.disabled=!ledger;sendEl.textContent=ledger?'台帳をHarborDeskへ同期（'+count+'件）':'台帳データ待ち';sendEl.style.opacity=ledger?'1':'.55'}
+  if(sendEl){sendEl.disabled=!ledger;sendEl.textContent=ledger?'Safari版へ送る（'+count+'件）':'台帳データ待ち';sendEl.style.opacity=ledger?'1':'.55'}
+  const homeSend=panel?.querySelector('[data-hd-home-send]');if(homeSend){homeSend.disabled=!ledger;homeSend.style.opacity=ledger?'1':'.55'}
   if(statusEl){
     statusEl.textContent=count?(ledger?(core?'台帳＋基本データ取得済み':'台帳同期準備OK'):'台帳データ取得中'):'通信待機中';
     statusEl.style.color=ledger?'#9fe0b7':'#f0d590';
@@ -362,6 +364,20 @@ async function copy(){
     alert('HarborDesk用JSONをコピーしたよ');
   }catch{
     prompt('このJSONをコピーしてHarborDeskへ貼り付けてね',text);
+  }
+}
+async function sendHome(rows=currentRecords()){
+  if(!ledgerReady(captureCoverage(rows))){alert('ホーム画面へ送るには、ゲーム内で母港と装備を開いてね。');return false}
+  try{
+    // Keep this as the first asynchronous operation inside the tap handler: WebKit requires a user gesture.
+    await navigator.clipboard.writeText(JSON.stringify(exportObject(rows)));
+    if(statusEl)statusEl.textContent='ホーム画面版への受け渡し準備OK';
+    alert('ホーム画面のHarborDeskアイコンを開いて、上部の「同期を受け取る」を押してね。JSONの操作はいらないよ。');
+    return true;
+  }catch(err){
+    if(statusEl)statusEl.textContent='受け渡しに失敗';
+    alert('iPhoneのコピー機能を使えなかったよ。もう一度押してみてね。'+String(err?.message||''));
+    return false;
   }
 }
 function bytesToBase64Url(bytes){
@@ -428,7 +444,8 @@ window.__HARBORDESK_KANCOLLE_USERSCRIPT__={
   setMinimized,
   isMinimized:()=>minimized,
   show,
-  send
+  send,
+  sendHome
 };
 
 restoreCapture();
