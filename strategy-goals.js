@@ -206,7 +206,7 @@ function hdStrategyFocusRows(map,state,rows=hdStrategyCandidates(map)){
 function hdStrategyFocusHtml(map,state,rows){
  const focus=hdStrategyFocusRows(map,state,rows);
  if(!focus.length)return '';
- return `<div class="hd-strategy-focus"><strong>次に進める準備</strong><small>未完了の任務・編成・装備・育成から表示。達成状況はゲーム画面でも確認してください。</small>${focus.map(({row,existing})=>`<div class="hd-strategy-preview-item"><div><b>${hdStrategyEsc(row.title)}</b><small>${hdStrategyEsc(row.detail)}</small></div><button type="button" class="ghost small" ${existing?`data-hd-strategy-focus-group="${hdStrategyEsc(row.category)}"`:`data-hd-strategy-import="${hdStrategyEsc(row.sourceKey)}"`}>${existing?'リストで見る':'目標に追加'}</button></div>`).join('')}</div>`;
+ return `<div class="hd-strategy-focus"><strong>次に進める準備</strong><small>未完了の任務・編成・装備・育成から表示。達成状況はゲーム画面でも確認してください。</small>${focus.map(({row,existing})=>`<div class="hd-strategy-preview-item"><div><b>${hdStrategyEsc(row.title)}</b><small>${hdStrategyEsc(row.detail)}</small></div><button type="button" class="ghost small" ${existing?`data-hd-strategy-focus-group="${hdStrategyEsc(row.category)}" data-hd-strategy-focus-key="${hdStrategyEsc(row.sourceKey)}"`:`data-hd-strategy-import="${hdStrategyEsc(row.sourceKey)}"`}>${existing?'リストで見る':'目標に追加'}</button></div>`).join('')}</div>`;
 }
 function hdStrategyPreview(map,state){
  if(!map)return '';
@@ -265,7 +265,15 @@ document.addEventListener('click',e=>{
  }
  const focus=e.target.closest?.('[data-hd-strategy-focus-group]');if(focus){
   const group=[...document.querySelectorAll('#homeGuideSteps details.home-guide-group')].find(x=>x.dataset.group===focus.dataset.hdStrategyFocusGroup);
-  if(group){group.open=true;group.scrollIntoView({behavior:'smooth',block:'start'})}return;
+  if(group){
+   group.open=true;
+   const task=homeGuideState().custom.find(x=>x.sourceKey===focus.dataset.hdStrategyFocusKey);
+   const key=task&&typeof homeGuideGoalKey==='function'?homeGuideGoalKey(task):'';
+   const button=[...group.querySelectorAll('[data-home-guide-toggle]')].find(x=>x.dataset.homeGuideToggle===key);
+   const row=button?.closest('.home-guide-step');
+   if(row){row.classList.add('hd-strategy-target');row.setAttribute('tabindex','-1');row.scrollIntoView({behavior:'smooth',block:'center'});row.focus({preventScroll:true});setTimeout(()=>row.classList.remove('hd-strategy-target'),3000)}
+   else group.scrollIntoView({behavior:'smooth',block:'start'});
+  }return;
  }
  const one=e.target.closest?.('[data-hd-strategy-import]'),all=e.target.closest?.('[data-hd-strategy-import-all]'),nav=e.target.closest?.('[data-hd-msn-to-todo]');
  if(one||all||nav){const map=nav?.dataset.hdMsnToTodo||all?.dataset.hdStrategyImportAll||homeGuideActiveMap();
