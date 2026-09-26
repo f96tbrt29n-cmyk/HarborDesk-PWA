@@ -9829,20 +9829,20 @@ test('release smoke: diagnostics center runtime stylesheet is loaded', async ({ 
   await page.waitForSelector('#diagnosticsCenter .hd-dx-note', { state: 'attached' });
   const data = await page.evaluate(() => {
     const link=document.querySelector('link[data-hd-diagnostics-center]');
-    const note=document.querySelector('#diagnosticsCenter .hd-dx-note');
-    const style=note?getComputedStyle(note):null;
+    let cssText='';
+    try{cssText=[...(link?.sheet?.cssRules||[])].map(rule=>rule.cssText||'').join('\n')}catch{}
     return {
       href:link?.getAttribute('href')||'',
       loaded:link?.dataset.hdLoaded||'',
-      noteFont:style?.fontSize||'',
-      noteLine:style?.lineHeight||''
+      cssText
     };
   });
 
   expect(data.href).toContain('diagnostics-center.css?v=487');
   expect(data.loaded).toBe('1');
-  expect(data.noteFont).not.toBe('');
-  expect(data.noteLine).not.toBe('');
+  expect(data.cssText).toContain('.hd-dx-note');
+  expect(data.cssText).toContain('font-size');
+  expect(data.cssText).toContain('line-height');
   expect(errors).toEqual([]);
 });
 
