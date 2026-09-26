@@ -10009,3 +10009,32 @@ test('release smoke: map strategy navigator connects route examples and saved fl
   await expect(page.locator('#hdMapStrategyMap')).toHaveValue('3-2');
   expect(errors).toEqual([]);
 });
+
+
+test('release smoke: game sync freshness follows the latest successful sync marker', async ({ page }) => {
+  await boot(page);
+  const result = await page.evaluate(() => {
+    const staleAt = Date.now() - 3 * 86400000;
+    const freshAt = Date.now();
+    localStorage.setItem('harbordesk-kancolle-sync-v1', JSON.stringify({
+      syncedAt: staleAt,
+      ships: 10,
+      equipment: 20,
+      decks: 4,
+      coverage: { ships: true, equipment: true, resources: true, fleets: true, quests: true, docks: true }
+    }));
+    localStorage.setItem('harbordesk-kancolle-last-success-at-v1', String(freshAt));
+    const ws = window.hdWSSyncInfo?.();
+    const home = window.homeSyncInfo?.();
+    const personal = window.hdPHSyncInfo?.();
+    const core = window.hdKcSyncSuccessAt?.();
+    return { ws, home, personal, core, freshAt };
+  });
+
+  expect(result.core).toBe(result.freshAt);
+  expect(result.ws?.label).toBe('たった今');
+  expect(result.home?.label).toBe('たった今');
+  expect(result.personal?.label).toBe('たった今');
+  expect(result.ws?.state).toBe('fresh');
+  expect(result.home?.state).toBe('ok');
+});
