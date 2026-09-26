@@ -368,6 +368,28 @@ test('strategy integration: completed shared tasks stay out of bulk imports but 
   await expect(task).toHaveAttribute('aria-pressed','false');
 });
 
+test('strategy integration: next preparation advances through prerequisite missions', async ({ page }) => {
+  await openApp(page);
+  await page.locator('#homeGuideMapSelect').selectOption('6-5');
+  const focus=page.locator('.hd-strategy-focus');
+  await expect(focus).toContainText('「航空基地設営」事前準備');
+  const first=focus.locator('.hd-strategy-preview-item').filter({hasText:'「航空基地設営」事前準備'});
+  await first.locator('[data-hd-strategy-import]').click();
+  await expect(first.locator('[data-hd-strategy-focus-group="quest"]')).toContainText('リストで見る');
+  await first.locator('[data-hd-strategy-focus-group="quest"]').click();
+  await expect(page.locator('[data-group=quest]')).toHaveJSProperty('open',true);
+  const task=page.locator('[data-group=quest] .home-guide-step').filter({hasText:'「航空基地設営」事前準備'});
+  await task.locator('[data-home-guide-toggle]').click();
+  await expect(focus).not.toContainText('「航空基地設営」事前準備');
+  await expect(focus).toContainText('水雷戦隊、南西諸島海域を哨戒せよ！');
+  await page.evaluate(() => {
+    const state=homeGuideState();
+    state.done.push(homeGuideGoalKey(hdStrategyCandidates('6-5').find(x=>x.ref==='B77')));
+    homeGuideSave(state);
+  });
+  await expect(focus).toContainText('「陸攻」隊の増勢');
+});
+
 test('ship database: acquisition shows sourced drops and exact construction recipes', async ({ page }) => {
   await openApp(page);
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible();
