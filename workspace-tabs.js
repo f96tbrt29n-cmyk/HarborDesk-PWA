@@ -241,8 +241,10 @@ function hdWSEnsureSwipeHint(){
 }
 function hdWSSyncInfo(){
  const sync=hdWSJson('harbordesk-kancolle-sync-v1',null);
- if(!sync?.syncedAt)return {sync:null,state:'missing',label:'未同期',shortLabel:'未同期',detail:'ゲームデータ未同期',missing:[]};
- const age=Math.max(0,Date.now()-Number(sync.syncedAt||0));
+ let marker=0;try{marker=Math.max(0,Number(localStorage.getItem('harbordesk-kancolle-last-success-at-v1'))||0)}catch{}
+ const syncedAt=typeof hdKcSyncSuccessAt==='function'?hdKcSyncSuccessAt(sync):Math.max(marker,Math.max(0,Number(sync?.lastSuccessAt)||0),Math.max(0,Number(sync?.syncedAt)||0));
+ if(!sync||!syncedAt)return {sync:null,state:'missing',label:'未同期',shortLabel:'未同期',detail:'ゲームデータ未同期',missing:[]};
+ const age=Math.max(0,Date.now()-syncedAt);
  let ageLabel='たった今';
  if(age>=86400000)ageLabel=Math.floor(age/86400000)+'日前';
  else if(age>=3600000)ageLabel=Math.floor(age/3600000)+'時間前';
