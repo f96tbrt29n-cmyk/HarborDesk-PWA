@@ -379,6 +379,8 @@ test('strategy integration: next preparation advances through prerequisite missi
   await first.locator('[data-hd-strategy-focus-group="quest"]').click();
   await expect(page.locator('[data-group=quest]')).toHaveJSProperty('open',true);
   const task=page.locator('[data-group=quest] .home-guide-step').filter({hasText:'「航空基地設営」事前準備'});
+  await expect(task).toHaveClass(/hd-strategy-target/);
+  await expect(task).toBeFocused();
   await task.locator('[data-home-guide-toggle]').click();
   await expect(focus).not.toContainText('「航空基地設営」事前準備');
   await expect(focus).toContainText('水雷戦隊、南西諸島海域を哨戒せよ！');
