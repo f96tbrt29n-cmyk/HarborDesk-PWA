@@ -368,6 +368,20 @@ test('strategy integration: completed shared tasks stay out of bulk imports but 
   await expect(task).toHaveAttribute('aria-pressed','false');
 });
 
+test('strategy integration: prerequisite map preparation comes first', async ({ page }) => {
+  await openApp(page);
+  await page.locator('#homeGuideMapSelect').selectOption('6-5');
+  const firstMap=await page.evaluate(() => hdStrategyPendingPath('6-5',homeGuideState())[0]);
+  const title=await page.evaluate(map => hdStrategyFocusRows(map,homeGuideState())[0]?.row.title,firstMap);
+  expect(firstMap).toBeTruthy();
+  expect(title).toBeTruthy();
+  await expect(page.locator('.hd-strategy-preview')).toContainText(`まず ${firstMap} の準備：${title}`);
+  await expect(page.locator('.hd-strategy-focus strong')).toContainText('6-5 向けに並行して進める準備');
+  await page.locator(`[data-hd-strategy-next-map="${firstMap}"]`).click();
+  await expect(page.locator('#homeGuideMapSelect')).toHaveValue(firstMap);
+  await expect(page.locator('.hd-strategy-focus')).toContainText(title);
+});
+
 test('strategy integration: next preparation advances through prerequisite missions', async ({ page }) => {
   await openApp(page);
   await page.locator('#homeGuideMapSelect').selectOption('6-5');
