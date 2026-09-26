@@ -33,6 +33,27 @@ test('strategy goals: categories, custom goals and completion survive reload', a
   await expect(page.locator('#homeGuideCount')).toContainText('目標 0/');
 });
 
+test('strategy goals: unfinished filter keeps counts and can restore completed items', async ({ page }) => {
+  await openApp(page);
+  const map=page.locator('[data-group="map"]');
+  const goal=map.locator('.home-guide-step').filter({hasText:'開放条件とルート分岐を確認'});
+  await goal.locator('[data-home-guide-toggle]').click();
+  await expect(page.locator('#homeGuideCount')).toContainText('目標 1/');
+  const filter=page.locator('[data-home-guide-pending]');
+  await filter.click();
+  await expect(filter).toHaveAttribute('aria-pressed','true');
+  await expect(goal).toHaveCount(0);
+  await expect(page.locator('#homeGuideCount')).toContainText('目標 1/');
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, {timeout:30000});
+  await expect(filter).toHaveAttribute('aria-pressed','true');
+  await expect(goal).toHaveCount(0);
+  await filter.click();
+  await expect(goal).toBeVisible();
+  await goal.locator('[data-home-guide-toggle]').click();
+  await expect(page.locator('#homeGuideCount')).toContainText('目標 0/');
+});
+
 test('strategy goals: per-map progress and cleared maps remain separate', async ({ page }) => {
   await openApp(page);
   await page.locator('#homeGuideMapSelect').selectOption('2-4');
