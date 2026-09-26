@@ -223,8 +223,10 @@ function hdPHSyncInfo(){
  try{
   if(typeof hdWSSyncInfo==='function')return hdWSSyncInfo();
   const raw=JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null');
-  if(!raw?.syncedAt)return {state:'missing',label:'未同期',shortLabel:'未同期',detail:'ゲームデータ未同期'};
-  const age=Math.max(0,Date.now()-Number(raw.syncedAt||0));let label='たった今';
+  let marker=0;try{marker=Math.max(0,Number(localStorage.getItem('harbordesk-kancolle-last-success-at-v1'))||0)}catch{}
+  const syncedAt=typeof hdKcSyncSuccessAt==='function'?hdKcSyncSuccessAt(raw):Math.max(marker,Math.max(0,Number(raw?.lastSuccessAt)||0),Math.max(0,Number(raw?.syncedAt)||0));
+  if(!raw||!syncedAt)return {state:'missing',label:'未同期',shortLabel:'未同期',detail:'ゲームデータ未同期'};
+  const age=Math.max(0,Date.now()-syncedAt);let label='たった今';
   if(age>=86400000)label=Math.floor(age/86400000)+'日前';else if(age>=3600000)label=Math.floor(age/3600000)+'時間前';else if(age>=60000)label=Math.floor(age/60000)+'分前';
   return {state:age>21600000?'stale':'fresh',label,shortLabel:label,detail:'ゲーム同期'};
  }catch{return {state:'missing',label:'未同期',shortLabel:'未同期',detail:'ゲームデータ未同期'}}
