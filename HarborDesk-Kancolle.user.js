@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HarborDesk 艦これ連携
 // @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
-// @version      1.0.15
+// @version      1.0.16
 // @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
 // @match        http://*.dmm.com/*
 // @match        https://*.dmm.com/*
@@ -21,7 +21,7 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.15';
+const HD_VERSION='1.0.16';
 const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/';
 const HARBOR_ORIGIN=new URL(HARBOR_URL).origin;
 const BRIDGE_IMPORT_MESSAGE='harbordesk-kancolle-import';
@@ -187,6 +187,9 @@ try{
 
 const records=[];
 const signatures=new Set();
+// A restored capture is useful for diagnostics, but must never pass as a new sync.
+const sessionStartedAt=Date.now();
+const currentRecords=()=>records.filter(row=>Number(row.at)>=sessionStartedAt);
 const captureId='kc-userscript-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
 let panel,countEl,statusEl,frameEl,coverageEl,hintEl,sendEl,miniCountEl,minimizeEl,panelBodyEl;
 let frameHits=0,minimized=false;
@@ -220,7 +223,7 @@ function clearCapture(){
 }
 
 function captureCoverage(){
-  const endpoints=records.map(x=>String(x.endpoint||''));
+  const endpoints=currentRecords().map(x=>String(x.endpoint||''));
   const has=re=>endpoints.some(x=>re.test(x));
   return {
     port:has(/api_port\/port|api_get_member\/ship2/),
@@ -253,10 +256,14 @@ function signature(r){
 }
 function receiveRecord(r){
   if(!r||r.type!==RECORD_MESSAGE||!wanted(r.endpoint))return;
-  const endpoint=String(r.endpoint||''),row={endpoint,payload:r.payload,at:Number(r.at)||Date.now()},sig=signature(row);
-  if(signatures.has(sig))return;
+  const endpoint=String(r.endpoint||''),row={endpoint,payload:r.payload,at:Date.now()},sig=signature(row);
   if(latestSnapshotEndpoint(endpoint)){
     for(let i=records.length-1;i>=0;i--)if(String(records[i]?.endpoint||'')===endpoint)records.splice(i,1);
+    rebuildSignatures();
+  }
+  if(signatures.has(sig)){
+    if(records.some(x=>signature(x)===sig&&Number(x.at)>=sessionStartedAt))return;
+    for(let i=records.length-1;i>=0;i--)if(signature(records[i])===sig)records.splice(i,1);
     rebuildSignatures();
   }
   signatures.add(sig);records.push(row);
@@ -273,7 +280,7 @@ function exportObject(){
     userscriptVersion:HD_VERSION,
     captureId,
     createdAt:new Date().toISOString(),
-    records:records.map(x=>({endpoint:x.endpoint,payload:x.payload,at:x.at}))
+    records:currentRecords().map(x=>({endpoint:x.endpoint,payload:x.payload,at:x.at}))
   };
 }
 function isGameShell(){
@@ -324,15 +331,15 @@ function setMinimized(next,persist=true){
   render();return minimized;
 }
 function render(){
-  const c=captureCoverage(),ledger=ledgerReady(c),core=ledger&&c.quests;
-  if(countEl)countEl.textContent=String(records.length);
-  if(miniCountEl){miniCountEl.textContent=records.length+(ledger?'件 ✓':'件');miniCountEl.style.color=ledger?'#9fe0b7':'#f0d590'}
+  const c=captureCoverage(),ledger=ledgerReady(c),core=ledger&&c.quests,count=currentRecords().length;
+  if(countEl)countEl.textContent=String(count);
+  if(miniCountEl){miniCountEl.textContent=count+(ledger?'件 ✓':'件');miniCountEl.style.color=ledger?'#9fe0b7':'#f0d590'}
   if(frameEl)frameEl.textContent=String(frameHits);
   if(coverageEl)coverageEl.innerHTML=coverageHtml();
-  if(hintEl){hintEl.textContent=records.length?nextCaptureHint(c):'まず母港と装備画面を開いて、艦隊台帳・装備台帳の同期材料を揃えてね';hintEl.style.color=ledger?'#bcefd0':'#f0d590'}
-  if(sendEl){sendEl.disabled=!ledger;sendEl.textContent=ledger?'台帳をHarborDeskへ同期（'+records.length+'件）':'台帳データ待ち';sendEl.style.opacity=ledger?'1':'.55'}
+  if(hintEl){hintEl.textContent=count?nextCaptureHint(c):'今回の起動後に母港と装備画面を開いてね。前回の取得分は送らないよ';hintEl.style.color=ledger?'#bcefd0':'#f0d590'}
+  if(sendEl){sendEl.disabled=!ledger;sendEl.textContent=ledger?'台帳をHarborDeskへ同期（'+count+'件）':'台帳データ待ち';sendEl.style.opacity=ledger?'1':'.55'}
   if(statusEl){
-    statusEl.textContent=records.length?(ledger?(core?'台帳＋基本データ取得済み':'台帳同期準備OK'):'台帳データ取得中'):'通信待機中';
+    statusEl.textContent=count?(ledger?(core?'台帳＋基本データ取得済み':'台帳同期準備OK'):'台帳データ取得中'):'通信待機中';
     statusEl.style.color=ledger?'#9fe0b7':'#f0d590';
   }
 }
@@ -367,7 +374,7 @@ async function encodeHandoff(value){
 }
 async function send(){
   const c=captureCoverage();
-  if(!records.length){
+  if(!currentRecords().length){
     alert('まだ取得データがないよ。まず母港と装備画面を開いてね。');
     return;
   }

@@ -1,6 +1,6 @@
 const HD_KC_SYNC_KEY='harbordesk-kancolle-sync-v1';
 const HD_KC_LAST_SUCCESS_AT_KEY='harbordesk-kancolle-last-success-at-v1';
-const HD_KC_USERSCRIPT_VERSION='1.0.15';
+const HD_KC_USERSCRIPT_VERSION='1.0.16';
 const HD_KC_FLEETS_KEY='harbordesk-kancolle-fleets-v1';
 const HD_KC_MATERIALS_KEY='harbordesk-kancolle-materials-v1';
 const HD_KC_BRIDGE_IMPORT_MESSAGE='harbordesk-kancolle-import';
@@ -84,10 +84,10 @@ function hdKcImportAdd(out,hint,payload,meta={}){
   else if('api_ship_id' in first){for(const x of data)if(Number(x?.api_id)>0&&Number(x?.api_ship_id)>0)out.ships.set(Number(x.api_id),x)}
   else if('api_value' in first){for(const x of data)if(Number(x?.api_id)>0)out.materials.set(Number(x.api_id),x)}
  }
- if(/api_port\/port/.test(h)||/api_get_member\/ship2/.test(h)||(!h&&shipRows&&deckRows))out.completeShips=true;
- if(/api_port\/port/.test(h)||(/api_get_member\/ship2/.test(h)&&deckRows))out.completeDecks=true;
- if(/api_port\/port/.test(h)||/api_get_member\/ndock/.test(h))out.completeNdocks=true;
- if(/api_get_member\/(?:slot_item|slotitem)/.test(h)||(/require_info/.test(h)&&slotRows))out.completeSlotItems=true;
+ if(fullShips&&shipRows)out.completeShips=true;
+ if(fullDecks&&deckRows)out.completeDecks=true;
+ if(fullDocks&&(dockRows||Array.isArray(data)))out.completeNdocks=true;
+ if(fullSlotItems&&(slotRows||Array.isArray(data)))out.completeSlotItems=true;
  if(Array.isArray(data)&&data.length&&'api_slotitem_id' in (data.find(Boolean)||{})&&!h)out.completeSlotItems=true;
  if(Array.isArray(data)&&data.length&&'api_ship_id' in (data.find(Boolean)||{})&&!h)out.completeShips=true;
 }
@@ -106,7 +106,7 @@ function hdKcParseImport(raw){
   }
   if(!matched)hdKcImportAdd(out,'',root);
  }else hdKcImportAdd(out,'',root);
- if(!out.ships.size&&!out.slotItems.size&&!out.materials.size&&!out.decks.size&&!out.ndocks.size&&!out.quests.size&&!out.sortieEvents.length)throw new Error('艦娘・装備・資源・艦隊・入渠・任務・出撃データを見つけられませんでした');
+ if(!out.sources.size||(!out.ships.size&&!out.slotItems.size&&!out.materials.size&&!out.decks.size&&!out.ndocks.size&&!out.quests.size&&!out.sortieEvents.some(e=>!/api_port\/port/.test(e.endpoint))&&!out.completeShips&&!out.completeSlotItems&&!out.completeDecks&&!out.completeNdocks&&!out.completeQuests))throw new Error('艦娘・装備・資源・艦隊・入渠・任務・出撃データを見つけられませんでした');
  return out;
 }
 function hdKcPreviewData(parsed){
@@ -179,10 +179,10 @@ function hdKcMergeRoster(parsed){
   const normalSlotIds=[...(Array.isArray(ship.api_slot)?ship.api_slot:[])],gameGearSlots=normalSlotIds.map(id=>{const item=Number(id)>0?parsed.slotItems.get(Number(id)):null;return item?hdKcEquipLabel(item,equipMap):''}),expansionItem=Number(ship.api_slot_ex)>0?parsed.slotItems.get(Number(ship.api_slot_ex)):null,gameGearExpansion=expansionItem?hdKcEquipLabel(expansionItem,equipMap):'',labels=[...gameGearSlots.filter(Boolean),gameGearExpansion].filter(Boolean);
   next.push({...old,
    id:old.id||`kc-ship-${gameId}`,name:String(master?.name||old.name||`艦娘ID ${masterId||'?'}`),masterId,type:String(master?.type||old.type||'未解決'),level:Number(ship.api_lv)||0,
-   gear:parsed.slotItems.size?labels.join(' / '):(old.gear||''),gameGearSlots:parsed.slotItems.size?gameGearSlots:(Array.isArray(old.gameGearSlots)?old.gameGearSlots:[]),gameGearExpansion:parsed.slotItems.size?gameGearExpansion:String(old.gameGearExpansion||''),tags:Array.isArray(old.tags)?old.tags:[],memo:old.memo||'',remodel:old.remodel||'',
+   gear:parsed.slotItems.size||parsed.completeSlotItems?labels.join(' / '):(old.gear||''),gameGearSlots:parsed.slotItems.size||parsed.completeSlotItems?gameGearSlots:(Array.isArray(old.gameGearSlots)?old.gameGearSlots:[]),gameGearExpansion:parsed.slotItems.size||parsed.completeSlotItems?gameGearExpansion:String(old.gameGearExpansion||''),tags:Array.isArray(old.tags)?old.tags:[],memo:old.memo||'',remodel:old.remodel||'',
    source:'kancolle-import',gameShipId:gameId,gameHp:Number(ship.api_nowhp)||0,gameMaxHp:Number(ship.api_maxhp)||0,gameCond:Number(ship.api_cond)||0,
    gameLos:Array.isArray(ship.api_sakuteki)?Number(ship.api_sakuteki[0])||0:Number(ship.api_sakuteki)||0,gameOnslot:Array.isArray(ship.api_onslot)?ship.api_onslot.map(Number):[],gameFuel:ship.api_fuel==null?null:Number(ship.api_fuel)||0,gameAmmo:ship.api_bull==null?null:Number(ship.api_bull)||0,
-   gameLocked:Number(ship.api_locked)||0,gameSallyArea:Number(ship.api_sally_area)||0,gameSlotEx:Number(ship.api_slot_ex)||0,syncedAt:now
+   gameLocked:Number(ship.api_locked)||0,gameSallyArea:Number(ship.api_sally_area)||0,gameSlotEx:Number(ship.api_slot_ex)||0,syncedAt:now,updatedAt:now
   });
  }
  for(let i=0;i<existing.length;i++){
@@ -235,7 +235,7 @@ function hdKcMergeEquipment(parsed){
  const next=[],represented=new Set(groups.keys());
  for(const [key,g] of groups){
   const old=meta.get(key)||{},oldMeta={...old};delete oldMeta.syncMissing;delete oldMeta.lastOwnedCount;
-  next.push({...oldMeta,id:old.id||`kc-equip-${g.masterEquipId}-${g.star}`,name:g.name,category:g.category,count:g.count,star:g.star,targetStar:Number.isFinite(Number(old.targetStar))?Number(old.targetStar):g.star,assigned:old.assigned||'',memo:old.memo||'',masterEquipId:g.masterEquipId,source:'kancolle-import',syncedAt:Date.now(),proficiency:g.proficiency});
+  next.push({...oldMeta,id:old.id||`kc-equip-${g.masterEquipId}-${g.star}`,name:g.name,category:g.category,count:g.count,star:g.star,targetStar:Number.isFinite(Number(old.targetStar))?Number(old.targetStar):g.star,assigned:old.assigned||'',memo:old.memo||'',masterEquipId:g.masterEquipId,source:'kancolle-import',syncedAt:Date.now(),updatedAt:Date.now(),proficiency:g.proficiency});
  }
  if(!parsed.completeSlotItems){
   for(const row of existing){const key=rowKey(row);if(!represented.has(key)&&!changedOldKeys.has(key))next.push(row)}
@@ -496,12 +496,12 @@ function hdKcApplyImport(preview,opts={}){
  const parsed=preview?.parsed;if(!parsed)throw new Error('先にデータを解析してください');
  const previous=hdKcSyncStatus(),before=hdKcStateSnapshot();
  const result={ships:0,equipment:0,materials:0,decks:0,expeditions:0,docks:0,quests:0,sorties:0};
- if(opts.ships!==false&&parsed.ships.size)result.ships=hdKcMergeRoster(parsed);
- if(opts.equipment!==false&&parsed.slotItems.size)result.equipment=hdKcMergeEquipment(parsed);
+ if(opts.ships!==false&&(parsed.ships.size||parsed.completeShips))result.ships=hdKcMergeRoster(parsed);
+ if(opts.equipment!==false&&(parsed.slotItems.size||parsed.completeSlotItems))result.equipment=hdKcMergeEquipment(parsed);
  if(opts.resources!==false&&parsed.materials.size)result.materials=hdKcApplyMaterials(parsed);
- if(opts.fleets!==false&&parsed.decks.size)result.decks=hdKcApplyDecks(parsed);
- if(opts.timers!==false&&(parsed.decks.size||parsed.ndocks.size)){const t=hdKcApplyTimers(parsed);result.expeditions=t.expeditions;result.docks=t.docks}
- if(opts.quests!==false&&parsed.quests.size)result.quests=hdKcApplyQuests(parsed);
+ if(opts.fleets!==false&&(parsed.decks.size||parsed.completeDecks))result.decks=hdKcApplyDecks(parsed);
+ if(opts.timers!==false&&(parsed.decks.size||parsed.ndocks.size||parsed.completeDecks||parsed.completeNdocks)){const t=hdKcApplyTimers(parsed);result.expeditions=t.expeditions;result.docks=t.docks}
+ if(opts.quests!==false&&(parsed.quests.size||parsed.completeQuests))result.quests=hdKcApplyQuests(parsed);
  if(opts.sorties!==false&&parsed.sortieEvents.length)result.sorties=hdKcApplySorties(parsed);
  const snapshot=hdKcStateSnapshot(),delta=hdKcSyncDelta(before,snapshot,parsed,opts,!!previous),coverage=hdKcCoverageFromSources(preview.sources,parsed);
  const integrity={
