@@ -108,7 +108,7 @@ function hdStrategyCandidates(map){
  for(const gear of hdStrategyGearRows(map).filter(x=>(x.target||x.wanted)&&x.shortfall>0)){
   const key=typeof hdPLDemandKey==='function'?hdPLDemandKey(gear,map):gear.target;
   const label=typeof hdPLTargetLabel==='function'?hdPLTargetLabel(gear):gear.target;
-  add(hdStrategyCandidate(map,'gear','gear',key,`${label}を揃える`,`必要 ${gear.needed} / 所持 ${gear.owned} / あと ${gear.shortfall}。${gear.methodLabel||'入手方法を確認'}`,{status:gear.status}));
+  add(hdStrategyCandidate(map,'gear','gear',key,`${label}を揃える`,`必要 ${gear.needed} / 所持 ${gear.owned} / あと ${gear.shortfall}。${gear.methodLabel||'入手方法を確認'}`,{status:gear.status,target:gear.target||gear.wanted}));
  }
  for(const x of hdStrategyTrainingRows(map))add(hdStrategyCandidate(map,'level','training',x.ship.id,`${x.ship.name} を Lv.${x.target} まで育成`,`現在 Lv.${x.lv} / 目標 Lv.${x.target} / あと ${x.gap}。${x.inFleet?'保存編成の艦。':'育成計画の対象。'}`,{targetLv:x.target,shipId:x.ship.id}));
  const quests=hdStrategyRelatedQuests(map),byId=new Map(HD_QUESTS.map(q=>[q.id,q]));
@@ -155,7 +155,8 @@ function hdStrategyTaskActions(task){
  if(['oneTimeQuest','basePrep'].includes(task.source)&&task.sourceUrl)return `<a class="ghost small" href="${hdStrategyEsc(task.sourceUrl)}" target="_blank" rel="noopener">条件の詳細 ↗</a>`;
  if(task.source==='periodicQuest')return `<button type="button" class="ghost small" data-hd-strategy-open-quest="${hdStrategyEsc(task.ref)}">任務の条件・前提 →</button>`;
  if(task.source==='training')return `<button type="button" class="ghost small" data-hd-strategy-open-training="${hdStrategyEsc(task.shipId||task.ref)}">育成計画 →</button>`;
- if(['gear','gearKind'].includes(task.source))return '<button type="button" class="ghost small" data-home-jump="hdEquipmentProcurement">装備の入手計画 →</button>';
+ if(task.source==='gear')return `<button type="button" class="ghost small" data-hd-strategy-open-gear="${hdStrategyEsc(task.sourceKey)}">この装備の入手方法 →</button><button type="button" class="ghost small" data-home-jump="hdEquipmentProcurement">装備の入手計画 →</button>`;
+ if(task.source==='gearKind')return `<button type="button" class="ghost small" data-hd-strategy-open-kind="${hdStrategyEsc(task.ref)}" data-hd-strategy-gear-map="${hdStrategyEsc(task.map)}">代替装備を見る →</button><button type="button" class="ghost small" data-home-jump="hdEquipmentProcurement">装備の入手計画 →</button>`;
  if(task.source==='unlock')return `<button type="button" class="ghost small" data-hd-strategy-open-map="${hdStrategyEsc(task.ref)}">前提海域を見る →</button>`;
  if(['nav','fleetSetup'].includes(task.source))return `<button type="button" class="ghost small" data-hd-strategy-open-map="${hdStrategyEsc(task.map)}">攻略ナビで確認 →</button>`;
  return '';
@@ -219,6 +220,20 @@ document.addEventListener('click',e=>{
   if(typeof hdEnsureTrainingPlanner==='function')hdEnsureTrainingPlanner();
   if(typeof hdWSShowElement==='function')hdWSShowElement('trainingPlanner',true);
   const input=document.getElementById('hdTrainingSearch');if(input&&ship){input.value=ship.name;hdRenderTrainingPlanner()}return;
+ }
+ const equipment=e.target.closest?.('[data-hd-strategy-open-gear]');if(equipment){
+  const task=homeGuideState().custom.find(x=>x.sourceKey===equipment.dataset.hdStrategyOpenGear);
+  if(task){
+   const row=hdStrategyGearRows(task.map).find(x=>String(typeof hdPLDemandKey==='function'?hdPLDemandKey(x,task.map):x.target)===String(task.ref));
+   const target=row?.target||row?.wanted||task.target||'';
+   if(target&&typeof hdAGOpenItem==='function')hdAGOpenItem(target,task.map);
+   else if(typeof hdPLOpenList==='function')hdPLOpenList();
+  }return;
+ }
+ const kind=e.target.closest?.('[data-hd-strategy-open-kind]');if(kind){
+  if(typeof hdAGOpen==='function')hdAGOpen(kind.dataset.hdStrategyOpenKind,kind.dataset.hdStrategyGearMap||'');
+  else if(typeof hdPLOpenList==='function')hdPLOpenList();
+  return;
  }
  const toMap=e.target.closest?.('[data-hd-strategy-open-map]');if(toMap){
   const map=toMap.dataset.hdStrategyOpenMap;if(typeof hdMSNOpen==='function')hdMSNOpen(map);return;
