@@ -70,12 +70,14 @@ function homeRelative(ts){
 function homeSyncInfo(){
  const s=homeJson('harbordesk-kancolle-sync-v1',null);
  if(!s)return {sync:null,label:'未同期',state:'missing',age:Infinity,missing:['艦娘','装備','資源','艦隊','任務','入渠']};
- const age=Date.now()-Number(s.syncedAt||0),coverage=s.coverage&&typeof s.coverage==='object'?s.coverage:null;
+ let marker=0;try{marker=Math.max(0,Number(localStorage.getItem('harbordesk-kancolle-last-success-at-v1'))||0)}catch{}
+ const syncedAt=typeof hdKcSyncSuccessAt==='function'?hdKcSyncSuccessAt(s):Math.max(marker,Math.max(0,Number(s.lastSuccessAt)||0),Math.max(0,Number(s.syncedAt)||0));
+ const age=syncedAt?Math.max(0,Date.now()-syncedAt):Infinity,coverage=s.coverage&&typeof s.coverage==='object'?s.coverage:null;
  const required=[['ships','艦娘'],['equipment','装備'],['resources','資源'],['fleets','艦隊'],['quests','任務'],['docks','入渠']];
  const missing=coverage?required.filter(([key])=>coverage[key]===false).map(([,label])=>label):[];
  const audit=typeof hdKcLiveLedgerAudit==='function'?hdKcLiveLedgerAudit(s):{verified:false,ok:true},state=audit?.verified&&!audit.ok?'drift':missing.length?'partial':age>21600000?'warn':'ok';
- const label=state==='drift'?'台帳差異・'+homeRelative(s.syncedAt):state==='partial'?'一部未取得・'+homeRelative(s.syncedAt):homeRelative(s.syncedAt);
- return {sync:s,label,state,age,missing,audit};
+ const label=state==='drift'?'台帳差異・'+homeRelative(syncedAt):state==='partial'?'一部未取得・'+homeRelative(syncedAt):homeRelative(syncedAt);
+ return {sync:s,label,state,age,missing,audit,syncedAt};
 }
 function homeSyncMissingGuide(missing=[]){
  const set=new Set(missing||[]),steps=[];
