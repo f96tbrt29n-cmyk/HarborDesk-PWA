@@ -443,13 +443,20 @@ function renderHomeDashboard(){
 
 document.addEventListener('click',e=>{
  const pendingToggle=e.target.closest('[data-home-guide-pending]');if(pendingToggle){try{localStorage.setItem(HD_HOME_GUIDE_PENDING_KEY,homeGuidePendingOnly()?'0':'1')}catch{}homeGuideRender();document.querySelector('[data-home-guide-pending]')?.focus();return}
- const guideToggle=e.target.closest('[data-home-guide-toggle]');if(guideToggle){const state=homeGuideState(),key=guideToggle.dataset.homeGuideToggle;
+ const guideToggle=e.target.closest('[data-home-guide-toggle]');if(guideToggle){const state=homeGuideState(),key=guideToggle.dataset.homeGuideToggle,wasDone=guideToggle.getAttribute('aria-pressed')==='true',title=guideToggle.closest('.home-guide-step')?.querySelector('strong')?.textContent||'目標';
   const unlock=state.custom.find(x=>x.source==='unlock'&&x.map!=='5-6'&&homeGuideItemKey(x.category,x.id,x.map,x.scope)===key);
   if(unlock){const checked=state.cleared.includes(unlock.ref)||state.done.includes(key);
    state.cleared=checked?state.cleared.filter(x=>x!==unlock.ref):[...state.cleared,unlock.ref];
    state.done=state.done.filter(k=>!state.custom.some(x=>x.source==='unlock'&&x.ref===unlock.ref&&x.map!=='5-6'&&homeGuideItemKey(x.category,x.id,x.map,x.scope)===k));
   }else state.done=state.done.includes(key)?state.done.filter(x=>x!==key):[...state.done,key];
-  homeGuideSave(state);return}
+  homeGuideSave(state);
+  if(homeGuidePendingOnly()&&!wasDone&&typeof hdToastAction==='function')hdToastAction(`${title} を完了にしたよ`,'元に戻す',()=>{
+   const current=homeGuideState();
+   if(unlock){current.cleared=current.cleared.filter(x=>x!==unlock.ref);current.done=current.done.filter(x=>x!==key)}
+   else current.done=current.done.filter(x=>x!==key);
+   homeGuideSave(current);
+  },6500);
+  return}
  const guideClear=e.target.closest('[data-home-guide-clear]');if(guideClear){const map=homeGuideActiveMap();if(map){const state=homeGuideState();const removing=state.cleared.includes(map);state.cleared=removing?state.cleared.filter(x=>x!==map):[...state.cleared,map];
   if(removing)state.done=state.done.filter(k=>!state.custom.some(x=>x.source==='unlock'&&x.ref===map&&x.map!=='5-6'&&homeGuideItemKey(x.category,x.id,x.map,x.scope)===k));
   homeGuideSave(state)}return}
