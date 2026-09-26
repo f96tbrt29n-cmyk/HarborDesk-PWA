@@ -1,4 +1,5 @@
 const HD_KC_SYNC_KEY='harbordesk-kancolle-sync-v1';
+const HD_KC_LAST_SUCCESS_AT_KEY='harbordesk-kancolle-last-success-at-v1';
 const HD_KC_USERSCRIPT_VERSION='1.0.15';
 const HD_KC_FLEETS_KEY='harbordesk-kancolle-fleets-v1';
 const HD_KC_MATERIALS_KEY='harbordesk-kancolle-materials-v1';
@@ -509,8 +510,11 @@ function hdKcApplyImport(preview,opts={}){
  };
  integrity.verified=integrity.ships.complete&&integrity.equipment.complete;
  integrity.ok=(!integrity.ships.complete||integrity.ships.ok)&&(!integrity.equipment.complete||integrity.equipment.ok);
- const sync={syncedAt:Date.now(),sources:preview.sources,userscriptVersion:String(preview.userscriptVersion||''),admiralLevel:Number(parsed.admiralLevel)||Number(previous?.admiralLevel)||0,coverage,ships:result.ships,equipment:result.equipment,equipmentRows:snapshot.equipmentRows,equipmentOwnedRows:snapshot.equipmentOwnedRows,equipmentPlanRows:snapshot.equipmentPlanRows,equipmentItems:snapshot.equipment,materials:result.materials,decks:result.decks,expeditions:result.expeditions,docks:result.docks,quests:result.quests,sorties:result.sorties,unknownShips:preview.unknownShips,unknownEquip:preview.unknownEquip,snapshot,integrity,delta};
- localStorage.setItem(HD_KC_SYNC_KEY,JSON.stringify(sync));window.dispatchEvent(new CustomEvent('hd:kancolle-sync',{detail:sync}));hdKcRenderSyncStatus();hdKcRenderCurrentFleets();hdKcNotifySyncSuccess(sync);
+ const syncedAt=Date.now();
+ const sync={syncedAt,lastSuccessAt:syncedAt,sources:preview.sources,userscriptVersion:String(preview.userscriptVersion||''),admiralLevel:Number(parsed.admiralLevel)||Number(previous?.admiralLevel)||0,coverage,ships:result.ships,equipment:result.equipment,equipmentRows:snapshot.equipmentRows,equipmentOwnedRows:snapshot.equipmentOwnedRows,equipmentPlanRows:snapshot.equipmentPlanRows,equipmentItems:snapshot.equipment,materials:result.materials,decks:result.decks,expeditions:result.expeditions,docks:result.docks,quests:result.quests,sorties:result.sorties,unknownShips:preview.unknownShips,unknownEquip:preview.unknownEquip,snapshot,integrity,delta};
+ localStorage.setItem(HD_KC_SYNC_KEY,JSON.stringify(sync));
+ try{localStorage.setItem(HD_KC_LAST_SUCCESS_AT_KEY,String(syncedAt))}catch{}
+ window.dispatchEvent(new CustomEvent('hd:kancolle-sync',{detail:sync}));hdKcRenderSyncStatus();hdKcRenderCurrentFleets();hdKcNotifySyncSuccess(sync);
  return sync;
 }
 function hdKcVersionCompare(a,b){
@@ -530,6 +534,10 @@ function hdKcRenderUserscriptStatus(sync){
 }
 function hdKcSyncStatus(){
  try{return JSON.parse(localStorage.getItem(HD_KC_SYNC_KEY)||'null')}catch{return null}
+}
+function hdKcSyncSuccessAt(sync=hdKcSyncStatus()){
+ let marker=0;try{marker=Math.max(0,Number(localStorage.getItem(HD_KC_LAST_SUCCESS_AT_KEY))||0)}catch{}
+ return Math.max(marker,Math.max(0,Number(sync?.lastSuccessAt)||0),Math.max(0,Number(sync?.syncedAt)||0));
 }
 function hdKcLiveLedgerAudit(sync=hdKcSyncStatus()){
  const integrity=sync?.integrity;if(!integrity?.verified)return {verified:false,ok:true,ships:null,equipment:null};
@@ -569,10 +577,10 @@ function hdKcPreviewHtml(p){
  return `<div class="hd-kc-import-stats"><div><span>艦娘</span><strong>${p.ships}</strong><small>${p.completeShips?'全件同期候補':'部分データ'}</small></div><div><span>装備個体</span><strong>${p.slotItems}</strong><small>${p.completeSlotItems?'全件同期候補':'部分データ'}</small></div><div><span>資源</span><strong>${p.materials}</strong></div><div><span>艦隊</span><strong>${p.decks}</strong></div><div><span>遠征中</span><strong>${p.expeditions||0}</strong></div><div><span>入渠中</span><strong>${p.docks||0}</strong></div><div><span>任務</span><strong>${p.activeQuests||0}</strong><small>${p.completeQuests?'全ページ取得':'取得ページ内'}</small></div><div><span>出撃</span><strong>${p.sortieStarts||0}</strong><small>戦闘結果 ${p.battleResults||0}</small></div></div>${p.unknownShips||p.unknownEquip?`<div class="hd-kc-import-warn">未解決: 艦娘 ${p.unknownShips} / 装備 ${p.unknownEquip}</div>`:''}<small>検出元: ${p.sources.map(hdKcEsc).join(' / ')||'自動判定'}</small>`;
 }
 function hdKcRenderSyncStatus(){
- const el=document.getElementById('hdKcSyncLast'),headline=document.getElementById('hdKcSyncHeadline'),box=document.querySelector('.hd-kc-sync-overview'),s=hdKcSyncStatus();
+ const el=document.getElementById('hdKcSyncLast'),headline=document.getElementById('hdKcSyncHeadline'),box=document.querySelector('.hd-kc-sync-overview'),s=hdKcSyncStatus(),lastSyncAt=s?hdKcSyncSuccessAt(s):0;
  const audit=hdKcLiveLedgerAudit(s);
  const equipRows=s?Number(s.equipmentOwnedRows??s.snapshot?.equipmentOwnedRows??s.equipmentRows??s.equipment)||0:0,equipPlans=s?Number(s.equipmentPlanRows??s.snapshot?.equipmentPlanRows)||0:0,equipItems=s?Number(s.equipmentItems??s.snapshot?.equipment??s.equipment)||0:0;
- if(el)el.textContent=s?`最終同期 ${new Date(s.syncedAt).toLocaleString('ja-JP')} ・ 艦娘${s.ships} / 装備台帳${equipRows}種類・${equipItems}個${equipPlans?`＋計画${equipPlans}`:''} / 資源${s.materials} / 艦隊${s.decks} / 遠征${s.expeditions||0} / 入渠${s.docks||0} / 任務${s.quests||0} / 出撃${s.sorties||0}`:'まだ同期してないよ';
+ if(el)el.textContent=s?`最終同期 ${new Date(lastSyncAt).toLocaleString('ja-JP')} ・ 艦娘${s.ships} / 装備台帳${equipRows}種類・${equipItems}個${equipPlans?`＋計画${equipPlans}`:''} / 資源${s.materials} / 艦隊${s.decks} / 遠征${s.expeditions||0} / 入渠${s.docks||0} / 任務${s.quests||0} / 出撃${s.sorties||0}`:'まだ同期してないよ';
  if(headline)headline.textContent=s?(audit.verified&&!audit.ok?'台帳に差異あり・再同期推奨':'艦これデータは同期済み'):'まず艦これから同期しよう';
  if(box){box.classList.toggle('is-synced',!!s&&(!audit.verified||audit.ok));box.classList.toggle('has-ledger-drift',!!s&&audit.verified&&!audit.ok)}
  const delta=document.getElementById('hdKcSyncDelta');if(delta){delta.hidden=!s;delta.innerHTML=s?hdKcDeltaHtml(s):''}
