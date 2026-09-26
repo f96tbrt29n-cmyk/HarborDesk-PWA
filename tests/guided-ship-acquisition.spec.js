@@ -111,6 +111,17 @@ test('strategy integration: equipment counts and ship levels refresh imported go
   await expect(page.locator('.hd-strategy-preview')).toContainText('あと 28');
   await expect(page.locator('.hd-strategy-preview')).toContainText('22号対水上電探');
   await page.locator('[data-hd-strategy-import-all="3-2"]').click();
+  await page.evaluate(() => {
+    const state=homeGuideState(),gear=state.custom.find(x=>x.map==='3-2'&&x.source==='gear');
+    delete gear.target;
+    homeGuideSave(state);
+  });
+  await page.locator('[data-group=gear] summary').click();
+  const equipmentGoal=page.locator('[data-group=gear] .home-guide-step').filter({hasText:'22号対水上電探'});
+  await equipmentGoal.locator('[data-hd-strategy-open-gear]').click();
+  await expect(page.locator('#hdAcquisitionDialog')).toBeVisible();
+  await expect(page.locator('#hdAcquisitionTitle')).toContainText('3-2｜22号対水上電探 の入手方法');
+  await page.locator('[data-hd-ag-close]').click();
   await page.locator('[data-group=level] summary').click();
   await expect(page.locator('[data-group=level]')).toContainText('現在 Lv.42 / 目標 Lv.70');
   await page.evaluate(() => {
