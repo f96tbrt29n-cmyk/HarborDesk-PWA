@@ -1418,11 +1418,11 @@ test('release smoke: userscript captures scouting and admiral level for readines
   await boot(page, errors);
   const source = await page.evaluate(async () => fetch('./HarborDesk-Kancolle.user.js', { cache:'no-store' }).then(r => r.text()));
   const importer = await page.evaluate(async () => fetch('./kancolle-import.js', { cache:'no-store' }).then(r => r.text()));
-  expect(source).toContain("// @version      1.0.16");
+  expect(source).toContain("// @version      1.0.17");
   expect(source).toContain("api_sakuteki:Array.isArray(x.api_sakuteki)");
   expect(source).toContain("api_onslot:Array.isArray(x.api_onslot)");
   expect(source).toContain("api_basic:data?.api_basic");
-  expect(importer).toContain("HD_KC_USERSCRIPT_VERSION='1.0.16'");
+  expect(importer).toContain("HD_KC_USERSCRIPT_VERSION='1.0.17'");
   expect(importer).toContain("gameLos:Array.isArray(ship.api_sakuteki)");
   expect(importer).toContain("admiralLevel:Number(parsed.admiralLevel)");
   expect(errors).toEqual([]);
@@ -2879,8 +2879,8 @@ test('release smoke: userscript blocks handoff until ship and equipment ledger d
     return res.text();
   });
 
-  expect(source).toContain('// @version      1.0.16');
-  expect(source).toContain("const HD_VERSION='1.0.16'");
+  expect(source).toContain('// @version      1.0.17');
+  expect(source).toContain("const HD_VERSION='1.0.17'");
   expect(source).toContain('// @downloadURL  https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/HarborDesk-Kancolle.user.js');
   expect(source).toContain('// @updateURL    https://raw.githubusercontent.com/f96tbrt29n-cmyk/HarborDesk-PWA/main/HarborDesk-Kancolle.meta.js');
   expect(source).toContain('function ledgerReady(c=captureCoverage())');
@@ -9906,8 +9906,8 @@ test('release smoke: userscript uses same-tab handoff without popup', async ({ p
   const errors = [];
   await boot(page, errors);
   const source = await page.evaluate(async () => fetch('./HarborDesk-Kancolle.user.js', { cache:'no-store' }).then(r => r.text()));
-  expect(source).toContain('// @version      1.0.16');
-  expect(source).toContain("const HD_VERSION='1.0.16'");
+  expect(source).toContain('// @version      1.0.17');
+  expect(source).toContain("const HD_VERSION='1.0.17'");
   expect(source).toContain("#kcimport=");
   expect(source).toContain("a.target='_self'");
   expect(source).not.toContain('window.open(');

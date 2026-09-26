@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HarborDesk 艦これ連携
 // @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
-// @version      1.0.16
+// @version      1.0.17
 // @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
 // @match        http://*.dmm.com/*
 // @match        https://*.dmm.com/*
@@ -21,7 +21,7 @@
 (function(){
 'use strict';
 
-const HD_VERSION='1.0.16';
+const HD_VERSION='1.0.17';
 const HARBOR_URL='https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/';
 const HARBOR_ORIGIN=new URL(HARBOR_URL).origin;
 const BRIDGE_IMPORT_MESSAGE='harbordesk-kancolle-import';
@@ -32,7 +32,7 @@ const STATUS_MESSAGE='harbordesk-kancolle-frame-status-v1';
 const MAX_RECORDS=120;
 const HD_PANEL_MIN_KEY='harbordesk-kc-panel-minimized-v1';
 const HD_CAPTURE_STORE_KEY='harbordesk-kc-capture-v1';
-const HD_CAPTURE_MAX_AGE=6*60*60*1000;
+const HD_CAPTURE_STALE_AGE=6*60*60*1000;
 
 function wanted(url){
   return /\/kcsapi\/(?:api_port\/port|api_get_member\/(?:ship2|slot_item|slotitem|require_info|material|ndock|questlist)|api_req_map\/(?:start|next)|api_req_(?:sortie|combined_battle)\/battleresult)(?:$|[?#])/.test(String(url||''));
@@ -187,9 +187,10 @@ try{
 
 const records=[];
 const signatures=new Set();
-// A restored capture is useful for diagnostics, but must never pass as a new sync.
 const sessionStartedAt=Date.now();
-const currentRecords=()=>records.filter(row=>Number(row.at)>=sessionStartedAt);
+let lastSentAt=0;
+let legacyCapture=false;
+const currentRecords=()=>records.filter(row=>Number(row.at)>lastSentAt);
 const captureId='kc-userscript-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
 let panel,countEl,statusEl,frameEl,coverageEl,hintEl,sendEl,miniCountEl,minimizeEl,panelBodyEl;
 let frameHits=0,minimized=false;
@@ -202,28 +203,29 @@ function latestSnapshotEndpoint(endpoint){
   return /\/api_port\/port$|\/api_get_member\/(?:ship2|slot_item|slotitem|require_info|material|ndock)$/.test(String(endpoint||''));
 }
 function persistCapture(){
-  try{localStorage.setItem(HD_CAPTURE_STORE_KEY,JSON.stringify({savedAt:Date.now(),records:records.slice(-MAX_RECORDS)}))}catch{}
+  try{localStorage.setItem(HD_CAPTURE_STORE_KEY,JSON.stringify({savedAt:Date.now(),sentAt:lastSentAt,records:records.slice(-MAX_RECORDS)}));return true}catch{return false}
 }
 function restoreCapture(){
   try{
     const saved=JSON.parse(localStorage.getItem(HD_CAPTURE_STORE_KEY)||'null');
-    if(!saved||!Array.isArray(saved.records)||Date.now()-Number(saved.savedAt||0)>HD_CAPTURE_MAX_AGE){
-      localStorage.removeItem(HD_CAPTURE_STORE_KEY);return 0;
-    }
+    if(!saved||!Array.isArray(saved.records))return 0;
+    legacyCapture=!Object.prototype.hasOwnProperty.call(saved,'sentAt');
+    lastSentAt=legacyCapture?Math.max(0,...saved.records.map(row=>Number(row?.at)||0)):Math.max(0,Number(saved.sentAt)||0);
     for(const row of saved.records){
       if(!row||!wanted(row.endpoint))continue;
-      records.push({endpoint:String(row.endpoint||''),payload:row.payload,at:Number(row.at)||Date.now()});
+      const at=Number(row.at)||Number(saved.savedAt)||0;
+      if(at>0)records.push({endpoint:String(row.endpoint||''),payload:row.payload,at});
     }
     while(records.length>MAX_RECORDS)records.shift();
     rebuildSignatures();return records.length;
   }catch{return 0}
 }
 function clearCapture(){
-  records.length=0;signatures.clear();try{localStorage.removeItem(HD_CAPTURE_STORE_KEY)}catch{}
+  records.length=0;signatures.clear();lastSentAt=0;legacyCapture=false;try{localStorage.removeItem(HD_CAPTURE_STORE_KEY)}catch{}
 }
 
-function captureCoverage(){
-  const endpoints=currentRecords().map(x=>String(x.endpoint||''));
+function captureCoverage(rows=currentRecords()){
+  const endpoints=rows.map(x=>String(x.endpoint||''));
   const has=re=>endpoints.some(x=>re.test(x));
   return {
     port:has(/api_port\/port|api_get_member\/ship2/),
@@ -256,23 +258,24 @@ function signature(r){
 }
 function receiveRecord(r){
   if(!r||r.type!==RECORD_MESSAGE||!wanted(r.endpoint))return;
-  const endpoint=String(r.endpoint||''),row={endpoint,payload:r.payload,at:Date.now()},sig=signature(row);
+  const endpoint=String(r.endpoint||''),row={endpoint,payload:r.payload,at:Math.max(Date.now(),lastSentAt+1)},sig=signature(row);
   if(latestSnapshotEndpoint(endpoint)){
     for(let i=records.length-1;i>=0;i--)if(String(records[i]?.endpoint||'')===endpoint)records.splice(i,1);
     rebuildSignatures();
   }
   if(signatures.has(sig)){
-    if(records.some(x=>signature(x)===sig&&Number(x.at)>=sessionStartedAt))return;
+    if(records.some(x=>signature(x)===sig&&Number(x.at)>lastSentAt))return;
     for(let i=records.length-1;i>=0;i--)if(signature(records[i])===sig)records.splice(i,1);
     rebuildSignatures();
   }
   signatures.add(sig);records.push(row);
   while(records.length>MAX_RECORDS)records.shift();
-  rebuildSignatures();persistCapture();
+  rebuildSignatures();const saved=persistCapture();
   render();
+  if(!saved&&statusEl){statusEl.textContent='取得データを保存できません。端末の空き容量を確認してね';statusEl.style.color='#ffb0a4'}
   show();
 }
-function exportObject(){
+function exportObject(rows=currentRecords()){
   return {
     format:'harbordesk-kancolle-import',
     version:2,
@@ -280,7 +283,7 @@ function exportObject(){
     userscriptVersion:HD_VERSION,
     captureId,
     createdAt:new Date().toISOString(),
-    records:currentRecords().map(x=>({endpoint:x.endpoint,payload:x.payload,at:x.at}))
+    records:rows.map(x=>({endpoint:x.endpoint,payload:x.payload,at:x.at}))
   };
 }
 function isGameShell(){
@@ -296,7 +299,7 @@ function ensurePanel(){
       '<div style="margin:6px 0;color:#aac0d1"><b data-hd-status style="color:#9fe0b7">通信待機中</b><br>取得 <b data-hd-count>0</b>件 / 検出フレーム <b data-hd-frames>0</b><br><small>母港・装備・任務などを開くと自動で取得するよ。</small></div>'+
       '<div data-hd-coverage style="display:flex;gap:4px;flex-wrap:wrap;margin:7px 0 7px"></div>'+
       '<div data-hd-next-hint style="margin:0 0 9px;padding:7px 8px;border-radius:9px;background:rgba(255,255,255,.05);color:#d8e8f5;font-size:11px"></div>'+
-      '<div style="display:flex;gap:6px;flex-wrap:wrap"><button data-hd-send style="font-weight:700">HarborDeskへ送る</button><button data-hd-copy>JSONをコピー</button><button data-hd-clear>クリア</button></div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap"><button data-hd-send style="font-weight:700">HarborDeskへ送る</button><button data-hd-resend hidden>前回の送信をやり直す</button><button data-hd-copy>JSONをコピー</button><button data-hd-clear>クリア</button></div>'+
       '<div style="margin-top:7px;color:#7f9aae"><small>api_token・Cookie・DMMログイン情報・リクエスト本文は保存しません。</small></div>'+
     '</div>';
   document.documentElement.appendChild(panel);
@@ -313,7 +316,8 @@ function ensurePanel(){
   panel.querySelector('[data-hd-panel-head]').onclick=e=>{if(minimized&&!e.target.closest('button'))setMinimized(false)};
   panel.querySelector('[data-hd-clear]').onclick=()=>{clearCapture();render()};
   panel.querySelector('[data-hd-copy]').onclick=copy;
-  panel.querySelector('[data-hd-send]').onclick=send;
+  panel.querySelector('[data-hd-send]').onclick=()=>send();
+  panel.querySelector('[data-hd-resend]').onclick=()=>send(records.slice());
   let savedMinimized=false;try{savedMinimized=localStorage.getItem(HD_PANEL_MIN_KEY)==='1'}catch{}
   setMinimized(savedMinimized,false);
   render();
@@ -332,11 +336,15 @@ function setMinimized(next,persist=true){
 }
 function render(){
   const c=captureCoverage(),ledger=ledgerReady(c),core=ledger&&c.quests,count=currentRecords().length;
+  const oldest=count?Math.min(...currentRecords().map(x=>Number(x.at)||Date.now())):0;
+  const resumed=count&&oldest<sessionStartedAt;
+  const stale=count&&Date.now()-oldest>HD_CAPTURE_STALE_AGE;
+  const resend=panel?.querySelector('[data-hd-resend]');if(resend){resend.hidden=!!count||!lastSentAt||!records.length;resend.textContent=legacyCapture?'以前の取得を送る':'前回の送信をやり直す'}
   if(countEl)countEl.textContent=String(count);
   if(miniCountEl){miniCountEl.textContent=count+(ledger?'件 ✓':'件');miniCountEl.style.color=ledger?'#9fe0b7':'#f0d590'}
   if(frameEl)frameEl.textContent=String(frameHits);
   if(coverageEl)coverageEl.innerHTML=coverageHtml();
-  if(hintEl){hintEl.textContent=count?nextCaptureHint(c):'今回の起動後に母港と装備画面を開いてね。前回の取得分は送らないよ';hintEl.style.color=ledger?'#bcefd0':'#f0d590'}
+  if(hintEl){hintEl.textContent=count?(resumed?'前回の未送信データを引き継いだよ。'+(stale?'古い取得内容なので、送る前に母港と装備を開き直すと安心。':''):'')+nextCaptureHint(c):legacyCapture?'旧版で取得したデータが残っているよ。内容を確かめてから送るか、母港と装備を開き直してね':lastSentAt?'前回のデータは送信済み。新しい同期には母港と装備を開いてね':'まず母港と装備画面を開いて、同期するデータを取得してね';hintEl.style.color=ledger?'#bcefd0':'#f0d590'}
   if(sendEl){sendEl.disabled=!ledger;sendEl.textContent=ledger?'台帳をHarborDeskへ同期（'+count+'件）':'台帳データ待ち';sendEl.style.opacity=ledger?'1':'.55'}
   if(statusEl){
     statusEl.textContent=count?(ledger?(core?'台帳＋基本データ取得済み':'台帳同期準備OK'):'台帳データ取得中'):'通信待機中';
@@ -372,9 +380,9 @@ async function encodeHandoff(value){
   }
   return 'j.'+bytesToBase64Url(raw);
 }
-async function send(){
-  const c=captureCoverage();
-  if(!currentRecords().length){
+async function send(rows=currentRecords()){
+  const c=captureCoverage(rows);
+  if(!rows.length){
     alert('まだ取得データがないよ。まず母港と装備画面を開いてね。');
     return;
   }
@@ -384,10 +392,14 @@ async function send(){
     alert('艦隊台帳・装備台帳を埋めるため、'+missing+'のデータが必要だよ。ゲーム内で該当画面を一度開いてから再度同期してね。');
     return;
   }
-  const value=exportObject();
+  const value=exportObject(rows);
+  const previousSentAt=lastSentAt;
   try{
     if(statusEl)statusEl.textContent='データ圧縮中';
     const token=await encodeHandoff(value);
+    lastSentAt=Math.max(lastSentAt,...rows.map(x=>Number(x.at)||0));
+    if(!persistCapture())throw new Error('送信記録を端末に保存できませんでした');
+    legacyCapture=false;
     if(statusEl)statusEl.textContent='送信OK → HarborDeskへ移動';
     const a=document.createElement('a');
     a.href=HARBOR_URL+'#kcimport='+token;
@@ -396,6 +408,7 @@ async function send(){
     document.documentElement.appendChild(a);
     a.click();
   }catch(err){
+    lastSentAt=previousSentAt;persistCapture();render();
     if(statusEl)statusEl.textContent='送信失敗';
     alert('HarborDeskへの受け渡しに失敗したよ: '+String(err&&err.message||err));
   }
