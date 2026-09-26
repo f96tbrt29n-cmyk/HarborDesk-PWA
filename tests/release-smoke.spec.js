@@ -1005,6 +1005,23 @@ test('release smoke: home rerenders when ship roster changes', async ({ page }) 
 
 
 
+test('release smoke: home screen import writes to its own saved ledger', async ({ page }) => {
+  await page.addInitScript(() => Object.defineProperty(navigator, 'standalone', { value: true, configurable: true }));
+  await boot(page);
+  await expect(page.locator('#hdKcHomeSync')).toBeVisible();
+  await page.evaluate(() => {
+    const raw=JSON.stringify({format:'harbordesk-kancolle-import',version:2,records:[
+      {endpoint:'/kcsapi/api_port/port',at:1,payload:{api_result:1,api_data:{api_ship:[{api_id:987,api_ship_id:1,api_lv:20,api_nowhp:13,api_maxhp:13,api_cond:49,api_slot:[]}],api_deck_port:[],api_material:[]}}},
+      {endpoint:'/kcsapi/api_get_member/slot_item',at:2,payload:{api_result:1,api_data:[]}}
+    ]});
+    Object.defineProperty(navigator,'clipboard',{value:{readText:async()=>raw},configurable:true});
+  });
+  page.once('dialog',dialog=>dialog.accept());
+  await page.locator('#hdKcHomeSync').click();
+  await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]').some(x=>x.gameShipId===987))).toBe(true);
+  await expect(page.locator('#hdKcHomeSync')).toBeEnabled();
+});
+
 test('release smoke: userscript bridge imports without URL payload limits', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
