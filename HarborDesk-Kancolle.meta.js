@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HarborDesk 艦これ連携
 // @namespace    https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/
-// @version      1.0.17
+// @version      1.0.18
 // @description  艦これの対応APIレスポンスを端末内で抽出し、HarborDeskへ送る。
 // @match        http://*.dmm.com/*
 // @match        https://*.dmm.com/*

@@ -1,6 +1,6 @@
 const HD_KC_SYNC_KEY='harbordesk-kancolle-sync-v1';
 const HD_KC_LAST_SUCCESS_AT_KEY='harbordesk-kancolle-last-success-at-v1';
-const HD_KC_USERSCRIPT_VERSION='1.0.17';
+const HD_KC_USERSCRIPT_VERSION='1.0.18';
 const HD_KC_FLEETS_KEY='harbordesk-kancolle-fleets-v1';
 const HD_KC_MATERIALS_KEY='harbordesk-kancolle-materials-v1';
 const HD_KC_BRIDGE_IMPORT_MESSAGE='harbordesk-kancolle-import';
@@ -798,7 +798,7 @@ function hdKcEnsureImport(){
  <div class="hd-kc-import card">
   <div class="hd-kc-sync-overview"><div><span>連携状態</span><strong id="hdKcSyncHeadline">確認中…</strong></div><div class="hd-kc-sync-side"><div id="hdKcSyncLast" class="muted"></div><button type="button" class="ghost small" data-hd-kc-return-game hidden>艦これへ戻る</button></div></div><div id="hdKcSyncDelta" class="hd-kc-sync-delta"></div><div id="hdKcSyncCoverage" class="hd-kc-sync-coverage"></div><div id="hdKcSyncRecommendation" class="hd-kc-sync-recommendation" hidden></div><div id="hdKcUserscriptStatus" class="hd-kc-userscript-status" hidden></div><div id="hdKcBridgeStatus" class="hd-kc-bridge-status" hidden></div><div id="hdKcNextActions" class="hd-kc-next-actions" hidden><span>次に見る</span><div><button type="button" class="ghost small" data-hd-kc-jump="roster">艦隊台帳</button><button type="button" class="ghost small" data-hd-kc-jump="equipmentBook">装備台帳</button><button type="button" class="ghost small" data-hd-kc-jump="quests">任務</button><button type="button" class="ghost small" data-hd-kc-jump="sortieLog">出撃記録</button></div></div>
   <div id="hdKcImportResult" class="hd-kc-import-result muted" aria-live="polite"></div>
-  <details class="hd-kc-capture-guide" data-hd-kc-auto-guide open><summary>Userscripts 自動連携</summary><div><p>艦これを開くだけで対応APIを自動取得。ゲーム画面の「HarborDeskへ送る」でそのまま同期できるよ。</p><p>ホーム画面のアイコンから使う場合は、ゲーム画面で「JSONをコピー」→ホーム画面のHarborDeskで「ゲーム同期を貼り付け」を押してね。</p><div class="hd-kc-import-actions"><a class="primary" href="./HarborDesk-Kancolle.user.js" target="_blank" rel="noopener">Userscripts版を確認・更新</a></div><ol><li>Userscriptsを有効にする</li><li>艦これを開き直す</li><li>母港・装備・任務などを一度開く</li><li>「HarborDeskへ送る」を押す</li></ol><small>リクエスト本文・api_token・Cookie・DMMログイン情報は保存しない。</small></div></details>
+  <details class="hd-kc-capture-guide" data-hd-kc-auto-guide open><summary>Userscripts 自動連携</summary><div><p>艦これを開くだけで対応APIを自動取得。ゲーム画面で「ホーム画面へ送る」→ホーム画面のHarborDeskで「同期を受け取る」を押してね。JSONを手で操作する必要はないよ。</p><div class="hd-kc-import-actions"><a class="primary" href="./HarborDesk-Kancolle.user.js" target="_blank" rel="noopener">Userscripts版を確認・更新</a></div><ol><li>Userscriptsを有効にする</li><li>艦これを開き直す</li><li>母港・装備・任務などを一度開く</li><li>ゲーム画面から送る</li></ol><small>リクエスト本文・api_token・Cookie・DMMログイン情報は保存しない。</small></div></details>
   <details class="hd-kc-capture-guide"><summary>その他の取込方法</summary><div>
    <div class="hd-kc-import-actions"><label class="ghost hd-kc-import-file">JSONファイルを選ぶ<input id="hdKcImportFile" type="file" accept=".json,.txt,application/json,text/plain"></label><button type="button" class="ghost" data-hd-kc-paste>クリップボードから貼る</button></div>
    <details class="hd-kc-manual-panel"><summary>手動JSON取込の詳細</summary><div>
@@ -819,18 +819,18 @@ function hdKcEnsureHomeScreenSync(){
  if(!(window.matchMedia?.('(display-mode: standalone)').matches||navigator.standalone===true))return;
  const header=document.querySelector('.topbar');if(!header||document.getElementById('hdKcHomeSync'))return;
  const button=document.createElement('button');button.id='hdKcHomeSync';button.type='button';button.className='ghost small';
- button.textContent='同期貼付';button.title='ゲーム同期を貼り付け';button.setAttribute('aria-label','ゲーム同期を貼り付け');button.style.cssText='white-space:nowrap;min-height:38px;font-size:11px;padding:6px';
+ button.textContent='同期を受け取る';button.title='ゲーム同期を受け取る';button.setAttribute('aria-label','ゲーム同期を受け取る');button.style.cssText='white-space:nowrap;min-height:38px;font-size:11px;padding:6px';
  button.addEventListener('click',async()=>{
   button.disabled=true;button.textContent='読み込み中…';
   try{
    let raw='';
-   try{raw=await navigator.clipboard.readText()}catch{raw=prompt('艦これ画面でコピーしたJSONを貼り付けてね')||''}
+   try{raw=await navigator.clipboard.readText()}catch{throw new Error('iPhoneの「ペーストを許可」を選んで、もう一度押してね')}
    const data=hdKcReadJson(raw);
-   if(data?.format!=='harbordesk-kancolle-import'||!Array.isArray(data.records))throw new Error('艦これ画面の「JSONをコピー」で取得したデータを貼り付けてね');
+   if(data?.format!=='harbordesk-kancolle-import'||!Array.isArray(data.records)||!data.records.length)throw new Error('先に艦これ画面で「ホーム画面へ送る」を押してね');
    const sync=await hdKcHandleBridgeImport(raw);
    alert(`ホーム画面版へ同期したよ。艦娘 ${sync.ships}隻・装備 ${sync.equipment}件を反映したよ。`);
-  }catch(err){alert('同期できなかったよ: '+String(err?.message||err)+'\n\nコピー後にホーム画面のHarborDeskへ戻って、もう一度押してね。')}
-  finally{button.disabled=false;button.textContent='同期貼付'}
+  }catch(err){alert('同期できなかったよ: '+String(err?.message||err))}
+  finally{button.disabled=false;button.textContent='同期を受け取る'}
  });
  header.appendChild(button);
 }

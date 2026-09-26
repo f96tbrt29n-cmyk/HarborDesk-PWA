@@ -4,13 +4,14 @@ const data=new Map(),localStorage={getItem:k=>data.get(k)??null,setItem:(k,v)=>d
 const port='/kcsapi/api_port/port',equip='/kcsapi/api_get_member/slot_item';
 const portData={api_result:1,api_data:{api_ship:[{api_id:1,api_ship_id:1}],api_deck_port:[{api_id:1}]}};
 const equipData={api_result:1,api_data:[{api_id:10,api_slotitem_id:1}]};
-function boot(){const listeners={},links=[];const window={addEventListener:(n,f)=>listeners[n]=f};window.top=window;
- const context={window,localStorage,document:{readyState:'loading',addEventListener(){},createElement:()=>({style:{},click(){links.push(this.href)}}),documentElement:null},location:{href:'https://example.invalid'},setTimeout(){},URL,Date,TextEncoder,Buffer,btoa:x=>Buffer.from(x,'binary').toString('base64'),alert(){},console};
- vm.createContext(context);vm.runInContext(raw,context);return {api:window.__HARBORDESK_KANCOLLE_USERSCRIPT__,listeners,links,context};}
+function boot(){const listeners={},links=[],clipboard=[];const window={addEventListener:(n,f)=>listeners[n]=f};window.top=window;
+ const context={window,localStorage,navigator:{clipboard:{writeText:async value=>clipboard.push(value)}},document:{readyState:'loading',addEventListener(){},createElement:()=>({style:{},click(){links.push(this.href)}}),documentElement:null},location:{href:'https://example.invalid'},setTimeout(){},URL,Date,TextEncoder,Buffer,btoa:x=>Buffer.from(x,'binary').toString('base64'),alert(){},console};
+ vm.createContext(context);vm.runInContext(raw,context);return {api:window.__HARBORDESK_KANCOLLE_USERSCRIPT__,listeners,links,clipboard,context};}
 function record(run,endpoint,payload){run.listeners.message({data:{type:'harbordesk-kancolle-frame-record-v1',endpoint,payload}})}
 (async()=>{let run=boot();record(run,port,portData);record(run,equip,equipData);
  assert.equal(run.api.ledgerReady(),true);assert.equal(run.api.exportObject().records.length,2);
  run=boot();assert.equal(run.api.ledgerReady(),true,'pending capture survives close');assert.equal(run.api.exportObject().records.length,2);
+ assert.equal(await run.api.sendHome(),true,'home screen handoff prepares on button press');assert.equal(run.clipboard.length,1);assert.equal(JSON.parse(run.clipboard[0]).records.length,2);assert.equal(run.links.length,0,'home handoff stays on game page');assert.equal(run.api.ledgerReady(),true,'copy alone does not mark import complete');
  run.context.document.documentElement={appendChild(){}};await run.api.send();assert.equal(run.links.length,1);assert.equal(run.api.ledgerReady(),false,'sent capture not offered as new');
  run=boot();assert.equal(run.api.ledgerReady(),false,'sent capture stays excluded after close');
  record(run,port,portData);record(run,equip,equipData);assert.equal(run.api.ledgerReady(),true,'same API payload received again counts as new');
