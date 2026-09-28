@@ -1,0 +1,1 @@
+Verify HarborDesk v1.0.145 candidate after multi-ship demand fix
