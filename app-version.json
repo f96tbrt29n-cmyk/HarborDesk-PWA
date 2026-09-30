@@ -1,7 +1,32 @@
 {
-  "version": "1.0.492",
-  "build": 492,
-  "releasedAt": "2026-09-26T22:11:48.814608Z",
-  "notes": "ホーム画面版との同期をボタン二つで受け渡せるようにしました。JSONのコピー・貼り付け操作は不要です。",
-  "masterChanges": null
+  "version": "1.0.493",
+  "build": 493,
+  "releasedAt": "2026-10-01T03:36:33.589+09:00",
+  "notes": "艦これマスター自動同期。api_start2 f45f36f / 装備picker 9a74ce1 を反映。艦娘変更 0件 / 新装備 0件 / 装備変更 0件 / 増設ルール 0件。",
+  "masterChanges": {
+    "baseline": false,
+    "from": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
+    "to": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
+    "at": "2026-09-30T18:36:33.581Z",
+    "ships": {
+      "added": [],
+      "removed": [],
+      "changed": []
+    },
+    "equipment": {
+      "added": [],
+      "removed": [],
+      "changed": []
+    },
+    "exslot": {
+      "changed": false,
+      "itemRulesChanged": 0,
+      "limitShipsChanged": 0
+    },
+    "picker": {
+      "changed": false,
+      "slotRulesChanged": 0,
+      "overrideChanged": 0
+    }
+  }
 }

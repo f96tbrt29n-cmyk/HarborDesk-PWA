@@ -7,6 +7,123 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
     "updated": "2026-09-16T21:50:47Z",
     "basis": "api_start2 / player equipment api_id < 1500"
   },
+  "clientRules": {
+    "source": {
+      "repo": "poooi/poi",
+      "ref": "master",
+      "path": "views/utils/game-selector/tables.ts",
+      "commit": "9a74ce1fc0006b88ae7c5758edf9ed4a8e76c5f4",
+      "updated": "2026-09-30T02:47:41Z"
+    },
+    "equipTypeSpOverrides": {
+      "128": 38,
+      "142": 93,
+      "151": 94,
+      "281": 38,
+      "460": 93,
+      "465": 38,
+      "561": 91
+    },
+    "pickerTypeOverrides": {
+      "467": 95
+    },
+    "slotExclusions": [
+      {
+        "shipIds": [
+          553,
+          554
+        ],
+        "slot": 2,
+        "fromSlot": true,
+        "exclude": [
+          2,
+          3
+        ]
+      },
+      {
+        "shipIds": [
+          622,
+          623,
+          624
+        ],
+        "slot": 3,
+        "exclude": [
+          1,
+          2,
+          5,
+          22
+        ]
+      },
+      {
+        "shipIds": [
+          622,
+          623,
+          624
+        ],
+        "slot": 4,
+        "allowOnly": [
+          12,
+          21,
+          43
+        ]
+      },
+      {
+        "shipIds": [
+          662,
+          663,
+          668
+        ],
+        "slot": 3,
+        "exclude": [
+          5
+        ]
+      },
+      {
+        "shipIds": [
+          963,
+          968
+        ],
+        "slot": 3,
+        "exclude": [
+          1,
+          5,
+          13
+        ]
+      },
+      {
+        "shipIds": [
+          978
+        ],
+        "slot": 2,
+        "exclude": [
+          2
+        ]
+      },
+      {
+        "shipIds": [
+          961,
+          1035
+        ],
+        "slot": 3,
+        "exclude": [
+          1,
+          5
+        ]
+      },
+      {
+        "shipIds": [
+          743,
+          744,
+          745
+        ],
+        "slot": 3,
+        "allowOnly": [
+          21,
+          43
+        ]
+      }
+    ]
+  },
   "ships": {
     "長門改二": {
       "id": 541,
@@ -10105,150 +10222,6 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
     "1006": [
       27
     ]
-  },
-  "clientRules": {
-    "source": {
-      "repo": "poooi/poi",
-      "ref": "master",
-      "path": "views/utils/game-selector/tables.ts",
-      "commit": "556387c8e2059bda1d71888a288b1b907fcacbcd",
-      "updated": "2026-09-15T16:52:23Z"
-    },
-    "equipTypeSpOverrides": {
-      "128": 38,
-      "142": 93,
-      "151": 94,
-      "281": 38,
-      "460": 93,
-      "465": 38,
-      "561": 91
-    },
-    "pickerTypeOverrides": {
-      "467": 95
-    },
-    "slotExclusions": [
-      {
-        "shipIds": [
-          553,
-          554
-        ],
-        "slot": 2,
-        "fromSlot": true,
-        "exclude": [
-          2,
-          3
-        ]
-      },
-      {
-        "shipIds": [
-          622,
-          623,
-          624
-        ],
-        "slot": 3,
-        "exclude": [
-          1,
-          2,
-          5,
-          22
-        ]
-      },
-      {
-        "shipIds": [
-          622,
-          623,
-          624
-        ],
-        "slot": 4,
-        "allowOnly": [
-          12,
-          21,
-          43
-        ]
-      },
-      {
-        "shipIds": [
-          662,
-          663,
-          668
-        ],
-        "slot": 3,
-        "exclude": [
-          5
-        ]
-      },
-      {
-        "shipIds": [
-          963,
-          968
-        ],
-        "slot": 3,
-        "exclude": [
-          1,
-          5,
-          13
-        ]
-      },
-      {
-        "shipIds": [
-          978
-        ],
-        "slot": 2,
-        "exclude": [
-          2
-        ]
-      },
-      {
-        "shipIds": [
-          961,
-          1035
-        ],
-        "slot": 3,
-        "exclude": [
-          1,
-          5
-        ]
-      },
-      {
-        "shipIds": [
-          743,
-          744,
-          745
-        ],
-        "slot": 3,
-        "allowOnly": [
-          21,
-          43
-        ]
-      }
-    ]
-  },
-  "changes": {
-    "baseline": true,
-    "from": null,
-    "to": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
-    "at": "2026-09-19T02:50:00.000Z",
-    "ships": {
-      "added": [],
-      "removed": [],
-      "changed": []
-    },
-    "equipment": {
-      "added": [],
-      "removed": [],
-      "changed": []
-    },
-    "exslot": {
-      "changed": false,
-      "itemRulesChanged": 0,
-      "limitShipsChanged": 0
-    },
-    "picker": {
-      "changed": false,
-      "slotRulesChanged": 0,
-      "overrideChanged": 0
-    },
-    "masterForms": 865
   },
   "stypeEquipRules": {
     "1": {
@@ -39859,6 +39832,32 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         "aa": 100,
         "luck": 110
       }
+    }
+  },
+  "changes": {
+    "baseline": false,
+    "from": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
+    "to": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
+    "at": "2026-09-30T18:36:33.581Z",
+    "ships": {
+      "added": [],
+      "removed": [],
+      "changed": []
+    },
+    "equipment": {
+      "added": [],
+      "removed": [],
+      "changed": []
+    },
+    "exslot": {
+      "changed": false,
+      "itemRulesChanged": 0,
+      "limitShipsChanged": 0
+    },
+    "picker": {
+      "changed": false,
+      "slotRulesChanged": 0,
+      "overrideChanged": 0
     }
   }
 };
