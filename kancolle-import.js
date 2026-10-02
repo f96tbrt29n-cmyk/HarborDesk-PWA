@@ -98,6 +98,7 @@ function hdKcParseImport(raw){
  }else if(Array.isArray(root?.records)){
   out.captureId=String(root?.captureId||root?.createdAt||'');
   out.userscriptVersion=String(root?.userscriptVersion||'');
+  out.transfer=hdKcTransferReceipt(root.records);
   root.records.forEach((r,i)=>hdKcImportAdd(out,r?.endpoint||r?.path||'',r?.payload??r?.response??r?.data,{at:r?.at,index:i}));
  }else if(root&&typeof root==='object'&&!Array.isArray(root)&&!('api_result' in root)&&!('api_ship' in root)&&!('api_ship_data' in root)&&!('api_slot_item' in root)&&!('api_material' in root)&&!('api_ndock' in root)&&!('api_list' in root)){
   let matched=false;
@@ -492,9 +493,34 @@ function hdKcDeltaHtml(sync){
  if(!sync.delta.baseline)return '<span class="hd-kc-sync-delta-first">初回同期の基準を保存したよ</span>';
  const parts=hdKcDeltaParts(sync);return parts.length?parts.map(x=>'<span>'+hdKcEsc(x)+'</span>').join(''):'<span class="hd-kc-sync-delta-none">前回同期から大きな変化なし</span>';
 }
+// Compare captured records, not export time or captureId (one session can send new records).
+function hdKcTransferReceipt(records){
+ const endpoints={};
+ const normalized=records.map(r=>{
+  const endpoint=String(r?.endpoint||r?.path||'').replace(/^.*?(?=api_(?:port|get_member|req_))/,'');
+  const at=Number(r?.at),time=Number.isFinite(at)&&at>0?at:0;
+  if(endpoint&&time)endpoints[endpoint]=Math.max(endpoints[endpoint]||0,time);
+  return {endpoint,at:time,payload:r?.payload??r?.response??r?.data};
+ });
+ return {key:hdKcBridgePayloadKey(normalized),endpoints};
+}
+function hdKcCheckTransfer(parsed,previous){
+ const incoming=parsed.transfer,prior=previous?.transferReceipt;
+ if(!incoming)return prior;
+ const keys=Array.isArray(prior?.keys)?prior.keys:[];
+ if(keys.includes(incoming.key))throw new Error('この同期データは受信済みだよ。艦これで母港などを開き、新しいデータを送ってね');
+ const endpoints={...(prior?.endpoints||{})};
+ for(const [endpoint,at] of Object.entries(incoming.endpoints)){
+  if(at<(Number(endpoints[endpoint])||0))throw new Error('保存済みより古い同期データだよ。艦これで母港などを開き直してから送ってね');
+ }
+ for(const [endpoint,at] of Object.entries(incoming.endpoints))endpoints[endpoint]=Math.max(Number(endpoints[endpoint])||0,at);
+ return {keys:[...keys,incoming.key].slice(-40),endpoints};
+}
 function hdKcApplyImport(preview,opts={}){
  const parsed=preview?.parsed;if(!parsed)throw new Error('先にデータを解析してください');
- const previous=hdKcSyncStatus(),before=hdKcStateSnapshot();
+ const previous=hdKcSyncStatus();
+ const transferReceipt=opts.automatic?hdKcCheckTransfer(parsed,previous):previous?.transferReceipt;
+ const before=hdKcStateSnapshot();
  const result={ships:0,equipment:0,materials:0,decks:0,expeditions:0,docks:0,quests:0,sorties:0};
  if(opts.ships!==false&&(parsed.ships.size||parsed.completeShips))result.ships=hdKcMergeRoster(parsed);
  if(opts.equipment!==false&&(parsed.slotItems.size||parsed.completeSlotItems))result.equipment=hdKcMergeEquipment(parsed);
@@ -511,7 +537,7 @@ function hdKcApplyImport(preview,opts={}){
  integrity.verified=integrity.ships.complete&&integrity.equipment.complete;
  integrity.ok=(!integrity.ships.complete||integrity.ships.ok)&&(!integrity.equipment.complete||integrity.equipment.ok);
  const syncedAt=Date.now();
- const sync={syncedAt,lastSuccessAt:syncedAt,sources:preview.sources,userscriptVersion:String(preview.userscriptVersion||''),admiralLevel:Number(parsed.admiralLevel)||Number(previous?.admiralLevel)||0,coverage,ships:result.ships,equipment:result.equipment,equipmentRows:snapshot.equipmentRows,equipmentOwnedRows:snapshot.equipmentOwnedRows,equipmentPlanRows:snapshot.equipmentPlanRows,equipmentItems:snapshot.equipment,materials:result.materials,decks:result.decks,expeditions:result.expeditions,docks:result.docks,quests:result.quests,sorties:result.sorties,unknownShips:preview.unknownShips,unknownEquip:preview.unknownEquip,snapshot,integrity,delta};
+ const sync={transferReceipt,syncedAt,lastSuccessAt:syncedAt,sources:preview.sources,userscriptVersion:String(preview.userscriptVersion||''),admiralLevel:Number(parsed.admiralLevel)||Number(previous?.admiralLevel)||0,coverage,ships:result.ships,equipment:result.equipment,equipmentRows:snapshot.equipmentRows,equipmentOwnedRows:snapshot.equipmentOwnedRows,equipmentPlanRows:snapshot.equipmentPlanRows,equipmentItems:snapshot.equipment,materials:result.materials,decks:result.decks,expeditions:result.expeditions,docks:result.docks,quests:result.quests,sorties:result.sorties,unknownShips:preview.unknownShips,unknownEquip:preview.unknownEquip,snapshot,integrity,delta};
  localStorage.setItem(HD_KC_SYNC_KEY,JSON.stringify(sync));
  try{localStorage.setItem(HD_KC_LAST_SUCCESS_AT_KEY,String(syncedAt))}catch{}
  window.dispatchEvent(new CustomEvent('hd:kancolle-sync',{detail:sync}));hdKcRenderSyncStatus();hdKcRenderCurrentFleets();hdKcNotifySyncSuccess(sync);
@@ -723,7 +749,7 @@ function hdKcBridgeImportOnce(captureId,raw){
 async function hdKcHandleBridgeImport(raw){
  hdKcEnsureImport();
  const preview=await hdKcReadAndPreview(raw);
- const sync=hdKcApplyImport(preview,{ships:true,equipment:true,resources:true,fleets:true,timers:true,quests:true,sorties:true});
+ const sync=hdKcApplyImport(preview,{automatic:true,ships:true,equipment:true,resources:true,fleets:true,timers:true,quests:true,sorties:true});
  const result=document.getElementById('hdKcImportResult');
  if(result)result.textContent=`Userscriptsから自動同期完了: 艦娘 ${sync.ships} / 装備 ${sync.equipment} / 資源 ${sync.materials} / 艦隊 ${sync.decks} / 遠征 ${sync.expeditions||0} / 入渠 ${sync.docks||0} / 任務 ${sync.quests||0} / 出撃 ${sync.sorties||0}`;
  const sec=document.getElementById('kancolleImport');if(sec)sec.scrollIntoView({block:'start'});
@@ -753,7 +779,7 @@ async function hdKcConsumeWindowNameImport(){
  try{
   hdKcEnsureImport();
   const preview=await hdKcReadAndPreview(value.slice(prefix.length));
-  const sync=hdKcApplyImport(preview,{ships:true,equipment:true,resources:true,fleets:true,timers:true,quests:true,sorties:true});
+  const sync=hdKcApplyImport(preview,{automatic:true,ships:true,equipment:true,resources:true,fleets:true,timers:true,quests:true,sorties:true});
   const result=document.getElementById('hdKcImportResult');
   if(result)result.textContent=`Userscriptsから自動同期完了: 艦娘 ${sync.ships} / 装備 ${sync.equipment} / 資源 ${sync.materials} / 艦隊 ${sync.decks} / 遠征 ${sync.expeditions||0} / 入渠 ${sync.docks||0} / 任務 ${sync.quests||0} / 出撃 ${sync.sorties||0}`;
   const sec=document.getElementById('kancolleImport');if(sec)sec.scrollIntoView({block:'start'});
@@ -775,7 +801,7 @@ async function hdKcConsumeHashImport(){
   const raw=await hdKcDecodeHandoff(m[1]);
   hdKcEnsureImport();
   const preview=await hdKcReadAndPreview(raw);
-  const sync=hdKcApplyImport(preview,{ships:true,equipment:true,resources:true,fleets:true,timers:true,quests:true,sorties:true});
+  const sync=hdKcApplyImport(preview,{automatic:true,ships:true,equipment:true,resources:true,fleets:true,timers:true,quests:true,sorties:true});
   const result=document.getElementById('hdKcImportResult');
   if(result)result.textContent=`Userscriptsから自動同期完了: 艦娘 ${sync.ships} / 装備 ${sync.equipment} / 資源 ${sync.materials} / 艦隊 ${sync.decks} / 遠征 ${sync.expeditions||0} / 入渠 ${sync.docks||0} / 任務 ${sync.quests||0} / 出撃 ${sync.sorties||0}`;
   const sec=document.getElementById('kancolleImport');if(sec)sec.scrollIntoView({block:'start'});

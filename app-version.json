@@ -1,8 +1,8 @@
 {
-  "version": "1.0.493",
-  "build": 493,
-  "releasedAt": "2026-10-01T03:36:33.589+09:00",
-  "notes": "艦これマスター自動同期。api_start2 f45f36f / 装備picker 9a74ce1 を反映。艦娘変更 0件 / 新装備 0件 / 装備変更 0件 / 増設ルール 0件。",
+  "version": "1.0.494",
+  "build": 494,
+  "releasedAt": "2026-10-03T03:24:58.902701+09:00",
+  "notes": "ホーム画面の同期受信を改善。受信済みデータの再適用と古い取得データによる上書きを防止し、受信記録を再起動後も保持。",
   "masterChanges": {
     "baseline": false,
     "from": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
