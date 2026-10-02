@@ -9234,7 +9234,7 @@ function hdShipDbMasterSuggestedHtml(row){
 }
 function hdShipDbMasterNext(row){return hdShipDbMasterSnapshot().allShips?.[String(row.afterId)]?.name||''}
 function hdShipDbMasterOwned(row){
- const rows=hdShipDbRoster().filter(x=>String(x.name||'').trim()===row.name);
+ const rows=hdShipDbRoster().filter(x=>typeof hdShipFamilyId==='function'?hdShipFamilyId(x)===Number(row.id):String(x.name||'').trim()===row.name);
  return rows.sort((a,b)=>(Number(b.level)||0)-(Number(a.level)||0))[0]||null;
 }
 function hdShipDbMasterMatchesType(row,type){
@@ -9247,7 +9247,7 @@ function hdShipDbMasterMatchesType(row,type){
 let hdShipDbAcquisitionIndex=null;
 function hdShipDbAcquisitionRows(name){
  if(!hdShipDbAcquisitionIndex&&typeof hdDropAllTargets==='function')hdShipDbAcquisitionIndex=new Map(hdDropAllTargets().map(row=>[row.ship,row]));
- const ship=String(name||'').trim(),base=ship.split('改')[0],drop=hdShipDbAcquisitionIndex?.get(ship)||hdShipDbAcquisitionIndex?.get(base)||null;
+ const ship=String(name||'').trim(),base=typeof hdShipFamilyBaseName==='function'?hdShipFamilyBaseName(ship):ship.split('改')[0],drop=hdShipDbAcquisitionIndex?.get(ship)||hdShipDbAcquisitionIndex?.get(base)||null;
  const recipes=typeof HD_CONSTRUCTION_RECIPES!=='undefined'?HD_CONSTRUCTION_RECIPES.filter(recipe=>recipe.target.includes(ship)||recipe.target.includes(base)):[];
  return {ship,base,drop,recipes};
 }
@@ -9290,7 +9290,7 @@ async function hdShipDbUpdateImageCoverage(){
 function hdShipDbEsc(s){return typeof rosterEsc==='function'?rosterEsc(s):String(s??'')}
 function hdShipDbRoster(){try{return JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')||[]}catch{return []}}
 function hdShipDbOwned(item){
- const rows=hdShipDbRoster().filter(x=>{const n=String(x.name||'').trim();return n===item.base||n===item.final||n.startsWith(item.base)});
+ const rows=hdShipDbRoster().filter(x=>typeof hdShipSameFamily==='function'?hdShipSameFamily(x,item.base)||hdShipSameFamily(x,item.final):[item.base,item.final].includes(String(x.name||'').trim()));
  if(!rows.length)return null;
  return rows.sort((a,b)=>(Number(b.level)||0)-(Number(a.level)||0))[0];
 }
@@ -9338,7 +9338,7 @@ function hdRenderShipDatabase(){
  if((q||hdShipDbImageFilter!=='all')&&hdShipDbIncludeMaster){
   const detailedNames=new Set(HD_SHIP_DATABASE.map(x=>x.final));
   masterRows=hdShipDbMasterRows().filter(x=>!detailedNames.has(x.name)&&hdShipDbMasterMatchesType(x,hdShipDbType)&&(!q||(`${x.name} ${x.type}`.toLowerCase().includes(q))||hdShipDbAcquisitionMatches(x.name,q))&&hdShipDbImageMatches(x));
-  if(hdShipDbMissingOnly)masterRows=masterRows.filter(x=>!hdShipDbMasterOwned(x));
+  if(hdShipDbMissingOnly)masterRows=masterRows.filter(x=>!hdShipDbOwned({base:x.name,final:x.name}));
   masterRows.sort((a,b)=>(a.sortno||99999)-(b.sortno||99999)||a.id-b.id);
  }
  const shown=masterRows.slice(0,80),masterHtml=shown.length?`<div class="hd-shipdb-master-group"><div class="hd-shipdb-master-group-head"><div><div class="eyebrow">OFFICIAL MASTER</div><strong>公式マスター参照</strong></div><span>${masterRows.length}件${masterRows.length>80?'・先頭80件表示':''}</span></div>${shown.map(hdShipDbMasterCardHtml).join('')}</div>`:'';
@@ -9433,6 +9433,8 @@ window.addEventListener('storage',e=>{if(e.key==='harbordesk-equipment-v1')hdShi
 window.addEventListener('hd:equipment-changed',()=>hdShipDbRefreshOwnedFits(document));
 window.addEventListener('hd:ship-images-changed',()=>{hdShipDbUpdateImageCoverage();if(hdShipDbImageFilter!=='all')hdRenderShipDatabase();else if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(document.getElementById('hdShipDbList')||document)});
 window.addEventListener('hd:ship-images-ready',()=>{hdShipDbUpdateImageCoverage();if(hdShipDbImageFilter!=='all')hdRenderShipDatabase()});
+window.addEventListener('hd:ship-identity-changed',()=>hdShipDbScheduleRender());
+window.addEventListener('storage',e=>{if(e.key==='harbordesk-ship-roster-v1'||e.key===null)hdShipDbScheduleRender()});
 setTimeout(()=>hdShipDbRefreshOwnedFits(document),900);
 document.addEventListener('click',e=>{const jump=e.target.closest?.('[data-hd-shipdb-jump]');if(jump){hdShipDbJumpTo(jump.dataset.hdShipdbJump);return}});
 function hdShipDbOpenConstructionLink(buildLink){

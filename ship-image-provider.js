@@ -41,6 +41,38 @@ function hdShipIdentityRef(input){
  if(s.suggestedId&&s.master)return {id:s.suggestedId,name:s.canonical||s.name};
  return s.name||'';
 }
+let HD_SHIP_FAMILY_CACHE=null;
+function hdShipFamilyIndex(){
+ const ships=window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips||{};
+ if(HD_SHIP_FAMILY_CACHE?.ships===ships)return HD_SHIP_FAMILY_CACHE;
+ const groups=new Map(),names=new Map(),parents=new Map();
+ for(const row of Object.values(ships)){groups.set(Number(row.id),new Set([Number(row.id)]));names.set(String(row.name||'').trim(),Number(row.id))}
+ for(const row of Object.values(ships)){
+  const id=Number(row.id),next=Number(row.afterId);if(!next||!groups.has(next))continue;
+  if(!parents.has(next))parents.set(next,new Set());parents.get(next).add(id);
+  const a=groups.get(id),b=groups.get(next);if(a===b)continue;
+  const merged=new Set([...a,...b]);for(const member of merged)groups.set(member,merged);
+ }
+ return HD_SHIP_FAMILY_CACHE={ships,groups,names,parents};
+}
+function hdShipFamilyId(input){
+ const index=hdShipFamilyIndex(),id=Number(input?.masterId)||0;
+ if(id&&index.groups.has(id))return id;
+ return index.names.get(String(input?.name??(typeof input==='string'?input:'')).trim())||0;
+}
+function hdShipSameFamily(a,b){
+ const index=hdShipFamilyIndex(),left=hdShipFamilyId(a),right=hdShipFamilyId(b);
+ if(left&&right)return index.groups.get(left).has(right);
+ const name=x=>String(x?.name??(typeof x==='string'?x:'')).trim();
+ return !!name(a)&&name(a)===name(b);
+}
+function hdShipFamilyBaseName(input){
+ const index=hdShipFamilyIndex(),id=hdShipFamilyId(input),group=index.groups.get(id);
+ if(!group)return String(input?.name??input??'').trim();
+ const roots=[...group].filter(member=>!index.parents.has(member));
+ const row=(roots.length?roots:[...group]).map(member=>index.ships[String(member)]).sort((a,b)=>Number(a.sortno)-Number(b.sortno)||Number(a.id)-Number(b.id))[0];
+ return String(row?.name||'');
+}
 function hdShipImageConfig(){
  try{const x=JSON.parse(localStorage.getItem(HD_SHIP_IMAGE_CONFIG_KEY)||'{}');return {remoteTemplate:String(x.remoteTemplate||'').trim(),autoSource:x.autoSource!==false}}catch{return {remoteTemplate:'',autoSource:true}}
 }

@@ -309,7 +309,7 @@ let hdDropMap='すべて';
 let hdDropMissingOnly=false;
 function hdDropEsc(s){return typeof esc==='function'?esc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdDropRosterNames(){try{return new Set((JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')||[]).map(x=>String(x.name||'').trim()).filter(Boolean))}catch{return new Set()}}
-function hdDropOwned(ship){const names=hdDropRosterNames();return [...names].some(n=>n===ship||n.startsWith(ship))}
+function hdDropOwned(ship){let rows=[];try{rows=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')||[]}catch{}return rows.some(row=>typeof hdShipSameFamily==='function'?hdShipSameFamily(row,ship):String(row.name||'').trim()===ship)}
 function hdDropHunts(){try{return JSON.parse(localStorage.getItem(HD_DROP_HUNT_KEY)||'[]')||[]}catch{return []}}
 function hdDropSave(v){
  localStorage.setItem(HD_DROP_HUNT_KEY,JSON.stringify(v));hdRenderDropHunts();hdRenderDropDb();
@@ -321,9 +321,8 @@ function hdDropUid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'
 function hdRenderDropDb(){
  const host=document.getElementById('hdDropDbList');if(!host)return;
  const q=(document.getElementById('hdDropSearch')?.value||'').trim().toLowerCase();
- const owned=hdDropRosterNames();
  let rows=hdDropAllTargets().filter(x=>(hdDropMap==='すべて'||x.locations.some(l=>l.map===hdDropMap))&&(!q||`${x.ship} ${x.type} ${x.locations.map(l=>`${l.map} ${l.node} ${l.note}`).join(' ')}`.toLowerCase().includes(q)));
- if(hdDropMissingOnly)rows=rows.filter(x=>![...owned].some(n=>n===x.ship||n.startsWith(x.ship)));
+ if(hdDropMissingOnly)rows=rows.filter(x=>!hdDropOwned(x.ship));
  const count=document.getElementById('hdDropCount');if(count)count.textContent=`${rows.length}隻`;
  host.innerHTML=rows.map(x=>{const isOwned=hdDropOwned(x.ship);return `<article class="hd-drop-card"><div class="hd-drop-head"><div><strong>${hdDropEsc(x.ship)}</strong><span>${hdDropEsc(x.type)}${x.featured?'・注目ドロップ':''}</span></div><b class="${isOwned?'owned':'missing'}">${isOwned?'所持済み':'未所持'}</b></div><div class="hd-drop-locations">${x.locations.filter(l=>hdDropMap==='すべて'||l.map===hdDropMap).map((l,i)=>`<div class="hd-drop-location ${l.featured?'featured':''}"><div><strong>${hdDropEsc(l.map)} ${hdDropEsc(l.node)}</strong><span>${hdDropEsc(l.rank)}勝利目安${l.featured?'・注目':''}</span></div><p>${hdDropEsc(l.note)}</p><button class="primary small" type="button" data-hd-drop-target="${hdDropEsc(x.ship)}" data-hd-drop-map="${hdDropEsc(l.map)}" data-hd-drop-node="${hdDropEsc(l.node)}">ここを掘り目標にする</button></div>`).join('')}</div><div class="hd-drop-source">${hdDropEsc(x.source)}｜確認 ${hdDropEsc(x.checked)}</div></article>`}).join('')||'<div class="empty">条件に合うドロップ候補がないよ</div>';
 }
@@ -373,3 +372,6 @@ document.addEventListener('click',e=>{
  const rr=e.target.closest?.('[data-hd-hunt-roster]');if(rr){const h=hdDropHunts().find(x=>x.id===rr.dataset.hdHuntRoster);if(h&&typeof openShipRosterDialog==='function'){openShipRosterDialog({name:h.ship,memo:`${h.map} ${h.node}で入手。HarborDesk掘り記録 ${h.runs||0}周。`})}}
 });
 window.addEventListener('load',()=>setTimeout(hdEnsureDropDb,340));setTimeout(hdEnsureDropDb,520);
+function hdDropRefreshOwnership(){hdRenderDropDb();hdRenderDropHunts();hdMapDropRefreshCurrent()}
+window.addEventListener('hd:ship-identity-changed',hdDropRefreshOwnership);
+window.addEventListener('storage',e=>{if(e.key==='harbordesk-ship-roster-v1'||e.key===null)hdDropRefreshOwnership()});
