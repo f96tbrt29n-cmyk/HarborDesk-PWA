@@ -15,6 +15,9 @@ test('navigator refreshes live condition after sync and roster changes while kee
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);
  const health=page.locator('.hd-msn-check').filter({has:page.locator('b',{hasText:'艦状態'})});
  await expect(health).toContainText('同期状態不明');
+ await page.evaluate(()=>rosterSave([{id:'manual',name:'吹雪',masterId:1,level:25}]));
+ await expect(health).toHaveClass(/manual/);
+ await expect(health).toContainText('同期状態不明');
  await page.evaluate(()=>hdKcHandleBridgeImport(JSON.stringify({format:'harbordesk-kancolle-import',version:2,captureId:'preflight',records:[{endpoint:'/kcsapi/api_port/port',at:Date.now(),payload:{api_result:1,api_data:{api_ship:[{api_id:11,api_ship_id:1,api_lv:25,api_nowhp:1,api_maxhp:15,api_cond:49,api_slot:[],api_fuel:15,api_bull:20}],api_deck_port:[],api_material:[]}}}]})));
  await expect(health).toHaveClass(/missing/);
  await expect(health).toContainText('大破');
@@ -29,6 +32,19 @@ test('navigator refreshes live condition after sync and roster changes while kee
  await expect(health).toHaveClass(/missing/);
  await expect(page.locator('#hdMapStrategyFleet')).toHaveValue('second');
  await other.close();expect(errors).toEqual([]);
+});
+test('registered ships with incomplete condition stay unverified, and known damage still blocks',async({page})=>{
+ await boot(page);
+ const states=await page.evaluate(()=>{
+  const condition=row=>{
+   localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{id:'manual',name:'吹雪',masterId:1,...row}]));
+   return hdFEEvaluate({map:'3-2',ships:[{ship:'吹雪',masterId:1,items:[]}]}).auto.checks.find(x=>x.id==='health');
+  };
+  return [condition({}),condition({gameHp:15,gameMaxHp:15}),condition({gameHp:0,gameMaxHp:15}),condition({gameHp:15,gameMaxHp:15,gameCond:49})];
+ });
+ expect(states.map(x=>x.status)).toEqual(['manual','manual','missing','ready']);
+ expect(states[0].detail).toContain('同期状態不明');expect(states[1].detail).toContain('同期状態不明');
+ expect(states[2].detail).toContain('大破');
 });
 test('changing a roster immediately updates the sortie checklist registration count',async({page})=>{
  await boot(page);

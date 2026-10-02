@@ -139,9 +139,10 @@ function hdFELiveFleet(plan){
   if(x.row&&typeof hdFSOperational==='function')op=hdFSOperational(x.row,state);
   else if(x.row){const hp=Number(x.row.gameHp)||0,max=Number(x.row.gameMaxHp)||0,ratio=max>0?hp/max:null;op={available:!(ratio!=null&&ratio<=.25),reasons:ratio!=null&&ratio<=.25?['大破']:[],labels:ratio!=null&&ratio<=.5?['中破']:[],penalty:0,hp,maxHp:max,cond:Number(x.row.gameCond)||null}}
   if(!op){details.push({name:x.ship.ship,status:'unknown',labels:['同期状態不明']});continue}
+  const known=Number(x.row?.gameMaxHp)>0&&x.row?.gameHp!=null&&Number.isFinite(Number(x.row.gameHp))&&x.row?.gameCond!=null&&Number.isFinite(Number(x.row.gameCond));
   if(op.available===false){blocked++;for(const r of op.reasons||[])reasons[r]=(reasons[r]||0)+1}
   else if((op.labels||[]).some(v=>/中破|小破|疲労/.test(v)))caution++;
-  details.push({name:x.ship.ship,status:op.available===false?'blocked':((op.labels||[]).some(v=>/中破|小破|疲労/.test(v))?'caution':'ready'),labels:[...(op.reasons||[]),...(op.labels||[])],hp:op.hp,maxHp:op.maxHp,cond:op.cond});
+  details.push({name:x.ship.ship,status:op.available===false?'blocked':!known?'unknown':((op.labels||[]).some(v=>/中破|小破|疲労/.test(v))?'caution':'ready'),labels:[...(op.reasons||[]),...(op.labels||[]),...(!known?['同期状態不明']:[])],hp:op.hp,maxHp:op.maxHp,cond:op.cond});
  }
  const status=blocked?'missing':caution?'partial':(details.length&&details.every(x=>x.status!=='unknown')?'ready':'manual');
  return {status,blocked,caution,reasons,details,total:rows.length};
