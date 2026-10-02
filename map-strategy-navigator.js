@@ -27,10 +27,11 @@ function hdMSNEvaluation(map,fleet,preset){
  try{
   const plan=hdFEPlanFromSavedFleet(map,fleet);
   if(preset){plan.preset=preset;plan.routeInfo=typeof hdFSPresetInfo==='function'?hdFSPresetInfo(preset):null}
-  const result=hdFEEvaluate(plan),auto=result.auto,gate=typeof hdFEGoNoGo==='function'?hdFEGoNoGo(auto):null;
+  const result=hdFEEvaluate(plan),auto=result.auto;
   const checks=HD_MSN_CHECK_IDS.map(id=>auto.checks.find(c=>c.id===id)).filter(Boolean);
   const routeParsed=preset&&typeof hdFSPresetInfo==='function'?hdFSPresetInfo(preset):null;
   if(routeParsed&&!routeParsed.requirements?.length){const route=checks.find(c=>c.id==='route');if(route){route.status='manual';route.detail='編成例から艦種条件を自動抽出できないためルートを確認'}}
+  const gate=typeof hdFEGoNoGo==='function'?hdFEGoNoGo(auto):null;
   const actions=(gate?.actions||[]).filter(a=>a.id!=='route'||routeParsed?.requirements?.length).slice(0,4);
   const missing=checks.filter(x=>x.status==='missing').length,manual=checks.filter(x=>x.status==='manual'||x.status==='partial').length;
   const title=missing?`修正が必要 ${missing}件`:manual?`要確認 ${manual}件`:'自動判定の不足なし';
@@ -54,5 +55,9 @@ document.addEventListener('click',e=>{if(e.target.closest?.('[data-hd-msn-open]'
 window.addEventListener('hd:guide-map-changed',e=>{if(e.detail?.map)hdMSNSelectMap(e.detail.map,false)});
 window.addEventListener('hd:map-rendered',()=>hdMSNAddEntry());
 window.addEventListener('hd:custom-fleets-changed',()=>hdMSNRender());
+let hdMSNRefreshTimer=0;
+function hdMSNScheduleRefresh(){clearTimeout(hdMSNRefreshTimer);hdMSNRefreshTimer=setTimeout(hdMSNRender,80)}
+['hd:kancolle-sync','hd:ship-identity-changed','hd:equipment-changed','hd:workspace-refresh'].forEach(event=>window.addEventListener(event,hdMSNScheduleRefresh));
+window.addEventListener('storage',e=>{if(e.key===null||['harbordesk-custom-fleets-v1','harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-kancolle-sync-v1','harbordesk-kancolle-fleets-v1','harbordesk-pwa-v1'].includes(e.key))hdMSNScheduleRefresh()});
 window.addEventListener('hd:modules-ready',()=>{hdMSNRender();hdMSNAddEntry()});
 window.addEventListener('load',()=>{if(typeof selectedMap!=='undefined'&&selectedMap)hdMSNMap=selectedMap;hdMSNRender();hdMSNAddEntry()});
