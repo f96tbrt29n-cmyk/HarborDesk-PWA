@@ -508,10 +508,10 @@ function hdKcCheckTransfer(parsed,previous){
  const incoming=parsed.transfer,prior=previous?.transferReceipt;
  if(!incoming)return prior;
  const keys=Array.isArray(prior?.keys)?prior.keys:[];
- if(keys.includes(incoming.key))throw new Error('この同期データは受信済みだよ。艦これで母港などを開き、新しいデータを送ってね');
+ if(keys.includes(incoming.key))throw hdKcReceiveError('duplicate','この同期データは受信済みだよ。艦これで母港などを開き、新しいデータを送ってね');
  const endpoints={...(prior?.endpoints||{})};
  for(const [endpoint,at] of Object.entries(incoming.endpoints)){
-  if(at<(Number(endpoints[endpoint])||0))throw new Error('保存済みより古い同期データだよ。艦これで母港などを開き直してから送ってね');
+  if(at<(Number(endpoints[endpoint])||0))throw hdKcReceiveError('stale','保存済みより古い同期データだよ。艦これで母港などを開き直してから送ってね');
  }
  for(const [endpoint,at] of Object.entries(incoming.endpoints))endpoints[endpoint]=Math.max(Number(endpoints[endpoint])||0,at);
  return {keys:[...keys,incoming.key].slice(-40),endpoints};
@@ -603,6 +603,7 @@ function hdKcPreviewHtml(p){
  return `<div class="hd-kc-import-stats"><div><span>艦娘</span><strong>${p.ships}</strong><small>${p.completeShips?'全件同期候補':'部分データ'}</small></div><div><span>装備個体</span><strong>${p.slotItems}</strong><small>${p.completeSlotItems?'全件同期候補':'部分データ'}</small></div><div><span>資源</span><strong>${p.materials}</strong></div><div><span>艦隊</span><strong>${p.decks}</strong></div><div><span>遠征中</span><strong>${p.expeditions||0}</strong></div><div><span>入渠中</span><strong>${p.docks||0}</strong></div><div><span>任務</span><strong>${p.activeQuests||0}</strong><small>${p.completeQuests?'全ページ取得':'取得ページ内'}</small></div><div><span>出撃</span><strong>${p.sortieStarts||0}</strong><small>戦闘結果 ${p.battleResults||0}</small></div></div>${p.unknownShips||p.unknownEquip?`<div class="hd-kc-import-warn">未解決: 艦娘 ${p.unknownShips} / 装備 ${p.unknownEquip}</div>`:''}<small>検出元: ${p.sources.map(hdKcEsc).join(' / ')||'自動判定'}</small>`;
 }
 function hdKcRenderSyncStatus(){
+ hdKcRenderReceiveState();
  const el=document.getElementById('hdKcSyncLast'),headline=document.getElementById('hdKcSyncHeadline'),box=document.querySelector('.hd-kc-sync-overview'),s=hdKcSyncStatus(),lastSyncAt=s?hdKcSyncSuccessAt(s):0;
  const audit=hdKcLiveLedgerAudit(s);
  const equipRows=s?Number(s.equipmentOwnedRows??s.snapshot?.equipmentOwnedRows??s.equipmentRows??s.equipment)||0:0,equipPlans=s?Number(s.equipmentPlanRows??s.snapshot?.equipmentPlanRows)||0:0,equipItems=s?Number(s.equipmentItems??s.snapshot?.equipment??s.equipment)||0:0;
@@ -823,6 +824,7 @@ function hdKcEnsureImport(){
  <div class="section-head"><div><div class="eyebrow">GAME DATA IMPORT</div><h2>艦これゲーム内データ取込</h2></div><span class="muted">端末内処理</span></div>
  <div class="hd-kc-import card">
   <div class="hd-kc-sync-overview"><div><span>連携状態</span><strong id="hdKcSyncHeadline">確認中…</strong></div><div class="hd-kc-sync-side"><div id="hdKcSyncLast" class="muted"></div><button type="button" class="ghost small" data-hd-kc-return-game hidden>艦これへ戻る</button></div></div><div id="hdKcSyncDelta" class="hd-kc-sync-delta"></div><div id="hdKcSyncCoverage" class="hd-kc-sync-coverage"></div><div id="hdKcSyncRecommendation" class="hd-kc-sync-recommendation" hidden></div><div id="hdKcUserscriptStatus" class="hd-kc-userscript-status" hidden></div><div id="hdKcBridgeStatus" class="hd-kc-bridge-status" hidden></div><div id="hdKcNextActions" class="hd-kc-next-actions" hidden><span>次に見る</span><div><button type="button" class="ghost small" data-hd-kc-jump="roster">艦隊台帳</button><button type="button" class="ghost small" data-hd-kc-jump="equipmentBook">装備台帳</button><button type="button" class="ghost small" data-hd-kc-jump="quests">任務</button><button type="button" class="ghost small" data-hd-kc-jump="sortieLog">出撃記録</button></div></div>
+  <div class="hd-kc-receive-panel"><div data-hd-kc-receive-summary></div><p data-hd-kc-receive-result role="status" aria-live="polite" hidden></p><button type="button" class="primary" data-hd-kc-receive>同期を受け取る</button><small>艦これで「ホーム画面へ送る」を押してから受け取ってね。この画面の台帳に保存するよ。</small></div>
   <div id="hdKcImportResult" class="hd-kc-import-result muted" aria-live="polite"></div>
   <details class="hd-kc-capture-guide" data-hd-kc-auto-guide open><summary>Userscripts 自動連携</summary><div><p>艦これを開くだけで対応APIを自動取得。ゲーム画面で「ホーム画面へ送る」→ホーム画面のHarborDeskで「同期を受け取る」を押してね。JSONを手で操作する必要はないよ。</p><div class="hd-kc-import-actions"><a class="primary" href="./HarborDesk-Kancolle.user.js" target="_blank" rel="noopener">Userscripts版を確認・更新</a></div><ol><li>Userscriptsを有効にする</li><li>艦これを開き直す</li><li>母港・装備・任務などを一度開く</li><li>ゲーム画面から送る</li></ol><small>リクエスト本文・api_token・Cookie・DMMログイン情報は保存しない。</small></div></details>
   <details class="hd-kc-capture-guide"><summary>その他の取込方法</summary><div>
@@ -841,29 +843,47 @@ function hdKcEnsureImport(){
  </div>`;
  wrap.insertBefore(sec,backup);if(synced)sec.querySelector('[data-hd-kc-auto-guide]')?.removeAttribute('open');hdKcRenderSyncStatus();hdKcRenderCurrentFleets();
 }
+let HD_KC_RECEIVE_BUSY=false;
+let HD_KC_RECEIVE_RESULT=null;
+function hdKcReceiveError(code,message){const err=new Error(message);err.code=code;return err}
+function hdKcRenderReceiveState(){
+ const sync=hdKcSyncStatus(),at=sync?hdKcSyncSuccessAt(sync):0;
+ const ships=Number(sync?.snapshot?.ships??sync?.ships)||0,equipment=Number(sync?.equipmentItems??sync?.snapshot?.equipment??sync?.equipment)||0;
+ const summary=sync?`この画面に保存済み：艦娘 ${ships}隻・装備 ${equipment}個\n最終受信 ${new Date(at).toLocaleString('ja-JP')}`:'この画面にはまだ同期データを保存していないよ';
+ document.querySelectorAll('[data-hd-kc-receive-summary]').forEach(el=>el.textContent=summary);
+ document.querySelectorAll('[data-hd-kc-receive-result]').forEach(el=>{el.hidden=!HD_KC_RECEIVE_RESULT;el.dataset.state=HD_KC_RECEIVE_RESULT?.state||'';el.textContent=HD_KC_RECEIVE_RESULT?.message||''});
+ document.querySelectorAll('[data-hd-kc-receive]').forEach(el=>{el.disabled=HD_KC_RECEIVE_BUSY;el.textContent=HD_KC_RECEIVE_BUSY?'読み込み中…':'同期を受け取る';el.setAttribute('aria-busy',String(HD_KC_RECEIVE_BUSY))});
+}
+async function hdKcReceiveFromClipboard(){
+ if(HD_KC_RECEIVE_BUSY)return;
+ HD_KC_RECEIVE_BUSY=true;HD_KC_RECEIVE_RESULT={state:'reading',message:'同期データを読み込み中…'};hdKcRenderReceiveState();
+ try{
+  if(typeof navigator.clipboard?.readText!=='function')throw hdKcReceiveError('unsupported','この画面では受信できないよ。Safariかホーム画面のHarborDeskで開いてね');
+  let raw='';
+  try{raw=await navigator.clipboard.readText()}catch{throw hdKcReceiveError('permission','読み取りが許可されなかったよ。もう一度押して、iPhoneの「ペーストを許可」を選んでね')}
+  let data;try{data=hdKcReadJson(raw)}catch{throw hdKcReceiveError('invalid','艦これの同期データが見つからないよ。先に艦これ画面で「ホーム画面へ送る」を押してね')}
+  if(data?.format!=='harbordesk-kancolle-import'||!Array.isArray(data.records)||!data.records.length)throw hdKcReceiveError('invalid','先に艦これ画面で「ホーム画面へ送る」を押してね');
+  const sync=await hdKcHandleBridgeImport(raw);
+  HD_KC_RECEIVE_RESULT={state:'success',message:`同期したよ。艦娘 ${Number(sync.snapshot?.ships??sync.ships)||0}隻・装備 ${Number(sync.equipmentItems??sync.equipment)||0}個を保存したよ。`};
+  alert(HD_KC_RECEIVE_RESULT.message);
+ }catch(err){
+  const state=['duplicate','stale','permission','invalid','unsupported'].includes(err?.code)?err.code:'error';
+  HD_KC_RECEIVE_RESULT={state,message:String(err?.message||err)};
+  alert('同期できなかったよ: '+HD_KC_RECEIVE_RESULT.message);
+ }finally{HD_KC_RECEIVE_BUSY=false;hdKcRenderReceiveState()}
+}
 function hdKcEnsureHomeScreenSync(){
  if(!(window.matchMedia?.('(display-mode: standalone)').matches||navigator.standalone===true))return;
  const header=document.querySelector('.topbar');if(!header||document.getElementById('hdKcHomeSync'))return;
- const button=document.createElement('button');button.id='hdKcHomeSync';button.type='button';button.className='ghost small';
- button.textContent='同期を受け取る';button.title='ゲーム同期を受け取る';button.setAttribute('aria-label','ゲーム同期を受け取る');button.style.cssText='white-space:nowrap;min-height:38px;font-size:11px;padding:6px';
- button.addEventListener('click',async()=>{
-  button.disabled=true;button.textContent='読み込み中…';
-  try{
-   let raw='';
-   try{raw=await navigator.clipboard.readText()}catch{throw new Error('iPhoneの「ペーストを許可」を選んで、もう一度押してね')}
-   const data=hdKcReadJson(raw);
-   if(data?.format!=='harbordesk-kancolle-import'||!Array.isArray(data.records)||!data.records.length)throw new Error('先に艦これ画面で「ホーム画面へ送る」を押してね');
-   const sync=await hdKcHandleBridgeImport(raw);
-   alert(`ホーム画面版へ同期したよ。艦娘 ${sync.ships}隻・装備 ${sync.equipment}件を反映したよ。`);
-  }catch(err){alert('同期できなかったよ: '+String(err?.message||err))}
-  finally{button.disabled=false;button.textContent='同期を受け取る'}
- });
- header.appendChild(button);
+ const button=document.createElement('button');button.id='hdKcHomeSync';button.type='button';button.className='ghost small';button.setAttribute('data-hd-kc-receive','');
+ button.textContent='同期を受け取る';button.title='ゲーム同期を受け取る';button.setAttribute('aria-label','ゲーム同期を受け取る');
+ header.appendChild(button);hdKcRenderReceiveState();
 }
 async function hdKcReadAndPreview(raw){
  const p=hdKcPreviewData(hdKcParseImport(raw));HD_KC_IMPORT_PREVIEW=p;const el=document.getElementById('hdKcImportPreview');if(el)el.innerHTML=hdKcPreviewHtml(p);const btn=document.querySelector('[data-hd-kc-apply]');if(btn)btn.disabled=false;return p;
 }
 document.addEventListener('click',async e=>{
+ if(e.target.closest?.('[data-hd-kc-receive]')){await hdKcReceiveFromClipboard();return}
  const ship=e.target.closest?.('[data-hd-kc-ship]');if(ship){hdKcOpenShipFromFleet(ship.dataset.hdKcShip);return}
  const jump=e.target.closest?.('[data-hd-kc-jump]');if(jump){const id=jump.dataset.hdKcJump;if(typeof hdQNRecordRecent==='function')hdQNRecordRecent(id);if(typeof hdWSShowElement==='function')hdWSShowElement(id,true);else document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});return}
  if(e.target.closest?.('[data-hd-kc-return-game]')){

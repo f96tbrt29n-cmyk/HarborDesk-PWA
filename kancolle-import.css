@@ -82,3 +82,15 @@
  .hd-kc-deck-actions button{min-height:38px}
  .hd-kc-deck-ship{grid-template-columns:20px auto minmax(0,1fr) 14px}
 }
+
+/* Keep receipt feedback visible after the system alert is dismissed. */
+.hd-kc-receive-panel{display:grid;gap:10px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#10283b;margin:12px 0}
+.hd-kc-receive-panel [data-hd-kc-receive-summary]{white-space:pre-line;font-size:13px;line-height:1.7;font-weight:700;overflow-wrap:anywhere}
+.hd-kc-receive-panel small{color:var(--muted);font-size:11px;line-height:1.6}
+.hd-kc-receive-panel [data-hd-kc-receive-result]{margin:0;padding:10px;border-radius:9px;background:#342c1c;color:#ffe0a0;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.hd-kc-receive-panel [data-state="success"]{background:#153c30;color:#bcf5d5}
+.hd-kc-receive-panel [data-state="reading"]{background:#18374e;color:#d1eeff}
+.hd-kc-receive-panel [hidden]{display:none}
+.hd-kc-receive-panel button{min-height:44px;touch-action:manipulation}
+.hd-sync-status-dialog>.hd-kc-receive-panel{margin:0 14px 14px}
+#hdKcHomeSync{flex:0 0 auto;white-space:nowrap;min-height:44px;padding:8px;font-size:11px;touch-action:manipulation}

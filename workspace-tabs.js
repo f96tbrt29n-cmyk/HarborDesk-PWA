@@ -307,7 +307,7 @@ function hdWSSyncChecklistHtml(info){
 function hdWSEnsureSyncDialog(){
  if(document.getElementById('hdSyncStatusDialog'))return document.getElementById('hdSyncStatusDialog');
  const d=document.createElement('dialog');d.id='hdSyncStatusDialog';d.className='hd-sync-status-dialog';
- d.innerHTML='<div class="hd-sync-status-head"><div><div class="eyebrow">GAME SYNC</div><h3>ゲーム同期の状態</h3></div><button type="button" class="ghost small" data-hd-sync-close>閉じる</button></div><div id="hdSyncStatusBody" class="hd-sync-status-body"></div><div class="hd-sync-status-actions"><a class="primary" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost" data-hd-sync-import>取込画面へ</button></div>';
+ d.innerHTML='<div class="hd-sync-status-head"><div><div class="eyebrow">GAME SYNC</div><h3>ゲーム同期の状態</h3></div><button type="button" class="ghost small" data-hd-sync-close>閉じる</button></div><div class="hd-kc-receive-panel"><div data-hd-kc-receive-summary></div><p data-hd-kc-receive-result role="status" aria-live="polite" hidden></p><button type="button" class="primary" data-hd-kc-receive>同期を受け取る</button><small>艦これで「ホーム画面へ送る」→この画面で受信</small></div><div id="hdSyncStatusBody" class="hd-sync-status-body"></div><div class="hd-sync-status-actions"><a class="primary" href="https://play.games.dmm.com/game/kancolle">艦これを開く</a><button type="button" class="ghost" data-hd-sync-import>取込画面へ</button></div>';
  document.body.appendChild(d);d.addEventListener('click',e=>{if(e.target===d)d.close?.()});return d;
 }
 function hdWSOpenSyncStatus(){
@@ -318,6 +318,7 @@ function hdWSOpenSyncStatus(){
  const statusText=info.state==='missing'?'まだゲームデータを同期してないよ':info.state==='stale'?'前回同期から時間が空いてるよ':info.state==='partial'?'一部のデータがまだ取れてないよ':'ゲームデータは最新だよ';
  const freshHtml=info.state==='fresh'?'<div class="hd-sync-guide"><b>最新状態</b><p>このまま使ってOK</p><small>艦これでプレイを進めたあと、必要な時だけ再同期してね。</small></div>':'';
  if(body)body.innerHTML='<strong>'+hdWSEsc(statusText)+'</strong><p>'+hdWSEsc(info.detail||'')+'</p>'+missingHtml+checklistHtml+freshHtml;
+ if(typeof hdKcRenderReceiveState==='function')hdKcRenderReceiveState();
  if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','');return true;
 }
 function hdWSEnsureSyncStatus(){
@@ -334,6 +335,7 @@ function hdWSUpdateSyncStatus(){
  const info=hdWSSyncInfo();btn.classList.remove('fresh','stale','partial','missing');btn.classList.add(info.state);
  btn.innerHTML=`<span>ゲーム同期</span><b>${hdWSEsc(info.shortLabel||info.label)}</b>`;
  btn.title=info.detail;btn.setAttribute('aria-label',`ゲーム同期 ${info.label}。タップで同期画面を開く`);
+ if(document.getElementById('hdSyncStatusDialog')?.open)hdWSOpenSyncStatus();
 }
 function hdWSTitle(el){return el?.querySelector(':scope > .section-head h2,:scope > .section-head h3,:scope > h2,:scope > h3')?.textContent?.trim()||el?.querySelector('h2,h3')?.textContent?.trim()||el?.id||'機能'}
 function hdWSGroupForSection(el){
