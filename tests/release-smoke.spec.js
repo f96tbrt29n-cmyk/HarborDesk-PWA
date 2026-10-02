@@ -10056,3 +10056,41 @@ test('release smoke: game sync freshness follows the latest successful sync mark
   expect(result.ws?.state).toBe('fresh');
   expect(result.home?.state).toBe('ok');
 });
+
+test('release smoke: persistent sync receipt rejects replay and stale data but accepts fresh capture', async ({ page }) => {
+  await page.addInitScript(() => Object.defineProperty(navigator, 'standalone', { value: true, configurable: true }));
+  await boot(page);
+  const bundle = (at, level) => ({format:'harbordesk-kancolle-import',version:2,captureId:'same-session',createdAt:new Date().toISOString(),records:[
+    {endpoint:'/kcsapi/api_port/port',at,payload:{api_result:1,api_data:{api_ship:[{api_id:987,api_ship_id:1,api_lv:level,api_nowhp:13,api_maxhp:13,api_cond:49,api_slot:[]}],api_deck_port:[],api_material:[]}}},
+    {endpoint:'/kcsapi/api_get_member/slot_item',at:at+1,payload:{api_result:1,api_data:[]}}
+  ]});
+  const receive = async data => {
+    await page.evaluate(raw => Object.defineProperty(navigator,'clipboard',{value:{readText:async()=>raw},configurable:true}),JSON.stringify(data));
+    const dialog = page.waitForEvent('dialog').then(async shown => {const message=shown.message();await shown.accept();return message;});
+    await page.locator('#hdKcHomeSync').click();
+    const message = await dialog;
+    await expect(page.locator('#hdKcHomeSync')).toBeEnabled();
+    return message;
+  };
+  const snapshot = () => page.evaluate(() => Object.fromEntries(['harbordesk-kancolle-sync-v1','harbordesk-kancolle-last-success-at-v1','harbordesk-ship-roster-v1','harbordesk-equipment-v1'].map(key=>[key,localStorage.getItem(key)])));
+  expect(await receive(bundle(100,20))).toContain('同期したよ');
+  const saved = await snapshot();
+  // Close and reopen the page in the same storage context, as with a saved PWA.
+  const context = page.context();
+  await page.close();
+  page = await context.newPage();
+  await page.addInitScript(() => Object.defineProperty(navigator, 'standalone', { value: true, configurable: true }));
+  await boot(page);
+  expect(await snapshot()).toEqual(saved);
+  expect(await receive({...bundle(100,20),captureId:'new-export',createdAt:'2099-01-01'})).toContain('受信済み');
+  expect(await snapshot()).toEqual(saved);
+  expect(await receive(bundle(90,10))).toContain('古い同期データ');
+  expect(await snapshot()).toEqual(saved);
+  expect(await receive(bundle(200,30))).toContain('同期したよ');
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')).find(x=>x.gameShipId===987).level)).toBe(30);
+  const newer = await snapshot();
+  // A fresh equipment timestamp must not hide an older ship snapshot.
+  const mixed=bundle(150,25);mixed.records[1].at=300;
+  expect(await receive(mixed)).toContain('古い同期データ');
+  expect(await snapshot()).toEqual(newer);
+});
