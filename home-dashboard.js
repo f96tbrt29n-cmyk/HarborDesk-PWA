@@ -271,8 +271,37 @@ function homeGuideGoalKey(task,now=Date.now()){
 }
 function homeGuideActiveMap(){return homeSelectedMap()||(typeof hdGuideMapSequence==='function'?hdGuideMapSequence()[0]:'')||''}
 let homeGuideLastSignature='';
+let homeGuidePressedPointer=null,homeGuideRenderPending=false;
+document.addEventListener('pointerdown',e=>{
+ if(e.button!==0||e.isPrimary===false||!e.target.closest?.('#homeGuideSteps'))return;
+ homeGuidePressedPointer={id:e.pointerId};
+},true);
+function homeGuideFinishPress(press,delay=0){
+ if(!press)return;
+ // Keep the pressed node through click and the default summary toggle.
+ setTimeout(()=>{
+  if(homeGuidePressedPointer!==press)return;
+  homeGuidePressedPointer=null;
+  if(homeGuideRenderPending)homeGuideRender();
+ },delay);
+}
+window.addEventListener('pointerup',e=>{
+ const press=homeGuidePressedPointer;if(press?.id!==e.pointerId)return;
+ // Flush after click; a release without a click must also resume updates.
+ homeGuideFinishPress(press,500);
+},true);
+window.addEventListener('pointercancel',e=>{
+ if(homeGuidePressedPointer?.id===e.pointerId)homeGuideFinishPress(homeGuidePressedPointer);
+},true);
+document.addEventListener('click',()=>homeGuideFinishPress(homeGuidePressedPointer),true);
+window.addEventListener('blur',()=>{
+ homeGuidePressedPointer=null;
+ if(homeGuideRenderPending)homeGuideRender();
+});
 function homeGuideRender(){
  const host=document.getElementById('homeGuideSteps');if(!host)return;
+ if(homeGuidePressedPointer){homeGuideRenderPending=true;return}
+ homeGuideRenderPending=false;
  const state=homeGuideState(),map=homeGuideActiveMap(),maps=typeof hdGuideMapSequence==='function'?hdGuideMapSequence():[],cleared=new Set(state.cleared.filter(x=>maps.includes(x))),done=new Set(state.done),pendingOnly=homeGuidePendingOnly();
  const signature=map+homeGuideJstMonth()+pendingOnly+JSON.stringify(state)+(typeof hdStrategyFingerprint==='function'?hdStrategyFingerprint(map):'');if(host.children.length&&homeGuideLastSignature===signature)return;homeGuideLastSignature=signature;
  const opened=new Set([...host.querySelectorAll('details.home-guide-group[open]')].map(el=>el.dataset.group));

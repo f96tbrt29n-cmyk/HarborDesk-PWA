@@ -178,3 +178,19 @@ test('revealing the active map tab scrolls only its tab bar and keeps the curren
   expect(position.right).toBeLessThanOrEqual(position.barRight+1);
  }
 });
+
+test('workspace tab refresh keeps the current page position while revealing category buttons',async({page})=>{
+ await boot(page);
+ const position=await page.evaluate(async()=>{
+  const section=document.getElementById('mapStrategyNavigator');
+  window.scrollTo({top:section.getBoundingClientRect().top+window.scrollY+150,behavior:'instant'});
+  const start=window.scrollY;
+  const location=hdWSCurrentLocation();
+  hdWSRenderSubtabs(location.group,location.section);
+  hdWSRevealTab(document.querySelector('[data-hd-ws-group="'+location.group+'"]'));
+  await new Promise(resolve=>setTimeout(resolve,250));
+  return {start,end:window.scrollY};
+ });
+ expect(position.start).toBeGreaterThan(0);
+ expect(Math.abs(position.end-position.start)).toBeLessThan(1);
+});

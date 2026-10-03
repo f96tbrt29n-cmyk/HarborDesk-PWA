@@ -3,6 +3,7 @@ const { test, expect } = require('@playwright/test');
 test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, serviceWorkers: 'block' });
 
 async function openApp(page) {
+  await page.route('**/*',route=>{const url=new URL(route.request().url());return ['127.0.0.1','localhost'].includes(url.hostname)?route.continue():route.fulfill({status:204,body:''})});
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => typeof homeGuideRender === 'function' && typeof hdShipDbAcquisitionRows === 'function' && typeof hdDropAllTargets === 'function' && typeof HD_CONSTRUCTION_RECIPES !== 'undefined', null, { timeout: 30000 });
   await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 30000 });
@@ -485,4 +486,65 @@ test('ship database: acquisition shows sourced drops and exact construction reci
   await expect(page.locator('#hdShipDbList .hd-shipdb-head strong').filter({ hasText: '大和' }).first()).toContainText('大和');
   const rows = await page.evaluate(() => ({ known: hdShipDbAcquisitionRows('明石').drop?.ship, unknown: hdShipDbAcquisitionRows('未収録艦名').drop, hasBuild: hdShipDbAcquisitionRows('大和').recipes.length > 0 }));
   expect(rows).toEqual({ known: '明石', unknown: null, hasBuild: true });
+});
+
+test('strategy goals: a refresh during a B175 check press preserves the click and latest goals', async ({ page }) => {
+  await openApp(page);
+  await page.evaluate(() => {
+    hdSelectGuideMap('7-4');
+    hdStrategyImportMap('7-4','7-4:baseSortie:B175-7-3');
+    document.querySelector('[data-group="quest"]').open=true;
+  });
+  const button=page.locator('[data-home-guide-toggle="shared:baseSortie:B175-7-3"]');
+  await button.hover();
+  await button.evaluate(el=>el.dataset.pressMarker='original');
+  await page.mouse.down();
+  await page.evaluate(() => {
+    const state=homeGuideState();
+    state.custom.push({id:'refresh-during-press',category:'quest',title:'同期で追加された目標',scope:'global',map:''});
+    homeGuideSave(state);
+  });
+  await expect(button).toHaveAttribute('data-press-marker','original');
+  await page.mouse.up();
+  await expect(button).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('[data-group="quest"]')).toContainText('同期で追加された目標');
+  expect(await page.evaluate(() => homeGuideState().done)).toContain('shared:baseSortie:B175-7-3');
+});
+
+test('strategy goals: refreshing during a category press preserves its default open action', async ({ page }) => {
+  await openApp(page);
+  const summary=page.locator('[data-group="quest"] summary');
+  await summary.hover();
+  await page.mouse.down();
+  await page.evaluate(() => {
+    const state=homeGuideState();
+    state.custom.push({id:'summary-refresh',category:'quest',title:'更新後の任務目標',scope:'global',map:''});
+    homeGuideSave(state);
+  });
+  await page.mouse.up();
+  await expect(page.locator('[data-group="quest"]')).toHaveAttribute('open','');
+  await expect(page.locator('[data-group="quest"]')).toContainText('更新後の任務目標');
+});
+
+test('strategy goals: a cancelled press resumes pending updates without completing the goal', async ({ page }) => {
+  await openApp(page);
+  await page.evaluate(() => {
+    hdSelectGuideMap('7-4');
+    hdStrategyImportMap('7-4','7-4:baseSortie:B175-7-3');
+    document.querySelector('[data-group="quest"]').open=true;
+  });
+  const button=page.locator('[data-home-guide-toggle="shared:baseSortie:B175-7-3"]');
+  await button.hover();
+  await button.evaluate(el=>el.addEventListener('pointerdown',e=>window.__cancelledGoalPointer=e.pointerId,{once:true}));
+  await page.mouse.down();
+  await page.evaluate(() => {
+    const state=homeGuideState();
+    state.custom.push({id:'cancel-refresh',category:'quest',title:'キャンセル後の最新目標',scope:'global',map:''});
+    homeGuideSave(state);
+    window.dispatchEvent(new PointerEvent('pointercancel',{pointerId:window.__cancelledGoalPointer}));
+  });
+  await expect(page.locator('[data-group="quest"]')).toContainText('キャンセル後の最新目標');
+  await page.mouse.up();
+  await expect(button).toHaveAttribute('aria-pressed','false');
+  expect(await page.evaluate(() => homeGuideState().done)).not.toContain('shared:baseSortie:B175-7-3');
 });

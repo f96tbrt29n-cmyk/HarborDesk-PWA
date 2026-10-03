@@ -451,6 +451,12 @@ function hdWSEnsureUI(){
  else top.insertAdjacentElement('afterend',nav);
  document.body.classList.add('hd-workspace-mode');hdWSEnsureSyncStatus();hdWSEnsureNetworkStatus();hdWSEnsureSwipeHint();hdWSEnsureGameReturnAction();hdWSUpdateTopbarHeight();window.hdRefreshHeaderMenuMetrics?.();hdWSUpdateBadges();hdWSUpdateSyncStatus();
 }
+function hdWSRevealTab(button){
+ const bar=button?.parentElement;if(!bar)return;
+ // Category tabs must not move the page while a control is being tapped.
+ const bounds=bar.getBoundingClientRect(),tab=button.getBoundingClientRect();
+ bar.scrollTo({left:bar.scrollLeft+tab.left-bounds.left-(bar.clientWidth-tab.width)/2,behavior:'instant'});
+}
 function hdWSRenderSubtabs(group,selected){
  const host=document.getElementById('hdWorkspaceSubtabs'),picker=document.getElementById('hdWorkspaceMobilePicker'),select=document.getElementById('hdWorkspaceSectionSelect'),context=document.getElementById('hdWorkspaceContextGroup');if(!host)return;const rows=hdWSVisibleSections(group);
  if(context)context.textContent=hdWSGroupLabel(group);
@@ -459,7 +465,7 @@ function hdWSRenderSubtabs(group,selected){
  hdWSUpdateBackButton();hdWSUpdatePinButton();
  if(rows.length<=1){host.hidden=true;host.innerHTML='';return}
  host.hidden=false;host.innerHTML=rows.map(el=>`<button type="button" role="tab" class="${el.id===selected?'active':''}" aria-selected="${el.id===selected?'true':'false'}" data-hd-ws-section="${hdWSEsc(el.id)}">${hdWSEsc(hdWSTitle(el))}</button>`).join('');
- const active=host.querySelector('.active');active?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+ const active=host.querySelector('.active');hdWSRevealTab(active);
  requestAnimationFrame(hdWSUpdateTopbarHeight);
 }
 function hdWSUpdateWrappers(){
@@ -483,7 +489,7 @@ function hdWSApply(group=hdWSState.group,sectionId=null,opts={}){
    el.classList.toggle('hd-ws-hidden',!show);
   }
   hdWSRenderSubtabs(group,chosen);hdWSUpdateWrappers();hdWSUpdateBadges();
-  document.getElementById('hdWorkspaceNav')?.querySelector(`[data-hd-ws-group="${group}"]`)?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  hdWSRevealTab(document.getElementById('hdWorkspaceNav')?.querySelector(`[data-hd-ws-group="${group}"]`));
   if(opts.restoreScroll){setTimeout(()=>{if(!hdWSRestoreScroll(chosen)){const y=(document.getElementById('hdWorkspaceNav')?.offsetTop||0)-2;window.scrollTo({top:Math.max(0,y),behavior:'smooth'})}},0)}
   else if(opts.scrollTop){const y=(document.getElementById('hdWorkspaceNav')?.offsetTop||0)-2;window.scrollTo({top:Math.max(0,y),behavior:'smooth'})}
   window.dispatchEvent(new CustomEvent('hd:workspace-changed',{detail:{group,section:chosen}}));
