@@ -100,6 +100,25 @@ test('release smoke: strategy sortie summary updates after recording deletion an
   await expect(summary).toContainText('まだこの海域の出撃記録はありません');
 });
 
+test('release smoke: sortie progress updates preserve an unfinished strategy goal', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdSLSave([]);hdWSShowElement('home',false);});
+  const form=page.locator('[data-home-guide-add="map"]');
+  await form.locator('[name="title"]').fill('6-5で編成を確認');
+  const retained=await page.evaluate(()=>{
+    const input=document.querySelector('[data-home-guide-add="map"] [name="title"]');
+    input.setSelectionRange(3,3);
+    hdSLSave([{id:'draft-update',map:'6-5',at:Date.now(),node:'M',result:'S',boss:true}]);
+    renderHomeDashboard();
+    return {connected:input.isConnected,value:input.value,focused:document.activeElement===input,caret:input.selectionStart};
+  });
+  expect(retained).toEqual({connected:true,value:'6-5で編成を確認',focused:true,caret:3});
+  await expect(page.locator('.hd-strategy-sortie-summary')).toContainText('記録 1周');
+  await form.locator('button[type="submit"]').click();
+  expect(await page.evaluate(()=>homeGuideState().custom.filter(x=>x.title==='6-5で編成を確認').length)).toBe(1);
+  await expect(form.locator('[name="title"]')).toHaveValue('');
+});
+
 test('release smoke: hidden completed strategy goal can be undone without losing other progress', async ({ page }) => {
   await boot(page);
   await page.evaluate(() => window.hdWSShowElement('home', true));

@@ -303,6 +303,7 @@ function homeGuideRender(){
  if(homeGuidePressedPointer){homeGuideRenderPending=true;return}
  homeGuideRenderPending=false;
  const state=homeGuideState(),map=homeGuideActiveMap(),maps=typeof hdGuideMapSequence==='function'?hdGuideMapSequence():[],cleared=new Set(state.cleared.filter(x=>maps.includes(x))),done=new Set(state.done),pendingOnly=homeGuidePendingOnly();
+ if(typeof hdStrategyRefreshSortieSummary==='function')hdStrategyRefreshSortieSummary(map);
  const signature=map+homeGuideJstMonth()+pendingOnly+JSON.stringify(state)+(typeof hdStrategyFingerprint==='function'?hdStrategyFingerprint(map):'');if(host.children.length&&homeGuideLastSignature===signature)return;homeGuideLastSignature=signature;
  const opened=new Set([...host.querySelectorAll('details.home-guide-group[open]')].map(el=>el.dataset.group));
  const firstRender=!host.children.length;
