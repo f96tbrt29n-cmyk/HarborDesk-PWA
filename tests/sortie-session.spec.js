@@ -208,6 +208,68 @@ test('return form keeps entered values and focus through session and preparation
   await expect(page.locator('#hdSSMemo')).toHaveValue('');
 });
 
+test('return draft survives a reload without recording a log and clears for the next sortie', async ({ page }) => {
+  await boot(page);
+  await seed(page);
+  await openPreparation(page);
+  await page.locator('[data-hd-ss-start-override]').click();
+  await page.evaluate(() => window.hdWSShowElement?.('hdSortiePreparation', true));
+  await page.locator('#hdSSResult').selectOption('A');
+  await page.locator('#hdSSNode').fill('ボス');
+  await page.locator('#hdSSBattles').fill('3');
+  await page.locator('#hdSSBoss').check();
+  await page.locator('#hdSSDrop').fill('島風');
+  await page.locator('#hdSSBuckets').fill('2');
+  await page.locator('#hdSSFuel').fill('120');
+  await page.locator('#hdSSAmmo').fill('95');
+  await page.locator('#hdSSSteel').fill('');
+  await page.locator('#hdSSBauxite').fill('0');
+  await page.locator('#hdSSMemo').fill('入力途中のメモ');
+  const sessionId = await page.evaluate(() => hdSSLoad().id);
+
+  await boot(page);
+  await openPreparation(page);
+  await expect(page.locator('#hdSSResult')).toHaveValue('A');
+  await expect(page.locator('#hdSSNode')).toHaveValue('ボス');
+  await expect(page.locator('#hdSSBattles')).toHaveValue('3');
+  await expect(page.locator('#hdSSBoss')).toBeChecked();
+  await expect(page.locator('#hdSSDrop')).toHaveValue('島風');
+  await expect(page.locator('#hdSSBuckets')).toHaveValue('2');
+  await expect(page.locator('#hdSSFuel')).toHaveValue('120');
+  await expect(page.locator('#hdSSAmmo')).toHaveValue('95');
+  await expect(page.locator('#hdSSSteel')).toHaveValue('');
+  await expect(page.locator('#hdSSBauxite')).toHaveValue('0');
+  await expect(page.locator('#hdSSMemo')).toHaveValue('入力途中のメモ');
+  expect(await page.evaluate(() => hdSSLoad().id)).toBe(sessionId);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1') || '[]'))).toHaveLength(0);
+
+  // Clearing a value and unchecking the boss flag must overwrite the saved draft too.
+  await page.locator('#hdSSDrop').fill('');
+  await page.locator('#hdSSBoss').uncheck();
+  await boot(page);
+  await openPreparation(page);
+  await expect(page.locator('#hdSSDrop')).toHaveValue('');
+  await expect(page.locator('#hdSSBoss')).not.toBeChecked();
+  await page.locator('[data-hd-ss-finish]').click();
+  await expect(page.locator('.hd-ss.active')).toHaveCount(0);
+  const data = await page.evaluate(() => ({session:hdSSLoad(),logs:JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1') || '[]')}));
+  expect(data.session).toBeNull();
+  expect(data.logs).toHaveLength(1);
+  expect(data.logs[0]).toMatchObject({sessionId,result:'A',node:'ボス',battles:3,boss:false,drop:'',fuel:120,ammo:95});
+  expect(data.logs[0].memo).toContain('入力途中のメモ');
+  await page.locator('[data-hd-ss-start-override]').click();
+  await expect(page.locator('#hdSSResult')).toHaveValue('S');
+  await expect(page.locator('#hdSSMemo')).toHaveValue('');
+  expect(await page.evaluate(() => hdSSLoad().returnDraft)).toBeUndefined();
+  await page.evaluate(() => window.hdWSShowElement?.('hdSortiePreparation', true));
+  await page.locator('#hdSSMemo').fill('破棄する下書き');
+  await page.locator('[data-hd-ss-cancel]').click();
+  await expect(page.locator('.hd-ss.active')).toHaveCount(0);
+  expect(await page.evaluate(() => hdSSLoad())).toBeNull();
+  await page.locator('[data-hd-ss-start-override]').click();
+  await expect(page.locator('#hdSSMemo')).toHaveValue('');
+});
+
 test('only one active sortie session can exist at a time', async ({ page }) => {
   await boot(page);
   await seed(page);

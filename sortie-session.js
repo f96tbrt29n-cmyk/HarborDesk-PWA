@@ -1,4 +1,5 @@
 const HD_SS_KEY='harbordesk-active-sortie-session-v1';
+const HD_SS_RETURN_FIELDS=['hdSSResult','hdSSNode','hdSSBattles','hdSSBoss','hdSSDrop','hdSSBuckets','hdSSFuel','hdSSAmmo','hdSSSteel','hdSSBauxite','hdSSMemo'];
 const HD_SS_POST_KEY='harbordesk-post-sortie-review-v1';
 const HD_SS_OBJECTIVE_PREF_KEY='harbordesk-sortie-objective-pref-v1';
 const HD_SS_SERIES_GOALS_KEY='harbordesk-sortie-series-goals-v1';
@@ -475,7 +476,7 @@ function hdSSIdleHtml(map){
 }
 function hdSSActiveHtml(session){
  const r=session.readinessSnapshot||{},unresolved=(r.unresolved||[]).map(function(x){return x.label}).filter(Boolean).join('、'),gate=r.gate||null,gateText=gate?(gate.label+(gate.overridden?'・上書き開始':'')):'',seriesGoal=hdSSSeriesGoal(session.seriesId),seriesGoalText=[seriesGoal.maxCycles?seriesGoal.maxCycles+'周':null,seriesGoal.maxResources?'資源'+seriesGoal.maxResources:null,seriesGoal.maxBuckets?'バケツ'+seriesGoal.maxBuckets:null,seriesGoal.maxElapsedMin?seriesGoal.maxElapsedMin+'分':null,seriesGoal.target?'Drop '+seriesGoal.target:null].filter(Boolean).join(' / ');
- return '<section class="hd-ss active"><div class="hd-ss-head"><div><div class="eyebrow">SORTIE IN PROGRESS</div><strong>出撃中</strong><span>'+hdSSEsc(session.map)+'｜'+hdSSEsc(session.fleetName)+'</span></div><b>'+hdSSEsc(session.strategyLabel||'手動編成')+'</b></div><div class="hd-ss-active-meta">'+(Number(session.cycleIndex)>1?'<span>連続出撃 第'+Number(session.cycleIndex)+'周</span>':'')+(seriesGoalText?'<span>終了条件 '+hdSSEsc(seriesGoalText)+'</span>':'')+(gateText?'<span>開始判定 '+hdSSEsc(gateText)+'</span>':'')+'<span>開始 '+hdSSEsc(new Date(session.startedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}))+'</span><span>自動 '+(r.autoOk||0)+'/'+(r.autoTotal||0)+'</span><span>手動 '+(r.manualDone||0)+'/'+(r.manualTotal||0)+'</span></div>'+(unresolved?'<p class="hd-ss-warning">開始時の要確認: '+hdSSEsc(unresolved)+'</p>':'')+'<div class="hd-ss-return"><div class="hd-ss-return-head"><strong>帰還結果</strong><span>記録すると既存の出撃ログ・任務連動へ反映</span></div><div class="hd-ss-form"><label>結果<select id="hdSSResult"><option>S</option><option>A</option><option>B</option><option>C</option><option>D</option><option>撤退</option></select></label><label>到達マス<input id="hdSSNode" placeholder="例 ボス / P"></label><label>戦闘数<input id="hdSSBattles" type="number" min="0" max="20" value="1"></label><label class="hd-ss-check"><input id="hdSSBoss" type="checkbox">ボス到達</label><label>ドロップ<input id="hdSSDrop" placeholder="艦名など"></label><label>バケツ<input id="hdSSBuckets" type="number" min="0" value="0"></label><label>燃料<input id="hdSSFuel" type="number" min="0" value="0"></label><label>弾薬<input id="hdSSAmmo" type="number" min="0" value="0"></label><label>鋼材<input id="hdSSSteel" type="number" min="0" value="0"></label><label>ボーキ<input id="hdSSBauxite" type="number" min="0" value="0"></label><label class="hd-ss-wide">メモ<input id="hdSSMemo" placeholder="撤退原因、装備変更など"></label></div><div class="hd-ss-actions"><button type="button" class="primary" data-hd-ss-finish>帰還結果を記録</button><button type="button" class="ghost small" data-hd-ss-cancel>このセッションを破棄</button></div></div><p class="hd-ss-note">出撃中に保存プリセットを切り替えても、このセッションは開始時の編成スナップショットを保持するよ。</p></section>';
+ return '<section class="hd-ss active"><div class="hd-ss-head"><div><div class="eyebrow">SORTIE IN PROGRESS</div><strong>出撃中</strong><span>'+hdSSEsc(session.map)+'｜'+hdSSEsc(session.fleetName)+'</span></div><b>'+hdSSEsc(session.strategyLabel||'手動編成')+'</b></div><div class="hd-ss-active-meta">'+(Number(session.cycleIndex)>1?'<span>連続出撃 第'+Number(session.cycleIndex)+'周</span>':'')+(seriesGoalText?'<span>終了条件 '+hdSSEsc(seriesGoalText)+'</span>':'')+(gateText?'<span>開始判定 '+hdSSEsc(gateText)+'</span>':'')+'<span>開始 '+hdSSEsc(new Date(session.startedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}))+'</span><span>自動 '+(r.autoOk||0)+'/'+(r.autoTotal||0)+'</span><span>手動 '+(r.manualDone||0)+'/'+(r.manualTotal||0)+'</span></div>'+(unresolved?'<p class="hd-ss-warning">開始時の要確認: '+hdSSEsc(unresolved)+'</p>':'')+'<div class="hd-ss-return"><div class="hd-ss-return-head"><strong>帰還結果</strong><span>記録すると既存の出撃ログ・任務連動へ反映</span></div><div class="hd-ss-form"><label>結果<select id="hdSSResult"><option>S</option><option>A</option><option>B</option><option>C</option><option>D</option><option>撤退</option></select></label><label>到達マス<input id="hdSSNode" placeholder="例 ボス / P"></label><label>戦闘数<input id="hdSSBattles" type="number" min="0" max="20" value="1"></label><label class="hd-ss-check"><input id="hdSSBoss" type="checkbox">ボス到達</label><label>ドロップ<input id="hdSSDrop" placeholder="艦名など"></label><label>バケツ<input id="hdSSBuckets" type="number" min="0" value="0"></label><label>燃料<input id="hdSSFuel" type="number" min="0" value="0"></label><label>弾薬<input id="hdSSAmmo" type="number" min="0" value="0"></label><label>鋼材<input id="hdSSSteel" type="number" min="0" value="0"></label><label>ボーキ<input id="hdSSBauxite" type="number" min="0" value="0"></label><label class="hd-ss-wide">メモ<input id="hdSSMemo" placeholder="撤退原因、装備変更など"></label></div><div class="hd-ss-actions"><button type="button" class="primary" data-hd-ss-finish>帰還結果を記録</button><button type="button" class="ghost small" data-hd-ss-cancel>このセッションを破棄</button></div></div><p class="hd-ss-note">出撃中に保存プリセットを切り替えても、このセッションは開始時の編成スナップショットを保持するよ。帰還結果の入力はこの端末に下書き保存され、開き直しても続けられるよ。</p></section>';
 }
 function hdSSHtml(map){const active=hdSSLoad();return active?hdSSActiveHtml(active):hdSSIdleHtml(map)}
 function hdSSRender(retained){
@@ -497,10 +498,29 @@ function hdSSRender(retained){
  if(sameSession){
   const form=previous.querySelector('.hd-ss-return');
   if(form)sec.querySelector('.hd-ss-return')?.replaceWith(form);
- }
+ }else if(session){hdSSRestoreReturnDraft(sec,session)}
  sec.__hdSSSessionId=session?.id;sec.__hdSSHtml=html;
  current?.remove();overview.insertAdjacentElement('afterend',sec);
  if(sameSession&&sec.contains(focused))focused.focus({preventScroll:true});
+}
+function hdSSRestoreReturnDraft(section,session){
+ const draft=session.returnDraft;if(!draft||typeof draft!=='object')return;
+ for(const id of HD_SS_RETURN_FIELDS){
+  const input=section.querySelector('#'+id),value=draft[id];if(!input)continue;
+  if(input.type==='checkbox'){if(typeof value==='boolean')input.checked=value}
+  else if(typeof value==='string')input.value=value;
+ }
+}
+function hdSSSaveReturnDraft(e){
+ if(!HD_SS_RETURN_FIELDS.includes(e.target?.id))return;
+ const section=e.target.closest?.('.hd-ss.active'),session=hdSSLoad();
+ if(!section||!session||section.__hdSSSessionId!==session.id)return;
+ const draft={};
+ for(const id of HD_SS_RETURN_FIELDS){
+  const input=section.querySelector('#'+id);if(input)draft[id]=input.type==='checkbox'?input.checked:input.value;
+ }
+ if(JSON.stringify(session.returnDraft)===JSON.stringify(draft))return;
+ hdSSSave({...session,returnDraft:draft});
 }
 function hdSSFormData(){
  const val=function(id){return document.getElementById(id)?.value||''},num=function(id){return Math.max(0,Number(val(id))||0)};
@@ -560,6 +580,9 @@ window.hdSSSelectedSummary=hdSSSelectedSummary;
 window.hdSSRender=hdSSRender;
 window.hdSSFormData=hdSSFormData;
 window.hdSSInstall=hdSSInstall;
+
+document.addEventListener('input',hdSSSaveReturnDraft);
+document.addEventListener('change',hdSSSaveReturnDraft);
 
 document.addEventListener('click',function(e){
  if(e.target.closest?.('[data-hd-ss-start]')){const session=hdSSStart(hdSSMap());if(session&&typeof window.hdSMOpen==='function')setTimeout(()=>window.hdSMOpen(),0);return}
