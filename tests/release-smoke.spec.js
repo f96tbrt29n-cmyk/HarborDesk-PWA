@@ -4372,6 +4372,20 @@ test('release smoke: map fleet procurement action recovers failed lazy module', 
 });
 
 
+test('release smoke: an offscreen ship card keeps its height when scrolled into view', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => hdWSShowElement('shipDatabase', false));
+  if(await page.locator('#hdShipDbList').evaluate(el => el.classList.contains('hd-compact')))
+    await page.locator('[data-hd-shipdb-compact]').click();
+  const card = page.locator('#hdShipDbList .hd-shipdb-card').nth(12);
+  const before = await card.evaluate(el => el.getBoundingClientRect().height);
+  await card.scrollIntoViewIfNeeded();
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  const after = await card.evaluate(el => el.getBoundingClientRect().height);
+  // Small rendering differences are acceptable; placeholder layout shifted this by hundreds of pixels.
+  expect(Math.abs(after-before)).toBeLessThanOrEqual(4);
+});
+
 test('release smoke: master ship procurement recovers failed lazy module', async ({ page }) => {
   const errors = [];
   let blockProcurement = true;

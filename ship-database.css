@@ -41,7 +41,8 @@
 .hd-master-procure{justify-self:start;margin-top:2px}.hd-master-owned-plan.empty .hd-master-procure{grid-column:1/-1}
 
 @supports(content-visibility:auto){
- .hd-shipdb-card,.hd-shipdb-master-card,.hd-equip-reverse-row{content-visibility:auto;contain-intrinsic-size:190px}
+ /* Ship cards have variable image/detail heights; keep their real layout offscreen. */
+ .hd-equip-reverse-row{content-visibility:auto;contain-intrinsic-size:190px}
 }
 
 .hd-shipdb-list.hd-compact .hd-shipdb-card{padding:9px;gap:6px}
