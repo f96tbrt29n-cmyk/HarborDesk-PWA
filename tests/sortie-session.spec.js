@@ -270,6 +270,61 @@ test('return draft survives a reload without recording a log and clears for the 
   await expect(page.locator('#hdSSMemo')).toHaveValue('');
 });
 
+test('return draft updates across tabs without replacing inputs or overwriting other fields', async ({ page, context }) => {
+  await boot(page);
+  await seed(page);
+  await openPreparation(page);
+  await page.locator('[data-hd-ss-start-override]').click();
+  await page.evaluate(() => window.hdWSShowElement?.('hdSortiePreparation', true));
+  await page.locator('#hdSSResult').selectOption('A');
+  await page.locator('#hdSSMemo').fill('最初のメモ');
+  const other = await context.newPage();
+  await boot(other);
+  await openPreparation(other);
+  await expect(other.locator('#hdSSMemo')).toHaveValue('最初のメモ');
+  await other.evaluate(() => {
+    window.returnMemoInput = document.getElementById('hdSSMemo');
+    window.returnMemoInput.focus();
+    window.returnMemoInput.setSelectionRange(2,2);
+  });
+  await page.locator('#hdSSNode').fill('P');
+  await expect(other.locator('#hdSSNode')).toHaveValue('P');
+  const inputState = await other.evaluate(() => ({
+    sameInput:document.getElementById('hdSSMemo') === window.returnMemoInput,
+    focused:document.activeElement === window.returnMemoInput,
+    caret:window.returnMemoInput.selectionStart,
+  }));
+  expect(inputState).toEqual({sameInput:true,focused:true,caret:2});
+  await other.locator('#hdSSMemo').fill('別タブで更新');
+  await expect(page.locator('#hdSSMemo')).toHaveValue('別タブで更新');
+  await page.locator('#hdSSBattles').fill('4');
+  await expect(other.locator('#hdSSBattles')).toHaveValue('4');
+  await expect(other.locator('#hdSSResult')).toHaveValue('A');
+  const draft = await page.evaluate(() => hdSSLoad().returnDraft);
+  expect(draft).toMatchObject({hdSSResult:'A',hdSSNode:'P',hdSSMemo:'別タブで更新',hdSSBattles:'4'});
+  await other.close();
+});
+
+test('editing one return field preserves a newer saved draft before a storage event is handled', async ({ page }) => {
+  await boot(page);
+  await seed(page);
+  await openPreparation(page);
+  await page.locator('[data-hd-ss-start-override]').click();
+  await page.evaluate(() => window.hdWSShowElement?.('hdSortiePreparation', true));
+  await page.locator('#hdSSMemo').fill('古い表示');
+  const state = await page.evaluate(() => {
+    const session = hdSSLoad();
+    // Simulate newer storage arriving before this tab receives its storage event.
+    hdSSSave({...session,returnDraft:{...session.returnDraft,hdSSMemo:'新しい下書き'}});
+    const input = document.getElementById('hdSSNode');
+    input.value = 'ボス';
+    input.dispatchEvent(new Event('input',{bubbles:true}));
+    return {draft:hdSSLoad().returnDraft,memo:document.getElementById('hdSSMemo').value};
+  });
+  expect(state.draft).toMatchObject({hdSSNode:'ボス',hdSSMemo:'新しい下書き'});
+  expect(state.memo).toBe('新しい下書き');
+});
+
 test('only one active sortie session can exist at a time', async ({ page }) => {
   await boot(page);
   await seed(page);

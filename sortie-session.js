@@ -488,7 +488,10 @@ function hdSSRender(retained){
  // Keep the live return form only for the same active session.
  const previous=current||retained;
  const sameSession=!!session&&previous?.__hdSSSessionId===session.id;
+ const draftKey=JSON.stringify(session?.returnDraft);
+ if(sameSession&&previous.__hdSSReturnDraft!==draftKey)hdSSRestoreReturnDraft(previous,session);
  if(sameSession&&previous.__hdSSHtml===html){
+  previous.__hdSSReturnDraft=draftKey;
   if(!previous.isConnected)overview.insertAdjacentElement('afterend',previous);
   return;
  }
@@ -499,7 +502,7 @@ function hdSSRender(retained){
   const form=previous.querySelector('.hd-ss-return');
   if(form)sec.querySelector('.hd-ss-return')?.replaceWith(form);
  }else if(session){hdSSRestoreReturnDraft(sec,session)}
- sec.__hdSSSessionId=session?.id;sec.__hdSSHtml=html;
+ sec.__hdSSSessionId=session?.id;sec.__hdSSHtml=html;sec.__hdSSReturnDraft=draftKey;
  current?.remove();overview.insertAdjacentElement('afterend',sec);
  if(sameSession&&sec.contains(focused))focused.focus({preventScroll:true});
 }
@@ -508,19 +511,26 @@ function hdSSRestoreReturnDraft(section,session){
  for(const id of HD_SS_RETURN_FIELDS){
   const input=section.querySelector('#'+id),value=draft[id];if(!input)continue;
   if(input.type==='checkbox'){if(typeof value==='boolean')input.checked=value}
-  else if(typeof value==='string')input.value=value;
+  else if(typeof value==='string'&&input.value!==value)input.value=value;
  }
 }
 function hdSSSaveReturnDraft(e){
  if(!HD_SS_RETURN_FIELDS.includes(e.target?.id))return;
  const section=e.target.closest?.('.hd-ss.active'),session=hdSSLoad();
  if(!section||!session||section.__hdSSSessionId!==session.id)return;
- const draft={};
- for(const id of HD_SS_RETURN_FIELDS){
-  const input=section.querySelector('#'+id);if(input)draft[id]=input.type==='checkbox'?input.checked:input.value;
+ // Merge only the edited field into the newest stored draft. A storage event
+ // from another tab may still be queued while this input event is handled.
+ const hasDraft=session.returnDraft&&typeof session.returnDraft==='object';
+ const draft=hasDraft?{...session.returnDraft}:{};
+ if(!hasDraft){
+  for(const id of HD_SS_RETURN_FIELDS){
+   const input=section.querySelector('#'+id);if(input)draft[id]=input.type==='checkbox'?input.checked:input.value;
+  }
  }
- if(JSON.stringify(session.returnDraft)===JSON.stringify(draft))return;
- hdSSSave({...session,returnDraft:draft});
+ draft[e.target.id]=e.target.type==='checkbox'?e.target.checked:e.target.value;
+ if(JSON.stringify(session.returnDraft)!==JSON.stringify(draft))hdSSSave({...session,returnDraft:draft});
+ hdSSRestoreReturnDraft(section,{returnDraft:draft});
+ section.__hdSSReturnDraft=JSON.stringify(draft);
 }
 function hdSSFormData(){
  const val=function(id){return document.getElementById(id)?.value||''},num=function(id){return Math.max(0,Number(val(id))||0)};
