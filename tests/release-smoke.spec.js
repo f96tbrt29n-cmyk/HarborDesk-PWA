@@ -5608,6 +5608,66 @@ test('release smoke: quest database type filter works after map quest navigation
 });
 
 
+test('release smoke: fleet suggestion updates retain a pressed acquisition button until native click', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'pressed-akagi',name:'赤城',type:'正規空母',level:95,gear:''}]));
+    selectedWorld='6';selectedMap='6-5';renderMapPicker();hdFSOpen();
+  });
+  const button = page.locator('#hdFleetSuggester [data-hd-fs-acquire]').first();
+  await button.click({trial:true});
+  const box = await button.boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  expect(await page.evaluate(() => {
+    const button = document.querySelector('#hdFleetSuggester [data-hd-fs-acquire]');
+    const roster = JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1'));
+    roster[0].level = 42;
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify(roster));
+    window.dispatchEvent(new Event('hd:ship-images-ready'));
+    window.dispatchEvent(new Event('hd:kancolle-sync'));
+    return button === document.querySelector('#hdFleetSuggester [data-hd-fs-acquire]');
+  })).toBe(true);
+  await page.mouse.up();
+  await expect(page.locator('#hdAcquisitionDialog')).toBeVisible();
+  await expect(page.locator('#hdAcquisitionTitle')).toContainText('6-5｜');
+  await expect(page.locator('#hdFleetSuggesterBody')).toContainText('Lv.42');
+});
+
+test('release smoke: fleet suggestion recovery preserves the user scroll position', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'scroll-akagi',name:'赤城',type:'正規空母',level:95,gear:''}]));
+    selectedWorld='6';selectedMap='6-5';renderMapPicker();hdFSOpen();
+  });
+  const offset = await page.evaluate(() => {
+    document.documentElement.style.scrollBehavior='auto';
+    window.scrollTo(0,400);
+    return scrollY;
+  });
+  expect(offset).toBeGreaterThan(300);
+  // Exercise the animation-frame, 80ms and 420ms visibility recovery passes.
+  await page.waitForTimeout(550);
+  expect(Math.abs(await page.evaluate(()=>scrollY) - offset)).toBeLessThanOrEqual(2);
+  await expect(page.locator('#hdFleetSuggester')).toBeVisible();
+});
+
+test('release smoke: canceled fleet suggestion presses render the latest map', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => {
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'cancel-akagi',name:'赤城',type:'正規空母',level:95,gear:''}]));
+    selectedWorld='6';selectedMap='6-5';renderMapPicker();hdFSOpen();
+  });
+  const button = page.locator('#hdFleetSuggester [data-hd-fs-acquire]').first();
+  await button.dispatchEvent('pointerdown', {pointerId:75,button:0,isPrimary:true});
+  await page.evaluate(() => {selectedMap='6-4';hdFSRender(true);hdFSRender();});
+  await expect(page.locator('#hdFleetSuggesterMap')).toHaveText('6-5');
+  await page.evaluate(() => window.dispatchEvent(new PointerEvent('pointercancel',{pointerId:75})));
+  await expect(page.locator('#hdFleetSuggesterMap')).toHaveText('6-4');
+  await expect(page.locator('#hdFleetSuggester')).toBeVisible();
+  await expect(page.locator('#hdAcquisitionDialog')).toBeHidden();
+});
+
 test('release smoke: remaining map攻略 action controls open and persist', async ({ page }) => {
   const errors = [];
   await boot(page, errors);

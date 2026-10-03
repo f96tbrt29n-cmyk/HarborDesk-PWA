@@ -128,7 +128,41 @@ function hdFSSuggestionHtml(s){
  '<div class="hd-fs-source"><b>アプリ内編成例:</b> '+hdFSEsc(s.preset.ships||'')+'<br><b>装備メモ:</b> '+hdFSEsc(s.preset.gear||'')+'</div>'+
  '<div class="hd-fs-actions"><button type="button" class="primary small" data-hd-fs-save="'+s.index+'">この候補を自分用編成に保存</button><button type="button" class="ghost small" data-hd-fs-roster>艦隊台帳を確認</button></div></article>';
 }
+// Keep the pressed target alive until the native click has been dispatched.
+let hdFSPressedPointer=null,hdFSRenderPending=false,hdFSPendingPreserveLoadouts=true;
+function hdFSFlushPressedRender(){
+ if(!hdFSRenderPending)return;
+ const preserve=hdFSPendingPreserveLoadouts;
+ hdFSRenderPending=false;hdFSPendingPreserveLoadouts=true;
+ hdFSRender(preserve);
+}
+document.addEventListener('pointerdown',e=>{
+ if(e.button!==0||e.isPrimary===false||!e.target.closest?.('#hdFleetSuggesterBody'))return;
+ hdFSPressedPointer={id:e.pointerId};
+},true);
+function hdFSFinishPress(press,delay=0){
+ if(!press)return;
+ setTimeout(()=>{
+  if(hdFSPressedPointer!==press)return;
+  hdFSPressedPointer=null;hdFSFlushPressedRender();
+ },delay);
+}
+window.addEventListener('pointerup',e=>{
+ if(hdFSPressedPointer?.id===e.pointerId)hdFSFinishPress(hdFSPressedPointer,500);
+},true);
+window.addEventListener('pointercancel',e=>{
+ if(hdFSPressedPointer?.id===e.pointerId)hdFSFinishPress(hdFSPressedPointer);
+},true);
+document.addEventListener('click',()=>hdFSFinishPress(hdFSPressedPointer),true);
+window.addEventListener('blur',()=>{hdFSPressedPointer=null;hdFSFlushPressedRender()});
 function hdFSRender(preserveLoadouts=false){
+ if(hdFSPressedPointer){
+  hdFSRenderPending=true;
+  // A data refresh must take precedence over image-only preservation requests.
+  hdFSPendingPreserveLoadouts=hdFSPendingPreserveLoadouts&&preserveLoadouts===true;
+  return;
+ }
+
  var host=document.getElementById('hdFleetSuggesterBody'),label=document.getElementById('hdFleetSuggesterMap');if(!host)return;var map=hdFSMap();
  if(!map){if(label)label.textContent='海域未選択';host.innerHTML='<div class="empty">海域を選ぶと、艦隊台帳から編成候補を作るよ。</div>';return}
  const saved=preserveLoadouts===true&&label?.textContent===map?[...host.querySelectorAll('.hd-fs-card')].map(card=>({index:card.querySelector('[data-hd-fl-generate]')?.getAttribute('data-hd-fl-generate'),plan:card.querySelector('.hd-fl-host')})).filter(x=>x.index!=null&&x.plan?.querySelector('.hd-fl-plan')):[];
@@ -153,12 +187,12 @@ function hdFSSave(index){
  if(typeof hdSortieSetSelection==='function')hdSortieSetSelection(map,id);if(typeof renderCustomFleets==='function')renderCustomFleets(map);if(typeof hdSPSRender==='function')hdSPSRender();
  var btn=document.querySelector('[data-hd-fs-save="'+index+'"]');if(btn){btn.textContent='保存したよ';setTimeout(function(){btn.textContent='この候補を自分用編成に保存'},1300)}
 }
-function hdFSReveal(target){
+function hdFSReveal(target,scroll=true){
  if(!target)return false;
- if(typeof window.hdRevealWorkspaceTarget==='function')return !!window.hdRevealWorkspaceTarget(target,true);
+ if(typeof window.hdRevealWorkspaceTarget==='function')return !!window.hdRevealWorkspaceTarget(target,scroll);
  target.hidden=false;target.classList?.remove('hd-ws-hidden');
  for(var p=target.parentElement;p&&p!==document.body;p=p.parentElement)p.classList?.remove('hd-ws-wrapper-hidden');
- target.scrollIntoView?.({behavior:'smooth',block:'start'});return true;
+ if(scroll)target.scrollIntoView?.({behavior:'smooth',block:'start'});return true;
 }
 function hdFSStillSelected(target){
  try{
@@ -186,7 +220,7 @@ function hdFSOpen(){
  var userNavEpoch=Number(window.__HD_WORKSPACE_USER_NAV_EPOCH)||0;
  var settle=function(){
   if((Number(window.__HD_WORKSPACE_USER_NAV_EPOCH)||0)!==userNavEpoch)return;
-  if(hdFSStillSelected(target)){hdFSReveal(target);return}
+  if(hdFSStillSelected(target)){hdFSReveal(target,false);return}
   if(!hdFSOpenRecoveryAllowed(target))return;
   if(typeof window.hdWSRevealElement==='function')window.hdWSRevealElement(target,true,{history:false,direct:false});
   else if(typeof hdWSShowElement==='function')hdWSShowElement(target,true);
