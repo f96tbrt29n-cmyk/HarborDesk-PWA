@@ -478,11 +478,29 @@ function hdSSActiveHtml(session){
  return '<section class="hd-ss active"><div class="hd-ss-head"><div><div class="eyebrow">SORTIE IN PROGRESS</div><strong>出撃中</strong><span>'+hdSSEsc(session.map)+'｜'+hdSSEsc(session.fleetName)+'</span></div><b>'+hdSSEsc(session.strategyLabel||'手動編成')+'</b></div><div class="hd-ss-active-meta">'+(Number(session.cycleIndex)>1?'<span>連続出撃 第'+Number(session.cycleIndex)+'周</span>':'')+(seriesGoalText?'<span>終了条件 '+hdSSEsc(seriesGoalText)+'</span>':'')+(gateText?'<span>開始判定 '+hdSSEsc(gateText)+'</span>':'')+'<span>開始 '+hdSSEsc(new Date(session.startedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}))+'</span><span>自動 '+(r.autoOk||0)+'/'+(r.autoTotal||0)+'</span><span>手動 '+(r.manualDone||0)+'/'+(r.manualTotal||0)+'</span></div>'+(unresolved?'<p class="hd-ss-warning">開始時の要確認: '+hdSSEsc(unresolved)+'</p>':'')+'<div class="hd-ss-return"><div class="hd-ss-return-head"><strong>帰還結果</strong><span>記録すると既存の出撃ログ・任務連動へ反映</span></div><div class="hd-ss-form"><label>結果<select id="hdSSResult"><option>S</option><option>A</option><option>B</option><option>C</option><option>D</option><option>撤退</option></select></label><label>到達マス<input id="hdSSNode" placeholder="例 ボス / P"></label><label>戦闘数<input id="hdSSBattles" type="number" min="0" max="20" value="1"></label><label class="hd-ss-check"><input id="hdSSBoss" type="checkbox">ボス到達</label><label>ドロップ<input id="hdSSDrop" placeholder="艦名など"></label><label>バケツ<input id="hdSSBuckets" type="number" min="0" value="0"></label><label>燃料<input id="hdSSFuel" type="number" min="0" value="0"></label><label>弾薬<input id="hdSSAmmo" type="number" min="0" value="0"></label><label>鋼材<input id="hdSSSteel" type="number" min="0" value="0"></label><label>ボーキ<input id="hdSSBauxite" type="number" min="0" value="0"></label><label class="hd-ss-wide">メモ<input id="hdSSMemo" placeholder="撤退原因、装備変更など"></label></div><div class="hd-ss-actions"><button type="button" class="primary" data-hd-ss-finish>帰還結果を記録</button><button type="button" class="ghost small" data-hd-ss-cancel>このセッションを破棄</button></div></div><p class="hd-ss-note">出撃中に保存プリセットを切り替えても、このセッションは開始時の編成スナップショットを保持するよ。</p></section>';
 }
 function hdSSHtml(map){const active=hdSSLoad();return active?hdSSActiveHtml(active):hdSSIdleHtml(map)}
-function hdSSRender(){
+function hdSSRender(retained){
  const body=document.getElementById('hdSortiePreparationBody');if(!body)return;
- body.querySelector('.hd-ss')?.remove();const map=hdSSMap();if(!map&&!hdSSLoad())return;
+ const current=body.querySelector('.hd-ss'),session=hdSSLoad(),map=hdSSMap();
+ if(!map&&!session){current?.remove();return}
  const overview=body.querySelector('.hd-sps-overview');if(!overview)return;
- const wrap=document.createElement('div');wrap.innerHTML=hdSSHtml(map);const sec=wrap.firstElementChild;if(sec)overview.insertAdjacentElement('afterend',sec);
+ const html=session?hdSSActiveHtml(session):hdSSIdleHtml(map);
+ // Keep the live return form only for the same active session.
+ const previous=current||retained;
+ const sameSession=!!session&&previous?.__hdSSSessionId===session.id;
+ if(sameSession&&previous.__hdSSHtml===html){
+  if(!previous.isConnected)overview.insertAdjacentElement('afterend',previous);
+  return;
+ }
+ const wrap=document.createElement('div');wrap.innerHTML=html;const sec=wrap.firstElementChild;
+ if(!sec){current?.remove();return}
+ const focused=document.activeElement;
+ if(sameSession){
+  const form=previous.querySelector('.hd-ss-return');
+  if(form)sec.querySelector('.hd-ss-return')?.replaceWith(form);
+ }
+ sec.__hdSSSessionId=session?.id;sec.__hdSSHtml=html;
+ current?.remove();overview.insertAdjacentElement('afterend',sec);
+ if(sameSession&&sec.contains(focused))focused.focus({preventScroll:true});
 }
 function hdSSFormData(){
  const val=function(id){return document.getElementById(id)?.value||''},num=function(id){return Math.max(0,Number(val(id))||0)};
@@ -491,7 +509,13 @@ function hdSSFormData(){
 function hdSSInstall(){
  if(window.__hdSortieSessionInstalled||typeof hdSPSRender!=='function')return false;
  window.__hdSortieSessionInstalled=true;const prev=hdSPSRender;
- hdSPSRender=function(){const v=prev.apply(this,arguments);setTimeout(hdSSRender,0);return v};
+ hdSPSRender=function(){
+  const retained=document.querySelector('#hdSortiePreparationBody .hd-ss.active'),focused=document.activeElement,restoreFocus=retained?.contains(focused);
+  const v=prev.apply(this,arguments);
+  hdSSRender(retained);
+  if(restoreFocus&&focused.isConnected)focused.focus({preventScroll:true});
+  return v;
+ };
  setTimeout(hdSSRender,0);return true;
 }
 window.hdSSLoad=hdSSLoad;

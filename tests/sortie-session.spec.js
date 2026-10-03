@@ -166,6 +166,48 @@ test('return result writes one existing sortie log entry with session metadata t
   expect(Array.isArray(log.activityRefs)).toBeTruthy();
 });
 
+test('return form keeps entered values and focus through session and preparation redraws', async ({ page }) => {
+  await boot(page);
+  await seed(page);
+  await openPreparation(page);
+  await page.locator('[data-hd-ss-start-override]').click();
+  await page.evaluate(() => window.hdWSShowElement?.('hdSortiePreparation', true));
+  await page.locator('#hdSSResult').selectOption('A');
+  await page.locator('#hdSSNode').fill('ボス');
+  await page.locator('#hdSSBattles').fill('3');
+  await page.locator('#hdSSBoss').check();
+  await page.locator('#hdSSMemo').fill('再描画しても保持');
+
+  for (const render of ['hdSSRender', 'hdSPSRender', 'hdSSRender', 'hdSPSRender']) {
+    const state = await page.evaluate((name) => {
+      const input = document.getElementById('hdSSMemo');
+      input.focus();
+      const session = hdSSLoad();
+      const goals = JSON.parse(localStorage.getItem('harbordesk-sortie-series-goals-v1') || '{}');
+      goals[session.seriesId] = {maxCycles:(goals[session.seriesId]?.maxCycles || 0)+1};
+      localStorage.setItem('harbordesk-sortie-series-goals-v1', JSON.stringify(goals));
+      window[name]();
+      return {
+        sameInput: document.getElementById('hdSSMemo') === input,
+        focused: document.activeElement === input,
+        data: hdSSFormData(),
+      };
+    }, render);
+    expect(state.sameInput).toBe(true);
+    expect(state.focused).toBe(true);
+    expect(state.data).toMatchObject({result:'A',node:'ボス',battles:3,boss:true,memo:'再描画しても保持'});
+  }
+  await page.locator('[data-hd-ss-finish]').click();
+  await expect(page.locator('.hd-ss.active')).toHaveCount(0);
+  const logs = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1') || '[]'));
+  expect(logs).toHaveLength(1);
+  expect(logs[0]).toMatchObject({result:'A',node:'ボス',battles:3,boss:true});
+  expect(logs[0].memo).toContain('再描画しても保持');
+  await page.locator('[data-hd-ss-start-override]').click();
+  await expect(page.locator('#hdSSResult')).toHaveValue('S');
+  await expect(page.locator('#hdSSMemo')).toHaveValue('');
+});
+
 test('only one active sortie session can exist at a time', async ({ page }) => {
   await boot(page);
   await seed(page);
