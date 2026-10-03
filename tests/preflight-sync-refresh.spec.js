@@ -194,3 +194,31 @@ test('workspace tab refresh keeps the current page position while revealing cate
  expect(position.start).toBeGreaterThan(0);
  expect(Math.abs(position.end-position.start)).toBeLessThan(1);
 });
+
+test('suggester recovery does not hide the map tab selected from sortie preparation',async({page})=>{
+ await boot(page);
+ await page.waitForFunction(()=>typeof hdFSOpen==='function'&&typeof hdSPSOpenMapTab==='function');
+ await page.evaluate(async()=>{
+  hdSelectGuideMap('3-2');
+  hdFSOpen();
+  hdSPSOpen();
+  hdSPSOpenMapTab('mine');
+  await new Promise(resolve=>setTimeout(resolve,14000));
+ });
+ await expect(page.locator('[data-map-pane="mine"]')).toBeVisible();
+ expect(await page.evaluate(()=>hdWSCurrentLocation())).toMatchObject({group:'guide',section:'guide'});
+ await expect(page.locator('#customFleetPanel')).toContainText('編成2');
+});
+
+test('suggester still recovers an incidental workspace redraw without a newer navigation',async({page})=>{
+ await boot(page);
+ await page.waitForFunction(()=>typeof hdFSOpen==='function');
+ await page.evaluate(async()=>{
+  hdSelectGuideMap('3-2');
+  hdFSOpen();
+  hdWSApply('guide','guide',{ignorePin:true});
+  await new Promise(resolve=>setTimeout(resolve,500));
+ });
+ await expect(page.locator('#hdFleetSuggester')).toBeVisible();
+ expect(await page.evaluate(()=>hdWSCurrentLocation())).toMatchObject({group:'guide',section:'hdFleetSuggester'});
+});
