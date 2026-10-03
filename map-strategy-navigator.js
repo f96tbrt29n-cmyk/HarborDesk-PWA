@@ -20,17 +20,29 @@ function hdMSNRouteInfo(preset,plan){
  const total=parsed?.total&&/\d+隻/.test(String(parsed.text||''))?`<span>計${Number(parsed.total)}隻${plan?` / 保存編成${plan.ships.length}隻`:''}</span>`:'';
  return `<p>${hdMSNEsc(preset.ships||'編成例の艦種条件を確認')}</p>${pills||speed||total?`<div class="hd-msn-pills">${pills}${speed}${total}</div>`:''}<small>編成例から読み取れる条件の目安。分岐の全条件を保証しないため、ルートタブとWikiで最終確認してね。</small>`;
 }
-function hdMSNCheckHtml(check){const label=typeof hdFEAutoStatusLabel==='function'?hdFEAutoStatusLabel(check.status):check.status;return `<div class="hd-msn-check ${hdMSNEsc(check.status)}"><div><b>${hdMSNEsc(check.label)}</b><small>${hdMSNEsc(check.detail||'')}</small></div><strong>${hdMSNEsc(label)}</strong></div>`}
+function hdMSNCheckHtml(check){
+ const label=typeof hdFEAutoStatusLabel==='function'?hdFEAutoStatusLabel(check.status):check.status,fix=typeof hdFEFixActionInfo==='function'?hdFEFixActionInfo(check.id):null;
+ return `<div class="hd-msn-check ${hdMSNEsc(check.status)}"><div><b>${hdMSNEsc(check.label)}</b><small>${hdMSNEsc(check.detail||'')}</small></div><div class="hd-msn-check-side"><strong>${hdMSNEsc(label)}</strong>${check.status!=='ready'&&fix?`<button type="button" class="ghost small" data-hd-msn-fix="${hdMSNEsc(check.id)}">${hdMSNEsc(fix.label)}</button>`:''}</div></div>`;
+}
+function hdMSNAuto(map,fleet,preset){
+ const plan=hdFEPlanFromSavedFleet(map,fleet);
+ if(preset){plan.preset=preset;plan.routeInfo=typeof hdFSPresetInfo==='function'?hdFSPresetInfo(preset):null}
+ const auto=hdFEEvaluate(plan).auto,routeParsed=preset&&typeof hdFSPresetInfo==='function'?hdFSPresetInfo(preset):null;
+ if(routeParsed&&!routeParsed.requirements?.length){const route=auto.checks.find(c=>c.id==='route');if(route){route.status='manual';route.detail='編成例から艦種条件を自動抽出できないためルートを確認'}}
+ return auto;
+}
+function hdMSNSyncContext(){
+ const map=hdMSNMapSelected();if(!map)return null;
+ const fleets=hdMSNFleets(map),fid=hdMSNFleetId(map,fleets),fleet=fleets.find(x=>String(x.id)===String(fid))||null,presets=hdMSNPresets(map),preset=presets[hdMSNRouteIndex(map,presets)]||null;
+ if(typeof hdSelectGuideMap==='function')hdSelectGuideMap(map);
+ if(fleet&&typeof hdSortieSetSelection==='function')hdSortieSetSelection(map,fleet.id);
+ return {map,fleet,preset};
+}
 function hdMSNEvaluation(map,fleet,preset){
  if(!fleet)return `<div class="hd-msn-empty"><strong>保存編成を選ぶと差分を判定できるよ</strong><span>この海域の「自分用編成」に艦娘と装備を保存してから確認してね。</span><button type="button" class="ghost small" data-hd-msn-action="fleet">自分用編成を開く</button></div>`;
  if(typeof hdFEPlanFromSavedFleet!=='function'||typeof hdFEEvaluate!=='function')return '<p class="muted">判定モジュールを読み込み中。少し待ってから再確認してね。</p>';
  try{
-  const plan=hdFEPlanFromSavedFleet(map,fleet);
-  if(preset){plan.preset=preset;plan.routeInfo=typeof hdFSPresetInfo==='function'?hdFSPresetInfo(preset):null}
-  const result=hdFEEvaluate(plan),auto=result.auto;
-  const checks=HD_MSN_CHECK_IDS.map(id=>auto.checks.find(c=>c.id===id)).filter(Boolean);
-  const routeParsed=preset&&typeof hdFSPresetInfo==='function'?hdFSPresetInfo(preset):null;
-  if(routeParsed&&!routeParsed.requirements?.length){const route=checks.find(c=>c.id==='route');if(route){route.status='manual';route.detail='編成例から艦種条件を自動抽出できないためルートを確認'}}
+  const auto=hdMSNAuto(map,fleet,preset),checks=HD_MSN_CHECK_IDS.map(id=>auto.checks.find(c=>c.id===id)).filter(Boolean),routeParsed=preset&&typeof hdFSPresetInfo==='function'?hdFSPresetInfo(preset):null;
   const gate=typeof hdFEGoNoGo==='function'?hdFEGoNoGo(auto):null;
   const actions=(gate?.actions||[]).filter(a=>a.id!=='route'||routeParsed?.requirements?.length).slice(0,4);
   const missing=checks.filter(x=>x.status==='missing').length,manual=checks.filter(x=>x.status==='manual'||x.status==='partial').length;
@@ -47,11 +59,11 @@ function hdMSNRender(){
  host.innerHTML=`<div class="hd-msn-overview"><div><span class="eyebrow">${hdMSNEsc(map)} 攻略</span><h3>${hdMSNEsc(d?.name||map)}</h3><p>${hdMSNEsc(d?.overview||'攻略データを整理中。最新のルートはWikiで確認してね。')}</p></div><a class="guide-link" href="${typeof wikiMapUrl==='function'?wikiMapUrl(map):'https://wikiwiki.jp/kancolle/'}" target="_blank" rel="noopener">最新のWiki ↗</a></div><div class="hd-msn-facts">${hdMSNRow('主なルート',d?.route)}${hdMSNRow('制空・装備',d?.air)}${hdMSNRow('索敵',adv?.los?.summary||'ルートタブで条件を確認')}${base?.available?hdMSNRow('基地航空隊',`出撃可能 ${base.sorties||1}部隊 / ボス必要半径 ${base.bossRadius??'要確認'}。${base.note||''}`):''}</div><div class="hd-msn-choices"><label>編成例<select id="hdMapStrategyRoute">${presets.map((p,i)=>`<option value="${i}" ${i===ri?'selected':''}>${hdMSNEsc(p.name||`候補${i+1}`)}</option>`).join('')||'<option value="">編成例なし</option>'}</select></label><label>自分用編成<select id="hdMapStrategyFleet"><option value="">保存編成を選ぶ</option>${fleets.map(f=>`<option value="${hdMSNEsc(f.id)}" ${String(f.id)===String(fid)?'selected':''}>${hdMSNEsc(f.name||'名称なし')}</option>`).join('')}</select></label></div><div class="hd-msn-route"><h4>${hdMSNEsc(preset?.name||'編成例')}</h4>${hdMSNRouteInfo(preset,fleet&&typeof hdFEPlanFromSavedFleet==='function'?hdFEPlanFromSavedFleet(map,fleet):null)}${preset?hdMSNRow('装備の方針',preset.gear):''}${preset?hdMSNRow('使いどころ',preset.use):''}</div><h4 class="hd-msn-subhead">出撃前の差分</h4>${hdMSNEvaluation(map,fleet,preset)}<div class="hd-msn-links"><button type="button" class="primary small" data-hd-msn-to-todo="${hdMSNEsc(map)}">不足と前提をやることリストへ追加</button><button type="button" class="ghost small" data-hd-msn-action="route">ルート詳細</button><button type="button" class="ghost small" data-hd-msn-action="fleet">編成を編集</button><button type="button" class="ghost small" data-hd-msn-action="calculator">制空・索敵を計算</button><button type="button" class="ghost small" data-hd-msn-action="preparation">出撃準備表</button></div><p class="muted hd-msn-foot">編成例と自動判定は攻略の目安。海域の段階や敵編成で条件は変わるため、出撃直前はゲーム画面と最新情報を確認してね。</p>`;
 }
 function hdMSNSelectMap(map,syncGuide=false){if(!hdMSNMaps().includes(map))return;hdMSNMap=map;if(syncGuide&&typeof hdSelectGuideMap==='function')hdSelectGuideMap(map);hdMSNRender()}
-function hdMSNGoGuide(tab){const map=hdMSNMapSelected();if(map&&typeof hdSelectGuideMap==='function')hdSelectGuideMap(map);if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);if(tab&&typeof hdMapActivateTab==='function')hdMapActivateTab(tab)}
+function hdMSNGoGuide(tab){hdMSNSyncContext();if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);if(tab&&typeof hdMapActivateTab==='function')hdMapActivateTab(tab)}
 function hdMSNOpen(map){if(map)hdMSNSelectMap(map,false);else if(!hdMSNMapSelected()&&typeof selectedMap!=='undefined'&&selectedMap)hdMSNSelectMap(selectedMap,false);if(typeof hdWSShowElement==='function')hdWSShowElement('mapStrategyNavigator',true);else document.getElementById('mapStrategyNavigator')?.scrollIntoView({behavior:'smooth'});hdMSNRender()}
 function hdMSNAddEntry(){const head=document.querySelector('#selectedMapCard .map-tabs-head');if(head&&!head.querySelector('[data-hd-msn-open]')){const b=document.createElement('button');b.type='button';b.className='ghost small';b.dataset.hdMsnOpen='';b.textContent='攻略ナビ';head.appendChild(b)}}
 document.addEventListener('change',e=>{if(e.target.id==='hdMapStrategyMap'){hdMSNSelectMap(e.target.value,true);return}if(e.target.id==='hdMapStrategyRoute'){hdMSNRouteByMap[hdMSNMapSelected()]=Number(e.target.value)||0;hdMSNRender();return}if(e.target.id==='hdMapStrategyFleet'){hdMSNFleetByMap[hdMSNMapSelected()]=e.target.value;hdMSNRender()}});
-document.addEventListener('click',e=>{if(e.target.closest?.('[data-hd-msn-open]')){hdMSNOpen(typeof selectedMap!=='undefined'?selectedMap:'');return}const action=e.target.closest?.('[data-hd-msn-action]')?.dataset.hdMsnAction;if(!action)return;if(action==='route'||action==='fleet'){hdMSNGoGuide(action==='route'?'route':'mine');return}if(action==='calculator'){hdMSNGoGuide('gear');setTimeout(()=>document.getElementById('hdFleetCalculator')?.scrollIntoView({behavior:'smooth',block:'start'}),80);return}if(typeof hdWSShowElement==='function')hdWSShowElement('hdSortiePreparation',true)});
+document.addEventListener('click',e=>{const fix=e.target.closest?.('[data-hd-msn-fix]');if(fix){const context=hdMSNSyncContext();if(context?.fleet&&typeof hdFEOpenFix==='function')hdFEOpenFix(fix.dataset.hdMsnFix,hdMSNAuto(context.map,context.fleet,context.preset));return}if(e.target.closest?.('[data-hd-msn-open]')){hdMSNOpen(typeof selectedMap!=='undefined'?selectedMap:'');return}const action=e.target.closest?.('[data-hd-msn-action]')?.dataset.hdMsnAction;if(!action)return;if(action==='route'||action==='fleet'){hdMSNGoGuide(action==='route'?'route':'mine');return}if(action==='calculator'){hdMSNGoGuide('gear');setTimeout(()=>document.getElementById('hdFleetCalculator')?.scrollIntoView({behavior:'smooth',block:'start'}),80);return}hdMSNSyncContext();if(typeof hdSPSRender==='function')hdSPSRender();if(typeof hdSPSOpen==='function')hdSPSOpen();else if(typeof hdWSShowElement==='function')hdWSShowElement('hdSortiePreparation',true)});
 window.addEventListener('hd:guide-map-changed',e=>{if(e.detail?.map)hdMSNSelectMap(e.detail.map,false)});
 window.addEventListener('hd:map-rendered',()=>hdMSNAddEntry());
 window.addEventListener('hd:custom-fleets-changed',()=>hdMSNRender());

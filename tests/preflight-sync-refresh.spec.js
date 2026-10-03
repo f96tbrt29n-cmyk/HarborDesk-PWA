@@ -55,3 +55,25 @@ test('changing a roster immediately updates the sortie checklist registration co
  await page.evaluate(()=>rosterSave([]));
  await expect(check).toContainText('0/1隻を台帳で確認');
 });
+test('navigator preparation opens the selected map and saved fleet rather than the guide defaults',async({page})=>{
+ await boot(page);
+ await page.evaluate(()=>{hdSelectGuideMap('1-1');hdMSNOpen('3-2')});
+ await page.locator('[data-hd-msn-action="preparation"]').click();
+ await expect(page.locator('#hdSortiePreparation')).toBeVisible();
+ await expect(page.locator('#hdSortiePreparationBody')).toContainText('編成2');
+ expect(await page.evaluate(()=>({map:selectedMap,fleet:hdSPSFleet(selectedMap)?.id}))).toEqual({map:'3-2',fleet:'second'});
+});
+test('navigator issue buttons open the matching tool with the current fleet evaluation',async({page})=>{
+ await boot(page);
+ await page.evaluate(()=>{hdSelectGuideMap('1-1');hdMSNOpen('3-2');window.__hdFELastAuto={checks:[{id:'health',status:'ready',detail:'other fleet'}]}});
+ const health=page.locator('.hd-msn-check').filter({has:page.locator('[data-hd-msn-fix="health"]')});
+ await expect(health).toContainText('同期状態不明');
+ expect(await health.evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true);
+ await page.locator('[data-hd-msn-fix="health"]').click();
+ await expect(page.locator('#kancolleImport')).toBeVisible();
+ expect(await page.evaluate(()=>({map:selectedMap,fleet:hdSortieSelection(selectedMap),flow:hdFEFixFlowLoad()}))).toMatchObject({map:'3-2',fleet:'second',flow:{id:'health',map:'3-2',beforeStatus:'manual'}});
+ await page.evaluate(()=>hdMSNOpen('3-2'));
+ await page.locator('[data-hd-msn-fix="air"]').click();
+ await expect(page.locator('#hdFleetCalculator')).toBeVisible();
+ expect(await page.evaluate(()=>hdFEFixFlowLoad())).toMatchObject({id:'air',map:'3-2'});
+});
