@@ -50,6 +50,93 @@ async function openGuideWorkspace(page) {
   await expect(page.locator('#guide')).toBeVisible({ timeout: 5000 });
 }
 
+test('release smoke: strategy goal drafts survive background updates reload and successful submission', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  const group=page.locator('details.home-guide-group[data-group="quest"]');
+  await group.locator('summary').click();
+  const form=group.locator('[data-home-guide-add]');
+  await form.locator('[name="title"]').fill('任務の艦種を確認');
+  await form.locator('[name="prereq"]').fill('前提任務を確認');
+  await form.locator('[name="scope"]').selectOption('map');
+  await form.locator('[name="title"]').focus();
+  expect(await page.evaluate(()=>{
+    const input=document.querySelector('[data-home-guide-add="quest"] [name="title"]');input.setSelectionRange(2,2);
+    const state=homeGuideState();state.done.push('draft-background-update');homeGuideSave(state);
+    return {connected:input.isConnected,focused:document.activeElement===input,caret:input.selectionStart};
+  })).toEqual({connected:true,focused:true,caret:2});
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  await group.locator('summary').click();
+  await expect(form.locator('[name="title"]')).toHaveValue('任務の艦種を確認');
+  await expect(form.locator('[name="prereq"]')).toHaveValue('前提任務を確認');
+  await expect(form.locator('[name="scope"]')).toHaveValue('map');
+  await form.locator('button[type="submit"]').click();
+  await expect(form.locator('[name="title"]')).toHaveValue('');
+  const goals=await page.evaluate(()=>homeGuideState().custom.filter(x=>x.title==='任務の艦種を確認'));
+  expect(goals).toHaveLength(1);expect(goals[0]).toMatchObject({map:'6-5',scope:'map',detail:'前提：前提任務を確認'});
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  await expect(form.locator('[name="title"]')).toHaveValue('');
+});
+
+test('release smoke: strategy goal drafts stay separate when switching maps', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  const title=page.locator('[data-home-guide-add="map"] [name="title"]');
+  await title.fill('6-5の下書き');
+  await page.locator('#homeGuideMapSelect').selectOption('6-4');
+  await expect(title).toHaveValue('');
+  await title.fill('6-4の下書き');
+  await page.locator('#homeGuideMapSelect').selectOption('6-5');
+  await expect(title).toHaveValue('6-5の下書き');
+  await page.locator('[data-home-guide-add="map"] button[type="submit"]').click();
+  await expect(title).toHaveValue('');
+  await page.locator('#homeGuideMapSelect').selectOption('6-4');
+  await expect(title).toHaveValue('6-4の下書き');
+  expect(await page.evaluate(()=>homeGuideState().custom.filter(x=>x.title==='6-5の下書き').map(x=>x.map))).toEqual(['6-5']);
+});
+
+test('release smoke: strategy goal drafts remain when saving a goal fails', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  const form=page.locator('[data-home-guide-add="map"]');
+  await form.locator('[name="title"]').fill('保存できるまで残す目標');
+  await page.evaluate(()=>{
+    const original=Storage.prototype.setItem;
+    window.restoreGoalStorage=()=>{Storage.prototype.setItem=original};
+    Storage.prototype.setItem=function(key,value){if(key===HD_HOME_GUIDE_KEY)throw new DOMException('Storage full','QuotaExceededError');return original.call(this,key,value)};
+  });
+  await form.locator('button[type="submit"]').click();
+  await expect(form.locator('[name="title"]')).toHaveValue('保存できるまで残す目標');
+  expect(await page.evaluate(()=>homeGuideState().custom.some(x=>x.title==='保存できるまで残す目標'))).toBe(false);
+  await page.evaluate(()=>window.restoreGoalStorage());
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  await expect(form.locator('[name="title"]')).toHaveValue('保存できるまで残す目標');
+  await form.locator('button[type="submit"]').click();
+  await expect(form.locator('[name="title"]')).toHaveValue('');
+  expect(await page.evaluate(()=>homeGuideState().custom.filter(x=>x.title==='保存できるまで残す目標').length)).toBe(1);
+});
+
+test('release smoke: composing a strategy goal postpones background rendering', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  const title=page.locator('[data-home-guide-add="map"] [name="title"]');
+  await title.fill('編成');
+  await title.dispatchEvent('compositionstart');
+  const previous=await page.locator('#homeGuideCount').textContent();
+  await page.evaluate(()=>{const state=homeGuideState();state.custom.push({id:'composition-bg',title:'背景で追加された目標',category:'map',map:'6-5',scope:'map'});homeGuideSave(state);});
+  await expect(page.locator('#homeGuideCount')).toHaveText(previous);
+  await expect(title).toHaveValue('編成');
+  await title.dispatchEvent('compositionend');
+  await expect(page.locator('#homeGuideCount')).not.toHaveText(previous);
+  await expect(title).toHaveValue('編成');
+});
+
 test('release smoke: strategy sortie summary counts only its map and opens filtered logs', async ({ page }) => {
   await boot(page);
   await page.evaluate(() => {

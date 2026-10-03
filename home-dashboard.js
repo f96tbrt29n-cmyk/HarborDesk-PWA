@@ -261,7 +261,7 @@ function homeGuideState(){
   return {done:[...new Set([...done.filter(key=>!legacy.has(key)),...shared])],cleared:Array.isArray(data.cleared)?data.cleared.filter(x=>typeof x==='string'):[],custom};
  }catch{return {done:[],cleared:[],custom:[]}}
 }
-function homeGuideSave(state){try{localStorage.setItem(HD_HOME_GUIDE_KEY,JSON.stringify(state))}catch{}homeGuideRender()}
+function homeGuideSave(state){try{localStorage.setItem(HD_HOME_GUIDE_KEY,JSON.stringify(state))}catch{return false}homeGuideRender();return true}
 function homeGuideItemKey(group,id,map,scope){return (scope==='map'?'map:'+map:'global')+':'+group+':'+id}
 function homeGuideJstMonth(now=Date.now()){return new Date(now+9*60*60*1000).toISOString().slice(0,7)}
 function homeGuideGoalKey(task,now=Date.now()){
@@ -270,6 +270,22 @@ function homeGuideGoalKey(task,now=Date.now()){
  return task.source==='unlock'&&task.map==='5-6'&&task.ref==='5-5'?`${key}:${homeGuideJstMonth(now)}`:key;
 }
 function homeGuideActiveMap(){return homeSelectedMap()||(typeof hdGuideMapSequence==='function'?hdGuideMapSequence()[0]:'')||''}
+const HD_HOME_GUIDE_DRAFT_KEY='harbordesk-strategy-goal-drafts-v1';
+function homeGuideDraftStore(){try{const rows=JSON.parse(localStorage.getItem(HD_HOME_GUIDE_DRAFT_KEY)||'{}');return rows&&typeof rows==='object'&&!Array.isArray(rows)?rows:{}}catch{return {}}}
+function homeGuideDraftKey(form){return JSON.stringify([form.dataset.homeGuideDraftMap||'',form.dataset.homeGuideAdd||''])}
+function homeGuideSaveDraft(form){
+ const rows=homeGuideDraftStore();rows[homeGuideDraftKey(form)]={title:form.elements.title.value,prereq:form.elements.prereq?.value||'',scope:form.elements.scope.value};
+ try{localStorage.setItem(HD_HOME_GUIDE_DRAFT_KEY,JSON.stringify(rows))}catch{}
+}
+function homeGuideClearDraft(form){const rows=homeGuideDraftStore();delete rows[homeGuideDraftKey(form)];try{localStorage.setItem(HD_HOME_GUIDE_DRAFT_KEY,JSON.stringify(rows))}catch{}}
+function homeGuideRestoreDraft(form){
+ const draft=homeGuideDraftStore()[homeGuideDraftKey(form)];if(!draft)return;
+ for(const name of ['title','prereq','scope']){const el=form.elements[name],value=draft[name];if(!el||typeof value!=='string')continue;if(name==='scope'&&!['map','global'].includes(value))continue;el.value=value}
+}
+let homeGuideComposing=false;
+for(const type of ['input','change'])document.addEventListener(type,e=>{const form=e.target.closest?.('#homeGuideSteps [data-home-guide-add]');if(form)homeGuideSaveDraft(form)});
+document.addEventListener('compositionstart',e=>{if(e.target.closest?.('#homeGuideSteps [data-home-guide-add]'))homeGuideComposing=true});
+document.addEventListener('compositionend',e=>{const form=e.target.closest?.('#homeGuideSteps [data-home-guide-add]');if(!form)return;homeGuideComposing=false;homeGuideSaveDraft(form);if(homeGuideRenderPending)homeGuideRender()});
 let homeGuideLastSignature='';
 let homeGuidePressedPointer=null,homeGuideRenderPending=false;
 document.addEventListener('pointerdown',e=>{
@@ -300,11 +316,14 @@ window.addEventListener('blur',()=>{
 });
 function homeGuideRender(){
  const host=document.getElementById('homeGuideSteps');if(!host)return;
- if(homeGuidePressedPointer){homeGuideRenderPending=true;return}
+ if(homeGuidePressedPointer||homeGuideComposing){homeGuideRenderPending=true;return}
  homeGuideRenderPending=false;
  const state=homeGuideState(),map=homeGuideActiveMap(),maps=typeof hdGuideMapSequence==='function'?hdGuideMapSequence():[],cleared=new Set(state.cleared.filter(x=>maps.includes(x))),done=new Set(state.done),pendingOnly=homeGuidePendingOnly();
  if(typeof hdStrategyRefreshSortieSummary==='function')hdStrategyRefreshSortieSummary(map);
  const signature=map+homeGuideJstMonth()+pendingOnly+JSON.stringify(state)+(typeof hdStrategyFingerprint==='function'?hdStrategyFingerprint(map):'');if(host.children.length&&homeGuideLastSignature===signature)return;homeGuideLastSignature=signature;
+ const retained=new Map([...host.querySelectorAll('[data-home-guide-add]')].filter(form=>form.dataset.homeGuideDraftMap===map).map(form=>[form.dataset.homeGuideAdd,form]));
+ const active=document.activeElement,focusForm=active?.closest?.('[data-home-guide-add]'),restoreFocus=focusForm&&retained.get(focusForm.dataset.homeGuideAdd)===focusForm;
+ const selection=restoreFocus&&typeof active.selectionStart==='number'?{start:active.selectionStart,end:active.selectionEnd,direction:active.selectionDirection}:null;
  const opened=new Set([...host.querySelectorAll('details.home-guide-group[open]')].map(el=>el.dataset.group));
  const firstRender=!host.children.length;
   const total=HD_HOME_GUIDE_GROUPS.reduce((n,g)=>n+g.steps.length,0)+state.custom.filter(x=>x.scope!=='map'||x.map===map).length;
@@ -325,8 +344,10 @@ function homeGuideRender(){
   const rows=group.steps.map(([id,title,detail])=>item(group,id,title,detail,group.id==='map'?'map':'global')).filter(Boolean);
   for(const x of own){const row=item(group,x.id,x.title,x.detail||(x.scope==='map'?`${x.map} 向けの目標`:'自分で追加した目標'),x.scope,x,x.map);if(row)rows.push(row)}
   const count=group.steps.filter(([id])=>done.has(homeGuideItemKey(group.id,id,map,group.id==='map'?'map':'global'))).length+own.filter(x=>goalDone(x,homeGuideGoalKey(x))).length;
-  return `<details class="home-guide-group" data-group="${group.id}" ${(firstRender?group.id==='map':opened.has(group.id))?'open':''}><summary><strong>${homeEsc(group.title)}</strong><span>${count}/${group.steps.length+own.length}</span></summary><div class="home-guide-group-body">${rows.length?rows.join(''):'<p class="home-guide-empty">この分類の目標はすべて完了済み。全件表示で確認できます。</p>'}<div class="home-guide-actions"><button type="button" class="ghost small" data-home-jump="${group.target}">${homeEsc(group.action)}を開く →</button>${group.id==='gear'?'<button type="button" class="ghost small" data-home-jump="hdEquipmentProcurement">装備の入手計画 →</button>':''}${group.id==='level'?'<button type="button" class="ghost small" data-home-jump="trainingPlanner">レベリング候補 →</button>':''}${group.id==='quest'?'<small>デイリー・ウィークリー・マンスリーは「今日やること」で管理します。</small>':''}</div><form class="home-guide-add" data-home-guide-add="${group.id}"><input name="title" required maxlength="100" aria-label="${homeEsc(group.title)}の目標を追加" placeholder="具体的な目標を追加">${group.id==='quest'?'<input name="prereq" maxlength="120" aria-label="前提任務・開放条件" placeholder="前提任務・開放条件（任意）">':''}<select name="scope" aria-label="目標の対象"><option value="map">${homeEsc(map||'選択海域')} 向け</option><option value="global"${group.id==='map'?'':' selected'}>全海域共通</option></select><button type="submit" class="ghost small">追加</button></form></div></details>`;
+  return `<details class="home-guide-group" data-group="${group.id}" ${(firstRender?group.id==='map':opened.has(group.id))?'open':''}><summary><strong>${homeEsc(group.title)}</strong><span>${count}/${group.steps.length+own.length}</span></summary><div class="home-guide-group-body">${rows.length?rows.join(''):'<p class="home-guide-empty">この分類の目標はすべて完了済み。全件表示で確認できます。</p>'}<div class="home-guide-actions"><button type="button" class="ghost small" data-home-jump="${group.target}">${homeEsc(group.action)}を開く →</button>${group.id==='gear'?'<button type="button" class="ghost small" data-home-jump="hdEquipmentProcurement">装備の入手計画 →</button>':''}${group.id==='level'?'<button type="button" class="ghost small" data-home-jump="trainingPlanner">レベリング候補 →</button>':''}${group.id==='quest'?'<small>デイリー・ウィークリー・マンスリーは「今日やること」で管理します。</small>':''}</div><form class="home-guide-add" data-home-guide-add="${group.id}" data-home-guide-draft-map="${homeEsc(map)}"><input name="title" required maxlength="100" aria-label="${homeEsc(group.title)}の目標を追加" placeholder="具体的な目標を追加">${group.id==='quest'?'<input name="prereq" maxlength="120" aria-label="前提任務・開放条件" placeholder="前提任務・開放条件（任意）">':''}<select name="scope" aria-label="目標の対象"><option value="map">${homeEsc(map||'選択海域')} 向け</option><option value="global"${group.id==='map'?'':' selected'}>全海域共通</option></select><button type="submit" class="ghost small">追加</button></form></div></details>`;
  }).join('');
+ for(const form of host.querySelectorAll('[data-home-guide-add]')){const previous=retained.get(form.dataset.homeGuideAdd);if(previous)form.replaceWith(previous);else homeGuideRestoreDraft(form)}
+ if(restoreFocus&&active.isConnected){active.focus({preventScroll:true});if(selection)active.setSelectionRange(selection.start,selection.end,selection.direction)}
 }
 
 function ensureHomeDashboard(){
@@ -622,5 +643,5 @@ window.addEventListener('load',()=>setTimeout(renderHomeDashboard,300));
 ensureHomeDashboard();
 
 document.addEventListener('change',e=>{if(e.target.id==='homeGuideMapSelect'&&typeof hdSelectGuideMap==='function'){hdSelectGuideMap(e.target.value);homeGuideRender()}});
-document.addEventListener('submit',e=>{const form=e.target.closest('[data-home-guide-add]');if(!form)return;e.preventDefault();const title=form.elements.title.value.trim(),category=form.dataset.homeGuideAdd,map=homeGuideActiveMap(),scope=form.elements.scope.value;if(!title||!HD_HOME_GUIDE_GROUPS.some(g=>g.id===category)||scope==='map'&&!map)return;const state=homeGuideState();state.custom.push({id:'custom-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),category,title,scope,map:scope==='map'?map:'',detail:form.elements.prereq?.value.trim()?`前提：${form.elements.prereq.value.trim()}`:''});homeGuideSave(state)});
+document.addEventListener('submit',e=>{const form=e.target.closest('[data-home-guide-add]');if(!form)return;e.preventDefault();const title=form.elements.title.value.trim(),category=form.dataset.homeGuideAdd,map=form.dataset.homeGuideDraftMap||homeGuideActiveMap(),scope=form.elements.scope.value;if(!title||!HD_HOME_GUIDE_GROUPS.some(g=>g.id===category)||scope==='map'&&!map)return;const state=homeGuideState();state.custom.push({id:'custom-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),category,title,scope,map:scope==='map'?map:'',detail:form.elements.prereq?.value.trim()?`前提：${form.elements.prereq.value.trim()}`:''});if(!homeGuideSave(state))return;homeGuideClearDraft(form);form.reset()});
 window.addEventListener('hd:guide-map-changed',()=>homeGuideRender());
