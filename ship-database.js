@@ -9326,8 +9326,36 @@ function hdShipDbRestoreOpenDetails(list,rows){
   const details=selector?card.querySelector(selector):null;if(details)details.open=true;
  }
 }
+let hdShipDbPressedPointer=null,hdShipDbRenderPending=false;
+let hdShipDbLastRenderList=null,hdShipDbLastRenderHtml='';
+document.addEventListener('pointerdown',e=>{
+ if(e.button!==0||e.isPrimary===false||!e.target.closest?.('#hdShipDbList'))return;
+ hdShipDbPressedPointer={id:e.pointerId};
+},true);
+function hdShipDbFinishPress(press,delay=0){
+ if(!press)return;
+ // Retain the pressed card through click and the native details toggle.
+ setTimeout(()=>{
+  if(hdShipDbPressedPointer!==press)return;
+  hdShipDbPressedPointer=null;
+  if(hdShipDbRenderPending)hdRenderShipDatabase();
+ },delay);
+}
+window.addEventListener('pointerup',e=>{
+ if(hdShipDbPressedPointer?.id===e.pointerId)hdShipDbFinishPress(hdShipDbPressedPointer,500);
+},true);
+window.addEventListener('pointercancel',e=>{
+ if(hdShipDbPressedPointer?.id===e.pointerId)hdShipDbFinishPress(hdShipDbPressedPointer);
+},true);
+document.addEventListener('click',()=>hdShipDbFinishPress(hdShipDbPressedPointer),true);
+window.addEventListener('blur',()=>{
+ hdShipDbPressedPointer=null;
+ if(hdShipDbRenderPending)hdRenderShipDatabase();
+});
 function hdRenderShipDatabase(){
  const list=document.getElementById('hdShipDbList');if(!list)return;
+ if(hdShipDbPressedPointer){hdShipDbRenderPending=true;return}
+ hdShipDbRenderPending=false;
  const openDetails=hdShipDbOpenDetailsSnapshot(list);
  const q=(document.getElementById('hdShipDbSearch')?.value||'').trim().toLowerCase();
  let rows=HD_SHIP_DATABASE.filter(x=>(hdShipDbType==='すべて'||x.type===hdShipDbType)&&(!q||`${x.base} ${x.final} ${x.type} ${x.roles.join(' ')} ${x.note} ${x.path} ${(HD_SHIP_LOADOUTS[x.final]||[]).flatMap(y=>[y.name,...y.gear,y.memo]).join(' ')}`.toLowerCase().includes(q)||hdShipDbAcquisitionMatches(x.base,q)));
@@ -9346,7 +9374,11 @@ function hdRenderShipDatabase(){
  const summary=document.getElementById('hdShipDbActiveFilters'),chips=[];if(q)chips.push('検索: '+q);if(hdShipDbType!=='すべて')chips.push('艦種: '+hdShipDbType);if(hdShipDbMissingOnly)chips.push('未所持');if(!hdShipDbIncludeMaster)chips.push('詳細DBのみ');if(hdShipDbImageFilter!=='all')chips.push(hdShipDbImageFilter==='registered'?'画像登録済み':'画像未登録');
  if(summary){summary.hidden=!chips.length;summary.innerHTML=chips.length?chips.map(x=>`<span>${hdShipDbEsc(x)}</span>`).join('')+'<button type="button" class="ghost small" data-hd-shipdb-reset>クリア</button>':''}
  const count=document.getElementById('hdShipDbCount');if(count)count.textContent=(q||hdShipDbImageFilter!=='all')&&hdShipDbIncludeMaster?`詳細 ${rows.length} / マスター ${masterRows.length}`:`詳細 ${rows.length}隻`;
- list.innerHTML=(detailedHtml||masterHtml)?detailedHtml+masterHtml:'<div class="empty empty-action"><strong>条件に合う艦娘がいないよ</strong><p>検索・艦種・所持・画像条件を一度戻してみて。</p><button type="button" class="ghost small" data-hd-shipdb-empty-reset>条件をクリア</button></div>';
+ const html=(detailedHtml||masterHtml)?detailedHtml+masterHtml:'<div class="empty empty-action"><strong>条件に合う艦娘がいないよ</strong><p>検索・艦種・所持・画像条件を一度戻してみて。</p><button type="button" class="ghost small" data-hd-shipdb-empty-reset>条件をクリア</button></div>';
+ // Identical data does not require replacing hydrated cards or native details.
+ if(hdShipDbLastRenderList===list&&hdShipDbLastRenderHtml===html&&list.children.length)return;
+ hdShipDbLastRenderList=list;hdShipDbLastRenderHtml=html;
+ list.innerHTML=html;
  hdShipDbRestoreOpenDetails(list,openDetails);
  if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(list);
 }

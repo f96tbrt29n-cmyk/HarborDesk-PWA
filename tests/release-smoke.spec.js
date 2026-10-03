@@ -4508,6 +4508,52 @@ test('release smoke: master ship acquisition recovers failed lazy module', async
 });
 
 
+test('release smoke: ship database refresh retains the pressed summary and its native toggle', async ({ page }) => {
+  await boot(page);
+  const state = await page.evaluate(() => {
+    const detailed = new Set(HD_SHIP_DATABASE.map(x => x.final));
+    const candidate = Object.values(HD_KANCOLLE_MASTER_SNAPSHOT.allShips).find(x =>
+      !detailed.has(x.name) && x.slots?.length && hdShipDbMasterSuggestedLoadouts(x).length);
+    hdWSShowElement('shipDatabase', false);
+    document.getElementById('hdShipDbSearch').value = candidate.name;
+    hdRenderShipDatabase();
+    const summary = document.querySelector('.hd-shipdb-master-suggest > summary');
+    summary.dispatchEvent(new PointerEvent('pointerdown', { bubbles:true, pointerId:18, button:0, isPrimary:true }));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'press-sync',name:candidate.name,masterId:candidate.id,level:15}]));
+    window.dispatchEvent(new Event('hd:ship-identity-changed'));
+    hdRenderShipDatabase();
+    const retained = summary.isConnected;
+    summary.dispatchEvent(new PointerEvent('pointerup', { bubbles:true, pointerId:18 }));
+    summary.click();
+    return {retained, opened:summary.parentElement.open};
+  });
+  expect(state).toEqual({retained:true, opened:true});
+  await expect.poll(() => page.evaluate(() => hdShipDbPressedPointer === null && !hdShipDbRenderPending)).toBe(true);
+  await expect.poll(() => page.locator('.hd-shipdb-master-suggest').first().evaluate(el => el.open)).toBe(true);
+  await expect(page.locator('.hd-shipdb-master-card').first()).toContainText('Lv.15');
+  expect(await page.evaluate(() => {
+    const summary = document.querySelector('.hd-shipdb-master-suggest > summary');
+    hdRenderShipDatabase();
+    return summary === document.querySelector('.hd-shipdb-master-suggest > summary');
+  })).toBe(true);
+});
+
+test('release smoke: canceled ship database press resumes the latest pending filter', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => {
+    hdWSShowElement('shipDatabase', false);
+    document.getElementById('hdShipDbSearch').value = '吹雪';
+    hdRenderShipDatabase();
+    const list = document.getElementById('hdShipDbList');
+    list.querySelector('button').dispatchEvent(new PointerEvent('pointerdown', { bubbles:true, pointerId:17, button:0, isPrimary:true }));
+    document.getElementById('hdShipDbSearch').value = 'no-such-ship-507';
+    hdRenderShipDatabase();
+  });
+  await expect(page.locator('#hdShipDbList')).toContainText('吹雪');
+  await page.evaluate(() => window.dispatchEvent(new PointerEvent('pointercancel', { pointerId:17 })));
+  await expect(page.locator('#hdShipDbList')).toContainText('条件に合う艦娘がいないよ');
+});
+
 test('release smoke: map fleet procurement opens even when workspace routing refuses target', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
