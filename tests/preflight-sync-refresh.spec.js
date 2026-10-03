@@ -75,6 +75,7 @@ test('navigator issue buttons open the matching tool with the current fleet eval
  await page.evaluate(()=>hdMSNOpen('3-2'));
  await page.locator('[data-hd-msn-fix="air"]').click();
  await expect(page.locator('#hdFleetCalculator')).toBeVisible();
+ await expect(page.locator('#hdFCFleetSelect')).toHaveValue('second');
  expect(await page.evaluate(()=>hdFEFixFlowLoad())).toMatchObject({id:'air',map:'3-2'});
 });
 test('returning to navigator immediately cancels delayed navigation from the previous fix',async({page})=>{
@@ -88,4 +89,20 @@ test('returning to navigator immediately cancels delayed navigation from the pre
   await expect(page.locator('#mapStrategyNavigator')).toBeVisible();
   expect(await page.evaluate(()=>hdWSCurrentLocation())).toMatchObject({group:'guide',section:'mapStrategyNavigator'});
  }
+});
+
+test('calculator activation survives a repeat guide reveal without waiting for deferred navigation',async({page})=>{
+ await boot(page);
+ await page.evaluate(()=>{hdSelectGuideMap('3-2');hdFEOpenCalculator();hdWSShowElement('guide',false)});
+ await expect(page.locator('[data-map-pane="gear"]')).toHaveClass(/active/);
+ await expect(page.locator('#hdFleetCalculator')).toBeVisible();
+});
+
+test('navigator calculator link carries the chosen fleet and keeps its saved inputs',async({page})=>{
+ await boot(page);
+ await page.evaluate(()=>hdFCMutate('3-2','second',state=>state.hqLevel=88));
+ await page.locator('[data-hd-msn-action="calculator"]').click();
+ await expect(page.locator('#hdFleetCalculator')).toBeVisible();
+ await expect(page.locator('#hdFCFleetSelect')).toHaveValue('second');
+ await expect(page.locator('[data-hd-fc-hq]')).toHaveValue('88');
 });

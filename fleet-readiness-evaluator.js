@@ -379,16 +379,7 @@ function hdFEDeferNavigation(run,delay){
 function hdFEOpenFix(id,auto=null){
  hdFEStartFixFlow(id,auto);
  const info=hdFEFixActionInfo(id),target=info.target;
- if(target==='calculator'){
-  hdFERevealTarget('guide',false);
-  hdFEDeferNavigation(()=>{
-   const open=typeof window.hdCoreMapAction==='function'
-    ?Promise.resolve(window.hdCoreMapAction('gear')).catch(()=>false)
-    :Promise.resolve((()=>{if(typeof hdSortieOpenTab==='function')return hdSortieOpenTab('gear');document.querySelector('[data-map-tab="gear"]')?.click();return true})());
-   open.finally(()=>hdFEDeferNavigation(()=>document.getElementById('hdFleetCalculator')?.scrollIntoView({behavior:'smooth',block:'start'}),80));
-  },60);
-  return true;
- }
+ if(target==='calculator')return hdFEOpenCalculator();
  if(target==='guide'){
   hdFERevealTarget('guide',true);
   hdFEDeferNavigation(()=>document.getElementById('selectedMapCard')?.scrollIntoView({behavior:'smooth',block:'start'}),60);return true;
@@ -479,19 +470,19 @@ function hdFEInstall(){
 }
 function hdFEOpenCalculator(){
  hdFERevealTarget('guide',false);
- hdFEDeferNavigation(()=>{
-  let opened=false;
-  if(typeof window.hdCoreMapAction==='function'){
-   try{
-    const result=window.hdCoreMapAction('gear');
-    if(result&&typeof result.then==='function')result.catch(()=>{});
-    opened=result!==false;
-   }catch{}
-  }
-  if(!opened&&typeof hdSortieOpenTab==='function')opened=hdSortieOpenTab('gear')!==false;
-  if(!opened){const btn=document.querySelector('[data-map-tab="gear"]');if(btn){btn.click();opened=true}}
-  hdFEDeferNavigation(()=>document.getElementById('hdFleetCalculator')?.scrollIntoView({behavior:'smooth',block:'start'}),80);
- },60);
+ // Activate the tab in the same navigation turn; a later guide reveal must not
+ // cancel opening the calculator while its saved tab is still the overview.
+ let opened=false;
+ if(typeof window.hdCoreMapAction==='function'){
+  try{
+   const result=window.hdCoreMapAction('gear');
+   if(result&&typeof result.then==='function')result.catch(()=>{});
+   opened=result!==false;
+  }catch{}
+ }
+ if(!opened&&typeof hdSortieOpenTab==='function')opened=hdSortieOpenTab('gear')!==false;
+ if(!opened){const btn=document.querySelector('[data-map-tab="gear"]');if(btn){btn.click();opened=true}}
+ hdFEDeferNavigation(()=>document.getElementById('hdFleetCalculator')?.scrollIntoView({behavior:'smooth',block:'start'}),80);
  return true;
 }
 function hdFEOpenPreparation(){
