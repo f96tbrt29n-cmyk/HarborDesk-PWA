@@ -77,3 +77,15 @@ test('navigator issue buttons open the matching tool with the current fleet eval
  await expect(page.locator('#hdFleetCalculator')).toBeVisible();
  expect(await page.evaluate(()=>hdFEFixFlowLoad())).toMatchObject({id:'air',map:'3-2'});
 });
+test('returning to navigator immediately cancels delayed navigation from the previous fix',async({page})=>{
+ await boot(page);
+ for(const id of ['health','master','route','air']){
+  await page.evaluate(async id=>{
+   hdFEOpenFix(id,{checks:[{id,status:'manual',detail:'未確認'}]});
+   hdMSNOpen('3-2');
+   await new Promise(resolve=>setTimeout(resolve,250));
+  },id);
+  await expect(page.locator('#mapStrategyNavigator')).toBeVisible();
+  expect(await page.evaluate(()=>hdWSCurrentLocation())).toMatchObject({group:'guide',section:'mapStrategyNavigator'});
+ }
+});

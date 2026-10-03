@@ -371,30 +371,35 @@ function hdFERevealTarget(target,scroll=true){
  }
  return opened;
 }
+// A newer workspace choice cancels scrolling scheduled by the previous choice.
+function hdFEDeferNavigation(run,delay){
+ const epoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0;
+ return setTimeout(()=>{if(epoch===(Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0))run()},delay);
+}
 function hdFEOpenFix(id,auto=null){
  hdFEStartFixFlow(id,auto);
  const info=hdFEFixActionInfo(id),target=info.target;
  if(target==='calculator'){
   hdFERevealTarget('guide',false);
-  setTimeout(()=>{
+  hdFEDeferNavigation(()=>{
    const open=typeof window.hdCoreMapAction==='function'
     ?Promise.resolve(window.hdCoreMapAction('gear')).catch(()=>false)
     :Promise.resolve((()=>{if(typeof hdSortieOpenTab==='function')return hdSortieOpenTab('gear');document.querySelector('[data-map-tab="gear"]')?.click();return true})());
-   open.finally(()=>setTimeout(()=>document.getElementById('hdFleetCalculator')?.scrollIntoView({behavior:'smooth',block:'start'}),80));
+   open.finally(()=>hdFEDeferNavigation(()=>document.getElementById('hdFleetCalculator')?.scrollIntoView({behavior:'smooth',block:'start'}),80));
   },60);
   return true;
  }
  if(target==='guide'){
   hdFERevealTarget('guide',true);
-  setTimeout(()=>document.getElementById('selectedMapCard')?.scrollIntoView({behavior:'smooth',block:'start'}),60);return true;
+  hdFEDeferNavigation(()=>document.getElementById('selectedMapCard')?.scrollIntoView({behavior:'smooth',block:'start'}),60);return true;
  }
  if(target==='kancolleImport'){
   hdFERevealTarget('kancolleImport',true);
-  setTimeout(()=>{const focus=String(id)==='gameMatch'?document.getElementById('hdKcCurrentFleets'):document.getElementById('hdKcSyncStatus');(focus||document.getElementById('kancolleImport'))?.scrollIntoView({behavior:'smooth',block:'start'})},60);return true;
+  hdFEDeferNavigation(()=>{const focus=String(id)==='gameMatch'?document.getElementById('hdKcCurrentFleets'):document.getElementById('hdKcSyncStatus');(focus||document.getElementById('kancolleImport'))?.scrollIntoView({behavior:'smooth',block:'start'})},60);return true;
  }
  if(target==='equipmentBook'){
   hdFERevealTarget('equipmentBook',true);
-  setTimeout(()=>document.getElementById('equipmentBook')?.scrollIntoView({behavior:'smooth',block:'start'}),60);return true;
+  hdFEDeferNavigation(()=>document.getElementById('equipmentBook')?.scrollIntoView({behavior:'smooth',block:'start'}),60);return true;
  }
  if(typeof hdSPSOpen==='function')hdSPSOpen();return true;
 }
@@ -474,7 +479,7 @@ function hdFEInstall(){
 }
 function hdFEOpenCalculator(){
  hdFERevealTarget('guide',false);
- setTimeout(()=>{
+ hdFEDeferNavigation(()=>{
   let opened=false;
   if(typeof window.hdCoreMapAction==='function'){
    try{
@@ -485,7 +490,7 @@ function hdFEOpenCalculator(){
   }
   if(!opened&&typeof hdSortieOpenTab==='function')opened=hdSortieOpenTab('gear')!==false;
   if(!opened){const btn=document.querySelector('[data-map-tab="gear"]');if(btn){btn.click();opened=true}}
-  setTimeout(()=>document.getElementById('hdFleetCalculator')?.scrollIntoView({behavior:'smooth',block:'start'}),80);
+  hdFEDeferNavigation(()=>document.getElementById('hdFleetCalculator')?.scrollIntoView({behavior:'smooth',block:'start'}),80);
  },60);
  return true;
 }
