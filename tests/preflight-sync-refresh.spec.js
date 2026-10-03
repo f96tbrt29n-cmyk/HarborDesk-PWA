@@ -106,3 +106,32 @@ test('navigator calculator link carries the chosen fleet and keeps its saved inp
  await expect(page.locator('#hdFCFleetSelect')).toHaveValue('second');
  await expect(page.locator('[data-hd-fc-hq]')).toHaveValue('88');
 });
+
+test('a sync refresh between pressing and releasing a navigator button keeps the tap',async({page})=>{
+ await boot(page);
+ const button=page.locator('[data-hd-msn-fix="air"]');
+ await button.scrollIntoViewIfNeeded();
+ const box=await button.boundingBox();
+ await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
+ await page.mouse.down();
+ await page.evaluate(async()=>{
+  rosterSave([{id:'manual',name:'吹雪',masterId:1,gameHp:15,gameMaxHp:15,gameCond:49}]);
+  await new Promise(resolve=>setTimeout(resolve,120));
+ });
+ await page.mouse.up();
+ await expect(page.locator('.hd-msn-check').filter({has:page.locator('b',{hasText:'艦状態'})})).toContainText('艦状態OK');
+ await expect(page.locator('#hdFleetCalculator')).toBeVisible();
+ expect(await page.evaluate(()=>hdFEFixFlowLoad()?.id)).toBe('air');
+});
+
+
+test('unchanged navigator refresh keeps a focused button usable from the keyboard',async({page})=>{
+ await boot(page);
+ const button=page.locator('[data-hd-msn-fix="air"]');
+ await button.focus();
+ await page.evaluate(()=>hdMSNRender());
+ await expect(button).toBeFocused();
+ await page.keyboard.press('Enter');
+ await expect(page.locator('#hdFleetCalculator')).toBeVisible();
+ await expect(page.locator('#hdFCFleetSelect')).toHaveValue('second');
+});
