@@ -23,7 +23,14 @@ function hdMapEmit(type,detail={}){
   try{window.dispatchEvent(new CustomEvent(type,{detail:{map:typeof selectedMap!=='undefined'?selectedMap:null,tab:typeof selectedMap!=='undefined'&&selectedMap?hdMapTabSaved(selectedMap):null,...detail}}))}catch{}
 }
 function hdMapTabsRevealActive(){
- requestAnimationFrame(()=>document.querySelector('.map-tab-bar .map-tab-btn.active')?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'}));
+ requestAnimationFrame(()=>{
+  const bar=document.querySelector('.map-tab-bar'),active=bar?.querySelector('.map-tab-btn.active');
+  if(!active)return;
+  // Keep the current pane in place: scrollIntoView also scrolls page ancestors.
+  const bounds=bar.getBoundingClientRect(),tab=active.getBoundingClientRect();
+  const left=bar.scrollLeft+tab.left-bounds.left-(bar.clientWidth-tab.width)/2;
+  bar.scrollTo({left,behavior:'instant'});
+ });
 }
 function hdFleetHtml(map){
   const p=hdMapPlan(map);

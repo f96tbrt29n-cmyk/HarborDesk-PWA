@@ -152,3 +152,29 @@ test('returning from sync to navigator finishes scrolling before the next tool t
  await expect(page.locator('#hdFleetCalculator')).toBeVisible();
  await expect(page.locator('#hdFCFleetSelect')).toHaveValue('second');
 });
+
+test('revealing the active map tab scrolls only its tab bar and keeps the current control in place',async({page})=>{
+ await boot(page);
+ for(const width of [390,600]){
+  await page.setViewportSize({width,height:844});
+  await page.evaluate(()=>{hdWSShowElement('guide',false);hdSelectGuideMap('3-2');hdMapActivateTab('mine')});
+  await expect(page.locator('[data-map-pane="mine"]')).toBeVisible();
+  const position=await page.evaluate(async()=>{
+   // Start below the tab bar, as when editing readiness or support controls.
+   await new Promise(resolve=>setTimeout(resolve,300));
+   const bar=document.querySelector('.map-tab-bar');
+   const control=document.querySelector('[data-map-pane="mine"]');
+   window.scrollTo({top:control.getBoundingClientRect().top+window.scrollY+200,behavior:'instant'});
+   bar.scrollLeft=0;
+   const start=window.scrollY;
+   hdMapTabsRevealActive();
+   await new Promise(resolve=>setTimeout(resolve,300));
+   const active=bar.querySelector('.active').getBoundingClientRect(),bounds=bar.getBoundingClientRect();
+   return {start,end:window.scrollY,left:active.left,right:active.right,barLeft:bounds.left,barRight:bounds.right};
+  });
+  expect(position.start).toBeGreaterThan(0);
+  expect(Math.abs(position.end-position.start)).toBeLessThan(1);
+  expect(position.left).toBeGreaterThanOrEqual(position.barLeft-1);
+  expect(position.right).toBeLessThanOrEqual(position.barRight+1);
+ }
+});
