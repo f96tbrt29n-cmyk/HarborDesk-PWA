@@ -170,7 +170,7 @@ function hdStrategySortieProgress(map){
 function hdStrategySortieHtml(map){
  if(!map)return '';
  const p=hdStrategySortieProgress(map),last=p.latest,time=last?.at>0?new Date(last.at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';
- return `<div class="hd-strategy-preview hd-strategy-sortie-summary"><div class="hd-strategy-preview-head"><strong>${hdStrategyEsc(map)} の出撃記録</strong><button type="button" class="ghost small" data-hd-strategy-sortie-log="${hdStrategyEsc(map)}">この海域のログを見る →</button></div><small>${p.runs?`記録 ${p.runs}周 / ボス到達 ${p.boss}回<br>ボスS勝利 ${p.bossS}回 / 撤退 ${p.retreat}回`:'まだこの海域の出撃記録はありません。'}</small>${last?`<small>最新：${hdStrategyEsc([time,last.node,last.result,last.drop?'ドロップ '+last.drop:''].filter(Boolean).join(' ｜ '))}</small>`:''}<small>保存された出撃ログの集計です。海域クリアはゲームで確認して記録してください。</small></div>`;
+ return `<div class="hd-strategy-sortie-summary"><div class="hd-strategy-preview-head"><strong>${hdStrategyEsc(map)} の出撃記録</strong><button type="button" class="ghost small" data-hd-strategy-sortie-log="${hdStrategyEsc(map)}">この海域のログを見る →</button></div><small>${p.runs?`記録 ${p.runs}周 / ボス到達 ${p.boss}回<br>ボスS勝利 ${p.bossS}回 / 撤退 ${p.retreat}回`:'まだこの海域の出撃記録はありません。'}</small>${last?`<small>最新：${hdStrategyEsc([time,last.node,last.result,last.drop?'ドロップ '+last.drop:''].filter(Boolean).join(' ｜ '))}</small>`:''}<small>保存された出撃ログの集計です。海域クリアはゲームで確認して記録してください。</small></div>`;
 }
 function hdStrategyRefreshSortieSummary(map){
  const current=document.querySelector('#homeGuideSteps .hd-strategy-sortie-summary');if(!current)return;
