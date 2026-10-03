@@ -154,9 +154,42 @@ async function hdSPSCopy(map){
  try{await navigator.clipboard.writeText(text)}catch{try{prompt('出撃準備表をコピーしてね',text)}catch{}}
 }
 
+let hdSPSPressedPointer=null,hdSPSRenderPending=false;
+let hdSPSLastRenderHost=null,hdSPSLastRenderHtml='';
+document.addEventListener('pointerdown',e=>{
+ if(e.button!==0||e.isPrimary===false||!e.target.closest?.('#hdSortiePreparationBody'))return;
+ hdSPSPressedPointer={id:e.pointerId};
+},true);
+function hdSPSDeferPressedRender(){
+ if(!hdSPSPressedPointer)return false;
+ hdSPSRenderPending=true;return true;
+}
+window.hdSPSDeferPressedRender=hdSPSDeferPressedRender;
+function hdSPSFinishPress(press,delay=0){
+ if(!press)return;
+ setTimeout(()=>{
+  if(hdSPSPressedPointer!==press)return;
+  hdSPSPressedPointer=null;
+  if(hdSPSRenderPending)hdSPSRender();
+ },delay);
+}
+window.addEventListener('pointerup',e=>{
+ if(hdSPSPressedPointer?.id===e.pointerId)hdSPSFinishPress(hdSPSPressedPointer,500);
+},true);
+window.addEventListener('pointercancel',e=>{
+ if(hdSPSPressedPointer?.id===e.pointerId)hdSPSFinishPress(hdSPSPressedPointer);
+},true);
+document.addEventListener('click',()=>hdSPSFinishPress(hdSPSPressedPointer),true);
+window.addEventListener('blur',()=>{
+ hdSPSPressedPointer=null;
+ if(hdSPSRenderPending)hdSPSRender();
+});
 function hdSPSRender(){
  const host=document.getElementById('hdSortiePreparationBody'),title=document.getElementById('hdSortiePreparationMap');if(!host)return;
- const map=hdSPSMap();if(!map){if(title)title.textContent='海域未選択';host.innerHTML='<div class="empty">攻略タブで海域を選ぶと、艦隊・装備・基地航空隊をまとめた準備表を作るよ。</div>';return}
+ // Keep the original pointer target connected until click or cancellation.
+ if(hdSPSDeferPressedRender())return;
+ hdSPSRenderPending=false;
+ const map=hdSPSMap();if(!map){hdSPSLastRenderHost=null;hdSPSLastRenderHtml='';if(title)title.textContent='海域未選択';host.innerHTML='<div class="empty">攻略タブで海域を選ぶと、艦隊・装備・基地航空隊をまとめた準備表を作るよ。</div>';return}
  const d=hdSPSMapDetail(map),fleet=hdSPSFleetInfo(map);
  if(title)title.textContent=`${map} ${d.name||''}`;
  const eq=hdSPSEquipmentInfo(map,fleet),base=hdSPSBaseInfo(map),auto=eq.assigned?.auto||null;
@@ -165,10 +198,13 @@ function hdSPSRender(){
  const baseReady=!base.available||base.sortieReady;
  const manualReady=!fleet.manualTotal||fleet.manualDone===fleet.manualTotal;
  const score=[fleetReady,eqReady,baseReady,manualReady].filter(Boolean).length,autoLabel=auto?(typeof hdFEAutoStatusLabel==='function'?hdFEAutoStatusLabel(auto.status):auto.status):'編成保存後に判定';
- host.innerHTML=`<div class="hd-sps-overview"><div><strong>準備状況 ${score}/4</strong><span>艦隊・装備・基地航空隊・出撃直前チェックを統合 ｜ 自動判定 ${hdSPSEsc(autoLabel)}</span></div><div class="hd-sps-actions"><button type="button" class="ghost small" data-hd-sps-refresh>再判定</button><button type="button" class="ghost small" data-hd-sps-copy>準備表をコピー</button><button type="button" class="ghost small" data-hd-sps-guide>海域攻略へ戻る</button></div></div>
+ const html=`<div class="hd-sps-overview"><div><strong>準備状況 ${score}/4</strong><span>艦隊・装備・基地航空隊・出撃直前チェックを統合 ｜ 自動判定 ${hdSPSEsc(autoLabel)}</span></div><div class="hd-sps-actions"><button type="button" class="ghost small" data-hd-sps-refresh>再判定</button><button type="button" class="ghost small" data-hd-sps-copy>準備表をコピー</button><button type="button" class="ghost small" data-hd-sps-guide>海域攻略へ戻る</button></div></div>
   ${hdSPSAutoHtml(auto)}
   <div class="hd-sps-grid">${hdSPSFleetHtml(map,fleet)}${hdSPSEquipmentHtml(map,fleet)}${hdSPSBaseHtml(map)}${hdSPSManualHtml(map,fleet)}</div>
   <div class="hd-sps-foot">※自動判定は同期済み艦状態・保存編成・実配備装備と登録済み海域閾値を照合する補助。敵編成変化、熟練度、イベント固有条件などはゲーム画面で最終確認してね。</div>`;
+ if(hdSPSLastRenderHost===host&&hdSPSLastRenderHtml===html&&host.querySelector('.hd-sps-overview'))return;
+ hdSPSLastRenderHost=host;hdSPSLastRenderHtml=html;
+ host.innerHTML=html;
  if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
 }
 function hdSPSEnsure(){

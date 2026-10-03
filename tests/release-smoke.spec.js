@@ -5326,6 +5326,74 @@ test('release smoke: secondary drop and synced custom fleet controls work', asyn
 });
 
 
+test('release smoke: runtime starts while an initial image is still loading', async ({ page }) => {
+  let releaseImage;
+  const pendingImage = new Promise(resolve => { releaseImage = resolve; });
+  await page.context().route('https://**/*', route => route.request().resourceType()==='image'
+    ? route.fulfill({status:200,contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=', 'base64')})
+    : route.fulfill({status:204,body:''}));
+  await page.route('**/hd-test-pending-image.png', async route => {
+    await pendingImage;
+    await route.fulfill({status:200,contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=', 'base64')}).catch(() => {});
+  });
+  await page.addInitScript(() => {
+    window.__hdInitialLoadObserved = false;
+    window.addEventListener('load', () => {window.__hdInitialLoadObserved = true;}, {once:true});
+    document.addEventListener('DOMContentLoaded', () => {
+      const image = document.createElement('img');
+      image.src = './hd-test-pending-image.png';
+      image.hidden = true;
+      document.body.appendChild(image);
+    }, {once:true});
+  });
+  try {
+    await page.goto('http://127.0.0.1:4173/', {waitUntil:'domcontentloaded'});
+    await expect.poll(() => page.evaluate(() => document.body?.dataset?.hdReady), {timeout:10000}).toBe('1');
+    expect(await page.evaluate(() => window.__hdInitialLoadObserved)).toBe(false);
+    await expect(page.locator('#hdWorkspaceNav')).toBeVisible();
+  } finally { releaseImage(); }
+  await page.waitForFunction(() => window.__hdInitialLoadObserved, null, {timeout:10000});
+});
+
+test('release smoke: preparation updates keep a pressed guide button until its click', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => {
+    selectedWorld='6';selectedMap='6-5';renderMapPicker();hdSPSOpen();
+    window.hdWSShowElement = undefined;
+  });
+  const button = page.locator('#hdSortiePreparation [data-hd-sps-guide]');
+  await expect(button).toBeVisible();
+  await button.dispatchEvent('pointerdown', {pointerId:71,button:0,isPrimary:true});
+  const retained = await page.evaluate(() => {
+    const button = document.querySelector('#hdSortiePreparation [data-hd-sps-guide]');
+    selectedMap='6-4';
+    hdSPSRender();
+    return document.querySelector('#hdSortiePreparation [data-hd-sps-guide]') === button;
+  });
+  expect(retained).toBe(true);
+  await button.click();
+  await expect(page.locator('#guide')).toBeVisible();
+  await expect(page.locator('#hdSortiePreparationMap')).toContainText('6-4');
+});
+
+test('release smoke: unchanged preparation retains controls and canceled presses resume updates', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => {selectedWorld='6';selectedMap='6-5';renderMapPicker();hdSPSOpen();});
+  const button = page.locator('#hdSortiePreparation [data-hd-sps-guide]');
+  await expect(button).toBeVisible();
+  expect(await page.evaluate(() => {
+    const button = document.querySelector('#hdSortiePreparation [data-hd-sps-guide]');
+    hdSPSRender();
+    return document.querySelector('#hdSortiePreparation [data-hd-sps-guide]') === button;
+  })).toBe(true);
+  await button.dispatchEvent('pointerdown', {pointerId:72,button:0,isPrimary:true});
+  await page.evaluate(() => {selectedMap='6-4';hdSPSRender();});
+  await expect(page.locator('#hdSortiePreparationMap')).toContainText('6-5');
+  await page.evaluate(() => window.dispatchEvent(new PointerEvent('pointercancel',{pointerId:72})));
+  await expect(page.locator('#hdSortiePreparationMap')).toContainText('6-4');
+  await expect(page.locator('#hdSortiePreparation')).toBeVisible();
+});
+
 test('release smoke:攻略 secondary navigation survives workspace helper outage', async ({ page }) => {
   const errors = [];
   await boot(page, errors);

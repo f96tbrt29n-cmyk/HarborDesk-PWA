@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.512';
-const HD_APP_BUILD=512;
+const HD_APP_VERSION='1.0.513';
+const HD_APP_BUILD=513;
 const HD_UPDATE_SNOOZE_KEY='harbordesk-update-snooze-v1';
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
@@ -470,8 +470,13 @@ document.addEventListener('keydown',e=>{
   menu.removeAttribute('open');
   const summary=menu.querySelector(':scope > summary');try{summary?.focus({preventScroll:true})}catch{summary?.focus()}
 });
+// Runtime modules can start as soon as the core scripts and DOM are ready.
+// Waiting for load also waits for unrelated images and can leave the UI booting.
+const hdStartCurrentAssets=()=>hdEnsureCurrentAssets().catch(()=>{});
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',hdStartCurrentAssets,{once:true});
+else queueMicrotask(hdStartCurrentAssets);
 window.addEventListener('load',()=>{
-  hdEnsureServiceWorker();hdEnsureCurrentAssets().catch(()=>{});hdInitUpdateManagerUI();
+  hdEnsureServiceWorker();hdInitUpdateManagerUI();
   if(new URL(location.href).searchParams.has('hd_update')){
     setTimeout(()=>{try{history.replaceState(null,'',location.pathname+location.hash)}catch{}},500);
   }

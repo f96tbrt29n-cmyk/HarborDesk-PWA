@@ -482,6 +482,8 @@ function hdSSHtml(map){const active=hdSSLoad();return active?hdSSActiveHtml(acti
 function hdSSRender(retained){
  const body=document.getElementById('hdSortiePreparationBody');if(!body)return;
  const current=body.querySelector('.hd-ss'),session=hdSSLoad(),map=hdSSMap();
+ // A changed session must invalidate its old controls even during a press.
+ if(window.hdSPSDeferPressedRender?.()&&current?.__hdSSSessionId===session?.id)return;
  if(!map&&!session){current?.remove();return}
  const overview=body.querySelector('.hd-sps-overview');if(!overview)return;
  const html=session?hdSSActiveHtml(session):hdSSIdleHtml(map);
@@ -595,8 +597,8 @@ document.addEventListener('input',hdSSSaveReturnDraft);
 document.addEventListener('change',hdSSSaveReturnDraft);
 
 document.addEventListener('click',function(e){
- if(e.target.closest?.('[data-hd-ss-start]')){const session=hdSSStart(hdSSMap());if(session&&typeof window.hdSMOpen==='function')setTimeout(()=>window.hdSMOpen(),0);return}
- if(e.target.closest?.('[data-hd-ss-start-override]')){const session=hdSSStart(hdSSMap(),{force:true});if(session&&typeof window.hdSMOpen==='function')setTimeout(()=>window.hdSMOpen(),0);return}
+ if(e.target.closest?.('[data-hd-ss-start]')){const session=hdSSStart(hdSSMap());if(session&&typeof window.hdSMOpen==='function')window.hdSMOpen();return}
+ if(e.target.closest?.('[data-hd-ss-start-override]')){const session=hdSSStart(hdSSMap(),{force:true});if(session&&typeof window.hdSMOpen==='function')window.hdSMOpen();return}
  if(e.target.closest?.('[data-hd-ss-finish]')){hdSSFinish(hdSSFormData());return}
  if(e.target.closest?.('[data-hd-ss-cancel]')){hdSSClear();return}
  if(e.target.closest?.('[data-hd-ss-check]')){if(typeof hdSPSOpenMapTab==='function')hdSPSOpenMapTab('mine');return}
@@ -604,7 +606,7 @@ document.addEventListener('click',function(e){
  const postFix=e.target.closest?.('[data-hd-ss-post-fix]');if(postFix){if(typeof hdFEOpenFix==='function')hdFEOpenFix(postFix.dataset.hdSsPostFix);return}
  if(e.target.closest?.('[data-hd-ss-reprep]')){hdSSPostStartReprepare();return}
  if(e.target.closest?.('[data-hd-ss-next-preflight]')){hdSSPostPrepareNextRound();return}
- if(e.target.closest?.('[data-hd-ss-next-start]')){const session=hdSSPostStartNextRound();if(session&&typeof window.hdSMOpen==='function')setTimeout(()=>window.hdSMOpen(),0);return}
+ if(e.target.closest?.('[data-hd-ss-next-start]')){const session=hdSSPostStartNextRound();if(session&&typeof window.hdSMOpen==='function')window.hdSMOpen();return}
  const goalSave=e.target.closest?.('[data-hd-ss-goal-save]');if(goalSave){hdSSSeriesGoalSaveFromUi(goalSave.dataset.hdSsGoalSave);return}
  const goalClear=e.target.closest?.('[data-hd-ss-goal-clear]');if(goalClear){hdSSSeriesGoalSave(goalClear.dataset.hdSsGoalClear,{});hdSSRender();return}
  const seriesCopy=e.target.closest?.('[data-hd-ss-series-copy]');if(seriesCopy){const text=hdSSSeriesSummaryText(seriesCopy.dataset.hdSsSeriesCopy);hdSSCopyText(text).then(ok=>{seriesCopy.textContent=ok?'コピーしたよ':'コピーできなかった';setTimeout(()=>seriesCopy.textContent='結果をコピー',1300)});return}

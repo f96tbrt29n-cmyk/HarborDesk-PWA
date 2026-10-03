@@ -101,6 +101,37 @@ test('starting a sortie session snapshots the selected fleet and readiness state
   expect(session.readinessSnapshot.gate.overridden).toBe(true);
 });
 
+test('a pressed sortie start button survives both preparation and session updates', async ({ page }) => {
+  await boot(page);
+  await seed(page);
+  await openPreparation(page);
+  const button = page.locator('[data-hd-ss-start-override]');
+  await button.dispatchEvent('pointerdown', {pointerId:73,button:0,isPrimary:true});
+  expect(await page.evaluate(() => {
+    const button = document.querySelector('[data-hd-ss-start-override]');
+    const presets = document.querySelector('#hdSortiePreparationBody .hd-spm');
+    hdSSRender();hdSPSRender();hdSPMRender();
+    return document.querySelector('[data-hd-ss-start-override]') === button && document.querySelector('#hdSortiePreparationBody .hd-spm') === presets;
+  })).toBe(true);
+  const started = await page.evaluate(() => {
+    document.querySelector('[data-hd-ss-start-override]').click();
+    const mode = document.getElementById('hdSortieMode');
+    return {fleetId:hdSSLoad()?.fleetId,modeVisible:!!mode&&!mode.hidden&&!mode.classList.contains('hd-ws-hidden')};
+  });
+  expect(started).toEqual({fleetId:'stable1',modeVisible:true});
+  await page.evaluate(() => window.hdWSShowElement('hdSortiePreparation',true));
+  const finish = page.locator('[data-hd-ss-finish]');
+  await finish.dispatchEvent('pointerdown',{pointerId:74,button:0,isPrimary:true});
+  expect(await page.evaluate(() => {
+    const button = document.querySelector('[data-hd-ss-finish]'),session = hdSSLoad();
+    hdSSSave({...session,id:session.id+'-replacement'});
+    hdSSRender();
+    const replaced = !button.isConnected;
+    window.dispatchEvent(new PointerEvent('pointercancel',{pointerId:74}));
+    return replaced;
+  })).toBe(true);
+});
+
 test('switching the selected preset during a sortie does not mutate the session snapshot', async ({ page }) => {
   await boot(page);
   await seed(page);

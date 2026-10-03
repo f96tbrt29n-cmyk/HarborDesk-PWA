@@ -94,6 +94,7 @@ function hdSPMHtml(map){
 }
 function hdSPMRender(){
  const body=document.getElementById('hdSortiePreparationBody');if(!body)return;
+ if(window.hdSPSDeferPressedRender?.())return;
  body.querySelector('.hd-spm')?.remove();
  const map=hdSPMMap();if(!map)return;
  const overview=body.querySelector('.hd-sps-overview');if(!overview)return;
