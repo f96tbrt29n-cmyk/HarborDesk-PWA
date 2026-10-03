@@ -421,7 +421,12 @@ function hdWSInstallScrollCompact(){
  window.addEventListener('scroll',()=>{
   if(hdWSScrollTick)return;hdWSScrollTick=true;requestAnimationFrame(hdWSUpdateScrollCompact);
  },{passive:true});
- document.addEventListener('focusin',()=>hdWSSetHeaderCompact(false),true);
+ document.addEventListener('focusin',e=>{
+  const target=e.target;
+  // Pointer focus on a button or summary must not move the pressed control.
+  const textInput=target?.matches?.('input')&&!['button','submit','reset','checkbox','radio','range','color','file','hidden'].includes(target.type);
+  if(textInput||target?.matches?.('textarea,select')||target?.isContentEditable)hdWSSetHeaderCompact(false);
+ },true);
  document.addEventListener('toggle',e=>{if(e.target?.matches?.('.hd-header-more')&&e.target.open)hdWSSetHeaderCompact(false)},true);
  window.addEventListener('resize',()=>{if(window.matchMedia?.('(min-width:561px)')?.matches)hdWSSetHeaderCompact(false)},{passive:true});
 }

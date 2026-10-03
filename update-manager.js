@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.507';
-const HD_APP_BUILD=507;
+const HD_APP_VERSION='1.0.508';
+const HD_APP_BUILD=508;
 const HD_UPDATE_SNOOZE_KEY='harbordesk-update-snooze-v1';
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
@@ -287,6 +287,11 @@ function hdSyncMobileHeaderMenu(){
 function hdBindMobileHeaderMenu(){
   const details=document.querySelector('.hd-header-more');if(!details||details.dataset.hdInlineBound==='1')return;
   details.dataset.hdInlineBound='1';
+  details.addEventListener('click',e=>{
+    const summary=e.target.closest?.('summary');
+    // A queued scroll can arrive before the native toggle event initializes the menu.
+    if(summary?.parentElement===details&&!details.open)window.__HD_HEADER_MENU_OPENED_AT=performance.now();
+  });
   details.addEventListener('toggle',hdSyncMobileHeaderMenu);
   if(!window.__HD_HEADER_MENU_RESIZE_BOUND){
     window.__HD_HEADER_MENU_RESIZE_BOUND=true;

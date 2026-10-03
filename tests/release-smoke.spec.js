@@ -7396,6 +7396,62 @@ test('release smoke:攻略 tabs stay readable, selected and keyboard operable on
 });
 
 
+test('release smoke: focusing a ship database summary preserves compact navigation until text editing', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => {
+    const detailed = new Set(HD_SHIP_DATABASE.map(x => x.final));
+    const candidate = Object.values(HD_KANCOLLE_MASTER_SNAPSHOT.allShips).find(x =>
+      !detailed.has(x.name) && x.slots?.length && hdShipDbMasterSuggestedLoadouts(x).length);
+    hdWSShowElement('shipDatabase', false);
+    document.getElementById('hdShipDbSearch').value = candidate.name;
+    hdRenderShipDatabase();
+  });
+  if(await page.locator('#hdShipDbList').evaluate(el => el.classList.contains('hd-compact')))
+    await page.locator('[data-hd-shipdb-compact]').click();
+  const summary = page.locator('.hd-shipdb-master-suggest > summary').first();
+  await summary.scrollIntoViewIfNeeded();
+  const position = await summary.evaluate(el => {
+    window.scrollTo({top:Math.max(200, el.getBoundingClientRect().top + scrollY - 350), behavior:'instant'});
+    hdWSSetHeaderCompact(true);
+    const before = document.getElementById('hdWorkspaceNav').getBoundingClientRect().height;
+    const compactBefore = document.body.classList.contains('hd-header-compact');
+    el.focus({preventScroll:true});
+    const after = document.getElementById('hdWorkspaceNav').getBoundingClientRect().height;
+    const compactAfter = document.body.classList.contains('hd-header-compact');
+    document.getElementById('hdShipDbMissingOnly').focus({preventScroll:true});
+    return {before, after, compactBefore, compactAfter, checkboxCompact:document.body.classList.contains('hd-header-compact')};
+  });
+  expect(position.compactBefore).toBe(true);
+  expect(position.compactAfter).toBe(true);
+  expect(position.checkboxCompact).toBe(true);
+  expect(position.after).toBe(position.before);
+  await summary.click();
+  await expect.poll(() => summary.evaluate(el => el.parentElement.open)).toBe(true);
+  await page.locator('#hdShipDbSearch').evaluate(el => el.focus({preventScroll:true}));
+  await expect(page.locator('body')).not.toHaveClass(/hd-header-compact/);
+});
+
+test('release smoke: a queued scroll cannot close the mobile menu before its native toggle', async ({ page }) => {
+  await boot(page);
+  for(let attempt=0;attempt<2;attempt++) {
+    const opened = await page.evaluate(() => {
+      const details = document.querySelector('.hd-header-more');
+      window.__HD_HEADER_MENU_OPENED_AT = performance.now() - 1000;
+      details.querySelector(':scope > summary').click();
+      window.dispatchEvent(new Event('scroll'));
+      return details.open;
+    });
+    expect(opened).toBe(true);
+    await expect(page.locator('#hdMobileHeaderMenuRow')).toBeVisible();
+    await page.evaluate(() => {
+      window.__HD_HEADER_MENU_OPENED_AT = performance.now() - 1000;
+      window.dispatchEvent(new Event('scroll'));
+    });
+    await expect(page.locator('.hd-header-more')).not.toHaveAttribute('open','');
+    await expect(page.locator('#hdMobileHeaderMenuRow')).toBeHidden();
+  }
+});
+
 test('release smoke: mobile update menu occupies its own row without covering攻略', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
