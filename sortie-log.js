@@ -3,7 +3,7 @@ let hdSLFilter='all';
 
 function hdSLEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdSLLoad(){try{return JSON.parse(localStorage.getItem(HD_SORTIE_LOG_KEY)||'[]')||[]}catch{return []}}
-function hdSLSave(v){localStorage.setItem(HD_SORTIE_LOG_KEY,JSON.stringify((Array.isArray(v)?v:[]).slice(0,500)))}
+function hdSLSave(v){localStorage.setItem(HD_SORTIE_LOG_KEY,JSON.stringify((Array.isArray(v)?v:[]).slice(0,500)));try{window.dispatchEvent(new Event('hd:sortie-log-changed'))}catch{}}
 function hdSLHunts(){try{return JSON.parse(localStorage.getItem('harbordesk-drop-hunts-v1')||'[]')||[]}catch{return []}}
 function hdSLSaveHunts(v){localStorage.setItem('harbordesk-drop-hunts-v1',JSON.stringify(v));try{if(typeof hdRenderDropHunts==='function')hdRenderDropHunts();if(typeof hdRenderDropDb==='function')hdRenderDropDb()}catch{}}
 function hdSLUid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)}

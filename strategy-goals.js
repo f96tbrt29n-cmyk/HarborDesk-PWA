@@ -161,9 +161,20 @@ function hdStrategyTaskActions(task){
  if(['nav','fleetSetup'].includes(task.source))return `<button type="button" class="ghost small" data-hd-strategy-open-map="${hdStrategyEsc(task.map)}">攻略ナビで確認 →</button>`;
  return '';
 }
+function hdStrategySortieProgress(map){
+ let rows=[];try{const saved=typeof hdSLLoad==='function'?hdSLLoad():JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]');if(Array.isArray(saved))rows=saved.filter(x=>x&&x.map===map)}catch{}
+ const latest=rows.reduce((last,row)=>!last||(Number(row.at)||0)>(Number(last.at)||0)?row:last,null);
+ return {runs:rows.length,boss:rows.filter(x=>x.boss).length,bossS:rows.filter(x=>x.boss&&x.result==='S').length,retreat:rows.filter(x=>x.retreat||x.result==='撤退').length,
+  latest:latest?{at:Number(latest.at)||0,node:String(latest.node||''),result:String(latest.result||''),drop:String(latest.drop||'')}:null};
+}
+function hdStrategySortieHtml(map){
+ if(!map)return '';
+ const p=hdStrategySortieProgress(map),last=p.latest,time=last?.at>0?new Date(last.at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+ return `<div class="hd-strategy-preview hd-strategy-sortie-summary"><div class="hd-strategy-preview-head"><strong>${hdStrategyEsc(map)} の出撃記録</strong><button type="button" class="ghost small" data-hd-strategy-sortie-log="${hdStrategyEsc(map)}">この海域のログを見る →</button></div><small>${p.runs?`記録 ${p.runs}周 / ボス到達 ${p.boss}回<br>ボスS勝利 ${p.bossS}回 / 撤退 ${p.retreat}回`:'まだこの海域の出撃記録はありません。'}</small>${last?`<small>最新：${hdStrategyEsc([time,last.node,last.result,last.drop?'ドロップ '+last.drop:''].filter(Boolean).join(' ｜ '))}</small>`:''}<small>保存された出撃ログの集計です。海域クリアはゲームで確認して記録してください。</small></div>`;
+}
 function hdStrategyFingerprint(map){
  try{const next=typeof homeGuideState==='function'?hdStrategyPendingPath(map,homeGuideState())[0]:'';
-  return JSON.stringify([hdStrategyCandidates(map).map(x=>[x.sourceKey,x.detail,x.status]),next,next?hdStrategyCandidates(next).map(x=>[x.sourceKey,x.detail,x.status]):[]]);}catch{return ''}
+  return JSON.stringify([hdStrategySortieProgress(map),hdStrategyCandidates(map).map(x=>[x.sourceKey,x.detail,x.status]),next,next?hdStrategyCandidates(next).map(x=>[x.sourceKey,x.detail,x.status]):[]]);}catch{return ''}
 }
 function hdStrategyCandidateReady(row,state){
  if(row.source==='unlock')return row.map!=='5-6'&&state.cleared.includes(row.ref);
@@ -275,6 +286,13 @@ document.addEventListener('click',e=>{
    if(row){row.classList.add('hd-strategy-target');row.setAttribute('tabindex','-1');row.scrollIntoView({behavior:'smooth',block:'center'});row.focus({preventScroll:true});setTimeout(()=>row.classList.remove('hd-strategy-target'),3000)}
    else group.scrollIntoView({behavior:'smooth',block:'start'});
   }return;
+ }
+ const log=e.target.closest?.('[data-hd-strategy-sortie-log]');if(log){
+  if(typeof hdSLEnsure==='function'&&typeof hdSLRender==='function'){
+   hdSLEnsure();hdSLFilter=log.dataset.hdStrategySortieLog;hdSLRender();
+   if(typeof hdWSShowElement==='function')hdWSShowElement('sortieLog',true);
+  }
+  return;
  }
  const one=e.target.closest?.('[data-hd-strategy-import]'),all=e.target.closest?.('[data-hd-strategy-import-all]'),nav=e.target.closest?.('[data-hd-msn-to-todo]');
  if(one||all||nav){const map=nav?.dataset.hdMsnToTodo||all?.dataset.hdStrategyImportAll||homeGuideActiveMap();

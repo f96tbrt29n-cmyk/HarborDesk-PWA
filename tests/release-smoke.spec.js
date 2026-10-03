@@ -50,6 +50,56 @@ async function openGuideWorkspace(page) {
   await expect(page.locator('#guide')).toBeVisible({ timeout: 5000 });
 }
 
+test('release smoke: strategy sortie summary counts only its map and opens filtered logs', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => {
+    hdSelectGuideMap('6-5');
+    hdSLSave([
+      {id:'older',map:'6-5',at:1000,node:'A',result:'S',boss:false},
+      {id:'latest',map:'6-5',at:3000,node:'M',result:'S',boss:true,drop:'<img src=x onerror=alert(1)>'},
+      {id:'retreat',map:'6-5',at:2000,node:'C',result:'撤退',retreat:true},
+      {id:'other',map:'6-4',at:4000,node:'N',result:'S',boss:true}
+    ]);
+    hdWSShowElement('home',false);
+  });
+  const summary=page.locator('.hd-strategy-sortie-summary');
+  await expect(summary).toContainText('6-5 の出撃記録');
+  for(const text of ['記録 3周','ボス到達 1回','ボスS勝利 1回','撤退 1回'])await expect(summary).toContainText(text);
+  await expect(summary).toContainText('M ｜ S ｜ ドロップ <img src=x onerror=alert(1)>');
+  await expect(summary.locator('img')).toHaveCount(0);
+  await expect(page.locator('[data-home-guide-clear]')).toHaveAttribute('aria-pressed','false');
+  await summary.locator('[data-hd-strategy-sortie-log]').click();
+  await expect(page.locator('#sortieLog')).toBeVisible();
+  await expect(page.locator('[data-hd-sl-filter="6-5"]')).toHaveClass(/active/);
+  await expect(page.locator('#hdSLList .hd-sl-row')).toHaveCount(3);
+  expect(await page.locator('#hdSLList .hd-sl-main strong').allTextContents()).toEqual(['6-5 A','6-5 M','6-5 C']);
+});
+
+test('release smoke: strategy sortie summary updates after recording deletion and map changes', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => {hdSelectGuideMap('6-5');hdSLSave([]);hdWSShowElement('home',false);});
+  const summary=page.locator('.hd-strategy-sortie-summary');
+  await expect(summary).toContainText('まだこの海域の出撃記録はありません');
+  const recorded=await page.evaluate(() => {
+    const before=JSON.stringify(homeGuideState());
+    const row=hdSLRecordEntry({map:'6-5',node:'M',result:'A',boss:true});
+    return {id:row.id,text:document.querySelector('.hd-strategy-sortie-summary').textContent,unchanged:before===JSON.stringify(homeGuideState())};
+  });
+  for(const text of ['記録 1周','ボス到達 1回','ボスS勝利 0回','撤退 0回'])expect(recorded.text).toContain(text);
+  expect(recorded.unchanged).toBe(true);
+  await page.locator('#homeGuideMapSelect').selectOption('6-4');
+  await expect(summary).toContainText('6-4 の出撃記録');
+  await expect(summary).toContainText('まだこの海域の出撃記録はありません');
+  await page.locator('#homeGuideMapSelect').selectOption('6-5');
+  await expect(summary).toContainText('記録 1周');
+  page.once('dialog',dialog=>dialog.accept());
+  expect(await page.evaluate(id=>{hdSLDelete(id);return document.querySelector('.hd-strategy-sortie-summary').textContent;},recorded.id)).toContain('まだこの海域の出撃記録はありません');
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  await expect(summary).toContainText('まだこの海域の出撃記録はありません');
+});
+
 test('release smoke: hidden completed strategy goal can be undone without losing other progress', async ({ page }) => {
   await boot(page);
   await page.evaluate(() => window.hdWSShowElement('home', true));
