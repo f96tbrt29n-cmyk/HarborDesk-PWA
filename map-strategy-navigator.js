@@ -74,7 +74,14 @@ function hdMSNRender(){
 }
 function hdMSNSelectMap(map,syncGuide=false){if(!hdMSNMaps().includes(map))return;hdMSNMap=map;if(syncGuide&&typeof hdSelectGuideMap==='function')hdSelectGuideMap(map);hdMSNRender()}
 function hdMSNGoGuide(tab){const context=hdMSNSyncContext();if(tab==='gear'&&context?.fleet&&typeof hdFCSetSelection==='function')hdFCSetSelection(context.map,context.fleet.id);if(typeof hdWSShowElement==='function')hdWSShowElement('guide',true);if(tab&&typeof hdMapActivateTab==='function')hdMapActivateTab(tab)}
-function hdMSNOpen(map){if(map)hdMSNSelectMap(map,false);else if(!hdMSNMapSelected()&&typeof selectedMap!=='undefined'&&selectedMap)hdMSNSelectMap(selectedMap,false);if(typeof hdWSShowElement==='function')hdWSShowElement('mapStrategyNavigator',true);else document.getElementById('mapStrategyNavigator')?.scrollIntoView({behavior:'smooth'});hdMSNRender()}
+function hdMSNOpen(map){
+ if(map)hdMSNSelectMap(map,false);else if(!hdMSNMapSelected()&&typeof selectedMap!=='undefined'&&selectedMap)hdMSNSelectMap(selectedMap,false);
+ hdMSNRender();
+ if(typeof hdWSShowElement==='function')hdWSShowElement('mapStrategyNavigator',false);
+ // Finish navigation before accepting the next tap; a moving viewport can
+ // change the hit target between pointer down and the delivered click in WebKit.
+ document.getElementById('mapStrategyNavigator')?.scrollIntoView({behavior:'instant',block:'start'});
+}
 function hdMSNAddEntry(){const head=document.querySelector('#selectedMapCard .map-tabs-head');if(head&&!head.querySelector('[data-hd-msn-open]')){const b=document.createElement('button');b.type='button';b.className='ghost small';b.dataset.hdMsnOpen='';b.textContent='攻略ナビ';head.appendChild(b)}}
 document.addEventListener('change',e=>{if(e.target.id==='hdMapStrategyMap'){hdMSNSelectMap(e.target.value,true);return}if(e.target.id==='hdMapStrategyRoute'){hdMSNRouteByMap[hdMSNMapSelected()]=Number(e.target.value)||0;hdMSNRender();return}if(e.target.id==='hdMapStrategyFleet'){hdMSNFleetByMap[hdMSNMapSelected()]=e.target.value;hdMSNRender()}});
 document.addEventListener('click',e=>{const fix=e.target.closest?.('[data-hd-msn-fix]');if(fix){const context=hdMSNSyncContext();if(context?.fleet&&['air','scouting'].includes(fix.dataset.hdMsnFix)&&typeof hdFCSetSelection==='function')hdFCSetSelection(context.map,context.fleet.id);if(context?.fleet&&typeof hdFEOpenFix==='function')hdFEOpenFix(fix.dataset.hdMsnFix,hdMSNAuto(context.map,context.fleet,context.preset));return}if(e.target.closest?.('[data-hd-msn-open]')){hdMSNOpen(typeof selectedMap!=='undefined'?selectedMap:'');return}const action=e.target.closest?.('[data-hd-msn-action]')?.dataset.hdMsnAction;if(!action)return;if(action==='route'||action==='fleet'){hdMSNGoGuide(action==='route'?'route':'mine');return}if(action==='calculator'){hdMSNGoGuide('gear');setTimeout(()=>document.getElementById('hdFleetCalculator')?.scrollIntoView({behavior:'smooth',block:'start'}),80);return}hdMSNSyncContext();if(typeof hdSPSRender==='function')hdSPSRender();if(typeof hdSPSOpen==='function')hdSPSOpen();else if(typeof hdWSShowElement==='function')hdWSShowElement('hdSortiePreparation',true)});

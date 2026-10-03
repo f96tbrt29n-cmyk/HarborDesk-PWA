@@ -74,9 +74,9 @@ test('navigator issue buttons open the matching tool with the current fleet eval
  expect(await page.evaluate(()=>({map:selectedMap,fleet:hdSortieSelection(selectedMap),flow:hdFEFixFlowLoad()}))).toMatchObject({map:'3-2',fleet:'second',flow:{id:'health',map:'3-2',beforeStatus:'manual'}});
  await page.evaluate(()=>hdMSNOpen('3-2'));
  await page.locator('[data-hd-msn-fix="air"]').click();
+ expect(await page.evaluate(()=>hdFEFixFlowLoad())).toMatchObject({id:'air',map:'3-2'});
  await expect(page.locator('#hdFleetCalculator')).toBeVisible();
  await expect(page.locator('#hdFCFleetSelect')).toHaveValue('second');
- expect(await page.evaluate(()=>hdFEFixFlowLoad())).toMatchObject({id:'air',map:'3-2'});
 });
 test('returning to navigator immediately cancels delayed navigation from the previous fix',async({page})=>{
  await boot(page);
@@ -132,6 +132,23 @@ test('unchanged navigator refresh keeps a focused button usable from the keyboar
  await page.evaluate(()=>hdMSNRender());
  await expect(button).toBeFocused();
  await page.keyboard.press('Enter');
+ await expect(page.locator('#hdFleetCalculator')).toBeVisible();
+ await expect(page.locator('#hdFCFleetSelect')).toHaveValue('second');
+});
+
+test('returning from sync to navigator finishes scrolling before the next tool tap',async({page})=>{
+ await boot(page);
+ await page.locator('[data-hd-msn-fix="health"]').click();
+ await expect(page.locator('#kancolleImport')).toBeVisible();
+ const position=await page.evaluate(async()=>{
+  hdMSNOpen('3-2');
+  const section=document.getElementById('mapStrategyNavigator');
+  const start=section.getBoundingClientRect().top;
+  await new Promise(resolve=>setTimeout(resolve,200));
+  return {start,end:section.getBoundingClientRect().top};
+ });
+ expect(Math.abs(position.end-position.start)).toBeLessThan(1);
+ await page.locator('[data-hd-msn-fix="air"]').click();
  await expect(page.locator('#hdFleetCalculator')).toBeVisible();
  await expect(page.locator('#hdFCFleetSelect')).toHaveValue('second');
 });
