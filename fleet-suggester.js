@@ -184,19 +184,14 @@ function hdFSOpen(){
  if(!opened)opened=hdFSReveal(target);
  hdFSRender(true);
  var userNavEpoch=Number(window.__HD_WORKSPACE_USER_NAV_EPOCH)||0;
- var directNavEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0;
  var settle=function(){
   if((Number(window.__HD_WORKSPACE_USER_NAV_EPOCH)||0)!==userNavEpoch)return;
-  // A preparation link or another tool opener is also a newer navigation.
-  // Only recover this opening while no later direct navigation has occurred.
-  if((Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0)!==directNavEpoch)return;
-  if(hdFSStillSelected(target)){hdFSReveal(target);directNavEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0;return}
+  if(hdFSStillSelected(target)){hdFSReveal(target);return}
   if(!hdFSOpenRecoveryAllowed(target))return;
   if(typeof window.hdWSRevealElement==='function')window.hdWSRevealElement(target,true,{history:false,direct:false});
   else if(typeof hdWSShowElement==='function')hdWSShowElement(target,true);
   else hdFSReveal(target);
   userNavEpoch=Number(window.__HD_WORKSPACE_USER_NAV_EPOCH)||userNavEpoch;
-  directNavEpoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0;
  };
  requestAnimationFrame(settle);[80,420,1200,1900,3600,6500,9500,13500].forEach(function(ms){setTimeout(settle,ms)});
  return !!opened;

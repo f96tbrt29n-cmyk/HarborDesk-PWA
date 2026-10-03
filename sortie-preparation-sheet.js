@@ -193,7 +193,9 @@ function hdSPSStillSelected(target){
  }catch{return !!target&&!target.hidden&&!target.classList.contains('hd-ws-hidden')}
 }
 function hdSPSOpen(){
- hdSPSEnsure();const target=document.getElementById('hdSortiePreparation');if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdSortiePreparation',true)))hdSPSReveal(target);
+ hdSPSEnsure();const target=document.getElementById('hdSortiePreparation');
+ if(target)window.hdWSMarkUserNavigation?.();
+ if(!(typeof hdWSShowElement==='function'&&hdWSShowElement(target||'hdSortiePreparation',true)))hdSPSReveal(target);
  setTimeout(()=>{if(hdSPSStillSelected(target))hdSPSReveal(target,false);hdSPSRender()},70);
  setTimeout(()=>{if(hdSPSStillSelected(target))hdSPSReveal(target,false);hdSPSRender()},430);
 }
@@ -208,6 +210,7 @@ function hdSPSWorkspaceTargetSelected(target){
 }
 function hdSPSOpenWorkspace(id){
  const target=document.getElementById(id);if(!target)return false;
+ window.hdWSMarkUserNavigation?.();
  if(typeof hdWSShowElement==='function'&&hdWSShowElement(target,true))return true;
  const opened=hdSPSReveal(target,true);if(!opened)return false;
  const keep=()=>{
@@ -218,6 +221,8 @@ function hdSPSOpenWorkspace(id){
  return true;
 }
 function hdSPSOpenMapTab(tab,focusBase=false){
+ // Preparation links are explicit navigation, not a background workspace redraw.
+ window.hdWSMarkUserNavigation?.();
  if(!(typeof hdWSShowElement==='function'&&hdWSShowElement('guide',true)))hdSPSReveal(document.getElementById('guide'),false);
  setTimeout(()=>{if(typeof hdSortieOpenTab==='function')hdSortieOpenTab(tab);else if(typeof window.hdCoreMapAction==='function')Promise.resolve(window.hdCoreMapAction(tab)).catch(()=>{});else document.querySelector(`[data-map-tab="${tab}"]`)?.click();if(focusBase)setTimeout(()=>document.getElementById('hdLandBasePlanner')?.scrollIntoView({behavior:'smooth',block:'start'}),120)},80);
 }
