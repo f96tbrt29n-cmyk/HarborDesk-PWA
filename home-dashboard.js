@@ -272,20 +272,26 @@ function homeGuideGoalKey(task,now=Date.now()){
 function homeGuideActiveMap(){return homeSelectedMap()||(typeof hdGuideMapSequence==='function'?hdGuideMapSequence()[0]:'')||''}
 const HD_HOME_GUIDE_DRAFT_KEY='harbordesk-strategy-goal-drafts-v1';
 function homeGuideDraftStore(){try{const rows=JSON.parse(localStorage.getItem(HD_HOME_GUIDE_DRAFT_KEY)||'{}');return rows&&typeof rows==='object'&&!Array.isArray(rows)?rows:{}}catch{return {}}}
-function homeGuideDraftKey(form){return JSON.stringify([form.dataset.homeGuideDraftMap||'',form.dataset.homeGuideAdd||''])}
+function homeGuideDraftKey(form){return form.dataset.homeGuideEdit?JSON.stringify(['edit',form.dataset.homeGuideEdit]):JSON.stringify([form.dataset.homeGuideDraftMap||'',form.dataset.homeGuideAdd||''])}
 function homeGuideSaveDraft(form){
- const rows=homeGuideDraftStore();rows[homeGuideDraftKey(form)]={title:form.elements.title.value,prereq:form.elements.prereq?.value||'',scope:form.elements.scope.value};
+ const rows=homeGuideDraftStore();rows[homeGuideDraftKey(form)]={title:form.elements.title.value,prereq:form.elements.prereq?.value||'',detail:form.elements.detail?.value||'',map:form.elements.map?.value||'',scope:form.elements.scope.value};
  try{localStorage.setItem(HD_HOME_GUIDE_DRAFT_KEY,JSON.stringify(rows))}catch{}
 }
 function homeGuideClearDraft(form){const rows=homeGuideDraftStore();delete rows[homeGuideDraftKey(form)];try{localStorage.setItem(HD_HOME_GUIDE_DRAFT_KEY,JSON.stringify(rows))}catch{}}
 function homeGuideRestoreDraft(form){
  const draft=homeGuideDraftStore()[homeGuideDraftKey(form)];if(!draft)return;
- for(const name of ['title','prereq','scope']){const el=form.elements[name],value=draft[name];if(!el||typeof value!=='string')continue;if(name==='scope'&&!['map','global'].includes(value))continue;el.value=value}
+ for(const name of ['title','prereq','detail','map','scope']){const el=form.elements[name],value=draft[name];if(!el||typeof value!=='string')continue;if(name==='scope'&&!['map','global'].includes(value))continue;el.value=value}
+}
+function homeGuideEditDraftKey(id){return JSON.stringify(['edit',id])}
+function homeGuideDiscardEdit(id){const rows=homeGuideDraftStore();delete rows[homeGuideEditDraftKey(id)];try{localStorage.setItem(HD_HOME_GUIDE_DRAFT_KEY,JSON.stringify(rows))}catch{}}
+function homeGuideFormKey(form){return form.dataset.homeGuideEdit?'edit:'+form.dataset.homeGuideEdit:'add:'+form.dataset.homeGuideAdd}
+function homeGuideEditHtml(task,map,maps){
+ return `<form class="home-guide-edit" data-home-guide-edit="${homeEsc(task.id)}" data-home-guide-draft-map="${homeEsc(map)}" aria-label="${homeEsc(task.title)}を編集"><label>目標名<input name="title" required maxlength="100" value="${homeEsc(task.title)}"></label><label>前提任務・メモ<textarea name="detail" maxlength="1200" rows="3">${homeEsc(task.detail||'')}</textarea></label><label>目標の対象<select name="scope"><option value="map"${task.scope==='map'?' selected':''}>海域を指定</option><option value="global"${task.scope!=='map'?' selected':''}>全海域共通</option></select></label><label>対象海域（海域指定時）<select name="map">${maps.map(x=>`<option value="${homeEsc(x)}"${x===(task.map||map)?' selected':''}>${homeEsc(x)}</option>`).join('')}</select></label><div class="home-guide-edit-actions"><button type="submit" class="primary small">変更を保存</button><button type="button" class="ghost small" data-home-guide-edit-cancel="${homeEsc(task.id)}">編集を取り消す</button><small>入力途中は自動保存。取り消すと編集前の内容に戻ります。</small></div></form>`;
 }
 let homeGuideComposing=false;
-for(const type of ['input','change'])document.addEventListener(type,e=>{const form=e.target.closest?.('#homeGuideSteps [data-home-guide-add]');if(form)homeGuideSaveDraft(form)});
-document.addEventListener('compositionstart',e=>{if(e.target.closest?.('#homeGuideSteps [data-home-guide-add]'))homeGuideComposing=true});
-document.addEventListener('compositionend',e=>{const form=e.target.closest?.('#homeGuideSteps [data-home-guide-add]');if(!form)return;homeGuideComposing=false;homeGuideSaveDraft(form);if(homeGuideRenderPending)homeGuideRender()});
+for(const type of ['input','change'])document.addEventListener(type,e=>{const form=e.target.closest?.('#homeGuideSteps [data-home-guide-add],#homeGuideSteps [data-home-guide-edit]');if(form)homeGuideSaveDraft(form)});
+document.addEventListener('compositionstart',e=>{if(e.target.closest?.('#homeGuideSteps [data-home-guide-add],#homeGuideSteps [data-home-guide-edit]'))homeGuideComposing=true});
+document.addEventListener('compositionend',e=>{const form=e.target.closest?.('#homeGuideSteps [data-home-guide-add],#homeGuideSteps [data-home-guide-edit]');if(!form)return;homeGuideComposing=false;homeGuideSaveDraft(form);if(homeGuideRenderPending)homeGuideRender()});
 let homeGuideLastSignature='';
 let homeGuidePressedPointer=null,homeGuideRenderPending=false;
 document.addEventListener('pointerdown',e=>{
@@ -320,9 +326,10 @@ function homeGuideRender(){
  homeGuideRenderPending=false;
  const state=homeGuideState(),map=homeGuideActiveMap(),maps=typeof hdGuideMapSequence==='function'?hdGuideMapSequence():[],cleared=new Set(state.cleared.filter(x=>maps.includes(x))),done=new Set(state.done),pendingOnly=homeGuidePendingOnly();
  if(typeof hdStrategyRefreshSortieSummary==='function')hdStrategyRefreshSortieSummary(map);
- const signature=map+homeGuideJstMonth()+pendingOnly+JSON.stringify(state)+(typeof hdStrategyFingerprint==='function'?hdStrategyFingerprint(map):'');if(host.children.length&&homeGuideLastSignature===signature)return;homeGuideLastSignature=signature;
- const retained=new Map([...host.querySelectorAll('[data-home-guide-add]')].filter(form=>form.dataset.homeGuideDraftMap===map).map(form=>[form.dataset.homeGuideAdd,form]));
- const active=document.activeElement,focusForm=active?.closest?.('[data-home-guide-add]'),restoreFocus=focusForm&&retained.get(focusForm.dataset.homeGuideAdd)===focusForm;
+ const drafts=homeGuideDraftStore(),editing=new Set(state.custom.filter(x=>!x.source&&drafts[homeGuideEditDraftKey(x.id)]).map(x=>x.id));
+ const signature=JSON.stringify([...editing])+map+homeGuideJstMonth()+pendingOnly+JSON.stringify(state)+(typeof hdStrategyFingerprint==='function'?hdStrategyFingerprint(map):'');if(host.children.length&&homeGuideLastSignature===signature)return;homeGuideLastSignature=signature;
+ const retained=new Map([...host.querySelectorAll('[data-home-guide-add],[data-home-guide-edit]')].filter(form=>form.dataset.homeGuideDraftMap===map).map(form=>[homeGuideFormKey(form),form]));
+ const active=document.activeElement,focusForm=active?.closest?.('[data-home-guide-add],[data-home-guide-edit]'),restoreFocus=focusForm&&retained.get(homeGuideFormKey(focusForm))===focusForm;
  const selection=restoreFocus&&typeof active.selectionStart==='number'?{start:active.selectionStart,end:active.selectionEnd,direction:active.selectionDirection}:null;
  const opened=new Set([...host.querySelectorAll('details.home-guide-group[open]')].map(el=>el.dataset.group));
  const firstRender=!host.children.length;
@@ -336,7 +343,7 @@ function homeGuideRender(){
   const key=custom?homeGuideGoalKey(custom):homeGuideItemKey(group.id,id,assignedMap,scope),checked=goalDone(custom,key),view=custom&&typeof hdStrategyTaskView==='function'?hdStrategyTaskView(custom,mapCandidates,state.cleared):null;
   if(view){detail=view.detail||detail;}
   if(pendingOnly&&checked)return '';
-  return `<div class="home-guide-step${checked?' done':''}${view?.ready?' ready-from-data':''}"><button type="button" class="home-guide-check" data-home-guide-toggle="${homeEsc(key)}" aria-pressed="${checked}" aria-label="${homeEsc(title)}を${checked?'未完了に戻す':'完了にする'}">${checked?'✓':'○'}</button><div><strong>${homeEsc(title)}</strong>${detail?`<p>${homeEsc(detail)}</p>`:''}${view?.status?`<small class="home-guide-live-state${view.ready?' ready':''}">${homeEsc(view.status)}</small>`:''}${custom&&typeof hdStrategyTaskActions==='function'?hdStrategyTaskActions(custom):''}${custom?`<button type="button" class="ghost small home-guide-delete" data-home-guide-delete="${homeEsc(id)}" aria-label="${homeEsc(title)}を削除">削除</button>`:''}</div></div>`;
+  return `<div class="home-guide-step${checked?' done':''}${view?.ready?' ready-from-data':''}"><button type="button" class="home-guide-check" data-home-guide-toggle="${homeEsc(key)}" aria-pressed="${checked}" aria-label="${homeEsc(title)}を${checked?'未完了に戻す':'完了にする'}">${checked?'✓':'○'}</button><div><strong>${homeEsc(title)}</strong>${detail?`<p>${homeEsc(detail)}</p>`:''}${view?.status?`<small class="home-guide-live-state${view.ready?' ready':''}">${homeEsc(view.status)}</small>`:''}${custom&&typeof hdStrategyTaskActions==='function'?hdStrategyTaskActions(custom):''}${custom&&!custom.source?`<button type="button" class="ghost small home-guide-edit-open" data-home-guide-edit-open="${homeEsc(id)}" aria-label="${homeEsc(title)}を編集" aria-expanded="${editing.has(id)}">編集</button>${editing.has(id)?homeGuideEditHtml(custom,map,maps):''}`:''}${custom?`<button type="button" class="ghost small home-guide-delete" data-home-guide-delete="${homeEsc(id)}" aria-label="${homeEsc(title)}を削除">削除</button>`:''}</div></div>`;
  };
  host.innerHTML=`<div class="home-guide-map"><label for="homeGuideMapSelect">攻略対象の海域</label><select id="homeGuideMapSelect" aria-label="攻略対象の海域">${maps.map(x=>`<option value="${x}"${x===map?' selected':''}>${x}${cleared.has(x)?' ✓ クリア':''}</option>`).join('')}</select><button type="button" class="ghost small" data-home-guide-next ${next?'':'disabled'}>未攻略 ${homeEsc(next||'なし')} へ</button><button type="button" class="${cleared.has(map)?'ghost':'primary'} small" data-home-guide-clear ${map?'':'disabled'} aria-pressed="${cleared.has(map)}">${cleared.has(map)?'クリアを取り消す':'この海域をクリア済みにする'}</button><small>海域のクリアは手動で記録します。基地航空隊の同じ任務は海域間で完了状態を共有します。</small></div>`+(typeof hdStrategySortieHtml==='function'?hdStrategySortieHtml(map):'')+(typeof hdStrategyPreview==='function'?hdStrategyPreview(map,state):'')+`<div class="home-guide-filter"><strong>攻略のやることリスト</strong><button type="button" class="ghost small" data-home-guide-pending aria-pressed="${pendingOnly}">${pendingOnly?'全件表示':'未完了のみ表示'}</button></div>`+
  HD_HOME_GUIDE_GROUPS.map(group=>{
@@ -344,9 +351,9 @@ function homeGuideRender(){
   const rows=group.steps.map(([id,title,detail])=>item(group,id,title,detail,group.id==='map'?'map':'global')).filter(Boolean);
   for(const x of own){const row=item(group,x.id,x.title,x.detail||(x.scope==='map'?`${x.map} 向けの目標`:'自分で追加した目標'),x.scope,x,x.map);if(row)rows.push(row)}
   const count=group.steps.filter(([id])=>done.has(homeGuideItemKey(group.id,id,map,group.id==='map'?'map':'global'))).length+own.filter(x=>goalDone(x,homeGuideGoalKey(x))).length;
-  return `<details class="home-guide-group" data-group="${group.id}" ${(firstRender?group.id==='map':opened.has(group.id))?'open':''}><summary><strong>${homeEsc(group.title)}</strong><span>${count}/${group.steps.length+own.length}</span></summary><div class="home-guide-group-body">${rows.length?rows.join(''):'<p class="home-guide-empty">この分類の目標はすべて完了済み。全件表示で確認できます。</p>'}<div class="home-guide-actions"><button type="button" class="ghost small" data-home-jump="${group.target}">${homeEsc(group.action)}を開く →</button>${group.id==='gear'?'<button type="button" class="ghost small" data-home-jump="hdEquipmentProcurement">装備の入手計画 →</button>':''}${group.id==='level'?'<button type="button" class="ghost small" data-home-jump="trainingPlanner">レベリング候補 →</button>':''}${group.id==='quest'?'<small>デイリー・ウィークリー・マンスリーは「今日やること」で管理します。</small>':''}</div><form class="home-guide-add" data-home-guide-add="${group.id}" data-home-guide-draft-map="${homeEsc(map)}"><input name="title" required maxlength="100" aria-label="${homeEsc(group.title)}の目標を追加" placeholder="具体的な目標を追加">${group.id==='quest'?'<input name="prereq" maxlength="120" aria-label="前提任務・開放条件" placeholder="前提任務・開放条件（任意）">':''}<select name="scope" aria-label="目標の対象"><option value="map">${homeEsc(map||'選択海域')} 向け</option><option value="global"${group.id==='map'?'':' selected'}>全海域共通</option></select><button type="submit" class="ghost small">追加</button></form></div></details>`;
+  return `<details class="home-guide-group" data-group="${group.id}" ${(firstRender?group.id==='map'||own.some(x=>editing.has(x.id)):opened.has(group.id))?'open':''}><summary><strong>${homeEsc(group.title)}</strong><span>${count}/${group.steps.length+own.length}</span></summary><div class="home-guide-group-body">${rows.length?rows.join(''):'<p class="home-guide-empty">この分類の目標はすべて完了済み。全件表示で確認できます。</p>'}<div class="home-guide-actions"><button type="button" class="ghost small" data-home-jump="${group.target}">${homeEsc(group.action)}を開く →</button>${group.id==='gear'?'<button type="button" class="ghost small" data-home-jump="hdEquipmentProcurement">装備の入手計画 →</button>':''}${group.id==='level'?'<button type="button" class="ghost small" data-home-jump="trainingPlanner">レベリング候補 →</button>':''}${group.id==='quest'?'<small>デイリー・ウィークリー・マンスリーは「今日やること」で管理します。</small>':''}</div><form class="home-guide-add" data-home-guide-add="${group.id}" data-home-guide-draft-map="${homeEsc(map)}"><input name="title" required maxlength="100" aria-label="${homeEsc(group.title)}の目標を追加" placeholder="具体的な目標を追加">${group.id==='quest'?'<input name="prereq" maxlength="120" aria-label="前提任務・開放条件" placeholder="前提任務・開放条件（任意）">':''}<select name="scope" aria-label="目標の対象"><option value="map">${homeEsc(map||'選択海域')} 向け</option><option value="global"${group.id==='map'?'':' selected'}>全海域共通</option></select><button type="submit" class="ghost small">追加</button></form></div></details>`;
  }).join('');
- for(const form of host.querySelectorAll('[data-home-guide-add]')){const previous=retained.get(form.dataset.homeGuideAdd);if(previous)form.replaceWith(previous);else homeGuideRestoreDraft(form)}
+ for(const form of host.querySelectorAll('[data-home-guide-add],[data-home-guide-edit]')){const previous=retained.get(homeGuideFormKey(form));if(previous)form.replaceWith(previous);else homeGuideRestoreDraft(form)}
  if(restoreFocus&&active.isConnected){active.focus({preventScroll:true});if(selection)active.setSelectionRange(selection.start,selection.end,selection.direction)}
 }
 
@@ -514,7 +521,13 @@ document.addEventListener('click',e=>{
   if(removing)state.done=state.done.filter(k=>!state.custom.some(x=>x.source==='unlock'&&x.ref===map&&x.map!=='5-6'&&homeGuideItemKey(x.category,x.id,x.map,x.scope)===k));
   homeGuideSave(state)}return}
  const guideNext=e.target.closest('[data-home-guide-next]');if(guideNext){const state=homeGuideState(),next=hdGuideMapSequence().find(x=>!state.cleared.includes(x));if(next&&typeof hdSelectGuideMap==='function'){hdSelectGuideMap(next);homeGuideRender()}return}
- const guideDelete=e.target.closest('[data-home-guide-delete]');if(guideDelete){const state=homeGuideState(),id=guideDelete.dataset.homeGuideDelete;state.custom=state.custom.filter(x=>x.id!==id);state.done=state.done.filter(x=>!x.endsWith(':'+id));homeGuideSave(state);return}
+ const editOpen=e.target.closest('[data-home-guide-edit-open]');if(editOpen){
+  const task=homeGuideState().custom.find(x=>x.id===editOpen.dataset.homeGuideEditOpen&&!x.source);if(!task)return;
+  const drafts=homeGuideDraftStore(),key=homeGuideEditDraftKey(task.id);if(!drafts[key]){drafts[key]={title:task.title,detail:task.detail||'',scope:task.scope==='map'?'map':'global',map:task.map||homeGuideActiveMap()};try{localStorage.setItem(HD_HOME_GUIDE_DRAFT_KEY,JSON.stringify(drafts))}catch{if(typeof hdToast==='function')hdToast('編集を開始できなかったよ。保存領域を確認してね','warn');return}}
+  homeGuideRender();setTimeout(()=>{const form=[...document.querySelectorAll('[data-home-guide-edit]')].find(x=>x.dataset.homeGuideEdit===task.id);form?.elements.title.focus()},0);return;
+ }
+ const editCancel=e.target.closest('[data-home-guide-edit-cancel]');if(editCancel){homeGuideDiscardEdit(editCancel.dataset.homeGuideEditCancel);homeGuideRender();return}
+ const guideDelete=e.target.closest('[data-home-guide-delete]');if(guideDelete){const state=homeGuideState(),id=guideDelete.dataset.homeGuideDelete;state.custom=state.custom.filter(x=>x.id!==id);state.done=state.done.filter(x=>!x.endsWith(':'+id));if(homeGuideSave(state)){homeGuideDiscardEdit(id);homeGuideRender()}return}
  const resume=e.target.closest('[data-home-resume]');if(resume){
   if(typeof hdWSGoBack==='function'&&hdWSGoBack())return;
   const row=homeResumeLocation();if(row&&typeof hdWSShowElement==='function')hdWSShowElement(row.id,true);
@@ -643,5 +656,17 @@ window.addEventListener('load',()=>setTimeout(renderHomeDashboard,300));
 ensureHomeDashboard();
 
 document.addEventListener('change',e=>{if(e.target.id==='homeGuideMapSelect'&&typeof hdSelectGuideMap==='function'){hdSelectGuideMap(e.target.value);homeGuideRender()}});
+document.addEventListener('submit',e=>{
+ const form=e.target.closest('[data-home-guide-edit]');if(!form)return;e.preventDefault();
+ const state=homeGuideState(),index=state.custom.findIndex(x=>x.id===form.dataset.homeGuideEdit&&!x.source);if(index<0)return;
+ const original=state.custom[index],title=form.elements.title.value.trim(),scope=form.elements.scope.value,map=form.elements.map.value;
+ if(!title||!['map','global'].includes(scope)||scope==='map'&&!(typeof hdGuideMapSequence==='function'&&hdGuideMapSequence().includes(map)))return;
+ const updated={...original,title,detail:form.elements.detail.value.trim(),scope,map:scope==='map'?map:''},oldKey=homeGuideGoalKey(original),newKey=homeGuideGoalKey(updated);
+ state.custom[index]=updated;
+ if(oldKey!==newKey){const wasDone=state.done.includes(oldKey);state.done=state.done.filter(x=>x!==oldKey);if(wasDone&&!state.done.includes(newKey))state.done.push(newKey)}
+ if(!homeGuideSave(state)){if(typeof hdToast==='function')hdToast('保存できなかったよ。編集内容は残してあるよ','warn');return}
+ homeGuideClearDraft(form);homeGuideRender();
+ if(typeof hdToast==='function')hdToast('目標を保存したよ'+(scope==='map'&&map!==homeGuideActiveMap()?`。${map} で確認できるよ`:''),'success');
+});
 document.addEventListener('submit',e=>{const form=e.target.closest('[data-home-guide-add]');if(!form)return;e.preventDefault();const title=form.elements.title.value.trim(),category=form.dataset.homeGuideAdd,map=form.dataset.homeGuideDraftMap||homeGuideActiveMap(),scope=form.elements.scope.value;if(!title||!HD_HOME_GUIDE_GROUPS.some(g=>g.id===category)||scope==='map'&&!map)return;const state=homeGuideState();state.custom.push({id:'custom-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),category,title,scope,map:scope==='map'?map:'',detail:form.elements.prereq?.value.trim()?`前提：${form.elements.prereq.value.trim()}`:''});if(!homeGuideSave(state))return;homeGuideClearDraft(form);form.reset()});
 window.addEventListener('hd:guide-map-changed',()=>homeGuideRender());

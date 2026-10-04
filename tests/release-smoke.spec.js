@@ -50,6 +50,80 @@ async function openGuideWorkspace(page) {
   await expect(page.locator('#guide')).toBeVisible({ timeout: 5000 });
 }
 
+test('release smoke: strategy goal editing moves completed goals without changing other progress', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{
+    hdSelectGuideMap('6-5');hdWSShowElement('home',false);
+    const state=homeGuideState();state.custom.push({id:'edit-quest',category:'quest',title:'元の任務目標',detail:'前提：元の条件',map:'6-5',scope:'map'},{id:'edit-other',category:'map',title:'別の目標',map:'6-5',scope:'map'});
+    state.done.push('map:6-5:quest:edit-quest','map:6-5:map:edit-other');homeGuideSave(state);
+  });
+  await page.locator('details[data-group="quest"] summary').click();
+  await page.locator('[data-home-guide-edit-open="edit-quest"]').click();
+  const form=page.locator('[data-home-guide-edit="edit-quest"]');
+  await form.locator('[name="title"]').fill('変更した任務 <確認>');
+  await form.locator('[name="detail"]').fill('前提任務と必要な艦種を確認');
+  await form.locator('[name="map"]').selectOption('6-4');
+  await form.locator('button[type="submit"]').click();
+  await expect(form).toHaveCount(0);
+  expect(await page.evaluate(()=>({goals:homeGuideState().custom.filter(x=>x.id==='edit-quest'),done:homeGuideState().done}))).toMatchObject({goals:[{id:'edit-quest',title:'変更した任務 <確認>',detail:'前提任務と必要な艦種を確認',scope:'map',map:'6-4'}],done:['map:6-5:map:edit-other','map:6-4:quest:edit-quest']});
+  await page.locator('#homeGuideMapSelect').selectOption('6-4');
+  const row=page.locator('.home-guide-step').filter({has:page.locator('[data-home-guide-edit-open="edit-quest"]')});
+  await expect(row.locator('strong')).toHaveText('変更した任務 <確認>');
+  await expect(row.locator('[data-home-guide-toggle]')).toHaveAttribute('aria-pressed','true');
+  await row.locator('[data-home-guide-edit-open]').click();
+  await form.locator('[name="scope"]').selectOption('global');
+  await form.locator('button[type="submit"]').click();
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');
+  expect(await page.evaluate(()=>homeGuideState())).toMatchObject({custom:expect.arrayContaining([{id:'edit-quest',category:'quest',title:'変更した任務 <確認>',detail:'前提任務と必要な艦種を確認',map:'',scope:'global'}]),done:['map:6-5:map:edit-other','global:quest:edit-quest']});
+});
+
+test('release smoke: strategy goal editing drafts survive updates map switches and reload then cancel', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const state=homeGuideState();state.custom.push({id:'edit-draft',category:'map',title:'元の攻略目標',detail:'元のメモ',scope:'map',map:'6-5'});homeGuideSave(state);});
+  await page.locator('[data-home-guide-add="map"] [name="title"]').fill('追加の下書き');
+  await page.locator('[data-home-guide-edit-open="edit-draft"]').click();
+  const form=page.locator('[data-home-guide-edit="edit-draft"]');
+  await form.locator('[name="title"]').fill('編集中の目標');
+  await form.locator('[name="detail"]').fill('編集中の前提');
+  await form.locator('[name="scope"]').selectOption('global');
+  await form.locator('[name="map"]').selectOption('6-4');
+  await form.locator('[name="title"]').focus();
+  expect(await page.evaluate(()=>{const input=document.querySelector('[data-home-guide-edit] [name="title"]');input.setSelectionRange(2,2);const state=homeGuideState();state.done.push('edit-background');homeGuideSave(state);return {connected:input.isConnected,focused:document.activeElement===input,caret:input.selectionStart}})).toEqual({connected:true,focused:true,caret:2});
+  await page.locator('#homeGuideMapSelect').selectOption('6-4');await expect(form).toHaveCount(0);
+  await page.locator('#homeGuideMapSelect').selectOption('6-5');await expect(form.locator('[name="title"]')).toHaveValue('編集中の目標');
+  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  await expect(form.locator('[name="detail"]')).toHaveValue('編集中の前提');
+  await expect(form.locator('[name="scope"]')).toHaveValue('global');await expect(form.locator('[name="map"]')).toHaveValue('6-4');
+  await form.locator('[data-home-guide-edit-cancel]').click();await expect(form).toHaveCount(0);
+  await expect(page.locator('[data-home-guide-add="map"] [name="title"]')).toHaveValue('追加の下書き');
+  expect(await page.evaluate(()=>homeGuideState().custom.find(x=>x.id==='edit-draft'))).toMatchObject({title:'元の攻略目標',detail:'元のメモ',scope:'map',map:'6-5'});
+  await page.locator('[data-home-guide-edit-open="edit-draft"]').click();await expect(form.locator('[name="title"]')).toHaveValue('元の攻略目標');
+});
+
+test('release smoke: strategy goal editing keeps failed changes and saves once on retry', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const state=homeGuideState();state.custom.push({id:'edit-failed',category:'map',title:'保存前の目標',scope:'map',map:'6-5'});homeGuideSave(state);});
+  await page.locator('[data-home-guide-edit-open="edit-failed"]').click();
+  const form=page.locator('[data-home-guide-edit="edit-failed"]');await form.locator('[name="title"]').fill('保存後の目標');
+  await page.evaluate(()=>{const original=Storage.prototype.setItem;window.restoreEditStorage=()=>{Storage.prototype.setItem=original};Storage.prototype.setItem=function(key,value){if(key===HD_HOME_GUIDE_KEY)throw new DOMException('Full','QuotaExceededError');return original.call(this,key,value)}});
+  await form.locator('button[type="submit"]').click();await expect(form.locator('[name="title"]')).toHaveValue('保存後の目標');
+  expect(await page.evaluate(()=>homeGuideState().custom.find(x=>x.id==='edit-failed').title)).toBe('保存前の目標');
+  await page.evaluate(()=>window.restoreEditStorage());
+  await form.locator('button[type="submit"]').click();await expect(form).toHaveCount(0);
+  expect(await page.evaluate(()=>homeGuideState().custom.filter(x=>x.id==='edit-failed').map(x=>x.title))).toEqual(['保存後の目標']);
+});
+
+test('release smoke: strategy goal editing excludes imported goals and removes deleted drafts', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const state=homeGuideState();state.custom.push({id:'edit-delete',category:'map',title:'削除する目標',scope:'map',map:'6-5'},{id:'edit-imported',category:'map',title:'自動の候補目標',scope:'map',map:'6-5',source:'unlock',ref:'6-4'});homeGuideSave(state);});
+  await expect(page.locator('[data-home-guide-edit-open="edit-imported"]')).toHaveCount(0);
+  await page.locator('[data-home-guide-edit-open="edit-delete"]').click();await page.locator('[data-home-guide-edit="edit-delete"] [name="title"]').fill('削除する編集下書き');
+  await page.locator('[data-home-guide-delete="edit-delete"]').click();await expect(page.locator('[data-home-guide-edit="edit-delete"]')).toHaveCount(0);
+  expect(await page.evaluate(()=>({draft:homeGuideDraftStore()[homeGuideEditDraftKey('edit-delete')],goals:homeGuideState().custom.map(x=>x.id)}))).toEqual({draft:undefined,goals:['edit-imported']});
+});
+
 test('release smoke: strategy goal drafts survive background updates reload and successful submission', async ({ page }) => {
   await boot(page);
   await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
