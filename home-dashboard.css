@@ -278,3 +278,11 @@ button.home-next-main{cursor:pointer}
 .home-guide-edit textarea{resize:vertical}
 .home-guide-edit-actions{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
 .home-guide-edit-actions small{width:100%;font-size:11px;color:var(--muted);line-height:1.5}
+
+.home-guide-priority{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:7px 0;font-size:11px;color:var(--muted)}
+.home-guide-priority select{min-width:100px;max-width:100%;border-radius:8px;padding:7px;font:inherit}
+.home-guide-step.priority-high{border-color:#dabd78}
+.home-guide-step.priority-high .home-guide-priority{color:#f4d992}
+.home-guide-step.priority-later .home-guide-priority{color:var(--muted)}
+
+.home-guide-priority-help{margin:0;color:var(--muted);font-size:11px;line-height:1.5}

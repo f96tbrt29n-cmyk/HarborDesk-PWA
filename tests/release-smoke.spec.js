@@ -50,6 +50,57 @@ async function openGuideWorkspace(page) {
   await expect(page.locator('#guide')).toBeVisible({ timeout: 5000 });
 }
 
+test('release smoke: strategy goal priorities survive creation and editing drafts', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  const add=page.locator('[data-home-guide-add="map"]');
+  await add.locator('[name="title"]').fill('優先度を付ける目標');await add.locator('[name="priority"]').selectOption('later');
+  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  await expect(add.locator('[name="priority"]')).toHaveValue('later');await add.locator('button[type="submit"]').click();
+  const goal=await page.evaluate(()=>homeGuideState().custom.find(x=>x.title==='優先度を付ける目標'));expect(goal.priority).toBe('later');
+  await expect(add.locator('[name="priority"]')).toHaveValue('normal');
+  await page.locator(`[data-home-guide-edit-open="${goal.id}"]`).click();
+  const edit=page.locator(`[data-home-guide-edit="${goal.id}"]`);await edit.locator('[name="priority"]').selectOption('high');
+  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  await expect(edit.locator('[name="priority"]')).toHaveValue('high');await edit.locator('button[type="submit"]').click();await expect(edit).toHaveCount(0);
+  await expect(page.locator(`[data-home-guide-priority="${goal.id}"]`)).toHaveValue('high');
+  expect(await page.evaluate(()=>homeGuideState().custom.filter(x=>x.title==='優先度を付ける目標').map(x=>x.priority))).toEqual(['high']);
+});
+
+test('release smoke: strategy goal priorities reorder manual and imported goals without changing completion', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{
+    hdSelectGuideMap('6-5');hdWSShowElement('home',false);const state=homeGuideState();
+    state.custom.push({id:'priority-normal',category:'quest',title:'通常の目標',scope:'map',map:'6-5'},{id:'priority-invalid',category:'quest',title:'古い保存データの目標',scope:'global',priority:'unknown'},{id:'priority-later',category:'quest',title:'あとで取り組む目標',scope:'map',map:'6-5',priority:'later'},{id:'priority-imported',category:'quest',title:'候補から追加した任務',scope:'map',map:'6-5',source:'oneTimeQuest',ref:'B175'},{id:'priority-other',category:'quest',title:'別海域の優先目標',scope:'map',map:'6-4',priority:'high'});
+    state.done.push('shared:oneTimeQuest:B175');homeGuideSave(state);
+  });
+  const group=page.locator('details[data-group="quest"]');await group.locator('summary').click();
+  await expect(page.locator('[data-home-guide-priority="priority-normal"]')).toHaveValue('normal');await expect(page.locator('[data-home-guide-priority="priority-invalid"]')).toHaveValue('normal');
+  await page.locator('[data-home-guide-priority="priority-imported"]').focus();await page.locator('[data-home-guide-priority="priority-imported"]').selectOption('high');
+  await expect(group.locator('.home-guide-step').first().locator('strong')).toHaveText('候補から追加した任務');
+  await expect(group.locator('.home-guide-step').last().locator('strong')).toHaveText('あとで取り組む目標');
+  expect(await page.evaluate(()=>document.activeElement?.dataset.homeGuidePriority)).toBe('priority-imported');
+  const before=await page.evaluate(()=>homeGuideState());expect(before.done).toContain('shared:oneTimeQuest:B175');expect(before.custom.find(x=>x.id==='priority-imported')).toMatchObject({source:'oneTimeQuest',ref:'B175',map:'6-5',priority:'high'});
+  await page.locator('#homeGuideMapSelect').selectOption('6-4');await expect(group.locator('.home-guide-step').first().locator('strong')).toHaveText('別海域の優先目標');
+  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});await group.locator('summary').click();
+  await expect(group.locator('.home-guide-step').first().locator('strong')).toHaveText('候補から追加した任務');
+  expect(await page.evaluate(()=>homeGuideState())).toEqual(before);
+});
+
+test('release smoke: strategy goal priorities recover failed saves and keep an open edit draft', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const state=homeGuideState();state.custom.push({id:'priority-failed',category:'map',title:'元の優先目標',scope:'map',map:'6-5'});homeGuideSave(state);});
+  await page.locator('[data-home-guide-edit-open="priority-failed"]').click();const edit=page.locator('[data-home-guide-edit="priority-failed"]');await edit.locator('[name="title"]').fill('編集中の目標名');
+  await page.evaluate(()=>{const original=Storage.prototype.setItem;window.restorePriorityStorage=()=>{Storage.prototype.setItem=original};Storage.prototype.setItem=function(key,value){if(key===HD_HOME_GUIDE_KEY)throw new DOMException('Full','QuotaExceededError');return original.call(this,key,value)}});
+  const priority=page.locator('[data-home-guide-priority="priority-failed"]');await priority.selectOption('high');await expect(priority).toHaveValue('normal');
+  expect(await page.evaluate(()=>homeGuideState().custom.find(x=>x.id==='priority-failed').priority)).toBeUndefined();await expect(edit.locator('[name="title"]')).toHaveValue('編集中の目標名');
+  await page.evaluate(()=>window.restorePriorityStorage());await priority.selectOption('high');await expect(edit.locator('[name="priority"]')).toHaveValue('high');await expect(edit.locator('[name="title"]')).toHaveValue('編集中の目標名');
+  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  await expect(edit.locator('[name="priority"]')).toHaveValue('high');await expect(edit.locator('[name="title"]')).toHaveValue('編集中の目標名');
+  await edit.locator('[data-home-guide-edit-cancel]').click();
+  expect(await page.evaluate(()=>homeGuideState().custom.filter(x=>x.id==='priority-failed').map(x=>({title:x.title,priority:x.priority})))).toEqual([{title:'元の優先目標',priority:'high'}]);
+});
+
 test('release smoke: strategy goal editing moves completed goals without changing other progress', async ({ page }) => {
   await boot(page);
   await page.evaluate(()=>{
@@ -75,7 +126,7 @@ test('release smoke: strategy goal editing moves completed goals without changin
   await form.locator('button[type="submit"]').click();
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');
-  expect(await page.evaluate(()=>homeGuideState())).toMatchObject({custom:expect.arrayContaining([{id:'edit-quest',category:'quest',title:'変更した任務 <確認>',detail:'前提任務と必要な艦種を確認',map:'',scope:'global'}]),done:['map:6-5:map:edit-other','global:quest:edit-quest']});
+  expect(await page.evaluate(()=>homeGuideState())).toMatchObject({custom:expect.arrayContaining([{id:'edit-quest',category:'quest',title:'変更した任務 <確認>',detail:'前提任務と必要な艦種を確認',map:'',scope:'global',priority:'normal'}]),done:['map:6-5:map:edit-other','global:quest:edit-quest']});
 });
 
 test('release smoke: strategy goal editing drafts survive updates map switches and reload then cancel', async ({ page }) => {
