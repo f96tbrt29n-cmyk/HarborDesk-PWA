@@ -286,3 +286,9 @@ button.home-next-main{cursor:pointer}
 .home-guide-step.priority-later .home-guide-priority{color:var(--muted)}
 
 .home-guide-priority-help{margin:0;color:var(--muted);font-size:11px;line-height:1.5}
+
+.home-guide-filter{flex-wrap:wrap}
+.home-guide-filter strong{flex:1 1 100%}
+.home-guide-filter button{flex:1 1 140px;min-width:0}
+.home-guide-filter button[aria-pressed="true"]{background:#21495e;border-color:var(--accent2)}
+.home-guide-filter-state{width:100%;font-size:11px;color:var(--muted);line-height:1.5}

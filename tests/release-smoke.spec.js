@@ -50,6 +50,53 @@ async function openGuideWorkspace(page) {
   await expect(page.locator('#guide')).toBeVisible({ timeout: 5000 });
 }
 
+test('release smoke: completed strategy view filters by completion and map and persists on reload', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{
+    hdSelectGuideMap('6-5');hdWSShowElement('home',false);const state=homeGuideState();
+    state.custom.push({id:'completed-local',category:'map',title:'完了した海域目標',scope:'map',map:'6-5',priority:'high'},{id:'completed-global',category:'map',title:'完了した共通目標',scope:'global'},{id:'completed-other',category:'map',title:'別海域の完了目標',scope:'map',map:'6-4'},{id:'completed-pending',category:'map',title:'未完了の海域目標',scope:'map',map:'6-5'},{id:'completed-shared',category:'quest',title:'達成済みの共通任務',scope:'map',map:'6-5',source:'oneTimeQuest',ref:'B175'});
+    state.done.push('map:6-5:map:completed-local','global:map:completed-global','map:6-4:map:completed-other','shared:oneTimeQuest:B175');homeGuideSave(state);
+  });
+  const before=await page.evaluate(()=>homeGuideState());const filter=page.locator('[data-home-guide-completed]');
+  await filter.click();await expect(filter).toHaveAttribute('aria-pressed','true');await expect(filter).toBeFocused();
+  await expect(page.locator('#homeGuideSteps .home-guide-step:not(.done)')).toHaveCount(0);
+  await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：完了済み 3件');
+  await expect(page.locator('[data-home-guide-priority="completed-local"]')).toHaveCount(1);await expect(page.locator('[data-home-guide-priority="completed-pending"]')).toHaveCount(0);await expect(page.locator('[data-home-guide-priority="completed-other"]')).toHaveCount(0);
+  await expect(page.locator('details[data-group="gear"] .home-guide-empty')).toHaveText('この分類に完了済みの目標はありません。');
+  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  await expect(filter).toHaveAttribute('aria-pressed','true');await expect(page.locator('[data-home-guide-priority="completed-shared"]')).toHaveCount(1);
+  await page.locator('#homeGuideMapSelect').selectOption('6-4');await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：完了済み 2件');await expect(page.locator('[data-home-guide-priority="completed-other"]')).toHaveCount(1);await expect(page.locator('[data-home-guide-priority="completed-local"]')).toHaveCount(0);
+  await page.locator('[data-home-guide-pending]').click();await expect(filter).toHaveAttribute('aria-pressed','false');await expect(page.locator('#homeGuideSteps .home-guide-step.done')).toHaveCount(0);
+  await page.locator('[data-home-guide-pending]').click();await expect(page.locator('[data-home-guide-priority="completed-other"]')).toHaveCount(1);
+  expect(await page.evaluate(()=>homeGuideState())).toEqual(before);
+});
+
+test('release smoke: completed strategy view restores manual and prerequisite completion after undo', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const state=homeGuideState();state.custom.push({id:'completed-undo',category:'map',title:'未完了に戻す目標',scope:'map',map:'6-5'},{id:'completed-keep',category:'map',title:'維持する完了目標',scope:'map',map:'6-5'},{id:'completed-unlock',category:'map',title:'6-4をクリア',scope:'map',map:'6-5',source:'unlock',ref:'6-4'});state.done.push('map:6-5:map:completed-undo','map:6-5:map:completed-keep');state.cleared.push('6-4','6-3');homeGuideSave(state);});
+  await page.locator('[data-home-guide-completed]').click();
+  const row=page.locator('.home-guide-step').filter({has:page.locator('[data-home-guide-priority="completed-undo"]')});
+  await page.evaluate(()=>{const original=Storage.prototype.setItem;window.restoreCompletedStorage=()=>{Storage.prototype.setItem=original};Storage.prototype.setItem=function(key,value){if(key===HD_HOME_GUIDE_KEY)throw new DOMException('Full','QuotaExceededError');return original.call(this,key,value)}});
+  await row.locator('[data-home-guide-toggle]').click();await expect(row).toHaveCount(1);await expect(row.locator('[data-home-guide-toggle]')).toHaveAttribute('aria-pressed','true');await expect(page.locator('#hdToastRegion .hd-toast-action')).toHaveCount(0);
+  await page.evaluate(()=>window.restoreCompletedStorage());await row.locator('[data-home-guide-toggle]').click();await expect(row).toHaveCount(0);await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：完了済み 2件');
+  await page.locator('#hdToastRegion .hd-toast-action').click();await expect(row).toHaveCount(1);expect(await page.evaluate(()=>homeGuideState().done)).toEqual(expect.arrayContaining(['map:6-5:map:completed-undo','map:6-5:map:completed-keep']));
+  const unlock=page.locator('.home-guide-step').filter({has:page.locator('[data-home-guide-priority="completed-unlock"]')});await unlock.locator('[data-home-guide-toggle]').click();await expect(unlock).toHaveCount(0);expect(await page.evaluate(()=>homeGuideState().cleared)).toEqual(['6-3']);
+  await page.locator('#hdToastRegion .hd-toast-action').click();await expect(unlock).toHaveCount(1);expect(await page.evaluate(()=>homeGuideState().cleared)).toEqual(expect.arrayContaining(['6-3','6-4']));
+});
+
+test('release smoke: completed strategy view keeps drafts and reveals newly added unfinished goals', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const state=homeGuideState();state.custom.push({id:'completed-edit-draft',category:'map',title:'元の未完了目標',scope:'map',map:'6-5'});homeGuideSave(state);});
+  const add=page.locator('[data-home-guide-add="map"]');await add.locator('[name="title"]').fill('完了済み一覧から追加する目標');await add.locator('[name="priority"]').selectOption('high');
+  await page.locator('[data-home-guide-edit-open="completed-edit-draft"]').click();const edit=page.locator('[data-home-guide-edit="completed-edit-draft"]');await edit.locator('[name="title"]').fill('編集中の未完了目標');await edit.locator('[name="detail"]').fill('残しておく編集メモ');
+  await page.locator('[data-home-guide-completed]').click();await expect(edit).toHaveCount(0);await expect(add.locator('[name="title"]')).toHaveValue('完了済み一覧から追加する目標');await expect(add.locator('[name="priority"]')).toHaveValue('high');
+  await add.locator('button[type="submit"]').click();await expect(page.locator('[data-home-guide-pending]')).toHaveAttribute('aria-pressed','true');await expect(page.locator('[data-home-guide-completed]')).toHaveAttribute('aria-pressed','false');
+  await expect(edit.locator('[name="title"]')).toHaveValue('編集中の未完了目標');await expect(edit.locator('[name="detail"]')).toHaveValue('残しておく編集メモ');
+  await expect(add.locator('[name="title"]')).toHaveValue('');
+  const newRow=page.locator('.home-guide-step').filter({has:page.locator('strong',{hasText:'完了済み一覧から追加する目標'})});await expect(newRow).toHaveCount(1);await expect(newRow.locator('[data-home-guide-priority]')).toHaveValue('high');
+  expect(await page.evaluate(()=>homeGuideState().custom.find(x=>x.id==='completed-edit-draft').title)).toBe('元の未完了目標');
+});
+
 test('release smoke: strategy goal priorities survive creation and editing drafts', async ({ page }) => {
   await boot(page);
   await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
