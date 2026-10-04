@@ -17,9 +17,9 @@ function hdFEParseGearLabel(label){
 function hdFEPlanFromSavedFleet(map,fleet){
  const ships=(fleet?.ships||[]).filter(x=>String(x.ship||'').trim()||String(x.gear||'').trim()).map(row=>{
   const db=hdFEFindShip(String(row.ship||'').trim()),profile=db&&typeof hdShipDbSlotProfile==='function'?hdShipDbSlotProfile(db):null;
-  const tokens=String(row.gear||'').split(/\s+\/\s+/).map(hdFEParseGearLabel).filter(x=>x.name);
+  const tokens=String(row.gear||'').split(/\s+\/\s+/).map(hdFEParseGearLabel);
   const normal=tokens.filter(x=>!x.expansion),ex=tokens.find(x=>x.expansion)||null;
-  const items=normal.map((x,i)=>({name:x.name,star:x.star,slotIndex:i,capacity:profile?.slots?.[i]??null,category:hdFEFind(x.name)?.category||''}));
+  const items=normal.map((x,i)=>({name:x.name,star:x.star,slotIndex:i,capacity:profile?.slots?.[i]??null,category:hdFEFind(x.name)?.category||''})).filter(x=>x.name);
   return {ship:String(row.ship||'').trim(),gameShipId:Number(row.gameShipId)||0,masterId:Number(row.masterId)||Number(db?.id)||0,type:db?.type||'',items,expansion:ex?{name:ex.name,star:ex.star}:null,missing:[],master:!!profile};
  });
  const presets=typeof MAP_PLANS!=='undefined'?(MAP_PLANS[map]?.presets||[]):[],preset=presets.find(p=>String(fleet?.name||'').includes(String(p?.name||'')))||null,routeInfo=preset&&typeof hdFSPresetInfo==='function'?hdFSPresetInfo(preset):null;

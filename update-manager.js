@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.523';
-const HD_APP_BUILD=523;
+const HD_APP_VERSION='1.0.524';
+const HD_APP_BUILD=524;
 const HD_UPDATE_SNOOZE_KEY='harbordesk-update-snooze-v1';
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
@@ -196,7 +196,8 @@ async function hdLoadCurrentAssets(){
   const fleetLoadoutP=fleetSuggesterP.then(()=>hdLoadScript('data-hd-fleet-loadout','./fleet-loadout-planner.js'));
   const fleetEvaluatorP=fleetLoadoutP.then(()=>hdLoadScript('data-hd-fleet-evaluator','./fleet-readiness-evaluator.js'));
   const fleetOptimizerP=fleetEvaluatorP.then(()=>hdLoadScript('data-hd-fleet-optimizer','./fleet-loadout-optimizer.js'));
-  const sortiePresetManagerP=fleetOptimizerP.then(()=>hdLoadScript('data-hd-sortie-preset-manager','./sortie-preset-manager.js'));
+  const ownedEquipmentPlannerP=fleetOptimizerP.then(()=>hdLoadScript('data-hd-owned-equipment-planner','./owned-equipment-planner.js'));
+  const sortiePresetManagerP=ownedEquipmentPlannerP.then(()=>hdLoadScript('data-hd-sortie-preset-manager','./sortie-preset-manager.js'));
   const sortieP=hdLoadScript('data-hd-sortie-ready','./sortie-readiness.js');
   const landP=hdLoadScript('data-hd-land-base','./land-base-planner.js');
   const fleetP=hdLoadScript('data-hd-fleet-calc','./fleet-calculator.js').then(ok=>ok?hdLoadScript('data-hd-fleet-calc-fix','./fleet-calculator-fix.js'):false);
