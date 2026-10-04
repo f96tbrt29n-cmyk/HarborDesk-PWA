@@ -5053,6 +5053,8 @@ test('release smoke: map fleet acquisition catalog falls back when workspace rou
 
   await catalog.click();
   await expect(page.locator('#equipmentBook')).toBeVisible({ timeout: 5000 });
+  await page.evaluate(()=>hdWSRefresh());
+  await expect(page.locator('#equipmentBook')).toBeVisible();
   const search = page.locator('#hdEquipCatalogSearch');
   if (await search.count()) await expect(search).toHaveValue(equipName || '');
 

@@ -138,6 +138,9 @@ function hdAGOpenItem(name,map=''){
 }
 function hdAGForceReveal(target){
  if(!target)return false;
+ // Keep workspace state aligned so delayed refreshes cannot hide the fallback target.
+ if(typeof window.hdWSRevealElement==='function'){try{if(window.hdWSRevealElement(target,true,{history:false})!==false)return true}catch{}}
+ if(typeof window.hdStageWorkspaceTarget==='function')window.hdStageWorkspaceTarget(target);
  for(let node=target;node&&node!==document.body;node=node.parentElement){
   node.hidden=false;
   node.classList?.remove('hd-ws-hidden','hd-ws-wrapper-hidden');
