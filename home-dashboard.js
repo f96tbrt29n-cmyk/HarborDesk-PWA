@@ -559,7 +559,22 @@ document.addEventListener('click',e=>{
   homeGuideRender();setTimeout(()=>{const form=[...document.querySelectorAll('[data-home-guide-edit]')].find(x=>x.dataset.homeGuideEdit===task.id);form?.elements.title.focus()},0);return;
  }
  const editCancel=e.target.closest('[data-home-guide-edit-cancel]');if(editCancel){homeGuideDiscardEdit(editCancel.dataset.homeGuideEditCancel);homeGuideRender();return}
- const guideDelete=e.target.closest('[data-home-guide-delete]');if(guideDelete){const state=homeGuideState(),id=guideDelete.dataset.homeGuideDelete;state.custom=state.custom.filter(x=>x.id!==id);state.done=state.done.filter(x=>!x.endsWith(':'+id));if(homeGuideSave(state)){homeGuideDiscardEdit(id);homeGuideRender()}return}
+ const guideDelete=e.target.closest('[data-home-guide-delete]');if(guideDelete){
+  const state=homeGuideState(),id=guideDelete.dataset.homeGuideDelete,index=state.custom.findIndex(x=>x.id===id);if(index<0)return;
+  const task=state.custom[index],removedDone=state.done.filter(x=>x.endsWith(':'+id)),draftKey=homeGuideEditDraftKey(id),draft=homeGuideDraftStore()[draftKey];
+  state.custom.splice(index,1);state.done=state.done.filter(x=>!removedDone.includes(x));
+  if(!homeGuideSave(state)){if(typeof hdToast==='function')hdToast('削除を保存できなかったよ。目標は残してあるよ','warn');return}
+  homeGuideDiscardEdit(id);homeGuideRender();
+  const offerUndo=message=>{if(typeof hdToastAction==='function')hdToastAction(message,'元に戻す',()=>{
+   const current=homeGuideState();if(current.custom.some(x=>x.id===id))return;
+   current.custom.splice(Math.min(index,current.custom.length),0,task);
+   for(const key of removedDone)if(!current.done.includes(key))current.done.push(key);
+   if(!homeGuideSave(current)){setTimeout(()=>offerUndo('復元を保存できなかったよ。もう一度試してね'),0);return}
+   if(draft){const drafts=homeGuideDraftStore();if(!drafts[draftKey]){drafts[draftKey]=draft;try{localStorage.setItem(HD_HOME_GUIDE_DRAFT_KEY,JSON.stringify(drafts))}catch{setTimeout(()=>{if(typeof hdToast==='function')hdToast('目標は戻したよ。編集下書きは保存できなかったよ','warn')},0)}}}
+   homeGuideRender();
+  },8000)};
+  offerUndo(`${task.title} を削除したよ`);return
+ }
  const resume=e.target.closest('[data-home-resume]');if(resume){
   if(typeof hdWSGoBack==='function'&&hdWSGoBack())return;
   const row=homeResumeLocation();if(row&&typeof hdWSShowElement==='function')hdWSShowElement(row.id,true);
