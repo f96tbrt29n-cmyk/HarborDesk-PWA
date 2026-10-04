@@ -1,7 +1,7 @@
 /* Search the registered inventory against the selected fleet's equipment targets. */
 const HD_OC_CACHE=new Map();
 function hdOCContext(map,fleetId='',route=''){
- const fleets=typeof hdSPSFleets==='function'?hdSPSFleets(map):[],fleet=fleetId?fleets.find(x=>String(x.id)===String(fleetId)):hdSPSFleet(map);
+ const fleets=typeof hdSPSFleets==='function'?hdSPSFleets(map):[],fleet=fleetId?fleets.find(x=>String(x.id)===String(fleetId)):(typeof hdSPSFleet==='function'?hdSPSFleet(map):null);
  const presets=typeof hdMSNPresets==='function'?hdMSNPresets(map):[],index=route===''?(typeof hdMSNRouteIndex==='function'?hdMSNRouteIndex(map,presets):0):Number(route);
  return {map,fleet,preset:presets[index]||null,index};
 }
