@@ -50,6 +50,34 @@ async function openGuideWorkspace(page) {
   await expect(page.locator('#guide')).toBeVisible({ timeout: 5000 });
 }
 
+test('release smoke: priority strategy view combines completion and map filters and persists', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'priority-local',category:'map',title:'優先の海域目標',scope:'map',map:'6-5',priority:'high'},{id:'priority-global',category:'map',title:'優先の共通目標',scope:'global',priority:'high'},{id:'priority-other',category:'map',title:'別海域の優先目標',scope:'map',map:'6-4',priority:'high'},{id:'priority-normal',category:'map',title:'通常目標',scope:'global'},{id:'priority-import',category:'quest',title:'優先の取り込み任務',scope:'map',map:'6-5',source:'oneTimeQuest',ref:'B175',priority:'high'});s.done.push('map:6-5:map:priority-local','shared:oneTimeQuest:B175');homeGuideSave(s)});
+  const before=await page.evaluate(()=>homeGuideState());const filter=page.locator('[data-home-guide-priority-only]');
+  await filter.click();await expect(filter).toBeFocused();await expect(filter).toHaveAttribute('aria-pressed','true');await expect(page.locator('#homeGuideSteps .home-guide-step')).toHaveCount(3);await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：全件・優先のみ 3件');
+  await expect(page.locator('details[data-group="gear"] .home-guide-empty')).toHaveText('この分類に表示条件に合う優先目標はありません。');
+  await page.locator('[data-home-guide-pending]').click();await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：未完了・優先のみ 1件');
+  await page.locator('[data-home-guide-completed]').click();await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：完了済み・優先のみ 2件');
+  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false)});await expect(filter).toHaveAttribute('aria-pressed','true');await expect(page.locator('[data-home-guide-priority="priority-import"]')).toHaveCount(1);
+  await page.locator('#homeGuideMapSelect').selectOption('6-4');await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：完了済み・優先のみ 0件');await page.locator('[data-home-guide-completed]').click();await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：全件・優先のみ 2件');
+  expect(await page.evaluate(()=>homeGuideState())).toEqual(before);
+});
+
+test('release smoke: priority strategy view preserves drafts when changing priority hides a row', async ({ page }) => {
+  await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'priority-edit',category:'map',title:'優先の編集目標',scope:'map',map:'6-5',priority:'high'});homeGuideSave(s)});
+  const add=page.locator('[data-home-guide-add="map"]');await add.locator('[name="title"]').fill('追加の下書き');await add.locator('[name="priority"]').selectOption('later');await page.locator('[data-home-guide-edit-open="priority-edit"]').click();const edit=page.locator('[data-home-guide-edit="priority-edit"]');await edit.locator('[name="title"]').fill('編集の下書き');await edit.locator('[name="detail"]').fill('残すメモ');await page.locator('[data-home-guide-priority-only]').click();
+  await page.evaluate(()=>{const original=Storage.prototype.setItem;window.restorePriorityStorage=()=>Storage.prototype.setItem=original;Storage.prototype.setItem=function(k,v){if(k===HD_HOME_GUIDE_KEY)throw new DOMException('Full','QuotaExceededError');return original.call(this,k,v)}});
+  const select=page.locator('[data-home-guide-priority="priority-edit"]');await select.selectOption('normal');await expect(select).toHaveValue('high');await expect(edit.locator('[name="priority"]')).toHaveValue('high');await page.evaluate(()=>window.restorePriorityStorage());
+  await select.selectOption('normal');await expect(select).toHaveCount(0);await expect(edit).toHaveCount(0);await page.locator('[data-home-guide-priority-only]').click();await expect(edit.locator('[name="title"]')).toHaveValue('編集の下書き');await expect(edit.locator('[name="detail"]')).toHaveValue('残すメモ');await expect(edit.locator('[name="priority"]')).toHaveValue('normal');await expect(add.locator('[name="title"]')).toHaveValue('追加の下書き');await expect(add.locator('[name="priority"]')).toHaveValue('later');
+});
+
+test('release smoke: priority strategy view reveals newly added goals only after successful saving', async ({ page }) => {
+  await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false)});await page.locator('[data-home-guide-priority-only]').click();await page.locator('[data-home-guide-completed]').click();const add=page.locator('[data-home-guide-add="map"]');await add.locator('[name="title"]').fill('新しい優先目標');await add.locator('[name="priority"]').selectOption('high');
+  await page.evaluate(()=>{const original=Storage.prototype.setItem;window.restorePriorityStorage=()=>Storage.prototype.setItem=original;Storage.prototype.setItem=function(k,v){if(k===HD_HOME_GUIDE_KEY)throw new DOMException('Full','QuotaExceededError');return original.call(this,k,v)}});await add.locator('button[type="submit"]').click();await expect(page.locator('[data-home-guide-completed]')).toHaveAttribute('aria-pressed','true');await expect(page.locator('[data-home-guide-priority-only]')).toHaveAttribute('aria-pressed','true');await expect(add.locator('[name="title"]')).toHaveValue('新しい優先目標');await page.evaluate(()=>window.restorePriorityStorage());
+  await add.locator('button[type="submit"]').click();await expect(page.locator('[data-home-guide-pending]')).toHaveAttribute('aria-pressed','true');await expect(page.locator('[data-home-guide-priority-only]')).toHaveAttribute('aria-pressed','true');await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：未完了・優先のみ 1件');
+  await add.locator('[name="title"]').fill('新しい通常目標');await add.locator('button[type="submit"]').click();await expect(page.locator('[data-home-guide-priority-only]')).toHaveAttribute('aria-pressed','false');await expect(page.locator('.home-guide-step strong').filter({hasText:'新しい通常目標'})).toHaveCount(1);
+});
+
 test('release smoke: completed strategy view filters by completion and map and persists on reload', async ({ page }) => {
   await boot(page);
   await page.evaluate(()=>{
