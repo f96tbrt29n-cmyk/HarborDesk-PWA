@@ -95,8 +95,28 @@ function hdMapEquipRenderHost(){
   if(fallback&&!document.querySelector('[data-map-tab="gear"]'))return fallback;
   return normal||fallback||document.getElementById('hdMapEquipRecommend');
 }
+let hdMapEquipPressedPointer=null;
+const hdMapEquipPendingRenders=new Map();
+function hdMapEquipFinishPress(press,delay=0){
+  if(!press)return;
+  setTimeout(()=>{
+    if(hdMapEquipPressedPointer!==press)return;
+    hdMapEquipPressedPointer=null;
+    const pending=[...hdMapEquipPendingRenders];hdMapEquipPendingRenders.clear();
+    for(const [host,map] of pending)if(host.isConnected)hdRenderMapEquipmentRecommendationsInto(host,map);
+  },delay);
+}
+document.addEventListener('pointerdown',e=>{
+  const host=e.target.closest?.('#hdMapEquipRecommend');
+  if(host&&e.button===0&&e.isPrimary!==false)hdMapEquipPressedPointer={id:e.pointerId,host};
+},true);
+window.addEventListener('pointerup',e=>{if(hdMapEquipPressedPointer?.id===e.pointerId)hdMapEquipFinishPress(hdMapEquipPressedPointer,500)},true);
+window.addEventListener('pointercancel',e=>{if(hdMapEquipPressedPointer?.id===e.pointerId)hdMapEquipFinishPress(hdMapEquipPressedPointer)},true);
+document.addEventListener('click',()=>hdMapEquipFinishPress(hdMapEquipPressedPointer),true);
+window.addEventListener('blur',()=>hdMapEquipFinishPress(hdMapEquipPressedPointer));
 function hdRenderMapEquipmentRecommendationsInto(host,map){
   if(!host||!map)return false;
+  if(hdMapEquipPressedPointer?.host===host){hdMapEquipPendingRenders.set(host,map);return false}
   try{
     host.innerHTML=hdMapEquipRecommendationsHtml(map);
     return !!host.querySelector('.hd-map-equip-recommend');

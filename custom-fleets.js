@@ -113,7 +113,26 @@ function cfFleetCardHtml(map,item){
 
 }
 
+// Image and inventory events can arrive while a fleet control is being tapped.
+// Defer replacement until the click has reached the delegated handlers.
+let cfPressedPointer=null,cfRenderPending=false,cfPendingMap='';
+function cfFinishPress(press,delay=0){
+  if(!press)return;
+  setTimeout(()=>{
+    if(cfPressedPointer!==press)return;
+    cfPressedPointer=null;
+    if(cfRenderPending){const map=cfPendingMap;cfRenderPending=false;renderCustomFleets(map)}
+  },delay);
+}
+document.addEventListener('pointerdown',e=>{
+  if(e.button===0&&e.isPrimary!==false&&e.target.closest?.('#customFleetPanel'))cfPressedPointer={id:e.pointerId};
+},true);
+window.addEventListener('pointerup',e=>{if(cfPressedPointer?.id===e.pointerId)cfFinishPress(cfPressedPointer,500)},true);
+window.addEventListener('pointercancel',e=>{if(cfPressedPointer?.id===e.pointerId)cfFinishPress(cfPressedPointer)},true);
+document.addEventListener('click',()=>cfFinishPress(cfPressedPointer),true);
+window.addEventListener('blur',()=>cfFinishPress(cfPressedPointer));
 function renderCustomFleets(map){
+  if(cfPressedPointer){cfRenderPending=true;cfPendingMap=map;return}
   const card=document.getElementById('selectedMapCard');if(!card)return;
   let host=document.getElementById('customFleetPanel');
   if(!host){host=document.createElement('section');host.id='customFleetPanel';host.className='custom-fleet-section';card.appendChild(host)}

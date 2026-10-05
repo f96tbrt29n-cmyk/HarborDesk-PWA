@@ -55,12 +55,13 @@ let hdMSNPressedPointer=null,hdMSNRenderPending=false;
 const hdMSNContent=new WeakMap();
 function hdMSNSetContent(el,html){if(hdMSNContent.get(el)===html)return;el.innerHTML=html;hdMSNContent.set(el,html)}
 document.addEventListener('pointerdown',e=>{if(e.button===0&&e.target.closest?.('#mapStrategyNavigator'))hdMSNPressedPointer={id:e.pointerId}},true);
-function hdMSNReleasePointer(e){
- const press=hdMSNPressedPointer;if(press===null||e.pointerId!==press.id)return;
- setTimeout(()=>{if(hdMSNPressedPointer!==press)return;hdMSNPressedPointer=null;if(hdMSNRenderPending)hdMSNRender()},0);
+function hdMSNFinishPress(press,delay=0){
+ if(press===null)return;
+ setTimeout(()=>{if(hdMSNPressedPointer!==press)return;hdMSNPressedPointer=null;if(hdMSNRenderPending)hdMSNRender()},delay);
 }
-window.addEventListener('pointerup',hdMSNReleasePointer,true);
-window.addEventListener('pointercancel',hdMSNReleasePointer,true);
+window.addEventListener('pointerup',e=>{if(hdMSNPressedPointer?.id===e.pointerId)hdMSNFinishPress(hdMSNPressedPointer,500)},true);
+window.addEventListener('pointercancel',e=>{if(hdMSNPressedPointer?.id===e.pointerId)hdMSNFinishPress(hdMSNPressedPointer)},true);
+document.addEventListener('click',()=>hdMSNFinishPress(hdMSNPressedPointer),true);
 window.addEventListener('blur',()=>{hdMSNPressedPointer=null;if(hdMSNRenderPending)hdMSNRender()});
 function hdMSNRender(){
  if(hdMSNPressedPointer!==null){hdMSNRenderPending=true;return}

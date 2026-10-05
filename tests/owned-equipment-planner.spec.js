@@ -327,3 +327,48 @@ test('verified route source links reject executable URLs and appear in the fleet
  await boot(page);await page.waitForFunction(()=>typeof hdPlanSourceHtml==='function'&&typeof hdFleetHtml==='function');
  const r=await page.evaluate(()=>{selectedWorld='1';selectedMap='1-2';hdMapTabSave('1-2','fleet');renderMapPicker();return {bad:hdPlanSourceHtml({source:'javascript:alert(1)'}),none:hdPlanSourceHtml({}),source:document.querySelector('#selectedMapCard a[href*="zekamashi"]')?.getAttribute('href')}});expect(r.bad).toBe('');expect(r.none).toBe('');expect(r.source).toBe('https://zekamashi.net/kancolle-kouryaku/1-2/');
 });
+
+test('owned equipment search survives a fleet refresh between press and release',async({page})=>{
+ await prepare(page,[{name:'33号水上電探',count:1,star:0}],[{kind:'電探',label:'電探',minCount:2}]);
+ await page.evaluate(()=>{selectedMap='1-1';renderMapPicker();hdWSShowElement('guide',true);hdMapActivateTab('mine')});
+ const card=page.locator('#customFleetPanel [data-cf-id="oc-test"]'),button=card.locator('[data-hd-oc-search]');
+ await button.scrollIntoViewIfNeeded();await expect(button).toBeVisible();
+ const box=await button.boundingBox();await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();
+ await page.evaluate(()=>{window.dispatchEvent(new Event('hd:equipment-changed'));window.dispatchEvent(new Event('hd:ship-images-ready'))});
+ await page.mouse.up();await expect(card.locator('.hd-oc-result')).toBeVisible();await expect(card.locator('.hd-oc-shortage')).toContainText('配備不足 1個');
+});
+
+for(const surface of ['gear','navigator'])test(`owned equipment search accepts a mobile tap during inventory refresh in ${surface}`,async({page})=>{
+ await prepare(page,[{name:'33号水上電探',count:1,star:0}],[{kind:'電探',label:'電探',minCount:2}]);
+ await page.evaluate(surface=>{
+  if(surface==='gear'){selectedMap='1-1';renderMapPicker();hdWSShowElement('guide',true);hdMapActivateTab('gear');hdRenderMapEquipmentRecommendations()}
+ },surface);
+ const panel=page.locator(surface==='gear'?'#hdMapEquipRecommend .hd-oc-panel':'#mapStrategyNavigator .hd-oc-panel');
+ await expect(panel).toBeVisible();
+ await page.evaluate(()=>{
+  document.addEventListener('pointerdown',function refresh(e){
+   if(!e.target.closest('[data-hd-oc-search]'))return;
+   document.removeEventListener('pointerdown',refresh);
+   localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'33号水上電探',count:2,star:0}]));
+   window.dispatchEvent(new Event('hd:equipment-changed'));
+  });
+ });
+ await panel.locator('[data-hd-oc-search]').tap();
+ await expect(panel.locator('.hd-oc-result')).toContainText('装備目安は充足');await expect(panel.locator('.hd-oc-shortage')).toHaveCount(0);
+ await panel.locator('[data-hd-oc-apply]').tap();
+ expect(await page.evaluate(()=>loadCustomFleets()['1-1'][0].ships.flatMap(s=>s.gear.split(' / ')).filter(x=>x==='33号水上電探').length)).toBe(2);
+});
+
+test('cancelled fleet press flushes a pending inventory refresh and leaves search usable',async({page})=>{
+ await prepare(page,[{name:'33号水上電探',count:1,star:0}],[{kind:'電探',label:'電探',minCount:2}]);
+ await page.evaluate(()=>{selectedMap='1-1';renderMapPicker();hdWSShowElement('guide',true);hdMapActivateTab('mine')});
+ const card=page.locator('#customFleetPanel [data-cf-id="oc-test"]');
+ await page.evaluate(()=>{
+  const button=document.querySelector('#customFleetPanel [data-hd-oc-search]');
+  button.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:99,button:0,isPrimary:true}));
+  localStorage.setItem('harbordesk-equipment-v1','[]');window.dispatchEvent(new Event('hd:equipment-changed'));
+  window.dispatchEvent(new PointerEvent('pointercancel',{pointerId:99}));
+ });
+ await expect.poll(()=>page.evaluate(()=>cfPressedPointer===null&&!cfRenderPending)).toBe(true);
+ await card.locator('[data-hd-oc-search]').tap();await expect(card.locator('.hd-oc-shortage')).toContainText('配備不足 2個');
+});
