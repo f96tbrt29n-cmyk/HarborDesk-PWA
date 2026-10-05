@@ -33,19 +33,29 @@ function hdOCBuild(c){
  return {plan,inventory,slots,unknown};
 }
 function hdOCAssigned(plan){return hdFEAssigned(plan).filter(x=>x.name)}
+function hdOCSpeedPart(item){
+ const meta=hdFOItemMeta(item),name=item?.name||meta.name,turbine=/タービン/.test(name)||(meta.tags||[]).some(x=>String(x).includes('タービン'));
+ return turbine?'turbine':hdFOItemMatches('高速化',item)?'boiler':'';
+}
+function hdOCItemMatches(kind,item){return kind==='speed-turbine'?hdOCSpeedPart(item)==='turbine':kind==='speed-boiler'?hdOCSpeedPart(item)==='boiler':hdFOItemMatches(kind,item)}
 function hdOCMeasure(plan,requirements,unknown=[]){
  const items=hdOCAssigned(plan),air=hdFEAirCheck(plan.map,hdFEAir(items)),scouting=hdFEScouting(plan,items);
- const goals=requirements.map(r=>{const m=hdFEKindCount(r.kind,items),count=r.kind==='高速化'?plan.ships.reduce((n,ship)=>n+hdFEKindCount('高速化',items.filter(x=>x.ship===ship.ship)).count,0):Number(m.count)||0;return {...r,count,ok:count>=r.minCount,detail:`配備 ${count} / 目安 ${r.minCount}`,ratio:Math.min(1,count/r.minCount)}});
+ const goals=requirements.map(r=>{const m=hdFEKindCount(r.kind,items),count=r.kind==='高速化'?plan.ships.reduce((n,ship)=>n+Number(hdFEKindCount('高速化',hdOCAssigned({ships:[ship]})).count>0),0):Number(m.count)||0;return {...r,count,ok:count>=r.minCount,detail:r.kind==='高速化'?`同じ艦の標準セット ${count} / 目安 ${r.minCount}組`:`配備 ${count} / 目安 ${r.minCount}`,ratio:Math.min(1,count/r.minCount)}});
  if(air.enemy)goals.push({kind:'air-value',label:'制空優勢の目安',count:air.ours,minCount:Math.ceil(air.enemy*1.5),ok:air.status==='ready',ratio:Math.min(1,air.ours/Math.ceil(air.enemy*1.5)),detail:`基礎制空 ${air.ours} / 目安 ${Math.ceil(air.enemy*1.5)}（あと ${Math.max(0,Math.ceil(air.enemy*1.5)-air.ours)}）`});
  if(scouting.available){const target=Math.max(...scouting.checks.map(x=>Number(x.safe)||0));goals.push({kind:'los-value',label:'索敵分岐の安全域',count:scouting.score,minCount:target,ok:scouting.status==='ready',ratio:Math.max(0,Math.min(1,scouting.score/Math.max(1,target))),detail:`33式 ${scouting.score.toFixed(2)} / 安全域 ${target}（あと ${Math.max(0,target-scouting.score).toFixed(2)}）`})}
  // A global turbine/can total does not prove that a low-speed ship is sped up.
  const route=hdFERoute(plan),speedRequired=plan.routeInfo?.speedRequired;
  if(speedRequired)for(const row of hdFERouteShips(plan).filter(x=>x.speed==='低速')){
-  const own=items.filter(x=>x.ship===row.ship.ship),t=own.some(x=>/タービン/.test(x.name)),b=own.some(x=>!/タービン/.test(x.name)&&/缶$/.test(x.name));
+  const own=hdOCAssigned({ships:[row.ship]}),t=own.some(x=>hdOCSpeedPart(x)==='turbine'),b=own.some(x=>hdOCSpeedPart(x)==='boiler');
   goals.push({kind:'speed-ship',label:`${row.ship.ship} の高速化セット`,count:Number(t)+Number(b),minCount:2,ok:t&&b,ratio:(Number(t)+Number(b))/2,detail:'同じ艦にタービンと缶が必要。特殊な高速化条件はルートで確認'});
  }
+ const speedSets=Math.max(0,...requirements.filter(x=>x.kind==='高速化').map(x=>Number(x.minCount)||0),speedRequired?hdFERouteShips(plan).filter(x=>x.speed==='低速').length:0);
+ if(speedSets)for(const [part,label] of [['turbine','高速化用タービン'],['boiler','高速化用の缶']]){
+  const count=items.filter(x=>hdOCSpeedPart(x)===part).length;
+  goals.push({kind:'speed-'+part,label,count,minCount:speedSets,ok:count>=speedSets,ratio:Math.min(1,count/speedSets),detail:`配備 ${count} / 標準セットの目安 ${speedSets}個。同じ艦でタービンと缶を組み合わせてね`});
+ }
  const manual=[...unknown];for(const row of hdFLRows())if(Number(row.count)>0&&!hdFEFind(row.name))manual.push(`装備性能が未登録：${row.name}。台帳の装備名を確認`);
- if(speedRequired&&hdFERouteShips(plan).some(x=>x.speed==='低速'))manual.push('高速化後の実際の速力は艦ごとの条件を確認');
+ if(speedRequired)manual.push('高速化・高速+などの実際の速力と必要な缶の種類・改修値は艦ごとに確認');
  if(air.status==='manual')manual.push(`制空：${air.detail}`);
  if(!scouting.available)manual.push(`索敵：${scouting.detail}`);
  if(route.requirements?.some(x=>!x.ok))manual.push(`艦種の変更が必要：${route.detail}`);
@@ -92,11 +102,14 @@ function hdOCSearch(c){
   if(candidates[0]){ship.items[slot.index]=hdOCEquipment(candidates[0],slot);usage[candidates[0].key]=(usage[candidates[0].key]||0)+1;}
  }
  best.measure=hdOCMeasure(best.plan,requirements,unknown);
+ const speedNeed=best.measure.goals.find(x=>x.kind==='speed-turbine')?.minCount||0;
  const shortages=best.measure.goals.filter(x=>!x.ok).map(goal=>{
   const kind=goal.kind==='air-value'?'制空':goal.kind==='los-value'?'索敵':goal.kind==='speed-ship'?'高速化':goal.kind;
-  const candidates=hdFLCatalog().filter(x=>hdFOItemMatches(kind,x)&&slots.some(slot=>hdOCCompatible(slot,{item:x,star:0}))).sort((a,b)=>hdOCScore(kind,b)-hdOCScore(kind,a)).slice(0,3).map(x=>x.name);
-  const owned=inventory.filter(x=>hdFOItemMatches(kind,x)).reduce((n,x)=>n+x.count,0);
-  return {...goal,goalKind:goal.kind,kind,owned,placement:owned>=goal.minCount&&!['air-value','los-value'].includes(goal.kind),shortfall:Math.max(0,goal.minCount-goal.count),candidates};
+  const compatible=hdFLCatalog().filter(x=>hdOCItemMatches(kind,x)&&slots.some(slot=>hdOCCompatible(slot,{item:x,star:0}))).sort((a,b)=>hdOCScore(kind,b)-hdOCScore(kind,a));
+  const candidates=(kind==='高速化'?['turbine','boiler'].flatMap(part=>compatible.filter(x=>hdOCSpeedPart(x)===part).slice(0,1)):compatible.slice(0,3)).map(x=>x.name);
+  const ownedCount=part=>inventory.filter(x=>hdOCSpeedPart(x)===part).reduce((n,x)=>n+x.count,0);
+  const owned=kind==='高速化'?Math.min(ownedCount('turbine'),ownedCount('boiler')):inventory.filter(x=>hdOCItemMatches(kind,x)).reduce((n,x)=>n+x.count,0);
+  return {...goal,goalKind:goal.kind,kind,owned,placement:owned>=(kind==='高速化'?Math.max(1,speedNeed):goal.minCount)&&!['air-value','los-value'].includes(goal.kind),shortfall:Math.max(0,goal.minCount-goal.count),candidates};
  });
  best.plan.ships.forEach(s=>{s.items=s.items.filter(x=>x.name)});
  return {...best,shortages,examined,signature:hdOCSignature(c),fleetId:c.fleet.id};
@@ -134,7 +147,7 @@ function hdOCUpdateProcurement(c,result){
   const gap=hdOCStockGap(shortage);if(!gap)return [item];
   // Keep a previously chosen candidate even when its score drops outside the top three.
   const meta=hdFLCatalog().find(x=>x.name===item.target),slots=hdOCBuild(c).slots;
-  if(!meta||!hdFOItemMatches(goal.kind,meta)||!slots.some(slot=>hdOCCompatible(slot,{item:meta,star:0})))return [item];
+  if(!meta||!hdOCItemMatches(goal.kind,meta)||!slots.some(slot=>hdOCCompatible(slot,{item:meta,star:0})))return [item];
   const needed=hdPLOwnedCount(item.target)+gap;
   if(item.needed===needed&&item.ownedPlanRoute===c.index)return [item];
   updated++;return [{...item,needed,ownedPlanRoute:c.index}];
@@ -146,7 +159,7 @@ function hdOCPanel(map,fleetId='',route=''){
  if(typeof hdFLInventory!=='function')return '';
  const c=hdOCContext(map,fleetId,route),key=`${map}:${c.fleet?.id||''}:${c.index}`,cached=HD_OC_CACHE.get(key),result=cached&&cached.signature===hdOCSignature(c)?cached:null,esc=hdFEEsc;
  const attrs=`data-hd-oc-map="${esc(map)}" data-hd-oc-fleet="${esc(c.fleet?.id||'')}" data-hd-oc-route="${c.index}"`;
- return `<section class="hd-oc-panel"><strong>手持ち装備で攻略条件を満たす</strong><p>${c.fleet?`対象：${esc(c.fleet.name||'保存編成')}。所持数・改修値・装備可否・空きスロットから配備案を探します。他の艦の装備も移し替える前提です。`:'先に自分用編成を保存・選択すると、艦ごとに手持ち装備を配備できます。'}</p><button type="button" class="primary small" data-hd-oc-search ${attrs} ${c.fleet?'':'disabled'}>手持ちで条件を満たす配備を探す</button><button type="button" class="ghost small" data-hd-oc-select-fleet ${attrs}>艦隊を選ぶ・保存する</button>${result?`<div class="hd-oc-result"><b>${!result.measure.goals.length?'この海域は装備条件を自動判定できません':result.measure.complete?(result.measure.manual.length?'登録済み装備目安は充足・確認項目あり':'登録済みの装備条件を充足'):'配備案に未充足の条件あり'}</b>${result.measure.goals.map(g=>`<div class="hd-oc-goal ${g.ok?'ready':'missing'}"><strong>${esc(g.label)}：${g.ok?'充足':'不足'}</strong><span>${esc(g.detail)}</span></div>`).join('')}${result.shortages.map((g,index)=>`<div class="hd-oc-shortage"><b>${esc(g.label)}に必要なもの</b><p>${esc(g.detail)}。${['制空','索敵'].includes(g.kind)&&['air-value','los-value'].includes(g.goalKind||g.kind)?'性能・搭載枠を増やす必要あり':`配備不足 ${Math.ceil(g.shortfall)}個 / 同種の所持 ${g.owned}個`}。${g.placement?'所持数は足りています。装備可否・配備枠・他の条件との両立を見直してね。':''}${g.candidates.length?'装備候補：'+esc(g.candidates.join('、')):'この編成に載せられる候補なし。艦種や装備枠を見直してね。'}</p><button type="button" class="ghost small" data-hd-oc-acquire="${esc(g.kind)}" ${attrs}>入手方法を見る</button>${hdOCProcurementHtml(g,index,attrs)}</div>`).join('')}<div class="hd-oc-ships">${result.plan.ships.map(s=>`<p><b>${esc(s.ship)}</b><span>${esc([...s.items.map(x=>`第${x.slotIndex+1}：${x.name}${x.star?' ★'+x.star:''}`),...(s.expansion?[`増設：${s.expansion.name}${s.expansion.star?' ★'+s.expansion.star:''}`]:[])].join(' / ')||'配備なし')}</span></p>`).join('')}</div>${result.measure.manual.length?`<div class="hd-oc-manual"><b>別途確認が必要</b>${result.measure.manual.map(x=>`<p>${esc(x)}</p>`).join('')}</div>`:''}${hdOCProcurementUpdateHtml(c,result,attrs)}<button type="button" class="ghost small" data-hd-oc-apply ${attrs}>${result.measure.complete?'この配備を保存編成に反映':'不足を残した配備案を保存'}</button><small>登録済み目安・制空は熟練度なしの推定。探索で見つからない組み合わせもあります。保存後はゲーム側の装備を変更し、基地航空隊・ルート条件も確認してね。</small></div>`:''}</section>`;
+ return `<section class="hd-oc-panel"><strong>手持ち装備で攻略条件を満たす</strong><p>${c.fleet?`対象：${esc(c.fleet.name||'保存編成')}。所持数・改修値・装備可否・空きスロットから配備案を探します。他の艦の装備も移し替える前提です。`:'先に自分用編成を保存・選択すると、艦ごとに手持ち装備を配備できます。'}</p><button type="button" class="primary small" data-hd-oc-search ${attrs} ${c.fleet?'':'disabled'}>手持ちで条件を満たす配備を探す</button><button type="button" class="ghost small" data-hd-oc-select-fleet ${attrs}>艦隊を選ぶ・保存する</button>${result?`<div class="hd-oc-result"><b>${!result.measure.goals.length?'この海域は装備条件を自動判定できません':result.measure.complete?(result.measure.manual.length?'登録済み装備目安は充足・確認項目あり':'登録済みの装備条件を充足'):'配備案に未充足の条件あり'}</b>${result.measure.goals.map(g=>`<div class="hd-oc-goal ${g.ok?'ready':'missing'}"><strong>${esc(g.label)}：${g.ok?'充足':'不足'}</strong><span>${esc(g.detail)}</span></div>`).join('')}${result.shortages.map((g,index)=>`<div class="hd-oc-shortage"><b>${esc(g.label)}に必要なもの</b><p>${esc(g.detail)}。${g.kind==='高速化'?(g.goalKind==='speed-ship'?'この艦へのタービン・缶の配備を確認':`同じ艦のセットがあと ${Math.ceil(g.shortfall)}組。タービン・缶の内訳を確認してね`):['制空','索敵'].includes(g.kind)&&['air-value','los-value'].includes(g.goalKind||g.kind)?'性能・搭載枠を増やす必要あり':`配備不足 ${Math.ceil(g.shortfall)}個 / 同種の所持 ${g.owned}個`}。${g.placement?'所持数は足りています。装備可否・配備枠・他の条件との両立を見直してね。':''}${g.candidates.length?'装備候補：'+esc(g.candidates.join('、')):'この編成に載せられる候補なし。艦種や装備枠を見直してね。'}</p><button type="button" class="ghost small" data-hd-oc-acquire="${esc(g.kind.startsWith('speed-')?'高速化':g.kind)}" ${attrs}>入手方法を見る</button>${hdOCProcurementHtml(g,index,attrs)}</div>`).join('')}<div class="hd-oc-ships">${result.plan.ships.map(s=>`<p><b>${esc(s.ship)}</b><span>${esc([...s.items.map(x=>`第${x.slotIndex+1}：${x.name}${x.star?' ★'+x.star:''}`),...(s.expansion?[`増設：${s.expansion.name}${s.expansion.star?' ★'+s.expansion.star:''}`]:[])].join(' / ')||'配備なし')}</span></p>`).join('')}</div>${result.measure.manual.length?`<div class="hd-oc-manual"><b>別途確認が必要</b>${result.measure.manual.map(x=>`<p>${esc(x)}</p>`).join('')}</div>`:''}${hdOCProcurementUpdateHtml(c,result,attrs)}<button type="button" class="ghost small" data-hd-oc-apply ${attrs}>${result.measure.complete?'この配備を保存編成に反映':'不足を残した配備案を保存'}</button><small>登録済み目安・制空は熟練度なしの推定。探索で見つからない組み合わせもあります。保存後はゲーム側の装備を変更し、基地航空隊・ルート条件も確認してね。</small></div>`:''}</section>`;
 }
 function hdOCRefresh(){if(typeof hdRenderMapEquipmentRecommendations==='function')hdRenderMapEquipmentRecommendations();if(typeof hdMSNRender==='function')hdMSNRender()}
 document.addEventListener('click',e=>{
