@@ -372,3 +372,22 @@ test('cancelled fleet press flushes a pending inventory refresh and leaves searc
  await expect.poll(()=>page.evaluate(()=>cfPressedPointer===null&&!cfRenderPending)).toBe(true);
  await card.locator('[data-hd-oc-search]').tap();await expect(card.locator('.hd-oc-shortage')).toContainText('配備不足 2個');
 });
+
+test('owned equipment asynchronous search lets the page respond while retaining its result',async({page})=>{
+ await prepare(page,[{name:'33号水上電探',count:8,star:0},{name:'発煙装置(煙幕)',count:8,star:0}],[{kind:'電探',label:'電探',minCount:8},{kind:'煙幕',label:'煙幕',minCount:8}]);
+ const r=await page.evaluate(async()=>{
+  const c=hdOCContext('1-1','oc-test',0),expected=hdOCSearch(c);let ticks=0;
+  const timer=setInterval(()=>ticks++,0);try{const result=await hdOCSearchAsync(c);return {ticks,examined:result.examined,usage:hdFOAssignedUsage(result.plan),expected:hdFOAssignedUsage(expected.plan),goals:result.measure.goals,expectedGoals:expected.measure.goals}}finally{clearInterval(timer)}
+ });
+ expect(r.examined).toBeGreaterThan(50);expect(r.ticks).toBeGreaterThan(1);expect(r.usage).toEqual(r.expected);expect(r.goals).toEqual(r.expectedGoals);
+});
+
+test('owned equipment asynchronous search rejects a changed inventory before caching an obsolete proposal',async({page})=>{
+ await prepare(page,[{name:'33号水上電探',count:8,star:0}],[{kind:'電探',label:'電探',minCount:8}]);
+ const r=await page.evaluate(async()=>{
+  const promise=hdOCSearchAsync(hdOCContext('1-1','oc-test',0));setTimeout(()=>localStorage.setItem('harbordesk-equipment-v1','[]'),0);
+  try{await promise;return 'accepted'}catch(e){return e.code}
+ });expect(r).toBe('HD_OC_STALE');
+ const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await panel.locator('[data-hd-oc-search]').tap();
+ await expect(panel.locator('.hd-oc-shortage')).toContainText('配備不足 8個');
+});
