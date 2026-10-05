@@ -105,7 +105,7 @@ function openCustomFleetDialog(item=null){
 
 function cfFleetCardHtml(map,item){
     const proposal=typeof hdOCInlineResult==='function'?hdOCInlineResult(map,item.id):null;let proposalIndex=0;
-    const rows=(item.ships||[]).map((s,i)=>{if(!s.ship&&!s.gear)return '';const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(cfShipRef(s),'custom-fleet-thumb'):'';return `<div class="custom-fleet-saved-row"><span>${i+1}</span>${image}<div><b>${cfEsc(s.ship||'未入力')}</b><small>${cfEsc(s.gear||'装備メモなし')}</small>${typeof hdOCInlineShipHtml==='function'?hdOCInlineShipHtml(proposal,proposalIndex++):''}</div></div>`}).join('');
+    const rows=(item.ships||[]).map((s,i)=>{if(!s.ship&&!s.gear)return '';const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(cfShipRef(s),'custom-fleet-thumb'):'';return `<div class="custom-fleet-saved-row"><span>${i+1}</span>${image}<div><b>${cfEsc(s.ship||'未入力')}</b><small>${cfEsc(s.gear||'装備メモなし')}</small>${s.ship&&typeof hdFSSavedLevelText==='function'?`<small class="hd-fs-level">${cfEsc(hdFSSavedLevelText(s,map))}</small>`:''}${typeof hdOCInlineShipHtml==='function'?hdOCInlineShipHtml(proposal,proposalIndex++):''}</div></div>`}).join('');
     const linked=item.source==='kancolle-import'&&Number(item.sourceDeckId)>0,detached=item.detachedFromSource==='kancolle-import';
     const sourceMeta=linked?`<span class="custom-fleet-source sync">ゲーム同期・第${Number(item.sourceDeckId)}艦隊・自動追従</span>`:detached?'<span class="custom-fleet-source detached">手動編成・ゲーム同期から切り離し</span>':'<span class="custom-fleet-source manual">手動編成</span>';
     const relink=detached&&Number(item.detachedSourceDeckId)>0?`<button class="ghost small" data-cf-relink="${item.id}">ゲーム同期に戻す</button>`:'';

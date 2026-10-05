@@ -10734,3 +10734,25 @@ test('release smoke: persistent sync receipt rejects replay and stale data but a
   expect(await receive(mixed)).toContain('古い同期データ');
   expect(await snapshot()).toEqual(newer);
 });
+
+test('release smoke: fleet suggestions select ships near the recommended level and expose gaps',async({page})=>{
+ await boot(page,[]);await page.waitForFunction(()=>typeof hdFSLevelTarget==='function');
+ const data=await page.evaluate(()=>{
+  const rows=[{id:'near',name:'夕立改二',type:'駆逐艦',level:50,tags:[]},{id:'close',name:'時雨改二',type:'駆逐艦',level:53,tags:[]},{id:'high',name:'吹雪改二',type:'駆逐艦',level:99,tags:['主力']},{id:'below',name:'綾波改二',type:'駆逐艦',level:49,tags:[]}];
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(rows));const first=hdFSGenerate('3-2',{ships:'駆逐2',name:'近いLv'},0);
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(rows.filter(x=>x.level<50).concat([{id:'lower',name:'睦月',type:'駆逐艦',level:30,tags:[]},{id:'unknown',name:'如月',type:'駆逐艦',level:0,tags:[]}])));
+  const below=hdFSGenerate('3-2',{ships:'駆逐1'},0),fallback=hdFSLevelTarget('未登録');
+  return {ids:first.slots.map(x=>x.profile.row.id),html:hdFSSuggestionHtml(first),below:below.slots[0].profile.row.id,gap:hdFSShipHtml(below.slots[0],0),unknown:hdFSLevelText(0,first.info.levelTarget),fallback};
+ });
+ expect(data.ids).toEqual(['near','close']);expect(data.html).toContain('推奨帯内');expect(data.html).toContain('平均Lv50〜65');expect(data.below).toBe('below');expect(data.gap).toContain('あと 1Lv');expect(data.unknown).toContain('Lv未確認');expect(data.fallback.low).toBe(0);
+});
+
+test('release smoke: level proximity respects ship condition and saved fleet level text',async({page})=>{
+ await boot(page,[]);await page.waitForFunction(()=>typeof hdFSSavedLevelText==='function');
+ const result=await page.evaluate(()=>{
+  const rows=[{id:'tired',name:'夕立改二',type:'駆逐艦',level:50,gameCond:15,tags:[]},{id:'ready',name:'時雨改二',type:'駆逐艦',level:54,gameCond:49,tags:[]},{id:'broken',name:'吹雪改二',type:'駆逐艦',level:51,gameHp:1,gameMaxHp:20,tags:[]}];
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(rows));const r=hdFSGenerate('3-2',{ships:'駆逐1'},0);
+  return {id:r.slots[0].profile.row.id,text:hdFSSavedLevelText({ship:'時雨改二'},'3-2'),missing:hdFSSavedLevelText({ship:'未登録艦'},'3-2'),oldBest:hdFSPickBest(rows.map(x=>hdFSProfile(x)),new Set(),null,{preferred:[],speedRequired:false,speedPreferred:false},[]).row.id,exact:(()=>{localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{id:'dup-high',name:'夕立改二',level:99},{id:'dup-near',name:'夕立改二',level:52}]));return hdFSSavedLevelText({ship:'夕立改二',rosterId:'dup-near'},'3-2')})()};
+ });
+ expect(result.id).toBe('ready');expect(result.text).toContain('Lv.54 / 推奨帯 Lv50〜65');expect(result.missing).toContain('Lv未確認');expect(result.oldBest).toBe('ready');expect(result.exact).toContain('Lv.52 / 推奨帯');
+});
