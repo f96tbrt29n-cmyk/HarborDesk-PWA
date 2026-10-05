@@ -264,7 +264,7 @@ function hdMapDropWikiUrl(map){return 'https://wikiwiki.jp/kancolle/%E5%87%BA%E6
 function hdMapDropHuntActive(ship,map,node){return hdDropHunts().some(x=>x.ship===ship&&x.map===map&&x.node===node&&!x.obtained)}
 function hdMapDropShipHtml(ship,map,node,featured){
  const owned=hdDropOwned(ship),active=hdMapDropHuntActive(ship,map,node);
- return `<button type="button" class="hd-map-drop-chip${featured?' featured':''}${owned?' owned':''}${active?' hunting':''}" data-hd-map-drop-ship="${hdDropEsc(ship)}" data-hd-map-drop-map="${hdDropEsc(map)}" data-hd-map-drop-node="${hdDropEsc(node)}" data-hd-map-drop-owned="${owned?'1':'0'}" data-hd-map-drop-featured="${featured?'1':'0'}" title="${active?'掘り目標に追加済み':'タップで掘り目標に追加'}"><span>${hdDropEsc(ship)}</span>${featured?'<em>注目</em>':''}${owned?'<i>所持</i>':''}${active?'<b>掘り中</b>':''}</button>`;
+ return `<button type="button" class="hd-map-drop-chip${featured?' featured':''}${owned?' owned':''}${active?' hunting':''}" data-hd-map-drop-ship="${hdDropEsc(ship)}" data-hd-map-drop-map="${hdDropEsc(map)}" data-hd-map-drop-node="${hdDropEsc(node)}" data-hd-map-drop-owned="${owned?'1':'0'}" data-hd-map-drop-featured="${featured?'1':'0'}" aria-pressed="${active?'true':'false'}" title="${active?'タップで掘り目標を解除':'タップで掘り目標に追加'}"><span>${hdDropEsc(ship)}</span>${featured?'<em>注目</em>':''}${owned?'<i>所持</i>':''}${active?'<b>掘り中</b>':''}</button>`;
 }
 function hdMapDropHtml(map){
  const data=HD_MAP_DROP_DATA[map];
@@ -277,7 +277,7 @@ function hdMapDropHtml(map){
   return `<article class="hd-map-drop-node ${n.kind==='route'?'route':'boss'}"><div class="hd-map-drop-node-head"><div><strong>${hdDropEsc(n.node)}</strong><span>${hdDropEsc(n.rank||'S中心')}</span></div><b>${ships.length} / ${allShips.length}隻</b></div><div class="hd-map-drop-ships">${ships.map(ship=>hdMapDropShipHtml(ship,map,n.node,featured.has(ship))).join('')}</div>${n.note?`<p>${hdDropEsc(n.note)}</p>`:''}</article>`;
  }).filter(Boolean).join('');
  const filters=[['all','すべて'],['missing','未所持'],['featured','注目艦']];
- return `<section class="hd-map-drop-panel"><div class="hd-map-drop-intro"><div><div class="eyebrow">MAP DROPS</div><h4>${hdDropEsc(map)} ドロップ艦娘</h4><p>ボス・主要マスで確認されている主なドロップ。艦名をタップすると掘り目標へ追加できるよ。</p></div><a class="guide-link" href="${hdMapDropWikiUrl(map)}" target="_blank" rel="noopener">Wiki全表 ↗</a></div><div class="hd-map-drop-summary"><div class="hd-map-drop-progress"><div><strong>収録艦 所持率</strong><b>${stats.owned} / ${stats.total}隻・${stats.rate}%</b></div><div class="hd-map-drop-progress-bar" aria-label="収録艦所持率 ${stats.rate}%"><span style="width:${stats.rate}%"></span></div></div><div class="hd-map-drop-summary-stats"><span>未所持 <b>${stats.missing}</b></span><span>注目艦 <b>${stats.featured}</b></span></div></div><div class="hd-map-drop-view" role="group" aria-label="ドロップ表示フィルタ">${filters.map(([id,label])=>`<button type="button" class="ghost small ${view===id?'active':''}" data-hd-map-drop-view="${id}" data-hd-map-drop-view-map="${hdDropEsc(map)}">${label}</button>`).join('')}</div>${data.note?`<div class="hd-drop-warning">${hdDropEsc(data.note)}</div>`:''}<div class="hd-map-drop-nodes">${nodeHtml||'<div class="empty">この条件に合うドロップ艦はいないよ。</div>'}</div><div class="hd-map-drop-foot">所持率はこのタブに収録した艦娘を基準に計算｜確認 ${HD_MAP_DROP_CHECKED}｜ドロップテーブルは告知なく変わる場合があるため、限定艦を狙う前は最新Wikiも確認してね。</div></section>`;
+ return `<section class="hd-map-drop-panel"><div class="hd-map-drop-intro"><div><div class="eyebrow">MAP DROPS</div><h4>${hdDropEsc(map)} ドロップ艦娘</h4><p>ボス・主要マスで確認されている主なドロップ。艦名をタップして掘り目標へ追加。掘り中の艦名をもう一度タップすると解除できるよ。</p></div><a class="guide-link" href="${hdMapDropWikiUrl(map)}" target="_blank" rel="noopener">Wiki全表 ↗</a></div><div class="hd-map-drop-summary"><div class="hd-map-drop-progress"><div><strong>収録艦 所持率</strong><b>${stats.owned} / ${stats.total}隻・${stats.rate}%</b></div><div class="hd-map-drop-progress-bar" aria-label="収録艦所持率 ${stats.rate}%"><span style="width:${stats.rate}%"></span></div></div><div class="hd-map-drop-summary-stats"><span>未所持 <b>${stats.missing}</b></span><span>注目艦 <b>${stats.featured}</b></span></div></div><div class="hd-map-drop-view" role="group" aria-label="ドロップ表示フィルタ">${filters.map(([id,label])=>`<button type="button" class="ghost small ${view===id?'active':''}" data-hd-map-drop-view="${id}" data-hd-map-drop-view-map="${hdDropEsc(map)}">${label}</button>`).join('')}</div>${data.note?`<div class="hd-drop-warning">${hdDropEsc(data.note)}</div>`:''}<div class="hd-map-drop-nodes">${nodeHtml||'<div class="empty">この条件に合うドロップ艦はいないよ。</div>'}</div><div class="hd-map-drop-foot">所持率はこのタブに収録した艦娘を基準に計算｜確認 ${HD_MAP_DROP_CHECKED}｜ドロップテーブルは告知なく変わる場合があるため、限定艦を狙う前は最新Wikiも確認してね。</div></section>`;
 }
 
 function hdDropOpenMapPanel(){
@@ -312,7 +312,7 @@ function hdDropRosterNames(){try{return new Set((JSON.parse(localStorage.getItem
 function hdDropOwned(ship){let rows=[];try{rows=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')||[]}catch{}return rows.some(row=>typeof hdShipSameFamily==='function'?hdShipSameFamily(row,ship):String(row.name||'').trim()===ship)}
 function hdDropHunts(){try{return JSON.parse(localStorage.getItem(HD_DROP_HUNT_KEY)||'[]')||[]}catch{return []}}
 function hdDropSave(v){
- localStorage.setItem(HD_DROP_HUNT_KEY,JSON.stringify(v));hdRenderDropHunts();hdRenderDropDb();
+ localStorage.setItem(HD_DROP_HUNT_KEY,JSON.stringify(v));hdRenderDropHunts();hdRenderDropDb();hdMapDropRefreshCurrent();
  const refresh=()=>{hdEnsureDropDb();hdRenderDropHunts();hdRenderDropDb()};
  requestAnimationFrame(refresh);setTimeout(refresh,80);setTimeout(refresh,360);setTimeout(refresh,900);setTimeout(refresh,1800);
  window.dispatchEvent(new CustomEvent('hd:drop-hunts-changed',{detail:{count:Array.isArray(v)?v.length:0}}));
@@ -330,7 +330,17 @@ function hdRenderDropHunts(){
  const host=document.getElementById('hdDropHuntList');if(!host)return;const rows=hdDropHunts();
  host.innerHTML=rows.length?rows.map(h=>`<article class="hd-hunt-card${h.obtained?' done':''}"><div class="hd-hunt-head"><div><strong>${hdDropEsc(h.ship)}</strong><span>${hdDropEsc(h.map)} ${hdDropEsc(h.node)}</span></div><button class="ghost small" type="button" data-hd-hunt-delete="${h.id}">削除</button></div><div class="hd-hunt-stats"><span>周回 <b>${h.runs||0}</b></span><span>S <b>${h.s||0}</b></span><span>A <b>${h.a||0}</b></span></div><div class="hd-hunt-actions"><button class="ghost small" data-hd-hunt-add="${h.id}" data-field="runs">＋1周</button><button class="ghost small" data-hd-hunt-add="${h.id}" data-field="s">＋S</button><button class="ghost small" data-hd-hunt-add="${h.id}" data-field="a">＋A</button><button class="primary small" data-hd-hunt-obtained="${h.id}">${h.obtained?'入手済み ✓':'入手した！'}</button></div>${h.obtained&&!hdDropOwned(h.ship)?`<button class="ghost small" data-hd-hunt-roster="${h.id}">艦隊台帳へ追加</button>`:''}</article>`).join(''):'<div class="empty">掘り目標はまだないよ。下の逆引きから追加できる。</div>';
 }
-function hdAddDropTarget(ship,map,node){const rows=hdDropHunts();if(rows.some(x=>x.ship===ship&&x.map===map&&x.node===node&&!x.obtained)){hdEnsureDropDb();hdRenderDropHunts();document.getElementById('hdDropHuntList')?.scrollIntoView({behavior:'smooth',block:'center'});return}rows.unshift({id:hdDropUid(),ship,map,node,runs:0,s:0,a:0,obtained:false,createdAt:Date.now()});hdDropSave(rows);document.getElementById('hdDropHuntList')?.scrollIntoView({behavior:'smooth',block:'center'})}
+function hdAddDropTarget(ship,map,node,scroll=true){const rows=hdDropHunts();if(rows.some(x=>x.ship===ship&&x.map===map&&x.node===node&&!x.obtained)){hdEnsureDropDb();hdRenderDropHunts();if(scroll)document.getElementById('hdDropHuntList')?.scrollIntoView({behavior:'smooth',block:'center'});return}rows.unshift({id:hdDropUid(),ship,map,node,runs:0,s:0,a:0,obtained:false,createdAt:Date.now()});hdDropSave(rows);if(scroll)document.getElementById('hdDropHuntList')?.scrollIntoView({behavior:'smooth',block:'center'})}
+function hdDropRemoveHunts(match){
+ const rows=hdDropHunts(),removed=rows.map((item,index)=>({item,index})).filter(x=>match(x.item));if(!removed.length)return false;
+ hdDropSave(rows.filter(x=>!match(x)));
+ window.hdToastAction?.(`${removed[0].item.ship||'掘り目標'} の掘り目標を解除したよ`,'元に戻す',()=>{
+  const current=hdDropHunts();for(const {item,index} of removed){
+   if(current.some(x=>String(x.id)===String(item.id)||(!item.obtained&&!x.obtained&&x.ship===item.ship&&x.map===item.map&&x.node===item.node)))continue;
+   current.splice(Math.min(index,current.length),0,item);
+  }hdDropSave(current);window.hdToast?.('元に戻したよ');
+ },6500);return true;
+}
 function hdEnsureDropDb(){
  if(document.getElementById('dropHuntingDb'))return;const anchor=document.getElementById('shipDatabase')||document.getElementById('roster');if(!anchor)return;
  const maps=['すべて',...Object.keys(HD_MAP_DROP_DATA)].sort((a,b)=>a==='すべて'?-1:a.localeCompare(b,undefined,{numeric:true}));
@@ -363,15 +373,15 @@ window.hdDropOpenSearch=hdDropOpenSearch;
 
 document.addEventListener('click',e=>{
  const mapView=e.target.closest?.('[data-hd-map-drop-view]');if(mapView){hdMapDropSetView(mapView.dataset.hdMapDropViewMap,mapView.dataset.hdMapDropView);hdMapDropRefreshCurrent();return}
- const mapShip=e.target.closest?.('[data-hd-map-drop-ship]');if(mapShip){hdAddDropTarget(mapShip.dataset.hdMapDropShip,mapShip.dataset.hdMapDropMap,mapShip.dataset.hdMapDropNode);hdMapDropRefreshCurrent();return}
+ const mapShip=e.target.closest?.('[data-hd-map-drop-ship]');if(mapShip){const {hdMapDropShip:ship,hdMapDropMap:map,hdMapDropNode:node}=mapShip.dataset;if(hdMapDropHuntActive(ship,map,node))hdDropRemoveHunts(x=>x.ship===ship&&x.map===map&&x.node===node&&!x.obtained);else hdAddDropTarget(ship,map,node,false);return}
  const mf=e.target.closest?.('[data-hd-drop-mapfilter]');if(mf){hdDropMap=mf.dataset.hdDropMapfilter;document.querySelectorAll('[data-hd-drop-mapfilter]').forEach(b=>b.classList.toggle('active',b===mf));hdRenderDropDb();return}
  const add=e.target.closest?.('[data-hd-drop-target]');if(add){hdAddDropTarget(add.dataset.hdDropTarget,add.dataset.hdDropMap,add.dataset.hdDropNode);return}
  const inc=e.target.closest?.('[data-hd-hunt-add]');if(inc){const rows=hdDropHunts(),h=rows.find(x=>x.id===inc.dataset.hdHuntAdd);if(h){h.runs=(Number(h.runs)||0)+1;if(inc.dataset.field==='s')h.s=(Number(h.s)||0)+1;if(inc.dataset.field==='a')h.a=(Number(h.a)||0)+1;localStorage.setItem(HD_DROP_HUNT_KEY,JSON.stringify(rows));const card=inc.closest('.hd-hunt-card'),vals=card?.querySelectorAll('.hd-hunt-stats b');if(vals?.length>=3){vals[0].textContent=String(h.runs||0);vals[1].textContent=String(h.s||0);vals[2].textContent=String(h.a||0)}window.dispatchEvent(new CustomEvent('hd:drop-hunts-changed',{detail:{id:h.id,field:inc.dataset.field||'runs'}}))}return}
  const got=e.target.closest?.('[data-hd-hunt-obtained]');if(got){const rows=hdDropHunts(),h=rows.find(x=>x.id===got.dataset.hdHuntObtained);if(h){h.obtained=!h.obtained;h.obtainedAt=h.obtained?Date.now():null;hdDropSave(rows)}return}
- const del=e.target.closest?.('[data-hd-hunt-delete]');if(del){const rows=hdDropHunts(),i=rows.findIndex(x=>String(x.id)===String(del.dataset.hdHuntDelete));if(i<0)return;const [item]=rows.splice(i,1);hdDropSave(rows);window.hdToastAction?.(`${item.ship||'掘り目標'} を削除したよ`,'元に戻す',()=>{const current=hdDropHunts();if(!current.some(x=>String(x.id)===String(item.id))){current.splice(Math.min(i,current.length),0,item);hdDropSave(current);window.hdToast?.('元に戻したよ')}},6500);return}
+ const del=e.target.closest?.('[data-hd-hunt-delete]');if(del){hdDropRemoveHunts(x=>String(x.id)===String(del.dataset.hdHuntDelete));return}
  const rr=e.target.closest?.('[data-hd-hunt-roster]');if(rr){const h=hdDropHunts().find(x=>x.id===rr.dataset.hdHuntRoster);if(h&&typeof openShipRosterDialog==='function'){openShipRosterDialog({name:h.ship,memo:`${h.map} ${h.node}で入手。HarborDesk掘り記録 ${h.runs||0}周。`})}}
 });
 window.addEventListener('load',()=>setTimeout(hdEnsureDropDb,340));setTimeout(hdEnsureDropDb,520);
 function hdDropRefreshOwnership(){hdRenderDropDb();hdRenderDropHunts();hdMapDropRefreshCurrent()}
 window.addEventListener('hd:ship-identity-changed',hdDropRefreshOwnership);
-window.addEventListener('storage',e=>{if(e.key==='harbordesk-ship-roster-v1'||e.key===null)hdDropRefreshOwnership()});
+window.addEventListener('storage',e=>{if(e.key==='harbordesk-ship-roster-v1'||e.key===HD_DROP_HUNT_KEY||e.key===null)hdDropRefreshOwnership()});
