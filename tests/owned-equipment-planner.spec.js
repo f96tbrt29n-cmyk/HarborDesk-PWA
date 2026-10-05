@@ -391,3 +391,76 @@ test('owned equipment asynchronous search rejects a changed inventory before cac
  const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await panel.locator('[data-hd-oc-search]').tap();
  await expect(panel.locator('.hd-oc-shortage')).toContainText('配備不足 8個');
 });
+
+async function prepareCapability(page,map,inventory,ships){
+ await boot(page);await page.waitForFunction(()=>typeof hdSECapabilityHtml==='function'&&typeof hdOCSearch==='function');
+ await page.evaluate(({map,inventory,ships})=>{
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify(inventory));
+  const all=loadCustomFleets();all[map]=[{id:'cap-test',name:'装備条件の確認',ships:ships.map(s=>typeof s==='string'?{ship:s,gear:''}:s)}];saveCustomFleets(all);
+  selectedMap=map;renderMapPicker();hdWSShowElement('guide',true);hdMapActivateTab('mine');
+ },{map,inventory,ships});
+}
+
+test('map equipment capabilities: 1-6 shows a missing cutin component and does not demand air superiority',async({page})=>{
+ await prepareCapability(page,'1-6',[{name:'10cm高角砲＋高射装置',count:1,star:0}],['阿武隈改二','夕立改二','時雨改二','秋月改','雪風改','暁改二']);
+ const r=await page.evaluate(()=>{const c=hdOCContext('1-6','cap-test',0),rows=hdSEChecks('1-6').rows,result=hdOCSearch(c);return {rows:rows.map(x=>x.kind),goals:result.measure.goals.map(x=>x.kind),stock:hdSECapabilityStock(hdFEPlanFromSavedFleet(c.map,c.fleet),'cap-aa')}});
+ expect(r.rows).toContain('cap-aa');expect(r.rows).not.toContain('制空');expect(r.goals).not.toContain('air-value');
+ const panel=page.locator('#customFleetPanel [data-cf-id="cap-test"]'),aa=panel.locator('[data-hd-se-capability="cap-aa"]');
+ await expect(aa).toContainText('安定化の推奨');await expect(aa).toContainText('対空電探');await expect(aa).toContainText('あと1個');await expect(aa).toContainText('所持不足');await expect(aa.locator('a')).toHaveAttribute('href',/対空カットイン/);
+ expect(await page.evaluate(()=>hdSECapabilityMeasure({ships:[{ship:'夕立改二',items:[{name:'Bofors 40mm四連装機関砲',slotIndex:0}]}]},'cap-aa').count)).toBe(0);
+ expect(await page.evaluate(()=>hdSEPartMatches('director',hdFEFind('10cm高角砲＋高射装置')))).toBe(false);
+});
+
+test('map equipment capabilities: a generic cutin must be together on a compatible ship',async({page})=>{
+ await prepareCapability(page,'1-4',[{name:'10cm高角砲＋高射装置',count:1,star:0},{name:'13号対空電探改',count:1,star:0}],['夕立改二','時雨改二']);
+ const r=await page.evaluate(()=>{
+  const split={map:'1-4',ships:[{ship:'夕立改二',items:[{name:'10cm高角砲＋高射装置',slotIndex:0}]},{ship:'時雨改二',items:[{name:'13号対空電探改',slotIndex:0}]}]};
+  const together={map:'1-4',ships:[{ship:'夕立改二',items:[{name:'10cm高角砲＋高射装置',slotIndex:0},{name:'13号対空電探改',slotIndex:1}]}]};
+  const search=hdOCSearch(hdOCContext('1-4','cap-test',0));return {split:hdSECapabilityMeasure(split,'cap-aa'),together:hdSECapabilityMeasure(together,'cap-aa'),search:search.measure.goals.find(x=>x.kind==='cap-aa'),invalid:hdFEMasterValidation(search.plan).invalid};
+ });expect(r.split.count).toBe(0);expect(r.together.count).toBe(1);expect(r.search.ok).toBe(true);expect(r.invalid).toEqual([]);
+ await expect(page.locator('#customFleetPanel [data-hd-se-capability="cap-aa"]')).toContainText('手持ちで配備可能');
+ expect(await page.evaluate(()=>[0,3].map(index=>hdSECapabilityMeasure({ships:[{ship:'夕立改二',items:[{name:'10cm高角砲＋高射装置',slotIndex:0},{name:'13号対空電探改',slotIndex:index}]}]},'cap-aa').count))).toEqual([0,0]);
+});
+
+test('map equipment capabilities: Akizuki class uses its own high angle gun recipe and stock quantities',async({page})=>{
+ await prepareCapability(page,'1-6',[{name:'10cm連装高角砲',count:1,star:0}],['秋月改']);
+ const r=await page.evaluate(()=>{
+  const one=hdSECapabilityMeasure({ships:[{ship:'秋月改',items:[{name:'10cm連装高角砲',slotIndex:0}]}]},'cap-aa');
+  const two=hdSECapabilityMeasure({ships:[{ship:'秋月改',items:[{name:'10cm連装高角砲',slotIndex:0},{name:'10cm連装高角砲',slotIndex:1}]}]},'cap-aa');
+  return {one,two,stock:hdSECapabilityStock(hdFEPlanFromSavedFleet('1-6',loadCustomFleets()['1-6'][0]),'cap-aa')};
+ });expect(r.one.count).toBe(0);expect(r.two.count).toBe(1);expect(r.stock.parts.find(x=>x.part==='ha')).toMatchObject({need:2,have:1});
+ await expect(page.locator('#customFleetPanel [data-hd-se-capability="cap-aa"]')).toContainText('高角砲：1/2・あと1個');
+});
+
+test('map equipment capabilities: full stock on a submarine does not become a deployable cutin',async({page})=>{
+ await prepareCapability(page,'1-4',[{name:'10cm高角砲＋高射装置',count:2,star:0},{name:'13号対空電探改',count:1,star:0}],['伊58改']);
+ const panel=page.locator('#customFleetPanel [data-hd-se-capability="cap-aa"]');await expect(panel).toContainText('艦種・装備枠の確認が必要');await expect(panel).not.toContainText('手持ちで配備可能');
+ expect(await page.evaluate(()=>hdSECapabilityMeasure({ships:[{ship:'伊58改',items:[{name:'10cm高角砲＋高射装置',slotIndex:0},{name:'13号対空電探改',slotIndex:1}]}]},'cap-aa').count)).toBe(0);
+});
+
+test('map equipment capabilities: sonar duplicates do not satisfy an ASW synergy set',async({page})=>{
+ await prepareCapability(page,'1-5',[{name:'三式水中探信儀',count:2,star:0}],['夕立改二']);
+ const card=page.locator('#customFleetPanel [data-hd-se-capability="cap-asw"]');await expect(card).toContainText('爆雷投射機：0/1・あと1個');await expect(card).toContainText('先制対潜は別条件');
+ const r=await page.evaluate(()=>({duplicate:hdSECapabilityMeasure({ships:[{ship:'夕立改二',items:[{name:'三式水中探信儀',slotIndex:0},{name:'三式水中探信儀',slotIndex:1}]}]},'cap-asw'),combo:hdSECapabilityMeasure({ships:[{ship:'夕立改二',items:[{name:'三式水中探信儀',slotIndex:0},{name:'三式爆雷投射機',slotIndex:1}]}]},'cap-asw')}));expect(r.duplicate.count).toBe(0);expect(r.combo.count).toBe(1);
+});
+
+test('map equipment capabilities: land attack examples differ between soft skin and mixed installations',async({page})=>{
+ await prepareCapability(page,'6-4',[{name:'大発動艇(八九式中戦車＆陸戦隊)',count:1,star:0}],['大潮改二']);
+ const card=page.locator('#customFleetPanel [data-hd-se-capability="cap-land-mixed"]');await expect(card).toContainText('内火艇系：0/1・あと1個');await expect(card).toContainText('敵の種類');
+ const r=await page.evaluate(()=>({maps:['1-5','7-1','7-4','6-4','4-5','6-5'].map(map=>({map,profiles:hdSEProfiles(map).map(x=>x.kind)})),wrong:hdSECapabilityMeasure({ships:[{ship:'大潮改二',items:[{name:'三式弾',slotIndex:0}]}]},'cap-land-mixed').count,combo:hdSECapabilityMeasure({ships:[{ship:'大潮改二',items:[{name:'大発動艇(八九式中戦車＆陸戦隊)',slotIndex:0},{name:'特二式内火艇',slotIndex:1}]}]},'cap-land-mixed').count}));
+ expect(r.maps.find(x=>x.map==='4-5').profiles).toContain('cap-land-soft');expect(r.maps.find(x=>x.map==='7-1').profiles).toContain('cap-asw');expect(r.maps.find(x=>x.map==='6-5').profiles).toContain('cap-aa');expect(r.wrong).toBe(0);expect(r.combo).toBe(1);
+});
+
+test('map equipment capabilities: owned search completes and saves the 1-6 recommended same ship sets',async({page})=>{
+ await prepareCapability(page,'1-6',[{name:'10cm高角砲＋高射装置',count:1,star:0},{name:'13号対空電探改',count:1,star:0},{name:'三式水中探信儀',count:1,star:0},{name:'三式爆雷投射機',count:1,star:0}],['阿武隈改二','夕立改二','時雨改二','秋月改','雪風改','暁改二']);
+ const card=page.locator('#customFleetPanel [data-cf-id="cap-test"]');await card.locator('[data-hd-oc-search]').tap();await expect(card.locator('.hd-oc-result')).toContainText('装備目安は充足');await expect(card.locator('.hd-oc-shortage')).toHaveCount(0);
+ await card.locator('[data-hd-oc-apply]').tap();await expect(card.locator('[data-hd-se-capability="cap-aa"]')).toContainText('配備済み');await expect(card.locator('[data-hd-se-capability="cap-asw"]')).toContainText('配備済み');
+ const r=await page.evaluate(()=>hdFEMasterValidation(hdFEPlanFromSavedFleet('1-6',loadCustomFleets()['1-6'][0])));expect(r.invalid).toEqual([]);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('map equipment capabilities: stock refresh clears a resolved component shortage',async({page})=>{
+ await prepareCapability(page,'1-5',[{name:'三式水中探信儀',count:1,star:0}],['夕立改二']);
+ const card=page.locator('#customFleetPanel [data-hd-se-capability="cap-asw"]');await expect(card).toContainText('所持不足');
+ await page.evaluate(()=>{localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'三式水中探信儀',count:1,star:0},{name:'三式爆雷投射機',count:1,star:0}]));window.dispatchEvent(new Event('hd:equipment-changed'))});await expect(card).toContainText('手持ちで配備可能');await expect(card).not.toContainText('あと1個');
+});

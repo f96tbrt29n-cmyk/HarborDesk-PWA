@@ -13,7 +13,7 @@ function hdFLInventory(){
  const cat=hdFLCatalog(),byName=new Map(cat.map(x=>[hdFLNorm(x.name),x])),m=new Map();
  for(const row of hdFLRows()){
   const norm=hdFLNorm(row.name),star=Math.max(0,Number(row.star)||0),key=hdFLInventoryStackKey(row.name,star),count=Math.max(0,Number(row.count)||0);if(!norm||!count)continue;
-  const meta=byName.get(norm)||{name:row.name,category:row.category||'',stats:{},tags:[],role:''},cur=m.get(key)||{key,norm,name:row.name,count:0,star,maxStar:star,item:meta};
+  const meta=byName.get(norm)||(typeof hdFEFind==='function'?hdFEFind(row.name):null)||{name:row.name,category:row.category||'',stats:{},tags:[],role:''},cur=m.get(key)||{key,norm,name:row.name,count:0,star,maxStar:star,item:meta};
   cur.count+=count;m.set(key,cur);
  }
  return m;

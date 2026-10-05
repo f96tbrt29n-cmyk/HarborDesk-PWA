@@ -34,7 +34,7 @@ function hdMapEquipNeeds(map){
   const airExplicitNone=/航空戦力(?:は|が)?(?:基本)?不要|制空(?:は|より)?[^。]*(?:不要|優先度が低い)/.test(text);
   const airPositive=(g.air||[]).length||(!airExplicitNone&&/航空戦(?!力)|空襲|航空優勢|航空均衡|制空値|制空確保|制空を(?:確保|取る|調整)|制空調整|制空重視|艦戦/.test(text));
   if(airPositive){
-    add('制空','制空','航空優勢・拮抗などの制空調整用。艦戦/水戦から編成に合うものを選ぶ。');
+    if(map!=='1-6')add('制空','制空','航空優勢・拮抗などの制空調整用。艦戦/水戦から編成に合うものを選ぶ。');
     add('防空','防空','空襲・航空戦の被害軽減用。対空CIや噴進弾幕を組める艦では特に有効。');
   }
   if(/陸上型|対地|集積地|砲台|離島|飛行場姫/.test(text))add('対地','対地','陸上型への特効装備。艦種ごとの搭載可否と組み合わせを確認。');
@@ -79,6 +79,7 @@ function hdMapEquipRecommendationsHtml(map){
   const {needs,adv}=hdMapEquipNeeds(map);
   const groups=[];
   needs.forEach(n=>{const items=hdMapEquipPick(n.id,n.id==='対地'?4:3);if(items.length)groups.push({label:n.label,reason:n.reason,items})});
+  if(map==='1-6')groups.push({label:'水戦・水爆（搭載できる軽巡の選択肢）',reason:'下ルートの制空優勢は必須ではありません。防空・対潜を優先し、航空戦の勝利や拮抗を狙う場合に検討。',items:HD_EQUIPMENT_CATALOG.filter(x=>['水上戦闘機','水上爆撃機'].includes(x.category)).slice(0,3)});
   if(adv.base?.available){
     const items=hdMapBasePick(map,5);
     groups.push({label:'基地航空隊',reason:`出撃可能 ${adv.base.sorties||1}部隊。ボス必要半径 ${adv.base.bossRadius??'要確認'}。${adv.base.note||''}`,items});

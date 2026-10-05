@@ -2,7 +2,12 @@ const HD_FE_AIR_CATS=new Set(['艦上戦闘機','艦上攻撃機','艦上爆撃�
 
 function hdFEEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdFECatalog(){return typeof hdFLCatalog==='function'?hdFLCatalog():(typeof HD_EQUIPMENT_CATALOG!=='undefined'?HD_EQUIPMENT_CATALOG:[])}
-function hdFEFind(name){return hdFECatalog().find(x=>x.name===name)||null}
+function hdFEFind(name){
+ const aliases={'10cm高角砲＋高射装置':'10cm連装高角砲＋高射装置'},norm=s=>String(s||'').normalize('NFKC').replace(/\s+/g,'');
+ const canonical=Object.keys(aliases).find(x=>norm(x)===norm(name)),target=canonical?aliases[canonical]:name;
+ const catalog=hdFECatalog(),exact=catalog.find(x=>x.name===target);if(exact)return exact;
+ const key=norm(target);return catalog.find(x=>norm(x.name)===key)||null;
+}
 function hdFEFindShip(name){
  if(typeof hdShipDbResolveShip==='function')return hdShipDbResolveShip(String(name||'').trim());
  const rows=typeof HD_SHIP_DATABASE!=='undefined'?HD_SHIP_DATABASE:[];
@@ -268,6 +273,7 @@ function hdFEScouting(plan,items){
 }
 function hdFEAutoVerdict(plan,e){
  const live=hdFELiveFleet(plan),supply=hdFESupply(plan),freshness=hdFESyncFreshness(),gameMatch=hdFEGameMatch(plan),route=hdFERoute(plan),air=hdFEAirCheck(plan?.map,e.air),scouting=hdFEScouting(plan,e.items),equipment={status:e.missing?'missing':e.partial?'partial':'ready',detail:`海域装備 ${e.ready}/${e.requirements.length} 準備`},master={status:e.master.invalid.length?'missing':e.master.unresolved.length?'partial':'ready',detail:e.master.invalid.length?`装備不可 ${e.master.invalid.length}件`:e.master.unresolved.length?`未解決 ${e.master.unresolved.length}件`:'装備可否OK'},unknownHealth=live.details.filter(x=>x.status==='unknown').length,health={status:live.status,detail:live.blocked?`出撃不可候補 ${live.blocked}隻（${Object.entries(live.reasons).map(x=>x[0]+' '+x[1]).join(' / ')}）`:live.caution?`注意艦 ${live.caution}隻${unknownHealth?` / 同期状態不明 ${unknownHealth}隻`:''}`:unknownHealth?`同期状態不明 ${unknownHealth}隻。ゲーム連携を確認`:'艦状態OK'};
+ if(typeof hdSEAirOptional==='function'&&hdSEAirOptional(plan?.map)){air.status='manual';air.detail='1-6下ルートは制空優勢が必須ではありません。防空・対潜を優先し、水戦/水爆は編成に応じた選択肢'}
  const checks=[{id:'health',label:'艦状態',...health},{id:'supply',label:'補給',...supply},{id:'freshness',label:'同期鮮度',...freshness},{id:'gameMatch',label:'ゲーム反映',...gameMatch},{id:'route',label:'編成条件',...route},{id:'equipment',label:'装備',...equipment},{id:'air',label:'制空',...air},{id:'scouting',label:'索敵',...scouting},{id:'master',label:'装備可否',...master}],ranked={missing:3,partial:2,manual:1,ready:0},worst=checks.reduce((a,x)=>(ranked[x.status]??1)>(ranked[a.status]??0)?x:a,{status:'ready'});
  return {status:worst.status,checks,live,supply,freshness,gameMatch,route,air,scouting,master,equipment};
 }
@@ -407,7 +413,7 @@ function hdFEEvaluate(plan){
  const map=plan?.map||'',items=hdFEAssigned(plan),stats=hdFEStats(items),air=hdFEAir(items),los=hdFELos(items,map),night=hdFENight(items,stats),master=hdFEMasterValidation(plan);
  const check=typeof hdSEChecks==='function'?hdSEChecks(map):{rows:[],adv:{}};
  const requirements=(check.rows||[]).filter(r=>r.kind!=='基地航空隊').map(r=>{
-  const m=hdFEKindCount(r.kind,items),min=Math.max(1,Number(r.minCount)||1),count=Number(m.count)||0;
+  const m=typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[r.kind]?hdSECapabilityMeasure(plan,r.kind):hdFEKindCount(r.kind,items),min=Math.max(1,Number(r.minCount)||1),count=Number(m.count)||0;
   const status=count>=min?'ready':(count>0||m.partial?'partial':'missing');
   return {kind:r.kind,label:r.label||r.kind,minCount:min,count,status,detail:m.detail||`${count} / 目安 ${min}`,hint:r.hint||''};
  });
