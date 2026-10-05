@@ -208,3 +208,22 @@ test('owned equipment route speed components use all low speed ships rather than
  for(const kind of ['speed-turbine','speed-boiler']){const goal=r.shortages.find(x=>x.kind===kind);expect(goal.owned).toBe(1);expect(goal.minCount).toBe(2);expect(await page.evaluate(g=>hdOCStockGap(g),goal)).toBe(1)}
  expect(r.measure.manual.some(x=>x.includes('実際の速力'))).toBeTruthy();
 });
+
+test('owned equipment placement explains unusable owned gear and procures a compatible alternative',async({page})=>{
+ await prepare(page,[{name:'試製烈風 後期型',count:3,star:6}],[{kind:'制空',label:'制空装備',minCount:2}]);
+ await page.evaluate(()=>{const all=loadCustomFleets();all['1-1'][0].ships=[{ship:'最上改',gear:''}];saveCustomFleets(all);hdMSNRender()});
+ const r=await page.evaluate(()=>hdOCSearch(hdOCContext('1-1','oc-test',0))),g=r.shortages[0];
+ expect(g.owned).toBe(3);expect(g.usableOwned).toBe(0);expect(g.placement).toBeFalsy();expect(g.compatibleSlots).toBe(4);expect(g.blocked).toEqual([{name:'試製烈風 後期型',star:6,count:3}]);
+ expect(await page.evaluate(g=>hdOCStockGap(g),g)).toBe(2);expect(g.candidates).not.toContain('試製烈風 後期型');
+ const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await panel.locator('[data-hd-oc-search]').click();
+ await expect(panel.locator('.hd-oc-placement')).toContainText('試製烈風 後期型 ★6 ×3');await expect(panel.locator('[data-hd-oc-procure]')).toHaveText('候補をあと2個、調達リストへ');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+ await panel.locator('[data-hd-oc-procure]').click();expect(await page.evaluate(()=>hdPLLoad()[0].gearItems[0].needed)).toBe(2);
+});
+
+test('owned equipment placement distinguishes total slots from competition for compatible slots',async({page})=>{
+ await prepare(page,[{name:'33号水上電探',count:8,star:0}],[{kind:'電探',label:'電探',minCount:8}]);
+ const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await panel.locator('[data-hd-oc-search]').click();
+ await expect(panel.locator('.hd-oc-placement')).toContainText('最大 6枠');await expect(panel.locator('.hd-oc-placement')).toContainText('装備を増やすだけでは解消できない');await expect(panel.locator('[data-hd-oc-procure]')).toHaveCount(0);
+ const info=await page.evaluate(()=>{const c=hdOCContext('1-1','oc-test',0),build=hdOCBuild(c);return hdOCPlacementInfo('電探',build.inventory,build.slots,hdFLCatalog())});expect(info.usableOwned).toBe(8);expect(info.blocked).toEqual([]);
+});
