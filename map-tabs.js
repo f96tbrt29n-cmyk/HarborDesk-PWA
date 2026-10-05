@@ -35,7 +35,7 @@ function hdMapTabsRevealActive(){
 function hdFleetHtml(map){
   const p=hdMapPlan(map);
   if(!(p.presets||[]).length)return '<div class="empty">編成例を準備中</div>';
-  return p.presets.map((x,i)=>`<article class="map-tab-card"><div class="map-tab-card-title">編成例 ${i+1}｜${hdMapEsc(x.name)}</div><div><b>艦隊:</b> ${hdMapEsc(x.ships)}</div><div><b>装備:</b> ${hdMapEsc(x.gear)}</div><div><b>用途:</b> ${hdMapEsc(x.use)}</div></article>`).join('');
+  return p.presets.map((x,i)=>`<article class="map-tab-card"><div class="map-tab-card-title">編成例 ${i+1}｜${hdMapEsc(x.name)}</div><div><b>艦隊:</b> ${hdMapEsc(x.ships)}</div><div><b>装備:</b> ${hdMapEsc(x.gear)}</div><div><b>用途:</b> ${hdMapEsc(x.use)}</div>${typeof hdPlanSourceHtml==='function'&&hdPlanSourceHtml(x)?`<div>${hdPlanSourceHtml(x)}</div>`:''}</article>`).join('');
 }
 function hdQuestHtml(map){
   const planned=(hdMapPlan(map).quests||[]).map(q=>({...q,id:q.id||'',source:'plan'}));

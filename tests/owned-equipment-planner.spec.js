@@ -299,3 +299,31 @@ test('route fleet conditions: readiness rejects ambiguous presets and incorrect 
   return {good:good.status,tooMany:tooMany.status,unclear:unclear.status,zero:zero.status};
  });expect(r).toEqual({good:'ready',tooMany:'missing',unclear:'manual',zero:'missing'});
 });
+
+test('verified route presets generate the required counts without adding unrelated ships',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdFSPlans==='function');
+ const rows=await page.evaluate(()=>{
+  const roster=[];for(const [type,count] of [['軽巡洋艦',4],['駆逐艦',6],['海防艦',4],['軽空母',2],['正規空母',2],['戦艦',2],['航空戦艦',1],['航空巡洋艦',1],['重雷装巡洋艦',2]])for(let i=0;i<count;i++)roster.push({id:type+i,name:'条件テスト'+type+i,type,level:80});
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(roster));return ['1-2','1-3','1-4','1-5','2-5','6-5'].flatMap(map=>hdFSPlans(map).filter(s=>!s.info.conditionManual).map(s=>({map,name:s.preset.name,total:s.info.total,filled:s.filled,requirements:s.info.requirements,types:s.slots.map(x=>x.profile?.type),source:hdPlanSourceHtml(s.preset)})));
+ });
+ expect(rows.filter(x=>x.map==='1-2')).toHaveLength(1);expect(rows.find(x=>x.map==='1-2').types).toHaveLength(5);
+ expect(rows.find(x=>x.map==='1-3').types.filter(x=>x==='軽空母')).toHaveLength(2);
+ expect(rows.find(x=>x.map==='1-4').types.filter(x=>x==='駆逐艦')).toHaveLength(4);
+ for(const row of rows){expect(row.filled).toBe(row.total);expect(row.types.filter(Boolean)).toHaveLength(row.total);expect(row.source).toContain('https://zekamashi.net/');expect(row.source).toContain('noopener noreferrer')}
+ const antiSub=rows.filter(x=>x.map==='1-5');expect(antiSub).toHaveLength(3);for(const row of antiSub){expect(row.total).toBe(4);expect(row.types.filter(x=>x==='軽巡洋艦').length).toBeLessThanOrEqual(2)}
+ const lower=rows.find(x=>x.map==='6-5'&&x.name==='下ルート型');expect(lower.types.filter(x=>x==='駆逐艦')).toHaveLength(2);expect(lower.types).not.toContain('重雷装巡洋艦');expect(lower.types).not.toContain('正規空母');expect(lower.types).not.toContain('軽空母');
+});
+
+test('verified route presets preserve missing ship slots and prefer fast ships for 2-5 south',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdFSPlans==='function');
+ const r=await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{id:'cl',name:'条件テスト軽巡',type:'軽巡洋艦',level:50},{id:'dd',name:'条件テスト駆逐',type:'駆逐艦',level:50},{id:'bb',name:'条件テスト戦艦',type:'戦艦',level:50}]));const short=hdFSPlans('1-2')[0];const asw=hdFSPlans('1-5')[1];
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{id:'slow',name:'龍鳳',type:'軽空母',level:50},{id:'fast',name:'瑞鳳',type:'軽空母',level:99}]));const south=hdFSPlans('2-5')[1];
+  return {shortFilled:short.filled,shortMissing:short.missing,shortIds:short.slots.map(x=>x.profile?.row.id),aswFilled:asw.filled,speedRequired:south.info.speedRequired,cvl:south.slots.find(x=>x.required==='軽空母')?.profile?.row.id,slowType:hdFSProfile({name:'龍鳳',type:'軽空母'}).speed,html:hdFSSuggestionHtml(south)};
+ });expect(r.shortFilled).toBe(2);expect(r.shortMissing).toEqual(['駆逐','駆逐','駆逐']);expect(r.shortIds).not.toContain('bb');expect(r.aswFilled).toBe(1);expect(r.speedRequired).toBe(true);expect(r.slowType).toBe('低速');expect(r.cvl).toBe('fast');expect(r.html).toContain('編成条件の出典');
+});
+
+test('verified route source links reject executable URLs and appear in the fleet tab',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdPlanSourceHtml==='function'&&typeof hdFleetHtml==='function');
+ const r=await page.evaluate(()=>{selectedWorld='1';selectedMap='1-2';hdMapTabSave('1-2','fleet');renderMapPicker();return {bad:hdPlanSourceHtml({source:'javascript:alert(1)'}),none:hdPlanSourceHtml({}),source:document.querySelector('#selectedMapCard a[href*="zekamashi"]')?.getAttribute('href')}});expect(r.bad).toBe('');expect(r.none).toBe('');expect(r.source).toBe('https://zekamashi.net/kancolle-kouryaku/1-2/');
+});

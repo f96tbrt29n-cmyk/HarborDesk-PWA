@@ -149,7 +149,7 @@ function hdFSSuggestionHtml(s){
  '<div class="hd-fs-ships">'+s.slots.map(hdFSShipHtml).join('')+'</div>'+
  '<p class="hd-fs-level-guide">'+hdFSEsc(s.info.levelTarget?.text||'推奨Lvは個別確認')+'。艦隊平均の目安を基に、下限目安を満たす近いLvの艦を優先。足りない場合は近い艦を表示。Lvだけでは攻略可否は判定しません。</p>'+
  (warnings.length?'<div class="hd-fs-warning">'+hdFSEsc(warnings.join(' ｜ '))+'</div>':'')+hdFSMissingGearHtml(s)+
- '<div class="hd-fs-source"><b>アプリ内編成例:</b> '+hdFSEsc(s.preset.ships||'')+'<br><b>装備メモ:</b> '+hdFSEsc(s.preset.gear||'')+'</div>'+
+ '<div class="hd-fs-source"><b>アプリ内編成例:</b> '+hdFSEsc(s.preset.ships||'')+'<br><b>装備メモ:</b> '+hdFSEsc(s.preset.gear||'')+(typeof hdPlanSourceHtml==='function'&&hdPlanSourceHtml(s.preset)?'<br>'+hdPlanSourceHtml(s.preset):'')+'</div>'+
  '<div class="hd-fs-actions"><button type="button" class="primary small" data-hd-fs-save="'+s.index+'"'+(!s.filled?' disabled':'')+'>この候補を自分用編成に保存</button><button type="button" class="ghost small" data-hd-fs-roster>艦隊台帳を確認</button></div></article>';
 }
 // Keep the pressed target alive until the native click has been dispatched.

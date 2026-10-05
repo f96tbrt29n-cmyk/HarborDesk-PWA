@@ -6013,7 +6013,8 @@ test('release smoke: fleet suggestion updates retain a pressed acquisition butto
   });
   const button = page.locator('#hdFleetSuggester [data-hd-fs-acquire]').first();
   await button.click({trial:true});
-  const box = await button.boundingBox();
+  let box;
+  await expect.poll(async()=>{box=await button.boundingBox();return !!box}).toBe(true);
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
   expect(await page.evaluate(() => {
