@@ -22,7 +22,7 @@ function hdPLResolveWanted(wanted){
  return {item:missing,kind,exact:false};
 }
 function hdPLReqStar(x){return Math.max(0,Number(x?.reqStar)||0)}
-function hdPLMergeKey(x){return [x.map||'',x.target||x.wanted||'',x.methodKey||'',x.ship||'',x.kind||'',hdPLReqStar(x)].join('|')+(x.ownedPlanSource?'|'+x.ownedPlanSource:'')}
+function hdPLMergeKey(x){return [x.map||'',x.target||x.wanted||'',x.methodKey||'',x.ship||'',x.kind||'',hdPLReqStar(x)].join('|')+(x.ownedPlanSource?'|'+x.ownedPlanSource+'|'+(x.ownedPlanRoute??'legacy'):'')}
 function hdPLDemandKey(x,map=''){return [map||x.map||'',x.target||x.wanted||'',x.methodKey||'',x.kind||'',hdPLReqStar(x)].join('|')}
 function hdPLTargetLabel(x){const t=x?.target||x?.wanted||'';return t+(hdPLReqStar(x)?` ★${hdPLReqStar(x)}+`:'')}
 function hdPLMergeGearItems(items=[]){

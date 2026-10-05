@@ -110,25 +110,57 @@ function hdOCAddProcurement(c,result,index,target){
  const goal=result.shortages[index],gap=hdOCStockGap(goal);if(!gap||!goal.candidates.includes(target)||typeof hdPLSave!=='function')return false;
  const item=hdPLResolveWanted(target).item;if(!item||item.name!==target)return false;
  const source=JSON.stringify([c.fleet.id,goal.kind,goal.label]),method=hdPLMethodMeta(item),now=Date.now(),list=hdPLLoad(),old=list.find(x=>x.map===c.map);
- const added={map:c.map,ship:c.fleet.name||'保存編成',loadout:'手持ち配備の不足：'+goal.label,wanted:target,target,kind:goal.kind,exact:true,methodKey:method.key,methodLabel:method.label,rank:method.rank,needed:hdPLOwnedCount(target)+gap,ownedPlanSource:source,sources:[c.fleet.name||'保存編成'],createdAt:now};
- const next={...old,id:old?.id||`pl-${now}-${Math.random().toString(16).slice(2)}`,map:c.map,kinds:old?.kinds||[],gearItems:[...(old?.gearItems||[]).filter(x=>x.ownedPlanSource!==source),added],createdAt:old?.createdAt||now,updatedAt:now};
+ const added={map:c.map,ship:c.fleet.name||'保存編成',loadout:'手持ち配備の不足：'+goal.label,wanted:target,target,kind:goal.kind,exact:true,methodKey:method.key,methodLabel:method.label,rank:method.rank,needed:hdPLOwnedCount(target)+gap,ownedPlanSource:source,ownedPlanRoute:c.index,sources:[c.fleet.name||'保存編成'],createdAt:now};
+ const next={...old,id:old?.id||`pl-${now}-${Math.random().toString(16).slice(2)}`,map:c.map,kinds:old?.kinds||[],gearItems:[...(old?.gearItems||[]).filter(x=>!(x.ownedPlanSource===source&&(x.ownedPlanRoute==null||Number(x.ownedPlanRoute)===c.index))),added],createdAt:old?.createdAt||now,updatedAt:now};
  hdPLSave(old?list.map(x=>x.map===c.map?next:x):[next,...list]);return true;
+}
+function hdOCSavedGoal(c,result,item){
+ if(!item.ownedPlanSource||(item.ownedPlanRoute!=null&&Number(item.ownedPlanRoute)!==c.index))return null;
+ try{const source=JSON.parse(item.ownedPlanSource);if(!Array.isArray(source)||String(source[0])!==String(c.fleet.id))return null;return result.measure.goals.find(g=>g.kind===source[1]&&g.label===source[2])||null}catch{return null}
+}
+function hdOCProcurementUpdateHtml(c,result,attrs){
+ if(typeof hdPLLoad!=='function')return '';
+ const row=hdPLLoad().find(x=>x.map===c.map);if(!(row?.gearItems||[]).some(x=>hdOCSavedGoal(c,result,x)))return '';
+ return `<div class="hd-oc-procurement"><button type="button" class="ghost small" data-hd-oc-procurement-update ${attrs}>現在の条件で調達計画を更新</button><small>この編成・ルートの保存済み候補を再確認します。同じ編成・条件の旧計画も更新します。所持不足が解消した計画は整理し、配備条件は上の結果で確認してね。</small></div>`;
+}
+function hdOCUpdateProcurement(c,result){
+ if(result.signature!==hdOCSignature(c))return false;
+ const list=hdPLLoad(),old=list.find(x=>x.map===c.map);if(!old)return {removed:0,updated:0};
+ let removed=0,updated=0;
+ const items=(old.gearItems||[]).flatMap(item=>{
+  const goal=hdOCSavedGoal(c,result,item);if(!goal)return [item];
+  const shortage=result.shortages.find(g=>(g.goalKind||g.kind)===goal.kind&&g.label===goal.label);
+  if(goal.ok||shortage&&hdOCStockGap(shortage)===0){removed++;return []}
+  const gap=hdOCStockGap(shortage);if(!gap)return [item];
+  // Keep a previously chosen candidate even when its score drops outside the top three.
+  const meta=hdFLCatalog().find(x=>x.name===item.target),slots=hdOCBuild(c).slots;
+  if(!meta||!hdFOItemMatches(goal.kind,meta)||!slots.some(slot=>hdOCCompatible(slot,{item:meta,star:0})))return [item];
+  const needed=hdPLOwnedCount(item.target)+gap;
+  if(item.needed===needed&&item.ownedPlanRoute===c.index)return [item];
+  updated++;return [{...item,needed,ownedPlanRoute:c.index}];
+ });
+ if(removed||updated){const next={...old,gearItems:items,updatedAt:Date.now()};hdPLSave(!items.length&&!(old.kinds||[]).length?list.filter(x=>x.map!==c.map):list.map(x=>x.map===c.map?next:x))}
+ return {removed,updated};
 }
 function hdOCPanel(map,fleetId='',route=''){
  if(typeof hdFLInventory!=='function')return '';
  const c=hdOCContext(map,fleetId,route),key=`${map}:${c.fleet?.id||''}:${c.index}`,cached=HD_OC_CACHE.get(key),result=cached&&cached.signature===hdOCSignature(c)?cached:null,esc=hdFEEsc;
  const attrs=`data-hd-oc-map="${esc(map)}" data-hd-oc-fleet="${esc(c.fleet?.id||'')}" data-hd-oc-route="${c.index}"`;
- return `<section class="hd-oc-panel"><strong>手持ち装備で攻略条件を満たす</strong><p>${c.fleet?`対象：${esc(c.fleet.name||'保存編成')}。所持数・改修値・装備可否・空きスロットから配備案を探します。他の艦の装備も移し替える前提です。`:'先に自分用編成を保存・選択すると、艦ごとに手持ち装備を配備できます。'}</p><button type="button" class="primary small" data-hd-oc-search ${attrs} ${c.fleet?'':'disabled'}>手持ちで条件を満たす配備を探す</button><button type="button" class="ghost small" data-hd-oc-select-fleet ${attrs}>艦隊を選ぶ・保存する</button>${result?`<div class="hd-oc-result"><b>${!result.measure.goals.length?'この海域は装備条件を自動判定できません':result.measure.complete?(result.measure.manual.length?'登録済み装備目安は充足・確認項目あり':'登録済みの装備条件を充足'):'配備案に未充足の条件あり'}</b>${result.measure.goals.map(g=>`<div class="hd-oc-goal ${g.ok?'ready':'missing'}"><strong>${esc(g.label)}：${g.ok?'充足':'不足'}</strong><span>${esc(g.detail)}</span></div>`).join('')}${result.shortages.map((g,index)=>`<div class="hd-oc-shortage"><b>${esc(g.label)}に必要なもの</b><p>${esc(g.detail)}。${['制空','索敵'].includes(g.kind)&&['air-value','los-value'].includes(g.goalKind||g.kind)?'性能・搭載枠を増やす必要あり':`配備不足 ${Math.ceil(g.shortfall)}個 / 同種の所持 ${g.owned}個`}。${g.placement?'所持数は足りています。装備可否・配備枠・他の条件との両立を見直してね。':''}${g.candidates.length?'装備候補：'+esc(g.candidates.join('、')):'この編成に載せられる候補なし。艦種や装備枠を見直してね。'}</p><button type="button" class="ghost small" data-hd-oc-acquire="${esc(g.kind)}" ${attrs}>入手方法を見る</button>${hdOCProcurementHtml(g,index,attrs)}</div>`).join('')}<div class="hd-oc-ships">${result.plan.ships.map(s=>`<p><b>${esc(s.ship)}</b><span>${esc([...s.items.map(x=>`第${x.slotIndex+1}：${x.name}${x.star?' ★'+x.star:''}`),...(s.expansion?[`増設：${s.expansion.name}${s.expansion.star?' ★'+s.expansion.star:''}`]:[])].join(' / ')||'配備なし')}</span></p>`).join('')}</div>${result.measure.manual.length?`<div class="hd-oc-manual"><b>別途確認が必要</b>${result.measure.manual.map(x=>`<p>${esc(x)}</p>`).join('')}</div>`:''}<button type="button" class="ghost small" data-hd-oc-apply ${attrs}>${result.measure.complete?'この配備を保存編成に反映':'不足を残した配備案を保存'}</button><small>登録済み目安・制空は熟練度なしの推定。探索で見つからない組み合わせもあります。保存後はゲーム側の装備を変更し、基地航空隊・ルート条件も確認してね。</small></div>`:''}</section>`;
+ return `<section class="hd-oc-panel"><strong>手持ち装備で攻略条件を満たす</strong><p>${c.fleet?`対象：${esc(c.fleet.name||'保存編成')}。所持数・改修値・装備可否・空きスロットから配備案を探します。他の艦の装備も移し替える前提です。`:'先に自分用編成を保存・選択すると、艦ごとに手持ち装備を配備できます。'}</p><button type="button" class="primary small" data-hd-oc-search ${attrs} ${c.fleet?'':'disabled'}>手持ちで条件を満たす配備を探す</button><button type="button" class="ghost small" data-hd-oc-select-fleet ${attrs}>艦隊を選ぶ・保存する</button>${result?`<div class="hd-oc-result"><b>${!result.measure.goals.length?'この海域は装備条件を自動判定できません':result.measure.complete?(result.measure.manual.length?'登録済み装備目安は充足・確認項目あり':'登録済みの装備条件を充足'):'配備案に未充足の条件あり'}</b>${result.measure.goals.map(g=>`<div class="hd-oc-goal ${g.ok?'ready':'missing'}"><strong>${esc(g.label)}：${g.ok?'充足':'不足'}</strong><span>${esc(g.detail)}</span></div>`).join('')}${result.shortages.map((g,index)=>`<div class="hd-oc-shortage"><b>${esc(g.label)}に必要なもの</b><p>${esc(g.detail)}。${['制空','索敵'].includes(g.kind)&&['air-value','los-value'].includes(g.goalKind||g.kind)?'性能・搭載枠を増やす必要あり':`配備不足 ${Math.ceil(g.shortfall)}個 / 同種の所持 ${g.owned}個`}。${g.placement?'所持数は足りています。装備可否・配備枠・他の条件との両立を見直してね。':''}${g.candidates.length?'装備候補：'+esc(g.candidates.join('、')):'この編成に載せられる候補なし。艦種や装備枠を見直してね。'}</p><button type="button" class="ghost small" data-hd-oc-acquire="${esc(g.kind)}" ${attrs}>入手方法を見る</button>${hdOCProcurementHtml(g,index,attrs)}</div>`).join('')}<div class="hd-oc-ships">${result.plan.ships.map(s=>`<p><b>${esc(s.ship)}</b><span>${esc([...s.items.map(x=>`第${x.slotIndex+1}：${x.name}${x.star?' ★'+x.star:''}`),...(s.expansion?[`増設：${s.expansion.name}${s.expansion.star?' ★'+s.expansion.star:''}`]:[])].join(' / ')||'配備なし')}</span></p>`).join('')}</div>${result.measure.manual.length?`<div class="hd-oc-manual"><b>別途確認が必要</b>${result.measure.manual.map(x=>`<p>${esc(x)}</p>`).join('')}</div>`:''}${hdOCProcurementUpdateHtml(c,result,attrs)}<button type="button" class="ghost small" data-hd-oc-apply ${attrs}>${result.measure.complete?'この配備を保存編成に反映':'不足を残した配備案を保存'}</button><small>登録済み目安・制空は熟練度なしの推定。探索で見つからない組み合わせもあります。保存後はゲーム側の装備を変更し、基地航空隊・ルート条件も確認してね。</small></div>`:''}</section>`;
 }
 function hdOCRefresh(){if(typeof hdRenderMapEquipmentRecommendations==='function')hdRenderMapEquipmentRecommendations();if(typeof hdMSNRender==='function')hdMSNRender()}
 document.addEventListener('click',e=>{
- const button=e.target.closest?.('[data-hd-oc-search],[data-hd-oc-apply],[data-hd-oc-acquire],[data-hd-oc-select-fleet],[data-hd-oc-procure]');if(!button)return;
+ const button=e.target.closest?.('[data-hd-oc-search],[data-hd-oc-apply],[data-hd-oc-acquire],[data-hd-oc-select-fleet],[data-hd-oc-procure],[data-hd-oc-procurement-update]');if(!button)return;
  if(button.hasAttribute('data-hd-oc-select-fleet')){hdMSNOpen(button.dataset.hdOcMap);return}
  const c=hdOCContext(button.dataset.hdOcMap,button.dataset.hdOcFleet,button.dataset.hdOcRoute);if(!c.fleet)return;
  const key=`${c.map}:${c.fleet.id}:${c.index}`;
  if(button.hasAttribute('data-hd-oc-acquire')){if(typeof hdAGOpen==='function')hdAGOpen(button.dataset.hdOcAcquire,c.map);return}
  if(button.hasAttribute('data-hd-oc-search')){button.disabled=true;button.textContent='手持ち装備を確認中…';setTimeout(()=>{try{HD_OC_CACHE.set(key,hdOCSearch(c));hdOCRefresh()}catch(err){button.disabled=false;button.textContent='手持ちで条件を満たす配備を探す';hdToast('配備案を作れなかったよ。編成と台帳を確認してね','warn')}},0);return}
  const result=HD_OC_CACHE.get(key);if(!result||result.signature!==hdOCSignature(c)){hdToast('編成や台帳が変わったので、もう一度配備を探してね','warn');hdOCRefresh();return}
+ if(button.hasAttribute('data-hd-oc-procurement-update')){
+  try{const change=hdOCUpdateProcurement(c,result);if(change){hdToast(change.removed||change.updated?`調達計画を更新したよ。所持不足解消 ${change.removed}件・必要数更新 ${change.updated}件`:'保存済みの調達計画は現在の必要数と一致しているよ','success');hdOCRefresh()}}
+  catch{hdToast('調達計画を保存できなかったよ。計画は残しているので再試行してね','warn')}return;
+ }
  if(button.hasAttribute('data-hd-oc-procure')){
   const target=button.closest('.hd-oc-shortage')?.querySelector('[data-hd-oc-target]')?.value;
   try{if(hdOCAddProcurement(c,result,Number(button.dataset.hdOcProcure),target)){hdToast('不足候補を調達リストに保存したよ。入手後に配備を再確認してね','success');if(typeof hdPLOpenList==='function')hdPLOpenList()}}

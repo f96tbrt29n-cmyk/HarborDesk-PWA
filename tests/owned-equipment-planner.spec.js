@@ -143,3 +143,35 @@ test('owned equipment procurement preserves independent goals and avoids summing
  const counts=await page.evaluate(()=>{const c=hdOCContext('1-1','oc-test',0),r=hdOCSearch(c),target=r.shortages[0].candidates[0];hdOCAddProcurement(c,r,0,target);hdOCAddProcurement({...c,fleet:{...c.fleet,id:'oc-other',name:'別編成'}},r,0,target);let rows=hdPLLoad(),items=rows[0].gearItems;items.push({...items[0],ownedPlanSource:undefined,ship:'夕立改二',loadout:'別の希望',needed:1});hdPLSave(rows);return {items:items.length,needed:hdPLDemandRows(items)[0].needed,other:items.find(x=>x.loadout==='別の希望').needed}});
  expect(counts).toEqual({items:3,needed:2,other:1});
 });
+
+test('owned equipment plan update lowers a stock gap and retires a candidate when alternatives satisfy the goal',async({page})=>{
+ await prepare(page,[{name:'33号水上電探',count:1,star:0}],[{kind:'電探',label:'電探',minCount:4}]);
+ const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await panel.locator('[data-hd-oc-search]').click();await panel.locator('[data-hd-oc-procure]').click();
+ const initial=await page.evaluate(()=>hdPLLoad()[0].gearItems[0]);expect(initial.needed).toBe(3);
+ await page.evaluate(()=>{const rows=hdPLLoad();rows[0].gearItems.push({map:'1-1',ship:'別の希望',target:'12.7cm連装砲',wanted:'12.7cm連装砲',kind:'主砲',needed:1});hdPLSave(rows);localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'33号水上電探',count:2,star:0}]));hdMSNOpen('1-1')});
+ await panel.locator('[data-hd-oc-search]').click();await panel.locator('[data-hd-oc-procurement-update]').click();
+ expect(await page.evaluate(()=>hdPLLoad()[0].gearItems.find(x=>x.ownedPlanSource).needed)).toBe(2);
+ await page.evaluate(()=>{localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'33号水上電探',count:4,star:0}]));hdMSNRender()});
+ await panel.locator('[data-hd-oc-search]').click();await expect(panel.locator('.hd-oc-result')).toContainText('登録済み装備目安は充足');await panel.locator('[data-hd-oc-procurement-update]').click();
+ const left=await page.evaluate(()=>hdPLLoad()[0].gearItems);expect(left).toEqual([{map:'1-1',ship:'別の希望',target:'12.7cm連装砲',wanted:'12.7cm連装砲',kind:'主砲',needed:1}]);await expect(panel.locator('[data-hd-oc-procurement-update]')).toHaveCount(0);
+});
+
+test('owned equipment plan update preserves other routes fleets and unknown conditions while migrating a legacy plan',async({page})=>{
+ await prepare(page,[],[{kind:'電探',label:'電探',minCount:2}]);
+ const result=await page.evaluate(()=>{const c=hdOCContext('1-1','oc-test',0),r=hdOCSearch(c),target=r.shortages[0].candidates[0];hdOCAddProcurement(c,r,0,target);hdOCAddProcurement({...c,index:1},r,0,target);let rows=hdPLLoad(),entry=rows[0].gearItems[0];delete entry.ownedPlanRoute;rows[0].gearItems.push({...entry,ownedPlanSource:JSON.stringify(['other','電探','電探'])},{...entry,ownedPlanSource:JSON.stringify(['oc-test','電探','別条件'])});hdPLSave(rows);const before=JSON.stringify(rows[0].gearItems.slice(1));const change=hdOCUpdateProcurement(c,r);return {change,route:hdPLLoad()[0].gearItems[0].ownedPlanRoute,untouched:JSON.stringify(hdPLLoad()[0].gearItems.slice(1))===before}});
+ expect(result).toEqual({change:{removed:0,updated:1},route:0,untouched:true});
+ const cleanup=await page.evaluate(()=>{localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'33号水上電探',count:2,star:0}]));const c=hdOCContext('1-1','oc-test',0),r=hdOCSearch(c);return {change:hdOCUpdateProcurement(c,r),rows:hdPLLoad()[0].gearItems}});
+ expect(cleanup.change).toEqual({removed:1,updated:0});expect(cleanup.rows.length).toBe(3);expect(cleanup.rows[0].ownedPlanRoute).toBe(1);
+});
+
+test('owned equipment plan update retains the saved plan on storage failure and rejects stale results',async({page})=>{
+ await prepare(page,[{name:'33号水上電探',count:1,star:0}],[{kind:'電探',label:'電探',minCount:2}]);
+ const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await panel.locator('[data-hd-oc-search]').click();await panel.locator('[data-hd-oc-procure]').click();
+ await page.evaluate(()=>{localStorage.setItem('harbordesk-equipment-v1','[]');hdMSNOpen('1-1')});await panel.locator('[data-hd-oc-search]').click();
+ const before=await page.evaluate(()=>localStorage.getItem(HD_PROCUREMENT_KEY));
+ await page.evaluate(()=>{const set=Storage.prototype.setItem;window.ocRestore=()=>Storage.prototype.setItem=set;Storage.prototype.setItem=function(k,v){if(k===HD_PROCUREMENT_KEY)throw new DOMException('Full','QuotaExceededError');return set.call(this,k,v)}});
+ await panel.locator('[data-hd-oc-procurement-update]').click();expect(await page.evaluate(()=>localStorage.getItem(HD_PROCUREMENT_KEY))).toBe(before);
+ await page.evaluate(()=>window.ocRestore());await panel.locator('[data-hd-oc-procurement-update]').click();expect(await page.evaluate(()=>hdPLLoad()[0].gearItems[0].needed)).toBe(2);
+ await page.evaluate(()=>localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'33号水上電探',count:2,star:0}])));await panel.locator('[data-hd-oc-procurement-update]').click();expect(await page.evaluate(()=>hdPLLoad()[0].gearItems[0].needed)).toBe(2);await expect(panel.locator('[data-hd-oc-procurement-update]')).toHaveCount(0);
+ await panel.locator('[data-hd-oc-search]').click();await panel.locator('[data-hd-oc-procurement-update]').click();expect(await page.evaluate(()=>hdPLLoad())).toEqual([]);
+});
