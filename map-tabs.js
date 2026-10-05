@@ -123,6 +123,7 @@ function hdCustomFleetHtml(map){
   if(typeof loadCustomFleets!=='function')return '<div class="empty">自分用編成機能を読み込み中</div>';
   const list=(loadCustomFleets()[map]||[]);
   const saved=list.length?list.map(item=>{
+    if(typeof cfFleetCardHtml==='function')return cfFleetCardHtml(map,item);
     const rows=(item.ships||[]).map((s,i)=>s.ship||s.gear?`<div class="custom-fleet-saved-row"><span>${i+1}</span><b>${hdMapEsc(s.ship||'未入力')}</b><small>${hdMapEsc(s.gear||'装備メモなし')}</small></div>`:'').join('');
     const linked=item.source==='kancolle-import'&&Number(item.sourceDeckId)>0;
     const detached=item.detachedFromSource==='kancolle-import';

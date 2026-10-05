@@ -227,3 +227,27 @@ test('owned equipment placement distinguishes total slots from competition for c
  await expect(panel.locator('.hd-oc-placement')).toContainText('最大 6枠');await expect(panel.locator('.hd-oc-placement')).toContainText('装備を増やすだけでは解消できない');await expect(panel.locator('[data-hd-oc-procure]')).toHaveCount(0);
  const info=await page.evaluate(()=>{const c=hdOCContext('1-1','oc-test',0),build=hdOCBuild(c);return hdOCPlacementInfo('電探',build.inventory,build.slots,hdFLCatalog())});expect(info.usableOwned).toBe(8);expect(info.blocked).toEqual([]);
 });
+
+test('owned equipment proposal appears beside each ship inside its saved fleet and shows fleet shortages',async({page})=>{
+ await prepare(page,[{name:'33号水上電探',count:1,star:6}],[{kind:'電探',label:'電探',minCount:2}]);
+ await page.evaluate(()=>{selectedMap='1-1';renderMapPicker();hdWSShowElement('guide',true);hdMapActivateTab('mine')});
+ const card=page.locator('#customFleetPanel [data-cf-id="oc-test"]');await expect(card).toBeVisible();
+ await card.locator('[data-hd-oc-search]').click();await expect(card.locator('.hd-oc-inline-ship')).toHaveCount(2);
+ await expect(card.locator('.custom-fleet-saved-list')).toContainText('33号水上電探 ★6');await expect(card.locator('.hd-oc-inline-ship').first()).toContainText('編成全体に不足');
+ await expect(card.locator('.hd-oc-shortage')).toContainText('配備不足 1個');await expect(card.locator('[data-hd-oc-procure]')).toBeVisible();
+ expect(await page.evaluate(()=>loadCustomFleets()['1-1'][0].ships.every(s=>s.gear===''))).toBeTruthy();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+ await card.locator('[data-hd-oc-apply]').click();expect(await page.evaluate(()=>loadCustomFleets()['1-1'][0].ships.some(s=>s.gear.includes('33号水上電探 ★6')))).toBeTruthy();
+ await expect(card.locator('.hd-oc-inline-ship')).toHaveCount(0);
+});
+
+test('owned equipment inline fleet selection keeps proposals separate and invalidates changed inventory and route',async({page})=>{
+ await prepare(page,[{name:'33号水上電探',count:2,star:0}],[{kind:'電探',label:'電探',minCount:2}]);
+ await page.evaluate(()=>{const all=loadCustomFleets();all['1-1'].push({id:'oc-second',name:'別の艦隊',ships:[{ship:'夕立改二',gear:''}]});saveCustomFleets(all);selectedMap='1-1';renderMapPicker();hdWSShowElement('guide',true);hdMapActivateTab('mine')});
+ const card=page.locator('#customFleetPanel [data-cf-id="oc-test"]'),second=page.locator('#customFleetPanel [data-cf-id="oc-second"]');
+ await card.locator('[data-hd-oc-search]').click();await expect(card.locator('.hd-oc-inline-ship')).toHaveCount(2);await expect(second.locator('.hd-oc-inline-ship')).toHaveCount(0);await expect(card.locator('.hd-oc-result')).toContainText('装備目安は充足');
+ await page.evaluate(()=>{localStorage.setItem('harbordesk-equipment-v1','[]');window.dispatchEvent(new Event('hd:equipment-changed'))});await expect(card.locator('.hd-oc-inline-ship')).toHaveCount(0);await expect(card.locator('[data-hd-oc-apply]')).toHaveCount(0);
+ await card.locator('[data-hd-oc-search]').click();await expect(card.locator('.hd-oc-inline-ship')).toHaveCount(2);
+ await page.evaluate(()=>{MAP_PLANS['1-1']={presets:[{name:'通常',ships:'駆逐2'},{name:'別条件',ships:'駆逐2 高速統一'}]};renderCustomFleets('1-1')});
+ await card.locator('[data-hd-oc-inline-route]').selectOption('1');await expect(card.locator('.hd-oc-inline-ship')).toHaveCount(0);await expect(second.locator('[data-hd-oc-inline-route]')).toHaveValue('1');
+});
