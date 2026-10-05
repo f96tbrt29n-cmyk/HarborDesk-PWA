@@ -15,7 +15,7 @@ const HD_FS_TYPE_ALIASES={
  '軽巡':['軽巡洋艦'],'軽巡洋艦':['軽巡洋艦'],
  '雷巡':['重雷装巡洋艦'],'重雷装巡洋艦':['重雷装巡洋艦'],
  '航巡':['航空巡洋艦'],'航空巡洋艦':['航空巡洋艦'],
- '重巡':['重巡洋艦','航空巡洋艦'],'重巡級':['重巡洋艦','航空巡洋艦'],
+ '重巡/雷巡':['重巡洋艦','航空巡洋艦','重雷装巡洋艦'],'重巡':['重巡洋艦','航空巡洋艦'],'重巡級':['重巡洋艦','航空巡洋艦'],
  '戦艦':['戦艦','高速戦艦','航空戦艦'],'戦艦級':['戦艦','高速戦艦','航空戦艦'],
  '航空戦艦':['航空戦艦'],
  '空母':['軽空母','正規空母','装甲空母'],'空母系':['軽空母','正規空母','装甲空母'],
@@ -27,7 +27,7 @@ function hdFSEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s==null?'':
 function hdFSMap(){return typeof selectedMap!=='undefined'?selectedMap:''}
 function hdFSRoster(){try{return typeof rosterLoad==='function'?rosterLoad():JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')}catch(e){return []}}
 function hdFSDbFor(input){var row=typeof input==='object'?input:null,n=String(row?.name||input||'').trim();if(!n)return null;if(typeof hdShipDbResolveShip==='function')return hdShipDbResolveShip({name:n,masterId:Number(row?.masterId)||0});if(typeof HD_SHIP_DATABASE==='undefined')return null;return HD_SHIP_DATABASE.find(function(x){return n===x.base||n===x.final||n.startsWith(x.base)})||null}
-function hdFSType(row){if(row&&row.type)return row.type;var db=hdFSDbFor(row);return db&&db.type||''}
+function hdFSType(row){var db=hdFSDbFor(row);return db&&db.type||row?.type||''}
 function hdFSReadJson(key,fallback){try{const x=JSON.parse(localStorage.getItem(key)||'null');return x??fallback}catch(e){return fallback}}
 function hdFSLiveState(){
  var now=Date.now(),fleets=hdFSReadJson('harbordesk-kancolle-fleets-v1',[]),base=hdFSReadJson('harbordesk-pwa-v1',{}),expeditionShips=new Set(),dockedShips=new Set();
@@ -61,18 +61,22 @@ function hdFSTypeMatches(p,token){
  var allowed=HD_FS_TYPE_ALIASES[token]||[token];return allowed.includes(p.type);
 }
 function hdFSRequirementPatterns(){return [
- ['航空戦艦',/航空戦艦\s*(\d+)/],['重巡級',/重巡級\s*(\d+)/],['戦艦級',/戦艦級\s*(\d+)/],['空母系',/空母系\s*(\d+)/],
- ['正規空母',/正規空母\s*(\d+)/],['軽空母',/軽空母\s*(\d+)/],['装甲空母',/装甲空母\s*(\d+)/],
- ['航巡',/航巡\s*(\d+)/],['重巡',/重巡(?!級)\s*(\d+)/],['軽巡',/軽巡\s*(\d+)/],['駆逐',/駆逐\s*(\d+)/],
- ['海防艦',/海防艦\s*(\d+)/],['対潜艦',/対潜艦\s*(\d+)/],['水母',/水母\s*(\d+)/],['潜水艦',/潜水艦\s*(\d+)/]
+ ['重巡/雷巡',/重巡[／/]雷巡\s*(\d+)/g],['航空戦艦',/航空戦艦\s*(\d+)/g],['重巡級',/重巡級\s*(\d+)/g],['戦艦級',/戦艦級\s*(\d+)/g],['空母系',/空母系\s*(\d+)/g],
+ ['正規空母',/正規空母\s*(\d+)/g],['軽空母',/軽空母\s*(\d+)/g],['装甲空母',/装甲空母\s*(\d+)/g],
+ ['航巡',/航(?:巡|空巡洋艦)\s*(\d+)/g],['重巡',/重(?:巡|巡洋艦)\s*(\d+)/g],['雷巡',/(?:雷巡|重雷装巡洋艦)\s*(\d+)/g],['軽巡',/軽(?:巡|巡洋艦)\s*(\d+)/g],['駆逐',/駆逐(?:艦)?\s*(\d+)/g],
+ ['戦艦',/(?<!航空|高速)戦艦\s*(\d+)/g],['高速戦艦',/高速戦艦\s*(\d+)/g],['空母',/(?<!正規|装甲|軽)空母\s*(\d+)/g],
+ ['海防艦',/海防艦\s*(\d+)/g],['対潜艦',/対潜艦\s*(\d+)/g],['水母',/(?:水母|水上機母艦)\s*(\d+)/g],['潜水艦',/潜水艦\s*(\d+)/g],['潜水母艦',/潜水母艦\s*(\d+)/g]
 ]}
 function hdFSPresetInfo(preset){
- var text=String(preset&&preset.ships||'').replace(/ /g,'');var requirements=[];
- hdFSRequirementPatterns().forEach(function(pair){var m=text.match(pair[1]);if(m)requirements.push({token:pair[0],count:Math.max(1,Number(m[1])||1)})});
+ var text=String(preset&&preset.ships||'').replace(/ /g,'');var requirements=[],remaining=text;
+ hdFSRequirementPatterns().forEach(function(pair){let count=0,found=false;remaining=remaining.replace(pair[1],function(match,n){found=true;count+=Number(n)||0;return ' '.repeat(match.length)});if(found)requirements.push({token:pair[0],count:count})});
  var sum=requirements.reduce(function(s,x){return s+x.count},0),tm=text.match(/(\d+)隻/),total=tm?Number(tm[1]):(sum||6);total=Math.max(sum,Math.min(6,total||6));
+ // Conditional prose is not an exact fleet specification. Never interpret a limit or an alternative as a required count.
+ var ambiguous=/\d+(?:隻)?(?:以上|以下|未満|超)|または|又は|狙い|[〜～~]/.test(text)||sum>6;
+ if(ambiguous){requirements=[];total=Math.min(6,tm?Number(tm[1])||6:6)}
  var preferred=[];Object.keys(HD_FS_TYPE_ALIASES).forEach(function(k){if(text.includes(k)&&!preferred.includes(k))preferred.push(k)});
  if(/水雷/.test(text)){preferred.push('軽巡','駆逐','雷巡')}
- return {text:text,requirements:requirements,total:total,preferred:Array.from(new Set(preferred)),speedRequired:/高速\+|高速以上|高速統一|高速\s*以上/.test(text),speedPreferred:/高速/.test(text)};
+ return {conditionManual:ambiguous||!requirements.length||/など|軸|中心|含む|組み合わせ|切替|任務/.test(text),text:text,requirements:requirements,total:total,preferred:Array.from(new Set(preferred)),speedRequired:/高速\+|高速以上|高速統一|高速\s*以上/.test(text),speedPreferred:/高速/.test(text)};
 }
 function hdFSNeeds(map){try{return typeof hdSEChecks==='function'?hdSEChecks(map).rows||[]:[]}catch(e){return []}}
 function hdFSScore(p,info,needs){
@@ -111,11 +115,11 @@ function hdFSOperationalSummary(pool){
  return {total:pool.length,available:pool.length-blocked.length,blocked:blocked.length,counts:counts};
 }
 function hdFSGenerate(map,preset,index){
- var info=hdFSPresetInfo(preset),needs=hdFSNeeds(map),live=hdFSLiveState(),pool=hdFSRoster().map(function(row){return hdFSProfile(row,live)}),operational=hdFSOperationalSummary(pool),used=new Set(),slots=[],missing=[];
+ var info=hdFSPresetInfo(preset),needs=hdFSNeeds(map),live=hdFSLiveState(),pool=hdFSRoster().map(function(row){return hdFSProfile(row,live)}).filter(p=>!info.requirements.some(req=>req.count===0&&hdFSTypeMatches(p,req.token))).filter(p=>map!=='1-6'||!['戦艦','高速戦艦','正規空母','装甲空母','重雷装巡洋艦','潜水艦','潜水空母'].includes(p.type)),operational=hdFSOperationalSummary(pool),used=new Set(),slots=[],missing=[];
  info.levelTarget=hdFSLevelTarget(map);
  info.requirements.forEach(function(req){for(var i=0;i<req.count;i++){var p=hdFSPickBest(pool,used,function(x){return hdFSTypeMatches(x,req.token)},info,needs);if(p){used.add(p.row.id);slots.push({profile:p,required:req.token,levelTarget:info.levelTarget})}else{slots.push({profile:null,required:req.token});missing.push(req.token)}}});
- while(slots.length<info.total){var p=hdFSPickBest(pool,used,null,info,needs);if(!p)break;used.add(p.row.id);slots.push({profile:p,required:'',levelTarget:info.levelTarget})}
- while(slots.length<info.total)slots.push({profile:null,required:'自由枠'});
+ while(info.requirements.length&&slots.length<info.total){var p=hdFSPickBest(pool,used,p=>/自由枠/.test(info.text)||info.preferred.some(t=>hdFSTypeMatches(p,t)),info,needs);if(!p)break;used.add(p.row.id);slots.push({profile:p,required:'',levelTarget:info.levelTarget})}
+ while(slots.length<info.total)slots.push({profile:null,required:info.conditionManual?'条件未確認':'自由枠'});
  var known=slots.filter(function(s){return s.profile&&s.profile.type}).length,filled=slots.filter(function(s){return s.profile}).length;
  var low=info.speedRequired?slots.filter(function(s){return s.profile&&s.profile.speed==='低速'}).map(function(s){return s.profile.row.name}):[];
  var masterBacked=slots.filter(function(s){return s.profile&&s.profile.masterBacked}).length;return {map:map,preset:preset,index:index,info:info,needs:needs,slots:slots,missing:missing,filled:filled,known:known,low:low,masterBacked:masterBacked,operational:operational};
@@ -126,6 +130,7 @@ function hdFSPlans(map){
  return presets.slice(0,3).map(function(x,i){return hdFSGenerate(map,x,i)});
 }
 function hdFSShipHtml(slot,i){
+ if(!slot.profile&&slot.required==='条件未確認')return '<div class="hd-fs-ship missing"><span>'+(i+1)+'</span><div><strong>編成条件が未確認</strong><small>海域・ルートの艦種と隻数を確認してね</small></div></div>';
  if(!slot.profile)return '<div class="hd-fs-ship missing"><span>'+(i+1)+'</span><div><strong>'+hdFSEsc(slot.required||'自由枠')+' が不足</strong><small>艦隊台帳に候補を追加してね</small></div></div>';
  var p=slot.profile,r=p.row,op=p.operational||{},live=(op.hp&&op.maxHp?' ・ HP '+op.hp+'/'+op.maxHp:'')+(op.cond!=null?' ・ cond '+op.cond:'')+((op.labels||[]).length?' ・ '+op.labels.join(' / '):''),meta=(p.type||'艦種未設定')+(r.level?' ・ Lv.'+r.level:'')+(p.speed?' ・ '+p.speed:'')+(p.db&&p.db._masterOnly?' ・ MASTER':'')+live;
  var image=typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(Number(r.masterId)>0?{id:Number(r.masterId),name:r.name}:r.name,'fleet-thumb'):'';
@@ -137,15 +142,15 @@ function hdFSMissingGearHtml(s){
 }
 function hdFSSuggestionHtml(s){
  var complete=s.missing.length===0&&s.filled===s.info.total,unknown=s.slots.filter(function(x){return x.profile&&!x.profile.type}).length;
- var status=complete?(unknown?'候補完成・艦種確認':'候補完成'):'不足あり';var cls=complete?'ok':'warn';
- var warnings=[];if(s.missing.length)warnings.push('不足艦種: '+Array.from(new Set(s.missing)).join(' / '));if(s.low.length)warnings.push('速力確認: '+s.low.join('、'));if(unknown)warnings.push('艦種未設定 '+unknown+'隻');
+ var status=s.info.conditionManual?'編成条件の確認が必要':s.low.length?'速力条件の確認が必要':complete?(unknown?'候補完成・艦種確認':'候補完成'):'不足あり';var cls=complete&&!s.info.conditionManual&&!s.low.length?'ok':'warn';
+ var warnings=[];if(s.info.conditionManual)warnings.push('艦種・隻数の条件を手動確認。読み取れない条件や不明な自由枠を無関係な艦で埋めません');if(s.missing.length)warnings.push('不足艦種: '+Array.from(new Set(s.missing)).join(' / '));if(s.low.length)warnings.push('速力確認: '+s.low.join('、'));if(unknown)warnings.push('艦種未設定 '+unknown+'隻');
  var op=s.operational||{},excluded=Object.entries(op.counts||{}).map(function(x){return x[0]+' '+x[1]+'隻'}).join(' / ');if(excluded)warnings.push('候補から除外: '+excluded);
  return '<article class="hd-fs-card"><div class="hd-fs-card-head"><div><span>編成候補 '+(s.index+1)+'</span><strong>'+hdFSEsc(s.preset.name||'候補編成')+'</strong><small>'+hdFSEsc(s.preset.use||'')+'</small></div><b class="'+cls+'">'+status+'</b></div>'+
  '<div class="hd-fs-ships">'+s.slots.map(hdFSShipHtml).join('')+'</div>'+
  '<p class="hd-fs-level-guide">'+hdFSEsc(s.info.levelTarget?.text||'推奨Lvは個別確認')+'。艦隊平均の目安を基に、下限目安を満たす近いLvの艦を優先。足りない場合は近い艦を表示。Lvだけでは攻略可否は判定しません。</p>'+
  (warnings.length?'<div class="hd-fs-warning">'+hdFSEsc(warnings.join(' ｜ '))+'</div>':'')+hdFSMissingGearHtml(s)+
  '<div class="hd-fs-source"><b>アプリ内編成例:</b> '+hdFSEsc(s.preset.ships||'')+'<br><b>装備メモ:</b> '+hdFSEsc(s.preset.gear||'')+'</div>'+
- '<div class="hd-fs-actions"><button type="button" class="primary small" data-hd-fs-save="'+s.index+'">この候補を自分用編成に保存</button><button type="button" class="ghost small" data-hd-fs-roster>艦隊台帳を確認</button></div></article>';
+ '<div class="hd-fs-actions"><button type="button" class="primary small" data-hd-fs-save="'+s.index+'"'+(!s.filled?' disabled':'')+'>この候補を自分用編成に保存</button><button type="button" class="ghost small" data-hd-fs-roster>艦隊台帳を確認</button></div></article>';
 }
 // Keep the pressed target alive until the native click has been dispatched.
 let hdFSPressedPointer=null,hdFSRenderPending=false,hdFSPendingPreserveLoadouts=true;
@@ -197,7 +202,7 @@ function hdFSEnsure(){
  var sec=document.createElement('section');sec.id='hdFleetSuggester';sec.className='advanced-section hd-fs-section';sec.innerHTML='<div class="section-head"><div><div class="eyebrow">FLEET SUGGESTER</div><h2>手持ち艦隊・自動編成候補</h2></div><span id="hdFleetSuggesterMap" class="muted">海域未選択</span></div><div id="hdFleetSuggesterBody"></div>';anchor.insertAdjacentElement('afterend',sec);hdFSRender();
 }
 function hdFSSave(index){
- var map=hdFSMap(),s=hdFSPlans(map)[Number(index)];if(!map||!s)return;var all=typeof loadCustomFleets==='function'?loadCustomFleets():{};all[map]=all[map]||[];
+ var map=hdFSMap(),s=hdFSPlans(map)[Number(index)];if(!map||!s||!s.filled)return;var all=typeof loadCustomFleets==='function'?loadCustomFleets():{};all[map]=all[map]||[];
  var name=map+' 自動提案｜'+(s.preset.name||('候補'+(s.index+1))),ships=Array.from({length:6},function(_,i){var slot=s.slots[i],p=slot&&slot.profile,r=p&&p.row,mid=Number(r&&r.masterId)||Number(p&&p.master&&p.master.id)||Number(typeof hdShipImageResolve==='function'&&r?.name?hdShipImageResolve(r.name)?.id:0)||0;return {ship:r&&r.name||'',masterId:mid,gameShipId:Number(r?.gameShipId)||0,rosterId:r?.id||'',gear:r&&r.gear||''}});
  var memo='HarborDesk自動提案。'+(s.preset.use||'通常攻略')+'。アプリ内編成例を基にした候補で、ルート固定を保証しません。';
  var old=all[map].find(function(x){return x.name===name}),id=old&&old.id||(typeof cfUid==='function'?cfUid():'fs-'+Date.now()+'-'+Math.random().toString(16).slice(2));

@@ -6007,6 +6007,7 @@ test('release smoke: quest database type filter works after map quest navigation
 test('release smoke: fleet suggestion updates retain a pressed acquisition button until native click', async ({ page }) => {
   await boot(page);
   await page.evaluate(() => {
+    MAP_PLANS['6-5']={presets:[{name:'操作確認用の明確な条件',ships:'正規空母1',gear:'艦戦',use:'テスト'}]};
     localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([{id:'pressed-akagi',name:'赤城',type:'正規空母',level:95,gear:''}]));
     selectedWorld='6';selectedMap='6-5';renderMapPicker();hdFSOpen();
   });

@@ -251,3 +251,51 @@ test('owned equipment inline fleet selection keeps proposals separate and invali
  await page.evaluate(()=>{MAP_PLANS['1-1']={presets:[{name:'通常',ships:'駆逐2'},{name:'別条件',ships:'駆逐2 高速統一'}]};renderCustomFleets('1-1')});
  await card.locator('[data-hd-oc-inline-route]').selectOption('1');await expect(card.locator('.hd-oc-inline-ship')).toHaveCount(0);await expect(second.locator('[data-hd-oc-inline-route]')).toHaveValue('1');
 });
+
+
+test('route fleet conditions: 1-6 uses one light cruiser and five destroyers and keeps missing slots',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdFSPlans==='function');
+ const r=await page.evaluate(()=>{
+  const roster=[{id:'cl',name:'条件テスト軽巡',type:'軽巡洋艦',level:30},...Array.from({length:5},(_,i)=>({id:'dd'+i,name:'条件テスト駆逐'+i,type:'駆逐艦',level:30})),{id:'bb',name:'条件テスト戦艦',type:'戦艦',level:30},{id:'cv',name:'条件テスト空母',type:'正規空母',level:30},{id:'clt',name:'条件テスト雷巡',type:'重雷装巡洋艦',level:30}];
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(roster));const full=hdFSPlans('1-6')[0];
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(roster.filter(x=>x.id!=='dd4')));const partial=hdFSPlans('1-6')[0];
+  const forbidden=hdFSGenerate('1-6',{ships:'戦艦1＋正規空母1＋雷巡1'},0);
+  return {types:full.slots.map(x=>x.profile?.type),complete:full.filled,manual:full.info.conditionManual,partial:partial.slots.map(x=>x.profile?.type||null),missing:partial.missing,html:hdFSSuggestionHtml(partial),forbidden:forbidden.filled};
+ });
+ expect(r.types.filter(x=>x==='軽巡洋艦')).toHaveLength(1);expect(r.types.filter(x=>x==='駆逐艦')).toHaveLength(5);expect(r.complete).toBe(6);expect(r.manual).toBe(false);expect(r.partial.filter(Boolean)).toHaveLength(5);expect(r.missing).toEqual(['駆逐']);expect(r.html).toContain('駆逐 が不足');expect(r.forbidden).toBe(0);
+});
+
+test('route fleet conditions: master ship type overrides an incorrect roster type',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdFSPlans==='function');
+ const r=await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{id:'wrong',name:'北上改二',type:'軽巡洋艦',level:30},{id:'real',name:'条件テスト軽巡',type:'軽巡洋艦',level:30},...Array.from({length:5},(_,i)=>({id:'dd'+i,name:'条件テスト駆逐'+i,type:'駆逐艦',level:30}))]));
+  const s=hdFSPlans('1-6')[0];return {type:hdFSType({name:'北上改二',type:'軽巡洋艦'}),ids:s.slots.map(x=>x.profile?.row.id)};
+ });expect(r.type).toBe('重雷装巡洋艦');expect(r.ids).not.toContain('wrong');expect(r.ids).toContain('real');
+});
+
+test('route fleet conditions: formal type names and alternative slots parse without overlap',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdFSPresetInfo==='function');
+ const r=await page.evaluate(()=>({formal:hdFSPresetInfo({ships:'軽巡洋艦1＋駆逐艦5'}),mixed:hdFSPresetInfo({ships:'戦艦1＋正規空母1＋軽空母1＋重巡/雷巡2＋駆逐1'}),aviation:hdFSPresetInfo({ships:'航空戦艦1＋装甲空母1＋高速戦艦1＋水上機母艦1＋重雷装巡洋艦1＋駆逐艦1'})}));
+ expect(r.formal.requirements).toEqual([{token:'軽巡',count:1},{token:'駆逐',count:5}]);expect(r.mixed.total).toBe(6);expect(r.mixed.requirements.reduce((n,x)=>n+x.count,0)).toBe(6);expect(r.mixed.requirements).toContainEqual({token:'重巡/雷巡',count:2});expect(r.aviation.requirements.reduce((n,x)=>n+x.count,0)).toBe(6);expect(r.aviation.requirements).not.toContainEqual({token:'戦艦',count:1});
+});
+
+test('route fleet conditions: uncertain descriptions never fill unrelated ships or save empty fleets',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdFSGenerate==='function');
+ const r=await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{id:'bb',name:'条件テスト戦艦',type:'戦艦',level:30}]));
+  const unknown=hdFSGenerate('1-3',{ships:'軽巡・駆逐を中心に6隻'},0),range=hdFSGenerate('2-2',{ships:'戦艦級0・空母3以上'},0),over=hdFSGenerate('1-3',{ships:'軽巡1＋駆逐7'},0);selectedMap='1-3';hdFSSave(0);
+  return {filled:unknown.filled,html:hdFSSuggestionHtml(unknown),range:range.filled,over:over.slots.length,saved:(loadCustomFleets()['1-3']||[]).length};
+ });expect(r.filled).toBe(0);expect(r.html).toContain('編成条件の確認が必要');expect(r.html).toContain('編成条件が未確認');expect(r.html).toContain('disabled');expect(r.range).toBe(0);expect(r.over).toBe(6);expect(r.saved).toBe(0);
+});
+
+
+test('route fleet conditions: readiness rejects ambiguous presets and incorrect ship counts',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdFERoute==='function');
+ const r=await page.evaluate(()=>{
+  const fleet={map:'1-6',ships:[{ship:'条件テスト軽巡',type:'軽巡洋艦'},...Array.from({length:5},(_,i)=>({ship:'条件テスト駆逐'+i,type:'駆逐艦'}))],routeInfo:hdFSPresetInfo({ships:'軽巡1＋駆逐5'})};
+  const good=hdFERoute(fleet);const tooMany=hdFERoute({...fleet,ships:[...fleet.ships,{ship:'余剰艦',type:'駆逐艦'}]});
+  const unclear=hdFERoute({...fleet,routeInfo:hdFSPresetInfo({ships:'軽巡・駆逐中心'})});
+  const zero=hdFERoute({map:'1-1',ships:[{ship:'条件テスト戦艦',type:'戦艦'},{ship:'条件テスト駆逐',type:'駆逐艦'}],routeInfo:hdFSPresetInfo({ships:'戦艦0＋駆逐2'})});
+  return {good:good.status,tooMany:tooMany.status,unclear:unclear.status,zero:zero.status};
+ });expect(r).toEqual({good:'ready',tooMany:'missing',unclear:'manual',zero:'missing'});
+});

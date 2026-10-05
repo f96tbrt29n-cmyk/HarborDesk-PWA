@@ -1,4 +1,5 @@
 const MAP_PLANS={
+ '1-6':{presets:[{name:'下ルート・軽巡1＋駆逐5',ships:'軽巡1＋駆逐5',gear:'対空カットイン・対潜装備を準備。航空戦と旗艦の損傷を確認。',use:'通常攻略・下ルート AEGFBN',source:'https://zekamashi.net/kancolle-kouryaku/1-6/'}],quests:[]},
  '1-5':{
   presets:[
    {name:'先制対潜・4隻',ships:'海防艦/駆逐/軽巡など対潜艦4隻',gear:'ソナー＋爆雷系。先制対潜可能艦を優先。',use:'月次EO・対潜任務向け'},
