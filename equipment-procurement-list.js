@@ -22,7 +22,7 @@ function hdPLResolveWanted(wanted){
  return {item:missing,kind,exact:false};
 }
 function hdPLReqStar(x){return Math.max(0,Number(x?.reqStar)||0)}
-function hdPLMergeKey(x){return [x.map||'',x.target||x.wanted||'',x.methodKey||'',x.ship||'',x.kind||'',hdPLReqStar(x)].join('|')}
+function hdPLMergeKey(x){return [x.map||'',x.target||x.wanted||'',x.methodKey||'',x.ship||'',x.kind||'',hdPLReqStar(x)].join('|')+(x.ownedPlanSource?'|'+x.ownedPlanSource:'')}
 function hdPLDemandKey(x,map=''){return [map||x.map||'',x.target||x.wanted||'',x.methodKey||'',x.kind||'',hdPLReqStar(x)].join('|')}
 function hdPLTargetLabel(x){const t=x?.target||x?.wanted||'';return t+(hdPLReqStar(x)?` ★${hdPLReqStar(x)}+`:'')}
 function hdPLMergeGearItems(items=[]){
@@ -49,7 +49,8 @@ function hdPLDemandRows(items=[]){
   const target=x.target||x.wanted||'',key=hdPLDemandKey({...x,target});
   const cur=m.get(key)||{...x,target,needed:0,requiredTotal:0,qualifiedNeeded:0,ships:[],loadouts:[],sources:[]};
   const reqStar=hdPLReqStar(x),unit=Math.max(Number(x.needed)||1,Number(x.requiredTotal)||0);
-  if(reqStar){cur.needed=Math.max(Number(cur.needed)||0,unit);cur.requiredTotal=Math.max(Number(cur.requiredTotal)||0,Number(x.requiredTotal)||0)}
+  if(x.ownedPlanSource){cur.ownedPlanTotal=Math.max(Number(cur.ownedPlanTotal)||0,unit)}
+  else if(reqStar){cur.needed=Math.max(Number(cur.needed)||0,unit);cur.requiredTotal=Math.max(Number(cur.requiredTotal)||0,Number(x.requiredTotal)||0)}
   else{cur.needed=(Number(cur.needed)||0)+unit;cur.requiredTotal=(Number(cur.requiredTotal)||0)+(Number(x.requiredTotal)||0)}
   cur.qualifiedNeeded=Math.max(Number(cur.qualifiedNeeded)||0,Number(x.qualifiedNeeded)||0,reqStar?1:0);
   cur.ships=[...new Set([...cur.ships,x.ship].filter(Boolean))];
@@ -58,7 +59,7 @@ function hdPLDemandRows(items=[]){
   m.set(key,cur);
  }
  return [...m.values()].map(x=>{
-  const reqStar=hdPLReqStar(x),needed=Math.max(Number(x.needed)||0,Number(x.requiredTotal)||0),ownedTotal=x.target?hdPLOwnedCount(x.target,0):0,qualifiedNeeded=reqStar?Math.max(1,Number(x.qualifiedNeeded)||0):0,ownedQualified=reqStar&&x.target?hdPLOwnedCount(x.target,reqStar):ownedTotal,totalShortfall=Math.max(0,needed-ownedTotal),starShortfall=reqStar?Math.max(0,qualifiedNeeded-ownedQualified):0,shortfall=Math.max(totalShortfall,starShortfall),owned=reqStar?ownedQualified:ownedTotal;
+  const reqStar=hdPLReqStar(x),needed=Math.max(Number(x.needed)||0,Number(x.requiredTotal)||0,Number(x.ownedPlanTotal)||0),ownedTotal=x.target?hdPLOwnedCount(x.target,0):0,qualifiedNeeded=reqStar?Math.max(1,Number(x.qualifiedNeeded)||0):0,ownedQualified=reqStar&&x.target?hdPLOwnedCount(x.target,reqStar):ownedTotal,totalShortfall=Math.max(0,needed-ownedTotal),starShortfall=reqStar?Math.max(0,qualifiedNeeded-ownedQualified):0,shortfall=Math.max(totalShortfall,starShortfall),owned=reqStar?ownedQualified:ownedTotal;
   return {...x,reqStar,needed,qualifiedNeeded,ownedTotal,ownedQualified,owned,shortfall,totalShortfall,starShortfall,status:shortfall===0?'ready':(ownedTotal>0||ownedQualified>0)?'partial':'missing'};
  }).sort((a,b)=>{
   if((a.shortfall===0)!==(b.shortfall===0))return a.shortfall===0?1:-1;
