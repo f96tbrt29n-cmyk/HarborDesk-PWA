@@ -227,7 +227,16 @@ function hdOCReview(plan,measure){
    else if(radius<target)problems.push(`第${i}航空隊：行動半径 ${radius} / ボス必要半径 ${target}（あと${target-radius}）`);
   }
   if(problems.length||unconfirmed.length)add('base',!sorties.length?'data':problems.length?'missing':'manual','基地航空隊の計画を確認',[...problems,...unconfirmed].join('。'),'基地航空隊プランナーで機体・機数・出撃設定を直してね。半径は海域のボス必要半径で確認するよ。','base');
-  else add('base','info','基地計画の基本条件は確認済み',`保存計画の出撃${sorties.length}部隊について、機体・機数・所持数・ボスへの行動半径を確認しました。`,'ゲーム側の配備と出撃先を合わせてね。基地制空・敵編成・実際の損耗は別の確認が必要です。','base');
+  else add('base','info','基地計画の基本条件は確認済み',`保存計画の出撃${sorties.length}部隊について、機体・機数・所持数・ボスへの行動半径を確認しました。`,'ゲーム側の配備と出撃先を合わせてね。敵編成と残機数のチェックは下の項目に表示します。','base');
+  if(state?.defenseCheck?.enemyId&&typeof hdLBDefenseAssessment==='function'){const a=hdLBDefenseAssessment(plan.map,state);add('base-defense',a.status,'基地防空の合計制空目安',a.invalid?'防空部隊の機体・機数・★が未判定です。':a.enemy===null?'基地空襲の敵制空値が未入力です。':`${a.label}：防空${a.count}部隊の合計 ${a.ours} / 敵 ${a.enemy} / ${HD_LB_AIR_GOALS[a.goal]} ${a.required}${a.shortage?`、あと ${a.shortage}不足`:'、目安を充足'}。`,'基地計画で防空札・敵空襲編成・機数を確認してね。高高度・重爆補正には未対応です。','base',a.source);}
+  if(typeof hdLBAirAssessment==='function')for(const [i,c] of corps.entries())if(c.mode==='sortie'){
+   const a=hdLBAirAssessment(plan.map,c),name=`第${i+1}航空隊`;
+   if(a.invalid.length)add('base-air:'+i,'data',name+'の制空は未判定',a.invalid.join('、'),'基地計画の機体・機数・★を直してね。','base');
+   else if(a.enemy===null)add('base-air:'+i,'data',name+'の敵編成が未設定','基地用の敵制空値がないため、目標までの不足値を計算できません。','基地計画で敵編成を選ぶか、敵偵察機込みの基地用制空値を入力してね。','base');
+   else add('base-air:'+i,a.status,name+'の基地制空目安',`${a.label}：敵 ${a.enemy} / 基地 ${a.ours}（${a.state}）。${HD_LB_AIR_GOALS[a.goal]}には ${a.required}${a.shortage?`、あと ${a.shortage}不足`:'、目安を充足'}。`,a.shortage?(a.fullPower>=a.required?'機数を補充すると目安を満たします。':'戦闘機・改修・熟練度・目標を見直してね。後続部隊は敵機削りを含まない保守的な比較です。'):'登録機数での簡易目安です。ゲーム側の敵編成・配備を合わせてね。','base',a.source);
+   if(!a.invalid.length&&a.missing)add('base-loss:'+i,'missing',name+'の機数が満載未満',`補充 ${a.missing}機 / 燃料 ${a.fuel} / ボーキ ${a.bauxite}。制空 ${a.ours} → 満載目安 ${a.fullPower}。`,'出撃前に基地を補充してね。計画の機数を更新すると再計算します。','base');
+   if(!a.invalid.length&&a.loss>0)add('base-scenario:'+i,a.scenarioShortage?'manual':'info',name+'の損耗を仮定した比較',`各中隊の機数を仮に${a.loss}%減らすと制空 ${a.scenarioPower}${a.enemy===null?' / 敵編成未設定':a.scenarioShortage?` / 目標まであと ${a.scenarioShortage}`:' / 目標維持'}。`,'実際の撃墜率・全滅確率ではありません。熟練度は維持、敵機削りは含まない仮定です。集中時の2回目へ損耗をそのまま持ち越す計算はしていません。','base');
+  }
  }
  return rows;
 }

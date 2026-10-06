@@ -116,19 +116,24 @@ function hdSPSBaseInfo(map){
   const configured=squads.filter(s=>s.name).length;
   const reach=radius.radius!=null&&(!target||radius.radius>=target);
   const power=typeof hdLBCorpsPower==='function'?hdLBCorpsPower(c,c.mode==='defense'?'defense':'sortie'):{total:0};
-  corps.push({index:i+1,mode:c.mode,configured,radius:radius.radius,target,reach,power:Number(power.total)||0,squads});
+  const airCheck=typeof hdLBAirAssessment==='function'?hdLBAirAssessment(map,c):null;
+  corps.push({index:i+1,mode:c.mode,configured,radius:radius.radius,target,reach,power:Number(power.total)||0,squads,airCheck});
  }
  const shortages=[];
  for(const [name,count] of usage){const own=typeof hdLBOwned==='function'?hdLBOwned(name).count:0;if(own<count)shortages.push({name,need:count,own})}
  const sortie=corps.filter(x=>x.mode==='sortie'),limit=Math.max(1,Number(meta.sorties)||1);
- const sortieReady=sortie.length>0&&sortie.length<=limit&&sortie.every(x=>x.configured===4&&x.reach)&&shortages.length===0;
- return {available:true,meta,state,corps,shortages,sortieReady,limit};
+ const defense=state.defenseCheck?.enemyId&&typeof hdLBDefenseAssessment==='function'?hdLBDefenseAssessment(map,state):null;
+ const sortieReady=sortie.length>0&&sortie.length<=limit&&sortie.every(x=>x.configured===4&&x.reach&&x.airCheck?.status==='info'&&!x.airCheck.missing)&&shortages.length===0&&(!defense||defense.status==='info');
+ return {available:true,meta,state,corps,shortages,sortieReady,limit,defense};
 }
+function hdSPSBaseAirText(c){const a=c.airCheck;if(!a||c.mode!=='sortie')return '';if(a.invalid.length)return '基地制空未判定：'+a.invalid.join('、');if(a.enemy===null)return '基地制空未判定：敵編成を設定してね';return `基地用敵 ${a.enemy} / ${HD_LB_AIR_GOALS[a.goal]} ${a.required}${a.shortage?` / あと ${a.shortage}不足`:' / 目安を充足'}${a.missing?` / 補充 ${a.missing}機（燃料 ${a.fuel}・ボーキ ${a.bauxite}）`:''}${a.loss>0?` / 仮に${a.loss}%減少で制空 ${a.scenarioPower}`:''}`}
 function hdSPSBaseHtml(map){
  const b=hdSPSBaseInfo(map);if(!b.available)return '';
  const rows=b.corps.map(c=>`<div class="hd-sps-base-corps ${c.mode==='sortie'?(c.configured===4&&c.reach?'ok':'warn'):'note'}"><div><strong>第${c.index}航空隊</strong><small>${c.mode==='sortie'?'出撃':c.mode==='defense'?'防空':'待機'} ・ ${c.configured}/4中隊</small></div><span>半径 ${c.radius??'?'}${c.target?` / ${c.target}`:''}</span><span>制空 ${c.power}</span></div>`).join('');
  return `<section class="hd-sps-card"><div class="hd-sps-card-head"><div><span>基地航空隊</span><strong>出撃可能 ${b.limit}部隊</strong></div><b class="${b.sortieReady?'ok':'warn'}">${b.sortieReady?'設定確認':'要確認'}</b></div>
   <div class="hd-sps-base-list">${rows}</div>
+  ${b.corps.filter(c=>c.mode==='sortie').map(c=>`<p class="muted">第${c.index}航空隊：${hdSPSEsc(hdSPSBaseAirText(c))}</p>`).join('')}
+  ${b.defense?`<p class="muted">防空合計 ${b.defense.ours} / ${b.defense.invalid||b.defense.enemy===null?'未判定':`敵 ${b.defense.enemy} / 目標 ${b.defense.required}${b.defense.shortage?` / あと ${b.defense.shortage}不足`:' / 目安を充足'}`}</p>`:''}
   ${b.shortages.length?`<div class="hd-sps-alert">台帳不足: ${b.shortages.map(x=>`${hdSPSEsc(x.name)} ${x.own}/${x.need}`).join('、')}</div>`:''}
   <div class="hd-sps-card-actions"><button type="button" class="ghost small" data-hd-sps-tab="gear" data-hd-sps-focus-base>基地航空隊を調整</button></div></section>`;
 }
@@ -145,7 +150,7 @@ function hdSPSSummaryText(map){
  const lines=[`HarborDesk 出撃準備表｜${map} ${d.name||''}`,fleet.fleet?`艦隊: ${fleet.fleet.name}（台帳確認 ${fleet.registered}/${fleet.ships.length}）`:'艦隊: 自分用編成なし'];
  for(const x of eq.rows||[])lines.push(`装備: ${x.label||x.kind} = ${hdSPSStatusLabel(x.status)}（${x.detail||''}）`);
  if(eq.assigned){lines.push(`装備マスター可否: ${eq.assigned.master?.valid?'正常':`要確認（違反${eq.assigned.master?.invalid?.length||0}/未解決${eq.assigned.master?.unresolved?.length||0}）`}`);lines.push(`基礎制空（熟練度なし）: ${eq.assigned.air?.basePower||0}`);if(eq.assigned.auto){const gate=typeof hdFEGoNoGo==='function'?hdFEGoNoGo(eq.assigned.auto):null;lines.push(`自動判定: ${typeof hdFEAutoStatusLabel==='function'?hdFEAutoStatusLabel(eq.assigned.auto.status):eq.assigned.auto.status}`);if(gate){lines.push(`出撃判定: ${gate.label}（${gate.detail}）`);for(const x of gate.actions)lines.push(`  次: ${x.action}`)}for(const x of eq.assigned.auto.checks||[])lines.push(`  ${x.label}: ${typeof hdFEAutoStatusLabel==='function'?hdFEAutoStatusLabel(x.status):x.status}（${x.detail||''}）`);for(const ship of eq.assigned.auto.gameMatch?.details||[])for(const diff of ship.mismatches||[])lines.push(`  差分: ${ship.name} ${diff.slotIndex==='ex'?'補強増設':`第${Number(diff.slotIndex)+1}スロ`}｜予定 ${diff.planned||'空き'} → ゲーム ${diff.actual||'空き'}`)}}
- if(base.available){lines.push(`基地航空隊: ${base.sortieReady?'設定確認':'要確認'}`);for(const c of base.corps)lines.push(`第${c.index}: ${c.mode} ${c.configured}/4中隊 半径${c.radius??'?'} 制空${c.power}`)}
+ if(base.available){lines.push(`基地航空隊: ${base.sortieReady?'設定確認':'要確認'}`);for(const c of base.corps)lines.push(`第${c.index}: ${c.mode} ${c.configured}/4中隊 半径${c.radius??'?'} 制空${c.power} ${hdSPSBaseAirText(c)}`)}
  if(fleet.manualTotal)lines.push(`出撃直前チェック: ${fleet.manualDone}/${fleet.manualTotal}`);
  return lines.join('\n');
 }

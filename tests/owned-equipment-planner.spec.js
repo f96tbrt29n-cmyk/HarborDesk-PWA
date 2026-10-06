@@ -509,7 +509,7 @@ test('equipment reviews refresh cached base diagnostics without replacing active
 });
 
 test('equipment review base action opens the planner for the proposal map',async({page})=>{
- await prepareCapability(page,'6-4',[],['大潮改二']);const card=page.locator('#customFleetPanel [data-cf-id="cap-test"]');await card.locator('[data-hd-oc-search]').click();await card.locator('[data-hd-oc-review="base"]').click();await expect(page.locator('#hdLandBasePlanner')).toBeVisible();await expect(page.locator('#hdLandBasePlanner')).toContainText('6-4');
+ await prepareCapability(page,'6-4',[],['大潮改二']);const card=page.locator('#customFleetPanel [data-cf-id="cap-test"]');await card.locator('[data-hd-oc-search]').click();await card.locator('[data-hd-oc-review-id="base"] [data-hd-oc-review="base"]').click();await expect(page.locator('#hdLandBasePlanner')).toBeVisible();await expect(page.locator('#hdLandBasePlanner')).toContainText('6-4');
 });
 
 test('equipment review reports fleet count failures as unmet conditions even when equipment is complete',async({page})=>{
@@ -575,4 +575,60 @@ test('speed UI shows the required grade and resolves an improved boiler shortage
 
 test('fleet suggestions use each exact remodel master speed instead of the final remodel database shortcut',async({page})=>{
  await prepare(page,[],[]);const speeds=await page.evaluate(()=>['夕張','夕張改二','夕張改二特','大和改','大和改二','大和改二重'].map(name=>hdFSProfile({name}).speed));expect(speeds).toEqual(['高速','高速','低速','低速','高速','低速']);
+});
+test('base air checks use strict disadvantage and parity boundaries and explicit enemy zero',async({page})=>{
+ await baseReviewFixture(page);
+ const r=await page.evaluate(()=>({thresholds:['disadvantage','parity','superiority','supremacy'].map(g=>hdLBAirThreshold(318,g)),states:[106,107,212,213,476,477,953,954].map(n=>hdLBAirState(n,318)),zero:hdLBAirThreshold(0,'superiority'),noAir:hdLBAirState(0,0)}));
+ expect(r.thresholds).toEqual([107,213,477,954]);expect(r.states).toEqual(['喪失','劣勢','劣勢','均衡','均衡','優勢','優勢','確保']);expect(r.zero).toBe(0);expect(r.noAir).toBe('航空戦なし');
+});
+
+test('base air checks distinguish base enemy presets and never reuse stale map or mode presets',async({page})=>{
+ await baseReviewFixture(page);
+ const r=await page.evaluate(()=>{const c={mode:'sortie',squads:Array.from({length:4},()=>({name:'一式陸攻',slot:18,star:0})),airCheck:{enemyId:'m1'}};return {normal:hdLBAirAssessment('6-5',c),final:hdLBAirAssessment('6-5',{...c,airCheck:{enemyId:'m3'}}),other:hdLBAirAssessment('6-4',c),defense:hdLBAirAssessment('6-5',{...c,mode:'defense'}),empty:hdLBAirAssessment('6-5',{...c,airCheck:{enemyId:'custom',enemyAir:''}}),zero:hdLBAirAssessment('6-5',{...c,airCheck:{enemyId:'custom',enemyAir:'0'}})};});
+ expect(r.normal.enemy).toBe(215);expect(r.final.enemy).toBe(318);expect(r.other.enemy).toBeNull();expect(r.defense.enemy).toBeNull();expect(r.empty.status).toBe('data');expect(r.zero.enemy).toBe(0);expect(r.zero.shortage).toBe(0);
+});
+
+test('base air checks calculate residual supply and loss scenarios without mutating saved squads',async({page})=>{
+ await baseReviewFixture(page);
+ const r=await page.evaluate(()=>{const c={mode:'sortie',squads:[{name:'二式陸上偵察機',slot:2,star:0,maxProf:false},...Array.from({length:3},()=>({name:'一式陸攻',slot:14,star:0,maxProf:false}))],airCheck:{enemyId:'custom',enemyAir:318,lossPercent:100}},before=JSON.stringify(c),a=hdLBAirAssessment('6-5',c);return {a,unchanged:before===JSON.stringify(c),noLoss:hdLBAirAssessment('6-5',{...c,airCheck:{enemyId:'custom',enemyAir:318,lossPercent:0}})};});
+ expect(r.a.missing).toBe(14);expect(r.a.fuel).toBe(42);expect(r.a.bauxite).toBe(70);expect(r.a.scenarioPower).toBe(0);expect(r.a.scenarioShortage).toBe(107);expect(r.a.fullPower).toBeGreaterThan(r.a.ours);expect(r.unchanged).toBe(true);expect(r.noLoss.scenarioPower).toBe(r.noLoss.ours);
+});
+
+test('base air checks reject invalid aircraft counts stars enemies and loss inputs',async({page})=>{
+ await baseReviewFixture(page);
+ const r=await page.evaluate(()=>{const c={mode:'sortie',squads:Array.from({length:4},()=>({name:'一式陸攻',slot:18,star:0})),airCheck:{enemyId:'custom',enemyAir:100}};return {invalid:[-1,19,2.5].map(slot=>hdLBAirAssessment('6-4',{...c,squads:c.squads.map(s=>({...s,slot}))}).status),star:hdLBAirAssessment('6-4',{...c,squads:c.squads.map(s=>({...s,star:11}))}).status,enemy:[-1,1.5,'',10001].map(enemyAir=>hdLBAirAssessment('6-4',{...c,airCheck:{enemyId:'custom',enemyAir}}).enemy),loss:hdLBAirAssessment('6-4',{...c,airCheck:{lossPercent:101}}).loss};});
+ expect(r.invalid).toEqual(['data','data','data']);expect(r.star).toBe('data');expect(r.enemy).toEqual([null,null,null,null]);expect(r.loss).toBeNull();
+});
+
+test('base defense check sums only defense corps and supports strongest raid preset',async({page})=>{
+ await baseReviewFixture(page);
+ const r=await page.evaluate(()=>{const c={mode:'defense',squads:Array.from({length:4},()=>({name:'一式陸攻',slot:18,star:0}))},state={defenseCheck:{enemyId:'raid3'},corps:[c,c,{...c,mode:'sortie'},{...c,mode:'standby'}]},a=hdLBDefenseAssessment('6-5',state);return {a,one:hdLBCorpsPower(c,'defense').total,none:hdLBDefenseAssessment('6-5',{...state,corps:[]})};});
+ expect(r.a.count).toBe(2);expect(r.a.ours).toBe(2*r.one);expect(r.a.enemy).toBe(313);expect(r.a.required).toBe(470);expect(r.none.status).toBe('missing');expect(r.none.shortage).toBe(470);
+});
+
+test('base air equipment review transitions from no enemy to shortage then met estimate',async({page})=>{
+ await baseReviewFixture(page);
+ const r=await page.evaluate(()=>{const state={corps:[{mode:'sortie',squads:Array.from({length:4},()=>({name:'一式陸攻',slot:14,star:0}))}]};hdLBSave({'6-4':state});const get=()=>hdOCReview(reviewPlan,reviewMeasure),missing=get();state.corps[0].airCheck={enemyId:'custom',enemyAir:318,lossPercent:100};hdLBSave({'6-4':state});const shortage=get();state.corps[0].airCheck.enemyAir=0;hdLBSave({'6-4':state});return {missing,shortage,met:get()};});
+ expect(r.missing.find(x=>x.id==='base-air:0').kind).toBe('data');expect(r.shortage.find(x=>x.id==='base-air:0').kind).toBe('missing');expect(r.shortage.find(x=>x.id==='base-loss:0').reason).toContain('補充 16機');expect(r.shortage.find(x=>x.id==='base-scenario:0').kind).toBe('manual');expect(r.met.find(x=>x.id==='base-air:0').kind).toBe('info');
+});
+
+test('base air mobile controls persist enemy goal and loss settings and survive reload',async({page})=>{
+ await baseReviewFixture(page);
+ await page.evaluate(()=>{selectedMap='6-5';selectedWorld='6';hdLBSave({'6-5':{corps:[{mode:'sortie',targetRadius:5,squads:Array.from({length:4},()=>({name:'一式陸攻',slot:18,star:0}))}]}});renderMapPicker();hdFEOpenCalculator();hdRenderLandBasePlanner();});
+ const result=page.locator('#hdLandBasePlanner [data-hd-lb-air-result="0"]');await expect(result).toBeVisible();await result.locator('[data-field="enemyId"]').selectOption('m3');await expect(result).toContainText('基地用敵制空 318');await result.locator('[data-field="goal"]').selectOption('parity');await expect(result).toContainText('目安 213');await result.locator('[data-field="lossPercent"]').fill('50');await result.locator('[data-field="lossPercent"]').blur();await expect(result).toContainText('仮に50%');
+ const saved=await page.evaluate(()=>hdLBLoad()['6-5'].corps[0].airCheck);expect(saved).toMatchObject({enemyId:'m3',goal:'parity',lossPercent:'50'});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await page.reload();await page.waitForFunction(()=>typeof hdLBLoad==='function');expect(await page.evaluate(()=>hdLBLoad()['6-5'].corps[0].airCheck)).toEqual(saved);
+});
+
+test('base air custom enemy and defense controls update their distinct persisted fields',async({page})=>{
+ await baseReviewFixture(page);
+ await page.evaluate(()=>{selectedMap='6-5';selectedWorld='6';renderMapPicker();hdFEOpenCalculator();hdRenderLandBasePlanner();});
+ const planner=page.locator('#hdLandBasePlanner');await planner.locator('[data-hd-lb-air="0"][data-field="enemyId"]').selectOption('custom');const input=planner.locator('[data-hd-lb-air="0"][data-field="enemyAir"]');await input.fill('0');await input.blur();await expect(planner.locator('[data-hd-lb-air-result="0"]')).toContainText('第1中隊');
+ await planner.locator('[data-hd-lb-defense="enemyId"]').selectOption('raid3');await expect(planner.locator('[data-hd-lb-defense-result]')).toContainText('敵 313');await expect(planner.locator('[data-hd-lb-defense-result]')).toContainText('470');
+ expect(await page.evaluate(()=>hdLBLoad()['6-5'].defenseCheck.enemyId)).toBe('raid3');expect(await page.evaluate(()=>hdLBLoad()['6-5'].corps[0].airCheck.enemyAir)).toBe('0');
+});
+test('base air preparation readiness requires enemy data air goal and filled aircraft',async({page})=>{
+ await baseReviewFixture(page);await page.waitForFunction(()=>typeof hdSPSBaseInfo==='function');
+ const r=await page.evaluate(()=>{const c={mode:'sortie',targetRadius:5,squads:Array.from({length:4},()=>({name:'一式陸攻',slot:18,star:0}))},state={corps:[c]};hdLBSave({'6-4':state});const unknown=hdSPSBaseInfo('6-4');c.airCheck={enemyId:'custom',enemyAir:318};hdLBSave({'6-4':state});const shortage=hdSPSBaseInfo('6-4');c.airCheck.enemyAir=0;hdLBSave({'6-4':state});const met=hdSPSBaseInfo('6-4');c.squads[0].slot=0;hdLBSave({'6-4':state});return {unknown:unknown.sortieReady,shortage:shortage.sortieReady,met:met.sortieReady,empty:hdSPSBaseInfo('6-4').sortieReady,html:hdSPSBaseHtml('6-4')};});
+ expect(r.unknown).toBe(false);expect(r.shortage).toBe(false);expect(r.met).toBe(true);expect(r.empty).toBe(false);expect(r.html).toContain('補充 18機');expect(r.html).toContain('ボーキ 90');
 });
