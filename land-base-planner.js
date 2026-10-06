@@ -13,7 +13,7 @@ const HD_LB_FIGHTER_CATEGORIES=new Set(['陸軍戦闘機','局地戦闘機','艦
 
 function hdLBEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdLBLoad(){try{return JSON.parse(localStorage.getItem(HD_LB_KEY)||'{}')||{}}catch{return {}}}
-function hdLBSave(v){localStorage.setItem(HD_LB_KEY,JSON.stringify(v))}
+function hdLBSave(v){localStorage.setItem(HD_LB_KEY,JSON.stringify(v));window.dispatchEvent(new Event('hd:land-base-changed'))}
 function hdLBOwnedLedger(){try{return JSON.parse(localStorage.getItem('harbordesk-equipment-v1')||'[]')||[]}catch{return []}}
 function hdLBOwned(name){const rows=hdLBOwnedLedger().filter(x=>String(x.name||'').trim()===name);return {count:rows.reduce((a,x)=>a+(Number(x.count)||0),0),star:rows.reduce((a,x)=>Math.max(a,Number(x.star)||0),0)}}
 function hdLBAircraft(){

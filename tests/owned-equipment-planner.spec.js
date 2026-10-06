@@ -464,3 +464,55 @@ test('map equipment capabilities: stock refresh clears a resolved component shor
  const card=page.locator('#customFleetPanel [data-hd-se-capability="cap-asw"]');await expect(card).toContainText('所持不足');
  await page.evaluate(()=>{localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'三式水中探信儀',count:1,star:0},{name:'三式爆雷投射機',count:1,star:0}]));window.dispatchEvent(new Event('hd:equipment-changed'))});await expect(card).toContainText('手持ちで配備可能');await expect(card).not.toContainText('あと1個');
 });
+
+test('equipment reviews distinguish missing synced scouting fields and resolve after syncing',async({page})=>{
+ await prepare(page,[{name:'33号水上電探',count:1,star:0}],[{kind:'電探',label:'電探',minCount:1}]);
+ await page.evaluate(()=>{HD_MAP_ADVANCED_DATA['1-1']={los:{coef:3,checks:[{safe:1,failBelow:0}]}};localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',gameLos:36}]));});
+ const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await panel.locator('[data-hd-oc-search]').click();
+ const warning=panel.locator('[data-hd-oc-review-id="scouting"]');await expect(warning).toContainText('司令部Lv、時雨改二 の索敵値');await expect(warning).not.toContainText('夕立改二 の索敵値');await expect(panel.locator('[data-hd-oc-review-kind="data"]')).toBeVisible();
+ await warning.locator('button').click();await expect(page.locator('#kancolleImport')).toBeVisible();
+ const resolved=await page.evaluate(()=>{localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:20}));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',gameLos:36},{name:'時雨改二',gameLos:36}]));const r=hdOCSearch(hdOCContext('1-1','oc-test',0));return {available:hdFEScouting(r.plan,hdOCAssigned(r.plan)).available,rows:hdOCReview(r.plan,r.measure)};});
+ expect(resolved.available).toBe(true);expect(resolved.rows.some(x=>x.id==='scouting')).toBe(false);
+});
+
+test('equipment reviews keep optional 1-6 air guidance out of warnings',async({page})=>{
+ await prepareCapability(page,'1-6',[{name:'10cm高角砲＋高射装置',count:1,star:0},{name:'13号対空電探改',count:1,star:0},{name:'三式水中探信儀',count:1,star:0},{name:'三式爆雷投射機',count:1,star:0}],['阿武隈改二','夕立改二','時雨改二','秋月改','雪風改','暁改二']);
+ const card=page.locator('#customFleetPanel [data-cf-id="cap-test"]');await card.locator('[data-hd-oc-search]').tap();await expect(card.locator('[data-hd-oc-review-kind="info"]')).toContainText('制空優勢は必須ではありません');await expect(card.locator('[data-hd-oc-review-kind="data"],[data-hd-oc-review-kind="missing"],[data-hd-oc-review-kind="manual"]')).toHaveCount(0);await expect(card).not.toContainText('別途確認が必要');
+});
+
+async function baseReviewFixture(page){
+ await prepare(page,[{name:'一式陸攻',count:4,star:0}],[{kind:'電探',label:'電探',minCount:0}]);
+ await page.evaluate(()=>{hdSEChecks=()=>({rows:[],adv:{base:{available:true,sorties:1,bossRadius:8}}});window.reviewPlan={map:'6-4',ships:[]};window.reviewMeasure={complete:true,goals:[{ok:true}]};});
+}
+
+test('equipment reviews identify absent base plans then accept complete owned aircraft plans',async({page})=>{
+ await baseReviewFixture(page);
+ expect(await page.evaluate(()=>hdOCReview(reviewPlan,reviewMeasure).find(x=>x.id==='base'))).toMatchObject({kind:'data',action:'base'});
+ const row=await page.evaluate(()=>{hdLBSave({'6-4':{corps:[{mode:'sortie',squads:Array.from({length:4},()=>({name:'一式陸攻',slot:18,star:0}))}]}});return hdOCReview(reviewPlan,reviewMeasure).find(x=>x.id==='base');});expect(row).toMatchObject({kind:'info'});expect(row.title).toContain('確認済み');
+});
+
+test('equipment reviews check actual map radius and aircraft counts instead of overridden targets',async({page})=>{
+ await baseReviewFixture(page);
+ const row=await page.evaluate(()=>{hdSEChecks=()=>({rows:[],adv:{base:{available:true,sorties:1,bossRadius:10}}});hdLBSave({'6-4':{corps:[{mode:'sortie',targetRadius:1,squads:Array.from({length:4},()=>({name:'一式陸攻',slot:99,star:0}))}]}});return hdOCReview(reviewPlan,reviewMeasure).find(x=>x.id==='base');});expect(row.kind).toBe('missing');expect(row.reason).toContain('中隊 0/4');expect(row.reason).toContain('ボス必要半径 10');
+});
+
+test('equipment reviews count fleet and base aircraft together and enforce sortie limits',async({page})=>{
+ await baseReviewFixture(page);
+ const row=await page.evaluate(()=>{reviewPlan.ships=[{ship:'赤城改',items:[{name:'一式陸攻',star:0,slotIndex:0}]}];hdLBSave({'6-4':{corps:Array.from({length:2},()=>({mode:'sortie',squads:Array.from({length:4},()=>({name:'一式陸攻',slot:18,star:0}))}))}});return hdOCReview(reviewPlan,reviewMeasure).find(x=>x.id==='base');});expect(row.kind).toBe('missing');expect(row.reason).toContain('出撃 2部隊 / 海域上限 1部隊');expect(row.reason).toContain('計9個 / 所持4個');
+});
+
+test('equipment reviews refresh cached base diagnostics without replacing active inputs',async({page})=>{
+ await prepare(page,[{name:'33号水上電探',count:1,star:0},{name:'一式陸攻',count:4,star:0}],[{kind:'電探',label:'電探',minCount:1}]);
+ await page.evaluate(()=>{hdSEChecks=()=>({rows:[{kind:'電探',label:'電探',minCount:1}],adv:{base:{available:true,sorties:1,bossRadius:8}}});});
+ const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await panel.locator('[data-hd-oc-search]').click();await expect(panel.locator('[data-hd-oc-review-id="base"]')).toContainText('出撃部隊が未設定');
+ const preserved=await page.evaluate(()=>{const el=document.createElement('input');el.id='review-focus-test';document.body.append(el);el.focus();hdLBSave({'1-1':{corps:[{mode:'sortie',squads:Array.from({length:4},()=>({name:'一式陸攻',slot:18,star:0}))}]}});return document.activeElement===el;});expect(preserved).toBe(true);await expect(panel.locator('[data-hd-oc-review-id="base"]')).toContainText('基本条件は確認済み');
+});
+
+test('equipment review base action opens the planner for the proposal map',async({page})=>{
+ await prepareCapability(page,'6-4',[],['大潮改二']);const card=page.locator('#customFleetPanel [data-cf-id="cap-test"]');await card.locator('[data-hd-oc-search]').click();await card.locator('[data-hd-oc-review="base"]').click();await expect(page.locator('#hdLandBasePlanner')).toBeVisible();await expect(page.locator('#hdLandBasePlanner')).toContainText('6-4');
+});
+
+test('equipment review reports fleet count failures as unmet conditions even when equipment is complete',async({page})=>{
+ await prepare(page,[{name:'33号水上電探',count:1,star:0}],[{kind:'電探',label:'電探',minCount:1}]);
+ const r=await page.evaluate(()=>{const result=hdOCSearch(hdOCContext('1-1','oc-test',0));result.plan.routeInfo={total:6,conditionManual:false,requirements:[]};const rows=hdOCReview(result.plan,result.measure);return {route:rows.find(x=>x.id==='route'),headline:hdOCReviewHeadline(result.measure,rows)};});expect(r.route).toMatchObject({kind:'missing',action:'route'});expect(r.route.reason).toContain('編成隻数 2/6');expect(r.headline).toContain('編成や基地計画に未充足');
+});
