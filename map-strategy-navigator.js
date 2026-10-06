@@ -16,7 +16,7 @@ function hdMSNRouteInfo(preset,plan){
  const matched=plan&&typeof hdFEPresetRouteMatch==='function'?hdFEPresetRouteMatch(plan,preset):null;
  const reqs=matched?.reqs||parsed?.requirements||[];
  const pills=reqs.map(x=>{const need=Number(x.need||x.count)||1,got=Number(x.got)||0,cls=plan?(got>=need?'ok':'warn'):'';return `<span class="${cls}">${hdMSNEsc(x.token)} ${plan?`${got}/`:''}${need}</span>`}).join('');
- const speed=parsed?.speedRequired?'<span>高速以上の統一を確認</span>':'';
+ const speed=parsed?.speedRequired?`<span>${/最速/.test(parsed.text)?'最速':/高速[+＋]/.test(parsed.text)?'高速+':'高速'}以上の統一を確認</span>`:'';
  const total=parsed?.total&&/\d+隻/.test(String(parsed.text||''))?`<span>計${Number(parsed.total)}隻${plan?` / 保存編成${plan.ships.length}隻`:''}</span>`:'';
  return `<p>${hdMSNEsc(preset.ships||'編成例の艦種条件を確認')}</p>${pills||speed||total?`<div class="hd-msn-pills">${pills}${speed}${total}</div>`:''}<small>編成例から読み取れる条件の目安。分岐の全条件を保証しないため、ルートタブとWikiで最終確認してね。</small>`;
 }

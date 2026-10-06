@@ -222,13 +222,62 @@ function hdFEGameMatchHtml(match){
  if(!rows.length)return '';
  return `<div class="hd-fe-game-diffs"><div class="hd-fe-auto-detail-title">ゲームとの差分</div>${rows.join('')}</div>`;
 }
+// Rules checked against the speed table on 2026-10-07; master speed takes precedence
+// over the curated database (e.g. Yubari Kai Ni Toku). Unknown groups stay unresolved.
+const HD_FE_SPEED_SOURCE='https://wikiwiki.jp/kancolle/速力';
+function hdFESpeedTarget(info){const text=String(info?.text||'').normalize('NFKC');return /最速/.test(text)?20:/高速\+/.test(text)?15:info?.speedRequired?10:0}
+function hdFESpeedLabel(rank){return ({5:'低速',10:'高速',15:'高速+',20:'最速'})[rank]||'未判定'}
+function hdFESpeedGroup(name,base,type){
+ const n=String(name).normalize('NFKC');
+ if(base===10){
+  if(/^(翔鶴|瑞鶴|大鳳|最上|三隈|鈴谷|熊野|利根|筑摩|島風|天津風改二|Ташкент|Vautour|Visby|飛龍改三)/.test(n)||/^吹雪改三護\(六式\)$/.test(n))return 'HA';
+  if(/^(加賀|Samuel B\.Roberts)/.test(n)||/^夕張(?:改)?$/.test(n)||type==='水上機母艦')return 'HC';
+  if(/^(金剛|比叡|榛名|霧島|Iowa|蒼龍|飛龍|雲龍|天城|Algérie|阿賀野|能代|矢矧|酒匂|天津風|北上改三|吹雪改三)/.test(n)||n==='大和改二')return 'HB1';
+  if(['戦艦','高速戦艦','正規空母','装甲空母','軽空母','重巡洋艦','航空巡洋艦','軽巡洋艦','重雷装巡洋艦','駆逐艦'].includes(type))return 'HB2';
+ }else if(base===5){
+  if(n==='夕張改二特'||/^Samuel B\.Roberts(?:改)?$/.test(n))return 'LS';
+  if(/^鳳翔改二(?:戦)?$/.test(n))return 'LE';
+  if(/^(伊201|伊203)(?:改)?$/.test(n)||n==='稲木改二')return 'LD';
+  if(/^(大和|武蔵|長門改二|陸奥改二)/.test(n))return 'LA';
+  if(/^(Béarn|あきつ丸|明石|速吸|まるゆ改)/.test(n)||['潜水艦','潜水空母'].includes(type)&&n!=='まるゆ')return 'LC';
+  if(['戦艦','高速戦艦','航空戦艦','軽空母','水上機母艦','練習巡洋艦','潜水母艦','海防戦艦'].includes(type)||/^(神威|神州丸|朝日|Norge|Eidsvold|Thonburi)/.test(n))return 'LB';
+  if(type==='海防艦'||n==='まるゆ')return 'blocked';
+ }
+ return '';
+}
+function hdFESpeedRecipes(group,target,base){
+ if(base>=target)return [{}];
+ if(target===10)return group==='LS'?[{t:1}]:['LD','LE'].includes(group)?[{n:1},{t:1,c:1}]:group&&group!=='blocked'?[{t:1,c:1}]:[];
+ if(target===15)return group==='HA'?[{n:1,h:1},{t:1,c:1}]:/^HB|HC$/.test(group)?[{t:1,c:1}]:group==='LA'?[{t:1,n:1,h:1},{t:1,n:1,c:2}]:['LB','LS'].includes(group)?[{t:1,n:2},{t:1,c:3}]:['LD','LE'].includes(group)?[{t:1,n:1},{t:1,c:3}]:[];
+ if(target===20)return group==='HA'?[{n:2,h:2},{t:1,n:1},{t:1,c:2}]:group==='HB1'?[{t:1,n:1,c:2}]:group==='HB2'?[{t:1,n:2},{t:1,c:3}]:group==='LA'?[{t:1,n:2,h:2},{t:1,n:1,c:3}]:group==='LE'?[{t:1,n:2},{t:1,n:1,c:3}]:[];
+ return [];
+}
+function hdFESpeedRecipeText(r){return [r.t?`タービン${r.t}個`:'',r.n?`新型高温高圧缶${r.n}個以上${r.h?`（うち★7以上${r.h}個）`:''}`:'',r.c?`強化型缶・新型缶の合計${r.c}個以上`:''].filter(Boolean).join('＋')||'追加装備なし'}
+const HD_FE_SPEED_MEMO=new WeakMap();
+function hdFEShipSpeed(ship){
+ const master=typeof hdShipDbMasterRowFor==='function'?hdShipDbMasterRowFor({name:ship.ship,masterId:ship.masterId}):null,db=hdFEFindShip(ship.ship),exact=db&&(db.final===ship.ship||db.base===ship.ship),base=Number(master?.speed)||({低速:5,高速:10})[exact?db.speed:'']||0,type=master?.type||(exact?db.type:'')||'',group=hdFESpeedGroup(master?.name||ship.ship,base,type),parts={t:0,n:0,h:0,c:0},invalid=[];
+ const key=JSON.stringify([ship.ship,master?.id,base,type,(ship.items||[]).map(x=>[x.name,x.star,x.slotIndex]),ship.expansion]),cached=HD_FE_SPEED_MEMO.get(ship);if(cached?.key===key)return cached.value;
+ const entries=[...(ship.items||[]).map((x,i)=>({...x,slotIndex:x.slotIndex??i})),...(ship.expansion?.name?[{...ship.expansion,isExpansion:true}]:[])];
+ for(const item of entries){const name=String(item.name||'').normalize('NFKC').replace(/\s+/g,'');if(!['改良型艦本式タービン','強化型艦本式缶','新型高温高圧缶'].includes(name))continue;
+  const speedDb=master?hdShipDbMasterAdapter({masterId:master.id}):db,meta=hdFEFind(item.name),profile=speedDb&&hdShipDbSlotProfile(speedDb),unique=item.isExpansion||entries.filter(x=>!x.isExpansion&&Number(x.slotIndex)===Number(item.slotIndex)).length===1,allowed=unique&&meta&&profile&&(item.isExpansion?hdShipDbExpansionInfo(meta,speedDb,item.star).allowed:hdShipDbEquipCompatible(meta,speedDb)&&Number.isInteger(Number(item.slotIndex))&&Number(item.slotIndex)>=0&&Number(item.slotIndex)<profile.count&&!hdShipDbSlotRejects(profile,Number(item.slotIndex),meta));
+  if(!allowed){invalid.push(item.name+'（装備位置・装備可否が未充足）');continue}
+  if(name==='改良型艦本式タービン')parts.t++;else{parts.c++;if(name==='新型高温高圧缶'){parts.n++;if(Number(item.star)>=7)parts.h++;}}
+ }
+ let rank=base;
+ if(group)for(const target of [10,15,20])if(hdFESpeedRecipes(group,target,base).some(r=>Object.entries(r).every(([k,v])=>parts[k]>=v)))rank=Math.max(rank,target);
+ const value={base,rank,group,parts,invalid,known:!!base,label:hdFESpeedLabel(rank),detail:`${ship.ship}：${hdFESpeedLabel(base)} → ${hdFESpeedLabel(rank)}${group?`（${group}）`:'（潜在速力区分が未登録）'}`};HD_FE_SPEED_MEMO.set(ship,{key,value});return value;
+}
+function hdFESpeedGoal(ship,target){
+ const speed=hdFEShipSpeed(ship),recipes=hdFESpeedRecipes(speed.group,target,speed.base),ok=speed.known&&speed.rank>=target,ratio=ok?1:Math.max(0,...recipes.map(r=>{const values=Object.entries(r);return values.length?values.reduce((n,[k,v])=>n+Math.min(1,speed.parts[k]/v),0)/values.length:0})),unresolved=!speed.known||!speed.group&&speed.rank<target;
+ return {kind:'speed-ship',label:`${ship.ship} の${hdFESpeedLabel(target)}条件`,count:Number(ok),minCount:1,ok,ratio,speedActual:true,speed,unresolved,detail:`${speed.detail} / 必要 ${hdFESpeedLabel(target)}。${ok?'配備案の速力条件を満たす':unresolved?'艦娘名・改造段階・速力データを確認':recipes.length?'必要な組み合わせ：'+recipes.map(hdFESpeedRecipeText).join(' または '):'この艦の速力区分では到達できません。艦娘を入れ替えてね'}${speed.invalid.length?'。'+speed.invalid.join('、'):''}`};
+}
 function hdFERouteShips(plan){
- return (plan?.ships||[]).filter(x=>x?.ship).map(s=>{const row=hdFERosterForShip(s),db=hdFEFindShip(s.ship);return {ship:s,type:db?.type||row?.type||s.type||'',speed:db?.speed||''}});
+ return (plan?.ships||[]).filter(x=>x?.ship).map(s=>{const row=hdFERosterForShip(s),db=hdFEFindShip(s.ship),speedInfo=hdFEShipSpeed(s);return {ship:s,type:db?.type||row?.type||s.type||'',speed:speedInfo.label,speedInfo}});
 }
 function hdFEPresetRouteMatch(plan,preset,index=0){
  if(typeof hdFSPresetInfo!=='function')return null;
- const ships=hdFERouteShips(plan),info=hdFSPresetInfo(preset),reqs=(info.requirements||[]).map(req=>{const need=Math.max(0,Number(req.count)||0),got=ships.filter(x=>typeof hdFSTypeMatches==='function'?hdFSTypeMatches({type:x.type,roles:[],tags:[]},req.token):x.type===req.token).length;return {token:req.token,need,got,ok:need===0?got===0:got>=need}}),required=reqs.reduce((n,x)=>n+x.need,0),coverage=ships.length?required/ships.length:0,explicitTotal=!info.conditionManual||/\d+隻/.test(String(info.text||'')),totalOk=!explicitTotal||ships.length===Number(info.total),lows=info.speedRequired?ships.filter(x=>x.speed==='低速').map(x=>x.ship.ship):[],bad=reqs.filter(x=>!x.ok),strong=required>=2&&coverage>=.5;
- return {preset,index,info,reqs,required,coverage,explicitTotal,totalOk,lows,bad,strong,exact:!info.conditionManual&&strong&&totalOk&&!bad.length&&!lows.length};
+ const ships=hdFERouteShips(plan),info=hdFSPresetInfo(preset),reqs=(info.requirements||[]).map(req=>{const need=Math.max(0,Number(req.count)||0),got=ships.filter(x=>typeof hdFSTypeMatches==='function'?hdFSTypeMatches({type:x.type,roles:[],tags:[]},req.token):x.type===req.token).length;return {token:req.token,need,got,ok:need===0?got===0:got>=need}}),required=reqs.reduce((n,x)=>n+x.need,0),coverage=ships.length?required/ships.length:0,explicitTotal=!info.conditionManual||/\d+隻/.test(String(info.text||'')),totalOk=!explicitTotal||ships.length===Number(info.total),lows=hdFESpeedTarget(info)?ships.filter(x=>x.speedInfo.known&&x.speedInfo.rank<hdFESpeedTarget(info)&&!!x.speedInfo.group).map(x=>x.ship.ship):[],unknownSpeed=hdFESpeedTarget(info)?ships.filter(x=>!x.speedInfo.known||!x.speedInfo.group&&x.speedInfo.rank<hdFESpeedTarget(info)).map(x=>x.ship.ship):[],bad=reqs.filter(x=>!x.ok),strong=required>=2&&coverage>=.5;
+ return {preset,index,info,reqs,required,coverage,explicitTotal,totalOk,lows,bad,strong,exact:!info.conditionManual&&strong&&totalOk&&!bad.length&&!lows.length&&!unknownSpeed.length};
 }
 function hdFEInferRoute(plan){
  const presets=typeof MAP_PLANS!=='undefined'?(MAP_PLANS[String(plan?.map||'')]?.presets||[]):[];
@@ -243,9 +292,9 @@ function hdFERoute(plan){
  let info=plan?.suggestion?.info||plan?.routeInfo||null,inferred=null,presetName=plan?.suggestion?.preset?.name||plan?.preset?.name||'';
  if(!info){inferred=hdFEInferRoute(plan);if(inferred.status==='matched'){info=inferred.match.info;presetName=inferred.match.preset?.name||''}}
  if(!info)return {status:'manual',detail:inferred?.detail||'保存編成のルート条件を特定できないため攻略ルートを確認',requirements:[],inference:inferred};
- const ships=hdFERouteShips(plan),reqs=(info.requirements||[]).map(req=>{const got=ships.filter(x=>typeof hdFSTypeMatches==='function'?hdFSTypeMatches({type:x.type,roles:[],tags:[]},req.token):x.type===req.token).length;return {token:req.token,need:Math.max(0,Number(req.count)||0),got,ok:Number(req.count)===0?got===0:got>=Number(req.count)}}),lows=info.speedRequired?ships.filter(x=>x.speed==='低速').map(x=>x.ship.ship):[],bad=reqs.filter(x=>!x.ok),prefix=inferred?.status==='matched'?`自動照合: ${presetName} / `:presetName?`${presetName} / `:'';
+ const ships=hdFERouteShips(plan),reqs=(info.requirements||[]).map(req=>{const got=ships.filter(x=>typeof hdFSTypeMatches==='function'?hdFSTypeMatches({type:x.type,roles:[],tags:[]},req.token):x.type===req.token).length;return {token:req.token,need:Math.max(0,Number(req.count)||0),got,ok:Number(req.count)===0?got===0:got>=Number(req.count)}}),lows=hdFESpeedTarget(info)?ships.filter(x=>x.speedInfo.known&&x.speedInfo.rank<hdFESpeedTarget(info)&&!!x.speedInfo.group).map(x=>x.ship.ship):[],unknownSpeed=hdFESpeedTarget(info)?ships.filter(x=>!x.speedInfo.known||!x.speedInfo.group&&x.speedInfo.rank<hdFESpeedTarget(info)).map(x=>x.ship.ship):[],bad=reqs.filter(x=>!x.ok),prefix=inferred?.status==='matched'?`自動照合: ${presetName} / `:presetName?`${presetName} / `:'';
  const totalBad=!info.conditionManual&&Number(info.total)>0&&ships.length!==Number(info.total);
- return {status:bad.length||lows.length||totalBad?'missing':info.conditionManual?'manual':'ready',requirements:reqs,lowSpeed:lows,inference:inferred,presetName,detail:prefix+(bad.length?bad.map(x=>x.token+' '+x.got+'/'+x.need).join(' / '):(lows.length?'高速条件: 低速 '+lows.join('、'):totalBad?'編成隻数 '+ships.length+'/'+info.total:info.conditionManual?'艦種・隻数の条件を手動確認':'基本編成条件を満たす'))};
+ return {status:bad.length||lows.length||totalBad?'missing':info.conditionManual||unknownSpeed.length?'manual':'ready',requirements:reqs,lowSpeed:lows,unknownSpeed,speedTarget:hdFESpeedTarget(info),inference:inferred,presetName,detail:prefix+(bad.length?bad.map(x=>x.token+' '+x.got+'/'+x.need).join(' / '):(lows.length?hdFESpeedLabel(hdFESpeedTarget(info))+'条件未充足: '+lows.join('、'):totalBad?'編成隻数 '+ships.length+'/'+info.total:unknownSpeed.length?'速力未判定: '+unknownSpeed.join('、'):info.conditionManual?'艦種・隻数の条件を手動確認':'基本編成条件を満たす'))};
 }
 function hdFEEnemyAirCandidates(map){
  if(typeof hdFCMapEnemyAirCandidates==='function')return hdFCMapEnemyAirCandidates(map);

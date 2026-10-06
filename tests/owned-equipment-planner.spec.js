@@ -206,7 +206,7 @@ test('owned equipment route speed components use all low speed ships rather than
  const r=await page.evaluate(()=>{const all=loadCustomFleets();all['1-1'][0].ships=[{ship:'長門改',gear:''},{ship:'陸奥改',gear:''}];saveCustomFleets(all);const c=hdOCContext('1-1','oc-test',0);c.preset={name:'高速統一の確認',ships:'戦艦2 高速統一'};return hdOCSearch(c)});
  expect(r.measure.complete).toBeFalsy();const parts=r.measure.goals.filter(x=>['speed-turbine','speed-boiler'].includes(x.kind));expect(parts.map(x=>x.minCount)).toEqual([2,2]);
  for(const kind of ['speed-turbine','speed-boiler']){const goal=r.shortages.find(x=>x.kind===kind);expect(goal.owned).toBe(1);expect(goal.minCount).toBe(2);expect(await page.evaluate(g=>hdOCStockGap(g),goal)).toBe(1)}
- expect(r.measure.manual.some(x=>x.includes('実際の速力'))).toBeTruthy();
+ expect(r.measure.manual.some(x=>x.includes('実際の速力'))).toBeFalsy();expect(r.measure.goals.filter(x=>x.kind==='speed-ship').every(x=>!x.unresolved)).toBe(true);
 });
 
 test('owned equipment placement explains unusable owned gear and procures a compatible alternative',async({page})=>{
@@ -515,4 +515,64 @@ test('equipment review base action opens the planner for the proposal map',async
 test('equipment review reports fleet count failures as unmet conditions even when equipment is complete',async({page})=>{
  await prepare(page,[{name:'33号水上電探',count:1,star:0}],[{kind:'電探',label:'電探',minCount:1}]);
  const r=await page.evaluate(()=>{const result=hdOCSearch(hdOCContext('1-1','oc-test',0));result.plan.routeInfo={total:6,conditionManual:false,requirements:[]};const rows=hdOCReview(result.plan,result.measure);return {route:rows.find(x=>x.id==='route'),headline:hdOCReviewHeadline(result.measure,rows)};});expect(r.route).toMatchObject({kind:'missing',action:'route'});expect(r.route.reason).toContain('編成隻数 2/6');expect(r.headline).toContain('編成や基地計画に未充足');
+});
+
+test('speed targets distinguish fast, fast plus, fullwidth plus and fastest without confusing battlecruiser type',async({page})=>{
+ await prepare(page,[],[]);const values=await page.evaluate(()=>['駆逐2 高速統一','駆逐2 高速+統一','駆逐2 高速＋統一','駆逐2 最速統一','高速戦艦2'].map(ships=>hdFESpeedTarget(hdFSPresetInfo({ships}))));expect(values).toEqual([10,15,15,20,0]);
+});
+
+test('speed checks use improved boiler counts and different groups for each remodel',async({page})=>{
+ await prepare(page,[],[]);const rows=await page.evaluate(()=>{
+  const t={name:'改良型艦本式タービン'},n=star=>({name:'新型高温高圧缶',star});
+  const cases=[['翔鶴改二甲',[n(7)],15],['翔鶴改二甲',[n(7),n(7)],20],['金剛改二丙',[n(7)],10],['大和改二重',[t,n(6)],10],['大和改二重',[t,n(7)],15],['大和改二重',[t,n(7),n(7)],20],['大和改二',[n(7)],10],['長門改',[t,n(7)],10],['長門改二',[t,n(7)],15],['伊勢改二',[t,n(0),n(0)],15],['伊58改',[t,n(7),n(7)],10]];
+  return cases.map(([ship,items,expected])=>({ship,expected,result:hdFEShipSpeed({ship,items})}));
+ });for(const row of rows)expect(row.result.rank,JSON.stringify(row)).toBe(row.expected);
+});
+
+test('speed checks support single engine exceptions and preserve speed ceilings',async({page})=>{
+ await prepare(page,[],[]);const rows=await page.evaluate(()=>{
+  const turbine={name:'改良型艦本式タービン'},boiler={name:'新型高温高圧缶'};
+  return [hdFEShipSpeed({ship:'夕張改二特',items:[],expansion:turbine}),hdFEShipSpeed({ship:'Samuel B.Roberts改',items:[turbine]}),hdFEShipSpeed({ship:'伊201改',items:[boiler]}),hdFEShipSpeed({ship:'鳳翔改二',items:[turbine,boiler,boiler]}),hdFESpeedGoal({ship:'伊58改',items:[turbine,boiler]},15)];
+ });expect(rows.slice(0,4).map(x=>x.rank)).toEqual([10,10,10,20]);expect(rows[0].base).toBe(5);expect(rows[4]).toMatchObject({ok:false,unresolved:false});expect(rows[4].detail).toContain('到達できません');
+});
+
+test('speed checks reject unavailable slots and invalid expansion gear and invalidate memo after star changes',async({page})=>{
+ await prepare(page,[],[]);const r=await page.evaluate(()=>{
+  const t={name:'改良型艦本式タービン'},n={name:'新型高温高圧缶',star:6},ship={ship:'長門改二',items:[t,n]};const before=hdFEShipSpeed(ship).rank;n.star=7;const after=hdFEShipSpeed(ship).rank;
+  return {before,after,outside:hdFEShipSpeed({ship:'長門改二',items:[{...t,slotIndex:99},n]}),duplicate:hdFEShipSpeed({ship:'長門改二',items:[{...t,slotIndex:0},{...n,slotIndex:0}]}),blocked:hdFEShipSpeed({ship:'夕立改二',items:[t],expansion:{name:'強化型艦本式缶'}}),unknown:hdFESpeedGoal({ship:'未知の艦娘',items:[t,n]},15)};
+ });expect([r.before,r.after]).toEqual([10,15]);expect(r.outside.rank).toBe(5);expect(r.outside.invalid.length).toBe(1);expect(r.duplicate.rank).toBe(5);expect(r.blocked.rank).toBe(10);expect(r.blocked.invalid.length).toBe(1);expect(r.unknown.unresolved).toBe(true);
+});
+
+test('route checks use proposed speed and do not change the original ship type',async({page})=>{
+ await prepare(page,[],[]);const r=await page.evaluate(()=>{
+  const ship={ship:'長門改二',items:[{name:'改良型艦本式タービン'},{name:'新型高温高圧缶',star:7}]},plan={map:'1-1',ships:[ship],routeInfo:{total:1,conditionManual:false,requirements:[],text:'高速+統一',speedRequired:true}};
+  const plus=hdFERoute(plan);ship.items[1].star=6;const short=hdFERoute(plan);plan.routeInfo.text='高速統一';const fast=hdFERoute(plan);plan.routeInfo.requirements=[{token:'高速戦艦',count:1}];const type=hdFERoute(plan);return {plus,short,fast,type};
+ });expect(r.plus.status).toBe('ready');expect(r.short.status).toBe('missing');expect(r.short.detail).toContain('高速+条件未充足');expect(r.fast.status).toBe('ready');expect(r.type.status).toBe('missing');
+});
+
+test('owned speed search can satisfy fast plus with a single improved boiler and clears manual warning',async({page})=>{
+ await prepare(page,[{name:'新型高温高圧缶',count:2,star:7}],[{kind:'高速化',label:'高速化',minCount:2}]);
+ const r=await page.evaluate(()=>{const all=loadCustomFleets();all['1-1'][0].ships=[{ship:'翔鶴改二甲',gear:''},{ship:'瑞鶴改二甲',gear:''}];saveCustomFleets(all);const c=hdOCContext('1-1','oc-test',0);c.preset={name:'高速+統一',ships:'装甲空母2 高速+統一'};const result=hdOCSearch(c);return {result,route:hdFERoute(result.plan),reviews:hdOCReview(result.plan,result.measure)};});
+ expect(r.result.measure.complete).toBe(true);expect(r.result.shortages).toEqual([]);expect(r.route.status).toBe('ready');expect(r.reviews.find(x=>x.id==='speed')).toMatchObject({kind:'info'});expect(r.result.plan.ships.every(s=>s.items.some(x=>x.name==='新型高温高圧缶'&&x.star===7))).toBe(true);
+});
+
+test('owned speed search does not declare an ordinary fast boiler set sufficient for a low speed fast plus route',async({page})=>{
+ await prepare(page,[{name:'改良型艦本式タービン',count:2,star:0},{name:'強化型艦本式缶',count:2,star:0}],[{kind:'高速化',label:'高速化',minCount:2}]);
+ const r=await page.evaluate(()=>{const all=loadCustomFleets();all['1-1'][0].ships=[{ship:'長門改二',gear:''},{ship:'陸奥改二',gear:''}];saveCustomFleets(all);const c=hdOCContext('1-1','oc-test',0);c.preset={name:'高速+統一',ships:'戦艦2 高速+統一'};const result=hdOCSearch(c);return {result,reviews:hdOCReview(result.plan,result.measure)};});expect(r.result.measure.complete).toBe(false);expect(r.reviews.find(x=>x.id==='speed')).toMatchObject({kind:'missing'});expect(r.reviews.find(x=>x.id==='speed').reason).toContain('★7以上');
+});
+
+test('owned speed search uses turbine only for Yubari special remodel without requesting unnecessary boilers',async({page})=>{
+ await prepare(page,[{name:'改良型艦本式タービン',count:1,star:0}],[{kind:'高速化',label:'高速化',minCount:1}]);
+ const r=await page.evaluate(()=>{const all=loadCustomFleets();all['1-1'][0].ships=[{ship:'夕張改二特',gear:''}];saveCustomFleets(all);const c=hdOCContext('1-1','oc-test',0);c.preset={name:'高速統一',ships:'軽巡1 高速統一'};return hdOCSearch(c)});expect(r.measure.complete).toBe(true);expect(r.shortages).toEqual([]);expect(r.measure.goals.some(g=>g.kind==='speed-boiler')).toBe(false);
+});
+
+test('speed UI shows the required grade and resolves an improved boiler shortage after re-search',async({page})=>{
+ await prepare(page,[{name:'改良型艦本式タービン',count:1,star:0},{name:'新型高温高圧缶',count:1,star:6}],[{kind:'高速化',label:'高速化',minCount:1}]);
+ await page.evaluate(()=>{const all=loadCustomFleets();all['1-1'][0].ships=[{ship:'長門改二',gear:''}];saveCustomFleets(all);MAP_PLANS['1-1']={presets:[{name:'高速+統一',ships:'戦艦1 高速+統一'}]};hdMSNOpen('1-1');});
+ const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await panel.locator('[data-hd-oc-search]').click();await expect(panel.locator('[data-hd-oc-review-id="speed"]')).toContainText('低速 → 高速');await expect(panel.locator('[data-hd-oc-review-id="speed"]')).toContainText('★7以上');await expect(panel.locator('[data-hd-oc-review-kind="missing"]')).toContainText('高速+条件');
+ await page.evaluate(()=>{localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'改良型艦本式タービン',count:1,star:0},{name:'新型高温高圧缶',count:1,star:7}]));hdOCRefresh();});await panel.locator('[data-hd-oc-search]').click();await expect(panel.locator('[data-hd-oc-review-id="speed"]')).toContainText('低速 → 高速+');await expect(panel.locator('[data-hd-oc-review-kind="missing"]')).toHaveCount(0);await expect(panel.locator('[data-hd-oc-review-kind="info"]')).toContainText('速力条件は確認済み');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('fleet suggestions use each exact remodel master speed instead of the final remodel database shortcut',async({page})=>{
+ await prepare(page,[],[]);const speeds=await page.evaluate(()=>['夕張','夕張改二','夕張改二特','大和改','大和改二','大和改二重'].map(name=>hdFSProfile({name}).speed));expect(speeds).toEqual(['高速','高速','低速','低速','高速','低速']);
 });
