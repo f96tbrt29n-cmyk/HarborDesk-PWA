@@ -2533,7 +2533,7 @@ test('release smoke: pending fix workflow refreshes after sync and equipment cha
   await boot(page, errors);
   const source = await page.evaluate(async () => fetch('./fleet-readiness-evaluator.js', { cache:'no-store' }).then(r => r.text()));
   expect(source).toContain("const HD_FE_FIX_FLOW_KEY='harbordesk-sortie-fix-flow-v1'");
-  expect(source).toContain("['hd:kancolle-sync','hd:equipment-changed','hd:ship-identity-changed']");
+  expect(source).toContain("['hd:kancolle-sync','hd:equipment-changed','hd:ship-identity-changed','hd:map-air-changed']");
   expect(source).toContain("data-hd-fe-recheck");
   expect(source).toContain("data-hd-fe-fix-dismiss");
   expect(errors).toEqual([]);
