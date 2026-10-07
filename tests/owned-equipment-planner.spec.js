@@ -711,3 +711,42 @@ test('all sea air mobile node and goal controls persist through reload without o
 test('all sea air node details show every recorded enemy pattern and base distinction',async({page})=>{
  await boot(page);const html=await page.evaluate(()=>hdMapAirNodeHtml('7-4','P'));expect(html).toContain('157');expect(html).toContain('優勢236');expect(html).toContain('基地用制空値とは異なります');expect(html).toContain('ヒ船団棲姫');expect(html).toContain('南西海域/7-4');
 });
+test('route air profiles distinguish night submarine raid and two round aviation nodes',async({page})=>{
+ await boot(page);const r=await page.evaluate(()=>{hdMapAirSave('6-5','J',true);return {profiles:[['1-6','F'],['6-5','G'],['6-5','J'],['6-5','B']].map(([m,n])=>hdMapAirNodeProfile(m,n)),night:hdMapAirTarget('6-5')};});
+ expect(r.profiles.map(p=>p.rounds)).toEqual([2,1,0,0]);expect(r.night).toMatchObject({known:true,enemy:0,hasAir:false});expect(r.profiles[2].kind).toBe('夜戦');
+});
+
+test('route air order needs confirmation and selection moves reset it while goals preserve it',async({page})=>{
+ await boot(page);const r=await page.evaluate(()=>{hdMapAirSave('1-4','L',true);hdMapAirSave('1-4','J',true);const legacy=hdMapAirRouteLoss('1-4',[],()=>0);hdMapAirConfirmOrder('1-4');hdMapAirSave('1-4',null,false,'parity');const goal=hdMapAirSelection('1-4');hdMapAirMove('1-4','J',-1);const moved=hdMapAirSelection('1-4');hdMapAirConfirmOrder('1-4');hdMapAirSave('1-4','J',false);return {legacy,goal,moved,removed:hdMapAirSelection('1-4')};});
+ expect(r.legacy.known).toBe(false);expect(r.legacy.reason).toContain('順番が未確認');expect(r.goal.orderConfirmed).toBe(true);expect(r.moved).toMatchObject({nodeIds:['J','L'],orderConfirmed:false,goal:'parity'});expect(r.removed).toMatchObject({nodeIds:['L'],orderConfirmed:false});
+});
+
+test('route air cumulative stage one bounds carry actual residual slots without mutation',async({page})=>{
+ await boot(page);const r=await page.evaluate(()=>{HD_MAP_AIR_DATA['99-1']={source:'fixture',nodes:Object.fromEntries(['A','B','C','D'].map(id=>[id,{label:id+'：通常戦',patterns:[{enemy:'駆逐イ級',air:0}]}]))};for(const id of ['A','B','C','D'])hdMapAirSave('99-1',id,true);hdMapAirConfirmOrder('99-1');const rows=[{category:'艦上戦闘機',slot:20}],before=JSON.stringify(rows),chain=hdMapAirRouteLoss('99-1',rows,r=>r.slot);return {chain,unchanged:before===JSON.stringify(rows)};});
+ expect(r.chain.steps.map(s=>s.afterLower)).toEqual([19,18,17,17]);expect(r.chain).toMatchObject({known:true,initial:20,lower:17,upper:20,minLost:0,maxLost:3,maxGap:0});expect(r.unchanged).toBe(true);
+});
+
+test('route air flags later deficit in readiness and owned equipment goals despite sufficient starting air',async({page})=>{
+ await prepare(page,[],[]);const r=await page.evaluate(()=>{HD_MAP_AIR_DATA['99-2']={source:'fixture',nodes:Object.fromEntries(['A','B'].map(id=>[id,{label:id+'：通常戦',patterns:[{enemy:'空母ヲ級',air:40}]}]))};hdMapAirSave('99-2','A',true);hdMapAirSave('99-2','B',true);hdMapAirConfirmOrder('99-2');const air={basePower:63,count:1,capacityKnown:1,rows:[{cap:40,aa:10,meta:{category:'艦上戦闘機'}}]},check=hdFEAirCheck('99-2',air),chain=check.routeLoss;return {check,chain};});
+ expect(r.check).toMatchObject({ours:63,required:60,status:'partial'});expect(r.chain).toMatchObject({known:true,lower:48,upper:59,minLost:5,maxLost:16,maxGap:3});expect(r.chain.firstGap).toMatchObject({id:'B',round:1,beforeLower:57,beforeUpper:60,gap:3});expect(r.chain.minimumRatio).toBeCloseTo(57/60);
+ const goal=await page.evaluate(()=>{const originalAssigned=hdOCAssigned,originalAir=hdFEAir;hdOCAssigned=()=>[];hdFEAir=()=>({basePower:63,count:1,capacityKnown:1,rows:[{cap:40,aa:10,meta:{category:'艦上戦闘機'}}]});try{return hdOCMeasure({map:'99-2',ships:[],routeInfo:{}},[],[]).goals.find(g=>g.kind==='air-value')}finally{hdOCAssigned=originalAssigned;hdFEAir=originalAir}});
+ expect(goal.ok).toBe(false);expect(goal.ratio).toBeCloseTo(57/60);expect(goal.detail).toContain('B・1回目であと3不足');
+});
+
+test('route air counts two rounds within aviation node and skips night and submarine stages',async({page})=>{
+ await boot(page);const r=await page.evaluate(()=>{hdMapAirSave('1-6','F',true);hdMapAirConfirmOrder('1-6');const two=hdMapAirRouteLoss('1-6',[{category:'艦上戦闘機',slot:40}],r=>Math.floor(10*Math.sqrt(r.slot)));hdMapAirSave('6-5','B',true);hdMapAirSave('6-5','J',true);hdMapAirConfirmOrder('6-5');const skip=hdMapAirRouteLoss('6-5',[{category:'艦上戦闘機',slot:40}],r=>r.slot);return {two,skip};});
+ expect(r.two.steps.map(s=>s.round)).toEqual([1,2]);expect(r.two).toMatchObject({lower:45,upper:59,minLost:5,maxLost:19});expect(r.skip.steps.map(s=>s.round)).toEqual([0,0]);expect(r.skip).toMatchObject({lower:40,upper:40,minLost:0,maxLost:0,maxGap:0});
+});
+
+test('route air rejects unconfirmed enemy malformed slots and duplicate nodes',async({page})=>{
+ await boot(page);const r=await page.evaluate(()=>{hdMapAirSave('6-4','H',true);const confirm=hdMapAirConfirmOrder('6-4'),enemy=hdMapAirRouteLoss('6-4',[],()=>0);hdMapAirSave('1-4','L',true);hdMapAirConfirmOrder('1-4');const slots=[-1,100,1.5,NaN].map(slot=>hdMapAirRouteLoss('1-4',[{category:'艦上戦闘機',slot}],r=>r.slot));const power=hdMapAirRouteLoss('1-4',[{category:'艦上戦闘機',slot:20}],()=>NaN);localStorage.setItem(HD_MAP_AIR_KEY,JSON.stringify({'1-4':{nodeIds:['L','L'],goal:'superiority',orderConfirmed:true}}));return {confirm,enemy,slots,power,duplicate:hdMapAirRouteLoss('1-4',[],()=>0)};});
+ expect(r.confirm).toBe(false);expect(r.enemy.known).toBe(false);expect(r.slots.every(x=>!x.known)).toBe(true);expect(r.power.known).toBe(false);expect(r.duplicate.known).toBe(false);
+});
+
+test('route air mobile order buttons confirmation and settings survive reload',async({page})=>{
+ await prepare(page,[],[]);await page.evaluate(()=>{selectedMap='6-5';selectedWorld='6';renderMapPicker();hdFEOpenCalculator();hdFCMutate('6-5','manual',s=>{s.gear=[{name:'零式艦戦53型(岩本隊)',slot:40,star:0,maxProf:false}]})});const fc=page.locator('#hdFleetCalculator');await fc.locator('[data-hd-map-air-select="M"]').check();await fc.locator('[data-hd-map-air-select="J"]').check();await fc.locator('[data-hd-map-air-move="J"][data-direction="-1"]').click();await fc.locator('[data-hd-map-air-confirm]').click();await expect(fc.locator('[data-hd-map-air-order]')).toContainText('確認済み');await expect(fc.locator('[data-hd-map-air-route-loss]')).toContainText('最終制空');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);await page.reload();await page.waitForFunction(()=>typeof hdMapAirSelection==='function');expect(await page.evaluate(()=>hdMapAirSelection('6-5'))).toMatchObject({nodeIds:['J','M'],orderConfirmed:true});
+});
+
+test('route air reordered settings invalidate cached equipment results and only confirmed chains show review',async({page})=>{
+ await prepare(page,[],[]);const r=await page.evaluate(()=>{const c=hdOCContext('1-1','oc-test',0);hdMapAirSave('1-1','A',true);hdMapAirSave('1-1','C',true);const before=hdOCSignature(c);hdMapAirConfirmOrder('1-1');const confirmed=hdOCSignature(c);hdMapAirMove('1-1','C',-1);return {confirmed:before!==confirmed,moved:confirmed!==hdOCSignature(c),html:hdMapAirRouteHtml('1-1',hdMapAirRouteLoss('1-1',[],()=>0))};});expect(r.confirmed).toBe(true);expect(r.moved).toBe(true);expect(r.html).toContain('順番が未確認');expect(r.html).not.toContain('このモデル内では目標値以上');
+});
