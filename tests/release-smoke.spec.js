@@ -1877,6 +1877,7 @@ test('release smoke: integrated readiness evaluates route air scouting and live 
     const scouting = window.hdFEScouting(plan, items);
     const route = window.hdFERoute(plan);
     const live = window.hdFELiveFleet(plan);
+    window.hdMapAirSave('7-4','P',true);
     const air = window.hdFEAirCheck('7-4', { basePower:300, capacityKnown:4, count:4 });
     return { scouting, route, live, air };
   });
