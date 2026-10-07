@@ -105,6 +105,7 @@ function hdShowNodeInfo(map,label){
       <div class="wide"><span>制空・装備</span><strong>${hdEscAdv(air)}</strong></div>
     </div>
     ${hdPatternsHtml(override)}
+    ${typeof hdMapAirNodeHtml==='function'?hdMapAirNodeHtml(map,label):''}
     ${hdAdvancedHtml(map)}
     ${source}
     <div class="hd-node-actions"><button class="ghost small" type="button" data-open-route-tab>ルート条件を見る</button><a class="guide-link" href="${wikiMapUrl(map)}" target="_blank" rel="noopener">Wikiで最新情報 ↗</a></div>`;

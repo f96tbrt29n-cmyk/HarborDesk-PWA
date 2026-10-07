@@ -6,7 +6,7 @@ function hdOCContext(map,fleetId='',route=''){
  const presets=typeof hdMSNPresets==='function'?hdMSNPresets(map):[],index=route===''?(typeof hdMSNRouteIndex==='function'?hdMSNRouteIndex(map,presets):0):Number(route);
  return {map,fleet,preset:presets[index]||null,index};
 }
-function hdOCSignature(c){return JSON.stringify([c.map,c.fleet,c.preset,hdFLRows(),hdFERoster(),localStorage.getItem('harbordesk-kancolle-sync-v1')])}
+function hdOCSignature(c){return JSON.stringify([c.map,c.fleet,c.preset,hdFLRows(),hdFERoster(),localStorage.getItem('harbordesk-kancolle-sync-v1'),typeof hdMapAirSelection==='function'?hdMapAirSelection(c.map):null])}
 function hdOCCompatible(slot,candidate){
  const meta=candidate.item,db=slot.db;if(!db||!meta)return false;
  if(slot.expansion)return hdShipDbExpansionInfo(meta,db,candidate.star).allowed;
@@ -42,7 +42,7 @@ function hdOCItemMatches(kind,item){if(typeof HD_SE_RECIPES!=='undefined'&&HD_SE
 function hdOCMeasure(plan,requirements,unknown=[]){
  const items=hdOCAssigned(plan),air=hdFEAirCheck(plan.map,hdFEAir(items)),scouting=hdFEScouting(plan,items),speedTarget=hdFESpeedTarget(plan.routeInfo),speedGoals=speedTarget?(plan.ships||[]).filter(s=>s.ship).map(s=>hdFESpeedGoal(s,speedTarget)):[];
  const goals=requirements.filter(r=>!speedTarget||r.kind!=='高速化').map(r=>{const cap=typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[r.kind]?hdSECapabilityMeasure(plan,r.kind):null,m=cap||hdFEKindCount(r.kind,items),count=r.kind==='高速化'?plan.ships.reduce((n,ship)=>n+Number(hdFEKindCount('高速化',hdOCAssigned({ships:[ship]})).count>0),0):Number(m.count)||0;return {...r,count,ok:count>=r.minCount,detail:cap?`同じ艦の推奨セット ${count} / 目安 ${r.minCount}組` :r.kind==='高速化'?`同じ艦の標準セット ${count} / 目安 ${r.minCount}組`:`配備 ${count} / 目安 ${r.minCount}`,ratio:cap?cap.ratio:Math.min(1,count/r.minCount)}});
- if(air.enemy&&!(typeof hdSEAirOptional==='function'&&hdSEAirOptional(plan.map)))goals.push({kind:'air-value',label:'制空優勢の目安',count:air.ours,minCount:Math.ceil(air.enemy*1.5),ok:air.status==='ready',ratio:Math.min(1,air.ours/Math.ceil(air.enemy*1.5)),detail:`基礎制空 ${air.ours} / 目安 ${Math.ceil(air.enemy*1.5)}（あと ${Math.max(0,Math.ceil(air.enemy*1.5)-air.ours)}）`});
+ if(air.enemy&&!(typeof hdSEAirOptional==='function'&&hdSEAirOptional(plan.map)))goals.push({kind:'air-value',label:air.goal==='superiority'?'制空優勢の目安':`制空${HD_MAP_AIR_GOALS[air.goal]}の目安`,count:air.ours,minCount:air.required,ok:air.status==='ready',ratio:Math.min(1,air.ours/Math.max(1,air.required)),detail:`基礎制空 ${air.ours} / 目安 ${air.required}（あと ${Math.max(0,air.required-air.ours)}）${air.reason==='route'?'。通るマス未選択のため参考値・未充足扱い':''}`});
  if(scouting.available){const target=Math.max(...scouting.checks.map(x=>Number(x.safe)||0));goals.push({kind:'los-value',label:'索敵分岐の安全域',count:scouting.score,minCount:target,ok:scouting.status==='ready',ratio:Math.max(0,Math.min(1,scouting.score/Math.max(1,target))),detail:`33式 ${scouting.score.toFixed(2)} / 安全域 ${target}（あと ${Math.max(0,target-scouting.score).toFixed(2)}）`})}
  // A global turbine/can total does not prove that a low-speed ship is sped up.
  const route=hdFERoute(plan),speedRequired=!!speedTarget;
@@ -198,7 +198,8 @@ function hdOCReview(plan,measure){
   if(unused.length)add('equipment-unused','info','未登録の所持装備',unused.map(x=>x.name).join('、')+'。この配備案には載せていません。','使いたい装備なら台帳の名前・性能データを確認してね。','equipment');
  }
  if(typeof hdSEAirOptional==='function'&&hdSEAirOptional(plan.map))add('air-optional','info','1-6下ルートの装備方針','制空優勢は必須ではありません。対空CI・対潜装備を優先する方針です。','水戦・水爆を使う場合は、搭載できる軽巡を選んでね。');
- else if(air.status==='manual'&&(air.enemy||needs.some(x=>x.kind==='制空')))add('air',air.enemy?'data':'manual','制空値を判定できない',air.detail,air.enemy?'艦娘の搭載情報を同期してから再探索してね。':'制空計算画面で、進むルートの敵編成と目標制空値を確認してね。',air.enemy?'sync':'calculator');
+ else if(air.status==='manual'&&(air.enemy||needs.some(x=>x.kind==='制空')))add('air',air.reason==='route'?'manual':air.enemy?'data':'manual','制空値を判定できない',air.detail,air.reason==='route'?'制空計算画面で通る戦闘マスと目標を選んで、再探索してね。':air.enemy?'艦娘の搭載情報を同期してから再探索してね。':'制空計算画面で、進むルートの敵編成と目標制空値を確認してね。',air.reason==='route'?'calculator':air.enemy?'sync':'calculator');
+ if(air.loss?.active)add('air-loss','manual','本隊の制空戦損耗（1回の範囲）',`${air.loss.minLost}〜${air.loss.maxLost}機減少 / 迎撃後の基礎制空 ${air.loss.lower}〜${air.loss.upper} / 目標 ${air.required}（厳しい側ではあと ${Math.max(0,air.required-air.loss.lower)}不足）。`,'制空戦だけの範囲。対空砲火・複数マスの累積・熟練度低下・敵機削りは含まず、全滅確率や到達時の保証ではありません。','calculator','https://wikiwiki.jp/kancolle/航空戦');
  if(!scouting.available){
   if(scouting.reason==='sync'){const missing=[...(scouting.missing?.hq?['司令部Lv']:[]),...(scouting.missing?.ships||[]).map(x=>x+' の索敵値')];add('scouting','data','索敵計算に必要な情報が不足',missing.join('、'), 'ゲーム連携で母港・艦隊情報を同期し、配備を再探索すると自動計算できるよ。','sync');}
   else if(needs.some(x=>x.kind==='索敵')&&plan.map!=='1-6')add('scouting','manual','索敵の判定基準が未登録',scouting.detail,'索敵計算画面で、進むルートの係数・必要スコアを確認してね。','calculator');
@@ -250,7 +251,7 @@ function hdOCReviewHeadline(measure,rows){
 }
 function hdOCReviewHtml(rows,attrs){
  const groups=[['missing','条件を満たしていない'],['data','情報不足で未判定'],['manual','自動判定できない項目'],['info','攻略の参考情報']],labels={sync:'ゲーム連携を開く',equipment:'装備台帳を開く',ships:'艦娘データベースを開く',route:'編成例を選ぶ',calculator:'制空・索敵計算を開く',base:'基地航空隊の計画を開く'},esc=hdFEEsc;
- return `<div data-hd-oc-reviews>${groups.map(([kind,label])=>{const items=rows.filter(x=>x.kind===kind);if(!items.length)return '';return `<div class="hd-oc-review-group ${kind}" data-hd-oc-review-kind="${kind}"><b>${label} ${items.length}件</b>${items.map(x=>`<article data-hd-oc-review-id="${esc(x.id)}"><strong>${esc(x.title)}</strong><p>${esc(x.reason)}</p><p><b>次にすること：</b>${esc(x.next)}</p>${x.action?`<button type="button" class="ghost small" data-hd-oc-review="${x.action}" ${attrs}>${labels[x.action]}</button>`:''}${x.source?`<a class="guide-link" href="${esc(x.source)}" target="_blank" rel="noopener">速力の判定元（2026-10-07確認） ↗</a>`:''}</article>`).join('')}</div>`}).join('')}</div>`;
+ return `<div data-hd-oc-reviews>${groups.map(([kind,label])=>{const items=rows.filter(x=>x.kind===kind);if(!items.length)return '';return `<div class="hd-oc-review-group ${kind}" data-hd-oc-review-kind="${kind}"><b>${label} ${items.length}件</b>${items.map(x=>`<article data-hd-oc-review-id="${esc(x.id)}"><strong>${esc(x.title)}</strong><p>${esc(x.reason)}</p><p><b>次にすること：</b>${esc(x.next)}</p>${x.action?`<button type="button" class="ghost small" data-hd-oc-review="${x.action}" ${attrs}>${labels[x.action]}</button>`:''}${x.source?`<a class="guide-link" href="${esc(x.source)}" target="_blank" rel="noopener">条件の判定元（2026-10-07確認） ↗</a>`:''}</article>`).join('')}</div>`}).join('')}</div>`;
 }
 function hdOCReviewRefresh(){
  for(const panel of document.querySelectorAll('.hd-oc-panel[data-hd-oc-map]')){const c=hdOCContext(panel.dataset.hdOcMap,panel.dataset.hdOcFleet,panel.dataset.hdOcRoute),result=HD_OC_CACHE.get(`${c.map}:${c.fleet?.id||''}:${c.index}`);if(!result||result.signature!==hdOCSignature(c))continue;
@@ -285,6 +286,7 @@ function hdOCInlineRefresh(){if(typeof renderCustomFleets==='function'&&typeof s
 document.addEventListener('change',e=>{if(e.target.id==='hdMapStrategyRoute'){setTimeout(hdOCInlineRefresh,0);return}if(!e.target.matches?.('[data-hd-oc-inline-route]'))return;const map=e.target.dataset.hdOcMap;if(typeof hdMSNRouteByMap!=='undefined')hdMSNRouteByMap[map]=Number(e.target.value)||0;hdOCRefresh()});
 ['hd:equipment-changed','hd:kancolle-sync','hd:custom-fleets-changed','hd:ship-identity-changed','hd:workspace-refresh'].forEach(event=>window.addEventListener(event,hdOCInlineRefresh));
 window.addEventListener('storage',e=>{if(e.key===null||['harbordesk-custom-fleets-v1','harbordesk-equipment-v1','harbordesk-ship-roster-v1','harbordesk-kancolle-sync-v1'].includes(e.key))hdOCInlineRefresh()});
+window.addEventListener('hd:map-air-changed',()=>hdOCRefresh());
 function hdOCRefresh(){hdOCInlineRefresh();if(typeof hdRenderMapEquipmentRecommendations==='function')hdRenderMapEquipmentRecommendations();if(typeof hdMSNRender==='function')hdMSNRender()}
 document.addEventListener('click',e=>{
  const button=e.target.closest?.('[data-hd-oc-search],[data-hd-oc-apply],[data-hd-oc-acquire],[data-hd-oc-select-fleet],[data-hd-oc-procure],[data-hd-oc-procurement-update],[data-hd-oc-review]');if(!button)return;

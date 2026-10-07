@@ -145,7 +145,7 @@ function hdSECapabilityHtml(map,fleetId='',proposal=null){
   return `<article class="hd-se-capability ${actual.count?'ready':stock?.complete?'partial':'missing'}" data-hd-se-capability="${p.kind}"><div class="hd-se-check-head"><div><b>${esc(p.label)}</b><small>${esc(p.importance)}</small></div><strong>${esc(status)}</strong></div><p>${esc(p.reason)}</p>${stock?`<b>${esc(stock.recipe.name)}</b><div class="hd-se-cap-parts">${stock.parts.map(part=>{const gap=Math.max(0,part.need-part.have),examples=HD_SE_PARTS[part.part].examples;return `<div class="${gap?'missing':'ready'}"><b>${esc(part.label)}：${part.have}/${part.need}${gap?`・あと${gap}個`:''}</b><span>${esc(part.items.length?'手持ち：'+part.items.join('、'):'候補：'+examples.join(' / '))}</span></div>`}).join('')}</div>`:''}${actual.count?`<p>条件を満たす配備：${esc(actual.ships.join('、'))}</p>`:stock?.usable?.complete?`<p>同じ艦に載せられる候補：${esc(stock.usable.ship)}。下の探索で他の目安との両立を確認してね。</p>`:stock?.complete&&plan?'<p>所持品は揃っていますが、この編成に同じ艦のセットを確認できません。対応艦・スロット・増設枠を見直してね。</p>':''}<details><summary>別の装備例</summary>${(HD_SE_RECIPES[p.kind]||[]).map(r=>`<p>${esc(r.name)}${r.ship==='akizuki'?'（秋月型専用）':''}</p>`).join('')}</details><small>${esc(p.note)}</small><a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">装備条件の出典 ↗</a></article>`;
  }).join('')}</div>`;
 }
-function hdSEAirOptional(map){return map==='1-6'}
+function hdSEAirOptional(map){if(map!=='1-6')return false;const s=typeof hdMapAirSelection==='function'?hdMapAirSelection(map):null;return !Array.isArray(s?.nodeIds)||!s.nodeIds.some(id=>!['A','E','G','F','B'].includes(id))}
 
 function hdSECheckKind(kind){
  if(kind==='高速化')return hdSEFastCheck();

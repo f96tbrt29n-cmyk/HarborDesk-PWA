@@ -35,7 +35,7 @@ const HD_NODE_PATTERN_DATA={
       {name:'削りA',enemy:'ヒ船団棲姫(A)、駆逐イ級後期型×2、潜水ソ級elite×3',formation:'輪形',air:'敵制空93 / 優勢140 / 確保279 / 半径2'},
       {name:'削りB',enemy:'ヒ船団棲姫(B)、駆逐イ級後期型×2、潜水ソ級elite×3',formation:'輪形',air:'敵制空97 / 優勢146 / 確保291 / 半径2'},
       {name:'最終A',enemy:'ヒ船団棲姫-壊(A)、軽巡ツ級elite、駆逐イ級後期型×2、潜水ソ級flagship、潜水ソ級elite',formation:'輪形',air:'敵制空154 / 優勢231 / 確保462 / 半径2'},
-      {name:'最終B',enemy:'ヒ船団棲姫-壊(B)、軽巡ツ級elite、駆逐ロ級後期型elite×2、潜水ソ級flagship、潜水ソ級elite',formation:'輪形',air:'敵制空157 / 優勢234 / 確保471 / 半径2'}
+      {name:'最終B',enemy:'ヒ船団棲姫-壊(B)、軽巡ツ級elite、駆逐ロ級後期型elite×2、潜水ソ級flagship、潜水ソ級elite',formation:'輪形',air:'敵制空157 / 優勢236 / 確保471 / 半径2'}
     ],source:'攻略Wiki 7-4（2026-09-17確認）'}
   },
   '7-5':{

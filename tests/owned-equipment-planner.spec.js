@@ -657,3 +657,57 @@ test('base air preparation readiness requires enemy data air goal and filled air
  const r=await page.evaluate(()=>{const c={mode:'sortie',targetRadius:5,squads:Array.from({length:4},()=>({name:'一式陸攻',slot:18,star:0}))},state={corps:[c]};hdLBSave({'6-4':state});const unknown=hdSPSBaseInfo('6-4');c.airCheck={enemyId:'custom',enemyAir:318};hdLBSave({'6-4':state});const shortage=hdSPSBaseInfo('6-4');c.airCheck.enemyAir=0;hdLBSave({'6-4':state});const met=hdSPSBaseInfo('6-4');c.squads[0].slot=0;hdLBSave({'6-4':state});return {unknown:unknown.sortieReady,shortage:shortage.sortieReady,met:met.sortieReady,empty:hdSPSBaseInfo('6-4').sortieReady,html:hdSPSBaseHtml('6-4')};});
  expect(r.unknown).toBe(false);expect(r.shortage).toBe(false);expect(r.met).toBe(true);expect(r.empty).toBe(false);expect(r.html).toContain('補充 18機');expect(r.html).toContain('ボーキ 90');
 });
+
+test('all sea air data cover 37 maps 300 battle nodes and typed enemy patterns',async({page})=>{
+ await boot(page);const r=await page.evaluate(()=>{const maps=Object.entries(HD_MAP_AIR_DATA),nodes=maps.flatMap(([map,d])=>Object.values(d.nodes)),samples=nodes.flatMap(n=>n.patterns);return {maps:maps.length,nodes:nodes.length,patterns:samples.length,valid:samples.every(p=>p.air===null||Number.isInteger(p.air)&&p.air>=0),missing:maps.filter(([map,d])=>!Object.keys(d.nodes).length||!d.source.endsWith('/'+map)).map(([map])=>map)};});
+ expect(r).toEqual({maps:37,nodes:300,patterns:1259,valid:true,missing:[]});
+});
+
+test('all sea air maximums come from enemy air columns not superiority columns',async({page})=>{
+ await boot(page);const r=await page.evaluate(()=>[['1-4','L'],['3-5','H'],['5-6','Z'],['6-5','M'],['7-4','P'],['7-5','A']].map(([map,node])=>Math.max(...HD_MAP_AIR_DATA[map].nodes[node].patterns.map(p=>p.air))));
+ expect(r).toEqual([20,254,435,312,157,335]);
+});
+
+test('all sea air targets exclude unvisited carrier nodes and separate maps',async({page})=>{
+ await prepare(page,[],[]);const r=await page.evaluate(()=>{hdMapAirSave('3-5','K',true);const lower=hdMapAirTarget('3-5');hdMapAirSave('3-5','H',true);const upper=hdMapAirTarget('3-5');hdMapAirSave('3-5','H',false);return {lower,upper,restored:hdMapAirTarget('3-5'),other:hdMapAirTarget('7-5')};});
+ expect(r.lower).toMatchObject({known:true,enemy:0});expect(r.upper.enemy).toBe(254);expect(r.restored.enemy).toBe(0);expect(r.other.selected).toBe(false);expect(r.other.known).toBe(false);
+});
+
+test('all sea air route choices change required air in actual fleet evaluation',async({page})=>{
+ await prepare(page,[],[]);const r=await page.evaluate(()=>{const air={basePower:40,capacityKnown:1,count:1,rows:[{cap:16,aa:10,meta:{category:'艦上戦闘機'}}]};hdMapAirSave('1-4','L',true);const normal=hdFEAirCheck('1-4',air);hdMapAirSave('1-4',null,false,'supremacy');return {normal,strong:hdFEAirCheck('1-4',air),target:hdMapAirTarget('1-4')};});
+ expect(r.normal).toMatchObject({enemy:20,required:30,status:'ready'});expect(r.normal.loss.active).toBe(1);expect(r.strong.required).toBe(60);expect(r.strong.status).not.toBe('ready');expect(r.target.goal).toBe('supremacy');
+});
+
+test('all sea air unknown route and unconfirmed enemy data cannot pass readiness',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdFEAirCheck==='function');const r=await page.evaluate(()=>{const air={basePower:9999,capacityKnown:1,count:1},unknown=hdFEAirCheck('7-5',air);hdMapAirSave('6-4','H',true);const missing=hdMapAirTarget('6-4'),check=hdFEAirCheck('6-4',air);localStorage.setItem(HD_MAP_AIR_KEY,JSON.stringify({'7-5':{nodeIds:['nonexistent'],goal:'supremacy'}}));return {unknown,missing,check,stale:hdMapAirTarget('7-5')};});
+ expect(r.unknown).toMatchObject({status:'manual',reason:'route'});expect(r.missing.known).toBe(false);expect(r.check.status).toBe('manual');expect(r.stale.invalid).toBe(true);expect(r.stale.enemy).toBeNull();
+});
+
+test('all sea air selection keeps lower 1-6 optional but checks upper routes',async({page})=>{
+ await prepare(page,[],[]);const r=await page.evaluate(()=>{hdMapAirSave('1-6','F',true);const lower=hdSEAirOptional('1-6');hdMapAirSave('1-6','K',true);return {lower,upper:hdSEAirOptional('1-6'),other:hdSEAirOptional('1-4')};});expect(r).toEqual({lower:true,upper:false,other:false});
+});
+
+test('all sea air strict boundary ratios distinguish loss disadvantage and parity',async({page})=>{
+ await prepare(page,[],[]);const r=await page.evaluate(()=>({loss:hdFCAirStatus(100,300).cls,disadvantage:hdFCAirStatus(200,300).cls,parity:hdFCAirStatus(201,300).cls,targets:['disadvantage','parity','superiority','supremacy'].map(g=>hdMapAirThreshold(300,g))}));expect(r).toEqual({loss:'lost',disadvantage:'disadvantage',parity:'parity',targets:[101,201,450,900]});
+});
+
+test('all sea air fallback parsing retains both endpoints of enemy ranges',async({page})=>{
+ await prepare(page,[],[]);const r=await page.evaluate(()=>{HD_NODE_DETAIL_OVERRIDES['99-1']={A:{air:'敵制空値8〜16。優勢12〜24、確保24〜48。'},B:{air:'敵制空 20～30'}};return hdFCMapEnemyAirCandidates('99-1')});expect(r).toEqual([8,16,20,30]);
+});
+
+test('all sea air loss ranges use per slot floors and jet denominators without mutation',async({page})=>{
+ await prepare(page,[],[]);const r=await page.evaluate(()=>{const fighter=[{category:'艦上戦闘機',slot:20}],jet=[{category:'噴式戦闘爆撃機',slot:20}],before=JSON.stringify(fighter);return {secure:hdMapAirLossBounds(fighter,0,r=>r.slot),small:hdMapAirLossBounds([{category:'艦上戦闘機',slot:17}],0,r=>r.slot),jet:hdMapAirLossBounds(jet,0,r=>r.slot),lost:hdMapAirLossBounds(fighter,100,r=>r.slot),unchanged:before===JSON.stringify(fighter),unknown:hdMapAirLossBounds(fighter,null,r=>r.slot)};});
+ expect(r.secure).toMatchObject({minLost:0,maxLost:1,lower:19,upper:20});expect(r.small.maxLost).toBe(0);expect(r.jet.maxLost).toBe(0);expect(r.lost).toMatchObject({minLost:5,maxLost:11,lower:9,upper:15});expect(r.unchanged).toBe(true);expect(r.unknown).toBeNull();
+});
+
+test('all sea air selection invalidates cached equipment signatures only for the changed map',async({page})=>{
+ await prepare(page,[],[]);const r=await page.evaluate(()=>{const c=hdOCContext('1-1','oc-test',0),before=hdOCSignature(c);hdMapAirSave('1-4','L',true);const other=hdOCSignature(c);hdMapAirSave('1-1','C',true);return {otherUnchanged:before===other,changed:before!==hdOCSignature(c)};});expect(r).toEqual({otherUnchanged:true,changed:true});
+});
+
+test('all sea air mobile node and goal controls persist through reload without overflow',async({page})=>{
+ await prepare(page,[],[]);await page.evaluate(()=>{selectedMap='7-5';selectedWorld='7';renderMapPicker();hdFEOpenCalculator();hdFCRender();});const fc=page.locator('#hdFleetCalculator');await fc.locator('[data-hd-map-air-select="A"]').check();await expect(fc.locator('[data-hd-map-air-select="A"]')).toBeChecked();await fc.locator('[data-hd-map-air-goal]').selectOption('parity');await expect(fc.locator('[data-hd-map-air-panel]')).toContainText('敵 335');await expect(fc.locator('[data-hd-fc-enemy]')).toBeDisabled();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);await page.reload();await page.waitForFunction(()=>typeof hdMapAirTarget==='function');expect(await page.evaluate(()=>hdMapAirTarget('7-5'))).toMatchObject({known:true,enemy:335,goal:'parity',ids:['A']});
+});
+
+test('all sea air node details show every recorded enemy pattern and base distinction',async({page})=>{
+ await boot(page);const html=await page.evaluate(()=>hdMapAirNodeHtml('7-4','P'));expect(html).toContain('157');expect(html).toContain('優勢236');expect(html).toContain('基地用制空値とは異なります');expect(html).toContain('ヒ船団棲姫');expect(html).toContain('南西海域/7-4');
+});
