@@ -588,6 +588,31 @@ test('base air checks distinguish base enemy presets and never reuse stale map o
  expect(r.normal.enemy).toBe(215);expect(r.final.enemy).toBe(318);expect(r.other.enemy).toBeNull();expect(r.defense.enemy).toBeNull();expect(r.empty.status).toBe('data');expect(r.zero.enemy).toBe(0);expect(r.zero.shortage).toBe(0);
 });
 
+test('base boss presets include enemy reconnaissance for 6-4 and 7-4',async({page})=>{
+ await baseReviewFixture(page);
+ const r=await page.evaluate(()=>{const c={mode:'sortie',squads:Array.from({length:4},()=>({name:'一式陸攻',slot:18,star:0}))},get=(map,id)=>hdLBAirAssessment(map,{...c,airCheck:{enemyId:id}});return {n:[1,2,3,4,5,6].map(i=>get('6-4',`n${i}`).enemy),p:[1,2,3,4,5,6].map(i=>get('7-4',`p${i}`).enemy),finalN:get('6-4','n6'),finalP:get('7-4','p6'),wrong:get('6-4','p6')};});
+ expect(r.n).toEqual([78,34,112,48,48,49]);expect(r.p).toEqual([93,97,94,98,155,158]);expect(r.finalN.required).toBe(17);expect(r.finalP.required).toBe(53);expect(r.finalP.source).toContain('/南西海域/7-4');expect(r.finalN.source).toContain('/中部海域/6-4');expect(r.wrong.enemy).toBeNull();
+});
+
+test('base phase presets use maximum enemy air rather than one random composition',async({page})=>{
+ await baseReviewFixture(page);
+ const r=await page.evaluate(()=>{const c={mode:'sortie',squads:Array.from({length:4},()=>({name:'一式陸攻',slot:18,star:0}))};return ['6-4','6-5','7-4'].map(map=>['boss-all','boss-normal','boss-final'].map(enemyId=>hdLBAirAssessment(map,{...c,airCheck:{enemyId}}).enemy));});
+ expect(r).toEqual([[112,112,49],[318,318,318],[158,98,158]]);
+});
+
+test('base phase choice updates shortages and preparation without manual enemy input',async({page})=>{
+ await baseReviewFixture(page);await page.waitForFunction(()=>typeof hdSPSBaseInfo==='function');
+ const r=await page.evaluate(()=>{const c={mode:'sortie',targetRadius:2,squads:Array.from({length:4},()=>({name:'一式陸攻',slot:18,star:0,maxProf:true})),airCheck:{enemyId:'boss-normal'}},state={corps:[c]};hdLBSave({'7-4':state});const normal=hdSPSBaseInfo('7-4');c.airCheck.enemyId='boss-final';hdLBSave({'7-4':state});const final=hdSPSBaseInfo('7-4');const plan={...reviewPlan,map:'7-4'};return {normal:normal.sortieReady,final:final.sortieReady,normalAir:normal.corps[0].airCheck,finalAir:final.corps[0].airCheck,review:hdOCReview(plan,reviewMeasure),html:hdSPSBaseHtml('7-4')};});
+ expect(r.normal).toBe(true);expect(r.final).toBe(false);expect(r.normalAir.enemy).toBe(98);expect(r.finalAir.enemy).toBe(158);expect(r.finalAir.shortage).toBeGreaterThan(0);expect(r.review.find(x=>x.id==='base-air:0').kind).toBe('missing');expect(r.html).toContain('158');
+});
+
+test('base boss phase selection persists on mobile with matching map source and no raid note',async({page})=>{
+ await baseReviewFixture(page);
+ await page.evaluate(()=>{selectedMap='7-4';selectedWorld='7';renderMapPicker();hdFEOpenCalculator();hdRenderLandBasePlanner();});
+ const planner=page.locator('#hdLandBasePlanner');await planner.locator('[data-hd-lb-air="0"][data-field="enemyId"]').selectOption('boss-final');await expect(planner.locator('[data-hd-lb-air="0"][data-field="enemyId"]')).toHaveValue('boss-final');await expect(planner.locator('[data-hd-lb-air-result="0"] a')).toHaveAttribute('href','https://wikiwiki.jp/kancolle/南西海域/7-4');await expect(planner.locator('[data-hd-lb-defense-result]')).toContainText('基地空襲はありません');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);await page.reload();await page.waitForFunction(()=>typeof hdLBLoad==='function');expect(await page.evaluate(()=>hdLBLoad()['7-4'].corps[0].airCheck.enemyId)).toBe('boss-final');
+});
+
 test('base air checks calculate residual supply and loss scenarios without mutating saved squads',async({page})=>{
  await baseReviewFixture(page);
  const r=await page.evaluate(()=>{const c={mode:'sortie',squads:[{name:'二式陸上偵察機',slot:2,star:0,maxProf:false},...Array.from({length:3},()=>({name:'一式陸攻',slot:14,star:0,maxProf:false}))],airCheck:{enemyId:'custom',enemyAir:318,lossPercent:100}},before=JSON.stringify(c),a=hdLBAirAssessment('6-5',c);return {a,unchanged:before===JSON.stringify(c),noLoss:hdLBAirAssessment('6-5',{...c,airCheck:{enemyId:'custom',enemyAir:318,lossPercent:0}})};});
