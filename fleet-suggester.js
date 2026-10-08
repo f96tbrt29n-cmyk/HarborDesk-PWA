@@ -255,7 +255,7 @@ function hdFSOpen(){
  return !!opened;
 }
 function hdFSOpenRoster(){if(typeof hdWSShowElement==='function'&&hdWSShowElement('roster',true))return true;return hdFSReveal(document.getElementById('roster'))}
-function hdFSMapButton(){var head=document.querySelector('#selectedMapCard .map-tabs-head');if(!head||head.querySelector('[data-hd-fs-open]'))return;var b=document.createElement('button');b.type='button';b.className='ghost small';b.setAttribute('data-hd-fs-open','1');b.textContent='編成候補';head.appendChild(b)}
+function hdFSMapButton(){var head=document.querySelector('#selectedMapCard .map-tabs-head, #selectedMapCard .guide-card-top');if(!head||head.querySelector('[data-hd-fs-open]'))return;var b=document.createElement('button');b.type='button';b.className='ghost small';b.setAttribute('data-hd-fs-open','1');b.textContent='編成候補';head.appendChild(b)}
 async function hdFSOpenAcquire(kind,button){
  if(!kind)return false;
  if(typeof hdAGOpen!=='function'&&typeof window.hdEnsureCurrentAssets==='function'){
@@ -285,5 +285,9 @@ window.addEventListener('hd:ship-identity-changed',hdFSRender);
 window.addEventListener('hd:workspace-refresh',hdFSRender);
 window.addEventListener('hd:ship-images-changed',()=>hdFSRender(true));
 window.addEventListener('hd:ship-images-ready',()=>hdFSRender(true));
-window.addEventListener('hd:map-rendered',function(){hdFSMapButton();hdFSRender(true)});
+window.addEventListener('hd:map-rendered',function(){hdFSEnsure();hdFSMapButton();hdFSRender(true)});
+function hdFSInstall(){hdFSEnsure();hdFSMapButton();hdFSRender(true)}
+window.addEventListener('hd:modules-ready',hdFSInstall);
+if(document.readyState!=='loading')hdFSInstall();
+else document.addEventListener('DOMContentLoaded',hdFSInstall,{once:true});
 window.addEventListener('load',function(){setTimeout(function(){hdFSEnsure();hdFSMapButton();hdFSRender(true)},560)});

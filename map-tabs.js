@@ -33,9 +33,10 @@ function hdMapTabsRevealActive(){
  });
 }
 function hdFleetHtml(map){
+  const launch='<div class="map-tab-card"><b>手持ち艦隊・自動編成候補</b><p>艦隊台帳の艦娘から、この海域の編成候補を確認できます。</p><button type="button" class="primary small" data-hd-map-tool="suggest">手持ち艦隊・自動編成候補を開く</button></div>';
   const p=hdMapPlan(map);
-  if(!(p.presets||[]).length)return '<div class="empty">編成例を準備中</div>';
-  return p.presets.map((x,i)=>`<article class="map-tab-card"><div class="map-tab-card-title">編成例 ${i+1}｜${hdMapEsc(x.name)}</div><div><b>艦隊:</b> ${hdMapEsc(x.ships)}</div><div><b>装備:</b> ${hdMapEsc(x.gear)}</div><div><b>用途:</b> ${hdMapEsc(x.use)}</div>${typeof hdPlanSourceHtml==='function'&&hdPlanSourceHtml(x)?`<div>${hdPlanSourceHtml(x)}</div>`:''}</article>`).join('');
+  if(!(p.presets||[]).length)return launch+'<div class="empty">編成例を準備中</div>';
+  return launch+p.presets.map((x,i)=>`<article class="map-tab-card"><div class="map-tab-card-title">編成例 ${i+1}｜${hdMapEsc(x.name)}</div><div><b>艦隊:</b> ${hdMapEsc(x.ships)}</div><div><b>装備:</b> ${hdMapEsc(x.gear)}</div><div><b>用途:</b> ${hdMapEsc(x.use)}</div>${typeof hdPlanSourceHtml==='function'&&hdPlanSourceHtml(x)?`<div>${hdPlanSourceHtml(x)}</div>`:''}</article>`).join('');
 }
 function hdQuestHtml(map){
   const planned=(hdMapPlan(map).quests||[]).map(q=>({...q,id:q.id||'',source:'plan'}));
