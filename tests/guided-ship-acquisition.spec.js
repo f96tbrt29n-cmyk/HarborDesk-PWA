@@ -547,4 +547,8 @@ test('strategy goals: a cancelled press resumes pending updates without completi
   await page.mouse.up();
   await expect(button).toHaveAttribute('aria-pressed','false');
   expect(await page.evaluate(() => homeGuideState().done)).not.toContain('shared:baseSortie:B175-7-3');
+  await button.press('Enter');
+  await expect(button).toHaveAttribute('aria-pressed','true');
+  await button.click();
+  await expect(button).toHaveAttribute('aria-pressed','false');
 });

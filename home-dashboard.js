@@ -338,8 +338,9 @@ for(const type of ['input','change'])document.addEventListener(type,e=>{const fo
 document.addEventListener('compositionstart',e=>{if(e.target.closest?.('#homeGuideSteps [data-home-guide-add],#homeGuideSteps [data-home-guide-edit],#homeGuideSteps [data-home-guide-search]'))homeGuideComposing=true});
 document.addEventListener('compositionend',e=>{const form=e.target.closest?.('#homeGuideSteps [data-home-guide-add],#homeGuideSteps [data-home-guide-edit]');if(!form&&!e.target.matches?.('[data-home-guide-search]'))return;homeGuideComposing=false;if(form)homeGuideSaveDraft(form);if(e.target.matches?.('[data-home-guide-search]'))homeGuideSetSearch(e.target.value);else if(homeGuideRenderPending)homeGuideRender()});
 let homeGuideLastSignature='';
-let homeGuidePressedPointer=null,homeGuideRenderPending=false;
+let homeGuidePressedPointer=null,homeGuideCancelledPointer=null,homeGuideRenderPending=false;
 document.addEventListener('pointerdown',e=>{
+ homeGuideCancelledPointer=null;
  if(e.button!==0||e.isPrimary===false||!e.target.closest?.('#homeGuideSteps'))return;
  homeGuidePressedPointer={id:e.pointerId};
 },true);
@@ -358,11 +359,16 @@ window.addEventListener('pointerup',e=>{
  homeGuideFinishPress(press,500);
 },true);
 window.addEventListener('pointercancel',e=>{
- if(homeGuidePressedPointer?.id===e.pointerId)homeGuideFinishPress(homeGuidePressedPointer);
+ if(homeGuidePressedPointer?.id===e.pointerId){homeGuideCancelledPointer=homeGuidePressedPointer;homeGuideFinishPress(homeGuidePressedPointer)}
 },true);
-document.addEventListener('click',()=>homeGuideFinishPress(homeGuidePressedPointer),true);
+document.addEventListener('click',e=>{
+ // A cancelled press must not activate a retained node on its later release.
+ // Keyboard activation is independent; the next pointerdown starts a new press.
+ if(homeGuideCancelledPointer&&e.detail>0&&(e.pointerId===undefined||e.pointerId===homeGuideCancelledPointer.id)&&e.target.closest?.('#homeGuideSteps')){homeGuideCancelledPointer=null;e.preventDefault();e.stopImmediatePropagation();return}
+ homeGuideFinishPress(homeGuidePressedPointer);
+},true);
 window.addEventListener('blur',()=>{
- homeGuidePressedPointer=null;
+ homeGuidePressedPointer=null;homeGuideCancelledPointer=null;
  if(homeGuideRenderPending)homeGuideRender();
 });
 function homeGuideRender(){
