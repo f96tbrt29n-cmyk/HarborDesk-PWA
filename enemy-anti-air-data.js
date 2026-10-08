@@ -1,4 +1,221 @@
 // Wiki enemy equipment + pinned api_start2 item stats. Strict names; same-name alternatives use independent maxima.
+// Ordinary main-fleet aircraft only; names and categories strictly matched to the pinned master.
+const HD_AIRCRAFT_AA_EVASION_DATA={
+ "checkedAt": "2026-10-08",
+ "source": "https://wikiwiki.jp/kancolle/対空砲火#avoid_AAfire",
+ "aircraft": {
+  "九七式艦攻(村田隊)": {
+   "name": "九七式艦攻(村田隊)",
+   "id": 143,
+   "category": "艦上攻撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "天山一二型(村田隊)": {
+   "name": "天山一二型(村田隊)",
+   "id": 144,
+   "category": "艦上攻撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "九七式艦攻(友永隊)": {
+   "name": "九七式艦攻(友永隊)",
+   "id": 93,
+   "category": "艦上攻撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "天山一二型(友永隊)": {
+   "name": "天山一二型(友永隊)",
+   "id": 94,
+   "category": "艦上攻撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "天山一二型甲改(熟練/空六号電探改装備機)": {
+   "name": "天山一二型甲改(熟練/空六号電探改装備機)",
+   "id": 374,
+   "category": "艦上攻撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "天山一二型甲改二(村田隊/電探装備)": {
+   "name": "天山一二型甲改二(村田隊/電探装備)",
+   "id": 545,
+   "category": "艦上攻撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "流星改(熟練)": {
+   "name": "流星改(熟練)",
+   "id": 466,
+   "category": "艦上攻撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "流星改(一航戦/熟練)": {
+   "name": "流星改(一航戦/熟練)",
+   "id": 343,
+   "category": "艦上攻撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "流星改(友永隊)": {
+   "name": "流星改(友永隊)",
+   "id": 570,
+   "category": "艦上攻撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 70
+  },
+  "Ju87D-4(Fliegerass)": {
+   "name": "Ju87 D-4(Fliegerass)",
+   "id": 559,
+   "category": "艦上攻撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "MosquitoTRMk.33": {
+   "name": "Mosquito TR Mk.33",
+   "id": 481,
+   "category": "艦上攻撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "九九式艦爆(江草隊)": {
+   "name": "九九式艦爆(江草隊)",
+   "id": 99,
+   "category": "艦上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "彗星(江草隊)": {
+   "name": "彗星(江草隊)",
+   "id": 100,
+   "category": "艦上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 70
+  },
+  "彗星一二型(六三四空/三号爆弾搭載機)": {
+   "name": "彗星一二型(六三四空/三号爆弾搭載機)",
+   "id": 319,
+   "category": "艦上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "彗星一二型(三一号光電管爆弾搭載機)": {
+   "name": "彗星一二型(三一号光電管爆弾搭載機)",
+   "id": 320,
+   "category": "艦上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "零式艦戦62型改(夜間爆戦)": {
+   "name": "零式艦戦62型改(夜間爆戦)",
+   "id": 557,
+   "category": "艦上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "零式艦戦62型改(熟練/夜間爆戦)": {
+   "name": "零式艦戦62型改(熟練/夜間爆戦)",
+   "id": 558,
+   "category": "艦上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 70
+  },
+  "零戦62型(爆戦/岩井隊)": {
+   "name": "零戦62型(爆戦/岩井隊)",
+   "id": 154,
+   "category": "艦上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 70
+  },
+  "零式艦戦64型(熟練爆戦)": {
+   "name": "零式艦戦64型(熟練爆戦)",
+   "id": 487,
+   "category": "艦上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "F4U-4": {
+   "name": "F4U-4",
+   "id": 474,
+   "category": "艦上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "AU-1": {
+   "name": "AU-1",
+   "id": 475,
+   "category": "艦上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "F4U-7": {
+   "name": "F4U-7",
+   "id": 476,
+   "category": "艦上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "瑞雲(六三四空)": {
+   "name": "瑞雲(六三四空)",
+   "id": 79,
+   "category": "水上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "瑞雲12型": {
+   "name": "瑞雲12型",
+   "id": 80,
+   "category": "水上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  },
+  "瑞雲12型(六三四空)": {
+   "name": "瑞雲12型(六三四空)",
+   "id": 81,
+   "category": "水上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 70
+  },
+  "瑞雲(六三四空/熟練)": {
+   "name": "瑞雲(六三四空/熟練)",
+   "id": 237,
+   "category": "水上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 70
+  },
+  "瑞雲改二(六三四空)": {
+   "name": "瑞雲改二(六三四空)",
+   "id": 322,
+   "category": "水上爆撃機",
+   "weightedPercent": 50,
+   "fleetPercent": 70
+  },
+  "試製夜間瑞雲(攻撃装備)": {
+   "name": "試製 夜間瑞雲(攻撃装備)",
+   "id": 490,
+   "category": "水上爆撃機",
+   "weightedPercent": 50,
+   "fleetPercent": 70
+  },
+  "瑞雲改二(六三四空/熟練)": {
+   "name": "瑞雲改二(六三四空/熟練)",
+   "id": 323,
+   "category": "水上爆撃機",
+   "weightedPercent": 50,
+   "fleetPercent": 50
+  },
+  "晴嵐(六三一空)": {
+   "name": "晴嵐(六三一空)",
+   "id": 208,
+   "category": "水上爆撃機",
+   "weightedPercent": 60,
+   "fleetPercent": 100
+  }
+ }
+};
 const HD_ENEMY_AA_DATA={
  "checkedAt": "2026-10-08",
  "masterCommit": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",

@@ -50,3 +50,20 @@ test('second aviation round begins with previous AA losses and raid has no enemy
 test('malformed slot or enemy coefficients do not produce known losses',()=>{
  const run=app(),r=run(`[hdEnemyAALossBounds([{category:'艦上爆撃機',slot:100}],{known:true,maxWeighted:92,maxFleet:12},r=>r.slot),hdEnemyAALossBounds([{category:'艦上爆撃機',slot:20}],{known:true,maxWeighted:null,maxFleet:12},r=>r.slot)]`);assert.deepEqual(r,[null,null]);
 });
+test('evasion floors both enemy coefficients before proportional and fixed losses',()=>{
+ const run=app(),r=run(`(()=>{const rows=[{name:'零戦62型(爆戦／岩井隊)',category:'艦上爆撃機',slot:18},{name:'彗星(江草隊)',category:'艦上爆撃機',slot:18},{name:'瑞雲改二(六三四空／熟練)',category:'水上爆撃機',slot:18},{name:'彗星',category:'艦上爆撃機',slot:18}],before=JSON.stringify(rows),loss=hdEnemyAALossBounds(rows,{known:true,applicable:true,maxWeighted:92,maxFleet:12},r=>r.slot);return {loss,unchanged:before===JSON.stringify(rows)}})()`);
+ assert.deepEqual(r.loss.worstRows.map(x=>x.slot),[11,11,12,5]);assert.deepEqual(r.loss.shots.map(x=>[x.weighted,x.fleet,x.lost]),[[55,8,7],[55,8,7],[46,6,6],[92,12,13]]);assert.equal(r.unchanged,true);
+});
+test('strict aircraft names and categories reject misleading evasion labels',()=>{
+ const run=app(),r=run(`[{name:'彗星(江草隊)改',category:'艦上爆撃機'},{name:'彗星(江草隊)',category:'水上爆撃機'},{name:'彗星(江草隊)',category:'艦上爆撃機',meta:{name:'彗星'}},{meta:{name:'零戦62型(爆戦／岩井隊)',category:'艦上爆撃機'}},{name:'瑞雲改二（六三四空／熟練）',category:'水上爆撃機'}].map(hdEnemyAAEvasion)`);
+ assert.deepEqual(r.map(x=>x.registered),[false,false,false,true,true]);assert.equal(r[0].weightedPercent,100);assert.equal(r[4].fleetPercent,50);
+});
+test('all registered aircraft match pinned master identity and reduce no loss below zero',()=>{
+ const run=app(),entries=run('Object.values(HD_AIRCRAFT_AA_EVASION_DATA.aircraft)'),master=JSON.parse(fs.readFileSync(path.join(__dirname,'../ship-master-snapshot.js'),'utf8').split('window.HD_KANCOLLE_MASTER_SNAPSHOT=')[1].trim().replace(/;$/,''));
+ assert.equal(entries.length,30);for(const e of entries){assert.equal(master.equipment[e.name].id,e.id);assert.equal(master.equipment[e.name].typeName,e.category)}
+ const r=run(`Object.values(HD_AIRCRAFT_AA_EVASION_DATA.aircraft).every(e=>Array.from({length:100},(_,slot)=>{const row={name:e.name,category:e.category,slot},target={known:true,applicable:true,maxWeighted:92,maxFleet:12},a=hdEnemyAALossBounds([row],target,r=>r.slot),b=hdEnemyAALossBounds([{...row,name:'未登録機'}],target,r=>r.slot);return a.maxLost<=b.maxLost&&a.worstRows[0].slot>=0}).every(Boolean))`);assert.equal(r,true);
+});
+test('registered evasion persists through a route and appears beside residual slots',()=>{
+ const run=app(),r=run(`(()=>{HD_MAP_AIR_DATA['99-11']={nodes:Object.fromEntries(['A','B'].map(id=>[id,{label:'通常戦',patterns:[{name:'パターン1',enemy:'軽巡ツ級elite',air:0,formations:['単縦陣']}]}]))};for(const id of ['A','B'])hdMapAirSave('99-11',id,true);hdMapAirConfirmOrder('99-11');const rows=[{name:'瑞雲改二(六三四空／熟練)',category:'水上爆撃機',slot:18}],loss=hdMapAirRouteLoss('99-11',rows,r=>r.slot),plain=hdMapAirRouteLoss('99-11',[{...rows[0],name:'未登録機'}],r=>r.slot);return {loss,plain,html:hdMapAirRouteHtml('99-11',loss)}})()`);
+ assert.equal(r.loss.lower,7);assert.equal(r.plain.lower,0);assert.equal(r.loss.slotResults[0].evasion.registered,true);assert.match(r.html,/射撃回避：加重×0.5・防空×0.5/);assert.doesNotMatch(r.html,/射撃回避補正なし/);
+});
