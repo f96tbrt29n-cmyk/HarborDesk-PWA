@@ -81,6 +81,9 @@ jobs:
           const recovery=fs.readFileSync('refresh.html','utf8');
           const recoveryBuild=Number(recovery.match(/const BUILD=(\d+)/)?.[1]);
           if(recoveryBuild!==Number(version.build))throw new Error(`Recovery page build mismatch: refresh=${recoveryBuild}, app-version=${version.build}`);
+          const index=fs.readFileSync('index.html','utf8');
+          const assetBuilds=[...index.matchAll(/(?:src|href)=["'][^"']+\.(?:js|css)\?v=(\d+)/g)].map(m=>Number(m[1]));
+          if(!assetBuilds.length||assetBuilds.some(b=>b!==Number(version.build)))throw new Error('Index asset build mismatch');
           const build=Number(version.build),parts=String(version.version||'').split('.'),patch=Number(parts[2]);
           if(version.version!==updateVersion||version.version!==pkg.version||build!==updateBuild||build!==cacheBuild){
             throw new Error(`Version mismatch: app-version=${version.version}/${build}, update-manager=${updateVersion}/${updateBuild}, sw=v${cacheBuild}, package=${pkg.version}`);
