@@ -163,14 +163,28 @@ test('release smoke: completed strategy view keeps drafts and reveals newly adde
   expect(await page.evaluate(()=>homeGuideState().custom.find(x=>x.id==='completed-edit-draft').title)).toBe('元の未完了目標');
 });
 
+test('release smoke: strategy background updates never detach active goal forms or group summaries', async ({ page }) => {
+  await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'connected-editor',title:'編集中の目標',category:'map',scope:'map',map:'6-5'});homeGuideSave(s)});
+  await page.locator('[data-home-guide-edit-open="connected-editor"]').click();const edit=page.locator('[data-home-guide-edit="connected-editor"]');await edit.locator('[name="title"]').fill('入力を保護する目標');
+  const result=await page.evaluate(()=>{const host=document.querySelector('#homeGuideSteps'),form=host.querySelector('[data-home-guide-edit="connected-editor"]'),add=host.querySelector('[data-home-guide-add="map"]'),summary=host.querySelector('[data-group="map"]>summary'),input=form.elements.title,observer=new MutationObserver(()=>{});observer.observe(host,{childList:true,subtree:true});for(let i=0;i<8;i++){const s=homeGuideState();s.done.push('continuous-update-'+i);homeGuideSave(s)}const removed=observer.takeRecords().flatMap(r=>[...r.removedNodes]),detached=removed.some(n=>[form,add,summary].some(el=>n===el||n.contains?.(el)));observer.disconnect();return {detached,same:host.querySelector('[data-home-guide-edit="connected-editor"]')===form,focused:document.activeElement===input,value:input.value}});
+  expect(result).toEqual({detached:false,same:true,focused:true,value:'入力を保護する目標'});
+});
+
+test('release smoke: strategy native keyboard submission survives a background update on button focus', async ({ page }) => {
+  await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false)});const add=page.locator('[data-home-guide-add="map"]');await add.locator('[name="title"]').fill('キーボードで追加する目標');
+  await add.locator('button[type="submit"]').evaluate(button=>button.addEventListener('focus',()=>{const s=homeGuideState();s.custom.push({id:'keyboard-background',title:'背景の更新',category:'map',scope:'map',map:'6-5'});homeGuideSave(s)},{once:true}));await add.locator('button[type="submit"]').focus();await add.locator('button[type="submit"]').press('Enter');
+  await expect.poll(()=>page.evaluate(()=>homeGuideState().custom.filter(x=>x.title==='キーボードで追加する目標').length)).toBe(1);const goal=await page.evaluate(()=>homeGuideState().custom.find(x=>x.title==='キーボードで追加する目標'));await page.locator(`[data-home-guide-edit-open="${goal.id}"]`).click();const edit=page.locator(`[data-home-guide-edit="${goal.id}"]`);await edit.locator('[name="title"]').fill('キーボードで編集した目標');
+  await edit.locator('button[type="submit"]').evaluate(button=>button.addEventListener('focus',()=>{const s=homeGuideState();s.done.push('keyboard-edit-background');homeGuideSave(s)},{once:true}));await edit.locator('button[type="submit"]').focus();await edit.locator('button[type="submit"]').press('Enter');await expect(edit).toHaveCount(0);await expect.poll(()=>page.evaluate(id=>homeGuideState().custom.find(x=>x.id===id)?.title,goal.id)).toBe('キーボードで編集した目標');
+});
+
 test('release smoke: strategy goal priorities survive creation and editing drafts', async ({ page }) => {
   await boot(page);
   await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
   const add=page.locator('[data-home-guide-add="map"]');
   await add.locator('[name="title"]').fill('優先度を付ける目標');await add.locator('[name="priority"]').selectOption('later');
   await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
-  await expect(add.locator('[name="priority"]')).toHaveValue('later');await add.locator('button[type="submit"]').click();
-  const goal=await page.evaluate(()=>homeGuideState().custom.find(x=>x.title==='優先度を付ける目標'));expect(goal.priority).toBe('later');
+  await expect(add.locator('[name="title"]')).toHaveValue('優先度を付ける目標');await expect(add.locator('[name="priority"]')).toHaveValue('later');await add.locator('button[type="submit"]').click();
+  await expect.poll(()=>page.evaluate(()=>homeGuideState().custom.find(x=>x.title==='優先度を付ける目標')?.priority)).toBe('later');const goal=await page.evaluate(()=>homeGuideState().custom.find(x=>x.title==='優先度を付ける目標'));
   await expect(add.locator('[name="priority"]')).toHaveValue('normal');
   await page.locator(`[data-home-guide-edit-open="${goal.id}"]`).click();
   const edit=page.locator(`[data-home-guide-edit="${goal.id}"]`);await edit.locator('[name="priority"]').selectOption('high');
@@ -292,7 +306,7 @@ test('release smoke: strategy goal drafts survive background updates reload and 
   await boot(page);
   await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
   const group=page.locator('details.home-guide-group[data-group="quest"]');
-  await group.locator('summary').click();
+  if(!await group.evaluate(el=>el.open))await group.locator('summary').click();
   const form=group.locator('[data-home-guide-add]');
   await form.locator('[name="title"]').fill('任務の艦種を確認');
   await form.locator('[name="prereq"]').fill('前提任務を確認');
@@ -306,7 +320,7 @@ test('release smoke: strategy goal drafts survive background updates reload and 
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');
   await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
-  await group.locator('summary').click();
+  if(!await group.evaluate(el=>el.open))await group.locator('summary').click();
   await expect(form.locator('[name="title"]')).toHaveValue('任務の艦種を確認');
   await expect(form.locator('[name="prereq"]')).toHaveValue('前提任務を確認');
   await expect(form.locator('[name="scope"]')).toHaveValue('map');

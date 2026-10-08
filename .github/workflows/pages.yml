@@ -139,6 +139,10 @@ jobs:
       - name: Install Playwright browser
         run: npx playwright install --with-deps ${{ matrix.browser }}
 
+      - name: Verify strategy forms repeatedly without retries
+        if: matrix.browser == 'webkit' && matrix.shard == 1
+        run: npx playwright test tests/release-smoke.spec.js --project=webkit --workers=1 --retries=0 --repeat-each=3 --grep 'strategy background updates never detach|strategy native keyboard submission|strategy goal priorities survive creation|strategy goal drafts survive background'
+
       - name: Run browser regression tests
         run: npm run test:browser -- --project=${{ matrix.browser }} --workers=${{ matrix.workers }} --shard=${{ matrix.shard }}/${{ matrix.shards }}
 
