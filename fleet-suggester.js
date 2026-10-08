@@ -57,10 +57,12 @@ function hdFSOperational(row,state){
 }
 function hdFSProfile(row,state){var db=hdFSDbFor(row),type=hdFSType(row),roles=db&&db.roles||[],tags=row.tags||[],master=db&&db._masterOnly?db._masterRow:null,speedMaster=typeof hdShipDbMasterRowFor==='function'?hdShipDbMasterRowFor(row):null;return {row:row,db:db,master:master,type:type,roles:roles,tags:tags,level:Number(row.level)||0,speed:speedMaster?hdShipDbMasterSpeed(speedMaster.speed):db&&db.speed||((type==='高速戦艦')?'高速':''),masterBacked:!!db,operational:hdFSOperational(row,state)}}
 function hdFSTypeMatches(p,token){
+ if(['羽黒','足柄'].includes(token))return p.db?.base===token||String(p.row?.name||'').startsWith(token);
  if(token==='対潜艦')return p.roles.some(function(r){return ['対潜','自動先制対潜','対潜補助','対潜護衛'].includes(r)})||['海防艦','駆逐艦','軽巡洋艦'].includes(p.type);
  var allowed=HD_FS_TYPE_ALIASES[token]||[token];return allowed.includes(p.type);
 }
 function hdFSRequirementPatterns(){return [
+ ['羽黒',/羽黒\s*(\d+)/g],['足柄',/足柄\s*(\d+)/g],
  ['重巡/雷巡',/重巡[／/]雷巡\s*(\d+)/g],['航空戦艦',/航空戦艦\s*(\d+)/g],['重巡級',/重巡級\s*(\d+)/g],['戦艦級',/戦艦級\s*(\d+)/g],['空母系',/空母系\s*(\d+)/g],
  ['正規空母',/正規空母\s*(\d+)/g],['軽空母',/軽空母\s*(\d+)/g],['装甲空母',/装甲空母\s*(\d+)/g],
  ['航巡',/航(?:巡|空巡洋艦)\s*(\d+)/g],['重巡',/重(?:巡|巡洋艦)\s*(\d+)/g],['雷巡',/(?:雷巡|重雷装巡洋艦)\s*(\d+)/g],['軽巡',/軽(?:巡|巡洋艦)\s*(\d+)/g],['駆逐',/駆逐(?:艦)?\s*(\d+)/g],
@@ -74,6 +76,8 @@ function hdFSPresetInfo(preset){
  // Conditional prose is not an exact fleet specification. Never interpret a limit or an alternative as a required count.
  var ambiguous=/\d+(?:隻)?(?:以上|以下|未満|超)|または|又は|狙い|[〜～~]/.test(text)||sum>6;
  if(ambiguous){requirements=[];total=Math.min(6,tm?Number(tm[1])||6:6)}
+ // Pick narrower groups first so a flexible air-carrier slot cannot consume the only regular carrier.
+ requirements.sort((a,b)=>Number(b.token===preset?.flagship)-Number(a.token===preset?.flagship)||(HD_FS_TYPE_ALIASES[a.token]||[a.token]).length-(HD_FS_TYPE_ALIASES[b.token]||[b.token]).length);
  var preferred=[];Object.keys(HD_FS_TYPE_ALIASES).forEach(function(k){if(text.includes(k)&&!preferred.includes(k))preferred.push(k)});
  if(/水雷/.test(text)){preferred.push('軽巡','駆逐','雷巡')}
  return {conditionManual:ambiguous||!requirements.length||/など|軸|中心|含む|組み合わせ|切替|任務/.test(text),text:text,requirements:requirements,total:total,preferred:Array.from(new Set(preferred)),speedRequired:/高速[+＋]|高速以上|高速統一|高速\s*以上|最速/.test(text),speedPreferred:/高速|最速/.test(text)};
@@ -127,6 +131,8 @@ function hdFSGenerate(map,preset,index){
 function hdFSPlans(map){
  var p=(typeof MAP_PLANS!=='undefined'&&MAP_PLANS[map])||(typeof genericPlan==='function'?genericPlan(map):null);
  var presets=p&&p.presets||[];if(!presets.length){var d=typeof MAP_DETAILS!=='undefined'?MAP_DETAILS[map]||{}:{};presets=[{name:'基本候補',ships:d.fleet||d.formation||'6隻編成',gear:d.air||'',use:'通常攻略'}]}
+ // A manual alternative must not occupy the first candidate when a concrete example exists.
+ presets=presets.slice().sort((a,b)=>Number(hdFSPresetInfo(a).conditionManual)-Number(hdFSPresetInfo(b).conditionManual));
  return presets.slice(0,3).map(function(x,i){return hdFSGenerate(map,x,i)});
 }
 function hdFSShipHtml(slot,i){
