@@ -58,6 +58,7 @@ function hdFSOperational(row,state){
 function hdFSProfile(row,state){var db=hdFSDbFor(row),type=hdFSType(row),roles=db&&db.roles||[],tags=row.tags||[],master=db&&db._masterOnly?db._masterRow:null,speedMaster=typeof hdShipDbMasterRowFor==='function'?hdShipDbMasterRowFor(row):null;return {row:row,db:db,master:master,type:type,roles:roles,tags:tags,level:Number(row.level)||0,speed:speedMaster?hdShipDbMasterSpeed(speedMaster.speed):db&&db.speed||((type==='高速戦艦')?'高速':''),masterBacked:!!db,operational:hdFSOperational(row,state)}}
 function hdFSTypeMatches(p,token){
  if(['羽黒','足柄'].includes(token))return p.db?.base===token||String(p.row?.name||'').startsWith(token);
+ if(token==='高速戦艦')return p.type==='高速戦艦'||p.type==='戦艦'&&/高速|最速/.test(p.speed||'');
  if(token==='対潜艦')return p.roles.some(function(r){return ['対潜','自動先制対潜','対潜補助','対潜護衛'].includes(r)})||['海防艦','駆逐艦','軽巡洋艦'].includes(p.type);
  var allowed=HD_FS_TYPE_ALIASES[token]||[token];return allowed.includes(p.type);
 }
@@ -80,7 +81,7 @@ function hdFSPresetInfo(preset){
  requirements.sort((a,b)=>Number(b.token===preset?.flagship)-Number(a.token===preset?.flagship)||(HD_FS_TYPE_ALIASES[a.token]||[a.token]).length-(HD_FS_TYPE_ALIASES[b.token]||[b.token]).length);
  var preferred=[];Object.keys(HD_FS_TYPE_ALIASES).forEach(function(k){if(text.includes(k)&&!preferred.includes(k))preferred.push(k)});
  if(/水雷/.test(text)){preferred.push('軽巡','駆逐','雷巡')}
- return {conditionManual:ambiguous||!requirements.length||/など|軸|中心|含む|組み合わせ|切替|任務/.test(text),text:text,requirements:requirements,total:total,preferred:Array.from(new Set(preferred)),speedRequired:/高速[+＋]|高速以上|高速統一|高速\s*以上|最速/.test(text),speedPreferred:/高速|最速/.test(text)};
+ return {flagship:preset?.flagship||'',conditionManual:ambiguous||!requirements.length||/など|軸|中心|含む|組み合わせ|切替|任務/.test(text),text:text,requirements:requirements,total:total,preferred:Array.from(new Set(preferred)),speedRequired:/高速[+＋]|高速以上|高速統一|高速\s*以上|最速/.test(text),speedPreferred:/高速|最速/.test(text)};
 }
 function hdFSNeeds(map){try{return typeof hdSEChecks==='function'?hdSEChecks(map).rows||[]:[]}catch(e){return []}}
 function hdFSScore(p,info,needs){

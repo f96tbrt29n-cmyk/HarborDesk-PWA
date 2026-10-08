@@ -55,6 +55,18 @@ test('concrete examples fill every stage and preserve scarce and required ships'
   return hdFSPlans('2-1')[0].filled;
  });
  expect(scarce).toBe(6);
+ const readiness=await page.evaluate(()=>{
+  const ships=[{ship:'羽黒改二',type:'重巡洋艦'},...Array.from({length:3},(_,i)=>({ship:'テスト駆逐'+i,type:'駆逐艦'}))];
+  const routeInfo=hdFSPresetInfo(MAP_PLANS['7-3'].presets[0]);
+  return {match:hdFERoute({map:'7-3',ships,routeInfo}).status,wrong:hdFERoute({map:'7-3',ships:[{ship:'妙高改二',type:'重巡洋艦'},...ships.slice(1)],routeInfo}).status};
+ });
+ expect(readiness).toEqual({match:'ready',wrong:'missing'});
+ const flagship=await page.evaluate(()=>{
+  const ships=['阿武隈改二','金剛改二','最上改二','睦月改二','夕立改二','時雨改二'].map(ship=>({ship}));
+  const routeInfo=hdFSPresetInfo(MAP_PLANS['6-4'].presets[0]);
+  return {good:hdFERoute({map:'6-4',ships,routeInfo}),wrong:hdFERoute({map:'6-4',ships:[ships[1],ships[0],...ships.slice(2)],routeInfo}).detail};
+ });
+ expect(flagship.good).toMatchObject({status:'ready'});expect(flagship.wrong).toContain('旗艦条件未充足');
  const named=await page.evaluate(()=>{
   localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(Array.from({length:6},(_,i)=>({id:'dd'+i,name:'テスト駆逐'+i,type:'駆逐艦',level:90,tags:[]}))));
   const plan=hdFSPlans('7-3')[0];return {filled:plan.filled,missing:plan.missing};
