@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  workflow_run:
+    workflows: ['Sync Kancolle master']
+    types: [completed]
+    branches: [main]
 
 permissions:
   contents: read
@@ -17,11 +21,20 @@ concurrency:
 jobs:
   validate:
     name: Validate HarborDesk
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    outputs:
+      revision: ${{ steps.revision.outputs.sha }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && 'main' || github.sha }}
+
+      - name: Resolve tested revision
+        id: revision
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Validate JavaScript syntax
         shell: bash
@@ -29,6 +42,9 @@ jobs:
           set -euo pipefail
           find . -maxdepth 1 -type f -name '*.js' -print0 | sort -z | xargs -0 -n1 node --check
           find tests scripts -maxdepth 1 -type f \( -name '*.js' -o -name '*.cjs' -o -name '*.mjs' \) -print0 | sort -z | xargs -0 -n1 node --check
+
+      - name: Verify release version bump
+        run: node --test tests/app-version-bump.test.mjs
 
       - name: Verify captured data survives a browser restart
         run: node tests/userscript-capture-resume.test.cjs
@@ -127,6 +143,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ needs.validate.outputs.revision }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v7.0.0
@@ -159,7 +177,7 @@ jobs:
 
   deploy:
     name: Deploy Pages
-    needs: browser
+    needs: [validate, browser]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment:
@@ -168,6 +186,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ needs.validate.outputs.revision }}
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -180,3 +200,4 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+

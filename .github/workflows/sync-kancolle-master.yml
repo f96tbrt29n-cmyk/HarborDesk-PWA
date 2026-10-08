@@ -7,6 +7,7 @@ on:
   push:
     paths:
       - 'scripts/sync-kancolle-master.mjs'
+      - 'scripts/bump-app-version.mjs'
       - '.github/workflows/sync-kancolle-master.yml'
 
 permissions:
@@ -37,6 +38,7 @@ jobs:
         shell: bash
         run: |
           node --check scripts/sync-kancolle-master.mjs
+          node --test tests/app-version-bump.test.mjs
           node --check ship-master-snapshot.js
           node --check update-manager.js
           node --check sw.js
@@ -49,6 +51,9 @@ jobs:
           const ub=Number(u.match(/const HD_APP_BUILD=(\d+)/)?.[1]);
           const sb=Number(s.match(/const CACHE='harbordesk-pwa-v(\d+)'/)?.[1]);
           if(v.version!==uv||Number(v.build)!==ub||Number(v.build)!==sb)throw new Error('Version mismatch');
+          const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
+          const rb=Number(fs.readFileSync('refresh.html','utf8').match(/const BUILD=(\d+)/)?.[1]);
+          if(pkg.version!==v.version||rb!==Number(v.build))throw new Error('Package/recovery version mismatch');
           console.log('Runtime aligned:',v.version,v.build);
           NODE
       - name: Validate Kancolle master semantics
@@ -56,12 +61,13 @@ jobs:
       - name: Commit if master changed
         shell: bash
         run: |
-          if git diff --quiet -- ship-master-snapshot.js app-version.json update-manager.js sw.js; then
+          if git diff --quiet -- ship-master-snapshot.js app-version.json update-manager.js sw.js package.json refresh.html; then
             echo "No master changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ship-master-snapshot.js app-version.json update-manager.js sw.js
+          git add ship-master-snapshot.js app-version.json update-manager.js sw.js package.json refresh.html
           git commit -m "Sync Kancolle master and bump HarborDesk"
           git push
+

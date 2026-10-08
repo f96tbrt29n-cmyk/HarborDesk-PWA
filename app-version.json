@@ -1,32 +1,32 @@
 {
-  "version": "1.0.548",
-  "build": 548,
-  "releasedAt": "2026-10-09T03:40:06.447+09:00",
-  "notes": "艦これマスター自動同期。api_start2 f45f36f / 装備picker e38bdbc を反映。艦娘変更 0件 / 新装備 0件 / 装備変更 0件 / 増設ルール 0件。",
+  "version": "1.0.549",
+  "build": 549,
+  "releasedAt": "2026-10-09T06:57:24.094+09:00",
+  "notes": "自動同期後の公開漏れとバージョン不一致を修正。更新リセット画面・package・アプリ本体を同時更新し、同期完了後の公開を自動化。",
   "masterChanges": {
-    "baseline": false,
-    "from": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
-    "to": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
-    "at": "2026-10-08T18:40:06.439Z",
-    "ships": {
-      "added": [],
-      "removed": [],
-      "changed": []
-    },
-    "equipment": {
-      "added": [],
-      "removed": [],
-      "changed": []
-    },
-    "exslot": {
-      "changed": false,
-      "itemRulesChanged": 0,
-      "limitShipsChanged": 0
-    },
-    "picker": {
-      "changed": false,
-      "slotRulesChanged": 0,
-      "overrideChanged": 0
-    }
+  "baseline": false,
+  "from": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
+  "to": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
+  "at": "2026-10-08T18:40:06.439Z",
+  "ships": {
+    "added": [],
+    "removed": [],
+    "changed": []
+  },
+  "equipment": {
+    "added": [],
+    "removed": [],
+    "changed": []
+  },
+  "exslot": {
+    "changed": false,
+    "itemRulesChanged": 0,
+    "limitShipsChanged": 0
+  },
+  "picker": {
+    "changed": false,
+    "slotRulesChanged": 0,
+    "overrideChanged": 0
   }
+}
 }

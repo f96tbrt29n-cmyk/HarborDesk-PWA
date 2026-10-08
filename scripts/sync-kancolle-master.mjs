@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import {bumpHarborDeskVersion} from './bump-app-version.mjs';
 
 const SOURCE_REPO='Tibowl/api_start2';
 const SOURCE_REF='master';
@@ -10,9 +11,6 @@ const PICKER_PATH='views/utils/game-selector/tables.ts';
 const PICKER_RAW_URL=`https://raw.githubusercontent.com/${PICKER_REPO}/${PICKER_REF}/${PICKER_PATH}`;
 const PICKER_COMMIT_URL=`https://api.github.com/repos/${PICKER_REPO}/commits/${PICKER_REF}`;
 const OUT=new URL('../ship-master-snapshot.js',import.meta.url);
-const APP_VERSION_FILE=new URL('../app-version.json',import.meta.url);
-const UPDATE_MANAGER_FILE=new URL('../update-manager.js',import.meta.url);
-const SW_FILE=new URL('../sw.js',import.meta.url);
 
 const text=async p=>fs.readFile(new URL('../'+p,import.meta.url),'utf8');
 const headers={'User-Agent':'HarborDesk-master-sync',...(process.env.GITHUB_TOKEN?{Authorization:'Bearer '+process.env.GITHUB_TOKEN}:{})};
@@ -45,36 +43,6 @@ function flagsForTypes(names){
   if(names.some(x=>String(x).includes('噴式')))out.push('噴式');return out;
 }
 
-function jstIsoNow(){
- const d=new Date(Date.now()+9*60*60*1000);
- return d.toISOString().replace('Z','+09:00');
-}
-async function bumpHarborDeskVersion(sourceCommit,pickerCommit,changes=null){
- const app=JSON.parse(await fs.readFile(APP_VERSION_FILE,'utf8'));
- const update=await fs.readFile(UPDATE_MANAGER_FILE,'utf8');
- const sw=await fs.readFile(SW_FILE,'utf8');
- const builds=[
-  Number(app.build)||0,
-  Number(update.match(/const HD_APP_BUILD=(\d+)/)?.[1])||0,
-  Number(sw.match(/const CACHE='harbordesk-pwa-v(\d+)'/)?.[1])||0
- ];
- const build=Math.max(...builds)+1,version=`1.0.${build}`;
- app.version=version;app.build=build;app.releasedAt=jstIsoNow();
- const shipDiff=changes?(changes.ships.added.length+changes.ships.removed.length+changes.ships.changed.length):0,equipAdd=changes?.equipment?.added?.length||0,equipChanged=changes?(changes.equipment.removed.length+changes.equipment.changed.length):0,exDiff=changes?(changes.exslot?.itemRulesChanged||0)+(changes.exslot?.limitShipsChanged||0):0;
- app.notes=`艦これマスター自動同期。api_start2 ${String(sourceCommit||'').slice(0,7)} / 装備picker ${String(pickerCommit||'').slice(0,7)} を反映。艦娘変更 ${shipDiff}件 / 新装備 ${equipAdd}件 / 装備変更 ${equipChanged}件 / 増設ルール ${exDiff}件${changes?.picker?.changed?' / picker位置制限変更':''}。`;
- app.masterChanges=changes||null;
- const nextUpdate=update.replace(/const HD_APP_VERSION='[^']+';/,`const HD_APP_VERSION='${version}';`).replace(/const HD_APP_BUILD=\d+;/,`const HD_APP_BUILD=${build};`);
- const nextSw=sw.replace(/const CACHE='harbordesk-pwa-v\d+';/,`const CACHE='harbordesk-pwa-v${build}';`);
- if(nextUpdate===update)throw new Error('update-manager version marker not found');
- if(nextSw===sw)throw new Error('sw cache marker not found');
- await Promise.all([
-  fs.writeFile(APP_VERSION_FILE,JSON.stringify(app,null,2)+'\n','utf8'),
-  fs.writeFile(UPDATE_MANAGER_FILE,nextUpdate,'utf8'),
-  fs.writeFile(SW_FILE,nextSw,'utf8')
- ]);
- console.log('Bumped HarborDesk to',version,'build',build);
- return {version,build};
-}
 
 const [api,commit,pickerSource,pickerCommit]=await Promise.all([json(RAW_URL),json(COMMIT_URL),rawText(PICKER_RAW_URL),json(PICKER_COMMIT_URL)]);
 const pickerTables=parsePickerTables(pickerSource);
@@ -210,3 +178,4 @@ if(!write){console.error('Kancolle master snapshot is stale. Run: node scripts/s
 await fs.writeFile(OUT,out,'utf8');
 if(bump)await bumpHarborDeskVersion(commit.sha,pickerCommit.sha,snapshot.changes);
 console.log('Updated ship-master-snapshot.js from',commit.sha,'picker',pickerCommit.sha,'detailShips',Object.keys(ships).length,'allShipForms',Object.keys(allShips).length,'equipment',Object.keys(equipment).length,'slotRules',pickerTables.slotExclusions.length,'bumpApp',bump);
+
