@@ -8,11 +8,22 @@ function boot(){const listeners={},links=[],clipboard=[];const window={addEventL
  const context={window,localStorage,navigator:{clipboard:{writeText:async value=>clipboard.push(value)}},document:{readyState:'loading',addEventListener(){},createElement:()=>({style:{},click(){links.push(this.href)}}),documentElement:null},location:{href:'https://example.invalid'},setTimeout(){},URL,Date,TextEncoder,Buffer,btoa:x=>Buffer.from(x,'binary').toString('base64'),alert(){},console};
  vm.createContext(context);vm.runInContext(raw,context);return {api:window.__HARBORDESK_KANCOLLE_USERSCRIPT__,listeners,links,clipboard,context};}
 function record(run,endpoint,payload){run.listeners.message({data:{type:'harbordesk-kancolle-frame-record-v1',endpoint,payload}})}
-(async()=>{let run=boot();record(run,port,portData);record(run,equip,equipData);
+(async()=>{let run=boot();
+ assert.equal(run.api.captureCoverage().port,false);assert.equal(run.api.captureCoverage().equipment,false);
+ assert.match(run.api.nextCaptureHint(),/母港/,'empty capture guides port retrieval');
+ record(run,port,portData);
+ assert.equal(run.api.captureCoverage().port,true);assert.equal(run.api.captureCoverage().docks,true);
+ assert.equal(run.api.ledgerReady(),false,'port alone cannot sync equipment ledger');
+ assert.match(run.api.nextCaptureHint(),/装備画面/,'port-only capture guides equipment retrieval');
+ record(run,equip,equipData);
+ assert.equal(run.api.captureCoverage().equipment,true);
+ assert.match(run.api.nextCaptureHint(),/任務画面/,'complete ledger guides optional quest capture');
  assert.equal(run.api.ledgerReady(),true);assert.equal(run.api.exportObject().records.length,2);
  run=boot();assert.equal(run.api.ledgerReady(),true,'pending capture survives close');assert.equal(run.api.exportObject().records.length,2);
  assert.equal(await run.api.sendHome(),true,'home screen handoff prepares on button press');assert.equal(run.clipboard.length,1);assert.equal(JSON.parse(run.clipboard[0]).records.length,2);assert.equal(run.links.length,0,'home handoff stays on game page');assert.equal(run.api.ledgerReady(),true,'copy alone does not mark import complete');
  run.context.document.documentElement={appendChild(){}};await run.api.send();assert.equal(run.links.length,1);assert.equal(run.api.ledgerReady(),false,'sent capture not offered as new');
+ assert.equal(run.api.captureCoverage().port,false,'coverage excludes sent data');
+ assert.equal(run.api.captureCoverage().equipment,false,'equipment coverage excludes sent data');
  run=boot();assert.equal(run.api.ledgerReady(),false,'sent capture stays excluded after close');
  record(run,port,portData);record(run,equip,equipData);assert.equal(run.api.ledgerReady(),true,'same API payload received again counts as new');
  const old=JSON.parse(data.get('harbordesk-kc-capture-v1'));delete old.sentAt;data.set('harbordesk-kc-capture-v1',JSON.stringify(old));run=boot();assert.equal(run.api.ledgerReady(),false,'old script captures require explicit resend');
