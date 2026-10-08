@@ -57,6 +57,17 @@ test('fleet picker selects another saved fleet as the actual owned search target
  await expect(panel).toContainText('対象：別の艦隊');
  expect(await page.evaluate(()=>hdOCContext('1-1').fleet.id)).toBe('second');
 });
+test('navigator fleet selection survives reload and remains the owned search target',async({page})=>{
+ await boot(page);
+ await page.evaluate(()=>{const all=loadCustomFleets();all['1-1'].push({id:'second',name:'再読込後も使う艦隊',ships:[{ship:'睦月改'}]});saveCustomFleets(all);hdMSNRender()});
+ await page.locator('#hdMapStrategyFleet').selectOption('second');
+ expect(await page.evaluate(()=>hdSortieSelection('1-1'))).toBe('second');
+ await page.reload();await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCSearch==='function');
+ await page.evaluate(()=>hdMSNOpen('1-1'));
+ await expect(page.locator('#hdMapStrategyFleet')).toHaveValue('second');
+ expect(await page.evaluate(()=>hdOCContext('1-1').fleet.id)).toBe('second');
+ await expect(page.locator('#mapStrategyNavigator .hd-oc-panel')).toContainText('対象：再読込後も使う艦隊');
+});
 test('fleet picker creates and selects a fleet for its own map when no fleet is saved',async({page})=>{
  const panel=await boot(page);
  await page.evaluate(()=>{saveCustomFleets({});hdMSNRender()});

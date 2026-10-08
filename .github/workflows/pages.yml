@@ -44,7 +44,7 @@ jobs:
           find tests scripts -maxdepth 1 -type f \( -name '*.js' -o -name '*.cjs' -o -name '*.mjs' \) -print0 | sort -z | xargs -0 -n1 node --check
 
       - name: Verify release version bump
-        run: node --test tests/app-version-bump.test.mjs
+        run: node --test tests/app-version-bump.test.mjs tests/navigator-fleet-selection.test.cjs
 
       - name: Verify captured data survives a browser restart
         run: node tests/userscript-capture-resume.test.cjs
