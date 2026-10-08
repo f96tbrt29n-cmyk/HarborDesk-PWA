@@ -54,7 +54,7 @@ function ensureCustomFleetDialog(){
     <div class="muted">艦隊台帳に登録した艦娘は、艦娘名を入力すると候補に出るよ。</div>
     <div id="customFleetRows" class="custom-fleet-form-grid"></div>
     <label>編成メモ<textarea id="customFleetMemo" maxlength="500" placeholder="支援あり、制空○○目安、など"></textarea></label>
-    <div class="dialog-actions"><button value="cancel" class="ghost">キャンセル</button><button value="default" class="primary">保存</button></div>
+    <div class="dialog-actions"><button value="cancel" class="ghost" formnovalidate>キャンセル</button><button value="default" class="primary">保存</button></div>
   </form>`;
   document.body.appendChild(dialog);
   const rows=document.getElementById('customFleetRows');

@@ -45,3 +45,36 @@ test('proposal import preserves sparse slots and expansion equipment and never a
  const s=await page.evaluate(()=>{const c=hdOCContext('1-1','proposal-fleet',0),r=HD_OC_CACHE.get('1-1:proposal-fleet:0');r.plan.ships[0].items=[{name:'彩雲',star:2,slotIndex:3,capacity:10}];r.plan.ships[0].expansion={name:'33号水上電探',star:4};hdFCImportOwnedPlan(c,r);return hdFCState('1-1',hdFCSelection('1-1'))});
  expect(s.gear).toMatchObject([{name:'彩雲',star:2,slotIndex:3,slot:10,maxProf:false},{name:'33号水上電探',star:4,slotIndex:null,slot:0,maxProf:false}]);
 });
+test.describe('mobile fleet picker',()=>{
+test.use({hasTouch:true,isMobile:true});
+test('fleet picker selects another saved fleet as the actual owned search target',async({page})=>{
+ const panel=await boot(page);
+ await page.evaluate(()=>{const all=loadCustomFleets();all['1-1'].push({id:'second',name:'別の艦隊',ships:[{ship:'睦月改'}]});saveCustomFleets(all);hdMSNFleetByMap['1-1']='proposal-fleet';hdMSNRender()});
+ await panel.locator('[data-hd-oc-select-fleet]').click();
+ const picker=page.locator('#hdOCFleetPicker');await expect(picker).toBeVisible();
+ await picker.locator('select').selectOption('second');await picker.locator('[data-hd-oc-fleet-use]').click();
+ await expect(picker).not.toBeVisible();await expect(page.locator('#hdMapStrategyFleet')).toHaveValue('second');
+ await expect(panel).toContainText('対象：別の艦隊');
+ expect(await page.evaluate(()=>hdOCContext('1-1').fleet.id)).toBe('second');
+});
+test('fleet picker creates and selects a fleet for its own map when no fleet is saved',async({page})=>{
+ const panel=await boot(page);
+ await page.evaluate(()=>{saveCustomFleets({});hdMSNRender()});
+ await panel.locator('[data-hd-oc-select-fleet]').click();
+ const picker=page.locator('#hdOCFleetPicker');await expect(picker).toContainText('保存編成はまだありません');
+ await expect(picker.locator('[data-hd-oc-fleet-use]')).toBeDisabled();await page.evaluate(()=>hdSelectGuideMap('1-6'));await picker.locator('[data-hd-oc-fleet-new]').click();
+ const form=page.locator('#customFleetDialog');await expect(form).toBeVisible();
+ await form.locator('#customFleetName').fill('新しい攻略艦隊');await form.locator('#cfShip0').fill('睦月改');await form.locator('button[value="default"]').click();
+ await expect(form).not.toBeVisible();await expect(panel).toContainText('対象：新しい攻略艦隊');
+ const state=await page.evaluate(()=>({fleets:loadCustomFleets(),selected:hdOCContext('1-1').fleet?.name}));
+ expect(state.selected).toBe('新しい攻略艦隊');expect(state.fleets['1-1'][0].ships[0].ship).toBe('睦月改');expect(state.fleets['1-6']).toBeUndefined();
+ await expect(panel.locator('[data-hd-oc-search]')).toBeEnabled();
+});
+test('cancelling new fleet creation keeps the existing search selection',async({page})=>{
+ const panel=await boot(page);await panel.locator('[data-hd-oc-select-fleet]').click();
+ await page.locator('[data-hd-oc-fleet-new]').click();await page.locator('#customFleetDialog button[value="cancel"]').click();
+ await expect(page.locator('#customFleetDialog')).not.toBeVisible();
+ expect(await page.evaluate(()=>hdOCContext('1-1').fleet.id)).toBe('proposal-fleet');
+ expect(await page.evaluate(()=>hdSPSFleets('1-1').length)).toBe(1);
+});
+});

@@ -7,6 +7,35 @@ function hdOCContext(map,fleetId='',route=''){
  return {map,fleet,preset:presets[index]||null,index};
 }
 function hdOCSignature(c){return JSON.stringify([c.map,c.fleet,c.preset,hdFLRows(),hdFERoster(),localStorage.getItem('harbordesk-kancolle-sync-v1'),typeof hdMapAirSelection==='function'?hdMapAirSelection(c.map):null])}
+function hdOCUseFleet(map,id){
+ if(!hdSPSFleets(map).some(f=>String(f.id)===String(id)))return false;
+ if(typeof hdMSNFleetByMap!=='undefined')hdMSNFleetByMap[map]=id;
+ if(typeof hdSortieSetSelection==='function')hdSortieSetSelection(map,id);
+ hdMSNOpen(map);return true;
+}
+function hdOCOpenFleetPicker(map,fleetId=''){
+ let dialog=document.getElementById('hdOCFleetPicker');
+ if(!dialog){dialog=document.createElement('dialog');dialog.id='hdOCFleetPicker';document.body.appendChild(dialog)}
+ const fleets=hdSPSFleets(map),selected=fleets.find(f=>String(f.id)===String(fleetId))?.id||fleets[0]?.id||'';
+ dialog.innerHTML=`<form method="dialog"><h3>${hdFEEsc(map)} の艦隊を選ぶ・保存する</h3>${fleets.length?`<label>保存済みの艦隊<select data-hd-oc-fleet-picker>${fleets.map(f=>`<option value="${hdFEEsc(f.id)}" ${String(f.id)===String(selected)?'selected':''}>${hdFEEsc(f.name||'名称なし')}</option>`).join('')}</select></label>`:'<p>この海域の保存編成はまだありません。新しい編成を保存してね。</p>'}<div class="dialog-actions"><button type="button" class="primary" data-hd-oc-fleet-use ${fleets.length?'':'disabled'}>この艦隊を使う</button><button type="button" class="ghost" data-hd-oc-fleet-new>新しい編成を保存</button><button value="cancel" class="ghost">閉じる</button></div></form>`;
+ dialog.querySelector('[data-hd-oc-fleet-use]').onclick=()=>{
+  const id=dialog.querySelector('[data-hd-oc-fleet-picker]')?.value;
+  if(!hdSPSFleets(map).some(f=>String(f.id)===String(id))){hdToast('編成が更新されたので、もう一度選んでね','warn');hdOCOpenFleetPicker(map,id);return}
+  dialog.close();hdOCUseFleet(map,id);
+ };
+ dialog.querySelector('[data-hd-oc-fleet-new]').onclick=()=>{
+  if(typeof openCustomFleetDialog!=='function'){hdToast('編成の保存画面を読み込めなかったよ','warn');return}
+  const ids=new Set(hdSPSFleets(map).map(f=>String(f.id)));
+  dialog.close();hdSelectGuideMap(map);openCustomFleetDialog();
+  const editor=document.getElementById('customFleetDialog');editor.returnValue='';
+  editor.addEventListener('close',()=>{
+   if(editor.returnValue!=='default')return;
+   const created=hdSPSFleets(map).find(f=>!ids.has(String(f.id)));
+   if(created)hdOCUseFleet(map,created.id);
+  },{once:true});
+ };
+ if(!dialog.open)dialog.showModal();
+}
 function hdOCCompatible(slot,candidate){
  const meta=candidate.item,db=slot.db;if(!db||!meta)return false;
  if(slot.expansion)return hdShipDbExpansionInfo(meta,db,candidate.star).allowed;
@@ -307,7 +336,7 @@ document.addEventListener('click',e=>{
   }
   const target={sync:'kancolleImport',equipment:'equipmentBook',ships:'shipDatabase'}[action];if(target&&typeof hdQNJump==='function')hdQNJump(target);else if(target&&typeof hdWSShowElement==='function')hdWSShowElement(target,true);return;
  }
- if(button.hasAttribute('data-hd-oc-select-fleet')){hdMSNOpen(button.dataset.hdOcMap);return}
+ if(button.hasAttribute('data-hd-oc-select-fleet')){hdOCOpenFleetPicker(button.dataset.hdOcMap,button.dataset.hdOcFleet);return}
  const c=hdOCContext(button.dataset.hdOcMap,button.dataset.hdOcFleet,button.dataset.hdOcRoute);if(!c.fleet)return;
  const key=`${c.map}:${c.fleet.id}:${c.index}`;
  if(button.hasAttribute('data-hd-oc-acquire')){if(typeof hdAGOpen==='function')hdAGOpen(button.dataset.hdOcAcquire,c.map);return}
