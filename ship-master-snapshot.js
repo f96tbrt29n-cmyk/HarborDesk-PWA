@@ -12,8 +12,8 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "repo": "poooi/poi",
       "ref": "master",
       "path": "views/utils/game-selector/tables.ts",
-      "commit": "76b267ecea14c545e4909784ace130d9b1d51e37",
-      "updated": "2026-10-05T14:02:38Z"
+      "commit": "e38bdbc29ba470b511e15645a4b2f349bb512bd3",
+      "updated": "2026-10-08T17:35:56Z"
     },
     "equipTypeSpOverrides": {
       "128": 38,
@@ -39838,7 +39838,7 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
     "baseline": false,
     "from": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
     "to": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
-    "at": "2026-10-05T18:40:49.852Z",
+    "at": "2026-10-08T18:40:06.439Z",
     "ships": {
       "added": [],
       "removed": [],
