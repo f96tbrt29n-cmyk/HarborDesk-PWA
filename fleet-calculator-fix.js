@@ -1,7 +1,7 @@
 (function(){
  if(typeof window.hdFCMutate==='function'&&!window.__hdFCMutateFix){
   window.hdFCMutate=function(map,fleetId,fn){
-   const s=hdFCState(map,fleetId);fn(s);s.ships=Array.isArray(s.ships)?s.ships:[];const need=Math.max(6,Math.min(7,Number(s.shipCount)||6));while(s.ships.length<need)s.ships.push({name:'',los:0});hdFCSaveState(map,fleetId,s);hdFCRender();
+   const s=hdFCState(map,fleetId);fn(s);s.ships=Array.isArray(s.ships)?s.ships:[];if(s.proposal)s.proposal.edited=true;else{const need=Math.max(6,Math.min(7,Number(s.shipCount)||6));while(s.ships.length<need)s.ships.push({name:'',los:0})}hdFCSaveState(map,fleetId,s);hdFCRender();
   };
   window.__hdFCMutateFix=true;
  }
