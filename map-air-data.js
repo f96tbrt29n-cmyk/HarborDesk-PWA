@@ -1,4 +1,5 @@
 // 全37通常海域の攻略Wiki敵編成表。scripts/audit-map-air.pyによる2026-10-07取得。
+// 敵陣形を2026-10-08に照合・追記。
 // 本隊用制空値。全掲載司令部レベル・ゲージ段階を含む。基地用には流用しない。
 const HD_MAP_AIR_DATA={
  "1-1": {
@@ -11,17 +12,26 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "駆逐ハ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -31,17 +41,26 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "駆逐ハ級、駆逐ハ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -51,17 +70,26 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級、駆逐ハ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    }
@@ -77,27 +105,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "駆逐ロ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "駆逐ロ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡ヘ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -107,27 +150,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "駆逐ロ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "駆逐ロ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡ヘ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -137,32 +195,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級、駆逐ロ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級、駆逐ロ級、駆逐ロ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ホ級、駆逐ロ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡ヘ級、駆逐ロ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "軽巡ヘ級、駆逐ハ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -172,27 +248,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級、駆逐イ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級、駆逐イ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級、軽巡ホ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級、軽巡ホ級、雷巡チ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡ヘ級、雷巡チ級、雷巡チ級、駆逐ハ級、駆逐ハ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    }
@@ -208,37 +299,58 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級、駆逐ハ級、駆逐ハ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡ヘ級、駆逐ハ級、駆逐ハ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "パターン5と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン7",
       "enemy": "軽巡ヘ級、駆逐ハ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -248,37 +360,58 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級、駆逐ハ級、駆逐ハ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡ヘ級、駆逐ハ級、駆逐ハ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "パターン5と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン7",
       "enemy": "軽巡ヘ級、駆逐ハ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -288,22 +421,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級、駆逐ロ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級、雷巡チ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級、重巡リ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -313,17 +462,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級、軽巡ヘ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級、雷巡チ級、軽巡ヘ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級、雷巡チ級、軽巡ヘ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    }
@@ -339,17 +500,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級、軽巡ヘ級、駆逐ハ級、駆逐ハ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級、軽巡ヘ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級、軽巡ヘ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -359,17 +532,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級、軽巡ヘ級、駆逐ハ級、駆逐ハ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級、軽巡ヘ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級、軽巡ヘ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -379,17 +564,26 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級、軽母ヌ級、軽巡ヘ級、駆逐ロ級、駆逐ロ級",
-      "air": 16
+      "air": 16,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級、軽母ヌ級、重巡リ級、軽巡ヘ級、駆逐ロ級、駆逐ロ級",
-      "air": 16
+      "air": 16,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "パターン2と同じ",
-      "air": 16
+      "air": 16,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -399,17 +593,26 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級、重巡リ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 8
+      "air": 8,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級、軽母ヌ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 16
+      "air": 16,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級、軽母ヌ級、重巡リ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 16
+      "air": 16,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -419,17 +622,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級、雷巡チ級、雷巡チ級、軽巡ヘ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級、軽母ヌ級、軽巡ヘ級、軽巡ヘ級、駆逐ロ級、駆逐ロ級",
-      "air": 8
+      "air": 8,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級、軽母ヌ級、軽母ヌ級、軽巡ヘ級、駆逐ロ級、駆逐ロ級",
-      "air": 16
+      "air": 16,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -439,32 +654,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級、重巡リ級、軽巡ヘ級、駆逐ロ級、駆逐ロ級、駆逐ロ級",
-      "air": 10
+      "air": 10,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級、重巡リ級、軽巡ヘ級、駆逐ハ級、駆逐ハ級、駆逐ハ級",
-      "air": 10
+      "air": 10,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級、軽母ヌ級、重巡リ級、軽巡ヘ級、駆逐ロ級、駆逐ロ級",
-      "air": 18
+      "air": 18,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級、軽母ヌ級、重巡リ級、軽巡ヘ級、駆逐ハ級、駆逐ハ級",
-      "air": 18
+      "air": 18,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級、空母ヲ級、重巡リ級、軽巡ヘ級、駆逐ハ級、駆逐ハ級",
-      "air": 20
+      "air": 20,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級、空母ヲ級、重巡リ級、軽巡ヘ級、駆逐ニ級、駆逐ニ級",
-      "air": 20
+      "air": 20,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    }
@@ -480,32 +713,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水カ級elite、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -515,32 +766,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、雷巡チ級flagship、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級flagship、雷巡チ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡ヘ級flagship、雷巡チ級flagship、雷巡チ級flagship、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "軽巡ヘ級flagship、雷巡チ級flagship、雷巡チ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -550,32 +819,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "潜水ヨ級elite、潜水ヨ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "潜水ヨ級elite、潜水ヨ級、潜水ヨ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -585,32 +872,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水カ級elite、潜水カ級elite、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "潜水ヨ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -620,32 +925,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水ヨ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "潜水ヨ級elite、潜水カ級elite、潜水カ級elite、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "潜水ヨ級elite、潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -655,32 +978,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、雷巡チ級flagship、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級flagship、雷巡チ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡ヘ級flagship、雷巡チ級flagship、雷巡チ級flagship、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "軽巡ヘ級flagship、雷巡チ級flagship、雷巡チ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -690,37 +1031,58 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級elite、軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "パターン1と同編成",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級flagship、軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship、軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽母ヌ級flagship、軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級flagship、軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン7",
       "enemy": "空母ヲ級flagship、軽巡ヘ級flagship、軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -730,37 +1092,58 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級flagship、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水ヨ級flagship、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "潜水ヨ級flagship、潜水ヨ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "潜水ソ級flagship、潜水ヨ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン7",
       "enemy": "潜水ソ級flagship、潜水ヨ級elite、潜水ヨ級elite、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      }
     ]
    }
@@ -776,27 +1159,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級flagship、軽母ヌ級elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -806,32 +1204,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "パターン2と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "パターン5と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -841,32 +1257,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級elite、軽母ヌ級elite、軽巡ツ級elite、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級elite、軽母ヌ級elite、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級flagship、軽母ヌ級elite、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 47
+      "air": 47,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽母ヌ級flagship、軽母ヌ級elite、軽母ヌ級elite、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 71
+      "air": 71,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、軽母ヌ級elite、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 76
+      "air": 76,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級flagship（艦載機白）、軽母ヌ級elite、軽母ヌ級elite、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 132
+      "air": 132,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -876,32 +1310,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水カ級、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水カ級、潜水カ級、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -911,42 +1363,66 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級elite、重巡リ級elite、駆逐イ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 27
+      "air": 27,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級elite、軽母ヌ級elite、重巡リ級elite、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship、重巡リ級elite、駆逐イ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽母ヌ級flagship、軽母ヌ級elite、重巡リ級elite、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 47
+      "air": 47,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship、軽母ヌ級、重巡リ級elite、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 36
+      "air": 36,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、重巡リ級elite、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン7",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、軽巡ツ級elite、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン8",
       "enemy": "空母ヲ級flagship、空母ヲ級elite、軽巡ツ級elite、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 55
+      "air": 55,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -956,22 +1432,36 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "パターン3と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -981,32 +1471,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship、軽巡ヘ級elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship、軽母ヌ級、軽母ヌ級、駆逐イ級後期型、駆逐イ級後期型、輸送ワ級",
-      "air": 44
+      "air": 44,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship、軽母ヌ級、軽母ヌ級、軽母ヌ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship（艦載機白）、軽母ヌ級、軽母ヌ級、軽母ヌ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 108
+      "air": 108,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship（艦載機白）、軽母ヌ級、軽母ヌ級、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 100
+      "air": 100,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級改flagship、軽母ヌ級、軽母ヌ級、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 118
+      "air": 118,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -1016,27 +1524,43 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ト級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、重巡リ級elite、軽巡ト級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "パターン2と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級flagship、戦艦ル級elite、軽巡ト級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "パターン4と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -1046,32 +1570,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級flagship、軽母ヌ級elite、軽巡ツ級elite、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 47
+      "air": 47,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級flagship、軽母ヌ級elite、軽母ヌ級elite、軽巡ツ級elite、駆逐イ級、駆逐イ級",
-      "air": 71
+      "air": 71,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、軽母ヌ級elite、軽巡ツ級elite、駆逐イ級、駆逐イ級",
-      "air": 76
+      "air": 76,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship（艦載機白）、軽母ヌ級elite、軽母ヌ級elite、軽巡ツ級elite、駆逐イ級、駆逐イ級",
-      "air": 132
+      "air": 132,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship（艦載機白）、空母ヲ級elite、軽母ヌ級elite、軽巡ツ級elite、駆逐イ級、駆逐イ級",
-      "air": 135
+      "air": 135,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級flagship（艦載機白）、空母ヲ級flagship（艦載機白）、軽母ヌ級elite、軽巡ツ級elite、駆逐イ級、駆逐イ級",
-      "air": 192
+      "air": 192,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    }
@@ -1087,17 +1629,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級elite、軽巡ホ級elite、輸送ワ級、輸送ワ級、駆逐イ級、駆逐イ級",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級elite、軽巡ホ級elite、輸送ワ級elite、輸送ワ級elite、駆逐イ級、駆逐イ級",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級elite、軽巡ホ級elite、輸送ワ級elite、輸送ワ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -1107,17 +1661,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級elite、軽巡ヘ級、軽巡ヘ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級elite、軽巡ヘ級、軽巡ヘ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級elite、重巡リ級elite、軽巡ヘ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -1127,32 +1693,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級、軽母ヌ級、重巡リ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 16
+      "air": 16,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級elite、軽母ヌ級、重巡リ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 32
+      "air": 32,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級elite、軽母ヌ級elite、重巡リ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽母ヌ級elite、軽母ヌ級elite、重巡リ級elite、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽母ヌ級elite、軽母ヌ級elite、重巡リ級elite、軽巡ホ級elite、駆逐イ級、駆逐イ級",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "軽母ヌ級elite、軽母ヌ級elite、重巡リ級elite、軽巡ホ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -1162,32 +1746,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級、空母ヲ級、重巡リ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 20
+      "air": 20,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級elite、空母ヲ級、重巡リ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 37
+      "air": 37,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級elite、空母ヲ級elite、重巡リ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 54
+      "air": 54,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級elite、空母ヲ級elite、重巡リ級elite、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 54
+      "air": 54,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級elite、空母ヲ級elite、重巡リ級elite、軽巡ホ級elite、駆逐イ級、駆逐イ級",
-      "air": 54
+      "air": 54,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級elite、空母ヲ級elite、重巡リ級elite、軽巡ホ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 54
+      "air": 54,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -1197,32 +1799,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級、空母ヲ級、軽母ヌ級、重巡リ級、駆逐イ級、駆逐イ級",
-      "air": 18
+      "air": 18,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級elite、空母ヲ級、軽母ヌ級、重巡リ級、駆逐イ級、駆逐イ級",
-      "air": 18
+      "air": 18,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級elite、空母ヲ級elite、軽母ヌ級elite、重巡リ級、駆逐イ級、駆逐イ級",
-      "air": 51
+      "air": 51,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "戦艦ル級elite、空母ヲ級elite、空母ヲ級elite、重巡リ級、駆逐イ級、駆逐イ級",
-      "air": 54
+      "air": 54,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "戦艦ル級elite、空母ヲ級elite、空母ヲ級elite、重巡リ級elite、駆逐イ級、駆逐イ級",
-      "air": 54
+      "air": 54,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "戦艦ル級elite、空母ヲ級elite、空母ヲ級elite、重巡リ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 54
+      "air": 54,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    }
@@ -1238,32 +1858,56 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "輸送ワ級、輸送ワ級、軽巡ホ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級elite、輸送ワ級、輸送ワ級、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "輸送ワ級elite、輸送ワ級elite、軽巡ホ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ホ級elite、輸送ワ級elite、輸送ワ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "輸送ワ級elite、輸送ワ級elite、軽巡ホ級elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "軽巡ホ級elite、輸送ワ級elite、輸送ワ級elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -1273,32 +1917,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "輸送ワ級、輸送ワ級、軽巡ホ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級elite、輸送ワ級、輸送ワ級、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "輸送ワ級elite、輸送ワ級elite、軽巡ホ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ホ級elite、輸送ワ級elite、輸送ワ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "輸送ワ級elite、輸送ワ級elite、軽巡ホ級elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "軽巡ホ級elite、輸送ワ級elite、輸送ワ級elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -1308,17 +1970,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級、雷巡チ級、雷巡チ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級elite、雷巡チ級、雷巡チ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級elite、雷巡チ級elite、雷巡チ級elite、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -1328,17 +2002,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級、戦艦ル級、軽巡ホ級elite、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級elite、戦艦ル級、軽巡ホ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級elite、戦艦ル級elite、重巡リ級elite、軽巡ホ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -1348,27 +2034,45 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級elite、重巡リ級elite、軽巡ホ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級elite、重巡リ級elite、軽巡ホ級elite、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級elite、重巡リ級elite、重巡リ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級elite、重巡リ級elite、重巡リ級elite、軽巡ヘ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 27
+      "air": 27,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級elite、戦艦ル級elite、戦艦ル級elite、軽巡ヘ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 27
+      "air": 27,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      }
     ]
    }
@@ -1384,32 +2088,52 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級elite、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ホ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "パターン4と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "軽巡ホ級elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -1419,32 +2143,55 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級elite、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ホ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "パターン4と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "軽巡ホ級elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -1454,17 +2201,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級elite、雷巡チ級、雷巡チ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級elite、雷巡チ級、雷巡チ級、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級elite、雷巡チ級elite、雷巡チ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -1474,27 +2233,46 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "雷巡チ級elite、重巡リ級、重巡リ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級elite、重巡リ級、雷巡チ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級elite、重巡リ級elite、雷巡チ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級elite、重巡リ級elite、雷巡チ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "重巡リ級elite、重巡リ級elite、雷巡チ級elite、軽巡ヘ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -1504,27 +2282,46 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "雷巡チ級elite、重巡リ級、重巡リ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級elite、重巡リ級、雷巡チ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級elite、重巡リ級elite、雷巡チ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級elite、重巡リ級elite、雷巡チ級elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "重巡リ級elite、重巡リ級elite、雷巡チ級elite、軽巡ヘ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -1534,27 +2331,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級elite、輸送ワ級、輸送ワ級、輸送ワ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級elite、輸送ワ級、輸送ワ級、輸送ワ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級elite、輸送ワ級elite、輸送ワ級、輸送ワ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ホ級elite、輸送ワ級elite、輸送ワ級elite、輸送ワ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡ホ級elite、輸送ワ級elite、輸送ワ級elite、輸送ワ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -1564,42 +2376,66 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級elite、空母ヲ級、軽母ヌ級、駆逐ロ級、駆逐ロ級、駆逐ロ級",
-      "air": 18
+      "air": 18,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級elite、空母ヲ級elite、軽母ヌ級、駆逐ロ級、駆逐ロ級、駆逐ロ級",
-      "air": 35
+      "air": 35,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級elite、空母ヲ級elite、軽母ヌ級elite、駆逐ロ級、駆逐ロ級、駆逐ロ級",
-      "air": 51
+      "air": 51,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "戦艦ル級elite、空母ヲ級elite、軽母ヌ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 51
+      "air": 51,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "戦艦ル級flagship、空母ヲ級elite、軽母ヌ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 51
+      "air": 51,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "戦艦ル級flagship、空母ヲ級elite、軽母ヌ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級",
-      "air": 51
+      "air": 51,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン7",
       "enemy": "戦艦ル級flagship、空母ヲ級elite、軽母ヌ級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 51
+      "air": 51,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン8",
       "enemy": "戦艦ル級flagship、空母ヲ級elite、空母ヲ級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 54
+      "air": 54,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    }
@@ -1615,22 +2451,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級elite、重巡リ級、重巡リ級、軽巡ホ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級elite、重巡リ級elite、重巡リ級、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級elite、重巡リ級elite、重巡リ級、軽巡ヘ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級elite、重巡リ級elite、重巡リ級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -1640,27 +2492,46 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -1670,32 +2541,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級elite、軽母ヌ級、重巡リ級、駆逐ロ級、駆逐ロ級、駆逐ロ級",
-      "air": 32
+      "air": 32,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級elite、軽母ヌ級elite、重巡リ級、駆逐ロ級、駆逐ロ級、駆逐ロ級",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級elite、軽母ヌ級elite、重巡リ級、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽母ヌ級elite、軽母ヌ級elite、重巡リ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽母ヌ級elite、軽母ヌ級elite、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "軽母ヌ級flagship、軽母ヌ級elite、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 47
+      "air": 47,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -1705,32 +2594,53 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "パターン5と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -1740,32 +2650,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級elite、空母ヲ級elite、重巡リ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 54
+      "air": 54,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship、空母ヲ級elite、重巡リ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 55
+      "air": 55,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship、空母ヲ級elite、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 55
+      "air": 55,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 56
+      "air": 56,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、重巡リ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 56
+      "air": 56,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 56
+      "air": 56,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -1775,32 +2703,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級elite、空母ヲ級elite、戦艦ル級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 54
+      "air": 54,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship、空母ヲ級elite、戦艦ル級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 55
+      "air": 55,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship、空母ヲ級elite、戦艦ル級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 55
+      "air": 55,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、戦艦ル級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 56
+      "air": 56,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、戦艦ル級flagship、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 56
+      "air": 56,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 56
+      "air": 56,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -1810,27 +2756,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級elite、戦艦ル級elite、戦艦ル級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級flagship、戦艦ル級elite、戦艦ル級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、戦艦ル級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    }
@@ -1846,22 +2807,37 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級flagship、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -1871,27 +2847,47 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級elite、重巡リ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級flagship、重巡リ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級flagship、重巡リ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽母ヌ級flagship、重巡リ級flagship、重巡リ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽母ヌ級flagship、重巡リ級flagship、重巡リ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -1901,22 +2897,37 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、重巡リ級elite、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、重巡リ級flagship、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級flagship、重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -1926,27 +2937,46 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級elite、雷巡チ級elite、雷巡チ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、雷巡チ級elite、雷巡チ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、雷巡チ級elite、雷巡チ級elite、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級flagship、雷巡チ級flagship、雷巡チ級flagship、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡ヘ級flagship、雷巡チ級flagship、雷巡チ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -1956,22 +2986,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級flagship、重巡リ級flagship、重巡リ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級flagship、重巡リ級flagship、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級flagship、重巡リ級flagship、重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "戦艦ル級flagship、重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -1981,37 +3031,58 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級elite、軽母ヌ級elite、戦艦ル級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 51
+      "air": 51,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、戦艦ル級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、戦艦ル級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、軽母ヌ級elite、戦艦ル級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 76
+      "air": 76,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、軽母ヌ級elite、戦艦ル級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 76
+      "air": 76,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級flagship、軽母ヌ級flagship、軽母ヌ級elite、戦艦ル級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 75
+      "air": 75,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン7",
       "enemy": "空母ヲ級flagship、軽母ヌ級flagship、軽母ヌ級flagship、戦艦ル級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 74
+      "air": 74,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -2021,32 +3092,53 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、戦艦ル級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、戦艦ル級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship、戦艦ル級flagship、戦艦ル級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship、戦艦ル級flagship、戦艦ル級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級flagship、戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    }
@@ -2062,17 +3154,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級elite、雷巡チ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級elite、雷巡チ級elite、雷巡チ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -2082,17 +3186,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -2102,32 +3218,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級elite、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級elite、重巡リ級elite、軽巡ホ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級flagship、重巡リ級elite、軽巡ホ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽母ヌ級flagship、重巡リ級flagship、軽巡ホ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽母ヌ級flagship、重巡リ級flagship、軽巡ホ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "軽母ヌ級flagship、重巡リ級flagship、軽巡ヘ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -2137,22 +3271,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -2162,32 +3312,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級flagship、戦艦ル級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、輸送ワ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、輸送ワ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級flagship、戦艦ル級flagship、戦艦ル級flagship、駆逐ロ級後期型、駆逐ロ級後期型、輸送ワ級elite",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    }
@@ -2203,32 +3371,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級elite、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級elite、重巡リ級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級elite、重巡リ級elite、軽巡ヘ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級elite、重巡リ級elite、重巡リ級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽母ヌ級elite、重巡リ級elite、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "軽母ヌ級elite、重巡リ級elite、重巡リ級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -2238,17 +3424,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "雷巡チ級elite、雷巡チ級elite、雷巡チ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級flagship、雷巡チ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -2258,17 +3456,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級elite、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級elite、重巡リ級elite、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級elite、戦艦ル級elite、重巡リ級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -2278,32 +3488,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、軽巡ホ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、軽巡ホ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ホ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "重巡リ級flagship、軽巡ホ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -2313,32 +3541,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級elite、空母ヲ級elite、戦艦ル級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 54
+      "air": 54,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship、空母ヲ級elite、戦艦ル級elite、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 55
+      "air": 55,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship、空母ヲ級elite、戦艦ル級elite、戦艦ル級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 55
+      "air": 55,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、戦艦ル級elite、戦艦ル級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 56
+      "air": 56,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、戦艦ル級flagship、戦艦ル級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 56
+      "air": 56,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、戦艦ル級flagship、戦艦ル級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 56
+      "air": 56,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -2348,17 +3594,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型、輸送ワ級、輸送ワ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級elite、駆逐ハ級後期型、駆逐ハ級後期型、輸送ワ級、輸送ワ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、軽巡ヘ級elite、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型、輸送ワ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    }
@@ -2374,17 +3632,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、重巡リ級elite、軽巡ホ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、重巡リ級elite、軽巡ト級elite(A)、軽巡ト級elite(A)、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -2394,22 +3664,34 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ト級elite(A)、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ト級elite(A)、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ト級elite(A)、軽巡ト級elite(A)、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、軽巡ト級elite(A)、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -2419,22 +3701,34 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級elite、軽母ヌ級elite、軽母ヌ級elite、重巡リ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 72
+      "air": 72,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級flagship、軽母ヌ級elite、軽母ヌ級elite、重巡リ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 71
+      "air": 71,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級flagship、軽母ヌ級elite、軽母ヌ級elite、重巡リ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 71
+      "air": 71,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽母ヌ級flagship、軽母ヌ級flagship、軽母ヌ級elite、重巡リ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 70
+      "air": 70,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -2444,27 +3738,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、戦艦ル級elite、駆逐ハ級後期型、駆逐イ級、駆逐イ級",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、戦艦ル級elite、軽巡ホ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、戦艦ル級elite、軽巡ホ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、戦艦ル級flagship、軽巡ホ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship、軽母ヌ級flagship、戦艦ル級flagship、軽巡ホ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 51
+      "air": 51,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -2474,27 +3783,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ト級elite(A)、駆逐ハ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ト級elite(A)、駆逐ハ級後期型、駆逐ハ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、雷巡チ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級flagship、重巡リ級flagship、雷巡チ級flagship、軽巡ト級elite(A)、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "重巡リ級flagship、重巡リ級flagship、雷巡チ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -2504,27 +3828,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級flagship、戦艦ル級elite、軽母ヌ級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級flagship、戦艦ル級elite、軽母ヌ級elite、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級flagship、戦艦ル級elite、軽母ヌ級elite、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽母ヌ級elite、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽母ヌ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    }
@@ -2540,17 +3879,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ト級elite(A)、軽巡ホ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ト級elite(A)、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、軽巡ト級elite(A)、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -2560,17 +3911,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ト級elite(A)、軽巡ホ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ト級elite(A)、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、軽巡ト級elite(A)、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -2580,17 +3943,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級flagship、戦艦ル級elite、軽母ヌ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級flagship、戦艦ル級elite、軽母ヌ級elite、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽母ヌ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -2600,12 +3975,22 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship、戦艦ル級flagship、戦艦ル級elite、軽巡ホ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship、戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -2615,22 +4000,36 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、雷巡チ級elite、雷巡チ級elite、雷巡チ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、雷巡チ級flagship、雷巡チ級elite、雷巡チ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、雷巡チ級flagship、雷巡チ級flagship、雷巡チ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級flagship、雷巡チ級flagship、雷巡チ級flagship、雷巡チ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -2640,17 +4039,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽母ヌ級flagship、軽母ヌ級flagship、駆逐ハ級後期型、駆逐イ級、駆逐イ級",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、軽母ヌ級flagship、軽母ヌ級flagship、軽巡ホ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級flagship、軽母ヌ級flagship、軽母ヌ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -2660,17 +4071,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽母ヌ級flagship、軽母ヌ級flagship、駆逐ハ級後期型、駆逐イ級、駆逐イ級",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、軽母ヌ級flagship、軽母ヌ級flagship、軽巡ホ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級flagship、軽母ヌ級flagship、軽母ヌ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -2680,27 +4103,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、戦艦ル級flagship、雷巡チ級flagship、雷巡チ級flagship、駆逐ハ級後期型",
-      "air": 56
+      "air": 56,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、戦艦ル級flagship、軽巡ヘ級flagship、雷巡チ級flagship、雷巡チ級flagship",
-      "air": 56
+      "air": 56,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、戦艦ル級flagship、戦艦ル級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 56
+      "air": 56,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship、戦艦ル級flagship、戦艦ル級flagship、戦艦ル級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship、戦艦ル級flagship、戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ハ級後期型",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    }
@@ -2716,17 +4154,28 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級flagship、戦艦タ級elite、重巡リ級elite、雷巡チ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級flagship、戦艦タ級elite、重巡リ級elite、重巡リ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級flagship、重巡リ級flagship、戦艦タ級elite、雷巡チ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -2736,27 +4185,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship（艦載機白）、空母ヲ級flagship、戦艦タ級flagship、軽巡ホ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 112
+      "air": 112,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship（艦載機白）、空母ヲ級flagship、戦艦タ級flagship、重巡リ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 112
+      "air": 112,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級改flagship、空母ヲ級flagship（艦載機白）、戦艦タ級flagship、重巡リ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 186
+      "air": 186,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship（艦載機白）、空母ヲ級flagship、戦艦タ級flagship、重巡リ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 112
+      "air": 112,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級改flagship、空母ヲ級flagship（艦載機白）、空母ヲ級flagship、戦艦タ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 214
+      "air": 214,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -2766,22 +4230,34 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、駆逐ハ級後期型、駆逐ハ級後期型、潜水カ級flagship、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2 最終形態",
       "enemy": "軽母ヌ級flagship、戦艦ル級flagship、戦艦ル級flagship、駆逐ハ級後期型、駆逐ハ級後期型、潜水カ級flagship",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "軽母ヌ級flagship、戦艦ル級flagship、戦艦ル級flagship、駆逐ロ級後期型、駆逐ロ級後期型、潜水カ級flagship",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、駆逐ハ級後期型、駆逐イ級後期型、駆逐イ級後期型、潜水カ級flagship",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -2791,22 +4267,34 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、重巡リ級elite、雷巡チ級elite、雷巡チ級elite、駆逐ロ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2 最終形態",
       "enemy": "軽巡ヘ級flagship、重巡リ級flagship、雷巡チ級elite、雷巡チ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級flagship、雷巡チ級elite、雷巡チ級elite、雷巡チ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級flagship、重巡リ級elite、雷巡チ級elite、雷巡チ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -2816,22 +4304,35 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン2 最終形態",
       "enemy": "軽母ヌ級flagship、重巡リ級flagship、重巡リ級elite、駆逐ハ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級elite、軽巡ト級elite(A)、軽巡ホ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4 最終形態",
       "enemy": "軽母ヌ級flagship、重巡リ級flagship、重巡リ級elite、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、重巡リ級elite、重巡リ級elite、軽巡ト級elite(A)、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -2841,32 +4342,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "北方棲姫（前哨戦 強）、護衛要塞（A）、護衛要塞（B）、重巡リ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 134
+      "air": 134,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "北方棲姫（前哨戦 強）、護衛要塞（A）、護衛要塞（B）、護衛要塞（C）、護衛要塞（B）、護衛要塞（C）",
-      "air": 221
+      "air": 221,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "北方棲姫（最終形態 強）、護衛要塞（A）、護衛要塞（B）、護衛要塞（C）、護衛要塞（B）、護衛要塞（C）",
-      "air": 254
+      "air": 254,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "北方棲姫（前哨戦 弱）、護衛要塞（A）、護衛要塞（B）、重巡リ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 130
+      "air": 130,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "北方棲姫（前哨戦 弱）、護衛要塞（A）、護衛要塞（B）、護衛要塞（C）、護衛要塞（B）、護衛要塞（C）",
-      "air": 217
+      "air": 217,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6 最終形態",
       "enemy": "北方棲姫（最終形態 弱）、護衛要塞（A）、護衛要塞（B）、護衛要塞（C）、護衛要塞（B）、護衛要塞（C）",
-      "air": 250
+      "air": 250,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -2876,27 +4395,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ツ級、輸送ワ級elite、輸送ワ級elite、戦艦ル級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2 最終形態",
       "enemy": "軽巡ツ級、輸送ワ級flagship、輸送ワ級flagship、戦艦タ級flagship、駆逐ニ級後期型、駆逐ニ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ツ級、輸送ワ級elite、輸送ワ級elite、戦艦ル級flagship、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4 最終形態",
       "enemy": "軽巡ツ級、輸送ワ級flagship、輸送ワ級flagship、戦艦タ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡ツ級、輸送ワ級elite、輸送ワ級elite、戦艦タ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    }
@@ -2912,17 +4446,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級flagship、雷巡チ級elite、雷巡チ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級flagship、雷巡チ級elite、雷巡チ級elite、雷巡チ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級flagship、雷巡チ級flagship、雷巡チ級elite、雷巡チ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -2932,17 +4478,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、軽巡ヘ級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、軽巡ヘ級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、軽巡ヘ級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -2952,32 +4510,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級、潜水カ級、潜水カ級、軽巡ホ級elite、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級、軽巡ホ級elite、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級、軽巡ホ級elite、駆逐ロ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級、潜水カ級、軽巡ホ級elite、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -2987,27 +4563,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "輸送ワ級elite、輸送ワ級elite、軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "輸送ワ級elite、輸送ワ級elite、輸送ワ級elite、軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "輸送ワ級flagship、輸送ワ級elite、輸送ワ級elite、戦艦ル級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "輸送ワ級flagship、輸送ワ級flagship、戦艦ル級elite、戦艦ル級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "輸送ワ級flagship、輸送ワ級flagship、戦艦ル級flagship、戦艦ル級flagship、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -3017,17 +4608,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦タ級elite、戦艦タ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦タ級elite、戦艦タ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦タ級elite、戦艦タ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -3037,22 +4640,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -3062,32 +4681,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、重巡リ級elite、重巡リ級elite、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、重巡リ級elite、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽母ヌ級elite、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽母ヌ級elite、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽母ヌ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    }
@@ -3103,17 +4740,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ホ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、重巡リ級elite、軽巡ホ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、軽巡ホ級flagship、軽巡ホ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -3123,17 +4772,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級、軽巡ト級elite(A)、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級、潜水カ級、軽巡ト級elite(A)、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級elite、潜水ヨ級elite、潜水カ級、潜水カ級、軽巡ト級elite(A)",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -3143,17 +4804,32 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ホ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級flagship、重巡リ級flagship、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級flagship、重巡リ級flagship、重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -3163,22 +4839,34 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、戦艦ル級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、戦艦ル級elite、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 56
+      "air": 56,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -3188,17 +4876,32 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ホ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、軽巡ホ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級flagship、重巡リ級flagship、軽巡ホ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -3208,17 +4911,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "輸送ワ級elite、輸送ワ級elite、輸送ワ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "輸送ワ級elite、輸送ワ級elite、輸送ワ級elite、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "輸送ワ級flagship、輸送ワ級elite、輸送ワ級elite、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -3228,17 +4943,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級elite、潜水ヨ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級elite、潜水ヨ級elite、潜水カ級、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -3248,17 +4975,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦タ級flagship、空母ヲ級elite、輸送ワ級、輸送ワ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 27
+      "air": 27,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦タ級flagship、空母ヲ級flagship、輸送ワ級elite、輸送ワ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦タ級flagship、空母ヲ級flagship、輸送ワ級flagship、輸送ワ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    }
@@ -3274,17 +5013,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級、軽巡ト級elite(A)",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級、軽巡ト級elite(A)、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級、軽巡ト級elite(A)、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -3294,17 +5045,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級elite、潜水ヨ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級elite、潜水ヨ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -3314,17 +5077,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ヘ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -3334,22 +5109,34 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級flagship、軽母ヌ級elite、戦艦タ級elite、軽巡ホ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 47
+      "air": 47,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、戦艦タ級elite、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、戦艦タ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship、軽母ヌ級flagship、戦艦タ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 51
+      "air": 51,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -3359,17 +5146,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ヘ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、軽巡ヘ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -3379,27 +5178,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級elite、戦艦タ級elite、重巡リ級elite、軽巡ホ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級flagship、戦艦タ級elite、重巡リ級elite、軽巡ホ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級flagship、戦艦タ級elite、重巡リ級elite、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽母ヌ級flagship、戦艦タ級elite、重巡リ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽母ヌ級flagship、戦艦タ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -3409,22 +5223,34 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦タ級flagship、戦艦タ級elite、軽母ヌ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦タ級flagship、戦艦タ級elite、軽母ヌ級elite、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦タ級flagship、戦艦タ級elite、軽母ヌ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、軽母ヌ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -3434,17 +5260,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、軽巡ヘ級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、軽巡ヘ級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、軽巡ヘ級elite、軽巡ヘ級elite、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -3454,32 +5292,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "港湾棲姫（前哨戦）、駆逐イ級、輸送ワ級、輸送ワ級",
-      "air": 80
+      "air": 80,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "港湾棲姫（前哨戦）、駆逐イ級、駆逐イ級、輸送ワ級、輸送ワ級",
-      "air": 80
+      "air": 80,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "港湾棲姫（前哨戦）、軽巡ト級elite(A)、駆逐イ級、駆逐イ級、輸送ワ級、輸送ワ級",
-      "air": 80
+      "air": 80,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "港湾棲姫（前哨戦）、軽巡ト級elite(A)、駆逐ロ級後期型、駆逐イ級、輸送ワ級、輸送ワ級",
-      "air": 80
+      "air": 80,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "港湾棲姫（前哨戦）、軽巡ト級elite(A)、駆逐ロ級後期型、駆逐ロ級後期型、輸送ワ級、輸送ワ級",
-      "air": 80
+      "air": 80,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "港湾棲姫（前哨戦）、軽母ヌ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、輸送ワ級、輸送ワ級",
-      "air": 103
+      "air": 103,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    }
@@ -3495,12 +5351,22 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ヘ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -3510,17 +5376,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -3530,17 +5408,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級flagship、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -3550,27 +5440,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級flagship、軽母ヌ級elite、戦艦タ級elite、軽巡ホ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 47
+      "air": 47,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級flagship、軽母ヌ級elite、戦艦タ級elite、軽巡ホ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 47
+      "air": 47,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、戦艦タ級elite、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship、軽母ヌ級elite、戦艦タ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 52
+      "air": 52,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship、軽母ヌ級flagship、戦艦タ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 51
+      "air": 51,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -3580,17 +5485,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、軽母ヌ級elite、駆逐ハ級後期型、駆逐ハ級後期型、駆逐イ級",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、軽母ヌ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -3600,22 +5517,34 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、重巡リ級elite、雷巡チ級elite、駆逐ロ級後期型、駆逐イ級、潜水ヨ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級flagship、重巡リ級flagship、重巡リ級flagship、軽巡ト級elite(A)、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級flagship、戦艦ル級flagship、重巡リ級flagship、重巡リ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship、戦艦ル級flagship、重巡リ級flagship、重巡リ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -3625,17 +5554,28 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -3645,17 +5585,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級flagship、戦艦タ級flagship、戦艦タ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、輸送ワ級",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "装甲空母姫、戦艦タ級flagship、戦艦タ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、輸送ワ級",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "装甲空母姫、戦艦タ級flagship、戦艦タ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、潜水ヨ級",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      }
     ]
    }
@@ -3671,17 +5623,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ソ級elite、潜水ヨ級、潜水ヨ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ソ級elite、潜水ヨ級elite、潜水ヨ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ソ級elite、潜水ヨ級elite、潜水ヨ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -3691,17 +5655,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級flagship、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級flagship、潜水カ級、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級flagship、潜水ヨ級flagship、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -3711,17 +5687,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級改flagship、重巡リ級flagship、重巡リ級flagship、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級改flagship、重巡リ級flagship、重巡リ級flagship、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級改flagship、重巡リ級flagship、重巡リ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -3731,17 +5719,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級elite、潜水ヨ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級elite、潜水ヨ級elite、潜水ヨ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -3751,17 +5751,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級改flagship、重巡リ級flagship、重巡リ級flagship、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級改flagship、重巡リ級flagship、重巡リ級flagship、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級改flagship、重巡リ級flagship、重巡リ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -3771,17 +5783,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級改flagship、戦艦タ級elite、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級改flagship、戦艦タ級elite、重巡ネ級elite、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級改flagship、戦艦タ級elite、戦艦タ級elite、重巡ネ級elite、軽巡ツ級elite、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -3791,17 +5815,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "雷巡チ級flagship、雷巡チ級flagship、雷巡チ級flagship、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "雷巡チ級flagship、雷巡チ級flagship、雷巡チ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "雷巡チ級flagship、雷巡チ級flagship、雷巡チ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -3811,27 +5847,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡棲鬼(A)、空母ヲ級flagship(艦載機白)、空母ヲ級flagship、戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship",
-      "air": 112
+      "air": 112,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡棲鬼(A)、空母ヲ級flagship(艦載機白)、空母ヲ級flagship、戦艦ル級改flagship、戦艦ル級flagship、軽巡ヘ級flagship",
-      "air": 112
+      "air": 112,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡棲鬼(B)、空母ヲ級flagship、戦艦ル級改flagship、戦艦ル級改flagship、重巡ネ級elite、軽巡ヘ級flagship",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡棲鬼(B)、空母ヲ級flagship(艦載機白)、空母ヲ級flagship、戦艦ル級改flagship、戦艦ル級改flagship、軽巡ヘ級flagship",
-      "air": 112
+      "air": 112,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡棲鬼(B)、空母ヲ級flagship(艦載機白)、空母ヲ級flagship(艦載機白)、戦艦ル級改flagship、戦艦ル級改flagship、軽巡ヘ級flagship",
-      "air": 168
+      "air": 168,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -3841,17 +5892,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "輸送ワ級elite、輸送ワ級elite、輸送ワ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "輸送ワ級elite、輸送ワ級elite、輸送ワ級elite、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "輸送ワ級flagship、輸送ワ級elite、輸送ワ級elite、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -3861,17 +5924,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ソ級elite、潜水カ級、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ソ級elite、潜水ソ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ソ級elite、潜水ソ級elite、潜水カ級、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -3881,17 +5956,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級flagship、戦艦タ級flagship、重巡ネ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級flagship、戦艦タ級flagship、重巡ネ級elite、軽巡ツ級、駆逐ハ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級flagship、戦艦タ級flagship、重巡ネ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -3901,32 +5988,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "港湾棲姫、護衛要塞(B)、護衛要塞(C)、戦艦ル級flagship、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 138
+      "air": 138,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "港湾棲姫、護衛要塞(B)、護衛要塞(C)、戦艦ル級改flagship、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 138
+      "air": 138,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "港湾棲姫、護衛要塞(B)、護衛要塞(C)、戦艦ル級改flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 138
+      "air": 138,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4 最終形態",
       "enemy": "港湾棲姫(最終形態)、護衛要塞(A)、戦艦ル級改flagship、重巡ネ級elite、輸送ワ級elite、輸送ワ級elite",
-      "air": 82
+      "air": 82,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "港湾棲姫(最終形態)、護衛要塞(B)、戦艦ル級改flagship、重巡ネ級elite、輸送ワ級flagship、輸送ワ級elite",
-      "air": 82
+      "air": 82,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6 最終形態",
       "enemy": "港湾棲姫(最終形態)、護衛要塞(A)、護衛要塞(B)、戦艦ル級改flagship、重巡ネ級elite、輸送ワ級flagship",
-      "air": 111
+      "air": 111,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    }
@@ -3942,17 +6047,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ホ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -3962,32 +6079,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship、空母ヲ級elite、軽母ヌ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 79
+      "air": 79,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、軽母ヌ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 80
+      "air": 80,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、軽母ヌ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 80
+      "air": 80,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship、空母ヲ級flagship、軽母ヌ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 79
+      "air": 79,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship（艦載機白）、空母ヲ級flagship、軽母ヌ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 135
+      "air": 135,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級flagship（艦載機白）、空母ヲ級flagship（艦載機白）、軽母ヌ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 191
+      "air": 191,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -3997,17 +6132,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -4017,22 +6164,36 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級elite、重巡ネ級、重巡ネ級、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級elite、重巡ネ級elite、重巡ネ級、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "戦艦タ級flagship、重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4042,17 +6203,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦タ級flagship、戦艦タ級elite、軽母ヌ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、軽母ヌ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、軽母ヌ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4062,27 +6235,43 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦タ級flagship、重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "輸送ワ級flagship、戦艦タ級flagship、戦艦タ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship（艦載機白）、戦艦タ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship（艦載機白）、空母ヲ級flagship（艦載機白）、戦艦タ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 168
+      "air": 168,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    }
@@ -4098,17 +6287,26 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship(艦載機白)、重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship(艦載機白)、空母ヲ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 112
+      "air": 112,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship(艦載機白)、空母ヲ級flagship(艦載機白)、重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 168
+      "air": 168,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -4118,17 +6316,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "輸送ワ級elite、輸送ワ級elite、軽巡ホ級flagship、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "輸送ワ級elite、輸送ワ級elite、輸送ワ級elite、軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水カ級elite、潜水カ級、軽巡ホ級flagship、駆逐イ級、駆逐イ級、輸送ワ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4138,17 +6348,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship(艦載機白)、戦艦タ級elite、軽巡ヘ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship(艦載機白)、戦艦タ級flagship、軽巡ヘ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship(艦載機白)、戦艦タ級flagship、軽巡ヘ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -4158,17 +6380,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship(艦載機白)、重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship(艦載機白)、重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship(艦載機白)、重巡リ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -4178,17 +6412,26 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級改flagship、空母ヲ級改flagship、重巡ネ級、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 204
+      "air": 204,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母棲鬼(艦載機赤)、重巡ネ級elite、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 117
+      "air": 117,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母棲鬼(艦載機赤)、空母ヲ級改flagship、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 219
+      "air": 219,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -4198,17 +6441,28 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4218,17 +6472,26 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship(艦載機白)、重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship(艦載機白)、空母ヲ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 112
+      "air": 112,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship(艦載機白)、空母ヲ級flagship(艦載機白)、重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 168
+      "air": 168,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -4238,27 +6501,43 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級改flagship、重巡ネ級、重巡ネ級、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 102
+      "air": 102,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級改flagship、重巡ネ級elite、重巡ネ級、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 102
+      "air": 102,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級改flagship、重巡ネ級elite、重巡ネ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 102
+      "air": 102,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級改flagship、重巡ネ級elite、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 102
+      "air": 102,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母棲鬼(艦載機赤)、重巡ネ級elite、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 117
+      "air": 117,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      }
     ]
    }
@@ -4274,22 +6553,36 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4299,17 +6592,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、重巡リ級elite、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、重巡リ級flagship、重巡リ級elite、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、重巡リ級flagship、軽巡ホ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4319,17 +6624,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、重巡ネ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、重巡ネ級elite、重巡ネ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -4339,22 +6656,36 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡ネ級、重巡ネ級、軽巡ツ級、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡ネ級elite、重巡ネ級、軽巡ツ級、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡ネ級elite、重巡ネ級、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4364,32 +6695,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship（艦載機白）、軽母ヌ級elite、重巡ネ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 108
+      "air": 108,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship（艦載機白）、軽母ヌ級elite、重巡ネ級elite、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 108
+      "air": 108,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship（艦載機白）、軽母ヌ級elite、重巡ネ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 108
+      "air": 108,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship（艦載機白）、軽母ヌ級flagship、重巡ネ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 107
+      "air": 107,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship（艦載機白）、空母ヲ級flagship（艦載機白）、軽母ヌ級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 191
+      "air": 191,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級flagship（艦載機白）、空母ヲ級flagship（艦載機白）、空母ヲ級flagship（艦載機白）、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 252
+      "air": 252,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -4399,17 +6748,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ヘ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "雷巡チ級flagship、雷巡チ級flagship、雷巡チ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -4419,32 +6780,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "輸送ワ級elite、輸送ワ級elite、輸送ワ級elite、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "輸送ワ級elite、輸送ワ級elite、輸送ワ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "輸送ワ級elite、輸送ワ級elite、輸送ワ級elite、輸送ワ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "輸送ワ級flagship、輸送ワ級elite、輸送ワ級elite、輸送ワ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "輸送ワ級flagship、輸送ワ級flagship、輸送ワ級elite、輸送ワ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "輸送ワ級flagship、輸送ワ級flagship、輸送ワ級flagship、輸送ワ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4454,17 +6833,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "南方棲戦姫、軽巡ツ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 47
+      "air": 47,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "南方棲戦姫、雷巡チ級flagship、雷巡チ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 47
+      "air": 47,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "南方棲戦姫、軽母ヌ級flagship、軽母ヌ級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 93
+      "air": 93,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    }
@@ -4480,17 +6871,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐イ級、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -4500,17 +6903,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級elite、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4520,12 +6935,22 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦タ級flagship、重巡リ級elite、重巡リ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、重巡リ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4535,32 +6960,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship(艦載機赤)、空母ヲ級flagship(艦載機赤)、重巡ネ級、駆逐ハ級後期型、駆逐イ級、駆逐イ級",
-      "air": 206
+      "air": 206,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship(艦載機赤)、空母ヲ級flagship(艦載機赤)、戦艦タ級flagship、駆逐ハ級後期型、駆逐イ級、駆逐イ級",
-      "air": 206
+      "air": 206,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship(艦載機赤)、空母ヲ級flagship(艦載機赤)、戦艦タ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、駆逐イ級",
-      "air": 206
+      "air": 206,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級flagship(艦載機赤)、空母ヲ級flagship(艦載機赤)、戦艦タ級flagship、重巡ネ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 206
+      "air": 206,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級flagship(艦載機赤)、空母ヲ級flagship(艦載機赤)、戦艦タ級flagship、重巡ネ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 206
+      "air": 206,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級flagship(艦載機赤)、空母ヲ級flagship(艦載機赤)、戦艦タ級flagship、重巡ネ級elite、軽巡ツ級、駆逐ハ級後期型",
-      "air": 206
+      "air": 206,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -4570,17 +7013,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、重巡リ級elite、軽巡ヘ級elite、軽巡ホ級elite、駆逐ハ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、重巡リ級elite、軽巡ヘ級elite、軽巡ホ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級elite、重巡リ級elite、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -4590,32 +7045,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "輸送ワ級elite、輸送ワ級、輸送ワ級、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "輸送ワ級elite、輸送ワ級elite、輸送ワ級、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "輸送ワ級elite、輸送ワ級elite、輸送ワ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "輸送ワ級elite、輸送ワ級elite、輸送ワ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "輸送ワ級elite、輸送ワ級elite、輸送ワ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "輸送ワ級flagship、輸送ワ級elite、輸送ワ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4625,12 +7098,22 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦タ級flagship、軽巡ヘ級flagship、軽巡ホ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、重巡ネ級elite、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -4640,32 +7123,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "輸送ワ級flagship、軽母ヌ級flagship(艦載機赤)、戦艦ル級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 93
+      "air": 93,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "輸送ワ級flagship、軽母ヌ級flagship(艦載機赤)、戦艦ル級flagship、重巡ネ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 93
+      "air": 93,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "輸送ワ級flagship、軽母ヌ級flagship(艦載機赤)、戦艦ル級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 93
+      "air": 93,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "輸送ワ級flagship、軽母ヌ級flagship(艦載機赤)、戦艦ル級flagship、重巡ネ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 93
+      "air": 93,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "輸送ワ級flagship、軽母ヌ級flagship(艦載機赤)、戦艦タ級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 93
+      "air": 93,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "輸送ワ級flagship、軽母ヌ級flagship(艦載機赤)、戦艦タ級flagship、重巡ネ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 93
+      "air": 93,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    }
@@ -4681,17 +7182,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級elite、潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級flagship、潜水ヨ級elite、潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -4701,17 +7214,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4721,17 +7246,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、重巡リ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、重巡リ級elite、重巡リ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、重巡リ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -4741,17 +7278,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級flagship、軽母ヌ級flagship、軽巡ヘ級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級改flagship、軽母ヌ級flagship、軽巡ヘ級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 125
+      "air": 125,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級改flagship、空母ヲ級改flagship、軽巡ヘ級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 204
+      "air": 204,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -4761,17 +7310,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級改flagship、軽母ヌ級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型、潜水カ級",
-      "air": 125
+      "air": 125,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級改flagship、空母ヲ級改flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型、潜水カ級",
-      "air": 204
+      "air": 204,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級改flagship、空母ヲ級改flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型、潜水カ級elite",
-      "air": 204
+      "air": 204,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -4781,17 +7342,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級改flagship、軽母ヌ級flagship、重巡ネ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 125
+      "air": 125,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級改flagship、空母ヲ級改flagship、重巡ネ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 204
+      "air": 204,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級改flagship、空母ヲ級改flagship、軽母ヌ級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 227
+      "air": 227,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -4801,17 +7374,32 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、重巡ネ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4821,12 +7409,22 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "雷巡チ級flagship、雷巡チ級flagship、軽巡ツ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "雷巡チ級flagship、雷巡チ級flagship、雷巡チ級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4836,32 +7434,53 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦レ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 94
+      "air": 94,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦レ級、戦艦ル級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 94
+      "air": 94,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦レ級、戦艦ル級flagship、戦艦ル級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 94
+      "air": 94,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "戦艦レ級elite、戦艦ル級flagship、戦艦ル級flagship、軽巡ホ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 107
+      "air": 107,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "戦艦レ級elite、戦艦ル級flagship、戦艦ル級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 107
+      "air": 107,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "戦艦レ級elite、重巡ネ級elite、重巡ネ級elite、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 107
+      "air": 107,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4871,42 +7490,67 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1 クリア前のみ",
       "enemy": "南方棲戦姫、空母ヲ級flagship(艦載機白)、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 131
+      "air": 131,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2 クリア前のみ",
       "enemy": "空母ヲ級改flagship、南方棲戦姫、重巡ネ級elite、駆逐ハ級後期型、駆逐ハ級後期型、潜水ヨ級",
-      "air": 149
+      "air": 149,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3 クリア前のみ",
       "enemy": "空母ヲ級改flagship、空母ヲ級改flagship、南方棲戦姫、駆逐ハ級後期型、駆逐ハ級後期型、潜水ヨ級",
-      "air": 251
+      "air": 251,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4 クリア前のみ",
       "enemy": "南方棲戦姫、戦艦レ級elite、戦艦レ級elite、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 261
+      "air": 261,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン5 クリア前のみ",
       "enemy": "南方棲戦姫、戦艦レ級elite、戦艦レ級elite、駆逐ハ級後期型、駆逐ハ級後期型、潜水ヨ級",
-      "air": 261
+      "air": 261,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6 クリア後のみ",
       "enemy": "空母ヲ級flagship(艦載機白)、戦艦レ級elite、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 191
+      "air": 191,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン7 クリア後のみ",
       "enemy": "空母ヲ級改flagship、空母ヲ級flagship、戦艦レ級elite、駆逐ハ級後期型、駆逐ハ級後期型、潜水ヨ級elite",
-      "air": 237
+      "air": 237,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン8 クリア後のみ",
       "enemy": "戦艦レ級elite、戦艦タ級flagship、空母ヲ級flagship(艦載機白)、駆逐ハ級後期型、駆逐ハ級後期型、潜水ヨ級elite",
-      "air": 191
+      "air": 191,
+      "formations": [
+       "複縦陣"
+      ]
      }
     ]
    }
@@ -4922,17 +7566,32 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級後期型、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級後期型、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -4942,17 +7601,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -4962,17 +7633,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型、潜水ヨ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -4982,22 +7665,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級elite、潜水カ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級elite、潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水ヨ級flagship、潜水ヨ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -5007,32 +7706,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "飛行場姫(空襲)(F)",
-      "air": 32
+      "air": 32,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "飛行場姫(空襲)(F)、飛行場姫(偵察)(A)",
-      "air": 103
+      "air": 103,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "飛行場姫(空襲)(F)、飛行場姫(空襲)(F)",
-      "air": 64
+      "air": 64,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "飛行場姫(空襲)(F)、飛行場姫(空襲)(F)、飛行場姫(偵察)(A)",
-      "air": 135
+      "air": 135,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "飛行場姫(空襲)(A)、飛行場姫(空襲)(F)、飛行場姫(偵察)(A)",
-      "air": 137
+      "air": 137,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "飛行場姫(空襲)(A)、飛行場姫(空襲)(F)、飛行場姫(空襲)(F)、飛行場姫(偵察)(A)",
-      "air": 169
+      "air": 169,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5042,32 +7759,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "飛行場姫(空襲)(F)",
-      "air": 32
+      "air": 32,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "飛行場姫(空襲)(F)、飛行場姫(偵察)(A)",
-      "air": 103
+      "air": 103,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "飛行場姫(空襲)(F)、飛行場姫(空襲)(F)",
-      "air": 64
+      "air": 64,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "飛行場姫(空襲)(F)、飛行場姫(空襲)(F)、飛行場姫(偵察)(A)",
-      "air": 135
+      "air": 135,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "飛行場姫(空襲)(A)、飛行場姫(空襲)(F)、飛行場姫(偵察)(A)",
-      "air": 137
+      "air": 137,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "飛行場姫(空襲)(A)、飛行場姫(空襲)(F)、飛行場姫(空襲)(F)、飛行場姫(偵察)(A)",
-      "air": 169
+      "air": 169,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5077,17 +7812,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "PT小鬼群(D)、PT小鬼群(C)、PT小鬼群(B)、PT小鬼群(A)、PT小鬼群(A)",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "PT小鬼群(D)、PT小鬼群(C)、PT小鬼群(B)、PT小鬼群(A)、PT小鬼群(A)、PT小鬼群(A)",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "PT小鬼群(D)、PT小鬼群(D)、PT小鬼群(C)、PT小鬼群(B)、PT小鬼群(A)、PT小鬼群(A)",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -5097,32 +7844,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "飛行場姫(空襲)(F)",
-      "air": 32
+      "air": 32,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "飛行場姫(空襲)(F)、飛行場姫(偵察)(A)",
-      "air": 103
+      "air": 103,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "飛行場姫(空襲)(F)、飛行場姫(空襲)(F)",
-      "air": 64
+      "air": 64,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "飛行場姫(空襲)(F)、飛行場姫(空襲)(F)、飛行場姫(偵察)(A)",
-      "air": 135
+      "air": 135,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "飛行場姫(空襲)(A)、飛行場姫(空襲)(F)、飛行場姫(偵察)(A)",
-      "air": 137
+      "air": 137,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "飛行場姫(空襲)(A)、飛行場姫(空襲)(F)、飛行場姫(空襲)(F)、飛行場姫(偵察)(A)",
-      "air": 169
+      "air": 169,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5132,17 +7897,31 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "南方棲戦姫、雷巡チ級flagship、雷巡チ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 47
+      "air": 47,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "南方棲戦姫、軽母ヌ級elite(B)(艦載機白)、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 116
+      "air": 116,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3 ゲージ破壊後",
       "enemy": "軽母ヌ級flagship(C)(艦載機赤)、輸送ワ級flagship、雷巡チ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 93
+      "air": 93,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5152,22 +7931,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級elite、潜水カ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級elite、潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水ヨ級flagship、潜水ヨ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -5177,17 +7972,32 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、潜水ヨ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -5197,22 +8007,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級elite、潜水カ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級elite、潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水ヨ級flagship、潜水ヨ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -5222,22 +8048,34 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、重巡リ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 108
+      "air": 108,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級elite(B)(艦載機白)、軽母ヌ級elite(B)(艦載機白)、重巡リ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 138
+      "air": 138,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、軽母ヌ級flagship(C)(艦載機赤)、重巡リ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 177
+      "air": 177,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、空母ヲ級改flagship(B)(艦載機白)、重巡リ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 216
+      "air": 216,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5247,22 +8085,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、戦艦レ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 202
+      "air": 202,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、軽母ヌ級elite(B)(艦載機白)、戦艦レ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 271
+      "air": 271,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、空母ヲ級改flagship(B)(艦載機白)、戦艦レ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 310
+      "air": 310,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、空母ヲ級改flagship(B)(艦載機白)、軽母ヌ級elite(B)(艦載機白)、戦艦レ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 392
+      "air": 392,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5272,22 +8126,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級elite(B)(艦載機白)、軽母ヌ級elite(B)(艦載機白)、重巡リ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 138
+      "air": 138,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、重巡リ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 108
+      "air": 108,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、軽母ヌ級elite(B)(艦載機白)、重巡リ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 177
+      "air": 177,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、空母ヲ級改flagship(B)(艦載機白)、重巡リ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 216
+      "air": 216,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5297,22 +8167,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、戦艦レ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 202
+      "air": 202,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、戦艦レ級、重巡ネ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 202
+      "air": 202,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、空母ヲ級改flagship(B)(艦載機白)、戦艦レ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 310
+      "air": 310,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、空母ヲ級改flagship(B)(艦載機白)、戦艦レ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 323
+      "air": 323,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5322,17 +8208,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡ネ級、重巡ネ級、軽巡ツ級、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級flagship、重巡ネ級、重巡ネ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、重巡ネ級elite、重巡ネ級elite、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -5342,17 +8240,32 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡ネ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級flagship、重巡ネ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、潜水ヨ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、重巡ネ級elite、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、潜水ヨ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -5362,17 +8275,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、軽母ヌ級elite(B)(艦載機白)、戦艦レ級、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 271
+      "air": 271,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、軽母ヌ級flagship(B)(艦載機白)、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型、潜水ヨ級",
-      "air": 185
+      "air": 185,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、空母ヲ級改flagship(B)(艦載機白)、軽巡ツ級elite、駆逐ハ級後期型elite、駆逐ハ級後期型elite、潜水ヨ級elite",
-      "air": 216
+      "air": 216,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5382,22 +8307,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級elite、潜水カ級elite、潜水ヨ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級flagship、潜水ヨ級elite、潜水ヨ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級flagship、潜水ヨ級elite、潜水ヨ級elite、潜水ヨ級elite、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水ヨ級flagship、潜水ヨ級flagship、潜水ヨ級elite、潜水ヨ級elite、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -5407,17 +8348,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "輸送ワ級elite、輸送ワ級elite、軽巡ツ級、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "輸送ワ級flagship、輸送ワ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "輸送ワ級flagship、輸送ワ級flagship、輸送ワ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5427,27 +8380,46 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、重巡ネ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、重巡ネ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -5457,17 +8429,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、軽母ヌ級elite(B)(艦載機白)、戦艦レ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 271
+      "air": 271,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、空母ヲ級改flagship(B)(艦載機白)、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型、潜水ヨ級",
-      "air": 216
+      "air": 216,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級改flagship(B)(艦載機白)、空母ヲ級改flagship(B)(艦載機白)、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型、潜水ヨ級elite",
-      "air": 216
+      "air": 216,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5477,22 +8461,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級elite、潜水ヨ級elite、潜水ヨ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級flagship、潜水ヨ級elite、潜水ヨ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級flagship、潜水ヨ級elite、潜水ヨ級elite、潜水ヨ級elite、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水ヨ級flagship、潜水ヨ級flagship、潜水ヨ級elite、潜水ヨ級elite、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -5502,47 +8502,74 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "南太平洋空母棲姫(A)、空母ヲ級改flagship(B)(艦載機白)、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 218
+      "air": 218,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "南太平洋空母棲姫(A)、空母ヲ級改flagship(B)(艦載機白)、戦艦レ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 312
+      "air": 312,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "南太平洋空母棲姫(A)、空母ヲ級改flagship(B)(艦載機白)、戦艦レ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 325
+      "air": 325,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4 最終形態",
       "enemy": "南太平洋空母棲姫-壊(A)、空母ヲ級改flagship(B)(艦載機白)、空母ヲ級改flagship(B)(艦載機白)、軽巡ツ級flagship、駆逐ハ級後期型elite、駆逐ハ級後期型elite",
-      "air": 328
+      "air": 328,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "南太平洋空母棲姫-壊(A)、空母ヲ級改flagship(B)(艦載機白)、戦艦レ級elite、戦艦レ級elite、駆逐ハ級後期型elite、駆逐ハ級後期型elite",
-      "air": 434
+      "air": 434,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6 最終形態",
       "enemy": "南太平洋空母棲姫-壊(A)、空母ヲ級改flagship(B)(艦載機白)、空母ヲ級改flagship(B)(艦載機白)、戦艦レ級elite、駆逐ハ級後期型elite、駆逐ハ級後期型elite",
-      "air": 435
+      "air": 435,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン7 クリア後",
       "enemy": "南太平洋空母棲姫(A)、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 110
+      "air": 110,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン8 クリア後",
       "enemy": "南太平洋空母棲姫(A)、軽母ヌ級flagship(B)(艦載機白)、重巡ネ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 187
+      "air": 187,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン9 クリア後",
       "enemy": "南太平洋空母棲姫(A)、空母ヲ級改flagship(B)(艦載機白)、重巡ネ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 218
+      "air": 218,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5552,47 +8579,74 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "南太平洋空母棲姫(A)、空母ヲ級改flagship(B)(艦載機白)、戦艦レ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 312
+      "air": 312,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "南太平洋空母棲姫(A)、空母ヲ級改flagship(B)(艦載機白)、戦艦レ級elite、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 325
+      "air": 325,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "南太平洋空母棲姫(A)、空母ヲ級改flagship(B)(艦載機白)、戦艦レ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 325
+      "air": 325,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4 最終形態",
       "enemy": "南太平洋空母棲姫-壊(A)、空母ヲ級改flagship(B)(艦載機白)、空母ヲ級改flagship(B)(艦載機白)、軽巡ツ級flagship、駆逐ハ級後期型elite、駆逐ハ級後期型elite",
-      "air": 328
+      "air": 328,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "南太平洋空母棲姫-壊(A)、空母ヲ級改flagship(B)(艦載機白)、空母ヲ級改flagship(B)(艦載機白)、戦艦レ級elite、駆逐ハ級後期型elite、駆逐ハ級後期型elite",
-      "air": 435
+      "air": 435,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6 最終形態",
       "enemy": "南太平洋空母棲姫-壊(A)、空母ヲ級改flagship(B)(艦載機白)、戦艦レ級elite、戦艦レ級elite、駆逐ハ級後期型elite、駆逐ハ級後期型elite",
-      "air": 434
+      "air": 434,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン7 クリア後",
       "enemy": "南太平洋空母棲姫(A)、重巡ネ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 110
+      "air": 110,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン8 クリア後",
       "enemy": "南太平洋空母棲姫(A)、軽母ヌ級flagship(B)(艦載機白)、重巡ネ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 187
+      "air": 187,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン9 クリア後",
       "enemy": "南太平洋空母棲姫(A)、空母ヲ級改flagship(B)(艦載機白)、重巡ネ級、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 218
+      "air": 218,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    }
@@ -5608,17 +8662,27 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級flagship、軽母ヌ級flagship、重巡リ級elite、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級flagship、軽母ヌ級flagship、重巡リ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級flagship、軽母ヌ級flagship、重巡リ級flagship、軽巡ツ級、駆逐ニ級後期型、駆逐ニ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -5628,7 +8692,12 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級flagship、駆逐ハ級elite、駆逐ハ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5638,22 +8707,34 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、駆逐ハ級elite、駆逐ハ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、駆逐ニ級elite、駆逐ニ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、輸送ワ級elite、輸送ワ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級flagship、軽巡ト級elite(A)、駆逐ニ級elite、駆逐ニ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -5663,17 +8744,26 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、駆逐ハ級elite、駆逐ハ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、駆逐ハ級elite、駆逐ハ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級elite、雷巡チ級elite、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -5683,17 +8773,26 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母棲鬼(艦載機白)、空母ヲ級flagship(艦載機白)、重巡リ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 180
+      "air": 180,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母棲鬼(艦載機白)、重巡リ級flagship、重巡リ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 96
+      "air": 96,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship(艦載機白)、空母ヲ級flagship(艦載機白)、重巡リ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 168
+      "air": 168,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5703,12 +8802,18 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "輸送ワ級flagship、輸送ワ級flagship、軽巡ヘ級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "輸送ワ級flagship、輸送ワ級flagship、軽巡ヘ級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -5718,17 +8823,27 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship(艦載機白)、重巡リ級flagship、軽巡ヘ級elite、軽巡ツ級、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship(艦載機白)、重巡リ級flagship、軽巡ツ級elite、軽巡ツ級elite、駆逐ニ級後期型、駆逐ニ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship(艦載機白)、重巡リ級flagship、軽巡ヘ級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    }
@@ -5744,12 +8859,20 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽母ヌ級elite、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、軽母ヌ級elite、軽母ヌ級elite、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5759,22 +8882,34 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級flagship、重巡リ級elite、重巡リ級elite、軽母ヌ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級flagship、軽母ヌ級flagship、戦艦ル級elite、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級flagship、軽母ヌ級elite、重巡リ級elite、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽母ヌ級flagship、戦艦ル級flagship、重巡リ級elite、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5784,17 +8919,27 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship(艦載機白)、空母ヲ級flagship(艦載機白)、軽巡ツ級elite、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 168
+      "air": 168,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship(艦載機白)、軽巡ツ級、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship(艦載機白)、重巡リ級flagship、軽巡ツ級、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -5804,12 +8949,20 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦タ級flagship、重巡リ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦タ級flagship、重巡リ級flagship、重巡リ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -5819,12 +8972,19 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ツ級、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽母ヌ級flagship、軽巡ツ級、駆逐ハ級後期型、駆逐ニ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -5834,17 +8994,26 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級改flagship、戦艦ル級elite、戦艦ル級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級改flagship、戦艦ル級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 102
+      "air": 102,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級改flagship、戦艦ル級flagship、軽母ヌ級elite、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -5854,12 +9023,19 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "輸送ワ級flagship、戦艦ル級改flagship、軽巡ツ級elite、軽巡ツ級elite、駆逐ニ級後期型、駆逐ニ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "輸送ワ級flagship、空母ヲ級flagship(艦載機白)、戦艦ル級改flagship、軽巡ツ級elite、駆逐ニ級後期型、駆逐ニ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      }
     ]
    }
@@ -5875,22 +9051,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -5900,17 +9092,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級elite、潜水ヨ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級elite、潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ソ級elite、潜水ヨ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -5920,32 +9124,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "パターン1と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "パターン3と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "パターン5と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -5955,17 +9177,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、雷巡チ級elite、雷巡チ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、雷巡チ級elite、雷巡チ級elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ツ級elite、雷巡チ級elite、雷巡チ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -5975,32 +9209,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡ネ級elite、軽巡ト級elite(A)、軽巡ホ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "パターン1と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡ネ級elite、軽巡ト級elite(A)、軽巡ト級elite(A)、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "パターン3と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "重巡ネ級elite、重巡リ級elite、軽巡ト級elite(A)、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "パターン5と同じ",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -6010,32 +9262,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦タ級flagship、重巡リ級flagship、軽巡ヘ級flagship、駆逐棲姫(A)、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦タ級flagship、重巡リ級flagship、重巡リ級flagship、駆逐棲姫(A)、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦タ級flagship、重巡リ級flagship、重巡リ級flagship、駆逐棲姫(A)、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "戦艦タ級flagship、重巡リ級flagship、重巡リ級flagship、駆逐棲姫(A)、駆逐ニ級後期型、駆逐ニ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "戦艦タ級flagship、戦艦タ級flagship、重巡リ級flagship、駆逐棲姫(A)、駆逐ニ級後期型、駆逐ニ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6 最終形態",
       "enemy": "駆逐棲姫(B)、戦艦タ級flagship、戦艦タ級flagship、重巡リ級flagship、駆逐ニ級後期型、駆逐ニ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    }
@@ -6051,27 +9321,43 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級flagship、雷巡チ級flagship、雷巡チ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級flagship、雷巡チ級flagship、雷巡チ級flagship、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級flagship、雷巡チ級flagship、雷巡チ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4 最終形態",
       "enemy": "軽巡ホ級flagship、雷巡チ級flagship、雷巡チ級flagship、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "軽巡ヘ級flagship、雷巡チ級flagship、雷巡チ級flagship、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -6081,27 +9367,43 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級flagship、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4 最終形態",
       "enemy": "軽巡ホ級flagship、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "軽巡ホ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -6111,32 +9413,51 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型、軽母ヌ級",
-      "air": 8
+      "air": 8,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型、軽母ヌ級elite",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、軽母ヌ級",
-      "air": 8
+      "air": 8,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、軽母ヌ級elite",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、軽母ヌ級elite",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6 最終形態",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ニ級後期型、駆逐ニ級後期型、軽母ヌ級elite",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -6146,12 +9467,20 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "離島棲姫(陸爆弱)",
-      "air": 59
+      "air": 59,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "離島棲姫(陸爆強)",
-      "air": 82
+      "air": 82,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -6161,27 +9490,43 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型、潜水カ級elite、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6 最終形態",
       "enemy": "重巡リ級flagship、軽巡ホ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -6191,17 +9536,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "離島棲姫(陸爆弱)",
-      "air": 59
+      "air": 59,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "離島棲姫(A)",
-      "air": 78
+      "air": 78,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "離島棲姫(陸爆強)",
-      "air": 82
+      "air": 82,
+      "formations": [
+       "単縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -6211,12 +9568,18 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "離島棲姫(陸爆弱)",
-      "air": 59
+      "air": 59,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "離島棲姫(陸爆強)",
-      "air": 82
+      "air": 82,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -6226,27 +9589,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型、軽母ヌ級elite",
-      "air": null
+      "air": null,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、軽母ヌ級elite",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、軽母ヌ級flagship",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4 最終形態",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、軽母ヌ級flagship",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "戦艦ル級flagship、戦艦ル級flagship、軽巡ヘ級flagship、駆逐ニ級後期型、駆逐ニ級後期型、軽母ヌ級flagship",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -6256,12 +9634,18 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "離島棲姫(A)、軽母ヌ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 101
+      "air": 101,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "離島棲姫(陸爆強)、軽母ヌ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 105
+      "air": 105,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -6271,32 +9655,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級改flagship(艦載機白)、戦艦タ級flagship、重巡ネ級elite、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 108
+      "air": 108,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級改flagship(艦載機白)、戦艦タ級flagship、重巡ネ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 108
+      "air": 108,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級改flagship(艦載機白赤)、戦艦タ級flagship、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 126
+      "air": 126,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級改flagship(艦載機赤)、戦艦ル級改flagship、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 132
+      "air": 132,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "空母棲姫(艦載機赤)、戦艦ル級改flagship、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 129
+      "air": 129,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6 最終形態",
       "enemy": "空母棲姫(艦載機赤)、戦艦ル級改flagship、重巡ネ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 129
+      "air": 129,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -6306,27 +9708,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship、戦艦タ級elite、重巡リ級flagship、軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 28
+      "air": 28,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship(艦載機白赤)、戦艦タ級elite、重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 100
+      "air": 100,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship(艦載機赤)、戦艦タ級elite、重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 103
+      "air": 103,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級改flagship(艦載機白)、戦艦タ級flagship、重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 108
+      "air": 108,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "空母ヲ級改flagship(艦載機白赤)、戦艦タ級flagship、重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 126
+      "air": 126,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -6336,17 +9753,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級flagship、軽母ヌ級flagship、重巡リ級flagship、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級flagship、軽母ヌ級flagship、重巡リ級flagship、軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "軽母ヌ級flagship、軽母ヌ級flagship、重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -6356,17 +9785,28 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ソ級flagship、潜水ソ級elite、潜水ソ級、潜水ソ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ソ級flagship、潜水ソ級elite、潜水ソ級、潜水ソ級、潜水ソ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "潜水ソ級flagship、潜水ソ級elite、潜水ソ級elite、潜水ソ級、潜水ソ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -6376,32 +9816,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1 前哨戦",
       "enemy": "離島棲姫(A)、砲台小鬼(B)、砲台小鬼(A)、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 78
+      "air": 78,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2 前哨戦",
       "enemy": "離島棲姫(B)、砲台小鬼(B)、砲台小鬼(A)、集積地棲姫(A)、軽巡ホ級flagship",
-      "air": 34
+      "air": 34,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3 前哨戦",
       "enemy": "離島棲姫(A)、砲台小鬼(C)、砲台小鬼(B)、砲台小鬼(A)、集積地棲姫(A)、輸送ワ級flagship",
-      "air": 112
+      "air": 112,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4 前哨戦",
       "enemy": "離島棲姫(B)、砲台小鬼(C)、砲台小鬼(B)、砲台小鬼(A)、集積地棲姫-壊(A)、軽巡ホ級flagship",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "離島棲姫(B)、砲台小鬼(C)、砲台小鬼(B)、砲台小鬼(A)、集積地棲姫-壊(A)、輸送ワ級flagship",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6 最終形態",
       "enemy": "離島棲姫(B)、砲台小鬼(C)、砲台小鬼(B)、砲台小鬼(A)、集積地棲姫-壊(A)、軽巡ヘ級flagship",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    }
@@ -6417,47 +9875,74 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級flagship、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン7",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級flagship、軽巡ホ級flagship、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン8 最終形態",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級flagship、軽巡ホ級flagship、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン9 最終形態",
       "enemy": "軽巡ヘ級flagship、軽巡ヘ級flagship、軽巡ホ級flagship、軽巡ホ級flagship、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -6467,27 +9952,46 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "潜水カ級flagship、潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -6497,47 +10001,74 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級改flagship(艦載機赤)、戦艦タ級flagship、軽巡ツ級、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 132
+      "air": 132,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級改flagship(艦載機赤)、戦艦タ級flagship、重巡ネ級、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 132
+      "air": 132,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級改flagship(艦載機赤)、戦艦タ級flagship、重巡ネ級、重巡ネ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 132
+      "air": 132,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級改flagship(艦載機赤)、戦艦タ級flagship、軽巡ツ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 132
+      "air": 132,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級改flagship(艦載機赤)、戦艦タ級flagship、重巡ネ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 132
+      "air": 132,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級改flagship(艦載機赤)、戦艦タ級flagship、重巡ネ級elite、重巡ネ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 132
+      "air": 132,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン7 最終形態",
       "enemy": "空母ヲ級改flagship(艦載機赤)、戦艦タ級flagship、軽巡ツ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 132
+      "air": 132,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン8 最終形態",
       "enemy": "空母ヲ級改flagship(艦載機赤)、戦艦タ級flagship、重巡ネ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 132
+      "air": 132,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン9 最終形態",
       "enemy": "空母ヲ級改flagship(艦載機赤)、戦艦タ級flagship、重巡ネ級elite、重巡ネ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 132
+      "air": 132,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -6547,17 +10078,32 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級flagship、軽母ヌ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級flagship、軽母ヌ級flagship、重巡ネ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "軽母ヌ級flagship、軽母ヌ級flagship、重巡ネ級elite、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -6567,27 +10113,47 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ソ級flagship、潜水ソ級elite、潜水ソ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ソ級flagship、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ソ級flagship、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水ソ級flagship、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "潜水ソ級flagship、潜水ソ級flagship、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -6597,17 +10163,32 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、雷巡チ級flagship、雷巡チ級flagship、軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、雷巡チ級flagship、雷巡チ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "重巡リ級改flagship、雷巡チ級flagship、雷巡チ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -6617,17 +10198,26 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母棲姫(艦載機白)、空母ヲ級flagship(艦載機赤)、重巡リ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 209
+      "air": 209,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母棲姫(艦載機白)、空母ヲ級flagship(艦載機赤)、空母ヲ級flagship(艦載機赤)、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 312
+      "air": 312,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "空母棲姫(艦載機白)、空母ヲ級flagship(艦載機赤)、空母ヲ級flagship(艦載機赤)、軽巡ツ級elite、駆逐ニ級後期型、駆逐ニ級後期型",
-      "air": 312
+      "air": 312,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -6637,17 +10227,26 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship(艦載機赤)、重巡リ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 103
+      "air": 103,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship(艦載機赤)、空母ヲ級flagship(艦載機赤)、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 206
+      "air": 206,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "空母棲姫(艦載機白)、空母ヲ級flagship(艦載機赤)、軽巡ツ級elite、駆逐ニ級後期型、駆逐ニ級後期型、駆逐ニ級後期型",
-      "air": 209
+      "air": 209,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -6657,17 +10256,32 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級flagship、軽母ヌ級flagship、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級flagship、軽母ヌ級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "軽母ヌ級flagship、軽母ヌ級flagship、軽巡ヘ級flagship、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 46
+      "air": 46,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -6677,17 +10291,32 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級flagship、軽巡ヘ級flagship、軽巡ツ級、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級flagship、軽巡ヘ級flagship、軽巡ツ級、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "軽母ヌ級flagship、軽巡ヘ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "単縦陣",
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -6697,32 +10326,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母棲姫(艦載機白)、空母ヲ級flagship(艦載機赤)、重巡リ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 209
+      "air": 209,
+      "formations": [
+       "未確定：第三警戒 航行序列"
+      ]
      },
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、重巡リ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 209
+      "air": 209,
+      "formations": [
+       "未確定：第三警戒 航行序列"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母棲姫(艦載機白)、空母ヲ級flagship(艦載機赤)、空母ヲ級flagship(艦載機赤)、軽巡ツ級elite、駆逐ハ級後期型、駆逐ハ級後期型",
-      "air": 312
+      "air": 312,
+      "formations": [
+       "未確定：第三警戒 航行序列"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、重巡リ級flagship、重巡リ級flagship、駆逐ハ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 312
+      "air": 312,
+      "formations": [
+       "未確定：第三警戒 航行序列"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "空母棲姫(艦載機白)、空母ヲ級flagship(艦載機赤)、空母ヲ級flagship(艦載機赤)、軽巡ツ級elite、駆逐ニ級後期型、駆逐ニ級後期型",
-      "air": 312
+      "air": 312,
+      "formations": [
+       "未確定：第三警戒 航行序列"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "軽巡ヘ級flagship、重巡リ級flagship、重巡リ級flagship、駆逐ハ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 312
+      "air": 312,
+      "formations": [
+       "未確定：第三警戒 航行序列"
+      ]
      }
     ]
    }
@@ -6738,17 +10385,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、重巡ネ級elite、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級flagship、重巡リ級flagship、軽巡ヘ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級flagship、重巡リ級flagship、重巡リ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 23
+      "air": 23,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -6758,17 +10417,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級flagship（艦載機白）、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級flagship（艦載機白）、重巡ネ級elite、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級flagship（艦載機白）、戦艦タ級flagship、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 84
+      "air": 84,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -6778,22 +10449,37 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ソ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ソ級elite、潜水カ級、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ソ級elite、潜水カ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水ソ級elite、潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -6803,27 +10489,46 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級elite、潜水ヨ級、潜水ヨ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水ヨ級elite、潜水ヨ級、潜水ヨ級、潜水ヨ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "潜水ヨ級elite、潜水ヨ級elite、潜水ヨ級、潜水ヨ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -6833,17 +10538,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -6853,27 +10570,46 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ヨ級elite、潜水ヨ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級elite、潜水ヨ級elite、潜水ヨ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ソ級elite、潜水ヨ級elite、潜水ヨ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水ソ級elite、潜水ヨ級elite、潜水ヨ級、潜水ヨ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "潜水ソ級elite、潜水ソ級elite、潜水ヨ級、潜水ヨ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -6883,17 +10619,26 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ソ級flagship、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ソ級flagship、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ソ級flagship、潜水ヨ級elite、潜水ヨ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      }
     ]
    }
@@ -6909,17 +10654,32 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級flagship、軽巡ツ級、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -6929,22 +10689,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水カ級elite、潜水カ級elite、潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -6954,22 +10730,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水カ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水カ級elite、潜水カ級elite、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -6979,32 +10771,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ソ級elite、潜水カ級、潜水カ級、輸送ワ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ソ級elite、潜水カ級elite、潜水カ級elite、輸送ワ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ソ級flagship、潜水カ級elite、潜水カ級elite、輸送ワ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4 クリア後",
       "enemy": "潜水ソ級elite、潜水カ級、潜水カ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5 クリア後",
       "enemy": "潜水ソ級elite、潜水カ級elite、潜水カ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン6 クリア後",
       "enemy": "潜水ソ級flagship、潜水カ級elite、潜水カ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -7014,42 +10824,66 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級改flagship(艦載機白)、軽母ヌ級elite(艦載機白)、重巡ネ級、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 177
+      "air": 177,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級改flagship(艦載機白)、軽母ヌ級elite(艦載機白)、軽母ヌ級、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 185
+      "air": 185,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級改flagship(艦載機白)、軽母ヌ級elite(艦載機白)、軽母ヌ級、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 185
+      "air": 185,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級改flagship(艦載機白赤)、軽母ヌ級elite(艦載機白)、軽母ヌ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 219
+      "air": 219,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級改flagship(艦載機白赤)、軽母ヌ級flagship(艦載機白)、軽母ヌ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 227
+      "air": 227,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級改flagship(艦載機赤)、軽母ヌ級flagship(艦載機白)、軽母ヌ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 233
+      "air": 233,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン7",
       "enemy": "空母ヲ級改flagship(艦載機赤)、軽母ヌ級flagship(艦載機赤)、軽母ヌ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 249
+      "air": 249,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン8",
       "enemy": "空母ヲ級改flagship(艦載機赤)、軽母ヌ級改flagship(艦載機赤)、軽母ヌ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 263
+      "air": 263,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -7059,22 +10893,38 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -7084,27 +10934,44 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "戦艦ル級flagship、軽巡ホ級flagship、輸送ワ級、輸送ワ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "戦艦ル級flagship、軽巡ホ級flagship、輸送ワ級elite、輸送ワ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "戦艦ル級flagship、軽巡ホ級flagship、輸送ワ級flagship、輸送ワ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級flagship、輸送ワ級flagship、輸送ワ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -7114,42 +10981,66 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "空母ヲ級改flagship(艦載機白)、軽母ヌ級elite(艦載機白)、重巡ネ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 177
+      "air": 177,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "空母ヲ級改flagship(艦載機白)、軽母ヌ級elite(艦載機白)、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 177
+      "air": 177,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "空母ヲ級改flagship(艦載機白赤)、軽母ヌ級elite(艦載機白)、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 195
+      "air": 195,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "空母ヲ級改flagship(艦載機白赤)、軽母ヌ級flagship(艦載機白)、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 203
+      "air": 203,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "空母ヲ級改flagship(艦載機赤)、軽母ヌ級flagship(艦載機白)、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 209
+      "air": 209,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "空母ヲ級改flagship(艦載機赤)、軽母ヌ級flagship(艦載機赤)、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 225
+      "air": 225,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン7",
       "enemy": "空母ヲ級改flagship(艦載機赤)、軽母ヌ級改flagship(艦載機赤)、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 239
+      "air": 239,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン8",
       "enemy": "空母ヲ級改flagship(艦載機白)、軽母ヌ級elite(艦載機白)、重巡ネ級、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 177
+      "air": 177,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    }
@@ -7165,17 +11056,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "駆逐イ級後期型、PT小鬼群(B)、PT小鬼群(B)",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "駆逐イ級後期型、PT小鬼群(B)、PT小鬼群(B)、PT小鬼群(B)",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "駆逐イ級後期型、PT小鬼群(C)、PT小鬼群(B)、PT小鬼群(B)",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -7185,17 +11088,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "駆逐ロ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "駆逐ロ級後期型、駆逐ロ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -7205,17 +11120,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級flagship、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級flagship、駆逐ロ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級flagship、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -7225,17 +11152,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級、駆逐ロ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "駆逐ロ級後期型elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -7245,17 +11184,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ヨ級elite、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ヨ級flagship、潜水カ級、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -7265,17 +11216,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、重巡リ級flagship、雷巡チ級、雷巡チ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、重巡リ級flagship、雷巡チ級elite、雷巡チ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、重巡リ級flagship、雷巡チ級elite、雷巡チ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -7285,17 +11248,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級改elite(艦載機鳥白)、軽母ヌ級改elite(艦載機鳥白)、戦艦タ級elite、軽巡ツ級、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 212
+      "air": 212,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級改elite(艦載機鳥白)、軽母ヌ級改elite(艦載機鳥白)、戦艦タ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 212
+      "air": 212,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級改flagship(艦載機鳥赤)、軽母ヌ級改elite(艦載機鳥白)、戦艦タ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 238
+      "air": 238,
+      "formations": [
+       "複縦陣",
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -7305,17 +11280,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "重巡ネ級elite、軽巡ツ級elite、軽巡ツ級elite、駆逐ロ級後期型elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      }
     ]
    }
@@ -7331,27 +11318,47 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "潜水カ級flagship、潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -7361,27 +11368,47 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級elite、潜水カ級elite、潜水カ級elite、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水カ級flagship、潜水カ級flagship、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水カ級flagship、潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "潜水カ級flagship、潜水カ級flagship、潜水カ級flagship、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -7391,27 +11418,42 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級elite(艦載機黒)、軽母ヌ級elite、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 131
+      "air": 131,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 214
+      "air": 214,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 214
+      "air": 214,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽母ヌ級elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 321
+      "air": 321,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽母ヌ級改elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、軽巡ツ級elite、駆逐ロ級後期型elite、駆逐ロ級後期型elite",
-      "air": 346
+      "air": 346,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -7421,32 +11463,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級elite(艦載機黒)、軽母ヌ級、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 115
+      "air": 115,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級elite(艦載機黒)、軽母ヌ級elite、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 131
+      "air": 131,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、軽巡ツ級、駆逐ロ級後期型elite、駆逐ロ級後期型elite、駆逐ロ級後期型elite",
-      "air": 214
+      "air": 214,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽母ヌ級elite(艦載機黒)、軽母ヌ級elite、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 131
+      "air": 131,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "軽母ヌ級elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 214
+      "air": 214,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "軽母ヌ級改elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、軽巡ツ級elite、駆逐ロ級後期型elite、駆逐ロ級後期型elite、駆逐ロ級後期型elite",
-      "air": 239
+      "air": 239,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -7456,22 +11516,37 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水ソ級flagship、潜水ソ級elite、潜水ソ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水ソ級flagship、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水ソ級flagship、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水ソ級flagship、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -7481,22 +11556,34 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 214
+      "air": 214,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 321
+      "air": 321,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級改elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 239
+      "air": 239,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽母ヌ級改elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 346
+      "air": 346,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -7506,22 +11593,36 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、潜水ソ級flagship、潜水ソ級elite、潜水ソ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、潜水ソ級flagship、潜水ソ級flagship、潜水ソ級flagship",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、駆逐イ級後期型、駆逐イ級後期型、潜水ソ級flagship、潜水ソ級elite、潜水ソ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級flagship、駆逐イ級後期型、駆逐イ級後期型、潜水ソ級flagship、潜水ソ級flagship、潜水ソ級flagship",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -7531,27 +11632,47 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水新棲姫(E)、潜水ソ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水新棲姫(A)、潜水ソ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水新棲姫(A)、潜水ソ級elite、潜水ソ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水新棲姫(A)、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "潜水新棲姫(B)、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -7561,17 +11682,29 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "駆逐イ級後期型、駆逐イ級、駆逐イ級、潜水ソ級elite、潜水ソ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "駆逐イ級後期型、駆逐イ級、駆逐イ級、潜水ソ級flagship、潜水ソ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "駆逐イ級後期型、駆逐イ級後期型、駆逐イ級、潜水ソ級flagship、潜水ソ級flagship",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -7581,32 +11714,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "ヒ船団棲姫(A)、軽母ヌ級elite(艦載機鳥白)、軽母ヌ級elite(艦載機鳥白)、駆逐イ級後期型、駆逐イ級後期型、潜水ソ級elite",
-      "air": 345
+      "air": 345,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "ヒ船団棲姫(B)、軽母ヌ級改elite(艦載機鳥白)、軽母ヌ級elite(艦載機鳥白)、駆逐イ級後期型、駆逐イ級後期型、潜水ソ級elite",
-      "air": 329
+      "air": 329,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "ヒ船団棲姫(A)、軽母ヌ級改elite(艦載機鳥白)、軽母ヌ級elite(艦載機鳥白)、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 325
+      "air": 325,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "ヒ船団棲姫(B)、軽母ヌ級改elite(艦載機鳥白)、軽母ヌ級改elite(艦載機鳥白)、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 309
+      "air": 309,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "ヒ船団棲姫-壊(A)、軽母ヌ級改elite(艦載機鳥白)、軽母ヌ級改elite(艦載機鳥白)、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 366
+      "air": 366,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6 最終形態",
       "enemy": "ヒ船団棲姫-壊(B)、軽母ヌ級改elite(艦載機鳥白)、軽母ヌ級改elite(艦載機鳥白)、軽巡ツ級elite、駆逐ロ級後期型elite、駆逐ロ級後期型elite",
-      "air": 369
+      "air": 369,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -7616,32 +11767,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "ヒ船団棲姫(A)、駆逐イ級後期型、駆逐イ級後期型、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite",
-      "air": 93
+      "air": 93,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "ヒ船団棲姫(B)、駆逐イ級後期型、駆逐イ級後期型、潜水ソ級elite、潜水ソ級elite、潜水ソ級elite",
-      "air": 97
+      "air": 97,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "ヒ船団棲姫(A)、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型、潜水ソ級elite、潜水ソ級elite",
-      "air": 93
+      "air": 93,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "ヒ船団棲姫(B)、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型、潜水ソ級elite、潜水ソ級elite",
-      "air": 97
+      "air": 97,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "ヒ船団棲姫-壊(A)、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型、潜水ソ級flagship、潜水ソ級elite",
-      "air": 154
+      "air": 154,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6 最終形態",
       "enemy": "ヒ船団棲姫-壊(B)、軽巡ツ級elite、駆逐ロ級後期型elite、駆逐ロ級後期型elite、潜水ソ級flagship、潜水ソ級elite",
-      "air": 157
+      "air": 157,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    }
@@ -7657,22 +11826,34 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "飛行場姫(陸爆中)",
-      "air": 48
+      "air": 48,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "飛行場姫(鳥黒弱)、飛行場姫(陸爆弱)",
-      "air": 169
+      "air": 169,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "飛行場姫(鳥黒弱)、飛行場姫(陸爆中)",
-      "air": 183
+      "air": 183,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "飛行場姫(鳥黒強)、飛行場姫(鳥黒弱)、飛行場姫(陸爆弱)",
-      "air": 335
+      "air": 335,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -7682,27 +11863,47 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級elite、潜水カ級elite、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -7712,17 +11913,28 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "駆逐ロ級後期型elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "駆逐ロ級後期型elite、駆逐ロ級後期型elite、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -7732,22 +11944,36 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ホ級flagship、軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ホ級flagship、軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ホ級flagship、軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級flagship、軽巡ホ級flagship、軽巡ホ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -7757,22 +11983,36 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "駆逐イ級後期型、駆逐イ級、PT小鬼群(C)、PT小鬼群(B)、PT小鬼群(A)",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "警戒陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "駆逐イ級後期型、駆逐イ級後期型、PT小鬼群(C)、PT小鬼群(B)、PT小鬼群(A)",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "警戒陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "駆逐イ級後期型、駆逐イ級、PT小鬼群(C)、PT小鬼群(B)、PT小鬼群(A)、PT小鬼群(A)",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "駆逐イ級後期型、駆逐イ級後期型、PT小鬼群(D)、PT小鬼群(C)、PT小鬼群(B)、PT小鬼群(A)",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -7782,22 +12022,36 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -7807,22 +12061,36 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型elite、駆逐イ級後期型、駆逐イ級、駆逐イ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、駆逐ロ級後期型elite、駆逐ロ級後期型elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽母ヌ級elite、駆逐ロ級後期型elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 24
+      "air": 24,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "重巡リ級flagship、軽巡ヘ級flagship、軽母ヌ級elite(艦載機白)、駆逐ロ級後期型elite、駆逐ロ級後期型elite、駆逐ロ級後期型elite",
-      "air": 69
+      "air": 69,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -7832,22 +12100,36 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ト級elite(A)、重巡リ級elite、重巡リ級elite、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ト級flagship、重巡リ級flagship、重巡リ級flagship、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "軽巡ト級elite(A)、重巡リ級flagship、重巡リ級elite、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4 最終形態",
       "enemy": "軽巡ト級flagship、重巡リ級flagship、重巡リ級flagship、軽巡ツ級elite、駆逐ロ級後期型、駆逐ロ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    },
@@ -7857,12 +12139,22 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "駆逐イ級後期型、駆逐イ級後期型、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "駆逐イ級後期型elite、駆逐イ級後期型elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -7872,12 +12164,22 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽巡ヘ級改flagship(A)、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽巡ヘ級改flagship(B)、駆逐イ級後期型elite、駆逐イ級後期型elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣",
+       "梯形陣",
+       "複縦陣"
+      ]
      }
     ]
    },
@@ -7887,37 +12189,60 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "潜水カ級elite、潜水カ級elite、潜水カ級",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単横陣",
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン5",
       "enemy": "潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン6",
       "enemy": "潜水カ級flagship、潜水カ級flagship、潜水カ級elite、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      },
      {
       "name": "パターン7",
       "enemy": "潜水カ級flagship、潜水カ級flagship、潜水カ級flagship、潜水カ級elite、潜水カ級elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "梯形陣"
+      ]
      }
     ]
    },
@@ -7927,32 +12252,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "砲台小鬼(B)、飛行場姫(陸爆中)、集積地棲姫II(B)、PT小鬼群(C)、PT小鬼群(B)、輸送ワ級",
-      "air": 95
+      "air": 95,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "砲台小鬼(B)、飛行場姫(陸爆中)、集積地棲姫II-壊(B)、PT小鬼群(C)、輸送ワ級、輸送ワ級",
-      "air": 114
+      "air": 114,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "砲台小鬼(B)、砲台小鬼(A)、飛行場姫(陸爆中)、集積地棲姫II(B)、PT小鬼群(D)、PT小鬼群(C)",
-      "air": 95
+      "air": 95,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "砲台小鬼(B)、砲台小鬼(A)、飛行場姫(陸爆中)、集積地棲姫II-壊(B)、PT小鬼群(D)、輸送ワ級elite",
-      "air": 114
+      "air": 114,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン5 最終形態",
       "enemy": "砲台小鬼(B)、砲台小鬼(A)、飛行場姫(陸爆中)、集積地棲姫II-壊(B)、PT小鬼群(C)、輸送ワ級",
-      "air": 114
+      "air": 114,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン6 最終形態",
       "enemy": "砲台小鬼(B)、砲台小鬼(B)、砲台小鬼(A)、飛行場姫(陸爆中)、集積地棲姫II-壊(B)、PT小鬼群(D)",
-      "air": 114
+      "air": 114,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -7962,22 +12305,34 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "軽母ヌ級elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、重巡ネ級、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 214
+      "air": 214,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "軽母ヌ級elite(艦載機黒)、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 107
+      "air": 107,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン3",
       "enemy": "軽母ヌ級改elite(艦載機黒)、軽母ヌ級elite(艦載機黒)、重巡ネ級elite、軽巡ツ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 239
+      "air": 239,
+      "formations": [
+       "輪形陣"
+      ]
      },
      {
       "name": "パターン4",
       "enemy": "軽母ヌ級改elite(艦載機黒)、軽母ヌ級改elite(艦載機黒)、重巡ネ級elite、軽巡ツ級elite、駆逐ロ級後期型elite、駆逐ロ級後期型elite",
-      "air": 264
+      "air": 264,
+      "formations": [
+       "輪形陣"
+      ]
      }
     ]
    },
@@ -7987,32 +12342,50 @@ const HD_MAP_AIR_DATA={
      {
       "name": "パターン1",
       "enemy": "バタビア沖棲姫(A)、軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン2",
       "enemy": "バタビア沖棲姫(B)、軽巡ヘ級flagship、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン3 最終形態",
       "enemy": "バタビア沖棲姫-壊(A)、軽巡ヘ級flagship、軽巡ツ級、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン4 最終形態",
       "enemy": "バタビア沖棲姫-壊(B)、軽巡ヘ級flagship、軽巡ツ級elite、駆逐ロ級後期型elite、駆逐ロ級後期型elite",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン5 クリア後",
       "enemy": "バタビア沖棲姫-壊(A)、軽巡ヘ級elite、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      },
      {
       "name": "パターン6 クリア後",
       "enemy": "バタビア沖棲姫-壊(B)、軽巡ヘ級flagship、駆逐イ級後期型、駆逐イ級後期型",
-      "air": 0
+      "air": 0,
+      "formations": [
+       "単縦陣"
+      ]
      }
     ]
    }

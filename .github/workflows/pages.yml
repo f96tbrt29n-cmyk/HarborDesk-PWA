@@ -33,6 +33,9 @@ jobs:
       - name: Verify captured data survives a browser restart
         run: node tests/userscript-capture-resume.test.cjs
 
+      - name: Verify enemy anti-aircraft loss model
+        run: node --test tests/enemy-anti-air.test.cjs
+
       - name: Validate PWA metadata and cached assets
         shell: bash
         run: |
