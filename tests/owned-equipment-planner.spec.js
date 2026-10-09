@@ -303,7 +303,7 @@ test('route fleet conditions: readiness rejects ambiguous presets and incorrect 
 test('verified route presets generate the required counts without adding unrelated ships',async({page})=>{
  await boot(page);await page.waitForFunction(()=>typeof hdFSPlans==='function');
  const rows=await page.evaluate(()=>{
-  const roster=[];for(const [type,count] of [['軽巡洋艦',4],['駆逐艦',6],['海防艦',4],['軽空母',2],['正規空母',2],['戦艦',2],['航空戦艦',1],['航空巡洋艦',1],['重雷装巡洋艦',2]])for(let i=0;i<count;i++)roster.push({id:type+i,name:'条件テスト'+type+i,type,level:80});
+  const roster=[];for(const [type,count] of [['軽巡洋艦',4],['駆逐艦',6],['海防艦',4],['軽空母',2],['正規空母',2],['戦艦',2],['航空戦艦',1],['航空巡洋艦',2],['重巡洋艦',3],['重雷装巡洋艦',2]])for(let i=0;i<count;i++)roster.push({id:type+i,name:'条件テスト'+type+i,type,level:80});
   localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(roster));return ['1-2','1-3','1-4','1-5','2-5','6-5'].flatMap(map=>hdFSPlans(map).filter(s=>!s.info.conditionManual).map(s=>({map,name:s.preset.name,total:s.info.total,filled:s.filled,requirements:s.info.requirements,types:s.slots.map(x=>x.profile?.type),source:hdPlanSourceHtml(s.preset)})));
  });
  expect(rows.filter(x=>x.map==='1-2')).toHaveLength(1);expect(rows.find(x=>x.map==='1-2').types).toHaveLength(5);

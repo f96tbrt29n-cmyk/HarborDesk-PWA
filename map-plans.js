@@ -16,7 +16,7 @@ const MAP_PLANS={
  },
  '2-5':{
   presets:[
-   {name:'北ルート型',ships:'航巡2＋重巡級/戦艦級など',gear:'偵察機・電探で索敵を確保。',use:'夜戦ルートを含む北側攻略'},
+   {name:'北ルート型',ships:'航空戦艦1＋航巡2＋重巡3',gear:'低速艦を含める（高速化しない）。別々の2隻にドラム缶を1個ずつ。索敵33式係数1で49以上を確認。',use:'北ルート・BFJO（低速艦・ドラム缶2隻が必要）',source:'https://zekamashi.net/kancolle-kouryaku/2-5/'},
    {name:'南ルート型',ships:'正規空母1＋軽空母1＋軽巡1＋駆逐3（高速統一）',gear:'艦戦＋偵察機・電探。高速統一、索敵33式係数1で34以上を確認（司令部Lv119以下は余裕を取る）。',use:'通常攻略・CEIO',source:'https://zekamashi.net/kancolle-kouryaku/2-5/'}
   ],
   quests:[
@@ -72,7 +72,7 @@ const HD_MAP_FLEET_EXAMPLES={
  '3-1':[['正規空母2＋重巡1＋雷巡1＋駆逐2','通常攻略・CFG']],
  '3-3':[['正規空母1＋軽空母1＋重巡2＋駆逐2','通常攻略・ACGM']],
  '3-4':[['戦艦級1＋正規空母2＋軽空母1＋軽巡1＋水母1','通常攻略・ACEGJP']],
- '3-5':[['軽巡1＋駆逐5','下ルート・FGK']],
+ '3-5':[['軽巡1＋駆逐5','下ルート・FGK'],['正規空母3＋重巡1＋雷巡1＋駆逐1','上ルート・BDHK']],
  '4-1':[['正規空母2＋重巡3＋駆逐1','通常攻略・CFDGJ/ABDGJ']],
  '4-2':[['正規空母2＋軽巡1＋駆逐3','通常攻略・ACL/BDCL（初手ランダム）'],['空母系2＋駆逐4','駆逐4隻型・ACL/BDCL（初手ランダム）']],
  '4-3':[['正規空母2＋重巡2＋駆逐2','対地攻略・CDHN/CFHN（ボス前逸れあり）']],
@@ -97,7 +97,7 @@ const HD_MAP_FLEET_EXAMPLES={
 Object.entries(HD_MAP_FLEET_EXAMPLES).forEach(([map,examples])=>{
  const detail=(typeof MAP_DETAILS!=='undefined'&&MAP_DETAILS[map])||(typeof MAP_DETAILS_34!=='undefined'&&MAP_DETAILS_34[map])||(typeof MAP_DETAILS_57!=='undefined'&&MAP_DETAILS_57[map])||{};
  const old=MAP_PLANS[map]||{};
- MAP_PLANS[map]={...old,presets:examples.map(([ships,use,flagship],i)=>({name:use.split('・')[0]+' '+(i+1),ships,use,flagship,gear:old.presets?.[i]?.gear||detail.air||'制空・索敵と海域別の必要装備を確認。',source:'https://zekamashi.net/kancolle-kouryaku/'+map+'/'})),quests:old.quests||[]};
+ MAP_PLANS[map]={...old,presets:examples.map(([ships,use,flagship],i)=>({name:use.split('・')[0]+' '+(i+1),ships,use,flagship,gear:(map==='3-5'?(i===0?'対潜・夜戦装備。索敵33式係数4で28以上を確認。':'空母の艦戦で制空を確保。索敵33式係数4で40以上を確認。'):old.presets?.[i]?.gear)||detail.air||'制空・索敵と海域別の必要装備を確認。',source:'https://zekamashi.net/kancolle-kouryaku/'+map+'/'})),quests:old.quests||[]};
 });
 
 function hdPlanSourceHtml(preset){try{const url=new URL(preset?.source||'');if(!['https:','http:'].includes(url.protocol))return '';return '<a href="'+planEsc(url.href)+'" target="_blank" rel="noopener noreferrer">編成条件の出典</a>'}catch{return ''}}
@@ -116,3 +116,14 @@ function renderPlans(map){
 }
 
 window.hdRenderMapPlans=renderPlans;
+
+// Share explicit route choices across the guide and owned-fleet tools.
+const HD_MAP_ROUTE_STORAGE='harbordesk-map-routes-v1';
+function hdMapRouteStored(map){
+ try{const saved=JSON.parse(localStorage.getItem(HD_MAP_ROUTE_STORAGE)||'{}')[map];if(!saved)return null;const rows=MAP_PLANS[map]?.presets||[];const index=rows.findIndex(p=>p.name===saved.name&&p.ships===saved.ships);return index<0?null:index}catch{return null}
+}
+function hdMapRouteSet(map,index){
+ const preset=MAP_PLANS[map]?.presets?.[Number(index)];if(index!==null&&!preset)return false;
+ try{const saved=JSON.parse(localStorage.getItem(HD_MAP_ROUTE_STORAGE)||'{}');if(index===null)delete saved[map];else saved[map]={name:preset.name,ships:preset.ships};localStorage.setItem(HD_MAP_ROUTE_STORAGE,JSON.stringify(saved))}catch{return false}
+ window.dispatchEvent(new CustomEvent('hd:map-route-changed',{detail:{map,index}}));return true;
+}

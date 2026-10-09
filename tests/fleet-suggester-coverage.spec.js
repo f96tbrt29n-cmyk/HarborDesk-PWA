@@ -73,3 +73,42 @@ test('concrete examples fill every stage and preserve scarce and required ships'
  });
  expect(named.filled).toBe(3);expect(named.missing).toEqual(['羽黒']);
 });
+
+test('route choices coordinate the navigator, survive reloads and stay attached to saved fleets',async({page})=>{
+ test.setTimeout(120000);
+ await boot(page);
+ await page.evaluate(()=>{hdSelectGuideMap('3-5');hdFSOpen()});
+ const chooser=page.locator('[data-hd-fs-route]');
+ await expect(chooser).toHaveValue('all');
+ await expect(page.locator('#hdFleetSuggester .hd-fs-card')).toHaveCount(2);
+ await chooser.selectOption('1');
+ const card=page.locator('#hdFleetSuggester .hd-fs-card');
+ await expect(card).toHaveCount(1);await expect(card).toContainText('上ルート');
+ expect(await page.evaluate(()=>hdFSPlans('3-5')[1].slots.filter(x=>x.required==='正規空母').length)).toBe(3);
+ await card.locator('[data-hd-fs-save]').click();
+ const saved=await page.evaluate(()=>{
+  const fleet=loadCustomFleets()['3-5'][0];fleet.name='名前を変更した編成';
+  return {route:fleet.routePreset,use:hdFEPlanFromSavedFleet('3-5',fleet).preset.use,html:hdSPSFleetHtml('3-5',{fleet,ships:fleet.ships,registered:6})};
+ });
+ expect(saved.route.use).toContain('上ルート');expect(saved.use).toContain('上ルート');expect(saved.html).toContain('保存した攻略ルート');
+ const equipped=await page.evaluate(()=>{const plan=hdFLGenerate(1),fleet=hdFLSave(1);return {route:plan.suggestion.preset.use,saved:fleet.routePreset.use}});
+ expect(equipped.route).toContain('上ルート');expect(equipped.saved).toContain('上ルート');
+ await page.evaluate(()=>hdMSNOpen('3-5'));
+ await expect(page.locator('#hdMapStrategyRoute')).toHaveValue('1');
+ await page.locator('#hdMapStrategyRoute').selectOption('0');
+ await page.evaluate(()=>hdFSOpen());
+ await expect(chooser).toHaveValue('0');await expect(card).toContainText('下ルート');
+ await chooser.selectOption('1');
+ await page.evaluate(()=>{hdSelectGuideMap('7-5');hdFSOpen()});
+ await expect(chooser).toHaveValue('all');await expect(card).toHaveCount(3);
+ await chooser.selectOption('2');await expect(card).toHaveCount(1);await expect(card).toContainText('第3ゲージ');
+ await page.evaluate(()=>{hdSelectGuideMap('3-5');hdFSOpen();window.dispatchEvent(new Event('hd:workspace-refresh'))});
+ await expect(chooser).toHaveValue('1');await expect(card).toHaveCount(1);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
+ await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdFSOpen==='function');
+ await page.evaluate(()=>{hdSelectGuideMap('3-5');hdFSOpen()});
+ await expect(chooser).toHaveValue('1');await expect(card).toContainText('上ルート');
+ await chooser.selectOption('all');await expect(card).toHaveCount(2);
+ expect(await page.evaluate(()=>hdMapRouteStored('3-5'))).toBe(null);
+ expect(await page.evaluate(()=>hdMapRouteStored('7-5'))).toBe(2);
+});

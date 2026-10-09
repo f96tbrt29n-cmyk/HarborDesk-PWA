@@ -133,8 +133,9 @@ function hdFSPlans(map){
  var p=(typeof MAP_PLANS!=='undefined'&&MAP_PLANS[map])||(typeof genericPlan==='function'?genericPlan(map):null);
  var presets=p&&p.presets||[];if(!presets.length){var d=typeof MAP_DETAILS!=='undefined'?MAP_DETAILS[map]||{}:{};presets=[{name:'基本候補',ships:d.fleet||d.formation||'6隻編成',gear:d.air||'',use:'通常攻略'}]}
  // A manual alternative must not occupy the first candidate when a concrete example exists.
+ var routePresets=presets.slice();
  presets=presets.slice().sort((a,b)=>Number(hdFSPresetInfo(a).conditionManual)-Number(hdFSPresetInfo(b).conditionManual));
- return presets.slice(0,3).map(function(x,i){return hdFSGenerate(map,x,i)});
+ return presets.map(function(x,i){return Object.assign(hdFSGenerate(map,x,i),{routeIndex:routePresets.indexOf(x)})});
 }
 function hdFSShipHtml(slot,i){
  if(!slot.profile&&slot.required==='条件未確認')return '<div class="hd-fs-ship missing"><span>'+(i+1)+'</span><div><strong>編成条件が未確認</strong><small>海域・ルートの艦種と隻数を確認してね</small></div></div>';
@@ -200,7 +201,11 @@ function hdFSRender(preserveLoadouts=false){
  if(label)label.textContent=map;var roster=hdFSRoster();
  if(!roster.length){host.innerHTML='<div class="empty">艦隊台帳が空だよ。艦娘を登録すると、Lv・艦種・役割から候補を自動生成できる。</div><button type="button" class="primary small" data-hd-fs-roster>艦隊台帳を開く</button>';return}
  var plans=hdFSPlans(map),sync=(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')}catch{return null}})(),equipItems=Number(sync?.equipmentItems??sync?.snapshot?.equipment??0)||0,op=plans[0]?.operational||{available:roster.length,total:roster.length};
- host.innerHTML='<div class="hd-fs-summary"><div><strong>'+hdFSEsc(map)+' 自動編成候補</strong><span>出撃候補 '+op.available+'/'+op.total+'隻（遠征中・入渠中・大破は自動除外）'+(sync?' ｜ 艦これ同期 装備'+equipItems+'個':'')+'</span></div><button type="button" class="ghost small" data-hd-fs-refresh>再生成</button></div><div class="hd-fs-list">'+plans.map(hdFSSuggestionHtml).join('')+'</div><p class="hd-fs-note">※中破・疲労艦は候補順位を下げ、遠征中・入渠中・大破艦は候補から外す。札は表示のみで、イベント海域の出撃可否はゲーム側で最終確認してね。</p>';
+ const route=typeof hdMapRouteStored==='function'?hdMapRouteStored(map):null;
+ const options=plans.map(s=>'<option value="'+s.routeIndex+'"'+(s.routeIndex===route?' selected':'')+'>'+hdFSEsc(s.preset.name+' ｜ '+(s.preset.use||s.preset.ships))+'</option>').join('');
+ const routeChoice='<label class="hd-fs-route">攻略ルート<select data-hd-fs-route aria-label="攻略ルート" style="width:100%;max-width:100%;margin:8px 0 16px"><option value="all"'+(route===null?' selected':'')+'>すべてのルート候補を比較</option>'+options+'</select></label>';
+ const shown=route===null?plans:plans.filter(s=>s.routeIndex===route);
+ host.innerHTML='<div class="hd-fs-summary"><div><strong>'+hdFSEsc(map)+' 自動編成候補</strong><span>出撃候補 '+op.available+'/'+op.total+'隻（遠征中・入渠中・大破は自動除外）'+(sync?' ｜ 艦これ同期 装備'+equipItems+'個':'')+'</span></div><button type="button" class="ghost small" data-hd-fs-refresh>再生成</button></div>'+routeChoice+'<div class="hd-fs-list">'+shown.map(hdFSSuggestionHtml).join('')+'</div><p class="hd-fs-note">※中破・疲労艦は候補順位を下げ、遠征中・入渠中・大破艦は候補から外す。札は表示のみで、イベント海域の出撃可否はゲーム側で最終確認してね。</p>';
  for(const row of saved){const button=[...host.querySelectorAll('[data-hd-fl-generate]')].find(x=>x.getAttribute('data-hd-fl-generate')===row.index),placeholder=button?.closest('.hd-fs-card')?.querySelector('.hd-fl-host');if(placeholder)placeholder.replaceWith(row.plan)}
  if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
 }
@@ -213,8 +218,9 @@ function hdFSSave(index){
  var name=map+' 自動提案｜'+(s.preset.name||('候補'+(s.index+1))),ships=Array.from({length:6},function(_,i){var slot=s.slots[i],p=slot&&slot.profile,r=p&&p.row,mid=Number(r&&r.masterId)||Number(p&&p.master&&p.master.id)||Number(typeof hdShipImageResolve==='function'&&r?.name?hdShipImageResolve(r.name)?.id:0)||0;return {ship:r&&r.name||'',masterId:mid,gameShipId:Number(r?.gameShipId)||0,rosterId:r?.id||'',gear:r&&r.gear||''}});
  var memo='HarborDesk自動提案。'+(s.preset.use||'通常攻略')+'。アプリ内編成例を基にした候補で、ルート固定を保証しません。';
  var old=all[map].find(function(x){return x.name===name}),id=old&&old.id||(typeof cfUid==='function'?cfUid():'fs-'+Date.now()+'-'+Math.random().toString(16).slice(2));
- var item={id:id,name:name,ships:ships,memo:memo,createdAt:old&&old.createdAt||Date.now(),updatedAt:Date.now()};all[map]=old?all[map].map(function(x){return x.id===id?item:x}):all[map].concat(item);
+ var item={id:id,name:name,ships:ships,memo:memo,routePreset:{...s.preset},createdAt:old&&old.createdAt||Date.now(),updatedAt:Date.now()};all[map]=old?all[map].map(function(x){return x.id===id?item:x}):all[map].concat(item);
  if(typeof saveCustomFleets==='function')saveCustomFleets(all);else localStorage.setItem('harbordesk-custom-fleets-v1',JSON.stringify(all));
+ if(typeof hdMapRouteSet==='function')hdMapRouteSet(map,s.routeIndex);
  if(typeof hdSortieSetSelection==='function')hdSortieSetSelection(map,id);if(typeof renderCustomFleets==='function')renderCustomFleets(map);if(typeof hdSPSRender==='function')hdSPSRender();
  var btn=document.querySelector('[data-hd-fs-save="'+index+'"]');if(btn){btn.textContent='保存したよ';setTimeout(function(){btn.textContent='この候補を自分用編成に保存'},1300)}
 }
@@ -298,3 +304,7 @@ window.addEventListener('hd:modules-ready',hdFSInstall);
 if(document.readyState!=='loading')hdFSInstall();
 else document.addEventListener('DOMContentLoaded',hdFSInstall,{once:true});
 window.addEventListener('load',function(){setTimeout(function(){hdFSEnsure();hdFSMapButton();hdFSRender(true)},560)});
+
+document.addEventListener('change',e=>{if(e.target.matches?.('[data-hd-fs-route]'))hdMapRouteSet(hdFSMap(),e.target.value==='all'?null:Number(e.target.value))});
+window.addEventListener('hd:map-route-changed',()=>hdFSRender(true));
+window.addEventListener('storage',e=>{if(e.key===null||e.key===HD_MAP_ROUTE_STORAGE)hdFSRender(true)});

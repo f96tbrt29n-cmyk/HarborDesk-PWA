@@ -26,7 +26,8 @@ function hdSPSDbShip(row){
 }
 function hdSPSPlan(map){
  const p=typeof MAP_PLANS!=='undefined'?MAP_PLANS[map]:null;
- return p?.presets?.[0]||null;
+ const index=typeof hdMapRouteStored==='function'?hdMapRouteStored(map):null;
+ return p?.presets?.[index??0]||null;
 }
 function hdSPSNeeds(map){return typeof hdSEChecks==='function'?hdSEChecks(map):{rows:[],adv:{}}}
 function hdSPSStatusLabel(status){return status==='ready'?'準備あり':status==='partial'?'一部あり':'不足'}
@@ -59,7 +60,7 @@ function hdSPSFleetHtml(map,info){
  if(!info.fleet){
   const preset=hdSPSPlan(map);
   return `<section class="hd-sps-card hd-sps-fleet"><div class="hd-sps-card-head"><div><span>艦隊</span><strong>自分用編成が未登録</strong></div><b class="warn">要準備</b></div>
-   ${preset?`<div class="hd-sps-preset"><span>海域の基本案</span><strong>${hdSPSEsc(preset.name)}</strong><p>${hdSPSEsc(preset.ships)}<br>${hdSPSEsc(preset.gear)}</p></div>`:''}
+   ${preset?`<div class="hd-sps-preset"><span>選択ルートの編成案</span><strong>${hdSPSEsc(preset.name)}</strong><p>${hdSPSEsc(preset.ships)}<br>${hdSPSEsc(preset.gear)}</p></div>`:''}
    <div class="hd-sps-card-actions"><button type="button" class="primary small" data-hd-sps-tab="mine">自分用編成を作る</button><button type="button" class="ghost small" data-hd-sps-workspace="roster">艦隊台帳</button></div></section>`;
  }
  const rows=info.ships.map((s,i)=>{
@@ -69,6 +70,7 @@ function hdSPSFleetHtml(map,info){
  }).join('');
  const fleetState=info.ships.length&&info.registered===info.ships.length?'ok':info.ships.length?'warn':'bad';
  return `<section class="hd-sps-card hd-sps-fleet"><div class="hd-sps-card-head"><div><span>艦隊</span><strong>${hdSPSEsc(info.fleet.name)}</strong></div><b class="${fleetState}">${info.registered}/${info.ships.length} 台帳確認</b></div>
+  ${info.fleet.routePreset?`<div class="hd-sps-preset"><span>保存した攻略ルート</span><strong>${hdSPSEsc(info.fleet.routePreset.name)}</strong><p>${hdSPSEsc(info.fleet.routePreset.use)}<br>${hdSPSEsc(info.fleet.routePreset.ships)}</p></div>`:''}
   <div class="hd-sps-ships">${rows||'<div class="empty">艦娘が未入力だよ</div>'}</div>
   ${info.fleet.memo?`<p class="hd-sps-memo">${hdSPSEsc(info.fleet.memo)}</p>`:''}
   <div class="hd-sps-card-actions"><button type="button" class="ghost small" data-hd-sps-tab="mine">編成・出撃前チェック</button><button type="button" class="ghost small" data-hd-sps-workspace="roster">艦隊台帳</button></div></section>`;
@@ -299,3 +301,5 @@ window.addEventListener('hd:ship-images-changed',hdSPSRender);
 window.addEventListener('hd:ship-images-ready',hdSPSRender);
 window.addEventListener('storage',e=>{if([HD_SPS_EQUIP_KEY,'harbordesk-ship-roster-v1','harbordesk-custom-fleets-v1','harbordesk-land-base-v1','harbordesk-sortie-readiness-v1'].includes(e.key))hdSPSRender()});
 window.addEventListener('load',()=>setTimeout(()=>{hdSPSEnsure();hdSPSMapButton();hdSPSRender()},500));
+
+window.addEventListener('hd:map-route-changed',()=>hdSPSRender());
