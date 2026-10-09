@@ -1650,7 +1650,7 @@ test('release smoke: expansion shortage procurement action adds demand and opens
       needs: [],
       slots: [{
         profile: {
-          row: { name: 'テスト駆逐', masterId: 999999, gear: '' },
+          row: { name: 'テスト駆逐', masterId: 999999, gear: '', gameSlotEx: 0 },
           type: '駆逐艦',
           roles: [],
           master: { id: 999999 }
