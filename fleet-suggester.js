@@ -148,6 +148,8 @@ function hdFSMissingGearHtml(s){
  var missing=s.needs.filter(function(x){return x.status!=='ready'});if(!missing.length)return '<div class="hd-fs-good">主要装備カテゴリは台帳上準備あり</div>';
  return '<div class="hd-fs-needs"><span>装備要確認</span>'+missing.map(function(x){return '<button type="button" class="ghost small" data-hd-fs-acquire="'+hdFSEsc(x.kind)+'">'+hdFSEsc(x.label||x.kind)+'：'+(x.status==='partial'?'一部あり':'不足')+'</button>'}).join('')+'</div>';
 }
+let hdFSSaveFeedback=null;
+function hdFSSaveLabel(s){return hdFSSaveFeedback?.map===s.map&&hdFSSaveFeedback.index===s.index&&Date.now()<hdFSSaveFeedback.until?'保存したよ':'この候補を自分用編成に保存'}
 function hdFSSuggestionHtml(s){
  var complete=s.missing.length===0&&s.filled===s.info.total,unknown=s.slots.filter(function(x){return x.profile&&!x.profile.type}).length;
  var status=s.info.conditionManual?'編成条件の確認が必要':s.low.length?'速力条件の確認が必要':complete?(unknown?'候補完成・艦種確認':'候補完成'):'不足あり';var cls=complete&&!s.info.conditionManual&&!s.low.length?'ok':'warn';
@@ -158,7 +160,7 @@ function hdFSSuggestionHtml(s){
  '<p class="hd-fs-level-guide">'+hdFSEsc(s.info.levelTarget?.text||'推奨Lvは個別確認')+'。艦隊平均の目安を基に、下限目安を満たす近いLvの艦を優先。足りない場合は近い艦を表示。Lvだけでは攻略可否は判定しません。</p>'+
  (warnings.length?'<div class="hd-fs-warning">'+hdFSEsc(warnings.join(' ｜ '))+'</div>':'')+hdFSMissingGearHtml(s)+
  '<div class="hd-fs-source"><b>アプリ内編成例:</b> '+hdFSEsc(s.preset.ships||'')+'<br><b>装備メモ:</b> '+hdFSEsc(s.preset.gear||'')+(typeof hdPlanSourceHtml==='function'&&hdPlanSourceHtml(s.preset)?'<br>'+hdPlanSourceHtml(s.preset):'')+'</div>'+
- '<div class="hd-fs-actions"><button type="button" class="primary small" data-hd-fs-save="'+s.index+'"'+(!s.filled?' disabled':'')+'>この候補を自分用編成に保存</button><button type="button" class="ghost small" data-hd-fs-roster>艦隊台帳を確認</button></div></article>';
+ '<div class="hd-fs-actions"><button type="button" class="primary small" data-hd-fs-save="'+s.index+'"'+(!s.filled?' disabled':'')+'>'+hdFSSaveLabel(s)+'</button><button type="button" class="ghost small" data-hd-fs-roster>艦隊台帳を確認</button></div></article>';
 }
 // Keep the pressed target alive until the native click has been dispatched.
 let hdFSPressedPointer=null,hdFSRenderPending=false,hdFSPendingPreserveLoadouts=true;
@@ -220,9 +222,11 @@ function hdFSSave(index){
  var old=all[map].find(function(x){return x.name===name}),id=old&&old.id||(typeof cfUid==='function'?cfUid():'fs-'+Date.now()+'-'+Math.random().toString(16).slice(2));
  var item={id:id,name:name,ships:ships,memo:memo,routePreset:{...s.preset},createdAt:old&&old.createdAt||Date.now(),updatedAt:Date.now()};all[map]=old?all[map].map(function(x){return x.id===id?item:x}):all[map].concat(item);
  if(typeof saveCustomFleets==='function')saveCustomFleets(all);else localStorage.setItem('harbordesk-custom-fleets-v1',JSON.stringify(all));
+ const feedback=hdFSSaveFeedback={map,index:Number(index),until:Date.now()+1800};
  if(typeof hdMapRouteSet==='function')hdMapRouteSet(map,s.routeIndex);
  if(typeof hdSortieSetSelection==='function')hdSortieSetSelection(map,id);if(typeof renderCustomFleets==='function')renderCustomFleets(map);if(typeof hdSPSRender==='function')hdSPSRender();
- var btn=document.querySelector('[data-hd-fs-save="'+index+'"]');if(btn){btn.textContent='保存したよ';setTimeout(function(){btn.textContent='この候補を自分用編成に保存'},1300)}
+ var btn=document.querySelector('[data-hd-fs-save="'+index+'"]');if(btn)btn.textContent='保存したよ';
+ setTimeout(function(){if(hdFSSaveFeedback!==feedback)return;hdFSSaveFeedback=null;if(hdFSMap()!==map)return;var current=document.querySelector('[data-hd-fs-save="'+index+'"]');if(current)current.textContent='この候補を自分用編成に保存'},1800)
 }
 function hdFSReveal(target,scroll=true){
  if(!target)return false;

@@ -86,6 +86,9 @@ test('route choices coordinate the navigator, survive reloads and stay attached 
  await expect(card).toHaveCount(1);await expect(card).toContainText('上ルート');
  expect(await page.evaluate(()=>hdFSPlans('3-5')[1].slots.filter(x=>x.required==='正規空母').length)).toBe(3);
  await card.locator('[data-hd-fs-save]').click();
+ await expect(card.locator('[data-hd-fs-save]')).toHaveText('保存したよ');
+ await page.evaluate(()=>hdFSRender(true));
+ await expect(card.locator('[data-hd-fs-save]')).toHaveText('保存したよ');
  const saved=await page.evaluate(()=>{
   const fleet=loadCustomFleets()['3-5'][0];fleet.name='名前を変更した編成';
   return {route:fleet.routePreset,use:hdFEPlanFromSavedFleet('3-5',fleet).preset.use,html:hdSPSFleetHtml('3-5',{fleet,ships:fleet.ships,registered:6})};
