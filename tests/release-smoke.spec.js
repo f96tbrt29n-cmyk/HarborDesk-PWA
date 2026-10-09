@@ -183,13 +183,13 @@ test('release smoke: strategy goal priorities survive creation and editing draft
   const add=page.locator('[data-home-guide-add="map"]');
   await add.locator('[name="title"]').fill('優先度を付ける目標');await add.locator('[name="priority"]').selectOption('later');
   await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
-  await expect(add.locator('[name="title"]')).toHaveValue('優先度を付ける目標');await expect(add.locator('[name="priority"]')).toHaveValue('later');await add.locator('button[type="submit"]').click();
+  await expect(add.locator('[name="title"]')).toHaveValue('優先度を付ける目標');await expect(add.locator('[name="priority"]')).toHaveValue('later');await add.locator('button[type="submit"]').tap();
   await expect.poll(()=>page.evaluate(()=>homeGuideState().custom.find(x=>x.title==='優先度を付ける目標')?.priority)).toBe('later');const goal=await page.evaluate(()=>homeGuideState().custom.find(x=>x.title==='優先度を付ける目標'));
   await expect(add.locator('[name="priority"]')).toHaveValue('normal');
   await page.locator(`[data-home-guide-edit-open="${goal.id}"]`).click();
   const edit=page.locator(`[data-home-guide-edit="${goal.id}"]`);await edit.locator('[name="priority"]').selectOption('high');
   await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
-  await expect(edit.locator('[name="priority"]')).toHaveValue('high');await edit.locator('button[type="submit"]').click();await expect(edit).toHaveCount(0);
+  await expect(edit.locator('[name="priority"]')).toHaveValue('high');await edit.locator('button[type="submit"]').tap();await expect(edit).toHaveCount(0);
   await expect(page.locator(`[data-home-guide-priority="${goal.id}"]`)).toHaveValue('high');
   expect(await page.evaluate(()=>homeGuideState().custom.filter(x=>x.title==='優先度を付ける目標').map(x=>x.priority))).toEqual(['high']);
 });
