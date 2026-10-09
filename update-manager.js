@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.554';
-const HD_APP_BUILD=554;
+const HD_APP_VERSION='1.0.555';
+const HD_APP_BUILD=555;
 const HD_UPDATE_SNOOZE_KEY='harbordesk-update-snooze-v1';
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
@@ -215,7 +215,7 @@ async function hdLoadCurrentAssets(){
     return stats&&support;
   });
 
-  const resourceP=commandP.then(()=>hdLoadScript('data-hd-resource-budget','./resource-budget.js'));
+  const resourceP=commandP.then(()=>hdLoadScript('data-hd-resource-budget','./resource-budget.js')).then(()=>hdLoadScript('data-hd-resource-history','./resource-history.js'));
   const exerciseP=Promise.all([questP,resourceP]).then(()=>hdLoadScript('data-hd-exercise-routine','./exercise-routine.js'));
   const guardP=exerciseP.then(()=>hdLoadScript('data-hd-quest-acceptance','./quest-acceptance-guard.js'));
   const activityP=Promise.all([guardP,questP]).then(()=>hdLoadScript('data-hd-activity-logger','./activity-logger.js'));

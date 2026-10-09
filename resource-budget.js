@@ -12,7 +12,7 @@ function hdRBCurrent(){
  return out;
 }
 function hdRBRate(key){
- const h=hdRBHistory(),now=Date.now(),cut=now-14*86400000;let rows=h.filter(x=>Number(x.at)>=cut);
+ const h=hdRBHistory().filter(x=>x[key]!=null&&x[key]!==''),now=Date.now(),cut=now-14*86400000;let rows=h.filter(x=>Number(x.at)>=cut);
  if(rows.length<2)rows=h.slice(-2);if(rows.length<2)return null;
  const first=rows[0],last=rows.at(-1),days=(Number(last.at)-Number(first.at))/86400000;if(days<0.5)return null;
  return (Number(last[key]||0)-Number(first[key]||0))/days;
@@ -32,7 +32,7 @@ function hdRBStats(){
 }
 function hdRBRecentHtml(){
  const h=hdRBHistory().slice(-7).reverse();if(!h.length)return '<div class="hd-rb-empty">まだ履歴がないよ。「現在値を記録」で推移を残せる。</div>';
- return h.map((x,i)=>{const prev=h[i+1];const d=prev?HD_RB_KEYS.map(([k,n])=>`${n.slice(0,1)} ${hdRBSign((Number(x[k])||0)-(Number(prev[k])||0))}`).join(' / '):'最初の記録';return `<div class="hd-rb-history"><span>${new Date(x.at).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})}</span><b>${d}</b></div>`}).join('');
+ return h.map((x,i)=>{const prev=h[i+1];const d=prev?HD_RB_KEYS.map(([k,n])=>`${n.slice(0,1)} ${x[k]==null||prev[k]==null?'—':hdRBSign(Number(x[k])-Number(prev[k]))}`).join(' / '):'最初の記録';return `<div class="hd-rb-history"><span>${new Date(x.at).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})}</span><b>${d}</b></div>`}).join('');
 }
 function hdRBRender(){
  const host=document.getElementById('hdResourceBudget');if(!host)return;const goals=hdRBLoad(),stats=hdRBStats(),deadline=goals.deadline||'';

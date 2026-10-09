@@ -254,13 +254,14 @@ function hdKcMergeEquipment(parsed){
 }
 function hdKcApplyMaterials(parsed){
  const names={1:'fuel',2:'ammo',3:'steel',4:'bauxite',5:'instantBuild',6:'bucket',7:'devMaterial',8:'screw'},values={};
- for(const row of parsed.materials.values()){const key=names[Number(row.api_id)];if(key)values[key]=Math.max(0,Number(row.api_value)||0)}
+ for(const row of parsed.materials.values()){const key=names[Number(row.api_id)],value=Number(row.api_value);if(key&&row.api_value!=null&&Number.isFinite(value)&&value>=0)values[key]=Math.floor(value)}
  localStorage.setItem(HD_KC_MATERIALS_KEY,JSON.stringify({...values,syncedAt:Date.now()}));
  const base=(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-pwa-v1')||'null')}catch{return null}})()||{expeditions:[],docks:[],quests:[],resources:{}};
  base.resources=base.resources||{};
  for(const k of ['fuel','ammo','steel','bauxite'])if(k in values)base.resources[k]=values[k];
  base.resources.savedAt=Date.now();localStorage.setItem('harbordesk-pwa-v1',JSON.stringify(base));
  try{if(typeof state!=='undefined'&&state?.resources){Object.assign(state.resources,base.resources);if(typeof save==='function')save();if(typeof renderResources==='function')renderResources()}}catch{}
+ if(typeof hdRHRecord==='function')try{hdRHRecord(values,{source:'sync'})}catch{window.hdToast?.('現在値は同期済み。資源履歴を保存できなかったので、現在値を記録から再試行してね','warn')}
  if(typeof renderDashboard==='function')renderDashboard();if(typeof renderHomeDashboard==='function')renderHomeDashboard();window.dispatchEvent(new CustomEvent('hd:workspace-refresh'));
  return Object.keys(values).length;
 }
