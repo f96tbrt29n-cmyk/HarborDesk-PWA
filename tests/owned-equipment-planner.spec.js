@@ -318,7 +318,7 @@ test('verified route presets preserve missing ship slots and prefer fast ships f
  await boot(page);await page.waitForFunction(()=>typeof hdFSPlans==='function');
  const r=await page.evaluate(()=>{
   localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{id:'cl',name:'条件テスト軽巡',type:'軽巡洋艦',level:50},{id:'dd',name:'条件テスト駆逐',type:'駆逐艦',level:50},{id:'bb',name:'条件テスト戦艦',type:'戦艦',level:50}]));const short=hdFSPlans('1-2')[0];const asw=hdFSPlans('1-5')[1];
-  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{id:'slow',name:'龍鳳',type:'軽空母',level:50},{id:'fast',name:'瑞鳳',type:'軽空母',level:99}]));const south=hdFSPlans('2-5')[1];
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{id:'slow',name:'龍鳳',type:'軽空母',level:50},{id:'fast',name:'瑞鳳',type:'軽空母',level:99}]));const south=hdFSPlans('2-5').find(s=>s.preset.name==='南ルート型');
   return {shortFilled:short.filled,shortMissing:short.missing,shortIds:short.slots.map(x=>x.profile?.row.id),aswFilled:asw.filled,speedRequired:south.info.speedRequired,cvl:south.slots.find(x=>x.required==='軽空母')?.profile?.row.id,slowType:hdFSProfile({name:'龍鳳',type:'軽空母'}).speed,html:hdFSSuggestionHtml(south)};
  });expect(r.shortFilled).toBe(2);expect(r.shortMissing).toEqual(['駆逐','駆逐','駆逐']);expect(r.shortIds).not.toContain('bb');expect(r.aswFilled).toBe(1);expect(r.speedRequired).toBe(true);expect(r.slowType).toBe('低速');expect(r.cvl).toBe('fast');expect(r.html).toContain('編成条件の出典');
 });
