@@ -183,7 +183,7 @@ function hdKcMergeRoster(parsed){
    gear:parsed.slotItems.size||parsed.completeSlotItems?labels.join(' / '):(old.gear||''),gameGearSlots:parsed.slotItems.size||parsed.completeSlotItems?gameGearSlots:(Array.isArray(old.gameGearSlots)?old.gameGearSlots:[]),gameGearExpansion:parsed.slotItems.size||parsed.completeSlotItems?gameGearExpansion:String(old.gameGearExpansion||''),tags:Array.isArray(old.tags)?old.tags:[],memo:old.memo||'',remodel:old.remodel||'',
    source:'kancolle-import',gameShipId:gameId,gameHp:Number(ship.api_nowhp)||0,gameMaxHp:Number(ship.api_maxhp)||0,gameCond:Number(ship.api_cond)||0,
    gameLos:Array.isArray(ship.api_sakuteki)?Number(ship.api_sakuteki[0])||0:Number(ship.api_sakuteki)||0,gameOnslot:Array.isArray(ship.api_onslot)?ship.api_onslot.map(Number):[],gameFuel:ship.api_fuel==null?null:Number(ship.api_fuel)||0,gameAmmo:ship.api_bull==null?null:Number(ship.api_bull)||0,
-   gameLocked:Number(ship.api_locked)||0,gameSallyArea:Number(ship.api_sally_area)||0,gameSlotEx:Number(ship.api_slot_ex)||0,syncedAt:now,updatedAt:now
+   gameLocked:Number(ship.api_locked)||0,gameSallyArea:Number(ship.api_sally_area)||0,gameSlotEx:ship.api_slot_ex!=null&&String(ship.api_slot_ex).trim()!==''&&Number.isFinite(Number(ship.api_slot_ex))?Number(ship.api_slot_ex):null,syncedAt:now,updatedAt:now
   });
  }
  for(let i=0;i<existing.length;i++){

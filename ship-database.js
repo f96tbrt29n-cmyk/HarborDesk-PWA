@@ -8903,7 +8903,8 @@ function hdShipDbResolveOwnedLoadout(ship,set){
   if(best){remaining.set(best.own.key,(remaining.get(best.own.key)||0)-1);slots.push({wanted,found:true,name:best.own.name,star:best.own.maxStar,count:best.own.count,slotIndex,capacity})}
   else slots.push({wanted,found:false,name:'',star:0,count:0,slotIndex,capacity});
  }
- const expansion=hdShipDbExpansionCandidates(ship,remaining,`${set?.name||''} ${set?.memo||''} ${(set?.gear||[]).join(' ')}`)[0]||null;
+ const owned=typeof hdFERoster==='function'?hdFERoster().filter(row=>String(row.name||'').trim()===String(ship.final||ship.name||'').trim()):[];
+ const expansion=owned.length===1&&typeof hdFLHasExpansion==='function'&&hdFLHasExpansion(owned[0])?hdShipDbExpansionCandidates(ship,remaining,`${set?.name||''} ${set?.memo||''} ${(set?.gear||[]).join(' ')}`)[0]||null:null;
  return {slots,filled:slots.filter(x=>x.found).length,total:slots.length,inventoryCount:[...inv.values()].reduce((s,x)=>s+x.count,0),profile,freeSlots:free,expansion};
 }
 function hdShipDbOwnedFitHtml(ship,set){

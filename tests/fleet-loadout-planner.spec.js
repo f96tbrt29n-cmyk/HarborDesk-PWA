@@ -199,3 +199,57 @@ test('generated loadout survives fleet rerender after ship images become ready',
   await expect(page.locator('.hd-fs-card').first().locator('.hd-fl-plan')).toContainText('未配備');
 });
 
+
+test('automatic expansion allocation requires an unlocked synced slot for the individual ship', async ({ page }) => {
+  await boot(page);
+  await page.waitForFunction(() => typeof hdOCBuild === 'function' && typeof hdKcMergeRoster === 'function');
+  const result = await page.evaluate(() => {
+    const rows = [-1, null, undefined, '', 'invalid', 0, 123].map((ex, i) => ({
+      name: '夕立改二', masterId: 144, gameShipId: 8100 + i, gameSlotEx: ex, gear: '', type: '駆逐艦', level: 99
+    }));
+    localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify(rows));
+    localStorage.setItem('harbordesk-equipment-v1', JSON.stringify([{name:'Bofors 40mm四連装機関砲',count:50,star:0}]));
+    const suggestion = {needs:[],slots:rows.map(row => ({profile:{row,type:row.type,roles:[]}}))};
+    const oldMap=hdFSMap,oldPlans=hdFSPlans;
+    hdFSMap=()=> '1-1';hdFSPlans=()=> [suggestion];
+    const plan=hdFLGenerate(0);
+    const html=hdFLPlanHtml(plan);
+    hdFSMap=oldMap;hdFSPlans=oldPlans;
+    const build = hdOCBuild({map:'1-1',preset:null,fleet:{ships:rows.map(row => ({ship:row.name,masterId:row.masterId,gameShipId:row.gameShipId,gear:'[増設] Bofors 40mm四連装機関砲'}))}});
+    const db=hdFEFindShip('夕立改二');
+    const ledgerExpansion=[-1,0].map(gameSlotEx=>{
+      localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{...rows[0],gameSlotEx}]));
+      return !!hdShipDbResolveOwnedLoadout(db,{gear:[]}).expansion;
+    });
+    localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(rows));
+    const ambiguousExpansion=!!hdOCBuild({map:'1-1',preset:null,fleet:{ships:[{ship:'夕立改二',gear:'[増設] Bofors 40mm四連装機関砲'}]}}).plan.ships[0].expansion;
+    localStorage.setItem('harbordesk-equipment-v1','[]');
+    hdFSMap=()=> '1-1';hdFSPlans=()=> [suggestion];
+    const empty=hdFLGenerate(0);
+    hdFSMap=oldMap;hdFSPlans=oldPlans;
+    hdKcMergeRoster({ships:new Map([[9999,{api_id:9999,api_ship_id:144,api_lv:99,api_slot:[]}]]),slotItems:new Map()});
+    const imported=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1'));
+    return {
+      expansion:plan.ships.map(s=>!!s.expansion),
+      missing:empty.ships.map(s=>!!s.expansionMissing),
+      normalCounts:plan.ships.map(s=>s.items.length),
+      used:plan.used['Bofors 40mm四連装機関砲'],
+      normalUsed:plan.ships.reduce((n,s)=>n+s.items.length,0),
+      htmlCandidates:(html.match(/<i>増設候補<\/i>/g)||[]).length,
+      searchExpansionSlots:build.slots.filter(s=>s.expansion).map(s=>s.si),
+      savedExpansion:build.plan.ships.map(s=>!!s.expansion),
+      ledgerExpansion,ambiguousExpansion,
+      importedUnknown:imported.find(s=>s.gameShipId===9999)?.gameSlotEx
+    };
+  });
+  expect(result.expansion).toEqual([false,false,false,false,false,true,true]);
+  expect(result.missing).toEqual([false,false,false,false,false,true,true]);
+  expect(result.normalCounts.every(n=>n>0)).toBe(true);
+  expect(result.used).toBe(result.normalUsed+2);
+  expect(result.htmlCandidates).toBe(2);
+  expect(result.searchExpansionSlots).toEqual([5,6]);
+  expect(result.savedExpansion).toEqual([false,false,false,false,false,true,true]);
+  expect(result.ledgerExpansion).toEqual([false,true]);
+  expect(result.ambiguousExpansion).toBe(false);
+  expect(result.importedUnknown).toBeNull();
+});

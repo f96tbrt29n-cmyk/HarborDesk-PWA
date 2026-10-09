@@ -20,6 +20,12 @@ function hdFLInventory(){
 }
 function hdFLType(slot){return slot?.profile?.type||''}
 function hdFLRoles(slot){return slot?.profile?.roles||[]}
+// api_slot_ex: -1 = not expanded, 0 = expanded and empty, positive = equipped.
+// Missing sync information is not evidence of an unlocked expansion slot.
+function hdFLHasExpansion(row){
+ const value=row?.gameSlotEx;
+ return value!==null&&value!==undefined&&String(value).trim()!==''&&Number.isFinite(Number(value))&&Number(value)>=0;
+}
 function hdFLIsCarrier(type){return ['軽空母','正規空母','装甲空母'].includes(type)}
 function hdFLIsBattleship(type){return ['戦艦','高速戦艦','航空戦艦'].includes(type)}
 function hdFLIsCruiser(type){return ['軽巡洋艦','重雷装巡洋艦','重巡洋艦','航空巡洋艦','練習巡洋艦'].includes(type)}
@@ -196,7 +202,7 @@ function hdFLGenerate(index){
  // Optional expansion-slot suggestions, only after every normal slot has been allocated.
  ships.forEach((row,i)=>{
   const slot=suggestion.slots[i],ship=hdFLShipDbItem(slot);
-  if(!ship||typeof hdShipDbExpansionCandidates!=='function')return;
+  if(!hdFLHasExpansion(slot?.profile?.row)||!ship||typeof hdShipDbExpansionCandidates!=='function')return;
   const context=[...(suggestion.needs||[]).map(x=>x.kind||''),slot?.profile?.row?.gear||''].join(' ');
   let pick=hdShipDbExpansionCandidates(ship,remaining,context)[0],rebalance=null;
   if(!pick){rebalance=hdFLRebalanceExpansion(inv,remaining,suggestion,ships,i,ship,context);if(rebalance){const rows=hdShipDbExpansionCandidates(ship,remaining,context);pick=rows.find(x=>x.own.key===rebalance.own.key)||rows[0]||null}}

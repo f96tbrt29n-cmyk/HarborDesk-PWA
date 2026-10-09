@@ -46,7 +46,7 @@ function hdOCBuild(c){
  const plan=hdFEPlanFromSavedFleet(c.map,c.fleet);plan.preset=c.preset;plan.routeInfo=c.preset?hdFSPresetInfo(c.preset):null;
  const inventory=[...hdFLInventory().values()],counts=new Map(inventory.map(x=>[x.key,x.count])),slots=[],unknown=[];
  for(let si=0;si<plan.ships.length;si++){
-  const ship=plan.ships[si],db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db),live=hdFERosterForShip(ship);
+  const ship=plan.ships[si],db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db);
   if(!profile){unknown.push(`${ship.ship}：艦娘のスロット情報が未登録`);ship.items=[];ship.expansion=null;continue}
   const original=ship.items;ship.items=Array.from({length:profile.count},(_,index)=>({name:'',slotIndex:index,capacity:profile.slots[index]}));
   const add=(index,expansion=false)=>{
@@ -57,7 +57,8 @@ function hdOCBuild(c){
    slots.push(slot);
   };
   for(let i=0;i<profile.count;i++)add(i);
-  const expanded=!!ship.expansion||live&&Number.isFinite(Number(live.gameSlotEx))&&Number(live.gameSlotEx)>=0;
+  const matches=hdFERoster().filter(row=>ship.gameShipId?Number(row.gameShipId)===Number(ship.gameShipId):ship.masterId?Number(row.masterId)===Number(ship.masterId):String(row.name||'').trim()===String(ship.ship||'').trim());
+  const expanded=matches.length===1&&typeof hdFLHasExpansion==='function'&&hdFLHasExpansion(matches[0]);
   if(expanded)add(0,true);else ship.expansion=null;
  }
  return {plan,inventory,slots,unknown};
