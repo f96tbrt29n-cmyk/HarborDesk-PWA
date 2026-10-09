@@ -320,7 +320,9 @@ test('release smoke: strategy goal drafts survive background updates reload and 
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');
   await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
-  if(!await group.evaluate(el=>el.open))await group.locator('summary').click();
+  await expect(group).toHaveAttribute('open','');
+  await page.evaluate(()=>homeGuideRender());
+  await expect(group).toHaveAttribute('open','');
   await expect(form.locator('[name="title"]')).toHaveValue('任務の艦種を確認');
   await expect(form.locator('[name="prereq"]')).toHaveValue('前提任務を確認');
   await expect(form.locator('[name="scope"]')).toHaveValue('map');
