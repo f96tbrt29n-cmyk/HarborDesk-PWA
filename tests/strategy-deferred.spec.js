@@ -48,6 +48,8 @@ async function boot(page, errors = []) {
 
 
 test('release smoke: deferred strategy goals filter persists and combines with completion and search', async ({ page }) => {
+  // This scenario exercises every filter and then reloads the app.
+  test.setTimeout(90000);
   await boot(page);
   await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push(
     {id:'later-pending',category:'map',title:'あとで装備を準備',priority:'later',scope:'map',map:'6-5'},

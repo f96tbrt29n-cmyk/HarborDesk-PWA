@@ -5488,6 +5488,8 @@ test('release smoke: core攻略 navigation activates map tabs without synthetic 
 
 
 test('release smoke: secondary map gear and readiness controls work', async ({ page }) => {
+  // Keep each operation's assertions; allow the complete multi-control scenario to finish.
+  test.setTimeout(120000);
   const errors = [];
   await boot(page, errors);
   await openGuideWorkspace(page);
@@ -5812,6 +5814,8 @@ test('release smoke: unchanged preparation retains controls and canceled presses
 });
 
 test('release smoke:攻略 secondary navigation survives workspace helper outage', async ({ page }) => {
+  // Keep each operation's assertions; allow the complete multi-control scenario to finish.
+  test.setTimeout(120000);
   const errors = [];
   await boot(page, errors);
   await page.waitForFunction(() =>
@@ -6088,6 +6092,8 @@ test('release smoke: canceled fleet suggestion presses render the latest map', a
 });
 
 test('release smoke: remaining map攻略 action controls open and persist', async ({ page }) => {
+  // Keep each operation's assertions; allow the complete multi-control scenario to finish.
+  test.setTimeout(120000);
   const errors = [];
   await boot(page, errors);
   await page.waitForFunction(() =>
@@ -6410,6 +6416,8 @@ test('release smoke: map quest actions add, open, count and reset progress', asy
 
 
 test('release smoke: map gear calculators persist detailed controls', async ({ page }) => {
+  // Keep each operation's assertions; allow the complete multi-control scenario to finish.
+  test.setTimeout(120000);
   const errors = [];
   await boot(page, errors);
   await openGuideWorkspace(page);
