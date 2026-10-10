@@ -2,11 +2,17 @@ const HD_FE_AIR_CATS=new Set(['艦上戦闘機','艦上攻撃機','艦上爆撃�
 
 function hdFEEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdFECatalog(){return typeof hdFLCatalog==='function'?hdFLCatalog():(typeof HD_EQUIPMENT_CATALOG!=='undefined'?HD_EQUIPMENT_CATALOG:[])}
+let hdFEEquipmentIndex=null;
 function hdFEFind(name){
  const aliases={'10cm高角砲＋高射装置':'10cm連装高角砲＋高射装置'},norm=s=>String(s||'').normalize('NFKC').replace(/\s+/g,'');
  const canonical=Object.keys(aliases).find(x=>norm(x)===norm(name)),target=canonical?aliases[canonical]:name;
- const catalog=hdFECatalog(),exact=catalog.find(x=>x.name===target);if(exact)return exact;
- const key=norm(target);return catalog.find(x=>norm(x.name)===key)||null;
+ const catalog=hdFECatalog(),coverage=window.HD_EQUIPMENT_PERFORMANCE_COVERAGE;
+ if(!hdFEEquipmentIndex||hdFEEquipmentIndex.catalog!==catalog||hdFEEquipmentIndex.length!==catalog.length||hdFEEquipmentIndex.coverage!==coverage){
+  const exact=new Map(),normalized=new Map();
+  for(const item of catalog){if(!exact.has(item.name))exact.set(item.name,item);const key=norm(item.name);if(!normalized.has(key))normalized.set(key,item)}
+  hdFEEquipmentIndex={catalog,length:catalog.length,coverage,exact,normalized};
+ }
+ return hdFEEquipmentIndex.exact.get(target)||hdFEEquipmentIndex.normalized.get(norm(target))||null;
 }
 function hdFEFindShip(name){
  if(typeof hdShipDbResolveShip==='function')return hdShipDbResolveShip(String(name||'').trim());

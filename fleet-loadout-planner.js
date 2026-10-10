@@ -9,9 +9,16 @@ function hdFLCatalog(){
 }
 function hdFLRows(){try{const x=JSON.parse(localStorage.getItem(HD_FL_KEY)||'[]');return Array.isArray(x)?x:[]}catch{return []}}
 function hdFLInventoryStackKey(name,star=0){return hdFLNorm(name)+'@@'+Math.max(0,Number(star)||0)}
+let hdFLCatalogIndex=null;
+function hdFLCatalogByName(){
+ const catalog=hdFLCatalog(),coverage=window.HD_EQUIPMENT_PERFORMANCE_COVERAGE;
+ if(!hdFLCatalogIndex||hdFLCatalogIndex.catalog!==catalog||hdFLCatalogIndex.length!==catalog.length||hdFLCatalogIndex.coverage!==coverage)hdFLCatalogIndex={catalog,length:catalog.length,coverage,byName:new Map(catalog.map(x=>[hdFLNorm(x.name),x]))};
+ return hdFLCatalogIndex.byName;
+}
 function hdFLInventory(){
- const cat=hdFLCatalog(),byName=new Map(cat.map(x=>[hdFLNorm(x.name),x])),m=new Map();
- for(const row of hdFLRows()){
+ const rows=hdFLRows(),m=new Map();if(!rows.length)return m;
+ const byName=hdFLCatalogByName();
+ for(const row of rows){
   const norm=hdFLNorm(row.name),star=Math.max(0,Number(row.star)||0),key=hdFLInventoryStackKey(row.name,star),count=Math.max(0,Number(row.count)||0);if(!norm||!count)continue;
   const meta=byName.get(norm)||(typeof hdFEFind==='function'?hdFEFind(row.name):null)||{name:row.name,category:row.category||'',stats:{},tags:[],role:''},cur=m.get(key)||{key,norm,name:row.name,count:0,star,maxStar:star,item:meta};
   cur.count+=count;m.set(key,cur);
