@@ -1,5 +1,6 @@
 function hdEquipSignedValue(v){const n=Number(v);return Number.isFinite(n)?(n>0?`+${n}`:`${n}`):String(v)}
 let hdEquipCatalogPage=0,hdEquipCatalogPageFilter='';
+const hdEquipCatalogMarkup=new WeakMap();
 hdEquipStatText=function(item){const parts=Object.entries(item.stats||{}).map(([k,v])=>`${k}${hdEquipSignedValue(v)}`);if(item.range)parts.push(`射程 ${item.range}`);if(item.radius!=null)parts.push(`半径 ${item.radius}`);return parts};
 hdRenderEquipmentCatalog=function(){
  const list=document.getElementById('hdEquipCatalogList');if(!list)return;
@@ -17,7 +18,8 @@ hdRenderEquipmentCatalog=function(){
   const peekKey=String(x.name||''),peek=hdEquipCatalogPeekKey===peekKey?' hd-peek':'';
   return `<article class="hd-equip-ref-card${peek}" data-hd-equip-peek-key="${hdEsc(peekKey)}"><div class="hd-equip-ref-head"><div><strong>${hdEsc(x.name)}</strong><div class="muted">${hdEsc(x.category)}</div></div><button class="primary small" type="button" data-hd-equip-add="${hdEsc(x.name)}">台帳へ追加</button></div><div class="hd-equip-stats">${hdEquipStatText(x).map(s=>`<span>${hdEsc(s)}</span>`).join('')||'<span>特殊効果装備</span>'}</div><div class="hd-equip-tags">${(x.tags||[]).map(t=>`<span>${hdEsc(t)}</span>`).join('')}</div><p>${hdEsc(x.role||'')}</p><div class="hd-equip-ref-grid"><div><span>改修</span><strong>${hdEsc(x.improve||'未確認')}</strong></div><div><span>入手</span><strong>${hdEsc(x.obtain||'未確認')}</strong></div>${x.equip?`<div class="wide"><span>主な搭載</span><strong>${hdEsc(x.equip)}</strong></div>`:''}${x.special?`<div class="wide"><span>特殊効果・注意</span><strong>${hdEsc(x.special)}</strong></div>`:''}<div class="wide"><span>更新・補足</span><strong>${hdEsc(x.update||'なし')}</strong></div></div><a class="guide-link" href="${hdEquipWikiUrl(x.name)}" target="_blank" rel="noopener">攻略Wikiで詳細 ↗</a></article>`;
  }).join('')||'<div class="empty empty-action"><strong>条件に合う装備がないよ</strong><p>検索語かカテゴリを戻すと一覧へ戻れるよ。</p><button type="button" class="ghost small" data-hd-equip-reset>条件をクリア</button></div>';
- list.innerHTML=pager+cards+pager;
+ const html=pager+cards+pager;
+ if(hdEquipCatalogMarkup.get(list)!==html||!list.firstElementChild){list.innerHTML=html;hdEquipCatalogMarkup.set(list,html)}
 };
 function hdEquipOpenFn(){try{return typeof openEquipment==='function'?openEquipment:null}catch{return null}}
 async function hdEquipOpenWhenReady(item,button=null){

@@ -37,6 +37,7 @@ test('all captured player equipment has usable performance in allocation and cal
  expect(r.fighter).toMatchObject({category:'艦上戦闘機',stats:{対空:5}});expect(r.air).toBe(Math.floor(5*Math.sqrt(18)));expect(r.unknown).toBeNull();expect(r.note).toContain('任務');
  await page.evaluate(()=>{hdEnsureEquipmentCatalog();hdEquipCatalogFilter='すべて';document.getElementById('hdEquipCatalogSearch').value='';hdRenderEquipmentCatalog()});
  await expect(page.locator('#hdEquipCatalogList .hd-equip-ref-card')).toHaveCount(40);
+ expect(await page.evaluate(()=>{const first=document.querySelector('#hdEquipCatalogList .hd-equip-ref-card');hdRenderEquipmentCatalog();hdEnsureEquipmentCatalog();return first===document.querySelector('#hdEquipCatalogList .hd-equip-ref-card')})).toBe(true);
  const first=await page.locator('#hdEquipCatalogList .hd-equip-ref-card').first().textContent();
  await page.evaluate(()=>document.querySelector('[data-hd-equip-page="1"]').click());
  expect(await page.locator('#hdEquipCatalogList .hd-equip-ref-card').first().textContent()).not.toBe(first);
