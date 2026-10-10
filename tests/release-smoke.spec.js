@@ -165,6 +165,14 @@ test('release smoke: completed strategy view keeps drafts and reveals newly adde
 
 test('release smoke: strategy background updates never detach active goal forms or group summaries', async ({ page }) => {
   await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'connected-editor',title:'編集中の目標',category:'map',scope:'map',map:'6-5'});homeGuideSave(s)});
+  page.on('console',m=>{if(m.text().startsWith('HD_POINTER_PROBE '))console.log(m.text())});
+  await page.evaluate(()=>{
+   for(const type of ['pointerdown','pointerup','pointercancel','click'])window.addEventListener(type,e=>{
+    const button=document.querySelector('[data-home-guide-edit-open="connected-editor"]');if(!button)return;
+    const r=button.getBoundingClientRect(),v=window.visualViewport,hit=document.elementFromPoint(e.clientX,e.clientY);
+    console.log('HD_POINTER_PROBE '+JSON.stringify({type,xy:[e.clientX,e.clientY],pointer:e.pointerType,id:e.pointerId,detail:e.detail,target:{tag:e.target.tagName,id:e.target.id,cls:e.target.className,edit:e.target.closest?.('[data-home-guide-edit-open]')?.dataset.homeGuideEditOpen},hit:{tag:hit?.tagName,id:hit?.id,edit:hit?.closest?.('[data-home-guide-edit-open]')?.dataset.homeGuideEditOpen},rect:{x:r.x,y:r.y,w:r.width,h:r.height},scroll:[scrollX,scrollY],viewport:v?{top:v.offsetTop,page:v.pageTop,height:v.height,scale:v.scale}:null,pressed:typeof homeGuidePressedPointer==='undefined'?null:homeGuidePressedPointer?.id,cancelled:typeof homeGuideCancelledPointer==='undefined'?null:homeGuideCancelledPointer?.id}));
+   },true);
+  });
   await page.locator('[data-home-guide-edit-open="connected-editor"]').click();const edit=page.locator('[data-home-guide-edit="connected-editor"]');await edit.locator('[name="title"]').fill('入力を保護する目標');
   const result=await page.evaluate(()=>{const host=document.querySelector('#homeGuideSteps'),form=host.querySelector('[data-home-guide-edit="connected-editor"]'),add=host.querySelector('[data-home-guide-add="map"]'),summary=host.querySelector('[data-group="map"]>summary'),input=form.elements.title,observer=new MutationObserver(()=>{});observer.observe(host,{childList:true,subtree:true});for(let i=0;i<8;i++){const s=homeGuideState();s.done.push('continuous-update-'+i);homeGuideSave(s)}const removed=observer.takeRecords().flatMap(r=>[...r.removedNodes]),detached=removed.some(n=>[form,add,summary].some(el=>n===el||n.contains?.(el)));observer.disconnect();return {detached,same:host.querySelector('[data-home-guide-edit="connected-editor"]')===form,focused:document.activeElement===input,value:input.value}});
   expect(result).toEqual({detached:false,same:true,focused:true,value:'入力を保護する目標'});
