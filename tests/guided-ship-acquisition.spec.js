@@ -212,6 +212,8 @@ test('strategy integration: bulk goals include the prerequisite chain without re
 });
 
 test('strategy integration: prerequisite checkbox and cleared map share one completion state', async ({ page }) => {
+  // Verify the complete scenario across both app loads with the same per-assertion deadlines.
+  test.setTimeout(90000);
   await openApp(page);
   await page.locator('#homeGuideMapSelect').selectOption('6-5');
   await page.locator('[data-hd-strategy-import-all="6-5"]').click();
@@ -291,6 +293,8 @@ test('strategy integration: training candidates belong to the selected saved fle
 });
 
 test('strategy integration: base squad opening splits prerequisite missions, item and completion', async ({ page }) => {
+  // Verify the complete scenario across both app loads with the same per-assertion deadlines.
+  test.setTimeout(90000);
   await openApp(page);
   const rows=await page.evaluate(() => ({
     central:hdStrategyCandidates('6-5').filter(x=>['oneTimeQuest','basePrep'].includes(x.source)).map(x=>({ref:x.ref,detail:x.detail})),

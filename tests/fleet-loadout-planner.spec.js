@@ -35,6 +35,10 @@ test('all captured player equipment has usable performance in allocation and cal
  });
  expect(r.missing).toEqual([]);expect(r.wrong).toEqual([]);expect(r.coverage.registered).toBe(r.coverage.total);expect(r.coverage.total).toBeGreaterThan(500);expect(r.stable).toBe(true);
  expect(r.fighter).toMatchObject({category:'艦上戦闘機',stats:{対空:5}});expect(r.air).toBe(Math.floor(5*Math.sqrt(18)));expect(r.unknown).toBeNull();expect(r.note).toContain('任務');
+ await page.evaluate(()=>{hdWSShowElement('home',false);hdEnsureEquipmentCatalog();hdRenderEquipmentCatalog()});
+ await expect(page.locator('#hdEquipCatalogList .hd-equip-ref-card')).toHaveCount(0);
+ await page.evaluate(()=>hdWSShowElement('equipmentBook',false));
+ await expect(page.locator('#equipmentBook')).toBeVisible();
  await page.evaluate(()=>{hdEnsureEquipmentCatalog();hdEquipCatalogFilter='すべて';document.getElementById('hdEquipCatalogSearch').value='';hdRenderEquipmentCatalog()});
  await expect(page.locator('#hdEquipCatalogList .hd-equip-ref-card')).toHaveCount(40);
  expect(await page.evaluate(()=>{const first=document.querySelector('#hdEquipCatalogList .hd-equip-ref-card');hdRenderEquipmentCatalog();hdEnsureEquipmentCatalog();return first===document.querySelector('#hdEquipCatalogList .hd-equip-ref-card')})).toBe(true);

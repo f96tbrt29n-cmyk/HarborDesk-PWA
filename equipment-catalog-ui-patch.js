@@ -1,6 +1,19 @@
 function hdEquipSignedValue(v){const n=Number(v);return Number.isFinite(n)?(n>0?`+${n}`:`${n}`):String(v)}
 let hdEquipCatalogPage=0,hdEquipCatalogPageFilter='';
 const hdEquipCatalogMarkup=new WeakMap();
+const hdEquipCatalogDeferred=new WeakMap();
+function hdEquipCatalogWaitForVisibility(list){
+ if(list.getClientRects().length){hdEquipCatalogDeferred.get(list)?.disconnect();hdEquipCatalogDeferred.delete(list);return false}
+ if(!hdEquipCatalogDeferred.has(list)){
+  const observer=new MutationObserver(()=>{
+   if(!list.isConnected){observer.disconnect();hdEquipCatalogDeferred.delete(list);return}
+   if(list.getClientRects().length){observer.disconnect();hdEquipCatalogDeferred.delete(list);hdRenderEquipmentCatalog()}
+  });
+  for(let parent=list.parentElement;parent;parent=parent.parentElement)observer.observe(parent,{attributes:true,attributeFilter:['class','style','hidden']});
+  hdEquipCatalogDeferred.set(list,observer);
+ }
+ return true;
+}
 hdEquipStatText=function(item){const parts=Object.entries(item.stats||{}).map(([k,v])=>`${k}${hdEquipSignedValue(v)}`);if(item.range)parts.push(`射程 ${item.range}`);if(item.radius!=null)parts.push(`半径 ${item.radius}`);return parts};
 hdRenderEquipmentCatalog=function(){
  const list=document.getElementById('hdEquipCatalogList');if(!list)return;
@@ -11,6 +24,7 @@ hdRenderEquipmentCatalog=function(){
  const summary=document.getElementById('hdEquipCatalogActiveFilters'),chips=[];if(q)chips.push('検索: '+q);if(hdEquipCatalogFilter!=='すべて')chips.push('カテゴリ: '+hdEquipCatalogFilter);
  if(summary){summary.hidden=!chips.length;summary.innerHTML=chips.length?chips.map(x=>`<span>${hdEsc(x)}</span>`).join('')+'<button type="button" class="ghost small" data-hd-equip-reset>クリア</button>':''}
  const count=document.getElementById('hdEquipCatalogCount');if(count)count.textContent=`${rows.length}件 / 全${HD_EQUIPMENT_CATALOG.length}件`;
+ if(!hdEquipCatalogMarkup.has(list)&&hdEquipCatalogWaitForVisibility(list))return;
  const filterKey=JSON.stringify([q,hdEquipCatalogFilter]);if(filterKey!==hdEquipCatalogPageFilter){hdEquipCatalogPage=0;hdEquipCatalogPageFilter=filterKey}
  const size=40,pages=Math.max(1,Math.ceil(rows.length/size));hdEquipCatalogPage=Math.max(0,Math.min(pages-1,hdEquipCatalogPage));
  const pager=pages>1?`<nav class="hd-equip-pagination" aria-label="装備一覧のページ"><button type="button" class="ghost small" data-hd-equip-page="${hdEquipCatalogPage-1}" ${hdEquipCatalogPage===0?'disabled':''}>前へ</button><span>${hdEquipCatalogPage+1} / ${pages}ページ</span><button type="button" class="ghost small" data-hd-equip-page="${hdEquipCatalogPage+1}" ${hdEquipCatalogPage===pages-1?'disabled':''}>次へ</button></nav>`:'';
