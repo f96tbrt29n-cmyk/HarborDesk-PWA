@@ -121,7 +121,7 @@ function hdSECapabilityStock(plan,kind){
  for(const recipe of recipes){
   const stock=hdSERecipeParts(recipe,inventory);let bestUsable=null;
   for(const ship of ships){if(!hdSERecipeAllows(recipe,ship))continue;const db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db);if(!profile)continue;
-   const live=hdFERosterForShip(ship),expanded=!!ship.expansion||live&&Number.isFinite(Number(live.gameSlotEx))&&Number(live.gameSlotEx)>=0;
+   const live=hdFERosterForShip(ship),expanded=typeof hdFLHasExpansion==='function'&&hdFLHasExpansion(live);
    const slots=Array.from({length:profile.count},(_,index)=>({index,db,profile}));if(expanded)slots.push({index:0,db,profile,expansion:true});
    const options=recipe.parts.map(part=>({part,choices:slots.flatMap(slot=>inventory.filter(x=>hdSEPartMatches(part,x)&&(slot.expansion?hdShipDbExpansionInfo(x.item,db,x.star).allowed:hdShipDbEquipCompatible(x.item,db)&&!hdShipDbSlotRejects(profile,slot.index,x.item))).map(row=>({slot,row})))})).sort((a,b)=>a.choices.length-b.choices.length);
    const used=new Map(),taken=new Set();let matched=0,examined=0;

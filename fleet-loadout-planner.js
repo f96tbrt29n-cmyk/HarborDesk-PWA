@@ -20,11 +20,12 @@ function hdFLInventory(){
 }
 function hdFLType(slot){return slot?.profile?.type||''}
 function hdFLRoles(slot){return slot?.profile?.roles||[]}
-// api_slot_ex: -1 = not expanded, 0 = expanded and empty, positive = equipped.
+// api_slot_ex: 0 = not expanded, -1 = expanded and empty, positive = equipped.
+// Reference: KC3Kai src/library/objects/Ship.js (ex_item API semantics).
 // Missing sync information is not evidence of an unlocked expansion slot.
 function hdFLHasExpansion(row){
  const value=row?.gameSlotEx;
- return value!==null&&value!==undefined&&String(value).trim()!==''&&Number.isFinite(Number(value))&&Number(value)>=0;
+ return value!==null&&value!==undefined&&String(value).trim()!==''&&Number.isInteger(Number(value))&&(Number(value)===-1||Number(value)>0);
 }
 function hdFLIsCarrier(type){return ['軽空母','正規空母','装甲空母'].includes(type)}
 function hdFLIsBattleship(type){return ['戦艦','高速戦艦','航空戦艦'].includes(type)}
