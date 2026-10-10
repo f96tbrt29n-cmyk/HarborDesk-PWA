@@ -61,6 +61,8 @@ for(const [name,row] of Object.entries(equipment)){
   const id=Number(row.id);
   if(!(id>0&&id<1500))errors.push(`invalid player equipment id: ${name}=${row.id}`);
   if(!Number.isInteger(Number(row.typeId))||Number(row.typeId)<=0)errors.push(`invalid equipment type: ${name}`);
+  const performance=['火力','雷装','爆装','対空','対潜','索敵','装甲',...(Number(row.typeId)===48?['迎撃','対爆']:['命中','回避'])];
+  for(const field of performance)if(!Number.isFinite(row.stats?.[field]))errors.push(`missing equipment performance: ${name} / ${field}`);
   if(seenEquipIds.has(id)&&seenEquipIds.get(id)!==name)errors.push(`duplicate equipment id ${id}: ${seenEquipIds.get(id)} / ${name}`);
   seenEquipIds.set(id,name);
 }

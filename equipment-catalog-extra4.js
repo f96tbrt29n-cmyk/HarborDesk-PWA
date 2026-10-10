@@ -24,3 +24,22 @@ HD_EQUIPMENT_CATALOG.push(
  {name:'熟練聴音員＋後期型艦首魚雷(6門)',category:'潜水艦魚雷',stats:{雷装:15,索敵:1,命中:5,回避:4},range:'短',tags:['潜水艦','魚雷CI','後期型','高命中'],improve:'改修不可',obtain:'開発不可。任務・ランキング等。',update:'後期型艦首魚雷(6門)の上位系統。',role:'雷装15に命中5・回避4を備える潜水艦用高性能魚雷。',equip:'潜水艦・潜水空母のみ。',special:'後期型潜水艦魚雷として専用魚雷カットインに関係。'},
  {name:'潜水艦搭載電探＆逆探(E27)',category:'潜水艦装備',stats:{火力:1,対空:1,索敵:5,命中:3,回避:11},tags:['潜水艦','索敵','補強増設','回避'],improve:'改修可',obtain:'開発不可。伊13改初期装備、改修更新等。',update:'潜水艦搭載電探＆水防式望遠鏡から更新。',role:'索敵と回避を大きく補う潜水艦専用電探。',equip:'潜水艦・潜水空母のみ。補強増設にも装備可能。',special:'回避+11が特徴。潜水艦の補強増設枠を活用できる。'}
 );
+// Keep the performance catalog complete using the same captured game master
+// as the ship compatibility checker. Hand-written acquisition notes stay intact.
+function hdEquipApplyMasterPerformance(){
+ const snap=window.HD_KANCOLLE_MASTER_SNAPSHOT;if(!snap?.equipment)return;
+ const norm=s=>String(s||'').normalize('NFKC').replace(/\s+/g,'').replace(/･/g,'・'),byName=new Map(HD_EQUIPMENT_CATALOG.map(x=>[norm(x.name),x]));
+ const categories={25:'回転翼機',38:'大口径主砲',91:'噴式戦闘爆撃機',93:'大型電探',94:'艦上偵察機',95:'副砲'};
+ const tags={6:['制空','艦戦'],7:['艦爆'],8:['艦攻'],9:['索敵','艦偵'],10:['索敵','水偵'],11:['水爆'],12:['電探'],13:['電探'],14:['対潜','ソナー'],15:['対潜'],21:['防空'],24:['輸送'],25:['対潜'],26:['対潜'],40:['対潜','ソナー'],45:['制空','水戦'],47:['基地航空隊','陸攻'],48:['基地航空隊'],49:['基地航空隊','索敵'],57:['噴式'],91:['噴式'],93:['電探'],94:['索敵','艦偵']};
+ let added=0,registered=0;
+ for(const [name,meta] of Object.entries(snap.equipment)){
+  if(!meta.stats||!Object.values(meta.stats).every(Number.isFinite))continue;
+  const key=norm(name);let item=byName.get(key);
+  if(!item){item={name,category:categories[meta.typeId]||meta.typeName||'その他',tags:tags[meta.typeId]||[],improve:'未確認',obtain:'入手方法は攻略Wikiで確認。',update:'特殊効果・改修効果・艦固有ボーナスは別途確認。',role:'装備マスターの基本性能を登録。'};HD_EQUIPMENT_CATALOG.push(item);byName.set(key,item);added++}
+  item.stats=Object.fromEntries(Object.entries(meta.stats).filter(([,v])=>v!==0));item.range=meta.range||'';
+  if(meta.radius!=null)item.radius=meta.radius;else delete item.radius;
+  item.masterId=meta.id;item.performanceSource={...snap.source};registered++;
+ }
+ window.HD_EQUIPMENT_PERFORMANCE_COVERAGE={registered,added,total:Object.keys(snap.equipment).length,source:snap.source};
+}
+hdEquipApplyMasterPerformance();

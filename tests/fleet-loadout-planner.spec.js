@@ -20,6 +20,25 @@ async function boot(page) {
   ).toBe('ok');
 }
 
+test('all captured player equipment has usable performance in allocation and calculators', async ({page}) => {
+ await boot(page);
+ const r=await page.evaluate(()=>{
+  const missing=[],wrong=[];
+  for(const [name,meta] of Object.entries(window.HD_KANCOLLE_MASTER_SNAPSHOT.equipment)){
+   const item=hdFEFind(name),calc=hdFCFind(name);
+   if(!item||!calc){missing.push(name);continue}
+   for(const [field,value] of Object.entries(meta.stats))if((Number(item.stats[field])||0)!==value||(Number(calc.stats[field])||0)!==value)wrong.push(name+':'+field);
+  }
+  const before=HD_EQUIPMENT_CATALOG.length;hdEquipApplyMasterPerformance();
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'零式艦戦21型',count:1,star:0},{name:'12cm単装砲',count:1,star:0}]));
+  return {missing,wrong,coverage:window.HD_EQUIPMENT_PERFORMANCE_COVERAGE,stable:before===HD_EQUIPMENT_CATALOG.length,fighter:hdFLInventory().get(hdFLInventoryStackKey('零式艦戦21型',0)).item,air:hdFCAirSlotPower({name:'零式艦戦21型',slot:18,star:0,maxProf:false}),unknown:hdFEFind('存在しない装備テスト'),note:hdFEFind('零式艦戦53型(岩本隊)').obtain};
+ });
+ expect(r.missing).toEqual([]);expect(r.wrong).toEqual([]);expect(r.coverage.registered).toBe(r.coverage.total);expect(r.coverage.total).toBeGreaterThan(500);expect(r.stable).toBe(true);
+ expect(r.fighter).toMatchObject({category:'艦上戦闘機',stats:{対空:5}});expect(r.air).toBe(Math.floor(5*Math.sqrt(18)));expect(r.unknown).toBeNull();expect(r.note).toContain('任務');
+ await page.evaluate(()=>{hdEnsureEquipmentCatalog();document.getElementById('hdEquipCatalogSearch').value='零式艦戦21型';hdRenderEquipmentCatalog()});
+ await expect(page.locator('#hdEquipCatalogList')).toContainText('対空+5');
+});
+
 async function prepare32(page, sparse = false) {
   await page.evaluate(({ sparse }) => {
     localStorage.setItem('harbordesk-ship-roster-v1', JSON.stringify([

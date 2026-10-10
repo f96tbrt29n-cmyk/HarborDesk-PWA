@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import {bumpHarborDeskVersion} from './bump-app-version.mjs';
+import {equipmentMasterPerformance} from './equipment-master-performance.mjs';
 
 const SOURCE_REPO='Tibowl/api_start2';
 const SOURCE_REF='master';
@@ -116,7 +117,7 @@ const equipment={};
 for(const x of (api.api_mst_slotitem||[])){
   const id=Number(x.api_id)||0;if(!(id>0&&id<ENEMY_SLOT_BORDER)||!x.api_name)continue;
   const typeId=Array.isArray(x.api_type)?Number(x.api_type[2])||0:0;
-  equipment[x.api_name]={id,typeId,typeName:typeNameById.get(typeId)||''};
+  equipment[x.api_name]=equipmentMasterPerformance(x,typeNameById.get(typeId)||'');
 }
 
 const exslotBaseTypeIds=(api.api_mst_equip_exslot||[]).map(Number),exslotItemRules={},exslotGlobalItemIds=[];
