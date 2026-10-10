@@ -315,8 +315,8 @@ function hdFEAirCheck(map,air){
 function hdFEScouting(plan,items){
  const map=String(plan?.map||''),adv=typeof HD_MAP_ADVANCED_DATA!=='undefined'?HD_MAP_ADVANCED_DATA[map]?.los:null,coef=Number(adv?.coef)||0,checks=Array.isArray(adv?.checks)?adv.checks:[];
  if(!coef||!checks.length)return {status:'manual',available:false,reason:'threshold',score:null,checks:[],detail:adv?.summary||'数値閾値なし'};
- const sync=(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')}catch{return null}})(),hq=Number(sync?.admiralLevel)||0,ships=(plan?.ships||[]).filter(x=>x?.ship),roster=ships.map(hdFERosterForShip),losRows=roster.map(x=>Number(x?.gameLos)||0);
- if(!hq||losRows.length!==ships.length||losRows.some(x=>x<=0)){const missing={hq:!hq,ships:ships.filter((x,i)=>losRows[i]<=0).map(x=>x.ship)};return {status:'manual',available:false,reason:'sync',missing,score:null,checks,detail:'同期情報が不足：'+[...(missing.hq?['司令部Lv']:[]),...missing.ships.map(x=>x+' の索敵値')].join('、')+'。ゲーム連携で母港・艦隊情報を取得すると自動計算'};}
+ const sync=(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')}catch{return null}})(),hq=Number(sync?.admiralLevel)||0,ships=(plan?.ships||[]).filter(x=>x?.ship),losRows=ships.map(ship=>typeof hdFCProposalShipLos==='function'?hdFCProposalShipLos(ship):null);
+ if(!hq||losRows.length!==ships.length||losRows.some(x=>x===null||!Number.isFinite(x)||x<0)){const missing={hq:!hq,ships:ships.filter((x,i)=>losRows[i]===null||!Number.isFinite(losRows[i])||losRows[i]<0).map(x=>x.ship)};return {status:'manual',available:false,reason:'sync',missing,score:null,checks,detail:'同期情報が不足：'+[...(missing.hq?['司令部Lv']:[]),...missing.ships.map(x=>x+' の索敵値')].join('、')+'。ゲーム連携で母港・艦隊情報を取得すると自動計算'};}
  const shipTerm=losRows.reduce((s,v)=>s+Math.sqrt(Math.max(0,v)),0);let equipRaw=0;
  for(const x of items||[]){const los=Number(x.meta?.stats?.索敵)||0,star=Math.max(0,Math.min(10,Number(x.star)||0));equipRaw+=(los+hdFEImproveCoef(x.meta)*Math.sqrt(star))*hdFEEquipCoef(x.meta)}
  const count=Math.max(1,Math.min(7,ships.length||6)),score=shipTerm+equipRaw*coef-Math.ceil(hq*.4)+2*(6-count);

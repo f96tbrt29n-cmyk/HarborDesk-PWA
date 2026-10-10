@@ -280,7 +280,7 @@ test('quick automatic allocation outfits ASW and cutin sets and saves the assess
  expect(data.goals.find(g=>g.kind==='cap-asw').ok).toBe(true);expect(data.goals.find(g=>g.kind==='cap-aa').ok).toBe(true);expect(data.goals.some(g=>g.kind==='air-value')).toBe(false);
  expect(data.invalid).toEqual([]);expect(data.expanded).toBe(false);expect(Object.values(data.usage).every(n=>n<=1)).toBe(true);
  expect(data.saved.ships.some(s=>s.gear.includes('三式水中探信儀')&&s.gear.includes('三式爆雷投射機'))).toBe(true);
- const calculator=await page.evaluate(()=>{const plan=HD_FL_CACHE['1-6:0'],c=hdFLContext(plan),ok=hdFLCalculator(0),state=hdFCState(c.map,`owned:${c.fleet.id}:${c.index}`);return {ok,names:state.gear.map(x=>x.name),count:plan.ships.reduce((n,s)=>n+s.items.length+(s.expansion?1:0),0)}});expect(calculator.ok).toBe(true);expect(calculator.names).toContain('三式爆雷投射機');expect(calculator.names.length).toBe(calculator.count);
+ const calculator=await page.evaluate(()=>{const plan=HD_FL_CACHE['1-6:0'],c=hdFLContext(plan),ok=hdFLCalculator(0),state=hdFCState(c.map,`owned:${c.fleet.id}:${c.index}`);return {ok,proposalHtml:hdFCProposalHtml(state),names:state.gear.map(x=>x.name),count:plan.ships.reduce((n,s)=>n+s.items.length+(s.expansion?1:0),0)}});expect(calculator.ok).toBe(true);expect(calculator.proposalHtml).not.toContain('最新の条件で再探索');expect(calculator.names).toContain('三式爆雷投射機');expect(calculator.names.length).toBe(calculator.count);
  await page.evaluate(()=>hdFSOpen());
  await expect(page.locator('.hd-fs-card').first().locator('[data-hd-fl-goal="cap-asw"]')).toContainText('充足');
  await expect(page.locator('.hd-fs-card').first().locator('.hd-fl-checks')).toContainText('制空優勢は必須ではありません');
@@ -334,4 +334,22 @@ test('quick scouting remedies show computed gains and distinguish missing sync d
  });
  expect(r.options.some(x=>x.name==='33号水上電探'&&x.available)).toBe(true);for(const x of r.options)expect(x.value).toBeCloseTo(x.actual,6);
  expect(r.html).toContain('33式索敵');expect(r.html).toContain('目安まであと');expect(r.unknownGoals).not.toContain('los-value');expect(r.unknownHtml).toContain('司令部Lv');
+});
+
+
+test('quick assessment subtracts synced current equipment LOS and matches the imported calculator',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  HD_MAP_ADVANCED_DATA['1-1']={los:{coef:3,checks:[{safe:45,failBelow:10}]}};
+  localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:100}));
+  const radar=hdFEFind('33号水上電探'),base=36;
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',gameShipId:71,gameLos:base+radar.stats.索敵,gameGearSlots:['33号水上電探']} ]));
+  const db=hdFEFindShip('夕立改二'),plan={map:'1-1',index:0,ships:[{ship:'夕立改二',gameShipId:71,masterId:db.id,master:true,type:db.type,items:[{name:radar.name,slotIndex:0,capacity:0}],missing:[],expansion:null}],used:{},owned:{},missing:[],suggestion:{slots:[]}};
+  hdFLUpdateAssessment(plan);HD_FL_CACHE['1-1:0']=plan;const c=hdFLContext(plan);
+  hdFCImportOwnedPlan(c,{plan,signature:hdOCSignature(c)});const state=hdFCState(c.map,`owned:${c.fleet.id}:${c.index}`),assessment=hdFEScouting(plan,hdFEAssigned(plan));
+  const expected=Math.sqrt(base)+radar.stats.索敵*hdFEEquipCoef(radar)*3-Math.ceil(100*.4)+2*5;
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',gameShipId:71,gameLos:44,gameGearSlots:['未登録の索敵装備']} ]));
+  return {score:assessment.score,expected,calculator:hdFCLOS(state).score,unknown:hdFEScouting(plan,hdFEAssigned(plan)).available};
+ });
+ expect(r.score).toBeCloseTo(r.expected,6);expect(r.score).toBeCloseTo(r.calculator,6);expect(r.unknown).toBe(false);
 });

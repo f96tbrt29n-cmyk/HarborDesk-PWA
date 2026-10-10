@@ -16,7 +16,8 @@ function hdFCProposalRoster(ship){
  let rows=[];try{rows=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')}catch{}
  if(!Array.isArray(rows))return null;
  if(Number(ship.gameShipId)>0)return rows.find(r=>Number(r.gameShipId)===Number(ship.gameShipId))||null;
- const matches=rows.filter(r=>Number(ship.masterId)>0?Number(r.masterId)===Number(ship.masterId):r.name===ship.ship);
+ const byMaster=Number(ship.masterId)>0?rows.filter(r=>Number(r.masterId)===Number(ship.masterId)):[];
+ const matches=byMaster.length?byMaster:rows.filter(r=>r.name===ship.ship&&(!Number(ship.masterId)||!Number(r.masterId))); 
  return matches.length===1?matches[0]:null;
 }
 function hdFCProposalShipLos(ship){
@@ -44,7 +45,10 @@ function hdFCProposalIssues(s){
 }
 function hdFCProposalHtml(s){
  if(!s.proposal)return '';
- const issues=hdFCProposalIssues(s),p=s.proposal,c=typeof hdOCContext==='function'?hdOCContext(p.map,p.fleetId,p.route):null,stale=c&&(!c.fleet||hdOCSignature(c)!==p.signature);
+ const issues=hdFCProposalIssues(s),p=s.proposal,automatic=String(p.fleetId||'').startsWith('auto:');
+ let c=typeof hdOCContext==='function'?hdOCContext(p.map,p.fleetId,p.route):null;
+ if(automatic){const index=Number(String(p.fleetId).split(':').at(-1)),plan=typeof HD_FL_CACHE!=='undefined'?HD_FL_CACHE[p.map+':'+index]:null;c=plan&&typeof hdFLContext==='function'?hdFLContext(plan):null}
+ const stale=automatic?(!c||hdOCSignature(c)!==p.signature):c&&(!c.fleet||hdOCSignature(c)!==p.signature);
  return `<div class="hd-fc-mapnote" data-hd-fc-proposal><b>手持ちで探索した配備案${p.edited?'（手動調整あり）':''}</b><p>${hdFCEsc(p.name)} / ${hdFCEsc(new Date(p.at).toLocaleString('ja-JP'))}。${stale?'台帳・編成・海域条件が変わっています。最新の条件で再探索してね。':'提案された艦娘・装備・★・スロット位置を反映済み。'}</p>${issues.length?`<p>未判定：${hdFCEsc(issues.join('、'))}。同期または不足欄の入力が必要です。</p>`:''}<small>搭載数は配備案の満載値。熟練度は配備する装備個体が未指定のため加算なしで開始。素索敵は現在装備の基本索敵を差し引いた同期値で、配備変更に伴う艦固有ボーナスの差分は手動補正してね。</small></div>`;
 }
 function hdFCSelection(map){const fleets=hdFCFleets(map);let s={};try{s=JSON.parse(localStorage.getItem(HD_FC_SELECT_KEY)||'{}')||{}}catch{}return s[map]==='manual'?'manual':fleets.find(x=>x.id===s[map])?.id||fleets[0]?.id||'manual'}
