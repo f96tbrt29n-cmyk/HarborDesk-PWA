@@ -35,7 +35,12 @@ test('all captured player equipment has usable performance in allocation and cal
  });
  expect(r.missing).toEqual([]);expect(r.wrong).toEqual([]);expect(r.coverage.registered).toBe(r.coverage.total);expect(r.coverage.total).toBeGreaterThan(500);expect(r.stable).toBe(true);
  expect(r.fighter).toMatchObject({category:'艦上戦闘機',stats:{対空:5}});expect(r.air).toBe(Math.floor(5*Math.sqrt(18)));expect(r.unknown).toBeNull();expect(r.note).toContain('任務');
- await page.evaluate(()=>{hdEnsureEquipmentCatalog();document.getElementById('hdEquipCatalogSearch').value='零式艦戦21型';hdRenderEquipmentCatalog()});
+ await page.evaluate(()=>{hdEnsureEquipmentCatalog();hdEquipCatalogFilter='すべて';document.getElementById('hdEquipCatalogSearch').value='';hdRenderEquipmentCatalog()});
+ await expect(page.locator('#hdEquipCatalogList .hd-equip-ref-card')).toHaveCount(40);
+ const first=await page.locator('#hdEquipCatalogList .hd-equip-ref-card').first().textContent();
+ await page.evaluate(()=>document.querySelector('[data-hd-equip-page="1"]').click());
+ expect(await page.locator('#hdEquipCatalogList .hd-equip-ref-card').first().textContent()).not.toBe(first);
+ await page.evaluate(()=>{document.getElementById('hdEquipCatalogSearch').value='零式艦戦21型';hdRenderEquipmentCatalog()});
  await expect(page.locator('#hdEquipCatalogList')).toContainText('対空+5');
 });
 

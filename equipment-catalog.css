@@ -40,3 +40,4 @@
 
 .hd-compact-hint{padding:6px 9px;border-radius:9px;background:rgba(79,163,211,.09);color:var(--muted);font-size:9px;line-height:1.4}
 .hd-compact-hint[hidden]{display:none}
+.hd-equip-pagination{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;grid-column:1/-1;padding:8px 0;color:var(--muted)}
