@@ -96,7 +96,8 @@ function hdOCMeasure(plan,requirements,unknown=[]){
 }
 function hdOCKey(plan){return JSON.stringify(plan.ships.map(s=>[(s.items||[]).map(x=>hdFOStackKey(x)),hdFOStackKey(s.expansion)]))}
 function hdOCScore(kind,row){const item=row.item||row,s=item.stats||{};if(kind==='制空')return Number(s.対空)||0;if(kind==='索敵')return ((Number(s.索敵)||0)+hdFEImproveCoef(item)*Math.sqrt(Number(row.star)||0))*hdFEEquipCoef(item);return hdFLScoreBase(item,row)}
-function* hdOCSearchSteps(c){
+function* hdOCSearchSteps(c,limits={}){
+ const maxExamined=Math.max(50,Math.min(10000,Number(limits.maxExamined)||10000)),maxDepth=Math.max(1,Math.min(24,Number(limits.maxDepth)||24));
  const signature=hdOCSignature(c);
  const {plan,inventory,slots,unknown}=hdOCBuild(c),requirements=hdSEChecks(c.map).rows.filter(x=>x.kind!=='基地航空隊').map(x=>({...x,minCount:Math.max(1,Number(x.minCount)||1)}));
  const relevant=inventory.filter(x=>requirements.some(r=>hdOCItemMatches(r.kind,x))||hdFOItemMatches('制空',x)||hdFOItemMatches('索敵',x)||hdFOItemMatches('高速化',x));
@@ -107,7 +108,7 @@ function* hdOCSearchSteps(c){
   for(const x of sorted.slice(0,5))picked.set(x.key,x);if(kind==='高速化')for(const turbine of [true,false])for(const x of sorted.filter(x=>/タービン/.test(x.name)===turbine).slice(0,3))picked.set(x.key,x);
  }return [...picked.values()]});
  const initial={plan,measure:hdOCMeasure(plan,requirements,unknown)},seen=new Set([hdOCKey(plan)]);let beam=[initial],best=initial,examined=0;
- for(let depth=0;depth<Math.min(slots.length,24)&&!best.measure.goals.every(x=>x.ok)&&examined<10000;depth++){
+ for(let depth=0;depth<Math.min(slots.length,maxDepth)&&!best.measure.goals.every(x=>x.ok)&&examined<maxExamined;depth++){
   const next=[];
   for(const state of beam){const used=hdFOAssignedUsage(state.plan);
    for(let i=0;i<slots.length;i++){const slot=slots[i],old=slot.expansion?state.plan.ships[slot.si].expansion:state.plan.ships[slot.si].items[slot.index];
@@ -116,7 +117,7 @@ function* hdOCSearchSteps(c){
      let donor=null;if((used[candidate.key]||0)>=candidate.count){donor=slots.find(other=>{if(other.si===slot.si&&other.index===slot.index&&other.expansion===slot.expansion)return false;const item=other.expansion?state.plan.ships[other.si].expansion:state.plan.ships[other.si].items[other.index];return hdFOStackKey(item)===candidate.key});if(!donor)continue;}
      const trial=hdFOClone(state.plan),value=hdOCEquipment(candidate,slot);if(slot.expansion)trial.ships[slot.si].expansion=value;else trial.ships[slot.si].items[slot.index]=value;
      if(donor){const replacement=old?.name?inventory.find(x=>x.key===hdFOStackKey(old)):null,newItem=replacement&&hdOCCompatible(donor,replacement)?hdOCEquipment(replacement,donor):null;if(donor.expansion)trial.ships[donor.si].expansion=newItem;else trial.ships[donor.si].items[donor.index]=newItem||{name:'',slotIndex:donor.index,capacity:donor.capacity};}
-     const key=hdOCKey(trial);if(seen.has(key))continue;seen.add(key);examined++;if(examined>10000)break;
+     const key=hdOCKey(trial);if(seen.has(key))continue;seen.add(key);examined++;if(examined>maxExamined)break;
      const measure=hdOCMeasure(trial,requirements,unknown),row={plan:trial,measure};
      if(measure.score>best.measure.score)best=row;
      next.push(row);

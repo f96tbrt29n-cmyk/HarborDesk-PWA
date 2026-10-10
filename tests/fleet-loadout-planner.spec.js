@@ -261,3 +261,77 @@ test('automatic expansion allocation requires an unlocked synced slot for the in
   expect(result.importedStates).toEqual([false,true,true]);
   expect(result.invalidStates).toEqual([false,false,false,false,false,false,false,false]);
 });
+
+async function prepareQuickRequirements(page,inventory){
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ await page.evaluate(inventory=>{
+  const names=['阿武隈改二','夕立改二','時雨改二','秋月改','雪風改','暁改二'];
+  const rows=names.map((name,i)=>({id:'quick-'+i,name,gameShipId:7000+i,gameSlotEx:0,masterId:hdFEFindShip(name).id,type:hdFEFindShip(name).type,level:99,gear:''}));
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(rows));localStorage.setItem('harbordesk-equipment-v1',JSON.stringify(inventory));
+  selectedMap='1-6';hdWSShowElement('guide',false);renderMapPicker();hdFSOpen();hdFSRender();
+ },inventory);
+ await page.evaluate(()=>hdFLRender(0,document.querySelector('.hd-fs-card')));
+ await page.waitForFunction(()=>HD_FL_CACHE['1-6:0']&&!HD_FL_CACHE['1-6:0'].searching);
+}
+
+test('quick automatic allocation outfits ASW and cutin sets and saves the assessed equipment',async({page})=>{
+ await prepareQuickRequirements(page,[{name:'10cm連装高角砲＋高射装置',count:1},{name:'13号対空電探改',count:1},{name:'三式水中探信儀',count:1},{name:'三式爆雷投射機',count:1}]);
+ const data=await page.evaluate(()=>{const plan=HD_FL_CACHE['1-6:0'];return {optimized:plan.optimized,goals:plan.assessment.measure.goals.map(g=>({kind:g.kind,ok:g.ok})),invalid:hdFEMasterValidation(plan).invalid,usage:plan.used,expanded:plan.ships.some(s=>s.expansion),saved:hdFLSave(0)}});
+ expect(data.goals.find(g=>g.kind==='cap-asw').ok).toBe(true);expect(data.goals.find(g=>g.kind==='cap-aa').ok).toBe(true);expect(data.goals.some(g=>g.kind==='air-value')).toBe(false);
+ expect(data.invalid).toEqual([]);expect(data.expanded).toBe(false);expect(Object.values(data.usage).every(n=>n<=1)).toBe(true);
+ expect(data.saved.ships.some(s=>s.gear.includes('三式水中探信儀')&&s.gear.includes('三式爆雷投射機'))).toBe(true);
+ const calculator=await page.evaluate(()=>{const plan=HD_FL_CACHE['1-6:0'],c=hdFLContext(plan),ok=hdFLCalculator(0),state=hdFCState(c.map,`owned:${c.fleet.id}:${c.index}`);return {ok,names:state.gear.map(x=>x.name),count:plan.ships.reduce((n,s)=>n+s.items.length+(s.expansion?1:0),0)}});expect(calculator.ok).toBe(true);expect(calculator.names).toContain('三式爆雷投射機');expect(calculator.names.length).toBe(calculator.count);
+ await page.evaluate(()=>hdFSOpen());
+ await expect(page.locator('.hd-fs-card').first().locator('[data-hd-fl-goal="cap-asw"]')).toContainText('充足');
+ await expect(page.locator('.hd-fs-card').first().locator('.hd-fl-checks')).toContainText('制空優勢は必須ではありません');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('quick automatic allocation explains an unavailable ASW component and unconfirmed data',async({page})=>{
+ await prepareQuickRequirements(page,[{name:'三式水中探信儀',count:1}]);
+ const check=page.locator('.hd-fs-card').first().locator('[data-hd-fl-goal="cap-asw"]');
+ await expect(check).toContainText('不足');await expect(check).toContainText('三式爆雷投射機');await expect(check).toContainText('所持 0/1');
+ const plan=await page.evaluate(()=>HD_FL_CACHE['1-6:0']);expect(plan.assessment.measure.complete).toBe(false);expect(plan.ships.flatMap(s=>s.items).some(x=>x.name==='三式爆雷投射機')).toBe(false);
+});
+
+test('quick numeric remedies calculate real slot improvements without allocating unowned equipment',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'零式艦戦21型',count:1}]));
+  const db=hdFEFindShip('赤城改'),profile=hdShipDbSlotProfile(db),plan={map:'2-1',ships:[{ship:'赤城改',masterId:db.id,items:[{name:'零式艦戦21型',slotIndex:0,capacity:profile.slots[0]}],expansion:null}],suggestion:{slots:[]}};
+  const count=hdFEAir(hdFEAssigned(plan)).basePower,goal={kind:'air-value',count,minCount:count+100};
+  const options=hdFLNumericRemedies(plan,goal),before=JSON.stringify(plan.ships);
+  for(const option of options){const trial=structuredClone(plan);trial.ships[0].items=trial.ships[0].items.filter(x=>x.slotIndex!==option.slot-1);trial.ships[0].items.push({name:option.name,star:option.star,slotIndex:option.slot-1,capacity:profile.slots[option.slot-1]});option.actual=hdFEAir(hdFEAssigned(trial)).basePower;}
+  return {options,unchanged:before===JSON.stringify(plan.ships),count};
+ });
+ expect(r.options.length).toBeGreaterThan(0);expect(r.unchanged).toBe(true);for(const x of r.options){expect(x.value).toBe(x.actual);expect(x.value).toBeGreaterThan(r.count);expect(x.gain).toBe(x.value-r.count)}
+ expect(r.options.some(x=>x.owned===0&&!x.available)).toBe(true);
+});
+
+
+test('quick allocation discards an in-flight result when synced inventory changes',async({page})=>{
+ await prepareQuickRequirements(page,[{name:'三式水中探信儀',count:1}]);
+ await page.evaluate(()=>{
+  hdFLRender(0,document.querySelector('.hd-fs-card'));
+  localStorage.setItem('harbordesk-equipment-v1','[]');window.dispatchEvent(new Event('hd:equipment-changed'));
+ });
+ await expect.poll(()=>page.evaluate(()=>HD_FL_CACHE['1-6:0']||null)).toBeNull();
+ await expect(page.locator('.hd-fs-card').first().locator('.hd-fl-host')).toContainText('再配備して確認');
+});
+
+test('quick scouting remedies show computed gains and distinguish missing sync data',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  HD_MAP_ADVANCED_DATA['1-1']={los:{coef:3,checks:[{safe:45,failBelow:10}]}};
+  localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:100}));
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',gameShipId:71,gameLos:36}]));
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'33号水上電探',count:1}]));
+  const db=hdFEFindShip('夕立改二'),plan={map:'1-1',index:0,ships:[{ship:'夕立改二',gameShipId:71,masterId:db.id,master:true,type:db.type,items:[],missing:[],expansion:null}],used:{},owned:{},missing:[],suggestion:{slots:[]}};
+  hdFLUpdateAssessment(plan,true);const options=plan.numericRemedies['los-value'],html=hdFLAssessmentHtml(plan);
+  for(const x of options){const trial=structuredClone(plan);trial.ships[0].items.push({name:x.name,star:x.star,slotIndex:x.slot-1,capacity:0});x.actual=hdFEScouting(trial,hdFEAssigned(trial)).score;}
+  localStorage.removeItem('harbordesk-kancolle-sync-v1');hdFLUpdateAssessment(plan,true);
+  return {options,html,unknownHtml:hdFLAssessmentHtml(plan),unknownGoals:plan.assessment.measure.goals.map(g=>g.kind)};
+ });
+ expect(r.options.some(x=>x.name==='33号水上電探'&&x.available)).toBe(true);for(const x of r.options)expect(x.value).toBeCloseTo(x.actual,6);
+ expect(r.html).toContain('33式索敵');expect(r.html).toContain('目安まであと');expect(r.unknownGoals).not.toContain('los-value');expect(r.unknownHtml).toContain('司令部Lv');
+});

@@ -155,6 +155,7 @@ function hdFOOptimize(plan,mode,maxChanges){
 function hdFOStatusText(e){return e?'配置あり '+e.ready+'/'+e.requirements.length+'｜一部 '+e.partial+'｜未配置 '+e.missing:'評価なし'}
 function hdFOStandardPlan(index){
  const map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+index,current=(typeof HD_FL_CACHE!=='undefined'&&HD_FL_CACHE[key])||null;
+ if(current?.searching)return null;
  const fresh=typeof hdFLGenerate==='function'?hdFLGenerate(index):null;if(!fresh)return null;
  const base=hdFOClone(fresh);
  if(typeof HD_FL_CACHE!=='undefined'){if(current)HD_FL_CACHE[key]=current;else delete HD_FL_CACHE[key]}
@@ -229,12 +230,12 @@ function hdFOInstall(){
   let html=prev(plan);
   const current=plan.optimization&&plan.optimization.strategy||hdFOStoredMode(),modeOptions=Object.values(HD_FO_MODES).map(function(m){return '<option value="'+m.id+'" '+(m.id===current?'selected':'')+'>'+m.label+'</option>'}).join('');
   const controls='<div class="hd-fo-controls"><label class="hd-fo-mode"><span>最適化方針</span><select data-hd-fo-mode="'+plan.index+'">'+modeOptions+'</select><small>'+hdFOEsc(hdFOMode(current).note)+'</small></label><button type="button" class="primary small" data-hd-fo-optimize="'+plan.index+'">この方針で最適化</button><button type="button" class="ghost small" data-hd-fo-compare="'+plan.index+'">5モードを比較</button>'+(plan.optimization?'<button type="button" class="ghost small" data-hd-fo-reset="'+plan.index+'">標準配備に戻す</button>':'')+'</div><div class="hd-fo-compare-host"></div>';
-  return html.replace('<div class="hd-fe-actions">',hdFOResultHtml(plan)+controls+'<div class="hd-fe-actions">');
+  return html.replace('<div class="hd-fe-actions">',hdFOResultHtml(plan)+(plan.searching?controls.replace(/<button type="button"/g,'<button type="button" disabled'):controls)+'<div class="hd-fe-actions">');
  };
  return true;
 }
 function hdFOApply(index,card,mode){
- const map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+index,cached=(typeof HD_FL_CACHE!=='undefined'&&HD_FL_CACHE[key])||null,base=(cached&&!cached.optimization?cached:hdFLGenerate(index));if(!base||!card)return;
+ const map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+index,cached=(typeof HD_FL_CACHE!=='undefined'&&HD_FL_CACHE[key])||null,base=(cached&&!cached.optimization?cached:hdFLGenerate(index));if(!base||!card||cached?.searching)return;
  const selected=hdFOMode(mode||hdFOStoredMode()).id;hdFOSetStoredMode(selected);
  const optimized=hdFOOptimize(base,selected);if(typeof HD_FL_CACHE!=='undefined')HD_FL_CACHE[key]=optimized;
  const host=card.querySelector('.hd-fl-host');if(host)host.innerHTML=hdFLPlanHtml(optimized);
