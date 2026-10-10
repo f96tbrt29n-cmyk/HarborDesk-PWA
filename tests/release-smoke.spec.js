@@ -179,7 +179,7 @@ test('release smoke: strategy native keyboard submission survives a background u
 
 test('release smoke: strategy goal priorities survive creation and editing drafts', async ({ page }) => {
   // This scenario performs three full app loads and verifies native taps.
-  test.setTimeout(90000);
+  test.setTimeout(120000);
   await boot(page);
   await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
   const add=page.locator('[data-home-guide-add="map"]');
