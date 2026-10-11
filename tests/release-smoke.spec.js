@@ -69,6 +69,8 @@ test('release smoke: strategy goal deletion undo keeps failed deletions and retr
 });
 
 test('release smoke: strategy goal search combines normalized words map priority and completion', async ({ page }) => {
+  // Two full app loads and native actions need their complete assertion windows.
+  test.setTimeout(90000);
   await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'search-local',title:'基地航空隊を準備',detail:'熟練度を上げる',category:'map',scope:'map',map:'6-5',priority:'high'},{id:'search-global',title:'基地航空隊の任務',detail:'熟練度を確認',category:'quest',scope:'global',priority:'high',source:'oneTimeQuest',ref:'B175'},{id:'search-normal',title:'基地航空隊の通常目標',detail:'熟練度',category:'gear',scope:'global'},{id:'search-other',title:'基地航空隊の別海域目標',detail:'熟練度',category:'map',scope:'map',map:'6-4',priority:'high'});s.done.push('shared:oneTimeQuest:B175');homeGuideSave(s)});
   const before=await page.evaluate(()=>homeGuideState()),search=page.locator('[data-home-guide-search]');await search.fill('基地航空隊　熟練度');await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：全件・検索中 3件');await expect(page.locator('details[data-group="quest"]')).toHaveAttribute('open','');
   await page.locator('[data-home-guide-priority-only]').click();await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：全件・優先のみ・検索中 2件');await page.locator('[data-home-guide-completed]').click();await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：完了済み・優先のみ・検索中 1件');await search.fill('ｂ１７５');await expect(page.locator('[data-home-guide-priority="search-global"]')).toHaveCount(1);
@@ -89,6 +91,8 @@ test('release smoke: strategy goal search reveals additions after saving and saf
 });
 
 test('release smoke: priority strategy view combines completion and map filters and persists', async ({ page }) => {
+  // Two full app loads and native actions need their complete assertion windows.
+  test.setTimeout(90000);
   await boot(page);
   await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'priority-local',category:'map',title:'優先の海域目標',scope:'map',map:'6-5',priority:'high'},{id:'priority-global',category:'map',title:'優先の共通目標',scope:'global',priority:'high'},{id:'priority-other',category:'map',title:'別海域の優先目標',scope:'map',map:'6-4',priority:'high'},{id:'priority-normal',category:'map',title:'通常目標',scope:'global'},{id:'priority-import',category:'quest',title:'優先の取り込み任務',scope:'map',map:'6-5',source:'oneTimeQuest',ref:'B175',priority:'high'});s.done.push('map:6-5:map:priority-local','shared:oneTimeQuest:B175');homeGuideSave(s)});
   const before=await page.evaluate(()=>homeGuideState());const filter=page.locator('[data-home-guide-priority-only]');
@@ -117,6 +121,8 @@ test('release smoke: priority strategy view reveals newly added goals only after
 });
 
 test('release smoke: completed strategy view filters by completion and map and persists on reload', async ({ page }) => {
+  // Two full app loads and native actions need their complete assertion windows.
+  test.setTimeout(90000);
   await boot(page);
   await page.evaluate(()=>{
     hdSelectGuideMap('6-5');hdWSShowElement('home',false);const state=homeGuideState();
@@ -217,6 +223,8 @@ test('release smoke: strategy goal priorities reorder manual and imported goals 
 });
 
 test('release smoke: strategy goal priorities recover failed saves and keep an open edit draft', async ({ page }) => {
+  // Two full app loads and native actions need their complete assertion windows.
+  test.setTimeout(90000);
   await boot(page);
   await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const state=homeGuideState();state.custom.push({id:'priority-failed',category:'map',title:'元の優先目標',scope:'map',map:'6-5'});homeGuideSave(state);});
   await page.locator('[data-home-guide-edit-open="priority-failed"]').click();const edit=page.locator('[data-home-guide-edit="priority-failed"]');await edit.locator('[name="title"]').fill('編集中の目標名');
@@ -360,6 +368,8 @@ test('release smoke: strategy goal drafts stay separate when switching maps', as
 });
 
 test('release smoke: strategy goal drafts remain when saving a goal fails', async ({ page }) => {
+  // Two full app loads and native actions need their complete assertion windows.
+  test.setTimeout(90000);
   await boot(page);
   await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
   const form=page.locator('[data-home-guide-add="map"]');
@@ -423,6 +433,8 @@ test('release smoke: strategy sortie summary counts only its map and opens filte
 });
 
 test('release smoke: strategy sortie summary updates after recording deletion and map changes', async ({ page }) => {
+  // Two full app loads and native actions need their complete assertion windows.
+  test.setTimeout(90000);
   await boot(page);
   await page.evaluate(() => {hdSelectGuideMap('6-5');hdSLSave([]);hdWSShowElement('home',false);});
   const summary=page.locator('.hd-strategy-sortie-summary');
