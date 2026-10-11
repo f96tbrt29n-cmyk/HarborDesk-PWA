@@ -596,3 +596,79 @@ test('opening ASW remedies retain a known insufficient sync value for the exact 
  });
  expect(r.candidate.state).toMatchObject({status:'missing',value:99,threshold:100,source:'同じ装備での同期値'});expect(r.html).toContain('この同期値では発動不可');
 });
+test('non-ASW remedies locate compatible normal slots for radar night smoke and transport',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const rows=await page.evaluate(()=>[['電探','22号対水上電探'],['夜戦','照明弾'],['煙幕','発煙装置(煙幕)'],['輸送','大発動艇']].map(([kind,name])=>{
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name,count:1}]));
+  const plan={map:'1-1',index:0,ships:[{ship:'霞改二',items:[],expansion:null}],suggestion:{slots:[]}},requirements=[{kind,label:kind+'の準備',minCount:1}];plan.assessment={requirements,measure:hdOCMeasure(plan,requirements)};
+  const original=JSON.stringify(plan),goal=plan.assessment.measure.goals.find(x=>x.kind===kind),options=hdFLCountRemedies(plan,goal);plan.goalRemedies={[hdFLGoalKey(goal)]:options};
+  return {kind,name,options,html:hdFLGoalRemediesHtml(plan,goal),unchanged:original===JSON.stringify({...plan,goalRemedies:undefined})};
+ }));
+ for(const r of rows){expect(r.unchanged).toBe(true);const available=r.options.find(x=>x.available);expect(available).toMatchObject({ship:'霞改二',targetReady:true,count:1,changes:[{name:r.name,owned:1,free:1}]});expect(available.changes[0].slot).toBeLessThanOrEqual(3);expect(r.html).toContain('通常スロット');}
+ expect(rows.find(x=>x.kind==='夜戦').html).toContain('発動率の判定ではありません');expect(rows.find(x=>x.kind==='煙幕').html).toContain('展開率');
+});
+
+test('non-ASW remedies count used stock and explain loss of ready opening ASW',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  const sonar='三式水中探信儀',radar='22号対水上電探',db=hdFEFindShip('夕立改二'),masterId=hdShipDbMasterRowFor(db).id;
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:sonar,count:1},{name:radar,count:3}]));
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',gameShipId:71,masterId,gameAsw:100,gameAswGearKnown:true,gameGearSlots:[sonar,radar,radar],gameGearExpansion:'',gameSlotEx:0}]));
+  const plan={map:'1-1',index:0,ships:[{ship:'夕立改二',masterId,gameShipId:71,items:[sonar,radar,radar].map((name,slotIndex)=>({name,slotIndex,capacity:0})),expansion:null}],suggestion:{slots:[]}},requirements=[{kind:'電探',label:'電探3枠',minCount:3}];plan.assessment={requirements,measure:hdOCMeasure(plan,requirements)};
+  const goal=plan.assessment.measure.goals[0],ready=hdFEOpeningAsw(plan.ships[0],hdFLOaswScope(plan,0)),options=hdFLCountRemedies(plan,goal);plan.goalRemedies={[hdFLGoalKey(goal)]:options};const html=hdFLGoalRemediesHtml(plan,goal);
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:sonar,count:1},{name:radar,count:2}]));const scarce=hdFLCountRemedies(plan,goal);
+  return {ready,options,scarce:scarce.find(x=>x.changes[0].name===radar),html};
+ });
+ expect(r.ready.status).toBe('ready');expect(r.options.find(x=>x.available)).toMatchObject({changes:[{slot:1}],targetReady:true});expect(r.html).toContain('先制対潜が不可');expect(r.scarce).toMatchObject({available:false,missing:[{name:'22号対水上電探',need:1,owned:2}],changes:[{free:0}]});
+});
+
+test('speed remedies target the missing individual ship without borrowing a same-name ships set',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  const names=['改良型艦本式タービン','新型高温高圧缶','新型高温高圧缶'];localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:names[0],count:2},{name:names[1],count:4}]));
+  const plan={map:'1-1',index:0,ships:[{ship:'夕張改二特',items:names.map((name,slotIndex)=>({name,slotIndex,capacity:0})),expansion:null},{ship:'夕張改二特',items:[],expansion:null}],suggestion:{slots:[]},routeInfo:{text:'高速+',speedRequired:true}},requirements=[];plan.assessment={requirements,measure:hdOCMeasure(plan,requirements)};
+  const goal=plan.assessment.measure.goals.find(x=>x.kind==='speed-ship'&&!x.ok),options=hdFLSetRemedies(plan,goal);plan.goalRemedies={[hdFLGoalKey(goal)]:options};
+  const best=options.find(x=>x.available),trial=hdFOClone(plan);for(const c of best.changes)trial.ships[1].items.push({name:c.name,star:c.star,slotIndex:c.slot-1,capacity:0});
+  return {goal,options,after:hdOCMeasure(trial,requirements).goals.filter(x=>x.kind==='speed-ship'),html:hdFLGoalRemediesHtml(plan,goal),expansions:plan.ships.map(x=>x.expansion)};
+ });
+ expect(r.goal).toMatchObject({shipIndex:1,targetRank:15});expect(r.after.every(x=>x.ok)).toBe(true);const best=r.options.find(x=>x.available);expect(best.shipIndex).toBe(1);expect(best.changes).toHaveLength(3);expect(new Set(best.changes.map(x=>x.slot)).size).toBe(3);expect(best.tradeoffs).toEqual([]);expect(r.expansions).toEqual([null,null]);expect(r.html).toContain('高速+');expect(r.html).toContain('第2艦：夕張改二特');
+});
+
+test('speed remedies reuse a confirmed existing expansion turbine and require the actual improved boiler',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  const name='大和改二重',db=hdFEFindShip(name),masterId=hdShipDbMasterRowFor(db).id,turbine='改良型艦本式タービン',boiler='新型高温高圧缶';
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:turbine,count:1},{name:boiler,count:1,star:7}]));
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name,gameShipId:71,masterId,gameSlotEx:1}]));
+  const plan={map:'1-1',index:0,ships:[{ship:name,masterId,gameShipId:71,items:[],expansion:{name:turbine,star:0}}],suggestion:{slots:[]},routeInfo:{text:'高速+',speedRequired:true}},requirements=[];plan.assessment={requirements,measure:hdOCMeasure(plan,requirements)};
+  const goal=plan.assessment.measure.goals.find(x=>x.kind==='speed-ship'),options=hdFLSetRemedies(plan,goal);const best=options.find(x=>x.available);
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:turbine,count:1},{name:boiler,count:1,star:0}]));const scarce=hdFLSetRemedies(plan,goal);
+  return {best,scarce,expansion:plan.ships[0].expansion};
+ });
+ expect(r.best).toMatchObject({available:true,targetReady:true,changes:[{name:'新型高温高圧缶',star:7}]});expect(r.expansion.name).toBe('改良型艦本式タービン');expect(r.scarce.every(x=>!x.available)).toBe(true);expect(r.scarce.some(x=>x.missing.some(m=>m.name==='新型高温高圧缶'&&m.star===7))).toBe(true);
+});
+test('non-ASW remedy details are included in the quick loadout assessment on mobile',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ await page.evaluate(()=>{
+  const original=hdSEChecks;hdSEChecks=map=>({...original(map),rows:[{kind:'煙幕',label:'煙幕装備',minCount:1},{kind:'電探',label:'電探装備',minCount:1}]});
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'発煙装置(煙幕)',count:1},{name:'22号対水上電探',count:1}]));
+  const plan={map:'1-1',index:0,ships:[{ship:'霞改二',type:'駆逐艦',master:true,items:[],missing:[],expansion:null}],suggestion:{slots:[]},missing:[],used:{},owned:{}};hdFLUpdateAssessment(plan,true);
+  const host=document.createElement('section');host.id='other-remedy-test';host.innerHTML=hdFLPlanHtml(plan);document.body.appendChild(host);
+ });
+ const host=page.locator('#other-remedy-test');for(const kind of ['煙幕','電探']){const check=host.locator(`[data-hd-fl-goal="${kind}"]`);await expect(check).toContainText('不足');await check.locator('summary').click();await expect(check).toContainText('手持ちで交換可能');await expect(check).toContainText('この項目を充足');}
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('non-ASW set remedies complete anti-air and land equipment without consuming stock or opening expansion',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const rows=await page.evaluate(()=>[
+  ['cap-aa','秋月改',['10cm連装高角砲','10cm連装高角砲','22号対水上電探']],
+  ['cap-land-soft','摩耶改二',['三式弾']],
+  ['cap-land-mixed','霞改二',['大発動艇(八九式中戦車＆陸戦隊)','特二式内火艇']]
+ ].map(([kind,ship,names])=>{
+  const inventory=[...new Set(names)].map(name=>({name,count:names.filter(x=>x===name).length}));localStorage.setItem('harbordesk-equipment-v1',JSON.stringify(inventory));
+  const plan={map:'1-1',index:0,ships:[{ship,items:[],expansion:null}],suggestion:{slots:[]}},requirements=[{kind,label:kind,minCount:1}];plan.assessment={requirements,measure:hdOCMeasure(plan,requirements)};
+  const original=JSON.stringify(plan),options=hdFLSetRemedies(plan,plan.assessment.measure.goals[0]);return {kind,options,unchanged:original===JSON.stringify(plan),inventoryUnchanged:localStorage.getItem('harbordesk-equipment-v1')===JSON.stringify(inventory)};
+ }));
+ for(const r of rows){expect(r.unchanged&&r.inventoryUnchanged).toBe(true);expect(r.options.some(x=>x.available&&x.targetReady)).toBe(true);for(const x of r.options.filter(x=>x.available))expect(new Set(x.changes.map(c=>c.slot)).size).toBe(x.changes.length);}
+});
