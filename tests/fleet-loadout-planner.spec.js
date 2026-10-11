@@ -435,3 +435,59 @@ test('numeric remedies do not claim route readiness when a replacement only reac
  expect(candidate.value).toBeGreaterThanOrEqual(r.goal.minCount);
  expect(r.html).toContain('連戦損耗などの判定は未充足・要確認');expect(r.unresolved).toEqual([]);
 });
+
+test('ASW set remedies specify compatible slots while preserving a ready radar condition',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'三式水中探信儀',count:1},{name:'三式爆雷投射機',count:1},{name:'10cm連装高角砲',count:1},{name:'22号対水上電探',count:1}]));
+  const db=hdFEFindShip('夕立改二'),plan={map:'1-6',ships:[{ship:'夕立改二',masterId:db.id,items:[{name:'三式水中探信儀',slotIndex:0,capacity:0},{name:'10cm連装高角砲',slotIndex:1,capacity:0},{name:'22号対水上電探',slotIndex:2,capacity:0}],expansion:null}],suggestion:{slots:[]}};
+  const requirements=[{kind:'cap-asw',label:'対潜シナジー',minCount:1},{kind:'電探',label:'電探',minCount:1}],measure=hdOCMeasure(plan,requirements),goal=measure.goals.find(g=>g.kind==='cap-asw');
+  plan.assessment={requirements,measure};const original=JSON.stringify(plan),options=hdFLSetRemedies(plan,goal),best=options.find(x=>x.available);
+  const trial=structuredClone(plan);for(const change of best.changes){trial.ships[0].items=trial.ships[0].items.filter(x=>x.slotIndex!==change.slot-1);trial.ships[0].items.push({name:change.name,star:change.star,slotIndex:change.slot-1,capacity:0})}
+  return {options,unchanged:original===JSON.stringify(plan),after:hdOCMeasure(trial,requirements).goals,usage:hdFOAssignedUsage(trial),compatible:best.changes.every(x=>hdShipDbEquipCompatible(hdFEFind(x.name),db)),html:hdFLSetRemediesHtml(goal,options)};
+ });
+ expect(r.unchanged).toBe(true);expect(r.compatible).toBe(true);expect(r.after.every(g=>g.ok)).toBe(true);
+ expect(r.options.find(x=>x.available)).toMatchObject({ship:'夕立改二',changes:[{slot:2,old:'10cm連装高角砲',name:'三式爆雷投射機'}],tradeoffs:[],count:1,targetReady:true});
+ expect(Object.values(r.usage).every(n=>n===1)).toBe(true);expect(r.html).toContain('手持ちでセットを完成できる交換');expect(r.html).toContain('第2：10cm連装高角砲 → 三式爆雷投射機');
+});
+
+test('set remedies do not reuse an ASW set already assigned to another ship',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'三式水中探信儀',count:1},{name:'三式爆雷投射機',count:1}]));
+  const plan={map:'1-6',ships:[{ship:'夕立改二',items:[{name:'三式水中探信儀',slotIndex:0,capacity:0},{name:'三式爆雷投射機',slotIndex:1,capacity:0}],expansion:null},{ship:'時雨改二',items:[],expansion:null}],suggestion:{slots:[]}},requirements=[{kind:'cap-asw',label:'対潜シナジー',minCount:2}],measure=hdOCMeasure(plan,requirements),goal=measure.goals[0];
+  plan.assessment={requirements,measure};const options=hdFLSetRemedies(plan,goal);
+  return {before:goal.count,options,html:hdFLSetRemediesHtml(goal,options)};
+ });
+ expect(r.before).toBe(1);expect(r.options.length).toBeGreaterThan(0);expect(r.options.every(x=>!x.available&&x.ship==='時雨改二')).toBe(true);
+ expect(r.options[0].missing).toEqual(expect.arrayContaining([{name:'三式水中探信儀',star:0,need:1,owned:1},{name:'三式爆雷投射機',star:0,need:1,owned:1}]));
+ expect(r.html).toContain('不足分の補充が必要なセット');expect(r.html).toContain('追加で1個必要');expect(r.html).not.toContain('手持ちでセットを完成できる交換');expect(r.html).toContain('転用元の条件も確認');
+});
+
+test('AA set remedies respect ship restrictions repeated parts and unexpanded normal slots',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'10cm連装高角砲',count:2},{name:'22号対水上電探',count:1}]));
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'秋月改',gameSlotEx:0},{name:'夕立改二',gameSlotEx:0}]));
+  const plan={map:'1-6',ships:['夕立改二','秋月改'].map(ship=>({ship,items:[],expansion:null})),suggestion:{slots:[]}},requirements=[{kind:'cap-aa',label:'対空カットイン',minCount:1}],measure=hdOCMeasure(plan,requirements),goal=measure.goals[0];plan.assessment={requirements,measure};
+  const options=hdFLSetRemedies(plan,goal),available=options.filter(x=>x.available);
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'10cm連装高角砲',count:1},{name:'22号対水上電探',count:1}]));
+  const scarce=hdFLSetRemedies(plan,goal);return {available,scarce,expansions:plan.ships.map(x=>x.expansion),html:hdFLSetRemediesHtml(goal,options)};
+ });
+ expect(r.available.length).toBeGreaterThan(0);expect(r.available.every(x=>x.ship==='秋月改'&&x.targetReady)).toBe(true);
+ for(const x of r.available){expect(x.changes.filter(c=>c.name==='10cm連装高角砲')).toHaveLength(2);expect(new Set(x.changes.map(c=>c.slot)).size).toBe(x.changes.length);expect(x.changes.every(c=>c.slot>=1&&c.slot<=3)).toBe(true)}
+ expect(r.scarce.every(x=>!x.available)).toBe(true);expect(r.expansions).toEqual([null,null]);
+ await page.evaluate(html=>{const host=document.createElement('section');host.style.width='100%';host.innerHTML=html;document.body.replaceChildren(host)},r.html);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('set remedies warn when AA equipment competes with a ready ASW set',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'三式水中探信儀',count:1},{name:'三式爆雷投射機',count:1},{name:'10cm連装高角砲＋高射装置',count:1},{name:'13号対空電探改',count:1}]));
+  const plan={map:'1-6',ships:[{ship:'夕立改二',items:[{name:'三式水中探信儀',slotIndex:0,capacity:0},{name:'三式爆雷投射機',slotIndex:1,capacity:0},{name:'10cm連装高角砲＋高射装置',slotIndex:2,capacity:0}],expansion:null}],suggestion:{slots:[]}},requirements=[{kind:'cap-aa',label:'対空カットイン',minCount:1},{kind:'cap-asw',label:'対潜シナジー',minCount:1}],measure=hdOCMeasure(plan,requirements);plan.assessment={requirements,measure};
+  const goal=measure.goals.find(g=>g.kind==='cap-aa'),options=hdFLSetRemedies(plan,goal);return {readyAsw:measure.goals.find(g=>g.kind==='cap-asw').ok,options,html:hdFLSetRemediesHtml(goal,options)};
+ });
+ expect(r.readyAsw).toBe(true);expect(r.options.some(x=>x.available)).toBe(true);expect(r.options.filter(x=>x.available).every(x=>x.tradeoffs.includes('対潜シナジー'))).toBe(true);
+ expect(r.html).toContain('ただし 対潜シナジー が不足します。');expect(r.html).not.toContain('現在充足している装備条件を維持する候補です。');
+});
