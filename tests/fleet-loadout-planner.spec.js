@@ -584,3 +584,15 @@ test('opening ASW remedy UI warns about competing requirements and disappears af
  await check.locator('input').fill('100');await check.locator('input').press('Tab');await expect(check).toContainText('先制対潜：可能');await expect(check.locator('details')).toHaveCount(0);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
+
+test('opening ASW remedies retain a known insufficient sync value for the exact proposed gear',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  const db=hdFEFindShip('夕立改二'),masterId=hdShipDbMasterRowFor(db).id;
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'四式水中聴音機',count:1}]));
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',gameShipId:71,masterId,syncedAt:1,gameAsw:99,gameAswGearKnown:true,gameGearSlots:['四式水中聴音機','',''],gameGearExpansion:'',gameSlotEx:0}]));
+  const plan={map:'1-1',index:0,ships:[{ship:'夕立改二',gameShipId:71,masterId,items:[],expansion:null}],suggestion:{slots:[]}};
+  return {candidate:hdFLOaswRemedies(plan,0).find(x=>x.available),html:hdFLOaswRemediesHtml(plan,0)};
+ });
+ expect(r.candidate.state).toMatchObject({status:'missing',value:99,threshold:100,source:'同じ装備での同期値'});expect(r.html).toContain('この同期値では発動不可');
+});
