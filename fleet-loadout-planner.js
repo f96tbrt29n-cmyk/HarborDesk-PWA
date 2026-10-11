@@ -240,35 +240,47 @@ function hdFLAssessment(plan){
  return {measure,requirements,profiles:typeof hdSEProfiles==='function'?hdSEProfiles(plan.map):[],reviews:typeof hdOCReview==='function'?hdOCReview(plan,measure):[]};
 }
 function hdFLNumericRemedies(plan,goal){
- const kind=goal.kind==='air-value'?'制空':'索敵',usage=hdFOAssignedUsage(plan),inventory=[...hdFLInventory().values()],catalog=hdFLCatalog(),candidates=new Map();
- const score=x=>hdOCScore(kind,x);
- for(const x of inventory.filter(x=>hdOCItemMatches(kind,x)).sort((a,b)=>score(b)-score(a)).slice(0,5))candidates.set(x.key,x);
- for(const item of catalog.filter(x=>hdOCItemMatches(kind,x)).sort((a,b)=>score(b)-score(a)).slice(0,5)){const key=hdFLInventoryStackKey(item.name);if(!candidates.has(key))candidates.set(key,{key,name:item.name,star:0,item,count:0})}
- const options=[];
+ if(!['air-value','los-value'].includes(goal.kind)||goal.unresolved||!Number.isFinite(goal.count)||!Number.isFinite(goal.minCount))return [];
+ const kind=goal.kind==='air-value'?'制空':'索敵',usage=hdFOAssignedUsage(plan),inventory=[...hdFLInventory().values()].filter(x=>hdOCItemMatches(kind,x)),catalog=hdFLCatalog().filter(x=>hdOCItemMatches(kind,x)).sort((a,b)=>hdOCScore(kind,b)-hdOCScore(kind,a)),options=[];
+ const requirements=plan.assessment?.requirements||hdFLRequirements(plan),before=plan.assessment?.measure||hdOCMeasure(plan,requirements);
  for(const [si,ship] of plan.ships.entries()){
   const db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db);if(!profile)continue;
-  for(let index=0;index<profile.count;index++)for(const candidate of candidates.values()){
-   const slot={si,index,db,profile,capacity:profile.slots[index]},old=ship.items.find(x=>x.slotIndex===index);
-   if(!hdOCCompatible(slot,candidate)||hdFOStackKey(old)===candidate.key)continue;
-   const trial=hdFOClone(plan);trial.ships[si].items=trial.ships[si].items.filter(x=>x.slotIndex!==index);trial.ships[si].items.push(hdOCEquipment(candidate,slot));
-   const value=goal.kind==='air-value'?hdFEAir(hdFEAssigned(trial)).basePower:hdFEScouting(trial,hdFEAssigned(trial)).score;
-   const gain=value-goal.count;if(!(gain>0))continue;
-   const free=candidate.count-(usage[candidate.key]||0)+(hdFOStackKey(old)===candidate.key?1:0);
-   options.push({trial,name:candidate.name,star:candidate.star,ship:ship.ship,slot:index+1,old:old?.name||'空き枠',gain,value,available:free>0,owned:candidate.count,remaining:Math.max(0,goal.minCount-value)});
+  for(let index=0;index<profile.count;index++){
+   const slot={si,index,db,profile,capacity:profile.slots[index]},old=ship.items.find(x=>x.slotIndex===index),candidates=new Map();
+   // Check every owned stack, including weaker equipment below the catalog leaders.
+   for(const x of inventory)if(hdOCCompatible(slot,x))candidates.set(x.key,x);
+   // Acquisition examples are shortlisted only after this ship's compatibility check.
+   let added=0;
+   for(const item of catalog){const key=hdFLInventoryStackKey(item.name),candidate={key,name:item.name,star:0,item,count:0};if(candidates.has(key)||!hdOCCompatible(slot,candidate))continue;candidates.set(key,candidate);if(++added===5)break}
+   for(const candidate of candidates.values()){
+    if(hdFOStackKey(old)===candidate.key)continue;
+    const trial=hdFOClone(plan);trial.ships[si].items=trial.ships[si].items.filter(x=>x.slotIndex!==index);trial.ships[si].items.push(hdOCEquipment(candidate,slot));
+    const value=goal.kind==='air-value'?hdFEAir(hdFEAssigned(trial)).basePower:hdFEScouting(trial,hdFEAssigned(trial)).score,gain=value-goal.count;if(!Number.isFinite(value)||!(gain>0))continue;
+    const after=hdOCMeasure(trial,requirements),target=after.goals.find(g=>g.kind===goal.kind&&g.label===goal.label),tradeoffs=before.goals.filter(g=>g.ok&&after.goals.some(n=>n.kind===g.kind&&n.label===g.label&&!n.ok)).map(g=>g.label),free=Math.max(0,candidate.count-(usage[candidate.key]||0));
+    options.push({name:candidate.name,star:candidate.star,ship:ship.ship,slot:index+1,old:old?.name||'空き枠',gain,value,available:free>0,owned:candidate.count,free,remaining:Math.max(0,goal.minCount-value),targetReady:target?target.ok:value>=goal.minCount,tradeoffs});
+   }
   }
  }
- // Concrete single-slot improvements; an acquisition suggestion is not an allocation.
- options.sort((a,b)=>Number(b.available)-Number(a.available)||b.gain-a.gain);
- return [...new Map(options.map(x=>[x.name+'@@'+x.star,x])).values()].slice(0,3).map(({trial,...x})=>{const after=hdOCMeasure(trial,plan.assessment?.requirements||hdFLRequirements(plan));x.tradeoffs=(plan.assessment?.measure.goals||[]).filter(g=>g.ok&&after.goals.some(n=>n.kind===g.kind&&n.label===g.label&&!n.ok)).map(g=>g.label);return x});
+ // Prefer preserving satisfied requirements before chasing the largest numeric gain.
+ options.sort((a,b)=>a.tradeoffs.length-b.tradeoffs.length||Number(b.targetReady)-Number(a.targetReady)||b.gain-a.gain);
+ const seen=new Set(),unique=options.filter(x=>{const key=hdFLInventoryStackKey(x.name,x.star);if(seen.has(key))return false;seen.add(key);return true});
+ return [...unique.filter(x=>x.available).slice(0,3),...unique.filter(x=>x.owned&&!x.available).slice(0,1),...unique.filter(x=>!x.owned).slice(0,3)];
+}
+function hdFLRemediesHtml(goal,options){
+ const esc=hdFLEsc,number=n=>goal.kind==='los-value'?Number(n).toFixed(2):Math.ceil(Number(n)),metric=goal.kind==='air-value'?'基礎制空':'33式索敵';
+ return [['手持ちで補える交換',x=>x.available],['所持しているがこの配備案で使用中',x=>x.owned&&!x.available],['入手して補う候補',x=>!x.owned]].map(([title,filter])=>{
+  const rows=options.filter(filter);if(!rows.length)return '';
+  return `<div class="hd-fl-remedy-group"><h5>${esc(title)}</h5>${rows.map(x=>`<p class="hd-fl-remedy"><b>${esc(x.name)}${x.star?' ★'+x.star:''}</b>（${x.available?'手持ちで交換可能':x.owned?'所持品を他の枠に配備中':'入手候補'}）<br>所持 ${x.owned}個・この配備案で未使用 ${x.free}個<br>${esc(x.ship)} 第${x.slot}：${esc(x.old)}と交換すると${metric} ${number(goal.count)} → ${number(x.value)}（+${number(x.gain)}）。${x.remaining?`目安まであと ${number(x.remaining)}`:x.targetReady?'登録済みのこの項目を充足':'基礎値の目安に到達。連戦損耗などの判定は未充足・要確認'}。${x.tradeoffs.length?`<strong>ただし ${esc(x.tradeoffs.join('・'))} が不足します。</strong>`:'現在充足している装備条件を維持する候補です。'}${x.owned&&!x.available?'転用元の装備条件も見直してね。':''}${!x.owned&&typeof hdEquipWikiUrl==='function'?`<br><a class="guide-link" href="${esc(hdEquipWikiUrl(x.name))}" target="_blank" rel="noopener">入手方法を攻略Wikiで確認 ↗</a>`:''}他の条件は再配備で確認。</p>`).join('')}</div>`;
+ }).join('');
 }
 function hdFLAssessmentHtml(plan){
  const a=plan.assessment;if(!a)return '<p class="hd-fl-note">攻略条件の判定を読み込み中。再配備して確認してね。</p>';
- const esc=hdFLEsc,goals=a.measure.goals,number=(n,k)=>k==='los-value'?Number(n).toFixed(2):Math.ceil(Number(n));
+ const esc=hdFLEsc,goals=a.measure.goals;
  return `<section class="hd-fl-checks"><h4>攻略に必要な装備・数値</h4><p>${plan.searching?'海域の対策装備を手持ちから配備中…':goals.length&&goals.every(g=>g.ok)?'登録済みの装備目安は充足。下の注意点も確認してね。':'不足・未判定の項目があります。補う装備と注意点を確認してね。'}</p>${goals.map(g=>{
   const numeric=['air-value','los-value'].includes(g.kind),profile=a.profiles.find(x=>x.kind===g.kind),stock=!g.ok&&typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[g.kind]?hdSECapabilityStock(plan,g.kind):null;
   const remedies=!g.ok&&!g.unresolved&&numeric?(plan.numericRemedies?.[g.kind]||[]):[];
   const examples=!g.ok&&!numeric&&!stock?hdSECandidates(g.kind,3).filter(x=>plan.ships.some(s=>{const db=hdFEFindShip(s.ship);return db&&hdShipDbEquipCompatible(x,db)})).map(x=>x.name):[];
-  return `<article class="hd-fl-check ${g.ok?'ready':g.unresolved?'manual':'missing'}" data-hd-fl-goal="${esc(g.kind)}"><b>${esc(g.label)}：${g.ok?'充足':g.unresolved?'未判定':'不足'}</b><p>${esc(g.detail)}</p>${profile?`<small>${esc(profile.importance)}：${esc(profile.reason)} ${esc(profile.note)}</small>`:''}${stock?`<p><b>補う装備：</b>${esc(stock.recipe.name)}。同じ艦に組み合わせて配備。</p>${stock.parts.map(p=>`<small>${esc(p.label)}：所持 ${p.have}/${p.need} ${esc(p.items.length?p.items.join('、'):HD_SE_PARTS[p.part].examples.join('、'))}</small>`).join('')}${stock.complete?'<p>手持ちにセットあり。装備できる艦・配備枠・他の条件との両立を見直してね。探索で見つからない組み合わせもあります。</p>':''}`:''}${remedies.map(x=>`<p class="hd-fl-remedy"><b>${esc(x.name)}${x.star?' ★'+x.star:''}</b>（${x.available?'手持ちで交換可能':x.owned?'所持品を他の枠に配備中':'入手候補'}）<br>${esc(x.ship)} 第${x.slot}：${esc(x.old)}と交換すると${g.kind==='air-value'?'基礎制空':'33式索敵'} ${number(g.count,g.kind)} → ${number(x.value,g.kind)}（+${number(x.gain,g.kind)}）。${x.remaining?`目安まであと ${number(x.remaining,g.kind)}`:'この数値の目安に到達'}。${x.tradeoffs.length?'ただし '+esc(x.tradeoffs.join('・'))+' が不足します。':''}他の条件は再配備で確認。</p>`).join('')}${!g.ok&&numeric&&!g.unresolved&&!remedies.length?'<p>この編成の確認済み枠で、単独の交換により数値を増やす候補は見つかりません。搭載数・艦種・複数枠の変更や補充を見直してね。</p>':''}${examples.length?`<p>補う装備候補：${esc(examples.join('、'))}</p>`:''}</article>`;
+  return `<article class="hd-fl-check ${g.ok?'ready':g.unresolved?'manual':'missing'}" data-hd-fl-goal="${esc(g.kind)}"><b>${esc(g.label)}：${g.ok?'充足':g.unresolved?'未判定':'不足'}</b><p>${esc(g.detail)}</p>${profile?`<small>${esc(profile.importance)}：${esc(profile.reason)} ${esc(profile.note)}</small>`:''}${stock?`<p><b>補う装備：</b>${esc(stock.recipe.name)}。同じ艦に組み合わせて配備。</p>${stock.parts.map(p=>`<small>${esc(p.label)}：所持 ${p.have}/${p.need} ${esc(p.items.length?p.items.join('、'):HD_SE_PARTS[p.part].examples.join('、'))}</small>`).join('')}${stock.complete?'<p>手持ちにセットあり。装備できる艦・配備枠・他の条件との両立を見直してね。探索で見つからない組み合わせもあります。</p>':''}`:''}${hdFLRemediesHtml(g,remedies)}${!g.ok&&numeric&&!g.unresolved&&!remedies.length?'<p>この編成の確認済み枠で、単独の交換により数値を増やす候補は見つかりません。搭載数・艦種・複数枠の変更や補充を見直してね。</p>':''}${examples.length?`<p>補う装備候補：${esc(examples.join('、'))}</p>`:''}</article>`;
  }).join('')}<h4>攻略する上での注意点</h4>${[...new Set([...a.measure.manual,...a.reviews.map(x=>`${x.title}：${x.reason} ${x.next}`)])].map(x=>`<p>${esc(x)}</p>`).join('')||'<p>登録済みの装備目安です。ゲーム側にも同じ装備を配備してね。</p>'}${plan.searchError?'<p>対策装備の探索を完了できませんでした。再配備でやり直してね。</p>':''}<small>制空は熟練度なしの基礎値。対策装備の推奨とルートの必須条件は区別して確認。探索で見つからない組み合わせもあります。</small></section>`;
 }
 function hdFLUpdateAssessment(plan,remedies=false){

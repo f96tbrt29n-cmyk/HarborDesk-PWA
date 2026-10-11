@@ -379,3 +379,59 @@ test('quick assessment subtracts synced current equipment LOS and matches the im
  });
  expect(r.score).toBeCloseTo(r.expected,6);expect(r.score).toBeCloseTo(r.calculator,6);expect(r.unknown).toBe(false);
 });
+
+
+test('numeric remedies retain a weaker owned radar when stronger equipment cannot fit the ship',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  HD_MAP_ADVANCED_DATA['1-1']={los:{coef:3,checks:[{safe:45,failBelow:10}]}};
+  localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:100}));
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',gameShipId:71,gameLos:36}]));
+  const names=['紫雲','零式水上観測機','零式水上偵察機','彩雲','二式艦上偵察機','22号対水上電探'];
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify(names.map(name=>({name,count:1}))));
+  const db=hdFEFindShip('夕立改二'),plan={map:'1-1',ships:[{ship:'夕立改二',gameShipId:71,masterId:db.id,items:[],expansion:null}],suggestion:{slots:[]}};
+  hdFLUpdateAssessment(plan,true);
+  const goal=plan.assessment.measure.goals.find(g=>g.kind==='los-value'),options=plan.numericRemedies['los-value'];
+  return {options,html:hdFLAssessmentHtml(plan),above:names.slice(0,5).map(n=>hdOCScore('索敵',hdFEFind(n))),radarScore:hdOCScore('索敵',hdFEFind(names[5])),compatible:options.map(x=>hdShipDbEquipCompatible(hdFEFind(x.name),db)),gap:goal.minCount-goal.count};
+ });
+ expect(r.above.every(x=>x>r.radarScore)).toBe(true);
+ expect(r.options.find(x=>x.name==='22号対水上電探')).toMatchObject({available:true,owned:1,free:1});
+ expect(r.compatible.every(Boolean)).toBe(true);expect(r.html).toContain('手持ちで補える交換');expect(r.html).toContain('入手して補う候補');expect(r.html).toContain('所持 1個・この配備案で未使用 1個');expect(r.gap).toBeGreaterThan(0);
+});
+
+test('numeric remedies preserve the ASW set and distinguish gear already consumed by this plan',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  HD_MAP_ADVANCED_DATA['1-1']={los:{coef:3,checks:[{safe:45,failBelow:10}]}};
+  localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:100}));
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',gameShipId:71,gameLos:36}]));
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'三式水中探信儀',count:1},{name:'三式爆雷投射機',count:1},{name:'22号対水上電探',count:1},{name:'33号水上電探',count:1}]));
+  const db=hdFEFindShip('夕立改二'),plan={map:'1-1',ships:[{ship:'夕立改二',gameShipId:71,masterId:db.id,items:[{name:'三式水中探信儀',slotIndex:0,capacity:0},{name:'三式爆雷投射機',slotIndex:1,capacity:0},{name:'22号対水上電探',slotIndex:2,capacity:0}],expansion:null}],suggestion:{slots:[]}};
+  const req=[{kind:'cap-asw',label:'対潜セット',minCount:1}],before=hdOCMeasure(plan,req),goal=before.goals.find(g=>g.kind==='los-value');
+  plan.assessment={requirements:req,measure:before};const unchanged=JSON.stringify(plan),options=hdFLNumericRemedies(plan,goal),html=hdFLRemediesHtml(goal,options);
+  return {options,html,unchanged:unchanged===JSON.stringify(plan),aswReady:before.goals.find(g=>g.kind==='cap-asw').ok};
+ });
+ expect(r.aswReady).toBe(true);expect(r.unchanged).toBe(true);
+ expect(r.options.find(x=>x.name==='33号水上電探')).toMatchObject({available:true,slot:3,old:'22号対水上電探',tradeoffs:[]});
+ expect(r.options.find(x=>x.name==='22号対水上電探')).toMatchObject({available:false,owned:1,free:0});
+ expect(r.html).toContain('所持しているがこの配備案で使用中');expect(r.html).toContain('転用元の装備条件も見直して');
+});
+
+
+test('numeric remedies do not claim route readiness when a replacement only reaches starting air',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  HD_MAP_AIR_DATA['99-2']={source:'fixture',nodes:Object.fromEntries(['A','B'].map(id=>[id,{label:id+'：通常戦',patterns:[{enemy:'空母ヲ級',air:40}]}]))};
+  hdMapAirSave('99-2','A',true);hdMapAirSave('99-2','B',true);hdMapAirConfirmOrder('99-2');
+  const db=hdFEFindShip('加賀改');
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'加賀改',gameShipId:71,gameOnslot:[0,0,46,0]}]));
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'零式艦戦52型(熟練)',count:1}]));
+  const plan={map:'99-2',ships:[{ship:'加賀改',gameShipId:71,masterId:db.id,items:[{name:'零式艦戦21型',slotIndex:2,capacity:46}],expansion:null}],suggestion:{slots:[]}};
+  hdFLUpdateAssessment(plan,true);const goal=plan.assessment.measure.goals.find(g=>g.kind==='air-value'),options=plan.numericRemedies['air-value'];
+  return {goal,options,html:hdFLRemediesHtml(goal,options),unresolved:hdFLNumericRemedies(plan,{...goal,unresolved:true})};
+ });
+ const candidate=r.options.find(x=>x.name==='零式艦戦52型(熟練)');
+ expect(candidate).toMatchObject({available:true,slot:3,remaining:0,targetReady:false});
+ expect(candidate.value).toBeGreaterThanOrEqual(r.goal.minCount);
+ expect(r.html).toContain('連戦損耗などの判定は未充足・要確認');expect(r.unresolved).toEqual([]);
+});
