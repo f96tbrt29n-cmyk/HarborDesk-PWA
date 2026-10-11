@@ -672,3 +672,55 @@ test('non-ASW set remedies complete anti-air and land equipment without consumin
  }));
  for(const r of rows){expect(r.unchanged&&r.inventoryUnchanged).toBe(true);expect(r.options.some(x=>x.available&&x.targetReady)).toBe(true);for(const x of r.options.filter(x=>x.available))expect(new Set(x.changes.map(c=>c.slot)).size).toBe(x.changes.length);}
 });
+test('night CI evaluates the actual basic priority and excludes midget submarines and invalid slots',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdFENightCI==='function');
+ const r=await page.evaluate(()=>{
+  const check=(ship,names)=>hdFENightCI({ship,items:names.map((name,slotIndex)=>({name,slotIndex,capacity:0})),expansion:null}),gun='20.3cm連装砲',torpedo='61cm四連装(酸素)魚雷',secondary='15.5cm三連装副砲';
+  const ship={ship:'北上改二',items:[{name:'甲標的 甲型',slotIndex:0,capacity:0},{name:'20.3cm連装砲',slotIndex:1,capacity:0}],expansion:null},before=JSON.stringify(ship),state=hdFENightCI(ship);
+  return {main:check('最上改二',[gun,gun,gun,torpedo]),secondary:check('最上改二',[gun,gun,secondary,torpedo]),torpedo:check('最上改二',[gun,torpedo,torpedo,secondary]),mixed:check('最上改二',[gun,torpedo]),double:check('最上改二',[gun,gun]),midget:state,unchanged:before===JSON.stringify(ship),carrier:check('加賀改',[]),sub:check('伊58改',[torpedo,torpedo]),invalid:hdFENightCI({ship:'最上改二',items:[{name:gun,slotIndex:0},{name:gun,slotIndex:0},{name:gun,slotIndex:1}],expansion:null}),html:hdFENightCIHtml({ship:'夕立改二',items:[{name:torpedo,slotIndex:0},{name:torpedo,slotIndex:1}],expansion:null})};
+ });
+ expect(r.main).toMatchObject({status:'ready',attack:'main'});expect(r.secondary).toMatchObject({status:'ready',attack:'main-secondary'});expect(r.torpedo).toMatchObject({status:'ready',attack:'torpedo'});expect(r.mixed.attack).toBe('mixed');expect(r.double).toMatchObject({status:'missing',attack:'double'});expect(r.midget).toMatchObject({status:'missing',torpedo:0});expect(r.unchanged).toBe(true);for(const k of ['carrier','sub','invalid'])expect(r[k].status).toBe('manual');expect(r.html).toContain('発動確定・発動率');
+});
+
+test('night CI search clears a competing main gun and never refills it to break the selected cutin',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  const gun='20.3cm連装砲',torpedo='61cm四連装(酸素)魚雷';localStorage.setItem(HD_SE_NIGHT_POLICY_KEY,JSON.stringify({'1-1':'mixed'}));localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:gun,count:3},{name:torpedo,count:1}]));
+  const c={map:'1-1',index:0,preset:null,fleet:{id:'night-priority',ships:[{ship:'最上改二',gear:[gun,gun,gun,torpedo].join(' / ')}]}},result=hdOCSearch(c),goal=result.measure.goals.find(g=>g.kind==='cap-night-mixed'),usage=hdFOAssignedUsage(result.plan);
+  const plan=hdFEPlanFromSavedFleet('1-1',c.fleet);plan.assessment={requirements:[{kind:'cap-night-mixed',label:goal.label,minCount:1}],measure:hdOCMeasure(plan,[{kind:'cap-night-mixed',label:goal.label,minCount:1}])};const options=hdFLSetRemedies(plan,plan.assessment.measure.goals.find(g=>g.kind==='cap-night-mixed'));
+  return {goal,state:hdFENightCI(result.plan.ships[0]),items:result.plan.ships[0].items,usage,options,expansion:result.plan.ships[0].expansion};
+ });
+ expect(r.goal.ok).toBe(true);expect(r.state).toMatchObject({attack:'mixed',main:2,torpedo:1});expect(r.items).toHaveLength(3);expect(r.expansion).toBeNull();expect(Object.keys(r.usage).every(x=>!x.startsWith('@@'))).toBe(true);expect(r.options.some(x=>x.available&&x.changes.some(c=>c.name==='空き枠'))).toBe(true);
+});
+
+test('night CI counts a same-ship set and reports missing owned torpedoes without inventing stock',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  const torpedo='61cm四連装(酸素)魚雷',ships=['夕立改二','時雨改二'].map(ship=>({ship,items:[{name:torpedo,slotIndex:0,capacity:0}],expansion:null})),split=hdSECapabilityMeasure({ships},'cap-night-torpedo');
+  localStorage.setItem(HD_SE_NIGHT_POLICY_KEY,JSON.stringify({'1-1':'torpedo'}));localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:torpedo,count:1}]));const plan={map:'1-1',index:0,ships:[{ship:'夕立改二',items:[],expansion:null}],suggestion:{slots:[]}},requirements=[{kind:'cap-night-torpedo',label:'魚雷CI',minCount:1}];plan.assessment={requirements,measure:hdOCMeasure(plan,requirements)};
+  const original=JSON.stringify(plan),options=hdFLSetRemedies(plan,plan.assessment.measure.goals.find(g=>g.kind==='cap-night-torpedo'));
+  const unknown=hdOCMeasure({map:'1-1',ships:[{ship:'加賀改',items:[],expansion:null}]},requirements).goals.find(g=>g.kind==='cap-night-torpedo');return {split,options,unchanged:original===JSON.stringify(plan),unknown};
+ });
+ expect(r.split.count).toBe(0);expect(r.options.length).toBeGreaterThan(0);expect(r.options.every(x=>!x.available)).toBe(true);expect(r.options.some(x=>x.missing.some(m=>m.name==='61cm四連装(酸素)魚雷'&&m.need===1&&m.owned===1))).toBe(true);expect(r.unchanged).toBe(true);expect(r.unknown.unresolved).toBe(true);
+});
+
+test('night CI policy selection regenerates the quick owned loadout and persists across reloads',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ await page.evaluate(()=>{
+  const db=hdFEFindShip('夕立改二'),masterId=hdShipDbMasterRowFor(db).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'12.7cm連装砲',count:3},{name:'61cm四連装(酸素)魚雷',count:2}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',masterId,gameShipId:71,level:90,gameSlotEx:0}]));
+  hdFSMap=()=> '1-1';hdFSPlans=()=>[{index:0,preset:{name:'night fixture'},needs:[],slots:[{profile:{row:{name:'夕立改二',masterId,gameShipId:71,level:90},type:'駆逐艦',roles:[]}}]}];
+  const card=document.createElement('article');card.id='night-policy-test';card.className='hd-fs-card';card.innerHTML='<button data-hd-fl-generate="0">自動配備</button><div class="hd-fl-host"></div>';document.body.appendChild(card);hdFLRender(0,card);
+ });
+ const card=page.locator('#night-policy-test');await card.locator('[data-hd-night-policy]').selectOption('torpedo');
+ await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightCI(p.ships[0]).attack})).toBe('torpedo');await expect(card).toContainText('夜戦汎用CI装備条件：成立');
+ const r=await page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return {policy:hdSENightPolicy('1-1'),goal:p.assessment.measure.goals.find(g=>g.kind==='cap-night-torpedo'),usage:hdFOAssignedUsage(p),expansion:p.ships[0].expansion}});expect(r.policy).toBe('torpedo');expect(r.goal.ok).toBe(true);expect(r.usage['61cm四連装(酸素)魚雷@@0']).toBe(2);expect(r.expansion).toBeNull();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('torpedo');
+});
+test('night CI selected recipes automatically assemble all four supported generic cutins from owned gear',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const rows=await page.evaluate(()=>[['torpedo',['61cm四連装(酸素)魚雷','61cm四連装(酸素)魚雷']],['main',['20.3cm連装砲','20.3cm連装砲','20.3cm連装砲']],['main-secondary',['20.3cm連装砲','20.3cm連装砲','15.5cm三連装副砲']],['mixed',['20.3cm連装砲','61cm四連装(酸素)魚雷']]].map(([policy,names])=>{
+  localStorage.setItem(HD_SE_NIGHT_POLICY_KEY,JSON.stringify({'1-1':policy}));const inventory=[...new Set(names)].map(name=>({name,count:names.filter(x=>x===name).length}));localStorage.setItem('harbordesk-equipment-v1',JSON.stringify(inventory));
+  const result=hdOCSearch({map:'1-1',index:0,preset:null,fleet:{id:'night-'+policy,ships:[{ship:'最上改二',gear:''}]}},{}),state=hdFENightCI(result.plan.ships[0]);return {policy,state,goal:result.measure.goals.find(g=>g.kind===hdSENightKind('1-1')),usage:hdFOAssignedUsage(result.plan),inventory,expansion:result.plan.ships[0].expansion};
+ }));
+ for(const r of rows){expect(r.state).toMatchObject({status:'ready',attack:r.policy});expect(r.goal.ok).toBe(true);expect(r.expansion).toBeNull();for(const x of r.inventory)expect(r.usage[x.name+'@@0']||0).toBeLessThanOrEqual(x.count);}
+});

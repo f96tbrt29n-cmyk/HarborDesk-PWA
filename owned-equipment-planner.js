@@ -6,7 +6,7 @@ function hdOCContext(map,fleetId='',route=''){
  const presets=typeof hdMSNPresets==='function'?hdMSNPresets(map):[],index=route===''?(typeof hdMSNRouteIndex==='function'?hdMSNRouteIndex(map,presets):0):Number(route);
  return {map,fleet,preset:presets[index]||null,index};
 }
-function hdOCSignature(c){return JSON.stringify([c.map,c.fleet,c.preset,hdFLRows(),hdFERoster(),localStorage.getItem('harbordesk-kancolle-sync-v1'),typeof hdMapAirSelection==='function'?hdMapAirSelection(c.map):null])}
+function hdOCSignature(c){return JSON.stringify([c.map,c.fleet,c.preset,hdSENightPolicy(c.map),hdFLRows(),hdFERoster(),localStorage.getItem('harbordesk-kancolle-sync-v1'),typeof hdMapAirSelection==='function'?hdMapAirSelection(c.map):null])}
 function hdOCUseFleet(map,id){
  if(!hdSPSFleets(map).some(f=>String(f.id)===String(id)))return false;
  if(typeof hdMSNFleetByMap!=='undefined')hdMSNFleetByMap[map]=id;
@@ -71,7 +71,7 @@ function hdOCSpeedPart(item){
 function hdOCItemMatches(kind,item){if(typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[kind])return HD_SE_RECIPES[kind].some(r=>r.parts.some(part=>hdSEPartMatches(part,item)));return kind==='speed-turbine'?hdOCSpeedPart(item)==='turbine':kind==='speed-boiler'?hdOCSpeedPart(item)==='boiler':hdFOItemMatches(kind,item)}
 function hdOCMeasure(plan,requirements,unknown=[]){
  const items=hdOCAssigned(plan),air=hdFEAirCheck(plan.map,hdFEAir(items)),scouting=hdFEScouting(plan,items),speedTarget=hdFESpeedTarget(plan.routeInfo),speedGoals=speedTarget?(plan.ships||[]).flatMap((s,shipIndex)=>s.ship?[{...hdFESpeedGoal(s,speedTarget),shipIndex,targetRank:speedTarget}]:[]):[];
- const goals=requirements.filter(r=>!speedTarget||r.kind!=='高速化').map(r=>{const cap=typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[r.kind]?hdSECapabilityMeasure(plan,r.kind):null,m=cap||hdFEKindCount(r.kind,items),count=r.kind==='高速化'?plan.ships.reduce((n,ship)=>n+Number(hdFEKindCount('高速化',hdOCAssigned({ships:[ship]})).count>0),0):Number(m.count)||0;return {...r,count,ok:count>=r.minCount,detail:cap?`同じ艦の推奨セット ${count} / 目安 ${r.minCount}組` :r.kind==='高速化'?`同じ艦の標準セット ${count} / 目安 ${r.minCount}組`:`配備 ${count} / 目安 ${r.minCount}`,ratio:cap?cap.ratio:Math.min(1,count/r.minCount)}});
+ const goals=requirements.filter(r=>!speedTarget||r.kind!=='高速化').map(r=>{const cap=typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[r.kind]?hdSECapabilityMeasure(plan,r.kind):null,m=cap||hdFEKindCount(r.kind,items),count=r.kind==='高速化'?plan.ships.reduce((n,ship)=>n+Number(hdFEKindCount('高速化',hdOCAssigned({ships:[ship]})).count>0),0):Number(m.count)||0;return {...r,count,...(cap?.unresolved?{unresolved:true}:{}),ok:count>=r.minCount,detail:cap?`同じ艦の推奨セット ${count} / 目安 ${r.minCount}組` :r.kind==='高速化'?`同じ艦の標準セット ${count} / 目安 ${r.minCount}組`:`配備 ${count} / 目安 ${r.minCount}`,ratio:cap?cap.ratio:Math.min(1,count/r.minCount)}});
  if(air.enemy&&!(typeof hdSEAirOptional==='function'&&hdSEAirOptional(plan.map)))goals.push({kind:'air-value',label:air.goal==='superiority'?'制空優勢の目安':`制空${HD_MAP_AIR_GOALS[air.goal]}の目安`,count:air.ours,minCount:air.required,ok:air.status==='ready',unresolved:air.reason==='anti-air',ratio:Math.min(1,air.ours/Math.max(1,air.required),air.routeLoss?.known?air.routeLoss.minimumRatio:1),detail:`基礎制空 ${air.ours} / 目安 ${air.required}（あと ${Math.max(0,air.required-air.ours)}）${air.reason==='route'?'。通るマス未選択のため参考値・未充足扱い':air.reason==='anti-air'?'。敵防空データ不足のため未判定。装備不足とは限りません':''}${air.routeLoss?.firstGap?`。連戦モデル ${air.routeLoss.firstGap.id}・${air.routeLoss.firstGap.round}回目であと${air.routeLoss.firstGap.gap}不足`:''}`});
  if(scouting.available){const target=Math.max(...scouting.checks.map(x=>Number(x.safe)||0));goals.push({kind:'los-value',label:'索敵分岐の安全域',count:scouting.score,minCount:target,ok:scouting.status==='ready',ratio:Math.max(0,Math.min(1,scouting.score/Math.max(1,target))),detail:`33式 ${scouting.score.toFixed(2)} / 安全域 ${target}（あと ${Math.max(0,target-scouting.score).toFixed(2)}）`})}
  // A global turbine/can total does not prove that a low-speed ship is sped up.
@@ -106,7 +106,7 @@ function* hdOCSearchSteps(c,limits={}){
   if(typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[kind])for(const part of new Set(HD_SE_RECIPES[kind].flatMap(r=>r.parts))){for(const x of compatible.filter(x=>hdSEPartMatches(part,x)).sort((a,b)=>hdOCScore(kind,b)-hdOCScore(kind,a)).slice(0,3))picked.set(x.key,x)}
   const sorted=compatible.filter(x=>hdOCItemMatches(kind,x)).sort((a,b)=>hdOCScore(kind,b)-hdOCScore(kind,a));
   for(const x of sorted.slice(0,5))picked.set(x.key,x);if(kind==='高速化')for(const turbine of [true,false])for(const x of sorted.filter(x=>/タービン/.test(x.name)===turbine).slice(0,3))picked.set(x.key,x);
- }return [...picked.values()]});
+ }return [...picked.values(),...(!slot.expansion&&requirements.some(r=>r.kind.startsWith('cap-night-'))?[{key:'',name:'',star:0,item:{name:'',category:'',stats:{}},count:Infinity}]:[])]});
  const initial={plan,measure:hdOCMeasure(plan,requirements,unknown)},seen=new Set([hdOCKey(plan)]);let beam=[initial],best=initial,examined=0;
  for(let depth=0;depth<Math.min(slots.length,maxDepth)&&!best.measure.goals.every(x=>x.ok)&&examined<maxExamined;depth++){
   const next=[];
@@ -133,7 +133,8 @@ function* hdOCSearchSteps(c,limits={}){
   const ship=best.plan.ships[slot.si];if(ship.items[slot.index]?.name)continue;
   const kind=hdFLSlotKind({profile:{type:ship.type,row:{name:ship.ship}}},slot.index);
   const candidates=inventory.filter(x=>(usage[x.key]||0)<x.count&&hdOCCompatible(slot,x)&&hdFLKindMatch(x.item,kind)).sort((a,b)=>hdFLScoreBase(b.item,b)-hdFLScoreBase(a.item,a));
-  if(candidates[0]){ship.items[slot.index]=hdOCEquipment(candidates[0],slot);usage[candidates[0].key]=(usage[candidates[0].key]||0)+1;}
+  const candidate=candidates.find(row=>{if(!requirements.some(r=>r.kind.startsWith('cap-night-')))return true;const trial=hdFOClone(best.plan);trial.ships[slot.si].items[slot.index]=hdOCEquipment(row,slot);const after=hdOCMeasure(trial,requirements,unknown);return !best.measure.goals.some(g=>g.kind.startsWith('cap-night-')&&g.ok&&after.goals.some(n=>n.kind===g.kind&&!n.ok))});
+  if(candidate){ship.items[slot.index]=hdOCEquipment(candidate,slot);usage[candidate.key]=(usage[candidate.key]||0)+1;}
  }
  best.measure=hdOCMeasure(best.plan,requirements,unknown);
  const speedNeed=best.measure.goals.find(x=>x.kind==='speed-turbine')?.minCount||0;
@@ -318,8 +319,8 @@ function hdOCInlinePanel(map,fleetId){
 function hdOCInlineRefresh(){if(typeof renderCustomFleets==='function'&&typeof selectedMap!=='undefined'&&selectedMap)renderCustomFleets(selectedMap)}
 document.addEventListener('change',e=>{if(e.target.id==='hdMapStrategyRoute'){setTimeout(hdOCInlineRefresh,0);return}if(!e.target.matches?.('[data-hd-oc-inline-route]'))return;const map=e.target.dataset.hdOcMap,index=Number(e.target.value);if(typeof hdMapRouteSet==='function'){if(!hdMapRouteSet(map,index))hdOCRefresh();return}if(typeof hdMSNRouteByMap!=='undefined')hdMSNRouteByMap[map]=index;hdOCRefresh()});
 window.addEventListener('hd:map-route-changed',hdOCRefresh);
-['hd:equipment-changed','hd:kancolle-sync','hd:custom-fleets-changed','hd:ship-identity-changed','hd:workspace-refresh'].forEach(event=>window.addEventListener(event,hdOCInlineRefresh));
-window.addEventListener('storage',e=>{if(e.key==='harbordesk-map-routes-v1'){hdOCRefresh();return}if(e.key===null||['harbordesk-custom-fleets-v1','harbordesk-equipment-v1','harbordesk-ship-roster-v1','harbordesk-kancolle-sync-v1'].includes(e.key))hdOCInlineRefresh()});
+['hd:night-ci-policy','hd:equipment-changed','hd:kancolle-sync','hd:custom-fleets-changed','hd:ship-identity-changed','hd:workspace-refresh'].forEach(event=>window.addEventListener(event,hdOCInlineRefresh));
+window.addEventListener('storage',e=>{if(e.key==='harbordesk-map-routes-v1'){hdOCRefresh();return}if(e.key===null||[HD_SE_NIGHT_POLICY_KEY,'harbordesk-custom-fleets-v1','harbordesk-equipment-v1','harbordesk-ship-roster-v1','harbordesk-kancolle-sync-v1'].includes(e.key))hdOCInlineRefresh()});
 window.addEventListener('hd:map-air-changed',()=>hdOCRefresh());
 function hdOCRefresh(){hdOCInlineRefresh();if(typeof hdRenderMapEquipmentRecommendations==='function')hdRenderMapEquipmentRecommendations();if(typeof hdMSNRender==='function')hdMSNRender()}
 document.addEventListener('click',e=>{

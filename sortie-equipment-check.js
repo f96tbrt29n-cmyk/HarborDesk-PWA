@@ -54,7 +54,10 @@ const HD_SE_PARTS={
  type3:{label:'三式弾系',examples:['三式弾','三式弾改']},
  tank:{label:'陸戦隊系',examples:['大発動艇(八九式中戦車＆陸戦隊)','特大発動艇＋戦車第11連隊']},
  amphibious:{label:'内火艇系',examples:['特二式内火艇']},
- rocket:{label:'対地ロケット',examples:['WG42 (Wurfgerät 42)','艦載型 四式20cm対地噴進砲']}
+ rocket:{label:'対地ロケット',examples:['WG42 (Wurfgerät 42)','艦載型 四式20cm対地噴進砲']},
+ nightMain:{label:'主砲',examples:['12.7cm連装砲','20.3cm連装砲','35.6cm連装砲']},
+ nightSecondary:{label:'副砲',examples:['15.5cm三連装副砲']},
+ nightTorpedo:{label:'魚雷（甲標的を除く）',examples:['61cm四連装(酸素)魚雷','61cm五連装(酸素)魚雷']}
 };
 const HD_SE_RECIPES={
  'cap-aa':[
@@ -67,8 +70,20 @@ const HD_SE_RECIPES={
  ],
  'cap-asw':[{id:'sonar-projector',name:'ソナー＋爆雷投射機',parts:['sonar','projector']}],
  'cap-land-soft':[{id:'type3',name:'ソフトスキン向け：三式弾系',parts:['type3']},{id:'rocket',name:'軽量艦の対地補助：対地ロケット',parts:['rocket']}],
- 'cap-land-mixed':[{id:'tank-amphibious',name:'陸戦隊系＋内火艇系',parts:['tank','amphibious']},{id:'tank-rocket',name:'陸戦隊系＋対地ロケット',parts:['tank','rocket']}]
+ 'cap-land-mixed':[{id:'tank-amphibious',name:'陸戦隊系＋内火艇系',parts:['tank','amphibious']},{id:'tank-rocket',name:'陸戦隊系＋対地ロケット',parts:['tank','rocket']}],
+ 'cap-night-ci':[
+  {id:'night-torpedo',name:'魚雷CI：魚雷2',parts:['nightTorpedo','nightTorpedo'],ship:'night-surface',attack:'torpedo'},
+  {id:'night-main',name:'主砲CI：主砲3',parts:['nightMain','nightMain','nightMain'],ship:'night-surface',attack:'main'},
+  {id:'night-main-secondary',name:'主副CI：主砲2＋副砲1',parts:['nightMain','nightMain','nightSecondary'],ship:'night-surface',attack:'main-secondary'},
+  {id:'night-mixed',name:'主魚CI：主砲1＋魚雷1',parts:['nightMain','nightTorpedo'],ship:'night-surface',attack:'mixed'}
+ ]
 };
+const HD_SE_NIGHT_POLICY_KEY='harbordesk-night-ci-policy-v1';
+const HD_SE_NIGHT_POLICIES={auto:'自動（海域目安）',torpedo:'魚雷CI',main:'主砲CI','main-secondary':'主副CI',mixed:'主魚CI'};
+for(const attack of ['torpedo','main','main-secondary','mixed'])HD_SE_RECIPES['cap-night-'+attack]=HD_SE_RECIPES['cap-night-ci'].filter(r=>r.attack===attack);
+function hdSENightPolicy(map){try{const value=JSON.parse(localStorage.getItem(HD_SE_NIGHT_POLICY_KEY)||'{}')[map];return Object.hasOwn(HD_SE_NIGHT_POLICIES,value)?value:'auto'}catch{return 'auto'}}
+function hdSENightKind(map){const policy=hdSENightPolicy(map);return policy==='auto'?'cap-night-ci':'cap-night-'+policy}
+function hdSENightPolicyHtml(map){return `<label class="hd-fl-night-policy">夜戦CI方針<select data-hd-night-policy="${hdSEEsc(map)}">${Object.entries(HD_SE_NIGHT_POLICIES).map(([value,label])=>`<option value="${value}" ${hdSENightPolicy(map)===value?'selected':''}>${label}</option>`).join('')}</select><small>自動は海域目安に従います。CIの種類を選ぶと、その装備条件を配備目標に追加します。水上艦目標向けで、発動確定ではありません。</small></label>`}
 function hdSEPartMatches(part,row){
  const item=row?.item||row?.meta||row||{},name=String(item.name||row?.name||''),cat=String(item.category||''),aa=Number(item.stats?.対空)||0;
  const ha=/高角砲|5inch.*Mk\.?\s*(?:12|30|38)/i.test(name);
@@ -83,17 +98,21 @@ function hdSEPartMatches(part,row){
  if(part==='tank')return /陸戦隊|戦車第11連隊|M4A1 DD/.test(name);
  if(part==='amphibious')return /内火艇/.test(cat+' '+name);
  if(part==='rocket')return /WG42|対地噴進砲/.test(name);
+ if(part==='nightMain')return cat.includes('主砲');
+ if(part==='nightSecondary')return cat.includes('副砲');
+ if(part==='nightTorpedo')return cat==='魚雷'||cat==='潜水艦魚雷';
  return false;
 }
 function hdSEAkizuki(ship){
  const db=typeof hdFEFindShip==='function'?hdFEFindShip(ship.ship):null,row=db&&typeof hdShipDbMasterRowFor==='function'?hdShipDbMasterRowFor(db):null;
  return Number(row?.ctype)===54||/^(秋月|照月|初月|涼月|冬月|夏月|宵月|春月|若月|霜月)/.test(ship.ship||'');
 }
-function hdSERecipeAllows(recipe,ship){return !recipe.ship||(recipe.ship==='akizuki'?hdSEAkizuki(ship):!hdSEAkizuki(ship))}
+function hdSERecipeAllows(recipe,ship){if(recipe.ship==='night-surface')return typeof hdFENightCI==='function'&&hdFENightCI({...ship,items:[],expansion:null}).status!=='manual';return !recipe.ship||(recipe.ship==='akizuki'?hdSEAkizuki(ship):!hdSEAkizuki(ship))}
 function hdSEProfiles(map){
  const needs=typeof hdMapEquipNeeds==='function'?hdMapEquipNeeds(map).needs:[],ids=new Set(needs.map(x=>x.id)),rows=[];
  if(ids.has('防空'))rows.push({kind:'cap-aa',baseKind:'防空',label:'対空カットイン',importance:'安定化の推奨',reason:map==='1-6'?'F航空戦マスの被害を抑える防空役を1隻用意。下ルートでは制空優勢や対空CIの発動が通行条件ではありません。':'航空戦・空襲を通るルートの被害軽減用。同じ艦に発動条件を満たす装備を載せます。',note:'対応例の装備条件を確認します。発動は確率制で、ここにない艦固有の専用CIは出典で確認。機銃だけではこのCIセットの準備ありになりません。',source:HD_SE_CAP_SOURCE.aa});
  if(ids.has('対潜'))rows.push({kind:'cap-asw',baseKind:'対潜',label:'対潜シナジー',importance:'潜水艦対策の推奨',reason:'潜水艦と戦うルートで、同じ艦にソナーと爆雷投射機を組み合わせる装備例。',note:'先制対潜は別条件です。装備だけで確定せず、艦種・改造・表示対潜値・ソナー要否を出典で確認。爆雷を追加する3種シナジーも検討。',source:HD_SE_CAP_SOURCE.asw});
+ if(ids.has('夜戦')&&!ids.has('対地')||hdSENightPolicy(map)!=='auto')rows.push({kind:hdSENightKind(map),baseKind:'夜戦',label:hdSENightPolicy(map)==='auto'?'夜戦汎用カットイン':'夜戦'+HD_SE_NIGHT_POLICIES[hdSENightPolicy(map)],importance:'水上艦への夜戦火力の選択肢',reason:'同じ艦に選んだCIの装備セットを配備。配備後の全装備で優先される汎用CIを確認します。',note:'装備条件の準備判定です。発動率は未計算。運・Lv・損傷・配置も確認し、低運艦では連撃も検討。陸上型・潜水艦目標や空母・潜水艦・駆逐艦専用CIは別判定です。',source:'https://wikiwiki.jp/kancolle/夜戦#dfcb6e1f'});
  if(ids.has('対地')){const soft=['3-5','4-3','4-5'].includes(map);rows.push({kind:soft?'cap-land-soft':'cap-land-mixed',baseKind:'対地',label:soft?'ソフトスキン向け対地装備':'対地装備の組み合わせ',importance:'陸上型対策の推奨',reason:soft?'北方棲姫・飛行場姫・港湾棲姫などを攻撃する艦に三式弾系を優先。軽量艦のロケットは補助の選択肢。':'陸戦隊系と内火艇系・ロケットを同じ艦に組み合わせる装備例。砲台・集積地など、対象ごとに有効装備が異なります。',note:'装備例の準備状況であり撃破火力の保証ではありません。通らないマスの対策は不要。敵の種類・改修★・配備艦数も確認。',source:soft?(map==='3-5'?'https://wikiwiki.jp/kancolle/北方海域/3-5':map==='4-5'?'https://wikiwiki.jp/kancolle/西方海域/4-5':HD_SE_CAP_SOURCE.land):map==='6-4'?'https://wikiwiki.jp/kancolle/中部海域/6-4':HD_SE_CAP_SOURCE.land})}
  return rows;
 }
@@ -112,6 +131,7 @@ function hdSEShipPool(ship){
  return hdSEPool(rows.map(x=>({...x,item:hdFEFind(x.name)})));
 }
 function hdSECapabilityMeasure(plan,kind){
+ if(kind.startsWith('cap-night-')){const states=(plan?.ships||[]).filter(s=>s.ship).map(ship=>({ship,state:hdFENightCI(ship)})),attacks=new Set((HD_SE_RECIPES[kind]||[]).map(r=>r.attack)),matched=states.filter(x=>x.state.status==='ready'&&attacks.has(x.state.attack));return {count:matched.length,ratio:matched.length?1:Math.max(0,...states.filter(x=>x.state.status!=='manual').map(x=>Math.max(0,...HD_SE_RECIPES[kind].map(r=>{const p=hdSERecipeParts(r,hdSEShipPool(x.ship));return p.matched/p.total})))),ships:matched.map(x=>x.ship.ship),unresolved:states.length>0&&states.every(x=>x.state.status==='manual')}}
  const recipes=HD_SE_RECIPES[kind]||[],ships=plan?.ships||[],matched=[];let best=0;
  for(const ship of ships){const pool=hdSEShipPool(ship);let complete=false;for(const recipe of recipes){if(!hdSERecipeAllows(recipe,ship))continue;const r=hdSERecipeParts(recipe,pool);best=Math.max(best,r.matched/Math.max(1,r.total));if(r.complete)complete=true}if(complete)matched.push(ship.ship)}
  return {count:matched.length,ratio:Math.max(Math.min(1,matched.length),best),ships:matched};
@@ -138,9 +158,9 @@ function hdSECapabilityStock(plan,kind){
  return options[0]||null;
 }
 function hdSECapabilityHtml(map,fleetId='',proposal=null){
- const profiles=hdSEProfiles(map);if(!profiles.length)return '';
+ const profiles=hdSEProfiles(map);if(!profiles.length)return hdSENightPolicyHtml(map);
  const fleets=typeof hdSPSFleets==='function'?hdSPSFleets(map):[],fleet=fleetId?fleets.find(x=>String(x.id)===String(fleetId)):(typeof hdSPSFleet==='function'?hdSPSFleet(map):null),plan=proposal||(fleet?hdFEPlanFromSavedFleet(map,fleet):null),esc=hdSEEsc;
- return `<div class="hd-se-capabilities"><strong>攻略で用意する装備・組み合わせ</strong><p>通るルートに合わせた推奨装備です。所持・同じ艦への配備・艦種条件を分けて確認します。</p>${profiles.map(p=>{
+ return `<div class="hd-se-capabilities">${hdSENightPolicyHtml(map)}<strong>攻略で用意する装備・組み合わせ</strong><p>通るルートに合わせた推奨装備です。所持・同じ艦への配備・艦種条件を分けて確認します。</p>${profiles.map(p=>{
   const stock=hdSECapabilityStock(plan,p.kind),actual=hdSECapabilityMeasure(plan,p.kind),status=actual.count?'配備済み':stock?.usable?.complete?'手持ちで配備可能':stock?.complete?(plan?'艦種・装備枠の確認が必要':'所持セットあり・艦隊を選んで確認'):'所持不足';
   return `<article class="hd-se-capability ${actual.count?'ready':stock?.complete?'partial':'missing'}" data-hd-se-capability="${p.kind}"><div class="hd-se-check-head"><div><b>${esc(p.label)}</b><small>${esc(p.importance)}</small></div><strong>${esc(status)}</strong></div><p>${esc(p.reason)}</p>${stock?`<b>${esc(stock.recipe.name)}</b><div class="hd-se-cap-parts">${stock.parts.map(part=>{const gap=Math.max(0,part.need-part.have),examples=HD_SE_PARTS[part.part].examples;return `<div class="${gap?'missing':'ready'}"><b>${esc(part.label)}：${part.have}/${part.need}${gap?`・あと${gap}個`:''}</b><span>${esc(part.items.length?'手持ち：'+part.items.join('、'):'候補：'+examples.join(' / '))}</span></div>`}).join('')}</div>`:''}${actual.count?`<p>条件を満たす配備：${esc(actual.ships.join('、'))}</p>`:stock?.usable?.complete?`<p>同じ艦に載せられる候補：${esc(stock.usable.ship)}。下の探索で他の目安との両立を確認してね。</p>`:stock?.complete&&plan?'<p>所持品は揃っていますが、この編成に同じ艦のセットを確認できません。対応艦・スロット・増設枠を見直してね。</p>':''}<details><summary>別の装備例</summary>${(HD_SE_RECIPES[p.kind]||[]).map(r=>`<p>${esc(r.name)}${r.ship==='akizuki'?'（秋月型専用）':''}</p>`).join('')}</details><small>${esc(p.note)}</small><a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">装備条件の出典 ↗</a></article>`;
  }).join('')}</div>`;
@@ -157,7 +177,7 @@ function hdSECheckKind(kind){
 const HD_SE_CHECK_CACHE=new Map();
 function hdSEChecks(map){
  const info=typeof hdMapEquipNeeds==='function'?hdMapEquipNeeds(map):{needs:[],adv:{}};
- const cacheKey=JSON.stringify([info,localStorage.getItem('harbordesk-equipment-v1'),typeof hdFLCatalog==='function'?hdFLCatalog().length:0]);const cached=HD_SE_CHECK_CACHE.get(map);if(cached?.key===cacheKey)return cached.value;
+ const cacheKey=JSON.stringify([info,hdSENightPolicy(map),localStorage.getItem('harbordesk-equipment-v1'),typeof hdFLCatalog==='function'?hdFLCatalog().length:0]);const cached=HD_SE_CHECK_CACHE.get(map);if(cached?.key===cacheKey)return cached.value;
  const profiles=hdSEProfiles(map),replaced=new Set(profiles.map(x=>x.baseKind));
  const rows=(info.needs||[]).filter(n=>!replaced.has(n.id)&&!(map==='1-6'&&['制空','索敵','輸送'].includes(n.id))).map(n=>hdSECheckKind(n.id));
  for(const p of profiles){const stock=hdSECapabilityStock(null,p.kind);rows.push({...p,minCount:1,count:Number(!!stock?.complete),status:stock?.complete?'ready':stock?.matched?'partial':'missing',detail:'同じ艦の推奨セット 1組',hint:p.reason,candidates:[],ownedTypes:[]})}

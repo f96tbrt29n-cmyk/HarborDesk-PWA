@@ -28,7 +28,7 @@ function hdFOItemMeta(item){
  return meta||{name:item&&item.name||'',category:item&&item.category||'',stats:{},tags:[]};
 }
 function hdFOStackKey(item){
- if(!item)return '';
+ if(!item||!item.name)return '';
  if(item.stackKey)return String(item.stackKey);
  if(typeof hdFLInventoryStackKey==='function')return hdFLInventoryStackKey(item.name,item.star);
  return String(item.name||'')+'@@'+Math.max(0,Number(item.star)||0);

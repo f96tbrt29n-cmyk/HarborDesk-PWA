@@ -316,11 +316,16 @@ function hdFLSetRemedies(plan,goal){
     leaves++;
     const trial=hdFOClone(plan),changes=[];
     for(const {slot,row} of chosen){const old=ship.items.find(x=>x.slotIndex===slot.index);trial.ships[si].items=trial.ships[si].items.filter(x=>x.slotIndex!==slot.index);trial.ships[si].items.push(hdOCEquipment(row,slot));if(hdFOStackKey(old)!==row.key)changes.push({slot:slot.index+1,old:old?.name||'空き枠',name:row.name,star:row.star,owned:row.count,free:Math.max(0,row.count-(usageBefore[row.key]||0))})}
-    if(!changes.length)return;
-    const after=hdOCMeasure(trial,requirements),target=after.goals.find(g=>hdFLGoalMatch(g,goal));if(!target||target.count<=goal.count)return;
-    const usage=hdFOAssignedUsage(trial),missing=Object.entries(usage).filter(([key,count])=>count>(inventory.get(key)?.count||0)).map(([key,count])=>({name:inventory.get(key)?.name||chosen.find(x=>x.row.key===key)?.row.name||key.split('@@')[0],star:inventory.get(key)?.star||chosen.find(x=>x.row.key===key)?.row.star||0,need:count-(inventory.get(key)?.count||0),owned:inventory.get(key)?.count||0}));
-    const tradeoffs=before.goals.filter(g=>g.ok&&after.goals.some(n=>hdFLGoalMatch(n,g)&&!n.ok)).map(g=>g.label);
-    options.push({ship:ship.ship,shipIndex:si,recipe:recipe.name,recipeId:recipe.id,mode:recipe.mode||'capability',detail:target.detail,changes,missing,available:!missing.length,tradeoffs,rechecks:hdFLRemedyRechecks(plan,trial,si),count:target.count,targetReady:target.ok});
+    if(!changes.length&&!goal.kind.startsWith('cap-night-'))return;
+    const extras=goal.kind.startsWith('cap-night-')?trial.ships[si].items.filter(x=>x.name&&!taken.has(x.slotIndex)&&['nightMain','nightSecondary','nightTorpedo'].some(p=>hdSEPartMatches(p,hdFEFind(x.name)))):[];
+    for(let mask=0;mask<2**extras.length;mask++){
+     const variant=mask?hdFOClone(trial):trial,swaps=changes.slice();for(let i=0;i<extras.length;i++)if(mask&(1<<i)){const x=extras[i];variant.ships[si].items=variant.ships[si].items.filter(v=>v.slotIndex!==x.slotIndex);swaps.push({slot:x.slotIndex+1,old:x.name,name:'空き枠',star:0,owned:0,free:0})}
+     if(goal.kind.startsWith('cap-night-')){const night=hdFENightCI(variant.ships[si]);if(night.status!=='ready'||night.attack!==recipe.attack)continue}
+     const after=hdOCMeasure(variant,requirements),target=after.goals.find(g=>hdFLGoalMatch(g,goal));if(!target||target.count<=goal.count)continue;
+     const usage=hdFOAssignedUsage(variant),missing=Object.entries(usage).filter(([key,count])=>count>(inventory.get(key)?.count||0)).map(([key,count])=>({name:inventory.get(key)?.name||chosen.find(x=>x.row.key===key)?.row.name||key.split('@@')[0],star:inventory.get(key)?.star||chosen.find(x=>x.row.key===key)?.row.star||0,need:count-(inventory.get(key)?.count||0),owned:inventory.get(key)?.count||0}));
+     const tradeoffs=before.goals.filter(g=>g.ok&&after.goals.some(n=>hdFLGoalMatch(n,g)&&!n.ok)).map(g=>g.label);
+     options.push({ship:ship.ship,shipIndex:si,recipe:recipe.name,recipeId:recipe.id,mode:recipe.mode||'capability',detail:target.detail,changes:swaps,missing,available:!missing.length,tradeoffs,rechecks:hdFLRemedyRechecks(plan,variant,si),count:target.count,targetReady:target.ok});
+    }
    };place(0);
   }
  }
@@ -364,7 +369,7 @@ function hdFLSetRemediesHtml(goal,options){
 function hdFLAssessmentHtml(plan){
  const a=plan.assessment;if(!a)return '<p class="hd-fl-note">攻略条件の判定を読み込み中。再配備して確認してね。</p>';
  const esc=hdFLEsc,goals=a.measure.goals;
- return `<section class="hd-fl-checks"><h4>攻略に必要な装備・数値</h4><p>${plan.searching?'海域の対策装備を手持ちから配備中…':goals.length&&goals.every(g=>g.ok)?'登録済みの装備目安は充足。下の注意点も確認してね。':'不足・未判定の項目があります。補う装備と注意点を確認してね。'}</p>${goals.map(g=>{
+ return `<section class="hd-fl-checks"><h4>攻略に必要な装備・数値</h4>${hdSENightPolicyHtml(plan.map)}<p>${plan.searching?'海域の対策装備を手持ちから配備中…':goals.length&&goals.every(g=>g.ok)?'登録済みの装備目安は充足。下の注意点も確認してね。':'不足・未判定の項目があります。補う装備と注意点を確認してね。'}</p>${goals.map(g=>{
   const numeric=['air-value','los-value'].includes(g.kind),profile=a.profiles.find(x=>x.kind===g.kind),stock=!g.ok&&typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[g.kind]?hdSECapabilityStock(plan,g.kind):null;
   const remedies=!g.ok&&!g.unresolved&&numeric?(plan.numericRemedies?.[g.kind]||[]):[];
   const examples=!g.ok&&!numeric&&!stock?hdSECandidates(g.kind,3).filter(x=>plan.ships.some(s=>{const db=hdFEFindShip(s.ship);return db&&hdShipDbEquipCompatible(x,db)})).map(x=>x.name):[];
@@ -444,7 +449,7 @@ function hdFLPlanHtml(plan){
  return `<div class="hd-fl-plan">
   <div class="hd-fl-summary"><div><strong>手持ち装備の自動配備</strong><span>所持数＋艦別装備可否＋実スロット制限を反映</span></div><b class="${plan.missing.length?'warn':'ok'}">${plan.missing.length?`未配備 ${plan.missing.length}枠`:'主要枠を配備'}</b></div>
   <div class="hd-fl-master-status">マスター同期 ${plan.masterBacked||0}/${plan.ships.filter(x=>x.ship).length}隻</div>
-  <p class="hd-fl-note">先制対潜は昼戦開始の通常艦隊での装備・対潜値条件です。連合艦隊では第二艦隊が対象。対潜シナジーの充足とは別に判定します。</p><div class="hd-fl-ships">${plan.ships.map((s,i)=>{const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(Number(s.masterId)>0?{id:Number(s.masterId),name:s.ship}:s.ship,'loadout-thumb'):'';return `<div class="hd-fl-ship"><div class="hd-fl-ship-head"><span>${i+1}</span>${image}<div><strong>${hdFLEsc(s.ship||'艦娘未選択')}</strong><small>${hdFLEsc(s.type||'')}${s.master?'・マスター判定':''}</small></div></div><div class="hd-fl-items">${s.items.map(x=>`<span>${hdFLEsc(x.name)}${x.star?` ★${x.star}`:''}<small>第${(x.slotIndex??0)+1}スロ${x.capacity!=null?`・${x.capacity}機`:''}</small></span>`).join('')||'<em>配備なし</em>'}</div>${s.expansion?`<div class="hd-fl-expansion"><i>増設候補</i><b>${hdFLEsc(s.expansion.name)}${s.expansion.star?` ★${s.expansion.star}`:''}</b><small>${hdFLEsc(s.expansion.reason)}</small></div>`:''}${s.expansionMissing?`<div class="hd-fl-expansion missing"><i>増設不足</i><b>${hdFLEsc(s.expansionMissing.name)}${s.expansionMissing.reqStar?` ★${s.expansionMissing.reqStar}+`:''}</b><small>${hdFLEsc(s.expansionMissing.reason)}</small><button type="button" class="ghost small" data-hd-fl-procure-expansion="${plan.index}" data-hd-fl-ship-index="${i}">調達リストへ</button></div>`:''}${typeof hdFEOpeningAswHtml==='function'?hdFLOaswHtml(plan,i):''}${s.missing.length?`<small class="hd-fl-missing">未配備: ${s.missing.map(hdFLKindLabel).join(' / ')}</small>`:''}</div>`}).join('')}</div>
+  <p class="hd-fl-note">先制対潜は昼戦開始の通常艦隊での装備・対潜値条件です。連合艦隊では第二艦隊が対象。対潜シナジーの充足とは別に判定します。</p><div class="hd-fl-ships">${plan.ships.map((s,i)=>{const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(Number(s.masterId)>0?{id:Number(s.masterId),name:s.ship}:s.ship,'loadout-thumb'):'';return `<div class="hd-fl-ship"><div class="hd-fl-ship-head"><span>${i+1}</span>${image}<div><strong>${hdFLEsc(s.ship||'艦娘未選択')}</strong><small>${hdFLEsc(s.type||'')}${s.master?'・マスター判定':''}</small></div></div><div class="hd-fl-items">${s.items.map(x=>`<span>${hdFLEsc(x.name)}${x.star?` ★${x.star}`:''}<small>第${(x.slotIndex??0)+1}スロ${x.capacity!=null?`・${x.capacity}機`:''}</small></span>`).join('')||'<em>配備なし</em>'}</div>${s.expansion?`<div class="hd-fl-expansion"><i>増設候補</i><b>${hdFLEsc(s.expansion.name)}${s.expansion.star?` ★${s.expansion.star}`:''}</b><small>${hdFLEsc(s.expansion.reason)}</small></div>`:''}${s.expansionMissing?`<div class="hd-fl-expansion missing"><i>増設不足</i><b>${hdFLEsc(s.expansionMissing.name)}${s.expansionMissing.reqStar?` ★${s.expansionMissing.reqStar}+`:''}</b><small>${hdFLEsc(s.expansionMissing.reason)}</small><button type="button" class="ghost small" data-hd-fl-procure-expansion="${plan.index}" data-hd-fl-ship-index="${i}">調達リストへ</button></div>`:''}${typeof hdFEOpeningAswHtml==='function'?hdFLOaswHtml(plan,i):''}${typeof hdFENightCIHtml==='function'&&s.ship?hdFENightCIHtml(s):''}${s.missing.length?`<small class="hd-fl-missing">未配備: ${s.missing.map(hdFLKindLabel).join(' / ')}</small>`:''}</div>`}).join('')}</div>
   ${used?`<div class="hd-fl-usage"><b>在庫使用:</b> ${used}</div>`:''}
   ${hdFLAssessmentHtml(plan)}
   <button type="button" class="ghost small" data-hd-fl-calculator="${plan.index}" ${plan.searching?'disabled':''}>この配備で制空・索敵を確認</button>
@@ -510,15 +515,17 @@ document.addEventListener('click',e=>{
  const procure=e.target.closest?.('[data-hd-fl-procure-expansion]');if(procure){hdFLProcureExpansion(procure.dataset.hdFlProcureExpansion,procure.dataset.hdFlShipIndex);return}
  if(e.target.closest?.('[data-hd-fl-ledger]')){if(typeof hdWSShowElement==='function')hdWSShowElement('equipmentBook',true);return}
 });
-window.addEventListener('storage',e=>{if(e.key===null||[HD_FL_KEY,'harbordesk-ship-roster-v1','harbordesk-kancolle-sync-v1','harbordesk-map-routes-v1','harbordesk-oasw-confirmed-v1'].includes(e.key))hdFLInvalidate()});
+window.addEventListener('storage',e=>{if(e.key===null||[HD_SE_NIGHT_POLICY_KEY,HD_FL_KEY,'harbordesk-ship-roster-v1','harbordesk-kancolle-sync-v1','harbordesk-map-routes-v1','harbordesk-oasw-confirmed-v1'].includes(e.key))hdFLInvalidate()});
 window.addEventListener('hd:ship-images-changed',()=>{document.querySelectorAll('.hd-fl-host').forEach(host=>{if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host)})});
 window.addEventListener('hd:equipment-changed',hdFLInvalidate);
+window.addEventListener('hd:night-ci-policy',hdFLInvalidate);
 window.addEventListener('hd:kancolle-sync',hdFLInvalidate);
 window.addEventListener('hd:ship-identity-changed',hdFLInvalidate);
 window.addEventListener('load',()=>setTimeout(()=>{if(!hdFLInstall())setTimeout(hdFLInstall,500)},650));
 hdFLInstall();
 
 window.addEventListener('hd:map-air-changed',hdFLInvalidate);
+document.addEventListener('change',e=>{const select=e.target.closest?.('[data-hd-night-policy]');if(!select)return;const map=select.dataset.hdNightPolicy;if(!Object.hasOwn(HD_SE_NIGHT_POLICIES,select.value))return;const card=select.closest('.hd-fs-card'),index=card?.querySelector('[data-hd-fl-generate]')?.dataset.hdFlGenerate;try{let saved;try{saved=JSON.parse(localStorage.getItem(HD_SE_NIGHT_POLICY_KEY)||'{}')}catch{saved={}}localStorage.setItem(HD_SE_NIGHT_POLICY_KEY,JSON.stringify({...saved,[map]:select.value}))}catch{hdToast('夜戦CI方針を保存できませんでした','warn');return}window.dispatchEvent(new CustomEvent('hd:night-ci-policy',{detail:{map}}));if(card?.isConnected&&index!=null&&hdFSMap()===map)hdFLRender(Number(index),card);else if(typeof hdOCRefresh==='function')hdOCRefresh()});
 window.addEventListener('hd:map-route-changed',e=>{for(const [key,plan] of Object.entries(HD_FL_CACHE))if(plan.map===e.detail?.map&&(plan.suggestion.routeIndex??plan.index)!==Number(e.detail.index))delete HD_FL_CACHE[key]});
 
 document.addEventListener('change',e=>{const input=e.target.closest?.('[data-hd-oasw-value]');if(!input)return;const plan=HD_FL_CACHE[input.dataset.hdOaswMap+':'+input.dataset.hdOaswPlan],ship=plan?.ships?.[Number(input.dataset.hdOaswShip)];if(!ship)return;const value=hdFEAswNumber(input.value);if(input.value.trim()!==''&&value==null){input.setCustomValidity('0〜500の整数で入力してね');input.reportValidity();return}input.setCustomValidity('');const scope=input.closest('[data-hd-oasw-scope]').dataset.hdOaswScope,key=hdFEAswKey(ship,scope),saved=hdFEAswConfirmed();if(value==null)delete saved[key];else saved[key]=value;try{localStorage.setItem(HD_FE_OASW_CONFIRM_KEY,JSON.stringify(Object.fromEntries(Object.entries(saved).slice(-80))))}catch{hdToast('対潜値を保存できませんでした','warn');return}input.closest('.hd-fl-oasw').outerHTML=hdFLOaswHtml(plan,Number(input.dataset.hdOaswShip))});
