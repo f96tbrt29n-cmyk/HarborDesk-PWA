@@ -531,3 +531,56 @@ test('opening ASW sync captures exact displayed stats and rejects incomplete gea
  });
  expect(r).toEqual({complete:{value:100,known:true},partial:{value:100,known:false},absent:null,empty:{slots:['','',''],known:true},invalid:null,zero:0});
 });
+test('opening ASW remedies show unused stock without guessing the changed display value',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'三式水中探信儀',count:1},{name:'四式水中聴音機',count:1,star:3}]));
+  const db=hdFEFindShip('夕立改二'),ship={ship:'夕立改二',gameShipId:71,masterId:hdShipDbMasterRowFor(db).id,items:[{name:'三式水中探信儀',slotIndex:0,capacity:0}],expansion:null};
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship.ship,gameShipId:71,masterId:ship.masterId,syncedAt:1,gameAsw:99,gameAswGearKnown:true,gameGearSlots:['三式水中探信儀','',''],gameGearExpansion:'',gameSlotEx:0}]));
+  const plan={map:'1-1',index:0,ships:[ship],suggestion:{slots:[]}},original=JSON.stringify(plan),options=hdFLOaswRemedies(plan,0),candidate=options.find(x=>x.available);
+  return {candidate,unchanged:original===JSON.stringify(plan),html:hdFLOaswHtml(plan,0)};
+ });
+ expect(r.unchanged).toBe(true);expect(r.candidate).toMatchObject({available:true,state:{status:'manual',needsValue:true,threshold:100},changes:[{name:'四式水中聴音機',star:3,owned:1,free:1}]});
+ expect(r.html).toContain('先制対潜を補う装備候補');expect(r.html).toContain('ゲームの表示対潜値ではありません');expect(r.html).toContain('再同期・入力');
+ expect(r.candidate.changes.every(x=>x.slot>=1&&x.slot<=3)).toBe(true);
+});
+
+test('opening ASW remedies count allocated stock and refresh when the inventory changes',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  const name='四式水中聴音機',inventory=n=>localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name,count:n}]));inventory(1);
+  const plan={map:'1-1',index:0,ships:[{ship:'夕立改二',items:[],expansion:null},{ship:'時雨改二',items:[{name,slotIndex:0,capacity:0}],expansion:null}],suggestion:{slots:[]}};
+  const scarce=hdFLOaswRemedies(plan,0),html=hdFLOaswRemediesHtml(plan,0);inventory(2);const enough=hdFLOaswRemedies(plan,0);
+  return {scarce:scarce.find(x=>x.changes.some(c=>c.name===name)),enough:enough.find(x=>x.available),html,automatic:hdFLOaswRemedies({...plan,ships:[{ship:'五十鈴改二',items:[],expansion:null}]},0),expansions:plan.ships.map(x=>x.expansion)};
+ });
+ expect(r.scarce).toMatchObject({available:false,missing:[{name:'四式水中聴音機',star:0,need:1,owned:1}],changes:[{free:0}]});
+ expect(r.enough).toMatchObject({available:true,changes:[{name:'四式水中聴音機',owned:2,free:1}]});expect(r.automatic).toEqual([]);expect(r.expansions).toEqual([null,null]);expect(r.html).toContain('転用が必要');
+});
+
+test('opening ASW remedies combine two different owned rotors in distinct normal slots',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'カ号観測機',count:1},{name:'オ号観測機改',count:1}]));
+  const plan={map:'1-1',index:0,ships:[{ship:'日向改二',items:[],expansion:null}],suggestion:{slots:[]}},start=performance.now(),options=hdFLOaswRemedies(plan,0),elapsed=performance.now()-start;
+  return {options,elapsed,html:hdFLOaswRemediesHtml(plan,0)};
+ });
+ const candidate=r.options.find(x=>x.available);expect(candidate).toBeTruthy();expect(candidate.state.status).toBe('ready');expect(candidate.changes).toHaveLength(2);
+ expect(new Set(candidate.changes.map(x=>x.slot)).size).toBe(2);expect(new Set(candidate.changes.map(x=>x.name)).size).toBe(2);expect(r.elapsed).toBeLessThan(5000);expect(r.html).toContain('通常スロットだけ');
+});
+
+test('opening ASW remedy UI warns about competing requirements and disappears after confirmation',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'四式水中聴音機',count:1},{name:'22号対水上電探',count:3}]));
+  const ship={ship:'夕立改二',items:[0,1,2].map(slotIndex=>({name:'22号対水上電探',slotIndex,capacity:0})),missing:[],expansion:null},plan={map:'1-1',index:0,ships:[ship],suggestion:{slots:[]},missing:[],used:{},owned:{}};
+  const requirements=[{kind:'電探',label:'電探3枠',minCount:3}];plan.assessment={requirements,measure:hdOCMeasure(plan,requirements)};
+  const options=hdFLOaswRemedies(plan,0),html=hdFLOaswHtml(plan,0);
+  ship.items=[{name:'三式水中探信儀',slotIndex:0,capacity:0}];hdFLUpdateAssessment(plan);HD_FL_CACHE['1-1:0']=plan;
+  const host=document.createElement('section');host.id='oasw-remedy-test';host.innerHTML=hdFLPlanHtml(plan);document.body.appendChild(host);
+  return {options,html};
+ });
+ expect(r.options.filter(x=>x.available).every(x=>x.tradeoffs.includes('電探3枠'))).toBe(true);expect(r.html).toContain('電探3枠 が不足');
+ const check=page.locator('#oasw-remedy-test .hd-fl-oasw');await expect(check.locator('details')).toHaveCount(1);await check.locator('summary').click();await expect(check).toContainText('手持ちで交換可能');
+ await check.locator('input').fill('100');await check.locator('input').press('Tab');await expect(check).toContainText('先制対潜：可能');await expect(check.locator('details')).toHaveCount(0);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});

@@ -604,8 +604,8 @@ function hdFEOpeningAsw(ship,scope=''){
  const sonar=items.some(x=>/ソナー/.test(x.category)),rawAsw=items.reduce((n,x)=>n+(Number(x.stats?.対潜)||0),0);
  const aircraft=rows.flatMap((row,i)=>{const item=items[i];return row===ship.expansion||!(Number(profile?.slots?.[row.slotIndex])>0)?[]:[item]}),positive=x=>(Number(x.stats?.対潜)||0)>0;
  const attack=aircraft.some(x=>/艦上攻撃機|艦上爆撃機/.test(x.category)&&positive(x)),high=aircraft.some(x=>/艦上攻撃機/.test(x.category)&&(Number(x.stats?.対潜)||0)>=7||/回転翼機|対潜哨戒機/.test(x.category)&&positive(x)),rotor=aircraft.filter(x=>/回転翼機/.test(x.category)),water=aircraft.some(x=>/水上爆撃機|回転翼機/.test(x.category)&&positive(x)),anyAircraft=attack||high;
- if(name==='日向改二')return result(rotor.some(x=>/^S-51J/.test(x.name))||rotor.filter(x=>/カ号観測機|オ号観測機/.test(x.name)).length>=2?'ready':'missing','S-51J系1枠、またはカ号・オ号系2枠が必要です。対潜値100＋ソナーだけでは発動しません。');
- if(name==='加賀改二護'||/^(大鷹|神鷹|雲鷹)改(?:二)?$/.test(name))return result(anyAircraft?'ready':'missing','対潜値1以上の艦攻・艦爆、対潜哨戒機、回転翼機のいずれかを搭載できる枠に配備してね。');
+ if(name==='日向改二')return result(rotor.some(x=>/^S-51J/.test(x.name))||rotor.filter(x=>/カ号観測機|オ号観測機/.test(x.name)).length>=2?'ready':'missing','S-51J系1枠、またはカ号・オ号系2枠が必要です。対潜値100＋ソナーだけでは発動しません。',{equipmentCondition:true});
+ if(name==='加賀改二護'||/^(大鷹|神鷹|雲鷹)改(?:二)?$/.test(name))return result(anyAircraft?'ready':'missing','対潜値1以上の艦攻・艦爆、対潜哨戒機、回転翼機のいずれかを搭載できる枠に配備してね。',{equipmentCondition:true});
  let paths=[];
  if(type==='海防艦')paths=[{threshold:60,gear:sonar,label:'ソナー＋表示対潜60以上'},{threshold:75,gear:rawAsw>=4,label:'装備の素対潜合計4以上＋表示対潜75以上'}];
  else if(type==='軽空母')paths=[...(!['鈴谷航改二','熊野航改二'].includes(name)?[{threshold:50,gear:sonar&&high,label:'ソナー＋高対潜艦攻など＋表示対潜50以上'},{threshold:65,gear:high,label:'高対潜艦攻など＋表示対潜65以上'}]:[]),{threshold:100,gear:sonar&&attack,label:'ソナー＋対潜値1以上の艦攻・艦爆＋表示対潜100以上'}];
@@ -617,7 +617,7 @@ function hdFEOpeningAsw(ship,scope=''){
   paths=[{threshold:100,gear:sonar,label:'ソナー＋表示対潜100以上'}];
  }else return result(['重巡洋艦','戦艦','高速戦艦','正規空母','装甲空母','潜水艦','潜水空母'].includes(type)?'missing':'manual','この艦種・改造段階の先制対潜条件は'+(['重巡洋艦','戦艦','高速戦艦','正規空母','装甲空母','潜水艦','潜水空母'].includes(type)?'対象外です。':'未対応です。出典で確認してね。'));
  const eligible=paths.filter(x=>x.gear).sort((a,b)=>a.threshold-b.threshold),rules=paths.map(x=>x.label).join(' / ');
- if(!eligible.length)return result('missing','必要装備の条件を満たしていません。'+rules,{rules});
+ if(!eligible.length)return result('missing','必要装備の条件を満たしていません。'+rules,{rules,equipmentCondition:true});
  const row=hdFEAswRoster(ship),key=hdFEAswKey(ship,scope),confirmed=hdFEAswNumber(hdFEAswConfirmed()[key]);let value=confirmed,source=confirmed==null?'':'入力したゲーム表示値';
  if(value==null&&row?.gameAswGearKnown===true&&Array.isArray(row.gameGearSlots)&&row.gameGearSlots.length===profile.count){
   const planned=Array.from({length:profile.count},(_,i)=>hdFEPlannedGearLabel((ship.items||[]).find(x=>x.slotIndex===i)));
@@ -627,7 +627,7 @@ function hdFEOpeningAsw(ship,scope=''){
  if(value==null)return result('manual','配備案の表示対潜値が未確認です。同じ装備にして同期するか、ゲームの艦娘詳細に出る対潜値を入力してね。',{rules,threshold,needsValue:true});
  return result(value>=threshold?'ready':'missing',`${source} ${value} / 必要 ${threshold}${value<threshold?`（あと${threshold-value}）`:''}。${eligible[0].label}`,{rules,value,threshold,source,needsValue:true});
 }
-function hdFEOpeningAswHtml(ship,scope='',attrs=''){
+function hdFEOpeningAswHtml(ship,scope='',attrs='',remedies=''){
  const a=hdFEOpeningAsw(ship,scope),esc=hdFEEsc,manual=hdFEAswNumber(hdFEAswConfirmed()[hdFEAswKey(ship,scope)]);
- return `<section class="hd-fl-oasw ${a.status}" data-hd-oasw-scope="${esc(scope)}"><b>先制対潜：${a.status==='ready'?'可能':a.status==='missing'?'不可':'未判定'}</b><p>${esc(a.reason)}</p>${a.needsValue?`<label>${esc(ship.ship)}：この配備後のゲーム表示対潜値<input type="number" min="0" max="500" step="1" inputmode="numeric" value="${manual??''}" placeholder="未入力なら同期値で確認" data-hd-oasw-value ${attrs}></label><small>艦固有の装備ボーナスを含む表示値。装備や同期情報が変わると入力値は再確認します。</small>`:''}<a class="guide-link" href="${HD_FE_OASW_SOURCE}" target="_blank" rel="noopener">発動条件の出典 ↗</a></section>`;
+ return `<section class="hd-fl-oasw ${a.status}" data-hd-oasw-scope="${esc(scope)}"><b>先制対潜：${a.status==='ready'?'可能':a.status==='missing'?'不可':'未判定'}</b><p>${esc(a.reason)}</p>${a.needsValue?`<label>${esc(ship.ship)}：この配備後のゲーム表示対潜値<input type="number" min="0" max="500" step="1" inputmode="numeric" value="${manual??''}" placeholder="未入力なら同期値で確認" data-hd-oasw-value ${attrs}></label><small>艦固有の装備ボーナスを含む表示値。装備や同期情報が変わると入力値は再確認します。</small>`:''}${remedies}<a class="guide-link" href="${HD_FE_OASW_SOURCE}" target="_blank" rel="noopener">発動条件の出典 ↗</a></section>`;
 }
