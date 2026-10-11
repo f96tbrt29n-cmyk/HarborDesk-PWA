@@ -575,3 +575,59 @@ window.hdFEOpenPreparation=hdFEOpenPreparation;
 ['hd:kancolle-sync','hd:equipment-changed','hd:ship-identity-changed','hd:map-air-changed'].forEach(evt=>window.addEventListener(evt,hdFERefreshPendingFix));
 window.addEventListener('load',()=>setTimeout(()=>{if(!hdFEInstall())setTimeout(hdFEInstall,500)},720));
 hdFEInstall();
+
+// Opening ASW equipment conditions, separate from recommended ASW synergy.
+// Sources: KC3Kai Ship.canDoOASW/isOaswShip and the linked verification table.
+const HD_FE_OASW_SOURCE='https://wikiwiki.jp/kancolle/対潜攻撃#trigger_conditions';
+const HD_FE_OASW_CONFIRM_KEY='harbordesk-oasw-confirmed-v1';
+function hdFEAswRoster(ship){
+ const rows=hdFERoster(),id=Number(ship.gameShipId)||0,master=Number(ship.masterId)||0;
+ const matches=rows.filter(r=>id?Number(r.gameShipId)===id:master?Number(r.masterId)===master:String(r.name||'').trim()===String(ship.ship||'').trim());
+ return matches.length===1?matches[0]:null;
+}
+function hdFEAswKey(ship,scope=''){
+ const row=hdFEAswRoster(ship);
+ return JSON.stringify([scope,ship.gameShipId||ship.masterId||ship.ship,ship.ship,row?.id,row?.gameShipId,row?.masterId,row?.level,row?.syncedAt,row?.gameAsw,(ship.items||[]).map(x=>[x.slotIndex,hdFEPlannedGearLabel(x)]).sort((a,b)=>a[0]-b[0]),hdFEPlannedGearLabel(ship.expansion)]);
+}
+function hdFEAswConfirmed(){try{const x=JSON.parse(localStorage.getItem(HD_FE_OASW_CONFIRM_KEY)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch{return {}}}
+function hdFEAswNumber(value){if(value==null||String(value).trim()==='')return null;const n=Number(value);return Number.isInteger(n)&&n>=0&&n<=500?n:null}
+function hdFEOpeningAsw(ship,scope=''){
+ const result=(status,reason,extra={})=>({status,reason,...extra}),db=hdFEFindShip(ship.ship),master=db&&hdShipDbMasterRowFor(db),id=Number(master?.id)||Number(db?.id)||Number(ship.masterId)||0,type=db?.type||ship.type||'',name=ship.ship||'';
+ if(!db)return result('manual','艦娘名・改造段階の情報が不足しています。');
+ const liveIdentity=hdFEAswRoster(ship);if(liveIdentity?.masterId&&id&&Number(liveIdentity.masterId)!==id)return result('manual','同期された改造段階と配備案が違います。再配備して確認してね。');
+ const automatic=new Set([141,478,394,893,906,681,920,562,689,596,692,628,629,726,737,624,1040,1062,1067]);
+ if(automatic.has(id))return result('ready','この改造段階は、対潜値・装備を問わない艦固有の先制対潜条件を持ちます。',{automatic:true});
+ const profile=hdShipDbSlotProfile(db),rows=[...(ship.items||[]).filter(x=>x.name),...(ship.expansion?.name?[ship.expansion]:[])],items=rows.map(x=>hdFEFind(x.name));
+ if(items.some(x=>!x))return result('manual','配備装備の性能が未登録のため、装備条件を確認できません。');
+ const normal=rows.filter(x=>x!==ship.expansion),indices=normal.map(x=>x.slotIndex);if(!profile||new Set(indices).size!==indices.length||normal.some((x,i)=>!Number.isInteger(x.slotIndex)||x.slotIndex<0||x.slotIndex>=profile.count||!hdShipDbEquipCompatible(items[rows.indexOf(x)],db)||hdShipDbSlotRejects(profile,x.slotIndex,items[rows.indexOf(x)])))return result('manual','配備枠・装備可否を確認できません。再配備してね。');
+ if(ship.expansion?.name){const row=hdFEAswRoster(ship),meta=hdFEFind(ship.expansion.name);if(!hdShipDbExpansionInfo(meta,db,ship.expansion.star||0).allowed)return result('missing','この艦の増設に載せられない装備があります。');if(!row||row.gameSlotEx==null)return result('manual','増設の開放状態が未同期です。');if(!hdFLHasExpansion(row))return result('missing','未開放の増設枠に装備があります。再配備してね。')}
+ const sonar=items.some(x=>/ソナー/.test(x.category)),rawAsw=items.reduce((n,x)=>n+(Number(x.stats?.対潜)||0),0);
+ const aircraft=rows.flatMap((row,i)=>{const item=items[i];return row===ship.expansion||!(Number(profile?.slots?.[row.slotIndex])>0)?[]:[item]}),positive=x=>(Number(x.stats?.対潜)||0)>0;
+ const attack=aircraft.some(x=>/艦上攻撃機|艦上爆撃機/.test(x.category)&&positive(x)),high=aircraft.some(x=>/艦上攻撃機/.test(x.category)&&(Number(x.stats?.対潜)||0)>=7||/回転翼機|対潜哨戒機/.test(x.category)&&positive(x)),rotor=aircraft.filter(x=>/回転翼機/.test(x.category)),water=aircraft.some(x=>/水上爆撃機|回転翼機/.test(x.category)&&positive(x)),anyAircraft=attack||high;
+ if(name==='日向改二')return result(rotor.some(x=>/^S-51J/.test(x.name))||rotor.filter(x=>/カ号観測機|オ号観測機/.test(x.name)).length>=2?'ready':'missing','S-51J系1枠、またはカ号・オ号系2枠が必要です。対潜値100＋ソナーだけでは発動しません。');
+ if(name==='加賀改二護'||/^(大鷹|神鷹|雲鷹)改(?:二)?$/.test(name))return result(anyAircraft?'ready':'missing','対潜値1以上の艦攻・艦爆、対潜哨戒機、回転翼機のいずれかを搭載できる枠に配備してね。');
+ let paths=[];
+ if(type==='海防艦')paths=[{threshold:60,gear:sonar,label:'ソナー＋表示対潜60以上'},{threshold:75,gear:rawAsw>=4,label:'装備の素対潜合計4以上＋表示対潜75以上'}];
+ else if(type==='軽空母')paths=[...(!['鈴谷航改二','熊野航改二'].includes(name)?[{threshold:50,gear:sonar&&high,label:'ソナー＋高対潜艦攻など＋表示対潜50以上'},{threshold:65,gear:high,label:'高対潜艦攻など＋表示対潜65以上'}]:[]),{threshold:100,gear:sonar&&attack,label:'ソナー＋対潜値1以上の艦攻・艦爆＋表示対潜100以上'}];
+ else if(['神州丸改','大和改二重'].includes(name))paths=[{threshold:100,gear:sonar&&water,label:'ソナー＋水爆・回転翼機＋表示対潜100以上'}];
+ else if(/^熊野丸(?:改)?$/.test(name))paths=[{threshold:100,gear:sonar&&aircraft.some(x=>/艦上爆撃機|回転翼機|対潜哨戒機/.test(x.category)&&positive(x)),label:'ソナー＋対潜艦爆・回転翼機・対潜哨戒機＋表示対潜100以上'}];
+ else if(/^(扶桑|山城)改二(?:補)?$/.test(name))paths=[{threshold:100,gear:sonar&&(water||items.some(x=>/爆雷/.test(x.category))),label:'ソナー＋水爆・回転翼機・爆雷系＋表示対潜100以上'}];
+ else if(['駆逐艦','軽巡洋艦','練習巡洋艦','重雷装巡洋艦','補給艦'].includes(type)){
+  if(type==='補給艦'&&aircraft.some(x=>/艦上攻撃機|艦上爆撃機/.test(x.category))&&!attack)return result('missing','対潜値0の航空攻撃機だけを載せた補給艦は、この先制対潜条件を満たしません。');
+  paths=[{threshold:100,gear:sonar,label:'ソナー＋表示対潜100以上'}];
+ }else return result(['重巡洋艦','戦艦','高速戦艦','正規空母','装甲空母','潜水艦','潜水空母'].includes(type)?'missing':'manual','この艦種・改造段階の先制対潜条件は'+(['重巡洋艦','戦艦','高速戦艦','正規空母','装甲空母','潜水艦','潜水空母'].includes(type)?'対象外です。':'未対応です。出典で確認してね。'));
+ const eligible=paths.filter(x=>x.gear).sort((a,b)=>a.threshold-b.threshold),rules=paths.map(x=>x.label).join(' / ');
+ if(!eligible.length)return result('missing','必要装備の条件を満たしていません。'+rules,{rules});
+ const row=hdFEAswRoster(ship),key=hdFEAswKey(ship,scope),confirmed=hdFEAswNumber(hdFEAswConfirmed()[key]);let value=confirmed,source=confirmed==null?'':'入力したゲーム表示値';
+ if(value==null&&row?.gameAswGearKnown===true&&Array.isArray(row.gameGearSlots)&&row.gameGearSlots.length===profile.count){
+  const planned=Array.from({length:profile.count},(_,i)=>hdFEPlannedGearLabel((ship.items||[]).find(x=>x.slotIndex===i)));
+  if(planned.every((x,i)=>x===hdFENormGearLabel(row.gameGearSlots[i]))&&hdFEPlannedGearLabel(ship.expansion)===hdFENormGearLabel(row.gameGearExpansion)){value=hdFEAswNumber(row.gameAsw);if(value!=null)source='同じ装備での同期値'}
+ }
+ const threshold=eligible[0].threshold;
+ if(value==null)return result('manual','配備案の表示対潜値が未確認です。同じ装備にして同期するか、ゲームの艦娘詳細に出る対潜値を入力してね。',{rules,threshold,needsValue:true});
+ return result(value>=threshold?'ready':'missing',`${source} ${value} / 必要 ${threshold}${value<threshold?`（あと${threshold-value}）`:''}。${eligible[0].label}`,{rules,value,threshold,source,needsValue:true});
+}
+function hdFEOpeningAswHtml(ship,scope='',attrs=''){
+ const a=hdFEOpeningAsw(ship,scope),esc=hdFEEsc,manual=hdFEAswNumber(hdFEAswConfirmed()[hdFEAswKey(ship,scope)]);
+ return `<section class="hd-fl-oasw ${a.status}" data-hd-oasw-scope="${esc(scope)}"><b>先制対潜：${a.status==='ready'?'可能':a.status==='missing'?'不可':'未判定'}</b><p>${esc(a.reason)}</p>${a.needsValue?`<label>${esc(ship.ship)}：この配備後のゲーム表示対潜値<input type="number" min="0" max="500" step="1" inputmode="numeric" value="${manual??''}" placeholder="未入力なら同期値で確認" data-hd-oasw-value ${attrs}></label><small>艦固有の装備ボーナスを含む表示値。装備や同期情報が変わると入力値は再確認します。</small>`:''}<a class="guide-link" href="${HD_FE_OASW_SOURCE}" target="_blank" rel="noopener">発動条件の出典 ↗</a></section>`;
+}

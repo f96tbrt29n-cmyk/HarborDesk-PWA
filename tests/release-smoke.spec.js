@@ -2193,8 +2193,8 @@ test('release smoke: game sync persists exact gear slots for comparison', async 
   const errors = [];
   await boot(page, errors);
   const source = await page.evaluate(async () => fetch('./kancolle-import.js', { cache:'no-store' }).then(r => r.text()));
-  expect(source).toContain('gameGearSlots:parsed.slotItems.size||parsed.completeSlotItems?gameGearSlots');
-  expect(source).toContain('gameGearExpansion:parsed.slotItems.size||parsed.completeSlotItems?gameGearExpansion');
+  expect(source).toContain('gameGearSlots:gearKnown||parsed.slotItems.size||parsed.completeSlotItems?gameGearSlots');
+  expect(source).toContain('gameGearExpansion:gearKnown||parsed.slotItems.size||parsed.completeSlotItems?gameGearExpansion');
   expect(source).toContain('gearSlots,gearExpansion');
   expect(errors).toEqual([]);
 });

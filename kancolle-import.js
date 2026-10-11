@@ -30,6 +30,7 @@ function hdKcApiData(value){
  }
  return obj;
 }
+function hdKcStatValue(raw){const v=Array.isArray(raw)?raw[0]:raw;if(v==null||String(v).trim()==='')return null;const n=Number(v);return Number.isInteger(n)&&n>=0&&n<=500?n:null}
 function hdKcMasterShip(id){return window.HD_KANCOLLE_MASTER_SNAPSHOT?.allShips?.[String(Number(id))]||null}
 function hdKcMasterEquipMap(){
  const map=new Map(),rows=window.HD_KANCOLLE_MASTER_SNAPSHOT?.equipment||{};
@@ -178,10 +179,12 @@ function hdKcMergeRoster(parsed){
   if(idx!=null)used.add(idx);
   const old=idx!=null?existing[idx]:{};
   const normalSlotIds=[...(Array.isArray(ship.api_slot)?ship.api_slot:[])],gameGearSlots=normalSlotIds.map(id=>{const item=Number(id)>0?parsed.slotItems.get(Number(id)):null;return item?hdKcEquipLabel(item,equipMap):''}),expansionItem=Number(ship.api_slot_ex)>0?parsed.slotItems.get(Number(ship.api_slot_ex)):null,gameGearExpansion=expansionItem?hdKcEquipLabel(expansionItem,equipMap):'',labels=[...gameGearSlots.filter(Boolean),gameGearExpansion].filter(Boolean);
+  const gearKnown=Array.isArray(ship.api_slot)&&ship.api_slot_ex!=null&&[...normalSlotIds,ship.api_slot_ex].every(id=>Number(id)<=0||parsed.slotItems.has(Number(id)));
   next.push({...old,
    id:old.id||`kc-ship-${gameId}`,name:String(master?.name||old.name||`艦娘ID ${masterId||'?'}`),masterId,type:String(master?.type||old.type||'未解決'),level:Number(ship.api_lv)||0,
-   gear:parsed.slotItems.size||parsed.completeSlotItems?labels.join(' / '):(old.gear||''),gameGearSlots:parsed.slotItems.size||parsed.completeSlotItems?gameGearSlots:(Array.isArray(old.gameGearSlots)?old.gameGearSlots:[]),gameGearExpansion:parsed.slotItems.size||parsed.completeSlotItems?gameGearExpansion:String(old.gameGearExpansion||''),tags:Array.isArray(old.tags)?old.tags:[],memo:old.memo||'',remodel:old.remodel||'',
+   gear:gearKnown||parsed.slotItems.size||parsed.completeSlotItems?labels.join(' / '):(old.gear||''),gameGearSlots:gearKnown||parsed.slotItems.size||parsed.completeSlotItems?gameGearSlots:(Array.isArray(old.gameGearSlots)?old.gameGearSlots:[]),gameGearExpansion:gearKnown||parsed.slotItems.size||parsed.completeSlotItems?gameGearExpansion:String(old.gameGearExpansion||''),tags:Array.isArray(old.tags)?old.tags:[],memo:old.memo||'',remodel:old.remodel||'',
    source:'kancolle-import',gameShipId:gameId,gameHp:Number(ship.api_nowhp)||0,gameMaxHp:Number(ship.api_maxhp)||0,gameCond:Number(ship.api_cond)||0,
+   gameAsw:ship.api_taisen==null?null:hdKcStatValue(ship.api_taisen),gameAswGearKnown:gearKnown,
    gameLos:Array.isArray(ship.api_sakuteki)?Number(ship.api_sakuteki[0])||0:Number(ship.api_sakuteki)||0,gameOnslot:Array.isArray(ship.api_onslot)?ship.api_onslot.map(Number):[],gameFuel:ship.api_fuel==null?null:Number(ship.api_fuel)||0,gameAmmo:ship.api_bull==null?null:Number(ship.api_bull)||0,
    gameLocked:Number(ship.api_locked)||0,gameSallyArea:Number(ship.api_sally_area)||0,gameSlotEx:ship.api_slot_ex!=null&&String(ship.api_slot_ex).trim()!==''&&Number.isFinite(Number(ship.api_slot_ex))?Number(ship.api_slot_ex):null,syncedAt:now,updatedAt:now
   });

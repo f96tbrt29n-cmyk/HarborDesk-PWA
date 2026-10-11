@@ -491,3 +491,43 @@ test('set remedies warn when AA equipment competes with a ready ASW set',async({
  expect(r.readyAsw).toBe(true);expect(r.options.some(x=>x.available)).toBe(true);expect(r.options.filter(x=>x.available).every(x=>x.tradeoffs.includes('対潜シナジー'))).toBe(true);
  expect(r.html).toContain('ただし 対潜シナジー が不足します。');expect(r.html).not.toContain('現在充足している装備条件を維持する候補です。');
 });
+
+test('opening ASW distinguishes threshold boundaries automatic ships and carrier conditions',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdFEOpeningAsw==='function');
+ const r=await page.evaluate(()=>{
+  const check=(name,value,names)=>{const db=hdFEFindShip(name),profile=hdShipDbSlotProfile(db),ship={ship:name,gameShipId:71,masterId:hdShipDbMasterRowFor(db).id,items:names.map((name,slotIndex)=>({name,slotIndex,capacity:profile.slots[slotIndex]})),expansion:null};localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name,gameShipId:71,masterId:ship.masterId,gameAsw:value,gameAswGearKnown:true,gameGearSlots:Array.from({length:profile.count},(_,i)=>names[i]||''),gameGearExpansion:''}]));return hdFEOpeningAsw(ship)};
+  return {dd99:check('夕立改二',99,['三式水中探信儀']),dd100:check('夕立改二',100,['三式水中探信儀']),noSonar:check('夕立改二',100,['三式爆雷投射機']),de59:check('占守改',59,['三式水中探信儀']),de60:check('占守改',60,['三式水中探信儀']),de74:check('占守改',74,['九五式爆雷']),de75:check('占守改',75,['九五式爆雷']),deWeak:check('占守改',75,['12cm単装高角砲E型']),auto:check('五十鈴改二',null,[]),beforeRemodel:check('五十鈴改',null,[]),cvl64:check('瑞鳳改二乙',64,['九七式艦攻(九三一空)']),cvl65:check('瑞鳳改二乙',65,['九七式艦攻(九三一空)']),cvlLowPlane:check('瑞鳳改二乙',65,['九七式艦攻']),hyugaBad:check('日向改二',100,['零式水中聴音機']),hyuga:check('日向改二',null,['S-51J']),kagaBad:check('加賀改二護',null,[]),kaga:check('加賀改二護',null,['九七式艦攻'])};
+ });
+ for(const key of ['dd99','noSonar','de59','de74','deWeak','beforeRemodel','cvl64','cvlLowPlane','hyugaBad','kagaBad'])expect(r[key].status,key).toBe('missing');
+ for(const key of ['dd100','de60','de75','auto','cvl65','hyuga','kaga'])expect(r[key].status,key).toBe('ready');
+ expect(r.dd99).toMatchObject({value:99,threshold:100,source:'同じ装備での同期値'});expect(r.dd99.reason).toContain('あと1');
+});
+
+test('opening ASW manual game values expire after gear or sync changes and never borrow a duplicate ship stat',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ await page.evaluate(()=>{
+  const db=hdFEFindShip('夕立改二'),profile=hdShipDbSlotProfile(db),ship={ship:'夕立改二',gameShipId:71,masterId:hdShipDbMasterRowFor(db).id,type:'駆逐艦',master:true,items:[{name:'三式水中探信儀',slotIndex:0,capacity:0},{name:'三式爆雷投射機',slotIndex:1,capacity:0}],missing:[],expansion:null};
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship.ship,gameShipId:71,masterId:ship.masterId,level:90,syncedAt:1,gameAsw:100,gameAswGearKnown:true,gameGearSlots:Array.from({length:profile.count},(_,i)=>i===0?'三式水中探信儀':''),gameGearExpansion:''}]));
+  const plan={map:'1-1',index:0,ships:[ship],suggestion:{slots:[]},missing:[],used:{},owned:{}};hdFLUpdateAssessment(plan);HD_FL_CACHE['1-1:0']=plan;
+  const host=document.createElement('section');host.id='oasw-test';host.innerHTML=hdFLPlanHtml(plan);document.body.appendChild(host);
+ });
+ const check=page.locator('#oasw-test .hd-fl-oasw');await expect(check).toContainText('先制対潜：未判定');
+ const input=check.locator('input');await input.fill('99');await input.press('Tab');await expect(check).toContainText('先制対潜：不可');await expect(check).toContainText('あと1');
+ await check.locator('input').fill('100');await check.locator('input').press('Tab');await expect(check).toContainText('先制対潜：可能');
+ await page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];p.ships[0].items.push({name:'10cm連装高角砲',slotIndex:2,capacity:0});document.getElementById('oasw-test').innerHTML=hdFLPlanHtml(p)});
+ await expect(check).toContainText('先制対潜：未判定');
+ const r=await page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'],s=p.ships[0],key=hdFEAswKey(s,'scope'),confirmed=hdFEAswConfirmed();confirmed[key]=100;localStorage.setItem(HD_FE_OASW_CONFIRM_KEY,JSON.stringify(confirmed));const before=hdFEOpeningAsw(s,'scope');const rows=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1'));rows[0].syncedAt=2;localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(rows));const after=hdFEOpeningAsw(s,'scope');localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([rows[0],{...rows[0],gameShipId:72}]));const ambiguous=hdFEOpeningAsw({...s,gameShipId:0},'another');window.dispatchEvent(new Event('hd:kancolle-sync'));return {before:before.status,after:after.status,ambiguous:ambiguous.status}});
+ expect(r).toEqual({before:'ready',after:'manual',ambiguous:'manual'});await expect(check).toContainText('再配備して確認');await expect(check.locator('input')).toHaveCount(0);
+});
+
+test('opening ASW sync captures exact displayed stats and rejects incomplete gear information',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdKcMergeRoster==='function');
+ const r=await page.evaluate(()=>{
+  const parsed=hdKcImportEmpty(),db=hdFEFindShip('夕立改二'),id=hdShipDbMasterRowFor(db).id,equipId=[...hdKcMasterEquipMap()].find(([id,x])=>x.name==='三式水中探信儀')[0];
+  parsed.ships.set(71,{api_id:71,api_ship_id:id,api_lv:90,api_slot:[10,-1,-1],api_slot_ex:0,api_taisen:[100,130]});parsed.slotItems.set(10,{api_id:10,api_slotitem_id:equipId});
+  hdKcMergeRoster(parsed);const complete=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1'))[0];parsed.slotItems.clear();hdKcMergeRoster(parsed);const partial=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1'))[0];parsed.ships.get(71).api_taisen=null;hdKcMergeRoster(parsed);const absent=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1'))[0];
+  const ship=parsed.ships.get(71);ship.api_slot=[-1,-1,-1];ship.api_taisen=[100,130];hdKcMergeRoster(parsed);const empty=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1'))[0];
+  return {complete:{value:complete.gameAsw,known:complete.gameAswGearKnown},partial:{value:partial.gameAsw,known:partial.gameAswGearKnown},absent:absent.gameAsw,empty:{slots:empty.gameGearSlots,known:empty.gameAswGearKnown},invalid:hdKcStatValue(['',100]),zero:hdKcStatValue([0,100])};
+ });
+ expect(r).toEqual({complete:{value:100,known:true},partial:{value:100,known:false},absent:null,empty:{slots:['','',''],known:true},invalid:null,zero:0});
+});
