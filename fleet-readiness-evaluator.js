@@ -134,14 +134,19 @@ function hdFEAir(items){
 }
 // Generic surface night attacks, checked against KC3Kai Ship.estimateNightAttackType
 // and https://wikiwiki.jp/kancolle/夜戦#dfcb6e1f (2026-10-12).
-function hdFENightCI(ship){
- const db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db),master=db&&hdShipDbMasterRowFor(db),base={main:0,secondary:0,torpedo:0};
- const result=(status,attack,label,detail)=>({status,attack,label,detail,...base});
- if(!db||!profile||Number(ship.masterId)>0&&Number(master?.id)!==Number(ship.masterId))return result('manual','unknown','未判定','艦娘名・改造段階・マスター情報を確認してね。');
- if(!['駆逐艦','軽巡洋艦','練習巡洋艦','重雷装巡洋艦','重巡洋艦','航空巡洋艦','戦艦','高速戦艦','航空戦艦','海防艦','海防戦艦'].includes(db.type))return result('manual','unsupported','未対応','この艦種の夜戦攻撃は別判定です。空母・潜水艦などの専用CIは出典で確認してね。');
+function hdFENightEquipment(ship){
+ const db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db),master=db&&hdShipDbMasterRowFor(db),result=detail=>({status:'manual',db,rows:[],detail});
+ if(!db||!profile||Number(ship.masterId)>0&&Number(master?.id)!==Number(ship.masterId))return result('艦娘名・改造段階・マスター情報を確認してね。');
  const slots=new Set(),rows=(ship.items||[]).filter(x=>x.name);
- for(const row of rows){const index=Number(row.slotIndex),item=hdFEFind(row.name);if(!item||!Number.isInteger(index)||index<0||index>=profile.count||slots.has(index)||!hdShipDbEquipCompatible(item,db)||hdShipDbSlotRejects(profile,index,item))return result('manual','unknown','未判定','装備性能・通常スロット位置・装備可否を確認してね。');slots.add(index)}
- if(ship.expansion?.name){const item=hdFEFind(ship.expansion.name);if(!item||!hdFLHasExpansion(hdFEAswRoster(ship))||!hdShipDbExpansionInfo(item,db,ship.expansion.star).allowed)return result('manual','unknown','未判定','増設の開放状態・装備可否を確認してね。');rows.push(ship.expansion)}
+ for(const row of rows){const index=Number(row.slotIndex),item=hdFEFind(row.name);if(!item||!Number.isInteger(index)||index<0||index>=profile.count||slots.has(index)||!hdShipDbEquipCompatible(item,db)||hdShipDbSlotRejects(profile,index,item))return result('装備性能・通常スロット位置・装備可否を確認してね。');slots.add(index)}
+ if(ship.expansion?.name){const item=hdFEFind(ship.expansion.name);if(!item||!hdFLHasExpansion(hdFEAswRoster(ship))||!hdShipDbExpansionInfo(item,db,ship.expansion.star).allowed)return result('増設の開放状態・装備可否を確認してね。');rows.push(ship.expansion)}
+ return {status:'known',db,rows};
+}
+function hdFENightCI(ship){
+ const equipment=hdFENightEquipment(ship),db=equipment.db,base={main:0,secondary:0,torpedo:0},result=(status,attack,label,detail)=>({status,attack,label,detail,...base});
+ if(equipment.status==='manual')return result('manual','unknown','未判定',equipment.detail);
+ if(!['駆逐艦','軽巡洋艦','練習巡洋艦','重雷装巡洋艦','重巡洋艦','航空巡洋艦','戦艦','高速戦艦','航空戦艦','海防艦','海防戦艦'].includes(db.type))return result('manual','unsupported','未対応','この艦種の夜戦攻撃は別判定です。専用CIの条件を確認してね。');
+ const rows=equipment.rows;
  for(const row of rows){const cat=hdFEFind(row.name).category||'';if(cat.includes('主砲'))base.main++;else if(cat.includes('副砲'))base.secondary++;else if(cat==='魚雷'||cat==='潜水艦魚雷')base.torpedo++}
  if(base.main>=3)return result('ready','main','主砲カットイン','主砲3以上。汎用CIでは主砲CIが優先されます。');
  if(base.main>=2&&base.secondary>=1)return result('ready','main-secondary','主副カットイン','主砲2以上＋副砲1以上。汎用CIでは魚雷CIより優先されます。');
@@ -168,7 +173,22 @@ function hdFENightDDHtml(ship){
  if(hdFEFindShip(ship.ship)?.type!=='駆逐艦')return '';
  const x=hdFENightDD(ship),esc=hdFEEsc;return `<section class="hd-fl-night ${x.status}"><b>駆逐艦専用CI装備条件：${x.status==='ready'?'成立':x.status==='manual'?'未判定':'未成立'}</b><p>${esc(x.candidates.map(c=>c.label).join(' → ')||x.detail)}</p>${x.candidates.length?`<small>${esc(x.detail)}</small>`:''}<p>攻撃回数の条件：${esc(x.hitDetail)}</p><small>水上艦目標向け。発動・命中・2回攻撃は確定しません。運・配置・損傷も確認してね。水上電探は素索敵5以上。通常の熟練見張員は魚魚水・魚ド水CI用の水雷戦隊 熟練見張員を代用できません。${x.dGun?'D型改二・改三の砲あり。主魚電・魚見電CIの威力補正対象です。':'D型砲は装備条件の必須ではありません。威力補正は別確認です。'}</small><a class="guide-link" href="https://wikiwiki.jp/kancolle/夜戦#dfcb6e1f" target="_blank" rel="noopener">駆逐艦専用CIの出典 ↗</a></section>`;
 }
+// The submarine radar set shadows the late-torpedo pair, which shadows the regular pair.
+function hdFENightSub(ship){
+ const equipment=hdFENightEquipment(ship),base={late:0,radar:0,torpedo:0},result=(status,attack,label,detail)=>({status,attack,label,detail,...base});
+ if(!['潜水艦','潜水空母'].includes(equipment.db?.type))return result('manual','unsupported','未対応','潜水艦・潜水空母専用の装備条件です。');
+ if(equipment.status==='manual')return result('manual','unknown','未判定',equipment.detail);
+ for(const row of equipment.rows){const item=hdFEFind(row.name);if(!hdSENightSubMeta(item.name))return result('manual','unknown','未判定','装備のマスター区分が未確認です。');if(hdSEPartMatches('nightSubLate',item))base.late++;if(hdSEPartMatches('nightSubRadar',item))base.radar++;if(hdSEPartMatches('nightTorpedo',item))base.torpedo++}
+ if(base.late>=1&&base.radar>=1)return result('ready','sub-radar','後期型魚雷＋潜水艦用電探CI','このセットが優先されます。後期型魚雷2本のCIとは重複して判定しません。');
+ if(base.late>=2)return result('ready','sub-late','後期型魚雷2本CI','後期型魚雷2本。潜水艦用電探のセットがなければ、このCIを優先します。');
+ if(base.torpedo>=2)return result('ready','sub-torpedo','通常魚雷2本CI','後期型の専用セットがない場合の通常魚雷CI。甲標的は魚雷に数えません。');
+ return result('missing','normal','通常攻撃','後期型魚雷＋潜水艦用電探、後期型魚雷2本、通常魚雷2本のいずれも未成立です。');
+}
+function hdFENightSubHtml(ship){
+ const x=hdFENightSub(ship),esc=hdFEEsc;return `<section class="hd-fl-night ${x.status}"><b>潜水艦夜戦CI装備条件：${x.status==='ready'?'成立':x.status==='manual'?'未判定':'未成立'}</b><p>${esc(x.label)}｜${esc(x.detail)}</p>${x.status!=='manual'?`<small>後期型魚雷 ${x.late}・潜水艦用電探 ${x.radar}・魚雷合計 ${x.torpedo}</small>`:''}<small>水上艦目標向けの装備条件です。発動率・命中・撃破火力は未計算。運・配置・損傷も確認してね。装備名に「後期型」「電探」があるだけでは専用セットと判定しません。潜水艦隊の特殊攻撃は別判定です。</small><a class="guide-link" href="https://wikiwiki.jp/kancolle/夜戦#dfcb6e1f" target="_blank" rel="noopener">潜水艦CIの出典 ↗</a></section>`;
+}
 function hdFENightCIHtml(ship){
+ if(['潜水艦','潜水空母'].includes(hdFEFindShip(ship.ship)?.type))return hdFENightSubHtml(ship);
  const x=hdFENightCI(ship),esc=hdFEEsc;return `<section class="hd-fl-night ${x.status}"><b>夜戦汎用CI装備条件：${x.status==='ready'?'成立':x.status==='manual'?'未判定':'未成立'}</b><p>${esc(x.label)}｜${esc(x.detail)}</p>${x.status!=='manual'?`<small>主砲 ${x.main}・副砲 ${x.secondary}・魚雷 ${x.torpedo}</small>`:''}<small>水上艦目標向けの装備条件です。発動確定・発動率・撃破火力の判定ではありません。運・Lv・配置・損傷、敵の種類も確認してね。駆逐艦専用CIは下欄、夜間瑞雲・タッチなどは別判定です。</small><a class="guide-link" href="https://wikiwiki.jp/kancolle/夜戦#dfcb6e1f" target="_blank" rel="noopener">夜戦装備条件の出典 ↗</a></section>${hdFENightDDHtml(ship)}`;
 }
 function hdFENight(items,stats){

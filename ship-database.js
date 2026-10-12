@@ -8613,8 +8613,12 @@ function hdShipDbSlotProfile(ship){
  const names=typeof hdShipDbMasterTypeMap==='function'?hdShipDbMasterTypeMap():new Map(),allowedTypes=Object.keys(equipRules).map(id=>names.get(String(id))||'').filter(Boolean);
  return {id:row.id,ctype:row.ctype,stype:row.stype,slots:[...(row.slots||[])],equipRules,allowedTypes,flags:[],total:(row.slots||[]).reduce((s,n)=>s+n,0),count:(row.slots||[]).length,masterOnly:true};
 }
+let hdShipDbMetaAliases=null;
 function hdShipDbMasterMeta(item){
- return HD_EQUIPMENT_MASTER_META_BY_NAME[String(item?.name||'')]||null;
+ const name=String(item?.name||''),exact=HD_EQUIPMENT_MASTER_META_BY_NAME[name];if(exact)return exact;
+ const source=window.HD_KANCOLLE_MASTER_SNAPSHOT;
+ if(!hdShipDbMetaAliases||hdShipDbMetaAliases.source!==source)hdShipDbMetaAliases={source,names:new Map(Object.keys(HD_EQUIPMENT_MASTER_META_BY_NAME).map(name=>[hdShipDbEquipNorm(name),name]))};
+ return HD_EQUIPMENT_MASTER_META_BY_NAME[hdShipDbMetaAliases.names.get(hdShipDbEquipNorm(name))]||null;
 }
 function hdShipDbPickerTypeId(item){
  const exact=hdShipDbMasterMeta(item);

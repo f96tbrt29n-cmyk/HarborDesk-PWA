@@ -766,3 +766,48 @@ test('destroyer night CI remedies reuse a confirmed expansion lookout and name a
  });
  expect(r.unchanged).toBe(true);expect(r.owned.some(x=>x.available&&x.targetReady)).toBe(true);expect(r.owned.every(x=>x.changes.every(c=>c.slot<=3))).toBe(true);expect(r.missing.length).toBeGreaterThan(0);expect(r.missing.every(x=>!x.available)).toBe(true);expect(r.missing.some(x=>x.missing.some(m=>m.name==='水雷戦隊 熟練見張員'&&m.need===1))).toBe(true);
 });
+
+test('submarine night CI uses verified equipment IDs and evaluates the actual priority',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdFENightSub==='function');
+ const r=await page.evaluate(()=>{
+  const late='後期型艦首魚雷(6門)',radar='潜水艦搭載電探＆逆探(E27)',fish='61cm四連装(酸素)魚雷',check=(ship,names)=>hdFENightSub({ship,items:names.map((name,slotIndex)=>({name,slotIndex})),expansion:null});
+  const ship={ship:'伊13改',items:[late,late,radar].map((name,slotIndex)=>({name,slotIndex})),expansion:null},before=JSON.stringify(ship),state=hdFENightSub(ship),parts=[...HD_SE_SUB_LATE_IDS].map(id=>{const [name]=Object.entries(window.HD_KANCOLLE_MASTER_SNAPSHOT.equipment).find(([,v])=>v.id===id);return {id,matched:hdSEPartMatches('nightSubLate',hdFEFind(name))}});
+  return {state,parts,alias:hdSEPartMatches('nightSubLate',hdFEFind('熟練聴音員＋後期型艦首魚雷(6門)')),pair:check('伊58改',[late,late]),regular:check('伊58改',[late,fish]),one:check('伊58改',[fish,radar]),waterRadar:check('伊13改',[late,late,'22号対水上電探']),surface:check('夕立改二',[fish,fish]),fake:hdSEPartMatches('nightSubLate',{name:'架空の後期型魚雷',category:'潜水艦魚雷',stats:{雷装:99}}),invalid:hdFENightSub({ship:'伊58改',items:[{name:late,slotIndex:0},{name:late,slotIndex:0}],expansion:null}),unchanged:before===JSON.stringify(ship),lowerGoal:hdSECapabilityMeasure({ships:[ship]},'cap-night-sub-late'),html:hdFENightCIHtml(ship)};
+ });
+ expect(r.parts).toHaveLength(8);expect(r.parts.every(x=>x.matched)).toBe(true);expect(r.alias).toBe(true);expect(r.fake).toBe(false);expect(r.state).toMatchObject({status:'ready',attack:'sub-radar',late:2,radar:1});expect(r.pair.attack).toBe('sub-late');expect(r.regular.attack).toBe('sub-torpedo');expect(r.one.status).toBe('missing');expect(r.waterRadar).toMatchObject({status:'ready',attack:'sub-late',radar:0});expect(r.surface.status).toBe('manual');expect(r.invalid.status).toBe('manual');expect(r.lowerGoal.count).toBe(0);expect(r.unchanged).toBe(true);expect(r.html).toContain('潜水艦夜戦CI装備条件：成立');expect(r.html).not.toContain('夜戦汎用CI装備条件');expect(r.html).toContain('発動率・命中・撃破火力は未計算');
+});
+
+test('submarine night CI search assembles all selected sets within stock and keeps unopened expansion slots empty',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const rows=await page.evaluate(()=>[['sub-radar',[['後期型艦首魚雷(6門)',1],['潜水艦搭載電探＆逆探(E27)',1]]],['sub-late',[['後期型艦首魚雷(6門)',2]]],['sub-torpedo',[['後期型艦首魚雷(6門)',2],['61cm四連装(酸素)魚雷',1]]]].map(([policy,stock])=>{
+  localStorage.setItem(HD_SE_NIGHT_POLICY_KEY,JSON.stringify({'1-1':policy}));const inventory=stock.map(([name,count])=>({name,count})),ship=policy==='sub-torpedo'?'伊13改':'伊58改';localStorage.setItem('harbordesk-equipment-v1',JSON.stringify(inventory));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship,level:80,gameSlotEx:0}]));const result=hdOCSearch({map:'1-1',index:0,preset:null,fleet:{id:policy,ships:[{ship,gear:''}]}},{});return {policy,goal:result.measure.goals.find(g=>g.kind===hdSENightKind('1-1')),state:hdFENightSub(result.plan.ships[0]),expansion:result.plan.ships[0].expansion,inventory,usage:hdFOAssignedUsage(result.plan)};
+ }));
+ for(const r of rows){expect(r.state).toMatchObject({status:'ready',attack:r.policy});expect(r.goal.ok).toBe(true);expect(r.expansion).toBeNull();for(const x of r.inventory)expect(r.usage[x.name+'@@0']||0).toBeLessThanOrEqual(x.count);}
+});
+
+test('submarine night CI can remove a competing confirmed expansion radar and proposes its removal without inventing a slot',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const r=await page.evaluate(()=>{
+  const late='後期型艦首魚雷(6門)',radar='潜水艦搭載電探＆逆探(E27)',masterId=hdShipDbMasterRowFor(hdFEFindShip('伊58改')).id,requirements=[{kind:'cap-night-sub-late',label:'後期型魚雷2本CI',minCount:1}],ship={ship:'伊58改',masterId,gameShipId:91,items:[late,late].map((name,slotIndex)=>({name,slotIndex})),expansion:{name:radar}},plan={map:'1-1',index:0,ships:[ship],suggestion:{slots:[]}};
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:late,count:2},{name:radar,count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship.ship,masterId,gameShipId:91,level:90,gameSlotEx:1}]));localStorage.setItem(HD_SE_NIGHT_POLICY_KEY,JSON.stringify({'1-1':'sub-late'}));plan.assessment={requirements,measure:hdOCMeasure(plan,requirements)};const original=JSON.stringify(plan),options=hdFLSetRemedies(plan,plan.assessment.measure.goals[0]),unchanged=original===JSON.stringify(plan),html=hdFLSetRemediesHtml(plan.assessment.measure.goals[0],options),context={map:'1-1',index:0,preset:null,fleet:{id:'sub-clear-exp',ships:[{ship:ship.ship,gameShipId:91,masterId,gear:[late,late,'[増設] '+radar].join(' / ')}]}},starting=hdFENightSub(hdOCBuild(context).plan.ships[0]),result=hdOCSearch(context,{});
+  const initial=hdFENightSub(ship),info=hdShipDbExpansionInfo(hdFEFind(radar),hdFEFindShip(ship.ship));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship.ship,masterId,gameShipId:91,level:90,gameSlotEx:0}]));const closed=hdFENightSub(ship);return {initial,info,starting,options,unchanged,html,state:hdFENightSub(result.plan.ships[0]),expansion:result.plan.ships[0].expansion,goal:result.measure.goals.find(g=>g.kind==='cap-night-sub-late'),closed};
+ });
+ expect(r.unchanged).toBe(true);expect(r.info.allowed).toBe(true);expect(r.initial.attack).toBe('sub-radar');expect(r.starting.attack).toBe('sub-radar');expect(r.options.some(x=>x.available&&x.targetReady&&x.changes.some(c=>c.expansion&&c.name==='空き枠'))).toBe(true);expect(r.html).toContain('増設：');expect(r.html).not.toContain('第増設');expect(r.state.attack).toBe('sub-late');expect(r.goal.ok).toBe(true);expect(r.expansion).toBeNull();expect(r.closed.status).toBe('manual');
+});
+
+test('submarine night CI missing sets name the equipment and cannot combine gear from different ships',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdFENightSub==='function');
+ const r=await page.evaluate(()=>{
+  const late='後期型艦首魚雷(6門)',ships=['伊58改','伊19改'].map(ship=>({ship,items:[{name:late,slotIndex:0}],expansion:null})),split=hdSECapabilityMeasure({ships},'cap-night-sub-late'),requirements=[{kind:'cap-night-sub-radar',label:'後期型魚雷＋電探CI',minCount:1}],plan={map:'1-1',index:0,ships:[ships[0]],suggestion:{slots:[]}};localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:late,count:1}]));plan.assessment={requirements,measure:hdOCMeasure(plan,requirements)};const before=JSON.stringify(plan),options=hdFLSetRemedies(plan,plan.assessment.measure.goals[0]);return {split,options,unchanged:before===JSON.stringify(plan)};
+ });
+ expect(r.split.count).toBe(0);expect(r.options.length).toBeGreaterThan(0);expect(r.options.every(x=>!x.available)).toBe(true);expect(r.options.some(x=>x.missing.some(m=>hdLikeSubRadar(m.name)))).toBe(true);expect(r.unchanged).toBe(true);
+ function hdLikeSubRadar(name){return /潜水艦|シュノーケル|SJレーダー/.test(name)}
+});
+
+test('submarine night CI policy regenerates the mobile owned loadout and persists the selected set',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ await page.evaluate(()=>{
+  const masterId=hdShipDbMasterRowFor(hdFEFindShip('伊58改')).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'後期型艦首魚雷(6門)',count:2},{name:'潜水艦搭載電探＆逆探(E27)',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'伊58改',masterId,gameShipId:93,level:90,gameSlotEx:0}]));hdFSMap=()=> '1-1';hdFSPlans=()=>[{index:0,preset:{name:'sub fixture'},needs:[],slots:[{profile:{row:{name:'伊58改',masterId,gameShipId:93,level:90},type:'潜水空母',roles:[]}}]}];const card=document.createElement('article');card.id='sub-policy-test';card.className='hd-fs-card';card.innerHTML='<button data-hd-fl-generate="0">自動配備</button><div class="hd-fl-host"></div>';document.body.appendChild(card);hdFLRender(0,card);
+ });
+ const card=page.locator('#sub-policy-test');await card.locator('[data-hd-night-policy]').selectOption('sub-radar');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightSub(p.ships[0]).attack})).toBe('sub-radar');await expect(card).toContainText('潜水艦夜戦CI装備条件：成立');await card.locator('[data-hd-night-policy]').selectOption('sub-late');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightSub(p.ships[0]).attack})).toBe('sub-late');expect(await page.evaluate(()=>HD_FL_CACHE['1-1:0'].ships[0].expansion)).toBeNull();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('sub-late');
+});

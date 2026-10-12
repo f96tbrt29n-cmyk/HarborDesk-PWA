@@ -62,7 +62,10 @@ const HD_SE_PARTS={
  nightSurfaceRadar:{label:'水上電探（素索敵5以上）',examples:['22号対水上電探','33号対水上電探']},
  nightLookout:{label:'熟練見張員系',examples:['熟練見張員','水雷戦隊 熟練見張員']},
  nightWaterLookout:{label:'水雷戦隊 熟練見張員（通常見張員は不可）',examples:['水雷戦隊 熟練見張員']},
- nightDrum:{label:'ドラム缶(輸送用)',examples:['ドラム缶(輸送用)']}
+ nightDrum:{label:'ドラム缶(輸送用)',examples:['ドラム缶(輸送用)']},
+ nightSubLate:{label:'専用CI対応の後期型潜水艦魚雷',examples:['後期型艦首魚雷(6門)','熟練聴音員＋後期型艦首魚雷(6門)']},
+ nightSubRadar:{label:'潜水艦用電探（マスター装備種51）',examples:['潜水艦搭載電探＆逆探(E27)','後期型潜水艦搭載電探＆逆探']},
+ nightSubNormal:{label:'通常魚雷（後期型専用魚雷を除く）',examples:['61cm四連装(酸素)魚雷','試製FaT仕様九五式酸素魚雷改']}
 };
 const HD_SE_RECIPES={
  'cap-aa':[
@@ -87,12 +90,21 @@ const HD_SE_RECIPES={
   {id:'dd-lookout-radar',name:'魚見電CI：魚雷＋見張員系＋水上電探',parts:['nightTorpedo','nightLookout','nightSurfaceRadar'],ship:'night-dd',attack:'dd-lookout-radar'},
   {id:'dd-water-torpedo',name:'魚魚水CI：魚雷2＋水雷戦隊 熟練見張員',parts:['nightTorpedo','nightTorpedo','nightWaterLookout'],ship:'night-dd',attack:'dd-water-torpedo'},
   {id:'dd-water-drum',name:'魚ド水CI：魚雷＋ドラム缶＋水雷戦隊 熟練見張員',parts:['nightTorpedo','nightDrum','nightWaterLookout'],ship:'night-dd',attack:'dd-water-drum'}
+ ],
+ 'cap-night-sub':[
+  {id:'sub-radar',name:'後期型魚雷＋潜水艦用電探CI',parts:['nightSubLate','nightSubRadar'],ship:'night-sub',attack:'sub-radar'},
+  {id:'sub-late',name:'後期型魚雷2本CI',parts:['nightSubLate','nightSubLate'],ship:'night-sub',attack:'sub-late'},
+  {id:'sub-torpedo',name:'通常魚雷2本CI（後期型は最大1本）',parts:['nightSubNormal','nightTorpedo'],ship:'night-sub',attack:'sub-torpedo'}
  ]
 };
 const HD_SE_NIGHT_POLICY_KEY='harbordesk-night-ci-policy-v1';
-const HD_SE_NIGHT_POLICIES={auto:'自動（海域目安）',torpedo:'魚雷CI',main:'主砲CI','main-secondary':'主副CI',mixed:'主魚CI','dd-main-radar':'駆逐：主魚電CI','dd-lookout-radar':'駆逐：魚見電CI','dd-water-torpedo':'駆逐：魚魚水CI','dd-water-drum':'駆逐：魚ド水CI'};
+const HD_SE_NIGHT_POLICIES={auto:'自動（海域目安）',torpedo:'魚雷CI',main:'主砲CI','main-secondary':'主副CI',mixed:'主魚CI','dd-main-radar':'駆逐：主魚電CI','dd-lookout-radar':'駆逐：魚見電CI','dd-water-torpedo':'駆逐：魚魚水CI','dd-water-drum':'駆逐：魚ド水CI','sub-radar':'潜水：後期魚雷＋電探CI','sub-late':'潜水：後期魚雷2本CI','sub-torpedo':'潜水：通常魚雷2本CI'};
 for(const attack of ['torpedo','main','main-secondary','mixed'])HD_SE_RECIPES['cap-night-'+attack]=HD_SE_RECIPES['cap-night-ci'].filter(r=>r.attack===attack);
 for(const recipe of HD_SE_RECIPES['cap-night-dd'])HD_SE_RECIPES['cap-night-'+recipe.attack]=[recipe];
+for(const recipe of HD_SE_RECIPES['cap-night-sub'])HD_SE_RECIPES['cap-night-'+recipe.attack]=[recipe];
+const HD_SE_SUB_LATE_IDS=new Set([213,214,383,441,443,457,461,512]);
+let hdSENightSubMetaCache=null;
+function hdSENightSubMeta(name){const snapshot=window.HD_KANCOLLE_MASTER_SNAPSHOT;if(hdSENightSubMetaCache?.snapshot!==snapshot||!hdSENightSubMetaCache)hdSENightSubMetaCache={snapshot,rows:new Map()};const rows=hdSENightSubMetaCache.rows;if(!rows.has(name))rows.set(name,typeof hdShipDbMasterEquipmentMeta==='function'?hdShipDbMasterEquipmentMeta(name):null);return rows.get(name)}
 function hdSENightPolicy(map){try{const value=JSON.parse(localStorage.getItem(HD_SE_NIGHT_POLICY_KEY)||'{}')[map];return Object.hasOwn(HD_SE_NIGHT_POLICIES,value)?value:'auto'}catch{return 'auto'}}
 function hdSENightKind(map){const policy=hdSENightPolicy(map);return policy==='auto'?'cap-night-ci':'cap-night-'+policy}
 function hdSENightPolicyHtml(map){return `<label class="hd-fl-night-policy">夜戦CI方針<select data-hd-night-policy="${hdSEEsc(map)}">${Object.entries(HD_SE_NIGHT_POLICIES).map(([value,label])=>`<option value="${value}" ${hdSENightPolicy(map)===value?'selected':''}>${label}</option>`).join('')}</select><small>自動は海域目安に従います。CIの種類を選ぶと、その装備条件を配備目標に追加します。水上艦目標向けで、発動確定ではありません。</small></label>`}
@@ -118,19 +130,22 @@ function hdSEPartMatches(part,row){
  if(part==='nightLookout')return ['熟練見張員','水雷戦隊 熟練見張員'].includes(name);
  if(part==='nightWaterLookout')return name==='水雷戦隊 熟練見張員';
  if(part==='nightDrum')return name==='ドラム缶(輸送用)';
+ if(['nightSubLate','nightSubRadar','nightSubNormal'].includes(part)){const meta=hdSENightSubMeta(name);return part==='nightSubLate'?HD_SE_SUB_LATE_IDS.has(Number(meta?.id)):part==='nightSubRadar'?Number(meta?.typeId)===51:[5,32].includes(Number(meta?.typeId))&&!HD_SE_SUB_LATE_IDS.has(Number(meta?.id))}
  return false;
 }
 function hdSEAkizuki(ship){
  const db=typeof hdFEFindShip==='function'?hdFEFindShip(ship.ship):null,row=db&&typeof hdShipDbMasterRowFor==='function'?hdShipDbMasterRowFor(db):null;
  return Number(row?.ctype)===54||/^(秋月|照月|初月|涼月|冬月|夏月|宵月|春月|若月|霜月)/.test(ship.ship||'');
 }
-function hdSERecipeAllows(recipe,ship){if(recipe.ship==='night-dd')return typeof hdFENightDD==='function'&&hdFENightDD({...ship,items:[],expansion:null}).status!=='manual';if(recipe.ship==='night-surface')return typeof hdFENightCI==='function'&&hdFENightCI({...ship,items:[],expansion:null}).status!=='manual';return !recipe.ship||(recipe.ship==='akizuki'?hdSEAkizuki(ship):!hdSEAkizuki(ship))}
-function hdSENightRecipeReady(ship,recipe){if(recipe.ship==='night-dd'){const x=hdFENightDD(ship);return x.status==='ready'&&x.candidates.some(c=>c.attack===recipe.attack)}const x=hdFENightCI(ship);return x.status==='ready'&&x.attack===recipe.attack}
+function hdSERecipeAllows(recipe,ship){if(recipe.ship==='night-sub')return typeof hdFENightSub==='function'&&hdFENightSub({...ship,items:[],expansion:null}).status!=='manual';if(recipe.ship==='night-dd')return typeof hdFENightDD==='function'&&hdFENightDD({...ship,items:[],expansion:null}).status!=='manual';if(recipe.ship==='night-surface')return typeof hdFENightCI==='function'&&hdFENightCI({...ship,items:[],expansion:null}).status!=='manual';return !recipe.ship||(recipe.ship==='akizuki'?hdSEAkizuki(ship):!hdSEAkizuki(ship))}
+function hdSENightRecipeState(ship,recipe){return recipe.ship==='night-sub'?hdFENightSub(ship):recipe.ship==='night-dd'?hdFENightDD(ship):hdFENightCI(ship)}
+function hdSENightStateReady(state,recipe){return state.status==='ready'&&(recipe.ship==='night-dd'?state.candidates.some(c=>c.attack===recipe.attack):state.attack===recipe.attack)}
+function hdSENightRecipeReady(ship,recipe){return hdSENightStateReady(hdSENightRecipeState(ship,recipe),recipe)}
 function hdSEProfiles(map){
  const needs=typeof hdMapEquipNeeds==='function'?hdMapEquipNeeds(map).needs:[],ids=new Set(needs.map(x=>x.id)),rows=[];
  if(ids.has('防空'))rows.push({kind:'cap-aa',baseKind:'防空',label:'対空カットイン',importance:'安定化の推奨',reason:map==='1-6'?'F航空戦マスの被害を抑える防空役を1隻用意。下ルートでは制空優勢や対空CIの発動が通行条件ではありません。':'航空戦・空襲を通るルートの被害軽減用。同じ艦に発動条件を満たす装備を載せます。',note:'対応例の装備条件を確認します。発動は確率制で、ここにない艦固有の専用CIは出典で確認。機銃だけではこのCIセットの準備ありになりません。',source:HD_SE_CAP_SOURCE.aa});
  if(ids.has('対潜'))rows.push({kind:'cap-asw',baseKind:'対潜',label:'対潜シナジー',importance:'潜水艦対策の推奨',reason:'潜水艦と戦うルートで、同じ艦にソナーと爆雷投射機を組み合わせる装備例。',note:'先制対潜は別条件です。装備だけで確定せず、艦種・改造・表示対潜値・ソナー要否を出典で確認。爆雷を追加する3種シナジーも検討。',source:HD_SE_CAP_SOURCE.asw});
- if(ids.has('夜戦')&&!ids.has('対地')||hdSENightPolicy(map)!=='auto')rows.push({kind:hdSENightKind(map),baseKind:'夜戦',label:hdSENightPolicy(map)==='auto'?'夜戦汎用カットイン':'夜戦'+HD_SE_NIGHT_POLICIES[hdSENightPolicy(map)],importance:'水上艦への夜戦火力の選択肢',reason:'同じ艦に選んだCIの装備セットを配備。汎用CIの優先候補と、駆逐艦専用CIの成立セットを別々に確認します。',note:'装備条件の準備判定です。発動率は未計算。駆逐艦専用CIの2回攻撃型はLv80以上が必要で、発動確定ではありません。運・Lv・損傷・配置も確認し、低運艦では連撃も検討。陸上型・潜水艦目標や空母・潜水艦の専用CIは別判定です。',source:'https://wikiwiki.jp/kancolle/夜戦#dfcb6e1f'});
+ if(ids.has('夜戦')&&!ids.has('対地')||hdSENightPolicy(map)!=='auto')rows.push({kind:hdSENightKind(map),baseKind:'夜戦',label:hdSENightPolicy(map)==='auto'?'夜戦汎用カットイン':'夜戦'+HD_SE_NIGHT_POLICIES[hdSENightPolicy(map)],importance:'水上艦への夜戦火力の選択肢',reason:'同じ艦に選んだCIの装備セットを配備。汎用CI・潜水艦CIの優先候補と、駆逐艦専用CIの成立セットを確認します。',note:'装備条件の準備判定です。発動率は未計算。駆逐艦専用CIの2回攻撃型はLv80以上が必要で、発動確定ではありません。潜水艦CIは後期型魚雷＋潜水艦用電探を優先し、選択したCIが成立するか全装備で確認します。運・Lv・損傷・配置も確認してね。陸上型・潜水艦目標、空母の専用CI・潜水艦隊の特殊攻撃は別判定です。',source:'https://wikiwiki.jp/kancolle/夜戦#dfcb6e1f'});
  if(ids.has('対地')){const soft=['3-5','4-3','4-5'].includes(map);rows.push({kind:soft?'cap-land-soft':'cap-land-mixed',baseKind:'対地',label:soft?'ソフトスキン向け対地装備':'対地装備の組み合わせ',importance:'陸上型対策の推奨',reason:soft?'北方棲姫・飛行場姫・港湾棲姫などを攻撃する艦に三式弾系を優先。軽量艦のロケットは補助の選択肢。':'陸戦隊系と内火艇系・ロケットを同じ艦に組み合わせる装備例。砲台・集積地など、対象ごとに有効装備が異なります。',note:'装備例の準備状況であり撃破火力の保証ではありません。通らないマスの対策は不要。敵の種類・改修★・配備艦数も確認。',source:soft?(map==='3-5'?'https://wikiwiki.jp/kancolle/北方海域/3-5':map==='4-5'?'https://wikiwiki.jp/kancolle/西方海域/4-5':HD_SE_CAP_SOURCE.land):map==='6-4'?'https://wikiwiki.jp/kancolle/中部海域/6-4':HD_SE_CAP_SOURCE.land})}
  return rows;
 }
@@ -149,7 +164,7 @@ function hdSEShipPool(ship){
  return hdSEPool(rows.map(x=>({...x,item:hdFEFind(x.name)})));
 }
 function hdSECapabilityMeasure(plan,kind){
- if(kind.startsWith('cap-night-')){const recipes=HD_SE_RECIPES[kind]||[],dd=recipes.every(r=>r.ship==='night-dd'),states=(plan?.ships||[]).filter(s=>s.ship).map(ship=>({ship,state:dd?hdFENightDD(ship):hdFENightCI(ship)})),matched=states.filter(x=>recipes.some(r=>hdSENightRecipeReady(x.ship,r)));return {count:matched.length,ratio:matched.length?1:Math.max(0,...states.filter(x=>x.state.status!=='manual').map(x=>Math.max(0,...recipes.filter(r=>hdSERecipeAllows(r,x.ship)).map(r=>{const p=hdSERecipeParts(r,hdSEShipPool(x.ship));return p.matched/p.total})))),ships:matched.map(x=>x.ship.ship),unresolved:states.length>0&&states.every(x=>x.state.status==='manual')}}
+ if(kind.startsWith('cap-night-')){const recipes=HD_SE_RECIPES[kind]||[],states=(plan?.ships||[]).filter(s=>s.ship).map(ship=>({ship,state:hdSENightRecipeState(ship,recipes[0]||{})})),matched=states.filter(x=>recipes.some(r=>hdSENightStateReady(x.state,r)));return {count:matched.length,ratio:matched.length?1:Math.max(0,...states.filter(x=>x.state.status!=='manual').map(x=>Math.max(0,...recipes.map(r=>{const p=hdSERecipeParts(r,hdSEShipPool(x.ship));return p.matched/p.total})))),ships:matched.map(x=>x.ship.ship),unresolved:states.length>0&&states.every(x=>x.state.status==='manual')}}
  const recipes=HD_SE_RECIPES[kind]||[],ships=plan?.ships||[],matched=[];let best=0;
  for(const ship of ships){const pool=hdSEShipPool(ship);let complete=false;for(const recipe of recipes){if(!hdSERecipeAllows(recipe,ship))continue;const r=hdSERecipeParts(recipe,pool);best=Math.max(best,r.matched/Math.max(1,r.total));if(r.complete)complete=true}if(complete)matched.push(ship.ship)}
  return {count:matched.length,ratio:Math.max(Math.min(1,matched.length),best),ships:matched};

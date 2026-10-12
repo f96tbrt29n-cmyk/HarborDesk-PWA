@@ -1,11 +1,21 @@
 const { test, expect } = require('@playwright/test');
 
-test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, serviceWorkers: 'block' });
 
 async function boot(page, errors = []) {
   page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
   page.on('console', msg => {
     if (msg.type() === 'error') errors.push(`console: ${msg.text()}`);
+  });
+  // Equipment permission assertions do not depend on third-party image hosts.
+  await page.context().route('**/*', async route => {
+    const request = route.request(), url = new URL(request.url());
+    if (['127.0.0.1', 'localhost'].includes(url.hostname) || ['blob:', 'data:'].includes(url.protocol)) return route.continue();
+    if (request.resourceType() === 'image') {
+      const pixel = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=', 'base64');
+      return route.fulfill({ status: 200, contentType: 'image/png', body: pixel });
+    }
+    return route.fulfill({ status: 204, body: '' });
   });
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
