@@ -190,7 +190,7 @@ function hdFENightSubHtml(ship){
 // Equipment prerequisites only. KC3Kai Ship.canCarrierNightAirAttack / estimateNightAttackType.
 // https://github.com/KC3Kai/KC3Kai/blob/6b0534d291c27220da1b6fe454e91fc96a6a7b27/src/library/objects/Ship.js
 function hdFENightCarrier(ship){
- const equipment=hdFENightEquipment(ship),db=equipment.db,base={fighter:0,torpedo:0,crew:0,native:false,candidates:[],depleted:[],unknownCapacity:false},result=(status,detail)=>({...base,status,detail});
+ const equipment=hdFENightEquipment(ship),db=equipment.db,base={fighter:0,torpedo:0,bomber:0,photo:0,crew:0,native:false,candidates:[],depleted:[],unknownCapacity:false},result=(status,detail)=>({...base,status,detail});
  if(!['正規空母','装甲空母','軽空母'].includes(db?.type))return result('manual','空母専用の装備条件です。');
  if(equipment.status==='manual')return result('manual',equipment.detail);
  const profile=hdShipDbSlotProfile(db),master=hdShipDbMasterRowFor(db),roster=hdFEAswRoster(ship),identity=roster&&(!Number(roster.masterId)||Number(roster.masterId)===Number(master.id)),live=identity&&Array.isArray(roster.gameOnslot)?roster.gameOnslot:[];
@@ -198,19 +198,20 @@ function hdFENightCarrier(ship){
  base.native=HD_SE_NATIVE_NIGHT_CARRIERS.has(Number(master.id));
  for(const row of equipment.rows){
   const item=hdFEFind(row.name);if(hdSEPartMatches('nightCarrierCrew',item))base.crew++;
-  const fighter=hdSEPartMatches('nightCarrierFighter',item),torpedo=hdSEPartMatches('nightCarrierTorpedo',item);if(!fighter&&!torpedo)continue;
+  const fighter=hdSEPartMatches('nightCarrierFighter',item),torpedo=hdSEPartMatches('nightCarrierTorpedo',item),bomber=hdSEPartMatches('nightCarrierBomber',item),photo=hdSEPartMatches('nightCarrierPhoto',item);if(!fighter&&!torpedo&&!bomber&&!photo)continue;
   const i=Number(row.slotIndex),raw=live[i],known=raw!=null&&String(raw).trim()!==''&&Number.isFinite(Number(raw))&&Number(raw)>=0,capacity=known?Number(raw):Number(profile.slots[i]);
   if(capacity<=0){base.depleted.push(row.name);continue}if(!Number.isFinite(capacity))return result('manual','航空機の搭載枠を確認してね。');
   if(!known)base.unknownCapacity=true;
-  if(fighter)base.fighter++;if(torpedo)base.torpedo++;
+  if(fighter)base.fighter++;if(torpedo)base.torpedo++;if(bomber)base.bomber++;if(photo)base.photo++;
  }
  if(!base.native&&!base.crew)return result('missing','この改造段階は夜間作戦航空要員系が必要です。');
  if(base.fighter>=2&&base.torpedo>=1)base.candidates.push({attack:'cv-fighter2',label:'夜間戦闘機2＋夜間攻撃機1CI'});
  if(base.fighter>=1&&base.torpedo>=1)base.candidates.push({attack:'cv-fighter1',label:'夜間戦闘機1＋夜間攻撃機1CI'});
+ if((base.photo>=1&&(base.fighter>=1||base.torpedo>=1||base.bomber>=1))||(base.bomber>=1&&(base.fighter>=1||base.torpedo>=1))||base.bomber>=2)base.candidates.push({attack:'cv-bomber',label:'夜間爆撃機・光電管爆弾CI'});
  return result(base.candidates.length?'ready':'missing',base.candidates.length?'対応セットの装備条件が成立。複数成立時は順に判定されます。':'対応する夜間戦闘機・夜間攻撃機の組み合わせが不足しています。');
 }
 function hdFENightCarrierHtml(ship){
- const x=hdFENightCarrier(ship),esc=hdFEEsc;return `<section class="hd-fl-night ${x.status}"><b>空母夜戦CI装備条件：${x.status==='ready'?'成立':x.status==='manual'?'未判定':'未成立'}</b><p>${esc(x.candidates.map(c=>c.label).join(' → ')||x.detail)}</p><small>夜間戦闘機 ${x.fighter}・夜間攻撃機 ${x.torpedo}・${x.native?'夜間作戦航空要員は不要な改造段階':'夜間作戦航空要員系 '+x.crew}</small>${x.depleted.length?`<p>搭載数0で判定から除外：${esc(x.depleted.join('、'))}。補給・残機を確認してね。</p>`:''}${x.unknownCapacity?'<p>残機未同期の枠は最大搭載数で装備条件を判定。出撃前に補給・残機を確認してね。</p>':''}<small>水上艦目標向け。発動率・撃破火力は未計算。通常・軽空母は中破で攻撃不可、装甲空母も大破で攻撃不可。損傷・連合艦隊の配置を別途確認してね。夜間爆撃機・特殊夜間機の別セットは未対応。</small><a class="guide-link" href="https://github.com/KC3Kai/KC3Kai/blob/master/src/library/objects/Ship.js" target="_blank" rel="noopener">空母夜戦CIの判定出典 ↗</a></section>`;
+ const x=hdFENightCarrier(ship),esc=hdFEEsc;return `<section class="hd-fl-night ${x.status}"><b>空母夜戦CI装備条件：${x.status==='ready'?'成立':x.status==='manual'?'未判定':'未成立'}</b><p>${esc(x.candidates.map(c=>c.label).join(' → ')||x.detail)}</p><small>夜間戦闘機 ${x.fighter}・夜間攻撃機 ${x.torpedo}・夜間爆撃機 ${x.bomber}・光電管爆弾 ${x.photo}・${x.native?'夜間作戦航空要員は不要な改造段階':'夜間作戦航空要員系 '+x.crew}</small>${x.depleted.length?`<p>搭載数0で判定から除外：${esc(x.depleted.join('、'))}。補給・残機を確認してね。</p>`:''}${x.unknownCapacity?'<p>残機未同期の枠は最大搭載数で装備条件を判定。出撃前に補給・残機を確認してね。</p>':''}<small>水上艦目標向け。発動率・撃破火力は未計算。通常・軽空母は中破で攻撃不可、装甲空母も大破で攻撃不可。損傷・連合艦隊の配置を別途確認してね。夜間機3枠の別CI・Swordfish系などの特殊夜間機は未対応。</small><a class="guide-link" href="https://github.com/KC3Kai/KC3Kai/blob/master/src/library/objects/Ship.js" target="_blank" rel="noopener">空母夜戦CIの判定出典 ↗</a></section>`;
 }
 function hdFENightCIHtml(ship){
  if(['正規空母','装甲空母','軽空母'].includes(hdFEFindShip(ship.ship)?.type))return hdFENightCarrierHtml(ship);
