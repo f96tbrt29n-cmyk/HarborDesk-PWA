@@ -115,6 +115,19 @@ function hdPLAddExpansionRequirement(map,shipName,masterId,target,reqStar=0,reas
  hdPLSave(old?list.map(x=>x.map===sourceMap?next:x):[next,...list]);return true;
 }
 
+function hdPLAddRemedyRequirement(map,planIndex,goal,option){
+ if(!map||!goal?.label||!option?.missing?.length||option.available)return false;
+ const source='loadout-remedy',route=String(planIndex),items=[];
+ for(const missing of option.missing){
+  const need=Number(missing.need),owned=Number(missing.owned),star=Number(missing.star)||0;
+  if(!missing.name||!Number.isInteger(need)||need<=0||!Number.isInteger(owned)||owned<0||!Number.isInteger(star)||star<0)return false;
+  const resolved=hdPLResolveWanted(missing.name),method=hdPLMethodMeta(resolved.exact?resolved.item:null),total=owned+need;
+  items.push({map,ship:option.ship||'',loadout:goal.label,wanted:missing.name,target:missing.name,kind:hdPLWantedKind(missing.name),exact:true,reqStar:star,qualifiedNeeded:star?total:0,requiredTotal:total,needed:total,ownedPlanSource:source,ownedPlanRoute:route,methodKey:method.key,methodLabel:method.label,rank:method.rank,reason:option.recipe||'',sources:[goal.label,option.ship].filter(Boolean),createdAt:Date.now()});
+ }
+ const list=hdPLLoad(),old=list.find(x=>x.map===map),base=(old?.gearItems||[]).filter(x=>!(x.ownedPlanSource===source&&String(x.ownedPlanRoute)===route&&x.loadout===goal.label));
+ const next={id:old?.id||`pl-${Date.now()}-${Math.random().toString(16).slice(2)}`,map,kinds:old?.kinds||[],gearItems:hdPLMergeGearItems([...base,...items]),createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};
+ hdPLSave(old?list.map(x=>x.map===map?next:x):[next,...list]);return true;
+}
 function hdPLEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdPLLabel(kind){return typeof hdAGKindLabel==='function'?hdAGKindLabel(kind):kind}
 function hdPLCurrentCheck(map,kind){

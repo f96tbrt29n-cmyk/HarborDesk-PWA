@@ -436,6 +436,33 @@ test('numeric remedies do not claim route readiness when a replacement only reac
  expect(r.html).toContain('連戦損耗などの判定は未充足・要確認');expect(r.unresolved).toEqual([]);
 });
 
+async function prepareRemedyProcurement(page){
+ await boot(page);await page.waitForFunction(()=>typeof hdPLAddRemedyRequirement==='function');
+ await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'三式水中探信儀',count:1},{name:'三式爆雷投射機',count:1}]));
+  const plan={map:'1-6',index:0,ships:[{ship:'夕立改二',items:[{name:'三式水中探信儀',slotIndex:0,capacity:0},{name:'三式爆雷投射機',slotIndex:1,capacity:0}],expansion:null,master:true},{ship:'時雨改二',items:[],expansion:null,master:true}],suggestion:{slots:[]}};
+  hdFSMap=()=> '1-6';hdFLRequirements=()=>[{kind:'cap-asw',label:'対潜シナジー',minCount:2}];HD_FL_CACHE['1-6:0']=plan;hdFLUpdateAssessment(plan,true);
+  const goal=plan.assessment.measure.goals.find(g=>g.kind==='cap-asw'),option=plan.setRemedies['cap-asw'].find(x=>!x.available);window.hdProcureFixture={key:hdFLGoalKey(goal),identity:hdFLRemedyIdentity(option)};
+  const host=document.createElement('section');host.id='remedy-procurement-test';host.innerHTML=hdFLSetRemediesHtml(goal,[option],plan);document.body.appendChild(host);
+ });
+}
+test('set remedy procurement preserves total demand without duplicating clicks and survives reload',async({page})=>{
+ await prepareRemedyProcurement(page);
+ await page.locator('#remedy-procurement-test [data-hd-fl-procure-set]').click();
+ await expect(page.locator('#hdEquipmentProcurement')).toBeVisible();
+ const result=await page.evaluate(()=>{const again=hdFLProcureSet('1-6',0,hdProcureFixture.key,hdProcureFixture.identity),items=hdPLLoad().find(x=>x.map==='1-6').gearItems;return {again,items:items.length,demands:hdPLDemandRows(items).map(x=>({target:x.target,needed:x.needed,shortfall:x.shortfall})),inventory:hdPLOwnedCount('三式水中探信儀')}});
+ expect(result.again).toBe(true);expect(result.items).toBe(2);expect(result.inventory).toBe(1);expect(result.demands).toEqual(expect.arrayContaining([{target:'三式水中探信儀',needed:2,shortfall:1},{target:'三式爆雷投射機',needed:2,shortfall:1}]));
+ await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof hdPLDemandRows==='function');
+ expect(await page.evaluate(()=>hdPLLoad().find(x=>x.map==='1-6').gearItems.length)).toBe(2);
+ await page.evaluate(()=>{localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'三式水中探信儀',count:2},{name:'三式爆雷投射機',count:2}]));hdPLRender()});
+ expect(await page.evaluate(()=>hdPLDemandRows(hdPLLoad().find(x=>x.map==='1-6').gearItems).every(x=>x.shortfall===0))).toBe(true);
+});
+test('set remedy procurement rejects stale alternatives when owned stock has changed',async({page})=>{
+ await prepareRemedyProcurement(page);
+ const result=await page.evaluate(()=>{localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'三式水中探信儀',count:2},{name:'三式爆雷投射機',count:2}]));return {saved:hdFLProcureSet('1-6',0,hdProcureFixture.key,hdProcureFixture.identity),rows:hdPLLoad()}});
+ expect(result).toEqual({saved:false,rows:[]});
+});
+
 test('ASW set remedies specify compatible slots while preserving a ready radar condition',async({page})=>{
  await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
  const r=await page.evaluate(()=>{
