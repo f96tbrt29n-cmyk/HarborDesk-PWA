@@ -1,0 +1,118 @@
+const {test,expect}=require('@playwright/test');
+test.use({viewport:{width:390,height:844},isMobile:true,hasTouch:true,serviceWorkers:'block'});
+async function boot(page){
+ await page.route('**/*',r=>['127.0.0.1','localhost'].includes(new URL(r.request().url()).hostname)?r.continue():r.fulfill({status:204,body:''}));
+ await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCFindAlternatives==='function');
+}
+async function fleet(page,{count=2,base=50,stock=2}={}){
+ await boot(page);
+ await page.evaluate(({count,base,stock})=>{
+  const names=['占守改','国後改','択捉改','松輪改'].slice(0,count);
+  const rows=names.map((name,i)=>{const master=hdShipDbMasterRowFor(name),profile=hdShipDbSlotProfile(hdFEFindShip(name));return {id:'asw-'+i,name,masterId:master.id,gameShipId:100+i,level:80,gameAsw:base,gameLos:36,gameAswGearKnown:true,gameGearSlots:Array(profile.count).fill(''),gameGearExpansion:'',gameSlotEx:0}});
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(rows));localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:20}));
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'三式水中探信儀',count:stock,star:0},{name:'三式爆雷投射機',count:stock,star:0}]));
+  saveCustomFleets({'1-5':[{id:'oasw-fleet',name:'先制対潜統合',openingAswCount:count,ships:rows.map(r=>({ship:r.name,masterId:r.masterId,gameShipId:r.gameShipId,rosterId:r.id,gear:''}))}]});
+  hdMSNPresets=()=>[{name:'対潜テストルート',ships:'海防艦'+count,openingAswCount:count}];
+  hdSEChecks=()=>({rows:[{kind:'cap-asw',label:'対潜シナジー',minCount:1}],adv:{}});hdFEEnemyAirCandidates=()=>[];
+  HD_MAP_ADVANCED_DATA['1-5']={los:{coef:1,checks:[{safe:1,failBelow:0}]}};
+  hdMSNOpen('1-5');
+ },{count,base,stock});
+}
+test('opening ASW search equips two distinct ships from owned stacks and counts real capabilities',async({page})=>{
+ await fleet(page);
+ const r=await page.evaluate(()=>{const c=hdOCContext('1-5','oasw-fleet',0),result=hdOCSearch(c);return {result,readiness:hdOCReadiness(result.plan,result.measure),stock:[...hdFLInventory().values()],usage:hdFOAssignedUsage(result.plan)}});
+ const goal=r.result.measure.goals.find(x=>x.kind==='opening-asw');expect(goal).toMatchObject({count:2,minCount:2,ok:true});expect(goal.ships.every(x=>x.state.status==='ready')).toBe(true);
+ expect(r.readiness.registeredReady).toBe(true);expect(r.readiness.complete).toBe(false);
+ for(const row of r.stock)expect(r.usage[row.key]||0).toBeLessThanOrEqual(row.count);
+});
+test('opening ASW lower bounds never turn unverified bonus deficits or missing gear into success',async({page})=>{
+ await fleet(page,{base:49,stock:1});
+ const r=await page.evaluate(()=>{
+  const result=hdOCSearch(hdOCContext('1-5','oasw-fleet',0));const row=hdFERoster()[0],profile=hdShipDbSlotProfile(hdFEFindShip(row.name)),ship={ship:row.name,masterId:row.masterId,gameShipId:row.gameShipId,items:[{name:'三式水中探信儀',slotIndex:0,capacity:0}]};
+  const low=hdFEOpeningAsw(ship);row.gameAsw=60;row.gameGearSlots=Array.from({length:profile.count},(_,i)=>i?'':'三式水中探信儀');localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([row]));const exact=hdFEOpeningAsw(ship);ship.items[0].name='四式水中聴音機';const swapped=hdFEOpeningAsw(ship);return {result,low,exact,swapped};
+ });
+ expect(r.result.measure.goals.find(x=>x.kind==='opening-asw').ok).toBe(false);expect(r.low).toMatchObject({status:'manual',lowerBound:true,value:59,shortfall:1});expect(r.exact.status).toBe('ready');expect(r.swapped.status).toBe('manual');
+});
+test('opening ASW importer retains a naked baseline only across matching level remodel and modernization',async({page})=>{
+ await boot(page);
+ const r=await page.evaluate(()=>{
+  const parsed=hdKcImportEmpty(),mid=hdShipDbMasterRowFor('夕立改二').id,eid=[...hdKcMasterEquipMap()].find(([,x])=>x.name==='三式水中探信儀')[0];
+  const ship={api_id:71,api_ship_id:mid,api_lv:90,api_slot:[-1,-1,-1],api_slot_ex:0,api_taisen:[90,130],api_kyouka:[0,0,0,0,0,0,0]};parsed.ships.set(71,ship);hdKcMergeRoster(parsed);
+  ship.api_slot=[10,-1,-1];ship.api_taisen=[100,130];parsed.slotItems.set(10,{api_id:10,api_slotitem_id:eid});hdKcMergeRoster(parsed);const kept=hdFERoster().find(x=>x.gameShipId===71).gameAswBaseline;
+  const proposed={ship:'夕立改二',masterId:mid,gameShipId:71,items:[{name:'四式水中聴音機',slotIndex:0,capacity:0}]},state=hdFEOpeningAsw(proposed);
+  ship.api_lv=91;hdKcMergeRoster(parsed);const leveled=hdFERoster().find(x=>x.gameShipId===71).gameAswBaseline;
+  ship.api_lv=90;ship.api_slot=[-1,-1,-1];ship.api_taisen=[90,130];hdKcMergeRoster(parsed);ship.api_slot=[10,-1,-1];ship.api_kyouka[6]=1;hdKcMergeRoster(parsed);const modernized=hdFERoster().find(x=>x.gameShipId===71).gameAswBaseline;
+  return {kept,state,leveled,modernized};
+ });
+ expect(r.kept.value).toBe(90);expect(r.state).toMatchObject({status:'ready',value:102,lowerBound:true});expect(r.leveled).toBeNull();expect(r.modernized).toBeNull();
+});
+test('opening ASW goal edits invalidate proposals and confirmed values update the integrated result',async({page})=>{
+ await fleet(page,{base:49,stock:1});const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await panel.locator('[data-hd-oc-search]').tap();
+ await expect(panel.locator('[data-hd-oc-asw-ships]')).toContainText('先制対潜');await expect(panel.locator('[data-hd-oc-readiness]')).not.toContainText('登録範囲の条件を充足');
+ const input=panel.locator('[data-hd-oc-oasw-ship][data-hd-oasw-value]').first();await input.fill('60');
+ expect(await page.evaluate(()=>{const active=document.activeElement;hdMSNRender();return active===document.activeElement&&active.isConnected})).toBe(true);
+ await input.press('Tab');
+ await expect(panel.locator('[data-hd-oc-asw-ships]')).toContainText('入力したゲーム表示値 60');
+ await panel.locator('[data-hd-oc-asw-target]').fill('1');await panel.locator('[data-hd-oc-asw-target]').press('Tab');await expect(panel.locator('[data-hd-oc-apply]')).toHaveCount(0);
+ expect(await page.evaluate(()=>hdOCOaswTarget(hdOCContext('1-5','oasw-fleet',0)))).toBe(1);
+});
+test('opening ASW saves individual IDs and gear then reloads and reflects synchronized HQ in the planner',async({page})=>{
+ await fleet(page);const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await panel.locator('[data-hd-oc-search]').tap();await expect(panel.locator('[data-hd-oc-readiness]')).toContainText('登録範囲の条件を充足');
+ const proposed=await page.evaluate(()=>HD_OC_CACHE.get('1-5:oasw-fleet:0').plan.ships);
+ await panel.locator('[data-hd-oc-calculator]').tap();await expect(page.locator('[data-hd-fc-hq]')).toHaveValue('20');
+ await page.evaluate(()=>hdMSNOpen('1-5'));await panel.locator('[data-hd-oc-apply]').tap();
+ const saved=await page.evaluate(()=>loadCustomFleets()['1-5'][0]);expect(saved.openingAswCount).toBe(2);expect(saved.ships.map(x=>x.gameShipId)).toEqual(proposed.map(x=>x.gameShipId));expect(saved.ships.every(x=>x.gear.includes('三式水中探信儀'))).toBe(true);
+ await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdFEOpeningAsw==='function');
+ const actual=await page.evaluate(()=>{const p=hdFEPlanFromSavedFleet('1-5',loadCustomFleets()['1-5'][0]);return {ids:p.ships.map(x=>x.rosterId),states:p.ships.map(x=>hdFEOpeningAsw(x).status),calculator:hdFCLoadAll()}});
+ expect(actual.ids).toEqual(saved.ships.map(x=>x.rosterId));expect(actual.states).toEqual(['ready','ready']);expect(Object.values(actual.calculator).find(x=>x.proposal).hqLevel).toBe(20);
+});
+test('owned alternatives select distinct matching ships near the recommended level and refuse stale data',async({page})=>{
+ await fleet(page);
+ const r=await page.evaluate(async()=>{
+  const all=loadCustomFleets();all['1-5'][0].ships[0]={ship:'択捉改',gear:''};saveCustomFleets(all);
+  const rows=hdFERoster();rows.push({...rows[0],id:'low',gameShipId:999,level:1});localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(rows));
+  const c=hdOCContext('1-5','oasw-fleet',0),result=hdOCSearch(c),before=localStorage.getItem(CUSTOM_FLEET_KEY),found=await hdOCFindAlternatives(c,result,{maxCandidates:8,maxExamined:350});
+  const unchanged=before===localStorage.getItem(CUSTOM_FLEET_KEY);localStorage.setItem('harbordesk-equipment-v1','[]');let stale=false;try{await hdOCFindAlternatives(c,result)}catch(e){stale=e.code==='HD_OC_STALE'}return {found,unchanged,stale};
+ });
+ expect(r.found.proposal).not.toBeNull();expect(r.found.proposal.plan.ships.map(x=>x.gameShipId)).toEqual([100,101]);expect(r.found.proposal.replacements[0].level).toBe(80);expect(r.found.proposal.alternativeAssessment.registeredReady).toBe(true);expect(r.unchanged).toBe(true);expect(r.stale).toBe(true);
+});
+test('all registered maps expose unknown conditions and reject inventory overflow in the integrated gate',async({page})=>{
+ await fleet(page);
+ const r=await page.evaluate(()=>{
+  const maps=Object.keys(MAP_PLANS),coverage=maps.map(map=>hdOCReadiness({map,ships:[]},{goals:[],complete:false}).registeredReady);
+  const result=hdOCSearch(hdOCContext('1-5','oasw-fleet',0));localStorage.setItem('harbordesk-equipment-v1','[]');return {count:maps.length,coverage,overflow:hdOCReadiness(result.plan,result.measure)};
+ });
+ expect(r.count).toBeGreaterThanOrEqual(37);expect(r.coverage.every(x=>x===false)).toBe(true);expect(r.overflow.status).toBe('missing');expect(r.overflow.checks.find(x=>x.id==='inventory').detail).toContain('所持0');
+});
+
+test('owned alternative UI preserves chosen identities through save reload and planner reflection',async({page})=>{
+ await fleet(page);await page.evaluate(()=>{const all=loadCustomFleets();all['1-5'][0].ships[0]={ship:'択捉改',gear:''};saveCustomFleets(all);hdMSNRender()});
+ const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await panel.locator('[data-hd-oc-search]').tap();await expect(panel.locator('[data-hd-oc-missing-ships]')).toContainText('入手方法');
+ await panel.locator('[data-hd-oc-alternatives]').tap();await expect(panel.locator('[data-hd-oc-replacements]')).toContainText('択捉改 → 占守改');
+ expect(await page.evaluate(()=>Object.values(hdFCLoadAll()).find(x=>x.proposal).ships[0].gameShipId)).toBe(100);
+ await panel.locator('[data-hd-oc-apply]').tap();expect(await page.evaluate(()=>loadCustomFleets()['1-5'][0].ships[0])).toMatchObject({ship:'占守改',rosterId:'asw-0',gameShipId:100});
+ await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCShipOwnership==='function');
+ expect(await page.evaluate(()=>hdOCShipOwnership(hdFEPlanFromSavedFleet('1-5',loadCustomFleets()['1-5'][0])).every(x=>x.status==='ready'))).toBe(true);
+});
+
+test.describe('PWA cached runtime',()=>{
+ test.use({serviceWorkers:'allow'});
+ test('opening ASW and owned planner data survive a cached PWA restart with Chromium offline reload',async({page,context,browserName})=>{
+  await fleet(page,{count:4,stock:4});
+  await page.evaluate(()=>navigator.serviceWorker.ready);await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
+  const snapshot=await page.evaluate(()=>{
+   const c=hdOCContext('1-5','oasw-fleet',0),result=hdOCSearch(c);hdFCImportOwnedPlan(c,result);
+   const keys=[CUSTOM_FLEET_KEY,HD_FL_KEY,SHIP_ROSTER_KEY,HD_FC_KEY,'harbordesk-kancolle-sync-v1'];window.offlineOwnedKeys=keys;return {keys,values:keys.map(k=>localStorage.getItem(k)),count:hdOCOaswMeasure(result.plan).count};
+  });expect(snapshot.count).toBe(4);
+  expect(await page.evaluate(async()=>!!(await caches.match('./index.html'))&&!!(await caches.match('./owned-equipment-planner.js')))).toBe(true);
+  // Playwright's WebKit setOffline/reload produces an engine-internal navigation error
+  // even with an active service worker; verify its cache and online restart here.
+  if(browserName==='chromium')await context.setOffline(true);
+  else test.info().annotations.push({type:'engine-limitation',description:'WebKit cache + online restart tested; offline navigation requires iPhone verification.'});
+  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdFEOpeningAsw==='function');
+  expect(await page.evaluate(keys=>keys.map(k=>localStorage.getItem(k)),snapshot.keys)).toEqual(snapshot.values);
+  const check=await page.evaluate(()=>{const p=hdFEPlanFromSavedFleet('1-5',loadCustomFleets()['1-5'][0]);return {target:hdOCOaswTarget(hdOCContext('1-5','oasw-fleet',0)),hq:Object.values(hdFCLoadAll()).find(x=>x.proposal).hqLevel,ownership:hdOCShipOwnership(p).every(x=>x.status==='ready')}});
+  expect(check).toEqual({target:4,hq:20,ownership:true});await context.setOffline(false);
+ });
+});

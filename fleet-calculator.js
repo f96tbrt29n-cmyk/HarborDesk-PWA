@@ -15,7 +15,9 @@ function hdFCFleets(map){
 function hdFCProposalRoster(ship){
  let rows=[];try{rows=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')}catch{}
  if(!Array.isArray(rows))return null;
- if(Number(ship.gameShipId)>0)return rows.find(r=>Number(r.gameShipId)===Number(ship.gameShipId))||null;
+ const valid=row=>row&&(!Number(ship.masterId)||!Number(row.masterId)||Number(ship.masterId)===Number(row.masterId))?row:null;
+ if(Number(ship.gameShipId)>0)return valid(rows.find(r=>Number(r.gameShipId)===Number(ship.gameShipId)));
+ if(ship.rosterId)return valid(rows.find(r=>String(r.id||'')===String(ship.rosterId)));
  const byMaster=Number(ship.masterId)>0?rows.filter(r=>Number(r.masterId)===Number(ship.masterId)):[];
  const matches=byMaster.length?byMaster:rows.filter(r=>r.name===ship.ship&&(!Number(ship.masterId)||!Number(r.masterId))); 
  return matches.length===1?matches[0]:null;
@@ -36,7 +38,7 @@ function hdFCImportOwnedPlan(c,result){
   }
   if(ship.expansion?.name)gear.push({name:ship.expansion.name,star:Number(ship.expansion.star)||0,slot:0,maxProf:false,ship:ship.ship,slotIndex:null});
  }
- const state={...hdFCDefaultState(c.map,c.fleet.id),enemyAir:Number(old.enemyAir)||0,hqLevel:hq??old.hqLevel??120,shipCount:ships.length,ships:ships.map(ship=>({name:ship.ship,gameShipId:Number(ship.gameShipId)||0,masterId:Number(ship.masterId)||0,los:hdFCProposalShipLos(ship)})),gear,proposal:{id,map:c.map,fleetId:c.fleet.id,route:c.index,name:c.fleet.name||'保存編成',at:Date.now(),signature:result.signature,hqMissing:hq==null,edited:false}};
+ const state={...hdFCDefaultState(c.map,c.fleet.id),enemyAir:Number(old.enemyAir)||0,hqLevel:hq??old.hqLevel??120,shipCount:ships.length,ships:ships.map(ship=>({name:ship.ship,rosterId:ship.rosterId||'',gameShipId:Number(ship.gameShipId)||0,masterId:Number(ship.masterId)||0,los:hdFCProposalShipLos(ship)})),gear,proposal:{id,map:c.map,fleetId:c.fleet.id,route:c.index,name:c.fleet.name||'保存編成',at:Date.now(),signature:result.signature,hqMissing:hq==null,edited:false}};
  hdFCSaveState(c.map,id,state);hdFCSetSelection(c.map,id);return true;
 }
 function hdFCProposalIssues(s){

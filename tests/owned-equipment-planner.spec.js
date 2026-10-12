@@ -396,7 +396,7 @@ async function prepareCapability(page,map,inventory,ships){
  await boot(page);await page.waitForFunction(()=>typeof hdSECapabilityHtml==='function'&&typeof hdOCSearch==='function');
  await page.evaluate(({map,inventory,ships})=>{
   localStorage.setItem('harbordesk-equipment-v1',JSON.stringify(inventory));
-  const all=loadCustomFleets();all[map]=[{id:'cap-test',name:'装備条件の確認',ships:ships.map(s=>typeof s==='string'?{ship:s,gear:''}:s)}];saveCustomFleets(all);
+  const all=loadCustomFleets();all[map]=[{id:'cap-test',name:'装備条件の確認',openingAswCount:0,ships:ships.map(s=>typeof s==='string'?{ship:s,gear:''}:s)}];saveCustomFleets(all);
   selectedMap=map;renderMapPicker();hdWSShowElement('guide',true);hdMapActivateTab('mine');
  },{map,inventory,ships});
 }
@@ -477,6 +477,7 @@ test('equipment reviews distinguish missing synced scouting fields and resolve a
 
 test('equipment reviews keep optional 1-6 air guidance out of warnings',async({page})=>{
  await prepareCapability(page,'1-6',[{name:'10cm高角砲＋高射装置',count:1,star:0},{name:'13号対空電探改',count:1,star:0},{name:'三式水中探信儀',count:1,star:0},{name:'三式爆雷投射機',count:1,star:0}],['阿武隈改二','夕立改二','時雨改二','秋月改','雪風改','暁改二']);
+ await page.evaluate(()=>localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(loadCustomFleets()['1-6'][0].ships.map((s,i)=>({id:'optional-'+i,name:s.ship})))));
  const card=page.locator('#customFleetPanel [data-cf-id="cap-test"]');await card.locator('[data-hd-oc-search]').tap();await expect(card.locator('[data-hd-oc-review-kind="info"]')).toContainText('制空優勢は必須ではありません');await expect(card.locator('[data-hd-oc-review-kind="data"],[data-hd-oc-review-kind="missing"],[data-hd-oc-review-kind="manual"]')).toHaveCount(0);await expect(card).not.toContainText('別途確認が必要');
 });
 
@@ -770,4 +771,76 @@ test('aircraft evasion mobile calculator shows coefficients and retains aircraft
 
 test('enemy AA mobile residual slots show zero-machine model and survive reload',async({page})=>{
  await prepare(page,[],[]);await page.evaluate(()=>{selectedMap='3-5';selectedWorld='3';renderMapPicker();hdFEOpenCalculator();const item=hdFCCatalog().find(x=>x.category==='水上爆撃機');hdFCMutate('3-5','manual',s=>{s.gear=[{name:item.name,slot:4,star:0,maxProf:false}]})});const fc=page.locator('#hdFleetCalculator');await fc.locator('[data-hd-map-air-select="K"]').check();await fc.locator('[data-hd-map-air-confirm]').click();await expect(fc.locator('[data-hd-map-air-route-loss]')).toContainText('制空戦＋対空砲火');await expect(fc.locator('[data-hd-map-air-aa-step]')).toContainText('0〜4機減少');await expect(fc.locator('[data-hd-map-air-residual-slots]')).toContainText('0機になるモデル経路あり');await expect(fc.locator('[data-hd-map-air-route-loss]')).toContainText('登録30機種の射撃回避補正');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);await page.reload();await page.waitForFunction(()=>typeof hdMapAirSelection==='function');expect(await page.evaluate(()=>hdMapAirSelection('3-5'))).toMatchObject({nodeIds:['K'],orderConfirmed:true});
+});
+
+test('owned ship checks require exact remodels and preserve saved roster identities',async({page})=>{
+ await prepare(page,[],[]);
+ const r=await page.evaluate(()=>{
+  const master=name=>Number(hdShipDbMasterRowFor(name).id);
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{id:'owned-yuudachi',name:'夕立改',masterId:master('夕立改')} ]));
+  const fleet={ships:[{ship:'夕立改二',rosterId:'owned-yuudachi',gear:''}]},plan=hdFEPlanFromSavedFleet('1-1',fleet);
+  const before=localStorage.getItem('harbordesk-ship-roster-v1');
+  return {plan,checks:hdOCShipOwnership(plan),sparse:hdOCShipOwnership({ships:[{ship:''},...plan.ships]}),unchanged:before===localStorage.getItem('harbordesk-ship-roster-v1')};
+ });
+ expect(r.plan.ships[0].rosterId).toBe('owned-yuudachi');expect(r.checks[0].status).toBe('missing');expect(r.checks[0].detail).toContain('同じ改造段階');expect(r.unchanged).toBe(true);
+ expect(r.sparse[0]).toMatchObject({index:1,status:'missing'});
+});
+
+test('owned ship checks do not substitute another individual for stale saved IDs',async({page})=>{
+ await prepare(page,[],[]);
+ const checks=await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{id:'current',name:'夕立改二',gameShipId:20}]));
+  return hdOCShipOwnership({ships:[{ship:'夕立改二',gameShipId:19},{ship:'夕立改二',rosterId:'deleted'}]});
+ });
+ expect(checks.map(x=>x.status)).toEqual(['data','data']);expect(checks.every(x=>x.detail.includes('同名の別個体'))).toBe(true);
+});
+
+test('owned ship checks assign distinct individuals even when a flexible slot precedes a pinned slot',async({page})=>{
+ await prepare(page,[],[]);
+ const r=await page.evaluate(()=>{
+  const ships=[{ship:'夕立改二'},{ship:'夕立改二',gameShipId:10}],plan={ships};
+  const rows=[{id:'a',name:'夕立改二',gameShipId:10},{id:'b',name:'夕立改二',gameShipId:11}];
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(rows));const two=hdOCShipOwnership(plan);
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([rows[0]]));const one=hdOCShipOwnership(plan);
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([rows[0],{...rows[0],id:'duplicate-row'}]));const duplicateRows=hdOCShipOwnership(plan);
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(rows));const duplicateSlots=hdOCShipOwnership({ships:[ships[1],ships[1]]});
+  return {two,one,duplicateRows,duplicateSlots};
+ });
+ expect(r.two.every(x=>x.status==='ready')).toBe(true);
+ for(const checks of [r.one,r.duplicateRows,r.duplicateSlots]){expect(checks.filter(x=>x.status==='ready')).toHaveLength(1);expect(checks.filter(x=>x.status==='missing')).toHaveLength(1);expect(checks.find(x=>x.status==='missing').detail).toContain('1隻を複数枠');}
+});
+
+test('owned ship checks use canonical master IDs and leave missing or conflicting data unverified',async({page})=>{
+ await prepare(page,[],[]);
+ const r=await page.evaluate(()=>{
+  const plan={ships:[{ship:'Верный'}]},id=Number(hdShipDbMasterRowFor('Верный').id);
+  localStorage.setItem('harbordesk-ship-roster-v1','[]');const empty=hdOCShipOwnership(plan);
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{id:'one',name:'古い名前',masterId:id}]));const canonical=hdOCShipOwnership(plan);
+  const conflict=hdOCShipOwnership({ships:[{ship:'響',masterId:id}]});
+  const unknown=hdOCShipOwnership({ships:[{ship:'未登録の艦娘'}]});return {empty,canonical,conflict,unknown};
+ });
+ expect(r.empty[0].status).toBe('data');expect(r.canonical[0].status).toBe('ready');expect(r.conflict[0].status).toBe('data');expect(r.unknown[0].status).toBe('data');
+});
+
+test('owned ship warnings appear despite complete equipment and refresh without changing synced or saved data',async({page})=>{
+ await prepare(page,[{name:'33号水上電探',count:2,star:0}],[{kind:'電探',label:'電探',minCount:2}]);
+ const baseline=await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:20}));
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{id:'one',name:'夕立改二'}]));
+  localStorage.setItem('harbordesk-kancolle-materials-v1',JSON.stringify({fuel:1000}));
+  const keys=[CUSTOM_FLEET_KEY,'harbordesk-kancolle-sync-v1','harbordesk-equipment-v1','harbordesk-ship-roster-v1','harbordesk-kancolle-materials-v1','harbordesk-pwa-v1'];
+  window.ownedShipTestKeys=keys;return keys.map(k=>localStorage.getItem(k));
+ });
+ const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await panel.locator('[data-hd-oc-search]').click();
+ await expect(panel.locator('[data-hd-oc-headline]')).toContainText('編成や基地計画に未充足');
+ await expect(panel.locator('[data-hd-oc-review-id="owned-ships-missing"]')).toContainText('第2艦 時雨改二');
+ expect(await page.evaluate(()=>HD_OC_CACHE.get('1-1:oc-test:0').measure.complete)).toBe(true);
+ expect(await page.evaluate(()=>window.ownedShipTestKeys.map(k=>localStorage.getItem(k)))).toEqual(baseline);
+ await page.evaluate(()=>{localStorage.setItem('harbordesk-ship-roster-v1','[]');window.dispatchEvent(new Event('hd:kancolle-sync'))});
+ await expect(panel.locator('[data-hd-oc-apply]')).toHaveCount(0);await panel.locator('[data-hd-oc-search]').click();
+ await expect(panel.locator('[data-hd-oc-headline]')).toContainText('未充足');
+ await expect(panel.locator('[data-hd-oc-review-id="owned-ships-data"]')).toContainText('艦隊台帳が空');
+ await page.evaluate(()=>rosterSave([{id:'one',name:'夕立改二'},{id:'two',name:'時雨改二'}]));
+ await panel.locator('[data-hd-oc-search]').click();await expect(panel.locator('[data-hd-oc-review-id^="owned-ships-"]')).toHaveCount(0);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });

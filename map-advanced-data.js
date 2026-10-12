@@ -1,6 +1,7 @@
 // Advanced map metadata: scouting thresholds, land-base aviation, and verified enemy pattern samples.
 // Values are summarized from the current Kancolle Strategy Wiki. Unknown/uncertain values stay explicitly marked as such.
 const HD_MAP_ADVANCED_DATA={
+  '7-1':{openingAsw:{recommended:4,upper:5,source:'https://zekamashi.net/kancolle-kouryaku/7-1/',note:'先制対潜4〜5隻を用意する攻略案（2026-10-13確認）。ルート固定の必須条件ではなく、編成・装備・練度で調整する配備目標。'},base:{available:false}},
   '2-5':{los:{coef:1,summary:'ボス前の索敵判定あり。司令部Lv120基準で索敵スコア33以上ならボス到達確定、31未満は逸れ確定、31〜33未満はランダム域。',checks:[{label:'ボス前',safe:33,failBelow:31}]},base:{available:false}},
   '3-5':{los:{coef:4,summary:'ボス方面で索敵判定あり。ルートごとの必要値は編成条件と合わせて確認。'},base:{available:false}},
   '4-5':{los:{coef:2,summary:'ボス方面で索敵判定あり。司令部Lv120未満では表示閾値より+1以上の余裕を推奨。'},base:{available:false}},
