@@ -33,9 +33,14 @@ jobs:
         include:
           - browser: chromium
             workers: 2
-            timeout_minutes: 30
+            timeout_minutes: 45
             shard: 1
-            shards: 1
+            shards: 2
+          - browser: chromium
+            workers: 2
+            timeout_minutes: 45
+            shard: 2
+            shards: 2
           - browser: webkit
             workers: 1
             timeout_minutes: 45
