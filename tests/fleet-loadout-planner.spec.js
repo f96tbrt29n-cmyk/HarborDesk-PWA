@@ -915,3 +915,44 @@ test('carrier three-plane CI policy persists and regenerates the mobile loadout'
  });
  const card=page.locator('#three-policy-test');await card.locator('[data-hd-night-policy]').selectOption('cv-three');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightCarrier(p.ships[0]).candidates.some(c=>c.attack==='cv-three')})).toBe(true);await expect(card).toContainText('空母夜戦CI装備条件：成立');await expect(card).toContainText('岩井隊爆戦／Swordfish系 2');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('cv-three');
 });
+
+test('automatic night CI evaluates mixed ship families once per ship and names the matched sets',async({page})=>{
+ await boot(page);
+ const r=await page.evaluate(()=>{
+  const build=(ship,names)=>({ship,items:names.map((name,slotIndex)=>({name,slotIndex})),expansion:null}),plan={map:'1-1',ships:[build('夕立改二',['12.7cm連装砲','61cm四連装(酸素)魚雷','22号対水上電探']),build('最上改二',['61cm四連装(酸素)魚雷','61cm四連装(酸素)魚雷']),build('伊58改',['後期型艦首魚雷(6門)','潜水艦搭載電探＆逆探(E27)']),build('Saratoga Mk.II',['F6F-3N','九九式練爆二二型改(夜間装備実験機)'])]};const m=hdSECapabilityMeasure(plan,'cap-night-auto'),goal=hdOCMeasure(plan,[{kind:'cap-night-auto',label:'自動CI',minCount:1}]).goals[0],unknown=hdSECapabilityMeasure({ships:[build('存在しない艦',[])]},'cap-night-auto'),split=hdSECapabilityMeasure({ships:[build('Saratoga Mk.II',['F6F-3N']),build('赤城改',['TBM-3D','夜間作戦航空要員'])]},'cap-night-auto');
+  return {m,goal,unknown,split,kind:hdSENightKind('1-1'),dd:m.matches.find(x=>x.ship==='夕立改二')};
+ });
+ expect(r.kind).toBe('cap-night-auto');expect(r.m.count).toBe(4);expect(r.m.matches).toHaveLength(4);expect(r.dd.attacks).toContain('主魚電CI');expect(r.dd.attacks).toContain('主魚カットイン');expect(r.goal.detail).toContain('伊58改：後期型魚雷＋潜水艦用電探CI');expect(r.goal.detail).toContain('Saratoga Mk.II：夜間爆撃機・光電管爆弾CI');expect(r.unknown.unresolved).toBe(true);expect(r.split.count).toBe(0);
+});
+
+test('automatic night CI searches owned generic destroyer submarine and carrier sets without a selected type',async({page})=>{
+ test.setTimeout(120000);await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const rows=await page.evaluate(()=>{
+  const needs=hdMapEquipNeeds;hdMapEquipNeeds=()=>({needs:[{id:'夜戦'}],adv:{}});try{return [
+   ['最上改二',[['61cm四連装(酸素)魚雷',2]]],['夕立改二',[['61cm四連装(酸素)魚雷',1],['熟練見張員',1],['22号対水上電探',1]]],['伊58改',[['後期型艦首魚雷(6門)',1],['潜水艦搭載電探＆逆探(E27)',1]]],['Saratoga Mk.II',[['F6F-3N',1],['TBM-3D',1]]],['赤城改',[['F6F-3N',1],['TBM-3D',1],['夜間作戦航空要員',1]]],['赤城改',[['F6F-3N',1],['Swordfish',2],['夜間作戦航空要員',1]]]
+  ].map(([ship,items],index)=>{localStorage.setItem(HD_SE_NIGHT_POLICY_KEY,JSON.stringify({'1-1':'auto'}));const stock=items.map(([name,count])=>({name,count}));localStorage.setItem('harbordesk-equipment-v1',JSON.stringify(stock));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship,level:90,gameSlotEx:0}]));const result=hdOCSearch({map:'1-1',index:0,preset:null,fleet:{id:'auto-ci-'+index,ships:[{ship,gear:''}]}},{});return {ship,stock,goal:result.measure.goals.find(g=>g.kind==='cap-night-auto'),m:hdSECapabilityMeasure(result.plan,'cap-night-auto'),expansion:result.plan.ships[0].expansion,usage:hdFOAssignedUsage(result.plan)};});}finally{hdMapEquipNeeds=needs}
+ });
+ for(const r of rows){expect(r.goal.ok,r.ship).toBe(true);expect(r.m.count).toBe(1);expect(r.expansion).toBeNull();expect(r.goal.detail).toContain(r.ship+'：');for(const item of r.stock)expect(r.usage[item.name+'@@0']||0).toBeLessThanOrEqual(item.count);}
+});
+
+test('automatic night CI shows required carrier crew shortages and preserves explicit policy constraints',async({page})=>{
+ await boot(page);
+ const r=await page.evaluate(()=>{
+  const ship={ship:'赤城改',items:[{name:'F6F-3N',slotIndex:0},{name:'TBM-3D',slotIndex:1}],expansion:null},plan={map:'1-1',index:0,ships:[ship],suggestion:{slots:[]}},requirements=[{kind:'cap-night-auto',label:'自動CI',minCount:1}];localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'F6F-3N',count:1},{name:'TBM-3D',count:1}]));plan.assessment={requirements,measure:hdOCMeasure(plan,requirements)};const before=JSON.stringify(plan),stock=hdSECapabilityStock(plan,'cap-night-auto'),options=hdFLSetRemedies(plan,plan.assessment.measure.goals[0]);localStorage.setItem(HD_SE_NIGHT_POLICY_KEY,JSON.stringify({'1-1':'torpedo'}));return {goal:plan.assessment.measure.goals[0],stock,options,unchanged:JSON.stringify(plan)===before,kind:hdSENightKind('1-1'),explicit:hdSECapabilityMeasure({ships:[{ship:'Saratoga Mk.II',items:[{name:'F6F-3N',slotIndex:0},{name:'TBM-3D',slotIndex:1}],expansion:null}]},'cap-night-torpedo')};
+ });
+ expect(r.goal.ok).toBe(false);expect(r.stock.complete).toBe(false);expect(r.options.length).toBeGreaterThan(0);expect(r.options.every(x=>!x.available)).toBe(true);expect(r.options.some(x=>x.missing.some(m=>/夜間作戦航空要員/.test(m.name)))).toBe(true);expect(r.unchanged).toBe(true);expect(r.kind).toBe('cap-night-torpedo');expect(r.explicit.count).toBe(0);expect(r.explicit.unresolved).toBe(true);
+});
+
+test('automatic night CI follows sea-area needs and does not add a CI goal to non-night or land maps',async({page})=>{
+ await boot(page);
+ const r=await page.evaluate(()=>{const needs=hdMapEquipNeeds;localStorage.removeItem(HD_SE_NIGHT_POLICY_KEY);try{hdMapEquipNeeds=()=>({needs:[],adv:{}});const none=hdSEProfiles('1-1');hdMapEquipNeeds=()=>({needs:[{id:'夜戦'},{id:'対地'}],adv:{}});const land=hdSEProfiles('1-1');hdMapEquipNeeds=()=>({needs:[{id:'夜戦'}],adv:{}});const night=hdSEProfiles('1-1');return {none,land,night};}finally{hdMapEquipNeeds=needs}});
+ expect(r.none.some(x=>x.kind.startsWith('cap-night-'))).toBe(false);expect(r.land.some(x=>x.kind.startsWith('cap-night-'))).toBe(false);expect(r.night.some(x=>x.kind==='cap-night-auto')).toBe(true);
+});
+
+test('automatic night CI mobile control returns from an explicit policy to the compatible owned set',async({page})=>{
+ test.setTimeout(90000);await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ await page.evaluate(()=>{
+  const ship='赤城改',masterId=hdShipDbMasterRowFor(hdFEFindShip(ship)).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'F6F-3N',count:1},{name:'TBM-3D',count:1},{name:'夜間作戦航空要員',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship,masterId,gameShipId:895,level:90,gameSlotEx:0}]));localStorage.setItem(HD_SE_NIGHT_POLICY_KEY,JSON.stringify({'1-1':'cv-fighter2'}));hdMapEquipNeeds=()=>({needs:[{id:'夜戦'}],adv:{}});hdFSMap=()=> '1-1';hdFSPlans=()=>[{index:0,preset:{name:'auto fixture'},needs:[],slots:[{profile:{row:{name:ship,masterId,gameShipId:895,level:90},type:'正規空母',roles:[]}}]}];const card=document.createElement('article');card.id='auto-ci-policy-test';card.className='hd-fs-card';card.innerHTML='<button data-hd-fl-generate="0">自動配備</button><div class="hd-fl-host"></div>';document.body.appendChild(card);hdFLRender(0,card);
+ });
+ const card=page.locator('#auto-ci-policy-test');await card.locator('[data-hd-night-policy]').selectOption('auto');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&p.assessment.measure.goals.find(g=>g.kind==='cap-night-auto')?.ok})).toBe(true);await expect(card).toContainText('夜戦CI（自動・艦種別）');await expect(card).toContainText('赤城改：夜間戦闘機1＋夜間攻撃機1CI');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('auto');
+});
