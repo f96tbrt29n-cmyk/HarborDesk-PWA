@@ -299,7 +299,7 @@ function hdFLSetRemedies(plan,goal){
   for(const recipe of recipes){
    const required=recipe.parts.slice();
    // Reuse an existing, confirmed expansion item, without proposing a new expansion allocation.
-   if(recipe.mode?.startsWith('speed')&&ship.expansion&&hdFLHasExpansion(hdFEAswRoster(ship))){const item=hdFEFind(ship.expansion.name),part=required.findIndex(p=>hdFLRemedyPartMatches(p,{item,star:ship.expansion.star}));if(item&&part>=0&&hdShipDbExpansionInfo(item,db,ship.expansion.star).allowed)required.splice(part,1)}
+   if((recipe.mode?.startsWith('speed')||recipe.ship==='night-dd')&&ship.expansion&&hdFLHasExpansion(hdFEAswRoster(ship))){const item=hdFEFind(ship.expansion.name),part=required.findIndex(p=>hdFLRemedyPartMatches(p,{item,star:ship.expansion.star}));if(item&&part>=0&&hdShipDbExpansionInfo(item,db,ship.expansion.star).allowed)required.splice(part,1)}
    if(!hdSERecipeAllows(recipe,ship)||required.length>profile.count)continue;
    const slots=Array.from({length:profile.count},(_,index)=>({si,index,db,profile,capacity:profile.slots[index]}));
    const parts=required.map(part=>({part,choices:slots.flatMap(slot=>{
@@ -317,10 +317,10 @@ function hdFLSetRemedies(plan,goal){
     const trial=hdFOClone(plan),changes=[];
     for(const {slot,row} of chosen){const old=ship.items.find(x=>x.slotIndex===slot.index);trial.ships[si].items=trial.ships[si].items.filter(x=>x.slotIndex!==slot.index);trial.ships[si].items.push(hdOCEquipment(row,slot));if(hdFOStackKey(old)!==row.key)changes.push({slot:slot.index+1,old:old?.name||'空き枠',name:row.name,star:row.star,owned:row.count,free:Math.max(0,row.count-(usageBefore[row.key]||0))})}
     if(!changes.length&&!goal.kind.startsWith('cap-night-'))return;
-    const extras=goal.kind.startsWith('cap-night-')?trial.ships[si].items.filter(x=>x.name&&!taken.has(x.slotIndex)&&['nightMain','nightSecondary','nightTorpedo'].some(p=>hdSEPartMatches(p,hdFEFind(x.name)))):[];
+    const extras=goal.kind.startsWith('cap-night-')&&recipe.ship!=='night-dd'?trial.ships[si].items.filter(x=>x.name&&!taken.has(x.slotIndex)&&['nightMain','nightSecondary','nightTorpedo'].some(p=>hdSEPartMatches(p,hdFEFind(x.name)))):[];
     for(let mask=0;mask<2**extras.length;mask++){
      const variant=mask?hdFOClone(trial):trial,swaps=changes.slice();for(let i=0;i<extras.length;i++)if(mask&(1<<i)){const x=extras[i];variant.ships[si].items=variant.ships[si].items.filter(v=>v.slotIndex!==x.slotIndex);swaps.push({slot:x.slotIndex+1,old:x.name,name:'空き枠',star:0,owned:0,free:0})}
-     if(goal.kind.startsWith('cap-night-')){const night=hdFENightCI(variant.ships[si]);if(night.status!=='ready'||night.attack!==recipe.attack)continue}
+     if(goal.kind.startsWith('cap-night-')&&!hdSENightRecipeReady(variant.ships[si],recipe))continue;
      const after=hdOCMeasure(variant,requirements),target=after.goals.find(g=>hdFLGoalMatch(g,goal));if(!target||target.count<=goal.count)continue;
      const usage=hdFOAssignedUsage(variant),missing=Object.entries(usage).filter(([key,count])=>count>(inventory.get(key)?.count||0)).map(([key,count])=>({name:inventory.get(key)?.name||chosen.find(x=>x.row.key===key)?.row.name||key.split('@@')[0],star:inventory.get(key)?.star||chosen.find(x=>x.row.key===key)?.row.star||0,need:count-(inventory.get(key)?.count||0),owned:inventory.get(key)?.count||0}));
      const tradeoffs=before.goals.filter(g=>g.ok&&after.goals.some(n=>hdFLGoalMatch(n,g)&&!n.ok)).map(g=>g.label);

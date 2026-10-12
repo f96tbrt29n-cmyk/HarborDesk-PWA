@@ -150,8 +150,26 @@ function hdFENightCI(ship){
  if(base.main+base.secondary>=2)return result('missing','double','夜戦連撃','汎用CIの装備条件は未成立。主砲・副砲の合計2以上で連撃条件です。');
  return result('missing','normal','通常攻撃','汎用CI・連撃の装備条件が未成立です。');
 }
+// Destroyer special sets roll separately from the generic attack above.
+// KC3Kai Ship.estimateNightAttackType/Gear.isSurfaceRadar (2026-10-12).
+function hdFENightDD(ship){
+ const db=hdFEFindShip(ship.ship),generic=hdFENightCI(ship),base={candidates:[],level:null,hitStatus:'manual',hitDetail:'レベル未確認。同期・艦娘台帳で確認してね。'};
+ if(db?.type!=='駆逐艦')return {...base,status:'manual',detail:'駆逐艦専用の装備条件です。'};
+ if(generic.status==='manual')return {...base,status:'manual',detail:generic.detail};
+ const rows=[...(ship.items||[]),...(ship.expansion?[ship.expansion]:[])].filter(x=>x.name),items=rows.map(x=>hdFEFind(x.name)),has=part=>items.some(x=>hdSEPartMatches(part,x)),count=part=>items.filter(x=>hdSEPartMatches(part,x)).length,candidates=[];
+ if(has('nightSmallMain')&&has('nightTorpedo')&&has('nightSurfaceRadar'))candidates.push({attack:'dd-main-radar',label:'主魚電CI'});
+ if(has('nightTorpedo')&&has('nightLookout')&&has('nightSurfaceRadar'))candidates.push({attack:'dd-lookout-radar',label:'魚見電CI'});
+ if(count('nightTorpedo')>=2&&has('nightWaterLookout'))candidates.push({attack:'dd-water-torpedo',label:'魚魚水CI'});
+ if(has('nightTorpedo')&&has('nightDrum')&&has('nightWaterLookout'))candidates.push({attack:'dd-water-drum',label:'魚ド水CI'});
+ const roster=hdFEAswRoster(ship),master=hdShipDbMasterRowFor(db),identity=roster&&(!Number(roster.masterId)||Number(roster.masterId)===Number(master?.id)),raw=identity?roster.level:!ship.gameShipId?ship.level:null,n=Number(raw),level=raw!=null&&String(raw).trim()!==''&&Number.isInteger(n)&&n>=1&&n<=200?n:null;
+ return {...base,status:candidates.length?'ready':'missing',candidates,level,hitStatus:level==null?'manual':level>=80?'ready':'missing',hitDetail:level==null?base.hitDetail:level>=80?`Lv${level}：2回攻撃型のレベル条件を充足。1回攻撃型の判定もあります。`:`Lv${level}：専用CIは1回攻撃型。2回攻撃型にはLv80以上が必要。`,detail:candidates.length?'専用CIは成立する複数の装備セットを順に判定。汎用CIとは別の判定機会です。':'主砲・魚雷・水上電探、見張員などの組み合わせが未成立です。',dGun:items.some(x=>['12.7cm連装砲D型改二','12.7cm連装砲D型改三'].includes(x.name))};
+}
+function hdFENightDDHtml(ship){
+ if(hdFEFindShip(ship.ship)?.type!=='駆逐艦')return '';
+ const x=hdFENightDD(ship),esc=hdFEEsc;return `<section class="hd-fl-night ${x.status}"><b>駆逐艦専用CI装備条件：${x.status==='ready'?'成立':x.status==='manual'?'未判定':'未成立'}</b><p>${esc(x.candidates.map(c=>c.label).join(' → ')||x.detail)}</p>${x.candidates.length?`<small>${esc(x.detail)}</small>`:''}<p>攻撃回数の条件：${esc(x.hitDetail)}</p><small>水上艦目標向け。発動・命中・2回攻撃は確定しません。運・配置・損傷も確認してね。水上電探は素索敵5以上。通常の熟練見張員は魚魚水・魚ド水CI用の水雷戦隊 熟練見張員を代用できません。${x.dGun?'D型改二・改三の砲あり。主魚電・魚見電CIの威力補正対象です。':'D型砲は装備条件の必須ではありません。威力補正は別確認です。'}</small><a class="guide-link" href="https://wikiwiki.jp/kancolle/夜戦#dfcb6e1f" target="_blank" rel="noopener">駆逐艦専用CIの出典 ↗</a></section>`;
+}
 function hdFENightCIHtml(ship){
- const x=hdFENightCI(ship),esc=hdFEEsc;return `<section class="hd-fl-night ${x.status}"><b>夜戦汎用CI装備条件：${x.status==='ready'?'成立':x.status==='manual'?'未判定':'未成立'}</b><p>${esc(x.label)}｜${esc(x.detail)}</p>${x.status!=='manual'?`<small>主砲 ${x.main}・副砲 ${x.secondary}・魚雷 ${x.torpedo}</small>`:''}<small>水上艦目標向けの装備条件です。発動確定・発動率・撃破火力の判定ではありません。運・Lv・配置・損傷、敵の種類も確認してね。駆逐艦専用・夜間瑞雲・タッチなどは別判定です。</small><a class="guide-link" href="https://wikiwiki.jp/kancolle/夜戦#dfcb6e1f" target="_blank" rel="noopener">夜戦装備条件の出典 ↗</a></section>`;
+ const x=hdFENightCI(ship),esc=hdFEEsc;return `<section class="hd-fl-night ${x.status}"><b>夜戦汎用CI装備条件：${x.status==='ready'?'成立':x.status==='manual'?'未判定':'未成立'}</b><p>${esc(x.label)}｜${esc(x.detail)}</p>${x.status!=='manual'?`<small>主砲 ${x.main}・副砲 ${x.secondary}・魚雷 ${x.torpedo}</small>`:''}<small>水上艦目標向けの装備条件です。発動確定・発動率・撃破火力の判定ではありません。運・Lv・配置・損傷、敵の種類も確認してね。駆逐艦専用CIは下欄、夜間瑞雲・タッチなどは別判定です。</small><a class="guide-link" href="https://wikiwiki.jp/kancolle/夜戦#dfcb6e1f" target="_blank" rel="noopener">夜戦装備条件の出典 ↗</a></section>${hdFENightDDHtml(ship)}`;
 }
 function hdFENight(items,stats){
  const support=items.filter(x=>hdFEHasTag(x,'夜戦','魚雷CI','夜偵')||['探照灯','大型探照灯','照明弾'].includes(x.meta?.category)).length;
