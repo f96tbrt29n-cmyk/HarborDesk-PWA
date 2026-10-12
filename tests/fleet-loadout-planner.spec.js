@@ -811,3 +811,39 @@ test('submarine night CI policy regenerates the mobile owned loadout and persist
  });
  const card=page.locator('#sub-policy-test');await card.locator('[data-hd-night-policy]').selectOption('sub-radar');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightSub(p.ships[0]).attack})).toBe('sub-radar');await expect(card).toContainText('潜水艦夜戦CI装備条件：成立');await card.locator('[data-hd-night-policy]').selectOption('sub-late');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightSub(p.ships[0]).attack})).toBe('sub-late');expect(await page.evaluate(()=>HD_FL_CACHE['1-1:0'].ships[0].expansion)).toBeNull();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('sub-late');
 });
+
+test('carrier night CI requires native remodel or crew and counts only surviving night aircraft',async({page})=>{
+ await boot(page);
+ const r=await page.evaluate(()=>{
+  const f='F6F-3N',t='TBM-3D',c='夜間作戦航空要員',build=(ship,names)=>({ship,items:names.map((name,slotIndex)=>({name,slotIndex})),expansion:null});
+  const native=build('Saratoga Mk.II',[f,f,t]),ordinary=build('赤城改',[f,f,t]),crew=build('赤城改',[f,f,t,c]),wrong=build('赤城改',['零式艦戦21型','流星',c]),noCrew=hdFENightCarrier(ordinary),full=hdFENightCarrier(crew),self=hdFENightCarrier(native),base=hdFENightCarrier(build('Saratoga改',[f,f,t]));
+  const masterId=hdShipDbMasterRowFor(hdFEFindShip(native.ship)).id;native.masterId=masterId;native.gameShipId=881;localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:native.ship,masterId,gameShipId:881,gameOnslot:[0,0,18,0]}]));const zero=hdFENightCarrier(native),html=hdFENightCarrierHtml(native);localStorage.removeItem('harbordesk-ship-roster-v1');
+  const split=hdSECapabilityMeasure({ships:[build('Saratoga Mk.II',[f,f]),build('赤城改',[t,c])]},'cap-night-cv-fighter2');
+  return {noCrew,full,self,base,zero,html,wrong:hdFENightCarrier(wrong),split,unknown:hdFENightCarrier(build('赤城改',['存在しない夜間戦闘機',t,c])),alias:hdSEPartMatches('nightCarrierTorpedo',hdFEFind('TBM-3W＋3S')),fake:hdSEPartMatches('nightCarrierFighter',{name:'夜間戦闘機テスト',category:'艦上戦闘機'})};
+ });
+ expect(r.self.status).toBe('ready');expect(r.self.native).toBe(true);expect(r.self.candidates.map(x=>x.attack)).toEqual(['cv-fighter2','cv-fighter1']);expect(r.full.status).toBe('ready');expect(r.noCrew.status).toBe('missing');expect(r.base.status).toBe('missing');expect(r.zero.status).toBe('missing');expect(r.zero.fighter).toBe(0);expect(r.html).toContain('搭載数0');expect(r.wrong.status).toBe('missing');expect(r.unknown.status).toBe('manual');expect(r.fake).toBe(false);expect(r.alias).toBe(true);expect(r.split.count).toBe(0);
+});
+
+test('carrier night CI search assembles native and ordinary carrier sets within owned stock',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ const rows=await page.evaluate(()=>['cv-fighter2','cv-fighter1'].flatMap(policy=>['Saratoga Mk.II','赤城改'].map(ship=>{
+  localStorage.setItem(HD_SE_NIGHT_POLICY_KEY,JSON.stringify({'1-1':policy}));const stock=[{name:'F6F-3N',count:policy==='cv-fighter2'?2:1},{name:'TBM-3D',count:1},...(ship==='赤城改'?[{name:'夜間作戦航空要員',count:1}]:[])];localStorage.setItem('harbordesk-equipment-v1',JSON.stringify(stock));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship,level:90,gameSlotEx:0}]));const result=hdOCSearch({map:'1-1',index:0,preset:null,fleet:{id:policy+ship,ships:[{ship,gear:''}]}},{});return {policy,ship,stock,goal:result.measure.goals.find(g=>g.kind===hdSENightKind('1-1')),state:hdFENightCarrier(result.plan.ships[0]),expansion:result.plan.ships[0].expansion,usage:hdFOAssignedUsage(result.plan)};
+ })));
+ for(const r of rows){expect(r.goal.ok,r.ship+r.policy).toBe(true);expect(r.state.candidates.some(c=>c.attack===r.policy)).toBe(true);expect(r.expansion).toBeNull();for(const item of r.stock)expect(r.usage[item.name+'@@0']||0).toBeLessThanOrEqual(item.count);}
+});
+
+test('carrier night CI remedies identify missing personnel and do not invent aircraft on incompatible ships',async({page})=>{
+ await boot(page);
+ const r=await page.evaluate(()=>{
+  const f='F6F-3N',t='TBM-3D',ship={ship:'赤城改',items:[f,f,t].map((name,slotIndex)=>({name,slotIndex})),expansion:null},plan={map:'1-1',index:0,ships:[ship],suggestion:{slots:[]}},requirements=[{kind:'cap-night-cv-fighter2',label:'空母CI',minCount:1}];localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:f,count:2},{name:t,count:1}]));plan.assessment={requirements,measure:hdOCMeasure(plan,requirements)};const original=JSON.stringify(plan),options=hdFLSetRemedies(plan,plan.assessment.measure.goals[0]),stock=hdSECapabilityStock(plan,'cap-night-cv-fighter2');return {options,stock,unchanged:original===JSON.stringify(plan),surface:hdSERecipeAllows(HD_SE_RECIPES['cap-night-cv-fighter2'][1],{ship:'夕立改二'})};
+ });
+ expect(r.options.length).toBeGreaterThan(0);expect(r.options.every(x=>!x.available)).toBe(true);expect(r.options.some(x=>x.missing.some(m=>/夜間作戦航空要員/.test(m.name)))).toBe(true);expect(r.stock.complete).toBe(false);expect(r.unchanged).toBe(true);expect(r.surface).toBe(false);
+});
+
+test('carrier night CI policy persists and regenerates the mobile loadout',async({page})=>{
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ await page.evaluate(()=>{
+  const ship='赤城改',masterId=hdShipDbMasterRowFor(hdFEFindShip(ship)).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'F6F-3N',count:2},{name:'TBM-3D',count:1},{name:'夜間作戦航空要員',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship,masterId,gameShipId:882,level:90,gameSlotEx:0}]));hdFSMap=()=> '1-1';hdFSPlans=()=>[{index:0,preset:{name:'carrier fixture'},needs:[],slots:[{profile:{row:{name:ship,masterId,gameShipId:882,level:90},type:'正規空母',roles:[]}}]}];const card=document.createElement('article');card.id='carrier-policy-test';card.className='hd-fs-card';card.innerHTML='<button data-hd-fl-generate="0">自動配備</button><div class="hd-fl-host"></div>';document.body.appendChild(card);hdFLRender(0,card);
+ });
+ const card=page.locator('#carrier-policy-test');await card.locator('[data-hd-night-policy]').selectOption('cv-fighter2');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightCarrier(p.ships[0]).candidates.some(c=>c.attack==='cv-fighter2')})).toBe(true);await expect(card).toContainText('空母夜戦CI装備条件：成立');await expect(card).toContainText('残機未同期');expect(await page.evaluate(()=>HD_FL_CACHE['1-1:0'].ships[0].expansion)).toBeNull();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('cv-fighter2');
+});
