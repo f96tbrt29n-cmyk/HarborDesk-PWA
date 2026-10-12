@@ -20,6 +20,27 @@ async function boot(page) {
   ).toBe('ok');
 }
 
+test('night damage checks synced identities boundaries and carrier exceptions independently of CI equipment',async({page})=>{
+ await boot(page);
+ const results=await page.evaluate(()=>{
+  const check=(name,hp,max=100,extra={})=>{const masterId=hdShipDbMasterRowFor(hdFEFindShip(name)).id,ship={ship:name,masterId,gameShipId:991,items:[]};localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name,masterId,gameShipId:991,gameHp:hp,gameMaxHp:max,...extra}]));return hdFENightDamage(ship).status};
+  const out={healthy:check('赤城改',51),middle:check('赤城改',50),large:check('吹雪改',25),surface:check('吹雪改',26),armored:check('翔鶴改二甲',50),armoredLarge:check('翔鶴改二甲',25),legacy:check('Graf Zeppelin改',50),missing:check('赤城改',null),blank:check('赤城改',''),negative:check('赤城改',-1),overflow:check('赤城改',101),badMax:check('赤城改',50,0),wrongMaster:check('赤城改',100,100,{masterId:1})};
+  const name='赤城改',masterId=hdShipDbMasterRowFor(hdFEFindShip(name)).id;localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([1,2].map(gameShipId=>({name,masterId,gameShipId,gameHp:100,gameMaxHp:100}))));out.ambiguous=hdFENightDamage({ship:name,masterId}).status;out.selected=hdFENightDamage({ship:name,masterId,gameShipId:2}).status;out.missingIndividual=hdFENightDamage({ship:name,masterId,gameShipId:3}).status;return out;
+ });
+ expect(results).toEqual({healthy:'ready',middle:'missing',large:'missing',surface:'ready',armored:'ready',armoredLarge:'missing',legacy:'manual',missing:'manual',blank:'manual',negative:'manual',overflow:'manual',badMax:'manual',wrongMaster:'manual',ambiguous:'manual',selected:'ready',missingIndividual:'manual'});
+});
+
+test('night damage mobile display keeps equipment CI ready while synced HP blocks attack',async({page})=>{
+ await boot(page);
+ await page.evaluate(()=>{
+  const name='赤城改',masterId=hdShipDbMasterRowFor(hdFEFindShip(name)).id;localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name,masterId,gameShipId:992,gameHp:50,gameMaxHp:100,gameSlotEx:0}]));
+  const ship={ship:name,masterId,gameShipId:992,items:[{slotIndex:0,name:'F6F-3N'},{slotIndex:1,name:'TBM-3D'},{slotIndex:2,name:'夜間作戦航空要員'}]};window.hdDamageFixture=ship;const host=document.createElement('div');host.id='night-damage-test';host.innerHTML=hdFENightCIHtml(ship);document.body.appendChild(host);
+ });
+ const host=page.locator('#night-damage-test');await expect(host).toContainText('空母夜戦CI装備条件：成立');await expect(host).toContainText('夜戦攻撃の損傷条件：攻撃不可');await expect(host).toContainText('同期HP 50/100');
+ await page.evaluate(()=>{const rows=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1'));rows[0].gameHp=100;localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(rows));document.getElementById('night-damage-test').innerHTML=hdFENightCIHtml(window.hdDamageFixture)});
+ await expect(host).toContainText('夜戦攻撃の損傷条件：充足');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
 test('all captured player equipment has usable performance in allocation and calculators', async ({page}) => {
  await boot(page);
  const r=await page.evaluate(()=>{

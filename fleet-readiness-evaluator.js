@@ -213,9 +213,27 @@ function hdFENightCarrier(ship){
  return result(base.candidates.length?'ready':'missing',base.candidates.length?'対応セットの装備条件が成立。複数成立時は順に判定されます。':'対応する夜間機の組み合わせが不足しています。');
 }
 function hdFENightCarrierHtml(ship){
- const x=hdFENightCarrier(ship),esc=hdFEEsc;return `<section class="hd-fl-night ${x.status}"><b>空母夜戦CI装備条件：${x.status==='ready'?'成立':x.status==='manual'?'未判定':'未成立'}</b><p>${esc(x.candidates.map(c=>c.label).join(' → ')||x.detail)}</p><small>夜間戦闘機 ${x.fighter}・夜間攻撃機 ${x.torpedo}・夜間爆撃機 ${x.bomber}・光電管爆弾 ${x.photo}・岩井隊爆戦／Swordfish系 ${x.special}・${x.native?'夜間作戦航空要員は不要な改造段階':'夜間作戦航空要員系 '+x.crew}</small>${x.fighter===2&&x.torpedo===1&&x.nightPlanes===3?'<p>夜間機3枠CIは対象外：夜間戦闘機2＋夜間攻撃機1の専用セットとして判定します。</p>':''}${x.depleted.length?`<p>搭載数0で判定から除外：${esc(x.depleted.join('、'))}。補給・残機を確認してね。</p>`:''}${x.unknownCapacity?'<p>残機未同期の枠は最大搭載数で装備条件を判定。出撃前に補給・残機を確認してね。</p>':''}<small>水上艦目標向け。発動率・撃破火力は未計算。通常・軽空母は中破で攻撃不可、装甲空母も大破で攻撃不可。損傷・連合艦隊の配置を別途確認してね。岩井隊爆戦・Swordfish系だけでは夜間機3枠CIは成立しません。通常の空母夜間砲撃・Ark RoyalのSwordfish単独による夜間攻撃は別判定です。</small><a class="guide-link" href="https://github.com/KC3Kai/KC3Kai/blob/master/src/library/objects/Ship.js" target="_blank" rel="noopener">空母夜戦CIの判定出典 ↗</a></section>`;
+ const x=hdFENightCarrier(ship),esc=hdFEEsc;return `<section class="hd-fl-night ${x.status}"><b>空母夜戦CI装備条件：${x.status==='ready'?'成立':x.status==='manual'?'未判定':'未成立'}</b><p>${esc(x.candidates.map(c=>c.label).join(' → ')||x.detail)}</p><small>夜間戦闘機 ${x.fighter}・夜間攻撃機 ${x.torpedo}・夜間爆撃機 ${x.bomber}・光電管爆弾 ${x.photo}・岩井隊爆戦／Swordfish系 ${x.special}・${x.native?'夜間作戦航空要員は不要な改造段階':'夜間作戦航空要員系 '+x.crew}</small>${x.fighter===2&&x.torpedo===1&&x.nightPlanes===3?'<p>夜間機3枠CIは対象外：夜間戦闘機2＋夜間攻撃機1の専用セットとして判定します。</p>':''}${x.depleted.length?`<p>搭載数0で判定から除外：${esc(x.depleted.join('、'))}。補給・残機を確認してね。</p>`:''}${x.unknownCapacity?'<p>残機未同期の枠は最大搭載数で装備条件を判定。出撃前に補給・残機を確認してね。</p>':''}<small>水上艦目標向け。発動率・撃破火力は未計算。損傷条件は下欄で同期HPから判定。中破時の通常夜戦攻撃がある空母は別途確認。連合艦隊の配置も確認してね。岩井隊爆戦・Swordfish系だけでは夜間機3枠CIは成立しません。通常の空母夜間砲撃・Ark RoyalのSwordfish単独による夜間攻撃は別判定です。</small><a class="guide-link" href="https://github.com/KC3Kai/KC3Kai/blob/master/src/library/objects/Ship.js" target="_blank" rel="noopener">空母夜戦CIの判定出典 ↗</a></section>`;
 }
-function hdFENightCIHtml(ship){
+// Damage gate only; equipment, target, fleet position and attack activation remain separate.
+// KC3Kai 6b0534d canDoNightAttack; positive initial night power from bundled api_start2 f45f36f.
+const HD_FE_CARRIER_NIGHT_DAMAGE_EXCEPTIONS=new Set([353,432,433,529,536,646,735,889,966,1025,1030,1055,1060,1061]);
+function hdFENightDamage(ship){
+ const db=hdFEFindShip(ship.ship),master=db&&hdShipDbMasterRowFor(db),row=hdFEAswRoster(ship),result=(status,detail,hp=null,maxHp=null)=>({status,detail,hp,maxHp});
+ if(!db||!master||Number(ship.masterId)>0&&Number(ship.masterId)!==Number(master.id)||!row||row.masterId&&Number(row.masterId)!==Number(master.id))return result('manual','艦娘の個体・改造段階・HPを同期して確認してね。');
+ const parse=v=>v==null||String(v).trim()===''?null:Number(v),hp=parse(row.gameHp),maxHp=parse(row.gameMaxHp);
+ if(!Number.isInteger(hp)||!Number.isInteger(maxHp)||maxHp<=0||hp<0||hp>maxHp)return result('manual','現在HP・最大HPが未同期、または不正です。母港で同期してね。');
+ const label=`同期HP ${hp}/${maxHp}`;
+ if(hp/maxHp<=.25)return result('missing',`${label}：大破相当のため夜戦攻撃不可。出撃前に入渠・編成変更を確認してね。`,hp,maxHp);
+ if(hp/maxHp<=.5&&['正規空母','軽空母'].includes(db.type)){
+  if(HD_FE_CARRIER_NIGHT_DAMAGE_EXCEPTIONS.has(Number(master.id)))return result('manual',`${label}：中破時の通常夜戦攻撃がある改造段階です。夜戦CIの攻撃可否は別途確認してね。`,hp,maxHp);
+  return result('missing',`${label}：中破のため空母夜戦攻撃不可。修理して再確認してね。`,hp,maxHp);
+ }
+ return result('ready',`${label}：損傷条件を充足${hp/maxHp<=.5&&db.type==='装甲空母'?'（装甲空母は中破でも攻撃可能）':''}。装備成立・発動を保証する判定ではありません。`,hp,maxHp);
+}
+function hdFENightDamageHtml(ship){const x=hdFENightDamage(ship);return `<section class="hd-fl-night ${x.status}"><b>夜戦攻撃の損傷条件：${x.status==='ready'?'充足':x.status==='missing'?'攻撃不可':'未判定'}</b><p>${hdFEEsc(x.detail)}</p><small>同期時点のHPで判定。戦闘中の損傷変化・退避・連合艦隊の配置は別確認です。</small><a class="guide-link" href="https://github.com/KC3Kai/KC3Kai/blob/6b0534d291c27220da1b6fe454e91fc96a6a7b27/src/library/objects/Ship.js" target="_blank" rel="noopener">損傷条件の判定出典 ↗</a></section>`}
+function hdFENightCIHtml(ship){return hdFENightCIEquipmentHtml(ship)+hdFENightDamageHtml(ship)}
+function hdFENightCIEquipmentHtml(ship){
  if(['正規空母','装甲空母','軽空母'].includes(hdFEFindShip(ship.ship)?.type))return hdFENightCarrierHtml(ship);
  if(['潜水艦','潜水空母'].includes(hdFEFindShip(ship.ship)?.type))return hdFENightSubHtml(ship);
  const x=hdFENightCI(ship),esc=hdFEEsc;return `<section class="hd-fl-night ${x.status}"><b>夜戦汎用CI装備条件：${x.status==='ready'?'成立':x.status==='manual'?'未判定':'未成立'}</b><p>${esc(x.label)}｜${esc(x.detail)}</p>${x.status!=='manual'?`<small>主砲 ${x.main}・副砲 ${x.secondary}・魚雷 ${x.torpedo}</small>`:''}<small>水上艦目標向けの装備条件です。発動確定・発動率・撃破火力の判定ではありません。運・Lv・配置・損傷、敵の種類も確認してね。駆逐艦専用CIは下欄、夜間瑞雲・タッチなどは別判定です。</small><a class="guide-link" href="https://wikiwiki.jp/kancolle/夜戦#dfcb6e1f" target="_blank" rel="noopener">夜戦装備条件の出典 ↗</a></section>${hdFENightDDHtml(ship)}`;
