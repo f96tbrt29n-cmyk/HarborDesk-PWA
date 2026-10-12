@@ -26,23 +26,41 @@ jobs:
     name: Smoke / ${{ matrix.browser }} / shard ${{ matrix.shard }} of ${{ matrix.shards }}
     if: github.event_name != 'workflow_dispatch' || inputs.suite == 'smoke'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: ${{ matrix.timeout_minutes }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - browser: chromium
             workers: 2
-            shard: 1
-            shards: 1
-          - browser: webkit
-            workers: 1
+            timeout_minutes: 45
             shard: 1
             shards: 2
-          - browser: webkit
-            workers: 1
+          - browser: chromium
+            workers: 2
+            timeout_minutes: 45
             shard: 2
             shards: 2
+          - browser: webkit
+            workers: 1
+            timeout_minutes: 45
+            shard: 1
+            shards: 4
+          - browser: webkit
+            workers: 1
+            timeout_minutes: 45
+            shard: 2
+            shards: 4
+          - browser: webkit
+            workers: 1
+            timeout_minutes: 45
+            shard: 3
+            shards: 4
+          - browser: webkit
+            workers: 1
+            timeout_minutes: 45
+            shard: 4
+            shards: 4
 
     steps:
       - name: Checkout

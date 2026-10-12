@@ -299,7 +299,7 @@ function hdFLSetRemedies(plan,goal){
   for(const recipe of recipes){
    const required=recipe.parts.slice();
    // Reuse an existing, confirmed expansion item, without proposing a new expansion allocation.
-   if((recipe.mode?.startsWith('speed')||['night-dd','night-sub'].includes(recipe.ship))&&ship.expansion&&hdFLHasExpansion(hdFEAswRoster(ship))){const item=hdFEFind(ship.expansion.name),part=required.findIndex(p=>hdFLRemedyPartMatches(p,{item,star:ship.expansion.star}));if(item&&part>=0&&hdShipDbExpansionInfo(item,db,ship.expansion.star).allowed)required.splice(part,1)}
+   if((recipe.mode?.startsWith('speed')||['night-dd','night-sub','night-cv'].includes(recipe.ship))&&ship.expansion&&hdFLHasExpansion(hdFEAswRoster(ship))){const item=hdFEFind(ship.expansion.name),part=required.findIndex(p=>hdFLRemedyPartMatches(p,{item,star:ship.expansion.star}));if(item&&part>=0&&hdShipDbExpansionInfo(item,db,ship.expansion.star).allowed)required.splice(part,1)}
    if(!hdSERecipeAllows(recipe,ship)||required.length>profile.count)continue;
    const slots=Array.from({length:profile.count},(_,index)=>({si,index,db,profile,capacity:profile.slots[index]}));
    const parts=required.map(part=>({part,choices:slots.flatMap(slot=>{
