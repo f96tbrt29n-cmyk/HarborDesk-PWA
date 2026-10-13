@@ -44,6 +44,10 @@ function hdSEBaseCheck(map,adv){
 // Verified equipment examples. These are recommendations, not universal sortie gates.
 const HD_SE_CAP_SOURCE={aa:'https://wikiwiki.jp/kancolle/対空砲火/対空カットイン一覧表',asw:'https://wikiwiki.jp/kancolle/対潜攻撃',land:'https://wikiwiki.jp/kancolle/対地攻撃'};
 const HD_SE_PARTS={
+ carrierAttackPlane:{label:'艦上攻撃機・艦上爆撃機',examples:['流星','彗星']},
+ waterAttackPlane:{label:'水上爆撃機',examples:['瑞雲']},
+ ptMachineGun:{label:'対空機銃',examples:['25mm三連装機銃','Bofors 40mm四連装機関砲']},
+ ptWaterAir:{label:'水上爆撃機・水上戦闘機（水偵は対象外）',examples:['瑞雲','二式水戦改']},
  ha:{label:'高角砲',examples:['10cm連装高角砲']},
  specialHa:{label:'特殊高角砲（素対空8以上）',examples:['10cm連装高角砲＋高射装置']},
  aaRadar:{label:'対空電探（素対空2以上）',examples:['13号対空電探改','21号対空電探']},
@@ -75,6 +79,13 @@ const HD_SE_PARTS={
  nightSubNormal:{label:'通常魚雷（後期型専用魚雷を除く）',examples:['61cm四連装(酸素)魚雷','試製FaT仕様九五式酸素魚雷改']}
 };
 const HD_SE_RECIPES={
+ 'cap-carrier-attack':[{id:'carrier-attack',name:'空母：搭載枠に攻撃機',parts:['carrierAttackPlane'],ship:'carrier-attack'}],
+ 'cap-water-attack':[{id:'water-attack',name:'水母・航戦：搭載枠に水上爆撃機',parts:['waterAttackPlane'],ship:'water-attack'}],
+ 'cap-pt':[
+  {id:'pt-dd-lookout',name:'駆逐・海防：小口径主砲＋見張員',parts:['nightSmallMain','nightLookout'],ship:'pt-dd'},
+  {id:'pt-surface-lookout',name:'水上艦：副砲＋機銃＋見張員',parts:['nightSecondary','ptMachineGun','nightLookout'],ship:'pt-surface'},
+  {id:'pt-surface-water',name:'水上艦：副砲＋機銃＋水爆/水戦',parts:['nightSecondary','ptMachineGun','ptWaterAir'],ship:'pt-surface'}
+ ],
  'cap-aa':[
   {id:'akizuki-radar',name:'秋月型：高角砲2＋電探',parts:['ha','ha','radar'],ship:'akizuki'},
   {id:'generic-two',name:'汎用：特殊高角砲2＋対空電探',parts:['specialHa','specialHa','aaRadar'],ship:'not-akizuki'},
@@ -154,6 +165,10 @@ function hdSENightPolicyHtml(map){return `<label class="hd-fl-night-policy">夜�
 function hdSEPartMatches(part,row){
  const item=row?.item||row?.meta||row||{},name=String(item.name||row?.name||''),cat=String(item.category||''),aa=Number(item.stats?.対空)||0;
  const ha=/高角砲|5inch.*Mk\.?\s*(?:12|30|38)/i.test(name);
+ if(part==='carrierAttackPlane')return ['艦上攻撃機','艦上爆撃機','噴式戦闘爆撃機'].includes(cat);
+ if(part==='waterAttackPlane')return cat==='水上爆撃機';
+ if(part==='ptMachineGun')return /機銃/.test(cat);
+ if(part==='ptWaterAir')return ['水上爆撃機','水上戦闘機'].includes(cat);
  if(part==='ha')return ha;
  if(part==='specialHa')return ha&&aa>=8;
  if(part==='aaRadar')return /電探|レーダー/.test(cat)&&aa>=2;
@@ -185,7 +200,7 @@ function hdSEAkizuki(ship){
  const db=typeof hdFEFindShip==='function'?hdFEFindShip(ship.ship):null,row=db&&typeof hdShipDbMasterRowFor==='function'?hdShipDbMasterRowFor(db):null;
  return Number(row?.ctype)===54||/^(秋月|照月|初月|涼月|冬月|夏月|宵月|春月|若月|霜月)/.test(ship.ship||'');
 }
-function hdSERecipeAllows(recipe,ship){if(recipe.ship==='night-cv'){const db=hdFEFindShip(ship.ship),id=Number(db&&hdShipDbMasterRowFor(db)?.id);return typeof hdFENightCarrier==='function'&&hdFENightCarrier({...ship,items:[],expansion:null}).status!=='manual'&&(!recipe.native||HD_SE_NATIVE_NIGHT_CARRIERS.has(id))}if(recipe.ship==='night-sub')return typeof hdFENightSub==='function'&&hdFENightSub({...ship,items:[],expansion:null}).status!=='manual';if(recipe.ship==='night-dd')return typeof hdFENightDD==='function'&&hdFENightDD({...ship,items:[],expansion:null}).status!=='manual';if(recipe.ship==='night-surface')return typeof hdFENightCI==='function'&&hdFENightCI({...ship,items:[],expansion:null}).status!=='manual';return !recipe.ship||(recipe.ship==='akizuki'?hdSEAkizuki(ship):!hdSEAkizuki(ship))}
+function hdSERecipeAllows(recipe,ship){if(recipe.ship==='carrier-attack')return ['軽空母','正規空母','装甲空母'].includes(hdFEFindShip(ship.ship)?.type);if(recipe.ship==='water-attack')return ['水上機母艦','航空戦艦'].includes(hdFEFindShip(ship.ship)?.type);if(recipe.ship==='pt-dd')return ['駆逐艦','海防艦'].includes(hdFEFindShip(ship.ship)?.type);if(recipe.ship==='pt-surface')return ['軽巡洋艦','重雷装巡洋艦','練習巡洋艦','重巡洋艦','航空巡洋艦','戦艦','高速戦艦','航空戦艦','水上機母艦','潜水母艦','補給艦','揚陸艦'].includes(hdFEFindShip(ship.ship)?.type);if(recipe.ship==='night-cv'){const db=hdFEFindShip(ship.ship),id=Number(db&&hdShipDbMasterRowFor(db)?.id);return typeof hdFENightCarrier==='function'&&hdFENightCarrier({...ship,items:[],expansion:null}).status!=='manual'&&(!recipe.native||HD_SE_NATIVE_NIGHT_CARRIERS.has(id))}if(recipe.ship==='night-sub')return typeof hdFENightSub==='function'&&hdFENightSub({...ship,items:[],expansion:null}).status!=='manual';if(recipe.ship==='night-dd')return typeof hdFENightDD==='function'&&hdFENightDD({...ship,items:[],expansion:null}).status!=='manual';if(recipe.ship==='night-surface')return typeof hdFENightCI==='function'&&hdFENightCI({...ship,items:[],expansion:null}).status!=='manual';return !recipe.ship||(recipe.ship==='akizuki'?hdSEAkizuki(ship):!hdSEAkizuki(ship))}
 function hdSENightRecipeState(ship,recipe){return recipe.ship==='night-cv'?hdFENightCarrier(ship):recipe.ship==='night-sub'?hdFENightSub(ship):recipe.ship==='night-dd'?hdFENightDD(ship):hdFENightCI(ship)}
 function hdSENightStateReady(state,recipe){return state.status==='ready'&&(['night-dd','night-cv'].includes(recipe.ship)?state.candidates.some(c=>c.attack===recipe.attack):state.attack===recipe.attack)}
 function hdSENightRecipeReady(ship,recipe){return hdSENightStateReady(hdSENightRecipeState(ship,recipe),recipe)}
@@ -205,9 +220,9 @@ function hdSERecipeParts(recipe,pool){
  for(const part of recipe.parts){const hit=pool.find(row=>row.count>(used.get(row.key)||0)&&hdSEPartMatches(part,row));if(hit)used.set(hit.key,(used.get(hit.key)||0)+1);const old=parts.find(x=>x.part===part);if(old){old.need++;old.have+=Number(!!hit);if(hit)old.items.push(hit.name)}else parts.push({part,label:HD_SE_PARTS[part].label,need:1,have:Number(!!hit),items:hit?[hit.name]:[]})}
  return {parts,matched:parts.reduce((n,x)=>n+x.have,0),total:recipe.parts.length,complete:parts.every(x=>x.have>=x.need)};
 }
-function hdSEShipPool(ship){
+function hdSEShipPool(ship,kind=''){
  const db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db);if(!profile)return [];
- const occupied=new Set(),rows=(ship.items||[]).filter((x,i)=>{const index=x.slotIndex??i,meta=x.name&&hdFEFind(x.name);if(!Number.isInteger(index)||index<0||index>=profile.count||occupied.has(index)||!meta||!hdShipDbEquipCompatible(meta,db)||hdShipDbSlotRejects(profile,index,meta))return false;occupied.add(index);return true});
+ const occupied=new Set(),rows=(ship.items||[]).filter((x,i)=>{const index=x.slotIndex??i,meta=x.name&&hdFEFind(x.name);if(!Number.isInteger(index)||index<0||index>=profile.count||occupied.has(index)||!meta||['cap-pt','cap-carrier-attack','cap-water-attack'].includes(kind)&&HD_FE_AIR_CATS.has(meta.category)&&Number(x.capacity??profile.slots[index])<=0||!hdShipDbEquipCompatible(meta,db)||hdShipDbSlotRejects(profile,index,meta))return false;occupied.add(index);return true});
  if(ship.expansion?.name){const meta=hdFEFind(ship.expansion.name);if(meta&&hdShipDbExpansionInfo(meta,db,ship.expansion.star||0).allowed)rows.push(ship.expansion)}
  return hdSEPool(rows.map(x=>({...x,item:hdFEFind(x.name)})));
 }
@@ -227,17 +242,18 @@ function hdSECapabilityMeasure(plan,kind){
   return {count:matches.length,ratio:matches.length?1:ratio,ships:matches.map(x=>x.ship),matches,unresolved:ships.length>0&&!known};
  }
  const recipes=HD_SE_RECIPES[kind]||[],ships=plan?.ships||[],matched=[];let best=0;
- for(const ship of ships){const pool=hdSEShipPool(ship);let complete=false;for(const recipe of recipes){if(!hdSERecipeAllows(recipe,ship))continue;const r=hdSERecipeParts(recipe,pool);best=Math.max(best,r.matched/Math.max(1,r.total));if(r.complete)complete=true}if(complete)matched.push(ship.ship)}
+ for(const ship of ships){const pool=hdSEShipPool(ship,kind);let complete=false;for(const recipe of recipes){if(!hdSERecipeAllows(recipe,ship))continue;const r=hdSERecipeParts(recipe,pool);best=Math.max(best,r.matched/Math.max(1,r.total));if(r.complete)complete=true}if(complete)matched.push(ship.ship)}
  return {count:matched.length,ratio:Math.max(Math.min(1,matched.length),best),ships:matched};
 }
-function hdSECapabilityStock(plan,kind){
+function hdSECapabilityStock(plan,kind,targetCount=1){
+ targetCount=Math.max(1,Math.min(7,Number(targetCount)||1));
  const inventory=typeof hdFLInventory==='function'?[...hdFLInventory().values()]:[],recipes=HD_SE_RECIPES[kind]||[],ships=plan?.ships||[],options=[];
  for(const recipe of recipes){
-  const stock=hdSERecipeParts(recipe,inventory);let bestUsable=null;
+  const stock=hdSERecipeParts({...recipe,parts:Array.from({length:targetCount},()=>recipe.parts).flat()},inventory);let bestUsable=null;
   for(const ship of ships){if(!hdSERecipeAllows(recipe,ship))continue;const db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db);if(!profile)continue;
    const live=hdFERosterForShip(ship),expanded=typeof hdFLHasExpansion==='function'&&hdFLHasExpansion(live);
    const slots=Array.from({length:profile.count},(_,index)=>({index,db,profile}));if(expanded)slots.push({index:0,db,profile,expansion:true});
-   const options=recipe.parts.map(part=>({part,choices:slots.flatMap(slot=>inventory.filter(x=>hdSEPartMatches(part,x)&&(slot.expansion?hdShipDbExpansionInfo(x.item,db,x.star).allowed:hdShipDbEquipCompatible(x.item,db)&&!hdShipDbSlotRejects(profile,slot.index,x.item))).map(row=>({slot,row})))})).sort((a,b)=>a.choices.length-b.choices.length);
+   const options=recipe.parts.map(part=>({part,choices:slots.flatMap(slot=>inventory.filter(x=>hdSEPartMatches(part,x)&&(slot.expansion?hdShipDbExpansionInfo(x.item,db,x.star).allowed:hdShipDbEquipCompatible(x.item,db)&&!hdShipDbSlotRejects(profile,slot.index,x.item)&&(!['cap-pt','cap-carrier-attack','cap-water-attack'].includes(kind)||!HD_FE_AIR_CATS.has(x.item.category)||Number(profile.slots[slot.index])>0))).map(row=>({slot,row})))})).sort((a,b)=>a.choices.length-b.choices.length);
    const used=new Map(),taken=new Set();let matched=0,examined=0;
    const place=(index,count)=>{
     matched=Math.max(matched,count);if(count===recipe.parts.length)return true;if(index===options.length||++examined>3000)return false;
@@ -276,7 +292,7 @@ function hdSEChecks(map){
  const rows=(info.needs||[]).filter(n=>!replaced.has(n.id)&&!(map==='1-6'&&['制空','索敵','輸送'].includes(n.id))).map(n=>hdSECheckKind(n.id));
  for(const p of profiles){const stock=hdSECapabilityStock(null,p.kind);rows.push({...p,minCount:1,count:Number(!!stock?.complete),status:stock?.complete?'ready':stock?.matched?'partial':'missing',detail:'同じ艦の推奨セット 1組',hint:p.reason,candidates:[],ownedTypes:[]})}
  if(info.adv?.base?.available)rows.push(hdSEBaseCheck(map,info.adv));
- const value={rows,adv:info.adv||{}};HD_SE_CHECK_CACHE.set(map,{key:cacheKey,value});return value;
+ const value={rows:rows.map(r=>({...r,generatedFromMap:true})),adv:info.adv||{}};HD_SE_CHECK_CACHE.set(map,{key:cacheKey,value});return value;
 }
 function hdSEStatusLabel(status){return status==='ready'?'準備あり':status==='partial'?'一部あり':'不足'}
 function hdSECard(row,adv){

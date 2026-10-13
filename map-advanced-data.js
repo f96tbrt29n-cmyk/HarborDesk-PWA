@@ -2,10 +2,10 @@
 // Values are summarized from the current Kancolle Strategy Wiki. Unknown/uncertain values stay explicitly marked as such.
 const HD_MAP_ADVANCED_DATA={
   '7-1':{openingAsw:{recommended:4,upper:5,source:'https://zekamashi.net/kancolle-kouryaku/7-1/',note:'先制対潜4〜5隻を用意する攻略案（2026-10-13確認）。ルート固定の必須条件ではなく、編成・装備・練度で調整する配備目標。'},base:{available:false}},
-  '2-5':{los:{coef:1,summary:'ボス前の索敵判定あり。司令部Lv120基準で索敵スコア33以上ならボス到達確定、31未満は逸れ確定、31〜33未満はランダム域。',checks:[{label:'ボス前',safe:33,failBelow:31}]},base:{available:false}},
+  '2-5':{los:{coef:1,summary:'33式係数1。北BFJOは49以上、南CEIOは34以上。数値は選択経路の条件から判定し、海域共通の閾値にはしない。司令部Lv120未満は出典が+1以上の余裕を推奨。'},base:{available:false}},
   '3-5':{los:{coef:4,summary:'ボス方面で索敵判定あり。ルートごとの必要値は編成条件と合わせて確認。'},base:{available:false}},
-  '4-5':{los:{coef:2,summary:'ボス方面で索敵判定あり。司令部Lv120未満では表示閾値より+1以上の余裕を推奨。'},base:{available:false}},
-  '5-2':{los:{coef:2,summary:'ボス方面で索敵判定あり。司令部Lv120未満では+1以上の余裕を推奨。'},base:{available:false}},
+  '4-5':{los:{coef:2,summary:'中央K経由は33式係数2で71以上。高速+最短・軽量最短は数値索敵不要。経路別に判定。'},base:{available:false}},
+  '5-2':{los:{coef:2,summary:'登録したBCEFOは33式係数2で70以上。史実艦BCDFOも70以上だが艦種・速力条件は別。'},base:{available:false}},
   '5-4':{los:{coef:2,summary:'上ルートL→Pは索敵60前後、中央M→Pは45以上が主要目安。ランダム域あり。',checks:[{label:'上ルート L→P',safe:60},{label:'中央 M→P',safe:45}]},base:{available:false}},
   '5-5':{los:{coef:2,summary:'ボス方面で索敵判定あり。ルートごとに必要値が異なるためルートタブと併用。'},base:{available:false}},
   '5-6':{los:{coef:null,summary:'L→N、Q1→T、X→Zなどに索敵判定あり。2026年実装の新海域で検証継続中のため、数値閾値は確定値のみ順次登録。'},base:{available:false,note:'現行Wikiでは「対地戦や基地要素こそ無い」とされ、基地航空隊は使用しない。'}},
@@ -13,7 +13,7 @@ const HD_MAP_ADVANCED_DATA={
   '6-2':{los:{coef:3,summary:'E分岐は43未満でI、43〜50未満はI/Jランダム、50以上でJ。Hは32以上でK。Iは40以上でK、35前後〜40未満はランダム域。',checks:[{label:'E→J 安全域',safe:50,failBelow:43},{label:'H→K',safe:32},{label:'I→K 安全域',safe:40,failBelow:35}]},base:{available:false}},
   '6-3':{los:{coef:3,summary:'H分岐は36未満で逸れ、36〜38未満はランダム、38以上がボス方面の安全域目安。',checks:[{label:'H分岐',safe:38,failBelow:36}]},base:{available:false}},
   '6-4':{los:{coef:null,summary:'主要攻略ルートは艦種・速力条件が中心。'},base:{available:true,sorties:1,bossRadius:5,note:'空襲なし。ボスは通常半径5。噴式機（橘花改/噴式景雲改）配備時は特殊仕様で半径2扱い。右側遠方マスは最大半径8。'}},
-  '6-5':{los:{coef:null,summary:'主なボス到達は艦種・速力・ルート条件中心。'},base:{available:true,sorties:2,bossRadius:5,note:'2部隊まで出撃可能。ボス必要半径5。ボス集中が基本。'}},
+  '6-5':{los:{coef:3,summary:'33式係数3。上ACDGMは50以上、下BFIJMは35以上。経路ごとの条件で判定。'},base:{available:true,sorties:2,bossRadius:5,note:'2部隊まで出撃可能。ボス必要半径5。ボス集中が基本。'}},
   '7-4':{los:{coef:4,summary:'J分岐は33未満でK、33〜37未満はK/Lランダム、37以上でL/P条件へ。M分岐は45未満でN、45〜47未満はN/Oランダム、47以上でO（特定重量条件時）。',checks:[{label:'J分岐 安全域',safe:37,failBelow:33},{label:'M→O 安全域',safe:47,failBelow:45}]},base:{available:true,sorties:1,bossRadius:2,note:'1部隊出撃可能・空襲なし。最寄りの潜水Cマスでも必要半径7。Pボスの必要半径は2。'}},
   '7-5':{los:{coef:4,summary:'I分岐は59以上でM、53〜58はL/Mランダム、52以下でL。ほかにも段階ゲージごとに索敵分岐あり。',checks:[{label:'I→M 安全域',safe:59,failBelow:53}]},base:{available:false}}
 };

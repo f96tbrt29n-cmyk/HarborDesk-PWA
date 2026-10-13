@@ -1897,6 +1897,7 @@ test('release smoke: integrated readiness evaluates route air scouting and live 
     localStorage.setItem('harbordesk-pwa-v1', JSON.stringify({ expeditions:[], docks:[] }));
     const plan = {
       map:'2-5',
+      preset:MAP_PLANS['2-5'].presets[0],
       routeInfo:{ requirements:[{ token:'駆逐', count:2 }], speedRequired:false },
       ships:[
         {ship:'睦月',masterId:1,type:'駆逐艦'},
@@ -1918,8 +1919,10 @@ test('release smoke: integrated readiness evaluates route air scouting and live 
 
   expect(data.scouting.available).toBe(true);
   expect(data.scouting.status).toBe('ready');
-  expect(data.scouting.score).toBeGreaterThanOrEqual(33);
-  expect(data.route.status).toBe('ready');
+  expect(data.scouting.coef).toBe(1);
+  expect(data.scouting.score).toBeGreaterThanOrEqual(49);
+  // Numerical scouting alone cannot confirm an invalid north-route fleet.
+  expect(data.route.status).toBe('missing');
   expect(data.live.status).toBe('ready');
   expect(data.air.status).toBe('ready');
   expect(data.air.enemy).toBeGreaterThan(0);

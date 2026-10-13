@@ -56,7 +56,7 @@ test('concrete examples fill every stage and preserve scarce and required ships'
  });
  expect(scarce).toBe(6);
  const readiness=await page.evaluate(()=>{
-  const ships=[{ship:'羽黒改二',type:'重巡洋艦'},...Array.from({length:3},(_,i)=>({ship:'テスト駆逐'+i,type:'駆逐艦'}))];
+  const ships=[{ship:'羽黒改二',type:'重巡洋艦'},...['夕立改二','時雨改二','島風改'].map(ship=>({ship,type:'駆逐艦'}))];
   const routeInfo=hdFSPresetInfo(MAP_PLANS['7-3'].presets[0]);
   return {match:hdFERoute({map:'7-3',ships,routeInfo}).status,wrong:hdFERoute({map:'7-3',ships:[{ship:'妙高改二',type:'重巡洋艦'},...ships.slice(1)],routeInfo}).status};
  });
@@ -75,6 +75,7 @@ test('concrete examples fill every stage and preserve scarce and required ships'
 });
 
 test('route choices coordinate the navigator, survive reloads and stay attached to saved fleets',async({page})=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
  test.setTimeout(120000);
  await boot(page);
  await page.evaluate(()=>{hdSelectGuideMap('3-5');hdFSOpen()});
@@ -114,4 +115,5 @@ test('route choices coordinate the navigator, survive reloads and stay attached 
  await chooser.selectOption('all');await expect(card).toHaveCount(2);
  expect(await page.evaluate(()=>hdMapRouteStored('3-5'))).toBe(null);
  expect(await page.evaluate(()=>hdMapRouteStored('7-5'))).toBe(2);
+ expect(errors).toEqual([]);
 });
