@@ -21,7 +21,7 @@ const HD_FS_TYPE_ALIASES={
  '空母':['軽空母','正規空母','装甲空母'],'空母系':['軽空母','正規空母','装甲空母'],
  '正規空母':['正規空母','装甲空母'],'装甲空母':['装甲空母'],'軽空母':['軽空母'],
  '水母':['水上機母艦'],'水上機母艦':['水上機母艦'],
- '潜水艦':['潜水艦','潜水空母'],'潜水母艦':['潜水母艦']
+ '潜水艦':['潜水艦','潜水空母'],'潜水母艦':['潜水母艦'],'補給艦':['補給艦']
 };
 function hdFSEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function hdFSMap(){return typeof selectedMap!=='undefined'?selectedMap:''}
@@ -112,7 +112,16 @@ function hdFSLevelCompare(a,b,info){
  return speed(a)-speed(b)||condition(a)-condition(b)||tier(a)-tier(b)||distance(a)-distance(b);
 }
 function hdFSPickBest(pool,used,predicate,info,needs){
- return pool.filter(function(p){return !used.has(p.row.id)&&p.operational?.available!==false&&(!predicate||predicate(p))}).sort(function(a,b){return hdFSLevelCompare(a,b,info)||hdFSScore(b,info,needs)-hdFSScore(a,info,needs)||b.level-a.level})[0]||null;
+ return pool.filter(function(p){return !used.has(p.row.id)&&p.operational?.available!==false&&(!predicate||predicate(p))}).sort(function(a,b){return (a.routeRank||0)-(b.routeRank||0)||hdFSLevelCompare(a,b,info)||hdFSScore(b,info,needs)-hdFSScore(a,info,needs)||b.level-a.level})[0]||null;
+}
+function hdFSRouteRank(profile,goal){
+ if(!goal?.speed||typeof hdFEShipSpeed!=='function')return 0;
+ const row=profile.row,ship={ship:row.name,masterId:row.masterId,items:[]},speed=hdFEShipSpeed(ship),db=hdFEFindShip(row.name),slots=db&&hdShipDbSlotProfile(db);
+ if(!speed.known||!slots)return 3;
+ const recipes=hdFESpeedRecipes(speed.group,goal.speed,speed.base);if(!recipes.length)return 2;
+ const turbine=hdFEFind('改良型艦本式タービン'),ex=hdFLHasExpansion(row)&&turbine&&hdShipDbExpansionInfo(turbine,db,0).allowed?1:0;
+ const minimum=Math.min(...recipes.map(r=>(r.t||0)+Math.max(r.n||0,r.c||0)-(r.t?ex:0)));
+ return minimum>slots.count?2:goal.radar&&minimum===slots.count?1:0;
 }
 function hdFSOperationalSummary(pool){
  var blocked=pool.filter(function(p){return p.operational?.available===false}),counts={};
@@ -122,6 +131,7 @@ function hdFSOperationalSummary(pool){
 function hdFSGenerate(map,preset,index){
  var info=hdFSPresetInfo(preset),needs=hdFSNeeds(map),live=hdFSLiveState(),pool=hdFSRoster().map(function(row){return hdFSProfile(row,live)}).filter(p=>!info.requirements.some(req=>req.count===0&&hdFSTypeMatches(p,req.token))).filter(p=>map!=='1-6'||!['戦艦','高速戦艦','正規空母','装甲空母','重雷装巡洋艦','潜水艦','潜水空母'].includes(p.type)),operational=hdFSOperationalSummary(pool),used=new Set(),slots=[],missing=[];
  info.levelTarget=hdFSLevelTarget(map);
+ if(typeof hdOCRouteGoal==='function'){const goal=MAP_PLANS[map]?.routeBranches?.goals?.[hdOCRouteGoal({map,preset,index,fleet:{id:`auto:${map}:${index}`}})];if(goal?.speed)pool.forEach(p=>p.routeRank=hdFSRouteRank(p,goal))}
  info.requirements.forEach(function(req){for(var i=0;i<req.count;i++){var p=hdFSPickBest(pool,used,function(x){return hdFSTypeMatches(x,req.token)},info,needs);if(p){used.add(p.row.id);slots.push({profile:p,required:req.token,levelTarget:info.levelTarget})}else{slots.push({profile:null,required:req.token});missing.push(req.token)}}});
  while(info.requirements.length&&slots.length<info.total){var p=hdFSPickBest(pool,used,p=>/自由枠/.test(info.text)||info.preferred.some(t=>hdFSTypeMatches(p,t)),info,needs);if(!p)break;used.add(p.row.id);slots.push({profile:p,required:'',levelTarget:info.levelTarget})}
  while(slots.length<info.total)slots.push({profile:null,required:info.conditionManual?'条件未確認':'自由枠'});

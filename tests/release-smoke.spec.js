@@ -10707,7 +10707,11 @@ test('release smoke: map strategy navigator connects route examples and saved fl
     saveCustomFleets(rows);
   });
   await expect(page.locator('#hdMapStrategyFleet')).toHaveValue('ci-route-fleet');
-  await expect(page.locator('.hd-msn-check').filter({ hasText:'編成条件' })).toContainText('軽巡');
+  // The registered 3-2 graph confirms six destroyers even when the selected
+  // example contains a light cruiser. Five ships cannot meet the boss-route count.
+  await expect(page.locator('.hd-msn-check').filter({ hasText:'編成条件' })).toContainText('登録した分岐条件を充足');
+  await expect(page.locator('.hd-msn-check').filter({ hasText:'編成条件' })).toContainText('OK');
+  await page.evaluate(()=>{const rows=loadCustomFleets();rows['3-2'][0].ships.pop();saveCustomFleets(rows)});
   await expect(page.locator('.hd-msn-check').filter({ hasText:'編成条件' })).toContainText('不足/不可');
   await expect(page.locator('.hd-msn-actions')).toBeVisible();
   await page.locator('[data-hd-msn-action="route"]').click();

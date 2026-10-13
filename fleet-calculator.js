@@ -38,8 +38,9 @@ function hdFCImportOwnedPlan(c,result){
   }
   if(ship.expansion?.name)gear.push({name:ship.expansion.name,star:Number(ship.expansion.star)||0,slot:0,maxProf:false,ship:ship.ship,slotIndex:null});
  }
- const assessment=hdOCReadiness(result.plan,result.measure);
- const state={...hdFCDefaultState(c.map,c.fleet.id),enemyAir:Number(old.enemyAir)||0,hqLevel:hq??old.hqLevel??120,shipCount:ships.length,ships:ships.map(ship=>({name:ship.ship,rosterId:ship.rosterId||'',gameShipId:Number(ship.gameShipId)||0,masterId:Number(ship.masterId)||0,los:hdFCProposalShipLos(ship)})),gear,proposal:{id,map:c.map,fleetId:c.fleet.id,route:c.index,name:c.fleet.name||'保存編成',at:Date.now(),signature:result.signature,hqMissing:hq==null,edited:false,assessment:{status:assessment.status,detail:assessment.detail,checks:assessment.checks.filter(x=>x.status!=='ready')}}};
+ const measure=result.measure||hdOCMeasure(result.plan,typeof hdFLRequirements==='function'?hdFLRequirements(result.plan):hdSEChecks(c.map).rows);
+ const assessment=hdOCReadiness(result.plan,measure),routeAssessment=hdFEBranchRoute(result.plan);
+ const state={...hdFCDefaultState(c.map,c.fleet.id),enemyAir:Number(old.enemyAir)||0,hqLevel:hq??old.hqLevel??120,shipCount:ships.length,ships:ships.map(ship=>({name:ship.ship,rosterId:ship.rosterId||'',gameShipId:Number(ship.gameShipId)||0,masterId:Number(ship.masterId)||0,los:hdFCProposalShipLos(ship)})),gear,proposal:{id,map:c.map,fleetId:c.fleet.id,route:c.index,name:c.fleet.name||'保存編成',at:Date.now(),signature:result.signature,hqMissing:hq==null,edited:false,routeGoal:result.plan.routeGoal||'',routeAssessment,assessment:{status:assessment.status,detail:assessment.detail,checks:assessment.checks.filter(x=>x.status!=='ready')}}};
  hdFCSaveState(c.map,id,state);hdFCSetSelection(c.map,id);return true;
 }
 function hdFCProposalIssues(s){

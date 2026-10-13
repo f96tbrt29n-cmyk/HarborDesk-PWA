@@ -121,6 +121,28 @@ function renderPlans(map){
 window.hdRenderMapPlans=renderPlans;
 
 // Share explicit route choices across the guide and owned-fleet tools.
+// Verified route graphs are separate from the unchanged 37-map / 53-example registry.
+(()=>{
+ const ae=MAP_PLANS['1-2'].routeBranches;
+ ae.schemaVersion=2;ae.graph={start:'start',target:'E',nodes:{start:[{conditionRef:'start-A',to:['A']}],A:[{conditionRef:'A-E',to:['E']}]}};
+ ae.checks[0].from='start';ae.checks[0].to=['A'];ae.checks[1].from='A';ae.checks[1].to=['E'];
+ const count=(types,min,max=6)=>({kind:'typeCount',types,min,max}),speed=rank=>({kind:'minSpeed',rank}),radar=min=>({kind:'equipmentShips',match:'radar',slotPolicy:'valid',min,max:6}),all=(...xs)=>({all:xs}),not=x=>({not:x});
+ const rule=(condition,to,random=false)=>({condition,to,random,state:'verified'}),always={kind:'always'};
+ MAP_PLANS['3-2'].routeBranches={schemaVersion:2,path:'C…L',checkedAt:'2026-10-13',sources:['https://zekamashi.net/kancolle-kouryaku/3-2/','https://zh.kcwiki.cn/wiki/北方海域/3-2'],coverage:'登録したボス経路の分岐。戦闘勝利・大破進撃の安全性は保証しない',defaultGoal:'normal',goals:{
+  normal:{label:'通常・H経由を許容',next:'補給艦を外して軽巡1＋駆逐5または駆逐6へ変更する。H回避を選ぶ場合は全艦が高速＋へ到達できるか確認する。',path:'CG(H)FL / CEFL',checks:[],speed:0,radar:0,allowed:['start','C','E','G','H','F','L']},
+  fastPlus:{label:'H回避・高速＋以上',path:'CEFL / CGFL',checks:[{id:'speed-goal',label:'高速＋統一',condition:speed(15),next:'各艦に有効な缶・タービンのセットを配備する。'},{id:'radar-goal',label:'電探装備艦',condition:radar(1),next:'電探を搭載できる艦の有効スロットに1個以上配備する。'}],speed:15,radar:1,allowed:['start','C','E','G','F','L']},
+  fastest:{label:'CEFL固定・最速',path:'CEFL',checks:[{id:'speed-goal',label:'最速統一',condition:speed(20),next:'最速に到達できる艦と必要な缶・改修値・スロットを確認する。'},{id:'radar-goal',label:'電探装備艦4隻',condition:radar(4),next:'4隻それぞれの有効スロットに電探を配備する。同じ艦の複数電探は1隻と数える。'}],speed:20,radar:4,allowed:['start','C','E','F','L']}
+ },notRequired:{scouting:'この登録経路には数値索敵の分岐条件なし。電探装備艦数とは区別する。',air:'この登録ボス経路に航空戦なし。別経路は対象外。'},checks:[
+  {id:'six-ships',label:'ボス経路の隻数',condition:{kind:'fleetCount',min:6,max:6},next:'6隻にする。5隻以下ではHからIへ逸れる。'},
+  {id:'boss-types',label:'登録ボス経路の艦種',condition:all(count(['軽巡','駆逐','補給艦'],6,6),count(['軽巡'],0,1),count(['駆逐'],4,6)),next:'軽巡1＋駆逐5、または駆逐6を基本にする。補給艦を使う場合はランダムな逸れ先も再確認する。'}
+ ],graph:{start:'start',target:'L',terminals:{A:'nonboss',D:'nonboss',I:'nonboss',J:'nonboss',L:'boss'},nodes:{
+  start:[rule(count(['戦艦','空母'],1),['C']),rule(count(['駆逐'],6,6),['C']),rule(all(count(['軽巡'],1,1),count(['駆逐'],4)),['C']),rule(always,['A'])],
+  C:[rule(count(['駆逐'],0,3),['A']),rule(count(['戦艦','正規空母'],2),['A']),rule(count(['潜水艦'],1),['A','G'],true),rule(not(speed(10)),['G']),rule({...radar(0),max:0},['G']),rule(count(['軽巡','駆逐','補給艦'],0,5),['G']),rule(all(speed(20),radar(4)),['E']),rule(speed(15),['E','G'],true),rule(count(['補給艦'],1),['E','G'],true),rule(always,['G'])],
+  E:[rule(speed(15),['F']),rule(always,['D','F'],true)],
+  G:[rule(count(['正規空母'],1),['J']),rule(count(['戦艦','軽空母'],2),['J']),rule(count(['潜水艦'],1),['H','J'],true),rule(count(['軽巡','駆逐','補給艦'],0,5),['H']),rule(not(speed(10)),['H']),rule({...radar(0),max:0},['H']),rule(speed(15),['F']),rule(count(['補給艦'],1),['H','F'],true),rule(always,['H','F'],true)],
+  H:[rule(count(['軽巡','駆逐','補給艦'],6,6),['F']),rule(count(['軽巡','駆逐','補給艦'],0,5),['I']),{...rule(always,['I','F']),state:'unverified',reason:'6隻を超える範囲は資料表記が一致しない'}],F:[rule(always,['L'])]
+ }}};
+})();
 const HD_MAP_ROUTE_STORAGE='harbordesk-map-routes-v1';
 function hdMapRouteStored(map){
  try{const saved=JSON.parse(localStorage.getItem(HD_MAP_ROUTE_STORAGE)||'{}')[map];if(!saved)return null;const rows=MAP_PLANS[map]?.presets||[];const index=rows.findIndex(p=>p.name===saved.name&&p.ships===saved.ships);return index<0?null:index}catch{return null}

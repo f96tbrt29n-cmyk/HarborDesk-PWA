@@ -212,8 +212,9 @@ test('strategy integration: bulk goals include the prerequisite chain without re
 });
 
 test('strategy integration: prerequisite checkbox and cleared map share one completion state', async ({ page }) => {
-  // Verify the complete scenario across both app loads with the same per-assertion deadlines.
-  test.setTimeout(90000);
+  // Two app loads and three map changes share this budget. Keep the individual
+  // readiness (30s) and assertion (12s) deadlines; do not abort a valid final step.
+  test.setTimeout(180000);
   await openApp(page);
   await page.locator('#homeGuideMapSelect').selectOption('6-5');
   await page.locator('[data-hd-strategy-import-all="6-5"]').click();
@@ -231,6 +232,19 @@ test('strategy integration: prerequisite checkbox and cleared map share one comp
   await page.locator('#homeGuideMapSelect').selectOption('6-5');
   await expect(unlock).toHaveAttribute('aria-pressed','false');
   expect(await page.evaluate(() => homeGuideState().cleared.includes('6-4'))).toBe(false);
+});
+
+test('strategy render snapshot updates saved route goals after every fleet change',async({page})=>{
+ await openApp(page);await page.evaluate(()=>{
+  const names=['島風改','夕立改二','時雨改二','綾波改二','雪風改'];
+  saveCustomFleets({'1-2':[{id:'render-fleet',name:'描画の鮮度',ships:names.map(ship=>({ship,masterId:hdShipDbMasterRowFor(ship).id,gear:''}))}]});
+  hdSelectGuideMap('1-2');hdStrategyImportMap('1-2','1-2:nav:route');homeGuideRender();
+ });
+ const row=page.locator('#homeGuideSteps .home-guide-step').filter({hasText:'編成条件を確認・改善'});await expect(row).toContainText('不足・要確認');
+ await page.evaluate(()=>{const all=loadCustomFleets();all['1-2'][0].ships[0]={ship:'夕張改二特',masterId:hdShipDbMasterRowFor('夕張改二特').id,gear:''};saveCustomFleets(all);homeGuideRender()});
+ await expect(row).toContainText('自動判定OK');
+ await page.evaluate(()=>{const all=loadCustomFleets();all['1-2'][0].ships[0]={ship:'島風改',masterId:hdShipDbMasterRowFor('島風改').id,gear:''};saveCustomFleets(all);homeGuideRender()});
+ await expect(row).toContainText('不足・要確認');
 });
 
 test('strategy integration: 5-6 monthly clear confirmation expires at the JST month boundary', async ({ page }) => {
