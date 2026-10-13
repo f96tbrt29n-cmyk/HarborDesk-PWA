@@ -716,7 +716,7 @@ function hdFEOpeningAsw(ship,scope=''){
  // A naked synchronized stat gives a conservative floor without subtracting unknown bonuses.
  if(value==null&&row?.gameAswGearKnown===true){
   const naked=Array.isArray(row.gameGearSlots)&&row.gameGearSlots.length===profile.count&&row.gameGearSlots.every(x=>!String(x||'').trim())&&!String(row.gameGearExpansion||'').trim();
-  const b=row.gameAswBaseline,valid=b&&b.masterId===Number(row.masterId)&&b.level===Number(row.level)&&b.mods&&b.mods===row.gameAswMods;
+  const b=row.gameAswBaseline,valid=b&&b.slotCount===profile.count&&b.masterId===Number(row.masterId)&&b.level===Number(row.level)&&b.mods&&b.mods===row.gameAswMods;
   const base=hdFEAswNumber(naked?row.gameAsw:valid?b.value:null);
   if(base!=null){const lower=base+rawAsw,level=Number(row.level)||null;return result(lower>=threshold?'ready':'manual',`Lv${level||'未確認'}・装備なし同期値 ${base}＋装備素対潜 ${rawAsw}＝ボーナス除外下限 ${lower} / 必要 ${threshold}${lower<threshold?`（下限ではあと${threshold-lower}。艦固有ボーナス込みの表示値を要確認）`:''}。${eligible[0].label}`,{rules,value:lower,threshold,source:'装備なし同期値からの下限',lowerBound:true,shortfall:Math.max(0,threshold-lower),level,needsValue:true})}
  }

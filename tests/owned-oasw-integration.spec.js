@@ -69,6 +69,46 @@ test('opening ASW importer retains a naked baseline only across matching level r
  });
  expect(r.kept.value).toBe(90);expect(r.state).toMatchObject({status:'ready',value:102,lowerBound:true});expect(r.leveled).toBeNull();expect(r.modernized).toBeNull();
 });
+test('opening ASW importer rejects incomplete slot arrays as evidence for a naked baseline',async({page})=>{
+ await boot(page);
+ const results=await page.evaluate(()=>{
+  const mid=hdShipDbMasterRowFor('夕立改二').id,eid=[...hdKcMasterEquipMap()].find(([,x])=>x.name==='三式水中探信儀')[0];
+  return [[],[-1],[null,null,null],['','',''],[-2,-1,-1]].map(api_slot=>{
+   localStorage.setItem('harbordesk-ship-roster-v1','[]');const parsed=hdKcImportEmpty();
+   const ship={api_id:71,api_ship_id:mid,api_lv:90,api_slot,api_slot_ex:0,api_taisen:[90,130],api_kyouka:[0,0,0,0,0,0,0]};parsed.ships.set(71,ship);hdKcMergeRoster(parsed);
+   const row=hdFERoster()[0],before={known:row.gameAswGearKnown,baseline:row.gameAswBaseline};
+   ship.api_slot=[10,-1,-1];ship.api_taisen=[100,130];parsed.slotItems.set(10,{api_id:10,api_slotitem_id:eid});hdKcMergeRoster(parsed);
+   const state=hdFEOpeningAsw({ship:'夕立改二',masterId:mid,gameShipId:71,items:[{name:'四式水中聴音機',slotIndex:0,capacity:0}]});return {before,state};
+  });
+ });
+ for(const r of results){expect(r.before).toEqual({known:false,baseline:null});expect(r.state.status).toBe('manual');expect(r.state.value??null).toBeNull();}
+});
+test('incomplete ship slots preserve previous equipment identity and unrelated ledgers even with a complete inventory',async({page})=>{
+ await boot(page);
+ const r=await page.evaluate(()=>{
+  const parsed=hdKcImportEmpty(),mid=hdShipDbMasterRowFor('夕立改二').id,eid=[...hdKcMasterEquipMap()].find(([,x])=>x.name==='三式水中探信儀')[0];
+  const ship={api_id:71,api_ship_id:mid,api_lv:90,api_slot:[10,-1,-1],api_slot_ex:0,api_taisen:[100,130]};parsed.ships.set(71,ship);parsed.slotItems.set(10,{api_id:10,api_slotitem_id:eid});hdKcMergeRoster(parsed);
+  const row=hdFERoster()[0];row.memo='保持するメモ';localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([row]));
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'三式水中探信儀',count:1}]));localStorage.setItem('harbordesk-kancolle-materials-v1',JSON.stringify({fuel:12345}));
+  saveCustomFleets({'1-5':[{id:'preserved',ships:[{ship:row.name,rosterId:row.id,gameShipId:71,masterId:mid,gear:row.gear}]}]});
+  const keys=['harbordesk-equipment-v1','harbordesk-kancolle-materials-v1',CUSTOM_FLEET_KEY],values=keys.map(k=>localStorage.getItem(k));
+  ship.api_slot=[];ship.api_taisen=[90,130];parsed.completeSlotItems=true;hdKcMergeRoster(parsed);const after=hdFERoster()[0];
+  return {before:row,after,unrelatedPreserved:JSON.stringify(values)===JSON.stringify(keys.map(k=>localStorage.getItem(k))),state:hdFEOpeningAsw({ship:row.name,masterId:mid,gameShipId:71,items:[{name:'三式水中探信儀',slotIndex:0,capacity:0}]})};
+ });
+ expect(r.after).toMatchObject({id:r.before.id,gameShipId:71,gear:r.before.gear,gameGearSlots:r.before.gameGearSlots,gameGearExpansion:r.before.gameGearExpansion,memo:'保持するメモ',gameAswGearKnown:false});
+ expect(r.unrelatedPreserved).toBe(true);expect(r.state.status).toBe('manual');
+});
+test('opening ASW legacy baseline without complete slot evidence stays unverified without deleting saved data',async({page})=>{
+ await boot(page);
+ const r=await page.evaluate(()=>{
+  const parsed=hdKcImportEmpty(),mid=hdShipDbMasterRowFor('夕立改二').id,eid=[...hdKcMasterEquipMap()].find(([,x])=>x.name==='三式水中探信儀')[0];
+  parsed.ships.set(71,{api_id:71,api_ship_id:mid,api_lv:90,api_slot:[10,-1,-1],api_slot_ex:0,api_taisen:[100,130],api_kyouka:[0,0,0,0,0,0,0]});parsed.slotItems.set(10,{api_id:10,api_slotitem_id:eid});hdKcMergeRoster(parsed);
+  const row=hdFERoster()[0];row.memo='旧データを保持';row.gameAswBaseline={value:90,level:90,masterId:mid,mods:row.gameAswMods};localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([row]));
+  const before=localStorage.getItem('harbordesk-ship-roster-v1'),ship={ship:row.name,masterId:mid,gameShipId:71,items:[{name:'四式水中聴音機',slotIndex:0,capacity:0}]},changed=hdFEOpeningAsw(ship);
+  ship.items[0].name='三式水中探信儀';const exact=hdFEOpeningAsw(ship);return {changed,exact,unchanged:before===localStorage.getItem('harbordesk-ship-roster-v1')};
+ });
+ expect(r.changed.status).toBe('manual');expect(r.exact).toMatchObject({status:'ready',value:100,source:'同じ装備での同期値'});expect(r.unchanged).toBe(true);
+});
 test('opening ASW goal edits invalidate proposals and confirmed values update the integrated result',async({page})=>{
  await fleet(page,{base:49,stock:1});const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await panel.locator('[data-hd-oc-search]').tap();
  await expect(panel.locator('[data-hd-oc-asw-ships]')).toContainText('先制対潜');await expect(panel.locator('[data-hd-oc-readiness]')).not.toContainText('登録範囲の条件を充足');
