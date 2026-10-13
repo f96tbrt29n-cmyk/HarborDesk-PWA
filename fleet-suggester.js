@@ -131,10 +131,16 @@ function hdFSOperationalSummary(pool){
 function hdFSGenerate(map,preset,index){
  var info=hdFSPresetInfo(preset),needs=hdFSNeeds(map),live=hdFSLiveState(),pool=hdFSRoster().map(function(row){return hdFSProfile(row,live)}).filter(p=>!info.requirements.some(req=>req.count===0&&hdFSTypeMatches(p,req.token))).filter(p=>map!=='1-6'||!['戦艦','高速戦艦','正規空母','装甲空母','重雷装巡洋艦','潜水艦','潜水空母'].includes(p.type)),operational=hdFSOperationalSummary(pool),used=new Set(),slots=[],missing=[];
  info.levelTarget=hdFSLevelTarget(map);
+ const routeRequirements=typeof hdMapPresetRequirements==='function'?hdMapPresetRequirements(map,preset):null;needs=hdFEEquipmentRequirements({map,preset},needs);if(routeRequirements?.selectionAliases)info.requirements=info.requirements.map(r=>({...r,token:routeRequirements.selectionAliases[r.token]||r.token}));
+ if(routeRequirements?.minimumSpeed){info.speedRequired=true;info.speedPreferred=true;pool.forEach(p=>p.routeRank=hdFSRouteRank(p,{speed:routeRequirements.minimumSpeed}));}
  if(typeof hdOCRouteGoal==='function'){const goal=MAP_PLANS[map]?.routeBranches?.goals?.[hdOCRouteGoal({map,preset,index,fleet:{id:`auto:${map}:${index}`}})];if(goal?.speed)pool.forEach(p=>p.routeRank=hdFSRouteRank(p,goal))}
  info.requirements.forEach(function(req){for(var i=0;i<req.count;i++){var p=hdFSPickBest(pool,used,function(x){return hdFSTypeMatches(x,req.token)},info,needs);if(p){used.add(p.row.id);slots.push({profile:p,required:req.token,levelTarget:info.levelTarget})}else{slots.push({profile:null,required:req.token});missing.push(req.token)}}});
  while(info.requirements.length&&slots.length<info.total){var p=hdFSPickBest(pool,used,p=>/自由枠/.test(info.text)||info.preferred.some(t=>hdFSTypeMatches(p,t)),info,needs);if(!p)break;used.add(p.row.id);slots.push({profile:p,required:'',levelTarget:info.levelTarget})}
  while(slots.length<info.total)slots.push({profile:null,required:info.conditionManual?'条件未確認':'自由枠'});
+ if(routeRequirements?.keepLow&&!slots.some(s=>s.profile?.speed==='低速')){
+  for(let i=0;i<slots.length;i++){const slot=slots[i];if(!slot.profile)continue;const replacement=hdFSPickBest(pool,used,p=>p.speed==='低速'&&(!slot.required||hdFSTypeMatches(p,slot.required)),info,needs);if(replacement){used.delete(slot.profile.row.id);used.add(replacement.row.id);slot.profile=replacement;break;}}
+  if(!slots.some(s=>s.profile?.speed==='低速'))missing.push('低速艦（高速化せず維持）');
+ }
  var known=slots.filter(function(s){return s.profile&&s.profile.type}).length,filled=slots.filter(function(s){return s.profile}).length;
  var low=info.speedRequired?slots.filter(function(s){return s.profile&&s.profile.speed==='低速'}).map(function(s){return s.profile.row.name}):[];
  var masterBacked=slots.filter(function(s){return s.profile&&s.profile.masterBacked}).length;return {map:map,preset:preset,index:index,info:info,needs:needs,slots:slots,missing:missing,filled:filled,known:known,low:low,masterBacked:masterBacked,operational:operational};
@@ -170,6 +176,7 @@ function hdFSSuggestionHtml(s){
  '<p class="hd-fs-level-guide">'+hdFSEsc(s.info.levelTarget?.text||'推奨Lvは個別確認')+'。艦隊平均の目安を基に、下限目安を満たす近いLvの艦を優先。足りない場合は近い艦を表示。Lvだけでは攻略可否は判定しません。</p>'+
  (warnings.length?'<div class="hd-fs-warning">'+hdFSEsc(warnings.join(' ｜ '))+'</div>':'')+hdFSMissingGearHtml(s)+
  '<div class="hd-fs-source"><b>アプリ内編成例:</b> '+hdFSEsc(s.preset.ships||'')+'<br><b>装備メモ:</b> '+hdFSEsc(s.preset.gear||'')+(typeof hdPlanSourceHtml==='function'&&hdPlanSourceHtml(s.preset)?'<br>'+hdPlanSourceHtml(s.preset):'')+'</div>'+
+ hdMapRequirementsHtml(s.map,s.preset)+
  '<div class="hd-fs-actions"><button type="button" class="primary small" data-hd-fs-save="'+s.index+'"'+(!s.filled?' disabled':'')+'>'+hdFSSaveLabel(s)+'</button><button type="button" class="ghost small" data-hd-fs-roster>艦隊台帳を確認</button></div></article>';
 }
 // Keep the pressed target alive until the native click has been dispatched.

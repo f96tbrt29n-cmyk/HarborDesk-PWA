@@ -113,7 +113,7 @@ function genericPlan(map){
 function renderPlans(map){
  const host=document.getElementById('mapExtraPanel'); if(!host)return;
  const p=MAP_PLANS[map]||genericPlan(map); if(!p){host.innerHTML='';return}
- const presets=(p.presets||[]).map((x,i)=>`<div class="plan-card"><div class="plan-title">編成例 ${i+1}｜${planEsc(x.name)}</div><div><b>艦隊:</b> ${planEsc(x.ships)}</div><div><b>装備:</b> ${planEsc(x.gear)}</div><div><b>用途:</b> ${planEsc(x.use)}</div>${hdPlanSourceHtml(x)?`<div>${hdPlanSourceHtml(x)}</div>`:''}</div>`).join('');
+ const presets=(p.presets||[]).map((x,i)=>`<div class="plan-card"><div class="plan-title">編成例 ${i+1}｜${planEsc(x.name)}</div><div><b>艦隊:</b> ${planEsc(x.ships)}</div><div><b>装備:</b> ${planEsc(x.gear)}</div><div><b>用途:</b> ${planEsc(x.use)}</div>${hdPlanSourceHtml(x)?`<div>${hdPlanSourceHtml(x)}</div>`:''}${hdMapRequirementsHtml(map,x)}</div>`).join('');
  const quests=(p.quests||[]).length?(p.quests||[]).map(q=>`<div class="quest-related"><span class="quest-kind">${planEsc(q.kind)}</span><div><b>${planEsc(q.name)}</b><div>${planEsc(q.condition)}</div></div></div>`).join(''):'<div class="muted">この海域の関連任務は、現在アプリ内データを整理中。</div>';
  host.innerHTML=`<section class="map-extra-section"><h4>編成例</h4>${presets}<h4>関連任務</h4>${quests}</section>`;
 }
@@ -179,3 +179,116 @@ function hdMapRouteSet(map,index){
  try{const saved=JSON.parse(localStorage.getItem(HD_MAP_ROUTE_STORAGE)||'{}');if(index===null)delete saved[map];else saved[map]={name:preset.name,ships:preset.ships};localStorage.setItem(HD_MAP_ROUTE_STORAGE,JSON.stringify(saved))}catch{return false}
  window.dispatchEvent(new CustomEvent('hd:map-route-changed',{detail:{map,index}}));return true;
 }
+
+// Route-specific requirements for every shipped regular/EO example. Numerical
+// scouting and item-bearing ship counts are never inferred from free-text gear.
+const HD_MAP_ROUTE_REQUIREMENTS={};
+(()=>{
+ const T={bb:['戦艦','高速戦艦','航空戦艦'],cv:['正規空母','装甲空母','軽空母'],cvn:['正規空母','装甲空母'],cvl:['軽空母'],cav:['重巡洋艦','航空巡洋艦'],cl:['軽巡洋艦'],clt:['軽巡洋艦','重雷装巡洋艦','練習巡洋艦'],dd:['駆逐艦'],escort:['駆逐艦','海防艦'],de:['海防艦'],av:['水上機母艦'],as:['潜水母艦'],ao:['補給艦'],ss:['潜水艦','潜水空母'],lha:['揚陸艦'],bbv:['航空戦艦']};
+ const types=(...keys)=>[...new Set(keys.flatMap(k=>T[k]||[k]))],count=(keys,min=0,max=7)=>({kind:'typeCount',types:types(...keys),matchPolicy:'exact',min,max}),fleet=n=>({kind:'fleetCount',min:n,max:n}),speed=rank=>({kind:'minSpeed',rank}),named=(name,min=1)=>({kind:'namedCount',names:[name],min,max:7}),los=(coef,safe,failBelow)=>({kind:'required',coef,checks:[{label:'選択経路の索敵分岐',safe,...(failBelow==null?{}:{failBelow})}],marginNote:'司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。'}),none={kind:'none',note:'この登録経路に数値索敵の条件は掲載されていません。'};
+ const add=(map,index,path,conditions=[],extra={})=>{
+  const p=MAP_PLANS[map]?.presets?.[index];if(!p)throw Error('Missing route example '+map+':'+index);
+  const r={schemaVersion:1,map,index,path,checkedAt:'2026-10-13',source:'https://zekamashi.net/kancolle-kouryaku/'+map+'/',routing:'documented-example',los:none,conditions,notes:[],...extra};
+  HD_MAP_ROUTE_REQUIREMENTS[map]??=[];HD_MAP_ROUTE_REQUIREMENTS[map][index]=r;p.source=r.source;
+ };
+ add('1-1',0,'AC',[{kind:'fleetCount',min:1,max:6}],{useExampleScope:false,routing:'random',notes:['ボス分岐はランダム。編成だけで到達確定とは判定しない。']});
+ for(const [m,path] of [['1-2','AE'],['1-3','CFJ / A(DB)EFJ'],['1-4','BCF(E)HL / AD(EH/GJ)L']])add(m,0,path,[],{engine:'verified-graph'});
+ add('1-5',0,'ADEJ',[fleet(4),count(['de'],4,4)],{equipmentKinds:['対潜'],airNotRequired:true,equipmentTargets:[{kind:'cap-asw',label:'対潜シナジー',minCount:4}],notes:['海防艦4隻の経路。先制対潜の可否は艦別に別評価。']});
+ for(const i of [1,2])add('1-5',i,'ADFGJ',[fleet(4),count(['戦艦','高速戦艦','cvn','ss'],0,0),count(['cl'],0,2),count(['cvl'],0,1),count(['de'],0,3)],{equipmentKinds:['対潜'],airNotRequired:true,equipmentTargets:[{kind:'cap-asw',label:'対潜シナジー',minCount:i===1?3:4}],notes:['航空戦艦は採用可能。砲撃二巡型の航空戦艦には対潜攻撃可能な水上爆撃機などを検討。']});
+ add('1-6',0,'AEGFBN',[fleet(6),count(['cl'],1,1),count(['escort'],5,5)],{notes:['下ルートでは制空優勢・対空CI発動は通行条件ではない。対潜と防空を推奨。']});
+ add('2-1',0,'C(E)DH',[fleet(6),count(['bb','cv'],0,4),count(['cv'],0,2),count(['bbv'],0,0),count(['ao'],0,0)],{routing:'multiple',notes:['経由マスが複数ある登録例。補給艦入り等の別例は対象外。']});
+ add('2-2',0,'CE(GH)K',[fleet(6),count(['bb','cv'],0,3),count(['cv'],0,2),count(['bbv'],0,0),count(['av','as'],1)],{routing:'multiple',notes:['水母または潜水母艦を維持。G/Hを通るかはランダム。']});
+ add('2-3',0,'ボス方面・経路ランダム',[fleet(6),count(['bb','cv'],0,4)],{routing:'random',notes:['Jからの逸れなどを含む。編成条件の充足でボス到達を保証しない。']});
+ add('2-4',0,'ボス方面・経路ランダム',[fleet(6),count(['bb','cv'],0,3),count(['av','as','ao'],0,0)],{routing:'random',notes:['戦艦＋空母は3隻まで。羅針盤による逸れを残す編成例。']});
+ add('2-5',0,'BFJO',[fleet(6),count(['bb'],0,3),count(['cv','ss','lha'],0,0),count(['de'],0,2),count(['av'],0,1),{kind:'speedCount',rank:5,min:1,max:7},{kind:'equipmentShips',match:'drum',min:2,max:7,slotPolicy:'valid'}],{useExampleScope:false,selectionAliases:{'航空戦艦':'戦艦級'},keepLow:1,los:los(1,49,42),notes:['実際の編成速力が低速の艦を1隻以上維持。高速化して低速艦がなくなるとF→J条件を満たさない。','ドラム缶(輸送用)は異なる2隻に各1個以上。同じ艦に2個は1隻として数える。']});
+ add('2-5',1,'CEIO',[fleet(6),speed(10),count(['bb','ss'],0,0),count(['cvn','cav'],0,1),count(['cv'],1),count(['cl'],1),count(['dd'],3)],{minimumSpeed:10,los:los(1,34,31)});
+ add('3-1',0,'CFG',[fleet(6),count(['bb','cv'],0,2),count(['escort'],2),count(['bbv','cl','av','ao'],0,2)]);
+ for(const i of [0,1])add('3-2',i,'選択したC…L目標',[],{engine:'verified-graph'});
+ add('3-3',0,'ACGM',[fleet(6),count(['cvn'],0,1),count(['bb','cvl'],0,1),count(['dd'],2)]);
+ add('3-4',0,'ACEGJP',[fleet(6),count(['bb','cv'],3,4),count(['cvn'],0,2),count(['cl'],1),count(['av','ao'],1)]);
+ add('3-5',0,'FGK',[fleet(6),count(['dd'],5),count(['cl','ss','av','ao'],0,1),count(['dd','cl','ss','av','ao'],6,6)],{los:los(4,28),equipmentKinds:['索敵','夜戦'],airNotRequired:true});
+ add('3-5',1,'BDHK',[fleet(6),count(['bb','cv'],0,3),count(['cv'],2),count(['lha'],0,0)],{los:los(4,40)});
+ add('4-1',0,'CFDGJ / ABDGJ',[fleet(6),count(['bb','cv'],1,2),count(['escort'],1,1),count(['ss'],0,0)],{routing:'multiple',notes:['始点A/Cはランダム。潜水艦なし・護衛1隻の登録例はD→G。']});
+ add('4-2',0,'ACL / BDCL',[fleet(6),{any:[{all:[count(['cl'],1),count(['escort'],3)]},count(['escort'],4)]}],{routing:'multiple',notes:['始点A/Bはランダム。海防艦を含む艦種条件と単一経路固定は区別。']});
+ add('4-2',1,'ACL / BDCL',[fleet(6),count(['escort'],4)],{routing:'multiple',notes:['始点A/Bはランダム。']});
+ add('4-3',0,'CDHN / CFHN',[fleet(6),count(['bb','ss'],0,0),count(['cvn'],1),count(['cv'],2,2),count(['escort'],2),speed(10)],{minimumSpeed:10,routing:'random',notes:['この登録例でもHからIへの逸れがある。対地装備は勝利目的に応じた推奨で、通行条件ではない。']});
+ add('4-4',0,'AEIK',[fleet(6),count(['bb','cvn'],0,3),count(['escort'],2),count(['de'],0,2),count(['cl','cav'],1),count(['cvn'],2,2)]);
+ add('4-5',0,'ADHT / CDHT',[fleet(6),count(['bb','cv'],0,4),speed(15)],{minimumSpeed:15,routing:'multiple',notes:['高速+統一の最短経路では数値索敵条件なし。対地攻撃の装備は別の推奨目標。']});
+ add('4-5',1,'ADHKT / CDHKT',[fleet(6),count(['bb','cvn'],0,3),count(['bb','cv'],0,4)],{los:los(2,71),routing:'multiple'});
+ add('4-5',2,'ADHT / CDHT',[fleet(6),count(['cl'],1),count(['escort'],3)],{routing:'multiple',notes:['軽量最短例は高速+不要、数値索敵条件なし。']});
+ add('5-1',0,'BCFJ',[fleet(6),count(['cvn'],0,0),count(['bb','cvl'],0,2),count(['cvl'],0,1),count(['cl'],1),count(['dd'],2)]);
+ add('5-2',0,'BCEFO',[fleet(6),count(['cv'],0,2),count(['bb'],0,2)],{los:los(2,70)});
+ add('5-3',0,'DGIOKEQ',[fleet(6),count(['cv','bbv'],0,0),count(['cl'],0,1),count(['dd'],2),count(['bb'],0,2),{any:[count(['bb'],0,1),speed(10)]}],{conditionalSpeed:{rank:10,when:count(['bb'],2,7)},notes:['航戦不可。戦艦2隻へ変更する別例では高速統一が必要。能動分岐Oでボス方面を選ぶ。']});
+ add('5-4',0,'ADEHIJMP',[fleet(6),count(['cv'],0,0),count(['bb'],2,2),count(['dd'],2)],{los:los(2,45),notes:['この登録例は中央ルート。上ルートL→Pの索敵値を流用しない。渦潮対策の電探は推奨。']});
+ add('5-5',0,'BKPS',[fleet(6),count(['bb','cv'],0,4),count(['dd'],0,1),count(['ss'],0,0)],{los:los(2,80),notes:['戦艦＋空母5隻以上の別例には索敵を満たしても逸れがある。']});
+ add('5-5',1,'BFDHNOS',[fleet(6),count(['bb'],0,2),count(['cv','ss'],0,0),count(['dd'],2)],{los:los(2,66),notes:['この登録例は中央下ルート。ACEGIMOSのドラム缶4隻／大発系4隻の条件とは別。']});
+ for(const [i,path,safe,conditions] of [[0,'ABC2DEG',65,[count(['bbv'],2,2),count(['dd'],4,4)]],[1,'IJKLN',80,[speed(10),count(['bb','cv'],0,2),count(['cl'],1),count(['dd'],2),count(['av','lha'],0,0)]],[2,'IOQUXZ',88,[speed(10),count(['cl'],1),count(['dd'],2),count(['av','lha'],0,0)]]])add('5-6',i,path,[fleet(6),...conditions],{los:los(4,safe),minimumSpeed:i?10:0,equipmentKinds:i===0?['対潜','制空','防空','輸送','索敵','PT対策']:['対潜','制空','防空','夜戦','索敵'],...(i===0?{equipmentTargets:[{kind:'cap-pt',baseKind:'PT対策',label:'PT小鬼群対策セット',minCount:1,source:'https://zekamashi.net/kancolle-kouryaku/ptboat-taisaku/'}]}:{}),scopeIncomplete:true,notes:['出典が仮更新・検証継続中としている条件。数値は攻略目安として表示し、確定分岐成立とは扱わない。','第1ゲージ後のR到達ギミックと新スタート開放は別途確認。PT小鬼群対策・輸送装備をゲージ別に準備。']});
+ add('6-1',0,'AFGHK',[fleet(6),count(['ss'],3),count(['as'],1,1),count(['cl','dd'],1),count(['bb','cv','cav'],0,1)],{los:los(4,25),notes:['潜水母艦を外す別例は必要索敵値とランダム分岐が変わる。']});
+ add('6-2',0,'CEJK',[fleet(6),count(['bb'],0,1),count(['cv'],0,1),count(['cl'],0,1),count(['dd'],2)],{los:los(3,50,43),notes:['I経由を狙う別例は40以上43未満。選択したJ経由は50以上を使う。']});
+ add('6-3',0,'ACEGHJ',[fleet(6),count(['cl','練習巡洋艦','dd','av'],6,6),count(['cl'],1,1),count(['dd'],3),count(['av'],1,1)],{los:los(3,38,36),notes:['出撃可能な艦種は軽巡・練巡・駆逐・水母。能動分岐はE方面を選ぶ。']});
+ add('6-4',0,'BDCFN',[fleet(6),speed(10),count(['cl'],1,1),{kind:'flagshipType',types:types('cl')},count(['bb'],0,1),count(['cv','lha'],0,0),count(['dd'],3)],{minimumSpeed:10,notes:['軽巡旗艦。長門型タッチの別編成と混同しない。対地装備、基地1部隊とボス半径5を別評価。']});
+ add('6-5',0,'ACDGM',[fleet(6),count(['bb','cv'],0,3),count(['bb','cv','cav'],0,4),count(['cv'],1),count(['重雷装巡洋艦'],0,1),count(['dd'],1)],{los:los(3,50),notes:['基地航空隊は2部隊まで。ボスへの行動半径5、敵編成・制空・補充を基地計画で確認。']});
+ add('6-5',1,'BFIJM',[fleet(6),count(['bb'],0,2),count(['cv','重雷装巡洋艦'],0,0),count(['cl'],1),count(['dd'],2)],{los:los(3,35),notes:['空母・雷巡を使わない下ルート。道中対潜・夜戦と基地航空隊を準備。']});
+ add('7-1',0,'DEGHK',[fleet(5),count(['cl'],1,1),count(['dd'],4,4)],{airNotRequired:true,equipmentKinds:['対潜','夜戦'],equipmentTargets:[{kind:'cap-asw',label:'対潜シナジー',minCount:4}],notes:['先制対潜4〜5隻は攻略用の推奨。通常戦Gへの火力とルート条件は別評価。']});
+ add('7-2',0,'CEG',[fleet(4),count(['cvn','bb','ss','ao'],0,0),count(['escort'],3)],{airNotRequired:true,equipmentKinds:['対潜'],equipmentTargets:[{kind:'cap-asw',label:'対潜シナジー',minCount:4}],notes:['第1ゲージの4隻例では数値索敵不要。対潜攻撃装備を各艦に準備。']});
+ add('7-2',1,'BCDIM',[fleet(6),speed(10),count(['bb','cv'],0,3),count(['cvn'],0,1),count(['cl','練習巡洋艦'],0,2),count(['escort'],2),count(['ao','ss'],0,0)],{minimumSpeed:10,los:los(4,69),notes:['第2ゲージ用。敵編成に応じた制空目標と道中対潜を別評価。']});
+ add('7-3',0,'ACE',[fleet(4),named('羽黒'),count(['dd'],3),count(['bb','cv'],0,0)],{airNotRequired:true,equipmentKinds:['夜戦'],notes:['第1ゲージ・羽黒入りの例。史実艦の改造段階を含めて識別。数値索敵条件なし。']});
+ add('7-3',1,'ACDGJP',[fleet(6),named('羽黒'),named('足柄'),count(['dd'],3),count(['bb','cv'],0,0),speed(10)],{minimumSpeed:10,airNotRequired:true,equipmentKinds:['対潜','夜戦','煙幕'],notes:['第2ゲージの羽黒・足柄・駆逐3例。道中Jの潜水艦に煙幕または対潜対策。数値索敵条件なし。']});
+ add('7-4',0,'ABEJLP',[fleet(6),count(['戦艦','高速戦艦','cvn','ss'],0,0),count(['cav'],0,1),count(['clt'],0,1),count(['bbv','cvl','lha'],0,2),{any:[count(['escort'],3),count(['de'],2)]}],{los:los(4,37,33),equipmentTargets:[{kind:'cap-asw',label:'対潜シナジー',minCount:3}],notes:['登録した6隻の経路例。対潜枠・夜戦フィニッシャー・基地1部隊（ボス半径2）を準備。']});
+ const g75=[fleet(6),count(['bb'],0,1),count(['cvn'],0,0),count(['cvl'],0,1),count(['bb','cav'],0,2),count(['cl'],1)];
+ add('7-5',0,'ABDFGHK',[...g75,count(['dd'],2)],{equipmentKinds:['制空','防空','対潜','夜戦'],notes:['第1ゲージKへの例では数値索敵不要。M到達ギミックを行う場合は別に33式係数4で59以上必要。']});
+ add('7-5',1,'ABDFJOQ',[...g75,count(['dd'],3)],{equipmentKinds:['制空','防空','対潜','対地','PT対策'],equipmentTargets:[{kind:'cap-pt',baseKind:'PT対策',label:'PT小鬼群対策セット',minCount:1,source:'https://zekamashi.net/kancolle-kouryaku/ptboat-taisaku/'}],notes:['第2ゲージQの対地攻略例。第1ゲージ撃破を確認。Mギミックは第3ゲージ開放に必要。']});
+ add('7-5',2,'ABDFJOPT',[fleet(6),count(['bb','cvn'],0,0),count(['cvl'],1,1),count(['航空巡洋艦'],2,2),count(['cl'],1,1),count(['dd'],2,2)],{los:los(4,63),equipmentKinds:['制空','防空','対潜','夜戦','索敵'],notes:['軽空母入りの第3ゲージ例は63以上。航空戦艦入りの別例の58を流用しない。低速可。第2ゲージ撃破とMマスS勝利1回が開放条件。']});
+ for(const [map,d] of Object.entries(MAP_PLANS)){
+  const rows=HD_MAP_ROUTE_REQUIREMENTS[map];if(!rows||rows.length!==d.presets.length||rows.some(x=>!x))throw Error('Incomplete route requirements '+map);
+ }
+})();
+function hdMapPresetRequirements(map,preset){
+ const rows=MAP_PLANS[map]?.presets||[],matches=rows.map((p,i)=>({p,i})).filter(x=>x.p===preset||x.p.name===preset?.name&&x.p.ships===preset?.ships),i=matches.length===1?matches[0].i:matches.find(x=>x.p.use===preset?.use)?.i??-1;
+ return i<0?null:HD_MAP_ROUTE_REQUIREMENTS[map]?.[i]||null;
+}
+function hdMapRequirementConditionText(c){
+ if(c.all)return c.all.map(hdMapRequirementConditionText).join(' かつ ');if(c.any)return c.any.map(hdMapRequirementConditionText).join(' または ');
+ if(c.kind==='fleetCount')return `編成 ${c.min===c.max?c.min:c.min+'〜'+c.max}隻`;
+ if(c.kind==='typeCount')return `${c.types.join('＋')} ${c.max===0?'不可':c.min===c.max?c.min+'隻':c.min+'〜'+c.max+'隻'}`;
+ if(c.kind==='minSpeed')return `${({10:'高速',15:'高速+',20:'最速'})[c.rank]}統一`;
+ if(c.kind==='speedCount')return `配備後の低速艦 ${c.min}隻以上（高速化して低速艦がなくなると不可）`;
+ if(c.kind==='equipmentShips')return `別々の${c.min}隻にドラム缶(輸送用)を各1個以上`;
+ if(c.kind==='namedCount')return `${c.names.join('・')} ${c.min}隻以上`;
+ if(c.kind==='flagshipType')return `旗艦 ${c.types.join('・')}`;
+ return '条件の検証中';
+}
+function hdMapRequirementsHtml(map,preset){
+ const r=hdMapPresetRequirements(map,preset);if(!r)return '';
+ const los=r.los.kind==='required'?`33式・分岐点係数${r.los.coef}、必要索敵値${r.los.checks.map(c=>c.safe+'以上').join('・')}`:r.los.note;
+ return `<div class="plan-card" data-hd-route-requirements="${planEsc(map+':'+r.index)}"><b>${planEsc(r.path)}の攻略条件${r.scopeIncomplete?'（検証中）':''}</b><ul>${r.conditions.map(c=>`<li>${planEsc(hdMapRequirementConditionText(c))}</li>`).join('')}<li>${planEsc(los)}</li></ul>${r.equipmentTargets?.length?`<p>装備の推奨目標：${planEsc(r.equipmentTargets.map(x=>x.label+' '+x.minCount+'組').join(' / '))}。先制対潜の発動や戦闘勝利とは別判定。</p>`:''}${r.notes.map(n=>`<p>${planEsc(n)}</p>`).join('')}${r.los.kind==='required'?`<small>${planEsc(r.los.marginNote)}</small>`:''}<p><a href="${planEsc(r.source)}" target="_blank" rel="noopener noreferrer">経路条件の出典 ↗</a></p></div>`;
+}
+// Scope generated recommendations to the documented route, rather than enemy
+// names or requirements belonging to another path/stage in the same sea.
+(()=>{
+ const needs={
+  '1-1':['夜戦'],'1-2':['夜戦'],'1-3':['夜戦'],'1-4':['制空','防空','夜戦'],'1-6':['対潜','防空','夜戦'],
+  '2-1':['制空','防空','夜戦'],'2-2':['制空','防空','夜戦'],'2-3':['制空','防空','夜戦'],'2-4':['制空','防空','電探','夜戦'],'2-5':['制空','防空','夜戦','索敵'],
+  '3-1':['制空','防空','夜戦'],'3-2':['夜戦','電探'],'3-3':['制空','防空','電探','夜戦'],'3-4':['制空','防空','夜戦'],
+  '4-1':['対潜','制空','防空','夜戦'],'4-2':['対潜','制空','防空','夜戦'],'4-3':['対潜','制空','防空','対地'],'4-4':['対潜','制空','防空','夜戦'],'4-5':['対潜','制空','防空','対地','索敵'],
+  '5-1':['制空','防空','夜戦'],'5-2':['制空','防空','夜戦','索敵'],'5-3':['制空','夜戦','索敵'],'5-4':['制空','電探','夜戦','索敵'],
+  '6-1':['制空','夜戦','索敵'],'6-2':['制空','防空','夜戦','索敵'],'6-3':['対潜','夜戦','索敵'],'6-4':['制空','防空','対地'],
+  '6-5':['制空','防空','夜戦','索敵'],'7-2':['対潜','制空','防空','夜戦','索敵'],'7-4':['対潜','制空','防空','夜戦','索敵']
+ };
+ for(const [map,rows] of Object.entries(HD_MAP_ROUTE_REQUIREMENTS))for(const r of rows){
+  r.equipmentKinds??=needs[map]||['対潜','制空','防空','夜戦','索敵'];
+  r.carrierAttackTarget=MAP_PLANS[map].presets[r.index].ships.includes('空母');
+  if(r.carrierAttackTarget)r.notes.push('空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。');
+  if(['1-1','1-2','1-3','6-3'].includes(map))r.airNotRequired=true;
+ }
+ HD_MAP_ROUTE_REQUIREMENTS['5-5'][0].equipmentKinds=['制空','防空','夜戦','索敵'];
+ HD_MAP_ROUTE_REQUIREMENTS['5-5'][0].notes.push('対潜艦を入れない重量例ではBマスの陣形・回避や支援を出典で確認。対潜可能な別編成は別途評価。');
+ HD_MAP_ROUTE_REQUIREMENTS['5-5'][1].equipmentKinds=['対潜','制空','防空','夜戦','索敵'];
+ HD_MAP_ROUTE_REQUIREMENTS['6-5'][1].equipmentKinds.push('対潜');
+ HD_MAP_ROUTE_REQUIREMENTS['6-3'][0].waterAttackTarget=true;
+ HD_MAP_ROUTE_REQUIREMENTS['6-3'][0].waterAttackTypes=['水上機母艦'];
+ HD_MAP_ROUTE_REQUIREMENTS['1-5'][1].waterAttackTarget=true;
+ HD_MAP_ROUTE_REQUIREMENTS['1-5'][1].waterAttackTypes=['航空戦艦'];
+ MAP_PLANS['7-5'].presets[0].gear='第1ゲージの対潜・制空・夜戦装備を準備。対地とPT対策は第2ゲージ用。';
+ MAP_PLANS['3-5'].presets[0].gear='夜戦連撃と索敵装備。33式係数4で28以上を確認。';
+})();
