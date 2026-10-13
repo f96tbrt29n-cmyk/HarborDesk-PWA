@@ -128,6 +128,17 @@ window.hdRenderMapPlans=renderPlans;
  ae.checks[0].from='start';ae.checks[0].to=['A'];ae.checks[1].from='A';ae.checks[1].to=['E'];
  const count=(types,min,max=6)=>({kind:'typeCount',types,min,max}),speed=rank=>({kind:'minSpeed',rank}),radar=min=>({kind:'equipmentShips',match:'radar',slotPolicy:'valid',min,max:6}),all=(...xs)=>({all:xs}),not=x=>({not:x});
  const rule=(condition,to,random=false)=>({condition,to,random,state:'verified'}),always={kind:'always'};
+ MAP_PLANS['1-3'].routeBranches={schemaVersion:2,path:'CFJ / A(DB)EFJ',checkedAt:'2026-10-13',sources:['https://zekamashi.net/kancolle-kouryaku/1-3/','https://wikiwiki.jp/kancolle/鎮守府海域/1-3'],coverage:'6隻・軽空母/軽巡/駆逐のみ・駆逐4以上のボス経路。その他の編成と戦闘勝利は未保証',defaultGoal:'normal',goals:{
+  normal:{label:'ボス方面・ランダム経由を許容',path:'CFJ / A(DB)EFJ',checks:[],speed:0,radar:0,allowed:['start','A','B','C','D','E','F','J'],next:'軽空母を1隻以上含めるとCFJ。空母なしでは始点とAの経由がランダム。'},
+  cfj:{label:'CFJ固定・軽空母入り',path:'CFJ',checks:[{id:'carrier-start',label:'始点→Cの軽空母',condition:count(['軽空母'],1),next:'軽空母を1隻以上編成する。低速でも可。手持ちで無理ならランダム経由を許容する目標を選び直す。'}],speed:0,radar:0,allowed:['start','C','F','J']}
+ },notRequired:{scouting:'この登録経路に数値索敵の分岐条件なし。',air:'この登録経路に敵航空機なし。航空戦力・戦闘勝利の判定とは区別する。'},checks:[
+  {id:'six-ships',label:'登録した編成の隻数',condition:{kind:'fleetCount',min:6,max:6},next:'この登録範囲は6隻。少数編成の別経路は未登録のため別途確認する。'},
+  {id:'registered-types',label:'登録した艦種の範囲',condition:count(['軽空母','軽巡','駆逐'],6,6),next:'軽空母・軽巡・駆逐のみの6隻へ変更する。他艦種の経路は別途確認する。'},
+  {id:'boss-dd',label:'F→Jの駆逐艦',from:'F',to:['J'],condition:count(['駆逐'],4),next:'駆逐を4隻以上にする。他の固定条件・H経由は未登録のため別途確認する。'}
+ ],graph:{start:'start',target:'J',nodes:{
+  start:[rule(count(['空母'],1),['C']),rule(always,['A','C'],true)],
+  A:[rule(count(['駆逐'],4),['D','E'],true)],C:[rule(always,['F'])],D:[rule(always,['B'])],B:[rule(always,['E'])],E:[rule(always,['F'])],F:[{conditionRef:'boss-dd',to:['J'],state:'verified'}]
+ }}};
  MAP_PLANS['3-2'].routeBranches={schemaVersion:2,path:'C…L',checkedAt:'2026-10-13',sources:['https://zekamashi.net/kancolle-kouryaku/3-2/','https://zh.kcwiki.cn/wiki/北方海域/3-2'],coverage:'登録したボス経路の分岐。戦闘勝利・大破進撃の安全性は保証しない',defaultGoal:'normal',goals:{
   normal:{label:'通常・H経由を許容',next:'補給艦を外して軽巡1＋駆逐5または駆逐6へ変更する。H回避を選ぶ場合は全艦が高速＋へ到達できるか確認する。',path:'CG(H)FL / CEFL',checks:[],speed:0,radar:0,allowed:['start','C','E','G','H','F','L']},
   fastPlus:{label:'H回避・高速＋以上',path:'CEFL / CGFL',checks:[{id:'speed-goal',label:'高速＋統一',condition:speed(15),next:'各艦に有効な缶・タービンのセットを配備する。'},{id:'radar-goal',label:'電探装備艦',condition:radar(1),next:'電探を搭載できる艦の有効スロットに1個以上配備する。'}],speed:15,radar:1,allowed:['start','C','E','G','F','L']},

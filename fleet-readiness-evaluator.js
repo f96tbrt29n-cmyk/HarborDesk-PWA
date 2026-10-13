@@ -389,7 +389,7 @@ function hdFEBranchPredicate(condition,ships,plan=null){
  const manual=detail=>({status:'manual',ratio:0,detail});
  if(!condition||typeof condition!=='object')return manual('分岐条件が未登録');
  const fields={always:[],unverified:[],fleetCount:['min','max'],typeCount:['types','min','max'],minSpeed:['rank'],equipmentShips:['match','min','max','slotPolicy'],scoutingValue:['min'],airValue:['min']};
- const groups=['all','any','not'].filter(k=>Object.prototype.hasOwnProperty.call(condition,k)),supported=['kind','reason','state','source','sources','checkedAt',...groups,...(fields[condition.kind]||[])];
+ const groups=['all','any','not'].filter(k=>Object.prototype.hasOwnProperty.call(condition,k)),supported=['kind','reason','state','source','sources','checkedAt',...groups,...(Array.isArray(fields[condition.kind])?fields[condition.kind]:[])];
  const extra=Object.keys(condition).filter(k=>!supported.includes(k));
  if(extra.length||groups.length>1||groups.length&&condition.kind||condition.state&&condition.state!=='verified')return manual('未対応・未確認の分岐条件：'+(extra.join('、')||condition.state||'条件式'));
  if(condition.kind==='always')return {status:'ready',ratio:1,detail:'他の優先条件に該当しない'};
@@ -427,7 +427,7 @@ function hdFEBranchPredicate(condition,ships,plan=null){
  }
  if(!['fleetCount','typeCount'].includes(condition.kind))return manual('未対応の分岐条件です');
  const {min,max}=condition;if(!Number.isInteger(min)||!Number.isInteger(max)||min<0||max<min||max>7)return manual('隻数条件が不明です');
- if(condition.kind==='typeCount'&&(!Array.isArray(condition.types)||!condition.types.length||condition.types.some(x=>!HD_FS_TYPE_ALIASES[x])))return manual('艦種条件が未登録');
+ if(condition.kind==='typeCount'&&(!Array.isArray(condition.types)||!condition.types.length||condition.types.some(x=>typeof x!=='string'||!Object.prototype.hasOwnProperty.call(HD_FS_TYPE_ALIASES,x)||!Array.isArray(HD_FS_TYPE_ALIASES[x]))))return manual('艦種条件が未登録');
  const known=ships.filter(x=>x.typeKnown),unknown=condition.kind==='fleetCount'?0:ships.length-known.length;
  const count=condition.kind==='fleetCount'?ships.length:known.filter(x=>condition.types.some(token=>hdFSTypeMatches({type:x.type,roles:[],tags:[],row:{name:x.ship.ship}},token))).length;
  const status=count>max||count+unknown<min?'missing':unknown?'manual':'ready',gap=Math.max(0,min-count),excess=Math.max(0,count-max),label=condition.kind==='fleetCount'?'編成':condition.types.join('＋');
@@ -454,11 +454,16 @@ function hdFEGraphRoute(data,ships,plan,goal){
  walk(graph.start,[]);const pathsUnique=[...new Map(paths.map(x=>[x.join('→'),x])).values()],allBoss=pathsUnique.length>0&&pathsUnique.every(p=>p[p.length-1]===graph.target&&(!goal?.allowed||p.every(n=>goal.allowed.includes(n))));
  return {status:unknown?'manual':allBoss?'ready':'missing',paths:pathsUnique,trace,hasRandom:random,arrivalGuaranteed:!unknown&&allBoss,fixedPath:!unknown&&allBoss&&pathsUnique.length===1&&!random,detail:pathsUnique.map(x=>x.filter(n=>n!==graph.start).join('')).join(' / ')+(unknown?'（未確認の分岐あり）':!allBoss?'（登録した目標経路への到達は保証できない）':random?'（経由はランダム。登録候補はボス方面）':'（登録分岐の固定経路）')};
 }
+function hdFEBranchGoal(data,id){
+ const key=id==null||id===''?data?.defaultGoal:id;
+ if(typeof key!=='string'||!data?.goals||!Object.prototype.hasOwnProperty.call(data.goals,key))return null;
+ const goal=data.goals[key];return goal&&typeof goal==='object'&&!Array.isArray(goal)?goal:null;
+}
 function hdFEBranchRoute(plan){
  const data=typeof MAP_PLANS!=='undefined'?MAP_PLANS[String(plan?.map||'')]?.routeBranches:null;
  if(!data)return {available:false,status:'manual',checks:[],detail:'ルート分岐条件は未登録。編成例の基本条件だけでは固定経路を保証できません。',requiredSpeed:0};
  if(data.schemaVersion!==2)return {available:true,status:'manual',path:data.path||'登録経路',sources:data.sources||[],checkedAt:data.checkedAt||'',checks:[],graph:null,requiredSpeed:0,requiredRadar:0,arrivalGuaranteed:false,fixedPath:false,detail:'分岐データ形式が未対応のため未判定です。',next:'対応した分岐データへ更新してください'};
- const ships=hdFERouteShips(plan),goalId=plan?.routeGoal==null||plan.routeGoal===''?data.defaultGoal:plan.routeGoal,goal=typeof goalId==='string'?data.goals?.[goalId]:null,checks=[...(data.checks||[]),...(goal?.checks||[])].map(x=>({...x,...hdFEBranchPredicate(x.condition,ships,plan)}));
+ const ships=hdFERouteShips(plan),goalId=plan?.routeGoal==null||plan.routeGoal===''?data.defaultGoal:plan.routeGoal,goal=hdFEBranchGoal(data,goalId),checks=[...(data.checks||[]),...(goal?.checks||[])].map(x=>({...x,...hdFEBranchPredicate(x.condition,ships,plan)}));
  const graph=data.graph&&checks.every(x=>x.status==='ready')&&(!data.goals||goal)?hdFEGraphRoute(data,ships,plan,goal):null;
  const status=!checks.length||data.goals&&!goal?'manual':checks.some(x=>x.status==='missing')?'missing':!checks.every(x=>x.status==='ready')?'manual':graph?.status||'ready';
  // Keep the speed target stable before and after equipping. The disputed low-speed
@@ -467,7 +472,7 @@ function hdFEBranchRoute(plan){
  return {available:true,path:goal?.path||data.path,goal:goalId,sources:data.sources||[],checkedAt:data.checkedAt,checks,status,graph,next:goal?.next||(data.goals&&!goal?'登録済みのルート目標を選び直してください':''),requiredRadar:goal?.radar||0,requiredSpeed:Math.max(requiredSpeed,goal?.speed||0),arrivalGuaranteed:status==='ready'&&!!graph?.arrivalGuaranteed,fixedPath:status==='ready'&&!!graph?.fixedPath,detail:`${data.goals&&!goal?'未登録のルート目標 '+String(goalId):goal?.label||data.path+'固定'}: ${status==='ready'?'登録した分岐条件を充足':status==='missing'?'固定条件に不足（別経路・ランダム到達は別途確認）':'未判定'} / `+checks.filter(x=>status==='ready'||x.status!=='ready').map(x=>x.label+' '+x.detail+(x.status!=='ready'?'。'+x.next:'')).join(' / ')+(graph?' / '+graph.detail:'')};
 }
 function hdFEPlanSpeedTarget(plan){
- const data=typeof MAP_PLANS!=='undefined'?MAP_PLANS[plan?.map]?.routeBranches:null,goal=data?.goals?.[plan?.routeGoal||data.defaultGoal],fallback=data?.speedFallback;
+ const data=typeof MAP_PLANS!=='undefined'?MAP_PLANS[plan?.map]?.routeBranches:null,goal=hdFEBranchGoal(data,plan?.routeGoal),fallback=data?.speedFallback;
  const required=fallback?.unless?.length&&fallback.unless.every(x=>hdFEBranchPredicate(x,hdFERouteShips(plan),plan).status==='missing')?fallback.rank:0;
  return Math.max(hdFESpeedTarget(plan?.routeInfo||plan?.suggestion?.info),goal?.speed||0,required||0);
 }
