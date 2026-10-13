@@ -196,6 +196,9 @@ test.describe('PWA cached runtime',()=>{
    const keys=[CUSTOM_FLEET_KEY,HD_FL_KEY,SHIP_ROSTER_KEY,HD_FC_KEY,'harbordesk-kancolle-sync-v1'];window.offlineOwnedKeys=keys;return {keys,values:keys.map(k=>localStorage.getItem(k)),count:hdOCOaswMeasure(result.plan).count};
   });expect(snapshot.count).toBe(4);
   expect(await page.evaluate(async()=>!!(await caches.match('./index.html'))&&!!(await caches.match('./owned-equipment-planner.js')))).toBe(true);
+  // Let the service worker handle same-origin requests during the restart.
+  await page.unroute('**/*');
+  await page.route(url=>!['127.0.0.1','localhost'].includes(url.hostname),r=>r.fulfill({status:204,body:''}));
   // Playwright's WebKit setOffline/reload produces an engine-internal navigation error
   // even with an active service worker; verify its cache and online restart here.
   if(browserName==='chromium')await context.setOffline(true);
