@@ -26,6 +26,28 @@ test('opening ASW search equips two distinct ships from owned stacks and counts 
  expect(r.readiness.registeredReady).toBe(true);expect(r.readiness.complete).toBe(false);
  for(const row of r.stock)expect(r.usage[row.key]||0).toBeLessThanOrEqual(row.count);
 });
+test('opening ASW positive target remains unmet when synced ASW and baseline are absent',async({page})=>{
+ await fleet(page,{count:1,stock:1});
+ const r=await page.evaluate(()=>{
+  const rows=hdFERoster();for(const row of rows){delete row.gameAsw;delete row.gameAswBaseline;}
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(rows));
+  const result=hdOCSearch(hdOCContext('1-5','oasw-fleet',0));
+  return {goal:result.measure.goals.find(x=>x.kind==='opening-asw'),readiness:hdOCReadiness(result.plan,result.measure)};
+ });
+ expect(r.goal).toMatchObject({minCount:1,count:0,ok:false,unresolved:true});
+ expect(r.goal.ships).toHaveLength(1);expect(r.goal.ships[0].state.status).toBe('manual');
+ expect(r.readiness.registeredReady).toBe(false);
+});
+test('opening ASW positive target cannot reuse one owned sonar for two ships',async({page})=>{
+ await fleet(page,{count:2,base:60,stock:1});
+ const r=await page.evaluate(()=>{
+  const result=hdOCSearch(hdOCContext('1-5','oasw-fleet',0));
+  return {goal:result.measure.goals.find(x=>x.kind==='opening-asw'),usage:hdFOAssignedUsage(result.plan),stock:[...hdFLInventory().values()],readiness:hdOCReadiness(result.plan,result.measure)};
+ });
+ expect(r.goal).toMatchObject({minCount:2,count:1,ok:false});
+ for(const row of r.stock)expect(r.usage[row.key]||0).toBeLessThanOrEqual(row.count);
+ expect(r.readiness.registeredReady).toBe(false);
+});
 test('opening ASW lower bounds never turn unverified bonus deficits or missing gear into success',async({page})=>{
  await fleet(page,{base:49,stock:1});
  const r=await page.evaluate(()=>{
