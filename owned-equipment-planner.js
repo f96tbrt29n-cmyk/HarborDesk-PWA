@@ -418,6 +418,7 @@ function hdOCReviewHeadline(measure,rows){
  if(!measure.goals.length)return 'この海域は装備条件を自動判定できません';
  if(!measure.complete)return '配備案に未充足・未判定の装備条件あり';
  if(rows.some(x=>x.kind==='missing'))return '登録済み装備目安は充足・編成や基地計画に未充足あり';
+ if(rows.some(x=>x.id==='owned-ships-data'))return '登録済み装備目安は充足・所持艦の情報不足で未充足・未判定の項目あり';
  if(rows.some(x=>x.kind==='data'))return '登録済み装備目安は充足・情報不足で未判定の項目あり';
  if(rows.some(x=>x.kind==='manual'))return '登録済み装備目安は充足・自動判定できない項目あり';
  return '登録済み装備目安は充足';
