@@ -34,7 +34,7 @@ function hdFEPlanFromSavedFleet(map,fleet){
   return {ship:String(row.ship||'').trim(),rosterId:row.rosterId||'',gameShipId:Number(row.gameShipId)||0,masterId:Number(row.masterId)||Number(db?.id)||0,type:db?.type||'',items,expansion:ex?{name:ex.name,star:ex.star}:null,missing:[],master:!!profile};
  });
  const presets=typeof MAP_PLANS!=='undefined'?(MAP_PLANS[map]?.presets||[]):[],preset=fleet?.routePreset||presets.find(p=>String(fleet?.name||'').includes(String(p?.name||'')))||null,routeInfo=preset&&typeof hdFSPresetInfo==='function'?hdFSPresetInfo(preset):null;
- return {map,ships,missing:[],masterBacked:ships.filter(x=>x.master).length,createdAt:Date.now(),source:'saved-fleet',sourceFleet:fleet||null,preset,routeInfo};
+ return {map,ships,routeGoal:fleet?.routeGoal??'',missing:[],masterBacked:ships.filter(x=>x.master).length,createdAt:Date.now(),source:'saved-fleet',sourceFleet:fleet||null,preset,routeInfo};
 }
 function hdFEAssigned(plan){
  const rows=[];
@@ -367,7 +367,7 @@ function hdFESpeedGoal(ship,target){
  return {kind:'speed-ship',label:`${ship.ship} の${hdFESpeedLabel(target)}条件`,count:Number(ok),minCount:1,ok,ratio,speedActual:true,speed,unresolved,detail:`${speed.detail} / 必要 ${hdFESpeedLabel(target)}。${ok?'配備案の速力条件を満たす':unresolved?'艦娘名・改造段階・速力データを確認':recipes.length?'必要な組み合わせ：'+recipes.map(hdFESpeedRecipeText).join(' または '):'この艦の速力区分では到達できません。艦娘を入れ替えてね'}${speed.invalid.length?'。'+speed.invalid.join('、'):''}`};
 }
 function hdFERouteShips(plan){
- return (plan?.ships||[]).filter(x=>x?.ship).map(s=>{const row=hdFERosterForShip(s),db=hdFEFindShip(s.ship),speedInfo=hdFEShipSpeed(s);return {ship:s,type:db?.type||row?.type||s.type||'',speed:speedInfo.label,speedInfo}});
+ return (plan?.ships||[]).filter(x=>x?.ship).map(s=>{const row=hdFERosterForShip(s),db=hdFEFindShip(s.ship),speedInfo=hdFEShipSpeed(s);return {ship:s,type:db?.type||row?.type||s.type||'',typeKnown:!!db?.type&&db.type!=='海防戦艦',speed:speedInfo.label,speedInfo}});
 }
 function hdFERouteFlagshipOk(ships,info){return !info?.flagship||!!ships[0]&&hdFSTypeMatches({type:ships[0].type,speed:hdFESpeedLabel(ships[0].speedInfo.base),roles:[],tags:[],row:{name:ships[0].ship.ship}},info.flagship)}
 function hdFEPresetRouteMatch(plan,preset,index=0){
@@ -384,7 +384,94 @@ function hdFEInferRoute(plan){
  const close=rows.filter(x=>x.strong&&x.totalOk).sort((a,b)=>a.bad.length-b.bad.length||b.coverage-a.coverage);
  return {status:'none',matches:[],rows,closest:close[0]||null,detail:close[0]?`近い編成例: ${close[0].preset?.name||'候補'}（条件未一致）`:'編成条件の自動特定に必要な具体条件が不足'};
 }
-function hdFERoute(plan){
+// Three-valued predicates: a missing fact never becomes a satisfied condition.
+function hdFEBranchPredicate(condition,ships,plan=null){
+ const manual=detail=>({status:'manual',ratio:0,detail});
+ if(!condition||typeof condition!=='object')return manual('分岐条件が未登録');
+ const fields={always:[],unverified:[],fleetCount:['min','max'],typeCount:['types','min','max'],minSpeed:['rank'],equipmentShips:['match','min','max','slotPolicy'],scoutingValue:['min'],airValue:['min']};
+ const groups=['all','any','not'].filter(k=>Object.prototype.hasOwnProperty.call(condition,k)),supported=['kind','reason','state','source','sources','checkedAt',...groups,...(fields[condition.kind]||[])];
+ const extra=Object.keys(condition).filter(k=>!supported.includes(k));
+ if(extra.length||groups.length>1||groups.length&&condition.kind||condition.state&&condition.state!=='verified')return manual('未対応・未確認の分岐条件：'+(extra.join('、')||condition.state||'条件式'));
+ if(condition.kind==='always')return {status:'ready',ratio:1,detail:'他の優先条件に該当しない'};
+ if(condition.not){const child=hdFEBranchPredicate(condition.not,ships,plan);return {...child,status:child.status==='ready'?'missing':child.status==='missing'?'ready':'manual',ratio:1-child.ratio,detail:'否定条件: '+child.detail}}
+ const group=Array.isArray(condition.all)?'all':Array.isArray(condition.any)?'any':null;
+ if(group){
+  const children=condition[group].map(x=>hdFEBranchPredicate(x,ships,plan));if(!children.length)return manual('分岐条件が空です');
+  const status=group==='all'?(children.some(x=>x.status==='missing')?'missing':children.every(x=>x.status==='ready')?'ready':'manual'):(children.some(x=>x.status==='ready')?'ready':children.every(x=>x.status==='missing')?'missing':'manual');
+  return {status,children,ratio:group==='all'?children.reduce((n,x)=>n+x.ratio,0)/children.length:Math.max(...children.map(x=>x.ratio)),detail:children.map(x=>x.detail).join(group==='all'?' / ':' または ')};
+ }
+ if(condition.kind==='unverified')return manual(condition.reason||'条件の根拠を確認してください');
+ if(condition.kind==='equipmentShips'){
+  if(condition.match!=='radar'||condition.slotPolicy&&condition.slotPolicy!=='valid'||!Number.isInteger(condition.min)||!Number.isInteger(condition.max)||condition.min<0||condition.max<condition.min||condition.max>7)return manual('装備艦数・搭載条件が未対応');
+  let count=0,unknown=0;
+  for(const row of ships){const ship=row.ship,db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db);let has=false,unresolved=!profile;
+   for(const [i,item] of [...(ship.items||[]).map((x,i)=>[i,x]),...(ship.expansion?.name?[[null,ship.expansion]]:[])]){if(!item.name)continue;const meta=hdFEFind(item.name);if(!meta){unresolved=true;continue}if(!/電探/.test(meta.category||''))continue;
+    const slot=item.slotIndex??i,unique=i===null||(ship.items||[]).filter((x,j)=>Number(x.slotIndex??j)===slot).length===1,allowed=unique&&profile&&(i===null?hdShipDbExpansionInfo(meta,db,item.star).allowed:hdShipDbEquipCompatible(meta,db)&&Number.isInteger(slot)&&slot>=0&&slot<profile.count&&!hdShipDbSlotRejects(profile,slot,meta));if(allowed)has=true;
+   }if(has)count++;else if(unresolved)unknown++;
+  }
+  const {min,max}=condition,status=count>max||count+unknown<min?'missing':count>=min&&count+unknown<=max?'ready':'manual';
+  return {status,count,min,max,gap:Math.max(0,min-count),ratio:status==='ready'?1:Math.min(1,count/Math.max(1,min)),detail:`電探装備艦 ${count}/${min}隻${unknown?' / 未判定 '+unknown+'隻':''}${count<min?'（あと'+(min-count)+'隻）':''}。複数電探を同じ艦に積んでも1隻`};
+ }
+ if(['scoutingValue','airValue'].includes(condition.kind)){
+  if(!plan||!Number.isFinite(condition.min)||condition.min<0)return manual('数値分岐の根拠・入力が不足');
+  if(condition.kind==='airValue')return manual('分岐到達時の制空値は、判定地点・全候補経路の損耗との接続が未対応。制空プランナーで確認してください');
+  if(hdFEGameMatch(plan).status!=='ready')return manual('装備変更に伴う艦固有索敵ボーナスの差分が未確認。同期した同じ配備で再確認してください');
+  const items=hdFEAssigned(plan),m=condition.kind==='scoutingValue'?hdFEScouting(plan,items):hdFEAir(items),value=condition.kind==='scoutingValue'?m.score:m.basePower;
+  if(!Number.isFinite(value)||items.some(x=>x.name&&!hdFEFind(x.name))||m.status==='manual'||condition.kind==='airValue'&&m.capacityKnown<m.count)return manual('索敵・制空の計算情報が不足');
+  return {status:value>=condition.min?'ready':'missing',ratio:Math.min(1,value/Math.max(1,condition.min)),count:value,min:condition.min,detail:`${condition.kind==='scoutingValue'?'索敵':'制空'} ${value}/${condition.min}（あと${Math.max(0,condition.min-value)}）`};
+ }
+ if(condition.kind==='minSpeed'){
+  if(![10,15,20].includes(condition.rank)||!ships.length)return manual('速力条件を確認してください');
+  const known=x=>x.speedInfo.known&&![...(x.ship.items||[]),x.ship.expansion].some(i=>i?.name&&!hdFEFind(i.name)),low=ships.filter(x=>known(x)&&x.speedInfo.rank<condition.rank),unknown=ships.filter(x=>!known(x));
+  return {status:low.length?'missing':unknown.length?'manual':'ready',ratio:ships.filter(x=>known(x)&&x.speedInfo.rank>=condition.rank).length/ships.length,count:ships.length-low.length-unknown.length,need:ships.length,detail:`${hdFESpeedLabel(condition.rank)}統一 ${ships.length-low.length-unknown.length}/${ships.length}隻${low.length?' / 不足: '+low.map(x=>x.ship.ship).join('、'):''}${unknown.length?' / 速力未判定: '+unknown.map(x=>x.ship.ship).join('、'):''}`};
+ }
+ if(!['fleetCount','typeCount'].includes(condition.kind))return manual('未対応の分岐条件です');
+ const {min,max}=condition;if(!Number.isInteger(min)||!Number.isInteger(max)||min<0||max<min||max>7)return manual('隻数条件が不明です');
+ if(condition.kind==='typeCount'&&(!Array.isArray(condition.types)||!condition.types.length||condition.types.some(x=>!HD_FS_TYPE_ALIASES[x])))return manual('艦種条件が未登録');
+ const known=ships.filter(x=>x.typeKnown),unknown=condition.kind==='fleetCount'?0:ships.length-known.length;
+ const count=condition.kind==='fleetCount'?ships.length:known.filter(x=>condition.types.some(token=>hdFSTypeMatches({type:x.type,roles:[],tags:[],row:{name:x.ship.ship}},token))).length;
+ const status=count>max||count+unknown<min?'missing':unknown?'manual':'ready',gap=Math.max(0,min-count),excess=Math.max(0,count-max),label=condition.kind==='fleetCount'?'編成':condition.types.join('＋');
+ return {status,count,min,max,gap,excess,ratio:status==='ready'?1:unknown?0:count>max?Math.max(0,1-(count-max)/Math.max(1,count)):Math.min(1,count/Math.max(1,min)),detail:`${label} ${count}${unknown?'＋未判定'+unknown:''}隻 / 条件 ${min===max?min:min+'〜'+max}隻${gap&&!unknown?'（あと'+gap+'隻）':''}${excess?'（'+excess+'隻超過）':''}`};
+}
+function hdFEGraphRoute(data,ships,plan,goal){
+ const graph=data.graph,paths=[],trace=[];let unknown=false,random=false;
+ if(!graph||typeof graph.start!=='string'||typeof graph.target!=='string')return {status:'manual',paths:[],trace:[],hasRandom:false,arrivalGuaranteed:false,fixedPath:false,detail:'分岐グラフの始点・到達点が未登録'};
+ const walk=(node,path)=>{
+  if(path.includes(node)||path.length>16||paths.length>=64){unknown=true;return}
+  const nextPath=[...path,node];if(node===graph.target||graph.terminals?.[node]==='nonboss'){paths.push(nextPath);return}
+  if(goal?.allowed&&!goal.allowed.includes(node)){paths.push(nextPath);return}
+  const rules=graph.nodes?.[node];if(!Array.isArray(rules)||!rules.length){unknown=true;paths.push(nextPath);return}
+  let matched=false;
+  for(const rule of rules){const condition=rule.condition||data.checks?.find(x=>x.id===rule.conditionRef)?.condition,result=hdFEBranchPredicate(condition,ships,plan);
+   if(result.status==='missing')continue;
+   const verified=!rule.state||rule.state==='verified';if(!verified||result.status==='manual'||rule.to?.length>1&&rule.random!==true){unknown=true}
+   if(!Array.isArray(rule.to)||!rule.to.length){unknown=true;continue}
+   random ||= rule.random===true;trace.push({from:node,to:rule.to,random:rule.random===true,state:verified?'verified':rule.state,status:verified?result.status:'manual',detail:(rule.reason?rule.reason+' / ':'')+result.detail,sources:rule.sources||data.sources});
+   for(const to of rule.to)walk(to,nextPath);
+   if(result.status==='ready'&&verified){matched=true;break}
+  }if(!matched)unknown=true;
+ };
+ walk(graph.start,[]);const pathsUnique=[...new Map(paths.map(x=>[x.join('→'),x])).values()],allBoss=pathsUnique.length>0&&pathsUnique.every(p=>p[p.length-1]===graph.target&&(!goal?.allowed||p.every(n=>goal.allowed.includes(n))));
+ return {status:unknown?'manual':allBoss?'ready':'missing',paths:pathsUnique,trace,hasRandom:random,arrivalGuaranteed:!unknown&&allBoss,fixedPath:!unknown&&allBoss&&pathsUnique.length===1&&!random,detail:pathsUnique.map(x=>x.filter(n=>n!==graph.start).join('')).join(' / ')+(unknown?'（未確認の分岐あり）':!allBoss?'（登録した目標経路への到達は保証できない）':random?'（経由はランダム。登録候補はボス方面）':'（登録分岐の固定経路）')};
+}
+function hdFEBranchRoute(plan){
+ const data=typeof MAP_PLANS!=='undefined'?MAP_PLANS[String(plan?.map||'')]?.routeBranches:null;
+ if(!data)return {available:false,status:'manual',checks:[],detail:'ルート分岐条件は未登録。編成例の基本条件だけでは固定経路を保証できません。',requiredSpeed:0};
+ if(data.schemaVersion!==2)return {available:true,status:'manual',path:data.path||'登録経路',sources:data.sources||[],checkedAt:data.checkedAt||'',checks:[],graph:null,requiredSpeed:0,requiredRadar:0,arrivalGuaranteed:false,fixedPath:false,detail:'分岐データ形式が未対応のため未判定です。',next:'対応した分岐データへ更新してください'};
+ const ships=hdFERouteShips(plan),goalId=plan?.routeGoal==null||plan.routeGoal===''?data.defaultGoal:plan.routeGoal,goal=typeof goalId==='string'?data.goals?.[goalId]:null,checks=[...(data.checks||[]),...(goal?.checks||[])].map(x=>({...x,...hdFEBranchPredicate(x.condition,ships,plan)}));
+ const graph=data.graph&&checks.every(x=>x.status==='ready')&&(!data.goals||goal)?hdFEGraphRoute(data,ships,plan,goal):null;
+ const status=!checks.length||data.goals&&!goal?'manual':checks.some(x=>x.status==='missing')?'missing':!checks.every(x=>x.status==='ready')?'manual':graph?.status||'ready';
+ // Keep the speed target stable before and after equipping. The disputed low-speed
+ // CL/DE variant stays manual instead of being declared impossible.
+ const fallback=data.speedFallback,requiredSpeed=[10,15,20].includes(fallback?.rank)&&fallback.unless?.length&&fallback.unless.every(x=>hdFEBranchPredicate(x,ships).status==='missing')?fallback.rank:0;
+ return {available:true,path:goal?.path||data.path,goal:goalId,sources:data.sources||[],checkedAt:data.checkedAt,checks,status,graph,next:goal?.next||(data.goals&&!goal?'登録済みのルート目標を選び直してください':''),requiredRadar:goal?.radar||0,requiredSpeed:Math.max(requiredSpeed,goal?.speed||0),arrivalGuaranteed:status==='ready'&&!!graph?.arrivalGuaranteed,fixedPath:status==='ready'&&!!graph?.fixedPath,detail:`${data.goals&&!goal?'未登録のルート目標 '+String(goalId):goal?.label||data.path+'固定'}: ${status==='ready'?'登録した分岐条件を充足':status==='missing'?'固定条件に不足（別経路・ランダム到達は別途確認）':'未判定'} / `+checks.filter(x=>status==='ready'||x.status!=='ready').map(x=>x.label+' '+x.detail+(x.status!=='ready'?'。'+x.next:'')).join(' / ')+(graph?' / '+graph.detail:'')};
+}
+function hdFEPlanSpeedTarget(plan){
+ const data=typeof MAP_PLANS!=='undefined'?MAP_PLANS[plan?.map]?.routeBranches:null,goal=data?.goals?.[plan?.routeGoal||data.defaultGoal],fallback=data?.speedFallback;
+ const required=fallback?.unless?.length&&fallback.unless.every(x=>hdFEBranchPredicate(x,hdFERouteShips(plan),plan).status==='missing')?fallback.rank:0;
+ return Math.max(hdFESpeedTarget(plan?.routeInfo||plan?.suggestion?.info),goal?.speed||0,required||0);
+}
+function hdFERouteBasic(plan){
  let info=plan?.suggestion?.info||plan?.routeInfo||null,inferred=null,presetName=plan?.suggestion?.preset?.name||plan?.preset?.name||'';
  if(!info){inferred=hdFEInferRoute(plan);if(inferred.status==='matched'){info=inferred.match.info;presetName=inferred.match.preset?.name||''}}
  if(!info)return {status:'manual',detail:inferred?.detail||'保存編成のルート条件を特定できないため攻略ルートを確認',requirements:[],inference:inferred};
@@ -392,6 +479,16 @@ function hdFERoute(plan){
  const flagshipBad=!hdFERouteFlagshipOk(ships,info);
  const totalBad=!info.conditionManual&&Number(info.total)>0&&ships.length!==Number(info.total);
  return {status:bad.length||lows.length||totalBad||flagshipBad?'missing':info.conditionManual||unknownSpeed.length?'manual':'ready',requirements:reqs,lowSpeed:lows,unknownSpeed,speedTarget:hdFESpeedTarget(info),inference:inferred,presetName,detail:prefix+(flagshipBad?'旗艦条件未充足: '+info.flagship:bad.length?bad.map(x=>x.token+' '+x.got+'/'+x.need).join(' / '):(lows.length?hdFESpeedLabel(hdFESpeedTarget(info))+'条件未充足: '+lows.join('、'):totalBad?'編成隻数 '+ships.length+'/'+info.total:unknownSpeed.length?'速力未判定: '+unknownSpeed.join('、'):info.conditionManual?'艦種・隻数の条件を手動確認':'基本編成条件を満たす'))};
+}
+function hdFERoute(plan){
+ const basic=hdFERouteBasic(plan),branch=hdFEBranchRoute(plan);
+ if(!branch.available)return {...basic,branch};
+ const info=plan?.suggestion?.info||plan?.routeInfo;
+ // The canonical preset is an example; verified AE alternatives need not contain
+ // a light cruiser. Explicit quest/flagship constraints remain in force.
+ const example=!info||MAP_PLANS[plan.map].presets.some(p=>JSON.stringify(info)===JSON.stringify(hdFSPresetInfo(p)));
+ const status=example?branch.status:basic.status==='missing'||branch.status==='missing'?'missing':basic.status!=='ready'||branch.status!=='ready'?'manual':'ready';
+ return {...basic,status,branch,requirements:example?[]:basic.requirements,speedTarget:hdFEPlanSpeedTarget(plan),detail:(example?'':basic.detail+' / ')+branch.detail};
 }
 function hdFEEnemyAirCandidates(map){
  if(typeof hdFCMapEnemyAirCandidates==='function')return hdFCMapEnemyAirCandidates(map);

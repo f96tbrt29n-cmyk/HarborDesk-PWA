@@ -33,7 +33,8 @@ function hdStrategyEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??''
 function hdStrategyCandidate(map,category,source,ref,title,detail,extra={}){
  return {id:`auto-${source}-${String(ref).replace(/[^a-zA-Z0-9_-]/g,'_')}`,sourceKey:`${map}:${source}:${ref}`,category,source,ref:String(ref),map,scope:'map',title,detail,...extra};
 }
-function hdStrategyNavChecks(map){
+function hdStrategyNavChecks(map){return hdStrategyRenderCached('NavChecks:'+map,()=>hdStrategyComputeNavChecks(map))}
+function hdStrategyComputeNavChecks(map){
  try{
   const fleets=hdMSNFleets(map),fleet=fleets.find(x=>String(x.id)===String(hdMSNFleetId(map,fleets)));
   if(!fleet||typeof hdFEPlanFromSavedFleet!=='function'||typeof hdFEEvaluate!=='function')return [];
@@ -46,7 +47,8 @@ function hdStrategyNavChecks(map){
 function hdStrategyGearRows(map){
  try{const entry=hdPLLoad().find(x=>x.map===map);return entry&&typeof hdPLDemandRows==='function'?hdPLDemandRows(entry.gearItems||[]):[]}catch{return []}
 }
-function hdStrategyGearChecks(map){try{return typeof hdSEChecks==='function'?(hdSEChecks(map).rows||[]):[]}catch{return []}}
+function hdStrategyGearChecks(map){return hdStrategyRenderCached('GearChecks:'+map,()=>hdStrategyComputeGearChecks(map))}
+function hdStrategyComputeGearChecks(map){try{return typeof hdSEChecks==='function'?(hdSEChecks(map).rows||[]):[]}catch{return []}}
 function hdStrategyFleetHasShips(map){
  try{return hdMSNFleets(map).some(fleet=>(fleet.ships||[]).some(ship=>String(ship.ship||ship.name||'').trim()))}catch{return false}
 }
@@ -84,7 +86,13 @@ function hdStrategyPrerequisiteMaps(map){
  visit(map);
  return rows;
 }
-function hdStrategyCandidates(map){
+// One synchronous render shares a consistent snapshot. Never retain it across
+// input, sync or storage events; subsequent renders must observe fresh data.
+let hdStrategyRenderSnapshot=null;
+function hdStrategyWithRenderSnapshot(render){const previous=hdStrategyRenderSnapshot;hdStrategyRenderSnapshot=new Map();try{return render()}finally{hdStrategyRenderSnapshot=previous}}
+function hdStrategyRenderCached(key,compute){if(!hdStrategyRenderSnapshot)return compute();if(!hdStrategyRenderSnapshot.has(key))hdStrategyRenderSnapshot.set(key,compute());return hdStrategyRenderSnapshot.get(key)}
+function hdStrategyCandidates(map){return hdStrategyRenderCached('candidates:'+map,()=>hdStrategyComputeCandidates(map))}
+function hdStrategyComputeCandidates(map){
  if(!map)return [];
  const rows=[],add=x=>{if(!rows.some(r=>r.sourceKey===x.sourceKey))rows.push(x)};
  const unlock=HD_STRATEGY_UNLOCKS[map];

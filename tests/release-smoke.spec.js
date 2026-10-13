@@ -2123,6 +2123,11 @@ test('release smoke: current fleet route inference only accepts strong unique pr
 
     const infer32 = window.hdFEInferRoute(plan32);
     const route32 = window.hdFERoute(plan32);
+    // Preset inference can use reported types, but an unknown hull cannot prove
+    // verified branching. Check the separate canonical-hull case as well.
+    const known32 = window.hdFERoute({map:'3-2', ships:
+      ['阿武隈改二','夕立改二','時雨改二','綾波改二','雪風改','島風改']
+        .map(ship => ({ship, items:[]}))});
     const infer25 = window.hdFEInferRoute(plan25);
     const route25 = window.hdFERoute(plan25);
     return {
@@ -2130,6 +2135,8 @@ test('release smoke: current fleet route inference only accepts strong unique pr
       infer32Name: infer32.match?.preset?.name || '',
       route32Status: route32.status,
       route32Detail: route32.detail,
+      known32Status: known32.status,
+      known32Guaranteed: known32.branch.arrivalGuaranteed,
       infer25Status: infer25.status,
       route25Status: route25.status,
       route25Detail: route25.detail
@@ -2138,9 +2145,9 @@ test('release smoke: current fleet route inference only accepts strong unique pr
 
   expect(data.infer32Status).toBe('matched');
   expect(data.infer32Name).toBe('軽巡1＋駆逐5');
-  expect(data.route32Status).toBe('ready');
-  expect(data.route32Detail).toContain('自動照合');
-  expect(data.route32Detail).toContain('軽巡1＋駆逐5');
+  expect(data.route32Status).toBe('manual');
+  expect(data.known32Status).toBe('ready');
+  expect(data.known32Guaranteed).toBe(true);
   expect(data.infer25Status).toBe('none');
   expect(data.route25Status).toBe('manual');
   expect(data.route25Detail).not.toContain('自動照合:');
@@ -10707,7 +10714,11 @@ test('release smoke: map strategy navigator connects route examples and saved fl
     saveCustomFleets(rows);
   });
   await expect(page.locator('#hdMapStrategyFleet')).toHaveValue('ci-route-fleet');
-  await expect(page.locator('.hd-msn-check').filter({ hasText:'編成条件' })).toContainText('軽巡');
+  // The registered 3-2 graph confirms six destroyers even when the selected
+  // example contains a light cruiser. Five ships cannot meet the boss-route count.
+  await expect(page.locator('.hd-msn-check').filter({ hasText:'編成条件' })).toContainText('登録した分岐条件を充足');
+  await expect(page.locator('.hd-msn-check').filter({ hasText:'編成条件' })).toContainText('OK');
+  await page.evaluate(()=>{const rows=loadCustomFleets();rows['3-2'][0].ships.pop();saveCustomFleets(rows)});
   await expect(page.locator('.hd-msn-check').filter({ hasText:'編成条件' })).toContainText('不足/不可');
   await expect(page.locator('.hd-msn-actions')).toBeVisible();
   await page.locator('[data-hd-msn-action="route"]').click();

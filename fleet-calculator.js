@@ -38,12 +38,19 @@ function hdFCImportOwnedPlan(c,result){
   }
   if(ship.expansion?.name)gear.push({name:ship.expansion.name,star:Number(ship.expansion.star)||0,slot:0,maxProf:false,ship:ship.ship,slotIndex:null});
  }
- const state={...hdFCDefaultState(c.map,c.fleet.id),enemyAir:Number(old.enemyAir)||0,hqLevel:hq??old.hqLevel??120,shipCount:ships.length,ships:ships.map(ship=>({name:ship.ship,rosterId:ship.rosterId||'',gameShipId:Number(ship.gameShipId)||0,masterId:Number(ship.masterId)||0,los:hdFCProposalShipLos(ship)})),gear,proposal:{id,map:c.map,fleetId:c.fleet.id,route:c.index,name:c.fleet.name||'保存編成',at:Date.now(),signature:result.signature,hqMissing:hq==null,edited:false}};
+ const measure=result.measure||hdOCMeasure(result.plan,typeof hdFLRequirements==='function'?hdFLRequirements(result.plan):hdSEChecks(c.map).rows);
+ const assessment=hdOCReadiness(result.plan,measure),routeAssessment=hdFEBranchRoute(result.plan);
+ const state={...hdFCDefaultState(c.map,c.fleet.id),enemyAir:Number(old.enemyAir)||0,hqLevel:hq??old.hqLevel??120,shipCount:ships.length,ships:ships.map(ship=>({name:ship.ship,rosterId:ship.rosterId||'',gameShipId:Number(ship.gameShipId)||0,masterId:Number(ship.masterId)||0,los:hdFCProposalShipLos(ship)})),gear,proposal:{id,map:c.map,fleetId:c.fleet.id,route:c.index,name:c.fleet.name||'保存編成',at:Date.now(),signature:result.signature,hqMissing:hq==null,edited:false,routeGoal:result.plan.routeGoal||'',routeAssessment,assessment:{status:assessment.status,detail:assessment.detail,checks:assessment.checks.filter(x=>x.status!=='ready')}}};
  hdFCSaveState(c.map,id,state);hdFCSetSelection(c.map,id);return true;
 }
 function hdFCProposalIssues(s){
  if(!s.proposal)return [];
  return [...(s.proposal.hqMissing?['司令部Lvの同期']:[]),...(s.ships||[]).filter(x=>x.los==null).map(x=>x.name+'の素索敵'),...(s.gear||[]).filter(x=>!hdFCFind(x.name)||x.slot==null).map(x=>x.ship+'・'+x.name+'の性能／搭載数')];
+}
+function hdFCProposalAssessmentHtml(s,stale=false){
+ if(stale||s.proposal?.edited)return '<p data-hd-fc-assessment>条件・配備が変更されています。攻略条件は未判定です。最新の条件で再探索してください。</p>';
+ const a=s.proposal?.assessment;if(!a)return '<p>攻略条件の判定結果は未保存です。再探索して確認してください。</p>';
+ return `<p data-hd-fc-assessment>${hdFCEsc(a.detail)}${a.checks?.length?' / '+hdFCEsc(a.checks.map(x=>x.detail).filter(Boolean).join(' / ')):''}。計算値だけで攻略可能とは判定しません。</p>`;
 }
 function hdFCProposalHtml(s){
  if(!s.proposal)return '';
@@ -51,7 +58,7 @@ function hdFCProposalHtml(s){
  let c=typeof hdOCContext==='function'?hdOCContext(p.map,p.fleetId,p.route):null;
  if(automatic){const index=Number(String(p.fleetId).split(':').at(-1)),plan=typeof HD_FL_CACHE!=='undefined'?HD_FL_CACHE[p.map+':'+index]:null;c=plan&&typeof hdFLContext==='function'?hdFLContext(plan):null}
  const stale=automatic?(!c||hdOCSignature(c)!==p.signature):c&&(!c.fleet||hdOCSignature(c)!==p.signature);
- return `<div class="hd-fc-mapnote" data-hd-fc-proposal><b>手持ちで探索した配備案${p.edited?'（手動調整あり）':''}</b><p>${hdFCEsc(p.name)} / ${hdFCEsc(new Date(p.at).toLocaleString('ja-JP'))}。${stale?'台帳・編成・海域条件が変わっています。最新の条件で再探索してね。':'提案された艦娘・装備・★・スロット位置を反映済み。'}</p>${issues.length?`<p>未判定：${hdFCEsc(issues.join('、'))}。同期または不足欄の入力が必要です。</p>`:''}<small>搭載数は配備案の満載値。熟練度は配備する装備個体が未指定のため加算なしで開始。素索敵は現在装備の基本索敵を差し引いた同期値で、配備変更に伴う艦固有ボーナスの差分は手動補正してね。</small></div>`;
+ return `<div class="hd-fc-mapnote" data-hd-fc-proposal><b>手持ちで探索した配備案${p.edited?'（手動調整あり）':''}</b><p>${hdFCEsc(p.name)} / ${hdFCEsc(new Date(p.at).toLocaleString('ja-JP'))}。${stale?'台帳・編成・海域条件が変わっています。最新の条件で再探索してね。':'提案された艦娘・装備・★・スロット位置を反映済み。'}</p>${hdFCProposalAssessmentHtml(s,stale)}${issues.length?`<p>未判定：${hdFCEsc(issues.join('、'))}。同期または不足欄の入力が必要です。</p>`:''}<small>搭載数は配備案の満載値。熟練度は配備する装備個体が未指定のため加算なしで開始。素索敵は現在装備の基本索敵を差し引いた同期値で、配備変更に伴う艦固有ボーナスの差分は手動補正してね。</small></div>`;
 }
 function hdFCSelection(map){const fleets=hdFCFleets(map);let s={};try{s=JSON.parse(localStorage.getItem(HD_FC_SELECT_KEY)||'{}')||{}}catch{}return s[map]==='manual'?'manual':fleets.find(x=>x.id===s[map])?.id||fleets[0]?.id||'manual'}
 function hdFCSetSelection(map,id){let s={};try{s=JSON.parse(localStorage.getItem(HD_FC_SELECT_KEY)||'{}')||{}}catch{}s[map]=id;localStorage.setItem(HD_FC_SELECT_KEY,JSON.stringify(s));hdFCScheduleRender()}

@@ -371,7 +371,8 @@ window.addEventListener('blur',()=>{
  homeGuidePressedPointer=null;homeGuideCancelledPointer=null;
  if(homeGuideRenderPending)homeGuideRender();
 });
-function homeGuideRender(){
+function homeGuideRender(){return typeof hdStrategyWithRenderSnapshot==='function'?hdStrategyWithRenderSnapshot(homeGuideRenderNow):homeGuideRenderNow()}
+function homeGuideRenderNow(){
  const host=document.getElementById('homeGuideSteps');if(!host)return;
  if(homeGuidePressedPointer||homeGuideComposing){homeGuideRenderPending=true;return}
  homeGuideRenderPending=false;
