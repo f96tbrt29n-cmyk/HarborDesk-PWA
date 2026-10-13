@@ -139,6 +139,22 @@ window.hdRenderMapPlans=renderPlans;
   start:[rule(count(['空母'],1),['C']),rule(always,['A','C'],true)],
   A:[rule(count(['駆逐'],4),['D','E'],true)],C:[rule(always,['F'])],D:[rule(always,['B'])],B:[rule(always,['E'])],E:[rule(always,['F'])],F:[{conditionRef:'boss-dd',to:['J'],state:'verified'}]
  }}};
+ // 1-4: restricted six-ship scope. Initial route remains random even when every path reaches L.
+ MAP_PLANS['1-4'].routeBranches={schemaVersion:2,path:'BCF(E)HL / AD(EH/GJ)L',checkedAt:'2026-10-13',sources:['https://zekamashi.net/kancolle-kouryaku/1-4/','https://wikiwiki.jp/kancolle/鎮守府海域/1-4','https://zh.kcwiki.cn/wiki/镇守府海域/1-4/带路条件'],coverage:'6隻・駆逐/海防2以上・登録した軽量艦種/空母のボス方面。範囲外・任務固有条件・戦闘勝利は未保証',defaultGoal:'normal',goals:{
+  normal:{label:'ボス方面・ランダム経由を許容',path:'BCF(E)HL / AD(EH/GJ)L',checks:[],speed:0,radar:0,allowed:['start','A','B','C','D','E','F','G','H','J','K','L'],next:'駆逐4以上、または軽巡＋水母＋駆逐/海防2以上でJ→L。潜水母艦でD→Eを選べます。始点はランダム。'},
+  'j-avoid':{label:'J回避・潜水母艦入り',path:'BCFEHL / ADEHL',checks:[{id:'tender-E',label:'D→Eの潜水母艦',condition:count(['潜水母艦'],1),next:'手持ちの潜水母艦を1隻以上にする。潜水艦・潜水空母は代用できません。'},{id:'north-three',label:'B→Cの駆逐・海防艦',condition:count(['駆逐','海防艦'],3),next:'駆逐と海防艦を合計3隻以上にする。'}],speed:0,radar:0,allowed:['start','A','B','C','D','E','F','H','L'],next:'潜水母艦と駆逐/海防3以上を維持。BCFEHLとADEHLの経由はランダムです。'}
+ },notRequired:{scouting:'登録した分岐資料に数値索敵の固定条件なし。制空は航空戦の装備目標として別評価。'},checks:[
+  {id:'six-ships',label:'登録した編成の隻数',condition:{kind:'fleetCount',min:6,max:6},next:'この登録範囲は6隻。少数編成は未登録です。'},
+  {id:'registered-types',label:'登録した艦種の範囲',condition:count(['空母','軽巡','駆逐','海防艦','水母','潜水母艦','補給艦'],6,6),next:'この登録範囲は空母・軽巡・駆逐・海防・水母・潜水母艦・補給艦。その他の艦種は別途確認する。'},
+  {id:'registered-escorts',label:'登録した駆逐・海防艦の範囲',condition:count(['駆逐','海防艦'],2),next:'駆逐・海防を合計2隻以上にする。1隻以下のF→I経路は未登録です。'}
+ ],graph:{start:'start',target:'L',terminals:{K:'nonboss'},nodes:{
+  start:[rule(always,['A','B'],true)],A:[rule(always,['D'])],
+  B:[rule(count(['空母'],3),['D']),rule(count(['駆逐','海防艦'],3),['C']),{condition:all(count(['駆逐','海防艦'],2,2),count(['補給艦'],1)),to:['C'],state:'disputed',reason:'駆逐/海防2＋補給艦のB→Cは資料間で記載が異なるため未判定。'},rule(always,['C','D'],true)],
+  C:[rule(always,['F'])],D:[rule(count(['潜水母艦'],1),['E']),rule(count(['水母'],1),['G']),rule(always,['E','G'],true)],
+  F:[rule(count(['駆逐','海防艦'],4),['E']),rule(count(['水母','潜水母艦','補給艦'],1),['E']),rule(always,['E','H'],true)],
+  E:[rule(always,['H'])],H:[rule(always,['L'])],G:[rule(always,['J'])],
+  J:[rule(all(count(['軽巡'],1),count(['水母'],1),count(['駆逐','海防艦'],2)),['L']),rule(count(['駆逐'],4),['L']),rule(always,['K','L'],true)]
+ }}};
  MAP_PLANS['3-2'].routeBranches={schemaVersion:2,path:'C…L',checkedAt:'2026-10-13',sources:['https://zekamashi.net/kancolle-kouryaku/3-2/','https://zh.kcwiki.cn/wiki/北方海域/3-2'],coverage:'登録したボス経路の分岐。戦闘勝利・大破進撃の安全性は保証しない',defaultGoal:'normal',goals:{
   normal:{label:'通常・H経由を許容',next:'補給艦を外して軽巡1＋駆逐5または駆逐6へ変更する。H回避を選ぶ場合は全艦が高速＋へ到達できるか確認する。',path:'CG(H)FL / CEFL',checks:[],speed:0,radar:0,allowed:['start','C','E','G','H','F','L']},
   fastPlus:{label:'H回避・高速＋以上',path:'CEFL / CGFL',checks:[{id:'speed-goal',label:'高速＋統一',condition:speed(15),next:'各艦に有効な缶・タービンのセットを配備する。'},{id:'radar-goal',label:'電探装備艦',condition:radar(1),next:'電探を搭載できる艦の有効スロットに1個以上配備する。'}],speed:15,radar:1,allowed:['start','C','E','G','F','L']},
