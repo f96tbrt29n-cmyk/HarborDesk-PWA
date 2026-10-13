@@ -123,6 +123,11 @@ function hdOCMeasure(plan,requirements,unknown=[]){
 }
 function hdOCKey(plan){return JSON.stringify(plan.ships.map(s=>[(s.items||[]).map(x=>hdFOStackKey(x)),hdFOStackKey(s.expansion)]))}
 function hdOCScore(kind,row){const item=row.item||row,s=item.stats||{};if(kind==='opening-asw')return Number(s.対潜)||0;if(kind==='制空')return Number(s.対空)||0;if(kind==='索敵')return ((Number(s.索敵)||0)+hdFEImproveCoef(item)*Math.sqrt(Number(row.star)||0))*hdFEEquipCoef(item);return hdFLScoreBase(item,row)}
+function hdOCGoalIdentity(goal){return JSON.stringify([goal.kind,goal.label,goal.shipIndex??null])}
+function hdOCGoalRegressions(before,after){
+ const current=new Map(after.goals.map(g=>[hdOCGoalIdentity(g),g]));
+ return before.goals.filter(g=>g.ok&&!g.unresolved&&(!current.get(hdOCGoalIdentity(g))?.ok||current.get(hdOCGoalIdentity(g))?.unresolved));
+}
 function* hdOCSearchSteps(c,limits={}){
  const maxExamined=Math.max(50,Math.min(10000,Number(limits.maxExamined)||10000)),maxDepth=Math.max(1,Math.min(24,Number(limits.maxDepth)||24));
  const signature=hdOCSignature(c);
@@ -148,13 +153,15 @@ function* hdOCSearchSteps(c,limits={}){
      if(donor){const replacement=old?.name?inventory.find(x=>x.key===hdFOStackKey(old)):null,newItem=replacement&&hdOCCompatible(donor,replacement)?hdOCEquipment(replacement,donor):null;if(donor.expansion)trial.ships[donor.si].expansion=newItem;else trial.ships[donor.si].items[donor.index]=newItem||{name:'',slotIndex:donor.index,capacity:donor.capacity};}
      const key=hdOCKey(trial);if(seen.has(key))continue;seen.add(key);examined++;if(examined>maxExamined)break;
      const measure=hdOCMeasure(trial,requirements,unknown),row={plan:trial,measure};
-     if(measure.score>best.measure.score)best=row;
+     // Intermediate swaps may break a set, but the delivered plan must keep
+     // every confirmed target satisfied by the best equipment so far.
+     if(!hdOCGoalRegressions(best.measure,measure).length&&measure.score>best.measure.score)best=row;
      next.push(row);
      if(examined%50===0)yield examined;
     }
    }
   }
-  next.sort((a,b)=>b.measure.score-a.measure.score);beam=next.slice(0,5);if(!beam.length)break;
+  next.sort((a,b)=>hdOCGoalRegressions(initial.measure,a.measure).length-hdOCGoalRegressions(initial.measure,b.measure).length||b.measure.score-a.measure.score);beam=next.slice(0,5);if(!beam.length)break;
  }
  // Fill remaining ordinary slots with owned basic weapons after satisfying the targets.
  const usage=hdFOAssignedUsage(best.plan);
@@ -162,8 +169,8 @@ function* hdOCSearchSteps(c,limits={}){
   const ship=best.plan.ships[slot.si];if(ship.items[slot.index]?.name)continue;
   const kind=hdFLSlotKind({profile:{type:ship.type,row:{name:ship.ship}}},slot.index);
   const candidates=inventory.filter(x=>(usage[x.key]||0)<x.count&&hdOCCompatible(slot,x)&&hdFLKindMatch(x.item,kind)).sort((a,b)=>hdFLScoreBase(b.item,b)-hdFLScoreBase(a.item,a));
-  const candidate=candidates.find(row=>{const trial=hdFOClone(best.plan);trial.ships[slot.si].items[slot.index]=hdOCEquipment(row,slot);const after=hdOCMeasure(trial,requirements,unknown);return !best.measure.goals.some(g=>g.ok&&after.goals.some(n=>n.kind===g.kind&&!n.ok))});
-  if(candidate){ship.items[slot.index]=hdOCEquipment(candidate,slot);usage[candidate.key]=(usage[candidate.key]||0)+1;}
+  const candidate=candidates.find(row=>{const trial=hdFOClone(best.plan);trial.ships[slot.si].items[slot.index]=hdOCEquipment(row,slot);const after=hdOCMeasure(trial,requirements,unknown);return !hdOCGoalRegressions(best.measure,after).length});
+  if(candidate){ship.items[slot.index]=hdOCEquipment(candidate,slot);usage[candidate.key]=(usage[candidate.key]||0)+1;best.measure=hdOCMeasure(best.plan,requirements,unknown);}
  }
  best.measure=hdOCMeasure(best.plan,requirements,unknown);
  const speedNeed=best.measure.goals.find(x=>x.kind==='speed-turbine')?.minCount||0;

@@ -396,6 +396,10 @@ async function hdFLRefine(plan,host){
   let result;
   while(current()){const step=steps.next();if(step.done){result=step.value;break}await new Promise(resolve=>setTimeout(resolve,0))}
   if(!current()||!result)return;
+  // Re-evaluate against the quick plan's own targets before replacing it.
+  // A higher aggregate score must not remove an already satisfied set.
+  const assessment=hdFLAssessment({...plan,ships:result.plan.ships});
+  if(hdOCGoalRegressions(plan.assessment.measure,assessment.measure).length){hdFLUpdateAssessment(plan,true);return}
   const assigned=new Set();for(const row of plan.ships){const i=result.plan.ships.findIndex((s,i)=>!assigned.has(i)&&(row.gameShipId?Number(s.gameShipId)===Number(row.gameShipId):s.ship===row.ship));if(i<0)continue;assigned.add(i);row.items=result.plan.ships[i].items;row.expansion=result.plan.ships[i].expansion;if(row.expansion)row.expansionMissing=null;row.missing=Array.from({length:hdFLSlotCount(plan.suggestion.slots[plan.ships.indexOf(row)])},(_,i)=>i).filter(i=>!row.items.some(x=>x.slotIndex===i)).map(i=>hdFLSlotKind(plan.suggestion.slots[plan.ships.indexOf(row)],i))}
   plan.missing=plan.ships.flatMap(s=>s.missing.map(kind=>({ship:s.ship,kind})));plan.used={};for(const s of plan.ships)for(const x of [...s.items,...(s.expansion?[s.expansion]:[])])plan.used[x.name]=(plan.used[x.name]||0)+1;
   plan.optimized=true;hdFLUpdateAssessment(plan,true);
@@ -450,8 +454,10 @@ function hdFLOaswHtml(plan,index){const scope=hdFLOaswScope(plan,index);return h
 function hdFLPlanHtml(plan){
  if(typeof hdOCKey==='function'&&plan.assessmentKey!==hdOCKey(plan))hdFLUpdateAssessment(plan,true);
  const used=Object.entries(plan.used).map(([n,c])=>`${hdFLEsc(n)} ×${c} / 所持${plan.owned[n]||0}`).join('、');
+ const goals=(plan.assessment?.measure.goals||[]).filter(g=>g.kind!=='route-branches'),shortfall=goals.filter(g=>!g.ok&&!g.unresolved).length,unresolved=goals.filter(g=>g.unresolved).length;
+ const status=[plan.missing.length?`未配備 ${plan.missing.length}枠`:'',shortfall?`対策不足 ${shortfall}項目`:'',unresolved?`未判定 ${unresolved}項目`:''].filter(Boolean).join(' / ');
  return `<div class="hd-fl-plan">
-  <div class="hd-fl-summary"><div><strong>手持ち装備の自動配備</strong><span>所持数＋艦別装備可否＋実スロット制限を反映</span></div><b class="${plan.missing.length?'warn':'ok'}">${plan.missing.length?`未配備 ${plan.missing.length}枠`:'主要枠を配備'}</b></div>
+  <div class="hd-fl-summary"><div><strong>手持ち装備の自動配備</strong><span>所持数＋艦別装備可否＋実スロット制限を反映</span></div><b class="${status?'warn':'ok'}">${plan.searching?'対策装備を確認中…':status||'主要枠を配備'}</b></div>
   <div class="hd-fl-master-status">マスター同期 ${plan.masterBacked||0}/${plan.ships.filter(x=>x.ship).length}隻</div>
   <p class="hd-fl-note">先制対潜は昼戦開始の通常艦隊での装備・対潜値条件です。連合艦隊では第二艦隊が対象。対潜シナジーの充足とは別に判定します。</p><div class="hd-fl-ships">${plan.ships.map((s,i)=>{const image=s.ship&&typeof hdShipImageThumbHtml==='function'?hdShipImageThumbHtml(Number(s.masterId)>0?{id:Number(s.masterId),name:s.ship}:s.ship,'loadout-thumb'):'';return `<div class="hd-fl-ship"><div class="hd-fl-ship-head"><span>${i+1}</span>${image}<div><strong>${hdFLEsc(s.ship||'艦娘未選択')}</strong><small>${hdFLEsc(s.type||'')}${s.master?'・マスター判定':''}</small></div></div><div class="hd-fl-items">${s.items.map(x=>`<span>${hdFLEsc(x.name)}${x.star?` ★${x.star}`:''}<small>第${(x.slotIndex??0)+1}スロ${x.capacity!=null?`・${x.capacity}機`:''}</small></span>`).join('')||'<em>配備なし</em>'}</div>${s.expansion?`<div class="hd-fl-expansion"><i>増設候補</i><b>${hdFLEsc(s.expansion.name)}${s.expansion.star?` ★${s.expansion.star}`:''}</b><small>${hdFLEsc(s.expansion.reason)}</small></div>`:''}${s.expansionMissing?`<div class="hd-fl-expansion missing"><i>増設不足</i><b>${hdFLEsc(s.expansionMissing.name)}${s.expansionMissing.reqStar?` ★${s.expansionMissing.reqStar}+`:''}</b><small>${hdFLEsc(s.expansionMissing.reason)}</small><button type="button" class="ghost small" data-hd-fl-procure-expansion="${plan.index}" data-hd-fl-ship-index="${i}">調達リストへ</button></div>`:''}${typeof hdFEOpeningAswHtml==='function'?hdFLOaswHtml(plan,i):''}${typeof hdFENightCIHtml==='function'&&s.ship?hdFENightCIHtml(s):''}${s.missing.length?`<small class="hd-fl-missing">未配備: ${s.missing.map(hdFLKindLabel).join(' / ')}</small>`:''}</div>`}).join('')}</div>
   ${used?`<div class="hd-fl-usage"><b>在庫使用:</b> ${used}</div>`:''}

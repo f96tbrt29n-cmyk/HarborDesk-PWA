@@ -106,6 +106,7 @@ function hdFOCoverage(plan){
 }
 function hdFOBestSwap(plan,focusKind,mode){
  const cfg=hdFOMode(mode),before=hdFOCoverage(plan),baseScore=hdFOReqScore(before.evaluation,cfg.id),baseCombat=hdFOCombatScore(before.evaluation),candidates=hdFOCandidateRows(focusKind,cfg.id);let best=null;
+ const requirements=typeof hdFLRequirements==='function'?hdFLRequirements(plan):[],protectedMeasure=typeof hdOCMeasure==='function'?hdOCMeasure(plan,requirements):null;
  for(const cand of candidates){
   for(let si=0;si<(plan.ships||[]).length;si++){
    const ship=plan.ships[si];if(!ship||!ship.ship)continue;
@@ -120,6 +121,7 @@ function hdFOBestSwap(plan,focusKind,mode){
     const focusDelta=(Number(focusAfter.count)||0)-(Number(focusBefore.count)||0);
     const statusGain=(focusAfter.status==='ready'?2:focusAfter.status==='partial'?1:0)-(focusBefore.status==='ready'?2:focusBefore.status==='partial'?1:0);
     if(focusDelta<=0&&statusGain<=0)continue;
+    if(protectedMeasure&&hdOCGoalRegressions(protectedMeasure,hdOCMeasure(trial,requirements)).length)continue;
     const conditionGain=(afterScore-baseScore)*cfg.conditionWeight,combatGain=(afterCombat-baseCombat)*cfg.offenseWeight;
     const net=conditionGain+combatGain-hdFOProtectedPenalty(old)*cfg.protectWeight-hdFORarePenalty(cand)*cfg.rareWeight;
     if(net<=cfg.minNet)continue;
