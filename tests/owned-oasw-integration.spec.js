@@ -1,4 +1,5 @@
 const {test,expect}=require('@playwright/test');
+const fs=require('node:fs'),path=require('node:path');
 test.use({viewport:{width:390,height:844},isMobile:true,hasTouch:true,serviceWorkers:'block'});
 async function boot(page){
  await page.route('**/*',r=>['127.0.0.1','localhost'].includes(new URL(r.request().url()).hostname)?r.continue():r.fulfill({status:204,body:''}));
@@ -87,16 +88,25 @@ test('incomplete ship slots preserve previous equipment identity and unrelated l
  await boot(page);
  const r=await page.evaluate(()=>{
   const parsed=hdKcImportEmpty(),mid=hdShipDbMasterRowFor('夕立改二').id,eid=[...hdKcMasterEquipMap()].find(([,x])=>x.name==='三式水中探信儀')[0];
-  const ship={api_id:71,api_ship_id:mid,api_lv:90,api_slot:[10,-1,-1],api_slot_ex:0,api_taisen:[100,130]};parsed.ships.set(71,ship);parsed.slotItems.set(10,{api_id:10,api_slotitem_id:eid});hdKcMergeRoster(parsed);
+  const ship={api_id:71,api_ship_id:mid,api_lv:90,api_slot:[-1,10,-1],api_slot_ex:0,api_taisen:[100,130]};parsed.ships.set(71,ship);parsed.slotItems.set(10,{api_id:10,api_slotitem_id:eid});hdKcMergeRoster(parsed);
   const row=hdFERoster()[0];row.memo='保持するメモ';localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([row]));
   localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'三式水中探信儀',count:1}]));localStorage.setItem('harbordesk-kancolle-materials-v1',JSON.stringify({fuel:12345}));
+  localStorage.setItem('harbordesk-pwa-v1',JSON.stringify({resources:{fuel:12345,ammo:23456,steel:34567,bauxite:45678}}));
+  hdFCSaveState('1-5','preserved',{hqLevel:75,ships:[{name:row.name,gameShipId:71}],gear:[{name:'三式水中探信儀',slotIndex:1,star:0,slot:0}]});
   saveCustomFleets({'1-5':[{id:'preserved',ships:[{ship:row.name,rosterId:row.id,gameShipId:71,masterId:mid,gear:row.gear}]}]});
-  const keys=['harbordesk-equipment-v1','harbordesk-kancolle-materials-v1',CUSTOM_FLEET_KEY],values=keys.map(k=>localStorage.getItem(k));
+  const keys=['harbordesk-equipment-v1','harbordesk-kancolle-materials-v1','harbordesk-pwa-v1',CUSTOM_FLEET_KEY,HD_FC_KEY],values=keys.map(k=>localStorage.getItem(k));
   ship.api_slot=[];ship.api_taisen=[90,130];parsed.completeSlotItems=true;hdKcMergeRoster(parsed);const after=hdFERoster()[0];
-  return {before:row,after,unrelatedPreserved:JSON.stringify(values)===JSON.stringify(keys.map(k=>localStorage.getItem(k))),state:hdFEOpeningAsw({ship:row.name,masterId:mid,gameShipId:71,items:[{name:'三式水中探信儀',slotIndex:0,capacity:0}]})};
+  return {before:row,after,unrelatedPreserved:JSON.stringify(values)===JSON.stringify(keys.map(k=>localStorage.getItem(k))),state:hdFEOpeningAsw({ship:row.name,masterId:mid,gameShipId:71,items:[{name:'三式水中探信儀',slotIndex:1,capacity:0}]})};
  });
  expect(r.after).toMatchObject({id:r.before.id,gameShipId:71,gear:r.before.gear,gameGearSlots:r.before.gameGearSlots,gameGearExpansion:r.before.gameGearExpansion,memo:'保持するメモ',gameAswGearKnown:false});
  expect(r.unrelatedPreserved).toBe(true);expect(r.state.status).toBe('manual');
+});
+test('documented 37 maps and 53 presets remain available to the existing route selector',async({page})=>{
+ const doc=fs.readFileSync(path.join(__dirname,'../docs/route-condition-coverage-ja.md'),'utf8');
+ const documented=[...doc.matchAll(/^\| (\d+-\d+) \| (\d+) \|/gm)].map(m=>({map:m[1],count:Number(m[2])})).sort((a,b)=>a.map.localeCompare(b.map));
+ await boot(page);
+ const actual=await page.evaluate(()=>Object.keys(MAP_PLANS).map(map=>({map,count:hdMSNPresets(map).length})).sort((a,b)=>a.map.localeCompare(b.map)));
+ expect(actual).toEqual(documented);expect(actual).toHaveLength(37);expect(actual.reduce((n,r)=>n+r.count,0)).toBe(53);
 });
 test('opening ASW legacy baseline without complete slot evidence stays unverified without deleting saved data',async({page})=>{
  await boot(page);
