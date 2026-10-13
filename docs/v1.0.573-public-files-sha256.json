@@ -1,0 +1,766 @@
+{
+  "commit": "9cb6a9d695d2a7c16dbd40c31d1054921d08df97",
+  "files": [
+    {
+      "file": "HarborDesk-Kancolle.meta.js",
+      "equal": true,
+      "sha256": "bc4698b4cd9972d20a4d88c30a306bce2b5cb31d12b5f192b86672cdc2e4cf21"
+    },
+    {
+      "file": "HarborDesk-Kancolle.user.js",
+      "equal": true,
+      "sha256": "a49fa9f6ac7fa62dd4c2e461879e2fcdb20d1433ea889433e7d108aa738c6567"
+    },
+    {
+      "file": "activity-logger.css",
+      "equal": true,
+      "sha256": "0611e1b8768af7d91fcc7cac2ffa8956dfc06780866ca90cd607d20c7c072639"
+    },
+    {
+      "file": "activity-logger.js",
+      "equal": true,
+      "sha256": "e2c3ab576ce27ffa924e53c06afe66bed52af7169460cfa24c9a095365361fe6"
+    },
+    {
+      "file": "advanced-tools.css",
+      "equal": true,
+      "sha256": "2b0ac11a29ddb689be4c10a7a0087afc8141b5b66c8fb84091ee9c6b5f464f18"
+    },
+    {
+      "file": "advanced-tools.js",
+      "equal": true,
+      "sha256": "5240fe70fc22f4c01d1e65e63cb1cd621ce99cbe3a252b1c39562f93a4081aac"
+    },
+    {
+      "file": "app-version.json",
+      "equal": true,
+      "sha256": "173f9f6c18a739a0d5e284db69b3c5c3617be462ea022ada2eee67a9ef450f17"
+    },
+    {
+      "file": "app.js",
+      "equal": true,
+      "sha256": "80e8f404a8a8ebae8c3b780e19e01a7a010b032da57bb16a7e42e9a0cdb623f1"
+    },
+    {
+      "file": "command-center.css",
+      "equal": true,
+      "sha256": "440444a1b9447b10055df842f487c21cea16d390d2fda1b2a2f6eeed229184be"
+    },
+    {
+      "file": "command-center.js",
+      "equal": true,
+      "sha256": "550406a5d10ac0f0ea831bc29dde155648a07f8498ce850c0e38a33b241cabe7"
+    },
+    {
+      "file": "construction-database.css",
+      "equal": true,
+      "sha256": "f701289bc9634b6302563b5e03fd21761f2dd097c97f740350336e6af0272528"
+    },
+    {
+      "file": "construction-database.js",
+      "equal": true,
+      "sha256": "3a1ff7a8a130920f2cb42b3f0dc0668ba9f78eeb7374e54f9119f5275891023f"
+    },
+    {
+      "file": "custom-fleets.css",
+      "equal": true,
+      "sha256": "88d1d9f212aa6dd4a7567abe5ebe9dbaddaf5458c2d88c51ab33ff1f066626ce"
+    },
+    {
+      "file": "custom-fleets.js",
+      "equal": true,
+      "sha256": "1ede583b892f124970a23ccf1755b8e8c00d6826ee6d01d4652706d80ee7f30f"
+    },
+    {
+      "file": "daily-ops.js",
+      "equal": true,
+      "sha256": "2b472b6577b3a6e269017634709c8e95e35ff0644603c1703e64016e39cf1110"
+    },
+    {
+      "file": "development-recipes.css",
+      "equal": true,
+      "sha256": "8ae5487fd653bc2882ea55e98667ccd86fc4a9dab03425f4542a7c76a8faafb8"
+    },
+    {
+      "file": "development-recipes.js",
+      "equal": true,
+      "sha256": "9ee455ec94f8601d9516615c489ae7ed59b98b546504cbd09af45cabefd94e88"
+    },
+    {
+      "file": "diagnostics-center.css",
+      "equal": true,
+      "sha256": "40126c5476199aff6308d6aeb11f31e2054234470c40e0c8c8f1a1d896c3ca22"
+    },
+    {
+      "file": "diagnostics-center.js",
+      "equal": true,
+      "sha256": "0ba273cb8baa67b0ce790c94e8c8939b07ff7ac2eaf04a03aca03099918bbdc5"
+    },
+    {
+      "file": "drop-hunting.css",
+      "equal": true,
+      "sha256": "d99b8b42158a32cf2e23267694eabb637a5beef2dd3fda7bdfdf02fb76f0f0ff"
+    },
+    {
+      "file": "drop-hunting.js",
+      "equal": true,
+      "sha256": "304cd3a825742a20b01cb8e3f223d8ed21a256cc68ca5702b1e1df7231284632"
+    },
+    {
+      "file": "enemy-anti-air-data.js",
+      "equal": true,
+      "sha256": "25d648dc51cb1e8a03eaa0fe4eb67aa35e425f1150cc79ef028331d45d518e07"
+    },
+    {
+      "file": "enemy-anti-air.js",
+      "equal": true,
+      "sha256": "07eb910a832d63c051475d3500f0d99777c9ae19e29b09cee5b46f619a1354a6"
+    },
+    {
+      "file": "eo-tracker.css",
+      "equal": true,
+      "sha256": "e9e0ee16725612d65b772fb1933888dec3e88c49f6d3ad6e289b285d796e9ee8"
+    },
+    {
+      "file": "eo-tracker.js",
+      "equal": true,
+      "sha256": "eec07e1be9c0a49c38a275f42e7db9c76219e1fd71d9336b847a46995cac8674"
+    },
+    {
+      "file": "equipment-acquisition-guide.css",
+      "equal": true,
+      "sha256": "6f3d56812611f223503097fe3c4a388915233242b7e6ad309b90d800919b8798"
+    },
+    {
+      "file": "equipment-acquisition-guide.js",
+      "equal": true,
+      "sha256": "9713a12b63bfd816fbcdca46d83721cad8555d93e18daaf068f68f8aa277468f"
+    },
+    {
+      "file": "equipment-analyzer.css",
+      "equal": true,
+      "sha256": "f3e8a9ef6e5a339c821847a78f3e7b9f47dbbc3e7b113a712d06e7db784a3b63"
+    },
+    {
+      "file": "equipment-analyzer.js",
+      "equal": true,
+      "sha256": "f8ef2a8edcc72ff990fa69e7e36fd3245951aa39667cba2b362901159b59b514"
+    },
+    {
+      "file": "equipment-catalog-extra.js",
+      "equal": true,
+      "sha256": "64d093e654ec1b819213058fced1d6fad7491c6ffee36794392016aa5c13df95"
+    },
+    {
+      "file": "equipment-catalog-extra2.js",
+      "equal": true,
+      "sha256": "b49d2f96b6ee4c46b1835c85575468c3e5937b53c5e6a78157d6d1d6d9764b39"
+    },
+    {
+      "file": "equipment-catalog-extra3.js",
+      "equal": true,
+      "sha256": "0bcbcdf636095251b8695f274ca353769b2ca82f6fd00b8c7f8c056bdf7fdc15"
+    },
+    {
+      "file": "equipment-catalog-extra4.js",
+      "equal": true,
+      "sha256": "5ff7f5eec12cbcb5ea547e015077cd9efeb38324d4613928106be391929f0d58"
+    },
+    {
+      "file": "equipment-catalog-ui-patch.js",
+      "equal": true,
+      "sha256": "959d4c0c97b137ac2a810a363e848c3749d982dcb8a4465424ba5cd79b238ab7"
+    },
+    {
+      "file": "equipment-catalog.css",
+      "equal": true,
+      "sha256": "8b5275232a3c7da06ffd8a435cb3e290d22f695896e35513fa827b724fc95a73"
+    },
+    {
+      "file": "equipment-catalog.js",
+      "equal": true,
+      "sha256": "86fe01df833301dede40a73ff02784b724e37a5413dfc96c14586048f5d6b3ee"
+    },
+    {
+      "file": "equipment-procurement-list.css",
+      "equal": true,
+      "sha256": "16f83199f3d2fa3befc2a3d3f20fe29e7cee7223bebf39fb255662e1efd8fbf3"
+    },
+    {
+      "file": "equipment-procurement-list.js",
+      "equal": true,
+      "sha256": "83ec1a1a810fc5125ba8e6953ab52878d348559410b5cbb0c7279cab14958996"
+    },
+    {
+      "file": "event-operations.js",
+      "equal": true,
+      "sha256": "3974644ea9d17cc076a4e81f4215ad533acb2ae94f52573756f9980ce1b2da6d"
+    },
+    {
+      "file": "exercise-routine.css",
+      "equal": true,
+      "sha256": "65fbf2475ee85a594fc905fcccfd765830b587477ddf2c2d44a697665d896e4f"
+    },
+    {
+      "file": "exercise-routine.js",
+      "equal": true,
+      "sha256": "6a4279625490635a74279e08eb4392c2f79c033237a12b8fe398af46d662b735"
+    },
+    {
+      "file": "expedition-database.css",
+      "equal": true,
+      "sha256": "9db84120f76980cfd1820ef91737e4fecc715b0c1d8417590ba81c34bb241a21"
+    },
+    {
+      "file": "expedition-database.js",
+      "equal": true,
+      "sha256": "2461121d80b146a53c1ac10881cc736e17c06c8d9198bdd71d6b33957845452c"
+    },
+    {
+      "file": "expedition-fleet-manager-patch.js",
+      "equal": true,
+      "sha256": "944a7c939ce977343d1d8c495ea375360893d471c6ffe412fbe79d1b12b971d7"
+    },
+    {
+      "file": "expedition-fleet-manager.css",
+      "equal": true,
+      "sha256": "d936d492f84126f9578fdada1d3bd431053558585036d17b9111bdd606d584d6"
+    },
+    {
+      "file": "expedition-fleet-manager.js",
+      "equal": true,
+      "sha256": "433a5edc37783a32d3adac4a10c896f168768fd81c3aedf0eee1f99a19cc1257"
+    },
+    {
+      "file": "expedition-stats-extension.css",
+      "equal": true,
+      "sha256": "ebcf46d9a7179ac45cbe53298ca23c138be7ea9bd47c76c4b6c14c569b6743b3"
+    },
+    {
+      "file": "expedition-stats-extension.js",
+      "equal": true,
+      "sha256": "95f112b7d3ea843a98513c8412eedbeb09e3332a6839d09ad72b54b16678b706"
+    },
+    {
+      "file": "fleet-calculator-fix.js",
+      "equal": true,
+      "sha256": "cd31803adfd91f4223c376048db70b3d839deb482ff9681e6f5db04509cdeaf9"
+    },
+    {
+      "file": "fleet-calculator.css",
+      "equal": true,
+      "sha256": "f3b194403ca045dc6bde793d902d9f5c09c32a3b4566feedaec8edb2ed084c5f"
+    },
+    {
+      "file": "fleet-calculator.js",
+      "equal": true,
+      "sha256": "b45da8fe6e212608da33a3672d5d65deaea1a32c12a8a05369bac60212eb9780"
+    },
+    {
+      "file": "fleet-loadout-optimizer.css",
+      "equal": true,
+      "sha256": "29be238edac0a66c956c4ab0de21616349212154d20aedaece5de13f383de205"
+    },
+    {
+      "file": "fleet-loadout-optimizer.js",
+      "equal": true,
+      "sha256": "d26ea0a85bc7f4c004738172dec53bd032d90ef7da97997423bcc8f3da6bb14f"
+    },
+    {
+      "file": "fleet-loadout-planner.css",
+      "equal": true,
+      "sha256": "9dfb5870a82d6ec73feb9adc4fe0d051bb220e880521c6d9cf23f24833358ffa"
+    },
+    {
+      "file": "fleet-loadout-planner.js",
+      "equal": true,
+      "sha256": "902b5e35a03765206155c28d981653dbd2d9621d58fb99341e24e82d4ef45dd0"
+    },
+    {
+      "file": "fleet-readiness-evaluator.css",
+      "equal": true,
+      "sha256": "60b3b96df009f827c3a4121c9f94007e78401c8f6ce6b1407a4e13073ac585d2"
+    },
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "equal": true,
+      "sha256": "4db7147055ee5c9def034ce95b66c14b2899c67d5f90a58e2aaea67eb8ea9538"
+    },
+    {
+      "file": "fleet-suggester.css",
+      "equal": true,
+      "sha256": "3549109b753d4a65547882330e29088ed8f82c3c02808104a0186d65770994d4"
+    },
+    {
+      "file": "fleet-suggester.js",
+      "equal": true,
+      "sha256": "f3b11c0da402489238c927ba22ecb012d962b5d1c6377c8c2a7f0f050a0e2b4b"
+    },
+    {
+      "file": "global-search.css",
+      "equal": true,
+      "sha256": "984d1eb1e1b8d1ad88f615764f605c972a47a98c9c89dd46826c44025d003e45"
+    },
+    {
+      "file": "global-search.js",
+      "equal": true,
+      "sha256": "7dba60d3160288f054f54ea616a0375a79d9a8a23993e8de7021d13cfb5a7e98"
+    },
+    {
+      "file": "grand-operations.css",
+      "equal": true,
+      "sha256": "3d12df44b7d7ec8319e88229c7e3bcfb9bbc031d26eae21372cddbf1c2e0afde"
+    },
+    {
+      "file": "home-dashboard.css",
+      "equal": true,
+      "sha256": "02bd9bcabaa9134bc816f44feebb5d78a169cbc9a37a655b1673ff1444bee389"
+    },
+    {
+      "file": "home-dashboard.js",
+      "equal": true,
+      "sha256": "13072a201ea9fd627be5db97f045455c6251eff353f6af300738f30472a87829"
+    },
+    {
+      "file": "improvement-workshop.css",
+      "equal": true,
+      "sha256": "2c5e48cdd2811bc79beb7bd17570a1a73ce90f49adf1ab396b98cb63c717b7d0"
+    },
+    {
+      "file": "improvement-workshop.js",
+      "equal": true,
+      "sha256": "2c59a157bf72721699b95997420e8815d9a5cc7f762e1e4bd46ecc4fd277f3f8"
+    },
+    {
+      "file": "index.html",
+      "equal": true,
+      "sha256": "a66b62498e57c85060fcf3ecb29a237131a9bbf6253a6e37b7080d56fb5c131c"
+    },
+    {
+      "file": "kancolle-import.css",
+      "equal": true,
+      "sha256": "f2abf99f609c7c6d98ba90f187995565ac9161abe2d87e54a68e7e69026188cb"
+    },
+    {
+      "file": "kancolle-import.js",
+      "equal": true,
+      "sha256": "302c1392cad9612eb60a55660aae41cc1874c9fbd960487483a517bc6e28cf9a"
+    },
+    {
+      "file": "land-base-planner.css",
+      "equal": true,
+      "sha256": "db75c5e15b6fffc60622e35e8abe0236aba4aa609996d62768812eae2c28602d"
+    },
+    {
+      "file": "land-base-planner.js",
+      "equal": true,
+      "sha256": "4e2b8bfe9fae035586df996cbcda9581ed4bc7a7a8bcea9ee083c2ac99db2846"
+    },
+    {
+      "file": "manifest.webmanifest",
+      "equal": true,
+      "sha256": "b004d4e7bc9ad3077dfae1b7c0afda6b2236e84c2b8b6b71150b89dfffbf780d"
+    },
+    {
+      "file": "map-advanced-data.js",
+      "equal": true,
+      "sha256": "c6ba0452b9fe57ea5e0731f0f730fa5e12d2cf03213937de8a313c7608083640"
+    },
+    {
+      "file": "map-air-check.js",
+      "equal": true,
+      "sha256": "447699857a06c0caf2ee68428d34b3282964bf8f98b16e33d74b6463fa13fa64"
+    },
+    {
+      "file": "map-air-data.js",
+      "equal": true,
+      "sha256": "2b97b615fdc6edf8286d987b43c1c27a99ea4a2481927cfefa433cd7378e6014"
+    },
+    {
+      "file": "map-controller.js",
+      "equal": true,
+      "sha256": "ee91d3a2c4b7079811abde68207cf4a0a901c535a845a7877506fee264a8cf54"
+    },
+    {
+      "file": "map-details-34.js",
+      "equal": true,
+      "sha256": "1e8714f6e5e75197ca1de433ad35713951f3bd7a81b36df77e2c317ebe0837ba"
+    },
+    {
+      "file": "map-details-57.js",
+      "equal": true,
+      "sha256": "d6d2d02ef922e856ce5a48bea6c7e28e9a3d58b3197b4afddfa1c8a5d18395c4"
+    },
+    {
+      "file": "map-details.css",
+      "equal": true,
+      "sha256": "721fcb632be83db1d4d98f6c531161811611cf3495a8b146204af8746267c83d"
+    },
+    {
+      "file": "map-details.js",
+      "equal": true,
+      "sha256": "38f6127d919226731d63bf2165e7fce8aaeb006b6ccedab653fcc11cd3e63146"
+    },
+    {
+      "file": "map-equipment-owned.css",
+      "equal": true,
+      "sha256": "1b42ac487540bdc214d88f6436af9884f7b5006b4f2826c06e75c89b5ec8eda2"
+    },
+    {
+      "file": "map-equipment-owned.js",
+      "equal": true,
+      "sha256": "f29812ba3ec1130821cfb728fc467e1d66b67a8d1cfa4bb71e54b2515334d77d"
+    },
+    {
+      "file": "map-equipment-recommend.css",
+      "equal": true,
+      "sha256": "96dffd845bf7994c240fcbbce05dfb727e8eedb6bef1d02c06842f67c34ce20c"
+    },
+    {
+      "file": "map-equipment-recommend.js",
+      "equal": true,
+      "sha256": "3f4e116ee928dba8a9546c6264b3a662f2feec4cfc72a70c965438dc62fab100"
+    },
+    {
+      "file": "map-images.css",
+      "equal": true,
+      "sha256": "15c251f09047da16c406f58758959997d09617d4b78e14ed6a5a7fe0e35b9001"
+    },
+    {
+      "file": "map-images.js",
+      "equal": true,
+      "sha256": "b623a602c35904889a3a05d9364931faf9f4642ea7d05c1f3b9826a86e2e603f"
+    },
+    {
+      "file": "map-interactive.css",
+      "equal": true,
+      "sha256": "2c0e5ecb4b17f4236f29d8ad918a96304fc742ff7499c781b213213ec57a675e"
+    },
+    {
+      "file": "map-interactive.js",
+      "equal": true,
+      "sha256": "57f44348a97f45f60cd996af3321f6cbe655bec5cb97c85f572714644843a438"
+    },
+    {
+      "file": "map-node-data-1.js",
+      "equal": true,
+      "sha256": "7ad46215a0848a0756256bc69c4f9b40e6f5273876f12deff73e514060ca6e56"
+    },
+    {
+      "file": "map-node-data-2-7.js",
+      "equal": true,
+      "sha256": "8c55f1b126dd23db3b77a0f7010a44c0773552f52f70bf0172ca53705e8aed5a"
+    },
+    {
+      "file": "map-plans.css",
+      "equal": true,
+      "sha256": "90604f4752a1f2fb4ac41c88d1b4d8b936f5ce16b52607ed981af50479b49720"
+    },
+    {
+      "file": "map-plans.js",
+      "equal": true,
+      "sha256": "5e1fef624b58c98e2e38e5ddc3c92e9fdcfb627b985e23202a761c8de7e47b7b"
+    },
+    {
+      "file": "map-runtime.js",
+      "equal": true,
+      "sha256": "6ac1e03f89f9f0745f109b6b28241b419ef5d5e8eeaa4e6ab6fc19367d3d8777"
+    },
+    {
+      "file": "map-strategy-navigator.css",
+      "equal": true,
+      "sha256": "c425bdb496e677fb99504a61356678dd16358057ab025bb82cb3da5a068cb0e6"
+    },
+    {
+      "file": "map-strategy-navigator.js",
+      "equal": true,
+      "sha256": "3d54700cefe6dd1bc0d3aa904babb3a7aa926163c7e67ccdbb7c0df31d653c63"
+    },
+    {
+      "file": "map-tabs.css",
+      "equal": true,
+      "sha256": "0e1e75ec655b14d3de67e3b0531df9a0be48be118fe52a877a4dfae7b23a8aef"
+    },
+    {
+      "file": "map-tabs.js",
+      "equal": true,
+      "sha256": "977f278168c428d6151a17706e30408b6ff7c951f2ef69aa2003672067cb7858"
+    },
+    {
+      "file": "material-planner.css",
+      "equal": true,
+      "sha256": "16c63852b866035b4d8fe10ff5f913aa522b4aa9f6c7d214480b365b218ca5a7"
+    },
+    {
+      "file": "material-planner.js",
+      "equal": true,
+      "sha256": "45a69ae05126146a91b8c062885c786199f7cf64fd023cad9ed8a47729b7883d"
+    },
+    {
+      "file": "mobile-layout.css",
+      "equal": true,
+      "sha256": "6578cfea5365f428bf958f0143c8c4a74153725135cf0d10003480582d4e0245"
+    },
+    {
+      "file": "optimization-tools.js",
+      "equal": true,
+      "sha256": "e4dbb3b87df6a1a1132ff62cbf0a71f5f83025ea291ae285b592095f91b7e0ea"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "equal": true,
+      "sha256": "ab7fa0098170f2244df1b5df7cda6dcd4d1eb5aaf045c182fe56eb531a175109"
+    },
+    {
+      "file": "personal-home.css",
+      "equal": true,
+      "sha256": "dfcf32ebbbb10e71f28990e4ac04506b2a00a963bd41357c92ecea86646907db"
+    },
+    {
+      "file": "personal-home.js",
+      "equal": true,
+      "sha256": "8ebaee32acd538b2600e611aa0175e322e481e1a6603c7c15ddef692482d95a8"
+    },
+    {
+      "file": "quest-acceptance-guard.js",
+      "equal": true,
+      "sha256": "26f2c1733bc8a7dfa758d37e0cdcf13ffdc63d311296f33313dd6b5c7d9857f8"
+    },
+    {
+      "file": "quest-database.css",
+      "equal": true,
+      "sha256": "47e961df6eb1722a52eabd8e0d5084f4c21bf9c61b5bfd70466d35f34899e21a"
+    },
+    {
+      "file": "quest-database.js",
+      "equal": true,
+      "sha256": "7dbe97c81fba9856afe8e4ab7864e3891d2ede9998bb77b9b8a97358e779370b"
+    },
+    {
+      "file": "quest-progress-extension.css",
+      "equal": true,
+      "sha256": "8cc67cc3ca029f0ee92c030a8e6da0bfc0e110602dd12d9141bb51cf404db1f1"
+    },
+    {
+      "file": "quest-progress-extension.js",
+      "equal": true,
+      "sha256": "22b93d56977ab67a57936b33a07356215284cd3f832f355a08f1c1f6d0f811e2"
+    },
+    {
+      "file": "quick-nav.css",
+      "equal": true,
+      "sha256": "445edfb06714852a4de0263b954c69588dcd408d596b681b96190b63fb97335d"
+    },
+    {
+      "file": "quick-nav.js",
+      "equal": true,
+      "sha256": "2a45178662e837ee067e4f8441bdab63c4b4ad8d61911cbbe77a200961778b5a"
+    },
+    {
+      "file": "refresh.html",
+      "equal": true,
+      "sha256": "f83e0c75bea0ca486ac0bc62fedede19eec781594e3d8d4c8dc68b2f47dccc88"
+    },
+    {
+      "file": "resource-budget.css",
+      "equal": true,
+      "sha256": "109444c208a3af6568c22e36f0da4bfe5e0e80d35ee74f7b61e15e7e0d995e75"
+    },
+    {
+      "file": "resource-budget.js",
+      "equal": true,
+      "sha256": "f93ce1e2754c541f631a265938b1d1a6a61890edd5861a0e7bd2ef711d790bda"
+    },
+    {
+      "file": "resource-history.js",
+      "equal": true,
+      "sha256": "f95257db3091a4574520071d4f2febbc2c5b502cf0e3dcffcb78dd1df263cc84"
+    },
+    {
+      "file": "ship-database.css",
+      "equal": true,
+      "sha256": "231674f855a38849783e332c1588aea10e491dd1227e7a627e35c50de781cf49"
+    },
+    {
+      "file": "ship-database.js",
+      "equal": true,
+      "sha256": "0d5a9753ab33878ce7b547ce9cbdb3411d8235019c6e824ba3cc9fe616960f7e"
+    },
+    {
+      "file": "ship-image-provider.css",
+      "equal": true,
+      "sha256": "1fb2b18ee8c61eb8a2a14c1ec8a8a64153185e14d0630fce879c9910b067a3bc"
+    },
+    {
+      "file": "ship-image-provider.js",
+      "equal": true,
+      "sha256": "2ea6688b3917a1927da519d066f5e155e5df7e8fb1600cc00c0410534041e2ce"
+    },
+    {
+      "file": "ship-master-snapshot.js",
+      "equal": true,
+      "sha256": "4640e0c7b2626267967c4de3ec2f560adfd58d08a37129014b9e77afa6435782"
+    },
+    {
+      "file": "ship-roster.css",
+      "equal": true,
+      "sha256": "8f078811ed7aa7df64405c8f6caedfbe5207e9159616b48b0ae1c1149c509847"
+    },
+    {
+      "file": "ship-roster.js",
+      "equal": true,
+      "sha256": "950b0147b8851932ad4109d6dbc7b324f43cad19e52319936df18c06738389a8"
+    },
+    {
+      "file": "sortie-equipment-check.css",
+      "equal": true,
+      "sha256": "65ad55bed869d17487258765e20f62a1a0832c2adeaf97bd9f8a2d49e138d6fb"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "equal": true,
+      "sha256": "ff004c45eeb288153495c7776e6d884a4dd8dc0a378a7c739a45699f64a37303"
+    },
+    {
+      "file": "sortie-log.css",
+      "equal": true,
+      "sha256": "c0c64397b51664600853779e04681f44dbd6e5e07930d5432192505a0ca3d549"
+    },
+    {
+      "file": "sortie-log.js",
+      "equal": true,
+      "sha256": "c38deacb133e1c203bef789eec7ecc612c93ebf0eb5eba5b41badf540a605175"
+    },
+    {
+      "file": "sortie-mode.css",
+      "equal": true,
+      "sha256": "11bf688e69e53ab7e4b2ec44501abc9a677a49c9aff3244abbeef3add74a27c0"
+    },
+    {
+      "file": "sortie-mode.js",
+      "equal": true,
+      "sha256": "4a00db4af73a57f9c7d0088ba92d80e533abe0ef4253695fb61784b5766f2c0e"
+    },
+    {
+      "file": "sortie-performance-analytics.css",
+      "equal": true,
+      "sha256": "6b2248b670e2f2c386babced904a279cc829413416b2ccd9ba36c0f376a3e7cc"
+    },
+    {
+      "file": "sortie-performance-analytics.js",
+      "equal": true,
+      "sha256": "5c2afc341f7a33f9f43590c4eb19498032374cb5e0b6d40777e7b710f368210c"
+    },
+    {
+      "file": "sortie-preparation-sheet.css",
+      "equal": true,
+      "sha256": "16cae6b2b1747050464f069c55e81c4b6198d05374bee9eef15a29c2ae9f3e5f"
+    },
+    {
+      "file": "sortie-preparation-sheet.js",
+      "equal": true,
+      "sha256": "2c9651f613bdf58b4c2a3a275dca86133da9703a5d5b8251ef686956574febfd"
+    },
+    {
+      "file": "sortie-preset-manager.css",
+      "equal": true,
+      "sha256": "838c0c5d51eef9836689473779eb796f146ab79eae0cd4d9c7eebc399a3cfc82"
+    },
+    {
+      "file": "sortie-preset-manager.js",
+      "equal": true,
+      "sha256": "8124b9e99a8f9b04c3b557ed137dde83a2bc14df2a1a11fe31d51e5bc7742744"
+    },
+    {
+      "file": "sortie-readiness.css",
+      "equal": true,
+      "sha256": "0eadc72bc8a110bea01991ae9ac7ba4487007202d555544367cb29428c6f1225"
+    },
+    {
+      "file": "sortie-readiness.js",
+      "equal": true,
+      "sha256": "125c00b52e06ad801ce24c2a81774eb039bd5f8ae3de0318ae59d1c8abf12c53"
+    },
+    {
+      "file": "sortie-session.css",
+      "equal": true,
+      "sha256": "6500fc36fa3d19946681bcd4f6357acdb9befe2a49b381d44a2570d15758944c"
+    },
+    {
+      "file": "sortie-session.js",
+      "equal": true,
+      "sha256": "0e7fb21134f70468ef8312e779330c0b7b5f00cbe24aa74abd366f1785096a23"
+    },
+    {
+      "file": "stability-integration.js",
+      "equal": true,
+      "sha256": "edf716932378f6c5f64eb618d4eb07e996f17f65420ff8b010ffac669a736162"
+    },
+    {
+      "file": "strategy-goals.js",
+      "equal": true,
+      "sha256": "e409a14b12086ba24ef550996e1536ba2276af534cd8ac80c83b6a21ae2154c8"
+    },
+    {
+      "file": "styles.css",
+      "equal": true,
+      "sha256": "02e5cea218b30638e2555d3046db8f0c2bf45d7c3bfbaf6b7b37fdf9d1c067e5"
+    },
+    {
+      "file": "support-fleet-planner.css",
+      "equal": true,
+      "sha256": "94c670506911d8c964d6e296582767d4214ff905f32ca97fbfc27ff5e1fbfccb"
+    },
+    {
+      "file": "support-fleet-planner.js",
+      "equal": true,
+      "sha256": "7d84744d2cae5ec61762d3a14232841cfd0b1d00d3c9c1dd82ded93cb13a6244"
+    },
+    {
+      "file": "training-planner.css",
+      "equal": true,
+      "sha256": "6da10b1059f18347f4fbb792fcc159abefada063b55524e025406e8459887768"
+    },
+    {
+      "file": "training-planner.js",
+      "equal": true,
+      "sha256": "c9e45160233d4e0393fbeb97bf6e62d207f58e493b62daede31f9a4ffc02f233"
+    },
+    {
+      "file": "update-manager.css",
+      "equal": true,
+      "sha256": "d82c03ced8e319a9f92afc95e5be59bcdec606c5bb06c43e38d5283d8034bc4e"
+    },
+    {
+      "file": "update-manager.js",
+      "equal": true,
+      "sha256": "3823e8a20e61cd42a43807fc475bb992aca418154c1c36611610662bd5f19bd2"
+    },
+    {
+      "file": "workspace-compat.js",
+      "equal": true,
+      "sha256": "ee4ceb8546cdf917dbda75a76ad651dfbec5628b66891e74f0643aa2f173d6c7"
+    },
+    {
+      "file": "workspace-tabs.css",
+      "equal": true,
+      "sha256": "34b2130fca879d8912290270d21f85a474e9a0a6a65f3088dbd72cc5560a67a0"
+    },
+    {
+      "file": "workspace-tabs.js",
+      "equal": true,
+      "sha256": "2dfa48b01a718cff46faee70c04284809393f44d221040e880c9cb8f61cf74b1"
+    },
+    {
+      "file": "sw.js",
+      "equal": true,
+      "sha256": "1bbc66e5a804ed90986fcb6e54e910907765843185870275fe470e99a1bdb260"
+    },
+    {
+      "file": "package.json",
+      "equal": true,
+      "sha256": "923735bb5a36d3baa8305b17ea3c5384928edb15d4b971e53b1da41da40d5004"
+    }
+  ],
+  "matched": 152
+}
