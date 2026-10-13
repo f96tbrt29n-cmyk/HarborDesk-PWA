@@ -31,7 +31,7 @@ function hdFEPlanFromSavedFleet(map,fleet){
   const tokens=String(row.gear||'').split(/\s+\/\s+/).map(hdFEParseGearLabel);
   const normal=tokens.filter(x=>!x.expansion),ex=tokens.find(x=>x.expansion)||null;
   const items=normal.map((x,i)=>({name:x.name,star:x.star,slotIndex:i,capacity:profile?.slots?.[i]??null,category:hdFEFind(x.name)?.category||''})).filter(x=>x.name);
-  return {ship:String(row.ship||'').trim(),gameShipId:Number(row.gameShipId)||0,masterId:Number(row.masterId)||Number(db?.id)||0,type:db?.type||'',items,expansion:ex?{name:ex.name,star:ex.star}:null,missing:[],master:!!profile};
+  return {ship:String(row.ship||'').trim(),rosterId:row.rosterId||'',gameShipId:Number(row.gameShipId)||0,masterId:Number(row.masterId)||Number(db?.id)||0,type:db?.type||'',items,expansion:ex?{name:ex.name,star:ex.star}:null,missing:[],master:!!profile};
  });
  const presets=typeof MAP_PLANS!=='undefined'?(MAP_PLANS[map]?.presets||[]):[],preset=fleet?.routePreset||presets.find(p=>String(fleet?.name||'').includes(String(p?.name||'')))||null,routeInfo=preset&&typeof hdFSPresetInfo==='function'?hdFSPresetInfo(preset):null;
  return {map,ships,missing:[],masterBacked:ships.filter(x=>x.master).length,createdAt:Date.now(),source:'saved-fleet',sourceFleet:fleet||null,preset,routeInfo};
@@ -669,13 +669,13 @@ hdFEInstall();
 const HD_FE_OASW_SOURCE='https://wikiwiki.jp/kancolle/対潜攻撃#trigger_conditions';
 const HD_FE_OASW_CONFIRM_KEY='harbordesk-oasw-confirmed-v1';
 function hdFEAswRoster(ship){
- const rows=hdFERoster(),id=Number(ship.gameShipId)||0,master=Number(ship.masterId)||0;
- const matches=rows.filter(r=>id?Number(r.gameShipId)===id:master?Number(r.masterId)===master:String(r.name||'').trim()===String(ship.ship||'').trim());
+ const rows=hdFERoster(),id=Number(ship.gameShipId)||0,master=Number(ship.masterId)||0,rosterId=String(ship.rosterId||'');
+ const matches=rows.filter(r=>id?Number(r.gameShipId)===id:rosterId?String(r.id||'')===rosterId:master?Number(r.masterId)===master:String(r.name||'').trim()===String(ship.ship||'').trim());
  return matches.length===1?matches[0]:null;
 }
 function hdFEAswKey(ship,scope=''){
  const row=hdFEAswRoster(ship);
- return JSON.stringify([scope,ship.gameShipId||ship.masterId||ship.ship,ship.ship,row?.id,row?.gameShipId,row?.masterId,row?.level,row?.syncedAt,row?.gameAsw,(ship.items||[]).map(x=>[x.slotIndex,hdFEPlannedGearLabel(x)]).sort((a,b)=>a[0]-b[0]),hdFEPlannedGearLabel(ship.expansion)]);
+ return JSON.stringify([scope,ship.gameShipId||ship.masterId||ship.ship,ship.ship,row?.id,row?.gameShipId,row?.masterId,row?.level,row?.syncedAt,row?.gameAsw,row?.gameAswGearKnown,row?.gameGearSlots,row?.gameGearExpansion,row?.gameAswMods,row?.gameAswBaseline,(ship.items||[]).map(x=>[x.slotIndex,hdFEPlannedGearLabel(x)]).sort((a,b)=>a[0]-b[0]),hdFEPlannedGearLabel(ship.expansion)]);
 }
 function hdFEAswConfirmed(){try{const x=JSON.parse(localStorage.getItem(HD_FE_OASW_CONFIRM_KEY)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch{return {}}}
 function hdFEAswNumber(value){if(value==null||String(value).trim()==='')return null;const n=Number(value);return Number.isInteger(n)&&n>=0&&n<=500?n:null}
@@ -709,9 +709,17 @@ function hdFEOpeningAsw(ship,scope=''){
  const row=hdFEAswRoster(ship),key=hdFEAswKey(ship,scope),confirmed=hdFEAswNumber(hdFEAswConfirmed()[key]);let value=confirmed,source=confirmed==null?'':'入力したゲーム表示値';
  if(value==null&&row?.gameAswGearKnown===true&&Array.isArray(row.gameGearSlots)&&row.gameGearSlots.length===profile.count){
   const planned=Array.from({length:profile.count},(_,i)=>hdFEPlannedGearLabel((ship.items||[]).find(x=>x.slotIndex===i)));
-  if(planned.every((x,i)=>x===hdFENormGearLabel(row.gameGearSlots[i]))&&hdFEPlannedGearLabel(ship.expansion)===hdFENormGearLabel(row.gameGearExpansion)){value=hdFEAswNumber(row.gameAsw);if(value!=null)source='同じ装備での同期値'}
+  const actual=row.gameGearSlots.map(hdFENormGearLabel);
+  if(JSON.stringify(planned.slice().sort())===JSON.stringify(actual.slice().sort())&&hdFEPlannedGearLabel(ship.expansion)===hdFENormGearLabel(row.gameGearExpansion)){value=hdFEAswNumber(row.gameAsw);if(value!=null)source='同じ装備での同期値'}
  }
  const threshold=eligible[0].threshold;
+ // A naked synchronized stat gives a conservative floor without subtracting unknown bonuses.
+ if(value==null&&row?.gameAswGearKnown===true){
+  const naked=Array.isArray(row.gameGearSlots)&&row.gameGearSlots.length===profile.count&&row.gameGearSlots.every(x=>!String(x||'').trim())&&!String(row.gameGearExpansion||'').trim();
+  const b=row.gameAswBaseline,valid=b&&b.masterId===Number(row.masterId)&&b.level===Number(row.level)&&b.mods&&b.mods===row.gameAswMods;
+  const base=hdFEAswNumber(naked?row.gameAsw:valid?b.value:null);
+  if(base!=null){const lower=base+rawAsw,level=Number(row.level)||null;return result(lower>=threshold?'ready':'manual',`Lv${level||'未確認'}・装備なし同期値 ${base}＋装備素対潜 ${rawAsw}＝ボーナス除外下限 ${lower} / 必要 ${threshold}${lower<threshold?`（下限ではあと${threshold-lower}。艦固有ボーナス込みの表示値を要確認）`:''}。${eligible[0].label}`,{rules,value:lower,threshold,source:'装備なし同期値からの下限',lowerBound:true,shortfall:Math.max(0,threshold-lower),level,needsValue:true})}
+ }
  if(value==null)return result('manual','配備案の表示対潜値が未確認です。同じ装備にして同期するか、ゲームの艦娘詳細に出る対潜値を入力してね。',{rules,threshold,needsValue:true});
  return result(value>=threshold?'ready':'missing',`${source} ${value} / 必要 ${threshold}${value<threshold?`（あと${threshold-value}）`:''}。${eligible[0].label}`,{rules,value,threshold,source,needsValue:true});
 }

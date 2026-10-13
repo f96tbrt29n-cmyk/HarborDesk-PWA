@@ -132,7 +132,7 @@ window.addEventListener('pointercancel',e=>{if(cfPressedPointer?.id===e.pointerI
 document.addEventListener('click',()=>cfFinishPress(cfPressedPointer),true);
 window.addEventListener('blur',()=>cfFinishPress(cfPressedPointer));
 function renderCustomFleets(map){
-  if(cfPressedPointer){cfRenderPending=true;cfPendingMap=map;return}
+  if(cfPressedPointer||document.activeElement?.matches?.('#customFleetPanel [data-hd-oc-asw-target],#customFleetPanel [data-hd-oc-oasw-ship]')){cfRenderPending=true;cfPendingMap=map;return}
   const card=document.getElementById('selectedMapCard');if(!card)return;
   let host=document.getElementById('customFleetPanel');
   if(!host){host=document.createElement('section');host.id='customFleetPanel';host.className='custom-fleet-section';card.appendChild(host)}
@@ -144,6 +144,7 @@ function renderCustomFleets(map){
   if(typeof hdShipImageHydrate==='function')hdShipImageHydrate(host);
   document.getElementById('addCustomFleet').onclick=()=>openCustomFleetDialog();
 }
+document.addEventListener('focusout',e=>{if(e.target.matches?.('#customFleetPanel [data-hd-oc-asw-target],#customFleetPanel [data-hd-oc-oasw-ship]'))setTimeout(()=>{if(cfRenderPending){const map=cfPendingMap;cfRenderPending=false;renderCustomFleets(map)}},0)});
 
 document.addEventListener('change',e=>{
   if(e.target.matches('.cf-ship-input')&&typeof findRosterShip==='function'){

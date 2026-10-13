@@ -467,7 +467,8 @@ test('ASW set remedies specify compatible slots while preserving a ready radar c
  await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
  const r=await page.evaluate(()=>{
   localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'三式水中探信儀',count:1},{name:'三式爆雷投射機',count:1},{name:'10cm連装高角砲',count:1},{name:'22号対水上電探',count:1}]));
-  const db=hdFEFindShip('夕立改二'),plan={map:'1-6',ships:[{ship:'夕立改二',masterId:db.id,items:[{name:'三式水中探信儀',slotIndex:0,capacity:0},{name:'10cm連装高角砲',slotIndex:1,capacity:0},{name:'22号対水上電探',slotIndex:2,capacity:0}],expansion:null}],suggestion:{slots:[]}};
+  // This fixture tests ASW equipment synergy and radar preservation, not opening ASW.
+  const db=hdFEFindShip('夕立改二'),plan={map:'1-6',openingAswCount:0,ships:[{ship:'夕立改二',masterId:db.id,items:[{name:'三式水中探信儀',slotIndex:0,capacity:0},{name:'10cm連装高角砲',slotIndex:1,capacity:0},{name:'22号対水上電探',slotIndex:2,capacity:0}],expansion:null}],suggestion:{slots:[]}};
   const requirements=[{kind:'cap-asw',label:'対潜シナジー',minCount:1},{kind:'電探',label:'電探',minCount:1}],measure=hdOCMeasure(plan,requirements),goal=measure.goals.find(g=>g.kind==='cap-asw');
   plan.assessment={requirements,measure};const original=JSON.stringify(plan),options=hdFLSetRemedies(plan,goal),best=options.find(x=>x.available);
   const trial=structuredClone(plan);for(const change of best.changes){trial.ships[0].items=trial.ships[0].items.filter(x=>x.slotIndex!==change.slot-1);trial.ships[0].items.push({name:change.name,star:change.star,slotIndex:change.slot-1,capacity:0})}

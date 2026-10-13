@@ -205,7 +205,7 @@ function hdFLGenerate(index){
    if(picked)items.push({name:picked.name,star:picked.maxStar,stackKey:picked.key,norm:picked.norm,category:picked.item.category||'',kind,slotIndex:n,capacity});
    else{slotMissing.push(kind);missing.push({ship:slot.profile.row.name,kind,slotIndex:n,capacity})}
   }
-  ships.push({ship:slot.profile.row.name,gameShipId:Number(slot.profile.row.gameShipId)||0,masterId:Number(slot.profile.row.masterId)||Number(master?.id)||0,type:slot.profile.type||'',items,missing:slotMissing,master:!!master,expansion:null,expansionMissing:null});
+  ships.push({ship:slot.profile.row.name,rosterId:slot.profile.row.id||'',gameShipId:Number(slot.profile.row.gameShipId)||0,masterId:Number(slot.profile.row.masterId)||Number(master?.id)||0,type:slot.profile.type||'',items,missing:slotMissing,master:!!master,expansion:null,expansionMissing:null});
  });
  // Optional expansion-slot suggestions, only after every normal slot has been allocated.
  ships.forEach((row,i)=>{
@@ -229,7 +229,7 @@ function hdFLGenerate(index){
 function hdFLRequirements(plan){return typeof hdSEChecks==='function'?hdSEChecks(plan.map).rows.filter(x=>x.kind!=='基地航空隊').map(x=>({...x,minCount:Math.max(1,Number(x.minCount)||1)})):[]}
 function hdFLContext(plan){
  const label=x=>x.name+(x.star?` ★${x.star}`:'');
- return {map:plan.map,index:plan.suggestion.routeIndex??plan.index,preset:plan.suggestion.preset||null,fleet:{id:`auto:${plan.map}:${plan.index}`,name:`${plan.map} 自動配備`,routePreset:plan.suggestion.preset||null,ships:plan.ships.map(s=>({ship:s.ship,masterId:s.masterId,gameShipId:s.gameShipId,gear:[...Array.from({length:s.ship?hdFLSlotCount({profile:{row:{name:s.ship},type:s.type}}):0},(_,i)=>{const x=s.items.find(x=>x.slotIndex===i);return x?label(x):''}),...(s.expansion?[`[増設] ${label(s.expansion)}`]:[])].join(' / ')}))}};
+ return {map:plan.map,index:plan.suggestion.routeIndex??plan.index,preset:plan.suggestion.preset||null,fleet:{id:`auto:${plan.map}:${plan.index}`,name:`${plan.map} 自動配備`,routePreset:plan.suggestion.preset||null,ships:plan.ships.map(s=>({ship:s.ship,rosterId:s.rosterId||'',masterId:s.masterId,gameShipId:s.gameShipId,gear:[...Array.from({length:s.ship?hdFLSlotCount({profile:{row:{name:s.ship},type:s.type}}):0},(_,i)=>{const x=s.items.find(x=>x.slotIndex===i);return x?label(x):''}),...(s.expansion?[`[増設] ${label(s.expansion)}`]:[])].join(' / ')}))}};
 }
 function hdFLAssessment(plan){
  if(typeof hdOCMeasure!=='function')return null;
@@ -372,7 +372,7 @@ function hdFLSetRemediesHtml(goal,options,plan=null){
 function hdFLAssessmentHtml(plan){
  const a=plan.assessment;if(!a)return '<p class="hd-fl-note">攻略条件の判定を読み込み中。再配備して確認してね。</p>';
  const esc=hdFLEsc,goals=a.measure.goals;
- return `<section class="hd-fl-checks"><h4>攻略に必要な装備・数値</h4>${hdSENightPolicyHtml(plan.map)}<p>${plan.searching?'海域の対策装備を手持ちから配備中…':goals.length&&goals.every(g=>g.ok)?'登録済みの装備目安は充足。下の注意点も確認してね。':'不足・未判定の項目があります。補う装備と注意点を確認してね。'}</p>${goals.map(g=>{
+ return `<section class="hd-fl-checks"><h4>攻略に必要な装備・数値</h4>${hdSENightPolicyHtml(plan.map)}<p>${plan.searching?'海域の対策装備を手持ちから配備中…':hdOCReviewHeadline(a.measure,a.reviews)}</p>${goals.map(g=>{
   const numeric=['air-value','los-value'].includes(g.kind),profile=a.profiles.find(x=>x.kind===g.kind),stock=!g.ok&&typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[g.kind]?hdSECapabilityStock(plan,g.kind):null;
   const remedies=!g.ok&&!g.unresolved&&numeric?(plan.numericRemedies?.[g.kind]||[]):[];
   const examples=!g.ok&&!numeric&&!stock?hdSECandidates(g.kind,3).filter(x=>plan.ships.some(s=>{const db=hdFEFindShip(s.ship);return db&&hdShipDbEquipCompatible(x,db)})).map(x=>x.name):[];
@@ -482,7 +482,7 @@ function hdFLSave(index){
  const map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+index,plan=HD_FL_CACHE[key]||hdFLGenerate(index);if(!map||!plan||plan.searching)return;
  const s=plan.suggestion,all=typeof loadCustomFleets==='function'?loadCustomFleets():{};all[map]=all[map]||[];
  const name=map+' 自動提案＋装備｜'+(s.preset.name||('候補'+(s.index+1)));
- const ships=Array.from({length:6},(_,i)=>{const slot=s.slots[i],r=slot?.profile?.row,p=plan.ships[i];const normal=Array.from({length:r?hdFLSlotCount(slot):0},(_,n)=>{const x=p?.items?.find(x=>x.slotIndex===n);return x?x.name+(x.star?` ★${x.star}`:''):''});if(p?.expansion)normal.push(`[増設] ${p.expansion.name}${p.expansion.star?` ★${p.expansion.star}`:''}`);return {ship:r?.name||'',gameShipId:Number(r?.gameShipId)||0,masterId:Number(p?.masterId)||Number(r?.masterId)||0,gear:normal.join(' / ')}});
+ const ships=Array.from({length:6},(_,i)=>{const slot=s.slots[i],r=slot?.profile?.row,p=plan.ships[i];const normal=Array.from({length:r?hdFLSlotCount(slot):0},(_,n)=>{const x=p?.items?.find(x=>x.slotIndex===n);return x?x.name+(x.star?` ★${x.star}`:''):''});if(p?.expansion)normal.push(`[増設] ${p.expansion.name}${p.expansion.star?` ★${p.expansion.star}`:''}`);return {ship:r?.name||'',rosterId:r?.id||'',gameShipId:Number(r?.gameShipId)||0,masterId:Number(p?.masterId)||Number(r?.masterId)||0,gear:normal.join(' / ')}});
  const memo='HarborDesk手持ち装備自動配備。所持数に加え、詳細100隻＋公式マスター全865形態の通常スロット数・搭載数・装備可否を反映。';
  const old=all[map].find(x=>x.name===name),id=old?.id||(typeof cfUid==='function'?cfUid():'fl-'+Date.now()+'-'+Math.random().toString(16).slice(2));
  const item={id,name,ships,memo,routePreset:{...s.preset},createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};all[map]=old?all[map].map(x=>x.id===id?item:x):all[map].concat(item);
