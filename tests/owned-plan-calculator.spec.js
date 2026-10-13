@@ -33,6 +33,7 @@ test('headquarters sync updates the proposal without replacing manually adjusted
  await page.evaluate(()=>{localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:99}));window.dispatchEvent(new Event('hd:kancolle-sync'))});
  await expect(page.locator('[data-hd-fc-hq]')).toHaveValue('99');await expect(page.locator('[data-hd-fc-star="0"]')).toHaveValue('9');
  await expect(page.locator('[data-hd-fc-proposal]')).toContainText('手動調整あり');
+ await expect(page.locator('[data-hd-fc-assessment]')).toContainText('攻略条件は未判定');
 });
 test('missing synced scouting stays unverified and stale proposals cannot overwrite the calculator',async({page})=>{
  const panel=await boot(page,false);await panel.locator('[data-hd-oc-calculator]').click();

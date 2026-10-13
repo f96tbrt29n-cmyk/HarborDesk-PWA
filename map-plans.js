@@ -1,5 +1,8 @@
 const MAP_PLANS={
- '1-2':{presets:[{name:'軽量5隻・軽巡1＋駆逐4',ships:'軽巡1＋駆逐4',gear:'主砲2本で夜戦連撃を準備。5隻編成を維持。',use:'通常攻略・AE（この編成では低速可）',source:'https://zekamashi.net/kancolle-kouryaku/1-2/'}],quests:[]},
+ '1-2':{presets:[{name:'軽量5隻・軽巡1＋駆逐4',ships:'軽巡1＋駆逐4',gear:'主砲2本で夜戦連撃を準備。5隻編成を維持。',use:'通常攻略・AE（この編成では低速可）',source:'https://zekamashi.net/kancolle-kouryaku/1-2/'}],quests:[],routeBranches:{path:'AE',checkedAt:'2026-10-13',sources:['https://zekamashi.net/kancolle-kouryaku/1-2/','https://zh.kcwiki.cn/wiki/镇守府海域/1-2'],checks:[
+  {id:'start-A',label:'始点→A',condition:{all:[{kind:'fleetCount',min:4,max:5},{kind:'typeCount',types:['駆逐','海防艦'],min:4,max:4}]},next:'4〜5隻にし、駆逐＋海防をちょうど4隻にする。自由枠には駆逐・海防以外を選ぶ。'},
+  {id:'A-E',label:'A→E',condition:{any:[{kind:'minSpeed',rank:10},{all:[{kind:'typeCount',types:['軽巡'],min:1,max:1},{kind:'typeCount',types:['駆逐'],min:4,max:4}]},{all:[{kind:'typeCount',types:['軽巡'],min:1,max:1},{kind:'typeCount',types:['駆逐','海防艦'],min:4,max:4},{kind:'unverified',reason:'低速の軽巡＋海防混在編成は資料の記述が一致しないため未判定'}]}]},next:'高速統一、または軽巡1＋駆逐4へ変更する。高速化装備は艦別の必要セットと所持数を確認する。'}
+ ],speedFallback:{rank:10,unless:[{all:[{kind:'typeCount',types:['軽巡'],min:1,max:1},{kind:'typeCount',types:['駆逐'],min:4,max:4}]},{all:[{kind:'typeCount',types:['軽巡'],min:1,max:1},{kind:'typeCount',types:['駆逐','海防艦'],min:4,max:4}]}]}}},
  '1-3':{presets:[{name:'軽空母2＋駆逐4',ships:'軽空母2＋駆逐4',gear:'艦戦と攻撃機を準備。駆逐は夜戦連撃。',use:'通常攻略・CFJ',source:'https://zekamashi.net/kancolle-kouryaku/1-3/'}],quests:[]},
  '1-4':{presets:[{name:'空母2＋駆逐4',ships:'空母系2＋駆逐4',gear:'艦戦と攻撃機で制空を確保。駆逐4隻を維持。',use:'通常攻略・ボス方面（経由マスは複数）',source:'https://zekamashi.net/kancolle-kouryaku/1-4/'}],quests:[]},
  '1-6':{presets:[{name:'下ルート・軽巡1＋駆逐5',ships:'軽巡1＋駆逐5',gear:'対空カットイン・対潜装備を準備。航空戦と旗艦の損傷を確認。',use:'通常攻略・下ルート AEGFBN',source:'https://zekamashi.net/kancolle-kouryaku/1-6/'}],quests:[]},

@@ -23,7 +23,7 @@ function hdOCContext(map,fleetId='',route=''){
  const presets=typeof hdMSNPresets==='function'?hdMSNPresets(map):[],index=route===''?(typeof hdMSNRouteIndex==='function'?hdMSNRouteIndex(map,presets):0):Number(route);
  return {map,fleet,preset:presets[index]||null,index};
 }
-function hdOCSignature(c){return JSON.stringify([c.map,c.fleet,c.preset,hdOCOaswTarget(c),hdFEAswConfirmed(),hdSENightPolicy(c.map),hdFLRows(),hdFERoster(),localStorage.getItem('harbordesk-kancolle-sync-v1'),typeof hdMapAirSelection==='function'?hdMapAirSelection(c.map):null])}
+function hdOCSignature(c){return JSON.stringify([c.map,c.fleet,c.preset,typeof MAP_PLANS!=='undefined'?MAP_PLANS[c.map]?.routeBranches:null,hdOCOaswTarget(c),hdFEAswConfirmed(),hdSENightPolicy(c.map),hdFLRows(),hdFERoster(),localStorage.getItem('harbordesk-kancolle-sync-v1'),typeof hdMapAirSelection==='function'?hdMapAirSelection(c.map):null])}
 function hdOCUseFleet(map,id){
  if(!hdSPSFleets(map).some(f=>String(f.id)===String(id)))return false;
  if(typeof hdMSNFleetByMap!=='undefined')hdMSNFleetByMap[map]=id;
@@ -87,13 +87,14 @@ function hdOCSpeedPart(item){
 }
 function hdOCItemMatches(kind,item){if(kind==='opening-asw')return Number(hdFOItemMeta(item).stats?.対潜)>0; if(typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[kind])return HD_SE_RECIPES[kind].some(r=>r.parts.some(part=>hdSEPartMatches(part,item)));return kind==='speed-turbine'?hdOCSpeedPart(item)==='turbine':kind==='speed-boiler'?hdOCSpeedPart(item)==='boiler':hdFOItemMatches(kind,item)}
 function hdOCMeasure(plan,requirements,unknown=[]){
- const items=hdOCAssigned(plan),air=hdFEAirCheck(plan.map,hdFEAir(items)),scouting=hdFEScouting(plan,items),speedTarget=hdFESpeedTarget(plan.routeInfo),speedGoals=speedTarget?(plan.ships||[]).flatMap((s,shipIndex)=>s.ship?[{...hdFESpeedGoal(s,speedTarget),shipIndex,targetRank:speedTarget}]:[]):[];
+ const items=hdOCAssigned(plan),air=hdFEAirCheck(plan.map,hdFEAir(items)),scouting=hdFEScouting(plan,items),speedTarget=hdFEPlanSpeedTarget(plan),speedGoals=speedTarget?(plan.ships||[]).flatMap((s,shipIndex)=>s.ship?[{...hdFESpeedGoal(s,speedTarget),shipIndex,targetRank:speedTarget}]:[]):[];
  const goals=requirements.filter(r=>r.kind!=='opening-asw'&&(!speedTarget||r.kind!=='高速化')).map(r=>{const cap=typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[r.kind]?hdSECapabilityMeasure(plan,r.kind):null,m=cap||hdFEKindCount(r.kind,items),count=r.kind==='高速化'?plan.ships.reduce((n,ship)=>n+Number(hdFEKindCount('高速化',hdOCAssigned({ships:[ship]})).count>0),0):Number(m.count)||0;return {...r,count,...(cap?.unresolved?{unresolved:true}:{}),ok:count>=r.minCount,detail:cap?`同じ艦の推奨セット ${count} / 目安 ${r.minCount}組${r.kind==='cap-night-auto'&&cap.matches?.length?'（'+cap.matches.map(x=>x.ship+'：'+x.attacks.join('・')).join(' / ')+ '）':''}` :r.kind==='高速化'?`同じ艦の標準セット ${count} / 目安 ${r.minCount}組`:`配備 ${count} / 目安 ${r.minCount}`,ratio:cap?cap.ratio:Math.min(1,count/r.minCount)}});
  if(air.enemy&&!(typeof hdSEAirOptional==='function'&&hdSEAirOptional(plan.map)))goals.push({kind:'air-value',label:air.goal==='superiority'?'制空優勢の目安':`制空${HD_MAP_AIR_GOALS[air.goal]}の目安`,count:air.ours,minCount:air.required,ok:air.status==='ready',unresolved:air.reason==='anti-air',ratio:Math.min(1,air.ours/Math.max(1,air.required),air.routeLoss?.known?air.routeLoss.minimumRatio:1),detail:`基礎制空 ${air.ours} / 目安 ${air.required}（あと ${Math.max(0,air.required-air.ours)}）${air.reason==='route'?'。通るマス未選択のため参考値・未充足扱い':air.reason==='anti-air'?'。敵防空データ不足のため未判定。装備不足とは限りません':''}${air.routeLoss?.firstGap?`。連戦モデル ${air.routeLoss.firstGap.id}・${air.routeLoss.firstGap.round}回目であと${air.routeLoss.firstGap.gap}不足`:''}`});
  if(scouting.available){const target=Math.max(...scouting.checks.map(x=>Number(x.safe)||0));goals.push({kind:'los-value',label:'索敵分岐の安全域',count:scouting.score,minCount:target,ok:scouting.status==='ready',ratio:Math.max(0,Math.min(1,scouting.score/Math.max(1,target))),detail:`33式 ${scouting.score.toFixed(2)} / 安全域 ${target}（あと ${Math.max(0,target-scouting.score).toFixed(2)}）`})}
  const oasw=hdOCOaswMeasure(plan);if(oasw.minCount)goals.push(oasw);
  // A global turbine/can total does not prove that a low-speed ship is sped up.
  const route=hdFERoute(plan),speedRequired=!!speedTarget;
+ if(route.branch?.available){const b=route.branch;goals.push({kind:'route-branches',label:b.path+'固定の分岐条件',count:b.checks.filter(x=>x.status==='ready').length,minCount:b.checks.length,ok:route.status==='ready',unresolved:route.status==='manual',ratio:b.checks.length?b.checks.reduce((n,x)=>n+x.ratio,0)/b.checks.length:0,detail:route.detail})}
  goals.push(...speedGoals);
  const speedSets=speedTarget?0:Math.max(0,...requirements.filter(x=>x.kind==='高速化').map(x=>Number(x.minCount)||0));
  const speedMinimum=part=>speedGoals.reduce((n,g)=>{const recipes=hdFESpeedRecipes(g.speed.group,speedTarget,g.speed.base);return n+(recipes.length?Math.min(...recipes.map(r=>part==='turbine'?(r.t||0):Math.max(r.n||0,r.c||0))):0)},0);
@@ -157,7 +158,7 @@ function* hdOCSearchSteps(c,limits={}){
  }
  best.measure=hdOCMeasure(best.plan,requirements,unknown);
  const speedNeed=best.measure.goals.find(x=>x.kind==='speed-turbine')?.minCount||0;
- const shortages=best.measure.goals.filter(x=>!x.ok&&!(x.kind==='air-value'&&x.unresolved)).map(goal=>{
+ const shortages=best.measure.goals.filter(x=>!x.ok&&x.kind!=='route-branches'&&!(x.kind==='air-value'&&x.unresolved)).map(goal=>{
   if(goal.kind==='opening-asw')return {...goal,goalKind:goal.kind,kind:'対潜',owned:0,placement:false,shortfall:goal.minCount-goal.count,candidates:inventory.filter(x=>hdOCItemMatches('opening-asw',x)).map(x=>x.name),asw:true};
   if(typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[goal.kind]){const profile=hdSEProfiles(c.map).find(x=>x.kind===goal.kind),stock=hdSECapabilityStock(best.plan,goal.kind);return {...goal,kind:profile?.baseKind||goal.kind,goalKind:goal.kind,capability:true,stock,owned:Number(!!stock?.complete),placement:true,shortfall:1,candidates:stock?.parts.filter(x=>x.have<x.need).flatMap(x=>HD_SE_PARTS[x.part].examples)||[]}}
   const kind=goal.kind==='air-value'?'制空':goal.kind==='los-value'?'索敵':goal.kind==='speed-ship'?'高速化':goal.kind;
@@ -294,7 +295,8 @@ function hdOCReview(plan,measure){
  }
  if(route.status==='missing')add('route','missing','編成条件を満たしていない',route.detail,'攻略する編成例に合わせて艦種・隻数・速力を見直してね。','route');
  else if(route.status==='manual')add('route','manual','進むルートの条件を要確認',route.detail,'編成例を選び、攻略するルートの艦種・隻数条件を確認してね。','route');
- const target=hdFESpeedTarget(plan.routeInfo);
+ if(route.branch?.available)add('route-source','info','分岐条件の根拠と判定範囲',`${route.branch.path}の登録分岐 / ${route.branch.checkedAt}確認。${route.branch.detail}`,'他の経路・任務条件・戦闘勝利は別途確認してください。','route',route.branch.sources[0]||'');
+ const target=hdFEPlanSpeedTarget(plan);
  if(target){const checks=(plan.ships||[]).filter(s=>s.ship).map(s=>hdFESpeedGoal(s,target)),unknown=checks.filter(g=>g.unresolved),missing=checks.filter(g=>!g.ok&&!g.unresolved);
   if(unknown.length)add('speed-data','data','速力の判定データが不足',unknown.map(g=>g.detail).join('。'),'艦娘名・改造段階を確認し、未登録の区分はゲーム側の速力で確認してね。','ships',HD_FE_SPEED_SOURCE);
   if(missing.length)add('speed','missing',hdFESpeedLabel(target)+'条件を満たしていない',missing.map(g=>g.detail).join('。'),'必要な缶の種類・改修値・配備枠を確認して再探索してね。到達不可の艦は入れ替えてね。','equipment',HD_FE_SPEED_SOURCE);
@@ -347,7 +349,9 @@ async function hdOCFindAlternatives(c,result,limits={}){
  const roster=hdFERoster().filter(row=>hdFEFindShip(row.name)&&hdFSOperational(row,live).available);
  const levelRank=row=>{const lv=Number(row.level)||0;return !lv?1000:target.low&&lv<target.low?500+target.low-lv:Math.abs(lv-(target.high||90))};
  roster.sort((a,b)=>levelRank(a)-levelRank(b));
- const quality=r=>r.measure.score-hdOCShipOwnership(r.plan).filter(x=>x.status!=='ready').length*500-(hdFERoute(r.plan).status==='missing'?200:0);
+ // Different hulls can remove speed goals entirely. Compare mean achievement,
+ // so extra already-satisfied goals cannot outweigh a verified route repair.
+ const quality=r=>{const route=hdFERoute(r.plan);return r.measure.score/Math.max(1,r.measure.goals.length)-hdOCShipOwnership(r.plan).filter(x=>x.status!=='ready').length*500-(route.status==='missing'?200:route.status==='manual'?100:0)};
  let best=result,changed=false,examined=0;const maxCandidates=Math.max(1,Math.min(40,Number(limits.maxCandidates)||24));
  const problems=hdOCShipOwnership(original),order=original.ships.map((s,i)=>i).sort((a,b)=>Number(problems.find(x=>x.index===b)?.status!=='ready')-Number(problems.find(x=>x.index===a)?.status!=='ready'));
  for(const index of order){
