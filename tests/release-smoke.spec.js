@@ -10821,3 +10821,46 @@ test('release smoke: level proximity respects ship condition and saved fleet lev
  });
  expect(result.id).toBe('ready');expect(result.text).toContain('Lv.54 / 推奨帯 Lv50〜65');expect(result.missing).toContain('Lv未確認');expect(result.oldBest).toBe('ready');expect(result.exact).toContain('Lv.52 / 推奨帯');
 });
+
+test('release smoke: strategy native edit press survives a pending header expansion', async ({ page }) => {
+  await boot(page);
+  await page.waitForFunction(()=>window.__HD_WS_SCROLL_COMPACT===true);
+  // Exercise the layout change without viewport scroll anchoring compensating it.
+  await page.addStyleTag({content:'html,body{overflow-anchor:none}'});
+  await page.evaluate(() => {
+    hdSelectGuideMap('6-5'); hdWSShowElement('home',false);
+    const s=homeGuideState();s.custom.push({id:'header-press-editor',title:'タップ中の目標',category:'map',scope:'map',map:'6-5'});homeGuideSave(s);
+  });
+  const button=page.locator('[data-home-guide-edit-open="header-press-editor"]');
+  await button.scrollIntoViewIfNeeded();
+  await expect(page.locator('body')).toHaveClass(/hd-header-compact/);
+  await button.hover({position:{x:18,y:4}});
+  await page.mouse.down();
+  const before=await button.boundingBox();
+  await page.evaluate(() => hdWSSetHeaderCompact(false));
+  const after=await button.boundingBox();
+  expect(after).toEqual(before);
+  await page.mouse.up();
+  await expect(page.locator('[data-home-guide-edit="header-press-editor"] [name="title"]')).toBeVisible();
+});
+
+test('release smoke: strategy native touch edit survives a pending header expansion', async ({ page }) => {
+  await boot(page);
+  await page.waitForFunction(()=>window.__HD_WS_SCROLL_COMPACT===true);
+  // Exercise the layout change without viewport scroll anchoring compensating it.
+  await page.addStyleTag({content:'html,body{overflow-anchor:none}'});
+  await page.evaluate(() => {
+    hdSelectGuideMap('6-5');hdWSShowElement('home',false);
+    const s=homeGuideState();s.custom.push({id:'header-touch-editor',title:'タッチ中の目標',category:'map',scope:'map',map:'6-5'});homeGuideSave(s);
+  });
+  const button=page.locator('[data-home-guide-edit-open="header-touch-editor"]');
+  await button.evaluate(el=>el.addEventListener('pointerdown',e=>{
+    window.__headerTouchPointerType=e.pointerType;
+    hdWSSetHeaderCompact(false);
+  },{once:true}));
+  await button.scrollIntoViewIfNeeded();
+  await expect(page.locator('body')).toHaveClass(/hd-header-compact/);
+  await button.tap({position:{x:18,y:4}});
+  expect(await page.evaluate(()=>window.__headerTouchPointerType)).toBe('touch');
+  await expect(page.locator('[data-home-guide-edit="header-touch-editor"] [name="title"]')).toBeVisible();
+});

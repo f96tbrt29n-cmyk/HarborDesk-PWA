@@ -398,11 +398,24 @@ function hdWSInstallKeyboardTracking(){
  window.addEventListener('orientationchange',()=>setTimeout(()=>{hdWSViewportBaseline=window.visualViewport?.height||window.innerHeight||hdWSViewportBaseline;update()},250),{passive:true});
 }
 let hdWSLastScrollY=Math.max(0,window.scrollY||0),hdWSScrollTick=false;
+let hdWSHeaderPress=null,hdWSHeaderCompactPending=null;
+function hdWSFinishHeaderPress(press,delay=0){
+ if(!press)return;
+ // A layout change must wait for click and its native default action.
+ setTimeout(()=>{
+  if(hdWSHeaderPress!==press)return;
+  hdWSHeaderPress=null;
+  const pending=hdWSHeaderCompactPending;hdWSHeaderCompactPending=null;
+  if(pending!==null)hdWSSetHeaderCompact(pending);
+ },delay);
+}
 function hdWSSetHeaderCompact(compact){
  const mobile=window.matchMedia?.('(max-width:560px)')?.matches!==false;
  const blocked=document.body.classList.contains('hd-keyboard-open')||document.querySelector('.hd-header-more[open]');
  const next=!!compact&&mobile&&!blocked&&Math.max(0,window.scrollY||0)>100;
- if(document.body.classList.contains('hd-header-compact')===next)return next;
+ const current=document.body.classList.contains('hd-header-compact');
+ if(current===next){hdWSHeaderCompactPending=null;return next}
+ if(hdWSHeaderPress){hdWSHeaderCompactPending=!!compact;return current}
  document.body.classList.toggle('hd-header-compact',next);
  requestAnimationFrame(hdWSUpdateTopbarHeight);
  return next;
@@ -418,6 +431,13 @@ function hdWSUpdateScrollCompact(){
 function hdWSInstallScrollCompact(){
  if(window.__HD_WS_SCROLL_COMPACT)return;window.__HD_WS_SCROLL_COMPACT=true;
  hdWSLastScrollY=Math.max(0,window.scrollY||0);
+ document.addEventListener('pointerdown',e=>{
+  if(e.button===0&&e.isPrimary!==false&&e.target.closest?.('#homeGuideSteps'))hdWSHeaderPress={id:e.pointerId};
+ },true);
+ window.addEventListener('pointerup',e=>{if(hdWSHeaderPress?.id===e.pointerId)hdWSFinishHeaderPress(hdWSHeaderPress,500)},true);
+ window.addEventListener('pointercancel',e=>{if(hdWSHeaderPress?.id===e.pointerId)hdWSFinishHeaderPress(hdWSHeaderPress)},true);
+ document.addEventListener('click',()=>hdWSFinishHeaderPress(hdWSHeaderPress),true);
+ window.addEventListener('blur',()=>hdWSFinishHeaderPress(hdWSHeaderPress));
  window.addEventListener('scroll',()=>{
   if(hdWSScrollTick)return;hdWSScrollTick=true;requestAnimationFrame(hdWSUpdateScrollCompact);
  },{passive:true});

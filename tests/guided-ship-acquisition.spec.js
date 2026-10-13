@@ -552,16 +552,28 @@ test('strategy goals: a cancelled press resumes pending updates without completi
     document.querySelector('[data-group="quest"]').open=true;
   });
   const button=page.locator('[data-home-guide-toggle="shared:baseSortie:B175-7-3"]');
+  // Capture the actual native press on this goal even if a background render
+  // replaces its button between preparation and pointerdown.
+  await page.evaluate(() => {
+    document.addEventListener('pointerdown', function captureGoalPress(e) {
+      if (!e.target.closest?.('[data-home-guide-toggle="shared:baseSortie:B175-7-3"]')) return;
+      window.__cancelledGoalPointer = e.pointerId;
+      document.removeEventListener('pointerdown', captureGoalPress, true);
+    }, true);
+  });
   await button.hover();
-  await button.evaluate(el=>el.addEventListener('pointerdown',e=>window.__cancelledGoalPointer=e.pointerId,{once:true}));
   await page.mouse.down();
+  await expect.poll(() => page.evaluate(() => Number.isInteger(window.__cancelledGoalPointer)),
+    { message: 'The native press must reach the goal before its pointer is cancelled' }).toBe(true);
   await page.evaluate(() => {
     const state=homeGuideState();
     state.custom.push({id:'cancel-refresh',category:'quest',title:'キャンセル後の最新目標',scope:'global',map:''});
     homeGuideSave(state);
+    hdWSSetHeaderCompact(false);
     window.dispatchEvent(new PointerEvent('pointercancel',{pointerId:window.__cancelledGoalPointer}));
   });
   await expect(page.locator('[data-group="quest"]')).toContainText('キャンセル後の最新目標');
+  await expect(page.locator('body')).not.toHaveClass(/hd-header-compact/);
   await page.mouse.up();
   await expect(button).toHaveAttribute('aria-pressed','false');
   expect(await page.evaluate(() => homeGuideState().done)).not.toContain('shared:baseSortie:B175-7-3');
