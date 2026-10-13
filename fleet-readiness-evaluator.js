@@ -272,7 +272,8 @@ function hdFEGameMatch(plan){
   if(!row||!Number(row.gameShipId)){unknown++;details.push({name:ship.ship,status:'unknown',mismatches:[]});continue}
   ids.push(Number(row.gameShipId));
   const mismatches=[],actualSlots=Array.isArray(row.gameGearSlots)?row.gameGearSlots:null;
-  if(!actualSlots){unknown++;details.push({name:ship.ship,status:'unknown',mismatches,gameShipId:Number(row.gameShipId)});continue}
+  const live=fleets.flatMap(d=>d.ships||[]).find(s=>Number(s.gameShipId)===Number(row.gameShipId));
+  if(!actualSlots||row.gameAswGearKnown===false||live?.gearKnown===false){unknown++;details.push({name:ship.ship,status:'unknown',mismatches,gameShipId:Number(row.gameShipId)});continue}
   const plannedBySlot=new Map((ship.items||[]).map(item=>[Number.isFinite(Number(item.slotIndex))?Number(item.slotIndex):0,hdFEPlannedGearLabel(item)])),maxPlanned=plannedBySlot.size?Math.max(...plannedBySlot.keys())+1:0,slotCount=Math.max(actualSlots.length,maxPlanned);
   for(let idx=0;idx<slotCount;idx++){
    const planned=plannedBySlot.get(idx)||'',actual=hdFENormGearLabel(actualSlots[idx]||'');
@@ -291,7 +292,7 @@ function hdFEGameMatch(plan){
   }
  }
  const fleetKnown=fleets.length>0&&ids.length===ships.length&&ids.length>0,fleetMatch=!!deck,status=gearMismatch||(!fleetMatch&&fleetKnown)?'partial':unknown||!fleetKnown?'manual':'ready';
- const parts=[];if(fleetMatch)parts.push(`${deck.name||'ゲーム艦隊'}一致`);else if(deckOrderMismatch)parts.push('同じ艦だが並び順が違う');else if(fleetKnown)parts.push('現在艦隊と不一致');else parts.push('現在艦隊の照合待ち');if(gearMismatch)parts.push(`装備差 ${gearMismatch}件`);else if(!unknown)parts.push('装備一致');
+ const parts=[];if(fleetMatch)parts.push(`${deck.name||'ゲーム艦隊'}一致`);else if(deckOrderMismatch)parts.push('同じ艦だが並び順が違う');else if(fleetKnown)parts.push('現在艦隊と不一致');else parts.push('現在艦隊の照合待ち');if(gearMismatch)parts.push(`装備差 ${gearMismatch}件`);else if(!unknown)parts.push('装備一致');if(unknown)parts.push(`装備情報未確認 ${unknown}隻`);
  return {status,detail:parts.join(' / '),fleetMatch,deckId:Number(deck?.deckId)||0,deckName:String(deck?.name||''),deckOrderMismatch,gearMismatch,unknown,details};
 }
 function hdFESyncFreshness(){
@@ -716,7 +717,7 @@ function hdFEOpeningAsw(ship,scope=''){
  // A naked synchronized stat gives a conservative floor without subtracting unknown bonuses.
  if(value==null&&row?.gameAswGearKnown===true){
   const naked=Array.isArray(row.gameGearSlots)&&row.gameGearSlots.length===profile.count&&row.gameGearSlots.every(x=>!String(x||'').trim())&&!String(row.gameGearExpansion||'').trim();
-  const b=row.gameAswBaseline,valid=b&&b.masterId===Number(row.masterId)&&b.level===Number(row.level)&&b.mods&&b.mods===row.gameAswMods;
+  const b=row.gameAswBaseline,valid=b&&b.slotCount===profile.count&&b.masterId===Number(row.masterId)&&b.level===Number(row.level)&&b.mods&&b.mods===row.gameAswMods;
   const base=hdFEAswNumber(naked?row.gameAsw:valid?b.value:null);
   if(base!=null){const lower=base+rawAsw,level=Number(row.level)||null;return result(lower>=threshold?'ready':'manual',`Lv${level||'未確認'}・装備なし同期値 ${base}＋装備素対潜 ${rawAsw}＝ボーナス除外下限 ${lower} / 必要 ${threshold}${lower<threshold?`（下限ではあと${threshold-lower}。艦固有ボーナス込みの表示値を要確認）`:''}。${eligible[0].label}`,{rules,value:lower,threshold,source:'装備なし同期値からの下限',lowerBound:true,shortfall:Math.max(0,threshold-lower),level,needsValue:true})}
  }
