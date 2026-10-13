@@ -108,6 +108,24 @@ test('documented 37 maps and 53 presets remain available to the existing route s
  const actual=await page.evaluate(()=>Object.keys(MAP_PLANS).map(map=>({map,count:hdMSNPresets(map).length})).sort((a,b)=>a.map.localeCompare(b.map)));
  expect(actual).toEqual(documented);expect(actual).toHaveLength(37);expect(actual.reduce((n,r)=>n+r.count,0)).toBe(53);
 });
+test('linked fleet sync retains sparse slots expansion and saved individual IDs when ship slots are missing',async({page})=>{
+ await boot(page);
+ const r=await page.evaluate(()=>{
+  const parsed=hdKcImportEmpty(),mid=hdShipDbMasterRowFor('夕立改二').id,eid=[...hdKcMasterEquipMap()].find(([,x])=>x.name==='三式水中探信儀')[0],gun=[...hdKcMasterEquipMap()].find(([,x])=>x.name==='25mm連装機銃')[0];
+  const ship={api_id:71,api_ship_id:mid,api_lv:90,api_slot:[-1,10,-1],api_slot_ex:11,api_taisen:[100,130]};parsed.ships.set(71,ship);parsed.decks.set(1,{api_id:1,api_name:'保持テスト',api_ship:[71]});
+  parsed.slotItems.set(10,{api_id:10,api_slotitem_id:eid});parsed.slotItems.set(11,{api_id:11,api_slotitem_id:gun});hdKcMergeRoster(parsed);hdKcApplyDecks(parsed);
+  const roster=hdFERoster()[0],fleet=hdKcCopyFleetToCustom(1,'1-5');fleet.ships[0].rosterId=roster.id;saveCustomFleets({'1-5':[fleet]});
+  const before=hdKcCurrentFleets()[0].ships[0],savedBefore=loadCustomFleets()['1-5'][0].ships[0],planBefore=hdFEPlanFromSavedFleet('1-5',fleet);
+  ship.api_slot=[];ship.api_slot_ex=null;parsed.completeSlotItems=true;hdKcMergeRoster(parsed);hdKcApplyDecks(parsed);
+  const after=hdKcCurrentFleets()[0].ships[0],savedAfter=loadCustomFleets()['1-5'][0].ships[0],match=hdFEGameMatch(planBefore);
+  ship.api_slot=[-1,-1,-1];ship.api_slot_ex=0;hdKcMergeRoster(parsed);hdKcApplyDecks(parsed);const cleared=loadCustomFleets()['1-5'][0].ships[0];
+  return {before,after,savedBefore,savedAfter,planBefore,match,cleared};
+ });
+ expect(r.planBefore.ships[0].items).toEqual([expect.objectContaining({name:'三式水中探信儀',slotIndex:1})]);expect(r.planBefore.ships[0].expansion.name).toBe('25mm連装機銃');
+ expect(r.after).toMatchObject({gearSlots:r.before.gearSlots,gearExpansion:r.before.gearExpansion,gearKnown:false});
+ expect(r.savedAfter).toMatchObject({gameShipId:71,rosterId:r.savedBefore.rosterId,gear:r.savedBefore.gear});expect(r.match.status).toBe('manual');expect(r.match.detail).toContain('装備情報未確認');
+ expect(r.cleared.gear).toBe('');expect(r.cleared.gameShipId).toBe(71);
+});
 test('opening ASW legacy baseline without complete slot evidence stays unverified without deleting saved data',async({page})=>{
  await boot(page);
  const r=await page.evaluate(()=>{

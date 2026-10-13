@@ -770,9 +770,9 @@ test('release smoke: game sync fills ship and equipment ledgers from latest snap
       source: 'userscripts',
       userscriptVersion: '1.0.10',
       records: [
-        { endpoint: '/kcsapi/api_port/port', payload: port([ship(101, 2, 10, [401])]), at: 1 },
+        { endpoint: '/kcsapi/api_port/port', payload: port([ship(101, 2, 10, [401,-1])]), at: 1 },
         { endpoint: '/kcsapi/api_get_member/slot_item', payload: slotPayload([{ api_id: 401, api_slotitem_id: 2, api_level: 0, api_alv: 0 }]), at: 2 },
-        { endpoint: '/kcsapi/api_port/port', payload: port([ship(201, 1, 25, [501]), ship(299, 999999, 7, [])]), at: 3 },
+        { endpoint: '/kcsapi/api_port/port', payload: port([ship(201, 1, 25, [501,-1]), ship(299, 999999, 7, [])]), at: 3 },
         { endpoint: '/kcsapi/api_get_member/slot_item', payload: slotPayload([{ api_id: 501, api_slotitem_id: 1, api_level: 2, api_alv: 0 }]), at: 4 }
       ]
     };
@@ -2192,10 +2192,16 @@ test('release smoke: planned fleet is compared with synced game fleet and gear',
 test('release smoke: game sync persists exact gear slots for comparison', async ({ page }) => {
   const errors = [];
   await boot(page, errors);
-  const source = await page.evaluate(async () => fetch('./kancolle-import.js', { cache:'no-store' }).then(r => r.text()));
-  expect(source).toContain('gameGearSlots:gearKnown||parsed.slotItems.size||parsed.completeSlotItems?gameGearSlots');
-  expect(source).toContain('gameGearExpansion:gearKnown||parsed.slotItems.size||parsed.completeSlotItems?gameGearExpansion');
-  expect(source).toContain('gearSlots,gearExpansion');
+  const data=await page.evaluate(()=>{
+    const parsed=hdKcImportEmpty(),machineGun=[...hdKcMasterEquipMap()].find(([,x])=>x.name==='25mm連装機銃')[0];
+    parsed.ships.set(101,{api_id:101,api_ship_id:1,api_lv:25,api_slot:[-1,501],api_slot_ex:502});
+    parsed.slotItems.set(501,{api_id:501,api_slotitem_id:1,api_level:2});parsed.slotItems.set(502,{api_id:502,api_slotitem_id:machineGun});
+    parsed.decks.set(1,{api_id:1,api_name:'比較テスト',api_ship:[101]});hdKcMergeRoster(parsed);hdKcApplyDecks(parsed);
+    const row=hdFERoster().find(x=>x.gameShipId===101),deck=hdKcCurrentFleets()[0].ships[0];
+    return {roster:{slots:row.gameGearSlots,expansion:row.gameGearExpansion},deck:{slots:deck.gearSlots,expansion:deck.gearExpansion,known:deck.gearKnown}};
+  });
+  expect(data.roster).toEqual({slots:['','12cm単装砲 ★2'],expansion:'25mm連装機銃'});
+  expect(data.deck).toEqual({slots:['','12cm単装砲 ★2'],expansion:'25mm連装機銃',known:true});
   expect(errors).toEqual([]);
 });
 
