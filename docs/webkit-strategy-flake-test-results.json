@@ -43,5 +43,48 @@
     "four intermittent WebKit input failures were not reproduced; root cause remains unconfirmed",
     "desktop engines only; real iPhone not tested",
     "six storage keys tested with synthetic fixtures; page reopen differs from browser or device restart"
-  ]
+  ],
+  "moved_tests_sha256": {
+    "release smoke: priority strategy view combines completion and map filters and persists": "8f2bd22fd47491d6eb77a26057646208bd972557a9864c4849df47247319ea55",
+    "release smoke: strategy goal priorities reorder manual and imported goals without changing completion": "ea695b6695d09287636bdb6eb226993ab321b2611dcab75735928928d04542bc",
+    "release smoke: strategy goal editing keeps failed changes and saves once on retry": "24fad3ba08e57b0f759807d0c66b12c3d6b0128360e320c9fe1cbea05023d4b9",
+    "strategy integration: prerequisite checkbox and cleared map share one completion state": "f5e377febe6a070603e1c088b3c56d1c7aed32f7ab7f7c8d8529a9c1d2b8ea6a"
+  },
+  "targeted_final": {
+    "startTime": "2026-10-14T03:28:32.801Z",
+    "duration": 202583.948,
+    "expected": 8,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "trace_scope_comparison": {
+    "same_workers": 2,
+    "same_test_timeout_ms": 45000,
+    "before_failed": 2,
+    "before_log": "/tmp/harbordesk-577-trace-cost.log",
+    "after": {
+      "startTime": "2026-10-14T03:25:57.539Z",
+      "duration": 11554.578000000001,
+      "expected": 2,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "ci_initial": {
+    "run": 38503088183,
+    "head": "2cbc7eab6988db75b60b1c294ab860953d7dfebf",
+    "required_jobs_successful": 5,
+    "required_jobs_failed": 1,
+    "failed_cases": 2,
+    "webkit_no_retry_repeat_passed": 12,
+    "webkit_shard_first_pass_counts": [
+      148,
+      147,
+      147,
+      147
+    ],
+    "chromium_suite_registered_cases": 589
+  }
 }

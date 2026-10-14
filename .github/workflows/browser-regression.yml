@@ -79,7 +79,7 @@ jobs:
 
       - name: Investigate remaining strategy input failures without retries
         if: matrix.browser == 'webkit' && matrix.shard == 1
-        run: npx playwright test tests/release-smoke.spec.js tests/guided-ship-acquisition.spec.js --project=webkit --workers=1 --retries=0 --repeat-each=3 --grep 'prerequisite checkbox and cleared map|priority strategy view combines completion|priorities reorder manual|editing keeps failed changes'
+        run: npx playwright test tests/strategy-input-regression.spec.js --project=webkit --workers=1 --retries=0 --repeat-each=3 --grep 'prerequisite checkbox and cleared map|priority strategy view combines completion|priorities reorder manual|editing keeps failed changes'
 
       - name: Run smoke browser regression
         run: npm run test:browser -- --project=${{ matrix.browser }} --workers=${{ matrix.workers }} --shard=${{ matrix.shard }}/${{ matrix.shards }}
