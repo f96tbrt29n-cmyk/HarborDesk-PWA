@@ -1,7 +1,36 @@
 {
-  "version": "1.0.577",
-  "build": 577,
-  "releasedAt": "2026-10-14T08:12:09.450+09:00",
-  "notes": "攻略のやることリストを押している間のヘッダー変更をクリック・取消の完了まで待機し、ボタンの移動による編集操作の取りこぼしを修正。取消時の実ポインタ確認と失敗時トレースを補強。公開v576のコード152ファイル一致を記録。",
-  "masterChanges": null
+  "version": "1.0.578",
+  "build": 578,
+  "releasedAt": "2026-10-15T03:59:18.598+09:00",
+  "notes": "艦これマスター自動同期。api_start2 23637be / 装備picker e38bdbc を反映。艦娘変更 2件 / 新装備 0件 / 装備変更 0件 / 増設ルール 5件。",
+  "masterChanges": {
+    "baseline": false,
+    "from": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
+    "to": "23637be57ac23a7b4281f193b836fa568ead8ee4",
+    "at": "2026-10-14T18:59:18.588Z",
+    "ships": {
+      "added": [
+        "902"
+      ],
+      "removed": [],
+      "changed": [
+        "391"
+      ]
+    },
+    "equipment": {
+      "added": [],
+      "removed": [],
+      "changed": []
+    },
+    "exslot": {
+      "changed": true,
+      "itemRulesChanged": 5,
+      "limitShipsChanged": 0
+    },
+    "picker": {
+      "changed": false,
+      "slotRulesChanged": 0,
+      "overrideChanged": 0
+    }
+  }
 }
