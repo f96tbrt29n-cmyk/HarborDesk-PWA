@@ -93,7 +93,7 @@ test('owned equipment UI shows shortages and saves only a current proposal while
 // Synthetic route contracts isolate numerical search; production 1-1 has no LOS requirement.
 test('owned equipment search reaches a numeric scouting threshold rather than just filling a radar slot',async({page})=>{
  await prepare(page,[{name:'33号水上電探',count:2,star:0}],[]);
- const r=await page.evaluate(()=>{HD_MAP_ROUTE_REQUIREMENTS['1-1'][0].los={kind:'required',coef:3,checks:[{label:'テスト用索敵目標',safe:32,failBelow:25}]};HD_MAP_ROUTE_REQUIREMENTS['1-1'][0].engine='verified-graph';localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:20}));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',gameLos:36},{name:'時雨改二',gameLos:36}]));return hdOCSearch(hdOCContext('1-1','oc-test',0))});
+ const r=await page.evaluate(()=>{HD_MAP_ROUTE_REQUIREMENTS['1-1'][0].los={kind:'required',coef:3,checks:[{label:'テスト用索敵目標',safe:32,failBelow:25}]};HD_MAP_ROUTE_REQUIREMENTS['1-1'][0].engine='verified-graph';MAP_PLANS['1-1'].routeBranches={schemaVersion:2,path:'数値探索専用fixture',checks:[{id:'fixture-fleet',label:'2隻の数値探索fixture',condition:{kind:'fleetCount',min:2,max:2}}]};localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:20}));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',gameLos:36},{name:'時雨改二',gameLos:36}]));return hdOCSearch(hdOCContext('1-1','oc-test',0))});
  expect(r.measure.complete).toBeTruthy();expect(r.measure.goals.find(x=>x.kind==='los-value').count).toBeGreaterThanOrEqual(32);expect(r.plan.ships.flatMap(x=>x.items).length).toBe(2);
 });
 
@@ -468,7 +468,7 @@ test('map equipment capabilities: stock refresh clears a resolved component shor
 
 test('equipment reviews distinguish missing synced scouting fields and resolve after syncing',async({page})=>{
  await prepare(page,[{name:'33号水上電探',count:1,star:0}],[{kind:'電探',label:'電探',minCount:1}]);
- await page.evaluate(()=>{HD_MAP_ROUTE_REQUIREMENTS['1-1'][0].los={kind:'required',coef:3,checks:[{safe:1,failBelow:0}]};HD_MAP_ROUTE_REQUIREMENTS['1-1'][0].engine='verified-graph';localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',gameLos:36}]));});
+ await page.evaluate(()=>{HD_MAP_ROUTE_REQUIREMENTS['1-1'][0].los={kind:'required',coef:3,checks:[{safe:1,failBelow:0}]};HD_MAP_ROUTE_REQUIREMENTS['1-1'][0].engine='verified-graph';MAP_PLANS['1-1'].routeBranches={schemaVersion:2,path:'数値探索専用fixture',checks:[{id:'fixture-fleet',label:'2隻の数値探索fixture',condition:{kind:'fleetCount',min:2,max:2}}]};localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',gameLos:36}]));});
  const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await panel.locator('[data-hd-oc-search]').click();
  const warning=panel.locator('[data-hd-oc-review-id="scouting"]');await expect(warning).toContainText('司令部Lv、時雨改二 の索敵値');await expect(warning).not.toContainText('夕立改二 の索敵値');await expect(panel.locator('[data-hd-oc-review-kind="data"]')).toBeVisible();
  await warning.locator('button').click();await expect(page.locator('#kancolleImport')).toBeVisible();

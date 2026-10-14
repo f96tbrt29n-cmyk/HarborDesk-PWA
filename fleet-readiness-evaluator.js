@@ -19,6 +19,8 @@ function hdFEFindShip(name){
  const rows=typeof HD_SHIP_DATABASE!=='undefined'?HD_SHIP_DATABASE:[];
  return rows.find(x=>x.final===name||x.base===name)||null;
 }
+// Leave the right-side whitespace for the next separator, preserving empty slots.
+function hdFEGearTokens(gear){return String(gear||'').split(/\s+\/(?=\s|$)/).map(x=>x.trim())}
 function hdFEParseGearLabel(label){
  let s=String(label||'').trim(),expansion=false,star=0;
  if(/^\[増設\]/.test(s)){expansion=true;s=s.replace(/^\[増設\]\s*/,'').trim()}
@@ -28,7 +30,7 @@ function hdFEParseGearLabel(label){
 function hdFEPlanFromSavedFleet(map,fleet){
  const ships=(fleet?.ships||[]).filter(x=>String(x.ship||'').trim()||String(x.gear||'').trim()).map(row=>{
   const db=hdFEFindShip(String(row.ship||'').trim()),profile=db&&typeof hdShipDbSlotProfile==='function'?hdShipDbSlotProfile(db):null;
-  const tokens=String(row.gear||'').split(/\s+\/\s+/).map(hdFEParseGearLabel);
+  const tokens=hdFEGearTokens(row.gear).map(hdFEParseGearLabel);
   const normal=tokens.filter(x=>!x.expansion),ex=tokens.find(x=>x.expansion)||null;
   const items=normal.map((x,i)=>({name:x.name,star:x.star,slotIndex:i,capacity:profile?.slots?.[i]??null,category:hdFEFind(x.name)?.category||''})).filter(x=>x.name);
   return {ship:String(row.ship||'').trim(),rosterId:row.rosterId||'',gameShipId:Number(row.gameShipId)||0,masterId:Number(row.masterId)||Number(db?.id)||0,type:db?.type||'',items,expansion:ex?{name:ex.name,star:ex.star}:null,missing:[],master:!!profile};
@@ -530,7 +532,7 @@ function hdFERoute(plan){
  const info=plan?.suggestion?.info||plan?.routeInfo;
  // The canonical preset is an example; verified AE alternatives need not contain
  // a light cruiser. Explicit quest/flagship constraints remain in force.
- const example=!info||MAP_PLANS[plan.map].presets.some(p=>JSON.stringify(info)===JSON.stringify(hdFSPresetInfo(p)));
+ const example=!info||MAP_PLANS[plan.map].presets.some(p=>{const canonical=hdFSPresetInfo(p);return ['text','requirements','total','conditionManual','speedRequired','flagship'].every(k=>JSON.stringify(info[k])===JSON.stringify(canonical[k]))});
  const status=example?branch.status:basic.status==='missing'||branch.status==='missing'?'missing':basic.status!=='ready'||branch.status!=='ready'?'manual':'ready';
  return {...basic,status,branch,requirements:example?[]:basic.requirements,speedTarget:hdFEPlanSpeedTarget(plan),detail:(example?'':basic.detail+' / ')+branch.detail};
 }
