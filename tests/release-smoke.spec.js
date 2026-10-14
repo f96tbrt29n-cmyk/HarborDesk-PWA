@@ -1,11 +1,13 @@
 const { test, expect } = require('@playwright/test');
+const { installStrategyInputDiagnostics } = require('./strategy-input-diagnostics.cjs');
+installStrategyInputDiagnostics(test);
 const APP_BUILD = require('../app-version.json').build;
 
 test.use({
   viewport: { width: 390, height: 844 },
   hasTouch: true,
   isMobile: true,
-  serviceWorkers: 'block'
+  serviceWorkers: 'block', trace: 'retain-on-failure'
 });
 
 async function boot(page, errors = []) {

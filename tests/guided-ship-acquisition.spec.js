@@ -1,6 +1,8 @@
 const { test, expect } = require('@playwright/test');
+const { installStrategyInputDiagnostics } = require('./strategy-input-diagnostics.cjs');
+installStrategyInputDiagnostics(test);
 
-test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, serviceWorkers: 'block' });
+test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, serviceWorkers: 'block', trace: 'retain-on-failure' });
 
 async function openApp(page) {
   await page.route('**/*',route=>{const url=new URL(route.request().url());return ['127.0.0.1','localhost'].includes(url.hostname)?route.continue():route.fulfill({status:204,body:''})});

@@ -1,0 +1,47 @@
+{
+  "base_main": "f6fbe2f4c7144a6db4a6dad2a92c2573e132c771",
+  "public_version": "1.0.577",
+  "public_build": 577,
+  "public_files_matched": 152,
+  "runs": {
+    "diagnostics": {
+      "startTime": "2026-10-14T02:26:22.683Z",
+      "duration": 479271.769,
+      "expected": 12,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "checks": {
+      "startTime": "2026-10-14T02:35:29.947Z",
+      "duration": 252966.816,
+      "expected": 12,
+      "skipped": 0,
+      "unexpected": 2,
+      "flaky": 0
+    },
+    "regression": {
+      "startTime": "2026-10-14T02:40:28.398Z",
+      "duration": 392120.64999999997,
+      "expected": 68,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "artifact_followup": {
+    "passed": 6,
+    "retries": 0,
+    "prior_trace_files_unchanged": 6,
+    "prior_trace_files_checked": 6
+  },
+  "node_test_files_passed": 4,
+  "runtime_js_syntax_files_passed": 89,
+  "master_audit_warnings": [],
+  "limitations": [
+    "checks run includes two initial Chromium data URL policy failures; fixed fixture verified in later runs",
+    "four intermittent WebKit input failures were not reproduced; root cause remains unconfirmed",
+    "desktop engines only; real iPhone not tested",
+    "six storage keys tested with synthetic fixtures; page reopen differs from browser or device restart"
+  ]
+}

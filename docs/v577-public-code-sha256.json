@@ -1,0 +1,922 @@
+{
+  "checked_at": "2026-10-14T02:27:02.694045+00:00",
+  "revision": "f6fbe2f4c7144a6db4a6dad2a92c2573e132c771",
+  "base_url": "https://f96tbrt29n-cmyk.github.io/HarborDesk-PWA/",
+  "files": 152,
+  "matches": 152,
+  "mismatches": [],
+  "results": [
+    {
+      "file": "HarborDesk-Kancolle.meta.js",
+      "matches": true,
+      "git_sha256": "bc4698b4cd9972d20a4d88c30a306bce2b5cb31d12b5f192b86672cdc2e4cf21",
+      "public_sha256": "bc4698b4cd9972d20a4d88c30a306bce2b5cb31d12b5f192b86672cdc2e4cf21"
+    },
+    {
+      "file": "HarborDesk-Kancolle.user.js",
+      "matches": true,
+      "git_sha256": "a49fa9f6ac7fa62dd4c2e461879e2fcdb20d1433ea889433e7d108aa738c6567",
+      "public_sha256": "a49fa9f6ac7fa62dd4c2e461879e2fcdb20d1433ea889433e7d108aa738c6567"
+    },
+    {
+      "file": "activity-logger.css",
+      "matches": true,
+      "git_sha256": "0611e1b8768af7d91fcc7cac2ffa8956dfc06780866ca90cd607d20c7c072639",
+      "public_sha256": "0611e1b8768af7d91fcc7cac2ffa8956dfc06780866ca90cd607d20c7c072639"
+    },
+    {
+      "file": "activity-logger.js",
+      "matches": true,
+      "git_sha256": "e2c3ab576ce27ffa924e53c06afe66bed52af7169460cfa24c9a095365361fe6",
+      "public_sha256": "e2c3ab576ce27ffa924e53c06afe66bed52af7169460cfa24c9a095365361fe6"
+    },
+    {
+      "file": "advanced-tools.css",
+      "matches": true,
+      "git_sha256": "2b0ac11a29ddb689be4c10a7a0087afc8141b5b66c8fb84091ee9c6b5f464f18",
+      "public_sha256": "2b0ac11a29ddb689be4c10a7a0087afc8141b5b66c8fb84091ee9c6b5f464f18"
+    },
+    {
+      "file": "advanced-tools.js",
+      "matches": true,
+      "git_sha256": "5240fe70fc22f4c01d1e65e63cb1cd621ce99cbe3a252b1c39562f93a4081aac",
+      "public_sha256": "5240fe70fc22f4c01d1e65e63cb1cd621ce99cbe3a252b1c39562f93a4081aac"
+    },
+    {
+      "file": "app.js",
+      "matches": true,
+      "git_sha256": "80e8f404a8a8ebae8c3b780e19e01a7a010b032da57bb16a7e42e9a0cdb623f1",
+      "public_sha256": "80e8f404a8a8ebae8c3b780e19e01a7a010b032da57bb16a7e42e9a0cdb623f1"
+    },
+    {
+      "file": "command-center.css",
+      "matches": true,
+      "git_sha256": "440444a1b9447b10055df842f487c21cea16d390d2fda1b2a2f6eeed229184be",
+      "public_sha256": "440444a1b9447b10055df842f487c21cea16d390d2fda1b2a2f6eeed229184be"
+    },
+    {
+      "file": "command-center.js",
+      "matches": true,
+      "git_sha256": "550406a5d10ac0f0ea831bc29dde155648a07f8498ce850c0e38a33b241cabe7",
+      "public_sha256": "550406a5d10ac0f0ea831bc29dde155648a07f8498ce850c0e38a33b241cabe7"
+    },
+    {
+      "file": "construction-database.css",
+      "matches": true,
+      "git_sha256": "f701289bc9634b6302563b5e03fd21761f2dd097c97f740350336e6af0272528",
+      "public_sha256": "f701289bc9634b6302563b5e03fd21761f2dd097c97f740350336e6af0272528"
+    },
+    {
+      "file": "construction-database.js",
+      "matches": true,
+      "git_sha256": "3a1ff7a8a130920f2cb42b3f0dc0668ba9f78eeb7374e54f9119f5275891023f",
+      "public_sha256": "3a1ff7a8a130920f2cb42b3f0dc0668ba9f78eeb7374e54f9119f5275891023f"
+    },
+    {
+      "file": "custom-fleets.css",
+      "matches": true,
+      "git_sha256": "88d1d9f212aa6dd4a7567abe5ebe9dbaddaf5458c2d88c51ab33ff1f066626ce",
+      "public_sha256": "88d1d9f212aa6dd4a7567abe5ebe9dbaddaf5458c2d88c51ab33ff1f066626ce"
+    },
+    {
+      "file": "custom-fleets.js",
+      "matches": true,
+      "git_sha256": "1ede583b892f124970a23ccf1755b8e8c00d6826ee6d01d4652706d80ee7f30f",
+      "public_sha256": "1ede583b892f124970a23ccf1755b8e8c00d6826ee6d01d4652706d80ee7f30f"
+    },
+    {
+      "file": "daily-ops.js",
+      "matches": true,
+      "git_sha256": "2b472b6577b3a6e269017634709c8e95e35ff0644603c1703e64016e39cf1110",
+      "public_sha256": "2b472b6577b3a6e269017634709c8e95e35ff0644603c1703e64016e39cf1110"
+    },
+    {
+      "file": "development-recipes.css",
+      "matches": true,
+      "git_sha256": "8ae5487fd653bc2882ea55e98667ccd86fc4a9dab03425f4542a7c76a8faafb8",
+      "public_sha256": "8ae5487fd653bc2882ea55e98667ccd86fc4a9dab03425f4542a7c76a8faafb8"
+    },
+    {
+      "file": "development-recipes.js",
+      "matches": true,
+      "git_sha256": "9ee455ec94f8601d9516615c489ae7ed59b98b546504cbd09af45cabefd94e88",
+      "public_sha256": "9ee455ec94f8601d9516615c489ae7ed59b98b546504cbd09af45cabefd94e88"
+    },
+    {
+      "file": "diagnostics-center.css",
+      "matches": true,
+      "git_sha256": "40126c5476199aff6308d6aeb11f31e2054234470c40e0c8c8f1a1d896c3ca22",
+      "public_sha256": "40126c5476199aff6308d6aeb11f31e2054234470c40e0c8c8f1a1d896c3ca22"
+    },
+    {
+      "file": "diagnostics-center.js",
+      "matches": true,
+      "git_sha256": "0ba273cb8baa67b0ce790c94e8c8939b07ff7ac2eaf04a03aca03099918bbdc5",
+      "public_sha256": "0ba273cb8baa67b0ce790c94e8c8939b07ff7ac2eaf04a03aca03099918bbdc5"
+    },
+    {
+      "file": "drop-hunting.css",
+      "matches": true,
+      "git_sha256": "d99b8b42158a32cf2e23267694eabb637a5beef2dd3fda7bdfdf02fb76f0f0ff",
+      "public_sha256": "d99b8b42158a32cf2e23267694eabb637a5beef2dd3fda7bdfdf02fb76f0f0ff"
+    },
+    {
+      "file": "drop-hunting.js",
+      "matches": true,
+      "git_sha256": "304cd3a825742a20b01cb8e3f223d8ed21a256cc68ca5702b1e1df7231284632",
+      "public_sha256": "304cd3a825742a20b01cb8e3f223d8ed21a256cc68ca5702b1e1df7231284632"
+    },
+    {
+      "file": "enemy-anti-air-data.js",
+      "matches": true,
+      "git_sha256": "25d648dc51cb1e8a03eaa0fe4eb67aa35e425f1150cc79ef028331d45d518e07",
+      "public_sha256": "25d648dc51cb1e8a03eaa0fe4eb67aa35e425f1150cc79ef028331d45d518e07"
+    },
+    {
+      "file": "enemy-anti-air.js",
+      "matches": true,
+      "git_sha256": "07eb910a832d63c051475d3500f0d99777c9ae19e29b09cee5b46f619a1354a6",
+      "public_sha256": "07eb910a832d63c051475d3500f0d99777c9ae19e29b09cee5b46f619a1354a6"
+    },
+    {
+      "file": "eo-tracker.css",
+      "matches": true,
+      "git_sha256": "e9e0ee16725612d65b772fb1933888dec3e88c49f6d3ad6e289b285d796e9ee8",
+      "public_sha256": "e9e0ee16725612d65b772fb1933888dec3e88c49f6d3ad6e289b285d796e9ee8"
+    },
+    {
+      "file": "eo-tracker.js",
+      "matches": true,
+      "git_sha256": "eec07e1be9c0a49c38a275f42e7db9c76219e1fd71d9336b847a46995cac8674",
+      "public_sha256": "eec07e1be9c0a49c38a275f42e7db9c76219e1fd71d9336b847a46995cac8674"
+    },
+    {
+      "file": "equipment-acquisition-guide.css",
+      "matches": true,
+      "git_sha256": "6f3d56812611f223503097fe3c4a388915233242b7e6ad309b90d800919b8798",
+      "public_sha256": "6f3d56812611f223503097fe3c4a388915233242b7e6ad309b90d800919b8798"
+    },
+    {
+      "file": "equipment-acquisition-guide.js",
+      "matches": true,
+      "git_sha256": "9713a12b63bfd816fbcdca46d83721cad8555d93e18daaf068f68f8aa277468f",
+      "public_sha256": "9713a12b63bfd816fbcdca46d83721cad8555d93e18daaf068f68f8aa277468f"
+    },
+    {
+      "file": "equipment-analyzer.css",
+      "matches": true,
+      "git_sha256": "f3e8a9ef6e5a339c821847a78f3e7b9f47dbbc3e7b113a712d06e7db784a3b63",
+      "public_sha256": "f3e8a9ef6e5a339c821847a78f3e7b9f47dbbc3e7b113a712d06e7db784a3b63"
+    },
+    {
+      "file": "equipment-analyzer.js",
+      "matches": true,
+      "git_sha256": "f8ef2a8edcc72ff990fa69e7e36fd3245951aa39667cba2b362901159b59b514",
+      "public_sha256": "f8ef2a8edcc72ff990fa69e7e36fd3245951aa39667cba2b362901159b59b514"
+    },
+    {
+      "file": "equipment-catalog-extra.js",
+      "matches": true,
+      "git_sha256": "64d093e654ec1b819213058fced1d6fad7491c6ffee36794392016aa5c13df95",
+      "public_sha256": "64d093e654ec1b819213058fced1d6fad7491c6ffee36794392016aa5c13df95"
+    },
+    {
+      "file": "equipment-catalog-extra2.js",
+      "matches": true,
+      "git_sha256": "b49d2f96b6ee4c46b1835c85575468c3e5937b53c5e6a78157d6d1d6d9764b39",
+      "public_sha256": "b49d2f96b6ee4c46b1835c85575468c3e5937b53c5e6a78157d6d1d6d9764b39"
+    },
+    {
+      "file": "equipment-catalog-extra3.js",
+      "matches": true,
+      "git_sha256": "0bcbcdf636095251b8695f274ca353769b2ca82f6fd00b8c7f8c056bdf7fdc15",
+      "public_sha256": "0bcbcdf636095251b8695f274ca353769b2ca82f6fd00b8c7f8c056bdf7fdc15"
+    },
+    {
+      "file": "equipment-catalog-extra4.js",
+      "matches": true,
+      "git_sha256": "5ff7f5eec12cbcb5ea547e015077cd9efeb38324d4613928106be391929f0d58",
+      "public_sha256": "5ff7f5eec12cbcb5ea547e015077cd9efeb38324d4613928106be391929f0d58"
+    },
+    {
+      "file": "equipment-catalog-ui-patch.js",
+      "matches": true,
+      "git_sha256": "959d4c0c97b137ac2a810a363e848c3749d982dcb8a4465424ba5cd79b238ab7",
+      "public_sha256": "959d4c0c97b137ac2a810a363e848c3749d982dcb8a4465424ba5cd79b238ab7"
+    },
+    {
+      "file": "equipment-catalog.css",
+      "matches": true,
+      "git_sha256": "8b5275232a3c7da06ffd8a435cb3e290d22f695896e35513fa827b724fc95a73",
+      "public_sha256": "8b5275232a3c7da06ffd8a435cb3e290d22f695896e35513fa827b724fc95a73"
+    },
+    {
+      "file": "equipment-catalog.js",
+      "matches": true,
+      "git_sha256": "86fe01df833301dede40a73ff02784b724e37a5413dfc96c14586048f5d6b3ee",
+      "public_sha256": "86fe01df833301dede40a73ff02784b724e37a5413dfc96c14586048f5d6b3ee"
+    },
+    {
+      "file": "equipment-procurement-list.css",
+      "matches": true,
+      "git_sha256": "16f83199f3d2fa3befc2a3d3f20fe29e7cee7223bebf39fb255662e1efd8fbf3",
+      "public_sha256": "16f83199f3d2fa3befc2a3d3f20fe29e7cee7223bebf39fb255662e1efd8fbf3"
+    },
+    {
+      "file": "equipment-procurement-list.js",
+      "matches": true,
+      "git_sha256": "83ec1a1a810fc5125ba8e6953ab52878d348559410b5cbb0c7279cab14958996",
+      "public_sha256": "83ec1a1a810fc5125ba8e6953ab52878d348559410b5cbb0c7279cab14958996"
+    },
+    {
+      "file": "event-operations.js",
+      "matches": true,
+      "git_sha256": "3974644ea9d17cc076a4e81f4215ad533acb2ae94f52573756f9980ce1b2da6d",
+      "public_sha256": "3974644ea9d17cc076a4e81f4215ad533acb2ae94f52573756f9980ce1b2da6d"
+    },
+    {
+      "file": "exercise-routine.css",
+      "matches": true,
+      "git_sha256": "65fbf2475ee85a594fc905fcccfd765830b587477ddf2c2d44a697665d896e4f",
+      "public_sha256": "65fbf2475ee85a594fc905fcccfd765830b587477ddf2c2d44a697665d896e4f"
+    },
+    {
+      "file": "exercise-routine.js",
+      "matches": true,
+      "git_sha256": "6a4279625490635a74279e08eb4392c2f79c033237a12b8fe398af46d662b735",
+      "public_sha256": "6a4279625490635a74279e08eb4392c2f79c033237a12b8fe398af46d662b735"
+    },
+    {
+      "file": "expedition-database.css",
+      "matches": true,
+      "git_sha256": "9db84120f76980cfd1820ef91737e4fecc715b0c1d8417590ba81c34bb241a21",
+      "public_sha256": "9db84120f76980cfd1820ef91737e4fecc715b0c1d8417590ba81c34bb241a21"
+    },
+    {
+      "file": "expedition-database.js",
+      "matches": true,
+      "git_sha256": "2461121d80b146a53c1ac10881cc736e17c06c8d9198bdd71d6b33957845452c",
+      "public_sha256": "2461121d80b146a53c1ac10881cc736e17c06c8d9198bdd71d6b33957845452c"
+    },
+    {
+      "file": "expedition-fleet-manager-patch.js",
+      "matches": true,
+      "git_sha256": "944a7c939ce977343d1d8c495ea375360893d471c6ffe412fbe79d1b12b971d7",
+      "public_sha256": "944a7c939ce977343d1d8c495ea375360893d471c6ffe412fbe79d1b12b971d7"
+    },
+    {
+      "file": "expedition-fleet-manager.css",
+      "matches": true,
+      "git_sha256": "d936d492f84126f9578fdada1d3bd431053558585036d17b9111bdd606d584d6",
+      "public_sha256": "d936d492f84126f9578fdada1d3bd431053558585036d17b9111bdd606d584d6"
+    },
+    {
+      "file": "expedition-fleet-manager.js",
+      "matches": true,
+      "git_sha256": "433a5edc37783a32d3adac4a10c896f168768fd81c3aedf0eee1f99a19cc1257",
+      "public_sha256": "433a5edc37783a32d3adac4a10c896f168768fd81c3aedf0eee1f99a19cc1257"
+    },
+    {
+      "file": "expedition-stats-extension.css",
+      "matches": true,
+      "git_sha256": "ebcf46d9a7179ac45cbe53298ca23c138be7ea9bd47c76c4b6c14c569b6743b3",
+      "public_sha256": "ebcf46d9a7179ac45cbe53298ca23c138be7ea9bd47c76c4b6c14c569b6743b3"
+    },
+    {
+      "file": "expedition-stats-extension.js",
+      "matches": true,
+      "git_sha256": "95f112b7d3ea843a98513c8412eedbeb09e3332a6839d09ad72b54b16678b706",
+      "public_sha256": "95f112b7d3ea843a98513c8412eedbeb09e3332a6839d09ad72b54b16678b706"
+    },
+    {
+      "file": "fleet-calculator-fix.js",
+      "matches": true,
+      "git_sha256": "cd31803adfd91f4223c376048db70b3d839deb482ff9681e6f5db04509cdeaf9",
+      "public_sha256": "cd31803adfd91f4223c376048db70b3d839deb482ff9681e6f5db04509cdeaf9"
+    },
+    {
+      "file": "fleet-calculator.css",
+      "matches": true,
+      "git_sha256": "f3b194403ca045dc6bde793d902d9f5c09c32a3b4566feedaec8edb2ed084c5f",
+      "public_sha256": "f3b194403ca045dc6bde793d902d9f5c09c32a3b4566feedaec8edb2ed084c5f"
+    },
+    {
+      "file": "fleet-calculator.js",
+      "matches": true,
+      "git_sha256": "79840479b8e150b12ea584d929263f09233b217d4c85faebba8c8e26e3ddb13c",
+      "public_sha256": "79840479b8e150b12ea584d929263f09233b217d4c85faebba8c8e26e3ddb13c"
+    },
+    {
+      "file": "fleet-loadout-optimizer.css",
+      "matches": true,
+      "git_sha256": "29be238edac0a66c956c4ab0de21616349212154d20aedaece5de13f383de205",
+      "public_sha256": "29be238edac0a66c956c4ab0de21616349212154d20aedaece5de13f383de205"
+    },
+    {
+      "file": "fleet-loadout-optimizer.js",
+      "matches": true,
+      "git_sha256": "6fb8d62f0ee9253500b2424e52fa65112faaf151c4130ee010acc477cc8b0a71",
+      "public_sha256": "6fb8d62f0ee9253500b2424e52fa65112faaf151c4130ee010acc477cc8b0a71"
+    },
+    {
+      "file": "fleet-loadout-planner.css",
+      "matches": true,
+      "git_sha256": "9dfb5870a82d6ec73feb9adc4fe0d051bb220e880521c6d9cf23f24833358ffa",
+      "public_sha256": "9dfb5870a82d6ec73feb9adc4fe0d051bb220e880521c6d9cf23f24833358ffa"
+    },
+    {
+      "file": "fleet-loadout-planner.js",
+      "matches": true,
+      "git_sha256": "eb1d944b1bf4dfb0cec7e8c512459dca8eb53bcd5b1e4ff29723798b542ebe4c",
+      "public_sha256": "eb1d944b1bf4dfb0cec7e8c512459dca8eb53bcd5b1e4ff29723798b542ebe4c"
+    },
+    {
+      "file": "fleet-readiness-evaluator.css",
+      "matches": true,
+      "git_sha256": "60b3b96df009f827c3a4121c9f94007e78401c8f6ce6b1407a4e13073ac585d2",
+      "public_sha256": "60b3b96df009f827c3a4121c9f94007e78401c8f6ce6b1407a4e13073ac585d2"
+    },
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "matches": true,
+      "git_sha256": "2963c3ca11b01e313fad2f91698293bb8c8fe06e9fb2c0f1df52d62a0b514834",
+      "public_sha256": "2963c3ca11b01e313fad2f91698293bb8c8fe06e9fb2c0f1df52d62a0b514834"
+    },
+    {
+      "file": "fleet-suggester.css",
+      "matches": true,
+      "git_sha256": "3549109b753d4a65547882330e29088ed8f82c3c02808104a0186d65770994d4",
+      "public_sha256": "3549109b753d4a65547882330e29088ed8f82c3c02808104a0186d65770994d4"
+    },
+    {
+      "file": "fleet-suggester.js",
+      "matches": true,
+      "git_sha256": "dff310063618f5d2221ebfd4da8fe86ade104b11a49d21c8b9db19e43a05b58e",
+      "public_sha256": "dff310063618f5d2221ebfd4da8fe86ade104b11a49d21c8b9db19e43a05b58e"
+    },
+    {
+      "file": "global-search.css",
+      "matches": true,
+      "git_sha256": "984d1eb1e1b8d1ad88f615764f605c972a47a98c9c89dd46826c44025d003e45",
+      "public_sha256": "984d1eb1e1b8d1ad88f615764f605c972a47a98c9c89dd46826c44025d003e45"
+    },
+    {
+      "file": "global-search.js",
+      "matches": true,
+      "git_sha256": "7dba60d3160288f054f54ea616a0375a79d9a8a23993e8de7021d13cfb5a7e98",
+      "public_sha256": "7dba60d3160288f054f54ea616a0375a79d9a8a23993e8de7021d13cfb5a7e98"
+    },
+    {
+      "file": "grand-operations.css",
+      "matches": true,
+      "git_sha256": "3d12df44b7d7ec8319e88229c7e3bcfb9bbc031d26eae21372cddbf1c2e0afde",
+      "public_sha256": "3d12df44b7d7ec8319e88229c7e3bcfb9bbc031d26eae21372cddbf1c2e0afde"
+    },
+    {
+      "file": "home-dashboard.css",
+      "matches": true,
+      "git_sha256": "02bd9bcabaa9134bc816f44feebb5d78a169cbc9a37a655b1673ff1444bee389",
+      "public_sha256": "02bd9bcabaa9134bc816f44feebb5d78a169cbc9a37a655b1673ff1444bee389"
+    },
+    {
+      "file": "home-dashboard.js",
+      "matches": true,
+      "git_sha256": "13072a201ea9fd627be5db97f045455c6251eff353f6af300738f30472a87829",
+      "public_sha256": "13072a201ea9fd627be5db97f045455c6251eff353f6af300738f30472a87829"
+    },
+    {
+      "file": "improvement-workshop.css",
+      "matches": true,
+      "git_sha256": "2c5e48cdd2811bc79beb7bd17570a1a73ce90f49adf1ab396b98cb63c717b7d0",
+      "public_sha256": "2c5e48cdd2811bc79beb7bd17570a1a73ce90f49adf1ab396b98cb63c717b7d0"
+    },
+    {
+      "file": "improvement-workshop.js",
+      "matches": true,
+      "git_sha256": "2c59a157bf72721699b95997420e8815d9a5cc7f762e1e4bd46ecc4fd277f3f8",
+      "public_sha256": "2c59a157bf72721699b95997420e8815d9a5cc7f762e1e4bd46ecc4fd277f3f8"
+    },
+    {
+      "file": "kancolle-import.css",
+      "matches": true,
+      "git_sha256": "f2abf99f609c7c6d98ba90f187995565ac9161abe2d87e54a68e7e69026188cb",
+      "public_sha256": "f2abf99f609c7c6d98ba90f187995565ac9161abe2d87e54a68e7e69026188cb"
+    },
+    {
+      "file": "kancolle-import.js",
+      "matches": true,
+      "git_sha256": "302c1392cad9612eb60a55660aae41cc1874c9fbd960487483a517bc6e28cf9a",
+      "public_sha256": "302c1392cad9612eb60a55660aae41cc1874c9fbd960487483a517bc6e28cf9a"
+    },
+    {
+      "file": "land-base-planner.css",
+      "matches": true,
+      "git_sha256": "db75c5e15b6fffc60622e35e8abe0236aba4aa609996d62768812eae2c28602d",
+      "public_sha256": "db75c5e15b6fffc60622e35e8abe0236aba4aa609996d62768812eae2c28602d"
+    },
+    {
+      "file": "land-base-planner.js",
+      "matches": true,
+      "git_sha256": "4e2b8bfe9fae035586df996cbcda9581ed4bc7a7a8bcea9ee083c2ac99db2846",
+      "public_sha256": "4e2b8bfe9fae035586df996cbcda9581ed4bc7a7a8bcea9ee083c2ac99db2846"
+    },
+    {
+      "file": "map-advanced-data.js",
+      "matches": true,
+      "git_sha256": "e1dca19bf04b61dba10fba14a0acbebe1e514b06054dc0df274a013f936257d0",
+      "public_sha256": "e1dca19bf04b61dba10fba14a0acbebe1e514b06054dc0df274a013f936257d0"
+    },
+    {
+      "file": "map-air-check.js",
+      "matches": true,
+      "git_sha256": "447699857a06c0caf2ee68428d34b3282964bf8f98b16e33d74b6463fa13fa64",
+      "public_sha256": "447699857a06c0caf2ee68428d34b3282964bf8f98b16e33d74b6463fa13fa64"
+    },
+    {
+      "file": "map-air-data.js",
+      "matches": true,
+      "git_sha256": "2b97b615fdc6edf8286d987b43c1c27a99ea4a2481927cfefa433cd7378e6014",
+      "public_sha256": "2b97b615fdc6edf8286d987b43c1c27a99ea4a2481927cfefa433cd7378e6014"
+    },
+    {
+      "file": "map-controller.js",
+      "matches": true,
+      "git_sha256": "ee91d3a2c4b7079811abde68207cf4a0a901c535a845a7877506fee264a8cf54",
+      "public_sha256": "ee91d3a2c4b7079811abde68207cf4a0a901c535a845a7877506fee264a8cf54"
+    },
+    {
+      "file": "map-details-34.js",
+      "matches": true,
+      "git_sha256": "1e8714f6e5e75197ca1de433ad35713951f3bd7a81b36df77e2c317ebe0837ba",
+      "public_sha256": "1e8714f6e5e75197ca1de433ad35713951f3bd7a81b36df77e2c317ebe0837ba"
+    },
+    {
+      "file": "map-details-57.js",
+      "matches": true,
+      "git_sha256": "d6d2d02ef922e856ce5a48bea6c7e28e9a3d58b3197b4afddfa1c8a5d18395c4",
+      "public_sha256": "d6d2d02ef922e856ce5a48bea6c7e28e9a3d58b3197b4afddfa1c8a5d18395c4"
+    },
+    {
+      "file": "map-details.css",
+      "matches": true,
+      "git_sha256": "721fcb632be83db1d4d98f6c531161811611cf3495a8b146204af8746267c83d",
+      "public_sha256": "721fcb632be83db1d4d98f6c531161811611cf3495a8b146204af8746267c83d"
+    },
+    {
+      "file": "map-details.js",
+      "matches": true,
+      "git_sha256": "38f6127d919226731d63bf2165e7fce8aaeb006b6ccedab653fcc11cd3e63146",
+      "public_sha256": "38f6127d919226731d63bf2165e7fce8aaeb006b6ccedab653fcc11cd3e63146"
+    },
+    {
+      "file": "map-equipment-owned.css",
+      "matches": true,
+      "git_sha256": "1b42ac487540bdc214d88f6436af9884f7b5006b4f2826c06e75c89b5ec8eda2",
+      "public_sha256": "1b42ac487540bdc214d88f6436af9884f7b5006b4f2826c06e75c89b5ec8eda2"
+    },
+    {
+      "file": "map-equipment-owned.js",
+      "matches": true,
+      "git_sha256": "f29812ba3ec1130821cfb728fc467e1d66b67a8d1cfa4bb71e54b2515334d77d",
+      "public_sha256": "f29812ba3ec1130821cfb728fc467e1d66b67a8d1cfa4bb71e54b2515334d77d"
+    },
+    {
+      "file": "map-equipment-recommend.css",
+      "matches": true,
+      "git_sha256": "96dffd845bf7994c240fcbbce05dfb727e8eedb6bef1d02c06842f67c34ce20c",
+      "public_sha256": "96dffd845bf7994c240fcbbce05dfb727e8eedb6bef1d02c06842f67c34ce20c"
+    },
+    {
+      "file": "map-equipment-recommend.js",
+      "matches": true,
+      "git_sha256": "3f4e116ee928dba8a9546c6264b3a662f2feec4cfc72a70c965438dc62fab100",
+      "public_sha256": "3f4e116ee928dba8a9546c6264b3a662f2feec4cfc72a70c965438dc62fab100"
+    },
+    {
+      "file": "map-images.css",
+      "matches": true,
+      "git_sha256": "15c251f09047da16c406f58758959997d09617d4b78e14ed6a5a7fe0e35b9001",
+      "public_sha256": "15c251f09047da16c406f58758959997d09617d4b78e14ed6a5a7fe0e35b9001"
+    },
+    {
+      "file": "map-images.js",
+      "matches": true,
+      "git_sha256": "b623a602c35904889a3a05d9364931faf9f4642ea7d05c1f3b9826a86e2e603f",
+      "public_sha256": "b623a602c35904889a3a05d9364931faf9f4642ea7d05c1f3b9826a86e2e603f"
+    },
+    {
+      "file": "map-interactive.css",
+      "matches": true,
+      "git_sha256": "2c0e5ecb4b17f4236f29d8ad918a96304fc742ff7499c781b213213ec57a675e",
+      "public_sha256": "2c0e5ecb4b17f4236f29d8ad918a96304fc742ff7499c781b213213ec57a675e"
+    },
+    {
+      "file": "map-interactive.js",
+      "matches": true,
+      "git_sha256": "57f44348a97f45f60cd996af3321f6cbe655bec5cb97c85f572714644843a438",
+      "public_sha256": "57f44348a97f45f60cd996af3321f6cbe655bec5cb97c85f572714644843a438"
+    },
+    {
+      "file": "map-node-data-1.js",
+      "matches": true,
+      "git_sha256": "7ad46215a0848a0756256bc69c4f9b40e6f5273876f12deff73e514060ca6e56",
+      "public_sha256": "7ad46215a0848a0756256bc69c4f9b40e6f5273876f12deff73e514060ca6e56"
+    },
+    {
+      "file": "map-node-data-2-7.js",
+      "matches": true,
+      "git_sha256": "8c55f1b126dd23db3b77a0f7010a44c0773552f52f70bf0172ca53705e8aed5a",
+      "public_sha256": "8c55f1b126dd23db3b77a0f7010a44c0773552f52f70bf0172ca53705e8aed5a"
+    },
+    {
+      "file": "map-plans.css",
+      "matches": true,
+      "git_sha256": "90604f4752a1f2fb4ac41c88d1b4d8b936f5ce16b52607ed981af50479b49720",
+      "public_sha256": "90604f4752a1f2fb4ac41c88d1b4d8b936f5ce16b52607ed981af50479b49720"
+    },
+    {
+      "file": "map-plans.js",
+      "matches": true,
+      "git_sha256": "c2892984fa0f2b5c74181363f1aa6ced42a8f64eb42a3aa0e021926870851f43",
+      "public_sha256": "c2892984fa0f2b5c74181363f1aa6ced42a8f64eb42a3aa0e021926870851f43"
+    },
+    {
+      "file": "map-runtime.js",
+      "matches": true,
+      "git_sha256": "6ac1e03f89f9f0745f109b6b28241b419ef5d5e8eeaa4e6ab6fc19367d3d8777",
+      "public_sha256": "6ac1e03f89f9f0745f109b6b28241b419ef5d5e8eeaa4e6ab6fc19367d3d8777"
+    },
+    {
+      "file": "map-strategy-navigator.css",
+      "matches": true,
+      "git_sha256": "c425bdb496e677fb99504a61356678dd16358057ab025bb82cb3da5a068cb0e6",
+      "public_sha256": "c425bdb496e677fb99504a61356678dd16358057ab025bb82cb3da5a068cb0e6"
+    },
+    {
+      "file": "map-strategy-navigator.js",
+      "matches": true,
+      "git_sha256": "3d54700cefe6dd1bc0d3aa904babb3a7aa926163c7e67ccdbb7c0df31d653c63",
+      "public_sha256": "3d54700cefe6dd1bc0d3aa904babb3a7aa926163c7e67ccdbb7c0df31d653c63"
+    },
+    {
+      "file": "map-tabs.css",
+      "matches": true,
+      "git_sha256": "0e1e75ec655b14d3de67e3b0531df9a0be48be118fe52a877a4dfae7b23a8aef",
+      "public_sha256": "0e1e75ec655b14d3de67e3b0531df9a0be48be118fe52a877a4dfae7b23a8aef"
+    },
+    {
+      "file": "map-tabs.js",
+      "matches": true,
+      "git_sha256": "977f278168c428d6151a17706e30408b6ff7c951f2ef69aa2003672067cb7858",
+      "public_sha256": "977f278168c428d6151a17706e30408b6ff7c951f2ef69aa2003672067cb7858"
+    },
+    {
+      "file": "material-planner.css",
+      "matches": true,
+      "git_sha256": "16c63852b866035b4d8fe10ff5f913aa522b4aa9f6c7d214480b365b218ca5a7",
+      "public_sha256": "16c63852b866035b4d8fe10ff5f913aa522b4aa9f6c7d214480b365b218ca5a7"
+    },
+    {
+      "file": "material-planner.js",
+      "matches": true,
+      "git_sha256": "45a69ae05126146a91b8c062885c786199f7cf64fd023cad9ed8a47729b7883d",
+      "public_sha256": "45a69ae05126146a91b8c062885c786199f7cf64fd023cad9ed8a47729b7883d"
+    },
+    {
+      "file": "mobile-layout.css",
+      "matches": true,
+      "git_sha256": "6578cfea5365f428bf958f0143c8c4a74153725135cf0d10003480582d4e0245",
+      "public_sha256": "6578cfea5365f428bf958f0143c8c4a74153725135cf0d10003480582d4e0245"
+    },
+    {
+      "file": "optimization-tools.js",
+      "matches": true,
+      "git_sha256": "e4dbb3b87df6a1a1132ff62cbf0a71f5f83025ea291ae285b592095f91b7e0ea",
+      "public_sha256": "e4dbb3b87df6a1a1132ff62cbf0a71f5f83025ea291ae285b592095f91b7e0ea"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "matches": true,
+      "git_sha256": "2e2fe868ab159d4dee056a70726eb08cf9062de24506064bec6109a2caafefcc",
+      "public_sha256": "2e2fe868ab159d4dee056a70726eb08cf9062de24506064bec6109a2caafefcc"
+    },
+    {
+      "file": "personal-home.css",
+      "matches": true,
+      "git_sha256": "dfcf32ebbbb10e71f28990e4ac04506b2a00a963bd41357c92ecea86646907db",
+      "public_sha256": "dfcf32ebbbb10e71f28990e4ac04506b2a00a963bd41357c92ecea86646907db"
+    },
+    {
+      "file": "personal-home.js",
+      "matches": true,
+      "git_sha256": "8ebaee32acd538b2600e611aa0175e322e481e1a6603c7c15ddef692482d95a8",
+      "public_sha256": "8ebaee32acd538b2600e611aa0175e322e481e1a6603c7c15ddef692482d95a8"
+    },
+    {
+      "file": "quest-acceptance-guard.js",
+      "matches": true,
+      "git_sha256": "26f2c1733bc8a7dfa758d37e0cdcf13ffdc63d311296f33313dd6b5c7d9857f8",
+      "public_sha256": "26f2c1733bc8a7dfa758d37e0cdcf13ffdc63d311296f33313dd6b5c7d9857f8"
+    },
+    {
+      "file": "quest-database.css",
+      "matches": true,
+      "git_sha256": "47e961df6eb1722a52eabd8e0d5084f4c21bf9c61b5bfd70466d35f34899e21a",
+      "public_sha256": "47e961df6eb1722a52eabd8e0d5084f4c21bf9c61b5bfd70466d35f34899e21a"
+    },
+    {
+      "file": "quest-database.js",
+      "matches": true,
+      "git_sha256": "7dbe97c81fba9856afe8e4ab7864e3891d2ede9998bb77b9b8a97358e779370b",
+      "public_sha256": "7dbe97c81fba9856afe8e4ab7864e3891d2ede9998bb77b9b8a97358e779370b"
+    },
+    {
+      "file": "quest-progress-extension.css",
+      "matches": true,
+      "git_sha256": "8cc67cc3ca029f0ee92c030a8e6da0bfc0e110602dd12d9141bb51cf404db1f1",
+      "public_sha256": "8cc67cc3ca029f0ee92c030a8e6da0bfc0e110602dd12d9141bb51cf404db1f1"
+    },
+    {
+      "file": "quest-progress-extension.js",
+      "matches": true,
+      "git_sha256": "22b93d56977ab67a57936b33a07356215284cd3f832f355a08f1c1f6d0f811e2",
+      "public_sha256": "22b93d56977ab67a57936b33a07356215284cd3f832f355a08f1c1f6d0f811e2"
+    },
+    {
+      "file": "quick-nav.css",
+      "matches": true,
+      "git_sha256": "445edfb06714852a4de0263b954c69588dcd408d596b681b96190b63fb97335d",
+      "public_sha256": "445edfb06714852a4de0263b954c69588dcd408d596b681b96190b63fb97335d"
+    },
+    {
+      "file": "quick-nav.js",
+      "matches": true,
+      "git_sha256": "2a45178662e837ee067e4f8441bdab63c4b4ad8d61911cbbe77a200961778b5a",
+      "public_sha256": "2a45178662e837ee067e4f8441bdab63c4b4ad8d61911cbbe77a200961778b5a"
+    },
+    {
+      "file": "resource-budget.css",
+      "matches": true,
+      "git_sha256": "109444c208a3af6568c22e36f0da4bfe5e0e80d35ee74f7b61e15e7e0d995e75",
+      "public_sha256": "109444c208a3af6568c22e36f0da4bfe5e0e80d35ee74f7b61e15e7e0d995e75"
+    },
+    {
+      "file": "resource-budget.js",
+      "matches": true,
+      "git_sha256": "f93ce1e2754c541f631a265938b1d1a6a61890edd5861a0e7bd2ef711d790bda",
+      "public_sha256": "f93ce1e2754c541f631a265938b1d1a6a61890edd5861a0e7bd2ef711d790bda"
+    },
+    {
+      "file": "resource-history.js",
+      "matches": true,
+      "git_sha256": "f95257db3091a4574520071d4f2febbc2c5b502cf0e3dcffcb78dd1df263cc84",
+      "public_sha256": "f95257db3091a4574520071d4f2febbc2c5b502cf0e3dcffcb78dd1df263cc84"
+    },
+    {
+      "file": "ship-database.css",
+      "matches": true,
+      "git_sha256": "231674f855a38849783e332c1588aea10e491dd1227e7a627e35c50de781cf49",
+      "public_sha256": "231674f855a38849783e332c1588aea10e491dd1227e7a627e35c50de781cf49"
+    },
+    {
+      "file": "ship-database.js",
+      "matches": true,
+      "git_sha256": "0d5a9753ab33878ce7b547ce9cbdb3411d8235019c6e824ba3cc9fe616960f7e",
+      "public_sha256": "0d5a9753ab33878ce7b547ce9cbdb3411d8235019c6e824ba3cc9fe616960f7e"
+    },
+    {
+      "file": "ship-image-provider.css",
+      "matches": true,
+      "git_sha256": "1fb2b18ee8c61eb8a2a14c1ec8a8a64153185e14d0630fce879c9910b067a3bc",
+      "public_sha256": "1fb2b18ee8c61eb8a2a14c1ec8a8a64153185e14d0630fce879c9910b067a3bc"
+    },
+    {
+      "file": "ship-image-provider.js",
+      "matches": true,
+      "git_sha256": "2ea6688b3917a1927da519d066f5e155e5df7e8fb1600cc00c0410534041e2ce",
+      "public_sha256": "2ea6688b3917a1927da519d066f5e155e5df7e8fb1600cc00c0410534041e2ce"
+    },
+    {
+      "file": "ship-master-snapshot.js",
+      "matches": true,
+      "git_sha256": "4640e0c7b2626267967c4de3ec2f560adfd58d08a37129014b9e77afa6435782",
+      "public_sha256": "4640e0c7b2626267967c4de3ec2f560adfd58d08a37129014b9e77afa6435782"
+    },
+    {
+      "file": "ship-roster.css",
+      "matches": true,
+      "git_sha256": "8f078811ed7aa7df64405c8f6caedfbe5207e9159616b48b0ae1c1149c509847",
+      "public_sha256": "8f078811ed7aa7df64405c8f6caedfbe5207e9159616b48b0ae1c1149c509847"
+    },
+    {
+      "file": "ship-roster.js",
+      "matches": true,
+      "git_sha256": "950b0147b8851932ad4109d6dbc7b324f43cad19e52319936df18c06738389a8",
+      "public_sha256": "950b0147b8851932ad4109d6dbc7b324f43cad19e52319936df18c06738389a8"
+    },
+    {
+      "file": "sortie-equipment-check.css",
+      "matches": true,
+      "git_sha256": "65ad55bed869d17487258765e20f62a1a0832c2adeaf97bd9f8a2d49e138d6fb",
+      "public_sha256": "65ad55bed869d17487258765e20f62a1a0832c2adeaf97bd9f8a2d49e138d6fb"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "matches": true,
+      "git_sha256": "938b2f8d4f734e6ec12f42ed7da3a882a093f40ede9a5cd0435099e17745c9fe",
+      "public_sha256": "938b2f8d4f734e6ec12f42ed7da3a882a093f40ede9a5cd0435099e17745c9fe"
+    },
+    {
+      "file": "sortie-log.css",
+      "matches": true,
+      "git_sha256": "c0c64397b51664600853779e04681f44dbd6e5e07930d5432192505a0ca3d549",
+      "public_sha256": "c0c64397b51664600853779e04681f44dbd6e5e07930d5432192505a0ca3d549"
+    },
+    {
+      "file": "sortie-log.js",
+      "matches": true,
+      "git_sha256": "c38deacb133e1c203bef789eec7ecc612c93ebf0eb5eba5b41badf540a605175",
+      "public_sha256": "c38deacb133e1c203bef789eec7ecc612c93ebf0eb5eba5b41badf540a605175"
+    },
+    {
+      "file": "sortie-mode.css",
+      "matches": true,
+      "git_sha256": "11bf688e69e53ab7e4b2ec44501abc9a677a49c9aff3244abbeef3add74a27c0",
+      "public_sha256": "11bf688e69e53ab7e4b2ec44501abc9a677a49c9aff3244abbeef3add74a27c0"
+    },
+    {
+      "file": "sortie-mode.js",
+      "matches": true,
+      "git_sha256": "4a00db4af73a57f9c7d0088ba92d80e533abe0ef4253695fb61784b5766f2c0e",
+      "public_sha256": "4a00db4af73a57f9c7d0088ba92d80e533abe0ef4253695fb61784b5766f2c0e"
+    },
+    {
+      "file": "sortie-performance-analytics.css",
+      "matches": true,
+      "git_sha256": "6b2248b670e2f2c386babced904a279cc829413416b2ccd9ba36c0f376a3e7cc",
+      "public_sha256": "6b2248b670e2f2c386babced904a279cc829413416b2ccd9ba36c0f376a3e7cc"
+    },
+    {
+      "file": "sortie-performance-analytics.js",
+      "matches": true,
+      "git_sha256": "5c2afc341f7a33f9f43590c4eb19498032374cb5e0b6d40777e7b710f368210c",
+      "public_sha256": "5c2afc341f7a33f9f43590c4eb19498032374cb5e0b6d40777e7b710f368210c"
+    },
+    {
+      "file": "sortie-preparation-sheet.css",
+      "matches": true,
+      "git_sha256": "16cae6b2b1747050464f069c55e81c4b6198d05374bee9eef15a29c2ae9f3e5f",
+      "public_sha256": "16cae6b2b1747050464f069c55e81c4b6198d05374bee9eef15a29c2ae9f3e5f"
+    },
+    {
+      "file": "sortie-preparation-sheet.js",
+      "matches": true,
+      "git_sha256": "2c9651f613bdf58b4c2a3a275dca86133da9703a5d5b8251ef686956574febfd",
+      "public_sha256": "2c9651f613bdf58b4c2a3a275dca86133da9703a5d5b8251ef686956574febfd"
+    },
+    {
+      "file": "sortie-preset-manager.css",
+      "matches": true,
+      "git_sha256": "838c0c5d51eef9836689473779eb796f146ab79eae0cd4d9c7eebc399a3cfc82",
+      "public_sha256": "838c0c5d51eef9836689473779eb796f146ab79eae0cd4d9c7eebc399a3cfc82"
+    },
+    {
+      "file": "sortie-preset-manager.js",
+      "matches": true,
+      "git_sha256": "8124b9e99a8f9b04c3b557ed137dde83a2bc14df2a1a11fe31d51e5bc7742744",
+      "public_sha256": "8124b9e99a8f9b04c3b557ed137dde83a2bc14df2a1a11fe31d51e5bc7742744"
+    },
+    {
+      "file": "sortie-readiness.css",
+      "matches": true,
+      "git_sha256": "0eadc72bc8a110bea01991ae9ac7ba4487007202d555544367cb29428c6f1225",
+      "public_sha256": "0eadc72bc8a110bea01991ae9ac7ba4487007202d555544367cb29428c6f1225"
+    },
+    {
+      "file": "sortie-readiness.js",
+      "matches": true,
+      "git_sha256": "125c00b52e06ad801ce24c2a81774eb039bd5f8ae3de0318ae59d1c8abf12c53",
+      "public_sha256": "125c00b52e06ad801ce24c2a81774eb039bd5f8ae3de0318ae59d1c8abf12c53"
+    },
+    {
+      "file": "sortie-session.css",
+      "matches": true,
+      "git_sha256": "6500fc36fa3d19946681bcd4f6357acdb9befe2a49b381d44a2570d15758944c",
+      "public_sha256": "6500fc36fa3d19946681bcd4f6357acdb9befe2a49b381d44a2570d15758944c"
+    },
+    {
+      "file": "sortie-session.js",
+      "matches": true,
+      "git_sha256": "0e7fb21134f70468ef8312e779330c0b7b5f00cbe24aa74abd366f1785096a23",
+      "public_sha256": "0e7fb21134f70468ef8312e779330c0b7b5f00cbe24aa74abd366f1785096a23"
+    },
+    {
+      "file": "stability-integration.js",
+      "matches": true,
+      "git_sha256": "edf716932378f6c5f64eb618d4eb07e996f17f65420ff8b010ffac669a736162",
+      "public_sha256": "edf716932378f6c5f64eb618d4eb07e996f17f65420ff8b010ffac669a736162"
+    },
+    {
+      "file": "strategy-goals.js",
+      "matches": true,
+      "git_sha256": "e409a14b12086ba24ef550996e1536ba2276af534cd8ac80c83b6a21ae2154c8",
+      "public_sha256": "e409a14b12086ba24ef550996e1536ba2276af534cd8ac80c83b6a21ae2154c8"
+    },
+    {
+      "file": "styles.css",
+      "matches": true,
+      "git_sha256": "02e5cea218b30638e2555d3046db8f0c2bf45d7c3bfbaf6b7b37fdf9d1c067e5",
+      "public_sha256": "02e5cea218b30638e2555d3046db8f0c2bf45d7c3bfbaf6b7b37fdf9d1c067e5"
+    },
+    {
+      "file": "support-fleet-planner.css",
+      "matches": true,
+      "git_sha256": "94c670506911d8c964d6e296582767d4214ff905f32ca97fbfc27ff5e1fbfccb",
+      "public_sha256": "94c670506911d8c964d6e296582767d4214ff905f32ca97fbfc27ff5e1fbfccb"
+    },
+    {
+      "file": "support-fleet-planner.js",
+      "matches": true,
+      "git_sha256": "7d84744d2cae5ec61762d3a14232841cfd0b1d00d3c9c1dd82ded93cb13a6244",
+      "public_sha256": "7d84744d2cae5ec61762d3a14232841cfd0b1d00d3c9c1dd82ded93cb13a6244"
+    },
+    {
+      "file": "sw.js",
+      "matches": true,
+      "git_sha256": "65061ac46d749f6431600af3133a9dce04e664a162a34dc4c003ece65e810f45",
+      "public_sha256": "65061ac46d749f6431600af3133a9dce04e664a162a34dc4c003ece65e810f45"
+    },
+    {
+      "file": "training-planner.css",
+      "matches": true,
+      "git_sha256": "6da10b1059f18347f4fbb792fcc159abefada063b55524e025406e8459887768",
+      "public_sha256": "6da10b1059f18347f4fbb792fcc159abefada063b55524e025406e8459887768"
+    },
+    {
+      "file": "training-planner.js",
+      "matches": true,
+      "git_sha256": "c9e45160233d4e0393fbeb97bf6e62d207f58e493b62daede31f9a4ffc02f233",
+      "public_sha256": "c9e45160233d4e0393fbeb97bf6e62d207f58e493b62daede31f9a4ffc02f233"
+    },
+    {
+      "file": "update-manager.css",
+      "matches": true,
+      "git_sha256": "d82c03ced8e319a9f92afc95e5be59bcdec606c5bb06c43e38d5283d8034bc4e",
+      "public_sha256": "d82c03ced8e319a9f92afc95e5be59bcdec606c5bb06c43e38d5283d8034bc4e"
+    },
+    {
+      "file": "update-manager.js",
+      "matches": true,
+      "git_sha256": "edbf0d85bfbebff6f19793682a5a95d791eef00a68cc576ee92c55846db3c890",
+      "public_sha256": "edbf0d85bfbebff6f19793682a5a95d791eef00a68cc576ee92c55846db3c890"
+    },
+    {
+      "file": "workspace-compat.js",
+      "matches": true,
+      "git_sha256": "ee4ceb8546cdf917dbda75a76ad651dfbec5628b66891e74f0643aa2f173d6c7",
+      "public_sha256": "ee4ceb8546cdf917dbda75a76ad651dfbec5628b66891e74f0643aa2f173d6c7"
+    },
+    {
+      "file": "workspace-tabs.css",
+      "matches": true,
+      "git_sha256": "34b2130fca879d8912290270d21f85a474e9a0a6a65f3088dbd72cc5560a67a0",
+      "public_sha256": "34b2130fca879d8912290270d21f85a474e9a0a6a65f3088dbd72cc5560a67a0"
+    },
+    {
+      "file": "workspace-tabs.js",
+      "matches": true,
+      "git_sha256": "0485e5442428d8978d2d8828457199fbff9191c653d814d973cb13c6f852dbaf",
+      "public_sha256": "0485e5442428d8978d2d8828457199fbff9191c653d814d973cb13c6f852dbaf"
+    },
+    {
+      "file": "index.html",
+      "matches": true,
+      "git_sha256": "2c9672ed32f25fabf96898b50dd4dd670b8b7afc7a9a460b3e513ab06960b2b4",
+      "public_sha256": "2c9672ed32f25fabf96898b50dd4dd670b8b7afc7a9a460b3e513ab06960b2b4"
+    },
+    {
+      "file": "app-version.json",
+      "matches": true,
+      "git_sha256": "ef9086e9fe71580575bb5c968046c3a6b8e165e5e9c2a8cc8cbce9b86cc7452f",
+      "public_sha256": "ef9086e9fe71580575bb5c968046c3a6b8e165e5e9c2a8cc8cbce9b86cc7452f"
+    },
+    {
+      "file": "package.json",
+      "matches": true,
+      "git_sha256": "e47047608d7d9a06a882d728f1be4e96f8c7f0140e99a3dc0b00e413f3d6b4c8",
+      "public_sha256": "e47047608d7d9a06a882d728f1be4e96f8c7f0140e99a3dc0b00e413f3d6b4c8"
+    },
+    {
+      "file": "refresh.html",
+      "matches": true,
+      "git_sha256": "b3c687e5cca93989505d68a6a9eceac499cb3eb06edb0dde538608bafbd88f2d",
+      "public_sha256": "b3c687e5cca93989505d68a6a9eceac499cb3eb06edb0dde538608bafbd88f2d"
+    },
+    {
+      "file": "manifest.webmanifest",
+      "matches": true,
+      "git_sha256": "b004d4e7bc9ad3077dfae1b7c0afda6b2236e84c2b8b6b71150b89dfffbf780d",
+      "public_sha256": "b004d4e7bc9ad3077dfae1b7c0afda6b2236e84c2b8b6b71150b89dfffbf780d"
+    }
+  ]
+}
