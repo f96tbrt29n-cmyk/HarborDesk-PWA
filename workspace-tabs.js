@@ -399,12 +399,25 @@ function hdWSInstallKeyboardTracking(){
 }
 let hdWSLastScrollY=Math.max(0,window.scrollY||0),hdWSScrollTick=false;
 let hdWSHeaderPress=null,hdWSHeaderCompactPending=null;
+function hdWSResumeHeaderTransitions(press){
+ for(const animation of press?.transitions||[]){
+  if(animation.playState==='paused')animation.play();
+ }
+}
+function hdWSPauseHeaderTransitions(){
+ const transitions=document.querySelector('.topbar')?.getAnimations?.()||[];
+ return transitions.filter(animation=>{
+  if(animation.playState!=='running'||!animation.transitionProperty?.startsWith('padding'))return false;
+  animation.pause();return true;
+ });
+}
 function hdWSFinishHeaderPress(press,delay=0){
  if(!press)return;
  // A layout change must wait for click and its native default action.
  setTimeout(()=>{
   if(hdWSHeaderPress!==press)return;
   hdWSHeaderPress=null;
+  hdWSResumeHeaderTransitions(press);
   const pending=hdWSHeaderCompactPending;hdWSHeaderCompactPending=null;
   if(pending!==null)hdWSSetHeaderCompact(pending);
  },delay);
@@ -432,7 +445,12 @@ function hdWSInstallScrollCompact(){
  if(window.__HD_WS_SCROLL_COMPACT)return;window.__HD_WS_SCROLL_COMPACT=true;
  hdWSLastScrollY=Math.max(0,window.scrollY||0);
  document.addEventListener('pointerdown',e=>{
-  if(e.button===0&&e.isPrimary!==false&&e.target.closest?.('#homeGuideSteps'))hdWSHeaderPress={id:e.pointerId};
+  if(e.button===0&&e.isPrimary!==false&&e.target.closest?.('#homeGuideSteps')){
+   // Deferring the next class change does not stop an existing transition.
+   // Resume an abandoned press before transferring the hold to this pointer.
+   hdWSResumeHeaderTransitions(hdWSHeaderPress);
+   hdWSHeaderPress={id:e.pointerId,transitions:hdWSPauseHeaderTransitions()};
+  }
  },true);
  window.addEventListener('pointerup',e=>{if(hdWSHeaderPress?.id===e.pointerId)hdWSFinishHeaderPress(hdWSHeaderPress,500)},true);
  window.addEventListener('pointercancel',e=>{if(hdWSHeaderPress?.id===e.pointerId)hdWSFinishHeaderPress(hdWSHeaderPress)},true);
