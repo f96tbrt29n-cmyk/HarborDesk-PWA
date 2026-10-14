@@ -15,6 +15,7 @@ test('strategy diagnostics retain ordered pointer evidence without input or stor
   await before({ page }, { title: 'editing keeps failed changes' });
   await openInputFixture(page, '<div id="homeGuideSteps"><button data-home-guide-edit-open="fixture">Edit</button><input value="private-input"></div>');
   await page.locator('button').click();
+  await expect.poll(() => page.evaluate(() => window.__hdStrategyInputDiagnostics.some(e=>e.type==='click-result'))).toBe(true);
   const events = await page.evaluate(() => window.__hdStrategyInputDiagnostics);
   const pointer = events.filter(event => ['pointerdown', 'pointerup', 'click'].includes(event.type));
   expect(pointer.map(event => event.type)).toEqual(['pointerdown', 'pointerup', 'click']);
@@ -90,4 +91,61 @@ test('strategy operations and page reopening preserve six core storage keys byte
   await reopened.waitForFunction(() => document.body.dataset.hdReady === '1', null, {timeout:30000});
   expect(await reopened.evaluate(keys => Object.fromEntries(keys.map(key => [key,localStorage.getItem(key)])), keys)).toEqual(before);
   await reopened.close();
+});
+
+test('strategy diagnostics distinguish replaced controls from controls moved during a press', async ({ page }) => {
+  let before;
+  installStrategyInputDiagnostics({beforeEach: hook => before = hook, afterEach: () => {}});
+  await before({page}, {title:'strategy goal editing excludes imported goals'});
+  await openInputFixture(page, '<div id="homeGuideSteps" style="height:300px"><button data-home-guide-edit-open="fixture" style="width:100px;height:40px">Edit</button></div>');
+  const button = page.locator('button');
+  const box = await button.boundingBox();
+  await page.mouse.move(box.x+20, box.y+10);await page.mouse.down();
+  await button.evaluate(el => el.replaceWith(el.cloneNode(true)));
+  await page.mouse.up();
+  const replaced = await page.evaluate(() => window.__hdStrategyInputDiagnostics.filter(e=>e.type==='pointerup').at(-1));
+  expect(replaced.pressedTarget.connected).toBe(false);
+  expect(replaced.target.data.homeGuideEditOpen).toBe('fixture');
+  expect(replaced.target.nodeId).not.toBe(replaced.pressedTarget.nodeId);
+  expect(replaced.hitTarget.nodeId).toBe(replaced.target.nodeId);
+  await page.mouse.down();
+  await button.evaluate(el => el.style.transform='translateY(60px)');
+  await page.mouse.up();
+  const moved = await page.evaluate(() => window.__hdStrategyInputDiagnostics.filter(e=>e.type==='pointerup').at(-1));
+  expect(moved.pressedTarget.connected).toBe(true);
+  expect(moved.pressedTarget.nodeId).toBe(replaced.target.nodeId);
+  expect(moved.pressedTarget.rect.y).toBe(replaced.target.rect.y+60);
+  expect(moved.hitTarget.id).toBe('homeGuideSteps');
+});
+
+test('strategy diagnostics retain successful first input across reload for comparison', async ({ page }) => {
+  let before, after;
+  installStrategyInputDiagnostics({beforeEach: hook => before = hook, afterEach: hook => after = hook}, {recordSuccess:true});
+  const title='deferred strategy goals filter persists';
+  await before({page}, {title});
+  await openInputFixture(page, '<div id="homeGuideSteps"><button data-home-guide-later-only aria-pressed="false">Later</button><input value="unrecorded-text"></div>');
+  await page.locator('button').click();
+  await page.reload();await page.locator('button').click();
+  const attachments=[];
+  await after({page}, {title,status:'passed',expectedStatus:'passed',attach:(name,value)=>attachments.push({name,...value})});
+  expect(attachments).toHaveLength(1);
+  const events=JSON.parse(attachments[0].body.toString());
+  const presses=events.filter(e=>e.type==='pointerdown');
+  expect(presses).toHaveLength(2);
+  expect(presses[0].timeOrigin).not.toBe(presses[1].timeOrigin);
+  expect(presses.every(e=>e.target.data.homeGuideLaterOnly==='')).toBe(true);
+  expect(attachments[0].body.toString()).not.toContain('unrecorded-text');
+});
+
+test('strategy diagnostics observe native click cancellation after downstream handlers', async ({ page }) => {
+  let before;
+  installStrategyInputDiagnostics({beforeEach: hook => before = hook, afterEach: () => {}});
+  await before({page}, {title:'editing keeps failed changes'});
+  await openInputFixture(page, '<div id="homeGuideSteps"><button>Edit</button></div>');
+  await page.locator('button').evaluate(el => el.addEventListener('click', event => event.preventDefault()));
+  await page.locator('button').click();
+  await expect.poll(() => page.evaluate(() => window.__hdStrategyInputDiagnostics.filter(e=>e.type==='click-result').length)).toBe(1);
+  const events = await page.evaluate(() => window.__hdStrategyInputDiagnostics);
+  expect(events.find(e=>e.type==='click').defaultPrevented).toBe(false);
+  expect(events.find(e=>e.type==='click-result').defaultPrevented).toBe(true);
 });

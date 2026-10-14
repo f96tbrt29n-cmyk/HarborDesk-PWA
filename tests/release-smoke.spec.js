@@ -57,16 +57,7 @@ test('release smoke: strategy goal deletion undo restores completion priority an
   expect(await page.evaluate(()=>homeGuideState().custom.find(x=>x.id==='delete-undo').title)).toBe('優先の達成済み目標');expect(await page.evaluate(()=>homeGuideState().done)).toContain('map:6-5:map:delete-undo');
 });
 
-test('release smoke: strategy goal deletion undo preserves newer changes and shared imported completion', async ({ page }) => {
-  await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'delete-import',title:'取り込んだ任務',category:'map',scope:'map',map:'6-5',priority:'high',source:'oneTimeQuest',ref:'B175'},{id:'delete-other',title:'別海域の同じ任務',category:'quest',scope:'map',map:'6-4',source:'oneTimeQuest',ref:'B175'});s.done.push('shared:oneTimeQuest:B175');homeGuideSave(s)});const imported=await page.evaluate(()=>homeGuideState().custom.find(x=>x.id==='delete-import'));await page.locator('[data-home-guide-delete="delete-import"]').click();
-  await page.evaluate(()=>{const s=homeGuideState();s.custom.push({id:'delete-new',title:'削除後に追加した目標',category:'map',scope:'global'});s.done.push('global:map:delete-new');s.cleared.push('6-3');homeGuideSave(s);hdSelectGuideMap('6-4')});await page.locator('#hdToastRegion .hd-toast-action').click();expect(await page.evaluate(()=>homeGuideState().custom.find(x=>x.id==='delete-import'))).toEqual(imported);expect(await page.evaluate(()=>homeGuideState().custom.map(x=>x.id))).toEqual(['delete-import','delete-other','delete-new']);expect(await page.evaluate(()=>homeGuideState().done)).toEqual(expect.arrayContaining(['shared:oneTimeQuest:B175','global:map:delete-new']));expect(await page.evaluate(()=>homeGuideState().cleared)).toContain('6-3');
-  await page.locator('#homeGuideMapSelect').selectOption('6-5');await expect(page.locator('[data-home-guide-priority="delete-import"]')).toHaveValue('high');await expect(page.locator('[data-home-guide-toggle="shared:oneTimeQuest:B175"]')).toHaveAttribute('aria-pressed','true');
-});
 
-test('release smoke: strategy goal deletion undo keeps failed deletions and retries failed restoration', async ({ page }) => {
-  await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'delete-failure',title:'削除を試す目標',category:'map',scope:'map',map:'6-5'});homeGuideSave(s)});await page.locator('[data-home-guide-edit-open="delete-failure"]').click();await page.locator('[data-home-guide-edit="delete-failure"] [name="title"]').fill('残す下書き');
-  await page.evaluate(()=>{const original=Storage.prototype.setItem;window.restoreDeleteStorage=()=>Storage.prototype.setItem=original;window.failDeleteStorage=()=>{Storage.prototype.setItem=function(k,v){if(k===HD_HOME_GUIDE_KEY)throw new DOMException('Full','QuotaExceededError');return original.call(this,k,v)}};window.failDeleteStorage()});await page.locator('[data-home-guide-delete="delete-failure"]').click();await expect(page.locator('[data-home-guide-edit="delete-failure"] [name="title"]')).toHaveValue('残す下書き');await expect(page.locator('#hdToastRegion .hd-toast-action')).toHaveCount(0);await page.evaluate(()=>window.restoreDeleteStorage());await page.locator('[data-home-guide-delete="delete-failure"]').click();await page.evaluate(()=>window.failDeleteStorage());await page.locator('#hdToastRegion .hd-toast-action').click();await expect(page.locator('[data-home-guide-priority="delete-failure"]')).toHaveCount(0);await expect(page.locator('#hdToastRegion')).toHaveClass(/show/);await expect(page.locator('#hdToastRegion')).toContainText('復元を保存できなかった');await page.evaluate(()=>window.restoreDeleteStorage());await page.locator('#hdToastRegion .hd-toast-action').click();await expect(page.locator('[data-home-guide-edit="delete-failure"] [name="title"]')).toHaveValue('残す下書き');expect(await page.evaluate(()=>homeGuideState().custom.filter(x=>x.id==='delete-failure').length)).toBe(1);
-});
 
 test('release smoke: strategy goal search combines normalized words map priority and completion', async ({ page }) => {
   // Two full app loads and native actions need their complete assertion windows.
@@ -263,14 +254,6 @@ test('release smoke: strategy goal editing drafts survive updates map switches a
 
 
 
-test('release smoke: strategy goal editing excludes imported goals and removes deleted drafts', async ({ page }) => {
-  await boot(page);
-  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const state=homeGuideState();state.custom.push({id:'edit-delete',category:'map',title:'削除する目標',scope:'map',map:'6-5'},{id:'edit-imported',category:'map',title:'自動の候補目標',scope:'map',map:'6-5',source:'unlock',ref:'6-4'});homeGuideSave(state);});
-  await expect(page.locator('[data-home-guide-edit-open="edit-imported"]')).toHaveCount(0);
-  await page.locator('[data-home-guide-edit-open="edit-delete"]').click();await page.locator('[data-home-guide-edit="edit-delete"] [name="title"]').fill('削除する編集下書き');
-  await page.locator('[data-home-guide-delete="edit-delete"]').click();await expect(page.locator('[data-home-guide-edit="edit-delete"]')).toHaveCount(0);
-  expect(await page.evaluate(()=>({draft:homeGuideDraftStore()[homeGuideEditDraftKey('edit-delete')],goals:homeGuideState().custom.map(x=>x.id)}))).toEqual({draft:undefined,goals:['edit-imported']});
-});
 
 test('release smoke: strategy goal drafts survive background updates reload and successful submission', async ({ page }) => {
   // Keep the budget for the whole multi-reload scenario separate from assertions.

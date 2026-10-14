@@ -86,5 +86,89 @@
       147
     ],
     "chromium_suite_registered_cases": 589
+  },
+  "pr151_continuation": {
+    "base_head": "8e2b68864da60383c470a57155f0b9ab4c446b87",
+    "trace_repetition": {
+      "startTime": "2026-10-14T04:49:09.556Z",
+      "duration": 498449.346,
+      "expected": 20,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "lightweight_repetition": {
+      "startTime": "2026-10-14T04:58:07.985Z",
+      "duration": 507574.518,
+      "expected": 20,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "retries": 0,
+    "moved_tests": [
+      {
+        "title": "strategy goal deletion undo preserves newer changes",
+        "source": "tests/release-smoke.spec.js",
+        "sha256": "6112f4197e8f2f78984081c0c25aee4cf7ceacc7b7ea19aa3160745432bdf1de",
+        "unchanged": true
+      },
+      {
+        "title": "strategy goal deletion undo keeps failed deletions",
+        "source": "tests/release-smoke.spec.js",
+        "sha256": "3cb79581c86d549f513d1a0d0303cc58ef429391a9c11c29e9d3ad762bb4ecc7",
+        "unchanged": true
+      },
+      {
+        "title": "strategy goal editing excludes imported goals",
+        "source": "tests/release-smoke.spec.js",
+        "sha256": "a8d4f67ca2e9b2aaba23da776fa985813ec1eeb4fcccce35996d0089cd2ccdf7",
+        "unchanged": true
+      },
+      {
+        "title": "deferred strategy goals filter persists",
+        "source": "tests/strategy-deferred.spec.js",
+        "sha256": "5afdfdf9200221c0555ccbf9ea8096805429f8ac397f527098d1807f94d90731",
+        "unchanged": true
+      }
+    ],
+    "root_cause_confirmed": false,
+    "initial_browser_regression": {
+      "startTime": "2026-10-14T05:07:03.183Z",
+      "duration": 601694.9330000001,
+      "expected": 87,
+      "skipped": 0,
+      "unexpected": 1,
+      "flaky": 0
+    },
+    "initial_click_order_probe": {
+      "startTime": "2026-10-14T05:17:40.576Z",
+      "duration": 1182.036,
+      "expected": 0,
+      "skipped": 0,
+      "unexpected": 1,
+      "flaky": 0
+    },
+    "fixed_diagnostics_repetition": {
+      "startTime": "2026-10-14T05:20:03.632Z",
+      "duration": 60845.476,
+      "expected": 36,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "initial_failures_are_diagnostic_not_product": true,
+    "final_ui_regression": {
+      "startTime": "2026-10-14T05:21:30.671Z",
+      "duration": 342074.734,
+      "expected": 16,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "subsequent_output_control_passed": 2,
+    "retained_evidence_files_unchanged": 4,
+    "registered_cases_per_browser": 592,
+    "node_test_files_passed": 4
   }
 }

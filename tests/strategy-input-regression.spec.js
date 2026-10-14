@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 const { installStrategyInputDiagnostics } = require('./strategy-input-diagnostics.cjs');
 // Keep expensive database snapshots out of this targeted first-failure trace scope.
 test.use({ viewport:{width:390,height:844}, hasTouch:true, isMobile:true, serviceWorkers:'block', trace:'retain-on-failure' });
-installStrategyInputDiagnostics(test);
+installStrategyInputDiagnostics(test, { recordSuccess: process.env.HD_STRATEGY_RECORD_SUCCESS === '1' });
 
 async function boot(page, errors = []) {
   page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
@@ -117,4 +117,43 @@ test('strategy integration: prerequisite checkbox and cleared map share one comp
   await page.locator('#homeGuideMapSelect').selectOption('6-5');
   await expect(unlock).toHaveAttribute('aria-pressed','false');
   expect(await page.evaluate(() => homeGuideState().cleared.includes('6-4'))).toBe(false);
+});
+
+test('release smoke: strategy goal deletion undo preserves newer changes and shared imported completion', async ({ page }) => {
+  await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'delete-import',title:'取り込んだ任務',category:'map',scope:'map',map:'6-5',priority:'high',source:'oneTimeQuest',ref:'B175'},{id:'delete-other',title:'別海域の同じ任務',category:'quest',scope:'map',map:'6-4',source:'oneTimeQuest',ref:'B175'});s.done.push('shared:oneTimeQuest:B175');homeGuideSave(s)});const imported=await page.evaluate(()=>homeGuideState().custom.find(x=>x.id==='delete-import'));await page.locator('[data-home-guide-delete="delete-import"]').click();
+  await page.evaluate(()=>{const s=homeGuideState();s.custom.push({id:'delete-new',title:'削除後に追加した目標',category:'map',scope:'global'});s.done.push('global:map:delete-new');s.cleared.push('6-3');homeGuideSave(s);hdSelectGuideMap('6-4')});await page.locator('#hdToastRegion .hd-toast-action').click();expect(await page.evaluate(()=>homeGuideState().custom.find(x=>x.id==='delete-import'))).toEqual(imported);expect(await page.evaluate(()=>homeGuideState().custom.map(x=>x.id))).toEqual(['delete-import','delete-other','delete-new']);expect(await page.evaluate(()=>homeGuideState().done)).toEqual(expect.arrayContaining(['shared:oneTimeQuest:B175','global:map:delete-new']));expect(await page.evaluate(()=>homeGuideState().cleared)).toContain('6-3');
+  await page.locator('#homeGuideMapSelect').selectOption('6-5');await expect(page.locator('[data-home-guide-priority="delete-import"]')).toHaveValue('high');await expect(page.locator('[data-home-guide-toggle="shared:oneTimeQuest:B175"]')).toHaveAttribute('aria-pressed','true');
+});
+
+test('release smoke: strategy goal deletion undo keeps failed deletions and retries failed restoration', async ({ page }) => {
+  await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'delete-failure',title:'削除を試す目標',category:'map',scope:'map',map:'6-5'});homeGuideSave(s)});await page.locator('[data-home-guide-edit-open="delete-failure"]').click();await page.locator('[data-home-guide-edit="delete-failure"] [name="title"]').fill('残す下書き');
+  await page.evaluate(()=>{const original=Storage.prototype.setItem;window.restoreDeleteStorage=()=>Storage.prototype.setItem=original;window.failDeleteStorage=()=>{Storage.prototype.setItem=function(k,v){if(k===HD_HOME_GUIDE_KEY)throw new DOMException('Full','QuotaExceededError');return original.call(this,k,v)}};window.failDeleteStorage()});await page.locator('[data-home-guide-delete="delete-failure"]').click();await expect(page.locator('[data-home-guide-edit="delete-failure"] [name="title"]')).toHaveValue('残す下書き');await expect(page.locator('#hdToastRegion .hd-toast-action')).toHaveCount(0);await page.evaluate(()=>window.restoreDeleteStorage());await page.locator('[data-home-guide-delete="delete-failure"]').click();await page.evaluate(()=>window.failDeleteStorage());await page.locator('#hdToastRegion .hd-toast-action').click();await expect(page.locator('[data-home-guide-priority="delete-failure"]')).toHaveCount(0);await expect(page.locator('#hdToastRegion')).toHaveClass(/show/);await expect(page.locator('#hdToastRegion')).toContainText('復元を保存できなかった');await page.evaluate(()=>window.restoreDeleteStorage());await page.locator('#hdToastRegion .hd-toast-action').click();await expect(page.locator('[data-home-guide-edit="delete-failure"] [name="title"]')).toHaveValue('残す下書き');expect(await page.evaluate(()=>homeGuideState().custom.filter(x=>x.id==='delete-failure').length)).toBe(1);
+});
+
+test('release smoke: strategy goal editing excludes imported goals and removes deleted drafts', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const state=homeGuideState();state.custom.push({id:'edit-delete',category:'map',title:'削除する目標',scope:'map',map:'6-5'},{id:'edit-imported',category:'map',title:'自動の候補目標',scope:'map',map:'6-5',source:'unlock',ref:'6-4'});homeGuideSave(state);});
+  await expect(page.locator('[data-home-guide-edit-open="edit-imported"]')).toHaveCount(0);
+  await page.locator('[data-home-guide-edit-open="edit-delete"]').click();await page.locator('[data-home-guide-edit="edit-delete"] [name="title"]').fill('削除する編集下書き');
+  await page.locator('[data-home-guide-delete="edit-delete"]').click();await expect(page.locator('[data-home-guide-edit="edit-delete"]')).toHaveCount(0);
+  expect(await page.evaluate(()=>({draft:homeGuideDraftStore()[homeGuideEditDraftKey('edit-delete')],goals:homeGuideState().custom.map(x=>x.id)}))).toEqual({draft:undefined,goals:['edit-imported']});
+});
+
+test('release smoke: deferred strategy goals filter persists and combines with completion and search', async ({ page }) => {
+  // This scenario exercises every filter and then reloads the app.
+  test.setTimeout(90000);
+  await boot(page);
+  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push(
+    {id:'later-pending',category:'map',title:'あとで装備を準備',priority:'later',scope:'map',map:'6-5'},
+    {id:'later-done',category:'map',title:'あとで任務を確認',priority:'later',scope:'global',map:''},
+    {id:'later-high',category:'map',title:'優先する目標',priority:'high',scope:'global',map:''});s.done.push(homeGuideGoalKey(s.custom.find(x=>x.id==='later-done')));homeGuideSave(s)});
+  const before=await page.evaluate(()=>homeGuideState());
+  const filter=page.locator('[data-home-guide-later-only]');await filter.click();
+  await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：全件・あとでのみ 2件');
+  await page.locator('[data-home-guide-pending]').click();await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：未完了・あとでのみ 1件');
+  await page.locator('[data-home-guide-completed]').click();await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：完了済み・あとでのみ 1件');
+  await page.locator('[data-home-guide-search]').fill('装備');await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：完了済み・あとでのみ・検索中 0件');await page.locator('[data-home-guide-search-clear]').click();
+  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false)});await expect(filter).toHaveAttribute('aria-pressed','true');
+  await page.locator('[data-home-guide-priority-only]').click();await expect(filter).toHaveAttribute('aria-pressed','false');await expect(page.locator('[data-home-guide-priority-only]')).toHaveAttribute('aria-pressed','true');
+  await filter.click();await expect(page.locator('[data-home-guide-priority-only]')).toHaveAttribute('aria-pressed','false');expect(await page.evaluate(()=>homeGuideState())).toEqual(before);
 });

@@ -1,0 +1,395 @@
+{
+  "run_id": 38507086448,
+  "head": "8e2b68864da60383c470a57155f0b9ab4c446b87",
+  "artifacts": [
+    11868803299,
+    11868364110
+  ],
+  "first_failure_trace_present": false,
+  "successful_retry_trace_present": true,
+  "cases": [
+    {
+      "title": "release smoke: strategy goal deletion undo preserves newer changes and shared imported completion",
+      "attempts": [
+        {
+          "retry": 0,
+          "duration_ms": 46813,
+          "first_click": {
+            "title": "Click locator('[data-home-guide-delete=\"delete-import\"]')",
+            "startTime": "2026-10-14T03:48:42.409Z",
+            "duration": 10642,
+            "error": null
+          },
+          "next_step": {
+            "title": "Evaluate",
+            "startTime": "2026-10-14T03:48:53.052Z",
+            "duration": 1412,
+            "error": null
+          },
+          "errors": [
+            "Test timeout of 45000ms exceeded.",
+            "Error: locator.click: Test timeout of 45000ms exceeded.\nCall log:\n  - waiting for locator('#hdToastRegion .hd-toast-action')"
+          ]
+        },
+        {
+          "retry": 1,
+          "duration_ms": 24495,
+          "first_click": {
+            "title": "Click locator('[data-home-guide-delete=\"delete-import\"]')",
+            "startTime": "2026-10-14T03:49:34.864Z",
+            "duration": 507,
+            "error": null
+          },
+          "next_step": {
+            "title": "Evaluate",
+            "startTime": "2026-10-14T03:49:35.372Z",
+            "duration": 1609,
+            "error": null
+          },
+          "errors": []
+        }
+      ]
+    },
+    {
+      "title": "release smoke: strategy goal deletion undo keeps failed deletions and retries failed restoration",
+      "attempts": [
+        {
+          "retry": 0,
+          "duration_ms": 46899,
+          "first_click": {
+            "title": "Click locator('[data-home-guide-edit-open=\"delete-failure\"]')",
+            "startTime": "2026-10-14T03:49:54.613Z",
+            "duration": 10493,
+            "error": null
+          },
+          "next_step": {
+            "title": "Fill \"残す下書き\" locator('[data-home-guide-edit=\"delete-failure\"] [name=\"title\"]')",
+            "startTime": "2026-10-14T03:50:05.107Z",
+            "duration": 28936,
+            "error": "Error: locator.fill: Test timeout of 45000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-home-guide-edit=\"delete-failure\"] [name=\"title\"]')\u001b[22m\n"
+          },
+          "errors": [
+            "Test timeout of 45000ms exceeded.",
+            "Error: locator.fill: Test timeout of 45000ms exceeded.\nCall log:\n  - waiting for locator('[data-home-guide-edit=\"delete-failure\"] [name=\"title\"]')"
+          ]
+        },
+        {
+          "retry": 1,
+          "duration_ms": 16396,
+          "first_click": {
+            "title": "Click locator('[data-home-guide-edit-open=\"delete-failure\"]')",
+            "startTime": "2026-10-14T03:50:43.813Z",
+            "duration": 3868,
+            "error": null
+          },
+          "next_step": {
+            "title": "Fill \"残す下書き\" locator('[data-home-guide-edit=\"delete-failure\"] [name=\"title\"]')",
+            "startTime": "2026-10-14T03:50:47.683Z",
+            "duration": 334,
+            "error": null
+          },
+          "errors": []
+        }
+      ]
+    },
+    {
+      "title": "release smoke: strategy goal editing excludes imported goals and removes deleted drafts",
+      "attempts": [
+        {
+          "retry": 0,
+          "duration_ms": 46839,
+          "first_click": {
+            "title": "Click locator('[data-home-guide-edit-open=\"edit-delete\"]')",
+            "startTime": "2026-10-14T03:59:28.054Z",
+            "duration": 10583,
+            "error": null
+          },
+          "next_step": {
+            "title": "Fill \"削除する編集下書き\" locator('[data-home-guide-edit=\"edit-delete\"] [name=\"title\"]')",
+            "startTime": "2026-10-14T03:59:38.639Z",
+            "duration": 28645,
+            "error": "Error: locator.fill: Test timeout of 45000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-home-guide-edit=\"edit-delete\"] [name=\"title\"]')\u001b[22m\n"
+          },
+          "errors": [
+            "Test timeout of 45000ms exceeded.",
+            "Error: locator.fill: Test timeout of 45000ms exceeded.\nCall log:\n  - waiting for locator('[data-home-guide-edit=\"edit-delete\"] [name=\"title\"]')"
+          ]
+        },
+        {
+          "retry": 1,
+          "duration_ms": 14165,
+          "first_click": {
+            "title": "Click locator('[data-home-guide-edit-open=\"edit-delete\"]')",
+            "startTime": "2026-10-14T04:00:20.532Z",
+            "duration": 507,
+            "error": null
+          },
+          "next_step": {
+            "title": "Fill \"削除する編集下書き\" locator('[data-home-guide-edit=\"edit-delete\"] [name=\"title\"]')",
+            "startTime": "2026-10-14T04:00:21.040Z",
+            "duration": 354,
+            "error": null
+          },
+          "errors": []
+        }
+      ]
+    },
+    {
+      "title": "release smoke: deferred strategy goals filter persists and combines with completion and search",
+      "attempts": [
+        {
+          "retry": 0,
+          "duration_ms": 32250,
+          "first_click": {
+            "title": "Click locator('[data-home-guide-later-only]')",
+            "startTime": "2026-10-14T03:48:43.239Z",
+            "duration": 10673,
+            "error": null
+          },
+          "next_step": {
+            "title": "Expect \"toHaveText\"",
+            "startTime": "2026-10-14T03:48:53.919Z",
+            "duration": 12005,
+            "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.home-guide-filter-state')\nExpected string: \u001b[32m\"表示：全件\u001b[7m・あとでのみ\u001b[27m 2件\"\u001b[39m\nReceived string: \u001b[31m\"表示：全件 2\u001b[7m7\u001b[27m件\"\u001b[39m\nTimeout: 12000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 12000ms\u001b[22m\n\u001b[2m  - waiting for locator('.home-guide-filter-state')\u001b[22m\n\u001b[2m    15 × locator resolved to <span role=\"status\" class=\"home-guide-filter-state\">表示：全件 27件</span>\u001b[22m\n\u001b[2m       - unexpected value \"表示：全件 27件\"\u001b[22m\n"
+          },
+          "errors": [
+            "Error: expect(locator).toHaveText(expected) failed"
+          ]
+        },
+        {
+          "retry": 1,
+          "duration_ms": 55672,
+          "first_click": {
+            "title": "Click locator('[data-home-guide-later-only]')",
+            "startTime": "2026-10-14T03:49:21.110Z",
+            "duration": 590,
+            "error": null
+          },
+          "next_step": {
+            "title": "Expect \"toHaveText\"",
+            "startTime": "2026-10-14T03:49:21.702Z",
+            "duration": 212,
+            "error": null
+          },
+          "errors": []
+        }
+      ]
+    }
+  ],
+  "local_lightweight_comparison": {
+    "stats": {
+      "startTime": "2026-10-14T04:58:07.985Z",
+      "duration": 507574.518,
+      "expected": 20,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "retries": 0,
+    "trace": "off",
+    "event_reports": 20,
+    "samples": [
+      {
+        "title": "release smoke: strategy goal deletion undo preserves newer changes and shared imported completion",
+        "documents": 1,
+        "native_press_ms": 7,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: strategy goal deletion undo keeps failed deletions and retries failed restoration",
+        "documents": 1,
+        "native_press_ms": 9,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: strategy goal editing excludes imported goals and removes deleted drafts",
+        "documents": 1,
+        "native_press_ms": 6,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: deferred strategy goals filter persists and combines with completion and search",
+        "documents": 2,
+        "native_press_ms": 4,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: strategy goal deletion undo preserves newer changes and shared imported completion",
+        "documents": 1,
+        "native_press_ms": 4,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: strategy goal deletion undo keeps failed deletions and retries failed restoration",
+        "documents": 1,
+        "native_press_ms": 7,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: strategy goal editing excludes imported goals and removes deleted drafts",
+        "documents": 1,
+        "native_press_ms": 3,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: deferred strategy goals filter persists and combines with completion and search",
+        "documents": 2,
+        "native_press_ms": 7,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: strategy goal deletion undo preserves newer changes and shared imported completion",
+        "documents": 1,
+        "native_press_ms": 6,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: strategy goal deletion undo keeps failed deletions and retries failed restoration",
+        "documents": 1,
+        "native_press_ms": 5,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: strategy goal editing excludes imported goals and removes deleted drafts",
+        "documents": 1,
+        "native_press_ms": 10,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: deferred strategy goals filter persists and combines with completion and search",
+        "documents": 2,
+        "native_press_ms": 4,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: strategy goal deletion undo preserves newer changes and shared imported completion",
+        "documents": 1,
+        "native_press_ms": 3,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: strategy goal deletion undo keeps failed deletions and retries failed restoration",
+        "documents": 1,
+        "native_press_ms": 7,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: strategy goal editing excludes imported goals and removes deleted drafts",
+        "documents": 1,
+        "native_press_ms": 4.0,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: deferred strategy goals filter persists and combines with completion and search",
+        "documents": 2,
+        "native_press_ms": 14,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: strategy goal deletion undo preserves newer changes and shared imported completion",
+        "documents": 1,
+        "native_press_ms": 3.0,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: strategy goal deletion undo keeps failed deletions and retries failed restoration",
+        "documents": 1,
+        "native_press_ms": 4.0,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: strategy goal editing excludes imported goals and removes deleted drafts",
+        "documents": 1,
+        "native_press_ms": 3,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      },
+      {
+        "title": "release smoke: deferred strategy goals filter persists and combines with completion and search",
+        "documents": 2,
+        "native_press_ms": 3,
+        "same_down_up_click_node": true,
+        "pressed_node_connected_at_up": true,
+        "position_delta_y": 0.0,
+        "scroll_delta": 0,
+        "pointer_cancelled": false
+      }
+    ],
+    "root_cause_confirmed": false
+  }
+}

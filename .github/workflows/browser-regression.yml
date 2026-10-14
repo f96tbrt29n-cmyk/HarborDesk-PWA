@@ -77,12 +77,22 @@ jobs:
       - name: Install Playwright browser
         run: npx playwright install --with-deps ${{ matrix.browser }}
 
+      - name: Compare first strategy input without trace delays or retries
+        if: matrix.browser == 'webkit' && matrix.shard == 1
+        env:
+          HD_STRATEGY_RECORD_SUCCESS: '1'
+          PLAYWRIGHT_JSON_OUTPUT_NAME: test-results/strategy-input-light/report.json
+        run: npx playwright test tests/strategy-input-regression.spec.js --project=webkit --workers=1 --retries=0 --repeat-each=3 --trace=off --output=test-results/strategy-input-light --reporter=line,json --grep 'strategy goal deletion undo preserves newer changes|strategy goal deletion undo keeps failed deletions|strategy goal editing excludes imported goals|deferred strategy goals filter persists'
+
       - name: Investigate remaining strategy input failures without retries
         if: matrix.browser == 'webkit' && matrix.shard == 1
-        run: npx playwright test tests/strategy-input-regression.spec.js --project=webkit --workers=1 --retries=0 --repeat-each=3 --grep 'prerequisite checkbox and cleared map|priority strategy view combines completion|priorities reorder manual|editing keeps failed changes'
+        env:
+          HD_STRATEGY_RECORD_SUCCESS: '1'
+          PLAYWRIGHT_JSON_OUTPUT_NAME: test-results/strategy-input-trace/report.json
+        run: npx playwright test tests/strategy-input-regression.spec.js --project=webkit --workers=1 --retries=0 --repeat-each=3 --output=test-results/strategy-input-trace --reporter=line,json
 
       - name: Run smoke browser regression
-        run: npm run test:browser -- --project=${{ matrix.browser }} --workers=${{ matrix.workers }} --shard=${{ matrix.shard }}/${{ matrix.shards }}
+        run: npm run test:browser -- --project=${{ matrix.browser }} --workers=${{ matrix.workers }} --shard=${{ matrix.shard }}/${{ matrix.shards }} --output=test-results/smoke
 
       - name: Upload Playwright diagnostics
         if: ${{ !cancelled() }}
