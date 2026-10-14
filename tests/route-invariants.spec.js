@@ -8,7 +8,7 @@ async function boot(page){
 async function north(page){await boot(page);await page.evaluate(()=>{
  const names=['扶桑改二','鈴谷改二','熊野改二','妙高改二','羽黒改二','那智改二'];
  const ships=names.map((ship,i)=>({ship,gameShipId:9000+i,masterId:hdShipDbMasterRowFor({name:ship}).id,rosterId:'invariant-'+i,gear:i===0?' / / / 零式水上観測機':i===1||i===2?'零式水上観測機 / ドラム缶(輸送用)':'零式水上観測機'}));
- localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(ships.map(s=>({id:s.rosterId,name:s.ship,gameShipId:s.gameShipId,masterId:s.masterId,level:99,gameSlotEx:0,gameLos:121+s.gear.split(' / ').reduce((n,x)=>n+(Number(hdFEFind(x)?.stats?.索敵)||0),0),gameGearSlots:s.gear.split(' / '),gameGearExpansion:'',gameAswGearKnown:true}))));
+ localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(ships.map(s=>({id:s.rosterId,name:s.ship,gameShipId:s.gameShipId,masterId:s.masterId,level:99,gameSlotEx:0,gameLos:121+hdFEGearTokens(s.gear).reduce((n,x)=>n+(Number(hdFEFind(x)?.stats?.索敵)||0),0),gameGearSlots:hdFEGearTokens(s.gear),gameGearExpansion:'',gameAswGearKnown:true}))));
  localStorage.setItem('harbordesk-kancolle-fleets-v1',JSON.stringify([{deckId:1,ships:ships.map(s=>({gameShipId:s.gameShipId,gearKnown:true}))}]));
  localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:120}));
  localStorage.setItem(HD_FL_KEY,JSON.stringify([{name:'零式水上観測機',count:6},{name:'ドラム缶(輸送用)',count:2}]));
@@ -65,8 +65,8 @@ test('ship alternatives cannot discard a fulfilled AA set to improve aggregate A
  const rows=['時雨改二','夕立改二'].map((name,i)=>({id:'alt-'+i,name,gameShipId:800+i,masterId:hdShipDbMasterRowFor({name}).id,level:70,gear:''}));localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));
  saveCustomFleets({'1-1':[{id:'alt',openingAswCount:0,ships:[{ship:rows[0].name,rosterId:rows[0].id,gameShipId:rows[0].gameShipId,masterId:rows[0].masterId,gear:'10cm連装高角砲＋高射装置 / 13号対空電探改 / 三式水中探信儀'}]}]});
  const c=hdOCContext('1-1','alt',0),result=hdOCSearch(c),before=result.measure.goals.find(g=>g.kind==='cap-aa').ok,found=await hdOCFindAlternatives(c,result,{maxCandidates:2,maxExamined:150});
- return {before,proposal:found.proposal&&found.proposal.measure.goals.find(g=>g.kind==='cap-aa').ok};
- });expect(r.before).toBe(true);expect(r.proposal===null||r.proposal===true).toBe(true);
+ return {before,proposal:found.proposal&&found.proposal.measure.goals.find(g=>g.kind==='cap-aa').ok,search:found.search,detail:found.detail};
+ });expect(r.before).toBe(true);expect(r.proposal===null||r.proposal===true).toBe(true);if(r.proposal===null){expect(r.search.status).toBe('incomplete');expect(r.detail).toContain('探索未完了');}
 });
 test('changing synchronized HQ or stock invalidates a proposal without changing six saved data keys',async({page})=>{
  await north(page);const r=await page.evaluate(()=>{
@@ -156,4 +156,25 @@ test('reset to a quick standard cannot drop fulfilled route equipment',async({pa
  hdFLGenerate=()=>{const q=hdFOClone(p);q.ships.forEach(s=>s.items=[]);HD_FL_CACHE['2-5:0']=q;return q;};hdFLRender=()=>{};
  hdFOReset(0,document.createElement('article'));return {before:hdOCKey(p),after:hdOCKey(HD_FL_CACHE['2-5:0'])};
  });expect(r.after).toBe(r.before);
+});
+
+test('2-5 north retains ready low-speed scouting49 and two distinct drums through optimize save and reload',async({page})=>{
+ await north(page);const r=await page.evaluate(()=>{
+ const source=loadCustomFleets()['2-5'][0],p=hdFEPlanFromSavedFleet('2-5',source);p.index=0;p.openingAswCount=0;
+ p.suggestion={preset:source.routePreset,info:hdFSPresetInfo(source.routePreset),slots:p.ships.map(s=>({profile:{type:s.type,row:hdFERoster().find(r=>r.id===s.rosterId)}}))};
+ const summary=q=>{const c=hdFERouteContract(q);return {status:hdFERoute(q).status,low:c.checks.find(x=>x.condition.kind==='speedCount'),drums:c.checks.find(x=>x.condition.kind==='equipmentShips'),los:c.checks.find(x=>x.condition.kind==='scoutingValue')}};
+ const stages=[summary(p)];for(const mode of Object.keys(HD_FO_MODES))stages.push(summary(hdFOOptimize(p,mode)));
+ const fast=hdFOClone(p);fast.ships[0].ship='金剛改二';fast.ships[0].masterId=hdShipDbMasterRowFor({name:'金剛改二'}).id;
+ const noDrum=hdFOClone(p);noDrum.ships[1].items=noDrum.ships[1].items.filter(x=>x.name!=='ドラム缶(輸送用)');
+ const rejects=[fast,noDrum].map(q=>hdOCGoalRegressions(hdOCMeasure(p,[]),hdOCMeasure(q,[])).map(x=>x.kind));
+ hdFOStandardPlan=()=>p;hdFSMap=()=> '2-5';hdFOSavePreset(0,'stable');const saved=loadCustomFleets()['2-5'].find(x=>x.source==='optimizer-preset');return {stages,rejects,id:saved.id};
+ });for(const x of r.stages){expect(x.status).toBe('ready');expect(x.low.status).toBe('ready');expect(x.drums).toMatchObject({status:'ready',count:2});expect(x.los.condition).toMatchObject({coef:1,min:49});expect(x.los.status).toBe('ready');}for(const x of r.rejects)expect(x.length).toBeGreaterThan(0);
+ await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1');expect(await page.evaluate(id=>hdFERoute(hdFEPlanFromSavedFleet('2-5',loadCustomFleets()['2-5'].find(x=>x.id===id))).status,r.id)).toBe('ready');
+});
+test('bounded search reports unfinished exploration without claiming a stock deficit',async({page})=>{
+ await north(page);const r=await page.evaluate(()=>{
+ const c=hdOCContext('2-5','north',0);c.fleet.ships=c.fleet.ships.map(s=>({...s,gear:''}));hdSEChecks=()=>({rows:[],adv:{}});hdFEEnemyAirCandidates=()=>[];
+ const steps=hdOCSearchSteps(c,{maxExamined:50,maxDepth:1});let step;do{step=steps.next()}while(!step.done);const result=step.value;
+ const drum=result.shortages.find(g=>g.goalKind==='drum-ships');hdFCImportOwnedPlan(c,result);const saved={...c.fleet,searchAssessment:result.search};const restored=hdFEPlanFromSavedFleet(c.map,saved).search;return {search:result.search,html:hdOCSearchStatusHtml(result),stockGap:drum?hdOCStockGap(drum):0,proposal:hdFCState('2-5',hdFCSelection('2-5')).proposal,restored};
+ });expect(r.search.status).toBe('incomplete');expect(r.search.exhaustive).toBe(false);expect(r.search.examined).toBeLessThanOrEqual(50);expect(r.search.reasons.some(x=>['combination-limit','depth-limit'].includes(x))).toBe(true);expect(r.html).toContain('探索未完了');expect(r.html).toContain('不足を証明するものではありません');expect(r.stockGap).toBe(0);expect(r.proposal.search).toEqual(r.search);expect(r.restored).toEqual(r.search);
 });

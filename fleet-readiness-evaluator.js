@@ -36,7 +36,7 @@ function hdFEPlanFromSavedFleet(map,fleet){
   return {ship:String(row.ship||'').trim(),rosterId:row.rosterId||'',gameShipId:Number(row.gameShipId)||0,masterId:Number(row.masterId)||Number(db?.id)||0,type:db?.type||'',items,expansion:ex?{name:ex.name,star:ex.star}:null,missing:[],master:!!profile};
  });
  const presets=typeof MAP_PLANS!=='undefined'?(MAP_PLANS[map]?.presets||[]):[],preset=fleet?.routePreset||presets.find(p=>String(fleet?.name||'').includes(String(p?.name||'')))||null,routeInfo=preset&&typeof hdFSPresetInfo==='function'?hdFSPresetInfo(preset):null;
- return {map,ships,routeGoal:fleet?.routeGoal??'',missing:[],masterBacked:ships.filter(x=>x.master).length,createdAt:Date.now(),source:'saved-fleet',sourceFleet:fleet||null,preset,routeInfo};
+ return {map,ships,routeGoal:fleet?.routeGoal??'',missing:[],masterBacked:ships.filter(x=>x.master).length,createdAt:Date.now(),source:'saved-fleet',sourceFleet:fleet||null,search:fleet?.searchAssessment||null,preset,routeInfo};
 }
 function hdFEAssigned(plan){
  const rows=[];

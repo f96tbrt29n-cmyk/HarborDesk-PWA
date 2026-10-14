@@ -1,0 +1,6299 @@
+{
+  "basis": "c6e3da9; existing route thresholds unchanged",
+  "scope": "Registry and implemented predicate coverage, not exhaustive successful equipment search. OR/conditional expressions must be read from conditions/graph, not applied by ANDing extracted speed/equipment lists.",
+  "examples": [
+    {
+      "map": "1-1",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "AC",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-1/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "random",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "ボス分岐はランダム。編成だけで到達確定とは判定しない。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "1-2",
+      "index": 0,
+      "name": "軽量5隻・軽巡1＋駆逐4",
+      "path": "AE",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-2/",
+      "engine": "verified-graph",
+      "provisional": false,
+      "conditions": [
+        {
+          "all": [
+            {
+              "kind": "fleetCount",
+              "min": 4,
+              "max": 5
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐",
+                "海防艦"
+              ],
+              "min": 4,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "any": [
+            {
+              "kind": "minSpeed",
+              "rank": 10
+            },
+            {
+              "all": [
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡"
+                  ],
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐"
+                  ],
+                  "min": 4,
+                  "max": 4
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡"
+                  ],
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐",
+                    "海防艦"
+                  ],
+                  "min": 4,
+                  "max": 4
+                },
+                {
+                  "kind": "unverified",
+                  "reason": "低速の軽巡＋海防混在編成は資料の記述が一致しないため未判定"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "speed": {
+        "conditions": [
+          {
+            "kind": "minSpeed",
+            "rank": 10
+          }
+        ],
+        "minimum": null,
+        "conditional": null,
+        "fallback": {
+          "rank": 10,
+          "unless": [
+            {
+              "all": [
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡"
+                  ],
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐"
+                  ],
+                  "min": 4,
+                  "max": 4
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡"
+                  ],
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐",
+                    "海防艦"
+                  ],
+                  "min": 4,
+                  "max": 4
+                }
+              ]
+            }
+          ]
+        },
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [
+          {
+            "kind": "unverified",
+            "reason": "低速の軽巡＋海防混在編成は資料の記述が一致しないため未判定"
+          }
+        ],
+        "routing": "documented-example",
+        "graph": {
+          "start": "start",
+          "target": "E",
+          "nodes": {
+            "start": [
+              {
+                "conditionRef": "start-A",
+                "to": [
+                  "A"
+                ]
+              }
+            ],
+            "A": [
+              {
+                "conditionRef": "A-E",
+                "to": [
+                  "E"
+                ]
+              }
+            ]
+          }
+        },
+        "goals": {},
+        "notes": []
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "1-3",
+      "index": 0,
+      "name": "軽空母2＋駆逐4",
+      "path": "CFJ / A(DB)EFJ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-3/",
+      "engine": "verified-graph",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母",
+            "軽巡",
+            "駆逐"
+          ],
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐"
+          ],
+          "min": 4,
+          "max": 6
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {
+          "normal": 0,
+          "cfj": 0
+        }
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": {
+          "start": "start",
+          "target": "J",
+          "nodes": {
+            "start": [
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "空母"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "C"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "A",
+                  "C"
+                ],
+                "random": true,
+                "state": "verified"
+              }
+            ],
+            "A": [
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐"
+                  ],
+                  "min": 4,
+                  "max": 6
+                },
+                "to": [
+                  "D",
+                  "E"
+                ],
+                "random": true,
+                "state": "verified"
+              }
+            ],
+            "C": [
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "F"
+                ],
+                "random": false,
+                "state": "verified"
+              }
+            ],
+            "D": [
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "B"
+                ],
+                "random": false,
+                "state": "verified"
+              }
+            ],
+            "B": [
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "E"
+                ],
+                "random": false,
+                "state": "verified"
+              }
+            ],
+            "E": [
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "F"
+                ],
+                "random": false,
+                "state": "verified"
+              }
+            ],
+            "F": [
+              {
+                "conditionRef": "boss-dd",
+                "to": [
+                  "J"
+                ],
+                "state": "verified"
+              }
+            ]
+          }
+        },
+        "goals": {
+          "normal": {
+            "speed": 0,
+            "radar": 0,
+            "conditions": [],
+            "allowed": [
+              "start",
+              "A",
+              "B",
+              "C",
+              "D",
+              "E",
+              "F",
+              "J"
+            ],
+            "label": "ボス方面・ランダム経由を許容"
+          },
+          "cfj": {
+            "speed": 0,
+            "radar": 0,
+            "conditions": [
+              {
+                "kind": "typeCount",
+                "types": [
+                  "軽空母"
+                ],
+                "min": 1,
+                "max": 6
+              }
+            ],
+            "allowed": [
+              "start",
+              "C",
+              "F",
+              "J"
+            ],
+            "label": "CFJ固定・軽空母入り"
+          }
+        },
+        "notes": [
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "1-4",
+      "index": 0,
+      "name": "空母2＋駆逐4",
+      "path": "BCF(E)HL / AD(EH/GJ)L",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-4/",
+      "engine": "verified-graph",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "空母",
+            "軽巡",
+            "駆逐",
+            "海防艦",
+            "水母",
+            "潜水母艦",
+            "補給艦"
+          ],
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐",
+            "海防艦"
+          ],
+          "min": 2,
+          "max": 6
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {
+          "normal": 0,
+          "j-avoid": 0
+        }
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": {
+          "start": "start",
+          "target": "L",
+          "terminals": {
+            "K": "nonboss"
+          },
+          "nodes": {
+            "start": [
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "A",
+                  "B"
+                ],
+                "random": true,
+                "state": "verified"
+              }
+            ],
+            "A": [
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "D"
+                ],
+                "random": false,
+                "state": "verified"
+              }
+            ],
+            "B": [
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "空母"
+                  ],
+                  "min": 3,
+                  "max": 6
+                },
+                "to": [
+                  "D"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐",
+                    "海防艦"
+                  ],
+                  "min": 3,
+                  "max": 6
+                },
+                "to": [
+                  "C"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "all": [
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "駆逐",
+                        "海防艦"
+                      ],
+                      "min": 2,
+                      "max": 2
+                    },
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "補給艦"
+                      ],
+                      "min": 1,
+                      "max": 6
+                    }
+                  ]
+                },
+                "to": [
+                  "C"
+                ],
+                "state": "disputed",
+                "reason": "駆逐/海防2＋補給艦のB→Cは資料間で記載が異なるため未判定。"
+              },
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "C",
+                  "D"
+                ],
+                "random": true,
+                "state": "verified"
+              }
+            ],
+            "C": [
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "F"
+                ],
+                "random": false,
+                "state": "verified"
+              }
+            ],
+            "D": [
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水母艦"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "E"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "水母"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "G"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "E",
+                  "G"
+                ],
+                "random": true,
+                "state": "verified"
+              }
+            ],
+            "F": [
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐",
+                    "海防艦"
+                  ],
+                  "min": 4,
+                  "max": 6
+                },
+                "to": [
+                  "E"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "水母",
+                    "潜水母艦",
+                    "補給艦"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "E"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "E",
+                  "H"
+                ],
+                "random": true,
+                "state": "verified"
+              }
+            ],
+            "E": [
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "H"
+                ],
+                "random": false,
+                "state": "verified"
+              }
+            ],
+            "H": [
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "L"
+                ],
+                "random": false,
+                "state": "verified"
+              }
+            ],
+            "G": [
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "J"
+                ],
+                "random": false,
+                "state": "verified"
+              }
+            ],
+            "J": [
+              {
+                "condition": {
+                  "all": [
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "軽巡"
+                      ],
+                      "min": 1,
+                      "max": 6
+                    },
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "水母"
+                      ],
+                      "min": 1,
+                      "max": 6
+                    },
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "駆逐",
+                        "海防艦"
+                      ],
+                      "min": 2,
+                      "max": 6
+                    }
+                  ]
+                },
+                "to": [
+                  "L"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐"
+                  ],
+                  "min": 4,
+                  "max": 6
+                },
+                "to": [
+                  "L"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "K",
+                  "L"
+                ],
+                "random": true,
+                "state": "verified"
+              }
+            ]
+          }
+        },
+        "goals": {
+          "normal": {
+            "speed": 0,
+            "radar": 0,
+            "conditions": [],
+            "allowed": [
+              "start",
+              "A",
+              "B",
+              "C",
+              "D",
+              "E",
+              "F",
+              "G",
+              "H",
+              "J",
+              "K",
+              "L"
+            ],
+            "label": "ボス方面・ランダム経由を許容"
+          },
+          "j-avoid": {
+            "speed": 0,
+            "radar": 0,
+            "conditions": [
+              {
+                "kind": "typeCount",
+                "types": [
+                  "潜水母艦"
+                ],
+                "min": 1,
+                "max": 6
+              },
+              {
+                "kind": "typeCount",
+                "types": [
+                  "駆逐",
+                  "海防艦"
+                ],
+                "min": 3,
+                "max": 6
+              }
+            ],
+            "allowed": [
+              "start",
+              "A",
+              "B",
+              "C",
+              "D",
+              "E",
+              "F",
+              "H",
+              "L"
+            ],
+            "label": "J回避・潜水母艦入り"
+          }
+        },
+        "notes": [
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "1-5",
+      "index": 0,
+      "name": "海防艦4隻",
+      "path": "ADEJ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 4,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 4,
+          "max": 4
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [
+        {
+          "kind": "cap-asw",
+          "label": "対潜シナジー",
+          "minCount": 4
+        }
+      ],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "海防艦4隻の経路。先制対潜の可否は艦別に別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "1-5",
+      "index": 1,
+      "name": "砲撃二巡型",
+      "path": "ADFGJ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 4,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "正規空母",
+            "装甲空母",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [
+        {
+          "kind": "cap-asw",
+          "label": "対潜シナジー",
+          "minCount": 3
+        }
+      ],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "航空戦艦は採用可能。砲撃二巡型の航空戦艦には対潜攻撃可能な水上爆撃機などを検討。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "1-5",
+      "index": 2,
+      "name": "駆逐4隻",
+      "path": "ADFGJ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 4,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "正規空母",
+            "装甲空母",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [
+        {
+          "kind": "cap-asw",
+          "label": "対潜シナジー",
+          "minCount": 4
+        }
+      ],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "航空戦艦は採用可能。砲撃二巡型の航空戦艦には対潜攻撃可能な水上爆撃機などを検討。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "1-6",
+      "index": 0,
+      "name": "下ルート・軽巡1＋駆逐5",
+      "path": "AEGFBN",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-6/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 5,
+          "max": 5
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "下ルートでは制空優勢・対空CI発動は通行条件ではない。対潜と防空を推奨。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "2-1",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "C(E)DH",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-1/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "multiple",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "経由マスが複数ある登録例。補給艦入り等の別例は対象外。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "2-2",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "CE(GH)K",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-2/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦",
+            "潜水母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "multiple",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "水母または潜水母艦を維持。G/Hを通るかはランダム。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "2-3",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "ボス方面・経路ランダム",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-3/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "random",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "Jからの逸れなどを含む。編成条件の充足でボス到達を保証しない。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "2-4",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "ボス方面・経路ランダム",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-4/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦",
+            "潜水母艦",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "random",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "戦艦＋空母は3隻まで。羅針盤による逸れを残す編成例。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "2-5",
+      "index": 0,
+      "name": "北ルート型",
+      "path": "BFJO",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "潜水艦",
+            "潜水空母",
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "speedCount",
+          "rank": 5,
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "equipmentShips",
+          "match": "drum",
+          "min": 2,
+          "max": 7,
+          "slotPolicy": "valid"
+        }
+      ],
+      "speed": {
+        "conditions": [
+          {
+            "kind": "speedCount",
+            "rank": 5,
+            "min": 1,
+            "max": 7
+          }
+        ],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 1,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 49,
+            "failBelow": 42
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [
+        {
+          "kind": "equipmentShips",
+          "match": "drum",
+          "min": 2,
+          "max": 7,
+          "slotPolicy": "valid"
+        }
+      ],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "実際の編成速力が低速の艦を1隻以上維持。高速化して低速艦がなくなるとF→J条件を満たさない。",
+          "ドラム缶(輸送用)は異なる2隻に各1個以上。同じ艦に2個は1隻として数える。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": true,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "2-5",
+      "index": 1,
+      "name": "南ルート型",
+      "path": "CEIO",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [
+          {
+            "kind": "minSpeed",
+            "rank": 10
+          }
+        ],
+        "minimum": 10,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 1,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 34,
+            "failBelow": 31
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "3-1",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "CFG",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-1/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空戦艦",
+            "軽巡洋艦",
+            "水上機母艦",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "3-2",
+      "index": 0,
+      "name": "軽巡1＋駆逐5",
+      "path": "選択したC…L目標",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-2/",
+      "engine": "verified-graph",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "all": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡",
+                "駆逐",
+                "補給艦"
+              ],
+              "min": 6,
+              "max": 6
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡"
+              ],
+              "min": 0,
+              "max": 1
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐"
+              ],
+              "min": 4,
+              "max": 6
+            }
+          ]
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {
+          "normal": 0,
+          "fastPlus": 15,
+          "fastest": 20
+        }
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": {
+          "start": "start",
+          "target": "L",
+          "terminals": {
+            "A": "nonboss",
+            "D": "nonboss",
+            "I": "nonboss",
+            "J": "nonboss",
+            "L": "boss"
+          },
+          "nodes": {
+            "start": [
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "戦艦",
+                    "空母"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "C"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐"
+                  ],
+                  "min": 6,
+                  "max": 6
+                },
+                "to": [
+                  "C"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "all": [
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "軽巡"
+                      ],
+                      "min": 1,
+                      "max": 1
+                    },
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "駆逐"
+                      ],
+                      "min": 4,
+                      "max": 6
+                    }
+                  ]
+                },
+                "to": [
+                  "C"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "A"
+                ],
+                "random": false,
+                "state": "verified"
+              }
+            ],
+            "C": [
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐"
+                  ],
+                  "min": 0,
+                  "max": 3
+                },
+                "to": [
+                  "A"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "戦艦",
+                    "正規空母"
+                  ],
+                  "min": 2,
+                  "max": 6
+                },
+                "to": [
+                  "A"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水艦"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "A",
+                  "G"
+                ],
+                "random": true,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "not": {
+                    "kind": "minSpeed",
+                    "rank": 10
+                  }
+                },
+                "to": [
+                  "G"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "equipmentShips",
+                  "match": "radar",
+                  "slotPolicy": "valid",
+                  "min": 0,
+                  "max": 0
+                },
+                "to": [
+                  "G"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡",
+                    "駆逐",
+                    "補給艦"
+                  ],
+                  "min": 0,
+                  "max": 5
+                },
+                "to": [
+                  "G"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "all": [
+                    {
+                      "kind": "minSpeed",
+                      "rank": 20
+                    },
+                    {
+                      "kind": "equipmentShips",
+                      "match": "radar",
+                      "slotPolicy": "valid",
+                      "min": 4,
+                      "max": 6
+                    }
+                  ]
+                },
+                "to": [
+                  "E"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "minSpeed",
+                  "rank": 15
+                },
+                "to": [
+                  "E",
+                  "G"
+                ],
+                "random": true,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "補給艦"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "E",
+                  "G"
+                ],
+                "random": true,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "G"
+                ],
+                "random": false,
+                "state": "verified"
+              }
+            ],
+            "E": [
+              {
+                "condition": {
+                  "kind": "minSpeed",
+                  "rank": 15
+                },
+                "to": [
+                  "F"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "D",
+                  "F"
+                ],
+                "random": true,
+                "state": "verified"
+              }
+            ],
+            "G": [
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "正規空母"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "J"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "戦艦",
+                    "軽空母"
+                  ],
+                  "min": 2,
+                  "max": 6
+                },
+                "to": [
+                  "J"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水艦"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "H",
+                  "J"
+                ],
+                "random": true,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡",
+                    "駆逐",
+                    "補給艦"
+                  ],
+                  "min": 0,
+                  "max": 5
+                },
+                "to": [
+                  "H"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "not": {
+                    "kind": "minSpeed",
+                    "rank": 10
+                  }
+                },
+                "to": [
+                  "H"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "equipmentShips",
+                  "match": "radar",
+                  "slotPolicy": "valid",
+                  "min": 0,
+                  "max": 0
+                },
+                "to": [
+                  "H"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "minSpeed",
+                  "rank": 15
+                },
+                "to": [
+                  "F"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "補給艦"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "H",
+                  "F"
+                ],
+                "random": true,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "H",
+                  "F"
+                ],
+                "random": true,
+                "state": "verified"
+              }
+            ],
+            "H": [
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡",
+                    "駆逐",
+                    "補給艦"
+                  ],
+                  "min": 6,
+                  "max": 6
+                },
+                "to": [
+                  "F"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡",
+                    "駆逐",
+                    "補給艦"
+                  ],
+                  "min": 0,
+                  "max": 5
+                },
+                "to": [
+                  "I"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "I",
+                  "F"
+                ],
+                "random": false,
+                "state": "unverified",
+                "reason": "6隻を超える範囲は資料表記が一致しない"
+              }
+            ],
+            "F": [
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "L"
+                ],
+                "random": false,
+                "state": "verified"
+              }
+            ]
+          }
+        },
+        "goals": {
+          "normal": {
+            "speed": 0,
+            "radar": 0,
+            "conditions": [],
+            "allowed": [
+              "start",
+              "C",
+              "E",
+              "G",
+              "H",
+              "F",
+              "L"
+            ],
+            "label": "通常・H経由を許容"
+          },
+          "fastPlus": {
+            "speed": 15,
+            "radar": 1,
+            "conditions": [
+              {
+                "kind": "minSpeed",
+                "rank": 15
+              },
+              {
+                "kind": "equipmentShips",
+                "match": "radar",
+                "slotPolicy": "valid",
+                "min": 1,
+                "max": 6
+              }
+            ],
+            "allowed": [
+              "start",
+              "C",
+              "E",
+              "G",
+              "F",
+              "L"
+            ],
+            "label": "H回避・高速＋以上"
+          },
+          "fastest": {
+            "speed": 20,
+            "radar": 4,
+            "conditions": [
+              {
+                "kind": "minSpeed",
+                "rank": 20
+              },
+              {
+                "kind": "equipmentShips",
+                "match": "radar",
+                "slotPolicy": "valid",
+                "min": 4,
+                "max": 6
+              }
+            ],
+            "allowed": [
+              "start",
+              "C",
+              "E",
+              "F",
+              "L"
+            ],
+            "label": "CEFL固定・最速"
+          }
+        },
+        "notes": []
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "3-2",
+      "index": 1,
+      "name": "駆逐6",
+      "path": "選択したC…L目標",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-2/",
+      "engine": "verified-graph",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "all": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡",
+                "駆逐",
+                "補給艦"
+              ],
+              "min": 6,
+              "max": 6
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡"
+              ],
+              "min": 0,
+              "max": 1
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐"
+              ],
+              "min": 4,
+              "max": 6
+            }
+          ]
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {
+          "normal": 0,
+          "fastPlus": 15,
+          "fastest": 20
+        }
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": {
+          "start": "start",
+          "target": "L",
+          "terminals": {
+            "A": "nonboss",
+            "D": "nonboss",
+            "I": "nonboss",
+            "J": "nonboss",
+            "L": "boss"
+          },
+          "nodes": {
+            "start": [
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "戦艦",
+                    "空母"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "C"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐"
+                  ],
+                  "min": 6,
+                  "max": 6
+                },
+                "to": [
+                  "C"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "all": [
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "軽巡"
+                      ],
+                      "min": 1,
+                      "max": 1
+                    },
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "駆逐"
+                      ],
+                      "min": 4,
+                      "max": 6
+                    }
+                  ]
+                },
+                "to": [
+                  "C"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "A"
+                ],
+                "random": false,
+                "state": "verified"
+              }
+            ],
+            "C": [
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐"
+                  ],
+                  "min": 0,
+                  "max": 3
+                },
+                "to": [
+                  "A"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "戦艦",
+                    "正規空母"
+                  ],
+                  "min": 2,
+                  "max": 6
+                },
+                "to": [
+                  "A"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水艦"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "A",
+                  "G"
+                ],
+                "random": true,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "not": {
+                    "kind": "minSpeed",
+                    "rank": 10
+                  }
+                },
+                "to": [
+                  "G"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "equipmentShips",
+                  "match": "radar",
+                  "slotPolicy": "valid",
+                  "min": 0,
+                  "max": 0
+                },
+                "to": [
+                  "G"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡",
+                    "駆逐",
+                    "補給艦"
+                  ],
+                  "min": 0,
+                  "max": 5
+                },
+                "to": [
+                  "G"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "all": [
+                    {
+                      "kind": "minSpeed",
+                      "rank": 20
+                    },
+                    {
+                      "kind": "equipmentShips",
+                      "match": "radar",
+                      "slotPolicy": "valid",
+                      "min": 4,
+                      "max": 6
+                    }
+                  ]
+                },
+                "to": [
+                  "E"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "minSpeed",
+                  "rank": 15
+                },
+                "to": [
+                  "E",
+                  "G"
+                ],
+                "random": true,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "補給艦"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "E",
+                  "G"
+                ],
+                "random": true,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "G"
+                ],
+                "random": false,
+                "state": "verified"
+              }
+            ],
+            "E": [
+              {
+                "condition": {
+                  "kind": "minSpeed",
+                  "rank": 15
+                },
+                "to": [
+                  "F"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "D",
+                  "F"
+                ],
+                "random": true,
+                "state": "verified"
+              }
+            ],
+            "G": [
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "正規空母"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "J"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "戦艦",
+                    "軽空母"
+                  ],
+                  "min": 2,
+                  "max": 6
+                },
+                "to": [
+                  "J"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水艦"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "H",
+                  "J"
+                ],
+                "random": true,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡",
+                    "駆逐",
+                    "補給艦"
+                  ],
+                  "min": 0,
+                  "max": 5
+                },
+                "to": [
+                  "H"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "not": {
+                    "kind": "minSpeed",
+                    "rank": 10
+                  }
+                },
+                "to": [
+                  "H"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "equipmentShips",
+                  "match": "radar",
+                  "slotPolicy": "valid",
+                  "min": 0,
+                  "max": 0
+                },
+                "to": [
+                  "H"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "minSpeed",
+                  "rank": 15
+                },
+                "to": [
+                  "F"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "補給艦"
+                  ],
+                  "min": 1,
+                  "max": 6
+                },
+                "to": [
+                  "H",
+                  "F"
+                ],
+                "random": true,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "H",
+                  "F"
+                ],
+                "random": true,
+                "state": "verified"
+              }
+            ],
+            "H": [
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡",
+                    "駆逐",
+                    "補給艦"
+                  ],
+                  "min": 6,
+                  "max": 6
+                },
+                "to": [
+                  "F"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡",
+                    "駆逐",
+                    "補給艦"
+                  ],
+                  "min": 0,
+                  "max": 5
+                },
+                "to": [
+                  "I"
+                ],
+                "random": false,
+                "state": "verified"
+              },
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "I",
+                  "F"
+                ],
+                "random": false,
+                "state": "unverified",
+                "reason": "6隻を超える範囲は資料表記が一致しない"
+              }
+            ],
+            "F": [
+              {
+                "condition": {
+                  "kind": "always"
+                },
+                "to": [
+                  "L"
+                ],
+                "random": false,
+                "state": "verified"
+              }
+            ]
+          }
+        },
+        "goals": {
+          "normal": {
+            "speed": 0,
+            "radar": 0,
+            "conditions": [],
+            "allowed": [
+              "start",
+              "C",
+              "E",
+              "G",
+              "H",
+              "F",
+              "L"
+            ],
+            "label": "通常・H経由を許容"
+          },
+          "fastPlus": {
+            "speed": 15,
+            "radar": 1,
+            "conditions": [
+              {
+                "kind": "minSpeed",
+                "rank": 15
+              },
+              {
+                "kind": "equipmentShips",
+                "match": "radar",
+                "slotPolicy": "valid",
+                "min": 1,
+                "max": 6
+              }
+            ],
+            "allowed": [
+              "start",
+              "C",
+              "E",
+              "G",
+              "F",
+              "L"
+            ],
+            "label": "H回避・高速＋以上"
+          },
+          "fastest": {
+            "speed": 20,
+            "radar": 4,
+            "conditions": [
+              {
+                "kind": "minSpeed",
+                "rank": 20
+              },
+              {
+                "kind": "equipmentShips",
+                "match": "radar",
+                "slotPolicy": "valid",
+                "min": 4,
+                "max": 6
+              }
+            ],
+            "allowed": [
+              "start",
+              "C",
+              "E",
+              "F",
+              "L"
+            ],
+            "label": "CEFL固定・最速"
+          }
+        },
+        "notes": []
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "3-3",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "ACGM",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-3/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "3-4",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "ACEGJP",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-4/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "3-5",
+      "index": 0,
+      "name": "下ルート 1",
+      "path": "FGK",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 5,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "潜水艦",
+            "潜水空母",
+            "水上機母艦",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "軽巡洋艦",
+            "潜水艦",
+            "潜水空母",
+            "水上機母艦",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 6,
+          "max": 6
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 28
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": []
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "3-5",
+      "index": 1,
+      "name": "上ルート 2",
+      "path": "BDHK",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 40
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "4-1",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "CFDGJ / ABDGJ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-1/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "multiple",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "始点A/Cはランダム。潜水艦なし・護衛1隻の登録例はD→G。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "4-2",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "ACL / BDCL",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-2/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "any": [
+            {
+              "all": [
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡洋艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 1,
+                  "max": 7
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐艦",
+                    "海防艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 3,
+                  "max": 7
+                }
+              ]
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐艦",
+                "海防艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 4,
+              "max": 7
+            }
+          ]
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "multiple",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "始点A/Bはランダム。海防艦を含む艦種条件と単一経路固定は区別。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "4-2",
+      "index": 1,
+      "name": "駆逐4隻型 2",
+      "path": "ACL / BDCL",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-2/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 4,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "multiple",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "始点A/Bはランダム。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "4-3",
+      "index": 0,
+      "name": "対地攻略 1",
+      "path": "CDHN / CFHN",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-3/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        }
+      ],
+      "speed": {
+        "conditions": [
+          {
+            "kind": "minSpeed",
+            "rank": 10
+          }
+        ],
+        "minimum": 10,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "random",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "この登録例でもHからIへの逸れがある。対地装備は勝利目的に応じた推奨で、通行条件ではない。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "4-4",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "AEIK",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-4/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "4-5",
+      "index": 0,
+      "name": "高速+最短 1",
+      "path": "ADHT / CDHT",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 15
+        }
+      ],
+      "speed": {
+        "conditions": [
+          {
+            "kind": "minSpeed",
+            "rank": 15
+          }
+        ],
+        "minimum": 15,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "multiple",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "高速+統一の最短経路では数値索敵条件なし。対地攻撃の装備は別の推奨目標。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "4-5",
+      "index": 1,
+      "name": "中央ルート 2",
+      "path": "ADHKT / CDHKT",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 2,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 71
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "multiple",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "4-5",
+      "index": 2,
+      "name": "軽量最短 3",
+      "path": "ADHT / CDHT",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "multiple",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "軽量最短例は高速+不要、数値索敵条件なし。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "5-1",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "BCFJ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-1/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "5-2",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "BCEFO",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-2/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 2,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 70
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "5-3",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "DGIOKEQ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-3/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "any": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "戦艦",
+                "高速戦艦",
+                "航空戦艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 0,
+              "max": 1
+            },
+            {
+              "kind": "minSpeed",
+              "rank": 10
+            }
+          ]
+        }
+      ],
+      "speed": {
+        "conditions": [
+          {
+            "kind": "minSpeed",
+            "rank": 10
+          }
+        ],
+        "minimum": null,
+        "conditional": {
+          "rank": 10,
+          "when": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          }
+        },
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "航戦不可。戦艦2隻へ変更する別例では高速統一が必要。能動分岐Oでボス方面を選ぶ。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "5-4",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "ADEHIJMP",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-4/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 2,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 45
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "この登録例は中央ルート。上ルートL→Pの索敵値を流用しない。渦潮対策の電探は推奨。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "5-5",
+      "index": 0,
+      "name": "上ルート 1",
+      "path": "BKPS",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 2,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 80
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "戦艦＋空母5隻以上の別例には索敵を満たしても逸れがある。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。",
+          "対潜艦を入れない重量例ではBマスの陣形・回避や支援を出典で確認。対潜可能な別編成は別途評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "5-5",
+      "index": 1,
+      "name": "中央下ルート 2",
+      "path": "BFDHNOS",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 2,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 66
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "この登録例は中央下ルート。ACEGIMOSのドラム缶4隻／大発系4隻の条件とは別。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "5-6",
+      "index": 0,
+      "name": "第1輸送ゲージ 1",
+      "path": "ABC2DEG",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-6/",
+      "engine": "contract",
+      "provisional": true,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 4,
+          "max": 4
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": 0,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 65
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [
+        {
+          "kind": "cap-pt",
+          "baseKind": "PT対策",
+          "label": "PT小鬼群対策セット",
+          "minCount": 1,
+          "source": "https://zekamashi.net/kancolle-kouryaku/ptboat-taisaku/"
+        }
+      ],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "出典が仮更新・検証継続中としている条件。数値は攻略目安として表示し、確定分岐成立とは扱わない。",
+          "第1ゲージ後のR到達ギミックと新スタート開放は別途確認。PT小鬼群対策・輸送装備をゲージ別に準備。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "5-6",
+      "index": 1,
+      "name": "第2戦力ゲージ 2",
+      "path": "IJKLN",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-6/",
+      "engine": "contract",
+      "provisional": true,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦",
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "speed": {
+        "conditions": [
+          {
+            "kind": "minSpeed",
+            "rank": 10
+          }
+        ],
+        "minimum": 10,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 80
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "出典が仮更新・検証継続中としている条件。数値は攻略目安として表示し、確定分岐成立とは扱わない。",
+          "第1ゲージ後のR到達ギミックと新スタート開放は別途確認。PT小鬼群対策・輸送装備をゲージ別に準備。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "5-6",
+      "index": 2,
+      "name": "第3戦力ゲージ 3",
+      "path": "IOQUXZ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-6/",
+      "engine": "contract",
+      "provisional": true,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦",
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "speed": {
+        "conditions": [
+          {
+            "kind": "minSpeed",
+            "rank": 10
+          }
+        ],
+        "minimum": 10,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 88
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "出典が仮更新・検証継続中としている条件。数値は攻略目安として表示し、確定分岐成立とは扱わない。",
+          "第1ゲージ後のR到達ギミックと新スタート開放は別途確認。PT小鬼群対策・輸送装備をゲージ別に準備。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "6-1",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "AFGHK",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-1/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 25
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "潜水母艦を外す別例は必要索敵値とランダム分岐が変わる。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "6-2",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "CEJK",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-2/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 3,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 50,
+            "failBelow": 43
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "I経由を狙う別例は40以上43未満。選択したJ経由は50以上を使う。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "6-3",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "ACEGHJ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-3/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "練習巡洋艦",
+            "駆逐艦",
+            "水上機母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 3,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 38,
+            "failBelow": 36
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "出撃可能な艦種は軽巡・練巡・駆逐・水母。能動分岐はE方面を選ぶ。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "6-4",
+      "index": 0,
+      "name": "左ルート 1",
+      "path": "BDCFN",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-4/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "flagshipType",
+          "types": [
+            "軽巡洋艦"
+          ]
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [
+          {
+            "kind": "minSpeed",
+            "rank": 10
+          }
+        ],
+        "minimum": 10,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [
+          {
+            "kind": "flagshipType",
+            "types": [
+              "軽巡洋艦"
+            ]
+          }
+        ],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "軽巡旗艦。長門型タッチの別編成と混同しない。対地装備、基地1部隊とボス半径5を別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "6-5",
+      "index": 0,
+      "name": "上ルート型",
+      "path": "ACDGM",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "重雷装巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 3,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 50
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "基地航空隊は2部隊まで。ボスへの行動半径5、敵編成・制空・補充を基地計画で確認。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "6-5",
+      "index": 1,
+      "name": "下ルート型",
+      "path": "BFIJM",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "重雷装巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 3,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 35
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "空母・雷巡を使わない下ルート。道中対潜・夜戦と基地航空隊を準備。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "7-1",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "DEGHK",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-1/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 5,
+          "max": 5
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 4,
+          "max": 4
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [
+        {
+          "kind": "cap-asw",
+          "label": "対潜シナジー",
+          "minCount": 4
+        }
+      ],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "先制対潜4〜5隻は攻略用の推奨。通常戦Gへの火力とルート条件は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "7-2",
+      "index": 0,
+      "name": "第1ゲージ 1",
+      "path": "CEG",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-2/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 4,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "潜水艦",
+            "潜水空母",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [
+        {
+          "kind": "cap-asw",
+          "label": "対潜シナジー",
+          "minCount": 4
+        }
+      ],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "第1ゲージの4隻例では数値索敵不要。対潜攻撃装備を各艦に準備。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "7-2",
+      "index": 1,
+      "name": "第2ゲージ 2",
+      "path": "BCDIM",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-2/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "練習巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "補給艦",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "speed": {
+        "conditions": [
+          {
+            "kind": "minSpeed",
+            "rank": 10
+          }
+        ],
+        "minimum": 10,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 69
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "第2ゲージ用。敵編成に応じた制空目標と道中対潜を別評価。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "7-3",
+      "index": 0,
+      "name": "第1ゲージ 1",
+      "path": "ACE",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-3/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 4,
+          "max": 4
+        },
+        {
+          "kind": "namedCount",
+          "names": [
+            "羽黒"
+          ],
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [
+          {
+            "kind": "namedCount",
+            "names": [
+              "羽黒"
+            ],
+            "min": 1,
+            "max": 7
+          }
+        ],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "第1ゲージ・羽黒入りの例。史実艦の改造段階を含めて識別。数値索敵条件なし。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "7-3",
+      "index": 1,
+      "name": "第2ゲージ 2",
+      "path": "ACDGJP",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-3/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "namedCount",
+          "names": [
+            "羽黒"
+          ],
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "namedCount",
+          "names": [
+            "足柄"
+          ],
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        }
+      ],
+      "speed": {
+        "conditions": [
+          {
+            "kind": "minSpeed",
+            "rank": 10
+          }
+        ],
+        "minimum": 10,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [
+          {
+            "kind": "namedCount",
+            "names": [
+              "羽黒"
+            ],
+            "min": 1,
+            "max": 7
+          },
+          {
+            "kind": "namedCount",
+            "names": [
+              "足柄"
+            ],
+            "min": 1,
+            "max": 7
+          }
+        ],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "第2ゲージの羽黒・足柄・駆逐3例。道中Jの潜水艦に煙幕または対潜対策。数値索敵条件なし。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "7-4",
+      "index": 0,
+      "name": "通常攻略 1",
+      "path": "ABEJLP",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-4/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "正規空母",
+            "装甲空母",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "重雷装巡洋艦",
+            "練習巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空戦艦",
+            "軽空母",
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "any": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐艦",
+                "海防艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 3,
+              "max": 7
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "海防艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 2,
+              "max": 7
+            }
+          ]
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 37,
+            "failBelow": 33
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [
+        {
+          "kind": "cap-asw",
+          "label": "対潜シナジー",
+          "minCount": 3
+        }
+      ],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "登録した6隻の経路例。対潜枠・夜戦フィニッシャー・基地1部隊（ボス半径2）を準備。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "7-5",
+      "index": 0,
+      "name": "第1ゲージ 1",
+      "path": "ABDFGHK",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "第1ゲージKへの例では数値索敵不要。M到達ギミックを行う場合は別に33式係数4で59以上必要。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "7-5",
+      "index": 1,
+      "name": "第2ゲージ 2",
+      "path": "ABDFJOQ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [
+        {
+          "kind": "cap-pt",
+          "baseKind": "PT対策",
+          "label": "PT小鬼群対策セット",
+          "minCount": 1,
+          "source": "https://zekamashi.net/kancolle-kouryaku/ptboat-taisaku/"
+        }
+      ],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "第2ゲージQの対地攻略例。第1ゲージ撃破を確認。Mギミックは第3ゲージ開放に必要。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    },
+    {
+      "map": "7-5",
+      "index": 2,
+      "name": "第3ゲージ 3",
+      "path": "ABDFJOPT",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-5/",
+      "engine": "contract",
+      "provisional": false,
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        }
+      ],
+      "speed": {
+        "conditions": [],
+        "minimum": null,
+        "conditional": null,
+        "fallback": null,
+        "goals": {}
+      },
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 63
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "mandatoryEquipmentShips": [],
+      "strategyEquipmentTargets": [],
+      "special": {
+        "conditions": [],
+        "routing": "documented-example",
+        "graph": null,
+        "goals": {},
+        "notes": [
+          "軽空母入りの第3ゲージ例は63以上。航空戦艦入りの別例の58を流用しない。低速可。第2ゲージ撃破とMマスS勝利1回が開放条件。",
+          "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+        ]
+      },
+      "verification": {
+        "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
+        "unknownInputs": "empty/unknown hull rejection all53",
+        "perExampleAllRequirementsPositiveNegative": false,
+        "representativeAllRequirementsStages": false,
+        "physicalIPhone": false
+      }
+    }
+  ]
+}
