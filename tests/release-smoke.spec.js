@@ -10788,7 +10788,12 @@ test('release smoke: strategy native edit press survives a pending header expans
     return JSON.stringify(await button.boundingBox())===JSON.stringify(a);
   }).toBe(true);
   const target=await button.boundingBox();
-  expect(await button.evaluate(el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.x+18,r.y+4)?.closest('[data-home-guide-edit-open]')===el})).toBe(true);
+  expect(await button.evaluate(el=>{const r=el.getBoundingClientRect(),point={x:r.x+18,y:r.y+4},hit=document.elementFromPoint(point.x,point.y),matches=hit?.closest('[data-home-guide-edit-open]')===el;
+    window.__hdHeaderPressPreflight={commandPhase:'before page.mouse.down',sampleAt:performance.now(),rect:r.toJSON(),point,matches,
+      scrollY:window.scrollY,viewport:{width:innerWidth,height:innerHeight},bodyClass:document.body.className,
+      hit:hit?{tag:hit.tagName,id:hit.id,className:typeof hit.className==='string'?hit.className:''}:null,
+      headerPressId:hdWSHeaderPress?.id??null,navLockUntil:hdWSNavLockUntil,now:Date.now()};
+    return matches})).toBe(true);
   await page.mouse.move(target.x+18,target.y+4);
   await page.mouse.down();
   expect(await page.evaluate(()=>hdWSHeaderPress!==null)).toBe(true);
@@ -10831,4 +10836,11 @@ test('release smoke: strategy native touch edit survives a pending header expans
   await page.touchscreen.tap(target.x+18,target.y+4);
   expect(await page.evaluate(()=>window.__headerTouchPointerType)).toBe('touch');
   await expect(page.locator('[data-home-guide-edit="header-touch-editor"] [name="title"]')).toBeVisible();
+});
+
+// Record the exact failed precondition without adding a wait or another scroll.
+test.afterEach(async({page},info)=>{
+ if(info.title!=='release smoke: strategy native edit press survives a pending header expansion'||info.status===info.expectedStatus)return;
+ const evidence=await page.evaluate(()=>window.__hdHeaderPressPreflight||null).catch(()=>null);
+ await info.attach('header-press-preflight',{body:Buffer.from(JSON.stringify(evidence)),contentType:'application/json'});
 });
