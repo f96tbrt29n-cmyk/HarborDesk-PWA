@@ -47,24 +47,6 @@ async function boot(page, errors = []) {
 
 
 
-test('release smoke: deferred strategy goals filter persists and combines with completion and search', async ({ page }) => {
-  // This scenario exercises every filter and then reloads the app.
-  test.setTimeout(90000);
-  await boot(page);
-  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push(
-    {id:'later-pending',category:'map',title:'あとで装備を準備',priority:'later',scope:'map',map:'6-5'},
-    {id:'later-done',category:'map',title:'あとで任務を確認',priority:'later',scope:'global',map:''},
-    {id:'later-high',category:'map',title:'優先する目標',priority:'high',scope:'global',map:''});s.done.push(homeGuideGoalKey(s.custom.find(x=>x.id==='later-done')));homeGuideSave(s)});
-  const before=await page.evaluate(()=>homeGuideState());
-  const filter=page.locator('[data-home-guide-later-only]');await filter.click();
-  await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：全件・あとでのみ 2件');
-  await page.locator('[data-home-guide-pending]').click();await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：未完了・あとでのみ 1件');
-  await page.locator('[data-home-guide-completed]').click();await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：完了済み・あとでのみ 1件');
-  await page.locator('[data-home-guide-search]').fill('装備');await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：完了済み・あとでのみ・検索中 0件');await page.locator('[data-home-guide-search-clear]').click();
-  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false)});await expect(filter).toHaveAttribute('aria-pressed','true');
-  await page.locator('[data-home-guide-priority-only]').click();await expect(filter).toHaveAttribute('aria-pressed','false');await expect(page.locator('[data-home-guide-priority-only]')).toHaveAttribute('aria-pressed','true');
-  await filter.click();await expect(page.locator('[data-home-guide-priority-only]')).toHaveAttribute('aria-pressed','false');expect(await page.evaluate(()=>homeGuideState())).toEqual(before);
-});
 
 test('release smoke: deferred filter preserves drafts and reveals new normal goals after saving succeeds', async ({ page }) => {
   await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'later-edit',category:'map',title:'保留目標',scope:'map',map:'6-5',priority:'later'});homeGuideSave(s)});

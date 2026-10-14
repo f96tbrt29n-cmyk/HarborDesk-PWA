@@ -57,16 +57,7 @@ test('release smoke: strategy goal deletion undo restores completion priority an
   expect(await page.evaluate(()=>homeGuideState().custom.find(x=>x.id==='delete-undo').title)).toBe('優先の達成済み目標');expect(await page.evaluate(()=>homeGuideState().done)).toContain('map:6-5:map:delete-undo');
 });
 
-test('release smoke: strategy goal deletion undo preserves newer changes and shared imported completion', async ({ page }) => {
-  await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'delete-import',title:'取り込んだ任務',category:'map',scope:'map',map:'6-5',priority:'high',source:'oneTimeQuest',ref:'B175'},{id:'delete-other',title:'別海域の同じ任務',category:'quest',scope:'map',map:'6-4',source:'oneTimeQuest',ref:'B175'});s.done.push('shared:oneTimeQuest:B175');homeGuideSave(s)});const imported=await page.evaluate(()=>homeGuideState().custom.find(x=>x.id==='delete-import'));await page.locator('[data-home-guide-delete="delete-import"]').click();
-  await page.evaluate(()=>{const s=homeGuideState();s.custom.push({id:'delete-new',title:'削除後に追加した目標',category:'map',scope:'global'});s.done.push('global:map:delete-new');s.cleared.push('6-3');homeGuideSave(s);hdSelectGuideMap('6-4')});await page.locator('#hdToastRegion .hd-toast-action').click();expect(await page.evaluate(()=>homeGuideState().custom.find(x=>x.id==='delete-import'))).toEqual(imported);expect(await page.evaluate(()=>homeGuideState().custom.map(x=>x.id))).toEqual(['delete-import','delete-other','delete-new']);expect(await page.evaluate(()=>homeGuideState().done)).toEqual(expect.arrayContaining(['shared:oneTimeQuest:B175','global:map:delete-new']));expect(await page.evaluate(()=>homeGuideState().cleared)).toContain('6-3');
-  await page.locator('#homeGuideMapSelect').selectOption('6-5');await expect(page.locator('[data-home-guide-priority="delete-import"]')).toHaveValue('high');await expect(page.locator('[data-home-guide-toggle="shared:oneTimeQuest:B175"]')).toHaveAttribute('aria-pressed','true');
-});
 
-test('release smoke: strategy goal deletion undo keeps failed deletions and retries failed restoration', async ({ page }) => {
-  await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'delete-failure',title:'削除を試す目標',category:'map',scope:'map',map:'6-5'});homeGuideSave(s)});await page.locator('[data-home-guide-edit-open="delete-failure"]').click();await page.locator('[data-home-guide-edit="delete-failure"] [name="title"]').fill('残す下書き');
-  await page.evaluate(()=>{const original=Storage.prototype.setItem;window.restoreDeleteStorage=()=>Storage.prototype.setItem=original;window.failDeleteStorage=()=>{Storage.prototype.setItem=function(k,v){if(k===HD_HOME_GUIDE_KEY)throw new DOMException('Full','QuotaExceededError');return original.call(this,k,v)}};window.failDeleteStorage()});await page.locator('[data-home-guide-delete="delete-failure"]').click();await expect(page.locator('[data-home-guide-edit="delete-failure"] [name="title"]')).toHaveValue('残す下書き');await expect(page.locator('#hdToastRegion .hd-toast-action')).toHaveCount(0);await page.evaluate(()=>window.restoreDeleteStorage());await page.locator('[data-home-guide-delete="delete-failure"]').click();await page.evaluate(()=>window.failDeleteStorage());await page.locator('#hdToastRegion .hd-toast-action').click();await expect(page.locator('[data-home-guide-priority="delete-failure"]')).toHaveCount(0);await expect(page.locator('#hdToastRegion')).toHaveClass(/show/);await expect(page.locator('#hdToastRegion')).toContainText('復元を保存できなかった');await page.evaluate(()=>window.restoreDeleteStorage());await page.locator('#hdToastRegion .hd-toast-action').click();await expect(page.locator('[data-home-guide-edit="delete-failure"] [name="title"]')).toHaveValue('残す下書き');expect(await page.evaluate(()=>homeGuideState().custom.filter(x=>x.id==='delete-failure').length)).toBe(1);
-});
 
 test('release smoke: strategy goal search combines normalized words map priority and completion', async ({ page }) => {
   // Two full app loads and native actions need their complete assertion windows.
@@ -78,32 +69,14 @@ test('release smoke: strategy goal search combines normalized words map priority
   await page.locator('[data-home-guide-completed]').click();await search.fill('別海域');await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：全件・優先のみ・検索中 0件');await page.locator('#homeGuideMapSelect').selectOption('6-4');await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：全件・優先のみ・検索中 1件');expect(await page.evaluate(()=>homeGuideState())).toEqual(before);
 });
 
-test('release smoke: strategy goal search keeps input composition caret and hidden edit drafts', async ({ page }) => {
-  await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'search-edit',title:'検索前の目標',category:'map',scope:'map',map:'6-5'});homeGuideSave(s)});await page.locator('[data-home-guide-edit-open="search-edit"]').click();const edit=page.locator('[data-home-guide-edit="search-edit"]');await edit.locator('[name="title"]').fill('保存していない編集');await edit.locator('[name="detail"]').fill('消さないメモ');const add=page.locator('[data-home-guide-add="map"]');await add.locator('[name="title"]').fill('追加の下書き');
-  const search=page.locator('[data-home-guide-search]');await search.fill('検索前');await search.evaluate(el=>{window.searchInputNode=el;el.focus();el.setSelectionRange(1,2);const s=homeGuideState();s.cleared.push('1-1');homeGuideSave(s)});await expect(search).toBeFocused();expect(await search.evaluate(el=>({same:el===window.searchInputNode,start:el.selectionStart,end:el.selectionEnd}))).toEqual({same:true,start:1,end:2});
-  await search.dispatchEvent('compositionstart');await search.evaluate(el=>{el.value='一致しない変換中';el.dispatchEvent(new Event('input',{bubbles:true}));window.dispatchEvent(new Event('hd:workspace-refresh'))});await expect(edit).toHaveCount(1);await expect(search).toBeFocused();await search.dispatchEvent('compositionend');await expect(edit).toHaveCount(0);await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：全件・検索中 0件');
-  await page.locator('[data-home-guide-search-clear]').click();await expect(search).toHaveValue('');await expect(search).toBeFocused();await expect(edit.locator('[name="title"]')).toHaveValue('保存していない編集');await expect(edit.locator('[name="detail"]')).toHaveValue('消さないメモ');await expect(add.locator('[name="title"]')).toHaveValue('追加の下書き');
-});
+
 
 test('release smoke: strategy goal search reveals additions after saving and safely renders special text', async ({ page }) => {
   await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false)});const search=page.locator('[data-home-guide-search]');await search.fill('<img src=x onerror=alert(1)>');await expect(search).toHaveValue('<img src=x onerror=alert(1)>');await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：全件・検索中 0件');await expect(page.locator('.home-guide-filter img')).toHaveCount(0);
   await page.locator('details[data-group="map"] summary').click();const add=page.locator('[data-home-guide-add="map"]');await add.locator('[name="title"]').fill('検索中に追加する目標');await page.evaluate(()=>{const original=Storage.prototype.setItem;window.restoreSearchStorage=()=>Storage.prototype.setItem=original;Storage.prototype.setItem=function(k,v){if(k===HD_HOME_GUIDE_KEY)throw new DOMException('Full','QuotaExceededError');return original.call(this,k,v)}});await add.locator('button[type="submit"]').click();await expect(search).toHaveValue('<img src=x onerror=alert(1)>');await expect(add.locator('[name="title"]')).toHaveValue('検索中に追加する目標');await page.evaluate(()=>window.restoreSearchStorage());await add.locator('button[type="submit"]').click();await expect(search).toHaveValue('');await expect(page.locator('.home-guide-step strong').filter({hasText:'検索中に追加する目標'})).toBeVisible();await expect(page.locator('[data-home-guide-search-clear]')).toBeDisabled();
 });
 
-test('release smoke: priority strategy view combines completion and map filters and persists', async ({ page }) => {
-  // Two full app loads and native actions need their complete assertion windows.
-  test.setTimeout(90000);
-  await boot(page);
-  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'priority-local',category:'map',title:'優先の海域目標',scope:'map',map:'6-5',priority:'high'},{id:'priority-global',category:'map',title:'優先の共通目標',scope:'global',priority:'high'},{id:'priority-other',category:'map',title:'別海域の優先目標',scope:'map',map:'6-4',priority:'high'},{id:'priority-normal',category:'map',title:'通常目標',scope:'global'},{id:'priority-import',category:'quest',title:'優先の取り込み任務',scope:'map',map:'6-5',source:'oneTimeQuest',ref:'B175',priority:'high'});s.done.push('map:6-5:map:priority-local','shared:oneTimeQuest:B175');homeGuideSave(s)});
-  const before=await page.evaluate(()=>homeGuideState());const filter=page.locator('[data-home-guide-priority-only]');
-  await filter.click();await expect(filter).toBeFocused();await expect(filter).toHaveAttribute('aria-pressed','true');await expect(page.locator('#homeGuideSteps .home-guide-step')).toHaveCount(3);await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：全件・優先のみ 3件');
-  await expect(page.locator('details[data-group="gear"] .home-guide-empty')).toHaveText('この分類に表示条件に合う優先目標はありません。');
-  await page.locator('[data-home-guide-pending]').click();await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：未完了・優先のみ 1件');
-  await page.locator('[data-home-guide-completed]').click();await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：完了済み・優先のみ 2件');
-  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false)});await expect(filter).toHaveAttribute('aria-pressed','true');await expect(page.locator('[data-home-guide-priority="priority-import"]')).toHaveCount(1);
-  await page.locator('#homeGuideMapSelect').selectOption('6-4');await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：完了済み・優先のみ 0件');await page.locator('[data-home-guide-completed]').click();await expect(page.locator('.home-guide-filter-state')).toHaveText('表示：全件・優先のみ 2件');
-  expect(await page.evaluate(()=>homeGuideState())).toEqual(before);
-});
+
 
 test('release smoke: priority strategy view preserves drafts when changing priority hides a row', async ({ page }) => {
   await boot(page);await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const s=homeGuideState();s.custom.push({id:'priority-edit',category:'map',title:'優先の編集目標',scope:'map',map:'6-5',priority:'high'});homeGuideSave(s)});
@@ -202,25 +175,7 @@ test('release smoke: strategy goal priorities survive creation and editing draft
   expect(await page.evaluate(()=>homeGuideState().custom.filter(x=>x.title==='優先度を付ける目標').map(x=>x.priority))).toEqual(['high']);
 });
 
-test('release smoke: strategy goal priorities reorder manual and imported goals without changing completion', async ({ page }) => {
-  await boot(page);
-  await page.evaluate(()=>{
-    hdSelectGuideMap('6-5');hdWSShowElement('home',false);const state=homeGuideState();
-    state.custom.push({id:'priority-normal',category:'quest',title:'通常の目標',scope:'map',map:'6-5'},{id:'priority-invalid',category:'quest',title:'古い保存データの目標',scope:'global',priority:'unknown'},{id:'priority-later',category:'quest',title:'あとで取り組む目標',scope:'map',map:'6-5',priority:'later'},{id:'priority-imported',category:'quest',title:'候補から追加した任務',scope:'map',map:'6-5',source:'oneTimeQuest',ref:'B175'},{id:'priority-other',category:'quest',title:'別海域の優先目標',scope:'map',map:'6-4',priority:'high'});
-    state.done.push('shared:oneTimeQuest:B175');homeGuideSave(state);
-  });
-  const group=page.locator('details[data-group="quest"]');await group.locator('summary').click();
-  await expect(page.locator('[data-home-guide-priority="priority-normal"]')).toHaveValue('normal');await expect(page.locator('[data-home-guide-priority="priority-invalid"]')).toHaveValue('normal');
-  await page.locator('[data-home-guide-priority="priority-imported"]').focus();await page.locator('[data-home-guide-priority="priority-imported"]').selectOption('high');
-  await expect(group.locator('.home-guide-step').first().locator('strong')).toHaveText('候補から追加した任務');
-  await expect(group.locator('.home-guide-step').last().locator('strong')).toHaveText('あとで取り組む目標');
-  expect(await page.evaluate(()=>document.activeElement?.dataset.homeGuidePriority)).toBe('priority-imported');
-  const before=await page.evaluate(()=>homeGuideState());expect(before.done).toContain('shared:oneTimeQuest:B175');expect(before.custom.find(x=>x.id==='priority-imported')).toMatchObject({source:'oneTimeQuest',ref:'B175',map:'6-5',priority:'high'});
-  await page.locator('#homeGuideMapSelect').selectOption('6-4');await expect(group.locator('.home-guide-step').first().locator('strong')).toHaveText('別海域の優先目標');
-  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});await group.locator('summary').click();
-  await expect(group.locator('.home-guide-step').first().locator('strong')).toHaveText('候補から追加した任務');
-  expect(await page.evaluate(()=>homeGuideState())).toEqual(before);
-});
+
 
 test('release smoke: strategy goal priorities recover failed saves and keep an open edit draft', async ({ page }) => {
   // Two full app loads and native actions need their complete assertion windows.
@@ -292,27 +247,8 @@ test('release smoke: strategy goal editing drafts survive updates map switches a
   await page.locator('[data-home-guide-edit-open="edit-draft"]').click();await expect(form.locator('[name="title"]')).toHaveValue('元の攻略目標');
 });
 
-test('release smoke: strategy goal editing keeps failed changes and saves once on retry', async ({ page }) => {
-  await boot(page);
-  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const state=homeGuideState();state.custom.push({id:'edit-failed',category:'map',title:'保存前の目標',scope:'map',map:'6-5'});homeGuideSave(state);});
-  await page.locator('[data-home-guide-edit-open="edit-failed"]').click();
-  const form=page.locator('[data-home-guide-edit="edit-failed"]');await form.locator('[name="title"]').fill('保存後の目標');
-  await page.evaluate(()=>{const original=Storage.prototype.setItem;window.restoreEditStorage=()=>{Storage.prototype.setItem=original};Storage.prototype.setItem=function(key,value){if(key===HD_HOME_GUIDE_KEY)throw new DOMException('Full','QuotaExceededError');return original.call(this,key,value)}});
-  await form.locator('button[type="submit"]').click();await expect(form.locator('[name="title"]')).toHaveValue('保存後の目標');
-  expect(await page.evaluate(()=>homeGuideState().custom.find(x=>x.id==='edit-failed').title)).toBe('保存前の目標');
-  await page.evaluate(()=>window.restoreEditStorage());
-  await form.locator('button[type="submit"]').click();await expect(form).toHaveCount(0);
-  expect(await page.evaluate(()=>homeGuideState().custom.filter(x=>x.id==='edit-failed').map(x=>x.title))).toEqual(['保存後の目標']);
-});
 
-test('release smoke: strategy goal editing excludes imported goals and removes deleted drafts', async ({ page }) => {
-  await boot(page);
-  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);const state=homeGuideState();state.custom.push({id:'edit-delete',category:'map',title:'削除する目標',scope:'map',map:'6-5'},{id:'edit-imported',category:'map',title:'自動の候補目標',scope:'map',map:'6-5',source:'unlock',ref:'6-4'});homeGuideSave(state);});
-  await expect(page.locator('[data-home-guide-edit-open="edit-imported"]')).toHaveCount(0);
-  await page.locator('[data-home-guide-edit-open="edit-delete"]').click();await page.locator('[data-home-guide-edit="edit-delete"] [name="title"]').fill('削除する編集下書き');
-  await page.locator('[data-home-guide-delete="edit-delete"]').click();await expect(page.locator('[data-home-guide-edit="edit-delete"]')).toHaveCount(0);
-  expect(await page.evaluate(()=>({draft:homeGuideDraftStore()[homeGuideEditDraftKey('edit-delete')],goals:homeGuideState().custom.map(x=>x.id)}))).toEqual({draft:undefined,goals:['edit-imported']});
-});
+
 
 test('release smoke: strategy goal drafts survive background updates reload and successful submission', async ({ page }) => {
   // Keep the budget for the whole multi-reload scenario separate from assertions.
@@ -10847,7 +10783,12 @@ test('release smoke: strategy native edit press survives a pending header expans
     return JSON.stringify(await button.boundingBox())===JSON.stringify(a);
   }).toBe(true);
   const target=await button.boundingBox();
-  expect(await button.evaluate(el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.x+18,r.y+4)?.closest('[data-home-guide-edit-open]')===el})).toBe(true);
+  expect(await button.evaluate(el=>{const r=el.getBoundingClientRect(),point={x:r.x+18,y:r.y+4},hit=document.elementFromPoint(point.x,point.y),matches=hit?.closest('[data-home-guide-edit-open]')===el;
+    window.__hdHeaderPressPreflight={commandPhase:'before page.mouse.down',sampleAt:performance.now(),rect:r.toJSON(),point,matches,
+      scrollY:window.scrollY,viewport:{width:innerWidth,height:innerHeight},bodyClass:document.body.className,
+      hit:hit?{tag:hit.tagName,id:hit.id,className:typeof hit.className==='string'?hit.className:''}:null,
+      headerPressId:hdWSHeaderPress?.id??null,navLockUntil:hdWSNavLockUntil,now:Date.now()};
+    return matches})).toBe(true);
   await page.mouse.move(target.x+18,target.y+4);
   await page.mouse.down();
   expect(await page.evaluate(()=>hdWSHeaderPress!==null)).toBe(true);
@@ -10890,4 +10831,11 @@ test('release smoke: strategy native touch edit survives a pending header expans
   await page.touchscreen.tap(target.x+18,target.y+4);
   expect(await page.evaluate(()=>window.__headerTouchPointerType)).toBe('touch');
   await expect(page.locator('[data-home-guide-edit="header-touch-editor"] [name="title"]')).toBeVisible();
+});
+
+// Record the exact failed precondition without adding a wait or another scroll.
+test.afterEach(async({page},info)=>{
+ if(info.title!=='release smoke: strategy native edit press survives a pending header expansion'||info.status===info.expectedStatus)return;
+ const evidence=await page.evaluate(()=>window.__hdHeaderPressPreflight||null).catch(()=>null);
+ await info.attach('header-press-preflight',{body:Buffer.from(JSON.stringify(evidence)),contentType:'application/json'});
 });

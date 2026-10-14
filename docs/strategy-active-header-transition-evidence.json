@@ -1,0 +1,914 @@
+{
+  "base_commit": "14d4a81",
+  "kind": "controlled_product_reproduction_not_original_CI_failure",
+  "stats": {
+    "startTime": "2026-10-14T06:46:49.260Z",
+    "duration": 29017.17,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  },
+  "fixture_controls": [
+    "real CSS padding transitions prepared before press; resumed at native pointerdown before application capture",
+    "overflow anchoring disabled in test page only"
+  ],
+  "original_CI_root_cause_confirmed": false,
+  "geometry": {
+    "before": {
+      "x": 93,
+      "y": 477,
+      "width": 44,
+      "height": 40
+    },
+    "evidence": {
+      "id": 1,
+      "target": true,
+      "at": 12945,
+      "rect": {
+        "x": 93,
+        "y": 477,
+        "width": 44,
+        "height": 40,
+        "top": 477,
+        "right": 137,
+        "bottom": 517,
+        "left": 93
+      },
+      "running": [
+        {
+          "property": "padding-bottom",
+          "time": 0
+        },
+        {
+          "property": "padding-top",
+          "time": 0
+        }
+      ]
+    },
+    "overlap": [
+      {
+        "property": "padding-bottom",
+        "time": 0,
+        "state": "running"
+      },
+      {
+        "property": "padding-top",
+        "time": 0,
+        "state": "running"
+      }
+    ],
+    "after": {
+      "x": 93,
+      "y": 483,
+      "width": 44,
+      "height": 40
+    }
+  },
+  "input_sequence": [
+    {
+      "at": 12943,
+      "timeOrigin": 1791960410238.0002,
+      "type": "pointerdown",
+      "pointerId": 1,
+      "pointerType": "mouse",
+      "button": 0,
+      "buttons": 1,
+      "isPrimary": true,
+      "pressedTarget": {
+        "nodeId": 6,
+        "tag": "BUTTON",
+        "id": "",
+        "data": {
+          "homeGuideEditOpen": "active-transition"
+        },
+        "connected": true,
+        "group": "map",
+        "open": true,
+        "rect": {
+          "x": 93,
+          "y": 477,
+          "width": 44,
+          "height": 40
+        }
+      },
+      "hitTarget": {
+        "nodeId": 6,
+        "tag": "BUTTON",
+        "id": "",
+        "data": {
+          "homeGuideEditOpen": "active-transition"
+        },
+        "connected": true,
+        "group": "map",
+        "open": true,
+        "rect": {
+          "x": 93,
+          "y": 477,
+          "width": 44,
+          "height": 40
+        }
+      },
+      "x": 111,
+      "y": 481,
+      "detail": 1,
+      "defaultPrevented": false,
+      "target": {
+        "nodeId": 6,
+        "tag": "BUTTON",
+        "id": "",
+        "data": {
+          "homeGuideEditOpen": "active-transition"
+        },
+        "connected": true,
+        "group": "map",
+        "open": true,
+        "rect": {
+          "x": 93,
+          "y": 477,
+          "width": 44,
+          "height": 40
+        }
+      },
+      "focus": {
+        "nodeId": 2,
+        "tag": "BODY",
+        "id": "top",
+        "data": {
+          "hdReady": "1",
+          "hdBootFallback": "1"
+        },
+        "connected": true,
+        "rect": {
+          "x": 0,
+          "y": -4177,
+          "width": 390,
+          "height": 6611
+        }
+      },
+      "scrollY": 4177,
+      "compact": false,
+      "keyboard": false,
+      "view": {
+        "guide": {
+          "nodeId": 3,
+          "tag": "DIV",
+          "id": "homeGuideSteps",
+          "data": {},
+          "connected": true,
+          "rect": {
+            "x": 27,
+            "y": -2639,
+            "width": 336,
+            "height": 3665
+          }
+        },
+        "editForms": 0,
+        "laterPressed": "false",
+        "toastActions": 0
+      }
+    },
+    {
+      "at": 13784,
+      "timeOrigin": 1791960410238.0002,
+      "type": "pointerup",
+      "pointerId": 1,
+      "pointerType": "mouse",
+      "button": 0,
+      "buttons": 0,
+      "isPrimary": true,
+      "pressedTarget": {
+        "nodeId": 6,
+        "tag": "BUTTON",
+        "id": "",
+        "data": {
+          "homeGuideEditOpen": "active-transition"
+        },
+        "connected": true,
+        "group": "map",
+        "open": true,
+        "rect": {
+          "x": 93,
+          "y": 483,
+          "width": 44,
+          "height": 40
+        }
+      },
+      "hitTarget": {
+        "nodeId": 7,
+        "tag": "DIV",
+        "id": "",
+        "data": {},
+        "connected": true,
+        "group": "map",
+        "open": true,
+        "rect": {
+          "x": 93,
+          "y": 361,
+          "width": 248,
+          "height": 162
+        }
+      },
+      "x": 111,
+      "y": 481,
+      "detail": 1,
+      "defaultPrevented": false,
+      "target": {
+        "nodeId": 7,
+        "tag": "DIV",
+        "id": "",
+        "data": {},
+        "connected": true,
+        "group": "map",
+        "open": true,
+        "rect": {
+          "x": 93,
+          "y": 361,
+          "width": 248,
+          "height": 162
+        }
+      },
+      "focus": {
+        "nodeId": 6,
+        "tag": "BUTTON",
+        "id": "",
+        "data": {
+          "homeGuideEditOpen": "active-transition"
+        },
+        "connected": true,
+        "group": "map",
+        "open": true,
+        "rect": {
+          "x": 93,
+          "y": 483,
+          "width": 44,
+          "height": 40
+        }
+      },
+      "scrollY": 4177,
+      "compact": false,
+      "keyboard": false,
+      "view": {
+        "guide": {
+          "nodeId": 3,
+          "tag": "DIV",
+          "id": "homeGuideSteps",
+          "data": {},
+          "connected": true,
+          "rect": {
+            "x": 27,
+            "y": -2633,
+            "width": 336,
+            "height": 3665
+          }
+        },
+        "editForms": 0,
+        "laterPressed": "false",
+        "toastActions": 0
+      }
+    },
+    {
+      "at": 13786,
+      "timeOrigin": 1791960410238.0002,
+      "type": "click",
+      "pointerId": 1,
+      "pointerType": "mouse",
+      "button": 0,
+      "buttons": 0,
+      "isPrimary": true,
+      "pressedTarget": {
+        "nodeId": 6,
+        "tag": "BUTTON",
+        "id": "",
+        "data": {
+          "homeGuideEditOpen": "active-transition"
+        },
+        "connected": true,
+        "group": "map",
+        "open": true,
+        "rect": {
+          "x": 93,
+          "y": 483,
+          "width": 44,
+          "height": 40
+        }
+      },
+      "hitTarget": {
+        "nodeId": 7,
+        "tag": "DIV",
+        "id": "",
+        "data": {},
+        "connected": true,
+        "group": "map",
+        "open": true,
+        "rect": {
+          "x": 93,
+          "y": 361,
+          "width": 248,
+          "height": 162
+        }
+      },
+      "x": 111,
+      "y": 481,
+      "detail": 1,
+      "defaultPrevented": false,
+      "target": {
+        "nodeId": 7,
+        "tag": "DIV",
+        "id": "",
+        "data": {},
+        "connected": true,
+        "group": "map",
+        "open": true,
+        "rect": {
+          "x": 93,
+          "y": 361,
+          "width": 248,
+          "height": 162
+        }
+      },
+      "focus": {
+        "nodeId": 6,
+        "tag": "BUTTON",
+        "id": "",
+        "data": {
+          "homeGuideEditOpen": "active-transition"
+        },
+        "connected": true,
+        "group": "map",
+        "open": true,
+        "rect": {
+          "x": 93,
+          "y": 483,
+          "width": 44,
+          "height": 40
+        }
+      },
+      "scrollY": 4177,
+      "compact": false,
+      "keyboard": false,
+      "view": {
+        "guide": {
+          "nodeId": 3,
+          "tag": "DIV",
+          "id": "homeGuideSteps",
+          "data": {},
+          "connected": true,
+          "rect": {
+            "x": 27,
+            "y": -2633,
+            "width": 336,
+            "height": 3665
+          }
+        },
+        "editForms": 0,
+        "laterPressed": "false",
+        "toastActions": 0
+      }
+    },
+    {
+      "at": 13796.000000000002,
+      "timeOrigin": 1791960410238.0002,
+      "type": "click-result",
+      "pointerId": 1,
+      "pointerType": "mouse",
+      "button": 0,
+      "buttons": 0,
+      "isPrimary": true,
+      "pressedTarget": {
+        "nodeId": 6,
+        "tag": "BUTTON",
+        "id": "",
+        "data": {
+          "homeGuideEditOpen": "active-transition"
+        },
+        "connected": true,
+        "group": "map",
+        "open": true,
+        "rect": {
+          "x": 93,
+          "y": 483,
+          "width": 44,
+          "height": 40
+        }
+      },
+      "hitTarget": {
+        "nodeId": 7,
+        "tag": "DIV",
+        "id": "",
+        "data": {},
+        "connected": true,
+        "group": "map",
+        "open": true,
+        "rect": {
+          "x": 93,
+          "y": 361,
+          "width": 248,
+          "height": 162
+        }
+      },
+      "x": 111,
+      "y": 481,
+      "detail": 1,
+      "defaultPrevented": false,
+      "target": {
+        "nodeId": 7,
+        "tag": "DIV",
+        "id": "",
+        "data": {},
+        "connected": true,
+        "group": "map",
+        "open": true,
+        "rect": {
+          "x": 93,
+          "y": 361,
+          "width": 248,
+          "height": 162
+        }
+      },
+      "focus": {
+        "nodeId": 6,
+        "tag": "BUTTON",
+        "id": "",
+        "data": {
+          "homeGuideEditOpen": "active-transition"
+        },
+        "connected": true,
+        "group": "map",
+        "open": true,
+        "rect": {
+          "x": 93,
+          "y": 483,
+          "width": 44,
+          "height": 40
+        }
+      },
+      "scrollY": 4177,
+      "compact": false,
+      "keyboard": false,
+      "view": {
+        "guide": {
+          "nodeId": 3,
+          "tag": "DIV",
+          "id": "homeGuideSteps",
+          "data": {},
+          "connected": true,
+          "rect": {
+            "x": 27,
+            "y": -2633,
+            "width": 336,
+            "height": 3665
+          }
+        },
+        "editForms": 0,
+        "laterPressed": "false",
+        "toastActions": 0
+      }
+    }
+  ],
+  "fixed_repetition": {
+    "stats": {
+      "startTime": "2026-10-14T06:52:11.392Z",
+      "duration": 188484.475,
+      "expected": 12,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "retries": 0,
+    "samples": [
+      {
+        "project": "webkit",
+        "title": "strategy active header transition keeps native edit press and resumes after click",
+        "status": "passed",
+        "down": {
+          "x": 93,
+          "y": 477,
+          "width": 44,
+          "height": 40
+        },
+        "held": {
+          "x": 93,
+          "y": 477,
+          "width": 44,
+          "height": 40
+        },
+        "position_delta_y": 0
+      },
+      {
+        "project": "webkit",
+        "title": "strategy active header transition keeps native edit press and resumes after cancel",
+        "status": "passed",
+        "down": {
+          "x": 93,
+          "y": 706,
+          "width": 44,
+          "height": 40
+        },
+        "held": {
+          "x": 93,
+          "y": 706,
+          "width": 44,
+          "height": 40
+        },
+        "position_delta_y": 0
+      },
+      {
+        "project": "webkit",
+        "title": "strategy active header transition keeps native edit press and resumes after click",
+        "status": "passed",
+        "down": {
+          "x": 93,
+          "y": 477,
+          "width": 44,
+          "height": 40
+        },
+        "held": {
+          "x": 93,
+          "y": 477,
+          "width": 44,
+          "height": 40
+        },
+        "position_delta_y": 0
+      },
+      {
+        "project": "webkit",
+        "title": "strategy active header transition keeps native edit press and resumes after cancel",
+        "status": "passed",
+        "down": {
+          "x": 93,
+          "y": 477,
+          "width": 44,
+          "height": 40
+        },
+        "held": {
+          "x": 93,
+          "y": 477,
+          "width": 44,
+          "height": 40
+        },
+        "position_delta_y": 0
+      },
+      {
+        "project": "webkit",
+        "title": "strategy active header transition keeps native edit press and resumes after click",
+        "status": "passed",
+        "down": {
+          "x": 93,
+          "y": 477,
+          "width": 44,
+          "height": 40
+        },
+        "held": {
+          "x": 93,
+          "y": 477,
+          "width": 44,
+          "height": 40
+        },
+        "position_delta_y": 0
+      },
+      {
+        "project": "webkit",
+        "title": "strategy active header transition keeps native edit press and resumes after cancel",
+        "status": "passed",
+        "down": {
+          "x": 93,
+          "y": 477,
+          "width": 44,
+          "height": 40
+        },
+        "held": {
+          "x": 93,
+          "y": 477,
+          "width": 44,
+          "height": 40
+        },
+        "position_delta_y": 0
+      },
+      {
+        "project": "chromium",
+        "title": "strategy active header transition keeps native edit press and resumes after click",
+        "status": "passed",
+        "down": {
+          "x": 93,
+          "y": 477.46875,
+          "width": 44,
+          "height": 40
+        },
+        "held": {
+          "x": 93,
+          "y": 477.46875,
+          "width": 44,
+          "height": 40
+        },
+        "position_delta_y": 0.0
+      },
+      {
+        "project": "chromium",
+        "title": "strategy active header transition keeps native edit press and resumes after cancel",
+        "status": "passed",
+        "down": {
+          "x": 93,
+          "y": 477.46875,
+          "width": 44,
+          "height": 40
+        },
+        "held": {
+          "x": 93,
+          "y": 477.46875,
+          "width": 44,
+          "height": 40
+        },
+        "position_delta_y": 0.0
+      },
+      {
+        "project": "chromium",
+        "title": "strategy active header transition keeps native edit press and resumes after click",
+        "status": "passed",
+        "down": {
+          "x": 93,
+          "y": 477.46875,
+          "width": 44,
+          "height": 40
+        },
+        "held": {
+          "x": 93,
+          "y": 477.46875,
+          "width": 44,
+          "height": 40
+        },
+        "position_delta_y": 0.0
+      },
+      {
+        "project": "chromium",
+        "title": "strategy active header transition keeps native edit press and resumes after cancel",
+        "status": "passed",
+        "down": {
+          "x": 93,
+          "y": 477.46875,
+          "width": 44,
+          "height": 40
+        },
+        "held": {
+          "x": 93,
+          "y": 477.46875,
+          "width": 44,
+          "height": 40
+        },
+        "position_delta_y": 0.0
+      },
+      {
+        "project": "chromium",
+        "title": "strategy active header transition keeps native edit press and resumes after click",
+        "status": "passed",
+        "down": {
+          "x": 93,
+          "y": 477.46875,
+          "width": 44,
+          "height": 40
+        },
+        "held": {
+          "x": 93,
+          "y": 477.46875,
+          "width": 44,
+          "height": 40
+        },
+        "position_delta_y": 0.0
+      },
+      {
+        "project": "chromium",
+        "title": "strategy active header transition keeps native edit press and resumes after cancel",
+        "status": "passed",
+        "down": {
+          "x": 93,
+          "y": 477.46875,
+          "width": 44,
+          "height": 40
+        },
+        "held": {
+          "x": 93,
+          "y": 477.46875,
+          "width": 44,
+          "height": 40
+        },
+        "position_delta_y": 0.0
+      }
+    ]
+  },
+  "observed_successful_CI_inputs": {
+    "head": "14d4a81",
+    "run_id": 38516974869,
+    "samples": [
+      {
+        "title": "release smoke: strategy goal deletion undo preserves newer changes and shared imported completion",
+        "press_ms": 5,
+        "same_node": true,
+        "delta_y": 0.0,
+        "prevented_at_capture": false,
+        "prevented_after_dispatch": false,
+        "pointercancel_before_click": false,
+        "click_result": {
+          "target_connected": false,
+          "edit_forms": 0,
+          "later_pressed": "false",
+          "undo_actions": 1
+        }
+      },
+      {
+        "title": "release smoke: strategy goal deletion undo keeps failed deletions and retries failed restoration",
+        "press_ms": 3,
+        "same_node": true,
+        "delta_y": 0.0,
+        "prevented_at_capture": false,
+        "prevented_after_dispatch": false,
+        "pointercancel_before_click": false,
+        "click_result": {
+          "target_connected": true,
+          "edit_forms": 1,
+          "later_pressed": "false",
+          "undo_actions": 0
+        }
+      },
+      {
+        "title": "release smoke: strategy goal editing excludes imported goals and removes deleted drafts",
+        "press_ms": 5.000000000001819,
+        "same_node": true,
+        "delta_y": 0.0,
+        "prevented_at_capture": false,
+        "prevented_after_dispatch": false,
+        "pointercancel_before_click": false,
+        "click_result": {
+          "target_connected": true,
+          "edit_forms": 1,
+          "later_pressed": "false",
+          "undo_actions": 0
+        }
+      },
+      {
+        "title": "release smoke: deferred strategy goals filter persists and combines with completion and search",
+        "press_ms": 4.000000000001819,
+        "same_node": true,
+        "delta_y": 0.0,
+        "prevented_at_capture": false,
+        "prevented_after_dispatch": false,
+        "pointercancel_before_click": false,
+        "click_result": {
+          "target_connected": true,
+          "edit_forms": 0,
+          "later_pressed": "true",
+          "undo_actions": 0
+        }
+      },
+      {
+        "title": "release smoke: strategy goal deletion undo preserves newer changes and shared imported completion",
+        "press_ms": 5,
+        "same_node": true,
+        "delta_y": 0.0,
+        "prevented_at_capture": false,
+        "prevented_after_dispatch": false,
+        "pointercancel_before_click": false,
+        "click_result": {
+          "target_connected": false,
+          "edit_forms": 0,
+          "later_pressed": "false",
+          "undo_actions": 1
+        }
+      },
+      {
+        "title": "release smoke: strategy goal deletion undo keeps failed deletions and retries failed restoration",
+        "press_ms": 4,
+        "same_node": true,
+        "delta_y": 0.0,
+        "prevented_at_capture": false,
+        "prevented_after_dispatch": false,
+        "pointercancel_before_click": false,
+        "click_result": {
+          "target_connected": true,
+          "edit_forms": 1,
+          "later_pressed": "false",
+          "undo_actions": 0
+        }
+      },
+      {
+        "title": "release smoke: strategy goal editing excludes imported goals and removes deleted drafts",
+        "press_ms": 6,
+        "same_node": true,
+        "delta_y": 0.0,
+        "prevented_at_capture": false,
+        "prevented_after_dispatch": false,
+        "pointercancel_before_click": false,
+        "click_result": {
+          "target_connected": true,
+          "edit_forms": 1,
+          "later_pressed": "false",
+          "undo_actions": 0
+        }
+      },
+      {
+        "title": "release smoke: deferred strategy goals filter persists and combines with completion and search",
+        "press_ms": 4,
+        "same_node": true,
+        "delta_y": 0.0,
+        "prevented_at_capture": false,
+        "prevented_after_dispatch": false,
+        "pointercancel_before_click": false,
+        "click_result": {
+          "target_connected": true,
+          "edit_forms": 0,
+          "later_pressed": "true",
+          "undo_actions": 0
+        }
+      },
+      {
+        "title": "release smoke: strategy goal deletion undo preserves newer changes and shared imported completion",
+        "press_ms": 7,
+        "same_node": true,
+        "delta_y": 0.0,
+        "prevented_at_capture": false,
+        "prevented_after_dispatch": false,
+        "pointercancel_before_click": false,
+        "click_result": {
+          "target_connected": false,
+          "edit_forms": 0,
+          "later_pressed": "false",
+          "undo_actions": 1
+        }
+      },
+      {
+        "title": "release smoke: strategy goal deletion undo keeps failed deletions and retries failed restoration",
+        "press_ms": 5.000000000001819,
+        "same_node": true,
+        "delta_y": 0.0,
+        "prevented_at_capture": false,
+        "prevented_after_dispatch": false,
+        "pointercancel_before_click": false,
+        "click_result": {
+          "target_connected": true,
+          "edit_forms": 1,
+          "later_pressed": "false",
+          "undo_actions": 0
+        }
+      },
+      {
+        "title": "release smoke: strategy goal editing excludes imported goals and removes deleted drafts",
+        "press_ms": 3.999999999998181,
+        "same_node": true,
+        "delta_y": 0.0,
+        "prevented_at_capture": false,
+        "prevented_after_dispatch": false,
+        "pointercancel_before_click": false,
+        "click_result": {
+          "target_connected": true,
+          "edit_forms": 1,
+          "later_pressed": "false",
+          "undo_actions": 0
+        }
+      },
+      {
+        "title": "release smoke: deferred strategy goals filter persists and combines with completion and search",
+        "press_ms": 5,
+        "same_node": true,
+        "delta_y": 0.0,
+        "prevented_at_capture": false,
+        "prevented_after_dispatch": false,
+        "pointercancel_before_click": false,
+        "click_result": {
+          "target_connected": true,
+          "edit_forms": 0,
+          "later_pressed": "true",
+          "undo_actions": 0
+        }
+      }
+    ]
+  },
+  "related_regression": {
+    "stats": {
+      "startTime": "2026-10-14T06:57:08.862Z",
+      "duration": 369170.279,
+      "expected": 24,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "retries": 0
+  },
+  "guards_storage_and_fixture_metadata": {
+    "stats": {
+      "startTime": "2026-10-14T07:04:18.913Z",
+      "duration": 111941.234,
+      "expected": 9,
+      "skipped": 0,
+      "unexpected": 1,
+      "flaky": 0
+    },
+    "failure_phase": "existing WebKit mouse fixture hit-test precondition before native pointerdown; cause unknown",
+    "single_instrumented_probe": {
+      "startTime": "2026-10-14T07:09:46.273Z",
+      "duration": 15384.551,
+      "expected": 1,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  }
+}
