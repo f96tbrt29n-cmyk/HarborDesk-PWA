@@ -149,3 +149,27 @@ test('strategy diagnostics observe native click cancellation after downstream ha
   expect(events.find(e=>e.type==='click').defaultPrevented).toBe(false);
   expect(events.find(e=>e.type==='click-result').defaultPrevented).toBe(true);
 });
+
+test('strategy search draft diagnostics attribute script scrolls and retain spatial evidence without private values', async ({ page }) => {
+  let before, after;
+  const title='release smoke: strategy goal search keeps input composition caret and hidden edit drafts';
+  installStrategyInputDiagnostics({beforeEach:hook=>before=hook,afterEach:hook=>after=hook});
+  await before({page},{title});
+  await openInputFixture(page,'<header class="topbar">Header</header><div id="homeGuideSteps"><button data-home-guide-edit-open="search-edit">Edit</button><input value="private-search-draft"></div>');
+  const button=page.locator('button');
+  await button.evaluate(el=>{el.scrollIntoView({block:'center'});el.addEventListener('click',e=>e.preventDefault())});
+  await button.click();
+  await expect.poll(()=>page.evaluate(()=>window.__hdStrategyInputDiagnostics.some(e=>e.type==='click-result'))).toBe(true);
+  const events=await page.evaluate(()=>window.__hdStrategyInputDiagnostics);
+  const script=events.find(e=>e.type==='script-scroll');
+  expect(script.method).toBe('scrollIntoView');expect(script.scrollTarget.data.homeGuideEditOpen).toBe('search-edit');expect(script.stack).toMatch(/eval(?:uate)?/);
+  const down=events.find(e=>e.type==='pointerdown');
+  expect(down.target.nodeId).toBe(down.spatial.editButton.nodeId);expect(down.hitTarget.nodeId).toBe(down.target.nodeId);
+  expect(down.spatial.viewport.width).toBe(390);expect(down.spatial.viewport.height).toBe(844);
+  expect(down.spatial.header.tag).toBe('HEADER');expect(down.spatial.transitions).toEqual([]);
+  expect(events.find(e=>e.type==='click-result').defaultPrevented).toBe(true);
+  const attachments=[];
+  await after({page},{title,status:'failed',expectedStatus:'passed',attach:(name,value)=>attachments.push({name,...value})});
+  expect(attachments).toHaveLength(1);expect(JSON.parse(attachments[0].body.toString())).toEqual(events);
+  expect(attachments[0].body.toString()).not.toContain('private-search-draft');
+});

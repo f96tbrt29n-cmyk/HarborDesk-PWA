@@ -65,3 +65,21 @@
 未確認の押下前ヒット失敗について、既存のelementFromPoint判定と同じ評価内で矩形・入力点・重なる要素・scrollY・viewport・headerPressId・nav lockを記録し、そのケースが失敗した時だけ添付する。判定のBooleanとtoBe(true)、安定性待機、スクロール、タイムアウトは変更しない。入力前に新しいawaitや再スクロールを足さない。
 
 記録式について、画面内のボタンでは元と同じtrue、画面外では同じfalseと座標・nullヒットを記録する専用検証を両エンジン2件、再試行なしで確認した。これは計測の検証であり、既存fixtureの準備失敗を解消した証明ではない。今後の自然な初回失敗で不成立の時点の画面位置を特定するための変更。
+
+## 検索下書き編集の初回失敗と限定計測
+
+`d1f7fb8` / [CI 38527742685](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/38527742685)は必須6ジョブ成功。ただしChromium594件は初回成功、WebKit593件は初回成功・検索下書き編集1件は再試行成功。軽い入力12件・トレース付き24件は再試行なしで成功しており、この結果を全体の安定成功に読み替えない。
+
+初回失敗は `strategy goal search keeps input composition caret and hidden edit drafts` の最初の編集クリック後、フォームtitleへの入力待ちで既存の45秒制限に達したもの。検索・compositionの検証より前で止まっている。クリックAPI区間は初回10,510ms、成功した再試行3,804ms。初回は動画・スクリーンショット・error-contextのみで、traceと入力履歴がない。再試行traceには安定性確認→DOM.scrollIntoViewIfNeeded→予定座標(115,479)→click完了があるが、初回の実際の入力対象・取消・ノード交換・ヘッダー遷移の証拠にはできない。
+
+初回動画の18秒付近では目標行と編集ボタンが見えている一方、失敗スクリーンショットはホーム先頭。動画は368×800への縮小、テストviewportは390×844なので画像座標をそのまま入力点として比較しない。最終画面だけから入力時のscrollYやリセット呼出元を決めない。6px移動の制御再現との同一原因は未確認。
+
+次の自然な初回失敗で資料が残るよう、このテスト本体を変更せず `strategy-input-regression.spec.js` の限定retain-on-failure範囲へ移した。移動前後のテスト本体SHA256は `d84c276e368327fd67530adafabfcad2351ba1ded24f770ee4751bf8ea3175fd` で一致。boot、アサーション、45秒/12秒の設定、入力手順を維持する。release-smokeファイル全体のtraceを有効にはしない。
+
+このケースのみ、既存256件上限の履歴へpointermove・実測viewport/visual viewport・編集ボタンとtopbarのノード/矩形・padding等の遷移進行状態を追加する。既存pointerdown/up/click/cancel・elementFromPoint・scrollY・処理後defaultPrevented・フォーム数と一緒に比較できる。JavaScriptのscrollTo/scrollBy/scrollIntoViewは元のthis・引数・戻り値を維持して呼出元stackだけを記録する。ブラウザー内部のプロトコルスクロールはこのwrapperを通らず、DOM変化/scroll anchoringも呼出しなしで位置が変わり得る。呼出し記録なしを製品起因の否定に使わない。入力値や保存内容は取得しない。
+
+計測とtraceは処理時間・layoutへ影響し得る。記録付き成功だけで無計測の不具合が直ったとは扱わない。新しいケースは既存の3回反復工程から除外し、通常CIの594既存ケースの1つとして実行する。診断の空間情報・スクロール帰属・後続preventDefault・失敗時添付・入力値を含まないことを専用1ケースで検証する。製品コードの追加修正、攻略条件の変更、mainマージ、デプロイ、1-5拡張は行わない。
+
+限定検証の最初の工程は6件中5件成功・1件失敗（再試行0）。対象製品操作2件と6保存キー2件は成功し、追加診断fixtureのWebKitだけが、Error.stackに文字列「Error」が含まれるという新規の想定で失敗した。WebKitの実際のstackは呼出元フレームを含むが「Error」ヘッダーを含まない。診断fixtureを呼出元eval/evaluateフレームの検証へ訂正した。既存の製品判定・タイムアウトは変更していない。
+
+訂正後、pointermoveを含む対象操作と診断fixtureを両エンジン各1回、計4件成功・再試行0。対象操作の初回pointerdown/up/clickは同じノード（記録ID 7）、scrollYはWebKit4193/Chromium4311で各操作中一定、cancelなし、JavaScriptスクロール呼出し0件。成功時の比較資料として保持し、失敗の原因特定・安定化の証明とは扱わない。6保存キーは直前の工程で両エンジン文字列一致を確認し、関連コードに変更がないため追加反復しない。JS構文・diffチェック成功。通常テスト数は既存594件を維持し、診断fixture1件追加で595件/エンジン。

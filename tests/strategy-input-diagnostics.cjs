@@ -1,6 +1,6 @@
 // Retain the first failed attempt, even when the normal CI retry later passes.
 // Only synthetic browser-test input is recorded; no storage values or text.
-const TARGET = /prerequisite checkbox and cleared map|priority strategy view combines completion|priorities reorder manual|editing keeps failed changes|strategy goal deletion undo preserves newer changes|strategy goal deletion undo keeps failed deletions|strategy goal editing excludes imported goals|deferred strategy goals filter persists/;
+const TARGET = /prerequisite checkbox and cleared map|priority strategy view combines completion|priorities reorder manual|editing keeps failed changes|strategy goal deletion undo preserves newer changes|strategy goal deletion undo keeps failed deletions|strategy goal editing excludes imported goals|deferred strategy goals filter persists|strategy goal search keeps input composition caret and hidden edit drafts/;
 function installStrategyInputDiagnostics(test, { recordSuccess = false } = {}) {
   const archived = new WeakMap();
   const prefix = '[hd-strategy-input-pagehide]';
@@ -30,7 +30,7 @@ function installStrategyInputDiagnostics(test, { recordSuccess = false } = {}) {
       if (message.type() !== 'debug' || !message.text().startsWith(prefix)) return;
       try { archive(JSON.parse(message.text().slice(prefix.length))); } catch {}
     });
-    await page.addInitScript(prefix => {
+    await page.addInitScript(({ prefix, searchDraft }) => {
       const events = [];
       let pressedTarget = null;
       let sequence = 0;
@@ -44,9 +44,9 @@ function installStrategyInputDiagnostics(test, { recordSuccess = false } = {}) {
         open: node.closest('details.home-guide-group')?.open,
         rect: (() => { const r = node.getBoundingClientRect(); return { x:r.x, y:r.y, width:r.width, height:r.height }; })()
       } : null;
-      const record = (type, event) => {
+      const record = (type, event, extra = {}) => {
         events.push({
-          at: performance.now(), timeOrigin: performance.timeOrigin, type,
+          at: performance.now(), timeOrigin: performance.timeOrigin, type, ...extra,
           pointerId: event?.pointerId, pointerType: event?.pointerType,
           button: event?.button, buttons: event?.buttons, isPrimary: event?.isPrimary,
           pressedTarget: identify(pressedTarget),
@@ -57,6 +57,12 @@ function installStrategyInputDiagnostics(test, { recordSuccess = false } = {}) {
           scrollY: window.scrollY,
           compact: document.body?.classList.contains('hd-header-compact'),
           keyboard: document.body?.classList.contains('hd-keyboard-open'),
+          ...(searchDraft ? { spatial: {
+            viewport: { width:innerWidth, height:innerHeight, visual:window.visualViewport ? {width:visualViewport.width,height:visualViewport.height,offsetTop:visualViewport.offsetTop,offsetLeft:visualViewport.offsetLeft} : null },
+            editButton: identify(document.querySelector('[data-home-guide-edit-open="search-edit"]')),
+            header: identify(document.querySelector('.topbar')),
+            transitions: (document.querySelector('.topbar')?.getAnimations?.() || []).map(a=>({property:a.transitionProperty || null,state:a.playState,time:a.currentTime}))
+          }} : {}),
           view: {
             guide: identify(document.getElementById('homeGuideSteps')),
             editForms: document.querySelectorAll('#homeGuideSteps [data-home-guide-edit]').length,
@@ -66,7 +72,19 @@ function installStrategyInputDiagnostics(test, { recordSuccess = false } = {}) {
         });
         if (events.length > 256) events.shift();
       };
-      for (const type of ['pointerdown', 'pointerup', 'pointercancel', 'click', 'focusin', 'toggle']) {
+      // Only this newly failing case needs JavaScript scroll caller attribution.
+      // Browser-protocol scrolling bypasses these wrappers; absence is not proof
+      // that layout, anchoring or another browser scroll did not occur.
+      if (searchDraft) {
+        for (const [owner, method] of [[window,'scrollTo'],[window,'scrollBy'],[Element.prototype,'scrollIntoView']]) {
+          const original = owner[method];
+          owner[method] = function(...args) {
+            record('script-scroll', null, {method,scrollTarget:identify(this),stack:new Error().stack});
+            return original.apply(this,args);
+          };
+        }
+      }
+      for (const type of ['pointerdown', 'pointerup', 'pointercancel', 'click', 'focusin', 'toggle', ...(searchDraft ? ['pointermove'] : [])]) {
         document.addEventListener(type, event => {
           // A moved control can release on body/another node. Keep that evidence
           // too, rather than silently dropping the most relevant pointerup.
@@ -92,7 +110,7 @@ function installStrategyInputDiagnostics(test, { recordSuccess = false } = {}) {
           if (next !== previous) { previous = next; record('header-state'); }
         }).observe(document.body, { attributes:true, attributeFilter:['class'] });
       });
-    }, prefix);
+    }, { prefix, searchDraft: info.title.includes('strategy goal search keeps input composition caret and hidden edit drafts') });
   });
   test.afterEach(async ({ page }, info) => {
     if (!TARGET.test(info.title) || (!recordSuccess && info.status === info.expectedStatus)) return;
