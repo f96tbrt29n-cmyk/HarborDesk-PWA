@@ -10831,13 +10831,29 @@ test('release smoke: strategy native edit press survives a pending header expans
     hdSelectGuideMap('6-5'); hdWSShowElement('home',false);
     const s=homeGuideState();s.custom.push({id:'header-press-editor',title:'タップ中の目標',category:'map',scope:'map',map:'6-5'});homeGuideSave(s);
   });
+  await page.waitForFunction(()=>Date.now()>hdWSNavLockUntil);
   const button=page.locator('[data-home-guide-edit-open="header-press-editor"]');
-  await button.scrollIntoViewIfNeeded();
-  await expect(page.locator('body')).toHaveClass(/hd-header-compact/);
   await button.hover({position:{x:18,y:4}});
+  // Establish the starting state after scroll handlers; this test drives expansion directly.
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>{hdWSSetHeaderCompact(true);resolve()}))));
+  await expect(page.locator('body')).toHaveClass(/hd-header-compact/);
+  // The preceding compact transition must finish before testing a new expansion.
+  await page.waitForFunction(()=>document.querySelector('.topbar').getAnimations().every(a=>a.playState!=='running'));
+  await button.hover({position:{x:18,y:4}});
+  await expect(page.locator('body')).toHaveClass(/hd-header-compact/);
+  await expect.poll(async()=>{
+    const a=await button.boundingBox();
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    return JSON.stringify(await button.boundingBox())===JSON.stringify(a);
+  }).toBe(true);
+  const target=await button.boundingBox();
+  expect(await button.evaluate(el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.x+18,r.y+4)?.closest('[data-home-guide-edit-open]')===el})).toBe(true);
+  await page.mouse.move(target.x+18,target.y+4);
   await page.mouse.down();
+  expect(await page.evaluate(()=>hdWSHeaderPress!==null)).toBe(true);
   const before=await button.boundingBox();
   await page.evaluate(() => hdWSSetHeaderCompact(false));
+  await expect(page.locator('body')).toHaveClass(/hd-header-compact/);
   const after=await button.boundingBox();
   expect(after).toEqual(before);
   await page.mouse.up();
@@ -10853,14 +10869,25 @@ test('release smoke: strategy native touch edit survives a pending header expans
     hdSelectGuideMap('6-5');hdWSShowElement('home',false);
     const s=homeGuideState();s.custom.push({id:'header-touch-editor',title:'タッチ中の目標',category:'map',scope:'map',map:'6-5'});homeGuideSave(s);
   });
+  await page.waitForFunction(()=>Date.now()>hdWSNavLockUntil);
   const button=page.locator('[data-home-guide-edit-open="header-touch-editor"]');
   await button.evaluate(el=>el.addEventListener('pointerdown',e=>{
     window.__headerTouchPointerType=e.pointerType;
     hdWSSetHeaderCompact(false);
   },{once:true}));
-  await button.scrollIntoViewIfNeeded();
+  await button.hover({position:{x:18,y:4}});
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>{hdWSSetHeaderCompact(true);resolve()}))));
   await expect(page.locator('body')).toHaveClass(/hd-header-compact/);
-  await button.tap({position:{x:18,y:4}});
+  await page.waitForFunction(()=>document.querySelector('.topbar').getAnimations().every(a=>a.playState!=='running'));
+  await button.hover({position:{x:18,y:4}});
+  await expect(page.locator('body')).toHaveClass(/hd-header-compact/);
+  await expect.poll(async()=>{
+    const a=await button.boundingBox();
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    return JSON.stringify(await button.boundingBox())===JSON.stringify(a);
+  }).toBe(true);
+  const target=await button.boundingBox();
+  await page.touchscreen.tap(target.x+18,target.y+4);
   expect(await page.evaluate(()=>window.__headerTouchPointerType)).toBe('touch');
   await expect(page.locator('[data-home-guide-edit="header-touch-editor"] [name="title"]')).toBeVisible();
 });
