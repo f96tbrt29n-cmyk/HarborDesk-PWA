@@ -219,7 +219,6 @@ test('strategy integration: prerequisite checkbox and cleared map share one comp
   try{
   await openApp(page);
   await page.locator('#homeGuideMapSelect').selectOption('6-5');
-  await diagnostic.mark('before-import');
   await page.locator('[data-hd-strategy-import-all="6-5"]').click();
   await diagnostic.mark('after-import');
   const unlock=page.locator('[data-group="map"] .home-guide-step').filter({hasText:'6-4 のクリアを確認'}).locator('[data-home-guide-toggle]');
@@ -314,6 +313,8 @@ test('strategy integration: training candidates belong to the selected saved fle
 test('strategy integration: base squad opening splits prerequisite missions, item and completion', async ({ page }) => {
   // Verify the complete scenario across both app loads with the same per-assertion deadlines.
   test.setTimeout(90000);
+  const diagnostic=await require('./strategy-import-diagnostics.cjs').strategyImportDiagnostics(page,test.info());
+  try{
   await openApp(page);
   const rows=await page.evaluate(() => ({
     central:hdStrategyCandidates('6-5').filter(x=>['oneTimeQuest','basePrep'].includes(x.source)).map(x=>({ref:x.ref,detail:x.detail})),
@@ -325,6 +326,7 @@ test('strategy integration: base squad opening splits prerequisite missions, ite
   expect(rows.southwest.at(-1).detail).toContain('7-4/O');
   await page.locator('#homeGuideMapSelect').selectOption('6-5');
   await page.locator('[data-hd-strategy-import-all="6-5"]').click();
+  await diagnostic.mark('after-import');
   await page.locator('[data-group=quest] summary').click();
   await expect(page.locator('[data-group=quest]')).toContainText('設営隊を1個確保');
   await expect(page.locator('[data-group=quest]')).toContainText('「陸攻」隊の増勢');
@@ -332,6 +334,7 @@ test('strategy integration: base squad opening splits prerequisite missions, ite
   await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, {timeout:30000});
   await page.locator('[data-group=quest] summary').click();
   await expect(page.locator('[data-group=quest]')).toContainText('F43 の資源とドラム缶を準備');
+  }catch(error){diagnostic.failed(error);throw error}finally{await diagnostic.finish()}
 });
 
 test('strategy integration: B175 sorties can be tracked separately and open their maps', async ({ page }) => {

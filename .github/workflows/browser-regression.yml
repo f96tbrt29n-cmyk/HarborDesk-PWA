@@ -99,6 +99,7 @@ jobs:
           path: |
             test-results/strategy-import-diagnostics/
             test-results/guided-ship-acquisition-*share-one-completion-state-*/
+            test-results/guided-ship-acquisition-*issions-item-and-completion-*/
           if-no-files-found: ignore
           retention-days: 14
 
