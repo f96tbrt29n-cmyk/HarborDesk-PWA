@@ -91,6 +91,17 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+      - name: Preserve prerequisite import evidence including successful retries
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prerequisite-import-${{ matrix.browser }}-${{ matrix.shard }}-${{ github.run_id }}
+          path: |
+            test-results/strategy-import-diagnostics/
+            test-results/guided-ship-acquisition-*share-one-completion-state-*/
+          if-no-files-found: ignore
+          retention-days: 14
+
   full:
     name: Full / ${{ matrix.browser }} / shard ${{ matrix.shard }}
     if: github.event_name == 'workflow_dispatch' && inputs.suite == 'full'

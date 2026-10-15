@@ -215,9 +215,13 @@ test('strategy integration: prerequisite checkbox and cleared map share one comp
   // Two app loads and three map changes share this budget. Keep the individual
   // readiness (30s) and assertion (12s) deadlines; do not abort a valid final step.
   test.setTimeout(180000);
+  const diagnostic=await require('./strategy-import-diagnostics.cjs').strategyImportDiagnostics(page,test.info());
+  try{
   await openApp(page);
   await page.locator('#homeGuideMapSelect').selectOption('6-5');
+  await diagnostic.mark('before-import');
   await page.locator('[data-hd-strategy-import-all="6-5"]').click();
+  await diagnostic.mark('after-import');
   const unlock=page.locator('[data-group="map"] .home-guide-step').filter({hasText:'6-4 のクリアを確認'}).locator('[data-home-guide-toggle]');
   await expect(unlock).toHaveAttribute('aria-pressed','false');
   await unlock.click();
@@ -232,6 +236,7 @@ test('strategy integration: prerequisite checkbox and cleared map share one comp
   await page.locator('#homeGuideMapSelect').selectOption('6-5');
   await expect(unlock).toHaveAttribute('aria-pressed','false');
   expect(await page.evaluate(() => homeGuideState().cleared.includes('6-4'))).toBe(false);
+  }catch(error){diagnostic.failed(error);throw error}finally{await diagnostic.finish()}
 });
 
 test('strategy render snapshot updates saved route goals after every fleet change',async({page})=>{
