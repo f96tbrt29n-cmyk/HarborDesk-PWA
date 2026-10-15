@@ -4,6 +4,10 @@ const keys=['harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-ka
 test('prerequisite import preserves six non-null saved keys including sparse gear and calculator on reload',async({page})=>{
  await page.route('**/*',r=>['127.0.0.1','localhost'].includes(new URL(r.request().url()).hostname)?r.continue():r.fulfill({status:204,body:''}));
  await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1');
+ // Map selection legitimately creates a default calculator entry. Complete
+ // that preparation before seeding/snapshotting the six keys for import.
+ await page.locator('#homeGuideMapSelect').selectOption('6-5');
+ await expect.poll(()=>page.evaluate(()=>Object.hasOwn(hdFCLoadAll(),'6-5:manual'))).toBe(true);
  const before=await page.evaluate(keys=>{
   const ship='時雨改二',masterId=hdShipDbMasterRowFor({name:ship}).id;
   localStorage.setItem(keys[0],JSON.stringify([{id:'import-preservation',name:ship,masterId,gameShipId:777,level:99,gameSlotEx:0,gameGearSlots:['三式水中探信儀','','三式爆雷投射機'],gameGearExpansion:'',gameAswGearKnown:true}]));
@@ -15,7 +19,8 @@ test('prerequisite import preserves six non-null saved keys including sparse gea
   return keys.map(k=>localStorage.getItem(k));
  },keys);
  expect(before.every(x=>x!==null)).toBe(true);
- const imported=await page.evaluate(()=>hdStrategyImportMap('6-5'));expect(imported).toBeGreaterThan(0);
+ await page.locator('[data-hd-strategy-import-all="6-5"]').click();
+ await expect(page.locator('[data-group="map"]')).toContainText('6-4 のクリアを確認');
  expect(await page.evaluate(()=>homeGuideState().custom.some(x=>x.source==='unlock'&&x.ref==='6-4'))).toBe(true);
  expect(await page.evaluate(keys=>keys.map(k=>localStorage.getItem(k)),keys)).toEqual(before);
  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1');

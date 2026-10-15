@@ -58,14 +58,25 @@ function hdCCPriorityItems(){
  const short=hdCCShortages();if(short.length)items.push({score:68,icon:'🧰',title:`不足素材 ${short.length}種類`,detail:short.slice(0,3).map(x=>`${x.m.name}×${x.count}`).join(' / '),target:'materialPlanner'});
  return items.sort((a,b)=>b.score-a.score).slice(0,8);
 }
+let hdCCRenderPending=false;
+function hdCCGuidePressActive(){return typeof homeGuidePressedPointer!=='undefined'&&!!homeGuidePressedPointer}
+function hdCCFlushPendingRender(){
+ if(!hdCCRenderPending||hdCCGuidePressActive())return;
+ if(document.getElementById('hdCommandCenter'))hdCCRender();else hdCCEnsure();
+}
 function hdCCEnsure(){
  const home=document.getElementById('home');if(!home||document.getElementById('hdCommandCenter'))return;
+ if(hdCCGuidePressActive()){hdCCRenderPending=true;return}
  const box=document.createElement('section');box.id='hdCommandCenter';box.className='hd-cc';
  const summary=document.getElementById('homeSummary');if(summary)summary.insertAdjacentElement('afterend',box);else home.prepend(box);
  hdCCRender();
 }
 function hdCCRender(){
+ // This upstream card can grow when delayed priority providers arrive. Keep
+ // controls below it at their pressed position until click/cancel completes.
+ if(hdCCGuidePressActive()){hdCCRenderPending=true;return}
  const host=document.getElementById('hdCommandCenter');if(!host)return;
+ hdCCRenderPending=false;
  const timers=hdCCTimers(),urgent=timers.filter(x=>Number(x.endsAt)-hdCCNow()<=10*60000).length,qp=hdCCQuestProgress(),eo=hdCCEO(),training=hdCCTraining(),short=hdCCShortages(),fleets=hdCCFleetState(),items=hdCCPriorityItems();
  const idleText=fleets.idle.length?fleets.idle.map(n=>'第'+n).join('・'):'全艦隊稼働中';
  const priorityHtml=items.length?items.map((x,i)=>`<button type="button" class="hd-cc-item" data-hd-cc-jump="${hdCCEsc(x.target)}"><span class="hd-cc-rank">${i+1}</span><span class="hd-cc-icon">${x.icon}</span><span class="hd-cc-copy"><b>${hdCCEsc(x.title)}</b><small>${hdCCEsc(x.detail)}</small></span><span class="hd-cc-arrow">›</span></button>`).join(''):'<div class="hd-cc-clear"><b>いま急ぎの項目はないよ</b><span>任務・EO・育成目標を登録するとここに優先順で出る。</span></div>';
