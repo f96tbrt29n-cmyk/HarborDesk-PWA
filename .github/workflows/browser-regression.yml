@@ -15,10 +15,10 @@ jobs:
         run: |
           python - <<'PYLOG'
           import subprocess,re,json
-          for job in [116717900158]:
+          for job in [116725205910]:
               meta=subprocess.run(['gh','api',f'repos/f96tbrt29n-cmyk/HarborDesk-PWA/actions/jobs/{job}'],capture_output=True,text=True,check=True)
               info=json.loads(meta.stdout)
-              if info['run_id']!=38821059841 or info['status']!='completed':
+              if info['run_id']!=38823343757 or info['status']!='completed':
                   raise SystemExit('Expected completed job from the current CI run; no logs read')
               r=subprocess.run(['gh','api','--allow-escape-sequences',f'repos/f96tbrt29n-cmyk/HarborDesk-PWA/actions/jobs/{job}/logs'],capture_output=True,text=True)
               if r.returncode:
