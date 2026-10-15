@@ -98,11 +98,14 @@ function hdOCSpeedPart(item){
 function hdOCItemMatches(kind,item){if(['drum-ships','ドラム缶'].includes(kind))return hdFOItemMeta(item).name==='ドラム缶(輸送用)';if(kind==='radar-ships')return /電探/.test(hdFOItemMeta(item).category||'');if(kind==='opening-asw')return Number(hdFOItemMeta(item).stats?.対潜)>0; if(typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[kind])return HD_SE_RECIPES[kind].some(r=>r.parts.some(part=>hdSEPartMatches(part,item)));return kind==='speed-turbine'?hdOCSpeedPart(item)==='turbine':kind==='speed-boiler'?hdOCSpeedPart(item)==='boiler':hdFOItemMatches(kind,item)}
 // Keep each verified mandatory predicate, even while a different predicate
 // leaves the overall route incomplete. OR alternatives remain a single check.
-function hdOCRequiredChecks(plan,route=hdFERoute(plan)){
+function hdOCRequiredChecks(plan,route=hdFERoute(plan),sameEvaluation=false){
  const data=route.contract?.data,rows=route.contract?.checks||route.branch?.checks||[];
+ // Normalize once for this synchronous evaluation; never cache across plans or sync changes.
+ let ships;
  const flatten=c=>Array.isArray(c?.all)?c.all.flatMap(flatten):[c];
  return rows.flatMap(row=>flatten(row.condition).map(condition=>{
-  const check=hdFEBranchPredicate(condition,hdFERouteShips(plan),plan);
+  // Only hdOCMeasure passes a freshly computed contract from this synchronous evaluation.
+  const check=sameEvaluation&&route.contract&&condition===row.condition&&condition.kind!=='unverified'?row:hdFEBranchPredicate(condition,ships||(ships=hdFERouteShips(plan)),plan);
   const id=JSON.stringify([plan.map,data?.index??route.branch?.goal??null,condition]);
   return {...check,id,kind:'route-condition',mandatory:true,condition,
    label:typeof hdMapRequirementConditionText==='function'?hdMapRequirementConditionText(condition):row.label||check.detail,
@@ -157,7 +160,7 @@ function hdOCMeasure(plan,requirements,unknown=[]){
  if(route.status==='manual')manual.push(`ルート：${route.detail}`);
  if(hdSEChecks(plan.map).adv?.base?.available)manual.push('基地航空隊の機体・行動半径は基地航空隊プランナーで確認');
  for(const goal of goals){goal.purpose=['route-branches','route-requirements','radar-ships','drum-ships','low-speed-ships','speed-ship','los-value'].includes(goal.kind)?'route':goal.generatedFromMap&&!(goal.kind.startsWith('cap-night-')&&hdSENightPolicy(plan.map)!=='auto')?'recommendation':'strategy';}
- const requiredChecks=hdOCRequiredChecks(plan,route);
+ const requiredChecks=hdOCRequiredChecks(plan,route,true);
  const score=goals.reduce((s,g)=>s+g.ratio*100+(g.ok?25:0),0)+requiredChecks.reduce((n,c)=>n+(c.ok?10000:Math.max(0,c.ratio||0)*1000),0);
  return {goals,requiredChecks,manual,score,routeStatus:route.status,speedTarget,complete:goals.length>0&&goals.every(x=>x.ok&&!x.unresolved)&&!unknown.length&&air.reason!=='anti-air'&&route.status==='ready'};
 }

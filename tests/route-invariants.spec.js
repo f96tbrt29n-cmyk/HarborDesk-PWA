@@ -178,3 +178,16 @@ test('bounded search reports unfinished exploration without claiming a stock def
  const drum=result.shortages.find(g=>g.goalKind==='drum-ships');hdFCImportOwnedPlan(c,result);const saved={...c.fleet,searchAssessment:result.search};const restored=hdFEPlanFromSavedFleet(c.map,saved).search;return {search:result.search,html:hdOCSearchStatusHtml(result),stockGap:drum?hdOCStockGap(drum):0,proposal:hdFCState('2-5',hdFCSelection('2-5')).proposal,restored};
  });expect(r.search.status).toBe('incomplete');expect(r.search.exhaustive).toBe(false);expect(r.search.examined).toBeLessThanOrEqual(50);expect(r.search.reasons.some(x=>['combination-limit','depth-limit'].includes(x))).toBe(true);expect(r.html).toContain('探索未完了');expect(r.html).toContain('不足を証明するものではありません');expect(r.stockGap).toBe(0);expect(r.proposal.search).toEqual(r.search);expect(r.restored).toEqual(r.search);
 });
+
+test('mandatory checks refresh equipment speed and synchronized scouting on each evaluation',async({page})=>{
+ await north(page);const r=await page.evaluate(()=>{
+ const p=hdFEPlanFromSavedFleet('2-5',loadCustomFleets()['2-5'][0]);
+ const captured=hdFERoute(p),checks=()=>hdOCMeasure(p,[]).requiredChecks,select=(rows,kind)=>rows.find(x=>x.condition.kind===kind),before=checks();
+ const drum=p.ships[1].items.find(x=>x.name==='ドラム缶(輸送用)');p.ships[1].items=p.ships[1].items.filter(x=>x!==drum);const removed=checks(),supplied=select(hdOCRequiredChecks(p,captured),'equipmentShips').status;p.ships[1].items.push(drum);const restored=checks();
+ const old=p.ships[0].items;p.ships[0].items=[{name:'新型高温高圧缶',slotIndex:0},{name:'改良型艦本式タービン',slotIndex:1}];const fast=checks();p.ships[0].items=old;
+ const roster=hdFERoster();
+ // Keep the observed equipment and its slots identical; only the synchronized stat changes.
+ roster.forEach(row=>row.gameLos=49+(row.gameGearSlots||[]).reduce((n,x)=>n+(Number(hdFEFind(x)?.stats?.索敵)||0),0));localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(roster));const resynced=checks();
+ return {supplied,before:select(before,'scoutingValue').status,drumsBefore:select(before,'equipmentShips').status,removed:select(removed,'equipmentShips').status,restored:select(restored,'equipmentShips').status,fast:select(fast,'speedCount').status,resynced:select(resynced,'scoutingValue').status};
+ });expect(r).toEqual({supplied:'missing',before:'ready',drumsBefore:'ready',removed:'missing',restored:'ready',fast:'missing',resynced:'missing'});
+});
