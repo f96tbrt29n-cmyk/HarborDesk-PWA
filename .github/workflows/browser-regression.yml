@@ -14,7 +14,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh api repos/f96tbrt29n-cmyk/HarborDesk-PWA/actions/jobs/116318587127/logs > "$RUNNER_TEMP/ci153-job.log"
+          gh api --allow-escape-sequences repos/f96tbrt29n-cmyk/HarborDesk-PWA/actions/jobs/116318587127/logs > "$RUNNER_TEMP/ci153-job.log"
           python - "$RUNNER_TEMP/ci153-job.log" <<'PY'
           import pathlib,re,sys,json
           lines=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',pathlib.Path(sys.argv[1]).read_text()).splitlines()
