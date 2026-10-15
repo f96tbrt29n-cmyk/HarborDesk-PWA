@@ -1,0 +1,109 @@
+{
+  "main": "8177700",
+  "upstreamMasterCommit": "23637be57ac23a7b4281f193b836fa568ead8ee4",
+  "upstreamSha256": "71e7fecb9475df36063d9313bfdc552a906ae2f29ee97d5fb57fcdfac559771f",
+  "beforeCount": 865,
+  "afterCount": 866,
+  "added": [
+    "902"
+  ],
+  "removed": [],
+  "newForm": {
+    "id": 902,
+    "name": "狭霧改二",
+    "stype": 2,
+    "type": "駆逐艦",
+    "ctype": 1,
+    "sortno": 502,
+    "afterLv": 0,
+    "afterId": 0,
+    "speed": 10,
+    "range": 1,
+    "fuel": 15,
+    "ammo": 20,
+    "slots": [
+      0,
+      0,
+      0
+    ],
+    "stats": {
+      "hp": 31,
+      "armor": 51,
+      "fire": 63,
+      "torp": 87,
+      "aa": 60,
+      "luck": 81
+    }
+  },
+  "reform391": {
+    "afterId": 902,
+    "afterLv": 84
+  },
+  "pinnedCardRevision": "c6265b152e17a8ad6529fd1215f84ccd0304fce5",
+  "pinnedCardEntries": 865,
+  "masterCardsPresent": 865,
+  "masterCardsMissing": [
+    902
+  ],
+  "missing902HttpStatus": 404,
+  "verification": {
+    "pagesValidateSteps": [
+      {
+        "step": "Validate JavaScript syntax",
+        "exitCode": 0,
+        "log": "validate-step-2.log"
+      },
+      {
+        "step": "Verify release version bump",
+        "exitCode": 0,
+        "log": "validate-step-3.log"
+      },
+      {
+        "step": "Verify captured data survives a browser restart",
+        "exitCode": 0,
+        "log": "validate-step-4.log"
+      },
+      {
+        "step": "Verify enemy anti-aircraft loss model",
+        "exitCode": 0,
+        "log": "validate-step-5.log"
+      },
+      {
+        "step": "Validate PWA metadata and cached assets",
+        "exitCode": 0,
+        "log": "validate-step-6.log"
+      },
+      {
+        "step": "Validate runtime asset graph",
+        "exitCode": 0,
+        "log": "validate-step-7.log"
+      },
+      {
+        "step": "Validate ship image source",
+        "exitCode": 0,
+        "log": "validate-step-8.log"
+      },
+      {
+        "step": "Validate Kancolle master semantics",
+        "exitCode": 0,
+        "log": "validate-step-9.log"
+      }
+    ],
+    "imageNodeTests": {
+      "passed": 4,
+      "failed": 0
+    },
+    "browser": {
+      "passed": 10,
+      "failed": 0,
+      "flaky": 0,
+      "retries": 0,
+      "engines": [
+        "chromium",
+        "webkit"
+      ]
+    },
+    "physicalIPhone": "unverified",
+    "githubPagesDeploy": "not executed"
+  }
+}
