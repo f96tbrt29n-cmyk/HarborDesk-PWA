@@ -9,13 +9,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Read six completed job logs and emit summaries only
+      - name: Read the completed Chromium 1 log and emit its summary only
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           python - <<'PYLOG'
           import subprocess,re,json
-          for job in [116550651667,116550651893,116550651950,116550652009,116550652016,116550652033]:
+          for job in [116717900158]:
+              meta=subprocess.run(['gh','api',f'repos/f96tbrt29n-cmyk/HarborDesk-PWA/actions/jobs/{job}'],capture_output=True,text=True,check=True)
+              info=json.loads(meta.stdout)
+              if info['run_id']!=38821059841 or info['status']!='completed':
+                  raise SystemExit('Expected completed job from the current CI run; no logs read')
               r=subprocess.run(['gh','api','--allow-escape-sequences',f'repos/f96tbrt29n-cmyk/HarborDesk-PWA/actions/jobs/{job}/logs'],capture_output=True,text=True)
               if r.returncode:
                   raise SystemExit(f'Log retrieval failed for job {job}; no counts inferred')
