@@ -15,7 +15,7 @@ jobs:
         run: |
           python - <<'PYLOG'
           import subprocess,re,json
-          for job in [116525599747,116525599763,116525599764,116525599830,116525599880,116525599912]:
+          for job in [116550651667,116550651893,116550651950,116550652009,116550652016,116550652033]:
               r=subprocess.run(['gh','api','--allow-escape-sequences',f'repos/f96tbrt29n-cmyk/HarborDesk-PWA/actions/jobs/{job}/logs'],capture_output=True,text=True)
               if r.returncode:
                   raise SystemExit(f'Log retrieval failed for job {job}; no counts inferred')
