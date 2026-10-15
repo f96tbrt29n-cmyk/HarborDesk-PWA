@@ -20,6 +20,7 @@ concurrency:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   smoke:
@@ -65,6 +66,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
+
+      # Temporary read-only collector: local downloads of these old logs are blocked.
+      # Remove after the PR #152 failure has been identified.
+      - name: Read previous PR 152 Chromium failure
+        if: github.event_name == 'pull_request' && github.event.pull_request.number == 152 && matrix.browser == 'chromium' && matrix.shard == 1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PYDIAG'
+          import re, subprocess
+          result = subprocess.run(['gh', 'run', 'view', '38593444576', '--repo', 'f96tbrt29n-cmyk/HarborDesk-PWA', '--job', '115953986256', '--log'], capture_output=True, text=True)
+          if result.returncode:
+              print('::warning title=Previous CI diagnostic::Previous job log unavailable from hosted runner; original failure remains unconfirmed.')
+          else:
+              text = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', result.stdout)
+              match = re.search(r'\d+\) \[chromium\]', text)
+              excerpt = text[match.start():match.start()+16000] if match else text[-16000:]
+              escaped = excerpt.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print('::notice title=Previous Chromium job diagnostic::' + escaped)
+          PYDIAG
 
       - name: Setup Node
         uses: actions/setup-node@v7.0.0
