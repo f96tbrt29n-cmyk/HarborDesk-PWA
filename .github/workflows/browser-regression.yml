@@ -1,4 +1,4 @@
-name: Read CI153 job summary
+name: Read completed CI154 job summaries
 on:
   workflow_dispatch:
 permissions:
@@ -9,19 +9,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Read completed Chromium job log and emit summary only
+      - name: Read six completed job logs and emit summaries only
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          set -euo pipefail
-          gh api --allow-escape-sequences repos/f96tbrt29n-cmyk/HarborDesk-PWA/actions/jobs/116318587127/logs > "$RUNNER_TEMP/ci153-job.log"
-          python - "$RUNNER_TEMP/ci153-job.log" <<'PY'
-          import pathlib,re,sys,json
-          lines=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',pathlib.Path(sys.argv[1]).read_text()).splitlines()
-          selected=[x for x in lines if re.search(r'\b\d+ (passed|flaky|failed|skipped)\b|\(retry #\d+\)',x)]
-          if not any(re.search(r'\b\d+ passed\b',x) for x in selected):
-              raise SystemExit('Playwright pass summary not found; do not infer first-pass counts')
-          text=json.dumps({'job':116318587127,'lines':selected[-40:]},ensure_ascii=False)
-          text=text.replace('%','%25').replace('\r','%0D').replace('\n','%0A')
-          print('::notice title=CI153 Chromium shard1 summary::'+text)
-          PY
+          python - <<'PYLOG'
+          import subprocess,re,json
+          for job in [116525599747,116525599763,116525599764,116525599830,116525599880,116525599912]:
+              r=subprocess.run(['gh','api','--allow-escape-sequences',f'repos/f96tbrt29n-cmyk/HarborDesk-PWA/actions/jobs/{job}/logs'],capture_output=True,text=True)
+              if r.returncode:
+                  raise SystemExit(f'Log retrieval failed for job {job}; no counts inferred')
+              lines=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',r.stdout).splitlines()
+              selected=[x for x in lines if re.search(r'\b\d+ (passed|flaky|failed|skipped)\b|\(retry #\d+\)',x)]
+              if not any(re.search(r'\b\d+ passed\b',x) for x in selected):
+                  raise SystemExit(f'Playwright pass summary absent for job {job}; no counts inferred')
+              text=json.dumps({'job':job,'lines':selected[-40:]},ensure_ascii=False)
+              text=text.replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+              print('::notice title=CI154 job summary::'+text)
+          PYLOG
