@@ -1,8 +1,8 @@
 {
-  "version": "1.0.578",
-  "build": 578,
-  "releasedAt": "2026-10-15T03:59:18.598+09:00",
-  "notes": "艦これマスター自動同期。api_start2 23637be / 装備picker e38bdbc を反映。艦娘変更 2件 / 新装備 0件 / 装備変更 0件 / 増設ルール 5件。",
+  "version": "1.0.579",
+  "build": 579,
+  "releasedAt": "2026-10-16T08:02:05.223+09:00",
+  "notes": "攻略目標の取込ボタン押下中は作戦優先度の更新を保留し、クリック・取消後に最新内容を反映。保存データ形式は変更なし。",
   "masterChanges": {
     "baseline": false,
     "from": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
