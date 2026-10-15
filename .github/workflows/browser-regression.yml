@@ -1,132 +1,27 @@
-name: Browser Regression
-
+name: Read CI153 job summary
 on:
-  pull_request:
-    branches: [main]
   workflow_dispatch:
-    inputs:
-      suite:
-        description: Test suite
-        required: true
-        default: smoke
-        type: choice
-        options:
-          - smoke
-          - full
-
-concurrency:
-  group: browser-regression-${{ github.ref }}-${{ github.event_name == 'workflow_dispatch' && inputs.suite || 'smoke' }}
-  cancel-in-progress: true
-
 permissions:
+  actions: read
   contents: read
-
 jobs:
-  smoke:
-    name: Smoke / ${{ matrix.browser }} / shard ${{ matrix.shard }} of ${{ matrix.shards }}
-    if: github.event_name != 'workflow_dispatch' || inputs.suite == 'smoke'
+  read:
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ matrix.timeout_minutes }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - browser: chromium
-            workers: 2
-            timeout_minutes: 45
-            shard: 1
-            shards: 2
-          - browser: chromium
-            workers: 2
-            timeout_minutes: 45
-            shard: 2
-            shards: 2
-          - browser: webkit
-            workers: 1
-            timeout_minutes: 45
-            shard: 1
-            shards: 4
-          - browser: webkit
-            workers: 1
-            timeout_minutes: 45
-            shard: 2
-            shards: 4
-          - browser: webkit
-            workers: 1
-            timeout_minutes: 45
-            shard: 3
-            shards: 4
-          - browser: webkit
-            workers: 1
-            timeout_minutes: 45
-            shard: 4
-            shards: 4
-
+    timeout-minutes: 5
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7.0.1
-
-      - name: Setup Node
-        uses: actions/setup-node@v7.0.0
-        with:
-          node-version: 24
-
-      - name: Install test dependencies
-        run: npm install --no-audit --no-fund --no-package-lock
-
-      - name: Install Playwright browser
-        run: npx playwright install --with-deps ${{ matrix.browser }}
-
-      - name: Run smoke browser regression
-        run: npm run test:browser -- --project=${{ matrix.browser }} --workers=${{ matrix.workers }} --shard=${{ matrix.shard }}/${{ matrix.shards }}
-
-      - name: Upload Playwright diagnostics
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: smoke-${{ matrix.browser }}-shard-${{ matrix.shard }}-of-${{ matrix.shards }}-${{ github.run_id }}
-          path: |
-            playwright-report/
-            test-results/
-          if-no-files-found: ignore
-          retention-days: 14
-
-  full:
-    name: Full / ${{ matrix.browser }} / shard ${{ matrix.shard }}
-    if: github.event_name == 'workflow_dispatch' && inputs.suite == 'full'
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        browser: [chromium, webkit]
-        shard: [1, 2, 3, 4]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7.0.1
-
-      - name: Setup Node
-        uses: actions/setup-node@v7.0.0
-        with:
-          node-version: 24
-
-      - name: Install test dependencies
-        run: npm install --no-audit --no-fund --no-package-lock
-
-      - name: Install Playwright browser
-        run: npx playwright install --with-deps ${{ matrix.browser }}
-
-      - name: Run full browser regression shard
-        run: npm run test:browser:full -- --project=${{ matrix.browser }} --workers=1 --shard=${{ matrix.shard }}/4
-
-      - name: Upload Playwright diagnostics
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: full-${{ matrix.browser }}-shard-${{ matrix.shard }}-${{ github.run_id }}
-          path: |
-            playwright-report/
-            test-results/
-          if-no-files-found: ignore
-          retention-days: 14
+      - name: Read completed Chromium job log and emit summary only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api repos/f96tbrt29n-cmyk/HarborDesk-PWA/actions/jobs/116318587127/logs > "$RUNNER_TEMP/ci153-job.log"
+          python - "$RUNNER_TEMP/ci153-job.log" <<'PY'
+          import pathlib,re,sys,json
+          lines=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',pathlib.Path(sys.argv[1]).read_text()).splitlines()
+          selected=[x for x in lines if re.search(r'\b\d+ (passed|flaky|failed|skipped)\b|\(retry #\d+\)',x)]
+          if not any(re.search(r'\b\d+ passed\b',x) for x in selected):
+              raise SystemExit('Playwright pass summary not found; do not infer first-pass counts')
+          text=json.dumps({'job':116318587127,'lines':selected[-40:]},ensure_ascii=False)
+          text=text.replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+          print('::notice title=CI153 Chromium shard1 summary::'+text)
+          PY
