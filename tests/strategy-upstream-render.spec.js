@@ -45,7 +45,12 @@ for(const ending of ['click','cancel'])test(`strategy input: upstream priority u
  }
  await expect(page.locator('[data-group="map"]')).toContainText('6-4 のクリアを確認');
  await expect(page.locator('#hdCommandCenter .hd-cc-item')).toHaveCount(before.count+1);
- expect((await geometry(page)).height).toBe(before.height+54);
+ const after=await geometry(page);
+ const added=await page.locator('#hdCommandCenter .hd-cc-item').filter({hasText:'今日の司令部'}).boundingBox();
+ await test.info().attach('upstream-layout',{body:JSON.stringify({before,during,after,addedRowHeight:added.height}),contentType:'application/json'});
+ // Row line boxes vary between browser installations (52px in CI, 54px in
+ // the restored runtime). The entire added row must appear after release.
+ expect(after.height).toBe(before.height+added.height);
 });
 
 for(const interruption of ['blur','navigation','removed target'])test(`strategy input: repeated upstream updates flush after ${interruption}`,async({page})=>{
