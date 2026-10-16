@@ -8630,16 +8630,17 @@ function hdShipDbMasterTypeIdsForItem(item){
  return HD_EQUIPMENT_CATEGORY_MASTER_TYPE_IDS[String(item?.category||'')]||[];
 }
 function hdShipDbMasterCompatible(item,ship){
- const p=hdShipDbSlotProfile(ship);if(!p?.equipRules)return null;
+ const p=hdShipDbSlotProfile(ship);if(!p?.equipRules||!Object.keys(p.equipRules).length)return null;
  const exact=hdShipDbMasterMeta(item),ids=hdShipDbMasterTypeIdsForItem(item);if(!ids.length)return null;
- let saw=false;
  for(const typeId of ids){
   const key=String(typeId);if(!Object.prototype.hasOwnProperty.call(p.equipRules,key))continue;
-  saw=true;const rule=p.equipRules[key];
+  const rule=p.equipRules[key];
   if(rule===null)return true;
   if(exact&&Array.isArray(rule)&&rule.includes(Number(exact.id)))return true;
  }
- return saw?false:null;
+ // A known master table lists permitted types. Missing is forbidden, not
+ // unknown; otherwise the permissive legacy fallback can equip illegal gear.
+ return false;
 }
 function hdShipDbExpansionRuleApplies(rule,profile){
  if(!rule||!profile)return false;
@@ -8651,8 +8652,6 @@ function hdShipDbExpansionRuleMatch(rule,profile,star=0){
 function hdShipDbExpansionInfo(item,ship,star=0){
  const profile=hdShipDbSlotProfile(ship);if(!profile)return {allowed:false,mode:'none',reason:'艦娘マスター未登録',reqStar:0};
  const normal=hdShipDbMasterCompatible(item,ship);
- if(normal===false)return {allowed:false,mode:'none',reason:'通常スロット装備不可',reqStar:0};
- if(normal===null&&!hdShipDbEquipCompatible(item,ship))return {allowed:false,mode:'none',reason:'通常スロット装備不可',reqStar:0};
  const exact=hdShipDbMasterMeta(item),typeIds=hdShipDbMasterTypeIdsForItem(item);
  let starShort=null;
  if(exact){
@@ -8662,8 +8661,10 @@ function hdShipDbExpansionInfo(item,ship,star=0){
    if(Number(star||0)>=req)return {allowed:true,mode:(special.stypes||[]).includes(99)?'global':'special',reason:(special.stypes||[]).includes(99)?'全艦個別許可':'艦/艦級/艦種別の個別許可',reqStar:req};
    starShort={allowed:false,mode:'special',reason:`改修★${req}以上が必要`,reqStar:req};
   }
-  if(HD_EXSLOT_GLOBAL_ITEM_IDS.includes(Number(exact.id)))return {allowed:true,mode:'global',reason:'全艦個別許可',reqStar:0};
+  if(!special&&HD_EXSLOT_GLOBAL_ITEM_IDS.includes(Number(exact.id)))return {allowed:true,mode:'global',reason:'全艦個別許可',reqStar:0};
  }
+ // Explicit expansion permissions are independent of ordinary-slot permission.
+ if(normal===false||normal===null&&!hdShipDbEquipCompatible(item,ship))return starShort||{allowed:false,mode:'none',reason:'通常スロット装備不可',reqStar:0};
  const blocked=new Set(HD_EXSLOT_LIMIT_TYPE_IDS[String(profile.id)]||[]);
  const common=typeIds.find(id=>HD_EXSLOT_BASE_TYPE_IDS.includes(Number(id))&&!blocked.has(Number(id)));
  if(common)return {allowed:true,mode:'common',reason:`共通増設カテゴリ: ${HD_EXSLOT_TYPE_LABELS[common]||HD_EQUIP_TYPE_LABELS[common]||('#'+common)}`,reqStar:0,typeId:Number(common)};
@@ -8817,7 +8818,8 @@ function hdShipDbEquipCompatible(item,ship){
  if(/艦上攻撃機/.test(cat))return carrier||flags.includes('艦攻');
  if(/艦上爆撃機/.test(cat))return carrier||flags.includes('艦爆');
  if(/艦上偵察機/.test(cat))return carrier||flags.includes('艦偵');
- if(/噴式/.test(cat)||/噴式/.test(String(item.name||'')))return flags.includes('噴式');
+ // Only an affirmative master result permits jets; role flags are not enough.
+ if(/噴式/.test(cat)||/噴式/.test(String(item.name||'')))return false;
  if(/大口径主砲/.test(cat))return battle;
  if(/中口径主砲/.test(cat))return cruiser||ship.final==='大和改二';
  if(/小口径主砲/.test(cat))return destroyer||['軽巡洋艦','練習巡洋艦'].includes(type);
@@ -9034,9 +9036,12 @@ function hdShipDbMasterAdapter(input,extraRoles=[]){
 function hdShipDbResolveShip(input,extraRoles=[]){
  const name=String(typeof input==='string'?input:(input?.name||input?.final||input?.base||input?.row?.name||'')).trim();if(!name)return null;
  const rows=typeof HD_SHIP_DATABASE!=='undefined'?HD_SHIP_DATABASE:[];
- const exact=rows.find(x=>name===x.final||name===x.base);if(exact)return exact;
+ // Exact remodel/ID beats the family's final-remodel display card.
+ const id=Number(input?.masterId||input?._masterId||input?._masterRow?.id)||0,row=id?hdShipDbMasterRowFor(input):null;
+ if(id&&Number(row?.id)!==id)return null;
+ const exact=rows.find(x=>name===x.final);if(exact&&(!id||row?.name===exact.final))return exact;
  const master=hdShipDbMasterAdapter(input,extraRoles);if(master)return master;
- return rows.find(x=>name.startsWith(x.base))||null;
+ return rows.find(x=>name===x.base||name.startsWith(x.base))||null;
 }
 
 function hdShipDbMasterSpeed(code){return ({5:'低速',10:'高速',15:'高速+',20:'最速'})[Number(code)]||`速力${Number(code)||0}`}

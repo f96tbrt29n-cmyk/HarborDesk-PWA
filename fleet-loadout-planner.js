@@ -66,6 +66,8 @@ function hdFLCompatible(item,slot){
  const type=hdFLType(slot),cat=String(item.category||''),roles=hdFLRoles(slot);
  if(/陸上攻撃機|陸軍戦闘機|局地戦闘機/.test(cat))return false;
  if(/艦上戦闘機|艦上攻撃機|艦上爆撃機|艦上偵察機/.test(cat))return hdFLIsCarrier(type);
+ // Jets require affirmative master permission above, never generic fallback.
+ if(/噴式/.test(cat)||/噴式/.test(String(item.name||'')))return false;
  if(/大口径主砲/.test(cat))return hdFLIsBattleship(type);
  if(/中口径主砲/.test(cat))return hdFLIsCruiser(type);
  if(/小口径主砲/.test(cat))return hdFLIsDestroyer(type)||['軽巡洋艦','練習巡洋艦'].includes(type);

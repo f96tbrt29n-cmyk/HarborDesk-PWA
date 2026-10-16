@@ -125,3 +125,16 @@ test('north bounded search is not a proof of shortage when independent inventory
   return {search:result.search,measure:result.measure,status:hdOCSearchStatusHtml(result),ready:hdOCReadiness(result.plan,result.measure)};
  });expect(r.search).toMatchObject({status:'incomplete',exhaustive:false});expect(r.ready.registeredReady).toBe(false);expect(r.status).toContain('不足を証明するものではありません');
 });
+test('north unsupported jets never become shortage candidates or inflate allocated air power',async({page})=>{
+ await prepare(page);const r=await page.evaluate(()=>{
+  const jet=hdFEFind('橘花改'),otherJet=hdFEFind('Ho229');
+  const compatibility=['扶桑改二','鈴谷改二','妙高改二','翔鶴改二甲'].map(name=>{const db=hdFEFindShip(name),profile=hdShipDbSlotProfile(db),slot={profile:{type:db.type,row:{name}}};return {name,type57:profile.equipRules['57']??'absent-or-null',hasType57:Object.hasOwn(profile.equipRules,'57'),quick:hdFLCompatible(jet,slot),master:hdShipDbEquipCompatible(jet,db),other:hdShipDbEquipCompatible(otherJet,db),otherType:hdShipDbPickerTypeId(otherJet),otherHasType:Object.hasOwn(profile.equipRules,'91')}});
+  const permissionMatrix=['扶桑改二','鈴谷改二','妙高改二','翔鶴改二甲','時雨改二'].flatMap(name=>['橘花改','Ho229','瑞雲','三式水中探信儀','32号対水上電探','12.7cm連装砲','20.3cm連装砲','零式水上観測機','強風改二'].map(equipment=>{const item=hdFEFind(equipment),db=hdFEFindShip(name),profile=hdShipDbSlotProfile(db),type=hdShipDbPickerTypeId(item),rule=profile.equipRules[String(type)],id=hdShipDbMasterMeta(item).id;return {name,equipment,type,expected:Object.hasOwn(profile.equipRules,String(type))&&(rule===null||Array.isArray(rule)&&rule.includes(id)),quick:hdFLCompatible(item,{profile:{type:db.type,row:{name}}}),master:hdShipDbEquipCompatible(item,db)}}));
+  const rows=hdFLRows();rows.forEach(x=>{if(x.name==='強風改二')x.count=0});rows.push({name:'橘花改',count:1},{name:'Ho229',count:1});localStorage.setItem(HD_FL_KEY,JSON.stringify(rows));
+  const c=hdOCContext('2-5','completion',0),steps=hdOCSearchSteps(c,{maxExamined:50,maxDepth:1});let n;do{n=steps.next()}while(!n.done);const result=n.value;
+  return {permissionMatrix,compatibility,assigned:hdFEAssigned(result.plan).map(x=>x.name),air:result.measure.goals.find(x=>x.kind==='air-value'),shortage:result.shortages.find(x=>x.goalKind==='air-value'),ready:hdOCReadiness(result.plan,result.measure)};
+ });await test.info().attach('north-jet-master-vs-fallback',{body:Buffer.from(JSON.stringify(r,null,2)),contentType:'application/json'});
+ for(const row of r.compatibility){const allowed=row.name==='翔鶴改二甲';expect(row.hasType57,row.name).toBe(allowed);expect(row.quick,row.name).toBe(allowed);expect(row.master,row.name).toBe(allowed);expect(row.otherType,row.name).toBe(91);expect(row.otherHasType,row.name).toBe(false);expect(row.other,row.name).toBe(false)}
+ for(const row of r.permissionMatrix){expect(row.quick,row.name+' / '+row.equipment).toBe(row.expected);expect(row.master,row.name+' / '+row.equipment).toBe(row.expected)}
+ expect(r.assigned).not.toContain('橘花改');expect(r.assigned).not.toContain('Ho229');expect(r.air).toMatchObject({count:0,minCount:42,ok:false});expect(r.shortage.candidates).not.toContain('橘花改');expect(r.shortage.candidates).not.toContain('Ho229');expect(r.ready.registeredReady).toBe(false);
+});
