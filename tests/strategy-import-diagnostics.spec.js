@@ -1,0 +1,33 @@
+const {test,expect}=require('@playwright/test');
+const {strategyImportDiagnostics}=require('./strategy-import-diagnostics.cjs');
+const fixture=`<main id="homeGuideSteps"><select id="homeGuideMapSelect"><option>6-5</option></select><button data-hd-strategy-import-all="6-5" style="margin:80px">import</button></main><script>function hdStrategyImportMap(){window.imported=(window.imported||0)+1;return 1}document.addEventListener('click',e=>{if(e.target.matches('[data-hd-strategy-import-all]'))hdStrategyImportMap()})</script>`;
+test('import diagnostics retain pre-reload input and import calls in separate retry-safe archive',async({page},info)=>{
+ const diagnostic=await strategyImportDiagnostics(page,info);
+ await page.route('**/import-fixture',r=>r.fulfill({contentType:'text/html',body:fixture}));
+ await page.goto('http://127.0.0.1:4173/import-fixture');await diagnostic.mark('first');
+ await page.locator('[data-hd-strategy-import-all]').click();await page.reload();await diagnostic.mark('reloaded');
+ await page.evaluate(()=>window.__hdImportDiagnostic.flush());
+ expect(diagnostic.records.some(x=>x.kind==='hdStrategyImportMap:return'&&x.result===1)).toBe(true);
+ expect(new Set(diagnostic.records.map(x=>x.timeOrigin)).size).toBe(2);
+ const events=diagnostic.records.filter(x=>['pointerdown','pointerup','click'].includes(x.kind)&&x.phase==='capture');
+ expect(events.map(x=>x.kind)).toEqual(['pointerdown','pointerup','click']);
+ expect(events.every(x=>x.target.node===x.hit.node&&!x.defaultPrevented)).toBe(true);
+ await page.close();diagnostic.failed(new Error('diagnostic fixture simulates an interrupted assertion'));
+ await diagnostic.finish();
+ const fs=require('node:fs/promises');
+ const archive=JSON.parse(await fs.readFile(diagnostic.archiveFile,'utf8'));
+ expect(archive.status).toBe('failed');expect(archive.records.some(x=>x.kind==='mark'&&x.label==='first')).toBe(true);
+});
+test('import diagnostics distinguish an overlay hit and a replaced button from a called importer',async({page},info)=>{
+ const diagnostic=await strategyImportDiagnostics(page,info);
+ await page.route('**/import-fixture',r=>r.fulfill({contentType:'text/html',body:fixture}));
+ await page.goto('http://127.0.0.1:4173/import-fixture');await diagnostic.mark('before-overlay');
+ const box=await page.locator('[data-hd-strategy-import-all]').boundingBox();
+ await page.evaluate(()=>{const b=document.querySelector('[data-hd-strategy-import-all]'),r=b.getBoundingClientRect(),overlay=document.createElement('div');overlay.id='diagnostic-overlay';Object.assign(overlay.style,{position:'fixed',left:r.x+'px',top:r.y+'px',width:r.width+'px',height:r.height+'px',zIndex:999});overlay.addEventListener('click',e=>e.preventDefault());document.body.appendChild(overlay);b.replaceWith(b.cloneNode(true))});
+ await page.mouse.click(box.x+box.width/2,box.y+box.height/2);await page.evaluate(()=>window.__hdImportDiagnostic.flush());
+ expect(diagnostic.records.some(x=>x.kind==='button-replaced'&&!x.tracked.connected&&x.button.node!==x.tracked.node)).toBe(true);
+ expect(diagnostic.records.some(x=>x.kind==='click'&&x.phase==='capture'&&x.target.id==='diagnostic-overlay'&&x.hit.id==='diagnostic-overlay')).toBe(true);
+ expect(diagnostic.records.some(x=>x.kind==='hdStrategyImportMap:enter')).toBe(false);
+ expect(diagnostic.records.some(x=>x.kind==='click'&&x.phase==='after-task'&&x.defaultPrevented)).toBe(true);
+ await diagnostic.finish();
+});

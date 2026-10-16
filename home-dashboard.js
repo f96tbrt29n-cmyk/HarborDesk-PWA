@@ -351,6 +351,7 @@ function homeGuideFinishPress(press,delay=0){
   if(homeGuidePressedPointer!==press)return;
   homeGuidePressedPointer=null;
   if(homeGuideRenderPending)homeGuideRender();
+  if(typeof hdCCFlushPendingRender==='function')hdCCFlushPendingRender();
  },delay);
 }
 window.addEventListener('pointerup',e=>{
@@ -370,6 +371,7 @@ document.addEventListener('click',e=>{
 window.addEventListener('blur',()=>{
  homeGuidePressedPointer=null;homeGuideCancelledPointer=null;
  if(homeGuideRenderPending)homeGuideRender();
+ if(typeof hdCCFlushPendingRender==='function')hdCCFlushPendingRender();
 });
 function homeGuideRender(){return typeof hdStrategyWithRenderSnapshot==='function'?hdStrategyWithRenderSnapshot(homeGuideRenderNow):homeGuideRenderNow()}
 function homeGuideRenderNow(){
