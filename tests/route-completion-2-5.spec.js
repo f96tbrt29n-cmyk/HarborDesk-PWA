@@ -35,7 +35,7 @@ test('north simultaneous finite air scouting speed drums restores a synchronized
  const answers=oracle();expect(answers.length).toBeGreaterThan(0);
  await prepare(page);const r=await page.evaluate(()=>{
   const generated=hdFSGenerate('2-5',MAP_PLANS['2-5'].presets[0],0);
- 
+
   const source={...completionFleet,ships:generated.slots.map(x=>{
    const row=x.profile.row,s=completionFleet.ships.find(s=>s.gameShipId===row.gameShipId),parts=hdFEGearTokens(s.gear);if(row.gameShipId===9605)parts[2]='';return {...s,gear:parts.join(' / ')};
   })};saveCustomFleets({'2-5':[source]});
