@@ -23,7 +23,7 @@ function hdFCProposalRoster(ship){
  return matches.length===1?matches[0]:null;
 }
 function hdFCProposalShipLos(ship){
- const row=hdFCProposalRoster(ship);if(!row||!(Number(row.gameLos)>0))return null;
+ const row=hdFCProposalRoster(ship);if(!row||row.gameAswGearKnown===false||!(Number(row.gameLos)>0))return null;
  const labels=Array.isArray(row.gameGearSlots)&&row.gameGearSlots.length?[...row.gameGearSlots,row.gameGearExpansion||'']:(typeof hdFEGearTokens==='function'?hdFEGearTokens(row.gear):String(row.gear||'').split(/\s+\/(?=\s|$)/));
  let equipment=0;
  for(const label of labels){if(!label)continue;const item=hdFCFind(String(label).replace(/^\[増設\]\s*/,'').replace(/\s+★\d+$/,'').trim());if(!item)return null;equipment+=Number(item.stats?.索敵)||0}

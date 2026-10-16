@@ -1,5 +1,5 @@
 {
-  "basis": "24a73a8 plus finite-inventory verification change; route registration unchanged; prior CI38849329586 and new local targeted evidence",
+  "basis": "b679196 plus slot/scouting verification; registered route conditions unchanged",
   "date": "2026-10-16 JST",
   "summary": {
     "fullyVerified": 0,
@@ -386,7 +386,8 @@
       "status": "partial",
       "existingEvidence": [
         "全マスター仮想所持の直接構造選択・未知艦拒否（全論理枝ではない）",
-        "低速/49/異なる2隻のドラム缶・最適化5種・交換負例・保存再読込・プランナー"
+        "低速/49/異なる2隻のドラム缶・最適化5種・交換負例・保存再読込・プランナー",
+        "実33式の同期値・★0/4・司令部Lv100/120・係数分離・古い提案拒否・6キー/再読込/プランナー（専用API観測fixture）"
       ],
       "remaining": [
         {
@@ -483,7 +484,8 @@
       "status": "partial",
       "existingEvidence": [
         "全マスター仮想所持の直接構造選択・未知艦拒否（全論理枝ではない）",
-        "通常/高速＋/最速、電探装備艦数・在庫/保存/プランナー"
+        "通常/高速＋/最速、電探装備艦数・在庫/保存/プランナー",
+        "6駆逐の最速6隻＋電探4隻＋対潜2組、開放/閉鎖増設・改修別有限在庫・全5モードの実交換（限定fixture）"
       ],
       "remaining": [
         {
