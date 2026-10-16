@@ -38,7 +38,13 @@ test('7-3 second route checks each historical hull and rejects replacing only As
  const r=await page.evaluate(()=>{const p=boundaryPlan,q=hdFOClone(p);q.ships[1].ship='妙高改二';q.ships[1].masterId=hdShipDbMasterRowFor({name:'妙高改二'}).id;return {before:hdOCRequiredChecks(p).filter(x=>x.condition.kind==='namedCount').map(x=>x.status),lost:hdOCGoalRegressions(hdOCMeasure(p,[]),hdOCMeasure(q,[])).filter(x=>x.condition?.kind==='namedCount').length};});
  expect(r.before.length).toBeGreaterThan(0);expect(r.before.every(x=>x==='ready')).toBe(true);expect(r.lost).toBeGreaterThan(0);
 });
-for(const [map,index,coef,min] of [['2-5',1,1,34],['4-5',1,2,71],['7-2',1,4,69],['7-5',2,4,63]])test(`${map} example${index+1} exact numeric route boundary uses coefficient${coef} threshold${min}`,async({page})=>{
+// Registered safe thresholds are route-specific. Scores below these targets
+// do not prove that random or partially documented routes are unreachable.
+for(const [map,index,coef,min] of [
+ ['2-5',1,1,34],['4-5',1,2,71],['7-2',1,4,69],['7-5',2,4,63],
+ ['3-5',0,4,28],['3-5',1,4,40],['5-5',0,2,80],['5-5',1,2,66],
+ ['6-1',0,4,25],['6-2',0,3,50],['6-3',0,3,38],['6-5',0,3,50],['6-5',1,3,35]
+])test(`${map} example${index+1} exact numeric route boundary uses coefficient${coef} threshold${min}`,async({page})=>{
  await prepare(page,map,index,['矢矧改二','鈴谷改二','熊野改二','時雨改二','夕立改二','綾波改二']);
  const r=await page.evaluate(({coef,min})=>{
   const p=boundaryPlan,condition=hdOCRequiredChecks(p).find(x=>x.condition.kind==='scoutingValue').condition,ships=hdFERouteShips(p);

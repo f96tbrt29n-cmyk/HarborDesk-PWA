@@ -333,7 +333,9 @@ test('release smoke: strategy goal drafts survive background updates reload and 
   })).toEqual({connected:true,focused:true,caret:2});
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');
-  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  // Reload already restores this map/workspace; verify it without re-rendering all modules.
+  await expect(page.locator('#homeGuideMapSelect')).toHaveValue('6-5');
+  await expect(group).toBeVisible();
   await expect(group).toHaveAttribute('open','');
   await page.evaluate(()=>homeGuideRender());
   await expect(group).toHaveAttribute('open','');
@@ -346,7 +348,9 @@ test('release smoke: strategy goal drafts survive background updates reload and 
   expect(goals).toHaveLength(1);expect(goals[0]).toMatchObject({map:'6-5',scope:'map',detail:'前提：前提任務を確認'});
   await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.body?.dataset.hdReady==='1');
-  await page.evaluate(()=>{hdSelectGuideMap('6-5');hdWSShowElement('home',false);});
+  // Reload already restores this map/workspace; verify it without re-rendering all modules.
+  await expect(page.locator('#homeGuideMapSelect')).toHaveValue('6-5');
+  await expect(group).toBeVisible();
   await expect(form.locator('[name="title"]')).toHaveValue('');
 });
 
