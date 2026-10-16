@@ -173,6 +173,23 @@ function hdOCGoalRegressions(before,after){
  const requiredImproved=(after.requiredChecks||[]).some(g=>g.ok&&!previous.get(hdOCGoalIdentity(g))?.ok);
  return [...(before.goals||[]),...(before.requiredChecks||[])].filter(g=>!(g.kind==='speed-ship'&&after.speedTarget===0&&after.routeStatus==='ready')&&g.ok&&!g.unresolved&&(g.purpose!=='recommendation'||!requiredImproved)&&(!current.get(hdOCGoalIdentity(g))?.ok||current.get(hdOCGoalIdentity(g))?.unresolved));
 }
+// Reuse an observed loadout as a candidate, never as an extra inventory source.
+// Exact per-hull slots/star labels retain the synchronized fit-bonus context.
+function hdOCSynchronizedSeed(plan,inventory,slots){
+ if(typeof hdFCProposalRoster!=='function'||hdOCShipOwnership(plan).some(x=>x.status!=='ready'))return null;
+ const roster=hdFERoster(),rows=plan.ships.map(ship=>{const row=hdFCProposalRoster(ship);return row&&roster.filter(x=>Number(x.gameShipId)===Number(row.gameShipId)).length===1?row:null;});
+ if(rows.some((row,si)=>!row||!Number(row.gameShipId)||row.gameAswGearKnown===false||!Array.isArray(row.gameGearSlots)||row.gameGearSlots.length!==plan.ships[si].items.length||Array.from(row.gameGearSlots).some(x=>typeof x!=='string')||typeof row.gameGearExpansion!=='string'))return null;
+ const seed=hdFOClone(plan),remaining=new Map(inventory.map(x=>[x.key,x.count]));
+ for(const slot of slots){
+  const label=slot.expansion?rows[slot.si].gameGearExpansion:rows[slot.si].gameGearSlots[slot.index],parsed=hdFEParseGearLabel(label),key=label?hdFLInventoryStackKey(parsed.name,parsed.star):'';
+  if(!slot.expansion&&parsed.expansion)return null;
+  let value=slot.expansion?null:{name:'',slotIndex:slot.index,capacity:slot.capacity};
+  if(label){const candidate=inventory.find(x=>x.key===key);if(!candidate||!(remaining.get(key)>0)||!hdOCCompatible(slot,candidate))return null;value=hdOCEquipment(candidate,slot);remaining.set(key,remaining.get(key)-1);}
+  if(slot.expansion)seed.ships[slot.si].expansion=value;else seed.ships[slot.si].items[slot.index]=value;
+ }
+ if(!hdFEMasterValidation(seed).valid||hdFEGameMatch(seed).status!=='ready')return null;
+ return seed;
+}
 function* hdOCSearchSteps(c,limits={}){
  const maxExamined=Math.max(50,Math.min(10000,Number(limits.maxExamined)||10000)),maxDepth=Math.max(1,Math.min(24,Number(limits.maxDepth)||24));
  const signature=hdOCSignature(c);
@@ -189,6 +206,11 @@ function* hdOCSearchSteps(c,limits={}){
   for(const x of sorted.slice(0,5))picked.set(x.key,x);if(kind==='高速化')for(const turbine of [true,false])for(const x of sorted.filter(x=>/タービン/.test(x.name)===turbine).slice(0,3))picked.set(x.key,x);
  }candidatePruned+=compatible.filter(x=>!picked.has(x.key)).length;return [...picked.values(),...(routeData?.keepLow||requirements.some(r=>r.kind.startsWith('cap-night-')&&(!slot.expansion||HD_SE_RECIPES[r.kind]?.some(x=>x.ship==='night-sub')))?[{key:'',name:'',star:0,item:{name:'',category:'',stats:{}},count:Infinity}]:[])]});
  const initial={plan,measure:hdOCMeasure(plan,requirements,unknown)},seen=new Set([hdOCKey(plan)]);let beam=[initial],best=initial,examined=0,depth=0,beamPruned=false;
+ const synchronized=initial.measure.complete?null:hdOCSynchronizedSeed(plan,inventory,slots);
+ if(synchronized){
+  const candidate={plan:synchronized,measure:hdOCMeasure(synchronized,requirements,unknown)};
+  if(!hdOCGoalRegressions(initial.measure,candidate.measure).length&&candidate.measure.score>best.measure.score){best=candidate;beam=[candidate,initial];seen.add(hdOCKey(synchronized));}
+ }
  for(;depth<Math.min(slots.length,maxDepth)&&!best.measure.goals.filter(x=>x.kind!=='route-requirements').every(x=>x.ok)&&examined<maxExamined;depth++){
   const next=[];
   enumerate: for(const state of beam){const used=hdFOAssignedUsage(state.plan);

@@ -117,9 +117,10 @@ for(const [kind,count] of [['drum',1],['fighter',1],['improved',0]])test(`north 
  if(kind==='drum'){const g=r.shortages.find(x=>x.goalKind==='drum-ships');expect(g.minCount).toBe(2);expect(g.count).toBe(1);expect(g.candidates).toContain('ドラム缶(輸送用)');expect(r.html).toContain('装備艦があと1隻');}
  else {const g=r.shortages.find(x=>x.goalKind===(kind==='fighter'?'air-value':'los-value'));expect(g.count).toBeLessThan(g.minCount);expect(g.candidates.length).toBeGreaterThan(0);expect(r.html).toContain('あと');}
 });
-test('north bounded search is not a proof of shortage when independent inventory enumeration has solutions',async({page})=>{
+test('north bounded search without synchronized gear is not a proof of shortage when independent inventory enumeration has solutions',async({page})=>{
  expect(oracle().length).toBe(16);expect(oracle({fighters:1}).length).toBe(0);expect(oracle({improved:0}).length).toBe(0);
  await prepare(page);const r=await page.evaluate(()=>{
+  const rows=hdFERoster();rows.forEach(row=>{row.gameAswGearKnown=false});localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));
   const ships=completionFleet.ships.map((s,i)=>{const parts=hdFEGearTokens(s.gear);for(const slot of i===0?[2,3]:i<3?[3]:[2])parts[slot]='';return {...s,gear:parts.join(' / ')}});saveCustomFleets({'2-5':[{...completionFleet,ships}]});
   const c=hdOCContext('2-5','completion',0),steps=hdOCSearchSteps(c,{maxExamined:50,maxDepth:1});let n;do{n=steps.next()}while(!n.done);const result=n.value;
   return {search:result.search,measure:result.measure,status:hdOCSearchStatusHtml(result),ready:hdOCReadiness(result.plan,result.measure)};
@@ -137,4 +138,75 @@ test('north unsupported jets never become shortage candidates or inflate allocat
  for(const row of r.compatibility){const allowed=row.name==='翔鶴改二甲';expect(row.hasType57,row.name).toBe(allowed);expect(row.quick,row.name).toBe(allowed);expect(row.master,row.name).toBe(allowed);expect(row.otherType,row.name).toBe(91);expect(row.otherHasType,row.name).toBe(false);expect(row.other,row.name).toBe(false)}
  for(const row of r.permissionMatrix){expect(row.quick,row.name+' / '+row.equipment).toBe(row.expected);expect(row.master,row.name+' / '+row.equipment).toBe(row.expected)}
  expect(r.assigned).not.toContain('橘花改');expect(r.assigned).not.toContain('Ho229');expect(r.air).toMatchObject({count:0,minCount:42,ok:false});expect(r.shortage.candidates).not.toContain('橘花改');expect(r.shortage.candidates).not.toContain('Ho229');expect(r.ready.registeredReady).toBe(false);
+});
+
+
+test('north empty saved slots can select the complete synchronized finite loadout without guessing bonus deltas',async({page})=>{
+ await prepare(page);const r=await page.evaluate(()=>{
+  const generated=hdFSGenerate('2-5',MAP_PLANS['2-5'].presets[0],0),empty={...completionFleet,ships:generated.slots.map(x=>({...completionFleet.ships.find(s=>s.gameShipId===x.profile.row.gameShipId),gear:''}))};saveCustomFleets({'2-5':[empty]});
+  const c=hdOCContext('2-5','completion',0),steps=hdOCSearchSteps(c,{maxExamined:50,maxDepth:1});let n;do{n=steps.next()}while(!n.done);const result=n.value;
+  return {measure:result.measure,search:result.search,game:hdFEGameMatch(result.plan),scouting:hdFEScouting(result.plan,hdFEAssigned(result.plan)),air:hdFEAir(hdFEAssigned(result.plan)),master:hdFEMasterValidation(result.plan),usage:hdFOAssignedUsage(result.plan),stock:[...hdFLInventory()].map(([k,x])=>[k,x.count]),positions:result.plan.ships.map(s=>({ship:s.ship,items:s.items,expansion:s.expansion})),ready:hdOCReadiness(result.plan,result.measure)};
+ });await test.info().attach('north-empty-source-synchronized-candidate',{body:Buffer.from(JSON.stringify(r,null,2)),contentType:'application/json'});
+ expect(r.measure.requiredChecks.every(x=>x.ok)).toBe(true);expect(r.measure.goals.every(x=>x.ok)).toBe(true);expect(r.game.status).toBe('ready');expect(r.scouting.score).toBeCloseTo(49.4587454246,6);expect(r.air.basePower).toBe(66);expect(r.master.valid).toBe(true);expect(r.search.status).toBe('targets-met');
+ const stock=Object.fromEntries(r.stock);for(const [key,n] of Object.entries(r.usage))expect(n,key).toBeLessThanOrEqual(stock[key]||0);for(const s of r.positions){expect(s.items.map(x=>x.slotIndex)).toEqual([0,1,2,3]);expect(s.expansion).toBe(null)}
+ // The route-loss model review is still manual; a candidate is not a sortie guarantee.
+ expect(r.ready.registeredReady).toBe(false);
+});
+
+
+test('north synchronized candidate rejects shortage stars missing slots unknown expansion and duplicate hulls atomically',async({page})=>{
+ await prepare(page);const r=await page.evaluate(()=>{
+  const originalRows=JSON.stringify(hdFERoster()),originalInventory=JSON.stringify(hdFLRows()),results=[];
+  for(const kind of ['valid','opened-expansion','drum-short','wrong-stars','unknown-gear','missing-slot','closed-expansion','unknown-expansion','wrong-id','duplicate-id','duplicate-roster']){
+   const rows=JSON.parse(originalRows),inventory=JSON.parse(originalInventory),fleet=JSON.parse(JSON.stringify(completionFleet));
+   if(kind==='drum-short')inventory.find(x=>x.name==='ドラム缶(輸送用)').count=1;
+   if(kind==='wrong-stars')inventory.find(x=>x.name==='零式水上観測機'&&x.star===4).star=0;
+   if(kind==='unknown-gear')rows[0].gameAswGearKnown=false;
+   if(kind==='missing-slot')delete rows[0].gameGearSlots[2];
+   if(['opened-expansion','closed-expansion','unknown-expansion'].includes(kind)){rows[0].gameSlotEx=kind==='opened-expansion'?-1:kind==='closed-expansion'?0:null;rows[0].gameGearExpansion='改良型艦本式タービン';inventory.push({name:'改良型艦本式タービン',count:1});}
+   if(kind==='wrong-id')fleet.ships[0].gameShipId=123456789;
+   if(kind==='duplicate-id')fleet.ships[1]={...fleet.ships[0]};
+   if(kind==='duplicate-roster')rows.push({...rows[0],gameLos:999});
+   localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));localStorage.setItem(HD_FL_KEY,JSON.stringify(inventory));
+   const before=JSON.stringify([localStorage.getItem(SHIP_ROSTER_KEY),localStorage.getItem(HD_FL_KEY)]),built=hdOCBuild({map:'2-5',fleet,index:0,preset:fleet.routePreset}),planBefore=JSON.stringify(built.plan),seed=hdOCSynchronizedSeed(built.plan,built.inventory,built.slots);
+   results.push({kind,accepted:!!seed,unchanged:planBefore===JSON.stringify(built.plan)&&before===JSON.stringify([localStorage.getItem(SHIP_ROSTER_KEY),localStorage.getItem(HD_FL_KEY)])});
+  }
+  return results;
+ });for(const x of r){expect(x.accepted,x.kind).toBe(['valid','opened-expansion'].includes(x.kind));expect(x.unchanged,x.kind).toBe(true)}
+});
+
+test('north actual 33 formula evaluates below exactly on and above 49 with finite star-specific inventory',async({page})=>{
+ await prepare(page);const r=await page.evaluate(()=>{
+  const source=hdFERoster();
+  // Arithmetic boundary fixture, not a claim that these are the user's observed stats.
+  source[0].gameGearSlots[2]='零式水上観測機 ★9';source[3].gameGearSlots[2]='零式水上観測機 ★9';source[5].gameGearSlots[2]='零式水上観測機 ★4';source[5].gameGearSlots[3]='33号対水上電探';
+  localStorage.setItem(HD_FL_KEY,JSON.stringify(hdFLRows().filter(x=>!['零式水上観測機','32号対水上電探'].includes(x.name)).concat([{name:'零式水上観測機',star:9,count:2},{name:'零式水上観測機',star:4,count:2},{name:'32号対水上電探',count:2},{name:'33号対水上電探',count:1}])));
+  const results=[];
+  for(const first of [24,25,26]){
+   const bare=[first,25,36,36,36,36],rows=source.map((x,i)=>({...x,gameLos:bare[i]+x.gameGearSlots.reduce((n,label)=>n+(Number(hdFEFind(hdFEParseGearLabel(label).name)?.stats?.索敵)||0),0)}));localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));
+   const fleet={...completionFleet,ships:completionFleet.ships.map(s=>({...s,gear:''}))},built=hdOCBuild({map:'2-5',fleet,index:0,preset:fleet.routePreset}),plan=hdOCSynchronizedSeed(built.plan,built.inventory,built.slots),items=hdFEAssigned(plan),check=hdOCRequiredChecks(plan).find(x=>x.condition.kind==='scoutingValue'),scouting=hdFEScouting(plan,items);
+   results.push({first,check,scouting,air:hdFEAir(items),master:hdFEMasterValidation(plan),usage:hdFOAssignedUsage(plan),stock:[...hdFLInventory()].map(([key,x])=>[key,x.count])});
+  }return results;
+ });for(const [i,x] of r.entries()){const expected=Math.sqrt(x.first)+5+6*4+63-48;expect(x.scouting.score).toBeCloseTo(expected,10);expect(x.check.condition).toMatchObject({min:49,coef:1});expect(x.check.status).toBe(i===0?'missing':'ready');expect(x.air.basePower).toBe(66);expect(x.master.valid).toBe(true);const stock=Object.fromEntries(x.stock);for(const [k,n] of Object.entries(x.usage))expect(n,k).toBeLessThanOrEqual(stock[k]||0)}expect(r[1].scouting.score).toBe(49);
+});
+
+test('north synchronized candidate cannot replace fulfilled low speed with synchronized acceleration gear',async({page})=>{
+ await prepare(page);const r=await page.evaluate(()=>{
+  const rows=hdFERoster();rows[0].gameGearSlots[0]='新型高温高圧缶';rows[0].gameGearSlots[1]='改良型艦本式タービン';localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));localStorage.setItem(HD_FL_KEY,JSON.stringify(hdFLRows().concat([{name:'新型高温高圧缶',count:1},{name:'改良型艦本式タービン',count:1}])));
+  const c=hdOCContext('2-5','completion',0),built=hdOCBuild(c),before=hdOCMeasure(built.plan,[]),seed=hdOCSynchronizedSeed(built.plan,built.inventory,built.slots),after=hdOCMeasure(seed,[]),steps=hdOCSearchSteps(c,{maxExamined:50,maxDepth:1});let n;do{n=steps.next()}while(!n.done);const result=n.value;
+  return {seed:!!seed,regressions:hdOCGoalRegressions(before,after),required:result.measure.requiredChecks,ready:hdOCReadiness(result.plan,result.measure)};
+ });expect(r.seed).toBe(true);expect(r.regressions.some(x=>x.kind==='low-speed-ships'||x.condition?.kind==='speedCount')).toBe(true);expect(r.required.find(x=>x.condition.kind==='speedCount').status).toBe('ready');expect(r.ready.registeredReady).toBe(false);
+});
+
+test('north new candidate keeps five modes save reload planner and refuses unverified scouting bonus changes',async({page})=>{
+ await prepare(page);const r=await page.evaluate(()=>{
+  const empty={...completionFleet,ships:completionFleet.ships.map(s=>({...s,gear:''}))};saveCustomFleets({'2-5':[empty]});const c=hdOCContext('2-5','completion',0),steps=hdOCSearchSteps(c,{maxExamined:50,maxDepth:1});let n;do{n=steps.next()}while(!n.done);const result=n.value;
+  const variants=Object.keys(HD_FO_MODES).map(mode=>{const p=hdFOOptimize(result.plan,mode),m=hdOCMeasure(p,[]);return {mode,checks:m.requiredChecks,stock:hdOCReadiness(p,m).checks.find(x=>x.id==='inventory'),master:hdFEMasterValidation(p)}});
+  const imported=hdFCImportOwnedPlan(c,result),calc=hdFCState('2-5',hdFCSelection('2-5')),saved={...empty,ships:result.plan.ships.map(s=>({...empty.ships.find(x=>x.gameShipId===s.gameShipId),gear:hdOCShipGear(s)}))};saveCustomFleets({'2-5':[saved]});
+  const keys=['harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-kancolle-sync-v1','harbordesk-pwa-v1','harbordesk-custom-fleets-v1','harbordesk-fleet-calculator-v1'];localStorage.setItem('harbordesk-pwa-v1',JSON.stringify({resources:{fuel:12345},memo:'north dedicated test only'}));
+  const changed=hdFOClone(result.plan);changed.ships[0].items.find(x=>x.name==='零式水上観測機').star=0;const changedCheck=hdOCRequiredChecks(changed).find(x=>x.condition.kind==='scoutingValue');
+  return {variants,imported,calc,changedCheck,keys,values:keys.map(k=>localStorage.getItem(k)),ids:result.plan.ships.map(s=>s.gameShipId)};
+ });expect(r.variants).toHaveLength(5);for(const x of r.variants){expect(x.checks.every(c=>c.ok),x.mode).toBe(true);expect(x.stock.status,x.mode).toBe('ready');expect(x.master.valid,x.mode).toBe(true)}expect(r.imported).toBe(true);expect(r.changedCheck.status).toBe('manual');expect(r.changedCheck.detail).toContain('ボーナス');expect(new Set(r.ids).size).toBe(6);
+ await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCContext==='function');expect(await page.evaluate(keys=>keys.map(k=>localStorage.getItem(k)),r.keys)).toEqual(r.values);
+ const restored=await page.evaluate(()=>{const c=hdOCContext('2-5','completion',0),p=hdFEPlanFromSavedFleet('2-5',c.fleet);return {checks:hdOCRequiredChecks(p),calc:hdFCState('2-5',hdFCSelection('2-5')),ids:p.ships.map(s=>s.gameShipId)}});expect(restored.checks.every(c=>c.ok)).toBe(true);expect(restored.calc).toEqual(r.calc);expect(restored.ids).toEqual(r.ids);
 });
