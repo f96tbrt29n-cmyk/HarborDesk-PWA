@@ -21,7 +21,12 @@ function hdLBAircraft(){
  const merged=new Map();[...base,...HD_LB_EXTRA_AIRCRAFT].forEach(x=>{if(!merged.has(x.name))merged.set(x.name,x)});
  return [...merged.values()].sort((a,b)=>String(a.category).localeCompare(String(b.category),'ja')||String(a.name).localeCompare(String(b.name),'ja'));
 }
-function hdLBFind(name){return hdLBAircraft().find(x=>x.name===name)||null}
+function hdLBFind(name){
+ // Preserve the current master order and eligible-first lookup without sorting
+ // the presentation catalogue again for every slot calculation.
+ const base=typeof HD_EQUIPMENT_CATALOG!=='undefined'?HD_EQUIPMENT_CATALOG:[];
+ return base.find(x=>HD_LB_COMPATIBLE_CATEGORIES.has(x.category)&&x.name===name)||HD_LB_EXTRA_AIRCRAFT.find(x=>x.name===name)||null;
+}
 function hdLBIsScout(item){return !!item&&HD_LB_SCOUT_CATEGORIES.has(item.category)}
 function hdLBDefaultSlot(item){if(!item)return 18;if(hdLBIsScout(item))return 4;if(item.category==='大型陸上機')return 9;return 18}
 function hdLBImprovementBonus(item,star){star=Math.max(0,Math.min(10,Number(star)||0));if(!item||!star)return 0;if((item.tags||[]).includes('爆戦')||/爆戦/.test(item.name||''))return .25*star;if(HD_LB_FIGHTER_CATEGORIES.has(item.category))return .2*star;if(item.category==='陸上攻撃機'||item.category==='大型陸上機')return .5*Math.sqrt(star);return 0}
