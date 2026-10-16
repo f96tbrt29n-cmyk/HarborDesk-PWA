@@ -1,0 +1,58 @@
+{
+  "before": {
+    "counts": {
+      "hdOCMeasure": 518,
+      "hdOCRequiredChecks": 518,
+      "hdFERouteShips": 5705,
+      "hdFEScouting": 519,
+      "hdFEBranchPredicate": 8304
+    },
+    "milliseconds": {
+      "hdOCMeasure": 1745.0000000111759,
+      "hdOCRequiredChecks": 1034.2000000178814,
+      "hdFERouteShips": 1174.2999999672174,
+      "hdFEScouting": 31,
+      "hdFEBranchPredicate": 447.00000005587935
+    },
+    "duration": 1941.199999999255,
+    "examined": 500
+  },
+  "after": {
+    "counts": {
+      "hdOCMeasure": 518,
+      "hdOCRequiredChecks": 518,
+      "hdFERouteShips": 2079,
+      "hdFEScouting": 519,
+      "hdFEBranchPredicate": 8304
+    },
+    "milliseconds": {
+      "hdOCMeasure": 1125.200000025332,
+      "hdOCRequiredChecks": 356.5000000707805,
+      "hdFERouteShips": 530.4999999962747,
+      "hdFEScouting": 32.70000000670552,
+      "hdFEBranchPredicate": 462.0000000484288
+    },
+    "duration": 1346.800000000745,
+    "examined": 500
+  },
+  "final": {
+    "counts": {
+      "hdOCMeasure": 518,
+      "hdOCRequiredChecks": 518,
+      "hdFERouteShips": 1561,
+      "hdFEScouting": 519,
+      "hdFEBranchPredicate": 4160
+    },
+    "milliseconds": {
+      "hdOCMeasure": 775.2999999783933,
+      "hdOCRequiredChecks": 7.100000016391277,
+      "hdFERouteShips": 409.20000011846423,
+      "hdFEScouting": 31.199999935925007,
+      "hdFEBranchPredicate": 248.59999997541308
+    },
+    "duration": 994.7000000029802,
+    "examined": 500
+  },
+  "sameEquipmentAndMeasurement": true,
+  "protocol": "Same 500 candidate budget / dedicated synchronized north fleet, latest-main merge 6d8f0f4. Instrumented single-run reference, not a timing guarantee. No predicates, thresholds, search bounds or timeouts relaxed."
+}

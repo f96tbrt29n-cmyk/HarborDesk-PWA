@@ -1,0 +1,54 @@
+{
+  "run": 38588174971,
+  "commit": "c6e3da9d18e25ee442de6ffaf09e8da042422ddb",
+  "status": "completed",
+  "conclusion": "failure",
+  "mandatoryJobs": [
+    {
+      "name": "Smoke / chromium / shard 2 of 2",
+      "id": 115935662922,
+      "conclusion": "success"
+    },
+    {
+      "name": "Smoke / webkit / shard 1 of 4",
+      "id": 115935663122,
+      "conclusion": "success"
+    },
+    {
+      "name": "Smoke / chromium / shard 1 of 2",
+      "id": 115935663257,
+      "conclusion": "failure"
+    },
+    {
+      "name": "Smoke / webkit / shard 3 of 4",
+      "id": 115935663296,
+      "conclusion": "success"
+    },
+    {
+      "name": "Smoke / webkit / shard 4 of 4",
+      "id": 115935663311,
+      "conclusion": "success"
+    },
+    {
+      "name": "Smoke / webkit / shard 2 of 4",
+      "id": 115935663697,
+      "conclusion": "success"
+    }
+  ],
+  "knownWebKitRetries": [
+    {
+      "job": 115935663697,
+      "case": "strategy goal search keeps input composition caret and hidden edit drafts"
+    },
+    {
+      "job": 115935663697,
+      "case": "priority strategy view combines completion and map filters and persists"
+    },
+    {
+      "job": 115935663311,
+      "case": "deferred strategy goals filter persists and combines with completion and search"
+    }
+  ],
+  "failedJobCause": "Unconfirmed: browser regression step failed; full log transport fails; Azure artifact/log download tunnel returns HTTP403. Artifact 11907407887 exists.",
+  "firstAttemptDetails": "WebKit shards1/3:151 initial passes each; shard2:149 initial +2 flaky; shard4:150 initial +1 flaky. Chromium full logs unavailable, first attempt details unconfirmed."
+}

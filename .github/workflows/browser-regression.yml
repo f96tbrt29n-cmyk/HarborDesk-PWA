@@ -91,6 +91,21 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+      # A successful retry makes failure() false. Preserve files from failed
+      # attempts as well as any retry trace without uploading every passing report.
+      - name: Preserve failed-attempt diagnostics after successful retries
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: attempt-diagnostics-${{ matrix.browser }}-${{ matrix.shard }}-${{ github.run_id }}
+          path: |
+            test-results/**/test-failed-*.png
+            test-results/**/video.webm
+            test-results/**/trace.zip
+            test-results/**/error-context.md
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: Preserve prerequisite import evidence including successful retries
         if: always()
         uses: actions/upload-artifact@v4

@@ -9,7 +9,8 @@ module.exports = defineConfig({
   retries: 1,
   reporter: [
     ['line'],
-    ['html', { outputFolder: 'playwright-report', open: 'never' }]
+    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    ...(process.env.CI ? [['github']] : [])
   ],
   use: {
     viewport: { width: 390, height: 844 },

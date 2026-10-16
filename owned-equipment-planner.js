@@ -68,10 +68,13 @@ function hdOCCompatible(slot,candidate){
 function hdOCEquipment(candidate,slot){return {name:candidate.name,star:candidate.star,stackKey:candidate.key,category:candidate.item.category,slotIndex:slot.index,capacity:slot.capacity}}
 function hdOCBuild(c){
  const plan=hdFEPlanFromSavedFleet(c.map,c.fleet);plan.preset=c.preset;plan.routeInfo=c.preset?hdFSPresetInfo(c.preset):null;plan.routeIndex=c.index;plan.openingAswCount=hdOCOaswTarget(c);plan.routeGoal=hdOCRouteGoal(c);
+ plan.preservationIssues=[];
  const inventory=[...hdFLInventory().values()],counts=new Map(inventory.map(x=>[x.key,x.count])),slots=[],unknown=[];
  for(let si=0;si<plan.ships.length;si++){
   const ship=plan.ships[si],db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db);
-  if(!profile){unknown.push(`${ship.ship}：艦娘のスロット情報が未登録`);ship.items=[];ship.expansion=null;continue}
+  if(!profile){plan.preservationIssues.push(`${ship.ship}：艦娘のスロット情報が未登録`);unknown.push(`${ship.ship}：艦娘のスロット情報が未登録`);ship.items=[];ship.expansion=null;continue}
+  const unregistered=[...(ship.items||[]),...(ship.expansion?[ship.expansion]:[])].filter(x=>x.name&&!hdFEFind(x.name));
+  for(const x of unregistered)plan.preservationIssues.push(`${ship.ship}：${x.name}の性能・搭載条件が未登録`);
   const original=ship.items;ship.items=Array.from({length:profile.count},(_,index)=>({name:'',slotIndex:index,capacity:profile.slots[index]}));
   const add=(index,expansion=false)=>{
    const slot={si,index,expansion,db,profile,capacity:expansion?null:profile.slots[index]},old=expansion?ship.expansion:original.find(x=>x.slotIndex===index),key=old?hdFLInventoryStackKey(old.name,old.star):'',candidate=inventory.find(x=>x.key===key);
@@ -93,7 +96,41 @@ function hdOCSpeedPart(item){
  return turbine?'turbine':hdFOItemMatches('高速化',item)?'boiler':'';
 }
 function hdOCItemMatches(kind,item){if(['drum-ships','ドラム缶'].includes(kind))return hdFOItemMeta(item).name==='ドラム缶(輸送用)';if(kind==='radar-ships')return /電探/.test(hdFOItemMeta(item).category||'');if(kind==='opening-asw')return Number(hdFOItemMeta(item).stats?.対潜)>0; if(typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[kind])return HD_SE_RECIPES[kind].some(r=>r.parts.some(part=>hdSEPartMatches(part,item)));return kind==='speed-turbine'?hdOCSpeedPart(item)==='turbine':kind==='speed-boiler'?hdOCSpeedPart(item)==='boiler':hdFOItemMatches(kind,item)}
+// Keep each verified mandatory predicate, even while a different predicate
+// leaves the overall route incomplete. OR alternatives remain a single check.
+function hdOCRequiredChecks(plan,route=hdFERoute(plan),sameEvaluation=false){
+ const data=route.contract?.data,rows=route.contract?.checks||route.branch?.checks||[];
+ // Normalize once for this synchronous evaluation; never cache across plans or sync changes.
+ let ships;
+ const flatten=c=>Array.isArray(c?.all)?c.all.flatMap(flatten):[c];
+ return rows.flatMap(row=>flatten(row.condition).map(condition=>{
+  // Only hdOCMeasure passes a freshly computed contract from this synchronous evaluation.
+  const check=sameEvaluation&&route.contract&&condition===row.condition&&condition.kind!=='unverified'?row:hdFEBranchPredicate(condition,ships||(ships=hdFERouteShips(plan)),plan);
+  const id=JSON.stringify([plan.map,data?.index??route.branch?.goal??null,condition]);
+  return {...check,id,kind:'route-condition',mandatory:true,condition,
+   label:typeof hdMapRequirementConditionText==='function'?hdMapRequirementConditionText(condition):row.label||check.detail,
+   ok:check.status==='ready',unresolved:check.status==='manual'};
+ }));
+}
+function hdOCRequiredChecksHtml(plan,measure){
+ const route=hdFERoute(plan),label=s=>s==='ready'?'成立':s==='missing'?'不成立':'未確認';
+ return `<details data-hd-required-route><summary>経路の必須条件：${label(route.status)}</summary>${(measure.requiredChecks||[]).map(c=>`<p><b>${hdFEEsc(c.label)}：${label(c.status)}</b> ${hdFEEsc(c.detail)}</p>`).join('')}<p>${hdFEEsc(route.detail)}</p></details>`;
+}
+function hdOCShipGear(ship){
+ const count=hdFEFindShip(ship.ship)&&hdShipDbSlotProfile(hdFEFindShip(ship.ship)).count||Math.max(0,...(ship.items||[]).map(x=>x.slotIndex+1));
+ const label=x=>x?.name?x.name+(x.star?' ★'+x.star:''):'';
+ const normal=Array.from({length:count},(_,i)=>label((ship.items||[]).find(x=>x.slotIndex===i)));
+ return [...normal,...(ship.expansion?[`[増設] ${label(ship.expansion)}`]:[])].join(' / ');
+}
+function hdOCRevalidateResult(result){
+ if(!result?.plan)return null;
+ const requirements=typeof hdFLRequirements==='function'?hdFLRequirements(result.plan):hdSEChecks(result.plan.map).rows;
+ result.measure=hdOCMeasure(result.plan,requirements);
+ result.readiness=hdOCReadiness(result.plan,result.measure);
+ return result.readiness;
+}
 function hdOCMeasure(plan,requirements,unknown=[]){
+ unknown=[...new Set([...unknown,...(plan.preservationIssues||[])])];
  requirements=hdFEEquipmentRequirements(plan,requirements);
  const items=hdOCAssigned(plan),air=hdFEAirCheck(plan.map,hdFEAir(items),plan),scouting=hdFEScouting(plan,items),speedTarget=hdFEPlanSpeedTarget(plan),speedGoals=speedTarget?(plan.ships||[]).flatMap((s,shipIndex)=>s.ship?[{...hdFESpeedGoal(s,speedTarget),shipIndex,targetRank:speedTarget}]:[]):[];
  const goals=requirements.filter(r=>!['opening-asw','radar-ships','drum-ships'].includes(r.kind)&&(!speedTarget||r.kind!=='高速化')).map(r=>{const cap=typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[r.kind]?hdSECapabilityMeasure(plan,r.kind):null,m=cap||hdFEKindCount(r.kind,items),count=r.kind==='高速化'?plan.ships.reduce((n,ship)=>n+Number(hdFEKindCount('高速化',hdOCAssigned({ships:[ship]})).count>0),0):Number(m.count)||0;return {...r,count,...(cap?.unresolved?{unresolved:true}:{}),ok:count>=r.minCount,detail:cap?`同じ艦の推奨セット ${count} / 目安 ${r.minCount}組${r.kind==='cap-night-auto'&&cap.matches?.length?'（'+cap.matches.map(x=>x.ship+'：'+x.attacks.join('・')).join(' / ')+ '）':''}` :r.kind==='高速化'?`同じ艦の標準セット ${count} / 目安 ${r.minCount}組`:`配備 ${count} / 目安 ${r.minCount}`,ratio:cap?Math.min(1,count?count/r.minCount:cap.ratio/r.minCount):Math.min(1,count/r.minCount)}});
@@ -122,15 +159,36 @@ function hdOCMeasure(plan,requirements,unknown=[]){
  if(route.requirements?.some(x=>!x.ok))manual.push(`艦種の変更が必要：${route.detail}`);
  if(route.status==='manual')manual.push(`ルート：${route.detail}`);
  if(hdSEChecks(plan.map).adv?.base?.available)manual.push('基地航空隊の機体・行動半径は基地航空隊プランナーで確認');
- const score=goals.reduce((s,g)=>s+g.ratio*100+(g.ok?25:0),0);
- return {goals,manual,score,complete:goals.length>0&&goals.every(x=>x.ok)&&!unknown.length&&air.reason!=='anti-air'};
+ for(const goal of goals){goal.purpose=['route-branches','route-requirements','radar-ships','drum-ships','low-speed-ships','speed-ship','los-value'].includes(goal.kind)?'route':goal.generatedFromMap&&!(goal.kind.startsWith('cap-night-')&&hdSENightPolicy(plan.map)!=='auto')?'recommendation':'strategy';}
+ const requiredChecks=hdOCRequiredChecks(plan,route,true);
+ const score=goals.reduce((s,g)=>s+g.ratio*100+(g.ok?25:0),0)+requiredChecks.reduce((n,c)=>n+(c.ok?10000:Math.max(0,c.ratio||0)*1000),0);
+ return {goals,requiredChecks,manual,score,routeStatus:route.status,speedTarget,complete:goals.length>0&&goals.every(x=>x.ok&&!x.unresolved)&&!unknown.length&&air.reason!=='anti-air'&&route.status==='ready'};
 }
 function hdOCKey(plan){return JSON.stringify(plan.ships.map(s=>[(s.items||[]).map(x=>hdFOStackKey(x)),hdFOStackKey(s.expansion)]))}
 function hdOCScore(kind,row){const item=row.item||row,s=item.stats||{};if(kind==='opening-asw')return Number(s.対潜)||0;if(kind==='制空')return Number(s.対空)||0;if(kind==='索敵')return ((Number(s.索敵)||0)+hdFEImproveCoef(item)*Math.sqrt(Number(row.star)||0))*hdFEEquipCoef(item);return hdFLScoreBase(item,row)}
-function hdOCGoalIdentity(goal){return JSON.stringify([goal.kind,goal.label,goal.shipIndex??null])}
+function hdOCGoalIdentity(goal){if(goal.id&&goal.mandatory)return goal.id;if(goal.kind==='speed-ship')return JSON.stringify([goal.kind,goal.shipIndex,goal.targetRank]);return JSON.stringify([goal.kind,goal.label,goal.shipIndex??null])}
 function hdOCGoalRegressions(before,after){
- const current=new Map(after.goals.map(g=>[hdOCGoalIdentity(g),g]));
- return before.goals.filter(g=>g.ok&&!g.unresolved&&(!current.get(hdOCGoalIdentity(g))?.ok||current.get(hdOCGoalIdentity(g))?.unresolved));
+ const current=new Map([...(after.goals||[]),...(after.requiredChecks||[])].map(g=>[hdOCGoalIdentity(g),g]));
+ const previous=new Map((before.requiredChecks||[]).map(g=>[hdOCGoalIdentity(g),g]));
+ const requiredImproved=(after.requiredChecks||[]).some(g=>g.ok&&!previous.get(hdOCGoalIdentity(g))?.ok);
+ return [...(before.goals||[]),...(before.requiredChecks||[])].filter(g=>!(g.kind==='speed-ship'&&after.speedTarget===0&&after.routeStatus==='ready')&&g.ok&&!g.unresolved&&(g.purpose!=='recommendation'||!requiredImproved)&&(!current.get(hdOCGoalIdentity(g))?.ok||current.get(hdOCGoalIdentity(g))?.unresolved));
+}
+// Reuse an observed loadout as a candidate, never as an extra inventory source.
+// Exact per-hull slots/star labels retain the synchronized fit-bonus context.
+function hdOCSynchronizedSeed(plan,inventory,slots){
+ if(typeof hdFCProposalRoster!=='function'||hdOCShipOwnership(plan).some(x=>x.status!=='ready'))return null;
+ const roster=hdFERoster(),rows=plan.ships.map(ship=>{const row=hdFCProposalRoster(ship);return row&&roster.filter(x=>Number(x.gameShipId)===Number(row.gameShipId)).length===1?row:null;});
+ if(rows.some((row,si)=>!row||!Number(row.gameShipId)||row.gameAswGearKnown===false||!Array.isArray(row.gameGearSlots)||row.gameGearSlots.length!==plan.ships[si].items.length||Array.from(row.gameGearSlots).some(x=>typeof x!=='string')||typeof row.gameGearExpansion!=='string'))return null;
+ const seed=hdFOClone(plan),remaining=new Map(inventory.map(x=>[x.key,x.count]));
+ for(const slot of slots){
+  const label=slot.expansion?rows[slot.si].gameGearExpansion:rows[slot.si].gameGearSlots[slot.index],parsed=hdFEParseGearLabel(label),key=label?hdFLInventoryStackKey(parsed.name,parsed.star):'';
+  if(!slot.expansion&&parsed.expansion)return null;
+  let value=slot.expansion?null:{name:'',slotIndex:slot.index,capacity:slot.capacity};
+  if(label){const candidate=inventory.find(x=>x.key===key);if(!candidate||!(remaining.get(key)>0)||!hdOCCompatible(slot,candidate))return null;value=hdOCEquipment(candidate,slot);remaining.set(key,remaining.get(key)-1);}
+  if(slot.expansion)seed.ships[slot.si].expansion=value;else seed.ships[slot.si].items[slot.index]=value;
+ }
+ if(!hdFEMasterValidation(seed).valid||hdFEGameMatch(seed).status!=='ready')return null;
+ return seed;
 }
 function* hdOCSearchSteps(c,limits={}){
  const maxExamined=Math.max(50,Math.min(10000,Number(limits.maxExamined)||10000)),maxDepth=Math.max(1,Math.min(24,Number(limits.maxDepth)||24));
@@ -141,22 +199,28 @@ function* hdOCSearchSteps(c,limits={}){
  if(hdFEBranchRoute(plan).requiredRadar)requirements.push({kind:'radar-ships',label:'ルート用電探装備艦',minCount:hdFEBranchRoute(plan).requiredRadar});
  const relevant=inventory.filter(x=>requirements.some(r=>hdOCItemMatches(r.kind,x))||hdFOItemMatches('制空',x)||hdFOItemMatches('索敵',x)||hdFOItemMatches('高速化',x));
  // Keep the strongest candidates for each compatible slot and each distinct target.
+ let candidatePruned=0;
  const choices=slots.map(slot=>{const compatible=relevant.filter(x=>hdOCCompatible(slot,x)),picked=new Map();for(const kind of new Set([...requirements.map(x=>x.kind),'制空','索敵','高速化'])){
   if(typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[kind])for(const part of new Set(HD_SE_RECIPES[kind].flatMap(r=>r.parts))){for(const x of compatible.filter(x=>hdSEPartMatches(part,x)).sort((a,b)=>hdOCScore(kind,b)-hdOCScore(kind,a)).slice(0,3))picked.set(x.key,x)}
   const sorted=compatible.filter(x=>hdOCItemMatches(kind,x)).sort((a,b)=>hdOCScore(kind,b)-hdOCScore(kind,a));
   for(const x of sorted.slice(0,5))picked.set(x.key,x);if(kind==='高速化')for(const turbine of [true,false])for(const x of sorted.filter(x=>/タービン/.test(x.name)===turbine).slice(0,3))picked.set(x.key,x);
- }return [...picked.values(),...(routeData?.keepLow||requirements.some(r=>r.kind.startsWith('cap-night-')&&(!slot.expansion||HD_SE_RECIPES[r.kind]?.some(x=>x.ship==='night-sub')))?[{key:'',name:'',star:0,item:{name:'',category:'',stats:{}},count:Infinity}]:[])]});
- const initial={plan,measure:hdOCMeasure(plan,requirements,unknown)},seen=new Set([hdOCKey(plan)]);let beam=[initial],best=initial,examined=0;
- for(let depth=0;depth<Math.min(slots.length,maxDepth)&&!best.measure.goals.filter(x=>x.kind!=='route-requirements').every(x=>x.ok)&&examined<maxExamined;depth++){
+ }candidatePruned+=compatible.filter(x=>!picked.has(x.key)).length;return [...picked.values(),...(routeData?.keepLow||requirements.some(r=>r.kind.startsWith('cap-night-')&&(!slot.expansion||HD_SE_RECIPES[r.kind]?.some(x=>x.ship==='night-sub')))?[{key:'',name:'',star:0,item:{name:'',category:'',stats:{}},count:Infinity}]:[])]});
+ const initial={plan,measure:hdOCMeasure(plan,requirements,unknown)},seen=new Set([hdOCKey(plan)]);let beam=[initial],best=initial,examined=0,depth=0,beamPruned=false;
+ const synchronized=initial.measure.complete?null:hdOCSynchronizedSeed(plan,inventory,slots);
+ if(synchronized){
+  const candidate={plan:synchronized,measure:hdOCMeasure(synchronized,requirements,unknown)};
+  if(!hdOCGoalRegressions(initial.measure,candidate.measure).length&&candidate.measure.score>best.measure.score){best=candidate;beam=[candidate,initial];seen.add(hdOCKey(synchronized));}
+ }
+ for(;depth<Math.min(slots.length,maxDepth)&&!best.measure.goals.filter(x=>x.kind!=='route-requirements').every(x=>x.ok)&&examined<maxExamined;depth++){
   const next=[];
-  for(const state of beam){const used=hdFOAssignedUsage(state.plan);
+  enumerate: for(const state of beam){const used=hdFOAssignedUsage(state.plan);
    for(let i=0;i<slots.length;i++){const slot=slots[i],old=slot.expansion?state.plan.ships[slot.si].expansion:state.plan.ships[slot.si].items[slot.index];
     for(const candidate of choices[i]){
      if(hdFOStackKey(old)===candidate.key)continue;
      let donor=null;if((used[candidate.key]||0)>=candidate.count){donor=slots.find(other=>{if(other.si===slot.si&&other.index===slot.index&&other.expansion===slot.expansion)return false;const item=other.expansion?state.plan.ships[other.si].expansion:state.plan.ships[other.si].items[other.index];return hdFOStackKey(item)===candidate.key});if(!donor)continue;}
      const trial=hdFOClone(state.plan),value=slot.expansion&&!candidate.name?null:hdOCEquipment(candidate,slot);if(slot.expansion)trial.ships[slot.si].expansion=value;else trial.ships[slot.si].items[slot.index]=value;
      if(donor){const replacement=old?.name?inventory.find(x=>x.key===hdFOStackKey(old)):null,newItem=replacement&&hdOCCompatible(donor,replacement)?hdOCEquipment(replacement,donor):null;if(donor.expansion)trial.ships[donor.si].expansion=newItem;else trial.ships[donor.si].items[donor.index]=newItem||{name:'',slotIndex:donor.index,capacity:donor.capacity};}
-     const key=hdOCKey(trial);if(seen.has(key))continue;seen.add(key);examined++;if(examined>maxExamined)break;
+     const key=hdOCKey(trial);if(seen.has(key))continue;if(examined>=maxExamined)break enumerate;seen.add(key);examined++;
      const measure=hdOCMeasure(trial,requirements,unknown),row={plan:trial,measure};
      // Intermediate swaps may break a set, but the delivered plan must keep
      // every confirmed target satisfied by the best equipment so far.
@@ -166,7 +230,7 @@ function* hdOCSearchSteps(c,limits={}){
     }
    }
   }
-  next.sort((a,b)=>hdOCGoalRegressions(initial.measure,a.measure).length-hdOCGoalRegressions(initial.measure,b.measure).length||b.measure.score-a.measure.score);beam=next.slice(0,5);if(!beam.length)break;
+  next.sort((a,b)=>hdOCGoalRegressions(initial.measure,a.measure).length-hdOCGoalRegressions(initial.measure,b.measure).length||b.measure.score-a.measure.score);beamPruned ||= next.length>5;beam=next.slice(0,5);if(!beam.length)break;
  }
  // Fill remaining ordinary slots with owned basic weapons after satisfying the targets.
  const usage=hdFOAssignedUsage(best.plan);
@@ -192,7 +256,10 @@ function* hdOCSearchSteps(c,limits={}){
   return {...goal,...placementInfo,routeEquipment:['radar-ships','drum-ships'].includes(goal.kind),goalKind:goal.kind,kind,owned,placement:!goal.speedActual&&(placementInfo.usableOwned??owned)>=(kind==='高速化'?Math.max(1,speedNeed):goal.minCount)&&!['air-value','los-value'].includes(goal.kind),shortfall:Math.max(0,goal.minCount-goal.count),candidates};
  });
  best.plan.ships.forEach(s=>{s.items=s.items.filter(x=>x.name)});
- return {...best,shortages,examined,signature,fleetId:c.fleet.id};
+ const reasons=[...(examined>=maxExamined?['combination-limit']:[]),...(depth>=maxDepth&&maxDepth<slots.length?['depth-limit']:[]),...(candidatePruned?['candidate-limit']:[]),...(beamPruned?['beam-limit']:[])];
+ const search={status:best.measure.complete?'targets-met':'incomplete',exhaustive:false,examined,maxExamined,maxDepth,candidatePruned,reasons:reasons.length?reasons:['bounded-search']};
+ best.plan.search=search;
+ return {...best,search,readiness:hdOCReadiness(best.plan,best.measure),shortages,examined,signature,fleetId:c.fleet.id};
 }
 function hdOCSearch(c){const steps=hdOCSearchSteps(c);let step;do{step=steps.next()}while(!step.done);return step.value}
 async function hdOCSearchAsync(c){
@@ -224,6 +291,11 @@ function hdOCPlacementHtml(goal){
  return `<div class="hd-oc-placement">${lines.map(x=>`<p>${esc(x)}</p>`).join('')}</div>`;
 }
 function hdOCStockGap(goal){return !goal||goal.placement||(goal.kind==='高速化'||['opening-asw','air-value','los-value','speed-ship'].includes(goal.goalKind||goal.kind))?0:Math.max(0,Math.ceil(goal.minCount-(goal.usableOwned??goal.owned)))}
+function hdOCCapabilityStockHtml(goal){
+ const stock=goal.capability&&goal.stock;if(!stock?.parts?.length)return '';
+ const esc=hdFEEsc;
+ return `<div data-hd-oc-capability-stock><b>装備例「${esc(stock.recipe.name)}」の所持内訳</b>${stock.parts.map(part=>{const gap=Math.max(0,part.need-part.have);return `<p><b>${esc(part.label)}：所持${part.have} / この装備例に必要${part.need}${gap?'・あと'+gap+'個':''}</b><br>${esc(part.items.length?'手持ち：'+part.items.join('、'):'候補：'+(HD_SE_PARTS[part.part]?.examples||[]).join('、'))}</p>`}).join('')}<small>${stock.parts.every(p=>p.have>=p.need)?'この装備例の所持数は足りています。同じ艦のセット・装備枠・他の条件との両立を見直してください。':'この装備例の数量不足です。別の装備例や代替装備も含め、配備できるか再探索してください。'}所持数の内訳は、全目標を同時に満たす配備の保証ではありません。</small></div>`;
+}
 function hdOCProcurementHtml(goal,index,attrs){
  const gap=hdOCStockGap(goal);if(!gap||!goal.candidates.length||typeof hdPLSave!=='function')return '';
  return `<div class="hd-oc-procurement"><label>所持不足を補う候補 <select data-hd-oc-target>${goal.candidates.map(name=>`<option value="${hdFEEsc(name)}">${hdFEEsc(name)}</option>`).join('')}</select></label><button type="button" class="ghost small" data-hd-oc-procure="${index}" ${attrs}>候補をあと${gap}個、調達リストへ</button><small>候補の入手計画です。入手後に配備を再確認してね。</small></div>`;
@@ -356,6 +428,7 @@ function hdOCReview(plan,measure){
 }
 function hdOCReadiness(plan,measure,rows=hdOCReview(plan,measure)){
  const checks=[],add=(id,status,detail)=>checks.push({id,status,detail});
+ if(plan.preservationIssues?.length)add('source-data','manual',plan.preservationIssues.join(' / '));
  add('equipment',measure.goals.some(x=>!x.ok&&!x.unresolved)?'missing':measure.goals.some(x=>!x.ok)?'manual':measure.goals.length?'ready':'manual','装備・制空・索敵・先制対潜の登録目標');
  const route=hdFERoute(plan);add('route',route.status,route.detail);
  if(!(plan.ships||[]).some(s=>s.ship))add('fleet','missing','艦娘が未選択です');
@@ -368,6 +441,7 @@ function hdOCReadiness(plan,measure,rows=hdOCReview(plan,measure)){
 }
 async function hdOCFindAlternatives(c,result,limits={}){
  const signature=hdOCSignature(c);if(!result||result.signature!==signature)throw Object.assign(new Error('Stale proposal'),{code:'HD_OC_STALE'});
+ hdOCRevalidateResult(result);
  const original=hdFEPlanFromSavedFleet(c.map,c.fleet),target=hdFSLevelTarget(c.map),live=hdFSLiveState();
  const roster=hdFERoster().filter(row=>hdFEFindShip(row.name)&&hdFSOperational(row,live).available);
  const levelRank=row=>{const lv=Number(row.level)||0;return !lv?1000:target.low&&lv<target.low?500+target.low-lv:Math.abs(lv-(target.high||90))};
@@ -382,23 +456,23 @@ async function hdOCFindAlternatives(c,result,limits={}){
   for(const row of roster){
    if(examined>=maxCandidates||considered>=Math.max(2,Math.floor(maxCandidates/order.length)))break;
    if(hdOCSignature(c)!==signature)throw Object.assign(new Error('Data changed'),{code:'HD_OC_STALE'});
-   const ships=best.plan.ships.map(s=>({ship:s.ship,gameShipId:s.gameShipId,masterId:s.masterId,rosterId:s.rosterId||'',gear:''}));
+   const ships=best.plan.ships.map(s=>({ship:s.ship,gameShipId:s.gameShipId,masterId:s.masterId,rosterId:s.rosterId||'',gear:hdOCShipGear(s)}));
    if(ships[index].gameShipId&&Number(ships[index].gameShipId)===Number(row.gameShipId)||ships[index].rosterId&&String(ships[index].rosterId)===String(row.id))continue;
    const db=hdFEFindShip(row.name),masterId=Number(row.masterId)||Number(hdShipDbMasterRowFor(db)?.id)||0;
-   ships[index]={ship:row.name,gameShipId:Number(row.gameShipId)||0,masterId,rosterId:row.id||'',gear:row.gear||''};
+   ships[index]={ship:row.name,gameShipId:Number(row.gameShipId)||0,masterId,rosterId:row.id||'',gear:ships[index].gear||row.gear||''};
    const fleet={...c.fleet,ships},plan=hdFEPlanFromSavedFleet(c.map,fleet);plan.routeInfo=c.preset?hdFSPresetInfo(c.preset):null;
    // Reject reusing an individual even if the remaining source fleet still has unowned ships.
    if(hdOCShipOwnership(plan).some(x=>x.status==='missing'&&x.detail.includes('1隻を複数枠')))continue;
    examined++;considered++;const steps=hdOCSearchSteps({...c,fleet},{maxExamined:limits.maxExamined||700,maxDepth:12});let step;
    do{step=steps.next();if(!step.done)await new Promise(resolve=>setTimeout(resolve,0));if(hdOCSignature(c)!==signature){steps.return();throw Object.assign(new Error('Data changed'),{code:'HD_OC_STALE'})}}while(!step.done);
    const candidate=step.value;candidate.signature=signature;
-   if(quality(candidate)>quality(selected))selected=candidate;
+   if(!hdOCGoalRegressions(best.measure,candidate.measure).length&&quality(candidate)>quality(selected))selected=candidate;
   }
   if(selected!==best){best=selected;changed=true}
   if(examined>=maxCandidates)break;
  }
  const ownership=hdOCShipOwnership(best.plan),route=hdFERoute(best.plan),assessment=hdOCReadiness(best.plan,best.measure);
- if(!changed||ownership.some(x=>x.status!=='ready')||route.status!=='ready')return {proposal:null,examined,detail:'確認済みのルート条件と重複防止を満たす代替編成は見つかりませんでした。探索範囲外の組み合わせや不足艦の入手・育成も確認してね。'};
+ if(!changed||ownership.some(x=>x.status!=='ready')||route.status!=='ready')return {proposal:null,examined,search:{status:'incomplete',exhaustive:false,examined,maxCandidates,reasons:[examined>=maxCandidates?'ship-candidate-limit':'bounded-ship-search']},detail:'探索未完了：確認済みのルート条件と重複防止を満たす代替編成は見つかりませんでした。探索範囲外の組み合わせや不足艦の入手・育成も確認してね。'};
  best.replacements=best.plan.ships.flatMap((s,index)=>s.ship!==original.ships[index]?.ship||Number(s.gameShipId)!==Number(original.ships[index]?.gameShipId)||s.rosterId!==original.ships[index]?.rosterId?[{index,from:original.ships[index]?.ship||'',to:s.ship,level:hdFEAswRoster(s)?.level||null}]:[]);
  best.alternativeAssessment=assessment;return {proposal:best,examined,detail:'艦種・隻数・速力の登録条件と所持個体を確認した代替案です。装備・索敵・制空・先制対潜の不足は別途表示します。'};
 }
@@ -413,6 +487,10 @@ function hdOCOaswHtml(plan,attrs){
 function hdOCMissingShipsHtml(plan){
  const checks=hdOCShipOwnership(plan),issues=checks.filter(x=>x.status!=='ready'),esc=hdFEEsc;if(!issues.length)return '';
  return `<div data-hd-oc-missing-ships><b>所持個体の割当確認 ${checks.length-issues.length} / 必要 ${checks.length}隻</b>${issues.map(x=>`<article><p>第${x.index+1}艦 ${esc(x.ship)}：${esc(x.detail)}</p>${typeof hdShipDbAcquisitionHtml==='function'?hdShipDbAcquisitionHtml(x.ship):''}</article>`).join('')}</div>`;
+}
+function hdOCSearchStatusHtml(result){
+ if(result.measure.complete||result.search?.exhaustive!==false)return '';
+ return '<p data-hd-oc-search-status>探索未完了：限られた候補・組合せで条件を満たす配備を発見できませんでした。現在案の未充足は、手持ち装備の不足を証明するものではありません。所持数から確認できる不足と区別し、装備の配備先・代替艦・条件を確認してください。</p>';
 }
 function hdOCReviewHeadline(measure,rows){
  if(!measure.goals.length)return 'この海域は装備条件を自動判定できません';
@@ -439,7 +517,7 @@ function hdOCPanel(map,fleetId='',route=''){
  const c=hdOCContext(map,fleetId,route),key=`${map}:${c.fleet?.id||''}:${c.index}`,signature=hdOCSignature(c),cached=HD_OC_CACHE.get(key),result=cached&&cached.signature===signature?cached:null,searching=HD_OC_PENDING.get(key)?.signature===signature,esc=hdFEEsc;
  const attrs=`data-hd-oc-map="${esc(map)}" data-hd-oc-fleet="${esc(c.fleet?.id||'')}" data-hd-oc-route="${c.index}"`;
  const reviews=result?hdOCReview(result.plan,result.measure):[],readiness=result?hdOCReadiness(result.plan,result.measure,reviews):null;
- return `<section class="hd-oc-panel" ${attrs}>${typeof hdSECapabilityHtml==='function'?hdSECapabilityHtml(map,c.fleet?.id||''):''}<strong>手持ち装備で攻略条件を満たす</strong><p>${c.fleet?`対象：${esc(c.fleet.name||'保存編成')}。所持数・改修値・装備可否・空きスロットから配備案を探します。他の艦の装備も移し替える前提です。`:'先に自分用編成を保存・選択すると、艦ごとに手持ち装備を配備できます。'}</p>${hdMapRequirementsHtml(map,c.preset)}${hdOCRouteGoalHtml(c,attrs)}<label>先制対潜艦の配備目標 <input type="number" min="0" max="7" step="1" inputmode="numeric" data-hd-oc-asw-target ${attrs} value="${hdOCOaswTarget(c)}" ${c.fleet?'':'disabled'}></label><small>海域・ルートに合わせて必要人数を指定。人数の海域推奨が未登録の場合は初期目標1隻。攻略に十分な人数を保証しません。</small><button type="button" class="primary small" data-hd-oc-search ${attrs} ${c.fleet&&!searching?'':'disabled'}>${searching?'手持ち装備を確認中…':'手持ちで条件を満たす配備を探す'}</button><button type="button" class="ghost small" data-hd-oc-select-fleet ${attrs}>艦隊を選ぶ・保存する</button>${result?`<div class="hd-oc-result"><b data-hd-oc-headline>${hdOCReviewHeadline(result.measure,reviews)}</b><p data-hd-oc-readiness>${esc(readiness.detail)}</p>${result.replacements?.length?`<p data-hd-oc-replacements>${result.replacements.map(x=>esc('第'+(x.index+1)+'艦：'+x.from+' → '+x.to+' Lv'+(x.level||'未確認'))).join(' / ')}</p>`:''}${result.measure.goals.map(g=>`<div class="hd-oc-goal ${g.ok?'ready':'missing'}"><strong>${esc(g.label)}：${g.ok?'充足':g.unresolved?'未判定':'不足'}</strong><span>${esc(g.detail)}</span></div>`).join('')}${result.shortages.map((g,index)=>`<div class="hd-oc-shortage"><b>${esc(g.label)}に必要なもの</b><p>${esc(g.detail)}。${g.routeEquipment?'電探装備艦があと'+Math.ceil(g.shortfall)+'隻必要。同じ艦の複数電探では増えません。装備可能な別の艦と空き枠も確認してください':g.asw?'艦別判定で必要装備・対潜値を確認。装備の個数に換算できない不足です':g.capability?'同じ艦の推奨セットが未完成。下の装備別不足・配備可否を確認してね':g.kind==='高速化'?(g.goalKind==='speed-ship'?'缶の種類・改修値・同じ艦への配備、到達可能な速力を確認':`同じ艦のセットがあと ${Math.ceil(g.shortfall)}組。タービン・缶の内訳を確認してね`):['制空','索敵'].includes(g.kind)&&['air-value','los-value'].includes(g.goalKind||g.kind)?'性能・搭載枠を増やす必要あり':`配備不足 ${Math.ceil(g.shortfall)}個 / 同種の所持 ${g.owned}個`}。${g.placement&&!g.blocked&&!g.capability?'所持数は足りています。装備可否・配備枠・他の条件との両立を見直してね。':''}${g.candidates.length?'装備候補：'+esc(g.candidates.join('、')):'この編成に載せられる候補なし。艦種や装備枠を見直してね。'}</p><button type="button" class="ghost small" data-hd-oc-acquire="${esc(g.kind.startsWith('speed-')?'高速化':g.kind)}" ${attrs}>入手方法を見る</button>${hdOCPlacementHtml(g)}${hdOCProcurementHtml(g,index,attrs)}</div>`).join('')}<div class="hd-oc-ships">${result.plan.ships.map(s=>`<p><b>${esc(s.ship)}</b><span>${esc([...s.items.map(x=>`第${x.slotIndex+1}：${x.name}${x.star?' ★'+x.star:''}`),...(s.expansion?[`増設：${s.expansion.name}${s.expansion.star?' ★'+s.expansion.star:''}`]:[])].join(' / ')||'配備なし')}</span></p>`).join('')}</div>${hdOCMissingShipsHtml(result.plan)}${hdOCOaswTarget(c)?hdOCOaswHtml(result.plan,attrs):''}${hdOCReviewHtml(reviews,attrs)}<button type="button" class="ghost small" data-hd-oc-alternatives ${attrs} ${searching?'disabled':''}>所持艦娘・代替装備で再探索</button>${result.alternativeNote?`<p data-hd-oc-alternative-note>${esc(result.alternativeNote)}</p>`:''}${hdOCProcurementUpdateHtml(c,result,attrs)}<button type="button" class="primary small" data-hd-oc-calculator ${attrs}>この配備で制空・索敵を確認</button><small>探索した配備案を制空・索敵プランナーへ反映済み。司令部Lvは同期値を使用します。</small><button type="button" class="ghost small" data-hd-oc-apply ${attrs}>${result.measure.complete?'この配備を保存編成に反映':'不足を残した配備案を保存'}</button><small>登録済み目安・制空は熟練度なしの推定。探索で見つからない組み合わせもあります。保存後はゲーム側の装備を変更し、基地航空隊・ルート条件も確認してね。</small></div>`:''}</section>`;
+ return `<section class="hd-oc-panel" ${attrs}>${typeof hdSECapabilityHtml==='function'?hdSECapabilityHtml(map,c.fleet?.id||''):''}<strong>手持ち装備で攻略条件を満たす</strong><p>${c.fleet?`対象：${esc(c.fleet.name||'保存編成')}。所持数・改修値・装備可否・空きスロットから配備案を探します。他の艦の装備も移し替える前提です。`:'先に自分用編成を保存・選択すると、艦ごとに手持ち装備を配備できます。'}</p>${hdMapRequirementsHtml(map,c.preset)}${hdOCRouteGoalHtml(c,attrs)}<label>先制対潜艦の配備目標 <input type="number" min="0" max="7" step="1" inputmode="numeric" data-hd-oc-asw-target ${attrs} value="${hdOCOaswTarget(c)}" ${c.fleet?'':'disabled'}></label><small>海域・ルートに合わせて必要人数を指定。人数の海域推奨が未登録の場合は初期目標1隻。攻略に十分な人数を保証しません。</small><button type="button" class="primary small" data-hd-oc-search ${attrs} ${c.fleet&&!searching?'':'disabled'}>${searching?'手持ち装備を確認中…':'手持ちで条件を満たす配備を探す'}</button><button type="button" class="ghost small" data-hd-oc-select-fleet ${attrs}>艦隊を選ぶ・保存する</button>${result?`<div class="hd-oc-result"><b data-hd-oc-headline>${hdOCReviewHeadline(result.measure,reviews)}</b><p data-hd-oc-readiness>${esc(readiness.detail)}</p>${result.replacements?.length?`<p data-hd-oc-replacements>${result.replacements.map(x=>esc('第'+(x.index+1)+'艦：'+x.from+' → '+x.to+' Lv'+(x.level||'未確認'))).join(' / ')}</p>`:''}${hdOCSearchStatusHtml(result)}${hdOCRequiredChecksHtml(result.plan,result.measure)}${result.measure.goals.map(g=>`<div class="hd-oc-goal ${g.ok?'ready':'missing'}"><strong>${esc(g.label)}：${g.ok?'充足':g.unresolved?'未判定':'不足'}</strong><small>${g.purpose==='route'?'経路必須':g.purpose==='recommendation'?'戦闘推奨':'選択した方針の目標'}</small><span>${esc(g.detail)}</span></div>`).join('')}${result.shortages.map((g,index)=>`<div class="hd-oc-shortage"><b>${esc(g.label)}に必要なもの</b><p>${esc(g.detail)}。${g.routeEquipment?(g.goalKind==='drum-ships'?'ドラム缶':'電探')+'装備艦があと'+Math.ceil(g.shortfall)+'隻必要。同じ艦の複数装備では増えません。装備可能な別の艦と空き枠も確認してください':g.asw?'艦別判定で必要装備・対潜値を確認。装備の個数に換算できない不足です':g.capability?'同じ艦の推奨セットが未完成。下の装備別不足・配備可否を確認してね':g.kind==='高速化'?(g.goalKind==='speed-ship'?'缶の種類・改修値・同じ艦への配備、到達可能な速力を確認':`同じ艦のセットがあと ${Math.ceil(g.shortfall)}組。タービン・缶の内訳を確認してね`):['制空','索敵'].includes(g.kind)&&['air-value','los-value'].includes(g.goalKind||g.kind)?'性能・搭載枠を増やす必要あり':`配備不足 ${Math.ceil(g.shortfall)}個 / 同種の所持 ${g.owned}個`}。${g.placement&&!g.blocked&&!g.capability?'所持数は足りています。装備可否・配備枠・他の条件との両立を見直してね。':''}${g.candidates.length?'装備候補：'+esc(g.candidates.join('、')):'この編成に載せられる候補なし。艦種や装備枠を見直してね。'}</p><button type="button" class="ghost small" data-hd-oc-acquire="${esc(g.kind.startsWith('speed-')?'高速化':g.kind)}" ${attrs}>入手方法を見る</button>${hdOCPlacementHtml(g)}${hdOCCapabilityStockHtml(g)}${hdOCProcurementHtml(g,index,attrs)}</div>`).join('')}<div class="hd-oc-ships">${result.plan.ships.map(s=>`<p><b>${esc(s.ship)}</b><span>${esc([...s.items.map(x=>`第${x.slotIndex+1}：${x.name}${x.star?' ★'+x.star:''}`),...(s.expansion?[`増設：${s.expansion.name}${s.expansion.star?' ★'+s.expansion.star:''}`]:[])].join(' / ')||'配備なし')}</span></p>`).join('')}</div>${hdOCMissingShipsHtml(result.plan)}${hdOCOaswTarget(c)?hdOCOaswHtml(result.plan,attrs):''}${hdOCReviewHtml(reviews,attrs)}<button type="button" class="ghost small" data-hd-oc-alternatives ${attrs} ${searching?'disabled':''}>所持艦娘・代替装備で再探索</button>${result.alternativeNote?`<p data-hd-oc-alternative-note>${esc(result.alternativeNote)}</p>`:''}${hdOCProcurementUpdateHtml(c,result,attrs)}<button type="button" class="primary small" data-hd-oc-calculator ${attrs}>この配備で制空・索敵を確認</button><small>探索した配備案を制空・索敵プランナーへ反映済み。司令部Lvは同期値を使用します。</small><button type="button" class="ghost small" data-hd-oc-apply ${attrs}>${readiness.registeredReady?'この配備を保存編成に反映':'不足を残した配備案を保存'}</button><small>登録済み目安・制空は熟練度なしの推定。探索で見つからない組み合わせもあります。保存後はゲーム側の装備を変更し、基地航空隊・ルート条件も確認してね。</small></div>`:''}</section>`;
 }
 function hdOCInlineResult(map,fleetId){
  const c=hdOCContext(map,fleetId),result=HD_OC_CACHE.get(`${map}:${fleetId}:${c.index}`);
@@ -530,9 +608,11 @@ document.addEventListener('click',e=>{
   if(HD_OC_PENDING.has(key))return;HD_OC_PENDING.set(key,{signature:result.signature});button.disabled=true;button.textContent='代替編成を確認中…';
   hdOCFindAlternatives(c,result).then(found=>{HD_OC_PENDING.delete(key);if(found.proposal){found.proposal.alternativeNote=found.detail;HD_OC_CACHE.set(key,found.proposal);hdFCImportOwnedPlan(c,found.proposal)}else result.alternativeNote=found.detail;hdOCRefresh()}).catch(err=>{HD_OC_PENDING.delete(key);hdOCRefresh();hdToast(err.code==='HD_OC_STALE'?'台帳・条件が変わりました。最新の情報で再探索してね':'代替探索を完了できませんでした。再探索してね','warn')});return;
  }
+ hdOCRevalidateResult(result);
+ if(result.plan.preservationIssues?.length){hdToast('未登録の艦娘・装備を含むため、元の保存編成は上書きしません。台帳・マスター情報を確認してね','warn');return}
  const all=loadCustomFleets(),fleet=(all[c.map]||[]).find(x=>String(x.id)===String(c.fleet.id));if(!fleet){hdToast('自分用編成に保存してから反映してね','warn');return}
  let si=0;for(const ship of fleet.ships||[]){if(!String(ship.ship||'').trim()&&!String(ship.gear||'').trim())continue;const row=result.plan.ships[si++];if(!row)continue;if(result.replacements?.some(x=>x.index===si-1)){ship.ship=row.ship;ship.gameShipId=row.gameShipId||0;ship.masterId=row.masterId||0;ship.rosterId=row.rosterId||''}const normal=Array.from({length:Math.max(0,...row.items.map(x=>x.slotIndex+1))},(_,i)=>{const item=row.items.find(x=>x.slotIndex===i);return item?item.name+(item.star?' ★'+item.star:''):''});ship.gear=[...normal,...(row.expansion?[`[増設] ${row.expansion.name}${row.expansion.star?' ★'+row.expansion.star:''}`]:[])].join(' / ')}
- if(c.preset)fleet.routePreset={...c.preset};if(MAP_PLANS[c.map]?.routeBranches?.goals){fleet.routeGoal=result.plan.routeGoal;fleet.routeAssessment={status:hdFERoute(result.plan).status,branch:hdFEBranchRoute(result.plan),at:Date.now()}}fleet.openingAswCount=result.plan.openingAswCount??hdOCOaswTarget(c);if(hdFERouteContract(result.plan))fleet.routeAssessment={status:hdFERoute(result.plan).status,branch:hdFEBranchRoute(result.plan),contract:hdFERouteContract(result.plan),at:Date.now()};
+ if(c.preset)fleet.routePreset={...c.preset};if(MAP_PLANS[c.map]?.routeBranches?.goals){fleet.routeGoal=result.plan.routeGoal;fleet.routeAssessment={status:hdFERoute(result.plan).status,branch:hdFEBranchRoute(result.plan),at:Date.now()}}fleet.searchAssessment=result.search||result.plan.search||null;fleet.openingAswCount=result.plan.openingAswCount??hdOCOaswTarget(c);if(hdFERouteContract(result.plan))fleet.routeAssessment={status:hdFERoute(result.plan).status,branch:hdFEBranchRoute(result.plan),contract:hdFERouteContract(result.plan),at:Date.now()};
  try{saveCustomFleets(all)}catch{hdToast('保存できなかったよ。配備案は残しているので再試行してね','warn');return}
  HD_OC_CACHE.delete(key);hdToast('配備案を保存したよ。ゲーム側でも装備を変更してね','success');hdOCRefresh();
 });
