@@ -42,9 +42,18 @@
       "verification": {
         "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
         "unknownInputs": "empty/unknown hull rejection all53",
-        "perExampleAllRequirementsPositiveNegative": false,
-        "representativeAllRequirementsStages": false,
-        "physicalIPhone": false
+        "perExampleAllRequirementsPositiveNegative": true,
+        "representativeAllRequirementsStages": true,
+        "physicalIPhone": false,
+        "registeredCompletion": {
+          "state": "verified",
+          "scope": "Only registered fleetCount 1..6 plus random/non-guaranteed branch; no numerical or mandatory gear predicates",
+          "tests": [
+            "tests/route-completion-1-1.spec.js"
+          ],
+          "record": "docs/pr152-registered-example-completion-ja.md",
+          "physicalIPhone": false
+        }
       }
     },
     {

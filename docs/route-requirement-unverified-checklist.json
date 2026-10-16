@@ -1,42 +1,40 @@
 {
-  "basis": "b679196 plus slot/scouting verification; registered route conditions unchanged",
+  "basis": "9a0bff5 plus registered-example completion and current-stack integrity; route thresholds unchanged",
   "date": "2026-10-16 JST",
   "summary": {
-    "fullyVerified": 0,
-    "partiallyVerified": 50,
+    "fullyVerified": 1,
+    "partiallyVerified": 49,
     "unverified": 3
   },
-  "note": "Listing gaps does not mark requirements verified. U/I/P apply to every example. None of these codes invents a route requirement. Real iPhone and WebKit offline remain unverified. Air/ASW/cutin are selected combat goals, not automatically route predicates.",
+  "note": "Verified means every mandatory predicate of the registered example and its declared routing class, boundaries, finite-inventory safety and operation sequence are covered; not all hulls, quests, combat strategies or arbitrary inventories. U/I/P apply to remaining partial examples. Real iPhone and WebKit offline remain unverified. No route condition was invented.",
   "examples": [
     {
       "map": "1-1",
       "index": 0,
       "path": "AC",
       "source": "https://zekamashi.net/kancolle-kouryaku/1-1/",
-      "status": "partial",
+      "status": "verified",
       "existingEvidence": [
         "全マスター仮想所持の直接構造選択・未知艦拒否（全論理枝ではない）",
-        "2艦6枠の独立有限在庫oracle・改修別数量・保存/プランナー（新規専用fixture）"
+        "2艦6枠の独立有限在庫oracle・改修別数量・保存/プランナー（新規専用fixture）",
+        "登録条件集合（艦数1〜6のみ）・0〜7全値・ランダム未保証・未知艦",
+        "6艦18通常枠の主砲★0/6全190数量クラス、独立数量oracle",
+        "実自動編成/配備→全5モード→艦/改修装備交換→保存/再読込→同期→プランナー、6キー保持"
       ],
-      "remaining": [
-        {
-          "code": "R",
-          "detail": "複数/ランダム経路の全候補と固定到達の区別、別経路条件の混入拒否"
-        },
-        {
-          "code": "U",
-          "detail": "全条件同時成立と各条件の単独破壊・全境界の組合せ（既存の代表回帰を除く未網羅部分）"
-        },
-        {
-          "code": "I",
-          "detail": "当該登録例の複数装備/改修別の有限在庫を独立全列挙と比較し、艦/枠/在庫競合・探索打切りを検査する範囲が未網羅"
-        },
-        {
-          "code": "P",
-          "detail": "境界と在庫競合を組み合わせた生成→配備→最適化→艦/装備交換→保存再読込→同期更新→プランナーの全操作列"
-        }
-      ],
-      "strategyTargets": []
+      "remaining": [],
+      "strategyTargets": [],
+      "completion": {
+        "scope": "Registered 1-1 example only; fleetCount 1..6 and random routing. No mandatory numerical speed/LOS/air, historical/flagship or special equipment predicate. Not a battle victory or arrival guarantee.",
+        "sourceCheckedAt": "2026-10-16 JST",
+        "tests": [
+          "tests/route-completion-1-1.spec.js"
+        ],
+        "evidence": "docs/pr152-registered-example-completion-ja.md",
+        "outsideScope": [
+          "arbitrary combat strategies, quests/events, arbitrary equipment and hull combinations",
+          "physical iPhone and WebKit offline"
+        ]
+      }
     },
     {
       "map": "1-2",
@@ -387,7 +385,10 @@
       "existingEvidence": [
         "全マスター仮想所持の直接構造選択・未知艦拒否（全論理枝ではない）",
         "低速/49/異なる2隻のドラム缶・最適化5種・交換負例・保存再読込・プランナー",
-        "実33式の同期値・★0/4・司令部Lv100/120・係数分離・古い提案拒否・6キー/再読込/プランナー（専用API観測fixture）"
+        "実33式の同期値・★0/4・司令部Lv100/120・係数分離・古い提案拒否・6キー/再読込/プランナー（専用API観測fixture）",
+        "制空66/優勢42＋実33式49.458745＋低速＋2隻ドラム同時、7枠4^7独立列挙16解（固定基礎配備）",
+        "登録構造境界・実保存ボタン/再読込/6キー/プランナー・全5モード・個別破壊・増設3状態",
+        "空7枠の有限探索未完了、装備変更時の索敵ボーナス未確認、連戦制空manualを成立にしない"
       ],
       "remaining": [
         {
@@ -415,7 +416,12 @@
           "detail": "境界と在庫競合を組み合わせた生成→配備→最適化→艦/装備交換→保存再読込→同期更新→プランナーの全操作列"
         }
       ],
-      "strategyTargets": []
+      "strategyTargets": [],
+      "completionBlockers": [
+        "Unsynced equipment changes leave ship-specific LOS bonus deltas unconfirmed",
+        "Finite search can fail to find numerical solutions; incomplete is not a shortage proof",
+        "Sequential air model keeps manual readiness; arbitrary hull/inventory/bonus combinations not covered"
+      ]
     },
     {
       "map": "2-5",

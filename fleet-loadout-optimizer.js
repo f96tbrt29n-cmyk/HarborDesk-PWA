@@ -29,7 +29,8 @@ function hdFOItemMeta(item){
 }
 function hdFOStackKey(item){
  if(!item||!item.name)return '';
- if(item.stackKey)return String(item.stackKey);
+ // Name and improvement are authoritative; a proposal can be edited after
+ // allocation. A retained cached stackKey must never hide inventory overuse.
  if(typeof hdFLInventoryStackKey==='function')return hdFLInventoryStackKey(item.name,item.star);
  return String(item.name||'')+'@@'+Math.max(0,Number(item.star)||0);
 }

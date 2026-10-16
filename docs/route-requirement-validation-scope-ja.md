@@ -2,7 +2,7 @@
 
 2026-10-15確認。判定コードの対応、条件の登録、実際の配備による正負検証を区別する。CI成功は37海域の全条件を検証したことを意味しない。
 
-2026-10-16追記：[53例ごとの未検証項目](route-requirement-unverified-checklist-ja.md)と[有限在庫の追加検証・不足内訳の修正](pr152-finite-inventory-verification-ja.md)を参照。全条件検証済み0／一部検証50／未確認3の区分は維持する。
+2026-10-16追記：[53例ごとの未検証項目](route-requirement-unverified-checklist-ja.md)と[有限在庫の追加検証・不足内訳の修正](pr152-finite-inventory-verification-ja.md)を参照。前回の区分は0/50/3。最新は[登録条件完了記録](pr152-registered-example-completion-ja.md)に基づき **1/49/3**。1-1の登録必須条件だけを完了とし、任意戦闘条件へ広げない。
 
 [機械可読の53例一覧](route-requirement-validation-scope.json)には速度条件（条件付き/ORを含む）、33式係数/閾値、必須装備を持つ艦数、戦闘方針の装備目標、旗艦/史実艦、経路区分、選択目標、分岐グラフ、出典を記録した。抽出した項目を全てANDで適用せず、元の論理式/目標を使う。
 
