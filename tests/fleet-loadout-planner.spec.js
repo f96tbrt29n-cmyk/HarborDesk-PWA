@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { observeReload } = require('./reload-evidence.cjs');
 
 test.use({
   viewport: { width: 390, height: 844 },
@@ -732,7 +733,9 @@ test('night CI counts a same-ship set and reports missing owned torpedoes withou
  expect(r.split.count).toBe(0);expect(r.options.length).toBeGreaterThan(0);expect(r.options.every(x=>!x.available)).toBe(true);expect(r.options.some(x=>x.missing.some(m=>m.name==='61cm四連装(酸素)魚雷'&&m.need===1&&m.owned===1))).toBe(true);expect(r.unchanged).toBe(true);expect(r.unknown.unresolved).toBe(true);
 });
 
-test('night CI policy selection regenerates the quick owned loadout and persists across reloads',async({page})=>{
+test('night CI policy selection regenerates the quick owned loadout and persists across reloads',async({page},testInfo)=>{
+ const retainReloadEvidence=observeReload(page,testInfo);
+ try {
  await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
  await page.evaluate(()=>{
   const db=hdFEFindShip('夕立改二'),masterId=hdShipDbMasterRowFor(db).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'12.7cm連装砲',count:3},{name:'61cm四連装(酸素)魚雷',count:2},{name:'水雷戦隊 熟練見張員',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',masterId,gameShipId:71,level:90,gameSlotEx:0}]));
@@ -744,6 +747,7 @@ test('night CI policy selection regenerates the quick owned loadout and persists
  const r=await page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return {policy:hdSENightPolicy('1-1'),goal:p.assessment.measure.goals.find(g=>g.kind==='cap-night-torpedo'),usage:hdFOAssignedUsage(p),expansion:p.ships[0].expansion}});expect(r.policy).toBe('torpedo');expect(r.goal.ok).toBe(true);expect(r.usage['61cm四連装(酸素)魚雷@@0']).toBe(2);expect(r.expansion).toBeNull();
  await card.locator('[data-hd-night-policy]').selectOption('dd-water-torpedo');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightDD(p.ships[0]).candidates.some(c=>c.attack==='dd-water-torpedo')})).toBe(true);await expect(card).toContainText('駆逐艦専用CI装備条件：成立');await expect(card).toContainText('Lv90：2回攻撃型のレベル条件を充足');expect(await page.evaluate(()=>HD_FL_CACHE['1-1:0'].ships[0].expansion)).toBeNull();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('dd-water-torpedo');
+ } finally { await retainReloadEvidence(); }
 });
 test('night CI selected recipes automatically assemble all four supported generic cutins from owned gear',async({page})=>{
  await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
@@ -868,12 +872,15 @@ test('carrier night CI remedies identify missing personnel and do not invent air
  expect(r.options.length).toBeGreaterThan(0);expect(r.options.every(x=>!x.available)).toBe(true);expect(r.options.some(x=>x.missing.some(m=>/夜間作戦航空要員/.test(m.name)))).toBe(true);expect(r.stock.complete).toBe(false);expect(r.unchanged).toBe(true);expect(r.surface).toBe(false);
 });
 
-test('carrier night CI policy persists and regenerates the mobile loadout',async({page})=>{
+test('carrier night CI policy persists and regenerates the mobile loadout',async({page},testInfo)=>{
+ const retainReloadEvidence=observeReload(page,testInfo);
+ try {
  await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
  await page.evaluate(()=>{
   const ship='赤城改',masterId=hdShipDbMasterRowFor(hdFEFindShip(ship)).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'F6F-3N',count:2},{name:'TBM-3D',count:1},{name:'夜間作戦航空要員',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship,masterId,gameShipId:882,level:90,gameSlotEx:0}]));hdFSMap=()=> '1-1';hdFSPlans=()=>[{index:0,preset:{name:'carrier fixture'},needs:[],slots:[{profile:{row:{name:ship,masterId,gameShipId:882,level:90},type:'正規空母',roles:[]}}]}];const card=document.createElement('article');card.id='carrier-policy-test';card.className='hd-fs-card';card.innerHTML='<button data-hd-fl-generate="0">自動配備</button><div class="hd-fl-host"></div>';document.body.appendChild(card);hdFLRender(0,card);
  });
  const card=page.locator('#carrier-policy-test');await card.locator('[data-hd-night-policy]').selectOption('cv-fighter2');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightCarrier(p.ships[0]).candidates.some(c=>c.attack==='cv-fighter2')})).toBe(true);await expect(card).toContainText('空母夜戦CI装備条件：成立');await expect(card).toContainText('残機未同期');expect(await page.evaluate(()=>HD_FL_CACHE['1-1:0'].ships[0].expansion)).toBeNull();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('cv-fighter2');
+ } finally { await retainReloadEvidence(); }
 });
 
 test('carrier bomber CI evaluates all six same-ship combinations and excludes photo-only and ordinary planes',async({page})=>{

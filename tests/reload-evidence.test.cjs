@@ -1,0 +1,27 @@
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs/promises');
+const os = require('node:os');
+const path = require('node:path');
+const { EventEmitter } = require('node:events');
+const { observeReload } = require('./reload-evidence.cjs');
+test('reload evidence survives navigation and retains failure without evaluating a blocked page', async () => {
+  const page = new EventEmitter(), frame = { url: () => 'http://localhost/#home' }, attachments = [];
+  page.mainFrame = () => frame;
+  page.evaluate = () => { throw new Error('must not evaluate'); };
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'reload-evidence-'));
+  const retain = observeReload(page, { title: 'first attempt', outputPath: name => path.join(dir, name), attach: async (name, data) => attachments.push({ name, ...data }) });
+  page.emit('framenavigated', frame);
+  page.emit('response', { url: () => 'http://localhost/index.html', status: () => 200, fromServiceWorker: () => true });
+  page.emit('requestfailed', { url: () => 'http://localhost/module.js', failure: () => ({ errorText: 'cancelled' }) });
+  page.emit('pageerror', new Error('duplicate declaration'));
+  await retain();
+  const evidence = JSON.parse(await fs.readFile(attachments[0].path, 'utf8'));
+  assert.equal(evidence.test, 'first attempt');
+  assert.deepEqual(evidence.events.map(x => x.kind), ['navigation', 'response', 'requestfailed', 'pageerror']);
+  assert.equal(evidence.events[1].fromServiceWorker, true);
+  assert.equal(evidence.events[2].failure.errorText, 'cancelled');
+  assert.equal(evidence.events[3].message, 'duplicate declaration');
+  assert.equal(page.eventNames().length, 0);
+  await fs.rm(dir, { recursive: true });
+});

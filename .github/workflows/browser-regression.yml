@@ -103,6 +103,7 @@ jobs:
             test-results/**/video.webm
             test-results/**/trace.zip
             test-results/**/error-context.md
+            test-results/**/reload-navigation-evidence.json
           if-no-files-found: ignore
           retention-days: 14
 
