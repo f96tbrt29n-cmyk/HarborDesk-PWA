@@ -29,9 +29,9 @@ module.exports = defineConfig({
     }
   ],
   webServer: {
-    command: 'python3 -m http.server 4173 --bind 127.0.0.1',
+    command: process.env.HD_RELOAD_BUFFER_SW === '1' ? 'python3 tests/sw-reload-probe-server.py --directory .' : 'python3 -m http.server 4173 --bind 127.0.0.1',
     url: 'http://127.0.0.1:4173/',
-    reuseExistingServer: true,
+    reuseExistingServer: process.env.HD_RELOAD_BUFFER_SW !== '1',
     timeout: 120000
   },
   outputDir: 'test-results'

@@ -12,7 +12,7 @@ module.exports = {
     cwd: __dirname, reuseExistingServer: false,
   },
   projects: ['webkit', 'chromium'].flatMap(browser => ['allow', 'block', 'probe', 'retention'].map(mode => ({
-    name: browser + '-' + mode, metadata: { swProbe: mode === 'probe', retentionFixture: mode === 'retention' },
+    name: browser + '-' + mode, metadata: { keepNative: true, swProbe: mode === 'probe', retentionFixture: mode === 'retention' },
     use: {
       browserName: browser, serviceWorkers: mode === 'block' ? 'block' : 'allow',
       ...(browser === 'chromium' && process.env.HD_CHROMIUM_EXECUTABLE ? { launchOptions: { executablePath: process.env.HD_CHROMIUM_EXECUTABLE } } : {}),

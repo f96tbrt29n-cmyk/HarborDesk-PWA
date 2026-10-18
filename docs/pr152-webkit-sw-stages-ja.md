@@ -111,3 +111,5 @@ probe成功例ではtraining-planner 15,974bytes、equipment-catalog-extra3 10,2
 通信pageerrorは今回も復元完了した試行で出ており、45秒停止と別問題。Chromium元の重複宣言2件、2-5北同期外15候補の索敵ボーナス差分と一般探索の網羅性は未解決。有限在庫16候補と未知のガードを維持。53例は全条件検証済み1/一部49/未確認3。5-6・実機iPhone・WebKitオフラインは未確認。PR151変更なし。
 
 今回の全証拠は/workspace/hd152-sw-stages-20261018、元のCI資料は/workspace/hd152-network-impact-20261018に保持。新CIはpush後のPR記録で初回/再試行/最終失敗を区別する。
+
+追加調査：[同期script境界とnative/SWイベント採取](pr152-script-boundary-native-ja.md)。旧欠測に本文完了はなく、最後の正常終了は不明のまま。

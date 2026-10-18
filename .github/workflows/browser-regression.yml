@@ -78,6 +78,9 @@ jobs:
         run: npx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run smoke browser regression
+        env:
+          # Only the three reload tests opt in; all other SW responses are unchanged.
+          HD_RELOAD_BUFFER_SW: "1"
         run: npm run test:browser -- --project=${{ matrix.browser }} --workers=${{ matrix.workers }} --shard=${{ matrix.shard }}/${{ matrix.shards }}
 
       - name: Upload Playwright diagnostics
