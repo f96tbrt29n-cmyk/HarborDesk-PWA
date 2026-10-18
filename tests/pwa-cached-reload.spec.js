@@ -1,5 +1,6 @@
 const {test,expect}=require('@playwright/test');
 const {observeReload}=require('./reload-evidence.cjs');
+const {observeStorage}=require('./pwa-storage-audit.cjs');
 test.use({viewport:{width:390,height:844},isMobile:true,hasTouch:true,serviceWorkers:'allow',trace:{mode:'retain-on-failure',snapshots:false,screenshots:true,sources:true}});
 async function boot(page){
  await page.route('**/*',r=>['127.0.0.1','localhost'].includes(new URL(r.request().url()).hostname)?r.continue():r.fulfill({status:204,body:''}));
@@ -23,6 +24,7 @@ async function fleet(page,{count=2,base=50,stock=2}={}){
 test.describe('PWA cached runtime',()=>{
  test('opening ASW and owned planner data survive a cached PWA restart with Chromium offline reload',async({page,context,browserName},testInfo)=>{
   const retain=observeReload(page,testInfo);
+  const storageAudit=await observeStorage(page,testInfo);
   try{await retain.installNativeEvents();
   await fleet(page,{count:4,stock:4});
   await page.evaluate(()=>navigator.serviceWorker.ready);await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
@@ -38,10 +40,12 @@ test.describe('PWA cached runtime',()=>{
   // even with an active service worker; verify its cache and online restart here.
   if(browserName==='chromium')await context.setOffline(true);
   else test.info().annotations.push({type:'engine-limitation',description:'WebKit cache + online restart tested; offline navigation requires iPhone verification.'});
+  await storageAudit.mark('pre-reload');
   retain.mark('reload-start');await page.reload({waitUntil:'domcontentloaded'});retain.mark('reload-domcontentloaded');await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdFEOpeningAsw==='function');
+  await storageAudit.mark('application-ready-before-comparison');
   expect(await page.evaluate(keys=>keys.map(k=>localStorage.getItem(k)),snapshot.keys)).toEqual(snapshot.values);
   const check=await page.evaluate(()=>{const p=hdFEPlanFromSavedFleet('1-5',loadCustomFleets()['1-5'][0]);return {target:hdOCOaswTarget(hdOCContext('1-5','oasw-fleet',0)),hq:Object.values(hdFCLoadAll()).find(x=>x.proposal).hqLevel,ownership:hdOCShipOwnership(p).every(x=>x.status==='ready')}});
-  expect(check).toEqual({target:4,hq:20,ownership:true});retain.mark('five-keys-and-owned-plan-restored');await context.setOffline(false);
-  }catch(error){retain.failure();throw error}finally{await retain()}
+  expect(check).toEqual({target:4,hq:20,ownership:true});retain.mark('five-keys-and-owned-plan-restored');await storageAudit.mark('five-keys-and-owned-plan-restored');await context.setOffline(false);
+  }catch(error){retain.failure();throw error}finally{try{await storageAudit.finish()}finally{await retain()}}
  });
 });
