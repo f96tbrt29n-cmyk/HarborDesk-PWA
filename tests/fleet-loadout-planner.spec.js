@@ -814,13 +814,6 @@ test('submarine night CI missing sets name the equipment and cannot combine gear
  function hdLikeSubRadar(name){return /潜水艦|シュノーケル|SJレーダー/.test(name)}
 });
 
-test('submarine night CI policy regenerates the mobile owned loadout and persists the selected set',async({page})=>{
- await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
- await page.evaluate(()=>{
-  const masterId=hdShipDbMasterRowFor(hdFEFindShip('伊58改')).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'後期型艦首魚雷(6門)',count:2},{name:'潜水艦搭載電探＆逆探(E27)',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'伊58改',masterId,gameShipId:93,level:90,gameSlotEx:0}]));hdFSMap=()=> '1-1';hdFSPlans=()=>[{index:0,preset:{name:'sub fixture'},needs:[],slots:[{profile:{row:{name:'伊58改',masterId,gameShipId:93,level:90},type:'潜水空母',roles:[]}}]}];const card=document.createElement('article');card.id='sub-policy-test';card.className='hd-fs-card';card.innerHTML='<button data-hd-fl-generate="0">自動配備</button><div class="hd-fl-host"></div>';document.body.appendChild(card);hdFLRender(0,card);
- });
- const card=page.locator('#sub-policy-test');await card.locator('[data-hd-night-policy]').selectOption('sub-radar');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightSub(p.ships[0]).attack})).toBe('sub-radar');await expect(card).toContainText('潜水艦夜戦CI装備条件：成立');await card.locator('[data-hd-night-policy]').selectOption('sub-late');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightSub(p.ships[0]).attack})).toBe('sub-late');expect(await page.evaluate(()=>HD_FL_CACHE['1-1:0'].ships[0].expansion)).toBeNull();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('sub-late');
-});
 
 test('carrier night CI requires native remodel or crew and counts only surviving night aircraft',async({page})=>{
  await boot(page);

@@ -1,4 +1,4 @@
-// Node-side evidence survives navigation; used only by the three CI reload cases.
+// Node-side evidence survives navigation; used only by focused reload cases.
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { performance } = require('node:perf_hooks');

@@ -1,4 +1,4 @@
-// Serialized as an init script in the three isolated reload tests only.
+// Serialized as an init script in focused reload tests only.
 function reloadNativeProbe({ instrumentSW = false } = {}) {
   const prefix = '__HD_RELOAD_NATIVE__', doc = performance.timeOrigin;
   const sw = navigator.serviceWorker, watched = new WeakSet(), registrations = new WeakSet(), subscribed = new WeakSet();

@@ -185,27 +185,3 @@ test('owned alternative UI preserves chosen identities through save reload and p
  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCShipOwnership==='function');
  expect(await page.evaluate(()=>hdOCShipOwnership(hdFEPlanFromSavedFleet('1-5',loadCustomFleets()['1-5'][0])).every(x=>x.status==='ready'))).toBe(true);
 });
-
-test.describe('PWA cached runtime',()=>{
- test.use({serviceWorkers:'allow'});
- test('opening ASW and owned planner data survive a cached PWA restart with Chromium offline reload',async({page,context,browserName})=>{
-  await fleet(page,{count:4,stock:4});
-  await page.evaluate(()=>navigator.serviceWorker.ready);await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
-  const snapshot=await page.evaluate(()=>{
-   const c=hdOCContext('1-5','oasw-fleet',0),result=hdOCSearch(c);hdFCImportOwnedPlan(c,result);
-   const keys=[CUSTOM_FLEET_KEY,HD_FL_KEY,SHIP_ROSTER_KEY,HD_FC_KEY,'harbordesk-kancolle-sync-v1'];window.offlineOwnedKeys=keys;return {keys,values:keys.map(k=>localStorage.getItem(k)),count:hdOCOaswMeasure(result.plan).count};
-  });expect(snapshot.count).toBe(4);
-  expect(await page.evaluate(async()=>!!(await caches.match('./index.html'))&&!!(await caches.match('./owned-equipment-planner.js')))).toBe(true);
-  // Let the service worker handle same-origin requests during the restart.
-  await page.unroute('**/*');
-  await page.route(url=>!['127.0.0.1','localhost'].includes(url.hostname),r=>r.fulfill({status:204,body:''}));
-  // Playwright's WebKit setOffline/reload produces an engine-internal navigation error
-  // even with an active service worker; verify its cache and online restart here.
-  if(browserName==='chromium')await context.setOffline(true);
-  else test.info().annotations.push({type:'engine-limitation',description:'WebKit cache + online restart tested; offline navigation requires iPhone verification.'});
-  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdFEOpeningAsw==='function');
-  expect(await page.evaluate(keys=>keys.map(k=>localStorage.getItem(k)),snapshot.keys)).toEqual(snapshot.values);
-  const check=await page.evaluate(()=>{const p=hdFEPlanFromSavedFleet('1-5',loadCustomFleets()['1-5'][0]);return {target:hdOCOaswTarget(hdOCContext('1-5','oasw-fleet',0)),hq:Object.values(hdFCLoadAll()).find(x=>x.proposal).hqLevel,ownership:hdOCShipOwnership(p).every(x=>x.status==='ready')}});
-  expect(check).toEqual({target:4,hq:20,ownership:true});await context.setOffline(false);
- });
-});

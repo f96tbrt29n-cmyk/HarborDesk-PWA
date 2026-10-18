@@ -59,3 +59,14 @@ Cache Context is stoppedの過去資料は発信context/stack不明。以前「�
 一般探索の網羅性・同期外15候補の索敵ボーナスは未確認で、0補完しない。全5モード/保存6キー/同期・プランナーは既存証拠と通常CIで維持する。53例は全条件検証済み1/一部49/未確認3、証拠のみ台帳へ追加。Chromium元重複宣言2件、5-6、実機iPhone、WebKitオフラインも未確認。
 
 **自然停止の根本原因は未確定。** 44のSW fetch到達前/内部/ブラウザーdispatchのどこで待つかが元試行では未計測。今回、隔離時の各段階と応答元を検証したが、SW登録統合/timeout/製品loaderは推測変更しない。既存証拠：/workspace/hd152-passive-sw-20261018、追加証拠：/workspace/hd152-script44-20261018。最新CI結果はPR本文へ記録する。
+
+
+## 初回trace欠測を繰り返さないための限定保持
+
+新CI39133010384ではWebKitのPWAキャッシュ/オンライン再起動が初回45秒DCL待ちで再試行成功。初回動画/context、再試行traceは保持したが、元のon-first-retry設定では初回trace/native JSONがない。44境界と同じ原因とは断定しない。キー比較へ未到達なので、この初回を保持成功とも不一致とも扱わない。
+
+既知の潜水艦夜戦保存とPWA再起動の2件だけに、未加工SWの受動観測と初回trace（snapshots=false）/動画/段階JSON保持を追加。Playwright 1.55はdescribe内trace設定を認めず、初版の設定検査はテスト未実行で失敗した。資料を保持し、潜水艦は既存night-policy-reload.spec.js、PWAはpwa-cached-reload.spec.jsへ移動してファイル単位で限定。通常の他ケースには適用しない。
+
+元の2ケースの準備・機能アサーション/待機条件を、観測用追記を除いたテキスト照合で一致確認。PWAのhelperも同一、SW allow/Chromiumのみoffline/WebKit onlineの分岐を保持。45秒/expect期限変更、skip、pageerror除外なし。PWAの比較対象は従来の5保存キーのままで、6キー全非nullの証拠は別の既存プロフィールを維持する。
+
+移動後の対象4実行は両エンジン初回成功・再試行0（46.8秒）。Chromiumのオフライン検査とWebKitのオンライン検査を分ける。npmの通常CI一覧へPWA移動先を加え、旧ファイルから移した2ケースを重複させない。収集は各エンジン672件で維持（--listは実行成功数ではない）。原本/照合記録/設定失敗と最終結果はfocused-reload*、moved-case-equivalence.json、collection.logへ保存。製品修正ではなく、次の自然停止を採るための診断変更。
