@@ -36,3 +36,33 @@ test('reload evidence survives navigation and retains failure without evaluating
   assert.equal(context.eventNames().length, 0);
   await fs.rm(dir, { recursive: true });
 });
+
+test('finished requests retain identity, timing and sizes without retaining URL credentials', async () => {
+ const context=new EventEmitter(),page=new EventEmitter(),dir=await fs.mkdtemp(path.join(os.tmpdir(),'reload-finished-'));
+ page.context=()=>context;page.mainFrame=()=>null;
+ const retain=observeReload(page,{title:'body completion',outputPath:n=>path.join(dir,n),attach:async()=>{}});
+ const request={url:()=> 'http://user:password@localhost/training-planner.js?v=580&token=secret',resourceType:()=> 'script',isNavigationRequest:()=>false,frame:()=>({}),serviceWorker:()=>null,timing:()=>({responseEnd:12}),sizes:async()=>({responseBodySize:321,responseHeadersSize:100,requestBodySize:0,requestHeadersSize:50})};
+ page.emit('request',request);context.emit('request',request);
+ page.emit('response',{request:()=>request,url:request.url,status:()=>200,fromServiceWorker:()=>true,headers:()=>({'content-length':'321'})});
+ page.emit('requestfinished',request);context.emit('requestfinished',request);
+ await new Promise(resolve=>setImmediate(resolve));await retain();
+ const d=JSON.parse(await fs.readFile(path.join(dir,'reload-navigation-evidence.json'),'utf8'));
+ assert.equal(new Set(d.events.map(x=>x.id)).size,1);
+ assert.equal(d.events.find(x=>x.kind==='requestfinished').timing.responseEnd,12);
+ assert.equal(d.events.find(x=>x.kind==='requestfinished-sizes').sizes.responseBodySize,321);
+ assert.equal(d.events.find(x=>x.kind==='response').contentLength,'321');
+ assert.equal(d.events[0].url,'http://localhost/training-planner.js?v=580');
+ assert.ok(!JSON.stringify(d).includes('password'));assert.ok(!JSON.stringify(d).includes('secret'));
+ await fs.rm(dir,{recursive:true});
+});
+
+test('artifact retention does not await unfinished size collection',async()=>{
+ const context=new EventEmitter(),page=new EventEmitter(),dir=await fs.mkdtemp(path.join(os.tmpdir(),'reload-pending-'));
+ page.context=()=>context;
+ const retain=observeReload(page,{title:'pending body',outputPath:n=>path.join(dir,n),attach:async()=>{}});
+ const r={url:()=> 'http://localhost/training-planner.js',timing:()=>({responseEnd:-1}),sizes:()=>new Promise(()=>{})};
+ page.emit('requestfinished',r);await retain();
+ const d=JSON.parse(await fs.readFile(path.join(dir,'reload-navigation-evidence.json'),'utf8'));
+ assert.equal(d.events[0].kind,'requestfinished');assert.equal(typeof d.startedAt,'number');
+ await fs.rm(dir,{recursive:true});
+});

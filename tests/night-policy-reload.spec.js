@@ -23,6 +23,7 @@ async function boot(page) {
 test('night CI policy selection regenerates the quick owned loadout and persists across reloads',async({page},testInfo)=>{
  const retainReloadEvidence=observeReload(page,testInfo);
  try {
+ if(testInfo.project.metadata?.swProbe)await retainReloadEvidence.installSWProbe();
  await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
  await page.evaluate(()=>{
   const db=hdFEFindShip('夕立改二'),masterId=hdShipDbMasterRowFor(db).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'12.7cm連装砲',count:3},{name:'61cm四連装(酸素)魚雷',count:2},{name:'水雷戦隊 熟練見張員',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',masterId,gameShipId:71,level:90,gameSlotEx:0}]));
@@ -42,11 +43,27 @@ test('night CI policy selection regenerates the quick owned loadout and persists
 test('carrier night CI policy persists and regenerates the mobile loadout',async({page},testInfo)=>{
  const retainReloadEvidence=observeReload(page,testInfo);
  try {
+ if(testInfo.project.metadata?.swProbe)await retainReloadEvidence.installSWProbe();
  await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ if(testInfo.project.metadata?.retentionFixture)await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:120,syncedAt:Date.now()}));
+  if(!localStorage.getItem('harbordesk-pwa-v1'))localStorage.setItem('harbordesk-pwa-v1',JSON.stringify(blankState()));
+  saveCustomFleets({'1-1':[{id:'reload-retention',name:'Dedicated six-key fixture',ships:[{ship:'赤城改',gameShipId:882,masterId:hdShipDbMasterRowFor('赤城改').id,gear:'F6F-3N / TBM-3D / 夜間作戦航空要員 / F6F-3N'}]}]});
+  hdFCState('1-1','reload-retention');
+ });
  await page.evaluate(()=>{
   const ship='赤城改',masterId=hdShipDbMasterRowFor(hdFEFindShip(ship)).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'F6F-3N',count:2},{name:'TBM-3D',count:1},{name:'夜間作戦航空要員',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship,masterId,gameShipId:882,level:90,gameSlotEx:0}]));hdFSMap=()=> '1-1';hdFSPlans=()=>[{...hdFSGenerate('1-1',{name:'carrier fixture',ships:'正規空母1',gear:''},0),needs:[]}];const suggestion=hdFSPlans()[0];if(suggestion.slots.filter(x=>x.profile).length!==1)throw new Error('policy fixture must contain one owned ship');hdFSSuggestionHtml(suggestion);const card=document.createElement('article');card.id='carrier-policy-test';card.className='hd-fs-card';card.innerHTML='<button data-hd-fl-generate="0">自動配備</button><div class="hd-fl-host"></div>';document.body.appendChild(card);hdFLRender(0,card);
  });
- const card=page.locator('#carrier-policy-test');await card.locator('[data-hd-night-policy]').selectOption('cv-fighter2');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightCarrier(p.ships[0]).candidates.some(c=>c.attack==='cv-fighter2')})).toBe(true);await expect(card).toContainText('空母夜戦CI装備条件：成立');await expect(card).toContainText('残機未同期');expect(await page.evaluate(()=>HD_FL_CACHE['1-1:0'].ships[0].expansion)).toBeNull();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);retainReloadEvidence.mark('reload-start');await page.reload({waitUntil:'domcontentloaded'});retainReloadEvidence.mark('reload-domcontentloaded');await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('cv-fighter2');
+ const card=page.locator('#carrier-policy-test');await card.locator('[data-hd-night-policy]').selectOption('cv-fighter2');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightCarrier(p.ships[0]).candidates.some(c=>c.attack==='cv-fighter2')})).toBe(true);await expect(card).toContainText('空母夜戦CI装備条件：成立');await expect(card).toContainText('残機未同期');expect(await page.evaluate(()=>HD_FL_CACHE['1-1:0'].ships[0].expansion)).toBeNull();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ const saved=await page.evaluate(()=>{
+  const keys=['harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-kancolle-sync-v1','harbordesk-pwa-v1','harbordesk-custom-fleets-v1','harbordesk-fleet-calculator-v1'];
+  return {keys,values:keys.map(k=>localStorage.getItem(k))};
+ });
+ if(testInfo.project.metadata?.retentionFixture)expect(saved.values.every(v=>v!==null)).toBe(true);
+ await testInfo.attach('pre-reload-six-key-presence',{body:Buffer.from(JSON.stringify(saved.keys.map((key,i)=>({key,present:saved.values[i]!==null})))),contentType:'application/json'});
+ retainReloadEvidence.mark('reload-start');await page.reload({waitUntil:'domcontentloaded'});retainReloadEvidence.mark('reload-domcontentloaded');await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('cv-fighter2');
+ expect(await page.evaluate(keys=>keys.map(k=>localStorage.getItem(k)),saved.keys)).toEqual(saved.values);
+ retainReloadEvidence.mark('six-keys-restored');
  retainReloadEvidence.mark('policy-restored');
  expect(retainReloadEvidence.errors()).toEqual([]);
  } finally { await retainReloadEvidence(); }
@@ -55,6 +72,7 @@ test('carrier night CI policy persists and regenerates the mobile loadout',async
 test('carrier bomber CI policy persists and regenerates the mobile loadout',async({page},testInfo)=>{
  const retainReloadEvidence=observeReload(page,testInfo);
  try {
+ if(testInfo.project.metadata?.swProbe)await retainReloadEvidence.installSWProbe();
  await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
  await page.evaluate(()=>{
   const ship='赤城改',masterId=hdShipDbMasterRowFor(hdFEFindShip(ship)).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'九九式練爆二二型改(夜間装備実験機)',count:2},{name:'夜間作戦航空要員',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship,masterId,gameShipId:890,level:90,gameSlotEx:0}]));hdFSMap=()=> '1-1';hdFSPlans=()=>[{...hdFSGenerate('1-1',{name:'bomber fixture',ships:'正規空母1',gear:''},0),needs:[]}];const suggestion=hdFSPlans()[0];if(suggestion.slots.filter(x=>x.profile).length!==1)throw new Error('policy fixture must contain one owned ship');hdFSSuggestionHtml(suggestion);const card=document.createElement('article');card.id='bomber-policy-test';card.className='hd-fs-card';card.innerHTML='<button data-hd-fl-generate="0">自動配備</button><div class="hd-fl-host"></div>';document.body.appendChild(card);hdFLRender(0,card);
