@@ -1,0 +1,272 @@
+{
+  "sourceRun": 39127017545,
+  "sourceHead": "3de7ebf550ebc28e5f92125868034cbdf5cc0e15",
+  "profile": {
+    "swSource": "unmodified",
+    "serviceWorkers": "allow"
+  },
+  "idDefinition": "Node-side Playwright observation IDs, not browser protocol IDs",
+  "observerStartedAt": 1792326244228,
+  "newDocumentLifecycle": [
+    {
+      "ms": 2713,
+      "stage": "init",
+      "doc": 1792326246753,
+      "at": 187,
+      "readyState": "loading",
+      "lastScript": "",
+      "url": "",
+      "controller": {
+        "url": "http://127.0.0.1:4173/sw.js",
+        "state": "activated"
+      },
+      "worker": null
+    },
+    {
+      "ms": 2723,
+      "stage": "registration-initial",
+      "doc": 1792326246753,
+      "at": 194,
+      "readyState": "loading",
+      "lastScript": "",
+      "url": "",
+      "controller": {
+        "url": "http://127.0.0.1:4173/sw.js",
+        "state": "activated"
+      },
+      "worker": null,
+      "registration": {
+        "scope": "http://127.0.0.1:4173/",
+        "installing": {
+          "url": "http://127.0.0.1:4173/sw.js?v=580",
+          "state": "installing"
+        },
+        "waiting": null,
+        "active": {
+          "url": "http://127.0.0.1:4173/sw.js",
+          "state": "activated"
+        }
+      }
+    },
+    {
+      "ms": 2723,
+      "stage": "sw-state",
+      "doc": 1792326246753,
+      "at": 195,
+      "readyState": "loading",
+      "lastScript": "",
+      "url": "",
+      "controller": {
+        "url": "http://127.0.0.1:4173/sw.js?v=580",
+        "state": "installed"
+      },
+      "worker": {
+        "url": "http://127.0.0.1:4173/sw.js?v=580",
+        "state": "installed"
+      }
+    },
+    {
+      "ms": 2723,
+      "stage": "sw-state",
+      "doc": 1792326246753,
+      "at": 195,
+      "readyState": "loading",
+      "lastScript": "",
+      "url": "",
+      "controller": {
+        "url": "http://127.0.0.1:4173/sw.js?v=580",
+        "state": "installed"
+      },
+      "worker": {
+        "url": "http://127.0.0.1:4173/sw.js",
+        "state": "redundant"
+      }
+    },
+    {
+      "ms": 2723,
+      "stage": "sw-state",
+      "doc": 1792326246753,
+      "at": 195,
+      "readyState": "loading",
+      "lastScript": "",
+      "url": "",
+      "controller": {
+        "url": "http://127.0.0.1:4173/sw.js?v=580",
+        "state": "activating"
+      },
+      "worker": {
+        "url": "http://127.0.0.1:4173/sw.js?v=580",
+        "state": "activating"
+      }
+    },
+    {
+      "ms": 2723,
+      "stage": "controllerchange",
+      "doc": 1792326246753,
+      "at": 195,
+      "readyState": "loading",
+      "lastScript": "",
+      "url": "",
+      "controller": {
+        "url": "http://127.0.0.1:4173/sw.js?v=580",
+        "state": "activating"
+      },
+      "worker": null
+    },
+    {
+      "ms": 2723,
+      "stage": "registration-controller",
+      "doc": 1792326246753,
+      "at": 197,
+      "readyState": "loading",
+      "lastScript": "",
+      "url": "",
+      "controller": {
+        "url": "http://127.0.0.1:4173/sw.js?v=580",
+        "state": "activating"
+      },
+      "worker": null,
+      "registration": {
+        "scope": "http://127.0.0.1:4173/",
+        "installing": null,
+        "waiting": null,
+        "active": {
+          "url": "http://127.0.0.1:4173/sw.js?v=580",
+          "state": "activating"
+        }
+      }
+    },
+    {
+      "ms": 2724,
+      "stage": "sw-state",
+      "doc": 1792326246753,
+      "at": 199,
+      "readyState": "loading",
+      "lastScript": "",
+      "url": "",
+      "controller": {
+        "url": "http://127.0.0.1:4173/sw.js?v=580",
+        "state": "activated"
+      },
+      "worker": {
+        "url": "http://127.0.0.1:4173/sw.js?v=580",
+        "state": "activated"
+      }
+    },
+    {
+      "ms": 32714,
+      "stage": "stall-loading",
+      "doc": 1792326246753,
+      "at": 30188.000000000004,
+      "readyState": "loading",
+      "lastScript": "http://127.0.0.1:4173/update-manager.js?v=580",
+      "url": "",
+      "controller": {
+        "url": "http://127.0.0.1:4173/sw.js?v=580",
+        "state": "activated"
+      },
+      "worker": null
+    },
+    {
+      "ms": 32714,
+      "stage": "registration-stalled",
+      "doc": 1792326246753,
+      "at": 30188.000000000004,
+      "readyState": "loading",
+      "lastScript": "http://127.0.0.1:4173/update-manager.js?v=580",
+      "url": "",
+      "controller": {
+        "url": "http://127.0.0.1:4173/sw.js?v=580",
+        "state": "activated"
+      },
+      "worker": null,
+      "registration": {
+        "scope": "http://127.0.0.1:4173/",
+        "installing": null,
+        "waiting": null,
+        "active": {
+          "url": "http://127.0.0.1:4173/sw.js?v=580",
+          "state": "activated"
+        }
+      }
+    }
+  ],
+  "lastStaticLoad": {
+    "ms": 2834,
+    "stage": "script-load",
+    "doc": 1792326246753,
+    "at": 309,
+    "readyState": "loading",
+    "lastScript": "http://127.0.0.1:4173/update-manager.js?v=580",
+    "url": "http://127.0.0.1:4173/update-manager.js?v=580",
+    "controller": {
+      "url": "http://127.0.0.1:4173/sw.js?v=580",
+      "state": "activated"
+    },
+    "worker": null
+  },
+  "pendingRequests": [
+    {
+      "ms": 2722,
+      "kind": "context-request",
+      "id": 228,
+      "url": "http://127.0.0.1:4173/map-strategy-navigator.js?v=580",
+      "owner": "frame",
+      "type": "script"
+    },
+    {
+      "ms": 2722,
+      "kind": "request",
+      "id": 228,
+      "url": "http://127.0.0.1:4173/map-strategy-navigator.js?v=580",
+      "owner": "frame",
+      "type": "script",
+      "navigation": false
+    },
+    {
+      "ms": 2722,
+      "kind": "context-request",
+      "id": 229,
+      "url": "http://127.0.0.1:4173/strategy-goals.js?v=580",
+      "owner": "frame",
+      "type": "script"
+    },
+    {
+      "ms": 2722,
+      "kind": "request",
+      "id": 229,
+      "url": "http://127.0.0.1:4173/strategy-goals.js?v=580",
+      "owner": "frame",
+      "type": "script",
+      "navigation": false
+    }
+  ],
+  "script43": {
+    "request": true,
+    "response": true,
+    "requestfinished": true,
+    "nativeScriptLoad": true,
+    "responseFromServiceWorkerFlag": false,
+    "note": "Flag alone does not establish current SW fetch dispatch or source."
+  },
+  "pendingStages": {
+    "44": {
+      "responseObserved": false,
+      "requestfinishedObserved": false,
+      "requestfailedObserved": false,
+      "nativeScriptLoadObserved": false,
+      "bodyCompletion": "unknown",
+      "swInternalStages": "not instrumented"
+    },
+    "45": {
+      "responseObserved": false,
+      "requestfinishedObserved": false,
+      "requestfailedObserved": false,
+      "nativeScriptLoadObserved": false,
+      "bodyCompletion": "unknown",
+      "swInternalStages": "not instrumented"
+    }
+  },
+  "serverObservation": "2026-10-18 JST 21:24:06.741-21:24:55.200: versioned GET header records for 1..43, none for 44/45. Unversioned install/precache requests are distinct. Missing logs alone do not prove network failure.",
+  "cause": "unconfirmed"
+}

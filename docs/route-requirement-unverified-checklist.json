@@ -393,7 +393,8 @@
         "空の保存編成から、個体・改修別在庫・全装備位置を検査した同期配備候補を採用。未知の索敵ボーナス差分は未判定を維持。",
         "同じ艦と合法装備/有限在庫の算術境界fixtureで33式49の直下・丁度・超過、全5モード/保存6キー/再読込/プランナー。実プレイヤーのLv別索敵再現という主張ではない。",
         "既存16候補の各艦同期表示索敵・装備素索敵・★/位置の差を記録。同期外15候補の新ボーナス差は未確認を維持。",
-        "2枠可変/他枠固定の有限部分領域で、同期復元shortcutを無効化した探索と独立列挙の照合（一般探索全体の完全性ではない）。"
+        "2枠可変/他枠固定の有限部分領域で、同期復元shortcutを無効化した探索と独立列挙の照合（一般探索全体の完全性ではない）。",
+        "2枠限定照合を保持し、3枠/他枠固定へ拡張。独立4数値解と照合し、同期候補shortcutなしで26評価で成立候補発見。beam-limit/exhaustive=false、同期外15候補manualを維持。"
       ],
       "remaining": [
         {
@@ -428,7 +429,8 @@
         "Sequential air model keeps manual readiness; arbitrary hull/inventory/bonus combinations not covered"
       ],
       "continuationEvidence": "docs/pr152-startup-and-north-search-ja.md",
-      "passiveSWContinuationEvidence": "docs/pr152-passive-sw-and-finite-domain-ja.md"
+      "passiveSWContinuationEvidence": "docs/pr152-passive-sw-and-finite-domain-ja.md",
+      "script44ContinuationEvidence": "docs/pr152-script44-response-stages-ja.md"
     },
     {
       "map": "2-5",

@@ -21,7 +21,7 @@ function observeReload(page, testInfo) {
     if (data.stage === 'sw-stage') {
       const w = data.sw || {}, key = w.worker + ':' + w.seq;
       if (swSeen.has(key)) return; swSeen.add(key);
-      item.sw = { worker: w.worker, seq: w.seq, id: w.id, at: w.at, stage: String(w.stage || ''), url: safeUrl(w.url), status: w.status, hit: w.hit };
+      item.sw = { worker: w.worker, seq: w.seq, id: w.id, at: w.at, stage: String(w.stage || ''), url: safeUrl(w.url), status: w.status, hit: w.hit, source: ['network','cache','none','unknown'].includes(w.source) ? w.source : undefined, contentLength: /^\d+$/.test(w.contentLength || '') ? w.contentLength : undefined };
     }
     const summary = nativeDocuments.get(item.doc) || { doc: item.doc, scriptLoads: 0, scriptErrors: 0 };
     Object.assign(summary, { readyState: item.readyState, lastScript: item.lastScript, controller: item.controller });

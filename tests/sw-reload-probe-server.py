@@ -7,20 +7,39 @@ import pathlib
 import urllib.parse
 import threading
 import json
+import socket
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--directory', required=True)
 parser.add_argument('--port', type=int, default=4173)
 parser.add_argument('--gate-script', default='')
+parser.add_argument('--drop-target-scripts', action='store_true')
 args = parser.parse_args()
 root = pathlib.Path(args.directory).resolve()
 gate = threading.Event()
 gate.set()
+drop_targets = False
 gate_details = {"headerFlushed": False, "partialBytes": 0}
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
+    def end_headers(self):
+        url = urllib.parse.urlsplit(self.path)
+        if args.drop_target_scripts and url.path in ['/map-strategy-navigator.js', '/strategy-goals.js'] and 'v' in urllib.parse.parse_qs(url.query):
+            # Source comparison must reach SW fetch, not reuse the browser HTTP cache.
+            # Cache API still accepts these responses; only this private flag opts in.
+            self.send_header('Cache-Control', 'no-store')
+        return super().end_headers()
+
     def do_GET(self):
+        url = urllib.parse.urlsplit(self.path)
+        if args.drop_target_scripts and drop_targets and url.path in ['/map-strategy-navigator.js', '/strategy-goals.js'] and 'v' in urllib.parse.parse_qs(url.query):
+            # Explicit private fault: network rejection, not HTTP 503 (which fetch resolves).
+            self.log_message('controlled network drop: %s', url.path)
+            self.connection.shutdown(socket.SHUT_RDWR)
+            self.connection.close()
+            self.close_connection = True
+            return
         if args.gate_script and self.path == '/__hd_probe_gate/state':
             content = json.dumps(gate_details).encode()
             self.send_response(200)
@@ -32,6 +51,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return super().do_GET()
 
     def do_POST(self):
+        global drop_targets
+        if args.drop_target_scripts and self.path in ['/__hd_probe_drop/arm', '/__hd_probe_drop/release']:
+            drop_targets = self.path.endswith('/arm')
+            self.send_response(204)
+            self.end_headers()
+            return
         if args.gate_script and self.path in ['/__hd_probe_gate/arm', '/__hd_probe_gate/release']:
             if self.path.endswith('/arm'):
                 gate.clear()
