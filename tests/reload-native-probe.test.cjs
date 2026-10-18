@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const vm = require('node:vm');
 const { reloadNativeProbe } = require('./reload-native-probe.cjs');
 
-test('native probe records script/state events without changing register promise or waiting for a timer', async () => {
+test('passive native probe leaves registration untouched and records loading state without extra fetch', async () => {
   const listeners = new Map(), records = [], cleared = [];
   const target = prefix => ({ addEventListener: (name, fn) => listeners.set(prefix + name, fn) });
   const active = { ...target('worker:'), scriptURL: 'http://localhost/sw.js?v=580', state: 'activated' };
@@ -11,6 +11,7 @@ test('native probe records script/state events without changing register promise
   const originalPromise = Promise.resolve(reg), calls = [];
   const sw = { ...target('sw:'), controller: active, getRegistration: () => Promise.resolve(reg), register: function(...args) { calls.push({ receiver: this, args }); return originalPromise; } };
   const document = { ...target('document:'), readyState: 'loading' };
+  const nativeRegister = sw.register;
   let watchdog;
   vm.runInNewContext('(' + reloadNativeProbe.toString() + ')({instrumentSW:false})', {
     URL, location: { href: 'http://localhost/' }, performance: { timeOrigin: 1000, now: () => 1 },
@@ -19,8 +20,9 @@ test('native probe records script/state events without changing register promise
     setTimeout: (fn, ms) => { assert.equal(ms, 30000); watchdog = fn; return 1; }, clearTimeout: id => cleared.push(id),
     fetch: () => { throw new Error('probe must not fetch'); },
   });
+  assert.equal(sw.register, nativeRegister);
   assert.equal(sw.register('./sw.js'), originalPromise);
-  assert.equal(calls[0].receiver, sw); assert.deepEqual(calls[0].args, ['./sw.js', undefined]);
+  assert.equal(calls[0].receiver, sw); assert.deepEqual(calls[0].args, ['./sw.js']);
   await new Promise(resolve => setImmediate(resolve));
   listeners.get('document:load')({ target: { tagName: 'SCRIPT', src: 'http://localhost/training-planner.js?v=580' } });
   assert.equal(records.at(-1).stage, 'script-load');

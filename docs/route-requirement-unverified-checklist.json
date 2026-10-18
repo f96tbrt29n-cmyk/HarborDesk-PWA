@@ -391,7 +391,9 @@
         "空7枠の有限探索未完了、装備変更時の索敵ボーナス未確認、連戦制空manualを成立にしない",
         "搭載許可のない噴式機を候補/配備/制空へ算入しない、5艦×9装備の許可表一致、全181増設専用許可の形態ID/枠数/必要★保持（共通基盤）",
         "空の保存編成から、個体・改修別在庫・全装備位置を検査した同期配備候補を採用。未知の索敵ボーナス差分は未判定を維持。",
-        "同じ艦と合法装備/有限在庫の算術境界fixtureで33式49の直下・丁度・超過、全5モード/保存6キー/再読込/プランナー。実プレイヤーのLv別索敵再現という主張ではない。"
+        "同じ艦と合法装備/有限在庫の算術境界fixtureで33式49の直下・丁度・超過、全5モード/保存6キー/再読込/プランナー。実プレイヤーのLv別索敵再現という主張ではない。",
+        "既存16候補の各艦同期表示索敵・装備素索敵・★/位置の差を記録。同期外15候補の新ボーナス差は未確認を維持。",
+        "2枠可変/他枠固定の有限部分領域で、同期復元shortcutを無効化した探索と独立列挙の照合（一般探索全体の完全性ではない）。"
       ],
       "remaining": [
         {
@@ -425,7 +427,8 @@
         "Finite search can fail to find numerical solutions; incomplete is not a shortage proof",
         "Sequential air model keeps manual readiness; arbitrary hull/inventory/bonus combinations not covered"
       ],
-      "continuationEvidence": "docs/pr152-startup-and-north-search-ja.md"
+      "continuationEvidence": "docs/pr152-startup-and-north-search-ja.md",
+      "passiveSWContinuationEvidence": "docs/pr152-passive-sw-and-finite-domain-ja.md"
     },
     {
       "map": "2-5",

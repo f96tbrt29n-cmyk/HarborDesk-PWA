@@ -91,3 +91,15 @@ test('native DCL can be distinguished from a still-pending Playwright reload wai
  retain.mark('reload-start');page.emit('console',{text:()=> '__HD_RELOAD_NATIVE__'+JSON.stringify({stage:'native-dcl',doc:1,at:5,readyState:'interactive'})});retain.failure();await retain();
  const d=JSON.parse(await fs.readFile(path.join(dir,'reload-navigation-evidence.json'),'utf8'));assert.equal(d.nativeDetailsReason,'reload-wait-failure');assert.equal(d.nativeSummary[0].readyState,'interactive');assert.equal(d.nativeEvents[0].stage,'native-dcl');await fs.rm(dir,{recursive:true});
 });
+
+test('artifacts distinguish unmodified allowed blocked and isolated instrumented SW profiles',async()=>{
+ for(const [serviceWorkers,instrumentSW] of [['allow',false],['block',false],['allow',true]]){
+  const context=new EventEmitter(),page=new EventEmitter(),dir=await fs.mkdtemp(path.join(os.tmpdir(),'reload-profile-'));
+  page.context=()=>context;page.addInitScript=async()=>{};
+  const retain=observeReload(page,{title:'profile identity',project:{use:{serviceWorkers}},outputPath:n=>path.join(dir,n),attach:async()=>{}});
+  await retain.installNativeEvents({instrumentSW});await retain();
+  const d=JSON.parse(await fs.readFile(path.join(dir,'reload-navigation-evidence.json'),'utf8'));
+  assert.equal(d.profile.swSource,instrumentSW?'test-instrumented':'unmodified');assert.equal(d.profile.serviceWorkers,serviceWorkers);assert.equal(d.instrumentSW,instrumentSW);
+  await fs.rm(dir,{recursive:true});
+ }
+});

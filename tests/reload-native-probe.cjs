@@ -29,7 +29,8 @@ function reloadNativeProbe({ instrumentSW = false } = {}) {
   const inspect = stage => sw?.getRegistration().then(r => snapshot(r, stage)).catch(() => emit('registration-query-failed'));
   emit('init'); watchWorker(sw?.controller); inspect('registration-initial');
   sw?.addEventListener('controllerchange', () => { emit('controllerchange'); watchWorker(sw.controller); inspect('registration-controller'); });
-  if (sw) {
+  // Leave native registration untouched in unmodified-SW observations.
+  if (sw && instrumentSW) {
     const register = sw.register;
     sw.register = function(script, options) {
       let target = script;

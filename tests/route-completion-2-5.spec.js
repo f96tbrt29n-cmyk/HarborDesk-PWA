@@ -225,11 +225,36 @@ test('north all sixteen independent finite numeric candidates remain unconfirmed
     ship.items[index]=hdOCEquipment(row,slot);
    });
    const items=hdFEAssigned(plan),measure=hdOCMeasure(plan,[]),usage=hdFOAssignedUsage(plan),inventory=Object.fromEntries(built.inventory.map(x=>[x.key,x.count]));
-   return {answer,required:measure.requiredChecks.filter(x=>!['scoutingValue','airValue'].includes(x.condition?.kind)),master:hdFEMasterValidation(plan),inventory:Object.entries(usage).every(([k,v])=>v<=(inventory[k]||0)),score:hdFEScouting(plan,items).score,air:hdFEAir(items).basePower,match:hdFEGameMatch(plan).status,los:measure.requiredChecks.find(x=>x.condition.kind==='scoutingValue'),readiness:hdOCReadiness(plan,measure).registeredReady,sourceUnchanged:JSON.stringify(built.plan)===original};
+   const bonusInputs=plan.ships.map(ship=>{const row=hdFCProposalRoster(ship),synced=row.gameGearSlots,proposed=hdFEGearTokens(hdOCShipGear(ship)),raw=synced.reduce((n,label)=>n+(Number(hdFEFind(hdFEParseGearLabel(label).name)?.stats?.索敵)||0),0);return {gameShipId:ship.gameShipId,level:row.level,displayedLos:row.gameLos,synchronizedRawEquipmentLos:raw,observedShipTermInput:row.gameLos-raw,synchronizedSlots:synced,proposedSlots:proposed,sameSlots:JSON.stringify(synced)===JSON.stringify(proposed),newBonusDeltaKnown:JSON.stringify(synced)===JSON.stringify(proposed)}});
+   return {answer,bonusInputs,hq:hdFEScouting(plan,items).hq,coef:hdFEScouting(plan,items).coef,required:measure.requiredChecks.filter(x=>!['scoutingValue','airValue'].includes(x.condition?.kind)),master:hdFEMasterValidation(plan),inventory:Object.entries(usage).every(([k,v])=>v<=(inventory[k]||0)),score:hdFEScouting(plan,items).score,air:hdFEAir(items).basePower,match:hdFEGameMatch(plan).status,los:measure.requiredChecks.find(x=>x.condition.kind==='scoutingValue'),readiness:hdOCReadiness(plan,measure).registeredReady,sourceUnchanged:JSON.stringify(built.plan)===original};
   });
  },answers);
  await info.attach('sixteen-north-candidates',{body:Buffer.from(JSON.stringify(results,null,2)),contentType:'application/json'});
- for(const r of results){expect(r.required.every(x=>x.ok)).toBe(true);expect(r.master.valid).toBe(true);expect(r.inventory).toBe(true);expect(r.score).toBeCloseTo(r.answer.los,8);expect(r.air).toBe(r.answer.air);expect(r.sourceUnchanged).toBe(true);if(r.match!=='ready'){expect(r.los.status).toBe('manual');expect(r.readiness).toBe(false)}}
+ expect(results.filter(r=>r.bonusInputs.every(x=>x.sameSlots))).toHaveLength(1);
+ for(const r of results){expect(r.hq).toBe(120);expect(r.coef).toBe(1);expect(r.bonusInputs.every(x=>x.level===90&&x.observedShipTermInput===41)).toBe(true);expect(r.required.every(x=>x.ok)).toBe(true);expect(r.master.valid).toBe(true);expect(r.inventory).toBe(true);expect(r.score).toBeCloseTo(r.answer.los,8);expect(r.air).toBe(r.answer.air);expect(r.sourceUnchanged).toBe(true);if(r.match!=='ready'){expect(r.bonusInputs.some(x=>!x.newBonusDeltaKnown)).toBe(true);expect(r.los.status).toBe('manual');expect(r.readiness).toBe(false)}}
+});
+
+test('north two-slot finite domain matches independent enumeration without the synchronized seed shortcut',async({page},info)=>{
+ // Ablation only: five other critical slots and all guns/drums/radars are fixed.
+ // This does not claim completeness of the unrestricted beam search.
+ const answers=oracle().filter(a=>a.slots.slice(2).join()===['1','1','2','2','3'].join());
+ expect(answers).toHaveLength(2);await prepare(page);
+ const r=await page.evaluate(()=>{
+  const fleet={...completionFleet,ships:completionFleet.ships.map((s,i)=>i?s:{...s,gear:hdFEGearTokens(s.gear).slice(0,2).concat(['','']).join(' / ')})};
+  saveCustomFleets({'2-5':[fleet]});const c=hdOCContext('2-5','completion',0),build=hdOCBuild,seed=hdOCSynchronizedSeed;
+  let seedCalls=0;
+  hdOCBuild=context=>{const b=build(context);return {...b,slots:b.slots.filter(s=>s.si===0&&!s.expansion&&s.index>=2)}};
+  hdOCSynchronizedSeed=()=>{seedCalls++;return null};
+  try{
+   const steps=hdOCSearchSteps(c,{maxExamined:1000,maxDepth:2});let n;do{n=steps.next()}while(!n.done);const result=n.value,p=result.plan,items=hdFEAssigned(p);
+   return {seedCalls,search:result.search,required:result.measure.requiredChecks,complete:result.measure.complete,air:hdFEAir(items).basePower,scouting:hdFEScouting(p,items),game:hdFEGameMatch(p),master:hdFEMasterValidation(p),usage:hdFOAssignedUsage(p),inventory:Object.fromEntries(build(c).inventory.map(x=>[x.key,x.count])),slots:p.ships[0].items.filter(x=>x.slotIndex>=2).map(x=>({name:x.name,star:x.star,slotIndex:x.slotIndex,capacity:x.capacity})),untouched:JSON.stringify(p.ships.slice(1))===JSON.stringify(build(c).plan.ships.slice(1)),readiness:hdOCReadiness(p,result.measure)};
+  }finally{hdOCBuild=build;hdOCSynchronizedSeed=seed}
+ });
+ await info.attach('two-slot-general-search-ablation',{body:Buffer.from(JSON.stringify({answers,result:r},null,2)),contentType:'application/json'});
+ expect(r.seedCalls).toBeGreaterThan(0);expect(r.search.status).toBe('targets-met');expect(r.complete).toBe(true);expect(r.required.every(x=>x.ok)).toBe(true);expect(r.game.status).toBe('ready');expect(r.master.valid).toBe(true);expect(r.untouched).toBe(true);
+ expect(r.slots.map(x=>[x.name,x.star,x.slotIndex])).toEqual([['零式水上観測機',4,2],['強風改二',0,3]]);
+ expect(r.air).toBe(answers[0].air);expect(r.scouting.score).toBeCloseTo(answers[0].los,8);for(const [key,count] of Object.entries(r.usage))expect(count,key).toBeLessThanOrEqual(r.inventory[key]||0);
+ expect(r.readiness.registeredReady).toBe(false); // Route-loss/other unknowns stay unknown.
 });
 
 test('diagnostic upstream failures never claim current masters or alter the north fleet and six saved keys',async({page},info)=>{
