@@ -8,6 +8,8 @@ import urllib.parse
 import threading
 import json
 import socket
+import time
+import itertools
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--directory', required=True)
@@ -20,6 +22,17 @@ gate = threading.Event()
 gate.set()
 drop_targets = False
 gate_details = {"headerFlushed": False, "partialBytes": 0}
+transfer_events = []
+transfer_ids = itertools.count(1)
+transfer_lock = threading.Lock()
+
+
+def transfer_stage(request_id, stage, path, **extra):
+    # Explicit --gate-script experiments only. IDs are server-local, not browser IDs.
+    with transfer_lock:
+        transfer_events.append(dict(id=request_id, stage=stage, path=path,
+                                    utcMs=time.time_ns() // 1_000_000, **extra))
+        del transfer_events[:-128]
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -33,6 +46,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         url = urllib.parse.urlsplit(self.path)
+        if args.gate_script and url.path == '/' + args.gate_script and 'v' in urllib.parse.parse_qs(url.query):
+            self.transfer_id = next(transfer_ids)
+            transfer_stage(self.transfer_id, 'request-accepted', url.path)
         if args.drop_target_scripts and drop_targets and url.path in ['/map-strategy-navigator.js', '/strategy-goals.js'] and 'v' in urllib.parse.parse_qs(url.query):
             # Explicit private fault: network rejection, not HTTP 503 (which fetch resolves).
             self.log_message('controlled network drop: %s', url.path)
@@ -40,8 +56,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.connection.close()
             self.close_connection = True
             return
-        if args.gate_script and self.path == '/__hd_probe_gate/state':
-            content = json.dumps(gate_details).encode()
+        if args.gate_script and self.path in ['/__hd_probe_gate/state', '/__hd_probe_gate/transfers']:
+            with transfer_lock:
+                content = json.dumps(transfer_events if self.path.endswith('/transfers') else gate_details).encode()
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Content-Length', str(len(content)))
@@ -71,11 +88,23 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def copyfile(self, source, outputfile):
         url = urllib.parse.urlsplit(self.path)
         if args.gate_script and url.path == '/' + args.gate_script and 'v' in urllib.parse.parse_qs(url.query):
-            partial = source.read(1024)
-            outputfile.write(partial)
-            outputfile.flush()  # Server-side flush; browser notifications may be delayed.
-            gate_details.update(headerFlushed=True, partialBytes=len(partial))
-            gate.wait(45)       # Controlled fault only; explicit release normally ends it.
+            request_id = self.transfer_id
+            transfer_stage(request_id, 'copy-start', url.path)
+            try:
+                partial = source.read(1024)
+                outputfile.write(partial)
+                outputfile.flush()  # Server-side flush; not browser consumption/ACK.
+                gate_details.update(headerFlushed=True, partialBytes=len(partial))
+                transfer_stage(request_id, 'prefix-flushed', url.path, bytes=len(partial))
+                gate.wait(45)       # Controlled fault only; original deadline unchanged.
+                super().copyfile(source, outputfile)
+                transfer_stage(request_id, 'copy-returned', url.path, sourceBytes=source.tell())
+                outputfile.flush()
+                transfer_stage(request_id, 'flush-returned', url.path)
+            except (OSError, ValueError) as error:
+                transfer_stage(request_id, 'copy-failed', url.path, errorType=type(error).__name__)
+                raise
+            return
         return super().copyfile(source, outputfile)
 
     def send_head(self):

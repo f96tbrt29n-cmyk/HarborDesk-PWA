@@ -5,11 +5,11 @@ const { performance } = require('node:perf_hooks');
 const { reloadNativeProbe } = require('./reload-native-probe.cjs');
 function observeReload(page, testInfo) {
   const startedAt = Date.now(), started = performance.now(), events = [], ids = new WeakMap(), sized = new WeakSet();
-  let nextId = 0, closed = false, failed = false, reloadStarted = false, reloadPending = false, nativeStall = false, instrumentSW = false;
+  let nextId = 0, closed = false, failed = false, reloadStarted = false, reloadPending = false, nativeStall = false, instrumentSW = false, resourceTiming = true;
   const native = [], nativeDocuments = new Map(), swSeen = new Set();
   let nativeDropped = 0;
   const workerInfo = w => w ? { url: safeUrl(w.url), state: String(w.state || '') } : null;
-  const stages = new Set(['init','ready-state','native-dcl','window-load','pagehide','script-load','script-error','register-call','register-resolved','register-rejected','registration-initial','registration-controller','registration-stalled','registration-query-failed','controllerchange','updatefound','sw-state','stall-loading','sw-stage','probe-subscribe-failed']);
+  const stages = new Set(['init','ready-state','native-dcl','window-load','pagehide','script-load','script-error','register-call','register-resolved','register-rejected','registration-initial','registration-controller','registration-stalled','registration-query-failed','controllerchange','updatefound','sw-state','stall-loading','sw-stage','probe-subscribe-failed','resource-complete','resource-observer','resource-summary']);
   const nativeConsole = message => {
     const text = message.text();
     if (!text.startsWith('__HD_RELOAD_NATIVE__') || text.length > 16384) return;
@@ -17,6 +17,13 @@ function observeReload(page, testInfo) {
 
     if (!stages.has(data.stage) || typeof data.doc !== 'number') return;
     const item = { ms: Math.round(performance.now() - started), stage: data.stage, doc: data.doc, at: data.at, readyState: data.readyState, lastScript: safeUrl(data.lastScript), url: safeUrl(data.url), controller: workerInfo(data.controller), worker: workerInfo(data.worker) };
+    if (data.stage === 'resource-complete') {
+      item.timing = {};
+      for (const key of ['startTime','duration','workerStart','fetchStart','requestStart','responseStart','responseEnd','transferSize','encodedBodySize','decodedBodySize']) if (Number.isFinite(data.timing?.[key]) && data.timing[key] >= 0) item.timing[key] = data.timing[key];
+      item.initiatorType = String(data.initiatorType || '').slice(0,32);
+    }
+    if (data.stage === 'resource-observer' && ['observing','unavailable','disabled'].includes(data.observerState)) item.observerState = data.observerState;
+    if (data.stage === 'resource-summary') for (const key of ['resourceCount','resourceDropped','resourceBufferFull']) if (Number.isInteger(data[key]) && data[key] >= 0) item[key] = data[key];
     if (data.registration) item.registration = { scope: safeUrl(data.registration.scope), installing: workerInfo(data.registration.installing), waiting: workerInfo(data.registration.waiting), active: workerInfo(data.registration.active) };
     if (data.stage === 'sw-stage') {
       const w = data.sw || {}, key = w.worker + ':' + w.seq;
@@ -24,6 +31,15 @@ function observeReload(page, testInfo) {
       item.sw = { worker: w.worker, seq: w.seq, id: w.id, at: w.at, stage: String(w.stage || ''), url: safeUrl(w.url), status: w.status, hit: w.hit, source: ['network','cache','none','unknown'].includes(w.source) ? w.source : undefined, contentLength: /^\d+$/.test(w.contentLength || '') ? w.contentLength : undefined };
     }
     const summary = nativeDocuments.get(item.doc) || { doc: item.doc, scriptLoads: 0, scriptErrors: 0 };
+    if (item.stage === 'resource-complete') {
+      summary.resources = summary.resources || [];
+      if (summary.resources.length < 128) summary.resources.push({ ms: item.ms, at: item.at, url: item.url, timing: item.timing, initiatorType: item.initiatorType });
+    }
+    if (item.observerState) summary.resourceObserver = item.observerState;
+    if (item.stage === 'resource-summary') {
+      summary.resourceStatsAt = item.at;
+      for (const key of ['resourceCount','resourceDropped','resourceBufferFull']) summary[key] = item[key];
+    }
     Object.assign(summary, { readyState: item.readyState, lastScript: item.lastScript, controller: item.controller });
     if (item.registration) summary.registration = item.registration;
     if (item.stage === 'script-load') summary.scriptLoads++;
@@ -86,7 +102,7 @@ function observeReload(page, testInfo) {
     for (const [name, handler] of Object.entries(contextHandlers)) context.off(name, handler);
     closed = true;
     const retainNative = !!testInfo.project?.metadata?.keepNative || failed && (reloadPending || nativeStall);
-    const body = JSON.stringify({ test: testInfo.title, startedAt, events, instrumentSW, profile: { swSource: instrumentSW ? 'test-instrumented' : 'unmodified', serviceWorkers: testInfo.project?.use?.serviceWorkers || 'allow' }, nativeSummary: [...nativeDocuments.values()], nativeDetailsReason: retainNative ? failed && (reloadPending || nativeStall) ? 'reload-wait-failure' : 'diagnostic-control' : 'summary-only', nativeDropped, nativeEvents: retainNative ? native : [] }, null, 2);
+    const body = JSON.stringify({ test: testInfo.title, startedAt, events, instrumentSW, profile: { swSource: instrumentSW ? 'test-instrumented' : 'unmodified', serviceWorkers: testInfo.project?.use?.serviceWorkers || 'allow', resourceTiming }, nativeSummary: [...nativeDocuments.values()], nativeDetailsReason: retainNative ? failed && (reloadPending || nativeStall) ? 'reload-wait-failure' : 'diagnostic-control' : 'summary-only', nativeDropped, nativeEvents: retainNative ? native : [] }, null, 2);
     const target = testInfo.outputPath('reload-navigation-evidence.json');
     await fs.mkdir(path.dirname(target), { recursive: true });
     await fs.writeFile(target, body);
@@ -105,7 +121,8 @@ function observeReload(page, testInfo) {
   retain.errors = () => events.filter(event => event.kind === 'pageerror');
   retain.installNativeEvents = async (options = {}) => {
     instrumentSW = !!options.instrumentSW;
-    await page.addInitScript(reloadNativeProbe, { instrumentSW });
+    resourceTiming = (options.resourceTiming ?? testInfo.project?.metadata?.resourceTiming) !== false;
+    await page.addInitScript(reloadNativeProbe, { instrumentSW, resourceTiming });
   };
   return retain;
 }

@@ -1,11 +1,31 @@
 // Serialized as an init script in focused reload tests only.
-function reloadNativeProbe({ instrumentSW = false } = {}) {
+function reloadNativeProbe({ instrumentSW = false, resourceTiming = true } = {}) {
   const prefix = '__HD_RELOAD_NATIVE__', doc = performance.timeOrigin;
   const sw = navigator.serviceWorker, watched = new WeakSet(), registrations = new WeakSet(), subscribed = new WeakSet();
   let lastScript = '', sequence = 0;
   const url = value => { try { const u = new URL(value, location.href), v = u.searchParams.get('v'); u.username = ''; u.password = ''; u.hash = ''; u.search = ''; if (/^\d+$/.test(v || '')) u.searchParams.set('v', v); return u.href; } catch { return ''; } };
   const worker = w => w ? { url: url(w.scriptURL), state: w.state } : null;
   const emit = (stage, extra = {}) => console.debug(prefix + JSON.stringify({ stage, doc, at: performance.now(), readyState: document.readyState, lastScript, controller: worker(sw?.controller), ...extra }));
+  // Completion entries only: an absent entry is not a failed request. Do not
+  // fetch/read bodies, alter the timing buffer, inspect layout, or wrap fetch.
+  let resourceObserver, resourceCount = 0, resourceDropped = 0, resourceBufferFull = 0;
+  const resourceFields = ['startTime','duration','workerStart','fetchStart','requestStart','responseStart','responseEnd','transferSize','encodedBodySize','decodedBodySize'];
+  const recordResources = entries => {
+    for (const entry of entries) {
+      let source; try { source = new URL(entry.name, location.href); } catch { continue; }
+      if (source.origin !== new URL(location.href).origin || !source.pathname.endsWith('.js')) continue;
+      if (resourceCount >= 128) { resourceDropped++; continue; }
+      const timing = {};
+      for (const key of resourceFields) if (Number.isFinite(entry[key]) && entry[key] >= 0) timing[key] = entry[key];
+      resourceCount++;
+      emit('resource-complete', { url: url(source.href), timing, initiatorType: String(entry.initiatorType || '').slice(0,32) });
+    }
+  };
+  const resourceSummary = () => {
+    if (!resourceObserver) return;
+    recordResources(resourceObserver.takeRecords());
+    emit('resource-summary', { resourceCount, resourceDropped, resourceBufferFull });
+  };
   const subscribe = w => {
     if (!instrumentSW || !w || subscribed.has(w)) return;
     subscribed.add(w);
@@ -28,6 +48,14 @@ function reloadNativeProbe({ instrumentSW = false } = {}) {
   };
   const inspect = stage => sw?.getRegistration().then(r => snapshot(r, stage)).catch(() => emit('registration-query-failed'));
   emit('init'); watchWorker(sw?.controller); inspect('registration-initial');
+  if (resourceTiming && typeof PerformanceObserver === 'function') {
+    try {
+      resourceObserver = new PerformanceObserver(list => recordResources(list.getEntries()));
+      resourceObserver.observe({ type: 'resource', buffered: true });
+      performance.addEventListener?.('resourcetimingbufferfull', () => { resourceBufferFull++; });
+      emit('resource-observer', { observerState: 'observing' });
+    } catch { resourceObserver = null; emit('resource-observer', { observerState: 'unavailable' }); }
+  } else emit('resource-observer', { observerState: resourceTiming ? 'unavailable' : 'disabled' });
   sw?.addEventListener('controllerchange', () => { emit('controllerchange'); watchWorker(sw.controller); inspect('registration-controller'); });
   // Leave native registration untouched in unmodified-SW observations.
   if (sw && instrumentSW) {
@@ -53,9 +81,10 @@ function reloadNativeProbe({ instrumentSW = false } = {}) {
   // No timeout/assertion is changed, and no DOM snapshot/layout/network is read.
   const watchdog = setTimeout(() => {
     if (document.readyState !== 'loading') return;
+    resourceSummary();
     emit('stall-loading'); inspect('registration-stalled');
   }, 30000);
-  document.addEventListener('DOMContentLoaded', () => { clearTimeout(watchdog); emit('native-dcl'); }, { once: true });
+  document.addEventListener('DOMContentLoaded', () => { clearTimeout(watchdog); resourceSummary(); emit('native-dcl'); }, { once: true });
   window.addEventListener('pagehide', () => emit('pagehide'), { once: true });
 }
 module.exports = { reloadNativeProbe };

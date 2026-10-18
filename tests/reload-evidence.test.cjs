@@ -103,3 +103,14 @@ test('artifacts distinguish unmodified allowed blocked and isolated instrumented
   await fs.rm(dir,{recursive:true});
  }
 });
+
+test('completed resource timings survive a successful reload without retaining arbitrary fields',async()=>{
+ const context=new EventEmitter(),page=new EventEmitter(),dir=await fs.mkdtemp(path.join(os.tmpdir(),'reload-resource-'));
+ page.context=()=>context;page.addInitScript=async()=>{};
+ const retain=observeReload(page,{title:'native resource completion',outputPath:n=>path.join(dir,n),attach:async()=>{}});
+ await retain.installNativeEvents();
+ page.emit('console',{text:()=> '__HD_RELOAD_NATIVE__'+JSON.stringify({stage:'resource-complete',doc:1,at:40,readyState:'loading',url:'http://user:password@localhost/quest-database.js?v=580&token=secret',timing:{responseEnd:30,decodedBodySize:123,transferSize:0,requestStart:-1,unknown:'never retain'},initiatorType:'script'})});
+ await retain();const d=JSON.parse(await fs.readFile(path.join(dir,'reload-navigation-evidence.json'),'utf8'));
+ assert.equal(d.profile.resourceTiming,true);assert.deepEqual(d.nativeEvents,[]);assert.equal(d.nativeSummary[0].resources[0].timing.responseEnd,30);assert.equal(d.nativeSummary[0].resources[0].timing.transferSize,0);assert.equal(d.nativeSummary[0].resources[0].timing.requestStart,undefined);
+ assert.ok(!JSON.stringify(d).includes('secret'));assert.ok(!JSON.stringify(d).includes('password'));assert.ok(!JSON.stringify(d).includes('never retain'));await fs.rm(dir,{recursive:true});
+});
