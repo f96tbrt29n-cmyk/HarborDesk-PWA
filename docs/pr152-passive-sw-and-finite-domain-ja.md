@@ -37,7 +37,13 @@ SW内部の4ファイル計測は専用サーバー・opt-in marker・私用プ�
 
 ## 通信/Cache API例外を分離
 
-今回6件のpageerrorは0。以前の未加工SW比較でのsw.jsアクセス制御例外と、復元後のCache API Context is stoppedは未解決の別記録として残す。GitHub鮮度診断の2公開API fetchはhdDXGithubHead→hdDXUpstreamFreshness→hdDXCollectから発生し、遷移取消/CORS/ネイティブWebKit通知/実行環境を切り分ける必要がある。旧停止2試行はpageerror0だった。今回例外がないことも、DCL/方針復元後に例外が出た過去資料も、45秒停止との共通原因を証明しない。Cache例外のスタック・発信元がない試行は不明のまま。[以前の時系列](pr152-network-pageerror-ja.md)を維持し、推測の製品修正はしない。
+今回6件のpageerrorは0。以前の未加工SW比較でのsw.jsアクセス制御例外と、再読込開始後・DCL前のCache API Context is stoppedは未解決の別記録として残す。GitHub鮮度診断の2公開API fetchはhdDXGithubHead→hdDXUpstreamFreshness→hdDXCollectから発生し、遷移取消/CORS/ネイティブWebKit通知/実行環境を切り分ける必要がある。旧停止2試行はpageerror0だった。今回例外がないことも、例外後にDCL/方針復元が成功した過去資料も、45秒停止との共通原因を証明しない。Cache例外のスタック・発信元がない試行は不明のまま。[以前の時系列](pr152-network-pageerror-ja.md)を維持し、推測の製品修正はしない。
+
+### 例外時刻の訂正
+
+旧CI39098317706の空母爆撃初回：reload-start 3113ms、GitHub例外3127/3130ms、Cache Context is stopped 3175ms、DCL待機完了3320ms、policy-restored 3374ms。「復元が完了した試行での例外」を「復元完了後の例外」と記述していた箇所は誤りで、この試行は例外の後に復元が完了している。Cacheの発信context/要求URL/stackは未取得。requestfailedが空でも、別contextやSWの失敗がない証明にはならない。45秒停止との因果は未確定。
+
+前回ローカル未加工SWの別試行：reload-start 5499ms、sw.jsアクセス制御例外5562ms、DCL完了5834ms、6キー/方針復元5960ms。ここでも例外は復元より先。確認できる取消は別の公開app-version.json要求5513msであり、sw.jsが取消だったという証拠にはしない。比較JSONをprior-error-comparison.jsonへ保持。
 
 ## 2-5北の進捗と限界
 
