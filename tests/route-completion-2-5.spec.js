@@ -237,7 +237,7 @@ test('diagnostic upstream failures never claim current masters or alter the nort
  const fixture=await page.evaluate(()=>{
   const c=hdOCContext('2-5','completion',0),result=hdOCSearch(c,{maxExamined:50,maxDepth:1});
   if(!hdFCImportOwnedPlan(c,result))throw new Error('dedicated planner fixture must import');
-  localStorage.setItem('harbordesk-pwa-v1',JSON.stringify({resources:{fuel:12345},memo:'dedicated network impact test'}));
+  localStorage.setItem('harbordesk-pwa-v1',JSON.stringify({...blankState(),memo:'dedicated network impact test'}));
   const keys=['harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-kancolle-sync-v1','harbordesk-pwa-v1','harbordesk-custom-fleets-v1','harbordesk-fleet-calculator-v1'];
   const audit=typeof HD_SHIP_MASTER_AUDIT!=='undefined'?HD_SHIP_MASTER_AUDIT:window.HD_SHIP_MASTER_AUDIT;
   return {keys,values:keys.map(k=>localStorage.getItem(k)),source:audit.source,picker:audit.pickerSource,calc:hdFCState('2-5',hdFCSelection('2-5'))};
@@ -269,4 +269,6 @@ test('diagnostic upstream failures never claim current masters or alter the nort
  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCContext==='function');
  expect(await page.evaluate(keys=>keys.map(k=>localStorage.getItem(k)),fixture.keys)).toEqual(fixture.values);
  expect(await page.evaluate(()=>hdFCState('2-5',hdFCSelection('2-5')))).toEqual(fixture.calc);
+ await info.attach('post-reload-pageerrors',{body:Buffer.from(JSON.stringify(pageErrors,null,2)),contentType:'application/json'});
+ expect(pageErrors.filter(e=>e.mode!=='cors'||!e.message.includes('access control checks'))).toEqual([]);
 });
