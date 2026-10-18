@@ -210,3 +210,24 @@ test('north new candidate keeps five modes save reload planner and refuses unver
  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCContext==='function');expect(await page.evaluate(keys=>keys.map(k=>localStorage.getItem(k)),r.keys)).toEqual(r.values);
  const restored=await page.evaluate(()=>{const c=hdOCContext('2-5','completion',0),p=hdFEPlanFromSavedFleet('2-5',c.fleet);return {checks:hdOCRequiredChecks(p),calc:hdFCState('2-5',hdFCSelection('2-5')),ids:p.ships.map(s=>s.gameShipId)}});expect(restored.checks.every(c=>c.ok)).toBe(true);expect(restored.calc).toEqual(r.calc);expect(restored.ids).toEqual(r.ids);
 });
+
+test('north all sixteen independent finite numeric candidates remain unconfirmed outside synchronized bonus context',async({page},info)=>{
+ const answers=oracle();expect(answers).toHaveLength(16);await prepare(page);
+ const results=await page.evaluate(answers=>{
+  const c=hdOCContext('2-5','completion',0),built=hdOCBuild(c),original=JSON.stringify(built.plan),positions=[[0,2],[0,3],[1,3],[2,3],[3,2],[4,2],[5,2]];
+  return answers.map(answer=>{
+   const plan=hdFOClone(built.plan);
+   positions.forEach(([shipIndex,slotIndex],i)=>{
+    const ship=plan.ships[shipIndex],choice=answer.slots[i],slot=built.slots.find(x=>x.si===shipIndex&&x.index===slotIndex&&!x.expansion);
+    const index=ship.items.findIndex(x=>x.slotIndex===slotIndex);
+    if(!choice){ship.items.splice(index,1);return}
+    const name=choice===1?'強風改二':'零式水上観測機',star=choice===2?4:0,row=built.inventory.find(x=>x.name===name&&x.star===star);
+    ship.items[index]=hdOCEquipment(row,slot);
+   });
+   const items=hdFEAssigned(plan),measure=hdOCMeasure(plan,[]),usage=hdFOAssignedUsage(plan),inventory=Object.fromEntries(built.inventory.map(x=>[x.key,x.count]));
+   return {answer,required:measure.requiredChecks.filter(x=>!['scoutingValue','airValue'].includes(x.condition?.kind)),master:hdFEMasterValidation(plan),inventory:Object.entries(usage).every(([k,v])=>v<=(inventory[k]||0)),score:hdFEScouting(plan,items).score,air:hdFEAir(items).basePower,match:hdFEGameMatch(plan).status,los:measure.requiredChecks.find(x=>x.condition.kind==='scoutingValue'),readiness:hdOCReadiness(plan,measure).registeredReady,sourceUnchanged:JSON.stringify(built.plan)===original};
+  });
+ },answers);
+ await info.attach('sixteen-north-candidates',{body:Buffer.from(JSON.stringify(results,null,2)),contentType:'application/json'});
+ for(const r of results){expect(r.required.every(x=>x.ok)).toBe(true);expect(r.master.valid).toBe(true);expect(r.inventory).toBe(true);expect(r.score).toBeCloseTo(r.answer.los,8);expect(r.air).toBe(r.answer.air);expect(r.sourceUnchanged).toBe(true);if(r.match!=='ready'){expect(r.los.status).toBe('manual');expect(r.readiness).toBe(false)}}
+});
