@@ -23,6 +23,7 @@ tests/pwa-storage-audit.cjsをPWA再起動1ケースだけへ導入。公開コ�
 - 専用context識別子・ページラベル・文書timeOrigin・origin・クエリ/認証/hashを除いたURL・SW controllerを記録。crash/close/disconnected、新規ページ生成もNode側で記録する。OS内のNetworkProcess異常を直接検出するものではない。
 - Storage.prototypeのsetItem/removeItem/clearは元のメソッドへ先に委譲し、成功した対象操作だけをキーと呼出しスタックで記録。getItemは置換しない。sessionStorageや無関係なキーは記録しない。例外/プロパティ代入/別realm/ブラウザー内部での削除を完全に捕捉するものではない。
 - 各文書256記録、Node側1024記録で上限を明示。失敗時は追加evaluate/storageState取得をせず、受信済み履歴を添付する。監視自身が書込み・初期化・自動復元・追加fetchを行わない。
+- 単独のpwa-storage-audit.jsonを出力し、CIのalways成果物へ明示追加。初回失敗後に再試行が成功した場合も、初回と再試行のファイルをそれぞれ保持する。ブラウザーconsole/trace内にも同じ受信元記録が残る。
 
 既存の準備データ、45秒期限、アサーション、Chromiumのoffline再読込/WebKitのonline再読込を維持。元のtraceには専用fixture値が含まれるが、今回の追加成果物は値を複製しない。
 

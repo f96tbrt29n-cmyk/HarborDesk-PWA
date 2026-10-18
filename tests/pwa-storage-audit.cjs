@@ -1,5 +1,7 @@
 // Dedicated fixture diagnostics only. Never writes a sentinel or restores data.
 const { randomUUID } = require('node:crypto');
+const fs = require('node:fs/promises');
+const path = require('node:path');
 const KEYS = ['harbordesk-custom-fleets-v1','harbordesk-equipment-v1','harbordesk-ship-roster-v1','harbordesk-fleet-calculator-v1','harbordesk-kancolle-sync-v1','harbordesk-pwa-v1'];
 function storageProbe({ keys, contextId, pageId }) {
   if (window !== window.top) return;
@@ -63,7 +65,10 @@ async function observeStorage(page, testInfo) {
     finish: async () => {
       // No evaluation/Storage reads on failure; preserve browser-emitted history.
       for (const [target,name,fn] of listeners) target.off(name,fn);
-      await testInfo.attach('pwa-storage-audit', { body: Buffer.from(JSON.stringify({ version:1, hash:'prefix FNV32, non-cryptographic; equality assertions remain exact', dropped, events })), contentType:'application/json' });
+      const target = testInfo.outputPath('pwa-storage-audit.json');
+      await fs.mkdir(path.dirname(target), { recursive:true });
+      await fs.writeFile(target, JSON.stringify({ version:1, hash:'prefix FNV32, non-cryptographic; equality assertions remain exact', dropped, events }));
+      await testInfo.attach('pwa-storage-audit', { path:target, contentType:'application/json' });
     }
   };
 }
