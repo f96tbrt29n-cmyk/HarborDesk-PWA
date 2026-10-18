@@ -897,13 +897,6 @@ test('carrier three-plane CI stock and remedies never call the excluded dedicate
  expect(r.stock.complete).toBe(false);expect(r.stock.usable.complete).toBe(false);expect(r.goal.ok).toBe(false);expect(r.options.length).toBeGreaterThan(0);expect(r.options.every(x=>!x.available&&x.missing.length>0)).toBe(true);expect(r.unchanged).toBe(true);
 });
 
-test('carrier three-plane CI policy persists and regenerates the mobile loadout',async({page})=>{
- await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
- await page.evaluate(()=>{
-  const ship='赤城改',masterId=hdShipDbMasterRowFor(hdFEFindShip(ship)).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'F6F-3N',count:1},{name:'Swordfish',count:2},{name:'夜間作戦航空要員',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship,masterId,gameShipId:892,level:90,gameSlotEx:0}]));hdFSMap=()=> '1-1';hdFSPlans=()=>[{index:0,preset:{name:'three fixture'},needs:[],slots:[{profile:{row:{name:ship,masterId,gameShipId:892,level:90},type:'正規空母',roles:[]}}]}];const card=document.createElement('article');card.id='three-policy-test';card.className='hd-fs-card';card.innerHTML='<button data-hd-fl-generate="0">自動配備</button><div class="hd-fl-host"></div>';document.body.appendChild(card);hdFLRender(0,card);
- });
- const card=page.locator('#three-policy-test');await card.locator('[data-hd-night-policy]').selectOption('cv-three');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightCarrier(p.ships[0]).candidates.some(c=>c.attack==='cv-three')})).toBe(true);await expect(card).toContainText('空母夜戦CI装備条件：成立');await expect(card).toContainText('岩井隊爆戦／Swordfish系 2');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('cv-three');
-});
 
 test('automatic night CI evaluates mixed ship families once per ship and names the matched sets',async({page})=>{
  await boot(page);

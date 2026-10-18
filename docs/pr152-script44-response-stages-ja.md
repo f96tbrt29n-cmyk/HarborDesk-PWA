@@ -70,3 +70,19 @@ Cache Context is stoppedの過去資料は発信context/stack不明。以前「�
 元の2ケースの準備・機能アサーション/待機条件を、観測用追記を除いたテキスト照合で一致確認。PWAのhelperも同一、SW allow/Chromiumのみoffline/WebKit onlineの分岐を保持。45秒/expect期限変更、skip、pageerror除外なし。PWAの比較対象は従来の5保存キーのままで、6キー全非nullの証拠は別の既存プロフィールを維持する。
 
 移動後の対象4実行は両エンジン初回成功・再試行0（46.8秒）。Chromiumのオフライン検査とWebKitのオンライン検査を分ける。npmの通常CI一覧へPWA移動先を加え、旧ファイルから移した2ケースを重複させない。収集は各エンジン672件で維持（--listは実行成功数ではない）。原本/照合記録/設定失敗と最終結果はfocused-reload*、moved-case-equivalence.json、collection.logへ保存。製品修正ではなく、次の自然停止を採るための診断変更。
+
+
+## 40c3595の自然な初回失敗とfixtureの別問題
+
+CI39158760058のWebKitは671初回成功/1再試行成功、最終失敗0。新しく失敗したのは「carrier three-plane CI policy persists and regenerates the mobile loadout」で、ケース全体45秒期限をpage.reload/DCL待ちで消費した。直前の装備/方針検査は通過、初回の再読込後方針検査は未到達。初回video/contextとretry traceを保持、初回trace/nativeはこのケースには未設定で欠測。成功した再試行を安定解決としない。
+
+原ジョブログのケース開始19:33:11.046 UTC、root GET19:33:11.283、2回目root GET19:33:15.008、retry開始19:34:03.122。2回目root以降は同期script1〜34の版付きアクセス記録があり、35〜45はない。ヘッダー出力だけで本文読了/loadを判定せず、SW経路の欠測とも区別する。旧PWAの1〜13記録/14以降欠測、元の43 load/44以降未確認とは同一境界としない。今回の既知ケースも既存night-policy-reload.spec.jsへ移して初回trace/未加工SW受動記録を残す。45秒・待機/機能アサーションは維持する。
+
+追加観測した潜水艦ケースは初回復元成功だが、3753msにhdFSSuggestionHtml内のs.missing.length TypeErrorが記録された。元のテストがhdFSPlansへmissing/low/info等を持たない部分スタブを返しており、背景再描画の正規入力契約に違反する。これはfixture不備の証拠であり、製品や45秒停止の原因確定ではない。潜水艦と同型の空母3機fixtureだけ、既存3方針fixture同様のhdFSGenerateから正式な提案を作る。元の在庫・個体ID・レベル・slots/装備方針・元の機能アサーションを維持し、単一の指定個体を生成したことと、実rendererが例外なく受理することを即時確認する。描画関数由来のpageerror0検査を追加し、全例外は引き続き記録する。
+
+同じ潜水艦初回にはreload-start4235ms、raw/local app-version.jsonのアクセス制御例外4249ms（stackはhdFetchVersionMeta→hdFetchLatestVersion→hdCheckForUpdate）、SW版付きURLの空stack例外4251ms、DCL4675ms、方針復元4857msもあった。これら3通信例外とfixtureのTypeErrorを別分類とする。API鮮度照合2URLはその前に200/ACAO=*/requestfinishedを観測しており、このraw版情報取得の例外と取り違えない。取消/CORS/実行環境/SWの責任範囲は未確定。復元に成功したため通信例外を正常扱いにはせず、同時に45秒停止との同一原因も断定しない。
+
+全原本と抽出は /workspace/hd152-script44-20261018/ci-40c3595 に保持。製品/SW/保存形式の変更なし。追加fixture修正と初回保持の局所結果・最新必須CIはPR本文へ記録する。53例は1/49/3のまま。
+
+
+追加fixture初版の局所4実行は空母3機2初回成功/潜水艦2失敗/再試行0。潜水艦の新しい即時個体検査が失敗した。hdFSPresetInfoのトークンは「潜水艦1」で、hdFSTypeMatchesは潜水艦/潜水空母を含む。「潜水空母1」はパーサーに未登録だったため、正式なトークンへ修正。個体検査は緩めず、失敗した潜水艦2実行のみ追加確認し両エンジン初回成功・再試行0（23.3秒）。空母3機の成功を理由なく再実行しない。各ケースの元の機能検査列と45秒期限を維持、スタブ生成だけは上記理由で変更した。fixture-after（2成功/2失敗）とfixture-sub-valid（2成功）は別資料として保持。収集数は引き続き672件/engine。CI結果はPRへ記録する。
