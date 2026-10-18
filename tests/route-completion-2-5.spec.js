@@ -231,3 +231,42 @@ test('north all sixteen independent finite numeric candidates remain unconfirmed
  await info.attach('sixteen-north-candidates',{body:Buffer.from(JSON.stringify(results,null,2)),contentType:'application/json'});
  for(const r of results){expect(r.required.every(x=>x.ok)).toBe(true);expect(r.master.valid).toBe(true);expect(r.inventory).toBe(true);expect(r.score).toBeCloseTo(r.answer.los,8);expect(r.air).toBe(r.answer.air);expect(r.sourceUnchanged).toBe(true);if(r.match!=='ready'){expect(r.los.status).toBe('manual');expect(r.readiness).toBe(false)}}
 });
+
+test('diagnostic upstream failures never claim current masters or alter the north fleet and six saved keys',async({page},info)=>{
+ await prepare(page);
+ const fixture=await page.evaluate(()=>{
+  const c=hdOCContext('2-5','completion',0),result=hdOCSearch(c,{maxExamined:50,maxDepth:1});
+  if(!hdFCImportOwnedPlan(c,result))throw new Error('dedicated planner fixture must import');
+  localStorage.setItem('harbordesk-pwa-v1',JSON.stringify({resources:{fuel:12345},memo:'dedicated network impact test'}));
+  const keys=['harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-kancolle-sync-v1','harbordesk-pwa-v1','harbordesk-custom-fleets-v1','harbordesk-fleet-calculator-v1'];
+  const audit=typeof HD_SHIP_MASTER_AUDIT!=='undefined'?HD_SHIP_MASTER_AUDIT:window.HD_SHIP_MASTER_AUDIT;
+  return {keys,values:keys.map(k=>localStorage.getItem(k)),source:audit.source,picker:audit.pickerSource,calc:hdFCState('2-5',hdFCSelection('2-5'))};
+ });
+ let mode='failed';const requests=[],pageErrors=[];
+ page.on('pageerror',e=>pageErrors.push({mode,message:e.message,stack:e.stack}));
+ await page.route('https://api.github.com/repos/**/commits/**',async route=>{
+  const repo=new URL(route.request().url()).pathname.split('/').slice(2,4).join('/');requests.push({mode,repo});
+  const source=repo===fixture.source.repo?fixture.source:fixture.picker;
+  const failed=mode==='failed'||mode==='cors'||mode==='partial'&&repo===fixture.picker.repo;
+  await route.fulfill({status:mode==='cors'?200:failed?503:200,contentType:'application/json',headers:{'access-control-allow-origin':mode==='cors'?'https://invalid.test':'*'},body:JSON.stringify({sha:mode==='stale'&&repo===fixture.source.repo?'0'.repeat(40):source.commit,commit:{committer:{date:'2026-10-18T00:00:00Z'}}})});
+ });
+ const results=[];
+ for(const scenario of ['failed','partial','ready','stale','cors','cached']){
+  mode=scenario;
+  const r=await page.evaluate(async ({keys,force})=>{
+   await hdDXRender(force);
+   const metric=[...document.querySelectorAll('#hdDiagnosticsCenter .hd-dx-metric')].find(x=>x.querySelector('span')?.textContent==='マスター鮮度');
+   const c=hdOCContext('2-5','completion',0),plan=hdFEPlanFromSavedFleet('2-5',c.fleet);
+   return {upstream:window.__hdDXLast.upstream,metric:metric?.querySelector('strong')?.textContent,metricClass:metric?.className,issues:window.__hdDXLast.issues,values:keys.map(k=>localStorage.getItem(k)),required:hdOCRequiredChecks(plan),los:hdFEScouting(plan,hdFEAssigned(plan)).score,air:hdFEAir(hdFEAssigned(plan)).basePower,ids:plan.ships.map(s=>s.gameShipId)};
+  },{keys:fixture.keys,force:scenario!=='cached'});
+  results.push({scenario,...r});
+  await info.attach('upstream-impact-'+scenario,{body:Buffer.from(JSON.stringify({results,requests,pageErrors},null,2)),contentType:'application/json'});
+  expect(r.values).toEqual(fixture.values);expect(r.required.every(x=>x.ok)).toBe(true);expect(r.los).toBeCloseTo(49.4587454246,6);expect(r.air).toBe(66);expect(new Set(r.ids).size).toBe(6);
+  if(scenario==='ready'){expect(r.metric).toBe('最新');expect(r.metricClass).toContain('ok');expect(r.upstream.source.fresh).toBe(true);expect(r.upstream.picker.fresh).toBe(true)}
+  else if(scenario==='stale'){expect(r.metric).toBe('更新待ち');expect(r.metricClass).toContain('warn');expect(r.upstream.source.fresh).toBe(false)}
+  else {expect(r.metric).toBe('確認不可');expect(r.metricClass).toContain('warn');expect(r.issues.some(x=>x.includes('upstream'))).toBe(true);if(scenario!=='partial')expect(r.upstream.source.fresh).toBeNull();expect(r.upstream.picker.fresh).toBeNull();if(scenario==='cached')expect(r.upstream.cached).toBe(true)}
+ }
+ await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCContext==='function');
+ expect(await page.evaluate(keys=>keys.map(k=>localStorage.getItem(k)),fixture.keys)).toEqual(fixture.values);
+ expect(await page.evaluate(()=>hdFCState('2-5',hdFCSelection('2-5')))).toEqual(fixture.calc);
+});
