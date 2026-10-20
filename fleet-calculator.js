@@ -4,7 +4,8 @@ const HD_FC_SELECT_KEY='harbordesk-fleet-calculator-selection-v1';
 const HD_FC_AIR_CATEGORIES=new Set(['艦上戦闘機','艦上攻撃機','艦上爆撃機','水上戦闘機','水上爆撃機','噴式戦闘爆撃機']);
 
 function hdFCEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function hdFCLoadAll(){try{return JSON.parse(localStorage.getItem(HD_FC_KEY)||'{}')||{}}catch{return {}}}
+// A failed Storage read is not an empty ledger: callers may save defaults next.
+function hdFCLoadAll(){const raw=localStorage.getItem(HD_FC_KEY);try{return JSON.parse(raw||'{}')||{}}catch{return {}}}
 function hdFCSaveAll(v){localStorage.setItem(HD_FC_KEY,JSON.stringify(v))}
 function hdFCSyncedHq(){try{const level=Number(JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'{}').admiralLevel);return level>0?level:null}catch{return null}}
 function hdFCFleets(map){
