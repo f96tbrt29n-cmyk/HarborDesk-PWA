@@ -1,5 +1,5 @@
 // Serialized as an init script in focused reload tests only.
-function reloadNativeProbe({ instrumentSW = false, resourceTiming = true, parserBoundary = false } = {}) {
+function reloadNativeProbe({ instrumentSW = false, resourceTiming = true, parserBoundary = false, parserLoadBoundary = 40 } = {}) {
   const prefix = '__HD_RELOAD_NATIVE__', doc = performance.timeOrigin;
   const sw = navigator.serviceWorker, watched = new WeakSet(), registrations = new WeakSet(), subscribed = new WeakSet();
   let lastScript = '', sequence = 0;
@@ -8,16 +8,22 @@ function reloadNativeProbe({ instrumentSW = false, resourceTiming = true, parser
   const emit = (stage, extra = {}) => console.debug(prefix + JSON.stringify({ stage, doc, at: performance.now(), readyState: document.readyState, lastScript, controller: worker(sw?.controller), ...extra }));
   const boundaryNames = ['quest-database.js','expedition-database.js','home-dashboard.js','update-manager.js','map-strategy-navigator.js','strategy-goals.js'];
   const loaded = new WeakSet(), errored = new WeakSet();
+  const boundaryLoad = parserLoadBoundary === 42 ? 42 : 40, parserReasons = new Set();
   // Opt-in DOM metadata only, at existing events. No mutation observer, layout,
   // fetch, body read, evaluation marker, new timer or registration wrapper.
   const parserSnapshot = reason => {
-    if (!parserBoundary) return;
-    const nodes = Array.from(document.scripts).slice(0,128);
+    if (!parserBoundary || parserReasons.has(reason)) return;
+    parserReasons.add(reason);
+    const collection = document.scripts, truncated = collection.length > 128;
+    const nodes = Array.prototype.slice.call(collection,0,128);
     const scripts = boundaryNames.map(name => {
-      const node = nodes.find(node => { try { const u = new URL(node.src, location.href); return u.origin === location.origin && u.pathname === '/' + name; } catch { return false; } });
-      return node ? { name, present: true, ordinal: nodes.indexOf(node) + 1, connected: node.isConnected, url: url(node.src), async: node.async, defer: node.defer, type: String(node.type || '').slice(0,32), loadObserved: loaded.has(node), errorObserved: errored.has(node) } : { name, present: false };
+      const matches = nodes.filter(node => { try { const u = new URL(node.src, location.href); return u.origin === location.origin && u.pathname === '/' + name; } catch { return false; } });
+      const node = matches[0], matching = { matchCount: matches.length, ordinals: matches.slice(0,4).map(node => nodes.indexOf(node)+1), matchesTruncated: matches.length > 4 };
+      // First matching node metadata is not proof of a static HTML node.
+      // A negative result beyond the scan limit is unknown, not absent.
+      return node ? { name, present: true, ...matching, ordinal: nodes.indexOf(node) + 1, connected: node.isConnected, url: url(node.src), async: node.async, defer: node.defer, type: String(node.type || '').slice(0,32), loadObserved: loaded.has(node), errorObserved: errored.has(node) } : { name, present: truncated ? null : false, ...matching };
     });
-    emit('parser-boundary', { reason, scripts, scriptCount: nodes.length, truncated: document.scripts.length > 128 });
+    emit('parser-boundary', { reason, scripts, scriptCount: nodes.length, truncated });
   };
   // Completion entries only: an absent entry is not a failed request. Do not
   // fetch/read bodies, alter the timing buffer, inspect layout, or wrap fetch.
@@ -89,7 +95,7 @@ function reloadNativeProbe({ instrumentSW = false, resourceTiming = true, parser
     if (event.target?.tagName === 'SCRIPT' && event.target.src) {
       loaded.add(event.target);
       lastScript = url(event.target.src); emit('script-load', { url: lastScript });
-      if (new URL(lastScript).pathname === '/quest-database.js') parserSnapshot('script-40-load');
+      if (parserBoundary && new URL(lastScript).pathname === (boundaryLoad === 42 ? '/home-dashboard.js' : '/quest-database.js')) parserSnapshot('script-' + boundaryLoad + '-load');
     }
   }, true);
   window.addEventListener('load', () => emit('window-load'), { once: true });

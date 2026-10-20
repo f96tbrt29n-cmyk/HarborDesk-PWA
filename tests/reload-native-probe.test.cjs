@@ -87,3 +87,39 @@ test('opt-in parser boundary distinguishes DOM insertion, load and DCL without p
  assert.equal(dcl.scripts[1].loadObserved,false);assert.ok(!JSON.stringify(records).includes('secret'));
  assert.ok(!('evaluated' in dcl.scripts[1]));
 });
+
+function parserHarness(options, scripts){
+ const listeners=new Map(),records=[],timers=[];
+ const target=p=>({addEventListener:(n,f)=>listeners.set(p+n,f)});
+ const document={...target('document:'),readyState:'loading',scripts};
+ vm.runInNewContext('('+reloadNativeProbe.toString()+')('+JSON.stringify(options)+')',{
+  URL,location:{href:'http://localhost/',origin:'http://localhost'},performance:{timeOrigin:1000,now:()=>1},navigator:{},document,window:target('window:'),
+  console:{debug:s=>records.push(JSON.parse(s.slice('__HD_RELOAD_NATIVE__'.length)))},setTimeout:(f,ms)=>{timers.push({f,ms});return 1},clearTimeout:()=>{},
+  fetch:()=>{throw Error('no fetch')},MutationObserver:class{constructor(){throw Error('no observer')}}
+ });
+ return {document,listeners,records,timers,boundaries:()=>records.filter(r=>r.stage==='parser-boundary')};
+}
+const parserNode=name=>({tagName:'SCRIPT',src:'http://localhost/'+name+'?v=580&token=secret',isConnected:true,async:false,defer:false,type:''});
+test('carrier boundary selects only 42 and reserves load/watchdog/DCL despite repeated loads',()=>{
+ const n40=parserNode('quest-database.js'),n42=parserNode('home-dashboard.js'),n43=parserNode('update-manager.js');
+ const h=parserHarness({parserBoundary:true,parserLoadBoundary:42},[n40,n42]);
+ h.listeners.get('document:load')({target:n40});assert.equal(h.boundaries().length,0);
+ h.listeners.get('document:load')({target:n42});h.listeners.get('document:load')({target:n42});
+ assert.equal(h.boundaries().length,1);assert.equal(h.boundaries()[0].reason,'script-42-load');assert.equal(h.boundaries()[0].scripts[3].present,false);
+ h.document.scripts.push(n43);h.timers[0].f();h.timers[0].f();
+ assert.equal(h.boundaries().length,2);assert.equal(h.boundaries()[1].scripts[3].present,true);assert.equal(h.boundaries()[1].scripts[3].loadObserved,false);
+ h.listeners.get('document:error')({target:n43});h.document.readyState='interactive';h.listeners.get('document:DOMContentLoaded')();
+ assert.deepEqual(h.boundaries().map(x=>x.reason),['script-42-load','loading-watchdog','dcl']);assert.equal(h.boundaries()[2].scripts[3].errorObserved,true);
+ assert.equal(h.timers.length,1);assert.equal(h.timers[0].ms,30000);
+});
+test('scan and duplicate-position limits preserve unknown rather than absence beyond 128',()=>{
+ const nodes=Array.from({length:129},()=>parserNode('unrelated.js'));
+ for(let i=0;i<5;i++)nodes[i]=parserNode('quest-database.js');
+ const n42=nodes[5]=parserNode('home-dashboard.js');let pastLimitReads=0;
+ Object.defineProperty(nodes,128,{get(){pastLimitReads++;return parserNode('update-manager.js')}});
+ const h=parserHarness({parserBoundary:true,parserLoadBoundary:42},nodes);h.listeners.get('document:load')({target:n42});
+ const b=h.boundaries()[0];assert.equal(b.truncated,true);assert.equal(b.scriptCount,128);assert.equal(pastLimitReads,0);
+ assert.equal(b.scripts[3].present,null);assert.equal(b.scripts[3].matchCount,0);
+ assert.equal(b.scripts[0].matchCount,5);assert.deepEqual(b.scripts[0].ordinals,[1,2,3,4]);assert.equal(b.scripts[0].matchesTruncated,true);assert.equal(b.scripts[0].ordinal,1);
+ assert.ok(!JSON.stringify(b).includes('secret'));assert.ok(!('staticNode' in b.scripts[0]));
+});

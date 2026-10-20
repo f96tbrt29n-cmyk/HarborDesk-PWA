@@ -5,7 +5,7 @@ const { performance } = require('node:perf_hooks');
 const { reloadNativeProbe } = require('./reload-native-probe.cjs');
 function observeReload(page, testInfo) {
   const startedAt = Date.now(), started = performance.now(), events = [], ids = new WeakMap(), sized = new WeakSet();
-  let nextId = 0, closed = false, failed = false, reloadStarted = false, reloadPending = false, nativeStall = false, instrumentSW = false, resourceTiming = true, parserBoundary = false;
+  let nextId = 0, closed = false, failed = false, reloadStarted = false, reloadPending = false, nativeStall = false, instrumentSW = false, resourceTiming = true, parserBoundary = false, parserLoadBoundary = 40;
   const native = [], nativeDocuments = new Map(), swSeen = new Set();
   let nativeDropped = 0;
   const workerInfo = w => w ? { url: safeUrl(w.url), state: String(w.state || '') } : null;
@@ -16,6 +16,7 @@ function observeReload(page, testInfo) {
     let data; try { data = JSON.parse(text.slice('__HD_RELOAD_NATIVE__'.length)); } catch { return; }
 
     if (!stages.has(data.stage) || typeof data.doc !== 'number') return;
+    if (data.stage === 'parser-boundary' && !['script-'+parserLoadBoundary+'-load','loading-watchdog','dcl'].includes(data.reason)) return;
     const item = { ms: Math.round(performance.now() - started), stage: data.stage, doc: data.doc, at: data.at, readyState: data.readyState, lastScript: safeUrl(data.lastScript), url: safeUrl(data.url), controller: workerInfo(data.controller), worker: workerInfo(data.worker) };
     if (data.stage === 'resource-complete') {
       item.timing = {};
@@ -24,10 +25,13 @@ function observeReload(page, testInfo) {
     }
     if (data.stage === 'resource-observer' && ['observing','unavailable','disabled'].includes(data.observerState)) item.observerState = data.observerState;
     if (data.stage === 'resource-summary') for (const key of ['resourceCount','resourceDropped','resourceBufferFull']) if (Number.isInteger(data[key]) && data[key] >= 0) item[key] = data[key];
-    if (data.stage === 'parser-boundary' && ['script-40-load','loading-watchdog','dcl'].includes(data.reason)) {
+    if (data.stage === 'parser-boundary') {
       item.reason = data.reason;
       item.scripts = (Array.isArray(data.scripts) ? data.scripts : []).slice(0,6).filter(s => ['quest-database.js','expedition-database.js','home-dashboard.js','update-manager.js','map-strategy-navigator.js','strategy-goals.js'].includes(s.name)).map(s => {
-        const value = { name: s.name, present: s.present === true };
+        const value = { name: s.name, present: s.present === true ? true : s.present === false && data.truncated === false ? false : null };
+        if (Number.isInteger(s.matchCount) && s.matchCount >= 0 && s.matchCount <= 128) value.matchCount = s.matchCount;
+        value.ordinals = (Array.isArray(s.ordinals) ? s.ordinals : []).filter(n=>Number.isInteger(n)&&n>0&&n<=128).slice(0,4);
+        value.matchesTruncated = s.matchesTruncated === true;
         if (value.present) {
           value.url = safeUrl(s.url);
           if (Number.isInteger(s.ordinal) && s.ordinal > 0 && s.ordinal <= 128) value.ordinal = s.ordinal;
@@ -48,7 +52,10 @@ function observeReload(page, testInfo) {
     const summary = nativeDocuments.get(item.doc) || { doc: item.doc, scriptLoads: 0, scriptErrors: 0 };
     if (item.stage === 'parser-boundary' && item.scripts) {
       summary.parserBoundaries = summary.parserBoundaries || [];
-      if (summary.parserBoundaries.length < 3) summary.parserBoundaries.push({ ms: item.ms, at: item.at, reason: item.reason, scripts: item.scripts, scriptCount: item.scriptCount, truncated: item.truncated });
+      summary.parserBoundaryLimit = 3;
+      summary.parserBoundaryDropped = summary.parserBoundaryDropped || 0;
+      if (summary.parserBoundaries.some(b=>b.reason===item.reason) || summary.parserBoundaries.length >= 3) summary.parserBoundaryDropped++;
+      else summary.parserBoundaries.push({ ms: item.ms, at: item.at, reason: item.reason, scripts: item.scripts, scriptCount: item.scriptCount, truncated: item.truncated });
     }
     if (item.stage === 'resource-complete') {
       summary.resources = summary.resources || [];
@@ -121,7 +128,7 @@ function observeReload(page, testInfo) {
     for (const [name, handler] of Object.entries(contextHandlers)) context.off(name, handler);
     closed = true;
     const retainNative = !!testInfo.project?.metadata?.keepNative || failed && (reloadPending || nativeStall);
-    const body = JSON.stringify({ test: testInfo.title, startedAt, events, instrumentSW, profile: { swSource: instrumentSW ? 'test-instrumented' : 'unmodified', serviceWorkers: testInfo.project?.use?.serviceWorkers || 'allow', resourceTiming, parserBoundary }, nativeSummary: [...nativeDocuments.values()], nativeDetailsReason: retainNative ? failed && (reloadPending || nativeStall) ? 'reload-wait-failure' : 'diagnostic-control' : 'summary-only', nativeDropped, nativeEvents: retainNative ? native : [] }, null, 2);
+    const body = JSON.stringify({ test: testInfo.title, startedAt, events, instrumentSW, profile: { swSource: instrumentSW ? 'test-instrumented' : 'unmodified', serviceWorkers: testInfo.project?.use?.serviceWorkers || 'allow', resourceTiming, parserBoundary, parserLoadBoundary }, nativeSummary: [...nativeDocuments.values()], nativeDetailsReason: retainNative ? failed && (reloadPending || nativeStall) ? 'reload-wait-failure' : 'diagnostic-control' : 'summary-only', nativeDropped, nativeEvents: retainNative ? native : [] }, null, 2);
     const target = testInfo.outputPath('reload-navigation-evidence.json');
     await fs.mkdir(path.dirname(target), { recursive: true });
     await fs.writeFile(target, body);
@@ -142,7 +149,8 @@ function observeReload(page, testInfo) {
     instrumentSW = !!options.instrumentSW;
     resourceTiming = (options.resourceTiming ?? testInfo.project?.metadata?.resourceTiming) !== false;
     parserBoundary = !!options.parserBoundary;
-    await page.addInitScript(reloadNativeProbe, { instrumentSW, resourceTiming, parserBoundary });
+    parserLoadBoundary = options.parserLoadBoundary === 42 ? 42 : 40;
+    await page.addInitScript(reloadNativeProbe, { instrumentSW, resourceTiming, parserBoundary, parserLoadBoundary });
   };
   return retain;
 }

@@ -129,3 +129,26 @@ test('parser boundary is opt-in, bounded and retained in summary without page ev
  assert.ok(!JSON.stringify(d).includes('password'));assert.ok(!JSON.stringify(d).includes('secret'));assert.ok(!JSON.stringify(d).includes('never retain'));
  await fs.rm(dir,{recursive:true});
 });
+
+test('42-boundary summary reserves three reasons and retains presence/unknown separately from missing records',async()=>{
+ const context=new EventEmitter(),page=new EventEmitter(),dir=await fs.mkdtemp(path.join(os.tmpdir(),'reload-carrier-parser-'));
+ page.context=()=>context;page.evaluate=()=>{throw Error('no failed-page sampling')};let options;
+ page.addInitScript=async(fn,value)=>{options=value};
+ const retain=observeReload(page,{title:'carrier parser',outputPath:n=>path.join(dir,n),attach:async()=>{}});
+ await retain.installNativeEvents({parserBoundary:true,parserLoadBoundary:42});assert.equal(options.parserLoadBoundary,42);
+ const emit=data=>page.emit('console',{text:()=> '__HD_RELOAD_NATIVE__'+JSON.stringify({stage:'parser-boundary',doc:1,at:30,readyState:'loading',...data})});
+ // Neither record is present before an allowed event. A nonselected 40 event is rejected.
+ emit({reason:'script-40-load',scripts:[]});assert.equal(retain.nativeSummary().length,0);
+ emit({reason:'script-42-load',scriptCount:42,truncated:false,scripts:[{name:'update-manager.js',present:false,matchCount:0,ordinals:[]}]});
+ for(let i=0;i<5;i++)emit({reason:'script-42-load',scripts:[]});
+ emit({reason:'loading-watchdog',scriptCount:128,truncated:true,scripts:[{name:'update-manager.js',present:null,matchCount:0,ordinals:[]}]});
+ // Fill the raw native ring; summary must still retain the first boundary.
+ for(let i=0;i<1100;i++)page.emit('console',{text:()=> '__HD_RELOAD_NATIVE__'+JSON.stringify({stage:'script-load',doc:1,at:i,readyState:'loading',url:'http://localhost/extra.js'})});
+ emit({reason:'dcl',scriptCount:45,truncated:false,scripts:[{name:'update-manager.js',present:true,ordinal:43,matchCount:2,ordinals:[43,45],url:'http://user:password@localhost/update-manager.js?v=580&token=secret',connected:true,async:false,defer:false,type:'',loadObserved:true,errorObserved:false}]});
+ await retain();const d=JSON.parse(await fs.readFile(path.join(dir,'reload-navigation-evidence.json'),'utf8')),n=d.nativeSummary[0];
+ assert.equal(d.profile.parserLoadBoundary,42);assert.deepEqual(d.nativeEvents,[]);assert.ok(d.nativeDropped>0);
+ assert.equal(n.parserBoundaryLimit,3);assert.equal(n.parserBoundaryDropped,5);assert.equal(n.parserBoundaries.length,3);
+ assert.deepEqual(n.parserBoundaries.map(b=>b.reason),['script-42-load','loading-watchdog','dcl']);
+ assert.equal(n.parserBoundaries[0].scripts[0].present,false);assert.equal(n.parserBoundaries[1].scripts[0].present,null);assert.equal(n.parserBoundaries[2].scripts[0].present,true);assert.deepEqual(n.parserBoundaries[2].scripts[0].ordinals,[43,45]);
+ assert.ok(!JSON.stringify(d).includes('password'));assert.ok(!JSON.stringify(d).includes('secret'));await fs.rm(dir,{recursive:true});
+});
