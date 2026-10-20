@@ -1,10 +1,12 @@
 const {test,expect}=require('@playwright/test');
-test.use({viewport:{width:390,height:844},hasTouch:true,isMobile:true,serviceWorkers:'block'});
-async function boot(page){
+const {syncVersionFixture}=require('./sync-version-fixture.cjs');
+test.use({viewport:{width:390,height:844},hasTouch:true,isMobile:true,serviceWorkers:'block',trace:{mode:'retain-on-failure',snapshots:false,screenshots:true,sources:true}});
+async function boot(page,scenario='normal'){
  await page.addInitScript(()=>Object.defineProperty(navigator,'standalone',{value:true,configurable:true}));
- await page.route('**/*',route=>{const url=new URL(route.request().url());return url.hostname==='127.0.0.1'||url.hostname==='localhost'?route.continue():route.fulfill({status:204,body:''})});
+ const retain=await syncVersionFixture(page,scenario);
  await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdWSOpenSyncStatus==='function');
+ return retain;
 }
 function bundle(at=100,level=20){return JSON.stringify({format:'harbordesk-kancolle-import',version:2,captureId:'same-session',records:[
  {endpoint:'/kcsapi/api_port/port',at,payload:{api_result:1,api_data:{api_ship:[{api_id:987,api_ship_id:1,api_lv:level,api_nowhp:13,api_maxhp:13,api_cond:49,api_slot:[]}],api_deck_port:[],api_material:[]}}},
@@ -15,8 +17,8 @@ async function receive(page,button){
  const dialog=page.waitForEvent('dialog').then(async d=>{const message=d.message();await d.accept();return message});
  await button.click();const message=await dialog;await expect(button).toBeEnabled();return message;
 }
-test('receive status stays visible, preserves saved data on failures and recovers on retry',async({page})=>{
- const errors=[];page.on('pageerror',err=>errors.push(err.message));await boot(page);
+test('receive status stays visible, preserves saved data on failures and recovers on retry',async({page},info)=>{
+ const errors=[];page.on('pageerror',err=>errors.push(err.message));const retain=await boot(page);try{
  await page.locator('#hdGlobalSyncStatus').click();
  const panel=page.locator('#hdSyncStatusDialog'),button=panel.locator('[data-hd-kc-receive]'),result=panel.locator('[data-hd-kc-receive-result]');
  await expect(panel.locator('[data-hd-kc-receive-summary]')).toContainText('まだ同期データ');
@@ -37,9 +39,24 @@ test('receive status stays visible, preserves saved data on failures and recover
  await page.reload();await page.waitForFunction(()=>document.body.dataset.hdReady==='1');await page.locator('#hdGlobalSyncStatus').click();
  await expect(panel.locator('[data-hd-kc-receive-summary]')).toContainText('艦娘 1隻・装備 1個');
  expect(errors).toEqual([]);
+ }finally{await retain(info)}
+});
+for(const scenario of ['normal','external-failure','local-failure','both-failure'])test('version '+scenario+' preserves receive state and six non-null keys',async({page},info)=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));const retain=await boot(page,scenario);
+ try{
+  const version=await page.evaluate(async()=>{try{const v=await hdFetchLatestVersion();return{ok:true,publishedReady:v.publishedReady}}catch(e){return{ok:false,message:e.message}}});
+  expect(version).toEqual(scenario==='both-failure'?{ok:false,message:'version fetch failed'}:{ok:true,publishedReady:scenario!=='local-failure'});
+  await page.evaluate(()=>{localStorage.setItem(CUSTOM_FLEET_KEY,JSON.stringify({}));localStorage.setItem(HD_FC_KEY,JSON.stringify({}));localStorage.setItem('harbordesk-pwa-v1',JSON.stringify(blankState()))});
+  await page.locator('#hdGlobalSyncStatus').click();const panel=page.locator('#hdSyncStatusDialog'),button=panel.locator('[data-hd-kc-receive]');
+  await clipboard(page,bundle());expect(await receive(page,button)).toContain('同期したよ');
+  const saved=await page.evaluate(()=>{const keys=[CUSTOM_FLEET_KEY,HD_FL_KEY,SHIP_ROSTER_KEY,HD_FC_KEY,'harbordesk-kancolle-sync-v1','harbordesk-pwa-v1'];return{keys,values:keys.map(k=>localStorage.getItem(k))}});expect(saved.values.every(v=>v!==null)).toBe(true);
+  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1');await page.locator('#hdGlobalSyncStatus').click();
+  await expect(panel.locator('[data-hd-kc-receive-summary]')).toContainText('艦娘 1隻・装備 1個');
+  const after=await page.evaluate(keys=>keys.map(k=>localStorage.getItem(k)),saved.keys);expect(after.every(v=>v!==null)).toBe(true);expect(after).toEqual(saved.values);expect(errors).toEqual([]);
+ }finally{await retain(info)}
 });
 test('receive controls stay tappable at narrow and landscape widths',async({page},testInfo)=>{
- await boot(page);
+ const retain=await boot(page);try{
  for(const viewport of [{width:320,height:568},{width:390,height:844},{width:844,height:390}]){
   await page.setViewportSize(viewport);
   const header=page.locator('#hdKcHomeSync');await expect(header).toBeVisible();
@@ -57,4 +74,5 @@ test('receive controls stay tappable at narrow and landscape widths',async({page
  const button=page.locator('#kancolleImport [data-hd-kc-receive]');await expect(button).toBeVisible();
  await clipboard(page,bundle());expect(await receive(page,button)).toContain('同期したよ');
  await expect(page.locator('#kancolleImport [data-hd-kc-receive-result]')).toHaveAttribute('data-state','success');
+ }finally{await retain(testInfo)}
 });

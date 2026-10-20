@@ -105,6 +105,7 @@ jobs:
             test-results/**/error-context.md
             test-results/**/reload-navigation-evidence.json
             test-results/**/pwa-storage-audit.json
+            test-results/**/sync-version-response.json
           if-no-files-found: ignore
           retention-days: 14
 
