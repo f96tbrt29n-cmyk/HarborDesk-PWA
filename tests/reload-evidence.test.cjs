@@ -114,3 +114,18 @@ test('completed resource timings survive a successful reload without retaining a
  assert.equal(d.profile.resourceTiming,true);assert.deepEqual(d.nativeEvents,[]);assert.equal(d.nativeSummary[0].resources[0].timing.responseEnd,30);assert.equal(d.nativeSummary[0].resources[0].timing.transferSize,0);assert.equal(d.nativeSummary[0].resources[0].timing.requestStart,undefined);
  assert.ok(!JSON.stringify(d).includes('secret'));assert.ok(!JSON.stringify(d).includes('password'));assert.ok(!JSON.stringify(d).includes('never retain'));await fs.rm(dir,{recursive:true});
 });
+
+
+test('parser boundary is opt-in, bounded and retained in summary without page evaluation',async()=>{
+ const context=new EventEmitter(),page=new EventEmitter(),dir=await fs.mkdtemp(path.join(os.tmpdir(),'reload-parser-'));
+ page.context=()=>context;page.evaluate=()=>{throw Error('must not sample failed page')};let options;
+ page.addInitScript=async(fn,value)=>{options=value};
+ const retain=observeReload(page,{title:'parser boundary',outputPath:n=>path.join(dir,n),attach:async()=>{}});
+ await retain.installNativeEvents({parserBoundary:true});assert.equal(options.parserBoundary,true);
+ page.emit('console',{text:()=> '__HD_RELOAD_NATIVE__'+JSON.stringify({stage:'parser-boundary',doc:1,at:30,readyState:'loading',reason:'loading-watchdog',scriptCount:45,truncated:false,scripts:[{name:'expedition-database.js',present:true,ordinal:41,connected:true,async:false,defer:false,type:'',url:'http://user:password@localhost/expedition-database.js?v=580&token=secret',loadObserved:false,errorObserved:false,payload:'never retain'},{name:'private',present:true,payload:'never retain'}],payload:'never retain'})});
+ await retain();const d=JSON.parse(await fs.readFile(path.join(dir,'reload-navigation-evidence.json'),'utf8'));
+ assert.equal(d.profile.parserBoundary,true);assert.equal(d.nativeEvents.length,0);
+ const b=d.nativeSummary[0].parserBoundaries[0];assert.equal(b.at,30);assert.equal(b.scripts.length,1);assert.equal(b.scripts[0].ordinal,41);assert.equal(b.scripts[0].loadObserved,false);
+ assert.ok(!JSON.stringify(d).includes('password'));assert.ok(!JSON.stringify(d).includes('secret'));assert.ok(!JSON.stringify(d).includes('never retain'));
+ await fs.rm(dir,{recursive:true});
+});

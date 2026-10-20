@@ -5,11 +5,11 @@ const { performance } = require('node:perf_hooks');
 const { reloadNativeProbe } = require('./reload-native-probe.cjs');
 function observeReload(page, testInfo) {
   const startedAt = Date.now(), started = performance.now(), events = [], ids = new WeakMap(), sized = new WeakSet();
-  let nextId = 0, closed = false, failed = false, reloadStarted = false, reloadPending = false, nativeStall = false, instrumentSW = false, resourceTiming = true;
+  let nextId = 0, closed = false, failed = false, reloadStarted = false, reloadPending = false, nativeStall = false, instrumentSW = false, resourceTiming = true, parserBoundary = false;
   const native = [], nativeDocuments = new Map(), swSeen = new Set();
   let nativeDropped = 0;
   const workerInfo = w => w ? { url: safeUrl(w.url), state: String(w.state || '') } : null;
-  const stages = new Set(['init','ready-state','native-dcl','window-load','pagehide','script-load','script-error','register-call','register-resolved','register-rejected','registration-initial','registration-controller','registration-stalled','registration-query-failed','controllerchange','updatefound','sw-state','stall-loading','sw-stage','probe-subscribe-failed','resource-complete','resource-observer','resource-summary']);
+  const stages = new Set(['init','ready-state','native-dcl','window-load','pagehide','script-load','script-error','register-call','register-resolved','register-rejected','registration-initial','registration-controller','registration-stalled','registration-query-failed','controllerchange','updatefound','sw-state','stall-loading','sw-stage','probe-subscribe-failed','resource-complete','resource-observer','resource-summary','parser-boundary']);
   const nativeConsole = message => {
     const text = message.text();
     if (!text.startsWith('__HD_RELOAD_NATIVE__') || text.length > 16384) return;
@@ -24,6 +24,21 @@ function observeReload(page, testInfo) {
     }
     if (data.stage === 'resource-observer' && ['observing','unavailable','disabled'].includes(data.observerState)) item.observerState = data.observerState;
     if (data.stage === 'resource-summary') for (const key of ['resourceCount','resourceDropped','resourceBufferFull']) if (Number.isInteger(data[key]) && data[key] >= 0) item[key] = data[key];
+    if (data.stage === 'parser-boundary' && ['script-40-load','loading-watchdog','dcl'].includes(data.reason)) {
+      item.reason = data.reason;
+      item.scripts = (Array.isArray(data.scripts) ? data.scripts : []).slice(0,6).filter(s => ['quest-database.js','expedition-database.js','home-dashboard.js','update-manager.js','map-strategy-navigator.js','strategy-goals.js'].includes(s.name)).map(s => {
+        const value = { name: s.name, present: s.present === true };
+        if (value.present) {
+          value.url = safeUrl(s.url);
+          if (Number.isInteger(s.ordinal) && s.ordinal > 0 && s.ordinal <= 128) value.ordinal = s.ordinal;
+          for (const key of ['connected','async','defer','loadObserved','errorObserved']) value[key] = s[key] === true;
+          value.type = ['','text/javascript','application/javascript','module'].includes(s.type) ? s.type : 'other';
+        }
+        return value;
+      });
+      item.scriptCount = Number.isInteger(data.scriptCount) ? Math.max(0,Math.min(128,data.scriptCount)) : null;
+      item.truncated = data.truncated === true;
+    }
     if (data.registration) item.registration = { scope: safeUrl(data.registration.scope), installing: workerInfo(data.registration.installing), waiting: workerInfo(data.registration.waiting), active: workerInfo(data.registration.active) };
     if (data.stage === 'sw-stage') {
       const w = data.sw || {}, key = w.worker + ':' + w.seq;
@@ -31,6 +46,10 @@ function observeReload(page, testInfo) {
       item.sw = { worker: w.worker, seq: w.seq, id: w.id, at: w.at, stage: String(w.stage || ''), url: safeUrl(w.url), status: w.status, hit: w.hit, source: ['network','cache','none','unknown'].includes(w.source) ? w.source : undefined, contentLength: /^\d+$/.test(w.contentLength || '') ? w.contentLength : undefined };
     }
     const summary = nativeDocuments.get(item.doc) || { doc: item.doc, scriptLoads: 0, scriptErrors: 0 };
+    if (item.stage === 'parser-boundary' && item.scripts) {
+      summary.parserBoundaries = summary.parserBoundaries || [];
+      if (summary.parserBoundaries.length < 3) summary.parserBoundaries.push({ ms: item.ms, at: item.at, reason: item.reason, scripts: item.scripts, scriptCount: item.scriptCount, truncated: item.truncated });
+    }
     if (item.stage === 'resource-complete') {
       summary.resources = summary.resources || [];
       if (summary.resources.length < 128) summary.resources.push({ ms: item.ms, at: item.at, url: item.url, timing: item.timing, initiatorType: item.initiatorType });
@@ -102,7 +121,7 @@ function observeReload(page, testInfo) {
     for (const [name, handler] of Object.entries(contextHandlers)) context.off(name, handler);
     closed = true;
     const retainNative = !!testInfo.project?.metadata?.keepNative || failed && (reloadPending || nativeStall);
-    const body = JSON.stringify({ test: testInfo.title, startedAt, events, instrumentSW, profile: { swSource: instrumentSW ? 'test-instrumented' : 'unmodified', serviceWorkers: testInfo.project?.use?.serviceWorkers || 'allow', resourceTiming }, nativeSummary: [...nativeDocuments.values()], nativeDetailsReason: retainNative ? failed && (reloadPending || nativeStall) ? 'reload-wait-failure' : 'diagnostic-control' : 'summary-only', nativeDropped, nativeEvents: retainNative ? native : [] }, null, 2);
+    const body = JSON.stringify({ test: testInfo.title, startedAt, events, instrumentSW, profile: { swSource: instrumentSW ? 'test-instrumented' : 'unmodified', serviceWorkers: testInfo.project?.use?.serviceWorkers || 'allow', resourceTiming, parserBoundary }, nativeSummary: [...nativeDocuments.values()], nativeDetailsReason: retainNative ? failed && (reloadPending || nativeStall) ? 'reload-wait-failure' : 'diagnostic-control' : 'summary-only', nativeDropped, nativeEvents: retainNative ? native : [] }, null, 2);
     const target = testInfo.outputPath('reload-navigation-evidence.json');
     await fs.mkdir(path.dirname(target), { recursive: true });
     await fs.writeFile(target, body);
@@ -122,7 +141,8 @@ function observeReload(page, testInfo) {
   retain.installNativeEvents = async (options = {}) => {
     instrumentSW = !!options.instrumentSW;
     resourceTiming = (options.resourceTiming ?? testInfo.project?.metadata?.resourceTiming) !== false;
-    await page.addInitScript(reloadNativeProbe, { instrumentSW, resourceTiming });
+    parserBoundary = !!options.parserBoundary;
+    await page.addInitScript(reloadNativeProbe, { instrumentSW, resourceTiming, parserBoundary });
   };
   return retain;
 }

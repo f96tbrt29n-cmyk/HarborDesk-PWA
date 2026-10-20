@@ -10,7 +10,7 @@ test('passive native probe leaves registration untouched and records loading sta
   const reg = { ...target('reg:'), scope: 'http://localhost/', active, waiting: null, installing: null };
   const originalPromise = Promise.resolve(reg), calls = [];
   const sw = { ...target('sw:'), controller: active, getRegistration: () => Promise.resolve(reg), register: function(...args) { calls.push({ receiver: this, args }); return originalPromise; } };
-  const document = { ...target('document:'), readyState: 'loading' };
+  const document = { ...target('document:'), readyState: 'loading', get scripts() { throw Error('default probe must not inspect parser DOM'); } };
   const nativeRegister = sw.register;
   let watchdog;
   vm.runInNewContext('(' + reloadNativeProbe.toString() + ')({instrumentSW:false})', {
@@ -61,4 +61,29 @@ test('resource completion is bounded and redacted, separate from script load and
  listeners.get('performance:resourcetimingbufferfull')();listeners.get('document:DOMContentLoaded')();
  assert.equal(records.filter(x=>x.stage==='resource-complete').length,128);const last=records.filter(x=>x.stage==='resource-summary').at(-1);assert.equal(last.resourceDropped,4);assert.equal(last.resourceBufferFull,1);
  assert.equal(bufferMutations,0);assert.ok(!JSON.stringify(records).includes('password'));assert.ok(!JSON.stringify(records).includes('secret'));
+});
+
+
+test('opt-in parser boundary distinguishes DOM insertion, load and DCL without probing execution', () => {
+ const listeners=new Map(),records=[],timers=[];let now=1;
+ const target=p=>({addEventListener:(n,f)=>listeners.set(p+n,f)});
+ const node=name=>({tagName:'SCRIPT',src:'http://localhost/'+name+'?v=580&token=secret',isConnected:true,async:false,defer:false,type:''});
+ const first=node('quest-database.js'),next=node('expedition-database.js');
+ const document={...target('document:'),readyState:'loading',scripts:[first]};
+ vm.runInNewContext('('+reloadNativeProbe.toString()+')({parserBoundary:true})',{
+  URL,location:{href:'http://localhost/',origin:'http://localhost'},performance:{timeOrigin:1000,now:()=>now++},navigator:{},document,window:target('window:'),
+  console:{debug:s=>records.push(JSON.parse(s.slice('__HD_RELOAD_NATIVE__'.length)))},setTimeout:(f,ms)=>{timers.push({f,ms});return 1},clearTimeout:()=>{},
+  fetch:()=>{throw Error('no fetch')},MutationObserver:class{constructor(){throw Error('no new observer')}}
+ });
+ listeners.get('document:load')({target:first});
+ const initial=records.find(x=>x.stage==='parser-boundary');
+ assert.equal(initial.reason,'script-40-load');assert.equal(initial.scripts[0].loadObserved,true);assert.equal(initial.scripts[1].present,false);
+ document.scripts.push(next);timers[0].f();
+ const stalled=records.filter(x=>x.stage==='parser-boundary').at(-1);
+ assert.equal(stalled.reason,'loading-watchdog');assert.equal(stalled.scripts[1].present,true);assert.equal(stalled.scripts[1].loadObserved,false);
+ assert.equal(stalled.scripts[1].ordinal,2);assert.equal(timers.length,1);assert.equal(timers[0].ms,30000);
+ listeners.get('document:error')({target:next});document.readyState='interactive';listeners.get('document:DOMContentLoaded')();
+ const dcl=records.filter(x=>x.stage==='parser-boundary').at(-1);assert.equal(dcl.reason,'dcl');assert.equal(dcl.scripts[1].errorObserved,true);
+ assert.equal(dcl.scripts[1].loadObserved,false);assert.ok(!JSON.stringify(records).includes('secret'));
+ assert.ok(!('evaluated' in dcl.scripts[1]));
 });

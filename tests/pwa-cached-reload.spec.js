@@ -27,7 +27,7 @@ test.describe('PWA cached runtime',()=>{
  test('opening ASW and owned planner data survive a cached PWA restart with Chromium offline reload',async({page,context,browserName},testInfo)=>{
   const retain=observeReload(page,testInfo);
   const storageAudit=await observeStorage(page,testInfo);
-  try{await retain.installNativeEvents();
+  try{await retain.installNativeEvents({parserBoundary:testInfo.project.metadata?.parserBoundary!==false});
   await fleet(page,{count:4,stock:4});
   await page.evaluate(()=>navigator.serviceWorker.ready);await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
   const snapshot=await page.evaluate(()=>{

@@ -1,11 +1,24 @@
 // Serialized as an init script in focused reload tests only.
-function reloadNativeProbe({ instrumentSW = false, resourceTiming = true } = {}) {
+function reloadNativeProbe({ instrumentSW = false, resourceTiming = true, parserBoundary = false } = {}) {
   const prefix = '__HD_RELOAD_NATIVE__', doc = performance.timeOrigin;
   const sw = navigator.serviceWorker, watched = new WeakSet(), registrations = new WeakSet(), subscribed = new WeakSet();
   let lastScript = '', sequence = 0;
   const url = value => { try { const u = new URL(value, location.href), v = u.searchParams.get('v'); u.username = ''; u.password = ''; u.hash = ''; u.search = ''; if (/^\d+$/.test(v || '')) u.searchParams.set('v', v); return u.href; } catch { return ''; } };
   const worker = w => w ? { url: url(w.scriptURL), state: w.state } : null;
   const emit = (stage, extra = {}) => console.debug(prefix + JSON.stringify({ stage, doc, at: performance.now(), readyState: document.readyState, lastScript, controller: worker(sw?.controller), ...extra }));
+  const boundaryNames = ['quest-database.js','expedition-database.js','home-dashboard.js','update-manager.js','map-strategy-navigator.js','strategy-goals.js'];
+  const loaded = new WeakSet(), errored = new WeakSet();
+  // Opt-in DOM metadata only, at existing events. No mutation observer, layout,
+  // fetch, body read, evaluation marker, new timer or registration wrapper.
+  const parserSnapshot = reason => {
+    if (!parserBoundary) return;
+    const nodes = Array.from(document.scripts).slice(0,128);
+    const scripts = boundaryNames.map(name => {
+      const node = nodes.find(node => { try { const u = new URL(node.src, location.href); return u.origin === location.origin && u.pathname === '/' + name; } catch { return false; } });
+      return node ? { name, present: true, ordinal: nodes.indexOf(node) + 1, connected: node.isConnected, url: url(node.src), async: node.async, defer: node.defer, type: String(node.type || '').slice(0,32), loadObserved: loaded.has(node), errorObserved: errored.has(node) } : { name, present: false };
+    });
+    emit('parser-boundary', { reason, scripts, scriptCount: nodes.length, truncated: document.scripts.length > 128 });
+  };
   // Completion entries only: an absent entry is not a failed request. Do not
   // fetch/read bodies, alter the timing buffer, inspect layout, or wrap fetch.
   let resourceObserver, resourceCount = 0, resourceDropped = 0, resourceBufferFull = 0;
@@ -66,25 +79,30 @@ function reloadNativeProbe({ instrumentSW = false, resourceTiming = true } = {})
       emit('register-call', { url: url(target), sequence: ++sequence });
       const promise = register.call(this, target, options);
       promise.then(r => snapshot(r, 'register-resolved'), () => emit('register-rejected'));
-      return promise; // Preserve the native return promise, including rejection.
+      // Same returned promise, but the rejection observer changes unhandled-
+      // rejection bookkeeping/timing. This is an instrumented control only.
+      return promise;
     };
   }
   document.addEventListener('readystatechange', () => emit('ready-state'));
   document.addEventListener('load', event => {
     if (event.target?.tagName === 'SCRIPT' && event.target.src) {
+      loaded.add(event.target);
       lastScript = url(event.target.src); emit('script-load', { url: lastScript });
+      if (new URL(lastScript).pathname === '/quest-database.js') parserSnapshot('script-40-load');
     }
   }, true);
   window.addEventListener('load', () => emit('window-load'), { once: true });
-  document.addEventListener('error', event => { if (event.target?.tagName === 'SCRIPT') emit('script-error', { url: url(event.target.src) }); }, true);
+  document.addEventListener('error', event => { if (event.target?.tagName === 'SCRIPT') { errored.add(event.target); emit('script-error', { url: url(event.target.src) }); } }, true);
   // Diagnostic watchdog, not a test wait. Healthy documents cancel it at DCL.
-  // No timeout/assertion is changed, and no DOM snapshot/layout/network is read.
+  // No timeout/assertion is changed. Optional metadata never reads layout/network.
   const watchdog = setTimeout(() => {
     if (document.readyState !== 'loading') return;
     resourceSummary();
+    parserSnapshot('loading-watchdog');
     emit('stall-loading'); inspect('registration-stalled');
   }, 30000);
-  document.addEventListener('DOMContentLoaded', () => { clearTimeout(watchdog); resourceSummary(); emit('native-dcl'); }, { once: true });
+  document.addEventListener('DOMContentLoaded', () => { clearTimeout(watchdog); resourceSummary(); parserSnapshot('dcl'); emit('native-dcl'); }, { once: true });
   window.addEventListener('pagehide', () => emit('pagehide'), { once: true });
 }
 module.exports = { reloadNativeProbe };
