@@ -152,3 +152,27 @@ test('42-boundary summary reserves three reasons and retains presence/unknown se
  assert.equal(n.parserBoundaries[0].scripts[0].present,false);assert.equal(n.parserBoundaries[1].scripts[0].present,null);assert.equal(n.parserBoundaries[2].scripts[0].present,true);assert.deepEqual(n.parserBoundaries[2].scripts[0].ordinals,[43,45]);
  assert.ok(!JSON.stringify(d).includes('password'));assert.ok(!JSON.stringify(d).includes('secret'));await fs.rm(dir,{recursive:true});
 });
+
+test('sole watchdog metadata is sanitized and retained in standalone JSON, attachment and success summary',async()=>{
+ const context=new EventEmitter(),page=new EventEmitter(),dir=await fs.mkdtemp(path.join(os.tmpdir(),'reload-single-'));const attachments=[];
+ page.context=()=>context;page.evaluate=()=>{throw Error('no failed-page sampling')};let options;page.addInitScript=async(fn,value)=>{options=value};
+ const retain=observeReload(page,{title:'single script',outputPath:n=>path.join(dir,n),attach:async(name,value)=>attachments.push({name,value})});
+ await retain.installNativeEvents({parserBoundary:true,parserLoadBoundary:42,parserSingleScript:true});assert.equal(options.parserSingleScript,true);
+ const singleScript={url:'http://user:password@localhost/app.js?v=580&token=secret#private',type:'text/javascript',connected:true,async:false,defer:false,loadObserved:false,errorObserved:false,body:'never retain'};
+ const emit=data=>page.emit('console',{text:()=> '__HD_RELOAD_NATIVE__'+JSON.stringify({stage:'parser-boundary',doc:1,at:30,readyState:'loading',reason:'loading-watchdog',scriptCount:1,truncated:false,scripts:[],singleScript,...data})});
+ emit({});
+ for(let i=0;i<1100;i++)page.emit('console',{text:()=> '__HD_RELOAD_NATIVE__'+JSON.stringify({stage:'script-load',doc:1,at:i,readyState:'loading',url:'http://localhost/extra.js'})});
+ await retain();const file=path.join(dir,'reload-navigation-evidence.json'),d=JSON.parse(await fs.readFile(file,'utf8')),b=d.nativeSummary[0].parserBoundaries[0];
+ assert.equal(d.profile.parserSingleScript,true);assert.deepEqual(d.nativeEvents,[]);assert.ok(d.nativeDropped>0);assert.equal(b.singleScript.url,'http://localhost/app.js?v=580');assert.equal(b.singleScript.loadObserved,false);
+ assert.equal(d.nativeSummary[0].parserBoundaryLimit,3);assert.equal(d.nativeSummary[0].parserBoundaryDropped,0);assert.ok(attachments.some(a=>a.value.path===file));
+ assert.ok(!JSON.stringify(d).includes('secret'));assert.ok(!JSON.stringify(d).includes('password'));assert.ok(!JSON.stringify(d).includes('never retain'));await fs.rm(dir,{recursive:true});
+});
+test('receiver rejects sole metadata outside its opted-in, untruncated single-node watchdog',async()=>{
+ for(const [enabled,override] of [[false,{}],[true,{reason:'dcl'}],[true,{scriptCount:2}],[true,{truncated:true}]]){
+  const context=new EventEmitter(),page=new EventEmitter(),dir=await fs.mkdtemp(path.join(os.tmpdir(),'reload-single-guard-'));
+  page.context=()=>context;page.addInitScript=async()=>{};
+  const retain=observeReload(page,{title:'single guard',outputPath:n=>path.join(dir,n),attach:async()=>{}});await retain.installNativeEvents({parserBoundary:true,parserSingleScript:enabled});
+  page.emit('console',{text:()=> '__HD_RELOAD_NATIVE__'+JSON.stringify({stage:'parser-boundary',doc:1,at:30,readyState:'loading',reason:'loading-watchdog',scriptCount:1,truncated:false,scripts:[],singleScript:{url:'http://localhost/app.js',body:'never retain'},...override})});
+  await retain();const d=JSON.parse(await fs.readFile(path.join(dir,'reload-navigation-evidence.json'),'utf8'));assert.ok(!('singleScript' in d.nativeSummary[0].parserBoundaries[0]));await fs.rm(dir,{recursive:true});
+ }
+});

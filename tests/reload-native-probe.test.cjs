@@ -100,6 +100,25 @@ function parserHarness(options, scripts){
  return {document,listeners,records,timers,boundaries:()=>records.filter(r=>r.stage==='parser-boundary')};
 }
 const parserNode=name=>({tagName:'SCRIPT',src:'http://localhost/'+name+'?v=580&token=secret',isConnected:true,async:false,defer:false,type:''});
+test('sole node identity is opt-in and only sampled at the existing loading watchdog',()=>{
+ const n=parserNode('different-from-app.js');n.src='http://user:password@localhost/different-from-app.js?v=580&token=secret#private';
+ const h=parserHarness({parserBoundary:true,parserSingleScript:true},[n]);
+ h.listeners.get('document:load')({target:n});h.timers[0].f();
+ const b=h.boundaries()[0];assert.equal(b.reason,'loading-watchdog');assert.equal(b.scriptCount,1);assert.equal(b.truncated,false);
+ assert.deepEqual(b.singleScript,{url:'http://localhost/different-from-app.js?v=580',type:'',async:false,defer:false,connected:true,loadObserved:true,errorObserved:false});
+ h.document.readyState='interactive';h.listeners.get('document:DOMContentLoaded')();
+ assert.equal(h.boundaries()[1].singleScript,undefined);assert.equal(h.timers.length,1);assert.equal(h.timers[0].ms,30000);
+ assert.ok(!JSON.stringify(b).includes('secret'));assert.ok(!JSON.stringify(b).includes('password'));
+});
+test('sole-node metadata does not alter PWA/default, empty or multiple-node snapshots',()=>{
+ for(const [options,nodes] of [[{parserBoundary:true},[parserNode('app.js')]],[{parserSingleScript:true},[parserNode('app.js')]],[{parserBoundary:true,parserSingleScript:true},[]],[{parserBoundary:true,parserSingleScript:true},[parserNode('app.js'),parserNode('other.js')]]]){
+  const h=parserHarness(options,nodes);h.timers[0].f();assert.ok(h.boundaries().every(b=>!('singleScript' in b)));assert.equal(h.timers.length,1);
+ }
+ for(const src of ['', 'data:text/javascript,private-body']){
+  const n={...parserNode('app.js'),src};const h=parserHarness({parserBoundary:true,parserSingleScript:true},[n]);if(!src)h.listeners.get('document:error')({target:n});h.timers[0].f();
+  assert.equal(h.boundaries()[0].singleScript.url,'');assert.equal(h.boundaries()[0].singleScript.errorObserved,!src);assert.ok(!JSON.stringify(h.boundaries()).includes('private-body'));
+ }
+});
 test('carrier boundary selects only 42 and reserves load/watchdog/DCL despite repeated loads',()=>{
  const n40=parserNode('quest-database.js'),n42=parserNode('home-dashboard.js'),n43=parserNode('update-manager.js');
  const h=parserHarness({parserBoundary:true,parserLoadBoundary:42},[n40,n42]);

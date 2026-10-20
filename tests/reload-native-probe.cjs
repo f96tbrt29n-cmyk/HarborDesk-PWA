@@ -1,5 +1,5 @@
 // Serialized as an init script in focused reload tests only.
-function reloadNativeProbe({ instrumentSW = false, resourceTiming = true, parserBoundary = false, parserLoadBoundary = 40 } = {}) {
+function reloadNativeProbe({ instrumentSW = false, resourceTiming = true, parserBoundary = false, parserLoadBoundary = 40, parserSingleScript = false } = {}) {
   const prefix = '__HD_RELOAD_NATIVE__', doc = performance.timeOrigin;
   const sw = navigator.serviceWorker, watched = new WeakSet(), registrations = new WeakSet(), subscribed = new WeakSet();
   let lastScript = '', sequence = 0;
@@ -23,7 +23,11 @@ function reloadNativeProbe({ instrumentSW = false, resourceTiming = true, parser
       // A negative result beyond the scan limit is unknown, not absent.
       return node ? { name, present: true, ...matching, ordinal: nodes.indexOf(node) + 1, connected: node.isConnected, url: url(node.src), async: node.async, defer: node.defer, type: String(node.type || '').slice(0,32), loadObserved: loaded.has(node), errorObserved: errored.has(node) } : { name, present: truncated ? null : false, ...matching };
     });
-    emit('parser-boundary', { reason, scripts, scriptCount: nodes.length, truncated });
+    const single = parserSingleScript && reason === 'loading-watchdog' && !truncated && nodes.length === 1 ? nodes[0] : null;
+    // Identity of the sole current node, not evidence of parser insertion history
+    // or execution. Only the existing watchdog in the opted-in carrier case.
+    const singleScript = single ? { url: /^https?:/.test(single.src || '') ? url(single.src) : '', type: String(single.type || '').slice(0,32), async: single.async, defer: single.defer, connected: single.isConnected, loadObserved: loaded.has(single), errorObserved: errored.has(single) } : undefined;
+    emit('parser-boundary', { reason, scripts, scriptCount: nodes.length, truncated, ...(singleScript ? { singleScript } : {}) });
   };
   // Completion entries only: an absent entry is not a failed request. Do not
   // fetch/read bodies, alter the timing buffer, inspect layout, or wrap fetch.

@@ -5,7 +5,7 @@ const { performance } = require('node:perf_hooks');
 const { reloadNativeProbe } = require('./reload-native-probe.cjs');
 function observeReload(page, testInfo) {
   const startedAt = Date.now(), started = performance.now(), events = [], ids = new WeakMap(), sized = new WeakSet();
-  let nextId = 0, closed = false, failed = false, reloadStarted = false, reloadPending = false, nativeStall = false, instrumentSW = false, resourceTiming = true, parserBoundary = false, parserLoadBoundary = 40;
+  let nextId = 0, closed = false, failed = false, reloadStarted = false, reloadPending = false, nativeStall = false, instrumentSW = false, resourceTiming = true, parserBoundary = false, parserLoadBoundary = 40, parserSingleScript = false;
   const native = [], nativeDocuments = new Map(), swSeen = new Set();
   let nativeDropped = 0;
   const workerInfo = w => w ? { url: safeUrl(w.url), state: String(w.state || '') } : null;
@@ -42,6 +42,11 @@ function observeReload(page, testInfo) {
       });
       item.scriptCount = Number.isInteger(data.scriptCount) ? Math.max(0,Math.min(128,data.scriptCount)) : null;
       item.truncated = data.truncated === true;
+      if (parserBoundary && parserSingleScript && data.reason === 'loading-watchdog' && data.scriptCount === 1 && data.truncated === false && data.singleScript && typeof data.singleScript === 'object') {
+        const s = data.singleScript, source = safeUrl(s.url);
+        item.singleScript = { url: /^https?:/.test(source) ? source : '', type: ['','text/javascript','application/javascript','module'].includes(s.type) ? s.type : 'other' };
+        for (const key of ['connected','async','defer','loadObserved','errorObserved']) item.singleScript[key] = s[key] === true;
+      }
     }
     if (data.registration) item.registration = { scope: safeUrl(data.registration.scope), installing: workerInfo(data.registration.installing), waiting: workerInfo(data.registration.waiting), active: workerInfo(data.registration.active) };
     if (data.stage === 'sw-stage') {
@@ -55,7 +60,7 @@ function observeReload(page, testInfo) {
       summary.parserBoundaryLimit = 3;
       summary.parserBoundaryDropped = summary.parserBoundaryDropped || 0;
       if (summary.parserBoundaries.some(b=>b.reason===item.reason) || summary.parserBoundaries.length >= 3) summary.parserBoundaryDropped++;
-      else summary.parserBoundaries.push({ ms: item.ms, at: item.at, reason: item.reason, scripts: item.scripts, scriptCount: item.scriptCount, truncated: item.truncated });
+      else summary.parserBoundaries.push({ ms: item.ms, at: item.at, reason: item.reason, scripts: item.scripts, scriptCount: item.scriptCount, truncated: item.truncated, ...(item.singleScript ? { singleScript: item.singleScript } : {}) });
     }
     if (item.stage === 'resource-complete') {
       summary.resources = summary.resources || [];
@@ -128,7 +133,7 @@ function observeReload(page, testInfo) {
     for (const [name, handler] of Object.entries(contextHandlers)) context.off(name, handler);
     closed = true;
     const retainNative = !!testInfo.project?.metadata?.keepNative || failed && (reloadPending || nativeStall);
-    const body = JSON.stringify({ test: testInfo.title, startedAt, events, instrumentSW, profile: { swSource: instrumentSW ? 'test-instrumented' : 'unmodified', serviceWorkers: testInfo.project?.use?.serviceWorkers || 'allow', resourceTiming, parserBoundary, parserLoadBoundary }, nativeSummary: [...nativeDocuments.values()], nativeDetailsReason: retainNative ? failed && (reloadPending || nativeStall) ? 'reload-wait-failure' : 'diagnostic-control' : 'summary-only', nativeDropped, nativeEvents: retainNative ? native : [] }, null, 2);
+    const body = JSON.stringify({ test: testInfo.title, startedAt, events, instrumentSW, profile: { swSource: instrumentSW ? 'test-instrumented' : 'unmodified', serviceWorkers: testInfo.project?.use?.serviceWorkers || 'allow', resourceTiming, parserBoundary, parserLoadBoundary, parserSingleScript }, nativeSummary: [...nativeDocuments.values()], nativeDetailsReason: retainNative ? failed && (reloadPending || nativeStall) ? 'reload-wait-failure' : 'diagnostic-control' : 'summary-only', nativeDropped, nativeEvents: retainNative ? native : [] }, null, 2);
     const target = testInfo.outputPath('reload-navigation-evidence.json');
     await fs.mkdir(path.dirname(target), { recursive: true });
     await fs.writeFile(target, body);
@@ -150,7 +155,8 @@ function observeReload(page, testInfo) {
     resourceTiming = (options.resourceTiming ?? testInfo.project?.metadata?.resourceTiming) !== false;
     parserBoundary = !!options.parserBoundary;
     parserLoadBoundary = options.parserLoadBoundary === 42 ? 42 : 40;
-    await page.addInitScript(reloadNativeProbe, { instrumentSW, resourceTiming, parserBoundary, parserLoadBoundary });
+    parserSingleScript = !!options.parserSingleScript;
+    await page.addInitScript(reloadNativeProbe, { instrumentSW, resourceTiming, parserBoundary, parserLoadBoundary, parserSingleScript });
   };
   return retain;
 }
