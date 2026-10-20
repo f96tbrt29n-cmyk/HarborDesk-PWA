@@ -556,7 +556,7 @@ document.addEventListener('change',e=>{
  try{localStorage.setItem(HD_FE_OASW_CONFIRM_KEY,JSON.stringify(Object.fromEntries(Object.entries(confirmed).slice(-80))))}catch{hdToast('対潜値を保存できませんでした','warn');return}
  result.measure=hdOCMeasure(result.plan,hdSEChecks(c.map).rows.filter(x=>x.kind!=='基地航空隊'));result.signature=hdOCSignature(c);
  result.shortages=result.shortages.filter(x=>x.goalKind!=='opening-asw');const goal=result.measure.goals.find(x=>x.kind==='opening-asw');if(goal&&!goal.ok)result.shortages.push({...goal,goalKind:'opening-asw',kind:'対潜',owned:0,placement:false,shortfall:goal.minCount-goal.count,candidates:[],asw:true});
- if(typeof hdFCImportOwnedPlan==='function')hdFCImportOwnedPlan(c,result);hdOCRefresh();
+ if(typeof hdFCImportOwnedPlanForUI==='function')hdFCImportOwnedPlanForUI(c,result);hdOCRefresh();
 });
 window.addEventListener('hd:opening-asw-target',()=>{if(typeof hdFLInvalidate==='function')hdFLInvalidate()});
 document.addEventListener('click',e=>{
@@ -567,7 +567,7 @@ document.addEventListener('click',e=>{
   if(action==='calculator'||action==='base'){
    if(action==='calculator'){
     const c=hdOCContext(map,button.dataset.hdOcFleet,button.dataset.hdOcRoute),result=HD_OC_CACHE.get(`${c.map}:${c.fleet?.id}:${c.index}`);
-    if(!result||typeof hdFCImportOwnedPlan==='function'&&!hdFCImportOwnedPlan(c,result)){hdToast('最新の条件で配備を探してから計算してね','warn');return}
+    if(!result){hdToast('最新の条件で配備を探してから計算してね','warn');return}if(typeof hdFCImportOwnedPlanForUI==='function'){const accepted=hdFCImportOwnedPlanForUI(c,result);if(accepted===null)return;if(!accepted){hdToast('最新の条件で配備を探してから計算してね','warn');return}}
    }
    if(typeof hdSelectGuideMap==='function')hdSelectGuideMap(map);
    if(typeof hdFEOpenCalculator==='function')hdFEOpenCalculator();
@@ -584,14 +584,14 @@ document.addEventListener('click',e=>{
   const signature=hdOCSignature(c);if(HD_OC_PENDING.get(key)?.signature===signature)return;
   const pending={signature};HD_OC_PENDING.set(key,pending);button.disabled=true;button.textContent='手持ち装備を確認中…';
   const finish=()=>{if(HD_OC_PENDING.get(key)===pending)HD_OC_PENDING.delete(key)};
-  hdOCSearchAsync(c).then(result=>{finish();HD_OC_CACHE.set(key,result);if(typeof hdFCImportOwnedPlan==='function')hdFCImportOwnedPlan(c,result);hdOCRefresh()}).catch(err=>{
+  hdOCSearchAsync(c).then(result=>{finish();HD_OC_CACHE.set(key,result);if(typeof hdFCImportOwnedPlanForUI==='function')hdFCImportOwnedPlanForUI(c,result);hdOCRefresh()}).catch(err=>{
    finish();button.disabled=false;button.textContent='手持ちで条件を満たす配備を探す';hdOCRefresh();
    hdToast(err.code==='HD_OC_STALE'?'編成や台帳が更新されたので、もう一度配備を探してね':'配備案を作れなかったよ。編成と台帳を確認してね','warn');
   });return;
  }
  const result=HD_OC_CACHE.get(key);if(!result||result.signature!==hdOCSignature(c)){hdToast('編成や台帳が変わったので、もう一度配備を探してね','warn');hdOCRefresh();return}
  if(button.hasAttribute('data-hd-oc-calculator')){
-  if(typeof hdFCImportOwnedPlan==='function'&&!hdFCImportOwnedPlan(c,result))return;
+  if(typeof hdFCImportOwnedPlanForUI==='function'&&!hdFCImportOwnedPlanForUI(c,result))return;
   if(typeof hdSelectGuideMap==='function')hdSelectGuideMap(c.map);
   if(typeof hdFEOpenCalculator==='function')hdFEOpenCalculator();return;
  }
@@ -606,7 +606,7 @@ document.addEventListener('click',e=>{
  }
  if(button.hasAttribute('data-hd-oc-alternatives')){
   if(HD_OC_PENDING.has(key))return;HD_OC_PENDING.set(key,{signature:result.signature});button.disabled=true;button.textContent='代替編成を確認中…';
-  hdOCFindAlternatives(c,result).then(found=>{HD_OC_PENDING.delete(key);if(found.proposal){found.proposal.alternativeNote=found.detail;HD_OC_CACHE.set(key,found.proposal);hdFCImportOwnedPlan(c,found.proposal)}else result.alternativeNote=found.detail;hdOCRefresh()}).catch(err=>{HD_OC_PENDING.delete(key);hdOCRefresh();hdToast(err.code==='HD_OC_STALE'?'台帳・条件が変わりました。最新の情報で再探索してね':'代替探索を完了できませんでした。再探索してね','warn')});return;
+  hdOCFindAlternatives(c,result).then(found=>{HD_OC_PENDING.delete(key);if(found.proposal){found.proposal.alternativeNote=found.detail;HD_OC_CACHE.set(key,found.proposal);hdFCImportOwnedPlanForUI(c,found.proposal)}else result.alternativeNote=found.detail;hdOCRefresh()}).catch(err=>{HD_OC_PENDING.delete(key);hdOCRefresh();hdToast(err.code==='HD_OC_STALE'?'台帳・条件が変わりました。最新の情報で再探索してね':'代替探索を完了できませんでした。再探索してね','warn')});return;
  }
  hdOCRevalidateResult(result);
  if(result.plan.preservationIssues?.length){hdToast('未登録の艦娘・装備を含むため、元の保存編成は上書きしません。台帳・マスター情報を確認してね','warn');return}

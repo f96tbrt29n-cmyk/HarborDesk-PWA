@@ -410,8 +410,8 @@ async function hdFLRefine(plan,host){
 }
 
 function hdFLCalculator(index){
- const plan=hdFLCachedPlan(index);if(!plan||plan.searching||typeof hdFCImportOwnedPlan!=='function')return false;
- const c=hdFLContext(plan);if(!hdFCImportOwnedPlan(c,{plan,signature:hdOCSignature(c)}))return false;
+ const plan=hdFLCachedPlan(index);if(!plan||plan.searching||typeof hdFCImportOwnedPlanForUI!=='function')return false;
+ const c=hdFLContext(plan);if(!hdFCImportOwnedPlanForUI(c,{plan,signature:hdOCSignature(c)}))return false;
  if(typeof hdSelectGuideMap==='function')hdSelectGuideMap(plan.map);if(typeof hdFEOpenCalculator==='function')hdFEOpenCalculator();return true;
 }
 function hdFLKindLabel(k){return ({smallGun:'小口径主砲',mediumGun:'中口径主砲',smallMediumGun:'主砲',largeGun:'大口径主砲',torpedo:'魚雷',recon:'偵察/索敵',fighter:'艦戦',airAttack:'艦攻/艦爆',waterAir:'水上機',ap:'徹甲弾',utility:'海域向け装備'})[k]||k}

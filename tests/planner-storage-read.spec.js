@@ -23,3 +23,73 @@ test('planner read exceptions cannot overwrite existing plans or six stored keys
  });
  expect(result).toEqual({readOnlyFallback:true,nonNull:true,cases:[{sameError:true,unchanged:true},{sameError:true,unchanged:true},{sameError:true,unchanged:true}],originalPlan:true,newPlan:true,otherKeys:true});expect(errors).toEqual([]);
 });
+
+// Same legal Akagi proposal as owned-plan-calculator.spec.js; only Storage
+// reads are faulted. Original getItem is used to compare the underlying bytes.
+async function proposalFixture(page){
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await require('./sync-version-fixture.cjs').syncVersionFixture(page);
+ await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCSearch==='function');
+ await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'試製烈風 後期型',count:1,star:6},{name:'彩雲',count:1,star:0}]));
+  saveCustomFleets({'1-1':[{id:'proposal-fleet',name:'配備候補テスト',ships:[{ship:'赤城改',gameShipId:11,gear:'33号水上電探'}]}]});
+  localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:88}));
+  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'赤城改',gameShipId:11,gameLos:80,gameGearSlots:['33号水上電探'],gameOnslot:[0,0,0,0]}]));
+  localStorage.setItem('harbordesk-pwa-v1',JSON.stringify(blankState()));
+  hdSEChecks=()=>({rows:[{kind:'制空',label:'艦戦',minCount:1},{kind:'索敵',label:'索敵装備',minCount:1}],adv:{}});hdFEEnemyAirCandidates=()=>[];
+  hdFCSaveAll({'2-5:other':{...hdFCDefaultState('2-5','other'),enemyAir:77},'1-1:manual':hdFCDefaultState('1-1','manual')});
+  hdFCSetSelection('1-1','manual');
+  const c=hdOCContext('1-1','proposal-fleet',0),result=hdOCSearch(c);if(result.signature!==hdOCSignature(c)||!result.plan)throw Error('invalid proposal fixture');
+  HD_OC_CACHE.set('1-1:proposal-fleet:0',result);hdMSNOpen('1-1');
+  window.storageFault={mode:'none',original:Storage.prototype.getItem,keys:['harbordesk-custom-fleets-v1','harbordesk-equipment-v1','harbordesk-ship-roster-v1','harbordesk-fleet-calculator-v1','harbordesk-kancolle-sync-v1','harbordesk-pwa-v1',HD_FC_SELECT_KEY],error:new Error('isolated planner read failure')};
+  Storage.prototype.getItem=function(key){if(key===HD_FC_KEY){if(storageFault.mode==='throw'){storageFault.error.stack=new Error('isolated planner read failure').stack;throw storageFault.error;}if(storageFault.mode==='json')return '{"invalid":'}return storageFault.original.call(this,key)};
+ });
+ await expect(page.locator('#mapStrategyNavigator [data-hd-oc-calculator]')).toBeVisible();
+ return errors;
+}
+async function bytes(page){return page.evaluate(()=>{const values=storageFault.keys.map(k=>storageFault.original.call(localStorage,k));storageFault.reference??=values;return values.map((value,i)=>({present:value!==null,length:value?.length??0,unchanged:value===storageFault.reference[i]}))})}
+async function fault(page,mode){await page.evaluate(mode=>storageFault.mode=mode,mode)}
+// Fault the real operation, not an earlier scheduled navigation/render. No
+// event cancellation, synthetic click, or change to the production listeners.
+async function faultOnClick(page,mode,selector){await page.evaluate(({mode,selector})=>{document.addEventListener('click',function arm(e){if(!e.target.closest(selector))return;document.removeEventListener('click',arm,true);storageFault.mode=mode},true)},{mode,selector})}
+
+test('proposal import rejects read and JSON faults before saving or selecting',async({page})=>{
+ const errors=await proposalFixture(page),before=await bytes(page);expect(before.every(v=>v.present)).toBe(true);
+ for(const mode of ['throw','json']){
+  await fault(page,mode);
+  const r=await page.evaluate(()=>{const c=hdOCContext('1-1','proposal-fleet',0),result=HD_OC_CACHE.get('1-1:proposal-fleet:0');let accepted=false,error;try{accepted=hdFCImportOwnedPlan(c,result)}catch(e){error={same:e===storageFault.error,name:e.name}}return {accepted,error}});
+  expect(r.accepted).toBe(false);expect(mode==='throw'?r.error.same:r.error.name==='SyntaxError').toBe(true);
+  expect(await bytes(page)).toEqual(before);
+ }
+ await fault(page,'none');
+ expect(await page.evaluate(()=>hdFCImportOwnedPlan(hdOCContext('1-1','proposal-fleet',0),HD_OC_CACHE.get('1-1:proposal-fleet:0')))).toBe(true);
+ expect(await page.evaluate(()=>hdFCLoadAll()['2-5:other'].enemyAir)).toBe(77);expect(errors).toEqual([]);
+});
+
+for(const mode of ['throw','json'])test(`proposal import UI reports ${mode} failure and resumes without losing other plans`,async({page})=>{
+ const errors=await proposalFixture(page),before=await bytes(page);expect(before.every(v=>v.present)).toBe(true);
+ await faultOnClick(page,mode,'#mapStrategyNavigator [data-hd-oc-calculator]');await page.locator('#mapStrategyNavigator [data-hd-oc-calculator]').click();
+ expect(errors).toEqual([]);await expect(page.locator('#hdToastRegion.warn').filter({hasText:'プランナー'})).toBeVisible();if(mode==='throw'){expect(await page.evaluate(()=>hdDXLocalHealth().unavailable)).toBe(true);await page.evaluate(()=>hdPHRender());await expect(page.locator('#hdPersonalHome .hd-ph-metric').filter({hasText:'端末内データ'})).toContainText('未確認');await expect(page.locator('#hdPersonalHome .hd-ph-metric').filter({hasText:'JSON整合性'})).toContainText('未確認')}
+ expect(await bytes(page)).toEqual(before);await expect(page.locator('[data-hd-fc-proposal]')).toHaveCount(0);
+ await fault(page,'none');await page.locator('#mapStrategyNavigator [data-hd-oc-calculator]').click();
+ await expect(page.locator('[data-hd-fc-proposal]')).toContainText('提案された艦娘・装備・★・スロット位置を反映済み');
+ const after=await bytes(page);expect(after.every(v=>v.present)).toBe(true);expect(after.filter((_,i)=>![3,6].includes(i))).toEqual(before.filter((_,i)=>![3,6].includes(i)));
+ expect(await page.evaluate(()=>hdFCLoadAll()['2-5:other'].enemyAir)).toBe(77);expect(errors).toEqual([]);
+});
+
+for(const mode of ['throw','json'])test(`planner UI edit reset and render survive ${mode} reads without empty-state success`,async({page})=>{
+ const errors=await proposalFixture(page);await page.locator('#mapStrategyNavigator [data-hd-oc-calculator]').click();await expect(page.locator('[data-hd-fc-add]')).toBeVisible();
+ const before=await bytes(page);expect(before.every(v=>v.present)).toBe(true);
+ for(const action of ['edit','reset','render']){
+  const selector=action==='edit'?'[data-hd-fc-add]':action==='reset'?'[data-hd-fc-reset]':'[data-map-tab="gear"]';
+  await faultOnClick(page,mode,selector);
+  if(action==='edit')await page.locator('[data-hd-fc-add]').click();
+  else if(action==='reset'){page.once('dialog',d=>d.accept());await page.locator('[data-hd-fc-reset]').click()}
+  else await page.locator('[data-map-tab="gear"]').click();
+  expect(errors).toEqual([]);await expect(page.locator('[data-hd-fc-storage-error]')).toBeVisible();expect(await bytes(page)).toEqual(before);
+  await faultOnClick(page,'none','[data-hd-fc-storage-retry]');await page.locator('[data-hd-fc-storage-retry]').click();await expect(page.locator('[data-hd-fc-storage-error]')).toHaveCount(0);await expect(page.locator('[data-hd-fc-proposal]')).toBeVisible();expect(await bytes(page)).toEqual(before);
+ }
+ await page.locator('[data-hd-fc-add]').click();await expect(page.locator('[data-hd-fc-gear]')).toHaveCount((await page.evaluate(()=>hdFCLoadAll()['1-1:owned:proposal-fleet:0'].gear.length)));
+ const after=await bytes(page);expect(after.every(v=>v.present)).toBe(true);expect(after.filter((_,i)=>i!==3)).toEqual(before.filter((_,i)=>i!==3));expect(await page.evaluate(()=>hdFCLoadAll()['2-5:other'].enemyAir)).toBe(77);expect(errors).toEqual([]);
+});
