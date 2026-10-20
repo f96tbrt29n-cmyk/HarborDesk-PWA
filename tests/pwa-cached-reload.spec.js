@@ -10,6 +10,7 @@ async function boot(page){
 async function fleet(page,{count=2,base=50,stock=2}={}){
  await boot(page);
  await page.evaluate(({count,base,stock})=>{
+  window.__hdStorageAuditSnapshot?.('fixture-start');
   const names=['占守改','国後改','択捉改','松輪改'].slice(0,count);
   const rows=names.map((name,i)=>{const master=hdShipDbMasterRowFor(name),profile=hdShipDbSlotProfile(hdFEFindShip(name));return {id:'asw-'+i,name,masterId:master.id,gameShipId:100+i,level:80,gameAsw:base,gameLos:36,gameAswGearKnown:true,gameGearSlots:Array(profile.count).fill(''),gameGearExpansion:'',gameSlotEx:0}});
   localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(rows));localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:20}));
@@ -19,6 +20,7 @@ async function fleet(page,{count=2,base=50,stock=2}={}){
   hdSEChecks=()=>({rows:[{kind:'cap-asw',label:'対潜シナジー',minCount:1}],adv:{}});hdFEEnemyAirCandidates=()=>[];
   HD_MAP_ADVANCED_DATA['1-5']={los:{coef:1,checks:[{safe:1,failBelow:0}]}};
   hdMSNOpen('1-5');
+  window.__hdStorageAuditSnapshot?.('fixture-end');
  },{count,base,stock});
 }
 test.describe('PWA cached runtime',()=>{

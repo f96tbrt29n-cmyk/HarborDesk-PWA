@@ -6,7 +6,7 @@ const { EventEmitter } = require('node:events');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
-function fixture(debugFailure = false) {
+function fixture(debugFailure = false, unavailable = false) {
   const records = [], listeners = new Map();
   const data = new WeakMap();
   class Storage {
@@ -19,6 +19,7 @@ function fixture(debugFailure = false) {
   const localStorage = new Storage(), sessionStorage = new Storage();
   const originalGet = Storage.prototype.getItem;
   const window = { localStorage, sessionStorage, addEventListener: (name,fn) => listeners.set(name,fn) }; window.top = window;
+  if(unavailable)Object.defineProperty(window,'localStorage',{get(){const error=new Error('private');error.name='SecurityError';throw error}});
   const document = { readyState:'loading', addEventListener:(name,fn)=>listeners.set(name,fn) };
   vm.runInNewContext('('+storageProbe.toString()+')(args)', {
     args:{keys:KEYS,contextId:'fixture-context',pageId:'fixture-page'}, window, Storage, document, navigator:{},
@@ -51,6 +52,26 @@ test('snapshot records lifecycle without writes, caps records and bounds compari
 test('observer errors do not change successful writes or reads',()=>{
   const f=fixture(true);assert.equal(f.localStorage.setItem(KEYS[0],'kept'),undefined);
   assert.equal(f.localStorage.getItem(KEYS[0]),'kept');
+});
+test('paired mutation records locate explicit deletion and distinguish native failure from null',()=>{
+  const f=fixture();f.window.__hdStorageAuditSnapshot('fixture-start');f.localStorage.setItem(KEYS[0],'kept');
+  f.localStorage.removeItem(KEYS[0]);
+  const pair=f.records.filter(e=>e.mutation?.method==='removeItem');assert.equal(pair.length,2);
+  assert.equal(pair[0].stage,'mutation-before');assert.equal(pair[1].stage,'mutation');assert.equal(pair[0].mutation.id,pair[1].mutation.id);
+  assert.equal(pair[0].values[0].present,true);assert.equal(pair[1].values[0].present,false);assert.equal(pair[0].scope,'fixture');
+  const error=new Error('PRIVATE_THROW');assert.throws(()=>f.localStorage.setItem(KEYS[0],{toString(){throw error}}),e=>e===error);
+  assert.equal(f.records.at(-1).stage,'mutation-failed');assert.equal(f.records.at(-1).mutation.error,'Error');
+  assert.ok(!JSON.stringify(f.records).includes('PRIVATE_THROW'));
+});
+test('earliest storage access exception is recorded without inventing null values or DCL',()=>{
+  const f=fixture(false,true);assert.equal(f.records[0].stage,'init');assert.equal(f.records[0].readyState,'loading');
+  assert.ok(f.records[0].values.every(x=>x.error==='SecurityError'&&!('present'in x)));assert.equal(f.records[0].currentStorageError,'SecurityError');
+});
+test('new Storage object and app script load have separate evidence without overwriting either object',()=>{
+  const f=fixture();f.localStorage.setItem(KEYS[0],'held');f.window.localStorage=new f.Storage();
+  f.listeners.get('load')({target:{tagName:'SCRIPT',src:'http://localhost:4173/app.js?v=580'}});
+  const row=f.records.at(-1);assert.equal(row.stage,'app-script-loaded');assert.equal(row.storageIdentitySame,false);
+  assert.equal(row.values[0].present,true);assert.equal(row.currentValues[0].present,false);assert.equal(f.localStorage.getItem(KEYS[0]),'held');
 });
 test('failure retention uses emitted history without evaluating a blocked page or reading storageState',async(t)=>{
   const folder=await fs.mkdtemp(path.join(os.tmpdir(),'hd-storage-audit-'));t.after(()=>fs.rm(folder,{recursive:true,force:true}));

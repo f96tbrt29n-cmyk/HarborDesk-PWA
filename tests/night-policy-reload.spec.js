@@ -1,5 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const { observeReload } = require('./reload-evidence.cjs');
+const { observeStorage } = require('./pwa-storage-audit.cjs');
 // Retain first-attempt network/API evidence for these reload cases.
 // Whole-document snapshots previously blocked the main thread for up to 15.9s;
 // phases, screenshots, video, source and network evidence remain available.
@@ -42,9 +43,11 @@ test('night CI policy selection regenerates the quick owned loadout and persists
 
 test('carrier night CI policy persists and regenerates the mobile loadout',async({page},testInfo)=>{
  const retainReloadEvidence=observeReload(page,testInfo);
+ const storageAudit=await observeStorage(page,testInfo);
  try {
  await retainReloadEvidence.installNativeEvents({instrumentSW:!!testInfo.project.metadata?.swProbe||process.env.HD_RELOAD_BUFFER_SW==='1'});
  await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ await storageAudit.mark('fixture-start');
  if(testInfo.project.metadata?.retentionFixture)await page.evaluate(()=>{
   localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:120,syncedAt:Date.now()}));
   if(!localStorage.getItem('harbordesk-pwa-v1'))localStorage.setItem('harbordesk-pwa-v1',JSON.stringify(blankState()));
@@ -61,12 +64,14 @@ test('carrier night CI policy persists and regenerates the mobile loadout',async
  });
  if(testInfo.project.metadata?.retentionFixture)expect(saved.values.every(v=>v!==null)).toBe(true);
  await testInfo.attach('pre-reload-six-key-presence',{body:Buffer.from(JSON.stringify(saved.keys.map((key,i)=>({key,present:saved.values[i]!==null})))),contentType:'application/json'});
+ await storageAudit.mark('fixture-end');await storageAudit.mark('pre-reload');
  retainReloadEvidence.mark('reload-start');await page.reload({waitUntil:'domcontentloaded'});retainReloadEvidence.mark('reload-domcontentloaded');await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('cv-fighter2');
+ await storageAudit.mark('application-ready-before-comparison');
  expect(await page.evaluate(keys=>keys.map(k=>localStorage.getItem(k)),saved.keys)).toEqual(saved.values);
- retainReloadEvidence.mark('six-keys-restored');
+ retainReloadEvidence.mark('six-keys-restored');await storageAudit.mark('six-keys-restored');
  retainReloadEvidence.mark('policy-restored');
  expect(retainReloadEvidence.errors()).toEqual([]);
- } catch(error) { retainReloadEvidence.failure(); throw error; } finally { await retainReloadEvidence(); }
+ } catch(error) { retainReloadEvidence.failure(); throw error; } finally { try{await storageAudit.finish()}finally{await retainReloadEvidence();} }
 });
 
 test('carrier bomber CI policy persists and regenerates the mobile loadout',async({page},testInfo)=>{
