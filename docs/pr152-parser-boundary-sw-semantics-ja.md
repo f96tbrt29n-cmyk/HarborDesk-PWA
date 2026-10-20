@@ -1,6 +1,6 @@
 # PR152: 自然DCL停止の40→41境界とSW観測の介入
 
-基準: d61f821e5526002ea462dbad86795b55bbaac017 / CI39458798000。2026-10-21 JSTの調査。製品修正39801e0は読取り例外/JSON構文エラーの限定UI保護として固定し、再実装・再検証していない。本差分は診断/契約テスト/記録のみ。製品JS、公開SW、保存形式、版580は変更しない。
+基準: d61f821e5526002ea462dbad86795b55bbaac017 / CI39458798000。2026-10-21 JSTの調査。製品修正39801e0は読取り例外/JSON構文エラーの限定UI保護として固定し、再実装・再検証していない。本差分は診断/契約テスト/記録のみ（331fb0cとreceiver契約補完コミット）。製品JS、公開SW、保存形式、版580は変更しない。
 
 ## 元の自然停止で確認できる境界
 
@@ -54,13 +54,13 @@ app.js:658のload入口は版なしregister('./sw.js')、update-manager.js:11は
 
 隔離したblank.htmlと**専用no-op worker**（tests/fixtures/sw-api-observer、scopeも同ディレクトリ）だけでAPI観測の可否を検証した。アプリや通常PWAにこのラッパーは注入しない。call-only観測は文書ID/呼出ID/受信thisの識別子/引数の型と安全な文字列URL/返却オブジェクトID/同期throwの識別子を記録し、Reflect.applyで元receiver/元引数を渡し、返却値・throwをそのまま返す。オブジェクト引数のtoString/scope getterを先読みしない。文書時計読取り・配列追加・ラッパー自体の時間的/stack上の介入は残る。完全な呼出元スタックやobject options.scope、settlement、内部要求IDは未観測。handled Promiseの完了結果まで非介入で対応付けられるとは主張しない。
 
-Node契約はreceiver/引数/同期throw/返却identityとthenプロパティ非接触を確認。両ブラウザーの実native register/updateは返却Promise同一、引数変換とscope getter各1回、receiver、無効receiverのnative結果との一致、pageerror0を確認。これは登録障害や元の自然失敗を再現する試験ではない。
+Node契約はreceiver/引数/同期throw/返却identityとthenプロパティ非接触を確認。call-onlyの関数本体をstrictにし、null/undefined receiverがラッパーでglobalThisへ変換されないことも確認した。両ブラウザーの実native register/updateは返却Promise同一、引数変換とscope getter各1回、receiver、無効receiverのnative結果との一致、pageerror0を確認。これは登録障害や元の自然失敗を再現する試験ではない。
 
 別の人工Promise対照では、call-onlyはunhandledrejectionが届き、拒否用thenを付けるoutcome observerでは届かなくなる。両方とも返却Promiseは同一で、拒否reactionは後続checkpointの前に実行される。両エンジンで各対照1回成功、合計4ブラウザー契約実行。人工例外を通常アプリのpageerrorゼロ検査へ除外登録したのではない。既存instrumentSW=true方式はURLも変えthenも付けるため、旧コメントの「同一Promiseなら無影響」を訂正した。通常の未加工SW条件はこの方式を使わない。
 
 ## 結果と残件
 
-Node契約13件（native3/evidence9/call-only1）初回成功。ブラウザー契約4件・PWA対照2件も初回成功。期限・既存アサーション/pageerror検査は緩和しない。共通保存UIや探索を変更していないため完了済みUI/6キー/攻略回帰は再実行せず、通常CIで既存の関連ケースを確認する。診断は正常時の観測機能まで確認できたが、自然停止中のDOM挿入境界はまだ未採取である。実際の製品欠陥を今回新たに修正したとは報告しない。
+Node契約13件（native3/evidence9/call-only1）は成功。最初のブラウザー契約4件・PWA対照2件も初回成功。その後receiver=null/undefinedの契約を追加した際、結果配列へ旧文字列用toBeを残したfixture不備2件が発生した（両結果は同じ3個のTypeErrorだった）。値のtoStrictEqualへ変更し、strictなnative転送も確認した最終の該当2件は各エンジン1回/再試行0で初回成功。変更のない人工Promise2件/PWA2件は反復しない。fixture不備の動画/画像/sw-strict.logを保持、この途中snapshotでは初回traceなし。最終fixtureは失敗時初回traceを保持する設定。sw-final/summary.jsonとsw-call-strict-contract.logが契約補完後の証拠で、前snapshotの結果へ合算しない。期限・既存アサーション/pageerror検査は緩和しない。共通保存UIや探索を変更していないため完了済みUI/6キー/攻略回帰は再実行せず、通常CIで既存の関連ケースを確認する。SW隔離契約specは固定リストのnpm test:browserには含めず、明示実行したローカル診断として分離する。331fb0cのCI39472215041は契約補完前snapshotで、最終HEADのCIへ合算しない。診断は正常時の観測機能まで確認できたが、自然停止中のDOM挿入境界はまだ未採取である。実際の製品欠陥を今回新たに修正したとは報告しない。
 
 既存ログ/初回trace/再試行JSONは保持。1回exec開始前のtransport disconnectがあり、pwd確認後に未開始コマンドだけ再実行した（テストのやり直しではない）。既存未追跡node_modulesリンクは保持、コミットしない。
 

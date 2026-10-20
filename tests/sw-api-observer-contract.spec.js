@@ -1,11 +1,13 @@
 const {test,expect}=require('@playwright/test');
 const {installSWCallProbe}=require('./sw-api-call-probe.cjs');
+test.use({trace:'retain-on-failure'});
 test.describe('isolated SW API observer calibration (not natural failure evidence)',()=>{
  test('native register/update preserve receiver conversions and returned promise with call-only observation',async({page})=>{
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('http://127.0.0.1:4173/tests/fixtures/sw-api-observer/blank.html');
   await page.evaluate(source=>{window.installCalibration=eval('('+source+')')},installSWCallProbe.toString());
   const result=await page.evaluate(async()=>{
+   'use strict';
    const sw=navigator.serviceWorker,proto=ServiceWorkerRegistration.prototype,register=sw.register,update=proto.update;
    // Forwarding sentinels retain each actual native result; no reaction is added by the observer.
    let nativeReturn,registerReceiver,updateReceiver,registerArgs;
@@ -19,15 +21,16 @@ test.describe('isolated SW API observer calibration (not natural failure evidenc
    const originalArgs=registerArgs[0]===script&&registerArgs[1]===options, receivers=registerReceiver===sw&&updateReceiver===registration;
    const recordCount=probe.records.length,opaqueArgs=probe.records[0].args.every(x=>!('url'in x));
    // Invalid receiver: compare observed native outcome with direct native outcome (engines may reject instead of throwing).
-   async function invalid(fn){try{const value=Reflect.apply(fn,{},['./worker.js']);try{await value;return 'resolved'}catch(e){return 'rejected:'+e.name}}catch(e){return 'throw:'+e.name}}
-   const baselineInvalid=await invalid(register),observedInvalid=await invalid(sw.register);
+   async function invalid(fn,receiver){try{const value=Reflect.apply(fn,receiver,['./worker.js']);try{await value;return 'resolved'}catch(e){return 'rejected:'+e.name}}catch(e){return 'throw:'+e.name}}
+   const baselineInvalid=[],observedInvalid=[];
+   for(const receiver of [{},null,undefined]){baselineInvalid.push(await invalid(register,receiver));observedInvalid.push(await invalid(sw.register,receiver));}
    const recordedReceivers=probe.records[0].receiver.id!==probe.records[1].receiver.id;
    probe.restore();sw.register=register;proto.update=update;await registration.unregister();
    return {sameRegister,sameUpdate,conversions,scopeReads,recordCount,opaqueArgs,recordedReceivers,originalArgs,receivers,baselineInvalid,observedInvalid};
   });
   expect(result).toMatchObject({sameRegister:true,sameUpdate:true,conversions:1,scopeReads:1,recordCount:2,opaqueArgs:true,recordedReceivers:true,originalArgs:true,receivers:true});
   expect(errors).toEqual([]);
-  expect(result.observedInvalid).toBe(result.baselineInvalid);
+  expect(result.observedInvalid).toStrictEqual(result.baselineInvalid);
  });
  test('same returned Promise with a rejection reaction changes unhandled-rejection observation',async({page})=>{
   await page.goto('http://127.0.0.1:4173/tests/fixtures/sw-api-observer/blank.html');

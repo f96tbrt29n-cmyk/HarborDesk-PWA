@@ -1,3 +1,4 @@
+'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const {installSWCallProbe}=require('./sw-api-call-probe.cjs');
 test('call-only observer preserves receiver, arguments, synchronous throw and return identity without touching then',()=>{
@@ -12,6 +13,8 @@ test('call-only observer preserves receiver, arguments, synchronous throw and re
   assert.equal(prototype.update.call(container),promise);assert.equal(calls[1].receiver,container);
   assert.throws(()=>container.register.call(sentinel,script),error=>error===sentinel);
   assert.equal(probe.records.length,3);assert.ok(probe.records[2].syncThrow);assert.equal(probe.records[0].returned.id,probe.records[1].returned.id);
+  assert.equal(Reflect.apply(container.register,null,[script]),promise);assert.equal(calls[3].receiver,null);
+  assert.equal(Reflect.apply(container.register,undefined,[script]),promise);assert.equal(calls[4].receiver,undefined);
   probe.restore();assert.deepEqual(Object.getOwnPropertyDescriptor(container,'register'),original);assert.equal(prototype.update,native);
  } finally { if(oldLocation===undefined)delete global.location;else global.location=oldLocation; }
 });

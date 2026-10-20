@@ -1,5 +1,6 @@
 // Isolated calibration only. Not installed in application/reload fixtures.
 function installSWCallProbe(container, registrationPrototype) {
+  'use strict'; // Preserve null/undefined receivers instead of sloppy-mode coercion.
   const records = [], identities = new WeakMap(), restorers = [];
   let nextIdentity = 0, callId = 0;
   const identity = value => {
