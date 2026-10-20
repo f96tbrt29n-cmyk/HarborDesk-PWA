@@ -9,6 +9,8 @@ test('planner read exceptions cannot overwrite existing plans or six stored keys
   keys.forEach((k,i)=>localStorage.setItem(k,JSON.stringify(i===1||i===2?[]:i===5?blankState():{})));
   const plan={...hdFCDefaultState('2-5','saved'),gear:[{name:'零式水上観測機',star:4,slot:9}]};hdFCSaveAll({'2-5:saved':plan});
   const original=Storage.prototype.getItem,before=keys.map(k=>localStorage.getItem(k)),cases=[];
+  let readOnlyFallback=false;Storage.prototype.getItem=function(key){if(key===HD_FC_KEY)throw Error('isolated listing read unavailable');return original.call(this,key)};
+  try{readOnlyFallback=Object.keys(hdFCLoadAll()).length===0}finally{Storage.prototype.getItem=original}
   const actions=[()=>hdFCState('1-1','manual'),()=>hdFCSaveState('1-1','manual',{gear:[]}),()=>hdFCReset('2-5','saved')];
   for(const action of actions){
    const error=new Error('isolated planner read unavailable');let sameError=false;
@@ -17,7 +19,7 @@ test('planner read exceptions cannot overwrite existing plans or six stored keys
    cases.push({sameError,unchanged:keys.every((k,i)=>localStorage.getItem(k)===before[i])});
   }
   hdFCSaveState('1-1','new',hdFCDefaultState('1-1','new'));
-  return {nonNull:before.every(v=>v!==null),cases,originalPlan:JSON.stringify(hdFCLoadAll()['2-5:saved'])===JSON.stringify(plan),newPlan:!!hdFCLoadAll()['1-1:new'],otherKeys:keys.every((k,i)=>k===HD_FC_KEY||localStorage.getItem(k)===before[i])};
+  return {readOnlyFallback,nonNull:before.every(v=>v!==null),cases,originalPlan:JSON.stringify(hdFCLoadAll()['2-5:saved'])===JSON.stringify(plan),newPlan:!!hdFCLoadAll()['1-1:new'],otherKeys:keys.every((k,i)=>k===HD_FC_KEY||localStorage.getItem(k)===before[i])};
  });
- expect(result).toEqual({nonNull:true,cases:[{sameError:true,unchanged:true},{sameError:true,unchanged:true},{sameError:true,unchanged:true}],originalPlan:true,newPlan:true,otherKeys:true});expect(errors).toEqual([]);
+ expect(result).toEqual({readOnlyFallback:true,nonNull:true,cases:[{sameError:true,unchanged:true},{sameError:true,unchanged:true},{sameError:true,unchanged:true}],originalPlan:true,newPlan:true,otherKeys:true});expect(errors).toEqual([]);
 });

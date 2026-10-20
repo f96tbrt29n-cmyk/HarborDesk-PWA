@@ -166,5 +166,5 @@
     "旧失敗にはStorage操作履歴がない",
     "受信記録の欠測は物理削除の否定にならない"
   ],
-  "confirmedSeparateDefect": "Storage.getItem例外から{}にfallbackしplanner初期保存/明示保存が他プランを上書き。例外を伝播させて書込みを防止。実nullや不正JSONのfallback動作は今回変更せず。"
+  "confirmedSeparateDefect": "Storage.getItem例外から{}にfallbackしplanner初期保存/明示保存が他プランを上書き。最終版はstate/save/reset/importの4書込み入口だけstrict読取りとし、Storage/JSON構文例外を伝播。読取り専用fallbackと正しい未保存nullは維持。旧5nullの原因は未確定。"
 }

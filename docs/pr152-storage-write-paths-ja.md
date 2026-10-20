@@ -22,6 +22,6 @@
 
 キー名・機械可読の一覧は [pr152-storage-write-paths.json](pr152-storage-write-paths.json)。
 
-今回確認した別件欠陥はプランナー読取り例外後の上書き。旧5nullはAPIが実nullを返しており、読取り例外経路が原因とはしない。元のnull/JSON parse fallback、同期の途中書込み例外等は別の未検証範囲で、包括的な保存安全性を宣言しない。
+今回確認した別件欠陥はプランナー読取り例外後の上書き。旧5nullはAPIが実nullを返しており、読取り例外経路が原因とはしない。最終版は書込み入口だけ厳格に読み取る。元のnull/読取り専用fallback、構文が有効だが異なるschema、同期の途中書込み例外等は別の未検証範囲で、包括的な保存安全性を宣言しない。
 
 製品でNative Storageへの直接property代入/delete/Object.assign等は見つからなかった。backup作成のdata.localStorage[k]代入は通常object。別realm、ブラウザー内部の領域破棄/異常、外部操作、計測欠落はメソッド監査だけでは除外できない。旧traceのorigin/contextが同じである事実を尊重し、切替を推測しない。
