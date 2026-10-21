@@ -10,10 +10,10 @@ const { observeRegistrationContinuation } = require('./pwa-registration-continua
 const { initialUpdateBoundary, openFollowingPage, scopedInfo, retainInitialDocumentResult } = require('./initial-document-fixture.cjs');
 test.use({ viewport:{width:390,height:844},hasTouch:true,isMobile:true,serviceWorkers:'allow' });
 
-for (const disposition of ['keep','close']) test('B initial document '+disposition, async ({ page, browser }, info) => {
+for (const [disposition,suppressInitialUpdate] of [['keep',false],['close',false],['close',true]]) test('B initial document '+disposition+(suppressInitialUpdate?' with initial update suppressed':''), async ({ page, browser }, info) => {
   const root = path.resolve(__dirname,'..'), source = await fs.readFile(path.join(root,'update-manager.js'),'utf8');
-  const fixture = initialUpdateFixture(source, false), context = page.context(), contextId = randomUUID();
-  const report = { disposition, contextId, browser:browser.version(), sources:fixture.sources,
+  const fixture = initialUpdateFixture(source, suppressInitialUpdate), context = page.context(), contextId = randomUUID();
+  const report = { disposition, suppressInitialUpdate, contextId, browser:browser.version(), sources:fixture.sources,
     swSHA256:createHash('sha256').update(await fs.readFile(path.join(root,'sw.js'))).digest('hex'),
     events:[],samples:[],entryResponses:[],droppedEvents:0,droppedSamples:0,droppedEntryResponses:0,
     stage:'initial-preparation',validComparison:false };
@@ -50,8 +50,8 @@ for (const disposition of ['keep','close']) test('B initial document '+dispositi
     event('initial-navigation-request');await page.goto(report.origin,{waitUntil:'domcontentloaded'});
     await expect(page.locator('#registration-fixture')).toBeVisible();
     // Read only the original recorder's Node history, not the native Promise.
-    await expect.poll(()=>!!initialUpdateBoundary(initial.timeline()),{timeout:12000,message:'initial document must reach its existing explicit update expression'}).toBe(true);
-    report.initialBoundary=initialUpdateBoundary(initial.timeline());event('initial-update-gate');
+    await expect.poll(()=>!!initialUpdateBoundary(initial.timeline(),suppressInitialUpdate),{timeout:12000,message:suppressInitialUpdate?'initial document must reach its explicit update suppression site':'initial document must reach its existing explicit update expression'}).toBe(true);
+    report.initialBoundary=initialUpdateBoundary(initial.timeline(),suppressInitialUpdate);event('initial-update-gate');
     phase='reloaded';event('following-source-phase-selected');
     const following=await openFollowingPage(page,disposition,event);
     expect(following.context()).toBe(context);expect(page.isClosed()).toBe(disposition==='close');

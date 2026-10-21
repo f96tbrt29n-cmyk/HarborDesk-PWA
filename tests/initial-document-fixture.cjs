@@ -4,11 +4,12 @@ const path = require('node:path');
 
 // Require a complete, ordered gate in one initial document/call. A missing
 // marker is a preparation/observation limit, not a native Promise diagnosis.
-function initialUpdateBoundary(events) {
-  const stages = ['await-resumed','registered-assigned','explicit-update-site','explicit-update-expression-returned'];
+function initialUpdateBoundary(events, suppressInitialUpdate = false) {
+  if (typeof suppressInitialUpdate !== 'boolean') throw Error('invalid initial suppression policy');
+  const stages = ['await-resumed','registered-assigned','explicit-update-site',suppressInitialUpdate ? 'explicit-update-suppressed' : 'explicit-update-expression-returned'];
   for (const first of events) {
-    if (first.stage !== stages[0] || first.updateControl?.phase !== 'initial' || first.updateControl.suppress !== false) continue;
-    const matches = events.filter(e => e.callId === first.callId && e.document.timeOrigin === first.document.timeOrigin && e.updateControl?.phase === 'initial' && e.updateControl.suppress === false);
+    if (first.stage !== stages[0] || first.updateControl?.phase !== 'initial' || first.updateControl.suppress !== suppressInitialUpdate) continue;
+    const matches = events.filter(e => e.callId === first.callId && e.document.timeOrigin === first.document.timeOrigin && e.updateControl?.phase === 'initial' && e.updateControl.suppress === suppressInitialUpdate);
     let index = -1;
     const matched = [];
     for (const stage of stages) {

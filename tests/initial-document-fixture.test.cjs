@@ -24,6 +24,25 @@ test('initial gate requires ordered await/assignment/update/return in one docume
   assert.equal(initialUpdateBoundary(events.map(x=>({...x,updateControl:{phase:'initial',suppress:true}}))),null);
 });
 
+test('suppression gate completes on suppression, never waits for a nonexistent update return',()=>{
+  const suppressed=stages.map(stage=>event(stage==='explicit-update-expression-returned'?'explicit-update-suppressed':stage,{updateControl:{phase:'initial',suppress:true}}));
+  assert.deepEqual(initialUpdateBoundary(suppressed,true).boundaries.map(x=>x.stage),['await-resumed','registered-assigned','explicit-update-site','explicit-update-suppressed']);
+  assert.equal(initialUpdateBoundary(suppressed),null);
+  assert.equal(initialUpdateBoundary(stages.map(stage=>event(stage)),true),null);
+  assert.equal(initialUpdateBoundary(suppressed.slice(0,3),true),null);
+  const wrongReturn=suppressed.map(x=>x.stage==='explicit-update-suppressed'?{...x,stage:'explicit-update-expression-returned'}:x);
+  assert.equal(initialUpdateBoundary(wrongReturn,true),null);
+});
+
+test('suppression gate still requires matching document, call, initial phase and policy',()=>{
+  const original=stages.map(stage=>event(stage==='explicit-update-expression-returned'?'explicit-update-suppressed':stage,{updateControl:{phase:'initial',suppress:true}}));
+  for (const replacement of [{callId:2},{document:{...original[3].document,timeOrigin:2000}},{updateControl:{phase:'reloaded',suppress:true}},{updateControl:{phase:'initial',suppress:false}}]) {
+    const mixed=original.map((x,i)=>i===3?{...x,...replacement}:x);
+    assert.equal(initialUpdateBoundary(mixed,true),null);
+  }
+  assert.throws(()=>initialUpdateBoundary(original,'true'),/invalid/);
+});
+
 function pages(closeError) {
   const calls=[];let closed=false;
   const context={async newPage(...args){calls.push({kind:'newPage',receiver:this,args});return following;}};
