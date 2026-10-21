@@ -11,7 +11,8 @@ for(const cached of [false,true])test('private SW probe preserves response and r
  const self={location:{origin:'http://localhost'},addEventListener:(type,handler)=>listeners.set(type,handler),fetch:async()=>{fetchCalls++;if(cached)throw Error('controlled rejection');return response},caches:{match:async()=>response}};
  vm.runInNewContext(source,{self,Cache,URL,Date,WeakMap,Promise});
  listeners.get('message')({data:{tag:'hd-reload-buffer',action:'subscribe'},ports:[{postMessage:d=>messages.push(d)}]});
- // Mirror production composition. The observer must not add fetches/clones/readers.
+ // Historical minimal composition for observer identity only. Full current SW
+ // response/lifetime/rejection contracts live in sw-cache-lifetime.test.cjs.
  self.addEventListener('fetch',e=>e.respondWith(self.fetch(e.request).then(r=>{cache.put(e.request,r.clone());return r}).catch(()=>self.caches.match(e.request))));
  let delivered;listeners.get('fetch')({request:req,respondWith:p=>{delivered=p}});
  assert.equal(await delivered,response);assert.equal(fetchCalls,1);assert.equal(reads,0);assert.equal(clones,cached?0:1);
