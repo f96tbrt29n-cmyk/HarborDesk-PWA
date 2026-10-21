@@ -6,7 +6,7 @@ const { EventEmitter } = require('node:events');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
-function fixture(debugFailure = false, unavailable = false) {
+function fixture(debugFailure = false, unavailable = false, scriptErrorBoundary = false) {
   const records = [], listeners = new Map();
   const data = new WeakMap();
   class Storage {
@@ -22,7 +22,7 @@ function fixture(debugFailure = false, unavailable = false) {
   if(unavailable)Object.defineProperty(window,'localStorage',{get(){const error=new Error('private');error.name='SecurityError';throw error}});
   const document = { readyState:'loading', addEventListener:(name,fn)=>listeners.set(name,fn) };
   vm.runInNewContext('('+storageProbe.toString()+')(args)', {
-    args:{keys:KEYS,contextId:'fixture-context',pageId:'fixture-page'}, window, Storage, document, navigator:{},
+    args:{keys:KEYS,contextId:'fixture-context',pageId:'fixture-page',scriptErrorBoundary}, window, Storage, document, navigator:{},
     URL, location:{href:'http://localhost:4173/?token=secret#private',origin:'http://localhost:4173'},
     performance:{timeOrigin:100,now:()=>1},console:{debug:text=>{ if(debugFailure)throw Error('diagnostic failure');records.push(JSON.parse(text.slice('__HD_STORAGE_AUDIT__'.length))); }}
   });
@@ -75,13 +75,32 @@ test('new Storage object and app script load have separate evidence without over
 });
 test('failure retention uses emitted history without evaluating a blocked page or reading storageState',async(t)=>{
   const folder=await fs.mkdtemp(path.join(os.tmpdir(),'hd-storage-audit-'));t.after(()=>fs.rm(folder,{recursive:true,force:true}));
-  const browser=new EventEmitter(),context=new EventEmitter(),page=new EventEmitter();let attached;
+  const browser=new EventEmitter(),context=new EventEmitter(),page=new EventEmitter();let attached,initArgs;
   context.browser=()=>browser;context.pages=()=>[page];page.context=()=>context;
-  page.addInitScript=async()=>{};page.evaluate=()=>{throw Error('must not evaluate on failure')};
+  page.addInitScript=async(fn,args)=>{initArgs=args};page.evaluate=()=>{throw Error('must not evaluate on failure')};
   context.storageState=()=>{throw Error('must not serialize values')};
-  const audit=await observeStorage(page,{project:{},outputPath:name=>path.join(folder,name),attach:async(name,data)=>{attached=JSON.parse(await fs.readFile(data.path,'utf8'))}});
+  const audit=await observeStorage(page,{project:{},outputPath:name=>path.join(folder,name),attach:async(name,data)=>{attached=JSON.parse(await fs.readFile(data.path,'utf8'))}},{scriptErrorBoundary:true});
   page.emit('console',{text:()=> '__HD_STORAGE_AUDIT__'+JSON.stringify({stage:'pagehide',values:[{key:KEYS[0],present:true,length:8}]})});
   page.emit('crash');browser.emit('disconnected');await audit.finish();
   assert.deepEqual(attached.events.map(e=>e.kind),['install','storage','page-crash','browser-disconnected']);
+  assert.equal(initArgs.scriptErrorBoundary,true);assert.equal(attached.events[0].scriptErrorBoundary,true);
   assert.equal(page.listenerCount('console'),0);assert.equal(browser.listenerCount('disconnected'),0);
+});
+test('opt-in first script error boundary is read-only, once per document, and distinguishes nonnull from null',()=>{
+  assert.equal(fixture().listeners.has('error'),false);
+  const f=fixture(false,false,true),error=f.listeners.get('error');
+  f.localStorage.setItem(KEYS[0],'PRIVATE_VALUE');
+  const before=f.records.length;
+  error({target:{tagName:'IMG'}});assert.equal(f.records.length,before);
+  const event={target:{tagName:'SCRIPT'},preventDefault(){throw Error('must not cancel')}};
+  error(event);const boundary=f.records.at(-1);
+  assert.equal(boundary.stage,'first-script-error');assert.equal(boundary.values[0].present,true);
+  assert.equal(boundary.values[1].present,false);assert.equal(f.localStorage.getItem(KEYS[0]),'PRIVATE_VALUE');
+  assert.equal(f.Storage.prototype.getItem,f.originalGet);assert.equal(boundary.mutation,undefined);
+  error(event);assert.equal(f.records.length,before+1);
+  assert.ok(!JSON.stringify(boundary).includes('PRIVATE_VALUE'));
+  const unavailable=fixture(false,true,true);unavailable.listeners.get('error')(event);
+  assert.ok(unavailable.records.at(-1).values.every(x=>x.error==='SecurityError'&&!('present'in x)));
+  const failedDelivery=fixture(true,false,true);
+  assert.doesNotThrow(()=>failedDelivery.listeners.get('error')(event));
 });

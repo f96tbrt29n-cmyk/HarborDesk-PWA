@@ -3,7 +3,7 @@ const { randomUUID } = require('node:crypto');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const KEYS = ['harbordesk-custom-fleets-v1','harbordesk-equipment-v1','harbordesk-ship-roster-v1','harbordesk-fleet-calculator-v1','harbordesk-kancolle-sync-v1','harbordesk-pwa-v1'];
-function storageProbe({ keys, contextId, pageId }) {
+function storageProbe({ keys, contextId, pageId, scriptErrorBoundary = false }) {
   if (window !== window.top) return;
   const proto = Storage.prototype, get = proto.getItem, doc = performance.timeOrigin;
   let storage, storageError, count = 0, operation = 0, scope = 'application-or-runtime';
@@ -62,9 +62,19 @@ function storageProbe({ keys, contextId, pageId }) {
       try { if (new URL(event.target.src).pathname.endsWith('/app.js')) snapshot('app-script-loaded'); } catch {}
     }
   }, true);
+  // One passive boundary, only in the dedicated PWA case. No recovery or reads
+  // after failure; this runs during the original script error event instead.
+  if (scriptErrorBoundary) {
+    let observed = false;
+    document.addEventListener('error', event => {
+      if (observed || event.target?.tagName !== 'SCRIPT') return;
+      observed = true;
+      snapshot('first-script-error');
+    }, true);
+  }
   navigator.serviceWorker?.addEventListener('controllerchange', () => snapshot('controllerchange'));
 }
-async function observeStorage(page, testInfo) {
+async function observeStorage(page, testInfo, { scriptErrorBoundary = false } = {}) {
   if (testInfo.project.metadata?.storageAudit === false) return { mark: async () => {}, timeline:()=>[], finish: async () => {} };
   const context = page.context(), browser = context.browser(), contextId = randomUUID(), events = [];
   let dropped = 0;
@@ -79,8 +89,8 @@ async function observeStorage(page, testInfo) {
     [page,'framenavigated',frame=>{if(frame===page.mainFrame())record('navigation-commit',{url:safeUrl(frame.url())});}]];
   if (browser) listeners.push([browser,'disconnected',()=>record('browser-disconnected')]);
   for (const [target,name,fn] of listeners) target.on(name,fn);
-  record('install', { contextId, pageId: 'existing-fixture-page', existingPages: context.pages().length, storageStateConfigured: !!testInfo.project.use?.storageState, retry:testInfo.retry, workerIndex:testInfo.workerIndex, serviceWorkers:testInfo.project.use?.serviceWorkers||'allow' });
-  await page.addInitScript(storageProbe, { keys: KEYS, contextId, pageId: 'existing-fixture-page' });
+  record('install', { contextId, pageId: 'existing-fixture-page', existingPages: context.pages().length, storageStateConfigured: !!testInfo.project.use?.storageState, retry:testInfo.retry, workerIndex:testInfo.workerIndex, serviceWorkers:testInfo.project.use?.serviceWorkers||'allow', scriptErrorBoundary });
+  await page.addInitScript(storageProbe, { keys: KEYS, contextId, pageId: 'existing-fixture-page', scriptErrorBoundary });
   return {
     timeline: () => events.slice(),
     mark: stage => page.evaluate(stage => window.__hdStorageAuditSnapshot?.(stage), stage),
