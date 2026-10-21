@@ -46,6 +46,7 @@ test('carrier night CI policy persists and regenerates the mobile loadout',async
  const storageAudit=await observeStorage(page,testInfo);
  try {
  await retainReloadEvidence.installNativeEvents({instrumentSW:!!testInfo.project.metadata?.swProbe||process.env.HD_RELOAD_BUFFER_SW==='1',parserBoundary:testInfo.project.metadata?.parserBoundary!==false,parserLoadBoundary:42,parserSingleScript:true});
+ await retainReloadEvidence.installVersionCalls();
  await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
  await storageAudit.mark('fixture-start');
  if(testInfo.project.metadata?.retentionFixture)await page.evaluate(()=>{

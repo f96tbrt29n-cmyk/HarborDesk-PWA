@@ -3,15 +3,34 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { performance } = require('node:perf_hooks');
 const { reloadNativeProbe } = require('./reload-native-probe.cjs');
+const { versionCallProbe } = require('./version-call-probe.cjs');
 function observeReload(page, testInfo) {
   const startedAt = Date.now(), started = performance.now(), events = [], ids = new WeakMap(), sized = new WeakSet();
   let nextId = 0, closed = false, failed = false, reloadStarted = false, reloadPending = false, nativeStall = false, instrumentSW = false, resourceTiming = true, parserBoundary = false, parserLoadBoundary = 40, parserSingleScript = false;
   const native = [], nativeDocuments = new Map(), swSeen = new Set();
   let nativeDropped = 0;
+  let versionCallSites = null, versionDropped = 0;
+  const versionCounts = new Map(), versionLimit = 24;
   const workerInfo = w => w ? { url: safeUrl(w.url), state: String(w.state || '') } : null;
   const stages = new Set(['init','ready-state','native-dcl','window-load','pagehide','script-load','script-error','register-call','register-resolved','register-rejected','registration-initial','registration-controller','registration-stalled','registration-query-failed','controllerchange','updatefound','sw-state','stall-loading','sw-stage','probe-subscribe-failed','resource-complete','resource-observer','resource-summary','parser-boundary']);
   const nativeConsole = message => {
     const text = message.text();
+    if (versionCallSites && text.startsWith('__HD_VERSION_CALL__') && text.length <= 4096) {
+      let data; try { data=JSON.parse(text.slice('__HD_VERSION_CALL__'.length)); } catch { return; }
+      if (!Number.isFinite(data.doc) || !['init','install','call'].includes(data.stage)) return;
+      const count=versionCounts.get(data.doc)||0;
+      if(count>=versionLimit){versionDropped++;return;}versionCounts.set(data.doc,count+1);
+      const item={stage:data.stage,doc:data.doc,timeOrigin:data.timeOrigin,at:data.at,readyState:data.readyState,deliveryFailures:data.deliveryFailures};
+      if(data.stage==='install')Object.assign(item,{reason:data.reason,added:(data.added||[]).filter(n=>['hdCheckForUpdate','hdFetchLatestVersion','hdFetchVersionMeta'].includes(n)),installedCount:data.installedCount,afterWindowLoadOrComplete:data.afterWindowLoadOrComplete===true});
+      if(data.stage==='call'){
+        if(!['hdCheckForUpdate','hdFetchLatestVersion','hdFetchVersionMeta'].includes(data.api))return;
+        Object.assign(item,{api:data.api,id:data.id,parentId:data.parentId,
+          origin:['automatic-load-timer','explicit-update-check','unclassified'].includes(data.origin)?data.origin:'unclassified',
+          role:['entry','external-callsite','local-callsite','unclassified'].includes(data.role)?data.role:'unclassified',
+          caller:(data.caller||[]).slice(0,8).map(s=>({line:s.line,column:s.column}))});
+      }
+      record('version-entry',item);return;
+    }
     if (!text.startsWith('__HD_RELOAD_NATIVE__') || text.length > 16384) return;
     let data; try { data = JSON.parse(text.slice('__HD_RELOAD_NATIVE__'.length)); } catch { return; }
 
@@ -133,7 +152,7 @@ function observeReload(page, testInfo) {
     for (const [name, handler] of Object.entries(contextHandlers)) context.off(name, handler);
     closed = true;
     const retainNative = !!testInfo.project?.metadata?.keepNative || failed && (reloadPending || nativeStall);
-    const body = JSON.stringify({ test: testInfo.title, startedAt, events, instrumentSW, profile: { swSource: instrumentSW ? 'test-instrumented' : 'unmodified', serviceWorkers: testInfo.project?.use?.serviceWorkers || 'allow', resourceTiming, parserBoundary, parserLoadBoundary, parserSingleScript }, nativeSummary: [...nativeDocuments.values()], nativeDetailsReason: retainNative ? failed && (reloadPending || nativeStall) ? 'reload-wait-failure' : 'diagnostic-control' : 'summary-only', nativeDropped, nativeEvents: retainNative ? native : [] }, null, 2);
+    const body = JSON.stringify({ test: testInfo.title, startedAt, events, instrumentSW, profile: { swSource: instrumentSW ? 'test-instrumented' : 'unmodified', serviceWorkers: testInfo.project?.use?.serviceWorkers || 'allow', resourceTiming, parserBoundary, parserLoadBoundary, parserSingleScript }, ...(versionCallSites?{versionCalls:{sites:versionCallSites,limitPerDocument:versionLimit,dropped:versionDropped}}:{}), nativeSummary: [...nativeDocuments.values()], nativeDetailsReason: retainNative ? failed && (reloadPending || nativeStall) ? 'reload-wait-failure' : 'diagnostic-control' : 'summary-only', nativeDropped, nativeEvents: retainNative ? native : [] }, null, 2);
     const target = testInfo.outputPath('reload-navigation-evidence.json');
     await fs.mkdir(path.dirname(target), { recursive: true });
     await fs.writeFile(target, body);
@@ -149,6 +168,15 @@ function observeReload(page, testInfo) {
   retain.nativeTimeline = () => native.slice();
   retain.nativeSummary = () => [...nativeDocuments.values()];
   retain.failure = () => { failed = true; };
+  retain.installVersionCalls = async () => {
+    const source=await fs.readFile(path.join(__dirname,'../update-manager.js'),'utf8'), lines=source.split('\n');
+    const find=text=>lines.findIndex(line=>line.includes(text))+1;
+    versionCallSites={automaticLine:find('setTimeout(()=>hdCheckForUpdate(false),1200)'),
+      explicitLines:lines.flatMap((line,i)=>line.includes('hdCheckForUpdate(true)')?[i+1]:[]),
+      externalLine:find('hdFetchVersionMeta(HD_RELEASE_META_RAW)'),localLine:find("hdFetchVersionMeta('./app-version.json')")};
+    if(!versionCallSites.automaticLine||!versionCallSites.externalLine||!versionCallSites.localLine)throw Error('version callsite contract changed');
+    await page.addInitScript(versionCallProbe,versionCallSites);
+  };
   retain.errors = () => events.filter(event => event.kind === 'pageerror');
   retain.installNativeEvents = async (options = {}) => {
     instrumentSW = !!options.instrumentSW;
