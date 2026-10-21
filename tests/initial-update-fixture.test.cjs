@@ -9,6 +9,9 @@ const { EventEmitter } = require('node:events');
 const { registrationRouteFixture } = require('./registration-route-fixture.cjs');
 const { initialUpdateFixture } = require('./initial-update-fixture.cjs');
 const { observeRegistrationContinuation } = require('./pwa-registration-continuation.cjs');
+const { instrumentRegistrationSource } = require('./pwa-registration-continuation.cjs');
+const { initialUpdateSource } = require('./initial-update-fixture.cjs');
+const { createApplicationUpdateComparison } = require('./pwa-initial-update-comparison.cjs');
 const source = require('node:fs').readFileSync(path.join(__dirname, '../update-manager.js'), 'utf8');
 const control = initialUpdateFixture(source, false), comparison = initialUpdateFixture(source, true);
 
@@ -104,4 +107,78 @@ test('update phase and operation markers persist with document identity; invalid
   assert.deepEqual(report.events.filter(e => e.stage === 'explicit-update-site').map(e => e.updateControl),
     [{ phase:'initial',suppress:false },{ phase:'initial',suppress:true },{ phase:'reloaded',suppress:false }]);
   assert.ok(report.events.every(e => e.document.timeOrigin === 1000));
+});
+
+test('full-app delivery changes only initial policy, keeps the full update UI/timers and following source', () => {
+  const instrumented = instrumentRegistrationSource(source).source;
+  const initial = initialUpdateSource(instrumented, 'initial', false);
+  const suppressed = initialUpdateSource(instrumented, 'initial', true);
+  assert.equal(initial.replace('const __hdSuppressExplicitUpdate=false;', 'const __hdSuppressExplicitUpdate=true;'), suppressed);
+  for (const code of [initial, suppressed, initialUpdateSource(instrumented, 'reloaded', false)]) {
+    assert.equal(code.slice(code.indexOf('const HD_RELEASE_META_RAW=')), source.slice(source.indexOf('const HD_RELEASE_META_RAW=')));
+    for (const token of [/\.then\(/g,/\.catch\(/g,/\.finally\(/g,/setTimeout\(/g,/setInterval\(/g,/\.update\(/g,/\.register\(/g,/waitUntil\(/g]) assert.equal([...code.matchAll(token)].length, [...source.matchAll(token)].length);
+  }
+  assert.equal(control.sources.initialEntrySHA256, '193a19d5774c9cb95b1a7589876781065dfddaba7a5ff6a682e9bda092c05cc0');
+  assert.equal(comparison.sources.initialEntrySHA256, '3ba6281836337222b57c99d96de27d448b3192387928df9c804b29433a8ceb1d');
+  assert.throws(() => initialUpdateSource(instrumented, 'unknown', false), /invalid/);
+  assert.throws(() => initialUpdateSource(instrumented.replace('    reg.update().catch(()=>{});', ''), 'initial', true), /anchor/);
+});
+
+test('real-app fixture confirms preparation from received history without extra reads or waits; following update stays enabled', async t => {
+  for (const suppress of [false,true]) {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'pwa-app-update-'));
+    t.after(() => fs.rm(dir, { recursive:true }));
+    let timeline = [];
+    const probe = { transform: text => instrumentRegistrationSource(text).source, timeline: () => timeline.slice() };
+    const info = { project:{name:'isolated-contract'}, outputPath:(...names) => path.join(dir,...names) };
+    const fixture = createApplicationUpdateComparison(probe, info, suppress);
+    const response = new EventEmitter();response.writableFinished = false;
+    const served = fixture.transform(source, fixture.phase(), response);
+    const entry = text => text.slice(0,text.indexOf('const HD_RELEASE_META_RAW=')) + "\nwindow.addEventListener('load',()=>hdEnsureServiceWorker());";
+    const initial = await run(entry(served));
+    timeline = initial.events.map(text => JSON.parse(text.slice(text.indexOf('{'))));
+    assert.equal(initial.updateCalls.length, suppress ? 0 : 1);
+    fixture.beforeOriginalReload(); assert.equal(fixture.phase(), 'reloaded');
+    const followingSource = fixture.transform(source, fixture.phase(), response);
+    const following = await run(entry(followingSource));
+    assert.equal(following.updateCalls.length, 1); assert.match(followingSource, /const __hdSuppressExplicitUpdate=false;/);
+    timeline.push(...following.events.map(text => JSON.parse(text.slice(text.indexOf('{')))));
+    response.writableFinished = true;response.emit('finish');response.emit('close');
+    fixture.passed();await fixture.finish();
+    const report = JSON.parse(await fs.readFile(path.join(dir,'pwa-app-update-comparison.json'),'utf8'));
+    assert.equal(report.initialPreparation.confirmed,true);
+    assert.equal(report.initialPreparation.boundary.boundaries.at(-1).stage,suppress?'explicit-update-suppressed':'explicit-update-expression-returned');
+    assert.equal(report.originalTestPassed,true);assert.equal(report.droppedMarks,0);assert.equal(report.droppedDeliveries,0);
+    assert.ok(report.followingBoundaries.some(e=>e.stage==='explicit-update-expression-returned'));
+    assert.deepEqual(report.deliveries.filter(e=>e.phase==='initial').map(e=>e.stage),['body-prepared','response-finish','response-close-after-finish']);
+    const files = await fs.readdir(path.join(dir,'pwa-update-sources'));
+    assert.equal(files.length,3);assert.equal(await fs.readFile(path.join(dir,'pwa-update-sources','product-update-manager.js'),'utf8'),source);
+    initial.release();following.release();
+  }
+});
+
+test('missing preparation is not fabricated; failure history/source/drop are retained without post-failure evaluation', async t => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'pwa-app-failure-'));t.after(()=>fs.rm(dir,{recursive:true}));
+  const probe = { transform: text=>instrumentRegistrationSource(text).source, timeline:()=>[] };
+  const info = {outputPath:(...names)=>path.join(dir,...names)};
+  assert.throws(()=>createApplicationUpdateComparison(null,info,true),/required/);
+  const fixture = createApplicationUpdateComparison(probe,info,true);
+  for(let i=0;i<35;i++)fixture.transform(source,'initial');
+  fixture.beforeOriginalReload();fixture.mark('registration-wait-start');await fixture.finish();await fixture.finish();
+  const report = JSON.parse(await fs.readFile(path.join(dir,'pwa-app-update-comparison.json'),'utf8'));
+  assert.equal(report.initialPreparation.confirmed,false);assert.equal(report.originalTestPassed,false);
+  assert.equal(report.lastStage,'registration-wait-start');assert.equal(report.deliveries.length,32);assert.equal(report.droppedDeliveries,3);
+  assert.deepEqual(report.followingBoundaries,[]);
+});
+
+test('real-app fixture does not catch source errors or alter the original PWA preparation, deadlines and assertions', () => {
+  const fixture = createApplicationUpdateComparison({transform:()=>{throw Error('original transform failure')},timeline:()=>[]},{outputPath:()=>''},false);
+  assert.throws(()=>fixture.transform(source,'initial'),/original transform failure/);
+  const current = require('node:fs').readFileSync(path.join(__dirname,'pwa.spec.js'),'utf8');
+  assert.ok(current.includes("await waitForApplicationRegistration(page, registrationEvidence);"));
+  assert.ok(current.includes("await expect.poll(async () => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length), { timeout: 20000 }).toBeGreaterThan(0);"));
+  assert.equal([...current.matchAll(/expect\(errors,/g)].length,2);
+  assert.ok(current.includes("await expect.poll(() => page.evaluate(() => Object.values(window.HD_MODULE_STATUS || {}).filter(x => x !== 'ok').length)).toBe(0);"));
+  assert.equal(current.includes('test.setTimeout'),false);
+  assert.equal(current.includes('storageState('),false);
 });
