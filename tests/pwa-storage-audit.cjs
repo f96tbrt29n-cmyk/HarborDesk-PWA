@@ -15,7 +15,7 @@ function storageProbe({ keys, contextId, pageId, scriptErrorBoundary = false }) 
     for (let i = 0; i < end; i++) hash = Math.imul(hash ^ value.charCodeAt(i), 16777619);
     return { present: true, length: value.length, prefixFnv32: (hash >>> 0).toString(16), truncated: end < value.length };
   };
-  const snapshot = (stage, mutation) => {
+  const snapshot = (stage, mutation, storageEvent) => {
     if (count++ >= 256) return;
     try {
       if (stage === 'fixture-start') scope = 'fixture';
@@ -32,7 +32,7 @@ function storageProbe({ keys, contextId, pageId, scriptErrorBoundary = false }) 
       const controller = navigator.serviceWorker?.controller;
       let worker = null;
       if (controller) { const u = new URL(controller.scriptURL); const v=u.searchParams.get('v'); worker={url:u.origin+u.pathname+(/^\d+$/.test(v||'')?'?v='+v:''),state:controller.state}; }
-      console.debug('__HD_STORAGE_AUDIT__' + JSON.stringify({ stage, scope, sequence: count, limit: 256, contextId, pageId, doc, at: performance.now(), url: url.href, origin: location.origin, readyState: document.readyState, controller:worker, values, storageAccessError:storageError, storageIdentitySame, currentValues, currentStorageError, getItemUnchanged:proto.getItem===get, mutation }));
+      console.debug('__HD_STORAGE_AUDIT__' + JSON.stringify({ stage, scope, sequence: count, limit: 256, contextId, pageId, doc, at: performance.now(), url: url.href, origin: location.origin, readyState: document.readyState, controller:worker, values, storageAccessError:storageError, storageIdentitySame, currentValues, currentStorageError, getItemUnchanged:proto.getItem===get, mutation, storageEvent }));
     } catch { /* Observation must not change Storage return values or exceptions. */ }
   };
   // First observation precedes wrappers and does not depend on DCL/app execution.
@@ -56,13 +56,33 @@ function storageProbe({ keys, contextId, pageId, scriptErrorBoundary = false }) 
   }
   Object.defineProperty(window, '__hdStorageAuditSnapshot', { value: snapshot, configurable: true });
   for (const name of ['DOMContentLoaded','readystatechange']) document.addEventListener(name, () => snapshot(name));
-  for (const name of ['load','pagehide','pageshow','storage']) window.addEventListener(name, () => snapshot(name));
+  for (const name of ['load','pagehide','pageshow']) window.addEventListener(name, () => snapshot(name));
+  window.addEventListener('storage', event => {
+    const observedAt = performance.now();
+    let details;
+    try {
+      const key = event.key;
+      const source = new URL(event.url);
+      source.username = ''; source.password = ''; source.search = ''; source.hash = '';
+      details = {
+        observedAt,
+        keyKind: key === null ? 'null' : keys.includes(key) ? 'target' : 'other',
+        ...(keys.includes(key) ? { key } : {}),
+        oldValueIsNull: event.oldValue === null,
+        newValueIsNull: event.newValue === null,
+        storageAreaSame: storage ? event.storageArea === storage : null,
+        url: ['http:','https:'].includes(source.protocol) ? source.href : ''
+      };
+    } catch (error) { details = { observedAt, error: error.name }; }
+    // The original event snapshot performs the same reads, exactly once.
+    snapshot('storage', undefined, details);
+  });
   document.addEventListener('load', event => {
     if (event.target?.tagName === 'SCRIPT') {
       try { if (new URL(event.target.src).pathname.endsWith('/app.js')) snapshot('app-script-loaded'); } catch {}
     }
   }, true);
-  // One passive boundary, only in the dedicated PWA case. No recovery or reads
+  // One passive boundary, only in the two opted-in reload cases. No recovery or reads
   // after failure; this runs during the original script error event instead.
   if (scriptErrorBoundary) {
     let observed = false;

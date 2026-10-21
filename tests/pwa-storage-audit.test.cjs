@@ -6,12 +6,13 @@ const { EventEmitter } = require('node:events');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
-function fixture(debugFailure = false, unavailable = false, scriptErrorBoundary = false) {
+function fixture(debugFailure = false, unavailable = false, scriptErrorBoundary = false, doc = 100) {
   const records = [], listeners = new Map();
+  let getReads = 0;
   const data = new WeakMap();
   class Storage {
     constructor() { data.set(this, new Map()); }
-    getItem(key) { if (!data.has(this)) throw new TypeError('receiver'); return data.get(this).get(String(key)) ?? null; }
+    getItem(key) { if (!data.has(this)) throw new TypeError('receiver'); getReads++; return data.get(this).get(String(key)) ?? null; }
     setItem(key,value) { if (!data.has(this)) throw new TypeError('receiver'); data.get(this).set(String(key),String(value)); }
     removeItem(key) { if (!data.has(this)) throw new TypeError('receiver'); data.get(this).delete(String(key)); }
     clear() { if (!data.has(this)) throw new TypeError('receiver'); data.get(this).clear(); }
@@ -24,9 +25,9 @@ function fixture(debugFailure = false, unavailable = false, scriptErrorBoundary 
   vm.runInNewContext('('+storageProbe.toString()+')(args)', {
     args:{keys:KEYS,contextId:'fixture-context',pageId:'fixture-page',scriptErrorBoundary}, window, Storage, document, navigator:{},
     URL, location:{href:'http://localhost:4173/?token=secret#private',origin:'http://localhost:4173'},
-    performance:{timeOrigin:100,now:()=>1},console:{debug:text=>{ if(debugFailure)throw Error('diagnostic failure');records.push(JSON.parse(text.slice('__HD_STORAGE_AUDIT__'.length))); }}
+    performance:{timeOrigin:doc,now:()=>1},console:{debug:text=>{ if(debugFailure)throw Error('diagnostic failure');records.push(JSON.parse(text.slice('__HD_STORAGE_AUDIT__'.length))); }}
   });
-  return { localStorage,sessionStorage,Storage,originalGet,records,window,listeners };
+  return { localStorage,sessionStorage,Storage,originalGet,records,window,listeners,getReads:()=>getReads };
 }
 test('audit preserves native Storage semantics and never initializes or exposes fixture values', () => {
   const f=fixture(); assert.equal(f.Storage.prototype.getItem,f.originalGet);
@@ -81,8 +82,11 @@ test('failure retention uses emitted history without evaluating a blocked page o
   context.storageState=()=>{throw Error('must not serialize values')};
   const audit=await observeStorage(page,{project:{},outputPath:name=>path.join(folder,name),attach:async(name,data)=>{attached=JSON.parse(await fs.readFile(data.path,'utf8'))}},{scriptErrorBoundary:true});
   page.emit('console',{text:()=> '__HD_STORAGE_AUDIT__'+JSON.stringify({stage:'pagehide',values:[{key:KEYS[0],present:true,length:8}]})});
+  const storageEvent={keyKind:'target',key:KEYS[0],oldValueIsNull:false,newValueIsNull:true,storageAreaSame:true,url:'http://localhost:4173/'};
+  page.emit('console',{text:()=> '__HD_STORAGE_AUDIT__'+JSON.stringify({stage:'storage',storageEvent})});
   page.emit('crash');browser.emit('disconnected');await audit.finish();
-  assert.deepEqual(attached.events.map(e=>e.kind),['install','storage','page-crash','browser-disconnected']);
+  assert.deepEqual(attached.events.map(e=>e.kind),['install','storage','storage','page-crash','browser-disconnected']);
+  assert.deepEqual(attached.events[2].storageEvent,storageEvent);
   assert.equal(initArgs.scriptErrorBoundary,true);assert.equal(attached.events[0].scriptErrorBoundary,true);
   assert.equal(page.listenerCount('console'),0);assert.equal(browser.listenerCount('disconnected'),0);
 });
@@ -103,4 +107,34 @@ test('opt-in first script error boundary is read-only, once per document, and di
   assert.ok(unavailable.records.at(-1).values.every(x=>x.error==='SecurityError'&&!('present'in x)));
   const failedDelivery=fixture(true,false,true);
   assert.doesNotThrow(()=>failedDelivery.listeners.get('error')(event));
+  const newDocument=fixture(false,false,true,101);
+  newDocument.listeners.get('error')(event);newDocument.listeners.get('error')(event);
+  assert.equal(newDocument.records.filter(x=>x.stage==='first-script-error').length,1);
+  assert.equal(newDocument.records.at(-1).doc,101);assert.equal(boundary.doc,100);
+});
+test('storage event metadata excludes values and outside keys, preserves null distinctions, and adds no Storage reads',()=>{
+  const f=fixture(),handler=f.listeners.get('storage');
+  const base={key:KEYS[0],oldValue:'PRIVATE_OLD',newValue:null,storageArea:f.localStorage,url:'https://user:password@localhost:4173/from?secret=token#private'};
+  const reads=f.getReads(),rows=f.records.length;handler(base);
+  assert.equal(f.records.length,rows+1);assert.equal(f.getReads()-reads,KEYS.length);
+  let row=f.records.at(-1);assert.equal(row.stage,'storage');assert.equal(row.doc,100);
+  assert.deepEqual(row.storageEvent,{observedAt:1,keyKind:'target',key:KEYS[0],oldValueIsNull:false,newValueIsNull:true,storageAreaSame:true,url:'https://localhost:4173/from'});
+  handler({...base,key:'PRIVATE_OUTSIDE',oldValue:null,newValue:'PRIVATE_NEW',storageArea:f.sessionStorage});
+  row=f.records.at(-1);assert.equal(row.storageEvent.keyKind,'other');assert.equal(row.storageEvent.key,undefined);
+  assert.equal(row.storageEvent.oldValueIsNull,true);assert.equal(row.storageEvent.newValueIsNull,false);assert.equal(row.storageEvent.storageAreaSame,false);
+  handler({...base,key:null,oldValue:null,newValue:null});row=f.records.at(-1);
+  assert.equal(row.storageEvent.keyKind,'null');assert.equal(row.storageEvent.key,undefined);
+  assert.equal(row.storageEvent.oldValueIsNull,true);assert.equal(row.storageEvent.newValueIsNull,true);
+  assert.ok(!JSON.stringify(f.records).includes('PRIVATE'));assert.ok(!JSON.stringify(f.records).includes('password'));
+  assert.ok(!JSON.stringify(f.records).includes('secret='));assert.equal(f.Storage.prototype.getItem,f.originalGet);
+  assert.ok(f.records.every(x=>!x.mutation));
+  handler({...base,get oldValue(){throw new Error('PRIVATE_EVENT_ERROR')}});
+  assert.equal(f.records.at(-1).storageEvent.error,'Error');assert.ok(!JSON.stringify(f.records).includes('PRIVATE_EVENT_ERROR'));
+});
+test('only PWA cached restart and carrier night reload opt into the single script-error boundary',async()=>{
+  const [pwa,night,boundary]=await Promise.all(['pwa-cached-reload.spec.js','night-policy-reload.spec.js','pwa-storage-boundary.spec.js'].map(file=>fs.readFile(path.join(__dirname,file),'utf8')));
+  assert.equal((pwa.match(/scriptErrorBoundary:true/g)||[]).length,1);
+  assert.equal((night.match(/scriptErrorBoundary:true/g)||[]).length,1);
+  assert.match(night,/test\('carrier night CI policy persists and regenerates the mobile loadout',[\s\S]*?observeStorage\(page,testInfo,\{scriptErrorBoundary:true\}\)/);
+  assert.ok(!boundary.includes('scriptErrorBoundary:true'));
 });
