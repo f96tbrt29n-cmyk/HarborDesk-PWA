@@ -182,3 +182,47 @@ test('real-app fixture does not catch source errors or alter the original PWA pr
   assert.equal(current.includes('test.setTimeout'),false);
   assert.equal(current.includes('storageState('),false);
 });
+
+const initialGateEvents = () => ['await-resumed','registered-assigned','explicit-update-site','explicit-update-expression-returned'].map(stage => ({ stage, callId:1,
+  document:{timeOrigin:1000,at:2,readyState:'complete',url:'http://fixture.invalid/'},updateControl:{phase:'initial',suppress:false} }));
+
+test('isolated initial gate waits only on received current-source boundaries with the original12s/default poll', async t => {
+  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'pwa-initial-gate-'));t.after(()=>fs.rm(dir,{recursive:true}));
+  let timeline=[],reads=0;
+  const probe={timeline:()=>{reads++;return timeline.slice()}};
+  const fixture=createApplicationUpdateComparison(probe,{outputPath:(...names)=>path.join(dir,...names)},false);
+  const poll=(read,options)=>({async toBe(expected){
+    assert.equal(expected,true);assert.equal(options.timeout,12000);assert.equal('intervals' in options,false);
+    assert.equal(read(),false);
+    timeline=initialGateEvents().slice(0,3);assert.equal(read(),false,'site is not the update-expression return');
+    timeline=initialGateEvents();assert.equal(read(),true);
+  }});
+  await fixture.waitForInitialContinuation(poll);
+  assert.equal(fixture.phase(),'initial','gate must not reload or change delivery phase');assert.equal(reads,3);
+  fixture.beforeOriginalReload();
+  await fixture.finish();const report=JSON.parse(await fs.readFile(path.join(dir,'pwa-app-update-comparison.json'),'utf8'));
+  assert.equal(report.initialGate.outcome,'passed');assert.equal(report.initialGate.boundary.boundaries.at(-1).stage,'explicit-update-expression-returned');
+  assert.equal(report.initialPreparation.confirmed,true);assert.match(report.initialPreparation.rule,/changed isolated preparation/);
+  assert.equal(report.originalTestPassed,false);
+});
+
+test('failed isolated initial gate preserves original error/history and does not enter reload or read after failure', async t => {
+  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'pwa-initial-gate-fail-'));t.after(()=>fs.rm(dir,{recursive:true}));
+  let reads=0;const probe={timeline:()=>{reads++;return []}};
+  const fixture=createApplicationUpdateComparison(probe,{outputPath:(...names)=>path.join(dir,...names)},false);
+  const failure=Error('original gate deadline');
+  const poll=read=>({async toBe(){assert.equal(read(),false);throw failure}});
+  await assert.rejects(fixture.waitForInitialContinuation(poll),e=>e===failure);
+  assert.equal(fixture.phase(),'initial');await fixture.finish();
+  const report=JSON.parse(await fs.readFile(path.join(dir,'pwa-app-update-comparison.json'),'utf8'));
+  assert.equal(report.initialGate.outcome,'failed');assert.equal(report.lastStage,'initial-continuation-gate-failed');
+  assert.equal(report.initialPreparation,null);assert.equal(report.marks.some(e=>e.stage==='original-reload-request'),false);
+  assert.equal(reads,2,'one poll plus final received-history copy only, no browser/native read');
+});
+
+test('initial gate cannot silently resume the completed update-suppression comparison', async () => {
+  let polls=0;
+  const fixture=createApplicationUpdateComparison({timeline:()=>[]},{outputPath:()=>''},true);
+  await assert.rejects(fixture.waitForInitialContinuation(()=>{polls++}),/current update enabled/);
+  assert.equal(polls,0);assert.equal(fixture.phase(),'initial');
+});

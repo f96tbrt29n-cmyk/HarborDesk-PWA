@@ -45,6 +45,8 @@ test('PWA service worker caches app shell and survives offline reload', async ({
     ? observeRegistrationContinuation(page, testInfo, registrationEvidence.identity) : null;
   const comparison = typeof testInfo.project.metadata.pwaInitialUpdateSuppression === 'boolean'
     ? createApplicationUpdateComparison(continuation, testInfo, testInfo.project.metadata.pwaInitialUpdateSuppression) : null;
+  const initialGate = testInfo.project.metadata.pwaInitialRegistrationGate === true;
+  if (initialGate && (!comparison || testInfo.project.metadata.pwaInitialUpdateSuppression !== false)) throw Error('isolated initial gate requires current real-app delivery');
   const server = await startOfflineTestServer(continuation, comparison);
   try {
   const errors = [];
@@ -58,6 +60,8 @@ test('PWA service worker caches app shell and survives offline reload', async ({
   comparison?.mark('original-initial-preparation-passed');
 
   // Reload once so the active service worker controls the page as it would in normal PWA use.
+  // Isolated preparation control only; default/original preparation is unchanged.
+  if (initialGate) await comparison.waitForInitialContinuation(expect.poll);
   comparison?.beforeOriginalReload();
   await page.reload({ waitUntil: 'domcontentloaded' });
   comparison?.mark('reload-domcontentloaded');

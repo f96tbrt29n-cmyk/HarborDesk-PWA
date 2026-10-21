@@ -8,7 +8,8 @@ const { initialUpdateBoundary } = require('./initial-document-fixture.cjs');
 const hash = value => createHash('sha256').update(value).digest('hex');
 
 // Opt-in, real-app pwa.spec delivery only. No replacement HTML or app entry,
-// browser API wrapper, Promise observer, storage operation or preparation wait.
+// browser API wrapper, Promise observer or storage operation. The default does
+// not wait; the initial continuation gate is a separate, opt-in control.
 function createApplicationUpdateComparison(probe, info, suppressInitialUpdate) {
   if (!probe || typeof suppressInitialUpdate !== 'boolean') throw Error('isolated continuation probe and boolean policy required');
   let phase = 'initial', closed = false;
@@ -24,6 +25,25 @@ function createApplicationUpdateComparison(probe, info, suppressInitialUpdate) {
   return {
     phase: () => phase,
     mark,
+    async waitForInitialContinuation(poll) {
+      if (suppressInitialUpdate) throw Error('initial continuation control requires current update enabled');
+      report.initialGate = { ...now(), outcome: 'running', timeoutMs: 12000 };
+      mark('initial-continuation-gate-start');
+      let boundary = null;
+      try {
+        await poll(() => {
+          boundary = initialUpdateBoundary(probe.timeline(), false);
+          return !!boundary;
+        }, { timeout: 12000, message: 'initial document must reach register await continuation and explicit update return before reload' }).toBe(true);
+        report.initialGate.outcome = 'passed'; report.initialGate.boundary = boundary;
+        mark('initial-continuation-gate-passed');
+      } catch (error) {
+        report.initialGate.outcome = 'failed';
+        report.initialGate.error = { name: typeof error?.name === 'string' ? error.name : 'other',
+          messageSHA256: hash(typeof error?.message === 'string' ? error.message : '') };
+        mark('initial-continuation-gate-failed'); throw error;
+      } finally { report.initialGate.finished = now(); }
+    },
     transform(source, requestPhase, response) {
       if (!['initial','reloaded'].includes(requestPhase)) throw Error('invalid request phase');
       const instrumented = probe.transform(source);
@@ -44,7 +64,8 @@ function createApplicationUpdateComparison(probe, info, suppressInitialUpdate) {
       // Missing delivery is not proof that the initial operation did not run.
       const boundary = initialUpdateBoundary(probe.timeline(), suppressInitialUpdate);
       report.initialPreparation = { ...now(), confirmed: !!boundary, boundary,
-        rule: 'received before original reload; no added gate or preparation wait' };
+        rule: report.initialGate ? 'received after opt-in initial gate; changed isolated preparation'
+          : 'received before original reload; no added gate or preparation wait' };
       mark('original-reload-request'); phase = 'reloaded';
     },
     passed() { report.originalTestPassed = true; mark('original-test-passed'); },
