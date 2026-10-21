@@ -3,16 +3,19 @@ const http = require('node:http');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { waitForApplicationRegistration, observeApplicationRegistration } = require('./pwa-registration-ready.cjs');
+const { observeRegistrationContinuation } = require('./pwa-registration-continuation.cjs');
 
 // Give this test its own origin so a real server outage does not affect other tests.
-async function startOfflineTestServer() {
+async function startOfflineTestServer(probe = null) {
   const root = path.resolve(__dirname, '..');
   const server = http.createServer(async (req, res) => {
+    probe?.serverRequest(req, res);
     const pathname = new URL(req.url, 'http://localhost').pathname;
     const file = path.resolve(root, '.' + (pathname === '/' ? '/index.html' : pathname));
     if (!file.startsWith(root + path.sep)) { res.writeHead(403).end(); return; }
     try {
-      const body = await fs.readFile(file);
+      let body = await fs.readFile(file);
+      if (probe && pathname === '/update-manager.js') body = Buffer.from(probe.transform(body.toString('utf8')));
       const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.webmanifest': 'application/manifest+json' };
       res.writeHead(200, { 'Content-Type': types[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store' });
       res.end(body);
@@ -32,8 +35,12 @@ async function startOfflineTestServer() {
 test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
 
 test('PWA service worker caches app shell and survives offline reload', async ({ page, context, browserName }, testInfo) => {
-  const server = await startOfflineTestServer();
   const registrationEvidence = observeApplicationRegistration(page, testInfo);
+  // Opt-in isolated delivery only. The default fixture and product files keep
+  // their original bytes; do not install Promise settlement observers.
+  const continuation = testInfo.project.metadata.registrationContinuation === true
+    ? observeRegistrationContinuation(page, testInfo, registrationEvidence.identity) : null;
+  const server = await startOfflineTestServer(continuation);
   try {
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
@@ -111,6 +118,9 @@ test('PWA service worker caches app shell and survives offline reload', async ({
   expect(errors, `page errors: ${errors.join('\n')}`).toEqual([]);
   } finally {
     try { await registrationEvidence.finish(); }
-    finally { await context.setOffline(false); await server.stop(); }
+    finally {
+      try { continuation?.beginCleanup(); await context.setOffline(false); await server.stop(); }
+      finally { await continuation?.finish(); }
+    }
   }
 });

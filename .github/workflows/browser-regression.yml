@@ -75,7 +75,7 @@ jobs:
         run: npm install --no-audit --no-fund --no-package-lock
 
       - name: Verify service worker cache lifetime and registration readiness
-        run: node --test tests/sw-cache-lifetime.test.cjs tests/pwa-registration-ready.test.cjs
+        run: node --test tests/sw-cache-lifetime.test.cjs tests/pwa-registration-ready.test.cjs tests/pwa-registration-continuation.test.cjs
 
       - name: Install Playwright browser
         run: npx playwright install --with-deps ${{ matrix.browser }}
@@ -110,6 +110,7 @@ jobs:
             test-results/**/pwa-storage-audit.json
             test-results/**/sync-version-response.json
             test-results/**/pwa-registration-state.json
+            test-results/**/pwa-registration-continuation.json
           if-no-files-found: ignore
           retention-days: 14
 

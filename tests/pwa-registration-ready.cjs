@@ -34,7 +34,7 @@ function errorSummary(error) {
 function observeApplicationRegistration(page, testInfo, { sampleLimit = 64, eventLimit = 32 } = {}) {
   if (![sampleLimit, eventLimit].every(n => Number.isInteger(n) && n > 0 && n <= 64)) throw new Error('invalid registration evidence limit');
   const start = performance.now();
-  const report = { schema: 1, nodeStartedAt: Date.now(), pageId: idFor(page), contextId: idFor(page.context()),
+  const report = { schema: 1, nodeStartedAt: Date.now(), nodeStartedPerformanceMs: start, pageId: idFor(page), contextId: idFor(page.context()),
     clock: 'nodeMs is relative Node performance.now; document timeOrigin/at are a separate browser clock',
     documentIdentity: 'timeOrigin correlation, not a native document ID',
     limits: { samples: sampleLimit, events: eventLimit, policy: 'retain newest; drop oldest' },
@@ -55,6 +55,7 @@ function observeApplicationRegistration(page, testInfo, { sampleLimit = 64, even
   const listeners = { pageerror: onError, console: onConsole, framenavigated: onNavigation, load: onLoad, domcontentloaded: onDCL };
   for (const [name, listener] of Object.entries(listeners)) page.on(name, listener);
   return {
+    identity: { pageId: report.pageId, contextId: report.contextId },
     begin() { report.wait = { outcome: 'running', ...now() }; },
     outcome(value, error) { report.wait.outcome = value; report.wait.finished = now(); if (value === 'failed') report.wait.error = errorSummary(error); },
     async sample() {
