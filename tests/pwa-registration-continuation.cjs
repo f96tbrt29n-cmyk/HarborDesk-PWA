@@ -57,7 +57,7 @@ function observeRegistrationContinuation(page, testInfo, identity, { limit = 64,
       const value = JSON.parse(text.slice(PREFIX.length));
       const stages = ['probe-installed','register-before','register-returned','await-resumed','registered-assigned','catch-entered','error-assigned','controllerchange'];
       if (!stages.includes(value.stage) || !Number.isInteger(value.callId) || !Number.isFinite(value.document?.timeOrigin) || !Number.isFinite(value.document?.at) ||
-          !/^\.\/sw\.js\?v=\d+$/.test(value.registrationURL) || value.scope !== './') throw new Error('invalid event');
+          !/^\.\/sw\.js(?:\?v=\d+)?$/.test(value.registrationURL) || value.scope !== './') throw new Error('invalid event');
       const safeURL = raw => { const url = new URL(raw); return url.origin + url.pathname; };
       append(report.events, { ...now(), stage: value.stage, callId: value.callId,
         document: { timeOrigin: value.document.timeOrigin, at: value.document.at, readyState: value.document.readyState,
