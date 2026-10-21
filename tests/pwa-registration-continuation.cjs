@@ -70,6 +70,8 @@ function observeRegistrationContinuation(page, testInfo, identity, { limit = 64,
   };
   page.on('console', receive);
   return {
+    // Node-only access to already received boundaries; no browser/Promise reads.
+    timeline: () => report.events.slice(),
     transform(source) {
       const result = instrumentRegistrationSource(source);
       if (!report.sources.some(x => x.servedSha256 === result.servedSha256)) report.sources.push({ originalSha256: result.originalSha256, servedSha256: result.servedSha256 });
