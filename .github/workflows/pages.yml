@@ -52,6 +52,9 @@ jobs:
       - name: Verify enemy anti-aircraft loss model
         run: node --test tests/enemy-anti-air.test.cjs
 
+      - name: Verify service worker cache update lifetime
+        run: node --test tests/sw-cache-lifetime.test.cjs
+
       - name: Validate PWA metadata and cached assets
         shell: bash
         run: |

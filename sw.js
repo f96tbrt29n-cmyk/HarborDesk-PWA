@@ -7,14 +7,21 @@ self.addEventListener('fetch',event=>{
  const req=event.request;
  const url=new URL(req.url);
  const isNavigation=req.mode==='navigate'||url.pathname.endsWith('/')||url.pathname.endsWith('/index.html');
+ const network=fetch(req,{cache:'no-store'});
+ // Register the lifetime during dispatch, independently of the response chain.
+ // Clone before the response consumer can use its body; a cache failure must
+ // not discard a successful network response or trigger its cache fallback.
+ event.waitUntil(network.then(response=>{
+  const clone=response.clone();
+  return caches.open(CACHE).then(c=>c.put(isNavigation?'./index.html':req,clone));
+ },()=>undefined).catch(error=>{
+  const name=typeof error?.name==='string'?error.name.slice(0,64):'Error';
+  console.warn('[HarborDesk SW] Cache update failed:',name);
+ }));
  if(isNavigation){
-  event.respondWith(fetch(req,{cache:'no-store'}).then(response=>{
-   const clone=response.clone();caches.open(CACHE).then(c=>c.put('./index.html',clone));return response;
-  }).catch(()=>caches.match('./index.html').then(r=>r||caches.match('./'))));
+  event.respondWith(network.catch(()=>caches.match('./index.html').then(r=>r||caches.match('./'))));
   return;
  }
- event.respondWith(fetch(req,{cache:'no-store'}).then(response=>{
-   const clone=response.clone();caches.open(CACHE).then(c=>c.put(req,clone));return response;
- }).catch(()=>caches.match(req,{ignoreSearch:true})));
+ event.respondWith(network.catch(()=>caches.match(req,{ignoreSearch:true})));
 });
 
