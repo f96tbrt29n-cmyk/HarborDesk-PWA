@@ -66,12 +66,27 @@ test('carrier night CI policy persists and regenerates the mobile loadout',async
  if(testInfo.project.metadata?.retentionFixture)expect(saved.values.every(v=>v!==null)).toBe(true);
  await testInfo.attach('pre-reload-six-key-presence',{body:Buffer.from(JSON.stringify(saved.keys.map((key,i)=>({key,present:saved.values[i]!==null})))),contentType:'application/json'});
  await storageAudit.mark('fixture-end');await storageAudit.mark('pre-reload');
- retainReloadEvidence.mark('reload-start');await page.reload({waitUntil:'domcontentloaded'});retainReloadEvidence.mark('reload-domcontentloaded');await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('cv-fighter2');
+ retainReloadEvidence.mark('reload-start');await page.reload({waitUntil:'domcontentloaded'});retainReloadEvidence.mark('reload-domcontentloaded');
+ const reloadedDocument=await page.evaluate(()=>({timeOrigin:performance.timeOrigin,url:location.href}));
+ await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('cv-fighter2');
  await storageAudit.mark('application-ready-before-comparison');
  expect(await page.evaluate(keys=>keys.map(k=>localStorage.getItem(k)),saved.keys)).toEqual(saved.values);
  retainReloadEvidence.mark('six-keys-restored');await storageAudit.mark('six-keys-restored');
  retainReloadEvidence.mark('policy-restored');
  expect(retainReloadEvidence.errors()).toEqual([]);
+ // DCL can precede the complete/load storage boundary. Keep the original checks,
+ // then check the same document again after load (also handles load already fired).
+ await page.waitForLoadState('load');
+ retainReloadEvidence.mark('reload-load');
+ const afterLoad=await page.evaluate(keys=>({document:{timeOrigin:performance.timeOrigin,url:location.href},readyState:document.readyState,values:keys.map(k=>localStorage.getItem(k)),policy:hdSENightPolicy('1-1')}),saved.keys);
+ expect(afterLoad.document).toEqual(reloadedDocument);
+ expect(afterLoad.readyState).toBe('complete');
+ expect(afterLoad.values).toEqual(saved.values);
+ expect(afterLoad.policy).toBe('cv-fighter2');
+ expect(retainReloadEvidence.errors()).toEqual([]);
+ retainReloadEvidence.mark('post-load-storage-and-policy-restored');
+ await storageAudit.mark('post-load-storage-and-policy-restored');
+ await testInfo.attach('post-load-storage-verification',{body:Buffer.from(JSON.stringify({document:afterLoad.document,readyState:afterLoad.readyState,policy:afterLoad.policy,keys:saved.keys.map((key,i)=>({key,present:afterLoad.values[i]!==null,exactMatch:afterLoad.values[i]===saved.values[i]}))})),contentType:'application/json'});
  } catch(error) { retainReloadEvidence.failure(); throw error; } finally { try{await storageAudit.finish()}finally{await retainReloadEvidence();} }
 });
 

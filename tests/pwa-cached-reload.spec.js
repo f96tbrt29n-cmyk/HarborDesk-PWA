@@ -43,11 +43,22 @@ test.describe('PWA cached runtime',()=>{
   if(browserName==='chromium')await context.setOffline(true);
   else test.info().annotations.push({type:'engine-limitation',description:'WebKit cache + online restart tested; offline navigation requires iPhone verification.'});
   await storageAudit.mark('pre-reload');
-  retain.mark('reload-start');await page.reload({waitUntil:'domcontentloaded'});retain.mark('reload-domcontentloaded');await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdFEOpeningAsw==='function');
+  retain.mark('reload-start');await page.reload({waitUntil:'domcontentloaded'});retain.mark('reload-domcontentloaded');
+  const reloadedDocument=await page.evaluate(()=>({timeOrigin:performance.timeOrigin,url:location.href}));
+  await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdFEOpeningAsw==='function');
   await storageAudit.mark('application-ready-before-comparison');
   expect(await page.evaluate(keys=>keys.map(k=>localStorage.getItem(k)),snapshot.keys)).toEqual(snapshot.values);
   const check=await page.evaluate(()=>{const p=hdFEPlanFromSavedFleet('1-5',loadCustomFleets()['1-5'][0]);return {target:hdOCOaswTarget(hdOCContext('1-5','oasw-fleet',0)),hq:Object.values(hdFCLoadAll()).find(x=>x.proposal).hqLevel,ownership:hdOCShipOwnership(p).every(x=>x.status==='ready')}});
-  expect(check).toEqual({target:4,hq:20,ownership:true});retain.mark('five-keys-and-owned-plan-restored');await storageAudit.mark('five-keys-and-owned-plan-restored');await context.setOffline(false);
+  expect(check).toEqual({target:4,hq:20,ownership:true});retain.mark('five-keys-and-owned-plan-restored');await storageAudit.mark('five-keys-and-owned-plan-restored');
+  // Preserve the offline/online restart condition through a second exact check.
+  // The previous sample reached load, but the test did not require it.
+  await page.waitForLoadState('load');retain.mark('reload-load');
+  const afterLoad=await page.evaluate(keys=>({document:{timeOrigin:performance.timeOrigin,url:location.href},readyState:document.readyState,values:keys.map(k=>localStorage.getItem(k)),check:{target:hdOCOaswTarget(hdOCContext('1-5','oasw-fleet',0)),hq:Object.values(hdFCLoadAll()).find(x=>x.proposal).hqLevel,ownership:hdOCShipOwnership(hdFEPlanFromSavedFleet('1-5',loadCustomFleets()['1-5'][0])).every(x=>x.status==='ready')}}),snapshot.keys);
+  expect(afterLoad.document).toEqual(reloadedDocument);expect(afterLoad.readyState).toBe('complete');
+  expect(afterLoad.values).toEqual(snapshot.values);expect(afterLoad.check).toEqual(check);
+  retain.mark('post-load-five-keys-and-owned-plan-restored');await storageAudit.mark('post-load-five-keys-and-owned-plan-restored');
+  await testInfo.attach('post-load-storage-verification',{body:Buffer.from(JSON.stringify({document:afterLoad.document,readyState:afterLoad.readyState,check:afterLoad.check,keys:snapshot.keys.map((key,i)=>({key,present:afterLoad.values[i]!==null,exactMatch:afterLoad.values[i]===snapshot.values[i]}))})),contentType:'application/json'});
+  await context.setOffline(false);
   }catch(error){retain.failure();throw error}finally{try{await storageAudit.finish()}finally{await retain()}}
  });
 });
