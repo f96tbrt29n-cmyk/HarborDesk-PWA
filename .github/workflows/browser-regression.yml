@@ -109,6 +109,7 @@ jobs:
             test-results/**/reload-navigation-evidence.json
             test-results/**/pwa-storage-audit.json
             test-results/**/sync-version-response.json
+            test-results/**/pwa-registration-state.json
           if-no-files-found: ignore
           retention-days: 14
 

@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 const http = require('node:http');
 const fs = require('node:fs/promises');
 const path = require('node:path');
-const { waitForApplicationRegistration } = require('./pwa-registration-ready.cjs');
+const { waitForApplicationRegistration, observeApplicationRegistration } = require('./pwa-registration-ready.cjs');
 
 // Give this test its own origin so a real server outage does not affect other tests.
 async function startOfflineTestServer() {
@@ -31,8 +31,9 @@ async function startOfflineTestServer() {
 
 test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
 
-test('PWA service worker caches app shell and survives offline reload', async ({ page, context, browserName }) => {
+test('PWA service worker caches app shell and survives offline reload', async ({ page, context, browserName }, testInfo) => {
   const server = await startOfflineTestServer();
+  const registrationEvidence = observeApplicationRegistration(page, testInfo);
   try {
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
@@ -44,7 +45,7 @@ test('PWA service worker caches app shell and survives offline reload', async ({
   // Reload once so the active service worker controls the page as it would in normal PWA use.
   await page.reload({ waitUntil: 'domcontentloaded' });
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
-  await waitForApplicationRegistration(page);
+  await waitForApplicationRegistration(page, registrationEvidence);
 
   const sw = await page.evaluate(async () => {
     const reg = await navigator.serviceWorker.ready;
@@ -109,7 +110,7 @@ test('PWA service worker caches app shell and survives offline reload', async ({
   expect(await page.evaluate(() => !!navigator.serviceWorker.controller)).toBeTruthy();
   expect(errors, `page errors: ${errors.join('\n')}`).toEqual([]);
   } finally {
-    await context.setOffline(false);
-    await server.stop();
+    try { await registrationEvidence.finish(); }
+    finally { await context.setOffline(false); await server.stop(); }
   }
 });
