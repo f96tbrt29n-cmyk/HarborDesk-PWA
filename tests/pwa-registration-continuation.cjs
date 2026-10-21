@@ -55,14 +55,17 @@ function observeRegistrationContinuation(page, testInfo, identity, { limit = 64,
     try {
       if (text.length > 2048) throw new Error('oversize');
       const value = JSON.parse(text.slice(PREFIX.length));
-      const stages = ['probe-installed','register-before','register-returned','await-resumed','registered-assigned','catch-entered','error-assigned','controllerchange'];
+      const stages = ['probe-installed','register-before','register-returned','await-resumed','registered-assigned','catch-entered','error-assigned','controllerchange',
+        'explicit-update-site','explicit-update-suppressed','explicit-update-expression-returned'];
       if (!stages.includes(value.stage) || !Number.isInteger(value.callId) || !Number.isFinite(value.document?.timeOrigin) || !Number.isFinite(value.document?.at) ||
           !/^\.\/sw\.js(?:\?v=\d+)?$/.test(value.registrationURL) || value.scope !== './') throw new Error('invalid event');
       const safeURL = raw => { const url = new URL(raw); return url.origin + url.pathname; };
+      if (value.updateControl && (!['initial','reloaded'].includes(value.updateControl.phase) || typeof value.updateControl.suppress !== 'boolean')) throw Error('invalid update control');
       append(report.events, { ...now(), stage: value.stage, callId: value.callId,
         document: { timeOrigin: value.document.timeOrigin, at: value.document.at, readyState: value.document.readyState,
           url: safeURL(value.document.url) }, registrationURL: value.registrationURL, scope: value.scope, status: value.status,
-        controller: value.controller ? { url: safeURL(value.controller.url), state: value.controller.state } : null }, limit, 'droppedEvents');
+        controller: value.controller ? { url: safeURL(value.controller.url), state: value.controller.state } : null,
+        ...(value.updateControl ? { updateControl: { phase: value.updateControl.phase, suppress: value.updateControl.suppress } } : {}) }, limit, 'droppedEvents');
     } catch { report.invalidMessages++; }
   };
   page.on('console', receive);

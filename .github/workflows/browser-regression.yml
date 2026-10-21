@@ -75,7 +75,7 @@ jobs:
         run: npm install --no-audit --no-fund --no-package-lock
 
       - name: Verify service worker cache lifetime and registration readiness
-        run: node --test tests/sw-cache-lifetime.test.cjs tests/pwa-registration-ready.test.cjs tests/pwa-registration-continuation.test.cjs tests/registration-route-fixture.test.cjs
+        run: node --test tests/sw-cache-lifetime.test.cjs tests/pwa-registration-ready.test.cjs tests/pwa-registration-continuation.test.cjs tests/registration-route-fixture.test.cjs tests/initial-update-fixture.test.cjs
 
       - name: Install Playwright browser
         run: npx playwright install --with-deps ${{ matrix.browser }}
