@@ -5,6 +5,8 @@ const path = require('node:path');
 const { waitForApplicationRegistration, observeApplicationRegistration } = require('./pwa-registration-ready.cjs');
 const { observeRegistrationContinuation } = require('./pwa-registration-continuation.cjs');
 const { createApplicationUpdateComparison } = require('./pwa-initial-update-comparison.cjs');
+const { waitForInitialRegistration } = require('./pwa-initial-registration-ready.cjs');
+const { build } = require('../app-version.json');
 
 // Give this test its own origin so a real server outage does not affect other tests.
 async function startOfflineTestServer(probe = null, comparison = null) {
@@ -37,7 +39,13 @@ async function startOfflineTestServer(probe = null, comparison = null) {
 
 test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
 
-test('PWA service worker caches app shell and survives offline reload', async ({ page, context, browserName }, testInfo) => {
+async function offlineRegression({ page, context, browserName }, testInfo, prepared = false) {
+  if (prepared && (testInfo.project.metadata.registrationContinuation ||
+    typeof testInfo.project.metadata.pwaInitialUpdateSuppression === 'boolean' || testInfo.project.metadata.pwaInitialRegistrationGate)) {
+    throw Error('permanent prepared case requires unmodified product delivery');
+  }
+  const steps = [];
+  const mark = (stage, detail = {}) => { if (prepared) steps.push({ stage, nodeEpochMs: Date.now(), ...detail }); };
   const registrationEvidence = observeApplicationRegistration(page, testInfo);
   // Opt-in isolated delivery only. The default fixture and product files keep
   // their original bytes; do not install Promise settlement observers.
@@ -58,16 +66,24 @@ test('PWA service worker caches app shell and survives offline reload', async ({
 
   await expect.poll(async () => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length), { timeout: 20000 }).toBeGreaterThan(0);
   comparison?.mark('original-initial-preparation-passed');
+  if (prepared) {
+    mark('initial-preparation-start');
+    await waitForInitialRegistration(page, testInfo, { scope: server.origin + '/', scriptURL: server.origin + '/sw.js?v=' + build });
+    mark('initial-preparation-passed');
+  }
 
   // Reload once so the active service worker controls the page as it would in normal PWA use.
   // Isolated preparation control only; default/original preparation is unchanged.
   if (initialGate) await comparison.waitForInitialContinuation(expect.poll);
   comparison?.beforeOriginalReload();
+  mark('online-reload-request');
   await page.reload({ waitUntil: 'domcontentloaded' });
+  mark('online-reload-dcl');
   comparison?.mark('reload-domcontentloaded');
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
   comparison?.mark('registration-wait-start');
   await waitForApplicationRegistration(page, registrationEvidence);
+  mark('subsequent-registration-passed');
   comparison?.mark('registration-wait-passed');
 
   const sw = await page.evaluate(async () => {
@@ -94,6 +110,7 @@ test('PWA service worker caches app shell and survives offline reload', async ({
   expect(['registered','ready']).toContain(sw.status);
   expect(sw.scope).toBe(server.origin + '/');
   comparison?.mark('original-native-cache-scope-assertions-passed');
+  mark('native-cache-scope-assertions-passed');
 
   const cacheNameBefore = sw.current;
   comparison?.mark('original-offline-update-check');
@@ -121,6 +138,7 @@ test('PWA service worker caches app shell and survives offline reload', async ({
   expect(offlineUpdate.alerts.join(' ')).toContain('オフライン');
   expect(errors, `page errors: ${errors.join('\n')}`).toEqual([]);
   comparison?.mark('original-offline-update-and-errors-passed');
+  mark('offline-force-update-refused-cache-maintained-errors-zero');
 
   // WebKit's emulated offline navigation reported an internal browser error.
   // A stopped origin tests the real service-worker fallback in both engines.
@@ -131,12 +149,19 @@ test('PWA service worker caches app shell and survives offline reload', async ({
   }).toPass({ timeout: 5000 });
   if (browserName === 'chromium') await context.setOffline(true);
   comparison?.mark('original-stopped-origin-reload-request');
+  mark('stopped-origin-reload-request');
   await page.reload({ waitUntil: 'domcontentloaded' });
+  mark('stopped-origin-reload-dcl');
   comparison?.mark('stopped-origin-reload-domcontentloaded');
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
   await expect.poll(() => page.evaluate(() => Object.values(window.HD_MODULE_STATUS || {}).filter(x => x !== 'ok').length)).toBe(0);
   expect(await page.evaluate(() => !!navigator.serviceWorker.controller)).toBeTruthy();
+  if (prepared) mark('offline-ui-and-controller-passed', await page.evaluate(() => ({
+    status: window.HD_SERVICE_WORKER_STATUS,
+    document: { timeOrigin: performance.timeOrigin, at: performance.now(), readyState: document.readyState, url: location.origin + location.pathname }
+  })));
   expect(errors, `page errors: ${errors.join('\n')}`).toEqual([]);
+  mark('final-errors-zero');
   comparison?.passed();
   } finally {
     try { await registrationEvidence.finish(); }
@@ -144,8 +169,25 @@ test('PWA service worker caches app shell and survives offline reload', async ({
       try { continuation?.beginCleanup(); await context.setOffline(false); await server.stop(); }
       finally {
         try { await continuation?.finish(); }
-        finally { await comparison?.finish(); }
+        finally {
+          try { await comparison?.finish(); }
+          finally {
+            if (prepared) {
+              const file = testInfo.outputPath('pwa-prepared-offline-steps.json');
+              await fs.mkdir(path.dirname(file), { recursive: true });
+              await fs.writeFile(file, JSON.stringify({ productDelivery: 'unmodified', steps }, null, 2) + '\n');
+              await testInfo.attach('pwa-prepared-offline-steps', { path: file, contentType: 'application/json' });
+            }
+          }
+        }
       }
     }
   }
-});
+}
+
+// Keep the original early-reload preparation and all following assertions.
+test('PWA service worker caches app shell and survives offline reload', async ({ page, context, browserName }, info) => offlineRegression({ page, context, browserName }, info));
+
+// Separate coverage: preparing the first document must not erase the early
+// reload failure path above. This case shares its entire subsequent assertion path.
+test('PWA prepared registration survives offline update refusal and stopped-origin reload', async ({ page, context, browserName }, info) => offlineRegression({ page, context, browserName }, info, true));
