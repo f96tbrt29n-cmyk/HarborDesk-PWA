@@ -2,6 +2,7 @@ const { test, expect } = require('@playwright/test');
 const http = require('node:http');
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const { waitForApplicationRegistration } = require('./pwa-registration-ready.cjs');
 
 // Give this test its own origin so a real server outage does not affect other tests.
 async function startOfflineTestServer() {
@@ -43,7 +44,7 @@ test('PWA service worker caches app shell and survives offline reload', async ({
   // Reload once so the active service worker controls the page as it would in normal PWA use.
   await page.reload({ waitUntil: 'domcontentloaded' });
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
-  await page.waitForTimeout(1200);
+  await waitForApplicationRegistration(page);
 
   const sw = await page.evaluate(async () => {
     const reg = await navigator.serviceWorker.ready;
