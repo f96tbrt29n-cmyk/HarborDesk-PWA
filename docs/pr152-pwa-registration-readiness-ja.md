@@ -101,7 +101,8 @@ traceには旧文書のreload開始後にGitHub取得のアクセス制御pageer
 対象の初回trace・動画は取得済み。再試行は実施していない。
 旧資料にnative登録の決着結果がないことは取得不能と未計測を混同せず、未計測として扱う。
 
-製品166ファイルの変更有無は`product-hashes-before.json`と最終preservation記録で確認する。
+今回ハッシュを採取した製品153ファイルの変更有無は
+`product-hashes-before.json`と最終preservation記録で確認する。
 保存領域を操作しない変更であり、専用6キー全非nullや完全一致試験を今回再実行したとは報告しない。
 旧5キー実null、自然DCL停止、版取得例外、旧SW/通信/Cache API例外、
 小規模runtimeのnavigation内部エラーと現SW関与、Chromium重複宣言は別件のまま。
