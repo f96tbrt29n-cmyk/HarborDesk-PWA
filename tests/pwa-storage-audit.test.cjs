@@ -6,28 +6,33 @@ const { EventEmitter } = require('node:events');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
-function fixture(debugFailure = false, unavailable = false, scriptErrorBoundary = false, doc = 100) {
+function fixture(debugFailure = false, unavailable = false, scriptErrorBoundary = false, doc = 100, options = {}) {
   const records = [], listeners = new Map();
-  let getReads = 0;
+  let getReads = 0, writes = 0, lengthReads = 0, clock = 0;
   const data = new WeakMap();
   class Storage {
     constructor() { data.set(this, new Map()); }
-    getItem(key) { if (!data.has(this)) throw new TypeError('receiver'); getReads++; return data.get(this).get(String(key)) ?? null; }
-    setItem(key,value) { if (!data.has(this)) throw new TypeError('receiver'); data.get(this).set(String(key),String(value)); }
-    removeItem(key) { if (!data.has(this)) throw new TypeError('receiver'); data.get(this).delete(String(key)); }
-    clear() { if (!data.has(this)) throw new TypeError('receiver'); data.get(this).clear(); }
+    getItem(key) { if (!data.has(this)) throw new TypeError('receiver'); getReads++; return options.nullKey===key ? null : data.get(this).get(String(key)) ?? null; }
+    key(index) { if(options.keyError)throw new TypeError('PRIVATE_KEY_ERROR');return options.keyNullAt===index?null:[...data.get(this).keys()][index]??null; }
+    get length() { lengthReads++;if(options.lengthError)throw new Error('PRIVATE_LENGTH_ERROR');return data.get(this).size+(options.lengthChanged&&lengthReads%2===0?1:0); }
+    setItem(key,value) { if (!data.has(this)) throw new TypeError('receiver');key=String(key);value=String(value);writes++;data.get(this).set(key,value);Object.defineProperty(this,key,{value,enumerable:true,configurable:true,writable:true}); }
+    removeItem(key) { if (!data.has(this)) throw new TypeError('receiver');writes++;data.get(this).delete(String(key));delete this[String(key)]; }
+    clear() { if (!data.has(this)) throw new TypeError('receiver');writes++;for(const key of data.get(this).keys())delete this[key];data.get(this).clear(); }
   }
   const localStorage = new Storage(), sessionStorage = new Storage();
+  for(const [key,value] of options.seed||[])localStorage.setItem(key,value);
+  writes=0;
   const originalGet = Storage.prototype.getItem;
   const window = { localStorage, sessionStorage, addEventListener: (name,fn) => listeners.set(name,fn) }; window.top = window;
   if(unavailable)Object.defineProperty(window,'localStorage',{get(){const error=new Error('private');error.name='SecurityError';throw error}});
   const document = { readyState:'loading', addEventListener:(name,fn)=>listeners.set(name,fn) };
   vm.runInNewContext('('+storageProbe.toString()+')(args)', {
-    args:{keys:KEYS,contextId:'fixture-context',pageId:'fixture-page',scriptErrorBoundary}, window, Storage, document, navigator:{},
+    args:{keys:KEYS,contextId:'fixture-context',pageId:'fixture-page',scriptErrorBoundary,keyPresence:options.keyPresence===true}, window, Storage, document, navigator:{},
     URL, location:{href:'http://localhost:4173/?token=secret#private',origin:'http://localhost:4173'},
-    performance:{timeOrigin:doc,now:()=>1},console:{debug:text=>{ if(debugFailure)throw Error('diagnostic failure');records.push(JSON.parse(text.slice('__HD_STORAGE_AUDIT__'.length))); }}
+    Object:{prototype:{hasOwnProperty:function(key){if(options.ownErrorKey===key)throw new TypeError('PRIVATE_OWN_ERROR');return Object.prototype.hasOwnProperty.call(this,key)}},getOwnPropertyDescriptor:Object.getOwnPropertyDescriptor,defineProperty:Object.defineProperty},
+    performance:{timeOrigin:doc,now:()=>options.monotonicClock?++clock:1},console:{debug:text=>{ if(debugFailure)throw Error('diagnostic failure');records.push(JSON.parse(text.slice('__HD_STORAGE_AUDIT__'.length))); }}
   });
-  return { localStorage,sessionStorage,Storage,originalGet,records,window,listeners,getReads:()=>getReads };
+  return { localStorage,sessionStorage,Storage,originalGet,records,window,listeners,getReads:()=>getReads,writes:()=>writes,stored:key=>data.get(localStorage).get(key) };
 }
 test('audit preserves native Storage semantics and never initializes or exposes fixture values', () => {
   const f=fixture(); assert.equal(f.Storage.prototype.getItem,f.originalGet);
@@ -80,14 +85,16 @@ test('failure retention uses emitted history without evaluating a blocked page o
   context.browser=()=>browser;context.pages=()=>[page];page.context=()=>context;
   page.addInitScript=async(fn,args)=>{initArgs=args};page.evaluate=()=>{throw Error('must not evaluate on failure')};
   context.storageState=()=>{throw Error('must not serialize values')};
-  const audit=await observeStorage(page,{project:{},outputPath:name=>path.join(folder,name),attach:async(name,data)=>{attached=JSON.parse(await fs.readFile(data.path,'utf8'))}},{scriptErrorBoundary:true});
-  page.emit('console',{text:()=> '__HD_STORAGE_AUDIT__'+JSON.stringify({stage:'pagehide',values:[{key:KEYS[0],present:true,length:8}]})});
+  const audit=await observeStorage(page,{project:{},outputPath:name=>path.join(folder,name),attach:async(name,data)=>{attached=JSON.parse(await fs.readFile(data.path,'utf8'))}},{scriptErrorBoundary:true,keyPresence:true});
+  page.emit('console',{text:()=> '__HD_STORAGE_AUDIT__'+JSON.stringify({stage:'pagehide',values:[{key:KEYS[0],present:true,length:8,ownProperty:true,enumerated:null}],enumeration:{complete:false,truncated:true}})});
   const storageEvent={keyKind:'target',key:KEYS[0],oldValueIsNull:false,newValueIsNull:true,storageAreaSame:true,url:'http://localhost:4173/'};
   page.emit('console',{text:()=> '__HD_STORAGE_AUDIT__'+JSON.stringify({stage:'storage',storageEvent})});
   page.emit('crash');browser.emit('disconnected');await audit.finish();
   assert.deepEqual(attached.events.map(e=>e.kind),['install','storage','storage','page-crash','browser-disconnected']);
   assert.deepEqual(attached.events[2].storageEvent,storageEvent);
   assert.equal(initArgs.scriptErrorBoundary,true);assert.equal(attached.events[0].scriptErrorBoundary,true);
+  assert.equal(initArgs.keyPresence,true);assert.equal(attached.presence.enabled,true);
+  assert.equal(attached.events[1].values[0].enumerated,null);assert.equal(attached.events[1].enumeration.truncated,true);
   assert.equal(page.listenerCount('console'),0);assert.equal(browser.listenerCount('disconnected'),0);
 });
 test('opt-in first script error boundary is read-only, once per document, and distinguishes nonnull from null',()=>{
@@ -135,6 +142,52 @@ test('only PWA cached restart and carrier night reload opt into the single scrip
   const [pwa,night,boundary]=await Promise.all(['pwa-cached-reload.spec.js','night-policy-reload.spec.js','pwa-storage-boundary.spec.js'].map(file=>fs.readFile(path.join(__dirname,file),'utf8')));
   assert.equal((pwa.match(/scriptErrorBoundary:true/g)||[]).length,1);
   assert.equal((night.match(/scriptErrorBoundary:true/g)||[]).length,1);
-  assert.match(night,/test\('carrier night CI policy persists and regenerates the mobile loadout',[\s\S]*?observeStorage\(page,testInfo,\{scriptErrorBoundary:true\}\)/);
+  assert.match(night,/test\('carrier night CI policy persists and regenerates the mobile loadout',[\s\S]*?observeStorage\(page,testInfo,\{scriptErrorBoundary:true,keyPresence:true\}\)/);
+  assert.equal((pwa.match(/keyPresence:true/g)||[]).length,1);assert.equal((night.match(/keyPresence:true/g)||[]).length,1);
   assert.ok(!boundary.includes('scriptErrorBoundary:true'));
+});
+test('presence metadata distinguishes normal stored and genuinely absent keys without extra value reads or writes',()=>{
+  const f=fixture(false,false,false,100,{keyPresence:true,monotonicClock:true,seed:[[KEYS[0],'PRIVATE_STORED'],['PRIVATE_OTHER_KEY','PRIVATE_OTHER_VALUE']]});
+  const row=f.records[0],a=row.values[0],b=row.values[1];
+  assert.equal(a.present,true);assert.equal(a.ownProperty,true);assert.equal(a.enumerated,true);
+  assert.equal(b.present,false);assert.equal(b.ownProperty,false);assert.equal(b.enumerated,false);
+  assert.equal(row.enumeration.lengthBefore,2);assert.equal(row.enumeration.lengthAfter,2);assert.equal(row.enumeration.scanned,2);assert.equal(row.enumeration.complete,true);
+  assert.equal(f.getReads(),KEYS.length);assert.equal(f.writes(),0);assert.equal(f.stored(KEYS[0]),'PRIVATE_STORED');
+  assert.ok(a.readStartedAt<a.readAt&&a.readAt<a.ownStartedAt&&a.ownStartedAt<a.ownReadAt&&a.ownReadAt<row.enumeration.startedAt);
+  assert.ok(row.enumeration.lengthBeforeAt<=a.enumerationMatch.at&&a.enumerationMatch.at<=row.enumeration.lengthAfterAt);
+  assert.ok(!JSON.stringify(row).includes('PRIVATE'));assert.equal(f.Storage.prototype.getItem,f.originalGet);
+  const off=fixture();assert.equal(off.records[0].enumeration,undefined);assert.equal(off.records[0].values[0].ownProperty,undefined);
+});
+test('own-property exception and a disappearing enumerated index preserve unknown evidence and the original values',()=>{
+  const f=fixture(false,false,false,100,{keyPresence:true,ownErrorKey:KEYS[0],keyNullAt:0,seed:[[KEYS[0],'PRIVATE_KEPT']]});
+  const row=f.records[0];assert.equal(row.values[0].ownProperty,null);assert.equal(row.values[0].ownError,'TypeError');
+  assert.equal(row.values[0].present,true);assert.equal(row.enumeration.changed,true);assert.equal(row.enumeration.complete,false);
+  assert.ok(row.values.every(v=>v.enumerated===null));assert.equal(f.stored(KEYS[0]),'PRIVATE_KEPT');assert.equal(f.writes(),0);
+  assert.ok(!JSON.stringify(row).includes('PRIVATE'));
+});
+test('read-only actual-null injection retains own key and enumeration evidence without initializing or restoring',()=>{
+  const f=fixture(false,false,false,100,{keyPresence:true,nullKey:KEYS[0],seed:[[KEYS[0],'PRIVATE_KEPT']]});
+  const a=f.records[0].values[0];assert.equal(a.present,false);assert.equal(a.ownProperty,true);assert.equal(a.enumerated,true);
+  assert.equal(f.stored(KEYS[0]),'PRIVATE_KEPT');assert.equal(f.getReads(),KEYS.length);assert.equal(f.writes(),0);
+});
+test('enumeration error, scan limit and observed length change are unknown rather than absence',()=>{
+  for(const mode of ['keyError','lengthError','lengthChanged','limit']){
+    const options={keyPresence:true,seed:[[KEYS[0],'PRIVATE_VALUE']]};
+    if(mode==='limit')options.seed.push(...Array.from({length:128},(_,i)=>['PRIVATE_OUTSIDE_'+i,'x']));else options[mode]=true;
+    const f=fixture(false,false,false,100,options),row=f.records[0];
+    assert.equal(row.enumeration.complete,false);assert.ok(row.values.every(x=>x.enumerated===null));
+    assert.equal(row.values[0].ownProperty,true);assert.equal(f.writes(),0);assert.equal(f.getReads(),KEYS.length);
+    assert.ok(!JSON.stringify(row).includes('PRIVATE'));
+    if(mode==='limit'){assert.equal(row.enumeration.scanned,128);assert.equal(row.enumeration.truncated,true);assert.ok(row.values[0].enumerationMatch);}
+    if(mode==='lengthChanged')assert.equal(row.enumeration.changed,true);
+    if(mode==='keyError'||mode==='lengthError')assert.ok(row.enumeration.errors.length>0);
+  }
+});
+test('failed presence observation/delivery does not alter native operation results or exceptions',()=>{
+  const options={keyPresence:true,keyError:true,seed:[[KEYS[0],'kept']]},f=fixture(false,false,false,100,options);
+  assert.equal(f.localStorage.setItem(KEYS[0],'updated'),undefined);assert.equal(f.localStorage.getItem(KEYS[0]),'updated');
+  const error=new Error('PRIVATE_NATIVE');assert.throws(()=>f.localStorage.setItem(KEYS[0],{toString(){throw error}}),x=>x===error);
+  assert.equal(f.stored(KEYS[0]),'updated');assert.ok(f.records.some(r=>r.stage==='mutation-failed'));
+  const bad=fixture(true,false,false,100,{keyPresence:true});assert.doesNotThrow(()=>bad.localStorage.setItem(KEYS[0],'kept'));
+  assert.equal(bad.localStorage.getItem(KEYS[0]),'kept');
 });
