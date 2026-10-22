@@ -51,11 +51,17 @@ test(`late ${moduleName} resumes real application dependants and survives reload
   const url='http://127.0.0.1:'+server.address().port+'/';
   async function check(stage){
     await expect.poll(()=>page.evaluate(()=>Object.values(HD_MODULE_STATUS).filter(v=>v!=='ok').length)).toBe(0);
+    // Native script load is earlier than the existing asset pass's UI init.
+    // Join no new pass: wait for the currently running pass/recovery to finish.
+    await page.waitForFunction(()=>HD_CURRENT_ASSETS_PROMISE===null);
     await expect(page.locator('#hdWorkspaceNav')).toBeVisible();
     const later=await page.evaluate(({attr,moduleName})=>hdLoadScript(attr,'./'+moduleName),{attr,moduleName});
     expect(later).toBe(true);
+    // Use user navigation after startup rather than bypassing it during init.
+    await page.locator('#hdWorkspaceNav [data-hd-ws-group="quest"]').click();
+    await page.locator('#hdWorkspaceSectionSelect').selectOption('questDatabase');
+    await expect(page.locator('#questDatabase')).toBeVisible();
     const before=await page.evaluate(()=>{
-      window.hdWSShowElement('questDatabase',false);
       hdQuestCycle='daily';hdQuestType='すべて';hdRenderQuestDb();
       return hdQPEntry(HD_QUESTS.find(q=>q.id==='Bd3')).values[0];
     });

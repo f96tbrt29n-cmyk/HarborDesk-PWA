@@ -73,6 +73,25 @@ fleet-calculatorケースでは、false時点でfleet-calculator-fix.jsの要求
 2対象/両エンジンとも既存41moduleのokと画面操作、pageerrorゼロまで到達した。
 API内部の状態がokになっただけの成功とは区別する。
 
+### 最初の通常CIで分かった回帰fixtureの不足
+
+`af818b6`のCI39723815861では、WebKitのfleet-calculator実アプリ試験が初回/retryとも45秒で失敗した。
+両試行とも遅延load後の任務加算/装備追加は成功し、再読込後の任務ボタンがdetach→hiddenとなった段階で止まった。
+初回/retryのtrace/video/JSON/配信sourceを別々に保持。moduleのload状態が全okでも、既存asset pass末尾の
+hdInitLoadedModulesや画面準備の完了とは同じでない。旧fixtureはその完了前に内部APIで画面を開ける構成だった。
+実行順のどの描画が隠したかまでは特定せず、製品側の画面障害がすべて解消したとはしない。
+
+fixtureだけを修正し、**新たなasset passを起動せず既存HD_CURRENT_ASSETS_PROMISEがnullへ戻ること**を待ち、
+実ナビの任務タブ/画面選択から開く。元の機能操作・評価数・要求数・加算数・保存・再読込・例外検査は維持。
+固定sleep/期限延長/強制click/製品初期化の追加呼出しはない。
+変更したfleet-calculatorケースをChromium→WebKit各1回、retry0で確認し、2件初回成功（24.545秒/22.624秒）。
+この結果は変更前の最終失敗と分け、通常CIの最終結果はPR冒頭へ記す。
+
+同CIの別のWebKit再試行は調達リストの`fleet-loadout-planner.spec.js:444`。
+DCL後にhdPLLoad().find(map=1-6)がundefinedで、gearItems参照が失敗。初回は動画/PNG/error-contextのみ、traceはretryだけ。
+直接のgetItem結果やStorage監査はなく、null/読取り例外/JSONや行の変化を区別できない。
+旧5キー実nullへ同一視せず、原因未確定の保存関連初回失敗として保持する。成功retryから初回の欠測を補完しない。
+
 完了済み8件は中断後に再実行していない。その時点のsource snapshotと最終sourceの差は、
 警告の固定位置表示/文言と回復時の想定外拒否を警告だけに変換しない変更。最終HEADの通常CIでも新6ケース/engineを実行する。
 初回成功件数は全ケースのページ例外ゼロの保証ではなく、各ケースに元からある例外検査範囲による。
@@ -94,6 +113,7 @@ PR152ドラフト・公開保留、PR151未変更。マージ・公開・自動�
 
 原本: `/workspace/hd152-module-loader-recovery-20261022/`。before/after/appは中断前のまま保護。
 再開分: `resume-20261022/`（baseline-final/app-final/related、初回trace/video/JSON、served-source、source/hash、原本照合）。
+最初の通常CI原本は同配下`ci/`、準備修正後の限定2件は`app-ci-fix/`。別試行を上書きせず保持。
 旧原本118ファイルはhash差異0。snapshotを書き換えたり失敗後にevaluate/storageStateを追加したりしていない。
 
 新ブラウザー2ファイルを通常CIの固定test:browser一覧へ追加。Node契約もbrowser/pagesの必須工程へ追加。
