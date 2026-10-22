@@ -4,6 +4,11 @@ const HD_RESOURCE_HISTORY_KEY='harbordesk-resource-history-v1';
 const HD_EQUIP_LEDGER_VIEW_KEY='harbordesk-session-equipment-ledger-view-v1';
 
 function hdLoad(key,fallback=[]){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
+function hdLoadEquipmentForSave(){
+ const raw=localStorage.getItem(HD_EQUIP_KEY);
+ if(raw===null&&Object.prototype.hasOwnProperty.call(localStorage,HD_EQUIP_KEY))throw Object.assign(new Error('Equipment storage key is present but its value could not be read'),{code:'HD_STORAGE_NULL_READ'});
+ return JSON.parse(raw)??[];
+}
 function hdSave(key,value){localStorage.setItem(key,JSON.stringify(value));if(key===HD_EQUIP_KEY)window.dispatchEvent(new CustomEvent('hd:equipment-changed',{detail:{key,at:Date.now()}}))}
 function hdEsc(s){return typeof esc==='function'?esc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdUid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)}
@@ -68,7 +73,7 @@ function renderEquipment(){
   :'<div class="empty empty-action"><strong>条件に合う装備がないよ</strong><p>検索語を消すと装備一覧へ戻れるよ。</p><button type="button" class="ghost small" data-empty-eq-reset>検索をクリア</button></div>';
  el.innerHTML=rows.length?rows.map(x=>{const source=sourceKind(x),sourceBadge=source==='sync'?'<span class="equipment-source-badge sync">ゲーム同期</span>':source==='plan'?'<span class="equipment-source-badge plan">計画</span>':'<span class="equipment-source-badge manual">手動</span>';return `<article class="advanced-card"><div class="advanced-card-head"><div><strong>${hdEsc(x.name)}</strong><div class="equipment-card-meta"><span class="muted">${hdEsc(x.category||'カテゴリ未設定')} ・ 所持 ${Number(x.count)||0}${x.source==='equipment-plan'?' ・ 計画保存':''}</span>${sourceBadge}</div></div><div class="mini-actions"><button class="ghost small" data-eq-edit="${x.id}">編集</button><button class="ghost small" data-eq-delete="${x.id}">削除</button></div></div><div class="progress-line"><span>改修 ★${Number(x.star)||0} → 目標 ★${Number(x.targetStar)||0}</span><progress max="10" value="${Math.min(10,Number(x.star)||0)}"></progress></div>${x.assigned?`<div class="advanced-meta"><b>搭載:</b> ${hdEsc(x.assigned)}</div>`:''}${x.memo?`<p>${hdEsc(x.memo)}</p>`:''}</article>`}).join(''):empty;
 }
-function openEquipment(item){const d=document.getElementById('equipmentDialog');document.getElementById('equipmentId').value=item?.id||'';document.getElementById('equipmentName').value=item?.name||'';document.getElementById('equipmentCategory').value=item?.category||'';document.getElementById('equipmentCount').value=item?.count??1;document.getElementById('equipmentStar').value=item?.star??0;document.getElementById('equipmentTargetStar').value=item?.targetStar??10;document.getElementById('equipmentAssigned').value=item?.assigned||'';document.getElementById('equipmentMemo').value=item?.memo||'';d.showModal()}
+function openEquipment(item){const d=document.getElementById('equipmentDialog');d.querySelector('[data-hd-equipment-storage-error]')?.remove();document.getElementById('equipmentId').value=item?.id||'';document.getElementById('equipmentName').value=item?.name||'';document.getElementById('equipmentCategory').value=item?.category||'';document.getElementById('equipmentCount').value=item?.count??1;document.getElementById('equipmentStar').value=item?.star??0;document.getElementById('equipmentTargetStar').value=item?.targetStar??10;document.getElementById('equipmentAssigned').value=item?.assigned||'';document.getElementById('equipmentMemo').value=item?.memo||'';d.showModal()}
 
 function hdRefreshResourceConsumers(){try{if(typeof hdRBRender==='function')hdRBRender();if(typeof hdCCRender==='function')hdCCRender();if(typeof renderHomeDashboard==='function')renderHomeDashboard();window.dispatchEvent(new CustomEvent('hd:workspace-refresh'))}catch{}}
 function snapshotResources(){
@@ -252,7 +257,19 @@ async function importBackup(file){
 
 function bindAdvancedEvents(){
  document.getElementById('addEquipment').onclick=()=>openEquipment();document.getElementById('equipmentSearch').addEventListener('input',e=>{hdEquipLedgerViewSave({query:e.target.value});renderEquipment()});
- document.getElementById('equipmentForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const rows=hdLoad(HD_EQUIP_KEY,[]),id=document.getElementById('equipmentId').value||hdUid();const item={id,name:document.getElementById('equipmentName').value.trim(),category:document.getElementById('equipmentCategory').value.trim(),count:Number(document.getElementById('equipmentCount').value)||0,star:Number(document.getElementById('equipmentStar').value)||0,targetStar:Number(document.getElementById('equipmentTargetStar').value)||0,assigned:document.getElementById('equipmentAssigned').value.trim(),memo:document.getElementById('equipmentMemo').value.trim(),updatedAt:Date.now()};const i=rows.findIndex(x=>x.id===id);if(i>=0)rows[i]={...rows[i],...item};else rows.unshift({...item,createdAt:Date.now()});hdSave(HD_EQUIP_KEY,rows);setTimeout(()=>{renderEquipment();renderDashboard()},0)});
+ document.getElementById('equipmentForm').addEventListener('submit',e=>{
+  if(e.submitter?.value==='cancel')return;
+  let rows;
+  try{rows=hdLoadEquipmentForSave()}catch{
+   e.preventDefault();
+   let warning=e.target.querySelector('[data-hd-equipment-storage-error]');
+   if(!warning){warning=document.createElement('p');warning.setAttribute('role','alert');warning.dataset.hdEquipmentStorageError='1';e.target.querySelector('.dialog-actions').before(warning)}
+   warning.textContent='装備台帳を読み取れないため、保存していません。入力内容を残しています。読取りが回復したら、もう一度「保存」を押してください。';
+   return;
+  }
+  e.target.querySelector('[data-hd-equipment-storage-error]')?.remove();
+  const id=document.getElementById('equipmentId').value||hdUid();const item={id,name:document.getElementById('equipmentName').value.trim(),category:document.getElementById('equipmentCategory').value.trim(),count:Number(document.getElementById('equipmentCount').value)||0,star:Number(document.getElementById('equipmentStar').value)||0,targetStar:Number(document.getElementById('equipmentTargetStar').value)||0,assigned:document.getElementById('equipmentAssigned').value.trim(),memo:document.getElementById('equipmentMemo').value.trim(),updatedAt:Date.now()};const i=rows.findIndex(x=>x.id===id);if(i>=0)rows[i]={...rows[i],...item};else rows.unshift({...item,createdAt:Date.now()});hdSave(HD_EQUIP_KEY,rows);setTimeout(()=>{renderEquipment();renderDashboard()},0)
+ });
  document.getElementById('snapshotResources').onclick=snapshotResources;const sr=document.getElementById('saveResources');if(sr)sr.addEventListener('click',()=>setTimeout(snapshotResources,0));
  document.getElementById('addEventLog').onclick=()=>openEvent();document.getElementById('eventForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const rows=hdLoad(HD_EVENT_KEY,[]),id=document.getElementById('eventId').value||hdUid();const item={id,eventName:document.getElementById('eventName').value.trim(),map:document.getElementById('eventMap').value.trim(),difficulty:document.getElementById('eventDifficulty').value,status:document.getElementById('eventStatus').value,drop:document.getElementById('eventDrop').value.trim(),fleet:document.getElementById('eventFleet').value.trim(),memo:document.getElementById('eventMemo').value.trim(),updatedAt:Date.now()};const i=rows.findIndex(x=>x.id===id);if(i>=0)rows[i]={...rows[i],...item};else rows.unshift({...item,createdAt:Date.now()});hdSave(HD_EVENT_KEY,rows);setTimeout(()=>{renderEvents();renderDashboard()},0)});
  document.addEventListener('click',e=>{
