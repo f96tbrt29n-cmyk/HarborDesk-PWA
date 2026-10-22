@@ -6,6 +6,14 @@ const SHIP_TAGS=['主力','育成中','改二待ち','任務用','イベント�
 const SHIP_ROSTER_TYPES=['','駆逐艦','海防艦','軽巡洋艦','重雷装巡洋艦','練習巡洋艦','重巡洋艦','航空巡洋艦','高速戦艦','戦艦','航空戦艦','軽空母','正規空母','装甲空母','水上機母艦','潜水艦','潜水空母','潜水母艦','補給艦','揚陸艦'];
 
 function rosterLoad(){try{return JSON.parse(localStorage.getItem(SHIP_ROSTER_KEY))||[]}catch{return []}}
+// Form edits merge with existing rows; a failed read must not become an empty ledger.
+function rosterLoadForSave(){
+ const raw=localStorage.getItem(SHIP_ROSTER_KEY);
+ if(raw===null&&Object.prototype.hasOwnProperty.call(localStorage,SHIP_ROSTER_KEY)){
+  const error=new Error('艦娘台帳の保存値を読み取れません');error.code='HD_STORAGE_NULL_READ';throw error;
+ }
+ return JSON.parse(raw)||[];
+}
 function rosterViewLoad(){try{return JSON.parse(sessionStorage.getItem(SHIP_ROSTER_VIEW_KEY)||'{}')||{}}catch{return {}}}
 function rosterViewSave(patch={}){const next={...rosterViewLoad(),...patch};try{sessionStorage.setItem(SHIP_ROSTER_VIEW_KEY,JSON.stringify(next))}catch{}return next}
 function rosterScheduleRender(delay=90){clearTimeout(shipRosterRenderTimer);shipRosterRenderTimer=setTimeout(renderShipRoster,Math.max(0,Number(delay)||0))}
@@ -49,7 +57,15 @@ function ensureShipRosterDialog(){
  document.getElementById('shipRosterForm').addEventListener('submit',e=>{
   if(e.submitter?.value==='cancel')return;
   const name=document.getElementById('rosterName').value.trim();if(!name)return;
-  const items=rosterLoad();
+  let items;
+  try{items=rosterLoadForSave()}catch{
+   e.preventDefault();
+   let warning=document.querySelector('[data-hd-roster-storage-error]');
+   if(!warning){warning=document.createElement('p');warning.dataset.hdRosterStorageError='';warning.setAttribute('role','alert');document.querySelector('#shipRosterForm .dialog-actions').before(warning)}
+   warning.textContent='艦娘台帳を読み取れないため、保存していません。入力内容を残しています。読取りが回復したら、もう一度「保存」を押してください。';
+   return;
+  }
+  document.querySelector('[data-hd-roster-storage-error]')?.remove();
   const payload={name,masterId:rosterMasterId(name),type:document.getElementById('rosterType')?.value||'',level:document.getElementById('rosterLevel').value.trim(),remodel:document.getElementById('rosterRemodel').value.trim(),gear:document.getElementById('rosterGear').value.trim(),memo:document.getElementById('rosterMemo').value.trim(),tags:[...document.querySelectorAll('#rosterTagBox input:checked')].map(x=>x.value),updatedAt:Date.now()};
   const editing=!!shipRosterEditId;
   if(shipRosterEditId){const i=items.findIndex(x=>x.id===shipRosterEditId);if(i>=0)items[i]={...items[i],...payload}}
@@ -60,6 +76,7 @@ function ensureShipRosterDialog(){
 
 function openShipRosterDialog(item=null){
  ensureShipRosterDialog();shipRosterEditId=item?.id||null;
+ document.querySelector('[data-hd-roster-storage-error]')?.remove();
  document.querySelector('#shipRosterDialog h3').textContent=item?'艦娘を編集':'艦娘を登録';
  document.getElementById('rosterName').value=item?.name||'';document.getElementById('rosterType').value=item?.type||'';document.getElementById('rosterLevel').value=item?.level||'';document.getElementById('rosterRemodel').value=item?.remodel||'';document.getElementById('rosterGear').value=item?.gear||'';document.getElementById('rosterMemo').value=item?.memo||'';
  document.querySelectorAll('#rosterTagBox input').forEach(x=>x.checked=(item?.tags||[]).includes(x.value));
