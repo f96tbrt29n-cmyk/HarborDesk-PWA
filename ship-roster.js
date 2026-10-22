@@ -138,7 +138,17 @@ document.addEventListener('click',e=>{
  const f=e.target.closest('[data-roster-filter]');if(f){document.querySelectorAll('[data-roster-filter]').forEach(x=>x.classList.remove('active'));f.classList.add('active');rosterViewSave({filter:f.dataset.rosterFilter||'all'});renderShipRoster();return}
  const sync=e.target.closest('[data-roster-master-sync]');if(sync){rosterSyncCanonical(sync.dataset.rosterMasterSync);return}
  const ed=e.target.closest('[data-roster-edit]');if(ed){const item=rosterLoad().find(x=>x.id===ed.dataset.rosterEdit);if(item)openShipRosterDialog(item);return}
- const del=e.target.closest('[data-roster-delete]');if(del){const rows=rosterLoad(),i=rows.findIndex(x=>x.id===del.dataset.rosterDelete);if(i<0)return;const [item]=rows.splice(i,1);rosterSave(rows);window.hdToastAction?.(`${item.name||'艦娘'} を削除したよ`,'元に戻す',()=>{const current=rosterLoad();if(!current.some(x=>x.id===item.id)){current.splice(Math.min(i,current.length),0,item);rosterSave(current);window.hdToast?.('元に戻したよ')}});return}
+ const del=e.target.closest('[data-roster-delete]');if(del){
+  const rows=rosterLoad(),i=rows.findIndex(x=>x.id===del.dataset.rosterDelete);if(i<0)return;
+  const [item]=rows.splice(i,1);rosterSave(rows);
+  const undoToast=window.hdToastAction?.(`${item.name||'艦娘'} を削除したよ`,'元に戻す',()=>{
+   let current;try{current=rosterLoadForSave()}catch{
+    const text=undoToast?.querySelector('span');if(text)text.textContent='艦娘台帳を読み取れないため、復元していません。読取り回復後、期限内にもう一度押してください。';
+    return false;
+   }
+   if(!current.some(x=>x.id===item.id)){current.splice(Math.min(i,current.length),0,item);rosterSave(current);window.hdToast?.('元に戻したよ')}
+  });return
+ }
 });
 
 document.addEventListener('DOMContentLoaded',initShipRoster);

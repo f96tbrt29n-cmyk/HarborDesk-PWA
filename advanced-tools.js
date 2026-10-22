@@ -284,7 +284,13 @@ function bindAdvancedEvents(){
  const ed=e.target.closest('[data-eq-delete]');if(ed){
   const rows=hdLoad(HD_EQUIP_KEY,[]),i=rows.findIndex(x=>x.id===ed.dataset.eqDelete);if(i<0)return;const [item]=rows.splice(i,1);
   hdSave(HD_EQUIP_KEY,rows);renderEquipment();renderDashboard();
-  window.hdToastAction?.(`${item.name||'装備'} を削除したよ`,'元に戻す',()=>{const current=hdLoad(HD_EQUIP_KEY,[]);if(!current.some(x=>x.id===item.id)){current.splice(Math.min(i,current.length),0,item);hdSave(HD_EQUIP_KEY,current);renderEquipment();renderDashboard();window.hdToast?.('元に戻したよ')}});return
+  const undoToast=window.hdToastAction?.(`${item.name||'装備'} を削除したよ`,'元に戻す',()=>{
+   let current;try{current=hdLoadEquipmentForSave()}catch{
+    const text=undoToast?.querySelector('span');if(text)text.textContent='装備台帳を読み取れないため、復元していません。読取り回復後、期限内にもう一度押してください。';
+    return false;
+   }
+   if(!current.some(x=>x.id===item.id)){current.splice(Math.min(i,current.length),0,item);hdSave(HD_EQUIP_KEY,current);renderEquipment();renderDashboard();window.hdToast?.('元に戻したよ')}
+  });return
  }
  const he=e.target.closest('[data-history-delete]');if(he){
   const rows=hdLoad(HD_RESOURCE_HISTORY_KEY,[]),i=rows.findIndex(x=>x.id===he.dataset.historyDelete);if(i<0)return;const [item]=rows.splice(i,1);
