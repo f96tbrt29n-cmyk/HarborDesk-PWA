@@ -53,7 +53,7 @@ jobs:
         run: node --test tests/enemy-anti-air.test.cjs
 
       - name: Verify service worker cache update lifetime
-        run: node --test tests/sw-cache-lifetime.test.cjs
+        run: node --test tests/sw-cache-lifetime.test.cjs tests/module-loader-recovery.test.cjs
 
       - name: Validate PWA metadata and cached assets
         shell: bash
@@ -194,6 +194,15 @@ jobs:
           path: |
             playwright-report/
             test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Preserve module loader regression evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: module-loader-${{ matrix.browser }}-${{ matrix.shard }}-${{ github.run_id }}
+          path: test-results/module-loader-*/
           if-no-files-found: ignore
           retention-days: 14
 
