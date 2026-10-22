@@ -174,7 +174,7 @@ function hdKcReadMergeRows(key,label){
  try{
   const raw=localStorage.getItem(key);
   if(raw===null&&Object.prototype.hasOwnProperty.call(localStorage,key))throw new Error('unreadable existing key');
-  const rows=JSON.parse(raw||'[]');return Array.isArray(rows)?rows:[];
+  const rows=JSON.parse(raw??'[]');return Array.isArray(rows)?rows:[];
  }catch{throw hdKcReceiveError('storage-read',`${label}を読み取れないため、同期していません。読取りが回復したら、もう一度受信してください。`)}
 }
 function hdKcReadEquipmentMergeBase(parsed){

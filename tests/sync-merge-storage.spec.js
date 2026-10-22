@@ -35,7 +35,7 @@ async function setup(page,kind,seed='existing'){
   window.mergeReadFault={keys,nativeGet,roster,equipment,details,reference:keys.map(k=>nativeGet.call(localStorage,k)),allReference:Object.fromEntries(Object.keys(localStorage).map(k=>[k,nativeGet.call(localStorage,k)])),returnReference:nativeGet.call(sessionStorage,'harbordesk-kc-return-game-v1'),mode:'none',target:'',writes:[],successEvents:0,successToasts:0};
   window.addEventListener('hd:kancolle-sync',()=>mergeReadFault.successEvents++);
   const toast=window.hdToastAction;window.hdToastAction=function(...args){if(String(args[0]).startsWith('同期完了'))mergeReadFault.successToasts++;return toast?.apply(this,args)};
-  Storage.prototype.getItem=function(key){if(this===localStorage&&key===mergeReadFault.target){if(mergeReadFault.mode==='null')return null;if(mergeReadFault.mode==='throw')throw Error('isolated merge read unavailable');if(mergeReadFault.mode==='json')return '{invalid'}return nativeGet.call(this,key)};
+  Storage.prototype.getItem=function(key){if(this===localStorage&&key===mergeReadFault.target){if(mergeReadFault.mode==='null')return null;if(mergeReadFault.mode==='throw')throw Error('isolated merge read unavailable');if(mergeReadFault.mode==='json')return '{invalid';if(mergeReadFault.mode==='empty-json')return ''}return nativeGet.call(this,key)};
   Storage.prototype.setItem=function(key,value){if(this===localStorage)mergeReadFault.writes.push(mergeReadFault.keys.includes(key)?key:'other');return nativeSet.call(this,key,value)};
   Object.defineProperty(navigator,'clipboard',{value:{readText:async()=>raw},configurable:true});
   return {ships:parsed.completeShips,equipment:parsed.completeSlotItems};
@@ -83,6 +83,7 @@ for(const mode of ['null','throw','json']){
  for(const kind of ['full','partial'])faults.push({target:'equipment',index:1,mode,kind});
  faults.push({target:'roster',index:2,mode,kind:'full'},{target:'detail',index:6,mode,kind:'partial'});
 }
+faults.push({target:'equipment',index:1,mode:'empty-json',kind:'full'});
 for(const {target,index,mode,kind} of faults)test(`sync merge ${kind} ${target} ${mode} aborts without partial writes and recovers`,async({page},info)=>{
  const errors=await setup(page,kind);
  await page.evaluate(({index,mode})=>{mergeReadFault.target=mergeReadFault.keys[index];mergeReadFault.mode=mode},{index,mode});
