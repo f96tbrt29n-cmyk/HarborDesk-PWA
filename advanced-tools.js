@@ -110,18 +110,19 @@ function hdAnalyzeBackupIntegrity(obj){
 function hdBuildBackupFile(){
  const appVersion=typeof HD_APP_VERSION==='string'?HD_APP_VERSION:'',appBuild=typeof HD_APP_BUILD==='number'?HD_APP_BUILD:null;
  const data={version:1,exportedAt:new Date().toISOString(),app:{name:'HarborDesk',version:appVersion,build:appBuild},localStorage:{}};
- for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('harbordesk'))data.localStorage[k]=localStorage.getItem(k)}
+ data.localStorage=hdCaptureHarborLocalStorage();
  data.integrity={algorithm:'fnv1a32',hash:hdBackupChecksum(data)};
  const name=`HarborDesk-backup-${new Date().toISOString().slice(0,10)}.json`;
  const text=JSON.stringify(data,null,2),blob=new Blob([text],{type:'application/json'});
  return {data,name,text,blob};
 }
 function exportBackup(){
- const {blob,name}=hdBuildBackupFile(),a=document.createElement('a'),url=URL.createObjectURL(blob);
+ let backup;try{backup=hdBuildBackupFile()}catch(error){return hdBackupReadFailure(error)}
+ const {blob,name}=backup,a=document.createElement('a'),url=URL.createObjectURL(blob);
  a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);return true
 }
 async function shareBackup(){
- const backup=hdBuildBackupFile();
+ let backup;try{backup=hdBuildBackupFile()}catch(error){return hdBackupReadFailure(error)}
  try{
   if(typeof File==='function'&&typeof navigator.share==='function'){
    const file=new File([backup.blob],backup.name,{type:'application/json'}),payload={title:'HarborDesk バックアップ',files:[file]};
@@ -130,6 +131,7 @@ async function shareBackup(){
  }catch(err){if(err?.name==='AbortError')return false}
  return exportBackup()!==false
 }
+function hdBackupReadFailure(error){if(error?.code!=='HD_STORAGE_NULL_READ')throw error;window.hdToast?.('保存済みのキーから値を読み取れないため、バックアップを中止しました。端末内データは変更していません。読取りが回復してから、もう一度操作してください。','warn',6000);return false}
 function hdAnalyzeBackupLocalStorage(storage){
  if(!storage||typeof storage!=='object'||Array.isArray(storage))throw new Error('invalid backup storage');
  const raw=Object.entries(storage),entries=raw.filter(([k,v])=>k.startsWith('harbordesk')&&typeof v==='string');
@@ -187,7 +189,7 @@ function hdConfirmBackupRestore(obj,analysis,fileName=''){
  return new Promise(resolve=>{const done=()=>resolve(!compat.blocked&&d.returnValue==='restore');d.addEventListener('close',done,{once:true});if(typeof d.showModal==='function')d.showModal();else d.setAttribute('open','')});
 }
 function hdCaptureHarborLocalStorage(){
- const data={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k?.startsWith('harbordesk'))data[k]=localStorage.getItem(k)}return data
+ const data={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k?.startsWith('harbordesk')){const value=localStorage.getItem(k);if(value===null)throw Object.assign(new Error('Enumerated backup storage key has no readable value'),{code:'HD_STORAGE_NULL_READ'});data[k]=value}}return data
 }
 function hdValidateBackupApplied(storage){
  if(!storage||typeof storage!=='object'||Array.isArray(storage))return {ok:false,missing:[],mismatched:[],extra:[],reason:'invalid storage'};

@@ -6,7 +6,7 @@ const HD_FC_AIR_CATEGORIES=new Set(['艦上戦闘機','艦上攻撃機','艦上�
 function hdFCEsc(s){return typeof hdEsc==='function'?hdEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 // Write paths must not turn an unavailable ledger or invalid JSON into defaults.
 const HD_FC_READ_FAILURES=new WeakSet();
-function hdFCLoadAll(strict=false){try{return JSON.parse(localStorage.getItem(HD_FC_KEY)||'{}')||{}}catch(error){if(strict){if(error&&typeof error==='object')HD_FC_READ_FAILURES.add(error);throw error}return {}}}
+function hdFCLoadAll(strict=false){try{const raw=localStorage.getItem(HD_FC_KEY);if(strict&&raw===null&&Object.prototype.hasOwnProperty.call(localStorage,HD_FC_KEY))throw Object.assign(new Error('Planner storage key is present but its value could not be read'),{code:'HD_STORAGE_NULL_READ'});return JSON.parse(raw||'{}')||{}}catch(error){if(strict){if(error&&typeof error==='object')HD_FC_READ_FAILURES.add(error);throw error}return {}}}
 const HD_FC_READ_MESSAGE='プランナーの保存領域を読み取れないため、操作を中止しました。保存内容は変更していません。読取りが回復してから、もう一度操作してください。';
 // Only failures from the strict ledger read are handled here. Other defects
 // still propagate; no empty state, automatic save, or automatic restore.
