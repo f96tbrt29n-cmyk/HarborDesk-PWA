@@ -1,5 +1,11 @@
 const { test, expect } = require('@playwright/test');
 const APP_BUILD = require('../app-version.json').build;
+const { observeHashNavigation, readHashObservation } = require('./hash-navigation-audit.cjs');
+// Video is a worker option in Playwright 1.55; isolate this test type instead
+// of changing retention for every release-smoke case.
+const hashNavigationTest = test.extend({
+  trace: { mode: 'on', snapshots: false, screenshots: true, sources: true }, video: 'on'
+});
 
 test.use({
   viewport: { width: 390, height: 844 },
@@ -10243,7 +10249,10 @@ test('release smoke: Quick Nav group jump marks explicit workspace navigation', 
 });
 
 
-test('release smoke: hash navigation cancels stale fleet-suggester recovery', async ({ page }) => {
+hashNavigationTest('release smoke: hash navigation cancels stale fleet-suggester recovery', async ({ page }, info) => {
+  const audit = await observeHashNavigation(page, info);
+  let failed = false;
+  try {
   const errors = [];
   await boot(page, errors);
   await page.waitForFunction(() =>
@@ -10252,35 +10261,22 @@ test('release smoke: hash navigation cancels stale fleet-suggester recovery', as
     typeof window.hdWSMarkUserNavigation === 'function'
   );
 
-  const before = await page.evaluate(() => {
-    window.hdFSOpen();
-    return {
-      section: window.hdWSState?.sections?.guide || '',
-      userEpoch: Number(window.__HD_WORKSPACE_USER_NAV_EPOCH) || 0
-    };
-  });
+  const before = await audit.sample('open', () => page.evaluate(readHashObservation, 'open'));
   expect(before.section).toBe('hdFleetSuggester');
 
-  await page.evaluate(() => { location.hash = '#guide'; });
+  await audit.sample('navigate', () => page.evaluate(readHashObservation, 'navigate'));
   await expect.poll(
-    () => page.evaluate(() => ({
-      section: window.hdWSState?.sections?.guide || '',
-      userEpoch: Number(window.__HD_WORKSPACE_USER_NAV_EPOCH) || 0
-    })),
+    () => audit.sample('poll', () => page.evaluate(readHashObservation, 'poll')),
     { timeout: 3000 }
   ).toEqual({section:'guide',userEpoch:before.userEpoch+1});
 
   await page.waitForTimeout(700);
-  const after = await page.evaluate(() => {
-    const fleet=document.getElementById('hdFleetSuggester');
-    return {
-      section: window.hdWSState?.sections?.guide || '',
-      fleetVisible: !!fleet && !fleet.hidden && !fleet.classList.contains('hd-ws-hidden')
-    };
-  });
+  const after = await audit.sample('after-700ms', () => page.evaluate(readHashObservation, 'after'));
   expect(after.section).toBe('guide');
   expect(after.fleetVisible).toBe(false);
   expect(errors).toEqual([]);
+  } catch (error) { failed = true; throw error; }
+  finally { await audit.finish(failed); }
 });
 
 
