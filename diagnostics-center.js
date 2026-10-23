@@ -66,7 +66,22 @@ function hdDXShipIdentityHealth(){
 }
 function hdDXRepairShipIdentity(){
  if(!confirm('艦隊台帳と保存編成のMASTER ID・艦名をマスターに合わせて修復する？\nLv・タグ・装備メモなどは変更しないよ。'))return 0;
- let changed=0,roster=[],fleets={};try{roster=JSON.parse(localStorage.getItem('harbordesk-ship-roster-v1')||'[]')||[]}catch{}try{fleets=JSON.parse(localStorage.getItem('harbordesk-custom-fleets-v1')||'{}')||{}}catch{}
+ let changed=0,roster,fleets;
+ try{
+  const read=(key,empty)=>{
+   const raw=localStorage.getItem(key);
+   if(raw===null&&Object.prototype.hasOwnProperty.call(localStorage,key))throw new Error('保存値を読み取れません');
+   return raw===null?empty:JSON.parse(raw)||empty;
+  };
+  roster=read('harbordesk-ship-roster-v1',[]);fleets=read('harbordesk-custom-fleets-v1',{});
+ }catch{
+  const message='艦娘台帳または保存編成を読み取れないため、修復していません。保存内容は変更していません。読取りが回復したら、もう一度「艦ID/公式名を修復」を押してください。';
+  let warning=document.querySelector('[data-hd-dx-storage-error]');
+  const host=document.getElementById('hdDiagnosticsCenter');
+  if(!warning&&host){warning=document.createElement('p');warning.dataset.hdDxStorageError='';warning.setAttribute('role','alert');host.before(warning)}
+  if(warning)warning.textContent=message;window.hdToast?.(message);return false;
+ }
+ document.querySelector('[data-hd-dx-storage-error]')?.remove();
  for(const row of (Array.isArray(roster)?roster:[])){if(!row?.name)continue;const s=typeof hdShipIdentityStatus==='function'?hdShipIdentityStatus(row):null;if(!s?.master)continue;const id=Number(s.master.id)||0,name=String(s.master.name||row.name);if(Number(row.masterId)!==id||row.name!==name){row.masterId=id;row.name=name;row.updatedAt=Date.now();changed++}}
  for(const list of Object.values(fleets||{}))for(const fleet of (Array.isArray(list)?list:[]))for(const row of (fleet?.ships||[])){if(!row?.ship)continue;const s=typeof hdShipIdentityStatus==='function'?hdShipIdentityStatus({name:row.ship,masterId:row.masterId}):null;if(!s?.master)continue;const id=Number(s.master.id)||0,name=String(s.master.name||row.ship);if(Number(row.masterId)!==id||row.ship!==name){row.masterId=id;row.ship=name;changed++}}
  localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(roster));localStorage.setItem('harbordesk-custom-fleets-v1',JSON.stringify(fleets));
@@ -170,7 +185,7 @@ async function hdDXCopy(){const text=hdDXReport();try{await navigator.clipboard.
 async function hdDXReinit(){try{if(typeof hdInitLoadedModules==='function')hdInitLoadedModules();window.dispatchEvent(new CustomEvent('hd:modules-ready',{detail:{manual:true}}));setTimeout(hdDXRender,250)}catch{setTimeout(hdDXRender,250)}}
 async function hdDXCacheRepair(){if(!navigator.onLine){alert('オフライン中はキャッシュ再構築を実行しないよ。通信できる状態で試してね。');return}if(!confirm('アプリキャッシュだけ再構築する？\n艦娘・装備・任務・資源などの保存データは消さないよ。'))return;if(typeof hdForceUpdate==='function'){hdForceUpdate();return}try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('harbordesk-pwa-')).map(k=>caches.delete(k)));location.reload()}catch{location.reload()}}
 
-document.addEventListener('click',e=>{if(e.target.closest?.('[data-dx-recheck]')){hdDXRender(true);return}if(e.target.closest?.('[data-dx-ship-identity]')){hdDXRepairShipIdentity();hdDXRender();return}if(e.target.closest?.('[data-dx-ship-image-audit]')){if(typeof hdShipImageIntegrityAudit==='function')hdShipImageIntegrityAudit(true).then(()=>hdDXRender());return}if(e.target.closest?.('[data-dx-reinit]')){hdDXReinit();return}if(e.target.closest?.('[data-dx-cache]')){hdDXCacheRepair();return}if(e.target.closest?.('[data-dx-update]')){if(typeof hdCheckForUpdate==='function')hdCheckForUpdate(true);return}if(e.target.closest?.('[data-dx-copy]')){hdDXCopy();return}});
+document.addEventListener('click',e=>{if(e.target.closest?.('[data-dx-recheck]')){hdDXRender(true);return}if(e.target.closest?.('[data-dx-ship-identity]')){if(hdDXRepairShipIdentity()!==false)hdDXRender();return}if(e.target.closest?.('[data-dx-ship-image-audit]')){if(typeof hdShipImageIntegrityAudit==='function')hdShipImageIntegrityAudit(true).then(()=>hdDXRender());return}if(e.target.closest?.('[data-dx-reinit]')){hdDXReinit();return}if(e.target.closest?.('[data-dx-cache]')){hdDXCacheRepair();return}if(e.target.closest?.('[data-dx-update]')){if(typeof hdCheckForUpdate==='function')hdCheckForUpdate(true);return}if(e.target.closest?.('[data-dx-copy]')){hdDXCopy();return}});
 window.addEventListener('online',()=>hdDXRender());window.addEventListener('offline',()=>hdDXRender());
 window.addEventListener('hd:modules-ready',()=>setTimeout(hdDXEnsure,150));
 window.addEventListener('load',()=>setTimeout(hdDXEnsure,1700));
