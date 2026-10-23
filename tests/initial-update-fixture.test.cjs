@@ -177,7 +177,10 @@ test('real-app fixture does not catch source errors or alter the original PWA pr
   const current = require('node:fs').readFileSync(path.join(__dirname,'pwa.spec.js'),'utf8');
   assert.ok(current.includes("await waitForApplicationRegistration(page, registrationEvidence);"));
   assert.ok(current.includes("await expect.poll(async () => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length), { timeout: 20000 }).toBeGreaterThan(0);"));
-  assert.equal([...current.matchAll(/expect\(errors,/g)].length,2);
+  // Keep the original two shared checks, plus the storage-only post-load check.
+  assert.equal([...current.matchAll(/expect\(errors,/g)].length,3);
+  const sharedChecks=current.slice(0,current.indexOf("  mark('final-errors-zero');"));
+  assert.equal([...sharedChecks.matchAll(/expect\(errors,/g)].length,2);
   assert.ok(current.includes("await expect.poll(() => page.evaluate(() => Object.values(window.HD_MODULE_STATUS || {}).filter(x => x !== 'ok').length)).toBe(0);"));
   assert.equal(current.includes('test.setTimeout'),false);
   assert.equal(current.includes('storageState('),false);
