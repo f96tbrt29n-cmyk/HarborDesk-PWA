@@ -4,8 +4,10 @@ const path = require('node:path');
 const { performance } = require('node:perf_hooks');
 const { reloadNativeProbe } = require('./reload-native-probe.cjs');
 const { versionCallProbe } = require('./version-call-probe.cjs');
-function observeReload(page, testInfo) {
+const { observeStorageHeaders } = require('./response-storage-headers.cjs');
+function observeReload(page, testInfo, {storageHeaders = false} = {}) {
   const startedAt = Date.now(), started = performance.now(), events = [], ids = new WeakMap(), sized = new WeakSet();
+  const storageHeaderObserver=storageHeaders?observeStorageHeaders({now:()=>performance.now()-started}):null;
   let nextId = 0, closed = false, failed = false, reloadStarted = false, reloadPending = false, nativeStall = false, instrumentSW = false, resourceTiming = true, parserBoundary = false, parserLoadBoundary = 40, parserSingleScript = false;
   const native = [], nativeDocuments = new Map(), swSeen = new Set();
   let nativeDropped = 0;
@@ -120,7 +122,10 @@ function observeReload(page, testInfo) {
     request: request => record('request', { ...requestInfo(request), type: request.resourceType(), navigation: request.isNavigationRequest() }),
     requestfinished: request => finished('requestfinished', request),
     requestfailed: request => record('requestfailed', { ...requestInfo(request), failure: request.failure() }),
-    response: response => record('response', { id: requestId(response.request?.()), url: safeUrl(response.url()), status: response.status(), fromServiceWorker: response.fromServiceWorker(), contentLength: response.headers?.()['content-length'] || '' }),
+    response: response => {
+      const info={ id: requestId(response.request?.()), url: safeUrl(response.url()), status: response.status(), fromServiceWorker: response.fromServiceWorker(), contentLength: response.headers?.()['content-length'] || '' };
+      record('response',info);storageHeaderObserver?.read(response,'page',info);
+    },
     framenavigated: frame => { if (frame === page.mainFrame()) record('navigation', { url: safeUrl(frame.url()) }); },
     domcontentloaded: () => record('domcontentloaded'),
     load: () => record('load'),
@@ -141,7 +146,10 @@ function observeReload(page, testInfo) {
     request: request => { if (observedUrl(request.url())) record('context-request', { ...requestInfo(request), type: request.resourceType() }); },
     requestfinished: request => { if (observedUrl(request.url())) finished('context-requestfinished', request); },
     requestfailed: request => { if (observedUrl(request.url())) record('context-requestfailed', { ...requestInfo(request), failure: request.failure() }); },
-    response: response => { if (observedUrl(response.url())) record('context-response', { id: requestId(response.request?.()), url: safeUrl(response.url()), status: response.status(), fromServiceWorker: response.fromServiceWorker(), allowOrigin: response.headers()['access-control-allow-origin'] || '', contentLength: response.headers()['content-length'] || '' }); },
+    response: response => { if (observedUrl(response.url())) {
+      const info={ id: requestId(response.request?.()), url: safeUrl(response.url()), status: response.status(), fromServiceWorker: response.fromServiceWorker(), allowOrigin: response.headers()['access-control-allow-origin'] || '', contentLength: response.headers()['content-length'] || '' };
+      record('context-response',info);storageHeaderObserver?.read(response,'context',info);
+    } },
   };
   for (const [name, handler] of Object.entries(contextHandlers)) context.on(name, handler);
   for (const [name, handler] of Object.entries(handlers)) page.on(name, handler);
@@ -151,8 +159,9 @@ function observeReload(page, testInfo) {
     for (const [name, handler] of Object.entries(handlers)) page.off(name, handler);
     for (const [name, handler] of Object.entries(contextHandlers)) context.off(name, handler);
     closed = true;
+    const storageHeaderEvidence=storageHeaderObserver?.finish(events);
     const retainNative = !!testInfo.project?.metadata?.keepNative || failed && (reloadPending || nativeStall);
-    const body = JSON.stringify({ test: testInfo.title, startedAt, events, instrumentSW, profile: { swSource: instrumentSW ? 'test-instrumented' : 'unmodified', serviceWorkers: testInfo.project?.use?.serviceWorkers || 'allow', resourceTiming, parserBoundary, parserLoadBoundary, parserSingleScript }, ...(versionCallSites?{versionCalls:{sites:versionCallSites,limitPerDocument:versionLimit,dropped:versionDropped}}:{}), nativeSummary: [...nativeDocuments.values()], nativeDetailsReason: retainNative ? failed && (reloadPending || nativeStall) ? 'reload-wait-failure' : 'diagnostic-control' : 'summary-only', nativeDropped, nativeEvents: retainNative ? native : [] }, null, 2);
+    const body = JSON.stringify({ test: testInfo.title, startedAt, events, instrumentSW, profile: { swSource: instrumentSW ? 'test-instrumented' : 'unmodified', serviceWorkers: testInfo.project?.use?.serviceWorkers || 'allow', resourceTiming, parserBoundary, parserLoadBoundary, parserSingleScript }, ...(storageHeaderEvidence?{storageHeaders:storageHeaderEvidence}:{}), ...(versionCallSites?{versionCalls:{sites:versionCallSites,limitPerDocument:versionLimit,dropped:versionDropped}}:{}), nativeSummary: [...nativeDocuments.values()], nativeDetailsReason: retainNative ? failed && (reloadPending || nativeStall) ? 'reload-wait-failure' : 'diagnostic-control' : 'summary-only', nativeDropped, nativeEvents: retainNative ? native : [] }, null, 2);
     const target = testInfo.outputPath('reload-navigation-evidence.json');
     await fs.mkdir(path.dirname(target), { recursive: true });
     await fs.writeFile(target, body);

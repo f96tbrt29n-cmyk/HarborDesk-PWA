@@ -42,7 +42,7 @@ test('night CI policy selection regenerates the quick owned loadout and persists
 });
 
 test('carrier night CI policy persists and regenerates the mobile loadout',async({page},testInfo)=>{
- const retainReloadEvidence=observeReload(page,testInfo);
+ const retainReloadEvidence=observeReload(page,testInfo,{storageHeaders:true});
  const storageAudit=await observeStorage(page,testInfo,{scriptErrorBoundary:true,keyPresence:true});
  try {
  await retainReloadEvidence.installNativeEvents({instrumentSW:!!testInfo.project.metadata?.swProbe||process.env.HD_RELOAD_BUFFER_SW==='1',parserBoundary:testInfo.project.metadata?.parserBoundary!==false,parserLoadBoundary:42,parserSingleScript:true});
