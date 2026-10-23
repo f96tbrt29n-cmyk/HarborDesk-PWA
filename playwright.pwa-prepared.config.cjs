@@ -3,7 +3,7 @@ const base = require('./playwright.config.js');
 module.exports = {
   ...base,
   testMatch: 'pwa.spec.js',
-  grep: /PWA prepared registration survives offline update refusal and stopped-origin reload$/,
+  grep: /PWA prepared (registration survives offline update refusal and stopped-origin reload|storage survives stopped-origin reload after load)$/,
   fullyParallel: false,
   workers: 1,
   retries: 0,

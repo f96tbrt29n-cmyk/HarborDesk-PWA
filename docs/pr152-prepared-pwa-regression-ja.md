@@ -65,7 +65,8 @@ npm run test:pwa:prepared
 npx playwright test tests/pwa.spec.js --grep 'PWA service worker caches app shell and survives offline reload$' --project=webkit --workers=1 --retries=0
 ```
 
-通常CI `npm run test:browser`の固定一覧には**二つのpwa.specケースとも含まれない**。
+通常CI `npm run test:browser`の固定一覧には**pwa.specのケースは含まれない**。
+保存保持を追加した現行の選択範囲・手順は[保存保持ケース](pr152-prepared-offline-storage-ja.md)を参照。以下の二つのケースと結果は追加前の記録。
 Fullジョブもship-master-compatibilityのみであり、本ケースをカバーしない。
 通常CIには新しい準備helperのNode契約のみ追加する。CIの緑を専用PWAの成功に代用しない。
 
