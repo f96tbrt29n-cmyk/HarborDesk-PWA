@@ -116,6 +116,7 @@ jobs:
             test-results/**/pre-reload-storage-presence.json
             test-results/**/post-load-storage-verification.json
             test-results/**/sync-version-response.json
+            test-results/**/sync-write-failure.json
             test-results/**/pwa-registration-state.json
             test-results/**/pwa-registration-continuation.json
             test-results/**/registration-route-result.json

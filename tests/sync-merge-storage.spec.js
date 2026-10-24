@@ -98,3 +98,67 @@ for(const {target,index,mode,kind} of faults)test(`sync merge ${kind} ${target} 
 for(const seed of ['existing','absent'])for(const kind of ['full','partial'])test(`sync merge normal ${kind} ${seed} preserves the intended merge contract`,async({page},info)=>{
  const errors=await setup(page,kind,seed);expect(await receive(page)).toContain('同期したよ');await verifyApplied(page,kind,seed,info);expect(errors).toEqual([]);
 });
+
+test('sync merge partial detail write failure remains retryable without false success',async({page},info)=>{
+ const fs=require('node:fs/promises'),evidence={path:'partial clipboard receive',faultKey:'harbordesk-kancolle-equipment-detail-v1',failureLimit:1};
+ // Record verdicts and write outcomes only. Keep comparison strings in the page,
+ // and use the captured native getter when the fixture's read wrapper is present.
+ const collect=()=>page.evaluate(()=>{
+  const f=mergeReadFault,w=mergeWriteFault,get=k=>f.nativeGet.call(localStorage,k),values=f.keys.map(get);
+  const rows=JSON.parse(values[2]),equipment=JSON.parse(values[1]);
+  const ship=rows.find(x=>x.gameShipId===987),gear=equipment.find(x=>x.id==='equip-main');
+  return {document:{timeOrigin:performance.timeOrigin,at:performance.now(),readyState:document.readyState},
+   writes:w.history.slice(),failedWrites:w.failures,
+   keys:f.keys.map((key,i)=>({key,nonNull:values[i]!==null,exact:values[i]===f.reference[i]})),
+   otherDataKeysExact:[0,3,5].every(i=>values[i]===f.reference[i]),otherWriteCount:w.history.filter(x=>x.key==='other').length,
+   ledgersApplied:ship?.level===30&&gear?.proficiency?.[7]===1,
+   manualPreserved:ship?.memo===f.roster[0].memo&&ship?.remodel===f.roster[0].remodel&&ship?.gear===f.roster[0].gear&&JSON.stringify(ship?.tags)===JSON.stringify(f.roster[0].tags)&&JSON.stringify(ship?.customMeta)===JSON.stringify(f.roster[0].customMeta)&&gear?.memo===f.equipment[0].memo&&gear?.targetStar===10&&gear?.assigned===f.equipment[0].assigned&&JSON.stringify(gear?.customMeta)===JSON.stringify(f.equipment[0].customMeta)&&f.roster.slice(1).every(x=>JSON.stringify(rows.find(y=>y.id===x.id))===JSON.stringify(x))&&f.equipment.slice(1).every(x=>{const saved=equipment.find(y=>y.id===x.id);return Object.entries(x).every(([k,v])=>JSON.stringify(saved?.[k])===JSON.stringify(v))}),
+   receiveState:HD_KC_RECEIVE_RESULT?.state,successEvents:f.successEvents,successToasts:f.successToasts,
+   returnFlagExact:f.nativeGet.call(sessionStorage,'harbordesk-kc-return-game-v1')===f.returnReference};
+ });
+ try{
+  const errors=await setup(page,'partial');
+  await page.evaluate(()=>{
+   const trackedSet=Storage.prototype.setItem;
+   window.mergeWriteFault={history:[],failures:0};
+   Storage.prototype.setItem=function(key,value){
+    if(this!==localStorage)return trackedSet.apply(this,arguments);
+    const w=mergeWriteFault,entry={sequence:w.history.length+1,key:mergeReadFault.keys.includes(key)?key:'other',at:performance.now(),outcome:'started'};
+    w.history.push(entry);
+    if(key==='harbordesk-kancolle-equipment-detail-v1'&&w.failures===0){
+     w.failures++;entry.outcome='injected-throw';entry.error='QuotaExceededError';
+     throw new DOMException('isolated one-shot sync detail write failure','QuotaExceededError');
+    }
+    try{const result=trackedSet.apply(this,arguments);entry.outcome='returned';return result}
+    catch(err){entry.outcome='native-throw';entry.error=err.name;throw err}
+   };
+  });
+  const message=await receive(page);evidence.afterFailure=await collect();evidence.pageerrorsAfterFailure=errors.slice();
+  expect(message).toContain('同期できなかった');expect(message).toContain('isolated one-shot sync detail write failure');
+  const failed=evidence.afterFailure;
+  expect(failed.writes.filter(x=>x.key!=='other').map(({key,outcome})=>({key,outcome}))).toEqual([
+   {key:'harbordesk-ship-roster-v1',outcome:'returned'},
+   {key:'harbordesk-equipment-v1',outcome:'returned'},
+   {key:'harbordesk-kancolle-equipment-detail-v1',outcome:'injected-throw'}]);
+  expect(failed.keys.every(x=>x.nonNull)).toBe(true);
+  expect(failed.keys.filter(x=>!x.exact).map(x=>x.key)).toEqual(['harbordesk-equipment-v1','harbordesk-ship-roster-v1']);
+  expect(failed).toMatchObject({failedWrites:1,otherDataKeysExact:true,ledgersApplied:true,manualPreserved:true,receiveState:'error',successEvents:0,successToasts:0,returnFlagExact:true});
+  await expect(page.locator('#hdSyncStatusDialog [data-hd-kc-receive-result]')).toHaveAttribute('data-state','error');
+  await expect(page.locator('#hdSyncStatusDialog [data-hd-kc-receive-result]')).toContainText('isolated one-shot sync detail write failure');
+  expect(errors).toEqual([]);
+  // The one-shot fault is exhausted. Retry exactly the same clipboard data using
+  // the same button; no storage restore/clear or receipt reset is performed.
+  await page.evaluate(()=>{mergeReadFault.writes=[]});
+  expect(await receive(page)).toContain('同期したよ');evidence.afterRecovery=await collect();
+  await verifyApplied(page,'partial','existing',info);
+  expect(evidence.afterRecovery).toMatchObject({failedWrites:1,otherDataKeysExact:true,ledgersApplied:true,manualPreserved:true,receiveState:'success',successEvents:1,successToasts:1});
+  expect(evidence.afterRecovery.writes.filter(x=>x.key!=='other').slice(3).map(x=>x.outcome)).toEqual(Array(5).fill('returned'));
+  expect(evidence.afterRecovery.document.timeOrigin).toBe(evidence.afterFailure.document.timeOrigin);
+  evidence.pageerrors=errors.slice();expect(errors).toEqual([]);
+ }finally{
+  // Serialize only already-collected evidence, including on assertion failure.
+  // No extra evaluate/storageState or recovery is performed from this cleanup.
+  const target=info.outputPath('sync-write-failure.json');await fs.writeFile(target,JSON.stringify(evidence,null,2));
+  await info.attach('sync-write-failure',{path:target,contentType:'application/json'});
+ }
+});
