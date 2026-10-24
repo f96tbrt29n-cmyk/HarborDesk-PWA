@@ -2,6 +2,7 @@ const { test: baseTest, expect } = require('@playwright/test');
 const test = baseTest.extend({trace:{mode:'retain-on-failure',snapshots:false,screenshots:true,sources:true}});
 const { observeReload } = require('./reload-evidence.cjs');
 const { observeStorage } = require('./pwa-storage-audit.cjs');
+const { submarineStorageComparison, retainStorageComparison } = require('./submarine-storage-comparison.cjs');
 // Keep successful first-attempt diagnostics for the targeted submarine case too.
 const submarineNightTest = test.extend({
  trace:{mode:'on',snapshots:false,screenshots:true,sources:true},video:'on'
@@ -113,6 +114,7 @@ submarineNightTest('submarine night CI policy regenerates the mobile owned loado
  const retain=observeReload(page,testInfo);
  const storageAudit=await observeStorage(page,testInfo,{scriptErrorBoundary:true,keyPresence:true});
  try{
+ const compareStorage=await submarineStorageComparison(page);
  await retain.installNativeEvents({parserBoundary:true,parserLoadBoundary:42,parserSingleScript:true});
  await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
  await storageAudit.mark('fixture-start');
@@ -120,10 +122,32 @@ submarineNightTest('submarine night CI policy regenerates the mobile owned loado
   const masterId=hdShipDbMasterRowFor(hdFEFindShip('伊58改')).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'後期型艦首魚雷(6門)',count:2},{name:'潜水艦搭載電探＆逆探(E27)',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'伊58改',masterId,gameShipId:93,level:90,gameSlotEx:0}]));hdFSMap=()=> '1-1';hdFSPlans=()=>[{...hdFSGenerate('1-1',{name:'sub fixture',ships:'潜水艦1',gear:''},0),needs:[]}];const suggestion=hdFSPlans()[0],owned=suggestion.slots.filter(x=>x.profile);if(owned.length!==1||owned[0].profile.row.gameShipId!==93)throw new Error('policy fixture must preserve the exact owned ship');hdFSSuggestionHtml(suggestion);const card=document.createElement('article');card.id='sub-policy-test';card.className='hd-fs-card';card.innerHTML='<button data-hd-fl-generate="0">自動配備</button><div class="hd-fl-host"></div>';document.body.appendChild(card);hdFLRender(0,card);
  });
  await storageAudit.mark('fixture-end');
- const card=page.locator('#sub-policy-test');await card.locator('[data-hd-night-policy]').selectOption('sub-radar');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightSub(p.ships[0]).attack})).toBe('sub-radar');await expect(card).toContainText('潜水艦夜戦CI装備条件：成立');await card.locator('[data-hd-night-policy]').selectOption('sub-late');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightSub(p.ships[0]).attack})).toBe('sub-late');expect(await page.evaluate(()=>HD_FL_CACHE['1-1:0'].ships[0].expansion)).toBeNull();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await storageAudit.mark('pre-reload');retain.mark('reload-start');await page.reload({waitUntil:'domcontentloaded'});retain.mark('reload-domcontentloaded');await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('sub-late');
+ const card=page.locator('#sub-policy-test');await card.locator('[data-hd-night-policy]').selectOption('sub-radar');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightSub(p.ships[0]).attack})).toBe('sub-radar');await expect(card).toContainText('潜水艦夜戦CI装備条件：成立');await card.locator('[data-hd-night-policy]').selectOption('sub-late');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightSub(p.ships[0]).attack})).toBe('sub-late');expect(await page.evaluate(()=>HD_FL_CACHE['1-1:0'].ships[0].expansion)).toBeNull();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ // Baseline is after the original policy selection; preserve nullable keys.
+ const saved=await compareStorage('baseline');
+ retain.mark('storage-baseline-captured');
+ await retainStorageComparison(testInfo,'pre-reload-storage-presence',saved);
+ expect(saved.keys.filter(row=>['harbordesk-equipment-v1','harbordesk-ship-roster-v1','harbordesk-night-ci-policy-v1'].includes(row.key)).map(row=>row.present)).toEqual([true,true,true]);
+ retain.mark('storage-baseline-verified');
+ await storageAudit.mark('pre-reload');retain.mark('reload-start');await page.reload({waitUntil:'domcontentloaded'});retain.mark('reload-domcontentloaded');
+ const reloadedDocument=await page.evaluate(()=>({timeOrigin:performance.timeOrigin,url:location.origin+location.pathname}));
+ await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('sub-late');
  retain.mark('policy-restored');
  await storageAudit.mark('policy-restored');
  expect(retain.errors().filter(x=>/hdFSSuggestionHtml/.test(x.stack||''))).toEqual([]);
+ // Keep the original DCL/policy/error checks, then extend to the same document's load.
+ await page.waitForLoadState('load');retain.mark('reload-load');
+ const afterLoad=await compareStorage('after-load');
+ await retainStorageComparison(testInfo,'post-load-storage-verification',afterLoad);
+ expect(afterLoad.document).toEqual(reloadedDocument);
+ expect(afterLoad.readyState).toBe('complete');
+ expect(afterLoad.keys.slice(0,6).map(row=>({key:row.key,exactMatch:row.exactMatch}))).toEqual(saved.keys.slice(0,6).map(row=>({key:row.key,exactMatch:true})));
+ expect(afterLoad.keys[6].exactMatch,'raw night policy string must match the post-selection baseline').toBe(true);
+ expect(afterLoad.policy).toBe('sub-late');
+ expect(retain.errors().filter(x=>/hdFSSuggestionHtml/.test(x.stack||''))).toEqual([]);
+ retain.mark('post-load-storage-and-policy-restored');
+ await storageAudit.mark('post-load-storage-and-policy-restored');
+
  }catch(error){retain.failure();throw error}finally{try{await storageAudit.finish()}finally{await retain()}}
 });
 

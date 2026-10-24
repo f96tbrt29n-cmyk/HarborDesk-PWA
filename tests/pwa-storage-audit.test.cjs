@@ -201,7 +201,11 @@ test('submarine wiring reuses existing passive boundaries and preserves fixture,
  for(const mark of ['fixture-start','fixture-end','pre-reload','policy-restored'])assert.equal(sub.split("storageAudit.mark('"+mark+"')").length-1,1);
  assert.match(sub,/finally\{try\{await storageAudit.finish\(\)\}finally\{await retain\(\)\}\}/);
  const fixture=sub.slice(sub.indexOf(' await page.evaluate(()=>{'),sub.indexOf('\n });')+'\n });'.length);
- const core=sub.slice(sub.indexOf(" const card=page.locator('#sub-policy-test')"),sub.indexOf(' }catch(error)')).replace("await storageAudit.mark('pre-reload');",'').replace(" await storageAudit.mark('policy-restored');",'');
+ const originalEnd=sub.indexOf(' // Keep the original DCL/policy/error checks');
+ const core=sub.slice(sub.indexOf(" const card=page.locator('#sub-policy-test')"),originalEnd)
+  .replace(/\n \/\/ Baseline is after[\s\S]*?await storageAudit.mark\('pre-reload'\);/,'')
+  .replace(/\n const reloadedDocument=[^\n]*\n /,'')
+  .replace(" await storageAudit.mark('policy-restored');",'');
  const sha=value=>crypto.createHash('sha256').update(value).digest('hex');
  // Original fixture/core at 8394a8d: data, setup waits, actions and error filter.
  assert.equal(sha(fixture),'26c2bffa6e5e9d5400cc27adb2b2b32d5395ea43c8440e669a40dd35b9821907');
