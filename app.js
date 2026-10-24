@@ -164,9 +164,16 @@ function hdToastAction(message,label,onAction,ms=5000){
  clearTimeout(HD_TOAST_TIMER);host.className='hd-toast-region action warn';host.textContent='';
  const text=document.createElement('span');text.textContent=String(message||'');
  const btn=document.createElement('button');btn.type='button';btn.className='hd-toast-action';btn.textContent=String(label||'元に戻す');
- btn.addEventListener('click',()=>{clearTimeout(HD_TOAST_TIMER);try{onAction?.()}finally{host.classList.remove('show')}},{once:true});
+ // Only an explicit false keeps the action available within its original deadline.
+ let finished=false;
+ btn.addEventListener('click',()=>{
+  if(finished||!host.classList.contains('show'))return;
+  let retry=false;
+  try{retry=onAction?.()===false}finally{if(!retry){finished=true;clearTimeout(actionTimer);host.classList.remove('show')}}
+ });
  host.append(text,btn);host.classList.add('show');
- HD_TOAST_TIMER=setTimeout(()=>host.classList.remove('show'),Math.max(1800,Number(ms)||5000));
+ const actionTimer=setTimeout(()=>host.classList.remove('show'),Math.max(1800,Number(ms)||5000));
+ HD_TOAST_TIMER=actionTimer;
  return host;
 }
 window.hdToastAction=hdToastAction;

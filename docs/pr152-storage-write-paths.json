@@ -1,0 +1,170 @@
+{
+  "basis": "442e5e5",
+  "keys": {
+    "F": "harbordesk-custom-fleets-v1",
+    "E": "harbordesk-equipment-v1",
+    "R": "harbordesk-ship-roster-v1",
+    "P": "harbordesk-fleet-calculator-v1",
+    "S": "harbordesk-kancolle-sync-v1"
+  },
+  "paths": [
+    {
+      "id": "manual-roster",
+      "source": "ship-roster.js",
+      "entry": "rosterSave / editor / delete / undo",
+      "conditions": "フォーム保存、削除、canonical修正",
+      "keys": "R",
+      "method": "setItem(JSON array); 行削除もキー自体は残る",
+      "existingTests": "ship-master-compatibility.spec.js",
+      "oldFailureEvidence": "旧失敗はfixture直接投入。UI編集/削除の操作記録なし"
+    },
+    {
+      "id": "roster-migration",
+      "source": "ship-roster.js",
+      "entry": "rosterMigrateMasterIds -> roster rendering",
+      "conditions": "masterId未設定で名前から解決できた行がある時だけ",
+      "keys": "R",
+      "method": "setItem(changed rows); 読取りfallback[]ならchanged=false",
+      "existingTests": "ship-master-compatibility.spec.js: legacy roster and saved fleets migrate",
+      "oldFailureEvidence": "旧fixtureはmasterIdあり。新文書での呼出し監査なし"
+    },
+    {
+      "id": "custom-save",
+      "source": "custom-fleets.js; fleet-suggester.js; fleet-loadout-planner.js; fleet-loadout-optimizer.js; owned-equipment-planner.js",
+      "entry": "saveCustomFleets; 各保存ボタン/艦隊再連携",
+      "conditions": "対象map/fleet編集や保存を明示操作",
+      "keys": "F",
+      "method": "setItem(JSON object); UI行削除/undoも再保存",
+      "existingTests": "owned-equipment-planner.spec.js; route-completion-2-5.spec.js",
+      "oldFailureEvidence": "旧fixture直接保存を確認。再読込後のUI保存操作は記録なし"
+    },
+    {
+      "id": "fleet-migration",
+      "source": "custom-fleets.js",
+      "entry": "cfMigrateMasterIds -> module setup",
+      "conditions": "masterId欠損が解決できchanged=true",
+      "keys": "F",
+      "method": "setItem(JSON object); 全削除ではない",
+      "existingTests": "ship-master-compatibility.spec.js: legacy roster and saved fleets migrate",
+      "oldFailureEvidence": "旧fixtureの各艦にmasterIdあり。監査なしなので未実行断定不可"
+    },
+    {
+      "id": "equipment-ledger",
+      "source": "advanced-tools.js",
+      "entry": "hdSave(HD_EQUIP_KEY); equipment form/delete/undo",
+      "conditions": "利用者の台帳操作、同期からのhdSave呼出し",
+      "keys": "E",
+      "method": "setItem(JSON array); plan/manual行保持は同期側merge",
+      "existingTests": "release-smoke.spec.js: complete equipment sync preserves user plans at zero owned count",
+      "oldFailureEvidence": "旧fixture直接setItemで装備投入。UI台帳操作の記録なし"
+    },
+    {
+      "id": "planner-init",
+      "source": "fleet-calculator.js",
+      "entry": "hdFCState -> hdFCLoadAll -> hdFCSaveAll",
+      "conditions": "選択map/fleetのstateがない時に初期値作成",
+      "keys": "P",
+      "method": "読取り成功ならallへ追加してsetItem。修正前はgetItem例外も{}になり他プラン消失を隔離再現",
+      "existingTests": "planner-storage-read.test.cjs; planner-storage-read.spec.js",
+      "oldFailureEvidence": "別件欠陥を確認/修正。旧失敗は実nullであり、この例外経路の実行証拠なし"
+    },
+    {
+      "id": "planner-write",
+      "source": "fleet-calculator.js",
+      "entry": "hdFCSaveState / hdFCMutate / hdFCReset / hdFCImportOwnedPlan",
+      "conditions": "入力変更、reset確認、signatureが新しい提案取込",
+      "keys": "P",
+      "method": "read-modify-setItem。resetはall内のkey削除後setItemでlocalStorage.removeItemではない",
+      "existingTests": "planner-storage-read.spec.js; fleet-loadout-planner.spec.js; route-completion-2-5.spec.js",
+      "oldFailureEvidence": "旧提案取込の保存は再読込前に確認。再読込後の操作呼出し不明"
+    },
+    {
+      "id": "planner-sync-hq",
+      "source": "fleet-calculator.js",
+      "entry": "hdFCRefreshSyncedHq -> hd:kancolle-sync / storage",
+      "conditions": "同期HQが既知、保存値と差がある時",
+      "keys": "P",
+      "method": "all読取り後変更があればsetItem",
+      "existingTests": "preflight-sync-refresh.spec.js; route-completion-2-5.spec.js",
+      "oldFailureEvidence": "旧fixtureは直接Sを投入し、イベント取込の記録なし。監査欠測を未実行の証明にしない"
+    },
+    {
+      "id": "sync-import",
+      "source": "kancolle-import.js",
+      "entry": "hdKcApplyImport -> hdKcMergeRoster / hdKcMergeEquipment / hdKcApplyDecks",
+      "conditions": "解析済previewとoption/完全・部分レコードに応じて適用。自動受信は重複/古いreceipt拒否",
+      "keys": "R,E,F,S",
+      "method": "roster/equipment merge、linked fleet refresh、最後にS setItem。remove/clearなし。途中write例外の全キーtransactionではない",
+      "existingTests": "sync-receive-ui.spec.js; release-smoke.spec.js; ship-master-compatibility.spec.js",
+      "oldFailureEvidence": "旧PWA fixtureはこのimportを使わず直接投入。runtime呼出しの包括監査なし"
+    },
+    {
+      "id": "sync-entrances",
+      "source": "kancolle-import.js",
+      "entry": "applyボタン / clipboard / 許可originのpostMessage / window.name / hash受信",
+      "conditions": "形式・payload/receipt検証、bridgeのcaptureId等を確認",
+      "keys": "R,E,F,S",
+      "method": "hdKcApplyImportへ到達。起動時name/hash検査自体は有効payloadなしでは保存しない",
+      "existingTests": "sync-receive-ui.spec.js; release-smoke.spec.js",
+      "oldFailureEvidence": "旧traceに有効な受信操作/payloadの証拠なし。旧資料は全messageの不在証明ではない"
+    },
+    {
+      "id": "backup-restore",
+      "source": "advanced-tools.js",
+      "entry": "importBackup -> hdApplyBackupTransaction -> hdApplyBackupLocalStorage",
+      "conditions": "localStorage payload解析、非空/互換性/整合性、確認と安全snapshot後。低層helperの直接呼出しはUI確認を伴わない",
+      "keys": "F,E,R,P,S",
+      "method": "HarborDesk接頭辞の欠落キーをremoveItem、payloadをsetItem。明示的な全体置換",
+      "existingTests": "backup.spec.js; release-smoke.spec.js: backup restore preview/compatibility/integrity/concurrent locks",
+      "oldFailureEvidence": "旧traceにimport/confirm/restoreの操作なし。ただし低層呼出しの実行履歴はない"
+    },
+    {
+      "id": "snapshot-restore",
+      "source": "personal-home.js",
+      "entry": "hdPHRestoreSnapshot -> hdPHRestoreTransaction -> hdPHApplyHarborData",
+      "conditions": "保存済ID、利用者確認、安全snapshot作成。低層helperは直接呼出し可能",
+      "keys": "F,E,R,P,S",
+      "method": "payloadにないHarborDeskキーをremoveItem、各値setItem",
+      "existingTests": "release-smoke.spec.js: snapshot restore transaction rolls back partial writes / internal restore lock",
+      "oldFailureEvidence": "旧失敗で実行した証拠なし"
+    },
+    {
+      "id": "restore-rollback",
+      "source": "advanced-tools.js; personal-home.js",
+      "entry": "復元validation/適用例外 -> captured beforeを再適用",
+      "conditions": "restore処理で失敗した時だけ",
+      "keys": "F,E,R,P,S",
+      "method": "同じremoveItem/setItem helperでrollback、失敗時は警告。一般読取り障害で自動初期化しない",
+      "existingTests": "release-smoke.spec.js: snapshot restore transaction rolls back partial writes",
+      "oldFailureEvidence": "復元入口自体の証拠なし。rollback実行と断定不可"
+    },
+    {
+      "id": "fixture",
+      "source": "tests/pwa-cached-reload.spec.js; tests/night-policy-reload.spec.js",
+      "entry": "fleet/snapshot evaluate、専用retentionFixture",
+      "conditions": "新しい隔離contextで同期風データを投入、proposal import",
+      "keys": "F,E,R,P,S",
+      "method": "直接setItem + saveCustomFleets + hdFCImportOwnedPlan。旧対象fixtureはclear/removeなし",
+      "existingTests": "pwa-cached-reload.spec.js; night-policy-reload.spec.js",
+      "oldFailureEvidence": "旧traceの再読込前5文字列確認に対応。新人工対照のremoveは別context/別実行"
+    },
+    {
+      "id": "test-context",
+      "source": "Playwright context fixture",
+      "entry": "newContext/newPage/teardown/retry",
+      "conditions": "各試行で独立context。storageState指定/永続profile指定なし",
+      "keys": "F,E,R,P,S",
+      "method": "ブラウザー側の領域作成/廃棄。JSのStorage監査対象外",
+      "existingTests": "既存fixture-lifecycle-audit.json / original-context-options.json",
+      "oldFailureEvidence": "旧失敗は同じcontext/page/origin記録。teardownや別originを原因とする証拠なし"
+    }
+  ],
+  "nonApiWrites": "製品JSでStorageへのproperty代入/delete/Object.assign/Reflect.set/clearは見つからず。data.localStorage[k]はbackup生成用の通常objectで実Storageではない。構文検索とcallsite読取りであり動的生成コードの不存在証明ではない。",
+  "auditGaps": [
+    "別realm、ブラウザー内部eviction/領域異常、user設定/extensionによる消去",
+    "property代入/delete/definePropertyはStorage.prototypeメソッド監査の範囲外（現製品で実経路は未発見）",
+    "旧失敗にはStorage操作履歴がない",
+    "受信記録の欠測は物理削除の否定にならない"
+  ],
+  "confirmedSeparateDefect": "Storage.getItem例外から{}にfallbackしplanner初期保存/明示保存が他プランを上書き。最終版はstate/save/reset/importの4書込み入口だけstrict読取りとし、Storage/JSON構文例外を伝播。読取り専用fallbackと正しい未保存nullは維持。旧5nullの原因は未確定。"
+}

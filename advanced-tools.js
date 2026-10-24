@@ -4,6 +4,11 @@ const HD_RESOURCE_HISTORY_KEY='harbordesk-resource-history-v1';
 const HD_EQUIP_LEDGER_VIEW_KEY='harbordesk-session-equipment-ledger-view-v1';
 
 function hdLoad(key,fallback=[]){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
+function hdLoadEquipmentForSave(){
+ const raw=localStorage.getItem(HD_EQUIP_KEY);
+ if(raw===null&&Object.prototype.hasOwnProperty.call(localStorage,HD_EQUIP_KEY))throw Object.assign(new Error('Equipment storage key is present but its value could not be read'),{code:'HD_STORAGE_NULL_READ'});
+ return JSON.parse(raw)??[];
+}
 function hdSave(key,value){localStorage.setItem(key,JSON.stringify(value));if(key===HD_EQUIP_KEY)window.dispatchEvent(new CustomEvent('hd:equipment-changed',{detail:{key,at:Date.now()}}))}
 function hdEsc(s){return typeof esc==='function'?esc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdUid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2)}
@@ -68,7 +73,7 @@ function renderEquipment(){
   :'<div class="empty empty-action"><strong>条件に合う装備がないよ</strong><p>検索語を消すと装備一覧へ戻れるよ。</p><button type="button" class="ghost small" data-empty-eq-reset>検索をクリア</button></div>';
  el.innerHTML=rows.length?rows.map(x=>{const source=sourceKind(x),sourceBadge=source==='sync'?'<span class="equipment-source-badge sync">ゲーム同期</span>':source==='plan'?'<span class="equipment-source-badge plan">計画</span>':'<span class="equipment-source-badge manual">手動</span>';return `<article class="advanced-card"><div class="advanced-card-head"><div><strong>${hdEsc(x.name)}</strong><div class="equipment-card-meta"><span class="muted">${hdEsc(x.category||'カテゴリ未設定')} ・ 所持 ${Number(x.count)||0}${x.source==='equipment-plan'?' ・ 計画保存':''}</span>${sourceBadge}</div></div><div class="mini-actions"><button class="ghost small" data-eq-edit="${x.id}">編集</button><button class="ghost small" data-eq-delete="${x.id}">削除</button></div></div><div class="progress-line"><span>改修 ★${Number(x.star)||0} → 目標 ★${Number(x.targetStar)||0}</span><progress max="10" value="${Math.min(10,Number(x.star)||0)}"></progress></div>${x.assigned?`<div class="advanced-meta"><b>搭載:</b> ${hdEsc(x.assigned)}</div>`:''}${x.memo?`<p>${hdEsc(x.memo)}</p>`:''}</article>`}).join(''):empty;
 }
-function openEquipment(item){const d=document.getElementById('equipmentDialog');document.getElementById('equipmentId').value=item?.id||'';document.getElementById('equipmentName').value=item?.name||'';document.getElementById('equipmentCategory').value=item?.category||'';document.getElementById('equipmentCount').value=item?.count??1;document.getElementById('equipmentStar').value=item?.star??0;document.getElementById('equipmentTargetStar').value=item?.targetStar??10;document.getElementById('equipmentAssigned').value=item?.assigned||'';document.getElementById('equipmentMemo').value=item?.memo||'';d.showModal()}
+function openEquipment(item){const d=document.getElementById('equipmentDialog');d.querySelector('[data-hd-equipment-storage-error]')?.remove();document.getElementById('equipmentId').value=item?.id||'';document.getElementById('equipmentName').value=item?.name||'';document.getElementById('equipmentCategory').value=item?.category||'';document.getElementById('equipmentCount').value=item?.count??1;document.getElementById('equipmentStar').value=item?.star??0;document.getElementById('equipmentTargetStar').value=item?.targetStar??10;document.getElementById('equipmentAssigned').value=item?.assigned||'';document.getElementById('equipmentMemo').value=item?.memo||'';d.showModal()}
 
 function hdRefreshResourceConsumers(){try{if(typeof hdRBRender==='function')hdRBRender();if(typeof hdCCRender==='function')hdCCRender();if(typeof renderHomeDashboard==='function')renderHomeDashboard();window.dispatchEvent(new CustomEvent('hd:workspace-refresh'))}catch{}}
 function snapshotResources(){
@@ -110,18 +115,19 @@ function hdAnalyzeBackupIntegrity(obj){
 function hdBuildBackupFile(){
  const appVersion=typeof HD_APP_VERSION==='string'?HD_APP_VERSION:'',appBuild=typeof HD_APP_BUILD==='number'?HD_APP_BUILD:null;
  const data={version:1,exportedAt:new Date().toISOString(),app:{name:'HarborDesk',version:appVersion,build:appBuild},localStorage:{}};
- for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('harbordesk'))data.localStorage[k]=localStorage.getItem(k)}
+ data.localStorage=hdCaptureHarborLocalStorage();
  data.integrity={algorithm:'fnv1a32',hash:hdBackupChecksum(data)};
  const name=`HarborDesk-backup-${new Date().toISOString().slice(0,10)}.json`;
  const text=JSON.stringify(data,null,2),blob=new Blob([text],{type:'application/json'});
  return {data,name,text,blob};
 }
 function exportBackup(){
- const {blob,name}=hdBuildBackupFile(),a=document.createElement('a'),url=URL.createObjectURL(blob);
+ let backup;try{backup=hdBuildBackupFile()}catch(error){return hdBackupReadFailure(error)}
+ const {blob,name}=backup,a=document.createElement('a'),url=URL.createObjectURL(blob);
  a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);return true
 }
 async function shareBackup(){
- const backup=hdBuildBackupFile();
+ let backup;try{backup=hdBuildBackupFile()}catch(error){return hdBackupReadFailure(error)}
  try{
   if(typeof File==='function'&&typeof navigator.share==='function'){
    const file=new File([backup.blob],backup.name,{type:'application/json'}),payload={title:'HarborDesk バックアップ',files:[file]};
@@ -130,6 +136,7 @@ async function shareBackup(){
  }catch(err){if(err?.name==='AbortError')return false}
  return exportBackup()!==false
 }
+function hdBackupReadFailure(error){if(error?.code!=='HD_STORAGE_NULL_READ')throw error;window.hdToast?.('保存済みのキーから値を読み取れないため、バックアップを中止しました。端末内データは変更していません。読取りが回復してから、もう一度操作してください。','warn',6000);return false}
 function hdAnalyzeBackupLocalStorage(storage){
  if(!storage||typeof storage!=='object'||Array.isArray(storage))throw new Error('invalid backup storage');
  const raw=Object.entries(storage),entries=raw.filter(([k,v])=>k.startsWith('harbordesk')&&typeof v==='string');
@@ -187,7 +194,7 @@ function hdConfirmBackupRestore(obj,analysis,fileName=''){
  return new Promise(resolve=>{const done=()=>resolve(!compat.blocked&&d.returnValue==='restore');d.addEventListener('close',done,{once:true});if(typeof d.showModal==='function')d.showModal();else d.setAttribute('open','')});
 }
 function hdCaptureHarborLocalStorage(){
- const data={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k?.startsWith('harbordesk'))data[k]=localStorage.getItem(k)}return data
+ const data={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k?.startsWith('harbordesk')){const value=localStorage.getItem(k);if(value===null)throw Object.assign(new Error('Enumerated backup storage key has no readable value'),{code:'HD_STORAGE_NULL_READ'});data[k]=value}}return data
 }
 function hdValidateBackupApplied(storage){
  if(!storage||typeof storage!=='object'||Array.isArray(storage))return {ok:false,missing:[],mismatched:[],extra:[],reason:'invalid storage'};
@@ -250,7 +257,19 @@ async function importBackup(file){
 
 function bindAdvancedEvents(){
  document.getElementById('addEquipment').onclick=()=>openEquipment();document.getElementById('equipmentSearch').addEventListener('input',e=>{hdEquipLedgerViewSave({query:e.target.value});renderEquipment()});
- document.getElementById('equipmentForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const rows=hdLoad(HD_EQUIP_KEY,[]),id=document.getElementById('equipmentId').value||hdUid();const item={id,name:document.getElementById('equipmentName').value.trim(),category:document.getElementById('equipmentCategory').value.trim(),count:Number(document.getElementById('equipmentCount').value)||0,star:Number(document.getElementById('equipmentStar').value)||0,targetStar:Number(document.getElementById('equipmentTargetStar').value)||0,assigned:document.getElementById('equipmentAssigned').value.trim(),memo:document.getElementById('equipmentMemo').value.trim(),updatedAt:Date.now()};const i=rows.findIndex(x=>x.id===id);if(i>=0)rows[i]={...rows[i],...item};else rows.unshift({...item,createdAt:Date.now()});hdSave(HD_EQUIP_KEY,rows);setTimeout(()=>{renderEquipment();renderDashboard()},0)});
+ document.getElementById('equipmentForm').addEventListener('submit',e=>{
+  if(e.submitter?.value==='cancel')return;
+  let rows;
+  try{rows=hdLoadEquipmentForSave()}catch{
+   e.preventDefault();
+   let warning=e.target.querySelector('[data-hd-equipment-storage-error]');
+   if(!warning){warning=document.createElement('p');warning.setAttribute('role','alert');warning.dataset.hdEquipmentStorageError='1';e.target.querySelector('.dialog-actions').before(warning)}
+   warning.textContent='装備台帳を読み取れないため、保存していません。入力内容を残しています。読取りが回復したら、もう一度「保存」を押してください。';
+   return;
+  }
+  e.target.querySelector('[data-hd-equipment-storage-error]')?.remove();
+  const id=document.getElementById('equipmentId').value||hdUid();const item={id,name:document.getElementById('equipmentName').value.trim(),category:document.getElementById('equipmentCategory').value.trim(),count:Number(document.getElementById('equipmentCount').value)||0,star:Number(document.getElementById('equipmentStar').value)||0,targetStar:Number(document.getElementById('equipmentTargetStar').value)||0,assigned:document.getElementById('equipmentAssigned').value.trim(),memo:document.getElementById('equipmentMemo').value.trim(),updatedAt:Date.now()};const i=rows.findIndex(x=>x.id===id);if(i>=0)rows[i]={...rows[i],...item};else rows.unshift({...item,createdAt:Date.now()});hdSave(HD_EQUIP_KEY,rows);setTimeout(()=>{renderEquipment();renderDashboard()},0)
+ });
  document.getElementById('snapshotResources').onclick=snapshotResources;const sr=document.getElementById('saveResources');if(sr)sr.addEventListener('click',()=>setTimeout(snapshotResources,0));
  document.getElementById('addEventLog').onclick=()=>openEvent();document.getElementById('eventForm').addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return;const rows=hdLoad(HD_EVENT_KEY,[]),id=document.getElementById('eventId').value||hdUid();const item={id,eventName:document.getElementById('eventName').value.trim(),map:document.getElementById('eventMap').value.trim(),difficulty:document.getElementById('eventDifficulty').value,status:document.getElementById('eventStatus').value,drop:document.getElementById('eventDrop').value.trim(),fleet:document.getElementById('eventFleet').value.trim(),memo:document.getElementById('eventMemo').value.trim(),updatedAt:Date.now()};const i=rows.findIndex(x=>x.id===id);if(i>=0)rows[i]={...rows[i],...item};else rows.unshift({...item,createdAt:Date.now()});hdSave(HD_EVENT_KEY,rows);setTimeout(()=>{renderEvents();renderDashboard()},0)});
  document.addEventListener('click',e=>{
@@ -265,7 +284,13 @@ function bindAdvancedEvents(){
  const ed=e.target.closest('[data-eq-delete]');if(ed){
   const rows=hdLoad(HD_EQUIP_KEY,[]),i=rows.findIndex(x=>x.id===ed.dataset.eqDelete);if(i<0)return;const [item]=rows.splice(i,1);
   hdSave(HD_EQUIP_KEY,rows);renderEquipment();renderDashboard();
-  window.hdToastAction?.(`${item.name||'装備'} を削除したよ`,'元に戻す',()=>{const current=hdLoad(HD_EQUIP_KEY,[]);if(!current.some(x=>x.id===item.id)){current.splice(Math.min(i,current.length),0,item);hdSave(HD_EQUIP_KEY,current);renderEquipment();renderDashboard();window.hdToast?.('元に戻したよ')}});return
+  const undoToast=window.hdToastAction?.(`${item.name||'装備'} を削除したよ`,'元に戻す',()=>{
+   let current;try{current=hdLoadEquipmentForSave()}catch{
+    const text=undoToast?.querySelector('span');if(text)text.textContent='装備台帳を読み取れないため、復元していません。読取り回復後、期限内にもう一度押してください。';
+    return false;
+   }
+   if(!current.some(x=>x.id===item.id)){current.splice(Math.min(i,current.length),0,item);hdSave(HD_EQUIP_KEY,current);renderEquipment();renderDashboard();window.hdToast?.('元に戻したよ')}
+  });return
  }
  const he=e.target.closest('[data-history-delete]');if(he){
   const rows=hdLoad(HD_RESOURCE_HISTORY_KEY,[]),i=rows.findIndex(x=>x.id===he.dataset.historyDelete);if(i<0)return;const [item]=rows.splice(i,1);

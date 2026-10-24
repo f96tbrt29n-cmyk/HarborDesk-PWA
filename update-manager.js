@@ -1,5 +1,5 @@
-const HD_APP_VERSION='1.0.579';
-const HD_APP_BUILD=579;
+const HD_APP_VERSION='1.0.580';
+const HD_APP_BUILD=580;
 const HD_UPDATE_SNOOZE_KEY='harbordesk-update-snooze-v1';
 window.HD_MODULE_STATUS=window.HD_MODULE_STATUS||{};
 window.HD_SERVICE_WORKER_STATUS='idle';
@@ -70,11 +70,23 @@ function hdScriptAssetUrl(src,attempt=0){
   if(!attempt)return base;
   return base+(base.includes('?')?'&':'?')+`retry=${attempt}&t=${Date.now()}`;
 }
-function hdLoadScriptAttempt(attr,src,attempt=0){
+function hdModuleLoadWarning(){
+  const failed=Object.values(window.HD_MODULE_STATUS).some(x=>x==='error');
+  let notice=document.getElementById('hdModuleLoadWarning');
+  if(failed&&!notice){
+    notice=document.createElement('p');notice.id='hdModuleLoadWarning';notice.className='hd-toast-region warn show';notice.setAttribute('role','alert');
+    notice.textContent='一部の機能を読み込めていません。通信状態を確認してください。取得できた機能は順次表示します。戻らない場合は画面を再読み込みしてください。';
+    document.body.prepend(notice);
+  }
+  if(notice)notice.hidden=!failed;
+}
+function hdLoadScriptAttempt(attr,src,attempt=0,state={}){
   return new Promise(resolve=>{
     const old=document.querySelector(`script[${attr}]`);
     if(old?.dataset.hdLoaded==='1'){
       window.HD_MODULE_STATUS[src]='ok';
+      state.finished=true;
+      hdModuleLoadWarning();
       resolve(true);
       return;
     }
@@ -87,30 +99,48 @@ function hdLoadScriptAttempt(attr,src,attempt=0){
     script.dataset.hdAttempt=String(attempt);
     window.HD_MODULE_STATUS[src]=attempt?'retrying':'loading';
 
-    let settled=false;
+    let finished=false;
     let timer=0;
     const finish=ok=>{
-      if(settled)return;
-      settled=true;
+      if(finished)return;
+      finished=true;
       if(timer)clearTimeout(timer);
       if(ok){
         script.dataset.hdLoaded='1';
         delete script.dataset.hdError;
         window.HD_MODULE_STATUS[src]='ok';
+        state.finished=true;
+        hdModuleLoadWarning();
         resolve(true);
+        state.onFinish?.(true);
         return;
       }
       script.dataset.hdError='1';
       if(script.isConnected)script.remove();
       if(attempt<HD_SCRIPT_RETRY_LIMIT){
         window.HD_MODULE_STATUS[src]='retrying';
-        setTimeout(()=>hdLoadScriptAttempt(attr,src,attempt+1).then(resolve),80);
+        // Only a script error establishes that this attempt did not execute.
+        setTimeout(()=>hdLoadScriptAttempt(attr,src,attempt+1,state).then(resolve),80);
         return;
       }
       window.HD_MODULE_STATUS[src]='error';
+      state.finished=true;
+      hdModuleLoadWarning();
       resolve(false);
+      state.onFinish?.(false);
     };
-    timer=setTimeout(()=>finish(false),HD_SCRIPT_TIMEOUT_MS);
+    timer=setTimeout(()=>{
+      if(finished)return;
+      // Removing a classic script does not cancel its eventual evaluation.
+      // Bound the caller's wait, but retain this attempt and never race a retry
+      // against it. A later native load/error still settles the actual attempt.
+      state.timedOut=true;
+      script.dataset.hdTimedOut='1';
+      window.HD_MODULE_STATUS[src]='error';
+      hdModuleLoadWarning();
+      console.warn('HarborDesk module load timed out; waiting for its load/error without duplicate evaluation',src);
+      resolve(false);
+    },HD_SCRIPT_TIMEOUT_MS);
     script.onload=()=>finish(true);
     script.onerror=()=>finish(false);
     document.body.appendChild(script);
@@ -119,13 +149,31 @@ function hdLoadScriptAttempt(attr,src,attempt=0){
 function hdLoadScript(attr,src){
   const key=`${attr}:${src}`;
   if(HD_SCRIPT_LOADS[key])return HD_SCRIPT_LOADS[key];
-  const pending=hdLoadScriptAttempt(attr,src,0).finally(()=>{
-    if(HD_SCRIPT_LOADS[key]===pending)delete HD_SCRIPT_LOADS[key];
+  const state={finished:false,timedOut:false};
+  const pending=hdLoadScriptAttempt(attr,src,0,state).finally(()=>{
+    if(state.finished&&HD_SCRIPT_LOADS[key]===pending)delete HD_SCRIPT_LOADS[key];
   });
+  state.onFinish=ok=>{
+    if(HD_SCRIPT_LOADS[key]===pending)delete HD_SCRIPT_LOADS[key];
+    if(ok&&state.timedOut)hdResumeTimedOutAssets();
+  };
   HD_SCRIPT_LOADS[key]=pending;
   return pending;
 }
 window.hdLoadScript=hdLoadScript;
+let HD_ASSET_RECOVERY_REQUESTED=false;
+function hdRunAssetRecovery(){
+  if(!HD_ASSET_RECOVERY_REQUESTED)return;
+  HD_ASSET_RECOVERY_REQUESTED=false;
+  // Unexpected initialization failures must still surface as page errors.
+  queueMicrotask(()=>hdEnsureCurrentAssets());
+}
+function hdResumeTimedOutAssets(){
+  if(typeof hdEnsureCurrentAssets!=='function')return;
+  HD_ASSET_RECOVERY_REQUESTED=true;
+  // Resume skipped dependants after the bounded original asset pass finishes.
+  if(!HD_CURRENT_ASSETS_PROMISE)hdRunAssetRecovery();
+}
 function hdInitLoadedModules(){
   try{if(typeof hdRenderSortieReadiness==='function')hdRenderSortieReadiness()}catch{}
   try{if(typeof hdRenderLandBasePlanner==='function')hdRenderLandBasePlanner()}catch{}
@@ -168,7 +216,10 @@ let HD_CURRENT_ASSETS_PROMISE=null;
 function hdEnsureCurrentAssets(){
   if(HD_CURRENT_ASSETS_PROMISE)return HD_CURRENT_ASSETS_PROMISE;
   const pending=hdLoadCurrentAssets().finally(()=>{
-    if(HD_CURRENT_ASSETS_PROMISE===pending)HD_CURRENT_ASSETS_PROMISE=null;
+    if(HD_CURRENT_ASSETS_PROMISE===pending){
+      HD_CURRENT_ASSETS_PROMISE=null;
+      hdRunAssetRecovery();
+    }
   });
   HD_CURRENT_ASSETS_PROMISE=pending;
   return pending;

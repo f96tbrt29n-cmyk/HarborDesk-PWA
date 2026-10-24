@@ -26,6 +26,11 @@ jobs:
     name: Smoke / ${{ matrix.browser }} / shard ${{ matrix.shard }} of ${{ matrix.shards }}
     if: github.event_name != 'workflow_dispatch' || inputs.suite == 'smoke'
     runs-on: ubuntu-latest
+    # Match package.json exactly. Browsers and OS dependencies are baked in;
+    # verify and launch them on every job instead of downloading apt packages.
+    container:
+      image: mcr.microsoft.com/playwright:v1.55.0-noble@sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29
+      options: --user 1001 --init --ipc=host
     timeout-minutes: ${{ matrix.timeout_minutes }}
     strategy:
       fail-fast: false
@@ -74,8 +79,11 @@ jobs:
       - name: Install test dependencies
         run: npm install --no-audit --no-fund --no-package-lock
 
-      - name: Install Playwright browser
-        run: npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Verify service worker cache lifetime, registration readiness and storage diagnostics
+        run: node --test tests/north-drum-oracle.test.cjs tests/submarine-storage-comparison.test.cjs tests/pwa-prepared-storage.test.cjs tests/hash-navigation-audit.test.cjs tests/response-storage-headers.test.cjs tests/toast-action-retry.test.cjs tests/sw-cache-lifetime.test.cjs tests/module-loader-recovery.test.cjs tests/planner-storage-read.test.cjs tests/storage-null-capture.test.cjs tests/pwa-registration-ready.test.cjs tests/pwa-initial-registration-ready.test.cjs tests/pwa-registration-continuation.test.cjs tests/registration-route-fixture.test.cjs tests/initial-update-fixture.test.cjs tests/initial-document-fixture.test.cjs tests/pwa-storage-audit.test.cjs
+
+      - name: Verify and launch bundled Playwright browser
+        run: node tests/ci-browser-environment.cjs ${{ matrix.browser }}
 
       - name: Run smoke browser regression
         run: npm run test:browser -- --project=${{ matrix.browser }} --workers=${{ matrix.workers }} --shard=${{ matrix.shard }}/${{ matrix.shards }}
@@ -88,6 +96,34 @@ jobs:
           path: |
             playwright-report/
             test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      # A successful retry makes failure() false. Preserve files from failed
+      # attempts as well as any retry trace without uploading every passing report.
+      - name: Preserve failed-attempt diagnostics after successful retries
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: attempt-diagnostics-${{ matrix.browser }}-${{ matrix.shard }}-${{ github.run_id }}
+          path: |
+            test-results/**/test-failed-*.png
+            test-results/**/video.webm
+            test-results/**/trace.zip
+            test-results/**/error-context.md
+            test-results/**/reload-navigation-evidence.json
+            test-results/**/pwa-storage-audit.json
+            test-results/**/pre-reload-storage-presence.json
+            test-results/**/post-load-storage-verification.json
+            test-results/**/sync-version-response.json
+            test-results/**/sync-write-failure.json
+            test-results/**/north-drum-domain.json
+            test-results/**/pwa-registration-state.json
+            test-results/**/pwa-registration-continuation.json
+            test-results/**/registration-route-result.json
+            test-results/**/hash-navigation-audit.json
+            test-results/**/hash-workspace-*.js
+            test-results/module-loader-*/
           if-no-files-found: ignore
           retention-days: 14
 
@@ -108,6 +144,9 @@ jobs:
     name: Full / ${{ matrix.browser }} / shard ${{ matrix.shard }}
     if: github.event_name == 'workflow_dispatch' && inputs.suite == 'full'
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.55.0-noble@sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29
+      options: --user 1001 --init --ipc=host
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -127,8 +166,8 @@ jobs:
       - name: Install test dependencies
         run: npm install --no-audit --no-fund --no-package-lock
 
-      - name: Install Playwright browser
-        run: npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Verify and launch bundled Playwright browser
+        run: node tests/ci-browser-environment.cjs ${{ matrix.browser }}
 
       - name: Run full browser regression shard
         run: npm run test:browser:full -- --project=${{ matrix.browser }} --workers=1 --shard=${{ matrix.shard }}/4

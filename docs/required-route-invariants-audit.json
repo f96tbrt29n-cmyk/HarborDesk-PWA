@@ -1,0 +1,7009 @@
+{
+  "mainBase": "f6fbe2f4c7144a6db4a6dad2a92c2573e132c771",
+  "scope": "Registered 37 normal maps / 53 examples only; structural selection uses synthetic ownership of all registered master hulls. Not all equipment, branches, missions or events.",
+  "audit": [
+    {
+      "map": "1-1",
+      "index": 0,
+      "path": "AC",
+      "engine": "contract",
+      "routing": "random",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-1/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 1,
+            "max": 6
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "1-2",
+      "index": 0,
+      "path": "AE",
+      "engine": "verified-graph",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-2/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 4,
+            "max": 5
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐",
+              "海防艦"
+            ],
+            "min": 4,
+            "max": 4
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "any": [
+              {
+                "kind": "minSpeed",
+                "rank": 10
+              },
+              {
+                "all": [
+                  {
+                    "kind": "typeCount",
+                    "types": [
+                      "軽巡"
+                    ],
+                    "min": 1,
+                    "max": 1
+                  },
+                  {
+                    "kind": "typeCount",
+                    "types": [
+                      "駆逐"
+                    ],
+                    "min": 4,
+                    "max": 4
+                  }
+                ]
+              },
+              {
+                "all": [
+                  {
+                    "kind": "typeCount",
+                    "types": [
+                      "軽巡"
+                    ],
+                    "min": 1,
+                    "max": 1
+                  },
+                  {
+                    "kind": "typeCount",
+                    "types": [
+                      "駆逐",
+                      "海防艦"
+                    ],
+                    "min": 4,
+                    "max": 4
+                  },
+                  {
+                    "kind": "unverified",
+                    "reason": "低速の軽巡＋海防混在編成は資料の記述が一致しないため未判定"
+                  }
+                ]
+              }
+            ]
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "1-3",
+      "index": 0,
+      "path": "CFJ / A(DB)EFJ",
+      "engine": "verified-graph",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-3/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽空母",
+              "軽巡",
+              "駆逐"
+            ],
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐"
+            ],
+            "min": 4,
+            "max": 6
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "1-4",
+      "index": 0,
+      "path": "BCF(E)HL / AD(EH/GJ)L",
+      "engine": "verified-graph",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-4/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "空母",
+              "軽巡",
+              "駆逐",
+              "海防艦",
+              "水母",
+              "潜水母艦",
+              "補給艦"
+            ],
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐",
+              "海防艦"
+            ],
+            "min": 2,
+            "max": 6
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "1-5",
+      "index": 0,
+      "path": "ADEJ",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-5/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 4,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 4,
+          "max": 4
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 4,
+            "max": 4
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "海防艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 4,
+            "max": 4
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [
+        {
+          "kind": "cap-asw",
+          "label": "対潜シナジー",
+          "minCount": 4
+        }
+      ],
+      "complete": false
+    },
+    {
+      "map": "1-5",
+      "index": 1,
+      "path": "ADFGJ",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-5/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 4,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "正規空母",
+            "装甲空母",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 4,
+            "max": 4
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "正規空母",
+              "装甲空母",
+              "潜水艦",
+              "潜水空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "海防艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 3
+          },
+          "status": "ready"
+        }
+      ],
+      "targets": [
+        {
+          "kind": "cap-asw",
+          "label": "対潜シナジー",
+          "minCount": 3
+        }
+      ],
+      "complete": false
+    },
+    {
+      "map": "1-5",
+      "index": 2,
+      "path": "ADFGJ",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-5/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 4,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "正規空母",
+            "装甲空母",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 4,
+            "max": 4
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "正規空母",
+              "装甲空母",
+              "潜水艦",
+              "潜水空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "海防艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 3
+          },
+          "status": "ready"
+        }
+      ],
+      "targets": [
+        {
+          "kind": "cap-asw",
+          "label": "対潜シナジー",
+          "minCount": 4
+        }
+      ],
+      "complete": false
+    },
+    {
+      "map": "1-6",
+      "index": 0,
+      "path": "AEGFBN",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-6/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 5,
+          "max": 5
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 1
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦",
+              "海防艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 5,
+            "max": 5
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "2-1",
+      "index": 0,
+      "path": "C(E)DH",
+      "engine": "contract",
+      "routing": "multiple",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-1/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 4
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "航空戦艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "補給艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "2-2",
+      "index": 0,
+      "path": "CE(GH)K",
+      "engine": "contract",
+      "routing": "multiple",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-2/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦",
+            "潜水母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 3
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "航空戦艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "水上機母艦",
+              "潜水母艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "2-3",
+      "index": 0,
+      "path": "ボス方面・経路ランダム",
+      "engine": "contract",
+      "routing": "random",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-3/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 4
+          },
+          "status": "ready"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "2-4",
+      "index": 0,
+      "path": "ボス方面・経路ランダム",
+      "engine": "contract",
+      "routing": "random",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-4/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦",
+            "潜水母艦",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 3
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "水上機母艦",
+              "潜水母艦",
+              "補給艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "2-5",
+      "index": 0,
+      "path": "BFJO",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-5/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 1,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 49,
+            "failBelow": 42
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "潜水艦",
+            "潜水空母",
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "speedCount",
+          "rank": 5,
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "equipmentShips",
+          "match": "drum",
+          "min": 2,
+          "max": 7,
+          "slotPolicy": "valid"
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 3
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "軽空母",
+              "潜水艦",
+              "潜水空母",
+              "揚陸艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "海防艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "水上機母艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "speedCount",
+            "rank": 5,
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "equipmentShips",
+            "match": "drum",
+            "min": 2,
+            "max": 7,
+            "slotPolicy": "valid"
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 49,
+            "coef": 1
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "2-5",
+      "index": 1,
+      "path": "CEIO",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-5/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 1,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 34,
+            "failBelow": 31
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "minSpeed",
+            "rank": 10
+          },
+          "status": "manual"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "潜水艦",
+              "潜水空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "重巡洋艦",
+              "航空巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 3,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 34,
+            "coef": 1
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "3-1",
+      "index": 0,
+      "path": "CFG",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-1/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空戦艦",
+            "軽巡洋艦",
+            "水上機母艦",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦",
+              "海防艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "航空戦艦",
+              "軽巡洋艦",
+              "水上機母艦",
+              "補給艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "3-2",
+      "index": 0,
+      "path": "選択したC…L目標",
+      "engine": "verified-graph",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-2/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡",
+              "駆逐",
+              "補給艦"
+            ],
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡"
+            ],
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐"
+            ],
+            "min": 4,
+            "max": 6
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "3-2",
+      "index": 1,
+      "path": "選択したC…L目標",
+      "engine": "verified-graph",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-2/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡",
+              "駆逐",
+              "補給艦"
+            ],
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡"
+            ],
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐"
+            ],
+            "min": 4,
+            "max": 6
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "3-3",
+      "index": 0,
+      "path": "ACGM",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-3/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "3-4",
+      "index": 0,
+      "path": "ACEGJP",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-4/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 3,
+            "max": 4
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "水上機母艦",
+              "補給艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "3-5",
+      "index": 0,
+      "path": "FGK",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-5/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 28
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 5,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "潜水艦",
+            "潜水空母",
+            "水上機母艦",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "軽巡洋艦",
+            "潜水艦",
+            "潜水空母",
+            "水上機母艦",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 6,
+          "max": 6
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 5,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦",
+              "潜水艦",
+              "潜水空母",
+              "水上機母艦",
+              "補給艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦",
+              "軽巡洋艦",
+              "潜水艦",
+              "潜水空母",
+              "水上機母艦",
+              "補給艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 28,
+            "coef": 4
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "3-5",
+      "index": 1,
+      "path": "BDHK",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-5/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 40
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 3
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "揚陸艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 40,
+            "coef": 4
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "4-1",
+      "index": 0,
+      "path": "CFDGJ / ABDGJ",
+      "engine": "contract",
+      "routing": "multiple",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-1/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 2
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦",
+              "海防艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 1
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "潜水艦",
+              "潜水空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "4-2",
+      "index": 0,
+      "path": "ACL / BDCL",
+      "engine": "contract",
+      "routing": "multiple",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-2/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "any": [
+            {
+              "all": [
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡洋艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 1,
+                  "max": 7
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐艦",
+                    "海防艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 3,
+                  "max": 7
+                }
+              ]
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐艦",
+                "海防艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 4,
+              "max": 7
+            }
+          ]
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "any": [
+              {
+                "all": [
+                  {
+                    "kind": "typeCount",
+                    "types": [
+                      "軽巡洋艦"
+                    ],
+                    "matchPolicy": "exact",
+                    "min": 1,
+                    "max": 7
+                  },
+                  {
+                    "kind": "typeCount",
+                    "types": [
+                      "駆逐艦",
+                      "海防艦"
+                    ],
+                    "matchPolicy": "exact",
+                    "min": 3,
+                    "max": 7
+                  }
+                ]
+              },
+              {
+                "kind": "typeCount",
+                "types": [
+                  "駆逐艦",
+                  "海防艦"
+                ],
+                "matchPolicy": "exact",
+                "min": 4,
+                "max": 7
+              }
+            ]
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "4-2",
+      "index": 1,
+      "path": "ACL / BDCL",
+      "engine": "contract",
+      "routing": "multiple",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-2/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 4,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦",
+              "海防艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 4,
+            "max": 7
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "4-3",
+      "index": 0,
+      "path": "CDHN / CFHN",
+      "engine": "contract",
+      "routing": "random",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-3/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "潜水艦",
+              "潜水空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 2
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦",
+              "海防艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "minSpeed",
+            "rank": 10
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "4-4",
+      "index": 0,
+      "path": "AEIK",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-4/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 3
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦",
+              "海防艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "海防艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦",
+              "重巡洋艦",
+              "航空巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 2
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "4-5",
+      "index": 0,
+      "path": "ADHT / CDHT",
+      "engine": "contract",
+      "routing": "multiple",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-5/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 15
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 4
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "minSpeed",
+            "rank": 15
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "4-5",
+      "index": 1,
+      "path": "ADHKT / CDHKT",
+      "engine": "contract",
+      "routing": "multiple",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-5/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 2,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 71
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 3
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 4
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 71,
+            "coef": 2
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "4-5",
+      "index": 2,
+      "path": "ADHT / CDHT",
+      "engine": "contract",
+      "routing": "multiple",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-5/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦",
+              "海防艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 3,
+            "max": 7
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "5-1",
+      "index": 0,
+      "path": "BCFJ",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-1/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "5-2",
+      "index": 0,
+      "path": "BCEFO",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-2/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 2,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 70
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 70,
+            "coef": 2
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "5-3",
+      "index": 0,
+      "path": "DGIOKEQ",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-3/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "any": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "戦艦",
+                "高速戦艦",
+                "航空戦艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 0,
+              "max": 1
+            },
+            {
+              "kind": "minSpeed",
+              "rank": 10
+            }
+          ]
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "軽空母",
+              "航空戦艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "any": [
+              {
+                "kind": "typeCount",
+                "types": [
+                  "戦艦",
+                  "高速戦艦",
+                  "航空戦艦"
+                ],
+                "matchPolicy": "exact",
+                "min": 0,
+                "max": 1
+              },
+              {
+                "kind": "minSpeed",
+                "rank": 10
+              }
+            ]
+          },
+          "status": "ready"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "5-4",
+      "index": 0,
+      "path": "ADEHIJMP",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-4/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 2,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 45
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 2
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 45,
+            "coef": 2
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "5-5",
+      "index": 0,
+      "path": "BKPS",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-5/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 2,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 80
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 4
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "潜水艦",
+              "潜水空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 80,
+            "coef": 2
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "5-5",
+      "index": 1,
+      "path": "BFDHNOS",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-5/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 2,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 66
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "軽空母",
+              "潜水艦",
+              "潜水空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 66,
+            "coef": 2
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "5-6",
+      "index": 0,
+      "path": "ABC2DEG",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-6/",
+      "provisional": true,
+      "los": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 65
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 4,
+          "max": 4
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "航空戦艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 2
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 4,
+            "max": 4
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 65,
+            "coef": 4
+          },
+          "status": "manual"
+        },
+        {
+          "condition": {
+            "kind": "unverified"
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [
+        {
+          "kind": "cap-pt",
+          "baseKind": "PT対策",
+          "label": "PT小鬼群対策セット",
+          "minCount": 1,
+          "source": "https://zekamashi.net/kancolle-kouryaku/ptboat-taisaku/"
+        }
+      ],
+      "complete": false
+    },
+    {
+      "map": "5-6",
+      "index": 1,
+      "path": "IJKLN",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-6/",
+      "provisional": true,
+      "los": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 80
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦",
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "minSpeed",
+            "rank": 10
+          },
+          "status": "manual"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "水上機母艦",
+              "揚陸艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 80,
+            "coef": 4
+          },
+          "status": "manual"
+        },
+        {
+          "condition": {
+            "kind": "unverified"
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "5-6",
+      "index": 2,
+      "path": "IOQUXZ",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-6/",
+      "provisional": true,
+      "los": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 88
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦",
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "minSpeed",
+            "rank": 10
+          },
+          "status": "manual"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "水上機母艦",
+              "揚陸艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 88,
+            "coef": 4
+          },
+          "status": "manual"
+        },
+        {
+          "condition": {
+            "kind": "unverified"
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "6-1",
+      "index": 0,
+      "path": "AFGHK",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-1/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 25
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "潜水艦",
+              "潜水空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 3,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "潜水母艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 1
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦",
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母",
+              "重巡洋艦",
+              "航空巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 25,
+            "coef": 4
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "6-2",
+      "index": 0,
+      "path": "CEJK",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-2/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 3,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 50,
+            "failBelow": 43
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 50,
+            "coef": 3
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "6-3",
+      "index": 0,
+      "path": "ACEGHJ",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-3/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 3,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 38,
+            "failBelow": 36
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "練習巡洋艦",
+            "駆逐艦",
+            "水上機母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦",
+              "練習巡洋艦",
+              "駆逐艦",
+              "水上機母艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 1
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 3,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "水上機母艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 1
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 38,
+            "coef": 3
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "6-4",
+      "index": 0,
+      "path": "BDCFN",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-4/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "flagshipType",
+          "types": [
+            "軽巡洋艦"
+          ]
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "minSpeed",
+            "rank": 10
+          },
+          "status": "manual"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 1
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "flagshipType",
+            "types": [
+              "軽巡洋艦"
+            ]
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "軽空母",
+              "揚陸艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 3,
+            "max": 7
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "6-5",
+      "index": 0,
+      "path": "ACDGM",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-5/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 3,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 50
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "重雷装巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 3
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母",
+              "重巡洋艦",
+              "航空巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 4
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "重雷装巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 50,
+            "coef": 3
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "6-5",
+      "index": 1,
+      "path": "BFIJM",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-5/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 3,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 35
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "重雷装巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "軽空母",
+              "重雷装巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 35,
+            "coef": 3
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "7-1",
+      "index": 0,
+      "path": "DEGHK",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-1/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 5,
+          "max": 5
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 4,
+          "max": 4
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 5,
+            "max": 5
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 1
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 4,
+            "max": 4
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [
+        {
+          "kind": "cap-asw",
+          "label": "対潜シナジー",
+          "minCount": 4
+        }
+      ],
+      "complete": false
+    },
+    {
+      "map": "7-2",
+      "index": 0,
+      "path": "CEG",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-2/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 4,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "潜水艦",
+            "潜水空母",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 4,
+            "max": 4
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母",
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "潜水艦",
+              "潜水空母",
+              "補給艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦",
+              "海防艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 3,
+            "max": 7
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [
+        {
+          "kind": "cap-asw",
+          "label": "対潜シナジー",
+          "minCount": 4
+        }
+      ],
+      "complete": false
+    },
+    {
+      "map": "7-2",
+      "index": 1,
+      "path": "BCDIM",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-2/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 69
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "練習巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "補給艦",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "minSpeed",
+            "rank": 10
+          },
+          "status": "manual"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 3
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦",
+              "練習巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦",
+              "海防艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "補給艦",
+              "潜水艦",
+              "潜水空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 69,
+            "coef": 4
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "7-3",
+      "index": 0,
+      "path": "ACE",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-3/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 4,
+          "max": 4
+        },
+        {
+          "kind": "namedCount",
+          "names": [
+            "羽黒"
+          ],
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 4,
+            "max": 4
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "namedCount",
+            "names": [
+              "羽黒"
+            ],
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 3,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "7-3",
+      "index": 1,
+      "path": "ACDGJP",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-3/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "namedCount",
+          "names": [
+            "羽黒"
+          ],
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "namedCount",
+          "names": [
+            "足柄"
+          ],
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "namedCount",
+            "names": [
+              "羽黒"
+            ],
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "namedCount",
+            "names": [
+              "足柄"
+            ],
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 3,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母",
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "minSpeed",
+            "rank": 10
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "7-4",
+      "index": 0,
+      "path": "ABEJLP",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-4/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 37,
+            "failBelow": 33
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "正規空母",
+            "装甲空母",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "重雷装巡洋艦",
+            "練習巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空戦艦",
+            "軽空母",
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "any": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐艦",
+                "海防艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 3,
+              "max": 7
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "海防艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 2,
+              "max": 7
+            }
+          ]
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "正規空母",
+              "装甲空母",
+              "潜水艦",
+              "潜水空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "重巡洋艦",
+              "航空巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦",
+              "重雷装巡洋艦",
+              "練習巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "航空戦艦",
+              "軽空母",
+              "揚陸艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "any": [
+              {
+                "kind": "typeCount",
+                "types": [
+                  "駆逐艦",
+                  "海防艦"
+                ],
+                "matchPolicy": "exact",
+                "min": 3,
+                "max": 7
+              },
+              {
+                "kind": "typeCount",
+                "types": [
+                  "海防艦"
+                ],
+                "matchPolicy": "exact",
+                "min": 2,
+                "max": 7
+              }
+            ]
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 37,
+            "coef": 4
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [
+        {
+          "kind": "cap-asw",
+          "label": "対潜シナジー",
+          "minCount": 3
+        }
+      ],
+      "complete": false
+    },
+    {
+      "map": "7-5",
+      "index": 0,
+      "path": "ABDFGHK",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-5/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "重巡洋艦",
+              "航空巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 7
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    },
+    {
+      "map": "7-5",
+      "index": 1,
+      "path": "ABDFJOQ",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-5/",
+      "provisional": false,
+      "los": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "正規空母",
+              "装甲空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 1
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "重巡洋艦",
+              "航空巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 2
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 3,
+            "max": 7
+          },
+          "status": "missing"
+        }
+      ],
+      "targets": [
+        {
+          "kind": "cap-pt",
+          "baseKind": "PT対策",
+          "label": "PT小鬼群対策セット",
+          "minCount": 1,
+          "source": "https://zekamashi.net/kancolle-kouryaku/ptboat-taisaku/"
+        }
+      ],
+      "complete": false
+    },
+    {
+      "map": "7-5",
+      "index": 2,
+      "path": "ABDFJOPT",
+      "engine": "contract",
+      "routing": "documented-example",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-5/",
+      "provisional": false,
+      "los": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 63
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        }
+      ],
+      "protected": [
+        {
+          "condition": {
+            "kind": "fleetCount",
+            "min": 6,
+            "max": 6
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "戦艦",
+              "高速戦艦",
+              "航空戦艦",
+              "正規空母",
+              "装甲空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 0,
+            "max": 0
+          },
+          "status": "ready"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 1
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "航空巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 2
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "軽巡洋艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 1
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 2,
+            "max": 2
+          },
+          "status": "missing"
+        },
+        {
+          "condition": {
+            "kind": "scoutingValue",
+            "min": 63,
+            "coef": 4
+          },
+          "status": "manual"
+        }
+      ],
+      "targets": [],
+      "complete": false
+    }
+  ],
+  "structuralSelection": [
+    {
+      "map": "1-1",
+      "index": 0,
+      "names": [
+        "睦月",
+        "如月",
+        "長月",
+        "三日月"
+      ],
+      "missing": []
+    },
+    {
+      "map": "1-2",
+      "index": 0,
+      "names": [
+        "長良",
+        "睦月",
+        "如月",
+        "長月",
+        "三日月"
+      ],
+      "missing": []
+    },
+    {
+      "map": "1-3",
+      "index": 0,
+      "names": [
+        "祥鳳",
+        "飛鷹",
+        "睦月",
+        "如月",
+        "長月",
+        "三日月"
+      ],
+      "missing": []
+    },
+    {
+      "map": "1-4",
+      "index": 0,
+      "names": [
+        "睦月",
+        "如月",
+        "長月",
+        "三日月",
+        "祥鳳",
+        "飛鷹"
+      ],
+      "missing": []
+    },
+    {
+      "map": "1-5",
+      "index": 0,
+      "names": [
+        "占守改",
+        "国後改",
+        "八丈改",
+        "石垣改"
+      ],
+      "missing": []
+    },
+    {
+      "map": "1-5",
+      "index": 1,
+      "names": [
+        "伊勢",
+        "睦月",
+        "如月",
+        "長月"
+      ],
+      "missing": []
+    },
+    {
+      "map": "1-5",
+      "index": 2,
+      "names": [
+        "睦月",
+        "如月",
+        "長月",
+        "三日月"
+      ],
+      "missing": []
+    },
+    {
+      "map": "1-6",
+      "index": 0,
+      "names": [
+        "長良",
+        "睦月",
+        "如月",
+        "長月",
+        "三日月",
+        "吹雪"
+      ],
+      "missing": []
+    },
+    {
+      "map": "2-1",
+      "index": 0,
+      "names": [
+        "球磨",
+        "多摩",
+        "赤城",
+        "利根",
+        "筑摩",
+        "祥鳳"
+      ],
+      "missing": []
+    },
+    {
+      "map": "2-2",
+      "index": 0,
+      "names": [
+        "祥鳳",
+        "長良",
+        "千歳改",
+        "赤城",
+        "古鷹",
+        "加古"
+      ],
+      "missing": []
+    },
+    {
+      "map": "2-3",
+      "index": 0,
+      "names": [
+        "祥鳳",
+        "千歳改",
+        "赤城",
+        "利根",
+        "筑摩",
+        "伊勢"
+      ],
+      "missing": []
+    },
+    {
+      "map": "2-4",
+      "index": 0,
+      "names": [
+        "祥鳳",
+        "五十鈴",
+        "赤城",
+        "摩耶",
+        "摩耶改二",
+        "扶桑"
+      ],
+      "missing": []
+    },
+    {
+      "map": "2-5",
+      "index": 0,
+      "names": [
+        "伊勢改",
+        "利根",
+        "筑摩",
+        "最上改",
+        "三隈改",
+        "鈴谷"
+      ],
+      "missing": []
+    },
+    {
+      "map": "2-5",
+      "index": 1,
+      "names": [
+        "祥鳳",
+        "多摩",
+        "睦月",
+        "如月",
+        "長月",
+        "赤城"
+      ],
+      "missing": []
+    },
+    {
+      "map": "3-1",
+      "index": 0,
+      "names": [
+        "大井",
+        "睦月",
+        "如月",
+        "赤城",
+        "加賀",
+        "古鷹"
+      ],
+      "missing": []
+    },
+    {
+      "map": "3-2",
+      "index": 0,
+      "names": [
+        "五十鈴",
+        "磯風",
+        "浜風",
+        "秋月",
+        "初月",
+        "涼月"
+      ],
+      "missing": []
+    },
+    {
+      "map": "3-2",
+      "index": 1,
+      "names": [
+        "磯風",
+        "浜風",
+        "秋月",
+        "初月",
+        "涼月",
+        "涼月改"
+      ],
+      "missing": []
+    },
+    {
+      "map": "3-3",
+      "index": 0,
+      "names": [
+        "祥鳳",
+        "睦月",
+        "如月",
+        "赤城",
+        "利根",
+        "筑摩"
+      ],
+      "missing": []
+    },
+    {
+      "map": "3-4",
+      "index": 0,
+      "names": [
+        "祥鳳",
+        "球磨",
+        "千歳改",
+        "赤城",
+        "加賀",
+        "伊勢"
+      ],
+      "missing": []
+    },
+    {
+      "map": "3-5",
+      "index": 0,
+      "names": [
+        "多摩",
+        "睦月",
+        "如月",
+        "長月",
+        "三日月",
+        "吹雪"
+      ],
+      "missing": []
+    },
+    {
+      "map": "3-5",
+      "index": 1,
+      "names": [
+        "北上改三",
+        "睦月",
+        "赤城",
+        "加賀",
+        "蒼龍",
+        "利根"
+      ],
+      "missing": []
+    },
+    {
+      "map": "4-1",
+      "index": 0,
+      "names": [
+        "睦月",
+        "赤城",
+        "加賀",
+        "古鷹",
+        "加古",
+        "青葉"
+      ],
+      "missing": []
+    },
+    {
+      "map": "4-2",
+      "index": 0,
+      "names": [
+        "長良",
+        "睦月",
+        "如月",
+        "長月",
+        "赤城",
+        "加賀"
+      ],
+      "missing": []
+    },
+    {
+      "map": "4-2",
+      "index": 1,
+      "names": [
+        "睦月",
+        "如月",
+        "長月",
+        "三日月",
+        "祥鳳",
+        "飛鷹"
+      ],
+      "missing": []
+    },
+    {
+      "map": "4-3",
+      "index": 0,
+      "names": [
+        "睦月",
+        "如月",
+        "赤城",
+        "加賀",
+        "利根",
+        "筑摩"
+      ],
+      "missing": []
+    },
+    {
+      "map": "4-4",
+      "index": 0,
+      "names": [
+        "睦月",
+        "如月",
+        "赤城",
+        "加賀",
+        "利根",
+        "伊勢"
+      ],
+      "missing": []
+    },
+    {
+      "map": "4-5",
+      "index": 0,
+      "names": [
+        "祥鳳",
+        "最上",
+        "利根",
+        "赤城",
+        "加賀",
+        "金剛"
+      ],
+      "missing": []
+    },
+    {
+      "map": "4-5",
+      "index": 1,
+      "names": [
+        "祥鳳",
+        "赤城",
+        "利根",
+        "筑摩",
+        "伊勢改",
+        "日向改"
+      ],
+      "missing": []
+    },
+    {
+      "map": "4-5",
+      "index": 2,
+      "names": [
+        "祥鳳",
+        "長良",
+        "睦月",
+        "如月",
+        "長月",
+        "赤城"
+      ],
+      "missing": []
+    },
+    {
+      "map": "5-1",
+      "index": 0,
+      "names": [
+        "祥鳳",
+        "長良",
+        "睦月",
+        "如月",
+        "古鷹",
+        "扶桑"
+      ],
+      "missing": []
+    },
+    {
+      "map": "5-2",
+      "index": 0,
+      "names": [
+        "利根",
+        "筑摩",
+        "伊勢改",
+        "日向改",
+        "祥鳳",
+        "飛鷹"
+      ],
+      "missing": []
+    },
+    {
+      "map": "5-3",
+      "index": 0,
+      "names": [
+        "大井",
+        "長良",
+        "睦月",
+        "如月",
+        "金剛",
+        "古鷹"
+      ],
+      "missing": []
+    },
+    {
+      "map": "5-4",
+      "index": 0,
+      "names": [
+        "利根",
+        "筑摩",
+        "磯風",
+        "浜風",
+        "Italia",
+        "Roma改"
+      ],
+      "missing": []
+    },
+    {
+      "map": "5-5",
+      "index": 0,
+      "names": [
+        "利根",
+        "筑摩",
+        "赤城",
+        "加賀",
+        "伊勢改",
+        "日向改"
+      ],
+      "missing": []
+    },
+    {
+      "map": "5-5",
+      "index": 1,
+      "names": [
+        "利根",
+        "多摩",
+        "睦月",
+        "如月",
+        "伊勢改",
+        "日向改"
+      ],
+      "missing": []
+    },
+    {
+      "map": "5-6",
+      "index": 0,
+      "names": [
+        "扶桑改二補",
+        "山城改二補",
+        "睦月",
+        "如月",
+        "皐月",
+        "文月"
+      ],
+      "missing": []
+    },
+    {
+      "map": "5-6",
+      "index": 1,
+      "names": [
+        "利根",
+        "多摩",
+        "睦月",
+        "如月",
+        "赤城",
+        "加賀"
+      ],
+      "missing": []
+    },
+    {
+      "map": "5-6",
+      "index": 2,
+      "names": [
+        "多摩",
+        "睦月",
+        "如月",
+        "赤城",
+        "Italia",
+        "Roma改"
+      ],
+      "missing": []
+    },
+    {
+      "map": "6-1",
+      "index": 0,
+      "names": [
+        "多摩",
+        "大鯨",
+        "伊401",
+        "伊26改",
+        "伊13改",
+        "伊14改"
+      ],
+      "missing": []
+    },
+    {
+      "map": "6-2",
+      "index": 0,
+      "names": [
+        "北上改三",
+        "大井",
+        "睦月",
+        "如月",
+        "赤城",
+        "伊勢改"
+      ],
+      "missing": []
+    },
+    {
+      "map": "6-3",
+      "index": 0,
+      "names": [
+        "多摩",
+        "睦月",
+        "如月",
+        "長月",
+        "三日月",
+        "千歳改"
+      ],
+      "missing": []
+    },
+    {
+      "map": "6-4",
+      "index": 0,
+      "names": [
+        "球磨",
+        "利根",
+        "睦月",
+        "如月",
+        "長月",
+        "Italia"
+      ],
+      "missing": []
+    },
+    {
+      "map": "6-5",
+      "index": 0,
+      "names": [
+        "利根",
+        "多摩",
+        "睦月",
+        "伊勢",
+        "祥鳳",
+        "飛鷹"
+      ],
+      "missing": []
+    },
+    {
+      "map": "6-5",
+      "index": 1,
+      "names": [
+        "利根",
+        "多摩",
+        "睦月",
+        "如月",
+        "伊勢",
+        "伊勢改"
+      ],
+      "missing": []
+    },
+    {
+      "map": "7-1",
+      "index": 0,
+      "names": [
+        "長良",
+        "睦月",
+        "如月",
+        "長月",
+        "三日月"
+      ],
+      "missing": []
+    },
+    {
+      "map": "7-2",
+      "index": 0,
+      "names": [
+        "長良",
+        "睦月",
+        "如月",
+        "長月"
+      ],
+      "missing": []
+    },
+    {
+      "map": "7-2",
+      "index": 1,
+      "names": [
+        "祥鳳",
+        "北上改三",
+        "睦月",
+        "如月",
+        "Italia",
+        "赤城"
+      ],
+      "missing": []
+    },
+    {
+      "map": "7-3",
+      "index": 0,
+      "names": [
+        "羽黒",
+        "睦月",
+        "如月",
+        "長月"
+      ],
+      "missing": []
+    },
+    {
+      "map": "7-3",
+      "index": 1,
+      "names": [
+        "羽黒",
+        "足柄",
+        "最上",
+        "睦月",
+        "如月",
+        "長月"
+      ],
+      "missing": []
+    },
+    {
+      "map": "7-4",
+      "index": 0,
+      "names": [
+        "伊勢",
+        "北上改三",
+        "睦月",
+        "如月",
+        "占守改",
+        "利根"
+      ],
+      "missing": []
+    },
+    {
+      "map": "7-5",
+      "index": 0,
+      "names": [
+        "最上改",
+        "北上改三",
+        "長良",
+        "長月",
+        "三日月",
+        "千歳改"
+      ],
+      "missing": []
+    },
+    {
+      "map": "7-5",
+      "index": 1,
+      "names": [
+        "利根",
+        "球磨",
+        "睦月",
+        "如月",
+        "長月",
+        "伊勢"
+      ],
+      "missing": []
+    },
+    {
+      "map": "7-5",
+      "index": 2,
+      "names": [
+        "祥鳳",
+        "最上改",
+        "三隈改",
+        "長良",
+        "長月",
+        "三日月"
+      ],
+      "missing": []
+    }
+  ]
+}

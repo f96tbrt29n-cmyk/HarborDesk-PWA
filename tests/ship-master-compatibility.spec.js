@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 
 test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, serviceWorkers: 'block' });
 
-async function boot(page, errors = []) {
+async function boot(page, errors = [], initialShipQuery = null) {
   page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
   page.on('console', msg => {
     if (msg.type() !== 'error') return;
@@ -48,6 +48,11 @@ async function boot(page, errors = []) {
     }
     return route.fulfill({ status: 204, body: '' });
   });
+  // Keep this search/compatibility fixture small while retaining full trace capture.
+  // Unfiltered catalogue/startup cases continue to use the default query.
+  if (initialShipQuery !== null) await page.addInitScript(query => {
+    sessionStorage.setItem('harbordesk-session-shipdb-view-v1', JSON.stringify({ query }));
+  }, initialShipQuery);
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 20000 });
   await expect(page.locator('#shipDatabase')).toHaveCount(1, { timeout: 20000 });
@@ -121,10 +126,11 @@ test('official master drives normal compatibility, reverse lookup and owned filt
 
 test('master-only ship forms are searchable from the ship database', async ({ page }) => {
   const errors = [];
-  await boot(page, errors);
+  await boot(page, errors, '長門改二');
 
   await page.evaluate(() => window.hdWSShowElement?.('shipDatabase', false));
   const search = page.locator('#hdShipDbSearch');
+  await expect(search).toHaveValue('長門改二');
   await search.fill('大和改二重');
 
   const group = page.locator('.hd-shipdb-master-group');

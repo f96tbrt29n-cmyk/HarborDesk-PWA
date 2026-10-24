@@ -1,0 +1,166 @@
+const { test: baseTest, expect } = require('@playwright/test');
+const test = baseTest.extend({trace:{mode:'retain-on-failure',snapshots:false,screenshots:true,sources:true}});
+const { observeReload } = require('./reload-evidence.cjs');
+const { observeStorage } = require('./pwa-storage-audit.cjs');
+const { submarineStorageComparison, retainStorageComparison } = require('./submarine-storage-comparison.cjs');
+// Keep successful first-attempt diagnostics for the targeted submarine case too.
+const submarineNightTest = test.extend({
+ trace:{mode:'on',snapshots:false,screenshots:true,sources:true},video:'on'
+});
+// Retain first-attempt network/API evidence for these reload cases.
+// Whole-document snapshots previously blocked the main thread for up to 15.9s;
+// phases, screenshots, video, source and network evidence remain available.
+test.use({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
+
+async function boot(page) {
+  await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => document.body?.dataset?.hdReady === '1', null, { timeout: 45000 });
+  await expect(page.locator('#hdWorkspaceNav')).toBeVisible({ timeout: 45000 });
+  await expect.poll(
+    () => page.evaluate(() => window.HD_MODULE_STATUS?.['./fleet-loadout-planner.js'] || ''),
+    { timeout: 45000 }
+  ).toBe('ok');
+  await expect.poll(
+    () => page.evaluate(() => window.HD_MODULE_STATUS?.['./fleet-suggester.js'] || ''),
+    { timeout: 45000 }
+  ).toBe('ok');
+}
+
+
+test('night CI policy selection regenerates the quick owned loadout and persists across reloads',async({page},testInfo)=>{
+ const retainReloadEvidence=observeReload(page,testInfo);
+ try {
+ await retainReloadEvidence.installNativeEvents({instrumentSW:!!testInfo.project.metadata?.swProbe||process.env.HD_RELOAD_BUFFER_SW==='1'});
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ await page.evaluate(()=>{
+  const db=hdFEFindShip('夕立改二'),masterId=hdShipDbMasterRowFor(db).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'12.7cm連装砲',count:3},{name:'61cm四連装(酸素)魚雷',count:2},{name:'水雷戦隊 熟練見張員',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'夕立改二',masterId,gameShipId:71,level:90,gameSlotEx:0}]));
+  hdFSMap=()=> '1-1';hdFSPlans=()=>[{...hdFSGenerate('1-1',{name:'night fixture',ships:'駆逐艦1',gear:''},0),needs:[]}];
+  const suggestion=hdFSPlans()[0];if(suggestion.slots.filter(x=>x.profile).length!==1)throw new Error('policy fixture must contain one owned ship');hdFSSuggestionHtml(suggestion);const card=document.createElement('article');card.id='night-policy-test';card.className='hd-fs-card';card.innerHTML='<button data-hd-fl-generate="0">自動配備</button><div class="hd-fl-host"></div>';document.body.appendChild(card);hdFLRender(0,card);
+ });
+ const card=page.locator('#night-policy-test');await card.locator('[data-hd-night-policy]').selectOption('torpedo');
+ await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightCI(p.ships[0]).attack})).toBe('torpedo');await expect(card).toContainText('夜戦汎用CI装備条件：成立');
+ const r=await page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return {policy:hdSENightPolicy('1-1'),goal:p.assessment.measure.goals.find(g=>g.kind==='cap-night-torpedo'),usage:hdFOAssignedUsage(p),expansion:p.ships[0].expansion}});expect(r.policy).toBe('torpedo');expect(r.goal.ok).toBe(true);expect(r.usage['61cm四連装(酸素)魚雷@@0']).toBe(2);expect(r.expansion).toBeNull();
+ await card.locator('[data-hd-night-policy]').selectOption('dd-water-torpedo');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightDD(p.ships[0]).candidates.some(c=>c.attack==='dd-water-torpedo')})).toBe(true);await expect(card).toContainText('駆逐艦専用CI装備条件：成立');await expect(card).toContainText('Lv90：2回攻撃型のレベル条件を充足');expect(await page.evaluate(()=>HD_FL_CACHE['1-1:0'].ships[0].expansion)).toBeNull();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);retainReloadEvidence.mark('reload-start');await page.reload({waitUntil:'domcontentloaded'});retainReloadEvidence.mark('reload-domcontentloaded');await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('dd-water-torpedo');
+ retainReloadEvidence.mark('policy-restored');
+ expect(retainReloadEvidence.errors()).toEqual([]);
+ } catch(error) { retainReloadEvidence.failure(); throw error; } finally { await retainReloadEvidence(); }
+});
+
+test('carrier night CI policy persists and regenerates the mobile loadout',async({page},testInfo)=>{
+ const retainReloadEvidence=observeReload(page,testInfo,{storageHeaders:true});
+ const storageAudit=await observeStorage(page,testInfo,{scriptErrorBoundary:true,keyPresence:true});
+ try {
+ await retainReloadEvidence.installNativeEvents({instrumentSW:!!testInfo.project.metadata?.swProbe||process.env.HD_RELOAD_BUFFER_SW==='1',parserBoundary:testInfo.project.metadata?.parserBoundary!==false,parserLoadBoundary:42,parserSingleScript:true});
+ await retainReloadEvidence.installVersionCalls();
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ await storageAudit.mark('fixture-start');
+ if(testInfo.project.metadata?.retentionFixture)await page.evaluate(()=>{
+  localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:120,syncedAt:Date.now()}));
+  if(!localStorage.getItem('harbordesk-pwa-v1'))localStorage.setItem('harbordesk-pwa-v1',JSON.stringify(blankState()));
+  saveCustomFleets({'1-1':[{id:'reload-retention',name:'Dedicated six-key fixture',ships:[{ship:'赤城改',gameShipId:882,masterId:hdShipDbMasterRowFor('赤城改').id,gear:'F6F-3N / TBM-3D / 夜間作戦航空要員 / F6F-3N'}]}]});
+  hdFCState('1-1','reload-retention');
+ });
+ await page.evaluate(()=>{
+  const ship='赤城改',masterId=hdShipDbMasterRowFor(hdFEFindShip(ship)).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'F6F-3N',count:2},{name:'TBM-3D',count:1},{name:'夜間作戦航空要員',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship,masterId,gameShipId:882,level:90,gameSlotEx:0}]));hdFSMap=()=> '1-1';hdFSPlans=()=>[{...hdFSGenerate('1-1',{name:'carrier fixture',ships:'正規空母1',gear:''},0),needs:[]}];const suggestion=hdFSPlans()[0];if(suggestion.slots.filter(x=>x.profile).length!==1)throw new Error('policy fixture must contain one owned ship');hdFSSuggestionHtml(suggestion);const card=document.createElement('article');card.id='carrier-policy-test';card.className='hd-fs-card';card.innerHTML='<button data-hd-fl-generate="0">自動配備</button><div class="hd-fl-host"></div>';document.body.appendChild(card);hdFLRender(0,card);
+ });
+ const card=page.locator('#carrier-policy-test');await card.locator('[data-hd-night-policy]').selectOption('cv-fighter2');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightCarrier(p.ships[0]).candidates.some(c=>c.attack==='cv-fighter2')})).toBe(true);await expect(card).toContainText('空母夜戦CI装備条件：成立');await expect(card).toContainText('残機未同期');expect(await page.evaluate(()=>HD_FL_CACHE['1-1:0'].ships[0].expansion)).toBeNull();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ const saved=await page.evaluate(()=>{
+  const keys=['harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-kancolle-sync-v1','harbordesk-pwa-v1','harbordesk-custom-fleets-v1','harbordesk-fleet-calculator-v1'];
+  return {keys,values:keys.map(k=>localStorage.getItem(k))};
+ });
+ if(testInfo.project.metadata?.retentionFixture)expect(saved.values.every(v=>v!==null)).toBe(true);
+ await testInfo.attach('pre-reload-six-key-presence',{body:Buffer.from(JSON.stringify(saved.keys.map((key,i)=>({key,present:saved.values[i]!==null})))),contentType:'application/json'});
+ await storageAudit.mark('fixture-end');await storageAudit.mark('pre-reload');
+ retainReloadEvidence.mark('reload-start');await page.reload({waitUntil:'domcontentloaded'});retainReloadEvidence.mark('reload-domcontentloaded');
+ const reloadedDocument=await page.evaluate(()=>({timeOrigin:performance.timeOrigin,url:location.href}));
+ await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('cv-fighter2');
+ await storageAudit.mark('application-ready-before-comparison');
+ expect(await page.evaluate(keys=>keys.map(k=>localStorage.getItem(k)),saved.keys)).toEqual(saved.values);
+ retainReloadEvidence.mark('six-keys-restored');await storageAudit.mark('six-keys-restored');
+ retainReloadEvidence.mark('policy-restored');
+ expect(retainReloadEvidence.errors()).toEqual([]);
+ // DCL can precede the complete/load storage boundary. Keep the original checks,
+ // then check the same document again after load (also handles load already fired).
+ await page.waitForLoadState('load');
+ retainReloadEvidence.mark('reload-load');
+ const afterLoad=await page.evaluate(keys=>({document:{timeOrigin:performance.timeOrigin,url:location.href},readyState:document.readyState,values:keys.map(k=>localStorage.getItem(k)),policy:hdSENightPolicy('1-1')}),saved.keys);
+ expect(afterLoad.document).toEqual(reloadedDocument);
+ expect(afterLoad.readyState).toBe('complete');
+ expect(afterLoad.values).toEqual(saved.values);
+ expect(afterLoad.policy).toBe('cv-fighter2');
+ expect(retainReloadEvidence.errors()).toEqual([]);
+ retainReloadEvidence.mark('post-load-storage-and-policy-restored');
+ await storageAudit.mark('post-load-storage-and-policy-restored');
+ await testInfo.attach('post-load-storage-verification',{body:Buffer.from(JSON.stringify({document:afterLoad.document,readyState:afterLoad.readyState,policy:afterLoad.policy,keys:saved.keys.map((key,i)=>({key,present:afterLoad.values[i]!==null,exactMatch:afterLoad.values[i]===saved.values[i]}))})),contentType:'application/json'});
+ } catch(error) { retainReloadEvidence.failure(); throw error; } finally { try{await storageAudit.finish()}finally{await retainReloadEvidence();} }
+});
+
+test('carrier bomber CI policy persists and regenerates the mobile loadout',async({page},testInfo)=>{
+ const retainReloadEvidence=observeReload(page,testInfo);
+ try {
+ await retainReloadEvidence.installNativeEvents({instrumentSW:!!testInfo.project.metadata?.swProbe||process.env.HD_RELOAD_BUFFER_SW==='1'});
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ await page.evaluate(()=>{
+  const ship='赤城改',masterId=hdShipDbMasterRowFor(hdFEFindShip(ship)).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'九九式練爆二二型改(夜間装備実験機)',count:2},{name:'夜間作戦航空要員',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship,masterId,gameShipId:890,level:90,gameSlotEx:0}]));hdFSMap=()=> '1-1';hdFSPlans=()=>[{...hdFSGenerate('1-1',{name:'bomber fixture',ships:'正規空母1',gear:''},0),needs:[]}];const suggestion=hdFSPlans()[0];if(suggestion.slots.filter(x=>x.profile).length!==1)throw new Error('policy fixture must contain one owned ship');hdFSSuggestionHtml(suggestion);const card=document.createElement('article');card.id='bomber-policy-test';card.className='hd-fs-card';card.innerHTML='<button data-hd-fl-generate="0">自動配備</button><div class="hd-fl-host"></div>';document.body.appendChild(card);hdFLRender(0,card);
+ });
+ const card=page.locator('#bomber-policy-test');await card.locator('[data-hd-night-policy]').selectOption('cv-bomber');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightCarrier(p.ships[0]).candidates.some(c=>c.attack==='cv-bomber')})).toBe(true);await expect(card).toContainText('空母夜戦CI装備条件：成立');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);retainReloadEvidence.mark('reload-start');await page.reload({waitUntil:'domcontentloaded'});retainReloadEvidence.mark('reload-domcontentloaded');await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('cv-bomber');
+ retainReloadEvidence.mark('policy-restored');
+ expect(retainReloadEvidence.errors()).toEqual([]);
+ } catch(error) { retainReloadEvidence.failure(); throw error; } finally { await retainReloadEvidence(); }
+});
+
+submarineNightTest('submarine night CI policy regenerates the mobile owned loadout and persists the selected set',async({page},testInfo)=>{
+ const retain=observeReload(page,testInfo);
+ const storageAudit=await observeStorage(page,testInfo,{scriptErrorBoundary:true,keyPresence:true});
+ try{
+ const compareStorage=await submarineStorageComparison(page);
+ await retain.installNativeEvents({parserBoundary:true,parserLoadBoundary:42,parserSingleScript:true});
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ await storageAudit.mark('fixture-start');
+ await page.evaluate(()=>{
+  const masterId=hdShipDbMasterRowFor(hdFEFindShip('伊58改')).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'後期型艦首魚雷(6門)',count:2},{name:'潜水艦搭載電探＆逆探(E27)',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:'伊58改',masterId,gameShipId:93,level:90,gameSlotEx:0}]));hdFSMap=()=> '1-1';hdFSPlans=()=>[{...hdFSGenerate('1-1',{name:'sub fixture',ships:'潜水艦1',gear:''},0),needs:[]}];const suggestion=hdFSPlans()[0],owned=suggestion.slots.filter(x=>x.profile);if(owned.length!==1||owned[0].profile.row.gameShipId!==93)throw new Error('policy fixture must preserve the exact owned ship');hdFSSuggestionHtml(suggestion);const card=document.createElement('article');card.id='sub-policy-test';card.className='hd-fs-card';card.innerHTML='<button data-hd-fl-generate="0">自動配備</button><div class="hd-fl-host"></div>';document.body.appendChild(card);hdFLRender(0,card);
+ });
+ await storageAudit.mark('fixture-end');
+ const card=page.locator('#sub-policy-test');await card.locator('[data-hd-night-policy]').selectOption('sub-radar');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightSub(p.ships[0]).attack})).toBe('sub-radar');await expect(card).toContainText('潜水艦夜戦CI装備条件：成立');await card.locator('[data-hd-night-policy]').selectOption('sub-late');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightSub(p.ships[0]).attack})).toBe('sub-late');expect(await page.evaluate(()=>HD_FL_CACHE['1-1:0'].ships[0].expansion)).toBeNull();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ // Baseline is after the original policy selection; preserve nullable keys.
+ const saved=await compareStorage('baseline');
+ retain.mark('storage-baseline-captured');
+ await retainStorageComparison(testInfo,'pre-reload-storage-presence',saved);
+ expect(saved.keys.filter(row=>['harbordesk-equipment-v1','harbordesk-ship-roster-v1','harbordesk-night-ci-policy-v1'].includes(row.key)).map(row=>row.present)).toEqual([true,true,true]);
+ retain.mark('storage-baseline-verified');
+ await storageAudit.mark('pre-reload');retain.mark('reload-start');await page.reload({waitUntil:'domcontentloaded'});retain.mark('reload-domcontentloaded');
+ const reloadedDocument=await page.evaluate(()=>({timeOrigin:performance.timeOrigin,url:location.origin+location.pathname}));
+ await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('sub-late');
+ retain.mark('policy-restored');
+ await storageAudit.mark('policy-restored');
+ expect(retain.errors().filter(x=>/hdFSSuggestionHtml/.test(x.stack||''))).toEqual([]);
+ // Keep the original DCL/policy/error checks, then extend to the same document's load.
+ await page.waitForLoadState('load');retain.mark('reload-load');
+ const afterLoad=await compareStorage('after-load');
+ await retainStorageComparison(testInfo,'post-load-storage-verification',afterLoad);
+ expect(afterLoad.document).toEqual(reloadedDocument);
+ expect(afterLoad.readyState).toBe('complete');
+ expect(afterLoad.keys.slice(0,6).map(row=>({key:row.key,exactMatch:row.exactMatch}))).toEqual(saved.keys.slice(0,6).map(row=>({key:row.key,exactMatch:true})));
+ expect(afterLoad.keys[6].exactMatch,'raw night policy string must match the post-selection baseline').toBe(true);
+ expect(afterLoad.policy).toBe('sub-late');
+ expect(retain.errors().filter(x=>/hdFSSuggestionHtml/.test(x.stack||''))).toEqual([]);
+ retain.mark('post-load-storage-and-policy-restored');
+ await storageAudit.mark('post-load-storage-and-policy-restored');
+
+ }catch(error){retain.failure();throw error}finally{try{await storageAudit.finish()}finally{await retain()}}
+});
+
+test('carrier three-plane CI policy persists and regenerates the mobile loadout',async({page},testInfo)=>{
+ const retain=observeReload(page,testInfo);
+ try{
+ await retain.installNativeEvents();
+ await boot(page);await page.waitForFunction(()=>typeof hdOCSearchSteps==='function');
+ await page.evaluate(()=>{
+  const ship='赤城改',masterId=hdShipDbMasterRowFor(hdFEFindShip(ship)).id;localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'F6F-3N',count:1},{name:'Swordfish',count:2},{name:'夜間作戦航空要員',count:1}]));localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify([{name:ship,masterId,gameShipId:892,level:90,gameSlotEx:0}]));hdFSMap=()=> '1-1';hdFSPlans=()=>[{...hdFSGenerate('1-1',{name:'three fixture',ships:'正規空母1',gear:''},0),needs:[]}];const suggestion=hdFSPlans()[0],owned=suggestion.slots.filter(x=>x.profile);if(owned.length!==1||owned[0].profile.row.gameShipId!==892)throw new Error('policy fixture must preserve the exact owned ship');hdFSSuggestionHtml(suggestion);const card=document.createElement('article');card.id='three-policy-test';card.className='hd-fs-card';card.innerHTML='<button data-hd-fl-generate="0">自動配備</button><div class="hd-fl-host"></div>';document.body.appendChild(card);hdFLRender(0,card);
+ });
+ const card=page.locator('#three-policy-test');await card.locator('[data-hd-night-policy]').selectOption('cv-three');await expect.poll(()=>page.evaluate(()=>{const p=HD_FL_CACHE['1-1:0'];return p&&!p.searching&&hdFENightCarrier(p.ships[0]).candidates.some(c=>c.attack==='cv-three')})).toBe(true);await expect(card).toContainText('空母夜戦CI装備条件：成立');await expect(card).toContainText('岩井隊爆戦／Swordfish系 2');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);retain.mark('reload-start');await page.reload({waitUntil:'domcontentloaded'});retain.mark('reload-domcontentloaded');await page.waitForFunction(()=>typeof hdSENightPolicy==='function');expect(await page.evaluate(()=>hdSENightPolicy('1-1'))).toBe('cv-three');
+ retain.mark('policy-restored');
+ expect(retain.errors().filter(x=>/hdFSSuggestionHtml/.test(x.stack||''))).toEqual([]);
+ }catch(error){retain.failure();throw error}finally{await retain()}
+});

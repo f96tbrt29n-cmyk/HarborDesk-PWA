@@ -1,0 +1,1182 @@
+{
+  "sourceRun": 39096704516,
+  "sourceHead": "7e5713c",
+  "htmlHead": "797dc6c",
+  "lastFinishedScript": "unknown: requestfinished and script-load were not collected in old attempts",
+  "attempts": [
+    {
+      "attempt": "night-policy-reload-carrie-5f01b-enerates-the-mobile-loadout-webkit",
+      "rows": [
+        {
+          "index": 1,
+          "src": "app.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 2,
+          "src": "map-details.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 3,
+          "src": "map-details-34.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 4,
+          "src": "map-details-57.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 5,
+          "src": "map-plans.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 6,
+          "src": "ship-roster.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 7,
+          "src": "ship-master-snapshot.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 8,
+          "src": "ship-image-provider.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 9,
+          "src": "ship-database.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 10,
+          "src": "training-planner.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 11,
+          "src": "drop-hunting.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 12,
+          "src": "custom-fleets.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 13,
+          "src": "map-images.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 14,
+          "src": "map-tabs.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 15,
+          "src": "map-interactive.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 16,
+          "src": "map-node-data-1.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 17,
+          "src": "map-node-data-2-7.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 18,
+          "src": "map-advanced-data.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 19,
+          "src": "map-air-data.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 20,
+          "src": "enemy-anti-air-data.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 21,
+          "src": "enemy-anti-air.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 22,
+          "src": "map-air-check.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 23,
+          "src": "map-controller.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 24,
+          "src": "advanced-tools.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 25,
+          "src": "resource-history.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 26,
+          "src": "kancolle-import.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 27,
+          "src": "equipment-catalog.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 28,
+          "src": "equipment-catalog-extra.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 29,
+          "src": "equipment-catalog-extra2.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 30,
+          "src": "equipment-catalog-extra3.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 31,
+          "src": "equipment-catalog-extra4.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 32,
+          "src": "equipment-catalog-ui-patch.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 33,
+          "src": "map-equipment-recommend.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 34,
+          "src": "map-equipment-owned.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 35,
+          "src": "development-recipes.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 36,
+          "src": "construction-database.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 37,
+          "src": "improvement-workshop.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 38,
+          "src": "material-planner.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 39,
+          "src": "eo-tracker.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 40,
+          "src": "quest-database.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 41,
+          "src": "expedition-database.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 42,
+          "src": "home-dashboard.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 43,
+          "src": "update-manager.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 44,
+          "src": "map-strategy-navigator.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 45,
+          "src": "strategy-goals.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        }
+      ],
+      "lastContiguousHeader": "equipment-catalog-extra3.js?v=580",
+      "firstMissingHeader": "equipment-catalog-extra4.js?v=580",
+      "lastFinished": "unknown"
+    },
+    {
+      "attempt": "night-policy-reload-carrie-5f01b-enerates-the-mobile-loadout-webkit-retry1",
+      "rows": [
+        {
+          "index": 1,
+          "src": "app.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 2,
+          "src": "map-details.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 3,
+          "src": "map-details-34.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 4,
+          "src": "map-details-57.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 5,
+          "src": "map-plans.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 6,
+          "src": "ship-roster.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 7,
+          "src": "ship-master-snapshot.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 8,
+          "src": "ship-image-provider.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 9,
+          "src": "ship-database.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 1,
+          "headerStatus": [
+            200
+          ],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 10,
+          "src": "training-planner.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 11,
+          "src": "drop-hunting.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 12,
+          "src": "custom-fleets.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 13,
+          "src": "map-images.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 14,
+          "src": "map-tabs.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 15,
+          "src": "map-interactive.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 16,
+          "src": "map-node-data-1.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 17,
+          "src": "map-node-data-2-7.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 18,
+          "src": "map-advanced-data.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 19,
+          "src": "map-air-data.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 20,
+          "src": "enemy-anti-air-data.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 21,
+          "src": "enemy-anti-air.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 22,
+          "src": "map-air-check.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 23,
+          "src": "map-controller.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 24,
+          "src": "advanced-tools.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 25,
+          "src": "resource-history.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 26,
+          "src": "kancolle-import.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 27,
+          "src": "equipment-catalog.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 28,
+          "src": "equipment-catalog-extra.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 29,
+          "src": "equipment-catalog-extra2.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 30,
+          "src": "equipment-catalog-extra3.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 31,
+          "src": "equipment-catalog-extra4.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 32,
+          "src": "equipment-catalog-ui-patch.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 33,
+          "src": "map-equipment-recommend.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 34,
+          "src": "map-equipment-owned.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 35,
+          "src": "development-recipes.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 36,
+          "src": "construction-database.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 37,
+          "src": "improvement-workshop.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 38,
+          "src": "material-planner.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 39,
+          "src": "eo-tracker.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 40,
+          "src": "quest-database.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 41,
+          "src": "expedition-database.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 42,
+          "src": "home-dashboard.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 43,
+          "src": "update-manager.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 44,
+          "src": "map-strategy-navigator.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        },
+        {
+          "index": 45,
+          "src": "strategy-goals.js?v=580",
+          "async": false,
+          "defer": false,
+          "type": "classic",
+          "requests": 1,
+          "headerEvents": 0,
+          "headerStatus": [],
+          "finished": "not-collected",
+          "bodyComplete": "unknown"
+        }
+      ],
+      "lastContiguousHeader": "ship-database.js?v=580",
+      "firstMissingHeader": "training-planner.js?v=580",
+      "lastFinished": "unknown"
+    }
+  ]
+}
