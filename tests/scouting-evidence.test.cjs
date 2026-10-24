@@ -31,3 +31,9 @@ test('calculator inherits the manual route check until explicit editing; edited 
  assert.equal(issue(s),'bonus unknown');s.proposal.edited=true;assert.equal(issue(s),'');assert.equal(s.proposal.routeAssessment.contract.checks[0].status,'manual');
  s.proposal.edited=false;s.proposal.routeAssessment.contract.checks[0].status='missing';assert.equal(issue(s),'');assert.equal(issue({}), '');
 });
+
+test('equal-score scouting guidance uses known synchronized gear distance without inventing a LOS result',()=>{
+ let match={fleetMatch:true,unknown:0,gearMismatch:3};const distance=load('owned-equipment-planner.js','hdOCScoutingDistance',{hdFEGameMatch:()=>match}),measure={goals:[{kind:'los-value',count:null,unresolved:true}]};
+ assert.equal(distance({},measure),3);match.gearMismatch=1;assert.equal(distance({},measure),1);assert.equal(measure.goals[0].count,null);
+ match.unknown=1;assert.equal(distance({},measure),null);match.unknown=0;match.fleetMatch=false;assert.equal(distance({},measure),null);assert.equal(distance({},{goals:[{kind:'los-value',count:49,ok:true}]}),null);
+});

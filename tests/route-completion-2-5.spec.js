@@ -284,7 +284,7 @@ test('north all sixteen independent finite numeric candidates remain unconfirmed
  for(const r of results){expect(r.hq).toBe(120);expect(r.coef).toBe(1);expect(r.bonusInputs.every(x=>x.level===90&&x.observedShipTermInput===41)).toBe(true);expect(r.required.every(x=>x.ok)).toBe(true);expect(r.master.valid).toBe(true);expect(r.inventory).toBe(true);expect(r.score).toBeCloseTo(r.answer.los,8);expect(r.air).toBe(r.answer.air);expect(r.sourceUnchanged).toBe(true);if(r.match!=='ready'){expect(r.bonusInputs.some(x=>!x.newBonusDeltaKnown)).toBe(true);expect(r.los.status).toBe('manual');expect(r.readiness).toBe(false)}}
 });
 
-for(const width of [2,3,4])test('north '+(['','','two','three','four'][width])+'-slot finite domain matches independent enumeration without the synchronized seed shortcut',async({page},info)=>{
+for(const width of [2,3,4])northDrumTest('north '+(['','','two','three','four'][width])+'-slot finite domain matches independent enumeration without the synchronized seed shortcut',async({page},info)=>{
  const extra=width>=3,fourth=width===4;
  // Ablation only: the remaining critical slots and all guns/drums/radars are fixed.
  // This does not claim completeness of the unrestricted beam search.

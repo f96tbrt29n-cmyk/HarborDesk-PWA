@@ -167,6 +167,12 @@ function hdOCMeasure(plan,requirements,unknown=[]){
 }
 // Unresolved numeric goals are missing evidence, not a proven equipment deficit.
 function hdOCShortageGoals(measure){return measure.goals.filter(x=>!x.ok&&!['route-branches','route-requirements'].includes(x.kind)&&!(['air-value','los-value'].includes(x.kind)&&x.unresolved))}
+// Equal-scored intermediate states may approach the observed loadout without
+// treating its unknown bonus as a numeric LOS value or an achieved target.
+function hdOCScoutingDistance(plan,measure){
+ if(!measure.goals.some(g=>g.kind==='los-value'&&g.unresolved))return null;
+ const match=hdFEGameMatch(plan);return match.fleetMatch&&!match.unknown?match.gearMismatch:null;
+}
 function hdOCKey(plan){return JSON.stringify(plan.ships.map(s=>[(s.items||[]).map(x=>hdFOStackKey(x)),hdFOStackKey(s.expansion)]))}
 function hdOCScore(kind,row){const item=row.item||row,s=item.stats||{};if(kind==='opening-asw')return Number(s.対潜)||0;if(kind==='制空')return Number(s.対空)||0;if(kind==='索敵')return ((Number(s.索敵)||0)+hdFEImproveCoef(item)*Math.sqrt(Number(row.star)||0))*hdFEEquipCoef(item);return hdFLScoreBase(item,row)}
 function hdOCGoalIdentity(goal){if(goal.id&&goal.mandatory)return goal.id;if(goal.kind==='speed-ship')return JSON.stringify([goal.kind,goal.shipIndex,goal.targetRank]);return JSON.stringify([goal.kind,goal.label,goal.shipIndex??null])}
@@ -224,7 +230,7 @@ function* hdOCSearchSteps(c,limits={}){
      const trial=hdFOClone(state.plan),value=slot.expansion&&!candidate.name?null:hdOCEquipment(candidate,slot);if(slot.expansion)trial.ships[slot.si].expansion=value;else trial.ships[slot.si].items[slot.index]=value;
      if(donor){const replacement=old?.name?inventory.find(x=>x.key===hdFOStackKey(old)):null,newItem=replacement&&hdOCCompatible(donor,replacement)?hdOCEquipment(replacement,donor):null;if(donor.expansion)trial.ships[donor.si].expansion=newItem;else trial.ships[donor.si].items[donor.index]=newItem||{name:'',slotIndex:donor.index,capacity:donor.capacity};}
      const key=hdOCKey(trial);if(seen.has(key))continue;if(examined>=maxExamined)break enumerate;seen.add(key);examined++;
-     const measure=hdOCMeasure(trial,requirements,unknown),row={plan:trial,measure};
+     const measure=hdOCMeasure(trial,requirements,unknown),row={plan:trial,measure,scoutingDistance:hdOCScoutingDistance(trial,measure)};
      // Intermediate swaps may break a set, but the delivered plan must keep
      // every confirmed target satisfied by the best equipment so far.
      if(!hdOCGoalRegressions(best.measure,measure).length&&measure.score>best.measure.score)best=row;
@@ -233,7 +239,7 @@ function* hdOCSearchSteps(c,limits={}){
     }
    }
   }
-  next.sort((a,b)=>hdOCGoalRegressions(initial.measure,a.measure).length-hdOCGoalRegressions(initial.measure,b.measure).length||b.measure.score-a.measure.score);beamPruned ||= next.length>5;beam=next.slice(0,5);if(!beam.length)break;
+  next.sort((a,b)=>hdOCGoalRegressions(initial.measure,a.measure).length-hdOCGoalRegressions(initial.measure,b.measure).length||b.measure.score-a.measure.score||(a.scoutingDistance!==null&&b.scoutingDistance!==null?a.scoutingDistance-b.scoutingDistance:0));beamPruned ||= next.length>5;beam=next.slice(0,5);if(!beam.length)break;
  }
  // Fill remaining ordinary slots with owned basic weapons after satisfying the targets.
  const usage=hdFOAssignedUsage(best.plan);
