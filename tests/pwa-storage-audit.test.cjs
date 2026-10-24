@@ -138,12 +138,12 @@ test('storage event metadata excludes values and outside keys, preserves null di
   handler({...base,get oldValue(){throw new Error('PRIVATE_EVENT_ERROR')}});
   assert.equal(f.records.at(-1).storageEvent.error,'Error');assert.ok(!JSON.stringify(f.records).includes('PRIVATE_EVENT_ERROR'));
 });
-test('only PWA cached restart and carrier night reload opt into the single script-error boundary',async()=>{
+test('cached PWA and carrier/submarine reloads keep targeted script-error boundaries',async()=>{
   const [pwa,night,boundary]=await Promise.all(['pwa-cached-reload.spec.js','night-policy-reload.spec.js','pwa-storage-boundary.spec.js'].map(file=>fs.readFile(path.join(__dirname,file),'utf8')));
   assert.equal((pwa.match(/scriptErrorBoundary:true/g)||[]).length,1);
-  assert.equal((night.match(/scriptErrorBoundary:true/g)||[]).length,1);
+  assert.equal((night.match(/scriptErrorBoundary:true/g)||[]).length,2);
   assert.match(night,/test\('carrier night CI policy persists and regenerates the mobile loadout',[\s\S]*?observeStorage\(page,testInfo,\{scriptErrorBoundary:true,keyPresence:true\}\)/);
-  assert.equal((pwa.match(/keyPresence:true/g)||[]).length,1);assert.equal((night.match(/keyPresence:true/g)||[]).length,1);
+  assert.equal((pwa.match(/keyPresence:true/g)||[]).length,1);assert.equal((night.match(/keyPresence:true/g)||[]).length,2);
   assert.ok(!boundary.includes('scriptErrorBoundary:true'));
 });
 test('presence metadata distinguishes normal stored and genuinely absent keys without extra value reads or writes',()=>{
@@ -190,4 +190,22 @@ test('failed presence observation/delivery does not alter native operation resul
   assert.equal(f.stored(KEYS[0]),'updated');assert.ok(f.records.some(r=>r.stage==='mutation-failed'));
   const bad=fixture(true,false,false,100,{keyPresence:true});assert.doesNotThrow(()=>bad.localStorage.setItem(KEYS[0],'kept'));
   assert.equal(bad.localStorage.getItem(KEYS[0]),'kept');
+});
+
+test('submarine wiring reuses existing passive boundaries and preserves fixture, waits and assertions',async()=>{
+ const crypto=require('node:crypto'),night=await fs.readFile(path.join(__dirname,'night-policy-reload.spec.js'),'utf8');
+ const start=night.indexOf("submarineNightTest('submarine night CI"),end=night.indexOf("\ntest('carrier three-plane",start),sub=night.slice(start,end);
+ assert.ok(start>0&&end>start);
+ assert.match(sub,/observeStorage\(page,testInfo,\{scriptErrorBoundary:true,keyPresence:true\}\)/);
+ assert.match(sub,/installNativeEvents\(\{parserBoundary:true,parserLoadBoundary:42,parserSingleScript:true\}\)/);
+ for(const mark of ['fixture-start','fixture-end','pre-reload','policy-restored'])assert.equal(sub.split("storageAudit.mark('"+mark+"')").length-1,1);
+ assert.match(sub,/finally\{try\{await storageAudit.finish\(\)\}finally\{await retain\(\)\}\}/);
+ const fixture=sub.slice(sub.indexOf(' await page.evaluate(()=>{'),sub.indexOf('\n });')+'\n });'.length);
+ const core=sub.slice(sub.indexOf(" const card=page.locator('#sub-policy-test')"),sub.indexOf(' }catch(error)')).replace("await storageAudit.mark('pre-reload');",'').replace(" await storageAudit.mark('policy-restored');",'');
+ const sha=value=>crypto.createHash('sha256').update(value).digest('hex');
+ // Original fixture/core at 8394a8d: data, setup waits, actions and error filter.
+ assert.equal(sha(fixture),'26c2bffa6e5e9d5400cc27adb2b2b32d5395ea43c8440e669a40dd35b9821907');
+ assert.equal(sha(core.replace(/\s/g,'')),'dee754736d0c1ff4d4a1838d2a6785c15ff7a08ab9d33d09cf8597a337292ae9');
+ assert.ok(!/setTimeout|MutationObserver|storageState|setOffline|installVersionCalls|instrumentSW/.test(sub));
+ assert.match(night,/const submarineNightTest = test.extend\(\{[\s\S]*?mode:'on',snapshots:false,screenshots:true,sources:true[\s\S]*?video:'on'/);
 });
