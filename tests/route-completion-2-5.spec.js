@@ -1,5 +1,7 @@
 const {test,expect}=require('@playwright/test');
 test.use({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+const northDrumTest=test.extend({trace:{mode:'on',snapshots:false,screenshots:true,sources:true},video:'on'});
+const {northDrumPlacements}=require('./north-drum-oracle.cjs');
 async function prepare(page,{base=41}={}){
  await page.route('**/*',r=>['localhost','127.0.0.1'].includes(new URL(r.request().url()).hostname)?r.continue():r.fulfill({status:204,body:''}));
  await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCSearch==='function');
@@ -15,6 +17,53 @@ async function prepare(page,{base=41}={}){
   saveCustomFleets({'2-5':[completionFleet]});
  },base);
 }
+northDrumTest('north two finite drums match an independent legal-slot and distinct-hull domain',async({page},info)=>{
+ const fs=require('node:fs/promises'),evidence={caseId:'2-5/index0/BFJO',domain:'45 pairs of ten positions, two owned drums; no search completeness claim'};
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ try{
+  const expected=northDrumPlacements();await prepare(page);
+  evidence.result=await page.evaluate(placements=>{
+   const context=hdOCContext('2-5','completion',0),original=hdFEPlanFromSavedFleet('2-5',context.fleet),originalString=JSON.stringify(original);
+   const keys=['harbordesk-custom-fleets-v1','harbordesk-equipment-v1','harbordesk-ship-roster-v1','harbordesk-fleet-calculator-v1','harbordesk-kancolle-sync-v1','harbordesk-pwa-v1'],before=keys.map(k=>localStorage.getItem(k));
+   const allPositions=placements.flatMap(p=>p.slots),fixed=p=>p.ships.map((s,si)=>({ship:s.ship,masterId:s.masterId,gameShipId:s.gameShipId,rosterId:s.rosterId,
+    items:s.items.filter(x=>!allPositions.some(pos=>pos.shipIndex===si&&!pos.expansion&&pos.index===x.slotIndex)),expansion:allPositions.some(pos=>pos.shipIndex===si&&pos.expansion)?null:s.expansion}));
+   const baselineFixed=JSON.stringify(fixed(original));
+   const results=placements.map(({id,slots})=>{
+    const plan=hdFOClone(original);plan.ships.forEach(s=>s.items=s.items.filter(x=>x.name!=='ドラム缶(輸送用)'));
+    for(const pos of slots){
+     const ship=plan.ships[pos.shipIndex],drum={name:'ドラム缶(輸送用)',star:0,slotIndex:pos.index};
+     if(pos.expansion)ship.expansion=drum;
+     else{ship.items=ship.items.filter(x=>x.slotIndex!==pos.index);ship.items.push(drum)}
+    }
+    const measure=hdOCMeasure(plan,[]),drums=measure.requiredChecks.find(x=>x.condition.kind==='equipmentShips'),los=measure.requiredChecks.find(x=>x.condition.kind==='scoutingValue');
+    const usage=hdFOAssignedUsage(plan),inventory=[...hdFLInventory().values()];
+    return {id,master:hdFEMasterValidation(plan),drums,los,otherRequired:measure.requiredChecks.filter(x=>!['equipmentShips','scoutingValue'].includes(x.condition.kind)),
+     air:hdFEAir(hdFEAssigned(plan)).basePower,game:hdFEGameMatch(plan).status,readiness:hdOCReadiness(plan,measure),fixed:JSON.stringify(fixed(plan))===baselineFixed,
+     assigned:plan.ships.flatMap((s,si)=>[...s.items.map(x=>({...x,shipIndex:si,expansion:false})),...(s.expansion?[{...s.expansion,shipIndex:si,expansion:true}]:[])]).map(({name,star,shipIndex,slotIndex,expansion})=>({name,star:star||0,shipIndex,slotIndex,expansion})),
+     productUsage:inventory.map(x=>({name:x.name,star:x.star,count:usage[x.key]||0}))};
+   });
+   return {document:{timeOrigin:performance.timeOrigin,at:performance.now(),readyState:document.readyState},stock:JSON.parse(localStorage.getItem(HD_FL_KEY)),results,
+    sourceUnchanged:JSON.stringify(original)===originalString,savedKeys:keys.map((key,i)=>({key,exact:localStorage.getItem(key)===before[i]}))};
+  },expected);
+  evidence.pageerrors=errors.slice();
+  const actual=evidence.result,stock=new Map(actual.stock.map(x=>[JSON.stringify([x.name,x.star||0]),x.count]));
+  expect(stock.get(JSON.stringify(['ドラム缶(輸送用)',0]))).toBe(2);expect(actual.results).toHaveLength(45);
+  for(const oracle of expected){
+   const row=actual.results.find(x=>x.id===oracle.id);expect(row.master.valid,oracle.id+' legality').toBe(oracle.legal);
+   expect(row.drums.count,oracle.id+' distinct hulls').toBe(oracle.drumHulls);expect(row.drums.status,oracle.id+' drum route condition').toBe(oracle.drumsReady?'ready':'missing');
+   expect(row.otherRequired.every(x=>x.ok),oracle.id+' remaining structural conditions').toBe(true);expect(row.fixed,oracle.id+' fixed slots').toBe(true);expect(row.air,oracle.id+' fixed fighter allocation').toBe(66);
+   const usage=new Map();for(const x of row.assigned){const key=JSON.stringify([x.name,x.star]);usage.set(key,(usage.get(key)||0)+1)}
+   expect(usage.get(JSON.stringify(['ドラム缶(輸送用)',0]))).toBe(2);
+   for(const [key,count] of usage)expect(count,oracle.id+' '+key).toBeLessThanOrEqual(stock.get(key)||0);
+   for(const x of row.productUsage)expect(x.count,oracle.id+' product usage').toBe(usage.get(JSON.stringify([x.name,x.star]))||0);
+   expect(row.los.condition).toMatchObject({coef:1,min:49});expect(row.game).toBe(oracle.synchronized?'ready':'partial');
+   expect(row.los.status).toBe(oracle.synchronized?'ready':'manual');expect(row.readiness.registeredReady).toBe(false);
+  }
+  expect(actual.sourceUnchanged).toBe(true);expect(actual.savedKeys.every(x=>x.exact)).toBe(true);expect(errors).toEqual([]);
+ }finally{
+  const file=info.outputPath('north-drum-domain.json');await fs.writeFile(file,JSON.stringify(evidence,null,2));await info.attach('north-drum-domain',{path:file,contentType:'application/json'});
+ }
+});
 // Independent oracle: only seven critical slots vary. Main guns, two drums,
 // three large radars and six actual hulls are a fixed, validated foundation.
 // No production matcher, formula, or search score is used in this enumeration.
