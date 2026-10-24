@@ -22,6 +22,7 @@ function observedFixture(){
 function beamComparator(initial){
  const c={initial};for(const name of ['hdOCGoalIdentity','hdOCGoalRegressions'])load('owned-equipment-planner.js',name,c);
  const s=fs.readFileSync(path.join(__dirname,'..','owned-equipment-planner.js'),'utf8'),a=s.indexOf('next.sort(')+'next.sort('.length,b=s.indexOf(');beamPruned',a);
+ if(s.includes('function hdOCScoutingOrder('))load('owned-equipment-planner.js','hdOCScoutingOrder',c);
  assert.ok(a>='next.sort('.length&&b>a);return vm.runInNewContext('('+s.slice(a,b)+')',c);
 }
 test('candidate scouting with unknown bonus carries no numeric result or ready checks; known arithmetic is unchanged',()=>{
@@ -69,6 +70,49 @@ test('beam distance cannot reverse different scores or the confirmed-condition r
  const row=(score,distance,ok=true)=>({measure:{goals:[{...drum,ok},{...los}],requiredChecks:[],score},scoutingDistance:distance});
  const better=row(1.0000000001,5),closer=row(1,0),snapshot=JSON.stringify([better,closer]);
  assert.ok(compare(better,closer)<0);assert.ok(compare(closer,better)>0);assert.equal(JSON.stringify([better,closer]),snapshot);
- assert.ok(compare(row(999,0,false),row(1,5))>0);
- assert.ok(compare(row(1,3),row(1,1))>0);assert.equal(compare(row(1,null),row(1,3)),0);assert.equal(compare(row(1,3),row(1,null)),0);
+ assert.ok(compare(row(999,0,false),row(1,5))>0);assert.ok(compare(row(2,null),row(1,0))<0);assert.ok(compare(row(999,0,false),row(1,null))>0);
+ assert.ok(compare(row(1,3),row(1,1))>0);assert.ok(compare(row(1,null),row(1,3))>0);assert.ok(compare(row(1,3),row(1,null))<0);
+});
+
+function orderRows(distances){return distances.map((d,i)=>({id:'row-'+i,scoutingDistance:d,measure:{score:0,complete:false,goals:[{kind:'los-value',count:null,ok:false,unresolved:true}],requiredChecks:[]}}))}
+function permutations(xs){return xs.length?xs.flatMap((x,i)=>permutations(xs.filter((_,j)=>i!==j)).map(t=>[x,...t])):[[]]}
+function assertPreorder(compare,rows){
+ const sign=n=>n<0?-1:n>0?1:0;
+ for(const a of rows){assert.equal(compare(a,a),0);for(const b of rows){
+  assert.ok(Number.isFinite(compare(a,b)));assert.equal(sign(compare(a,b))+sign(compare(b,a)),0,'sign antisymmetry');
+  for(const c of rows){const ab=compare(a,b),bc=compare(b,c),ac=compare(a,c);
+   if(ab<=0&&bc<=0)assert.ok(ac<=0,'non-strict transitivity');
+   if(ab<0&&bc<0)assert.ok(ac<0,'strict transitivity');
+   if(ab===0&&bc===0)assert.equal(ac,0,'equal-rank transitivity');
+  }
+ }}
+}
+function assertSorted(compare,rows){for(let i=0;i<rows.length;i++)for(let j=i+1;j<rows.length;j++)assert.ok(compare(rows[i],rows[j])<=0,'all earlier/later pairs respect the comparator')}
+test('beam mixed distances have consistent transitive ties across all three-row permutations',()=>{
+ const compare=beamComparator({measure:{goals:[],requiredChecks:[]}}),rows=orderRows([1,null,2]),before=JSON.stringify(rows);
+ assertPreorder(compare,rows);
+ for(const input of permutations(rows)){
+  const sorted=input.slice().sort(compare);assertSorted(compare,sorted);assert.deepEqual(sorted.map(x=>x.scoutingDistance),[1,2,null]);
+ }
+ assert.equal(JSON.stringify(rows),before);assert.equal(rows[1].measure.goals[0].count,null);assert.equal(rows[1].measure.complete,false);
+});
+test('beam all numeric and all unknown distances preserve coherent ordering without assigning a candidate identity order',()=>{
+ const compare=beamComparator({measure:{goals:[],requiredChecks:[]}});
+ for(const distances of [[3,1,0,2,1],[null,null,null]]){
+  const rows=orderRows(distances),before=JSON.stringify(rows);assertPreorder(compare,rows);
+  for(const input of permutations(rows)){const sorted=input.slice().sort(compare);assertSorted(compare,sorted);assert.equal(new Set(sorted).size,rows.length);if(distances[0]!==null)assert.deepEqual(sorted.map(x=>x.scoutingDistance),[0,1,1,2,3]);}
+  assert.equal(JSON.stringify(rows),before);
+ }
+});
+test('beam five-row cutoff follows the declared distance-availability policy without changing manual candidates',()=>{
+ // Same distance classes as the six recorded intermediate states, not new fleet solutions.
+ const compare=beamComparator({measure:{goals:[],requiredChecks:[]}}),rows=orderRows([2,2,3,3,null,1]),before=JSON.stringify(rows);
+ assertPreorder(compare,rows);
+ for(const input of permutations(rows)){
+  const sorted=input.slice().sort(compare),kept=sorted.slice(0,5);assertSorted(compare,sorted);
+  assert.equal(new Set(sorted).size,6);assert.ok(sorted.includes(rows[4]));
+  assert.ok(kept.every(x=>x.scoutingDistance!==null));assert.ok(kept.some(x=>x.scoutingDistance===1));
+  assert.ok(sorted.every(x=>!x.measure.complete&&x.measure.goals[0].count===null&&x.measure.goals[0].unresolved));
+ }
+ assert.equal(JSON.stringify(rows),before);
 });

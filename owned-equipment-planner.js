@@ -183,6 +183,12 @@ function hdOCScoutingDistance(plan,measure){
  }
  const match=hdFEGameMatch(plan);return match.fleetMatch&&!match.unknown?match.gearMismatch:null;
 }
+// Search policy within a primary-rank tie: observed distances first, then lower
+// distances. Unknown distances remain unknown and do not imply invalidity.
+function hdOCScoutingOrder(a,b){
+ const knownA=Number.isFinite(a.scoutingDistance),knownB=Number.isFinite(b.scoutingDistance);
+ return knownA&&knownB?a.scoutingDistance-b.scoutingDistance:knownA?-1:knownB?1:0;
+}
 function hdOCKey(plan){return JSON.stringify(plan.ships.map(s=>[(s.items||[]).map(x=>hdFOStackKey(x)),hdFOStackKey(s.expansion)]))}
 function hdOCScore(kind,row){const item=row.item||row,s=item.stats||{};if(kind==='opening-asw')return Number(s.対潜)||0;if(kind==='制空')return Number(s.対空)||0;if(kind==='索敵')return ((Number(s.索敵)||0)+hdFEImproveCoef(item)*Math.sqrt(Number(row.star)||0))*hdFEEquipCoef(item);return hdFLScoreBase(item,row)}
 function hdOCGoalIdentity(goal){if(goal.id&&goal.mandatory)return goal.id;if(goal.kind==='speed-ship')return JSON.stringify([goal.kind,goal.shipIndex,goal.targetRank]);return JSON.stringify([goal.kind,goal.label,goal.shipIndex??null])}
@@ -249,7 +255,7 @@ function* hdOCSearchSteps(c,limits={}){
     }
    }
   }
-  next.sort((a,b)=>hdOCGoalRegressions(initial.measure,a.measure).length-hdOCGoalRegressions(initial.measure,b.measure).length||b.measure.score-a.measure.score||(a.scoutingDistance!==null&&b.scoutingDistance!==null?a.scoutingDistance-b.scoutingDistance:0));beamPruned ||= next.length>5;beam=next.slice(0,5);if(!beam.length)break;
+  next.sort((a,b)=>hdOCGoalRegressions(initial.measure,a.measure).length-hdOCGoalRegressions(initial.measure,b.measure).length||b.measure.score-a.measure.score||hdOCScoutingOrder(a,b));beamPruned ||= next.length>5;beam=next.slice(0,5);if(!beam.length)break;
  }
  // Fill remaining ordinary slots with owned basic weapons after satisfying the targets.
  const usage=hdFOAssignedUsage(best.plan);
