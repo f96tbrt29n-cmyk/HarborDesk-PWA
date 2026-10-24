@@ -164,7 +164,8 @@ for(const [kind,count] of [['drum',1],['fighter',1],['improved',0]])test(`north 
   return {measure:result.measure,search:result.search,shortages:result.shortages,html:hdOCPanel('2-5','completion',0),ready:hdOCReadiness(result.plan,result.measure),usage:hdFOAssignedUsage(result.plan),stock:[...hdFLInventory()].map(([key,v])=>[key,v.count])};
  },{kind,count});expect(r.ready.registeredReady).toBe(false);expect(r.search.status).toBe('incomplete');expect(r.html).toContain('探索未完了');const stock=Object.fromEntries(r.stock);for(const [key,n] of Object.entries(r.usage))expect(n,key).toBeLessThanOrEqual(stock[key]||0);
  if(kind==='drum'){const g=r.shortages.find(x=>x.goalKind==='drum-ships');expect(g.minCount).toBe(2);expect(g.count).toBe(1);expect(g.candidates).toContain('ドラム缶(輸送用)');expect(r.html).toContain('装備艦があと1隻');}
- else {const g=r.shortages.find(x=>x.goalKind===(kind==='fighter'?'air-value':'los-value'));expect(g.count).toBeLessThan(g.minCount);expect(g.candidates.length).toBeGreaterThan(0);expect(r.html).toContain('あと');}
+ else if(kind==='fighter'){const g=r.shortages.find(x=>x.goalKind==='air-value');expect(g.count).toBeLessThan(g.minCount);expect(g.candidates.length).toBeGreaterThan(0);expect(r.html).toContain('あと');}
+ else {const g=r.measure.goals.find(x=>x.kind==='los-value');expect(g).toMatchObject({count:null,ok:false,unresolved:true});expect(r.shortages.some(x=>x.goalKind==='los-value')).toBe(false);expect(r.html).toContain('索敵ボーナス差分が未確認');}
 });
 test('north bounded search without synchronized gear is not a proof of shortage when independent inventory enumeration has solutions',async({page})=>{
  expect(oracle().length).toBe(16);expect(oracle({fighters:1}).length).toBe(0);expect(oracle({improved:0}).length).toBe(0);
@@ -349,4 +350,58 @@ test('diagnostic upstream failures never claim current masters or alter the nort
  expect(await page.evaluate(()=>hdFCState('2-5',hdFCSelection('2-5')))).toEqual(fixture.calc);
  await info.attach('post-reload-pageerrors',{body:Buffer.from(JSON.stringify(pageErrors,null,2)),contentType:'application/json'});
  expect(pageErrors.filter(e=>e.mode!=='cors'||!e.message.includes('access control checks'))).toEqual([]);
+});
+
+// Replay one recorded changed allocation and two synchronized numeric controls.
+// base 41/40 are synthetic test inputs, not verified game stats for Lv90.
+for(const scenario of [
+ {id:'unknown',base:41,changed:true,required:'manual',goal:'未確認',calculator:'未判定'},
+ {id:'ready',base:41,changed:false,required:'ready',goal:'充足',calculator:'49.46'},
+ {id:'missing',base:40,changed:false,required:'missing',goal:'不足',calculator:'48.99'}
+])northDrumTest(`north scouting UI distinguishes ${scenario.id} and preserves candidate application`,async({page},info)=>{
+ const fs=require('node:fs/promises'),evidence={scenario,scope:'recorded candidate replay; no search and no real-game Lv90 verification'},errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ try{
+  await prepare(page,{base:scenario.base});
+  evidence.internal=await page.evaluate(changed=>{
+   const c=hdOCContext('2-5','completion',0),plan=hdFEPlanFromSavedFleet('2-5',c.fleet);
+   if(changed){const ship=plan.ships[1];ship.items=ship.items.filter(x=>x.slotIndex!==0&&x.name!=='ドラム缶(輸送用)');ship.items.push({name:'ドラム缶(輸送用)',star:0,slotIndex:0});}
+   plan.openingAswCount=0;plan.preservationIssues=[];
+   const measure=hdOCMeasure(plan,hdFLRequirements(plan)),result={plan,measure,signature:hdOCSignature(c),shortages:[]};
+   HD_OC_CACHE.set('2-5:completion:0',result);
+   const host=document.createElement('div');host.id='north-los-ui-panel';host.innerHTML=hdOCPanel('2-5','completion',0);document.body.append(host);
+   const keys=[SHIP_ROSTER_KEY,HD_FL_KEY,'harbordesk-kancolle-sync-v1','harbordesk-pwa-v1'];
+   window.northUiSource={keys,values:keys.map(k=>localStorage.getItem(k))};
+   return {required:measure.requiredChecks.find(x=>x.condition.kind==='scoutingValue'),goal:measure.goals.find(x=>x.kind==='los-value'),readiness:hdOCReadiness(plan,measure),verifiedScouting:hdFEPlanScouting(plan,hdFEAssigned(plan)),automaticScouting:hdFEEvaluate(plan).auto.scouting,shortageKinds:hdOCShortageGoals(measure).map(x=>x.kind),score:measure.score};
+  },scenario.changed);
+  const panel=page.locator('#north-los-ui-panel .hd-oc-panel');await expect(panel).toBeVisible();
+  evidence.panel={goal:await panel.locator('.hd-oc-goal').filter({hasText:'索敵分岐の安全域'}).innerText(),checks:await panel.locator('[data-hd-required-route]').textContent(),readiness:await panel.locator('[data-hd-oc-readiness]').innerText(),applyLabel:await panel.locator('[data-hd-oc-apply]').innerText()};
+  await panel.locator('[data-hd-oc-calculator]').click();const calculator=page.locator('#hdFleetCalculator');await expect(calculator).toBeVisible();
+  evidence.calculator={los:await calculator.locator('.hd-fc-results>div').filter({hasText:'33式索敵'}).locator('strong').innerText(),assessment:await calculator.locator('[data-hd-fc-assessment]').innerText(),proposal:await calculator.locator('[data-hd-fc-proposal]').innerText(),breakdown:await calculator.locator('.hd-fc-breakdown').textContent(),shipInputs:await calculator.locator('[data-hd-fc-ship-los]').evaluateAll(xs=>xs.map(x=>x.value))};
+  if(scenario.changed){
+   await calculator.locator('[data-hd-fc-ship-los="0"]').fill('42');await calculator.locator('[data-hd-fc-ship-los="0"]').press('Tab');
+   await expect(calculator.locator('[data-hd-fc-proposal]')).toContainText('手動調整あり');
+   evidence.manualEdit={label:await calculator.locator('.hd-fc-results>div').filter({hasText:'33式索敵'}).innerText(),assessment:await calculator.locator('[data-hd-fc-assessment]').innerText()};
+  }
+  await panel.locator('[data-hd-oc-apply]').click();
+  evidence.saved=await page.evaluate(()=>{const fleet=loadCustomFleets()['2-5'].find(x=>x.id==='completion'),s=northUiSource;return {gear:fleet.ships.map(x=>x.gear),route:fleet.routeAssessment?.status,unchangedInputs:s.keys.map((key,i)=>({key,exact:localStorage.getItem(key)===s.values[i]}))}});
+  evidence.pageerrors=errors.slice();
+  expect(evidence.internal.required.status).toBe(scenario.required);expect(evidence.internal.readiness.registeredReady).toBe(false);
+  expect(evidence.panel.goal).toContain(scenario.goal);expect(evidence.calculator.los).toBe(scenario.calculator);
+  expect(evidence.panel.checks).toContain(evidence.internal.required.label+'：'+({manual:'未確認',ready:'成立',missing:'不成立'})[scenario.required]);
+  expect(evidence.saved.route).toBe(scenario.required);expect(evidence.saved.unchangedInputs.every(x=>x.exact)).toBe(true);
+  expect(evidence.saved.gear[1]).toContain(scenario.changed?'ドラム缶(輸送用) / 20.3cm連装砲 /  / 強風改二':'20.3cm連装砲 / 20.3cm連装砲 / ドラム缶(輸送用) / 強風改二');
+  if(scenario.changed){
+   expect(evidence.internal.goal).toMatchObject({count:null,ok:false,unresolved:true,ratio:0});
+   expect(evidence.internal.verifiedScouting).toMatchObject({status:'manual',score:null});expect(evidence.internal.automaticScouting).toMatchObject({status:'manual',score:null});
+   expect(evidence.internal.shortageKinds).not.toContain('los-value');expect(evidence.panel.goal).not.toMatch(/充足|あと|49\.46/);
+   expect(evidence.panel.applyLabel).toBe('未確認を含む配備案を保存');expect(evidence.calculator.breakdown).toContain('未確認');expect(evidence.calculator.breakdown).not.toContain('59.040');
+   expect(evidence.calculator.proposal).toContain('参考入力');expect(evidence.calculator.shipInputs).toEqual(Array(6).fill('41'));
+   expect(evidence.manualEdit.label).toContain('手入力の参考値');expect(evidence.manualEdit.assessment).toContain('攻略条件は未判定');
+  }else{
+   expect(Number.isFinite(evidence.internal.goal.count)).toBe(true);expect(evidence.internal.goal.ok).toBe(scenario.required==='ready');
+   expect(evidence.internal.shortageKinds.includes('los-value')).toBe(scenario.required==='missing');
+  }
+  expect(errors).toEqual([]);
+ }finally{const file=info.outputPath('north-los-ui.json');await fs.writeFile(file,JSON.stringify(evidence,null,2));await info.attach('north-los-ui',{path:file,contentType:'application/json'});}
 });
