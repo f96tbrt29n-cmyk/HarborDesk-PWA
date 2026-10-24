@@ -8,6 +8,22 @@ function load(file,name,context){
  const source=fs.readFileSync(path.join(__dirname,'..',file),'utf8'),start=source.indexOf('function '+name+'('),end=source.indexOf('\nfunction ',start+1);
  vm.runInNewContext(source.slice(start,end<0?undefined:end),context);return context[name];
 }
+// Same six hulls, four slots and observed loadout as route-completion-2-5.
+// No LOS formula or search is used here; one of the existing four open slots is empty.
+function observedFixture(){
+ const names=['扶桑改二','鈴谷改二','熊野改二','妙高改二','羽黒改二','那智改二'],masters=[411,503,504,319,194,192];
+ const rows=names.map((name,i)=>({name,masterId:masters[i],gameShipId:9600+i,gameAswGearKnown:true,gameGearExpansion:'',gameGearSlots:i===0?['35.6cm連装砲','35.6cm連装砲','零式水上観測機 ★4','強風改二']:i<3?['20.3cm連装砲','20.3cm連装砲','ドラム缶(輸送用)','強風改二']:['20.3cm連装砲','20.3cm連装砲',i===5?'零式水上観測機':'零式水上観測機 ★4','32号対水上電探']}));
+ const plan={map:'2-5',ships:rows.map(r=>({ship:r.name,masterId:r.masterId,gameShipId:r.gameShipId,items:r.gameGearSlots.map((label,slotIndex)=>({name:label.replace(/ ★\d+$/,''),star:Number(/ ★(\d+)$/.exec(label)?.[1]||0),slotIndex})),expansion:null}))};
+ plan.ships[0].items[2]={name:'',star:0,slotIndex:2};
+ const fleets=[{deckId:1,name:'observed',ships:rows.map(r=>({gameShipId:r.gameShipId,gearKnown:true}))}],c={rosterLoad:()=>rows,localStorage:{getItem:key=>key==='harbordesk-kancolle-fleets-v1'?JSON.stringify(fleets):null}};
+ for(const name of ['hdFERoster','hdFERosterForShip','hdFENormGearLabel','hdFEPlannedGearLabel','hdFEGameMatch'])load('fleet-readiness-evaluator.js',name,c);
+ return {rows,plan,fleets,c};
+}
+function beamComparator(initial){
+ const c={initial};for(const name of ['hdOCGoalIdentity','hdOCGoalRegressions'])load('owned-equipment-planner.js',name,c);
+ const s=fs.readFileSync(path.join(__dirname,'..','owned-equipment-planner.js'),'utf8'),a=s.indexOf('next.sort(')+'next.sort('.length,b=s.indexOf(');beamPruned',a);
+ assert.ok(a>='next.sort('.length&&b>a);return vm.runInNewContext('('+s.slice(a,b)+')',c);
+}
 test('candidate scouting with unknown bonus carries no numeric result or ready checks; known arithmetic is unchanged',()=>{
  const raw={status:'ready',available:true,score:49.458745,coef:1,checks:[{safe:49,status:'ready',score:49.458745}]};
  let match='manual';const c={hdFEScouting:()=>raw,hdFEGameMatch:()=>({status:match}),hdFERouteContract:()=>({checks:[{condition:{kind:'scoutingValue'}}]}),hdFEBranchRoute:()=>({checks:[]})},verify=load('fleet-readiness-evaluator.js','hdFEPlanScouting',c);
@@ -33,7 +49,26 @@ test('calculator inherits the manual route check until explicit editing; edited 
 });
 
 test('equal-score scouting guidance uses known synchronized gear distance without inventing a LOS result',()=>{
- let match={fleetMatch:true,unknown:0,gearMismatch:3};const distance=load('owned-equipment-planner.js','hdOCScoutingDistance',{hdFEGameMatch:()=>match}),measure={goals:[{kind:'los-value',count:null,unresolved:true}]};
- assert.equal(distance({},measure),3);match.gearMismatch=1;assert.equal(distance({},measure),1);assert.equal(measure.goals[0].count,null);
- match.unknown=1;assert.equal(distance({},measure),null);match.unknown=0;match.fleetMatch=false;assert.equal(distance({},measure),null);assert.equal(distance({},{goals:[{kind:'los-value',count:49,ok:true}]}),null);
+ let match={fleetMatch:true,unknown:0,gearMismatch:3};const f=observedFixture(),plan=f.plan,distance=load('owned-equipment-planner.js','hdOCScoutingDistance',{hdFERoster:()=>f.rows,hdFEGameMatch:()=>match}),measure={goals:[{kind:'los-value',count:null,unresolved:true}]};
+ assert.equal(distance(plan,measure),3);match.gearMismatch=1;assert.equal(distance(plan,measure),1);assert.equal(measure.goals[0].count,null);
+ match.unknown=1;assert.equal(distance(plan,measure),null);match.unknown=0;match.fleetMatch=false;assert.equal(distance(plan,measure),null);assert.equal(distance(plan,{goals:[{kind:'los-value',count:49,ok:true}]}),null);
+});
+
+test('distance requires this individual and remodel plus complete observed slots even when the general matcher falls back',()=>{
+ const mutations={known:()=>{},unrelatedNull:f=>f.rows.push(null),noFleet:f=>f.fleets.splice(0),missingRow:f=>f.rows.splice(0,1),otherIndividual:f=>f.plan.ships[0].gameShipId=19600,otherForm:f=>{f.plan.ships[0].ship='扶桑改';f.plan.ships[0].masterId=77;},partialSlots:f=>f.rows[0].gameGearSlots.splice(2),missingExpansion:f=>delete f.rows[0].gameGearExpansion,duplicateRoster:f=>f.rows.push({...f.rows[0]}),duplicateIndividual:f=>f.plan.ships[1].gameShipId=f.plan.ships[0].gameShipId};
+ for(const [name,mutate] of Object.entries(mutations)){
+  const f=observedFixture();mutate(f);const measure={goals:[{kind:'los-value',count:null,ok:false,unresolved:true}],requiredChecks:[{status:'manual',ok:false}],score:0};
+  const before=JSON.stringify({plan:f.plan,rows:f.rows,fleets:f.fleets,measure}),distance=load('owned-equipment-planner.js','hdOCScoutingDistance',f.c),match=f.c.hdFEGameMatch(f.plan);
+  assert.notEqual(match.status,'ready');assert.equal(distance(f.plan,measure),['known','unrelatedNull'].includes(name)?1:null,name);
+  assert.equal(JSON.stringify({plan:f.plan,rows:f.rows,fleets:f.fleets,measure}),before,name);
+ }
+});
+test('beam distance cannot reverse different scores or the confirmed-condition regression priority',()=>{
+ // Scores below are comparator tokens, not LOS values. This executes the actual sort expression.
+ const drum={kind:'drum-ships',label:'two hulls',purpose:'route',ok:true},los={kind:'los-value',count:null,ok:false,unresolved:true},compare=beamComparator({measure:{goals:[drum],requiredChecks:[]}});
+ const row=(score,distance,ok=true)=>({measure:{goals:[{...drum,ok},{...los}],requiredChecks:[],score},scoutingDistance:distance});
+ const better=row(1.0000000001,5),closer=row(1,0),snapshot=JSON.stringify([better,closer]);
+ assert.ok(compare(better,closer)<0);assert.ok(compare(closer,better)>0);assert.equal(JSON.stringify([better,closer]),snapshot);
+ assert.ok(compare(row(999,0,false),row(1,5))>0);
+ assert.ok(compare(row(1,3),row(1,1))>0);assert.equal(compare(row(1,null),row(1,3)),0);assert.equal(compare(row(1,3),row(1,null)),0);
 });

@@ -171,6 +171,16 @@ function hdOCShortageGoals(measure){return measure.goals.filter(x=>!x.ok&&!['rou
 // treating its unknown bonus as a numeric LOS value or an achieved target.
 function hdOCScoutingDistance(plan,measure){
  if(!measure.goals.some(g=>g.kind==='los-value'&&g.unresolved))return null;
+ // The general matcher can fall back to another roster entry. That is not
+ // evidence for this individual or remodel, nor for unobserved empty slots.
+ const ships=(plan?.ships||[]).filter(s=>s?.ship),rows=hdFERoster();
+ if(!ships.length||!Array.isArray(rows)||new Set(ships.map(s=>Number(s.gameShipId))).size!==ships.length)return null;
+ for(const ship of ships){
+  const gameId=Number(ship.gameShipId),masterId=Number(ship.masterId);
+  if(!Number.isInteger(gameId)||gameId<=0||!Number.isInteger(masterId)||masterId<=0)return null;
+  const matches=rows.filter(r=>Number(r?.gameShipId)===gameId),row=matches.length===1?matches[0]:null;
+  if(!row||Number(row.masterId)!==masterId||String(row.name||'').trim()!==String(ship.ship).trim()||!Array.isArray(ship.items)||!Array.isArray(row.gameGearSlots)||row.gameGearSlots.length!==ship.items.length||Array.from(row.gameGearSlots).some(x=>typeof x!=='string')||typeof row.gameGearExpansion!=='string')return null;
+ }
  const match=hdFEGameMatch(plan);return match.fleetMatch&&!match.unknown?match.gearMismatch:null;
 }
 function hdOCKey(plan){return JSON.stringify(plan.ships.map(s=>[(s.items||[]).map(x=>hdFOStackKey(x)),hdFOStackKey(s.expansion)]))}
