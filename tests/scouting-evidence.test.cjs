@@ -12,10 +12,35 @@ function aswTargetContext(){
  const types={'夕立改二':'駆逐艦','時雨改二':'駆逐艦','綾波改二':'駆逐艦','島風改':'駆逐艦','占守改':'海防艦','扶桑改':'航空戦艦','阿武隈改二':'軽巡洋艦'},stored={};
  const c={window:{},HD_OC_ASW_TARGET_KEY:'harbordesk-opening-asw-targets-v1',localStorage:{getItem:key=>key==='harbordesk-opening-asw-targets-v1'?JSON.stringify(stored):null},hdSEChecks:()=>({rows:[{kind:'cap-asw'}]}),hdFEFindShip:name=>types[name]?{type:types[name]}:null,HD_MAP_ADVANCED_DATA:{'7-1':{openingAsw:{recommended:4,upper:5,source:'https://zekamashi.net/kancolle-kouryaku/7-1/'}}}};
  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../map-plans.js'),'utf8')+';this.plans=MAP_PLANS',c);
- for(const name of ['hdOCOaswTargets','hdOCOaswRecommendation','hdOCOaswTarget'])if(fs.readFileSync(path.join(__dirname,'../owned-equipment-planner.js'),'utf8').includes('function '+name+'('))load('owned-equipment-planner.js',name,c);
+ for(const name of ['hdOCOaswTargets','hdOCOaswKey','hdOCOaswFleetGoal','hdOCOaswChoice','hdOCOaswRecommendation','hdOCOaswTarget'])if(fs.readFileSync(path.join(__dirname,'../owned-equipment-planner.js'),'utf8').includes('function '+name+'('))load('owned-equipment-planner.js',name,c);
  const context=(map,index,names)=>({map,index,preset:c.plans[map].presets[index],fleet:{id:'target-fixture',ships:names.map(ship=>({ship}))}});
  return {c,stored,context};
 }
+
+test('remaining registered ASW routes choose a target instead of an unsupported default one',()=>{
+ const {c,context}=aswTargetContext(),routes=[["1-6", 0], ["4-1", 0], ["4-2", 0], ["4-2", 1], ["4-3", 0], ["4-4", 0], ["4-5", 0], ["4-5", 1], ["4-5", 2], ["5-5", 1], ["5-6", 0], ["5-6", 1], ["5-6", 2], ["6-3", 0], ["7-2", 1], ["7-4", 0], ["7-5", 0], ["7-5", 1], ["7-5", 2]];
+ assert.equal(routes.length,19);
+ for(const [map,index] of routes){const x=context(map,index,[]);assert.equal(c.hdOCOaswTarget(x),undefined,map+':'+index);assert.equal(c.hdOCOaswRecommendation(x).choose,true);assert.equal(c.hdOCOaswRecommendation(x).recommended,undefined);}
+});
+test('saved ASW counts belong to their documented route while user choices and unscoped legacy values are preserved',()=>{
+ const {c,stored,context}=aswTargetContext(),x=context('4-2',0,[]);x.fleet.routePreset=c.plans['4-2'].presets[0];x.fleet.openingAswCount=2;
+ const before=JSON.stringify(x.fleet);assert.equal(c.hdOCOaswTarget(x),2);
+ x.index=1;x.preset=c.plans['4-2'].presets[1];assert.equal(c.hdOCOaswTarget(x),undefined);assert.equal(JSON.stringify(x.fleet),before);
+ stored['4-2:target-fixture:1']=3;assert.equal(c.hdOCOaswTarget(x),3);stored['4-2:target-fixture:1']=0;assert.equal(c.hdOCOaswTarget(x),0);
+ x.index=0;x.preset=c.plans['4-2'].presets[0];assert.equal(c.hdOCOaswTarget(x),2);
+ const other=context('1-6',0,[]);assert.equal(c.hdOCOaswTarget(other),undefined);
+ delete x.fleet.routePreset;assert.equal(c.hdOCOaswTarget(x),2);assert.equal(c.hdOCOaswChoice(x).kind,'legacy');
+});
+test('saving a different route preserves its scoped legacy goal without overwriting choices or reconstructing unreadable data',()=>{
+ const {c,context}=aswTargetContext(),x=context('4-2',1,[]);x.fleet.routePreset=c.plans['4-2'].presets[0];x.fleet.openingAswCount=2;
+ let raw=JSON.stringify({'elsewhere:other:0':7,'4-2:target-fixture:1':3}),fault='',writes=[];
+ c.localStorage={getItem:()=>{if(fault==='throw')throw Error('read fault');return fault==='null'?null:fault==='json'?'{':raw},setItem:(key,value)=>{if(fault==='write')throw Error('write fault');writes.push({key,value});raw=value}};
+ const preserve=load('owned-equipment-planner.js','hdOCOaswPreserveFleetGoal',c),originalFleet=JSON.stringify(x.fleet);
+ preserve(x);assert.equal(writes.length,1);assert.deepEqual(JSON.parse(raw),{'elsewhere:other:0':7,'4-2:target-fixture:1':3,'4-2:target-fixture:0':2});assert.equal(JSON.stringify(x.fleet),originalFleet);
+ preserve(x);assert.equal(writes.length,1);raw=JSON.stringify({'4-2:target-fixture:0':0});preserve(x);assert.equal(writes.length,1);
+ Object.defineProperty(c.localStorage,c.HD_OC_ASW_TARGET_KEY,{value:'existence only',configurable:true});
+ for(const mode of ['throw','null','json','write']){raw='{}';fault=mode;const n=writes.length;assert.throws(()=>preserve(x));assert.equal(writes.length,n);assert.equal(raw,'{}');assert.equal(JSON.stringify(x.fleet),originalFleet);}
+});
 test('source-scoped ASW defaults use four destroyers without borrowing a count from another fleet or gauge',()=>{
  const {c,context}=aswTargetContext(),dd=['夕立改二','時雨改二','綾波改二','島風改'];
  assert.equal(c.hdOCOaswTarget(context('1-5',2,dd)),4);

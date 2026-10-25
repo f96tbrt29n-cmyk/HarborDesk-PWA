@@ -962,11 +962,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "D",
@@ -2972,11 +2975,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "B",
@@ -3084,11 +3090,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "B",
@@ -3169,11 +3178,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "B",
@@ -3294,11 +3306,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "B",
@@ -3421,11 +3436,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "B",
@@ -3517,11 +3535,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "B",
@@ -3628,11 +3649,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "B",
@@ -3723,11 +3747,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "B",
@@ -4424,11 +4451,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "B",
@@ -4528,11 +4558,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "C",
@@ -4662,11 +4695,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "C",
@@ -4782,11 +4818,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "C",
@@ -5152,11 +5191,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "D",
@@ -5875,11 +5917,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "B",
@@ -6241,11 +6286,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "B",
@@ -6376,11 +6424,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "B",
@@ -6512,11 +6563,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "B",
@@ -6646,11 +6700,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "人数未指定から利用者が設定。対潜装備セット目標は維持。未指定・明示0・保存済み人数・出典付き推奨を区別。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-remaining-targets-ja.md",
+            "tests/scouting-evidence.test.cjs: remaining registered ASW routes",
+            "tests/owned-oasw-integration.spec.js: remaining ASW goals / route-scoped ASW goals (代表のみ)"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "このルート・編成例に採用できる人数根拠は既存資料では未確認。人数選択への接続は、十分な人数の証明ではない。"
         },
         "制空": {
           "class": "B",

@@ -46,6 +46,36 @@ async function aswRouteSaveReload(page,map,index,evidence){
  evidence.saved=saved;expect(saved.complete).toBe(true);expect(saved.exact).toBe(true);expect(saved.other).toBe(true);expect(saved.ids).toEqual(before.ids);expect(saved.fleetMetadata).toEqual({keep:true});expect(saved.shipMetadata).toEqual(before.ids.map((_,i)=>({keep:'route-asw-'+i})));expect(saved.otherGoal).toBe(6);return saved;
 }
 async function finishAswRoute(info,evidence,errors){evidence.pageerrors=errors;const file=info.outputPath('route-guidance-evidence.json');await fs.promises.writeFile(file,JSON.stringify(evidence,null,2));await info.attach('route-guidance-evidence',{path:file,contentType:'application/json'});}
+guidanceTest('remaining ASW goals stay unselected or explicit zero while equipment sets still search and save',async({page},info)=>{
+ const evidence={scope:'19 registered routes: connection-only table; real 1-6 CL1 DD5 operations, no claim of a sufficient OASW count',stages:[]},errors=[];page.on('pageerror',e=>errors.push(e.message));
+ try{
+  await aswRouteFleet(page,'1-6',0,['阿武隈改二','夕立改二','時雨改二','綾波改二','島風改','雪風改']);
+  const audit=JSON.parse(fs.readFileSync(path.join(__dirname,'../docs/route-goal-guidance-audit.json'),'utf8')),rows=audit.rows.filter(x=>x.guidanceAudit['先制対潜'].class==='C'&&x.map!=='1-5'&&x.id!=='7-2/0/default');
+  evidence.connections=await page.evaluate(rows=>rows.map(({id,map,index})=>{const preset=MAP_PLANS[map].presets[index],c={map,index,preset,fleet:{id:'connection-only',ships:[]}},value=hdOCOaswTarget(c),plan={map,preset,routeIndex:index,ships:[]};return {id,map,index,selected:value!=null,target:value??null,choose:hdOCOaswRecommendation(c)?.choose,sets:hdFEEquipmentRequirements(plan,hdSEChecks(map).rows).filter(x=>x.kind==='cap-asw').map(x=>x.minCount)}}),rows);
+  expect(evidence.connections).toHaveLength(19);for(const x of evidence.connections){expect(x.selected,x.id).toBe(false);expect(x.target,x.id).toBe(null);expect(x.choose,x.id).toBe(true);expect(x.sets,x.id).toEqual([x.map==='7-4'?3:1]);}
+  const panel=page.locator('#mapStrategyNavigator .hd-oc-panel'),input=panel.locator('[data-hd-oc-asw-target]');await expect(input).toHaveValue('');await expect(panel.locator('[data-hd-oc-asw-source]')).toContainText('人数を指定');
+  await panel.locator('[data-hd-oc-search]').click();const unspecified=await aswRouteRecord(page,'1-6',0);evidence.stages.push(unspecified);expect(unspecified.goal).toMatchObject({minCount:null,count:null,unresolved:true,ok:false});expect(unspecified.sets).toMatchObject({minCount:1,ok:true});expect(unspecified.shortages.some(x=>x.kind==='opening-asw')).toBe(false);expect(unspecified.route).toBe('ready');
+  await input.fill('0');await input.press('Tab');await expect(panel.locator('[data-hd-oc-asw-source]')).toContainText('明示0');await panel.locator('[data-hd-oc-search]').click();const zero=await aswRouteRecord(page,'1-6',0);evidence.stages.push(zero);expect(zero.goal).toBeUndefined();expect(zero.sets).toMatchObject({minCount:1,ok:true});expect(zero.shortages.some(x=>x.kind==='opening-asw')).toBe(false);
+  for(const count of Object.values(zero.usage))expect(count).toBeLessThanOrEqual(6);
+  const saved=await aswRouteSaveReload(page,'1-6',0,evidence);expect(saved.goal).toBe(0);expect(saved.stored).toBe(0);await expect(input).toHaveValue('0');await page.evaluate(()=>{window.dispatchEvent(new CustomEvent('hd:kancolle-sync',{detail:{synthetic:true}}));hdMSNOpen('1-6')});await expect(input).toHaveValue('0');expect(errors).toEqual([]);
+ }finally{await finishAswRoute(info,evidence,errors)}
+});
+guidanceTest('route-scoped ASW goals preserve legacy counts through preset map switches and save reload',async({page},info)=>{
+ const evidence={scope:'4-2 scope isolation; route1 preview/save is deliberately not a claim of route legality; positive route0 final search uses real CV2 CL1 DD3',stages:[]},errors=[];page.on('pageerror',e=>errors.push(e.message));
+ try{
+  await aswRouteFleet(page,'4-2',0,['赤城改','加賀改','阿武隈改二','夕立改二','時雨改二','綾波改二']);
+  await page.evaluate(()=>{const all=loadCustomFleets();all['4-2'][0].openingAswCount=2;all['1-6']=[{id:'route-asw',name:'設定切替専用・空編成',metadata:{keep:true},ships:[],routePreset:MAP_PLANS['1-6'].presets[0]}];saveCustomFleets(all);hdMSNOpen('4-2')});
+  const panel=page.locator('#mapStrategyNavigator .hd-oc-panel'),input=panel.locator('[data-hd-oc-asw-target]'),route=page.locator('#hdMapStrategyRoute'),map=page.locator('#hdMapStrategyMap');await expect(input).toHaveValue('2');
+  await route.selectOption('1');await expect(route).toHaveValue('1');evidence.afterRouteSwitch=await input.inputValue();await expect(input).toHaveValue('');
+  expect(await page.evaluate(()=>loadCustomFleets()['4-2'][0].openingAswCount)).toBe(2);
+  await panel.locator('[data-hd-oc-search]').click();const preview=await aswRouteRecord(page,'4-2',1);evidence.stages.push(preview);expect(preview.goal).toMatchObject({minCount:null,unresolved:true,ok:false});
+  const unselected=await aswRouteSaveReload(page,'4-2',1,evidence);evidence.unselectedSave=unselected;expect(unselected.goal).toBeUndefined();expect(unselected.stored).toBeUndefined();expect(await page.evaluate(()=>hdOCOaswTargets()['4-2:route-asw:0'])).toBe(2);
+  const otherBefore=await page.evaluate(()=>JSON.stringify(loadCustomFleets()['1-6']));await map.selectOption('1-6');await expect(input).toHaveValue('');await input.fill('5');await input.press('Tab');await map.selectOption('4-2');await expect(input).toHaveValue('');await route.selectOption('0');await expect(input).toHaveValue('2');
+  await input.fill('3');await input.press('Tab');await page.evaluate(()=>{window.dispatchEvent(new CustomEvent('hd:kancolle-sync',{detail:{synthetic:true}}));hdMSNOpen('4-2')});await expect(input).toHaveValue('3');
+  await panel.locator('[data-hd-oc-search]').click();const result=await aswRouteRecord(page,'4-2',0);evidence.stages.push(result);expect(result.goal.minCount).toBe(3);expect(result.goal.count).toBeGreaterThanOrEqual(3);expect(result.goal.ok).toBe(true);expect(result.sets).toMatchObject({minCount:1,ok:true});expect(result.route).toBe('ready');for(const count of Object.values(result.usage))expect(count).toBeLessThanOrEqual(6);
+  const saved=await aswRouteSaveReload(page,'4-2',0,evidence);expect(saved.goal).toBe(3);expect(saved.stored).toBe(3);expect(await page.evaluate(()=>hdOCOaswTargets()['1-6:route-asw:0'])).toBe(5);expect(await page.evaluate(()=>JSON.stringify(loadCustomFleets()['1-6']))).toBe(otherBefore);expect(errors).toEqual([]);
+ }finally{await finishAswRoute(info,evidence,errors)}
+});
 guidanceTest('source-backed destroyer ASW target drives real owned search and keeps user override',async({page},info)=>{
  const evidence={scope:'real 1-5 preset2 destroyer4; source example target, not passage necessity; synthetic observed stats',stages:[]},errors=[];page.on('pageerror',e=>errors.push(e.message));
  try{

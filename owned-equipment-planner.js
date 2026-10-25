@@ -10,22 +10,46 @@ function hdOCRouteGoal(c){
 }
 function hdOCRouteGoalHtml(c,attrs){const goals=MAP_PLANS[c.map]?.routeBranches?.goals;if(!goals)return '';const current=hdOCRouteGoal(c),known=typeof current==='string'&&Object.prototype.hasOwnProperty.call(goals,current);return `<label>ルート目標<select data-hd-oc-route-goal ${attrs}>${known?'':`<option value="${hdFEEsc(current)}" selected>未登録の目標・選び直してください</option>`}${Object.entries(goals).map(([id,g])=>`<option value="${hdFEEsc(id)}" ${current===id?'selected':''}>${hdFEEsc(g.label)}</option>`).join('')}</select></label><small>経由がランダムでも、全候補が登録した目標経路に入るか検証します。戦闘勝利は保証しません。</small>`}
 function hdOCOaswTargets(){try{return JSON.parse(localStorage.getItem(HD_OC_ASW_TARGET_KEY)||'{}')||{}}catch{return {}}}
+function hdOCOaswKey(c,index=c.index??0){return `${c.map}:${c.fleet?.id||''}:${index}`}
+function hdOCOaswFleetGoal(c){
+ const value=c.fleet?.openingAswCount;if(value==null)return null;
+ if(!c.fleet.routePreset)return {value,kind:'legacy'};
+ const saved=hdMapPresetRequirements(c.map,c.fleet.routePreset),current=hdMapPresetRequirements(c.map,c.preset);
+ return saved&&current&&saved.index===current.index?{value,kind:'saved'}:null;
+}
+function hdOCOaswChoice(c){
+ const value=hdOCOaswTargets()[hdOCOaswKey(c)];
+ return value!=null?{value,kind:'user'}:hdOCOaswFleetGoal(c)??(c.preset?.openingAswCount!=null?{value:c.preset.openingAswCount,kind:'preset'}:{value:undefined,kind:'none'});
+}
+function hdOCOaswPreserveFleetGoal(c){
+ const value=c.fleet?.openingAswCount,saved=c.fleet?.routePreset&&hdMapPresetRequirements(c.map,c.fleet.routePreset);
+ if(value==null||!saved||saved.index===c.index)return;
+ // A deliberate save of a different route must retain the old scoped goal.
+ // Reuse the existing goal map; never reconstruct it after a failed read.
+ const raw=localStorage.getItem(HD_OC_ASW_TARGET_KEY);
+ if(raw===null&&Object.prototype.hasOwnProperty.call(localStorage,HD_OC_ASW_TARGET_KEY))throw Error('人数目標の保存値を読み取れません');
+ const targets=raw===null?{}:JSON.parse(raw);
+ if(!targets||typeof targets!=='object'||Array.isArray(targets))throw Error('人数目標の保存形式を確認できません');
+ const key=hdOCOaswKey(c,saved.index);if(targets[key]!=null)return;
+ localStorage.setItem(HD_OC_ASW_TARGET_KEY,JSON.stringify({...targets,[key]:value}));
+}
 function hdOCOaswRecommendation(c){
  const route=typeof hdMapPresetRequirements==='function'?hdMapPresetRequirements(c.map,c.preset||c.fleet?.routePreset):null;
- const r=route?.openingAsw;if(!r)return typeof HD_MAP_ADVANCED_DATA!=='undefined'?HD_MAP_ADVANCED_DATA[c.map]?.openingAsw:null;
+ const r=route?.openingAsw||(typeof HD_MAP_ADVANCED_DATA!=='undefined'?HD_MAP_ADVANCED_DATA[c.map]?.openingAsw:null);
+ if(!r){const needs=route&&(!route.equipmentKinds||route.equipmentKinds.includes('対潜'))&&hdSEChecks(c.map).rows.some(x=>['対潜','cap-asw'].includes(x.kind));return needs?{choose:true,note:'このルート・編成例に適用できる先制対潜人数の根拠は未登録です。「先制対潜艦の配備目標」で人数を指定してください。対潜装備セットの推奨目標は別に維持します。'}:null;}
  if(r.shipTypes){const ships=c.fleet?.ships||[];if(ships.length!==r.fleetSize||ships.some(s=>!r.shipTypes.includes(hdFEFindShip(s.ship)?.type)))return {...r,recommended:undefined,note:r.note+' この配備は対象編成と異なるため、人数を指定してください。'};}
  return r;
 }
 function hdOCOaswTarget(c){
- const stored=hdOCOaswTargets()[`${c.map}:${c.fleet?.id||''}:${c.index??0}`],specified=c.fleet?.openingAswCount??c.preset?.openingAswCount;
+ const specified=hdOCOaswChoice(c).value;
  const route=typeof hdMapPresetRequirements==='function'?hdMapPresetRequirements(c.map,c.preset):null,needs=(!route?.equipmentKinds||route.equipmentKinds.includes('対潜'))&&hdSEChecks(c.map).rows.some(x=>['対潜','cap-asw'].includes(x.kind));
- const recommendation=hdOCOaswRecommendation(c),value=stored??specified??recommendation?.recommended??(recommendation?.choose?undefined:needs?1:0);
+ const recommendation=hdOCOaswRecommendation(c),value=specified??recommendation?.recommended??(recommendation?.choose?undefined:needs?1:0);
  if(value==null&&recommendation?.choose)return undefined;
  return Number.isInteger(Number(value))&&Number(value)>=0&&Number(value)<=7?Number(value):recommendation?.choose?undefined:needs?1:0;
 }
 function hdOCOaswTargetHtml(c,attrs){
- const value=hdOCOaswTarget(c),r=hdOCOaswRecommendation(c),explicit=hdOCOaswTargets()[`${c.map}:${c.fleet?.id||''}:${c.index??0}`]??c.fleet?.openingAswCount??c.preset?.openingAswCount;
- const origin=value==null?'推奨人数が一意に定まらないため未指定です。人数を指定してください（0隻は人数目標を設けない選択）。':explicit!=null?`利用者指定・保存済みの目標 ${value}隻。推奨値で上書きしません。`:r?.recommended!=null?`対象編成向けの攻略推奨 ${r.recommended}${r.upper?'〜'+r.upper:''}隻を初期目標に採用。`:`海域の人数推奨は未登録。${value}隻は仮の初期目標で、十分な人数を保証しません。`;
+ const value=hdOCOaswTarget(c),r=hdOCOaswRecommendation(c),choice=hdOCOaswChoice(c),explicit=choice.value;
+ const origin=value==null?'推奨人数が一意に定まらないため未指定です。人数を指定してください（0隻は人数目標を設けない選択）。':explicit!=null?(value===0?'明示0隻：人数目標を設けない選択です。':choice.kind==='legacy'?`保存済みの目標 ${value}隻（適用ルート未特定の旧保存値）。推測で変更せず保持します。`:`利用者指定・保存済みの目標 ${value}隻。推奨値で上書きしません。`):r?.recommended!=null?`対象編成向けの攻略推奨 ${r.recommended}${r.upper?'〜'+r.upper:''}隻を初期目標に採用。`:`海域の人数推奨は未登録。${value}隻は仮の初期目標で、十分な人数を保証しません。`;
  return `<label>先制対潜艦の配備目標 <input type="number" min="0" max="7" step="1" inputmode="numeric" placeholder="人数を指定" data-hd-oc-asw-target ${attrs} value="${value??''}" ${c.fleet?'':'disabled'}></label><small data-hd-oc-asw-source>${hdFEEsc(origin)}${r?.note?' '+hdFEEsc(r.note):''} 対潜装備セットの組数とは別で、ルート通行の必須条件ではありません。${r?.source?` <a href="${hdFEEsc(r.source)}" target="_blank" rel="noopener noreferrer">人数目標の出典</a>`:''}</small>`;
 }
 function hdOCOaswScope(plan,index){return `owned:${plan.map}:${plan.sourceFleet?.id||plan.index||''}:${index}`}
@@ -651,6 +675,7 @@ document.addEventListener('click',e=>{
  hdOCRevalidateResult(result);
  if(result.plan.preservationIssues?.length){hdToast('未登録の艦娘・装備を含むため、元の保存編成は上書きしません。台帳・マスター情報を確認してね','warn');return}
  const all=loadCustomFleets(),fleet=(all[c.map]||[]).find(x=>String(x.id)===String(c.fleet.id));if(!fleet){hdToast('自分用編成に保存してから反映してね','warn');return}
+ try{hdOCOaswPreserveFleetGoal({...c,fleet})}catch{hdToast('以前の人数目標を保持できなかったので保存を中止しました。配備案は残しているので再試行してね','warn');return}
  let si=0;for(const ship of fleet.ships||[]){if(!String(ship.ship||'').trim()&&!String(ship.gear||'').trim())continue;const row=result.plan.ships[si++];if(!row)continue;if(result.replacements?.some(x=>x.index===si-1)){ship.ship=row.ship;ship.gameShipId=row.gameShipId||0;ship.masterId=row.masterId||0;ship.rosterId=row.rosterId||''}const normal=Array.from({length:Math.max(0,...row.items.map(x=>x.slotIndex+1))},(_,i)=>{const item=row.items.find(x=>x.slotIndex===i);return item?item.name+(item.star?' ★'+item.star:''):''});ship.gear=[...normal,...(row.expansion?[`[増設] ${row.expansion.name}${row.expansion.star?' ★'+row.expansion.star:''}`]:[])].join(' / ')}
  if(c.preset)fleet.routePreset={...c.preset};if(MAP_PLANS[c.map]?.routeBranches?.goals){fleet.routeGoal=result.plan.routeGoal;fleet.routeAssessment={status:hdFERoute(result.plan).status,branch:hdFEBranchRoute(result.plan),at:Date.now()}}fleet.searchAssessment=result.search||result.plan.search||null;fleet.openingAswCount=result.plan.openingAswCount??hdOCOaswTarget(c);if(hdFERouteContract(result.plan))fleet.routeAssessment={status:hdFERoute(result.plan).status,branch:hdFEBranchRoute(result.plan),contract:hdFERouteContract(result.plan),at:Date.now()};
  try{saveCustomFleets(all)}catch{hdToast('保存できなかったよ。配備案は残しているので再試行してね','warn');return}
