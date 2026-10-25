@@ -8,6 +8,33 @@ function load(file,name,context){
  const source=fs.readFileSync(path.join(__dirname,'..',file),'utf8'),start=source.indexOf('function '+name+'('),end=source.indexOf('\nfunction ',start+1);
  vm.runInNewContext(source.slice(start,end<0?undefined:end),context);return context[name];
 }
+test('unconfirmed air targets carry no numeric achievement or equipment deficit; known boundaries remain numeric',()=>{
+ let target={selected:false,known:false,detail:'通るマス未選択'},capacityKnown=1,antiAirKnown=true;
+ const c={
+  hdFEEquipmentRequirements:()=>[],hdFERouteRequirementData:()=>null,hdOCAssigned:()=>[],hdFEAir:()=>({basePower:44,count:1,capacityKnown,rows:[]}),
+  hdMapAirTarget:()=>target,hdMapAirData:()=>({nodes:{}}),hdFEEnemyAirCandidates:()=>[30],
+  hdMapAirThreshold:n=>Math.ceil(n*1.5),hdMapAirRouteLoss:()=>({known:true,stage2Complete:antiAirKnown,stage2Missing:[],minimumRatio:1}),
+  hdMapAirLossBounds:()=>null,HD_MAP_AIR_GOALS:{superiority:'優勢'},
+  hdFEPlanScouting:()=>({available:false,notRequired:true}),hdFEPlanSpeedTarget:()=>0,
+  hdOCOaswMeasure:()=>({minCount:0}),hdFERoute:()=>({status:'ready'}),hdOCRequiredChecks:()=>[],hdFLRows:()=>[],hdSEChecks:()=>({adv:{}})
+ };
+ load('fleet-readiness-evaluator.js','hdFEAirCheck',c);load('owned-equipment-planner.js','hdOCShortageGoals',c);
+ const measure=load('owned-equipment-planner.js','hdOCMeasure',c),sample=()=>measure({map:'numeric-fixture',ships:[]},[]);
+ for(const reason of ['route','capacity','anti-air']){
+  target=reason==='route'?{selected:false,known:false,detail:'通るマス未選択'}:{selected:true,known:true,enemy:30,hasAir:true,goal:'superiority',detail:'合成数値層'};
+  capacityKnown=reason==='capacity'?0:1;antiAirKnown=reason!=='anti-air';
+  const m=sample(),g=m.goals.find(x=>x.kind==='air-value');
+  assert.equal(g.unresolved,true,reason);assert.equal(g.ok,false,reason);assert.equal(g.ratio,0,reason);
+  assert.equal(m.score,0,reason);assert.equal(m.complete,false,reason);assert.equal(c.hdOCShortageGoals(m).length,0,reason);
+ }
+ capacityKnown=1;antiAirKnown=true;
+ for(const [enemy,ready,required] of [[29,true,44],[30,false,45]]){
+  target={selected:true,known:true,enemy,hasAir:true,goal:'superiority',detail:'合成数値層'};
+  const m=sample(),g=m.goals.find(x=>x.kind==='air-value');
+  assert.equal(g.unresolved,false);assert.equal(g.count,44);assert.equal(g.minCount,required);assert.equal(g.ok,ready);
+  assert.equal(c.hdOCShortageGoals(m).length,ready?0:1);
+ }
+});
 // Same six hulls, four slots and observed loadout as route-completion-2-5.
 // No LOS formula or search is used here; one of the existing four open slots is empty.
 function observedFixture(){

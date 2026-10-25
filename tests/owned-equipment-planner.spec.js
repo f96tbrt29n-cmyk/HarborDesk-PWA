@@ -7,6 +7,64 @@ test.use({
   isMobile: true,
   serviceWorkers: 'block'
 });
+const airTargetTest=test.extend({trace:{mode:'on',snapshots:false,screenshots:true,sources:true},video:'on'});
+
+airTargetTest('air target evidence distinguishes unknown and numeric boundaries through save edit and reload',async({page},info)=>{
+ const fs=require('node:fs/promises'),errors=[],evidence={scope:'synthetic air-value layer on a registered 3-3 fleet; no enemy-rule or search completeness claim',stages:[]};
+ try{
+  await boot(page,errors);await page.waitForFunction(()=>typeof hdOCContext==='function');
+  const reference=await page.evaluate(()=>{
+   const names=['赤城改','鳳翔改','摩耶改二','鳥海改二','夕立改二','時雨改二'];
+   const rows=names.map((name,i)=>({id:'air-evidence-'+i,name,masterId:hdShipDbMasterRowFor(name).id,gameShipId:64000+i,level:90,gameSlotEx:0,gear:i===0?'試製烈風 後期型':'',note:'keep roster metadata'}));
+   localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));localStorage.setItem(HD_FL_KEY,JSON.stringify([{name:'試製烈風 後期型',count:1,metadata:{keep:true}}]));
+   localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:120,metadata:{keep:true}}));
+   saveCustomFleets({'3-3':[{id:'air-evidence',name:'制空根拠の確認用',memo:'keep memo',metadata:{keep:true},openingAswCount:0,routePreset:MAP_PLANS['3-3'].presets[0],ships:rows.map(r=>({ship:r.name,rosterId:r.id,gameShipId:r.gameShipId,masterId:r.masterId,gear:r.gear,metadata:{keep:r.id}}))},{id:'air-other',name:'同海域の別編成',ships:[],metadata:{keep:true}}],'1-1':[{id:'other-map',name:'別海域',ships:[],metadata:{keep:true}}]});
+   const keys=[SHIP_ROSTER_KEY,HD_FL_KEY,'harbordesk-kancolle-sync-v1','harbordesk-kancolle-fleets-v1','harbordesk-pwa-v1'];
+   return {keys,values:keys.map(k=>localStorage.getItem(k)),other:JSON.stringify(loadCustomFleets()['3-3'][1]),otherMap:JSON.stringify(loadCustomFleets()['1-1']),identities:JSON.stringify(loadCustomFleets()['3-3'][0].ships.map(({ship,rosterId,gameShipId,masterId,metadata})=>({ship,rosterId,gameShipId,masterId,metadata})))};
+  });
+  // Replay one fixed legal allocation through the real measurement and UI.
+  // Numerical enemies are synthetic; the fleet's real slots/master are unchanged.
+  const replay=async mode=>page.evaluate(mode=>{
+   HD_MAP_AIR_DATA['3-3']={nodes:{X:{label:'合成数値の判別専用',patterns:[{name:'数値層fixture',enemy:'軽巡ツ級elite',air:mode==='ready'?29:30,formations:['単縦陣']}]}}};
+   hdMapAirSave('3-3','X',mode!=='unknown');if(mode!=='unknown')hdMapAirConfirmOrder('3-3');
+   const c=hdOCContext('3-3','air-evidence',0),built=hdOCBuild(c),plan=built.plan;
+   // Match the search result's existing final removal of empty slot placeholders.
+   plan.ships.forEach(s=>{s.items=s.items.filter(x=>x.name)});
+   const measure=hdOCMeasure(plan,hdFLRequirements(plan),built.unknown),goal=measure.goals.find(x=>x.kind==='air-value');
+   HD_OC_CACHE.set('3-3:air-evidence:0',{plan,measure,shortages:[],signature:hdOCSignature(c),fleetId:'air-evidence',examined:0,search:{status:'incomplete',exhaustive:false,examined:0,reasons:['fixed-allocation-replay']}});
+   hdMSNOpen('3-3');
+   return {mode,goal,route:hdFERoute(plan).status,master:hdFEMasterValidation(plan).valid,air:hdFEAirCheck('3-3',hdFEAir(hdFEAssigned(plan)),plan),airDeficits:hdOCShortageGoals(measure).filter(x=>x.kind==='air-value').length,usage:hdFOAssignedUsage(plan)};
+  },mode);
+  const panel=page.locator('#mapStrategyNavigator .hd-oc-panel'),goal=panel.locator('.hd-oc-goal').filter({hasText:'制空優勢の目安'});
+  for(const mode of ['unknown','ready','missing']){
+   const row=await replay(mode);evidence.stages.push(row);await goal.scrollIntoViewIfNeeded();
+   expect(row.master).toBe(true);expect(row.route).toBe('ready');expect(row.goal.count).toBe(44);
+   if(mode==='unknown'){
+    await expect(goal).toContainText('未判定');await expect(goal).toHaveClass(/manual/);
+    expect(row.air.reason).toBe('route');expect(row.goal).toMatchObject({ok:false,unresolved:true,ratio:0});expect(row.airDeficits).toBe(0);
+   }else{
+    expect(row.goal.minCount).toBe(mode==='ready'?44:45);expect(row.goal.unresolved).toBe(false);
+    await expect(goal).toContainText(mode==='ready'?'充足':'不足');expect(row.airDeficits).toBe(mode==='ready'?0:1);
+   }
+  }
+  evidence.stages.push(await replay('unknown'));
+  await panel.locator('[data-hd-oc-apply]').click();
+  await page.locator('#mapStrategyNavigator [data-hd-msn-action="fleet"]').click();
+  await page.locator('#customFleetPanel [data-cf-id="air-evidence"] [data-cf-edit]').click();
+  await expect(page.locator('#customFleetDialog')).toBeVisible();
+  await page.locator('#customFleetMemo').fill('keep memo / edited');await page.locator('#customFleetDialog button[value="default"]').click();
+  const preserved=await page.evaluate(reference=>{
+   const all=loadCustomFleets(),f=all['3-3'][0],plan=hdFEPlanFromSavedFleet('3-3',f);return {sources:reference.keys.map((k,i)=>({key:k,exact:localStorage.getItem(k)===reference.values[i]})),identitiesExact:JSON.stringify(f.ships.map(({ship,rosterId,gameShipId,masterId,metadata})=>({ship,rosterId,gameShipId,masterId,metadata})))===reference.identities,metadata:f.metadata.keep,memo:f.memo,other:JSON.stringify(all['3-3'][1])===reference.other,otherMap:JSON.stringify(all['1-1'])===reference.otherMap,assigned:plan.ships.flatMap((s,si)=>s.items.filter(x=>x.name).map(x=>({shipIndex:si,slot:x.slotIndex,name:x.name,star:x.star||0})))};
+  },reference);evidence.preserved=preserved;
+  expect(preserved.sources.every(x=>x.exact)).toBe(true);expect(preserved.metadata).toBe(true);expect(preserved.other).toBe(true);expect(preserved.otherMap).toBe(true);expect(preserved.identitiesExact).toBe(true);expect(preserved.memo).toBe('keep memo / edited');expect(preserved.assigned).toEqual([{shipIndex:0,slot:0,name:'試製烈風 後期型',star:0}]);
+  await page.reload({waitUntil:'load'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCContext==='function');
+  evidence.stages.push(await replay('unknown'));await expect(goal).toContainText('未判定');
+  const after=await page.evaluate(()=>({readyState:document.readyState,assessment:loadCustomFleets()['3-3'][0].routeAssessment,memo:loadCustomFleets()['3-3'][0].memo}));
+  evidence.after={readyState:after.readyState,memo:after.memo};expect(after.readyState).toBe('complete');expect(after.memo).toBe('keep memo / edited');expect(errors).toEqual([]);
+ }finally{
+  evidence.errors=errors;const path=info.outputPath('air-target-evidence.json');await fs.writeFile(path,JSON.stringify(evidence,null,2));await info.attach('air-target-evidence',{path,contentType:'application/json'});
+ }
+});
 
 async function boot(page, errors = []) {
   page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
@@ -75,7 +133,11 @@ test('owned equipment search can build a turbine and boiler combination and repo
 
 test('owned equipment search reports quantitative air shortfall and missing scouting data separately',async({page})=>{
  await prepare(page,[{name:'試製烈風 後期型',count:1,star:0}],[{kind:'制空',label:'制空装備',minCount:1}]);
- const r=await page.evaluate(()=>{const all=loadCustomFleets();all['1-1'][0].ships=[{ship:'赤城改',gear:''}];saveCustomFleets(all);HD_MAP_ROUTE_REQUIREMENTS['1-1'][0].airNotRequired=false;HD_MAP_ROUTE_REQUIREMENTS['1-1'][0].los={kind:'required',coef:3,checks:[{safe:1}]};hdFEEnemyAirCandidates=()=>[100];return hdOCSearch(hdOCContext('1-1','oc-test',0))});
+  const r=await page.evaluate(()=>{const all=loadCustomFleets();all['1-1'][0].ships=[{ship:'赤城改',gear:''}];saveCustomFleets(all);HD_MAP_ROUTE_REQUIREMENTS['1-1'][0].airNotRequired=false;HD_MAP_ROUTE_REQUIREMENTS['1-1'][0].los={kind:'required',coef:3,checks:[{safe:1}]};hdFEEnemyAirCandidates=()=>[100];
+   // Numerical fixture only: select the synthetic enemy before claiming a
+   // quantitative deficit. This is not an added real 1-1 air/LOS requirement.
+   HD_MAP_AIR_DATA['1-1']={nodes:{A:{label:'数値層fixture',patterns:[{name:'数値層fixture',enemy:'軽巡ツ級elite',air:100,formations:['単縦陣']}]}}};hdMapAirSave('1-1','A',true);hdMapAirConfirmOrder('1-1');
+   return hdOCSearch(hdOCContext('1-1','oc-test',0))});
  expect(r.measure.complete).toBeFalsy();const air=r.shortages.find(x=>x.kind==='制空'&&x.label==='制空優勢の目安');expect(air.minCount).toBe(150);expect(air.count).toBeGreaterThan(0);expect(air.shortfall).toBe(150-air.count);expect(await page.evaluate(goal=>hdOCStockGap(goal),air)).toBe(0);expect(r.measure.manual.some(x=>x.startsWith('索敵：'))).toBeTruthy();
 });
 
