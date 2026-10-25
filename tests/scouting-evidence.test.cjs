@@ -70,6 +70,15 @@ test('unknown numeric goals are not converted to equipment deficits; measured de
  const select=load('owned-equipment-planner.js','hdOCShortageGoals',{}),unknown={kind:'los-value',count:null,minCount:49,ok:false,unresolved:true},missing={kind:'los-value',count:48,minCount:49,ok:false},ready={kind:'los-value',count:50,minCount:49,ok:true};
  const rows=Array.from(select({goals:[unknown,missing,ready,{kind:'air-value',ok:false,unresolved:true},{kind:'drum-ships',ok:false}]}));assert.equal(rows.length,2);assert.equal(rows[0],missing);assert.equal(rows[1].kind,'drum-ships');assert.equal(unknown.count,null);
 });
+test('unresolved ASW speed and capability goals cannot become confirmed shortages or procurement quantities',()=>{
+ const select=load('owned-equipment-planner.js','hdOCShortageGoals',{}),gap=load('owned-equipment-planner.js','hdOCStockGap',{});
+ const unknown=['opening-asw','speed-ship','drum-ships','radar-ships','cap-night-auto'].map(kind=>({kind,goalKind:kind,minCount:4,count:0,owned:0,usableOwned:0,ok:false,unresolved:true}));
+ assert.equal(select({goals:unknown}).length,0);
+ for(const g of unknown)assert.equal(gap(g),0,g.kind);
+ const known={kind:'drum-ships',minCount:2,count:1,owned:1,usableOwned:1,ok:false};
+ assert.equal(select({goals:[known]})[0],known);assert.equal(gap(known),1);
+ assert.equal(gap({...known,placement:true}),0);
+});
 test('calculator inherits the manual route check until explicit editing; edited arithmetic remains a reference, not a route verdict',()=>{
  const issue=load('fleet-calculator.js','hdFCProposalScoutingIssue',{}),s={proposal:{routeAssessment:{contract:{checks:[{condition:{kind:'scoutingValue'},status:'manual',detail:'bonus unknown'}]}}}};
  assert.equal(issue(s),'bonus unknown');s.proposal.edited=true;assert.equal(issue(s),'');assert.equal(s.proposal.routeAssessment.contract.checks[0].status,'manual');

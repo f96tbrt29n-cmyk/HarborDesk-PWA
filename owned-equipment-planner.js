@@ -165,8 +165,8 @@ function hdOCMeasure(plan,requirements,unknown=[]){
  const score=goals.reduce((s,g)=>s+g.ratio*100+(g.ok?25:0),0)+requiredChecks.reduce((n,c)=>n+(c.ok?10000:Math.max(0,c.ratio||0)*1000),0);
  return {goals,requiredChecks,manual,score,routeStatus:route.status,speedTarget,complete:goals.length>0&&goals.every(x=>x.ok&&!x.unresolved)&&!unknown.length&&air.reason!=='anti-air'&&route.status==='ready'};
 }
-// Unresolved numeric goals are missing evidence, not a proven equipment deficit.
-function hdOCShortageGoals(measure){return measure.goals.filter(x=>!x.ok&&!['route-branches','route-requirements'].includes(x.kind)&&!(['air-value','los-value'].includes(x.kind)&&x.unresolved))}
+// An unresolved goal lacks evidence; it is not a confirmed equipment deficit.
+function hdOCShortageGoals(measure){return measure.goals.filter(x=>!x.ok&&!x.unresolved&&!['route-branches','route-requirements'].includes(x.kind))}
 // Equal-scored intermediate states may approach the observed loadout without
 // treating its unknown bonus as a numeric LOS value or an achieved target.
 function hdOCScoutingDistance(plan,measure){
@@ -315,7 +315,7 @@ function hdOCPlacementHtml(goal){
  else if(!numeric&&goal.compatibleSlots)lines.push(`装備できる同種の手持ちがあと ${Math.max(0,goal.minCount-goal.usableOwned)}個必要。候補の入手後も配備を再確認してね`);
  return `<div class="hd-oc-placement">${lines.map(x=>`<p>${esc(x)}</p>`).join('')}</div>`;
 }
-function hdOCStockGap(goal){return !goal||goal.placement||(goal.kind==='高速化'||['opening-asw','air-value','los-value','speed-ship'].includes(goal.goalKind||goal.kind))?0:Math.max(0,Math.ceil(goal.minCount-(goal.usableOwned??goal.owned)))}
+function hdOCStockGap(goal){return !goal||goal.unresolved||goal.placement||(goal.kind==='高速化'||['opening-asw','air-value','los-value','speed-ship'].includes(goal.goalKind||goal.kind))?0:Math.max(0,Math.ceil(goal.minCount-(goal.usableOwned??goal.owned)))}
 function hdOCCapabilityStockHtml(goal){
  const stock=goal.capability&&goal.stock;if(!stock?.parts?.length)return '';
  const esc=hdFEEsc;

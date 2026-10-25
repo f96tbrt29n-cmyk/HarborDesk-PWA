@@ -1,25 +1,80 @@
 const {test,expect}=require('@playwright/test');
 const fs=require('node:fs'),path=require('node:path');
 test.use({viewport:{width:390,height:844},isMobile:true,hasTouch:true,serviceWorkers:'block'});
+const guidanceTest=test.extend({trace:{mode:'on',snapshots:false,screenshots:true,sources:true},video:'on'});
 async function boot(page){
  await page.route('**/*',r=>['127.0.0.1','localhost'].includes(new URL(r.request().url()).hostname)?r.continue():r.fulfill({status:204,body:''}));
  await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCFindAlternatives==='function');
 }
-async function fleet(page,{count=2,base=50,stock=2}={}){
+async function fleet(page,{count=2,base=50,stock=2,realRoute=false}={}){
  await boot(page);
- await page.evaluate(({count,base,stock})=>{
+ await page.evaluate(({count,base,stock,realRoute})=>{
   const names=['占守改','国後改','択捉改','松輪改'].slice(0,count);
   const rows=names.map((name,i)=>{const master=hdShipDbMasterRowFor(name),profile=hdShipDbSlotProfile(hdFEFindShip(name));return {id:'asw-'+i,name,masterId:master.id,gameShipId:100+i,level:80,gameAsw:base,gameLos:36,gameAswGearKnown:true,gameGearSlots:Array(profile.count).fill(''),gameGearExpansion:'',gameSlotEx:0}});
   localStorage.setItem('harbordesk-ship-roster-v1',JSON.stringify(rows));localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:20}));
   localStorage.setItem('harbordesk-equipment-v1',JSON.stringify([{name:'三式水中探信儀',count:stock,star:0},{name:'三式爆雷投射機',count:stock,star:0}]));
   saveCustomFleets({'1-5':[{id:'oasw-fleet',name:'先制対潜統合',openingAswCount:count,ships:rows.map(r=>({ship:r.name,masterId:r.masterId,gameShipId:r.gameShipId,rosterId:r.id,gear:''}))}]});
-  hdMSNPresets=()=>[{name:'対潜テストルート',ships:'海防艦'+count,openingAswCount:count}];
-  hdSEChecks=()=>({rows:[{kind:'cap-asw',label:'対潜シナジー',minCount:1}],adv:{}});hdFEEnemyAirCandidates=()=>[];
-  HD_MAP_ADVANCED_DATA['1-5']={los:{coef:1,checks:[{safe:1,failBelow:0}]}};
+  if(!realRoute){
+   hdMSNPresets=()=>[{name:'対潜テストルート',ships:'海防艦'+count,openingAswCount:count}];
+   hdSEChecks=()=>({rows:[{kind:'cap-asw',label:'対潜シナジー',minCount:1}],adv:{}});hdFEEnemyAirCandidates=()=>[];
+   HD_MAP_ADVANCED_DATA['1-5']={los:{coef:1,checks:[{safe:1,failBelow:0}]}};
+  }
   hdMSNOpen('1-5');
- },{count,base,stock});
+ },{count,base,stock,realRoute});
 }
+guidanceTest('unknown opening ASW is not a confirmed equipment shortage and survives save reload before recovery',async({page},info)=>{
+ const evidence={scope:'real 1-5 preset0, four synthetic DE individuals; target4 is a user-selected ASW goal, not a new route requirement',stages:[]},errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ try{
+  await fleet(page,{count:4,stock:4,realRoute:true});
+  const audit=JSON.parse(fs.readFileSync(path.join(__dirname,'../docs/route-goal-guidance-audit.json'),'utf8'));
+  evidence.connections=await page.evaluate(rows=>rows.map(({id,map,index,goal})=>{
+   const preset=MAP_PLANS[map].presets[index],sourceFleet={id:'connection-only'},plan={map,preset,sourceFleet,routeIndex:index,routeInfo:hdFSPresetInfo(preset),routeGoal:goal,ships:[]};
+   plan.openingAswCount=hdOCOaswTarget({map,preset,fleet:sourceFleet,index});
+   const requirements=hdFEEquipmentRequirements(plan,hdSEChecks(map).rows),m=hdOCMeasure(plan,requirements),data=hdFERouteRequirementData(plan);
+   return {id,map,index,goal,los:data.los,targets:requirements.map(({kind,minCount,generatedFromMap})=>({kind,minCount,generatedFromMap})),aswTarget:plan.openingAswCount,speedTarget:hdFEPlanSpeedTarget(plan),conditions:m.requiredChecks.map(c=>c.condition),goals:m.goals.map(({kind,minCount,unresolved,purpose})=>({kind,minCount,unresolved,purpose})),targetData:{equipmentTargets:data.equipmentTargets,carrierAttackTarget:data.carrierAttackTarget,waterAttackTarget:data.waterAttackTarget},airOptional:typeof hdSEAirOptional==='function'&&hdSEAirOptional(map)};
+  }),audit.rows);
+  expect(evidence.connections).toHaveLength(59);
+  for(let i=0;i<audit.rows.length;i++){
+   const expected=audit.rows[i],actual=evidence.connections[i];expect(actual.id).toBe(expected.id);expect(actual.los).toEqual(expected.scouting);
+   if(expected.scouting.kind==='required')expect(actual.conditions).toContainEqual({kind:'scoutingValue',min:expected.scouting.checks[0].safe,coef:expected.scouting.coef});
+   for(const c of expected.conditions)if(c.kind==='equipmentShips'&&c.match==='drum')expect(actual.goals).toContainEqual(expect.objectContaining({kind:'drum-ships',minCount:c.min}));
+  }
+  const reference=await page.evaluate(()=>{
+   const rows=hdFERoster();for(const row of rows){delete row.gameAsw;delete row.gameAswBaseline;}
+   localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));
+   const fleets=loadCustomFleets(),f=fleets['1-5'][0];f.routePreset=MAP_PLANS['1-5'].presets[0];f.metadata={keep:true};f.ships.forEach(s=>{s.gear='三式水中探信儀 / 三式爆雷投射機'});
+   fleets['1-1']=[{id:'guidance-other',name:'別編成',ships:[],metadata:{keep:true}}];saveCustomFleets(fleets);hdMSNOpen('1-5');
+   const keys=[SHIP_ROSTER_KEY,HD_FL_KEY,'harbordesk-kancolle-sync-v1','harbordesk-kancolle-fleets-v1','harbordesk-pwa-v1'];
+   return {keys,values:keys.map(k=>localStorage.getItem(k)),other:JSON.stringify(fleets['1-1']),ids:f.ships.map(s=>s.gameShipId)};
+  });
+  const panel=page.locator('#mapStrategyNavigator .hd-oc-panel'),goal=panel.locator('.hd-oc-goal').filter({hasText:'先制対潜艦の目標'});
+  const observe=async label=>{
+   const row=await page.evaluate(()=>{const r=HD_OC_CACHE.get('1-5:oasw-fleet:0');return {goals:r.measure.goals.map(({kind,count,minCount,ok,unresolved,detail,purpose})=>({kind,count,minCount,ok,unresolved,detail,purpose})),shortages:r.shortages.map(({goalKind,unresolved,shortfall})=>({goalKind,unresolved,shortfall})),route:hdFERoute(r.plan).status,readiness:hdOCReadiness(r.plan,r.measure),search:r.search}});
+   evidence.stages.push({label,...row});return row;
+  };
+  await panel.locator('[data-hd-oc-search]').click();await expect(goal).toContainText('未判定');
+  const unknown=await observe('unknown');expect(unknown.goals.find(g=>g.kind==='cap-asw')).toMatchObject({count:4,minCount:4,ok:true});expect(unknown.route).toBe('ready');
+  expect(unknown.goals.find(g=>g.kind==='opening-asw')).toMatchObject({count:0,minCount:4,ok:false,unresolved:true});
+  expect(unknown.shortages.some(g=>g.goalKind==='opening-asw')).toBe(false);
+  await expect(panel.locator('.hd-oc-shortage').filter({hasText:'先制対潜艦の目標に必要なもの'})).toHaveCount(0);
+  await expect(panel.locator('[data-hd-oc-asw-ships]')).toContainText('未判定');
+  await panel.locator('[data-hd-oc-apply]').click();
+  const stored=await page.evaluate(reference=>{const f=loadCustomFleets()['1-5'][0];return {exact:reference.keys.every((k,i)=>localStorage.getItem(k)===reference.values[i]),other:JSON.stringify(loadCustomFleets()['1-1'])===reference.other,ids:f.ships.map(s=>s.gameShipId),metadata:f.metadata}},reference);
+  evidence.saved=stored;expect(stored).toEqual({exact:true,other:true,ids:reference.ids,metadata:{keep:true}});
+  await page.reload({waitUntil:'load'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCSearch==='function');
+  await page.evaluate(()=>hdMSNOpen('1-5'));await panel.locator('[data-hd-oc-search]').click();await expect(goal).toContainText('未判定');
+  await observe('after-load-unknown');
+  const after=await page.evaluate(reference=>({state:document.readyState,exact:reference.keys.every((k,i)=>localStorage.getItem(k)===reference.values[i]),other:JSON.stringify(loadCustomFleets()['1-1'])===reference.other}),reference);
+  evidence.after=after;expect(after).toEqual({state:'complete',exact:true,other:true});
+  await page.evaluate(()=>{const rows=hdFERoster(),f=loadCustomFleets()['1-5'][0];for(const row of rows){const tokens=hdFEGearTokens(f.ships.find(s=>s.gameShipId===row.gameShipId).gear),count=hdShipDbSlotProfile(hdFEFindShip(row.name)).count;row.gameAsw=70;row.gameGearSlots=Array.from({length:count},(_,i)=>tokens[i]||'');row.gameGearExpansion='';row.gameAswGearKnown=true;}localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));hdMSNRender()});
+  await panel.locator('[data-hd-oc-search]').click();await expect(goal).toContainText('充足');
+  const recovered=await observe('synced-value-recovery');expect(recovered.goals.find(g=>g.kind==='opening-asw')).toMatchObject({count:4,minCount:4,ok:true,unresolved:false});expect(errors).toEqual([]);
+ }finally{
+  evidence.pageerrors=errors;const file=info.outputPath('route-guidance-evidence.json');await fs.promises.writeFile(file,JSON.stringify(evidence,null,2));await info.attach('route-guidance-evidence',{path:file,contentType:'application/json'});
+ }
+});
 test('opening ASW search equips two distinct ships from owned stacks and counts real capabilities',async({page})=>{
  await fleet(page);
  const r=await page.evaluate(()=>{const c=hdOCContext('1-5','oasw-fleet',0),result=hdOCSearch(c);return {result,readiness:hdOCReadiness(result.plan,result.measure),stock:[...hdFLInventory().values()],usage:hdFOAssignedUsage(result.plan)}});

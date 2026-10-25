@@ -1,0 +1,6695 @@
+{
+  "baselineHead": "54bcfd2c672bd87570be2dbf5257dd07c1a824db",
+  "scope": "59 registered route/goal rows; data connection checks are not proof of all UI paths or full game conditions",
+  "rows": [
+    {
+      "id": "1-1/0/default",
+      "map": "1-1",
+      "index": 0,
+      "goal": "",
+      "path": "AC",
+      "verification": "verified",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "夜戦"
+      ],
+      "notes": [
+        "ボス分岐はランダム。編成だけで到達確定とは判定しない。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "D",
+          "detail": "当該経路で数値制空目標を一律必須にしない。必要なら敵/戦闘方針を別選択",
+          "evidence": [],
+          "limit": ""
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "登録には夜戦の推奨があるが、この状態の自動セット目標なし",
+          "evidence": [
+            "hdSEProfiles/hdMapEquipNeeds → hdFEEquipmentRequirements"
+          ],
+          "limit": "夜戦一般の推奨とCI必須を同一視しない。通常砲の基本補充とは別。適正セット/人数の根拠・案内接続が不足。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "1-2/0/default",
+      "map": "1-2",
+      "index": 0,
+      "goal": "",
+      "path": "AE",
+      "verification": "partial",
+      "conditions": [
+        {
+          "all": [
+            {
+              "kind": "fleetCount",
+              "min": 4,
+              "max": 5
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐",
+                "海防艦"
+              ],
+              "min": 4,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "any": [
+            {
+              "kind": "minSpeed",
+              "rank": 10
+            },
+            {
+              "all": [
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡"
+                  ],
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐"
+                  ],
+                  "min": 4,
+                  "max": 4
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡"
+                  ],
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐",
+                    "海防艦"
+                  ],
+                  "min": 4,
+                  "max": 4
+                },
+                {
+                  "kind": "unverified",
+                  "reason": "低速の軽巡＋海防混在編成は資料の記述が一致しないため未判定"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "夜戦"
+      ],
+      "notes": [],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "B",
+          "detail": "高速統一 OR 軽巡1＋駆逐4等の確認済み代替条件（成立時は高速化不要）",
+          "evidence": [
+            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+          ],
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "D",
+          "detail": "当該経路で数値制空目標を一律必須にしない。必要なら敵/戦闘方針を別選択",
+          "evidence": [],
+          "limit": ""
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "登録には夜戦の推奨があるが、この状態の自動セット目標なし",
+          "evidence": [
+            "hdSEProfiles/hdMapEquipNeeds → hdFEEquipmentRequirements"
+          ],
+          "limit": "夜戦一般の推奨とCI必須を同一視しない。通常砲の基本補充とは別。適正セット/人数の根拠・案内接続が不足。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "1-3/0/normal",
+      "map": "1-3",
+      "index": 0,
+      "goal": "normal",
+      "path": "CFJ / A(DB)EFJ",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母",
+            "軽巡",
+            "駆逐"
+          ],
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐"
+          ],
+          "min": 4,
+          "max": 6
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "夜戦"
+      ],
+      "notes": [
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "D",
+          "detail": "当該経路で数値制空目標を一律必須にしない。必要なら敵/戦闘方針を別選択",
+          "evidence": [],
+          "limit": ""
+        },
+        "推奨セット": {
+          "class": "B",
+          "detail": "空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "1-3/0/cfj",
+      "map": "1-3",
+      "index": 0,
+      "goal": "cfj",
+      "path": "CFJ",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母",
+            "軽巡",
+            "駆逐"
+          ],
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐"
+          ],
+          "min": 4,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "夜戦"
+      ],
+      "notes": [
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "D",
+          "detail": "当該経路で数値制空目標を一律必須にしない。必要なら敵/戦闘方針を別選択",
+          "evidence": [],
+          "limit": ""
+        },
+        "推奨セット": {
+          "class": "B",
+          "detail": "空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "1-4/0/normal",
+      "map": "1-4",
+      "index": 0,
+      "goal": "normal",
+      "path": "BCF(E)HL / AD(EH/GJ)L",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "空母",
+            "軽巡",
+            "駆逐",
+            "海防艦",
+            "水母",
+            "潜水母艦",
+            "補給艦"
+          ],
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐",
+            "海防艦"
+          ],
+          "min": 2,
+          "max": 6
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "夜戦"
+      ],
+      "notes": [
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "1-4/0/j-avoid",
+      "map": "1-4",
+      "index": 0,
+      "goal": "j-avoid",
+      "path": "BCFEHL / ADEHL",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "空母",
+            "軽巡",
+            "駆逐",
+            "海防艦",
+            "水母",
+            "潜水母艦",
+            "補給艦"
+          ],
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐",
+            "海防艦"
+          ],
+          "min": 2,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水母艦"
+          ],
+          "min": 1,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐",
+            "海防艦"
+          ],
+          "min": 3,
+          "max": 6
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "夜戦"
+      ],
+      "notes": [
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "1-5/0/default",
+      "map": "1-5",
+      "index": 0,
+      "goal": "",
+      "path": "ADEJ",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 4,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 4,
+          "max": 4
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "対潜"
+      ],
+      "notes": [
+        "海防艦4隻の経路。先制対潜の可否は艦別に別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。 対象実行では利用者指定4隻の未確認→保存/load→同期値回復を確認。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "tests/owned-oasw-integration.spec.js: unknown opening ASW"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "D",
+          "detail": "当該経路で数値制空目標を一律必須にしない。必要なら敵/戦闘方針を別選択",
+          "evidence": [],
+          "limit": ""
+        },
+        "推奨セット": {
+          "class": "A",
+          "detail": "cap-asw4組（海域の明示推奨）",
+          "evidence": [
+            "tests/all-map-route-requirements.spec.js",
+            "tests/required-loadout-preservation.spec.js"
+          ],
+          "limit": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "1-5/1/default",
+      "map": "1-5",
+      "index": 1,
+      "goal": "",
+      "path": "ADFGJ",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 4,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "正規空母",
+            "装甲空母",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "対潜"
+      ],
+      "notes": [
+        "航空戦艦は採用可能。砲撃二巡型の航空戦艦には対潜攻撃可能な水上爆撃機などを検討。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "D",
+          "detail": "当該経路で数値制空目標を一律必須にしない。必要なら敵/戦闘方針を別選択",
+          "evidence": [],
+          "limit": ""
+        },
+        "推奨セット": {
+          "class": "B",
+          "detail": "cap-asw3組（海域の明示推奨）、水爆：対象艦種の各艦に1枠以上（艦数で可変）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "1-5/2/default",
+      "map": "1-5",
+      "index": 2,
+      "goal": "",
+      "path": "ADFGJ",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 4,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "正規空母",
+            "装甲空母",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "対潜"
+      ],
+      "notes": [
+        "航空戦艦は採用可能。砲撃二巡型の航空戦艦には対潜攻撃可能な水上爆撃機などを検討。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "D",
+          "detail": "当該経路で数値制空目標を一律必須にしない。必要なら敵/戦闘方針を別選択",
+          "evidence": [],
+          "limit": ""
+        },
+        "推奨セット": {
+          "class": "A",
+          "detail": "cap-asw4組（海域の明示推奨）",
+          "evidence": [
+            "tests/all-map-route-requirements.spec.js",
+            "tests/required-loadout-preservation.spec.js"
+          ],
+          "limit": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "1-6/0/default",
+      "map": "1-6",
+      "index": 0,
+      "goal": "",
+      "path": "AEGFBN",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 5,
+          "max": 5
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "防空",
+        "夜戦"
+      ],
+      "notes": [
+        "下ルートでは制空優勢・対空CI発動は通行条件ではない。対潜と防空を推奨。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "D",
+          "detail": "当該経路で数値制空目標を一律必須にしない。必要なら敵/戦闘方針を別選択",
+          "evidence": [],
+          "limit": ""
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、cap-asw1組（既定目安）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "2-1/0/default",
+      "map": "2-1",
+      "index": 0,
+      "goal": "",
+      "path": "C(E)DH",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "夜戦"
+      ],
+      "notes": [
+        "経由マスが複数ある登録例。補給艦入り等の別例は対象外。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "2-2/0/default",
+      "map": "2-2",
+      "index": 0,
+      "goal": "",
+      "path": "CE(GH)K",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦",
+            "潜水母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "夜戦"
+      ],
+      "notes": [
+        "水母または潜水母艦を維持。G/Hを通るかはランダム。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "B",
+          "detail": "空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "2-3/0/default",
+      "map": "2-3",
+      "index": 0,
+      "goal": "",
+      "path": "ボス方面・経路ランダム",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "夜戦"
+      ],
+      "notes": [
+        "Jからの逸れなどを含む。編成条件の充足でボス到達を保証しない。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "2-4/0/default",
+      "map": "2-4",
+      "index": 0,
+      "goal": "",
+      "path": "ボス方面・経路ランダム",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦",
+            "潜水母艦",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "電探",
+        "夜戦"
+      ],
+      "notes": [
+        "戦艦＋空母は3隻まで。羅針盤による逸れを残す編成例。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、電探1個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "2-5/0/default",
+      "map": "2-5",
+      "index": 0,
+      "goal": "",
+      "path": "BFJO",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "潜水艦",
+            "潜水空母",
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "speedCount",
+          "rank": 5,
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "equipmentShips",
+          "match": "drum",
+          "min": 2,
+          "max": 7,
+          "slotPolicy": "valid"
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 1,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 49,
+            "failBelow": 42
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "実際の編成速力が低速の艦を1隻以上維持。高速化して低速艦がなくなるとF→J条件を満たさない。",
+        "ドラム缶(輸送用)は異なる2隻に各1個以上。同じ艦に2個は1隻として数える。"
+      ],
+      "requiredConnectionClass": "A",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "A",
+          "detail": "ドラム缶2艦（各艦1個以上）",
+          "evidence": [
+            "tests/all-map-route-requirements.spec.js",
+            "tests/route-slot-scouting.spec.js"
+          ],
+          "limit": "代表実行の範囲。すべての艦・装備・増設は未網羅"
+        },
+        "索敵": {
+          "class": "A",
+          "detail": "係数1／必要49以上",
+          "evidence": [
+            "tests/route-completion-2-5.spec.js: north scouting UI distinguishes"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "A",
+          "detail": "低速1艦維持",
+          "evidence": [
+            "tests/route-slot-scouting.spec.js",
+            "tests/all-map-route-requirements.spec.js"
+          ],
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "2-5/1/default",
+      "map": "2-5",
+      "index": 1,
+      "goal": "",
+      "path": "CEIO",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 1,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 34,
+            "failBelow": 31
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数1／必要34以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "B",
+          "detail": "高速統一",
+          "evidence": [
+            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+          ],
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "3-1/0/default",
+      "map": "3-1",
+      "index": 0,
+      "goal": "",
+      "path": "CFG",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空戦艦",
+            "軽巡洋艦",
+            "水上機母艦",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "夜戦"
+      ],
+      "notes": [
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "B",
+          "detail": "空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "3-2/0/normal",
+      "map": "3-2",
+      "index": 0,
+      "goal": "normal",
+      "path": "CG(H)FL / CEFL",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "all": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡",
+                "駆逐",
+                "補給艦"
+              ],
+              "min": 6,
+              "max": 6
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡"
+              ],
+              "min": 0,
+              "max": 1
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐"
+              ],
+              "min": 4,
+              "max": 6
+            }
+          ]
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "夜戦",
+        "電探"
+      ],
+      "notes": [],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-night-auto1組（既定目安）、電探1個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "3-2/0/fastPlus",
+      "map": "3-2",
+      "index": 0,
+      "goal": "fastPlus",
+      "path": "CEFL / CGFL",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "all": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡",
+                "駆逐",
+                "補給艦"
+              ],
+              "min": 6,
+              "max": 6
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡"
+              ],
+              "min": 0,
+              "max": 1
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐"
+              ],
+              "min": 4,
+              "max": 6
+            }
+          ]
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 15
+        },
+        {
+          "kind": "equipmentShips",
+          "match": "radar",
+          "slotPolicy": "valid",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "夜戦",
+        "電探"
+      ],
+      "notes": [],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "B",
+          "detail": "電探1艦（各艦1個以上）",
+          "evidence": [
+            "hdOCMeasure/hdOCSearchSteps → hdFEBranchPredicate"
+          ],
+          "limit": "代表実行の範囲。すべての艦・装備・増設は未網羅"
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "B",
+          "detail": "高速＋統一",
+          "evidence": [
+            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+          ],
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-night-auto1組（既定目安）、電探1個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "3-2/0/fastest",
+      "map": "3-2",
+      "index": 0,
+      "goal": "fastest",
+      "path": "CEFL",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "all": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡",
+                "駆逐",
+                "補給艦"
+              ],
+              "min": 6,
+              "max": 6
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡"
+              ],
+              "min": 0,
+              "max": 1
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐"
+              ],
+              "min": 4,
+              "max": 6
+            }
+          ]
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 20
+        },
+        {
+          "kind": "equipmentShips",
+          "match": "radar",
+          "slotPolicy": "valid",
+          "min": 4,
+          "max": 6
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "夜戦",
+        "電探"
+      ],
+      "notes": [],
+      "requiredConnectionClass": "A",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "A",
+          "detail": "電探4艦（各艦1個以上）",
+          "evidence": [
+            "tests/all-map-route-requirements.spec.js",
+            "tests/route-slot-scouting.spec.js"
+          ],
+          "limit": "代表実行の範囲。すべての艦・装備・増設は未網羅"
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "A",
+          "detail": "最速統一",
+          "evidence": [
+            "tests/route-slot-scouting.spec.js",
+            "tests/all-map-route-requirements.spec.js"
+          ],
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-night-auto1組（既定目安）、電探1個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "3-2/1/normal",
+      "map": "3-2",
+      "index": 1,
+      "goal": "normal",
+      "path": "CG(H)FL / CEFL",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "all": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡",
+                "駆逐",
+                "補給艦"
+              ],
+              "min": 6,
+              "max": 6
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡"
+              ],
+              "min": 0,
+              "max": 1
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐"
+              ],
+              "min": 4,
+              "max": 6
+            }
+          ]
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "夜戦",
+        "電探"
+      ],
+      "notes": [],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-night-auto1組（既定目安）、電探1個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "3-2/1/fastPlus",
+      "map": "3-2",
+      "index": 1,
+      "goal": "fastPlus",
+      "path": "CEFL / CGFL",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "all": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡",
+                "駆逐",
+                "補給艦"
+              ],
+              "min": 6,
+              "max": 6
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡"
+              ],
+              "min": 0,
+              "max": 1
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐"
+              ],
+              "min": 4,
+              "max": 6
+            }
+          ]
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 15
+        },
+        {
+          "kind": "equipmentShips",
+          "match": "radar",
+          "slotPolicy": "valid",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "夜戦",
+        "電探"
+      ],
+      "notes": [],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "B",
+          "detail": "電探1艦（各艦1個以上）",
+          "evidence": [
+            "hdOCMeasure/hdOCSearchSteps → hdFEBranchPredicate"
+          ],
+          "limit": "代表実行の範囲。すべての艦・装備・増設は未網羅"
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "B",
+          "detail": "高速＋統一",
+          "evidence": [
+            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+          ],
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-night-auto1組（既定目安）、電探1個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "3-2/1/fastest",
+      "map": "3-2",
+      "index": 1,
+      "goal": "fastest",
+      "path": "CEFL",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "all": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡",
+                "駆逐",
+                "補給艦"
+              ],
+              "min": 6,
+              "max": 6
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡"
+              ],
+              "min": 0,
+              "max": 1
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐"
+              ],
+              "min": 4,
+              "max": 6
+            }
+          ]
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 20
+        },
+        {
+          "kind": "equipmentShips",
+          "match": "radar",
+          "slotPolicy": "valid",
+          "min": 4,
+          "max": 6
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "夜戦",
+        "電探"
+      ],
+      "notes": [],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "B",
+          "detail": "電探4艦（各艦1個以上）",
+          "evidence": [
+            "hdOCMeasure/hdOCSearchSteps → hdFEBranchPredicate"
+          ],
+          "limit": "代表実行の範囲。すべての艦・装備・増設は未網羅"
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "B",
+          "detail": "最速統一",
+          "evidence": [
+            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+          ],
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-night-auto1組（既定目安）、電探1個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "3-3/0/default",
+      "map": "3-3",
+      "index": 0,
+      "goal": "",
+      "path": "ACGM",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "電探",
+        "夜戦"
+      ],
+      "notes": [
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "A",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "tests/owned-equipment-planner.spec.js: air target evidence distinguishes"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "3-4/0/default",
+      "map": "3-4",
+      "index": 0,
+      "goal": "",
+      "path": "ACEGJP",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "夜戦"
+      ],
+      "notes": [
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "3-5/0/default",
+      "map": "3-5",
+      "index": 0,
+      "goal": "",
+      "path": "FGK",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 5,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "潜水艦",
+            "潜水空母",
+            "水上機母艦",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "軽巡洋艦",
+            "潜水艦",
+            "潜水空母",
+            "水上機母艦",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 6,
+          "max": 6
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 28
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "索敵",
+        "夜戦"
+      ],
+      "notes": [],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数4／必要28以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "D",
+          "detail": "当該経路で数値制空目標を一律必須にしない。必要なら敵/戦闘方針を別選択",
+          "evidence": [],
+          "limit": ""
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-night-auto1組（既定目安）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "3-5/1/default",
+      "map": "3-5",
+      "index": 1,
+      "goal": "",
+      "path": "BDHK",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 40
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数4／必要40以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、cap-night-auto1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "4-1/0/default",
+      "map": "4-1",
+      "index": 0,
+      "goal": "",
+      "path": "CFDGJ / ABDGJ",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "夜戦"
+      ],
+      "notes": [
+        "始点A/Cはランダム。潜水艦なし・護衛1隻の登録例はD→G。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-asw1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "4-2/0/default",
+      "map": "4-2",
+      "index": 0,
+      "goal": "",
+      "path": "ACL / BDCL",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "any": [
+            {
+              "all": [
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡洋艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 1,
+                  "max": 7
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐艦",
+                    "海防艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 3,
+                  "max": 7
+                }
+              ]
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐艦",
+                "海防艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 4,
+              "max": 7
+            }
+          ]
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "夜戦"
+      ],
+      "notes": [
+        "始点A/Bはランダム。海防艦を含む艦種条件と単一経路固定は区別。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-asw1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "4-2/1/default",
+      "map": "4-2",
+      "index": 1,
+      "goal": "",
+      "path": "ACL / BDCL",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 4,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "夜戦"
+      ],
+      "notes": [
+        "始点A/Bはランダム。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-asw1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "4-3/0/default",
+      "map": "4-3",
+      "index": 0,
+      "goal": "",
+      "path": "CDHN / CFHN",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "対地"
+      ],
+      "notes": [
+        "この登録例でもHからIへの逸れがある。対地装備は勝利目的に応じた推奨で、通行条件ではない。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "B",
+          "detail": "高速統一",
+          "evidence": [
+            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+          ],
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、cap-asw1組（既定目安）、cap-land-soft1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "4-4/0/default",
+      "map": "4-4",
+      "index": 0,
+      "goal": "",
+      "path": "AEIK",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "夜戦"
+      ],
+      "notes": [
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、cap-asw1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "4-5/0/default",
+      "map": "4-5",
+      "index": 0,
+      "goal": "",
+      "path": "ADHT / CDHT",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 15
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "対地",
+        "索敵"
+      ],
+      "notes": [
+        "高速+統一の最短経路では数値索敵条件なし。対地攻撃の装備は別の推奨目標。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "B",
+          "detail": "高速＋統一",
+          "evidence": [
+            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+          ],
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-asw1組（既定目安）、cap-land-soft1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "4-5/1/default",
+      "map": "4-5",
+      "index": 1,
+      "goal": "",
+      "path": "ADHKT / CDHKT",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 2,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 71
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "対地",
+        "索敵"
+      ],
+      "notes": [
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数2／必要71以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-asw1組（既定目安）、cap-land-soft1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "4-5/2/default",
+      "map": "4-5",
+      "index": 2,
+      "goal": "",
+      "path": "ADHT / CDHT",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "対地",
+        "索敵"
+      ],
+      "notes": [
+        "軽量最短例は高速+不要、数値索敵条件なし。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-asw1組（既定目安）、cap-land-soft1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "5-1/0/default",
+      "map": "5-1",
+      "index": 0,
+      "goal": "",
+      "path": "BCFJ",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "夜戦"
+      ],
+      "notes": [
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-night-auto1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "5-2/0/default",
+      "map": "5-2",
+      "index": 0,
+      "goal": "",
+      "path": "BCEFO",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 2,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 70
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数2／必要70以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "5-3/0/default",
+      "map": "5-3",
+      "index": 0,
+      "goal": "",
+      "path": "DGIOKEQ",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "any": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "戦艦",
+                "高速戦艦",
+                "航空戦艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 0,
+              "max": 1
+            },
+            {
+              "kind": "minSpeed",
+              "rank": 10
+            }
+          ]
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "航戦不可。戦艦2隻へ変更する別例では高速統一が必要。能動分岐Oでボス方面を選ぶ。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "B",
+          "detail": "高速統一",
+          "evidence": [
+            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+          ],
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-night-auto1組（既定目安）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "5-4/0/default",
+      "map": "5-4",
+      "index": 0,
+      "goal": "",
+      "path": "ADEHIJMP",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 2,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 45
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "電探",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "この登録例は中央ルート。上ルートL→Pの索敵値を流用しない。渦潮対策の電探は推奨。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数2／必要45以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-night-auto1組（既定目安）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）、電探1個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "5-5/0/default",
+      "map": "5-5",
+      "index": 0,
+      "goal": "",
+      "path": "BKPS",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 2,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 80
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "戦艦＋空母5隻以上の別例には索敵を満たしても逸れがある。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。",
+        "対潜艦を入れない重量例ではBマスの陣形・回避や支援を出典で確認。対潜可能な別編成は別途評価。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数2／必要80以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-night-auto1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "5-5/1/default",
+      "map": "5-5",
+      "index": 1,
+      "goal": "",
+      "path": "BFDHNOS",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 2,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 66
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "この登録例は中央下ルート。ACEGIMOSのドラム缶4隻／大発系4隻の条件とは別。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数2／必要66以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-asw1組（既定目安）、cap-night-auto1組（既定目安）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "5-6/0/default",
+      "map": "5-6",
+      "index": 0,
+      "goal": "",
+      "path": "ABC2DEG",
+      "verification": "unverified",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 4,
+          "max": 4
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 65
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "輸送",
+        "索敵",
+        "PT対策"
+      ],
+      "notes": [
+        "出典が仮更新・検証継続中としている条件。数値は攻略目安として表示し、確定分岐成立とは扱わない。",
+        "第1ゲージ後のR到達ギミックと新スタート開放は別途確認。PT小鬼群対策・輸送装備をゲージ別に準備。"
+      ],
+      "requiredConnectionClass": "C",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "C",
+          "detail": "係数4／必要65以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。経路出典も未確認。"
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "C",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、cap-asw1組（既定目安）、cap-pt1組（海域の明示推奨）、制空2個（汎用カテゴリ目安・経路必須の数値と別）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）、輸送4個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "5-6/1/default",
+      "map": "5-6",
+      "index": 1,
+      "goal": "",
+      "path": "IJKLN",
+      "verification": "unverified",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦",
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 80
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "出典が仮更新・検証継続中としている条件。数値は攻略目安として表示し、確定分岐成立とは扱わない。",
+        "第1ゲージ後のR到達ギミックと新スタート開放は別途確認。PT小鬼群対策・輸送装備をゲージ別に準備。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "C",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "C",
+          "detail": "係数4／必要80以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。経路出典も未確認。"
+        },
+        "速力": {
+          "class": "B",
+          "detail": "高速統一",
+          "evidence": [
+            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+          ],
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "C",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、cap-asw1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "5-6/2/default",
+      "map": "5-6",
+      "index": 2,
+      "goal": "",
+      "path": "IOQUXZ",
+      "verification": "unverified",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦",
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 88
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "出典が仮更新・検証継続中としている条件。数値は攻略目安として表示し、確定分岐成立とは扱わない。",
+        "第1ゲージ後のR到達ギミックと新スタート開放は別途確認。PT小鬼群対策・輸送装備をゲージ別に準備。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "C",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "C",
+          "detail": "係数4／必要88以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。経路出典も未確認。"
+        },
+        "速力": {
+          "class": "B",
+          "detail": "高速統一",
+          "evidence": [
+            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+          ],
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "C",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、cap-asw1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "6-1/0/default",
+      "map": "6-1",
+      "index": 0,
+      "goal": "",
+      "path": "AFGHK",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 25
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "潜水母艦を外す別例は必要索敵値とランダム分岐が変わる。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数4／必要25以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "6-2/0/default",
+      "map": "6-2",
+      "index": 0,
+      "goal": "",
+      "path": "CEJK",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 3,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 50,
+            "failBelow": 43
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "I経由を狙う別例は40以上43未満。選択したJ経由は50以上を使う。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数3／必要50以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "6-3/0/default",
+      "map": "6-3",
+      "index": 0,
+      "goal": "",
+      "path": "ACEGHJ",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "練習巡洋艦",
+            "駆逐艦",
+            "水上機母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "水上機母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 3,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 38,
+            "failBelow": 36
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "出撃可能な艦種は軽巡・練巡・駆逐・水母。能動分岐はE方面を選ぶ。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数3／必要38以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "D",
+          "detail": "当該経路で数値制空目標を一律必須にしない。必要なら敵/戦闘方針を別選択",
+          "evidence": [],
+          "limit": ""
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-asw1組（既定目安）、cap-night-auto1組（既定目安）、水爆：対象艦種の各艦に1枠以上（艦数で可変）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "6-4/0/default",
+      "map": "6-4",
+      "index": 0,
+      "goal": "",
+      "path": "BDCFN",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "flagshipType",
+          "types": [
+            "軽巡洋艦"
+          ]
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "対地"
+      ],
+      "notes": [
+        "軽巡旗艦。長門型タッチの別編成と混同しない。対地装備、基地1部隊とボス半径5を別評価。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "B",
+          "detail": "高速統一",
+          "evidence": [
+            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+          ],
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、cap-land-mixed1組（既定目安）、制空2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "6-5/0/default",
+      "map": "6-5",
+      "index": 0,
+      "goal": "",
+      "path": "ACDGM",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "重雷装巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 3,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 50
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "夜戦",
+        "索敵",
+        "対潜"
+      ],
+      "notes": [
+        "基地航空隊は2部隊まで。ボスへの行動半径5、敵編成・制空・補充を基地計画で確認。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数3／必要50以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "6-5/1/default",
+      "map": "6-5",
+      "index": 1,
+      "goal": "",
+      "path": "BFIJM",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "軽空母",
+            "重雷装巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 3,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 35
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "夜戦",
+        "索敵",
+        "対潜"
+      ],
+      "notes": [
+        "空母・雷巡を使わない下ルート。道中対潜・夜戦と基地航空隊を準備。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数3／必要35以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、制空2個（汎用カテゴリ目安・経路必須の数値と別）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "7-1/0/default",
+      "map": "7-1",
+      "index": 0,
+      "goal": "",
+      "path": "DEGHK",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 5,
+          "max": 5
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 4,
+          "max": 4
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "夜戦"
+      ],
+      "notes": [
+        "先制対潜4〜5隻は攻略用の推奨。通常戦Gへの火力とルート条件は別評価。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "B",
+          "detail": "海域推奨4隻（7-1は4〜5の下限）。艦別判定後に人数集計",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/owned-loadout-verification-ja.md"
+          ],
+          "limit": "同じルートでの全人数・装備・不足案内の実操作は今回未実行"
+        },
+        "制空": {
+          "class": "D",
+          "detail": "当該経路で数値制空目標を一律必須にしない。必要なら敵/戦闘方針を別選択",
+          "evidence": [],
+          "limit": ""
+        },
+        "推奨セット": {
+          "class": "B",
+          "detail": "cap-asw4組（海域の明示推奨）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "7-2/0/default",
+      "map": "7-2",
+      "index": 0,
+      "goal": "",
+      "path": "CEG",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 4,
+          "max": 4
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母",
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "潜水艦",
+            "潜水空母",
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "対潜"
+      ],
+      "notes": [
+        "第1ゲージの4隻例では数値索敵不要。対潜攻撃装備を各艦に準備。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "D",
+          "detail": "当該経路で数値制空目標を一律必須にしない。必要なら敵/戦闘方針を別選択",
+          "evidence": [],
+          "limit": ""
+        },
+        "推奨セット": {
+          "class": "B",
+          "detail": "cap-asw4組（海域の明示推奨）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "7-2/1/default",
+      "map": "7-2",
+      "index": 1,
+      "goal": "",
+      "path": "BCDIM",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 3
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "練習巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "補給艦",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 69
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "第2ゲージ用。敵編成に応じた制空目標と道中対潜を別評価。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数4／必要69以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "B",
+          "detail": "高速統一",
+          "evidence": [
+            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+          ],
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-asw1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "7-3/0/default",
+      "map": "7-3",
+      "index": 0,
+      "goal": "",
+      "path": "ACE",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 4,
+          "max": 4
+        },
+        {
+          "kind": "namedCount",
+          "names": [
+            "羽黒"
+          ],
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "夜戦"
+      ],
+      "notes": [
+        "第1ゲージ・羽黒入りの例。史実艦の改造段階を含めて識別。数値索敵条件なし。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "D",
+          "detail": "当該経路で数値制空目標を一律必須にしない。必要なら敵/戦闘方針を別選択",
+          "evidence": [],
+          "limit": ""
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-night-auto1組（既定目安）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "7-3/1/default",
+      "map": "7-3",
+      "index": 1,
+      "goal": "",
+      "path": "ACDGJP",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "namedCount",
+          "names": [
+            "羽黒"
+          ],
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "namedCount",
+          "names": [
+            "足柄"
+          ],
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母",
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "minSpeed",
+          "rank": 10
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "夜戦",
+        "煙幕"
+      ],
+      "notes": [
+        "第2ゲージの羽黒・足柄・駆逐3例。道中Jの潜水艦に煙幕または対潜対策。数値索敵条件なし。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "B",
+          "detail": "高速統一",
+          "evidence": [
+            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+          ],
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+        },
+        "先制対潜": {
+          "class": "D",
+          "detail": "この経路の初期人数目標なし。任意指定は別",
+          "evidence": [],
+          "limit": ""
+        },
+        "制空": {
+          "class": "D",
+          "detail": "当該経路で数値制空目標を一律必須にしない。必要なら敵/戦闘方針を別選択",
+          "evidence": [],
+          "limit": ""
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-night-auto1組（既定目安）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "7-4/0/default",
+      "map": "7-4",
+      "index": 0,
+      "goal": "",
+      "path": "ABEJLP",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "正規空母",
+            "装甲空母",
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦",
+            "重雷装巡洋艦",
+            "練習巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空戦艦",
+            "軽空母",
+            "揚陸艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "any": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐艦",
+                "海防艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 3,
+              "max": 7
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "海防艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 2,
+              "max": 7
+            }
+          ]
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 37,
+            "failBelow": 33
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "登録した6隻の経路例。対潜枠・夜戦フィニッシャー・基地1部隊（ボス半径2）を準備。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数4／必要37以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、cap-asw3組（海域の明示推奨）、cap-night-auto1組（既定目安）、制空2個（汎用カテゴリ目安・経路必須の数値と別）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "7-5/0/default",
+      "map": "7-5",
+      "index": 0,
+      "goal": "",
+      "path": "ABDFGHK",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "対潜",
+        "夜戦"
+      ],
+      "notes": [
+        "第1ゲージKへの例では数値索敵不要。M到達ギミックを行う場合は別に33式係数4で59以上必要。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、cap-asw1組（既定目安）、制空2個（汎用カテゴリ目安・経路必須の数値と別）、夜戦1個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "7-5/1/default",
+      "map": "7-5",
+      "index": 1,
+      "goal": "",
+      "path": "ABDFJOQ",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "重巡洋艦",
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 3,
+          "max": 7
+        }
+      ],
+      "scouting": {
+        "kind": "none",
+        "note": "この登録経路に数値索敵の条件は掲載されていません。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "対潜",
+        "対地",
+        "PT対策"
+      ],
+      "notes": [
+        "第2ゲージQの対地攻略例。第1ゲージ撃破を確認。Mギミックは第3ゲージ開放に必要。"
+      ],
+      "requiredConnectionClass": "D",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "D",
+          "detail": "当該経路に数値索敵の登録なし。他経路へ一般化しない",
+          "evidence": [],
+          "limit": ""
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、cap-asw1組（既定目安）、cap-land-mixed1組（既定目安）、cap-pt1組（海域の明示推奨）、制空2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    },
+    {
+      "id": "7-5/2/default",
+      "map": "7-5",
+      "index": 2,
+      "goal": "",
+      "path": "ABDFJOPT",
+      "verification": "partial",
+      "conditions": [
+        {
+          "kind": "fleetCount",
+          "min": 6,
+          "max": 6
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "戦艦",
+            "高速戦艦",
+            "航空戦艦",
+            "正規空母",
+            "装甲空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "航空巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "軽巡洋艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 2
+        }
+      ],
+      "scouting": {
+        "kind": "required",
+        "coef": 4,
+        "checks": [
+          {
+            "label": "選択経路の索敵分岐",
+            "safe": 63
+          }
+        ],
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+      },
+      "equipmentKinds": [
+        "制空",
+        "防空",
+        "対潜",
+        "夜戦",
+        "索敵"
+      ],
+      "notes": [
+        "軽空母入りの第3ゲージ例は63以上。航空戦艦入りの別例の58を流用しない。低速可。第2ゲージ撃破とMマスS勝利1回が開放条件。",
+        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
+      ],
+      "requiredConnectionClass": "B",
+      "guidanceAudit": {
+        "装備艦数": {
+          "class": "D",
+          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
+          "evidence": [],
+          "limit": ""
+        },
+        "索敵": {
+          "class": "B",
+          "detail": "係数4／必要63以上",
+          "evidence": [
+            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+          ],
+          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+        },
+        "速力": {
+          "class": "D",
+          "detail": "高速化の一律必須指定なし",
+          "evidence": [],
+          "limit": ""
+        },
+        "先制対潜": {
+          "class": "C",
+          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "evidence": [
+            "hdOCOaswTarget/hdOCOaswMeasure"
+          ],
+          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+        },
+        "制空": {
+          "class": "B",
+          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "evidence": [
+            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+          ],
+          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+        },
+        "推奨セット": {
+          "class": "C",
+          "detail": "cap-aa1組（既定目安）、cap-asw1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）、夜戦1個（汎用カテゴリ目安・経路必須の数値と別）",
+          "evidence": [
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+          ],
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+        }
+      },
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+    }
+  ],
+  "classes": {
+    "A": "既存の実行証拠で確認済み（記載した層のみ）",
+    "B": "コード上の接続のみ確認済み",
+    "C": "条件データ・案内・検証が不足",
+    "D": "当該ルート・項目には該当しない"
+  },
+  "requiredConnectionCounts": {
+    "D": 29,
+    "B": 25,
+    "A": 2,
+    "C": 3
+  },
+  "perConditionCounts": {
+    "装備艦数:D": 54,
+    "索敵:D": 39,
+    "速力:D": 44,
+    "先制対潜:D": 35,
+    "制空:D": 14,
+    "推奨セット:C": 50,
+    "速力:B": 13,
+    "推奨セット:B": 7,
+    "制空:B": 41,
+    "先制対潜:C": 23,
+    "推奨セット:A": 2,
+    "装備艦数:A": 2,
+    "索敵:A": 1,
+    "速力:A": 2,
+    "索敵:B": 16,
+    "装備艦数:B": 3,
+    "制空:A": 1,
+    "索敵:C": 3,
+    "制空:C": 3,
+    "先制対潜:B": 1
+  },
+  "limits": "RequiredConnectionClass covers only route-mandatory gear-count/LOS/speed. Recommendation and user goals are separate per-condition columns; a required A does not validate recommended quantity or full route/fleet/game conditions. No promotion of 53-example verification status."
+}
