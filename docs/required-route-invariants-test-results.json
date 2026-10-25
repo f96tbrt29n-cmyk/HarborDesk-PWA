@@ -1,0 +1,114 @@
+{
+  "scope": "Intermediate failures retained; repaired cases were verified separately, not counted as stable passes in failed runs. All tests use dedicated local fixtures.",
+  "reports": [
+    {
+      "run": "regression",
+      "results": [
+        {
+          "engine": "chromium",
+          "status": "passed",
+          "retry": 0,
+          "count": 178
+        },
+        {
+          "engine": "webkit",
+          "status": "passed",
+          "retry": 0,
+          "count": 178
+        },
+        {
+          "engine": "chromium",
+          "status": "failed",
+          "retry": 0,
+          "count": 1
+        },
+        {
+          "engine": "webkit",
+          "status": "failed",
+          "retry": 0,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "run": "graph-final",
+      "results": [
+        {
+          "engine": "chromium",
+          "status": "passed",
+          "retry": 0,
+          "count": 92
+        },
+        {
+          "engine": "webkit",
+          "status": "passed",
+          "retry": 0,
+          "count": 92
+        },
+        {
+          "engine": "chromium",
+          "status": "failed",
+          "retry": 0,
+          "count": 3
+        },
+        {
+          "engine": "webkit",
+          "status": "failed",
+          "retry": 0,
+          "count": 3
+        }
+      ]
+    },
+    {
+      "run": "repair",
+      "results": [
+        {
+          "engine": "chromium",
+          "status": "passed",
+          "retry": 0,
+          "count": 5
+        },
+        {
+          "engine": "webkit",
+          "status": "passed",
+          "retry": 0,
+          "count": 5
+        }
+      ]
+    },
+    {
+      "run": "boundary",
+      "results": [
+        {
+          "engine": "chromium",
+          "status": "passed",
+          "retry": 0,
+          "count": 24
+        },
+        {
+          "engine": "webkit",
+          "status": "passed",
+          "retry": 0,
+          "count": 24
+        }
+      ]
+    },
+    {
+      "run": "last",
+      "results": [
+        {
+          "engine": "chromium",
+          "status": "passed",
+          "retry": 0,
+          "count": 3
+        },
+        {
+          "engine": "webkit",
+          "status": "passed",
+          "retry": 0,
+          "count": 3
+        }
+      ]
+    }
+  ]
+}

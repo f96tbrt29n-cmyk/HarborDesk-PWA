@@ -289,6 +289,12 @@ function hdMapRequirementsHtml(map,preset){
  HD_MAP_ROUTE_REQUIREMENTS['6-3'][0].waterAttackTypes=['水上機母艦'];
  HD_MAP_ROUTE_REQUIREMENTS['1-5'][1].waterAttackTarget=true;
  HD_MAP_ROUTE_REQUIREMENTS['1-5'][1].waterAttackTypes=['航空戦艦'];
+ // Strategy targets, never passage predicates. A set count does not imply OASW.
+ const asw15={choose:true,source:'https://zekamashi.net/kancolle-kouryaku/1-5/',checkedAt:'2026-10-25'};
+ HD_MAP_ROUTE_REQUIREMENTS['1-5'][0].openingAsw={...asw15,note:'海防艦4隻例は「可能な範囲」で先制対潜を準備する攻略案。人数は一意に指定されていません。対潜セット4組とは別に人数を選んでください。'};
+ HD_MAP_ROUTE_REQUIREMENTS['1-5'][1].openingAsw={...asw15,note:'航空戦艦を含む二巡型は、先制対潜人数の明記がありません。対潜セット3組・水上爆撃機の推奨とは別に人数を選んでください。'};
+ HD_MAP_ROUTE_REQUIREMENTS['1-5'][2].openingAsw={...asw15,recommended:4,fleetSize:4,shipTypes:['駆逐艦'],note:'駆逐4隻のキラ付け編成例で各艦の先制対潜条件を満たす装備案を初期目標に使用。初攻略全般の最低人数ではなく、他の艦種構成へ一律適用しません。'};
+ HD_MAP_ROUTE_REQUIREMENTS['7-2'][0].openingAsw={choose:true,source:'https://zekamashi.net/kancolle-kouryaku/7-2/',checkedAt:'2026-10-25',note:'第1ゲージの4隻初攻略例には先制対潜人数の明記がありません。5隻育成例の「先制対潜できる海防艦3隻」はこの編成へ流用せず、人数を選んでください。'};
  MAP_PLANS['7-5'].presets[0].gear='第1ゲージの対潜・制空・夜戦装備を準備。対地とPT対策は第2ゲージ用。';
  MAP_PLANS['3-5'].presets[0].gear='夜戦連撃と索敵装備。33式係数4で28以上を確認。';
 })();

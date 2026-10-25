@@ -1,4 +1,14 @@
 const {test,expect}=require('@playwright/test');
+
+test('all three provisional 5-6 examples stay unverified even when registered numeric and hull checks pass',async({page})=>{
+ await boot(page);const r=await page.evaluate(()=>{
+  const names=[['扶桑改二','山城改二','時雨改二','夕立改二','綾波改二','島風改'],['赤城改','加賀改','鈴谷改二','矢矧改二','時雨改二','夕立改二'],['金剛改二','榛名改二','赤城改','矢矧改二','時雨改二','夕立改二']];
+  // Isolate the uncertainty guard from numeric inputs. This is not evidence
+  // that these empty equipment fleets actually attain score200 or win battles.
+  const original=hdFEScouting,match=hdFEGameMatch;hdFEScouting=()=>({available:true,coef:4,score:200,status:'ready',checks:[{safe:200}]});hdFEGameMatch=()=>({status:'ready'});
+  try{return names.map((ships,index)=>{const plan={map:'5-6',preset:MAP_PLANS['5-6'].presets[index],ships:ships.map(ship=>({ship,masterId:hdShipDbMasterRowFor({name:ship}).id,items:[]})),openingAswCount:0},route=hdFERouteContract(plan);return {index,status:route.status,checks:route.checks.map(c=>({kind:c.condition.kind,status:c.status})),complete:hdOCMeasure(plan,[]).complete}})}finally{hdFEScouting=original;hdFEGameMatch=match}
+ });expect(r).toHaveLength(3);for(const x of r){expect(x.status).toBe('manual');expect(x.complete).toBe(false);expect(x.checks.filter(c=>c.kind!=='unverified').every(c=>c.status==='ready'),JSON.stringify(x)).toBe(true);expect(x.checks.filter(c=>c.kind==='unverified')).toEqual([{kind:'unverified',status:'manual'}])}
+});
 test.use({serviceWorkers:'block',viewport:{width:390,height:844},hasTouch:true,isMobile:true});
 async function boot(page){await page.route('**/*',r=>['127.0.0.1','localhost'].includes(new URL(r.request().url()).hostname)?r.continue():r.fulfill({status:204,body:''}));await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCSearch==='function')}
 async function north(page){await boot(page);await page.evaluate(()=>{

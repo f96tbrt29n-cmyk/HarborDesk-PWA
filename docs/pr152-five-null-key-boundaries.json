@@ -1,0 +1,204 @@
+{
+  "baseline": "d2ae01b823fc14caaffb3ec08e4091dd9ddf6527",
+  "run": 39585630823,
+  "attempt": "first",
+  "clock": "new document performance.now; readAt follows getItem return and precedes digest",
+  "atomic": false,
+  "boundaries": [
+    {
+      "key": "harbordesk-custom-fleets-v1",
+      "lastNonNull": {
+        "stage": "controllerchange",
+        "sequence": 6,
+        "doc": 1792579050603,
+        "scope": "application-or-runtime",
+        "readyState": "interactive",
+        "storageIdentitySame": true,
+        "getItemUnchanged": true,
+        "receivedAt": 1792579051001,
+        "read": {
+          "key": "harbordesk-custom-fleets-v1",
+          "readAt": 387,
+          "present": true,
+          "length": 379,
+          "prefixFnv32": "35eaf135",
+          "truncated": false
+        },
+        "snapshotAt": 387
+      },
+      "firstNull": {
+        "stage": "readystatechange",
+        "sequence": 7,
+        "doc": 1792579050603,
+        "scope": "application-or-runtime",
+        "readyState": "complete",
+        "storageIdentitySame": true,
+        "getItemUnchanged": true,
+        "receivedAt": 1792579053301,
+        "read": {
+          "key": "harbordesk-custom-fleets-v1",
+          "readAt": 2695,
+          "present": false,
+          "length": 0
+        },
+        "snapshotAt": 2695
+      }
+    },
+    {
+      "key": "harbordesk-equipment-v1",
+      "lastNonNull": {
+        "stage": "controllerchange",
+        "sequence": 6,
+        "doc": 1792579050603,
+        "scope": "application-or-runtime",
+        "readyState": "interactive",
+        "storageIdentitySame": true,
+        "getItemUnchanged": true,
+        "receivedAt": 1792579051001,
+        "read": {
+          "key": "harbordesk-equipment-v1",
+          "readAt": 387,
+          "present": true,
+          "length": 77,
+          "prefixFnv32": "8f30f9ec",
+          "truncated": false
+        },
+        "snapshotAt": 387
+      },
+      "firstNull": {
+        "stage": "readystatechange",
+        "sequence": 7,
+        "doc": 1792579050603,
+        "scope": "application-or-runtime",
+        "readyState": "complete",
+        "storageIdentitySame": true,
+        "getItemUnchanged": true,
+        "receivedAt": 1792579053301,
+        "read": {
+          "key": "harbordesk-equipment-v1",
+          "readAt": 2695,
+          "present": false,
+          "length": 0
+        },
+        "snapshotAt": 2695
+      }
+    },
+    {
+      "key": "harbordesk-ship-roster-v1",
+      "lastNonNull": {
+        "stage": "controllerchange",
+        "sequence": 6,
+        "doc": 1792579050603,
+        "scope": "application-or-runtime",
+        "readyState": "interactive",
+        "storageIdentitySame": true,
+        "getItemUnchanged": true,
+        "receivedAt": 1792579051001,
+        "read": {
+          "key": "harbordesk-ship-roster-v1",
+          "readAt": 387,
+          "present": true,
+          "length": 745,
+          "prefixFnv32": "cf70989b",
+          "truncated": false
+        },
+        "snapshotAt": 387
+      },
+      "firstNull": {
+        "stage": "readystatechange",
+        "sequence": 7,
+        "doc": 1792579050603,
+        "scope": "application-or-runtime",
+        "readyState": "complete",
+        "storageIdentitySame": true,
+        "getItemUnchanged": true,
+        "receivedAt": 1792579053301,
+        "read": {
+          "key": "harbordesk-ship-roster-v1",
+          "readAt": 2695,
+          "present": false,
+          "length": 0
+        },
+        "snapshotAt": 2695
+      }
+    },
+    {
+      "key": "harbordesk-fleet-calculator-v1",
+      "lastNonNull": {
+        "stage": "controllerchange",
+        "sequence": 6,
+        "doc": 1792579050603,
+        "scope": "application-or-runtime",
+        "readyState": "interactive",
+        "storageIdentitySame": true,
+        "getItemUnchanged": true,
+        "receivedAt": 1792579051001,
+        "read": {
+          "key": "harbordesk-fleet-calculator-v1",
+          "readAt": 387,
+          "present": true,
+          "length": 3154,
+          "prefixFnv32": "b2d4da48",
+          "truncated": false
+        },
+        "snapshotAt": 387
+      },
+      "firstNull": {
+        "stage": "readystatechange",
+        "sequence": 7,
+        "doc": 1792579050603,
+        "scope": "application-or-runtime",
+        "readyState": "complete",
+        "storageIdentitySame": true,
+        "getItemUnchanged": true,
+        "receivedAt": 1792579053301,
+        "read": {
+          "key": "harbordesk-fleet-calculator-v1",
+          "readAt": 2695,
+          "present": false,
+          "length": 0
+        },
+        "snapshotAt": 2695
+      }
+    },
+    {
+      "key": "harbordesk-kancolle-sync-v1",
+      "lastNonNull": {
+        "stage": "controllerchange",
+        "sequence": 6,
+        "doc": 1792579050603,
+        "scope": "application-or-runtime",
+        "readyState": "interactive",
+        "storageIdentitySame": true,
+        "getItemUnchanged": true,
+        "receivedAt": 1792579051001,
+        "read": {
+          "key": "harbordesk-kancolle-sync-v1",
+          "readAt": 387,
+          "present": true,
+          "length": 19,
+          "prefixFnv32": "abe03795",
+          "truncated": false
+        },
+        "snapshotAt": 387
+      },
+      "firstNull": {
+        "stage": "readystatechange",
+        "sequence": 7,
+        "doc": 1792579050603,
+        "scope": "application-or-runtime",
+        "readyState": "complete",
+        "storageIdentitySame": true,
+        "getItemUnchanged": true,
+        "receivedAt": 1792579053301,
+        "read": {
+          "key": "harbordesk-kancolle-sync-v1",
+          "readAt": 2695,
+          "present": false,
+          "length": 0
+        },
+        "snapshotAt": 2695
+      }
+    }
+  ]
+}

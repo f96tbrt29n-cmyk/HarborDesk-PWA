@@ -29,7 +29,8 @@ function hdFOItemMeta(item){
 }
 function hdFOStackKey(item){
  if(!item||!item.name)return '';
- if(item.stackKey)return String(item.stackKey);
+ // Name and improvement are authoritative; a proposal can be edited after
+ // allocation. A retained cached stackKey must never hide inventory overuse.
  if(typeof hdFLInventoryStackKey==='function')return hdFLInventoryStackKey(item.name,item.star);
  return String(item.name||'')+'@@'+Math.max(0,Number(item.star)||0);
 }
@@ -105,6 +106,7 @@ function hdFOCoverage(plan){
  return {evaluation:e,map:map};
 }
 function hdFOBestSwap(plan,focusKind,mode){
+ if(typeof hdOCMeasure!=='function'||typeof hdOCGoalRegressions!=='function')return null;
  const cfg=hdFOMode(mode),before=hdFOCoverage(plan),baseScore=hdFOReqScore(before.evaluation,cfg.id),baseCombat=hdFOCombatScore(before.evaluation),candidates=hdFOCandidateRows(focusKind,cfg.id);let best=null;
  const requirements=typeof hdFLRequirements==='function'?hdFLRequirements(plan):[],protectedMeasure=typeof hdOCMeasure==='function'?hdOCMeasure(plan,requirements):null;
  for(const cand of candidates){
@@ -152,12 +154,14 @@ function hdFOOptimize(plan,mode,maxChanges){
  }
  const after=typeof hdFEEvaluate==='function'?hdFEEvaluate(out):null;
  out.optimization={strategy:cfg.id,strategyLabel:cfg.label,before:before,after:after,changes:changes,unresolved:(after&&after.requirements||[]).filter(function(r){return r.status!=='ready'}).map(function(r){return {kind:r.kind,label:r.label,status:r.status,count:r.count,minCount:r.minCount}})};
- out.optimizedAt=Date.now();return out;
+ out.optimizedAt=Date.now();if(out.suggestion&&typeof hdFLUpdateAssessment==='function')hdFLUpdateAssessment(out,true);return out;
 }
 function hdFOStatusText(e){return e?'配置あり '+e.ready+'/'+e.requirements.length+'｜一部 '+e.partial+'｜未配置 '+e.missing:'評価なし'}
 function hdFOStandardPlan(index){
  const map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+index,current=(typeof HD_FL_CACHE!=='undefined'&&HD_FL_CACHE[key])||null;
  if(current?.searching)return null;
+ // Compare and switch from the actual refined equipment, not a new quick fill.
+ if(current)return hdFOClone(current);
  const fresh=typeof hdFLGenerate==='function'?hdFLGenerate(index):null;if(!fresh)return null;
  const base=hdFOClone(fresh);
  if(typeof HD_FL_CACHE!=='undefined'){if(current)HD_FL_CACHE[key]=current;else delete HD_FL_CACHE[key]}
@@ -237,7 +241,7 @@ function hdFOInstall(){
  return true;
 }
 function hdFOApply(index,card,mode){
- const map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+index,cached=(typeof HD_FL_CACHE!=='undefined'&&HD_FL_CACHE[key])||null,base=(cached&&!cached.optimization?cached:hdFLGenerate(index));if(!base||!card||cached?.searching)return;
+ const map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+index,cached=(typeof HD_FL_CACHE!=='undefined'&&HD_FL_CACHE[key])||null,base=hdFOStandardPlan(index);if(!base||!card||cached?.searching)return;
  const selected=hdFOMode(mode||hdFOStoredMode()).id;hdFOSetStoredMode(selected);
  const optimized=hdFOOptimize(base,selected);if(typeof HD_FL_CACHE!=='undefined')HD_FL_CACHE[key]=optimized;
  const host=card.querySelector('.hd-fl-host');if(host)host.innerHTML=hdFLPlanHtml(optimized);
@@ -257,9 +261,10 @@ function hdFOSavePreset(index,mode,button){
  const selected=hdFOMode(mode).id,plan=hdFOOptimize(base,selected),label=hdFOMode(selected).label,suggestion=plan.suggestion||{},preset=suggestion.preset||{},all=typeof loadCustomFleets==='function'?loadCustomFleets():{};
  all[map]=all[map]||[];
  const name=(map+' '+label+'｜'+(preset.name||('候補'+(Number(index)+1)))).slice(0,40);
- const ships=Array.from({length:6},function(_,i){const p=plan.ships&&plan.ships[i]||{},gear=(p.items||[]).map(function(x){return hdFOItemLabel(x)});if(p.expansion)gear.push('[増設] '+p.expansion.name+(p.expansion.star?' ★'+p.expansion.star:''));return {ship:p.ship||'',gear:gear.join(' / ')}});
+ const ships=Array.from({length:6},function(_,i){const p=plan.ships&&plan.ships[i]||{},slot=suggestion.slots?.[i],count=p.ship?hdFLSlotCount(slot||{profile:{type:p.type,row:{name:p.ship}}}):0,gear=Array.from({length:count},(_,n)=>{const x=(p.items||[]).find((x,i)=>(x.slotIndex??i)===n);return x?hdFOItemLabel(x):''});if(p.expansion)gear.push('[増設] '+p.expansion.name+(p.expansion.star?' ★'+p.expansion.star:''));return {ship:p.ship||'',rosterId:p.rosterId||slot?.profile?.row?.id||'',gameShipId:Number(p.gameShipId)||Number(slot?.profile?.row?.gameShipId)||0,masterId:Number(p.masterId)||Number(slot?.profile?.row?.masterId)||0,gear:gear.join(' / ')}});
  const e=plan.optimization&&plan.optimization.after||hdFEEvaluate(plan),memo='HarborDesk '+label+'比較案。条件充足 '+(e&&e.ready||0)+'/'+(e&&e.requirements&&e.requirements.length||0)+'、交換 '+(plan.optimization&&plan.optimization.changes.length||0)+'件。比較ビューから保存。ゲーム側で最終確認。';
- const old=all[map].find(function(x){return x.name===name}),id=old&&old.id||(typeof cfUid==='function'?cfUid():'fo-'+Date.now()+'-'+Math.random().toString(16).slice(2)),item={id:id,name:name,ships:ships,memo:memo,source:'optimizer-preset',strategy:selected,strategyLabel:label,map:map,createdAt:old&&old.createdAt||Date.now(),updatedAt:Date.now()};
+ const old=all[map].find(function(x){return x.name===name}),id=old&&old.id||(typeof cfUid==='function'?cfUid():'fo-'+Date.now()+'-'+Math.random().toString(16).slice(2)),item={id:id,name:name,ships:ships,memo:memo,source:'optimizer-preset',strategy:selected,strategyLabel:label,map:map,routePreset:{...preset},routeGoal:plan.routeGoal||'',searchAssessment:plan.search||plan.sourceFleet?.searchAssessment||null,openingAswCount:plan.openingAswCount??plan.sourceFleet?.openingAswCount??(typeof hdOCOaswTarget==='function'?hdOCOaswTarget(hdFLContext(plan)):undefined),createdAt:old&&old.createdAt||Date.now(),updatedAt:Date.now()};
+ if(typeof hdOCMeasure==='function')item.routeAssessment={status:hdFERoute(plan).status,contract:hdFERouteContract(plan),branch:hdFEBranchRoute(plan),at:Date.now()};
  all[map]=old?all[map].map(function(x){return x.id===id?item:x}):all[map].concat(item);
  if(typeof saveCustomFleets==='function')saveCustomFleets(all);else localStorage.setItem('harbordesk-custom-fleets-v1',JSON.stringify(all));
  if(typeof renderCustomFleets==='function')renderCustomFleets(map);
@@ -267,7 +272,14 @@ function hdFOSavePreset(index,mode,button){
  return true;
 }
 function hdFOReset(index,card){
- const map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+index;if(typeof HD_FL_CACHE!=='undefined')delete HD_FL_CACHE[key];
+ const map=typeof hdFSMap==='function'?hdFSMap():'',key=map+':'+index,current=typeof HD_FL_CACHE!=='undefined'?HD_FL_CACHE[key]:null;
+ if(current?.searching)return;
+ if(current){
+  if(typeof hdOCMeasure!=='function'||typeof hdOCGoalRegressions!=='function')return;
+  const fresh=typeof hdFLGenerate==='function'?hdFLGenerate(index):null;
+  const requirements=typeof hdFLRequirements==='function'?hdFLRequirements(current):[];
+  if(!fresh||hdOCGoalRegressions(hdOCMeasure(current,requirements),hdOCMeasure(fresh,requirements)).length){HD_FL_CACHE[key]=current;if(typeof hdToast==='function')hdToast('標準配備では成立済みの条件が失われるため、現在の配備を保持しました','warn');return}
+ }else if(typeof HD_FL_CACHE!=='undefined')delete HD_FL_CACHE[key];
  if(typeof hdFLRender==='function')hdFLRender(index,card);
 }
 document.addEventListener('click',function(e){

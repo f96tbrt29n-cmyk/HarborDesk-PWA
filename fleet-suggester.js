@@ -112,7 +112,7 @@ function hdFSLevelCompare(a,b,info){
  return speed(a)-speed(b)||condition(a)-condition(b)||tier(a)-tier(b)||distance(a)-distance(b);
 }
 function hdFSPickBest(pool,used,predicate,info,needs){
- return pool.filter(function(p){return !used.has(p.row.id)&&p.operational?.available!==false&&(!predicate||predicate(p))}).sort(function(a,b){return (a.routeRank||0)-(b.routeRank||0)||hdFSLevelCompare(a,b,info)||hdFSScore(b,info,needs)-hdFSScore(a,info,needs)||b.level-a.level})[0]||null;
+ return pool.filter(function(p){return !used.has(p.row.id)&&p.operational?.available!==false&&(!predicate||predicate(p))}).sort(function(a,b){const named=p=>(p.routeNamed||[]).some(i=>pool.filter(q=>used.has(q.row.id)&&(q.routeNamed||[]).includes(i)).length<(info.routeNamedCounts?.[i]||1))?0:1;return named(a)-named(b)||(a.routeRank||0)-(b.routeRank||0)||hdFSLevelCompare(a,b,info)||hdFSScore(b,info,needs)-hdFSScore(a,info,needs)||b.level-a.level})[0]||null;
 }
 function hdFSRouteRank(profile,goal){
  if(!goal?.speed||typeof hdFEShipSpeed!=='function')return 0;
@@ -123,6 +123,43 @@ function hdFSRouteRank(profile,goal){
  const minimum=Math.min(...recipes.map(r=>(r.t||0)+Math.max(r.n||0,r.c||0)-(r.t?ex:0)));
  return minimum>slots.count?2:goal.radar&&minimum===slots.count?1:0;
 }
+// Repair only registered verified-graph alternatives. Equipment and speed
+// remain for the subsequent owned-equipment search and final route validation.
+function hdFSRepairVerifiedSlots(map,preset,index,info,slots,pool){
+ const data=MAP_PLANS[map]?.routeBranches,registered=typeof hdMapPresetRequirements==='function'?hdMapPresetRequirements(map,preset):null;
+ if(data?.schemaVersion!==2||!registered||typeof hdOCRequiredChecks!=='function')return {slots,ready:false};
+ const canonical=MAP_PLANS[map].presets[registered.index];
+ if(JSON.stringify(hdFSPresetInfo(preset))!==JSON.stringify(hdFSPresetInfo(canonical)))return {slots,ready:false};
+ const goal=hdOCRouteGoal({map,preset,index,fleet:{id:`auto:${map}:${index}`}});
+ if(data.goals&&!Object.hasOwn(data.goals,goal))return {slots,ready:false};
+ const structural=c=>['fleetCount','typeCount','namedCount','flagshipType'].includes(c?.kind)||c?.not&&structural(c.not)||['all','any'].some(k=>Array.isArray(c?.[k])&&c[k].every(structural));
+ const evaluate=rows=>{
+  const p={map,preset,routeInfo:info,routeGoal:goal,ships:rows.flatMap(s=>s.profile?[{ship:s.profile.row.name,masterId:s.profile.row.masterId,type:s.profile.type,items:[]}]:[])};
+  const checks=hdOCRequiredChecks(p).filter(c=>structural(c.condition));
+  const score=checks.reduce((n,c)=>n+(c.ok?10000:c.status==='manual'?-10000:0)+(c.ratio||0)*100-Math.max(0,(c.condition.min||0)-(c.count||0),(c.count||0)-(c.condition.max??Infinity))*10,0);
+  return {checks,score};
+ };
+ const originalSlots=slots;
+ let current=evaluate(slots);
+ if(!current.checks.length)return {slots,ready:false};
+ for(let pass=0;pass<slots.length&&!current.checks.every(c=>c.ok);pass++){
+  let best=null;
+  for(let i=0;i<slots.length;i++){
+   const used=new Set(slots.flatMap((s,j)=>j!==i&&s.profile?[s.profile.row.id]:[]));
+   const candidates=pool.filter(p=>!used.has(p.row.id)&&p.operational?.available!==false&&current.checks.every(c=>c.condition.kind!=='typeCount'||c.condition.max!==0||!c.condition.types.includes(p.type))).sort((a,b)=>(a.routeRank||0)-(b.routeRank||0)||hdFSLevelCompare(a,b,info)||hdFSScore(b,info,[]) -hdFSScore(a,info,[])).slice(0,24);
+   for(const p of candidates){
+    if(p.row.id===slots[i].profile?.row.id)continue;
+    const rows=slots.slice();rows[i]={profile:p,required:p.type,levelTarget:info.levelTarget};
+    const next=evaluate(rows);
+    if(hdOCGoalRegressions({goals:[],requiredChecks:current.checks},{goals:[],requiredChecks:next.checks}).length||next.score<=current.score)continue;
+    if(!best||next.score>best.next.score)best={rows,next};
+   }
+  }
+  if(!best)break;slots=best.rows;current=best.next;
+ }
+ const ready=current.checks.every(c=>c.ok);
+ return {slots:ready?slots.filter(s=>s.profile):originalSlots,ready};
+}
 function hdFSOperationalSummary(pool){
  var blocked=pool.filter(function(p){return p.operational?.available===false}),counts={};
  blocked.forEach(function(p){(p.operational?.reasons||[]).forEach(function(r){counts[r]=(counts[r]||0)+1})});
@@ -130,8 +167,11 @@ function hdFSOperationalSummary(pool){
 }
 function hdFSGenerate(map,preset,index){
  var info=hdFSPresetInfo(preset),needs=hdFSNeeds(map),live=hdFSLiveState(),pool=hdFSRoster().map(function(row){return hdFSProfile(row,live)}).filter(p=>!info.requirements.some(req=>req.count===0&&hdFSTypeMatches(p,req.token))).filter(p=>map!=='1-6'||!['戦艦','高速戦艦','正規空母','装甲空母','重雷装巡洋艦','潜水艦','潜水空母'].includes(p.type)),operational=hdFSOperationalSummary(pool),used=new Set(),slots=[],missing=[];
- info.levelTarget=hdFSLevelTarget(map);
+ const individualIds=new Set();pool=pool.filter(p=>{const key=Number(p.row.gameShipId)>0?'game:'+Number(p.row.gameShipId):p.row.id?'row:'+p.row.id:'unknown:'+p.row.name;if(individualIds.has(key))return false;individualIds.add(key);return true});
+ operational=hdFSOperationalSummary(pool);info.levelTarget=hdFSLevelTarget(map);
  const routeRequirements=typeof hdMapPresetRequirements==='function'?hdMapPresetRequirements(map,preset):null;if(typeof hdFEEquipmentRequirements==='function')needs=hdFEEquipmentRequirements({map,preset},needs);if(routeRequirements?.selectionAliases)info.requirements=info.requirements.map(r=>({...r,token:routeRequirements.selectionAliases[r.token]||r.token}));
+ const namedConditions=(routeRequirements?.conditions||[]).filter(c=>c.kind==='namedCount');info.routeNamedCounts=namedConditions.map(c=>c.min);
+ pool.forEach(p=>{const name=typeof hdShipDbMasterRowFor==='function'?hdShipDbMasterRowFor(p.row)?.name:p.row.name;p.routeNamed=namedConditions.flatMap((c,i)=>c.names.some(n=>String(name||'').startsWith(n))?[i]:[])});
  if(routeRequirements?.minimumSpeed){info.speedRequired=true;info.speedPreferred=true;pool.forEach(p=>p.routeRank=hdFSRouteRank(p,{speed:routeRequirements.minimumSpeed}));}
  if(typeof hdOCRouteGoal==='function'){const goal=MAP_PLANS[map]?.routeBranches?.goals?.[hdOCRouteGoal({map,preset,index,fleet:{id:`auto:${map}:${index}`}})];if(goal?.speed)pool.forEach(p=>p.routeRank=hdFSRouteRank(p,goal))}
  info.requirements.forEach(function(req){for(var i=0;i<req.count;i++){var p=hdFSPickBest(pool,used,function(x){return hdFSTypeMatches(x,req.token)},info,needs);if(p){used.add(p.row.id);slots.push({profile:p,required:req.token,levelTarget:info.levelTarget})}else{slots.push({profile:null,required:req.token});missing.push(req.token)}}});
@@ -141,6 +181,8 @@ function hdFSGenerate(map,preset,index){
   for(let i=0;i<slots.length;i++){const slot=slots[i];if(!slot.profile)continue;const replacement=hdFSPickBest(pool,used,p=>p.speed==='低速'&&(!slot.required||hdFSTypeMatches(p,slot.required)),info,needs);if(replacement){used.delete(slot.profile.row.id);used.add(replacement.row.id);slot.profile=replacement;break;}}
   if(!slots.some(s=>s.profile?.speed==='低速'))missing.push('低速艦（高速化せず維持）');
  }
+ const flagship=(routeRequirements?.conditions||[]).find(c=>c.kind==='flagshipType');if(flagship){const first=slots.findIndex(s=>s.profile&&flagship.types.includes(s.profile.type));if(first>0)[slots[0],slots[first]]=[slots[first],slots[0]];}
+ const repaired=hdFSRepairVerifiedSlots(map,preset,index,info,slots,pool);slots=repaired.slots;if(repaired.ready)missing=[];
  var known=slots.filter(function(s){return s.profile&&s.profile.type}).length,filled=slots.filter(function(s){return s.profile}).length;
  var low=info.speedRequired?slots.filter(function(s){return s.profile&&s.profile.speed==='低速'}).map(function(s){return s.profile.row.name}):[];
  var masterBacked=slots.filter(function(s){return s.profile&&s.profile.masterBacked}).length;return {map:map,preset:preset,index:index,info:info,needs:needs,slots:slots,missing:missing,filled:filled,known:known,low:low,masterBacked:masterBacked,operational:operational};

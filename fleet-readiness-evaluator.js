@@ -19,6 +19,8 @@ function hdFEFindShip(name){
  const rows=typeof HD_SHIP_DATABASE!=='undefined'?HD_SHIP_DATABASE:[];
  return rows.find(x=>x.final===name||x.base===name)||null;
 }
+// Leave the right-side whitespace for the next separator, preserving empty slots.
+function hdFEGearTokens(gear){return String(gear||'').split(/\s+\/(?=\s|$)/).map(x=>x.trim())}
 function hdFEParseGearLabel(label){
  let s=String(label||'').trim(),expansion=false,star=0;
  if(/^\[増設\]/.test(s)){expansion=true;s=s.replace(/^\[増設\]\s*/,'').trim()}
@@ -28,13 +30,13 @@ function hdFEParseGearLabel(label){
 function hdFEPlanFromSavedFleet(map,fleet){
  const ships=(fleet?.ships||[]).filter(x=>String(x.ship||'').trim()||String(x.gear||'').trim()).map(row=>{
   const db=hdFEFindShip(String(row.ship||'').trim()),profile=db&&typeof hdShipDbSlotProfile==='function'?hdShipDbSlotProfile(db):null;
-  const tokens=String(row.gear||'').split(/\s+\/\s+/).map(hdFEParseGearLabel);
+  const tokens=hdFEGearTokens(row.gear).map(hdFEParseGearLabel);
   const normal=tokens.filter(x=>!x.expansion),ex=tokens.find(x=>x.expansion)||null;
   const items=normal.map((x,i)=>({name:x.name,star:x.star,slotIndex:i,capacity:profile?.slots?.[i]??null,category:hdFEFind(x.name)?.category||''})).filter(x=>x.name);
   return {ship:String(row.ship||'').trim(),rosterId:row.rosterId||'',gameShipId:Number(row.gameShipId)||0,masterId:Number(row.masterId)||Number(db?.id)||0,type:db?.type||'',items,expansion:ex?{name:ex.name,star:ex.star}:null,missing:[],master:!!profile};
  });
  const presets=typeof MAP_PLANS!=='undefined'?(MAP_PLANS[map]?.presets||[]):[],preset=fleet?.routePreset||presets.find(p=>String(fleet?.name||'').includes(String(p?.name||'')))||null,routeInfo=preset&&typeof hdFSPresetInfo==='function'?hdFSPresetInfo(preset):null;
- return {map,ships,routeGoal:fleet?.routeGoal??'',missing:[],masterBacked:ships.filter(x=>x.master).length,createdAt:Date.now(),source:'saved-fleet',sourceFleet:fleet||null,preset,routeInfo};
+ return {map,ships,routeGoal:fleet?.routeGoal??'',missing:[],masterBacked:ships.filter(x=>x.master).length,createdAt:Date.now(),source:'saved-fleet',sourceFleet:fleet||null,search:fleet?.searchAssessment||null,preset,routeInfo};
 }
 function hdFEAssigned(plan){
  const rows=[];
@@ -51,21 +53,36 @@ function hdFEAssigned(plan){
  }
  return rows;
 }
+function hdFEExpansionAvailability(ship){
+ const pinned=Number(ship?.gameShipId)>0||!!ship?.rosterId,rows=hdFERoster();
+ let matching=rows.filter(r=>Number(ship?.gameShipId)>0?Number(r.gameShipId)===Number(ship.gameShipId):ship?.rosterId?String(r.id||'')===String(ship.rosterId):Number(ship?.masterId)>0?Number(r.masterId)===Number(ship.masterId):r.name===ship?.ship);
+ if(!pinned&&!matching.length)matching=rows.filter(r=>r.name===ship?.ship&&(!Number(ship?.masterId)||!Number(r.masterId)));
+ // Unowned theoretical examples still describe equipment compatibility. Owned
+ // readiness separately requires physical ships; never borrow another's unlock.
+ if(!pinned&&!matching.length)return {status:'theoretical',allowed:true};
+ const row=matching.length===1?matching[0]:null,value=row?.gameSlotEx;
+ if(!row||Number(ship?.masterId)>0&&Number(row.masterId)>0&&Number(ship.masterId)!==Number(row.masterId)||value==null||String(value).trim()===''||!Number.isInteger(Number(value))||Number(value)<-1)return {status:'manual',allowed:false,reason:'増設の開放状態を同期情報で確認できません'};
+ return Number(value)===0?{status:'missing',allowed:false,reason:'補強増設が未開放です'}:{status:'ready',allowed:true};
+}
 function hdFEMasterValidation(plan){
  const invalid=[],unresolved=[];let checked=0,shipsChecked=0;
  for(const row of plan?.ships||[]){
   const db=hdFEFindShip(row.ship),profile=db&&typeof hdShipDbSlotProfile==='function'?hdShipDbSlotProfile(db):null;
   if(!db||!profile){if(row.ship)unresolved.push({ship:row.ship,name:'艦娘マスター未登録',where:'ship'});continue}
   shipsChecked++;
-  for(const item of row.items||[]){
+  for(const [position,item] of (row.items||[]).entries()){
    const meta=hdFEFind(item.name);
    if(!meta){unresolved.push({ship:row.ship,name:item.name,where:`第${(Number(item.slotIndex)||0)+1}スロ`});continue}
    checked++;
+   const index=Number(item.slotIndex??position),duplicate=(row.items||[]).filter((x,i)=>x.name&&Number(x.slotIndex??i)===index).length>1;
+   if(!Number.isInteger(index)||index<0||index>=profile.count||duplicate){invalid.push({ship:row.ship,name:item.name,where:'通常スロット',reason:duplicate?'通常スロットの重複':'通常スロット範囲外'});continue}
    const compatible=typeof hdShipDbEquipCompatible==='function'?hdShipDbEquipCompatible(meta,db):true;
-   const rejected=typeof hdShipDbSlotRejects==='function'?hdShipDbSlotRejects(profile,Number(item.slotIndex)||0,meta):false;
+   const rejected=typeof hdShipDbSlotRejects==='function'?hdShipDbSlotRejects(profile,index,meta):false;
    if(!compatible||rejected)invalid.push({ship:row.ship,name:item.name,where:`第${(Number(item.slotIndex)||0)+1}スロ`,reason:!compatible?'通常装備不可':'スロット位置制限'});
   }
   if(row.expansion?.name){
+   const available=hdFEExpansionAvailability(row);
+   if(!available.allowed)(available.status==='manual'?unresolved:invalid).push({ship:row.ship,name:row.expansion.name,where:'補強増設',reason:available.reason});
    const meta=hdFEFind(row.expansion.name);
    if(!meta){unresolved.push({ship:row.ship,name:row.expansion.name,where:'補強増設'});continue}
    checked++;
@@ -351,19 +368,21 @@ function hdFESpeedRecipeText(r){return [r.t?`タービン${r.t}個`:'',r.n?`新�
 const HD_FE_SPEED_MEMO=new WeakMap();
 function hdFEShipSpeed(ship){
  const master=typeof hdShipDbMasterRowFor==='function'?hdShipDbMasterRowFor({name:ship.ship,masterId:ship.masterId}):null,db=hdFEFindShip(ship.ship),exact=db&&(db.final===ship.ship||db.base===ship.ship),base=Number(master?.speed)||({低速:5,高速:10})[exact?db.speed:'']||0,type=master?.type||(exact?db.type:'')||'',group=hdFESpeedGroup(master?.name||ship.ship,base,type),parts={t:0,n:0,h:0,c:0},invalid=[];
- const key=JSON.stringify([ship.ship,master?.id,base,type,(ship.items||[]).map(x=>[x.name,x.star,x.slotIndex]),ship.expansion]),cached=HD_FE_SPEED_MEMO.get(ship);if(cached?.key===key)return cached.value;
+ const expansion=ship.expansion?.name?hdFEExpansionAvailability(ship):null;
+ const key=JSON.stringify([ship.ship,master?.id,base,type,(ship.items||[]).map(x=>[x.name,x.star,x.slotIndex]),ship.expansion,expansion?.status]),cached=HD_FE_SPEED_MEMO.get(ship);if(cached?.key===key)return cached.value;
  const entries=[...(ship.items||[]).map((x,i)=>({...x,slotIndex:x.slotIndex??i})),...(ship.expansion?.name?[{...ship.expansion,isExpansion:true}]:[])];
  for(const item of entries){const name=String(item.name||'').normalize('NFKC').replace(/\s+/g,'');if(!['改良型艦本式タービン','強化型艦本式缶','新型高温高圧缶'].includes(name))continue;
+  if(item.isExpansion&&!expansion.allowed){invalid.push(item.name+'（'+expansion.reason+'）');continue}
   const speedDb=master?hdShipDbMasterAdapter({masterId:master.id}):db,meta=hdFEFind(item.name),profile=speedDb&&hdShipDbSlotProfile(speedDb),unique=item.isExpansion||entries.filter(x=>!x.isExpansion&&Number(x.slotIndex)===Number(item.slotIndex)).length===1,allowed=unique&&meta&&profile&&(item.isExpansion?hdShipDbExpansionInfo(meta,speedDb,item.star).allowed:hdShipDbEquipCompatible(meta,speedDb)&&Number.isInteger(Number(item.slotIndex))&&Number(item.slotIndex)>=0&&Number(item.slotIndex)<profile.count&&!hdShipDbSlotRejects(profile,Number(item.slotIndex),meta));
   if(!allowed){invalid.push(item.name+'（装備位置・装備可否が未充足）');continue}
   if(name==='改良型艦本式タービン')parts.t++;else{parts.c++;if(name==='新型高温高圧缶'){parts.n++;if(Number(item.star)>=7)parts.h++;}}
  }
  let rank=base;
  if(group)for(const target of [10,15,20])if(hdFESpeedRecipes(group,target,base).some(r=>Object.entries(r).every(([k,v])=>parts[k]>=v)))rank=Math.max(rank,target);
- const value={base,rank,group,parts,invalid,known:!!base,label:hdFESpeedLabel(rank),detail:`${ship.ship}：${hdFESpeedLabel(base)} → ${hdFESpeedLabel(rank)}${group?`（${group}）`:'（潜在速力区分が未登録）'}`};HD_FE_SPEED_MEMO.set(ship,{key,value});return value;
+ const value={base,rank,group,parts,invalid,expansionUnconfirmed:expansion?.status==='manual',known:!!base,label:hdFESpeedLabel(rank),detail:`${ship.ship}：${hdFESpeedLabel(base)} → ${hdFESpeedLabel(rank)}${group?`（${group}）`:'（潜在速力区分が未登録）'}`};HD_FE_SPEED_MEMO.set(ship,{key,value});return value;
 }
 function hdFESpeedGoal(ship,target){
- const speed=hdFEShipSpeed(ship),recipes=hdFESpeedRecipes(speed.group,target,speed.base),ok=speed.known&&speed.rank>=target,ratio=ok?1:Math.max(0,...recipes.map(r=>{const values=Object.entries(r);return values.length?values.reduce((n,[k,v])=>n+Math.min(1,speed.parts[k]/v),0)/values.length:0})),unresolved=!speed.known||!speed.group&&speed.rank<target;
+ const speed=hdFEShipSpeed(ship),recipes=hdFESpeedRecipes(speed.group,target,speed.base),ok=speed.known&&!speed.expansionUnconfirmed&&!speed.invalid.length&&speed.rank>=target,ratio=ok?1:Math.max(0,...recipes.map(r=>{const values=Object.entries(r);return values.length?values.reduce((n,[k,v])=>n+Math.min(1,speed.parts[k]/v),0)/values.length:0})),unresolved=!speed.known||speed.expansionUnconfirmed||!speed.group&&speed.rank<target;
  return {kind:'speed-ship',label:`${ship.ship} の${hdFESpeedLabel(target)}条件`,count:Number(ok),minCount:1,ok,ratio,speedActual:true,speed,unresolved,detail:`${speed.detail} / 必要 ${hdFESpeedLabel(target)}。${ok?'配備案の速力条件を満たす':unresolved?'艦娘名・改造段階・速力データを確認':recipes.length?'必要な組み合わせ：'+recipes.map(hdFESpeedRecipeText).join(' または '):'この艦の速力区分では到達できません。艦娘を入れ替えてね'}${speed.invalid.length?'。'+speed.invalid.join('、'):''}`};
 }
 function hdFERouteShips(plan){
@@ -418,6 +437,7 @@ function hdFEBranchPredicate(condition,ships,plan=null){
   let count=0,unknown=0;
   for(const row of ships){const ship=row.ship,db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db);let has=false,unresolved=!profile;
    for(const [i,item] of [...(ship.items||[]).map((x,i)=>[i,x]),...(ship.expansion?.name?[[null,ship.expansion]]:[])]){if(!item.name)continue;const meta=hdFEFind(item.name);if(!meta){unresolved=true;continue}if(condition.match==='drum'?meta.name!=='ドラム缶(輸送用)':!/電探/.test(meta.category||''))continue;
+    const available=i===null?hdFEExpansionAvailability(ship):null;if(available&&!available.allowed){if(available.status==='manual')unresolved=true;continue}
     const slot=item.slotIndex??i,unique=i===null||(ship.items||[]).filter((x,j)=>Number(x.slotIndex??j)===slot).length===1,allowed=unique&&profile&&(i===null?hdShipDbExpansionInfo(meta,db,item.star).allowed:hdShipDbEquipCompatible(meta,db)&&Number.isInteger(slot)&&slot>=0&&slot<profile.count&&!hdShipDbSlotRejects(profile,slot,meta));if(allowed)has=true;
    }if(has)count++;else if(unresolved)unknown++;
   }
@@ -435,7 +455,7 @@ function hdFEBranchPredicate(condition,ships,plan=null){
  }
  if(condition.kind==='minSpeed'){
   if(![10,15,20].includes(condition.rank)||!ships.length)return manual('速力条件を確認してください');
-  const known=x=>x.speedInfo.known&&![...(x.ship.items||[]),x.ship.expansion].some(i=>i?.name&&!hdFEFind(i.name)),low=ships.filter(x=>known(x)&&x.speedInfo.rank<condition.rank),unknown=ships.filter(x=>!known(x));
+  const known=x=>x.speedInfo.known&&!x.speedInfo.expansionUnconfirmed&&![...(x.ship.items||[]),x.ship.expansion].some(i=>i?.name&&!hdFEFind(i.name)),low=ships.filter(x=>known(x)&&x.speedInfo.rank<condition.rank),unknown=ships.filter(x=>!known(x));
   return {status:low.length?'missing':unknown.length?'manual':'ready',ratio:ships.filter(x=>known(x)&&x.speedInfo.rank>=condition.rank).length/ships.length,count:ships.length-low.length-unknown.length,need:ships.length,detail:`${hdFESpeedLabel(condition.rank)}統一 ${ships.length-low.length-unknown.length}/${ships.length}隻${low.length?' / 不足: '+low.map(x=>x.ship.ship).join('、'):''}${unknown.length?' / 速力未判定: '+unknown.map(x=>x.ship.ship).join('、'):''}`};
  }
  if(!['fleetCount','typeCount'].includes(condition.kind))return manual('未対応の分岐条件です');
@@ -530,7 +550,7 @@ function hdFERoute(plan){
  const info=plan?.suggestion?.info||plan?.routeInfo;
  // The canonical preset is an example; verified AE alternatives need not contain
  // a light cruiser. Explicit quest/flagship constraints remain in force.
- const example=!info||MAP_PLANS[plan.map].presets.some(p=>JSON.stringify(info)===JSON.stringify(hdFSPresetInfo(p)));
+ const example=!info||MAP_PLANS[plan.map].presets.some(p=>{const canonical=hdFSPresetInfo(p);return ['text','requirements','total','conditionManual','speedRequired','flagship'].every(k=>JSON.stringify(info[k])===JSON.stringify(canonical[k]))});
  const status=example?branch.status:basic.status==='missing'||branch.status==='missing'?'missing':basic.status!=='ready'||branch.status!=='ready'?'manual':'ready';
  return {...basic,status,branch,requirements:example?[]:basic.requirements,speedTarget:hdFEPlanSpeedTarget(plan),detail:(example?'':basic.detail+' / ')+branch.detail};
 }
@@ -549,6 +569,8 @@ function hdFEAirCheck(map,air,plan=null){
  const loss=target?.known&&target.hasAir&&known===total&&typeof hdMapAirLossBounds==='function'?hdMapAirLossBounds((air?.rows||[]).map(r=>({...r,slot:r.cap,category:r.meta?.category})),enemy,r=>r.slot>0?Math.floor(r.aa*Math.sqrt(r.slot)):0):null;
  return {status,loss,routeLoss,ours,enemy:enemy??0,required,goal,reason,ratio,liveCapacityKnown:live,depletedSlots:depleted,source:target?.source||'',detail:reason==='route'?`${target.detail}。海域最大 ${enemy??'?'} は参考値で、ルート充足とは判定しません。`:enemy===null?`敵制空値の数値データなし${live?`（現在搭載 ${live}/${total}スロ反映）`:''}`:`基礎制空 ${ours} / ${target?.known?target.detail:'確認敵制空最大'} ${enemy} → ${label} / ${typeof HD_MAP_AIR_GOALS!=='undefined'?HD_MAP_AIR_GOALS[goal]:'優勢以上'} ${required}（あと ${Math.max(0,required-ours)}）${live?` / 現在搭載 ${live}/${total}スロ`:''}${depleted?` / 損耗 ${depleted}スロ`:''}${reason==='capacity'?'（搭載数未解決あり）':reason==='anti-air'?`（敵防空未判定：${routeLoss.stage2Missing.join(' / ')}）`:''}${routeLoss?.known?` / 連戦モデル最終 ${routeLoss.lower}〜${routeLoss.upper}${routeLoss.firstGap?` / ${routeLoss.firstGap.id}・${routeLoss.firstGap.round}回目に大損耗側であと${routeLoss.firstGap.gap}不足`:''}（通常敵の対空砲火・登録射撃回避モデル、未登録機は回避なし、敵機削りなし）`:''}${loss?.active?` / 制空戦1回後の基礎制空 ${loss.lower}〜${loss.upper}（対空砲火・累積・敵機削りなし）`:''}`};
 }
+// Reference arithmetic for the synchronized ship inputs. A changed loadout can
+// invalidate those inputs; candidate verdicts must use hdFEPlanScouting below.
 function hdFEScouting(plan,items){
  const map=String(plan?.map||''),contract=hdFERouteRequirementData(plan),fallback=typeof HD_MAP_ADVANCED_DATA!=='undefined'?HD_MAP_ADVANCED_DATA[map]?.los:null,adv=contract?.los?.kind==='required'?contract.los:fallback,coef=Number(adv?.coef)||0,checks=Array.isArray(adv?.checks)?adv.checks:[];
  if(contract?.los?.kind==='none')return {status:'ready',available:false,notRequired:true,reason:'not-required',score:null,checks:[],detail:`${contract.path}：${contract.los.note}`};
@@ -563,8 +585,15 @@ function hdFEScouting(plan,items){
  const status=rows.some(x=>x.status==='missing')?'missing':rows.every(x=>x.status==='ready')?'ready':'partial';
  return {status,available:true,score,coef,hq,checks:rows,source:contract?.source||'',route:contract?.path||'',detail:`推定33式 ${score.toFixed(2)}（係数${coef} / 司令部Lv${hq}）${contract?' / '+contract.path+' / 必要 '+checks.map(x=>x.safe).join('・'):''}`};
 }
+function hdFEPlanScouting(plan,items){
+ const scouting=hdFEScouting(plan,items);
+ if(!scouting.available)return scouting;
+ const required=[...(hdFERouteContract(plan)?.checks||[]),...(hdFEBranchRoute(plan).checks||[])].some(x=>x.condition?.kind==='scoutingValue');
+ if(!required||hdFEGameMatch(plan).status==='ready')return scouting;
+ return {status:'manual',available:false,score:null,reason:'bonus',coef:scouting.coef,checks:scouting.checks.map(({score,status,...check})=>check),detail:'装備変更に伴う艦固有索敵ボーナスの差分が未確認。同期した同じ配備で再確認してください'};
+}
 function hdFEAutoVerdict(plan,e){
- const live=hdFELiveFleet(plan),supply=hdFESupply(plan),freshness=hdFESyncFreshness(),gameMatch=hdFEGameMatch(plan),route=hdFERoute(plan),air=hdFEAirCheck(plan?.map,e.air,plan),scouting=hdFEScouting(plan,e.items),equipment={status:e.missing?'missing':e.partial?'partial':'ready',detail:`海域装備 ${e.ready}/${e.requirements.length} 準備`},master={status:e.master.invalid.length?'missing':e.master.unresolved.length?'partial':'ready',detail:e.master.invalid.length?`装備不可 ${e.master.invalid.length}件`:e.master.unresolved.length?`未解決 ${e.master.unresolved.length}件`:'装備可否OK'},unknownHealth=live.details.filter(x=>x.status==='unknown').length,health={status:live.status,detail:live.blocked?`出撃不可候補 ${live.blocked}隻（${Object.entries(live.reasons).map(x=>x[0]+' '+x[1]).join(' / ')}）`:live.caution?`注意艦 ${live.caution}隻${unknownHealth?` / 同期状態不明 ${unknownHealth}隻`:''}`:unknownHealth?`同期状態不明 ${unknownHealth}隻。ゲーム連携を確認`:'艦状態OK'};
+ const live=hdFELiveFleet(plan),supply=hdFESupply(plan),freshness=hdFESyncFreshness(),gameMatch=hdFEGameMatch(plan),route=hdFERoute(plan),air=hdFEAirCheck(plan?.map,e.air,plan),scouting=hdFEPlanScouting(plan,e.items),equipment={status:e.missing?'missing':e.partial?'partial':'ready',detail:`海域装備 ${e.ready}/${e.requirements.length} 準備`},master={status:e.master.invalid.length?'missing':e.master.unresolved.length?'partial':'ready',detail:e.master.invalid.length?`装備不可 ${e.master.invalid.length}件`:e.master.unresolved.length?`未解決 ${e.master.unresolved.length}件`:'装備可否OK'},unknownHealth=live.details.filter(x=>x.status==='unknown').length,health={status:live.status,detail:live.blocked?`出撃不可候補 ${live.blocked}隻（${Object.entries(live.reasons).map(x=>x[0]+' '+x[1]).join(' / ')}）`:live.caution?`注意艦 ${live.caution}隻${unknownHealth?` / 同期状態不明 ${unknownHealth}隻`:''}`:unknownHealth?`同期状態不明 ${unknownHealth}隻。ゲーム連携を確認`:'艦状態OK'};
  if(typeof hdSEAirOptional==='function'&&hdSEAirOptional(plan?.map)){air.status='manual';air.detail='1-6下ルートは制空優勢が必須ではありません。防空・対潜を優先し、水戦/水爆は編成に応じた選択肢'}
  const checks=[{id:'health',label:'艦状態',...health},{id:'supply',label:'補給',...supply},{id:'freshness',label:'同期鮮度',...freshness},{id:'gameMatch',label:'ゲーム反映',...gameMatch},{id:'route',label:'編成条件',...route},{id:'equipment',label:'装備',...equipment},{id:'air',label:'制空',...air},{id:'scouting',label:'索敵',...scouting},{id:'master',label:'装備可否',...master}],ranked={missing:3,partial:2,manual:1,ready:0},worst=checks.reduce((a,x)=>(ranked[x.status]??1)>(ranked[a.status]??0)?x:a,{status:'ready'});
  return {status:worst.status,checks,live,supply,freshness,gameMatch,route,air,scouting,master,equipment};
