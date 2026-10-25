@@ -1,21 +1,17 @@
 {
-  "version": "1.0.579",
-  "build": 579,
-  "releasedAt": "2026-10-16T08:02:05.223+09:00",
-  "notes": "攻略目標の取込ボタン押下中は作戦優先度の更新を保留し、クリック・取消後に最新内容を反映。保存データ形式は変更なし。",
+  "version": "1.0.580",
+  "build": 580,
+  "releasedAt": "2026-10-26T05:56:28.661+09:00",
+  "notes": "艦これマスター自動同期。api_start2 23637be / 装備picker 7250299 を反映。艦娘変更 0件 / 新装備 0件 / 装備変更 0件 / 増設ルール 0件。",
   "masterChanges": {
     "baseline": false,
-    "from": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
+    "from": "23637be57ac23a7b4281f193b836fa568ead8ee4",
     "to": "23637be57ac23a7b4281f193b836fa568ead8ee4",
-    "at": "2026-10-14T18:59:18.588Z",
+    "at": "2026-10-25T20:56:28.654Z",
     "ships": {
-      "added": [
-        "902"
-      ],
+      "added": [],
       "removed": [],
-      "changed": [
-        "391"
-      ]
+      "changed": []
     },
     "equipment": {
       "added": [],
@@ -23,8 +19,8 @@
       "changed": []
     },
     "exslot": {
-      "changed": true,
-      "itemRulesChanged": 5,
+      "changed": false,
+      "itemRulesChanged": 0,
       "limitShipsChanged": 0
     },
     "picker": {

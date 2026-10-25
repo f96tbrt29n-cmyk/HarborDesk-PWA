@@ -12,8 +12,8 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "repo": "poooi/poi",
       "ref": "master",
       "path": "views/utils/game-selector/tables.ts",
-      "commit": "e38bdbc29ba470b511e15645a4b2f349bb512bd3",
-      "updated": "2026-10-08T17:35:56Z"
+      "commit": "725029997b84729df6394e1f107079b8e9437f36",
+      "updated": "2026-10-25T15:07:21Z"
     },
     "equipTypeSpOverrides": {
       "128": 38,
@@ -47423,17 +47423,13 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
   },
   "changes": {
     "baseline": false,
-    "from": "f45f36fdc8caddf8f78c287e599dcab0cb5d5c68",
+    "from": "23637be57ac23a7b4281f193b836fa568ead8ee4",
     "to": "23637be57ac23a7b4281f193b836fa568ead8ee4",
-    "at": "2026-10-14T18:59:18.588Z",
+    "at": "2026-10-25T20:56:28.654Z",
     "ships": {
-      "added": [
-        "902"
-      ],
+      "added": [],
       "removed": [],
-      "changed": [
-        "391"
-      ]
+      "changed": []
     },
     "equipment": {
       "added": [],
@@ -47441,8 +47437,8 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "changed": []
     },
     "exslot": {
-      "changed": true,
-      "itemRulesChanged": 5,
+      "changed": false,
+      "itemRulesChanged": 0,
       "limitShipsChanged": 0
     },
     "picker": {
