@@ -39,7 +39,7 @@ function hdMSNSyncContext(){
  return {map,fleet,preset};
 }
 function hdMSNEvaluation(map,fleet,preset){
- if(!fleet)return `<div class="hd-msn-empty"><strong>保存編成を選ぶと差分を判定できるよ</strong><span>この海域の「自分用編成」に艦娘と装備を保存してから確認してね。</span><button type="button" class="ghost small" data-hd-msn-action="fleet">自分用編成を開く</button></div>`;
+ if(!fleet)return `<div class="hd-msn-empty"><strong>保存編成を選ぶと差分を判定できるよ</strong><span>艦隊台帳から候補を作り、この海域の「自分用編成」に保存して確認してね。</span><button type="button" class="primary small" data-hd-map-tool="suggest">手持ちから編成候補を作る</button><small>候補の保存だけでは攻略条件の成立を確認したことにはなりません。</small><button type="button" class="ghost small" data-hd-msn-action="fleet">自分用編成を開く</button></div>`;
  if(typeof hdFEPlanFromSavedFleet!=='function'||typeof hdFEEvaluate!=='function')return '<p class="muted">判定モジュールを読み込み中。少し待ってから再確認してね。</p>';
  try{
   const auto=hdMSNAuto(map,fleet,preset),checks=HD_MSN_CHECK_IDS.map(id=>auto.checks.find(c=>c.id===id)).filter(Boolean),routeParsed=preset&&typeof hdFSPresetInfo==='function'?hdFSPresetInfo(preset):null;

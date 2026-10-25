@@ -17,6 +17,77 @@ async function prepare(page,{base=41}={}){
   saveCustomFleets({'2-5':[completionFleet]});
  },base);
 }
+northDrumTest('north navigator without a saved fleet opens owned candidates and preserves manual checks through save and reload',async({page},info)=>{
+ const fs=require('node:fs/promises'),errors=[],evidence={scope:'navigation and save regression; synthetic base41 is not a verified game stat'};
+ page.on('pageerror',error=>errors.push(error.message));
+ try{
+  await prepare(page);
+  await page.evaluate(()=>{
+   // Reuse the recorded 0-3 unknown-LOS allocation as a manual equipment memo.
+   // The observed game loadout remains unchanged; do not invent bonus values.
+   const rows=rosterLoad(),parts=hdFEGearTokens(rows[1].gear);parts[0]='ドラム缶(輸送用)';parts[2]='';rows[1].gear=parts.join(' / ');
+   localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));
+   saveCustomFleets({'1-1':[{id:'entry-other-map',name:'保持する別海域',ships:[],memo:'keep'}]});
+   const keys=[SHIP_ROSTER_KEY,HD_FL_KEY,'harbordesk-kancolle-sync-v1','harbordesk-kancolle-fleets-v1','harbordesk-pwa-v1'];
+   window.northEntryBaseline={keys,values:keys.map(key=>localStorage.getItem(key)),other:JSON.stringify(loadCustomFleets()['1-1'])};
+  });
+  await page.locator('#hdWorkspaceNav [data-hd-ws-group="guide"]').click();
+  await page.locator('#hdWorkspaceSectionSelect').selectOption('mapStrategyNavigator');
+  const navigator=page.locator('#mapStrategyNavigator');await expect(navigator).toBeVisible();
+  await expect(page.locator('#hdMapStrategyMap')).toHaveValue('');
+  await page.locator('#hdMapStrategyMap').selectOption('2-5');
+  await page.locator('#hdMapStrategyRoute').selectOption('0');
+  await expect(page.locator('#hdMapStrategyFleet option')).toHaveCount(1);
+  const create=navigator.getByRole('button',{name:'手持ちから編成候補を作る',exact:true});
+  evidence.stage='selected-map-without-saved-fleet';
+  await expect(create).toBeVisible();await create.click();
+  const suggester=page.locator('#hdFleetSuggester');await expect(suggester).toBeVisible();
+  await expect(page.locator('#hdFleetSuggesterMap')).toHaveText('2-5');
+  await expect(suggester.locator('[data-hd-fs-route]')).toHaveValue('0');
+  const candidate=suggester.locator('.hd-fs-card');await expect(candidate).toHaveCount(1);
+  await expect(candidate.locator('.hd-fs-ship.missing')).toHaveCount(0);
+  await expect(candidate).toContainText('アプリ内編成例:');
+  evidence.stage='owned-candidate-visible';
+  await candidate.getByRole('button',{name:'この候補を自分用編成に保存',exact:true}).click();
+  await expect(candidate.locator('[data-hd-fs-save]')).toHaveText('保存したよ');
+  const saved=await page.evaluate(()=>{
+   const fleet=loadCustomFleets()['2-5'][0],plan=hdFEPlanFromSavedFleet('2-5',fleet),baseline=northEntryBaseline;
+   const rows=rosterLoad(),usage=hdFOAssignedUsage(plan),stock=Object.fromEntries([...hdFLInventory()].map(([key,row])=>[key,row.count]));
+   window.northEntrySaved=JSON.stringify(fleet);
+   return {id:fleet.id,route:hdMapRouteStored('2-5'),scouting:hdOCRequiredChecks(plan).find(x=>x.condition.kind==='scoutingValue'),
+    readiness:hdOCReadiness(plan,hdOCMeasure(plan,hdFLRequirements(plan))),master:hdFEMasterValidation(plan),usage,stock,
+    individualIds:fleet.ships.filter(x=>x.ship).map(x=>x.gameShipId),
+    slotsUnchanged:fleet.ships.filter(x=>x.ship).every(x=>x.gear===rows.find(row=>row.gameShipId===x.gameShipId)?.gear),
+    sourceKeysExact:baseline.keys.map((key,i)=>({key,exact:localStorage.getItem(key)===baseline.values[i]})),otherMapExact:JSON.stringify(loadCustomFleets()['1-1'])===baseline.other};
+  });
+  evidence.saved=saved;evidence.stage='candidate-saved';
+  expect(saved.route).toBe(0);expect(saved.scouting.status).toBe('manual');expect(saved.readiness.registeredReady).toBe(false);
+  expect(saved.master.valid).toBe(true);expect(new Set(saved.individualIds).size).toBe(6);expect(saved.slotsUnchanged).toBe(true);
+  for(const [key,count] of Object.entries(saved.usage))expect(count,key).toBeLessThanOrEqual(saved.stock[key]||0);
+  expect(saved.sourceKeysExact.every(row=>row.exact)).toBe(true);expect(saved.otherMapExact).toBe(true);
+  const reference=await page.evaluate(()=>({fleet:northEntrySaved,keys:northEntryBaseline.keys,values:northEntryBaseline.values,other:northEntryBaseline.other}));
+  await page.locator('#hdWorkspaceSectionSelect').selectOption('mapStrategyNavigator');
+  await expect(navigator).toBeVisible();await expect(page.locator('#hdMapStrategyFleet')).toHaveValue(saved.id);
+  await expect(navigator.locator('.hd-msn-check.manual').filter({has:page.getByText('索敵',{exact:true})})).toContainText('未確認');
+  await page.waitForLoadState('load');
+  await page.reload({waitUntil:'load'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCContext==='function');
+  await page.locator('#hdWorkspaceNav [data-hd-ws-group="guide"]').click();
+  await page.locator('#hdWorkspaceSectionSelect').selectOption('mapStrategyNavigator');
+  await page.locator('#hdMapStrategyMap').selectOption('2-5');
+  await expect(page.locator('#hdMapStrategyFleet')).toHaveValue(saved.id);
+  await expect(navigator.locator('.hd-msn-check.manual').filter({has:page.getByText('索敵',{exact:true})})).toContainText('未確認');
+  evidence.after=await page.evaluate(reference=>{
+   const fleet=loadCustomFleets()['2-5'][0],plan=hdFEPlanFromSavedFleet('2-5',fleet);
+   return {readyState:document.readyState,scouting:hdOCRequiredChecks(plan).find(x=>x.condition.kind==='scoutingValue').status,
+    fleetExact:JSON.stringify(fleet)===reference.fleet,sourceKeysExact:reference.keys.map((key,i)=>({key,exact:localStorage.getItem(key)===reference.values[i]})),otherMapExact:JSON.stringify(loadCustomFleets()['1-1'])===reference.other};
+  },reference);
+  evidence.stage='reloaded-saved-candidate-visible';expect(evidence.after.readyState).toBe('complete');expect(evidence.after.scouting).toBe('manual');
+  expect(evidence.after.fleetExact).toBe(true);expect(evidence.after.sourceKeysExact.every(row=>row.exact)).toBe(true);expect(evidence.after.otherMapExact).toBe(true);
+  expect(errors).toEqual([]);
+ }finally{
+  evidence.pageerrors=errors;const file=info.outputPath('north-candidate-entry.json');await fs.writeFile(file,JSON.stringify(evidence,null,2));await info.attach('north-candidate-entry',{path:file,contentType:'application/json'});
+ }
+});
 northDrumTest('north two finite drums match an independent legal-slot and distinct-hull domain',async({page},info)=>{
  const fs=require('node:fs/promises'),evidence={caseId:'2-5/index0/BFJO',domain:'45 pairs of ten positions, two owned drums; no search completeness claim'};
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
