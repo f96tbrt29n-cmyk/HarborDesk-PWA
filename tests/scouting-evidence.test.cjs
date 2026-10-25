@@ -8,6 +8,34 @@ function load(file,name,context){
  const source=fs.readFileSync(path.join(__dirname,'..',file),'utf8'),start=source.indexOf('function '+name+'('),end=source.indexOf('\nfunction ',start+1);
  vm.runInNewContext(source.slice(start,end<0?undefined:end),context);return context[name];
 }
+function aswTargetContext(){
+ const types={'夕立改二':'駆逐艦','時雨改二':'駆逐艦','綾波改二':'駆逐艦','島風改':'駆逐艦','占守改':'海防艦','扶桑改':'航空戦艦','阿武隈改二':'軽巡洋艦'},stored={};
+ const c={window:{},HD_OC_ASW_TARGET_KEY:'harbordesk-opening-asw-targets-v1',localStorage:{getItem:key=>key==='harbordesk-opening-asw-targets-v1'?JSON.stringify(stored):null},hdSEChecks:()=>({rows:[{kind:'cap-asw'}]}),hdFEFindShip:name=>types[name]?{type:types[name]}:null,HD_MAP_ADVANCED_DATA:{'7-1':{openingAsw:{recommended:4,upper:5,source:'https://zekamashi.net/kancolle-kouryaku/7-1/'}}}};
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../map-plans.js'),'utf8')+';this.plans=MAP_PLANS',c);
+ for(const name of ['hdOCOaswTargets','hdOCOaswRecommendation','hdOCOaswTarget'])if(fs.readFileSync(path.join(__dirname,'../owned-equipment-planner.js'),'utf8').includes('function '+name+'('))load('owned-equipment-planner.js',name,c);
+ const context=(map,index,names)=>({map,index,preset:c.plans[map].presets[index],fleet:{id:'target-fixture',ships:names.map(ship=>({ship}))}});
+ return {c,stored,context};
+}
+test('source-scoped ASW defaults use four destroyers without borrowing a count from another fleet or gauge',()=>{
+ const {c,context}=aswTargetContext(),dd=['夕立改二','時雨改二','綾波改二','島風改'];
+ assert.equal(c.hdOCOaswTarget(context('1-5',2,dd)),4);
+ assert.equal(c.hdOCOaswTarget(context('7-1',0,['阿武隈改二',...dd])),4);
+ for(const x of [context('1-5',0,Array(4).fill('占守改')),context('1-5',1,['扶桑改',...dd.slice(0,3)]),context('7-2',0,['阿武隈改二',...dd.slice(0,3)]),context('1-5',2,['阿武隈改二',...dd.slice(0,3)])])assert.equal(c.hdOCOaswTarget(x),undefined);
+});
+test('explicit ASW goals including zero survive recommendation changes and unspecified goals stay omitted on save',()=>{
+ const {c,stored,context}=aswTargetContext(),x=context('1-5',2,['夕立改二','時雨改二','綾波改二','島風改']);
+ x.preset={...x.preset,openingAswCount:4};x.fleet.openingAswCount=2;assert.equal(c.hdOCOaswTarget(x),2);
+ stored['1-5:target-fixture:2']=3;assert.equal(c.hdOCOaswTarget(x),3);
+ stored['1-5:target-fixture:2']=0;assert.equal(c.hdOCOaswTarget(x),0);
+ const choice=context('7-2',0,['阿武隈改二','夕立改二','時雨改二','綾波改二']);assert.equal(JSON.stringify({openingAswCount:c.hdOCOaswTarget(choice)}),'{}');
+});
+test('ASW aggregate keeps ready missing and unknown ships distinct and separates unselected from explicit zero',()=>{
+ const states=[{status:'ready'},{status:'ready'},{status:'missing',value:99,threshold:100},{status:'manual',threshold:100}],c={hdOCOaswTarget:()=>4,hdOCOaswScope:(_,i)=>String(i),hdFEOpeningAsw:(_,scope)=>states[Number(scope)]};
+ const measure=load('owned-equipment-planner.js','hdOCOaswMeasure',c),plan={map:'fixture',openingAswCount:4,ships:states.map((_,i)=>({ship:'ship'+i}))},m=measure(plan);
+ assert.equal(m.count,2);assert.equal(m.missingCount,1);assert.equal(m.manualCount,1);assert.equal(m.ok,false);assert.equal(m.unresolved,true);
+ c.hdOCOaswTarget=()=>undefined;const unknown=measure({map:'fixture',ships:[]});assert.equal(unknown.unresolved,true);assert.equal(unknown.count,null);assert.equal(unknown.minCount,null);
+ assert.equal(measure({map:'fixture',openingAswCount:0,ships:[]}).ok,true);
+});
 test('unconfirmed air targets carry no numeric achievement or equipment deficit; known boundaries remain numeric',()=>{
  let target={selected:false,known:false,detail:'通るマス未選択'},capacityKnown=1,antiAirKnown=true;
  const c={

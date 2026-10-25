@@ -640,12 +640,15 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。 対象実行では利用者指定4隻の未確認→保存/load→同期値回復を確認。",
+          "detail": "海防4隻例の人数は未指定。対潜セット4組と分けて利用者が選択。利用者指定4隻の未判定・保存/load・回復は既存証拠を再利用。",
           "evidence": [
             "hdOCOaswTarget/hdOCOaswMeasure",
-            "tests/owned-oasw-integration.spec.js: unknown opening ASW"
+            "tests/owned-oasw-integration.spec.js: unknown opening ASW",
+            "docs/asw-route-targets-ja.md",
+            "tests/scouting-evidence.test.cjs",
+            "tests/owned-oasw-integration.spec.js"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "出典は可能な範囲で先制対潜を準備する案で、十分な人数の一意な根拠なし。"
         },
         "制空": {
           "class": "D",
@@ -752,11 +755,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "航空戦艦入りの人数は未指定。対潜セット3組・水爆推奨とは分けて利用者が選択。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-route-targets-ja.md",
+            "tests/scouting-evidence.test.cjs",
+            "tests/owned-oasw-integration.spec.js"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "人数の明記なし。対象初期値のNode確認のみで、この編成の新規実操作は未実行。"
         },
         "制空": {
           "class": "D",
@@ -861,12 +867,15 @@
           "limit": ""
         },
         "先制対潜": {
-          "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "class": "A",
+          "detail": "駆逐4隻の対象例のみ先制対潜4隻を初期目標へ接続。自動/手持ち配備、利用者変更、保存/load・同期通知後の保持を実操作確認。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-route-targets-ja.md",
+            "tests/scouting-evidence.test.cjs",
+            "tests/owned-oasw-integration.spec.js"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "キラ付け編成例の攻略案。全初攻略の最低人数ではない。他艦種構成は人数選択。全艦固有ボーナス・勝利は未確認。"
         },
         "制空": {
           "class": "D",
@@ -5619,13 +5628,16 @@
           "limit": ""
         },
         "先制対潜": {
-          "class": "B",
-          "detail": "海域推奨4隻（7-1は4〜5の下限）。艦別判定後に人数集計",
+          "class": "A",
+          "detail": "既存の攻略案4〜5隻の下限4を維持。成立/不足/未判定の混在内訳・99/100境界・入力取消・利用者変更・保存/loadを実操作確認。",
           "evidence": [
             "hdOCOaswTarget/hdOCOaswMeasure",
-            "docs/owned-loadout-verification-ja.md"
+            "docs/owned-loadout-verification-ja.md",
+            "docs/asw-route-targets-ja.md",
+            "tests/scouting-evidence.test.cjs",
+            "tests/owned-oasw-integration.spec.js"
           ],
-          "limit": "同じルートでの全人数・装備・不足案内の実操作は今回未実行"
+          "limit": "煙幕を使う初攻略例の先制対潜2隻など別案もある。4を経路必須や唯一の十分人数としない。"
         },
         "制空": {
           "class": "D",
@@ -5716,11 +5728,14 @@
         },
         "先制対潜": {
           "class": "C",
-          "detail": "既定1隻／利用者が選ぶ目標。海域に十分な推奨人数ではない。",
+          "detail": "第1ゲージ4隻例は人数未指定。対潜セット4組の装備別不足と人数選択3隻、在庫回復、保存/loadを実操作確認。",
           "evidence": [
-            "hdOCOaswTarget/hdOCOaswMeasure"
+            "hdOCOaswTarget/hdOCOaswMeasure",
+            "docs/asw-route-targets-ja.md",
+            "tests/scouting-evidence.test.cjs",
+            "tests/owned-oasw-integration.spec.js"
           ],
-          "limit": "必要な推奨人数の根拠は未登録。艦別の表示対潜・装備/ボーナス情報も必要"
+          "limit": "4隻初攻略例には一意な人数の明記なし。別の5隻育成例の海防艦3隻を流用しない。"
         },
         "制空": {
           "class": "D",
@@ -6679,8 +6694,9 @@
     "速力:B": 13,
     "推奨セット:B": 7,
     "制空:B": 41,
-    "先制対潜:C": 23,
+    "先制対潜:C": 22,
     "推奨セット:A": 2,
+    "先制対潜:A": 2,
     "装備艦数:A": 2,
     "索敵:A": 1,
     "速力:A": 2,
@@ -6688,8 +6704,7 @@
     "装備艦数:B": 3,
     "制空:A": 1,
     "索敵:C": 3,
-    "制空:C": 3,
-    "先制対潜:B": 1
+    "制空:C": 3
   },
   "limits": "RequiredConnectionClass covers only route-mandatory gear-count/LOS/speed. Recommendation and user goals are separate per-condition columns; a required A does not validate recommended quantity or full route/fleet/game conditions. No promotion of 53-example verification status."
 }

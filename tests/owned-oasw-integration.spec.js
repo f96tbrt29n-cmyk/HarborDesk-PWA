@@ -23,6 +23,64 @@ async function fleet(page,{count=2,base=50,stock=2,realRoute=false}={}){
   hdMSNOpen('1-5');
  },{count,base,stock,realRoute});
 }
+async function aswRouteFleet(page,map,index,names,stock=names.length){
+ await boot(page);
+ await page.evaluate(({map,index,names,stock})=>{
+  const rows=names.map((name,i)=>({id:'route-asw-'+i,name,masterId:hdShipDbMasterRowFor(name).id,gameShipId:7300+i,level:160,gameAsw:90,gameLos:40,gameAswGearKnown:true,gameGearSlots:Array(hdShipDbSlotProfile(hdFEFindShip(name)).count).fill(''),gameGearExpansion:'',gameSlotEx:0,metadata:{keep:i}}));
+  localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));localStorage.setItem(HD_FL_KEY,JSON.stringify([{name:'三式水中探信儀',count:stock},{name:'三式爆雷投射機',count:stock}]));
+  localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:120,metadata:{keep:true}}));
+  localStorage.setItem(HD_OC_ASW_TARGET_KEY,JSON.stringify({'1-1:unrelated:0':6}));
+  saveCustomFleets({[map]:[{id:'route-asw',name:'対潜目標の合成編成',metadata:{keep:true},routePreset:MAP_PLANS[map].presets[index],ships:rows.map(r=>({ship:r.name,masterId:r.masterId,gameShipId:r.gameShipId,rosterId:r.id,gear:'',metadata:{keep:r.id}}))}],'1-1':[{id:'unrelated',name:'対象外',ships:[],metadata:{keep:true}}]});
+  hdMapRouteSet(map,index);hdMSNOpen(map);
+ },{map,index,names,stock});
+}
+async function aswRouteRecord(page,map,index){
+ await expect(page.locator('#mapStrategyNavigator .hd-oc-panel .hd-oc-result')).toBeVisible();
+ return page.evaluate(({map,index})=>{const r=HD_OC_CACHE.get(`${map}:route-asw:${index}`),g=r.measure.goals.find(x=>x.kind==='opening-asw'),usage={};for(const s of r.plan.ships)for(const x of [...s.items,s.expansion].filter(x=>x?.name)){usage[x.name]=(usage[x.name]||0)+1}return {goal:g,sets:r.measure.goals.find(x=>x.kind==='cap-asw'),shortages:r.shortages.map(x=>({kind:x.goalKind,unresolved:x.unresolved,parts:x.stock?.parts.map(p=>({part:p.part,need:p.need,have:p.have}))})),usage,route:hdFERoute(r.plan).status,readiness:hdOCReadiness(r.plan,r.measure)}},{map,index});
+}
+async function aswRouteSaveReload(page,map,index,evidence){
+ const before=await page.evaluate(map=>{const keys=[SHIP_ROSTER_KEY,HD_FL_KEY,'harbordesk-kancolle-sync-v1','harbordesk-kancolle-fleets-v1','harbordesk-pwa-v1'];return {keys,values:keys.map(k=>localStorage.getItem(k)),other:JSON.stringify(loadCustomFleets()['1-1']),ids:loadCustomFleets()[map][0].ships.map(s=>s.gameShipId)}},map);
+ await page.locator('#mapStrategyNavigator .hd-oc-panel [data-hd-oc-apply]').click();
+ await page.reload({waitUntil:'load'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCContext==='function');await page.evaluate(map=>hdMSNOpen(map),map);
+ const saved=await page.evaluate(({map,index,before})=>{const c=hdOCContext(map,'route-asw',index),f=c.fleet;return {complete:document.readyState==='complete',goal:hdOCOaswTarget(c),stored:f.openingAswCount,exact:before.keys.every((k,i)=>localStorage.getItem(k)===before.values[i]),presence:before.values.map(v=>v!==null),other:JSON.stringify(loadCustomFleets()['1-1'])===before.other,ids:f.ships.map(s=>s.gameShipId),fleetMetadata:f.metadata,shipMetadata:f.ships.map(s=>s.metadata),otherGoal:hdOCOaswTargets()['1-1:unrelated:0']}},{map,index,before});
+ evidence.saved=saved;expect(saved.complete).toBe(true);expect(saved.exact).toBe(true);expect(saved.other).toBe(true);expect(saved.ids).toEqual(before.ids);expect(saved.fleetMetadata).toEqual({keep:true});expect(saved.shipMetadata).toEqual(before.ids.map((_,i)=>({keep:'route-asw-'+i})));expect(saved.otherGoal).toBe(6);return saved;
+}
+async function finishAswRoute(info,evidence,errors){evidence.pageerrors=errors;const file=info.outputPath('route-guidance-evidence.json');await fs.promises.writeFile(file,JSON.stringify(evidence,null,2));await info.attach('route-guidance-evidence',{path:file,contentType:'application/json'});}
+guidanceTest('source-backed destroyer ASW target drives real owned search and keeps user override',async({page},info)=>{
+ const evidence={scope:'real 1-5 preset2 destroyer4; source example target, not passage necessity; synthetic observed stats',stages:[]},errors=[];page.on('pageerror',e=>errors.push(e.message));
+ try{
+  await aswRouteFleet(page,'1-5',2,['夕立改二','時雨改二','綾波改二','島風改']);
+  const panel=page.locator('#mapStrategyNavigator .hd-oc-panel'),input=panel.locator('[data-hd-oc-asw-target]');
+  evidence.initial=await input.inputValue();await expect(input).toHaveValue('4');await expect(panel.locator('[data-hd-oc-asw-source]')).toContainText('推奨');
+  await panel.locator('[data-hd-oc-search]').click();const r=await aswRouteRecord(page,'1-5',2);evidence.stages.push(r);
+  expect(r.goal).toMatchObject({count:4,minCount:4,ok:true,missingCount:0,manualCount:0});expect(r.sets).toMatchObject({count:4,minCount:4,ok:true});expect(r.usage).toEqual({'三式水中探信儀':4,'三式爆雷投射機':4});expect(r.route).toBe('ready');
+  const auto=await page.evaluate(()=>{hdSelectGuideMap('1-5');hdFSOpen();const list=hdFSPlans('1-5'),index=list.findIndex(x=>x.routeIndex===2),p=hdFLGenerate(index);return hdFLAssessment(p).measure.goals.find(x=>x.kind==='opening-asw')});evidence.automatic=auto;expect(auto.minCount).toBe(4);
+  await page.evaluate(()=>hdMSNOpen('1-5'));await input.fill('2');await input.press('Tab');await page.evaluate(()=>{window.dispatchEvent(new CustomEvent('hd:kancolle-sync',{detail:{synthetic:true}}));hdMSNOpen('1-5')});await expect(input).toHaveValue('2');
+  await panel.locator('[data-hd-oc-search]').click();const saved=await aswRouteSaveReload(page,'1-5',2,evidence);expect(saved.goal).toBe(2);expect(saved.stored).toBe(2);expect(errors).toEqual([]);
+ }finally{await finishAswRoute(info,evidence,errors)}
+});
+guidanceTest('7-1 ASW review counts mixed states and preserves the chosen goal after value clearing',async({page},info)=>{
+ const evidence={scope:'real 7-1 preset0, current legal allocation replay for independent 100/99/missing-stat boundaries',stages:[]},errors=[];page.on('pageerror',e=>errors.push(e.message));
+ try{
+  await aswRouteFleet(page,'7-1',0,['阿武隈改二','夕立改二','時雨改二','綾波改二','島風改']);const panel=page.locator('#mapStrategyNavigator .hd-oc-panel'),input=panel.locator('[data-hd-oc-asw-target]');await expect(input).toHaveValue('4');
+  await page.evaluate(()=>{const roster=hdFERoster(),fleets=loadCustomFleets();roster.forEach((r,i)=>{r.gameGearSlots=['三式水中探信儀','三式爆雷投射機',''];if(i===4)delete r.gameAsw;else r.gameAsw=i<2?100:99;fleets['7-1'][0].ships[i].gear='三式水中探信儀 / 三式爆雷投射機'});localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(roster));saveCustomFleets(fleets);const c=hdOCContext('7-1','route-asw',0),b=hdOCBuild(c);b.plan.ships.forEach(s=>{s.items=s.items.filter(x=>x.name)});const measure=hdOCMeasure(b.plan,hdFLRequirements(b.plan),b.unknown);HD_OC_CACHE.set('7-1:route-asw:0',{plan:b.plan,measure,signature:hdOCSignature(c),fleetId:'route-asw',shortages:[],examined:0,search:{status:'incomplete',exhaustive:false,examined:0,reasons:['current-allocation-review']}});hdMSNOpen('7-1')});
+  const first=await aswRouteRecord(page,'7-1',0);evidence.stages.push(first);expect(first.goal).toMatchObject({count:2,missingCount:2,manualCount:1,minCount:4,unresolved:true,ok:false});expect(first.goal.ships.map(x=>x.state.status)).toEqual(['ready','ready','missing','missing','manual']);
+  await expect(panel.locator('.hd-oc-goal').filter({hasText:'先制対潜艦の目標'})).toContainText('不足2隻・未判定1隻');await expect(panel.locator('[data-hd-oc-asw-ships]')).toContainText('必要 100（あと1）');
+  const value=panel.locator('[data-hd-oc-oasw-ship="4"][data-hd-oasw-value]');await value.fill('100');await value.press('Tab');const known=await aswRouteRecord(page,'7-1',0);evidence.stages.push(known);expect(known.goal).toMatchObject({count:3,missingCount:2,manualCount:0,unresolved:false});
+  await value.fill('');await value.press('Tab');const unknown=await aswRouteRecord(page,'7-1',0);evidence.stages.push(unknown);expect(unknown.goal.manualCount).toBe(1);expect(unknown.shortages.some(g=>g.kind==='opening-asw')).toBe(false);
+  await input.fill('2');await input.press('Tab');await page.evaluate(()=>hdMSNOpen('7-1'));await expect(input).toHaveValue('2');await panel.locator('[data-hd-oc-search]').click();const saved=await aswRouteSaveReload(page,'7-1',0,evidence);expect(saved.goal).toBe(2);expect(saved.stored).toBe(2);expect(errors).toEqual([]);
+ }finally{await finishAswRoute(info,evidence,errors)}
+});
+guidanceTest('7-2 first gauge asks for an ASW goal and reports four-set inventory shortage before recovery',async({page},info)=>{
+ const evidence={scope:'real 7-2 preset0 CL1 DD3; do not reuse the different five-ship leveling example',stages:[]},errors=[];page.on('pageerror',e=>errors.push(e.message));
+ try{
+  await aswRouteFleet(page,'7-2',0,['阿武隈改二','夕立改二','時雨改二','綾波改二'],1);const panel=page.locator('#mapStrategyNavigator .hd-oc-panel'),input=panel.locator('[data-hd-oc-asw-target]');await expect(input).toHaveValue('');await expect(panel.locator('[data-hd-oc-asw-source]')).toContainText('人数を指定');
+  await panel.locator('[data-hd-oc-search]').click();const poor=await aswRouteRecord(page,'7-2',0);evidence.stages.push(poor);expect(poor.goal).toMatchObject({count:null,minCount:null,unresolved:true,ok:false});expect(poor.sets).toMatchObject({minCount:4,count:1,ok:false});const parts=poor.shortages.find(g=>g.kind==='cap-asw').parts;expect(parts.map(p=>[p.need,p.have])).toEqual([[4,1],[4,1]]);await expect(panel.locator('[data-hd-oc-capability-stock]')).toContainText('あと3個');
+  await input.fill('3');await input.press('Tab');await page.evaluate(()=>{localStorage.setItem(HD_FL_KEY,JSON.stringify([{name:'三式水中探信儀',count:4},{name:'三式爆雷投射機',count:4}]));window.dispatchEvent(new Event('hd:equipment-changed'));hdMSNOpen('7-2')});await expect(input).toHaveValue('3');
+  await panel.locator('[data-hd-oc-search]').click();const recovered=await aswRouteRecord(page,'7-2',0);evidence.stages.push(recovered);expect(recovered.goal).toMatchObject({minCount:3,count:4,ok:true});expect(recovered.sets).toMatchObject({minCount:4,count:4,ok:true});expect(recovered.usage).toEqual({'三式水中探信儀':4,'三式爆雷投射機':4});
+  const saved=await aswRouteSaveReload(page,'7-2',0,evidence);expect(saved.goal).toBe(3);expect(saved.stored).toBe(3);expect(errors).toEqual([]);
+ }finally{await finishAswRoute(info,evidence,errors)}
+});
 guidanceTest('unknown opening ASW is not a confirmed equipment shortage and survives save reload before recovery',async({page},info)=>{
  const evidence={scope:'real 1-5 preset0, four synthetic DE individuals; target4 is a user-selected ASW goal, not a new route requirement',stages:[]},errors=[];
  page.on('pageerror',e=>errors.push(e.message));
