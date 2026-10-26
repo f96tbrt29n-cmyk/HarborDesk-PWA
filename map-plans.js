@@ -218,8 +218,17 @@ const HD_MAP_ROUTE_REQUIREMENTS={};
  add('4-5',2,'ADHT / CDHT',[fleet(6),count(['cl'],1),count(['escort'],3)],{routing:'multiple',notes:['軽量最短例は高速+不要、数値索敵条件なし。']});
  add('5-1',0,'BCFJ',[fleet(6),count(['cvn'],0,0),count(['bb','cvl'],0,2),count(['cvl'],0,1),count(['cl'],1),count(['dd'],2)]);
  add('5-2',0,'BCEFO',[fleet(6),count(['cv'],0,2),count(['bb'],0,2)],{los:los(2,70)});
- add('5-3',0,'DGIOKEQ',[fleet(6),count(['cv','bbv'],0,0),count(['cl'],0,1),count(['dd'],2),count(['bb'],0,2),{kind:'slowBattleshipCount',min:0,max:1},{any:[count(['bb'],0,1),speed(10)]}],{checkedAt:'2026-10-26',conditionalSpeed:{rank:10,when:count(['bb'],2,7)},notes:['G→Iでは元の艦種「戦艦」（低速戦艦）は1隻まで。高速化しても艦種は変わりません。艦種「高速戦艦」とは別に数えます。','航戦不可。戦艦2隻へ変更する別例では高速統一が必要。能動分岐Oでボス方面を選ぶ。']});
- MAP_PLANS['5-3'].presets[0].gear+=' G→Iの低速戦艦は元の艦種で1隻まで（高速化しても別枠にはなりません）。';
+ add('5-3',0,'DGIOKEQ',[fleet(6),count(['cv','bbv'],0,0),count(['cl'],0,1),count(['dd'],2),count(['bb'],0,2),{kind:'slowBattleshipCount',min:0,max:1},{any:[count(['bb'],0,1),speed(10)]},
+  {...count(['ss'],0,0),reason:'始点D・G→I・E→Q：潜水艦を含めない'},
+  {any:[count(['dd'],3),{all:[count(['cl'],1),count(['dd'],2,2)]},{all:[count(['bb'],0,1),count(['dd'],2,2)]}],reason:'I→O：O固定条件。未達の残りはJ/Oランダムで、到達不可能という意味ではありません'},
+  {any:[count(['cl'],1),count(['cav'],4),count(['dd'],4)],reason:'E→Q：Q固定条件。未達の残りはB/Qランダム。軽巡または重巡級などの編成を確認'},
+  {not:count(['dd'],4),reason:'K→E：駆逐4隻以上ではH経由。DGIOKEQとは別経路'},
+  {not:{all:[count(['cl'],1),count(['dd'],3,3)]},reason:'K→E：軽巡1隻以上＋駆逐3隻ではH経由。指定経路と艦種構成を確認'},
+  {not:count(['bbv','ao','潜水空母'],1),reason:'K→E：補給艦・航戦・潜水空母を含むとH経由。装備追加ではなく編成を確認'},
+  {not:speed(15),reason:'K→E：高速＋統一以上ではH経由。高速化の下限条件とは別'},
+  {not:{kind:'equipmentShips',match:'drum',min:2,max:7},reason:'K→E：ドラム缶装備艦2隻以上ではH経由。DGIOKEQを選ぶ場合は1隻以下。装備個数とは別'}
+ ],{checkedAt:'2026-10-27',conditionalSpeed:{rank:10,when:count(['bb'],2,7)},scopeIncomplete:true,scopeIncompleteReason:'K→E：大発系装備艦の算入対象が未確認。出典の個別装備一覧は疑問符付き・5-4確認/他海域未確認のため、5-3の経路全体を成立と確定しません。購入で解決する不足ではありません。',notes:['G→Iでは元の艦種「戦艦」（低速戦艦）は1隻まで。高速化しても艦種は変わりません。艦種「高速戦艦」とは別に数えます。','航戦不可。戦艦2隻へ変更する別例では高速統一が必要。能動分岐Oではゲーム内でKを選ぶ。P経由は別の経路で、このアプリは実際の選択操作を観測しません。','I→O・E→Qの固定条件、K→EとK→Hの違いを分けて確認。H経由を避ける条件は戦闘勝利の必須装備ではなく、Hへ進むことをボス到達不可能とは扱いません。','K→Eの大発系対象一覧は5-3への適用が未確認。既知の速力・艦種・ドラム条件を満たしても経路全体は未確認のままです。']});
+ MAP_PLANS['5-3'].presets[0].gear+=' G→Iの低速戦艦は元の艦種で1隻まで（高速化しても別枠にはなりません）。I/O/K/Eの分岐条件は別に確認。Kの大発系算入範囲は未確認。';
  add('5-4',0,'ADEHIJMP',[fleet(6),count(['cv'],0,0),count(['bb'],2,2),count(['dd'],2)],{los:los(2,45),notes:['この登録例は中央ルート。上ルートL→Pの索敵値を流用しない。渦潮対策の電探は推奨。']});
  add('5-5',0,'BKPS',[fleet(6),count(['bb','cv'],0,4),count(['dd'],0,1),count(['ss'],0,0)],{los:los(2,80),notes:['戦艦＋空母5隻以上の別例には索敵を満たしても逸れがある。']});
  add('5-5',1,'BFDHNOS',[fleet(6),count(['bb'],0,2),count(['cv','ss'],0,0),count(['dd'],2)],{los:los(2,66),notes:['この登録例は中央下ルート。ACEGIMOSのドラム缶4隻／大発系4隻の条件とは別。']});
@@ -249,6 +258,9 @@ function hdMapPresetRequirements(map,preset){
  return i<0?null:HD_MAP_ROUTE_REQUIREMENTS[map]?.[i]||null;
 }
 function hdMapRequirementConditionText(c){
+ if(c.reason&&c.kind!=='unverified')return c.reason+'（'+hdMapRequirementConditionText({...c,reason:undefined})+'）';
+ if(c.not)return '該当しないこと：'+hdMapRequirementConditionText(c.not);
+ if(c.kind==='unverified')return c.reason||'条件の根拠・入力が未確認';
  if(c.all)return c.all.map(hdMapRequirementConditionText).join(' かつ ');if(c.any)return c.any.map(hdMapRequirementConditionText).join(' または ');
  if(c.kind==='fleetCount')return `編成 ${c.min===c.max?c.min:c.min+'〜'+c.max}隻`;
  if(c.kind==='typeCount')return `${c.types.join('＋')} ${c.max===0?'不可':c.min===c.max?c.min+'隻':c.min+'〜'+c.max+'隻'}`;

@@ -4134,6 +4134,177 @@
               "rank": 10
             }
           ]
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0,
+          "reason": "始点D・G→I・E→Q：潜水艦を含めない"
+        },
+        {
+          "any": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 3,
+              "max": 7
+            },
+            {
+              "all": [
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡洋艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 1,
+                  "max": 7
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 2,
+                  "max": 2
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "戦艦",
+                    "高速戦艦",
+                    "航空戦艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 0,
+                  "max": 1
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 2,
+                  "max": 2
+                }
+              ]
+            }
+          ],
+          "reason": "I→O：O固定条件。未達の残りはJ/Oランダムで、到達不可能という意味ではありません"
+        },
+        {
+          "any": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "軽巡洋艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 1,
+              "max": 7
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "重巡洋艦",
+                "航空巡洋艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 4,
+              "max": 7
+            },
+            {
+              "kind": "typeCount",
+              "types": [
+                "駆逐艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 4,
+              "max": 7
+            }
+          ],
+          "reason": "E→Q：Q固定条件。未達の残りはB/Qランダム。軽巡または重巡級などの編成を確認"
+        },
+        {
+          "not": {
+            "kind": "typeCount",
+            "types": [
+              "駆逐艦"
+            ],
+            "matchPolicy": "exact",
+            "min": 4,
+            "max": 7
+          },
+          "reason": "K→E：駆逐4隻以上ではH経由。DGIOKEQとは別経路"
+        },
+        {
+          "not": {
+            "all": [
+              {
+                "kind": "typeCount",
+                "types": [
+                  "軽巡洋艦"
+                ],
+                "matchPolicy": "exact",
+                "min": 1,
+                "max": 7
+              },
+              {
+                "kind": "typeCount",
+                "types": [
+                  "駆逐艦"
+                ],
+                "matchPolicy": "exact",
+                "min": 3,
+                "max": 3
+              }
+            ]
+          },
+          "reason": "K→E：軽巡1隻以上＋駆逐3隻ではH経由。指定経路と艦種構成を確認"
+        },
+        {
+          "not": {
+            "kind": "typeCount",
+            "types": [
+              "航空戦艦",
+              "補給艦",
+              "潜水空母"
+            ],
+            "matchPolicy": "exact",
+            "min": 1,
+            "max": 7
+          },
+          "reason": "K→E：補給艦・航戦・潜水空母を含むとH経由。装備追加ではなく編成を確認"
+        },
+        {
+          "not": {
+            "kind": "minSpeed",
+            "rank": 15
+          },
+          "reason": "K→E：高速＋統一以上ではH経由。高速化の下限条件とは別"
+        },
+        {
+          "not": {
+            "kind": "equipmentShips",
+            "match": "drum",
+            "min": 2,
+            "max": 7
+          },
+          "reason": "K→E：ドラム缶装備艦2隻以上ではH経由。DGIOKEQを選ぶ場合は1隻以下。装備個数とは別"
         }
       ],
       "scouting": {
@@ -4146,16 +4317,22 @@
         "索敵"
       ],
       "notes": [
-        "G→Iの元艦種stype9は1隻まで。高速化しても別艦種にはならない。",
-        "航戦不可。戦艦2隻へ変更する別例では高速統一が必要。能動分岐Oでボス方面を選ぶ。"
+        "G→Iでは元の艦種「戦艦」（低速戦艦）は1隻まで。高速化しても艦種は変わりません。艦種「高速戦艦」とは別に数えます。",
+        "航戦不可。戦艦2隻へ変更する別例では高速統一が必要。能動分岐Oではゲーム内でKを選ぶ。P経由は別の経路で、このアプリは実際の選択操作を観測しません。",
+        "I→O・E→Qの固定条件、K→EとK→Hの違いを分けて確認。H経由を避ける条件は戦闘勝利の必須装備ではなく、Hへ進むことをボス到達不可能とは扱いません。",
+        "K→Eの大発系対象一覧は5-3への適用が未確認。既知の速力・艦種・ドラム条件を満たしても経路全体は未確認のままです。"
       ],
       "requiredConnectionClass": "B",
       "guidanceAudit": {
         "装備艦数": {
-          "class": "D",
-          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
-          "evidence": [],
-          "limit": ""
+          "class": "A",
+          "detail": "K→Eはドラム缶装備艦が2隻以上だとH経由。個数2/同一艦1と別2艦を実操作・保存/loadで区別。必須の購入数ではない",
+          "evidence": [
+            "tests/route-5-3-branches-ui.spec.js",
+            "tests/five-three-branches.test.cjs",
+            "docs/pr152-5-3-branches-ja.md"
+          ],
+          "limit": "大発系の算入一覧は出典が他海域確認/疑問符付きで未確認。全体manualを維持し、行全体Bのまま。"
         },
         "索敵": {
           "class": "D",
@@ -4171,7 +4348,7 @@
             "tests/conditional-speed-ui.test.cjs",
             "docs/pr152-5-3-speed-ui-ja.md"
           ],
-          "limit": "今回の速度下限/G条件のみ。登録例外の総合manualを維持。Kの高速＋/ドラム/大発系装備等による別経路条件は今回未接続/未検証のため、行全体Bを維持。勝利・全分岐網羅は未確認。"
+          "limit": "既存の速度下限/G確認を再利用。今回Kの高速＋以上でHとなる上位条件はNode接続確認。大発系対象/Oの実操作/未登録経路等が残り、行全体Bを維持。旧C stock load後再探索12秒は未解決。"
         },
         "先制対潜": {
           "class": "D",
@@ -4196,7 +4373,22 @@
           "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
         }
       },
-      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)",
+      "scopeIncomplete": true,
+      "scopeIncompleteReason": "K→E：大発系装備艦の算入対象が未確認。出典の個別装備一覧は疑問符付き・5-4確認/他海域未確認のため、5-3の経路全体を成立と確定しません。購入で解決する不足ではありません。",
+      "branchCoverage": {
+        "connected": [
+          "I→O固定/残りランダム",
+          "E→Q固定/残りランダム",
+          "Kの駆逐/軽巡/補給艦等/高速＋/ドラム装備艦数"
+        ],
+        "unverified": [
+          "Kの大発系算入対象（出典の他海域条件を流用しない）",
+          "Oの実ゲーム選択操作は未観測",
+          "D/O等の個別分岐表の網羅は未保証"
+        ],
+        "record": "docs/pr152-5-3-branches-ja.md"
+      }
     },
     {
       "id": "5-4/0/default",
@@ -6809,22 +7001,22 @@
     "C": 3
   },
   "perConditionCounts": {
-    "装備艦数:D": 54,
+    "装備艦数:D": 53,
     "索敵:D": 39,
     "速力:D": 44,
     "先制対潜:D": 35,
     "制空:D": 18,
     "推奨セット:C": 50,
-    "速力:B": 11,
+    "速力:A": 6,
     "推奨セット:B": 7,
     "制空:B": 37,
     "先制対潜:C": 22,
     "推奨セット:A": 2,
     "先制対潜:A": 2,
-    "装備艦数:A": 4,
+    "装備艦数:A": 5,
     "索敵:A": 2,
-    "速力:A": 4,
     "索敵:B": 15,
+    "速力:B": 9,
     "装備艦数:B": 1,
     "制空:A": 1,
     "索敵:C": 3,
