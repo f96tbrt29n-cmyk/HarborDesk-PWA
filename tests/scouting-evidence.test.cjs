@@ -36,7 +36,7 @@ test('owned async search keeps its existing UI yields and cancels changed inputs
 });
 function portContext(){
  const c={hdFEFindShip:()=>({type:'重巡洋艦'}),hdOCShipOwnership:p=>p.ships.map(()=>({status:'ready'})),hdFEFind:n=>({name:n,category:n==='gun'?'中口径主砲':n==='recon'?'水上偵察機':'対地装備'}),hdShipDbSlotProfile:()=>({count:4,slots:[2,2,2,2]}),hdFEExpansionAvailability:()=>({allowed:false}),hdOCCompatible:()=>true,hdSEPartMatches:(part,r)=>r.name==='shell'};
- for(const name of ['hdOCPortScope','hdOCPortRef','hdOCPortSame','hdOCPortEligible','hdOCPortTargets','hdOCPortPart','hdOCPortSlots','hdOCPortFits','hdOCPortMeasure','hdOCPortReadFleets','hdOCPortSave'])load('owned-equipment-planner.js',name,c);
+ for(const name of ['hdOCPortRoute','hdOCPortScope','hdOCPortRef','hdOCPortSame','hdOCPortEligible','hdOCPortTargets','hdOCPortPart','hdOCPortSlots','hdOCPortFits','hdOCPortMeasure','hdOCPortReadFleets','hdOCPortSave'])load('owned-equipment-planner.js',name,c);
  return c;
 }
 function boundedPortContext(){
@@ -58,10 +58,10 @@ test('saved bounded search remains visible only for its route and is explicitly 
 });
 test('bounded port search applies only to selected central-route targets and leaves ordinary limits intact',()=>{
  const source=fs.readFileSync(path.join(__dirname,'../owned-equipment-planner.js'),'utf8'),start=source.indexOf('function* hdOCSearchSteps('),end=source.indexOf(' const signature=',start),header=source.slice(start,end).replace('function* hdOCSearchSteps','function limits');
- const c={};load('owned-equipment-planner.js','hdOCPortScope',c);vm.runInNewContext(header+'return {maxExamined,maxDepth,portSearch};}',c);
+ const c={};load('owned-equipment-planner.js','hdOCPortRoute',c);load('owned-equipment-planner.js','hdOCPortScope',c);vm.runInNewContext(header+'return {maxExamined,maxDepth,portSearch};}',c);
  const fleet={portAttackersByRoute:{'4-5:1':[{}]}};
  for(const ctx of [{map:'1-6',index:0,fleet},{map:'4-5',index:0,fleet},{map:'4-5',index:1,fleet:{portAttackersByRoute:{'4-5:1':[]}}},{map:'4-5',index:1,fleet:{}}])assert.equal(c.limits(ctx).maxExamined,10000);
- assert.equal(c.limits({map:'4-5',index:1,fleet}).maxExamined,500);assert.equal(c.limits({map:'4-5',index:1,fleet},{maxExamined:50}).maxExamined,50);assert.equal(c.limits({map:'1-6',index:0,fleet}).maxDepth,24);
+ assert.equal(c.limits({map:'4-3',index:0,fleet}).maxExamined,10000);assert.equal(c.limits({map:'4-3',index:0,fleet:{portAttackersByRoute:{'4-3:0':[{}]}}}).maxExamined,500);assert.equal(c.limits({map:'4-5',index:1,fleet}).maxExamined,500);assert.equal(c.limits({map:'4-5',index:1,fleet},{maxExamined:50}).maxExamined,50);assert.equal(c.limits({map:'1-6',index:0,fleet}).maxDepth,24);
 });
 test('central port assignment is exact per individual, remodel and route; unknown references do not become achieved',()=>{
  const c=portContext(),ship={ship:'A',gameShipId:1,masterId:2,items:['gun','gun','recon','shell'].map((name,slotIndex)=>({name,slotIndex}))},p={map:'4-5',routeIndex:1,ships:[ship],sourceFleet:{portAttackersByRoute:{'4-5:1':[{ship:'A',gameShipId:1,masterId:2,rosterId:''}]}}};
@@ -74,6 +74,17 @@ test('central port types never count a water fighter, bomber or zero-capacity re
 test('central port setting writer preserves metadata and refuses null-present, exception and invalid JSON reads',()=>{
  const c=portContext();let raw=JSON.stringify({'4-5':[{id:'one',ships:[],metadata:{keep:true}}],'elsewhere':[1]}),fault='',writes=0;c.CUSTOM_FLEET_KEY='fleets';c.localStorage={fleets:true,getItem:()=>{if(fault==='throw')throw Error('fault');return fault==='null'?null:fault==='json'?'{':raw}};c.hdFEPlanFromSavedFleet=()=>({ships:[{ship:'A',masterId:2,gameShipId:1}]});c.saveCustomFleets=all=>{writes++;raw=JSON.stringify(all)};
  const ctx={map:'4-5',index:1,fleet:{id:'one'}};for(fault of ['null','throw','json'])assert.throws(()=>c.hdOCPortSave(ctx,0,true));assert.equal(writes,0);fault='';c.hdOCPortSave(ctx,0,true);assert.equal(writes,1);assert.deepEqual(JSON.parse(raw)['4-5'][0].metadata,{keep:true});assert.deepEqual(JSON.parse(raw).elsewhere,[1]);c.hdOCPortSave(ctx,-1,false);assert.equal(JSON.parse(raw)['4-5'][0].portAttackersByRoute['4-5:1'].length,0);
+});
+test('port set routes are explicit, source-linked and never inherit another map assignment',()=>{
+ const c=portContext(),ship={ship:'A',gameShipId:1,masterId:2,items:['gun','gun','recon','shell'].map((name,slotIndex)=>({name,slotIndex}))},ref={ship:'A',gameShipId:1,masterId:2,rosterId:''},p={map:'4-3',routeIndex:0,ships:[ship],sourceFleet:{portAttackersByRoute:{'4-5:1':[ref]}}};
+ assert.equal(c.hdOCPortMeasure(p).length,0);p.sourceFleet.portAttackersByRoute['4-3:0']=[ref];assert.equal(c.hdOCPortMeasure(p)[0].ok,true);assert.match(c.hdOCPortMeasure(p)[0].label,/4-3/);
+ assert.match(c.hdOCPortRoute(p).source,/4-3/);assert.match(c.hdOCPortRoute(p).scope,/B勝利/);
+ for(const [map,index] of [['4-3',1],['4-5',0],['4-5',2],['1-6',0]])assert.equal(c.hdOCPortScope({map,index}),false);
+ c.hdFEFindShip=()=>({type:'戦艦'});assert.equal(c.hdOCPortEligible(ship,{map:'4-3'}),false);assert.equal(c.hdOCPortEligible(ship,{map:'4-5'}),true);
+});
+test('4-3 scoped setting save keeps other route assignments and enforces existing read protection',()=>{
+ const c=portContext();let raw=JSON.stringify({'4-3':[{id:'one',ships:[],metadata:{keep:1},portAttackersByRoute:{'4-5:1':[{ship:'elsewhere'}]}}],'4-5':[{id:'other',metadata:{keep:2}}]}),fault='',writes=0;c.CUSTOM_FLEET_KEY='fleets';c.localStorage={fleets:true,getItem:()=>{if(fault==='throw')throw Error('fault');return fault==='null'?null:fault==='json'?'{':raw}};c.hdFEPlanFromSavedFleet=()=>({ships:[{ship:'A',masterId:2,gameShipId:1}]});c.saveCustomFleets=all=>{writes++;raw=JSON.stringify(all)};
+ const ctx={map:'4-3',index:0,fleet:{id:'one'}};for(fault of ['null','throw','json'])assert.throws(()=>c.hdOCPortSave(ctx,0,true));assert.equal(writes,0);fault='';c.hdOCPortSave(ctx,0,true);const saved=JSON.parse(raw);assert.equal(writes,1);assert.equal(saved['4-3'][0].portAttackersByRoute['4-3:0'].length,1);assert.deepEqual(saved['4-3'][0].portAttackersByRoute['4-5:1'],[{ship:'elsewhere'}]);assert.deepEqual(saved['4-5'],[{id:'other',metadata:{keep:2}}]);assert.deepEqual(saved['4-3'][0].metadata,{keep:1});c.hdOCPortSave(ctx,-1,false);assert.equal(JSON.parse(raw)['4-3'][0].portAttackersByRoute['4-3:0'].length,0);
 });
 function aswTargetContext(){
  const types={'夕立改二':'駆逐艦','時雨改二':'駆逐艦','綾波改二':'駆逐艦','島風改':'駆逐艦','占守改':'海防艦','扶桑改':'航空戦艦','阿武隈改二':'軽巡洋艦'},stored={};

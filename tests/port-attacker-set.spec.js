@@ -15,6 +15,47 @@ async function setup(page){
  });
 }
 async function finish(info,e,errors){e.pageerrors=errors;const file=info.outputPath('route-guidance-evidence.json');await fs.promises.writeFile(file,JSON.stringify(e,null,2));await info.attach('route-guidance-evidence',{path:file,contentType:'application/json'})}
+async function setupRilanka(page){
+ await page.route('**/*',r=>['127.0.0.1','localhost'].includes(new URL(r.request().url()).hostname)?r.continue():r.fulfill({status:204,body:''}));
+ await page.goto('http://127.0.0.1:4173/',{waitUntil:'load'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCSearch==='function');
+ return page.evaluate(()=>{
+  const names=['妙高改','羽黒改','赤城改','加賀改','時雨改','綾波改'],desired=[['20.3cm連装砲','','零式水上観測機','三式弾'],[],['流星改','彗星一二型甲','流星改','試製烈風 後期型'],['流星改','彗星一二型甲','試製烈風 後期型','彩雲'],['10cm連装高角砲','10cm連装高角砲','三式水中探信儀'],['10cm連装高角砲','10cm連装高角砲','三式水中探信儀']];
+  const rows=names.map((name,i)=>({id:'rilanka-'+i,name,masterId:hdShipDbMasterRowFor(name).id,gameShipId:9300+i,level:60,gameLos:55,gameGearSlots:Array.from({length:hdShipDbSlotProfile(hdFEFindShip(name)).count},(_,j)=>desired[i][j]||''),gameGearExpansion:'',gameSlotEx:0,metadata:{keep:i}}));
+  const inventory=[['20.3cm連装砲',4,0],['零式水上観測機',2,0],['三式弾',1,0],['三式弾',1,4],['流星改',3,0],['彗星一二型甲',2,0],['試製烈風 後期型',2,0],['彩雲',1,0],['10cm連装高角砲',4,0],['三式水中探信儀',2,0]].map(([name,count,star])=>({name,count,star}));
+  localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));localStorage.setItem(HD_FL_KEY,JSON.stringify(inventory));localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:120,metadata:{keep:true}}));
+  saveCustomFleets({'4-3':[{id:'rilanka',name:'合成：指定2艦（十分な人数の根拠ではない）',metadata:{keep:true},routePreset:MAP_PLANS['4-3'].presets[0],ships:rows.map((r,i)=>({ship:r.name,masterId:r.masterId,gameShipId:r.gameShipId,rosterId:r.id,gear:desired[i].join(' / '),metadata:{keep:i}}))},{id:'other',metadata:{keep:true},ships:[]}],'4-5':[{id:'other-map',metadata:{keep:true},ships:[]}]});hdMapRouteSet('4-3',0);hdMSNOpen('4-3');
+  return {reference:{keys:[SHIP_ROSTER_KEY,HD_FL_KEY,'harbordesk-kancolle-sync-v1'].map(k=>[k,localStorage.getItem(k)]),other:JSON.stringify(loadCustomFleets()['4-3'][1]),otherMap:JSON.stringify(loadCustomFleets()['4-5'])},initial:hdOCPortMeasure(hdOCBuild(hdOCContext('4-3','rilanka',0)).plan)};
+ });
+}
+test('rilanka selected cruiser sets allocate per hull and preserve settings through save load and edit',async({page},info)=>{
+ const e={},errors=[];page.on('pageerror',x=>errors.push(x.message));try{
+  e.setup=await setupRilanka(page);const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');
+  await expect(panel.locator('[data-hd-oc-port]')).toContainText('海域突破にはB勝利以上');await expect(panel.locator('[data-hd-oc-port-ship]')).toHaveCount(2);
+  await panel.locator('[data-hd-oc-port-ship="0"]').check();await panel.locator('[data-hd-oc-port-ship="1"]').check();
+  await expect(panel.locator('[data-hd-oc-port]')).toContainText('総必要 4・担当艦への現在配備 1・所持総数 8');
+  await panel.locator('[data-hd-oc-search]').click();await expect(panel.locator('.hd-oc-result')).toBeVisible();
+  e.result=await page.evaluate(()=>{const c=hdOCContext('4-3','rilanka',0),r=HD_OC_CACHE.get('4-3:rilanka:0');return {goals:hdOCPortMeasure(r.plan),search:r.search,route:hdFERouteRequirementData(r.plan),master:hdFEMasterValidation(r.plan),usage:hdFOAssignedUsage(r.plan),stock:Object.fromEntries([...hdFLInventory().values()].map(x=>[x.key,x.count])),regressions:hdOCGoalRegressions(hdOCMeasure(hdOCBuild(c).plan,hdSEChecks('4-3').rows),r.measure)}});
+  expect(e.result.goals.map(x=>x.counts)).toEqual([{main:2,recon:1,type3:1},{main:2,recon:1,type3:1}]);expect(e.result.goals.every(x=>x.ok)).toBe(true);expect(e.result.regressions).toEqual([]);expect(e.result.master.valid).toBe(true);expect(e.result.route.minimumSpeed).toBe(10);for(const [k,n] of Object.entries(e.result.usage))expect(n).toBeLessThanOrEqual(e.result.stock[k]);
+  await panel.locator('[data-hd-oc-apply]').click();await page.reload({waitUntil:'load'});await page.waitForFunction(()=>typeof hdMSNOpen==='function'&&document.body.dataset.hdReady==='1');await page.evaluate(()=>hdMSNOpen('4-3'));
+  await expect(panel.locator('[data-hd-oc-port-ship="0"]')).toBeChecked();await expect(panel.locator('[data-hd-oc-port-ship="1"]')).toBeChecked();
+  e.after=await page.evaluate(ref=>{const f=loadCustomFleets(),c=hdOCContext('4-3','rilanka',0);return {state:document.readyState,goals:hdOCPortMeasure(hdOCBuild(c).plan),metadata:c.fleet.metadata,shipMetadata:c.fleet.ships.map(s=>s.metadata),refs:c.fleet.portAttackersByRoute,other:JSON.stringify(f['4-3'][1])===ref.other,otherMap:JSON.stringify(f['4-5'])===ref.otherMap,exact:ref.keys.every(([k,v])=>localStorage.getItem(k)===v)}},e.setup.reference);
+  expect(e.after).toMatchObject({state:'complete',metadata:{keep:true},other:true,otherMap:true,exact:true});expect(e.after.goals.every(x=>x.ok)).toBe(true);expect(e.after.shipMetadata).toEqual(Array.from({length:6},(_,keep)=>({keep})));
+  await panel.locator('[data-hd-oc-port-ship="1"]').uncheck();await page.evaluate(()=>{hdMapRouteSet('4-5',1);hdMSNOpen('4-5')});await expect(panel.locator('[data-hd-oc-port-ship]:checked')).toHaveCount(0);
+  await page.evaluate(()=>hdMSNOpen('4-3'));await expect(panel.locator('[data-hd-oc-port-ship="0"]')).toBeChecked();await expect(panel.locator('[data-hd-oc-port-ship="1"]')).not.toBeChecked();await panel.locator('[data-hd-oc-port-clear]').click();await expect(panel.locator('[data-hd-oc-port-ship]:checked')).toHaveCount(0);expect(errors).toEqual([]);
+ }finally{await finish(info,e,errors)}
+});
+test('rilanka shortage and unknown settings distinguish stock compatibility slot conflict and bounded search',async({page},info)=>{
+ const e={},errors=[];page.on('pageerror',x=>errors.push(x.message));try{
+  e.setup=await setupRilanka(page);await page.evaluate(()=>{localStorage.setItem(HD_FL_KEY,JSON.stringify(hdFLRows().filter(x=>!(x.name==='三式弾'&&Number(x.star)===4))));hdMSNOpen('4-3')});const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');
+  await panel.locator('[data-hd-oc-port-ship="0"]').check();await panel.locator('[data-hd-oc-port-ship="1"]').check();await panel.locator('[data-hd-oc-search]').click();await expect(panel.locator('.hd-oc-result')).toBeVisible();
+  await expect(panel.locator('[data-hd-oc-port]')).toContainText('このセットだけの所持不足 1個');await expect(panel.locator('[data-hd-oc-port]')).toContainText('三式弾 あと1個');await expect(panel.locator('[data-hd-oc-port]')).toContainText('全目標の確定調達数ではありません');await expect(panel.locator('[data-hd-oc-port]')).toContainText('手持ちで不可能とは断定しません');
+  e.cases=await page.evaluate(()=>{const c=hdOCContext('4-3','rilanka',0),b=hdOCBuild(c),r=HD_OC_CACHE.get('4-3:rilanka:0'),recon=b.inventory.find(x=>x.name==='零式水上観測機'),shell=b.inventory.find(x=>x.name==='三式弾'),carrier=b.slots.find(x=>x.si===2),p=hdFOClone(b.plan);p.sourceFleet.portAttackersByRoute['4-3:0']=[p.sourceFleet.portAttackersByRoute['4-3:0'][0]];
+   const fixed=hdOCPortSeed(p,b.inventory,b.slots.filter(s=>s.si!==0||s.index!==1),hdSEChecks('4-3').rows,[],80),stale=hdFOClone(r.plan);stale.ships[0].masterId++;
+   return {goals:hdOCPortMeasure(r.plan),search:r.search,shortages:r.shortages.map(x=>x.goalKind),fixed:{found:!!fixed.plan,limited:fixed.limited},carrierType3:hdOCPortFits('type3',carrier,shell),zeroRecon:hdOCPortFits('recon',{...b.slots[0],capacity:0},recon),stale:hdOCPortMeasure(stale),staleHtml:hdOCPortHtml(c,{plan:stale},'')};});
+  expect(e.cases.goals.filter(x=>x.ok).length).toBeLessThan(2);expect(e.cases.search).toMatchObject({status:'incomplete',exhaustive:false,maxExamined:500});expect(e.cases.shortages).not.toContain('port-attacker-set');expect(e.cases.fixed.found).toBe(false);expect(e.cases.carrierType3).toBe(false);expect(e.cases.zeroRecon).toBe(false);expect(e.cases.stale[0]).toMatchObject({unresolved:true,ok:false});
+  await page.evaluate(()=>{const f=loadCustomFleets();f['4-3'][0].portAttackersByRoute['4-3:0'][0].masterId++;saveCustomFleets(f);hdMSNOpen('4-3')});await expect(panel.locator('[data-hd-oc-port-result]').first()).toContainText('未確認');await expect(panel.locator('[data-hd-oc-port-result]').first()).toContainText('再指定');expect(errors).toEqual([]);
+ }finally{await finish(info,e,errors)}
+});
 test('central port sets use each selected hull and persist through real search save load and route changes',async({page},info)=>{
  const e={},errors=[];page.on('pageerror',x=>errors.push(x.message));try{
   e.setup=await setup(page);const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');

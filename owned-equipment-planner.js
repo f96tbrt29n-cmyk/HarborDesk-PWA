@@ -4,17 +4,23 @@ const HD_OC_PENDING=new Map();
 const HD_OC_ASW_TARGET_KEY='harbordesk-opening-asw-targets-v1';
 const HD_OC_ROUTE_GOAL_KEY='harbordesk-route-goals-v1';
 // A user-selected equipment preparation goal, not a route or victory rule.
-// The central example's source specifies a same-hull set, not a sufficient count.
-function hdOCPortScope(c){return c.map==='4-5'&&Number(c.index??c.routeIndex)===1}
+// Each registered source specifies a same-hull set, not a sufficient count.
+function hdOCPortRoute(c){
+ const index=Number(c.index??c.routeIndex);
+ if(c.map==='4-5'&&index===1)return {key:'4-5:1',label:'中央対地担当セット',title:'中央ルートの対地担当艦',types:'戦艦・重巡系',source:'https://zekamashi.net/kancolle-kouryaku/4-5/',sourceLabel:'中央の旧編成例（戦艦2・重巡2・空母1・軽空母1）と港湾向け装備構成',scope:'港湾棲姫向けの装備構成。中央K経由の索敵条件は別に確認します。'};
+ if(c.map==='4-3'&&index===0)return {key:'4-3:0',label:'4-3対地担当セット',title:'4-3の対地担当艦',types:'重巡系',source:'https://zekamashi.net/kancolle-kouryaku/4-3/',sourceLabel:'初攻略の編成画像（正規空母2・重巡2・駆逐2）と三式弾の解説',scope:'港湾棲姫へ攻撃する重巡系の装備例です。登録例は高速統一、ボス前は逸れあり。海域突破にはB勝利以上でよく、このセットは通行必須ではありません。'};
+ return null;
+}
+function hdOCPortScope(c){return !!hdOCPortRoute(c)}
 function hdOCPortRef(ship){return {gameShipId:Number(ship.gameShipId)||0,rosterId:String(ship.rosterId||''),masterId:Number(ship.masterId)||0,ship:String(ship.ship||'')}}
 function hdOCPortSame(a,b){return !!a&&!!b&&(a.gameShipId>0?Number(b.gameShipId)===a.gameShipId:a.rosterId?String(b.rosterId)===a.rosterId:false)&&Number(b.masterId)===a.masterId&&b.ship===a.ship}
-function hdOCPortEligible(ship){const db=hdFEFindShip(ship.ship);return !!db&&/戦艦|重巡|航巡|航空巡洋/.test(db.type)&&!!(Number(ship.gameShipId)||ship.rosterId)&&Number(ship.masterId)>0}
+function hdOCPortEligible(ship,c){const db=hdFEFindShip(ship.ship),type=c?.map==='4-3'?/重巡|航巡|航空巡洋/:/戦艦|重巡|航巡|航空巡洋/;return !!db&&type.test(db.type)&&!!(Number(ship.gameShipId)||ship.rosterId)&&Number(ship.masterId)>0}
 function hdOCPortTargets(plan){
- if(!hdOCPortScope(plan))return [];
- const refs=plan.sourceFleet?.portAttackersByRoute?.['4-5:1'];if(refs==null)return [];
+ const route=hdOCPortRoute(plan);if(!route)return [];
+ const refs=plan.sourceFleet?.portAttackersByRoute?.[route.key];if(refs==null)return [];
  if(!Array.isArray(refs))return [{ship:'担当艦設定',index:-1,unresolved:true,reason:'保存した担当艦指定を確認できません。再指定してください'}];
  const ownership=hdOCShipOwnership(plan);
- return refs.map((ref,n)=>{const indices=(plan.ships||[]).flatMap((s,i)=>hdOCPortSame(ref,hdOCPortRef(s))?[i]:[]),index=indices.length===1?indices[0]:-1,ship=plan.ships[index],valid=ship&&hdOCPortEligible(ship)&&ownership[index]?.status==='ready'&&!refs.slice(0,n).some(x=>hdOCPortSame(ref,x));return {ref,index,ship:ref?.ship||'担当艦',unresolved:!valid,reason:valid?'':'指定個体・改造形態・台帳を確認できません。別艦へ移さず、担当艦を再指定してください'};});
+ return refs.map((ref,n)=>{const indices=(plan.ships||[]).flatMap((s,i)=>hdOCPortSame(ref,hdOCPortRef(s))?[i]:[]),index=indices.length===1?indices[0]:-1,ship=plan.ships[index],valid=ship&&hdOCPortEligible(ship,plan)&&ownership[index]?.status==='ready'&&!refs.slice(0,n).some(x=>hdOCPortSame(ref,x));return {ref,index,ship:ref?.ship||'担当艦',unresolved:!valid,reason:valid?'':'指定個体・改造形態・台帳を確認できません。別艦へ移さず、担当艦を再指定してください'};});
 }
 function hdOCPortPart(part,row){const item=row?.item||hdFEFind(row?.name)||row,cat=item?.category||'';return part==='main'?/主砲/.test(cat):part==='recon'?cat==='水上偵察機':typeof hdSEPartMatches==='function'&&hdSEPartMatches('type3',row)}
 function hdOCPortSlots(plan,si){
@@ -28,7 +34,7 @@ function hdOCPortMeasure(plan){
   const counts={main:0,recon:0,type3:0},slots=t.index<0?[]:hdOCPortSlots(plan,t.index),ship=plan.ships[t.index],seen=new Set();
   for(const slot of slots){const x=slot.expansion?ship.expansion:ship.items?.find(x=>x.slotIndex===slot.index),item=x?.name&&hdFEFind(x.name);if(!item)continue;const id=slot.expansion?'ex':slot.index;if(seen.has(id))continue;seen.add(id);for(const part of Object.keys(counts))if(hdOCPortFits(part,slot,{...x,item}))counts[part]++;}
   const matched=Math.min(2,counts.main)+Math.min(1,counts.recon)+Math.min(1,counts.type3),ok=!t.unresolved&&matched===4;
-  return {...t,kind:'port-attacker-set',shipIndex:t.index,label:t.ship+'：中央対地担当セット',minCount:1,count:ok?1:0,counts,ok,ratio:t.unresolved?0:matched/4,detail:t.unresolved?t.reason:`同じ艦内：主砲 ${counts.main}/2・水上偵察機 ${counts.recon}/1・三式弾 ${counts.type3}/1。${ok?'装備構成を確認（攻撃発動・勝利の保証ではありません）':'この担当艦のセットは未完成です'}`};
+  return {...t,kind:'port-attacker-set',shipIndex:t.index,label:t.ship+'：'+hdOCPortRoute(plan).label,minCount:1,count:ok?1:0,counts,ok,ratio:t.unresolved?0:matched/4,detail:t.unresolved?t.reason:`同じ艦内：主砲 ${counts.main}/2・水上偵察機 ${counts.recon}/1・三式弾 ${counts.type3}/1。${ok?'装備構成を確認（攻撃発動・勝利の保証ではありません）':'この担当艦のセットは未完成です'}`};
  });
 }
 function hdOCPortReadFleets(){
@@ -38,11 +44,11 @@ function hdOCPortReadFleets(){
 function hdOCPortSave(c,index,checked){
  if(!hdOCPortScope(c)||!c.fleet)throw Error('対象ルートではありません');
  const all=hdOCPortReadFleets(),fleet=all[c.map]?.find(x=>String(x.id)===String(c.fleet.id));if(!fleet)throw Error('保存編成が見つかりません');
- const plan=hdFEPlanFromSavedFleet(c.map,fleet),ship=plan.ships[index],key='4-5:1',old=fleet.portAttackersByRoute;
+ const plan=hdFEPlanFromSavedFleet(c.map,fleet),ship=plan.ships[index],key=hdOCPortRoute(c).key,old=fleet.portAttackersByRoute;
  if(old!=null&&(!old||typeof old!=='object'||Array.isArray(old)))throw Error('担当艦設定を確認できません');
  let refs=old?.[key]??[];if(!Array.isArray(refs))throw Error('担当艦設定を確認できません');
  if(index<0){refs=[]}else{
-  if(!ship||!hdOCPortEligible(ship)||hdOCShipOwnership(plan)[index]?.status!=='ready')throw Error('艦娘の個体・改造形態を確認してください');
+  if(!ship||!hdOCPortEligible(ship,c)||hdOCShipOwnership(plan)[index]?.status!=='ready')throw Error('艦娘の個体・改造形態を確認してください');
   const ref=hdOCPortRef(ship);refs=refs.filter(x=>!hdOCPortSame(ref,x));if(checked)refs.push(ref);
  }
  fleet.portAttackersByRoute={...old,[key]:refs};saveCustomFleets(all);
@@ -71,11 +77,11 @@ function hdOCPortSeed(plan,inventory,slots,requirements,unknown=[],limit=800){
 }
 function hdOCPortHtml(c,result,attrs){
  if(!hdOCPortScope(c)||!c.fleet)return '';
- const plan=result?.plan||Object.assign(hdFEPlanFromSavedFleet(c.map,c.fleet),{routeIndex:c.index}),targets=hdOCPortMeasure(plan),esc=hdFEEsc,ownership=hdOCShipOwnership(plan),inventory=[...hdFLInventory().values()],usage=hdFOAssignedUsage(plan),labels={main:'主砲',recon:'水上偵察機',type3:'三式弾'};
- const controls=plan.ships.map((s,i)=>{if(!/戦艦|重巡|航巡|航空巡洋/.test(hdFEFindShip(s.ship)?.type||''))return '';const usable=hdOCPortEligible(s)&&ownership[i]?.status==='ready';return `<label><input type="checkbox" data-hd-oc-port-ship="${i}" ${attrs} ${targets.some(t=>!t.unresolved&&t.index===i)?'checked':''} ${usable?'':'disabled'}>${esc(s.ship)}${usable?'':'（個体・台帳・形態を確認）'}</label>`}).join('');
+ const route=hdOCPortRoute(c),plan=result?.plan||Object.assign(hdFEPlanFromSavedFleet(c.map,c.fleet),{routeIndex:c.index}),targets=hdOCPortMeasure(plan),esc=hdFEEsc,ownership=hdOCShipOwnership(plan),inventory=[...hdFLInventory().values()],usage=hdFOAssignedUsage(plan),labels={main:'主砲',recon:'水上偵察機',type3:'三式弾'};
+ const controls=plan.ships.map((s,i)=>{if(!(c.map==='4-3'?/重巡|航巡|航空巡洋/:/戦艦|重巡|航巡|航空巡洋/).test(hdFEFindShip(s.ship)?.type||''))return '';const usable=hdOCPortEligible(s,c)&&ownership[i]?.status==='ready';return `<label><input type="checkbox" data-hd-oc-port-ship="${i}" ${attrs} ${targets.some(t=>!t.unresolved&&t.index===i)?'checked':''} ${usable?'':'disabled'}>${esc(s.ship)}${usable?'':'（個体・台帳・形態を確認）'}</label>`}).join('');
  const stock=Object.entries(labels).map(([part,label])=>{const rows=inventory.filter(r=>hdOCPortPart(part,r)),need=targets.length*(part==='main'?2:1),have=rows.reduce((n,r)=>n+r.count,0),free=rows.reduce((n,r)=>n+Math.max(0,r.count-(usage[r.key]||0)),0),count=targets.reduce((n,t)=>n+Math.min(part==='main'?2:1,t.counts[part]),0);return `<p>${label}：総必要 ${need}・担当艦への現在配備 ${count}・所持総数 ${have}・艦隊内未配備 ${free}。${have<need?'このセットだけの所持不足 '+(need-have)+'個。':'所持総数だけでは配備可否を確定できません。'}他目標との競合があるため、全目標の確定調達数ではありません。</p>`}).join('');
  const details=targets.map(t=>`<div data-hd-oc-port-result><b>${esc(t.label)}：${t.ok?'装備構成成立':t.unresolved?'未確認':'未完成'}</b><p>${esc(t.detail)}</p>${t.unresolved?'':Object.entries(labels).map(([part,label])=>{const gap=Math.max(0,(part==='main'?2:1)-t.counts[part]);if(!gap)return '';const slots=hdOCPortSlots(plan,t.index),catalog=hdFLCatalog().filter(item=>slots.some(slot=>hdOCPortFits(part,slot,{item,star:0}))),owned=inventory.filter(r=>slots.some(slot=>hdOCPortFits(part,slot,r))),usable=owned.reduce((n,r)=>n+r.count,0),free=owned.reduce((n,r)=>n+Math.max(0,r.count-(usage[r.key]||0)),0);return `<p>${esc(t.ship)}に${label} あと${gap}個。装備可能な手持ち総数 ${usable}・未配備で使える手持ち ${free}。${!catalog.length?'搭載不可または有効な搭載枠なし。':slots.length<4?'4点セットの枠不足。':usable<gap?'装備可能な在庫が不足。他艦の必要数・改修別在庫も確認してください。':'枠・他目標との競合、または探索未完了。配備を再確認してください。'}${catalog.length?'適合する装備例：'+esc(catalog.slice(0,3).map(x=>x.name).join('、')):''}</p>`}).join('')}</div>`).join('');
- return `<fieldset data-hd-oc-port><legend>中央ルートの対地担当艦（利用者指定）</legend><p>各担当艦に主砲2＋水上偵察機1＋三式弾1を配備します。戦艦・重巡系の装備構成の目標です。指定隻数が攻略に十分とは確認していません。通行必須条件・攻撃発動・勝利保証とは別です。</p>${controls}<button type="button" class="ghost small" data-hd-oc-port-clear ${attrs}>担当艦の指定を解除</button><p>${targets.length?'各艦の指定・形態を確認してください。':'担当艦は未指定です。上で艦を選んでから配備を探索してください。'}削除・形態変更後は再指定してください。三式弾単独・ロケットの汎用対地目標は別に維持します。</p><a href="https://zekamashi.net/kancolle-kouryaku/4-5/" target="_blank" rel="noopener noreferrer">出典：中央の旧編成例（戦艦2・重巡2・空母1・軽空母1）と港湾向け装備構成</a><small>他の編成へ攻略条件全体を保証しません。偵察機は正の搭載枠が必要で、出撃時の搭載補給・弾着条件は別確認です。</small>${details}${targets.length?stock:''}${result?'<p>探索は候補・組合せ上限つきです。未完成だけでは手持ちで不可能とは断定しません。</p>':''}</fieldset>`;
+ return `<fieldset data-hd-oc-port><legend>${esc(route.title)}（利用者指定）</legend><p>各担当艦に主砲2＋水上偵察機1＋三式弾1を配備します。${esc(route.types)}の装備構成の目標です。指定隻数が攻略に十分とは確認していません。通行必須条件・攻撃発動・勝利保証とは別です。</p><p>${esc(route.scope)}</p>${controls}<button type="button" class="ghost small" data-hd-oc-port-clear ${attrs}>担当艦の指定を解除</button><p>${targets.length?'各艦の指定・形態を確認してください。':'担当艦は未指定です。上で艦を選んでから配備を探索してください。'}削除・形態変更後は再指定してください。三式弾単独・ロケットの汎用対地目標は別に維持します。</p><a href="${esc(route.source)}" target="_blank" rel="noopener noreferrer">出典：${esc(route.sourceLabel)}</a><small>他の編成へ攻略条件全体を保証しません。偵察機は正の搭載枠が必要で、出撃時の搭載補給・弾着条件は別確認です。</small>${details}${targets.length?stock:''}${result?'<p>探索は候補・組合せ上限つきです。未完成だけでは手持ちで不可能とは断定しません。</p>':''}</fieldset>`;
 }
 function hdOCRouteGoal(c){
  const data=typeof MAP_PLANS!=='undefined'?MAP_PLANS[c.map]?.routeBranches:null;if(!data?.goals)return '';
@@ -330,16 +336,16 @@ function hdOCSynchronizedSeed(plan,inventory,slots){
 }
 function* hdOCSearchSteps(c,limits={}){
  // Joint sets are seeded as a unit before the ordinary beam. Bound subsequent
- // substitutions: an unavailable unrelated goal must not keep the UI searching
+ // substitutions for these selected port-set routes: an unavailable unrelated goal must not keep the UI searching
  // through 10,000 expensive fleet evaluations. An incomplete result stays such.
- const portSearch=hdOCPortScope(c)&&Array.isArray(c.fleet?.portAttackersByRoute?.['4-5:1'])&&c.fleet.portAttackersByRoute['4-5:1'].length>0;
+ const portKey=hdOCPortRoute(c)?.key,portSearch=!!portKey&&Array.isArray(c.fleet?.portAttackersByRoute?.[portKey])&&c.fleet.portAttackersByRoute[portKey].length>0;
  const maxExamined=Math.max(50,Math.min(portSearch?500:10000,Number(limits.maxExamined)||10000)),maxDepth=Math.max(1,Math.min(24,Number(limits.maxDepth)||24));
  const signature=hdOCSignature(c);
  const {plan,inventory,slots,unknown}=hdOCBuild(c),requirements=hdFEEquipmentRequirements(plan,hdSEChecks(c.map).rows);
  const routeData=hdFERouteRequirementData(plan);for(const condition of routeData?.conditions||[])if(condition.kind==='equipmentShips'&&condition.match==='drum')requirements.push({kind:'drum-ships',label:'ルート用ドラム缶装備艦',minCount:condition.min});
  if(plan.openingAswCount)requirements.push({kind:'opening-asw',label:'先制対潜艦',minCount:plan.openingAswCount});
  if(hdFEBranchRoute(plan).requiredRadar)requirements.push({kind:'radar-ships',label:'ルート用電探装備艦',minCount:hdFEBranchRoute(plan).requiredRadar});
- if(hdOCPortTargets(plan).length)requirements.push({kind:'port-attacker-set',label:'中央対地担当セット',minCount:hdOCPortTargets(plan).length});
+ if(hdOCPortTargets(plan).length)requirements.push({kind:'port-attacker-set',label:hdOCPortRoute(plan).label,minCount:hdOCPortTargets(plan).length});
  const relevant=inventory.filter(x=>requirements.some(r=>hdOCItemMatches(r.kind,x))||hdFOItemMatches('制空',x)||hdFOItemMatches('索敵',x)||hdFOItemMatches('高速化',x));
  // Keep the strongest candidates for each compatible slot and each distinct target.
  let candidatePruned=0;

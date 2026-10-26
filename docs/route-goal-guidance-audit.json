@@ -3325,11 +3325,29 @@
         },
         "推奨セット": {
           "class": "C",
-          "detail": "cap-aa1組（既定目安）、cap-asw1組（既定目安）、cap-land-soft1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "detail": "cap-aa1組（既定目安）、cap-asw1組（既定目安）、cap-land-soft1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）。4-3港湾向けの利用者指定担当艦：同一艦内に主砲2・水上偵察機1・三式弾1。セット具体化と必要担当艦数の根拠は別。",
           "evidence": [
             "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
           ],
-          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 同じ行の汎用セット数・十分な担当艦数の根拠不足はCのまま。45行を機械的に減らさない。",
+          "scopedTargets": [
+            {
+              "kind": "port-attacker-set",
+              "class": "A",
+              "scope": "利用者指定の各担当艦内の装備構成・有限在庫自動配備・艦別不足案内・保存/load後再表示",
+              "assignment": "利用者指定。攻略に十分な担当艦数の根拠ではない。",
+              "source": "https://zekamashi.net/kancolle-kouryaku/4-3/",
+              "sourceCheckedAt": "2026-10-26",
+              "implementation": "owned-equipment-planner.js / scoped route reference, same-hull set",
+              "executionEvidence": "tests/port-attacker-set.spec.js / rilanka selected cruiser sets, shortage and unknown settings",
+              "remaining": [
+                "十分な担当艦数",
+                "攻撃発動・勝利",
+                "一般探索の網羅性・最適性"
+              ],
+              "iPhoneVerified": false
+            }
+          ]
         }
       },
       "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
@@ -3668,11 +3686,29 @@
         },
         "推奨セット": {
           "class": "C",
-          "detail": "cap-asw1組（既定目安）、cap-land-soft1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "detail": "cap-asw1組（既定目安）、cap-land-soft1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）。中央ルートの利用者指定担当艦：同一艦内に主砲2・水上偵察機1・三式弾1。セット具体化と必要担当艦数の根拠は別。",
           "evidence": [
             "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
           ],
-          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 同じ行の汎用セット数・十分な担当艦数の根拠不足はCのまま。45行を機械的に減らさない。",
+          "scopedTargets": [
+            {
+              "kind": "port-attacker-set",
+              "class": "A",
+              "scope": "利用者指定の各担当艦内の装備構成・有限在庫自動配備・艦別不足案内・保存/load後再表示",
+              "assignment": "利用者指定。攻略に十分な担当艦数の根拠ではない。",
+              "source": "https://zekamashi.net/kancolle-kouryaku/4-5/",
+              "sourceCheckedAt": "2026-10-26",
+              "implementation": "owned-equipment-planner.js / scoped route reference, same-hull set",
+              "executionEvidence": "tests/port-attacker-set.spec.js / central port sets, incomplete search, finite allocations; original evidence reused",
+              "remaining": [
+                "十分な担当艦数",
+                "攻撃発動・勝利",
+                "一般探索の網羅性・最適性"
+              ],
+              "iPhoneVerified": false
+            }
+          ]
         }
       },
       "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
