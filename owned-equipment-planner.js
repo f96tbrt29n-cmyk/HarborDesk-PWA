@@ -407,7 +407,7 @@ function* hdOCSearchSteps(c,limits={}){
  best.plan.search=search;
  return {...best,search,readiness:hdOCReadiness(best.plan,best.measure),shortages,examined,signature,fleetId:c.fleet.id};
 }
-function hdOCSearch(c){const steps=hdOCSearchSteps(c);let step;do{step=steps.next()}while(!step.done);return step.value}
+function hdOCSearch(c){const steps=hdOCSearchSteps(c);let step;do{step=hdFEWithShipLookup(()=>steps.next())}while(!step.done);return step.value}
 async function hdOCSearchAsync(c){
  const signature=hdOCSignature(c),steps=hdOCSearchSteps(c);
  // Give the loading state a paint opportunity before evaluating combinations.
@@ -415,7 +415,7 @@ async function hdOCSearchAsync(c){
  while(true){
   const current=hdOCContext(c.map,c.fleet.id,c.index);
   if(hdOCSignature(current)!==signature){steps.return();const error=new Error('Owned search data changed');error.code='HD_OC_STALE';throw error}
-  const step=steps.next();if(step.done)return step.value;
+  const step=hdFEWithShipLookup(()=>steps.next());if(step.done)return step.value;
   await new Promise(resolve=>setTimeout(resolve,0));
  }
 }

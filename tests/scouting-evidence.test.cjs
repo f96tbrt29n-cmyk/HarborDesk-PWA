@@ -8,6 +8,32 @@ function load(file,name,context){
  const source=fs.readFileSync(path.join(__dirname,'..',file),'utf8'),start=source.indexOf('function '+name+'('),end=source.indexOf('\nfunction ',start+1);
  if(name==='hdOCMeasure'&&!context.hdOCPortMeasure)context.hdOCPortMeasure=()=>[];vm.runInNewContext(source.slice(start,end<0?undefined:end),context);return context[name];
 }
+function shipLookupContext(){
+ const c={window:{},calls:0,revision:1,hdShipDbResolveShip(name){c.calls++;if(name==='throw')throw Error('original resolution error');return name==='missing'?null:{name,revision:c.revision,roles:['対潜']}}};
+ vm.runInNewContext('let hdFEActiveShipLookup=null;',c);
+ for(const name of ['hdFEWithShipLookup','hdFEFindShip','hdFEFindShipUncached'])load('fleet-readiness-evaluator.js',name,c);
+ return c;
+}
+test('owned synchronous step caches only pure ship-name resolution, including null, without crossing steps',()=>{
+ const c=shipLookupContext();let first;
+ c.hdFEWithShipLookup(()=>{first=c.hdFEFindShip('A');assert.equal(c.hdFEFindShip('A'),first);assert.equal(c.hdFEFindShip('missing'),null);assert.equal(c.hdFEFindShip('missing'),null)});assert.equal(c.calls,2);
+ c.revision=2;const next=c.hdFEWithShipLookup(()=>c.hdFEFindShip('A'));assert.equal(next.revision,2);assert.notEqual(next,first);assert.equal(c.calls,3);
+ c.hdFEFindShip('A');c.hdFEFindShip('A');assert.equal(c.calls,5);
+});
+test('owned synchronous lookup restores context on original exceptions and nested steps',()=>{
+ const c=shipLookupContext();const marker=Error('caller');assert.throws(()=>c.hdFEWithShipLookup(()=>{c.hdFEFindShip('A');throw marker}),e=>e===marker);c.hdFEFindShip('A');assert.equal(c.calls,2);
+ assert.throws(()=>c.hdFEWithShipLookup(()=>c.hdFEFindShip('throw')),/original resolution error/);c.hdFEFindShip('A');assert.equal(c.calls,4);
+ c.hdFEWithShipLookup(()=>{const outer=c.hdFEFindShip('A'),inner=c.hdFEWithShipLookup(()=>c.hdFEFindShip('A'));assert.notEqual(inner,outer);assert.equal(c.hdFEFindShip('A'),outer)});assert.equal(c.calls,6);
+ const promise=Promise.resolve('unchanged return');assert.equal(c.hdFEWithShipLookup(()=>promise),promise);c.hdFEFindShip('A');assert.equal(c.calls,7);
+});
+test('owned async search keeps its existing UI yields and cancels changed inputs with no lookup cache left active',async()=>{
+ const c=shipLookupContext(),queue=[];let live='same',next=0,closed=0;
+ c.setTimeout=(fn,ms)=>queue.push({fn,ms});c.hdOCSignature=x=>x.signature;c.hdOCContext=()=>({signature:live});
+ c.hdOCSearchSteps=()=>({next(){next++;c.hdFEFindShip('A');c.hdFEFindShip('A');return {done:false,value:50}},return(){closed++}});
+ const source=fs.readFileSync(path.join(__dirname,'../owned-equipment-planner.js'),'utf8'),start=source.indexOf('async function hdOCSearchAsync('),end=source.indexOf('\nfunction ',start+1);vm.runInNewContext(source.slice(start,end),c);
+ const task=c.hdOCSearchAsync({map:'1-6',fleet:{id:'x'},index:0,signature:'same'});assert.equal(queue[0].ms,25);queue.shift().fn();await Promise.resolve();assert.equal(next,1);assert.equal(c.calls,1);assert.equal(queue[0].ms,0);
+ live='changed';c.revision=2;const rejected=assert.rejects(task,e=>e.code==='HD_OC_STALE');queue.shift().fn();await rejected;assert.equal(next,1);assert.equal(closed,1);assert.equal(c.hdFEFindShip('A').revision,2);assert.equal(c.calls,2);
+});
 function portContext(){
  const c={hdFEFindShip:()=>({type:'重巡洋艦'}),hdOCShipOwnership:p=>p.ships.map(()=>({status:'ready'})),hdFEFind:n=>({name:n,category:n==='gun'?'中口径主砲':n==='recon'?'水上偵察機':'対地装備'}),hdShipDbSlotProfile:()=>({count:4,slots:[2,2,2,2]}),hdFEExpansionAvailability:()=>({allowed:false}),hdOCCompatible:()=>true,hdSEPartMatches:(part,r)=>r.name==='shell'};
  for(const name of ['hdOCPortScope','hdOCPortRef','hdOCPortSame','hdOCPortEligible','hdOCPortTargets','hdOCPortPart','hdOCPortSlots','hdOCPortFits','hdOCPortMeasure','hdOCPortReadFleets','hdOCPortSave'])load('owned-equipment-planner.js',name,c);

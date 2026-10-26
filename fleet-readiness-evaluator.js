@@ -14,7 +14,19 @@ function hdFEFind(name){
  }
  return hdFEEquipmentIndex.exact.get(target)||hdFEEquipmentIndex.normalized.get(norm(target))||null;
 }
+// Only a synchronous, read-only owned-search step opts in. Never retain this
+// lookup table while yielding to UI/sync events or across separate searches.
+let hdFEActiveShipLookup=null;
+function hdFEWithShipLookup(action){
+ const previous=hdFEActiveShipLookup;hdFEActiveShipLookup=new Map();
+ try{return action()}finally{hdFEActiveShipLookup=previous}
+}
 function hdFEFindShip(name){
+ if(!hdFEActiveShipLookup||typeof name!=='string')return hdFEFindShipUncached(name);
+ if(!hdFEActiveShipLookup.has(name))hdFEActiveShipLookup.set(name,hdFEFindShipUncached(name));
+ return hdFEActiveShipLookup.get(name);
+}
+function hdFEFindShipUncached(name){
  if(typeof hdShipDbResolveShip==='function')return hdShipDbResolveShip(String(name||'').trim());
  const rows=typeof HD_SHIP_DATABASE!=='undefined'?HD_SHIP_DATABASE:[];
  return rows.find(x=>x.final===name||x.base===name)||null;
