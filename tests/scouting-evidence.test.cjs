@@ -293,7 +293,7 @@ test('H avoidance air exemption follows the selected registered goal, not the se
  load('fleet-readiness-evaluator.js','hdFEAirCheck',c);
  const plan={map:'3-2',routeGoal:'fastPlus',preset:c.plans['3-2'].presets[0]},air={basePower:0,count:0,capacityKnown:0};
  assert.equal(c.plans['3-2'].routeBranches.goals.fastPlus.airNotRequired,true);const result=c.hdFEAirCheck('3-2',air,plan);assert.equal(result.notRequired,true);assert.equal(result.required,0);assert.match(result.detail,/CEFL.*CGFL/);
- for(const goal of ['normal','fastest','future']){plan.routeGoal=goal;assert.equal(c.hdFEAirCheck('3-2',air,plan).status,'manual');assert.notEqual(c.hdFEAirCheck('3-2',air,plan).notRequired,true)}
+ for(const goal of ['normal','future']){plan.routeGoal=goal;assert.equal(c.hdFEAirCheck('3-2',air,plan).status,'manual');assert.notEqual(c.hdFEAirCheck('3-2',air,plan).notRequired,true)}
  assert.equal(c.hdFEAirCheck('3-2',air).status,'manual');plan.routeGoal='fastPlus';c.hdFERouteRequirementData=()=>null;assert.equal(c.hdFEAirCheck('3-2',air,plan).status,'manual');
 });
 
@@ -314,4 +314,18 @@ test('fixed H-route blockers stop only when all equipment-changeable targets alr
  for(const [map,goal,index] of [['4-5','fastPlus',0],['3-2','fastest',0],['3-2','fastPlus',1]]){assert.equal(c.hdOCHFixedInputStop({...plan,map,routeGoal:goal,routeIndex:index},measure,[]),'')}
  const unknown=structuredClone(measure);plan.ships[5].ship='unknown';unknown.goals=unknown.goals.filter(g=>!['電探','radar-ships'].includes(g.kind));unknown.goals.find(g=>g.kind==='route-branches').unresolved=true;Object.assign(unknown.goals[5],{ok:false,unresolved:true,ratio:0,speed:{known:false}});unknown.requiredChecks=[{ok:true,condition:{kind:'equipmentShips',match:'radar',min:1}},{ok:false,unresolved:true,condition:{kind:'minSpeed',rank:15}},{ok:false,unresolved:true,condition:{kind:'typeCount',types:['軽巡','駆逐','補給艦']}}];
  assert.equal(c.hdOCHFixedInputStop(plan,unknown,[{name:'radar',count:1}]),'route-ship-data');unknown.requiredChecks[2].condition.types=['高速艦'];assert.equal(c.hdOCHFixedInputStop(plan,unknown,[]),'');unknown.requiredChecks[2].condition.types=['軽巡','駆逐','補給艦'];unknown.goals[0].ok=false;assert.equal(c.hdOCHFixedInputStop(plan,unknown,[]),'');unknown.goals[0].ok=true;plan.ships[5].items=[{name:'unconfirmed'}];assert.equal(c.hdOCHFixedInputStop(plan,unknown,[]),'');
+});
+
+
+test('fixed CEFL air scope excludes off-route maximum while preserving speed and radar prerequisites',()=>{
+ const c={window:{},hdMapAirTarget:()=>({selected:false,known:false,detail:'未選択'}),hdFEEnemyAirCandidates:()=>[56],hdMapAirData:()=>({nodes:{}})};
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../map-plans.js'),'utf8')+';this.plans=MAP_PLANS',c);
+ c.hdFERouteRequirementData=p=>c.hdMapPresetRequirements(p.map,p.preset);load('fleet-readiness-evaluator.js','hdFEAirCheck',c);
+ const g=c.plans['3-2'].routeBranches.goals.fastest;
+ assert.equal(g.airNotRequired,true);assert.equal(g.speed,20);assert.equal(g.radar,4);assert.deepEqual(Array.from(g.allowed),['start','C','E','F','L']);
+ assert.deepEqual(JSON.parse(JSON.stringify(g.checks.map(x=>x.condition))),[{kind:'minSpeed',rank:20},{kind:'equipmentShips',match:'radar',slotPolicy:'valid',min:4,max:6}]);
+ for(const preset of c.plans['3-2'].presets){const r=c.hdFEAirCheck('3-2',{basePower:0},{map:'3-2',routeGoal:'fastest',preset});assert.equal(r.notRequired,true);assert.match(r.detail,/CEFL/)}
+ // No contract or an unregistered goal still cannot borrow the exemption.
+ for(const routeGoal of ['normal','future'])assert.equal(c.hdFEAirCheck('3-2',{basePower:0},{map:'3-2',routeGoal,preset:c.plans['3-2'].presets[1]}).status,'manual');
+ assert.equal(c.hdFEAirCheck('3-2',{basePower:0}).status,'manual');
 });

@@ -2118,12 +2118,13 @@
           "limit": ""
         },
         "制空": {
-          "class": "B",
-          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "class": "D",
+          "detail": "最速CEFL経路に数値制空目標なし。別経路Kの海域最大56を流用しない",
           "evidence": [
-            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+            "hdFEAirCheck → selected goal.airNotRequired",
+            "shared selected-goal data; no new index0 UI run"
           ],
-          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+          "limit": "任意の制空計算と別経路は別。数値0の充足目標を作らない"
         },
         "推奨セット": {
           "class": "C",
@@ -2413,15 +2414,15 @@
         "電探"
       ],
       "notes": [],
-      "requiredConnectionClass": "B",
+      "requiredConnectionClass": "A",
       "guidanceAudit": {
         "装備艦数": {
-          "class": "B",
-          "detail": "電探4艦（各艦1個以上）",
+          "class": "A",
+          "detail": "電探4艦（同艦複数は1艦）。4/4成立・0/4登録在庫不足と保存/loadを確認",
           "evidence": [
-            "hdOCMeasure/hdOCSearchSteps → hdFEBranchPredicate"
+            "tests/route-target-scope.spec.js / docs/pr152-route-target-scope-ja.md"
           ],
-          "limit": "代表実行の範囲。すべての艦・装備・増設は未網羅"
+          "limit": "合成駆逐6個体の代表実操作。全艦形態・部分在庫探索・勝利・網羅性は未確認。所持個体未確認は総合manualのまま"
         },
         "索敵": {
           "class": "D",
@@ -2430,12 +2431,12 @@
           "limit": ""
         },
         "速力": {
-          "class": "B",
-          "detail": "最速統一",
+          "class": "A",
+          "detail": "最速20を各艦判定し6/6。タービン補完・増設使用・有限在庫・保存/loadを確認",
           "evidence": [
-            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+            "tests/route-target-scope.spec.js / docs/pr152-route-target-scope-ja.md"
           ],
-          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+          "limit": "合成駆逐6個体の代表実操作。全艦形態・部分在庫探索・勝利・網羅性は未確認。所持個体未確認は総合manualのまま"
         },
         "先制対潜": {
           "class": "D",
@@ -2444,12 +2445,13 @@
           "limit": ""
         },
         "制空": {
-          "class": "B",
-          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "class": "D",
+          "detail": "最速CEFL経路に数値制空目標なし。別経路Kの海域最大56を流用しない",
           "evidence": [
-            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+            "hdFEAirCheck → selected goal.airNotRequired",
+            "tests/route-target-scope.spec.js / docs/pr152-route-target-scope-ja.md"
           ],
-          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+          "limit": "任意の制空計算と別経路は別。数値0の充足目標を作らない"
         },
         "推奨セット": {
           "class": "C",
@@ -6788,8 +6790,8 @@
   },
   "requiredConnectionCounts": {
     "D": 29,
-    "B": 25,
-    "A": 2,
+    "B": 23,
+    "A": 4,
     "C": 3
   },
   "perConditionCounts": {
@@ -6797,19 +6799,19 @@
     "索敵:D": 39,
     "速力:D": 44,
     "先制対潜:D": 35,
-    "制空:D": 14,
+    "制空:D": 18,
     "推奨セット:C": 50,
-    "速力:B": 13,
+    "速力:B": 11,
     "推奨セット:B": 7,
-    "制空:B": 41,
+    "制空:B": 37,
     "先制対潜:C": 22,
     "推奨セット:A": 2,
     "先制対潜:A": 2,
-    "装備艦数:A": 2,
+    "装備艦数:A": 4,
     "索敵:A": 1,
-    "速力:A": 2,
+    "速力:A": 4,
     "索敵:B": 16,
-    "装備艦数:B": 3,
+    "装備艦数:B": 1,
     "制空:A": 1,
     "索敵:C": 3,
     "制空:C": 3
