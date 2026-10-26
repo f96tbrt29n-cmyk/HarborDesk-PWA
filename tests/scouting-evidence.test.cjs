@@ -13,6 +13,30 @@ function portContext(){
  for(const name of ['hdOCPortScope','hdOCPortRef','hdOCPortSame','hdOCPortEligible','hdOCPortTargets','hdOCPortPart','hdOCPortSlots','hdOCPortFits','hdOCPortMeasure','hdOCPortReadFleets','hdOCPortSave'])load('owned-equipment-planner.js',name,c);
  return c;
 }
+function boundedPortContext(){
+ const c={hdOCPortTargets:()=>[{index:0},{index:1}],hdFOClone:v=>JSON.parse(JSON.stringify(v)),hdOCMeasure:()=>({score:1,goals:[]}),hdOCGoalRegressions:()=>[],hdFOAssignedUsage:()=>({}),hdFOStackKey:x=>x?.name||'',hdOCPortMeasure:()=>[{index:0,counts:{recon:0,type3:0,main:0}},{index:1,counts:{recon:0,type3:0,main:0}}],hdOCPortFits:(part,slot,row)=>row.name===part,hdFLScoreBase:()=>0,hdOCEquipment:(r,s)=>({name:r.name,slotIndex:s.index})};
+ const seed=load('owned-equipment-planner.js','hdOCPortSeed',c),plan={ships:[{items:Array.from({length:4},(_,slotIndex)=>({name:'',slotIndex}))},{items:Array.from({length:4},(_,slotIndex)=>({name:'',slotIndex}))}]},slots=[0,1].flatMap(si=>[0,1,2,3].map(index=>({si,index}))),inventory=[{name:'main',key:'main',count:4},{name:'recon',key:'recon',count:2},{name:'type3',key:'type3',count:2}];
+ return {seed,plan,slots,inventory};
+}
+test('bounded port seed never exceeds its operation cap and evaluates a complete eighth placement',()=>{
+ const {seed,plan,slots,inventory}=boundedPortContext(),original=JSON.stringify(plan);
+ const cut=seed(plan,inventory,slots,[],[],1);assert.equal(cut.examined,1);assert.equal(cut.limited,true);assert.equal(cut.plan,null);
+ const exact=seed(plan,inventory,slots,[],[],8);assert.equal(exact.examined,8);assert.equal(exact.limited,false);assert.ok(exact.plan);for(const ship of exact.plan.ships)assert.deepEqual(ship.items.map(x=>x.name).sort(),['main','main','recon','type3']);assert.equal(JSON.stringify(plan),original);
+});
+test('saved bounded search remains visible only for its route and is explicitly historical',()=>{
+ const source=fs.readFileSync(path.join(__dirname,'../owned-equipment-planner.js'),'utf8'),c={hdFEEsc:String,hdMapPresetRequirements:(map,p)=>p?{index:p.index}:null};
+ load('owned-equipment-planner.js','hdOCSearchStatusHtml',c);
+ const render=source.includes('function hdOCSavedSearchHtml(')?load('owned-equipment-planner.js','hdOCSavedSearchHtml',c):()=>'';
+ const ctx={map:'4-5',index:1,fleet:{routePreset:{index:1},searchAssessment:{status:'incomplete',exhaustive:false,examined:500,maxExamined:500,portSeed:{examined:800,limited:true},reasons:['combination-limit','port-seed-limit'],scope:{map:'4-5',routeIndex:1}}}};
+ const html=render(ctx);assert.match(html,/探索未完了/);assert.match(html,/500/);assert.match(html,/800/);assert.match(html,/保存時/);assert.match(html,/不足を証明するものではありません/);ctx.index=0;assert.equal(render(ctx),'');ctx.index=1;ctx.map='1-6';assert.equal(render(ctx),'');
+});
+test('bounded port search applies only to selected central-route targets and leaves ordinary limits intact',()=>{
+ const source=fs.readFileSync(path.join(__dirname,'../owned-equipment-planner.js'),'utf8'),start=source.indexOf('function* hdOCSearchSteps('),end=source.indexOf(' const signature=',start),header=source.slice(start,end).replace('function* hdOCSearchSteps','function limits');
+ const c={};load('owned-equipment-planner.js','hdOCPortScope',c);vm.runInNewContext(header+'return {maxExamined,maxDepth,portSearch};}',c);
+ const fleet={portAttackersByRoute:{'4-5:1':[{}]}};
+ for(const ctx of [{map:'1-6',index:0,fleet},{map:'4-5',index:0,fleet},{map:'4-5',index:1,fleet:{portAttackersByRoute:{'4-5:1':[]}}},{map:'4-5',index:1,fleet:{}}])assert.equal(c.limits(ctx).maxExamined,10000);
+ assert.equal(c.limits({map:'4-5',index:1,fleet}).maxExamined,500);assert.equal(c.limits({map:'4-5',index:1,fleet},{maxExamined:50}).maxExamined,50);assert.equal(c.limits({map:'1-6',index:0,fleet}).maxDepth,24);
+});
 test('central port assignment is exact per individual, remodel and route; unknown references do not become achieved',()=>{
  const c=portContext(),ship={ship:'A',gameShipId:1,masterId:2,items:['gun','gun','recon','shell'].map((name,slotIndex)=>({name,slotIndex}))},p={map:'4-5',routeIndex:1,ships:[ship],sourceFleet:{portAttackersByRoute:{'4-5:1':[{ship:'A',gameShipId:1,masterId:2,rosterId:''}]}}};
  assert.equal(c.hdOCPortMeasure(p)[0].ok,true);ship.items[3].name='gun';assert.equal(c.hdOCPortMeasure(p)[0].ok,false);ship.masterId=3;assert.equal(c.hdOCPortMeasure(p)[0].unresolved,true);p.routeIndex=0;assert.equal(c.hdOCPortMeasure(p).length,0);

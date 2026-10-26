@@ -36,10 +36,21 @@ test('central port sets use each selected hull and persist through real search s
 test('central port incomplete search displays the named stock deficit without a victory or procurement claim',async({page},info)=>{
  const e={},errors=[];page.on('pageerror',x=>errors.push(x.message));try{
   e.setup=await setup(page);const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');
-  await page.evaluate(()=>{const rows=hdFLRows().filter(x=>!(x.name==='三式弾'&&Number(x.star)===4));localStorage.setItem(HD_FL_KEY,JSON.stringify(rows));hdMSNOpen('4-5')});
+  e.boundary=await page.evaluate(()=>{hdOCPortSave(hdOCContext('4-5','port',1),0,true);hdOCPortSave(hdOCContext('4-5','port',1),2,true);const b=hdOCBuild(hdOCContext('4-5','port',1)),req=hdSEChecks('4-5').rows,cut=hdOCPortSeed(b.plan,b.inventory,b.slots,req,b.unknown,1),exact=hdOCPortSeed(b.plan,b.inventory,b.slots,req,b.unknown,8);return {cut:{examined:cut.examined,limited:cut.limited,found:!!cut.plan},exact:{examined:exact.examined,limited:exact.limited,goals:exact.plan&&hdOCPortMeasure(exact.plan)}}});
+  expect(e.boundary.cut).toEqual({examined:1,limited:true,found:false});expect(e.boundary.exact.examined).toBe(8);expect(e.boundary.exact.limited).toBe(false);expect(e.boundary.exact.goals.map(x=>x.counts)).toEqual([{main:2,recon:1,type3:1},{main:2,recon:1,type3:1}]);
+  // Extra owned star stack deliberately expands the joint-set search beyond
+  // 800 operations; the original single-stack shortage exhausts at 544 instead.
+  await page.evaluate(()=>{const rows=hdFLRows().filter(x=>!(x.name==='三式弾'&&Number(x.star)===4));rows.push({name:'35.6cm連装砲',star:1,count:2});localStorage.setItem(HD_FL_KEY,JSON.stringify(rows));hdMSNOpen('4-5')});
   await panel.locator('[data-hd-oc-port-ship="0"]').check();await panel.locator('[data-hd-oc-port-ship="2"]').check();await panel.locator('[data-hd-oc-search]').click();await expect(panel.locator('.hd-oc-result')).toBeVisible();
   e.result=await page.evaluate(()=>{const r=HD_OC_CACHE.get('4-5:port:1');return {goals:hdOCPortMeasure(r.plan),search:r.search,shortages:r.shortages.map(x=>x.goalKind)}});expect(e.result.goals.filter(x=>x.ok).length).toBeLessThan(2);expect(e.result.search).toMatchObject({status:'incomplete',maxExamined:500,exhaustive:false});expect(e.result.shortages).not.toContain('port-attacker-set');
   await expect(panel.locator('[data-hd-oc-port]')).toContainText('このセットだけの所持不足 1個');await expect(panel.locator('[data-hd-oc-port-result]').filter({hasText:'妙高改二'})).toContainText('三式弾 あと1個');await expect(panel.locator('[data-hd-oc-port]')).toContainText('手持ちで不可能とは断定しません');expect(errors).toEqual([]);
+  expect(e.result.search.portSeed).toMatchObject({examined:800,maxOperations:800,limited:true});expect(e.result.search.reasons).toContain('port-seed-limit');
+  await expect(panel.locator('[data-hd-oc-search-status]')).toContainText('500/500');await expect(panel.locator('[data-hd-oc-search-status]')).toContainText('800/800');
+  e.savedReference=await page.evaluate(()=>({other:JSON.stringify(loadCustomFleets()['4-5'][1]),keys:[SHIP_ROSTER_KEY,HD_FL_KEY,'harbordesk-kancolle-sync-v1'].map(k=>[k,localStorage.getItem(k)])}));
+  await panel.locator('[data-hd-oc-apply]').click();await page.reload({waitUntil:'load'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdMSNOpen==='function');await page.evaluate(()=>hdMSNOpen('4-5'));
+  await expect(panel.locator('[data-hd-oc-saved-search]')).toContainText('保存時');await expect(panel.locator('[data-hd-oc-saved-search]')).toContainText('500/500');await expect(panel.locator('[data-hd-oc-saved-search]')).toContainText('担当艦セットの操作上限');
+  e.after=await page.evaluate(ref=>({state:document.readyState,search:hdOCContext('4-5','port',1).fleet.searchAssessment,other:JSON.stringify(loadCustomFleets()['4-5'][1])===ref.other,exact:ref.keys.every(([k,v])=>localStorage.getItem(k)===v)}),e.savedReference);expect(e.after).toMatchObject({state:'complete',other:true,exact:true});expect(e.after.search.reasons).toEqual(e.result.search.reasons);
+  await page.evaluate(()=>{hdMapRouteSet('4-5',0);hdMSNOpen('4-5')});await expect(panel.locator('[data-hd-oc-saved-search]')).toHaveCount(0);expect(errors).toEqual([]);
  }finally{await finish(info,e,errors)}
 });
 test('central port finite allocations distinguish split sets stock slots compatibility unknown and preserved goals',async({page},info)=>{
