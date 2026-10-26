@@ -80,7 +80,7 @@ jobs:
         run: npm install --no-audit --no-fund --no-package-lock
 
       - name: Verify service worker cache lifetime, registration readiness and storage diagnostics
-        run: node --test tests/scouting-evidence.test.cjs tests/north-drum-oracle.test.cjs tests/submarine-storage-comparison.test.cjs tests/pwa-prepared-storage.test.cjs tests/hash-navigation-audit.test.cjs tests/response-storage-headers.test.cjs tests/toast-action-retry.test.cjs tests/sw-cache-lifetime.test.cjs tests/module-loader-recovery.test.cjs tests/planner-storage-read.test.cjs tests/storage-null-capture.test.cjs tests/pwa-registration-ready.test.cjs tests/pwa-initial-registration-ready.test.cjs tests/pwa-registration-continuation.test.cjs tests/registration-route-fixture.test.cjs tests/initial-update-fixture.test.cjs tests/initial-document-fixture.test.cjs tests/pwa-storage-audit.test.cjs
+        run: node --test tests/scouting-options.test.cjs tests/scouting-evidence.test.cjs tests/north-drum-oracle.test.cjs tests/submarine-storage-comparison.test.cjs tests/pwa-prepared-storage.test.cjs tests/hash-navigation-audit.test.cjs tests/response-storage-headers.test.cjs tests/toast-action-retry.test.cjs tests/sw-cache-lifetime.test.cjs tests/module-loader-recovery.test.cjs tests/planner-storage-read.test.cjs tests/storage-null-capture.test.cjs tests/pwa-registration-ready.test.cjs tests/pwa-initial-registration-ready.test.cjs tests/pwa-registration-continuation.test.cjs tests/registration-route-fixture.test.cjs tests/initial-update-fixture.test.cjs tests/initial-document-fixture.test.cjs tests/pwa-storage-audit.test.cjs
 
       - name: Verify and launch bundled Playwright browser
         run: node tests/ci-browser-environment.cjs ${{ matrix.browser }}
