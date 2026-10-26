@@ -218,7 +218,8 @@ const HD_MAP_ROUTE_REQUIREMENTS={};
  add('4-5',2,'ADHT / CDHT',[fleet(6),count(['cl'],1),count(['escort'],3)],{routing:'multiple',notes:['軽量最短例は高速+不要、数値索敵条件なし。']});
  add('5-1',0,'BCFJ',[fleet(6),count(['cvn'],0,0),count(['bb','cvl'],0,2),count(['cvl'],0,1),count(['cl'],1),count(['dd'],2)]);
  add('5-2',0,'BCEFO',[fleet(6),count(['cv'],0,2),count(['bb'],0,2)],{los:los(2,70)});
- add('5-3',0,'DGIOKEQ',[fleet(6),count(['cv','bbv'],0,0),count(['cl'],0,1),count(['dd'],2),count(['bb'],0,2),{any:[count(['bb'],0,1),speed(10)]}],{conditionalSpeed:{rank:10,when:count(['bb'],2,7)},notes:['航戦不可。戦艦2隻へ変更する別例では高速統一が必要。能動分岐Oでボス方面を選ぶ。']});
+ add('5-3',0,'DGIOKEQ',[fleet(6),count(['cv','bbv'],0,0),count(['cl'],0,1),count(['dd'],2),count(['bb'],0,2),{kind:'slowBattleshipCount',min:0,max:1},{any:[count(['bb'],0,1),speed(10)]}],{checkedAt:'2026-10-26',conditionalSpeed:{rank:10,when:count(['bb'],2,7)},notes:['G→Iでは元の艦種「戦艦」（低速戦艦）は1隻まで。高速化しても艦種は変わりません。艦種「高速戦艦」とは別に数えます。','航戦不可。戦艦2隻へ変更する別例では高速統一が必要。能動分岐Oでボス方面を選ぶ。']});
+ MAP_PLANS['5-3'].presets[0].gear+=' G→Iの低速戦艦は元の艦種で1隻まで（高速化しても別枠にはなりません）。';
  add('5-4',0,'ADEHIJMP',[fleet(6),count(['cv'],0,0),count(['bb'],2,2),count(['dd'],2)],{los:los(2,45),notes:['この登録例は中央ルート。上ルートL→Pの索敵値を流用しない。渦潮対策の電探は推奨。']});
  add('5-5',0,'BKPS',[fleet(6),count(['bb','cv'],0,4),count(['dd'],0,1),count(['ss'],0,0)],{los:los(2,80),notes:['戦艦＋空母5隻以上の別例には索敵を満たしても逸れがある。']});
  add('5-5',1,'BFDHNOS',[fleet(6),count(['bb'],0,2),count(['cv','ss'],0,0),count(['dd'],2)],{los:los(2,66),notes:['この登録例は中央下ルート。ACEGIMOSのドラム缶4隻／大発系4隻の条件とは別。']});
@@ -254,6 +255,7 @@ function hdMapRequirementConditionText(c){
  if(c.kind==='minSpeed')return `${({10:'高速',15:'高速+',20:'最速'})[c.rank]}統一`;
  if(c.kind==='speedCount')return `配備後の低速艦 ${c.min}隻以上（高速化して低速艦がなくなると不可）`;
  if(c.kind==='equipmentShips')return `別々の${c.min}隻に${({drum:'ドラム缶(輸送用)',radar:'電探'})[c.match]||'未確認の装備'}を各1個以上`;
+ if(c.kind==='slowBattleshipCount')return `低速戦艦（元の艦種） ${c.min===c.max?c.min:c.min+'〜'+c.max}隻`;
  if(c.kind==='namedCount')return `${c.names.join('・')} ${c.min}隻以上`;
  if(c.kind==='scoutingValue')return Number.isInteger(c.coef)&&c.coef>=1&&c.coef<=4&&Number.isFinite(c.min)&&c.min>=0?`33式索敵（分岐点係数${c.coef}）${c.min}以上`:'索敵条件（係数・必要値が未確認）';
  if(c.kind==='flagshipType')return `旗艦 ${c.types.join('・')}`;

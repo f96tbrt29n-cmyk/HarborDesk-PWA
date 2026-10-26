@@ -419,7 +419,7 @@ function hdFEInferRoute(plan){
 function hdFEBranchPredicate(condition,ships,plan=null){
  const manual=detail=>({status:'manual',ratio:0,detail});
  if(!condition||typeof condition!=='object')return manual('分岐条件が未登録');
- const fields={always:[],unverified:[],fleetCount:['min','max'],typeCount:['types','min','max','matchPolicy'],minSpeed:['rank'],speedCount:['rank','min','max'],namedCount:['names','min','max'],flagshipType:['types'],equipmentShips:['match','min','max','slotPolicy'],scoutingValue:['min','coef'],airValue:['min']};
+ const fields={always:[],unverified:[],fleetCount:['min','max'],typeCount:['types','min','max','matchPolicy'],minSpeed:['rank'],slowBattleshipCount:['min','max'],speedCount:['rank','min','max'],namedCount:['names','min','max'],flagshipType:['types'],equipmentShips:['match','min','max','slotPolicy'],scoutingValue:['min','coef'],airValue:['min']};
  const groups=['all','any','not'].filter(k=>Object.prototype.hasOwnProperty.call(condition,k)),supported=['kind','reason','state','source','sources','checkedAt',...groups,...(Array.isArray(fields[condition.kind])?fields[condition.kind]:[])];
  const extra=Object.keys(condition).filter(k=>!supported.includes(k));
  if(extra.length||groups.length>1||groups.length&&condition.kind||condition.state&&condition.state!=='verified')return manual('未対応・未確認の分岐条件：'+(extra.join('、')||condition.state||'条件式'));
@@ -436,13 +436,13 @@ function hdFEBranchPredicate(condition,ships,plan=null){
   if(!Array.isArray(condition.types)||!condition.types.length||condition.types.some(x=>typeof x!=='string'))return manual('旗艦の艦種条件が未登録');
   const first=ships[0],known=first?.typeKnown,ok=known&&condition.types.includes(first.type);return {status:!first?'missing':known?(ok?'ready':'missing'):'manual',ratio:Number(ok),detail:`旗艦 ${first?.ship?.ship||'未選択'} / 必要 ${condition.types.join('・')}`};
  }
- if(['speedCount','namedCount'].includes(condition.kind)){
+ if(['speedCount','namedCount','slowBattleshipCount'].includes(condition.kind)){
   if(!Number.isInteger(condition.min)||!Number.isInteger(condition.max)||condition.min<0||condition.max<condition.min||condition.max>7)return manual('艦数条件が未登録');
   if(condition.kind==='speedCount'&&![5,10,15,20].includes(condition.rank)||condition.kind==='namedCount'&&(!Array.isArray(condition.names)||!condition.names.length||condition.names.some(n=>typeof n!=='string'||!n)))return manual('速力・史実艦条件が未登録');
   let count=0,unknown=0;
-  for(const row of ships){if(condition.kind==='speedCount'){if(!row.speedInfo.known||row.speedInfo.invalid.length||[...(row.ship.items||[]),row.ship.expansion].some(i=>i?.name&&!hdFEFind(i.name)))unknown++;else if(row.speedInfo.rank===condition.rank)count++;}else{const db=hdFEFindShip(row.ship.ship),master=db&&hdShipDbMasterRowFor({name:row.ship.ship,masterId:row.ship.masterId});if(!db||!master)unknown++;else if(condition.names.some(n=>String(master.name||row.ship.ship).startsWith(n)))count++;}}
-  const {min,max}=condition,status=count>max||count+unknown<min?'missing':count>=min&&count+unknown<=max?'ready':'manual',label=condition.kind==='speedCount'?hdFESpeedLabel(condition.rank)+'艦（配備後）':condition.names.join('・');
-  return {status,count,min,max,ratio:status==='ready'?1:Math.min(1,count/Math.max(1,min)),detail:`${label} ${count}/${min}隻${unknown?' / 未判定 '+unknown+'隻':''}`};
+  for(const row of ships){if(condition.kind==='slowBattleshipCount'){const master=typeof hdShipDbMasterRowFor==='function'?hdShipDbMasterRowFor({name:row.ship.ship,masterId:row.ship.masterId}):null;if(!row.typeKnown||!master||!Number.isInteger(master.stype)||master.stype<=0||String(master.name||'')!==String(row.ship.ship||''))unknown++;else if(master.stype===9)count++;}else if(condition.kind==='speedCount'){if(!row.speedInfo.known||row.speedInfo.invalid.length||[...(row.ship.items||[]),row.ship.expansion].some(i=>i?.name&&!hdFEFind(i.name)))unknown++;else if(row.speedInfo.rank===condition.rank)count++;}else{const db=hdFEFindShip(row.ship.ship),master=db&&hdShipDbMasterRowFor({name:row.ship.ship,masterId:row.ship.masterId});if(!db||!master)unknown++;else if(condition.names.some(n=>String(master.name||row.ship.ship).startsWith(n)))count++;}}
+  const {min,max}=condition,status=count>max||count+unknown<min?'missing':count>=min&&count+unknown<=max?'ready':'manual',label=condition.kind==='slowBattleshipCount'?'低速戦艦（元の艦種）':condition.kind==='speedCount'?hdFESpeedLabel(condition.rank)+'艦（配備後）':condition.names.join('・');
+  return {status,count,min,max,ratio:condition.kind==='slowBattleshipCount'?(status==='ready'?1:status==='manual'?0:count>max?Math.max(0,1-(count-max)/Math.max(1,count)):Math.min(1,count/Math.max(1,min))):status==='ready'?1:Math.min(1,count/Math.max(1,min)),detail:condition.kind==='slowBattleshipCount'?`${label} ${count}隻 / 上限${max}隻${count>max?'（'+(count-max)+'隻超過）':''}${unknown?' / 未判定 '+unknown+'隻':''}`:`${label} ${count}/${min}隻${unknown?' / 未判定 '+unknown+'隻':''}`};
  }
  if(condition.kind==='equipmentShips'){
   if(!['radar','drum'].includes(condition.match)||condition.slotPolicy&&condition.slotPolicy!=='valid'||!Number.isInteger(condition.min)||!Number.isInteger(condition.max)||condition.min<0||condition.max<condition.min||condition.max>7)return manual('装備艦数・搭載条件が未対応');

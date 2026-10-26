@@ -4112,6 +4112,11 @@
           "max": 2
         },
         {
+          "kind": "slowBattleshipCount",
+          "min": 0,
+          "max": 1
+        },
+        {
           "any": [
             {
               "kind": "typeCount",
@@ -4141,6 +4146,7 @@
         "索敵"
       ],
       "notes": [
+        "G→Iの元艦種stype9は1隻まで。高速化しても別艦種にはならない。",
         "航戦不可。戦艦2隻へ変更する別例では高速統一が必要。能動分岐Oでボス方面を選ぶ。"
       ],
       "requiredConnectionClass": "B",
@@ -4158,12 +4164,14 @@
           "limit": ""
         },
         "速力": {
-          "class": "B",
-          "detail": "高速統一",
+          "class": "A",
+          "detail": "戦艦2隻の場合だけ高速統一。1隻の免除、同艦缶/タービン・缶不足・未登録艦manual/保存中止・Gの元艦種上限を限定実操作確認",
           "evidence": [
-            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+            "tests/route-5-3-speed-ui.spec.js",
+            "tests/conditional-speed-ui.test.cjs",
+            "docs/pr152-5-3-speed-ui-ja.md"
           ],
-          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+          "limit": "今回の速度下限/G条件のみ。登録例外の総合manualを維持。Kの高速＋/ドラム/大発系装備等による別経路条件は今回未接続/未検証のため、行全体Bを維持。勝利・全分岐網羅は未確認。"
         },
         "先制対潜": {
           "class": "D",
