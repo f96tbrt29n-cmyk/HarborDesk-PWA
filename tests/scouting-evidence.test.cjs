@@ -6,8 +6,25 @@ const vm=require('node:vm');
 const path=require('node:path');
 function load(file,name,context){
  const source=fs.readFileSync(path.join(__dirname,'..',file),'utf8'),start=source.indexOf('function '+name+'('),end=source.indexOf('\nfunction ',start+1);
- vm.runInNewContext(source.slice(start,end<0?undefined:end),context);return context[name];
+ if(name==='hdOCMeasure'&&!context.hdOCPortMeasure)context.hdOCPortMeasure=()=>[];vm.runInNewContext(source.slice(start,end<0?undefined:end),context);return context[name];
 }
+function portContext(){
+ const c={hdFEFindShip:()=>({type:'重巡洋艦'}),hdOCShipOwnership:p=>p.ships.map(()=>({status:'ready'})),hdFEFind:n=>({name:n,category:n==='gun'?'中口径主砲':n==='recon'?'水上偵察機':'対地装備'}),hdShipDbSlotProfile:()=>({count:4,slots:[2,2,2,2]}),hdFEExpansionAvailability:()=>({allowed:false}),hdOCCompatible:()=>true,hdSEPartMatches:(part,r)=>r.name==='shell'};
+ for(const name of ['hdOCPortScope','hdOCPortRef','hdOCPortSame','hdOCPortEligible','hdOCPortTargets','hdOCPortPart','hdOCPortSlots','hdOCPortFits','hdOCPortMeasure','hdOCPortReadFleets','hdOCPortSave'])load('owned-equipment-planner.js',name,c);
+ return c;
+}
+test('central port assignment is exact per individual, remodel and route; unknown references do not become achieved',()=>{
+ const c=portContext(),ship={ship:'A',gameShipId:1,masterId:2,items:['gun','gun','recon','shell'].map((name,slotIndex)=>({name,slotIndex}))},p={map:'4-5',routeIndex:1,ships:[ship],sourceFleet:{portAttackersByRoute:{'4-5:1':[{ship:'A',gameShipId:1,masterId:2,rosterId:''}]}}};
+ assert.equal(c.hdOCPortMeasure(p)[0].ok,true);ship.items[3].name='gun';assert.equal(c.hdOCPortMeasure(p)[0].ok,false);ship.masterId=3;assert.equal(c.hdOCPortMeasure(p)[0].unresolved,true);p.routeIndex=0;assert.equal(c.hdOCPortMeasure(p).length,0);
+});
+test('central port types never count a water fighter, bomber or zero-capacity recon as the requested recon',()=>{
+ const c=portContext();for(const category of ['水上戦闘機','水上爆撃機','艦上偵察機'])assert.equal(c.hdOCPortPart('recon',{item:{category}}),false);
+ assert.equal(c.hdOCPortFits('recon',{capacity:0},{item:{category:'水上偵察機'}}),false);assert.equal(c.hdOCPortFits('recon',{capacity:2,expansion:true},{item:{category:'水上偵察機'}}),false);assert.equal(c.hdOCPortFits('recon',{capacity:2},{item:{category:'水上偵察機'}}),true);
+});
+test('central port setting writer preserves metadata and refuses null-present, exception and invalid JSON reads',()=>{
+ const c=portContext();let raw=JSON.stringify({'4-5':[{id:'one',ships:[],metadata:{keep:true}}],'elsewhere':[1]}),fault='',writes=0;c.CUSTOM_FLEET_KEY='fleets';c.localStorage={fleets:true,getItem:()=>{if(fault==='throw')throw Error('fault');return fault==='null'?null:fault==='json'?'{':raw}};c.hdFEPlanFromSavedFleet=()=>({ships:[{ship:'A',masterId:2,gameShipId:1}]});c.saveCustomFleets=all=>{writes++;raw=JSON.stringify(all)};
+ const ctx={map:'4-5',index:1,fleet:{id:'one'}};for(fault of ['null','throw','json'])assert.throws(()=>c.hdOCPortSave(ctx,0,true));assert.equal(writes,0);fault='';c.hdOCPortSave(ctx,0,true);assert.equal(writes,1);assert.deepEqual(JSON.parse(raw)['4-5'][0].metadata,{keep:true});assert.deepEqual(JSON.parse(raw).elsewhere,[1]);c.hdOCPortSave(ctx,-1,false);assert.equal(JSON.parse(raw)['4-5'][0].portAttackersByRoute['4-5:1'].length,0);
+});
 function aswTargetContext(){
  const types={'夕立改二':'駆逐艦','時雨改二':'駆逐艦','綾波改二':'駆逐艦','島風改':'駆逐艦','占守改':'海防艦','扶桑改':'航空戦艦','阿武隈改二':'軽巡洋艦'},stored={};
  const c={window:{},HD_OC_ASW_TARGET_KEY:'harbordesk-opening-asw-targets-v1',localStorage:{getItem:key=>key==='harbordesk-opening-asw-targets-v1'?JSON.stringify(stored):null},hdSEChecks:()=>({rows:[{kind:'cap-asw'}]}),hdFEFindShip:name=>types[name]?{type:types[name]}:null,HD_MAP_ADVANCED_DATA:{'7-1':{openingAsw:{recommended:4,upper:5,source:'https://zekamashi.net/kancolle-kouryaku/7-1/'}}}};
