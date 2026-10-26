@@ -157,7 +157,7 @@ window.hdRenderMapPlans=renderPlans;
  }}};
  MAP_PLANS['3-2'].routeBranches={schemaVersion:2,path:'C…L',checkedAt:'2026-10-13',sources:['https://zekamashi.net/kancolle-kouryaku/3-2/','https://zh.kcwiki.cn/wiki/北方海域/3-2'],coverage:'登録したボス経路の分岐。戦闘勝利・大破進撃の安全性は保証しない',defaultGoal:'normal',goals:{
   normal:{label:'通常・H経由を許容',next:'補給艦を外して軽巡1＋駆逐5または駆逐6へ変更する。H回避を選ぶ場合は全艦が高速＋へ到達できるか確認する。',path:'CG(H)FL / CEFL',checks:[],speed:0,radar:0,allowed:['start','C','E','G','H','F','L']},
-  fastPlus:{label:'H回避・高速＋以上',path:'CEFL / CGFL',checks:[{id:'speed-goal',label:'高速＋統一',condition:speed(15),next:'各艦に有効な缶・タービンのセットを配備する。'},{id:'radar-goal',label:'電探装備艦',condition:radar(1),next:'電探を搭載できる艦の有効スロットに1個以上配備する。'}],speed:15,radar:1,allowed:['start','C','E','G','F','L']},
+  fastPlus:{label:'H回避・高速＋以上',path:'CEFL / CGFL',checks:[{id:'speed-goal',label:'高速＋統一',condition:speed(15),next:'各艦に有効な缶・タービンのセットを配備する。'},{id:'radar-goal',label:'電探装備艦',condition:radar(1),next:'電探を搭載できる艦の有効スロットに1個以上配備する。'}],speed:15,radar:1,airNotRequired:true,allowed:['start','C','E','G','F','L']},
   fastest:{label:'CEFL固定・最速',path:'CEFL',checks:[{id:'speed-goal',label:'最速統一',condition:speed(20),next:'最速に到達できる艦と必要な缶・改修値・スロットを確認する。'},{id:'radar-goal',label:'電探装備艦4隻',condition:radar(4),next:'4隻それぞれの有効スロットに電探を配備する。同じ艦の複数電探は1隻と数える。'}],speed:20,radar:4,allowed:['start','C','E','F','L']}
  },notRequired:{scouting:'この登録経路には数値索敵の分岐条件なし。電探装備艦数とは区別する。',air:'この登録ボス経路に航空戦なし。別経路は対象外。'},checks:[
   {id:'six-ships',label:'ボス経路の隻数',condition:{kind:'fleetCount',min:6,max:6},next:'6隻にする。5隻以下ではHからIへ逸れる。'},
@@ -253,7 +253,7 @@ function hdMapRequirementConditionText(c){
  if(c.kind==='typeCount')return `${c.types.join('＋')} ${c.max===0?'不可':c.min===c.max?c.min+'隻':c.min+'〜'+c.max+'隻'}`;
  if(c.kind==='minSpeed')return `${({10:'高速',15:'高速+',20:'最速'})[c.rank]}統一`;
  if(c.kind==='speedCount')return `配備後の低速艦 ${c.min}隻以上（高速化して低速艦がなくなると不可）`;
- if(c.kind==='equipmentShips')return `別々の${c.min}隻にドラム缶(輸送用)を各1個以上`;
+ if(c.kind==='equipmentShips')return `別々の${c.min}隻に${({drum:'ドラム缶(輸送用)',radar:'電探'})[c.match]||'未確認の装備'}を各1個以上`;
  if(c.kind==='namedCount')return `${c.names.join('・')} ${c.min}隻以上`;
  if(c.kind==='flagshipType')return `旗艦 ${c.types.join('・')}`;
  return '条件の検証中';

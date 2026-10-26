@@ -573,7 +573,8 @@ function hdFEEnemyAirCandidates(map){
  return [...vals].sort((a,b)=>a-b);
 }
 function hdFEAirCheck(map,air,plan=null){
- const contract=plan&&hdFERouteRequirementData(plan);if(contract?.airNotRequired)return {status:'ready',notRequired:true,enemy:0,required:0,ours:Number(air?.basePower)||0,goal:'superiority',reason:null,detail:contract.path+'：この登録経路に敵航空機による数値制空目標なし。',ratio:1};
+ const contract=plan&&hdFERouteRequirementData(plan),branch=plan&&typeof MAP_PLANS!=='undefined'?MAP_PLANS[map]?.routeBranches:null,goalData=branch?.goals?.[plan?.routeGoal||branch.defaultGoal],goalNoAir=contract?.engine==='verified-graph'&&goalData?.airNotRequired===true;
+ if(contract?.airNotRequired||goalNoAir)return {status:'ready',notRequired:true,enemy:0,required:0,ours:Number(air?.basePower)||0,goal:'superiority',reason:null,detail:(goalNoAir?goalData.path:contract.path)+'：この登録経路に敵航空機による数値制空目標なし。',ratio:1};
  const target=typeof hdMapAirTarget==='function'?hdMapAirTarget(map):null,enemies=hdFEEnemyAirCandidates(map),enemy=target?.known?target.enemy:enemies.length?Math.max(...enemies):null,ours=Number(air?.basePower)||0,known=Number(air?.capacityKnown)||0,total=Number(air?.count)||0,live=Number(air?.liveCapacityKnown)||0,depleted=Array.isArray(air?.depletedSlots)?air.depletedSlots.length:0,goal=target?.selected?target.goal:'superiority',required=enemy===null?null:typeof hdMapAirThreshold==='function'?hdMapAirThreshold(enemy,goal):Math.ceil(enemy*1.5),ratio=enemy?ours/enemy:0;
  const routeLoss=target?.known&&known===total&&typeof hdMapAirRouteLoss==='function'?hdMapAirRouteLoss(map,(air?.rows||[]).map(r=>({...r,slot:r.cap,category:r.meta?.category})),r=>r.slot>0?Math.floor(r.aa*Math.sqrt(r.slot)):0):null;
  const antiAirUnknown=routeLoss?.known&&routeLoss.stage2Complete===false;

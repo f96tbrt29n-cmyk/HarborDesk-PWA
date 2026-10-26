@@ -88,7 +88,7 @@ function hdOCRouteGoal(c){
  let stored;try{stored=JSON.parse(localStorage.getItem(HD_OC_ROUTE_GOAL_KEY)||'{}')[`${c.map}:${c.fleet?.id||''}`]}catch{}
  const value=stored??c.fleet?.routeGoal??data.defaultGoal;return value===''?data.defaultGoal:value;
 }
-function hdOCRouteGoalHtml(c,attrs){const goals=MAP_PLANS[c.map]?.routeBranches?.goals;if(!goals)return '';const current=hdOCRouteGoal(c),known=typeof current==='string'&&Object.prototype.hasOwnProperty.call(goals,current);return `<label>ルート目標<select data-hd-oc-route-goal ${attrs}>${known?'':`<option value="${hdFEEsc(current)}" selected>未登録の目標・選び直してください</option>`}${Object.entries(goals).map(([id,g])=>`<option value="${hdFEEsc(id)}" ${current===id?'selected':''}>${hdFEEsc(g.label)}</option>`).join('')}</select></label><small>経由がランダムでも、全候補が登録した目標経路に入るか検証します。戦闘勝利は保証しません。</small>`}
+function hdOCRouteGoalHtml(c,attrs){const goals=MAP_PLANS[c.map]?.routeBranches?.goals;if(!goals)return '';const current=hdOCRouteGoal(c),known=typeof current==='string'&&Object.prototype.hasOwnProperty.call(goals,current);return `<label>ルート目標<select data-hd-oc-route-goal ${attrs}>${known?'':`<option value="${hdFEEsc(current)}" selected>未登録の目標・選び直してください</option>`}${Object.entries(goals).map(([id,g])=>`<option value="${hdFEEsc(id)}" ${current===id?'selected':''}>${hdFEEsc(g.label)}</option>`).join('')}</select></label><small>経由がランダムでも、全候補が登録した目標経路に入るか検証します。戦闘勝利は保証しません。</small>${known&&goals[current].airNotRequired?'<small data-hd-oc-route-air>この選択経路に数値制空目標はありません。別経路や任意の制空計算とは区別します。</small>':''}`}
 function hdOCOaswTargets(){try{return JSON.parse(localStorage.getItem(HD_OC_ASW_TARGET_KEY)||'{}')||{}}catch{return {}}}
 function hdOCOaswKey(c,index=c.index??0){return `${c.map}:${c.fleet?.id||''}:${index}`}
 function hdOCOaswFleetGoal(c){
@@ -334,6 +334,21 @@ function hdOCSynchronizedSeed(plan,inventory,slots){
  if(!hdFEMasterValidation(seed).valid||hdFEGameMatch(seed).status!=='ready')return null;
  return seed;
 }
+// This is a fixed-input result, not a reduced candidate budget. Only stop when
+// every changeable target already has its maximum ratio, and the remaining
+// checks cannot change by moving equipment on these same ships.
+function hdOCHFixedInputStop(plan,measure,inventory){
+ if(plan.map!=='3-2'||plan.routeGoal!=='fastPlus'||Number(plan.routeIndex)!==0||plan.ships.length!==6)return '';
+ const goals=measure.goals||[],checks=measure.requiredChecks||[],pending=goals.filter(g=>!g.ok||g.unresolved),aggregate=g=>['route-branches','route-requirements'].includes(g.kind);
+ if(!pending.length||!checks.length||goals.some(g=>g.ok&&(g.unresolved||g.ratio!==1)))return '';
+ const radarCheck=c=>c.condition?.kind==='equipmentShips'&&c.condition.match==='radar'&&c.condition.min===1;
+ if(!(goals.filter(g=>g.kind==='speed-ship').length===6&&checks.some(radarCheck)))return '';
+ const unknown=new Set(plan.ships.flatMap((s,i)=>hdFEFindShip(s.ship)?[]:[i]));
+ if(!unknown.size&&!(measure.manual||[]).length&&!inventory.some(r=>r.count>0&&hdOCItemMatches('radar-ships',r))&&pending.some(g=>g.kind==='radar-ships')&&pending.every(g=>aggregate(g)||['radar-ships','電探'].includes(g.kind)&&g.count===0&&!g.unresolved)&&checks.every(c=>c.ok||radarCheck(c)&&c.status==='missing'&&c.count===0))return 'route-radar-stock';
+ const onlyShipData=(measure.manual||[]).every(x=>(plan.preservationIssues||[]).includes(x)||x.startsWith('ルート：')||x.startsWith('艦娘の速力区分が未登録のため未判定：'));
+ if(unknown.size&&onlyShipData&&[...unknown].every(i=>!(plan.ships[i].items||[]).some(x=>x.name)&&!plan.ships[i].expansion?.name)&&pending.every(g=>aggregate(g)&&g.unresolved||g.kind==='speed-ship'&&g.unresolved&&!g.speed?.known&&unknown.has(g.shipIndex))&&checks.every(c=>c.ok||c.unresolved&&(c.condition?.kind==='typeCount'&&c.condition.types?.length&&c.condition.types.every(t=>['軽巡','駆逐','補給艦'].includes(t))||c.condition?.kind==='minSpeed'&&c.condition.rank===15)))return 'route-ship-data';
+ return '';
+}
 function* hdOCSearchSteps(c,limits={}){
  // Joint sets are seeded as a unit before the ordinary beam. Bound subsequent
  // substitutions for these selected port-set routes: an unavailable unrelated goal must not keep the UI searching
@@ -356,14 +371,15 @@ function* hdOCSearchSteps(c,limits={}){
   for(const x of sorted.slice(0,5))picked.set(x.key,x);if(kind==='高速化')for(const turbine of [true,false])for(const x of sorted.filter(x=>/タービン/.test(x.name)===turbine).slice(0,3))picked.set(x.key,x);
  }candidatePruned+=compatible.filter(x=>!picked.has(x.key)).length;return [...picked.values(),...(routeData?.keepLow||requirements.some(r=>r.kind.startsWith('cap-night-')&&(!slot.expansion||HD_SE_RECIPES[r.kind]?.some(x=>x.ship==='night-sub')))?[{key:'',name:'',star:0,item:{name:'',category:'',stats:{}},count:Infinity}]:[])]});
  const initial={plan,measure:hdOCMeasure(plan,requirements,unknown)},seen=new Set([hdOCKey(plan)]);let beam=[initial],best=initial,examined=0,depth=0,beamPruned=false;
+ const fixedInputStop=hdOCHFixedInputStop(plan,initial.measure,inventory);
  const portSeed=hdOCPortSeed(plan,inventory,slots,requirements,unknown);
  if(portSeed.plan){best={plan:portSeed.plan,measure:hdOCMeasure(portSeed.plan,requirements,unknown)};beam=[best,initial];seen.add(hdOCKey(best.plan));}
- const synchronized=initial.measure.complete?null:hdOCSynchronizedSeed(plan,inventory,slots);
+ const synchronized=initial.measure.complete||fixedInputStop?null:hdOCSynchronizedSeed(plan,inventory,slots);
  if(synchronized){
   const candidate={plan:synchronized,measure:hdOCMeasure(synchronized,requirements,unknown)};
   if(!hdOCGoalRegressions(initial.measure,candidate.measure).length&&candidate.measure.score>best.measure.score){best=candidate;beam=[candidate,initial];seen.add(hdOCKey(synchronized));}
  }
- for(;depth<Math.min(slots.length,maxDepth)&&!best.measure.goals.filter(x=>x.kind!=='route-requirements'&&!(x.kind==='opening-asw'&&x.unresolved&&x.minCount==null)).every(x=>x.ok)&&examined<maxExamined;depth++){
+ for(;!fixedInputStop&&depth<Math.min(slots.length,maxDepth)&&!best.measure.goals.filter(x=>x.kind!=='route-requirements'&&!(x.kind==='opening-asw'&&x.unresolved&&x.minCount==null)).every(x=>x.ok)&&examined<maxExamined;depth++){
   const next=[];
   enumerate: for(const state of beam){const used=hdFOAssignedUsage(state.plan);
    for(let i=0;i<slots.length;i++){const slot=slots[i],old=slot.expansion?state.plan.ships[slot.si].expansion:state.plan.ships[slot.si].items[slot.index];
@@ -408,7 +424,7 @@ function* hdOCSearchSteps(c,limits={}){
   return {...goal,...placementInfo,routeEquipment:['radar-ships','drum-ships'].includes(goal.kind),goalKind:goal.kind,kind,owned,placement:!goal.speedActual&&(placementInfo.usableOwned??owned)>=(kind==='高速化'?Math.max(1,speedNeed):goal.minCount)&&!['air-value','los-value'].includes(goal.kind),shortfall:Math.max(0,goal.minCount-goal.count),candidates};
  });
  best.plan.ships.forEach(s=>{s.items=s.items.filter(x=>x.name)});
- const reasons=[...(portSeed.limited?['port-seed-limit']:[]),...(examined>=maxExamined?['combination-limit']:[]),...(depth>=maxDepth&&maxDepth<slots.length?['depth-limit']:[]),...(candidatePruned?['candidate-limit']:[]),...(beamPruned?['beam-limit']:[])];
+ const reasons=[...(fixedInputStop?[fixedInputStop]:[]),...(portSeed.limited?['port-seed-limit']:[]),...(examined>=maxExamined?['combination-limit']:[]),...(depth>=maxDepth&&maxDepth<slots.length?['depth-limit']:[]),...(candidatePruned?['candidate-limit']:[]),...(beamPruned?['beam-limit']:[])];
  const search={status:best.measure.complete?'targets-met':'incomplete',exhaustive:false,examined,maxExamined,maxDepth,candidatePruned,portSeed:{examined:portSeed.examined,maxOperations:800,limited:portSeed.limited},scope:{map:c.map,routeIndex:c.index},reasons:reasons.length?reasons:['bounded-search']};
  best.plan.search=search;
  return {...best,search,readiness:hdOCReadiness(best.plan,best.measure),shortages,examined,signature,fleetId:c.fleet.id};
@@ -643,11 +659,11 @@ function hdOCMissingShipsHtml(plan){
 }
 function hdOCSearchStatusHtml(result){
  if(result.measure.complete||result.search?.exhaustive!==false)return '';
- const s=result.search,reasons={'port-seed-limit':'担当艦セットの操作上限','combination-limit':'通常探索の候補上限','depth-limit':'探索深さ上限','candidate-limit':'装備候補の絞込み','beam-limit':'途中候補の絞込み','bounded-search':'有限範囲の探索'},details=[];
+ const s=result.search,reasons={'port-seed-limit':'担当艦セットの操作上限','combination-limit':'通常探索の候補上限','depth-limit':'探索深さ上限','candidate-limit':'装備候補の絞込み','beam-limit':'途中候補の絞込み','bounded-search':'有限範囲の探索','route-radar-stock':'登録台帳の電探在庫0を確認。他の変更可能な目標は成立しているため、所持情報の確認へ','route-ship-data':'未登録艦の情報不足。他の変更可能な目標は成立しているため、艦情報の確認へ'},details=[];
  if(Number.isFinite(s.examined)&&Number.isFinite(s.maxExamined))details.push(`通常探索 ${s.examined}/${s.maxExamined}候補`);
  if(s.portSeed?.examined)details.push(`担当艦セット ${s.portSeed.examined}/${s.portSeed.maxOperations||800}操作${s.portSeed.limited?'（上限で打切り）':''}`);
  details.push(...(s.reasons||[]).map(x=>reasons[x]||'限定した探索範囲'));
- return `<p data-hd-oc-search-status>探索未完了：限られた候補・組合せで条件を満たす配備を発見できませんでした。${hdFEEsc(details.join(' / '))}。現在案の未充足は、手持ち装備の不足を証明するものではありません。所持数から確認できる不足と区別し、装備の配備先・代替艦・条件を確認してください。探索の網羅性・最適性は保証しません。</p>`;
+ return `<p data-hd-oc-search-status>探索未完了：${s.reasons?.some(x=>['route-radar-stock','route-ship-data'].includes(x))?'この固定編成の装備交換だけでは解消できない入力を確認しました':'限られた候補・組合せで条件を満たす配備を発見できませんでした'}。${hdFEEsc(details.join(' / '))}。現在案の未充足は、手持ち装備の不足を証明するものではありません。所持数から確認できる不足と区別し、装備の配備先・代替艦・条件を確認してください。探索の網羅性・最適性は保証しません。</p>`;
 }
 function hdOCSavedSearchHtml(c){
  const s=c.fleet?.searchAssessment;if(!s||s.status!=='incomplete'||s.exhaustive!==false)return '';

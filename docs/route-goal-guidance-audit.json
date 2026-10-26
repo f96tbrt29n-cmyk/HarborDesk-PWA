@@ -1959,15 +1959,16 @@
         "電探"
       ],
       "notes": [],
-      "requiredConnectionClass": "B",
+      "requiredConnectionClass": "A",
       "guidanceAudit": {
         "装備艦数": {
-          "class": "B",
-          "detail": "電探1艦（各艦1個以上）",
+          "class": "A",
+          "detail": "電探1艦以上。H回避の実操作で1/1成立、0/1不足を確認。同艦の複数装備では増えない。",
           "evidence": [
-            "hdOCMeasure/hdOCSearchSteps → hdFEBranchPredicate"
+            "hdOCMeasure/hdOCSearchSteps → hdFEBranchPredicate",
+            "tests/route-fastplus-ui.spec.js / H avoidance; docs/pr152-fastplus-route-ui-ja.md"
           ],
-          "limit": "代表実行の範囲。すべての艦・装備・増設は未網羅"
+          "limit": "代表実行の範囲。すべての艦・装備・増設は未網羅 装備艦数と個数を分離。誰か1艦へ1個以上でよく、特定の電探を一律購入必須にしない。"
         },
         "索敵": {
           "class": "D",
@@ -1976,10 +1977,11 @@
           "limit": ""
         },
         "速力": {
-          "class": "B",
-          "detail": "高速＋統一",
+          "class": "A",
+          "detail": "6艦それぞれに有効な高速＋装備。5/6の未達からタービン配備→6/6、保存/load後を確認。",
           "evidence": [
-            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン",
+            "tests/route-fastplus-ui.spec.js / H avoidance; docs/pr152-fastplus-route-ui-ja.md"
           ],
           "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
         },
@@ -1990,12 +1992,14 @@
           "limit": ""
         },
         "制空": {
-          "class": "B",
-          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "class": "D",
+          "detail": "選択したH回避（CEFL/CGFL）は数値制空目標なし。別経路A/Kの海域最大値をこの目標へ流用しない。",
           "evidence": [
-            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+            "routeBranches.goals.fastPlus.airNotRequired",
+            "hdFEAirCheck / registered graph goal",
+            "出典3-2記事・既存敵データC/L全パターン0"
           ],
-          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+          "limit": "例2の実操作は未確認のまま。任意の制空計算・他のルート目標の扱いは別。"
         },
         "推奨セット": {
           "class": "C",
@@ -2006,7 +2010,16 @@
           "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
         }
       },
-      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)",
+      "executionScope": {
+        "route": "3-2/index0/fastPlus",
+        "fleet": "軽巡1＋駆逐5・既存の3-2登録分岐",
+        "ready": "高速＋6/6と電探1/1、CEFL/CGFL・ランダム",
+        "stock": "電探在庫0→1艦分不足、保存/load後の理由保持",
+        "manual": "合成未登録艦の速力/艦種不明。元編成の上書きは中止、元文字列保持、load後も未判定",
+        "limits": "局所・通常CI・iPhone実機は別。勝利/全探索/全53例は未確認",
+        "evidenceRoot": "/workspace/hd152-route-fastplus-ui-20261026"
+      }
     },
     {
       "id": "3-2/0/fastest",
@@ -2316,12 +2329,14 @@
           "limit": ""
         },
         "制空": {
-          "class": "B",
-          "detail": "通るマス/敵パターン/目標を選択→必要・現在・差。未選択/搭載/敵防空不明は未判定",
+          "class": "D",
+          "detail": "選択したH回避（CEFL/CGFL）は数値制空目標なし。別経路A/Kの海域最大値をこの目標へ流用しない。",
           "evidence": [
-            "hdMapAirTarget/hdFEAirCheck → hdOCMeasure"
+            "routeBranches.goals.fastPlus.airNotRequired",
+            "hdFEAirCheck / registered graph goal",
+            "出典3-2記事・既存敵データC/L全パターン0"
           ],
-          "limit": "Aは3-3合法艦隊＋合成敵29/30の境界44/45。実ゲーム敵値・勝率は別。全ルートのマス順・損耗モデルの網羅は未確認"
+          "limit": "例2の実操作は未確認のまま。任意の制空計算・他のルート目標の扱いは別。"
         },
         "推奨セット": {
           "class": "C",

@@ -283,3 +283,35 @@ test('beam five-row cutoff follows the declared distance-availability policy wit
  }
  assert.equal(JSON.stringify(rows),before);
 });
+
+test('H avoidance air exemption follows the selected registered goal, not the sea-wide maximum',()=>{
+ const c={window:{},hdMapAirTarget:()=>({selected:false,known:false,detail:'未選択'}),hdFEEnemyAirCandidates:()=>[56],hdMapAirData:()=>({nodes:{}})};
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../map-plans.js'),'utf8')+';this.plans=MAP_PLANS',c);
+ const data={};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../map-air-data.js'),'utf8')+';this.air=HD_MAP_AIR_DATA',data);
+ for(const node of ['C','L'])assert.ok(data.air['3-2'].nodes[node].patterns.every(p=>p.air===0));assert.equal(Math.max(...data.air['3-2'].nodes.K.patterns.map(p=>p.air)),56);
+ c.hdFERouteRequirementData=p=>c.hdMapPresetRequirements(p.map,p.preset);
+ load('fleet-readiness-evaluator.js','hdFEAirCheck',c);
+ const plan={map:'3-2',routeGoal:'fastPlus',preset:c.plans['3-2'].presets[0]},air={basePower:0,count:0,capacityKnown:0};
+ assert.equal(c.plans['3-2'].routeBranches.goals.fastPlus.airNotRequired,true);const result=c.hdFEAirCheck('3-2',air,plan);assert.equal(result.notRequired,true);assert.equal(result.required,0);assert.match(result.detail,/CEFL.*CGFL/);
+ for(const goal of ['normal','fastest','future']){plan.routeGoal=goal;assert.equal(c.hdFEAirCheck('3-2',air,plan).status,'manual');assert.notEqual(c.hdFEAirCheck('3-2',air,plan).notRequired,true)}
+ assert.equal(c.hdFEAirCheck('3-2',air).status,'manual');plan.routeGoal='fastPlus';c.hdFERouteRequirementData=()=>null;assert.equal(c.hdFEAirCheck('3-2',air,plan).status,'manual');
+});
+
+test('required equipment-ship labels distinguish radar from drums without inventing an unknown type',()=>{
+ const c={window:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../map-plans.js'),'utf8'),c);
+ assert.equal(c.hdMapRequirementConditionText({kind:'equipmentShips',match:'radar',min:1}),'別々の1隻に電探を各1個以上');
+ assert.equal(c.hdMapRequirementConditionText({kind:'equipmentShips',match:'drum',min:2}),'別々の2隻にドラム缶(輸送用)を各1個以上');
+ assert.match(c.hdMapRequirementConditionText({kind:'equipmentShips',match:'future',min:1}),/未確認の装備/);
+});
+test('fixed H-route blockers stop only when all equipment-changeable targets already have maximum scores',()=>{
+ const c={hdFEFindShip:name=>name==='unknown'?null:{},hdOCItemMatches:(kind,r)=>r.name==='radar'};load('owned-equipment-planner.js','hdOCHFixedInputStop',c);
+ const plan={map:'3-2',routeGoal:'fastPlus',routeIndex:0,ships:Array.from({length:6},()=>({ship:'known',items:[]}))};
+ const ready=()=>({ok:true,ratio:1,kind:'other'}),speeds=Array.from({length:6},(_,shipIndex)=>({...ready(),kind:'speed-ship',shipIndex}));
+ const radar={condition:{kind:'equipmentShips',match:'radar',min:1},status:'missing',count:0,ok:false},measure={manual:[],goals:[...speeds,ready(),{kind:'radar-ships',count:0,ok:false,ratio:0},{kind:'電探',count:0,ok:false,ratio:0},{kind:'route-branches',ok:false,ratio:.75}],requiredChecks:[radar,{ok:true,ratio:1,condition:{kind:'minSpeed',rank:15}}]};
+ assert.equal(c.hdOCHFixedInputStop(plan,measure,[]),'route-radar-stock');assert.equal(c.hdOCHFixedInputStop(plan,measure,[{name:'radar',count:1}]),'');
+ measure.goals[6].ok=false;assert.equal(c.hdOCHFixedInputStop(plan,measure,[]),'');measure.goals[6]=ready();measure.manual=['装備性能が未登録：未知の電探'];assert.equal(c.hdOCHFixedInputStop(plan,measure,[]),'');measure.manual=[];
+ measure.requiredChecks.push({ok:false,status:'missing',condition:{kind:'fleetCount'}});assert.equal(c.hdOCHFixedInputStop(plan,measure,[]),'');measure.requiredChecks.pop();
+ for(const [map,goal,index] of [['4-5','fastPlus',0],['3-2','fastest',0],['3-2','fastPlus',1]]){assert.equal(c.hdOCHFixedInputStop({...plan,map,routeGoal:goal,routeIndex:index},measure,[]),'')}
+ const unknown=structuredClone(measure);plan.ships[5].ship='unknown';unknown.goals=unknown.goals.filter(g=>!['電探','radar-ships'].includes(g.kind));unknown.goals.find(g=>g.kind==='route-branches').unresolved=true;Object.assign(unknown.goals[5],{ok:false,unresolved:true,ratio:0,speed:{known:false}});unknown.requiredChecks=[{ok:true,condition:{kind:'equipmentShips',match:'radar',min:1}},{ok:false,unresolved:true,condition:{kind:'minSpeed',rank:15}},{ok:false,unresolved:true,condition:{kind:'typeCount',types:['軽巡','駆逐','補給艦']}}];
+ assert.equal(c.hdOCHFixedInputStop(plan,unknown,[{name:'radar',count:1}]),'route-ship-data');unknown.requiredChecks[2].condition.types=['高速艦'];assert.equal(c.hdOCHFixedInputStop(plan,unknown,[]),'');unknown.requiredChecks[2].condition.types=['軽巡','駆逐','補給艦'];unknown.goals[0].ok=false;assert.equal(c.hdOCHFixedInputStop(plan,unknown,[]),'');unknown.goals[0].ok=true;plan.ships[5].items=[{name:'unconfirmed'}];assert.equal(c.hdOCHFixedInputStop(plan,unknown,[]),'');
+});
