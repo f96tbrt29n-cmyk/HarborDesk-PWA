@@ -2747,7 +2747,7 @@
         "夜戦"
       ],
       "notes": [],
-      "requiredConnectionClass": "B",
+      "requiredConnectionClass": "A",
       "guidanceAudit": {
         "装備艦数": {
           "class": "D",
@@ -2756,12 +2756,15 @@
           "limit": ""
         },
         "索敵": {
-          "class": "B",
-          "detail": "係数4／必要28以上",
+          "class": "A",
+          "detail": "係数4／G→K28以上。合成28成立・−20不足・HQ未取得manualの実操作/保存/loadを確認",
           "evidence": [
-            "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
+            "tests/route-south-scouting.spec.js",
+            "tests/scouting-evidence.test.cjs: south scouting",
+            "docs/pr152-south-scouting-ui-ja.md",
+            "https://zekamashi.net/kancolle-kouryaku/3-5/"
           ],
-          "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
+          "limit": "合成の同期表示値と同一配備への復元。27.82842712474619/28の独立算術境界。実ゲームLv/ボーナス・変更配備の差分・勝利・一般探索は未確認。4電探は試験入力であり経路必須個数ではない"
         },
         "速力": {
           "class": "D",
@@ -6790,8 +6793,8 @@
   },
   "requiredConnectionCounts": {
     "D": 29,
-    "B": 23,
-    "A": 4,
+    "B": 22,
+    "A": 5,
     "C": 3
   },
   "perConditionCounts": {
@@ -6808,9 +6811,9 @@
     "推奨セット:A": 2,
     "先制対潜:A": 2,
     "装備艦数:A": 4,
-    "索敵:A": 1,
+    "索敵:A": 2,
     "速力:A": 4,
-    "索敵:B": 16,
+    "索敵:B": 15,
     "装備艦数:B": 1,
     "制空:A": 1,
     "索敵:C": 3,

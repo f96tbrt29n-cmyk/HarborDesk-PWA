@@ -255,6 +255,7 @@ function hdMapRequirementConditionText(c){
  if(c.kind==='speedCount')return `配備後の低速艦 ${c.min}隻以上（高速化して低速艦がなくなると不可）`;
  if(c.kind==='equipmentShips')return `別々の${c.min}隻に${({drum:'ドラム缶(輸送用)',radar:'電探'})[c.match]||'未確認の装備'}を各1個以上`;
  if(c.kind==='namedCount')return `${c.names.join('・')} ${c.min}隻以上`;
+ if(c.kind==='scoutingValue')return Number.isInteger(c.coef)&&c.coef>=1&&c.coef<=4&&Number.isFinite(c.min)&&c.min>=0?`33式索敵（分岐点係数${c.coef}）${c.min}以上`:'索敵条件（係数・必要値が未確認）';
  if(c.kind==='flagshipType')return `旗艦 ${c.types.join('・')}`;
  return '条件の検証中';
 }

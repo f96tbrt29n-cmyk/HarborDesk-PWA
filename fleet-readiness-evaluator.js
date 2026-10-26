@@ -461,6 +461,7 @@ function hdFEBranchPredicate(condition,ships,plan=null){
   if(condition.kind==='airValue')return manual('分岐到達時の制空値は、判定地点・全候補経路の損耗との接続が未対応。制空プランナーで確認してください');
   if(hdFEGameMatch(plan).status!=='ready')return manual('装備変更に伴う艦固有索敵ボーナスの差分が未確認。同期した同じ配備で再確認してください');
   const items=hdFEAssigned(plan),m=condition.kind==='scoutingValue'?hdFEScouting(plan,items):hdFEAir(items),value=condition.kind==='scoutingValue'?m.score:m.basePower;
+  if(condition.kind==='scoutingValue'&&m.available===false)return manual(m.detail||'索敵計算に必要な情報が不足しています');
   if(condition.coef!=null&&(!Number.isInteger(condition.coef)||condition.coef<1||condition.coef>4||m.coef!==condition.coef))return manual('索敵の分岐点係数が一致していません');
   if(!Number.isFinite(value)||items.some(x=>x.name&&!hdFEFind(x.name))||m.status==='manual'||condition.kind==='airValue'&&m.capacityKnown<m.count)return manual('索敵・制空の計算情報が不足');
   return {status:value>=condition.min?'ready':'missing',ratio:Math.min(1,value/Math.max(1,condition.min)),count:value,min:condition.min,detail:`${condition.kind==='scoutingValue'?'索敵':'制空'} ${value}/${condition.min}（あと${Math.max(0,condition.min-value)}）`};

@@ -329,3 +329,35 @@ test('fixed CEFL air scope excludes off-route maximum while preserving speed and
  for(const routeGoal of ['normal','future'])assert.equal(c.hdFEAirCheck('3-2',{basePower:0},{map:'3-2',routeGoal,preset:c.plans['3-2'].presets[1]}).status,'manual');
  assert.equal(c.hdFEAirCheck('3-2',{basePower:0}).status,'manual');
 });
+
+
+function southScoutingContext(hq=120){
+ const c={window:{},localStorage:{getItem:()=>JSON.stringify({admiralLevel:hq})},hdFCProposalShipLos:ship=>ship.baseLos,hdFEGameMatch:()=>({status:'ready'}),hdFEAssigned:p=>p.items,hdFEFind:()=>({stats:{索敵:5}})};
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../map-plans.js'),'utf8')+';this.plans=MAP_PLANS',c);c.hdFERouteRequirementData=p=>c.hdMapPresetRequirements(p.map,p.preset);
+ for(const name of ['hdFEEquipCoef','hdFEImproveCoef','hdFEScouting','hdFEBranchPredicate'])load('fleet-readiness-evaluator.js',name,c);
+ const plan={map:'3-5',preset:c.plans['3-5'].presets[0],ships:[9,25,25,25,25,25].map(baseLos=>({ship:'合成入力',baseLos})),items:Array.from({length:4},()=>({name:'22号対水上電探改四',star:0,meta:{category:'小型水上電探',stats:{索敵:5}}}))};
+ return {c,plan};
+}
+test('south scouting boundary uses independent 28 and just-below arithmetic with coefficient four',()=>{
+ const {c,plan}=southScoutingContext(),contract=c.hdFERouteRequirementData(plan);assert.equal(contract.path,'FGK');assert.equal(contract.los.coef,4);assert.equal(contract.los.checks[0].safe,28);
+ // Published 33 formula: (sqrt9 + 5*sqrt25) + 4*(5*.6)*4 - ceil(120*.4) = 28.
+ // Below: replace sqrt9 with sqrt8, giving 27.82842712474619. These are synthetic inputs, not game Lv90 stats.
+ const predicate={kind:'scoutingValue',coef:4,min:28};const at=c.hdFEScouting(plan,plan.items);assert.equal(at.score,28);assert.equal(c.hdFEBranchPredicate(predicate,[],plan).status,'ready');
+ plan.ships[0].baseLos=8;const below=c.hdFEScouting(plan,plan.items);assert.ok(Math.abs(below.score-27.82842712474619)<1e-10);assert.equal(c.hdFEBranchPredicate(predicate,[],plan).status,'missing');
+});
+test('south scouting missing HQ stays null while known empty equipment has numeric minus twenty',()=>{
+ const {c,plan}=southScoutingContext();plan.items=[];assert.equal(c.hdFEScouting(plan,plan.items).score,-20);c.localStorage.getItem=()=>JSON.stringify({});const unknown=c.hdFEScouting(plan,plan.items);assert.equal(unknown.available,false);assert.equal(unknown.score,null);assert.equal(unknown.reason,'sync');assert.equal(unknown.missing.hq,true);
+});
+test('scouting condition labels name the coefficient and threshold without inventing unknown inputs',()=>{
+ const c={window:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../map-plans.js'),'utf8'),c);
+ assert.equal(c.hdMapRequirementConditionText({kind:'scoutingValue',coef:4,min:28}),'33式索敵（分岐点係数4）28以上');
+ assert.equal(c.hdMapRequirementConditionText({kind:'scoutingValue',coef:1,min:49}),'33式索敵（分岐点係数1）49以上');
+ assert.match(c.hdMapRequirementConditionText({kind:'scoutingValue',min:28}),/未確認/);
+});
+
+
+test('south scouting missing inputs report the actual reason before testing coefficient agreement',()=>{
+ const {c,plan}=southScoutingContext();c.localStorage.getItem=()=>JSON.stringify({});
+ const unknown=c.hdFEBranchPredicate({kind:'scoutingValue',coef:4,min:28},[],plan);assert.equal(unknown.status,'manual');assert.match(unknown.detail,/同期情報が不足：司令部Lv/);assert.doesNotMatch(unknown.detail,/係数が一致/);
+ c.localStorage.getItem=()=>JSON.stringify({admiralLevel:120});const mismatch=c.hdFEBranchPredicate({kind:'scoutingValue',coef:3,min:28},[],plan);assert.equal(mismatch.status,'manual');assert.match(mismatch.detail,/係数が一致/);
+});
