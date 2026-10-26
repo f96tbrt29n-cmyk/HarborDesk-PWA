@@ -157,7 +157,7 @@
         "夜戦"
       ],
       "notes": [],
-      "requiredConnectionClass": "B",
+      "requiredConnectionClass": "A",
       "guidanceAudit": {
         "装備艦数": {
           "class": "D",
@@ -172,12 +172,15 @@
           "limit": ""
         },
         "速力": {
-          "class": "B",
-          "detail": "高速統一 OR 軽巡1＋駆逐4等の確認済み代替条件（成立時は高速化不要）",
+          "class": "A",
+          "detail": "高速統一 OR 軽巡1＋駆逐4。自由枠の低速軽空母への同艦缶/タービン配備・缶不足・艦情報未判定/保存中止・低速軽巡例の高速化不要をC/Wの画面/保存/loadで限定確認",
           "evidence": [
-            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン"
+            "hdFEPlanSpeedTarget → 艦別speed-ship/必要缶・タービン",
+            "tests/route-ae-speed-ui.spec.js（製品関数の置換なし）",
+            "docs/pr152-ae-speed-ui-ja.md",
+            "/workspace/hd152-ae-speed-ui-20261026/"
           ],
-          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない。今回の自由枠/登録例の合成操作に限定し、低速軽巡＋海防混在の資料相違、一般探索、勝利は未確認。"
         },
         "先制対潜": {
           "class": "D",
