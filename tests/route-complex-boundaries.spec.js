@@ -86,7 +86,7 @@ test('small finite sonar inventory has an independent exhaustive oracle and boun
 const sevenRouteTest=test.extend({trace:{mode:'on',snapshots:false,screenshots:true,sources:true},video:'on'});
 sevenRouteTest.describe('7-3 second route speed',()=>{
  sevenRouteTest.use({viewport:{width:390,height:844}});
- for(const state of ['ready','stock','unknown'])sevenRouteTest(`7-3 second route speed ${state} preserves named hulls and saved data`,async({page},info)=>{
+ for(const state of ['ready','stock','type-mismatch','unknown'])sevenRouteTest(`7-3 second route speed ${state} preserves named hulls and saved data`,async({page},info)=>{
   const evidence={state,scope:'registered speed condition; synthetic owned inventory and identities'},errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   try{
@@ -97,10 +97,11 @@ sevenRouteTest.describe('7-3 second route speed',()=>{
    });
    await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCSearch==='function');
    const reference=await page.evaluate(state=>{
-    const names=['羽黒改二','足柄改二','最上改二特',state==='unknown'?'合成・艦情報未登録':'Samuel B.Roberts改','時雨改二','雪風改'];
-    const parts=[['61cm四連装(酸素)魚雷','61cm四連装(酸素)魚雷'],[],['発煙装置(煙幕)','発煙装置(煙幕)'],state==='ready'?['改良型艦本式タービン']:[],['三式水中探信儀','三式爆雷投射機'],[]];
+    const names=['羽黒改二','足柄改二',state==='unknown'?'合成・艦情報未登録':state==='type-mismatch'?'阿武隈改二':'最上改二特','Samuel B.Roberts改','時雨改二','雪風改'];
+    const hasTurbine=state==='ready'||state==='type-mismatch';
+    const parts=[['61cm四連装(酸素)魚雷','61cm四連装(酸素)魚雷'],[],['発煙装置(煙幕)','発煙装置(煙幕)'],hasTurbine?['改良型艦本式タービン']:[],['三式水中探信儀','三式爆雷投射機'],[]];
     const rows=names.map((name,i)=>{const db=hdFEFindShip(name),master=db&&hdShipDbMasterRowFor(db),profile=db&&hdShipDbSlotProfile(db);return {id:'seven-speed-'+i,name,masterId:master?.id||0,gameShipId:13100+i,level:99,gameSlotEx:0,gameGearSlots:Array.from({length:profile?.count||0},(_,j)=>state==='unknown'?'':parts[i][j]||''),gameGearExpansion:'',gameAswGearKnown:true,metadata:{keep:i}}});
-    const inventory=state==='unknown'?[]:[{name:'61cm四連装(酸素)魚雷',count:2},{name:'発煙装置(煙幕)',count:2},{name:'三式水中探信儀',count:1},{name:'三式爆雷投射機',count:1},...(state==='ready'?[{name:'改良型艦本式タービン',count:1}]:[])];
+    const inventory=state==='unknown'?[]:[{name:'61cm四連装(酸素)魚雷',count:2},{name:'発煙装置(煙幕)',count:2},{name:'三式水中探信儀',count:1},{name:'三式爆雷投射機',count:1},...(hasTurbine?[{name:'改良型艦本式タービン',count:1}]:[])];
     localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));localStorage.setItem(HD_FL_KEY,JSON.stringify(inventory));localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:120,metadata:{keep:true}}));localStorage.setItem('harbordesk-kancolle-fleets-v1',JSON.stringify([{deckId:1,ships:rows.map(r=>({gameShipId:r.gameShipId,gearKnown:true}))}]));localStorage.setItem('harbordesk-pwa-v1',JSON.stringify(blankState()));
     saveCustomFleets({'7-3':[{id:'speed-seven',name:'合成：7-3速度',memo:'keep memo',openingAswCount:0,routePreset:MAP_PLANS['7-3'].presets[1],metadata:{keep:true},ships:rows.map((r,i)=>({ship:r.name,masterId:r.masterId,gameShipId:r.gameShipId,rosterId:r.id,gear:i===3?'':r.gameGearSlots.join(' / '),metadata:{keep:i}}))},{id:'other',metadata:{keep:true},ships:[]}],'1-1':[{id:'other-map',metadata:{keep:true},ships:[]}]});
     localStorage.setItem(HD_FC_KEY,JSON.stringify({'1-1:unrelated':{metadata:{keep:true}}}));hdMapRouteSet('7-3',1);hdMSNOpen('1-1');
@@ -114,18 +115,26 @@ sevenRouteTest.describe('7-3 second route speed',()=>{
     (evidence.samples??=[]).push(r);expect(r.search.maxExamined).toBe(10000);for(const [k,n]of Object.entries(r.usage))expect(n).toBeLessThanOrEqual(r.stock[k]);
     expect(r.names.slice(0,2)).toEqual(['羽黒改二','足柄改二']);expect(r.route.contract.checks.filter(c=>c.condition.kind==='namedCount').every(c=>c.status==='ready')).toBe(true);
     await panel.locator('[data-hd-required-route] summary').click();const checks=panel.locator('[data-hd-required-route]');await expect(checks).toContainText('高速統一');await expect(checks).toContainText('羽黒');await expect(checks).toContainText('足柄');
-    const speed=r.route.contract.checks.find(c=>c.condition.kind==='minSpeed');
+    const speed=r.route.contract.checks.find(c=>c.condition.kind==='minSpeed'),cruisers=r.route.contract.checks.find(c=>c.condition.reason?.startsWith('I→J'));
+    await expect(checks).toContainText('ACDGJP / ACDGIJP');await expect(checks).toContainText('G→J/G→Iは未確認');await expect(checks).toContainText('固定・ランダムとは判定しません');
+    expect(r.shortages.some(g=>g.kind==='route-requirements')).toBe(false);
+    expect((await panel.locator('.hd-oc-shortage').allInnerTexts()).some(s=>/重巡級|G分岐/.test(s))).toBe(false);
     if(state==='ready'){
-     expect(speed.status).toBe('ready');expect(r.route.status).toBe('ready');expect(r.master.valid).toBe(true);expect(r.gear[3].some(x=>x.name==='改良型艦本式タービン')).toBe(true);
+     expect(speed.status).toBe('ready');expect(cruisers).toMatchObject({status:'ready',count:3});expect(r.route.status).toBe('manual');expect(r.master.valid).toBe(true);expect(r.gear[3].some(x=>x.name==='改良型艦本式タービン')).toBe(true);
      evidence.invalidControl=await page.evaluate(()=>{const p=hdFOClone(HD_OC_CACHE.get('7-3:speed-seven:1').plan);p.ships[0].items.push({name:'改良型艦本式タービン',slotIndex:99});const speed=hdFEShipSpeed(p.ships[0]);return {invalid:speed.invalid.length,rank:speed.rank,check:hdFERouteContract(p).checks.find(c=>c.condition.kind==='minSpeed')}});
      expect(evidence.invalidControl.invalid).toBeGreaterThan(0);expect(evidence.invalidControl.rank).toBe(10);expect(evidence.invalidControl.check).toMatchObject({status:'manual',count:5});
+    }else if(state==='type-mismatch'){
+     expect(speed.status).toBe('ready');expect(cruisers).toMatchObject({status:'missing',count:2,gap:1});expect(r.route.status).toBe('missing');expect(r.master.valid).toBe(true);await expect(checks).toContainText('重巡洋艦＋航空巡洋艦 2隻');await expect(checks).toContainText('装備購入で解決する不足とは扱いません');
     }else if(state==='stock'){
+     expect(cruisers).toMatchObject({status:'ready',count:3});
      expect(speed.status).toBe('missing');expect(r.route.status).toBe('missing');expect(r.master.valid).toBe(true);expect(r.shortages.find(g=>g.kind==='speed-turbine').stockGap).toBe(1);
      await expect(panel.locator('.hd-oc-goal').filter({hasText:'Samuel B.Roberts改 の高速条件'})).toContainText('タービン1個');
      await expect(panel.locator('.hd-oc-shortage').filter({hasText:'高速化用タービンに必要なもの'})).toContainText('同種の所持 0個');
      await expect(panel.locator('[data-hd-oc-search-status]')).toContainText('不足を証明するものではありません');
     }else{
-     expect(speed.status).toBe('manual');expect(r.route.status).toBe('manual');expect(r.shortages.some(g=>g.kind==='speed-ship')).toBe(false);await expect(checks).toContainText('速力未判定');
+     // Unknown CAV data coexists with the known, unequipped slow Samuel.
+     // The known speed shortage wins overall; the unknown hull stays unresolved.
+     expect(cruisers).toMatchObject({status:'manual',count:2});expect(speed).toMatchObject({status:'missing',count:4});expect(r.route.status).toBe('missing');expect(r.goals.find(g=>g.kind==='speed-ship'&&g.shipIndex===2)).toMatchObject({ok:false,unresolved:true});expect(r.goals.find(g=>g.kind==='speed-ship'&&g.shipIndex===3)).toMatchObject({ok:false,unresolved:false});expect(r.shortages.some(g=>g.kind==='speed-turbine')).toBe(true);await expect(checks).toContainText('速力未判定');await expect(checks).toContainText('不足: Samuel B.Roberts改');
     }
     evidence.ui={checks:await checks.innerText(),goals:await panel.locator('.hd-oc-goal').allInnerTexts(),shortages:await panel.locator('.hd-oc-shortage').allInnerTexts()};return r;
    }

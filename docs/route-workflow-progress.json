@@ -1,5 +1,5 @@
 {
-  "baselineHead": "f996d08dde45b508864ae3d2a6dc8c79f6400002",
+  "baselineHead": "874cd99cb18dccdbd392a1dc24ed38478d33de45",
   "scope": "37 registered maps / 53 presets expanded by selected goals to 59 rows, not every game route",
   "denominators": {
     "maps": 37,
@@ -36,20 +36,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 18,
-      "未確認": 41,
+      "一部": 19,
+      "未確認": 40,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 18,
-      "未確認": 41,
+      "一部": 19,
+      "未確認": 40,
       "非該当": 0
     },
     "D": {
-      "確認済み": 1,
+      "確認済み": 2,
       "一部": 19,
-      "未確認": 39,
+      "未確認": 38,
       "非該当": 0
     }
   },
@@ -2171,50 +2171,58 @@
       "map": "7-3",
       "index": 1,
       "goal": "default",
-      "path": "ACDGJP",
+      "path": "ACDGJP / ACDGIJP（G分岐未確認）",
       "source": "https://zekamashi.net/kancolle-kouryaku/7-3/",
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。 今回は高速統一の無効装備をmanualとする対照を確認。G/I/J等の全分岐・推奨数量は未確認。",
+          "reason": "重巡と重巡級の算入を照合。I/Jの登録範囲は条件対照あり。Gは重巡3/重巡級3の出典不一致を理由付きmanualとし、固定/ランダムへ昇格しない。全目標の数量根拠と全分岐は未完。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
             "docs/route-goal-guidance-audit.json",
             "docs/pr152-seven-three-speed-ja.md",
             "tests/conditional-speed-ui.test.cjs",
-            "tests/route-complex-boundaries.spec.js"
+            "tests/route-complex-boundaries.spec.js",
+            "docs/pr152-seven-three-gij-ja.md",
+            "tests/seven-three-gij.test.cjs"
           ]
         },
         "B": {
           "status": "一部",
-          "reason": "高速化タービン1個をSamuel B.Roberts改へ実配備。羽黒/足柄保持、有限在庫を確認。他の戦闘推奨の十分な組数は未確認。",
+          "reason": "高速化タービン1個をSamuel B.Roberts改へ実配備。羽黒/足柄保持、有限在庫を確認。他の戦闘推奨の十分な組数は未確認。 今回の正常/在庫不足/重巡級不足のC/W各初回で配備後の艦種/史実艦条件保持を確認。",
           "evidence": [
             "docs/pr152-seven-three-speed-ja.md",
             "tests/conditional-speed-ui.test.cjs",
-            "tests/route-complex-boundaries.spec.js"
+            "tests/route-complex-boundaries.spec.js",
+            "docs/pr152-seven-three-gij-ja.md",
+            "tests/seven-three-gij.test.cjs"
           ]
         },
         "C": {
           "status": "一部",
-          "reason": "タービン在庫0のあと1個と搭載先、未知艦の速力manual・未確認を調達個数にしないことを確認。全搭載/枠競合は未網羅。",
+          "reason": "タービン在庫0のあと1個と搭載先、未知艦の速力manual・未確認を調達個数にしないことを確認。全搭載/枠競合は未網羅。 重巡級の確定不足と未知艦manual、Gの資料不足を購入数量へ送らない。未知艦＋既知低速の局所は期待値誤りで失敗し、保存/load未到達を保持。",
           "evidence": [
             "docs/pr152-seven-three-speed-ja.md",
             "tests/conditional-speed-ui.test.cjs",
-            "tests/route-complex-boundaries.spec.js"
+            "tests/route-complex-boundaries.spec.js",
+            "docs/pr152-seven-three-gij-ja.md",
+            "tests/seven-three-gij.test.cjs"
           ]
         },
         "D": {
           "status": "確認済み",
-          "reason": "保存・編集・同一文書load後表示、他編成/metadata保持を同じ行の代表操作で確認。",
+          "reason": "保存・編集・同一文書load後表示、他編成/metadata保持を同じ行の代表操作で確認。 今回は正常/在庫不足/重巡級不足の3ケースでC/W成功。未知艦混在ケースの今回局所の未到達は別記。",
           "evidence": [
             "docs/pr152-seven-three-speed-ja.md",
             "tests/conditional-speed-ui.test.cjs",
-            "tests/route-complex-boundaries.spec.js"
+            "tests/route-complex-boundaries.spec.js",
+            "docs/pr152-seven-three-gij-ja.md",
+            "tests/seven-three-gij.test.cjs"
           ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "Gでの重巡2＋航巡1の記載差、神風/全艦最速等の上位分岐、A/Cを含む全経路、戦闘推奨数量、全搭載/枠競合は未完。"
     },
     {
       "id": "7-4/0/default",
@@ -2366,12 +2374,14 @@
   ],
   "selected": {
     "id": "7-3/1/default",
-    "condition": "minSpeed 10 / invalid speed equipment must remain manual",
-    "newDirectBrowserCases": {
-      "chromium": 3,
-      "webkit": 3
-    },
-    "retries": 0
+    "condition": "G source disagreement remains unresolved; explicit I CA-class count and scoped J priority",
+    "localBrowserCasesPerEngine": 4,
+    "localInitialPassPerEngine": 3,
+    "localInitialFailurePerEngine": 1,
+    "failure": "unknown hull plus known slow Samuel: test expected all manual; corrected expectation, no local rerun",
+    "retries": 0,
+    "statusCellChanges": 0,
+    "newEvidence": "docs/pr152-seven-three-gij-ja.md"
   },
-  "nextPriority": "7-3/1のG/I/J：出典が重巡と重巡級を使い分ける分岐と登録経路表記の整合を確認。今回の速度だけの成功で全経路固定を保証しない。"
+  "nextPriority": "7-3/1のG：重巡2＋航巡1＋駆逐3・羽黒/足柄・神風なし・高速の出撃根拠を確認し、G→J/G→Iの出典記載差を解消できるか判断する。"
 }
