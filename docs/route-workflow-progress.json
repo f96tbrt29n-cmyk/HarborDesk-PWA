@@ -1605,7 +1605,7 @@
             "docs/route-goal-guidance-audit.json",
             "docs/pr152-five-four-battleship-ja.md",
             "tests/five-four-battleship.test.cjs",
-            "tests/route-5-4-battleship.spec.js"
+            "tests/route-complex-boundaries.spec.js"
           ]
         },
         "B": {
@@ -1614,7 +1614,7 @@
           "evidence": [
             "docs/pr152-five-four-battleship-ja.md",
             "tests/five-four-battleship.test.cjs",
-            "tests/route-5-4-battleship.spec.js"
+            "tests/route-complex-boundaries.spec.js"
           ]
         },
         "C": {
@@ -1623,7 +1623,7 @@
           "evidence": [
             "docs/pr152-five-four-battleship-ja.md",
             "tests/five-four-battleship.test.cjs",
-            "tests/route-5-4-battleship.spec.js"
+            "tests/route-complex-boundaries.spec.js"
           ]
         },
         "D": {
@@ -1632,7 +1632,7 @@
           "evidence": [
             "docs/pr152-five-four-battleship-ja.md",
             "tests/five-four-battleship.test.cjs",
-            "tests/route-5-4-battleship.spec.js"
+            "tests/route-complex-boundaries.spec.js"
           ]
         }
       },
@@ -2397,7 +2397,15 @@
     "retries": 0,
     "statusCellChanges": 3,
     "newEvidence": "docs/pr152-five-four-battleship-ja.md",
-    "sevenThree": "bounded evidence review complete; G unresolved, product unchanged"
+    "sevenThree": "bounded evidence review complete; G unresolved, product unchanged",
+    "normalSmokeSelection": {
+      "totalPerBrowser": 803,
+      "targetCasesPerBrowser": 3,
+      "selectedFile": "tests/route-complex-boundaries.spec.js",
+      "listOnlyBrowserExecutions": 0,
+      "localTestBodyUnchanged": true,
+      "firstHeadCoverageGap": "57f21462 normal smoke excluded standalone new spec; preserve as separate run"
+    }
   },
   "nextPriority": "5-4/0のD→E：潜水艦を含むとFへ進む先行条件の接続を確認する。元の低速戦艦上限とは別条件で、今回の限定成功で全経路固定を保証しない。"
 }
