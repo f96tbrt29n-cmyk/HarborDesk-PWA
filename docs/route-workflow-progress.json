@@ -1,5 +1,5 @@
 {
-  "baselineHead": "874cd99cb18dccdbd392a1dc24ed38478d33de45",
+  "baselineHead": "a0d3981ee783fa722ad24ec5ea6bd8828fa5538a",
   "scope": "37 registered maps / 53 presets expanded by selected goals to 59 rows, not every game route",
   "denominators": {
     "maps": 37,
@@ -62,20 +62,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 19,
-      "未確認": 40,
+      "一部": 20,
+      "未確認": 39,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 19,
-      "未確認": 40,
+      "一部": 20,
+      "未確認": 39,
       "非該当": 0
     },
     "D": {
-      "確認済み": 2,
+      "確認済み": 3,
       "一部": 19,
-      "未確認": 38,
+      "未確認": 37,
       "非該当": 0
     }
   },
@@ -1598,30 +1598,45 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。 D→Eの元の低速戦艦1隻以下を出典2件と独立対照で接続。全分岐/推奨数量の網羅は未完。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/route-goal-guidance-audit.json",
+            "docs/pr152-five-four-battleship-ja.md",
+            "tests/five-four-battleship.test.cjs",
+            "tests/route-5-4-battleship.spec.js"
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "C/W各初回で不足していた35.6cm砲を手持ちから配備。元艦種・有限在庫・合法性保持を確認。全装備目標/推奨数量の網羅ではない。",
+          "evidence": [
+            "docs/pr152-five-four-battleship-ja.md",
+            "tests/five-four-battleship.test.cjs",
+            "tests/route-5-4-battleship.spec.js"
+          ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "元の低速戦艦2/上限1の確定超過と、既知1＋未知1のmanualを区別。艦種不一致を装備購入へ送らず、F経由を到達不可能としない。全装備・全不足区分は未網羅。",
+          "evidence": [
+            "docs/pr152-five-four-battleship-ja.md",
+            "tests/five-four-battleship.test.cjs",
+            "tests/route-5-4-battleship.spec.js"
+          ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "確認済み",
+          "reason": "同じ行の3代表をC/W各初回で確認。保存可能案のメモ編集、未知艦案の安全中止、同一文書load/complete後再探索、直接保存文字列一致、他編成/metadata保持。",
+          "evidence": [
+            "docs/pr152-five-four-battleship-ja.md",
+            "tests/five-four-battleship.test.cjs",
+            "tests/route-5-4-battleship.spec.js"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "D→Eの潜水艦条件、他分岐の全接続、戦闘推奨数量、全搭載/枠競合は未完。"
     },
     {
       "id": "5-5/0/default",
@@ -2176,7 +2191,7 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "重巡と重巡級の算入を照合。I/Jの登録範囲は条件対照あり。Gは重巡3/重巡級3の出典不一致を理由付きmanualとし、固定/ランダムへ昇格しない。全目標の数量根拠と全分岐は未完。",
+          "reason": "重巡と重巡級の算入を照合。I/Jの登録範囲は条件対照あり。Gは重巡3/重巡級3の出典不一致を理由付きmanualとし、固定/ランダムへ昇格しない。全目標の数量根拠と全分岐は未完。 今回の限定履歴/参照先確認では対象G遷移を確定できる出撃記録を得られず、根拠待ちとして一区切り。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
@@ -2185,7 +2200,8 @@
             "tests/conditional-speed-ui.test.cjs",
             "tests/route-complex-boundaries.spec.js",
             "docs/pr152-seven-three-gij-ja.md",
-            "tests/seven-three-gij.test.cjs"
+            "tests/seven-three-gij.test.cjs",
+            "docs/pr152-seven-three-g-evidence-limit-ja.md"
           ]
         },
         "B": {
@@ -2373,15 +2389,15 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "7-3/1/default",
-    "condition": "G source disagreement remains unresolved; explicit I CA-class count and scoped J priority",
-    "localBrowserCasesPerEngine": 4,
+    "id": "5-4/0/default",
+    "condition": "D-to-E original slow battleship count 0..1; current speed does not change the class",
+    "localBrowserCasesPerEngine": 3,
     "localInitialPassPerEngine": 3,
-    "localInitialFailurePerEngine": 1,
-    "failure": "unknown hull plus known slow Samuel: test expected all manual; corrected expectation, no local rerun",
+    "localInitialFailurePerEngine": 0,
     "retries": 0,
-    "statusCellChanges": 0,
-    "newEvidence": "docs/pr152-seven-three-gij-ja.md"
+    "statusCellChanges": 3,
+    "newEvidence": "docs/pr152-five-four-battleship-ja.md",
+    "sevenThree": "bounded evidence review complete; G unresolved, product unchanged"
   },
-  "nextPriority": "7-3/1のG：重巡2＋航巡1＋駆逐3・羽黒/足柄・神風なし・高速の出撃根拠を確認し、G→J/G→Iの出典記載差を解消できるか判断する。"
+  "nextPriority": "5-4/0のD→E：潜水艦を含むとFへ進む先行条件の接続を確認する。元の低速戦艦上限とは別条件で、今回の限定成功で全経路固定を保証しない。"
 }
