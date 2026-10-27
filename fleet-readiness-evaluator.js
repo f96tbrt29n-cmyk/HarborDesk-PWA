@@ -531,8 +531,8 @@ function hdFERouteRequirementData(plan){
  return preset?hdMapPresetRequirements(plan.map,preset):null;
 }
 function hdFEEquipmentRequirements(plan,rows){
- const contract=hdFERouteRequirementData(plan);
- const result=new Map((rows||[]).filter(r=>r.kind!=='基地航空隊').filter(r=>!r.generatedFromMap||r.kind.startsWith('cap-night-')&&hdSENightPolicy(plan.map)!=='auto'||(!contract?.equipmentKinds||contract.equipmentKinds.includes(r.baseKind||r.kind))&&!(contract?.los.kind==='none'&&r.kind==='索敵')).map(r=>[r.kind,{...r,minCount:Math.max(1,Number(r.minCount)||1)}]));
+ const contract=hdFERouteRequirementData(plan),noLos=contract?.los.kind==='none'||hdFEScoutingExemption(plan,contract)?.status==='ready';
+ const result=new Map((rows||[]).filter(r=>r.kind!=='基地航空隊').filter(r=>!r.generatedFromMap||r.kind.startsWith('cap-night-')&&hdSENightPolicy(plan.map)!=='auto'||(!contract?.equipmentKinds||contract.equipmentKinds.includes(r.baseKind||r.kind))&&!(noLos&&r.kind==='索敵')).map(r=>[r.kind,{...r,minCount:Math.max(1,Number(r.minCount)||1)}]));
  const recommended=(rows||[]).some(r=>r.generatedFromMap)||!rows?.length&&plan?.ships?.length&&hdFERouteBasic(plan).status==='ready';
  if(recommended&&contract?.carrierAttackTarget){const n=(plan.ships||[]).filter(s=>['軽空母','正規空母','装甲空母'].includes(hdFEFindShip(s.ship)?.type)).length;if(n)result.set('cap-carrier-attack',{kind:'cap-carrier-attack',baseKind:'航空攻撃',label:'空母の攻撃機配備',minCount:n,generatedFromMap:true});}
  if(recommended&&contract?.waterAttackTarget){const n=(plan.ships||[]).filter(s=>(contract.waterAttackTypes||['水上機母艦']).includes(hdFEFindShip(s.ship)?.type)).length;if(n)result.set('cap-water-attack',{kind:'cap-water-attack',baseKind:'航空攻撃',label:'水上爆撃機配備',minCount:n,generatedFromMap:true});}
@@ -543,7 +543,7 @@ function hdFERouteContract(plan){
  const data=hdFERouteRequirementData(plan);if(!data||data.engine==='verified-graph')return null;
  const ships=hdFERouteShips(plan),checks=data.conditions.map(condition=>{const check=hdFEBranchPredicate(condition,ships,plan);return {condition,...check,detail:condition.reason&&!check.detail.startsWith(condition.reason)?condition.reason+'：'+check.detail:check.detail}});
  if(ships.some(s=>!s.typeKnown))checks.push({condition:{kind:'unverified'},status:'manual',ratio:0,detail:'艦娘の艦種データが未登録のため、この経路の条件は未判定。'});
- if(data.los.kind==='required')checks.push({condition:{kind:'scoutingValue',min:data.los.checks[0].safe,coef:data.los.coef},...hdFEBranchPredicate({kind:'scoutingValue',min:data.los.checks[0].safe,coef:data.los.coef},ships,plan)});
+ if(data.los.kind==='required'){const numeric={kind:'scoutingValue',min:data.los.checks[0].safe,coef:data.los.coef},condition=data.los.exemptWhen?{any:[data.los.exemptWhen,numeric],reason:data.los.exemptNote}:numeric;checks.push({condition,...hdFEBranchPredicate(condition,ships,plan)});}
  if(data.scopeIncomplete){const reason=data.scopeIncompleteReason||'出典または分岐の網羅が検証中。成立保証は出しません。';checks.push({condition:{kind:'unverified',reason},status:'manual',ratio:0,detail:reason});}
  const status=checks.some(x=>x.status==='missing')?'missing':checks.every(x=>x.status==='ready')?'ready':'manual';
  return {data,checks,status,detail:`${data.path}：${checks.map(x=>x.detail).join(' / ')}${data.routing==='random'?'。羅針盤の逸れあり・ボス到達は未保証':data.routing==='multiple'?'。経由するマスは複数':''}`};
@@ -585,9 +585,13 @@ function hdFEAirCheck(map,air,plan=null){
 }
 // Reference arithmetic for the synchronized ship inputs. A changed loadout can
 // invalidate those inputs; candidate verdicts must use hdFEPlanScouting below.
+function hdFEScoutingExemption(plan,contract=hdFERouteRequirementData(plan)){
+ return contract?.los?.kind==='required'&&contract.los.exemptWhen?hdFEBranchPredicate(contract.los.exemptWhen,hdFERouteShips(plan),plan):null;
+}
 function hdFEScouting(plan,items){
  const map=String(plan?.map||''),contract=hdFERouteRequirementData(plan),fallback=typeof HD_MAP_ADVANCED_DATA!=='undefined'?HD_MAP_ADVANCED_DATA[map]?.los:null,adv=contract?.los?.kind==='required'?contract.los:fallback,coef=Number(adv?.coef)||0,checks=Array.isArray(adv?.checks)?adv.checks:[];
  if(contract?.los?.kind==='none')return {status:'ready',available:false,notRequired:true,reason:'not-required',score:null,checks:[],detail:`${contract.path}：${contract.los.note}`};
+ if(hdFEScoutingExemption(plan,contract)?.status==='ready')return {status:'ready',available:false,notRequired:true,reason:'exempt',score:null,checks:[],detail:`${contract.path}：M→Pの索敵条件は非適用。${contract.los.exemptNote}`};
  if(!contract&&typeof HD_MAP_ROUTE_REQUIREMENTS!=='undefined'&&HD_MAP_ROUTE_REQUIREMENTS[map]?.some(r=>r.los.kind==='required'))return {status:'manual',available:false,reason:'route',score:null,checks:[],detail:'登録済みの経路を特定できません。別経路の索敵値は流用せず、ルートを選び直してね。'};
  if(!coef||!checks.length)return {status:'manual',available:false,reason:'threshold',score:null,checks:[],detail:adv?.summary||'数値閾値なし'};
  const sync=(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')}catch{return null}})(),hq=Number(sync?.admiralLevel)||0,ships=(plan?.ships||[]).filter(x=>x?.ship),losRows=ships.map(ship=>typeof hdFCProposalShipLos==='function'?hdFCProposalShipLos(ship):null);
@@ -602,7 +606,8 @@ function hdFEScouting(plan,items){
 function hdFEPlanScouting(plan,items){
  const scouting=hdFEScouting(plan,items);
  if(!scouting.available)return scouting;
- const required=[...(hdFERouteContract(plan)?.checks||[]),...(hdFEBranchRoute(plan).checks||[])].some(x=>x.condition?.kind==='scoutingValue');
+ if(scouting.status!=='ready'&&hdFEScoutingExemption(plan)?.status==='manual')return {status:'manual',available:false,score:null,reason:'exemption',checks:scouting.checks.map(({score,status,...check})=>check),detail:'M→Pの高速＋以上統一による索敵免除は未確認。索敵安全域も未充足のため、この分岐は未判定です。速力・装備可否・索敵情報を確認してください。'};
+ const required=hdFERouteRequirementData(plan)?.los?.kind==='required'||[...(hdFERouteContract(plan)?.checks||[]),...(hdFEBranchRoute(plan).checks||[])].some(x=>x.condition?.kind==='scoutingValue');
  if(!required||hdFEGameMatch(plan).status==='ready')return scouting;
  return {status:'manual',available:false,score:null,reason:'bonus',coef:scouting.coef,checks:scouting.checks.map(({score,status,...check})=>check),detail:'装備変更に伴う艦固有索敵ボーナスの差分が未確認。同期した同じ配備で再確認してください'};
 }

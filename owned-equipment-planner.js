@@ -282,7 +282,7 @@ function hdOCMeasure(plan,requirements,unknown=[]){
  for(const goal of goals){goal.purpose=['route-branches','route-requirements','radar-ships','drum-ships','low-speed-ships','speed-ship','los-value'].includes(goal.kind)?'route':goal.generatedFromMap&&!(goal.kind.startsWith('cap-night-')&&hdSENightPolicy(plan.map)!=='auto')?'recommendation':'strategy';}
  const requiredChecks=hdOCRequiredChecks(plan,route,true);
  const score=goals.reduce((s,g)=>s+g.ratio*100+(g.ok?25:0),0)+requiredChecks.reduce((n,c)=>n+(c.ok?10000:Math.max(0,c.ratio||0)*1000),0);
- return {goals,requiredChecks,manual,score,routeStatus:route.status,speedTarget,complete:goals.length>0&&goals.every(x=>x.ok&&!x.unresolved)&&!unknown.length&&air.reason!=='anti-air'&&route.status==='ready'};
+ return {goals,requiredChecks,manual,score,scoutingExempt:scouting.reason==='exempt',routeStatus:route.status,speedTarget,complete:goals.length>0&&goals.every(x=>x.ok&&!x.unresolved)&&!unknown.length&&air.reason!=='anti-air'&&route.status==='ready'};
 }
 // An unresolved goal lacks evidence; it is not a confirmed equipment deficit.
 function hdOCShortageGoals(measure){return measure.goals.filter(x=>!x.ok&&!x.unresolved&&!['route-branches','route-requirements','port-attacker-set'].includes(x.kind))}
@@ -315,7 +315,7 @@ function hdOCGoalRegressions(before,after){
  const current=new Map([...(after.goals||[]),...(after.requiredChecks||[])].map(g=>[hdOCGoalIdentity(g),g]));
  const previous=new Map((before.requiredChecks||[]).map(g=>[hdOCGoalIdentity(g),g]));
  const requiredImproved=(after.requiredChecks||[]).some(g=>g.ok&&!previous.get(hdOCGoalIdentity(g))?.ok);
- return [...(before.goals||[]),...(before.requiredChecks||[])].filter(g=>!(g.kind==='speed-ship'&&after.speedTarget===0&&after.routeStatus==='ready')&&g.ok&&!g.unresolved&&(g.purpose!=='recommendation'||!requiredImproved)&&(!current.get(hdOCGoalIdentity(g))?.ok||current.get(hdOCGoalIdentity(g))?.unresolved));
+ return [...(before.goals||[]),...(before.requiredChecks||[])].filter(g=>!(after.scoutingExempt&&(g.kind==='los-value'||g.kind==='索敵'&&g.generatedFromMap))&&!(g.kind==='speed-ship'&&after.speedTarget===0&&after.routeStatus==='ready')&&g.ok&&!g.unresolved&&(g.purpose!=='recommendation'||!requiredImproved)&&(!current.get(hdOCGoalIdentity(g))?.ok||current.get(hdOCGoalIdentity(g))?.unresolved));
 }
 // Reuse an observed loadout as a candidate, never as an extra inventory source.
 // Exact per-hull slots/star labels retain the synchronized fit-bonus context.
@@ -365,6 +365,9 @@ function* hdOCSearchSteps(c,limits={}){
  const signature=hdOCSignature(c),airUnselected=hdOCUnselectedAir(c.map);
  const {plan,inventory,slots,unknown}=hdOCBuild(c),requirements=hdFEEquipmentRequirements(plan,hdSEChecks(c.map).rows);
  const routeData=hdFERouteRequirementData(plan);for(const condition of routeData?.conditions||[])if(condition.kind==='equipmentShips'&&condition.match==='drum')requirements.push({kind:'drum-ships',label:'ルート用ドラム缶装備艦',minCount:condition.min});
+ // Keep the raw conditional recommendation for candidate re-evaluation: a
+ // later loadout can lose the exemption. hdOCMeasure filters each current plan.
+ if(routeData?.los.exemptWhen)for(const row of hdSEChecks(c.map).rows)if(row.kind==='索敵'&&row.generatedFromMap&&!requirements.some(r=>r.kind===row.kind))requirements.push(row);
  if(plan.openingAswCount)requirements.push({kind:'opening-asw',label:'先制対潜艦',minCount:plan.openingAswCount});
  if(hdFEBranchRoute(plan).requiredRadar)requirements.push({kind:'radar-ships',label:'ルート用電探装備艦',minCount:hdFEBranchRoute(plan).requiredRadar});
  if(hdOCPortTargets(plan).length)requirements.push({kind:'port-attacker-set',label:hdOCPortRoute(plan).label,minCount:hdOCPortTargets(plan).length});

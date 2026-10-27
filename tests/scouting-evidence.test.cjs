@@ -6,6 +6,7 @@ const vm=require('node:vm');
 const path=require('node:path');
 function load(file,name,context){
  const source=fs.readFileSync(path.join(__dirname,'..',file),'utf8'),start=source.indexOf('function '+name+'('),end=source.indexOf('\nfunction ',start+1);
+ if(['hdFEScouting','hdFEPlanScouting'].includes(name)){context.hdFERouteRequirementData??=()=>null;context.hdFEScoutingExemption??=load('fleet-readiness-evaluator.js','hdFEScoutingExemption',context);}
  if(name==='hdOCMeasure'&&!context.hdOCPortMeasure)context.hdOCPortMeasure=()=>[];vm.runInNewContext(source.slice(start,end<0?undefined:end),context);return context[name];
 }
 function shipLookupContext(){
