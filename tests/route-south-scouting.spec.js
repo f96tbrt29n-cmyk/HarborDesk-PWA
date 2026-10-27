@@ -1,11 +1,18 @@
 const {test,expect}=require('@playwright/test');
+const versionMeta=require('../app-version.json');
 test.use({viewport:{width:390,height:844},isMobile:true,hasTouch:true,serviceWorkers:'block',trace:{mode:'on',snapshots:false,screenshots:true,sources:true},video:'on'});
 // Independent synthetic arithmetic (not verified game stats at the supplied Lv):
 // sqrt9+5*sqrt25 + 4*(5*.6)*4 - ceil(120*.4) = 28. Without equipment: -20.
 for(const state of ['ready','missing','unknown'])test(`south scouting ${state} keeps coefficient and reasons through save and load`,async({page},info)=>{
  const evidence={state,scope:'synthetic synchronized displayed values; not real-game bonus verification'},errors=[];page.on('pageerror',e=>errors.push(e.message));
  try{
-  await page.route('**/*',r=>['localhost','127.0.0.1'].includes(new URL(r.request().url()).hostname)?r.continue():r.fulfill({status:204,body:''}));await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCSearch==='function');
+  await page.route('**/*',r=>{
+   const u=new URL(r.request().url());
+   // This scouting/save fixture needs normal version JSON, not a version failure.
+   const versionUrl=(u.origin==='https://raw.githubusercontent.com'&&u.pathname==='/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json')||(u.origin==='http://127.0.0.1:4173'&&u.pathname==='/app-version.json');
+   if(r.request().method()==='GET'&&versionUrl)return r.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:JSON.stringify({version:versionMeta.version,build:versionMeta.build})});
+   return ['localhost','127.0.0.1'].includes(u.hostname)?r.continue():r.fulfill({status:204,body:''});
+  });await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCSearch==='function');
   const reference=await page.evaluate(state=>{
    const radar='22号対水上電探改四',fish='61cm四連装(酸素)魚雷',names=['矢矧改二','島風改','夕立改二','時雨改二','綾波改二','雪風改'],base=[9,25,25,25,25,25];
    if(hdFEFind(radar)?.stats?.索敵!==5)throw Error('fixture requires the documented radar LOS5');
