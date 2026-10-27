@@ -1,0 +1,2377 @@
+{
+  "baselineHead": "f996d08dde45b508864ae3d2a6dc8c79f6400002",
+  "scope": "37 registered maps / 53 presets expanded by selected goals to 59 rows, not every game route",
+  "denominators": {
+    "maps": 37,
+    "presets": 53,
+    "rows": 59,
+    "itemsPerRow": 4,
+    "cells": 236
+  },
+  "definitions": {
+    "A": "経路条件と目標値の根拠・適用範囲・判定。確認済みには全登録条件と目標の数量/必須・推奨・利用者指定の根拠が必要。条件単位の成功、構造選択、未確認数量の残る行は一部。暫定資料しかない5-6は未確認。",
+    "B": "同じ行の手持ち在庫からの実配備。確認済みにはその行の全適用目標の配備・合法性・有限在庫を確認する証拠が必要。特定条件/所持代替だけの実行は一部。共通コード・全マスター仮想所持の艦選択だけは未確認。",
+    "C": "同じ行の具体的な不足/未判定案内。確認済みには対象装備/数量/搭載先と在庫不足・搭載不可・枠競合・情報不足・探索打切りの全適用区分の証拠が必要。特定条件だけは一部。案内コードの存在だけは未確認。",
+    "D": "同じ行の保存・編集・同一reload文書load/complete後の再表示と他編成/metadata保持。全列挙の操作が明記された同定可能な証拠のみ確認済み。保存/loadや目標編集の一部だけは一部。別行の共通回帰は流用しない。"
+  },
+  "nonApplicable": "4列全体は全59行に適用。個別の数値索敵なし等を列全体の非該当へ換算しないため今回は0。",
+  "legacy53": {
+    "verified": 1,
+    "partial": 49,
+    "unverified": 3,
+    "changed": false
+  },
+  "legacyRequiredConnectionCounts": {
+    "D": 29,
+    "B": 22,
+    "A": 5,
+    "C": 3
+  },
+  "beforeCounts": {
+    "A": {
+      "確認済み": 0,
+      "一部": 56,
+      "未確認": 3,
+      "非該当": 0
+    },
+    "B": {
+      "確認済み": 0,
+      "一部": 18,
+      "未確認": 41,
+      "非該当": 0
+    },
+    "C": {
+      "確認済み": 0,
+      "一部": 18,
+      "未確認": 41,
+      "非該当": 0
+    },
+    "D": {
+      "確認済み": 1,
+      "一部": 19,
+      "未確認": 39,
+      "非該当": 0
+    }
+  },
+  "counts": {
+    "A": {
+      "確認済み": 0,
+      "一部": 56,
+      "未確認": 3,
+      "非該当": 0
+    },
+    "B": {
+      "確認済み": 0,
+      "一部": 19,
+      "未確認": 40,
+      "非該当": 0
+    },
+    "C": {
+      "確認済み": 0,
+      "一部": 19,
+      "未確認": 40,
+      "非該当": 0
+    },
+    "D": {
+      "確認済み": 2,
+      "一部": 19,
+      "未確認": 38,
+      "非該当": 0
+    }
+  },
+  "completionPercent": null,
+  "rows": [
+    {
+      "id": "1-1/0/default",
+      "map": "1-1",
+      "index": 0,
+      "goal": "default",
+      "path": "AC",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-1/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/pr152-registered-example-completion-ja.md",
+            "tests/route-completion-1-1.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/pr152-registered-example-completion-ja.md",
+            "tests/route-completion-1-1.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "登録条件の保存・装備交換・再表示は確認。参照した専用ケースのreloadはDCL待ちで、同一文書load/completeまで一括確認とはしない。",
+          "evidence": [
+            "docs/pr152-registered-example-completion-ja.md",
+            "tests/route-completion-1-1.spec.js"
+          ]
+        }
+      },
+      "remaining": "夜戦一般の推奨とCI必須を同一視しない。通常砲の基本補充とは別。適正セット/人数の根拠・案内接続が不足。"
+    },
+    {
+      "id": "1-2/0/default",
+      "map": "1-2",
+      "index": 0,
+      "goal": "default",
+      "path": "AE",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-2/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/pr152-ae-speed-ui-ja.md",
+            "tests/route-ae-speed-ui.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/pr152-ae-speed-ui-ja.md",
+            "tests/route-ae-speed-ui.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "evidence": [
+            "docs/pr152-ae-speed-ui-ja.md",
+            "tests/route-ae-speed-ui.spec.js"
+          ]
+        }
+      },
+      "remaining": "夜戦一般の推奨とCI必須を同一視しない。通常砲の基本補充とは別。適正セット/人数の根拠・案内接続が不足。"
+    },
+    {
+      "id": "1-3/0/normal",
+      "map": "1-3",
+      "index": 0,
+      "goal": "normal",
+      "path": "CFJ / A(DB)EFJ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-3/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+    },
+    {
+      "id": "1-3/0/cfj",
+      "map": "1-3",
+      "index": 0,
+      "goal": "cfj",
+      "path": "CFJ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-3/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "既存の同じ選択目標の所持艦代替/保存は空在庫・装備目標を省く経路専用対照。実装備の自動配備/不足案内の証拠へ換算しない。",
+          "evidence": [
+            "docs/route-1-3-verification-ja.md",
+            "tests/route-1-3.spec.js"
+          ]
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "既存の同じ選択目標の所持艦代替/保存は空在庫・装備目標を省く経路専用対照。実装備の自動配備/不足案内の証拠へ換算しない。",
+          "evidence": [
+            "docs/route-1-3-verification-ja.md",
+            "tests/route-1-3.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "空在庫の経路専用対照で所持艦変更/保存/再表示あり。DCL待ちで、編集・同一文書load/complete全体は未確認。",
+          "evidence": [
+            "docs/route-1-3-verification-ja.md",
+            "tests/route-1-3.spec.js"
+          ]
+        }
+      },
+      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+    },
+    {
+      "id": "1-4/0/normal",
+      "map": "1-4",
+      "index": 0,
+      "goal": "normal",
+      "path": "BCF(E)HL / AD(EH/GJ)L",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-4/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "1-4/0/j-avoid",
+      "map": "1-4",
+      "index": 0,
+      "goal": "j-avoid",
+      "path": "BCFEHL / ADEHL",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-4/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "既存の同じ選択目標の所持艦代替/保存は空在庫・装備目標を省く経路専用対照。実装備の自動配備/不足案内の証拠へ換算しない。",
+          "evidence": [
+            "docs/route-1-4-verification-ja.md",
+            "tests/route-1-4.spec.js"
+          ]
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "既存の同じ選択目標の所持艦代替/保存は空在庫・装備目標を省く経路専用対照。実装備の自動配備/不足案内の証拠へ換算しない。",
+          "evidence": [
+            "docs/route-1-4-verification-ja.md",
+            "tests/route-1-4.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "空在庫の経路専用対照で所持艦変更/保存/再表示あり。DCL待ちで、編集・同一文書load/complete全体は未確認。",
+          "evidence": [
+            "docs/route-1-4-verification-ja.md",
+            "tests/route-1-4.spec.js"
+          ]
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "1-5/0/default",
+      "map": "1-5",
+      "index": 0,
+      "goal": "default",
+      "path": "ADEJ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/route-goal-guidance-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/route-goal-guidance-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "evidence": [
+            "docs/route-goal-guidance-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        }
+      },
+      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+    },
+    {
+      "id": "1-5/1/default",
+      "map": "1-5",
+      "index": 1,
+      "goal": "default",
+      "path": "ADFGJ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+    },
+    {
+      "id": "1-5/2/default",
+      "map": "1-5",
+      "index": 2,
+      "goal": "default",
+      "path": "ADFGJ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/asw-route-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/asw-route-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "evidence": [
+            "docs/asw-route-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        }
+      },
+      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+    },
+    {
+      "id": "1-6/0/default",
+      "map": "1-6",
+      "index": 0,
+      "goal": "default",
+      "path": "AEGFBN",
+      "source": "https://zekamashi.net/kancolle-kouryaku/1-6/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/asw-remaining-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/asw-remaining-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "evidence": [
+            "docs/asw-remaining-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "2-1/0/default",
+      "map": "2-1",
+      "index": 0,
+      "goal": "default",
+      "path": "C(E)DH",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-1/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "2-2/0/default",
+      "map": "2-2",
+      "index": 0,
+      "goal": "default",
+      "path": "CE(GH)K",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-2/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+    },
+    {
+      "id": "2-3/0/default",
+      "map": "2-3",
+      "index": 0,
+      "goal": "default",
+      "path": "ボス方面・経路ランダム",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-3/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "2-4/0/default",
+      "map": "2-4",
+      "index": 0,
+      "goal": "default",
+      "path": "ボス方面・経路ランダム",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-4/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "2-5/0/default",
+      "map": "2-5",
+      "index": 0,
+      "goal": "default",
+      "path": "BFJO",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/pr152-north-los-ui-ja.md",
+            "docs/pr152-north-drum-domain-ja.md",
+            "tests/route-completion-2-5.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/pr152-north-los-ui-ja.md",
+            "docs/pr152-north-drum-domain-ja.md",
+            "tests/route-completion-2-5.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "evidence": [
+            "docs/pr152-north-los-ui-ja.md",
+            "docs/pr152-north-drum-domain-ja.md",
+            "tests/route-completion-2-5.spec.js"
+          ]
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "2-5/1/default",
+      "map": "2-5",
+      "index": 1,
+      "goal": "default",
+      "path": "CEIO",
+      "source": "https://zekamashi.net/kancolle-kouryaku/2-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "3-1/0/default",
+      "map": "3-1",
+      "index": 0,
+      "goal": "default",
+      "path": "CFG",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-1/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+    },
+    {
+      "id": "3-2/0/normal",
+      "map": "3-2",
+      "index": 0,
+      "goal": "normal",
+      "path": "CG(H)FL / CEFL",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-2/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "3-2/0/fastPlus",
+      "map": "3-2",
+      "index": 0,
+      "goal": "fastPlus",
+      "path": "CEFL / CGFL",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-2/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/pr152-fastplus-route-ui-ja.md",
+            "tests/route-fastplus-ui.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/pr152-fastplus-route-ui-ja.md",
+            "tests/route-fastplus-ui.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "evidence": [
+            "docs/pr152-fastplus-route-ui-ja.md",
+            "tests/route-fastplus-ui.spec.js"
+          ]
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "3-2/0/fastest",
+      "map": "3-2",
+      "index": 0,
+      "goal": "fastest",
+      "path": "CEFL",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-2/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/route-3-2-verification-ja.md",
+            "tests/route-3-2.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/route-3-2-verification-ja.md",
+            "tests/route-3-2.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "evidence": [
+            "docs/route-3-2-verification-ja.md",
+            "tests/route-3-2.spec.js"
+          ]
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "3-2/1/normal",
+      "map": "3-2",
+      "index": 1,
+      "goal": "normal",
+      "path": "CG(H)FL / CEFL",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-2/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "3-2/1/fastPlus",
+      "map": "3-2",
+      "index": 1,
+      "goal": "fastPlus",
+      "path": "CEFL / CGFL",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-2/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "3-2/1/fastest",
+      "map": "3-2",
+      "index": 1,
+      "goal": "fastest",
+      "path": "CEFL",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-2/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/pr152-route-target-scope-ja.md",
+            "tests/route-target-scope.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/pr152-route-target-scope-ja.md",
+            "tests/route-target-scope.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "evidence": [
+            "docs/pr152-route-target-scope-ja.md",
+            "tests/route-target-scope.spec.js"
+          ]
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "3-3/0/default",
+      "map": "3-3",
+      "index": 0,
+      "goal": "default",
+      "path": "ACGM",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-3/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/current-auto-loadout-coverage-ja.md",
+            "tests/owned-equipment-planner.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/current-auto-loadout-coverage-ja.md",
+            "tests/owned-equipment-planner.spec.js"
+          ]
+        },
+        "D": {
+          "status": "確認済み",
+          "reason": "保存・編集・同一文書load後表示、他編成/metadata保持を同じ行の代表操作で確認。",
+          "evidence": [
+            "docs/current-auto-loadout-coverage-ja.md",
+            "tests/owned-equipment-planner.spec.js"
+          ]
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "3-4/0/default",
+      "map": "3-4",
+      "index": 0,
+      "goal": "default",
+      "path": "ACEGJP",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-4/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "3-5/0/default",
+      "map": "3-5",
+      "index": 0,
+      "goal": "default",
+      "path": "FGK",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/pr152-south-scouting-ui-ja.md",
+            "docs/pr152-scouting-options-ja.md",
+            "tests/route-south-scouting.spec.js",
+            "tests/route-scouting-options.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/pr152-south-scouting-ui-ja.md",
+            "docs/pr152-scouting-options-ja.md",
+            "tests/route-south-scouting.spec.js",
+            "tests/route-scouting-options.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "evidence": [
+            "docs/pr152-south-scouting-ui-ja.md",
+            "docs/pr152-scouting-options-ja.md",
+            "tests/route-south-scouting.spec.js",
+            "tests/route-scouting-options.spec.js"
+          ]
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "3-5/1/default",
+      "map": "3-5",
+      "index": 1,
+      "goal": "default",
+      "path": "BDHK",
+      "source": "https://zekamashi.net/kancolle-kouryaku/3-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "4-1/0/default",
+      "map": "4-1",
+      "index": 0,
+      "goal": "default",
+      "path": "CFDGJ / ABDGJ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-1/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "4-2/0/default",
+      "map": "4-2",
+      "index": 0,
+      "goal": "default",
+      "path": "ACL / BDCL",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-2/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/asw-remaining-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/asw-remaining-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "evidence": [
+            "docs/asw-remaining-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "4-2/1/default",
+      "map": "4-2",
+      "index": 1,
+      "goal": "default",
+      "path": "ACL / BDCL",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-2/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。 4-2/0の艦隊をroute1へ切り替える設定隔離の負例のみ。route1の合法な正常配備の証拠ではない。",
+          "evidence": [
+            "docs/asw-remaining-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。 4-2/0の艦隊をroute1へ切り替える設定隔離の負例のみ。route1の合法な正常配備の証拠ではない。",
+          "evidence": [
+            "docs/asw-remaining-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。 4-2/0の艦隊をroute1へ切り替える設定隔離の負例のみ。route1の合法な正常配備の証拠ではない。",
+          "evidence": [
+            "docs/asw-remaining-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "4-3/0/default",
+      "map": "4-3",
+      "index": 0,
+      "goal": "default",
+      "path": "CDHN / CFHN",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-3/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/pr152-land-set-routes-ja.md",
+            "tests/port-attacker-set.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/pr152-land-set-routes-ja.md",
+            "tests/port-attacker-set.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "evidence": [
+            "docs/pr152-land-set-routes-ja.md",
+            "tests/port-attacker-set.spec.js"
+          ]
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 同じ行の汎用セット数・十分な担当艦数の根拠不足はCのまま。45行を機械的に減らさない。"
+    },
+    {
+      "id": "4-4/0/default",
+      "map": "4-4",
+      "index": 0,
+      "goal": "default",
+      "path": "AEIK",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-4/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "4-5/0/default",
+      "map": "4-5",
+      "index": 0,
+      "goal": "default",
+      "path": "ADHT / CDHT",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "4-5/1/default",
+      "map": "4-5",
+      "index": 1,
+      "goal": "default",
+      "path": "ADHKT / CDHKT",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/pr152-port-attacker-set-ja.md",
+            "tests/port-attacker-set.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/pr152-port-attacker-set-ja.md",
+            "tests/port-attacker-set.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "evidence": [
+            "docs/pr152-port-attacker-set-ja.md",
+            "tests/port-attacker-set.spec.js"
+          ]
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 同じ行の汎用セット数・十分な担当艦数の根拠不足はCのまま。45行を機械的に減らさない。"
+    },
+    {
+      "id": "4-5/2/default",
+      "map": "4-5",
+      "index": 2,
+      "goal": "default",
+      "path": "ADHT / CDHT",
+      "source": "https://zekamashi.net/kancolle-kouryaku/4-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "5-1/0/default",
+      "map": "5-1",
+      "index": 0,
+      "goal": "default",
+      "path": "BCFJ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-1/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "5-2/0/default",
+      "map": "5-2",
+      "index": 0,
+      "goal": "default",
+      "path": "BCEFO",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-2/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "5-3/0/default",
+      "map": "5-3",
+      "index": 0,
+      "goal": "default",
+      "path": "DGIOKEQ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-3/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/pr152-5-3-speed-ui-ja.md",
+            "docs/pr152-5-3-branches-ja.md",
+            "tests/route-5-3-speed-ui.spec.js",
+            "tests/route-5-3-branches-ui.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/pr152-5-3-speed-ui-ja.md",
+            "docs/pr152-5-3-branches-ja.md",
+            "tests/route-5-3-speed-ui.spec.js",
+            "tests/route-5-3-branches-ui.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "evidence": [
+            "docs/pr152-5-3-speed-ui-ja.md",
+            "docs/pr152-5-3-branches-ja.md",
+            "tests/route-5-3-speed-ui.spec.js",
+            "tests/route-5-3-branches-ui.spec.js"
+          ]
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "5-4/0/default",
+      "map": "5-4",
+      "index": 0,
+      "goal": "default",
+      "path": "ADEHIJMP",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-4/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "5-5/0/default",
+      "map": "5-5",
+      "index": 0,
+      "goal": "default",
+      "path": "BKPS",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "5-5/1/default",
+      "map": "5-5",
+      "index": 1,
+      "goal": "default",
+      "path": "BFDHNOS",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "5-6/0/default",
+      "map": "5-6",
+      "index": 0,
+      "goal": "default",
+      "path": "ABC2DEG",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-6/",
+      "items": {
+        "A": {
+          "status": "未確認",
+          "reason": "出典が暫定・検証継続中。確定成立の根拠未確認。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "5-6/1/default",
+      "map": "5-6",
+      "index": 1,
+      "goal": "default",
+      "path": "IJKLN",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-6/",
+      "items": {
+        "A": {
+          "status": "未確認",
+          "reason": "出典が暫定・検証継続中。確定成立の根拠未確認。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "5-6/2/default",
+      "map": "5-6",
+      "index": 2,
+      "goal": "default",
+      "path": "IOQUXZ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/5-6/",
+      "items": {
+        "A": {
+          "status": "未確認",
+          "reason": "出典が暫定・検証継続中。確定成立の根拠未確認。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "6-1/0/default",
+      "map": "6-1",
+      "index": 0,
+      "goal": "default",
+      "path": "AFGHK",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-1/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "6-2/0/default",
+      "map": "6-2",
+      "index": 0,
+      "goal": "default",
+      "path": "CEJK",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-2/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "6-3/0/default",
+      "map": "6-3",
+      "index": 0,
+      "goal": "default",
+      "path": "ACEGHJ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-3/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "6-4/0/default",
+      "map": "6-4",
+      "index": 0,
+      "goal": "default",
+      "path": "BDCFN",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-4/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "6-5/0/default",
+      "map": "6-5",
+      "index": 0,
+      "goal": "default",
+      "path": "ACDGM",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "6-5/1/default",
+      "map": "6-5",
+      "index": 1,
+      "goal": "default",
+      "path": "BFIJM",
+      "source": "https://zekamashi.net/kancolle-kouryaku/6-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "7-1/0/default",
+      "map": "7-1",
+      "index": 0,
+      "goal": "default",
+      "path": "DEGHK",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-1/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/asw-route-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/asw-route-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "evidence": [
+            "docs/asw-route-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        }
+      },
+      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+    },
+    {
+      "id": "7-2/0/default",
+      "map": "7-2",
+      "index": 0,
+      "goal": "default",
+      "path": "CEG",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-2/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "evidence": [
+            "docs/asw-route-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "evidence": [
+            "docs/asw-route-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        },
+        "D": {
+          "status": "一部",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "evidence": [
+            "docs/asw-route-targets-ja.md",
+            "tests/owned-oasw-integration.spec.js"
+          ]
+        }
+      },
+      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+    },
+    {
+      "id": "7-2/1/default",
+      "map": "7-2",
+      "index": 1,
+      "goal": "default",
+      "path": "BCDIM",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-2/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "7-3/0/default",
+      "map": "7-3",
+      "index": 0,
+      "goal": "default",
+      "path": "ACE",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-3/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "7-3/1/default",
+      "map": "7-3",
+      "index": 1,
+      "goal": "default",
+      "path": "ACDGJP",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-3/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。 今回は高速統一の無効装備をmanualとする対照を確認。G/I/J等の全分岐・推奨数量は未確認。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json",
+            "docs/pr152-seven-three-speed-ja.md",
+            "tests/conditional-speed-ui.test.cjs",
+            "tests/route-complex-boundaries.spec.js"
+          ]
+        },
+        "B": {
+          "status": "一部",
+          "reason": "高速化タービン1個をSamuel B.Roberts改へ実配備。羽黒/足柄保持、有限在庫を確認。他の戦闘推奨の十分な組数は未確認。",
+          "evidence": [
+            "docs/pr152-seven-three-speed-ja.md",
+            "tests/conditional-speed-ui.test.cjs",
+            "tests/route-complex-boundaries.spec.js"
+          ]
+        },
+        "C": {
+          "status": "一部",
+          "reason": "タービン在庫0のあと1個と搭載先、未知艦の速力manual・未確認を調達個数にしないことを確認。全搭載/枠競合は未網羅。",
+          "evidence": [
+            "docs/pr152-seven-three-speed-ja.md",
+            "tests/conditional-speed-ui.test.cjs",
+            "tests/route-complex-boundaries.spec.js"
+          ]
+        },
+        "D": {
+          "status": "確認済み",
+          "reason": "保存・編集・同一文書load後表示、他編成/metadata保持を同じ行の代表操作で確認。",
+          "evidence": [
+            "docs/pr152-seven-three-speed-ja.md",
+            "tests/conditional-speed-ui.test.cjs",
+            "tests/route-complex-boundaries.spec.js"
+          ]
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "7-4/0/default",
+      "map": "7-4",
+      "index": 0,
+      "goal": "default",
+      "path": "ABEJLP",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-4/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "7-5/0/default",
+      "map": "7-5",
+      "index": 0,
+      "goal": "default",
+      "path": "ABDFGHK",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "7-5/1/default",
+      "map": "7-5",
+      "index": 1,
+      "goal": "default",
+      "path": "ABDFJOQ",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    },
+    {
+      "id": "7-5/2/default",
+      "map": "7-5",
+      "index": 2,
+      "goal": "default",
+      "path": "ABDFJOPT",
+      "source": "https://zekamashi.net/kancolle-kouryaku/7-5/",
+      "items": {
+        "A": {
+          "status": "一部",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "evidence": [
+            "docs/route-requirement-validation-scope.json",
+            "docs/route-requirement-unverified-checklist.json",
+            "docs/route-goal-guidance-audit.json"
+          ]
+        },
+        "B": {
+          "status": "未確認",
+          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
+          "evidence": []
+        },
+        "C": {
+          "status": "未確認",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "evidence": []
+        },
+        "D": {
+          "status": "未確認",
+          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
+          "evidence": []
+        }
+      },
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+    }
+  ],
+  "limits": [
+    "一部は50%等へ換算しない。確認済み数/59のみを列ごとに数える。",
+    "同じ行の条件単位の成功は列全体の完了と異なる。今回A/B/Cの全体確認済み0は個別条件の成功0を意味しない。",
+    "原本が新環境に移送されていない過去分はコミット済み記録/試験ソースと現行CIを照合。旧環境にアクセスせず、原本を新たに再解析したとはしない。",
+    "未確認は本棚卸しで同定できる証拠なし。製品機能がないという意味ではない。",
+    "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
+  ],
+  "selected": {
+    "id": "7-3/1/default",
+    "condition": "minSpeed 10 / invalid speed equipment must remain manual",
+    "newDirectBrowserCases": {
+      "chromium": 3,
+      "webkit": 3
+    },
+    "retries": 0
+  },
+  "nextPriority": "7-3/1のG/I/J：出典が重巡と重巡級を使い分ける分岐と登録経路表記の整合を確認。今回の速度だけの成功で全経路固定を保証しない。"
+}

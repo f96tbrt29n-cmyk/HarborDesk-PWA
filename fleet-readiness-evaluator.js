@@ -468,7 +468,7 @@ function hdFEBranchPredicate(condition,ships,plan=null){
  }
  if(condition.kind==='minSpeed'){
   if(![10,15,20].includes(condition.rank)||!ships.length)return manual('速力条件を確認してください');
-  const known=x=>x.speedInfo.known&&!x.speedInfo.expansionUnconfirmed&&![...(x.ship.items||[]),x.ship.expansion].some(i=>i?.name&&!hdFEFind(i.name)),low=ships.filter(x=>known(x)&&x.speedInfo.rank<condition.rank),unknown=ships.filter(x=>!known(x));
+  const known=x=>x.speedInfo.known&&!x.speedInfo.invalid?.length&&!x.speedInfo.expansionUnconfirmed&&![...(x.ship.items||[]),x.ship.expansion].some(i=>i?.name&&!hdFEFind(i.name)),low=ships.filter(x=>known(x)&&x.speedInfo.rank<condition.rank),unknown=ships.filter(x=>!known(x));
   return {status:low.length?'missing':unknown.length?'manual':'ready',ratio:ships.filter(x=>known(x)&&x.speedInfo.rank>=condition.rank).length/ships.length,count:ships.length-low.length-unknown.length,need:ships.length,detail:`${hdFESpeedLabel(condition.rank)}統一 ${ships.length-low.length-unknown.length}/${ships.length}隻${low.length?' / 不足: '+low.map(x=>x.ship.ship).join('、'):''}${unknown.length?' / 速力未判定: '+unknown.map(x=>x.ship.ship).join('、'):''}`};
  }
  if(!['fleetCount','typeCount'].includes(condition.kind))return manual('未対応の分岐条件です');

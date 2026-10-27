@@ -3,6 +3,15 @@ const {test}=require('node:test'),assert=require('node:assert/strict'),fs=requir
 function load(file,name,c){const s=fs.readFileSync(path.join(__dirname,'..',file),'utf8'),start=s.indexOf('function '+name+'('),end=s.indexOf('\nfunction ',start+1);assert.ok(start>=0);vm.runInNewContext(s.slice(start,end<0?undefined:end),c);return c[name]}
 function routes(){const c=vm.createContext({window:{}});vm.runInContext(fs.readFileSync(path.join(__dirname,'../map-plans.js'),'utf8'),c);return vm.runInContext('({maps:MAP_PLANS,rules:HD_MAP_ROUTE_REQUIREMENTS})',c)}
 function predicate(){const raw=fs.readFileSync(path.join(__dirname,'../ship-master-snapshot.js'),'utf8'),snap=JSON.parse(raw.slice(raw.indexOf('=')+1).trim().replace(/;$/,'')),rows=Object.values(snap.allShips),c={HD_FS_TYPE_ALIASES:{},hdShipDbMasterRowFor:input=>rows.find(r=>r.name===input.name&&(input.masterId==null||input.masterId===r.id))};load('fleet-readiness-evaluator.js','hdFESpeedLabel',c);return load('fleet-readiness-evaluator.js','hdFEBranchPredicate',c)}
+test('7-3 route speed never counts invalid speed equipment as a confirmed fast hull',()=>{
+ const {rules}=routes(),rule=rules['7-3'][1].conditions.find(x=>x.kind==='minSpeed'),run=predicate();assert.equal(rule.rank,10);
+ const row={ship:{ship:'羽黒改二',items:[]},speedInfo:{known:true,rank:10,invalid:['改良型艦本式タービン（装備位置・装備可否が未充足）']}};
+ const input=JSON.stringify(row),r=run(rule,[row]);assert.equal(r.status,'manual');assert.equal(r.count,0);assert.equal(r.ratio,0);assert.match(r.detail,/速力未判定.*羽黒/);assert.equal(JSON.stringify(row),input);
+});
+test('minimum speed keeps confirmed shortage separate from invalid or unknown input',()=>{
+ const run=predicate(),row=(rank,invalid=[])=>({ship:{ship:'合成',items:[]},speedInfo:{known:true,rank,invalid}});
+ for(const rank of [10,15,20]){assert.equal(run({kind:'minSpeed',rank},[row(rank)]).status,'ready');assert.equal(run({kind:'minSpeed',rank},[row(5)]).status,'missing');assert.equal(run({kind:'minSpeed',rank},[row(5,['invalid speed slot'])]).status,'manual');assert.equal(run({kind:'minSpeed',rank},[row(5),row(rank,['invalid speed slot'])]).status,'missing');}
+});
 const hull=(type,rank=10,name=type==='戦艦'?'長門改二':type==='高速戦艦'?'金剛改二':type)=>({type:type==='高速戦艦'?'戦艦':type,typeKnown:true,speedInfo:{rank,base:type==='戦艦'?5:10,known:true,invalid:[]},ship:{ship:name,items:[]}});
 test('G original battleship class cap is independent of equipment-adjusted current speed',()=>{
  const {rules}=routes(),rule=rules['5-3'][0].conditions.find(x=>x.kind==='slowBattleshipCount'),run=predicate();assert.ok(rule);assert.equal(rule.kind,'slowBattleshipCount');assert.equal(rule.max,1);
