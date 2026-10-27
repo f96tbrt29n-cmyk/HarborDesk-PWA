@@ -193,6 +193,13 @@ test('candidate scouting with unknown bonus carries no numeric result or ready c
 test('unregistered numerical reference tools keep their arithmetic and do not invent a verified route verdict',()=>{
  const raw={available:true,score:17,status:'missing'},verify=load('fleet-readiness-evaluator.js','hdFEPlanScouting',{hdFEScouting:()=>raw,hdFERouteContract:()=>null,hdFEBranchRoute:()=>({checks:[]}),hdFEGameMatch:()=>{throw Error('no registered scouting predicate')}});assert.equal(verify({},[]),raw);
 });
+
+test('declared LOS without an actual graph check stays reference arithmetic; nested mandatory LOS keeps its bonus guard',()=>{
+ const raw={available:true,score:32,status:'ready',coef:3,checks:[{safe:32,status:'ready',score:32}]};let match='manual',condition=null;
+ const c={hdFEScouting:()=>raw,hdFERouteRequirementData:()=>({engine:'verified-graph',los:{kind:'required'}}),hdFERouteContract:()=>null,hdFEBranchRoute:()=>({checks:condition?[{condition}]:[]}),hdFEGameMatch:()=>({status:match})},verify=load('fleet-readiness-evaluator.js','hdFEPlanScouting',c);
+ assert.equal(verify({},[]),raw);
+ condition={any:[{kind:'minSpeed',rank:15},{kind:'scoutingValue',coef:3,min:32}]};assert.equal(verify({},[]).reason,'bonus');match='ready';assert.equal(verify({},[]),raw);
+});
 test('missing synchronized inputs and routes without a scouting condition retain their original unknown/not-required result',()=>{
  for(const raw of [{status:'manual',available:false,score:null,reason:'sync'},{status:'ready',available:false,notRequired:true,score:null}]){
   const verify=load('fleet-readiness-evaluator.js','hdFEPlanScouting',{hdFEScouting:()=>raw,hdFEGameMatch:()=>{throw Error('not needed')}});assert.equal(verify({},[]),raw);

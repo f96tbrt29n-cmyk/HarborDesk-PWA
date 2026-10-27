@@ -1,5 +1,5 @@
 {
-  "baselineHead": "311b49212660b7ae9d4517b6ed1876fe51713fba",
+  "baselineHead": "743645f57590cc42c0d88ca79d7c4db49341a620",
   "scope": "37 registered maps / 53 presets expanded by selected goals to 59 rows, not every game route",
   "denominators": {
     "maps": 37,
@@ -2427,6 +2427,15 @@
       "selectedFile": "tests/route-complex-boundaries.spec.js",
       "listOnlyBrowserExecutions": 0,
       "verifiedBeforeCIDispatch": true
+    },
+    "localFixtureSourceHead": "743645f57590cc42c0d88ca79d7c4db49341a620",
+    "guardRegressionCorrection": {
+      "sourceRun": 40598781247,
+      "change": "inspect real nested numeric predicates rather than LOS declaration",
+      "localCasesPerEngine": 2,
+      "initialPassPerEngine": 2,
+      "retries": 0,
+      "mRouteBrowserAttemptsRepeated": 0
     }
   },
   "nextPriority": "5-4 M→P免除対象の12秒結果待ち失敗：既存原本から探索完了と結果反映の未到達を区別する。追加計測・反復は今回行わない。"

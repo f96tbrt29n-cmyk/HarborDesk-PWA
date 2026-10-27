@@ -607,7 +607,8 @@ function hdFEPlanScouting(plan,items){
  const scouting=hdFEScouting(plan,items);
  if(!scouting.available)return scouting;
  if(scouting.status!=='ready'&&hdFEScoutingExemption(plan)?.status==='manual')return {status:'manual',available:false,score:null,reason:'exemption',checks:scouting.checks.map(({score,status,...check})=>check),detail:'M→Pの高速＋以上統一による索敵免除は未確認。索敵安全域も未充足のため、この分岐は未判定です。速力・装備可否・索敵情報を確認してください。'};
- const required=hdFERouteRequirementData(plan)?.los?.kind==='required'||[...(hdFERouteContract(plan)?.checks||[]),...(hdFEBranchRoute(plan).checks||[])].some(x=>x.condition?.kind==='scoutingValue');
+ const numeric=c=>c?.kind==='scoutingValue'||c?.all?.some(numeric)||c?.any?.some(numeric)||c?.not&&numeric(c.not);
+ const required=[...(hdFERouteContract(plan)?.checks||[]),...(hdFEBranchRoute(plan).checks||[])].some(x=>numeric(x.condition));
  if(!required||hdFEGameMatch(plan).status==='ready')return scouting;
  return {status:'manual',available:false,score:null,reason:'bonus',coef:scouting.coef,checks:scouting.checks.map(({score,status,...check})=>check),detail:'装備変更に伴う艦固有索敵ボーナスの差分が未確認。同期した同じ配備で再確認してください'};
 }
