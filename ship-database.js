@@ -8604,13 +8604,34 @@ const HD_SLOT_EXCLUSION_RULES=[
 const HD_EQUIP_TYPE_LABELS={1:'小口径主砲',2:'中口径主砲',3:'大口径主砲',5:'魚雷',12:'小型電探',13:'大型電探',21:'対空機銃',22:'特殊潜航艇',43:'戦闘糧食',38:'大口径主砲(II)',91:'噴式戦闘爆撃機(II)',93:'大型電探(II)',94:'艦上偵察機(II)',95:'副砲(II)'};
 const HD_EQUIPMENT_MASTER_NAME_BY_ID=Object.fromEntries(Object.entries(HD_EQUIPMENT_MASTER_META_BY_NAME).map(([name,v])=>[String(v.id),name]));
 const HD_EXSLOT_TYPE_LABELS={16:'追加装甲',21:'対空機銃',23:'応急修理要員',27:'追加装甲(中型)',28:'追加装甲(大型)',36:'高射装置',39:'水上艦要員',43:'戦闘糧食',44:'補給物資'};
+// Only the existing synchronous, read-only owned-search scope may reuse this
+// private type-name table. A new/yielded/cancelled step has a different scope;
+// public Maps and per-ship profiles are never shared by this memo.
+const hdShipDbSlotAllowedTypes=(()=>{
+ const scopes=new WeakMap(),build=hdShipDbMasterTypeMap;
+ return (snapshot,rules)=>{
+  const scope=typeof hdFEActiveShipLookup==='undefined'?null:hdFEActiveShipLookup;
+  let names;
+  if(scope instanceof Map&&hdShipDbMasterTypeMap===build){
+   let memo=scopes.get(scope);
+   if(!memo||memo.snapshot!==snapshot||memo.equipment!==snapshot.equipment){
+    memo={snapshot,equipment:snapshot.equipment,names:build()};scopes.set(scope,memo);
+   }
+   names=memo.names;
+  }else{
+   if(scope instanceof Map)scopes.delete(scope);
+   names=typeof hdShipDbMasterTypeMap==='function'?hdShipDbMasterTypeMap():new Map();
+  }
+  return Object.keys(rules).map(id=>names.get(String(id))||'').filter(Boolean);
+ };
+})();
 function hdShipDbSlotProfile(ship){
  const name=typeof ship==='string'?ship:(ship?.final||ship?.name||ship?.base||ship?.row?.name);
  const p=HD_SHIP_SLOT_PROFILES[name];
  if(p)return {...p,total:p.slots.reduce((s,n)=>s+n,0),count:p.slots.length,masterOnly:false};
  const row=typeof hdShipDbMasterRowFor==='function'?hdShipDbMasterRowFor(ship):null;if(!row)return null;
  const snap=window.HD_KANCOLLE_MASTER_SNAPSHOT||{},equipRules=snap.shipEquipOverrides?.[String(row.id)]||snap.stypeEquipRules?.[String(row.stype)]||{};
- const names=typeof hdShipDbMasterTypeMap==='function'?hdShipDbMasterTypeMap():new Map(),allowedTypes=Object.keys(equipRules).map(id=>names.get(String(id))||'').filter(Boolean);
+ const allowedTypes=hdShipDbSlotAllowedTypes(snap,equipRules);
  return {id:row.id,ctype:row.ctype,stype:row.stype,slots:[...(row.slots||[])],equipRules,allowedTypes,flags:[],total:(row.slots||[]).reduce((s,n)=>s+n,0),count:(row.slots||[]).length,masterOnly:true};
 }
 let hdShipDbMetaAliases=null;
