@@ -1,5 +1,5 @@
 {
-  "baselineHead": "a0d3981ee783fa722ad24ec5ea6bd8828fa5538a",
+  "baselineHead": "0fc0d936f3bfbc8566439dadf304161362c45805",
   "scope": "37 registered maps / 53 presets expanded by selected goals to 59 rows, not every game route",
   "denominators": {
     "maps": 37,
@@ -36,20 +36,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 19,
-      "未確認": 40,
+      "一部": 20,
+      "未確認": 39,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 19,
-      "未確認": 40,
+      "一部": 20,
+      "未確認": 39,
       "非該当": 0
     },
     "D": {
-      "確認済み": 2,
+      "確認済み": 3,
       "一部": 19,
-      "未確認": 38,
+      "未確認": 37,
       "非該当": 0
     }
   },
@@ -1598,45 +1598,49 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。 D→Eの元の低速戦艦1隻以下を出典2件と独立対照で接続。全分岐/推奨数量の網羅は未完。",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。 D→Eの元の低速戦艦1隻以下を出典2件と独立対照で接続。全分岐/推奨数量の網羅は未完。 D→Eの最優先の潜水艦・潜水空母なしを接続。潜水母艦は非該当と出典の艦種定義も照合。全分岐/推奨数量は未完。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
             "docs/route-goal-guidance-audit.json",
             "docs/pr152-five-four-battleship-ja.md",
             "tests/five-four-battleship.test.cjs",
-            "tests/route-complex-boundaries.spec.js"
+            "tests/route-complex-boundaries.spec.js",
+            "docs/pr152-five-four-submarine-ja.md"
           ]
         },
         "B": {
           "status": "一部",
-          "reason": "C/W各初回で不足していた35.6cm砲を手持ちから配備。元艦種・有限在庫・合法性保持を確認。全装備目標/推奨数量の網羅ではない。",
+          "reason": "C/W各初回で不足していた35.6cm砲を手持ちから配備。元艦種・有限在庫・合法性保持を確認。全装備目標/推奨数量の網羅ではない。 追加C/W各5初回で手持ち砲の配備後も潜水艦除外の成立/不一致/未判定と艦種を保持。",
           "evidence": [
             "docs/pr152-five-four-battleship-ja.md",
             "tests/five-four-battleship.test.cjs",
-            "tests/route-complex-boundaries.spec.js"
+            "tests/route-complex-boundaries.spec.js",
+            "docs/pr152-five-four-submarine-ja.md"
           ]
         },
         "C": {
           "status": "一部",
-          "reason": "元の低速戦艦2/上限1の確定超過と、既知1＋未知1のmanualを区別。艦種不一致を装備購入へ送らず、F経由を到達不可能としない。全装備・全不足区分は未網羅。",
+          "reason": "元の低速戦艦2/上限1の確定超過と、既知1＋未知1のmanualを区別。艦種不一致を装備購入へ送らず、F経由を到達不可能としない。全装備・全不足区分は未網羅。 追加C/W各5初回でSS/SSVの確定超過、潜水母艦の非該当、未知艦のみのmanual、既知SS＋未知の確定不一致を区別。購入不足へ変換しない。",
           "evidence": [
             "docs/pr152-five-four-battleship-ja.md",
             "tests/five-four-battleship.test.cjs",
-            "tests/route-complex-boundaries.spec.js"
+            "tests/route-complex-boundaries.spec.js",
+            "docs/pr152-five-four-submarine-ja.md"
           ]
         },
         "D": {
           "status": "確認済み",
-          "reason": "同じ行の3代表をC/W各初回で確認。保存可能案のメモ編集、未知艦案の安全中止、同一文書load/complete後再探索、直接保存文字列一致、他編成/metadata保持。",
+          "reason": "同じ行の3代表をC/W各初回で確認。保存可能案のメモ編集、未知艦案の安全中止、同一文書load/complete後再探索、直接保存文字列一致、他編成/metadata保持。 追加5代表もC/W各初回で保存/安全中止・編集・同一文書load/complete後再探索・直接保存一致・他編成metadata保持を確認。",
           "evidence": [
             "docs/pr152-five-four-battleship-ja.md",
             "tests/five-four-battleship.test.cjs",
-            "tests/route-complex-boundaries.spec.js"
+            "tests/route-complex-boundaries.spec.js",
+            "docs/pr152-five-four-submarine-ja.md"
           ]
         }
       },
-      "remaining": "D→Eの潜水艦条件、他分岐の全接続、戦闘推奨数量、全搭載/枠競合は未完。"
+      "remaining": "D→Eの潜水艦除外と元の低速戦艦上限は限定確認済み。他分岐の全接続（次はM→Pの高速+以上時の索敵免除）、全目標の数量根拠、全装備・搭載/枠競合は未完。"
     },
     {
       "id": "5-5/0/default",
@@ -2390,22 +2394,22 @@
   ],
   "selected": {
     "id": "5-4/0/default",
-    "condition": "D-to-E original slow battleship count 0..1; current speed does not change the class",
-    "localBrowserCasesPerEngine": 3,
-    "localInitialPassPerEngine": 3,
+    "condition": "D-to-E excludes SS/SSV, not AS; known mismatch remains missing alongside unknown hull",
+    "localBrowserCasesPerEngine": 5,
+    "localInitialPassPerEngine": 5,
     "localInitialFailurePerEngine": 0,
     "retries": 0,
-    "statusCellChanges": 3,
-    "newEvidence": "docs/pr152-five-four-battleship-ja.md",
-    "sevenThree": "bounded evidence review complete; G unresolved, product unchanged",
+    "statusCellChanges": 0,
+    "newEvidence": "docs/pr152-five-four-submarine-ja.md",
+    "previousEvidence": "docs/pr152-five-four-battleship-ja.md",
+    "sevenThree": "G remains unresolved; product and all statuses unchanged",
     "normalSmokeSelection": {
-      "totalPerBrowser": 803,
-      "targetCasesPerBrowser": 3,
+      "totalPerBrowser": 808,
+      "targetCasesPerBrowser": 5,
       "selectedFile": "tests/route-complex-boundaries.spec.js",
       "listOnlyBrowserExecutions": 0,
-      "localTestBodyUnchanged": true,
-      "firstHeadCoverageGap": "57f21462 normal smoke excluded standalone new spec; preserve as separate run"
+      "verifiedBeforeCIDispatch": true
     }
   },
-  "nextPriority": "5-4/0のD→E：潜水艦を含むとFへ進む先行条件の接続を確認する。元の低速戦艦上限とは別条件で、今回の限定成功で全経路固定を保証しない。"
+  "nextPriority": "5-4/0のM→P：高速+以上統一時の索敵条件免除が登録契約へ正しく接続されているかを確認する。今回のD→E条件とは別に扱う。"
 }

@@ -26,3 +26,31 @@ test('known mismatch, possible excess and harmless unknown remain distinct',()=>
 test('route mismatch is not converted into purchasable equipment',()=>{
  const c=context();assert.equal(c.hdOCShortageGoals({goals:[{kind:'route-requirements',ok:false,unresolved:false}]}).length,0);assert.match(c.data.notes.join(' '),/高速化.*艦種/);assert.match(c.data.notes.join(' '),/装備購入/);
 });
+
+test('5-4 submarine exclusion is connected before the original battleship cap',()=>{
+ const c=context(),d=c.data,at=d.conditions.findIndex(x=>x.kind==='typeCount'&&x.types.includes('潜水艦'));
+ assert.ok(at>=0);assert.deepEqual(Array.from(d.conditions[at].types),['潜水艦','潜水空母']);assert.equal(d.conditions[at].matchPolicy,'exact');assert.equal(d.conditions[at].min,0);assert.equal(d.conditions[at].max,0);
+ assert.ok(at<d.conditions.findIndex(x=>x.kind==='slowBattleshipCount'));assert.match(d.conditions[at].reason,/D→E/);assert.match(d.conditions[at].reason,/潜水母艦.*含めない/);
+ assert.equal(d.path,'ADEHIJMP');assert.equal(d.conditions.find(x=>x.kind==='slowBattleshipCount').max,1);assert.equal(d.los.coef,2);assert.equal(d.los.checks[0].safe,45);
+});
+test('5-4 submarine independent hull examples distinguish SS, SSV and tender',()=>{
+ const c=context(),rule={kind:'typeCount',types:['潜水艦','潜水空母'],matchPolicy:'exact',min:0,max:0};
+ // Literal expectations from the sources' hull definitions, not generated from
+ // the route condition. The real master snapshot independently identifies hulls.
+ for(const [name,type,stype,count,status] of [['伊168','潜水艦',13,1,'missing'],['伊58改','潜水空母',14,1,'missing'],['大鯨','潜水母艦',20,0,'ready'],['千歳甲','水上機母艦',16,0,'ready'],['鈴谷改二','航空巡洋艦',6,0,'ready']]){
+  assert.equal(c.hdShipDbMasterRowFor({name}).stype,stype);const row=hull(name,type),before=JSON.stringify(row),r=c.hdFEBranchPredicate(rule,[row]);assert.equal(r.count,count);assert.equal(r.status,status);assert.equal(JSON.stringify(row),before);
+ }
+ assert.equal(c.hdFEBranchPredicate(rule,[]).status,'ready');
+});
+test('5-4 submarine unknown cannot erase a known route mismatch',()=>{
+ const c=context(),unknown={...hull('合成・艦情報未登録',''),typeKnown:false},ss=hull('伊168','潜水艦'),normal=fleet(hull('金剛改二'),hull('榛名改二'));
+ const check=rows=>c.hdFERouteContract({ships:rows});
+ normal[2]=unknown;assert.equal(check(normal).status,'manual');
+ normal[3]=ss;const mixed=check(normal),rule=mixed.checks.find(x=>x.condition.kind==='typeCount'&&x.condition.types.includes('潜水艦'));assert.equal(mixed.status,'missing');assert.ok(rule);assert.equal(rule.status,'missing');assert.equal(rule.count,1);assert.equal(rule.excess,1);assert.match(rule.detail,/未判定/);
+});
+test('5-4 submarine guidance requests fleet review instead of purchasable equipment',()=>{
+ const c=context(),text=c.data.notes.join(' ');assert.match(text,/潜水艦.*潜水空母/);assert.match(text,/潜水母艦/);assert.match(text,/装備購入ではなく編成/);assert.match(text,/先にF/);
+ const r=c.hdFERouteContract({ships:fleet(hull('金剛改二'),hull('榛名改二'))});assert.equal(r.status,'ready');
+ assert.equal(c.hdOCShortageGoals({goals:[{kind:'route-requirements',ok:false,unresolved:false}]}).length,0);
+ const preset=vm.runInContext("MAP_PLANS['5-4'].presets[0]",c);assert.match(preset.gear,/潜水艦.*潜水空母/);
+});
