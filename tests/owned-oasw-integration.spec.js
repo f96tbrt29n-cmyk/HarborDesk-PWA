@@ -126,7 +126,7 @@ guidanceTest('unknown opening ASW is not a confirmed equipment shortage and surv
   expect(evidence.connections).toHaveLength(59);
   for(let i=0;i<audit.rows.length;i++){
    const expected=audit.rows[i],actual=evidence.connections[i];expect(actual.id).toBe(expected.id);expect(actual.los).toEqual(expected.scouting);
-   if(expected.scouting.kind==='required')expect(actual.conditions).toContainEqual({kind:'scoutingValue',min:expected.scouting.checks[0].safe,coef:expected.scouting.coef});
+   if(expected.scouting.kind==='required'){const numeric={kind:'scoutingValue',min:expected.scouting.checks[0].safe,coef:expected.scouting.coef},condition=expected.scouting.exemptWhen?{any:[expected.scouting.exemptWhen,numeric],reason:expected.scouting.exemptNote}:numeric;expect(actual.conditions).toContainEqual(condition);}
    for(const c of expected.conditions)if(c.kind==='equipmentShips'&&c.match==='drum')expect(actual.goals).toContainEqual(expect.objectContaining({kind:'drum-ships',minCount:c.min}));
   }
   const reference=await page.evaluate(()=>{

@@ -2436,6 +2436,15 @@
       "initialPassPerEngine": 2,
       "retries": 0,
       "mRouteBrowserAttemptsRepeated": 0
+    },
+    "connectionAuditUpdate": {
+      "file": "docs/route-goal-guidance-audit.json",
+      "row": "5-4/0/default",
+      "browserCase": "unknown opening ASW is not a confirmed equipment shortage and survives save reload before recovery",
+      "initialPassPerEngine": 1,
+      "casesPerEngine": 1,
+      "retries": 0,
+      "otherRowsOrAswAssertionsRelaxed": false
     }
   },
   "nextPriority": "5-4 M→P免除対象の12秒結果待ち失敗：既存原本から探索完了と結果反映の未到達を区別する。追加計測・反復は今回行わない。"
