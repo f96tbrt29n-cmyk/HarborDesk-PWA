@@ -2542,7 +2542,7 @@
   "selected": {
     "id": "5-2/0/default",
     "baselineHead": "db06f5a3a2e457d957f5fd775963ba094c8f34ce",
-    "state": "reviewed limited scope for normal commit/push/smoke; whole route remains partial",
+    "state": "limited5-2 scope committed; audit correction authorized and validating; old unknown causes preserved",
     "evidence": "docs/pr152-five-two-bcefo-ja.md",
     "sourceLiterals": {
       "provided": 45,
@@ -2610,7 +2610,7 @@
       "verifiedBeforeCI": true,
       "fixedListSource": "literal package.json test:browser and real Playwright --list"
     },
-    "newCiRuns": 0,
+    "newCiRuns": 1,
     "limitedNavigationTrial": {
       "classification": "diagnostic installed; no recurrence this trial; old cause unresolved",
       "cases": {
@@ -2672,9 +2672,136 @@
       "clearNewRegressionEstablished": false,
       "newDiagnosisOrRepeat": false,
       "reviewBlockingDefect": false
+    },
+    "head": "b2a1427cc199c18dc4a8af128f342bbc024190b1",
+    "ci": {
+      "runId": 40706076586,
+      "head": "b2a1427cc199c18dc4a8af128f342bbc024190b1",
+      "state": "completed",
+      "conclusion": "failure",
+      "smokeJobs": {
+        "success": 4,
+        "failure": 2
+      },
+      "full": "skipped",
+      "attempt": 1,
+      "dispatches": 1,
+      "reruns": 0,
+      "officialSummaryCount": 6,
+      "officialCounts": {
+        "chromium": {
+          "initialPass": 837,
+          "retrySuccess": 0,
+          "finalFailure": 1,
+          "skipped": 0
+        },
+        "webkit": {
+          "initialPass": 825,
+          "retrySuccess": 9,
+          "finalFailure": 4,
+          "skipped": 0
+        }
+      },
+      "jobs": [
+        {
+          "label": "C1",
+          "job": 122878460893,
+          "counts": {
+            "initialPass": 419,
+            "retrySuccess": 0,
+            "finalFailure": 0,
+            "skipped": 0
+          }
+        },
+        {
+          "label": "C2",
+          "job": 122878461145,
+          "counts": {
+            "initialPass": 418,
+            "retrySuccess": 0,
+            "finalFailure": 1,
+            "skipped": 0
+          }
+        },
+        {
+          "label": "W1",
+          "job": 122878460855,
+          "counts": {
+            "initialPass": 210,
+            "retrySuccess": 0,
+            "finalFailure": 0,
+            "skipped": 0
+          }
+        },
+        {
+          "label": "W2",
+          "job": 122878461363,
+          "counts": {
+            "initialPass": 210,
+            "retrySuccess": 0,
+            "finalFailure": 0,
+            "skipped": 0
+          }
+        },
+        {
+          "label": "W3",
+          "job": 122878461069,
+          "counts": {
+            "initialPass": 209,
+            "retrySuccess": 0,
+            "finalFailure": 0,
+            "skipped": 0
+          }
+        },
+        {
+          "label": "W4",
+          "job": 122878460996,
+          "counts": {
+            "initialPass": 196,
+            "retrySuccess": 9,
+            "finalFailure": 4,
+            "skipped": 0
+          }
+        }
+      ],
+      "artifacts": {
+        "published": 10,
+        "received": 7,
+        "receivedBytes": 354577606,
+        "sha256ZipCrc": "PASS",
+        "missingOver512MiB": [
+          {
+            "name": "C2 attempt",
+            "bytes": 1090434940
+          },
+          {
+            "name": "C2 full",
+            "bytes": 2185507646
+          },
+          {
+            "name": "W4 full",
+            "bytes": 712783253
+          }
+        ]
+      },
+      "allSixOwnEnvironments": "Node24.21.0/PW1.55.0/C1187/W2203",
+      "newAuditMismatch": "C2/W4 initial andretry metadata equality atowned-oasw128: actual5-2failBelow63 absent inexpected",
+      "C2RawEvidence": "over-cap missing; own official annotations andenvreceived",
+      "newFiveTwoW": "ready/unknown initial completed2/loadexact; stockinitialhidden finalcomparisonunreached, retry1completed2/loadexact; do notfill initial"
+    },
+    "ciStop": {
+      "runId": 40706076586,
+      "job": 122878460996,
+      "case": "owned-oasw-integration unknown",
+      "source": "tests/owned-oasw-integration.spec.js:128",
+      "initialAndRetry": "59-row metadata equality: actual adds failBelow63 for5-2; expected missing",
+      "stage": "after initial fixture seed, before target reference/search/save/reload",
+      "storageMismatchObserved": false,
+      "minimalFixApplied": false,
+      "furtherTrialOrCi": false
     }
   },
-  "nextPriority": "5-2限定範囲の通常取込み/同HEADsmoke回収後、停止条件がなければ5-5/index0 BKPSへ。既知非表示の原因取得へ戻らず、旧未到達/出典待ち/網羅検証不足を保持する。",
+  "nextPriority": "5-2監査期待値を独立出典の63/70境界へ整合し、前回未到達C/W対象を確認。結果記録後に保留5-5を続行。",
   "previousSelected": {
     "id": "5-4/0/default",
     "condition": "M-to-P conditional scouting exemption only for no SS/SSV and confirmed fleet speed >=15; unknown is not exemption",
@@ -3143,13 +3270,13 @@
     "record": "docs/pr152-continuation-policy-ja.md",
     "requiresPerMapPermission": false,
     "stopOn": [
-      "new data loss",
-      "clear regression",
-      "environment or permission blocker",
-      "specification change needing user decision"
+      "new preservation mismatch or suspected existing-data destruction",
+      "new target blocker without a supported repair choice",
+      "environment or permission blocker preventing safe work",
+      "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "5-2/index0 BCEFO; reviewed limited scope normal integration; old hidden-click unresolved",
-    "nextUnit": "5-5/index0 BKPS; ordered source contracts and missing per-carrier placement guidance",
+    "activeUnit": "5-2 independently sourced audit correction passed Node12 and original blocked C/W target once; commit/push and newHEAD smoke next",
+    "nextUnit": "review and resume prepared5-5BKPS after recording5-2 results, absent current stop conditions",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -3160,6 +3287,65 @@
       "existingUncommittedRecords": "3 files in separate four-five worktree preserved; not mixed into five-one commit",
       "stopOnNewPreservationMismatch": true,
       "fiveOneLocalResults": "C/W each3 initial pass; no new mismatch; original old anomaly unknown"
-    }
+    },
+    "updated": "2026-10-29",
+    "autonomousRepairs": [
+      "independently grounded expected-value, fixture, selector or fixed-list defects",
+      "concrete regressions caused by current changes: minimal repair and necessary validation",
+      "artifact gaps: check existing alternatives, retain missing evidence if unavailable",
+      "known unrelated CI failures: preserve attempts without widening investigation",
+      "source gaps: retain unknown and continue independent work"
+    ]
+  },
+  "auditCorrection": {
+    "baselineHead": "b2a1427cc199c18dc4a8af128f342bbc024190b1",
+    "record": "docs/pr152-five-two-audit-correction-ja.md",
+    "productChanged": false,
+    "expectedChange": "5-2/0/default.scouting.checks[0].failBelow:63 based on registered source orderedF table",
+    "nodeTests": {
+      "passed": 12,
+      "failed": 0,
+      "newTests": 2
+    },
+    "matrixCellChange": 0,
+    "oldAuditAttemptsUnreached": true,
+    "ordinaryTarget": "owned-oasw-integration.spec.js unknown opening ASW case; original operations/assertions unchanged",
+    "local": [
+      {
+        "browser": "chromium",
+        "exit_code": 0,
+        "connections": 59,
+        "stages": [
+          "unknown",
+          "after-load-unknown",
+          "synced-value-recovery"
+        ],
+        "savedExact": true,
+        "otherExact": true,
+        "afterExact": true,
+        "afterState": "complete",
+        "pageerrors": 0,
+        "workers": 1,
+        "retries": 0
+      },
+      {
+        "browser": "webkit",
+        "exit_code": 0,
+        "connections": 59,
+        "stages": [
+          "unknown",
+          "after-load-unknown",
+          "synced-value-recovery"
+        ],
+        "savedExact": true,
+        "otherExact": true,
+        "afterExact": true,
+        "afterState": "complete",
+        "pageerrors": 0,
+        "workers": 1,
+        "retries": 0
+      }
+    ],
+    "state": "local Node12/C1/W1 passed; independent commit and one newHEAD smoke next"
   }
 }

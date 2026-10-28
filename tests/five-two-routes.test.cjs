@@ -88,6 +88,40 @@ test('5-2 F numeric boundary remains coefficient2 and70; missing input is not ze
  const mismatch=make('BBVVCC');mismatch.coef=1;assert.equal(c.hdFERouteContract(mismatch).status,'manual');
  for(const [fleet,score]of [['BBBVVD',70],['BBvvvC',70],['BBVVs?',null]])assert.equal(c.hdFERouteContract(make(fleet,10,score)).status,'missing',fleet+' known mismatch survives missing numeric input');
 });
+test('5-2 F source boundaries distinguish certain H, random H and the safe O scouting range',()=>{
+ // Registered source F table: coefficient2, <63 H, [63,70) random H,
+ // then (or after avoiding H) CV<=2 and BB<=2 O. Synthetic arithmetic
+ // reaches these literal score boundaries; it is not real-game input proof.
+ const {c,make}=context();let hq=120,shipLos=0;
+ c.localStorage={getItem:()=>JSON.stringify({admiralLevel:hq})};
+ c.hdFCProposalShipLos=()=>shipLos;c.hdFEImproveCoef=()=>0;c.hdFEEquipCoef=()=>1;
+ load('fleet-readiness-evaluator.js','hdFEScoutingExemption',c);
+ load('fleet-readiness-evaluator.js','hdFEScouting',c);
+ for(const [score,status]of [[62.99,'missing'],[63,'partial'],[69.99,'partial'],[70,'ready']]){
+  const items=[{meta:{stats:{索敵:(score+48)/2}}}];
+  for(const speed of [5,10,null]){
+   const result=c.hdFEScouting(make('BBVVCC',speed),items);
+   assert.equal(result.available,true);assert.equal(result.status,status,String(score)+' speed '+speed);
+   assert.equal(result.checks[0].status,status);assert.ok(Math.abs(result.score-score)<1e-10);
+   assert.equal(result.notRequired,undefined,'5-2 has no fast-fleet scouting exemption');
+  }
+ }
+ const items=[{meta:{stats:{索敵:59}}}];
+ hq=100;assert.equal(c.hdFEScouting(make('BBVVCC'),items).score,78,'HQ subtraction is applied by the formula, not by changing 63/70 thresholds');
+ hq=0;let result=c.hdFEScouting(make('BBVVCC'),items);assert.equal(result.available,false);assert.equal(result.reason,'sync');assert.equal(result.score,null);
+ hq=120;shipLos=null;result=c.hdFEScouting(make('BBVVCC'),items);assert.equal(result.available,false);assert.equal(result.reason,'sync');assert.equal(result.score,null);
+});
+test('5-2 audit scouting expectation records the independently sourced F boundaries',()=>{
+ const {c}=context(),audit=JSON.parse(fs.readFileSync(path.join(root,'docs/route-goal-guidance-audit.json'),'utf8'));
+ const rows=audit.rows.filter(x=>x.id==='5-2/0/default');assert.equal(rows.length,1);
+ // These constants come from the registered ordered F table, not a copy of
+ // product output. The reference's overlapping 63 wording and prose71/
+ // coefficient0.35 value76 do not replace this coefficient2 table contract.
+ const expected={kind:'required',coef:2,checks:[{label:'選択経路の索敵分岐',safe:70,failBelow:63}],marginNote:'司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。'};
+ assert.deepEqual(rows[0].scouting,expected);
+ assert.deepEqual(JSON.parse(JSON.stringify(c.data.los)),expected);
+ assert.equal(c.data.path,'BCEFO');assert.equal(c.data.minimumSpeed,undefined);assert.equal(c.data.los.exemptWhen,undefined);
+});
 test('5-2 route example is not a CAV requirement or global speed/equipment count mandate',()=>{
  const {c,make}=context();const p=make('BBVVCC',null),before=JSON.stringify(p);assert.equal(c.hdFERouteContract(p).status,'ready');assert.equal(JSON.stringify(p),before);
  assert.equal(c.data.useExampleScope,false);assert.equal(c.data.minimumSpeed,undefined);assert.equal(c.data.path,'BCEFO');
