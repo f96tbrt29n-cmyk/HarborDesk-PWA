@@ -62,20 +62,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 23,
-      "未確認": 36,
+      "一部": 24,
+      "未確認": 35,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 23,
-      "未確認": 36,
+      "一部": 24,
+      "未確認": 35,
       "非該当": 0
     },
     "D": {
-      "確認済み": 10,
+      "確認済み": 11,
       "一部": 15,
-      "未確認": 34,
+      "未確認": 33,
       "非該当": 0
     }
   },
@@ -1587,30 +1587,41 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "reason": "S/B/F優先順とDD4代替、CVn/CVL区分、13辺Jボス図を出典56対照/独立135660境界で確認。最速の優先・CT代替・LHA算入、全目標の数量根拠は残る。",
           "evidence": [
-            "docs/route-requirement-validation-scope.json",
-            "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/pr152-five-one-bcfj-ja.md",
+            "tests/five-one-routes.test.cjs",
+            "tests/five-one-graph.test.cjs"
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じ5-1行のC/W各初回で有限在庫魚雷2個の自動配備を確認。全適用目標・全在庫/搭載先の網羅ではない。",
+          "evidence": [
+            "docs/pr152-five-one-bcfj-ja.md",
+            "tests/route-five-one-bcfj.spec.js",
+            "tests/five-one-placement.test.cjs"
+          ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "C/Wの不足代表で空母攻撃機1個/魚雷2個の名称・数量・合法候補艦/通常枠、未知と編成不一致の区別、探索未完了の保存を確認。全在庫/搭載不可/枠競合・全推奨数量は未完。",
+          "evidence": [
+            "docs/pr152-five-one-bcfj-ja.md",
+            "tests/route-five-one-bcfj.spec.js",
+            "tests/five-one-placement.test.cjs"
+          ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "確認済み",
+          "reason": "同じ5-1行のC/W成立/不足で保存→編集→load後同一新文書の再探索/表示とcustom全文/入力/他編成/metadataを直接比較。未知は安全中止と元保存全文保持を確認。",
+          "evidence": [
+            "docs/pr152-five-one-bcfj-ja.md",
+            "tests/route-five-one-bcfj.spec.js"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "F最速の適用優先、練巡の軽巡代替、揚陸艦のB算入は影響域を未判定のまま出典待ち。全戦闘目標の十分人数/制空数量・全在庫/搭載不可/枠競合は未完。成立は勝利/夜戦CI発動を保証しない。調達sentinel保持は新規調達案の一般的安全性の証明ではない。"
     },
     {
       "id": "5-2/0/default",
@@ -2519,63 +2530,61 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "4-5/1/default",
-    "baselineHead": "8aa17ad4e0e27b9b4475a2ea1412f06201e71878",
-    "condition": "Direct D-entry central H-to-K ordered exclusions and prior K submarine randomness, with numeric scouting and named equipment guidance",
-    "evidence": "docs/pr152-four-five-central-ja.md",
-    "nodePrerequisitesPass": 306,
-    "sourceCases": 33,
-    "sourceBaselineMatches": 22,
-    "sourceAfterMatches": 33,
-    "independentFleetSpeedComparisons": 92820,
+    "id": "5-1/0/default",
+    "baselineHead": "78223b8a503cfd0a315dba8b7147fab4e91bcd6d",
+    "evidence": "docs/pr152-five-one-bcfj-ja.md",
+    "condition": "S/B/F priority and DD4 alternative; selected night recipe and per-carrier attack guidance, source-wait fastest/CT/LHA retained",
+    "sourceCases": 56,
+    "independentFleetSpeedComparisons": 135660,
     "independentDifferences": 0,
+    "existingSourceAndRelatedEvidenceReused": true,
+    "nodePrerequisitesPass": 321,
     "local": {
       "states": [
         "ready",
         "stock",
         "unknown"
       ],
-      "firstBatchCases": 6,
-      "firstBatchPass": 4,
-      "firstBatchNewFixtureExpectationFailures": 2,
-      "fixtureCorrections": [
-        "scouting partial under safe-only threshold, preserve route missing12/71",
-        "carrier-target candidate name matches scoped actual catalog text"
-      ],
-      "correctedStockCases": 2,
-      "correctedStockPass": 2,
-      "unchangedSuccessesReused": 4,
-      "totalBrowserExecutions": 8,
-      "retries": 0,
-      "selectionOnlyPreparationFailure": {
-        "browserLaunches": 0,
-        "cause": "leading grep anchor excluded fully-qualified Playwright title",
-        "correctedSelectionPerEngine": 1
+      "casesPerEngine": 3,
+      "initialPass": {
+        "chromium": 3,
+        "webkit": 3
       },
-      "observer": "both documents installed; drop/failures/collectionFailures0; final navigator and button visible; no claim known old issue resolved"
+      "retries": 0,
+      "additionalBrowserRepeats": 0,
+      "newPreservationMismatch": false,
+      "observer": "existing bounded test-only navigation observer; original images/video retained, drop/failures0; actual-read diagnostic excluded"
     },
     "beforeCells": {
-      "confirmed": 9,
-      "partial": 118,
-      "unconfirmed": 109
-    },
-    "afterCells": {
       "confirmed": 10,
       "partial": 117,
       "unconfirmed": 109
     },
+    "afterCells": {
+      "confirmed": 11,
+      "partial": 119,
+      "unconfirmed": 106
+    },
     "changedCells": [
-      "4-5/1 D 一部→確認済み"
+      "5-1/0 B 未確認→一部",
+      "5-1/0 C 未確認→一部",
+      "5-1/0 D 未確認→確認済み"
     ],
-    "statusCellChanges": 1,
+    "statusCellChanges": 3,
     "normalSmokeSelection": {
-      "totalPerBrowser": 832,
+      "totalPerBrowser": 835,
       "targetCasesPerBrowser": 3,
+      "targetTitles": [
+        "5-1 BCFJ ready keeps branch and equipment distinctions through save and load",
+        "5-1 BCFJ stock keeps branch and equipment distinctions through save and load",
+        "5-1 BCFJ unknown keeps branch and equipment distinctions through save and load"
+      ],
       "browserLaunches": 0,
-      "verifiedBeforeCI": true
+      "verifiedBeforeCommitAndCI": true,
+      "source": "literal package.json test:browser fixed file list + real Playwright --list"
     }
   },
-  "nextPriority": "5-1 BCFJ。出典では戦艦1＋重巡1＋駆逐4が軽巡なしで直接F→Jを満たすのに現行契約は軽巡1を一律要求。まず実関数の旧対照と出典優先順を確認し、空母表記差等は根拠待ちへ分離して独立した確定範囲から進める。",
+  "nextPriority": "5-2/index0 BCEFO。登録はOボスだが図/説明はOを欠きGボスと不整合。登録出典と元地図・各分岐優先順を照合し、史実艦別経路BCDFOや戦闘推奨を混ぜず具体的誤りだけ直す。",
   "previousSelected": {
     "id": "5-4/0/default",
     "condition": "M-to-P conditional scouting exemption only for no SS/SSV and confirmed fleet speed >=15; unknown is not exemption",
@@ -2897,6 +2906,63 @@
         "browserLaunches": 0,
         "verifiedBeforeCI": true
       }
+    },
+    {
+      "id": "4-5/1/default",
+      "baselineHead": "8aa17ad4e0e27b9b4475a2ea1412f06201e71878",
+      "condition": "Direct D-entry central H-to-K ordered exclusions and prior K submarine randomness, with numeric scouting and named equipment guidance",
+      "evidence": "docs/pr152-four-five-central-ja.md",
+      "nodePrerequisitesPass": 306,
+      "sourceCases": 33,
+      "sourceBaselineMatches": 22,
+      "sourceAfterMatches": 33,
+      "independentFleetSpeedComparisons": 92820,
+      "independentDifferences": 0,
+      "local": {
+        "states": [
+          "ready",
+          "stock",
+          "unknown"
+        ],
+        "firstBatchCases": 6,
+        "firstBatchPass": 4,
+        "firstBatchNewFixtureExpectationFailures": 2,
+        "fixtureCorrections": [
+          "scouting partial under safe-only threshold, preserve route missing12/71",
+          "carrier-target candidate name matches scoped actual catalog text"
+        ],
+        "correctedStockCases": 2,
+        "correctedStockPass": 2,
+        "unchangedSuccessesReused": 4,
+        "totalBrowserExecutions": 8,
+        "retries": 0,
+        "selectionOnlyPreparationFailure": {
+          "browserLaunches": 0,
+          "cause": "leading grep anchor excluded fully-qualified Playwright title",
+          "correctedSelectionPerEngine": 1
+        },
+        "observer": "both documents installed; drop/failures/collectionFailures0; final navigator and button visible; no claim known old issue resolved"
+      },
+      "beforeCells": {
+        "confirmed": 9,
+        "partial": 118,
+        "unconfirmed": 109
+      },
+      "afterCells": {
+        "confirmed": 10,
+        "partial": 117,
+        "unconfirmed": 109
+      },
+      "changedCells": [
+        "4-5/1 D 一部→確認済み"
+      ],
+      "statusCellChanges": 1,
+      "normalSmokeSelection": {
+        "totalPerBrowser": 832,
+        "targetCasesPerBrowser": 3,
+        "browserLaunches": 0,
+        "verifiedBeforeCI": true
+      }
     }
   ],
   "fiveFourCloseout": {
@@ -2937,8 +3003,18 @@
       "environment or permission blocker",
       "specification change needing user decision"
     ],
-    "activeUnit": "4-5/index1 ADHKT / CDHKT",
-    "nextUnit": "5-1 BCFJ",
-    "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved"
+    "activeUnit": "5-1/index0 BCFJ",
+    "nextUnit": "5-2/index0 BCEFO",
+    "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
+    "preservationStopReview": {
+      "state": "limited investigation ended; five-one resumed by user",
+      "oldFailure": "CI40672407055/W1 initial, old cause unknown; raw original missing",
+      "separateDiagnostic": "78223b8a WebKit once exit0; actual getter consumed equal strings pre/postreload; no recurrence; no guarantee",
+      "repeatOrProductFix": false,
+      "diagnosticIncludedInProduct": false,
+      "existingUncommittedRecords": "3 files in separate four-five worktree preserved; not mixed into five-one commit",
+      "stopOnNewPreservationMismatch": true,
+      "fiveOneLocalResults": "C/W each3 initial pass; no new mismatch; original old anomaly unknown"
+    }
   }
 }
