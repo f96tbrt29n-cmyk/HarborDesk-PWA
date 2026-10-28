@@ -4,6 +4,8 @@
 
 旧53例の全条件1／一部49／未確認3は維持。旧「必須接続」集計も別尺度で、後述の236セルへ換算しない。
 
+[継続方針](pr152-continuation-policy-ja.md)に従い、以後は対象選定・通常push・最終smokeまで継続する。新たなデータ喪失・明確な回帰・環境/権限阻害・利用者判断を要する仕様変更では、判断点を残して停止する。
+
 ## 判定基準
 
 - A: 経路条件と目標値の根拠・適用範囲・判定。確認済みには全登録条件と目標の数量/必須・推奨・利用者指定の根拠が必要。条件単位の成功、構造選択、未確認数量の残る行は一部。暫定資料しかない5-6は未確認。
@@ -20,7 +22,7 @@
 |A|0|56|3|0|59|
 |B|0|22|37|0|59|
 |C|0|22|37|0|59|
-|D|6|18|35|0|59|
+|D|8|16|35|0|59|
 
 2026-10-28追補：[5-4最終整理](pr152-five-four-closeout-ja.md)は既存証拠で終了し、追加実行0・状態変更0。基準236セル3/115/118の下に閉じた限定残件と4分類を別記した。続く[2-5北F分岐](pr152-two-five-north-f-ja.md)では高速3戦艦の有効枝と選艦/不足案内を接続し、C/W各1初回で保存・編集・同一文書load後の完全一致まで確認したためDだけ一部→確認済み。前3/115/118→後4/114/118、変更1セル。A/B/Cの全条件完了へは広げない。7-3 Gと他行は維持。
 
@@ -29,6 +31,10 @@
 2026-10-28追補：[3-4 ACEGJP](pr152-three-four-acegjp-ja.md)で駆逐/海防代替・Pボス構造図・空母別不足案内を接続。C/W3状態各初回成功を根拠に、同じ行のB/Cを未確認→一部、Dを未確認→確認済みとした。前4/114/118→後5/116/115、変更3セル。A/B/Cの全目標完了へ格上げせず、基準・分母236は維持。[load後非表示の共通残件](pr152-post-load-navigation-residual-ja.md)は停止段階だけ照合し、同原因とは扱わない。
 
 2026-10-28追補：[4-1 CFDGJ／ABDGJ](pr152-four-one-routes-ja.md)はランダム始点の同じ登録群として、C/F/Dの優先条件・Jボス図・艦別不足案内を接続。有限在庫の実配備と不足/未知、保存・編集・同一load文書の保持をC/Wで確認し、B/Cを未確認→一部、Dを未確認→確認済み。前5/116/115→後6/118/112、変更3セル。新規試験の誤ったAA目標検査で初回4失敗を保持し、その前提だけ修正した4件の再検証と未知2成功の再利用を区別する。A/B/Cは一部のまま、分母・基準236を維持。[Nodeパッチ固定](pr152-ci-node-patch-ja.md)と旧5-4停止段階整理はセルを変更しない。
+
+4-1の最終CI記録：HEAD `dc174887264bbc4e04a1099aeb27e7e4653be238`、[通常smoke40640755417](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/40640755417)は6成功。Cは初回822/retry成功0/最終失敗0、Wは816/6/0。全6ジョブ自身の環境原本でNode24.21.0を確認。成果物8中7取得、C2詳細ZIPは512MiB上限で欠測。新規4-1 Cの初回成功は公式全822初回成功＋固定選択、Wは取得原本による確認と区別する。W初回失敗6件は各原本を保持し、成功retryで欠測を補わない。旧5-4非表示・空母夜戦等の原因解決とはしない。236セルの変更はこのCI記録追記では0。
+
+2026-10-28追補：[4-2 ACL／BDCL](pr152-four-two-routes-ja.md)は潜水系が先行するA分岐と16接続図、名前/数量/合法枠の不足案内を接続。C/W各4代表が初回成功。index0・1それぞれの成立案で保存/編集/同一新文書load後の再探索と完全一致を確認したため、両Dのみ一部→確認済み。前6/118/112→後8/116/112、変更2セル。A/B/Cと旧53例区分は維持。任意対空CI目標のマップ文字列判定による未接続、全数量根拠/全在庫/枠競合は残る。次は根拠のある別編成を誤って除外している4-4 AEIK。
 
 ## 行別対応
 
@@ -62,8 +68,8 @@
 |3-5/0/default FGK|一部|一部|一部|一部|[pr152-south-scouting-ui-ja](pr152-south-scouting-ui-ja.md) / [pr152-scouting-options-ja](pr152-scouting-options-ja.md)|
 |3-5/1/default BDHK|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
 |4-1/0/default CFDGJ / ABDGJ|一部|一部|一部|確認済み|[共通条件・経路差・代表操作](pr152-four-one-routes-ja.md)|
-|4-2/0/default ACL / BDCL|一部|一部|一部|一部|[asw-remaining-targets-ja](asw-remaining-targets-ja.md)|
-|4-2/1/default ACL / BDCL|一部|一部|一部|一部|[asw-remaining-targets-ja](asw-remaining-targets-ja.md)|
+|4-2/0/default ACL / BDCL|一部|一部|一部|確認済み|[共通分岐と代表操作](pr152-four-two-routes-ja.md)／[既存ASW設定](asw-remaining-targets-ja.md)|
+|4-2/1/default ACL / BDCL|一部|一部|一部|確認済み|[共通分岐と代表操作](pr152-four-two-routes-ja.md)／[既存ASW設定](asw-remaining-targets-ja.md)|
 |4-3/0/default CDHN / CFHN|一部|一部|一部|一部|[pr152-land-set-routes-ja](pr152-land-set-routes-ja.md)|
 |4-4/0/default AEIK|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
 |4-5/0/default ADHT / CDHT|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
@@ -96,7 +102,7 @@
 
 ## 根拠と限界
 
-行別の理由・試験ソース・残件・変更前後集計は[機械可読表](route-workflow-progress.json)。旧[59行の条件別案内表](route-goal-guidance-ja.md)と[53例の検証範囲](route-requirement-validation-scope-ja.md)を照合した。最新は[2-5北F分岐](pr152-two-five-north-f-ja.md)と[5-4最終整理](pr152-five-four-closeout-ja.md)。[5-4中央の限定仕上げ](pr152-five-four-completion-ja.md)は再利用する履歴。[5-4 M→P索敵免除](pr152-five-four-scouting-exemption-ja.md)は旧試行と未到達の履歴。[D→Eの潜水艦除外](pr152-five-four-submarine-ja.md)は再利用する履歴。前回の[元艦種上限](pr152-five-four-battleship-ja.md)は再利用する履歴。7-3は[限定根拠確認](pr152-seven-three-g-evidence-limit-ja.md)で未確認を維持。前回の[7-3 G/I/J](pr152-seven-three-gij-ja.md)は履歴。前回の[高速条件](pr152-seven-three-speed-ja.md)は当時の記録として保持。
+行別の理由・試験ソース・残件・変更前後集計は[機械可読表](route-workflow-progress.json)。旧[59行の条件別案内表](route-goal-guidance-ja.md)と[53例の検証範囲](route-requirement-validation-scope-ja.md)を照合した。最新は[4-2 ACL／BDCL](pr152-four-two-routes-ja.md)。[4-1](pr152-four-one-routes-ja.md)、[2-5北F分岐](pr152-two-five-north-f-ja.md)、[5-4最終整理](pr152-five-four-closeout-ja.md)は再利用する履歴。[5-4中央の限定仕上げ](pr152-five-four-completion-ja.md)は再利用する履歴。[5-4 M→P索敵免除](pr152-five-four-scouting-exemption-ja.md)は旧試行と未到達の履歴。[D→Eの潜水艦除外](pr152-five-four-submarine-ja.md)は再利用する履歴。前回の[元艦種上限](pr152-five-four-battleship-ja.md)は再利用する履歴。7-3は[限定根拠確認](pr152-seven-three-g-evidence-limit-ja.md)で未確認を維持。前回の[7-3 G/I/J](pr152-seven-three-gij-ja.md)は履歴。前回の[高速条件](pr152-seven-three-speed-ja.md)は当時の記録として保持。
 
 - 一部は50%等へ換算しない。確認済み数/59のみを列ごとに数える。
 - 同じ行の条件単位の成功は列全体の完了と異なる。今回A/B/Cの全体確認済み0は個別条件の成功0を意味しない。
@@ -104,6 +110,6 @@
 - 未確認は本棚卸しで同定できる証拠なし。製品機能がないという意味ではない。
 - 実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。
 
-次の1ルート候補：3-3/index0 ACGMのA/C/Gの接続。今回は実装・実行しない。
+次の作業単位：4-4/index0 AEIK。出典の重巡級2／正規空母0＋軽巡という代替を現行の正規・装甲空母ちょうど2条件が除外し、B/C/Dの同じ行の実操作証拠も未確認のため優先する。4-3は担当艦セットの既存成功を再利用。Eの海防艦条件の資料差は未判定とし、独立した成立範囲から進める。
 
 自然保存実null・DCL停止等は未解決。PR152ドラフト・公開保留、main競合未解消、PR151/main/版/SW/本番の変更・マージ・公開・自動マージなし。

@@ -73,8 +73,8 @@
       "非該当": 0
     },
     "D": {
-      "確認済み": 6,
-      "一部": 18,
+      "確認済み": 8,
+      "一部": 16,
       "未確認": 35,
       "非該当": 0
     }
@@ -1248,39 +1248,49 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "reason": "出典の先行潜水系条件とA/C/Dの優先順、2登録例・ランダム始点・16接続図を照合。全戦闘目標の数量根拠/対象外G/Hは未完。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/route-goal-guidance-audit.json",
+            "docs/pr152-four-two-routes-ja.md",
+            "tests/four-two-routes.test.cjs"
           ]
         },
         "B": {
           "status": "一部",
-          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "reason": "同じindexの有限在庫から対潜セットを実配備し、合法性・在庫上限・経路をC/Wで確認。全目標/全在庫/枠競合は未完。",
           "evidence": [
             "docs/asw-remaining-targets-ja.md",
-            "tests/owned-oasw-integration.spec.js"
+            "tests/owned-oasw-integration.spec.js",
+            "docs/pr152-four-two-routes-ja.md",
+            "tests/four-two-routes.test.cjs",
+            "tests/four-two-placement.test.cjs",
+            "tests/route-four-two-routes.spec.js"
           ]
         },
         "C": {
           "status": "一部",
-          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "reason": "同じindexの在庫0で空母各1機と同艦ソナー1/投射機1の名称/合法枠と代替搭載先をC/W確認。全失敗区分は未完。",
           "evidence": [
             "docs/asw-remaining-targets-ja.md",
-            "tests/owned-oasw-integration.spec.js"
+            "tests/owned-oasw-integration.spec.js",
+            "docs/pr152-four-two-routes-ja.md",
+            "tests/four-two-routes.test.cjs",
+            "tests/four-two-placement.test.cjs",
+            "tests/route-four-two-routes.spec.js"
           ]
         },
         "D": {
-          "status": "一部",
-          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "status": "確認済み",
+          "reason": "同じindexの成立例で保存→メモ編集→reload(load)→同一新文書complete後再探索/再表示とcustom保存文字列・同期元・他編成/海域・ID/metadata・計算/調達情報の直接保持をC/W各1回確認。index1未知は別に安全中止を確認。",
           "evidence": [
-            "docs/asw-remaining-targets-ja.md",
-            "tests/owned-oasw-integration.spec.js"
+            "docs/pr152-four-two-routes-ja.md",
+            "tests/route-four-two-routes.spec.js"
           ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "対潜既定1組の十分性/先制対潜人数、任意対空CI目標のマップ文字列判定による未接続、全戦闘目標数量根拠・全在庫/搭載不可/枠競合、対象外G/H分岐。始点A/Bランダムと既知load後非表示の原因未確定を維持。"
     },
     {
       "id": "4-2/1/default",
@@ -1292,39 +1302,49 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "reason": "出典の先行潜水系条件とA/C/Dの優先順、2登録例・ランダム始点・16接続図を照合。全戦闘目標の数量根拠/対象外G/Hは未完。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/route-goal-guidance-audit.json",
+            "docs/pr152-four-two-routes-ja.md",
+            "tests/four-two-routes.test.cjs"
           ]
         },
         "B": {
           "status": "一部",
-          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。 4-2/0の艦隊をroute1へ切り替える設定隔離の負例のみ。route1の合法な正常配備の証拠ではない。",
+          "reason": "同じindexの有限在庫から対潜セットを実配備し、合法性・在庫上限・経路をC/Wで確認。全目標/全在庫/枠競合は未完。",
           "evidence": [
             "docs/asw-remaining-targets-ja.md",
-            "tests/owned-oasw-integration.spec.js"
+            "tests/owned-oasw-integration.spec.js",
+            "docs/pr152-four-two-routes-ja.md",
+            "tests/four-two-routes.test.cjs",
+            "tests/four-two-placement.test.cjs",
+            "tests/route-four-two-routes.spec.js"
           ]
         },
         "C": {
           "status": "一部",
-          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。 4-2/0の艦隊をroute1へ切り替える設定隔離の負例のみ。route1の合法な正常配備の証拠ではない。",
+          "reason": "同じindexの未知入力/未知装備は未判定・安全中止・元編成不変をC/W確認。既存の人数設定隔離証拠を再利用。全不足/枠競合は未完。",
           "evidence": [
             "docs/asw-remaining-targets-ja.md",
-            "tests/owned-oasw-integration.spec.js"
+            "tests/owned-oasw-integration.spec.js",
+            "docs/pr152-four-two-routes-ja.md",
+            "tests/four-two-routes.test.cjs",
+            "tests/four-two-placement.test.cjs",
+            "tests/route-four-two-routes.spec.js"
           ]
         },
         "D": {
-          "status": "一部",
-          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。 4-2/0の艦隊をroute1へ切り替える設定隔離の負例のみ。route1の合法な正常配備の証拠ではない。",
+          "status": "確認済み",
+          "reason": "同じindexの成立例で保存→メモ編集→reload(load)→同一新文書complete後再探索/再表示とcustom保存文字列・同期元・他編成/海域・ID/metadata・計算/調達情報の直接保持をC/W各1回確認。index1未知は別に安全中止を確認。",
           "evidence": [
-            "docs/asw-remaining-targets-ja.md",
-            "tests/owned-oasw-integration.spec.js"
+            "docs/pr152-four-two-routes-ja.md",
+            "tests/route-four-two-routes.spec.js"
           ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "対潜既定1組の十分性/先制対潜人数、任意対空CI目標のマップ文字列判定による未接続、全戦闘目標数量根拠・全在庫/搭載不可/枠競合、対象外G/H分岐。始点A/Bランダムと既知load後非表示の原因未確定を維持。"
     },
     {
       "id": "4-3/0/default",
@@ -2461,53 +2481,51 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "4-1/0/default",
-    "baselineHead": "b5f706f75e50032bad8d1b8637f9e812ad88370f",
-    "condition": "CFDGJ/ABDGJ source-ordered C/D/F common conditions and random-start path differences",
-    "evidence": "docs/pr152-four-one-routes-ja.md",
-    "nodePrerequisitesPass": 269,
-    "sourceOracleMultisets": 12376,
+    "id": "4-2/0,1/default",
+    "baselineHead": "dc174887264bbc4e04a1099aeb27e7e4653be238",
+    "condition": "ACL/BDCL priorSS/SSV random exclusion; shared6hullconditions,16edgegraph,andnamedoptionalplacement",
+    "evidence": "docs/pr152-four-two-routes-ja.md",
+    "nodePrerequisitesPass": 280,
+    "sourceOracleComparisons": 24752,
     "local": {
-      "states": [
-        "ready",
-        "stock",
-        "unknown"
-      ],
+      "casesPerEngine": 4,
+      "firstPass": {
+        "chromium": 4,
+        "webkit": 4
+      },
       "retries": 0,
-      "firstBatchCases": 6,
-      "firstBatchPass": 2,
-      "firstBatchNewFixtureAssumptionFailures": 4,
-      "correctedBatchCases": 4,
-      "correctedBatchPass": 4,
-      "unknownSuccessReused": 2,
-      "productChangedForCorrection": false,
-      "limits": "First ready/stock failed at unsupported new AA assertions; preserved originals; corrected only those assumptions, not deadlines or productconditions"
+      "totalExecutions": 8,
+      "scenarios": [
+        "index0ready",
+        "index1ready",
+        "index0stock",
+        "index1unknown"
+      ],
+      "observer": "same2entries64/doc; allbothinstalled/drop0/fail0; nooperationblock"
     },
     "beforeCells": {
-      "confirmed": 5,
-      "partial": 116,
-      "unconfirmed": 115
-    },
-    "afterCells": {
       "confirmed": 6,
       "partial": 118,
       "unconfirmed": 112
     },
+    "afterCells": {
+      "confirmed": 8,
+      "partial": 116,
+      "unconfirmed": 112
+    },
     "changedCells": [
-      "B 未確認→一部",
-      "C 未確認→一部",
-      "D 未確認→確認済み"
+      "4-2/0 D 一部→確認済み",
+      "4-2/1 D 一部→確認済み"
     ],
-    "statusCellChanges": 3,
+    "statusCellChanges": 2,
     "normalSmokeSelection": {
-      "totalPerBrowser": 822,
-      "targetCasesPerBrowser": 3,
-      "selectedFile": "tests/route-four-one-routes.spec.js",
+      "totalPerBrowser": 826,
+      "targetCasesPerBrowser": 4,
       "browserLaunches": 0,
       "verifiedBeforeCI": true
     }
   },
-  "nextPriority": "4-2 ACL / BDCLの既存2例。共通分岐と軽巡/護衛条件、必要装備・具体的な搭載先の接続。今回追加調査・実装・実行なし。",
+  "nextPriority": "4-4/index0 AEIK。出典が認める重巡級2や正規空母0＋軽巡の経路を、現行の正規/装甲空母ちょうど2条件が除外する。B/C/D未確認を優先。4-3の既存担当艦セット証拠は再利用。Eの資料不一致は未判定を維持。",
   "previousSelected": {
     "id": "5-4/0/default",
     "condition": "M-to-P conditional scouting exemption only for no SS/SSV and confirmed fleet speed >=15; unknown is not exemption",
@@ -2684,6 +2702,53 @@
         "D 未確認→確認済み"
       ],
       "statusCellChanges": 3
+    },
+    {
+      "id": "4-1/0/default",
+      "baselineHead": "b5f706f75e50032bad8d1b8637f9e812ad88370f",
+      "condition": "CFDGJ/ABDGJ source-ordered C/D/F common conditions and random-start path differences",
+      "evidence": "docs/pr152-four-one-routes-ja.md",
+      "nodePrerequisitesPass": 269,
+      "sourceOracleMultisets": 12376,
+      "local": {
+        "states": [
+          "ready",
+          "stock",
+          "unknown"
+        ],
+        "retries": 0,
+        "firstBatchCases": 6,
+        "firstBatchPass": 2,
+        "firstBatchNewFixtureAssumptionFailures": 4,
+        "correctedBatchCases": 4,
+        "correctedBatchPass": 4,
+        "unknownSuccessReused": 2,
+        "productChangedForCorrection": false,
+        "limits": "First ready/stock failed at unsupported new AA assertions; preserved originals; corrected only those assumptions, not deadlines or productconditions"
+      },
+      "beforeCells": {
+        "confirmed": 5,
+        "partial": 116,
+        "unconfirmed": 115
+      },
+      "afterCells": {
+        "confirmed": 6,
+        "partial": 118,
+        "unconfirmed": 112
+      },
+      "changedCells": [
+        "B 未確認→一部",
+        "C 未確認→一部",
+        "D 未確認→確認済み"
+      ],
+      "statusCellChanges": 3,
+      "normalSmokeSelection": {
+        "totalPerBrowser": 822,
+        "targetCasesPerBrowser": 3,
+        "selectedFile": "tests/route-four-one-routes.spec.js",
+        "browserLaunches": 0,
+        "verifiedBeforeCI": true
+      }
     }
   ],
   "fiveFourCloseout": {
@@ -2713,5 +2778,18 @@
       "sameCause": "unknown",
       "newLocalThreeFourReproduction": false
     }
+  },
+  "continuationPolicy": {
+    "source": "https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/pull/152#issuecomment-6463228430",
+    "record": "docs/pr152-continuation-policy-ja.md",
+    "requiresPerMapPermission": false,
+    "stopOn": [
+      "new data loss",
+      "clear regression",
+      "environment or permission blocker",
+      "specification change needing user decision"
+    ],
+    "activeUnit": "4-2 ACL / BDCL",
+    "nextUnit": "4-4 AEIK"
   }
 }
