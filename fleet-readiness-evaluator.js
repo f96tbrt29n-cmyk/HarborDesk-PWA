@@ -419,7 +419,7 @@ function hdFEInferRoute(plan){
 function hdFEBranchPredicate(condition,ships,plan=null){
  const manual=detail=>({status:'manual',ratio:0,detail});
  if(!condition||typeof condition!=='object')return manual('分岐条件が未登録');
- const fields={always:[],unverified:[],fleetCount:['min','max'],typeCount:['types','min','max','matchPolicy'],minSpeed:['rank'],slowBattleshipCount:['min','max'],speedCount:['rank','min','max'],namedCount:['names','min','max','matchPolicy'],flagshipType:['types'],equipmentShips:['match','min','max','slotPolicy'],scoutingValue:['min','coef'],airValue:['min']};
+ const fields={always:[],unverified:[],fleetCount:['min','max'],typeCount:['types','min','max','matchPolicy','excludeMasterNames'],minSpeed:['rank'],slowBattleshipCount:['min','max'],speedCount:['rank','min','max'],namedCount:['names','min','max','matchPolicy'],flagshipType:['types'],equipmentShips:['match','min','max','slotPolicy'],scoutingValue:['min','coef'],airValue:['min']};
  const groups=['all','any','not'].filter(k=>Object.prototype.hasOwnProperty.call(condition,k)),supported=['kind','reason','state','source','sources','checkedAt',...groups,...(Array.isArray(fields[condition.kind])?fields[condition.kind]:[])];
  const extra=Object.keys(condition).filter(k=>!supported.includes(k));
  if(extra.length||groups.length>1||groups.length&&condition.kind||condition.state&&condition.state!=='verified')return manual('未対応・未確認の分岐条件：'+(extra.join('、')||condition.state||'条件式'));
@@ -478,6 +478,19 @@ function hdFEBranchPredicate(condition,ships,plan=null){
  const {min,max}=condition;if(!Number.isInteger(min)||!Number.isInteger(max)||min<0||max<min||max>7)return manual('隻数条件が不明です');
  const exactTypes=['駆逐艦','海防艦','軽巡洋艦','重雷装巡洋艦','重巡洋艦','航空巡洋艦','戦艦','高速戦艦','航空戦艦','軽空母','正規空母','装甲空母','潜水艦','潜水空母','水上機母艦','揚陸艦','潜水母艦','練習巡洋艦','補給艦','工作艦'];
  if(condition.kind==='typeCount'&&(condition.matchPolicy&&condition.matchPolicy!=='exact'||!Array.isArray(condition.types)||!condition.types.length||condition.types.some(x=>typeof x!=='string'||(condition.matchPolicy==='exact'?!exactTypes.includes(x):!Object.prototype.hasOwnProperty.call(HD_FS_TYPE_ALIASES,x)||!Array.isArray(HD_FS_TYPE_ALIASES[x])))))return manual('艦種条件が未登録');
+ if(Object.prototype.hasOwnProperty.call(condition,'excludeMasterNames')){
+  const names=condition.excludeMasterNames;
+  if(condition.kind!=='typeCount'||condition.matchPolicy!=='exact'||!Array.isArray(names)||!names.length||new Set(names).size!==names.length||names.some(x=>typeof x!=='string'||!x.trim()||x.trim()!==x))return manual('除外する完全マスター名の条件が不明です');
+  let count=0,unknown=0;
+  for(const row of ships){
+   if(!row.typeKnown){unknown++;continue}if(!condition.types.includes(row.type))continue;
+   const master=typeof hdShipDbMasterRowFor==='function'?hdShipDbMasterRowFor({name:row.ship.ship,masterId:row.ship.masterId}):null;
+   if(!master||String(master.name||'')!==String(row.ship.ship||'')||master.type!==row.type){unknown++;continue}
+   if(!names.includes(master.name))count++;
+  }
+  const status=count>max||count+unknown<min?'missing':unknown?'manual':'ready',gap=Math.max(0,min-count),excess=Math.max(0,count-max),label=names.join('・')+'以外の'+condition.types.join('＋');
+  return {status,count,min,max,gap,excess,ratio:status==='ready'?1:unknown?0:count>max?Math.max(0,1-(count-max)/Math.max(1,count)):Math.min(1,count/Math.max(1,min)),detail:`${label} ${count}${unknown?'＋未判定'+unknown:''}隻 / 条件 ${min===max?min:min+'〜'+max}隻${gap&&!unknown?'（あと'+gap+'隻）':''}${excess?'（'+excess+'隻超過）':''}`};
+ }
  const known=ships.filter(x=>x.typeKnown),unknown=condition.kind==='fleetCount'?0:ships.length-known.length;
  const count=condition.kind==='fleetCount'?ships.length:known.filter(x=>condition.matchPolicy==='exact'?condition.types.includes(x.type):condition.types.some(token=>hdFSTypeMatches({type:x.type,roles:[],tags:[],row:{name:x.ship.ship}},token))).length;
  const status=count>max||count+unknown<min?'missing':unknown?'manual':'ready',gap=Math.max(0,min-count),excess=Math.max(0,count-max),label=condition.kind==='fleetCount'?'編成':condition.types.join('＋');
@@ -562,7 +575,11 @@ function hdFERouteBasic(plan){
 }
 function hdFERoute(plan){
  const basic=hdFERouteBasic(plan),branch=hdFEBranchRoute(plan);
- if(!branch.available){const contract=hdFERouteContract(plan);if(!contract)return {...basic,branch};const info=plan?.suggestion?.info||plan?.routeInfo,flagshipBad=!hdFERouteFlagshipOk(hdFERouteShips(plan),info),general=contract.data.useExampleScope===false,canonical=hdFSPresetInfo(MAP_PLANS[plan.map].presets[contract.data.index]),customInfo=plan.routeInfo&&['requirements','total','conditionManual','speedRequired','flagship'].some(k=>JSON.stringify(plan.routeInfo[k])!==JSON.stringify(canonical[k]));const status=flagshipBad||contract.status==='missing'||customInfo&&basic.status==='missing'?'missing':contract.status!=='ready'||customInfo&&basic.status==='manual'?'manual':general?'ready':basic.status==='ready'?'ready':'manual';return {...basic,branch,contract,status,requirements:general&&!customInfo?[]:basic.requirements,detail:(customInfo?basic.detail+' / ':general?'':basic.status==='missing'?'編成例の登録範囲外。別例の分岐は未判定。 / ':basic.detail+' / ')+(flagshipBad?'旗艦条件未充足。 / ':'')+contract.detail};}
+ if(!branch.available){const contract=hdFERouteContract(plan);if(!contract)return {...basic,branch};
+  const info=plan?.suggestion?.info||plan?.routeInfo,general=contract.data.useExampleScope===false,canonical=hdFSPresetInfo(MAP_PLANS[plan.map].presets[contract.data.index]),conditionalExample=contract.data.map==='6-4'&&contract.data.index===0&&contract.data.useExampleFlagshipScope===false,keys=['text','requirements','total','conditionManual','speedRequired','flagship'];
+  const customInfo=plan.routeInfo&&['requirements','total','conditionManual','speedRequired','flagship'].some(k=>JSON.stringify(plan.routeInfo[k])!==JSON.stringify(canonical[k]))||conditionalExample&&info&&keys.some(k=>JSON.stringify(info[k])!==JSON.stringify(canonical[k]));
+  const exampleFlagship=conditionalExample&&general&&!customInfo&&info&&keys.every(k=>JSON.stringify(info[k])===JSON.stringify(canonical[k])),flagshipBad=!exampleFlagship&&!hdFERouteFlagshipOk(hdFERouteShips(plan),info);
+  const status=flagshipBad||contract.status==='missing'||customInfo&&basic.status==='missing'?'missing':contract.status!=='ready'||customInfo&&basic.status==='manual'?'manual':general?'ready':basic.status==='ready'?'ready':'manual';return {...basic,branch,contract,status,requirements:general&&!customInfo?[]:basic.requirements,detail:(customInfo?basic.detail+' / ':general?'':basic.status==='missing'?'編成例の登録範囲外。別例の分岐は未判定。 / ':basic.detail+' / ')+(flagshipBad?'旗艦条件未充足。 / ':'')+contract.detail};}
  const info=plan?.suggestion?.info||plan?.routeInfo;
  // The canonical preset is an example; verified AE alternatives need not contain
  // a light cruiser. Explicit quest/flagship constraints remain in force.

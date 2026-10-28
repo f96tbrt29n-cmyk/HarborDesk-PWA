@@ -81,10 +81,19 @@ test('4-5 fast-plus route and coefficient2 scouting71 route never inherit each o
   const b=hdOCRequiredChecks(long);return {shortSpeed:a.find(x=>x.condition.kind==='minSpeed'),shortLos:a.some(x=>x.condition.kind==='scoutingValue'),longSpeed:b.some(x=>x.condition.kind==='minSpeed'),longLos:b.find(x=>x.condition.kind==='scoutingValue')?.condition};
  });expect(r.shortSpeed).toMatchObject({status:'ready',condition:{rank:15}});expect(r.shortLos).toBe(false);expect(r.longSpeed).toBe(false);expect(r.longLos).toMatchObject({coef:2,min:71});
 });
-test('6-4 light cruiser flagship remains independently protected when the route still has other unmet goals',async({page})=>{
+test('6-4 DD3 keeps its light cruiser flagship while DD4 has an independently connected alternative',async({page})=>{
  await prepare(page,'6-4',0,['矢矧改二','金剛改二','鈴谷改二','時雨改二','夕立改二','綾波改二']);
- const r=await page.evaluate(()=>{const p=boundaryPlan,q=hdFOClone(p);[q.ships[0],q.ships[1]]=[q.ships[1],q.ships[0]];return {before:hdOCRequiredChecks(p).find(x=>x.condition.kind==='flagshipType').status,after:hdOCRequiredChecks(q).find(x=>x.condition.kind==='flagshipType').status,lost:hdOCGoalRegressions(hdOCMeasure(p,[]),hdOCMeasure(q,[])).filter(x=>x.condition?.kind==='flagshipType').length};});
- expect(r).toEqual({before:'ready',after:'missing',lost:1});
+ const r=await page.evaluate(()=>{
+  // Independent source condition: DD4, or ordinary CL flagship with DD3.
+  // Only the display reason is omitted; every behavioral field/array remains.
+  const count=min=>({kind:'typeCount',types:['駆逐艦'],matchPolicy:'exact',min,max:7}),expected={any:[count(4),{all:[{kind:'flagshipType',types:['軽巡洋艦']},count(3)]}]};
+  const canonical=x=>Array.isArray(x)?x.map(canonical):x&&typeof x==='object'?Object.fromEntries(Object.keys(x).filter(k=>k!=='reason').sort().map(k=>[k,canonical(x[k])])):x,key=JSON.stringify(canonical(expected)),same=c=>JSON.stringify(canonical(c))===key;
+  const connected=p=>{const row=hdOCRequiredChecks(p).find(x=>same(x.condition));if(!row)throw Error('Expected DD4 or CL-flagship/DD3 condition is not connected');return row};
+  const p=boundaryPlan,q=hdFOClone(p);[q.ships[0],q.ships[1]]=[q.ships[1],q.ships[0]];
+  const four=hdFOClone(p);four.ships[0].ship='島風改';four.ships[0].masterId=hdShipDbMasterRowFor({name:'島風改'}).id;[four.ships[0],four.ships[1]]=[four.ships[1],four.ships[0]];
+  return {connected:!!connected(p),before:connected(p).status,after:connected(q).status,lost:hdOCGoalRegressions(hdOCMeasure(p,[]),hdOCMeasure(q,[])).filter(x=>same(x.condition)).length,fourDD:connected(four).status};
+ });
+ expect(r).toEqual({connected:true,before:'ready',after:'missing',lost:1,fourDD:'ready'});
 });
 test('7-3 second route checks each historical hull and rejects replacing only Ashigara',async({page})=>{
  await prepare(page,'7-3',1,['羽黒改二','足柄改二','神風改','時雨改二','夕立改二','綾波改二']);
