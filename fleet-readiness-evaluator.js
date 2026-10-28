@@ -543,7 +543,7 @@ function hdFERouteContract(plan){
  const data=hdFERouteRequirementData(plan);if(!data||data.engine==='verified-graph')return null;
  const ships=hdFERouteShips(plan),checks=data.conditions.map(condition=>{const check=hdFEBranchPredicate(condition,ships,plan);return {condition,...check,detail:condition.reason&&!check.detail.startsWith(condition.reason)?condition.reason+'：'+check.detail:check.detail}});
  if(ships.some(s=>!s.typeKnown))checks.push({condition:{kind:'unverified'},status:'manual',ratio:0,detail:'艦娘の艦種データが未登録のため、この経路の条件は未判定。'});
- if(data.los.kind==='required'){const numeric={kind:'scoutingValue',min:data.los.checks[0].safe,coef:data.los.coef},condition=data.los.exemptWhen?{any:[data.los.exemptWhen,numeric],reason:data.los.exemptNote}:numeric;checks.push({condition,...hdFEBranchPredicate(condition,ships,plan)});}
+ if(data.los.kind==='required'){const numeric={kind:'scoutingValue',min:data.los.checks[0].safe,coef:data.los.coef},condition=data.los.exemptWhen?{any:[data.los.exemptWhen,numeric],reason:data.los.exemptNote}:numeric;const check=hdFEBranchPredicate(condition,ships,plan);checks.push({condition,...check,...(data.los.exemptWhen&&check.children?.[0]?.status==='ready'?{detail:`${data.path}：索敵条件は非適用。${data.los.exemptNote}`}:{})});}
  if(data.scopeIncomplete){const reason=data.scopeIncompleteReason||'出典または分岐の網羅が検証中。成立保証は出しません。';checks.push({condition:{kind:'unverified',reason},status:'manual',ratio:0,detail:reason});}
  const status=checks.some(x=>x.status==='missing')?'missing':checks.every(x=>x.status==='ready')?'ready':'manual';
  return {data,checks,status,detail:`${data.path}：${checks.map(x=>x.detail).join(' / ')}${data.routing==='random'?'。羅針盤の逸れあり・ボス到達は未保証':data.routing==='multiple'?'。経由するマスは複数':''}`};

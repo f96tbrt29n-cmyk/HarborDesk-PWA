@@ -1598,7 +1598,7 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。 D→Eの元の低速戦艦1隻以下を出典2件と独立対照で接続。全分岐/推奨数量の網羅は未完。 D→Eの最優先の潜水艦・潜水空母なしを接続。潜水母艦は非該当と出典の艦種定義も照合。全分岐/推奨数量は未完。 M→Pの潜水艦なし・高速＋以上統一時の索敵免除を出典と独立Node対照で接続。速度未判定・数値成立/不足を区別。免除対象のブラウザー操作は結果待ち失敗で未完。",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。 D→Eの元の低速戦艦1隻以下を出典2件と独立対照で接続。全分岐/推奨数量の網羅は未完。 D→Eの最優先の潜水艦・潜水空母なしを接続。潜水母艦は非該当と出典の艦種定義も照合。全分岐/推奨数量は未完。 M→Pの潜水艦なし・高速＋以上統一時の索敵免除を出典と独立Node対照で接続。速度未判定・数値成立/不足を区別。免除対象のブラウザー操作は結果待ち失敗で未完。 2026-10-28追補：固定入力の残存推奨による探索継続を限定計測で確認し、当該経路だけ終了理由を追加。免除の三値判定や未完了は保持。全数量/全分岐の確認済みへは進めない。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
@@ -1608,47 +1608,55 @@
             "tests/route-complex-boundaries.spec.js",
             "docs/pr152-five-four-submarine-ja.md",
             "docs/pr152-five-four-scouting-exemption-ja.md",
-            "tests/five-four-scouting-exemption.test.cjs"
+            "tests/five-four-scouting-exemption.test.cjs",
+            "docs/pr152-five-four-completion-ja.md",
+            "tests/five-four-fixed-input.test.cjs"
           ]
         },
         "B": {
           "status": "一部",
-          "reason": "C/W各初回で不足していた35.6cm砲を手持ちから配備。元艦種・有限在庫・合法性保持を確認。全装備目標/推奨数量の網羅ではない。 追加C/W各5初回で手持ち砲の配備後も潜水艦除外の成立/不一致/未判定と艦種を保持。 M→Pの免除対象外/情報不足のC3/W2成功で砲の実配備と有限在庫/合法性を確認。免除対象は両engineで結果採取未到達。",
+          "reason": "C/W各初回で不足していた35.6cm砲を手持ちから配備。元艦種・有限在庫・合法性保持を確認。全装備目標/推奨数量の網羅ではない。 追加C/W各5初回で手持ち砲の配備後も潜水艦除外の成立/不一致/未判定と艦種を保持。 M→Pの免除対象外/情報不足のC3/W2成功で砲の実配備と有限在庫/合法性を確認。免除対象は両engineで結果採取未到達。 2026-10-28追補：免除案C/W各1回の製品検証で実配備・結果表示を確認。情報不足C/W成功も再利用。全在庫組合せの保証ではない。",
           "evidence": [
             "docs/pr152-five-four-battleship-ja.md",
             "tests/five-four-battleship.test.cjs",
             "tests/route-complex-boundaries.spec.js",
             "docs/pr152-five-four-submarine-ja.md",
             "docs/pr152-five-four-scouting-exemption-ja.md",
-            "tests/five-four-scouting-exemption.test.cjs"
+            "tests/five-four-scouting-exemption.test.cjs",
+            "docs/pr152-five-four-completion-ja.md",
+            "tests/five-four-fixed-input.test.cjs"
           ]
         },
         "C": {
           "status": "一部",
-          "reason": "元の低速戦艦2/上限1の確定超過と、既知1＋未知1のmanualを区別。艦種不一致を装備購入へ送らず、F経由を到達不可能としない。全装備・全不足区分は未網羅。 追加C/W各5初回でSS/SSVの確定超過、潜水母艦の非該当、未知艦のみのmanual、既知SS＋未知の確定不一致を区別。購入不足へ変換しない。 免除の索敵目標/加点/案内除外はNode確認。UIは通常索敵成立/不足/情報不足を確認した範囲だけ追加し、免除対象UIは未到達。",
+          "reason": "元の低速戦艦2/上限1の確定超過と、既知1＋未知1のmanualを区別。艦種不一致を装備購入へ送らず、F経由を到達不可能としない。全装備・全不足区分は未網羅。 追加C/W各5初回でSS/SSVの確定超過、潜水母艦の非該当、未知艦のみのmanual、既知SS＋未知の確定不一致を区別。購入不足へ変換しない。 免除の索敵目標/加点/案内除外はNode確認。UIは通常索敵成立/不足/情報不足を確認した範囲だけ追加し、免除対象UIは未到達。 2026-10-28追補：免除案のUIで索敵非適用と不要な数値枝同期警告の除外を確認。固定した推奨在庫不足/情報不足は未完了で表示し、購入必須・手持ち不可能とはしない。",
           "evidence": [
             "docs/pr152-five-four-battleship-ja.md",
             "tests/five-four-battleship.test.cjs",
             "tests/route-complex-boundaries.spec.js",
             "docs/pr152-five-four-submarine-ja.md",
             "docs/pr152-five-four-scouting-exemption-ja.md",
-            "tests/five-four-scouting-exemption.test.cjs"
+            "tests/five-four-scouting-exemption.test.cjs",
+            "docs/pr152-five-four-completion-ja.md",
+            "tests/five-four-fixed-input.test.cjs"
           ]
         },
         "D": {
           "status": "確認済み",
-          "reason": "同じ行の3代表をC/W各初回で確認。保存可能案のメモ編集、未知艦案の安全中止、同一文書load/complete後再探索、直接保存文字列一致、他編成/metadata保持。 追加5代表もC/W各初回で保存/安全中止・編集・同一文書load/complete後再探索・直接保存一致・他編成metadata保持を確認。 新規4対象はC3/W2で保存/安全中止・編集・同一文書load/完全一致を確認。免除対象C/Wと不足対象Wは後段未到達。従来代表操作の確認を新条件全成功へ拡張しない。",
+          "reason": "同じ行の3代表をC/W各初回で確認。保存可能案のメモ編集、未知艦案の安全中止、同一文書load/complete後再探索、直接保存文字列一致、他編成/metadata保持。 追加5代表もC/W各初回で保存/安全中止・編集・同一文書load/complete後再探索・直接保存一致・他編成metadata保持を確認。 新規4対象はC3/W2で保存/安全中止・編集・同一文書load/完全一致を確認。免除対象C/Wと不足対象Wは後段未到達。従来代表操作の確認を新条件全成功へ拡張しない。 2026-10-28追補：免除案C/W各1回で保存→編集→同一文書load/complete後再探索・再表示、直接保存文字列一致・他編成metadata保持まで成功。情報不足C/Wの安全中止/同一文書load後一致も確認。旧失敗原本はそのまま保持。",
           "evidence": [
             "docs/pr152-five-four-battleship-ja.md",
             "tests/five-four-battleship.test.cjs",
             "tests/route-complex-boundaries.spec.js",
             "docs/pr152-five-four-submarine-ja.md",
             "docs/pr152-five-four-scouting-exemption-ja.md",
-            "tests/five-four-scouting-exemption.test.cjs"
+            "tests/five-four-scouting-exemption.test.cjs",
+            "docs/pr152-five-four-completion-ja.md",
+            "tests/five-four-fixed-input.test.cjs"
           ]
         }
       },
-      "remaining": "M→P免除のコード/Node契約は接続済み。免除対象の初回結果表示・後段操作、W不足対象のload後再探索は未到達。他分岐/全数量根拠/全装備・搭載/枠競合は未完。"
+      "remaining": "固定登録例の免除案と情報不足案の結果表示・保存/安全中止・編集・同一文書load後再表示は新ソースで確認。全分岐/全数量根拠/全在庫・搭載/枠競合と実ゲーム到達は未完。既存画面切替・通信失敗の原因は未確定。"
     },
     {
       "id": "5-5/0/default",
@@ -2402,6 +2410,50 @@
   ],
   "selected": {
     "id": "5-4/0/default",
+    "baselineHead": "f553563085f55b5023f37d7d180eb47797225168",
+    "condition": "5-4 central fixed-input search termination and inactive scouting branch guidance",
+    "newEvidence": "docs/pr152-five-four-completion-ja.md",
+    "boundedDiagnostic": {
+      "browser": "webkit",
+      "condition": "exempt",
+      "attempts": 1,
+      "retries": 0,
+      "result": "failure; search still running before result deadline",
+      "drop": 0,
+      "collectionFailures": 0
+    },
+    "productValidation": {
+      "finalExempt": {
+        "chromium": "initial pass",
+        "webkit": "initial pass"
+      },
+      "unknown": {
+        "chromium": "initial pass reused",
+        "webkit": "initial pass reused"
+      },
+      "intermediateExempt": {
+        "chromium": "guidance assertion failure preserved",
+        "webkit": "guidance assertion failure preserved"
+      },
+      "retries": 0
+    },
+    "nodePrerequisites": {
+      "pass": 227,
+      "fail": 0
+    },
+    "statusCellChanges": 0,
+    "normalSmokeSelection": {
+      "totalPerBrowser": 812,
+      "targetCasesPerBrowser": 4,
+      "selectedFile": "tests/route-complex-boundaries.spec.js",
+      "listOnlyBrowserExecutions": 0,
+      "verifiedBeforeCIDispatch": true
+    },
+    "limits": "limited completion of fixed example; old CI failure causes and missing originals remain unresolved"
+  },
+  "nextPriority": "別海域への拡張は保留。5-4中央の残る全推奨数量・在庫/搭載/枠競合の根拠確認は次作業の候補。今回の固定登録例の限定操作完了を全条件完了へ広げない。",
+  "previousSelected": {
+    "id": "5-4/0/default",
     "condition": "M-to-P conditional scouting exemption only for no SS/SSV and confirmed fleet speed >=15; unknown is not exemption",
     "localBrowserCasesPerEngine": 4,
     "localInitialPass": {
@@ -2446,6 +2498,5 @@
       "retries": 0,
       "otherRowsOrAswAssertionsRelaxed": false
     }
-  },
-  "nextPriority": "5-4 M→P免除対象の12秒結果待ち失敗：既存原本から探索完了と結果反映の未到達を区別する。追加計測・反復は今回行わない。"
+  }
 }

@@ -25,6 +25,7 @@ test('5-4 M-to-P source-independent exempt and nonexempt speed boundaries',()=>{
   assert.equal(JSON.stringify(p),before);
  }
 });
+test('exempt route detail omits the inactive numeric branch sync warning',()=>{const c=context(),p=plan(fleet());c.hdFEGameMatch=()=>({status:'manual'});const r=c.hdFERouteContract(p);assert.equal(r.status,'ready');assert.match(r.detail,/索敵条件は非適用/);assert.doesNotMatch(r.detail,/ボーナス.*未確認/);});
 test('exemption needs confirmed valid speed and never ignores a known nonexempt hull',()=>{
  const c=context();for(const fault of ['unknown','invalid','expansion','item']){const rows=fleet(),r=rows[0];if(fault==='unknown')r.speedInfo.known=false;if(fault==='invalid')r.speedInfo.invalid=['invalid slot'];if(fault==='expansion')r.speedInfo.expansionUnconfirmed=true;if(fault==='item'){r.ship.items=[{name:'unregistered'}];c.hdFEFind=n=>n==='unregistered'?null:{};}const s=c.hdFEPlanScouting(plan(rows),[]);assert.equal(s.notRequired===true,false);assert.equal(s.status,'manual');assert.equal(c.hdFERouteContract(plan(rows)).status,'manual');}
  const mixed=fleet();mixed[0].speedInfo.known=false;mixed[1].speedInfo.rank=10;assert.equal(c.hdFERouteContract(plan(mixed)).status,'missing');
