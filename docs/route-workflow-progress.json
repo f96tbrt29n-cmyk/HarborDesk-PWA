@@ -62,20 +62,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 22,
-      "未確認": 37,
+      "一部": 23,
+      "未確認": 36,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 22,
-      "未確認": 37,
+      "一部": 23,
+      "未確認": 36,
       "非該当": 0
     },
     "D": {
-      "確認済み": 8,
+      "確認済み": 9,
       "一部": 16,
-      "未確認": 35,
+      "未確認": 34,
       "非該当": 0
     }
   },
@@ -1400,30 +1400,48 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "reason": "S/E/I優先順・Iの独立した3代替とCA/CAVちょうど2を照合。DE資料差と結果へ影響する揚陸艦分類は未判定。全戦闘目標数量根拠は未完。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/route-goal-guidance-audit.json",
+            "docs/pr152-four-four-aeik-ja.md",
+            "tests/four-four-routes.test.cjs",
+            "tests/four-four-graph.test.cjs"
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じindexのCAV2非空母案で有限在庫の水戦2・AA1を保ちASW0→1を自動補完、合法性と在庫上限をC/W各1回確認。全目標/在庫/枠競合は未完。",
+          "evidence": [
+            "docs/pr152-four-four-aeik-ja.md",
+            "tests/four-four-routes.test.cjs",
+            "tests/four-four-graph.test.cjs",
+            "tests/four-four-placement.test.cjs",
+            "tests/route-four-four-aeik.spec.js"
+          ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じindexの在庫0で空母各1機・ASW同艦別枠1組の候補/名称/数量、未知の安全中止・DE未判定・既知不一致をC/W代表で確認。全失敗区分は未完。",
+          "evidence": [
+            "docs/pr152-four-four-aeik-ja.md",
+            "tests/four-four-routes.test.cjs",
+            "tests/four-four-graph.test.cjs",
+            "tests/four-four-placement.test.cjs",
+            "tests/route-four-four-aeik.spec.js"
+          ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "確認済み",
+          "reason": "同じindexの成立/在庫不足案で保存→メモ編集→reload(load)→同一新文書complete後再探索/再表示とcustom保存文字列・同期元・他編成/海域・ID/metadata・計算/調達情報をC/W直接一致。未知は編集なし安全中止と元保存値保持を確認。",
+          "evidence": [
+            "docs/pr152-four-four-aeik-ja.md",
+            "tests/route-four-four-aeik.spec.js"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "Eの海防艦条件の優先順差、結果へ影響する揚陸艦分類、全戦闘目標の数量/十分人数根拠・全在庫/搭載不可/枠競合、対象外B/F/G条件。共通load後非表示原因は未確定。"
     },
     {
       "id": "4-5/0/default",
@@ -2481,51 +2499,59 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "4-2/0,1/default",
-    "baselineHead": "dc174887264bbc4e04a1099aeb27e7e4653be238",
-    "condition": "ACL/BDCL priorSS/SSV random exclusion; shared6hullconditions,16edgegraph,andnamedoptionalplacement",
-    "evidence": "docs/pr152-four-two-routes-ja.md",
-    "nodePrerequisitesPass": 280,
-    "sourceOracleComparisons": 24752,
+    "id": "4-4/0/default",
+    "baselineHead": "2f2b78d4ebd63b9dd4e999635fc35cfc76985d95",
+    "condition": "AEIK alternateIconditions/source-disputedDEpriority andconsequentialLHAclassification,17edgeguide,namedownedplacement",
+    "evidence": "docs/pr152-four-four-aeik-ja.md",
+    "nodePrerequisitesPass": 291,
+    "sourceCases": 56,
+    "sourceBaselineMatches": 23,
+    "sourceAfterMatches": 56,
+    "independentMultisets": 18564,
+    "independentDifferences": 0,
     "local": {
-      "casesPerEngine": 4,
+      "casesPerEngine": 3,
       "firstPass": {
-        "chromium": 4,
-        "webkit": 4
+        "chromium": 3,
+        "webkit": 3
       },
       "retries": 0,
-      "totalExecutions": 8,
-      "scenarios": [
-        "index0ready",
-        "index1ready",
-        "index0stock",
-        "index1unknown"
+      "totalExecutions": 6,
+      "states": [
+        "ready",
+        "stock",
+        "unknown"
       ],
-      "observer": "same2entries64/doc; allbothinstalled/drop0/fail0; nooperationblock"
+      "searchEvaluationsReady": [
+        55,
+        0
+      ],
+      "observer": "bothdocumentsinstalled/drop0/fail0/finalnavvisible; knownoldfailuresnotresolved"
     },
     "beforeCells": {
-      "confirmed": 6,
-      "partial": 118,
-      "unconfirmed": 112
-    },
-    "afterCells": {
       "confirmed": 8,
       "partial": 116,
       "unconfirmed": 112
     },
+    "afterCells": {
+      "confirmed": 9,
+      "partial": 118,
+      "unconfirmed": 109
+    },
     "changedCells": [
-      "4-2/0 D 一部→確認済み",
-      "4-2/1 D 一部→確認済み"
+      "4-4 B 未確認→一部",
+      "4-4 C 未確認→一部",
+      "4-4 D 未確認→確認済み"
     ],
-    "statusCellChanges": 2,
+    "statusCellChanges": 3,
     "normalSmokeSelection": {
-      "totalPerBrowser": 826,
-      "targetCasesPerBrowser": 4,
+      "totalPerBrowser": 829,
+      "targetCasesPerBrowser": 3,
       "browserLaunches": 0,
       "verifiedBeforeCI": true
     }
   },
-  "nextPriority": "4-4/index0 AEIK。出典が認める重巡級2や正規空母0＋軽巡の経路を、現行の正規/装甲空母ちょうど2条件が除外する。B/C/D未確認を優先。4-3の既存担当艦セット証拠は再利用。Eの資料不一致は未判定を維持。",
+  "nextPriority": "4-5/index1 ADHKT / CDHKT。KのSS/SSVランダム逸れが索敵判定より先、H高速＋等によるT直行がK経由と異なる点を現行契約が接続していない。既存4-5/0・2と担当艦セット証拠を再利用し、実際の旧判定対照を先に確認。5-1のCL過剰制限は次点。",
   "previousSelected": {
     "id": "5-4/0/default",
     "condition": "M-to-P conditional scouting exemption only for no SS/SSV and confirmed fleet speed >=15; unknown is not exemption",
@@ -2749,6 +2775,51 @@
         "browserLaunches": 0,
         "verifiedBeforeCI": true
       }
+    },
+    {
+      "id": "4-2/0,1/default",
+      "baselineHead": "dc174887264bbc4e04a1099aeb27e7e4653be238",
+      "condition": "ACL/BDCL priorSS/SSV random exclusion; shared6hullconditions,16edgegraph,andnamedoptionalplacement",
+      "evidence": "docs/pr152-four-two-routes-ja.md",
+      "nodePrerequisitesPass": 280,
+      "sourceOracleComparisons": 24752,
+      "local": {
+        "casesPerEngine": 4,
+        "firstPass": {
+          "chromium": 4,
+          "webkit": 4
+        },
+        "retries": 0,
+        "totalExecutions": 8,
+        "scenarios": [
+          "index0ready",
+          "index1ready",
+          "index0stock",
+          "index1unknown"
+        ],
+        "observer": "same2entries64/doc; allbothinstalled/drop0/fail0; nooperationblock"
+      },
+      "beforeCells": {
+        "confirmed": 6,
+        "partial": 118,
+        "unconfirmed": 112
+      },
+      "afterCells": {
+        "confirmed": 8,
+        "partial": 116,
+        "unconfirmed": 112
+      },
+      "changedCells": [
+        "4-2/0 D 一部→確認済み",
+        "4-2/1 D 一部→確認済み"
+      ],
+      "statusCellChanges": 2,
+      "normalSmokeSelection": {
+        "totalPerBrowser": 826,
+        "targetCasesPerBrowser": 4,
+        "browserLaunches": 0,
+        "verifiedBeforeCI": true
+      }
     }
   ],
   "fiveFourCloseout": {
@@ -2789,7 +2860,8 @@
       "environment or permission blocker",
       "specification change needing user decision"
     ],
-    "activeUnit": "4-2 ACL / BDCL",
-    "nextUnit": "4-4 AEIK"
+    "activeUnit": "4-4 AEIK",
+    "nextUnit": "4-5/index1 ADHKT / CDHKT",
+    "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved"
   }
 }

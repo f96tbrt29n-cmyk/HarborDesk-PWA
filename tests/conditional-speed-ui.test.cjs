@@ -16,6 +16,9 @@ require('./four-one-placement.test.cjs');
 require('./four-two-routes.test.cjs');
 require('./four-two-graph.test.cjs');
 require('./four-two-placement.test.cjs');
+require('./four-four-routes.test.cjs');
+require('./four-four-graph.test.cjs');
+require('./four-four-placement.test.cjs');
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 function load(file,name,c){const s=fs.readFileSync(path.join(__dirname,'..',file),'utf8'),start=s.indexOf('function '+name+'('),end=s.indexOf('\nfunction ',start+1);assert.ok(start>=0);vm.runInNewContext(s.slice(start,end<0?undefined:end),c);return c[name]}
 function routes(){const c=vm.createContext({window:{}});vm.runInContext(fs.readFileSync(path.join(__dirname,'../map-plans.js'),'utf8'),c);return vm.runInContext('({maps:MAP_PLANS,rules:HD_MAP_ROUTE_REQUIREMENTS})',c)}

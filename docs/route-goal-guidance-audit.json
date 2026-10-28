@@ -3876,6 +3876,17 @@
         {
           "kind": "typeCount",
           "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 2,
+          "max": 7,
+          "reason": "S→A：駆逐＋海防2隻以上でA。1隻以下はA/Bランダムで、装備ではなく編成を見直す"
+        },
+        {
+          "kind": "typeCount",
+          "types": [
             "戦艦",
             "高速戦艦",
             "航空戦艦",
@@ -3884,26 +3895,8 @@
           ],
           "matchPolicy": "exact",
           "min": 0,
-          "max": 3
-        },
-        {
-          "kind": "typeCount",
-          "types": [
-            "駆逐艦",
-            "海防艦"
-          ],
-          "matchPolicy": "exact",
-          "min": 2,
-          "max": 7
-        },
-        {
-          "kind": "typeCount",
-          "types": [
-            "海防艦"
-          ],
-          "matchPolicy": "exact",
-          "min": 0,
-          "max": 2
+          "max": 3,
+          "reason": "E→I：戦艦級＋正規・装甲空母4隻以上は先にG。軽空母はこの合計に含めない"
         },
         {
           "kind": "typeCount",
@@ -3914,17 +3907,221 @@
           ],
           "matchPolicy": "exact",
           "min": 1,
-          "max": 7
+          "max": 7,
+          "reason": "E→I：軽巡または重巡・航巡1隻以上でI。軽巡は軽巡洋艦だけで、雷巡・練巡とは別。残るランダム分岐を固定Iとは扱わない"
         },
         {
-          "kind": "typeCount",
-          "types": [
-            "正規空母",
-            "装甲空母"
+          "any": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "海防艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 0,
+              "max": 1
+            },
+            {
+              "all": [
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "海防艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 2,
+                  "max": 2
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "補給艦",
+                    "潜水母艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 0,
+                  "max": 0
+                }
+              ]
+            },
+            {
+              "kind": "unverified",
+              "reason": "Eの海防3隻以上、または海防2隻＋補給艦/潜水母艦入りは、軽巡・重巡級より先にCとする出典と後にCとする出典が不一致。この範囲は未判定で、編成・出典を確認する"
+            }
           ],
-          "matchPolicy": "exact",
-          "min": 2,
-          "max": 2
+          "reason": "E→I：海防艦条件の優先順は出典不一致を残す"
+        },
+        {
+          "any": [
+            {
+              "all": [
+                {
+                  "any": [
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "正規空母",
+                        "装甲空母"
+                      ],
+                      "matchPolicy": "exact",
+                      "min": 2,
+                      "max": 2
+                    },
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "重巡洋艦",
+                        "航空巡洋艦"
+                      ],
+                      "matchPolicy": "exact",
+                      "min": 2,
+                      "max": 2
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "正規空母",
+                            "装甲空母"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 0
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "軽巡洋艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 1,
+                          "max": 7
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "any": [
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "揚陸艦"
+                      ],
+                      "matchPolicy": "exact",
+                      "min": 0,
+                      "max": 0
+                    },
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "重巡洋艦",
+                        "航空巡洋艦"
+                      ],
+                      "matchPolicy": "exact",
+                      "min": 2,
+                      "max": 2
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "揚陸艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 1,
+                  "max": 7
+                },
+                {
+                  "any": [
+                    {
+                      "any": [
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "正規空母",
+                            "装甲空母"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 2,
+                          "max": 2
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "重巡洋艦",
+                            "航空巡洋艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 2,
+                          "max": 2
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "正規空母",
+                                "装甲空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 0
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "軽巡洋艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 1,
+                              "max": 7
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "正規空母",
+                            "装甲空母"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 1
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "正規空母",
+                            "装甲空母",
+                            "揚陸艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 2,
+                          "max": 7
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "kind": "unverified",
+                  "reason": "揚陸艦を4-4の正規空母数へ算入するかは未確認。算入によってI→Kの成否が変わり得る場合は未判定を残す。重巡・航巡ちょうど2などで独立に決まる結果は保持する"
+                }
+              ]
+            }
+          ],
+          "reason": "I→K：駆逐・海防2以上に加え、正規・装甲空母ちょうど2、重巡・航巡ちょうど2、または正規・装甲空母0＋軽巡1以上のいずれか。他の編成はH/Kランダムなので編成見直しへ"
         }
       ],
       "scouting": {
@@ -3938,6 +4135,12 @@
         "夜戦"
       ],
       "notes": [
+        "始点は駆逐＋海防2隻以上でA、それ以外はA/Bランダム。A→Eは固定接続。この6隻登録範囲ではS→A、E→I、I→Kを順に確認する。",
+        "Eでは戦艦級＋正規/装甲空母4隻以上のGが先行する。その後の海防3以上・海防2＋補給/潜水母艦のCと、軽巡/重巡級のIの優先順は出典不一致のため該当範囲を未判定にする。既知の重量艦過多やI不一致はこの未判定で消さない。",
+        "I→Kは駆逐/海防2隻以上と、正規/装甲空母ちょうど2、重巡/航巡ちょうど2、正規/装甲空母0＋軽巡1以上のいずれか。正規空母2は元の編成例であり一律必須ではない。重巡級は2隻ちょうどで、3隻以上へ読み替えない。",
+        "軽巡は軽巡洋艦、重巡級は重巡＋航巡、正空は正規＋装甲空母。潜水艦と潜水空母は潜水母艦とは別。駆逐2＋重巡級2＋潜水艦系2のように前の条件でIとKが決まる編成へ、潜水艦一律除外を追加しない。",
+        "速力統一・数値索敵・電探/ドラム缶の装備艦数の一律通行必須指定はない。Eの対潜セット、ボスに混ざる潜水艦対策、制空と空母の攻撃機、対空・夜戦装備は戦闘上の推奨。先制対潜人数と制空値は利用者が別に選び、未選択・情報不足を未判定にする。",
+        "艦種・隻数は編成見直しへ、在庫不足・搭載不可・枠競合・情報不足・探索打切りは区別する。経路成立は勝利保証ではなく、探索未発見を手持ちでは不可能・購入必須・最適とは断定しない。",
         "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
       ],
       "requiredConnectionClass": "D",
@@ -3981,11 +4184,13 @@
         },
         "推奨セット": {
           "class": "C",
-          "detail": "cap-aa1組（既定目安）、cap-asw1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、制空2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "detail": "対潜1組/AA1組/制空装備2は既存の戦闘目安。実編成のASW補完と、各空母の攻撃機1機・同艦ソナー1＋投射機1の名称/数量/合法通常枠を接続。複数艦は同じ1組の代替候補。",
           "evidence": [
-            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+            "docs/pr152-four-four-aeik-ja.md",
+            "tests/four-four-placement.test.cjs",
+            "tests/route-four-four-aeik.spec.js"
           ],
-          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+          "limit": "既定組数/装備個数の十分性・先制対潜人数、全在庫/搭載不可/枠競合は未完。非空母案のCLによるASWセットはゲーム側のDD/DE推奨人数の保証ではない。"
         }
       },
       "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
