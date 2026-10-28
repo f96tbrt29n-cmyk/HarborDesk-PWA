@@ -73,8 +73,8 @@
       "非該当": 0
     },
     "D": {
-      "確認済み": 3,
-      "一部": 19,
+      "確認済み": 4,
+      "一部": 18,
       "未確認": 37,
       "非該当": 0
     }
@@ -644,42 +644,54 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。 F→Jの低速優先と、上位Eを除いた戦艦級3隻の例外を出典の具体的優先表から接続。全目標数量の根拠は未網羅。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/route-goal-guidance-audit.json",
+            "docs/pr152-two-five-north-f-ja.md",
+            "tests/two-five-north-f.test.cjs",
+            "tests/route-north-f-branch.spec.js"
           ]
         },
         "B": {
           "status": "一部",
-          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。 新しい高速3戦艦代表をC/W各1初回成功。在庫内の同期候補で砲補充、ドラム2艦/索敵/合法性/有限在庫を保持。全在庫・枠競合の証明ではない。",
           "evidence": [
             "docs/pr152-north-los-ui-ja.md",
             "docs/pr152-north-drum-domain-ja.md",
-            "tests/route-completion-2-5.spec.js"
+            "tests/route-completion-2-5.spec.js",
+            "docs/pr152-two-five-north-f-ja.md",
+            "tests/two-five-north-f.test.cjs",
+            "tests/route-north-f-branch.spec.js"
           ]
         },
         "C": {
           "status": "一部",
-          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。 高速の有効3戦艦枝から不要な低速目標/不足/強制差替えを除外し、上位E/ランダム/未知を軽い独立期待値で区別。全不足区分は未網羅。",
           "evidence": [
             "docs/pr152-north-los-ui-ja.md",
             "docs/pr152-north-drum-domain-ja.md",
-            "tests/route-completion-2-5.spec.js"
+            "tests/route-completion-2-5.spec.js",
+            "docs/pr152-two-five-north-f-ja.md",
+            "tests/two-five-north-f.test.cjs",
+            "tests/route-north-f-branch.spec.js"
           ]
         },
         "D": {
-          "status": "一部",
-          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "status": "確認済み",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。 新しい高速3戦艦代表で自動配備→保存→メモ編集→同一文書load/complete後再探索・再表示をC/W各1初回成功。直接保存文字列/入力完全一致、他編成・他海域・個体・metadata・他planner・調達案保持。",
           "evidence": [
             "docs/pr152-north-los-ui-ja.md",
             "docs/pr152-north-drum-domain-ja.md",
-            "tests/route-completion-2-5.spec.js"
+            "tests/route-completion-2-5.spec.js",
+            "docs/pr152-two-five-north-f-ja.md",
+            "tests/two-five-north-f.test.cjs",
+            "tests/route-north-f-branch.spec.js"
           ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "Fの低速/3戦艦の優先条件と代表操作を確認。全装備数量/在庫・改修・搭載/枠競合、未確認ボーナス、海防3隻以上の登録範囲外、実ゲーム到達/勝利は未完。"
     },
     {
       "id": "2-5/1/default",
@@ -2409,49 +2421,36 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "5-4/0/default",
-    "baselineHead": "f553563085f55b5023f37d7d180eb47797225168",
-    "condition": "5-4 central fixed-input search termination and inactive scouting branch guidance",
-    "newEvidence": "docs/pr152-five-four-completion-ja.md",
-    "boundedDiagnostic": {
-      "browser": "webkit",
-      "condition": "exempt",
-      "attempts": 1,
-      "retries": 0,
-      "result": "failure; search still running before result deadline",
-      "drop": 0,
-      "collectionFailures": 0
-    },
-    "productValidation": {
-      "finalExempt": {
-        "chromium": "initial pass",
-        "webkit": "initial pass"
-      },
-      "unknown": {
-        "chromium": "initial pass reused",
-        "webkit": "initial pass reused"
-      },
-      "intermediateExempt": {
-        "chromium": "guidance assertion failure preserved",
-        "webkit": "guidance assertion failure preserved"
-      },
-      "retries": 0
-    },
+    "id": "2-5/0/default",
+    "baselineHead": "aec0dc9c04ce04edff5a231d7d03ef431b4f8bac",
+    "condition": "F priority: low speed OR 3 battleships after excluding prior E branches",
+    "newEvidence": "docs/pr152-two-five-north-f-ja.md",
     "nodePrerequisites": {
-      "pass": 227,
+      "pass": 233,
       "fail": 0
     },
-    "statusCellChanges": 0,
-    "normalSmokeSelection": {
-      "totalPerBrowser": 812,
-      "targetCasesPerBrowser": 4,
-      "selectedFile": "tests/route-complex-boundaries.spec.js",
-      "listOnlyBrowserExecutions": 0,
-      "verifiedBeforeCIDispatch": true
+    "localBrowserCasesPerEngine": 1,
+    "localInitialPass": {
+      "chromium": 1,
+      "webkit": 1
     },
-    "limits": "limited completion of fixed example; old CI failure causes and missing originals remain unresolved"
+    "retries": 0,
+    "statusCellChanges": 1,
+    "completedLimitedItems": [
+      "fixed false-negative for all-fast three-battleship branch",
+      "conditional forced-low selection and low-goal guidance",
+      "same-document save/edit/load/direct exact storage and metadata preservation"
+    ],
+    "limits": "A/B/C remain partial; air goal remains manual; independent literal boundary tests and synthetic synchronized input do not prove game victory or exhaustive inventory search",
+    "normalSmokeSelection": {
+      "totalPerBrowser": 813,
+      "targetCasesPerBrowser": 1,
+      "selectedFile": "tests/route-north-f-branch.spec.js",
+      "browserLaunches": 0,
+      "verifiedBeforeCI": true
+    }
   },
-  "nextPriority": "別海域への拡張は保留。5-4中央の残る全推奨数量・在庫/搭載/枠競合の根拠確認は次作業の候補。今回の固定登録例の限定操作完了を全条件完了へ広げない。",
+  "nextPriority": "3-3/index0 ACGMのA/C/Gの必須分岐接続。既存制空・保存証拠を再利用し、上位条件/潜水系ランダム分岐との整合を確認する候補。今回実装・実行なし。",
   "previousSelected": {
     "id": "5-4/0/default",
     "condition": "M-to-P conditional scouting exemption only for no SS/SSV and confirmed fleet speed >=15; unknown is not exemption",
@@ -2497,6 +2496,70 @@
       "casesPerEngine": 1,
       "retries": 0,
       "otherRowsOrAswAssertionsRelaxed": false
+    }
+  },
+  "selectionHistory": [
+    {
+      "id": "5-4/0/default",
+      "baselineHead": "f553563085f55b5023f37d7d180eb47797225168",
+      "condition": "5-4 central fixed-input search termination and inactive scouting branch guidance",
+      "newEvidence": "docs/pr152-five-four-completion-ja.md",
+      "boundedDiagnostic": {
+        "browser": "webkit",
+        "condition": "exempt",
+        "attempts": 1,
+        "retries": 0,
+        "result": "failure; search still running before result deadline",
+        "drop": 0,
+        "collectionFailures": 0
+      },
+      "productValidation": {
+        "finalExempt": {
+          "chromium": "initial pass",
+          "webkit": "initial pass"
+        },
+        "unknown": {
+          "chromium": "initial pass reused",
+          "webkit": "initial pass reused"
+        },
+        "intermediateExempt": {
+          "chromium": "guidance assertion failure preserved",
+          "webkit": "guidance assertion failure preserved"
+        },
+        "retries": 0
+      },
+      "nodePrerequisites": {
+        "pass": 227,
+        "fail": 0
+      },
+      "statusCellChanges": 0,
+      "normalSmokeSelection": {
+        "totalPerBrowser": 812,
+        "targetCasesPerBrowser": 4,
+        "selectedFile": "tests/route-complex-boundaries.spec.js",
+        "listOnlyBrowserExecutions": 0,
+        "verifiedBeforeCIDispatch": true
+      },
+      "limits": "limited completion of fixed example; old CI failure causes and missing originals remain unresolved"
+    }
+  ],
+  "fiveFourCloseout": {
+    "evidence": "docs/pr152-five-four-closeout-ja.md",
+    "stateChanges": 0,
+    "newExecutions": 0,
+    "closed": [
+      "original slow-BB cap",
+      "SS/SSV exclusion with AS distinct",
+      "M scouting exemption and generated-LOS omission",
+      "fixed-input result display",
+      "exempt save/edit/load exact preservation",
+      "unknown safe-abort/load exact preservation; no edit"
+    ],
+    "remainingClasses": {
+      "implementation": "no confirmed defect in scoped stop; uninspected ranges not assumed implemented",
+      "verification": "all inventory/slots, alternative hull UI, pre-search display of persisted new reason",
+      "sourceWait": "submarine-containing M priority outside selected route",
+      "knownOperationInstability": "initial CI hidden load-search buttons; retries separate; cause unresolved"
     }
   }
 }

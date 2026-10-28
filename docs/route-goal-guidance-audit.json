@@ -1463,10 +1463,62 @@
           "max": 1
         },
         {
-          "kind": "speedCount",
-          "rank": 5,
-          "min": 1,
-          "max": 7
+          "any": [
+            {
+              "kind": "speedCount",
+              "rank": 5,
+              "min": 1,
+              "max": 7
+            },
+            {
+              "all": [
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "戦艦",
+                    "高速戦艦",
+                    "航空戦艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 3,
+                  "max": 7
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 0,
+                  "max": 2
+                },
+                {
+                  "not": {
+                    "all": [
+                      {
+                        "kind": "typeCount",
+                        "types": [
+                          "軽巡洋艦"
+                        ],
+                        "matchPolicy": "exact",
+                        "min": 1,
+                        "max": 7
+                      },
+                      {
+                        "kind": "typeCount",
+                        "types": [
+                          "駆逐艦"
+                        ],
+                        "matchPolicy": "exact",
+                        "min": 2,
+                        "max": 7
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "kind": "equipmentShips",
@@ -1495,7 +1547,7 @@
         "索敵"
       ],
       "notes": [
-        "実際の編成速力が低速の艦を1隻以上維持。高速化して低速艦がなくなるとF→J条件を満たさない。",
+        "Fは配備後低速艦なら先にJ。高速編成は駆逐3隻以上、軽巡1隻以上かつ駆逐2隻以上なら先にE。その後の戦艦級3隻はJ。現1戦艦級の編成例では低速を維持する。",
         "ドラム缶(輸送用)は異なる2隻に各1個以上。同じ艦に2個は1隻として数える。"
       ],
       "requiredConnectionClass": "A",
@@ -1519,12 +1571,14 @@
         },
         "速力": {
           "class": "A",
-          "detail": "低速1艦維持",
+          "detail": "F→Jは低速1艦、または上位E条件を除いた戦艦級3隻。高速3戦艦の有効枝を低速必須へしない。",
           "evidence": [
             "tests/route-slot-scouting.spec.js",
-            "tests/all-map-route-requirements.spec.js"
+            "tests/all-map-route-requirements.spec.js",
+            "tests/two-five-north-f.test.cjs",
+            "tests/route-north-f-branch.spec.js"
           ],
-          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない"
+          "limit": "艦形態・改修・通常/増設枠の組合せ依存。OR成立で高速化が不要になる経路は一律要求しない 高速3戦艦の条件単位を確認し、他海域の速力条件へ拡張しない。"
         },
         "先制対潜": {
           "class": "D",

@@ -258,11 +258,13 @@ function hdOCMeasure(plan,requirements,unknown=[]){
  goals.push(...hdOCPortMeasure(plan));
  const oasw=hdOCOaswMeasure(plan);if(oasw.minCount||oasw.unresolved)goals.push(oasw);
  // A global turbine/can total does not prove that a low-speed ship is sped up.
- const route=hdFERoute(plan),speedRequired=!!speedTarget;
+ const route=hdFERoute(plan),speedRequired=!!speedTarget;let lowSpeedAlternative;
  if(route.branch?.requiredRadar){const m=hdFEBranchPredicate({kind:'equipmentShips',match:'radar',min:route.branch.requiredRadar,max:7},hdFERouteShips(plan),plan);goals.push({kind:'radar-ships',label:'ルート用電探装備艦',count:m.count||0,minCount:route.branch.requiredRadar,ok:m.status==='ready',unresolved:m.status==='manual',ratio:m.ratio,detail:m.detail})}
  if(route.branch?.available){const b=route.branch;goals.push({kind:'route-branches',label:b.path+'の分岐条件',count:b.checks.filter(x=>x.status==='ready').length,minCount:b.checks.length,ok:route.status==='ready',unresolved:route.status==='manual',ratio:b.checks.length?b.checks.reduce((n,x)=>n+x.ratio,0)/b.checks.length:0,detail:route.detail})}
  if(route.contract){const r=route.contract;goals.push({kind:'route-requirements',label:r.data.path+'の攻略条件',count:r.checks.filter(x=>x.status==='ready').length,minCount:r.checks.length,ok:route.status==='ready',unresolved:route.status==='manual',ratio:r.checks.length?r.checks.reduce((n,x)=>n+x.ratio,0)/r.checks.length:0,detail:r.detail});
-  for(const check of r.checks){const c=check.condition;if(c.kind==='equipmentShips'&&c.match==='drum'||c.kind==='speedCount'&&c.rank===5)goals.push({kind:c.kind==='speedCount'?'low-speed-ships':'drum-ships',label:c.kind==='speedCount'?'低速艦の維持':'ルート用ドラム缶装備艦',count:check.count||0,minCount:c.min,ok:check.status==='ready',unresolved:check.status==='manual',ratio:check.ratio,detail:check.detail});}
+  for(const check of r.checks){let c=check.condition,m=check;
+   if(r.data.keepLowUnless&&c.any?.[1]===r.data.keepLowUnless&&c.any[0]?.kind==='speedCount'){lowSpeedAlternative=check.children?.[1]?.status==='ready';if(check.children?.[1]?.status!=='missing')continue;c=c.any[0];m=check.children[0];}
+   if(c.kind==='equipmentShips'&&c.match==='drum'||c.kind==='speedCount'&&c.rank===5)goals.push({kind:c.kind==='speedCount'?'low-speed-ships':'drum-ships',...(c.kind==='speedCount'?{routeLowSpeed:true}:{}),label:c.kind==='speedCount'?'低速艦の維持':'ルート用ドラム缶装備艦',count:m.count||0,minCount:c.min,ok:m.status==='ready',unresolved:m.status==='manual',ratio:m.ratio,detail:m.detail});}
  }
  goals.push(...speedGoals);
  const speedSets=speedTarget?0:Math.max(0,...requirements.filter(x=>x.kind==='高速化').map(x=>Number(x.minCount)||0));
@@ -282,7 +284,7 @@ function hdOCMeasure(plan,requirements,unknown=[]){
  for(const goal of goals){goal.purpose=['route-branches','route-requirements','radar-ships','drum-ships','low-speed-ships','speed-ship','los-value'].includes(goal.kind)?'route':goal.generatedFromMap&&!(goal.kind.startsWith('cap-night-')&&hdSENightPolicy(plan.map)!=='auto')?'recommendation':'strategy';}
  const requiredChecks=hdOCRequiredChecks(plan,route,true);
  const score=goals.reduce((s,g)=>s+g.ratio*100+(g.ok?25:0),0)+requiredChecks.reduce((n,c)=>n+(c.ok?10000:Math.max(0,c.ratio||0)*1000),0);
- return {goals,requiredChecks,manual,score,scoutingExempt:scouting.reason==='exempt',routeStatus:route.status,speedTarget,complete:goals.length>0&&goals.every(x=>x.ok&&!x.unresolved)&&!unknown.length&&air.reason!=='anti-air'&&route.status==='ready'};
+ return {goals,requiredChecks,manual,score,scoutingExempt:scouting.reason==='exempt',routeStatus:route.status,speedTarget,...(lowSpeedAlternative===undefined?{}:{lowSpeedAlternative}),complete:goals.length>0&&goals.every(x=>x.ok&&!x.unresolved)&&!unknown.length&&air.reason!=='anti-air'&&route.status==='ready'};
 }
 // An unresolved goal lacks evidence; it is not a confirmed equipment deficit.
 function hdOCShortageGoals(measure){return measure.goals.filter(x=>!x.ok&&!x.unresolved&&!['route-branches','route-requirements','port-attacker-set'].includes(x.kind))}
@@ -315,7 +317,7 @@ function hdOCGoalRegressions(before,after){
  const current=new Map([...(after.goals||[]),...(after.requiredChecks||[])].map(g=>[hdOCGoalIdentity(g),g]));
  const previous=new Map((before.requiredChecks||[]).map(g=>[hdOCGoalIdentity(g),g]));
  const requiredImproved=(after.requiredChecks||[]).some(g=>g.ok&&!previous.get(hdOCGoalIdentity(g))?.ok);
- return [...(before.goals||[]),...(before.requiredChecks||[])].filter(g=>!(after.scoutingExempt&&(g.kind==='los-value'||g.kind==='索敵'&&g.generatedFromMap))&&!(g.kind==='speed-ship'&&after.speedTarget===0&&after.routeStatus==='ready')&&g.ok&&!g.unresolved&&(g.purpose!=='recommendation'||!requiredImproved)&&(!current.get(hdOCGoalIdentity(g))?.ok||current.get(hdOCGoalIdentity(g))?.unresolved));
+ return [...(before.goals||[]),...(before.requiredChecks||[])].filter(g=>!(after.scoutingExempt&&(g.kind==='los-value'||g.kind==='索敵'&&g.generatedFromMap))&&!(g.kind==='low-speed-ships'&&g.routeLowSpeed===true&&after.lowSpeedAlternative===true)&&!(g.kind==='speed-ship'&&after.speedTarget===0&&after.routeStatus==='ready')&&g.ok&&!g.unresolved&&(g.purpose!=='recommendation'||!requiredImproved)&&(!current.get(hdOCGoalIdentity(g))?.ok||current.get(hdOCGoalIdentity(g))?.unresolved));
 }
 // Reuse an observed loadout as a candidate, never as an extra inventory source.
 // Exact per-hull slots/star labels retain the synchronized fit-bonus context.

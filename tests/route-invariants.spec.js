@@ -162,7 +162,7 @@ test('2-5 north retains ready low-speed scouting49 and two distinct drums throug
  await north(page);const r=await page.evaluate(()=>{
  const source=loadCustomFleets()['2-5'][0],p=hdFEPlanFromSavedFleet('2-5',source);p.index=0;p.openingAswCount=0;
  p.suggestion={preset:source.routePreset,info:hdFSPresetInfo(source.routePreset),slots:p.ships.map(s=>({profile:{type:s.type,row:hdFERoster().find(r=>r.id===s.rosterId)}}))};
- const summary=q=>{const c=hdFERouteContract(q);return {status:hdFERoute(q).status,low:c.checks.find(x=>x.condition.kind==='speedCount'),drums:c.checks.find(x=>x.condition.kind==='equipmentShips'),los:c.checks.find(x=>x.condition.kind==='scoutingValue')}};
+ const summary=q=>{const c=hdFERouteContract(q);return {status:hdFERoute(q).status,low:c.checks.find(x=>x.condition.any?.[0]?.kind==='speedCount').children[0],drums:c.checks.find(x=>x.condition.kind==='equipmentShips'),los:c.checks.find(x=>x.condition.kind==='scoutingValue')}};
  const stages=[summary(p)];for(const mode of Object.keys(HD_FO_MODES))stages.push(summary(hdFOOptimize(p,mode)));
  const fast=hdFOClone(p);fast.ships[0].ship='金剛改二';fast.ships[0].masterId=hdShipDbMasterRowFor({name:'金剛改二'}).id;
  const noDrum=hdFOClone(p);noDrum.ships[1].items=noDrum.ships[1].items.filter(x=>x.name!=='ドラム缶(輸送用)');
@@ -182,7 +182,7 @@ test('bounded search reports unfinished exploration without claiming a stock def
 test('mandatory checks refresh equipment speed and synchronized scouting on each evaluation',async({page})=>{
  await north(page);const r=await page.evaluate(()=>{
  const p=hdFEPlanFromSavedFleet('2-5',loadCustomFleets()['2-5'][0]);
- const captured=hdFERoute(p),checks=()=>hdOCMeasure(p,[]).requiredChecks,select=(rows,kind)=>rows.find(x=>x.condition.kind===kind),before=checks();
+ const captured=hdFERoute(p),checks=()=>hdOCMeasure(p,[]).requiredChecks,select=(rows,kind)=>rows.find(x=>x.condition.kind===kind)||rows.flatMap(x=>(x.condition.any||[]).map((condition,i)=>({...x.children[i],condition}))).find(x=>x.condition.kind===kind),before=checks();
  const drum=p.ships[1].items.find(x=>x.name==='ドラム缶(輸送用)');p.ships[1].items=p.ships[1].items.filter(x=>x!==drum);const removed=checks(),supplied=select(hdOCRequiredChecks(p,captured),'equipmentShips').status;p.ships[1].items.push(drum);const restored=checks();
  const old=p.ships[0].items;p.ships[0].items=[{name:'新型高温高圧缶',slotIndex:0},{name:'改良型艦本式タービン',slotIndex:1}];const fast=checks();p.ships[0].items=old;
  const roster=hdFERoster();

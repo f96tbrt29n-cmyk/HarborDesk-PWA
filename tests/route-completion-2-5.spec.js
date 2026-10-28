@@ -193,7 +193,7 @@ test('north all registered structural predicates have positive negative and boun
    if(name)for(const count of new Set([0,c.max,c.max+1])){const q=hdFOClone(p);for(let i=0;i<6;i++)replace(q,i,i<count?name:'妙高改二');check(c,q,name+' '+count,count<=c.max?'ready':'missing')}
    else {check(c,p,'excluded zero','ready');for(const name of ['赤城改','大鳳改','龍驤改二','伊168改','伊401改','あきつ丸改']){const q=hdFOClone(p);replace(q,5,name);check(c,q,'excluded '+name,'missing')}}
   }
-  const slow=conditions.find(x=>x.kind==='speedCount');for(const n of [0,1,6]){const q=hdFOClone(p);for(let i=0;i<6;i++)replace(q,i,i<n?'扶桑改二':'金剛改二');check(slow,q,'slow '+n,n?'ready':'missing')}
+  const slow=conditions.flatMap(x=>x.any||[x]).find(x=>x.kind==='speedCount');for(const n of [0,1,6]){const q=hdFOClone(p);for(let i=0;i<6;i++)replace(q,i,i<n?'扶桑改二':'金剛改二');check(slow,q,'slow '+n,n?'ready':'missing')}
   const drum=conditions.find(x=>x.kind==='equipmentShips');for(let count=0;count<=6;count++){const q=hdFOClone(p);q.ships.forEach((s,i)=>{replace(q,i,'鈴谷改二');q.ships[i].items=i<count?[{name:'ドラム缶(輸送用)',slotIndex:0}]:[];q.ships[i].expansion=null});check(drum,q,'drum hulls '+count,count>=2?'ready':'missing')}
   return result;
  });for(const x of r)expect(x.status,x.label).toBe(x.expected);await test.info().attach('north-structural-boundary-partitions',{body:Buffer.from(JSON.stringify(r,null,2)),contentType:'application/json'});
@@ -316,7 +316,7 @@ test('north synchronized candidate cannot replace fulfilled low speed with synch
   const rows=hdFERoster();rows[0].gameGearSlots[0]='新型高温高圧缶';rows[0].gameGearSlots[1]='改良型艦本式タービン';localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));localStorage.setItem(HD_FL_KEY,JSON.stringify(hdFLRows().concat([{name:'新型高温高圧缶',count:1},{name:'改良型艦本式タービン',count:1}])));
   const c=hdOCContext('2-5','completion',0),built=hdOCBuild(c),before=hdOCMeasure(built.plan,[]),seed=hdOCSynchronizedSeed(built.plan,built.inventory,built.slots),after=hdOCMeasure(seed,[]),steps=hdOCSearchSteps(c,{maxExamined:50,maxDepth:1});let n;do{n=steps.next()}while(!n.done);const result=n.value;
   return {seed:!!seed,regressions:hdOCGoalRegressions(before,after),required:result.measure.requiredChecks,ready:hdOCReadiness(result.plan,result.measure)};
- });expect(r.seed).toBe(true);expect(r.regressions.some(x=>x.kind==='low-speed-ships'||x.condition?.kind==='speedCount')).toBe(true);expect(r.required.find(x=>x.condition.kind==='speedCount').status).toBe('ready');expect(r.ready.registeredReady).toBe(false);
+ });expect(r.seed).toBe(true);expect(r.regressions.some(x=>x.kind==='low-speed-ships'||x.condition?.kind==='speedCount')).toBe(true);expect(r.required.find(x=>x.condition.any?.[0]?.kind==='speedCount').children[0].status).toBe('ready');expect(r.ready.registeredReady).toBe(false);
 });
 
 test('north new candidate keeps five modes save reload planner and refuses unverified scouting bonus changes',async({page})=>{

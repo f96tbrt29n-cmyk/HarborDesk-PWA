@@ -177,9 +177,10 @@ function hdFSGenerate(map,preset,index){
  info.requirements.forEach(function(req){for(var i=0;i<req.count;i++){var p=hdFSPickBest(pool,used,function(x){return hdFSTypeMatches(x,req.token)},info,needs);if(p){used.add(p.row.id);slots.push({profile:p,required:req.token,levelTarget:info.levelTarget})}else{slots.push({profile:null,required:req.token});missing.push(req.token)}}});
  while(info.requirements.length&&slots.length<info.total){var p=hdFSPickBest(pool,used,p=>/自由枠/.test(info.text)||info.preferred.some(t=>hdFSTypeMatches(p,t)),info,needs);if(!p)break;used.add(p.row.id);slots.push({profile:p,required:'',levelTarget:info.levelTarget})}
  while(slots.length<info.total)slots.push({profile:null,required:info.conditionManual?'条件未確認':'自由枠'});
- if(routeRequirements?.keepLow&&!slots.some(s=>s.profile?.speed==='低速')){
+ const lowAlternative=routeRequirements?.keepLowUnless&&slots.every(s=>s.profile)&&typeof hdFEBranchPredicate==='function'&&typeof hdFERouteShips==='function'?hdFEBranchPredicate(routeRequirements.keepLowUnless,hdFERouteShips({map,preset,ships:slots.flatMap(s=>s.profile?[{ship:s.profile.row.name,masterId:s.profile.row.masterId,type:s.profile.type,items:[]}]:[])})).status:routeRequirements?.keepLowUnless?'manual':'missing';
+ if(routeRequirements?.keepLow&&lowAlternative!=='ready'&&!slots.some(s=>s.profile?.speed==='低速')){
   for(let i=0;i<slots.length;i++){const slot=slots[i];if(!slot.profile)continue;const replacement=hdFSPickBest(pool,used,p=>p.speed==='低速'&&(!slot.required||hdFSTypeMatches(p,slot.required)),info,needs);if(replacement){used.delete(slot.profile.row.id);used.add(replacement.row.id);slot.profile=replacement;break;}}
-  if(!slots.some(s=>s.profile?.speed==='低速'))missing.push('低速艦（高速化せず維持）');
+  if(!slots.some(s=>s.profile?.speed==='低速'))missing.push(lowAlternative==='manual'?'F→J条件未確認（低速艦か戦艦級3隻の優先条件を確認）':'低速艦（高速化せず維持）');
  }
  const flagship=(routeRequirements?.conditions||[]).find(c=>c.kind==='flagshipType');if(flagship){const first=slots.findIndex(s=>s.profile&&flagship.types.includes(s.profile.type));if(first>0)[slots[0],slots[first]]=[slots[first],slots[0]];}
  const repaired=hdFSRepairVerifiedSlots(map,preset,index,info,slots,pool);slots=repaired.slots;if(repaired.ready)missing=[];

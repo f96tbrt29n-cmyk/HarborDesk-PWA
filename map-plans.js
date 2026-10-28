@@ -19,7 +19,7 @@ const MAP_PLANS={
  },
  '2-5':{
   presets:[
-   {name:'北ルート型',ships:'航空戦艦1＋航巡2＋重巡3',gear:'低速艦を含める（高速化しない）。別々の2隻にドラム缶を1個ずつ。索敵33式係数1で49以上を確認。',use:'北ルート・BFJO（低速艦・ドラム缶2隻が必要）',source:'https://zekamashi.net/kancolle-kouryaku/2-5/'},
+   {name:'北ルート型',ships:'航空戦艦1＋航巡2＋重巡3',gear:'この編成例では低速艦を含める（高速化しない）。戦艦級3隻で駆逐3隻以上・軽巡1隻以上かつ駆逐2隻以上の上位E条件に該当しない編成は、高速でもF→J。別々の2隻にドラム缶を1個ずつ。索敵33式係数1で49以上を確認。',use:'北ルート・BFJO（F分岐の編成・速力条件とドラム缶2隻を確認）',source:'https://zekamashi.net/kancolle-kouryaku/2-5/'},
    {name:'南ルート型',ships:'正規空母1＋軽空母1＋軽巡1＋駆逐3（高速統一）',gear:'艦戦＋偵察機・電探。高速統一、索敵33式係数1で34以上を確認（司令部Lv119以下は余裕を取る）。',use:'通常攻略・CEIO',source:'https://zekamashi.net/kancolle-kouryaku/2-5/'}
   ],
   quests:[
@@ -200,7 +200,8 @@ const HD_MAP_ROUTE_REQUIREMENTS={};
  add('2-2',0,'CE(GH)K',[fleet(6),count(['bb','cv'],0,3),count(['cv'],0,2),count(['bbv'],0,0),count(['av','as'],1)],{routing:'multiple',notes:['水母または潜水母艦を維持。G/Hを通るかはランダム。']});
  add('2-3',0,'ボス方面・経路ランダム',[fleet(6),count(['bb','cv'],0,4)],{routing:'random',notes:['Jからの逸れなどを含む。編成条件の充足でボス到達を保証しない。']});
  add('2-4',0,'ボス方面・経路ランダム',[fleet(6),count(['bb','cv'],0,3),count(['av','as','ao'],0,0)],{routing:'random',notes:['戦艦＋空母は3隻まで。羅針盤による逸れを残す編成例。']});
- add('2-5',0,'BFJO',[fleet(6),count(['bb'],0,3),count(['cv','ss','lha'],0,0),count(['de'],0,2),count(['av'],0,1),{kind:'speedCount',rank:5,min:1,max:7},{kind:'equipmentShips',match:'drum',min:2,max:7,slotPolicy:'valid'}],{useExampleScope:false,selectionAliases:{'航空戦艦':'戦艦級'},keepLow:1,los:los(1,49,42),notes:['実際の編成速力が低速の艦を1隻以上維持。高速化して低速艦がなくなるとF→J条件を満たさない。','ドラム缶(輸送用)は異なる2隻に各1個以上。同じ艦に2個は1隻として数える。']});
+ const northFast={all:[count(['bb'],3),count(['dd'],0,2),{not:{all:[count(['cl'],1),count(['dd'],2)]}}]};
+ add('2-5',0,'BFJO',[fleet(6),count(['bb'],0,3),count(['cv','ss','lha'],0,0),count(['de'],0,2),count(['av'],0,1),{any:[{kind:'speedCount',rank:5,min:1,max:7},northFast],reason:'F→J：低速艦が1隻以上なら先にJ。全高速では駆逐3隻以上、軽巡1隻以上かつ駆逐2隻以上が先にE、それ以外の戦艦級3隻はJ。残りはE/Jランダム。速力・艦種情報が不足する条件は未判定とし、別の既知不一致は保持。装備購入ではなく編成・速力を確認'},{kind:'equipmentShips',match:'drum',min:2,max:7,slotPolicy:'valid'}],{useExampleScope:false,selectionAliases:{'航空戦艦':'戦艦級'},keepLow:1,keepLowUnless:northFast,los:los(1,49,42),notes:['Fでは低速艦1隻以上なら先にJ。全高速では駆逐3隻以上、軽巡1隻以上かつ駆逐2隻以上が先にE、その後の戦艦級3隻はJ。軽巡は軽巡洋艦で、重雷装巡洋艦はこの数に含めない。この1戦艦級の編成例では低速艦を維持する。','固定J条件の未成立はボス到達不可能や購入必須を意味しない。速力・艦種情報が不足する場合は未判定とし、既知の不一致は別に表示する。','ドラム缶(輸送用)は異なる2隻に各1個以上。同じ艦に2個は1隻として数える。']});
  add('2-5',1,'CEIO',[fleet(6),speed(10),count(['bb','ss'],0,0),count(['cvn','cav'],0,1),count(['cv'],1),count(['cl'],1),count(['dd'],3)],{minimumSpeed:10,los:los(1,34,31)});
  add('3-1',0,'CFG',[fleet(6),count(['bb','cv'],0,2),count(['escort'],2),count(['bbv','cl','av','ao'],0,2)]);
  for(const i of [0,1])add('3-2',i,'選択したC…L目標',[],{engine:'verified-graph'});
