@@ -55,8 +55,8 @@ test('an exempt LOS goal is nonapplicable rather than regressed, while other goa
  const c=context(),before={goals:[{kind:'los-value',ok:true},{kind:'索敵',generatedFromMap:true,ok:true},{kind:'電探',ok:true}],requiredChecks:[]},after={scoutingExempt:true,goals:[],requiredChecks:[]};
  assert.deepEqual(Array.from(c.hdOCGoalRegressions(before,after),x=>x.kind),['電探']);after.scoutingExempt=false;assert.equal(c.hdOCGoalRegressions(before,after).length,3);
 });
-test('conditional LOS is confined to 5-4 central and the static description states both alternatives',()=>{
+test('conditional LOS is confined to 5-4 central and 5-5 BKPS while the existing 5-4 alternatives stay explicit',()=>{
  const c=context(),rules=vm.runInContext('HD_MAP_ROUTE_REQUIREMENTS',c);assert.ok(c.data.los.exemptWhen);assert.equal(c.data.los.coef,2);assert.equal(c.data.los.checks[0].safe,45);
- assert.equal(Object.values(rules).flat().filter(r=>r.los.exemptWhen).length,1);const html=c.hdMapRequirementsHtml('5-4',vm.runInContext("MAP_PLANS['5-4'].presets[0]",c));assert.match(html,/M→P.*高速[＋+].*非適用/);assert.match(html,/係数2/);assert.match(html,/45/);
+ assert.deepEqual(Object.entries(rules).flatMap(([map,rows])=>Array.from(rows,(r,index)=>r.los.exemptWhen?map+'/'+index:null).filter(Boolean)).sort(),['5-4/0','5-5/0']);const html=c.hdMapRequirementsHtml('5-4',vm.runInContext("MAP_PLANS['5-4'].presets[0]",c));assert.match(html,/M→P.*高速[＋+].*非適用/);assert.match(html,/係数2/);assert.match(html,/45/);
  c.data=rules['4-5'][1];assert.equal(c.hdFEPlanScouting(plan(fleet()),[]).notRequired===true,false);assert.equal(c.hdFERouteContract(plan(fleet())).checks.some(x=>x.condition.kind==='scoutingValue'&&x.condition.min===71),true);
 });

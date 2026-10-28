@@ -5301,35 +5301,1551 @@
         {
           "kind": "typeCount",
           "types": [
-            "戦艦",
-            "高速戦艦",
-            "航空戦艦",
-            "正規空母",
-            "装甲空母",
-            "軽空母"
-          ],
-          "matchPolicy": "exact",
-          "min": 0,
-          "max": 4
-        },
-        {
-          "kind": "typeCount",
-          "types": [
             "駆逐艦"
           ],
           "matchPolicy": "exact",
           "min": 0,
-          "max": 1
+          "max": 3,
+          "reason": "始点→B：駆逐4隻以上は先にAへ進む。海防艦は駆逐数に含めず、装備購入ではなく編成を見直す"
         },
         {
-          "kind": "typeCount",
-          "types": [
-            "潜水艦",
-            "潜水空母"
+          "not": {
+            "kind": "equipmentShips",
+            "match": "drum",
+            "min": 4,
+            "max": 7,
+            "slotPolicy": "valid"
+          },
+          "reason": "始点→B：ドラム缶を有効に装備した艦は3隻以下。異なる4隻以上ならA。1隻の複数個を装備艦数へ足さない"
+        },
+        {
+          "any": [
+            {
+              "kind": "equipmentShips",
+              "match": "landingCandidates",
+              "min": 0,
+              "max": 3,
+              "slotPolicy": "valid"
+            },
+            {
+              "kind": "unverified",
+              "reason": "始点の大発系4装備艦の個別算入対象は5-5で未確認。候補が4隻以上になり得る場合はA/Bを断定せず、編成・出典を確認する"
+            }
           ],
-          "matchPolicy": "exact",
-          "min": 0,
-          "max": 0
+          "reason": "始点→B：大発系の候補装備艦が3隻以下なら4隻条件に該当しない。候補4隻以上・情報不足では個別算入の未確認を残す"
+        },
+        {
+          "any": [
+            {
+              "all": [
+                {
+                  "all": [
+                    {
+                      "any": [
+                        {
+                          "not": {
+                            "kind": "typeCount",
+                            "types": [
+                              "正規空母",
+                              "装甲空母"
+                            ],
+                            "matchPolicy": "exact",
+                            "min": 0,
+                            "max": 2
+                          }
+                        },
+                        {
+                          "not": {
+                            "kind": "typeCount",
+                            "types": [
+                              "戦艦",
+                              "高速戦艦",
+                              "航空戦艦",
+                              "重雷装巡洋艦"
+                            ],
+                            "matchPolicy": "exact",
+                            "min": 0,
+                            "max": 3
+                          }
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "駆逐艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 1
+                        },
+                        {
+                          "all": [
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "重雷装巡洋艦"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 2
+                              }
+                            },
+                            {
+                              "kind": "unverified",
+                              "reason": "Bの雷巡3隻以上→Kは登録記事にあるが参照先では駆逐2隻以上→Fが先行する。上位条件で確定しない範囲は出典待ちとし、装備購入で解決する不足にはしない"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "any": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 20
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 15
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "正規空母",
+                                    "装甲空母",
+                                    "軽空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 5
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "戦艦",
+                                "高速戦艦",
+                                "航空戦艦",
+                                "正規空母",
+                                "装甲空母",
+                                "軽空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 4
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "潜水艦",
+                                "潜水空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 0
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "all": [
+                    {
+                      "any": [
+                        {
+                          "not": {
+                            "kind": "typeCount",
+                            "types": [
+                              "正規空母",
+                              "装甲空母",
+                              "揚陸艦"
+                            ],
+                            "matchPolicy": "exact",
+                            "min": 0,
+                            "max": 2
+                          }
+                        },
+                        {
+                          "not": {
+                            "kind": "typeCount",
+                            "types": [
+                              "戦艦",
+                              "高速戦艦",
+                              "航空戦艦",
+                              "重雷装巡洋艦"
+                            ],
+                            "matchPolicy": "exact",
+                            "min": 0,
+                            "max": 3
+                          }
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "駆逐艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 1
+                        },
+                        {
+                          "all": [
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "重雷装巡洋艦"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 2
+                              }
+                            },
+                            {
+                              "kind": "unverified",
+                              "reason": "Bの雷巡3隻以上→Kは登録記事にあるが参照先では駆逐2隻以上→Fが先行する。上位条件で確定しない範囲は出典待ちとし、装備購入で解決する不足にはしない"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "any": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 20
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 15
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "正規空母",
+                                    "装甲空母",
+                                    "軽空母",
+                                    "揚陸艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 5
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "戦艦",
+                                "高速戦艦",
+                                "航空戦艦",
+                                "正規空母",
+                                "装甲空母",
+                                "軽空母",
+                                "揚陸艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 4
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "潜水艦",
+                                "潜水空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 0
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "all": [
+                    {
+                      "any": [
+                        {
+                          "not": {
+                            "kind": "typeCount",
+                            "types": [
+                              "正規空母",
+                              "装甲空母"
+                            ],
+                            "matchPolicy": "exact",
+                            "min": 0,
+                            "max": 2
+                          }
+                        },
+                        {
+                          "not": {
+                            "kind": "typeCount",
+                            "types": [
+                              "戦艦",
+                              "高速戦艦",
+                              "航空戦艦",
+                              "重雷装巡洋艦"
+                            ],
+                            "matchPolicy": "exact",
+                            "min": 0,
+                            "max": 3
+                          }
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "駆逐艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 1
+                        },
+                        {
+                          "all": [
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "重雷装巡洋艦"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 2
+                              }
+                            },
+                            {
+                              "kind": "unverified",
+                              "reason": "Bの雷巡3隻以上→Kは登録記事にあるが参照先では駆逐2隻以上→Fが先行する。上位条件で確定しない範囲は出典待ちとし、装備購入で解決する不足にはしない"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "any": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 20
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 15
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "正規空母",
+                                    "装甲空母",
+                                    "軽空母",
+                                    "揚陸艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 5
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "戦艦",
+                                "高速戦艦",
+                                "航空戦艦",
+                                "正規空母",
+                                "装甲空母",
+                                "軽空母",
+                                "揚陸艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 4
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "潜水艦",
+                                "潜水空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 0
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "all": [
+                    {
+                      "any": [
+                        {
+                          "not": {
+                            "kind": "typeCount",
+                            "types": [
+                              "正規空母",
+                              "装甲空母"
+                            ],
+                            "matchPolicy": "exact",
+                            "min": 0,
+                            "max": 2
+                          }
+                        },
+                        {
+                          "not": {
+                            "kind": "typeCount",
+                            "types": [
+                              "戦艦",
+                              "高速戦艦",
+                              "航空戦艦",
+                              "重雷装巡洋艦"
+                            ],
+                            "matchPolicy": "exact",
+                            "min": 0,
+                            "max": 3
+                          }
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "駆逐艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 1
+                        },
+                        {
+                          "all": [
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "重雷装巡洋艦"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 2
+                              }
+                            },
+                            {
+                              "kind": "unverified",
+                              "reason": "Bの雷巡3隻以上→Kは登録記事にあるが参照先では駆逐2隻以上→Fが先行する。上位条件で確定しない範囲は出典待ちとし、装備購入で解決する不足にはしない"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "any": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 20
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 15
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "正規空母",
+                                    "装甲空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 5
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "戦艦",
+                                "高速戦艦",
+                                "航空戦艦",
+                                "正規空母",
+                                "装甲空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 4
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "潜水艦",
+                                "潜水空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 0
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "all": [
+                    {
+                      "any": [
+                        {
+                          "not": {
+                            "kind": "typeCount",
+                            "types": [
+                              "正規空母",
+                              "装甲空母",
+                              "揚陸艦"
+                            ],
+                            "matchPolicy": "exact",
+                            "min": 0,
+                            "max": 2
+                          }
+                        },
+                        {
+                          "not": {
+                            "kind": "typeCount",
+                            "types": [
+                              "戦艦",
+                              "高速戦艦",
+                              "航空戦艦",
+                              "重雷装巡洋艦"
+                            ],
+                            "matchPolicy": "exact",
+                            "min": 0,
+                            "max": 3
+                          }
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "駆逐艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 1
+                        },
+                        {
+                          "all": [
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "重雷装巡洋艦"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 2
+                              }
+                            },
+                            {
+                              "kind": "unverified",
+                              "reason": "Bの雷巡3隻以上→Kは登録記事にあるが参照先では駆逐2隻以上→Fが先行する。上位条件で確定しない範囲は出典待ちとし、装備購入で解決する不足にはしない"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "any": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 20
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 15
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "正規空母",
+                                    "装甲空母",
+                                    "揚陸艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 5
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "戦艦",
+                                "高速戦艦",
+                                "航空戦艦",
+                                "正規空母",
+                                "装甲空母",
+                                "揚陸艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 4
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "潜水艦",
+                                "潜水空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 0
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "all": [
+                    {
+                      "any": [
+                        {
+                          "not": {
+                            "kind": "typeCount",
+                            "types": [
+                              "正規空母",
+                              "装甲空母"
+                            ],
+                            "matchPolicy": "exact",
+                            "min": 0,
+                            "max": 2
+                          }
+                        },
+                        {
+                          "not": {
+                            "kind": "typeCount",
+                            "types": [
+                              "戦艦",
+                              "高速戦艦",
+                              "航空戦艦",
+                              "重雷装巡洋艦"
+                            ],
+                            "matchPolicy": "exact",
+                            "min": 0,
+                            "max": 3
+                          }
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "駆逐艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 1
+                        },
+                        {
+                          "all": [
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "重雷装巡洋艦"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 2
+                              }
+                            },
+                            {
+                              "kind": "unverified",
+                              "reason": "Bの雷巡3隻以上→Kは登録記事にあるが参照先では駆逐2隻以上→Fが先行する。上位条件で確定しない範囲は出典待ちとし、装備購入で解決する不足にはしない"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "any": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 20
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 15
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "正規空母",
+                                    "装甲空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 5
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "戦艦",
+                                "高速戦艦",
+                                "航空戦艦",
+                                "正規空母",
+                                "装甲空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 4
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "潜水艦",
+                                "潜水空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 0
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "any": [
+                    {
+                      "all": [
+                        {
+                          "any": [
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "正規空母",
+                                  "装甲空母"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 2
+                              }
+                            },
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "戦艦",
+                                  "高速戦艦",
+                                  "航空戦艦",
+                                  "重雷装巡洋艦"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 3
+                              }
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 1
+                            },
+                            {
+                              "all": [
+                                {
+                                  "not": {
+                                    "kind": "typeCount",
+                                    "types": [
+                                      "重雷装巡洋艦"
+                                    ],
+                                    "matchPolicy": "exact",
+                                    "min": 0,
+                                    "max": 2
+                                  }
+                                },
+                                {
+                                  "kind": "unverified",
+                                  "reason": "Bの雷巡3隻以上→Kは登録記事にあるが参照先では駆逐2隻以上→Fが先行する。上位条件で確定しない範囲は出典待ちとし、装備購入で解決する不足にはしない"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "any": [
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 20
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "minSpeed",
+                                      "rank": 15
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "戦艦",
+                                        "高速戦艦",
+                                        "航空戦艦",
+                                        "正規空母",
+                                        "装甲空母",
+                                        "軽空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 5
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "正規空母",
+                                    "装甲空母",
+                                    "軽空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 4
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "潜水艦",
+                                    "潜水空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 0
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "any": [
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "正規空母",
+                                  "装甲空母",
+                                  "揚陸艦"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 2
+                              }
+                            },
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "戦艦",
+                                  "高速戦艦",
+                                  "航空戦艦",
+                                  "重雷装巡洋艦"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 3
+                              }
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 1
+                            },
+                            {
+                              "all": [
+                                {
+                                  "not": {
+                                    "kind": "typeCount",
+                                    "types": [
+                                      "重雷装巡洋艦"
+                                    ],
+                                    "matchPolicy": "exact",
+                                    "min": 0,
+                                    "max": 2
+                                  }
+                                },
+                                {
+                                  "kind": "unverified",
+                                  "reason": "Bの雷巡3隻以上→Kは登録記事にあるが参照先では駆逐2隻以上→Fが先行する。上位条件で確定しない範囲は出典待ちとし、装備購入で解決する不足にはしない"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "any": [
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 20
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "minSpeed",
+                                      "rank": 15
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "戦艦",
+                                        "高速戦艦",
+                                        "航空戦艦",
+                                        "正規空母",
+                                        "装甲空母",
+                                        "軽空母",
+                                        "揚陸艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 5
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "正規空母",
+                                    "装甲空母",
+                                    "軽空母",
+                                    "揚陸艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 4
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "潜水艦",
+                                    "潜水空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 0
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "any": [
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "正規空母",
+                                  "装甲空母"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 2
+                              }
+                            },
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "戦艦",
+                                  "高速戦艦",
+                                  "航空戦艦",
+                                  "重雷装巡洋艦"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 3
+                              }
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 1
+                            },
+                            {
+                              "all": [
+                                {
+                                  "not": {
+                                    "kind": "typeCount",
+                                    "types": [
+                                      "重雷装巡洋艦"
+                                    ],
+                                    "matchPolicy": "exact",
+                                    "min": 0,
+                                    "max": 2
+                                  }
+                                },
+                                {
+                                  "kind": "unverified",
+                                  "reason": "Bの雷巡3隻以上→Kは登録記事にあるが参照先では駆逐2隻以上→Fが先行する。上位条件で確定しない範囲は出典待ちとし、装備購入で解決する不足にはしない"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "any": [
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 20
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "minSpeed",
+                                      "rank": 15
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "戦艦",
+                                        "高速戦艦",
+                                        "航空戦艦",
+                                        "正規空母",
+                                        "装甲空母",
+                                        "軽空母",
+                                        "揚陸艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 5
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "正規空母",
+                                    "装甲空母",
+                                    "軽空母",
+                                    "揚陸艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 4
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "潜水艦",
+                                    "潜水空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 0
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "any": [
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "正規空母",
+                                  "装甲空母"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 2
+                              }
+                            },
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "戦艦",
+                                  "高速戦艦",
+                                  "航空戦艦",
+                                  "重雷装巡洋艦"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 3
+                              }
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 1
+                            },
+                            {
+                              "all": [
+                                {
+                                  "not": {
+                                    "kind": "typeCount",
+                                    "types": [
+                                      "重雷装巡洋艦"
+                                    ],
+                                    "matchPolicy": "exact",
+                                    "min": 0,
+                                    "max": 2
+                                  }
+                                },
+                                {
+                                  "kind": "unverified",
+                                  "reason": "Bの雷巡3隻以上→Kは登録記事にあるが参照先では駆逐2隻以上→Fが先行する。上位条件で確定しない範囲は出典待ちとし、装備購入で解決する不足にはしない"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "any": [
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 20
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "minSpeed",
+                                      "rank": 15
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "戦艦",
+                                        "高速戦艦",
+                                        "航空戦艦",
+                                        "正規空母",
+                                        "装甲空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 5
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "正規空母",
+                                    "装甲空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 4
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "潜水艦",
+                                    "潜水空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 0
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "any": [
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "正規空母",
+                                  "装甲空母",
+                                  "揚陸艦"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 2
+                              }
+                            },
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "戦艦",
+                                  "高速戦艦",
+                                  "航空戦艦",
+                                  "重雷装巡洋艦"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 3
+                              }
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 1
+                            },
+                            {
+                              "all": [
+                                {
+                                  "not": {
+                                    "kind": "typeCount",
+                                    "types": [
+                                      "重雷装巡洋艦"
+                                    ],
+                                    "matchPolicy": "exact",
+                                    "min": 0,
+                                    "max": 2
+                                  }
+                                },
+                                {
+                                  "kind": "unverified",
+                                  "reason": "Bの雷巡3隻以上→Kは登録記事にあるが参照先では駆逐2隻以上→Fが先行する。上位条件で確定しない範囲は出典待ちとし、装備購入で解決する不足にはしない"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "any": [
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 20
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "minSpeed",
+                                      "rank": 15
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "戦艦",
+                                        "高速戦艦",
+                                        "航空戦艦",
+                                        "正規空母",
+                                        "装甲空母",
+                                        "揚陸艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 5
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "正規空母",
+                                    "装甲空母",
+                                    "揚陸艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 4
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "潜水艦",
+                                    "潜水空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 0
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "any": [
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "正規空母",
+                                  "装甲空母"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 2
+                              }
+                            },
+                            {
+                              "not": {
+                                "kind": "typeCount",
+                                "types": [
+                                  "戦艦",
+                                  "高速戦艦",
+                                  "航空戦艦",
+                                  "重雷装巡洋艦"
+                                ],
+                                "matchPolicy": "exact",
+                                "min": 0,
+                                "max": 3
+                              }
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 1
+                            },
+                            {
+                              "all": [
+                                {
+                                  "not": {
+                                    "kind": "typeCount",
+                                    "types": [
+                                      "重雷装巡洋艦"
+                                    ],
+                                    "matchPolicy": "exact",
+                                    "min": 0,
+                                    "max": 2
+                                  }
+                                },
+                                {
+                                  "kind": "unverified",
+                                  "reason": "Bの雷巡3隻以上→Kは登録記事にあるが参照先では駆逐2隻以上→Fが先行する。上位条件で確定しない範囲は出典待ちとし、装備購入で解決する不足にはしない"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "any": [
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 20
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "minSpeed",
+                                      "rank": 15
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "戦艦",
+                                        "高速戦艦",
+                                        "航空戦艦",
+                                        "正規空母",
+                                        "装甲空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 5
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "正規空母",
+                                    "装甲空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 4
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "潜水艦",
+                                    "潜水空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 0
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "kind": "unverified",
+                  "reason": "B→K・P→S：揚陸艦の空母算入、またはPの空母系/CV系の略記で軽空母を数えるかが結論を変えるため未確認。出典の複数の読みで同じ結果になる条件は保持し、購入必須へ変換しない"
+                }
+              ]
+            }
+          ],
+          "reason": "B→K・P→S：Bでは正規・装甲空母3以上、戦艦級＋雷巡4以上、駆逐1以下の共通K条件を先に確認。Pでは最速、次に高速＋かつ重量艦5以下のSを先に適用し、その後の重量艦5以上・潜水艦系入りのQ確率と区別する"
         }
       ],
       "scouting": {
@@ -5338,10 +6854,394 @@
         "checks": [
           {
             "label": "選択経路の索敵分岐",
-            "safe": 80
+            "safe": 80,
+            "failBelow": 73
           }
         ],
-        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。",
+        "exemptWhen": {
+          "any": [
+            {
+              "all": [
+                {
+                  "any": [
+                    {
+                      "kind": "minSpeed",
+                      "rank": 20
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 15
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "戦艦",
+                            "高速戦艦",
+                            "航空戦艦",
+                            "正規空母",
+                            "装甲空母",
+                            "軽空母"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 5
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "any": [
+                    {
+                      "kind": "minSpeed",
+                      "rank": 20
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 15
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "戦艦",
+                            "高速戦艦",
+                            "航空戦艦",
+                            "正規空母",
+                            "装甲空母",
+                            "軽空母",
+                            "揚陸艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 5
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "any": [
+                    {
+                      "kind": "minSpeed",
+                      "rank": 20
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 15
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "戦艦",
+                            "高速戦艦",
+                            "航空戦艦",
+                            "正規空母",
+                            "装甲空母",
+                            "軽空母",
+                            "揚陸艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 5
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "any": [
+                    {
+                      "kind": "minSpeed",
+                      "rank": 20
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 15
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "戦艦",
+                            "高速戦艦",
+                            "航空戦艦",
+                            "正規空母",
+                            "装甲空母"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 5
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "any": [
+                    {
+                      "kind": "minSpeed",
+                      "rank": 20
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 15
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "戦艦",
+                            "高速戦艦",
+                            "航空戦艦",
+                            "正規空母",
+                            "装甲空母",
+                            "揚陸艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 5
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "any": [
+                    {
+                      "kind": "minSpeed",
+                      "rank": 20
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 15
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "戦艦",
+                            "高速戦艦",
+                            "航空戦艦",
+                            "正規空母",
+                            "装甲空母"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 5
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "any": [
+                    {
+                      "any": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 20
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 15
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "戦艦",
+                                "高速戦艦",
+                                "航空戦艦",
+                                "正規空母",
+                                "装甲空母",
+                                "軽空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 5
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 20
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 15
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "戦艦",
+                                "高速戦艦",
+                                "航空戦艦",
+                                "正規空母",
+                                "装甲空母",
+                                "軽空母",
+                                "揚陸艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 5
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 20
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 15
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "戦艦",
+                                "高速戦艦",
+                                "航空戦艦",
+                                "正規空母",
+                                "装甲空母",
+                                "軽空母",
+                                "揚陸艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 5
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 20
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 15
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "戦艦",
+                                "高速戦艦",
+                                "航空戦艦",
+                                "正規空母",
+                                "装甲空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 5
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 20
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 15
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "戦艦",
+                                "高速戦艦",
+                                "航空戦艦",
+                                "正規空母",
+                                "装甲空母",
+                                "揚陸艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 5
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 20
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 15
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "戦艦",
+                                "高速戦艦",
+                                "航空戦艦",
+                                "正規空母",
+                                "装甲空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 5
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "kind": "unverified",
+                  "reason": "B→K・P→S：揚陸艦の空母算入、またはPの空母系/CV系の略記で軽空母を数えるかが結論を変えるため未確認。出典の複数の読みで同じ結果になる条件は保持し、購入必須へ変換しない"
+                }
+              ]
+            }
+          ]
+        },
+        "exemptLabel": "P→S",
+        "exemptNote": "P→S：最速統一、または高速＋以上統一かつ戦艦級＋空母系5隻以下なら、後続の索敵条件は非適用。速力・空母系算入が不明なら免除を断定しない。",
+        "exemptUnknownNote": "P→Sの先行する速力・重量艦数による索敵免除は未確認。索敵安全域も未充足のため、この分岐は未判定です。速力・装備可否・艦種と索敵情報を確認してください。"
       },
       "equipmentKinds": [
         "制空",
@@ -5350,31 +7250,38 @@
         "索敵"
       ],
       "notes": [
-        "戦艦＋空母5隻以上の別例には索敵を満たしても逸れがある。",
-        "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。",
-        "対潜艦を入れない重量例ではBマスの陣形・回避や支援を出典で確認。対潜可能な別編成は別途評価。"
+        "BKPS：始点は駆逐4隻以上、次にドラム缶を有効に装備した異なる4隻以上ならA。大発系は候補3隻以下なら4装備艦条件外、候補4隻以上や未知では個別算入範囲を未確認として保持する。",
+        "B→Kは正規・装甲空母3以上、戦艦級＋雷巡4以上が駆逐2以上のFより先行する。雷巡3だけの独立優先行は出典不一致、駆逐1以下等で別に決まる結果は保持する。K→Pは固定接続。",
+        "P→Sは最速統一、次に高速＋以上統一かつ重量艦5以下が先行し索敵非適用。この確認ができない重量艦5以上・潜水系入りはQ確率を残す。固定不成立はボス到達不可能を意味しない。",
+        "非免除の索敵は33式係数2・司令部減算0.4の80以上。73未満Q、73以上80未満Q/Sランダム。HQ120未満の+1余裕推奨、別式の86、古い例の43を分岐閾値へ混ぜない。",
+        "空母系/CV系の軽空母算入、揚陸艦、大発系個別対象は結論へ影響する範囲のみ未確認。既知不一致やどの読みでも同じ成立を未知で消さない。",
+        "各空母の攻撃機1枠・制空・対空・夜戦・Bの対潜対策は戦闘推奨または利用者目標。艦種は編成見直しへ、装備は具体名・搭載可能枠へ案内し、探索未完了や索敵ポイント差を購入必須・装備個数に変換しない。"
       ],
       "requiredConnectionClass": "B",
       "guidanceAudit": {
         "装備艦数": {
-          "class": "D",
-          "detail": "個数・装備艦数の経路必須指定なし（任意の推奨電探とは別）",
-          "evidence": [],
-          "limit": ""
+          "class": "B",
+          "detail": "始点→Bは既知のドラム缶装備艦3隻以下。大発系は候補3隻以下という上限確認だけで、4候補艦の個別算入は未確認。いずれも同じ艦の複数装備を1隻として数える。",
+          "evidence": [
+            "独立出典の始点優先順 → hdFEBranchPredicate/equipmentShips → requiredChecks"
+          ],
+          "limit": "コード接続とNode境界の範囲。装備購入でなく編成・装備艦の見直しへ案内し、全UI操作完了とはしない。"
         },
         "索敵": {
           "class": "B",
-          "detail": "係数2／必要80以上",
+          "detail": "係数2／非免除時は73未満Q、73以上80未満Q/Sランダム、80以上S。先行するP→S速力条件の成立時のみ非適用。",
           "evidence": [
             "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
           ],
           "limit": "同期/HQ/Lv/艦形態・配備変更時ボーナスが必要。Aも合成数値層であり実ゲーム索敵根拠の証明ではない。"
         },
         "速力": {
-          "class": "D",
-          "detail": "高速化の一律必須指定なし",
-          "evidence": [],
-          "limit": ""
+          "class": "B",
+          "detail": "速力の一律必須指定はない。最速統一、または高速＋以上統一かつ戦艦級＋空母系5以下で先行P→S。軽空母・揚陸艦算入の出典差は結論へ影響する範囲だけ未判定。",
+          "evidence": [
+            "独立出典のP優先順 → hdFEScoutingExemption → hdFEPlanScouting/requiredChecks"
+          ],
+          "limit": "非適用を0点や充足へ置換しない。速力未知でも数値索敵80等で独立に確定できる結果は保持する。実艦の達成可能性・全UI操作完了は別。"
         },
         "先制対潜": {
           "class": "D",
@@ -5392,14 +7299,14 @@
         },
         "推奨セット": {
           "class": "C",
-          "detail": "cap-night-auto1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "detail": "cap-night-auto1組（既定目安）、空母の攻撃機：採用空母の各艦に1枠以上（艦数で可変）、索敵2個（汎用カテゴリ目安・経路必須の数値と別） 確認済みP→S索敵免除では生成索敵2個の目標・加点・調達案内を適用せず、明示的な利用者指定は保持する。",
           "evidence": [
             "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
           ],
           "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
         }
       },
-      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+      "connectionSnapshot": "5-5/index0 source-reviewed contract plus existing Node boundary evidence; C/W operations pending, no game-outing proof"
     },
     {
       "id": "5-5/1/default",

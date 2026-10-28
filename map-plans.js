@@ -313,7 +313,27 @@ const HD_MAP_ROUTE_REQUIREMENTS={};
  MAP_PLANS['5-4'].presets[0].gear+=' M→Pは潜水艦・潜水空母なしの高速＋以上統一なら索敵条件非適用。それ以外は33式係数2で45以上。渦潮対策の電探は任意推奨。';
  MAP_PLANS['5-4'].presets[0].gear+=' D→Eでは潜水艦・潜水空母なし（潜水母艦は別艦種）。含む場合は先にFへ進むため編成を見直す。';
  MAP_PLANS['5-4'].presets[0].gear+=' D→Eの低速戦艦（元の艦種）は1隻まで。高速化装備では艦種は変わらない。2隻以上のF経由は別経路として確認。';
- add('5-5',0,'BKPS',[fleet(6),count(['bb','cv'],0,4),count(['dd'],0,1),count(['ss'],0,0)],{los:los(2,80),notes:['戦艦＋空母5隻以上の別例には索敵を満たしても逸れがある。']});
+ const fiveFiveAgree=(conditions,reason)=>({any:[{all:conditions},{all:[{any:conditions},{kind:'unverified',reason}]}]});
+ // Keep each possible carrier reading consistent across B and P. KC's generic
+ // carrier definition includes CVL, but its P-row abbreviation can exclude it;
+ // the LHA treatment also lacks a 5-5-specific complete definition.
+ const fiveFiveReadings=['cv','cvn'].flatMap(heavy=>['none','cvn','cvl'].map(lha=>({heavy,lha})));
+ const fiveFiveSpeedPass=({heavy,lha})=>({any:[speed(20),{all:[speed(15),count(['bb',heavy,...(lha==='cvn'||heavy==='cv'&&lha==='cvl'?['lha']:[])],0,5)]}]});
+ const fiveFiveBP=reading=>{
+  const regular=['cvn',...(reading.lha==='cvn'?['lha']:[])],heavy=['bb',reading.heavy,...(reading.lha==='cvn'||reading.heavy==='cv'&&reading.lha==='cvl'?['lha']:[])];
+  const b={any:[{not:count(regular,0,2)},{not:count(['bb','重雷装巡洋艦'],0,3)},count(['dd'],0,1),{all:[{not:count(['重雷装巡洋艦'],0,2)},{kind:'unverified',reason:'Bの雷巡3隻以上→Kは登録記事にあるが参照先では駆逐2隻以上→Fが先行する。上位条件で確定しない範囲は出典待ちとし、装備購入で解決する不足にはしない'}]}]};
+  const p={any:[fiveFiveSpeedPass(reading),{all:[count(heavy,0,4),count(['ss'],0,0)]}]};
+  return {all:[b,p]};
+ };
+ const fiveFiveSourceReason='B→K・P→S：揚陸艦の空母算入、またはPの空母系/CV系の略記で軽空母を数えるかが結論を変えるため未確認。出典の複数の読みで同じ結果になる条件は保持し、購入必須へ変換しない';
+ const fiveFiveExempt=fiveFiveAgree(fiveFiveReadings.map(fiveFiveSpeedPass),fiveFiveSourceReason);
+ add('5-5',0,'BKPS',[fleet(6),
+  {...count(['dd'],0,3),reason:'始点→B：駆逐4隻以上は先にAへ進む。海防艦は駆逐数に含めず、装備購入ではなく編成を見直す'},
+  {not:{kind:'equipmentShips',match:'drum',min:4,max:7,slotPolicy:'valid'},reason:'始点→B：ドラム缶を有効に装備した艦は3隻以下。異なる4隻以上ならA。1隻の複数個を装備艦数へ足さない'},
+  {any:[{kind:'equipmentShips',match:'landingCandidates',min:0,max:3,slotPolicy:'valid'},{kind:'unverified',reason:'始点の大発系4装備艦の個別算入対象は5-5で未確認。候補が4隻以上になり得る場合はA/Bを断定せず、編成・出典を確認する'}],reason:'始点→B：大発系の候補装備艦が3隻以下なら4隻条件に該当しない。候補4隻以上・情報不足では個別算入の未確認を残す'},
+  {...fiveFiveAgree(fiveFiveReadings.map(fiveFiveBP),fiveFiveSourceReason),reason:'B→K・P→S：Bでは正規・装甲空母3以上、戦艦級＋雷巡4以上、駆逐1以下の共通K条件を先に確認。Pでは最速、次に高速＋かつ重量艦5以下のSを先に適用し、その後の重量艦5以上・潜水艦系入りのQ確率と区別する'}
+ ],{checkedAt:'2026-10-28',useExampleScope:false,los:{...los(2,80,73),exemptWhen:fiveFiveExempt,exemptLabel:'P→S',exemptNote:'P→S：最速統一、または高速＋以上統一かつ戦艦級＋空母系5隻以下なら、後続の索敵条件は非適用。速力・空母系算入が不明なら免除を断定しない。',exemptUnknownNote:'P→Sの先行する速力・重量艦数による索敵免除は未確認。索敵安全域も未充足のため、この分岐は未判定です。速力・装備可否・艦種と索敵情報を確認してください。'},sources:['https://zekamashi.net/kancolle-kouryaku/5-5/','https://zh.kcwiki.cn/wiki/南方海域/5-5'],notes:['登録はB対潜→K通常戦→P通常戦→Sボス。Pは夜戦マスではない。始点の駆逐4・ドラム缶装備艦4・大発系装備艦4のAが先行し、経路の線と編成条件は別に確認する。','戦艦級は戦艦・高速戦艦・航空戦艦、正規空母は正規・装甲空母。潜水系は潜水艦・潜水空母で、潜水母艦は含まない。軽巡・練巡を雷巡へ足さず、海防艦を駆逐へ足さない。','Bの正規・装甲空母3以上、戦艦級＋雷巡4以上は駆逐2以上のF条件より先にK。記事だけの雷巡3以上→Kと参照先の優先順の差は、別の既知条件で結果が決まらない範囲だけ未確認。','Pは最速統一で先にS。次に高速＋以上統一かつ戦艦級＋空母系5以下でS。このとき索敵は0や充足ではなく非適用。速力未判定でも免除対象外の安全域80が既知で成立するなど、どの候補でも同じ結果になる条件は保持する。','先行速力条件を満たさない戦艦級＋空母系5以上、潜水艦・潜水空母入りには各Q確率がある。固定BKPS条件の不成立で、ボス到達不可能を意味しない。確率を加算したり、索敵80でこの先行分岐を消したりしない。','免除対象外のP索敵は33式係数2・司令部係数0.4の80以上。73未満はQ、73以上80未満はQ/Sランダム。別司令部係数0.35の86や古い別係数の例43を流用しない。HQ120未満の余裕推奨と分岐閾値を区別する。','Pの空母系/CV系の略記と軽空母算入、揚陸艦の算入、大発系個別対象は影響域だけ未確認。軽空母を含むだけで一律不成立にせず、最速や重量艦上限をどの読みでも満たす場合の成立を保持する。','各空母の攻撃機・制空・防空・夜戦・Bの対潜対策は戦闘上の推奨または利用者指定で、経路の固定装備数や勝利保証ではない。編成不一致、在庫不足、搭載不可、枠競合、情報不足、探索未完了を区別し、未発見を手持ちでは不可能・購入必須・最適と断定しない。']});
+ MAP_PLANS['5-5'].presets[0].gear+=' BKPSのP→Sは最速、または高速＋かつ戦艦級＋空母系5以下なら索敵非適用。それ以外は33式係数2・80以上と先行する逸れ条件を確認。軽空母算入などの出典差は影響域のみ未判定。';
  add('5-5',1,'BFDHNOS',[fleet(6),count(['bb'],0,2),count(['cv','ss'],0,0),count(['dd'],2)],{los:los(2,66),notes:['この登録例は中央下ルート。ACEGIMOSのドラム缶4隻／大発系4隻の条件とは別。']});
  for(const [i,path,safe,conditions] of [[0,'ABC2DEG',65,[count(['bbv'],2,2),count(['dd'],4,4)]],[1,'IJKLN',80,[speed(10),count(['bb','cv'],0,2),count(['cl'],1),count(['dd'],2),count(['av','lha'],0,0)]],[2,'IOQUXZ',88,[speed(10),count(['cl'],1),count(['dd'],2),count(['av','lha'],0,0)]]])add('5-6',i,path,[fleet(6),...conditions],{los:los(4,safe),minimumSpeed:i?10:0,equipmentKinds:i===0?['対潜','制空','防空','輸送','索敵','PT対策']:['対潜','制空','防空','夜戦','索敵'],...(i===0?{equipmentTargets:[{kind:'cap-pt',baseKind:'PT対策',label:'PT小鬼群対策セット',minCount:1,source:'https://zekamashi.net/kancolle-kouryaku/ptboat-taisaku/'}]}:{}),scopeIncomplete:true,notes:['出典が仮更新・検証継続中としている条件。数値は攻略目安として表示し、確定分岐成立とは扱わない。','第1ゲージ後のR到達ギミックと新スタート開放は別途確認。PT小鬼群対策・輸送装備をゲージ別に準備。']});
  add('6-1',0,'AFGHK',[fleet(6),count(['ss'],3),count(['as'],1,1),count(['cl','dd'],1),count(['bb','cv','cav'],0,1)],{los:los(4,25),notes:['潜水母艦を外す別例は必要索敵値とランダム分岐が変わる。']});
@@ -350,6 +370,7 @@ function hdMapRequirementConditionText(c){
  if(c.kind==='typeCount')return `${c.types.join('＋')} ${c.max===0?'不可':c.min===c.max?c.min+'隻':c.min+'〜'+c.max+'隻'}`;
  if(c.kind==='minSpeed')return `${({10:'高速',15:'高速+',20:'最速'})[c.rank]}統一`;
  if(c.kind==='speedCount')return `配備後の低速艦 ${c.min}隻以上（高速化して低速艦がなくなると不可）`;
+ if(c.kind==='equipmentShips'&&c.match==='landingCandidates')return `大発系の候補装備艦は${c.max}隻以下（個別装備の分岐算入は未確定）`;
  if(c.kind==='equipmentShips')return `別々の${c.min}隻に${({drum:'ドラム缶(輸送用)',radar:'電探'})[c.match]||'未確認の装備'}を各1個以上`;
  if(c.kind==='slowBattleshipCount')return `低速戦艦（元の艦種） ${c.min===c.max?c.min:c.min+'〜'+c.max}隻`;
  if(c.kind==='namedCount')return `${c.names.join('・')} ${c.min}隻以上`;

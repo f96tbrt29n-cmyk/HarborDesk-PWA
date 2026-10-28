@@ -62,20 +62,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 25,
-      "未確認": 34,
+      "一部": 26,
+      "未確認": 33,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 25,
-      "未確認": 34,
+      "一部": 26,
+      "未確認": 33,
       "非該当": 0
     },
     "D": {
       "確認済み": 11,
-      "一部": 16,
-      "未確認": 32,
+      "一部": 17,
+      "未確認": 31,
       "非該当": 0
     }
   },
@@ -1803,26 +1803,38 @@
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/route-goal-guidance-audit.json",
+            "docs/pr152-five-five-bkps-ja.md",
+            "tests/five-five-routes.test.cjs",
+            "tests/five-five-graph.test.cjs"
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "通常/免除の有限在庫から実探索と自動配備、C4/W3の2結果を確認。全目標/全在庫/枠競合の網羅は未完。",
+          "evidence": [
+            "docs/pr152-five-five-bkps-ja.md",
+            "tests/route-five-five-bkps.spec.js"
+          ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "確定索敵不足ポイントと装備個数を区別し、空母各1機の具体名/合法枠候補、未知/編成見直しをC/W代表で確認。全装備/全区分は未網羅。",
+          "evidence": [
+            "docs/pr152-five-five-bkps-ja.md",
+            "tests/route-five-five-bkps.spec.js"
+          ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "C4とW不足/未知/免除で保存または安全中止、編集、同一文書load後全文/入力/他編成/metadata保持。W成立はload後第2click非表示・最終比較未到達で一部。",
+          "evidence": [
+            "docs/pr152-five-five-bkps-ja.md",
+            "tests/route-five-five-bkps.spec.js"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "出典待ちはB雷巡3優先・PのCVL略称/揚陸艦・大発系個別対象の結論が変わる範囲。全在庫/枠競合/目標数量と5-5index1/実ゲーム到達は未完。W成立はload後第2click非表示で最終比較未到達、caller欠測/旧原因不明を保持。"
     },
     {
       "id": "5-5/1/default",
@@ -2540,9 +2552,292 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
+    "id": "5-5/0/default",
+    "baselineHead": "2225f6004c08f3a7e86481a7d6914317797d7654",
+    "state": "limited5-5 local scope reviewed; prior audit CI6success; ready for normal commit/push and one finalHEAD smoke",
+    "evidence": "docs/pr152-five-five-bkps-ja.md",
+    "sourceLiterals": {
+      "independent": 63
+    },
+    "graph": {
+      "edges": 28,
+      "before": 13,
+      "missing": 19,
+      "extra": 4
+    },
+    "node": {
+      "previousInitial": {
+        "pass": 351,
+        "fail": 1
+      },
+      "previousCorrectedScopeGuard": 1,
+      "previousSuccessfulReused": 351,
+      "resumeRoutesPassed": 6,
+      "addedAuditTest": 1,
+      "countsOverlapNotSummed": true
+    },
+    "local": [
+      {
+        "trial": "execution-chromium-exempt",
+        "browser": "chromium",
+        "target": "exempt",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "loadReached": true,
+        "pageerrors": 0,
+        "collectionFailures": 0,
+        "workers": 1,
+        "retries": 0
+      },
+      {
+        "trial": "execution-chromium-ready",
+        "browser": "chromium",
+        "target": "ready",
+        "exit_code": 1,
+        "stage": "first-search",
+        "samples": 1,
+        "savedBooleans": {},
+        "loadBooleans": {},
+        "loadReached": false,
+        "pageerrors": 0,
+        "collectionFailures": 0,
+        "workers": 1,
+        "retries": 0,
+        "failureClass": "new test fixed-edge label premise"
+      },
+      {
+        "trial": "execution-chromium-ready-fixture-corrected",
+        "browser": "chromium",
+        "target": "ready",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "loadReached": true,
+        "pageerrors": 0,
+        "collectionFailures": 0,
+        "workers": 1,
+        "retries": 0
+      },
+      {
+        "trial": "execution-chromium-stock",
+        "browser": "chromium",
+        "target": "stock",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "loadReached": true,
+        "pageerrors": 0,
+        "collectionFailures": 0,
+        "workers": 1,
+        "retries": 0
+      },
+      {
+        "trial": "execution-chromium-unknown",
+        "browser": "chromium",
+        "target": "unknown",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": true
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "loadReached": true,
+        "pageerrors": 0,
+        "collectionFailures": 0,
+        "workers": 1,
+        "retries": 0
+      },
+      {
+        "trial": "execution-webkit-exempt",
+        "browser": "webkit",
+        "target": "exempt",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "loadReached": true,
+        "pageerrors": 0,
+        "collectionFailures": 0,
+        "workers": 1,
+        "retries": 0
+      },
+      {
+        "trial": "execution-webkit-ready",
+        "browser": "webkit",
+        "target": "ready",
+        "exit_code": 1,
+        "stage": "after-load-search",
+        "samples": 1,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": false
+        },
+        "loadBooleans": {},
+        "loadReached": false,
+        "pageerrors": 0,
+        "collectionFailures": 1,
+        "workers": 1,
+        "retries": 0,
+        "failureClass": "known-stage post-load second click hidden; final comparison unreached/caller missing"
+      },
+      {
+        "trial": "execution-webkit-stock",
+        "browser": "webkit",
+        "target": "stock",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "loadReached": true,
+        "pageerrors": 0,
+        "collectionFailures": 0,
+        "workers": 1,
+        "retries": 0
+      },
+      {
+        "trial": "execution-webkit-unknown",
+        "browser": "webkit",
+        "target": "unknown",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": true
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "loadReached": true,
+        "pageerrors": 0,
+        "collectionFailures": 0,
+        "workers": 1,
+        "retries": 0
+      }
+    ],
+    "fixedSmokeSelection": {
+      "chromium": 842,
+      "webkit": 842,
+      "newEach": 4
+    },
+    "matrixChange": {
+      "before": "11/122/103",
+      "after": "11/125/100",
+      "cells": 3,
+      "D": "一部 only; Wready final comparison missing"
+    }
+  },
+  "nextPriority": "6-1/index0 AFGHK：根拠のある潜水母艦＋潜水艦の有効代替を例編成拘束が外す不整合と地図の欠落接続を優先。5-5の既知非表示を追加診断しない。",
+  "previousSelected": {
     "id": "5-2/0/default",
     "baselineHead": "db06f5a3a2e457d957f5fd775963ba094c8f34ce",
-    "state": "limited5-2 scope committed; audit correction authorized and validating; old unknown causes preserved",
+    "state": "5-2audit correction and smoke6success, old gaps retained",
     "evidence": "docs/pr152-five-two-bcefo-ja.md",
     "sourceLiterals": {
       "provided": 45,
@@ -2799,54 +3094,6 @@
       "storageMismatchObserved": false,
       "minimalFixApplied": false,
       "furtherTrialOrCi": false
-    }
-  },
-  "nextPriority": "5-2監査期待値を独立出典の63/70境界へ整合し、前回未到達C/W対象を確認。結果記録後に保留5-5を続行。",
-  "previousSelected": {
-    "id": "5-4/0/default",
-    "condition": "M-to-P conditional scouting exemption only for no SS/SSV and confirmed fleet speed >=15; unknown is not exemption",
-    "localBrowserCasesPerEngine": 4,
-    "localInitialPass": {
-      "chromium": 3,
-      "webkit": 2
-    },
-    "localInitialFailure": {
-      "chromium": 1,
-      "webkit": 2
-    },
-    "retries": 0,
-    "statusCellChanges": 0,
-    "newEvidence": "docs/pr152-five-four-scouting-exemption-ja.md",
-    "previousEvidence": "docs/pr152-five-four-submarine-ja.md",
-    "localMissing": [
-      "exempt C/W initial result and all later stages",
-      "required-missing W after-load search and final exact comparison"
-    ],
-    "sevenThree": "G remains unresolved; all statuses unchanged",
-    "normalSmokeSelection": {
-      "totalPerBrowser": 812,
-      "targetCasesPerBrowser": 4,
-      "selectedFile": "tests/route-complex-boundaries.spec.js",
-      "listOnlyBrowserExecutions": 0,
-      "verifiedBeforeCIDispatch": true
-    },
-    "localFixtureSourceHead": "743645f57590cc42c0d88ca79d7c4db49341a620",
-    "guardRegressionCorrection": {
-      "sourceRun": 40598781247,
-      "change": "inspect real nested numeric predicates rather than LOS declaration",
-      "localCasesPerEngine": 2,
-      "initialPassPerEngine": 2,
-      "retries": 0,
-      "mRouteBrowserAttemptsRepeated": 0
-    },
-    "connectionAuditUpdate": {
-      "file": "docs/route-goal-guidance-audit.json",
-      "row": "5-4/0/default",
-      "browserCase": "unknown opening ASW is not a confirmed equipment shortage and survives save reload before recovery",
-      "initialPassPerEngine": 1,
-      "casesPerEngine": 1,
-      "retries": 0,
-      "otherRowsOrAswAssertionsRelaxed": false
     }
   },
   "selectionHistory": [
@@ -3235,6 +3482,11 @@
         "verifiedBeforeCommitAndCI": true,
         "source": "literal package.json test:browser fixed file list + real Playwright --list"
       }
+    },
+    {
+      "id": "5-2/0/default",
+      "record": "docs/pr152-five-two-audit-correction-ja.md",
+      "state": "audit correction2225f600 Node12/C1/W1 passed; CI40733236149 pending; no cell change"
     }
   ],
   "fiveFourCloseout": {
@@ -3275,8 +3527,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "5-2 independently sourced audit correction passed Node12 and original blocked C/W target once; commit/push and newHEAD smoke next",
-    "nextUnit": "review and resume prepared5-5BKPS after recording5-2 results, absent current stop conditions",
+    "activeUnit": "5-5 limited local scope normal reflection; prior5-2audit CI6success and initial evidence gaps preserved",
+    "nextUnit": "6-1AFGHK independently supported alternate fleets and graph; isolated draft preparing without browser/search",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -3346,6 +3598,47 @@
         "retries": 0
       }
     ],
-    "state": "local Node12/C1/W1 passed; independent commit and one newHEAD smoke next"
+    "state": "corrected expected contract; local Node12/C1/W1 and newHEAD smoke6success; old gaps preserved",
+    "ci": {
+      "runId": 40733236149,
+      "head": "2225f6004c08f3a7e86481a7d6914317797d7654",
+      "attempt": 1,
+      "smokeSuccess": 6,
+      "full": "skipped",
+      "C": {
+        "initial": 838,
+        "retry": 0,
+        "finalFailure": 0
+      },
+      "W": {
+        "initial": 827,
+        "retry": 11,
+        "finalFailure": 0
+      },
+      "artifacts": {
+        "published": 8,
+        "received": 7,
+        "bytes": 454102787,
+        "C2AttemptMissingBytes": 1071187797
+      },
+      "environmentsOwnMatches": 6,
+      "initialFailures": {
+        "hiddenSecondClick": 8,
+        "preservationTrueThenExceptionAssert": 2,
+        "importStageMissing": 1
+      },
+      "positiveNewPreservationMismatchObserved": false,
+      "focusedWInitial": {
+        "connections": 59,
+        "savedExact": true,
+        "afterExact": true,
+        "stages": [
+          "unknown",
+          "after-load-unknown",
+          "synced-value-recovery"
+        ]
+      },
+      "matrixChange": 0
+    }
   }
 }

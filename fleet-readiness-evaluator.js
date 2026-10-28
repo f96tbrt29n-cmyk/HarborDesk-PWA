@@ -446,15 +446,17 @@ function hdFEBranchPredicate(condition,ships,plan=null){
   return {status,count,min,max,ratio:condition.kind==='slowBattleshipCount'?(status==='ready'?1:status==='manual'?0:count>max?Math.max(0,1-(count-max)/Math.max(1,count)):Math.min(1,count/Math.max(1,min))):status==='ready'?1:Math.min(1,count/Math.max(1,min)),detail:condition.kind==='slowBattleshipCount'?`${label} ${count}隻 / 上限${max}隻${count>max?'（'+(count-max)+'隻超過）':''}${unknown?' / 未判定 '+unknown+'隻':''}`:`${label} ${count}/${min}隻${unknown?' / 未判定 '+unknown+'隻':''}`};
  }
  if(condition.kind==='equipmentShips'){
-  if(!['radar','drum'].includes(condition.match)||condition.slotPolicy&&condition.slotPolicy!=='valid'||!Number.isInteger(condition.min)||!Number.isInteger(condition.max)||condition.min<0||condition.max<condition.min||condition.max>7)return manual('装備艦数・搭載条件が未対応');
+  if(!['radar','drum','landingCandidates'].includes(condition.match)||condition.slotPolicy&&condition.slotPolicy!=='valid'||!Number.isInteger(condition.min)||!Number.isInteger(condition.max)||condition.min<0||condition.max<condition.min||condition.max>7)return manual('装備艦数・搭載条件が未対応');
+  if(condition.match==='landingCandidates'&&(condition.min!==0||condition.max!==3))return manual('大発系候補は3隻以下という上限確認だけに対応。個別装備の分岐算入は未確認です');
   let count=0,unknown=0;
   for(const row of ships){const ship=row.ship,db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db);let has=false,unresolved=!profile;
-   for(const [i,item] of [...(ship.items||[]).map((x,i)=>[i,x]),...(ship.expansion?.name?[[null,ship.expansion]]:[])]){if(!item.name)continue;const meta=hdFEFind(item.name);if(!meta){unresolved=true;continue}if(condition.match==='drum'?meta.name!=='ドラム缶(輸送用)':!/電探/.test(meta.category||''))continue;
+   for(const [i,item] of [...(ship.items||[]).map((x,i)=>[i,x]),...(ship.expansion?.name?[[null,ship.expansion]]:[])]){if(!item.name)continue;const meta=hdFEFind(item.name);if(!meta){unresolved=true;continue}if(condition.match==='drum'?meta.name!=='ドラム缶(輸送用)':condition.match==='landingCandidates'?!['上陸用舟艇','特型内火艇'].includes(meta.category):!/電探/.test(meta.category||''))continue;
     const available=i===null?hdFEExpansionAvailability(ship):null;if(available&&!available.allowed){if(available.status==='manual')unresolved=true;continue}
     const slot=item.slotIndex??i,unique=i===null||(ship.items||[]).filter((x,j)=>Number(x.slotIndex??j)===slot).length===1,allowed=unique&&profile&&(i===null?hdShipDbExpansionInfo(meta,db,item.star).allowed:hdShipDbEquipCompatible(meta,db)&&Number.isInteger(slot)&&slot>=0&&slot<profile.count&&!hdShipDbSlotRejects(profile,slot,meta));if(allowed)has=true;
    }if(has)count++;else if(unresolved)unknown++;
   }
   const {min,max}=condition,status=count>max||count+unknown<min?'missing':count>=min&&count+unknown<=max?'ready':'manual';
+  if(condition.match==='landingCandidates')return {status,count,min,max,gap:0,ratio:status==='ready'?1:status==='manual'?0:Math.max(0,1-(count-max)/Math.max(1,count)),detail:`大発系の候補装備艦 ${count}隻 / 上限${max}隻${unknown?' / 未判定 '+unknown+'隻':''}。同じ艦の複数装備は1隻。個別装備の分岐算入は未確定です`};
   const label=condition.match==='drum'?'ドラム缶':'電探',note=condition.match==='drum'?'同じ艦に複数積んでも1隻':'複数電探を同じ艦に積んでも1隻';return {status,count,min,max,gap:Math.max(0,min-count),ratio:status==='ready'?1:Math.min(1,count/Math.max(1,min)),detail:`${label}装備艦 ${count}/${min}隻${unknown?' / 未判定 '+unknown+'隻':''}${count<min?'（あと'+(min-count)+'隻）':''}。${note}`};
  }
  if(['scoutingValue','airValue'].includes(condition.kind)){
@@ -592,7 +594,7 @@ function hdFEScoutingExemption(plan,contract=hdFERouteRequirementData(plan)){
 function hdFEScouting(plan,items){
  const map=String(plan?.map||''),contract=hdFERouteRequirementData(plan),fallback=typeof HD_MAP_ADVANCED_DATA!=='undefined'?HD_MAP_ADVANCED_DATA[map]?.los:null,adv=contract?.los?.kind==='required'?contract.los:fallback,coef=Number(adv?.coef)||0,checks=Array.isArray(adv?.checks)?adv.checks:[];
  if(contract?.los?.kind==='none')return {status:'ready',available:false,notRequired:true,reason:'not-required',score:null,checks:[],detail:`${contract.path}：${contract.los.note}`};
- if(hdFEScoutingExemption(plan,contract)?.status==='ready')return {status:'ready',available:false,notRequired:true,reason:'exempt',score:null,checks:[],detail:`${contract.path}：M→Pの索敵条件は非適用。${contract.los.exemptNote}`};
+ if(hdFEScoutingExemption(plan,contract)?.status==='ready')return {status:'ready',available:false,notRequired:true,reason:'exempt',score:null,checks:[],detail:`${contract.path}：${contract.los.exemptLabel||'M→P'}の索敵条件は非適用。${contract.los.exemptNote}`};
  if(!contract&&typeof HD_MAP_ROUTE_REQUIREMENTS!=='undefined'&&HD_MAP_ROUTE_REQUIREMENTS[map]?.some(r=>r.los.kind==='required'))return {status:'manual',available:false,reason:'route',score:null,checks:[],detail:'登録済みの経路を特定できません。別経路の索敵値は流用せず、ルートを選び直してね。'};
  if(!coef||!checks.length)return {status:'manual',available:false,reason:'threshold',score:null,checks:[],detail:adv?.summary||'数値閾値なし'};
  const sync=(()=>{try{return JSON.parse(localStorage.getItem('harbordesk-kancolle-sync-v1')||'null')}catch{return null}})(),hq=Number(sync?.admiralLevel)||0,ships=(plan?.ships||[]).filter(x=>x?.ship),losRows=ships.map(ship=>typeof hdFCProposalShipLos==='function'?hdFCProposalShipLos(ship):null);
@@ -607,7 +609,7 @@ function hdFEScouting(plan,items){
 function hdFEPlanScouting(plan,items){
  const scouting=hdFEScouting(plan,items);
  if(!scouting.available)return scouting;
- if(scouting.status!=='ready'&&hdFEScoutingExemption(plan)?.status==='manual')return {status:'manual',available:false,score:null,reason:'exemption',checks:scouting.checks.map(({score,status,...check})=>check),detail:'M→Pの高速＋以上統一による索敵免除は未確認。索敵安全域も未充足のため、この分岐は未判定です。速力・装備可否・索敵情報を確認してください。'};
+ if(scouting.status!=='ready'&&hdFEScoutingExemption(plan)?.status==='manual')return {status:'manual',available:false,score:null,reason:'exemption',checks:scouting.checks.map(({score,status,...check})=>check),detail:hdFERouteRequirementData(plan)?.los?.exemptUnknownNote||'M→Pの高速＋以上統一による索敵免除は未確認。索敵安全域も未充足のため、この分岐は未判定です。速力・装備可否・索敵情報を確認してください。'};
  const numeric=c=>c?.kind==='scoutingValue'||c?.all?.some(numeric)||c?.any?.some(numeric)||c?.not&&numeric(c.not);
  const required=[...(hdFERouteContract(plan)?.checks||[]),...(hdFEBranchRoute(plan).checks||[])].some(x=>numeric(x.condition));
  if(!required||hdFEGameMatch(plan).status==='ready')return scouting;
