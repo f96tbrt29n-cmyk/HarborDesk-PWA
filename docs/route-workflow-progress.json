@@ -62,20 +62,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 28,
-      "未確認": 31,
+      "一部": 29,
+      "未確認": 30,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 28,
-      "未確認": 31,
+      "一部": 29,
+      "未確認": 30,
       "非該当": 0
     },
     "D": {
-      "確認済み": 14,
+      "確認済み": 15,
       "一部": 16,
-      "未確認": 29,
+      "未確認": 28,
       "非該当": 0
     }
   },
@@ -2081,30 +2081,42 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "reason": "CL/CTの出撃制限/E分岐の適用差と38/36、12辺を独立出典/境界で確認。6隻以外・偵察/資源/全目標数量等は未完。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/route-goal-guidance-audit.json",
+            "docs/pr152-six-three-aceghj-ja.md",
+            "tests/six-three-routes.test.cjs",
+            "tests/six-three-graph.test.cjs"
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "明示CL1CT1DD3AV1の有限5個から水観/瑞雲を復元する自動配備をC/W代表で確認。全目標/全在庫は未網羅。",
+          "evidence": [
+            "docs/pr152-six-three-aceghj-ja.md",
+            "tests/route-six-three-aceghj.spec.js"
+          ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "索敵ポイント≠購入個数、水母の水爆推奨1個の具体名/数量/合法搭載枠、未知/編成見直しを代表とNodeで確認。全区分は未網羅。",
+          "evidence": [
+            "docs/pr152-six-three-aceghj-ja.md",
+            "tests/route-six-three-aceghj.spec.js"
+          ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "確認済み",
+          "reason": "C/W成立/不足/未知各初回で2結果、保存または安全中止/編集/同一load文書再表示、全文/入力/他編成/metadata保持を確認。旧他行の欠測へ流用しない。",
+          "evidence": [
+            "docs/pr152-six-three-aceghj-ja.md",
+            "tests/route-six-three-aceghj.spec.js"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "6隻以外の成立範囲/CT-only導出編成の実出撃・G/H航空偵察成功/資源/勝利、全在庫/搭載不可・枠競合/全戦闘数量と別経路は未網羅。現代表C/W保存操作列は確認済みだが旧他行の非表示/保存異常/通信の原因は解決扱いにしない。"
     },
     {
       "id": "6-4/0/default",
@@ -2577,8 +2589,427 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
+    "id": "6-3/0/default",
+    "preparationBasis": "original isolated6-2draft13/129/94 retained; actual integration based on published6-2HEAD9f6861ef14/128/94",
+    "state": "6-3 local C/W3 each initial pass; exact14 served-source reuse on9f base; upstream6-2CI40762108890 finalized6success; ready for normal commit/push then one own finalHEADsmoke, not yet started",
+    "evidence": "docs/pr152-six-three-aceghj-ja.md",
+    "independentLiterals": {
+      "provided": 52,
+      "selectedFull": 39,
+      "ESelectedPathGuards": 4,
+      "HNumericBoundaryChecks": 5,
+      "notAllDestinationsVerified": true
+    },
+    "actualBeforeAfter": {
+      "cases": 12,
+      "beforeMismatches": 4,
+      "afterMatches": 12,
+      "searchRuns": 0
+    },
+    "node": {
+      "routes": {
+        "uniqueVerified": 6,
+        "initialPass": 5,
+        "initialFailure": 1,
+        "correctedTargetPass": 1,
+        "unchangedReused": 5
+      },
+      "graph": {
+        "uniqueVerified": 4,
+        "initialPass": 4,
+        "correctedGuidanceTargetPass": 1,
+        "unchangedReused": 3
+      },
+      "placement": {
+        "uniqueVerified": 4,
+        "initialPass": 4,
+        "metadataParserOnlyCorrection": true,
+        "extraExecutions": 0
+      },
+      "finalUniqueVerified": 14
+    },
+    "local": [
+      {
+        "browser": "chromium",
+        "target": "ready",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "searches": [
+          {
+            "status": "targets-met",
+            "exhaustive": false,
+            "examined": 270,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "beam-limit"
+            ]
+          },
+          {
+            "status": "targets-met",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          }
+        ],
+        "pageerrors": 0,
+        "workers": 1,
+        "retries": 0,
+        "collectionFailures": 0
+      },
+      {
+        "browser": "chromium",
+        "target": "stock",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "searches": [
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          },
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          }
+        ],
+        "pageerrors": 0,
+        "workers": 1,
+        "retries": 0,
+        "collectionFailures": 0
+      },
+      {
+        "browser": "chromium",
+        "target": "unknown",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": true
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "searches": [
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          },
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          }
+        ],
+        "pageerrors": 0,
+        "workers": 1,
+        "retries": 0,
+        "collectionFailures": 0
+      },
+      {
+        "browser": "webkit",
+        "target": "ready",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "searches": [
+          {
+            "status": "targets-met",
+            "exhaustive": false,
+            "examined": 270,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "beam-limit"
+            ]
+          },
+          {
+            "status": "targets-met",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          }
+        ],
+        "pageerrors": 0,
+        "workers": 1,
+        "retries": 0,
+        "collectionFailures": 0
+      },
+      {
+        "browser": "webkit",
+        "target": "stock",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "searches": [
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          },
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          }
+        ],
+        "pageerrors": 0,
+        "workers": 1,
+        "retries": 0,
+        "collectionFailures": 0
+      },
+      {
+        "browser": "webkit",
+        "target": "unknown",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": true
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "searches": [
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          },
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          }
+        ],
+        "pageerrors": 0,
+        "workers": 1,
+        "retries": 0,
+        "collectionFailures": 0
+      }
+    ],
+    "fixedList": {
+      "each": 851,
+      "newEach": 3
+    },
+    "matrixChange": {
+      "before": "14/128/94",
+      "after": "15/130/91",
+      "cells": 3,
+      "scope": "6-3 B/C 未確認→一部, D 未確認→確認済み",
+      "originalPreparationBefore": "13/129/94",
+      "originalPreparationAfter": "14/131/91"
+    },
+    "upstreamAtRecord": {
+      "committedHead": "33ed3a1735aa4bc1ed4cba413b2c4ede7a39a0e1",
+      "committedCounts": "13/126/97",
+      "runId": 40754733298,
+      "CIState": "pending; no result inferred",
+      "sixTwoActualWorktree": "16WIP/14/128/94 separate"
+    },
+    "baselineHead": "9f6861ef383bd8c8687139308b80ea1a12583e7d",
+    "integrationProvenance": {
+      "originalValidation": "e78 plus6-1,6-2 and6-3 working-source snapshots in isolated runtime",
+      "integratedBaseHead": "9f6861ef383bd8c8687139308b80ea1a12583e7d",
+      "servedSourcesByteIdentical": 14,
+      "upstreamNumericFixtureInherited": true,
+      "upstreamFiveFiveDConfirmedRetained": true,
+      "upstreamCIState": "completed6smoke success C848/0/0 W841/7/0; ready initial unreached and retry/local full proof remain separate; C2raw missing",
+      "additionalNodeBrowserOrSearchExecutions": 0,
+      "upstreamCIStateBeforeFinalization": "6-2 ownHEAD normal smoke dispatched once, pending; no result inferred"
+    },
+    "upstreamFinalCI": {
+      "runId": 40762108890,
+      "head": "9f6861ef383bd8c8687139308b80ea1a12583e7d",
+      "attempt": 1,
+      "state": "completed",
+      "smokeSuccess": 6,
+      "smokeFailure": 0,
+      "full": "skipped",
+      "C": {
+        "initial": 848,
+        "retry": 0,
+        "final": 0
+      },
+      "W": {
+        "initial": 841,
+        "retry": 7,
+        "final": 0
+      },
+      "ownHeadAttemptAndNodePlaywrightRevisionMatches": 6,
+      "imageDigestEvidence": "same-head workflow pin plus own receipt image tag; no independent digest measurement",
+      "artifactReceived": 7,
+      "artifactPublished": 8,
+      "bytes": 455434107,
+      "collectionManifestFiles": 71,
+      "missing": [
+        {
+          "name": "attempt-diagnostics-chromium-2-40762108890",
+          "bytes": 1209231352,
+          "reason": "512MiB supported archive cap; not requested; no bypass"
+        }
+      ],
+      "failedInitialTrials": 7,
+      "failedRetryTrials": 0,
+      "failedTraces": 7,
+      "failedVideos": 7,
+      "initialFailureBoundary": "all seven after-load second-search click hidden; final comparison unreached; shared cause unknown",
+      "positiveNewPreservationMismatchObserved": false,
+      "ownSixTwoWebKit": {
+        "readyInitial": "after-load-search/sample1; save/edit source/other invariants true; final load comparison absent; final navigation collection failure1",
+        "readyRetry": "completed2; same-document complete/load exact/searchAssessment direct equality true/pageerrors0",
+        "stockInitial": "completed2; same-document complete/load exact/searchAssessment equality true/pageerrors0",
+        "unknownInitial": "completed2; safe abort/original full retained/load exact/pageerrors0"
+      },
+      "chromiumEvidence": "own official848 initial passes and fixed selection; C2 raw cap missing; unchanged localC3 full workflow remains separate",
+      "officialResultsSha256": "874b4876dc595c1c48b5b479c2a7e8633e8a176fa8854e212a44a93231200114",
+      "artifactSummarySha256": "ed1ab83ac4f5e66a37b4e38b446e307e25fd616da96cca0fe2a364be35a75fde",
+      "focusedFinalSummarySha256": "d2e309621e1b5db71123a95e45c0ded600169a4e7e99f299aad80d5f9a7691d1",
+      "closedCollectionManifestSha256": "a27ee6cab68816b17d4d8941dbd39b653e4f2c5ae0804f33bd5ac5a7f62755ce",
+      "matrixChange": 0,
+      "limits": "Retry/local/other-job success never fills initial missing observations. Ready initial final navigation snapshot missing; observed document counters are not a complete-final-collection claim."
+    }
+  },
+  "nextPriority": "6-4/index0 BDCFN：CL2/自由枠・DD4・長門/陸奥の名指定例外を独立根拠/actualで照合し、D/Gの図接続不明を別残件として保持。旧操作不安定の診断反復へ戻らない。",
+  "previousSelected": {
     "id": "6-2/0/default",
-    "state": "6-2 local C/W3 each initial pass; exact14 served-source reuse on33ed base; upstream6-1CI40754733298 finalized6success; ready for normal commit/push and then one own finalHEADsmoke (not yet started)",
+    "state": "9f6861ef normal commit/push and one ownHEADCI40762108890 completed6success C848/0/0 W841/7/0; Wready initial unreached and retry full retained separately; local6 initial full proof unchanged",
     "evidence": "docs/pr152-six-two-cejk-ja.md",
     "independentLiterals": {
       "provided": 52,
@@ -2831,244 +3262,36 @@
       "focusedFinalSummarySha256": "466e64435e93e1c2184a8282c5c3f9b42efba002083dacda134aa7eff629c7f3",
       "matrixChange": 0,
       "limits": "Interim focused summary kept its C2-running snapshot; separate final focused summary and official receipts establish C2 completion/raw gap. Successful retries do not fill initial unreached comparisons or old missing observations."
-    }
-  },
-  "nextPriority": "6-3/index0 ACEGHJ：軽巡/練巡の入域条件とE先行分岐の適用範囲、出典で有効な代替・図を独立根拠で照合。旧操作不安定の診断反復へ戻らない。",
-  "previousSelected": {
-    "id": "6-1/0/default",
-    "baselineHead": "9dd888aa2fc8abf7bef6ebb90c43b1a6eb34d6c6",
-    "state": "33ed3a17 normal commit/push completed; ownCI40754733298 finalized6smoke success C845/0/0 W838/7/0; ownW3 initial full save/load and unchanged localC3 proof kept separate from C2raw cap gap",
-    "evidence": "docs/pr152-six-one-afghk-ja.md",
-    "independentLiterals": {
-      "provided": 48,
-      "selectedBoundaryOrPartial": 39,
-      "outsideSelectedRejectionGuards": 9,
-      "notAllDestinationsVerified": true
     },
-    "actualBeforeAfter": {
-      "cases": 9,
-      "afterMatches": 9,
-      "searchRuns": 0
-    },
-    "node": {
-      "routes": 6,
-      "graph": 4,
-      "placement": 4,
-      "successfulUnchangedReused": 14
-    },
-    "local": [
-      {
-        "browser": "chromium",
-        "target": "ready",
-        "exit_code": 0,
-        "stage": "completed",
-        "samples": 2,
-        "savedBooleans": {
-          "sourcesExact": true,
-          "other": true,
-          "otherMap": true,
-          "procurement": true,
-          "otherPlanner": true,
-          "identitiesExact": true,
-          "customExact": false
-        },
-        "loadBooleans": {
-          "sameDocument": true,
-          "customExact": true,
-          "sourcesExact": true,
-          "otherPlanner": true,
-          "procurement": true
-        },
-        "pageerrors": 0,
-        "workers": 1,
-        "retries": 0,
-        "collectionFailures": 0
-      },
-      {
-        "browser": "chromium",
-        "target": "stock",
-        "exit_code": 0,
-        "stage": "completed",
-        "samples": 2,
-        "savedBooleans": {
-          "sourcesExact": true,
-          "other": true,
-          "otherMap": true,
-          "procurement": true,
-          "otherPlanner": true,
-          "identitiesExact": true,
-          "customExact": false
-        },
-        "loadBooleans": {
-          "sameDocument": true,
-          "customExact": true,
-          "sourcesExact": true,
-          "otherPlanner": true,
-          "procurement": true
-        },
-        "pageerrors": 0,
-        "workers": 1,
-        "retries": 0,
-        "collectionFailures": 0
-      },
-      {
-        "browser": "chromium",
-        "target": "unknown",
-        "exit_code": 0,
-        "stage": "completed",
-        "samples": 2,
-        "savedBooleans": {
-          "sourcesExact": true,
-          "other": true,
-          "otherMap": true,
-          "procurement": true,
-          "otherPlanner": true,
-          "identitiesExact": true,
-          "customExact": true
-        },
-        "loadBooleans": {
-          "sameDocument": true,
-          "customExact": true,
-          "sourcesExact": true,
-          "otherPlanner": true,
-          "procurement": true
-        },
-        "pageerrors": 0,
-        "workers": 1,
-        "retries": 0,
-        "collectionFailures": 0
-      },
-      {
-        "browser": "webkit",
-        "target": "ready",
-        "exit_code": 0,
-        "stage": "completed",
-        "samples": 2,
-        "savedBooleans": {
-          "sourcesExact": true,
-          "other": true,
-          "otherMap": true,
-          "procurement": true,
-          "otherPlanner": true,
-          "identitiesExact": true,
-          "customExact": false
-        },
-        "loadBooleans": {
-          "sameDocument": true,
-          "customExact": true,
-          "sourcesExact": true,
-          "otherPlanner": true,
-          "procurement": true
-        },
-        "pageerrors": 0,
-        "workers": 1,
-        "retries": 0,
-        "collectionFailures": 0
-      },
-      {
-        "browser": "webkit",
-        "target": "stock",
-        "exit_code": 0,
-        "stage": "completed",
-        "samples": 2,
-        "savedBooleans": {
-          "sourcesExact": true,
-          "other": true,
-          "otherMap": true,
-          "procurement": true,
-          "otherPlanner": true,
-          "identitiesExact": true,
-          "customExact": false
-        },
-        "loadBooleans": {
-          "sameDocument": true,
-          "customExact": true,
-          "sourcesExact": true,
-          "otherPlanner": true,
-          "procurement": true
-        },
-        "pageerrors": 0,
-        "workers": 1,
-        "retries": 0,
-        "collectionFailures": 0
-      },
-      {
-        "browser": "webkit",
-        "target": "unknown",
-        "exit_code": 0,
-        "stage": "completed",
-        "samples": 2,
-        "savedBooleans": {
-          "sourcesExact": true,
-          "other": true,
-          "otherMap": true,
-          "procurement": true,
-          "otherPlanner": true,
-          "identitiesExact": true,
-          "customExact": true
-        },
-        "loadBooleans": {
-          "sameDocument": true,
-          "customExact": true,
-          "sourcesExact": true,
-          "otherPlanner": true,
-          "procurement": true
-        },
-        "pageerrors": 0,
-        "workers": 1,
-        "retries": 0,
-        "collectionFailures": 0
-      }
-    ],
-    "fixedList": {
-      "each": 845,
-      "newEach": 3
-    },
-    "matrixChange": {
-      "before": "12/124/100",
-      "after": "13/126/97",
-      "cells": 3,
-      "scope": "6-1B/C 未確認→一部, D 未確認→確認済み; separate from upstream5-5D new-evidence1cell",
-      "originalDraftBeforeUpstreamCloseout": "12/127/97"
-    },
-    "integrationProvenance": {
-      "originalWorktreeHead": "e78ec607b493ee75fc57daa60aa7c4cc6d207ee5",
-      "originalValidation": "e78 plus6-1 working-source snapshot in isolated runtime",
-      "integratedBaseHead": "9dd888aa2fc8abf7bef6ebb90c43b1a6eb34d6c6",
-      "servedSourcesByteIdentical": 14,
-      "upstreamNumericFixtureInherited": true,
-      "upstreamCI": 40748149278,
-      "additionalNodeBrowserOrSearchExecutions": 0,
-      "upstreamCIState": "completed6smoke success; C842/0/0 W836/6/0; old gaps unchanged"
-    },
-    "stateBeforeOwnCIFinalization": "6-1 local C/W3 each initial pass; exact14 served-source reuse on9dd base; upstream correctedCI40748149278 finalized6success; ready for normal commit/push and then one own finalHEAD smoke (not yet started)",
+    "stateBeforeOwnCIFinalization": "6-2 local C/W3 each initial pass; exact14 served-source reuse on33ed base; upstream6-1CI40754733298 finalized6success; ready for normal commit/push and then one own finalHEADsmoke (not yet started)",
     "ci": {
-      "runId": 40754733298,
-      "head": "33ed3a1735aa4bc1ed4cba413b2c4ede7a39a0e1",
+      "runId": 40762108890,
+      "head": "9f6861ef383bd8c8687139308b80ea1a12583e7d",
       "attempt": 1,
       "state": "completed",
       "smokeSuccess": 6,
       "smokeFailure": 0,
       "full": "skipped",
       "C": {
-        "initial": 845,
+        "initial": 848,
         "retry": 0,
         "final": 0
       },
       "W": {
-        "initial": 838,
+        "initial": 841,
         "retry": 7,
         "final": 0
       },
-      "ownEnvironmentAndHeadReceiptsMatched": 6,
+      "ownHeadAttemptAndNodePlaywrightRevisionMatches": 6,
+      "imageDigestEvidence": "same-head workflow pin plus own receipt image tag; no independent digest measurement",
       "artifactReceived": 7,
       "artifactPublished": 8,
-      "bytes": 460138542,
-      "collectionManifestFiles": 83,
+      "bytes": 455434107,
+      "collectionManifestFiles": 71,
       "missing": [
         {
-          "name": "attempt-diagnostics-chromium-2-40754733298",
-          "bytes": 1118519423,
+          "name": "attempt-diagnostics-chromium-2-40762108890",
+          "bytes": 1209231352,
           "reason": "512MiB supported archive cap; not requested; no bypass"
         }
       ],
@@ -3076,20 +3299,21 @@
       "failedRetryTrials": 0,
       "failedTraces": 7,
       "failedVideos": 7,
+      "initialFailureBoundary": "all seven after-load second-search click hidden; final comparison unreached; shared cause unknown",
       "positiveNewPreservationMismatchObserved": false,
-      "officialResultsSha256": "50403b8ab326b8cd19e75c8980439af374692a7e1683ff897134b56a32c6fb65",
-      "artifactSummarySha256": "79319e73b9633a3e6d540057a71796da79eee2fc3b7148cf140ec3f2883b2250",
-      "closedCollectionManifestSha256": "a9818fb07d84fac5346e55647aba5c6cfed4ac03dffa86cdb2fd882e0628efc6",
-      "ownSixOneWebKit": "ready/stock/unknown own initial completed2/save or safe-abort/edit/same-document complete/load exact/other metadata preserved; pageerrors0",
-      "chromiumEvidence": "own C official845 initial passes and fixed selection; C2 raw cap missing; unchanged localC3 save/load raw is separate evidence",
-      "initialFailures": {
-        "postLoadHiddenSearch": 6,
-        "versionAccessControlAfterFullLoadComparison": 1,
-        "causes": "unknown; no broader diagnosis"
+      "ownSixTwoWebKit": {
+        "readyInitial": "after-load-search/sample1; save/edit source/other invariants true; final load comparison absent; final navigation collection failure1",
+        "readyRetry": "completed2; same-document complete/load exact/searchAssessment direct equality true/pageerrors0",
+        "stockInitial": "completed2; same-document complete/load exact/searchAssessment equality true/pageerrors0",
+        "unknownInitial": "completed2; safe abort/original full retained/load exact/pageerrors0"
       },
-      "focusedFinalSummarySha256": "466e64435e93e1c2184a8282c5c3f9b42efba002083dacda134aa7eff629c7f3",
+      "chromiumEvidence": "own official848 initial passes and fixed selection; C2 raw cap missing; unchanged localC3 full workflow remains separate",
+      "officialResultsSha256": "874b4876dc595c1c48b5b479c2a7e8633e8a176fa8854e212a44a93231200114",
+      "artifactSummarySha256": "ed1ab83ac4f5e66a37b4e38b446e307e25fd616da96cca0fe2a364be35a75fde",
+      "focusedFinalSummarySha256": "d2e309621e1b5db71123a95e45c0ded600169a4e7e99f299aad80d5f9a7691d1",
+      "closedCollectionManifestSha256": "a27ee6cab68816b17d4d8941dbd39b653e4f2c5ae0804f33bd5ac5a7f62755ce",
       "matrixChange": 0,
-      "limits": "Interim focused summary kept its C2-running snapshot; separate final focused summary and official receipts establish C2 completion/raw gap. Successful retries do not fill initial unreached comparisons or old missing observations."
+      "limits": "Retry/local/other-job success never fills initial missing observations. Ready initial final navigation snapshot missing; observed document counters are not a complete-final-collection claim."
     }
   },
   "selectionHistory": [
@@ -3560,6 +3784,65 @@
         "matrixChange": 0,
         "limits": "Interim focused summary kept its C2-running snapshot; separate final focused summary and official receipts establish C2 completion/raw gap. Successful retries do not fill initial unreached comparisons or old missing observations."
       }
+    },
+    {
+      "id": "6-2/0/default",
+      "head": "9f6861ef383bd8c8687139308b80ea1a12583e7d",
+      "record": "docs/pr152-six-two-cejk-ja.md",
+      "state": "normal commit/push and one ownHEADsmoke completed6success; initial7 hidden/unreached and C2raw cap gap preserved; no rerun",
+      "matrixCounts": "14/128/94",
+      "stateBeforeFinalization": "normal commit/push complete; one ownHEADsmoke pending; unchanged localC/W3 eachinitialsuccess reused; original prior gaps unchanged",
+      "ci": {
+        "runId": 40762108890,
+        "head": "9f6861ef383bd8c8687139308b80ea1a12583e7d",
+        "attempt": 1,
+        "state": "completed",
+        "smokeSuccess": 6,
+        "smokeFailure": 0,
+        "full": "skipped",
+        "C": {
+          "initial": 848,
+          "retry": 0,
+          "final": 0
+        },
+        "W": {
+          "initial": 841,
+          "retry": 7,
+          "final": 0
+        },
+        "ownHeadAttemptAndNodePlaywrightRevisionMatches": 6,
+        "imageDigestEvidence": "same-head workflow pin plus own receipt image tag; no independent digest measurement",
+        "artifactReceived": 7,
+        "artifactPublished": 8,
+        "bytes": 455434107,
+        "collectionManifestFiles": 71,
+        "missing": [
+          {
+            "name": "attempt-diagnostics-chromium-2-40762108890",
+            "bytes": 1209231352,
+            "reason": "512MiB supported archive cap; not requested; no bypass"
+          }
+        ],
+        "failedInitialTrials": 7,
+        "failedRetryTrials": 0,
+        "failedTraces": 7,
+        "failedVideos": 7,
+        "initialFailureBoundary": "all seven after-load second-search click hidden; final comparison unreached; shared cause unknown",
+        "positiveNewPreservationMismatchObserved": false,
+        "ownSixTwoWebKit": {
+          "readyInitial": "after-load-search/sample1; save/edit source/other invariants true; final load comparison absent; final navigation collection failure1",
+          "readyRetry": "completed2; same-document complete/load exact/searchAssessment direct equality true/pageerrors0",
+          "stockInitial": "completed2; same-document complete/load exact/searchAssessment equality true/pageerrors0",
+          "unknownInitial": "completed2; safe abort/original full retained/load exact/pageerrors0"
+        },
+        "chromiumEvidence": "own official848 initial passes and fixed selection; C2 raw cap missing; unchanged localC3 full workflow remains separate",
+        "officialResultsSha256": "874b4876dc595c1c48b5b479c2a7e8633e8a176fa8854e212a44a93231200114",
+        "artifactSummarySha256": "ed1ab83ac4f5e66a37b4e38b446e307e25fd616da96cca0fe2a364be35a75fde",
+        "focusedFinalSummarySha256": "d2e309621e1b5db71123a95e45c0ded600169a4e7e99f299aad80d5f9a7691d1",
+        "closedCollectionManifestSha256": "a27ee6cab68816b17d4d8941dbd39b653e4f2c5ae0804f33bd5ac5a7f62755ce",
+        "matrixChange": 0,
+        "limits": "Retry/local/other-job success never fills initial missing observations. Ready initial final navigation snapshot missing; observed document counters are not a complete-final-collection claim."
+      }
     }
   ],
   "fiveFourCloseout": {
@@ -3600,8 +3883,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "6-2 validated source integrated on33ed; prior6-1CI40754733298 finalized6success; ready for normal commit/push and one own finalHEADsmoke without repeating local successes",
-    "nextUnit": "6-3ACEGHJ remains a separate source-backed preparation unit; do not mix its source, trial or progress evidence with6-2",
+    "activeUnit": "6-3 validated source integrated on9f; prior6-2CI40762108890 finalized6success; ready for normal commit/push and one own finalHEADsmoke without repeating unchanged local successes",
+    "nextUnit": "6-4BDCFN remains a separate source-backed preparation unit; do not mix its source, trial or progress evidence with6-3",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
