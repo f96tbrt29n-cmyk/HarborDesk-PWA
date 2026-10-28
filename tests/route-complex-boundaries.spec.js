@@ -100,15 +100,23 @@ for(const [map,index,coef,min] of [
 ])test(`${map} example${index+1} exact numeric route boundary uses coefficient${coef} threshold${min}`,async({page})=>{
  await prepare(page,map,index,['矢矧改二','鈴谷改二','熊野改二','時雨改二','夕立改二','綾波改二']);
  const r=await page.evaluate(({coef,min})=>{
-  const p=boundaryPlan,condition=hdOCRequiredChecks(p).find(x=>x.condition.kind==='scoutingValue').condition,ships=hdFERouteShips(p);
+  const p=boundaryPlan,condition={kind:'scoutingValue',coef,min},los=hdFERouteRequirementData(p).los,ships=hdFERouteShips(p);
+  // The safe numeric layer may be a direct check or the numeric alternative
+  // to a verified exemption. Match its full connection rather than selecting
+  // the first numeric check (an earlier node may have a different threshold).
+  const expected=los.exemptWhen?{any:[los.exemptWhen,condition],reason:los.exemptNote}:condition;
+  const canonical=x=>Array.isArray(x)?x.map(canonical):x&&typeof x==='object'?Object.fromEntries(Object.keys(x).sort().map(k=>[k,canonical(x[k])])):x;
+  const expectedKey=JSON.stringify(canonical(expected));
+  const connected=hdOCRequiredChecks(p).some(x=>JSON.stringify(canonical(x.condition))===expectedKey);
+  if(!connected)throw Error('Expected safe scouting condition is not connected to the selected route');
   // Isolate threshold/unknown/coef comparison from the separately tested 33-formula.
   // These are numeric-layer fixtures, not claims of attainable ship stats or full route readiness.
   const scouting=hdFEScouting,match=hdFEGameMatch;let sample={available:true,coef,score:min};
   hdFEGameMatch=()=>({status:'ready'});hdFEScouting=()=>sample;
   const check=()=>hdFEBranchPredicate(condition,ships,p);
-  try{const exact=check();sample={...sample,score:min-.01};const below=check();sample={...sample,score:min+.01};const above=check();sample={...sample,coef:coef===4?1:4};const wrongCoef=check();sample={available:false,coef,score:null};const unknown=check();return {condition,exact,below,above,wrongCoef,unknown};}finally{hdFEScouting=scouting;hdFEGameMatch=match;}
+  try{const exact=check();sample={...sample,score:min-.01};const below=check();sample={...sample,score:min+.01};const above=check();sample={...sample,coef:coef===4?1:4};const wrongCoef=check();sample={available:false,coef,score:null};const unknown=check();return {condition,connected,conditional:!!los.exemptWhen,exact,below,above,wrongCoef,unknown};}finally{hdFEScouting=scouting;hdFEGameMatch=match;}
  },{coef,min});
- expect(r.condition).toMatchObject({coef,min});expect(r.exact.status).toBe('ready');expect(r.below.status).toBe('missing');expect(r.below.detail).toContain('あと');expect(r.above.status).toBe('ready');expect(r.wrongCoef.status).toBe('manual');expect(r.unknown.status).toBe('manual');
+ expect(r.connected).toBe(true);expect(r.conditional).toBe(map==='5-5'&&index===0);expect(r.condition).toMatchObject({coef,min});expect(r.exact.status).toBe('ready');expect(r.below.status).toBe('missing');expect(r.below.detail).toContain('あと');expect(r.above.status).toBe('ready');expect(r.wrongCoef.status).toBe('manual');expect(r.unknown.status).toBe('manual');
 });
 test('small finite sonar inventory has an independent exhaustive oracle and bounded search never proves shortage',async({page})=>{
  await prepare(page,'1-2',0,['時雨改二','夕立改二','綾波改二','島風改']);

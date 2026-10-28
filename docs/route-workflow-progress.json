@@ -2554,7 +2554,7 @@
   "selected": {
     "id": "5-5/0/default",
     "baselineHead": "2225f6004c08f3a7e86481a7d6914317797d7654",
-    "state": "limited5-5 local scope reviewed; prior audit CI6success; ready for normal commit/push and one finalHEAD smoke",
+    "state": "e78CI finalized3success3failure; direct numeric fixture assumption corrected separately; old Wready final comparison missing preserved",
     "evidence": "docs/pr152-five-five-bkps-ja.md",
     "sourceLiterals": {
       "independent": 63
@@ -2831,6 +2831,31 @@
       "after": "11/125/100",
       "cells": 3,
       "D": "一部 only; Wready final comparison missing"
+    },
+    "ci": {
+      "runId": 40740766001,
+      "head": "e78ec607b493ee75fc57daa60aa7c4cc6d207ee5",
+      "attempt": 1,
+      "smokeSuccess": 3,
+      "smokeFailure": 3,
+      "C": {
+        "initial": 841,
+        "retry": 0,
+        "final": 1
+      },
+      "W": {
+        "initial": 835,
+        "retry": 4,
+        "final": 3
+      },
+      "full": "skipped",
+      "artifactReceived": 9,
+      "artifactPublished": 12,
+      "bytes": 443959330,
+      "ownEnvironmentsMatched": 6,
+      "positiveNewPreservationMismatchObserved": false,
+      "rawManifestFiles": 106,
+      "scope": "oldHEAD before independently validated numeric fixture correction"
     }
   },
   "nextPriority": "6-1/index0 AFGHK：根拠のある潜水母艦＋潜水艦の有効代替を例編成拘束が外す不整合と地図の欠落接続を優先。5-5の既知非表示を追加診断しない。",
@@ -3527,8 +3552,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "5-5 limited local scope normal reflection; prior5-2audit CI6success and initial evidence gaps preserved",
-    "nextUnit": "6-1AFGHK independently supported alternate fleets and graph; isolated draft preparing without browser/search",
+    "activeUnit": "5-5 known numeric-fixture correction localC/W passed; reflect independent correction and one newHEAD smoke, no rerun of oldHEAD",
+    "nextUnit": "6-1 local C/W3 initial pass held separately, continue safe6-2draft preparation",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -3639,6 +3664,46 @@
         ]
       },
       "matrixChange": 0
+    }
+  },
+  "fiveFiveNumericFixtureRepair": {
+    "baselineHead": "e78ec607b493ee75fc57daa60aa7c4cc6d207ee5",
+    "oldRun": 40740766001,
+    "scope": "tests/route-complex-boundaries.spec.js numeric-layer lookup only",
+    "confirmedFailure": "initial/retry top-level-only scoutingValue lookup throws before numeric checks",
+    "productChanged": false,
+    "numericLiteral": {
+      "coef": 2,
+      "min": 80
+    },
+    "connection": "full direct or exemption-or-numeric structural equality, array order preserved",
+    "local": [
+      {
+        "browser": "chromium",
+        "target": "5-5 example1 numeric coefficient2/80",
+        "exit_code": 0,
+        "workers": 1,
+        "retries": 0,
+        "assertions": "full required connection/conditional shape + exact/below/above/wrong-coef/unknown preserved"
+      },
+      {
+        "browser": "webkit",
+        "target": "5-5 example1 numeric coefficient2/80",
+        "exit_code": 0,
+        "workers": 1,
+        "retries": 0,
+        "assertions": "full required connection/conditional shape + exact/below/above/wrong-coef/unknown preserved"
+      }
+    ],
+    "existingUIEvidenceReused": true,
+    "assertionsAndDeadlinesPreserved": true,
+    "matrixChange": 0,
+    "state": "local C/W passed; original13 + upcoming multi-node connection shape14 checks passed; oldCI fully collected; commit/push and one newHEAD smoke next",
+    "shapeOnlyChecks": {
+      "originalRows": 13,
+      "additionalMultiNodeCase": 1,
+      "connected": 14,
+      "numericStatusesNotCountedHere": true
     }
   }
 }
