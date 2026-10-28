@@ -1010,27 +1010,33 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "reason": "A/C/Gの優先順・艦種/隻数の境界を出典と独立Node期待値で確認。特殊艦種の固有算入と全戦闘目標の数量根拠は未完。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/route-goal-guidance-audit.json",
+            "docs/pr152-three-three-acgm-ja.md",
+            "tests/route-three-three-acgm.spec.js"
           ]
         },
         "B": {
           "status": "一部",
-          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "reason": "同じ登録行の有限在庫・同期候補からの配備を代表C/Wで確認する限定記録。全目標・全在庫・全枠の網羅へ広げない。",
           "evidence": [
             "docs/current-auto-loadout-coverage-ja.md",
-            "tests/owned-equipment-planner.spec.js"
+            "tests/owned-equipment-planner.spec.js",
+            "docs/pr152-three-three-acgm-ja.md",
+            "tests/route-three-three-acgm.spec.js"
           ]
         },
         "C": {
           "status": "一部",
-          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "reason": "代表の在庫不足・艦情報不足・経路不一致を区別。搭載不可/枠競合は軽い検査と既存共通証拠を併記し、全適用案内の完了へ広げない。",
           "evidence": [
             "docs/current-auto-loadout-coverage-ja.md",
-            "tests/owned-equipment-planner.spec.js"
+            "tests/owned-equipment-planner.spec.js",
+            "docs/pr152-three-three-acgm-ja.md",
+            "tests/route-three-three-acgm.spec.js"
           ]
         },
         "D": {
@@ -1038,11 +1044,13 @@
           "reason": "保存・編集・同一文書load後表示、他編成/metadata保持を同じ行の代表操作で確認。",
           "evidence": [
             "docs/current-auto-loadout-coverage-ja.md",
-            "tests/owned-equipment-planner.spec.js"
+            "tests/owned-equipment-planner.spec.js",
+            "docs/pr152-three-three-acgm-ja.md",
+            "tests/route-three-three-acgm.spec.js"
           ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "特殊艦種の3-3固有算入は未判定。全戦闘目標の数量根拠、全在庫・搭載枠の同時配備/競合の網羅、実ゲームでの到達・勝利は未確認。"
     },
     {
       "id": "3-4/0/default",
@@ -2421,36 +2429,27 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "2-5/0/default",
-    "baselineHead": "aec0dc9c04ce04edff5a231d7d03ef431b4f8bac",
-    "condition": "F priority: low speed OR 3 battleships after excluding prior E branches",
-    "newEvidence": "docs/pr152-two-five-north-f-ja.md",
-    "nodePrerequisites": {
-      "pass": 233,
-      "fail": 0
-    },
-    "localBrowserCasesPerEngine": 1,
-    "localInitialPass": {
-      "chromium": 1,
-      "webkit": 1
-    },
-    "retries": 0,
-    "statusCellChanges": 1,
-    "completedLimitedItems": [
-      "fixed false-negative for all-fast three-battleship branch",
-      "conditional forced-low selection and low-goal guidance",
-      "same-document save/edit/load/direct exact storage and metadata preservation"
-    ],
-    "limits": "A/B/C remain partial; air goal remains manual; independent literal boundary tests and synthetic synchronized input do not prove game victory or exhaustive inventory search",
-    "normalSmokeSelection": {
-      "totalPerBrowser": 813,
-      "targetCasesPerBrowser": 1,
-      "selectedFile": "tests/route-north-f-branch.spec.js",
-      "browserLaunches": 0,
-      "verifiedBeforeCI": true
+    "id": "3-3/0/default",
+    "baselineHead": "f758ac807be6c9a0d5f6e580d0b95e7a5d9f511e",
+    "condition": "ACGM A/C/G branch and owned combat-recommendation guidance",
+    "evidence": "docs/pr152-three-three-acgm-ja.md",
+    "statusCellChanges": 0,
+    "localResults": {
+      "nodePrerequisitesPass": 243,
+      "representativeStates": [
+        "ready",
+        "stock",
+        "unknown"
+      ],
+      "chromium": "all3 states verified",
+      "webkit": "all3 states verified",
+      "retries": 0,
+      "localAttempts": 12,
+      "fixtureCorrections": "absent goal assumptions, then canonical equipment name; product unchanged; prior successes reused",
+      "statusCellChanges": 0
     }
   },
-  "nextPriority": "3-3/index0 ACGMのA/C/Gの必須分岐接続。既存制空・保存証拠を再利用し、上位条件/潜水系ランダム分岐との整合を確認する候補。今回実装・実行なし。",
+  "nextPriority": "3-4/index0 ACEGJPの関連分岐・必須艦種と手持ち装備案内の接続。今回未調査・未実装・未実行。",
   "previousSelected": {
     "id": "5-4/0/default",
     "condition": "M-to-P conditional scouting exemption only for no SS/SSV and confirmed fleet speed >=15; unknown is not exemption",
@@ -2541,6 +2540,36 @@
         "verifiedBeforeCIDispatch": true
       },
       "limits": "limited completion of fixed example; old CI failure causes and missing originals remain unresolved"
+    },
+    {
+      "id": "2-5/0/default",
+      "baselineHead": "aec0dc9c04ce04edff5a231d7d03ef431b4f8bac",
+      "condition": "F priority: low speed OR 3 battleships after excluding prior E branches",
+      "newEvidence": "docs/pr152-two-five-north-f-ja.md",
+      "nodePrerequisites": {
+        "pass": 233,
+        "fail": 0
+      },
+      "localBrowserCasesPerEngine": 1,
+      "localInitialPass": {
+        "chromium": 1,
+        "webkit": 1
+      },
+      "retries": 0,
+      "statusCellChanges": 1,
+      "completedLimitedItems": [
+        "fixed false-negative for all-fast three-battleship branch",
+        "conditional forced-low selection and low-goal guidance",
+        "same-document save/edit/load/direct exact storage and metadata preservation"
+      ],
+      "limits": "A/B/C remain partial; air goal remains manual; independent literal boundary tests and synthetic synchronized input do not prove game victory or exhaustive inventory search",
+      "normalSmokeSelection": {
+        "totalPerBrowser": 813,
+        "targetCasesPerBrowser": 1,
+        "selectedFile": "tests/route-north-f-branch.spec.js",
+        "browserLaunches": 0,
+        "verifiedBeforeCI": true
+      }
     }
   ],
   "fiveFourCloseout": {

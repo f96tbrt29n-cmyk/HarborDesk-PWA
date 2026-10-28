@@ -205,7 +205,14 @@ const HD_MAP_ROUTE_REQUIREMENTS={};
  add('2-5',1,'CEIO',[fleet(6),speed(10),count(['bb','ss'],0,0),count(['cvn','cav'],0,1),count(['cv'],1),count(['cl'],1),count(['dd'],3)],{minimumSpeed:10,los:los(1,34,31)});
  add('3-1',0,'CFG',[fleet(6),count(['bb','cv'],0,2),count(['escort'],2),count(['bbv','cl','av','ao'],0,2)]);
  for(const i of [0,1])add('3-2',i,'選択したC…L目標',[],{engine:'verified-graph'});
- add('3-3',0,'ACGM',[fleet(6),count(['cvn'],0,1),count(['bb','cvl'],0,1),count(['dd'],2)]);
+ const threeThreeLight={all:[count(['bb','cv'],1,1),count(['cl'],1,1),count(['dd'],4,4)]};
+ add('3-3',0,'ACGM',[fleet(6),
+  {any:[count(['cvn'],1),count(['bb','cv'],4),threeThreeLight],reason:'A→C：正規空母・装甲空母1隻以上、次に戦艦級＋空母系4隻以上、次に同1隻＋軽巡1隻＋駆逐4隻。それ以外はBへ進むため編成を見直す'},
+  {all:[count(['escort'],2),count(['cvn'],0,1),count(['bb','cv'],0,2),{any:[count(['bb','cv'],2,2),threeThreeLight]}],reason:'C→G：駆逐＋海防1隻以下、正規空母・装甲空母2隻以上、戦艦級＋空母系3隻以上は先にE。残る同2隻、または同1隻＋軽巡1隻＋駆逐4隻はG。それ以外はEへ進むため編成を見直す'},
+  {...count(['ss'],0,0),reason:'G→M：潜水艦・潜水空母が1隻以上なら、戦艦級＋空母系3隻以下のM条件より先にI/Mランダム。ACGM固定条件から外れるため編成を見直す。潜水母艦はこの潜水艦数に含めない'},
+  {any:[count(['bb','cv','cav','cl','重雷装巡洋艦','dd','de'],6,6),{kind:'unverified',reason:'揚陸艦・潜水母艦・水母・補給艦・練習巡洋艦・工作艦などの特殊艦種は、3-3固有の算入範囲が未照合のため未判定。編成や出典を確認する。装備の不足数量には換算しない'}],reason:'登録した艦種の判定範囲'}
+ ],{checkedAt:'2026-10-28',useExampleScope:false,sources:['https://zekamashi.net/kancolle-kouryaku/3-3/','https://wikiwiki.jp/kancolle/北方海域/3-3'],notes:['A/C/Gの条件は順番に適用。Aの戦艦級＋空母系4隻以上はCへ進んでも、CでEへ進むためACGMにはならない。戦艦級は戦艦・高速戦艦・航空戦艦、空母系は正規空母・装甲空母・軽空母を数える。','軽巡1隻＋駆逐4隻の別条件では、重雷装巡洋艦・練習巡洋艦を軽巡、海防艦を駆逐の代わりに数えない。Cの先行する護衛隻数だけは駆逐＋海防の合計。速力はこの登録経路の必須条件ではない。','数値索敵・電探装備艦数はこの登録経路の必須条件ではない。電探はCのうずしお軽減用の任意推奨。艦戦・各空母の攻撃機・対空装備・夜戦装備は戦闘上の推奨で、分岐成立や勝利を保証しない。','艦種・隻数による経路不一致は編成を見直す。手持ち装備の配備とは別に表示し、探索未完了を装備の購入が必要という判定にしない。']});
+ MAP_PLANS['3-3'].presets[0].gear='艦戦と各空母の搭載可能な枠に攻撃機を配備。電探はCのうずしお軽減、対空・夜戦装備は任意推奨。A/C/Gの艦種・隻数条件とは別で、数値索敵・高速統一・電探装備艦数の一律必須指定はない。';
  add('3-4',0,'ACEGJP',[fleet(6),count(['bb','cv'],3,4),count(['cvn'],0,2),count(['cl'],1),count(['av','ao'],1)]);
  add('3-5',0,'FGK',[fleet(6),count(['dd'],5),count(['cl','ss','av','ao'],0,1),count(['dd','cl','ss','av','ao'],6,6)],{los:los(4,28),equipmentKinds:['索敵','夜戦'],airNotRequired:true});
  add('3-5',1,'BDHK',[fleet(6),count(['bb','cv'],0,3),count(['cv'],2),count(['lha'],0,0)],{los:los(4,40)});
