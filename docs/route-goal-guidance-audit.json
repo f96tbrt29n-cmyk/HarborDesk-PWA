@@ -7805,8 +7805,316 @@
       "conditions": [
         {
           "kind": "fleetCount",
-          "min": 6,
+          "min": 4,
           "max": 6
+        },
+        {
+          "any": [
+            {
+              "all": [
+                {
+                  "kind": "fleetCount",
+                  "min": 3,
+                  "max": 3
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水艦",
+                    "潜水空母"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 3,
+                  "max": 3
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "kind": "fleetCount",
+                  "min": 4,
+                  "max": 4
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水艦",
+                    "潜水空母"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 4,
+                  "max": 4
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "kind": "fleetCount",
+                  "min": 5,
+                  "max": 5
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水艦",
+                    "潜水空母"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 5,
+                  "max": 5
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "kind": "fleetCount",
+                  "min": 6,
+                  "max": 6
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水艦",
+                    "潜水空母"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 6,
+                  "max": 6
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "kind": "fleetCount",
+                  "min": 4,
+                  "max": 4
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水母艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水艦",
+                    "潜水空母"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 3,
+                  "max": 3
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水母艦",
+                    "潜水艦",
+                    "潜水空母"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 4,
+                  "max": 4
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "kind": "fleetCount",
+                  "min": 5,
+                  "max": 5
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水母艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水艦",
+                    "潜水空母"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 4,
+                  "max": 4
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水母艦",
+                    "潜水艦",
+                    "潜水空母"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 5,
+                  "max": 5
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "kind": "fleetCount",
+                  "min": 6,
+                  "max": 6
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水母艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水艦",
+                    "潜水空母"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 5,
+                  "max": 5
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水母艦",
+                    "潜水艦",
+                    "潜水空母"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 6,
+                  "max": 6
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "kind": "fleetCount",
+                  "min": 6,
+                  "max": 6
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水母艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水艦",
+                    "潜水空母"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 3,
+                  "max": 3
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水母艦",
+                    "潜水艦",
+                    "潜水空母",
+                    "駆逐艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 6,
+                  "max": 6
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "駆逐艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 2,
+                  "max": 2
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "kind": "fleetCount",
+                  "min": 6,
+                  "max": 6
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水母艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水艦",
+                    "潜水空母"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 4,
+                  "max": 4
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水母艦",
+                    "潜水艦",
+                    "潜水空母",
+                    "軽巡洋艦",
+                    "駆逐艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 6,
+                  "max": 6
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "軽巡洋艦",
+                    "駆逐艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 1,
+                  "max": 1
+                }
+              ]
+            }
+          ],
+          "reason": "始点→A：潜水母艦1＋潜水3〜5のみの4〜6隻、同1＋潜水3＋駆逐2、同1＋潜水4＋軽巡/駆逐1。潜水のみのAは次でDへ進む別経路。編成不一致は装備購入ではなく艦種・隻数を見直す"
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水母艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7,
+          "reason": "A→F：潜水母艦1隻以上でF。潜水艦・潜水空母は潜水母艦へ数えず、潜水母艦なしはD経由の別経路"
         },
         {
           "kind": "typeCount",
@@ -7816,42 +8124,14 @@
           ],
           "matchPolicy": "exact",
           "min": 3,
-          "max": 7
+          "max": 7,
+          "reason": "G→H：潜水艦・潜水空母3隻以上。選択した始点Aの潜水母艦入り固定群は重量艦0・潜水母艦ありで、先行する潜水2以下/重量艦過多/潜水母艦なしの逸れを避ける"
         },
         {
-          "kind": "typeCount",
-          "types": [
-            "潜水母艦"
-          ],
-          "matchPolicy": "exact",
-          "min": 1,
-          "max": 1
-        },
-        {
-          "kind": "typeCount",
-          "types": [
-            "軽巡洋艦",
-            "駆逐艦"
-          ],
-          "matchPolicy": "exact",
-          "min": 1,
-          "max": 7
-        },
-        {
-          "kind": "typeCount",
-          "types": [
-            "戦艦",
-            "高速戦艦",
-            "航空戦艦",
-            "正規空母",
-            "装甲空母",
-            "軽空母",
-            "重巡洋艦",
-            "航空巡洋艦"
-          ],
-          "matchPolicy": "exact",
-          "min": 0,
-          "max": 1
+          "kind": "scoutingValue",
+          "min": 16,
+          "coef": 4,
+          "reason": "G→H：先行する編成条件を満たした後の33式係数4で16以上。12付近の詳細な逸れ先は出典差を留保し、16未満を到達不可能とはしない"
         }
       ],
       "scouting": {
@@ -7860,7 +8140,8 @@
         "checks": [
           {
             "label": "選択経路の索敵分岐",
-            "safe": 25
+            "safe": 25,
+            "failBelow": 20
           }
         ],
         "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
@@ -7871,7 +8152,12 @@
         "索敵"
       ],
       "notes": [
-        "潜水母艦を外す別例は必要索敵値とランダム分岐が変わる。"
+        "AFGHK固定群は潜水母艦1＋潜水艦/潜水空母3〜5のみの4〜6隻、同1＋潜水3＋駆逐2、同1＋潜水4＋軽巡/駆逐1。元の軽巡1潜水4は一例で一律必須ではない。",
+        "潜水母艦ASと潜水艦/潜水空母SS/SSVを区別。軽巡CLへ雷巡/練巡、駆逐DDへ海防を足さない。空母入りCFGHKやASなしの別経路を同じ成立へ混ぜない。",
+        "始点の重量2/3先行B・CV略称・揚陸艦の出典差はAFGHK固定群の重量0域へ流用しない。Gのちょうど12は重複/差を留保する。",
+        "ASありのHは33式係数4で25以上K、20以上25未満E/Kランダム、20未満E。25は先行Gの16以上も満たす。HQ減算0.35用31/42やASなし36は流用しない。",
+        "速力統一・特定装備個数は経路必須とせず、魚雷/偵察機/夜戦等は戦闘推奨または利用者指定と区別する。索敵ポイントを装備数量/購入必須に変換しない。",
+        "艦種/隻数は編成見直し、情報不足は未判定、探索未完了は手持ちで不可能/最適/勝利の証明ではない。"
       ],
       "requiredConnectionClass": "B",
       "guidanceAudit": {
@@ -7883,7 +8169,7 @@
         },
         "索敵": {
           "class": "B",
-          "detail": "係数4／必要25以上",
+          "detail": "係数4／選択AFGHKのG16以上とASありH25以上。H20未満は逸れ域、20以上25未満はランダム。HQ/艦索敵欠測は未判定。",
           "evidence": [
             "hdFEScouting/hdFEPlanScouting → requiredChecks/manual理由"
           ],
@@ -7911,9 +8197,10 @@
         },
         "推奨セット": {
           "class": "C",
-          "detail": "索敵2個（汎用カテゴリ目安・経路必須の数値と別）",
+          "detail": "索敵カテゴリ2個は汎用目安で経路必須数ではない。夜戦は選択された任意装備例の名称・数量・同じ潜水艦の異なる合法通常枠を案内し、全候補への配備や購入数量を保証しない。",
           "evidence": [
-            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足",
+            "hdOCSixOneNightTargets → 同艦/別枠の合法候補（通常枠のみ）"
           ],
           "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
         }

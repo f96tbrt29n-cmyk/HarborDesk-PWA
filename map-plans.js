@@ -336,7 +336,19 @@ const HD_MAP_ROUTE_REQUIREMENTS={};
  MAP_PLANS['5-5'].presets[0].gear+=' BKPSのP→Sは最速、または高速＋かつ戦艦級＋空母系5以下なら索敵非適用。それ以外は33式係数2・80以上と先行する逸れ条件を確認。軽空母算入などの出典差は影響域のみ未判定。';
  add('5-5',1,'BFDHNOS',[fleet(6),count(['bb'],0,2),count(['cv','ss'],0,0),count(['dd'],2)],{los:los(2,66),notes:['この登録例は中央下ルート。ACEGIMOSのドラム缶4隻／大発系4隻の条件とは別。']});
  for(const [i,path,safe,conditions] of [[0,'ABC2DEG',65,[count(['bbv'],2,2),count(['dd'],4,4)]],[1,'IJKLN',80,[speed(10),count(['bb','cv'],0,2),count(['cl'],1),count(['dd'],2),count(['av','lha'],0,0)]],[2,'IOQUXZ',88,[speed(10),count(['cl'],1),count(['dd'],2),count(['av','lha'],0,0)]]])add('5-6',i,path,[fleet(6),...conditions],{los:los(4,safe),minimumSpeed:i?10:0,equipmentKinds:i===0?['対潜','制空','防空','輸送','索敵','PT対策']:['対潜','制空','防空','夜戦','索敵'],...(i===0?{equipmentTargets:[{kind:'cap-pt',baseKind:'PT対策',label:'PT小鬼群対策セット',minCount:1,source:'https://zekamashi.net/kancolle-kouryaku/ptboat-taisaku/'}]}:{}),scopeIncomplete:true,notes:['出典が仮更新・検証継続中としている条件。数値は攻略目安として表示し、確定分岐成立とは扱わない。','第1ゲージ後のR到達ギミックと新スタート開放は別途確認。PT小鬼群対策・輸送装備をゲージ別に準備。']});
- add('6-1',0,'AFGHK',[fleet(6),count(['ss'],3),count(['as'],1,1),count(['cl','dd'],1),count(['bb','cv','cav'],0,1)],{los:los(4,25),notes:['潜水母艦を外す別例は必要索敵値とランダム分岐が変わる。']});
+ // START's A cases are exact fleet families, not a universal CL/DD need.
+ // Count all hulls within each family's allowed types so one unknown cannot
+ // hide a known CV/other hull that is outside every documented A family.
+ const sixOneAsFamily=(n,sub,extra=[],countExtra=0)=>({all:[fleet(n),count(['as'],1,1),count(['ss'],sub,sub),count(['as','ss',...extra],n,n),...(countExtra?[count(extra,countExtra,countExtra)]:[])]});
+ const sixOneStartA={any:[...[3,4,5,6].map(n=>({all:[fleet(n),count(['ss'],n,n)]})),sixOneAsFamily(4,3),sixOneAsFamily(5,4),sixOneAsFamily(6,5),sixOneAsFamily(6,3,['dd'],2),sixOneAsFamily(6,4,['cl','dd'],1)]};
+ add('6-1',0,'AFGHK',[
+  {kind:'fleetCount',min:4,max:6},
+  {...sixOneStartA,reason:'始点→A：潜水母艦1＋潜水3〜5のみの4〜6隻、同1＋潜水3＋駆逐2、同1＋潜水4＋軽巡/駆逐1。潜水のみのAは次でDへ進む別経路。編成不一致は装備購入ではなく艦種・隻数を見直す'},
+  {...count(['as'],1),reason:'A→F：潜水母艦1隻以上でF。潜水艦・潜水空母は潜水母艦へ数えず、潜水母艦なしはD経由の別経路'},
+  {...count(['ss'],3),reason:'G→H：潜水艦・潜水空母3隻以上。選択した始点Aの潜水母艦入り固定群は重量艦0・潜水母艦ありで、先行する潜水2以下/重量艦過多/潜水母艦なしの逸れを避ける'},
+  {kind:'scoutingValue',min:16,coef:4,reason:'G→H：先行する編成条件を満たした後の33式係数4で16以上。12付近の詳細な逸れ先は出典差を留保し、16未満を到達不可能とはしない'}
+ ],{checkedAt:'2026-10-29',useExampleScope:false,los:los(4,25,20),sources:['https://zekamashi.net/kancolle-kouryaku/6-1/','https://zh.kcwiki.cn/wiki/中部海域/6-1'],notes:['登録は始点A→F通常戦→G非戦闘→H通常戦→Kボス。元の軽巡1・潜水4・潜水母艦1は編成例で、出典にある潜水母艦1＋潜水のみ4〜6隻や駆逐2の代替も確認する。','始点の重量艦によるBが先行するが、AFGHK固定群は重量艦0。記事の重量2以上と参照先の3以上、空母系/CV系略称・揚陸艦算入の差は、この固定群の成立へ流用しない。空母1＋軽巡1＋潜水3＋潜水母艦1はCFGHKの別経路。','潜水は潜水艦＋潜水空母、潜水母艦は別艦種。軽巡は軽巡洋艦で雷巡・練巡を含めず、駆逐へ海防艦を加えない。艦種・隻数不一致は編成を見直し、装備調達で解決する不足にしない。','Gは潜水2以下/重量艦過多のI、次に潜水母艦なしの15%Iが先行し、その後に係数4の索敵16以上でH。ちょうど12は資料の重複表記を留保する。H20未満など別の既知不一致は、この留保で消さない。','Hは潜水母艦ありの33式係数4・25以上でK、20以上25未満はE/Kランダム、20未満はE。25以上は先のG16も満たす。潜水母艦なしの36や司令部減算0.35用31/42は別条件として流用しない。HQ120未満の余裕推奨は閾値変更と区別する。','一律の速力統一や装備個数を通行必須にしない。魚雷・偵察機・制空/夜戦の目標は戦闘推奨または利用者指定と区別し、索敵ポイントを装備の購入数量へ換算しない。','情報不足・在庫不足・搭載不可・枠競合・探索未完了を区別し、未発見を手持ちでは不可能・購入必須・最適と断定しない。固定経路成立は到達や勝利の保証ではない。']});
+ MAP_PLANS['6-1'].presets[0].gear+=' AFGHKは潜水母艦1＋潜水のみ4〜6隻、潜水3＋駆逐2、潜水4＋軽巡/駆逐1の代替も扱う。Gは係数4の16以上、Hは潜水母艦あり25以上。潜水母艦なしや空母入りCFGHKは別経路。';
  add('6-2',0,'CEJK',[fleet(6),count(['bb'],0,1),count(['cv'],0,1),count(['cl'],0,1),count(['dd'],2)],{los:los(3,50,43),notes:['I経由を狙う別例は40以上43未満。選択したJ経由は50以上を使う。']});
  add('6-3',0,'ACEGHJ',[fleet(6),count(['cl','練習巡洋艦','dd','av'],6,6),count(['cl'],1,1),count(['dd'],3),count(['av'],1,1)],{los:los(3,38,36),notes:['出撃可能な艦種は軽巡・練巡・駆逐・水母。能動分岐はE方面を選ぶ。']});
  add('6-4',0,'BDCFN',[fleet(6),speed(10),count(['cl'],1,1),{kind:'flagshipType',types:types('cl')},count(['bb'],0,1),count(['cv','lha'],0,0),count(['dd'],3)],{minimumSpeed:10,notes:['軽巡旗艦。長門型タッチの別編成と混同しない。対地装備、基地1部隊とボス半径5を別評価。']});

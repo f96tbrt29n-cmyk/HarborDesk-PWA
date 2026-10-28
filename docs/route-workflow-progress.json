@@ -62,20 +62,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 26,
-      "未確認": 33,
+      "一部": 27,
+      "未確認": 32,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 26,
-      "未確認": 33,
+      "一部": 27,
+      "未確認": 32,
       "非該当": 0
     },
     "D": {
-      "確認済み": 11,
-      "一部": 17,
-      "未確認": 31,
+      "確認済み": 13,
+      "一部": 16,
+      "未確認": 30,
       "非該当": 0
     }
   },
@@ -1826,15 +1826,16 @@
           ]
         },
         "D": {
-          "status": "一部",
-          "reason": "C4とW不足/未知/免除で保存または安全中止、編集、同一文書load後全文/入力/他編成/metadata保持。W成立はload後第2click非表示・最終比較未到達で一部。",
+          "status": "確認済み",
+          "reason": "同じ5-5行の既存C4/W不足・未知・免除の操作列に加え、9ddCI40748149278自身W成立初回の2結果・保存/編集・同一load文書complete/全文/入力/他編成metadata保持を確認。旧W成立と今run不足初回の未到達は別記録で保持。",
           "evidence": [
             "docs/pr152-five-five-bkps-ja.md",
-            "tests/route-five-five-bkps.spec.js"
+            "tests/route-five-five-bkps.spec.js",
+            "https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/40748149278"
           ]
         }
       },
-      "remaining": "出典待ちはB雷巡3優先・PのCVL略称/揚陸艦・大発系個別対象の結論が変わる範囲。全在庫/枠競合/目標数量と5-5index1/実ゲーム到達は未完。W成立はload後第2click非表示で最終比較未到達、caller欠測/旧原因不明を保持。"
+      "remaining": "出典待ちはB雷巡3優先・PのCVL略称/揚陸艦・大発系個別対象の結論が変わる範囲。全在庫/枠競合/目標数量と5-5index1/実ゲーム到達は未完。旧W成立と9ddCI不足初回はload後第2click非表示で最終比較未到達、caller欠測/旧原因不明を保持し、新W成立成功で補完しない。"
     },
     {
       "id": "5-5/1/default",
@@ -1990,26 +1991,38 @@
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/route-goal-guidance-audit.json",
+            "docs/pr152-six-one-afghk-ja.md",
+            "tests/six-one-routes.test.cjs",
+            "tests/six-one-graph.test.cjs"
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "出典有効AS1SS5の有限4個から水観復元・合法在庫内の実配備をC/W代表で確認。全目標/全在庫は未網羅。",
+          "evidence": [
+            "docs/pr152-six-one-afghk-ja.md",
+            "tests/route-six-one-afghk.spec.js"
+          ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "索敵ポイント≠装備個数、潜水艦CI1組の具体名/数量/同艦別合法枠、未知/搭載候補なし/編成見直しを代表とNodeで確認。全区分は未網羅。",
+          "evidence": [
+            "docs/pr152-six-one-afghk-ja.md",
+            "tests/route-six-one-afghk.spec.js"
+          ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "確認済み",
+          "reason": "C/W成立/不足/未知各初回で2結果、保存または安全中止/編集/同一load文書再表示、全文/入力/他編成/metadata保持を確認。旧他行失敗の欠測へ流用しない。",
+          "evidence": [
+            "docs/pr152-six-one-afghk-ja.md",
+            "tests/route-six-one-afghk.spec.js"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "始点重量/CV略称/揚陸艦/G12の出典差・ASなし別経路、全在庫/搭載不可・枠競合/全戦闘目標数量と実ゲーム到達は未網羅。現代表C/W操作列は確認済みだが旧他行の非表示/保存異常/通信の原因は解決扱いにしない。"
     },
     {
       "id": "6-2/0/default",
@@ -2552,6 +2565,215 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
+    "id": "6-1/0/default",
+    "baselineHead": "9dd888aa2fc8abf7bef6ebb90c43b1a6eb34d6c6",
+    "state": "6-1 local C/W3 each initial pass; exact14 served-source reuse on9dd base; upstream correctedCI40748149278 finalized6success; ready for normal commit/push and then one own finalHEAD smoke (not yet started)",
+    "evidence": "docs/pr152-six-one-afghk-ja.md",
+    "independentLiterals": {
+      "provided": 48,
+      "selectedBoundaryOrPartial": 39,
+      "outsideSelectedRejectionGuards": 9,
+      "notAllDestinationsVerified": true
+    },
+    "actualBeforeAfter": {
+      "cases": 9,
+      "afterMatches": 9,
+      "searchRuns": 0
+    },
+    "node": {
+      "routes": 6,
+      "graph": 4,
+      "placement": 4,
+      "successfulUnchangedReused": 14
+    },
+    "local": [
+      {
+        "browser": "chromium",
+        "target": "ready",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "pageerrors": 0,
+        "workers": 1,
+        "retries": 0,
+        "collectionFailures": 0
+      },
+      {
+        "browser": "chromium",
+        "target": "stock",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "pageerrors": 0,
+        "workers": 1,
+        "retries": 0,
+        "collectionFailures": 0
+      },
+      {
+        "browser": "chromium",
+        "target": "unknown",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": true
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "pageerrors": 0,
+        "workers": 1,
+        "retries": 0,
+        "collectionFailures": 0
+      },
+      {
+        "browser": "webkit",
+        "target": "ready",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "pageerrors": 0,
+        "workers": 1,
+        "retries": 0,
+        "collectionFailures": 0
+      },
+      {
+        "browser": "webkit",
+        "target": "stock",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "pageerrors": 0,
+        "workers": 1,
+        "retries": 0,
+        "collectionFailures": 0
+      },
+      {
+        "browser": "webkit",
+        "target": "unknown",
+        "exit_code": 0,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": true
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "pageerrors": 0,
+        "workers": 1,
+        "retries": 0,
+        "collectionFailures": 0
+      }
+    ],
+    "fixedList": {
+      "each": 845,
+      "newEach": 3
+    },
+    "matrixChange": {
+      "before": "12/124/100",
+      "after": "13/126/97",
+      "cells": 3,
+      "scope": "6-1B/C 未確認→一部, D 未確認→確認済み; separate from upstream5-5D new-evidence1cell",
+      "originalDraftBeforeUpstreamCloseout": "12/127/97"
+    },
+    "integrationProvenance": {
+      "originalWorktreeHead": "e78ec607b493ee75fc57daa60aa7c4cc6d207ee5",
+      "originalValidation": "e78 plus6-1 working-source snapshot in isolated runtime",
+      "integratedBaseHead": "9dd888aa2fc8abf7bef6ebb90c43b1a6eb34d6c6",
+      "servedSourcesByteIdentical": 14,
+      "upstreamNumericFixtureInherited": true,
+      "upstreamCI": 40748149278,
+      "additionalNodeBrowserOrSearchExecutions": 0,
+      "upstreamCIState": "completed6smoke success; C842/0/0 W836/6/0; old gaps unchanged"
+    }
+  },
+  "nextPriority": "6-2/index0 CEJK：既存台帳・出典/コード・操作証拠を限定照合中。根拠ある未接続を選び、旧操作不安定の原因調査へ広げない。",
+  "previousSelected": {
     "id": "5-5/0/default",
     "baselineHead": "2225f6004c08f3a7e86481a7d6914317797d7654",
     "state": "e78CI finalized3success3failure; direct numeric fixture assumption corrected separately; old Wready final comparison missing preserved",
@@ -2856,270 +3078,72 @@
       "positiveNewPreservationMismatchObserved": false,
       "rawManifestFiles": 106,
       "scope": "oldHEAD before independently validated numeric fixture correction"
-    }
-  },
-  "nextPriority": "6-1/index0 AFGHK：根拠のある潜水母艦＋潜水艦の有効代替を例編成拘束が外す不整合と地図の欠落接続を優先。5-5の既知非表示を追加診断しない。",
-  "previousSelected": {
-    "id": "5-2/0/default",
-    "baselineHead": "db06f5a3a2e457d957f5fd775963ba094c8f34ce",
-    "state": "5-2audit correction and smoke6success, old gaps retained",
-    "evidence": "docs/pr152-five-two-bcefo-ja.md",
-    "sourceLiterals": {
-      "provided": 45,
-      "fullySpecified": 44,
-      "compared": 44,
-      "matches": 44,
-      "partialNotCounted": 1
     },
-    "nodePrerequisites": {
-      "initial": {
-        "tests": 339,
-        "pass": 338,
-        "newFixtureFailure": 1,
-        "browserRuns": 0
-      },
-      "correctedFailedCase": {
-        "tests": 1,
-        "pass": 1
-      },
-      "unchangedSuccessfulChecksReused": 338
-    },
-    "local": {
-      "chromium": {
-        "initialPass": 3,
-        "failure": 0
-      },
-      "webkit": {
-        "initialPass": 1,
-        "failure": 1,
-        "notStarted": 1
-      },
-      "retries": 0,
-      "browserExecutions": 5,
-      "repeats": 0,
-      "newPreservationMismatchObserved": false,
-      "postLoadFinalComparison": "W stock unreached; W unknown not run",
-      "caller": "unknown; old-doc expected guide stack does not fill new-doc gap",
-      "recordScope": "Initial batch only; later diagnostic successes do not replace its failed/unreached/not-started entries."
-    },
-    "beforeCells": {
-      "confirmed": 11,
-      "partial": 119,
-      "unconfirmed": 106
-    },
-    "draftAfterCells": {
-      "confirmed": 11,
-      "partial": 122,
-      "unconfirmed": 103
-    },
-    "changedCells": [
-      "5-2 B 未確認→一部",
-      "5-2 C 未確認→一部",
-      "5-2 D 未確認→一部"
-    ],
-    "statusCellChanges": 3,
-    "normalSmokeSelection": {
-      "totalPerBrowser": 838,
-      "targetCasesPerBrowser": 3,
-      "targetTitles": [
-        "5-2 BCEFO ready keeps prior branches and scouting distinctions through save and load",
-        "5-2 BCEFO stock keeps prior branches and scouting distinctions through save and load",
-        "5-2 BCEFO unknown keeps prior branches and scouting distinctions through save and load"
-      ],
-      "browserLaunches": 0,
-      "verifiedBeforeCI": true,
-      "fixedListSource": "literal package.json test:browser and real Playwright --list"
-    },
-    "newCiRuns": 1,
-    "limitedNavigationTrial": {
-      "classification": "diagnostic installed; no recurrence this trial; old cause unresolved",
-      "cases": {
-        "webkitStock": {
-          "attempts": 1,
-          "retries": 0,
-          "exitCode": 0,
-          "postloadFinalComparison": "reached and full string equal",
-          "documents": 2,
-          "events": 35,
-          "drop": 0,
-          "collectionFailures": 0
-        },
-        "webkitUnknown": {
-          "attempts": 1,
-          "retries": 0,
-          "exitCode": 0,
-          "save": "safe abort; original full string retained",
-          "postloadFinalComparison": "reached and full string equal; manual preserved",
-          "documents": 2,
-          "events": 25,
-          "drop": 0,
-          "collectionFailures": 0
-        }
-      },
-      "successfulPriorC3WReadyRepeated": false,
-      "productFixtureFix": false,
-      "oldUnreachedComparisonFilled": false,
-      "productAndTestFilesUnchanged": 12,
-      "statusCellChanges": 0,
-      "commitPushCi": false
-    },
-    "ordinaryResumption": {
-      "baseline": "db06f5a3a2e457d957f5fd775963ba094c8f34ce",
-      "diagnosticThisCorrectionInProduct": false,
-      "successfulOrdinaryReused": {
-        "chromium": 3,
-        "webkitReady": 1,
-        "sourceAndFixtureExact": true
-      },
-      "webkitStock": {
-        "attempts": 1,
-        "retries": 0,
-        "exitCode": 1,
-        "stage": "postreload second search click hidden; final comparison unreached",
-        "sameStopStageAsOld": true,
-        "sameCause": "unknown",
-        "navigationCollectionFailures": 1
-      },
-      "webkitUnknown": {
-        "attempts": 1,
-        "retries": 0,
-        "exitCode": 0,
-        "safeAbort": true,
-        "postloadSameDocumentFullValueEqual": true,
-        "routeStatus": "manual"
-      },
-      "newPreservationMismatchObserved": false,
-      "clearNewRegressionEstablished": false,
-      "newDiagnosisOrRepeat": false,
-      "reviewBlockingDefect": false
-    },
-    "head": "b2a1427cc199c18dc4a8af128f342bbc024190b1",
-    "ci": {
-      "runId": 40706076586,
-      "head": "b2a1427cc199c18dc4a8af128f342bbc024190b1",
-      "state": "completed",
-      "conclusion": "failure",
-      "smokeJobs": {
-        "success": 4,
-        "failure": 2
-      },
-      "full": "skipped",
+    "correctedCI": {
+      "runId": 40748149278,
+      "head": "9dd888aa2fc8abf7bef6ebb90c43b1a6eb34d6c6",
       "attempt": 1,
-      "dispatches": 1,
-      "reruns": 0,
-      "officialSummaryCount": 6,
-      "officialCounts": {
-        "chromium": {
-          "initialPass": 837,
-          "retrySuccess": 0,
-          "finalFailure": 1,
-          "skipped": 0
-        },
-        "webkit": {
-          "initialPass": 825,
-          "retrySuccess": 9,
-          "finalFailure": 4,
-          "skipped": 0
-        }
+      "state": "completed",
+      "smokeSuccess": 6,
+      "smokeFailure": 0,
+      "full": "skipped",
+      "C": {
+        "initial": 842,
+        "retry": 0,
+        "final": 0
       },
-      "jobs": [
+      "W": {
+        "initial": 836,
+        "retry": 6,
+        "final": 0
+      },
+      "ownEnvironmentAndHeadReceiptsMatched": 6,
+      "artifactReceived": 7,
+      "artifactPublished": 8,
+      "bytes": 437804932,
+      "missing": [
         {
-          "label": "C1",
-          "job": 122878460893,
-          "counts": {
-            "initialPass": 419,
-            "retrySuccess": 0,
-            "finalFailure": 0,
-            "skipped": 0
-          }
-        },
-        {
-          "label": "C2",
-          "job": 122878461145,
-          "counts": {
-            "initialPass": 418,
-            "retrySuccess": 0,
-            "finalFailure": 1,
-            "skipped": 0
-          }
-        },
-        {
-          "label": "W1",
-          "job": 122878460855,
-          "counts": {
-            "initialPass": 210,
-            "retrySuccess": 0,
-            "finalFailure": 0,
-            "skipped": 0
-          }
-        },
-        {
-          "label": "W2",
-          "job": 122878461363,
-          "counts": {
-            "initialPass": 210,
-            "retrySuccess": 0,
-            "finalFailure": 0,
-            "skipped": 0
-          }
-        },
-        {
-          "label": "W3",
-          "job": 122878461069,
-          "counts": {
-            "initialPass": 209,
-            "retrySuccess": 0,
-            "finalFailure": 0,
-            "skipped": 0
-          }
-        },
-        {
-          "label": "W4",
-          "job": 122878460996,
-          "counts": {
-            "initialPass": 196,
-            "retrySuccess": 9,
-            "finalFailure": 4,
-            "skipped": 0
-          }
+          "name": "attempt-diagnostics-chromium-2-40748149278",
+          "bytes": 845271542,
+          "reason": "512MiB supported archive cap; not requested; no bypass"
         }
       ],
-      "artifacts": {
-        "published": 10,
-        "received": 7,
-        "receivedBytes": 354577606,
-        "sha256ZipCrc": "PASS",
-        "missingOver512MiB": [
-          {
-            "name": "C2 attempt",
-            "bytes": 1090434940
-          },
-          {
-            "name": "C2 full",
-            "bytes": 2185507646
-          },
-          {
-            "name": "W4 full",
-            "bytes": 712783253
-          }
-        ]
+      "failedInitialTrials": 6,
+      "failedRetryTrials": 0,
+      "failedTraces": 6,
+      "failedVideos": 6,
+      "positiveNewPreservationMismatchObserved": false,
+      "officialResultsSha256": "5743b892a8515f73a308633ecec076128484e64901c0fdb4e50af5bd23e7a3aa",
+      "artifactSummarySha256": "e6ebea6cd8f8ab9a1a64aed0e8000d4b457780a01d2fb9bfc7aba817375c9f68",
+      "closedOriginalManifestSha256": "5e934f01c89b4b6b1bba0849718edea3b41259892a74b7347247f5338a6d1248",
+      "numericTarget": "C/W target is selected; own official summaries contain no final numeric failure; C2 raw is unavailable and is not filled from W or local success",
+      "initialFailures": {
+        "postLoadHiddenSearch": 5,
+        "reloadDomcontentloadedBeforeRestorationComparison": 1,
+        "causes": "unknown; no diagnostic expansion"
       },
-      "allSixOwnEnvironments": "Node24.21.0/PW1.55.0/C1187/W2203",
-      "newAuditMismatch": "C2/W4 initial andretry metadata equality atowned-oasw128: actual5-2failBelow63 absent inexpected",
-      "C2RawEvidence": "over-cap missing; own official annotations andenvreceived",
-      "newFiveTwoW": "ready/unknown initial completed2/loadexact; stockinitialhidden finalcomparisonunreached, retry1completed2/loadexact; do notfill initial"
+      "fiveFiveOwnWebKit": {
+        "ready": "initial completed,2results,save/edit,same-document complete/load exact and other metadata preserved",
+        "unknown": "initial completed,safe abort/original exact,2results/load exact",
+        "exempt": "initial completed,2results,save/edit/load exact",
+        "stockInitial": "after-load-search,1result,second-click hidden,final comparison unreached",
+        "stockRetry": "completed,2results,save/edit/load exact; does not fill initial gap"
+      },
+      "oaswOwnInitial": {
+        "connections": 59,
+        "stages": [
+          "unknown",
+          "after-load-unknown",
+          "synced-value-recovery"
+        ],
+        "saveAndLoadExact": true,
+        "other": true,
+        "pageerrors": 0
+      },
+      "limits": "Own new trial evidence only. Old ready and current stock initial gaps remain unreached/caller unknown; successful retry does not fill them. No product/schema/deadline/assertion change.",
+      "collectionManifestFiles": 75
     },
-    "ciStop": {
-      "runId": 40706076586,
-      "job": 122878460996,
-      "case": "owned-oasw-integration unknown",
-      "source": "tests/owned-oasw-integration.spec.js:128",
-      "initialAndRetry": "59-row metadata equality: actual adds failBelow63 for5-2; expected missing",
-      "stage": "after initial fixture seed, before target reference/search/save/reload",
-      "storageMismatchObserved": false,
-      "minimalFixApplied": false,
-      "furtherTrialOrCi": false
-    }
+    "currentWorkflowEvidence": "5-5D now confirmed by new own9ddWready initial plus unchanged local successes; old e78/localWready and newstockinitial remain unreached"
   },
   "selectionHistory": [
     {
@@ -3512,6 +3536,25 @@
       "id": "5-2/0/default",
       "record": "docs/pr152-five-two-audit-correction-ja.md",
       "state": "audit correction2225f600 Node12/C1/W1 passed; CI40733236149 pending; no cell change"
+    },
+    {
+      "id": "5-5/0/default",
+      "record": "docs/pr152-five-five-bkps-ja.md",
+      "state": "e78CI40740766001 finalized3success3failure; numeric fixture independently corrected9dd; CI40748149278 pending; initial/retry hidden-stage and missing evidence retained"
+    },
+    {
+      "id": "5-5/0/default",
+      "record": "docs/pr152-five-five-bkps-ja.md",
+      "head": "9dd888aa2fc8abf7bef6ebb90c43b1a6eb34d6c6",
+      "runId": 40748149278,
+      "state": "correctedCI6success; C842/0/0 W836/6/0; ownWready initial full workflow closesD, old and currentinitial gaps retained",
+      "matrixChange": {
+        "before": "11/125/100",
+        "after": "12/124/100",
+        "cells": 1,
+        "column": "D 一部→確認済み",
+        "cause": "new own trial evidence; not fixture expectation adjustment"
+      }
     }
   ],
   "fiveFourCloseout": {
@@ -3552,8 +3595,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "5-5 known numeric-fixture correction localC/W passed; reflect independent correction and one newHEAD smoke, no rerun of oldHEAD",
-    "nextUnit": "6-1 local C/W3 initial pass held separately, continue safe6-2draft preparation",
+    "activeUnit": "6-1 validated draft integrated on9dd without repeating unchanged successful trials; corrected upstream CI40748149278 pending before normal reflection",
+    "nextUnit": "6-2CEJK remains a separate safe unit; do not mix its source, trial or progress evidence with6-1",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -3698,12 +3741,87 @@
     "existingUIEvidenceReused": true,
     "assertionsAndDeadlinesPreserved": true,
     "matrixChange": 0,
-    "state": "local C/W passed; original13 + upcoming multi-node connection shape14 checks passed; oldCI fully collected; commit/push and one newHEAD smoke next",
+    "state": "9dd888aa committed/pushed; one corrected-HEAD CI40748149278 finalized6smoke success; old initial/retry failures and cap gaps retained",
     "shapeOnlyChecks": {
       "originalRows": 13,
       "additionalMultiNodeCase": 1,
       "connected": 14,
       "numericStatusesNotCountedHere": true
+    },
+    "correctedCI": {
+      "runId": 40748149278,
+      "head": "9dd888aa2fc8abf7bef6ebb90c43b1a6eb34d6c6",
+      "attempt": 1,
+      "state": "completed",
+      "smokeSuccess": 6,
+      "smokeFailure": 0,
+      "full": "skipped",
+      "C": {
+        "initial": 842,
+        "retry": 0,
+        "final": 0
+      },
+      "W": {
+        "initial": 836,
+        "retry": 6,
+        "final": 0
+      },
+      "ownEnvironmentAndHeadReceiptsMatched": 6,
+      "artifactReceived": 7,
+      "artifactPublished": 8,
+      "bytes": 437804932,
+      "missing": [
+        {
+          "name": "attempt-diagnostics-chromium-2-40748149278",
+          "bytes": 845271542,
+          "reason": "512MiB supported archive cap; not requested; no bypass"
+        }
+      ],
+      "failedInitialTrials": 6,
+      "failedRetryTrials": 0,
+      "failedTraces": 6,
+      "failedVideos": 6,
+      "positiveNewPreservationMismatchObserved": false,
+      "officialResultsSha256": "5743b892a8515f73a308633ecec076128484e64901c0fdb4e50af5bd23e7a3aa",
+      "artifactSummarySha256": "e6ebea6cd8f8ab9a1a64aed0e8000d4b457780a01d2fb9bfc7aba817375c9f68",
+      "closedOriginalManifestSha256": "5e934f01c89b4b6b1bba0849718edea3b41259892a74b7347247f5338a6d1248",
+      "numericTarget": "C/W target is selected; own official summaries contain no final numeric failure; C2 raw is unavailable and is not filled from W or local success",
+      "initialFailures": {
+        "postLoadHiddenSearch": 5,
+        "reloadDomcontentloadedBeforeRestorationComparison": 1,
+        "causes": "unknown; no diagnostic expansion"
+      },
+      "fiveFiveOwnWebKit": {
+        "ready": "initial completed,2results,save/edit,same-document complete/load exact and other metadata preserved",
+        "unknown": "initial completed,safe abort/original exact,2results/load exact",
+        "exempt": "initial completed,2results,save/edit/load exact",
+        "stockInitial": "after-load-search,1result,second-click hidden,final comparison unreached",
+        "stockRetry": "completed,2results,save/edit/load exact; does not fill initial gap"
+      },
+      "oaswOwnInitial": {
+        "connections": 59,
+        "stages": [
+          "unknown",
+          "after-load-unknown",
+          "synced-value-recovery"
+        ],
+        "saveAndLoadExact": true,
+        "other": true,
+        "pageerrors": 0
+      },
+      "limits": "Own new trial evidence only. Old ready and current stock initial gaps remain unreached/caller unknown; successful retry does not fill them. No product/schema/deadline/assertion change.",
+      "collectionManifestFiles": 75
+    },
+    "workflowEvidenceProgressChange": {
+      "id": "5-5/0/default",
+      "column": "D",
+      "before": "一部",
+      "after": "確認済み",
+      "beforeCounts": "11/125/100",
+      "afterCounts": "12/124/100",
+      "cells": 1,
+      "reason": "New own WebKit ready initial full save/edit/load evidence; separate from fixture correction itself, which changes0cells",
+      "oldUnreachedStillMissing": true
     }
   }
 }
