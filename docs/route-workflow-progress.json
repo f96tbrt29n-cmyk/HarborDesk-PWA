@@ -73,8 +73,8 @@
       "非該当": 0
     },
     "D": {
-      "確認済み": 9,
-      "一部": 16,
+      "確認済み": 10,
+      "一部": 15,
       "未確認": 34,
       "非該当": 0
     }
@@ -1488,39 +1488,59 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "reason": "直接D→H経由のH高速＋かつ重量艦4以下/軽巡＋護衛3の先行T、KのSS/SSV先行ランダムを出典順で接続。32接続図、情報不足と既知不一致、旧安全域71と出典70を区別。全戦闘数量根拠は未完。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/route-goal-guidance-audit.json",
+            "docs/pr152-four-five-central-ja.md",
+            "tests/four-five-central-routes.test.cjs",
+            "tests/four-five-central-graph.test.cjs",
+            "tests/four-five-central-placement.test.cjs",
+            "tests/route-four-five-central.spec.js"
           ]
         },
         "B": {
           "status": "一部",
-          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "reason": "同じindexの担当艦セット有限在庫自動配備の既存証拠を再利用。新代表C/Wは同期済み成立配備を変更せず保持し、ASW/対地/空母攻撃機と合法性を確認。今回新たな装備修復成功とは数えず、全目標/在庫/枠競合は未完。",
           "evidence": [
             "docs/pr152-port-attacker-set-ja.md",
-            "tests/port-attacker-set.spec.js"
+            "tests/port-attacker-set.spec.js",
+            "docs/pr152-four-five-central-ja.md",
+            "tests/four-five-central-routes.test.cjs",
+            "tests/four-five-central-graph.test.cjs",
+            "tests/four-five-central-placement.test.cjs",
+            "tests/route-four-five-central.spec.js"
           ]
         },
         "C": {
           "status": "一部",
-          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "reason": "同じindexの在庫0で索敵12/登録71の不足59、実数不足と戦闘推奨の空母1機/同艦ASW1組の名前・合法な別枠・代替搭載先をC/W確認。未知は索敵/艦の未判定と安全中止。全失敗区分は未完。",
           "evidence": [
             "docs/pr152-port-attacker-set-ja.md",
-            "tests/port-attacker-set.spec.js"
+            "tests/port-attacker-set.spec.js",
+            "docs/pr152-four-five-central-ja.md",
+            "tests/four-five-central-routes.test.cjs",
+            "tests/four-five-central-graph.test.cjs",
+            "tests/four-five-central-placement.test.cjs",
+            "tests/route-four-five-central.spec.js"
           ]
         },
         "D": {
-          "status": "一部",
-          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "status": "確認済み",
+          "reason": "同じindexの成立/在庫不足で保存→メモ編集→reload(load)→同一新文書complete後再探索/再表示、custom保存文字列・同期元・他編成/海域・ID/metadata・計算/調達/他経路担当艦情報をC/W直接一致。未知は編集なし安全中止と元保存値保持。初回stock2失敗は保存前で別記し、期待値2箇所修正後のstock2必要再検証と成功4再利用を区別。",
           "evidence": [
             "docs/pr152-port-attacker-set-ja.md",
-            "tests/port-attacker-set.spec.js"
+            "tests/port-attacker-set.spec.js",
+            "docs/pr152-four-five-central-ja.md",
+            "tests/four-five-central-routes.test.cjs",
+            "tests/four-five-central-graph.test.cjs",
+            "tests/four-five-central-placement.test.cjs",
+            "tests/route-four-five-central.spec.js"
           ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 同じ行の汎用セット数・十分な担当艦数の根拠不足はCのまま。45行を機械的に減らさない。"
+      "remaining": "登録索敵71の安全域と出典70の余裕根拠、全戦闘目標の数量/十分人数、全在庫/搭載不可/枠競合、外周・E/F経由の未照合条件。艦固有索敵ボーナス未確認はmanual。担当艦数は利用者指定で勝利保証ではない。共通load後非表示の原因未確定。"
     },
     {
       "id": "4-5/2/default",
@@ -2499,59 +2519,63 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "4-4/0/default",
-    "baselineHead": "2f2b78d4ebd63b9dd4e999635fc35cfc76985d95",
-    "condition": "AEIK alternateIconditions/source-disputedDEpriority andconsequentialLHAclassification,17edgeguide,namedownedplacement",
-    "evidence": "docs/pr152-four-four-aeik-ja.md",
-    "nodePrerequisitesPass": 291,
-    "sourceCases": 56,
-    "sourceBaselineMatches": 23,
-    "sourceAfterMatches": 56,
-    "independentMultisets": 18564,
+    "id": "4-5/1/default",
+    "baselineHead": "8aa17ad4e0e27b9b4475a2ea1412f06201e71878",
+    "condition": "Direct D-entry central H-to-K ordered exclusions and prior K submarine randomness, with numeric scouting and named equipment guidance",
+    "evidence": "docs/pr152-four-five-central-ja.md",
+    "nodePrerequisitesPass": 306,
+    "sourceCases": 33,
+    "sourceBaselineMatches": 22,
+    "sourceAfterMatches": 33,
+    "independentFleetSpeedComparisons": 92820,
     "independentDifferences": 0,
     "local": {
-      "casesPerEngine": 3,
-      "firstPass": {
-        "chromium": 3,
-        "webkit": 3
-      },
-      "retries": 0,
-      "totalExecutions": 6,
       "states": [
         "ready",
         "stock",
         "unknown"
       ],
-      "searchEvaluationsReady": [
-        55,
-        0
+      "firstBatchCases": 6,
+      "firstBatchPass": 4,
+      "firstBatchNewFixtureExpectationFailures": 2,
+      "fixtureCorrections": [
+        "scouting partial under safe-only threshold, preserve route missing12/71",
+        "carrier-target candidate name matches scoped actual catalog text"
       ],
-      "observer": "bothdocumentsinstalled/drop0/fail0/finalnavvisible; knownoldfailuresnotresolved"
+      "correctedStockCases": 2,
+      "correctedStockPass": 2,
+      "unchangedSuccessesReused": 4,
+      "totalBrowserExecutions": 8,
+      "retries": 0,
+      "selectionOnlyPreparationFailure": {
+        "browserLaunches": 0,
+        "cause": "leading grep anchor excluded fully-qualified Playwright title",
+        "correctedSelectionPerEngine": 1
+      },
+      "observer": "both documents installed; drop/failures/collectionFailures0; final navigator and button visible; no claim known old issue resolved"
     },
     "beforeCells": {
-      "confirmed": 8,
-      "partial": 116,
-      "unconfirmed": 112
-    },
-    "afterCells": {
       "confirmed": 9,
       "partial": 118,
       "unconfirmed": 109
     },
+    "afterCells": {
+      "confirmed": 10,
+      "partial": 117,
+      "unconfirmed": 109
+    },
     "changedCells": [
-      "4-4 B 未確認→一部",
-      "4-4 C 未確認→一部",
-      "4-4 D 未確認→確認済み"
+      "4-5/1 D 一部→確認済み"
     ],
-    "statusCellChanges": 3,
+    "statusCellChanges": 1,
     "normalSmokeSelection": {
-      "totalPerBrowser": 829,
+      "totalPerBrowser": 832,
       "targetCasesPerBrowser": 3,
       "browserLaunches": 0,
       "verifiedBeforeCI": true
     }
   },
-  "nextPriority": "4-5/index1 ADHKT / CDHKT。KのSS/SSVランダム逸れが索敵判定より先、H高速＋等によるT直行がK経由と異なる点を現行契約が接続していない。既存4-5/0・2と担当艦セット証拠を再利用し、実際の旧判定対照を先に確認。5-1のCL過剰制限は次点。",
+  "nextPriority": "5-1 BCFJ。出典では戦艦1＋重巡1＋駆逐4が軽巡なしで直接F→Jを満たすのに現行契約は軽巡1を一律要求。まず実関数の旧対照と出典優先順を確認し、空母表記差等は根拠待ちへ分離して独立した確定範囲から進める。",
   "previousSelected": {
     "id": "5-4/0/default",
     "condition": "M-to-P conditional scouting exemption only for no SS/SSV and confirmed fleet speed >=15; unknown is not exemption",
@@ -2820,6 +2844,59 @@
         "browserLaunches": 0,
         "verifiedBeforeCI": true
       }
+    },
+    {
+      "id": "4-4/0/default",
+      "baselineHead": "2f2b78d4ebd63b9dd4e999635fc35cfc76985d95",
+      "condition": "AEIK alternateIconditions/source-disputedDEpriority andconsequentialLHAclassification,17edgeguide,namedownedplacement",
+      "evidence": "docs/pr152-four-four-aeik-ja.md",
+      "nodePrerequisitesPass": 291,
+      "sourceCases": 56,
+      "sourceBaselineMatches": 23,
+      "sourceAfterMatches": 56,
+      "independentMultisets": 18564,
+      "independentDifferences": 0,
+      "local": {
+        "casesPerEngine": 3,
+        "firstPass": {
+          "chromium": 3,
+          "webkit": 3
+        },
+        "retries": 0,
+        "totalExecutions": 6,
+        "states": [
+          "ready",
+          "stock",
+          "unknown"
+        ],
+        "searchEvaluationsReady": [
+          55,
+          0
+        ],
+        "observer": "bothdocumentsinstalled/drop0/fail0/finalnavvisible; knownoldfailuresnotresolved"
+      },
+      "beforeCells": {
+        "confirmed": 8,
+        "partial": 116,
+        "unconfirmed": 112
+      },
+      "afterCells": {
+        "confirmed": 9,
+        "partial": 118,
+        "unconfirmed": 109
+      },
+      "changedCells": [
+        "4-4 B 未確認→一部",
+        "4-4 C 未確認→一部",
+        "4-4 D 未確認→確認済み"
+      ],
+      "statusCellChanges": 3,
+      "normalSmokeSelection": {
+        "totalPerBrowser": 829,
+        "targetCasesPerBrowser": 3,
+        "browserLaunches": 0,
+        "verifiedBeforeCI": true
+      }
     }
   ],
   "fiveFourCloseout": {
@@ -2860,8 +2937,8 @@
       "environment or permission blocker",
       "specification change needing user decision"
     ],
-    "activeUnit": "4-4 AEIK",
-    "nextUnit": "4-5/index1 ADHKT / CDHKT",
+    "activeUnit": "4-5/index1 ADHKT / CDHKT",
+    "nextUnit": "5-1 BCFJ",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved"
   }
 }

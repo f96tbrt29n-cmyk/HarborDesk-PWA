@@ -4333,6 +4333,68 @@
           "matchPolicy": "exact",
           "min": 0,
           "max": 4
+        },
+        {
+          "not": {
+            "all": [
+              {
+                "kind": "minSpeed",
+                "rank": 15
+              },
+              {
+                "kind": "typeCount",
+                "types": [
+                  "戦艦",
+                  "高速戦艦",
+                  "航空戦艦",
+                  "正規空母",
+                  "装甲空母",
+                  "軽空母"
+                ],
+                "matchPolicy": "exact",
+                "min": 0,
+                "max": 4
+              }
+            ]
+          },
+          "reason": "H→K：高速＋以上統一かつ戦艦級＋空母系4以下なら先にH→Tへ進み、選択したK経由とは別。既知の有効な高速以下の艦、または重量艦5以上ならこの高速＋近道には該当しない。速力未判定だけでK経由成立にせず、他の分岐条件も確認する"
+        },
+        {
+          "not": {
+            "all": [
+              {
+                "kind": "typeCount",
+                "types": [
+                  "軽巡洋艦"
+                ],
+                "matchPolicy": "exact",
+                "min": 1,
+                "max": 7
+              },
+              {
+                "kind": "typeCount",
+                "types": [
+                  "駆逐艦",
+                  "海防艦"
+                ],
+                "matchPolicy": "exact",
+                "min": 3,
+                "max": 7
+              }
+            ]
+          },
+          "reason": "H→K：軽巡洋艦1以上＋駆逐・海防3以上ならH→Tへ進むため、このK経由とは別。雷巡・練巡は軽巡洋艦に数えない。装備購入ではなく編成と選択経路を見直す"
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "潜水艦",
+            "潜水空母"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0,
+          "reason": "K→T：潜水艦・潜水空母を含めない。1隻以上は索敵判定より前にMへ逸れる可能性があるため、索敵装備の追加だけで固定できない。潜水母艦とは別で、装備購入ではなく編成を見直す"
         }
       ],
       "scouting": {
@@ -4354,6 +4416,12 @@
         "索敵"
       ],
       "notes": [
+        "始点A/Cはランダム。どちらも能動分岐でDを選び、D→H→K→Tを確認する登録経路。H→Tの高速＋最短・軽量最短は別の登録例。",
+        "Hは高速＋以上統一かつ戦艦級＋空母系4以下、次に軽巡洋艦1以上＋駆逐/海防3以上ならT。この直接D→H経路には、F経由時だけの軽巡＋駆逐/海防2隻の近道条件を適用しない。",
+        "Kは戦艦級＋正規/装甲空母4以上、戦艦級＋空母系5以上が先にM。潜水艦・潜水空母入りのM逸れ判定も索敵より先。Eから入る別経路の条件はこのD→H→K経路へ混ぜない。",
+        "索敵は33式係数2。出典の70以上に対し、既存登録の安全側目標71以上を維持する。71未満をゲーム上の到達不可能とは断定しない。",
+        "戦艦級は戦艦・高速戦艦・航空戦艦、正規空母数は正規・装甲空母、空母系はこれらと軽空母。元の戦艦2・重巡2・正規空母1・軽空母1は編成例で、確認済み分岐を満たす別の6隻編成も扱う。",
+        "対地セット・各空母の攻撃機・Dの対潜セットは戦闘上の推奨。艦種や隻数の不一致は編成見直しへ案内し、在庫不足・搭載不可・枠競合・情報不足・探索打切りを区別する。経路成立は勝利保証ではなく、未完了探索を手持ちでは不可能・購入必須・最適とは断定しない。",
         "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
       ],
       "requiredConnectionClass": "B",
@@ -4374,9 +4442,13 @@
         },
         "速力": {
           "class": "D",
-          "detail": "高速化の一律必須指定なし",
-          "evidence": [],
-          "limit": ""
+          "detail": "高速化の一律必須指定なし。Hでは高速＋以上統一かつ戦艦級＋空母系4以下ならTへ近道し、選択したK経由とは別。既知の有効な高速以下、または重量艦5以上ならこの近道に非該当。未確認の速力を成立扱いしない。",
+          "evidence": [
+            "map-plans.js / 4-5 index1 negative H shortcut condition",
+            "tests/four-five-central-routes.test.cjs / H component and speed-target boundaries",
+            "docs/pr152-four-five-central-ja.md"
+          ],
+          "limit": "否定条件は高速＋を自動配備目標へ追加しない。軽巡＋護衛の別のH→T条件、後続Kの重量艦・潜水艦系・索敵条件も個別に確認。出典と合成境界の確認であり、実ゲーム分岐・勝利や全編成の実操作を保証しない。"
         },
         "先制対潜": {
           "class": "C",
@@ -4424,7 +4496,7 @@
           ]
         }
       },
-      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+      "connectionSnapshot": "docs/pr152-four-five-central-ja.md / 4-5 index1 final loaded contract; ordered H/K source33 cases and actual master-backed fastplus counterexample. Full goal metadata unchanged (generic LOS2, ASW1, soft-land1, per-carrier attack); topology does not validate all outer branches."
     },
     {
       "id": "4-5/2/default",
