@@ -1,6 +1,6 @@
 # 6-1 AFGHKの有効代替・自動配備・保存確認
 
-基準は9dd888aa2fc8abf7bef6ebb90c43b1a6eb34d6c6。局所Node14とC/W3代表各初回の6試行は、元e78ec607＋6-1草稿を含む隔離runtimeで実施した。移植後の14配信app/testソースをbyte完全一致で確認し、成功済み試行を反復しない。上流の数値fixture訂正・e78確定CI・継続方針を保持し、9dd訂正CI40748149278は6smoke成功まで確定した。6-1は成功済み局所証拠を再利用して通常commit/push後、自身の最終HEADのsmokeを重複なく1回確認する（まだ未起動）。元16件・draft/runtime・75原本は別に保持する。
+基準は9dd888aa2fc8abf7bef6ebb90c43b1a6eb34d6c6。局所Node14とC/W3代表各初回の6試行は、元e78ec607＋6-1草稿を含む隔離runtimeで実施した。移植後の14配信app/testソースをbyte完全一致で確認し、成功済み試行を反復しない。上流の数値fixture訂正・e78確定CI・継続方針を保持し、9dd訂正CI40748149278は6smoke成功まで確定した。6-1は33ed3a17へ通常commit/pushし、自身CI40754733298は起動1回・6smoke成功まで確定した。詳細は末尾に初回/retry/欠測を分離して記録する。元16件・draft/runtime・75原本は別に保持する。
 
 ## 利用者から見た改善
 
@@ -38,3 +38,16 @@ Nodeは経路6件/地図4件/配置4件が固定Node24.21.0で初回成功、ソ
 
 
 上流CI確定の出典は[5-5訂正後CI記録](pr152-five-five-bkps-ja.md)。C842/0/0・W836/6/0、成果物8中7/437,804,932bytesとC2上限欠測を分離した。新W成立は旧失敗と別試行であり、旧未到達/caller欠測/原因不明を解決扱いにしない。6-1の製品・通常試験14配信ソース、元16件・75局所原本は変更せず、今回追加実行0。
+
+
+## 33ed3a17の通常CI確定
+
+HEAD33ed3a1735aa4bc1ed4cba413b2c4ede7a39a0e1の[40754733298](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/40754733298)はattempt1・起動1回・再実行0で、6smoke成功、Full skipped。自身公式はC845初回/0retry成功/0最終失敗（C1=423、C2=422）、W838/7/0（W1=212、W2/W3=各211、W4=204＋7retry）。全6自身のhead/attemptと固定Node24.21.0/PW1.55.0/C1187/W2203が一致した。
+
+新6-1のW成立・不足・未知は自身初回原本でcompleted/2結果、保存または安全中止・編集・同一新文書load complete/全文・入力・他編成/metadata保持、元pageerrors0まで確認した。成立/不足の保存編集時customExact=falseは意図した変更で、load時はtrue、未知は元全文もtrue。Cの3対象は固定選択と自身公式全845初回成功を確認したが、C2試行原本は上限欠測。元ソース不変の局所C3の保存/load証拠を再利用し、CI自身の未取得rawへ置換しない。
+
+W初回失敗7件は、5-5不足・5-1成立・4-2在庫不足・5-4索敵required-ready/元低速戦艦two-low・7-3艦種不一致のload後ボタン非表示6件と、5-3免除のload完全一致後に版取得access-control例外の検査で失敗した1件。7初回のtrace/動画を保持し、失敗retry0と区別する。retry成功で初回の未到達/caller欠測を埋めず、新保存不一致のpositive記録なし・原因未確定のまま追加診断や無関係との断定へ広げない。
+
+8成果物中7件460,138,542bytesをserver SHA-256/全ZIP CRC照合。C2試行1,118,519,423bytesは512MiB上限超で未要求・欠測、制限回避や追加CIなし。回収資料83ファイル（受信ZIP/派生summary等）の閉鎖台帳SHA-256はa9818fb07d84fac5346e55647aba5c6cfed4ac03dffa86cdb2fd882e0628efc6。途中のfocused summaryのC2-runningという当時の限界は原文で保持し、別の最終派生summaryと公式注記でC2完了/原本欠測を区別した。原本/実値/traceはprivate保持、sanitizer/外部アップロードなし。
+
+このCI追記による236セル変更0、コミット済み13/126/97を維持する。6-1全編成/全在庫/出典差や旧他行の原因解決・公開可能とはしない。成功済み局所確認を反復せず、次の6-2の独立した限定成果を通常反映・自身最終HEADのsmoke1回へ進める。

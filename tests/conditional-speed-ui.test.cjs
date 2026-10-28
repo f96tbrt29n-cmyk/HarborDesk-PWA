@@ -34,6 +34,9 @@ require('./five-five-placement.test.cjs');
 require('./six-one-routes.test.cjs');
 require('./six-one-graph.test.cjs');
 require('./six-one-placement.test.cjs');
+require('./six-two-routes.test.cjs');
+require('./six-two-graph.test.cjs');
+require('./six-two-placement.test.cjs');
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 function load(file,name,c){const s=fs.readFileSync(path.join(__dirname,'..',file),'utf8'),start=s.indexOf('function '+name+'('),end=s.indexOf('\nfunction ',start+1);assert.ok(start>=0);vm.runInNewContext(s.slice(start,end<0?undefined:end),c);return c[name]}
 function routes(){const c=vm.createContext({window:{}});vm.runInContext(fs.readFileSync(path.join(__dirname,'../map-plans.js'),'utf8'),c);return vm.runInContext('({maps:MAP_PLANS,rules:HD_MAP_ROUTE_REQUIREMENTS})',c)}
