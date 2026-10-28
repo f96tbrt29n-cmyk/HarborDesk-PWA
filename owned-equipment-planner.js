@@ -467,7 +467,7 @@ function* hdOCSearchSteps(c,limits={}){
  const shortages=hdOCShortageGoals(best.measure).map(goal=>{
   if(goal.kind==='low-speed-ships')return {...goal,goalKind:goal.kind,owned:0,placement:true,shortfall:Math.max(0,goal.minCount-goal.count),candidates:[],detail:goal.detail+'。低速艦を編成するか、高速化装備を外して速力を再確認。'};
   if(goal.kind==='opening-asw')return {...goal,goalKind:goal.kind,kind:'対潜',owned:0,placement:false,shortfall:goal.minCount-goal.count,candidates:inventory.filter(x=>hdOCItemMatches('opening-asw',x)).map(x=>x.name),asw:true};
-  if(typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[goal.kind]){const profile=hdSEProfiles(c.map).find(x=>x.kind===goal.kind),stock=hdSECapabilityStock(best.plan,goal.kind,goal.minCount);return {...goal,kind:profile?.baseKind||goal.baseKind||goal.label||goal.kind,goalKind:goal.kind,capability:true,stock,...(c.map==='3-3'&&goal.kind==='cap-carrier-attack'?{carrierTargets:hdOCThreeThreeCarrierTargets(best.plan,goal)}:{}),owned:stock?.parts?.length?Math.min(...stock.parts.map(p=>Math.floor(p.have/(p.need/goal.minCount)))):0,placement:true,shortfall:Math.max(1,goal.minCount-goal.count),candidates:stock?.parts.filter(x=>x.have<x.need).flatMap(x=>HD_SE_PARTS[x.part].examples)||[]}}
+  if(typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[goal.kind]){const profile=hdSEProfiles(c.map).find(x=>x.kind===goal.kind),stock=hdSECapabilityStock(best.plan,goal.kind,goal.minCount);return {...goal,kind:profile?.baseKind||goal.baseKind||goal.label||goal.kind,goalKind:goal.kind,capability:true,stock,...(['3-3','3-4'].includes(c.map)&&goal.kind==='cap-carrier-attack'?{carrierTargets:hdOCThreeThreeCarrierTargets(best.plan,goal)}:{}),owned:stock?.parts?.length?Math.min(...stock.parts.map(p=>Math.floor(p.have/(p.need/goal.minCount)))):0,placement:true,shortfall:Math.max(1,goal.minCount-goal.count),candidates:stock?.parts.filter(x=>x.have<x.need).flatMap(x=>HD_SE_PARTS[x.part].examples)||[]}}
   const kind=goal.kind==='air-value'?'制空':goal.kind==='los-value'?'索敵':goal.kind==='radar-ships'?'電探':goal.kind==='drum-ships'?'ドラム缶':goal.kind==='speed-ship'?'高速化':goal.kind;
   const compatible=hdFLCatalog().filter(x=>hdOCItemMatches(kind,x)&&slots.some(slot=>hdOCCompatible(slot,{item:x,star:0}))).sort((a,b)=>hdOCScore(kind,b)-hdOCScore(kind,a));
   const candidates=(kind==='高速化'?['turbine','boiler'].flatMap(part=>compatible.filter(x=>hdOCSpeedPart(x)===part).slice(0,1)):compatible.slice(0,3)).map(x=>x.name);
@@ -495,11 +495,11 @@ async function hdOCSearchAsync(c){
   await new Promise(resolve=>setTimeout(resolve,0));
  }
 }
-// Named placement candidates for this selected route's optional carrier attack
-// target. These are catalog-compatible exchange slots, never a joint allocation
-// or a purchase requirement. Keep other routes' existing presentation unchanged.
+// Named placement candidates for the selected 3-3 ACGM and 3-4 ACEGJP optional
+// carrier attack target. These are catalog-compatible exchange slots, never a
+// joint allocation or purchase requirement. Other routes keep their presentation.
 function hdOCThreeThreeCarrierTargets(plan,goal){
- if(plan?.map!=='3-3'||goal?.kind!=='cap-carrier-attack'||!goal.generatedFromMap||goal.purpose!=='recommendation'||hdFERouteRequirementData(plan)?.path!=='ACGM')return null;
+ if(!['3-3','3-4'].includes(plan?.map)||goal?.kind!=='cap-carrier-attack'||!goal.generatedFromMap||goal.purpose!=='recommendation'||hdFERouteRequirementData(plan)?.path!==(plan.map==='3-3'?'ACGM':'ACEGJP'))return null;
  const kind=goal.kind;
  const catalog=hdFLCatalog().filter(item=>hdSEPartMatches('carrierAttackPlane',item));
  return (plan.ships||[]).flatMap((ship,shipIndex)=>{

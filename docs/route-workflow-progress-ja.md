@@ -18,13 +18,15 @@
 |項目|確認済み|一部|未確認|非該当|分母|
 |---|---:|---:|---:|---:|---:|
 |A|0|56|3|0|59|
-|B|0|20|39|0|59|
-|C|0|20|39|0|59|
-|D|4|18|37|0|59|
+|B|0|21|38|0|59|
+|C|0|21|38|0|59|
+|D|5|18|36|0|59|
 
 2026-10-28追補：[5-4最終整理](pr152-five-four-closeout-ja.md)は既存証拠で終了し、追加実行0・状態変更0。基準236セル3/115/118の下に閉じた限定残件と4分類を別記した。続く[2-5北F分岐](pr152-two-five-north-f-ja.md)では高速3戦艦の有効枝と選艦/不足案内を接続し、C/W各1初回で保存・編集・同一文書load後の完全一致まで確認したためDだけ一部→確認済み。前3/115/118→後4/114/118、変更1セル。A/B/Cの全条件完了へは広げない。7-3 Gと他行は維持。
 
 2026-10-28追補：[3-3 ACGM](pr152-three-three-acgm-ja.md)はA/C/Gの優先順と装備推奨を分離し、独立した分岐境界と代表操作を確認する単位。A/B/Cは一部、Dは既存の確認済みを維持する。236セルは前後とも確認済み4／一部114／未確認118で、限定確認による格上げはしない。
+
+2026-10-28追補：[3-4 ACEGJP](pr152-three-four-acegjp-ja.md)で駆逐/海防代替・Pボス構造図・空母別不足案内を接続。C/W3状態各初回成功を根拠に、同じ行のB/Cを未確認→一部、Dを未確認→確認済みとした。前4/114/118→後5/116/115、変更3セル。A/B/Cの全目標完了へ格上げせず、基準・分母236は維持。[load後非表示の共通残件](pr152-post-load-navigation-residual-ja.md)は停止段階だけ照合し、同原因とは扱わない。
 
 ## 行別対応
 
@@ -54,7 +56,7 @@
 |3-2/1/fastPlus CEFL / CGFL|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
 |3-2/1/fastest CEFL|一部|一部|一部|一部|[pr152-route-target-scope-ja](pr152-route-target-scope-ja.md)|
 |3-3/0/default ACGM|一部|一部|一部|確認済み|[current-auto-loadout-coverage-ja](current-auto-loadout-coverage-ja.md) / [A/C/G分岐と代表操作](pr152-three-three-acgm-ja.md)|
-|3-4/0/default ACEGJP|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
+|3-4/0/default ACEGJP|一部|一部|一部|確認済み|[分岐・配備・代表操作](pr152-three-four-acegjp-ja.md)|
 |3-5/0/default FGK|一部|一部|一部|一部|[pr152-south-scouting-ui-ja](pr152-south-scouting-ui-ja.md) / [pr152-scouting-options-ja](pr152-scouting-options-ja.md)|
 |3-5/1/default BDHK|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
 |4-1/0/default CFDGJ / ABDGJ|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|

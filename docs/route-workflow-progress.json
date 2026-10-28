@@ -62,20 +62,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 20,
-      "未確認": 39,
+      "一部": 21,
+      "未確認": 38,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 20,
-      "未確認": 39,
+      "一部": 21,
+      "未確認": 38,
       "非該当": 0
     },
     "D": {
-      "確認済み": 4,
+      "確認済み": 5,
       "一部": 18,
-      "未確認": 37,
+      "未確認": 36,
       "非該当": 0
     }
   },
@@ -1046,11 +1046,12 @@
             "docs/current-auto-loadout-coverage-ja.md",
             "tests/owned-equipment-planner.spec.js",
             "docs/pr152-three-three-acgm-ja.md",
-            "tests/route-three-three-acgm.spec.js"
+            "tests/route-three-three-acgm.spec.js",
+            "docs/pr152-post-load-navigation-residual-ja.md"
           ]
         }
       },
-      "remaining": "特殊艦種の3-3固有算入は未判定。全戦闘目標の数量根拠、全在庫・搭載枠の同時配備/競合の網羅、実ゲームでの到達・勝利は未確認。"
+      "remaining": "特殊艦種の3-3固有算入は未判定。全戦闘目標の数量根拠、全在庫・搭載枠の同時配備/競合の網羅、実ゲームでの到達・勝利は未確認。 load後再探索ボタンの非表示停止はdocs/pr152-post-load-navigation-residual-ja.mdの共通操作残件へ統合。停止段階の一致であり共通原因は未確定。"
     },
     {
       "id": "3-4/0/default",
@@ -1062,30 +1063,42 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "reason": "始点/Cの優先条件・32編成の独立期待値と原寸図24接続を確認。全戦闘目標の数量根拠・特殊艦種の算入は未完。",
           "evidence": [
-            "docs/route-requirement-validation-scope.json",
-            "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/pr152-three-four-acegjp-ja.md",
+            "tests/route-three-four-acegjp.spec.js",
+            "tests/three-four-acegjp.test.cjs",
+            "tests/three-four-graph.test.cjs"
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じ登録行の駆逐代替代表で有限在庫から高角砲を配備し対空セット0→1、装備合法性・在庫上限・必須条件保持をC/W初回で確認。未選択制空や全在庫/全目標へ一般化しない。",
+          "evidence": [
+            "docs/pr152-three-four-acegjp-ja.md",
+            "tests/route-three-four-acegjp.spec.js"
+          ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じ行の在庫0で空母3隻へ各攻撃機1機と実搭載枠、対空装備例の部品数、未知艦/装備の未判定をC/Wで区別。搭載不可/枠競合は軽い検査と既存共通証拠、全失敗案内の網羅は未完。",
+          "evidence": [
+            "docs/pr152-three-four-acegjp-ja.md",
+            "tests/route-three-four-acegjp.spec.js",
+            "tests/three-four-placement.test.cjs",
+            "tests/three-three-placement.test.cjs"
+          ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "確認済み",
+          "reason": "同じ行の成立/在庫不足代表をC/W各1初回で配備→保存→編集→同一reload文書load/complete後再表示、保存値・他編成/海域・識別情報・metadata保持まで確認。未知案は安全中止/元文保持/loadの別操作列で、未知案の編集は主張しない。",
+          "evidence": [
+            "docs/pr152-three-four-acegjp-ja.md",
+            "tests/route-three-four-acegjp.spec.js"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "特殊艦種の3-4固有算入、全戦闘目標の数量根拠、全在庫・装備枠競合の網羅、実ゲーム到達/勝利は未確認。構造図の接続は固定分岐条件と区別する。"
     },
     {
       "id": "3-5/0/default",
@@ -1672,11 +1685,12 @@
             "docs/pr152-five-four-scouting-exemption-ja.md",
             "tests/five-four-scouting-exemption.test.cjs",
             "docs/pr152-five-four-completion-ja.md",
-            "tests/five-four-fixed-input.test.cjs"
+            "tests/five-four-fixed-input.test.cjs",
+            "docs/pr152-post-load-navigation-residual-ja.md"
           ]
         }
       },
-      "remaining": "固定登録例の免除案と情報不足案の結果表示・保存/安全中止・編集・同一文書load後再表示は新ソースで確認。全分岐/全数量根拠/全在庫・搭載/枠競合と実ゲーム到達は未完。既存画面切替・通信失敗の原因は未確定。"
+      "remaining": "固定登録例の免除案と情報不足案の結果表示・保存/安全中止・編集・同一文書load後再表示は新ソースで確認。全分岐/全数量根拠/全在庫・搭載/枠競合と実ゲーム到達は未完。既存画面切替・通信失敗の原因は未確定。 load後再探索ボタンの非表示停止はdocs/pr152-post-load-navigation-residual-ja.mdの共通操作残件へ統合。停止段階の一致であり共通原因は未確定。"
     },
     {
       "id": "5-5/0/default",
@@ -2429,27 +2443,41 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "3-3/0/default",
-    "baselineHead": "f758ac807be6c9a0d5f6e580d0b95e7a5d9f511e",
-    "condition": "ACGM A/C/G branch and owned combat-recommendation guidance",
-    "evidence": "docs/pr152-three-three-acgm-ja.md",
-    "statusCellChanges": 0,
-    "localResults": {
-      "nodePrerequisitesPass": 243,
-      "representativeStates": [
+    "id": "3-4/0/default",
+    "baselineHead": "e313f97fc6fe080893e5be628eac146bea894cc3",
+    "condition": "ACEGJP orderedbranch/DD-DE escort, corrected24-edgeguide andnamedownedcarrierrecommendations",
+    "evidence": "docs/pr152-three-four-acegjp-ja.md",
+    "nodePrerequisitesPass": 259,
+    "local": {
+      "states": [
         "ready",
         "stock",
         "unknown"
       ],
-      "chromium": "all3 states verified",
-      "webkit": "all3 states verified",
+      "casesPerEngine": 3,
+      "chromiumInitialPass": 3,
+      "webkitInitialPass": 3,
       "retries": 0,
-      "localAttempts": 12,
-      "fixtureCorrections": "absent goal assumptions, then canonical equipment name; product unchanged; prior successes reused",
-      "statusCellChanges": 0
-    }
+      "observer": "test-only2entries64/doc; drop0/failures0; nohiddenstopthistrial; timingoverhead/uncapturedpaths documented"
+    },
+    "beforeCells": {
+      "confirmed": 4,
+      "partial": 114,
+      "unconfirmed": 118
+    },
+    "afterCells": {
+      "confirmed": 5,
+      "partial": 116,
+      "unconfirmed": 115
+    },
+    "changedCells": [
+      "B 未確認→一部",
+      "C 未確認→一部",
+      "D 未確認→確認済み"
+    ],
+    "statusCellChanges": 3
   },
-  "nextPriority": "3-4/index0 ACEGJPの関連分岐・必須艦種と手持ち装備案内の接続。今回未調査・未実装・未実行。",
+  "nextPriority": "4-1/index0 CFDGJ / ABDGJの関連分岐・護衛艦数と潜水系除外の接続。今回未調査・未実装・未実行。",
   "previousSelected": {
     "id": "5-4/0/default",
     "condition": "M-to-P conditional scouting exemption only for no SS/SSV and confirmed fleet speed >=15; unknown is not exemption",
@@ -2570,6 +2598,27 @@
         "browserLaunches": 0,
         "verifiedBeforeCI": true
       }
+    },
+    {
+      "id": "3-3/0/default",
+      "baselineHead": "f758ac807be6c9a0d5f6e580d0b95e7a5d9f511e",
+      "condition": "ACGM A/C/G branch and owned combat-recommendation guidance",
+      "evidence": "docs/pr152-three-three-acgm-ja.md",
+      "statusCellChanges": 0,
+      "localResults": {
+        "nodePrerequisitesPass": 243,
+        "representativeStates": [
+          "ready",
+          "stock",
+          "unknown"
+        ],
+        "chromium": "all3 states verified",
+        "webkit": "all3 states verified",
+        "retries": 0,
+        "localAttempts": 12,
+        "fixtureCorrections": "absent goal assumptions, then canonical equipment name; product unchanged; prior successes reused",
+        "statusCellChanges": 0
+      }
     }
   ],
   "fiveFourCloseout": {
@@ -2589,6 +2638,15 @@
       "verification": "all inventory/slots, alternative hull UI, pre-search display of persisted new reason",
       "sourceWait": "submarine-containing M priority outside selected route",
       "knownOperationInstability": "initial CI hidden load-search buttons; retries separate; cause unresolved"
+    }
+  },
+  "sharedResiduals": {
+    "postLoadHiddenSearch": {
+      "evidence": "docs/pr152-post-load-navigation-residual-ja.md",
+      "sourceAttempts": 12,
+      "stagesMatched": true,
+      "sameCause": "unknown",
+      "newLocalThreeFourReproduction": false
     }
   }
 }
