@@ -62,20 +62,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 21,
-      "未確認": 38,
+      "一部": 22,
+      "未確認": 37,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 21,
-      "未確認": 38,
+      "一部": 22,
+      "未確認": 37,
       "非該当": 0
     },
     "D": {
-      "確認済み": 5,
+      "確認済み": 6,
       "一部": 18,
-      "未確認": 36,
+      "未確認": 35,
       "非該当": 0
     }
   },
@@ -1195,30 +1195,48 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "reason": "出典のC/D/F優先順と両経路群・装備推奨を分離。全戦闘目標の数量根拠・対象外F/H・特殊艦種は未完。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/route-goal-guidance-audit.json",
+            "docs/pr152-four-one-routes-ja.md",
+            "tests/four-one-routes.test.cjs",
+            "tests/four-one-graph.test.cjs"
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じ登録群で有限在庫から対潜セットを補完し、経路・合法性・在庫上限をC/Wで確認。全目標・在庫・枠競合の網羅ではない。",
+          "evidence": [
+            "docs/pr152-four-one-routes-ja.md",
+            "tests/four-one-routes.test.cjs",
+            "tests/four-one-graph.test.cjs",
+            "tests/four-one-placement.test.cjs",
+            "tests/route-four-one-routes.spec.js"
+          ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "在庫0で空母各1機と同艦ソナー1＋投射機1の艦名/合法枠、未知入力の未判定・安全中止をC/Wで確認。全装備/全失敗区分は未完。",
+          "evidence": [
+            "docs/pr152-four-one-routes-ja.md",
+            "tests/four-one-routes.test.cjs",
+            "tests/four-one-graph.test.cjs",
+            "tests/four-one-placement.test.cjs",
+            "tests/route-four-one-routes.spec.js"
+          ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "確認済み",
+          "reason": "成立/在庫不足の保存・編集・同一reload文書load/complete後の再探索/再表示、元保存値・他編成/metadata保持をC/Wで確認。未知は編集なし安全中止と元データ保持。両始点の共通登録群で、実ゲーム分岐固定とはしない。",
+          "evidence": [
+            "docs/pr152-four-one-routes-ja.md",
+            "tests/route-four-one-routes.spec.js"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "対象外F/H出典差・特殊艦種算入、対潜既定1組の十分性/OASW人数、全戦闘目標の数量根拠・全在庫/搭載不可/枠競合。始点A/Cはランダム。共通load後非表示の原因は未確定。"
     },
     {
       "id": "4-2/0/default",
@@ -2443,41 +2461,53 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "3-4/0/default",
-    "baselineHead": "e313f97fc6fe080893e5be628eac146bea894cc3",
-    "condition": "ACEGJP orderedbranch/DD-DE escort, corrected24-edgeguide andnamedownedcarrierrecommendations",
-    "evidence": "docs/pr152-three-four-acegjp-ja.md",
-    "nodePrerequisitesPass": 259,
+    "id": "4-1/0/default",
+    "baselineHead": "b5f706f75e50032bad8d1b8637f9e812ad88370f",
+    "condition": "CFDGJ/ABDGJ source-ordered C/D/F common conditions and random-start path differences",
+    "evidence": "docs/pr152-four-one-routes-ja.md",
+    "nodePrerequisitesPass": 269,
+    "sourceOracleMultisets": 12376,
     "local": {
       "states": [
         "ready",
         "stock",
         "unknown"
       ],
-      "casesPerEngine": 3,
-      "chromiumInitialPass": 3,
-      "webkitInitialPass": 3,
       "retries": 0,
-      "observer": "test-only2entries64/doc; drop0/failures0; nohiddenstopthistrial; timingoverhead/uncapturedpaths documented"
+      "firstBatchCases": 6,
+      "firstBatchPass": 2,
+      "firstBatchNewFixtureAssumptionFailures": 4,
+      "correctedBatchCases": 4,
+      "correctedBatchPass": 4,
+      "unknownSuccessReused": 2,
+      "productChangedForCorrection": false,
+      "limits": "First ready/stock failed at unsupported new AA assertions; preserved originals; corrected only those assumptions, not deadlines or productconditions"
     },
     "beforeCells": {
-      "confirmed": 4,
-      "partial": 114,
-      "unconfirmed": 118
-    },
-    "afterCells": {
       "confirmed": 5,
       "partial": 116,
       "unconfirmed": 115
+    },
+    "afterCells": {
+      "confirmed": 6,
+      "partial": 118,
+      "unconfirmed": 112
     },
     "changedCells": [
       "B 未確認→一部",
       "C 未確認→一部",
       "D 未確認→確認済み"
     ],
-    "statusCellChanges": 3
+    "statusCellChanges": 3,
+    "normalSmokeSelection": {
+      "totalPerBrowser": 822,
+      "targetCasesPerBrowser": 3,
+      "selectedFile": "tests/route-four-one-routes.spec.js",
+      "browserLaunches": 0,
+      "verifiedBeforeCI": true
+    }
   },
-  "nextPriority": "4-1/index0 CFDGJ / ABDGJの関連分岐・護衛艦数と潜水系除外の接続。今回未調査・未実装・未実行。",
+  "nextPriority": "4-2 ACL / BDCLの既存2例。共通分岐と軽巡/護衛条件、必要装備・具体的な搭載先の接続。今回追加調査・実装・実行なし。",
   "previousSelected": {
     "id": "5-4/0/default",
     "condition": "M-to-P conditional scouting exemption only for no SS/SSV and confirmed fleet speed >=15; unknown is not exemption",
@@ -2619,6 +2649,41 @@
         "fixtureCorrections": "absent goal assumptions, then canonical equipment name; product unchanged; prior successes reused",
         "statusCellChanges": 0
       }
+    },
+    {
+      "id": "3-4/0/default",
+      "baselineHead": "e313f97fc6fe080893e5be628eac146bea894cc3",
+      "condition": "ACEGJP orderedbranch/DD-DE escort, corrected24-edgeguide andnamedownedcarrierrecommendations",
+      "evidence": "docs/pr152-three-four-acegjp-ja.md",
+      "nodePrerequisitesPass": 259,
+      "local": {
+        "states": [
+          "ready",
+          "stock",
+          "unknown"
+        ],
+        "casesPerEngine": 3,
+        "chromiumInitialPass": 3,
+        "webkitInitialPass": 3,
+        "retries": 0,
+        "observer": "test-only2entries64/doc; drop0/failures0; nohiddenstopthistrial; timingoverhead/uncapturedpaths documented"
+      },
+      "beforeCells": {
+        "confirmed": 4,
+        "partial": 114,
+        "unconfirmed": 118
+      },
+      "afterCells": {
+        "confirmed": 5,
+        "partial": 116,
+        "unconfirmed": 115
+      },
+      "changedCells": [
+        "B 未確認→一部",
+        "C 未確認→一部",
+        "D 未確認→確認済み"
+      ],
+      "statusCellChanges": 3
     }
   ],
   "fiveFourCloseout": {

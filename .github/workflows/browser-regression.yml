@@ -21,6 +21,11 @@ concurrency:
 permissions:
   contents: read
 
+# Match the fixed local route-validation runtime; a floating major can resolve
+# to different patches on different runners in the same workflow run.
+env:
+  HD_CI_NODE_VERSION: '24.21.0'
+
 jobs:
   smoke:
     name: Smoke / ${{ matrix.browser }} / shard ${{ matrix.shard }} of ${{ matrix.shards }}
@@ -74,7 +79,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v7.0.0
         with:
-          node-version: 24
+          node-version: ${{ env.HD_CI_NODE_VERSION }}
 
       - name: Install test dependencies
         run: npm install --no-audit --no-fund --no-package-lock
@@ -136,6 +141,7 @@ jobs:
         with:
           name: prerequisite-import-${{ matrix.browser }}-${{ matrix.shard }}-${{ github.run_id }}
           path: |
+            ${{ runner.temp }}/harbordesk-ci-browser-environment/
             test-results/strategy-import-diagnostics/
             test-results/guided-ship-acquisition-*share-one-completion-state-*/
             test-results/guided-ship-acquisition-*issions-item-and-completion-*/
@@ -164,7 +170,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v7.0.0
         with:
-          node-version: 24
+          node-version: ${{ env.HD_CI_NODE_VERSION }}
 
       - name: Install test dependencies
         run: npm install --no-audit --no-fund --no-package-lock
@@ -183,5 +189,14 @@ jobs:
           path: |
             playwright-report/
             test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Preserve runtime environment receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: environment-full-${{ matrix.browser }}-${{ matrix.shard }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/harbordesk-ci-browser-environment/
           if-no-files-found: ignore
           retention-days: 14

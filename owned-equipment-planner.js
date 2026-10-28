@@ -467,7 +467,7 @@ function* hdOCSearchSteps(c,limits={}){
  const shortages=hdOCShortageGoals(best.measure).map(goal=>{
   if(goal.kind==='low-speed-ships')return {...goal,goalKind:goal.kind,owned:0,placement:true,shortfall:Math.max(0,goal.minCount-goal.count),candidates:[],detail:goal.detail+'。低速艦を編成するか、高速化装備を外して速力を再確認。'};
   if(goal.kind==='opening-asw')return {...goal,goalKind:goal.kind,kind:'対潜',owned:0,placement:false,shortfall:goal.minCount-goal.count,candidates:inventory.filter(x=>hdOCItemMatches('opening-asw',x)).map(x=>x.name),asw:true};
-  if(typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[goal.kind]){const profile=hdSEProfiles(c.map).find(x=>x.kind===goal.kind),stock=hdSECapabilityStock(best.plan,goal.kind,goal.minCount);return {...goal,kind:profile?.baseKind||goal.baseKind||goal.label||goal.kind,goalKind:goal.kind,capability:true,stock,...(['3-3','3-4'].includes(c.map)&&goal.kind==='cap-carrier-attack'?{carrierTargets:hdOCThreeThreeCarrierTargets(best.plan,goal)}:{}),owned:stock?.parts?.length?Math.min(...stock.parts.map(p=>Math.floor(p.have/(p.need/goal.minCount)))):0,placement:true,shortfall:Math.max(1,goal.minCount-goal.count),candidates:stock?.parts.filter(x=>x.have<x.need).flatMap(x=>HD_SE_PARTS[x.part].examples)||[]}}
+  if(typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[goal.kind]){const profile=hdSEProfiles(c.map).find(x=>x.kind===goal.kind),stock=hdSECapabilityStock(best.plan,goal.kind,goal.minCount);return {...goal,kind:profile?.baseKind||goal.baseKind||goal.label||goal.kind,goalKind:goal.kind,capability:true,stock,...(['3-3','3-4','4-1'].includes(c.map)&&goal.kind==='cap-carrier-attack'?{carrierTargets:hdOCThreeThreeCarrierTargets(best.plan,goal)}:{}),...(c.map==='4-1'&&goal.kind==='cap-asw'?{aswTargets:hdOCFourOneAswTargets(best.plan,goal,stock)}:{}),owned:stock?.parts?.length?Math.min(...stock.parts.map(p=>Math.floor(p.have/(p.need/goal.minCount)))):0,placement:true,shortfall:Math.max(1,goal.minCount-goal.count),candidates:stock?.parts.filter(x=>x.have<x.need).flatMap(x=>HD_SE_PARTS[x.part].examples)||[]}}
   const kind=goal.kind==='air-value'?'制空':goal.kind==='los-value'?'索敵':goal.kind==='radar-ships'?'電探':goal.kind==='drum-ships'?'ドラム缶':goal.kind==='speed-ship'?'高速化':goal.kind;
   const compatible=hdFLCatalog().filter(x=>hdOCItemMatches(kind,x)&&slots.some(slot=>hdOCCompatible(slot,{item:x,star:0}))).sort((a,b)=>hdOCScore(kind,b)-hdOCScore(kind,a));
   const candidates=(kind==='高速化'?['turbine','boiler'].flatMap(part=>compatible.filter(x=>hdOCSpeedPart(x)===part).slice(0,1)):compatible.slice(0,3)).map(x=>x.name);
@@ -495,11 +495,11 @@ async function hdOCSearchAsync(c){
   await new Promise(resolve=>setTimeout(resolve,0));
  }
 }
-// Named placement candidates for the selected 3-3 ACGM and 3-4 ACEGJP optional
+// Named placement candidates for the selected 3-3 ACGM, 3-4 ACEGJP and 4-1 optional
 // carrier attack target. These are catalog-compatible exchange slots, never a
 // joint allocation or purchase requirement. Other routes keep their presentation.
 function hdOCThreeThreeCarrierTargets(plan,goal){
- if(!['3-3','3-4'].includes(plan?.map)||goal?.kind!=='cap-carrier-attack'||!goal.generatedFromMap||goal.purpose!=='recommendation'||hdFERouteRequirementData(plan)?.path!==(plan.map==='3-3'?'ACGM':'ACEGJP'))return null;
+ if(!['3-3','3-4','4-1'].includes(plan?.map)||goal?.kind!=='cap-carrier-attack'||!goal.generatedFromMap||goal.purpose!=='recommendation'||hdFERouteRequirementData(plan)?.path!==({'3-3':'ACGM','3-4':'ACEGJP','4-1':'CFDGJ / ABDGJ'}[plan.map]))return null;
  const kind=goal.kind;
  const catalog=hdFLCatalog().filter(item=>hdSEPartMatches('carrierAttackPlane',item));
  return (plan.ships||[]).flatMap((ship,shipIndex)=>{
@@ -511,6 +511,25 @@ function hdOCThreeThreeCarrierTargets(plan,goal){
    if(candidates.length)slots.push({index,candidates});
   }
   return [{ship:ship.ship,shipIndex,count:1,status:slots.length?'candidate':unknownSlots?'manual':'blocked',slots,unknownSlots}];
+ });
+}
+// Display one documented ASW recipe on actual hulls and distinct normal slots.
+// This is a catalog inspection, not inventory allocation or an opening-ASW claim.
+function hdOCFourOneAswTargets(plan,goal,stock){
+ if(plan?.map!=='4-1'||goal?.kind!=='cap-asw'||!goal.generatedFromMap||goal.purpose!=='recommendation'||hdFERouteRequirementData(plan)?.path!=='CFDGJ / ABDGJ'||stock?.recipe?.id!=='sonar-projector')return null;
+ const catalog=hdFLCatalog(),parts=['sonar','projector'];
+ return (plan.ships||[]).flatMap((ship,shipIndex)=>{
+  const db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db);
+  if(!db||!profile||!Number.isInteger(profile.count)||profile.count<0)return [{ship:ship.ship,shipIndex,status:'manual',parts:[]}];
+  const rows=parts.map(part=>({part,count:1,label:HD_SE_PARTS[part].label,slots:Array.from({length:profile.count},(_,index)=>{
+   const slot={si:shipIndex,index,db,profile,capacity:profile.slots?.[index]},candidates=catalog.filter(item=>hdSEPartMatches(part,item)&&hdOCCompatible(slot,{item,star:0})).slice(0,3).map(item=>item.name);
+   return {index,candidates};
+  }).filter(slot=>slot.candidates.length)}));
+  // Two parts must fit different slots on the same ship. Normal zero aircraft
+  // capacity is valid for a sonar/projector; aircraft-only rules are not reused.
+  const candidate=rows[0].slots.some(a=>rows[1].slots.some(b=>a.index!==b.index));
+  const original=rows.map(row=>row.slots);for(let i=0;i<rows.length;i++)rows[i].slots=original[i].filter(a=>original[1-i].some(b=>a.index!==b.index));
+  return candidate?[{ship:ship.ship,shipIndex,status:'candidate',parts:rows}]:[];
  });
 }
 function hdOCPlacementInfo(kind,inventory,slots,catalog){
@@ -553,7 +572,8 @@ function hdOCCapabilityStockHtml(goal){
  const stock=goal.capability&&goal.stock;if(!stock?.parts?.length)return '';
  const esc=hdFEEsc;
  const targets=goal.carrierTargets?.length?`<div data-hd-oc-carrier-targets><b>未配備の空母ごとの搭載先候補</b>${goal.carrierTargets.map(t=>`<p>${esc(t.ship)}：艦上攻撃機・艦上爆撃機${t.count}個。${t.status==='candidate'?t.slots.map(slot=>`第${slot.index+1}枠：${slot.candidates.map(esc).join('・')}`).join(' / '):t.status==='manual'?'スロット情報が未判定のため、搭載先を確認できません。':'登録した機体を搭載できる通常枠がありません。艦・搭載枠を見直してください。'}${t.unknownSlots&&t.status==='candidate'?'（未確認の枠は候補から除外）':''}</p>`).join('')}<small>戦闘上の推奨で、経路の必須条件ではありません。候補は未所持品を含むカタログ例です。表示枠は他の目標と共用し、現在の装備との交換を含みます。同時配備の成立や購入数量を保証しません。</small></div>`:'';
- return `<div data-hd-oc-capability-stock><b>装備例「${esc(stock.recipe.name)}」の所持内訳</b>${stock.parts.map(part=>{const gap=Math.max(0,part.need-part.have);return `<p><b>${esc(part.label)}：所持${part.have} / この装備例に必要${part.need}${gap?'・あと'+gap+'個':''}</b><br>${esc(part.items.length?'手持ち：'+part.items.join('、'):'候補：'+(HD_SE_PARTS[part.part]?.examples||[]).join('、'))}</p>`}).join('')}<small>${stock.parts.every(p=>p.have>=p.need)?'この装備例の所持数は足りています。同じ艦のセット・装備枠・他の条件との両立を見直してください。':'この装備例の数量不足です。別の装備例や代替装備も含め、配備できるか再探索してください。'}所持数の内訳は、全目標を同時に満たす配備の保証ではありません。</small>${targets}</div>`;
+ const asw=Array.isArray(goal.aswTargets)?`<div data-hd-oc-asw-targets><b>対潜装備例の同じ艦への搭載先候補</b>${goal.aswTargets.length?goal.aswTargets.map(t=>`<p>${esc(t.ship)}：${t.status==='manual'?'艦・通常スロット情報が未判定のため、搭載先を確認できません。':t.parts.map(part=>`${esc(part.label)}${part.count}個（${part.slots.map(slot=>`通常第${slot.index+1}枠：${slot.candidates.map(esc).join('・')}`).join(' / ')}）`).join('＋')+'。同じ艦の別々の通常枠へ配備します。'}</p>`).join(''):'<p>この装備例の2種類を同じ艦の別々の通常枠へ載せられる候補を確認できません。艦・装備制限・増設枠を見直してください。手持ちでは不可能という判定ではありません。</p>'}<small>戦闘上の推奨セットの候補で、経路の必須条件や先制対潜の成立人数ではありません。表示は通常枠の装備例で、増設枠は含めません。候補は未所持品を含み、他の目標と枠を共用し、現在の装備との交換を含みます。全目標の同時配備や購入数量を保証しません。</small></div>`:'';
+ return `<div data-hd-oc-capability-stock><b>装備例「${esc(stock.recipe.name)}」の所持内訳</b>${stock.parts.map(part=>{const gap=Math.max(0,part.need-part.have);return `<p><b>${esc(part.label)}：所持${part.have} / この装備例に必要${part.need}${gap?'・あと'+gap+'個':''}</b><br>${esc(part.items.length?'手持ち：'+part.items.join('、'):'候補：'+(HD_SE_PARTS[part.part]?.examples||[]).join('、'))}</p>`}).join('')}<small>${stock.parts.every(p=>p.have>=p.need)?'この装備例の所持数は足りています。同じ艦のセット・装備枠・他の条件との両立を見直してください。':'この装備例の数量不足です。別の装備例や代替装備も含め、配備できるか再探索してください。'}所持数の内訳は、全目標を同時に満たす配備の保証ではありません。</small>${targets}${asw}</div>`;
 }
 function hdOCProcurementHtml(goal,index,attrs,c=null){
  const gap=hdOCStockGap(goal);if(!gap||!goal.candidates.length||typeof hdPLSave!=='function')return '';
