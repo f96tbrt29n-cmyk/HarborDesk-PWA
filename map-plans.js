@@ -259,7 +259,45 @@ const HD_MAP_ROUTE_REQUIREMENTS={};
   {any:[{all:[count(['bb','cvl'],0,2),{any:[{all:[{any:[count(['cl'],1),{all:[count(['ct'],1),{kind:'unverified',reason:'5-1のFで練巡を軽巡の代替にできる直接根拠は未確認。代替可否でJ固定が変わる場合は未判定にし、駆逐4などの独立条件は保持する'}]}]},count(['dd'],2)]},count(['dd'],4)]}]},{all:[speed(20),{kind:'unverified',reason:'Fの最速統一によるJ優先は出典で優先度要確認。通常条件ではF→G/Hやランダムになる編成を、この最速候補だけでBCFJ成立にしない。高速＋は最速とは別'}]}],reason:'F→J：戦艦級＋軽空母2以下で、軽巡洋艦1以上＋駆逐2以上、または駆逐4以上。通常速力の軽巡なし駆逐2/3はG/Jランダムで、重巡級2を軽巡の代用にしない。別経路BCFGJの可能性と区別し、編成見直しへ案内する'},
   {any:[count(['lha'],0,0),{kind:'unverified',reason:'揚陸艦の当該B分岐への空母相当の算入範囲は未確認。名称や甲板だけで正規・軽空母または非空母へ断定せず、影響する編成は未判定にする。別の既知不一致は保持する'}]}
  ],{checkedAt:'2026-10-28',useExampleScope:false,sources:['https://zekamashi.net/kancolle-kouryaku/5-1/','https://wikiwiki.jp/kancolle/南方海域/5-1','https://zh.kcwiki.cn/wiki/南方海域/5-1'],notes:['BCFJは開始B→Cの鋼材→F→Jボス。開始A/Bのランダムを含む編成を固定扱いにしない。重巡・航巡2以上＋軽巡ちょうど1などの開始条件も、後のB/F条件とは別に確認する。','通常の固定域は正規/装甲空母0・軽空母1以下・戦艦級＋軽空母2以下で、軽巡1以上＋駆逐2以上または駆逐4以上。軽巡の分類は軽巡洋艦で雷巡は別。練巡は分類上別で、当該分岐での代替可否が結果を変える範囲だけ未判定にする。駆逐は駆逐艦だけで、海防艦・潜水母艦は駆逐数に数えない。','軽巡なしでも駆逐4以上なら同じBCFJを固定できる。潜水艦・潜水空母と駆逐4の混成を潜水艦だけの編成と混同せず、一律除外しない。元の戦艦・軽空母・重巡・軽巡各1＋駆逐2は編成例。','Fの最速20によるJ優先は適用順の根拠待ち。通常固定域は最速かどうかによらずJなので、不要な速力条件を追加しない。通常条件で固定できず最速だけで変わり得る場合に未判定を残し、既知の非最速艦がいればその候補を除く。','索敵値・装備艦数・一律の速力下限を通行必須条件にしない。各空母の攻撃機、制空・防空・夜戦CIは戦闘上の推奨または利用者目標で、経路成立も勝利保証ではない。','艦種や隻数の不一致は編成見直しへ案内し、装備購入で解決する不足にはしない。在庫不足・搭載不可・枠競合・情報不足・探索打切りを区別し、探索未発見を手持ちでは不可能・購入必須・最適とは断定しない。']});
- add('5-2',0,'BCEFO',[fleet(6),count(['cv'],0,2),count(['bb'],0,2)],{los:los(2,70)});
+ // E/D rows are checked in source order. Agreement across the two documented
+ // CA readings and the unresolved LHA carrier readings is required; disagreement
+ // is source-wait, never a guessed destination or an equipment shortage.
+ const fiveTwoAgree=(conditions,reason)=>({any:[{all:conditions},{all:[{any:conditions},{kind:'unverified',reason}]}]});
+ const fiveTwoC=({carrier='none'}={})=>{
+  const cv=['cv',...(carrier==='none'?[]:['lha'])],cvn=['cvn',...(carrier==='cvn'?['lha']:[])],cvl=['cvl',...(carrier==='cvl'?['lha']:[])],identity=name=>({...named(name),matchPolicy:'masterName'}),pair={all:[identity('翔鶴'),identity('瑞鶴')]},both=(...conditions)=>({all:conditions});
+  const caReading=conditions=>fiveTwoAgree(conditions,'Cの一部に登録記事の「重巡」と参照先の「重巡級」の表記差があり、航巡の算入でD/Eが変わるため未確認。独立した先行条件で決まる結果は保持する');
+  const pairCruisers=caReading(['重巡洋艦','cav'].map(ca=>count([ca],2)));
+  const fastCruisers=caReading(['重巡洋艦','cav'].map(ca=>({any:[count([ca],1,1),both(count([ca],0,0),count(cvl,2,2))]})));
+  const rows=[
+   [both(pair,count(['dd'],0,1)),'E'],
+   [both(pair,pairCruisers),'D'],
+   [both(pair,speed(10)),'D'],
+   [pair,'E'],
+   [count(['bb','重雷装巡洋艦'],1),'E'],
+   [both(count(['dd'],2),count(cv,0,0)),'E'],
+   [both(count(['dd'],2),count(['cav'],2)),'D'],
+   [both(count(['dd'],2),count(cvn,1)),'E'],
+   [both(count(['dd'],2),count(cvl,3)),'E'],
+   [both(count(['dd'],2),speed(10),fastCruisers),'D'],
+   [both(count(['dd'],0,1),count(cvn,1)),'E'],
+   [both(count(['dd'],0,1),count(cvl,4)),'E'],
+   [both(identity('夕張'),count([...cvl,'cav','dd','ao'],5,5)),'D'],
+   [both(identity('祥鳳'),count(['cav','cl','ct','dd','ao'],5,5)),'D']
+  ];
+  return rows.reduceRight((next,[condition,to])=>to==='E'?{any:[condition,next]}:{all:[{not:condition},next]},{kind:'always'});
+ };
+ const fiveTwoCarrierReadings=['none','cvn','cvl'];
+ const fiveTwoCE=fiveTwoAgree(fiveTwoCarrierReadings.map(carrier=>fiveTwoC({carrier})),'揚陸艦の5-2での空母相当算入は未確認。非空母・正規空母相当・軽空母相当で結果が変わる場合だけ未判定とし、装備購入で解決する不足にはしない');
+ add('5-2',0,'BCEFO',[fleet(6),
+  {...count(['ss'],0,0),reason:'S→B：潜水艦・潜水空母が1隻以上なら先にAへ進む確率があるためB固定にはならない。潜水母艦とは区別し、装備購入ではなく編成を見直す'},
+  {...fiveTwoAgree(fiveTwoCarrierReadings.map(carrier=>count(['bb','cv',...(carrier==='none'?[]:['lha'])],0,4)),'Sの戦艦級＋空母系への揚陸艦算入がB固定を変えるため未確認'),reason:'S→B：戦艦級＋空母系5隻以上、正規・装甲空母3隻以上、戦艦級4隻以上のA確率がある範囲を除く。それぞれ順次判定され、確率を単純加算しない'},
+  {...fiveTwoAgree(fiveTwoCarrierReadings.map(carrier=>count(['cvn',...(carrier==='cvn'?['lha']:[])],0,2)),'Sの正規空母相当への揚陸艦算入がB固定を変えるため未確認'),reason:'S→B：正規空母・装甲空母は2隻以下。3隻以上ではAへ進む確率がある'},
+  {...count(['bb'],0,3),reason:'S→B：戦艦級は3隻以下。4隻以上のA確率は出典で未確定だがB固定とは扱わない'},
+  {...fiveTwoCE,reason:'C→E：翔鶴と瑞鶴の両方がいる特例を先に適用し、その後に戦艦級・雷巡、駆逐数と空母・重巡級・速力、夕張/祥鳳の過不足5隻条件を順に確認する。Dへ進む編成は別経路BCDFOとして見直す。全艦高速をBCEFOへ一律必須にしない'},
+  {...count(['bb'],0,2),reason:'F→O：索敵判定後、戦艦級2隻以下かつ空母系2隻以下でO。条件を外れたI/Oランダム等はO固定へ格上げせず、装備購入ではなく編成を見直す'},
+  {...fiveTwoAgree(fiveTwoCarrierReadings.map(carrier=>count(['cv',...(carrier==='none'?[]:['lha'])],0,2)),'Fの空母系への揚陸艦算入がO固定を変えるため未確認'),reason:'F→O：空母系は正規・装甲・軽空母（護衛空母を含む）の合計2隻以下。揚陸艦の算入範囲は結果を変える場合だけ未判定にする'}
+ ],{checkedAt:'2026-10-28',useExampleScope:false,los:los(2,70,63),sources:['https://zekamashi.net/kancolle-kouryaku/5-2/','https://zh.kcwiki.cn/wiki/南方海域/5-2'],notes:['登録はB→C空襲→E通常戦→F通常戦→OボスのBCEFO。E→Fは固定接続で、翔鶴・瑞鶴を使う高速BCDFOは別経路。元の戦艦2・空母系2・航巡1・重巡1は編成例で、根拠のある重巡2などの代替も扱う。','開始の潜水系・重量艦・正規空母過多のA確率は、B固定の不成立として扱う。潜水艦は潜水空母を含み、潜水母艦は含めない。戦艦級は戦艦・高速戦艦・航空戦艦、空母系は正規・装甲・軽空母。駆逐に海防艦を足さず、雷巡と普通の軽巡・練巡を区別する。','Cでは翔鶴と瑞鶴が両方いる場合、駆逐1以下で先にE、次に重巡2以上・高速以上でD、低速艦ありでE。名指し艦は実艦DBの同一艦・改装系譜で照合し、無関係な艦名の部分一致で成立にしない。','それ以外のCは戦艦級＋雷巡1以上で先にE。駆逐2以上では空母0のE、重巡級2以上のD、正規・装甲空母1以上のE、軽空母3以上のE、高速かつ重巡1または重巡0＋軽空母2のDが先行する。駆逐1以下では正規・装甲空母1以上、軽空母4以上で先にE。その後、夕張あり＋軽空母/重巡級/駆逐/補給の合計過不足5、祥鳳あり＋重巡級/軽巡/練巡/駆逐/補給の合計過不足5でD、それ以外はE。','Cの特例と高速下位行には重巡/重巡級の出典表記差がある。航巡を数えるかによってD/Eが変わる範囲は出典待ちとし、別の既知条件で確定した結果を消さない。揚陸艦の空母算入も結果に影響するときだけ未確認にする。','F索敵は33式係数2、登録分岐表の70以上を維持。登録は63未満でH、63以上70未満はHへランダム。参照先の63境界重複や本文71/別係数76を混ぜて閾値を変更せず、未取得を0や充足へ置換しない。','制空・各空母の攻撃機・対空CI・夜戦装備は戦闘推奨または利用者目標で、固定電探個数や購入必須の条件ではない。D経由の対潜推奨をE経由へ必須として加えない。編成不一致、在庫不足、搭載不可、枠競合、情報不足、探索未完了を区別し、成立や探索未完了を勝利・最適・手持ちでは不可能の保証へ変えない。']});
+ MAP_PLANS['5-2'].presets[0].gear+=' BCEFOの索敵はFで33式係数2・70以上を確認。通常経路へ一律高速や固定の電探個数を求めず、制空・各空母の攻撃機は戦闘上の推奨として分ける。';
  add('5-3',0,'DGIOKEQ',[fleet(6),count(['cv','bbv'],0,0),count(['cl'],0,1),count(['dd'],2),count(['bb'],0,2),{kind:'slowBattleshipCount',min:0,max:1},{any:[count(['bb'],0,1),speed(10)]},
   {...count(['ss'],0,0),reason:'始点D・G→I・E→Q：潜水艦を含めない'},
   {any:[count(['dd'],3),{all:[count(['cl'],1),count(['dd'],2,2)]},{all:[count(['bb'],0,1),count(['dd'],2,2)]}],reason:'I→O：O固定条件。未達の残りはJ/Oランダムで、到達不可能という意味ではありません'},
