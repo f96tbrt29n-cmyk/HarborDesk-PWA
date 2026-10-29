@@ -9417,27 +9417,293 @@
       "verification": "partial",
       "conditions": [
         {
-          "kind": "fleetCount",
-          "min": 5,
-          "max": 5
-        },
-        {
-          "kind": "typeCount",
-          "types": [
-            "軽巡洋艦"
+          "any": [
+            {
+              "all": [
+                {
+                  "kind": "fleetCount",
+                  "min": 5,
+                  "max": 5
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "潜水艦",
+                    "潜水空母"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 0,
+                  "max": 0,
+                  "reason": "始点は潜水艦＋潜水空母のランダムが先。含む場合にDEGHK固定とはせず、B/Dへ進み得ることと到達不可能を区別する。潜水母艦は含めない。"
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "戦艦",
+                    "高速戦艦",
+                    "航空戦艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 0,
+                  "max": 0,
+                  "reason": "潜水系なしの5隻で戦艦級があると始点B。選択した始点Dの固定とは違うため編成を見直す。速度装備で元艦種を変えない。"
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "正規空母",
+                    "装甲空母"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 0,
+                  "max": 0,
+                  "reason": "正規・装甲空母入り5隻は始点Bで、選択DEGHK固定とは別。軽空母の略称差は別の未確認域で扱う。"
+                },
+                {
+                  "any": [
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "軽空母",
+                        "揚陸艦"
+                      ],
+                      "matchPolicy": "exact",
+                      "min": 0,
+                      "max": 0
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "軽空母",
+                            "揚陸艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 1,
+                          "max": 7
+                        },
+                        {
+                          "kind": "unverified",
+                          "reason": "軽空母のSTART略称差、揚陸艦の空母相当算入は7-1固有の根拠が不足。影響する域だけ未判定にし、既知不一致は保持する。"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "any": [
+                    {
+                      "all": [
+                        {
+                          "any": [
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 4,
+                                  "max": 7
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 7
+                                }
+                              ]
+                            }
+                          ],
+                          "reason": "5隻のD→E/H→K：軽巡1＋駆逐4、または駆逐1以上＋海防3以上。後者は駆逐＋海防5の最優先、または同4内の海防3で水母ランダムより先にEへ進む。軽巡へ雷巡/練巡、駆逐へ海防を無条件合算しない。"
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "補給艦",
+                            "潜水母艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 0
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "補給艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 1,
+                          "max": 7
+                        },
+                        {
+                          "any": [
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 4,
+                                  "max": 4
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "補給艦",
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 5,
+                                  "max": 5
+                                }
+                              ]
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 3,
+                              "max": 3
+                            }
+                          ]
+                        },
+                        {
+                          "kind": "unverified",
+                          "reason": "補給艦があるこの5隻群はD→E条件を満たすが、Hへの追加影響が出典で未確認。固定Kと断定せず編成/出典を確認する。"
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "潜水母艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 1,
+                          "max": 1
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "潜水母艦",
+                            "駆逐艦",
+                            "海防艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 5,
+                          "max": 5
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "駆逐艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 1,
+                          "max": 1
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "海防艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 3,
+                          "max": 3
+                        },
+                        {
+                          "kind": "unverified",
+                          "reason": "潜水母艦1＋駆逐1＋海防3はD→Eだが、Hの潜水母艦追加影響が出典で未確認。潜水空母と同一扱いせず、固定Kを断定しない。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "kind": "fleetCount",
+                  "min": 4,
+                  "max": 4
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "補給艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "海防艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 3,
+                  "max": 3
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "補給艦",
+                    "海防艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 4,
+                  "max": 4
+                },
+                {
+                  "kind": "unverified",
+                  "reason": "補給艦1＋海防3の4隻はSTART/DからEへ進む候補だがHの追加影響が未確認。4隻を一般に不可ともDEGHK成立とも断定しない。"
+                }
+              ]
+            }
           ],
-          "matchPolicy": "exact",
-          "min": 1,
-          "max": 1
-        },
-        {
-          "kind": "typeCount",
-          "types": [
-            "駆逐艦"
-          ],
-          "matchPolicy": "exact",
-          "min": 4,
-          "max": 4
+          "reason": "確認したDEGHKの固定5隻群と、H根拠待ちの補給艦4隻例を分ける。駆逐1＋海防3の4隻は別FGHK。6隻の始点Bまたは潜水入りランダムを通行最低隻数の話へ変換しない。"
         }
       ],
       "scouting": {
@@ -9449,7 +9715,15 @@
         "夜戦"
       ],
       "notes": [
-        "先制対潜4〜5隻は攻略用の推奨。通常戦Gへの火力とルート条件は別評価。"
+        "登録は始点D→E燃料→G通常戦→H潜水戦→Kボス。5隻の軽巡1＋駆逐4、軽巡1＋駆逐1＋海防3、駆逐2＋海防3が出典の明示例で、元の軽巡1＋駆逐4だけへ拘束しない。",
+        "始点は潜水艦・潜水空母入りのランダムが先。潜水系なしの5隻では戦艦級・正規/装甲空母入りはB。軽空母の略称差と揚陸艦の空母算入は影響域を未判定に残す。潜水母艦を潜水艦・潜水空母、水母を補給艦へ数えない。",
+        "Dは駆逐＋海防5のEが最優先。合計4では軽巡1＋駆逐4、練巡、補給艦、海防3のEが、水母なしC/水母入りC・Eランダムより先。合計3以下では補給艦＋海防3以外C。Hは軽巡1＋駆逐4以上、または駆逐1以上＋海防3以上でKを先に確認する。",
+        "駆逐1＋海防4、練巡/雷巡/水母1＋駆逐1＋海防3は優先表からの導出で、取得した実出撃記録の証明ではない。軽巡は通常の軽巡洋艦で雷巡・練巡とは別、駆逐と海防も指定された合計以外では別に数える。",
+        "補給艦・潜水母艦入りはHの追加影響が出典で未確認。DからEを通れる候補だけを未判定にし、DからCなど別の既知不一致を消さない。駆逐1＋海防3の4隻は別FGHKで、記事内の一部4隻例のDEGHK表記不一致を推測で解消しない。",
+        "選択DEGHKに数値索敵・速力統一・装備個数の通行必須は掲載されていない。索敵非適用を0や充足へ置換せず、選択外Cの敵航空戦力を海域全体の制空条件へ一般化しない。5隻は固定群の確認範囲で実ゲームの出撃最低数という意味ではない。",
+        "対潜シナジー4組は既存の戦闘比較目標。先制対潜4〜5隻は一攻略案で、煙幕を使う初攻略例の2隻など別案もある。装備組数と発動人数を別にし、利用者指定2/0・保存済み目標を上書きしない。経路固定や唯一の十分数量、4組購入必須ではない。",
+        "G火力・夜戦・煙幕・ダメコン等は戦闘上の推奨または利用者指定。経路条件成立は到達・撃破・勝利の保証ではなく、危険な進撃を推奨しない。",
+        "艦種/隻数不一致は編成見直しへ案内する。在庫不足・搭載不可・枠競合・情報不足・探索未完了を区別し、未発見を手持ちでは不可能・購入必須・最適と断定しない。"
       ],
       "requiredConnectionClass": "D",
       "guidanceAudit": {
@@ -9473,7 +9747,7 @@
         },
         "先制対潜": {
           "class": "A",
-          "detail": "既存の攻略案4〜5隻の下限4を維持。成立/不足/未判定の混在内訳・99/100境界・入力取消・利用者変更・保存/loadを実操作確認。",
+          "detail": "既存の攻略案4〜5隻の下限4と、利用者/保存済み2/0の優先を維持。旧実操作成功は入力/ソース同一の範囲だけ再利用し、海防代替の新操作成功とは分ける。",
           "evidence": [
             "hdOCOaswTarget/hdOCOaswMeasure",
             "docs/owned-loadout-verification-ja.md",
@@ -9481,7 +9755,7 @@
             "tests/scouting-evidence.test.cjs",
             "tests/owned-oasw-integration.spec.js"
           ],
-          "limit": "煙幕を使う初攻略例の先制対潜2隻など別案もある。4を経路必須や唯一の十分人数としない。"
+          "limit": "煙幕を使う初攻略例の2隻など別案がある。4は経路必須や唯一の十分人数ではなく、発動人数と装備組数は別。"
         },
         "制空": {
           "class": "D",
@@ -9491,11 +9765,14 @@
         },
         "推奨セット": {
           "class": "B",
-          "detail": "cap-asw4組（海域の明示推奨）",
+          "detail": "cap-asw4組は既存の戦闘比較目標。実buildのソナー/投射機必要各4と、各艦ソナー1＋投射機1の別合法通常枠の候補を接続し、枠不明は未判定。1組候補・有限在庫の同時配備・先制対潜人数は別にする。",
           "evidence": [
-            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
+            "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足",
+            "hdOCFourOneAswTargets / hdOCCapabilityStockHtml",
+            "tests/seven-one-placement.test.cjs",
+            "tests/route-seven-one-deghk.spec.js（通常操作は未実施）"
           ],
-          "limit": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+          "limit": "通常C/Wの自動配備・保存/編集/load操作は未実施。4組購入必須・全候補同時配備・発動/撃破/勝利を保証しない。"
         }
       },
       "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"

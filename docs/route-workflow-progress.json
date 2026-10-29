@@ -2272,39 +2272,43 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "reason": "独立71リテラルとactual27でDE代替/優先順を限定確認。CDモデル・AO/AS/CVL/LHA・全戦闘数量などが残るため一部。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/route-goal-guidance-audit.json",
+            "docs/pr152-seven-one-deghk-ja.md"
           ]
         },
         "B": {
           "status": "一部",
-          "reason": "同じ行の特定条件の実配備/所持代替を確認。全目標・全在庫の網羅ではない。",
+          "reason": "同じ行の有限10個からの配備をC/W代表で確認。全在庫/全代替・全枠競合の網羅ではなく一部。",
           "evidence": [
             "docs/asw-route-targets-ja.md",
-            "tests/owned-oasw-integration.spec.js"
+            "tests/owned-oasw-integration.spec.js",
+            "docs/pr152-seven-one-deghk-ja.md"
           ]
         },
         "C": {
           "status": "一部",
-          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "reason": "同じ行の対潜4組比較目標/各艦1組の具体合法枠と不足/未知を確認。全数量/全区分の証拠ではなく一部。",
           "evidence": [
             "docs/asw-route-targets-ja.md",
-            "tests/owned-oasw-integration.spec.js"
+            "tests/owned-oasw-integration.spec.js",
+            "docs/pr152-seven-one-deghk-ja.md"
           ]
         },
         "D": {
           "status": "一部",
-          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "reason": "訂正後C3/W不足未知の5例は保存編集または安全中止/同一文書load全文/元5艦strict保持。W成立は保存strict正常後load後click非表示で最終比較未到達のため一部。旧初回/診断もload未到達のまま。",
           "evidence": [
             "docs/asw-route-targets-ja.md",
-            "tests/owned-oasw-integration.spec.js"
+            "tests/owned-oasw-integration.spec.js",
+            "docs/pr152-seven-one-deghk-ja.md"
           ]
         }
       },
-      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+      "remaining": "W成立load後最終比較、AO/AS/CVL/LHA、CDモデル、未確認方向/記事表記、全在庫/枠/戦闘数量。先制対潜人数・発動/撃破/勝利は別。"
     },
     {
       "id": "7-2/0/default",
@@ -2628,11 +2632,579 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
+    "id": "7-1/0/default",
+    "baselineHead": "9714233e5133e32951781e703567b66c8b0280ec",
+    "publishedRemoteBaseline": "95c4f3ff38c1977497e5982311ae156a883f1a61",
+    "evidence": "docs/pr152-seven-one-deghk-ja.md",
+    "state": "normal6:5pass/1Wready post-load hidden failure; Dpartial, old initial/diagnostic/load gaps distinct; commit/push/finalHEADsmoke not started",
+    "independentLiterals": 71,
+    "actualBeforeAfter": {
+      "cases": 27,
+      "beforeMismatches": 15,
+      "naiveChosenFalseReady": 4,
+      "finalMismatches": 0
+    },
+    "sourceLimits": [
+      "AO/AS H impact",
+      "CVL/LHA scope",
+      "CD model typeUnknown",
+      "4-hull article notation",
+      "combat quantities and all inventory/slots"
+    ],
+    "graph": {
+      "confirmedDirectedEdges": 13,
+      "unconfirmedDirections": [
+        "A-C",
+        "C-E"
+      ],
+      "otherMapsUnchanged": 36
+    },
+    "node": {
+      "uniquePublic": 24,
+      "routes": 8,
+      "graph": 4,
+      "placement": 4,
+      "identity": 8,
+      "original16Reused": true,
+      "routesInitial": "7pass1new-expectation-fail; necessary rechecks2pass, six unchanged reused",
+      "identityInitialPass": 8,
+      "privateDiagnosticContractSeparate": 10
+    },
+    "identityClassification": {
+      "observedNewTrial": "exact specification-conforming empty sixth editor row only; original5x5fields exact",
+      "productSaveEditorChanged": false,
+      "oldInitialAfterValues": "missing",
+      "oldInitialLoad": "unreached",
+      "diagnosticOriginalAssertion": "failed; load unreached",
+      "correctedRawIdentityArrayExpected": {
+        "edited": false,
+        "unknown": true
+      },
+      "strictFields": [
+        "ship",
+        "rosterId",
+        "gameShipId",
+        "masterId",
+        "metadata"
+      ],
+      "strictSavedAndLoad": true,
+      "additionalReadOrWait": 0
+    },
+    "local": [
+      {
+        "browser": "chromium",
+        "target": "ready",
+        "exitCode": 0,
+        "workers": 1,
+        "retries": 0,
+        "attemptsStarted": 1,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": false,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "savedStrictIdentityContract": true,
+        "loadStrictIdentityContract": true,
+        "initialRows": 5,
+        "savedRows": 6,
+        "savedRealRows": 5,
+        "savedPureBlankExtras": 1,
+        "all25SavedIdentityFieldsExact": true,
+        "savedIdentityOrderExact": true,
+        "savedMissingDuplicateUnexpected": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "searches": [
+          {
+            "status": "targets-met",
+            "exhaustive": false,
+            "examined": 320,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "beam-limit"
+            ]
+          },
+          {
+            "status": "targets-met",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          }
+        ],
+        "registeredReady": [
+          true,
+          true
+        ],
+        "pageerrors": 0,
+        "navigationCollectionFailures": 0,
+        "observedNavigationCounters": [
+          {
+            "drop": 0,
+            "failures": 0
+          },
+          {
+            "drop": 0,
+            "failures": 0
+          }
+        ],
+        "afterLoadSnapshot": "recorded",
+        "finalComparison": "complete"
+      },
+      {
+        "browser": "chromium",
+        "target": "stock",
+        "exitCode": 0,
+        "workers": 1,
+        "retries": 0,
+        "attemptsStarted": 1,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": false,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "savedStrictIdentityContract": true,
+        "loadStrictIdentityContract": true,
+        "initialRows": 5,
+        "savedRows": 6,
+        "savedRealRows": 5,
+        "savedPureBlankExtras": 1,
+        "all25SavedIdentityFieldsExact": true,
+        "savedIdentityOrderExact": true,
+        "savedMissingDuplicateUnexpected": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "searches": [
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          },
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          }
+        ],
+        "registeredReady": [
+          false,
+          false
+        ],
+        "pageerrors": 0,
+        "navigationCollectionFailures": 0,
+        "observedNavigationCounters": [
+          {
+            "drop": 0,
+            "failures": 0
+          },
+          {
+            "drop": 0,
+            "failures": 0
+          }
+        ],
+        "afterLoadSnapshot": "recorded",
+        "finalComparison": "complete"
+      },
+      {
+        "browser": "chromium",
+        "target": "unknown",
+        "exitCode": 0,
+        "workers": 1,
+        "retries": 0,
+        "attemptsStarted": 1,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": true
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "savedStrictIdentityContract": true,
+        "loadStrictIdentityContract": true,
+        "initialRows": 5,
+        "savedRows": 5,
+        "savedRealRows": 5,
+        "savedPureBlankExtras": 0,
+        "all25SavedIdentityFieldsExact": true,
+        "savedIdentityOrderExact": true,
+        "savedMissingDuplicateUnexpected": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "searches": [
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          },
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          }
+        ],
+        "registeredReady": [
+          false,
+          false
+        ],
+        "pageerrors": 0,
+        "navigationCollectionFailures": 0,
+        "observedNavigationCounters": [
+          {
+            "drop": 0,
+            "failures": 0
+          },
+          {
+            "drop": 0,
+            "failures": 0
+          }
+        ],
+        "afterLoadSnapshot": "recorded",
+        "finalComparison": "complete"
+      },
+      {
+        "browser": "webkit",
+        "target": "ready",
+        "exitCode": 1,
+        "workers": 1,
+        "retries": 0,
+        "attemptsStarted": 1,
+        "stage": "after-load-search",
+        "samples": 1,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": false,
+          "customExact": false
+        },
+        "loadBooleans": null,
+        "savedStrictIdentityContract": true,
+        "loadStrictIdentityContract": null,
+        "initialRows": 5,
+        "savedRows": 6,
+        "savedRealRows": 5,
+        "savedPureBlankExtras": 1,
+        "all25SavedIdentityFieldsExact": true,
+        "savedIdentityOrderExact": true,
+        "savedMissingDuplicateUnexpected": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "searches": [
+          {
+            "status": "targets-met",
+            "exhaustive": false,
+            "examined": 320,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "beam-limit"
+            ]
+          }
+        ],
+        "registeredReady": [
+          true
+        ],
+        "pageerrors": 0,
+        "navigationCollectionFailures": 1,
+        "observedNavigationCounters": [
+          {
+            "drop": 0,
+            "failures": 0
+          }
+        ],
+        "afterLoadSnapshot": "missing",
+        "finalComparison": "unreached"
+      },
+      {
+        "browser": "webkit",
+        "target": "stock",
+        "exitCode": 0,
+        "workers": 1,
+        "retries": 0,
+        "attemptsStarted": 1,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": false,
+          "customExact": false
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "savedStrictIdentityContract": true,
+        "loadStrictIdentityContract": true,
+        "initialRows": 5,
+        "savedRows": 6,
+        "savedRealRows": 5,
+        "savedPureBlankExtras": 1,
+        "all25SavedIdentityFieldsExact": true,
+        "savedIdentityOrderExact": true,
+        "savedMissingDuplicateUnexpected": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "searches": [
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          },
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          }
+        ],
+        "registeredReady": [
+          false,
+          false
+        ],
+        "pageerrors": 0,
+        "navigationCollectionFailures": 0,
+        "observedNavigationCounters": [
+          {
+            "drop": 0,
+            "failures": 0
+          },
+          {
+            "drop": 0,
+            "failures": 0
+          }
+        ],
+        "afterLoadSnapshot": "recorded",
+        "finalComparison": "complete"
+      },
+      {
+        "browser": "webkit",
+        "target": "unknown",
+        "exitCode": 0,
+        "workers": 1,
+        "retries": 0,
+        "attemptsStarted": 1,
+        "stage": "completed",
+        "samples": 2,
+        "savedBooleans": {
+          "sourcesExact": true,
+          "other": true,
+          "otherMap": true,
+          "procurement": true,
+          "otherPlanner": true,
+          "identitiesExact": true,
+          "customExact": true
+        },
+        "loadBooleans": {
+          "sameDocument": true,
+          "customExact": true,
+          "sourcesExact": true,
+          "otherPlanner": true,
+          "procurement": true
+        },
+        "savedStrictIdentityContract": true,
+        "loadStrictIdentityContract": true,
+        "initialRows": 5,
+        "savedRows": 5,
+        "savedRealRows": 5,
+        "savedPureBlankExtras": 0,
+        "all25SavedIdentityFieldsExact": true,
+        "savedIdentityOrderExact": true,
+        "savedMissingDuplicateUnexpected": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "searches": [
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          },
+          {
+            "status": "incomplete",
+            "exhaustive": false,
+            "examined": 0,
+            "maxExamined": 10000,
+            "maxDepth": 24,
+            "reasons": [
+              "bounded-search"
+            ]
+          }
+        ],
+        "registeredReady": [
+          false,
+          false
+        ],
+        "pageerrors": 0,
+        "navigationCollectionFailures": 0,
+        "observedNavigationCounters": [
+          {
+            "drop": 0,
+            "failures": 0
+          },
+          {
+            "drop": 0,
+            "failures": 0
+          }
+        ],
+        "afterLoadSnapshot": "recorded",
+        "finalComparison": "complete"
+      }
+    ],
+    "localAttemptAccounting": {
+      "oldInitialFailure": 1,
+      "authorizedDiagnosticFailure": 1,
+      "correctedNormalUnique": 6,
+      "correctedNecessaryReadyRecheckPass": 1,
+      "remainingInitialPass": 4,
+      "remainingInitialFailure": 1,
+      "correctedNormalPass": 5,
+      "physicalAcrossVariants": 8,
+      "normalResults": 11,
+      "retries": 0,
+      "oldMissingNotBackfilled": true
+    },
+    "fixedList": {
+      "chromium": 863,
+      "webkit": 863,
+      "selectedEach": 3,
+      "servedSources": 20,
+      "sourcePrePostExact": true
+    },
+    "matrixChange": {
+      "before": "18/136/82",
+      "after": "18/136/82",
+      "statusCellsChanged": 0,
+      "row": "7-1/0/default",
+      "D": "一部",
+      "reason": "Wready final load comparison unreached; other successful trials do not fill it",
+      "criteriaChanged": false
+    },
+    "evidenceRetention": {
+      "correctedRawFiles": 194,
+      "correctedRawBytes": 56328788,
+      "traceCRC": 6,
+      "videos": 6,
+      "environmentReceipts": 6,
+      "source20PrePostExact": true,
+      "pageerrors": 0,
+      "successfulDropAndCollectionFailures": 0,
+      "failedWreadyCollectionFailures": 1,
+      "failedWreadyPostLoadSnapshot": "missing",
+      "unreachedNotFilled": true
+    },
+    "nextCI": {
+      "state": "not started",
+      "plan": "normal push of separate6-5/7-1 commits then one same-finalHEAD smoke; avoid auto/manual duplicate"
+    }
+  },
+  "nextPriority": "7-2第1CEG/第2BCDIM：停止時の未完案を保持し、出典別の艦種/分岐・条件付き速力・索敵適用を独立確認する。7-1W成立load後未到達は別残件、追加診断/成功目的反復へ戻らない。",
+  "previousSelected": {
     "id": "6-5/0,1/default",
     "baselineHead": "95c4f3ff38c1977497e5982311ae156a883f1a61",
     "evidence": "docs/pr152-six-five-routes-ja.md",
     "preparationBasis": "isolated earlier6-4draft14/134/88 retained; actual current6-4HEAD95c4f3ff baseline15/133/88 only",
-    "state": "validated6-5 sources/local12 reused; source-backed7-1 blank-row fixture correction and normal regression authorized/in progress; six-four ownCI D proof integrated as1 cell to18/136/82; ready for separate6-5/7-1 commits and one finalHEAD smoke after required verification",
+    "state": "local6-5 commit9714233e prepared separately; not yet pushed; one combined finalHEAD smoke planned with7-1, not started",
     "independentLiterals": {
       "original": 61,
       "addedLHABoundaries": 12,
@@ -3443,723 +4015,13 @@
       "productSaveEditorChanged": false,
       "sevenOneNormalOperations": "not yet confirmed; D remains partial",
       "noExtraReadWaitOrSave": true
-    }
-  },
-  "nextPriority": "7-1 DEGHK：仕様6行化に反する試験前提を元5艦と純空行の厳密検査へ訂正し、保存・編集・同一文書load後保持を含む必要C/W正常回帰を完了する。未到達は成功へ換算せず、新不一致で停止する。7-2未完WIPは別に保持する。",
-  "previousSelected": {
-    "id": "6-4/0/default",
-    "preparationBasis": "original isolated6-3draft14/131/91 retained; original6-4draft14/134/88; actual integration based on published6-3HEAD65efa76715/130/91",
-    "state": "ownHEAD95c4f3ff/CI40775006189 finalized5success1failure; localC3 plus ownWready/unknown initial and stock separate retry1 full support bounded D confirmed; initial load-hidden failures/caller gaps retained; stability and old causes unresolved",
-    "evidence": "docs/pr152-six-four-bdcfn-ja.md",
-    "independentLiterals": 48,
-    "actualBefore": {
-      "initial": 23,
-      "separatelyAddedChosenInfo": 3
     },
-    "actualAfterMatches": 26,
-    "graph": {
-      "confirmedDirectedEdges": 20,
-      "unconfirmedConnection": "D/G direction"
-    },
-    "node": {
-      "routes": {
-        "unique": 9,
-        "initialPassed": 9,
-        "necessaryChecksAfterLiteralGuardCorrection": 1,
-        "necessaryChecksAfterExcludedNameDisplayCorrection": 1,
-        "finalUnchangedInitialReused": 7
-      },
-      "graph": {
-        "unique": 4,
-        "initialPassed": 4,
-        "rerun": 0
-      },
-      "placement": {
-        "unique": 4,
-        "initialPassed": 4,
-        "necessaryChecksAfterDisplayedExampleCorrection": 2,
-        "unchangedInitialReused": 2
-      }
-    },
-    "uniqueNodeCases": 17,
-    "local": [
-      {
-        "browser": "chromium",
-        "target": "ready",
-        "exit_code": 0,
-        "workers": 1,
-        "retries": 0,
-        "attempts_started": 1,
-        "capacityBefore": {
-          "availableBytes": 11229917184,
-          "availableInodes": 1901686,
-          "totalInodes": 2097152
-        },
-        "capacityAfter": {
-          "availableBytes": 11213848576,
-          "availableInodes": 1901634,
-          "totalInodes": 2097152
-        },
-        "stage": "completed",
-        "samples": 2,
-        "savedBooleans": {
-          "sourcesExact": true,
-          "other": true,
-          "otherMap": true,
-          "procurement": true,
-          "otherPlanner": true,
-          "identitiesExact": true,
-          "customExact": false
-        },
-        "loadBooleans": {
-          "sameDocument": true,
-          "customExact": true,
-          "sourcesExact": true,
-          "otherPlanner": true,
-          "procurement": true
-        },
-        "route": "ready",
-        "searches": [
-          {
-            "status": "incomplete",
-            "exhaustive": false,
-            "examined": 283,
-            "maxExamined": 10000,
-            "maxDepth": 24,
-            "reasons": [
-              "air-target-unselected",
-              "beam-limit"
-            ]
-          },
-          {
-            "status": "incomplete",
-            "exhaustive": false,
-            "examined": 0,
-            "maxExamined": 10000,
-            "maxDepth": 24,
-            "reasons": [
-              "air-target-unselected"
-            ]
-          }
-        ],
-        "registeredReady": false,
-        "air": "manual/unselected",
-        "base": "data/unset, readiness manual",
-        "scouting": {
-          "notRequired": true,
-          "score": null
-        },
-        "pageerrors": 0,
-        "collectionFailures": 0,
-        "observationLimit": "unchanged normal navigation snapshots; timing influence exists; caller or transition causality not established"
-      },
-      {
-        "browser": "chromium",
-        "target": "stock",
-        "exit_code": 0,
-        "workers": 1,
-        "retries": 0,
-        "attempts_started": 1,
-        "capacityBefore": {
-          "availableBytes": 11214741504,
-          "availableInodes": 1901669,
-          "totalInodes": 2097152
-        },
-        "capacityAfter": {
-          "availableBytes": 11200757760,
-          "availableInodes": 1901617,
-          "totalInodes": 2097152
-        },
-        "stage": "completed",
-        "samples": 2,
-        "savedBooleans": {
-          "sourcesExact": true,
-          "other": true,
-          "otherMap": true,
-          "procurement": true,
-          "otherPlanner": true,
-          "identitiesExact": true,
-          "customExact": false
-        },
-        "loadBooleans": {
-          "sameDocument": true,
-          "customExact": true,
-          "sourcesExact": true,
-          "otherPlanner": true,
-          "procurement": true
-        },
-        "route": "ready",
-        "searches": [
-          {
-            "status": "incomplete",
-            "exhaustive": false,
-            "examined": 0,
-            "maxExamined": 10000,
-            "maxDepth": 24,
-            "reasons": [
-              "bounded-search"
-            ]
-          },
-          {
-            "status": "incomplete",
-            "exhaustive": false,
-            "examined": 0,
-            "maxExamined": 10000,
-            "maxDepth": 24,
-            "reasons": [
-              "bounded-search"
-            ]
-          }
-        ],
-        "registeredReady": false,
-        "air": "manual/unselected",
-        "base": "data/unset, readiness manual",
-        "scouting": {
-          "notRequired": true,
-          "score": null
-        },
-        "pageerrors": 0,
-        "collectionFailures": 0,
-        "observationLimit": "unchanged normal navigation snapshots; timing influence exists; caller or transition causality not established"
-      },
-      {
-        "browser": "chromium",
-        "target": "unknown",
-        "exit_code": 0,
-        "workers": 1,
-        "retries": 0,
-        "attempts_started": 1,
-        "capacityBefore": {
-          "availableBytes": 11201650688,
-          "availableInodes": 1901653,
-          "totalInodes": 2097152
-        },
-        "capacityAfter": {
-          "availableBytes": 11190251520,
-          "availableInodes": 1901599,
-          "totalInodes": 2097152
-        },
-        "stage": "completed",
-        "samples": 2,
-        "savedBooleans": {
-          "sourcesExact": true,
-          "other": true,
-          "otherMap": true,
-          "procurement": true,
-          "otherPlanner": true,
-          "identitiesExact": true,
-          "customExact": true
-        },
-        "loadBooleans": {
-          "sameDocument": true,
-          "customExact": true,
-          "sourcesExact": true,
-          "otherPlanner": true,
-          "procurement": true
-        },
-        "route": "manual",
-        "searches": [
-          {
-            "status": "incomplete",
-            "exhaustive": false,
-            "examined": 0,
-            "maxExamined": 10000,
-            "maxDepth": 24,
-            "reasons": [
-              "bounded-search"
-            ]
-          },
-          {
-            "status": "incomplete",
-            "exhaustive": false,
-            "examined": 0,
-            "maxExamined": 10000,
-            "maxDepth": 24,
-            "reasons": [
-              "bounded-search"
-            ]
-          }
-        ],
-        "registeredReady": false,
-        "air": "manual/unselected",
-        "base": "data/unset, readiness manual",
-        "scouting": {
-          "notRequired": true,
-          "score": null
-        },
-        "pageerrors": 0,
-        "collectionFailures": 0,
-        "observationLimit": "unchanged normal navigation snapshots; timing influence exists; caller or transition causality not established"
-      },
-      {
-        "browser": "webkit",
-        "target": "ready",
-        "exit_code": 0,
-        "workers": 1,
-        "retries": 0,
-        "attempts_started": 1,
-        "capacityBefore": {
-          "availableBytes": 11191103488,
-          "availableInodes": 1901625,
-          "totalInodes": 2097152
-        },
-        "capacityAfter": {
-          "availableBytes": 11182755840,
-          "availableInodes": 1901431,
-          "totalInodes": 2097152
-        },
-        "stage": "completed",
-        "samples": 2,
-        "savedBooleans": {
-          "sourcesExact": true,
-          "other": true,
-          "otherMap": true,
-          "procurement": true,
-          "otherPlanner": true,
-          "identitiesExact": true,
-          "customExact": false
-        },
-        "loadBooleans": {
-          "sameDocument": true,
-          "customExact": true,
-          "sourcesExact": true,
-          "otherPlanner": true,
-          "procurement": true
-        },
-        "route": "ready",
-        "searches": [
-          {
-            "status": "incomplete",
-            "exhaustive": false,
-            "examined": 283,
-            "maxExamined": 10000,
-            "maxDepth": 24,
-            "reasons": [
-              "air-target-unselected",
-              "beam-limit"
-            ]
-          },
-          {
-            "status": "incomplete",
-            "exhaustive": false,
-            "examined": 0,
-            "maxExamined": 10000,
-            "maxDepth": 24,
-            "reasons": [
-              "air-target-unselected"
-            ]
-          }
-        ],
-        "registeredReady": false,
-        "air": "manual/unselected",
-        "base": "data/unset, readiness manual",
-        "scouting": {
-          "notRequired": true,
-          "score": null
-        },
-        "pageerrors": 0,
-        "collectionFailures": 0,
-        "observationLimit": "unchanged normal navigation snapshots; timing influence exists; caller or transition causality not established"
-      },
-      {
-        "browser": "webkit",
-        "target": "stock",
-        "exit_code": 1,
-        "workers": 1,
-        "retries": 0,
-        "attempts_started": 1,
-        "capacityBefore": {
-          "availableBytes": 11187175424,
-          "availableInodes": 1901609,
-          "totalInodes": 2097152
-        },
-        "capacityAfter": {
-          "availableBytes": 11173093376,
-          "availableInodes": 1901318,
-          "totalInodes": 2097152
-        },
-        "stage": "after-load-search",
-        "samples": 1,
-        "savedBooleans": {
-          "sourcesExact": true,
-          "other": true,
-          "otherMap": true,
-          "procurement": true,
-          "otherPlanner": true,
-          "identitiesExact": true,
-          "customExact": false
-        },
-        "loadBooleans": {},
-        "loadRecordPresent": false,
-        "finalComparison": "unreached",
-        "route": "ready",
-        "searches": [
-          {
-            "status": "incomplete",
-            "exhaustive": false,
-            "examined": 0,
-            "maxExamined": 10000,
-            "maxDepth": 24,
-            "reasons": [
-              "bounded-search"
-            ]
-          }
-        ],
-        "registeredReady": false,
-        "air": "manual/unselected",
-        "base": "data/unset, readiness manual",
-        "scouting": {
-          "notRequired": true,
-          "score": null
-        },
-        "pageerrors": 0,
-        "collectionFailures": 1,
-        "stop": "45s total timeout while post-load second search button exists but is hidden; click delivery and handler/search start unconfirmed",
-        "positivePreservationMismatchObserved": false,
-        "observationLimit": "earlier-document guide-switch stack does not identify a caller in the post-load document; not proof of same cause or loss; no retry/extra diagnostic"
-      },
-      {
-        "browser": "webkit",
-        "target": "unknown",
-        "exit_code": 0,
-        "workers": 1,
-        "retries": 0,
-        "attempts_started": 1,
-        "capacityBefore": {
-          "availableBytes": 11177480192,
-          "availableInodes": 1901494,
-          "totalInodes": 2097152
-        },
-        "capacityAfter": {
-          "availableBytes": 11170418688,
-          "availableInodes": 1901299,
-          "totalInodes": 2097152
-        },
-        "stage": "completed",
-        "samples": 2,
-        "savedBooleans": {
-          "sourcesExact": true,
-          "other": true,
-          "otherMap": true,
-          "procurement": true,
-          "otherPlanner": true,
-          "identitiesExact": true,
-          "customExact": true
-        },
-        "loadBooleans": {
-          "sameDocument": true,
-          "customExact": true,
-          "sourcesExact": true,
-          "otherPlanner": true,
-          "procurement": true
-        },
-        "route": "manual",
-        "searches": [
-          {
-            "status": "incomplete",
-            "exhaustive": false,
-            "examined": 0,
-            "maxExamined": 10000,
-            "maxDepth": 24,
-            "reasons": [
-              "bounded-search"
-            ]
-          },
-          {
-            "status": "incomplete",
-            "exhaustive": false,
-            "examined": 0,
-            "maxExamined": 10000,
-            "maxDepth": 24,
-            "reasons": [
-              "bounded-search"
-            ]
-          }
-        ],
-        "registeredReady": false,
-        "air": "manual/unselected",
-        "base": "data/unset, readiness manual",
-        "scouting": {
-          "notRequired": true,
-          "score": null
-        },
-        "pageerrors": 0,
-        "collectionFailures": 0,
-        "observationLimit": "unchanged normal navigation snapshots; timing influence exists; caller or transition causality not established"
-      }
-    ],
-    "changedExistingFlagshipLocal": [
-      {
-        "browser": "chromium",
-        "target": "flagship",
-        "exit_code": 0,
-        "workers": 1,
-        "retries": 0,
-        "attempts_started": 1,
-        "capacityBefore": {
-          "availableBytes": 11191136256,
-          "availableInodes": 1901635,
-          "totalInodes": 2097152
-        },
-        "capacityAfter": {
-          "availableBytes": 11190194176,
-          "availableInodes": 1901589,
-          "totalInodes": 2097152
-        },
-        "scope": "changed existing DD3 flagship/DD4 alternative response contract and condition case",
-        "normalSaveFlowNotRepeated": true
-      },
-      {
-        "browser": "webkit",
-        "target": "flagship",
-        "exit_code": 0,
-        "workers": 1,
-        "retries": 0,
-        "attempts_started": 1,
-        "capacityBefore": {
-          "availableBytes": 11174699008,
-          "availableInodes": 1901477,
-          "totalInodes": 2097152
-        },
-        "capacityAfter": {
-          "availableBytes": 11170422784,
-          "availableInodes": 1901287,
-          "totalInodes": 2097152
-        },
-        "scope": "changed existing DD3 flagship/DD4 alternative response contract and condition case",
-        "normalSaveFlowNotRepeated": true
-      }
-    ],
-    "fixedList": {
-      "each": 854,
-      "newEach": 3,
-      "changedExistingEach": 1
-    },
-    "matrixChange": {
-      "before": "15/130/91",
-      "after": "15/133/88",
-      "cells": 3,
-      "scope": "6-4 B/C/D 未確認→一部; D not confirmed",
-      "originalPreparationBefore": "14/131/91",
-      "originalPreparationAfter": "14/134/88"
-    },
-    "upstreamAtRecord": {
-      "committedHead": "9f6861ef383bd8c8687139308b80ea1a12583e7d",
-      "committedCounts": "14/128/94",
-      "runId": 40762108890,
-      "CIState": "回収中（結果未確定）",
-      "sixThreeActualWIP": "15/130/91 separate; no result inferred"
-    },
-    "baselineHead": "65efa767b5662c34240a611543ab5089fd51979c",
-    "integrationProvenance": {
-      "originalValidation": "isolated6-4draft/runtime, normalC/W6 plus changed existing flagshipC/W2; initial7pass1fail, no repeat",
-      "integratedBaseHead": "65efa767b5662c34240a611543ab5089fd51979c",
-      "servedSourcesByteIdentical": 15,
-      "copiedSources": 14,
-      "upstreamNumericFixturePreserved": true,
-      "upstreamFiveFiveDConfirmedRetained": true,
-      "upstreamCI": {
-        "runId": 40769177448,
-        "head": "65efa767b5662c34240a611543ab5089fd51979c",
-        "state": "completed6smoke success C851/0/0 W845/6/0; own W3 initial full, C2raw cap gap; old initial gaps preserved"
-      },
-      "wordingCorrection": "unknown success2 safe-abort without editing, ready/stock success3 save/edit explicitly distinguished; source doc ac22760728d157ef5a7cab9bb1312bb1d640de9766a742f76ddf54f6871cec81",
-      "additionalNodeBrowserOrSearchExecutions": 0,
-      "upstreamCIBeforeFinalization": {
-        "runId": 40769177448,
-        "head": "65efa767b5662c34240a611543ab5089fd51979c",
-        "state": "6-3 ownHEAD normal smoke dispatched once, pending; no result inferred"
-      }
-    },
-    "upstreamFinalCI": {
-      "runId": 40769177448,
-      "head": "65efa767b5662c34240a611543ab5089fd51979c",
-      "attempt": 1,
-      "state": "completed",
-      "smokeSuccess": 6,
-      "smokeFailure": 0,
-      "full": "skipped",
-      "normalRunCount": 1,
-      "reruns": 0,
-      "C": {
-        "initial": 851,
-        "retry": 0,
-        "final": 0
-      },
-      "W": {
-        "initial": 845,
-        "retry": 6,
-        "final": 0
-      },
-      "ownHeadAttemptAndNodePlaywrightRevisionMatches": 6,
-      "imageDigestEvidence": "same-head workflow pin plus own receipt image tag; no independent digest measurement",
-      "artifactReceived": 7,
-      "artifactPublished": 8,
-      "bytes": 484121796,
-      "collectionManifestFiles": 72,
-      "missing": [
-        {
-          "name": "attempt-diagnostics-chromium-2-40769177448",
-          "bytes": 1199362683,
-          "reason": "exceeds 536870912-byte supported archive cap, not requested"
-        }
-      ],
-      "failedInitialTrials": 6,
-      "failedRetryTrials": 0,
-      "failedTraces": 6,
-      "failedVideos": 6,
-      "initialFailureBoundary": "five post-load second-search click hidden; one existing night-carrier access-control exception assertion; shared cause unknown",
-      "positiveNewPreservationMismatchObserved": false,
-      "ownSixThreeWebKit": {
-        "ready": "initial success, two searches, save/edit/same-document load/exact preservation complete",
-        "stock": "initial success, two searches, save/edit/same-document load/exact preservation complete",
-        "unknown": "initial success, two searches, safe abort/original preserved/same-document load complete; no edit",
-        "pageerrors": 0,
-        "drop": 0,
-        "collectionFailures": 0
-      },
-      "chromiumEvidence": "C851 initial passes officially; own C2 job425 initial passes/no failure annotation; own6-3C3 original JSON missing in cap-exceeding archive, unchanged localC3 remains separate",
-      "counterLimits": {
-        "sixOneReadyInitial": {
-          "navigationCollectionFailures": 1,
-          "earlierDocumentDrop": 0,
-          "earlierDocumentFailures": 0,
-          "postLoadSnapshot": "missing"
-        },
-        "legacyFailureSummaryPageerrorCount": "review-received-boundaries.py uses default empty array when field absent; exact missingness is corrected by failed-navigation-counter-limits.json and must be preferred (night original pageerrors absent/null, not measured zero)."
-      },
-      "officialResultsSha256": "c9e7ee0ad8320ac745fbdc02d7776ecc75e99714ab2383a725f0cd691b1d83f7",
-      "artifactSummarySha256": "308d82b37373609aa072fdace6ada5822bbc2db51ac6de8bfe5515069e2538cd",
-      "focusedFinalSummarySha256": "bf89d8b5dd9418d2d1ec38e5ecea60f46ee137256019263ddbadf4f815fe5d68",
-      "failedCounterLimitsSha256": "9b96d8bab1b7e0823c1556bac5e0e4e53d31e862cdbc6461afc16a898773bf35",
-      "closedCollectionManifestSha256": "2d8e54b88a96f9078b4b908326cce0aebb87716f254b953307fbd3244f7ba006",
-      "matrixChange": 0,
-      "limits": "Retry/local/other-browser success never fills initial missing observations.6-1ready initial post-load snapshot/caller missing and navigation collection failure1; night original pageerrors absent/null, not measured zero."
-    },
-    "stateBeforeOwnCommit": "local C normal3 pass, W normal2 pass/stock1 initial fail; changed existing flagship C/W initial pass; Wstock final load comparison unreached; D partial; 15-source byte-exact reuse on65efa767, owncommit/push/CI not started",
-    "ownFinalCI": {
-      "runId": 40775006189,
-      "head": "95c4f3ff38c1977497e5982311ae156a883f1a61",
-      "attempt": 1,
-      "state": "completed",
-      "conclusion": "failure",
-      "smokeSuccess": 5,
-      "smokeFailure": 1,
-      "full": "skipped",
-      "normalRunCount": 1,
-      "reruns": 0,
-      "C": {
-        "initial": 854,
-        "retry": 0,
-        "final": 0
-      },
-      "W": {
-        "initial": 845,
-        "retry": 7,
-        "final": 2
-      },
-      "finalFailedTargets": [
-        "7-3 speed-ready",
-        "5-5 stock"
-      ],
-      "finalFailedBoundary": "both initial and retry stop on post-load second-search click hidden; shared cause not established",
-      "ownSixFourWebKit": {
-        "webkitReadyInitial": "completed; samples2; save/edit/same-document load/exact preservation all true",
-        "webkitUnknownInitial": "completed; samples2; safe abort/original preserved/same-document load exact; no edit",
-        "webkitStockInitial": {
-          "stage": "after-load-search",
-          "samples": 1,
-          "savedBooleansTrue": [
-            "sourcesExact",
-            "other",
-            "otherMap",
-            "procurement",
-            "otherPlanner",
-            "identitiesExact"
-          ],
-          "savedCustomExact": false,
-          "savedCustomExactMeaning": "planned save/edit changes initial proposal",
-          "loadRecord": "missing/not generated",
-          "trace": "second search click hidden until45s timeout; handler start not demonstrated",
-          "navigationCollectionFailures": 1,
-          "beforeReloadDocumentDrop": 0,
-          "beforeReloadDocumentFailures": 0,
-          "postLoadSnapshot": "missing",
-          "pageerrorCount": 0,
-          "finalComparison": "unreached"
-        },
-        "webkitStockRetry1": "separate own original completed; samples2; save/edit/same-document load exact all true; searchAssessment exact; navigationCollectionFailures0",
-        "chromium": "official427 first-pass/0retry/0failure ownC2; own6-4 ready/stock/unknown raw JSON missing in over-cap C2 archive",
-        "allObservedSearch": "incomplete/exhaustive false/registeredReady false; air target/base unselected remain unresolved",
-        "criteria": "No failure or missing raw observation filled from local/other-browser/retry."
-      },
-      "failedInitialTrials": 9,
-      "failedRetryTrials": 2,
-      "failedTracesReceived": 10,
-      "failedVideosReceived": 11,
-      "failedInitialTraceMissing": "W3 inner-controls initial trace not recorded under existing on-first-retry policy; successful retry trace is separate",
-      "artifactReceived": 8,
-      "artifactPublished": 10,
-      "receivedBytes": 526109115,
-      "closedArtifactFiles": 86,
-      "missing": [
-        {
-          "name": "attempt-diagnostics-chromium-2-40775006189",
-          "bytes": 1168503551,
-          "reason": "Published archive exceeds supported 512 MiB connector cap; not requested, no range/split/bypass."
-        },
-        {
-          "name": "smoke-webkit-shard-4-of-4-40775006189",
-          "bytes": 1043636073,
-          "reason": "Published archive exceeds supported 512 MiB connector cap; not requested, no range/split/bypass."
-        }
-      ],
-      "receivedW4AttemptBytes": 518995643,
-      "allReceivedTraceArchivesCRC": {
-        "count": 116,
-        "allCRC": "PASS",
-        "initial": 108,
-        "retry": 8
-      },
-      "environment": {
-        "ownReceiptCount": 6,
-        "actualNode": "v24.21.0",
-        "actualPlaywright": "1.55.0",
-        "actualChromiumRevision": "1187",
-        "actualWebkitRevision": "2203",
-        "allSixFixedMatches": true,
-        "image": "actual own receipt tag observed; image digest pinned in same-head workflow only, not independently measured"
-      },
-      "positiveNewPreservationMismatchObservedInThisCI": false,
-      "matrixIntegration": "bounded six-four D proof integrated as separate1cell17/137/82 to18/136/82 after user-authorized resume; old initial failure/missingness retained, criteria unchanged",
-      "oldMissingNotFilled": true,
-      "independentSevenOneStopStillActive": false,
-      "matrixIntegrationBeforeResume": "held under independent7-1 preservation stop; no promotion/demotion, rows and criteria unchanged",
-      "independentSevenOneStopStillActiveAtPriorRecord": true,
-      "sevenOneResumeLimit": "source-backed blank-row fixture correction underway; normal save/load regression not yet confirmed; any new identity anomaly stops work"
-    },
-    "stateBeforeOwnCIFinalization": "normal commit/push at95c4f3ff completed; ownHEAD normalCI40775006189 pending; local7pass1Wstock final-load unreached/Dpartial retained, no rerun",
-    "ownCIBeforeFinalization": {
-      "runId": 40775006189,
-      "head": "95c4f3ff38c1977497e5982311ae156a883f1a61",
-      "state": "pending; no final result inferred",
-      "normalRunCount": 1,
-      "reruns": 0
-    },
-    "stateBeforeBoundedDIntegration": "ownHEAD95c4f3ff/CI40775006189 finalized5smoke success1failure; own Wstock initial final comparison unreached and separate retry1 complete; new evidence held without matrix integration under independent7-1 preservation stop",
-    "additionalOwnCIMatrixIntegration": {
-      "recordedAt": "2026-10-29",
-      "sourceRunId": 40775006189,
-      "sourceHead": "95c4f3ff38c1977497e5982311ae156a883f1a61",
-      "before": "17/137/82",
-      "after": "18/136/82",
-      "cells": 1,
-      "cell": "6-4/0/default.D",
-      "change": "一部→確認済み",
-      "basis": "localC3 plus ownWready/unknown initial full and separate Wstock retry1 full",
-      "oldInitialUnreachedRetained": true,
-      "criteriaChanged": false,
-      "newExecutions": 0
+    "stateBeforeSevenOneRecord": "validated6-5 sources/local12 reused; source-backed7-1 blank-row fixture correction and normal regression authorized/in progress; six-four ownCI D proof integrated as1 cell to18/136/82; ready for separate6-5/7-1 commits and one finalHEAD smoke after required verification",
+    "localCommit": {
+      "head": "9714233e5133e32951781e703567b66c8b0280ec",
+      "publishedRemoteBaseline": "95c4f3ff38c1977497e5982311ae156a883f1a61",
+      "pushed": false,
+      "finalHeadSmokeStarted": false
     }
   },
   "selectionHistory": [
@@ -4895,6 +4757,16 @@
         "criteriaChanged": false,
         "newExecutions": 0
       }
+    },
+    {
+      "id": "6-5/0,1/default",
+      "head": "9714233e5133e32951781e703567b66c8b0280ec",
+      "record": "docs/pr152-six-five-routes-ja.md",
+      "state": "local6-5 commit9714233e prepared separately; not yet pushed; one combined finalHEAD smoke planned with7-1, not started",
+      "matrixCounts": "18/136/82",
+      "stateBeforeLocalCommitRecord": "validated6-5 sources/local12 reused; source-backed7-1 blank-row fixture correction and normal regression authorized/in progress; six-four ownCI D proof integrated as1 cell to18/136/82; ready for separate6-5/7-1 commits and one finalHEAD smoke after required verification",
+      "ownSeparateCIStarted": false,
+      "finalBatchSmokePlan": "one final pushedHEAD only; user-authorized6-5/7-1 separation; no duplicate run"
     }
   ],
   "fiveFourCloseout": {
@@ -4935,8 +4807,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "user-authorized7-1 identity observation classified only strict blank sixth-row append with original5x5fields exact; fixture correction/required normal regression underway; six-five validated sources retained and six-four D1 integrated to18/136/82",
-    "nextUnit": "7-1 DEGHK separate preparation; continue independent grounded work without repeated diagnosis or per-map permission",
+    "activeUnit": "7-1 blank-row identity fixture corrected with strict allID/field/order/blank-schema checks; correctednormal5pass1Wreadyknownhidden; Dpartial18/136/82; local6-5commit971 separate, batchpush/finalHEADsmoke once pending",
+    "nextUnit": "7-2 CEG/BCDIM independent preparation; source gaps unknown, no unverified WIP promotion",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -5034,7 +4906,18 @@
         "matrixIntegration": "held/no cell change"
       }
     },
-    "activeUnitBeforeAuthorizedIdentityObservationResume": "independent7-1 post-edit identity mismatch stop remains active; six-five19WIP/17sources/17/137/82 frozen; existing6-4CI40775006189 read-only collection complete5success1failure; no new trial or commit/push/CI"
+    "activeUnitBeforeAuthorizedIdentityObservationResume": "independent7-1 post-edit identity mismatch stop remains active; six-five19WIP/17sources/17/137/82 frozen; existing6-4CI40775006189 read-only collection complete5success1failure; no new trial or commit/push/CI",
+    "sevenOneIdentityResume": {
+      "classification": "specification-conforming sixth blank only in authorized observed trial",
+      "oldMissingRetained": true,
+      "productSaveEditorChanges": 0,
+      "strictNormalSavedPass": 6,
+      "strictNormalLoadPass": 5,
+      "normalFailure": "Wready post-load click hidden; caller missing",
+      "newStrictPreservationMismatch": false,
+      "stopOnNewMismatch": true,
+      "DStatus": "partial"
+    }
   },
   "auditCorrection": {
     "baselineHead": "b2a1427cc199c18dc4a8af128f342bbc024190b1",
