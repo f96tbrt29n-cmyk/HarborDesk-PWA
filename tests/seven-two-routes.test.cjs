@@ -65,6 +65,18 @@ test('7-2 one unknown does not erase independently known START C I or safe-targe
 
 test('7-2 general route examples retain chosen requirements manual and flagship plus explicit speed of both infos',()=>{
  const {c,make}=completeContext(),fleets=[['CL','DD','DD','DD'],['FBB','CV','CVL','CLT','DD','DD']];
+ // Independent selected inputs and expected outputs replace the old 7-1
+ // oracle's requirement/detail suppression, without weakening other presets.
+ const selected=[
+  {requirements:[{token:'軽巡',count:1},{token:'駆逐',count:3}],expected:[{token:'軽巡',need:1,got:1,ok:true},{token:'駆逐',need:3,got:3,ok:true}],path:'CEG'},
+  {requirements:[{token:'高速戦艦',count:1},{token:'正規空母',count:1},{token:'軽空母',count:1},{token:'雷巡',count:1},{token:'駆逐',count:2}],expected:[{token:'高速戦艦',need:1,got:1,ok:true},{token:'正規空母',need:1,got:1,ok:true},{token:'軽空母',need:1,got:1,ok:true},{token:'雷巡',need:1,got:1,ok:true},{token:'駆逐',need:2,got:2,ok:true}],path:'BCDIM'}
+ ];
+ for(const [index,row]of selected.entries()){
+  const p=make(index,fleets[index],10);p.suggestion={preset:{name:'独立した選択条件'},info:{text:'利用者が選択した艦種条件',requirements:row.requirements,total:fleets[index].length,conditionManual:true,speedRequired:false,flagship:''}};
+  const result=c.hdFERoute(p);assert.equal(result.status,'manual');assert.equal(result.contract.status,'ready');assert.deepEqual(JSON.parse(JSON.stringify(result.requirements)),row.expected);assert.ok(result.detail.startsWith('独立した選択条件 / 艦種・隻数の条件を手動確認 / '+row.path+'：'),'selected manual explanation precedes the actual registered route');
+ }
+ const six=make(0,['CL','DD','DD','DD','DD','DD'],10);six.suggestion={preset:{name:'独立した選択条件'},info:{text:'利用者が選択した艦種条件',requirements:[{token:'軽巡',count:1},{token:'駆逐',count:3}],total:4,conditionManual:true,speedRequired:false,flagship:''}};
+ const sixResult=c.hdFERoute(six);assert.equal(sixResult.status,'missing','six hulls cannot take the selected CEG route even with chosen manual information');assert.equal(sixResult.contract.status,'missing');assert.equal(sixResult.contract.data.path,'CEG');assert.deepEqual(JSON.parse(JSON.stringify(sixResult.requirements)),[{token:'軽巡',need:1,got:1,ok:true},{token:'駆逐',need:3,got:5,ok:true}]);assert.ok(sixResult.detail.startsWith('独立した選択条件 / 艦種・隻数の条件を手動確認 / CEG：'));assert.ok(sixResult.detail.endsWith(sixResult.contract.detail),'known route mismatch details are retained after the selected explanation');
  for(const index of [0,1]){for(const field of ['requirements','conditionManual','flagship']){const p=make(index,fleets[index],10),info=JSON.parse(JSON.stringify(p.routeInfo));if(field==='requirements')info.requirements.push({token:'空母',count:3});if(field==='conditionManual')info.conditionManual=true;if(field==='flagship')info.flagship='駆逐';p.suggestion={info};assert.equal(c.hdFERoute(p).status,field==='flagship'?'missing':'manual');}
   for(const rank of [10,15,20])for(const where of ['routeInfo','suggestion']){const p=make(index,fleets[index],5),info={...JSON.parse(JSON.stringify(p.routeInfo)),text:rank===20?'利用者指定 最速':rank===15?'利用者指定 高速+統一':'利用者指定 高速統一',speedRequired:true,requirements:[],total:fleets[index].length,conditionManual:false};if(where==='routeInfo')p.routeInfo=info;else p.suggestion={info};assert.equal(c.hdFEPlanSpeedTarget(p),rank);assert.equal(c.hdFERoute(p).status,'missing','known explicit speed shortfall');}
  }

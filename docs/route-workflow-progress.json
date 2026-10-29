@@ -2694,7 +2694,7 @@
     "id": "7-2/0,1/default",
     "baselineHead": "08ae92358c05d23b7d0044e22b3d36f51114623b",
     "evidence": "docs/pr152-seven-two-routes-ja.md",
-    "state": "local scoped validation complete; normal12 full after original11 reuse + newWunknown1; new25 targets successful after one grounded fixture correction; ordinary source commit/push/one finalHEAD smoke pending",
+    "state": "source6361061a committed/pushed; first CI40825717140 Node prerequisite failed before all browsers; grounded legacy-oracle scope corrected and three targeted Node cases first passed; newHEAD smoke pending; local25 and old gaps retained",
     "independentLiterals": 128,
     "sourceLimits": [
       "D CVL source split",
@@ -3123,11 +3123,87 @@
       "previousSevenOneD": "一部; oldWready load unreached not filled"
     },
     "nextCI": {
+      "state": "after concrete oracle correction commit, one newHEAD smoke planned; targeted Node3 passed, corrected CI not started",
+      "previousRunId": 40825717140,
+      "sameHeadRerun": false
+    },
+    "stateBeforeFirstSourceCI": "local scoped validation complete; normal12 full after original11 reuse + newWunknown1; new25 targets successful after one grounded fixture correction; ordinary source commit/push/one finalHEAD smoke pending",
+    "nextCIBeforeFirstRun": {
       "state": "not started",
       "plan": "ordinary source commit/push then one same finalHEAD smoke, no automatic/manual duplication"
+    },
+    "firstSourceCI": {
+      "runId": 40825717140,
+      "head": "6361061af962128a17ab92649b237866a111ac64",
+      "attempt": 1,
+      "conclusion": "failure",
+      "stage": "Node prerequisite before browser launch",
+      "smokeJobs": {
+        "success": 0,
+        "failure": 6
+      },
+      "full": "skipped",
+      "eachJobNode": {
+        "tests": 497,
+        "pass": 496,
+        "fail": 1
+      },
+      "failureTest": "tests/seven-one-routes.test.cjs:47",
+      "assertion": "7-2/0/true",
+      "allOwnCases": 16,
+      "ownCaseState": "all not reached",
+      "playwrightTotals": {
+        "chromium": null,
+        "webkit": null
+      },
+      "playwrightVersionActual": null,
+      "browserRevisionActual": null,
+      "publishedArtifacts": 0,
+      "nodeVersionActual": "24.21.0",
+      "imageDigestPulledObserved": true,
+      "localSuccessesDoNotFillUnreached": true,
+      "positiveNewPreservationMismatchObserved": null
+    },
+    "oracleCorrectionPlan": {
+      "state": "independently grounded scope correction complete; targeted Node3 first pass",
+      "reason": "7-2chosen-info intentionally preserves2requirements/basicdetail; actual and legacy route statuses both missing",
+      "unchangedLegacyScope": {
+        "presets": 50,
+        "fullOutputComparisons": 100,
+        "strictEqualityRetained": true
+      },
+      "newSevenTwoScope": "explicit independent requirements/detail and known route-mismatch retention assertions",
+      "productChanges": false,
+      "browserSpecOperationChanges": false,
+      "localBrowserReexecutionsForThisCorrection": 0,
+      "sameHeadRerun": false,
+      "validation": {
+        "node": "24.21.0",
+        "imagePinned": true,
+        "selectedCases": 3,
+        "attemptsEach": 1,
+        "tests": 3,
+        "pass": 3,
+        "fail": 0,
+        "skipped": 0,
+        "browserLaunches": 0,
+        "all497SuiteExecutedLocally": false,
+        "resultSHA256": "94f42f25f5965aaec4b84db961bb345db67885478f52de6cf0a66ded40565852",
+        "separateFromCompatibilityNode16Physical18": true
+      },
+      "reuseDependency": {
+        "oldTargetedManifestFiles": 51,
+        "byteIdentical": 50,
+        "changedNodeOnlyFilesWithinManifest": 1,
+        "otherEditedNodeFileOutsideManifest": true,
+        "productBrowserSpecsInputsOperationsUnchanged": true,
+        "browserSpecsImportCorrectedNodeFiles": false,
+        "whole51EqualityClaimed": false,
+        "localBrowserReexecutions": 0
+      }
     }
   },
-  "nextPriority": "7-3第1ゲージACE：既存原文の独立43期待案と、羽黒必須/駆逐exact3の例拘束・C→E図接続を確認する。旧4艦編集6行は空2行を厳密契約として扱い、旧第2G根拠待ちの反復調査や推測変換へ戻らない。",
+  "nextPriority": "7-3第1ACEのA/C判定・説明の出典一致域を先に進める。旧図goalG1/bossP（G2未登録）から実図E/Pへの変更は専用raw目標/履歴互換確認まで別扱いで、7-2G2→Mの流用不可。4艦編集6行は元4×5識別＋index4/5両strict空を契約化する。43期待案未実行・第2G再調査0、原本と旧案を保持。",
   "previousSelected": {
     "id": "7-1/0/default",
     "baselineHead": "9714233e5133e32951781e703567b66c8b0280ec",
@@ -5870,8 +5946,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "7-2 CEG/BCDIM and old sortie-goal/history compatibility locally validated; original11 reused + Wunknown1 complete; source commit/push/finalHEAD smoke pending",
-    "nextUnit": "7-3 index0 ACE source-backed alternatives and graph connection, not second-gauge G evidence wait",
+    "activeUnit": "7-2source6361061a firstCI Node prerequisite failed; grounded legacy7-1 scope corrected with independent7-2 assertions; targetedNode3 firstpass; newHEADsmoke pending, product/browser/local25 unchanged",
+    "nextUnit": "7-3 firstACE A/C predicates and explanations first; E/P graph requires dedicated7-3 raw-history compatibility, not7-2 alias reuse; fourrealships plus two strict blank editorrows",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -5910,9 +5986,42 @@
       "oldInitialFixtureFailureRetained": true,
       "extraSyntheticNodeBeforeRunRetained": true,
       "cellChange": "18/136/82 -> uncommitted20/137/79, 4 cells only",
-      "sourceCommitPushCI": "pending",
+      "sourceCommitPushCI": "6361061a pushed; CI40825717140 failed atNode before all browsers; targeted oracle correction Node3 passed; newHEADsmoke pending",
       "stopConditionsUnchanged": true,
-      "privateValuesShared": false
+      "privateValuesShared": false,
+      "firstSourceCI": {
+        "runId": 40825717140,
+        "head": "6361061af962128a17ab92649b237866a111ac64",
+        "attempt": 1,
+        "conclusion": "failure",
+        "stage": "Node prerequisite before browser launch",
+        "smokeJobs": {
+          "success": 0,
+          "failure": 6
+        },
+        "full": "skipped",
+        "eachJobNode": {
+          "tests": 497,
+          "pass": 496,
+          "fail": 1
+        },
+        "failureTest": "tests/seven-one-routes.test.cjs:47",
+        "assertion": "7-2/0/true",
+        "allOwnCases": 16,
+        "ownCaseState": "all not reached",
+        "playwrightTotals": {
+          "chromium": null,
+          "webkit": null
+        },
+        "playwrightVersionActual": null,
+        "browserRevisionActual": null,
+        "publishedArtifacts": 0,
+        "nodeVersionActual": "24.21.0",
+        "imageDigestPulledObserved": true,
+        "localSuccessesDoNotFillUnreached": true,
+        "positiveNewPreservationMismatchObserved": null
+      },
+      "oracleCorrection": "legacy unchanged50/100 and intentionally revised7-2dedicated assertions corrected; three targetedNode cases firstpass; original CI browser observations remain null/unreached"
     },
     "activeUnitBeforeUpstreamCIFinalization": "new preservation mismatch stop: separate7-1C ready post-edit identity false; six-five validated WIP retained; no new trial/productfix/commit/push/CI",
     "currentBeforeAuthorizedIdentityObservationResume": {
@@ -6002,7 +6111,8 @@
       "commitPlan": "separate six-five/seven-one commits, ordinary push, one smoke at final HEAD; no duplicate automatic/manual run",
       "stopConditionsUnchanged": true,
       "privateValuesShared": false
-    }
+    },
+    "activeUnitBeforeFirstSourceCI": "7-2 CEG/BCDIM and old sortie-goal/history compatibility locally validated; original11 reused + Wunknown1 complete; source commit/push/finalHEAD smoke pending"
   },
   "auditCorrection": {
     "baselineHead": "b2a1427cc199c18dc4a8af128f342bbc024190b1",
