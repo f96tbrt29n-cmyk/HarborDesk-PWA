@@ -267,10 +267,15 @@ function hdSECapabilityStock(plan,kind,targetCount=1){
  options.sort((a,b)=>Number(!!b.usable?.complete)-Number(!!a.usable?.complete)||(ships.length?Number(b.eligible)-Number(a.eligible):0)||Number(b.complete)-Number(a.complete)||b.matched/b.total-a.matched/a.total);
  return options[0]||null;
 }
-function hdSECapabilityHtml(map,fleetId='',proposal=null){
- const profiles=hdSEProfiles(map);if(!profiles.length)return hdSENightPolicyHtml(map);
+function hdSECapabilityHtml(map,fleetId='',proposal=null,selectedPreset=null){
+ // The selected 6-5 route can differ from the saved fleet's example. Legacy
+ // callers remain map-wide; explicit unknown selected routes remain unassessed.
+ const selectedScope=map==='6-5'&&arguments.length>=4,route=selectedScope&&typeof hdMapPresetRequirements==='function'?hdMapPresetRequirements(map,selectedPreset):null;
+ if(selectedScope&&(!route||!['ACDGM','BFIJM'].includes(route.path)||!Array.isArray(route.equipmentKinds)))return `<div class="hd-se-capabilities" data-hd-se-route-scope="manual">${hdSENightPolicyHtml(map)}<strong>選択経路の装備推奨は未判定</strong><p>経路を選び直して装備例の適用範囲を確認してください。未判定のため不足数は表示していません。</p></div>`;
+ const profiles=selectedScope?hdSEProfiles(map).filter(p=>route.equipmentKinds.includes(p.baseKind||p.kind)):hdSEProfiles(map);if(!profiles.length)return hdSENightPolicyHtml(map);
  const fleets=typeof hdSPSFleets==='function'?hdSPSFleets(map):[],fleet=fleetId?fleets.find(x=>String(x.id)===String(fleetId)):(typeof hdSPSFleet==='function'?hdSPSFleet(map):null),plan=proposal||(fleet?hdFEPlanFromSavedFleet(map,fleet):null),esc=hdSEEsc;
- return `<div class="hd-se-capabilities">${hdSENightPolicyHtml(map)}<strong>攻略で用意する装備・組み合わせ</strong><p>通るルートに合わせた推奨装備です。所持・同じ艦への配備・艦種条件を分けて確認します。</p>${profiles.map(p=>{
+ const scopeNote=selectedScope?`<small data-hd-se-route-scope="${esc(route.path)}">選択経路の戦闘上の任意装備例です。1組という目安は通行の必須条件・先制対潜人数・購入数量を表しません。他の目標と同じ艦や枠を使う場合もあります。</small>`:'';
+ return `<div class="hd-se-capabilities">${hdSENightPolicyHtml(map)}<strong>攻略で用意する装備・組み合わせ</strong><p>通るルートに合わせた推奨装備です。所持・同じ艦への配備・艦種条件を分けて確認します。</p>${scopeNote}${profiles.map(p=>{
   const stock=hdSECapabilityStock(plan,p.kind),actual=hdSECapabilityMeasure(plan,p.kind),status=actual.count?'配備済み':stock?.usable?.complete?'手持ちで配備可能':stock?.complete?(plan?'艦種・装備枠の確認が必要':'所持セットあり・艦隊を選んで確認'):'所持不足';
   return `<article class="hd-se-capability ${actual.count?'ready':stock?.complete?'partial':'missing'}" data-hd-se-capability="${p.kind}"><div class="hd-se-check-head"><div><b>${esc(p.label)}</b><small>${esc(p.importance)}</small></div><strong>${esc(status)}</strong></div><p>${esc(p.reason)}</p>${stock?`<b>${esc(stock.recipe.name)}</b><div class="hd-se-cap-parts">${stock.parts.map(part=>{const gap=Math.max(0,part.need-part.have),examples=HD_SE_PARTS[part.part].examples;return `<div class="${gap?'missing':'ready'}"><b>${esc(part.label)}：${part.have}/${part.need}${gap?`・あと${gap}個`:''}</b><span>${esc(part.items.length?'手持ち：'+part.items.join('、'):'候補：'+examples.join(' / '))}</span></div>`}).join('')}</div>`:''}${actual.count?`<p>条件を満たす配備：${esc(actual.ships.join('、'))}</p>`:stock?.usable?.complete?`<p>同じ艦に載せられる候補：${esc(stock.usable.ship)}。下の探索で他の目安との両立を確認してね。</p>`:stock?.complete&&plan?'<p>所持品は揃っていますが、この編成に同じ艦のセットを確認できません。対応艦・スロット・増設枠を見直してね。</p>':''}<details><summary>別の装備例</summary>${(HD_SE_RECIPES[p.kind]||[]).map(r=>`<p>${esc(r.name)}${r.ship==='akizuki'?'（秋月型専用）':''}</p>`).join('')}</details><small>${esc(p.note)}</small><a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">装備条件の出典 ↗</a></article>`;
  }).join('')}</div>`;
