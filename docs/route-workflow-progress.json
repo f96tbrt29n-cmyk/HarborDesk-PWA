@@ -2694,7 +2694,7 @@
     "id": "7-2/0,1/default",
     "baselineHead": "08ae92358c05d23b7d0044e22b3d36f51114623b",
     "evidence": "docs/pr152-seven-two-routes-ja.md",
-    "state": "source6361061a committed/pushed; first CI40825717140 Node prerequisite failed before all browsers; grounded legacy-oracle scope corrected and three targeted Node cases first passed; newHEAD smoke pending; local25 and old gaps retained",
+    "state": "local scoped compatibility implementation complete; corrected-source CI40827828692: five smoke success, W4 cancelled at45m; two own WebKit final failures unclassified because individual exceptions/raw evidence unavailable; no additional diagnosis, speculative repair or success rerun",
     "independentLiterals": 128,
     "sourceLimits": [
       "D CVL source split",
@@ -3123,9 +3123,10 @@
       "previousSevenOneD": "一部; oldWready load unreached not filled"
     },
     "nextCI": {
-      "state": "after concrete oracle correction commit, one newHEAD smoke planned; targeted Node3 passed, corrected CI not started",
-      "previousRunId": 40825717140,
-      "sameHeadRerun": false
+      "state": "one corrected-source smoke collected and closed; no success rerun or records-only manual dispatch",
+      "runId": 40827828692,
+      "head": "0f44f839be65d96b5627fd5951fb05525787c326",
+      "nextObservation": "当該W4の7-2失敗試行で、最初に失敗した操作／アサーションと到達段階を示す個別例外（stack／call log）"
     },
     "stateBeforeFirstSourceCI": "local scoped validation complete; normal12 full after original11 reuse + newWunknown1; new25 targets successful after one grounded fixture correction; ordinary source commit/push/one finalHEAD smoke pending",
     "nextCIBeforeFirstRun": {
@@ -3201,9 +3202,103 @@
         "whole51EqualityClaimed": false,
         "localBrowserReexecutions": 0
       }
+    },
+    "stateBeforeCorrectedSourceCIFinalization": "source6361061a committed/pushed; first CI40825717140 Node prerequisite failed before all browsers; grounded legacy-oracle scope corrected and three targeted Node cases first passed; newHEAD smoke pending; local25 and old gaps retained",
+    "nextCIBeforeCorrectedSourceCIFinalization": {
+      "state": "after concrete oracle correction commit, one newHEAD smoke planned; targeted Node3 passed, corrected CI not started",
+      "previousRunId": 40825717140,
+      "sameHeadRerun": false
+    },
+    "correctedSourceCI": {
+      "runId": 40827828692,
+      "head": "0f44f839be65d96b5627fd5951fb05525787c326",
+      "attempt": 1,
+      "conclusion": "cancelled",
+      "smokeJobs": {
+        "success": 5,
+        "cancelled": 1
+      },
+      "full": "skipped",
+      "W4Cancellation": "job45m limit",
+      "officialPlaywrightCounts": {
+        "chromium": {
+          "initialPass": 871,
+          "retrySuccess": 0,
+          "finalFailure": 0,
+          "skipped": 0
+        },
+        "webkit": {
+          "initialPass": 859,
+          "retrySuccess": 7,
+          "finalFailure": 5,
+          "skipped": 0
+        }
+      },
+      "ownWebKitFinalFailures": [
+        "CEG ready",
+        "BCDIM stock"
+      ],
+      "ownPerAttemptBoundary": null,
+      "ownPreservationObservation": null,
+      "ownRawJSONExpected": 16,
+      "ownRawJSONReceived": 0,
+      "missingMeaning": "Individual exceptions/full logs and own JSON/trace were not received; do not infer hidden operation, storage loss, shared cause, or successful preservation. Local25 and other trials do not fill gaps.",
+      "environment": {
+        "ownReceipts": 6,
+        "Node": "24.21.0",
+        "Playwright": "1.55.0",
+        "ChromiumRevision": "1187",
+        "WebKitRevision": "2203",
+        "all6Match": true,
+        "fullLogsJobs": [
+          "W2",
+          "W3"
+        ],
+        "eachMeasuredNode": {
+          "tests": 497,
+          "pass": 497,
+          "fail": 0
+        },
+        "other4MeasuredNodeCounts": null,
+        "actualImagePullObservedJobs": [
+          "W2",
+          "W3"
+        ]
+      },
+      "artifacts": {
+        "published": 9,
+        "received": 6,
+        "receivedBytes": 292379,
+        "serverSHA256Matches": 6,
+        "outerZipCRCVerified": 6,
+        "over512MiBNotRequested": [
+          {
+            "archive": "C2 attempt",
+            "bytes": 1122916626
+          },
+          {
+            "archive": "W4 attempt",
+            "bytes": 628986804
+          },
+          {
+            "archive": "W4 report",
+            "bytes": 1264043938
+          }
+        ],
+        "failedTraceVideoOriginalsReceived": false,
+        "innerTraceCRC": null
+      },
+      "old636NodeFailureAndBrowserUnreachedPreserved": true,
+      "localSuccessDoesNotFillCIGaps": true,
+      "decision": "stop execution; ownCI all-success incomplete; preserve locally completed compatibility scope without guessed repair or diagnostic repetition",
+      "nextObservation": "当該W4の7-2失敗試行で、最初に失敗した操作／アサーションと到達段階を示す個別例外（stack／call log）",
+      "matrixChanges": 0,
+      "sourceHeadVersusLaterRecordsOnlyHeadSeparated": true,
+      "recordsOnlyManualCIDispatch": false,
+      "existingWorkflowTriggersRetained": true
     }
   },
-  "nextPriority": "7-3第1ACEのA/C判定・説明の出典一致域を先に進める。旧図goalG1/bossP（G2未登録）から実図E/Pへの変更は専用raw目標/履歴互換確認まで別扱いで、7-2G2→Mの流用不可。4艦編集6行は元4×5識別＋index4/5両strict空を契約化する。43期待案未実行・第2G再調査0、原本と旧案を保持。",
+  "nextPriority": "現在は7-2自身WebKit 2最終失敗の個別例外／停止境界が欠測のため実行停止。必要観測は当該試行で最初に失敗した操作／アサーションと到達段階を示すstack／call logの1点。次候補7-3第1ACEは独立草稿7件の静的保持のみ、43＋8期待案未実行・図／sortie-mode／sortie-session／sortie-log不変・4＋2 UI／台帳未完。旧図goalG1/bossPから実図E/Pは専用raw目標／履歴互換まで別扱い、7-2alias流用不可、第2G再調査0。",
   "previousSelected": {
     "id": "7-1/0/default",
     "baselineHead": "9714233e5133e32951781e703567b66c8b0280ec",
@@ -5946,8 +6041,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "7-2source6361061a firstCI Node prerequisite failed; grounded legacy7-1 scope corrected with independent7-2 assertions; targetedNode3 firstpass; newHEADsmoke pending, product/browser/local25 unchanged",
-    "nextUnit": "7-3 firstACE A/C predicates and explanations first; E/P graph requires dedicated7-3 raw-history compatibility, not7-2 alias reuse; fourrealships plus two strict blank editorrows",
+    "activeUnit": "7-2 local compatibility scope complete; CI40827828692 closed five-success/W4cancelled with two own WebKit final failures unclassified; execution stopped pending one individual-exception/first-failure-boundary observation",
+    "nextUnit": "7-3 independent seven-file static draft retained only; 43+8 expectations and4+2UI/ledger not executed/completed; no execution expansion while ownCI boundary remains unclassified",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -5970,7 +6065,7 @@
     "activeUnitBeforePreservationStop": "6-5 upper/lower limited source-backed improvements and normalC/W12 targets completed; records17/137/82 prepared on95c4f3ff; physical14 incl2 prior fixturefailures separate; upstream6-4CI40775006189 pending, owncommit/push/CI not started",
     "current": {
       "date": "2026-10-29",
-      "state": "user-authorized compatibility implementation and required local validation complete; no observed real-user loss",
+      "state": "local scoped compatibility complete; own CI all-success incomplete; two own final failures unclassified; no additional diagnosis/speculative repair/success rerun",
       "baselineHead": "08ae92358c05d23b7d0044e22b3d36f51114623b",
       "record": "docs/pr152-seven-two-routes-ja.md",
       "oldStopRecord": "docs/pr152-seven-two-routes-hold-ja.md",
@@ -5986,7 +6081,7 @@
       "oldInitialFixtureFailureRetained": true,
       "extraSyntheticNodeBeforeRunRetained": true,
       "cellChange": "18/136/82 -> uncommitted20/137/79, 4 cells only",
-      "sourceCommitPushCI": "6361061a pushed; CI40825717140 failed atNode before all browsers; targeted oracle correction Node3 passed; newHEADsmoke pending",
+      "sourceCommitPushCI": "0f44f839 ordinary pushed; corrected-source CI40827828692 closed five smoke success/W4 cancelled at45m; own WebKit CEGready/BCDIMstock final failures lack individual boundary evidence",
       "stopConditionsUnchanged": true,
       "privateValuesShared": false,
       "firstSourceCI": {
@@ -6021,7 +6116,103 @@
         "localSuccessesDoNotFillUnreached": true,
         "positiveNewPreservationMismatchObserved": null
       },
-      "oracleCorrection": "legacy unchanged50/100 and intentionally revised7-2dedicated assertions corrected; three targetedNode cases firstpass; original CI browser observations remain null/unreached"
+      "oracleCorrection": "legacy unchanged50/100 and intentionally revised7-2dedicated assertions corrected; three targetedNode cases firstpass; original CI browser observations remain null/unreached",
+      "stateBeforeCorrectedSourceCIFinalization": "user-authorized compatibility implementation and required local validation complete; no observed real-user loss",
+      "sourceCommitPushCIBeforeFinalization": "6361061a pushed; CI40825717140 failed atNode before all browsers; targeted oracle correction Node3 passed; newHEADsmoke pending",
+      "correctedSourceCI": {
+        "runId": 40827828692,
+        "head": "0f44f839be65d96b5627fd5951fb05525787c326",
+        "attempt": 1,
+        "conclusion": "cancelled",
+        "smokeJobs": {
+          "success": 5,
+          "cancelled": 1
+        },
+        "full": "skipped",
+        "W4Cancellation": "job45m limit",
+        "officialPlaywrightCounts": {
+          "chromium": {
+            "initialPass": 871,
+            "retrySuccess": 0,
+            "finalFailure": 0,
+            "skipped": 0
+          },
+          "webkit": {
+            "initialPass": 859,
+            "retrySuccess": 7,
+            "finalFailure": 5,
+            "skipped": 0
+          }
+        },
+        "ownWebKitFinalFailures": [
+          "CEG ready",
+          "BCDIM stock"
+        ],
+        "ownPerAttemptBoundary": null,
+        "ownPreservationObservation": null,
+        "ownRawJSONExpected": 16,
+        "ownRawJSONReceived": 0,
+        "missingMeaning": "Individual exceptions/full logs and own JSON/trace were not received; do not infer hidden operation, storage loss, shared cause, or successful preservation. Local25 and other trials do not fill gaps.",
+        "environment": {
+          "ownReceipts": 6,
+          "Node": "24.21.0",
+          "Playwright": "1.55.0",
+          "ChromiumRevision": "1187",
+          "WebKitRevision": "2203",
+          "all6Match": true,
+          "fullLogsJobs": [
+            "W2",
+            "W3"
+          ],
+          "eachMeasuredNode": {
+            "tests": 497,
+            "pass": 497,
+            "fail": 0
+          },
+          "other4MeasuredNodeCounts": null,
+          "actualImagePullObservedJobs": [
+            "W2",
+            "W3"
+          ]
+        },
+        "artifacts": {
+          "published": 9,
+          "received": 6,
+          "receivedBytes": 292379,
+          "serverSHA256Matches": 6,
+          "outerZipCRCVerified": 6,
+          "over512MiBNotRequested": [
+            {
+              "archive": "C2 attempt",
+              "bytes": 1122916626
+            },
+            {
+              "archive": "W4 attempt",
+              "bytes": 628986804
+            },
+            {
+              "archive": "W4 report",
+              "bytes": 1264043938
+            }
+          ],
+          "failedTraceVideoOriginalsReceived": false,
+          "innerTraceCRC": null
+        },
+        "old636NodeFailureAndBrowserUnreachedPreserved": true,
+        "localSuccessDoesNotFillCIGaps": true,
+        "decision": "stop execution; ownCI all-success incomplete; preserve locally completed compatibility scope without guessed repair or diagnostic repetition",
+        "nextObservation": "当該W4の7-2失敗試行で、最初に失敗した操作／アサーションと到達段階を示す個別例外（stack／call log）",
+        "matrixChanges": 0,
+        "sourceHeadVersusLaterRecordsOnlyHeadSeparated": true,
+        "recordsOnlyManualCIDispatch": false,
+        "existingWorkflowTriggersRetained": true
+      },
+      "stopDecision": {
+        "reason": "cannot classify two own final failures from obtained originals",
+        "nextObservation": "当該W4の7-2失敗試行で、最初に失敗した操作／アサーションと到達段階を示す個別例外（stack／call log）",
+        "independentNextDraft": "seven-three seven files static only; no execution expansion",
+        "newTestsOrCIForMissingEvidence": false
+      }
     },
     "activeUnitBeforeUpstreamCIFinalization": "new preservation mismatch stop: separate7-1C ready post-edit identity false; six-five validated WIP retained; no new trial/productfix/commit/push/CI",
     "currentBeforeAuthorizedIdentityObservationResume": {
@@ -6112,7 +6303,8 @@
       "stopConditionsUnchanged": true,
       "privateValuesShared": false
     },
-    "activeUnitBeforeFirstSourceCI": "7-2 CEG/BCDIM and old sortie-goal/history compatibility locally validated; original11 reused + Wunknown1 complete; source commit/push/finalHEAD smoke pending"
+    "activeUnitBeforeFirstSourceCI": "7-2 CEG/BCDIM and old sortie-goal/history compatibility locally validated; original11 reused + Wunknown1 complete; source commit/push/finalHEAD smoke pending",
+    "activeUnitBeforeCorrectedSourceCIFinalization": "7-2source6361061a firstCI Node prerequisite failed; grounded legacy7-1 scope corrected with independent7-2 assertions; targetedNode3 firstpass; newHEADsmoke pending, product/browser/local25 unchanged"
   },
   "auditCorrection": {
     "baselineHead": "b2a1427cc199c18dc4a8af128f342bbc024190b1",
