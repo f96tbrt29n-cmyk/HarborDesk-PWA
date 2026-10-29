@@ -1,3 +1,6 @@
+> 最新追記（2026-10-29）：利用者の互換対応指示で再開し、旧目標／履歴の原文保持と新図表示を分離して局所確認まで完了した。旧途中履歴を新経路へ変換するものではない。[今回の対応・失敗原本と検証範囲](pr152-seven-two-routes-ja.md)。この時点で最終commit/CIは未開始。
+> 以下の停止経路・コード参照行は **08ae92358c05d23b7d0044e22b3d36f51114623b時点** の履歴である。現在の実装行とは一致しない。[旧sortie-mode.jsの固定参照](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/blob/08ae92358c05d23b7d0044e22b3d36f51114623b/sortie-mode.js#L93)。当時の原文はそのまま保持する。
+
 # 7-2準備差分の保存互換停止
 
 6-5と7-1は別commitでHEAD `84533636e21857d380eb22ea1b3c544be6c0dd69`へ反映済み。[CI40803882877](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/40803882877)は6smoke成功、公式C863初回／0retry／0最終失敗・W851／12／0。7-1局所W成立のload最終比較未到達とD一部、旧試行・成果物欠測はこの成功で補完しない。

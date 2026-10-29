@@ -38,6 +38,7 @@ function hdSMNodeRows(map){
 }
 function hdSMNextNodeRows(map,draft){
  const graph=hdSMGraph(map);if(!graph||!Array.isArray(graph.edges))return [];
+ if((String(draft?.node||'').trim()||(Array.isArray(draft?.routeNodes)&&draft.routeNodes.length))&&hdSMRetainedRoute({map,draft}))return [];
  const current=String(draft?.node||'').trim();
  const from=current?[current]:hdSMStartLabels(graph);
  const labels=[...new Set(graph.edges.filter(([a])=>from.includes(a)).map(([,b])=>b))];
@@ -90,12 +91,45 @@ function hdSMCanReachBoss(map,label,target){
  }
  return false;
 }
+function hdSMCompatibilityMap(map){return String(map||'')==='7-2'}
+function hdSMRealRoute(map){
+ const graph=hdSMGraph(map);
+ return String(map||'')==='7-2'&&Array.isArray(graph?.bosses)&&graph.bosses.includes('G')&&graph.bosses.includes('M');
+}
+function hdSMRetainedRoute(session){
+ return !!session&&hdSMCompatibilityMap(session.map)&&(!hdSMRealRoute(session.map)||session.draft?.routeGraph!=='7-2-real-v1');
+}
+function hdSMObjectiveState(map,value){
+ const raw=value;
+ if(value===undefined)return {raw,target:'',status:'unselected'};
+ if(value==='')return {raw,target:'',status:'cleared'};
+ if(typeof value!=='string')return {raw,target:'',status:'unknown'};
+ const chosen=value.trim(),allowed=hdSMObjectiveOptions(map).map(x=>x.label);
+ if(allowed.includes(chosen))return {raw,target:chosen,status:'current'};
+ const target=hdSMRealRoute(map)?({G1:'G',G2:'M'}[chosen]||''):'';
+ return target&&allowed.includes(target)?{raw,target,status:'legacy'}:{raw,target:'',status:'unknown'};
+}
+function hdSMObjectiveNoticeHtml(map,value){
+ if(!hdSMCompatibilityMap(map))return '';
+ if(!hdSMRealRoute(map))return '<p data-hd-sm-legacy-objective="unknown">図の確認待ちです。旧目標・通過履歴を保持し、現在図への対応を確認するまで進行候補は表示しません。</p>';
+ const state=hdSMObjectiveState(map,value);
+ if(state.status==='legacy')return '<p data-hd-sm-legacy-objective="legacy">旧目標 '+hdSMEsc(state.raw)+' を現在の '+hdSMEsc(state.target)+'ボスとして表示しています。保存した目標IDや通過履歴は変更しません。</p>';
+ if(state.status==='unknown')return '<p data-hd-sm-legacy-objective="unknown">旧目標・再選択が必要です。現在図への対応を確認できないため、自動の目標には置き換えず、元の保存値を保持しています。</p>';
+ if(state.status==='cleared')return '<p data-hd-sm-objective-cleared>目標は明示的に解除されています（自動）。</p>';
+ return '';
+}
 function hdSMObjectiveTargets(map,target){
+ if(hdSMCompatibilityMap(map)){
+  const state=hdSMObjectiveState(map,target);
+  return state.status==='unknown'?[]:state.target?[state.target]:hdSMObjectiveOptions(map).map(x=>x.label);
+ }
  const graph=hdSMGraph(map),all=[...new Set([graph?.goal,graph?.boss].map(String).map(x=>x.trim()).filter(Boolean))],chosen=String(target||'').trim();
  return chosen&&all.includes(chosen)?[chosen]:all;
 }
 function hdSMObjectiveOptions(map){
  const graph=hdSMGraph(map),out=[];
+ if(hdSMCompatibilityMap(map)&&!hdSMRealRoute(map))return [];
+ if(hdSMRealRoute(map))return [...new Set(graph.bosses.filter(x=>typeof x==='string'&&x.trim()).map(x=>x.trim()))].map(label=>({label,type:'boss',name:label+' ボス'}));
  const goal=String(graph?.goal||'').trim(),boss=String(graph?.boss||'').trim();
  if(goal)out.push({label:goal,type:'goal',name:goal+' 到達地点'});
  if(boss&&boss!==goal)out.push({label:boss,type:'boss',name:boss+' ボス'});
@@ -156,10 +190,23 @@ function hdSMObjectivePrefs(){
  try{const x=JSON.parse(localStorage.getItem(HD_SM_OBJECTIVE_PREF_KEY)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch{return {}}
 }
 function hdSMObjectivePreference(map){
- const chosen=String(hdSMObjectivePrefs()[String(map||'')]||'').trim(),allowed=hdSMObjectiveTargets(map);
+ const prefs=hdSMObjectivePrefs(),key=String(map||'');
+ if(hdSMCompatibilityMap(map))return Object.prototype.hasOwnProperty.call(prefs,key)?prefs[key]:undefined;
+ const chosen=String(prefs[key]||'').trim(),allowed=hdSMObjectiveTargets(map);
  return allowed.includes(chosen)?chosen:'';
 }
 function hdSMSaveObjectivePreference(map,target){
+ if(hdSMCompatibilityMap(map)){
+  if(typeof target!=='string')return undefined;
+  const state=hdSMObjectiveState(map,target);
+  if(state.status==='unknown')return undefined;
+  try{
+   const raw=localStorage.getItem(HD_SM_OBJECTIVE_PREF_KEY),prefs=raw===null?{}:JSON.parse(raw);
+   if(!prefs||typeof prefs!=='object'||Array.isArray(prefs))return undefined;
+   prefs[String(map||'')]=target;
+   localStorage.setItem(HD_SM_OBJECTIVE_PREF_KEY,JSON.stringify(prefs));return target;
+  }catch{return undefined}
+ }
  const key=String(map||''),chosen=String(target||'').trim(),allowed=hdSMObjectiveTargets(map),objectiveTarget=allowed.includes(chosen)?chosen:'';
  try{
   const prefs=hdSMObjectivePrefs();
@@ -169,25 +216,32 @@ function hdSMSaveObjectivePreference(map,target){
  return objectiveTarget;
 }
 function hdSMSetObjectivePreference(map,target){
- hdSMSaveObjectivePreference(map,target);hdSMRender();return true;
+ const saved=hdSMSaveObjectivePreference(map,target);
+ if(hdSMCompatibilityMap(map)&&saved===undefined)return false;
+ hdSMRender();return true;
 }
 function hdSMObjectivePrestartHtml(map){
- const options=hdSMObjectiveOptions(map);if(options.length<2)return '';
- const selected=hdSMObjectivePreference(map),autoText=hdSMObjectiveStatText(map,'');
- return '<div class="hd-sm-objective-picker prestart"><div><span>OBJECTIVE</span><b>出撃目標</b><small>開始前に選択／次回も記憶</small></div><div><button type="button" class="'+(!selected?'active':'')+'" data-hd-sm-pre-objective="" data-hd-sm-objective-map="'+hdSMEsc(map)+'"><b>自動</b><small>'+hdSMEsc(autoText)+'</small></button>'+options.map(x=>'<button type="button" class="'+(selected===x.label?'active':'')+'" data-hd-sm-pre-objective="'+hdSMEsc(x.label)+'" data-hd-sm-objective-map="'+hdSMEsc(map)+'"><b>'+hdSMEsc(x.name)+'</b><small>'+hdSMEsc(hdSMObjectiveStatText(map,x.label))+'</small></button>').join('')+'</div></div>';
+ const options=hdSMObjectiveOptions(map);if(options.length<2&&!hdSMCompatibilityMap(map))return '';
+ const raw=hdSMObjectivePreference(map),state=hdSMObjectiveState(map,raw),selected=hdSMCompatibilityMap(map)?state.target:raw,autoSelected=hdSMCompatibilityMap(map)?['unselected','cleared'].includes(state.status):!selected,autoText=hdSMObjectiveStatText(map,'');
+ return '<div class="hd-sm-objective-picker prestart"'+(hdSMCompatibilityMap(map)?' data-hd-sm-objective-status="'+state.status+'"':'')+'><div><span>OBJECTIVE</span><b>出撃目標</b><small>開始前に選択／次回も記憶</small></div><div><button type="button" class="'+(autoSelected?'active':'')+'" data-hd-sm-pre-objective="" data-hd-sm-objective-map="'+hdSMEsc(map)+'"><b>自動</b><small>'+hdSMEsc(autoText)+'</small></button>'+options.map(x=>'<button type="button" class="'+(selected===x.label?'active':'')+'" data-hd-sm-pre-objective="'+hdSMEsc(x.label)+'" data-hd-sm-objective-map="'+hdSMEsc(map)+'"><b>'+hdSMEsc(x.name)+'</b><small>'+hdSMEsc(hdSMObjectiveStatText(map,x.label))+'</small></button>').join('')+'</div>'+hdSMObjectiveNoticeHtml(map,raw)+'</div>';
 }
 function hdSMPrestartRoutePreviewHtml(map){
  const options=hdSMObjectiveOptions(map);if(options.length<2)return '';
- const target=hdSMObjectivePreference(map),targetName=hdSMRouteTargetName(map,target),next=hdSMNextNodeRows(map,{node:'',routeNodes:[]}),path=hdSMObjectiveShortestPath(map,target);
+ const target=hdSMObjectivePreference(map),targetName=hdSMRouteTargetName(map,target),state=hdSMObjectiveState(map,target),next=hdSMNextNodeRows(map,{node:'',routeNodes:[]}),path=hdSMObjectiveShortestPath(map,target);
  if(!next.length)return '';
  const pathHtml=path.length?'<p class="hd-sm-pre-route-path"><b>構造図最短</b><span>'+path.map(hdSMEsc).join(' → ')+'</span></p>':'';
- return '<div class="hd-sm-pre-route"><div><span>START ROUTE</span><b>構造図上の開始候補</b><small>'+hdSMEsc(target?targetName:'自動（攻略目標）')+' 基準</small></div><div>'+next.map(x=>{const reachable=hdSMCanReachBoss(map,x.label,target),intel=hdSMNodeIntel(map,x),status=reachable===true?'接続':reachable===false?'逸れ候補':'経路不明';return '<span class="'+(reachable===false?'off':reachable===true?'on':'unknown')+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(intel.kind))+'</small><em>'+hdSMEsc(status)+'</em></span>'}).join('')+'</div>'+pathHtml+'<p>実際の分岐は編成・索敵・確率条件で変わるため、攻略概要の条件も確認してね。</p></div>';
+ return '<div class="hd-sm-pre-route"><div><span>START ROUTE</span><b>構造図上の開始候補</b><small>'+hdSMEsc(hdSMCompatibilityMap(map)?(['unselected','cleared'].includes(state.status)?'自動（攻略目標）':targetName):(target?targetName:'自動（攻略目標）'))+' 基準</small></div><div>'+next.map(x=>{const reachable=hdSMCanReachBoss(map,x.label,target),intel=hdSMNodeIntel(map,x),status=reachable===true?'接続':reachable===false?'逸れ候補':'経路不明';return '<span class="'+(reachable===false?'off':reachable===true?'on':'unknown')+'"><b>'+hdSMEsc(x.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(intel.kind))+'</small><em>'+hdSMEsc(status)+'</em></span>'}).join('')+'</div>'+pathHtml+'<p>実際の分岐は編成・索敵・確率条件で変わるため、攻略概要の条件も確認してね。</p></div>';
 }
 function hdSMSelectedObjective(map,draft){
+ if(hdSMCompatibilityMap(map))return draft&&Object.prototype.hasOwnProperty.call(draft,'objectiveTarget')?draft.objectiveTarget:undefined;
  const chosen=String(draft?.objectiveTarget||'').trim(),targets=hdSMObjectiveTargets(map);
  return targets.includes(chosen)?chosen:'';
 }
 function hdSMRouteTargetName(map,target){
+ if(hdSMCompatibilityMap(map)){
+  const state=hdSMObjectiveState(map,target);
+  return state.status==='unknown'?'旧目標（再選択が必要）':state.target?state.target+'ボス':'攻略目標';
+ }
  const graph=hdSMGraph(map),chosen=String(target||'').trim();
  if(chosen&&chosen===String(graph?.goal||'').trim())return chosen+'到達地点';
  if(chosen&&chosen===String(graph?.boss||'').trim())return chosen+'ボス';
@@ -195,12 +249,13 @@ function hdSMRouteTargetName(map,target){
  return hasBoss&&hasGoal?'攻略目標':hasBoss?'ボス':hasGoal?'到達地点':'目標';
 }
 function hdSMObjectivePickerHtml(map,draft){
- const options=hdSMObjectiveOptions(map);if(options.length<2)return '';
- const selected=hdSMSelectedObjective(map,draft);
- return '<div class="hd-sm-objective-picker"><div><span>OBJECTIVE</span><b>今回の攻略目標</b><small>距離・経路判定／次回も記憶</small></div><div><button type="button" class="'+(!selected?'active':'')+'" data-hd-sm-objective="">自動</button>'+options.map(x=>'<button type="button" class="'+(selected===x.label?'active':'')+'" data-hd-sm-objective="'+hdSMEsc(x.label)+'">'+hdSMEsc(x.name)+'</button>').join('')+'</div></div>';
+ const options=hdSMObjectiveOptions(map);if(options.length<2&&!hdSMCompatibilityMap(map))return '';
+ const raw=hdSMSelectedObjective(map,draft),state=hdSMObjectiveState(map,raw),selected=hdSMCompatibilityMap(map)?state.target:raw,autoSelected=hdSMCompatibilityMap(map)?['unselected','cleared'].includes(state.status):!selected;
+ return '<div class="hd-sm-objective-picker"'+(hdSMCompatibilityMap(map)?' data-hd-sm-objective-status="'+state.status+'"':'')+'><div><span>OBJECTIVE</span><b>今回の攻略目標</b><small>距離・経路判定／次回も記憶</small></div><div><button type="button" class="'+(autoSelected?'active':'')+'" data-hd-sm-objective="">自動</button>'+options.map(x=>'<button type="button" class="'+(selected===x.label?'active':'')+'" data-hd-sm-objective="'+hdSMEsc(x.label)+'">'+hdSMEsc(x.name)+'</button>').join('')+'</div>'+hdSMObjectiveNoticeHtml(map,raw)+'</div>';
 }
 function hdSMObjectiveRouteState(map,draft){
  const current=String(draft?.node||'').trim(),target=hdSMSelectedObjective(map,draft);
+ if(hdSMCompatibilityMap(map)&&(hdSMRetainedRoute({map,draft})||hdSMObjectiveState(map,target).status==='unknown'))return {active:false,current,target,unresolved:true,legacy:hdSMRetainedRoute({map,draft}),alternatives:[]};
  if(!current||!target)return {active:false,current,target,alternatives:[]};
  const reachable=hdSMCanReachBoss(map,current,target);
  if(reachable!==false)return {active:false,current,target,reachable,alternatives:[]};
@@ -213,7 +268,10 @@ function hdSMObjectiveRouteWarningHtml(map,draft){
 }
 function hdSMSetObjectiveTarget(target){
  const session=hdSMSession();if(!session||session.status!=='active')return false;
+ const real=hdSMCompatibilityMap(session.map);
+ if(real&&Object.prototype.hasOwnProperty.call(session,'draft')&&session.draft!==undefined&&(!session.draft||typeof session.draft!=='object'||Array.isArray(session.draft)))return false;
  const prev=session.draft&&typeof session.draft==='object'?session.draft:{},objectiveTarget=hdSMSaveObjectivePreference(session.map,target);
+ if(real&&objectiveTarget===undefined)return false;
  session.draft={...prev,objectiveTarget,updatedAt:Date.now()};
  try{if(typeof window.hdSSSave==='function')window.hdSSSave(session);else localStorage.setItem(HD_SM_SESSION_KEY,JSON.stringify(session))}catch{return false}
  try{window.dispatchEvent(new CustomEvent('hd:sortie-draft-saved',{detail:{sessionId:session.id,draft:session.draft}}))}catch{}
@@ -316,6 +374,7 @@ function hdSMNextNodeButtonHtml(map,row,locked=false,objectiveTarget='',bestLabe
  return '<button type="button" class="hd-sm-next '+hdSMEsc(intel.kind)+(best?' best-route':'')+(locked?' locked':'')+'" data-hd-sm-next-node="'+hdSMEsc(intel.label)+'"'+(locked?' disabled aria-disabled="true"':'')+'><b>'+hdSMEsc(intel.label)+'</b><small>'+hdSMEsc(hdSMNodeKindLabel(intel.kind))+'</small><i>'+(locked?'確認待ち':'次へ')+'</i><span class="hd-sm-next-risk">'+hdSMEsc(intel.badge)+'</span><span class="hd-sm-next-formation">基本陣形 '+hdSMEsc(intel.formation)+'</span><span class="hd-sm-next-route '+(reachable===false?'off':reachable===true?'on':'unknown')+'">'+routeLabel+(best?'・最少戦闘候補':'')+'</span>'+(remaining?'<span class="hd-sm-next-remaining">'+remaining+'</span>':'')+(deltaLabel?'<span class="hd-sm-next-delta '+(delta?.best?'best':'')+'">'+hdSMEsc(deltaLabel)+'</span>':'')+'<span class="hd-sm-next-caution">'+hdSMEsc(intel.caution)+'</span><em>'+hdSMEsc(detail)+'</em></button>';
 }
 function hdSMCurrentTacticHtml(map,draft){
+ if(hdSMRetainedRoute({map,draft}))return '';
  const current=String(draft?.node||'').trim();if(!current)return '';
  const graph=hdSMGraph(map),rawKind=hdSMNodeKind(graph,current),intel=hdSMNodeIntel(map,{label:current,kind:rawKind}),kind=intel.kind,nonBattle=['item','safe','vortex','goal'].includes(kind);
  const guideLabel=nonBattle?'NODE GUIDE':'BATTLE GUIDE',pointLabel=nonBattle?'確認ポイント':'警戒ポイント';
@@ -346,6 +405,7 @@ function hdSMAdvanceGuard(session,draft){
  return {required:true,current,confirmed:!!(same&&row.safe===true),retreat:!!(same&&row.safe===false),skipped:false,at:same?Math.max(0,Number(row.at)||0):0,startHp:hdSMStartHpState(session)};
 }
 function hdSMAdvanceGuardHtml(session,draft){
+ if(hdSMRetainedRoute(session))return '';
  const g=hdSMAdvanceGuard(session,draft);if(!g.required)return '';
  const hp=g.startHp||{},critical=hp.critical||[],damaged=hp.damaged||[];
  let startHp='';
@@ -359,7 +419,7 @@ function hdSMAdvanceGuardHtml(session,draft){
  return '<div class="hd-sm-advance-guard '+state+'"><div class="hd-sm-advance-head"><div><span>ADVANCE CHECK</span><strong>'+hdSMEsc(title)+'</strong></div><b>'+hdSMEsc(g.current)+'マス後</b></div><p>'+hdSMEsc(desc)+'</p>'+startHp+'<div class="hd-sm-advance-actions"><button type="button" class="primary" data-hd-sm-safe-confirm>大破なしを確認</button><button type="button" class="ghost hd-sm-retreat-btn" data-hd-sm-damage-retreat>大破あり・撤退</button></div>'+(g.at?'<small class="hd-sm-advance-time">確認 '+hdSMEsc(new Date(g.at).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}))+'</small>':'')+'</div>';
 }
 function hdSMSetAdvanceGuard(safe){
- const session=hdSMSession();if(!session||session.status!=='active')return false;
+ const session=hdSMSession();if(!session||session.status!=='active'||hdSMRetainedRoute(session))return false;
  const prev=session.draft&&typeof session.draft==='object'?session.draft:{},node=String(prev.node||document.getElementById('hdSMNode')?.value||'').trim();if(!node)return false;
  const at=Date.now(),next={...prev,...hdSMFormData(),advanceGuard:{node,safe:!!safe,at},updatedAt:at};
  if(!safe){
@@ -372,6 +432,7 @@ function hdSMSetAdvanceGuard(safe){
  hdSMRender();return true;
 }
 function hdSMHudHtml(session,draft){
+ if(hdSMRetainedRoute(session))return '';
  const current=String(draft?.node||'').trim();if(!current)return '';
  const graph=hdSMGraph(session?.map),rawKind=hdSMNodeKind(graph,current),intel=hdSMNodeIntel(session?.map,{label:current,kind:rawKind}),kind=intel.kind,guard=hdSMAdvanceGuard(session,draft),branch=hdSMBranchHint(session?.map,draft);
  const state=guard.retreat?'stop':guard.confirmed?'ready':'warn',status=guard.retreat?'撤退':guard.skipped?'非戦闘':guard.confirmed?'大破確認済':'大破未確認',jump=guard.confirmed?'next':'guard';
@@ -404,6 +465,7 @@ function hdSMQuickRetreatReason(reason){
  result.value='撤退';if(boss)boss.checked=false;el.value=String(reason||'その他');hdSMSaveDraft();hdSMRender();return true;
 }
 function hdSMQuickBoss(){
+ if(hdSMRetainedRoute(hdSMSession()))return false;
  const el=document.getElementById('hdSMBoss');if(!el)return false;el.checked=!el.checked;hdSMSaveDraft();hdSMRender();return true;
 }
 function hdSMQuickDropNone(){
@@ -439,13 +501,22 @@ function hdSMIdleHtml(){
  return '<div class="hd-sm-idle"><div class="hd-sm-map"><span>選択海域</span><strong>'+hdSMEsc(map)+' '+hdSMEsc(d.name||'')+'</strong></div>'+hdSMObjectivePrestartHtml(map)+hdSMPrestartRoutePreviewHtml(map)+'<div class="hd-sm-status '+(ready?'ready':'warn')+'"><div><span>'+hdSMEsc(row.strategyLabel||'手動編成')+'</span><strong>'+hdSMEsc(row.fleet&&row.fleet.name||'名称なし')+'</strong><small>'+(Number(s.shipCount)||0)+'隻</small></div><b>'+(ready?'出撃前確認済み':'未確認あり')+'</b></div>'+hdSMReadinessHtml({autoOk:s.autoOk,autoTotal:s.autoTotal,manualDone:s.manualDone,manualTotal:s.manualTotal,unresolved:s.unresolved})+'<div class="hd-sm-actions"><button type="button" class="primary" data-hd-sm-start>この編成で出撃開始</button><button type="button" class="ghost" data-hd-sm-prep>出撃準備表</button><button type="button" class="ghost" data-hd-sm-guide>海域攻略</button></div><p class="hd-sm-note">開始すると、その時点の艦隊・装備・確認状態を固定して出撃中画面へ切り替えるよ。</p></div>';
 }
 function hdSMDraft(session){
- const d=session&&session.draft&&typeof session.draft==='object'?session.draft:{};
- const routeNodes=Array.isArray(d.routeNodes)?d.routeNodes.map(String).filter(Boolean).slice(-40):[];
+ const d=session&&session.draft&&typeof session.draft==='object'?session.draft:{},retained=hdSMRetainedRoute(session);
+ const routeNodes=Array.isArray(d.routeNodes)?(retained?d.routeNodes:d.routeNodes.map(String).filter(Boolean).slice(-40)):[];
  const storedBattles=(d.battles==null||d.battles==='')?1:Math.max(0,Number.isFinite(Number(d.battles))?Number(d.battles):1);
- const battles=routeNodes.length?hdSMBattleCount(session?.map,routeNodes):storedBattles;
- return {result:String(d.result||'S'),node:String(d.node||''),battles,boss:!!d.boss,drop:String(d.drop||''),buckets:Math.max(0,Number(d.buckets)||0),fuel:Math.max(0,Number(d.fuel)||0),ammo:Math.max(0,Number(d.ammo)||0),steel:Math.max(0,Number(d.steel)||0),bauxite:Math.max(0,Number(d.bauxite)||0),memo:String(d.memo||''),retreatReason:String(d.retreatReason||''),objectiveTarget:String(d.objectiveTarget||''),updatedAt:Math.max(0,Number(d.updatedAt)||0),routeNodes,advanceGuard:d.advanceGuard&&typeof d.advanceGuard==='object'?{node:String(d.advanceGuard.node||''),safe:d.advanceGuard.safe===true,at:Math.max(0,Number(d.advanceGuard.at)||0)}:null};
+ const battles=!retained&&routeNodes.length?hdSMBattleCount(session?.map,routeNodes):storedBattles;
+ const out={result:String(d.result||'S'),node:String(d.node||''),battles,boss:!!d.boss,drop:String(d.drop||''),buckets:Math.max(0,Number(d.buckets)||0),fuel:Math.max(0,Number(d.fuel)||0),ammo:Math.max(0,Number(d.ammo)||0),steel:Math.max(0,Number(d.steel)||0),bauxite:Math.max(0,Number(d.bauxite)||0),memo:String(d.memo||''),retreatReason:String(d.retreatReason||''),objectiveTarget:hdSMCompatibilityMap(session?.map)?d.objectiveTarget:String(d.objectiveTarget||''),updatedAt:Math.max(0,Number(d.updatedAt)||0),routeNodes,advanceGuard:d.advanceGuard&&typeof d.advanceGuard==='object'?{node:String(d.advanceGuard.node||''),safe:d.advanceGuard.safe===true,at:Math.max(0,Number(d.advanceGuard.at)||0)}:null};
+ if(hdSMCompatibilityMap(session?.map)){
+  if(Object.prototype.hasOwnProperty.call(d,'objectiveTarget'))out.objectiveTarget=d.objectiveTarget;else delete out.objectiveTarget;
+  if(Object.prototype.hasOwnProperty.call(d,'routeGraph'))out.routeGraph=d.routeGraph;
+ }
+ return out;
 }
 function hdSMNodePickerHtml(session,draft){
+ if(hdSMRetainedRoute(session)){
+  const route=Array.isArray(draft?.routeNodes)?draft.routeNodes:[];
+  return '<div class="hd-sm-panel" data-hd-sm-legacy-route>'+hdSMObjectivePickerHtml(session.map,draft)+'<strong>旧図の通過履歴を保持しています</strong><p>現在図への対応が未確認のため、進行候補と履歴を戻す操作は保留します。目標の再選択でも通過履歴は変更しません。メモと帰還結果は保存できます。</p><p>旧到達マス '+hdSMEsc(draft?.node||'未記録')+' ／ 保存戦闘数 '+hdSMEsc(draft?.battles)+'</p>'+(route.length?'<div class="hd-sm-route-trail"><span>旧履歴</span><b>'+route.map(hdSMEsc).join(' → ')+'</b></div>':'<p>旧履歴は未記録です。</p>')+'</div>';
+ }
  const rows=hdSMNodeRows(session?.map),route=draft?.routeNodes||[],current=String(draft?.node||''),next=hdSMNextNodeRows(session?.map,draft),guard=hdSMAdvanceGuard(session,draft),locked=guard.required&&!guard.confirmed,objectiveTarget=hdSMSelectedObjective(session?.map,draft),bestRoute=hdSMNextRouteRank(session?.map,draft,next);
  if(!rows.length)return '';
  const nextTitle=current?'次に進める候補':'最初の進行候補';
@@ -459,7 +530,8 @@ function hdSMResultOptions(current){
  return ['S','A','B','C','D','撤退'].map(function(v){return '<option'+(current===v?' selected':'')+'>'+v+'</option>'}).join('');
 }
 function hdSMActiveHtml(session){
- const d=hdSMMapDetail(session.map),started=Number(session.startedAt)||Date.now(),draft=hdSMDraft(session);
+ if(hdSMRetainedRoute(session)&&Object.prototype.hasOwnProperty.call(session,'draft')&&session.draft!==undefined&&(!session.draft||typeof session.draft!=='object'||Array.isArray(session.draft)))return '<div class="hd-sm-active" data-hd-sm-legacy-invalid><strong>旧形式を確認できないため、元の記録を保持しています</strong><p>編集と帰還記録は保留します。保存済みの目標・通過履歴を初期化したり、自動の目標へ置き換えたりしません。</p></div>';
+ const d=hdSMMapDetail(session.map),started=Number(session.startedAt)||Date.now(),draft=hdSMDraft(session),retained=hdSMRetainedRoute(session);
  const draftStatus=draft.updatedAt?'保存 '+new Date(draft.updatedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}):'入力は自動保存';
  return '<div class="hd-sm-active"><div class="hd-sm-command"><div><span>出撃中</span><strong>'+hdSMEsc(session.map)+' '+hdSMEsc(d.name||'')+'</strong><small>'+hdSMEsc(session.fleetName||'名称なし')+'｜'+hdSMEsc(session.strategyLabel||'手動編成')+'</small></div><div class="hd-sm-clock"><span>経過</span><b data-hd-sm-elapsed>'+hdSMElapsed(Date.now()-started)+'</b><small>'+hdSMEsc(new Date(started).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}))+'開始</small></div></div>'+
  hdSMHudHtml(session,draft)+
@@ -467,7 +539,7 @@ function hdSMActiveHtml(session){
  hdSMNodePickerHtml(session,draft)+
  '<div class="hd-sm-panel"><div class="hd-sm-panel-head"><strong>開始時の艦隊</strong><span>出撃中にプリセットを変えてもここは固定</span></div>'+hdSMFleetHtml(session)+'</div>'+
  '<div class="hd-sm-panel"><div class="hd-sm-panel-head"><strong>出撃中ショートカット</strong><span>必要な情報だけすぐ開く</span></div><div class="hd-sm-shortcuts"><button type="button" data-hd-sm-action="map">マップ</button><button type="button" data-hd-sm-action="overview">攻略概要</button><button type="button" data-hd-sm-action="gear">装備</button><button type="button" data-hd-sm-action="prep">準備表</button><button type="button" data-hd-sm-action="log">出撃ログ</button></div></div>'+
- '<div class="hd-sm-panel hd-sm-return"><div class="hd-sm-panel-head"><strong>帰還結果</strong><span data-hd-sm-draft-status>'+hdSMEsc(draftStatus)+'</span></div><div class="hd-sm-result-quick"><button type="button" data-hd-sm-quick-result="S">S勝利</button><button type="button" data-hd-sm-quick-result="A">A勝利</button><button type="button" data-hd-sm-quick-result="B">B勝利</button><button type="button" data-hd-sm-quick-result="撤退">撤退</button><button type="button" data-hd-sm-quick-boss>ボス到達</button><button type="button" data-hd-sm-quick-drop-none>ドロップなし</button><button type="button" data-hd-sm-quick-bucket="+1">バケツ +1</button></div><input id="hdSMRetreatReason" type="hidden" value="'+hdSMEsc(draft.retreatReason)+'"><div class="hd-sm-retreat-reasons '+(draft.result==='撤退'?'show':'')+'"><span>撤退理由</span><div><button type="button" data-hd-sm-retreat-reason="大破">大破</button><button type="button" data-hd-sm-retreat-reason="索敵不足">索敵不足</button><button type="button" data-hd-sm-retreat-reason="ルート逸れ">ルート逸れ</button><button type="button" data-hd-sm-retreat-reason="火力不足">火力不足</button><button type="button" data-hd-sm-retreat-reason="制空不足">制空不足</button><button type="button" data-hd-sm-retreat-reason="その他">その他</button></div>'+(draft.retreatReason?'<small>選択中: '+hdSMEsc(draft.retreatReason)+'</small>':'')+'</div><div class="hd-sm-form"><label>結果<select id="hdSMResult">'+hdSMResultOptions(draft.result)+'</select></label><label>到達マス<input id="hdSMNode" value="'+hdSMEsc(draft.node)+'" placeholder="例 ボス / P"></label><label>戦闘数<input id="hdSMBattles" type="number" min="0" max="20" value="'+draft.battles+'"></label><label class="check"><input id="hdSMBoss" type="checkbox"'+(draft.boss?' checked':'')+'>ボス到達</label><label>ドロップ<input id="hdSMDrop" value="'+hdSMEsc(draft.drop)+'" placeholder="艦名など"></label><label>バケツ<input id="hdSMBuckets" type="number" min="0" value="'+draft.buckets+'"></label><label class="wide">メモ<input id="hdSMMemo" value="'+hdSMEsc(draft.memo)+'" placeholder="撤退原因、装備変更など"></label></div><details class="hd-sm-cost"'+((draft.fuel||draft.ammo||draft.steel||draft.bauxite)?' open':'')+'><summary>資源消費も記録</summary><div><label>燃料<input id="hdSMFuel" type="number" min="0" value="'+draft.fuel+'"></label><label>弾薬<input id="hdSMAmmo" type="number" min="0" value="'+draft.ammo+'"></label><label>鋼材<input id="hdSMSteel" type="number" min="0" value="'+draft.steel+'"></label><label>ボーキ<input id="hdSMBauxite" type="number" min="0" value="'+draft.bauxite+'"></label></div></details><div class="hd-sm-finish-actions"><button type="button" class="primary" data-hd-sm-finish>帰還結果を記録</button><button type="button" class="ghost" data-hd-sm-cancel>セッションを破棄</button></div></div><p class="hd-sm-note">入力内容はこの出撃セッションへ自動保存。戦闘数は通過した戦闘マスから自動更新するよ。</p></div>';
+ '<div class="hd-sm-panel hd-sm-return"><div class="hd-sm-panel-head"><strong>帰還結果</strong><span data-hd-sm-draft-status>'+hdSMEsc(draftStatus)+'</span></div><div class="hd-sm-result-quick"><button type="button" data-hd-sm-quick-result="S">S勝利</button><button type="button" data-hd-sm-quick-result="A">A勝利</button><button type="button" data-hd-sm-quick-result="B">B勝利</button><button type="button" data-hd-sm-quick-result="撤退">撤退</button><button type="button" data-hd-sm-quick-boss'+(retained?' disabled aria-disabled="true"':'')+'>ボス到達</button><button type="button" data-hd-sm-quick-drop-none>ドロップなし</button><button type="button" data-hd-sm-quick-bucket="+1">バケツ +1</button></div><input id="hdSMRetreatReason" type="hidden" value="'+hdSMEsc(draft.retreatReason)+'"><div class="hd-sm-retreat-reasons '+(draft.result==='撤退'?'show':'')+'"><span>撤退理由</span><div><button type="button" data-hd-sm-retreat-reason="大破">大破</button><button type="button" data-hd-sm-retreat-reason="索敵不足">索敵不足</button><button type="button" data-hd-sm-retreat-reason="ルート逸れ">ルート逸れ</button><button type="button" data-hd-sm-retreat-reason="火力不足">火力不足</button><button type="button" data-hd-sm-retreat-reason="制空不足">制空不足</button><button type="button" data-hd-sm-retreat-reason="その他">その他</button></div>'+(draft.retreatReason?'<small>選択中: '+hdSMEsc(draft.retreatReason)+'</small>':'')+'</div><div class="hd-sm-form"><label>結果<select id="hdSMResult">'+hdSMResultOptions(draft.result)+'</select></label><label>到達マス<input id="hdSMNode"'+(retained?' disabled aria-disabled="true"':'')+' value="'+hdSMEsc(draft.node)+'" placeholder="例 ボス / P"></label><label>戦闘数<input id="hdSMBattles"'+(retained?' disabled aria-disabled="true"':'')+' type="number" min="0" max="20" value="'+hdSMEsc(draft.battles)+'"></label><label class="check"><input id="hdSMBoss"'+(retained?' disabled aria-disabled="true"':'')+' type="checkbox"'+(draft.boss?' checked':'')+'>ボス到達</label><label>ドロップ<input id="hdSMDrop" value="'+hdSMEsc(draft.drop)+'" placeholder="艦名など"></label><label>バケツ<input id="hdSMBuckets" type="number" min="0" value="'+draft.buckets+'"></label><label class="wide">メモ<input id="hdSMMemo" value="'+hdSMEsc(draft.memo)+'" placeholder="撤退原因、装備変更など"></label></div><details class="hd-sm-cost"'+((draft.fuel||draft.ammo||draft.steel||draft.bauxite)?' open':'')+'><summary>資源消費も記録</summary><div><label>燃料<input id="hdSMFuel" type="number" min="0" value="'+draft.fuel+'"></label><label>弾薬<input id="hdSMAmmo" type="number" min="0" value="'+draft.ammo+'"></label><label>鋼材<input id="hdSMSteel" type="number" min="0" value="'+draft.steel+'"></label><label>ボーキ<input id="hdSMBauxite" type="number" min="0" value="'+draft.bauxite+'"></label></div></details><div class="hd-sm-finish-actions"><button type="button" class="primary" data-hd-sm-finish>帰還結果を記録</button><button type="button" class="ghost" data-hd-sm-cancel>セッションを破棄</button></div></div><p class="hd-sm-note">'+(retained?'入力内容を保存し、旧図の目標・通過履歴・保存戦闘数を保持します。':'入力内容はこの出撃セッションへ自動保存。戦闘数は通過した戦闘マスから自動更新するよ。')+'</p></div>';
 }
 function hdSMEnsure(){
  let sec=document.getElementById('hdSortieMode');if(sec)return sec;
@@ -493,13 +565,44 @@ function hdSMOpen(){
 function hdSMNum(id){return Math.max(0,Number(document.getElementById(id)?.value)||0)}
 function hdSMFormData(){
  const result=document.getElementById('hdSMResult')?.value||'S',session=hdSMSession();
- return {result,node:document.getElementById('hdSMNode')?.value||'',battles:hdSMNum('hdSMBattles'),boss:!!document.getElementById('hdSMBoss')?.checked,drop:document.getElementById('hdSMDrop')?.value||'',buckets:hdSMNum('hdSMBuckets'),fuel:hdSMNum('hdSMFuel'),ammo:hdSMNum('hdSMAmmo'),steel:hdSMNum('hdSMSteel'),bauxite:hdSMNum('hdSMBauxite'),memo:document.getElementById('hdSMMemo')?.value||'',retreatReason:result==='撤退'?(document.getElementById('hdSMRetreatReason')?.value||''):'',objectiveTarget:hdSMSelectedObjective(session?.map,session?.draft)};
+ const form={result,node:document.getElementById('hdSMNode')?.value||'',battles:hdSMNum('hdSMBattles'),boss:!!document.getElementById('hdSMBoss')?.checked,drop:document.getElementById('hdSMDrop')?.value||'',buckets:hdSMNum('hdSMBuckets'),fuel:hdSMNum('hdSMFuel'),ammo:hdSMNum('hdSMAmmo'),steel:hdSMNum('hdSMSteel'),bauxite:hdSMNum('hdSMBauxite'),memo:document.getElementById('hdSMMemo')?.value||'',retreatReason:result==='撤退'?(document.getElementById('hdSMRetreatReason')?.value||''):''};
+ if(hdSMCompatibilityMap(session?.map)){
+  const d=session?.draft;
+  if(hdSMRetainedRoute(session)&&result===String(d?.result||'S')&&result!=='撤退'){
+   if(d&&Object.prototype.hasOwnProperty.call(d,'retreatReason'))form.retreatReason=d.retreatReason;else delete form.retreatReason;
+  }
+  for(const key of (hdSMRetainedRoute(session)?['objectiveTarget','node','battles','boss']:['objectiveTarget'])){
+   if(d&&Object.prototype.hasOwnProperty.call(d,key))form[key]=d[key];else delete form[key];
+  }
+ }else form.objectiveTarget=hdSMSelectedObjective(session?.map,session?.draft);
+ return form;
 }
 let hdSMDraftTimer=0;
 function hdSMSaveDraft(){
  const session=hdSMSession();if(!session||session.status!=='active'||!document.getElementById('hdSMResult'))return false;
- const prev=session.draft&&typeof session.draft==='object'?session.draft:{},routeNodes=Array.isArray(prev.routeNodes)?prev.routeNodes.map(String).filter(Boolean).slice(-40):[],form=hdSMFormData();
- const draft={...prev,...form,routeNodes,battles:routeNodes.length?hdSMBattleCount(session.map,routeNodes):form.battles};draft.updatedAt=Date.now();session.draft=draft;
+ const retained=hdSMRetainedRoute(session);
+ if(retained&&Object.prototype.hasOwnProperty.call(session,'draft')&&session.draft!==undefined&&(!session.draft||typeof session.draft!=='object'||Array.isArray(session.draft)))return false;
+ const prev=session.draft&&typeof session.draft==='object'?session.draft:{},form=hdSMFormData(),draft={...prev,...form};
+ if(retained){
+  const shown=hdSMDraft(session);
+  for(const key of Object.keys(form))if(form[key]===shown[key]){
+   if(Object.prototype.hasOwnProperty.call(prev,key))draft[key]=prev[key];else delete draft[key];
+  }
+  for(const key of ['objectiveTarget','node','routeNodes','battles','boss','advanceGuard','routeGraph']){
+   if(Object.prototype.hasOwnProperty.call(prev,key))draft[key]=prev[key];else delete draft[key];
+  }
+  if(form.result===String(prev.result||'S')&&form.result!=='撤退'){
+   if(Object.prototype.hasOwnProperty.call(prev,'retreatReason'))draft.retreatReason=prev.retreatReason;else delete draft.retreatReason;
+  }
+  if(JSON.stringify(draft)===JSON.stringify(prev))return true;
+ }else{
+  const routeNodes=Array.isArray(prev.routeNodes)?prev.routeNodes.map(String).filter(Boolean).slice(-40):[];
+  draft.routeNodes=routeNodes;draft.battles=routeNodes.length?hdSMBattleCount(session.map,routeNodes):form.battles;
+ }
+ if(hdSMCompatibilityMap(session.map)){
+  if(Object.prototype.hasOwnProperty.call(prev,'objectiveTarget'))draft.objectiveTarget=prev.objectiveTarget;else delete draft.objectiveTarget;
+ }
+ draft.updatedAt=Date.now();session.draft=draft;
  try{if(typeof window.hdSSSave==='function')window.hdSSSave(session);else localStorage.setItem(HD_SM_SESSION_KEY,JSON.stringify(session))}catch{return false}
  const status=document.querySelector('[data-hd-sm-draft-status]');if(status)status.textContent='保存 '+new Date(draft.updatedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
  try{window.dispatchEvent(new CustomEvent('hd:sortie-draft-saved',{detail:{sessionId:session.id,draft}}))}catch{}
@@ -507,23 +610,26 @@ function hdSMSaveDraft(){
 }
 function hdSMScheduleDraft(){clearTimeout(hdSMDraftTimer);hdSMDraftTimer=setTimeout(hdSMSaveDraft,180)}
 function hdSMSetNode(label){
- clearTimeout(hdSMDraftTimer);label=String(label||'').trim();const session=hdSMSession();if(!label||!session||session.status!=='active')return false;
+ const session=hdSMSession();if(hdSMRetainedRoute(session))return false;
+ clearTimeout(hdSMDraftTimer);label=String(label||'').trim();if(!label||!session||session.status!=='active')return false;
  const prev=session.draft&&typeof session.draft==='object'?session.draft:{},current=String(prev.node||'').trim(),guard=hdSMAdvanceGuard(session,prev);
  if(current&&label!==current&&guard.required&&!guard.confirmed){window.hdToast?.('進撃前に大破チェックを済ませてね','warn',1800);return false}
  const input=document.getElementById('hdSMNode'),boss=document.getElementById('hdSMBoss'),graph=hdSMGraph(session.map);
- if(input)input.value=label;if(boss)boss.checked=!!(graph&&graph.boss===label);
+ const isBoss=hdSMRealRoute(session.map)?hdSMNodeKind(graph,label)==='boss':!!(graph&&graph.boss===label);
+ if(input)input.value=label;if(boss)boss.checked=isBoss;
  const route=Array.isArray(prev.routeNodes)?prev.routeNodes.map(String).filter(Boolean).slice(-39):[];
  if(route[route.length-1]!==label)route.push(label);
- session.draft={...prev,...hdSMFormData(),node:label,boss:!!(graph&&graph.boss===label),battles:hdSMBattleCount(session.map,route),routeNodes:route,advanceGuard:null,updatedAt:Date.now()};
+ session.draft={...prev,...hdSMFormData(),node:label,boss:isBoss,battles:hdSMBattleCount(session.map,route),routeNodes:route,advanceGuard:null,updatedAt:Date.now()};
  try{if(typeof window.hdSSSave==='function')window.hdSSSave(session);else localStorage.setItem(HD_SM_SESSION_KEY,JSON.stringify(session))}catch{return false}
  try{window.dispatchEvent(new CustomEvent('hd:sortie-draft-saved',{detail:{sessionId:session.id,draft:session.draft}}))}catch{}
  hdSMRender();return true;
 }
 function hdSMUndoNode(){
- clearTimeout(hdSMDraftTimer);const session=hdSMSession();if(!session||session.status!=='active')return false;
+ const session=hdSMSession();if(hdSMRetainedRoute(session))return false;
+ clearTimeout(hdSMDraftTimer);if(!session||session.status!=='active')return false;
  const prev=session.draft&&typeof session.draft==='object'?session.draft:{},route=Array.isArray(prev.routeNodes)?prev.routeNodes.map(String).filter(Boolean):[];
  if(!route.length)return false;route.pop();const node=route[route.length-1]||'',graph=hdSMGraph(session.map);
- session.draft={...prev,node,boss:!!(node&&graph&&graph.boss===node),battles:hdSMBattleCount(session.map,route),routeNodes:route.slice(-40),advanceGuard:null,updatedAt:Date.now()};
+ session.draft={...prev,node,boss:hdSMRealRoute(session.map)?!!node&&hdSMNodeKind(graph,node)==='boss':!!(node&&graph&&graph.boss===node),battles:hdSMBattleCount(session.map,route),routeNodes:route.slice(-40),advanceGuard:null,updatedAt:Date.now()};
  try{if(typeof window.hdSSSave==='function')window.hdSSSave(session);else localStorage.setItem(HD_SM_SESSION_KEY,JSON.stringify(session))}catch{return false}
  try{window.dispatchEvent(new CustomEvent('hd:sortie-draft-saved',{detail:{sessionId:session.id,draft:session.draft}}))}catch{}
  hdSMRender();return true;
@@ -604,6 +710,10 @@ window.hdSMNextRouteRank=hdSMNextRouteRank;
 window.hdSMNextRouteDelta=hdSMNextRouteDelta;
 window.hdSMNextRouteDeltaLabel=hdSMNextRouteDeltaLabel;
 window.hdSMRouteTargetName=hdSMRouteTargetName;
+window.hdSMCompatibilityMap=hdSMCompatibilityMap;
+window.hdSMRealRoute=hdSMRealRoute;
+window.hdSMRetainedRoute=hdSMRetainedRoute;
+window.hdSMObjectiveState=hdSMObjectiveState;
 window.hdSMObjectiveTargets=hdSMObjectiveTargets;
 window.hdSMObjectiveOptions=hdSMObjectiveOptions;
 window.hdSMObjectivePrefs=hdSMObjectivePrefs;

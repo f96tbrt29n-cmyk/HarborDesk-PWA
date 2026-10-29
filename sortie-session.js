@@ -10,10 +10,21 @@ function hdSSLoad(){try{return JSON.parse(localStorage.getItem(HD_SS_KEY)||'null
 function hdSSSave(v){if(v)localStorage.setItem(HD_SS_KEY,JSON.stringify(v));else localStorage.removeItem(HD_SS_KEY)}
 function hdSSPostLoad(){try{return JSON.parse(localStorage.getItem(HD_SS_POST_KEY)||'null')}catch{return null}}
 function hdSSPostSave(v){if(v)localStorage.setItem(HD_SS_POST_KEY,JSON.stringify(v));else localStorage.removeItem(HD_SS_POST_KEY)}
+function hdSSRealRoute(map){
+ const graph=typeof HD_MAP_GRAPHS!=='undefined'?HD_MAP_GRAPHS[String(map||'')]:null;
+ return String(map||'')==='7-2'&&Array.isArray(graph?.bosses)&&graph.bosses.includes('G')&&graph.bosses.includes('M');
+}
 function hdSSObjectivePrefs(){try{const x=JSON.parse(localStorage.getItem(HD_SS_OBJECTIVE_PREF_KEY)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch{return {}}}
 function hdSSObjectivePref(map){return String(hdSSObjectivePrefs()[String(map||'')]||'').trim()}
 function hdSSApplyObjectivePref(session,map){
  if(!session)return session;
+ if(String(map||'')==='7-2'){
+  if(Object.prototype.hasOwnProperty.call(session,'draft')&&session.draft!==undefined&&(!session.draft||typeof session.draft!=='object'||Array.isArray(session.draft)))return session;
+  if(session.draft&&Object.prototype.hasOwnProperty.call(session.draft,'objectiveTarget'))return session;
+  const prefs=hdSSObjectivePrefs(),key=String(map||'');
+  if(Object.prototype.hasOwnProperty.call(prefs,key))session.draft={...(session.draft||{}),objectiveTarget:prefs[key]};
+  return session;
+ }
  const objectiveTarget=hdSSObjectivePref(map);
  if(objectiveTarget)session.draft={...(session.draft||{}),objectiveTarget};
  return session;
@@ -221,7 +232,8 @@ function hdSSSnapshot(map){
   fleetSnapshot:{id:fleet.id,name:fleet.name||'',strategy:strategy,strategyLabel:hdSSStrategyLabel(fleet),ships:JSON.parse(JSON.stringify(fleet.ships||[])),memo:fleet.memo||''},
   readinessSnapshot:{autoOk:stats.autoOk,autoTotal:stats.autoTotal,manualDone:stats.manualDone,manualTotal:stats.manualTotal,unresolved:(stats.unresolved||[]).map(function(x){return {label:x.label||'',state:x.state||'',detail:x.detail||''}}),gate:{state:gate.state,label:gate.label,detail:gate.detail,hardBlock:gate.hardBlock,actions:gate.actions.slice(0,8).map(x=>({id:x.id||'',action:x.action||'',detail:x.detail||''}))}},
   telemetrySnapshot:telemetry,
-  shipCount:stats.shipCount,status:'active'
+  shipCount:stats.shipCount,status:'active',
+  ...(hdSSRealRoute(map)?{draft:{routeGraph:'7-2-real-v1'}}:{})
  };
 }
 function hdSSEmit(action,detail={}){try{window.dispatchEvent(new CustomEvent('hd:sortie-session-changed',{detail:{action,...detail}}))}catch{}}
@@ -246,6 +258,9 @@ function hdSSDuration(ms){
 }
 function hdSSFinish(data){
  const session=hdSSLoad();if(!session||typeof hdSLRecordEntry!=='function')return null;
+ const compat=String(session.map||'')==='7-2',rawTarget=session.draft?.objectiveTarget,retained=compat&&(!hdSSRealRoute(session.map)||session.draft?.routeGraph!=='7-2-real-v1');
+ const preserveTarget=compat&&rawTarget!==undefined&&rawTarget!==''&&(typeof rawTarget!=='string'||!['G','M'].includes(rawTarget));
+ if(retained&&Object.prototype.hasOwnProperty.call(session,'draft')&&session.draft!==undefined&&(!session.draft||typeof session.draft!=='object'||Array.isArray(session.draft)))return null;
  const at=Date.now(),retreat=data?.retreat!=null?!!data.retreat:String(data?.result||'')==='撤退',result=retreat?'撤退':(data&&data.result||'S'),memoParts=[];
  if(session.strategyLabel)memoParts.push(session.strategyLabel);
  if(data&&String(data.memo||'').trim())memoParts.push(String(data.memo).trim());
@@ -253,7 +268,7 @@ function hdSSFinish(data){
   map:session.map,node:data&&data.node||'',result,boss:!!(data&&data.boss),retreat,
   battles:Math.max(0,Number(data&&data.battles)||0),drop:data&&data.drop||'',buckets:Math.max(0,Number(data&&data.buckets)||0),
   fuel:Math.max(0,Number(data&&data.fuel)||0),ammo:Math.max(0,Number(data&&data.ammo)||0),steel:Math.max(0,Number(data&&data.steel)||0),bauxite:Math.max(0,Number(data&&data.bauxite)||0),
-  memo:memoParts.join('｜'),retreatReason:String(data&&data.retreatReason||''),objectiveTarget:String(data&&data.objectiveTarget||''),sessionId:session.id,fleetId:session.fleetId,fleetName:session.fleetName,strategy:session.strategy,strategyLabel:session.strategyLabel,
+  memo:memoParts.join('｜'),retreatReason:String(data&&data.retreatReason||''),objectiveTarget:compat?(typeof rawTarget==='string'?rawTarget:''):String(data&&data.objectiveTarget||''),sessionId:session.id,fleetId:session.fleetId,fleetName:session.fleetName,strategy:session.strategy,strategyLabel:session.strategyLabel,
   seriesId:String(session.seriesId||session.id),cycleIndex:Math.max(1,Number(session.cycleIndex)||1),previousSessionId:String(session.previousSessionId||''),previousEntryId:String(session.previousEntryId||''),
   startedAt:session.startedAt,durationMs:Math.max(0,at-session.startedAt),fleetSnapshot:session.fleetSnapshot,readinessSnapshot:session.readinessSnapshot
  };
@@ -261,6 +276,11 @@ function hdSSFinish(data){
   if(data?.[k]!=null)input[k]=data[k];
  }
  if(data?.huntId!=null)input.huntId=data.huntId;if(data?.huntShip!=null)input.huntShip=data.huntShip;if(data?.targetObtained!=null)input.targetObtained=!!data.targetObtained;
+ if(retained||preserveTarget){
+  const status=rawTarget===undefined?'unselected':rawTarget===''?'cleared':!hdSSRealRoute(session.map)||typeof rawTarget!=='string'?'unknown':['G1','G2'].includes(rawTarget.trim())?'legacy':['G','M'].includes(rawTarget.trim())?'current':'unknown';
+  input.legacyRouteSnapshot={status,session:JSON.parse(JSON.stringify(session))};
+  input.objectiveTarget=typeof session.draft?.objectiveTarget==='string'?session.draft.objectiveTarget:'';
+ }
  const entry=hdSLRecordEntry(input);
  if(!entry)return null;
  hdSSPostSave({version:1,status:'awaiting-sync',sessionId:session.id,map:session.map,fleetId:session.fleetId,fleetName:session.fleetName,seriesId:String(session.seriesId||session.id),cycleIndex:Math.max(1,Number(session.cycleIndex)||1),previousSessionId:String(session.previousSessionId||''),previousEntryId:String(session.previousEntryId||''),finishedAt:at,entryId:String(entry.id||''),fleetSnapshot:session.fleetSnapshot,startTelemetry:session.telemetrySnapshot||null,gameMatched:!!data?.gameSortieKey});

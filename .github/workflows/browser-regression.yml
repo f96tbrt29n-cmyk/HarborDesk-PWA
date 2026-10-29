@@ -126,6 +126,7 @@ jobs:
             test-results/**/north-los-ui.json
             test-results/**/air-target-evidence.json
             test-results/**/route-guidance-evidence.json
+            test-results/**/sortie-compatibility-evidence.json
             test-results/**/pwa-registration-state.json
             test-results/**/pwa-registration-continuation.json
             test-results/**/registration-route-result.json

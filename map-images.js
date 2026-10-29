@@ -32,7 +32,7 @@ const HD_MAP_GRAPHS={
 '6-4':{edges:[['S1','A'],['S1','B'],['S2','M'],['A','D'],['A','E'],['B','D'],['E','D'],['E','G'],['D','C'],['C','F'],['F','N'],['M','K'],['K','H'],['K','J'],['H','J'],['J','L'],['J','N'],['J','I'],['L','I'],['I','N']],boss:'N',air:['D','F','G','I'],note:'取得原図で方向を確認できた20辺を表示。D/Gの接続は方向未確認のため有向線から除外し、地図全体の分岐検証済みとはしない。'},
 '6-5':{edges:[['S1','A'],['S2','B'],['A','C'],['B','C'],['B','F'],['C','D'],['C','E'],['D','G'],['E','H'],['E','I'],['F','I'],['H','G'],['G','K'],['G','M'],['I','H'],['I','J'],['J','L'],['J','M']],boss:'M',sub:['B','E'],air:['G','H'],night:['J'],safe:['K','L'],note:'取得原図の18有向辺と2始点を表示。図の整合を全分岐・配備・実操作の確認済みとはしない。'},
 '7-1':{edges:[['S','B'],['S','D'],['S','F'],['B','A'],['B','C'],['D','C'],['D','E'],['E','G'],['F','G'],['G','H'],['H','I'],['H','J'],['H','K']],boss:'K',sub:['D','F','H'],items:['E','I'],vortex:['A'],safe:['J'],note:'分岐表と明示経路で方向を確認した13辺を表示。原図のA-C/C-Eは方向未確認として有向線へ加えず、図の整合を全分岐・配備・実操作の確認済みとはしない。'},
-'7-2':{edges:[['S','A'],['A','B'],['B','C'],['C','G1'],['S2','D'],['D','E'],['E','F'],['F','I'],['I','G2']],boss:'G2',goal:'G1',sub:['A','B']},
+'7-2':{edges:[['S','A'],['S','B'],['S','C'],['A','B'],['B','C'],['C','D'],['C','E'],['D','H'],['D','I'],['E','F'],['E','G'],['H','I'],['I','J'],['I','L'],['I','M'],['J','K']],boss:'M',bosses:['G','M'],sub:['C','E'],air:['H'],vortex:['A'],items:['K'],safe:['D','F','L'],note:'共通始点S・実ボスG/Mの取得原図16有向辺。CEGとBCDIMの選択接続を示すが、当月の第1破壊による開放状態・艦種分岐・索敵安全域・配備・実操作を確認済みとはしない。I→Lの線を63未満の確定逸れの根拠にしない。'},
 '7-3':{edges:[['S','A'],['A','C'],['C','D'],['D','G1'],['S2','B'],['B','E'],['E','F'],['F','G'],['G','P']],boss:'P',goal:'G1'},
 '7-4':{edges:[['S','A'],['A','B'],['A','C'],['B','D'],['C','E'],['D','F'],['E','F'],['F','J'],['J','K'],['K','P']],boss:'P',sub:['A','B','C','D'],air:['J']},
 '7-5':{edges:[['S','A'],['A','B'],['B','C'],['C','G1'],['G1','D'],['D','E'],['E','M'],['M','Q'],['Q','G2'],['G2','R'],['R','T']],boss:'T',goal:'G1',note:'第1ゲージ→ギミック→第2ゲージ→第3ゲージの段階攻略を簡略表示'}
@@ -48,7 +48,7 @@ window.hdMapStartLabels=hdMapStartLabels;
 window.hdMapIsStartLabel=hdMapIsStartLabel;
 function hdMapKind(graph,label){
  if(hdMapIsStartLabel(graph,label))return 'start';
- if(graph.boss===label)return 'boss';
+ if(graph.boss===label||(Array.isArray(graph.bosses)&&graph.bosses.includes(label)))return 'boss';
  if(graph.goal===label)return 'goal';
  if((graph.items||[]).includes(label))return 'item';
  if((graph.sub||[]).includes(label))return 'sub';

@@ -1,0 +1,64 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const root=path.resolve(__dirname,'..'),legacyCapabilityRenderer=require('./fixtures/seven-two-legacy-capability-renderer.cjs');
+function load(file,name,c){const s=fs.readFileSync(path.join(root,file),'utf8'),a=s.indexOf('function '+name+'('),b=s.indexOf('\nfunction ',a+1);assert.ok(a>=0,name);vm.runInNewContext(s.slice(a,b<0?undefined:b),c);return c[name]}
+function aswContext(){
+ const items=[{name:'三式水中探信儀',category:'小型ソナー'},{name:'三式爆雷投射機',category:'爆雷投射機'}];
+ const hulls={軽巡候補:{type:'軽巡洋艦',profile:{id:1,count:3,slots:[0,0,0],flags:[]}},駆逐候補:{type:'駆逐艦',profile:{id:2,count:3,slots:[0,0,0],flags:[]}},海防候補:{type:'海防艦',profile:{id:3,count:2,slots:[0,0],flags:[]}},一枠艦:{type:'駆逐艦',profile:{id:4,count:1,slots:[0],flags:[]}},同一枠のみ:{type:'駆逐艦',profile:{id:5,count:2,slots:[0,0],flags:[]}},分離枠:{type:'駆逐艦',profile:{id:6,count:2,slots:[0,0],flags:[]}},未登録枠:{type:'海防艦'}};
+ let inventory=new Map(items.map(item=>[item.name,{key:item.name+'@@0',name:item.name,item,star:0,count:4}]));
+ const c={hdFEEsc:x=>String(x).replaceAll('<','&lt;').replaceAll('>','&gt;'),HD_SE_PARTS:{sonar:{label:'ソナー',examples:['三式水中探信儀']},projector:{label:'爆雷投射機',examples:['三式爆雷投射機']}},HD_SE_RECIPES:{'cap-asw':[{id:'sonar-projector',name:'ソナー＋爆雷投射機',parts:['sonar','projector']}]},HD_FE_AIR_CATS:new Set(),hdFLCatalog:()=>items,hdSEPartMatches:(part,item)=>({'小型ソナー':'sonar','爆雷投射機':'projector'})[(item.item||item).category]===part,hdFEFindShip:name=>hulls[name],hdShipDbSlotProfile:db=>db.profile||null,hdShipDbMasterCompatible:()=>null,HD_SLOT_EXCLUSION_RULES:[{shipIds:[5],slot:1,allowOnly:[6]},{shipIds:[6],slot:0,allowOnly:[14,15]},{shipIds:[6],slot:1,allowOnly:[14]}],hdShipDbPickerTypeId:item=>({'小型ソナー':14,'爆雷投射機':15})[item.category],hdFERouteRequirementData:p=>({path:p.path||({'7-2':'CEG','7-1':'DEGHK','6-5':'BFIJM','4-1':'CFDGJ / ABDGJ'}[p.map])}),hdFLInventory:()=>inventory,hdFERosterForShip:()=>null,hdFLHasExpansion:()=>false};
+ for(const name of ['hdShipDbSlotRules','hdShipDbSlotRejects','hdShipDbEquipCompatible'])load('ship-database.js',name,c);
+ for(const name of ['hdSERecipeAllows','hdSERecipeParts','hdSECapabilityStock'])load('sortie-equipment-check.js',name,c);
+ for(const name of ['hdOCCompatible','hdOCFourOneAswTargets','hdOCCapabilityStockHtml','hdOCStockGap','hdOCProcurementHtml'])load('owned-equipment-planner.js',name,c);
+ return {c,emptyInventory(){inventory=new Map()}};
+}
+function carrierContext(){
+ const items=[{name:'流星',category:'艦上攻撃機'},{name:'彗星',category:'艦上爆撃機'},{name:'零式水上観測機',category:'水上偵察機'}];
+ const hulls={赤城改:{type:'正規空母',profile:{id:1,count:3,slots:[20,0,10],flags:[]}},加賀改:{type:'正規空母',profile:{id:2,count:3,slots:[20,0,12],flags:[]}},鳥海改二:{type:'重巡洋艦',profile:{id:3,count:4,slots:[3,3,3,3],flags:[]}},長門改二:{type:'戦艦',profile:{id:4,count:4,slots:[3,3,6,3],flags:[]}},空母枠不明:{type:'正規空母'},空母搭載不明:{type:'正規空母',profile:{id:5,count:2,slots:[null,NaN],flags:[]}},空母搭載零:{type:'正規空母',profile:{id:6,count:2,slots:[0,0],flags:[]}},空母制限枠:{type:'正規空母',profile:{id:7,count:2,slots:[10,10],flags:[]}}};
+ const c={hdFEEsc:String,HD_SE_PARTS:{carrierAttackPlane:{examples:['流星','彗星']}},HD_FE_AIR_CATS:new Set(['艦上攻撃機','艦上爆撃機','水上偵察機']),hdFLCatalog:()=>items,hdSEPartMatches:(part,item)=>part==='carrierAttackPlane'&&['艦上攻撃機','艦上爆撃機'].includes(item.category),hdFEFindShip:name=>hulls[name],hdShipDbSlotProfile:db=>db.profile||null,hdShipDbMasterCompatible:()=>null,HD_SLOT_EXCLUSION_RULES:[{shipIds:[7],slot:0,allowOnly:[9]},{shipIds:[7],slot:1,allowOnly:[9]}],hdShipDbPickerTypeId:item=>({'艦上攻撃機':8,'艦上爆撃機':7,'水上偵察機':10})[item.category],hdFERouteRequirementData:p=>({path:p.path||({'7-2':'BCDIM','6-5':'ACDGM','6-2':'CEJK','5-5':'BKPS','5-2':'BCEFO','5-1':'BCFJ','4-5':'ADHKT / CDHKT','3-3':'ACGM'}[p.map])}),hdSECapabilityMeasure:p=>({count:p.ships.filter(s=>s.items?.some(i=>['流星','彗星'].includes(i.name))).length})};
+ for(const name of ['hdShipDbSlotRules','hdShipDbSlotRejects','hdShipDbEquipCompatible'])load('ship-database.js',name,c);
+ for(const name of ['hdOCCompatible','hdOCThreeThreeCarrierTargets','hdOCCapabilityStockHtml'])load('owned-equipment-planner.js',name,c);return c;
+}
+const aswGoal={kind:'cap-asw',minCount:4,generatedFromMap:true,purpose:'recommendation'},attackGoal={kind:'cap-carrier-attack',minCount:2,generatedFromMap:true,purpose:'recommendation'};
+const aswPlan=()=>({map:'7-2',path:'CEG',ships:['軽巡候補','駆逐候補','海防候補'].map(ship=>({ship,items:[]}))});
+test('7-2 selected ASW targets keep aggregate comparison4 and one-pair distinct-slot hull examples',()=>{
+ const {c}=aswContext(),p=aswPlan(),stock=c.hdSECapabilityStock(p,'cap-asw',4),before=JSON.stringify([p,aswGoal,stock]);
+ assert.deepEqual(Array.from(stock.parts,x=>[x.part,x.need,x.have]),[['sonar',4,4],['projector',4,4]]);assert.equal(stock.usable.total,2);
+ for(const path of ['CEG','BCDIM']){const rows=c.hdOCFourOneAswTargets({...p,path},aswGoal,stock);assert.deepEqual(Array.from(rows,x=>[x.ship,x.status]),[['軽巡候補','candidate'],['駆逐候補','candidate'],['海防候補','candidate']]);for(const row of rows){assert.deepEqual(Array.from(row.parts,x=>[x.part,x.count]),[['sonar',1],['projector',1]]);assert.ok(row.parts[0].slots.some(a=>row.parts[1].slots.some(b=>a.index!==b.index)))}}
+ for(const [q,g,t]of [[{...p,path:'other'},aswGoal,stock],[p,{...aswGoal,purpose:'strategy'},stock],[p,{...aswGoal,generatedFromMap:false},stock],[p,{...aswGoal,kind:'opening-asw'},stock],[p,aswGoal,{...stock,recipe:{id:'other'}}]])assert.equal(c.hdOCFourOneAswTargets(q,g,t),null);
+ assert.equal(JSON.stringify([p,aswGoal,stock]),before);
+});
+test('7-2 ASW placement retains slot conflict and missing knowledge without declaring inventory impossible',()=>{
+ const {c,emptyInventory}=aswContext();emptyInventory();const p={map:'7-2',path:'CEG',ships:['一枠艦','同一枠のみ','分離枠','未登録枠','艦名不明'].map(ship=>({ship,items:[]}))},stock=c.hdSECapabilityStock(p,'cap-asw',4),rows=c.hdOCFourOneAswTargets(p,aswGoal,stock);
+ assert.deepEqual(Array.from(rows,x=>[x.ship,x.status]),[['分離枠','candidate'],['未登録枠','manual'],['艦名不明','manual']]);assert.deepEqual(Array.from(rows[0].parts,p=>[p.part,Array.from(p.slots,s=>s.index)]),[['sonar',[1]],['projector',[0]]]);
+ const html=c.hdOCCapabilityStockHtml({capability:true,stock,aswTargets:[],aswScopeNote:'4組は元の軽巡1＋駆逐3向けの戦闘比較目標です。別の有効編成の必要・十分な組数は未確認で、購入数量ではありません。'});for(const text of ['この装備例に必要4・あと4個','必要・十分な組数は未確認','購入数量ではありません','手持ちでは不可能という判定ではありません','先制対潜の成立人数ではありません'])assert.ok(html.includes(text),text);
+ assert.equal(c.hdOCStockGap({...aswGoal,capability:true,stock,placement:true}),0);assert.equal(c.hdOCProcurementHtml({...aswGoal,capability:true,stock,placement:true},0,''),'');
+});
+test('7-2 BCDIM carrier example names both carriers and only positive legal normal slots',()=>{
+ const c=carrierContext(),p={map:'7-2',path:'BCDIM',ships:['長門改二','赤城改','加賀改','鳥海改二'].map(ship=>({ship,items:[]}))},before=JSON.stringify([p,attackGoal]),rows=c.hdOCThreeThreeCarrierTargets(p,attackGoal);
+ assert.deepEqual(Array.from(rows,r=>[r.ship,r.shipIndex,r.count,r.status,Array.from(r.slots,s=>s.index)]),[['赤城改',1,1,'candidate',[0,2]],['加賀改',2,1,'candidate',[0,2]]]);assert.ok(rows.every(r=>r.slots.every(s=>s.candidates.includes('流星')&&s.candidates.includes('彗星')&&!s.candidates.includes('零式水上観測機'))));
+ const unknown=c.hdOCThreeThreeCarrierTargets({...p,ships:['空母枠不明','空母搭載不明','空母搭載零','空母制限枠'].map(ship=>({ship,items:[]}))},attackGoal);assert.deepEqual(Array.from(unknown,r=>[r.ship,r.status]),[['空母枠不明','manual'],['空母搭載不明','manual'],['空母搭載零','blocked'],['空母制限枠','blocked']]);
+ for(const [q,g]of [[{...p,path:'CEG'},attackGoal],[{...p,path:'other'},attackGoal],[p,{...attackGoal,purpose:'strategy'}],[p,{...attackGoal,generatedFromMap:false}]])assert.equal(c.hdOCThreeThreeCarrierTargets(q,g),null);assert.equal(JSON.stringify([p,attackGoal]),before);
+});
+function capabilityContext(){
+ const profiles=[{kind:'cap-aa',baseKind:'防空',label:'AA',importance:'任意例',reason:'防空',note:'任意例',source:'#'},{kind:'cap-asw',baseKind:'対潜',label:'ASW',importance:'任意例',reason:'対潜',note:'人数は別条件',source:'#'},{kind:'cap-night-auto',baseKind:'夜戦',label:'Night',importance:'任意例',reason:'夜戦',note:'任意例',source:'#'}],first={id:'first'},second={id:'second'},upper={id:'upper'},lower={id:'lower'},counts={profiles:0,fleets:0,lookups:0,stock:0,builds:0},routes={first:{path:'CEG',equipmentKinds:['対潜'],equipmentTargets:[{kind:'cap-asw',minCount:4}]},second:{path:'BCDIM',equipmentKinds:['防空','対潜','夜戦']},upper:{path:'ACDGM',equipmentKinds:['防空','夜戦']},lower:{path:'BFIJM',equipmentKinds:['防空','夜戦','対潜']}};
+ let actualCount=3,stockCount=4,unresolved=false;
+ const c={hdSEProfiles:()=>{counts.profiles++;return profiles},hdSENightPolicyHtml:()=>'<policy/>',hdMapPresetRequirements:(map,preset)=>{counts.lookups++;return routes[preset?.id]||null},hdSPSFleets:()=>{counts.fleets++;return [{id:'saved',routePreset:second,ships:[]}]},hdFEPlanFromSavedFleet:(map,fleet)=>{counts.builds++;return {map,ships:[],sourceFleet:fleet}},hdSEEsc:String,hdSECapabilityStock:(plan,kind,target=1)=>{counts.stock++;return {recipe:{name:'任意の装備例'},complete:stockCount>=target,usable:{complete:stockCount>0,ship:'候補'},parts:[{part:'one',label:'装備例',have:stockCount,need:target,items:[]}]}},hdSECapabilityMeasure:()=>({count:actualCount,ships:['候補'],unresolved}),HD_SE_PARTS:{one:{examples:['例']}},HD_SE_RECIPES:Object.fromEntries(profiles.map(p=>[p.kind,[{name:'任意例'}]])),localStorage:new Proxy({},{get(){throw Error('renderer must not read storage directly')}}),hdOCBuild:()=>{throw Error('renderer must not rebuild search inputs')}};
+ const legacy=vm.runInNewContext('('+legacyCapabilityRenderer.toString()+')',c);load('sortie-equipment-check.js','hdSECapabilityHtml',c);return {c,legacy,current:c.hdSECapabilityHtml,first,second,upper,lower,counts,routes,profiles,set:(actual,stock,unknown=false)=>{actualCount=actual;stockCount=stock;unresolved=unknown}};
+}
+test('7-2 explicit selected capability header filters combat examples and requires all four actual sets',()=>{
+ const {current,first,second,set}=capabilityContext(),cards=h=>Array.from(h.matchAll(/data-hd-se-capability="([^"]+)"/g),x=>x[1]);
+ const partial=current('7-2','saved',null,first);assert.deepEqual(cards(partial),['cap-asw']);assert.ok(partial.includes('目標4組 / 配備3組'));assert.ok(partial.includes('装備例：4/4'));assert.ok(partial.includes('複数艦の配備確認が必要'));assert.ok(!partial.includes('hd-se-capability ready'));for(const text of ['元の軽巡1＋駆逐3','必要・十分な組数は未確認','購入数量ではありません'])assert.ok(partial.includes(text),text);
+ set(4,4);const ready=current('7-2','saved',null,first);assert.ok(ready.includes('hd-se-capability ready'));assert.ok(ready.includes('目標4組 / 配備4組'));
+ const other=current('7-2','saved',null,second);assert.deepEqual(cards(other),['cap-aa','cap-asw','cap-night-auto']);assert.equal((other.match(/data-hd-se-target-count="1"/g)||[]).length,3);assert.ok(!other.includes('元の軽巡1＋駆逐3'));
+});
+test('7-2 header keeps definite stock shortages, unresolved counts and invalid selected scope distinct',()=>{
+ const {current,first,set,counts,c}=capabilityContext();set(0,0);const missing=current('7-2','saved',null,first);assert.ok(missing.includes('装備例：0/4・あと4個'));assert.ok(missing.includes('この比較目標の所持不足'));assert.ok(!missing.includes('hd-se-capability ready'));
+ set(4,4,true);const unknown=current('7-2','saved',null,first);assert.ok(unknown.includes('配備は未判定'));assert.ok(unknown.includes('hd-se-capability manual'));assert.ok(!unknown.includes('hd-se-capability ready'));
+ for(const p of [undefined,null,{},'unknown']){Object.keys(counts).forEach(k=>counts[k]=0);const html=current('7-2','saved',null,p);assert.ok(html.includes('data-hd-se-route-scope="manual"'));assert.ok(!html.includes('data-hd-se-capability='));assert.deepEqual(counts,{profiles:0,fleets:0,lookups:1,stock:0,builds:0})}
+ for(const targets of [[{kind:'cap-asw',minCount:0}],[{kind:'cap-asw',minCount:8}],[{kind:'cap-asw',minCount:1.5}],{},[null]]){c.hdMapPresetRequirements=()=>({path:'CEG',equipmentKinds:['対潜'],equipmentTargets:targets});assert.ok(current('7-2','saved',null,first).includes('data-hd-se-route-scope="manual"'))}
+});
+test('7-2 optional selected argument preserves all legacy2/3 calls and explicit6-5 output and work counts',()=>{
+ const {current,legacy,upper,lower,counts}=capabilityContext();
+ for(const args of [['7-2','saved'],['7-2','saved',{ships:[]}],['7-1','saved'],['6-5','saved'],['6-5','saved',{ships:[]}],['4-2','saved'],['6-5','saved',null,upper],['6-5','saved',null,lower]]){Object.keys(counts).forEach(k=>counts[k]=0);const expected=legacy(...args),oldCounts={...counts};Object.keys(counts).forEach(k=>counts[k]=0);assert.equal(current(...args),expected,JSON.stringify(args));assert.deepEqual(counts,oldCounts)}
+});

@@ -9520,8 +9520,8 @@ test('release smoke: sortie progress uses nearest valid objective on multi-targe
     battles: window.hdSMBossBattleDistance('7-2','C'),
     target: window.hdSMRouteTargetName('7-2')
   }));
-  expect(metrics.distance).toBe(1);
-  expect(metrics.battles).toBe(0);
+  expect(metrics.distance).toBe(2);
+  expect(metrics.battles).toBe(2);
   expect(metrics.target).toBe('攻略目標');
 
   await page.evaluate(() => {
@@ -9537,7 +9537,7 @@ test('release smoke: sortie progress uses nearest valid objective on multi-targe
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
       status:'active',
-      draft:{node:'C',routeNodes:['A','B','C'],result:'S',memo:'',advanceGuard:{node:'C',safe:true,at:Date.now()}}
+      draft:{node:'C',routeNodes:['C'],routeGraph:'7-2-real-v1',result:'S',memo:'',advanceGuard:{node:'C',safe:true,at:Date.now()}}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
@@ -9546,8 +9546,8 @@ test('release smoke: sortie progress uses nearest valid objective on multi-targe
 
   const progress = page.locator('.hd-sm-hud-progress');
   await expect(progress).toBeVisible();
-  await expect(progress).toContainText('構造図最短 攻略目標まで 1マス');
-  await expect(progress).toContainText('最少戦闘あと 0');
+  await expect(progress).toContainText('構造図最短 攻略目標まで 2マス');
+  await expect(progress).toContainText('最少戦闘あと 2');
   expect(errors).toEqual([]);
 });
 
@@ -9574,7 +9574,7 @@ test('release smoke: sortie objective selector changes route guidance on multi-t
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
       status:'active',
-      draft:{objectiveTarget:'G2',routeNodes:[],result:'S',memo:''}
+      draft:{objectiveTarget:'M',routeGraph:'7-2-real-v1',node:'E',routeNodes:['C','E'],battles:2,result:'S',memo:'',advanceGuard:{node:'E',safe:true,at:Date.now()}}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
@@ -9583,22 +9583,24 @@ test('release smoke: sortie objective selector changes route guidance on multi-t
 
   const picker = page.locator('.hd-sm-objective-picker');
   await expect(picker).toBeVisible();
-  await expect(picker.locator('[data-hd-sm-objective="G2"]')).toHaveClass(/active/);
-  await expect(page.locator('[data-hd-sm-next-node="A"]')).toContainText('構造図上 逸れ候補');
-  await expect(page.locator('[data-hd-sm-next-node="D"]')).toContainText('構造図上 G2ボス接続');
+  await expect(picker.locator('[data-hd-sm-objective="M"]')).toHaveClass(/active/);
+  await expect(page.locator('[data-hd-sm-next-node="F"]')).toContainText('構造図上 逸れ候補');
+  await expect(page.locator('[data-hd-sm-next-node="G"]')).toContainText('構造図上 逸れ候補');
 
-  await picker.locator('[data-hd-sm-objective="G1"]').click();
-  await expect(picker.locator('[data-hd-sm-objective="G1"]')).toHaveClass(/active/);
-  await expect(page.locator('[data-hd-sm-next-node="A"]')).toContainText('構造図上 G1到達地点接続');
-  await expect(page.locator('[data-hd-sm-next-node="D"]')).toContainText('構造図上 逸れ候補');
+  await picker.locator('[data-hd-sm-objective="G"]').click();
+  await expect(picker.locator('[data-hd-sm-objective="G"]')).toHaveClass(/active/);
+  await expect(page.locator('[data-hd-sm-next-node="G"]')).toContainText('構造図上 Gボス接続');
+  await expect(page.locator('[data-hd-sm-next-node="F"]')).toContainText('構造図上 逸れ候補');
 
   let draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
-  expect(draft.objectiveTarget).toBe('G1');
+  expect(draft.objectiveTarget).toBe('G');
+  expect(draft.node).toBe('E');expect(draft.routeNodes).toEqual(['C','E']);expect(draft.advanceGuard.node).toBe('E');
 
   await picker.locator('[data-hd-sm-objective=""]').click();
   await expect(picker.locator('[data-hd-sm-objective=""]')).toHaveClass(/active/);
   draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
   expect(draft.objectiveTarget).toBe('');
+  expect(draft.node).toBe('E');expect(draft.routeNodes).toEqual(['C','E']);expect(draft.advanceGuard.node).toBe('E');
   expect(errors).toEqual([]);
 });
 
@@ -9632,18 +9634,22 @@ test('release smoke: sortie log preserves selected objective', async ({ page }) 
     window.hdSMOpen();
   });
 
-  await expect(page.locator('.hd-sm-objective-picker [data-hd-sm-objective="G2"]')).toHaveClass(/active/);
+  await expect(page.locator('.hd-sm-objective-picker [data-hd-sm-objective="M"]')).toHaveClass(/active/);
 
-  await page.evaluate(() => {
+  const held = await page.evaluate(() => {
+    const before=JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1'));
     const data=window.hdSMFormData();
     data.node='G2';data.result='S';data.boss=true;
-    window.hdSSFinish(data);
+    const entry=window.hdSSFinish(data);
+    return {rawTarget:data.objectiveTarget,battles:data.battles,snapshotExact:JSON.stringify(entry?.legacyRouteSnapshot?.session)===JSON.stringify(before)};
   });
+  expect(held).toMatchObject({rawTarget:'G2',battles:4,snapshotExact:true});
 
   const entry = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-sortie-log-v1')||'[]')[0]);
   expect(entry.map).toBe('7-2');
   expect(entry.objectiveTarget).toBe('G2');
   expect(entry.boss).toBe(true);
+  expect(entry.legacyRouteSnapshot.status).toBe('legacy');
   expect(errors).toEqual([]);
 });
 
@@ -9776,7 +9782,7 @@ test('release smoke: sortie remembers selected objective per map', async ({ page
       status:'active',
       draft:{routeNodes:[],result:'S',memo:''}
     }));
-    window.hdSMSetObjectiveTarget('G2');
+    window.hdSMSetObjectiveTarget('M');
     const restored=window.hdSSApplyObjectivePref({map:'7-2',shipCount:1,status:'active'},'7-2');
     return {
       pref:window.hdSSObjectivePref('7-2'),
@@ -9784,22 +9790,25 @@ test('release smoke: sortie remembers selected objective per map', async ({ page
       restored
     };
   });
-  expect(selected.pref).toBe('G2');
-  expect(selected.draft.objectiveTarget).toBe('G2');
-  expect(selected.restored.draft.objectiveTarget).toBe('G2');
+  expect(selected.pref).toBe('M');
+  expect(selected.draft.objectiveTarget).toBe('M');
+  expect(selected.restored.draft.objectiveTarget).toBe('M');
 
   const cleared = await page.evaluate(() => {
     window.hdSMSetObjectiveTarget('');
     const restored=window.hdSSApplyObjectivePref({map:'7-2',shipCount:1,status:'active'},'7-2');
     return {
       pref:window.hdSSObjectivePref('7-2'),
+      prefPresent:Object.hasOwn(JSON.parse(localStorage.getItem('harbordesk-sortie-objective-pref-v1')||'{}'),'7-2'),
       draft:JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft,
       restored
     };
   });
   expect(cleared.pref).toBe('');
   expect(cleared.draft.objectiveTarget).toBe('');
-  expect(cleared.restored.draft).toBeUndefined();
+  expect(cleared.restored.draft).toEqual({objectiveTarget:''});
+  expect(Object.hasOwn(cleared.restored.draft,'objectiveTarget')).toBe(true);
+  expect(cleared.prefPresent).toBe(true);
   expect(errors).toEqual([]);
 });
 
@@ -9823,17 +9832,17 @@ test('release smoke: pre-start objective selector persists map preference', asyn
 
   const host=page.locator('#hdPreObjectiveTest');
   await expect(host.locator('[data-hd-sm-pre-objective=""]')).toHaveClass(/active/);
-  await expect(host.locator('[data-hd-sm-pre-objective="G1"]')).toBeVisible();
-  await expect(host.locator('[data-hd-sm-pre-objective="G2"]')).toBeVisible();
+  await expect(host.locator('[data-hd-sm-pre-objective="G"]')).toBeVisible();
+  await expect(host.locator('[data-hd-sm-pre-objective="M"]')).toBeVisible();
 
-  await host.locator('[data-hd-sm-pre-objective="G2"]').click();
+  await host.locator('[data-hd-sm-pre-objective="M"]').click();
   let pref=await page.evaluate(() => window.hdSMObjectivePreference('7-2'));
-  expect(pref).toBe('G2');
+  expect(pref).toBe('M');
 
   await page.evaluate(() => {
     document.getElementById('hdPreObjectiveTest').innerHTML=window.hdSMObjectivePrestartHtml('7-2');
   });
-  await expect(host.locator('[data-hd-sm-pre-objective="G2"]')).toHaveClass(/active/);
+  await expect(host.locator('[data-hd-sm-pre-objective="M"]')).toHaveClass(/active/);
 
   await host.locator('[data-hd-sm-pre-objective=""]').click();
   pref=await page.evaluate(() => window.hdSMObjectivePreference('7-2'));
@@ -9857,10 +9866,10 @@ test('release smoke: pre-start route preview follows selected objective', async 
   const result = await page.evaluate(() => {
     localStorage.removeItem('harbordesk-sortie-objective-pref-v1');
 
-    window.hdSMSaveObjectivePreference('7-2','G2');
+    window.hdSMSaveObjectivePreference('7-2','M');
     const g2 = window.hdSMPrestartRoutePreviewHtml('7-2');
 
-    window.hdSMSaveObjectivePreference('7-2','G1');
+    window.hdSMSaveObjectivePreference('7-2','G');
     const g1 = window.hdSMPrestartRoutePreviewHtml('7-2');
 
     window.hdSMSaveObjectivePreference('7-2','');
@@ -9869,15 +9878,11 @@ test('release smoke: pre-start route preview follows selected objective', async 
     return {g2,g1,auto};
   });
 
-  expect(result.g2).toContain('G2ボス');
-  expect(result.g2).toContain('<b>A</b>');
-  expect(result.g2).toContain('<b>D</b>');
-  expect(result.g2).toMatch(/A[\s\S]*逸れ候補/);
-  expect(result.g2).toMatch(/D[\s\S]*接続/);
-
-  expect(result.g1).toContain('G1到達地点');
-  expect(result.g1).toMatch(/A[\s\S]*接続/);
-  expect(result.g1).toMatch(/D[\s\S]*逸れ候補/);
+  expect(result.g2).toContain('Mボス');
+  expect(result.g1).toContain('Gボス');
+  for(const start of ['A','B','C']){expect(result.g2).toContain('<b>'+start+'</b>');expect(result.g1).toContain('<b>'+start+'</b>')}
+  expect(result.g2).not.toContain('逸れ候補');
+  expect(result.g1).not.toContain('逸れ候補');
 
   expect(result.auto).toContain('自動（攻略目標）');
   expect(errors).toEqual([]);
@@ -9894,12 +9899,12 @@ test('release smoke: pre-start objective selector shows route stats', async ({ p
 
   const stats = await page.evaluate(() => ({
     auto: window.hdSMObjectiveStartStats('7-2',''),
-    g1: window.hdSMObjectiveStartStats('7-2','G1'),
-    g2: window.hdSMObjectiveStartStats('7-2','G2')
+    g1: window.hdSMObjectiveStartStats('7-2','G'),
+    g2: window.hdSMObjectiveStartStats('7-2','M')
   }));
-  expect(stats.auto).toEqual({steps:4,battles:3});
-  expect(stats.g1).toEqual({steps:4,battles:3});
-  expect(stats.g2).toEqual({steps:5,battles:5});
+  expect(stats.auto).toEqual({steps:3,battles:3});
+  expect(stats.g1).toEqual({steps:3,battles:3});
+  expect(stats.g2).toEqual({steps:4,battles:3});
 
   await page.evaluate(() => {
     const host=document.createElement('div');
@@ -9909,9 +9914,9 @@ test('release smoke: pre-start objective selector shows route stats', async ({ p
   });
 
   const host=page.locator('#hdPreObjectiveStatsTest');
-  await expect(host.locator('[data-hd-sm-pre-objective=""]')).toContainText('最短4マス・最少3戦');
-  await expect(host.locator('[data-hd-sm-pre-objective="G1"]')).toContainText('最短4マス・最少3戦');
-  await expect(host.locator('[data-hd-sm-pre-objective="G2"]')).toContainText('最短5マス・最少5戦');
+  await expect(host.locator('[data-hd-sm-pre-objective=""]')).toContainText('最短3マス・最少3戦');
+  await expect(host.locator('[data-hd-sm-pre-objective="G"]')).toContainText('最短3マス・最少3戦');
+  await expect(host.locator('[data-hd-sm-pre-objective="M"]')).toContainText('最短4マス・最少3戦');
   expect(errors).toEqual([]);
 });
 
@@ -9926,19 +9931,19 @@ test('release smoke: pre-start route preview shows shortest structural path', as
 
   const paths = await page.evaluate(() => ({
     auto: window.hdSMObjectiveShortestPath('7-2',''),
-    g1: window.hdSMObjectiveShortestPath('7-2','G1'),
-    g2: window.hdSMObjectiveShortestPath('7-2','G2')
+    g1: window.hdSMObjectiveShortestPath('7-2','G'),
+    g2: window.hdSMObjectiveShortestPath('7-2','M')
   }));
-  expect(paths.auto).toEqual(['A','B','C','G1']);
-  expect(paths.g1).toEqual(['A','B','C','G1']);
-  expect(paths.g2).toEqual(['D','E','F','I','G2']);
+  expect(paths.auto).toEqual(['C','E','G']);
+  expect(paths.g1).toEqual(['C','E','G']);
+  expect(paths.g2).toEqual(['C','D','I','M']);
 
   const html = await page.evaluate(() => {
-    window.hdSMSaveObjectivePreference('7-2','G2');
+    window.hdSMSaveObjectivePreference('7-2','M');
     return window.hdSMPrestartRoutePreviewHtml('7-2');
   });
   expect(html).toContain('構造図最短');
-  expect(html).toContain('D → E → F → I → G2');
+  expect(html).toContain('C → D → I → M');
   expect(errors).toEqual([]);
 });
 
@@ -9953,11 +9958,11 @@ test('release smoke: sortie warns when selected objective is unreachable from cu
   );
 
   const state = await page.evaluate(() => window.hdSMObjectiveRouteState('7-2',{
-    node:'C',routeNodes:['A','B','C'],objectiveTarget:'G2'
+    node:'E',routeNodes:['C','E'],routeGraph:'7-2-real-v1',objectiveTarget:'M'
   }));
   expect(state.active).toBe(true);
-  expect(state.target).toBe('G2');
-  expect(state.alternatives.map(x=>x.label)).toContain('G1');
+  expect(state.target).toBe('M');
+  expect(state.alternatives.map(x=>x.label)).toContain('G');
 
   await page.evaluate(() => {
     localStorage.setItem('harbordesk-active-sortie-session-v1', JSON.stringify({
@@ -9972,7 +9977,7 @@ test('release smoke: sortie warns when selected objective is unreachable from cu
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
       status:'active',
-      draft:{node:'C',routeNodes:['A','B','C'],result:'S',memo:'',objectiveTarget:'G2',advanceGuard:{node:'C',safe:true,at:Date.now()}}
+      draft:{node:'E',routeNodes:['C','E'],routeGraph:'7-2-real-v1',result:'S',memo:'',objectiveTarget:'M',advanceGuard:{node:'E',safe:true,at:Date.now()}}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
@@ -9981,20 +9986,20 @@ test('release smoke: sortie warns when selected objective is unreachable from cu
 
   const warning = page.locator('.hd-sm-objective-warning');
   await expect(warning).toBeVisible();
-  await expect(warning).toContainText('CからG2ボスへ構造図上接続なし');
-  await expect(page.locator('.hd-sm-hud-objective-alert')).toContainText('G2ボスへ接続なし');
-  await expect(warning.locator('[data-hd-sm-objective="G1"]')).toContainText('G1 到達地点へ切替');
+  await expect(warning).toContainText('EからMボスへ構造図上接続なし');
+  await expect(page.locator('.hd-sm-hud-objective-alert')).toContainText('Mボスへ接続なし');
+  await expect(warning.locator('[data-hd-sm-objective="G"]')).toContainText('G ボスへ切替');
 
-  await warning.locator('[data-hd-sm-objective="G1"]').click();
+  await warning.locator('[data-hd-sm-objective="G"]').click();
   await expect(page.locator('.hd-sm-objective-warning')).toHaveCount(0);
   await expect(page.locator('.hd-sm-hud-objective-alert')).toHaveCount(0);
-  await expect(page.locator('.hd-sm-objective-picker [data-hd-sm-objective="G1"]')).toHaveClass(/active/);
+  await expect(page.locator('.hd-sm-objective-picker [data-hd-sm-objective="G"]')).toHaveClass(/active/);
 
   const draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
-  expect(draft.objectiveTarget).toBe('G1');
-  expect(draft.node).toBe('C');
-  expect(draft.routeNodes).toEqual(['A','B','C']);
-  expect(draft.advanceGuard.node).toBe('C');
+  expect(draft.objectiveTarget).toBe('G');
+  expect(draft.node).toBe('E');
+  expect(draft.routeNodes).toEqual(['C','E']);
+  expect(draft.advanceGuard.node).toBe('E');
   expect(draft.advanceGuard.safe).toBe(true);
   expect(errors).toEqual([]);
 });
@@ -10020,7 +10025,7 @@ test('release smoke: route alert can mark route-deviation retreat', async ({ pag
       readinessSnapshot:{autoOk:1,autoTotal:1,manualDone:1,manualTotal:1,unresolved:[]},
       shipCount:1,
       status:'active',
-      draft:{node:'C',routeNodes:['A','B','C'],result:'S',memo:'',objectiveTarget:'G2',advanceGuard:{node:'C',safe:true,at:Date.now()}}
+      draft:{node:'E',routeNodes:['C','E'],routeGraph:'7-2-real-v1',result:'S',memo:'',objectiveTarget:'M',advanceGuard:{node:'E',safe:true,at:Date.now()}}
     }));
     window.hdSMEnsure();
     window.hdSMRender();
@@ -10036,8 +10041,9 @@ test('release smoke: route alert can mark route-deviation retreat', async ({ pag
   const draft = await page.evaluate(() => JSON.parse(localStorage.getItem('harbordesk-active-sortie-session-v1')).draft);
   expect(draft.result).toBe('撤退');
   expect(draft.retreatReason).toBe('ルート逸れ');
-  expect(draft.objectiveTarget).toBe('G2');
-  expect(draft.node).toBe('C');
+  expect(draft.objectiveTarget).toBe('M');
+  expect(draft.node).toBe('E');
+  expect(draft.routeNodes).toEqual(['C','E']);
   expect(errors).toEqual([]);
 });
 
