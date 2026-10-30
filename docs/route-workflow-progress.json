@@ -73,8 +73,8 @@
       "非該当": 0
     },
     "D": {
-      "確認済み": 20,
-      "一部": 16,
+      "確認済み": 21,
+      "一部": 15,
       "未確認": 23,
       "非該当": 0
     }
@@ -2487,18 +2487,18 @@
           ]
         },
         "D": {
-          "status": "一部",
-          "reason": "C3状態とWstock/unknownの計5代表は保存/適用可能なメモ編集または安全中止、同一reload文書load全文・元20識別項目/他編成metadata保持を完了。Wreadyは保存編集後strict20＋厳密空2行と配備案一致を通過したが、load後再探索click非表示で45秒timeout、load全文比較未到達/nav採取失敗1。旧文書の予定guide遷移stackで後文書caller/原因を補完しない。",
+          "status": "確認済み",
+          "reason": "同source/同fixtureの局所Cready/stock/unknown・Wstock/unknown計5完了と、自身CI40996265641のWready初回completedを6代表へ直接対応。保存/適用可能なメモ編集または安全中止、同一reload文書load全文、元20識別項目/厳密空行/他編成metadata・例外0を確認。局所Wreadyと新CIWstock初回のload未到達は別試行のまま保持し、caller/原因を解決扱いしない。",
           "evidence": [
             "docs/pr152-seven-three-first-ja.md",
-            "tests/seven-three-first-routes.test.cjs",
             "tests/route-seven-three-first.spec.js",
             "tests/fixtures/seven-one-identity-preservation.cjs",
-            "tests/seven-one-identity-preservation.test.cjs"
+            "tests/seven-one-identity-preservation.test.cjs",
+            "https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/40996265641"
           ]
         }
       },
-      "remaining": "軽空母CV系略称・少数隻史実ペア優先順、揚陸艦/海防戦艦モデル/未知艦、夜戦の必要十分数と全在庫/搭載/枠競合、図全体/旧目標・通過履歴互換は未完。Wreadyのload後非表示caller/原因と全文比較は未確認、第2G不一致は別行に保持。"
+      "remaining": "軽空母CV系略称・少数隻史実ペア優先順、揚陸艦/海防戦艦モデル/未知艦、夜戦の必要十分数と全在庫/搭載/枠競合、図全体/旧目標・通過履歴互換は未完。局所Wreadyと自CIWstock初回のload未到達/表示変更caller・原因は未解決の別試行履歴に保持。第2G不一致も別行に保持。"
     },
     {
       "id": "7-3/1/default",
@@ -2712,7 +2712,7 @@
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
     "docsOnlyFastForwardHead": "eac1294df69eaa06f1a13b988c6cca8d7426f0a1",
     "evidence": "docs/pr152-seven-three-first-ja.md",
-    "state": "source-grounded first ACE integration and necessary local validation complete with WebKit ready post-load comparison unreached; no repeat of that trial; commit/push and one final-HEAD smoke not started",
+    "state": "limited firstACE scope source and representative save/load evidence recorded; ownCI closed5smoke success/1failure, Fullskipped; D verified by local5 plus ownCIWebKitReady initial separate positive; prior failures/gaps retained; seven4 remains separate unfinished unit",
     "sourceScope": {
       "path": "ACE",
       "phase": "P not opened selected contract; no game unlock detection",
@@ -2925,8 +2925,11 @@
       "partialConvertedToPercent": false
     },
     "nextCI": {
-      "state": "not started",
-      "plan": "ordinary source commit/push then one same final-HEAD smoke; no duplicate automatic/manual run; local failed/unreached trial remains separate"
+      "state": "closed; no records-only dispatch or successful rerun",
+      "runId": 40996265641,
+      "head": "62d817223a1e72b28f956234a6090b3493c624b0",
+      "conclusion": "failure",
+      "recordHead": "later records-only HEAD is distinct from tested sourceHEAD"
     },
     "nextPriority": "7-4/0 ABEJLP: independent row with B/C/D unverified; reconcile DD/DE OR, aviation hull limits and coefficient4 LOS safe37 separately from optional ASW/night/base strategy.",
     "summaryArtifactPreparation": {
@@ -2967,9 +2970,301 @@
       "allBeforeAfterExact": true,
       "corrected03And04SameSource": true,
       "rawStorageBodySharedOrCommitted": false
+    },
+    "stateBeforeOwnCIFinalization20261030": "source-grounded first ACE integration and necessary local validation complete with WebKit ready post-load comparison unreached; no repeat of that trial; commit/push and one final-HEAD smoke not started",
+    "nextCIBeforeOwnCIFinalization20261030": {
+      "state": "not started",
+      "plan": "ordinary source commit/push then one same final-HEAD smoke; no duplicate automatic/manual run; local failed/unreached trial remains separate"
+    },
+    "ownSourceCIFinalization20261030": {
+      "runId": 40996265641,
+      "head": "62d817223a1e72b28f956234a6090b3493c624b0",
+      "attempt": 1,
+      "conclusion": "failure",
+      "smokeJobs": {
+        "success": 5,
+        "failure": 1,
+        "cancelled": 0
+      },
+      "full": "skipped",
+      "dispatch": {
+        "automaticBefore": 0,
+        "manual": 1,
+        "reruns": 0
+      },
+      "officialCaseOutcomes": {
+        "chromium": {
+          "passed": 874,
+          "flaky": 0,
+          "failed": 0,
+          "skipped": 0
+        },
+        "webkit": {
+          "passed": 865,
+          "flaky": 7,
+          "failed": 2,
+          "skipped": 0
+        }
+      },
+      "outcomeMeaning": "passed/flaky/failed/skipped are official case outcomes, not exact initial/retry/physical attempt counts; own initial/retry labels come from same-folder original summaries/traces",
+      "ownSummaryOriginals": 7,
+      "ownNormalUnique": 6,
+      "ownCompletedSeparateTrials": 6,
+      "ownPartialInitialTrials": 1,
+      "ownTrials": [
+        {
+          "browser": "chromium",
+          "state": "unknown",
+          "trial": "initial",
+          "stage": "completed",
+          "savedReadReached": true,
+          "loadReadReached": true,
+          "searchSampleCount": 2,
+          "pageerrorCount": 0,
+          "navigationCollectionFailures": 0,
+          "allSourceExpectedComparisonsMatch": true,
+          "summarySHA256": "08bed5b6f6ce62144bf475619c3c146511dd66f4f4617ccf8342afc2a765fb25"
+        },
+        {
+          "browser": "chromium",
+          "state": "ready",
+          "trial": "initial",
+          "stage": "completed",
+          "savedReadReached": true,
+          "loadReadReached": true,
+          "searchSampleCount": 2,
+          "pageerrorCount": 0,
+          "navigationCollectionFailures": 0,
+          "allSourceExpectedComparisonsMatch": true,
+          "summarySHA256": "a69600f9c1cb6ada301efbeb931d3ce1885846d83419e1bf803a8442728b851b"
+        },
+        {
+          "browser": "chromium",
+          "state": "stock",
+          "trial": "initial",
+          "stage": "completed",
+          "savedReadReached": true,
+          "loadReadReached": true,
+          "searchSampleCount": 2,
+          "pageerrorCount": 0,
+          "navigationCollectionFailures": 0,
+          "allSourceExpectedComparisonsMatch": true,
+          "summarySHA256": "a5215d04ed5462e5cbb98a4e0007e51bc56dce2b6a5dba0caf33e547c6748319"
+        },
+        {
+          "browser": "webkit",
+          "state": "ready",
+          "trial": "initial",
+          "stage": "completed",
+          "savedReadReached": true,
+          "loadReadReached": true,
+          "searchSampleCount": 2,
+          "pageerrorCount": 0,
+          "navigationCollectionFailures": 0,
+          "allSourceExpectedComparisonsMatch": true,
+          "summarySHA256": "2a46615c46540d86438866c7e55d4c86a452b5dd9c330bda55256f8c8f6963b4"
+        },
+        {
+          "browser": "webkit",
+          "state": "unknown",
+          "trial": "initial",
+          "stage": "completed",
+          "savedReadReached": true,
+          "loadReadReached": true,
+          "searchSampleCount": 2,
+          "pageerrorCount": 0,
+          "navigationCollectionFailures": 0,
+          "allSourceExpectedComparisonsMatch": true,
+          "summarySHA256": "8a9eefc286127bfecc88e24b79350f518f77422c8b7a1da3ce049501be8da519"
+        },
+        {
+          "browser": "webkit",
+          "state": "stock",
+          "trial": "initial",
+          "stage": "after-load-search",
+          "savedReadReached": true,
+          "loadReadReached": false,
+          "searchSampleCount": 1,
+          "pageerrorCount": 0,
+          "navigationCollectionFailures": 1,
+          "allSourceExpectedComparisonsMatch": false,
+          "summarySHA256": "161f5a51887f9d482d141deee9714939e670e5176778b770542f867276820279"
+        },
+        {
+          "browser": "webkit",
+          "state": "stock",
+          "trial": "retry1",
+          "stage": "completed",
+          "savedReadReached": true,
+          "loadReadReached": true,
+          "searchSampleCount": 2,
+          "pageerrorCount": 0,
+          "navigationCollectionFailures": 0,
+          "allSourceExpectedComparisonsMatch": true,
+          "summarySHA256": "01ae82e25e3046e631077a66c726f29d7d4aa7ebbd0ab33053b34e2065dd1364"
+        }
+      ],
+      "DPositiveSixTargetBasis": [
+        {
+          "browser": "chromium",
+          "state": "ready",
+          "source": "local corrected03/04 completed original",
+          "trial": "necessary grounded fixture correction revalidation"
+        },
+        {
+          "browser": "chromium",
+          "state": "stock",
+          "source": "local corrected03/04 completed original",
+          "trial": "initial"
+        },
+        {
+          "browser": "chromium",
+          "state": "unknown",
+          "source": "local corrected03/04 completed original",
+          "trial": "initial"
+        },
+        {
+          "browser": "webkit",
+          "state": "stock",
+          "source": "local corrected03/04 completed original",
+          "trial": "initial"
+        },
+        {
+          "browser": "webkit",
+          "state": "unknown",
+          "source": "local corrected03/04 completed original",
+          "trial": "initial"
+        },
+        {
+          "browser": "webkit",
+          "state": "ready",
+          "source": "own CI40996265641 W4",
+          "trial": "initial",
+          "summarySHA256": "2a46615c46540d86438866c7e55d4c86a452b5dd9c330bda55256f8c8f6963b4"
+        }
+      ],
+      "oldLocalWebKitReady": "unreached final load comparison and missing failed-document caller remain; not rewritten by ownCIready success",
+      "ownWebKitStockInitial": "saved strict20/extra2/proposal/other retention passed; after-load search button remained hidden until test45s timeout; load comparison unreached; navigation collection failure1; no performing-click/click-done evidence; delivery/handler entry/caller/cause unknown; retry1 completed is separate positive",
+      "otherFinalFailureBoundaries": {
+        "5-4 required-missing": "initial/retry post-load search-button hidden click wait timeout",
+        "3-5 south scouting unknown": "initial/retry save/load comparisons passed then version-fetch access-control pageerror assertion; not saved-value mismatch"
+      },
+      "sourceBinding": {
+        "confirmationSHA256": "84de3b33f55a4d924f60ff468c5b273ddfedb193e89f9e2b75e58fb5456e0102",
+        "checkoutMatchedJobs": 6,
+        "localSource27ComparedBeforeRecords": 27,
+        "sourceManifestSHA256": "c198c1cc8218d41535c9734c9c10a069a1eff7488b8d5eaa4abad9f66dc1d709",
+        "method": "Ownrun/jobhead + sixexplicitcheckoutlogs + finalcommitexpectedsource27manifest; staticworkflow has no source-rewrite process aftercheckout.",
+        "CIservedFileHashesActuallyMeasured": false,
+        "local598FrozenHashMeasurementsSeparate": true
+      },
+      "environment": {
+        "ownReceiptsMatch": 6,
+        "node": "24.21.0",
+        "playwright": "1.55.0",
+        "chromiumRevision": "1187",
+        "webkitRevision": "2203",
+        "nodeSuitePerJob": {
+          "tests": 510,
+          "pass": 510,
+          "fail": 0
+        },
+        "actualFixedImagePullDigestMatchedJobs": 6,
+        "imageDigest": "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29"
+      },
+      "artifacts": {
+        "published": 11,
+        "received": 9,
+        "receivedBytes": 496516810,
+        "receivedServerDigestMatches": 9,
+        "receivedOuterCRCMatches": 9,
+        "formalRunLogZIPBytes": 11281584,
+        "formalRunLogZIPCRC": "PASS",
+        "formalRunLogRequests": 1,
+        "smallSummaryArchives": 2,
+        "smallSummaryOriginals": 7,
+        "W4RawArchiveBytes": 496247932,
+        "W4OwnRawSummarySameTrialComparisons": 4,
+        "W4OwnInnerTraceCRC": 4,
+        "W4OwnVideosReceived": 4,
+        "CFullRawBeyondSmallSummaries": "missing; over-cap archive not requested",
+        "overCapUnrequested": [
+          {
+            "name": "attempt-diagnostics-chromium-2-40996265641",
+            "bytes": 1555485016,
+            "requests": 0
+          },
+          {
+            "name": "smoke-webkit-shard-4-of-4-40996265641",
+            "bytes": 999354956,
+            "requests": 0
+          }
+        ],
+        "rangeOrSplit": false,
+        "rawBodyOrTraceCommitted": false
+      },
+      "positiveNewPreservationMismatchObserved": false,
+      "matrixChange": {
+        "before": "20/140/76",
+        "after": "21/139/76",
+        "additionalStatusCells": 1,
+        "cell": "7-3/0/default.D 一部→確認済み",
+        "distinctCellsFromOriginal20_137_79": 3,
+        "finalDistinctCells": [
+          "B 未確認→一部",
+          "C 未確認→一部",
+          "D 未確認→確認済み"
+        ],
+        "other58RowsUnchanged": true,
+        "criteriaChanged": false,
+        "denominator": 236
+      },
+      "recordsOnlyNewCIDispatch": false,
+      "sevenFourSeparateWork": "based on62d, Node12 success precedes UI draft; UI/representative save/load/ledger not completed or credited to7-3",
+      "closureResultSHA256": "b917025661e4686f32bc67729e2e98d29051bcd295d385f14d46b6e8d54c4964",
+      "ownEightCaseOutcomes": {
+        "passed": 7,
+        "flaky": 1,
+        "failed": 0,
+        "flakyCase": "WebKit stock",
+        "namedInvariantCaseOutcomesIncluded": 2,
+        "physicalAttemptTotal": null
+      },
+      "ownSummaryObservations": {
+        "ownInitialSummaryCases": 6,
+        "ownRetry1SummaryRecords": 1,
+        "ownTotalSummaryRecords": 7,
+        "initialFolderCompleted": 5,
+        "initialFolderSavedRead": 6,
+        "initialFolderLoadRead": 5,
+        "totalSavedRead": 7,
+        "totalLoadRead": 6,
+        "savedStrict20Matches": 7,
+        "loadStrict20Matches": 6,
+        "missingInitialSummaryCases": [],
+        "newPreservationMismatchPositive": false,
+        "strictReviewPartialRows": [
+          {
+            "browser": "webkit",
+            "state": "stock",
+            "originalFolderTrialLabel": "initial",
+            "stage": "after-load-search",
+            "navigationCollectionFailures": 1
+          }
+        ]
+      },
+      "privateCollectionClosure": {
+        "ciFiles": 178,
+        "ciBytes": 125699867,
+        "artifactSideFiles": 121,
+        "artifactSideBytes": 532792512,
+        "allInventorySHARechecked": true,
+        "inventoryFileCountsNotArtifactDownloadCounts": true
+      },
+      "globalBoundaryCanonicalSource": "global-two-failure-boundaries-final.json; provisional reporter header segments are not trial counts"
     }
   },
-  "nextPriority": "7-3第1ACEの通常commit/push後、同じ最終HEADsmoke1回を重複なく確認。局所Wreadyのload後非表示/全文比較未到達は別試行として保持し反復しない。次の独立単位は7-4/0 ABEJLP：B/C/D未確認、駆逐/海防OR・航空艦数・係数4安全域37と任意対潜/夜戦/基地を分けて確認。7-2追加試験/推測修正/再CI、第2G再調査は行わない。",
+  "nextPriority": "7-3検証source62d81722/CI40996265641は5smoke成功・W4失敗/Fullskipで閉鎖。後続は記録のみcommit/pushで新CIなし。次の独立7-4/0 ABEJLPは別branchのNode12成功が先行しUI草稿あり、実操作/保存/load/台帳は未完。既存根拠と凍結sourceを照合して必要な代表操作へ進み、7-3の未到達や第2G差を混ぜない。",
   "previousSelected": {
     "id": "7-2/0,1/default",
     "baselineHead": "08ae92358c05d23b7d0044e22b3d36f51114623b",
@@ -6377,8 +6672,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "7-3 first ACE source-grounded local validation recorded; WebKit ready load final comparison unreached; source commit/push and one final-HEAD smoke pending",
-    "nextUnit": "7-4/0 ABEJLP independent source scope, finite inventory/guidance and representative save/load; retain first ACE graph/history/source gaps and second-G disagreement",
+    "activeUnit": "7-3 firstACE ownCI and limited evidence finalized; records-only update after tested62d source, no newCI; prior local/CI initial gaps remain",
+    "nextUnit": "based on62d, Node12 success precedes UI draft; UI/representative save/load/ledger not completed or credited to7-3",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -6403,30 +6698,60 @@
       "date": "2026-10-30",
       "target": "7-3/0/default",
       "record": "docs/pr152-seven-three-first-ja.md",
-      "state": "source-grounded first ACE integration and necessary local validation complete with WebKit ready post-load comparison unreached; no repeat of that trial; commit/push and one final-HEAD smoke not started",
-      "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
-      "docsOnlyFastForwardHead": "eac1294df69eaa06f1a13b988c6cca8d7426f0a1",
+      "testedSourceHead": "62d817223a1e72b28f956234a6090b3493c624b0",
+      "runId": 40996265641,
+      "conclusion": "failure",
+      "smokeJobs": {
+        "success": 5,
+        "failure": 1,
+        "cancelled": 0
+      },
+      "officialCaseOutcomes": {
+        "chromium": {
+          "passed": 874,
+          "flaky": 0,
+          "failed": 0,
+          "skipped": 0
+        },
+        "webkit": {
+          "passed": 865,
+          "flaky": 7,
+          "failed": 2,
+          "skipped": 0
+        }
+      },
+      "DStatus": "確認済み by local5 plus independent ownCIWebKitReady initial completed",
       "matrixChange": {
-        "before": "20/137/79",
-        "after": "20/140/76",
-        "statusCellsChanged": 3,
-        "cells": [
-          "7-3/0/default.B 未確認→一部",
-          "7-3/0/default.C 未確認→一部",
-          "7-3/0/default.D 未確認→一部"
+        "before": "20/140/76",
+        "after": "21/139/76",
+        "additionalStatusCells": 1,
+        "cell": "7-3/0/default.D 一部→確認済み",
+        "distinctCellsFromOriginal20_137_79": 3,
+        "finalDistinctCells": [
+          "B 未確認→一部",
+          "C 未確認→一部",
+          "D 未確認→確認済み"
         ],
-        "AStatus": "一部 unchanged",
         "other58RowsUnchanged": true,
         "criteriaChanged": false,
-        "denominatorCells": 236,
-        "partialConvertedToPercent": false
+        "denominator": 236
       },
-      "localUnique": "7success/1WebKit-ready failed, physical9 including original fixturefailure",
-      "normalSaveLoad": "5of6 completed full load; Wready saved strictpass then hidden after-load search; final whole comparison unreached",
-      "sourceCommitPushCI": "not started; one ordinary final-HEAD smoke planned",
-      "oldFailuresAndMissingPreserved": true,
+      "priorLocalAndCIInitialUnreachedRetained": true,
+      "sourceHeadAndLaterRecordsOnlyHeadDistinguished": true,
+      "recordsOnlyDispatch": false,
+      "sourceGapsAndGraphHistoryUnchanged": true,
+      "nextSeparateUnit": "based on62d, Node12 success precedes UI draft; UI/representative save/load/ledger not completed or credited to7-3",
+      "privateValuesShared": false,
       "stopConditionsUnchanged": true,
-      "privateValuesShared": false
+      "ownEightCaseOutcomes": {
+        "passed": 7,
+        "flaky": 1,
+        "failed": 0,
+        "flakyCase": "WebKit stock",
+        "namedInvariantCaseOutcomesIncluded": 2,
+        "physicalAttemptTotal": null
+      },
+      "closureResultSHA256": "b917025661e4686f32bc67729e2e98d29051bcd295d385f14d46b6e8d54c4964"
     },
     "activeUnitBeforeUpstreamCIFinalization": "new preservation mismatch stop: separate7-1C ready post-edit identity false; six-five validated WIP retained; no new trial/productfix/commit/push/CI",
     "currentBeforeAuthorizedIdentityObservationResume": {
@@ -6681,6 +7006,35 @@
         "newTestsOrCIForMissingEvidence": false
       },
       "failureClassificationRef": "sevenTwoCIFailureClassification20261030"
+    },
+    "currentBeforeSevenThreeCIFinalization20261030": {
+      "date": "2026-10-30",
+      "target": "7-3/0/default",
+      "record": "docs/pr152-seven-three-first-ja.md",
+      "state": "source-grounded first ACE integration and necessary local validation complete with WebKit ready post-load comparison unreached; no repeat of that trial; commit/push and one final-HEAD smoke not started",
+      "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
+      "docsOnlyFastForwardHead": "eac1294df69eaa06f1a13b988c6cca8d7426f0a1",
+      "matrixChange": {
+        "before": "20/137/79",
+        "after": "20/140/76",
+        "statusCellsChanged": 3,
+        "cells": [
+          "7-3/0/default.B 未確認→一部",
+          "7-3/0/default.C 未確認→一部",
+          "7-3/0/default.D 未確認→一部"
+        ],
+        "AStatus": "一部 unchanged",
+        "other58RowsUnchanged": true,
+        "criteriaChanged": false,
+        "denominatorCells": 236,
+        "partialConvertedToPercent": false
+      },
+      "localUnique": "7success/1WebKit-ready failed, physical9 including original fixturefailure",
+      "normalSaveLoad": "5of6 completed full load; Wready saved strictpass then hidden after-load search; final whole comparison unreached",
+      "sourceCommitPushCI": "not started; one ordinary final-HEAD smoke planned",
+      "oldFailuresAndMissingPreserved": true,
+      "stopConditionsUnchanged": true,
+      "privateValuesShared": false
     }
   },
   "auditCorrection": {
@@ -7138,5 +7492,6 @@
     "matrixChanges": 0,
     "independentSevenThreeResumeAuthorized": true
   },
-  "nextPriorityBeforeSevenThreeFirst20261030": "7-2自身W4の2case×初回/retryはreload後第2search非表示click timeoutと分類済み、load後全文比較と表示切替caller/原因は未確認。7-2追加試験・推測修正・CIなし。独立7-3第1ACEは未実行7件373133Bを保持して安全なstatic設計を続行可。4+2厳密helper、Node aggregator/旧第1oracle、専用UI固定一覧、台帳接続が残件。43+8期待案と図/旧目標履歴互換は未完、第2G再調査0。"
+  "nextPriorityBeforeSevenThreeFirst20261030": "7-2自身W4の2case×初回/retryはreload後第2search非表示click timeoutと分類済み、load後全文比較と表示切替caller/原因は未確認。7-2追加試験・推測修正・CIなし。独立7-3第1ACEは未実行7件373133Bを保持して安全なstatic設計を続行可。4+2厳密helper、Node aggregator/旧第1oracle、専用UI固定一覧、台帳接続が残件。43+8期待案と図/旧目標履歴互換は未完、第2G再調査0。",
+  "nextPriorityBeforeSevenThreeCIFinalization20261030": "7-3第1ACEの通常commit/push後、同じ最終HEADsmoke1回を重複なく確認。局所Wreadyのload後非表示/全文比較未到達は別試行として保持し反復しない。次の独立単位は7-4/0 ABEJLP：B/C/D未確認、駆逐/海防OR・航空艦数・係数4安全域37と任意対潜/夜戦/基地を分けて確認。7-2追加試験/推測修正/再CI、第2G再調査は行わない。"
 }

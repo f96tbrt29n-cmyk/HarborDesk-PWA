@@ -8754,7 +8754,15 @@
           "old goal/history compatibility",
           "second-gauge G agreement",
           "UI save/load success from static or Node evidence"
-        ]
+        ],
+        "ownCIFinalRepresentativeRecord": {
+          "head": "62d817223a1e72b28f956234a6090b3493c624b0",
+          "runId": 40996265641,
+          "record": "docs/pr152-seven-three-first-ja.md",
+          "DRepresentativeEvidence": "local completed5 plus ownCIWebKitReady initial separate completed trial",
+          "priorLocalAndCIInitialUnreachedRetained": true,
+          "staticAuditNotConvertedToUIEvidence": true
+        }
       },
       "useExampleScope": false
     },
