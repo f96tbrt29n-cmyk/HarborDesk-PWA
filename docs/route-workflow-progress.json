@@ -2694,7 +2694,7 @@
     "id": "7-2/0,1/default",
     "baselineHead": "08ae92358c05d23b7d0044e22b3d36f51114623b",
     "evidence": "docs/pr152-seven-two-routes-ja.md",
-    "state": "local scoped compatibility implementation complete; corrected-source CI40827828692: five smoke success, W4 cancelled at45m; two own WebKit final failures unclassified because individual exceptions/raw evidence unavailable; no additional diagnosis, speculative repair or success rerun",
+    "state": "local scoped compatibility complete; existing CI40827828692 own WebKit CEGready/BCDIMstock initial+retry four attempts classified as post-reload hidden search-click 45s timeouts; post-load exact comparison unreached and cause unresolved; no additional7-2 test, speculative repair or CI; independent7-3 static design continues",
     "independentLiterals": 128,
     "sourceLimits": [
       "D CVL source split",
@@ -3123,10 +3123,10 @@
       "previousSevenOneD": "一部; oldWready load unreached not filled"
     },
     "nextCI": {
-      "state": "one corrected-source smoke collected and closed; no success rerun or records-only manual dispatch",
+      "state": "existing corrected-source CI remains closed; no new test, rerun or records-only dispatch",
       "runId": 40827828692,
       "head": "0f44f839be65d96b5627fd5951fb05525787c326",
-      "nextObservation": "当該W4の7-2失敗試行で、最初に失敗した操作／アサーションと到達段階を示す個別例外（stack／call log）"
+      "nextObservation": "失敗したreload後文書で既に生成された表示切替metadataの画面ID・文書識別・caller stack。追加試験は起動しない。"
     },
     "stateBeforeFirstSourceCI": "local scoped validation complete; normal12 full after original11 reuse + newWunknown1; new25 targets successful after one grounded fixture correction; ordinary source commit/push/one finalHEAD smoke pending",
     "nextCIBeforeFirstRun": {
@@ -3296,9 +3296,17 @@
       "sourceHeadVersusLaterRecordsOnlyHeadSeparated": true,
       "recordsOnlyManualCIDispatch": false,
       "existingWorkflowTriggersRetained": true
-    }
+    },
+    "stateBeforeFailureClassification20261030": "local scoped compatibility implementation complete; corrected-source CI40827828692: five smoke success, W4 cancelled at45m; two own WebKit final failures unclassified because individual exceptions/raw evidence unavailable; no additional diagnosis, speculative repair or success rerun",
+    "nextCIBeforeFailureClassification20261030": {
+      "state": "one corrected-source smoke collected and closed; no success rerun or records-only manual dispatch",
+      "runId": 40827828692,
+      "head": "0f44f839be65d96b5627fd5951fb05525787c326",
+      "nextObservation": "当該W4の7-2失敗試行で、最初に失敗した操作／アサーションと到達段階を示す個別例外（stack／call log）"
+    },
+    "failureClassificationRef": "sevenTwoCIFailureClassification20261030"
   },
-  "nextPriority": "現在は7-2自身WebKit 2最終失敗の個別例外／停止境界が欠測のため実行停止。必要観測は当該試行で最初に失敗した操作／アサーションと到達段階を示すstack／call logの1点。次候補7-3第1ACEは独立草稿7件の静的保持のみ、43＋8期待案未実行・図／sortie-mode／sortie-session／sortie-log不変・4＋2 UI／台帳未完。旧図goalG1/bossPから実図E/Pは専用raw目標／履歴互換まで別扱い、7-2alias流用不可、第2G再調査0。",
+  "nextPriority": "7-2自身W4の2case×初回/retryはreload後第2search非表示click timeoutと分類済み、load後全文比較と表示切替caller/原因は未確認。7-2追加試験・推測修正・CIなし。独立7-3第1ACEは未実行7件373133Bを保持して安全なstatic設計を続行可。4+2厳密helper、Node aggregator/旧第1oracle、専用UI固定一覧、台帳接続が残件。43+8期待案と図/旧目標履歴互換は未完、第2G再調査0。",
   "previousSelected": {
     "id": "7-1/0/default",
     "baselineHead": "9714233e5133e32951781e703567b66c8b0280ec",
@@ -6041,8 +6049,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "7-2 local compatibility scope complete; CI40827828692 closed five-success/W4cancelled with two own WebKit final failures unclassified; execution stopped pending one individual-exception/first-failure-boundary observation",
-    "nextUnit": "7-3 independent seven-file static draft retained only; 43+8 expectations and4+2UI/ledger not executed/completed; no execution expansion while ownCI boundary remains unclassified",
+    "activeUnit": "7-2 failure classification finalized; independently resume7-3 first ACE source-grounded integration and required local verification",
+    "nextUnit": "7-3 first ACE: retain G source disagreement and old graph, connect4+2identity/Node/oracle/UI/guidance/audit only where grounded",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -6054,7 +6062,7 @@
       "stopOnNewPreservationMismatch": true,
       "fiveOneLocalResults": "C/W each3 initial pass; no new mismatch; original old anomaly unknown"
     },
-    "updated": "2026-10-29",
+    "updated": "2026-10-30",
     "autonomousRepairs": [
       "independently grounded expected-value, fixture, selector or fixed-list defects",
       "concrete regressions caused by current changes: minimal repair and necessary validation",
@@ -6064,8 +6072,8 @@
     ],
     "activeUnitBeforePreservationStop": "6-5 upper/lower limited source-backed improvements and normalC/W12 targets completed; records17/137/82 prepared on95c4f3ff; physical14 incl2 prior fixturefailures separate; upstream6-4CI40775006189 pending, owncommit/push/CI not started",
     "current": {
-      "date": "2026-10-29",
-      "state": "local scoped compatibility complete; own CI all-success incomplete; two own final failures unclassified; no additional diagnosis/speculative repair/success rerun",
+      "date": "2026-10-30",
+      "state": "local scoped compatibility complete; existing CI40827828692 own WebKit CEGready/BCDIMstock initial+retry four attempts classified as post-reload hidden search-click 45s timeouts; post-load exact comparison unreached and cause unresolved; no additional7-2 test, speculative repair or CI; independent7-3 static design continues",
       "baselineHead": "08ae92358c05d23b7d0044e22b3d36f51114623b",
       "record": "docs/pr152-seven-two-routes-ja.md",
       "oldStopRecord": "docs/pr152-seven-two-routes-hold-ja.md",
@@ -6081,7 +6089,7 @@
       "oldInitialFixtureFailureRetained": true,
       "extraSyntheticNodeBeforeRunRetained": true,
       "cellChange": "18/136/82 -> uncommitted20/137/79, 4 cells only",
-      "sourceCommitPushCI": "0f44f839 ordinary pushed; corrected-source CI40827828692 closed five smoke success/W4 cancelled at45m; own WebKit CEGready/BCDIMstock final failures lack individual boundary evidence",
+      "sourceCommitPushCI": "tested source0f44f839 / CI40827828692 attempt1 closed five smoke success/W4 jobcancelled; W4 smoke failed before cancellation; later records HEAD distinguished, no new CI dispatch",
       "stopConditionsUnchanged": true,
       "privateValuesShared": false,
       "firstSourceCI": {
@@ -6208,11 +6216,20 @@
         "existingWorkflowTriggersRetained": true
       },
       "stopDecision": {
+        "reason": "display-switch caller/cause unresolved; post-load full saved-value comparison unreached; no supported product/fixture repair identified",
+        "nextObservation": "失敗したreload後文書で既に生成された表示切替metadataの画面ID・文書識別・caller stack。追加試験は起動しない。",
+        "independentNextDraft": "safe independent7-3 static design may continue; seven files retained and unexecuted",
+        "newTestsOrCIForMissingEvidence": false
+      },
+      "stateBeforeFailureClassification20261030": "local scoped compatibility complete; own CI all-success incomplete; two own final failures unclassified; no additional diagnosis/speculative repair/success rerun",
+      "sourceCommitPushCIBeforeFailureClassification20261030": "0f44f839 ordinary pushed; corrected-source CI40827828692 closed five smoke success/W4 cancelled at45m; own WebKit CEGready/BCDIMstock final failures lack individual boundary evidence",
+      "stopDecisionBeforeFailureClassification20261030": {
         "reason": "cannot classify two own final failures from obtained originals",
         "nextObservation": "当該W4の7-2失敗試行で、最初に失敗した操作／アサーションと到達段階を示す個別例外（stack／call log）",
         "independentNextDraft": "seven-three seven files static only; no execution expansion",
         "newTestsOrCIForMissingEvidence": false
-      }
+      },
+      "failureClassificationRef": "sevenTwoCIFailureClassification20261030"
     },
     "activeUnitBeforeUpstreamCIFinalization": "new preservation mismatch stop: separate7-1C ready post-edit identity false; six-five validated WIP retained; no new trial/productfix/commit/push/CI",
     "currentBeforeAuthorizedIdentityObservationResume": {
@@ -6304,7 +6321,10 @@
       "privateValuesShared": false
     },
     "activeUnitBeforeFirstSourceCI": "7-2 CEG/BCDIM and old sortie-goal/history compatibility locally validated; original11 reused + Wunknown1 complete; source commit/push/finalHEAD smoke pending",
-    "activeUnitBeforeCorrectedSourceCIFinalization": "7-2source6361061a firstCI Node prerequisite failed; grounded legacy7-1 scope corrected with independent7-2 assertions; targetedNode3 firstpass; newHEADsmoke pending, product/browser/local25 unchanged"
+    "activeUnitBeforeCorrectedSourceCIFinalization": "7-2source6361061a firstCI Node prerequisite failed; grounded legacy7-1 scope corrected with independent7-2 assertions; targetedNode3 firstpass; newHEADsmoke pending, product/browser/local25 unchanged",
+    "activeUnitBeforeFailureClassification20261030": "7-2 local compatibility scope complete; CI40827828692 closed five-success/W4cancelled with two own WebKit final failures unclassified; execution stopped pending one individual-exception/first-failure-boundary observation",
+    "nextUnitBeforeFailureClassification20261030": "7-3 independent seven-file static draft retained only; 43+8 expectations and4+2UI/ledger not executed/completed; no execution expansion while ownCI boundary remains unclassified",
+    "activeUnitBeforeSevenThreeExecution20261030": "7-2 existing CI failure classification and records alignment complete; four own attempts stop at post-reload hidden search click, cause unresolved and post-load exact comparisons unreached; no additional7-2 test, speculative repair or CI"
   },
   "auditCorrection": {
     "baselineHead": "b2a1427cc199c18dc4a8af128f342bbc024190b1",
@@ -6512,5 +6532,253 @@
       "reason": "New own WebKit ready initial full save/edit/load evidence; separate from fixture correction itself, which changes0cells",
       "oldUnreachedStillMissing": true
     }
+  },
+  "nextPriorityBeforeFailureClassification20261030": "現在は7-2自身WebKit 2最終失敗の個別例外／停止境界が欠測のため実行停止。必要観測は当該試行で最初に失敗した操作／アサーションと到達段階を示すstack／call logの1点。次候補7-3第1ACEは独立草稿7件の静的保持のみ、43＋8期待案未実行・図／sortie-mode／sortie-session／sortie-log不変・4＋2 UI／台帳未完。旧図goalG1/bossPから実図E/Pは専用raw目標／履歴互換まで別扱い、7-2alias流用不可、第2G再調査0。",
+  "sevenTwoCIFailureClassification20261030": {
+    "date": "2026-10-30",
+    "record": "docs/pr152-seven-two-routes-ja.md#2026-10-30-既存ci全文ログによる失敗分類追補",
+    "runId": 40827828692,
+    "attempt": 1,
+    "job": 123294843255,
+    "testedSourceHead": "0f44f839be65d96b5627fd5951fb05525787c326",
+    "recordHeadBeforeUpdate": "a7edc698bf65c8499f6019743e49abe0ef20ed55",
+    "recordUpdate": "four documentation files retained uncommitted on a7edc698; no commit or push",
+    "priorMissingFields": "Retained verbatim in historical correctedSourceCI objects and prior prose. This dated classification supersedes only the evidence-availability and stop-stage descriptions.",
+    "runLogRetrieval": {
+      "route": "official per-attempt run-log ZIP, distinct from previously failed job-log endpoint",
+      "requests": 1,
+      "bytes": 5613736,
+      "sha256": "dab4686e33101c478985fddc6716c286dcc123a8e620a45af80fb217908a3723",
+      "zipCRCVerified": true,
+      "oldFailedJobLogRequestsRepeated": false,
+      "credentialChanges": false,
+      "capBypass": false,
+      "allSixJobFullLogsReceived": true,
+      "oldFourJobLogGapsResolved": true,
+      "separateFromSixReceivedArtifacts": true
+    },
+    "environmentFollowup": {
+      "jobs": [
+        "C1",
+        "C2",
+        "W1",
+        "W2",
+        "W3",
+        "W4"
+      ],
+      "eachNode": {
+        "tests": 497,
+        "pass": 497,
+        "fail": 0
+      },
+      "actualPulledDigestAllSix": "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29",
+      "existingSixEnvironmentReceiptsStillMatch": true
+    },
+    "officialCaseOutcomes": {
+      "chromium": {
+        "passed": 871,
+        "flaky": 0,
+        "failed": 0
+      },
+      "webkit": {
+        "passed": 859,
+        "flaky": 7,
+        "failed": 5
+      },
+      "meaning": "Playwright test-case outcomes, not rigorous first-attempt successes or physical execution counts",
+      "historicalFieldNamesRetained": [
+        "initialPass",
+        "retrySuccess",
+        "finalFailure"
+      ],
+      "physicalAttemptCount": null,
+      "strictInitialPassCount": null,
+      "otherInterruptedOrUnstartedCounts": null,
+      "jobCancellationAloneUsedToAdjustCounts": false
+    },
+    "W4TimelineUTC": {
+      "smokeStarted": "2026-10-29T06:13:34Z",
+      "smokeCompleted": "2026-10-29T06:56:40Z",
+      "smokeConclusion": "failure",
+      "jobCompleted": "2026-10-29T06:57:50Z",
+      "jobConclusion": "cancelled",
+      "jobCancellation": "45-minute limit after diagnostics upload"
+    },
+    "ownAttemptRecords": [
+      {
+        "case": "CEG ready",
+        "routeIndex": 0,
+        "attempt": "initial",
+        "stop": "post-reload second search button locator.click",
+        "timeoutMS": 45000,
+        "actionability": "element is not visible",
+        "elementResolvedToCorrectMapRouteFleet": true,
+        "stack": [
+          "tests/route-seven-two-routes.spec.js:69:47",
+          "tests/route-seven-two-routes.spec.js:115:44"
+        ],
+        "individualTimeoutBeforeJobCancellation": true,
+        "actualExceptionOccurrenceUTC": null
+      },
+      {
+        "case": "CEG ready",
+        "routeIndex": 0,
+        "attempt": "retry #1",
+        "stop": "post-reload second search button locator.click",
+        "timeoutMS": 45000,
+        "actionability": "element is not visible",
+        "elementResolvedToCorrectMapRouteFleet": true,
+        "stack": [
+          "tests/route-seven-two-routes.spec.js:69:47",
+          "tests/route-seven-two-routes.spec.js:115:44"
+        ],
+        "individualTimeoutBeforeJobCancellation": true,
+        "actualExceptionOccurrenceUTC": null
+      },
+      {
+        "case": "BCDIM stock",
+        "routeIndex": 1,
+        "attempt": "initial",
+        "stop": "post-reload second search button locator.click",
+        "timeoutMS": 45000,
+        "actionability": "element is not visible",
+        "elementResolvedToCorrectMapRouteFleet": true,
+        "stack": [
+          "tests/route-seven-two-routes.spec.js:69:47",
+          "tests/route-seven-two-routes.spec.js:115:44"
+        ],
+        "individualTimeoutBeforeJobCancellation": true,
+        "actualExceptionOccurrenceUTC": null
+      },
+      {
+        "case": "BCDIM stock",
+        "routeIndex": 1,
+        "attempt": "retry #1",
+        "stop": "post-reload second search button locator.click",
+        "timeoutMS": 45000,
+        "actionability": "element is not visible",
+        "elementResolvedToCorrectMapRouteFleet": true,
+        "stack": [
+          "tests/route-seven-two-routes.spec.js:69:47",
+          "tests/route-seven-two-routes.spec.js:115:44"
+        ],
+        "individualTimeoutBeforeJobCancellation": true,
+        "actualExceptionOccurrenceUTC": null
+      }
+    ],
+    "sameAttemptControlFlow": {
+      "basis": "same-source hard assertions and sequential awaited operations before recorded line115 failure; rawJSON values not retrieved",
+      "passedBeforeFailure": [
+        "initial search and apply",
+        "memo edit and prescribed saved-state comparisons",
+        "strict25/30 original identity checks",
+        "capture saved custom-fleet string before reload",
+        "reload load event and hdReady",
+        "hdMSNOpen7-2 and route value assertion"
+      ],
+      "unreachedAfterFailedAwait": [
+        "line115 load getter after search",
+        "line116 full saved-string equality",
+        "post-load same-document and strict-identity comparisons",
+        "final pageerror assertion"
+      ],
+      "storageWriteAcknowledgementObserved": false,
+      "durabilityObserved": false,
+      "postLoadPreservationVerified": false,
+      "positiveStorageLossEvidencePresent": false,
+      "noLossEvidenceIsSafetyProof": false
+    },
+    "stopRelation": {
+      "sameKnownHiddenClickStage": true,
+      "sameCauseEstablished": false,
+      "displaySwitchScreenDocumentCaller": null,
+      "productOrFixtureDefectIdentified": false,
+      "disabledOverlayPositionFrameOrSearchSlownessEstablished": false
+    },
+    "remainingMissing": {
+      "ownJSONExpected": 16,
+      "ownJSONReceived": 0,
+      "failedTraceVideoBodiesReceived": false,
+      "generatedPathsDoNotEstablishContents": true,
+      "oversizeArchivesStillNotRequested": [
+        {
+          "archive": "C2 attempt",
+          "bytes": 1122916626
+        },
+        {
+          "archive": "W4 attempt",
+          "bytes": 628986804
+        },
+        {
+          "archive": "W4 report",
+          "bytes": 1264043938
+        }
+      ],
+      "nextObservation": "失敗したreload後文書で既に生成された表示切替metadataの画面ID・文書識別・caller stack。追加試験は起動しない。"
+    },
+    "matrixAudit": {
+      "rows": 59,
+      "cells": 236,
+      "confirmed": 20,
+      "partial": 137,
+      "unconfirmed": 79,
+      "statusChanges": 0,
+      "criteriaChanged": false,
+      "fourCellEvidenceMaintained": {
+        "7-2/0/default.D": "prior six normal cases with same-row full save/edit or safe-abort and same-reload-document load/complete exact preservation",
+        "7-2/1/default.D": "prior five normal cases plus new WebKit unknown completion; same-row strict30 fields and full saved-value/other-state preservation",
+        "7-2/1/default.B": "partial representative finite-inventory deployment only",
+        "7-2/1/default.C": "partial representative concrete shortage/unknown guidance only"
+      },
+      "old11Reuse": "42 unchanged target dependencies plus two registration changes; three changed consumers independently tested; not whole-APP equality",
+      "newCISavedStateEvidence": "partial pre-reload control-flow evidence only; does not fill the same CI post-load comparison gap"
+    },
+    "independentStatic": {
+      "target": "7-3 firstACE",
+      "files": 7,
+      "bytes": 373133,
+      "executed": false,
+      "safeStaticContinuationAllowed": true,
+      "reviewedResiduals": [
+        "strict4-original +2 separately pure-blank identity helper contract",
+        "Node aggregator registration and old first-gauge literal oracle",
+        "dedicatedUI spec and fixed test list",
+        "independent source expectations connected to audit ledgers"
+      ],
+      "expectationDraft43Plus8Executed": false,
+      "diagramLegacyGoalHistoryCompatibilityComplete": false,
+      "secondGInvestigationResumed": false,
+      "cellPromotions": 0
+    },
+    "decision": {
+      "additionalSevenTwoTests": false,
+      "speculativeProductOrFixtureRepair": false,
+      "newCI": false,
+      "recordsOnlyDispatch": false,
+      "independentSafeStaticDesignContinues": true,
+      "ownCIAllSuccessComplete": false,
+      "PR152DraftAndPublicHoldMaintained": true,
+      "mainConflictAndPR151MainVersionSWProductionMaintained": true
+    }
+  },
+  "sevenTwoClassificationFinalization20261030": {
+    "sourceHead": "0f44f839be65d96b5627fd5951fb05525787c326",
+    "recordBaseline": "a7edc698bf65c8499f6019743e49abe0ef20ed55",
+    "runId": 40827828692,
+    "jobId": 123294843255,
+    "attempt": 1,
+    "targetTrials": 4,
+    "savedPostEditSpecifiedAssertions": "passed by same-attempt hard-assert control flow",
+    "afterReloadSecondSearch": "button present but not visible; locator.click45s timeout",
+    "afterReloadWholeValueComparison": "not reached",
+    "rawValueJSON": "missing",
+    "displayCallerAndCause": "unknown",
+    "outcomesMeaning": "passed/flaky/failed test cases, not exact initial or physical trial counts",
+    "smokeAndJobCancellationSeparated": true,
+    "receivedArtifactsCheckedForNavigationMetadata": 6,
+    "navigationRuntimeMetadataReceived": false,
+    "extraExecutionForMetadata": 0,
+    "matrixChanges": 0,
+    "independentSevenThreeResumeAuthorized": true
   }
 }
