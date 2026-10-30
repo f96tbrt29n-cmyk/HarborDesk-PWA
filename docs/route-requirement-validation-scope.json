@@ -13530,6 +13530,76 @@
         "localAfterLoadUnreached": 2,
         "applyAndMemoCases": 4,
         "unknownSafeAbortAndNoEditCases": 2
+      },
+      "ownCIFinalRepresentativeRecord": {
+        "record": "sevenFiveSecondCIFinalization20261030",
+        "document": "docs/pr152-seven-five-second-ja.md",
+        "source": "972b63a4a7761903c1f8d88fa04c61b136c89984",
+        "runId": 41060471226,
+        "attempt": 1,
+        "dispatches": 1,
+        "reruns": 0,
+        "runConclusion": "failure",
+        "smokeJobs": {
+          "success": 5,
+          "failure": 1,
+          "cancelled": 0
+        },
+        "full": "skipped",
+        "officialCaseOutcomes": {
+          "chromium": {
+            "passed": 882,
+            "flaky": 1,
+            "failed": 0
+          },
+          "webkit": {
+            "passed": 874,
+            "flaky": 8,
+            "failed": 1
+          }
+        },
+        "outcomeCountsArePhysicalInitialCounts": false,
+        "ownOfficialCaseOutcomes": {
+          "passed": 5,
+          "flaky": 1,
+          "failed": 0
+        },
+        "ownIdentifiedSummaryOriginals": 7,
+        "ownInitial": {
+          "identified": 6,
+          "full": 5,
+          "loadWholeUnreached": 1,
+          "savedOrSafeAbortReads": 6,
+          "loadWholeReads": 5,
+          "knownStockApplyMemoCases": 4,
+          "unknownSafeAbortNoEditCases": 2
+        },
+        "ownRetry": {
+          "identified": 1,
+          "knownWebKitRetry1Full": 1,
+          "savedRead": 1,
+          "loadWholeRead": 1,
+          "knownApplyMemoCases": 1
+        },
+        "DDirectEvidence": "identified same-row C3/Wstock/Wunknown initial5full plus Wknown retry1full; full saved/edit or safe-abort, same-document load, strict30 and other data/metadata comparisons",
+        "DDefinitionUnchanged": true,
+        "DOnly": {
+          "before": "一部",
+          "after": "確認済み"
+        },
+        "countsBefore": [
+          23,
+          146,
+          67
+        ],
+        "countsAfter": [
+          24,
+          145,
+          67
+        ],
+        "initialAndOldLocalGapsFilled": false,
+        "collectorClosureSHA256": "454d55146cc55e119b7df2c25d89c86270988635f4fc13b828b6d508dd0dfdaf",
+        "collectorFinalClosurePending": false
       }
     },
     {

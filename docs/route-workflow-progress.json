@@ -73,8 +73,8 @@
       "非該当": 0
     },
     "D": {
-      "確認済み": 23,
-      "一部": 16,
+      "確認済み": 24,
+      "一部": 15,
       "未確認": 20,
       "非該当": 0
     }
@@ -2830,8 +2830,8 @@
           ]
         },
         "D": {
-          "status": "一部",
-          "reason": "C3とW未知の4件は保存または安全中止・適用編集・同一reload文書load全文/strict30/他保持まで完了。W成立/不足は保存編集後strict30通過後load再探索非表示45秒、全文/caller未到達なので一部。",
+          "status": "確認済み",
+          "reason": "自身C3・W不足/未知の初回5件とW成立retry1の同定済み直接証拠で、保存または安全中止・適用可能な編集・同一reload文書load全文/strict30・他編成/metadata保持を6代表へ対応。W成立初回は保存編集後比較通過後の試験総45秒期限時にload後search buttonの非表示click待機で停止し全文未到達、旧localW成立/不足も未到達のまま。 初回限定/flaky除外ではなく既存Dの全列挙操作基準による限定確認で、全体安定性の証明ではない。",
           "evidence": [
             "docs/pr152-seven-five-second-ja.md",
             "tests/route-seven-five-second.spec.js",
@@ -2840,7 +2840,7 @@
           ]
         }
       },
-      "remaining": "D15の出典優先差・JP403・CD/LHA/六隻外の適用、全目標数量/全在庫/枠競合/代替は未完。PT汎用比較1組を第2の十分性・購入数へ変換しない。W成立/不足のload全文と表示変更元/原因は欠測。実ゲージ開放/到達/勝利、旧出撃目標/履歴互換を今回検証済みにしない。",
+      "remaining": "D15の出典優先差・JP403・CD/LHA/六隻外の適用、全目標数量/全在庫/枠競合/代替は未完。PT汎用比較1組を第2の十分性・購入数へ変換しない。旧localW成立/不足と今回CIW成立初回のload全文・表示変更元/原因は欠測として残す。実ゲージ開放/到達/勝利、旧出撃目標/履歴互換を今回検証済みにしない。",
       "representativeWorkflowRecord": {
         "record": "sevenFiveSecondLocal20261030",
         "document": "docs/pr152-seven-five-second-ja.md",
@@ -2856,6 +2856,76 @@
         "localAfterLoadUnreached": 2,
         "applyAndMemoCases": 4,
         "unknownSafeAbortAndNoEditCases": 2
+      },
+      "ownCIFinalRepresentativeRecord": {
+        "record": "sevenFiveSecondCIFinalization20261030",
+        "document": "docs/pr152-seven-five-second-ja.md",
+        "source": "972b63a4a7761903c1f8d88fa04c61b136c89984",
+        "runId": 41060471226,
+        "attempt": 1,
+        "dispatches": 1,
+        "reruns": 0,
+        "runConclusion": "failure",
+        "smokeJobs": {
+          "success": 5,
+          "failure": 1,
+          "cancelled": 0
+        },
+        "full": "skipped",
+        "officialCaseOutcomes": {
+          "chromium": {
+            "passed": 882,
+            "flaky": 1,
+            "failed": 0
+          },
+          "webkit": {
+            "passed": 874,
+            "flaky": 8,
+            "failed": 1
+          }
+        },
+        "outcomeCountsArePhysicalInitialCounts": false,
+        "ownOfficialCaseOutcomes": {
+          "passed": 5,
+          "flaky": 1,
+          "failed": 0
+        },
+        "ownIdentifiedSummaryOriginals": 7,
+        "ownInitial": {
+          "identified": 6,
+          "full": 5,
+          "loadWholeUnreached": 1,
+          "savedOrSafeAbortReads": 6,
+          "loadWholeReads": 5,
+          "knownStockApplyMemoCases": 4,
+          "unknownSafeAbortNoEditCases": 2
+        },
+        "ownRetry": {
+          "identified": 1,
+          "knownWebKitRetry1Full": 1,
+          "savedRead": 1,
+          "loadWholeRead": 1,
+          "knownApplyMemoCases": 1
+        },
+        "DDirectEvidence": "identified same-row C3/Wstock/Wunknown initial5full plus Wknown retry1full; full saved/edit or safe-abort, same-document load, strict30 and other data/metadata comparisons",
+        "DDefinitionUnchanged": true,
+        "DOnly": {
+          "before": "一部",
+          "after": "確認済み"
+        },
+        "countsBefore": [
+          23,
+          146,
+          67
+        ],
+        "countsAfter": [
+          24,
+          145,
+          67
+        ],
+        "initialAndOldLocalGapsFilled": false,
+        "collectorClosureSHA256": "454d55146cc55e119b7df2c25d89c86270988635f4fc13b828b6d508dd0dfdaf",
+        "collectorFinalClosurePending": false
       }
     },
     {
@@ -2903,12 +2973,12 @@
   ],
   "selected": {
     "id": "7-5/1/default",
-    "baselineHead": "80b156f5f3a39355946f38b8ca9d4d648c0bf45b",
-    "record": "sevenFiveSecondLocal20261030",
+    "baselineHead": "972b63a4a7761903c1f8d88fa04c61b136c89984",
+    "record": "sevenFiveSecondCIFinalization20261030",
     "evidence": "docs/pr152-seven-five-second-ja.md",
-    "state": "local6 firsts4complete/2WebKit postloadclickhidden; Dpartial, oldgapnotfilled, no preservationpositive in reached checks"
+    "state": "ownCI first5full + identified Wknown retry1full directly cover six same-row representatives; Dconfirmed only; old first/local gaps and whole-map limits retained"
   },
-  "nextPriority": "7-5第3ABDFJOPTの先行分岐・P索敵・旧目標保持を独立確認する。第2の最終HEAD smoke回収と分離し、出典未確定は未判定を維持、成功目的の反復をしない。",
+  "nextPriority": "7-5第3ABDFJOPTの選択表示scopeを独立確認する。G3草稿・未実施ブラウザーはG2証拠へ加算せず、その後の候補は3-1のsource-only確認とする。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -9150,5 +9220,157 @@
     "currentState": "own corrected-source CI initial6 completed all D operations; D confirmed, A/B/C partial, old local Wstock load/caller gap retained separately; next independent7-5second draft not executed",
     "recoveryRecord": "sevenFiveSecondRecoveryAndW4Correction20261030"
   },
-  "nextPriorityBeforeSevenFiveSecondLocal20261030": "実行接続復旧。7-5第2ABDFJOQの保存済み草稿12件から、B/D/J分岐順と軽空2の反例・代替境界、既存PT目標の保持をレビューし、after15と代表C/Wの未実施検証へ進む。今回の復旧/W4訂正はセルcredit0。"
+  "nextPriorityBeforeSevenFiveSecondLocal20261030": "実行接続復旧。7-5第2ABDFJOQの保存済み草稿12件から、B/D/J分岐順と軽空2の反例・代替境界、既存PT目標の保持をレビューし、after15と代表C/Wの未実施検証へ進む。今回の復旧/W4訂正はセルcredit0。",
+  "selectedBeforeSevenFiveSecondCIFinalization20261030": {
+    "id": "7-5/1/default",
+    "baselineHead": "80b156f5f3a39355946f38b8ca9d4d648c0bf45b",
+    "record": "sevenFiveSecondLocal20261030",
+    "evidence": "docs/pr152-seven-five-second-ja.md",
+    "state": "local6 firsts4complete/2WebKit postloadclickhidden; Dpartial, oldgapnotfilled, no preservationpositive in reached checks"
+  },
+  "sevenFiveSecondCIFinalization20261030": {
+    "record": "sevenFiveSecondCIFinalization20261030",
+    "document": "docs/pr152-seven-five-second-ja.md",
+    "source": "972b63a4a7761903c1f8d88fa04c61b136c89984",
+    "runId": 41060471226,
+    "attempt": 1,
+    "dispatches": 1,
+    "reruns": 0,
+    "runConclusion": "failure",
+    "smokeJobs": {
+      "success": 5,
+      "failure": 1,
+      "cancelled": 0
+    },
+    "full": "skipped",
+    "officialCaseOutcomes": {
+      "chromium": {
+        "passed": 882,
+        "flaky": 1,
+        "failed": 0
+      },
+      "webkit": {
+        "passed": 874,
+        "flaky": 8,
+        "failed": 1
+      }
+    },
+    "outcomeCountsArePhysicalInitialCounts": false,
+    "environment": {
+      "jobs": 6,
+      "Node": "24.21.0",
+      "Playwright": "1.55.0",
+      "ChromiumRevision": "1187",
+      "WebKitRevision": "2203",
+      "imageDigestPrefix": "b27e719e",
+      "eachJobNodeFooter": {
+        "tests": 566,
+        "pass": 566,
+        "fail": 0
+      },
+      "checkoutAndActualImagePullMatched": true
+    },
+    "sourceEvidence": {
+      "expectedGitFiles": 630,
+      "expectedGitManifestSHA256": "0b3426ef6948b05acf7e848a1b15bd2c1813f90d589b3efa53f0eb8c306afb38",
+      "expectedGitAndLocalRuntimeAreDifferentSets": true,
+      "CIHTTPServedFileHashesIndependentlyMeasured": false,
+      "localPublicSnapshotFiles": 629,
+      "localPrivateConfigFiles": 1
+    },
+    "ownOfficialCaseOutcomes": {
+      "passed": 5,
+      "flaky": 1,
+      "failed": 0
+    },
+    "ownIdentifiedSummaryOriginals": 7,
+    "ownInitial": {
+      "identified": 6,
+      "full": 5,
+      "loadWholeUnreached": 1,
+      "savedOrSafeAbortReads": 6,
+      "loadWholeReads": 5,
+      "knownStockApplyMemoCases": 4,
+      "unknownSafeAbortNoEditCases": 2
+    },
+    "ownRetry": {
+      "identified": 1,
+      "knownWebKitRetry1Full": 1,
+      "savedRead": 1,
+      "loadWholeRead": 1,
+      "knownApplyMemoCases": 1
+    },
+    "ownInitialKnownWebKit": {
+      "stage": "after-load-search",
+      "operation": "locator.click",
+      "testTotalDeadlineMS": 45000,
+      "resolvedElement": "search button, not visible",
+      "helperLine": 82,
+      "testCaller": "125:44",
+      "resultVisibilityAssertionReached": false,
+      "savedStrict30Passed": true,
+      "loadWholeComparisonReached": false,
+      "navigationCollectionFailures": 1,
+      "clickDeliveryHandlerSearchStartAndDisplayChangeCaller": null
+    },
+    "DDirectEvidence": "identified same-row C3/Wstock/Wunknown initial5full plus Wknown retry1full; full saved/edit or safe-abort, same-document load, strict30 and other data/metadata comparisons",
+    "DDefinitionUnchanged": true,
+    "DOnly": {
+      "before": "一部",
+      "after": "確認済み"
+    },
+    "countsBefore": [
+      23,
+      146,
+      67
+    ],
+    "countsAfter": [
+      24,
+      145,
+      67
+    ],
+    "initialAndOldLocalGapsFilled": false,
+    "newPreservationMismatchObserved": false,
+    "writeCallCount": null,
+    "artifacts": {
+      "listed": 12,
+      "received": 9,
+      "receivedBytes": 8237806,
+      "over512MiBUnrequested": 3,
+      "receivedTinySummaryOriginals": 26,
+      "tinySummariesAreRawTrace": false,
+      "C2AndW4TraceBodiesReceived": false,
+      "W1RetryTraceOnly": true,
+      "sourceEnvironmentAuditSHA256": "725d722d36a3749382ccf5f0dc16bdfefe470e71e06344a7d9a55fc0c8ce9de4",
+      "independentTinyAuditSHA256": "b6e90398204480b593a9ee9113199cb2bcc61c93edaeefc273e222f6e5797e01",
+      "collectorClosurePath": "private/seven-five-second-execution-20261030/ci/closure-result.json",
+      "collectorClosureBytes": 17718,
+      "collectorClosureSHA256": "454d55146cc55e119b7df2c25d89c86270988635f4fc13b828b6d508dd0dfdaf",
+      "independentClosureReviewSHA256": "5c16a7fb80bceddc7992ffa02a2d12cb20070d06cf6b6e43e50fb5432641c491",
+      "ciManifest": {
+        "files": 1136,
+        "bytes": 29242784,
+        "sha256": "3611a9377a1192dc83f463b9da9168a646598c02810cb6085beb894200c8f521"
+      },
+      "artifactManifest": {
+        "files": 129,
+        "bytes": 8625925,
+        "sha256": "a67c5e4823a62950c735666f6dba55343ee367ed1ca482f0e82c086277fb98b0"
+      },
+      "manifestFileHashesRechecked": 1265
+    },
+    "otherFailures": {
+      "W4FinalSixFourReady": "first and retry1 search button resolved not visible; waiting for locator.click on a nonvisible search button at the total45s test deadline; caller164:44; finalfailed1 directly confirmed by footer; result visibility assertion unreached, display-change caller/cause unknown",
+      "C2UpstreamInitial": "added boundingBox was null; diagnostic argument added.height threw TypeError before final height assertion; retry completed; not a storage-null finding",
+      "W1DropHuntInitial": "UI assertions passed; final errors[] failed with version access-control; first trace/time/caller missing; retry completed separately"
+    },
+    "specificG2CauseOfOtherFailuresConfirmed": false,
+    "investigationExpanded": false,
+    "legacy53DefinitionsScoutingAndOther58RowsChanged": false,
+    "wholeMapComplete": false,
+    "next": "7-5第3ABDFJOPTの選択表示scopeを独立確認する。G3草稿・未実施ブラウザーはG2証拠へ加算せず、その後の候補は3-1のsource-only確認とする。",
+    "collectorClosureSHA256": "454d55146cc55e119b7df2c25d89c86270988635f4fc13b828b6d508dd0dfdaf",
+    "collectorFinalClosurePending": false
+  },
+  "nextPriorityBeforeSevenFiveSecondCIFinalization20261030": "7-5第3ABDFJOPTの先行分岐・P索敵・旧目標保持を独立確認する。第2の最終HEAD smoke回収と分離し、出典未確定は未判定を維持、成功目的の反復をしない。"
 }
