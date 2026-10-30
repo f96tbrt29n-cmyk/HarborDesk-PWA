@@ -32,7 +32,9 @@ test('an unknown cruiser stays manual while a different known slow hull makes th
  const c=context(),rows=registered();rows[2]=hull('','艦情報未登録');rows[2].speedInfo.known=false;rows[3].speedInfo.rank=5;
  const r=c.hdFERouteContract({ships:rows});assert.equal(r.status,'missing');assert.equal(r.checks.find(x=>x.condition.reason?.startsWith('I→J')).status,'manual');assert.equal(r.checks.find(x=>x.condition.kind==='minSpeed').status,'missing');
 });
-test('first gauge and existing speed and historical hull requirements stay unchanged',()=>{
- const c=context(),first=vm.runInContext("HD_MAP_ROUTE_REQUIREMENTS['7-3'][0]",c);assert.equal(first.path,'ACE');assert.equal(first.scopeIncomplete,undefined);assert.deepEqual(JSON.parse(JSON.stringify(first.conditions)),[{kind:'fleetCount',min:4,max:4},{kind:'namedCount',names:['羽黒'],min:1,max:7},{kind:'typeCount',types:['駆逐艦'],matchPolicy:'exact',min:3,max:7},{kind:'typeCount',types:['戦艦','高速戦艦','航空戦艦','正規空母','装甲空母','軽空母'],matchPolicy:'exact',min:0,max:0}]);
+// The independently sourced first-gauge A/C scope is covered by
+// seven-three-first-routes.test.cjs; keep this second-gauge guard intact.
+test('second gauge keeps its existing speed and historical hull requirements',()=>{
+ const c=context();
  assert.equal(c.data.conditions.find(x=>x.kind==='minSpeed').rank,10);assert.deepEqual(Array.from(c.data.conditions.filter(x=>x.kind==='namedCount').flatMap(x=>Array.from(x.names))),['羽黒','足柄']);
 });

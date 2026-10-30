@@ -1516,7 +1516,9 @@
       "status": "partial",
       "existingEvidence": [
         "全マスター仮想所持の直接構造選択・未知艦拒否（全論理枝ではない）",
-        "羽黒優先選択"
+        "羽黒優先選択",
+        "P開放前A/Cの凍結三出典と独立P1 42＋追加8案。元43案の値/順序とP2 source-only1を保持。全艦隊へ4隻/羽黒/DD3を課さない。",
+        "tests/seven-three-first-routes.test.cjs / docs/pr152-seven-three-first-ja.md（Node・source根拠。UI完了へ換算しない）"
       ],
       "remaining": [
         {
@@ -1534,6 +1536,10 @@
         {
           "code": "P",
           "detail": "境界と在庫競合を組み合わせた生成→配備→最適化→艦/装備交換→保存再読込→同期更新→プランナーの全操作列"
+        },
+        {
+          "code": "X",
+          "detail": "軽空母CV系略称・少数隻の史実ペア優先順の出典差、揚陸艦・海防戦艦モデル・未知艦。図全体/旧出撃目標・通過履歴互換は未完、第2G不一致は別行に保持。"
         }
       ],
       "strategyTargets": []

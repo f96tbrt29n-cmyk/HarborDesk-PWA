@@ -1,5 +1,6 @@
 'use strict';
 require('./seven-three-gij.test.cjs');
+require('./seven-three-first-routes.test.cjs');
 require('./five-four-battleship.test.cjs');
 require('./five-four-scouting-exemption.test.cjs');
 require('./five-four-fixed-input.test.cjs');

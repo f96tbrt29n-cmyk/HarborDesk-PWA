@@ -16,7 +16,9 @@ async function north(page){await boot(page);await page.evaluate(()=>{
  });}
 test('fulfilled named route condition stays protected while another mandatory condition is missing',async({page})=>{
  await boot(page);const r=await page.evaluate(()=>{
- const p={map:'7-3',preset:MAP_PLANS['7-3'].presets[0],ships:['羽黒改二','時雨改二','矢矧改二','阿武隈改二'].map(ship=>({ship,items:[]})),openingAswCount:0};
+ // The generalized first ACE is independently checked in seven-three-first-routes.
+ // This generic protection oracle uses the unchanged second example's direct named condition.
+ const p={map:'7-3',preset:MAP_PLANS['7-3'].presets[1],ships:['羽黒改二','時雨改二','矢矧改二','阿武隈改二','夕立改二','島風改'].map(ship=>({ship,items:[]})),openingAswCount:0};
  const before=hdOCMeasure(p,[]),q=hdFOClone(p);q.ships[0].ship='妙高改二';const after=hdOCMeasure(q,[]);
  return {before:hdFERoute(p).status,after:hdFERoute(q).status,regressions:hdOCGoalRegressions(before,after)};
  });expect(r.before).not.toBe('ready');expect(r.after).not.toBe('ready');expect(r.regressions.length).toBeGreaterThan(0);
@@ -37,7 +39,7 @@ test('planner import revalidates the actual plan instead of trusting cached fulf
  return {cached:measure.goals.find(g=>g.kind==='drum-ships').ok,final:result.measure.goals.find(g=>g.kind==='drum-ships').ok,actual:hdOCMeasure(p,[]).goals.find(g=>g.kind==='drum-ships').ok,assessment:s.proposal.assessment};
  });expect(r.cached).toBe(true);expect(r.actual).toBe(false);expect(r.final).toBe(false);expect(r.assessment.status).toBe('missing');expect(r.assessment.checks.some(c=>c.id==='equipment')).toBe(true);
 });
-test('automatic selection prefers required historical hulls over higher-level substitutes',async({page})=>{
+test('automatic selection prefers registered historical examples over higher-level substitutes',async({page})=>{
  await boot(page);const r=await page.evaluate(()=>{
  const names=['妙高改二','羽黒改二','足柄改二','時雨改二','夕立改二','綾波改二','島風改'];
  localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(names.map((name,i)=>({id:'named-'+i,name,masterId:hdShipDbMasterRowFor({name}).id,gameShipId:700+i,level:i===0?99:50}))));

@@ -10538,25 +10538,9 @@
       "conditions": [
         {
           "kind": "fleetCount",
-          "min": 4,
-          "max": 4
-        },
-        {
-          "kind": "namedCount",
-          "names": [
-            "羽黒"
-          ],
           "min": 1,
-          "max": 7
-        },
-        {
-          "kind": "typeCount",
-          "types": [
-            "駆逐艦"
-          ],
-          "matchPolicy": "exact",
-          "min": 3,
-          "max": 7
+          "max": 4,
+          "reason": "P開放前の選択ACE。5隻以上は不一致。少数隻を出撃・勝利の推奨とはしない。"
         },
         {
           "kind": "typeCount",
@@ -10565,12 +10549,3013 @@
             "高速戦艦",
             "航空戦艦",
             "正規空母",
-            "装甲空母",
-            "軽空母"
+            "装甲空母"
           ],
           "matchPolicy": "exact",
           "min": 0,
-          "max": 0
+          "max": 0,
+          "reason": "Cの先行D条件。史実艦や未知艦があっても既知の戦艦級・正規/装甲空母不一致を保持する。"
+        },
+        {
+          "kind": "typeCount",
+          "types": [
+            "駆逐艦",
+            "海防艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 1,
+          "max": 7,
+          "reason": "A/Cで明記された駆逐＋海防の合算。海防を駆逐へ改名しない。"
+        },
+        {
+          "any": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "揚陸艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 0,
+              "max": 0
+            },
+            {
+              "kind": "unverified",
+              "reason": "揚陸艦のA/C算入は出典未確認。"
+            }
+          ]
+        },
+        {
+          "any": [
+            {
+              "all": [
+                {
+                  "all": [
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "軽空母"
+                      ],
+                      "matchPolicy": "exact",
+                      "min": 0,
+                      "max": 0
+                    },
+                    {
+                      "any": [
+                        {
+                          "kind": "fleetCount",
+                          "min": 1,
+                          "max": 1
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "重巡洋艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 1,
+                              "max": 7
+                            },
+                            {
+                              "any": [
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "羽黒"
+                                      ],
+                                      "min": 1,
+                                      "max": 7
+                                    },
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "神風"
+                                      ],
+                                      "min": 1,
+                                      "max": 7
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "fleetCount",
+                                      "min": 2,
+                                      "max": 3
+                                    },
+                                    {
+                                      "any": [
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 1,
+                                              "max": 1
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 1,
+                                              "max": 1
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 2,
+                                              "max": 2
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 2,
+                                              "max": 2
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 3,
+                                              "max": 3
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 3,
+                                              "max": 3
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 4,
+                                              "max": 4
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 4,
+                                              "max": 4
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "fleetCount",
+                                      "min": 4,
+                                      "max": 4
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "重巡洋艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 1
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "駆逐艦",
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 2,
+                                      "max": 7
+                                    },
+                                    {
+                                      "any": [
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 1,
+                                              "max": 1
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 1,
+                                              "max": 1
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 2,
+                                              "max": 2
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 2,
+                                              "max": 2
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 3,
+                                              "max": 3
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 3,
+                                              "max": 3
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 4,
+                                              "max": 4
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 4,
+                                              "max": 4
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "all": [
+                            {
+                              "all": [
+                                {
+                                  "kind": "namedCount",
+                                  "names": [
+                                    "羽黒"
+                                  ],
+                                  "min": 1,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "namedCount",
+                                  "names": [
+                                    "神風"
+                                  ],
+                                  "min": 1,
+                                  "max": 7
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "重巡洋艦",
+                                    "航空巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 2
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "足柄"
+                                      ],
+                                      "min": 1,
+                                      "max": 7
+                                    },
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "妙高"
+                                      ],
+                                      "min": 1,
+                                      "max": 7
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "駆逐艦",
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 2,
+                                      "max": 7
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "not": {
+                                "all": [
+                                  {
+                                    "kind": "namedCount",
+                                    "names": [
+                                      "羽黒"
+                                    ],
+                                    "min": 1,
+                                    "max": 7
+                                  },
+                                  {
+                                    "kind": "namedCount",
+                                    "names": [
+                                      "神風"
+                                    ],
+                                    "min": 1,
+                                    "max": 7
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "any": [
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "fleetCount",
+                                      "min": 4,
+                                      "max": 4
+                                    },
+                                    {
+                                      "any": [
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "namedCount",
+                                              "names": [
+                                                "羽黒"
+                                              ],
+                                              "min": 1,
+                                              "max": 7
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 3,
+                                              "max": 3
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "namedCount",
+                                              "names": [
+                                                "神風"
+                                              ],
+                                              "min": 1,
+                                              "max": 7
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 4,
+                                              "max": 4
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "fleetCount",
+                                      "min": 3,
+                                      "max": 3
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "重巡洋艦",
+                                        "航空巡洋艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 1
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "駆逐艦",
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 2,
+                                      "max": 7
+                                    },
+                                    {
+                                      "any": [
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 1,
+                                              "max": 1
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 1,
+                                              "max": 1
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 2,
+                                              "max": 2
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 2,
+                                              "max": 2
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 3,
+                                              "max": 3
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 3,
+                                              "max": 3
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 4,
+                                              "max": 4
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 4,
+                                              "max": 4
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "kind": "fleetCount",
+                                  "min": 1,
+                                  "max": 2
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "all": [
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "軽空母"
+                      ],
+                      "matchPolicy": "exact",
+                      "min": 0,
+                      "max": 0
+                    },
+                    {
+                      "any": [
+                        {
+                          "kind": "fleetCount",
+                          "min": 1,
+                          "max": 1
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "namedCount",
+                              "names": [
+                                "羽黒"
+                              ],
+                              "min": 1,
+                              "max": 7
+                            },
+                            {
+                              "kind": "namedCount",
+                              "names": [
+                                "神風"
+                              ],
+                              "min": 1,
+                              "max": 7
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "補給艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 1,
+                              "max": 7
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 3,
+                              "max": 7
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "重巡洋艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 1,
+                              "max": 7
+                            },
+                            {
+                              "any": [
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "fleetCount",
+                                      "min": 2,
+                                      "max": 3
+                                    },
+                                    {
+                                      "any": [
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 1,
+                                              "max": 1
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 1,
+                                              "max": 1
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 2,
+                                              "max": 2
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 2,
+                                              "max": 2
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 3,
+                                              "max": 3
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 3,
+                                              "max": 3
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 4,
+                                              "max": 4
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 4,
+                                              "max": 4
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "fleetCount",
+                                      "min": 4,
+                                      "max": 4
+                                    },
+                                    {
+                                      "any": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "羽黒"
+                                          ],
+                                          "min": 1,
+                                          "max": 7
+                                        },
+                                        {
+                                          "kind": "minSpeed",
+                                          "rank": 10
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "any": [
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "駆逐艦",
+                                            "海防艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 3,
+                                          "max": 7
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "軽巡洋艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 1,
+                                              "max": 1
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 2,
+                                              "max": 2
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "all": [
+                            {
+                              "kind": "fleetCount",
+                              "min": 4,
+                              "max": 4
+                            },
+                            {
+                              "any": [
+                                {
+                                  "all": [
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "羽黒"
+                                          ],
+                                          "min": 1,
+                                          "max": 7
+                                        },
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "神風"
+                                          ],
+                                          "min": 1,
+                                          "max": 7
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "重巡洋艦",
+                                            "航空巡洋艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 2
+                                        },
+                                        {
+                                          "any": [
+                                            {
+                                              "kind": "namedCount",
+                                              "names": [
+                                                "足柄"
+                                              ],
+                                              "min": 1,
+                                              "max": 7
+                                            },
+                                            {
+                                              "kind": "namedCount",
+                                              "names": [
+                                                "妙高"
+                                              ],
+                                              "min": 1,
+                                              "max": 7
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 2,
+                                              "max": 7
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "not": {
+                                        "all": [
+                                          {
+                                            "kind": "namedCount",
+                                            "names": [
+                                              "羽黒"
+                                            ],
+                                            "min": 1,
+                                            "max": 7
+                                          },
+                                          {
+                                            "kind": "namedCount",
+                                            "names": [
+                                              "神風"
+                                            ],
+                                            "min": 1,
+                                            "max": 7
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "fleetCount",
+                                          "min": 4,
+                                          "max": 4
+                                        },
+                                        {
+                                          "any": [
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "namedCount",
+                                                  "names": [
+                                                    "羽黒"
+                                                  ],
+                                                  "min": 1,
+                                                  "max": 7
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 3,
+                                                  "max": 3
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "namedCount",
+                                                  "names": [
+                                                    "神風"
+                                                  ],
+                                                  "min": 1,
+                                                  "max": 7
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 4,
+                                                  "max": 4
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "fleetCount",
+                              "min": 3,
+                              "max": 3
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "重巡洋艦",
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 3,
+                              "max": 3
+                            },
+                            {
+                              "any": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "重巡洋艦",
+                                    "航空巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 1
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "羽黒"
+                                      ],
+                                      "min": 1,
+                                      "max": 7
+                                    },
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "神風"
+                                      ],
+                                      "min": 1,
+                                      "max": 7
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "kind": "fleetCount",
+                          "min": 1,
+                          "max": 2
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "all": [
+                    {
+                      "any": [
+                        {
+                          "kind": "fleetCount",
+                          "min": 1,
+                          "max": 1
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "namedCount",
+                              "names": [
+                                "羽黒"
+                              ],
+                              "min": 1,
+                              "max": 7
+                            },
+                            {
+                              "kind": "namedCount",
+                              "names": [
+                                "神風"
+                              ],
+                              "min": 1,
+                              "max": 7
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "補給艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 1,
+                              "max": 7
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 3,
+                              "max": 7
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "重巡洋艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 1,
+                              "max": 7
+                            },
+                            {
+                              "any": [
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "fleetCount",
+                                      "min": 2,
+                                      "max": 3
+                                    },
+                                    {
+                                      "any": [
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 1,
+                                              "max": 1
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 1,
+                                              "max": 1
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 2,
+                                              "max": 2
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 2,
+                                              "max": 2
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 3,
+                                              "max": 3
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 3,
+                                              "max": 3
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 4,
+                                              "max": 4
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "軽巡洋艦",
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 4,
+                                              "max": 4
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "fleetCount",
+                                      "min": 4,
+                                      "max": 4
+                                    },
+                                    {
+                                      "any": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "羽黒"
+                                          ],
+                                          "min": 1,
+                                          "max": 7
+                                        },
+                                        {
+                                          "kind": "minSpeed",
+                                          "rank": 10
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "any": [
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "駆逐艦",
+                                            "海防艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 3,
+                                          "max": 7
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "軽巡洋艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 1,
+                                              "max": 1
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 2,
+                                              "max": 2
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "all": [
+                            {
+                              "kind": "fleetCount",
+                              "min": 4,
+                              "max": 4
+                            },
+                            {
+                              "any": [
+                                {
+                                  "all": [
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "羽黒"
+                                          ],
+                                          "min": 1,
+                                          "max": 7
+                                        },
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "神風"
+                                          ],
+                                          "min": 1,
+                                          "max": 7
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "重巡洋艦",
+                                            "航空巡洋艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 2
+                                        },
+                                        {
+                                          "any": [
+                                            {
+                                              "kind": "namedCount",
+                                              "names": [
+                                                "足柄"
+                                              ],
+                                              "min": 1,
+                                              "max": 7
+                                            },
+                                            {
+                                              "kind": "namedCount",
+                                              "names": [
+                                                "妙高"
+                                              ],
+                                              "min": 1,
+                                              "max": 7
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 2,
+                                              "max": 7
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "not": {
+                                        "all": [
+                                          {
+                                            "kind": "namedCount",
+                                            "names": [
+                                              "羽黒"
+                                            ],
+                                            "min": 1,
+                                            "max": 7
+                                          },
+                                          {
+                                            "kind": "namedCount",
+                                            "names": [
+                                              "神風"
+                                            ],
+                                            "min": 1,
+                                            "max": 7
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "fleetCount",
+                                          "min": 4,
+                                          "max": 4
+                                        },
+                                        {
+                                          "any": [
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "namedCount",
+                                                  "names": [
+                                                    "羽黒"
+                                                  ],
+                                                  "min": 1,
+                                                  "max": 7
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 3,
+                                                  "max": 3
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "namedCount",
+                                                  "names": [
+                                                    "神風"
+                                                  ],
+                                                  "min": 1,
+                                                  "max": 7
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 4,
+                                                  "max": 4
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "fleetCount",
+                              "min": 3,
+                              "max": 3
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "重巡洋艦",
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 3,
+                              "max": 3
+                            },
+                            {
+                              "any": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "重巡洋艦",
+                                    "航空巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 1
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "羽黒"
+                                      ],
+                                      "min": 1,
+                                      "max": 7
+                                    },
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "神風"
+                                      ],
+                                      "min": 1,
+                                      "max": 7
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "kind": "fleetCount",
+                          "min": 1,
+                          "max": 2
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "any": [
+                    {
+                      "all": [
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "軽空母"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 0
+                        },
+                        {
+                          "any": [
+                            {
+                              "kind": "fleetCount",
+                              "min": 1,
+                              "max": 1
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "重巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 7
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "羽黒"
+                                          ],
+                                          "min": 1,
+                                          "max": 7
+                                        },
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "神風"
+                                          ],
+                                          "min": 1,
+                                          "max": 7
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "fleetCount",
+                                          "min": 2,
+                                          "max": 3
+                                        },
+                                        {
+                                          "any": [
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 1,
+                                                  "max": 1
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 1,
+                                                  "max": 1
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 2,
+                                                  "max": 2
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 2,
+                                                  "max": 2
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 3,
+                                                  "max": 3
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 3,
+                                                  "max": 3
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 4,
+                                                  "max": 4
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 4,
+                                                  "max": 4
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "fleetCount",
+                                          "min": 4,
+                                          "max": 4
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "重巡洋艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 1
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "駆逐艦",
+                                            "海防艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 2,
+                                          "max": 7
+                                        },
+                                        {
+                                          "any": [
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 1,
+                                                  "max": 1
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 1,
+                                                  "max": 1
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 2,
+                                                  "max": 2
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 2,
+                                                  "max": 2
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 3,
+                                                  "max": 3
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 3,
+                                                  "max": 3
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 4,
+                                                  "max": 4
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 4,
+                                                  "max": 4
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "all": [
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "羽黒"
+                                      ],
+                                      "min": 1,
+                                      "max": 7
+                                    },
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "神風"
+                                      ],
+                                      "min": 1,
+                                      "max": 7
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "重巡洋艦",
+                                        "航空巡洋艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 2
+                                    },
+                                    {
+                                      "any": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "足柄"
+                                          ],
+                                          "min": 1,
+                                          "max": 7
+                                        },
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "妙高"
+                                          ],
+                                          "min": 1,
+                                          "max": 7
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "駆逐艦",
+                                            "海防艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 2,
+                                          "max": 7
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "not": {
+                                    "all": [
+                                      {
+                                        "kind": "namedCount",
+                                        "names": [
+                                          "羽黒"
+                                        ],
+                                        "min": 1,
+                                        "max": 7
+                                      },
+                                      {
+                                        "kind": "namedCount",
+                                        "names": [
+                                          "神風"
+                                        ],
+                                        "min": 1,
+                                        "max": 7
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "fleetCount",
+                                          "min": 4,
+                                          "max": 4
+                                        },
+                                        {
+                                          "any": [
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "namedCount",
+                                                  "names": [
+                                                    "羽黒"
+                                                  ],
+                                                  "min": 1,
+                                                  "max": 7
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 3,
+                                                  "max": 3
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "namedCount",
+                                                  "names": [
+                                                    "神風"
+                                                  ],
+                                                  "min": 1,
+                                                  "max": 7
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 4,
+                                                  "max": 4
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "fleetCount",
+                                          "min": 3,
+                                          "max": 3
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "重巡洋艦",
+                                            "航空巡洋艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 1
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "駆逐艦",
+                                            "海防艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 2,
+                                          "max": 7
+                                        },
+                                        {
+                                          "any": [
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 1,
+                                                  "max": 1
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 1,
+                                                  "max": 1
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 2,
+                                                  "max": 2
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 2,
+                                                  "max": 2
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 3,
+                                                  "max": 3
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 3,
+                                                  "max": 3
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 4,
+                                                  "max": 4
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 4,
+                                                  "max": 4
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "kind": "fleetCount",
+                                      "min": 1,
+                                      "max": 2
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "軽空母"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 0
+                        },
+                        {
+                          "any": [
+                            {
+                              "kind": "fleetCount",
+                              "min": 1,
+                              "max": 1
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "namedCount",
+                                  "names": [
+                                    "羽黒"
+                                  ],
+                                  "min": 1,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "namedCount",
+                                  "names": [
+                                    "神風"
+                                  ],
+                                  "min": 1,
+                                  "max": 7
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "補給艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 7
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "重巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 7
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "fleetCount",
+                                          "min": 2,
+                                          "max": 3
+                                        },
+                                        {
+                                          "any": [
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 1,
+                                                  "max": 1
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 1,
+                                                  "max": 1
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 2,
+                                                  "max": 2
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 2,
+                                                  "max": 2
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 3,
+                                                  "max": 3
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 3,
+                                                  "max": 3
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 4,
+                                                  "max": 4
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 4,
+                                                  "max": 4
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "fleetCount",
+                                          "min": 4,
+                                          "max": 4
+                                        },
+                                        {
+                                          "any": [
+                                            {
+                                              "kind": "namedCount",
+                                              "names": [
+                                                "羽黒"
+                                              ],
+                                              "min": 1,
+                                              "max": 7
+                                            },
+                                            {
+                                              "kind": "minSpeed",
+                                              "rank": 10
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "any": [
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 3,
+                                              "max": 7
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "軽巡洋艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 1,
+                                                  "max": 1
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 2,
+                                                  "max": 2
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "all": [
+                                {
+                                  "kind": "fleetCount",
+                                  "min": 4,
+                                  "max": 4
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "all": [
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "namedCount",
+                                              "names": [
+                                                "羽黒"
+                                              ],
+                                              "min": 1,
+                                              "max": 7
+                                            },
+                                            {
+                                              "kind": "namedCount",
+                                              "names": [
+                                                "神風"
+                                              ],
+                                              "min": 1,
+                                              "max": 7
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "航空巡洋艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 0,
+                                              "max": 2
+                                            },
+                                            {
+                                              "any": [
+                                                {
+                                                  "kind": "namedCount",
+                                                  "names": [
+                                                    "足柄"
+                                                  ],
+                                                  "min": 1,
+                                                  "max": 7
+                                                },
+                                                {
+                                                  "kind": "namedCount",
+                                                  "names": [
+                                                    "妙高"
+                                                  ],
+                                                  "min": 1,
+                                                  "max": 7
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 2,
+                                                  "max": 7
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "not": {
+                                            "all": [
+                                              {
+                                                "kind": "namedCount",
+                                                "names": [
+                                                  "羽黒"
+                                                ],
+                                                "min": 1,
+                                                "max": 7
+                                              },
+                                              {
+                                                "kind": "namedCount",
+                                                "names": [
+                                                  "神風"
+                                                ],
+                                                "min": 1,
+                                                "max": 7
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 4,
+                                              "max": 4
+                                            },
+                                            {
+                                              "any": [
+                                                {
+                                                  "all": [
+                                                    {
+                                                      "kind": "namedCount",
+                                                      "names": [
+                                                        "羽黒"
+                                                      ],
+                                                      "min": 1,
+                                                      "max": 7
+                                                    },
+                                                    {
+                                                      "kind": "typeCount",
+                                                      "types": [
+                                                        "駆逐艦",
+                                                        "海防艦"
+                                                      ],
+                                                      "matchPolicy": "exact",
+                                                      "min": 3,
+                                                      "max": 3
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "all": [
+                                                    {
+                                                      "kind": "namedCount",
+                                                      "names": [
+                                                        "神風"
+                                                      ],
+                                                      "min": 1,
+                                                      "max": 7
+                                                    },
+                                                    {
+                                                      "kind": "typeCount",
+                                                      "types": [
+                                                        "駆逐艦",
+                                                        "海防艦"
+                                                      ],
+                                                      "matchPolicy": "exact",
+                                                      "min": 4,
+                                                      "max": 4
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "fleetCount",
+                                  "min": 3,
+                                  "max": 3
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "重巡洋艦",
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 3
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "重巡洋艦",
+                                        "航空巡洋艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 1
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "羽黒"
+                                          ],
+                                          "min": 1,
+                                          "max": 7
+                                        },
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "神風"
+                                          ],
+                                          "min": 1,
+                                          "max": 7
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "kind": "fleetCount",
+                              "min": 1,
+                              "max": 2
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "any": [
+                            {
+                              "kind": "fleetCount",
+                              "min": 1,
+                              "max": 1
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "namedCount",
+                                  "names": [
+                                    "羽黒"
+                                  ],
+                                  "min": 1,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "namedCount",
+                                  "names": [
+                                    "神風"
+                                  ],
+                                  "min": 1,
+                                  "max": 7
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "補給艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 7
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "重巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 7
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "fleetCount",
+                                          "min": 2,
+                                          "max": 3
+                                        },
+                                        {
+                                          "any": [
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 1,
+                                                  "max": 1
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 1,
+                                                  "max": 1
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 2,
+                                                  "max": 2
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 2,
+                                                  "max": 2
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 3,
+                                                  "max": 3
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 3,
+                                                  "max": 3
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "fleetCount",
+                                                  "min": 4,
+                                                  "max": 4
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "重巡洋艦",
+                                                    "軽巡洋艦",
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 4,
+                                                  "max": 4
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "fleetCount",
+                                          "min": 4,
+                                          "max": 4
+                                        },
+                                        {
+                                          "any": [
+                                            {
+                                              "kind": "namedCount",
+                                              "names": [
+                                                "羽黒"
+                                              ],
+                                              "min": 1,
+                                              "max": 7
+                                            },
+                                            {
+                                              "kind": "minSpeed",
+                                              "rank": 10
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "any": [
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 3,
+                                              "max": 7
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "軽巡洋艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 1,
+                                                  "max": 1
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 2,
+                                                  "max": 2
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "all": [
+                                {
+                                  "kind": "fleetCount",
+                                  "min": 4,
+                                  "max": 4
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "all": [
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "namedCount",
+                                              "names": [
+                                                "羽黒"
+                                              ],
+                                              "min": 1,
+                                              "max": 7
+                                            },
+                                            {
+                                              "kind": "namedCount",
+                                              "names": [
+                                                "神風"
+                                              ],
+                                              "min": 1,
+                                              "max": 7
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "重巡洋艦",
+                                                "航空巡洋艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 0,
+                                              "max": 2
+                                            },
+                                            {
+                                              "any": [
+                                                {
+                                                  "kind": "namedCount",
+                                                  "names": [
+                                                    "足柄"
+                                                  ],
+                                                  "min": 1,
+                                                  "max": 7
+                                                },
+                                                {
+                                                  "kind": "namedCount",
+                                                  "names": [
+                                                    "妙高"
+                                                  ],
+                                                  "min": 1,
+                                                  "max": 7
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 2,
+                                                  "max": 7
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "not": {
+                                            "all": [
+                                              {
+                                                "kind": "namedCount",
+                                                "names": [
+                                                  "羽黒"
+                                                ],
+                                                "min": 1,
+                                                "max": 7
+                                              },
+                                              {
+                                                "kind": "namedCount",
+                                                "names": [
+                                                  "神風"
+                                                ],
+                                                "min": 1,
+                                                "max": 7
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "fleetCount",
+                                              "min": 4,
+                                              "max": 4
+                                            },
+                                            {
+                                              "any": [
+                                                {
+                                                  "all": [
+                                                    {
+                                                      "kind": "namedCount",
+                                                      "names": [
+                                                        "羽黒"
+                                                      ],
+                                                      "min": 1,
+                                                      "max": 7
+                                                    },
+                                                    {
+                                                      "kind": "typeCount",
+                                                      "types": [
+                                                        "駆逐艦",
+                                                        "海防艦"
+                                                      ],
+                                                      "matchPolicy": "exact",
+                                                      "min": 3,
+                                                      "max": 3
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "all": [
+                                                    {
+                                                      "kind": "namedCount",
+                                                      "names": [
+                                                        "神風"
+                                                      ],
+                                                      "min": 1,
+                                                      "max": 7
+                                                    },
+                                                    {
+                                                      "kind": "typeCount",
+                                                      "types": [
+                                                        "駆逐艦",
+                                                        "海防艦"
+                                                      ],
+                                                      "matchPolicy": "exact",
+                                                      "min": 4,
+                                                      "max": 4
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "fleetCount",
+                                  "min": 3,
+                                  "max": 3
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "重巡洋艦",
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 3
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "重巡洋艦",
+                                        "航空巡洋艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 1
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "羽黒"
+                                          ],
+                                          "min": 1,
+                                          "max": 7
+                                        },
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "神風"
+                                          ],
+                                          "min": 1,
+                                          "max": 7
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "kind": "fleetCount",
+                              "min": 1,
+                              "max": 2
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "kind": "unverified",
+                  "reason": "P開放前A/Cの出典別候補が不一致。軽空母のCV系略称・少数隻史実ペア優先順を統合しない。"
+                }
+              ]
+            }
+          ],
+          "reason": "A→CかつC→Eを三出典別に評価し、一致域だけ判定。"
         }
       ],
       "scouting": {
@@ -10581,7 +13566,11 @@
         "夜戦"
       ],
       "notes": [
-        "第1ゲージ・羽黒入りの例。史実艦の改造段階を含めて識別。数値索敵条件なし。"
+        "第1ゲージ・P開放前ACEの選択契約。実ゲームのP開放状態を検出せず、候補図・旧出撃目標/通過履歴の互換は別残件。",
+        "羽黒1＋駆逐3は編成例。出典が一致する海防置換・少数隻・足柄/妙高の代替を扱い、全艦隊へ4隻/羽黒/駆逐3を課さない。",
+        "重巡は重巡洋艦のみ、重巡級は重巡＋航巡。軽巡へ雷巡/練巡を無条件合算しない。各表のA/C優先順、軽空母略称差、少数隻の史実ペア差、揚陸艦・海防戦艦モデル・未知艦の未判定を保持する。",
+        "一律速力・数値索敵・経路必須の装備個数なし。利用者が明示した速力・追加艦種・旗艦条件は別に保持する。夜戦1組は戦闘推奨/利用者指定で必要十分数ではない。",
+        "艦種/隻数不一致は編成見直し、出典差/情報不足は理由付き未判定。装備不足数量や購入必須へ変換せず、未発見を手持ちでは不可能としない。第2G不一致は未解決。"
       ],
       "requiredConnectionClass": "D",
       "guidanceAudit": {
@@ -10617,14 +13606,40 @@
         },
         "推奨セット": {
           "class": "C",
-          "detail": "cap-night-auto1組（既定目安）",
+          "detail": "ACEで選択した任意夜戦1組（戦闘推奨/利用者指定）",
           "evidence": [
             "hdSEChecks → hdFEEquipmentRequirements → 同艦セット/部品不足"
           ],
-          "limit": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+          "limit": "夜戦は戦闘推奨で経路必須ではなく、この海域に必要十分な組数の根拠ではない。有限在庫の搭載先/不足と経路・艦情報の未判定を分ける。"
         }
       },
-      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)",
+      "sourceScopeAudit": {
+        "stage": "P not opened; selected first ACE only; no unlock-state inference",
+        "sources": [
+          "https://zekamashi.net/kancolle-kouryaku/7-3/",
+          "https://wikiwiki.jp/kancolle/南西海域/7-3",
+          "https://zh.kcwiki.cn/wiki/南西海域/7-3"
+        ],
+        "basis": "Frozen source tables independently audited on 2026-10-30; Japanese original HTML403 retained, saved rendered evidence used. Original prepared43 values/order unchanged: P1 42 runtime cases plus P2 source-only control1; extra8 separately frozen literals.",
+        "sourceOracle": "tests/fixtures/seven-three-first-source-cases.cjs",
+        "registryAssertion": "tests/seven-three-first-routes.test.cjs",
+        "record": "docs/pr152-seven-three-first-ja.md",
+        "runtimeExpectedCounts": {
+          "ready": 26,
+          "missing": 17,
+          "manual": 7
+        },
+        "notClaimed": [
+          "all source/game branches",
+          "full combat quantities or inventory/slot search",
+          "game unlock detection",
+          "full graph",
+          "old goal/history compatibility",
+          "second-gauge G agreement",
+          "UI save/load success from static or Node evidence"
+        ]
+      }
     },
     {
       "id": "7-3/1/default",

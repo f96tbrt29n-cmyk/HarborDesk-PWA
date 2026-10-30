@@ -93,6 +93,16 @@ jobs:
       - name: Run smoke browser regression
         run: npm run test:browser -- --project=${{ matrix.browser }} --workers=${{ matrix.workers }} --shard=${{ matrix.shard }}/${{ matrix.shards }}
 
+      # New producer metadata only; original raw evidence remains in its existing archive.
+      - name: Preserve seven-three first-gauge comparison summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: route-summary-${{ matrix.browser }}-${{ matrix.shard }}-${{ github.run_id }}
+          path: test-results/route-seven-three-first-*/route-guidance-summary.json
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: Upload Playwright diagnostics
         if: failure()
         uses: actions/upload-artifact@v4
