@@ -2757,7 +2757,9 @@
           "moduleRecoveryCounterAssert": 1,
           "nightPostReloadAccessControlErrors": 1,
           "locatorClickNotVisible": 13,
-          "lastSyncMergeCaseResult": null
+          "syncMergeCaseResult": null,
+          "lastReceiveControlsCaseResult": null,
+          "progressCorrectionRecord": "sevenFiveSecondRecoveryAndW4Correction20261030"
         },
         "closureSHA256": "4b4475a22ceac5a82d8625d2b647959849a7938f3dce262d8f72613ca218a545",
         "DDecision": {
@@ -2877,9 +2879,10 @@
     "record": "sevenFiveFirstLocal20261030",
     "panelContractCorrection": "sevenFiveFirstPanelContractCorrection20261030",
     "correctedCIFinalization": "sevenFiveFirstCorrectedCIFinalization20261030",
-    "currentState": "own corrected-source CI initial6 completed all D operations; D confirmed, A/B/C partial, old local Wstock load/caller gap retained separately; next independent7-5second draft not executed"
+    "currentState": "own corrected-source CI initial6 completed all D operations; D confirmed, A/B/C partial, old local Wstock load/caller gap retained separately; next independent7-5second draft not executed",
+    "recoveryRecord": "sevenFiveSecondRecoveryAndW4Correction20261030"
   },
-  "nextPriority": "7-5第2ABDFJOQの独立したroute/Node草稿。出典一致域とJ優先順、旧利用者PT目標の保持を確認し、今回CIとは別に必要検証へ進む。",
+  "nextPriority": "実行接続復旧。7-5第2ABDFJOQの保存済み草稿12件から、B/D/J分岐順と軽空2の反例・代替境界、既存PT目標の保持をレビューし、after15と代表C/Wの未実施検証へ進む。今回の復旧/W4訂正はセルcredit0。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -8831,7 +8834,9 @@
       "moduleRecoveryCounterAssert": 1,
       "nightPostReloadAccessControlErrors": 1,
       "locatorClickNotVisible": 13,
-      "lastSyncMergeCaseResult": null
+      "syncMergeCaseResult": null,
+      "lastReceiveControlsCaseResult": null,
+      "progressCorrectionRecord": "sevenFiveSecondRecoveryAndW4Correction20261030"
     },
     "closureSHA256": "4b4475a22ceac5a82d8625d2b647959849a7938f3dce262d8f72613ca218a545",
     "DDecision": {
@@ -8853,5 +8858,173 @@
     ],
     "next": "7-5第2ABDFJOQの独立したroute/Node草稿。出典一致域とJ優先順、旧利用者PT目標の保持を確認し、今回CIとは別に必要検証へ進む。"
   },
-  "nextPriorityBeforeSevenFiveFirstCorrectedCIFinalization20261030": "旧7-4の隣接文字列前提を実引数/案内分岐の限定VM契約へ訂正し当該1Node成功、製品/fixture/CW局所入力不変。独立commit/通常push後の訂正source smokeを1回確認。旧f090CIは各Node546/545/1・browser未開始、旧Wstock load全文未到達は保持。停止条件がなければ次の独立7-5第2ABDFJOQのsource/判定/装備接続へ進む。"
+  "nextPriorityBeforeSevenFiveFirstCorrectedCIFinalization20261030": "旧7-4の隣接文字列前提を実引数/案内分岐の限定VM契約へ訂正し当該1Node成功、製品/fixture/CW局所入力不変。独立commit/通常push後の訂正source smokeを1回確認。旧f090CIは各Node546/545/1・browser未開始、旧Wstock load全文未到達は保持。停止条件がなければ次の独立7-5第2ABDFJOQのsource/判定/装備接続へ進む。",
+  "sevenFiveSecondRecoveryAndW4Correction20261030": {
+    "record": "sevenFiveSecondRecoveryAndW4Correction20261030",
+    "document": "docs/pr152-seven-five-first-ja.md",
+    "scope": "recovery and existing CI41029470607 W4 classification correction only; no after or browser evidence added",
+    "recordBaseHead": "2e0eccc0104ea6f3cf964850ce4af93d4ebf0085",
+    "verifiedSource": "0cb16ded18d52e95151a783459660c5526a7e4ce",
+    "recovery": {
+      "recordedUTC": "2026-10-30T10:48:48.244596+00:00",
+      "recordedJST": "2026-10-30T19:48:48.244596+09:00",
+      "actualExecReadsSucceeded": [
+        "pwd",
+        "firstWT HEAD/status/capacity/inodes",
+        "activeG2 HEAD/status",
+        "git ls-remote exacthead",
+        "docker info/ps/imageinspect",
+        "Node version/PW package/browser revision config"
+      ],
+      "recordBaseAndVerifiedSourceDifference": "docs8 only",
+      "oldAndActiveDraft12ExactAtRecovery": true,
+      "freeBytesAtRecordedRecovery": 12520726528,
+      "inodeUsedPercentRounded": 9,
+      "existingManagedDockerHealthy": true,
+      "runningContainersBefore": 0,
+      "fixedImagePresent": true,
+      "Node": "v24.21.0",
+      "Playwright": "1.55.0",
+      "configuredBrowserRevisions": {
+        "Chromium": "1187",
+        "Webkit": "2203"
+      },
+      "newBrowserStartedByRecovery": 0,
+      "environmentDeletedInitializedOrRecreated": false
+    },
+    "beforeEvidence": {
+      "physicalHistoricalTrials": 1,
+      "exitCode": 1,
+      "classification": "old-product CVL2 missing versus independent ready expectation",
+      "subsequentDEAndFBB": "unreached",
+      "recordedBeforeDisconnectPostVerifyCounts": [
+        622,
+        622,
+        22
+      ],
+      "allBefore636OriginalsExactAtRecovery": true,
+      "currentRehashIsNotPastCapture": true,
+      "recoveryClosureSHA256": "07984a92977db7aa829c39d358b9d5b46c697046b89cc4677eaff6a24ca8f009",
+      "historicalGaps": [
+        "separate pre-disconnect post-run-protection artifact",
+        "pre-disconnect final artifact manifest",
+        "pre-disconnect independent post-run reader"
+      ],
+      "afterOrBrowserEvidenceAdded": 0
+    },
+    "run": 41029470607,
+    "attempt": 1,
+    "job": 123975449155,
+    "classificationCorrection": {
+      "datedJST": "2026-10-30",
+      "oldClaim": "sync merge ordinal220 was the last case at cancellation",
+      "oldClaimWasOfflineParserOmission": true,
+      "reason": "old progress regex omitted the optional global (retries) suffix after ordinal220; originals contained the later15 starts",
+      "oldRawAndGitHistoryRetained": true,
+      "auditReceiptSHA256": "a2bae6f6597495fac46d3a1b36b376dbd1f64d1719c82eb63a1c2c9e185738c6",
+      "originalAuditSHA256": "cf15d046a6b8aaf872256cafda00ce0049b72572730c4cbe7374debe9272766b"
+    },
+    "progressStarts": {
+      "allObserved": 235,
+      "initialStartLabels": 220,
+      "explicitRetry1StartLabels": 15,
+      "globalRetriesAnnotations": 15,
+      "globalRetriesAnnotationIsNotIndividualRetrySuffix": true,
+      "observedDistinctIdentities": 220,
+      "expectedShardManifestCompared": false,
+      "unstartedExpectedCaseCount": null,
+      "countsAreNotCompletedOrPassedOrFailed": true
+    },
+    "lastReceiveControlsCase": {
+      "sourceFile": "tests/sync-receive-ui.spec.js",
+      "sourceLine": 58,
+      "title": "receive controls stay tappable at narrow and landscape widths",
+      "startJST": "2026-10-30 18:38:19.3590345 JST",
+      "contextCancelJST": "2026-10-30 18:38:21.3710918 JST",
+      "startToContextCancelSeconds": "2.0120573",
+      "individualEndOrPASS": null,
+      "controlsAssertionReachAndResult": null,
+      "receiveCallReachAndResult": null,
+      "frameworkOutcome": null,
+      "physicalOutcome": null,
+      "containsDirectSerializedStorageFullComparison": false,
+      "storageFullComparisonApplicability": "not implemented in this case; do not classify as full-comparison unreached"
+    },
+    "syncMergeCase": {
+      "wasOrdinal220": true,
+      "nextOrdinal221StartObserved": true,
+      "nextStartDoesNotProvePASS": true,
+      "individualResult": null,
+      "storageComparisonResult": null
+    },
+    "diagnosticObservations": {
+      "caseHeaders": 15,
+      "errorSections": 19,
+      "initialErrorSections": 15,
+      "retry1ErrorSections": 4,
+      "convertedToOfficialFailedOrPhysicalSuccessCounts": false,
+      "sameCauseAsOlderRunsClaimed": false
+    },
+    "officialCaseOutcomes": {
+      "chromium": {
+        "passed": 880,
+        "flaky": 0,
+        "failed": 0
+      },
+      "webkitFirstThreeSubtotal": {
+        "passed": 660,
+        "flaky": 0,
+        "failed": 0
+      },
+      "webkitFourth": null,
+      "webkitTotal": null,
+      "strictPhysicalCountsInferred": false
+    },
+    "termination": {
+      "successfulSmokeJobs": 5,
+      "W4Job": "cancelled",
+      "W4SmokeStep": "cancelled",
+      "officialJobLimitMinutes": 45,
+      "full": "skipped",
+      "smokeFailureFinishedBeforeCancellationClaimed": false
+    },
+    "own19SummariesAndExistingDDecisionUnchanged": true,
+    "closedCollection1107FilesSHAUnchanged": true,
+    "retrieval": {
+      "alreadyPublished": 10,
+      "alreadyReceived": 8,
+      "alreadyReceivedBytes": 322695,
+      "detailedRawTraceVideoReceived": 0,
+      "zeroReceivedIsMissingNotGeneratedOrFailuresZero": true,
+      "overCapUnrequestedBytes": [
+        1658082732,
+        686716946
+      ],
+      "capBytes": 536870912,
+      "newAPIOrDownloadRequests": 0,
+      "splitOrBypass": 0
+    },
+    "matrixBefore": [
+      23,
+      143,
+      70
+    ],
+    "matrixAfter": [
+      23,
+      143,
+      70
+    ],
+    "cellCredit": 0,
+    "criteriaOrCanonicalConditionsChanged": false,
+    "resumeState": "execution recovered; 7-5 second normal work resumes from preserved draft12 and source/priority review; after15 and representative C/W are separate later evidence",
+    "actionsForThisRecord": {
+      "productOrTestsChanged": 0,
+      "newNodeSyntaxVMOrBrowserTests": 0,
+      "newCIOrReruns": 0,
+      "GitMutations": 0,
+      "APIOrDownloads": 0,
+      "originalOverwritesOrDeletion": 0
+    }
+  },
+  "nextPriorityBeforeSevenFiveSecondRecovery20261030": "7-5第2ABDFJOQの独立したroute/Node草稿。出典一致域とJ優先順、旧利用者PT目標の保持を確認し、今回CIとは別に必要検証へ進む。"
 }

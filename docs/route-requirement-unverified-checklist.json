@@ -1784,7 +1784,9 @@
           "moduleRecoveryCounterAssert": 1,
           "nightPostReloadAccessControlErrors": 1,
           "locatorClickNotVisible": 13,
-          "lastSyncMergeCaseResult": null
+          "syncMergeCaseResult": null,
+          "lastReceiveControlsCaseResult": null,
+          "progressCorrectionRecord": "sevenFiveSecondRecoveryAndW4Correction20261030"
         },
         "closureSHA256": "4b4475a22ceac5a82d8625d2b647959849a7938f3dce262d8f72613ca218a545",
         "DDecision": {
@@ -1916,5 +1918,17 @@
       "P"
     ],
     "newLimitedScopeNotFullRouteCompletion": true
+  },
+  "sevenFiveSecondRecoveryAndW4Correction20261030": {
+    "document": "docs/pr152-seven-five-first-ja.md",
+    "progressRecord": "sevenFiveSecondRecoveryAndW4Correction20261030",
+    "scope": "recovery and old W4 parser correction, not new route verification",
+    "legacySummaryUnchanged": true,
+    "matrix": [
+      23,
+      143,
+      70
+    ],
+    "cellCredit": 0
   }
 }

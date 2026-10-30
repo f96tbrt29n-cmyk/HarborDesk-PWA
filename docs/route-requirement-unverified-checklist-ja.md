@@ -1,3 +1,5 @@
+> 復旧・W4訂正（2026-10-30 JST）：実コマンド成功で接続回復を確認し、7-5第2草稿12件を保持して通常作業を再開。旧W4の末尾sync-merge分類はregex漏れとして訂正し、実末尾receive-controlsの個別結果は不明。全W nullと23/143/70は不変、after/C/W成功の追加0。[追補](pr152-seven-five-first-ja.md#2026-10-30-実行接続復旧とw4進捗解析訂正)。以下は各時点の履歴。
+
 > 最新確定（2026-10-30）：訂正後source0cb16ded／CI41029470607は5smoke成功・W4はjob45分上限取消、smoke自体cancelled。公式C880/0/0、W1〜3小計660/0/0、全Wはnull。自身7-5第1の6初回操作summaryは保存/適用編集・同一文書load全文/strict30・他保持まで完了し、同じ行のDだけ確認済み、23/143/70。旧local未到達/caller欠測やW4物理case outcomeは補完しない。[確定記録](pr152-seven-five-first-ja.md#2026-10-30-訂正後ci0cbの確定)。以下は各時点の履歴。
 
 # 登録53例：未検証項目の台帳
@@ -110,3 +112,8 @@ iPhone Safari・ホーム画面PWAの実機操作とWebKitオフラインは未�
 
 
 2026-10-30 7-5第1の訂正後CI：検証source `0cb16ded18d52e95151a783459660c5526a7e4ce`／[CI41029470607](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41029470607)、attempt1・dispatch1・再実行0・手動取消0。5smoke成功、W4 jobは公式45分上限で取消、smoke step自体もcancelledであり「smoke失敗終了後に取消」ではない。run cancelled、Full skipped・Pages未起動。公式C880 passed/0 flaky/0 failed、W1〜3小計660/0/0、W4と全Wのcase outcome集計はnull。初回成功数や物理試行数へ換算しない。 既存D定義の全列挙操作に同じ行の直接証拠を対応できたため、7-5/0/defaultのDだけ一部→確認済み。22/144/70→23/143/70の1セル変更。自身の一連では旧22/141/73からdistinctはB/C/Dの3セル、今回依頼基準20/137/79からは7-3第1・7-4・7-5第1のB/C/D計9セルだけ。A/B/C・他58行、判定基準・59行×4項目=236・旧53区分・一部を割合換算しない基準は維持する。全在庫/枠競合/数量根拠や海域全体完了・公開可能を意味しない。 残件はD高速＋の出典優先差・JP403・六隻外/LHA等のモデル境界、全目標数量/在庫/競合、旧非表示/通信/自然実null/DCLの原因、旧目標/履歴互換の対象外範囲。PR152ドラフト・未公開/main競合を維持し、main統合/PR151/版/SW/本番/マージ/公開/自動マージは行わない。次は7-5第2ABDFJOQの独立改善であり、旧原因を解くための反復や推測修正をしない。
+
+
+2026-10-30 JST 復旧・継続再開：実行接続は軽いpwdと両worktreeのGit読取り成功で回復を確認した。記録基準HEAD2e0eccc0と検証source0cb16dedの差はdocs8件だけ。復旧時点で旧/新worktreeの7-5第2草稿12件を閉鎖SHAと全件一致で保持し、空き約11.66GiB・inode9%、既存Docker/起動container0、固定image・Node24.21.0/PW1.55.0・設定revision C1187/W2203を確認した。管理API表示だけを復旧根拠にせず、環境の削除・初期化・再作成は行っていない。 復旧により7-5第2ABDFJOQの通常作業を再開する。本追補はafter15・C/W操作の新成功を追加せず、23確認済み/143一部/70未確認と全59行の状態・条件/索敵・旧53区分・定義・分母236を変更しない。未実施の通常検証と新PT草稿は別記録とし、検証済み扱いにしない。PR152ドラフト・未公開、main競合/既知残件/旧原本を保持し、main統合/PR151/版/SW/本番/マージ/公開/自動マージなし。
+
+W4記録訂正：2026-10-30 JST訂正：旧W4解析の「末尾sync-merge/ordinal220」は、globalな `(retries)` 付き進捗をregexが落とした解析上の誤分類だった。取得済み原文には235開始表示（220 initial-startラベル＋15個別retry#1-start）があり、global `(retries)` の15表示と個別retry suffixを区別する。開始表示を終了/PASS/failed数へ換算せず、期待shard一覧の未照合分から未開始件数を推定しない。 実際の最末尾は`tests/sync-receive-ui.spec.js:58`の`receive controls stay tappable at narrow and landscape widths`、18:38:19.3590345 JST開始から2.0120573秒後にcontext cancel。個別終了/PASS・UI assert到達・receive呼出し/完了は不明。当該caseには保存値全文の直接比較assert自体がないため、全文比較「未到達」とは分類しない。旧sync-merge220は次221開始へ進むが、その個別PASS/保存比較結果はnullのままである。 閉鎖収集物1107ファイル（受領原本・期待ソース・派生記録を含む）は不変、新API/download/試験/CI0、上限超2件未要求・全W nullを維持する。詳細と根拠hashは[復旧/W4追補](pr152-seven-five-first-ja.md#2026-10-30-実行接続復旧とw4進捗解析訂正)を参照。

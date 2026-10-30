@@ -1,3 +1,5 @@
+> 復旧・W4訂正（2026-10-30 JST）：実コマンド成功で接続回復を確認し、7-5第2草稿12件を保持して通常作業を再開。旧W4の末尾sync-merge分類はregex漏れとして訂正し、実末尾receive-controlsの個別結果は不明。全W nullと23/143/70は不変、after/C/W成功の追加0。[追補](pr152-seven-five-first-ja.md#2026-10-30-実行接続復旧とw4進捗解析訂正)。以下は各時点の履歴。
+
 > 最新確定（2026-10-30）：訂正後source0cb16ded／CI41029470607は5smoke成功・W4はjob45分上限取消、smoke自体cancelled。公式C880/0/0、W1〜3小計660/0/0、全Wはnull。自身7-5第1の6初回操作summaryは保存/適用編集・同一文書load全文/strict30・他保持まで完了し、同じ行のDだけ確認済み、23/143/70。旧local未到達/caller欠測やW4物理case outcomeは補完しない。[確定記録](pr152-seven-five-first-ja.md#2026-10-30-訂正後ci0cbの確定)。以下は各時点の履歴。
 
 > 最新契約訂正：source `f090e9c40b8d7d0f4ee90f51fb0c5fec0b87822c`／CI41026417307 attempt1・dispatch1/再実行0は、全6jobのNode546 tests/545pass/1failで停止し、C/Wのbrowser検証・smokeは未開始。Full skipped、公開artifact0、PW case outcomeはnullである。ステップ名にservice workerを含むが、その製品障害と分類しない。正式attempt ZIP427,167bytes/90members/CRC正常を1回取得し、初回原本を保持した。 当該test1の局所訂正確認は成功、製品/C/W入力不変、22/144/70変更0。詳細は[7-5記録](pr152-seven-five-first-ja.md#2026-10-30-初回ciのnode契約訂正)。
@@ -355,6 +357,21 @@ generic unknown-ASW訂正対象はC/W2件の別分母。Cは自身の完結し�
 
 既存D定義の全列挙操作に同じ行の直接証拠を対応できたため、7-5/0/defaultのDだけ一部→確認済み。22/144/70→23/143/70の1セル変更。自身の一連では旧22/141/73からdistinctはB/C/Dの3セル、今回依頼基準20/137/79からは7-3第1・7-4・7-5第1のB/C/D計9セルだけ。A/B/C・他58行、判定基準・59行×4項目=236・旧53区分・一部を割合換算しない基準は維持する。全在庫/枠競合/数量根拠や海域全体完了・公開可能を意味しない。
 
-全6job自身の完全checkout HEAD・固定image実pull・Node24.21.0/PW1.55.0/C1187/W2203と、実測Node546 tests/546 pass/0 failを確認。Git期待source617ファイルの照合はCI配信ファイルhashの独立実測とは別である。正式attempt run-log ZIP11,570,409bytes/101membersを1回取得、CRC正常、SHA-256 `75a0132b6344bb6758cf0ebc311a38980a674e3237507c65056b40960f41a88b`。C2 attempt1,658,082,732bytes/W4 attempt686,716,946bytesは512MiB上限超で要求/分割0、詳細raw/trace欠測を保持する。発行10成果物中8件322,695bytesを受領し、body/trace/video受領0は生成0や失敗0ではなく欠測。15診断block（module回復counter検査1、night reload後通信例外1、click非表示13）は公式failed件数へ換算せず、試行別に保持した。末尾sync-mergeケースは開始後取消で個別結果/比較とも不明。閉鎖receipt SHA-256 `4b4475a22ceac5a82d8625d2b647959849a7938f3dce262d8f72613ca218a545`。原本加工・外部アップロード0、記録のみの追加CIは起動しない。
+全6job自身の完全checkout HEAD・固定image実pull・Node24.21.0/PW1.55.0/C1187/W2203と、実測Node546 tests/546 pass/0 failを確認。Git期待source617ファイルの照合はCI配信ファイルhashの独立実測とは別である。正式attempt run-log ZIP11,570,409bytes/101membersを1回取得、CRC正常、SHA-256 `75a0132b6344bb6758cf0ebc311a38980a674e3237507c65056b40960f41a88b`。C2 attempt1,658,082,732bytes/W4 attempt686,716,946bytesは512MiB上限超で要求/分割0、詳細raw/trace欠測を保持する。発行10成果物中8件322,695bytesを受領し、body/trace/video受領0は生成0や失敗0ではなく欠測。15診断block（module回復counter検査1、night reload後通信例外1、click非表示13）は公式failed件数へ換算せず、試行別に保持した。2026-10-30再解析で訂正：旧「末尾sync-merge」は進捗regex漏れによる誤分類で、実末尾はreceive-controls。sync-mergeは次caseへ進むが個別PASS/比較は不明、実末尾の結果も不明である（下記追補）。閉鎖receipt SHA-256 `4b4475a22ceac5a82d8625d2b647959849a7938f3dce262d8f72613ca218a545`。原本加工・外部アップロード0、記録のみの追加CIは起動しない。
 
 残件はD高速＋の出典優先差・JP403・六隻外/LHA等のモデル境界、全目標数量/在庫/競合、旧非表示/通信/自然実null/DCLの原因、旧目標/履歴互換の対象外範囲。PR152ドラフト・未公開/main競合を維持し、main統合/PR151/版/SW/本番/マージ/公開/自動マージは行わない。次は7-5第2ABDFJOQの独立改善であり、旧原因を解くための反復や推測修正をしない。
+
+
+## 2026-10-30 実行接続復旧・既存W4分類訂正（セル変更0）
+
+実行接続は軽いpwdと両worktreeのGit読取り成功で回復を確認した。記録基準HEAD2e0eccc0と検証source0cb16dedの差はdocs8件だけ。復旧時点で旧/新worktreeの7-5第2草稿12件を閉鎖SHAと全件一致で保持し、空き約11.66GiB・inode9%、既存Docker/起動container0、固定image・Node24.21.0/PW1.55.0・設定revision C1187/W2203を確認した。管理API表示だけを復旧根拠にせず、環境の削除・初期化・再作成は行っていない。
+
+旧製品Node対照1回はCVL2のmissing≠readyでexit1、後続DE/FBBは未到達。保存済みraw/resultと元runnerのverify→result書込み順を独立に照合し、現在のruntime622/旧WT622/private22とbefore全636原本が一致した。追補は復旧後の新しいmanifest/独立読取りであり、当時未採取だった別post-run-protection・最終manifest・独立readerや切断中の観測を過去として埋めない。recovery closure SHA-256 `07984a92977db7aa829c39d358b9d5b46c697046b89cc4677eaff6a24ca8f009`。
+
+2026-10-30 JST訂正：旧W4解析の「末尾sync-merge/ordinal220」は、globalな `(retries)` 付き進捗をregexが落とした解析上の誤分類だった。取得済み原文には235開始表示（220 initial-startラベル＋15個別retry#1-start）があり、global `(retries)` の15表示と個別retry suffixを区別する。開始表示を終了/PASS/failed数へ換算せず、期待shard一覧の未照合分から未開始件数を推定しない。
+
+実際の最末尾は`tests/sync-receive-ui.spec.js:58`の`receive controls stay tappable at narrow and landscape widths`、18:38:19.3590345 JST開始から2.0120573秒後にcontext cancel。個別終了/PASS・UI assert到達・receive呼出し/完了は不明。当該caseには保存値全文の直接比較assert自体がないため、全文比較「未到達」とは分類しない。旧sync-merge220は次221開始へ進むが、その個別PASS/保存比較結果はnullのままである。
+
+15診断headerと19 error section（initial15/retry1は4）を公式failed件数や物理retry成功数へ換算しない。5smoke成功・W4 smoke/jobは45分上限cancelled、C880/0/0・W1〜3小計660/0/0とW4/全W nullは不変。自身19 summary・既存D根拠、旧試行のcaller/handler欠測も保持する。新解析は既存の閉鎖収集物1107ファイル（受領原本・期待ソース・派生記録を含む）を前後SHA一致で照合し、追加API/download/試験/CIは0。512MiB超の2archive（1,658,082,732/686,716,946bytes）は未要求、body/trace/video欠測を残して回収を打ち切った。正本audit SHA-256 `a2bae6f6597495fac46d3a1b36b376dbd1f64d1719c82eb63a1c2c9e185738c6`。
+
+復旧により7-5第2ABDFJOQの通常作業を再開する。本追補はafter15・C/W操作の新成功を追加せず、23確認済み/143一部/70未確認と全59行の状態・条件/索敵・旧53区分・定義・分母236を変更しない。未実施の通常検証と新PT草稿は別記録とし、検証済み扱いにしない。PR152ドラフト・未公開、main競合/既知残件/旧原本を保持し、main統合/PR151/版/SW/本番/マージ/公開/自動マージなし。
