@@ -1,3 +1,5 @@
+> 最終7-4 ABEJLP CI（2026-10-30）：検証source7fd5298e／CI41007168230 attempt1は4smoke成功・C2/W4失敗、取消/timeout0、Full skipped。公式C876/0/1、W862/12/3はpassed/flaky/failedのcase outcomeで、初回/物理件数へ換算しない。自身7-4の6初回summaryは保存または安全中止後/load後のstrict30比較を完了し、局所完了5＋自身CIWknown初回の直接証拠でDだけ一部→確認済み、21/142/73→22/141/73。局所Wknownのload未到達・caller欠測、secondary7-3Wready初回load未到達と別retry1完了はそのまま保持。全6checkout/env/実imagepull/Node527・source24照合はCI配信filehash実測とは別で、body原本/trace欠測とcasepassedログ導出の境界を残す。[最終記録](pr152-seven-four-ja.md#2026-10-30-自身初回ci確定)。以下は各時点の履歴。
+
 > 最新7-4 ABEJLP（2026-10-30）：基準69591040/21・139・76。source三資料のraw57＋policy6、有限適用差8、実索敵式未照合を分離し、Node20ユニークと純4契約は別記。局所known/stock/unknown×C/Wの6初回は5成功/1Wknown失敗。保存または安全中止後の読取り6件でstrict30・比較元7キー/他保持が通過し、known/stock4件は配備案も一致、load全文は5完了、Wknownはload後search-button非表示待機で試験45秒timeout・後文書caller欠測/nav1。A一部を維持し、B/C/Dの未確認→一部だけ21/142/73へ3セル更新。旧7-3/CI原本・他58行/旧53/定義236は不変。rootの関連commit/push・同HEADsmoke1回は未開始。[今回記録](pr152-seven-four-ja.md)。以下は各時点の履歴。
 
 > 最終7-3第1ACE CI（2026-10-30）：検証source62d81722／CI40996265641 attempt1は5smoke成功・W4失敗、Full skipped、job取消0。公式C passed874/flaky0/failed0、W865/7/2はcase outcomeであり初回/物理件数へ換算しない。同source局所完了5＋自身CI Wready初回完了を6代表へ直接対応し、Dだけ一部→確認済み、20/140/76→21/139/76。元基準20/137/79からdistinctはB/C/Dの3セル。局所Wready・自CIWstock初回のload未到達と旧欠測は別試行のまま保持。全6checkout/env/Node510/510/0/実pullと27source照合、7summaryを確認したがCI配信filehashの実測ではない。記録のみの新CIは起動しない。[最終記録](pr152-seven-three-first-ja.md#2026-10-30-最終head-smoke確定)。以下の未開始・D一部は局所時点の履歴。
@@ -159,3 +161,14 @@ Wreadyのload後非表示は同試行の全文比較未到達として保持す�
 
 
 saved6は保存または安全中止後の読取り6件を表し、保存書込み成功6回ではない。known/stock4件は保存・メモ編集、unknown2件は安全中止・編集なし。load全文完了5件はCknown/stock/unknownとWstock/unknownで、Wknown欠測1はそのまま保持する。
+
+
+## 2026-10-30 7-4自身初回CIの確定
+
+2026-10-30 CI追記：[7-4 ABEJLP](pr152-seven-four-ja.md#2026-10-30-自身初回ci確定)の検証source`7fd5298e7248ebeb6b71c67dae7c0a579e0b7991`／[41007168230](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41007168230)、attempt1・dispatch1/再実行0。4smoke成功/2失敗・Full skipped・取消/timeout0。自身6初回summaryの全厳密比較完了を確認し、局所C3＋Wstock/unknownの5完了と自身CI Wknown初回を6代表へ直接対応してDだけ一部→確認済み。21/142/73→22/141/73の1追加セル、一連の695基準21/139/76からdistinctはB/C/D3セル。A/B/C・他58行/旧53/基準236は不変。
+
+公式C passed876/flaky0/failed1、W862/12/3は各877caseの最終outcomeで、初回成功数/物理試行数ではない。primary7-4は各caseのinitial開始1/retry0と完全な最終failed/flaky一覧への非掲載からcase passedを導出し、個別物理PASS行はnull。小summary6原本はstage completed・6行/追加0・30項目/6anchor・比較元7キー/他保持・例外/nav0の保存後/load後比較完了を示すが、未受領の7-4 C/Wbody/trace原本を取得済みにしない。saved6はknown/stock4の保存・メモ編集とunknown2の安全中止後読取りであり、保存書込み成功6回ではない。局所Wknownの45秒非表示/load全文未到達・後文書caller欠測/nav1は別試行として不変。
+
+secondary7-3 firstは初回6のうち5完了、Wready初回はsaved strict20＋空2行通過/load全文未到達・nav1、別retry1が完了した。旧7-3資料や失敗初回を補完しない。C2/W4のunknown-ASWは全59行losの説明2文字列（marginNote/numericModelUnverified）比較が128行で不一致となり、初回/retryとも保存参照設定前に停止。数値条件や保存不一致の陽性ではない。別6WIPで根拠ある監査訂正を準備し、Node前1失敗→後2成功、必要C/W対象は準備中で製品変更なし。この検証sourceの2文字列は変更しない。W4の3-4ready/5-4required-missingは初回/retryともload後search-button非表示45秒でload全文未到達、失敗文書caller/handler開始は不明。W1 drop-hunt初回は事前UI/件数assert通過後の最終例外検査でversion access-control2件、全文storage比較はなく初回trace未生成。保存不一致陽性や全保存安全、共通原因を断定しない。
+
+全6jobの完全checkout HEAD、固定Node24.21.0/PW1.55.0/C1187/W2203、実image digest pull、各Node527/527/0と期待source24原本照合を確認。実ファイルhashは局所期待snapshotの確認であり、CI配信filehashの独立実測ではない。13artifact中9件4,452,232bytesをserver SHA/外側CRC一致で受領、4件512MiB超は要求/分割せず、7-4 C/Wのbody/traceは欠測。正式attempt run-log ZIPは別の11,416,985bytes/102membersでCRC正常。受領innertrace1はretry由来で、初回trace0を初回失敗0へ換算しない。記録だけの追加CIは起動せず、次7-5第1ABDFGHKは独立WIP12の静的準備・未実行とする。

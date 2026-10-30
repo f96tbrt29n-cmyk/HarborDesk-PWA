@@ -1,5 +1,9 @@
 # 7-4 ABEJLP：六隻例の出典一致域と索敵式の未照合
 
+> 最終7-4 ABEJLP CI（2026-10-30）：検証source7fd5298e／CI41007168230 attempt1は4smoke成功・C2/W4失敗、取消/timeout0、Full skipped。公式C876/0/1、W862/12/3はpassed/flaky/failedのcase outcomeで、初回/物理件数へ換算しない。自身7-4の6初回summaryは保存または安全中止後/load後のstrict30比較を完了し、局所完了5＋自身CIWknown初回の直接証拠でDだけ一部→確認済み、21/142/73→22/141/73。局所Wknownのload未到達・caller欠測、secondary7-3Wready初回load未到達と別retry1完了はそのまま保持。全6checkout/env/実imagepull/Node527・source24照合はCI配信filehash実測とは別で、body原本/trace欠測とcasepassedログ導出の境界を残す。[最終記録](pr152-seven-four-ja.md#2026-10-30-自身初回ci確定)。以下は各時点の履歴。
+
+以下の「代表操作6初回と未到達」「台帳と残件」は局所記録時点の履歴。現在の台帳は22/141/73で、末尾の自身初回CI確定を参照する。
+
 collectorの6summary/raw同試行比較・frame/traceCRC/更新前current605のsource-bindingを正式閉鎖し、root公開GOで記録した。台帳基準は21/139/76。実装開始sourceは62d81722、7-3記録だけをFFした台帳基準は69591040で、元16WIP byteと旧7-3原本/欠測を保持した。
 
 対象は7-4/0/default（rows配列index55）。元の航空戦艦1＋重巡1＋雷巡1＋駆逐2＋海防1を代表例とし、六隻を実ゲームの最低数や全編成への推奨十分数にしない。
@@ -48,3 +52,26 @@ source差/六隻外/CD/大鷹系等の適用域、実索敵式、全数量/全�
 
 
 局所原本の正式閉鎖は216ファイル/73,591,759bytes。6件のrawとsummaryは同じ試行の保存/load観測へ一致し、trace6のCRCと動画6のSHA、両phaseの606runtime実ファイルと更新前current public605のhashを確認した。606にはprivate local.config1を含む。image digestの固定指定と、各caseのNode/PW実測版・driver registry/executableに基づくインストール済みbrowser revision照合を区別する。browser.versionを独立測定した記録ではなく、まだCI run/配信filehashの証拠とはしない。collector result SHAは`510835f8776e9a2f0a86c102c2755935b88ed4bb6f6034bf7906ae15266ae0f8`、source-binding SHAは`427dc23141c741c31ba49508143ae806ea4d0d6785f98033f8c6f942f9b6c0fb`。
+
+
+## 2026-10-30 自身初回CI確定
+
+2026-10-30 CI追記：[7-4 ABEJLP](pr152-seven-four-ja.md#2026-10-30-自身初回ci確定)の検証source`7fd5298e7248ebeb6b71c67dae7c0a579e0b7991`／[41007168230](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41007168230)、attempt1・dispatch1/再実行0。4smoke成功/2失敗・Full skipped・取消/timeout0。自身6初回summaryの全厳密比較完了を確認し、局所C3＋Wstock/unknownの5完了と自身CI Wknown初回を6代表へ直接対応してDだけ一部→確認済み。21/142/73→22/141/73の1追加セル、一連の695基準21/139/76からdistinctはB/C/D3セル。A/B/C・他58行/旧53/基準236は不変。
+
+公式C passed876/flaky0/failed1、W862/12/3は各877caseの最終outcomeで、初回成功数/物理試行数ではない。primary7-4は各caseのinitial開始1/retry0と完全な最終failed/flaky一覧への非掲載からcase passedを導出し、個別物理PASS行はnull。小summary6原本はstage completed・6行/追加0・30項目/6anchor・比較元7キー/他保持・例外/nav0の保存後/load後比較完了を示すが、未受領の7-4 C/Wbody/trace原本を取得済みにしない。saved6はknown/stock4の保存・メモ編集とunknown2の安全中止後読取りであり、保存書込み成功6回ではない。局所Wknownの45秒非表示/load全文未到達・後文書caller欠測/nav1は別試行として不変。
+
+|代表対象|Dに用いた直接の完了証拠|保持する別試行の限界|
+|---|---|---|
+|Cknown/stock/unknown|同source/fixtureの局所3初回・全文load完了|旧記録のまま|
+|Wstock/unknown|同source/fixtureの局所2初回・全文load完了|旧記録のまま|
+|Wknown|自身CI41007168230初回・stage completed、保存後/load後strict30等の全文比較完了、例外/nav0|局所初回のload未到達・後文書caller欠測/nav1を補完しない|
+
+自身CIはこの6代表すべての初回で全期待比較を完了した。Dは上表の独立した正の証拠を同じ対象へ対応した評価であり、失敗初回の穴を埋めた扱いではない。既存named保護2件はinitial開始各1/retry0・最終failed/flaky非掲載からpassedを導出する別分母で、保存/load6件へ加算しない。数値式のmanualを総合readyへ変換せず、knownの総合manual、stock/unknownのmissingを保持する。
+
+secondary7-3 firstは初回6のうち5完了、Wready初回はsaved strict20＋空2行通過/load全文未到達・nav1、別retry1が完了した。旧7-3資料や失敗初回を補完しない。C2/W4のunknown-ASWは全59行losの説明2文字列（marginNote/numericModelUnverified）比較が128行で不一致となり、初回/retryとも保存参照設定前に停止。数値条件や保存不一致の陽性ではない。別6WIPで根拠ある監査訂正を準備し、Node前1失敗→後2成功、必要C/W対象は準備中で製品変更なし。この検証sourceの2文字列は変更しない。W4の3-4ready/5-4required-missingは初回/retryともload後search-button非表示45秒でload全文未到達、失敗文書caller/handler開始は不明。W1 drop-hunt初回は事前UI/件数assert通過後の最終例外検査でversion access-control2件、全文storage比較はなく初回trace未生成。保存不一致陽性や全保存安全、共通原因を断定しない。
+
+全6jobの完全checkout HEAD、固定Node24.21.0/PW1.55.0/C1187/W2203、実image digest pull、各Node527/527/0と期待source24原本照合を確認。実ファイルhashは局所期待snapshotの確認であり、CI配信filehashの独立実測ではない。13artifact中9件4,452,232bytesをserver SHA/外側CRC一致で受領、4件512MiB超は要求/分割せず、7-4 C/Wのbody/traceは欠測。正式attempt run-log ZIPは別の11,416,985bytes/102membersでCRC正常。受領innertrace1はretry由来で、初回trace0を初回失敗0へ換算しない。記録だけの追加CIは起動せず、次7-5第1ABDFGHKは独立WIP12の静的準備・未実行とする。
+
+未受領4archiveはC2 attempt-diagnostics 1,181,223,459bytes、W4 attempt-diagnostics 653,203,951bytes、C2 smoke 2,369,955,692bytes、W4 smoke 1,314,076,995bytes。summary原本13件はprimary7-4初回6＋secondary7-3初回6/retry1で、分母を混ぜない。fixed version JSONは引き続き試験入力であり、製品の実ネットワーク通信成功や本番更新/cache安全の証明ではない。privateの保存値本文・実行時実値JSON・原本traceは公開記録に含めない。
+
+source-binding SHAは`89235093a4f5451fc083565d77121e4f968f91f42b6f711b38097098f93672ab`、collector closure SHAは`59b7e1e4cdc991f3abb0201d95553a8e694ddc6f692588c87822fde7c68c7608`、正式run-log ZIP SHAは`1ffeb1897b36e165159b8609f327af1ed30c6368c7d2b945e9eb8f8259dd116e`。rootによるsource commit/push後の初回CI結果であり、検証7fd5298eと後続の記録commitを区別する。新保存不一致等の停止基準、PR152ドラフト・未公開/main競合・保護対象、旧7-3原本/第2G/各欠測は維持する。

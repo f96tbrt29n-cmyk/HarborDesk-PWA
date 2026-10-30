@@ -15359,10 +15359,26 @@
         "record": "docs/pr152-seven-four-ja.md",
         "sourceBindingSHA256": "427dc23141c741c31ba49508143ae806ea4d0d6785f98033f8c6f942f9b6c0fb",
         "collectorResultSHA256": "510835f8776e9a2f0a86c102c2755935b88ed4bb6f6034bf7906ae15266ae0f8",
-        "scope": "separate six first local UI representatives, five complete/one WebKit known load-unreached; not source-audit proof",
+        "scope": "separate local five completed plus own CI WebKit known initial completed directly support representative workflow D; old local unreached trial remains; not source-audit proof",
         "ledgerABC": "一部",
-        "ledgerD": "一部",
-        "oldSourceAuditRightsAndFalseFieldsUnchanged": true
+        "ledgerD": "確認済み",
+        "oldSourceAuditRightsAndFalseFieldsUnchanged": true,
+        "localScope": "separate six first local UI representatives, five complete/one WebKit known load-unreached; not source-audit proof",
+        "firstCI": {
+          "runId": 41007168230,
+          "head": "7fd5298e7248ebeb6b71c67dae7c0a579e0b7991",
+          "sourceBindingSHA256": "89235093a4f5451fc083565d77121e4f968f91f42b6f711b38097098f93672ab",
+          "collectorClosureSHA256": "59b7e1e4cdc991f3abb0201d95553a8e694ddc6f692588c87822fde7c68c7608",
+          "primaryInitialCompleted": 6,
+          "strict30Saved": 6,
+          "strict30Load": 6,
+          "individualPhysicalInitialPASSLine": null,
+          "casePassedDerivedFromCompleteOwnReporter": true,
+          "bodyRawTraceMissing": true,
+          "DDirectEvidence": "localC3+Wstock/unknown5 completed and ownCIWknown initial completed; local Wknown missing retained",
+          "matrix": "22/141/73",
+          "oldSourceAuditRightsAndFalseFieldsUnchanged": true
+        }
       }
     },
     {

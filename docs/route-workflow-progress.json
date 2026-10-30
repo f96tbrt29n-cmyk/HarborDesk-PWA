@@ -73,8 +73,8 @@
       "非該当": 0
     },
     "D": {
-      "確認済み": 21,
-      "一部": 16,
+      "確認済み": 22,
+      "一部": 15,
       "未確認": 22,
       "非該当": 0
     }
@@ -2601,8 +2601,8 @@
           ]
         },
         "D": {
-          "status": "一部",
-          "reason": "Cknown/stock/unknownとWstock/unknownの5代表は保存/適用可能なメモ編集または安全中止、同一reload文書load全文、strict6行+追加0・30項目/6anchor・比較元7キー/他編成metadataまで完了。Wknownは保存後strict30/配備案/他保持を通過したが、load後search-button非表示待機で試験45秒timeout、load全文未到達/nav採取失敗1。後文書caller/原因を別試行で補完しない。",
+          "status": "確認済み",
+          "reason": "同source/fixtureの局所Cknown/stock/unknown・Wstock/unknownの5完了と、自身CI41007168230のWknown初回完了を6代表へ直接対応。保存/適用可能なメモ編集または安全中止、同一reload文書load後再表示、6行+追加0・30項目/6anchor・比較元7キー/他編成metadataの厳密比較と例外0を確認。自身CIは6初回すべてcompleted。局所Wknownのload未到達/nav採取失敗1・後文書caller/原因欠測は別試行のまま保持し補完しない。CI body原本欠測とcasepassedログ導出は専用記録で分離。",
           "evidence": [
             "docs/pr152-seven-four-ja.md",
             "tests/seven-four-routes.test.cjs",
@@ -2732,7 +2732,7 @@
     "baselineHead": "69591040a92b6cfaa9055969b85c7bb258522b7a",
     "implementationStartHead": "62d817223a1e72b28f956234a6090b3493c624b0",
     "evidence": "docs/pr152-seven-four-ja.md",
-    "state": "limited source/Node and six first local representative operations recorded; five completed, WebKit known saved strict30 then post-load hidden click timeout with full load unreached; source commit/push and one finalHEAD smoke not started",
+    "state": "own first CI41007168230 closed four smoke success/two failure; primary six initial summaries completed strict saved/load30 comparisons. Local five plus own CI WebKit known initial directly satisfy D; local failed trial/body gaps remain separate.",
     "sourceScope": {
       "sourceTables": 3,
       "rawLiteralCount": 57,
@@ -3028,6 +3028,33 @@
       "firstFailureNeverFilledByOtherTrials": true
     },
     "matrixChange": {
+      "before": "21/142/73",
+      "after": "22/141/73",
+      "statusCells": 1,
+      "cells": [
+        "D 一部→確認済み"
+      ],
+      "A/B/C": "一部 unchanged",
+      "other58RowsUnchanged": true,
+      "criteriaChanged": false,
+      "cellsDenominator": 236,
+      "partialPercentConversion": false,
+      "original695Baseline": "21/139/76",
+      "distinctCellsFromOriginalBaseline": [
+        "B 未確認→一部",
+        "C 未確認→一部",
+        "D 未確認→確認済み"
+      ]
+    },
+    "graphHistory": "data unchanged, full graph/old target/history compatibility not proved",
+    "nextCI": {
+      "state": "own first CI completed failure, no records-only dispatch",
+      "runId": 41007168230,
+      "head": "7fd5298e7248ebeb6b71c67dae7c0a579e0b7991",
+      "plan": "independent source-grounded unknown-ASW audit correction and required C/W targets prepared separately; no speculative product change or successful-case repetition"
+    },
+    "nextIndependentTarget": "7-5 first registered example ABDFGHK; independent preparation after this source unit, no transfer of7-4 credit",
+    "localMatrixChange": {
       "before": "21/139/76",
       "after": "21/142/73",
       "statusCells": 3,
@@ -3042,14 +3069,209 @@
       "cellsDenominator": 236,
       "partialPercentConversion": false
     },
-    "graphHistory": "data unchanged, full graph/old target/history compatibility not proved",
-    "nextCI": {
-      "state": "not started",
-      "plan": "root ordinary related source commit/push then one same finalHEAD smoke without automatic/manual duplication; local failed/unreached trial retained"
-    },
-    "nextIndependentTarget": "7-5 first registered example ABDFGHK; independent preparation after this source unit, no transfer of7-4 credit"
+    "firstCI": {
+      "runId": 41007168230,
+      "head": "7fd5298e7248ebeb6b71c67dae7c0a579e0b7991",
+      "attempt": 1,
+      "conclusion": "failure",
+      "rootDispatches": 1,
+      "reruns": 0,
+      "jobs": {
+        "smoke": 6,
+        "success": 4,
+        "failure": 2,
+        "cancelled": 0,
+        "timedOut": 0,
+        "full": "skipped",
+        "pagesStarted": false
+      },
+      "officialCaseOutcomes": {
+        "chromium": {
+          "passed": 876,
+          "flaky": 0,
+          "failed": 1,
+          "skipped": 0
+        },
+        "webkit": {
+          "passed": 862,
+          "flaky": 12,
+          "failed": 3,
+          "skipped": 0
+        }
+      },
+      "caseOutcomeSemantics": "passed/flaky/failed/skipped; not physical initial-pass/retry-success attempt totals",
+      "primarySevenFour": {
+        "initialExpected": 6,
+        "initialReceived": 6,
+        "initialStageCompletedAllExpectedComparisons": 6,
+        "initialStrictSaved30FieldsSixRowsZeroExtra": 6,
+        "initialStrictLoad30FieldsSixRowsZeroExtra": 6,
+        "allRouteManual": true,
+        "positivePreservationMismatchObserved": false,
+        "caseOutcomeFromCompleteOwnReporter": "passed",
+        "individualPhysicalInitialPASSLine": null,
+        "retryEntries": 0,
+        "localFailedWebkitKnownTrialRemainsSeparate": true
+      },
+      "existingNamedProtection": {
+        "initialExpected": 2,
+        "initialStartEntries": 2,
+        "retryEntries": 0,
+        "caseOutcomeFromCompleteOwnReporter": "passed",
+        "individualPhysicalInitialPASSLine": null,
+        "denominatorSeparateFromPrimary": true
+      },
+      "secondarySevenThree": {
+        "initialExpected": 6,
+        "initialReceived": 6,
+        "initialCompleted": 5,
+        "initialAfterLoadPartial": 1,
+        "partialProject": "webkit",
+        "partialState": "ready",
+        "partialSavedStrict20FieldsFourPlusTwoRows": true,
+        "partialLoadReadReached": false,
+        "partialNavigationCollectionFailures": 1,
+        "retryCompleted": 1,
+        "retryDoesNotFillInitialGap": true
+      },
+      "environments": {
+        "received": 6,
+        "fixedMatches": 6,
+        "NodeActual": "v24.21.0",
+        "PlaywrightActual": "1.55.0",
+        "ChromiumRevision": "1187",
+        "WebkitRevision": "2203",
+        "nodeTestsEach": 527,
+        "nodePassedEach": 527,
+        "nodeFailedEach": 0,
+        "allSixFootersActual": true,
+        "allSixCheckoutFullHEADMatches": true,
+        "allSixActualImagePullDigestMatches": true,
+        "expectedSource24OriginalsPreservedAndExact": true,
+        "CIIndependentServedFileHashesMeasured": false
+      },
+      "sourceBinding": {
+        "SHA256": "89235093a4f5451fc083565d77121e4f968f91f42b6f711b38097098f93672ab",
+        "source24ManifestSHA256": "ccdc30046cb2abaf57a0c4b5e1a141460b5cda45f75421a212b536aba1117bf3",
+        "source24ActualHashVerifiedBeforeRecordUpdate": true,
+        "all24PreservedSourceCopiesExact": true,
+        "sourceAttribution": "own run/job complete HEAD + six exact checkout logs + immutable expected source24, no source-rewrite step; actual file hashes are local expected snapshots only",
+        "CIIndependentServedFileHashesMeasured": false
+      },
+      "archives": {
+        "state": "closed",
+        "runId": 41007168230,
+        "head": "7fd5298e7248ebeb6b71c67dae7c0a579e0b7991",
+        "publishedArchives": 13,
+        "receivedArchives": 9,
+        "receivedArchiveBytes": 4452232,
+        "receivedAllServerSHA256AndCRCValid": true,
+        "unreceivedArchives": [
+          {
+            "name": "attempt-diagnostics-chromium-2-41007168230",
+            "bytes": 1181223459,
+            "state": "not-requested-over-cap",
+            "requests": 0
+          },
+          {
+            "name": "attempt-diagnostics-webkit-4-41007168230",
+            "bytes": 653203951,
+            "state": "not-requested-over-cap",
+            "requests": 0
+          },
+          {
+            "name": "smoke-chromium-shard-2-of-2-41007168230",
+            "bytes": 2369955692,
+            "state": "not-requested-over-cap",
+            "requests": 0
+          },
+          {
+            "name": "smoke-webkit-shard-4-of-4-41007168230",
+            "bytes": 1314076995,
+            "state": "not-requested-over-cap",
+            "requests": 0
+          }
+        ],
+        "oversizeArchivesNeverRequestedOrSplit": true,
+        "smallSummaryOriginals": 13,
+        "summaryUnitDenominators": {
+          "seven-four": 6,
+          "seven-three-first": 6
+        },
+        "receivedInnerTraceArchives": 1,
+        "receivedInitialInnerTraces": 0,
+        "receivedRetryInnerTraces": 1,
+        "receivedZeroInitialTraceDoesNotMeanZeroInitialFailures": true,
+        "rawBodiesNeverTranscribedIntoPublicCandidates": true,
+        "formalAttemptLogArchiveIsSeparate": true
+      },
+      "formalAttemptLogs": {
+        "requests": 1,
+        "bytes": 11416985,
+        "sha256": "1ffeb1897b36e165159b8609f327af1ed30c6368c7d2b945e9eb8f8259dd116e",
+        "members": 102,
+        "CRC": "PASS"
+      },
+      "failedCaseBoundaries": {
+        "chromiumFinalFailed": "unknown-opening-ASW: 59-row los audit string mismatch at line128 before preservation setup, both first/retry",
+        "webkitFinalFailed": [
+          "unknown-opening-ASW: same own first/retry audit boundary, before preservation setup",
+          "3-4 ready: own first/retry after-load search resolved button not visible; load comparison unreached",
+          "5-4 required-missing: own first/retry after-load search resolved button not visible; load comparison unreached"
+        ],
+        "webkitDropHuntFlakyInitial": "after reload clear/retap and getter-count checks; final exception array caught two version access-control errors; no raw storage equality checked",
+        "unknownDocumentCallerAndSearchHandlerNotInferred": true,
+        "fourOversizeRawArchiveGapsRemain": true,
+        "noCommonCauseOrStorageSafetyVerdict": true
+      },
+      "collectorClosureSHA256": "59b7e1e4cdc991f3abb0201d95553a8e694ddc6f692588c87822fde7c68c7608",
+      "strictReadMeaning": "Six saved getter reads after save or safe-abort: known/stock4 saved and memo-edited, unknown2 safe-aborted without edit; not six write-success claims. Six load reads completed in this own CI, separate from local saved6/load5.",
+      "primarySummaryAndBodyBoundary": "Six original small summaries show stage completed and all strict expected comparisons; line reporter has one initial start per case, zero retry and no primary case in final failed/flaky lists, deriving passed case outcomes. Individual physical PASS lines are null; missing raw bodies/traces are not filled by summaries.",
+      "DDirectEvidenceMap": [
+        {
+          "target": "chromium known",
+          "positiveTrial": "local initial",
+          "fullLoadComparison": true
+        },
+        {
+          "target": "chromium stock",
+          "positiveTrial": "local initial",
+          "fullLoadComparison": true
+        },
+        {
+          "target": "chromium unknown",
+          "positiveTrial": "local initial",
+          "fullLoadComparison": true
+        },
+        {
+          "target": "webkit stock",
+          "positiveTrial": "local initial",
+          "fullLoadComparison": true
+        },
+        {
+          "target": "webkit unknown",
+          "positiveTrial": "local initial",
+          "fullLoadComparison": true
+        },
+        {
+          "target": "webkit known",
+          "positiveTrial": "own CI41007168230 initial",
+          "fullLoadComparison": true,
+          "localInitialUnreachedRetained": true
+        }
+      ],
+      "localWebkitKnownMissingAndCallerUnchanged": true,
+      "newPositivePreservationMismatchObserved": false,
+      "unknownASWCorrectivePreparation": {
+        "state": "independent six-file WIP; one before failure then two Node passes; C/W target preparation, not completed browser evidence at this record",
+        "twoScoutingStringsInThisSourceUnchanged": true,
+        "productChanges": false
+      },
+      "nextSevenFive": "independent first ABDFGHK static WIP12, unexecuted; no ledger credit",
+      "newExecutionsByRecords": 0
+    }
   },
-  "nextPriority": "7-4 ABEJLPの関連source/記録をrootが通常commit/pushし、同じ最終HEADのsmoke1回を重複なく確認する。局所Wknownの保存後保持通過/load全文未到達・後文書caller/原因欠測は反復や別試行で埋めない。次は7-5第1ABDFGHKの独立準備。数値式/source差/graph/旧履歴と7-3既存CI残件は維持。",
+  "nextPriority": "7-4自身初回CI41007168230は4smoke成功/2失敗で閉鎖。Dは局所5＋自身CIWknown初回完了により確認済み、22/141/73。局所Wknown未到達とsecondary7-3Wready初回欠測/別retryは保持する。unknown-ASW全59los比較の説明2文字列不整合は別6WIPの根拠ある監査訂正/必要C/W準備へ、製品変更なし。次7-5第1ABDFGHKは独立WIP12静的準備・未実行。source差/実式/graph/旧履歴/既存非表示・通信の原因は未完。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -6955,8 +7177,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "7-4 limited local scope recorded; WebKit known full post-load comparison unreached, A/B/C/D partial; root source commit/push/one finalHEAD smoke pending",
-    "nextUnit": "7-5 first ABDFGHK independent preparation; do not import7-4 limited Node/UI evidence into its cells",
+    "activeUnit": "7-4 own first CI closed 4smoke success/2failure; A/B/C partial, D confirmed by local five plus own CI Wknown initial,22/141/73; old local/secondary gaps preserved, independent audit correction targets preparing",
+    "nextUnit": "7-5 first ABDFGHK independent static WIP12, unexecuted; no7-4 evidence import or cell change",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -6987,25 +7209,47 @@
       "sourceBindingSHA256": "427dc23141c741c31ba49508143ae806ea4d0d6785f98033f8c6f942f9b6c0fb",
       "collectorResultSHA256": "510835f8776e9a2f0a86c102c2755935b88ed4bb6f6034bf7906ae15266ae0f8",
       "matrixChange": {
-        "before": "21/139/76",
-        "after": "21/142/73",
-        "statusCells": 3,
+        "before": "21/142/73",
+        "after": "22/141/73",
+        "statusCells": 1,
         "cells": [
-          "B 未確認→一部",
-          "C 未確認→一部",
-          "D 未確認→一部"
+          "D 一部→確認済み"
         ],
-        "A": "一部 unchanged",
+        "A/B/C": "一部 unchanged",
         "other58RowsUnchanged": true,
         "criteriaChanged": false,
         "cellsDenominator": 236,
-        "partialPercentConversion": false
+        "partialPercentConversion": false,
+        "original695Baseline": "21/139/76",
+        "distinctCellsFromOriginalBaseline": [
+          "B 未確認→一部",
+          "C 未確認→一部",
+          "D 未確認→確認済み"
+        ]
       },
       "actualFormulaStillUnverified": true,
-      "sourceCommitPushCI": "not started; one same finalHEAD smoke planned by root",
+      "sourceCommitPushCI": "source7fd5298e ordinary commit/push completed by root; one own smoke41007168230 attempt1 completed failure; records-only extra CI0",
       "sevenThreeOldOriginalsAndGapsChanged": false,
       "stopConditionsUnchanged": true,
-      "privateValuesShared": false
+      "privateValuesShared": false,
+      "firstCI": {
+        "record": "docs/pr152-seven-four-ja.md",
+        "details": "selected.firstCI",
+        "runId": 41007168230,
+        "head": "7fd5298e7248ebeb6b71c67dae7c0a579e0b7991",
+        "attempt": 1,
+        "conclusion": "failure",
+        "smokeSuccess": 4,
+        "smokeFailure": 2,
+        "primaryInitialCompletedStrictSavedLoad30": 6,
+        "DDirectEvidence": "localC3+Wstock/unknown5 and ownCIWknown initial",
+        "oldLocalAndSecondaryGapsPreserved": true,
+        "individualPhysicalInitialPASSLine": null,
+        "casePassedDerivedFromCompleteOwnReporter": true,
+        "rawBodyTraceMissing": true,
+        "sourceBindingSHA256": "89235093a4f5451fc083565d77121e4f968f91f42b6f711b38097098f93672ab",
+        "collectorClosureSHA256": "59b7e1e4cdc991f3abb0201d95553a8e694ddc6f692588c87822fde7c68c7608"
+      }
     },
     "activeUnitBeforeUpstreamCIFinalization": "new preservation mismatch stop: separate7-1C ready post-edit identity false; six-five validated WIP retained; no new trial/productfix/commit/push/CI",
     "currentBeforeAuthorizedIdentityObservationResume": {
@@ -7348,6 +7592,37 @@
         "physicalAttemptTotal": null
       },
       "closureResultSHA256": "b917025661e4686f32bc67729e2e98d29051bcd295d385f14d46b6e8d54c4964"
+    },
+    "activeUnitBeforeSevenFourFirstCIFinalization": "7-4 limited local scope recorded; WebKit known full post-load comparison unreached, A/B/C/D partial; root source commit/push/one finalHEAD smoke pending",
+    "currentBeforeSevenFourFirstCIFinalization": {
+      "date": "2026-10-30",
+      "target": "7-4/0/default",
+      "record": "docs/pr152-seven-four-ja.md",
+      "baselineHead": "69591040a92b6cfaa9055969b85c7bb258522b7a",
+      "implementationStartHead": "62d817223a1e72b28f956234a6090b3493c624b0",
+      "local": "six first physical trials, five pass/one WebKit known post-load hidden-click timeout; saved30six/load30five",
+      "sourceBindingSHA256": "427dc23141c741c31ba49508143ae806ea4d0d6785f98033f8c6f942f9b6c0fb",
+      "collectorResultSHA256": "510835f8776e9a2f0a86c102c2755935b88ed4bb6f6034bf7906ae15266ae0f8",
+      "matrixChange": {
+        "before": "21/139/76",
+        "after": "21/142/73",
+        "statusCells": 3,
+        "cells": [
+          "B 未確認→一部",
+          "C 未確認→一部",
+          "D 未確認→一部"
+        ],
+        "A": "一部 unchanged",
+        "other58RowsUnchanged": true,
+        "criteriaChanged": false,
+        "cellsDenominator": 236,
+        "partialPercentConversion": false
+      },
+      "actualFormulaStillUnverified": true,
+      "sourceCommitPushCI": "not started; one same finalHEAD smoke planned by root",
+      "sevenThreeOldOriginalsAndGapsChanged": false,
+      "stopConditionsUnchanged": true,
+      "privateValuesShared": false
     }
   },
   "auditCorrection": {
@@ -7807,5 +8082,6 @@
   },
   "nextPriorityBeforeSevenThreeFirst20261030": "7-2自身W4の2case×初回/retryはreload後第2search非表示click timeoutと分類済み、load後全文比較と表示切替caller/原因は未確認。7-2追加試験・推測修正・CIなし。独立7-3第1ACEは未実行7件373133Bを保持して安全なstatic設計を続行可。4+2厳密helper、Node aggregator/旧第1oracle、専用UI固定一覧、台帳接続が残件。43+8期待案と図/旧目標履歴互換は未完、第2G再調査0。",
   "nextPriorityBeforeSevenThreeCIFinalization20261030": "7-3第1ACEの通常commit/push後、同じ最終HEADsmoke1回を重複なく確認。局所Wreadyのload後非表示/全文比較未到達は別試行として保持し反復しない。次の独立単位は7-4/0 ABEJLP：B/C/D未確認、駆逐/海防OR・航空艦数・係数4安全域37と任意対潜/夜戦/基地を分けて確認。7-2追加試験/推測修正/再CI、第2G再調査は行わない。",
-  "nextPriorityBeforeSevenFourLocal20261030": "7-3検証source62d81722/CI40996265641は5smoke成功・W4失敗/Fullskipで閉鎖。後続は記録のみcommit/pushで新CIなし。次の独立7-4/0 ABEJLPは別branchのNode12成功が先行しUI草稿あり、実操作/保存/load/台帳は未完。既存根拠と凍結sourceを照合して必要な代表操作へ進み、7-3の未到達や第2G差を混ぜない。"
+  "nextPriorityBeforeSevenFourLocal20261030": "7-3検証source62d81722/CI40996265641は5smoke成功・W4失敗/Fullskipで閉鎖。後続は記録のみcommit/pushで新CIなし。次の独立7-4/0 ABEJLPは別branchのNode12成功が先行しUI草稿あり、実操作/保存/load/台帳は未完。既存根拠と凍結sourceを照合して必要な代表操作へ進み、7-3の未到達や第2G差を混ぜない。",
+  "nextPriorityBeforeSevenFourCIFinalization20261030": "7-4 ABEJLPの関連source/記録をrootが通常commit/pushし、同じ最終HEADのsmoke1回を重複なく確認する。局所Wknownの保存後保持通過/load全文未到達・後文書caller/原因欠測は反復や別試行で埋めない。次は7-5第1ABDFGHKの独立準備。数値式/source差/graph/旧履歴と7-3既存CI残件は維持。"
 }

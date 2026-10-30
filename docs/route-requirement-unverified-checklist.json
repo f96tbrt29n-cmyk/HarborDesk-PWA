@@ -1588,7 +1588,8 @@
       "existingEvidence": [
         "全マスター仮想所持の直接構造選択・未知艦拒否（全論理枝ではない）",
         "保存三出典raw57/policy6・有限適用差8を独立監査。Node20ユニークはroute/親12＋placement7＋audit1、純producer2/consumer2別。実索敵式/HQ補正は未照合でmanualを維持。",
-        "known/stock/unknown C/W6初回は5保存/安全中止/同一文書load全文完了、Wknownは保存strict30通過・load後非表示で全文未到達。限定記録はdocs/pr152-seven-four-ja.md、全操作列や旧欠測の補完ではない。"
+        "known/stock/unknown C/W6初回は5保存/安全中止/同一文書load全文完了、Wknownは保存strict30通過・load後非表示で全文未到達。限定記録はdocs/pr152-seven-four-ja.md、全操作列や旧欠測の補完ではない。",
+        "自身CI41007168230/source7fd5298eのprimary6初回summaryはstrict30保存後/load後全文比較を完了。局所5＋自身CIWknown初回を6代表へ直接対応しDのみ確認済み、22/141/73。局所Wknown未到達/caller欠測とCI body原本欠測は保持。全条件/全操作の網羅を示さず旧静的partialを変えない。"
       ],
       "remaining": [
         {
@@ -1617,7 +1618,7 @@
         },
         {
           "code": "X",
-          "detail": "raw33/37表・有限適用差8と実HQ0.35/0.4式を分離。六隻外/CD/大鷹系、全数量/在庫/枠競合/graph/旧履歴、Wknown後文書caller/原因・load全文未到達を残す。"
+          "detail": "raw33/37表・有限適用差8と実HQ0.35/0.4式を分離。六隻外/CD/大鷹系、全数量/在庫/枠競合/graph/旧履歴、Wknown後文書caller/原因・load全文未到達を残す。 自身CIの独立したWknown初回完了はDの直接証拠であり、局所失敗や欠測を補完しない。CIunknown-ASWは保存前のlos説明2文字列不整合で別訂正準備、非表示/通信の原因は未解決。"
         }
       ],
       "strategyTargets": [
