@@ -3269,9 +3269,20 @@
       },
       "nextSevenFive": "independent first ABDFGHK static WIP12, unexecuted; no ledger credit",
       "newExecutionsByRecords": 0
+    },
+    "followupCorrectionCIRecord": {
+      "record": "sevenFourCorrectionCIFinalization20261030",
+      "runId": 41014041261,
+      "head": "633b079cb1cd4e375fd095cabc33f60f08e9229d",
+      "remainingSummary": [
+        "WebKit W4 case outcomes/strict59 generic reach and physical PASS remain unknown; no local or retry substitution.",
+        "Initial7-4 Wknown/Wstock and7-3 Wstock after-load-search hidden-click stops retain load null/nav1 and caller/handler gaps.",
+        "Actual LOS formula/HQ applicability, source domain differences, whole inventory/slot/strategy combinations and old graph/history remain limited.",
+        "PR152 draft/unpublished, main conflict and protected release/production/SW/version targets remain held."
+      ]
     }
   },
-  "nextPriority": "7-4自身初回CI41007168230は4smoke成功/2失敗で閉鎖。Dは局所5＋自身CIWknown初回完了により確認済み、22/141/73。局所Wknown未到達とsecondary7-3Wready初回欠測/別retryは保持する。unknown-ASW全59los比較の説明2文字列不整合は別6WIPの根拠ある監査訂正/必要C/W準備へ、製品変更なし。次7-5第1ABDFGHKは独立WIP12静的準備・未実行。source差/実式/graph/旧履歴/既存非表示・通信の原因は未完。",
+  "nextPriority": "訂正source633/CI41014041261は5smoke成功・W4job45分取消で閉鎖、公式C877/0/0、W4/全W集計とgeneric Wの個別結果/strict59到達は欠測。旧初回7fdの監査失敗と新trialのload非表示/全文未到達は別保持し、22/141/73を維持。次は独立7-5第1ABDFGHKの実操作結果を別原本へ閉鎖・レビューし、必要な限定記録/通常pushと同source smoke1回へ進む。新保存不一致等がなければ第2等の独立した次条件を選ぶ。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -8083,5 +8094,256 @@
   "nextPriorityBeforeSevenThreeFirst20261030": "7-2自身W4の2case×初回/retryはreload後第2search非表示click timeoutと分類済み、load後全文比較と表示切替caller/原因は未確認。7-2追加試験・推測修正・CIなし。独立7-3第1ACEは未実行7件373133Bを保持して安全なstatic設計を続行可。4+2厳密helper、Node aggregator/旧第1oracle、専用UI固定一覧、台帳接続が残件。43+8期待案と図/旧目標履歴互換は未完、第2G再調査0。",
   "nextPriorityBeforeSevenThreeCIFinalization20261030": "7-3第1ACEの通常commit/push後、同じ最終HEADsmoke1回を重複なく確認。局所Wreadyのload後非表示/全文比較未到達は別試行として保持し反復しない。次の独立単位は7-4/0 ABEJLP：B/C/D未確認、駆逐/海防OR・航空艦数・係数4安全域37と任意対潜/夜戦/基地を分けて確認。7-2追加試験/推測修正/再CI、第2G再調査は行わない。",
   "nextPriorityBeforeSevenFourLocal20261030": "7-3検証source62d81722/CI40996265641は5smoke成功・W4失敗/Fullskipで閉鎖。後続は記録のみcommit/pushで新CIなし。次の独立7-4/0 ABEJLPは別branchのNode12成功が先行しUI草稿あり、実操作/保存/load/台帳は未完。既存根拠と凍結sourceを照合して必要な代表操作へ進み、7-3の未到達や第2G差を混ぜない。",
-  "nextPriorityBeforeSevenFourCIFinalization20261030": "7-4 ABEJLPの関連source/記録をrootが通常commit/pushし、同じ最終HEADのsmoke1回を重複なく確認する。局所Wknownの保存後保持通過/load全文未到達・後文書caller/原因欠測は反復や別試行で埋めない。次は7-5第1ABDFGHKの独立準備。数値式/source差/graph/旧履歴と7-3既存CI残件は維持。"
+  "nextPriorityBeforeSevenFourCIFinalization20261030": "7-4 ABEJLPの関連source/記録をrootが通常commit/pushし、同じ最終HEADのsmoke1回を重複なく確認する。局所Wknownの保存後保持通過/load全文未到達・後文書caller/原因欠測は反復や別試行で埋めない。次は7-5第1ABDFGHKの独立準備。数値式/source差/graph/旧履歴と7-3既存CI残件は維持。",
+  "sevenFourCorrectionCIFinalization20261030": {
+    "date": "2026-10-30",
+    "record": "docs/pr152-seven-four-ja.md#2026-10-30-訂正後ci633の確定",
+    "runId": 41014041261,
+    "head": "633b079cb1cd4e375fd095cabc33f60f08e9229d",
+    "attempt": 1,
+    "dispatches": 1,
+    "reruns": 0,
+    "manualCancelCalls": 0,
+    "runConclusion": "cancelled",
+    "jobs": {
+      "smoke": 6,
+      "success": 5,
+      "cancelled": 1,
+      "cancellationCauseMaximumExecutionTimeMinutes": 45,
+      "collectorOrRootManualCancelCalls": 0,
+      "Full": "skipped",
+      "PagesStarted": false
+    },
+    "smokeStepConclusions": {
+      "C1": "success",
+      "C2": "success",
+      "W1": "success",
+      "W2": "success",
+      "W3": "success",
+      "W4": "cancelled"
+    },
+    "smokeProcessNormalExitOrIndividualPhysicalPASSNotInferred": true,
+    "officialCaseOutcomes": {
+      "chromium": {
+        "passed": 877,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "webkit": null
+    },
+    "knownWebkitCompletedJobsSubtotal": {
+      "passed": 658,
+      "flaky": 0,
+      "failed": 0,
+      "jobs": 3
+    },
+    "webkitShard4CaseOutcomes": null,
+    "webkitTotalCaseOutcomes": null,
+    "caseOutcomeSemantics": "passed/flaky/failed are reporter case outcomes, not physical initial/retry counts; incomplete W4 reporter does not support passed by elimination",
+    "genericCorrectionSeparateTwo": {
+      "expectedCases": 2,
+      "chromium": {
+        "caseOutcome": "passed-derived-from-completed-own-reporter",
+        "initialStartEntries": 1,
+        "retryEntries": 0,
+        "originalStrict59AndSaveReloadRecoveryAssertionsPassedFromCaseAndFrozenSource": true,
+        "rawBodyDirectRead": false,
+        "physicalPASSLine": null
+      },
+      "webkit": {
+        "caseOutcome": null,
+        "initialStartEntries": 1,
+        "nextCaseStartObserved": true,
+        "retryOrFailureEntryObserved": false,
+        "strict59AssertionReach": null,
+        "rawBodyDirectRead": false,
+        "physicalPASSLine": null,
+        "reason": "job cancelled without completed footer or explicit target PASS; next start alone is retained as boundary, not substituted verdict"
+      },
+      "direct59RawOrStorageValuesInThisRunAvailable": false,
+      "localCorrectionCWSuccessSeparateAndNotSubstituted": true
+    },
+    "summaryUnits": {
+      "seven-four": {
+        "initialExpected": 6,
+        "initialReceived": 6,
+        "initialCompletedComparisons": 4,
+        "initialPartial": [
+          {
+            "project": "webkit",
+            "state": "stock",
+            "stage": "after-load-search",
+            "savedReadReached": true,
+            "loadReadReached": false,
+            "navigationCollectionFailures": 1,
+            "savedIdentityExpectedMatch": true,
+            "firstFailureLogKind": "locator click resolved/not visible under original total45000ms deadline",
+            "newDocumentCaller": null,
+            "handlerStart": null
+          },
+          {
+            "project": "webkit",
+            "state": "known",
+            "stage": "after-load-search",
+            "savedReadReached": true,
+            "loadReadReached": false,
+            "navigationCollectionFailures": 1,
+            "savedIdentityExpectedMatch": true,
+            "firstFailureLogKind": "locator click resolved/not visible under original total45000ms deadline",
+            "newDocumentCaller": null,
+            "handlerStart": null
+          }
+        ],
+        "retryCompletedComparisons": 2,
+        "retryFrameworkPhysicalOutcome": null,
+        "retryDoesNotFillInitialGap": true,
+        "initialSavedIdentityExpectedMatch": 6,
+        "rawDetailedOriginalsAvailable": false
+      },
+      "seven-three-first": {
+        "initialExpected": 6,
+        "initialReceived": 6,
+        "initialCompletedComparisons": 5,
+        "initialPartial": [
+          {
+            "project": "webkit",
+            "state": "stock",
+            "stage": "after-load-search",
+            "savedReadReached": true,
+            "loadReadReached": false,
+            "navigationCollectionFailures": 1,
+            "savedIdentityExpectedMatch": true,
+            "firstFailureLogKind": "locator click resolved/not visible under original total45000ms deadline",
+            "newDocumentCaller": null,
+            "handlerStart": null
+          }
+        ],
+        "retryCompletedComparisons": 1,
+        "retryFrameworkPhysicalOutcome": null,
+        "retryDoesNotFillInitialGap": true,
+        "initialSavedIdentityExpectedMatch": 6,
+        "rawDetailedOriginalsAvailable": false
+      }
+    },
+    "summaryOriginals": 15,
+    "summaryPreservationMismatchPositive": false,
+    "allReachedPreservationComparisonsExact": true,
+    "stageNotFrameworkCaseOutcome": true,
+    "namedProtectionSeparateTwo": {
+      "expected": 2,
+      "caseOutcome": "passed-derived-from-each-own-completed-reporter",
+      "physicalPASSLines": null,
+      "separateDenominator": true
+    },
+    "environment": {
+      "jobsActual": 6,
+      "fixedMatches": 6,
+      "Node": "v24.21.0",
+      "Playwright": "1.55.0",
+      "ChromiumRevision": "1187",
+      "WebkitRevision": "2203",
+      "NodeTestsEach": 529,
+      "NodePassedEach": 529,
+      "NodeFailedEach": 0,
+      "allNewOwnFootersMeasured": true,
+      "allCheckoutFullHEADMatches": true,
+      "allActualImagePullDigestsMatch": true,
+      "committedSourceFilesPreservedExact": 607,
+      "CIIndependentServedSourceHashMeasured": false
+    },
+    "sourceBinding": {
+      "confirmationSHA256": "7648993864549eeb7a6547546179946ee6d2e34830579c5a007a35661d0d4078",
+      "all607CommittedOriginalsExact": true,
+      "allSixCheckoutFullHEADMatches": true,
+      "CIIndependentServedFileHashesMeasured": false,
+      "manifestSHA256": "f5a7c90d91ac4e351c119f2989776d6c5f30051c3316e657446fbc33239269d7"
+    },
+    "archives": {
+      "state": "closed",
+      "publishedArchives": 10,
+      "receivedArchives": 8,
+      "receivedBytes": 304410,
+      "allReceivedServerSHA256AndCRCValid": true,
+      "unreceivedArchives": [
+        {
+          "name": "attempt-diagnostics-chromium-2-41014041261",
+          "bytes": 1600226752,
+          "reason": "not-requested-over-cap",
+          "requests": 0
+        },
+        {
+          "name": "attempt-diagnostics-webkit-4-41014041261",
+          "bytes": 667248390,
+          "reason": "not-requested-over-cap",
+          "requests": 0
+        }
+      ],
+      "oversizeArchivesNotRequestedRangeOrSplit": true,
+      "normalSmokeFullArchivesPublished": 0,
+      "summaryOriginals": 15,
+      "receivedTraceArchives": 0,
+      "receivedVideoOriginals": 0,
+      "zeroReceivedNotActualZeroFailuresOrZeroProduced": true,
+      "genericRawBodyMissing": true,
+      "ownDetailedRawJSONTraceVideoMissing": true,
+      "localOrOtherTrialNeverFillsCIGaps": true
+    },
+    "formalAttemptLog": {
+      "requests": 1,
+      "bytes": 11029657,
+      "sha256": "622077e8ca64eff85f7b4a6fc58e3558dda6b8c1a150ced3f89bac97c67c5e57",
+      "members": 101,
+      "CRC": "PASS"
+    },
+    "collectorClosureSHA256": "ab2e87ccce49101183d36d66093c484467c359a2cc2342c650dc43ee69889ae1",
+    "independentSourceLogAuditSHA256": "8b6790a14b0116b72df7e591e192f8b32ec40b616fc5ddfbfea458b130ba47e0",
+    "closedManifests": [
+      {
+        "path": "ci/closed-ci-collection-files-manifest.json",
+        "files": 996,
+        "bytes": 27341932,
+        "sha256": "14eb1d404ea9ad9c436d76cdb73ef47c834cee7db8c1417f2b7dfafc34dab10e",
+        "allEntriesBytesAndSHA256Rechecked": true
+      },
+      {
+        "path": "ci-artifacts/closed-ci-artifacts-files-manifest.json",
+        "files": 102,
+        "bytes": 517397,
+        "sha256": "f1dbf59d89e6108ea734259f79b5b5b1baf9ef7eec2205fcf2f3e209ad43cf16",
+        "allEntriesBytesAndSHA256Rechecked": true
+      }
+    ],
+    "matrix": {
+      "before": "22/141/73",
+      "after": "22/141/73",
+      "statusCellsChanged": 0,
+      "denominator": 236,
+      "DDirectEvidenceUnchanged": "old local C3+Wstock/unknown5 completed plus old7fd CI41007168230 Wknown initial; new633 partial trials do not remove or fill it",
+      "all59RowsDefinitionsOld53Unchanged": true
+    },
+    "oldFirstCIRunPreserved": 41007168230,
+    "correctionProductJSChanged": false,
+    "remainingSummary": [
+      "WebKit W4 case outcomes/strict59 generic reach and physical PASS remain unknown; no local or retry substitution.",
+      "Initial7-4 Wknown/Wstock and7-3 Wstock after-load-search hidden-click stops retain load null/nav1 and caller/handler gaps.",
+      "Actual LOS formula/HQ applicability, source domain differences, whole inventory/slot/strategy combinations and old graph/history remain limited.",
+      "PR152 draft/unpublished, main conflict and protected release/production/SW/version targets remain held."
+    ],
+    "nextIndependentPreparedAtRecordsTaskStart": {
+      "scope": "Independent7-5first prepared state at this records task start, before representative browser operations; later execution belongs to its separate records",
+      "worktreePublicFiles": 22,
+      "sourceFiles": 616,
+      "NodeUnique": 21,
+      "pureContracts": 4,
+      "pureContractsAndPreflight": "passed in separate root-authorized work; not executed by this records agent",
+      "browserChromiumExecutedAtCutoff": 0,
+      "browserWebkitExecutedAtCutoff": 0,
+      "cellCredit": 0,
+      "notImportedIntoSevenFour": true
+    },
+    "newExecutionByRecords": 0,
+    "privateRawBodyOrTracePublished": false
+  },
+  "nextPriorityBeforeSevenFourCorrectionCIFinalization20261030": "7-4自身初回CI41007168230は4smoke成功/2失敗で閉鎖。Dは局所5＋自身CIWknown初回完了により確認済み、22/141/73。局所Wknown未到達とsecondary7-3Wready初回欠測/別retryは保持する。unknown-ASW全59los比較の説明2文字列不整合は別6WIPの根拠ある監査訂正/必要C/W準備へ、製品変更なし。次7-5第1ABDFGHKは独立WIP12静的準備・未実行。source差/実式/graph/旧履歴/既存非表示・通信の原因は未完。"
 }

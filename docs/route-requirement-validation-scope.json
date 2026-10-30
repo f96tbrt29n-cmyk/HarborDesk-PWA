@@ -10467,6 +10467,43 @@
           "matrix": "22/141/73",
           "oldSourceAuditRightsAndFalseFieldsUnchanged": true
         }
+      },
+      "followupCorrectionCIRecord": {
+        "record": "docs/pr152-seven-four-ja.md#2026-10-30-訂正後ci633の確定",
+        "runId": 41014041261,
+        "head": "633b079cb1cd4e375fd095cabc33f60f08e9229d",
+        "attempt": 1,
+        "runConclusion": "cancelled",
+        "collectorClosureSHA256": "ab2e87ccce49101183d36d66093c484467c359a2cc2342c650dc43ee69889ae1",
+        "independentSourceLogAuditSHA256": "8b6790a14b0116b72df7e591e192f8b32ec40b616fc5ddfbfea458b130ba47e0",
+        "matrix": {
+          "before": "22/141/73",
+          "after": "22/141/73",
+          "statusCellsChanged": 0,
+          "denominator": 236,
+          "DDirectEvidenceUnchanged": "old local C3+Wstock/unknown5 completed plus old7fd CI41007168230 Wknown initial; new633 partial trials do not remove or fill it",
+          "all59RowsDefinitionsOld53Unchanged": true
+        },
+        "sourceBindingConfirmationSHA256": "7648993864549eeb7a6547546179946ee6d2e34830579c5a007a35661d0d4078",
+        "summaryInitialCompletedByUnit": {
+          "seven-four": 4,
+          "seven-three-first": 5
+        },
+        "summaryRetryCompletedSeparateByUnit": {
+          "seven-four": 2,
+          "seven-three-first": 1
+        },
+        "summaryRecords": {
+          "seven-four": 8,
+          "seven-three-first": 7
+        },
+        "genericChromiumCasePassedDerivedAndStrict59SourceControlFlow": true,
+        "genericWebkitCaseOutcome": null,
+        "genericWebkitStrict59Reach": null,
+        "individualPhysicalPASSAndDetailedBodyMissing": true,
+        "noNewCellCredit": true,
+        "noOldGapFilled": true,
+        "existingCanonicalScoutingAndIndependentProseUnchanged": true
       }
     },
     {

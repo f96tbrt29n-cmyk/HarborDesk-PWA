@@ -1,3 +1,6 @@
+
+> 最新追記（2026-10-30）：[訂正後CI633](pr152-seven-four-ja.md#2026-10-30-訂正後ci633の確定)／41014041261 attempt1は5smoke成功・W4は45分job上限で取消、run cancelled・Full skipped。公式C877/0/0、W1〜3小計658/0/0、W4と全W集計はnull。generic訂正Cは完結reporterと元assert制御フローからstrict59・保存/load/回復の通過を導出するが、Wはcase結果/strict59到達とも不明。新7-4初回summaryは4完了＋Wknown/stock未到達2、各retry完了は別記録。旧local5＋旧7fdCIWknownを根拠とするDと22/141/73は変更0。以下の旧「最終」「準備中」は各時点の履歴として保持する。
+
 > 最終7-4 ABEJLP CI（2026-10-30）：検証source7fd5298e／CI41007168230 attempt1は4smoke成功・C2/W4失敗、取消/timeout0、Full skipped。公式C876/0/1、W862/12/3はpassed/flaky/failedのcase outcomeで、初回/物理件数へ換算しない。自身7-4の6初回summaryは保存または安全中止後/load後のstrict30比較を完了し、局所完了5＋自身CIWknown初回の直接証拠でDだけ一部→確認済み、21/142/73→22/141/73。局所Wknownのload未到達・caller欠測、secondary7-3Wready初回load未到達と別retry1完了はそのまま保持。全6checkout/env/実imagepull/Node527・source24照合はCI配信filehash実測とは別で、body原本/trace欠測とcasepassedログ導出の境界を残す。[最終記録](pr152-seven-four-ja.md#2026-10-30-自身初回ci確定)。以下は各時点の履歴。
 
 > 最新7-4 ABEJLP（2026-10-30）：基準69591040/21・139・76。source三資料のraw57＋policy6、有限適用差8、実索敵式未照合を分離し、Node20ユニークと純4契約は別記。局所known/stock/unknown×C/Wの6初回は5成功/1Wknown失敗。保存または安全中止後の読取り6件でstrict30・比較元7キー/他保持が通過し、known/stock4件は配備案も一致、load全文は5完了、Wknownはload後search-button非表示待機で試験45秒timeout・後文書caller欠測/nav1。A一部を維持し、B/C/Dの未確認→一部だけ21/142/73へ3セル更新。旧7-3/CI原本・他58行/旧53/定義236は不変。rootの関連commit/push・同HEADsmoke1回は未開始。[今回記録](pr152-seven-four-ja.md)。以下は各時点の履歴。
@@ -316,3 +319,16 @@ saved6は保存または安全中止後の読取り6件を表し、保存書込�
 secondary7-3 firstは初回6のうち5完了、Wready初回はsaved strict20＋空2行通過/load全文未到達・nav1、別retry1が完了した。旧7-3資料や失敗初回を補完しない。C2/W4のunknown-ASWは全59行losの説明2文字列（marginNote/numericModelUnverified）比較が128行で不一致となり、初回/retryとも保存参照設定前に停止。数値条件や保存不一致の陽性ではない。別6WIPで根拠ある監査訂正を準備し、Node前1失敗→後2成功、必要C/W対象は準備中で製品変更なし。この検証sourceの2文字列は変更しない。W4の3-4ready/5-4required-missingは初回/retryともload後search-button非表示45秒でload全文未到達、失敗文書caller/handler開始は不明。W1 drop-hunt初回は事前UI/件数assert通過後の最終例外検査でversion access-control2件、全文storage比較はなく初回trace未生成。保存不一致陽性や全保存安全、共通原因を断定しない。
 
 全6jobの完全checkout HEAD、固定Node24.21.0/PW1.55.0/C1187/W2203、実image digest pull、各Node527/527/0と期待source24原本照合を確認。実ファイルhashは局所期待snapshotの確認であり、CI配信filehashの独立実測ではない。13artifact中9件4,452,232bytesをserver SHA/外側CRC一致で受領、4件512MiB超は要求/分割せず、7-4 C/Wのbody/traceは欠測。正式attempt run-log ZIPは別の11,416,985bytes/102membersでCRC正常。受領innertrace1はretry由来で、初回trace0を初回失敗0へ換算しない。記録だけの追加CIは起動せず、次7-5第1ABDFGHKは独立WIP12の静的準備・未実行とする。
+
+
+## 2026-10-30 訂正後CI633の確定
+
+検証sourceは`633b079cb1cd4e375fd095cabc33f60f08e9229d`／[CI41014041261](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41014041261)、attempt1・dispatch1・再実行0・手動取消0。初回7fd/41007168230の失敗とは別sourceの訂正後CIである。5smoke成功・W4 jobは公式45m上限取消、W4 smoke stepもcancelled、run cancelled・Full skipped・Pages未起動。job取消をsmoke正常終了や個別PASSへ読み替えない。公式C877 passed/0 flaky/0 failed、W1〜3だけ658/0/0で、W4とWebKit全体のcase outcome集計はnull。これは初回成功数・retry数・物理試行数ではなく、未取得を0や全成功にしない。
+
+generic unknown-ASW訂正対象はC/W2件の別分母。Cは自身の完結したall-passed reporter footerと非pass一覧からcase passedを導出し、凍結元specのstrict59 LOS/数値条件・保存後5キー/他編成/4艦ID/metadata・reload後未判定/同期値回復まで元assertの制御フローを通過した根拠とする。個別物理PASS行・実body/保存実値は欠測で、生の59行を別途再読した証拠ではない。Wは初回開始と次case開始のみを観測し、個別PASSと完結footerがないためcase outcome/strict59到達/保存後assert通過はnull。局所W成功や次case開始で補完しない。初回7fdの説明2文字列不整合で保存前停止した原本は、そのまま別履歴に残す。
+
+新runの小summaryは計15原本で、7-4と7-3を別unit・browser/state/initial/retryで保持する。7-4は初回6のうちC3＋Wunknownの4件がcompleted、Wknown/Wstockの2件は保存後strict30通過後のafter-load-searchでhidden click・元45秒上限、load:null/nav採取失敗1。各retry1のcompleted2件を初回欠測へ戻さず、計8記録とする。7-3は別unitの初回6のうち5completed、Wstock初回は保存後strict20通過後に同じ到達段階でload:null/nav1、別retry1completedを含む計7記録。3つの未到達試行の後文書caller/handlerは欠測のまま。全到達保存比較は一致・保持不一致の陽性0だが、stage completedをW4のcase passedや物理retry成功へ換算しない。generic2・named保護2もこの15件へ加算しない。
+
+236セル22確認済み/141一部/73未確認から変更0。Dは旧局所C3＋Wstock/unknownの5完了と、旧source7fd CI41007168230のWknown初回完了を6代表へ直接対応した根拠を維持し、新633の未到達で消さず、retryで補完もしない。A/B/C、全59行、旧53区分・定義・分母、canonicalなscouting係数4/37/33/preserveRandomBand trueと独立説明metadataを保持する。実索敵式/HQの未照合、出典域、全在庫/枠競合/戦闘方針、graph/旧履歴、旧非表示・通信原因は未完。PR152ドラフト・未公開、main競合・版/SW/本番/公開等の保護対象と停止条件を変えない。
+
+別7-5第1ABDFGHKはこの記録作業開始時点で22WIP/source616、Node21ユニーク・純契約4＋preflight成功、代表操作C/Wは0の準備範囲で、7-4や7-5のセルcreditへ換算しない。後続操作は別原本・別記録とする。本8記録作業による追加試験/CI/API/commit/pushは0。旧履歴・旧firstCI記録を削除せず、欠測を成功や保存異常解決へ変換しない。

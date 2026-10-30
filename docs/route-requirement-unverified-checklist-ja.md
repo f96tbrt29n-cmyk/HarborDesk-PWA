@@ -1,5 +1,8 @@
 # 登録53例：未検証項目の台帳
 
+> 最新追記（2026-10-30）：[訂正後CI633](pr152-seven-four-ja.md#2026-10-30-訂正後ci633の確定)／41014041261 attempt1は5smoke成功・W4は45分job上限で取消、run cancelled・Full skipped。公式C877/0/0、W1〜3小計658/0/0、W4と全W集計はnull。generic訂正Cは完結reporterと元assert制御フローからstrict59・保存/load/回復の通過を導出するが、Wはcase結果/strict59到達とも不明。新7-4初回summaryは4完了＋Wknown/stock未到達2、各retry完了は別記録。旧local5＋旧7fdCIWknownを根拠とするDと22/141/73は変更0。以下の旧「最終」「準備中」は各時点の履歴として保持する。
+
+
 2026-10-16 JST、基準9a0bff5＋登録条件完了検証。全37海域53例は **全条件検証済み1／一部検証49／未確認3（5-6）**。1-1/例1の登録条件だけを根拠付きで移行し、2-5北は一部検証を維持する。[完了根拠・具体的配備・残る制約](pr152-registered-example-completion-ja.md)を参照。
 
 [機械可読の各例別詳細](route-requirement-unverified-checklist.json) ／ [登録条件・出典](route-requirement-validation-scope.json)。
@@ -82,3 +85,16 @@ iPhone Safari・ホーム画面PWAの実機操作とWebKitオフラインは未�
 追加調査：[再読込初回失敗と証拠保持](pr152-reload-evidence-ja.md)。起動診断の成功を登録条件の網羅検証へ算入せず、区分は1／49／3を維持する。
 
 [再読込の段階記録・policy fixture契約・16候補回帰](pr152-reload-phase-and-fixture-ja.md)を追加。区分1／49／3は維持。
+
+
+## 2026-10-30 訂正後CI633の確定
+
+検証sourceは`633b079cb1cd4e375fd095cabc33f60f08e9229d`／[CI41014041261](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41014041261)、attempt1・dispatch1・再実行0・手動取消0。初回7fd/41007168230の失敗とは別sourceの訂正後CIである。5smoke成功・W4 jobは公式45m上限取消、W4 smoke stepもcancelled、run cancelled・Full skipped・Pages未起動。job取消をsmoke正常終了や個別PASSへ読み替えない。公式C877 passed/0 flaky/0 failed、W1〜3だけ658/0/0で、W4とWebKit全体のcase outcome集計はnull。これは初回成功数・retry数・物理試行数ではなく、未取得を0や全成功にしない。
+
+7-4の旧静的区分は一部検証のまま。generic unknown-ASW訂正対象はC/W2件の別分母。Cは自身の完結したall-passed reporter footerと非pass一覧からcase passedを導出し、凍結元specのstrict59 LOS/数値条件・保存後5キー/他編成/4艦ID/metadata・reload後未判定/同期値回復まで元assertの制御フローを通過した根拠とする。個別物理PASS行・実body/保存実値は欠測で、生の59行を別途再読した証拠ではない。Wは初回開始と次case開始のみを観測し、個別PASSと完結footerがないためcase outcome/strict59到達/保存後assert通過はnull。局所W成功や次case開始で補完しない。初回7fdの説明2文字列不整合で保存前停止した原本は、そのまま別履歴に残す。
+
+新runの小summaryは計15原本で、7-4と7-3を別unit・browser/state/initial/retryで保持する。7-4は初回6のうちC3＋Wunknownの4件がcompleted、Wknown/Wstockの2件は保存後strict30通過後のafter-load-searchでhidden click・元45秒上限、load:null/nav採取失敗1。各retry1のcompleted2件を初回欠測へ戻さず、計8記録とする。7-3は別unitの初回6のうち5completed、Wstock初回は保存後strict20通過後に同じ到達段階でload:null/nav1、別retry1completedを含む計7記録。3つの未到達試行の後文書caller/handlerは欠測のまま。全到達保存比較は一致・保持不一致の陽性0だが、stage completedをW4のcase passedや物理retry成功へ換算しない。generic2・named保護2もこの15件へ加算しない。
+
+236セル22確認済み/141一部/73未確認から変更0。Dは旧局所C3＋Wstock/unknownの5完了と、旧source7fd CI41007168230のWknown初回完了を6代表へ直接対応した根拠を維持し、新633の未到達で消さず、retryで補完もしない。A/B/C、全59行、旧53区分・定義・分母、canonicalなscouting係数4/37/33/preserveRandomBand trueと独立説明metadataを保持する。実索敵式/HQの未照合、出典域、全在庫/枠競合/戦闘方針、graph/旧履歴、旧非表示・通信原因は未完。PR152ドラフト・未公開、main競合・版/SW/本番/公開等の保護対象と停止条件を変えない。
+
+別7-5第1ABDFGHKはこの記録作業開始時点で22WIP/source616、Node21ユニーク・純契約4＋preflight成功、代表操作C/Wは0の準備範囲で、7-4や7-5のセルcreditへ換算しない。後続操作は別原本・別記録とする。本8記録作業による追加試験/CI/API/commit/pushは0。旧履歴・旧firstCI記録を削除せず、欠測を成功や保存異常解決へ変換しない。

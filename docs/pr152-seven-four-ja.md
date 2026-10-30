@@ -1,5 +1,8 @@
 # 7-4 ABEJLP：六隻例の出典一致域と索敵式の未照合
 
+> 最新追記（2026-10-30）：[訂正後CI633](pr152-seven-four-ja.md#2026-10-30-訂正後ci633の確定)／41014041261 attempt1は5smoke成功・W4は45分job上限で取消、run cancelled・Full skipped。公式C877/0/0、W1〜3小計658/0/0、W4と全W集計はnull。generic訂正Cは完結reporterと元assert制御フローからstrict59・保存/load/回復の通過を導出するが、Wはcase結果/strict59到達とも不明。新7-4初回summaryは4完了＋Wknown/stock未到達2、各retry完了は別記録。旧local5＋旧7fdCIWknownを根拠とするDと22/141/73は変更0。以下の旧「最終」「準備中」は各時点の履歴として保持する。
+
+
 > 最終7-4 ABEJLP CI（2026-10-30）：検証source7fd5298e／CI41007168230 attempt1は4smoke成功・C2/W4失敗、取消/timeout0、Full skipped。公式C876/0/1、W862/12/3はpassed/flaky/failedのcase outcomeで、初回/物理件数へ換算しない。自身7-4の6初回summaryは保存または安全中止後/load後のstrict30比較を完了し、局所完了5＋自身CIWknown初回の直接証拠でDだけ一部→確認済み、21/142/73→22/141/73。局所Wknownのload未到達・caller欠測、secondary7-3Wready初回load未到達と別retry1完了はそのまま保持。全6checkout/env/実imagepull/Node527・source24照合はCI配信filehash実測とは別で、body原本/trace欠測とcasepassedログ導出の境界を残す。[最終記録](pr152-seven-four-ja.md#2026-10-30-自身初回ci確定)。以下は各時点の履歴。
 
 以下の「代表操作6初回と未到達」「台帳と残件」は局所記録時点の履歴。現在の台帳は22/141/73で、末尾の自身初回CI確定を参照する。
@@ -83,3 +86,20 @@ source-binding SHAは`89235093a4f5451fc083565d77121e4f968f91f42b6f711b38097098f9
 旧監査2文字列によるNode対照1件の期待失敗と、訂正後の新Node2件の初回成功を分離した。固定環境の既存unknown-ASW対象をC/W各1回、workers1/retries0・元の45秒/12秒・入力と操作順で確認し、両方初回成功。59行LOS/数値条件の厳密比較、保存後5キー/他編成/4艦ID/metadata、reload後も0/4未判定、明示同期値更新後4/4充足まで元のassertを通過した。reference ID原文は実行時JSONに残らないため、その一致は元assert通過という証拠であり、別途生値を再読して比較したものではない。このケースにないメモ編集・CUSTOM全文・文書ID比較・strict30を追加して検証したとはしない。
 
 製品・7-4自身のspec/入力は不変なので既存Node20/代表操作6は再実行せず、進捗セルの追加変更も0。旧CIの監査停止と局所Wknown未到達、通信例外の原因未確定は保持する。訂正原本は専用worktree配下へ分離し、Node607・ブラウザー608ファイルの前後一致、trace2 CRC・動画2 SHAを確認した。初回CI記録commitと本訂正を分け、通常push後に訂正HEADのsmokeを重複なく1回確認する。これは具体的修正後の検証であり、旧HEADの成功目的の再実行ではない。
+
+
+## 2026-10-30 訂正後CI633の確定
+
+検証sourceは`633b079cb1cd4e375fd095cabc33f60f08e9229d`／[CI41014041261](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41014041261)、attempt1・dispatch1・再実行0・手動取消0。初回7fd/41007168230の失敗とは別sourceの訂正後CIである。5smoke成功・W4 jobは公式45m上限取消、W4 smoke stepもcancelled、run cancelled・Full skipped・Pages未起動。job取消をsmoke正常終了や個別PASSへ読み替えない。公式C877 passed/0 flaky/0 failed、W1〜3だけ658/0/0で、W4とWebKit全体のcase outcome集計はnull。これは初回成功数・retry数・物理試行数ではなく、未取得を0や全成功にしない。
+
+generic unknown-ASW訂正対象はC/W2件の別分母。Cは自身の完結したall-passed reporter footerと非pass一覧からcase passedを導出し、凍結元specのstrict59 LOS/数値条件・保存後5キー/他編成/4艦ID/metadata・reload後未判定/同期値回復まで元assertの制御フローを通過した根拠とする。個別物理PASS行・実body/保存実値は欠測で、生の59行を別途再読した証拠ではない。Wは初回開始と次case開始のみを観測し、個別PASSと完結footerがないためcase outcome/strict59到達/保存後assert通過はnull。局所W成功や次case開始で補完しない。初回7fdの説明2文字列不整合で保存前停止した原本は、そのまま別履歴に残す。
+
+新runの小summaryは計15原本で、7-4と7-3を別unit・browser/state/initial/retryで保持する。7-4は初回6のうちC3＋Wunknownの4件がcompleted、Wknown/Wstockの2件は保存後strict30通過後のafter-load-searchでhidden click・元45秒上限、load:null/nav採取失敗1。各retry1のcompleted2件を初回欠測へ戻さず、計8記録とする。7-3は別unitの初回6のうち5completed、Wstock初回は保存後strict20通過後に同じ到達段階でload:null/nav1、別retry1completedを含む計7記録。3つの未到達試行の後文書caller/handlerは欠測のまま。全到達保存比較は一致・保持不一致の陽性0だが、stage completedをW4のcase passedや物理retry成功へ換算しない。generic2・named保護2もこの15件へ加算しない。
+
+全6jobで完全checkout HEAD、固定Node24.21.0/PW1.55.0/C1187/W2203、実image pull digest、各Node529/529/0を新run自身の原本から確認した。607 committed sourceの原本/hash一致とCI checkoutの帰属を区別し、CI配信filehashの独立実測とはしない。成果物10公開中8件304,410bytesはserver SHA/外側CRC一致、C2診断1,600,226,752bytes・W4診断667,248,390bytesは512MiB超で要求/分割0。通常smoke/full archive公開0、受領trace/video0は生成0・失敗0ではなく、genericと自身詳細body/trace/videoの欠測を保持する。正式run-log ZIPは別の11,029,657bytes/101member・CRC正常。
+
+236セル22確認済み/141一部/73未確認から変更0。Dは旧局所C3＋Wstock/unknownの5完了と、旧source7fd CI41007168230のWknown初回完了を6代表へ直接対応した根拠を維持し、新633の未到達で消さず、retryで補完もしない。A/B/C、全59行、旧53区分・定義・分母、canonicalなscouting係数4/37/33/preserveRandomBand trueと独立説明metadataを保持する。実索敵式/HQの未照合、出典域、全在庫/枠競合/戦闘方針、graph/旧履歴、旧非表示・通信原因は未完。PR152ドラフト・未公開、main競合・版/SW/本番/公開等の保護対象と停止条件を変えない。
+
+別7-5第1ABDFGHKはこの記録作業開始時点で22WIP/source616、Node21ユニーク・純契約4＋preflight成功、代表操作C/Wは0の準備範囲で、7-4や7-5のセルcreditへ換算しない。後続操作は別原本・別記録とする。本8記録作業による追加試験/CI/API/commit/pushは0。旧履歴・旧firstCI記録を削除せず、欠測を成功や保存異常解決へ変換しない。
+
+source-binding SHA `7648993864549eeb7a6547546179946ee6d2e34830579c5a007a35661d0d4078`、collector closure SHA `ab2e87ccce49101183d36d66093c484467c359a2cc2342c650dc43ee69889ae1`、独立source/log監査 SHA `8b6790a14b0116b72df7e591e192f8b32ec40b616fc5ddfbfea458b130ba47e0`。閉鎖台帳CI996項目とartifact102項目の各byte/SHAを記録前に再照合した。検証633と後続の記録だけのHEADは別であり、公開記録に保存値本文や原本traceは含めない。
