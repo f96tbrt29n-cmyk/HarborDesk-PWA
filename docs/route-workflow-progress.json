@@ -62,20 +62,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 34,
-      "未確認": 25,
+      "一部": 35,
+      "未確認": 24,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 34,
-      "未確認": 25,
+      "一部": 35,
+      "未確認": 24,
       "非該当": 0
     },
     "D": {
       "確認済み": 21,
-      "一部": 15,
-      "未確認": 23,
+      "一部": 16,
+      "未確認": 22,
       "非該当": 0
     }
   },
@@ -2569,30 +2569,50 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "reason": "保存三出典のraw57/policy6と有限適用差8を分け、六隻ABEJLPの優先条件を独立監査treeへ接続。実索敵式のHQ0.35/既存0.4適用は未照合でformula/manual/score:nullを維持。出典差・六隻外/型対応・全目標数量根拠/図/旧履歴は未完。",
           "evidence": [
+            "docs/route-goal-guidance-audit.json",
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/pr152-seven-four-ja.md",
+            "tests/seven-four-routes.test.cjs",
+            "tests/seven-four-placement.test.cjs",
+            "tests/route-seven-four.spec.js"
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "knownの有限在庫でASW目標3/配備2から配備3、夜戦0→1を実配備し、同艦合法通常枠・在庫上限・保存配備と探索案の一致・元6艦30項目を確認。航空/対空等も任意戦闘比較で、数値式や全目標/全在庫/枠競合の完了・通行/購入必須を証明しない。",
+          "evidence": [
+            "docs/pr152-seven-four-ja.md",
+            "tests/seven-four-routes.test.cjs",
+            "tests/seven-four-placement.test.cjs",
+            "tests/route-seven-four.spec.js"
+          ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "stockのソナー/投射機各登録0・必要3・あと3個、魚雷登録0・必要2・あと2個と同じ艦の別通常枠候補を表示。unknownは元保存編成の上書きを安全中止。formula/艦情報未判定と確定した編成不一致を数量不足へ変換せず、全候補への配備や購入量を保証しない。全区分の組合せは未網羅。",
+          "evidence": [
+            "docs/pr152-seven-four-ja.md",
+            "tests/seven-four-routes.test.cjs",
+            "tests/seven-four-placement.test.cjs",
+            "tests/route-seven-four.spec.js"
+          ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "Cknown/stock/unknownとWstock/unknownの5代表は保存/適用可能なメモ編集または安全中止、同一reload文書load全文、strict6行+追加0・30項目/6anchor・比較元7キー/他編成metadataまで完了。Wknownは保存後strict30/配備案/他保持を通過したが、load後search-button非表示待機で試験45秒timeout、load全文未到達/nav採取失敗1。後文書caller/原因を別試行で補完しない。",
+          "evidence": [
+            "docs/pr152-seven-four-ja.md",
+            "tests/seven-four-routes.test.cjs",
+            "tests/seven-four-placement.test.cjs",
+            "tests/route-seven-four.spec.js",
+            "tests/fixtures/seven-one-identity-preservation.cjs"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "raw表/有限domain/実計算を分離。実索敵式とHQ補正、六隻外/CD/大鷹系等の適用差、全数量/在庫/搭載/枠競合/探索打切り、任意基地、graph/旧目標履歴は未完。Wknownのload全文未到達・後文書caller/handler開始/原因欠測を保持。"
     },
     {
       "id": "7-5/0/default",
@@ -2708,6 +2728,329 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
+    "id": "7-4/0/default",
+    "baselineHead": "69591040a92b6cfaa9055969b85c7bb258522b7a",
+    "implementationStartHead": "62d817223a1e72b28f956234a6090b3493c624b0",
+    "evidence": "docs/pr152-seven-four-ja.md",
+    "state": "limited source/Node and six first local representative operations recorded; five completed, WebKit known saved strict30 then post-load hidden click timeout with full load unreached; source commit/push and one finalHEAD smoke not started",
+    "sourceScope": {
+      "sourceTables": 3,
+      "rawLiteralCount": 57,
+      "policyLiteralCount": 6,
+      "rawValuesAndOrderUnchanged": true,
+      "rawCounts": {
+        "ready": 24,
+        "missing": 17,
+        "manual": 13,
+        "partial": 2,
+        "source-ready/runtime-model-unknown": 1
+      },
+      "finiteApplicabilityManualAdjustments": 8,
+      "finiteRawCounts": {
+        "ready": 18,
+        "missing": 16,
+        "manual": 21,
+        "partial": 2
+      },
+      "actualFormula": "manual/available:false/reason:formula/score:null; raw33/37 does not prove HQ0.35/0.4 applicability",
+      "knownStructuralMissingSurvivesFormulaManual": true,
+      "sixHullsIsNotUniversalMinimum": true
+    },
+    "node": {
+      "relatedAfterUnique": 20,
+      "routeAndParent": 12,
+      "placement": 7,
+      "audit": 1,
+      "singleRun20PassClaim": false,
+      "routeBeforeInvalidTokenHarness": 1,
+      "correctedBeforeExpectedSourceFailure": 1,
+      "routeAfterOneRunPass": 12,
+      "placementBeforeExpectedFail": 1,
+      "beforeActualASW1Observed": true,
+      "beforeASW2Reached": false,
+      "placementFirstAfter": {
+        "tests": 7,
+        "pass": 4,
+        "wrapperSyntaxFail": 3
+      },
+      "placementNecessaryFix": "two test-only VM-wrapper newlines",
+      "placementFailedOnlyRetestPass": 3,
+      "successfulFourRepeated": false,
+      "auditFirstPass": 1,
+      "old19RepeatedForAudit": 0,
+      "finiteReverseComparisons": {
+        "other52Modes4FullRouteSpeed": 208,
+        "parentLegacy": [
+          96,
+          196,
+          204
+        ],
+        "renderer": 33,
+        "helper": 24
+      },
+      "all500PlusRun": false
+    },
+    "pureContractsSeparate": {
+      "producer": 2,
+      "producerPass": 2,
+      "consumerGroups": 2,
+      "consumerOK": true,
+      "oneAuthorizedPhase": true,
+      "notBrowserOrProductTestCredit": true
+    },
+    "knownFixtureRevision": {
+      "beforeASW": 2,
+      "targetASW": 3,
+      "firstSearchASW": 3,
+      "beforeNight": 0,
+      "firstSearchNight": 1,
+      "bothInitialObserved": true,
+      "chromiumLoadObserved": true,
+      "webkitLoadObserved": null,
+      "finiteInventoryTotalItems": 14,
+      "optionalAirAAReconCounts": "fighter2/recon2/high-angle1/radar1 are synthetic battle comparisons, not mandatory passage, sufficiency, activation or purchase quantities",
+      "publicSpecSHA256": "3134b30b722d4de389b07c174d8b2b006d3b7ee0e117dad0f73b1020641b73c1"
+    },
+    "local": {
+      "uniqueTargets": 6,
+      "physicalTrials": 6,
+      "initialPass": 5,
+      "initialFail": 1,
+      "retries": 0,
+      "reruns": 0,
+      "additionalDiagnostics": 0,
+      "conditionsChangedToPass": false,
+      "samples": 11,
+      "saved": 6,
+      "load": 5,
+      "strict30Saved": 6,
+      "strict30Load": 5,
+      "sixAnchorsZeroExtra": true,
+      "sourceStorageKeys": 7,
+      "allPageerror0": true,
+      "positivePreservationMismatchObserved": false,
+      "cases": [
+        {
+          "browser": "chromium",
+          "state": "known",
+          "trial": "initial",
+          "exitCode": 0,
+          "frameworkStatus": "passed",
+          "stage": "completed",
+          "searchSamples": 2,
+          "savedReadReached": true,
+          "loadReadReached": true,
+          "savedStrict30": true,
+          "loadStrict30": true,
+          "firstSearchReadiness": "manual",
+          "afterLoadReadiness": "manual",
+          "pageerrorCount": 0,
+          "navigationCollectionFailures": 0,
+          "summarySHA256": "363a1323d617a0c59180b033b08def50a9130c379eace2102a4e62bd1b1618e7",
+          "rawSummarySelectedComparisonsExact": true
+        },
+        {
+          "browser": "chromium",
+          "state": "stock",
+          "trial": "initial",
+          "exitCode": 0,
+          "frameworkStatus": "passed",
+          "stage": "completed",
+          "searchSamples": 2,
+          "savedReadReached": true,
+          "loadReadReached": true,
+          "savedStrict30": true,
+          "loadStrict30": true,
+          "firstSearchReadiness": "missing",
+          "afterLoadReadiness": "missing",
+          "pageerrorCount": 0,
+          "navigationCollectionFailures": 0,
+          "summarySHA256": "a68910ec7f5b7527dc27543a35b460b5845ceba0acf70a6c9acdd097f666f8d3",
+          "rawSummarySelectedComparisonsExact": true
+        },
+        {
+          "browser": "chromium",
+          "state": "unknown",
+          "trial": "initial",
+          "exitCode": 0,
+          "frameworkStatus": "passed",
+          "stage": "completed",
+          "searchSamples": 2,
+          "savedReadReached": true,
+          "loadReadReached": true,
+          "savedStrict30": true,
+          "loadStrict30": true,
+          "firstSearchReadiness": "missing",
+          "afterLoadReadiness": "missing",
+          "pageerrorCount": 0,
+          "navigationCollectionFailures": 0,
+          "summarySHA256": "d9bc8dc2f0f9c30d31122f4b3fef4688e8a905a38b5b73a695cc80b09ffb9adb",
+          "rawSummarySelectedComparisonsExact": true
+        },
+        {
+          "browser": "webkit",
+          "state": "known",
+          "trial": "initial",
+          "exitCode": 1,
+          "frameworkStatus": "timedOut",
+          "stage": "after-load-search",
+          "searchSamples": 1,
+          "savedReadReached": true,
+          "loadReadReached": false,
+          "savedStrict30": true,
+          "loadStrict30": null,
+          "firstSearchReadiness": "manual",
+          "afterLoadReadiness": null,
+          "pageerrorCount": 0,
+          "navigationCollectionFailures": 1,
+          "summarySHA256": "fd1270c677018092e1bb08541287393e93880f77de555ba26bb5a4f1d22cce89",
+          "rawSummarySelectedComparisonsExact": true
+        },
+        {
+          "browser": "webkit",
+          "state": "stock",
+          "trial": "initial",
+          "exitCode": 0,
+          "frameworkStatus": "passed",
+          "stage": "completed",
+          "searchSamples": 2,
+          "savedReadReached": true,
+          "loadReadReached": true,
+          "savedStrict30": true,
+          "loadStrict30": true,
+          "firstSearchReadiness": "missing",
+          "afterLoadReadiness": "missing",
+          "pageerrorCount": 0,
+          "navigationCollectionFailures": 0,
+          "summarySHA256": "dbdc53a4eb88929f5dbe9a16a721a25a989c0caf3e303f1fc8fcb0e66cf04b57",
+          "rawSummarySelectedComparisonsExact": true
+        },
+        {
+          "browser": "webkit",
+          "state": "unknown",
+          "trial": "initial",
+          "exitCode": 0,
+          "frameworkStatus": "passed",
+          "stage": "completed",
+          "searchSamples": 2,
+          "savedReadReached": true,
+          "loadReadReached": true,
+          "savedStrict30": true,
+          "loadStrict30": true,
+          "firstSearchReadiness": "missing",
+          "afterLoadReadiness": "missing",
+          "pageerrorCount": 0,
+          "navigationCollectionFailures": 0,
+          "summarySHA256": "e5ad0cb9764c3c5eb179e2d8b401178f95073b95bcfd022fa6c5bad5914c80c0",
+          "rawSummarySelectedComparisonsExact": true
+        }
+      ],
+      "overallReadinessByState": {
+        "known": "manual",
+        "stock": "missing",
+        "unknown": "missing"
+      },
+      "allRouteAndScouting": "manual/formula/scorenull in observed first and completed second searches; no ready claim",
+      "allSearchesIncompleteRegisteredReadyFalse": true,
+      "localExecution": {
+        "workers": 1,
+        "retries": 0,
+        "repeatEach": 1,
+        "testTimeoutMS": 45000,
+        "expectTimeoutMS": 12000,
+        "maxExamined": 10000,
+        "beam": 5,
+        "maxDepth": 24,
+        "portSeedOperations": 800
+      },
+      "normalCIPolicyUnchanged": {
+        "chromiumWorkers": 2,
+        "webkitWorkers": 1,
+        "retries": 1
+      },
+      "fixedVersionJSON": "test input fulfilled by spec, not proof of product network success or production update/cache safety",
+      "WebKitKnownLimit": {
+        "project": "webkit",
+        "state": "known",
+        "stage": "after-load-search",
+        "locatorResolved": true,
+        "buttonNotVisible": true,
+        "compressedRepetitionCount": 61,
+        "traceNotVisibleLogCount": 64,
+        "searchClickAfterEventRecorded": false,
+        "handlerStarted": null,
+        "searchStarted": null,
+        "newDocumentDisplayDestination": null,
+        "newDocumentDisplayCaller": null,
+        "loadReadReached": false,
+        "savedStrictPreserved": true,
+        "navigationCollectionFailures": 1,
+        "causeConfirmed": false,
+        "olderDocumentCallerDoesNotFillNewDocumentGap": true,
+        "noSameCauseOrStorageLossClaim": true
+      },
+      "savedReadMeaning": "saved6 means six getter reads after save or safe-abort, not six successful writes; known/stock4 saved and memo-edited, unknown2 safely aborted with no edit",
+      "saveAndMemoEditCases": 4,
+      "safeAbortWithoutEditCases": 2,
+      "fullLoadCompletedTargets": [
+        "chromium known",
+        "chromium stock",
+        "chromium unknown",
+        "webkit stock",
+        "webkit unknown"
+      ]
+    },
+    "sourceBinding": {
+      "SHA256": "427dc23141c741c31ba49508143ae806ea4d0d6785f98033f8c6f942f9b6c0fb",
+      "collectorResultSHA256": "510835f8776e9a2f0a86c102c2755935b88ed4bb6f6034bf7906ae15266ae0f8",
+      "baseHEAD": "69591040a92b6cfaa9055969b85c7bb258522b7a",
+      "publicSourceFiles": 605,
+      "additionalPrivateLocalConfig": 1,
+      "runtimeRegularFiles": 606,
+      "runtimeManifestSHA256": "2a6b41e8944085b2fc6166146cc76b1fd0a63766eb28106da4b5929d68801a77",
+      "bothPhasesActualRuntimeAndCurrent605Exact": true,
+      "fixedListEachBrowser": 877,
+      "newEach": 3,
+      "sixSelectorsEachOne": true,
+      "syntaxFiles": 13,
+      "measuredEnvironment": "Node24.21.0 and Playwright1.55.0 measured per case; installed Chromium1187/WebKit2203 driver-registry/executable revisions matched; no independent browser.version measurement; configured image digest is separate",
+      "CIOrServedSourceHashClaim": false
+    },
+    "evidenceRetention": {
+      "rawSummariesMatchedSameTrial": 6,
+      "rawAndSummaryStrict30Saved": 6,
+      "rawAndSummaryStrict30Load": 5,
+      "traceOriginalsCRC": 6,
+      "videoOriginalsSHA": 6,
+      "closedLocalFiles": 216,
+      "closedLocalBytes": 73591759,
+      "rawStorageBodyIdentityTracePublic": false,
+      "firstFailureNeverFilledByOtherTrials": true
+    },
+    "matrixChange": {
+      "before": "21/139/76",
+      "after": "21/142/73",
+      "statusCells": 3,
+      "cells": [
+        "B 未確認→一部",
+        "C 未確認→一部",
+        "D 未確認→一部"
+      ],
+      "A": "一部 unchanged",
+      "other58RowsUnchanged": true,
+      "criteriaChanged": false,
+      "cellsDenominator": 236,
+      "partialPercentConversion": false
+    },
+    "graphHistory": "data unchanged, full graph/old target/history compatibility not proved",
+    "nextCI": {
+      "state": "not started",
+      "plan": "root ordinary related source commit/push then one same finalHEAD smoke without automatic/manual duplication; local failed/unreached trial retained"
+    },
+    "nextIndependentTarget": "7-5 first registered example ABDFGHK; independent preparation after this source unit, no transfer of7-4 credit"
+  },
+  "nextPriority": "7-4 ABEJLPの関連source/記録をrootが通常commit/pushし、同じ最終HEADのsmoke1回を重複なく確認する。局所Wknownの保存後保持通過/load全文未到達・後文書caller/原因欠測は反復や別試行で埋めない。次は7-5第1ABDFGHKの独立準備。数値式/source差/graph/旧履歴と7-3既存CI残件は維持。",
+  "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
     "docsOnlyFastForwardHead": "eac1294df69eaa06f1a13b988c6cca8d7426f0a1",
@@ -3263,623 +3606,6 @@
       },
       "globalBoundaryCanonicalSource": "global-two-failure-boundaries-final.json; provisional reporter header segments are not trial counts"
     }
-  },
-  "nextPriority": "7-3検証source62d81722/CI40996265641は5smoke成功・W4失敗/Fullskipで閉鎖。後続は記録のみcommit/pushで新CIなし。次の独立7-4/0 ABEJLPは別branchのNode12成功が先行しUI草稿あり、実操作/保存/load/台帳は未完。既存根拠と凍結sourceを照合して必要な代表操作へ進み、7-3の未到達や第2G差を混ぜない。",
-  "previousSelected": {
-    "id": "7-2/0,1/default",
-    "baselineHead": "08ae92358c05d23b7d0044e22b3d36f51114623b",
-    "evidence": "docs/pr152-seven-two-routes-ja.md",
-    "state": "local scoped compatibility complete; existing CI40827828692 own WebKit CEGready/BCDIMstock initial+retry four attempts classified as post-reload hidden search-click 45s timeouts; post-load exact comparison unreached and cause unresolved; no additional7-2 test, speculative repair or CI; independent7-3 static design continues",
-    "independentLiterals": 128,
-    "sourceLimits": [
-      "D CVL source split",
-      "LHA carrier scope",
-      "P2 non6 full route domain",
-      "below69 LOS route threshold",
-      "full combat quantities and inventory/slots",
-      "old intermediate route history cannot be mapped to real cells"
-    ],
-    "graph": {
-      "directedEdges": 16,
-      "start": "S",
-      "realBosses": [
-        "G",
-        "M"
-      ],
-      "registered": [
-        "CEG",
-        "BCDIM"
-      ],
-      "structuralOnly": [
-        "CEG",
-        "CDIM"
-      ],
-      "other36MapsUnchangedEvidenceReused": true,
-      "stageStateInferred": false
-    },
-    "node": {
-      "priorRouteGraphPlacementUniqueReused": 20,
-      "compatibilityFileUnique": 16,
-      "currentProductAfterUnique": 15,
-      "currentProductAfterFinalPass": 15,
-      "oldPublicCounterexampleUnique": 1,
-      "physicalCurrentTurnCaseExecutions": 18,
-      "beforeUnexpectedExtraExecution": 1,
-      "v2CurrentAfterInitialPass": 13,
-      "v2CurrentAfterInitialFail": 1,
-      "v4NecessaryChecksPass": 2,
-      "displayExpectationCorrection": "raw nonnumeric display projection and escaped markup versus exact storage separated; no storage assertion weakening",
-      "realUserLossObserved": false
-    },
-    "compatibility": {
-      "rawAndEffectiveSeparated": true,
-      "uniqueGoalAliases": {
-        "G1": "G",
-        "G2": "M"
-      },
-      "rawWritesOnReadOrCandidateSwitch": false,
-      "unknownTargetPreserved": true,
-      "missingAndExplicitOwnEmptyDistinct": true,
-      "legacyHistoryReinterpreted": false,
-      "legacyAdvanceUndoGuard": "held",
-      "newSessionMarkerOnly": true,
-      "graphMissingStillRetainsRaw": true,
-      "explicitReturnSnapshot": "legacyRouteSnapshot={status,session:deepclone(actualLoadedSession)}",
-      "priorLogsRewritten": false,
-      "legacyHistoryNewMapContinuation": "not implemented or claimed"
-    },
-    "originalNormal11Reuse": {
-      "rawFiles": 132,
-      "rawBytes": 93878266,
-      "reexecuted": 0,
-      "sourceDependency42Exact": true,
-      "registrationChanges": 2,
-      "changedConsumersOmittedFromOld44": [
-        "sortie-mode.js",
-        "sortie-session.js",
-        "sortie-log.js"
-      ],
-      "changedBootSurfaceSeparatelyTested": true,
-      "wholeAPPByteEqualityClaimed": false
-    },
-    "normalCompletion": {
-      "targets": 12,
-      "results": 24,
-      "savedEdited": 8,
-      "unknownSafeAbort": 4,
-      "remainingWsecondUnknownInitialPass": true,
-      "strictOriginalFieldsEach": [
-        25,
-        30
-      ],
-      "loadFullWholeSavedExact": true,
-      "initialAndLoadEndReasonDifferencesRetained": true,
-      "perHullReturnedEquipmentArrayDirectComparison": "not collected"
-    },
-    "newLocal": {
-      "successfulTargets": 25,
-      "necessaryCorrectedCmapped": 1,
-      "otherInitialPass": 24,
-      "physicalTrials": 26,
-      "compatibilityTargets": 4,
-      "affectedReleaseTargets": 20,
-      "formerlyUnstartedNormalTargets": 1,
-      "cases": [
-        {
-          "browser": "chromium",
-          "target": "compat-mapped",
-          "executionKind": "necessary-fixture-correction-revalidation",
-          "exitCode": 0,
-          "stage": "completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": 0,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "chromium",
-          "target": "compat-unknown-clear",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": 0,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "chromium",
-          "target": "release-01",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "chromium",
-          "target": "release-02",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "chromium",
-          "target": "release-03",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "chromium",
-          "target": "release-04",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "chromium",
-          "target": "release-05",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "chromium",
-          "target": "release-06",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "chromium",
-          "target": "release-07",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "chromium",
-          "target": "release-08",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "chromium",
-          "target": "release-09",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "chromium",
-          "target": "release-10",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "webkit",
-          "target": "compat-mapped",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": 0,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "webkit",
-          "target": "compat-unknown-clear",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": 0,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "webkit",
-          "target": "normal-second-unknown",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": 0,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "webkit",
-          "target": "release-01",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "webkit",
-          "target": "release-02",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "webkit",
-          "target": "release-03",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "webkit",
-          "target": "release-04",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "webkit",
-          "target": "release-05",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "webkit",
-          "target": "release-06",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "webkit",
-          "target": "release-07",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "webkit",
-          "target": "release-08",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "webkit",
-          "target": "release-09",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        },
-        {
-          "browser": "webkit",
-          "target": "release-10",
-          "executionKind": "initial",
-          "exitCode": 0,
-          "stage": "Playwright assertions completed",
-          "sourcesAfterExact": true,
-          "pageerrorsCount": null,
-          "retry": 0,
-          "skip": 0
-        }
-      ],
-      "oldInitialCmapped": {
-        "exitCode": 1,
-        "loadOthersExact": false,
-        "observedUnrelatedDelta": "missing canonical masterId added to unrelated synthetic fleet row",
-        "classification": "fixture omitted existing deterministic boot migration",
-        "staticCanonicalId": 144,
-        "callerStack": "not collected",
-        "postLoadGateAndReturn": "unreached",
-        "rawFiles": 172,
-        "rawBytes": 15707491,
-        "preserved": true
-      },
-      "fixtureCorrection": "unrelated sentinel initial masterId144 only; main legacy input/product/all assertions unchanged"
-    },
-    "preservation": {
-      "newPhasePositiveMismatch": false,
-      "rawFiles": 220,
-      "rawBytes": 23956095,
-      "traceCRC": 5,
-      "videoUnique": 5,
-      "successfulRelease20TraceVideo": "not recorded by unchanged on-first-retry/retain-on-failure settings",
-      "environmentReceipts": 25,
-      "fullRuntimeSourceCount": 593,
-      "all25PostSourceExact": true,
-      "originalNormal132AndInitialFailure172SHAReverified": true,
-      "privateValuesShared": false,
-      "rawRewriteSanitizerUpload": false,
-      "producerPageerrorScope": "compatibility4 and new normal1 only; release20 numeric count absent, original exception assertions passed",
-      "recordedPageerrorCounts": {
-        "compatibility4": 0,
-        "newNormal1": 0,
-        "release20": null
-      }
-    },
-    "fixedList": {
-      "chromium": 871,
-      "webkit": 871,
-      "newNormalEach": 6,
-      "compatibilityEach": 2,
-      "localEachSelected": 1,
-      "workers": 1,
-      "retries": 0,
-      "repeatEach": 1,
-      "timeoutsMS": [
-        45000,
-        12000
-      ]
-    },
-    "matrixChange": {
-      "before": "18/136/82",
-      "after": "20/137/79",
-      "statusCellsChanged": 4,
-      "criteriaChanged": false,
-      "other57RowsUnchanged": true,
-      "previousSevenOneD": "一部; oldWready load unreached not filled"
-    },
-    "nextCI": {
-      "state": "existing corrected-source CI remains closed; no new test, rerun or records-only dispatch",
-      "runId": 40827828692,
-      "head": "0f44f839be65d96b5627fd5951fb05525787c326",
-      "nextObservation": "失敗したreload後文書で既に生成された表示切替metadataの画面ID・文書識別・caller stack。追加試験は起動しない。"
-    },
-    "stateBeforeFirstSourceCI": "local scoped validation complete; normal12 full after original11 reuse + newWunknown1; new25 targets successful after one grounded fixture correction; ordinary source commit/push/one finalHEAD smoke pending",
-    "nextCIBeforeFirstRun": {
-      "state": "not started",
-      "plan": "ordinary source commit/push then one same finalHEAD smoke, no automatic/manual duplication"
-    },
-    "firstSourceCI": {
-      "runId": 40825717140,
-      "head": "6361061af962128a17ab92649b237866a111ac64",
-      "attempt": 1,
-      "conclusion": "failure",
-      "stage": "Node prerequisite before browser launch",
-      "smokeJobs": {
-        "success": 0,
-        "failure": 6
-      },
-      "full": "skipped",
-      "eachJobNode": {
-        "tests": 497,
-        "pass": 496,
-        "fail": 1
-      },
-      "failureTest": "tests/seven-one-routes.test.cjs:47",
-      "assertion": "7-2/0/true",
-      "allOwnCases": 16,
-      "ownCaseState": "all not reached",
-      "playwrightTotals": {
-        "chromium": null,
-        "webkit": null
-      },
-      "playwrightVersionActual": null,
-      "browserRevisionActual": null,
-      "publishedArtifacts": 0,
-      "nodeVersionActual": "24.21.0",
-      "imageDigestPulledObserved": true,
-      "localSuccessesDoNotFillUnreached": true,
-      "positiveNewPreservationMismatchObserved": null
-    },
-    "oracleCorrectionPlan": {
-      "state": "independently grounded scope correction complete; targeted Node3 first pass",
-      "reason": "7-2chosen-info intentionally preserves2requirements/basicdetail; actual and legacy route statuses both missing",
-      "unchangedLegacyScope": {
-        "presets": 50,
-        "fullOutputComparisons": 100,
-        "strictEqualityRetained": true
-      },
-      "newSevenTwoScope": "explicit independent requirements/detail and known route-mismatch retention assertions",
-      "productChanges": false,
-      "browserSpecOperationChanges": false,
-      "localBrowserReexecutionsForThisCorrection": 0,
-      "sameHeadRerun": false,
-      "validation": {
-        "node": "24.21.0",
-        "imagePinned": true,
-        "selectedCases": 3,
-        "attemptsEach": 1,
-        "tests": 3,
-        "pass": 3,
-        "fail": 0,
-        "skipped": 0,
-        "browserLaunches": 0,
-        "all497SuiteExecutedLocally": false,
-        "resultSHA256": "94f42f25f5965aaec4b84db961bb345db67885478f52de6cf0a66ded40565852",
-        "separateFromCompatibilityNode16Physical18": true
-      },
-      "reuseDependency": {
-        "oldTargetedManifestFiles": 51,
-        "byteIdentical": 50,
-        "changedNodeOnlyFilesWithinManifest": 1,
-        "otherEditedNodeFileOutsideManifest": true,
-        "productBrowserSpecsInputsOperationsUnchanged": true,
-        "browserSpecsImportCorrectedNodeFiles": false,
-        "whole51EqualityClaimed": false,
-        "localBrowserReexecutions": 0
-      }
-    },
-    "stateBeforeCorrectedSourceCIFinalization": "source6361061a committed/pushed; first CI40825717140 Node prerequisite failed before all browsers; grounded legacy-oracle scope corrected and three targeted Node cases first passed; newHEAD smoke pending; local25 and old gaps retained",
-    "nextCIBeforeCorrectedSourceCIFinalization": {
-      "state": "after concrete oracle correction commit, one newHEAD smoke planned; targeted Node3 passed, corrected CI not started",
-      "previousRunId": 40825717140,
-      "sameHeadRerun": false
-    },
-    "correctedSourceCI": {
-      "runId": 40827828692,
-      "head": "0f44f839be65d96b5627fd5951fb05525787c326",
-      "attempt": 1,
-      "conclusion": "cancelled",
-      "smokeJobs": {
-        "success": 5,
-        "cancelled": 1
-      },
-      "full": "skipped",
-      "W4Cancellation": "job45m limit",
-      "officialPlaywrightCounts": {
-        "chromium": {
-          "initialPass": 871,
-          "retrySuccess": 0,
-          "finalFailure": 0,
-          "skipped": 0
-        },
-        "webkit": {
-          "initialPass": 859,
-          "retrySuccess": 7,
-          "finalFailure": 5,
-          "skipped": 0
-        }
-      },
-      "ownWebKitFinalFailures": [
-        "CEG ready",
-        "BCDIM stock"
-      ],
-      "ownPerAttemptBoundary": null,
-      "ownPreservationObservation": null,
-      "ownRawJSONExpected": 16,
-      "ownRawJSONReceived": 0,
-      "missingMeaning": "Individual exceptions/full logs and own JSON/trace were not received; do not infer hidden operation, storage loss, shared cause, or successful preservation. Local25 and other trials do not fill gaps.",
-      "environment": {
-        "ownReceipts": 6,
-        "Node": "24.21.0",
-        "Playwright": "1.55.0",
-        "ChromiumRevision": "1187",
-        "WebKitRevision": "2203",
-        "all6Match": true,
-        "fullLogsJobs": [
-          "W2",
-          "W3"
-        ],
-        "eachMeasuredNode": {
-          "tests": 497,
-          "pass": 497,
-          "fail": 0
-        },
-        "other4MeasuredNodeCounts": null,
-        "actualImagePullObservedJobs": [
-          "W2",
-          "W3"
-        ]
-      },
-      "artifacts": {
-        "published": 9,
-        "received": 6,
-        "receivedBytes": 292379,
-        "serverSHA256Matches": 6,
-        "outerZipCRCVerified": 6,
-        "over512MiBNotRequested": [
-          {
-            "archive": "C2 attempt",
-            "bytes": 1122916626
-          },
-          {
-            "archive": "W4 attempt",
-            "bytes": 628986804
-          },
-          {
-            "archive": "W4 report",
-            "bytes": 1264043938
-          }
-        ],
-        "failedTraceVideoOriginalsReceived": false,
-        "innerTraceCRC": null
-      },
-      "old636NodeFailureAndBrowserUnreachedPreserved": true,
-      "localSuccessDoesNotFillCIGaps": true,
-      "decision": "stop execution; ownCI all-success incomplete; preserve locally completed compatibility scope without guessed repair or diagnostic repetition",
-      "nextObservation": "当該W4の7-2失敗試行で、最初に失敗した操作／アサーションと到達段階を示す個別例外（stack／call log）",
-      "matrixChanges": 0,
-      "sourceHeadVersusLaterRecordsOnlyHeadSeparated": true,
-      "recordsOnlyManualCIDispatch": false,
-      "existingWorkflowTriggersRetained": true
-    },
-    "stateBeforeFailureClassification20261030": "local scoped compatibility implementation complete; corrected-source CI40827828692: five smoke success, W4 cancelled at45m; two own WebKit final failures unclassified because individual exceptions/raw evidence unavailable; no additional diagnosis, speculative repair or success rerun",
-    "nextCIBeforeFailureClassification20261030": {
-      "state": "one corrected-source smoke collected and closed; no success rerun or records-only manual dispatch",
-      "runId": 40827828692,
-      "head": "0f44f839be65d96b5627fd5951fb05525787c326",
-      "nextObservation": "当該W4の7-2失敗試行で、最初に失敗した操作／アサーションと到達段階を示す個別例外（stack／call log）"
-    },
-    "failureClassificationRef": "sevenTwoCIFailureClassification20261030"
   },
   "selectionHistory": [
     {
@@ -6632,6 +6358,563 @@
         "nextObservation": "当該W4の7-2失敗試行で、最初に失敗した操作／アサーションと到達段階を示す個別例外（stack／call log）"
       },
       "failureClassificationRef": "sevenTwoCIFailureClassification20261030"
+    },
+    {
+      "id": "7-3/0/default",
+      "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
+      "docsOnlyFastForwardHead": "eac1294df69eaa06f1a13b988c6cca8d7426f0a1",
+      "evidence": "docs/pr152-seven-three-first-ja.md",
+      "state": "limited firstACE scope source and representative save/load evidence recorded; ownCI closed5smoke success/1failure, Fullskipped; D verified by local5 plus ownCIWebKitReady initial separate positive; prior failures/gaps retained; seven4 remains separate unfinished unit",
+      "sourceScope": {
+        "path": "ACE",
+        "phase": "P not opened selected contract; no game unlock detection",
+        "prepared43OriginalValuesAndOrderUnchanged": true,
+        "P1Prepared": 42,
+        "P2SourceOnlyControl": 1,
+        "additionalSeparate": 8,
+        "runtimeP1": 50,
+        "runtimeExpected": {
+          "ready": 26,
+          "missing": 17,
+          "manual": 7
+        },
+        "independentFrozenSourceAudit": true,
+        "newExternalFetches": 0,
+        "remaining": [
+          "CVL abbreviation",
+          "historical pair priority across small fleets",
+          "LHA",
+          "CD product model",
+          "unknown hulls",
+          "full combat quantities/inventory/slots",
+          "graph and old goal/history compatibility",
+          "second-gauge G disagreement unchanged"
+        ]
+      },
+      "node": {
+        "relatedAfterUnique": 19,
+        "before": {
+          "tests": 6,
+          "pass": 1,
+          "fail": 5
+        },
+        "beforeNightPlacement": {
+          "tests": 2,
+          "pass": 0,
+          "fail": 2
+        },
+        "initialAfter": {
+          "tests": 19,
+          "pass": 4,
+          "fail": 15
+        },
+        "necessarySyntaxCorrection": {
+          "characters": 2,
+          "failedTitlesOnly": 15,
+          "pass": 15,
+          "successfulCasesRepeated": 0
+        },
+        "auditRegistrationSeparate": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "old19Repeated": 0,
+          "independentCasesPerRegistry": 50
+        },
+        "completeOther52RouteAndSpeedComparisons": 208,
+        "olderSevenOneComparisons": 98,
+        "olderSevenTwoRouteAndSpeedComparisons": 200
+      },
+      "identityHelper": {
+        "tests": 12,
+        "pass": 12,
+        "runs": 1,
+        "scope": "helper11 plus first equipment scope1; four originals20fields, edited4+2 strict blanks, safe-abort4+0; old5+1/6+0 retained",
+        "productSaveEditorChanged": false
+      },
+      "fixtureCorrection": {
+        "scope": "ready fixture empty equipment string serialization1expression only; all assertions/product/helper/summary unchanged",
+        "initialChromiumReady": "first-search failure; saved/load read unreached; original retained",
+        "pureContractInitial": "one test-only old-whitespace expected literal failure retained",
+        "pureContractAfterLiteralCorrection": {
+          "tests": 1,
+          "pass": 1
+        },
+        "browserNecessaryRevalidation": "chromium ready completed; original failure not converted to success"
+      },
+      "local": {
+        "uniqueTargets": 8,
+        "normalTargets": 6,
+        "namedInvariantTargetsSeparate": 2,
+        "successfulLatestTargets": 7,
+        "failedLatestTargets": 1,
+        "physicalTrials": 9,
+        "initialFixtureFailureAdditional": 1,
+        "normalPostLoadFullComplete": 5,
+        "normalPostLoadUnreached": 1,
+        "namedInvariantSaveCompletionCredit": 0,
+        "workers": 1,
+        "retries": 0,
+        "repeatEach": 1,
+        "timeoutsMS": [
+          45000,
+          12000
+        ],
+        "cases": [
+          {
+            "browser": "chromium",
+            "target": "ready",
+            "kind": "necessary-fixture-correction-revalidation",
+            "exitCode": 0,
+            "stage": "completed",
+            "postLoadWholeComparison": true
+          },
+          {
+            "browser": "chromium",
+            "target": "stock",
+            "kind": "initial",
+            "exitCode": 0,
+            "stage": "completed",
+            "postLoadWholeComparison": true
+          },
+          {
+            "browser": "chromium",
+            "target": "unknown",
+            "kind": "initial",
+            "exitCode": 0,
+            "stage": "completed",
+            "postLoadWholeComparison": true
+          },
+          {
+            "browser": "webkit",
+            "target": "ready",
+            "kind": "initial",
+            "exitCode": 1,
+            "stage": "after-load-search hidden click45s timeout",
+            "postLoadWholeComparison": false
+          },
+          {
+            "browser": "webkit",
+            "target": "stock",
+            "kind": "initial",
+            "exitCode": 0,
+            "stage": "completed",
+            "postLoadWholeComparison": true
+          },
+          {
+            "browser": "webkit",
+            "target": "unknown",
+            "kind": "initial",
+            "exitCode": 0,
+            "stage": "completed",
+            "postLoadWholeComparison": true
+          }
+        ],
+        "namedInvariant": [
+          {
+            "browser": "chromium",
+            "exitCode": 0,
+            "kind": "initial",
+            "scope": "fulfilled named route remains protected while another mandatory condition is missing; separate from save/load representatives"
+          },
+          {
+            "browser": "webkit",
+            "exitCode": 0,
+            "kind": "initial",
+            "scope": "fulfilled named route remains protected while another mandatory condition is missing; separate from save/load representatives"
+          }
+        ],
+        "WebKitReady": {
+          "savedReadReached": true,
+          "savedStrictIdentityFields": 20,
+          "strictExtraPureBlankRows": 2,
+          "savedGearMatchesProposal": true,
+          "savedSourceOtherMapProcurementPlannerRetention": true,
+          "rawIntentionalDeltas": "auto allocation, editor4to6 and memo edit; raw identitiesExact/realGearExact/customExact false is not a positive preservation anomaly",
+          "afterReloadSearch": "hidden locator.click45s timeout",
+          "postLoadWholeComparisonReached": false,
+          "navigationCollectionFailures": 1,
+          "navigationReceived": "one planned pre-reload guide transition for memo editing only; not failed reload-document caller",
+          "failedReloadDocumentSnapshot": "missing",
+          "callerAndCause": "unknown",
+          "newPositivePreservationMismatchObserved": false
+        }
+      },
+      "fixedList": {
+        "chromium": 874,
+        "webkit": 874,
+        "newEach": 3,
+        "selectedLocalEachCount": 1,
+        "runtimeSources": 598,
+        "appSpecPackageWorkflowUnchangedAfterFreezeExceptGroundedEncoder": true,
+        "laterNonUIChanges": "audit/checklist metadata4 and audit Node1 during UI preparation; progress/policy/dedicated records4 after UI; no additional runtime app/spec/package/workflow change",
+        "privateCheckerInitial": {
+          "exitCode": 1,
+          "listings": 0,
+          "browserLaunches": 0,
+          "classification": "overstrict unresolved path equality; realpath comparison correction only; original preserved"
+        }
+      },
+      "graph": {
+        "changed": false,
+        "completed": false,
+        "oldGoalHistoryCompatibility": "not implemented or claimed by first-condition change",
+        "secondGaugeGUnresolved": true
+      },
+      "matrixChange": {
+        "before": "20/137/79",
+        "after": "20/140/76",
+        "statusCellsChanged": 3,
+        "cells": [
+          "7-3/0/default.B 未確認→一部",
+          "7-3/0/default.C 未確認→一部",
+          "7-3/0/default.D 未確認→一部"
+        ],
+        "AStatus": "一部 unchanged",
+        "other58RowsUnchanged": true,
+        "criteriaChanged": false,
+        "denominatorCells": 236,
+        "partialConvertedToPercent": false
+      },
+      "nextCI": {
+        "state": "closed; no records-only dispatch or successful rerun",
+        "runId": 40996265641,
+        "head": "62d817223a1e72b28f956234a6090b3493c624b0",
+        "conclusion": "failure",
+        "recordHead": "later records-only HEAD is distinct from tested sourceHEAD"
+      },
+      "nextPriority": "7-4/0 ABEJLP: independent row with B/C/D unverified; reconcile DD/DE OR, aviation hull limits and coefficient4 LOS safe37 separately from optional ASW/night/base strategy.",
+      "summaryArtifactPreparation": {
+        "fields": "allowlisted stage/boolean/count only; missing null; no stored-value body",
+        "workflow": "one dedicated summary upload before existing large artifact upload; no existing archive splitting/subset retrieval or size-limit bypass",
+        "producerContracts": {
+          "tests": 2,
+          "pass": 2
+        },
+        "consumerContracts": {
+          "tests": 2,
+          "pass": 2
+        },
+        "eachOneRun": true,
+        "summaryFunctionUnchangedAfterEncoderFix": true,
+        "actualCIGenerationOrReceipt": "not observed; CI not started"
+      },
+      "evidenceRetention": {
+        "collectorResultSHA256": "f187a8dcadc579988ff5fbef82271d223f228f7754820ea9ab01afc48278ad0f",
+        "collectorClosedManifestSHA256": "8d8179f05cf933e9fbb92976a8f66e83ea7257a9fa598b7226b664392c91b55e",
+        "normalUnique": 6,
+        "complete": 5,
+        "partial": 1,
+        "samples": 11,
+        "saved": 6,
+        "load": 5,
+        "strict20Saved": 6,
+        "strict20Load": 5,
+        "positivePreservationMismatch": 0,
+        "privateRawFiles": 270,
+        "privateRawBytes": 113066345,
+        "traceUniqueCRCVerified": 7,
+        "videoPhysicalFiles": 9,
+        "videoUnique": 7,
+        "namedSuccessTrace": "not generated under existing settings; absence is not zero missing evidence",
+        "runtimeSourceSnapshots": 3,
+        "sourceFilesEach": 598,
+        "allBeforeAfterExact": true,
+        "corrected03And04SameSource": true,
+        "rawStorageBodySharedOrCommitted": false
+      },
+      "stateBeforeOwnCIFinalization20261030": "source-grounded first ACE integration and necessary local validation complete with WebKit ready post-load comparison unreached; no repeat of that trial; commit/push and one final-HEAD smoke not started",
+      "nextCIBeforeOwnCIFinalization20261030": {
+        "state": "not started",
+        "plan": "ordinary source commit/push then one same final-HEAD smoke; no duplicate automatic/manual run; local failed/unreached trial remains separate"
+      },
+      "ownSourceCIFinalization20261030": {
+        "runId": 40996265641,
+        "head": "62d817223a1e72b28f956234a6090b3493c624b0",
+        "attempt": 1,
+        "conclusion": "failure",
+        "smokeJobs": {
+          "success": 5,
+          "failure": 1,
+          "cancelled": 0
+        },
+        "full": "skipped",
+        "dispatch": {
+          "automaticBefore": 0,
+          "manual": 1,
+          "reruns": 0
+        },
+        "officialCaseOutcomes": {
+          "chromium": {
+            "passed": 874,
+            "flaky": 0,
+            "failed": 0,
+            "skipped": 0
+          },
+          "webkit": {
+            "passed": 865,
+            "flaky": 7,
+            "failed": 2,
+            "skipped": 0
+          }
+        },
+        "outcomeMeaning": "passed/flaky/failed/skipped are official case outcomes, not exact initial/retry/physical attempt counts; own initial/retry labels come from same-folder original summaries/traces",
+        "ownSummaryOriginals": 7,
+        "ownNormalUnique": 6,
+        "ownCompletedSeparateTrials": 6,
+        "ownPartialInitialTrials": 1,
+        "ownTrials": [
+          {
+            "browser": "chromium",
+            "state": "unknown",
+            "trial": "initial",
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "searchSampleCount": 2,
+            "pageerrorCount": 0,
+            "navigationCollectionFailures": 0,
+            "allSourceExpectedComparisonsMatch": true,
+            "summarySHA256": "08bed5b6f6ce62144bf475619c3c146511dd66f4f4617ccf8342afc2a765fb25"
+          },
+          {
+            "browser": "chromium",
+            "state": "ready",
+            "trial": "initial",
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "searchSampleCount": 2,
+            "pageerrorCount": 0,
+            "navigationCollectionFailures": 0,
+            "allSourceExpectedComparisonsMatch": true,
+            "summarySHA256": "a69600f9c1cb6ada301efbeb931d3ce1885846d83419e1bf803a8442728b851b"
+          },
+          {
+            "browser": "chromium",
+            "state": "stock",
+            "trial": "initial",
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "searchSampleCount": 2,
+            "pageerrorCount": 0,
+            "navigationCollectionFailures": 0,
+            "allSourceExpectedComparisonsMatch": true,
+            "summarySHA256": "a5215d04ed5462e5cbb98a4e0007e51bc56dce2b6a5dba0caf33e547c6748319"
+          },
+          {
+            "browser": "webkit",
+            "state": "ready",
+            "trial": "initial",
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "searchSampleCount": 2,
+            "pageerrorCount": 0,
+            "navigationCollectionFailures": 0,
+            "allSourceExpectedComparisonsMatch": true,
+            "summarySHA256": "2a46615c46540d86438866c7e55d4c86a452b5dd9c330bda55256f8c8f6963b4"
+          },
+          {
+            "browser": "webkit",
+            "state": "unknown",
+            "trial": "initial",
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "searchSampleCount": 2,
+            "pageerrorCount": 0,
+            "navigationCollectionFailures": 0,
+            "allSourceExpectedComparisonsMatch": true,
+            "summarySHA256": "8a9eefc286127bfecc88e24b79350f518f77422c8b7a1da3ce049501be8da519"
+          },
+          {
+            "browser": "webkit",
+            "state": "stock",
+            "trial": "initial",
+            "stage": "after-load-search",
+            "savedReadReached": true,
+            "loadReadReached": false,
+            "searchSampleCount": 1,
+            "pageerrorCount": 0,
+            "navigationCollectionFailures": 1,
+            "allSourceExpectedComparisonsMatch": false,
+            "summarySHA256": "161f5a51887f9d482d141deee9714939e670e5176778b770542f867276820279"
+          },
+          {
+            "browser": "webkit",
+            "state": "stock",
+            "trial": "retry1",
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "searchSampleCount": 2,
+            "pageerrorCount": 0,
+            "navigationCollectionFailures": 0,
+            "allSourceExpectedComparisonsMatch": true,
+            "summarySHA256": "01ae82e25e3046e631077a66c726f29d7d4aa7ebbd0ab33053b34e2065dd1364"
+          }
+        ],
+        "DPositiveSixTargetBasis": [
+          {
+            "browser": "chromium",
+            "state": "ready",
+            "source": "local corrected03/04 completed original",
+            "trial": "necessary grounded fixture correction revalidation"
+          },
+          {
+            "browser": "chromium",
+            "state": "stock",
+            "source": "local corrected03/04 completed original",
+            "trial": "initial"
+          },
+          {
+            "browser": "chromium",
+            "state": "unknown",
+            "source": "local corrected03/04 completed original",
+            "trial": "initial"
+          },
+          {
+            "browser": "webkit",
+            "state": "stock",
+            "source": "local corrected03/04 completed original",
+            "trial": "initial"
+          },
+          {
+            "browser": "webkit",
+            "state": "unknown",
+            "source": "local corrected03/04 completed original",
+            "trial": "initial"
+          },
+          {
+            "browser": "webkit",
+            "state": "ready",
+            "source": "own CI40996265641 W4",
+            "trial": "initial",
+            "summarySHA256": "2a46615c46540d86438866c7e55d4c86a452b5dd9c330bda55256f8c8f6963b4"
+          }
+        ],
+        "oldLocalWebKitReady": "unreached final load comparison and missing failed-document caller remain; not rewritten by ownCIready success",
+        "ownWebKitStockInitial": "saved strict20/extra2/proposal/other retention passed; after-load search button remained hidden until test45s timeout; load comparison unreached; navigation collection failure1; no performing-click/click-done evidence; delivery/handler entry/caller/cause unknown; retry1 completed is separate positive",
+        "otherFinalFailureBoundaries": {
+          "5-4 required-missing": "initial/retry post-load search-button hidden click wait timeout",
+          "3-5 south scouting unknown": "initial/retry save/load comparisons passed then version-fetch access-control pageerror assertion; not saved-value mismatch"
+        },
+        "sourceBinding": {
+          "confirmationSHA256": "84de3b33f55a4d924f60ff468c5b273ddfedb193e89f9e2b75e58fb5456e0102",
+          "checkoutMatchedJobs": 6,
+          "localSource27ComparedBeforeRecords": 27,
+          "sourceManifestSHA256": "c198c1cc8218d41535c9734c9c10a069a1eff7488b8d5eaa4abad9f66dc1d709",
+          "method": "Ownrun/jobhead + sixexplicitcheckoutlogs + finalcommitexpectedsource27manifest; staticworkflow has no source-rewrite process aftercheckout.",
+          "CIservedFileHashesActuallyMeasured": false,
+          "local598FrozenHashMeasurementsSeparate": true
+        },
+        "environment": {
+          "ownReceiptsMatch": 6,
+          "node": "24.21.0",
+          "playwright": "1.55.0",
+          "chromiumRevision": "1187",
+          "webkitRevision": "2203",
+          "nodeSuitePerJob": {
+            "tests": 510,
+            "pass": 510,
+            "fail": 0
+          },
+          "actualFixedImagePullDigestMatchedJobs": 6,
+          "imageDigest": "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29"
+        },
+        "artifacts": {
+          "published": 11,
+          "received": 9,
+          "receivedBytes": 496516810,
+          "receivedServerDigestMatches": 9,
+          "receivedOuterCRCMatches": 9,
+          "formalRunLogZIPBytes": 11281584,
+          "formalRunLogZIPCRC": "PASS",
+          "formalRunLogRequests": 1,
+          "smallSummaryArchives": 2,
+          "smallSummaryOriginals": 7,
+          "W4RawArchiveBytes": 496247932,
+          "W4OwnRawSummarySameTrialComparisons": 4,
+          "W4OwnInnerTraceCRC": 4,
+          "W4OwnVideosReceived": 4,
+          "CFullRawBeyondSmallSummaries": "missing; over-cap archive not requested",
+          "overCapUnrequested": [
+            {
+              "name": "attempt-diagnostics-chromium-2-40996265641",
+              "bytes": 1555485016,
+              "requests": 0
+            },
+            {
+              "name": "smoke-webkit-shard-4-of-4-40996265641",
+              "bytes": 999354956,
+              "requests": 0
+            }
+          ],
+          "rangeOrSplit": false,
+          "rawBodyOrTraceCommitted": false
+        },
+        "positiveNewPreservationMismatchObserved": false,
+        "matrixChange": {
+          "before": "20/140/76",
+          "after": "21/139/76",
+          "additionalStatusCells": 1,
+          "cell": "7-3/0/default.D 一部→確認済み",
+          "distinctCellsFromOriginal20_137_79": 3,
+          "finalDistinctCells": [
+            "B 未確認→一部",
+            "C 未確認→一部",
+            "D 未確認→確認済み"
+          ],
+          "other58RowsUnchanged": true,
+          "criteriaChanged": false,
+          "denominator": 236
+        },
+        "recordsOnlyNewCIDispatch": false,
+        "sevenFourSeparateWork": "based on62d, Node12 success precedes UI draft; UI/representative save/load/ledger not completed or credited to7-3",
+        "closureResultSHA256": "b917025661e4686f32bc67729e2e98d29051bcd295d385f14d46b6e8d54c4964",
+        "ownEightCaseOutcomes": {
+          "passed": 7,
+          "flaky": 1,
+          "failed": 0,
+          "flakyCase": "WebKit stock",
+          "namedInvariantCaseOutcomesIncluded": 2,
+          "physicalAttemptTotal": null
+        },
+        "ownSummaryObservations": {
+          "ownInitialSummaryCases": 6,
+          "ownRetry1SummaryRecords": 1,
+          "ownTotalSummaryRecords": 7,
+          "initialFolderCompleted": 5,
+          "initialFolderSavedRead": 6,
+          "initialFolderLoadRead": 5,
+          "totalSavedRead": 7,
+          "totalLoadRead": 6,
+          "savedStrict20Matches": 7,
+          "loadStrict20Matches": 6,
+          "missingInitialSummaryCases": [],
+          "newPreservationMismatchPositive": false,
+          "strictReviewPartialRows": [
+            {
+              "browser": "webkit",
+              "state": "stock",
+              "originalFolderTrialLabel": "initial",
+              "stage": "after-load-search",
+              "navigationCollectionFailures": 1
+            }
+          ]
+        },
+        "privateCollectionClosure": {
+          "ciFiles": 178,
+          "ciBytes": 125699867,
+          "artifactSideFiles": 121,
+          "artifactSideBytes": 532792512,
+          "allInventorySHARechecked": true,
+          "inventoryFileCountsNotArtifactDownloadCounts": true
+        },
+        "globalBoundaryCanonicalSource": "global-two-failure-boundaries-final.json; provisional reporter header segments are not trial counts"
+      }
     }
   ],
   "fiveFourCloseout": {
@@ -6672,8 +6955,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "7-3 firstACE ownCI and limited evidence finalized; records-only update after tested62d source, no newCI; prior local/CI initial gaps remain",
-    "nextUnit": "based on62d, Node12 success precedes UI draft; UI/representative save/load/ledger not completed or credited to7-3",
+    "activeUnit": "7-4 limited local scope recorded; WebKit known full post-load comparison unreached, A/B/C/D partial; root source commit/push/one finalHEAD smoke pending",
+    "nextUnit": "7-5 first ABDFGHK independent preparation; do not import7-4 limited Node/UI evidence into its cells",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -6696,62 +6979,33 @@
     "activeUnitBeforePreservationStop": "6-5 upper/lower limited source-backed improvements and normalC/W12 targets completed; records17/137/82 prepared on95c4f3ff; physical14 incl2 prior fixturefailures separate; upstream6-4CI40775006189 pending, owncommit/push/CI not started",
     "current": {
       "date": "2026-10-30",
-      "target": "7-3/0/default",
-      "record": "docs/pr152-seven-three-first-ja.md",
-      "testedSourceHead": "62d817223a1e72b28f956234a6090b3493c624b0",
-      "runId": 40996265641,
-      "conclusion": "failure",
-      "smokeJobs": {
-        "success": 5,
-        "failure": 1,
-        "cancelled": 0
-      },
-      "officialCaseOutcomes": {
-        "chromium": {
-          "passed": 874,
-          "flaky": 0,
-          "failed": 0,
-          "skipped": 0
-        },
-        "webkit": {
-          "passed": 865,
-          "flaky": 7,
-          "failed": 2,
-          "skipped": 0
-        }
-      },
-      "DStatus": "確認済み by local5 plus independent ownCIWebKitReady initial completed",
+      "target": "7-4/0/default",
+      "record": "docs/pr152-seven-four-ja.md",
+      "baselineHead": "69591040a92b6cfaa9055969b85c7bb258522b7a",
+      "implementationStartHead": "62d817223a1e72b28f956234a6090b3493c624b0",
+      "local": "six first physical trials, five pass/one WebKit known post-load hidden-click timeout; saved30six/load30five",
+      "sourceBindingSHA256": "427dc23141c741c31ba49508143ae806ea4d0d6785f98033f8c6f942f9b6c0fb",
+      "collectorResultSHA256": "510835f8776e9a2f0a86c102c2755935b88ed4bb6f6034bf7906ae15266ae0f8",
       "matrixChange": {
-        "before": "20/140/76",
-        "after": "21/139/76",
-        "additionalStatusCells": 1,
-        "cell": "7-3/0/default.D 一部→確認済み",
-        "distinctCellsFromOriginal20_137_79": 3,
-        "finalDistinctCells": [
+        "before": "21/139/76",
+        "after": "21/142/73",
+        "statusCells": 3,
+        "cells": [
           "B 未確認→一部",
           "C 未確認→一部",
-          "D 未確認→確認済み"
+          "D 未確認→一部"
         ],
+        "A": "一部 unchanged",
         "other58RowsUnchanged": true,
         "criteriaChanged": false,
-        "denominator": 236
+        "cellsDenominator": 236,
+        "partialPercentConversion": false
       },
-      "priorLocalAndCIInitialUnreachedRetained": true,
-      "sourceHeadAndLaterRecordsOnlyHeadDistinguished": true,
-      "recordsOnlyDispatch": false,
-      "sourceGapsAndGraphHistoryUnchanged": true,
-      "nextSeparateUnit": "based on62d, Node12 success precedes UI draft; UI/representative save/load/ledger not completed or credited to7-3",
-      "privateValuesShared": false,
+      "actualFormulaStillUnverified": true,
+      "sourceCommitPushCI": "not started; one same finalHEAD smoke planned by root",
+      "sevenThreeOldOriginalsAndGapsChanged": false,
       "stopConditionsUnchanged": true,
-      "ownEightCaseOutcomes": {
-        "passed": 7,
-        "flaky": 1,
-        "failed": 0,
-        "flakyCase": "WebKit stock",
-        "namedInvariantCaseOutcomesIncluded": 2,
-        "physicalAttemptTotal": null
-      },
-      "closureResultSHA256": "b917025661e4686f32bc67729e2e98d29051bcd295d385f14d46b6e8d54c4964"
+      "privateValuesShared": false
     },
     "activeUnitBeforeUpstreamCIFinalization": "new preservation mismatch stop: separate7-1C ready post-edit identity false; six-five validated WIP retained; no new trial/productfix/commit/push/CI",
     "currentBeforeAuthorizedIdentityObservationResume": {
@@ -7035,6 +7289,65 @@
       "oldFailuresAndMissingPreserved": true,
       "stopConditionsUnchanged": true,
       "privateValuesShared": false
+    },
+    "currentBeforeSevenFourLocal20261030": {
+      "date": "2026-10-30",
+      "target": "7-3/0/default",
+      "record": "docs/pr152-seven-three-first-ja.md",
+      "testedSourceHead": "62d817223a1e72b28f956234a6090b3493c624b0",
+      "runId": 40996265641,
+      "conclusion": "failure",
+      "smokeJobs": {
+        "success": 5,
+        "failure": 1,
+        "cancelled": 0
+      },
+      "officialCaseOutcomes": {
+        "chromium": {
+          "passed": 874,
+          "flaky": 0,
+          "failed": 0,
+          "skipped": 0
+        },
+        "webkit": {
+          "passed": 865,
+          "flaky": 7,
+          "failed": 2,
+          "skipped": 0
+        }
+      },
+      "DStatus": "確認済み by local5 plus independent ownCIWebKitReady initial completed",
+      "matrixChange": {
+        "before": "20/140/76",
+        "after": "21/139/76",
+        "additionalStatusCells": 1,
+        "cell": "7-3/0/default.D 一部→確認済み",
+        "distinctCellsFromOriginal20_137_79": 3,
+        "finalDistinctCells": [
+          "B 未確認→一部",
+          "C 未確認→一部",
+          "D 未確認→確認済み"
+        ],
+        "other58RowsUnchanged": true,
+        "criteriaChanged": false,
+        "denominator": 236
+      },
+      "priorLocalAndCIInitialUnreachedRetained": true,
+      "sourceHeadAndLaterRecordsOnlyHeadDistinguished": true,
+      "recordsOnlyDispatch": false,
+      "sourceGapsAndGraphHistoryUnchanged": true,
+      "nextSeparateUnit": "based on62d, Node12 success precedes UI draft; UI/representative save/load/ledger not completed or credited to7-3",
+      "privateValuesShared": false,
+      "stopConditionsUnchanged": true,
+      "ownEightCaseOutcomes": {
+        "passed": 7,
+        "flaky": 1,
+        "failed": 0,
+        "flakyCase": "WebKit stock",
+        "namedInvariantCaseOutcomesIncluded": 2,
+        "physicalAttemptTotal": null
+      },
+      "closureResultSHA256": "b917025661e4686f32bc67729e2e98d29051bcd295d385f14d46b6e8d54c4964"
     }
   },
   "auditCorrection": {
@@ -7493,5 +7806,6 @@
     "independentSevenThreeResumeAuthorized": true
   },
   "nextPriorityBeforeSevenThreeFirst20261030": "7-2自身W4の2case×初回/retryはreload後第2search非表示click timeoutと分類済み、load後全文比較と表示切替caller/原因は未確認。7-2追加試験・推測修正・CIなし。独立7-3第1ACEは未実行7件373133Bを保持して安全なstatic設計を続行可。4+2厳密helper、Node aggregator/旧第1oracle、専用UI固定一覧、台帳接続が残件。43+8期待案と図/旧目標履歴互換は未完、第2G再調査0。",
-  "nextPriorityBeforeSevenThreeCIFinalization20261030": "7-3第1ACEの通常commit/push後、同じ最終HEADsmoke1回を重複なく確認。局所Wreadyのload後非表示/全文比較未到達は別試行として保持し反復しない。次の独立単位は7-4/0 ABEJLP：B/C/D未確認、駆逐/海防OR・航空艦数・係数4安全域37と任意対潜/夜戦/基地を分けて確認。7-2追加試験/推測修正/再CI、第2G再調査は行わない。"
+  "nextPriorityBeforeSevenThreeCIFinalization20261030": "7-3第1ACEの通常commit/push後、同じ最終HEADsmoke1回を重複なく確認。局所Wreadyのload後非表示/全文比較未到達は別試行として保持し反復しない。次の独立単位は7-4/0 ABEJLP：B/C/D未確認、駆逐/海防OR・航空艦数・係数4安全域37と任意対潜/夜戦/基地を分けて確認。7-2追加試験/推測修正/再CI、第2G再調査は行わない。",
+  "nextPriorityBeforeSevenFourLocal20261030": "7-3検証source62d81722/CI40996265641は5smoke成功・W4失敗/Fullskipで閉鎖。後続は記録のみcommit/pushで新CIなし。次の独立7-4/0 ABEJLPは別branchのNode12成功が先行しUI草稿あり、実操作/保存/load/台帳は未完。既存根拠と凍結sourceを照合して必要な代表操作へ進み、7-3の未到達や第2G差を混ぜない。"
 }

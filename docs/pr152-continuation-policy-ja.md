@@ -1,3 +1,5 @@
+> 最新7-4 ABEJLP（2026-10-30）：基準69591040/21・139・76。source三資料のraw57＋policy6、有限適用差8、実索敵式未照合を分離し、Node20ユニークと純4契約は別記。局所known/stock/unknown×C/Wの6初回は5成功/1Wknown失敗。保存または安全中止後の読取り6件でstrict30・比較元7キー/他保持が通過し、known/stock4件は配備案も一致、load全文は5完了、Wknownはload後search-button非表示待機で試験45秒timeout・後文書caller欠測/nav1。A一部を維持し、B/C/Dの未確認→一部だけ21/142/73へ3セル更新。旧7-3/CI原本・他58行/旧53/定義236は不変。rootの関連commit/push・同HEADsmoke1回は未開始。[今回記録](pr152-seven-four-ja.md)。以下は各時点の履歴。
+
 > 最終7-3第1ACE CI（2026-10-30）：検証source62d81722／CI40996265641 attempt1は5smoke成功・W4失敗、Full skipped、job取消0。公式C passed874/flaky0/failed0、W865/7/2はcase outcomeであり初回/物理件数へ換算しない。同source局所完了5＋自身CI Wready初回完了を6代表へ直接対応し、Dだけ一部→確認済み、20/140/76→21/139/76。元基準20/137/79からdistinctはB/C/Dの3セル。局所Wready・自CIWstock初回のload未到達と旧欠測は別試行のまま保持。全6checkout/env/Node510/510/0/実pullと27source照合、7summaryを確認したがCI配信filehashの実測ではない。記録のみの新CIは起動しない。[最終記録](pr152-seven-three-first-ja.md#2026-10-30-最終head-smoke確定)。以下の未開始・D一部は局所時点の履歴。
 
 > 最新7-3第1ACE（2026-10-30）：P開放前の三出典一致域を独立50案へ接続し、元例4隻/羽黒/DD3を普遍条件にしない。関連Node19最終成功・追加audit1・helper12は別記。局所8対象は7成功/1Wready失敗、物理9（旧Cready fixture失敗＋訂正後必要再検証を区別）。新3状態C/W6のうち5件はload全文まで完了、Wreadyは保存編集後strict20＋厳密空2行・配備案一致を通過後、load再探索click非表示45秒で全文比較未到達。D一部を守り、B/C/Dの3セルだけ20/137/79→20/140/76。A一部・他58行/基準236・旧原本・第2G不一致は維持し、commit/pushと同じ最終HEADsmoke1回は未開始。[今回記録](pr152-seven-three-first-ja.md)。以下は各時点の履歴。
@@ -147,3 +149,13 @@ Wreadyのload後非表示は同試行の全文比較未到達として保持す�
 
 
 正式閉鎖時の自身8caseは7passed/1flaky（WebKit stock）で、named保護2件を含むcase outcome。7summary原本は初回folder6＋stock retry1の1件、strict20一致はsaved7/load6。これは全試行の物理総数を公式ラベルから推定した値ではない。収集台帳はCI側178ファイル/125,699,867bytes、artifact側121ファイル/532,792,512bytesを再hash照合済みで、サーバー成果物9件の取得byte数とは別尺度。global2件の試行境界は最終正本の一意なoriginal folderだけを使い、reporterの重複header区間を試行数へ数えない。
+
+
+## 2026-10-30 7-4 ABEJLPの局所記録
+
+2026-10-30 [7-4 ABEJLP](pr152-seven-four-ja.md)：21/139/76を基準にB/C/Dの未確認→一部だけ21/142/73へ3セル更新。knownはASW目標3/配備2で全配備済みと表示せず、有限在庫から3組・night0→1を配備。stockの部品/同艦別通常枠候補とunknown安全中止を確認した。6初回は5完了/1Wknown load後非表示45秒で全文未到達、保存strict30は6件・loadは5件。Aはsource差/実数値式/全目標根拠を残す一部で、他58行/旧53/基準236は不変。通常CIは未開始。
+
+旧7-3/既存CIの失敗原本・欠測は保持する。Wknownは保存30項目/6anchor/追加0・比較元7キー/配備案一致を通過したがload後非表示で全文未到達、nav採取失敗1・後文書caller/handler開始/原因は未確認。成功反復・追加診断・強制click・条件変更なしで未実行Wstock/unknownだけを同sourceで初回完了した。fixed version JSONは試験入力で製品ネット成功とはしない。局所1worker/0retryと通常CI C2worker/W1worker/1retryは区別し既存設定を保持。rootが関連commit/pushした最終HEADのsmoke1回を自動/手動重複なく確認する段階で未開始。次7-5第1は独立準備とし、7-4の成功/未到達を台帳へ流用しない。PR152ドラフト・未公開/main競合・保護対象・新保存不一致等の停止基準を維持する。
+
+
+saved6は保存または安全中止後の読取り6件を表し、保存書込み成功6回ではない。known/stock4件は保存・メモ編集、unknown2件は安全中止・編集なし。load全文完了5件はCknown/stock/unknownとWstock/unknownで、Wknown欠測1はそのまま保持する。

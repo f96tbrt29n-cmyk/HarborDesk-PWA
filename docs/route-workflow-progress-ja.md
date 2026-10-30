@@ -1,3 +1,5 @@
+> 最新7-4 ABEJLP（2026-10-30）：基準69591040/21・139・76。source三資料のraw57＋policy6、有限適用差8、実索敵式未照合を分離し、Node20ユニークと純4契約は別記。局所known/stock/unknown×C/Wの6初回は5成功/1Wknown失敗。保存または安全中止後の読取り6件でstrict30・比較元7キー/他保持が通過し、known/stock4件は配備案も一致、load全文は5完了、Wknownはload後search-button非表示待機で試験45秒timeout・後文書caller欠測/nav1。A一部を維持し、B/C/Dの未確認→一部だけ21/142/73へ3セル更新。旧7-3/CI原本・他58行/旧53/定義236は不変。rootの関連commit/push・同HEADsmoke1回は未開始。[今回記録](pr152-seven-four-ja.md)。以下は各時点の履歴。
+
 > 最終7-3第1ACE CI（2026-10-30）：検証source62d81722／CI40996265641 attempt1は5smoke成功・W4失敗、Full skipped、job取消0。公式C passed874/flaky0/failed0、W865/7/2はcase outcomeであり初回/物理件数へ換算しない。同source局所完了5＋自身CI Wready初回完了を6代表へ直接対応し、Dだけ一部→確認済み、20/140/76→21/139/76。元基準20/137/79からdistinctはB/C/Dの3セル。局所Wready・自CIWstock初回のload未到達と旧欠測は別試行のまま保持。全6checkout/env/Node510/510/0/実pullと27source照合、7summaryを確認したがCI配信filehashの実測ではない。記録のみの新CIは起動しない。[最終記録](pr152-seven-three-first-ja.md#2026-10-30-最終head-smoke確定)。以下の未開始・D一部は局所時点の履歴。
 
 > 最新7-3第1ACE（2026-10-30）：P開放前の三出典一致域を独立50案へ接続し、元例4隻/羽黒/DD3を普遍条件にしない。関連Node19最終成功・追加audit1・helper12は別記。局所8対象は7成功/1Wready失敗、物理9（旧Cready fixture失敗＋訂正後必要再検証を区別）。新3状態C/W6のうち5件はload全文まで完了、Wreadyは保存編集後strict20＋厳密空2行・配備案一致を通過後、load再探索click非表示45秒で全文比較未到達。D一部を守り、B/C/Dの3セルだけ20/137/79→20/140/76。A一部・他58行/基準236・旧原本・第2G不一致は維持し、commit/pushと同じ最終HEADsmoke1回は未開始。[今回記録](pr152-seven-three-first-ja.md)。以下は各時点の履歴。
@@ -42,12 +44,14 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 
 2026-10-30 CI追記：7-3第1ACEの最終CIは検証`62d817223a1e72b28f956234a6090b3493c624b0`／[40996265641](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/40996265641)、attempt1・dispatch1/再実行0。5smoke成功/1W4失敗・Full skippedで、公式C874/0/0、W865/7/2はpassed/flaky/failedのcase outcome。局所C3＋Wstock/unknownの5完了と自身CI Wready初回の独立した全文比較/strict20＋空2/全保持/例外0を6代表へ直接対応し、Dだけ一部→確認済み。20/140/76→21/139/76の1セル追加、一連の元20/137/79からdistinctはB/C/D3セルで、A/B/C・他58行/基準236/旧53は維持する。
 
+2026-10-30 [7-4 ABEJLP](pr152-seven-four-ja.md)：21/139/76を基準にB/C/Dの未確認→一部だけ21/142/73へ3セル更新。knownはASW目標3/配備2で全配備済みと表示せず、有限在庫から3組・night0→1を配備。stockの部品/同艦別通常枠候補とunknown安全中止を確認した。6初回は5完了/1Wknown load後非表示45秒で全文未到達、保存strict30は6件・loadは5件。Aはsource差/実数値式/全目標根拠を残す一部で、他58行/旧53/基準236は不変。通常CIは未開始。
+
 |項目|確認済み|一部|未確認|非該当|分母|
 |---|---:|---:|---:|---:|---:|
 |A|0|56|3|0|59|
-|B|0|34|25|0|59|
-|C|0|34|25|0|59|
-|D|21|15|23|0|59|
+|B|0|35|24|0|59|
+|C|0|35|24|0|59|
+|D|21|16|22|0|59|
 
 2026-10-28追補：[5-4最終整理](pr152-five-four-closeout-ja.md)は既存証拠で終了し、追加実行0・状態変更0。基準236セル3/115/118の下に閉じた限定残件と4分類を別記した。続く[2-5北F分岐](pr152-two-five-north-f-ja.md)では高速3戦艦の有効枝と選艦/不足案内を接続し、C/W各1初回で保存・編集・同一文書load後の完全一致まで確認したためDだけ一部→確認済み。前3/115/118→後4/114/118、変更1セル。A/B/Cの全条件完了へは広げない。7-3 Gと他行は維持。
 
@@ -130,7 +134,7 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 |7-2/1/default BCDIM|一部|一部|一部|確認済み|[7-2条件・互換](pr152-seven-two-routes-ja.md)|
 |7-3/0/default ACE|一部|一部|一部|確認済み|[P開放前の出典一致域・代表操作](pr152-seven-three-first-ja.md)|
 |7-3/1/default ACDGJP / ACDGIJP（G分岐未確認）|一部|一部|一部|確認済み|[pr152-seven-three-gij-ja](pr152-seven-three-gij-ja.md) / [pr152-seven-three-speed-ja](pr152-seven-three-speed-ja.md)|
-|7-4/0/default ABEJLP|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
+|7-4/0/default ABEJLP|一部|一部|一部|一部|[六隻例・式未照合・代表操作](pr152-seven-four-ja.md)|
 |7-5/0/default ABDFGHK|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
 |7-5/1/default ABDFJOQ|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
 |7-5/2/default ABDFJOPT|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
@@ -287,3 +291,13 @@ Wreadyで取得したnavigation1件はreload前文書の予定されたメモ編
 
 
 正式閉鎖時の自身8caseは7passed/1flaky（WebKit stock）で、named保護2件を含むcase outcome。7summary原本は初回folder6＋stock retry1の1件、strict20一致はsaved7/load6。これは全試行の物理総数を公式ラベルから推定した値ではない。収集台帳はCI側178ファイル/125,699,867bytes、artifact側121ファイル/532,792,512bytesを再hash照合済みで、サーバー成果物9件の取得byte数とは別尺度。global2件の試行境界は最終正本の一意なoriginal folderだけを使い、reporterの重複header区間を試行数へ数えない。
+
+
+## 2026-10-30 7-4 ABEJLPの局所結果
+
+2026-10-30 [7-4 ABEJLP](pr152-seven-four-ja.md)：21/139/76を基準にB/C/Dの未確認→一部だけ21/142/73へ3セル更新。knownはASW目標3/配備2で全配備済みと表示せず、有限在庫から3組・night0→1を配備。stockの部品/同艦別通常枠候補とunknown安全中止を確認した。6初回は5完了/1Wknown load後非表示45秒で全文未到達、保存strict30は6件・loadは5件。Aはsource差/実数値式/全目標根拠を残す一部で、他58行/旧53/基準236は不変。通常CIは未開始。
+
+全状態のroute/scoutingはformula manual・score:null、探索incomplete/registeredReadyfalse。総合readinessはknown manual、stock/unknown missingで、数値未判定が他の確定不足を消さない。local workers1/retries0/repeat1と通常CI Cworkers2/Wworkers1/retries1を分ける。固定version JSONは試験入力で、製品実通信成功の証明ではない。collectorは6raw/summary同試行一致・trace6CRC/video6SHA、216ファイル73,591,759bytes、606runtime（public605＋private config1）×2phase/更新前current605一致で閉鎖した。Wknown後文書/callerとload全文は欠測のまま、陽性保存不一致0を未到達の成功へ換算しない。次はrootの同HEADsmoke1回と7-5第1の独立準備。
+
+
+saved6は保存または安全中止後の読取り6件を表し、保存書込み成功6回ではない。known/stock4件は保存・メモ編集、unknown2件は安全中止・編集なし。load全文完了5件はCknown/stock/unknownとWstock/unknownで、Wknown欠測1はそのまま保持する。

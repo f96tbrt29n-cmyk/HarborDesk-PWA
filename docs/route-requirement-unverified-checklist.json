@@ -1586,7 +1586,9 @@
       "source": "https://zekamashi.net/kancolle-kouryaku/7-4/",
       "status": "partial",
       "existingEvidence": [
-        "全マスター仮想所持の直接構造選択・未知艦拒否（全論理枝ではない）"
+        "全マスター仮想所持の直接構造選択・未知艦拒否（全論理枝ではない）",
+        "保存三出典raw57/policy6・有限適用差8を独立監査。Node20ユニークはroute/親12＋placement7＋audit1、純producer2/consumer2別。実索敵式/HQ補正は未照合でmanualを維持。",
+        "known/stock/unknown C/W6初回は5保存/安全中止/同一文書load全文完了、Wknownは保存strict30通過・load後非表示で全文未到達。限定記録はdocs/pr152-seven-four-ja.md、全操作列や旧欠測の補完ではない。"
       ],
       "remaining": [
         {
@@ -1612,6 +1614,10 @@
         {
           "code": "P",
           "detail": "境界と在庫競合を組み合わせた生成→配備→最適化→艦/装備交換→保存再読込→同期更新→プランナーの全操作列"
+        },
+        {
+          "code": "X",
+          "detail": "raw33/37表・有限適用差8と実HQ0.35/0.4式を分離。六隻外/CD/大鷹系、全数量/在庫/枠競合/graph/旧履歴、Wknown後文書caller/原因・load全文未到達を残す。"
         }
       ],
       "strategyTargets": [

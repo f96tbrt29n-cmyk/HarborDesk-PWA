@@ -53,16 +53,16 @@ test('7-3 general ACE retains explicit requirements, manual states, flagship and
 test('7-3 source disagreement is not a random route or an equipment stock shortage',()=>{
  const {c,make}=context();for(const row of [...prepared43,...additionalCases].filter(x=>x.gauge===1&&x.selectedACE==='manual')){const r=c.hdFERouteContract(make(row.hulls,row.speedRank));assert.equal(r.status,'manual',row.id);assert.equal(r.checks.some(x=>x.condition.kind==='equipmentShips'),false);assert.equal(r.data.los.kind,'none');}
 });
-test('7-3 first opt-in preserves complete route outputs and speed targets of all other 52 presets',()=>{
+test('7-3 first opt-in preserves complete route outputs and speed targets of all other 51 unaffected presets',()=>{
  const {c,maps}=context(),legacy=require('./fixtures/seven-three-first-legacy-route-speed.cjs');vm.runInContext(legacy.routeSource.replace('function hdFERoute(','function hdFERouteLegacy('),c);vm.runInContext(legacy.speedSource.replace('function hdFEPlanSpeedTarget(','function hdFEPlanSpeedTargetLegacy('),c);let presets=0,comparisons=0;
  for(const [map,data]of Object.entries(maps))for(const [index,preset]of data.presets.entries()){
-  if(map==='7-3'&&index===0)continue;presets++;
+  if((map==='7-3'||map==='7-4')&&index===0)continue;presets++;
   for(const mode of ['canonical','chosen-manual','explicit-speed','unknown']){
    const p={map,routeIndex:index,preset,routeInfo:JSON.parse(JSON.stringify(c.hdFSPresetInfo(preset))),rank:mode==='unknown'?null:10,score:100,ships:['CL','DD','DD','DD','DD','DD'].map((k,i)=>({ship:'legacy-'+i,type:TYPES[k],items:[]}))};if(mode==='chosen-manual')p.suggestion={info:{...JSON.parse(JSON.stringify(p.routeInfo)),conditionManual:true}};if(mode==='explicit-speed')p.routeInfo={...p.routeInfo,text:'利用者指定 高速+統一',speedRequired:true};
    assert.deepEqual(JSON.parse(JSON.stringify(c.hdFERoute(p))),JSON.parse(JSON.stringify(c.hdFERouteLegacy(p))),map+'/'+index+'/'+mode);assert.equal(c.hdFEPlanSpeedTarget(p),c.hdFEPlanSpeedTargetLegacy(p),map+'/'+index+'/'+mode);comparisons++;
   }
  }
- assert.equal(presets,52);assert.equal(comparisons,208);
+ assert.equal(presets,51);assert.equal(comparisons,204);
  assert.ok(fs.readFileSync(path.join(root,'map-plans.js'),'utf8').includes(legacy.secondGaugeDeclaration),'second-gauge G uncertainty declaration remains byte-identical');
 });
 test('7-3 first audit and validation snapshots satisfy independent P-not-opened ACE literals without upgrading scope',()=>{

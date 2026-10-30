@@ -1,0 +1,1558 @@
+{
+  "status": "independent literals; no Node execution",
+  "source57": [
+    {
+      "id": "original-six",
+      "hulls": [
+        "BBV",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "registered initial fleet explicitly listed in article; all ordered tables agree",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "original-speed-unknown",
+      "hulls": [
+        "BBV",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": null,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "no blanket speed requirement in selected common family",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "original-fastest-no-route-change",
+      "hulls": [
+        "BBV",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 20,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "ordered tables agree",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "cav-replaces-ca",
+      "hulls": [
+        "BBV",
+        "CAV",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "ordered tables agree",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "cl-replaces-clt",
+      "hulls": [
+        "BBV",
+        "CA",
+        "CL",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "ordered tables agree",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "ct-replaces-clt",
+      "hulls": [
+        "BBV",
+        "CA",
+        "CT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "ordered tables agree",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "escort-de2",
+      "hulls": [
+        "BBV",
+        "CA",
+        "CLT",
+        "DD",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "ordered tables agree",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "escort-de3",
+      "hulls": [
+        "BBV",
+        "CA",
+        "CLT",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "ordered tables agree",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "bbv-cvl-cl-dd3",
+      "hulls": [
+        "BBV",
+        "CVL",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "explicit common route example",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "bbv-cvl-cav-dd3",
+      "hulls": [
+        "BBV",
+        "CVL",
+        "CAV",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "explicit common route example",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "bbv-cvl-ca-clt-de2",
+      "hulls": [
+        "BBV",
+        "CVL",
+        "CA",
+        "CLT",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "explicit common six-hull family using DE2",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "bbv2-ca-cl-de2",
+      "hulls": [
+        "BBV",
+        "BBV",
+        "CA",
+        "CL",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "ordered-table deduction; no blanket BBV1 requirement",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "cvl2-ca-cl-de2",
+      "hulls": [
+        "CVL",
+        "CVL",
+        "CA",
+        "CL",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "ordered-table deduction; CVL is separate from CV/CVB",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "ct-dd2-de3",
+      "hulls": [
+        "CT",
+        "DD",
+        "DD",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "ordered tables agree",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "dd1-de5",
+      "hulls": [
+        "DD",
+        "DE",
+        "DE",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "six non-DE1 avoids Japanese all-DE direct-P boundary; no AO/LHA at E",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "ct-dd1-de4",
+      "hulls": [
+        "CT",
+        "DD",
+        "DE",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "DE4 alone is not E-G without AO/LHA exact six-hull family",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "ao-dd1-de4-e-g",
+      "hulls": [
+        "AO",
+        "DD",
+        "DE",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "E-G earlier than E-J",
+      "sourceCandidates": {
+        "article": "ABEG...",
+        "JP": "ABEG...",
+        "KC": "ABEG..."
+      }
+    },
+    {
+      "id": "akitsumaru-dd1-de4-e-g",
+      "hulls": [
+        "Akitsumaru:LHA",
+        "DD",
+        "DE",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "E-G earlier than E-J",
+      "sourceCandidates": {
+        "article": "ABEG...",
+        "JP": "ABEG...",
+        "KC": "ABEG..."
+      }
+    },
+    {
+      "id": "ao-de5-e-g",
+      "hulls": [
+        "AO",
+        "DE",
+        "DE",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "DE4 plus another DE in E-G six-hull family",
+      "sourceCandidates": {
+        "article": "ABEG...",
+        "JP": "ABEG...",
+        "KC": "ABEG..."
+      }
+    },
+    {
+      "id": "akitsumaru-rescues-heavy3",
+      "hulls": [
+        "Akitsumaru:LHA",
+        "BBV",
+        "BBV",
+        "DD",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "named Akitsumaru + DE2 + extraDD rescue precedes heavy3 in all three sources",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "akitsumaru-ca2-priority-difference",
+      "hulls": [
+        "Akitsumaru:LHA",
+        "CA",
+        "CA",
+        "DD",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "manual",
+      "basis": "Japanese CA-class2 C precedes rescue; article/KC rescue precedes CA-class cap",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "C...",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "akitsumaru-cl2-priority-difference",
+      "hulls": [
+        "Akitsumaru:LHA",
+        "CL",
+        "CL",
+        "DD",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "manual",
+      "basis": "Japanese CL-class2 C precedes rescue; article/KC rescue precedes CL-class cap",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "C...",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "generic-lha-application",
+      "hulls": [
+        "LHA",
+        "BBV",
+        "BBV",
+        "DD",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "manual",
+      "basis": "exact LHA/master-name and rescue reading must remain explicit; do not apply Akitsumaru identity to every LHA",
+      "sourceCandidates": {
+        "article": "LHA rescue candidate",
+        "JP": "requires actual master/name",
+        "KC": "LHA rescue candidate"
+      }
+    },
+    {
+      "id": "ca2-escort4-narrative-table-difference",
+      "hulls": [
+        "CA",
+        "CA",
+        "DD",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "manual",
+      "basis": "article route-example says ABEJLP while its ordered start and JP/KC tables send C; retain conflict",
+      "sourceCandidates": {
+        "article-table": "C...",
+        "article-example": "ABEJLP",
+        "JP": "C...",
+        "KC": "C..."
+      }
+    },
+    {
+      "id": "cl2-escort4-narrative-table-difference",
+      "hulls": [
+        "CL",
+        "CL",
+        "DD",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "manual",
+      "basis": "article route-example and ordered-table conflict; not generalized as ready",
+      "sourceCandidates": {
+        "article-table": "C...",
+        "article-example": "ABEJLP; CLT2 specifically uncertain",
+        "JP": "C...",
+        "KC": "C..."
+      }
+    },
+    {
+      "id": "ca2-escort3-known-start-c",
+      "hulls": [
+        "CA",
+        "CA",
+        "CL",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "all ordered tables put CA-class2 before normal escort A",
+      "sourceCandidates": {
+        "article": "C...",
+        "JP": "C...",
+        "KC": "C..."
+      }
+    },
+    {
+      "id": "cl2-escort3-known-start-c",
+      "hulls": [
+        "CA",
+        "CL",
+        "CL",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "all ordered tables put CL-class2 before normal escort A",
+      "sourceCandidates": {
+        "article": "C...",
+        "JP": "C...",
+        "KC": "C..."
+      }
+    },
+    {
+      "id": "bb-known-start-c",
+      "hulls": [
+        "BB",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 20,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "known forbidden original type goes C before A; speed equipment does not change type",
+      "sourceCandidates": {
+        "article": "C...",
+        "JP": "C...",
+        "KC": "C..."
+      }
+    },
+    {
+      "id": "fbb-known-start-c",
+      "hulls": [
+        "FBB",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 20,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "known forbidden original type goes C before A; speed equipment does not change type",
+      "sourceCandidates": {
+        "article": "C...",
+        "JP": "C...",
+        "KC": "C..."
+      }
+    },
+    {
+      "id": "cv-known-start-c",
+      "hulls": [
+        "CV",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 20,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "known forbidden original type goes C before A; speed equipment does not change type",
+      "sourceCandidates": {
+        "article": "C...",
+        "JP": "C...",
+        "KC": "C..."
+      }
+    },
+    {
+      "id": "cvb-known-start-c",
+      "hulls": [
+        "CVB",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 20,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "known forbidden original type goes C before A; speed equipment does not change type",
+      "sourceCandidates": {
+        "article": "C...",
+        "JP": "C...",
+        "KC": "C..."
+      }
+    },
+    {
+      "id": "ss-known-start-c",
+      "hulls": [
+        "SS",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 20,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "known forbidden original type goes C before A; speed equipment does not change type",
+      "sourceCandidates": {
+        "article": "C...",
+        "JP": "C...",
+        "KC": "C..."
+      }
+    },
+    {
+      "id": "ssv-known-start-c",
+      "hulls": [
+        "SSV",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 20,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "known forbidden original type goes C before A; speed equipment does not change type",
+      "sourceCandidates": {
+        "article": "C...",
+        "JP": "C...",
+        "KC": "C..."
+      }
+    },
+    {
+      "id": "bb-plus-unknown-knownbad",
+      "hulls": [
+        "BB",
+        "UNKNOWN",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "separate unknown cannot erase known BB start-C priority",
+      "sourceCandidates": {
+        "article": "C...",
+        "JP": "C...",
+        "KC": "C..."
+      }
+    },
+    {
+      "id": "cv-plus-unknown-knownbad",
+      "hulls": [
+        "CV",
+        "UNKNOWN",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "separate unknown cannot erase known CV start-C priority",
+      "sourceCandidates": {
+        "article": "C...",
+        "JP": "C...",
+        "KC": "C..."
+      }
+    },
+    {
+      "id": "one-unknown-model",
+      "hulls": [
+        "BBV",
+        "CA",
+        "CLT",
+        "DD",
+        "DE",
+        "UNKNOWN"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "manual",
+      "basis": "unknown type/name may alter start/E/J; retain uncertainty",
+      "sourceCandidates": {
+        "article": "unverified",
+        "JP": "unverified",
+        "KC": "unverified"
+      }
+    },
+    {
+      "id": "cd-model-gap",
+      "hulls": [
+        "BBV",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "CD"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "source-ready/runtime-model-unknown",
+      "basis": "source DE includes CD; product known-type support is separate and must not rename CD",
+      "sourceCandidates": {
+        "article": "DE-family table candidate",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "score-below33",
+      "hulls": [
+        "BBV",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 32.999,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "J score below33 goes K before selected L",
+      "sourceCandidates": {
+        "article": "ABEJK...",
+        "JP": "ABEJK...",
+        "KC": "ABEJK..."
+      }
+    },
+    {
+      "id": "score-at33",
+      "hulls": [
+        "BBV",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 33,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "partial",
+      "basis": "known K/L random band, not an unknown source or fixed route",
+      "sourceCandidates": {
+        "article": "ABEJ(K or L)...",
+        "JP": "ABEJ(K or L)...",
+        "KC": "ABEJ(K or L)..."
+      }
+    },
+    {
+      "id": "score-before37",
+      "hulls": [
+        "BBV",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 36.999,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "partial",
+      "basis": "known K/L random band, not fixed ABEJLP",
+      "sourceCandidates": {
+        "article": "ABEJ(K or L)...",
+        "JP": "ABEJ(K or L)...",
+        "KC": "ABEJ(K or L)..."
+      }
+    },
+    {
+      "id": "score-at37",
+      "hulls": [
+        "BBV",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "raw source score at common safe threshold reaches L for original family",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "score-unknown",
+      "hulls": [
+        "BBV",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": null,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "manual",
+      "basis": "no synthesized LOS from missing HQ/ship/equipment evidence",
+      "sourceCandidates": {
+        "article": "numeric unknown",
+        "JP": "numeric unknown",
+        "KC": "numeric unknown"
+      }
+    },
+    {
+      "id": "hq-formula-not-established",
+      "hulls": [
+        "BBV",
+        "CA",
+        "CLT",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 110,
+      "sourceScore": null,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "manual",
+      "basis": "provided score was computed with product HQ0.4, KC source annotates0.35; keep formula applicability uncertain rather than changing raw33/37",
+      "sourceCandidates": {
+        "article": "HQ<120 margin recommendation",
+        "JP": "HQ<120 margin recommendation",
+        "KC": "HQ coefficient0.35 note"
+      },
+      "proposedProductScore": 37
+    },
+    {
+      "id": "five-common-table-deduction",
+      "hulls": [
+        "BBV",
+        "CA",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "all ordered tables allow selected route; deduction does not recommend fewer hulls",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "four-common-table-deduction",
+      "hulls": [
+        "CA",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "all ordered tables allow selected route; no universal route minimum6 established",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "three-dd-table-deduction",
+      "hulls": [
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "all ordered tables route A/E/J/L; deduction only",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "two-de-table-deduction",
+      "hulls": [
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "all ordered tables route A/E/J/L; deduction only",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "three-dd1-de2-directp-difference",
+      "hulls": [
+        "DD",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "manual",
+      "basis": "Japanese J exception can go P, article/KC send L",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "five-ct-dd-de3-directp",
+      "hulls": [
+        "CT",
+        "DD",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "known shortest ABEJP is a different selected path",
+      "sourceCandidates": {
+        "article": "ABEJP",
+        "JP": "ABEJP",
+        "KC": "ABEJP"
+      }
+    },
+    {
+      "id": "five-ct-taiyo-de3-directp",
+      "hulls": [
+        "CT",
+        "Taiyo:CVL",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "known shortest ABEJP is a different selected path",
+      "sourceCandidates": {
+        "article": "ABEJP",
+        "JP": "ABEJP",
+        "KC": "ABEJP"
+      }
+    },
+    {
+      "id": "five-ct-de4-priority-difference",
+      "hulls": [
+        "CT",
+        "DE",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "manual",
+      "basis": "JP CT-without-Taiyo/DD criterion goes L; KC CT1 eligible-family5 goes P; article wording uncertain",
+      "sourceCandidates": {
+        "article": "P candidate / wording uncertain",
+        "JP": "ABEJLP",
+        "KC": "ABEJP"
+      }
+    },
+    {
+      "id": "six-de-directp-difference",
+      "hulls": [
+        "DE",
+        "DE",
+        "DE",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "manual",
+      "basis": "JP six all-DE can go P; article/KC normal DE>=3 goes L",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "five-taiyo-de4-directp-difference",
+      "hulls": [
+        "Taiyo:CVL",
+        "DE",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "manual",
+      "basis": "JP direct-P family differs from KC CT-required shortest subtree; article wording uncertain",
+      "sourceCandidates": {
+        "article": "P candidate / wording uncertain",
+        "JP": "ABEJP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "five-dd2-de3",
+      "hulls": [
+        "DD",
+        "DD",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "JP DD>=2 L, article/KC DE>=3 L; smaller-fleet deduction only",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "five-generic-cvl-de4",
+      "hulls": [
+        "NonTaiyo:CVL",
+        "DE",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "ready",
+      "basis": "non-Taiyo actual master must be established; outside shortest historical family => L",
+      "sourceCandidates": {
+        "article": "ABEJLP",
+        "JP": "ABEJLP",
+        "KC": "ABEJLP"
+      }
+    },
+    {
+      "id": "one-de-start-c",
+      "hulls": [
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "missing",
+      "basis": "one-DE fleet does not satisfy start A; no arbitrary minimum6 assertion",
+      "sourceCandidates": {
+        "article": "C...",
+        "JP": "C...",
+        "KC": "C..."
+      }
+    },
+    {
+      "id": "bbv3-de3-narrative-table-and-c-difference",
+      "hulls": [
+        "BBV",
+        "BBV",
+        "BBV",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "HQ": 120,
+      "sourceScore": 37,
+      "selectedPath": "ABEJLP",
+      "sourceSelectedFixedPathStatus": "manual",
+      "basis": "all ordered starts go C, article lists ABEJLP narrative and article/JP C->E differs from KC C->D; retain disagreement",
+      "sourceCandidates": {
+        "article-table": "CEJLP candidate",
+        "article-example": "ABEJLP",
+        "JP": "CEJLP candidate",
+        "KC": "CD..."
+      }
+    }
+  ],
+  "scopedExpectations": [
+    {
+      "id": "original-six",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "original-speed-unknown",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "original-fastest-no-route-change",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "cav-replaces-ca",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "cl-replaces-clt",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "ct-replaces-clt",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "escort-de2",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "escort-de3",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "bbv-cvl-cl-dd3",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "bbv-cvl-cav-dd3",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "bbv-cvl-ca-clt-de2",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "bbv2-ca-cl-de2",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "cvl2-ca-cl-de2",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "ct-dd2-de3",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "dd1-de5",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "ct-dd1-de4",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "ao-dd1-de4-e-g",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "akitsumaru-dd1-de4-e-g",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "ao-de5-e-g",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "akitsumaru-rescues-heavy3",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "akitsumaru-ca2-priority-difference",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "akitsumaru-cl2-priority-difference",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "generic-lha-application",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "ca2-escort4-narrative-table-difference",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "cl2-escort4-narrative-table-difference",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "ca2-escort3-known-start-c",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "cl2-escort3-known-start-c",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "bb-known-start-c",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "fbb-known-start-c",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "cv-known-start-c",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "cvb-known-start-c",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "ss-known-start-c",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "ssv-known-start-c",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "bb-plus-unknown-knownbad",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "cv-plus-unknown-knownbad",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "one-unknown-model",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "cd-model-gap",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "CD model support stays unknown"
+    },
+    {
+      "id": "score-below33",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "score-at33",
+      "expectedWithIndependentRawScore": "partial",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "score-before37",
+      "expectedWithIndependentRawScore": "partial",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "score-at37",
+      "expectedWithIndependentRawScore": "ready",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "score-unknown",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "hq-formula-not-established",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "five-common-table-deduction",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "current six-hull scope; smaller source deduction or Taiyo identity not integrated"
+    },
+    {
+      "id": "four-common-table-deduction",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "current six-hull scope; smaller source deduction or Taiyo identity not integrated"
+    },
+    {
+      "id": "three-dd-table-deduction",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "current six-hull scope; smaller source deduction or Taiyo identity not integrated"
+    },
+    {
+      "id": "two-de-table-deduction",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "current six-hull scope; smaller source deduction or Taiyo identity not integrated"
+    },
+    {
+      "id": "three-dd1-de2-directp-difference",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "five-ct-dd-de3-directp",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "five-ct-taiyo-de3-directp",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "current six-hull scope; smaller source deduction or Taiyo identity not integrated"
+    },
+    {
+      "id": "five-ct-de4-priority-difference",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "six-de-directp-difference",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "five-taiyo-de4-directp-difference",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "five-dd2-de3",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "current six-hull scope; smaller source deduction or Taiyo identity not integrated"
+    },
+    {
+      "id": "five-generic-cvl-de4",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "current six-hull scope; smaller source deduction or Taiyo identity not integrated"
+    },
+    {
+      "id": "one-de-start-c",
+      "expectedWithIndependentRawScore": "missing",
+      "reason": "matches independent source literal within current scope"
+    },
+    {
+      "id": "bbv3-de3-narrative-table-and-c-difference",
+      "expectedWithIndependentRawScore": "manual",
+      "reason": "matches independent source literal within current scope"
+    }
+  ],
+  "policyExpectations": [
+    {
+      "id": "oasw-three-comparison",
+      "expected": "retain existing ASW synergy target3 as combat comparison; do not turn it into route equipmentShips3/OASW people3 sufficient or purchase3",
+      "basis": "article initial example recommends OASW3; JP role-sharing/Tokai can reduce ASW hulls"
+    },
+    {
+      "id": "night-default-one",
+      "expected": "default night1 remains an arbitrary comparison target, not universal sufficient count; source initial article recommends two finishers and permits night double attack alternatives",
+      "basis": "article lines261-263,302-311"
+    },
+    {
+      "id": "air-goal-explicit-choice",
+      "expected": "no mandatory air value or air equipment count inferred from map maximum; respect user selected combat goal",
+      "basis": "article initial example explicitly says air control unnecessary"
+    },
+    {
+      "id": "base-one-group-optional",
+      "expected": "one group availability after unlock, P radius2; no routing/base purchase mandatory assertion",
+      "basis": "article lines264-280"
+    },
+    {
+      "id": "speed-user-selected-preserved",
+      "expected": "common family no blanket speed requirement; future generalization must preserve explicit user speed/flagship/requirements instead of dropping canonical example scope globally",
+      "basis": "no speed row on common A/E/J route; existing 7-3 chosen-info boundary is an implementation pattern, not product evidence for7-4"
+    },
+    {
+      "id": "formula-versus-threshold",
+      "expected": "coef4 raw scores <33/33..37/>=37 remain separate from HQ deduction formula and margin; do not silently replace37 with38,47,57 or0.35/0.4",
+      "basis": "three ordered tables and KC HQ annotation"
+    }
+  ]
+}

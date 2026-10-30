@@ -430,7 +430,60 @@ const HD_MAP_ROUTE_REQUIREMENTS={};
  MAP_PLANS['7-3'].presets[0].gear='P開放前のACE。羽黒＋駆逐3は編成例で、出典一致の海防置換・少数隻・史実艦代替も条件確認する。夜戦装備は戦闘推奨。数値索敵や一律高速を通行必須にせず、未知艦・出典差は未判定のまま残す。';
  add('7-3',1,'ACDGJP / ACDGIJP（G分岐未確認）',[fleet(6),named('羽黒'),named('足柄'),count(['dd'],3),count(['bb','cv'],0,0),speed(10),{...count(['cav'],3),reason:'I→J：この登録例では重巡級（重巡＋航巡）3隻以上。最速などの別条件は対象外'}],{checkedAt:'2026-10-27',minimumSpeed:10,airNotRequired:true,equipmentKinds:['対潜','夜戦','煙幕'],sources:['https://zekamashi.net/kancolle-kouryaku/7-3/','https://wikiwiki.jp/kancolle/南西海域/7-3','https://zh.kcwiki.cn/wiki/南西海域/7-3'],scopeIncomplete:true,scopeIncompleteReason:'Gの重巡3隻（航巡を除く）と重巡級3隻（航巡を含む）の記載が出典間で一致せず、G→J/G→Iは未確認。固定・ランダムとは判定しません。神風を加えた編成や全艦最速化等の上位条件は別途確認。艦種・編成や根拠の問題を、装備購入で解決する不足とは扱いません。',notes:['第2ゲージ（P開放後）の羽黒・足柄・航巡1・駆逐3例。重巡は重巡洋艦のみ、重巡級は重巡洋艦＋航空巡洋艦。軽巡・雷巡・水母は算入しない。','Gは補給/水母・潜水・戦艦/空母・羽黒＋神風の条件が先。羽黒のみの高速・駆逐3例でも、ぜかましの重巡3隻と艦これwiki/舰娘百科の重巡級3隻でJ直行かI経由かが異なるため未確認。2経路表記は出典別候補でありランダムの証明ではない。','Iを通る場合は、潜水・戦艦/空母・重巡級3隻以上等を史実艦条件より優先してJへ判定。Jは戦艦/空母・低速・駆逐数を先に確認し、この登録例の駆逐3＋羽黒/足柄は後段の重巡級条件より優先してP。全経路固定・到達・勝利を保証しない。','重巡級が足りない場合は登録例の艦種・編成を見直す。未登録艦は艦情報を確認する。装備の購入数量へ換算しない。道中Jの潜水艦に煙幕または対潜対策を推奨。数値索敵条件なし。']});
  MAP_PLANS['7-3'].presets[1].gear='第2ゲージ（P開放後）の羽黒・足柄・航巡・駆逐3例。高速統一。GからJ直行かI経由かは出典が一致せず未確認。I経由時は重巡級（重巡＋航巡）3隻以上でJ、Jは駆逐3＋羽黒/足柄を後段の重巡級条件より優先。対潜・夜戦・煙幕を推奨。';
- add('7-4',0,'ABEJLP',[fleet(6),count(['戦艦','高速戦艦','cvn','ss'],0,0),count(['cav'],0,1),count(['clt'],0,1),count(['bbv','cvl','lha'],0,2),{any:[count(['escort'],3),count(['de'],2)]}],{los:los(4,37,33),equipmentTargets:[{kind:'cap-asw',label:'対潜シナジー',minCount:3}],notes:['登録した6隻の経路例。対潜枠・夜戦フィニッシャー・基地1部隊（ボス半径2）を準備。']});
+ // 7-4: source-agreed six-hull ABEJLP only. The unchanged preset is an
+ // initial combat example; source/model differences are retained as manual.
+ const sevenFourSize=(min,max=min)=>({kind:'fleetCount',min,max});
+ const sevenFourAkitsu=(min,max=min)=>({kind:'namedCount',names:['あきつ丸','あきつ丸改'],matchPolicy:'exactMasterName',min,max});
+ const sevenFourHeavyCap={any:[
+  {all:[sevenFourAkitsu(0),count(['bbv','cvl'],0,2)]},
+  {all:[sevenFourAkitsu(1),count(['bbv','cvl'],0,1)]},
+  {all:[sevenFourAkitsu(2),count(['bbv','cvl'],0,0)]}
+ ]};
+ const sevenFourEscorts={any:[count(['escort'],3),count(['de'],2)]};
+ const sevenFourClassCaps={all:[count(['cav'],0,1),count(['clt'],0,1)]};
+ const sevenFourForbidden=count(['戦艦','高速戦艦','cvn','ss'],0,0);
+ // Article93/179: DE2 is exact, not >=2. JP87 also needs an extra escort.
+ const sevenFourArticleRescue={all:[count(['lha'],1),count(['de'],2,2)]};
+ const sevenFourKcRescue={all:[count(['lha'],1),count(['de'],2),count(['escort'],3)]};
+ const sevenFourJpRescue={all:[sevenFourAkitsu(1,7),count(['de'],2),count(['escort'],3)]};
+ const sevenFourNormal={all:[sevenFourHeavyCap,sevenFourClassCaps,sevenFourEscorts]};
+ const sevenFourStarts=[
+  {all:[sevenFourForbidden,{any:[sevenFourArticleRescue,sevenFourNormal]}]},
+  {all:[sevenFourForbidden,sevenFourClassCaps,{any:[sevenFourJpRescue,{all:[sevenFourHeavyCap,sevenFourEscorts]}]}]},
+  {all:[sevenFourForbidden,{any:[sevenFourKcRescue,sevenFourNormal]}]}
+ ];
+ // Article205-209 conflicts with the ordered starts; preserve that influence.
+ const sevenFourNarrative={all:[sevenFourSize(6),{any:[
+  {all:[count(['cav'],2,2),count(['escort'],4,4)]},
+  {all:[count(['clt'],2,2),count(['escort'],4,4)]},
+  {all:[count(['bbv'],3,3),count(['de'],3,3)]},
+  {all:[count(['bbv'],1,1),count(['cvl'],2,2),count(['de'],3,3)]}
+ ]}]};
+ // E103/124: exact six-hull family, not DE4 alone. Taiyo-class identity
+ // is not inferred from CVL/escort-carrier/ctype; its influence stays manual.
+ const sevenFourKnownEG={all:[sevenFourSize(6),count(['ao','lha'],1),count(['de'],4),count(['ao','lha','dd','de'],6,6)]};
+ const sevenFourPossibleTaiyoEG={all:[sevenFourSize(6),count(['ao','lha'],1),count(['de'],4),count(['cvl'],1,1),count(['ao','lha','dd','de','cvl'],6,6)]};
+ add('7-4',0,'ABEJLP',[
+  {...sevenFourForbidden,reason:'始点：潜水艦/潜水空母・戦艦/高速戦艦・正規/装甲空母はC。航空戦艦・軽空母・潜水母艦とは別で、速力装備で元艦種を変更しない'},
+  {any:[{all:sevenFourStarts},{all:[{any:[...sevenFourStarts,sevenFourNarrative]},{kind:'unverified',reason:'始点Aの出典別候補が一致しない。救済の優先順、海防2のexact表記、記事の編成例と優先表の差を手動確認する'}]}],reason:'始点→A：三出典を別々に評価し、同じ経路になる範囲だけを扱う'},
+  {not:sevenFourKnownEG,reason:'E→J：補給/揚陸1以上・海防4以上で全六隻が補給/揚陸/駆逐/海防の指定familyなら先にG。海防4だけではGとしない'},
+  {any:[{not:sevenFourPossibleTaiyoEG},{kind:'unverified',reason:'Eの六隻familyに軽空母が入る場合、大鷹型への実マスター対応が未照合。軽空母全体を大鷹型へ数えない'}]},
+  {any:[{not:{all:[sevenFourSize(6),count(['de'],6,6)]}},{kind:'unverified',reason:'海防6隻は日本語表のJ→Pと記事/KCのJ→Lが一致しない。既知ランダム域とは区別する'}]},
+  {not:{all:[sevenFourSize(5),count(['ct'],1,1),count(['dd'],1,1),count(['de'],3,3)]},reason:'J：練巡1駆逐1海防3の五隻はLを省くP候補で、選択ABEJLPとは別。記事のP?留保を実到達の証明へ変換しない'},
+  {any:[{...count(['lha'],0,0)},{...count(['lha'],0,0),excludeMasterNames:['あきつ丸','あきつ丸改']},{kind:'unverified',reason:'あきつ丸以外/未照合の揚陸艦は救済と重い艦数の適用が未確認。全揚陸をあきつ丸へ読み替えない'}]},
+  {any:[sevenFourSize(6),{kind:'unverified',reason:'今回の成立入力範囲は六隻。少数隻の表導出・JのL/P例外は別途確認し、最低六隻や到達不可能とは断定しない'}]}
+ ],{checkedAt:'2026-10-30',useExampleScope:false,los:{...los(4,37,33),preserveRandomBand:true,numericModelUnverified:'Jのraw係数4閾値33/37は一致するが、KCの司令部補正0.35と既存計算0.4の適用は未照合。式を推測変更せず数値経路は未判定。'},equipmentTargets:[{kind:'cap-asw',label:'対潜シナジー',minCount:3}],sources:['https://zekamashi.net/kancolle-kouryaku/7-4/','https://wikiwiki.jp/kancolle/南西海域/7-4','https://zh.kcwiki.cn/wiki/南西海域/7-4'],notes:[
+  '登録した選択は始点A→B潜水→E空襲→J混成→L混成→Pボス。B→E、L→Pは出典の接続。旧図・出撃目標・通過履歴は変更せず、この条件接続で図全体や保存互換を確認済みにしない。',
+  '元の航空戦艦1＋重巡1＋雷巡1＋駆逐2＋海防1は初攻略の編成例。六隻の出典一致代替を扱うが、六隻を実ゲームの最低数・勝利推奨としない。利用者が追加した艦種・旗艦・速力条件を維持する。',
+  '始点は潜水系・通常戦艦/正空のCが先。重巡級は重巡＋航巡、軽巡級は軽巡＋雷巡＋練巡。重い艦数は航戦＋軽空＋名前が確認できたあきつ丸で、全揚陸の合計ではない。記事/JP/KCの救済優先差と記事の表/例差は未判定に残す。',
+  'E→Gは補給/揚陸と海防4を含む指定familyの六隻だけ。Jの海防6、五隻の練巡/大鷹型、三隻の駆逐1海防2などL/P例外を、索敵37だけでABEJLP成立へ変えない。CD/海防戦艦や未知マスターは製品モデルの未対応で海防へ改名しない。',
+  'Jの33式係数4はraw33未満K、33以上37未満は既知ランダム、37以上でL/Pの艦種条件を確認する。HQ120未満の+1以上推奨余裕と閾値は別。HQ補正0.35/0.4の根拠不足は未確認で既存式を変更せず、別経路Mの45/47/57を流用しない。',
+  '対潜シナジー3組は既存の戦闘比較目標で、先制対潜3人・全編成の必要十分数・購入数量ではない。初攻略記事は先制対潜3人と夜戦フィニッシャー2隻を推奨するが、東海・役割分担や夜戦連撃の代替もある。明示0や保存済みの先制対潜/夜戦目標を上書きしない。',
+  '制空は利用者が選ぶ戦闘目標。初攻略例は制空不要で、汎用の制空装備2/索敵装備2や夜戦1組を全艦隊の通行必須・十分な数量へしない。搭載合法性・枠競合・有限在庫と数値索敵は別に確認する。',
+  '基地は開放後出撃1部隊、P半径2（B7/E5/J3/L3）。基地なしの攻略も可能とされ、基地開放・陸攻4機・購入を通行必須にしない。未設定は利用者が戦闘方針を選ぶ。',
+  '艦種/隻数不一致は編成見直しへ案内する。在庫不足・搭載不可・枠競合・情報不足・探索未完了を区別し、未発見を手持ちでは不可能・購入必須・最適と断定しない。条件成立は実到達・勝利の保証ではない。'
+ ]});
+ MAP_PLANS['7-4'].presets[0].gear='ABEJLPの六隻出典一致域を確認。元編成は初攻略例で、対潜3組・夜戦・制空・基地は戦闘比較や利用者指定。Eの指定familyによるG、JのL/P例外、索敵係数4の33/37と式未照合を分ける。基地は開放後1部隊・P半径2で任意。';
  const g75=[fleet(6),count(['bb'],0,1),count(['cvn'],0,0),count(['cvl'],0,1),count(['bb','cav'],0,2),count(['cl'],1)];
  add('7-5',0,'ABDFGHK',[...g75,count(['dd'],2)],{equipmentKinds:['制空','防空','対潜','夜戦'],notes:['第1ゲージKへの例では数値索敵不要。M到達ギミックを行う場合は別に33式係数4で59以上必要。']});
  add('7-5',1,'ABDFJOQ',[...g75,count(['dd'],3)],{equipmentKinds:['制空','防空','対潜','対地','PT対策'],equipmentTargets:[{kind:'cap-pt',baseKind:'PT対策',label:'PT小鬼群対策セット',minCount:1,source:'https://zekamashi.net/kancolle-kouryaku/ptboat-taisaku/'}],notes:['第2ゲージQの対地攻略例。第1ゲージ撃破を確認。Mギミックは第3ゲージ開放に必要。']});

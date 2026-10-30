@@ -99,7 +99,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: route-summary-${{ matrix.browser }}-${{ matrix.shard }}-${{ github.run_id }}
-          path: test-results/route-seven-three-first-*/route-guidance-summary.json
+          path: |
+            test-results/route-seven-three-first-*/route-guidance-summary.json
+            test-results/route-seven-four-*/route-guidance-summary.json
           if-no-files-found: ignore
           retention-days: 14
 

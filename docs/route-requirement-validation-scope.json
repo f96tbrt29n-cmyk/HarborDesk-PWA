@@ -8886,11 +8886,6 @@
       "provisional": false,
       "conditions": [
         {
-          "kind": "fleetCount",
-          "min": 6,
-          "max": 6
-        },
-        {
           "kind": "typeCount",
           "types": [
             "戦艦",
@@ -8902,60 +8897,1429 @@
           ],
           "matchPolicy": "exact",
           "min": 0,
-          "max": 0
+          "max": 0,
+          "reason": "始点A：潜水系・通常戦艦/高速戦艦・正規/装甲空母のCが先行。航戦と軽空、潜水母艦をこの除外艦種へ混ぜない。"
         },
         {
-          "kind": "typeCount",
-          "types": [
-            "重巡洋艦",
-            "航空巡洋艦"
+          "any": [
+            {
+              "all": [
+                {
+                  "all": [
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "戦艦",
+                        "高速戦艦",
+                        "正規空母",
+                        "装甲空母",
+                        "潜水艦",
+                        "潜水空母"
+                      ],
+                      "matchPolicy": "exact",
+                      "min": 0,
+                      "max": 0
+                    },
+                    {
+                      "any": [
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "揚陸艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 1,
+                              "max": 7
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 2,
+                              "max": 2
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "any": [
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "あきつ丸",
+                                        "あきつ丸改"
+                                      ],
+                                      "matchPolicy": "exactMasterName",
+                                      "min": 0,
+                                      "max": 0
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "航空戦艦",
+                                        "軽空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 2
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "あきつ丸",
+                                        "あきつ丸改"
+                                      ],
+                                      "matchPolicy": "exactMasterName",
+                                      "min": 1,
+                                      "max": 1
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "航空戦艦",
+                                        "軽空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 1
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "あきつ丸",
+                                        "あきつ丸改"
+                                      ],
+                                      "matchPolicy": "exactMasterName",
+                                      "min": 2,
+                                      "max": 2
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "航空戦艦",
+                                        "軽空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 0
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "重巡洋艦",
+                                    "航空巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽巡洋艦",
+                                    "重雷装巡洋艦",
+                                    "練習巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 1
+                                }
+                              ]
+                            },
+                            {
+                              "any": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 7
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "all": [
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "戦艦",
+                        "高速戦艦",
+                        "正規空母",
+                        "装甲空母",
+                        "潜水艦",
+                        "潜水空母"
+                      ],
+                      "matchPolicy": "exact",
+                      "min": 0,
+                      "max": 0
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "重巡洋艦",
+                            "航空巡洋艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 1
+                        },
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "軽巡洋艦",
+                            "重雷装巡洋艦",
+                            "練習巡洋艦"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 1
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "all": [
+                            {
+                              "kind": "namedCount",
+                              "names": [
+                                "あきつ丸",
+                                "あきつ丸改"
+                              ],
+                              "matchPolicy": "exactMasterName",
+                              "min": 1,
+                              "max": 7
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 2,
+                              "max": 7
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 3,
+                              "max": 7
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "any": [
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "あきつ丸",
+                                        "あきつ丸改"
+                                      ],
+                                      "matchPolicy": "exactMasterName",
+                                      "min": 0,
+                                      "max": 0
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "航空戦艦",
+                                        "軽空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 2
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "あきつ丸",
+                                        "あきつ丸改"
+                                      ],
+                                      "matchPolicy": "exactMasterName",
+                                      "min": 1,
+                                      "max": 1
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "航空戦艦",
+                                        "軽空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 1
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "あきつ丸",
+                                        "あきつ丸改"
+                                      ],
+                                      "matchPolicy": "exactMasterName",
+                                      "min": 2,
+                                      "max": 2
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "航空戦艦",
+                                        "軽空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 0
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "any": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 7
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "all": [
+                    {
+                      "kind": "typeCount",
+                      "types": [
+                        "戦艦",
+                        "高速戦艦",
+                        "正規空母",
+                        "装甲空母",
+                        "潜水艦",
+                        "潜水空母"
+                      ],
+                      "matchPolicy": "exact",
+                      "min": 0,
+                      "max": 0
+                    },
+                    {
+                      "any": [
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "揚陸艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 1,
+                              "max": 7
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 2,
+                              "max": 7
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 3,
+                              "max": 7
+                            }
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "any": [
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "あきつ丸",
+                                        "あきつ丸改"
+                                      ],
+                                      "matchPolicy": "exactMasterName",
+                                      "min": 0,
+                                      "max": 0
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "航空戦艦",
+                                        "軽空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 2
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "あきつ丸",
+                                        "あきつ丸改"
+                                      ],
+                                      "matchPolicy": "exactMasterName",
+                                      "min": 1,
+                                      "max": 1
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "航空戦艦",
+                                        "軽空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 1
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "namedCount",
+                                      "names": [
+                                        "あきつ丸",
+                                        "あきつ丸改"
+                                      ],
+                                      "matchPolicy": "exactMasterName",
+                                      "min": 2,
+                                      "max": 2
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "航空戦艦",
+                                        "軽空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 0
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "重巡洋艦",
+                                    "航空巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽巡洋艦",
+                                    "重雷装巡洋艦",
+                                    "練習巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 1
+                                }
+                              ]
+                            },
+                            {
+                              "any": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 7
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "any": [
+                    {
+                      "all": [
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "戦艦",
+                            "高速戦艦",
+                            "正規空母",
+                            "装甲空母",
+                            "潜水艦",
+                            "潜水空母"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 0
+                        },
+                        {
+                          "any": [
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "揚陸艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 2
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "any": [
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "あきつ丸",
+                                            "あきつ丸改"
+                                          ],
+                                          "matchPolicy": "exactMasterName",
+                                          "min": 0,
+                                          "max": 0
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "航空戦艦",
+                                            "軽空母"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 2
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "あきつ丸",
+                                            "あきつ丸改"
+                                          ],
+                                          "matchPolicy": "exactMasterName",
+                                          "min": 1,
+                                          "max": 1
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "航空戦艦",
+                                            "軽空母"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 1
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "あきつ丸",
+                                            "あきつ丸改"
+                                          ],
+                                          "matchPolicy": "exactMasterName",
+                                          "min": 2,
+                                          "max": 2
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "航空戦艦",
+                                            "軽空母"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 0
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "重巡洋艦",
+                                        "航空巡洋艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 1
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "軽巡洋艦",
+                                        "重雷装巡洋艦",
+                                        "練習巡洋艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 1
+                                    }
+                                  ]
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "駆逐艦",
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 3,
+                                      "max": 7
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 2,
+                                      "max": 7
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "戦艦",
+                            "高速戦艦",
+                            "正規空母",
+                            "装甲空母",
+                            "潜水艦",
+                            "潜水空母"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 0
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "重巡洋艦",
+                                "航空巡洋艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 1
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "軽巡洋艦",
+                                "重雷装巡洋艦",
+                                "練習巡洋艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 1
+                            }
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "all": [
+                                {
+                                  "kind": "namedCount",
+                                  "names": [
+                                    "あきつ丸",
+                                    "あきつ丸改"
+                                  ],
+                                  "matchPolicy": "exactMasterName",
+                                  "min": 1,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 7
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "any": [
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "あきつ丸",
+                                            "あきつ丸改"
+                                          ],
+                                          "matchPolicy": "exactMasterName",
+                                          "min": 0,
+                                          "max": 0
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "航空戦艦",
+                                            "軽空母"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 2
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "あきつ丸",
+                                            "あきつ丸改"
+                                          ],
+                                          "matchPolicy": "exactMasterName",
+                                          "min": 1,
+                                          "max": 1
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "航空戦艦",
+                                            "軽空母"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 1
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "あきつ丸",
+                                            "あきつ丸改"
+                                          ],
+                                          "matchPolicy": "exactMasterName",
+                                          "min": 2,
+                                          "max": 2
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "航空戦艦",
+                                            "軽空母"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 0
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "駆逐艦",
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 3,
+                                      "max": 7
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 2,
+                                      "max": 7
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "typeCount",
+                          "types": [
+                            "戦艦",
+                            "高速戦艦",
+                            "正規空母",
+                            "装甲空母",
+                            "潜水艦",
+                            "潜水空母"
+                          ],
+                          "matchPolicy": "exact",
+                          "min": 0,
+                          "max": 0
+                        },
+                        {
+                          "any": [
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "揚陸艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 7
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "any": [
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "あきつ丸",
+                                            "あきつ丸改"
+                                          ],
+                                          "matchPolicy": "exactMasterName",
+                                          "min": 0,
+                                          "max": 0
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "航空戦艦",
+                                            "軽空母"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 2
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "あきつ丸",
+                                            "あきつ丸改"
+                                          ],
+                                          "matchPolicy": "exactMasterName",
+                                          "min": 1,
+                                          "max": 1
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "航空戦艦",
+                                            "軽空母"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 1
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "namedCount",
+                                          "names": [
+                                            "あきつ丸",
+                                            "あきつ丸改"
+                                          ],
+                                          "matchPolicy": "exactMasterName",
+                                          "min": 2,
+                                          "max": 2
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "航空戦艦",
+                                            "軽空母"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 0
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "重巡洋艦",
+                                        "航空巡洋艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 1
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "軽巡洋艦",
+                                        "重雷装巡洋艦",
+                                        "練習巡洋艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 1
+                                    }
+                                  ]
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "駆逐艦",
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 3,
+                                      "max": 7
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 2,
+                                      "max": 7
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "kind": "fleetCount",
+                          "min": 6,
+                          "max": 6
+                        },
+                        {
+                          "any": [
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "重巡洋艦",
+                                    "航空巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 2
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 4,
+                                  "max": 4
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽巡洋艦",
+                                    "重雷装巡洋艦",
+                                    "練習巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 2
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 4,
+                                  "max": 4
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "航空戦艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 3
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 3
+                                }
+                              ]
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "航空戦艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 2
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 3
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "kind": "unverified",
+                  "reason": "三出典の始点候補又は記事の優先表/編成例が一致しない領域は手動確認。"
+                }
+              ]
+            }
           ],
-          "matchPolicy": "exact",
-          "min": 0,
-          "max": 1
+          "reason": "始点A：記事・日本語wiki・KCの順序を別々に保持し、全候補一致のみを採用。"
         },
         {
-          "kind": "typeCount",
-          "types": [
-            "軽巡洋艦",
-            "重雷装巡洋艦",
-            "練習巡洋艦"
-          ],
-          "matchPolicy": "exact",
-          "min": 0,
-          "max": 1
+          "not": {
+            "all": [
+              {
+                "kind": "fleetCount",
+                "min": 6,
+                "max": 6
+              },
+              {
+                "kind": "typeCount",
+                "types": [
+                  "補給艦",
+                  "揚陸艦"
+                ],
+                "matchPolicy": "exact",
+                "min": 1,
+                "max": 7
+              },
+              {
+                "kind": "typeCount",
+                "types": [
+                  "海防艦"
+                ],
+                "matchPolicy": "exact",
+                "min": 4,
+                "max": 7
+              },
+              {
+                "kind": "typeCount",
+                "types": [
+                  "補給艦",
+                  "揚陸艦",
+                  "駆逐艦",
+                  "海防艦"
+                ],
+                "matchPolicy": "exact",
+                "min": 6,
+                "max": 6
+              }
+            ]
+          },
+          "reason": "E：補給/揚陸と海防4以上を含む指定6隻familyはGのため、選択ABEJLPのE→Jとは別。"
         },
         {
-          "kind": "typeCount",
-          "types": [
-            "航空戦艦",
-            "軽空母",
-            "揚陸艦"
-          ],
-          "matchPolicy": "exact",
-          "min": 0,
-          "max": 2
+          "any": [
+            {
+              "not": {
+                "all": [
+                  {
+                    "kind": "fleetCount",
+                    "min": 6,
+                    "max": 6
+                  },
+                  {
+                    "kind": "typeCount",
+                    "types": [
+                      "補給艦",
+                      "揚陸艦"
+                    ],
+                    "matchPolicy": "exact",
+                    "min": 1,
+                    "max": 7
+                  },
+                  {
+                    "kind": "typeCount",
+                    "types": [
+                      "海防艦"
+                    ],
+                    "matchPolicy": "exact",
+                    "min": 4,
+                    "max": 7
+                  },
+                  {
+                    "kind": "typeCount",
+                    "types": [
+                      "軽空母"
+                    ],
+                    "matchPolicy": "exact",
+                    "min": 1,
+                    "max": 1
+                  },
+                  {
+                    "kind": "typeCount",
+                    "types": [
+                      "補給艦",
+                      "揚陸艦",
+                      "駆逐艦",
+                      "海防艦",
+                      "軽空母"
+                    ],
+                    "matchPolicy": "exact",
+                    "min": 6,
+                    "max": 6
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "unverified",
+              "reason": "大鷹型がEの指定familyに入る場合、軽空母という艦種から型を推定しない。"
+            }
+          ]
+        },
+        {
+          "any": [
+            {
+              "not": {
+                "all": [
+                  {
+                    "kind": "fleetCount",
+                    "min": 6,
+                    "max": 6
+                  },
+                  {
+                    "kind": "typeCount",
+                    "types": [
+                      "海防艦"
+                    ],
+                    "matchPolicy": "exact",
+                    "min": 6,
+                    "max": 6
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "unverified",
+              "reason": "海防6は日本語J→Pと記事/KCのJ→Lが異なるため未判定。"
+            }
+          ]
+        },
+        {
+          "not": {
+            "all": [
+              {
+                "kind": "fleetCount",
+                "min": 5,
+                "max": 5
+              },
+              {
+                "kind": "typeCount",
+                "types": [
+                  "練習巡洋艦"
+                ],
+                "matchPolicy": "exact",
+                "min": 1,
+                "max": 1
+              },
+              {
+                "kind": "typeCount",
+                "types": [
+                  "駆逐艦"
+                ],
+                "matchPolicy": "exact",
+                "min": 1,
+                "max": 1
+              },
+              {
+                "kind": "typeCount",
+                "types": [
+                  "海防艦"
+                ],
+                "matchPolicy": "exact",
+                "min": 3,
+                "max": 3
+              }
+            ]
+          },
+          "reason": "J：練巡1・駆逐1・海防3の5隻はLを省くP候補で選択経路に不一致。記事の疑問符は実到達の証明にしない。"
         },
         {
           "any": [
             {
               "kind": "typeCount",
               "types": [
-                "駆逐艦",
-                "海防艦"
+                "揚陸艦"
               ],
               "matchPolicy": "exact",
-              "min": 3,
-              "max": 7
+              "min": 0,
+              "max": 0
             },
             {
               "kind": "typeCount",
               "types": [
-                "海防艦"
+                "揚陸艦"
               ],
               "matchPolicy": "exact",
-              "min": 2,
-              "max": 7
+              "min": 0,
+              "max": 0,
+              "excludeMasterNames": [
+                "あきつ丸",
+                "あきつ丸改"
+              ]
+            },
+            {
+              "kind": "unverified",
+              "reason": "全揚陸をあきつ丸へ一般化せず、未照合の実マスターや別の揚陸艦は影響域を未判定。"
+            }
+          ]
+        },
+        {
+          "any": [
+            {
+              "kind": "fleetCount",
+              "min": 6,
+              "max": 6
+            },
+            {
+              "kind": "unverified",
+              "reason": "実装の成立対象は出典一致の6隻域。少数隻の表導出は残し、実ゲームの最低6隻とはしない。"
             }
           ]
         }
@@ -8977,7 +10341,9 @@
             "failBelow": 33
           }
         ],
-        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。"
+        "marginNote": "司令部Lv120未満の+1以上という出典の余裕推奨と固定閾値を区別する。",
+        "preserveRandomBand": true,
+        "numericModelUnverified": "raw係数4の33/37表と、HQ補正式0.35/0.4の適用確認は別。実計算式未照合のためmanualを保持する。"
       },
       "mandatoryEquipmentShips": [],
       "strategyEquipmentTargets": [
@@ -8993,7 +10359,15 @@
         "graph": null,
         "goals": {},
         "notes": [
-          "登録した6隻の経路例。対潜枠・夜戦フィニッシャー・基地1部隊（ボス半径2）を準備。"
+          "7-4/0の選択はA→B潜水→E空襲→J混成→L混成→Pボス。今回の条件接続は旧図・旧出撃目標・通過履歴を訂正せず、実到達や勝利、保存互換を確認した記録ではない。",
+          "航空戦艦1＋重巡1＋雷巡1＋駆逐2＋海防1は初攻略の元6隻例。出典一致の6隻代替を扱う一方、少数隻のsource導出は未接続のまま保持し、最低隻数へ読み替えない。利用者の追加艦種・旗艦・明示速力を保つ。",
+          "重巡級は重巡＋航巡、軽巡級は軽巡＋雷巡＋練巡。始点は潜水系・通常戦艦/高速戦艦・正規/装甲空母のCが先。日本語wikiの重巡級/軽巡級優先と、記事/KCの揚陸救済優先を分離する。",
+          "航戦＋軽空＋名前が完全一致するあきつ丸/あきつ丸改の重い艦数を数える。全揚陸を合算せず、記事の海防2 exact表記・記事の表/例差、未照合マスター・CD/海防戦艦を未判定のまま残す。",
+          "Eの補給/揚陸＋海防4以上は指定6隻familyが揃う場合だけG。大鷹型への型対応、Jの海防6や5隻/3隻のL/P例外は未確認を残す。既知の始点CやE-G不一致を別の未知艦・索敵未判定で消さない。",
+          "Jのraw33式係数4は33未満K、33以上37未満は既知ランダム、37以上で艦種に応じたL/P判定へ進む。KCのHQ補正0.35と既存0.4式の適用は未照合で、実appはmanual・score:nullを保つ。HQ120未満の+1以上余裕推奨や別経路Mの45/47/57を固定閾値へ流用しない。",
+          "対潜シナジー3組と夜戦1組は戦闘比較目標で、先制対潜人数・通行の必須条件・全編成への必要十分数・購入数量ではない。記事の初攻略は先制対潜3人と夜戦フィニッシャー2隻を勧め、東海や夜戦連撃の代替もある。明示0・保存済み目標・利用者指定を上書きしない。",
+          "制空は利用者が選ぶ戦闘目標で初攻略例は制空不要。汎用の制空2/索敵2や同艦装備セットの部品数を通行必須へ昇格せず、有限在庫・搭載合法性・枠競合・探索未完了と分ける。",
+          "基地は開放後出撃1部隊・P半径2（B7/E5/J3/L3）の任意方針。基地なしも可能という記事の留保を残し、基地開放・陸攻4機・購入を必須にしない。艦種/隻数不一致は編成見直しへ、情報不足は未判定へ案内し、未発見を手持ちでは不可能・購入必須・最適としない。"
         ]
       },
       "verification": {
@@ -9002,6 +10376,76 @@
         "perExampleAllRequirementsPositiveNegative": false,
         "representativeAllRequirementsStages": false,
         "physicalIPhone": false
+      },
+      "equipmentKinds": [
+        "対潜",
+        "制空",
+        "防空",
+        "夜戦",
+        "索敵"
+      ],
+      "useExampleScope": false,
+      "sourceScopeAudit": {
+        "domain": "source-agreed six-hull ABEJLP only; smaller source deductions and Taiyo family are not generalized",
+        "sources": [
+          "https://zekamashi.net/kancolle-kouryaku/7-4/",
+          "https://wikiwiki.jp/kancolle/南西海域/7-4",
+          "https://zh.kcwiki.cn/wiki/南西海域/7-4"
+        ],
+        "basis": "Three saved public source tables and type definitions independently authored into this audit tree. Reason/notes prose is independent; raw threshold agreement is separate from actual arithmetic applicability.",
+        "sourceOracle": "tests/fixtures/seven-four-source-cases.json",
+        "registryAssertion": "tests/seven-four-routes.test.cjs: independently registers both7-4 audit trees against source57/policy6 and actual formula gate",
+        "sourceLiteralProposals": 57,
+        "policyLiteralProposals": 6,
+        "sourceCounts": {
+          "ready": 24,
+          "missing": 17,
+          "manual": 13,
+          "partial": 2,
+          "source-ready/runtime-model-unknown": 1
+        },
+        "scopedRawExpectedCounts": {
+          "ready": 18,
+          "missing": 16,
+          "manual": 21,
+          "partial": 2
+        },
+        "scopeAdjustmentIds": [
+          "cd-model-gap",
+          "five-common-table-deduction",
+          "four-common-table-deduction",
+          "three-dd-table-deduction",
+          "two-de-table-deduction",
+          "five-ct-taiyo-de3-directp",
+          "five-dd2-de3",
+          "five-generic-cvl-de4"
+        ],
+        "actualArithmetic": "manual / available:false / score:null while HQ0.35/0.4 applicability is unresolved; no plan.score/sourceScore bypass",
+        "existingNodeEvidence": {
+          "routeAndParentTitles": 12,
+          "routeSourceTitles": 9,
+          "parentLegacyTitles": 3,
+          "placementTitles": 7,
+          "scope": "Existing isolated evidence only; not rerun here and not a result for this additional registry title."
+        },
+        "notClaimed": [
+          "all source/game branches",
+          "real HQ numeric formula applicability",
+          "full graph or old-goal/history compatibility",
+          "universal necessary/sufficient combat quantities",
+          "finite stock/search/browser save-edit-load completion",
+          "UI/full numerical validation inferred from this registry assertion"
+        ],
+        "registryAssertionPurpose": "Independent source binding only; not full game conditions, numeric formula applicability, UI completion or a test execution claim."
+      },
+      "representativeWorkflowRecord": {
+        "record": "docs/pr152-seven-four-ja.md",
+        "sourceBindingSHA256": "427dc23141c741c31ba49508143ae806ea4d0d6785f98033f8c6f942f9b6c0fb",
+        "collectorResultSHA256": "510835f8776e9a2f0a86c102c2755935b88ed4bb6f6034bf7906ae15266ae0f8",
+        "scope": "separate six first local UI representatives, five complete/one WebKit known load-unreached; not source-audit proof",
+        "ledgerABC": "一部",
+        "ledgerD": "一部",
+        "oldSourceAuditRightsAndFalseFieldsUnchanged": true
       }
     },
     {
