@@ -15220,9 +15220,9 @@
             "failBelow": 33
           }
         ],
-        "marginNote": "司令部Lv120未満の+1以上という出典の余裕推奨と固定閾値を区別する。",
+        "marginNote": "司令部Lv120未満では出典が+1以上の余裕を推奨。閾値と余裕は区別して確認。",
         "preserveRandomBand": true,
-        "numericModelUnverified": "raw係数4の33/37表と、HQ補正式0.35/0.4の適用確認は別。実計算式未照合のためmanualを保持する。"
+        "numericModelUnverified": "Jのraw係数4閾値33/37は一致するが、KCの司令部補正0.35と既存計算0.4の適用は未照合。式を推測変更せず数値経路は未判定。"
       },
       "equipmentKinds": [
         "対潜",
@@ -15346,7 +15346,12 @@
           "UI/full numerical validation inferred from this registry assertion"
         ],
         "historicalConnectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)",
-        "registryAssertionPurpose": "Independent source binding only; not full game conditions, numeric formula applicability, UI completion or a test execution claim."
+        "registryAssertionPurpose": "Independent source binding only; not full game conditions, numeric formula applicability, UI completion or a test execution claim.",
+        "canonicalScoutingBinding": "Serialized scouting mirrors the unchanged product contract for strict consumers; independent source wording is preserved separately and does not establish numerical formula applicability.",
+        "independentScoutingExplanation": {
+          "marginNote": "司令部Lv120未満の+1以上という出典の余裕推奨と固定閾値を区別する。",
+          "numericModelUnverified": "raw係数4の33/37表と、HQ補正式0.35/0.4の適用確認は別。実計算式未照合のためmanualを保持する。"
+        }
       },
       "equipmentTargets": [
         {

@@ -75,3 +75,11 @@ secondary7-3 firstは初回6のうち5完了、Wready初回はsaved strict20＋�
 未受領4archiveはC2 attempt-diagnostics 1,181,223,459bytes、W4 attempt-diagnostics 653,203,951bytes、C2 smoke 2,369,955,692bytes、W4 smoke 1,314,076,995bytes。summary原本13件はprimary7-4初回6＋secondary7-3初回6/retry1で、分母を混ぜない。fixed version JSONは引き続き試験入力であり、製品の実ネットワーク通信成功や本番更新/cache安全の証明ではない。privateの保存値本文・実行時実値JSON・原本traceは公開記録に含めない。
 
 source-binding SHAは`89235093a4f5451fc083565d77121e4f968f91f42b6f711b38097098f93672ab`、collector closure SHAは`59b7e1e4cdc991f3abb0201d95553a8e694ddc6f692588c87822fde7c68c7608`、正式run-log ZIP SHAは`1ffeb1897b36e165159b8609f327af1ed30c6368c7d2b945e9eb8f8259dd116e`。rootによるsource commit/push後の初回CI結果であり、検証7fd5298eと後続の記録commitを区別する。新保存不一致等の停止基準、PR152ドラフト・未公開/main競合・保護対象、旧7-3原本/第2G/各欠測は維持する。
+
+## 2026-10-30 監査表現と条件生成の独立訂正
+
+初回CIのunknown-ASWケースは、7-4監査の説明2項目を独立文言にしたことで既存の59行全文一致契約と食い違った。製品の索敵値・式・manual判定は変更せず、監査の`scouting`を既存のcanonical表現へ揃え、独立説明は`sourceScopeAudit`の別欄へ保持した。係数4・安全域37・下限33・未照合フラグは不変である。続く期待条件も、明示された`preserveRandomBand===true`だけに出典下限`failBelow`を含めるpure helperへ接続した。全文一致・条件の厳密一致・例外検査は維持し、他58行の期待出力は変えない。
+
+旧監査2文字列によるNode対照1件の期待失敗と、訂正後の新Node2件の初回成功を分離した。固定環境の既存unknown-ASW対象をC/W各1回、workers1/retries0・元の45秒/12秒・入力と操作順で確認し、両方初回成功。59行LOS/数値条件の厳密比較、保存後5キー/他編成/4艦ID/metadata、reload後も0/4未判定、明示同期値更新後4/4充足まで元のassertを通過した。reference ID原文は実行時JSONに残らないため、その一致は元assert通過という証拠であり、別途生値を再読して比較したものではない。このケースにないメモ編集・CUSTOM全文・文書ID比較・strict30を追加して検証したとはしない。
+
+製品・7-4自身のspec/入力は不変なので既存Node20/代表操作6は再実行せず、進捗セルの追加変更も0。旧CIの監査停止と局所Wknown未到達、通信例外の原因未確定は保持する。訂正原本は専用worktree配下へ分離し、Node607・ブラウザー608ファイルの前後一致、trace2 CRC・動画2 SHAを確認した。初回CI記録commitと本訂正を分け、通常push後に訂正HEADのsmokeを重複なく1回確認する。これは具体的修正後の検証であり、旧HEADの成功目的の再実行ではない。

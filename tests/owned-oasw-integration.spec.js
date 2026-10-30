@@ -1,5 +1,6 @@
 const {test,expect}=require('@playwright/test');
 const fs=require('node:fs'),path=require('node:path');
+const {routeAuditNumericCondition}=require('./fixtures/route-audit-numeric-condition.cjs');
 test.use({viewport:{width:390,height:844},isMobile:true,hasTouch:true,serviceWorkers:'block'});
 const guidanceTest=test.extend({trace:{mode:'on',snapshots:false,screenshots:true,sources:true},video:'on'});
 async function boot(page){
@@ -126,7 +127,7 @@ guidanceTest('unknown opening ASW is not a confirmed equipment shortage and surv
   expect(evidence.connections).toHaveLength(59);
   for(let i=0;i<audit.rows.length;i++){
    const expected=audit.rows[i],actual=evidence.connections[i];expect(actual.id).toBe(expected.id);expect(actual.los).toEqual(expected.scouting);
-   if(expected.scouting.kind==='required'){const numeric={kind:'scoutingValue',min:expected.scouting.checks[0].safe,coef:expected.scouting.coef},condition=expected.scouting.exemptWhen?{any:[expected.scouting.exemptWhen,numeric],reason:expected.scouting.exemptNote}:numeric;expect(actual.conditions).toContainEqual(condition);}
+   if(expected.scouting.kind==='required'){const condition=routeAuditNumericCondition(expected.scouting);expect(actual.conditions).toContainEqual(condition);}
    for(const c of expected.conditions)if(c.kind==='equipmentShips'&&c.match==='drum')expect(actual.goals).toContainEqual(expect.objectContaining({kind:'drum-ships',minCount:c.min}));
   }
   const reference=await page.evaluate(()=>{
