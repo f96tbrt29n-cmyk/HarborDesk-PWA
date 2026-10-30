@@ -1,6 +1,6 @@
 # 7-5第3ABDFJOPT：選択経路の装備表示
 
-2026-10-31 JSTの限定局所記録（UTC2026-10-30の実試行）。出典確認日2026-10-30と当時の原本はそのまま保持する。base `253734f34a01052d0480ea7a9d6696b7f1448432` 上の未コミット差分であり、訂正phase6終端・5完了/1W成立load全文未到達で、最終HEAD/通常CIは未確定。PR152ドラフト・未公開を維持する。
+2026-10-31 JSTの局所・CI確定記録（実試行UTC2026-10-30）。出典確認日30日は保持。局所の253基準WIPと、通常pushした検証source1b4f9ab6／CI41086731653、後続の記録HEADを分ける。PR152ドラフト・未公開を維持する。
 
 ## 利用者から見た変更
 
@@ -45,14 +45,37 @@
 
 ## 進捗と残件
 
-基準24確認済み/145一部/67未確認から、同じ第3行B/C/Dだけ未確認→一部、24/148/64の限定更新を準備した。D確認済みにはせず、旧Cknown初回の保存/load未到達・W成立のload全文欠測を後の成功で埋めない。他58行・旧53区分・全59scouting・236セルの定義は変えない。
+局所では24/145/67から同じ第3行B/C/Dだけ未確認→一部、24/148/64としてDを一部に留めた。後述のCI直接証拠でDだけ確認済み、25/147/64とし、旧Cknown初回と旧localW成立の未到達はそのまま保持する。他58行・旧53区分・全59scouting・236セルの定義は変えない。
 
 全戦闘目標の数量/必要十分性・全在庫/合法枠/同時配備・代替、数値索敵の出典待ち、既存single-target情報不足表示、実Storageの旧目標/履歴、実ゲージ/到達/勝利は残る。第3専用carrier/ASW搭載先helperは未接続で、具体搭載先の接続未完も成功扱いにしない。
 
 <!-- seven-five-third-ci-start -->
-最終HEAD/通常push/同HEAD smokeはpending。公式passed/flaky/failedと個別初回/retryの到達を分け、記録だけの重複CIや成功目的の反復はしない。
+
+## 2026-10-31 最終source CI確定
+
+検証source `1b4f9ab60c985a3315c99e4dc68b73d19b549b3f`／[CI41086731653](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41086731653)、attempt1・workflow_dispatch実受理1回/再実行0。run failure、5smoke成功/W4失敗、Full skipped・取消0。公式C886 passed/0 flaky/0 failed、W869/11/6はcase outcomeで、厳密な初回成功数や物理試行数へ換算しない。failed6はH回避stock、5-5免除、5-1成立、6-4成立、6-1成立、固定CEFLstockの6ケースで、注記だけのdistinct3タイトルへ縮約しない。
+
+
+|job|conclusion|passed|flaky|failed|
+|---|---|---:|---:|---:|
+|C1|success|443|0|0|
+|C2|success|443|0|0|
+|W1|success|222|0|0|
+|W2|success|222|0|0|
+|W3|success|221|0|0|
+|W4|failure|204|11|6|
+
+全6jobで実Node572/572/0、checkout1b4・実image pull b27e・Node24.21.0/PW1.55.0/C1187/W2203が一致。Git期待636 manifest84094c7d…は局所runtime636と別集合で、CI実HTTP配信hashの独立実測ではない。記録commit HEADは後続で、検証source1b4と分ける。cwd未指定の最初のCLI失敗は送信前の準備失敗であり、CIを2回起動した意味ではない。
+
+自身G3は初回C3＋W成立/未知の5件が全文まで完了。W不足初回は保存編集後strict30/6anchorを通過後、総45秒期限時のload再探索click非表示で停止し、load全文はnull・結果表示12秒assertは未到達。別retry1は全文/strict30/他保持/最終例外検査まで完了した。同source/inputの同定済み6代表にこの直接証拠を対応し、既存D定義のままDだけ一部→確認済み、24/148/64→25/147/64。初回限定/flaky除外は追加せず、最終closureと独立PASSで根拠を照合した。旧Cknown期待失敗と旧localW成立load未到達を、新しい成功で補完しない。
+
+5familyのtiny原本33件はinitial30＋採取retry3。保存後読取33・load読取31・stage completed30は別指標で、不一致陽性0を一般保存安全性へ広げない。実PWのhash付きmember名/contextをsourceから同定するprivate consumer訂正は対象7契約を1回成功し、旧4pureと製品試験を反復していない。G3原本7件もinitial読取6/load5＋retry読取1/load1と分け、書込み回数へ換算しない。7-4未知初回はload/strict30等は到達一致後の最終errors[]でaccess-control2件、retry完了は別記録である。
+
+他の最終失敗4ケースは両試行のload後非表示click待機、H回避/固定CEFLの2ケースは両試行の最終errors[] access-control配列比較。後者の直前load比較通過は同source制御順からの導出で、raw実値JSON/trace取得済みの意味ではない。表示変更元/例外原因/旧障害との同原因やG3因果は未確定。例外検査は維持し、調査を拡張せず試行別原文を残す。
+
+正式attempt ZIPは1要求で11,646,536B・102member/CRC正常、SHA-256 `bc98e05726fa2ecba847f6fadbb413015b646cb58f11bfbbce325216058c6dcf`。11成果物中8 logical artifacts/310,724B（環境6＋tiny2）を受領したが、C2 attempt1,655,857,936B・W4 attempt546,114,328B・W4 smoke1,100,287,395Bは上限超で未要求、raw trace/実値JSON欠測を維持。W1のCLI0B Forbiddenは取得阻害として保持し、同じ失敗経路を反復せず各小成果物を既存connector/FileServiceで各1回取得した。raw trace/videoの受領は0で、formal ZIPはrun-log、tinyはmetadataである。collector閉鎖SHA-256 `2f0c7d522c35ff32e2dc790926c6b548e3b1007f879f0c987725cd5f6de74878`、1283ファイル31,031,336Bをhash照合し保存した。独立最終review SHA-256 `16f10e91d7fa564f92831f390ac95bba6395efc32a165a94005477272cd493b9`で全件と試行区分を照合し、記録のみの新CIは起動しない。
 <!-- seven-five-third-ci-end -->
 
-次の独立候補は3-1のsource-only設計9＋代替編成addendum。出典上CFGへ進むCV2＋駆逐4等が旧登録例との違いでmanualと「艦種変更が必要」を残す静的経路、空母の合法搭載先案内の接続を検討する。JS/UI未実行・セル加算0で、第3の成功や修正へ合算しない。
+次の3-1では、閉鎖source-only設計9＋代替編成addendumは当時JS/UI未実行の記録として保持する。以後の3-1検証・未コミット差分は別WT・別記録で、UI未実行・セル加算0。G3の証拠や成果へ合算しない。
 
 PR152ドラフト・未公開、main競合・旧原本・既知残件を保持。main統合/PR151/版/SW/本番/マージ/公開/自動マージは行わない。

@@ -1,3 +1,5 @@
+> 第3 CI確定結果（2026-10-31 JST）：source1b4f9ab6／CI41086731653 attempt1・受理1回は5smoke成功/W4失敗、Full skipped・取消0。公式C886/0/0・W869/11/6はpassed/flaky/failed case outcomeで、failed6を注記タイトル件数へ縮約しない。自身初回5full＋W不足retry1fullで6代表のD直接証拠が揃い、Dだけ一部→確認済み、25/147/64。最終source/env/closureと独立PASSをpinし、旧local/初回未到達を埋めない。
+
 > 7-5第3の限定局所記録（2026-10-31 JST／実試行UTC30日）：[ABDFJOPT](pr152-seven-five-third-ja.md)は訂正後C/W各3で5完了・W成立1件が保存編集後strict30通過後のload再探索非表示待機で総45秒終了、全文null。旧Cknown期待失敗1件と必要訂正後再検証を分離し、物理7/成功目的反復0。B/C/Dだけ未確認→一部、24/145/67→24/148/64。D確認済み・海域全体完了にはしない。最終HEAD/CIはpending。
 
 > 最終CI確定（2026-10-30 JST）：[7-5第2ABDFJOQ](pr152-seven-five-second-ja.md#2026-10-30-最終head-smoke確定)は検証source972b63a4／CI41060471226 attempt1・dispatch1/再実行0、5smoke成功・W4失敗、Full skipped・取消0。公式C882/1/0・W874/8/1はpassed/flaky/failedのcase outcome。自身初回5完了＋W成立retry1完了を同じ行の6代表へ直接対応し、Dだけ一部→確認済み、23/146/67→24/145/67。W成立初回と旧localW2のload全文未到達・表示変更元欠測は別試行のまま保持し、安定性・海域全体完了とはしない。以下は各時点の履歴。

@@ -73,8 +73,8 @@
       "非該当": 0
     },
     "D": {
-      "確認済み": 24,
-      "一部": 16,
+      "確認済み": 25,
+      "一部": 15,
       "未確認": 19,
       "非該当": 0
     }
@@ -2962,15 +2962,15 @@
           ]
         },
         "D": {
-          "status": "一部",
-          "reason": "C3とW不足/未知の5件は保存または安全中止・適用可能な編集・同一reload文書load全文/strict30/他保持完了。W成立は保存編集後保持通過後、総45秒のloadclick非表示停止で全文null。Dは一部。",
+          "status": "確認済み",
+          "reason": "source1b4/CI41086731653の同定済みinitial C3+W成立/未知5fullとW不足retry1fullで、同じ行6代表の保存/適用可能な編集/同一reload文書load全文・strict30・他編成/metadata保持を直接確認。初回限定/flaky除外を追加しない。W不足初回と旧localW成立の未到達・旧Cknown期待失敗は別履歴として保持。",
           "evidence": [
             "docs/pr152-seven-five-third-ja.md",
             "tests/route-seven-five-third.spec.js"
           ]
         }
       },
-      "remaining": "CA/DE低速453と63未満帯の出典待ち、全目標数量/在庫/枠/代替、third carrier/ASW具体搭載先、旧goal/history2キー未seed、W成立load全文とload後停止文書の表示変更元/原因は欠測。初回文書guide stackをload欠測へ流用しない。実ゲージ/到達/勝利を検証済みにしない。",
+      "remaining": "CA/DE低速453と63未満帯の出典待ち、全目標数量/在庫/枠/代替、third carrier/ASW具体搭載先、旧goal/history2キー未seed、旧localW成立と今回CIW不足初回のload全文・停止文書表示変更元/原因は欠測のまま。初回文書guide stackをload欠測へ流用しない。実ゲージ/到達/勝利を検証済みにしない。",
       "representativeWorkflowRecord": {
         "record": "sevenFiveThirdLocal20261031",
         "document": "docs/pr152-seven-five-third-ja.md",
@@ -3061,6 +3061,93 @@
         "CI": "not-started",
         "collectorCombinedClosureSHA256": "26ec31ff8ac8e4030b12950da7ad2b58cb6609358f23b3a7638bce44b8c557cb",
         "independentCombinedReviewSHA256": "b8ad7279546fc6f0540ce53b79c5f3cf3e36785f578f84f8edfaf57ffe95aebd"
+      },
+      "ownCIFinalRepresentativeRecord": {
+        "record": "sevenFiveThirdCIFinalization20261031",
+        "recordDateJST": "2026-10-31",
+        "sourceHead": "1b4f9ab60c985a3315c99e4dc68b73d19b549b3f",
+        "laterRecordingHead": null,
+        "runId": 41086731653,
+        "attempt": 1,
+        "acceptedDispatches": 1,
+        "runConclusion": "failure",
+        "smokeJobs": {
+          "success": 5,
+          "failure": 1,
+          "cancelled": 0
+        },
+        "full": "skipped",
+        "officialCaseOutcomes": {
+          "chromium": {
+            "passed": 886,
+            "flaky": 0,
+            "failed": 0,
+            "skipped": 0
+          },
+          "webkit": {
+            "passed": 869,
+            "flaky": 11,
+            "failed": 6,
+            "skipped": 0
+          }
+        },
+        "caseOutcomeCountsArePhysicalInitialPassCounts": false,
+        "ownG3": {
+          "rawRecords": 7,
+          "initial": {
+            "records": 6,
+            "full": 5,
+            "savedReads": 6,
+            "loadReads": 5
+          },
+          "retry": {
+            "state": "webkit-stock",
+            "retryIndex": 1,
+            "full": true,
+            "savedRead": true,
+            "loadRead": true
+          },
+          "logicalSixFullEvidence": "C3+Wknown/Wunknown initial5full and Wstock retry1full; each strict30, direct save/load comparisons and other metadata hold",
+          "initialWstock": {
+            "savedStrict30And6AnchorsPassed": true,
+            "stage": "after-load-search",
+            "loadWholeComparison": null,
+            "testTotalDeadlineMS": 45000,
+            "operation": "search button locator.click resolved not visible",
+            "resultVisibility12sAssertionReached": false,
+            "clickDeliveryHandlerSearchStartAndLoadDocumentDisplayCaller": null,
+            "cause": null
+          },
+          "caseOutcomes": {
+            "passed": 5,
+            "flaky": 1,
+            "failed": 0
+          },
+          "oldLocalWknownGapAndOldCknownExpectedFailureFilled": false
+        },
+        "D": {
+          "before": "一部",
+          "definitionUnchanged": true,
+          "flakyExclusionAdded": false,
+          "logicalSixIdentifiedFullOperationProof": true,
+          "generalStorageSafetyOrWholeMapCompletionClaim": false,
+          "requiresFinalSourceEnvClosureAndIndependentPass": true,
+          "prerequisitesSatisfied": true,
+          "after": "確認済み"
+        },
+        "countsBefore": [
+          24,
+          148,
+          64
+        ],
+        "readyForPublicApplication": true,
+        "collectorClosureSHA256": "2f0c7d522c35ff32e2dc790926c6b548e3b1007f879f0c987725cd5f6de74878",
+        "independentFinalReviewSHA256": "16f10e91d7fa564f92831f390ac95bba6395efc32a165a94005477272cd493b9",
+        "countsAfter": [
+          25,
+          147,
+          64
+        ]
       }
     }
   ],
@@ -3073,12 +3160,12 @@
   ],
   "selected": {
     "id": "7-5/2/default",
-    "baselineHead": "253734f34a01052d0480ea7a9d6696b7f1448432",
-    "record": "sevenFiveThirdLocal20261031",
+    "baselineHead": "1b4f9ab60c985a3315c99e4dc68b73d19b549b3f",
+    "record": "sevenFiveThirdCIFinalization20261031",
     "evidence": "docs/pr152-seven-five-third-ja.md",
-    "state": "local corrected six5full/1Wknownloadunreached; original Cknown expected-failure separate; A/B/C/D partial, final Git/CI pending"
+    "state": "CI terminal5success/W4failure; identified ownG3 initial5 plus stockWretry1 cover six representatives; Dconfirmed only, old trials/gaps preserved"
   },
-  "nextPriority": "7-5第3ABDFJOPTの選択表示scopeを独立確認する。G3草稿・未実施ブラウザーはG2証拠へ加算せず、その後の候補は3-1のsource-only確認とする。",
+  "nextPriority": "3-1 CFGを別WT・別記録で続行する。閉鎖source-only設計9＋addendumの当時JS/UI未実行という履歴を保持し、以後の独立検証/未コミット差分と区別する。3-1 UI未実行・セル加算0、G3証拠へ合算しない。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -10046,5 +10133,370 @@
     "record": "sevenFiveSecondCIFinalization20261030",
     "evidence": "docs/pr152-seven-five-second-ja.md",
     "state": "ownCI first5full + identified Wknown retry1full directly cover six same-row representatives; Dconfirmed only; old first/local gaps and whole-map limits retained"
-  }
+  },
+  "sevenFiveThirdCIFinalization20261031": {
+    "record": "sevenFiveThirdCIFinalization20261031",
+    "recordDateJST": "2026-10-31",
+    "sourceCheckedAtRetained": "2026-10-30",
+    "sourceHead": "1b4f9ab60c985a3315c99e4dc68b73d19b549b3f",
+    "laterRecordingHead": null,
+    "runId": 41086731653,
+    "attempt": 1,
+    "event": "workflow_dispatch",
+    "acceptedDispatches": 1,
+    "reruns": 0,
+    "manualCancels": 0,
+    "runConclusion": "failure",
+    "smokeJobs": {
+      "success": 5,
+      "failure": 1,
+      "cancelled": 0
+    },
+    "full": "skipped",
+    "PagesOwnRunJobs": 0,
+    "officialCaseOutcomes": {
+      "chromium": {
+        "passed": 886,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "webkit": {
+        "passed": 869,
+        "flaky": 11,
+        "failed": 6,
+        "skipped": 0
+      }
+    },
+    "caseOutcomeCountsArePhysicalInitialPassCounts": false,
+    "officialFailedCases": 6,
+    "annotationDistinctTitlesAreNotFailedTotal": true,
+    "mainDiagnosticCases": 17,
+    "capturedErrorSections": 23,
+    "environment": {
+      "jobs": 6,
+      "eachNodeFooter": {
+        "tests": 572,
+        "pass": 572,
+        "fail": 0
+      },
+      "Node": "24.21.0",
+      "Playwright": "1.55.0",
+      "ChromiumRevision": "1187",
+      "WebKitRevision": "2203",
+      "checkoutAndActualImagePullMatch": true,
+      "imageDigestPrefix": "b27e719e"
+    },
+    "source": {
+      "expectedGitFiles": 636,
+      "expectedGitManifestSHA256": "84094c7d0569716b11fe575b183c54672fa89e7415c2c917e6d5298bba6fb34e",
+      "localRuntime636DifferentSet": true,
+      "nonRecord628UnchangedAtFeatureCommit": true,
+      "CIIndependentHTTPFileHashesMeasured": false
+    },
+    "tinyMetadata": {
+      "records": 33,
+      "initialRecords": 30,
+      "retryRecords": 3,
+      "savedReads": 33,
+      "loadReads": 31,
+      "stageCompleted": 30,
+      "initialLoadReads": 28,
+      "retryLoadReads": 3,
+      "missingInitialRecords": 0,
+      "schemaSourceBodyPathJobContextValid": true,
+      "preservationPositive": 0,
+      "notRawTraceOrStorageValueBodies": true,
+      "targetedPrivateConsumerChecks": 7,
+      "oldFourCodecsUnchanged": true
+    },
+    "ownG3": {
+      "rawRecords": 7,
+      "initial": {
+        "records": 6,
+        "full": 5,
+        "savedReads": 6,
+        "loadReads": 5
+      },
+      "retry": {
+        "state": "webkit-stock",
+        "retryIndex": 1,
+        "full": true,
+        "savedRead": true,
+        "loadRead": true
+      },
+      "logicalSixFullEvidence": "C3+Wknown/Wunknown initial5full and Wstock retry1full; each strict30, direct save/load comparisons and other metadata hold",
+      "initialWstock": {
+        "savedStrict30And6AnchorsPassed": true,
+        "stage": "after-load-search",
+        "loadWholeComparison": null,
+        "testTotalDeadlineMS": 45000,
+        "operation": "search button locator.click resolved not visible",
+        "resultVisibility12sAssertionReached": false,
+        "clickDeliveryHandlerSearchStartAndLoadDocumentDisplayCaller": null,
+        "cause": null
+      },
+      "caseOutcomes": {
+        "passed": 5,
+        "flaky": 1,
+        "failed": 0
+      },
+      "oldLocalWknownGapAndOldCknownExpectedFailureFilled": false
+    },
+    "D": {
+      "before": "一部",
+      "definitionUnchanged": true,
+      "flakyExclusionAdded": false,
+      "logicalSixIdentifiedFullOperationProof": true,
+      "generalStorageSafetyOrWholeMapCompletionClaim": false,
+      "requiresFinalSourceEnvClosureAndIndependentPass": true,
+      "prerequisitesSatisfied": true,
+      "after": "確認済み"
+    },
+    "countsBefore": [
+      24,
+      148,
+      64
+    ],
+    "other58ABCDefinitionsLegacy53ScoutingUnchanged": true,
+    "otherFailures": {
+      "finalFailedSixTitles": [
+        "H avoidance stock",
+        "5-5 BKPS exempt",
+        "5-1 BCFJ ready",
+        "6-4 BDCFN ready",
+        "6-1 AFGHK ready",
+        "fixed CEFL stock"
+      ],
+      "fourHiddenClickCases": {
+        "firstAndRetry": "load-after search button wait at overall45s test deadline; full load comparison unreached",
+        "rawValueJSONOrTraceReceived": false,
+        "sameCauseAsOldOrSpecificG3Cause": null
+      },
+      "twoFinalPageerrorCases": {
+        "titles": [
+          "H avoidance stock",
+          "fixed CEFL stock"
+        ],
+        "firstAndRetry": "final errors[] equality failed with access-control messages2; preceding load comparisons passed by same-source hard order",
+        "valueComparisonFromRawJSON": false,
+        "exceptionOriginTimeAndUIImpactConfirmed": false
+      },
+      "sevenFourUnknownInitial": "load-read/strict30+CUSTOM comparisons reached and matched, then finalerrors[] access-control2; separate retry full",
+      "separateFlakyCaseTypes": {
+        "click": 10,
+        "finalPageerrorArray": 1
+      },
+      "noUnrelatedCauseAssumed": true,
+      "newInvestigationsOrReruns": 0
+    },
+    "artifacts": {
+      "environmentReceipts": 6,
+      "tinyC2W4Received": true,
+      "W1OriginalCLI": "0B Forbidden stopped; alternate connector/FileService each1 success",
+      "overCapUnrequested": [
+        {
+          "name": "C2 attempt",
+          "bytes": 1655857936
+        },
+        {
+          "name": "W4 attempt",
+          "bytes": 546114328
+        },
+        {
+          "name": "W4 smoke",
+          "bytes": 1100287395
+        }
+      ],
+      "rawC2W4TraceAndValueJSONGapsRetained": true,
+      "formalAttemptZIP": {
+        "requests": 1,
+        "bytes": 11646536,
+        "members": 102,
+        "CRC": "PASS",
+        "sha256": "bc98e05726fa2ecba847f6fadbb413015b646cb58f11bfbbce325216058c6dcf"
+      },
+      "published": 11,
+      "receivedLogical": 8,
+      "receivedArchiveBytes": 310724,
+      "rawTraceVideoReceived": 0,
+      "originalFailedRouteRepeated": false,
+      "eachExistingArtifactConnectorAndFileServiceOnce": true
+    },
+    "collectorFinalClosure": {
+      "path": "private/seven-five-third-execution-corrected-known-20261030/closure-result.json",
+      "bytes": 6347,
+      "sha256": "2f0c7d522c35ff32e2dc790926c6b548e3b1007f879f0c987725cd5f6de74878",
+      "manifest": {
+        "path": "private/seven-five-third-execution-corrected-known-20261030/collector-final-manifest.json",
+        "manifestFileBytes": 244583,
+        "files": 1283,
+        "payloadBytes": 31031336,
+        "sha256": "3d84fb0ecb5826499fef62935f8b12624fd68e0b4d5569684b62f540c99f1a3e"
+      },
+      "collectorReportedAllRehashExact": true
+    },
+    "independentFinalReview": {
+      "receipts": [
+        {
+          "path": "private/ci-independent-review-20261031/original-jobs6-review.json",
+          "bytes": 8448,
+          "sha256": "dcc9efd0b3fbab2aa93768ca2c570cde448546e51d9294f4bc1beb36869122f7"
+        },
+        {
+          "path": "private/ci-independent-review-20261031/final-source-metadata-closure-review.json",
+          "bytes": 20725,
+          "sha256": "16f10e91d7fa564f92831f390ac95bba6395efc32a165a94005477272cd493b9"
+        }
+      ],
+      "sourceMetadataAndFinal1283FileSetHashesPass": true
+    },
+    "readyForPublicApplication": true,
+    "threeOneWIPOrCellCreditIncluded": false,
+    "rawOriginalsPrivateAndSharedMetadataAllowlistOnly": true,
+    "sourceCodeBrowserCIChanges": 0,
+    "evidenceReceipts": [
+      {
+        "path": "private/seven-five-third-execution-corrected-known-20261030/ci/official-results-final.json",
+        "bytes": 8716,
+        "sha256": "5c813059546d486529c26baeaba7a8683ae3acab96d6b9e62b48ddfe517a4460"
+      },
+      {
+        "path": "private/seven-five-third-execution-corrected-known-20261030/ci/source-environment-log-audit.json",
+        "bytes": 193301,
+        "sha256": "ec342e684ca919201ed33b862e16ea57a415c752299d4449e6b43b7ccc9e0ec8"
+      },
+      {
+        "path": "private/seven-five-third-execution-corrected-known-20261030/ci/attempt1-run-log-archive-receipt.json",
+        "bytes": 583,
+        "sha256": "37fa721982517642b01c2c5e5a0786cd75c2e0675988e105f119b474cf3c1e1e"
+      },
+      {
+        "path": "private/seven-five-third-execution-corrected-known-20261030/ci/activation-receipt.json",
+        "bytes": 3092,
+        "sha256": "464be613645852633445b8efa3ffe1b9884c8592dbe85dc69e832b799529b2db"
+      },
+      {
+        "path": "private/seven-five-third-execution-corrected-known-20261030/ci-artifacts/strict-five-unit-direct-summary-classification.json",
+        "bytes": 34764,
+        "sha256": "10d80837e01823f24bb0a4533ddbe9e435072b9ad0bbdaf5b9c47d81dc65a761"
+      },
+      {
+        "path": "private/seven-five-third-execution-corrected-known-20261030/closure-result.json",
+        "bytes": 6347,
+        "sha256": "2f0c7d522c35ff32e2dc790926c6b548e3b1007f879f0c987725cd5f6de74878"
+      },
+      {
+        "path": "private/seven-five-third-execution-corrected-known-20261030/collector-final-manifest.json",
+        "bytes": 244583,
+        "sha256": "3d84fb0ecb5826499fef62935f8b12624fd68e0b4d5569684b62f540c99f1a3e"
+      },
+      {
+        "path": "private/seven-five-third-execution-corrected-known-20261030/ci/seventeen-case-final-stage-classification.json",
+        "bytes": 35242,
+        "sha256": "0e7de76f371ca17c490e0b4c2b6284fdb40ecbb10e84515b9208b5db207760ff"
+      },
+      {
+        "path": "private/ci-independent-review-20261031/original-jobs6-review.json",
+        "bytes": 8448,
+        "sha256": "dcc9efd0b3fbab2aa93768ca2c570cde448546e51d9294f4bc1beb36869122f7"
+      },
+      {
+        "path": "private/ci-independent-review-20261031/final-source-metadata-closure-review.json",
+        "bytes": 20725,
+        "sha256": "16f10e91d7fa564f92831f390ac95bba6395efc32a165a94005477272cd493b9"
+      }
+    ],
+    "privateConsumerCorrection": {
+      "actualPathDerivedFromSourceAndHashedPWMember": true,
+      "oldActiveAndClosedDispatcherUnchanged": true,
+      "targetedChecks": 7,
+      "runs": 1,
+      "rootResultSHA256": "3d5a4d0c3b1170a09c5a7caad2ba934e75851db447d32cd2acb214e1fe3ae72f",
+      "newDispatcherSHA256": "7f06c0b5afd617d0ab1882f92d79903aed679102433eda77f9a76bc4b202e598",
+      "oldPureFourNotRepeated": true
+    },
+    "capacityAtCollectorClosureBytes": 11741548544,
+    "countsAfter": [
+      25,
+      147,
+      64
+    ],
+    "perJobOfficialCaseOutcomes": [
+      {
+        "label": "C1",
+        "job": 124169723052,
+        "counts": {
+          "passed": 443,
+          "flaky": 0,
+          "failed": 0,
+          "skipped": 0
+        },
+        "conclusion": "success"
+      },
+      {
+        "label": "C2",
+        "job": 124169722941,
+        "counts": {
+          "passed": 443,
+          "flaky": 0,
+          "failed": 0,
+          "skipped": 0
+        },
+        "conclusion": "success"
+      },
+      {
+        "label": "W1",
+        "job": 124169722979,
+        "counts": {
+          "passed": 222,
+          "flaky": 0,
+          "failed": 0,
+          "skipped": 0
+        },
+        "conclusion": "success"
+      },
+      {
+        "label": "W2",
+        "job": 124169722965,
+        "counts": {
+          "passed": 222,
+          "flaky": 0,
+          "failed": 0,
+          "skipped": 0
+        },
+        "conclusion": "success"
+      },
+      {
+        "label": "W3",
+        "job": 124169723064,
+        "counts": {
+          "passed": 221,
+          "flaky": 0,
+          "failed": 0,
+          "skipped": 0
+        },
+        "conclusion": "success"
+      },
+      {
+        "label": "W4",
+        "job": 124169723181,
+        "counts": {
+          "passed": 204,
+          "flaky": 11,
+          "failed": 6,
+          "skipped": 0
+        },
+        "conclusion": "failure"
+      }
+    ]
+  },
+  "selectedBeforeSevenFiveThirdCIFinalization20261031": {
+    "id": "7-5/2/default",
+    "baselineHead": "253734f34a01052d0480ea7a9d6696b7f1448432",
+    "record": "sevenFiveThirdLocal20261031",
+    "evidence": "docs/pr152-seven-five-third-ja.md",
+    "state": "local corrected six5full/1Wknownloadunreached; original Cknown expected-failure separate; A/B/C/D partial, final Git/CI pending"
+  },
+  "nextPriorityBeforeSevenFiveThirdCIFinalization20261031": "7-5第3ABDFJOPTの選択表示scopeを独立確認する。G3草稿・未実施ブラウザーはG2証拠へ加算せず、その後の候補は3-1のsource-only確認とする。"
 }

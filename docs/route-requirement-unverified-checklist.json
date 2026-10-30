@@ -2070,6 +2070,93 @@
         "CI": "not-started",
         "collectorCombinedClosureSHA256": "26ec31ff8ac8e4030b12950da7ad2b58cb6609358f23b3a7638bce44b8c557cb",
         "independentCombinedReviewSHA256": "b8ad7279546fc6f0540ce53b79c5f3cf3e36785f578f84f8edfaf57ffe95aebd"
+      },
+      "ownCIFinalRepresentativeRecord": {
+        "record": "sevenFiveThirdCIFinalization20261031",
+        "recordDateJST": "2026-10-31",
+        "sourceHead": "1b4f9ab60c985a3315c99e4dc68b73d19b549b3f",
+        "laterRecordingHead": null,
+        "runId": 41086731653,
+        "attempt": 1,
+        "acceptedDispatches": 1,
+        "runConclusion": "failure",
+        "smokeJobs": {
+          "success": 5,
+          "failure": 1,
+          "cancelled": 0
+        },
+        "full": "skipped",
+        "officialCaseOutcomes": {
+          "chromium": {
+            "passed": 886,
+            "flaky": 0,
+            "failed": 0,
+            "skipped": 0
+          },
+          "webkit": {
+            "passed": 869,
+            "flaky": 11,
+            "failed": 6,
+            "skipped": 0
+          }
+        },
+        "caseOutcomeCountsArePhysicalInitialPassCounts": false,
+        "ownG3": {
+          "rawRecords": 7,
+          "initial": {
+            "records": 6,
+            "full": 5,
+            "savedReads": 6,
+            "loadReads": 5
+          },
+          "retry": {
+            "state": "webkit-stock",
+            "retryIndex": 1,
+            "full": true,
+            "savedRead": true,
+            "loadRead": true
+          },
+          "logicalSixFullEvidence": "C3+Wknown/Wunknown initial5full and Wstock retry1full; each strict30, direct save/load comparisons and other metadata hold",
+          "initialWstock": {
+            "savedStrict30And6AnchorsPassed": true,
+            "stage": "after-load-search",
+            "loadWholeComparison": null,
+            "testTotalDeadlineMS": 45000,
+            "operation": "search button locator.click resolved not visible",
+            "resultVisibility12sAssertionReached": false,
+            "clickDeliveryHandlerSearchStartAndLoadDocumentDisplayCaller": null,
+            "cause": null
+          },
+          "caseOutcomes": {
+            "passed": 5,
+            "flaky": 1,
+            "failed": 0
+          },
+          "oldLocalWknownGapAndOldCknownExpectedFailureFilled": false
+        },
+        "D": {
+          "before": "一部",
+          "definitionUnchanged": true,
+          "flakyExclusionAdded": false,
+          "logicalSixIdentifiedFullOperationProof": true,
+          "generalStorageSafetyOrWholeMapCompletionClaim": false,
+          "requiresFinalSourceEnvClosureAndIndependentPass": true,
+          "prerequisitesSatisfied": true,
+          "after": "確認済み"
+        },
+        "countsBefore": [
+          24,
+          148,
+          64
+        ],
+        "readyForPublicApplication": true,
+        "collectorClosureSHA256": "2f0c7d522c35ff32e2dc790926c6b548e3b1007f879f0c987725cd5f6de74878",
+        "independentFinalReviewSHA256": "16f10e91d7fa564f92831f390ac95bba6395efc32a165a94005477272cd493b9",
+        "countsAfter": [
+          25,
+          147,
+          64
+        ]
       }
     }
   ],
