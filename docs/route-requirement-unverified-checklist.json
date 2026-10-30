@@ -1833,7 +1833,8 @@
       "source": "https://zekamashi.net/kancolle-kouryaku/7-5/",
       "status": "partial",
       "existingEvidence": [
-        "全マスター仮想所持の直接構造選択・未知艦拒否（全論理枝ではない）"
+        "全マスター仮想所持の直接構造選択・未知艦拒否（全論理枝ではない）",
+        "7-5第2の限定Node29/別audit・純契約、C/W6初回4完了/2load全文未到達。全U/I/P/B未完を維持。"
       ],
       "remaining": [
         {
@@ -1861,7 +1862,23 @@
           "minCount": 1,
           "source": "https://zekamashi.net/kancolle-kouryaku/ptboat-taisaku/"
         }
-      ]
+      ],
+      "representativeWorkflowRecord": {
+        "record": "sevenFiveSecondLocal20261030",
+        "document": "docs/pr152-seven-five-second-ja.md",
+        "sourceBase": "80b156f5f3a39355946f38b8ca9d4d648c0bf45b",
+        "sourceManifestSHA256": "d734071f332c0e049a6c81d88d230962d6fca9166c96a63fc9be90012df20788",
+        "localFirstTrials": 6,
+        "savedOrSafeAbortStrict30Reads": 6,
+        "loadStrict30Reads": 4,
+        "DStillPartial": true,
+        "preservationPositiveInReachedComparisons": false,
+        "oldTrialGapsFilled": false,
+        "localComplete": 4,
+        "localAfterLoadUnreached": 2,
+        "applyAndMemoCases": 4,
+        "unknownSafeAbortAndNoEditCases": 2
+      }
     },
     {
       "map": "7-5",
@@ -1930,5 +1947,16 @@
       70
     ],
     "cellCredit": 0
+  },
+  "sevenFiveSecondLocal20261030": {
+    "record": "docs/pr152-seven-five-second-ja.md",
+    "legacySummaryUnchanged": true,
+    "remainingCodesRetained": [
+      "B",
+      "U",
+      "I",
+      "P"
+    ],
+    "fullRouteCompletion": false
   }
 }

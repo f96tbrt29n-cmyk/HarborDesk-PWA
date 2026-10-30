@@ -70,9 +70,9 @@ test('7-4 canonical identity, chosen requirements/detail/flagship and both expli
  }
  for(const location of ['routeInfo','suggestion'])for(const rank of [10,15,20]){const p=make(['BBV','CA','CLT','DD','DD','DE']),info={...JSON.parse(JSON.stringify(p.routeInfo)),text:rank===20?'最速統一':rank===15?'高速+統一':'高速統一',speedRequired:true};if(location==='routeInfo')p.routeInfo=info;else p.suggestion={info};assert.equal(c.hdFEPlanSpeedTarget(p),rank);assert.equal(c.hdFERoute(p).status,'missing');p.rank=null;assert.equal(c.hdFERoute(p).status,'manual');}
 });
-// The seven-five-first suite independently covers changed7-5/0;
-// only that new index is excluded here; every remaining complete output stays compared.
-test('7-4 reverse comparison preserves full route outputs and speed targets of every other 51 unaffected presets',()=>{
+// The seven-five-first and seven-five-second suites independently cover changed7-5/0 and7-5/1;
+// only those changed scopes are excluded here; every remaining complete output stays compared.
+test('7-4 reverse comparison preserves full route outputs and speed targets of every other 50 unaffected presets',()=>{
  const {c,maps}=context(),legacy=require('./fixtures/seven-four-legacy-route-speed.json');
  // Baseline helpers are frozen too, so a shared-helper change cannot hide behind
  // equal new-helper calls on both sides of this reverse comparison.
@@ -80,8 +80,8 @@ test('7-4 reverse comparison preserves full route outputs and speed targets of e
  vm.runInContext(legacy.contractSource.replace('function hdFERouteContract(','function hdFERouteContractLegacy(').replaceAll('hdFEBranchPredicate(','hdFEBranchPredicateLegacy('),c);
  vm.runInContext(legacy.routeSource.replace('function hdFERoute(','function hdFERouteLegacy(').replaceAll('hdFERouteContract(','hdFERouteContractLegacy(').replaceAll('hdFEBranchPredicate(','hdFEBranchPredicateLegacy('),c);
  vm.runInContext(legacy.speedSource.replace('function hdFEPlanSpeedTarget(','function hdFEPlanSpeedTargetLegacy(').replaceAll('hdFEBranchPredicate(','hdFEBranchPredicateLegacy('),c);let presets=0,comparisons=0;
- for(const [map,data]of Object.entries(maps))for(const [index,preset]of data.presets.entries()){if((map==='7-4'||map==='7-5')&&index===0)continue;presets++;for(const mode of ['canonical','chosen-manual','explicit-speed','unknown']){const p={map,routeIndex:index,preset,routeInfo:JSON.parse(JSON.stringify(c.hdFSPresetInfo(preset))),rank:mode==='unknown'?null:10,sourceScore:100,ships:['CL','DD','DD','DD','DD','DD'].map((k,i)=>({ship:'legacy-'+i,type:TYPES[k],items:[]}))};if(mode==='chosen-manual')p.suggestion={info:{...JSON.parse(JSON.stringify(p.routeInfo)),conditionManual:true}};if(mode==='explicit-speed')p.routeInfo={...p.routeInfo,text:'利用者指定 高速+統一',speedRequired:true};assert.deepEqual(JSON.parse(JSON.stringify(c.hdFERoute(p))),JSON.parse(JSON.stringify(c.hdFERouteLegacy(p))),map+'/'+index+'/'+mode);assert.equal(c.hdFEPlanSpeedTarget(p),c.hdFEPlanSpeedTargetLegacy(p),map+'/'+index+'/'+mode);comparisons++;}}
- assert.equal(presets,51);assert.equal(comparisons,204);
+ for(const [map,data]of Object.entries(maps))for(const [index,preset]of data.presets.entries()){if((map==='7-4'||map==='7-5')&&index===0||map==='7-5'&&index===1)continue;presets++;for(const mode of ['canonical','chosen-manual','explicit-speed','unknown']){const p={map,routeIndex:index,preset,routeInfo:JSON.parse(JSON.stringify(c.hdFSPresetInfo(preset))),rank:mode==='unknown'?null:10,sourceScore:100,ships:['CL','DD','DD','DD','DD','DD'].map((k,i)=>({ship:'legacy-'+i,type:TYPES[k],items:[]}))};if(mode==='chosen-manual')p.suggestion={info:{...JSON.parse(JSON.stringify(p.routeInfo)),conditionManual:true}};if(mode==='explicit-speed')p.routeInfo={...p.routeInfo,text:'利用者指定 高速+統一',speedRequired:true};assert.deepEqual(JSON.parse(JSON.stringify(c.hdFERoute(p))),JSON.parse(JSON.stringify(c.hdFERouteLegacy(p))),map+'/'+index+'/'+mode);assert.equal(c.hdFEPlanSpeedTarget(p),c.hdFEPlanSpeedTargetLegacy(p),map+'/'+index+'/'+mode);comparisons++;}}
+ assert.equal(presets,50);assert.equal(comparisons,200);
 });
 test('7-4 combat comparisons and optional base guidance do not turn routing/type mismatch into purchase quantities',()=>{
  const {all}=context(),d=all['7-4'][0];assert.equal(d.useExampleScope,false);assert.equal(d.minimumSpeed,undefined);assert.equal(d.airNotRequired,undefined);assert.equal(d.los.preserveRandomBand,true);assert.equal(d.equipmentTargets[0].minCount,3);const notes=d.notes.join(' ');for(const phrase of ['夜戦フィニッシャー2隻','先制対潜3人','既存の戦闘比較目標','明示0','半径2','基地なし','CD/海防戦艦','旧図・出撃目標','購入必須'])assert.ok(notes.includes(phrase),phrase);

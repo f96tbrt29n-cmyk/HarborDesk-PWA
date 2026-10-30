@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "base": "80b156f5f3a39355946f38b8ca9d4d648c0bf45b",
+  "canonicalKeys": [
+    "id",
+    "map",
+    "index",
+    "goal",
+    "path",
+    "conditions",
+    "scouting",
+    "equipmentKinds",
+    "useExampleScope"
+  ],
+  "selected": {
+    "map": "7-5",
+    "index": 1,
+    "path": "ABDFJOQ"
+  },
+  "unaffected": {
+    "route-goal-guidance-audit.json": {
+      "rows": 58,
+      "sha256": "8857d25455dac2952013614c4bee108aa57a400aa1d2921b6815ceee877e54b3"
+    },
+    "route-requirement-validation-scope.json": {
+      "rows": 52,
+      "sha256": "9ab7ae97ba195877d7f29ff45fce87cd982362bc326d32b4160c5e1277e0937f"
+    }
+  }
+}

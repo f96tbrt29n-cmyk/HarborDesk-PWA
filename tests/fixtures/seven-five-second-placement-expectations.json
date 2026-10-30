@@ -1,0 +1,421 @@
+{
+  "schemaVersion": 1,
+  "scope": "7-5/index1/ABDFJOQ",
+  "basis": "Independent source/API intent literals frozen before the implementation; no captured user data",
+  "cases": [
+    {
+      "id": "absent-only-default",
+      "syntheticInput": {
+        "scope": "7-5/1/ABDFJOQ",
+        "capPTRowPresent": false
+      },
+      "independentExpected": {
+        "generatedFromMap": true,
+        "purpose": "recommendation",
+        "minCount": 1,
+        "meaning": "existinggenericoptionalcomparison; notP2sufficient/passage/purchase"
+      }
+    },
+    {
+      "id": "existing-origin-absent",
+      "syntheticInput": {
+        "scope": "7-5/1/ABDFJOQ",
+        "rowOriginTag": "absent",
+        "originValue": null,
+        "minCount": 4,
+        "hasUserLabelChoiceMetadata": true
+      },
+      "independentExpected": {
+        "rowOriginPresenceTypeValuePreserved": true,
+        "minCount": 4,
+        "labelChoiceMetadataPreserved": true,
+        "purpose": "strategy",
+        "inputUnchanged": true,
+        "presetDoesNotWin": true
+      }
+    },
+    {
+      "id": "existing-origin-false",
+      "syntheticInput": {
+        "scope": "7-5/1/ABDFJOQ",
+        "rowOriginTag": "false",
+        "originValue": false,
+        "minCount": 4,
+        "hasUserLabelChoiceMetadata": true
+      },
+      "independentExpected": {
+        "rowOriginPresenceTypeValuePreserved": true,
+        "minCount": 4,
+        "labelChoiceMetadataPreserved": true,
+        "purpose": "strategy",
+        "inputUnchanged": true,
+        "presetDoesNotWin": true
+      }
+    },
+    {
+      "id": "existing-origin-true",
+      "syntheticInput": {
+        "scope": "7-5/1/ABDFJOQ",
+        "rowOriginTag": "true",
+        "originValue": true,
+        "minCount": 4,
+        "hasUserLabelChoiceMetadata": true
+      },
+      "independentExpected": {
+        "rowOriginPresenceTypeValuePreserved": true,
+        "minCount": 4,
+        "labelChoiceMetadataPreserved": true,
+        "purpose": "recommendation",
+        "inputUnchanged": true,
+        "presetDoesNotWin": true
+      }
+    },
+    {
+      "id": "existing-origin-undefined",
+      "syntheticInput": {
+        "scope": "7-5/1/ABDFJOQ",
+        "rowOriginTag": "undefined",
+        "originValue": null,
+        "minCount": 4,
+        "hasUserLabelChoiceMetadata": true
+      },
+      "independentExpected": {
+        "rowOriginPresenceTypeValuePreserved": true,
+        "minCount": 4,
+        "labelChoiceMetadataPreserved": true,
+        "purpose": "strategy",
+        "inputUnchanged": true,
+        "presetDoesNotWin": true
+      }
+    },
+    {
+      "id": "existing-origin-string-true",
+      "syntheticInput": {
+        "scope": "7-5/1/ABDFJOQ",
+        "rowOriginTag": "string-true",
+        "originValue": "true",
+        "minCount": 4,
+        "hasUserLabelChoiceMetadata": true
+      },
+      "independentExpected": {
+        "rowOriginPresenceTypeValuePreserved": true,
+        "minCount": 4,
+        "labelChoiceMetadataPreserved": true,
+        "purpose": "strategy",
+        "inputUnchanged": true,
+        "presetDoesNotWin": true
+      }
+    },
+    {
+      "id": "existing-origin-number1",
+      "syntheticInput": {
+        "scope": "7-5/1/ABDFJOQ",
+        "rowOriginTag": "number1",
+        "originValue": 1,
+        "minCount": 4,
+        "hasUserLabelChoiceMetadata": true
+      },
+      "independentExpected": {
+        "rowOriginPresenceTypeValuePreserved": true,
+        "minCount": 4,
+        "labelChoiceMetadataPreserved": true,
+        "purpose": "strategy",
+        "inputUnchanged": true,
+        "presetDoesNotWin": true
+      }
+    },
+    {
+      "id": "existing-origin-null",
+      "syntheticInput": {
+        "scope": "7-5/1/ABDFJOQ",
+        "rowOriginTag": "null",
+        "originValue": null,
+        "minCount": 4,
+        "hasUserLabelChoiceMetadata": true
+      },
+      "independentExpected": {
+        "rowOriginPresenceTypeValuePreserved": true,
+        "minCount": 4,
+        "labelChoiceMetadataPreserved": true,
+        "purpose": "strategy",
+        "inputUnchanged": true,
+        "presetDoesNotWin": true
+      }
+    },
+    {
+      "id": "explicit-strategy-trumps-true",
+      "syntheticInput": {
+        "generatedFromMap": true,
+        "purpose": "strategy",
+        "minCount": 2
+      },
+      "independentExpected": {
+        "origin": true,
+        "purpose": "strategy",
+        "minCount": 2,
+        "metadataPreserved": true
+      }
+    },
+    {
+      "id": "pre-filter-existing-row",
+      "syntheticInput": {
+        "kind": "cap-pt",
+        "generatedFromMap": true,
+        "purpose": "strategy",
+        "baseKind": "synthetic-user-choice",
+        "minCount": 2
+      },
+      "independentExpected": {
+        "notMistakenForAbsent": true,
+        "originalLastRowPreserved": true,
+        "purpose": "strategy",
+        "noAutoReplacement": true
+      }
+    },
+    {
+      "id": "duplicate-last-wins",
+      "syntheticInput": {
+        "rows": [
+          {
+            "kind": "cap-pt",
+            "generatedFromMap": true,
+            "minCount": 2
+          },
+          {
+            "kind": "cap-pt",
+            "generatedFromMap": false,
+            "minCount": 4
+          }
+        ]
+      },
+      "independentExpected": {
+        "exactlyOnePT": true,
+        "origin": false,
+        "count": 4,
+        "lastMetadataOnly": true
+      }
+    },
+    {
+      "id": "zero-not-a-PT-toggle",
+      "syntheticInput": {
+        "existingRowMinCount": 0,
+        "noExistingPTDisableUI": true
+      },
+      "independentExpected": {
+        "existingGenericNormalization": 1,
+        "noInventedDisableOrNewStorageSchema": true
+      }
+    },
+    {
+      "id": "idempotent-no-input-write",
+      "syntheticInput": {
+        "operation": "requirements twice withprioroutput andsameplan"
+      },
+      "independentExpected": {
+        "outputStable": true,
+        "inputRowsAndNestedMetadataUnchanged": true,
+        "changesOnNextCallReflected": true
+      }
+    },
+    {
+      "id": "unaffected-7-5/0/ABDFGHK",
+      "syntheticInput": {
+        "scope": "7-5/0/ABDFGHK"
+      },
+      "independentExpected": {
+        "previousFullOutputsAndProvenanceUnchanged": true,
+        "goalsHistoryAndSavingSchemaUntouched": true
+      }
+    },
+    {
+      "id": "unaffected-7-5/2/ABDFJOPT",
+      "syntheticInput": {
+        "scope": "7-5/2/ABDFJOPT"
+      },
+      "independentExpected": {
+        "previousFullOutputsAndProvenanceUnchanged": true,
+        "goalsHistoryAndSavingSchemaUntouched": true
+      }
+    },
+    {
+      "id": "unaffected-7-5/1/wrongpath",
+      "syntheticInput": {
+        "scope": "7-5/1/wrongpath"
+      },
+      "independentExpected": {
+        "previousFullOutputsAndProvenanceUnchanged": true,
+        "goalsHistoryAndSavingSchemaUntouched": true
+      }
+    },
+    {
+      "id": "unaffected-7-2/0/CEG",
+      "syntheticInput": {
+        "scope": "7-2/0/CEG"
+      },
+      "independentExpected": {
+        "previousFullOutputsAndProvenanceUnchanged": true,
+        "goalsHistoryAndSavingSchemaUntouched": true
+      }
+    },
+    {
+      "id": "unaffected-othermap",
+      "syntheticInput": {
+        "scope": "othermap"
+      },
+      "independentExpected": {
+        "previousFullOutputsAndProvenanceUnchanged": true,
+        "goalsHistoryAndSavingSchemaUntouched": true
+      }
+    },
+    {
+      "id": "recipe2-generic-only",
+      "syntheticInput": {
+        "stockRecipe": "existingDDlookout2parts"
+      },
+      "independentExpected": {
+        "globalRecipeAndMeasurementUnchanged": true,
+        "label": "genericcomparison/P2sufficiencyunconfirmed",
+        "noPTOrFlagshipKillRequirementClaim": true,
+        "noNewRecipe": true,
+        "noUnsupportedP2ThreeSlotCandidateClaim": true
+      }
+    },
+    {
+      "id": "three-normal-slots",
+      "syntheticInput": {
+        "partsSlots": [
+          [
+            0
+          ],
+          [
+            1
+          ],
+          [
+            2
+          ]
+        ],
+        "allItemsMasterCompatible": true
+      },
+      "independentExpected": {
+        "candidate": true,
+        "threePairwiseDistinctNormalSlotAssignmentRequired": true,
+        "notOwnedOrJointAllocationProof": true
+      }
+    },
+    {
+      "id": "three-parts-two-frames",
+      "syntheticInput": {
+        "partsSlots": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "pairwiseNonempty": true
+      },
+      "independentExpected": {
+        "candidate": false,
+        "classification": "knownnormalframeconflict; notinventoryshortage"
+      }
+    },
+    {
+      "id": "waterair-zero",
+      "syntheticInput": {
+        "recipe": "existingwateroption",
+        "airSlotCapacity": 0
+      },
+      "independentExpected": {
+        "airCandidate": false,
+        "noWaterReconSubstitution": true
+      }
+    },
+    {
+      "id": "nonair-zero",
+      "syntheticInput": {
+        "recipe": "existinglookoutoption",
+        "nonAircraftSlotCapacities": [
+          0,
+          0,
+          0
+        ],
+        "allCompatibilityKnown": true
+      },
+      "independentExpected": {
+        "zeroAircraftCapacityDoesNotBlockNonAirParts": true
+      }
+    },
+    {
+      "id": "unknown-profile",
+      "syntheticInput": {
+        "profileKnown": false
+      },
+      "independentExpected": {
+        "classification": "manual",
+        "notKnownBlockedOrPurchaseNeed": true
+      }
+    },
+    {
+      "id": "stock0-catalog-alternative",
+      "syntheticInput": {
+        "inventoryAll0": true,
+        "legalThreeSlotCatalogCandidate": true
+      },
+      "independentExpected": {
+        "showConcreteNamesAndAlternativeSlots": true,
+        "inventoryShortageSeparate": true,
+        "notAllCandidateHullsRequired": true,
+        "notPurchaseOrImpossibleClaim": true
+      }
+    },
+    {
+      "id": "strict-helper-provenance",
+      "syntheticInput": {
+        "origins": [
+          false,
+          "true",
+          1,
+          null
+        ],
+        "purposes": [
+          "strategy",
+          "recommendation"
+        ]
+      },
+      "independentExpected": {
+        "attachOnlyBooleanTrueAndRecommendationAndExactScope": true,
+        "existingStrategyFieldsRemainVisible": true
+      }
+    },
+    {
+      "id": "selected-profile-boundary",
+      "syntheticInput": {
+        "scopeCases": [
+          "exact1",
+          "unknown",
+          "null",
+          "wrongmap",
+          "wrongpath",
+          "indexstring1",
+          "first",
+          "third",
+          "legacy-no-preset"
+        ]
+      },
+      "independentExpected": {
+        "onlyExact1AddsPTGenericProfile": true,
+        "unknownManualNoQuantity": true,
+        "firstThirdLegacyOtherMapsUnchanged": true,
+        "explicitNightStrategyRetained": true
+      }
+    }
+  ],
+  "count": 27
+}

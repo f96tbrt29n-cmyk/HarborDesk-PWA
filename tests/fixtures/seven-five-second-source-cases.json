@@ -1,0 +1,1002 @@
+{
+  "schemaVersion": 1,
+  "unit": "seven-five-second",
+  "status": "Independent source-table proposals; not runtime or arrival evidence",
+  "definitions": {
+    "CA": "重巡洋艦",
+    "CAV": "航空巡洋艦",
+    "CL": "軽巡洋艦",
+    "CLT": "重雷装巡洋艦",
+    "CT": "練習巡洋艦",
+    "DD": "駆逐艦",
+    "DE": "海防艦",
+    "CD": "海防戦艦",
+    "BB": "戦艦",
+    "FBB": "高速戦艦",
+    "BBV": "航空戦艦",
+    "CV": "正規空母",
+    "CVB": "装甲空母",
+    "CVL": "軽空母",
+    "AV": "水上機母艦",
+    "AO": "補給艦",
+    "AS": "潜水母艦",
+    "SS": "潜水艦",
+    "SSV": "潜水空母",
+    "LHA": "揚陸艦",
+    "AR": "工作艦",
+    "UNKNOWN": "?"
+  },
+  "citations": [
+    {
+      "url": "https://zekamashi.net/kancolle-kouryaku/7-5/",
+      "lines": {
+        "B": [
+          99,
+          110
+        ],
+        "D": [
+          111,
+          121
+        ],
+        "J": [
+          127,
+          136
+        ],
+        "types": [
+          155,
+          185
+        ],
+        "Qphase": [
+          364,
+          368
+        ],
+        "P2example": [
+          373,
+          427
+        ]
+      }
+    },
+    {
+      "url": "https://zh.kcwiki.cn/wiki/南西海域/7-5",
+      "lines": {
+        "B": [
+          105,
+          116
+        ],
+        "D": [
+          117,
+          128
+        ],
+        "J": [
+          134,
+          144
+        ],
+        "types": [
+          85,
+          103
+        ],
+        "phase": [
+          170,
+          174
+        ],
+        "P2example": [
+          229,
+          251
+        ]
+      }
+    }
+  ],
+  "unavailable": [
+    {
+      "url": "https://wikiwiki.jp/kancolle/南西海域/7-5",
+      "status": 403
+    }
+  ],
+  "cases": [
+    {
+      "id": "second-original-low",
+      "hulls": [
+        "BBV",
+        "CAV",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-dd2-de1-native",
+      "hulls": [
+        "BBV",
+        "CAV",
+        "CL",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-cvl2-native",
+      "hulls": [
+        "CVL",
+        "CVL",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-fbb2-native",
+      "hulls": [
+        "FBB",
+        "FBB",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 10,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-bb-fbb-native",
+      "hulls": [
+        "BB",
+        "FBB",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-cvl2-escort3-de",
+      "hulls": [
+        "CVL",
+        "CVL",
+        "CL",
+        "DD",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-j-special-dd2-low",
+      "hulls": [
+        "CVL",
+        "CAV",
+        "CAV",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-j-special-dd1-de1-low",
+      "hulls": [
+        "CVL",
+        "CAV",
+        "CAV",
+        "CL",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-j-special-broken-by-av-low",
+      "hulls": [
+        "CVL",
+        "CAV",
+        "AV",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "N",
+          "conditionalSelectedPath": "missing"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "N",
+          "conditionalSelectedPath": "missing"
+        }
+      },
+      "sourceAgreementStatus": "missing",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-j-late-fast-escort2",
+      "hulls": [
+        "CVL",
+        "CAV",
+        "AV",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 10,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-j-cv-before-escort-native",
+      "hulls": [
+        "CV",
+        "CVL",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 10,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "N",
+          "conditionalSelectedPath": "missing"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "N",
+          "conditionalSelectedPath": "missing"
+        }
+      },
+      "sourceAgreementStatus": "missing",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-j-highplus-before-cv",
+      "hulls": [
+        "CV",
+        "CVL",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 15,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-cv2-native-stops-b",
+      "hulls": [
+        "CV",
+        "CV",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 10,
+      "expectedBySource": {
+        "article": {
+          "B": "C",
+          "D": "E",
+          "standaloneJ": "N",
+          "conditionalSelectedPath": "missing"
+        },
+        "KC": {
+          "B": "C",
+          "D": "E",
+          "standaloneJ": "N",
+          "conditionalSelectedPath": "missing"
+        }
+      },
+      "sourceAgreementStatus": "missing",
+      "scope": "six-hull conditional table deduction",
+      "standaloneJDoesNotProveJReached": true
+    },
+    {
+      "id": "second-cv2-highplus-stops-d",
+      "hulls": [
+        "CV",
+        "CV",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 15,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "E",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "missing"
+        },
+        "KC": {
+          "B": "D",
+          "D": "E",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "missing"
+        }
+      },
+      "sourceAgreementStatus": "missing",
+      "scope": "six-hull conditional table deduction",
+      "standaloneJDoesNotProveJReached": true
+    },
+    {
+      "id": "second-cv2-fastest-abstract",
+      "hulls": [
+        "CV",
+        "CV",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 20,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-d15-source-order-gap",
+      "hulls": [
+        "CV",
+        "FBB",
+        "CAV",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 15,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "candidate"
+        },
+        "KC": {
+          "B": "D",
+          "D": "E",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "missing"
+        }
+      },
+      "sourceAgreementStatus": "manual",
+      "scope": "six-hull conditional table deduction",
+      "standaloneJDoesNotProveJReached": true
+    },
+    {
+      "id": "second-d20-common-rescue",
+      "hulls": [
+        "CV",
+        "FBB",
+        "CAV",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 20,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-heavy3-before-highplus",
+      "hulls": [
+        "BB",
+        "CAV",
+        "CAV",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 15,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "E",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "missing"
+        },
+        "KC": {
+          "B": "D",
+          "D": "E",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "missing"
+        }
+      },
+      "sourceAgreementStatus": "missing",
+      "scope": "six-hull conditional table deduction",
+      "standaloneJDoesNotProveJReached": true
+    },
+    {
+      "id": "second-heavy3-fastest-abstract",
+      "hulls": [
+        "BB",
+        "CAV",
+        "CAV",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 20,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-first-like-slow-j-negative",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CL",
+        "DD",
+        "DD",
+        "AV"
+      ],
+      "speedRank": 5,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "N",
+          "conditionalSelectedPath": "missing"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "N",
+          "conditionalSelectedPath": "missing"
+        }
+      },
+      "sourceAgreementStatus": "missing",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-first-like-fast-j-positive",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CL",
+        "DD",
+        "DD",
+        "AV"
+      ],
+      "speedRank": 10,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-plaincl0-not-rescued-by-escort-native",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "DD",
+        "DD",
+        "DD",
+        "AV"
+      ],
+      "speedRank": 5,
+      "expectedBySource": {
+        "article": {
+          "B": "C",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "missing"
+        },
+        "KC": {
+          "B": "C",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "missing"
+        }
+      },
+      "sourceAgreementStatus": "missing",
+      "scope": "six-hull conditional table deduction",
+      "standaloneJDoesNotProveJReached": true
+    },
+    {
+      "id": "second-plaincl0-highplus-abstract",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "DD",
+        "DD",
+        "DD",
+        "AV"
+      ],
+      "speedRank": 15,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-two-ordinarybb-native-stops-b",
+      "hulls": [
+        "BB",
+        "BB",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "expectedBySource": {
+        "article": {
+          "B": "C",
+          "D": "F",
+          "standaloneJ": "N",
+          "conditionalSelectedPath": "missing"
+        },
+        "KC": {
+          "B": "C",
+          "D": "F",
+          "standaloneJ": "N",
+          "conditionalSelectedPath": "missing"
+        }
+      },
+      "sourceAgreementStatus": "missing",
+      "scope": "six-hull conditional table deduction",
+      "standaloneJDoesNotProveJReached": true
+    },
+    {
+      "id": "second-two-ordinarybb-highplus-abstract",
+      "hulls": [
+        "BB",
+        "BB",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 15,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-unknown-can-fill-one-special-role",
+      "hulls": [
+        "CVL",
+        "CAV",
+        "CAV",
+        "CL",
+        "DD",
+        "UNKNOWN"
+      ],
+      "speedRank": 5,
+      "expectedBySource": {
+        "article": {
+          "B": "unresolved",
+          "D": "unresolved",
+          "standaloneJ": "unresolved",
+          "conditionalSelectedPath": "manual"
+        },
+        "KC": {
+          "B": "unresolved",
+          "D": "unresolved",
+          "standaloneJ": "unresolved",
+          "conditionalSelectedPath": "manual"
+        }
+      },
+      "sourceAgreementStatus": "manual",
+      "scope": "six-hull conditional table deduction",
+      "standaloneJDoesNotProveJReached": true
+    },
+    {
+      "id": "second-unknown-cannot-fill-two-special-roles",
+      "hulls": [
+        "CVL",
+        "CAV",
+        "CL",
+        "DD",
+        "AV",
+        "UNKNOWN"
+      ],
+      "speedRank": 5,
+      "expectedBySource": {
+        "article": {
+          "B": "unresolved",
+          "D": "unresolved",
+          "standaloneJ": "N",
+          "conditionalSelectedPath": "missing"
+        },
+        "KC": {
+          "B": "unresolved",
+          "D": "unresolved",
+          "standaloneJ": "N",
+          "conditionalSelectedPath": "missing"
+        }
+      },
+      "sourceAgreementStatus": "missing",
+      "scope": "six-hull conditional table deduction",
+      "standaloneJDoesNotProveJReached": true
+    },
+    {
+      "id": "second-speed-unknown-early-rescue",
+      "hulls": [
+        "CV",
+        "CVL",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": null,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "unresolved",
+          "conditionalSelectedPath": "manual"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "unresolved",
+          "conditionalSelectedPath": "manual"
+        }
+      },
+      "sourceAgreementStatus": "manual",
+      "scope": "six-hull conditional table deduction"
+    },
+    {
+      "id": "second-smaller-table-deduction",
+      "hulls": [
+        "CL",
+        "DD",
+        "DD",
+        "DD",
+        "AV"
+      ],
+      "speedRank": 5,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "ready",
+      "scope": "five-hull table deduction; proposed finite product scope manual"
+    },
+    {
+      "id": "second-cd-normalization-gap",
+      "hulls": [
+        "BBV",
+        "CAV",
+        "CL",
+        "DD",
+        "DD",
+        "CD"
+      ],
+      "speedRank": 5,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "source-type-unverified",
+          "conditionalSelectedPath": "manual"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready"
+        }
+      },
+      "sourceAgreementStatus": "manual",
+      "scope": "six-hull conditional table deduction",
+      "articleApplicabilityGap": "Article海防/CD範囲を推測確定しない。KCrawtableDE=DE+CDは明記され、このcaseはescort3 O。",
+      "productFiniteScopeExpected": "manual",
+      "runtimeNormalizationUnverified": true
+    },
+    {
+      "id": "second-lha-carrier-equivalence-gap",
+      "hulls": [
+        "LHA",
+        "CL",
+        "DD",
+        "DD",
+        "DD",
+        "AV"
+      ],
+      "speedRank": 10,
+      "expectedBySource": {
+        "article": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready",
+          "classificationAssumption": "LiteralLHA distinct fromCV/CVB/CVL; no inferred carrier addition"
+        },
+        "KC": {
+          "B": "D",
+          "D": "F",
+          "standaloneJ": "O",
+          "conditionalSelectedPath": "ready",
+          "classificationAssumption": "LiteralLHA distinct fromCV/CVB/CVL; no inferred carrier addition"
+        }
+      },
+      "sourceAgreementStatus": "manual",
+      "scope": "six-hull conditional table deduction",
+      "productFiniteScopeExpected": "manual",
+      "rawTableSourceAgreementStatus": "ready",
+      "sourceApplicabilityStatus": "manual",
+      "sourceAgreementStatusReason": "Rawtableliteralcategoryagreement is conditional. Article185 carrier-equivalence warning is not7-5-specific orCV-vsCVL-specific, so actual applicability/runtime staysmanual.",
+      "carrierEquivalenceSensitivity": {
+        "B": "D evenifonecarrier",
+        "D": "F evenifonecarrier",
+        "J": "OunderliteralLHA orifclassifiedCVL1;NifclassifiedCV/CVB1 atknownspeed10. Theactual7-5carrier category/applicability isunverified."
+      }
+    }
+  ],
+  "count": 31,
+  "policy": {
+    "FChoice": "J",
+    "OChoice": "Q",
+    "livePhaseInferred": false,
+    "sixHullScopeIsGameMinimum": false,
+    "numericalLOS": "not-applicable-on-selected-Q",
+    "baseAviation": "unavailable",
+    "defaultPT1": "existing optional comparison, origin classification and helper remain a later phase",
+    "defaultNightCIAdded": false
+  },
+  "sourceStatusCounts": {
+    "ready": 17,
+    "missing": 9,
+    "manual": 5
+  }
+}

@@ -109,21 +109,23 @@ test('chosen requirements, complete details, flagship and each explicit speed in
  const native=concrete.cases[0],p=context().makeActual(native);p.routeInfo={...p.routeInfo,text:'航巡1雷巡1軽巡1駆逐1海防1水母1',requirements:[{token:'航巡',count:1},{token:'雷巡',count:1},{token:'軽巡',count:1},{token:'駆逐',count:1},{token:'海防艦',count:1},{token:'水母',count:1}],total:6};
  const explicit=context(),selected=explicit.makeActual(native);selected.routeInfo=plain(p.routeInfo);assert.equal(explicit.c.hdFERoute(selected).status,'ready');assert.deepEqual(plain(explicit.c.hdFERoute(selected).requirements),selected.routeInfo.requirements.map(x=>({token:x.token,need:x.count,got:x.count,ok:true})));
 });
-test('before/new isolated implementations preserve full outputs for every other52 presets and4 modes',()=>{
+// The independent second-gauge oracle in seven-five-second-routes.test.cjs owns changed7-5/1.
+test('before/new isolated implementations preserve full outputs for every other51 presets and4 modes',()=>{
  const now=context(),old=context(true);let presets=0,comparisons=0;
  for(const [map,data]of Object.entries(now.maps))for(const [index,preset]of data.presets.entries()){
-  if(map==='7-5'&&index===0)continue;presets++;
+  if(map==='7-5'&&(index===0||index===1))continue;presets++;
   assert.deepEqual(plain(now.all[map][index]),plain(old.all[map][index]),map+'/'+index+' unchanged route data');
   for(const mode of ['canonical','chosen-manual','explicit-speed','unknown']){
    const make=h=>{const p=h.make(['CL','DD','DD','DD','DD','DD'],mode==='unknown'?null:10);p.map=map;p.routeIndex=index;p.preset=h.maps[map].presets[index];p.routeInfo=plain(h.c.hdFSPresetInfo(p.preset));p.score=100;if(mode==='chosen-manual')p.suggestion={preset:p.preset,info:{...plain(p.routeInfo),conditionManual:true}};if(mode==='explicit-speed')p.routeInfo={...p.routeInfo,text:'利用者指定 高速+統一',speedRequired:true};return p},a=make(now),b=make(old);
    assert.deepEqual(plain(now.c.hdFERoute(a)),plain(old.c.hdFERoute(b)),map+'/'+index+'/'+mode+' full route output');assert.equal(now.c.hdFEPlanSpeedTarget(a),old.c.hdFEPlanSpeedTarget(b),map+'/'+index+'/'+mode+' speed target');comparisons++;
   }
  }
- assert.equal(presets,52);assert.equal(comparisons,208);
+ assert.equal(presets,51);assert.equal(comparisons,204);
 });
-test('canonical key and second/third gauge declarations stay unchanged; first guidance preserves policy limits',()=>{
+test('canonical key and third gauge declaration stay unchanged; second uses its dedicated oracle and first guidance preserves policy limits',()=>{
  const {all,maps}=context(),preset=maps['7-5'].presets[0],d=all['7-5'][0],s=fs.readFileSync(path.join(root,'map-plans.js'),'utf8');assert.equal(preset.name,'第1ゲージ 1');assert.equal(preset.ships,'航巡1＋雷巡1＋軽巡1＋駆逐2＋水母1');assert.equal(d.useExampleScope,false);assert.deepEqual(plain(d.equipmentKinds),['制空','防空','対潜','夜戦']);
- for(const [index,declaration]of Object.entries(baseline.unchangedSecondAndThirdDeclarations)){const a=s.indexOf(" add('7-5',"+index+",");assert.ok(a>=0);assert.equal(s.slice(a,s.indexOf('\n',a)),declaration,'index'+index+' declaration remains byte-identical');}
+ // The frozen index1 literal is historical; seven-five-second-routes.test.cjs owns its intentional new declaration.
+ for(const [index,declaration]of Object.entries(baseline.unchangedSecondAndThirdDeclarations)){if(index==='1')continue;const a=s.indexOf(" add('7-5',"+index+",");assert.ok(a>=0);assert.equal(s.slice(a,s.indexOf('\n',a)),declaration,'index'+index+' declaration remains byte-identical');}
  const notes=d.notes.join(' ');for(const phrase of ['FでG','HでK','ゲージ開放','二資料','未取得','軽巡洋艦のみ','駆逐＋海防','CD/海防戦艦','数値索敵','基地航空隊は使用できず','明示0','必要十分数','購入必須','旧図'])assert.ok(notes.includes(phrase),phrase);
  for(const phrase of ['第1目標K','F→G','H→K','駆逐1＋海防1','二資料','任意'])assert.ok(preset.gear.includes(phrase),'effective guidance retains '+phrase);
  assert.equal((s.match(/MAP_PLANS\['7-5'\]\.presets\[0\]\.gear=/g)||[]).length,1,'first guidance is assigned once and cannot be overwritten by a late legacy value');

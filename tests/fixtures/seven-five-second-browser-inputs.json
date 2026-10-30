@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 1,
+  "unit": "seven-five-second",
+  "status": "Synthetic browser input and independent expectations; execution evidence is recorded separately",
+  "variantId": "synthetic-cvl2-yamakaze-ding",
+  "sourceLiteralId": "second-cvl2-native",
+  "frozenPrimaryReference": "actual-cvl2-native",
+  "variantDelta": [
+    {
+      "shipIndex": 4,
+      "fromMasterId": 588,
+      "toMasterId": 667,
+      "reason": "Independent DD substitution keeps CVL2/plainCL1/DD3 native5; permits land2 on a different hull from PT3. The original actual6 fixture remains unchanged."
+    }
+  ],
+  "selectedRoute": {
+    "map": "7-5",
+    "index": 1,
+    "path": "ABDFJOQ",
+    "chosenEdges": [
+      "F->J",
+      "O->Q"
+    ],
+    "gaugePrecondition": "Synthetic selected second-Q after first-K; actual game progress is not inferred",
+    "expectedSourceArticle": {
+      "B": "D",
+      "D": "F",
+      "J": "O"
+    },
+    "expectedSourceKC": {
+      "B": "D",
+      "D": "F",
+      "J": "O"
+    },
+    "numericalScouting": "not-applicable"
+  },
+  "ships": [
+    {
+      "masterId": 408,
+      "name": "隼鷹改二",
+      "stype": 7,
+      "baseSpeed": 5,
+      "normalSlots": [
+        24,
+        18,
+        20,
+        4
+      ],
+      "ctype": 24,
+      "masterType": "軽空母",
+      "curatedType": "軽空母"
+    },
+    {
+      "masterId": 157,
+      "name": "龍驤改二",
+      "stype": 7,
+      "baseSpeed": 10,
+      "normalSlots": [
+        18,
+        28,
+        6,
+        3
+      ],
+      "ctype": 32,
+      "masterType": "軽空母",
+      "curatedType": "軽空母"
+    },
+    {
+      "masterId": 668,
+      "name": "矢矧改二乙",
+      "stype": 3,
+      "baseSpeed": 10,
+      "normalSlots": [
+        1,
+        1,
+        2,
+        2
+      ],
+      "ctype": 41,
+      "masterType": "軽巡洋艦",
+      "curatedType": "軽巡洋艦"
+    },
+    {
+      "masterId": 951,
+      "name": "天津風改二",
+      "stype": 2,
+      "baseSpeed": 10,
+      "normalSlots": [
+        0,
+        0,
+        0
+      ],
+      "ctype": 30,
+      "masterType": "駆逐艦",
+      "curatedType": "駆逐艦"
+    },
+    {
+      "masterId": 667,
+      "name": "山風改二丁",
+      "stype": 2,
+      "baseSpeed": 10,
+      "normalSlots": [
+        0,
+        0,
+        0
+      ],
+      "ctype": 23,
+      "masterType": "駆逐艦",
+      "curatedType": "駆逐艦"
+    },
+    {
+      "masterId": 144,
+      "name": "夕立改二",
+      "stype": 2,
+      "baseSpeed": 10,
+      "normalSlots": [
+        0,
+        0,
+        0
+      ],
+      "ctype": 23,
+      "masterType": "駆逐艦",
+      "curatedType": "駆逐艦"
+    }
+  ],
+  "nativeFleetRank": 5,
+  "known": {
+    "finiteInventory": [
+      {
+        "name": "試製烈風 後期型",
+        "count": 2,
+        "star": 0
+      },
+      {
+        "name": "90mm単装高角砲",
+        "count": 2,
+        "star": 0
+      },
+      {
+        "name": "13号対空電探改",
+        "count": 1,
+        "star": 0
+      },
+      {
+        "name": "15.5cm三連装副砲",
+        "count": 1,
+        "star": 0
+      },
+      {
+        "name": "25mm三連装機銃",
+        "count": 1,
+        "star": 0
+      },
+      {
+        "name": "熟練見張員",
+        "count": 1,
+        "star": 0
+      },
+      {
+        "name": "三式水中探信儀",
+        "count": 1,
+        "star": 0
+      },
+      {
+        "name": "三式爆雷投射機",
+        "count": 1,
+        "star": 0
+      },
+      {
+        "name": "大発動艇(八九式中戦車＆陸戦隊)",
+        "count": 1,
+        "star": 0
+      },
+      {
+        "name": "特二式内火艇",
+        "count": 1,
+        "star": 0
+      }
+    ],
+    "plannedRosterGear": [
+      [
+        "試製烈風 後期型",
+        "試製烈風 後期型"
+      ],
+      [
+        "90mm単装高角砲",
+        "90mm単装高角砲",
+        "13号対空電探改"
+      ],
+      [
+        "15.5cm三連装副砲",
+        "25mm三連装機銃",
+        "熟練見張員"
+      ],
+      [
+        "三式水中探信儀",
+        "三式爆雷投射機"
+      ],
+      [
+        "大発動艇(八九式中戦車＆陸戦隊)",
+        "特二式内火艇"
+      ],
+      []
+    ],
+    "removeBeforeSearch": [
+      {
+        "shipIndex": 2,
+        "slotIndex": 1
+      },
+      {
+        "shipIndex": 3,
+        "slotIndex": 1
+      },
+      {
+        "shipIndex": 4,
+        "slotIndex": 1
+      }
+    ],
+    "optionalComparisonTargets": {
+      "cap-asw": 1,
+      "cap-pt": 1,
+      "cap-land-mixed": 1
+    },
+    "gearRetentionPolicy": "proposal-exact-with-original-identity"
+  },
+  "stock": {
+    "finiteInventory": [
+      {
+        "name": "15.5cm三連装副砲",
+        "count": 1,
+        "star": 0
+      },
+      {
+        "name": "熟練見張員",
+        "count": 1,
+        "star": 0
+      }
+    ],
+    "sourceForRecipeExpectation": "Existing generic stock comparator: all eligible/incomplete; surface-lookout matched2/total3 exceeds DD-lookout1/2 and water1/3. No product model changes are needed for this choice.",
+    "expectedRecipe": "pt-surface-lookout",
+    "expectedPTParts": [
+      {
+        "part": "nightSecondary",
+        "have": 1,
+        "need": 1
+      },
+      {
+        "part": "ptMachineGun",
+        "have": 0,
+        "need": 1
+      },
+      {
+        "part": "nightLookout",
+        "have": 1,
+        "need": 1
+      }
+    ],
+    "gearRetentionPolicy": "proposal-exact-with-original-identity",
+    "initialGearNeedNotRemainExact": "Finite owned parts may intentionally be deployed. Saved gear must equal the actual proposal; identity and other-data preservation stay strict."
+  },
+  "unknown": {
+    "replaceShipIndex": 5,
+    "name": "合成・7-5第2艦情報未登録",
+    "masterId": 0,
+    "gear": "合成・7-5第2性能未登録装備",
+    "finiteInventory": [],
+    "gearRetentionPolicy": "original-full-exact"
+  },
+  "limits": [
+    "This variant does not replace or prove the frozen primary actual6 input.",
+    "ASW1/PT1/land1 are existing optional comparisons, not route requirements, sufficient combat loadouts, opening-ASW people or purchase quantities.",
+    "PT uses the existing generic model; success of a two-part model is not P2-specific sufficiency.",
+    "Raw PT item and PT-set comparisons are separate and are not added into extra required sets or purchase counts.",
+    "Under the current master permissions, the original primary cannot put the specifically selected tank166/type24 and amphibious167/type46 on the same hull. This is an equipment-compatibility boundary for that example, not a claim about every recipe, all anti-installation gear or the whole search. A separate synthetic four-slot/all-five-allowed model covers shared-slot conflict."
+  ]
+}

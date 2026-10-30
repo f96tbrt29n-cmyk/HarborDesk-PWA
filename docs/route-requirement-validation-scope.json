@@ -11808,70 +11808,1615 @@
       "provisional": false,
       "conditions": [
         {
-          "kind": "fleetCount",
-          "min": 6,
-          "max": 6
+          "any": [
+            {
+              "all": [
+                {
+                  "all": [
+                    {
+                      "any": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 15
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "正規空母",
+                                "装甲空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 1
+                            },
+                            {
+                              "kind": "slowBattleshipCount",
+                              "min": 0,
+                              "max": 1
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "軽巡洋艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 1,
+                              "max": 7
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 2,
+                              "max": 7
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "軽巡洋艦",
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 3,
+                              "max": 7
+                            },
+                            {
+                              "any": [
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "駆逐艦",
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 3,
+                                      "max": 7
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "軽巡洋艦",
+                                        "駆逐艦",
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 4,
+                                      "max": 7
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "正規空母",
+                                        "装甲空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 0
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "軽空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 1
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "戦艦",
+                                        "高速戦艦",
+                                        "航空戦艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 2
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "重巡洋艦",
+                                        "航空巡洋艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 2
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 20
+                        },
+                        {
+                          "all": [
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "正規空母",
+                                    "装甲空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 2
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "重巡洋艦",
+                                    "航空巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 2
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽巡洋艦",
+                                    "駆逐艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 7
+                                }
+                              ]
+                            },
+                            {
+                              "any": [
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 15
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "戦艦",
+                                        "高速戦艦",
+                                        "航空戦艦",
+                                        "正規空母",
+                                        "装甲空母",
+                                        "重巡洋艦",
+                                        "航空巡洋艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 2
+                                    },
+                                    {
+                                      "any": [
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "駆逐艦",
+                                            "海防艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 3,
+                                          "max": 7
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 2,
+                                              "max": 7
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "戦艦",
+                                                "高速戦艦",
+                                                "航空戦艦",
+                                                "軽空母"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 0,
+                                              "max": 2
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "軽空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 1,
+                              "max": 1
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "重巡洋艦",
+                                "航空巡洋艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 2,
+                              "max": 2
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "軽巡洋艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 1,
+                              "max": 1
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 2,
+                              "max": 2
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "軽空母",
+                                "重巡洋艦",
+                                "航空巡洋艦",
+                                "軽巡洋艦",
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 6,
+                              "max": 6
+                            }
+                          ]
+                        },
+                        {
+                          "kind": "minSpeed",
+                          "rank": 15
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "正規空母",
+                                "装甲空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 0
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "軽空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 2
+                            },
+                            {
+                              "kind": "slowBattleshipCount",
+                              "min": 0,
+                              "max": 1
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "戦艦",
+                                "高速戦艦",
+                                "航空戦艦",
+                                "重巡洋艦",
+                                "航空巡洋艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 2
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 2,
+                              "max": 7
+                            },
+                            {
+                              "any": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 10
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "all": [
+                    {
+                      "any": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 15
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "正規空母",
+                                "装甲空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 1
+                            },
+                            {
+                              "kind": "slowBattleshipCount",
+                              "min": 0,
+                              "max": 1
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "軽巡洋艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 1,
+                              "max": 7
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 2,
+                              "max": 7
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "軽巡洋艦",
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 3,
+                              "max": 7
+                            },
+                            {
+                              "any": [
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "駆逐艦",
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 3,
+                                      "max": 7
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "軽巡洋艦",
+                                        "駆逐艦",
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 4,
+                                      "max": 7
+                                    }
+                                  ]
+                                },
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "正規空母",
+                                        "装甲空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 0
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "軽空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 1
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "戦艦",
+                                        "高速戦艦",
+                                        "航空戦艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 2
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "重巡洋艦",
+                                        "航空巡洋艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 2
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "kind": "minSpeed",
+                          "rank": 20
+                        },
+                        {
+                          "all": [
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "正規空母",
+                                    "装甲空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 2
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "重巡洋艦",
+                                    "航空巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 2
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽巡洋艦",
+                                    "駆逐艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 7
+                                }
+                              ]
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "戦艦",
+                                "高速戦艦",
+                                "航空戦艦",
+                                "正規空母",
+                                "装甲空母",
+                                "重巡洋艦",
+                                "航空巡洋艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 2
+                            },
+                            {
+                              "any": [
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 15
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "駆逐艦",
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 3,
+                                      "max": 7
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "駆逐艦",
+                                            "海防艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 2,
+                                          "max": 7
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "戦艦",
+                                            "高速戦艦",
+                                            "航空戦艦",
+                                            "軽空母"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 2
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "軽空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 1,
+                              "max": 1
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "重巡洋艦",
+                                "航空巡洋艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 2,
+                              "max": 2
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "軽巡洋艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 1,
+                              "max": 1
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 2,
+                              "max": 2
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "軽空母",
+                                "重巡洋艦",
+                                "航空巡洋艦",
+                                "軽巡洋艦",
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 6,
+                              "max": 6
+                            }
+                          ]
+                        },
+                        {
+                          "kind": "minSpeed",
+                          "rank": 15
+                        },
+                        {
+                          "all": [
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "正規空母",
+                                "装甲空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 0
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "軽空母"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 2
+                            },
+                            {
+                              "kind": "slowBattleshipCount",
+                              "min": 0,
+                              "max": 1
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "戦艦",
+                                "高速戦艦",
+                                "航空戦艦",
+                                "重巡洋艦",
+                                "航空巡洋艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 0,
+                              "max": 2
+                            },
+                            {
+                              "kind": "typeCount",
+                              "types": [
+                                "駆逐艦",
+                                "海防艦"
+                              ],
+                              "matchPolicy": "exact",
+                              "min": 2,
+                              "max": 7
+                            },
+                            {
+                              "any": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "minSpeed",
+                                  "rank": 10
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "all": [
+                {
+                  "any": [
+                    {
+                      "all": [
+                        {
+                          "any": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 15
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "正規空母",
+                                    "装甲空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "slowBattleshipCount",
+                                  "min": 0,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽巡洋艦",
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 7
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "駆逐艦",
+                                            "海防艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 3,
+                                          "max": 7
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "軽巡洋艦",
+                                            "駆逐艦",
+                                            "海防艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 4,
+                                          "max": 7
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "正規空母",
+                                            "装甲空母"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 0
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "軽空母"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 1
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "戦艦",
+                                            "高速戦艦",
+                                            "航空戦艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 2
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "重巡洋艦",
+                                            "航空巡洋艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 2
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 20
+                            },
+                            {
+                              "all": [
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "正規空母",
+                                        "装甲空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 1
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "軽空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 2
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "戦艦",
+                                        "高速戦艦",
+                                        "航空戦艦",
+                                        "重巡洋艦",
+                                        "航空巡洋艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 2
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "軽巡洋艦",
+                                        "駆逐艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 1,
+                                      "max": 7
+                                    }
+                                  ]
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "kind": "minSpeed",
+                                      "rank": 15
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "戦艦",
+                                            "高速戦艦",
+                                            "航空戦艦",
+                                            "正規空母",
+                                            "装甲空母",
+                                            "重巡洋艦",
+                                            "航空巡洋艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 2
+                                        },
+                                        {
+                                          "any": [
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 3,
+                                              "max": 7
+                                            },
+                                            {
+                                              "all": [
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "駆逐艦",
+                                                    "海防艦"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 2,
+                                                  "max": 7
+                                                },
+                                                {
+                                                  "kind": "typeCount",
+                                                  "types": [
+                                                    "戦艦",
+                                                    "高速戦艦",
+                                                    "航空戦艦",
+                                                    "軽空母"
+                                                  ],
+                                                  "matchPolicy": "exact",
+                                                  "min": 0,
+                                                  "max": 2
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "重巡洋艦",
+                                    "航空巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 2
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 2
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽空母",
+                                    "重巡洋艦",
+                                    "航空巡洋艦",
+                                    "軽巡洋艦",
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 6,
+                                  "max": 6
+                                }
+                              ]
+                            },
+                            {
+                              "kind": "minSpeed",
+                              "rank": 15
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "正規空母",
+                                    "装甲空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 0
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 2
+                                },
+                                {
+                                  "kind": "slowBattleshipCount",
+                                  "min": 0,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "重巡洋艦",
+                                    "航空巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 2
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 7
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "駆逐艦",
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 3,
+                                      "max": 7
+                                    },
+                                    {
+                                      "kind": "minSpeed",
+                                      "rank": 10
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "any": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 15
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "正規空母",
+                                    "装甲空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "slowBattleshipCount",
+                                  "min": 0,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 7
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽巡洋艦",
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 3,
+                                  "max": 7
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "駆逐艦",
+                                            "海防艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 3,
+                                          "max": 7
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "軽巡洋艦",
+                                            "駆逐艦",
+                                            "海防艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 4,
+                                          "max": 7
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "all": [
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "正規空母",
+                                            "装甲空母"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 0
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "軽空母"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 1
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "戦艦",
+                                            "高速戦艦",
+                                            "航空戦艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 2
+                                        },
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "重巡洋艦",
+                                            "航空巡洋艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 0,
+                                          "max": 2
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "kind": "minSpeed",
+                              "rank": 20
+                            },
+                            {
+                              "all": [
+                                {
+                                  "all": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "正規空母",
+                                        "装甲空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 1
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "軽空母"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 2
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "戦艦",
+                                        "高速戦艦",
+                                        "航空戦艦",
+                                        "重巡洋艦",
+                                        "航空巡洋艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 0,
+                                      "max": 2
+                                    },
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "軽巡洋艦",
+                                        "駆逐艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 1,
+                                      "max": 7
+                                    }
+                                  ]
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "正規空母",
+                                    "装甲空母",
+                                    "重巡洋艦",
+                                    "航空巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 2
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "kind": "minSpeed",
+                                      "rank": 15
+                                    },
+                                    {
+                                      "any": [
+                                        {
+                                          "kind": "typeCount",
+                                          "types": [
+                                            "駆逐艦",
+                                            "海防艦"
+                                          ],
+                                          "matchPolicy": "exact",
+                                          "min": 3,
+                                          "max": 7
+                                        },
+                                        {
+                                          "all": [
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "駆逐艦",
+                                                "海防艦"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 2,
+                                              "max": 7
+                                            },
+                                            {
+                                              "kind": "typeCount",
+                                              "types": [
+                                                "戦艦",
+                                                "高速戦艦",
+                                                "航空戦艦",
+                                                "軽空母"
+                                              ],
+                                              "matchPolicy": "exact",
+                                              "min": 0,
+                                              "max": 2
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "any": [
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "重巡洋艦",
+                                    "航空巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 2
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 1,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 2
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽空母",
+                                    "重巡洋艦",
+                                    "航空巡洋艦",
+                                    "軽巡洋艦",
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 6,
+                                  "max": 6
+                                }
+                              ]
+                            },
+                            {
+                              "kind": "minSpeed",
+                              "rank": 15
+                            },
+                            {
+                              "all": [
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "正規空母",
+                                    "装甲空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 0
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "軽空母"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 2
+                                },
+                                {
+                                  "kind": "slowBattleshipCount",
+                                  "min": 0,
+                                  "max": 1
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "戦艦",
+                                    "高速戦艦",
+                                    "航空戦艦",
+                                    "重巡洋艦",
+                                    "航空巡洋艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 0,
+                                  "max": 2
+                                },
+                                {
+                                  "kind": "typeCount",
+                                  "types": [
+                                    "駆逐艦",
+                                    "海防艦"
+                                  ],
+                                  "matchPolicy": "exact",
+                                  "min": 2,
+                                  "max": 7
+                                },
+                                {
+                                  "any": [
+                                    {
+                                      "kind": "typeCount",
+                                      "types": [
+                                        "駆逐艦",
+                                        "海防艦"
+                                      ],
+                                      "matchPolicy": "exact",
+                                      "min": 3,
+                                      "max": 7
+                                    },
+                                    {
+                                      "kind": "minSpeed",
+                                      "rank": 10
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "kind": "unverified",
+                  "reason": "B/D/Jの候補が二資料で一致しないか、必要な艦種・速力情報が不足。D高速＋の出典優先差とJの先行救済を手動確認し、最速を一律必須へ読み替えない"
+                }
+              ]
+            }
+          ],
+          "reason": "B→D・D→F・J→O：記事とKCの優先順を別々に評価し、一致する成立/不一致を残す"
         },
         {
-          "kind": "typeCount",
-          "types": [
-            "戦艦",
-            "高速戦艦",
-            "航空戦艦"
-          ],
-          "matchPolicy": "exact",
-          "min": 0,
-          "max": 1
+          "any": [
+            {
+              "kind": "typeCount",
+              "types": [
+                "揚陸艦"
+              ],
+              "matchPolicy": "exact",
+              "min": 0,
+              "max": 0
+            },
+            {
+              "kind": "unverified",
+              "reason": "揚陸艦の空母相当算入は7-5固有の適用が未確認。Jの正空/軽空へ推測変換せず、別の既知不一致は保持する"
+            }
+          ]
         },
         {
-          "kind": "typeCount",
-          "types": [
-            "正規空母",
-            "装甲空母"
-          ],
-          "matchPolicy": "exact",
-          "min": 0,
-          "max": 0
-        },
-        {
-          "kind": "typeCount",
-          "types": [
-            "軽空母"
-          ],
-          "matchPolicy": "exact",
-          "min": 0,
-          "max": 1
-        },
-        {
-          "kind": "typeCount",
-          "types": [
-            "戦艦",
-            "高速戦艦",
-            "航空戦艦",
-            "重巡洋艦",
-            "航空巡洋艦"
-          ],
-          "matchPolicy": "exact",
-          "min": 0,
-          "max": 2
-        },
-        {
-          "kind": "typeCount",
-          "types": [
-            "軽巡洋艦"
-          ],
-          "matchPolicy": "exact",
-          "min": 1,
-          "max": 7
-        },
-        {
-          "kind": "typeCount",
-          "types": [
-            "駆逐艦"
-          ],
-          "matchPolicy": "exact",
-          "min": 3,
-          "max": 7
+          "any": [
+            {
+              "kind": "fleetCount",
+              "min": 6,
+              "max": 6
+            },
+            {
+              "kind": "unverified",
+              "reason": "今回の成立入力範囲は六隻。少数隻の表導出は別確認とし、実ゲームの最低六隻やQ到達不可能とは断定しない"
+            }
+          ]
         }
       ],
       "speed": {
@@ -11895,21 +13440,96 @@
           "source": "https://zekamashi.net/kancolle-kouryaku/ptboat-taisaku/"
         }
       ],
-      "special": {
-        "conditions": [],
-        "routing": "documented-example",
-        "graph": null,
-        "goals": {},
-        "notes": [
-          "第2ゲージQの対地攻略例。第1ゲージ撃破を確認。Mギミックは第3ゲージ開放に必要。"
-        ]
-      },
+      "special": [
+        "この選択は第2目標QへのABDFJOQ。A空襲→B潜水→D通常→F能動分岐→J通常→O能動分岐→Q砲台ボス。FでJ、OでQを選び、第1ゲージK突破後のQ開放を前提とする。実際のゲージ状態を艦種や選択から推定しない。MギミックとQは順不同で、M突破を第2目標の必須条件へ追加しない。",
+        "元の戦艦級1＋航巡1＋軽巡1＋駆逐3は六隻の編成例。軽空2＋軽巡1＋駆逐3や駆逐2＋海防1への置換など、二資料のB/D/Jが一致する六隻の代替も扱う。日本語wiki本文は今回未取得・未照合。実出撃・到達・勝利や全条件の網羅を確認した意味ではない。",
+        "Bは高速＋Dが最優先、通常の低戦2・軽巡0等は護衛3のDより先。護衛3のDは正空1・軽空2等の後続Cより先。Dは最速Fが最優先、正空2・軽空3・戦艦級＋重巡級3・軽巡＋駆逐0のEが高速＋より先。Dの正空を含む重い艦3と高速＋の順が記事/KCで異なる域は未判定。",
+        "Jは軽空ちょうど1・重巡級ちょうど2・軽巡ちょうど1・駆逐＋海防ちょうど2のOが最優先で低速可。次に高速＋以上O、その後の正空1・軽空3・通常の低戦2・戦艦級＋重巡級3・護衛1以下はN、護衛3以上O、高速統一O、その他N。B/Dだけの成立をJ→Oへ流用しない。",
+        "護衛は指定箇所だけ駆逐＋海防、Dの軽巡＋駆逐には海防を足さない。軽巡は軽巡洋艦のみで雷巡・練巡とは別、重巡級は重巡＋航巡、正空は正規＋装甲で軽空を含めない。通常低戦は元の低速戦艦の艦種で、航空戦艦・高速戦艦や配備後の速力と区別する。CD/海防戦艦・揚陸艦・未知マスターの適用は未確認を残す。",
+        "選択Q経路に数値索敵・装備個数/装備艦数の通行必須は掲載されていない。索敵非適用を0点へ置換せず、I→Mの値や第3Pの閾値を流用しない。基地航空隊は使用できず、7-4の基地数量を持ち込まない。",
+        "Qは砲台とPT等の陸上混成で、PT1〜2隻という敵編成を装備セット数へ変換しない。PTを無理に撃破せず砲台旗艦を狙う攻略案もある。対地/PT/対潜・煙幕・制空・対空は戦闘方針や利用者指定で、既定PT1組等は任意の比較目標。通行必須・先制対潜人数・全編成の必要十分数・購入数量ではない。第1の夜戦CIを追加せず、明示0/保存済み/選択した方針を上書きしない。",
+        "対地/PT/対潜等の表示は戦闘上の比較用。同艦の具体搭載先、全在庫と枠競合は別に確認する。カタログ候補・所持数・合法枠・同時配備を区別し、未発見を手持ちでは不可能・購入必須・最適と断定しない。艦種/速力の不一致は編成見直しへ案内する。旧図・目標・出撃履歴・保存処理は変更しない。"
+      ],
       "verification": {
         "structuralSelection": "53-example synthetic all-master-owned fixture; direct fleetCount/typeCount/namedCount/flagshipType assertions only",
         "unknownInputs": "empty/unknown hull rejection all53",
         "perExampleAllRequirementsPositiveNegative": false,
         "representativeAllRequirementsStages": false,
         "physicalIPhone": false
+      },
+      "useExampleScope": false,
+      "sourceScopeAudit": {
+        "scope": "7-5/index1/default ABDFJOQ, six-hull conditional source agreement; F->J/O->Q choices and first-K-completed selection assumed, not real game progress",
+        "sources": [
+          "https://zekamashi.net/kancolle-kouryaku/7-5/",
+          "https://zh.kcwiki.cn/wiki/南西海域/7-5"
+        ],
+        "unavailable": [
+          {
+            "url": "https://wikiwiki.jp/kancolle/南西海域/7-5",
+            "status": 403
+          }
+        ],
+        "sourceRelationship": "The article references KC; agreement is not two independent sorties or majority voting. JP body remains unavailable.",
+        "independentEvidence": {
+          "sourceCases": "tests/fixtures/seven-five-second-source-cases.json",
+          "sourceCasesSHA256": "4cb6a7008cff86db17af413c7d3dd40b6d0579c029ccfc8bca438fff2fcf5551",
+          "sourceCasesCount": 31,
+          "rawSourceStatusCounts": {
+            "ready": 17,
+            "missing": 9,
+            "manual": 5
+          },
+          "scopeExpectedCounts": {
+            "ready": 16,
+            "missing": 9,
+            "manual": 6
+          },
+          "actualMasters": "tests/fixtures/seven-five-second-actual-masters.json",
+          "actualMastersSHA256": "ad278802d801ab37a3ab7941480b9f9057854991c8282391eb4eefb49aa9f63d",
+          "actualMasterProposals": 6
+        },
+        "boundaryVerification": {
+          "NodeSelectedAfterUnique": 29,
+          "NodePass": 29,
+          "NodeFail": 0,
+          "syntaxFiles": 14,
+          "browserExecuted": false,
+          "oldBeforeContrast": "CVL2 first new-ready assertion missing!=ready only; DE/FBB later loop unreached in before; after six proposals and independent31 checked separately"
+        },
+        "priorityDisagreement": "D speed15 with heavy carriers remains manual where article/KC disagree; speed20 first rescue is distinct. J exact CVL1/CAfamily2/plainCL1/escort2 low-speed priority and subsequent conditions are not inferred from B/D alone.",
+        "scopeLimits": [
+          "six-hull model is not a game minimum",
+          "unknown one hull cannot satisfy two disjoint missing roles; known mismatches retained",
+          "CD/LHA normalization, unknown hull/speed and source disagreement remain manual",
+          "Q LOS not applicable/score:null, no M or third-gauge threshold transfer",
+          "all inventory, battle targets and actual game arrival/victory are not proved"
+        ],
+        "combatPolicy": {
+          "PT1": "existing optional comparison, not passage/OASW people/sufficiency/purchase quantity",
+          "origin": "FE generates stricttrue only if input PT row is absent; existing user fields/origin presence/strategy retained",
+          "night": "no new default CI; explicitly selected existing night policy remains strategy",
+          "profile": "selected second only; global recipe/measurement/cache and first/third unchanged",
+          "specificCompatibilityBoundary": "original primary cannot put selected tank166/type24 and amphibious167/type46 on one permitted hull; no all-recipes impossibility claim",
+          "browserVariant": "separate synthetic DD667 variant, frozen actual6 is unchanged",
+          "slotConflict": "separate synthetic four-slot/all-five-allowed model, not original primary evidence"
+        }
+      },
+      "representativeWorkflowRecord": {
+        "record": "sevenFiveSecondLocal20261030",
+        "document": "docs/pr152-seven-five-second-ja.md",
+        "sourceBase": "80b156f5f3a39355946f38b8ca9d4d648c0bf45b",
+        "sourceManifestSHA256": "d734071f332c0e049a6c81d88d230962d6fca9166c96a63fc9be90012df20788",
+        "localFirstTrials": 6,
+        "savedOrSafeAbortStrict30Reads": 6,
+        "loadStrict30Reads": 4,
+        "DStillPartial": true,
+        "preservationPositiveInReachedComparisons": false,
+        "oldTrialGapsFilled": false,
+        "localComplete": 4,
+        "localAfterLoadUnreached": 2,
+        "applyAndMemoCases": 4,
+        "unknownSafeAbortAndNoEditCases": 2
       }
     },
     {

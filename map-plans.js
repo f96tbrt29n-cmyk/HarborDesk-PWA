@@ -515,7 +515,27 @@ const HD_MAP_ROUTE_REQUIREMENTS={};
   'Aの制空値88は記事例で、拮抗123/劣勢62などの戦闘目標と通行条件は別。制空喪失でも攻略可能とされ、航空・防空・夜戦目標は利用者が選ぶ。高速化装備も実マスター・通常枠・搭載可否・所持数を確認し、源表の最速入力だけで実在する配備や戦闘十分性を証明しない。',
   '艦種/隻数/速力の不一致は編成見直しへ案内する。在庫不足・搭載不可・枠競合・情報不足・探索未完了を区別し、未発見を手持ちでは不可能・購入必須・最適と断定しない。旧図・出撃目標・通過履歴は変更せず、保存互換や実到達を確認済みにしない。'
  ]});
- add('7-5',1,'ABDFJOQ',[...g75,count(['dd'],3)],{equipmentKinds:['制空','防空','対潜','対地','PT対策'],equipmentTargets:[{kind:'cap-pt',baseKind:'PT対策',label:'PT小鬼群対策セット',minCount:1,source:'https://zekamashi.net/kancolle-kouryaku/ptboat-taisaku/'}],notes:['第2ゲージQの対地攻略例。第1ゲージ撃破を確認。Mギミックは第3ゲージ開放に必要。']});
+ // 7-5 second target only: keep the two B/D source orders and add J->O.
+ const sevenFiveSecondJExact={all:[count(['cvl'],1,1),count(['cav'],2,2),count(['cl'],1,1),count(['escort'],2,2),count(['cvl','cav','cl','escort'],6,6)]};
+ // In this six-hull domain the exact disjoint roles sum to six. The union
+ // prevents one unknown hull from supplying two missing roles at once.
+ const sevenFiveSecondJ={any:[sevenFiveSecondJExact,speed(15),{all:[count(['cvn'],0,0),count(['cvl'],0,2),{kind:'slowBattleshipCount',min:0,max:1},count(['bb','cav'],0,2),count(['escort'],2),{any:[count(['escort'],3),speed(10)]}]}]};
+ const sevenFiveSecondSources=[{all:[sevenFiveFirstB,sevenFiveFirstDArticle,sevenFiveSecondJ]},{all:[sevenFiveFirstB,sevenFiveFirstDKc,sevenFiveSecondJ]}];
+ add('7-5',1,'ABDFJOQ',[
+  {any:[{all:sevenFiveSecondSources},{all:[{any:sevenFiveSecondSources},{kind:'unverified',reason:'B/D/Jの候補が二資料で一致しないか、必要な艦種・速力情報が不足。D高速＋の出典優先差とJの先行救済を手動確認し、最速を一律必須へ読み替えない'}]}],reason:'B→D・D→F・J→O：記事とKCの優先順を別々に評価し、一致する成立/不一致を残す'},
+  {any:[count(['lha'],0,0),{kind:'unverified',reason:'揚陸艦の空母相当算入は7-5固有の適用が未確認。Jの正空/軽空へ推測変換せず、別の既知不一致は保持する'}]},
+  {any:[fleet(6),{kind:'unverified',reason:'今回の成立入力範囲は六隻。少数隻の表導出は別確認とし、実ゲームの最低六隻やQ到達不可能とは断定しない'}]}
+ ],{checkedAt:'2026-10-30',useExampleScope:false,equipmentKinds:['制空','防空','対潜','対地','PT対策'],equipmentTargets:[{kind:'cap-pt',baseKind:'PT対策',label:'PT小鬼群対策セット',minCount:1,source:'https://zekamashi.net/kancolle-kouryaku/ptboat-taisaku/'}],sources:['https://zekamashi.net/kancolle-kouryaku/7-5/','https://zh.kcwiki.cn/wiki/南西海域/7-5'],sourceUnavailable:[{url:'https://wikiwiki.jp/kancolle/南西海域/7-5',status:403}],notes:[
+  'この選択は第2目標QへのABDFJOQ。A空襲→B潜水→D通常→F能動分岐→J通常→O能動分岐→Q砲台ボス。FでJ、OでQを選び、第1ゲージK突破後のQ開放を前提とする。実際のゲージ状態を艦種や選択から推定しない。MギミックとQは順不同で、M突破を第2目標の必須条件へ追加しない。',
+  '元の戦艦級1＋航巡1＋軽巡1＋駆逐3は六隻の編成例。軽空2＋軽巡1＋駆逐3や駆逐2＋海防1への置換など、二資料のB/D/Jが一致する六隻の代替も扱う。日本語wiki本文は今回未取得・未照合。実出撃・到達・勝利や全条件の網羅を確認した意味ではない。',
+  'Bは高速＋Dが最優先、通常の低戦2・軽巡0等は護衛3のDより先。護衛3のDは正空1・軽空2等の後続Cより先。Dは最速Fが最優先、正空2・軽空3・戦艦級＋重巡級3・軽巡＋駆逐0のEが高速＋より先。Dの正空を含む重い艦3と高速＋の順が記事/KCで異なる域は未判定。',
+  'Jは軽空ちょうど1・重巡級ちょうど2・軽巡ちょうど1・駆逐＋海防ちょうど2のOが最優先で低速可。次に高速＋以上O、その後の正空1・軽空3・通常の低戦2・戦艦級＋重巡級3・護衛1以下はN、護衛3以上O、高速統一O、その他N。B/Dだけの成立をJ→Oへ流用しない。',
+  '護衛は指定箇所だけ駆逐＋海防、Dの軽巡＋駆逐には海防を足さない。軽巡は軽巡洋艦のみで雷巡・練巡とは別、重巡級は重巡＋航巡、正空は正規＋装甲で軽空を含めない。通常低戦は元の低速戦艦の艦種で、航空戦艦・高速戦艦や配備後の速力と区別する。CD/海防戦艦・揚陸艦・未知マスターの適用は未確認を残す。',
+  '選択Q経路に数値索敵・装備個数/装備艦数の通行必須は掲載されていない。索敵非適用を0点へ置換せず、I→Mの値や第3Pの閾値を流用しない。基地航空隊は使用できず、7-4の基地数量を持ち込まない。',
+  'Qは砲台とPT等の陸上混成で、PT1〜2隻という敵編成を装備セット数へ変換しない。PTを無理に撃破せず砲台旗艦を狙う攻略案もある。対地/PT/対潜・煙幕・制空・対空は戦闘方針や利用者指定で、既定PT1組等は任意の比較目標。通行必須・先制対潜人数・全編成の必要十分数・購入数量ではない。第1の夜戦CIを追加せず、明示0/保存済み/選択した方針を上書きしない。',
+  '対地/PT/対潜等の表示は戦闘上の比較用。同艦の具体搭載先、全在庫と枠競合は別に確認する。カタログ候補・所持数・合法枠・同時配備を区別し、未発見を手持ちでは不可能・購入必須・最適と断定しない。艦種/速力の不一致は編成見直しへ案内する。旧図・目標・出撃履歴・保存処理は変更しない。'
+ ]});
+ MAP_PLANS['7-5'].presets[1].gear='第2目標QへF→J・O→Qを選択。元六隻は編成例で軽空2や駆逐2＋海防1等の二資料一致代替を分岐順で確認。Jの指定組み合わせによる低速例外・高速条件とD出典差を区別し、対地/PT/対潜等は任意の戦闘比較。Qに数値索敵・基地必須はない。';
  add('7-5',2,'ABDFJOPT',[fleet(6),count(['bb','cvn'],0,0),count(['cvl'],1,1),count(['航空巡洋艦'],2,2),count(['cl'],1,1),count(['dd'],2,2)],{los:los(4,63),equipmentKinds:['制空','防空','対潜','夜戦','索敵'],notes:['軽空母入りの第3ゲージ例は63以上。航空戦艦入りの別例の58を流用しない。低速可。第2ゲージ撃破とMマスS勝利1回が開放条件。']});
  for(const [map,d] of Object.entries(MAP_PLANS)){
   const rows=HD_MAP_ROUTE_REQUIREMENTS[map];if(!rows||rows.length!==d.presets.length||rows.some(x=>!x))throw Error('Incomplete route requirements '+map);

@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "unit": "seven-five-second",
+  "status": "Independent finite-domain adjustments, separate from frozen31 source values",
+  "adjustments": {
+    "second-smaller-table-deduction": {
+      "expectedRuntimeStatus": "manual",
+      "reason": "Five-hull source deduction is outside the finite six-hull product domain; not a game minimum."
+    },
+    "second-cd-normalization-gap": {
+      "expectedRuntimeStatus": "manual",
+      "reason": "KC DE includesCD and is raw-ready; article applicability and runtime CD model remain unverified."
+    },
+    "second-lha-carrier-equivalence-gap": {
+      "expectedRuntimeStatus": "manual",
+      "reason": "Literal LHA table read is raw-ready;7-5 carrier equivalence applicability is unverified."
+    },
+    "second-d15-source-order-gap": {
+      "expectedRuntimeStatus": "manual",
+      "reason": "Article/KC D priority results differ; J agreement does not settle D."
+    }
+  },
+  "cases": [
+    {
+      "id": "second-original-low",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-dd2-de1-native",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-cvl2-native",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-fbb2-native",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-bb-fbb-native",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-cvl2-escort3-de",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-j-special-dd2-low",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-j-special-dd1-de1-low",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-j-special-broken-by-av-low",
+      "expectedRuntimeStatus": "missing"
+    },
+    {
+      "id": "second-j-late-fast-escort2",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-j-cv-before-escort-native",
+      "expectedRuntimeStatus": "missing"
+    },
+    {
+      "id": "second-j-highplus-before-cv",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-cv2-native-stops-b",
+      "expectedRuntimeStatus": "missing"
+    },
+    {
+      "id": "second-cv2-highplus-stops-d",
+      "expectedRuntimeStatus": "missing"
+    },
+    {
+      "id": "second-cv2-fastest-abstract",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-d15-source-order-gap",
+      "expectedRuntimeStatus": "manual"
+    },
+    {
+      "id": "second-d20-common-rescue",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-heavy3-before-highplus",
+      "expectedRuntimeStatus": "missing"
+    },
+    {
+      "id": "second-heavy3-fastest-abstract",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-first-like-slow-j-negative",
+      "expectedRuntimeStatus": "missing"
+    },
+    {
+      "id": "second-first-like-fast-j-positive",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-plaincl0-not-rescued-by-escort-native",
+      "expectedRuntimeStatus": "missing"
+    },
+    {
+      "id": "second-plaincl0-highplus-abstract",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-two-ordinarybb-native-stops-b",
+      "expectedRuntimeStatus": "missing"
+    },
+    {
+      "id": "second-two-ordinarybb-highplus-abstract",
+      "expectedRuntimeStatus": "ready"
+    },
+    {
+      "id": "second-unknown-can-fill-one-special-role",
+      "expectedRuntimeStatus": "manual"
+    },
+    {
+      "id": "second-unknown-cannot-fill-two-special-roles",
+      "expectedRuntimeStatus": "missing"
+    },
+    {
+      "id": "second-speed-unknown-early-rescue",
+      "expectedRuntimeStatus": "manual"
+    },
+    {
+      "id": "second-smaller-table-deduction",
+      "expectedRuntimeStatus": "manual"
+    },
+    {
+      "id": "second-cd-normalization-gap",
+      "expectedRuntimeStatus": "manual"
+    },
+    {
+      "id": "second-lha-carrier-equivalence-gap",
+      "expectedRuntimeStatus": "manual"
+    }
+  ],
+  "expectedCounts": {
+    "ready": 16,
+    "missing": 9,
+    "manual": 6
+  }
+}

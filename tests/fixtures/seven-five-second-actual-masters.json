@@ -1,0 +1,622 @@
+{
+  "schemaVersion": 1,
+  "unit": "seven-five-second",
+  "status": "Saved master metadata proposals, not owned allocation or runtime evidence",
+  "cases": [
+    {
+      "id": "actual-cvl2-native",
+      "sourceLiteralId": "second-cvl2-native",
+      "ships": [
+        {
+          "masterId": 408,
+          "name": "隼鷹改二",
+          "stype": 7,
+          "baseSpeed": 5,
+          "normalSlots": [
+            24,
+            18,
+            20,
+            4
+          ],
+          "ctype": 24,
+          "items": [],
+          "masterType": "軽空母",
+          "curatedType": "軽空母"
+        },
+        {
+          "masterId": 157,
+          "name": "龍驤改二",
+          "stype": 7,
+          "baseSpeed": 10,
+          "normalSlots": [
+            18,
+            28,
+            6,
+            3
+          ],
+          "ctype": 32,
+          "items": [],
+          "masterType": "軽空母",
+          "curatedType": "軽空母"
+        },
+        {
+          "masterId": 668,
+          "name": "矢矧改二乙",
+          "stype": 3,
+          "baseSpeed": 10,
+          "normalSlots": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "ctype": 41,
+          "items": [],
+          "masterType": "軽巡洋艦",
+          "curatedType": "軽巡洋艦"
+        },
+        {
+          "masterId": 951,
+          "name": "天津風改二",
+          "stype": 2,
+          "baseSpeed": 10,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 30,
+          "items": [],
+          "masterType": "駆逐艦",
+          "curatedType": "駆逐艦"
+        },
+        {
+          "masterId": 588,
+          "name": "山風改二",
+          "stype": 2,
+          "baseSpeed": 10,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 23,
+          "items": [],
+          "masterType": "駆逐艦",
+          "curatedType": "駆逐艦"
+        },
+        {
+          "masterId": 144,
+          "name": "夕立改二",
+          "stype": 2,
+          "baseSpeed": 10,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 23,
+          "items": [],
+          "masterType": "駆逐艦",
+          "curatedType": "駆逐艦"
+        }
+      ],
+      "nativeFleetRank": 5,
+      "sourceConditionalExpectation": "ready",
+      "normalSlotCount": 21
+    },
+    {
+      "id": "actual-de-replacement-native",
+      "sourceLiteralId": "second-dd2-de1-native",
+      "ships": [
+        {
+          "masterId": 554,
+          "name": "日向改二",
+          "stype": 10,
+          "baseSpeed": 5,
+          "normalSlots": [
+            2,
+            8,
+            24,
+            12,
+            11
+          ],
+          "ctype": 2,
+          "items": [],
+          "masterType": "航空戦艦",
+          "curatedType": "航空戦艦"
+        },
+        {
+          "masterId": 506,
+          "name": "最上改二特",
+          "stype": 6,
+          "baseSpeed": 10,
+          "normalSlots": [
+            2,
+            2,
+            7,
+            3
+          ],
+          "ctype": 9,
+          "items": [],
+          "masterType": "航空巡洋艦",
+          "curatedType": "航空巡洋艦"
+        },
+        {
+          "masterId": 668,
+          "name": "矢矧改二乙",
+          "stype": 3,
+          "baseSpeed": 10,
+          "normalSlots": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "ctype": 41,
+          "items": [],
+          "masterType": "軽巡洋艦",
+          "curatedType": "軽巡洋艦"
+        },
+        {
+          "masterId": 951,
+          "name": "天津風改二",
+          "stype": 2,
+          "baseSpeed": 10,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 30,
+          "items": [],
+          "masterType": "駆逐艦",
+          "curatedType": "駆逐艦"
+        },
+        {
+          "masterId": 588,
+          "name": "山風改二",
+          "stype": 2,
+          "baseSpeed": 10,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 23,
+          "items": [],
+          "masterType": "駆逐艦",
+          "curatedType": "駆逐艦"
+        },
+        {
+          "masterId": 376,
+          "name": "占守改",
+          "stype": 1,
+          "baseSpeed": 5,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 74,
+          "items": [],
+          "masterType": "海防艦",
+          "curatedType": "海防艦"
+        }
+      ],
+      "nativeFleetRank": 5,
+      "sourceConditionalExpectation": "ready",
+      "normalSlotCount": 22
+    },
+    {
+      "id": "actual-j-special-low",
+      "sourceLiteralId": "second-j-special-dd2-low",
+      "ships": [
+        {
+          "masterId": 408,
+          "name": "隼鷹改二",
+          "stype": 7,
+          "baseSpeed": 5,
+          "normalSlots": [
+            24,
+            18,
+            20,
+            4
+          ],
+          "ctype": 24,
+          "items": [],
+          "masterType": "軽空母",
+          "curatedType": "軽空母"
+        },
+        {
+          "masterId": 506,
+          "name": "最上改二特",
+          "stype": 6,
+          "baseSpeed": 10,
+          "normalSlots": [
+            2,
+            2,
+            7,
+            3
+          ],
+          "ctype": 9,
+          "items": [],
+          "masterType": "航空巡洋艦",
+          "curatedType": "航空巡洋艦"
+        },
+        {
+          "masterId": 503,
+          "name": "鈴谷改二",
+          "stype": 6,
+          "baseSpeed": 10,
+          "normalSlots": [
+            3,
+            3,
+            7,
+            11
+          ],
+          "ctype": 9,
+          "items": [],
+          "masterType": "航空巡洋艦",
+          "curatedType": "航空巡洋艦"
+        },
+        {
+          "masterId": 668,
+          "name": "矢矧改二乙",
+          "stype": 3,
+          "baseSpeed": 10,
+          "normalSlots": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "ctype": 41,
+          "items": [],
+          "masterType": "軽巡洋艦",
+          "curatedType": "軽巡洋艦"
+        },
+        {
+          "masterId": 951,
+          "name": "天津風改二",
+          "stype": 2,
+          "baseSpeed": 10,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 30,
+          "items": [],
+          "masterType": "駆逐艦",
+          "curatedType": "駆逐艦"
+        },
+        {
+          "masterId": 588,
+          "name": "山風改二",
+          "stype": 2,
+          "baseSpeed": 10,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 23,
+          "items": [],
+          "masterType": "駆逐艦",
+          "curatedType": "駆逐艦"
+        }
+      ],
+      "nativeFleetRank": 5,
+      "sourceConditionalExpectation": "ready",
+      "normalSlotCount": 22
+    },
+    {
+      "id": "actual-j-special-broken-low",
+      "sourceLiteralId": "second-j-special-broken-by-av-low",
+      "ships": [
+        {
+          "masterId": 408,
+          "name": "隼鷹改二",
+          "stype": 7,
+          "baseSpeed": 5,
+          "normalSlots": [
+            24,
+            18,
+            20,
+            4
+          ],
+          "ctype": 24,
+          "items": [],
+          "masterType": "軽空母",
+          "curatedType": "軽空母"
+        },
+        {
+          "masterId": 506,
+          "name": "最上改二特",
+          "stype": 6,
+          "baseSpeed": 10,
+          "normalSlots": [
+            2,
+            2,
+            7,
+            3
+          ],
+          "ctype": 9,
+          "items": [],
+          "masterType": "航空巡洋艦",
+          "curatedType": "航空巡洋艦"
+        },
+        {
+          "masterId": 106,
+          "name": "千歳甲",
+          "stype": 16,
+          "baseSpeed": 10,
+          "normalSlots": [
+            12,
+            6,
+            6
+          ],
+          "ctype": 15,
+          "items": [],
+          "masterType": "水上機母艦",
+          "curatedType": "水上機母艦"
+        },
+        {
+          "masterId": 668,
+          "name": "矢矧改二乙",
+          "stype": 3,
+          "baseSpeed": 10,
+          "normalSlots": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "ctype": 41,
+          "items": [],
+          "masterType": "軽巡洋艦",
+          "curatedType": "軽巡洋艦"
+        },
+        {
+          "masterId": 951,
+          "name": "天津風改二",
+          "stype": 2,
+          "baseSpeed": 10,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 30,
+          "items": [],
+          "masterType": "駆逐艦",
+          "curatedType": "駆逐艦"
+        },
+        {
+          "masterId": 588,
+          "name": "山風改二",
+          "stype": 2,
+          "baseSpeed": 10,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 23,
+          "items": [],
+          "masterType": "駆逐艦",
+          "curatedType": "駆逐艦"
+        }
+      ],
+      "nativeFleetRank": 5,
+      "sourceConditionalExpectation": "missing",
+      "normalSlotCount": 21
+    },
+    {
+      "id": "actual-j-cv-priority-native",
+      "sourceLiteralId": "second-j-cv-before-escort-native",
+      "ships": [
+        {
+          "masterId": 698,
+          "name": "加賀改二",
+          "stype": 11,
+          "baseSpeed": 10,
+          "normalSlots": [
+            20,
+            20,
+            44,
+            12,
+            3
+          ],
+          "ctype": 3,
+          "items": [],
+          "masterType": "正規空母",
+          "curatedType": "正規空母"
+        },
+        {
+          "masterId": 157,
+          "name": "龍驤改二",
+          "stype": 7,
+          "baseSpeed": 10,
+          "normalSlots": [
+            18,
+            28,
+            6,
+            3
+          ],
+          "ctype": 32,
+          "items": [],
+          "masterType": "軽空母",
+          "curatedType": "軽空母"
+        },
+        {
+          "masterId": 668,
+          "name": "矢矧改二乙",
+          "stype": 3,
+          "baseSpeed": 10,
+          "normalSlots": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "ctype": 41,
+          "items": [],
+          "masterType": "軽巡洋艦",
+          "curatedType": "軽巡洋艦"
+        },
+        {
+          "masterId": 951,
+          "name": "天津風改二",
+          "stype": 2,
+          "baseSpeed": 10,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 30,
+          "items": [],
+          "masterType": "駆逐艦",
+          "curatedType": "駆逐艦"
+        },
+        {
+          "masterId": 588,
+          "name": "山風改二",
+          "stype": 2,
+          "baseSpeed": 10,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 23,
+          "items": [],
+          "masterType": "駆逐艦",
+          "curatedType": "駆逐艦"
+        },
+        {
+          "masterId": 144,
+          "name": "夕立改二",
+          "stype": 2,
+          "baseSpeed": 10,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 23,
+          "items": [],
+          "masterType": "駆逐艦",
+          "curatedType": "駆逐艦"
+        }
+      ],
+      "nativeFleetRank": 10,
+      "sourceConditionalExpectation": "missing",
+      "normalSlotCount": 22
+    },
+    {
+      "id": "actual-fbb2-native",
+      "sourceLiteralId": "second-fbb2-native",
+      "ships": [
+        {
+          "masterId": 149,
+          "name": "金剛改二",
+          "stype": 8,
+          "baseSpeed": 10,
+          "normalSlots": [
+            3,
+            3,
+            3,
+            3
+          ],
+          "ctype": 6,
+          "items": [],
+          "masterType": "戦艦",
+          "curatedType": "高速戦艦"
+        },
+        {
+          "masterId": 151,
+          "name": "榛名改二",
+          "stype": 8,
+          "baseSpeed": 10,
+          "normalSlots": [
+            3,
+            3,
+            3,
+            3
+          ],
+          "ctype": 6,
+          "items": [],
+          "masterType": "戦艦",
+          "curatedType": "高速戦艦"
+        },
+        {
+          "masterId": 668,
+          "name": "矢矧改二乙",
+          "stype": 3,
+          "baseSpeed": 10,
+          "normalSlots": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "ctype": 41,
+          "items": [],
+          "masterType": "軽巡洋艦",
+          "curatedType": "軽巡洋艦"
+        },
+        {
+          "masterId": 951,
+          "name": "天津風改二",
+          "stype": 2,
+          "baseSpeed": 10,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 30,
+          "items": [],
+          "masterType": "駆逐艦",
+          "curatedType": "駆逐艦"
+        },
+        {
+          "masterId": 588,
+          "name": "山風改二",
+          "stype": 2,
+          "baseSpeed": 10,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 23,
+          "items": [],
+          "masterType": "駆逐艦",
+          "curatedType": "駆逐艦"
+        },
+        {
+          "masterId": 144,
+          "name": "夕立改二",
+          "stype": 2,
+          "baseSpeed": 10,
+          "normalSlots": [
+            0,
+            0,
+            0
+          ],
+          "ctype": 23,
+          "items": [],
+          "masterType": "駆逐艦",
+          "curatedType": "駆逐艦"
+        }
+      ],
+      "nativeFleetRank": 10,
+      "sourceConditionalExpectation": "ready",
+      "normalSlotCount": 21
+    }
+  ]
+}

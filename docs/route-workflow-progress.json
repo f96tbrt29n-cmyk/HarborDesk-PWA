@@ -62,20 +62,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 36,
-      "未確認": 23,
+      "一部": 37,
+      "未確認": 22,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 36,
-      "未確認": 23,
+      "一部": 37,
+      "未確認": 22,
       "非該当": 0
     },
     "D": {
       "確認済み": 23,
-      "一部": 15,
-      "未確認": 21,
+      "一部": 16,
+      "未確認": 20,
       "非該当": 0
     }
   },
@@ -2810,22 +2810,53 @@
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じ第2Qの別合成667六隻variantで有限12品の対潜/PT/対地1組比較を実配備、実マスター合法/所持数内を確認。全在庫・代替・全目標同時配備は未網羅。",
+          "evidence": [
+            "docs/pr152-seven-five-second-ja.md",
+            "tests/route-seven-five-second.spec.js",
+            "tests/seven-five-second-routes.test.cjs",
+            "tests/seven-five-second-placement.test.cjs"
+          ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "有限在庫の部品別不足・同艦の合法別通常枠候補、未知の未判定/安全中止を確認。PTは汎用比較/第2十分性未確認。全装備・搭載不可/競合/探索打切りの実操作は未網羅。",
+          "evidence": [
+            "docs/pr152-seven-five-second-ja.md",
+            "tests/route-seven-five-second.spec.js",
+            "tests/seven-five-second-routes.test.cjs",
+            "tests/seven-five-second-placement.test.cjs"
+          ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "C3とW未知の4件は保存または安全中止・適用編集・同一reload文書load全文/strict30/他保持まで完了。W成立/不足は保存編集後strict30通過後load再探索非表示45秒、全文/caller未到達なので一部。",
+          "evidence": [
+            "docs/pr152-seven-five-second-ja.md",
+            "tests/route-seven-five-second.spec.js",
+            "tests/seven-five-second-routes.test.cjs",
+            "tests/seven-five-second-placement.test.cjs"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "D15の出典優先差・JP403・CD/LHA/六隻外の適用、全目標数量/全在庫/枠競合/代替は未完。PT汎用比較1組を第2の十分性・購入数へ変換しない。W成立/不足のload全文と表示変更元/原因は欠測。実ゲージ開放/到達/勝利、旧出撃目標/履歴互換を今回検証済みにしない。",
+      "representativeWorkflowRecord": {
+        "record": "sevenFiveSecondLocal20261030",
+        "document": "docs/pr152-seven-five-second-ja.md",
+        "sourceBase": "80b156f5f3a39355946f38b8ca9d4d648c0bf45b",
+        "sourceManifestSHA256": "d734071f332c0e049a6c81d88d230962d6fca9166c96a63fc9be90012df20788",
+        "localFirstTrials": 6,
+        "savedOrSafeAbortStrict30Reads": 6,
+        "loadStrict30Reads": 4,
+        "DStillPartial": true,
+        "preservationPositiveInReachedComparisons": false,
+        "oldTrialGapsFilled": false,
+        "localComplete": 4,
+        "localAfterLoadUnreached": 2,
+        "applyAndMemoCases": 4,
+        "unknownSafeAbortAndNoEditCases": 2
+      }
     },
     {
       "id": "7-5/2/default",
@@ -2871,18 +2902,13 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "7-5/0/default",
-    "baselineHead": "633b079cb1cd4e375fd095cabc33f60f08e9229d",
-    "integrationRecordHead": "d347aad828161781bd7504bc2a6b1005e68f9b5f",
-    "evidence": "docs/pr152-seven-five-first-ja.md",
-    "state": "local six firsts five complete, Wstock afterloadhidden/loadfullunreached; no new preservationpositive; first-gauge limited scope not whole-map complete",
-    "record": "sevenFiveFirstLocal20261030",
-    "panelContractCorrection": "sevenFiveFirstPanelContractCorrection20261030",
-    "correctedCIFinalization": "sevenFiveFirstCorrectedCIFinalization20261030",
-    "currentState": "own corrected-source CI initial6 completed all D operations; D confirmed, A/B/C partial, old local Wstock load/caller gap retained separately; next independent7-5second draft not executed",
-    "recoveryRecord": "sevenFiveSecondRecoveryAndW4Correction20261030"
+    "id": "7-5/1/default",
+    "baselineHead": "80b156f5f3a39355946f38b8ca9d4d648c0bf45b",
+    "record": "sevenFiveSecondLocal20261030",
+    "evidence": "docs/pr152-seven-five-second-ja.md",
+    "state": "local6 firsts4complete/2WebKit postloadclickhidden; Dpartial, oldgapnotfilled, no preservationpositive in reached checks"
   },
-  "nextPriority": "実行接続復旧。7-5第2ABDFJOQの保存済み草稿12件から、B/D/J分岐順と軽空2の反例・代替境界、既存PT目標の保持をレビューし、after15と代表C/Wの未実施検証へ進む。今回の復旧/W4訂正はセルcredit0。",
+  "nextPriority": "7-5第3ABDFJOPTの先行分岐・P索敵・旧目標保持を独立確認する。第2の最終HEAD smoke回収と分離し、出典未確定は未判定を維持、成功目的の反復をしない。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -9026,5 +9052,103 @@
       "originalOverwritesOrDeletion": 0
     }
   },
-  "nextPriorityBeforeSevenFiveSecondRecovery20261030": "7-5第2ABDFJOQの独立したroute/Node草稿。出典一致域とJ優先順、旧利用者PT目標の保持を確認し、今回CIとは別に必要検証へ進む。"
+  "nextPriorityBeforeSevenFiveSecondRecovery20261030": "7-5第2ABDFJOQの独立したroute/Node草稿。出典一致域とJ優先順、旧利用者PT目標の保持を確認し、今回CIとは別に必要検証へ進む。",
+  "sevenFiveSecondLocal20261030": {
+    "record": "sevenFiveSecondLocal20261030",
+    "document": "docs/pr152-seven-five-second-ja.md",
+    "sourceBase": "80b156f5f3a39355946f38b8ca9d4d648c0bf45b",
+    "sourceBaseIsUncommittedProductSHA": false,
+    "publicSourceSnapshotFiles": 629,
+    "localRuntimeFilesIncludingPrivateConfig": 630,
+    "sourceManifestSHA256": "d734071f332c0e049a6c81d88d230962d6fca9166c96a63fc9be90012df20788",
+    "finalGitHead": null,
+    "finalGitFileCount": null,
+    "NodeBoundaryTests": {
+      "tests": 29,
+      "pass": 29,
+      "fail": 0,
+      "unrelatedSuccessReruns": 0
+    },
+    "separateAuditBindingTests": 1,
+    "separatePureMetadataContracts": {
+      "producer": 2,
+      "consumer": 2
+    },
+    "localFirstTrials": 6,
+    "localWorkers": 1,
+    "localRetries": 0,
+    "localRepeats": 0,
+    "localResults": {
+      "chromium": {
+        "pass": 3,
+        "fail": 0
+      },
+      "webkit": {
+        "pass": 1,
+        "timedOut": 2
+      }
+    },
+    "completed": [
+      "chromium-known",
+      "chromium-stock",
+      "chromium-unknown",
+      "webkit-unknown"
+    ],
+    "unreached": [
+      {
+        "case": "webkit-known",
+        "stage": "after-load-search",
+        "savedStrict30Reached": true,
+        "loadFullComparisonReached": false,
+        "navigationCollectionFailures": 1,
+        "callerHandlerCause": null
+      },
+      {
+        "case": "webkit-stock",
+        "stage": "after-load-search",
+        "savedStrict30Reached": true,
+        "loadFullComparisonReached": false,
+        "navigationCollectionFailures": 1,
+        "callerHandlerCause": null
+      }
+    ],
+    "savedOrSafeAbortStrict30Reads": 6,
+    "loadStrict30Reads": 4,
+    "applyAndMemoCases": 4,
+    "unknownSafeAbortAndNoEditCases": 2,
+    "knownStockGearPolicy": "saved proposal exact; original identity retained; original gear need not be exact",
+    "unknownGearPolicy": "original full exact; no edit",
+    "preservationPositiveInReachedComparisons": false,
+    "oldTrialGapsFilled": false,
+    "DStillPartial": true,
+    "countsBefore": [
+      23,
+      143,
+      70
+    ],
+    "countsAfter": [
+      23,
+      146,
+      67
+    ],
+    "CI": {
+      "state": "not-started",
+      "source": null,
+      "run": null
+    },
+    "scopeNotWholeMapComplete": true
+  },
+  "selectedBeforeSevenFiveSecondLocal20261030": {
+    "id": "7-5/0/default",
+    "baselineHead": "633b079cb1cd4e375fd095cabc33f60f08e9229d",
+    "integrationRecordHead": "d347aad828161781bd7504bc2a6b1005e68f9b5f",
+    "evidence": "docs/pr152-seven-five-first-ja.md",
+    "state": "local six firsts five complete, Wstock afterloadhidden/loadfullunreached; no new preservationpositive; first-gauge limited scope not whole-map complete",
+    "record": "sevenFiveFirstLocal20261030",
+    "panelContractCorrection": "sevenFiveFirstPanelContractCorrection20261030",
+    "correctedCIFinalization": "sevenFiveFirstCorrectedCIFinalization20261030",
+    "currentState": "own corrected-source CI initial6 completed all D operations; D confirmed, A/B/C partial, old local Wstock load/caller gap retained separately; next independent7-5second draft not executed",
+    "recoveryRecord": "sevenFiveSecondRecoveryAndW4Correction20261030"
+  },
+  "nextPriorityBeforeSevenFiveSecondLocal20261030": "実行接続復旧。7-5第2ABDFJOQの保存済み草稿12件から、B/D/J分岐順と軽空2の反例・代替境界、既存PT目標の保持をレビューし、after15と代表C/Wの未実施検証へ進む。今回の復旧/W4訂正はセルcredit0。"
 }
