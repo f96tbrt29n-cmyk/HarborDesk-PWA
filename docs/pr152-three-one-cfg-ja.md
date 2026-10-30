@@ -1,5 +1,32 @@
 # PR152：3-1 CFGの限定接続と保存操作
 
+> 3-1初回CIとguard訂正（2026-10-31 JST）：source940154dd／CI41107517422 attempt1は全6smokeジョブがNode前段の同じ旧2guardで失敗（各580/578/2）、Full skipped・取消0。C/W試行・保存/load比較は未到達、公式case outcomeは両方null、36件のroute metadataは未生成。旧52/208と8857/9abのhashを保持する明示的な歴史射影＋現CFGの新9番目bindへ訂正し、固定imageで失敗2＋新1の3title/構文3が成功。製品/browser/入力は変更せず局所C/W6を再利用する。元局所Node15unique/16成功実行と追加3passは別記。セル26/149/61は変更0、新訂正HEAD/CIはpending。以下の局所時点pendingは履歴として保持する。
+
+
+## 2026-10-31 初回CI940の停止と具体的guard訂正
+
+検証source 940154dd2767afc111f8fd70474722a4d25136db／[CI41107517422](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41107517422)、attempt1・smoke受付1回、同HEAD再実行0。6smokeジョブは各1回のNode検査580件/578成功/2失敗で停止し、Full skipped、取消0。失敗は旧7-5第2の他52例「不変」検査（routes 91:1→94:55）と監査canonical hash検査（audit 5:1→12:204）で、意図して変えた3-1条件も旧値との一致を要求していた。初回失敗の原本は保持する。
+
+|確認層|今回確認できたこと|未到達・欠測|
+|---|---|---|
+|CI前段|全6のcheckout940、image実pull b27e719e…、試験Node24.21.0、Node580/578/2と同じ2assert|PW版・ブラウザーrevisionの実検査は未到達。Actions内部Node20警告を試験Node版へ混ぜない|
+|C/W・保存/load|このCIでは呼出しなし|初回/retryのcase結果・公式C/W件数・保存比較はnull。局所成功を代用しない|
+|成果物・観測|公開artifact0/download0。正式attempt-log ZIP1件225,106bytes/12membersをCRC/SHA照合、公式注記6ジョブ分|予定36件のroute metadataと環境receipt6は未生成。REST一覧/個別steps連携の2経路ともsteps=[]でstep表は6件欠測。ログ中の実行を0 stepへ変換しない|
+
+訂正は試験3ファイルだけ。旧比較ではapproved 3-1逆変換の現在hash・一意anchor・復元全文hashを検査し、歴史的な他52例×4モード=208と旧fixtureを保持する。auditは現在CFGを実条件/LOS/sourceScopeへ明示bindした上で、旧全体hashの計算だけCFG条件を既存のpre-3-1 snapshotへ戻す。58行の8857d254…と52行の9ab7ae97…は変更しない。現在のCFGは出典から独立した既存8titleを保持し、新9番目でdocs2件の条件・出典・限定範囲とwrapper1回登録を検査する。
+
+固定image/Node24.21.0で、旧失敗2title＋新binding1titleだけを必要検証し3/3成功、構文3件も通過した。検証657 payloadはmanifest 472bf6768aa47de4b0fa4d110289e33d84bd4510203845b746bde7e4883a5b8dで閉鎖。製品4ファイル、通常browser spec/入力と他640ファイルは不変。元の局所Node15ユニーク/成功実行16と、この追加3passを同一runや総件数へ混算しない。変更のない成功8・他Node・C/W6を局所で繰り返さず、全体CI成功は新HEADでの実測待ちとする。期限・探索上限・待機・取消・例外検査は変更しない。
+
+回収Nは761 payload、manifest 81f7bc290dc8021a82172ad089d9f3107f76a43a419fcffb2088b9aa0eec133d、closure 5c13c7bb90c857071e1ccea06650701891828bd2399fd8c74ba853eca523b519。正式解析15件のmanifest 9e1fc1e04f3614307e583f9e596d3f42d5dc558e5706a94f29f423be1f4d4c89、analysis d002378fa543e39301123aec5efad03bfc7f0ed21a051db91f52cc9be4091c10。最終独立照合 6d36fd7279bfd9dc096e843aa8afe98a0c77d5c4a1d091889fd9038680d69faeで全set/bytes/hash・6原文slice・各環境とnull/未到達を確認した。原本・実値はprivate、sharedは許可metadataだけ。
+
+236セル26/149/61は変更0。Dの根拠は同じ行の局所6例の完了で、今回CIには保存/load観測がない。旧CIや旧load非表示・通信例外の欠測を埋めず、原因全体・保存安全性の解決としない。具体的なguardfixと記録の通常commit/push後、新HEADのsmokeを重複なく1回確認する。新訂正HEAD/CIはpending、1-5独立準備と保護対象を維持する。
+
+
+---
+
+以下は局所確認時点の記録。初回CIの未到達を埋めず、当時のpendingをその時点の履歴として保持する。
+
+
 2026-10-31 JST。基準HEADは 7ef98ad4775856eee1d921962e6c5cde5720cd80。計測加工を入れない製品差分と通常試験の局所確認で、最終feature HEAD・通常smoke CIはpending。PR152ドラフト・未公開、main競合と公開保留を維持する。
 
 ## 利用者から見た変更

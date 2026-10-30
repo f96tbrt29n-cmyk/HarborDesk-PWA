@@ -60,6 +60,20 @@ test('3-1 CFG scoped changes preserve every other52 preset route and speed finit
  }assert.equal(presets,52);assert.equal(comparisons,208);
 });
 
+test('3-1 CFG audit snapshots bind reviewed conditions scopes and current oracle registration',()=>{
+ const data=plain(routeContext().contracts['3-1'][0]);assert.equal(data.path,'CFG');assert.equal(data.useExampleScope,false);
+ assert.deepEqual(data.sources,['https://zekamashi.net/kancolle-kouryaku/3-1/','https://wikiwiki.jp/kancolle/北方海域/3-1']);
+ for(const [file,key,count]of [['route-goal-guidance-audit.json','rows',59],['route-requirement-validation-scope.json','examples',53]]){
+  const rows=JSON.parse(text('docs/'+file))[key];assert.equal(rows.length,count);
+  const selected=rows.filter(row=>row.map==='3-1'&&row.index===0);assert.equal(selected.length,1);
+  const row=selected[0];assert.equal(row.path,'CFG');assert.deepEqual(row.conditions,data.conditions);assert.deepEqual(row.scouting,data.los);
+  assert.equal(row.sourceScopeAudit.useExampleScope,data.useExampleScope);assert.equal(row.sourceScopeAudit.knownSixOnly,true);
+  assert.equal(row.sourceScopeAudit.fullSourceOrCombatQuantityCoverage,false);assert.deepEqual(row.sourceScopeAudit.cachedSources,data.sources);
+  assert.equal(row.sourceScopeAudit.record,'docs/pr152-three-one-cfg-ja.md');
+ }
+ const wrapper=text('tests/conditional-speed-ui.test.cjs');assert.equal(wrapper.split("require('./three-one-cfg.test.cjs');").length,2,'current independent CFG oracle stays registered once');
+});
+
 function placement(){
  const items=[{name:'流星',category:'艦上攻撃機',stats:{}},{name:'彗星',category:'艦上爆撃機',stats:{}},{name:'零式艦戦',category:'艦上戦闘機',stats:{対空:5}}],rows={carrierA:{type:'正規空母',profile:{id:1,count:4,slots:[18,18,0,6],flags:[]}},carrierB:{type:'軽空母',profile:{id:2,count:3,slots:[12,0,12],flags:[]}},zero:{type:'軽空母',profile:{id:3,count:2,slots:[0,0],flags:[]}},unknownSlots:{type:'正規空母',profile:{id:4,count:2,slots:[undefined,-1],flags:[]}},unknownProfile:{type:'正規空母'},blocked:{type:'正規空母',profile:{id:5,count:1,slots:[18],flags:[]}}};
  const c=vm.createContext({hdFEEsc:value=>String(value).replaceAll('<','&lt;').replaceAll('>','&gt;'),HD_SE_PARTS:{carrierAttackPlane:{examples:['流星','彗星']}},HD_SE_RECIPES:{'cap-carrier-attack':[{id:'carrier-attack',name:'空母：搭載枠に攻撃機',parts:['carrierAttackPlane'],ship:'carrier-attack'}]},HD_FE_AIR_CATS:new Set(['艦上戦闘機','艦上攻撃機','艦上爆撃機']),hdFLCatalog:()=>items,hdFEFind:name=>items.find(row=>row.name===name),hdFEFindShip:name=>rows[name],hdShipDbSlotProfile:db=>db?.profile||null,hdShipDbMasterCompatible:()=>null,HD_SLOT_EXCLUSION_RULES:[{shipIds:[1],slot:1,allowOnly:[6]},{shipIds:[5],slot:0,allowOnly:[6]}],hdShipDbPickerTypeId:item=>({'艦上戦闘機':6,'艦上攻撃機':8,'艦上爆撃機':7})[item.category],hdFERouteRequirementData:plan=>({map:plan.contractMap??plan.map,index:plan.routeIndex??0,path:plan.path??'CFG'}),localStorage:new Proxy({},{get(){throw Error('hint must not read Storage')}})});

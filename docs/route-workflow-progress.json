@@ -3172,12 +3172,12 @@
   ],
   "selected": {
     "id": "3-1/0/default",
-    "baselineHead": "7ef98ad4775856eee1d921962e6c5cde5720cd80",
-    "record": "threeOneLocal20261031",
+    "baselineHead": "940154dd2767afc111f8fd70474722a4d25136db",
+    "record": "threeOneFirstCIGuardCorrection20261031",
     "evidence": "docs/pr152-three-one-cfg-ja.md",
-    "state": "six local firsts complete; B/C partial and D confirmed only; final feature HEAD and CI pending"
+    "state": "firstCI Node580/578/2 in all6; browser/save/load not reached; historical guards corrected and target3 passed; new correction HEAD/CI pending; local6 proof retained"
   },
-  "nextPriority": "1-5/index1 ADFGJを独立したsource-only候補として照合する。同海域index0/2の既存証拠を先に確認し、具体欠陥・適用域が未確定なら推測実装しない。3-1の最終HEAD smoke回収と分離する。",
+  "nextPriority": "3-1の具体的な旧比較guard訂正を独立反映し、新HEADのsmokeを重複なく1回回収する。1-5/index1 ADFGJの独立準備を保持し、3-1の初回CI未到達を局所成功で補完しない。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -7059,6 +7059,23 @@
         61
       ],
       "limitedScopeNotWholeMapCompletion": true
+    },
+    {
+      "id": "3-1/0/default",
+      "record": "threeOneFirstCIGuardCorrection20261031",
+      "sourceHead": "940154dd2767afc111f8fd70474722a4d25136db",
+      "countsBefore": [
+        26,
+        149,
+        61
+      ],
+      "countsAfter": [
+        26,
+        149,
+        61
+      ],
+      "statusCellChanges": 0,
+      "CIRouteOperationsUnreached": true
     }
   ],
   "fiveFourCloseout": {
@@ -10913,5 +10930,190 @@
     ],
     "nextPriority": "1-5/index1 ADFGJを独立したsource-only候補として照合する。同海域index0/2の既存証拠を先に確認し、具体欠陥・適用域が未確定なら推測実装しない。3-1の最終HEAD smoke回収と分離する。",
     "protected": "PR152 draft/unpublished; main conflict and old originals retained; no main integration/PR151/version/SW/production/merge/publish/automerge change"
-  }
+  },
+  "threeOneFirstCIGuardCorrection20261031": {
+    "record": "threeOneFirstCIGuardCorrection20261031",
+    "document": "docs/pr152-three-one-cfg-ja.md",
+    "recordDateJST": "2026-10-31",
+    "recordedUTC": "2026-10-30T19:05:33.326702+00:00",
+    "state": "first feature CI failed before browsers; concrete historical-guard correction locally verified; correction commit/new HEAD CI pending",
+    "firstCI": {
+      "sourceHead": "940154dd2767afc111f8fd70474722a4d25136db",
+      "runId": 41107517422,
+      "attempt": 1,
+      "acceptedSmokeDispatches": 1,
+      "sameHeadReruns": 0,
+      "conclusion": "failure",
+      "smokeJobs": {
+        "success": 0,
+        "failure": 6,
+        "cancelled": 0
+      },
+      "Full": "skipped",
+      "PagesJobs": 0,
+      "NodePerJobActual": {
+        "tests": 580,
+        "pass": 578,
+        "fail": 2,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "NodeSuiteInvocations": 6,
+      "distinctLogicalNodeFailures": 2,
+      "failures": [
+        {
+          "file": "tests/seven-five-second-routes.test.cjs",
+          "testLocation": "91:1",
+          "assertLocation": "94:55",
+          "message": "3-1/0 complete data unchanged"
+        },
+        {
+          "file": "tests/seven-five-second-audit.test.cjs",
+          "testLocation": "5:1",
+          "assertLocation": "12:204",
+          "message": "route-goal-guidance-audit.json unchanged canonical rows"
+        }
+      ],
+      "officialPlaywrightCaseOutcomes": {
+        "chromium": null,
+        "webkit": null
+      },
+      "PlaywrightInitialRetryCasesNotReached": true,
+      "bundledBrowserVerificationReached": false,
+      "browserSmokeReached": false,
+      "saveLoadComparisonReached": false,
+      "CIStoragePreservationObservation": null,
+      "expectedInitialRouteMetadata": 36,
+      "routeMetadataNotGenerated": 36,
+      "publishedArtifacts": 0,
+      "artifactDownloads": 0,
+      "generatedEnvironmentReceipts": 0,
+      "actualCheckoutMatchedJobs": 6,
+      "actualImagePullDigestMatchedJobs": 6,
+      "actualNodeMeasuredJobs": 6,
+      "actualNode": "v24.21.0",
+      "actualImageDigest": "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29",
+      "actualPlaywrightVersion": null,
+      "actualChromiumRevision": null,
+      "actualWebKitRevision": null,
+      "actualHTTPServedHashes": null,
+      "expectedGitSourceFiles": 643,
+      "expectedGitSourceManifestSHA256": "f57ea7d8bddb5cd2c615222b1a3872e473e586d641e8530d4b530d57d25deed0",
+      "stepMetadata": {
+        "routesTried": 2,
+        "allSixOfficialTablesWereEmpty": true,
+        "missingDespiteActualLogCommands": true,
+        "meansZeroExecutedSteps": false
+      },
+      "actionRuntimeNode20WarningIsTestNodeVersion": false,
+      "actualActionPatchVersion": null
+    },
+    "classification": "Intentional source-backed CFG changes were still inside two old unchanged-output guards. The current CFG product/oracle remains; historical comparisons and both original group hashes are retained through an explicitly bounded pre-CFG projection.",
+    "guardCorrection": {
+      "productChanges": 0,
+      "workflowAndBrowserSpecOrFixtureChanges": 0,
+      "testFilesChanged": 3,
+      "historicalGuardsCorrected": 2,
+      "newCurrentCFGSnapshotBindingTitle": 1,
+      "currentCFGOracleTitles": 9,
+      "originalEightBodiesExact": true,
+      "historicalSourceInverse": {
+        "fixtureSHA256": "9fe3a72b32982c108ca62ffbfae8468290278d36f3857f906219e4680246179e",
+        "mapAnchors": 1,
+        "FEAnchors": 4,
+        "afterHashUniqueAnchorBeforeWholeHashGuards": true,
+        "presets": 52,
+        "fourModesComparisons": 208
+      },
+      "auditHistoricalHashes": {
+        "rows58": "8857d25455dac2952013614c4bee108aa57a400aa1d2921b6815ceee877e54b3",
+        "rows52": "9ab7ae97ba195877d7f29ff45fce87cd982362bc326d32b4160c5e1277e0937f",
+        "normalization": "only the explicitly bound CFG conditions; all other canonical fields remain protected"
+      },
+      "blindNewExpectedHashSubstitution": false,
+      "unconditionalExclusion": false,
+      "newCurrentBinding": "both audit rows match actual CFG conditions/LOS/sourceScope/cachedSources/limited-coverage record and wrapper registration exactly once",
+      "fixedImageTargetVerification": {
+        "tests": 3,
+        "pass": 3,
+        "fail": 0,
+        "syntaxFilesPassed": 3,
+        "unchangedSuccessfulTestsRerun": 0,
+        "browserTrials": 0,
+        "resultSHA256": "7ce666f283260bf126437121d7adbd2a7a4b56e31cd2b34b838580e7f6ab04df",
+        "phaseManifestFiles": 657,
+        "phaseManifestSHA256": "472bf6768aa47de4b0fa4d110289e33d84bd4510203845b746bde7e4883a5b8d",
+        "phaseClosureSHA256": "987a63fe785e04b03162aa45e23feccf754bab42d9bfe40a7383915328ba81e8"
+      },
+      "independentStaticReviewSHA256": "ec924b208d41ecc22c25535661c254b7f5d7037e854b6983803ebceac2606da7",
+      "newFixCommitHead": null,
+      "newFixCI": {
+        "state": "not-started",
+        "runId": null,
+        "expectedFullNodeCountClaim": null
+      }
+    },
+    "localEvidenceKeptSeparate": {
+      "record": "threeOneLocal20261031",
+      "originalPublicNodeUniqueTitles": 15,
+      "originalSuccessfulPhysicalNodeExecutions": 16,
+      "newGuardTargetPasses": 3,
+      "theseCountsSummedAsOneRun": false,
+      "originalCWSixFirstPassesReused": true,
+      "CWSourcesAndInputsUnchanged": true,
+      "localSuccessFillsCIUnreached": false,
+      "CIUnreachedErasesIdentifiedLocalProof": false
+    },
+    "evidence": {
+      "finalCollectorFiles": 761,
+      "finalCollectorManifestSHA256": "81f7bc290dc8021a82172ad089d9f3107f76a43a419fcffb2088b9aa0eec133d",
+      "finalCollectorClosureSHA256": "5c13c7bb90c857071e1ccea06650701891828bd2399fd8c74ba853eca523b519",
+      "CIcoreFiles": 725,
+      "CIcoreManifestSHA256": "577fd494d60c4db8c9e699f599b91ee3714404aa1ffa740ffed55ee290d8d733",
+      "artifactContextFiles": 14,
+      "artifactContextManifestSHA256": "774a5716d854287b9d6eee778311b6a2cb97909f5d81a5263d3b71d62187769a",
+      "analysisFiles": 15,
+      "analysisManifestSHA256": "9e1fc1e04f3614307e583f9e596d3f42d5dc558e5706a94f29f423be1f4d4c89",
+      "analysisSHA256": "d002378fa543e39301123aec5efad03bfc7f0ed21a051db91f52cc9be4091c10",
+      "officialAnnotationsJobs": 6,
+      "formalAttemptLogZIPRequests": 1,
+      "formalAttemptLogZIPBytes": 225106,
+      "formalAttemptLogZIPMembers": 12,
+      "formalAttemptLogZIPCRC": "PASS",
+      "formalAttemptLogZIPSHA256": "9e1daba09a3f7368df995c260e79a59dedac106e96efda3a58983e911468fb9d",
+      "independentFinalReviewPath": "/workspace/harbordesk-handoff-_gnvlnto/continuation-three-one-followup-20261031/private/ci411-independent-review-20261031/review.json",
+      "independentFinalReviewSHA256": "6d36fd7279bfd9dc096e843aa8afe98a0c77d5c4a1d091889fd9038680d69fae",
+      "independentFinalReviewPending": false,
+      "originalsPrivateUnmodified": true,
+      "sharedAllowlistedMetadataOnly": true,
+      "newTestCIRerunUploadOrSanitizerByCollector": 0
+    },
+    "matrix": {
+      "before": [
+        26,
+        149,
+        61
+      ],
+      "after": [
+        26,
+        149,
+        61
+      ],
+      "statusCellsChanged": 0,
+      "basis": "D stays grounded in the six identified local complete workflows; this CI did not execute save/load comparisons.",
+      "definitionsOld53AndAll59RowsUnchanged": true,
+      "completionPercent": null
+    },
+    "protected": "PR152 draft/unpublished, old originals/main conflict/known unresolved causes retained; no main integration/PR151/version/SW/production/merge/publish/automerge",
+    "next": "Root ordinary commit/push of the concrete guard correction and records, then one smoke on the new HEAD without duplicate dispatch. Independent 1-5/index1 source/preparation work remains separate."
+  },
+  "selectedBeforeThreeOneFirstCIGuardCorrection20261031": {
+    "id": "3-1/0/default",
+    "baselineHead": "7ef98ad4775856eee1d921962e6c5cde5720cd80",
+    "record": "threeOneLocal20261031",
+    "evidence": "docs/pr152-three-one-cfg-ja.md",
+    "state": "six local firsts complete; B/C partial and D confirmed only; final feature HEAD and CI pending"
+  },
+  "nextPriorityBeforeThreeOneFirstCIGuardCorrection20261031": "1-5/index1 ADFGJを独立したsource-only候補として照合する。同海域index0/2の既存証拠を先に確認し、具体欠陥・適用域が未確定なら推測実装しない。3-1の最終HEAD smoke回収と分離する。"
 }

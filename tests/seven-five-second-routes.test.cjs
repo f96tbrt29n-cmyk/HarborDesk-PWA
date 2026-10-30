@@ -6,10 +6,23 @@ const source=require('./fixtures/seven-five-second-source-cases.json'),actual=re
 const plain=x=>JSON.parse(JSON.stringify(x)),sha=x=>crypto.createHash('sha256').update(x).digest('hex');
 const STYPES={BB:9,FBB:8,BBV:10,CL:3,CLT:4,CT:21,CA:5,CAV:6,CV:11,CVB:18,CVL:7,DD:2,DE:1,CD:12,AV:16,SS:13,SSV:14,AS:20,AO:22,LHA:17,AR:19};
 const original=['BBV','CAV','CL','DD','DD','DD'];
+function historicalThreeOneSource(file,body){
+ // This legacy comparison owns the pre-3-1 projection. Actual CFG semantics
+ // remain covered by the independent three-one-cfg suite in the same wrapper.
+ const bytes=fs.readFileSync(path.join(fixtures,'three-one-approved-source-inverses.json'));
+ assert.equal(sha(bytes),'9fe3a72b32982c108ca62ffbfae8468290278d36f3857f906219e4680246179e');
+ const approved=JSON.parse(bytes),changes=approved.changes.filter(row=>row.file===file);
+ assert.equal(changes.length,file==='map-plans.js'?1:4);assert.equal(sha(body),approved.files[file].approvedAfterSHA256);
+ for(const row of changes.reverse()){assert.equal(body.split(row.after).length,2,file+' approved anchor is unique');body=body.replace(row.after,row.before)}
+ assert.equal(sha(body),approved.files[file].beforeSHA256,file+' exact historical source');return body;
+}
 function fn(text,name){const a=text.indexOf('function '+name+'('),b=text.indexOf('\nfunction ',a+1);assert.ok(a>=0,name+' exists');return text.slice(a,b<0?undefined:b)}
 function load(text,name,c){vm.runInContext(fn(text,name),c)}
-function context(old=false){
- const evaluator=fs.readFileSync(path.join(root,'fleet-readiness-evaluator.js'),'utf8'),plans=old?baseline.mapPlanSource:fs.readFileSync(path.join(root,'map-plans.js'),'utf8'),masters=new Map(),ids=new Map();
+function context(old=false,historicalThreeOne=false){
+ assert.ok(!old||!historicalThreeOne);
+ let evaluator=fs.readFileSync(path.join(root,'fleet-readiness-evaluator.js'),'utf8'),plans=old?baseline.mapPlanSource:fs.readFileSync(path.join(root,'map-plans.js'),'utf8');
+ if(historicalThreeOne){evaluator=historicalThreeOneSource('fleet-readiness-evaluator.js',evaluator);plans=historicalThreeOneSource('map-plans.js',plans)}
+ const masters=new Map(),ids=new Map();
  const c=vm.createContext({window:{},localStorage:{getItem:()=>null},hdFEFind:()=>({}),hdFEFindShip:name=>masters.get(name)||null,hdShipDbMasterRowFor:x=>ids.get(Number(x?.masterId))||masters.get(typeof x==='string'?x:x?.name||x?.final)||null,hdShipDbSlotProfile:()=>null,hdFEExpansionAvailability:()=>({allowed:false,status:'manual'})});
  vm.runInContext(plans,c);const all=vm.runInContext('HD_MAP_ROUTE_REQUIREMENTS',c),maps=vm.runInContext('MAP_PLANS',c);
  const fleet=fs.readFileSync(path.join(root,'fleet-suggester.js'),'utf8'),a=fleet.indexOf('const HD_FS_TYPE_ALIASES='),b=fleet.indexOf('\n};',a)+3;vm.runInContext(old?baseline.fleetTypeAliasesSource:fleet.slice(a,b),c);
@@ -88,8 +101,8 @@ test('selected second Q keeps canonical nonapplicable LOS and the unchanged opti
  const d=h.all['7-5'][1];assert.deepEqual(plain(d.los),{kind:'none',note:'この登録経路に数値索敵の条件は掲載されていません。'});assert.equal(d.minimumSpeed,undefined);assert.equal(d.openingAsw,undefined);assert.deepEqual(plain(d.equipmentKinds),['制空','防空','対潜','対地','PT対策']);assert.deepEqual(plain(d.equipmentTargets),[{kind:'cap-pt',baseKind:'PT対策',label:'PT小鬼群対策セット',minCount:1,source:'https://zekamashi.net/kancolle-kouryaku/ptboat-taisaku/'}]);assert.equal(Object.hasOwn(d.equipmentTargets[0],'generatedFromMap'),false,'PT origin/merge correction is a separate unimplemented phase');assert.equal(d.equipmentKinds.includes('夜戦'),false);assert.equal(d.base,undefined);assert.deepEqual(plain(d.sourceUnavailable),source.unavailable);
  const notes=d.notes.join(' ');for(const phrase of ['FでJ','OでQ','MギミックとQは順不同','軽空2','駆逐2＋海防1','Jは軽空ちょうど1','その他N','PTを無理に撃破せず','任意の比較目標','購入数量','基地航空隊は使用できず','第1の夜戦CIを追加せず','旧図'])assert.ok(notes.includes(phrase),phrase);
 });
-test('isolated before and current contexts preserve full outputs for every other52 presets and four modes',()=>{
- const now=context(),old=context(true);let presets=0,comparisons=0;
+test('historical source projection preserves full outputs for other52 presets while current CFG has its own oracle',()=>{
+ const now=context(false,true),old=context(true);let presets=0,comparisons=0;
  for(const [map,data]of Object.entries(now.maps))for(const [index,preset]of data.presets.entries()){
   if(map==='7-5'&&index===1)continue;presets++;assert.deepEqual(plain(now.all[map][index]),plain(old.all[map][index]),map+'/'+index+' complete data unchanged');
   for(const mode of ['canonical','chosen-manual','explicit-speed','unknown']){const make=h=>{const p=h.make(['CL','DD','DD','DD','DD','DD'],mode==='unknown'?null:10);p.map=map;p.routeIndex=index;p.preset=h.maps[map].presets[index];p.routeInfo=plain(h.c.hdFSPresetInfo(p.preset));p.score=100;if(mode==='chosen-manual')p.suggestion={preset:p.preset,info:{...plain(p.routeInfo),conditionManual:true}};if(mode==='explicit-speed')p.routeInfo={...p.routeInfo,text:'利用者指定 高速+統一',speedRequired:true};return p},a=make(now),b=make(old);assert.deepEqual(plain(now.c.hdFERoute(a)),plain(old.c.hdFERoute(b)),map+'/'+index+'/'+mode+' full route');assert.equal(now.c.hdFEPlanSpeedTarget(a),old.c.hdFEPlanSpeedTarget(b),map+'/'+index+'/'+mode+' speed target');comparisons++;}
