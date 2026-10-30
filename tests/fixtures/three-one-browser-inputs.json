@@ -1,0 +1,359 @@
+{
+  "schemaVersion": 1,
+  "unit": "three-one",
+  "variantId": "source-clear-cv2-dd4-synchronized-five-finite-seven",
+  "selectedRoute": {
+    "map": "3-1",
+    "index": 0,
+    "path": "CFG",
+    "choiceMeaning": "six known CV2 DD4 alternative; source C-F and F-G condition confirmation, not victory guarantee"
+  },
+  "ships": [
+    {
+      "shipIndex": 0,
+      "masterId": 277,
+      "name": "赤城改",
+      "type": "正規空母",
+      "stype": 11,
+      "baseSpeed": 10,
+      "normalSlots": [
+        20,
+        20,
+        32,
+        10
+      ]
+    },
+    {
+      "shipIndex": 1,
+      "masterId": 278,
+      "name": "加賀改",
+      "type": "正規空母",
+      "stype": 11,
+      "baseSpeed": 10,
+      "normalSlots": [
+        20,
+        20,
+        46,
+        12
+      ]
+    },
+    {
+      "shipIndex": 2,
+      "masterId": 330,
+      "name": "秋月改",
+      "type": "駆逐艦",
+      "stype": 2,
+      "baseSpeed": 10,
+      "normalSlots": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "shipIndex": 3,
+      "masterId": 229,
+      "name": "島風改",
+      "type": "駆逐艦",
+      "stype": 2,
+      "baseSpeed": 10,
+      "normalSlots": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "shipIndex": 4,
+      "masterId": 144,
+      "name": "夕立改二",
+      "type": "駆逐艦",
+      "stype": 2,
+      "baseSpeed": 10,
+      "normalSlots": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "shipIndex": 5,
+      "masterId": 145,
+      "name": "時雨改二",
+      "type": "駆逐艦",
+      "stype": 2,
+      "baseSpeed": 10,
+      "normalSlots": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "level": 90,
+  "hq": 120,
+  "statsInput": "No synthetic LOS or ASW statistic values. No numeric/air target is injected or selected. Fleet saved OASW0 and night auto are explicit synthetic input.",
+  "modelExpectation": {
+    "needs": [],
+    "rowKinds": [],
+    "requestedKindsKnownStock": [
+      "cap-carrier-attack"
+    ],
+    "requestedKindsUnknown": [],
+    "allGoalKindsKnownStock": [
+      "cap-carrier-attack",
+      "air-value",
+      "route-requirements"
+    ],
+    "allGoalKindsUnknown": [
+      "air-value",
+      "route-requirements"
+    ],
+    "forbiddenKinds": [
+      "制空",
+      "cap-aa",
+      "cap-asw",
+      "opening-asw",
+      "夜戦",
+      "cap-night-auto",
+      "cap-land-mixed",
+      "cap-pt",
+      "los-value",
+      "speed-ship"
+    ],
+    "normalFrames": 20,
+    "airReferenceOnly": {
+      "maximumRegisteredEnemy": 28,
+      "superiorityReference": 42,
+      "selected": false,
+      "known": false
+    },
+    "purpose": {
+      "cap-carrier-attack": "recommendation",
+      "air-value": "strategy",
+      "route-requirements": "route"
+    },
+    "initialGearPurpose": "Existing fighter/AA setup remains real gear with legal frames and finite ownership, but no new inferred fighter/AA minimum goal is manufactured.",
+    "unknownAutomaticGoal": "Full route is unverified; no new automatic carrier default is generated for unknown hull."
+  },
+  "sourceContract": {
+    "inputSHA256": "cc2386b5c48d2bd38eae3a44e74ab428acd41a9e738e588b1954c1e262cd8da8",
+    "sourceSpansSHA256": "459df7211b872f5652e2b0ddd7f820d746ec4640990b721445266f5cd553f54e",
+    "scope": "Synthetic actual-master input; fixed-Node corrected two-title contract passed before this browser draft. No actual game, DOM or save proof is inferred from it."
+  },
+  "limits": "Original synchronous generator once/state, no custom limits; 10000/beam5/depth24. This Node contract adds no wait, save, reload, DOM, native fetch or timer.",
+  "known": {
+    "rosterGear": [
+      [
+        "零式艦戦52型"
+      ],
+      [
+        "零式艦戦52型"
+      ],
+      [
+        "10cm連装高角砲＋高射装置",
+        "10cm連装高角砲＋高射装置",
+        "13号対空電探改"
+      ],
+      [],
+      [],
+      []
+    ],
+    "initialGear": [
+      [
+        "零式艦戦52型"
+      ],
+      [
+        "零式艦戦52型"
+      ],
+      [
+        "10cm連装高角砲＋高射装置",
+        "10cm連装高角砲＋高射装置",
+        "13号対空電探改"
+      ],
+      [],
+      [],
+      []
+    ],
+    "initialItems": 5,
+    "inventoryItems": 7,
+    "expectedCarrierBefore": 0,
+    "expectedCarrierAfter": 2,
+    "initialItemsScope": "recognized known items in the Build input; unknown literal is separately retained in original saved text",
+    "initialKnownItems": 5,
+    "initialUnknownLiteralItems": 0,
+    "initialSourceTextItems": 5,
+    "finiteInventory": [
+      {
+        "id": "fighter",
+        "name": "零式艦戦52型",
+        "star": 0,
+        "count": 2
+      },
+      {
+        "id": "ha",
+        "name": "10cm連装高角砲＋高射装置",
+        "star": 0,
+        "count": 2
+      },
+      {
+        "id": "radar",
+        "name": "13号対空電探改",
+        "star": 0,
+        "count": 1
+      },
+      {
+        "id": "attack",
+        "name": "流星",
+        "star": 0,
+        "count": 2
+      }
+    ],
+    "expectedReadiness": "manual",
+    "expectedOriginalGearExact": false
+  },
+  "stock": {
+    "rosterGear": [
+      [
+        "零式艦戦52型"
+      ],
+      [
+        "零式艦戦52型"
+      ],
+      [
+        "10cm連装高角砲＋高射装置",
+        "10cm連装高角砲＋高射装置",
+        "13号対空電探改"
+      ],
+      [],
+      [],
+      []
+    ],
+    "initialGear": [
+      [
+        "零式艦戦52型"
+      ],
+      [
+        "零式艦戦52型"
+      ],
+      [
+        "10cm連装高角砲＋高射装置",
+        "10cm連装高角砲＋高射装置",
+        "13号対空電探改"
+      ],
+      [],
+      [],
+      []
+    ],
+    "initialItems": 5,
+    "inventoryItems": 5,
+    "expectedCarrierBefore": 0,
+    "expectedCarrierAfter": 0,
+    "initialItemsScope": "recognized known items in the Build input; unknown literal is separately retained in original saved text",
+    "initialKnownItems": 5,
+    "initialUnknownLiteralItems": 0,
+    "initialSourceTextItems": 5,
+    "finiteInventory": [
+      {
+        "id": "fighter",
+        "name": "零式艦戦52型",
+        "star": 0,
+        "count": 2
+      },
+      {
+        "id": "ha",
+        "name": "10cm連装高角砲＋高射装置",
+        "star": 0,
+        "count": 2
+      },
+      {
+        "id": "radar",
+        "name": "13号対空電探改",
+        "star": 0,
+        "count": 1
+      }
+    ],
+    "expectedReadiness": "missing",
+    "expectedOriginalGearExact": true
+  },
+  "unknown": {
+    "replaceShipIndex": 5,
+    "name": "合成未登録駆逐3-1",
+    "gear": "合成未登録装備3-1",
+    "rosterGear": [
+      [
+        "零式艦戦52型"
+      ],
+      [
+        "零式艦戦52型"
+      ],
+      [
+        "10cm連装高角砲＋高射装置",
+        "10cm連装高角砲＋高射装置",
+        "13号対空電探改"
+      ],
+      [],
+      [],
+      []
+    ],
+    "initialGear": [
+      [
+        "零式艦戦52型"
+      ],
+      [
+        "零式艦戦52型"
+      ],
+      [
+        "10cm連装高角砲＋高射装置",
+        "10cm連装高角砲＋高射装置",
+        "13号対空電探改"
+      ],
+      [],
+      [],
+      []
+    ],
+    "initialItems": 5,
+    "inventoryItems": 8,
+    "expectedCarrierBefore": null,
+    "expectedCarrierAfter": null,
+    "initialItemsScope": "recognized known items in the Build input; unknown literal is separately retained in original saved text",
+    "initialKnownItems": 5,
+    "initialUnknownLiteralItems": 1,
+    "initialSourceTextItems": 6,
+    "finiteInventory": [
+      {
+        "id": "fighter",
+        "name": "零式艦戦52型",
+        "star": 0,
+        "count": 2
+      },
+      {
+        "id": "ha",
+        "name": "10cm連装高角砲＋高射装置",
+        "star": 0,
+        "count": 2
+      },
+      {
+        "id": "radar",
+        "name": "13号対空電探改",
+        "star": 0,
+        "count": 1
+      },
+      {
+        "id": "attack",
+        "name": "流星",
+        "star": 0,
+        "count": 2
+      },
+      {
+        "id": "unknown",
+        "name": "合成未登録装備3-1",
+        "star": 0,
+        "count": 1
+      }
+    ],
+    "expectedReadiness": "manual",
+    "expectedOriginalGearExact": true
+  },
+  "operationScope": "One test per state/browser; original save/edit/reload/same-document load operations are retained. Unknown uses the original full text and safe abort; an unregistered proposal candidate is not confirmed legal. Known may replace unrequested fighters with finite attack planes; no fighter/AA minimum is fabricated."
+}

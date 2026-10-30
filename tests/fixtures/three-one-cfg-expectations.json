@@ -1,0 +1,151 @@
+{
+  "state": "fresh private literal expectations; not passed/executed tests",
+  "target": {
+    "map": "3-1",
+    "index": 0,
+    "path": "CFG",
+    "scope": "six known source-clear hulls only"
+  },
+  "definitions": {
+    "BB": "戦艦",
+    "FBB": "高速戦艦",
+    "BBV": "航空戦艦",
+    "CV": "正規空母",
+    "CVB": "装甲空母",
+    "CVL": "軽空母",
+    "CA": "重巡洋艦",
+    "CAV": "航空巡洋艦",
+    "CL": "軽巡洋艦",
+    "CLT": "重雷装巡洋艦",
+    "CT": "練習巡洋艦",
+    "DD": "駆逐艦",
+    "DE": "海防艦",
+    "AS": "潜水母艦",
+    "AV": "水上機母艦",
+    "AO": "補給艦",
+    "SS": "潜水艦",
+    "SSV": "潜水空母",
+    "LHA": "揚陸艦",
+    "CD": "海防戦艦",
+    "UNKNOWN": "未登録艦種"
+  },
+  "sourceReady": [
+    {
+      "id": "canonical-control",
+      "hulls": [
+        "CV",
+        "CV",
+        "CA",
+        "CLT",
+        "DD",
+        "DD"
+      ]
+    },
+    {
+      "id": "two-carriers-four-destroyers",
+      "hulls": [
+        "CV",
+        "CV",
+        "DD",
+        "DD",
+        "DD",
+        "DD"
+      ]
+    },
+    {
+      "id": "two-ordinary-battleships",
+      "hulls": [
+        "BB",
+        "BB",
+        "CA",
+        "CLT",
+        "DD",
+        "DD"
+      ]
+    },
+    {
+      "id": "one-battleship-one-carrier",
+      "hulls": [
+        "BB",
+        "CV",
+        "CA",
+        "CLT",
+        "DD",
+        "DD"
+      ]
+    },
+    {
+      "id": "aviation-battleship-and-plain-light-cruiser-group-two",
+      "hulls": [
+        "BBV",
+        "CL",
+        "CA",
+        "CLT",
+        "DD",
+        "DD"
+      ]
+    }
+  ],
+  "knownMissing": [
+    {
+      "id": "heavy-three",
+      "hulls": [
+        "CV",
+        "CV",
+        "BB",
+        "CA",
+        "DD",
+        "DD"
+      ]
+    },
+    {
+      "id": "one-escort",
+      "hulls": [
+        "CV",
+        "CV",
+        "CA",
+        "CA",
+        "CLT",
+        "DD"
+      ]
+    },
+    {
+      "id": "known-heavy-failure-plus-unknown",
+      "hulls": [
+        "CV",
+        "CV",
+        "BB",
+        "DD",
+        "DD",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "id": "aviation-battleship-and-two-plain-light-cruisers-group-three-random",
+      "hulls": [
+        "BBV",
+        "CL",
+        "CL",
+        "CA",
+        "DD",
+        "DD"
+      ],
+      "scopeMeaning": "C has a prior random B/F branch, so selected fixedCFG is not established; this is not game impossibility or equipment procurement"
+    }
+  ],
+  "scopeManualKinds": [
+    "AS",
+    "AV",
+    "AO",
+    "SS",
+    "SSV",
+    "CT",
+    "LHA",
+    "CD",
+    "UNKNOWN"
+  ],
+  "sourceBasis": "Articlecache3-1 L85–90 and JPcache L14/L20: ready rows have escort>=2/heavy<=2/BBV+plainCL group<=2 and noAS-AV-AO-SS. Group3 is prior randomB/F, not fixedCFG; CLT is not plainCL (JP L82). No source speed orLOS assumption. Excluded families are unreviewed domain, not declared impossible.",
+  "expectationOrigin": "Independently literalized from closed source review before any implementation; current oldBasicmissing/finalmanual is a counterexample, not an expected ready value generated from a new product.",
+  "noPassOr236Credit": true,
+  "dualInfoContractLimit": "Non-speed Basic selects suggestion.info before routeInfo; dual-info opposite directions must retain before/after priority, not invent AND semantics. Both explicit speed inputs are separately retained by the scoped speed guards."
+}

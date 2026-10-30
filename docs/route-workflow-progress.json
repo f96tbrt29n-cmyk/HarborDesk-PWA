@@ -62,20 +62,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 38,
-      "未確認": 21,
+      "一部": 39,
+      "未確認": 20,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 38,
-      "未確認": 21,
+      "一部": 39,
+      "未確認": 20,
       "非該当": 0
     },
     "D": {
-      "確認済み": 25,
+      "確認済み": 26,
       "一部": 15,
-      "未確認": 19,
+      "未確認": 18,
       "非該当": 0
     }
   },
@@ -746,22 +746,34 @@
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "出典一致の空母2＋駆逐4代表をC/W各初回で実配備。有限在庫の攻撃機0→2と合法通常枠を確認。制空未選択・全代替/全目標/枠競合は未網羅。",
+          "evidence": [
+            "docs/pr152-three-one-cfg-ja.md",
+            "tests/route-three-one-cfg.spec.js",
+            "tests/fixtures/three-one-browser-inputs.json"
+          ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "空母各艦の任意攻撃機1個、所持0/装備例2/あと2と各艦の合法通常枠候補、未知艦・装備の未判定/安全中止をC/Wで確認。全搭載不可/競合区分は未網羅。",
+          "evidence": [
+            "docs/pr152-three-one-cfg-ja.md",
+            "tests/route-three-one-cfg.spec.js",
+            "tests/fixtures/three-one-browser-inputs.json"
+          ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "確認済み",
+          "reason": "同じ行C/W各3初回が全完了。成立相当/在庫不足4件は保存・メモ編集、未知2件は原文安全中止。全6件で同一reload文書load/complete後の全文/識別30/他編成metadata保持を直接確認。",
+          "evidence": [
+            "docs/pr152-three-one-cfg-ja.md",
+            "tests/route-three-one-cfg.spec.js",
+            "tests/fixtures/three-one-browser-inputs.json"
+          ]
         }
       },
-      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+      "remaining": "出典一致の既知六隻域以外、全戦闘目標数量/全在庫・搭載不可・枠競合、地図タブ実操作・旧goal/history二キー互換は残る。全探索未完、制空未選択。旧非表示/通信原因は未解決。"
     },
     {
       "id": "3-2/0/normal",
@@ -3159,13 +3171,13 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "7-5/2/default",
-    "baselineHead": "1b4f9ab60c985a3315c99e4dc68b73d19b549b3f",
-    "record": "sevenFiveThirdCIFinalization20261031",
-    "evidence": "docs/pr152-seven-five-third-ja.md",
-    "state": "CI terminal5success/W4failure; identified ownG3 initial5 plus stockWretry1 cover six representatives; Dconfirmed only, old trials/gaps preserved"
+    "id": "3-1/0/default",
+    "baselineHead": "7ef98ad4775856eee1d921962e6c5cde5720cd80",
+    "record": "threeOneLocal20261031",
+    "evidence": "docs/pr152-three-one-cfg-ja.md",
+    "state": "six local firsts complete; B/C partial and D confirmed only; final feature HEAD and CI pending"
   },
-  "nextPriority": "3-1 CFGを別WT・別記録で続行する。閉鎖source-only設計9＋addendumの当時JS/UI未実行という履歴を保持し、以後の独立検証/未コミット差分と区別する。3-1 UI未実行・セル加算0、G3証拠へ合算しない。",
+  "nextPriority": "1-5/index1 ADFGJを独立したsource-only候補として照合する。同海域index0/2の既存証拠を先に確認し、具体欠陥・適用域が未確定なら推測実装しない。3-1の最終HEAD smoke回収と分離する。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -7031,6 +7043,22 @@
         },
         "globalBoundaryCanonicalSource": "global-two-failure-boundaries-final.json; provisional reporter header segments are not trial counts"
       }
+    },
+    {
+      "id": "3-1/0/default",
+      "record": "threeOneLocal20261031",
+      "baselineHead": "7ef98ad4775856eee1d921962e6c5cde5720cd80",
+      "countsBefore": [
+        25,
+        147,
+        64
+      ],
+      "countsAfter": [
+        26,
+        149,
+        61
+      ],
+      "limitedScopeNotWholeMapCompletion": true
     }
   ],
   "fiveFourCloseout": {
@@ -10498,5 +10526,392 @@
     "evidence": "docs/pr152-seven-five-third-ja.md",
     "state": "local corrected six5full/1Wknownloadunreached; original Cknown expected-failure separate; A/B/C/D partial, final Git/CI pending"
   },
-  "nextPriorityBeforeSevenFiveThirdCIFinalization20261031": "7-5第3ABDFJOPTの選択表示scopeを独立確認する。G3草稿・未実施ブラウザーはG2証拠へ加算せず、その後の候補は3-1のsource-only確認とする。"
+  "nextPriorityBeforeSevenFiveThirdCIFinalization20261031": "7-5第3ABDFJOPTの選択表示scopeを独立確認する。G3草稿・未実施ブラウザーはG2証拠へ加算せず、その後の候補は3-1のsource-only確認とする。",
+  "selectedBeforeThreeOneLocal20261031": {
+    "id": "7-5/2/default",
+    "baselineHead": "1b4f9ab60c985a3315c99e4dc68b73d19b549b3f",
+    "record": "sevenFiveThirdCIFinalization20261031",
+    "evidence": "docs/pr152-seven-five-third-ja.md",
+    "state": "CI terminal5success/W4failure; identified ownG3 initial5 plus stockWretry1 cover six representatives; Dconfirmed only, old trials/gaps preserved"
+  },
+  "nextPriorityBeforeThreeOneLocal20261031": "3-1 CFGを別WT・別記録で続行する。閉鎖source-only設計9＋addendumの当時JS/UI未実行という履歴を保持し、以後の独立検証/未コミット差分と区別する。3-1 UI未実行・セル加算0、G3証拠へ合算しない。",
+  "threeOneLocal20261031": {
+    "record": "threeOneLocal20261031",
+    "document": "docs/pr152-three-one-cfg-ja.md",
+    "recordDateJST": "2026-10-31",
+    "executionUTCDate": "2026-10-30",
+    "stage": "local-six-firsts-completed-and-collection-independently-closed; final feature HEAD/CI pending",
+    "baseHead": "7ef98ad4775856eee1d921962e6c5cde5720cd80",
+    "sourceIsUncommittedWIP": true,
+    "finalSourceHEAD": null,
+    "CI": {
+      "state": "not-started",
+      "runId": null,
+      "attempt": null
+    },
+    "scope": "3-1/index0/CFG source-confirmed known six-hull alternatives, optional per-carrier attack guidance and C-F graph edge",
+    "productChanges": [
+      {
+        "path": "map-plans.js",
+        "bytes": 161109,
+        "sha256": "aa312e59cf5533ac32dcff9036d57e8b6c049d7de8660d69020140ddafa9af7a"
+      },
+      {
+        "path": "fleet-readiness-evaluator.js",
+        "bytes": 116681,
+        "sha256": "bc7ffb6aa9efa012ee7baab4540fa8961190d9e9a39cdf2342ae42aba34bb409"
+      },
+      {
+        "path": "owned-equipment-planner.js",
+        "bytes": 150672,
+        "sha256": "ea8f63e332cf20ec5a289a806cbc2e6e7c92f4b94d0b69f116a0fe7c324b5088"
+      },
+      {
+        "path": "map-images.js",
+        "bytes": 19188,
+        "sha256": "d226a2e7c68892d0c43e0f8768239809e070b9f88e554a68a435e8285132dd8c"
+      }
+    ],
+    "source": {
+      "reviewDate": "2026-10-30",
+      "cachedExternalSourcesOnly": true,
+      "newHTTPRequests": 0,
+      "URLs": [
+        "https://zekamashi.net/kancolle-kouryaku/3-1/",
+        "https://wikiwiki.jp/kancolle/北方海域/3-1"
+      ],
+      "knownSixDomain": true,
+      "useExampleScope": false,
+      "plainCLDoesNotIncludeCLTOrCT": true,
+      "FtoG": "fixed in cited source",
+      "Cpriority": "escort<=1 precedes group/heavy conditions; reviewed known-six domain keeps heavy<=2, escort>=2, BBV+plainCL<=2",
+      "noNewRouteSpeedLOSOrEquipmentQuantity": true,
+      "sourceDomainAndCombatQuantitiesIncomplete": true
+    },
+    "node": {
+      "newPublicTitles": 8,
+      "affectedParentTitles": 7,
+      "distinctPublicAffectedTitles": 15,
+      "successfulPhysicalPublicTitleExecutions": 16,
+      "beforeSemanticCounterexample": {
+        "selected": 1,
+        "expectedAssertionFailures": 1,
+        "reason": "old canonical example kept source-clear CV2/DD4 manual"
+      },
+      "unchangedSuccessesReused": true,
+      "finiteOther52ParityOutputs": 208,
+      "notThe59RowsOr236CellsDenominator": true,
+      "privateActualInitial": {
+        "titles": 2,
+        "pass": 0,
+        "fail": 2,
+        "knownGeneratorConditions": 1,
+        "unknownGeneratorConditions": 1,
+        "stockGeneratorConditions": 0,
+        "classification": "unsupported seven-retained-items and registered-legality assumptions; originals retained"
+      },
+      "privateActualCorrected": {
+        "titles": 2,
+        "pass": 2,
+        "fail": 0,
+        "conditions": 3,
+        "inputsAndProductUnchangedForExpectationCorrection": true,
+        "resultSHA256": "90d80830458e69a809c4b66b639da98dc69a22962c7df229bd16453d60bb789f"
+      },
+      "pureMetadata": {
+        "producerTests": 2,
+        "consumerTests": 2,
+        "allPassed": true,
+        "resultSHA256": "a9d2f53eeb7b9caf387d20b2c98c95bf01dc6786b01ce204576ec40e23573266"
+      }
+    },
+    "browser": {
+      "physicalFirsts": 6,
+      "passed": 6,
+      "retry": 0,
+      "successPurposeRepeats": 0,
+      "saveEditCases": 4,
+      "safeAbortOriginalFullCases": 2,
+      "savedReadReached": 6,
+      "sameReloadDocumentCompleteLoadWholeComparisons": 6,
+      "savedStrictIdentityFields": 180,
+      "loadStrictIdentityFields": 180,
+      "pageerrorCount": 0,
+      "navigationCollectionFailures": 0,
+      "preservationPositive": 0,
+      "unknownInputCases": 2,
+      "missingFrameworkResults": 0,
+      "allSearchesIncomplete": true,
+      "knownWholeManualStockMissingUnknownManual": true,
+      "cases": [
+        {
+          "browser": "chromium",
+          "state": "known",
+          "framework": "passed",
+          "physicalTrial": 1,
+          "retry": 0,
+          "stage": "completed",
+          "savedStrictFields": 30,
+          "loadStrictFields": 30,
+          "proposalRoute": "ready",
+          "wholeReadiness": "manual",
+          "firstAndLoadSearchExamined": [
+            175,
+            0
+          ],
+          "firstAndLoadSearchReasons": [
+            [
+              "air-target-unselected",
+              "beam-limit"
+            ],
+            [
+              "air-target-unselected"
+            ]
+          ],
+          "originalGearExact": false,
+          "gearMatchesProposal": true,
+          "rawSHA256": "241a15d501d1cd69e33dcdecb2bb3b0cae428b6aa2d1b5c8dbc59e6a823aee66",
+          "summarySHA256": "a01d9887d0cf07811b9e0e665baaf63fe4077dad8377abe2fb07002a96a3299c"
+        },
+        {
+          "browser": "chromium",
+          "state": "stock",
+          "framework": "passed",
+          "physicalTrial": 1,
+          "retry": 0,
+          "stage": "completed",
+          "savedStrictFields": 30,
+          "loadStrictFields": 30,
+          "proposalRoute": "ready",
+          "wholeReadiness": "missing",
+          "firstAndLoadSearchExamined": [
+            873,
+            873
+          ],
+          "firstAndLoadSearchReasons": [
+            [
+              "beam-limit"
+            ],
+            [
+              "beam-limit"
+            ]
+          ],
+          "originalGearExact": true,
+          "gearMatchesProposal": true,
+          "rawSHA256": "78ddc4285758656dc5061b4184f4c05b473e76e15d2ac14890adb02b3495f4e1",
+          "summarySHA256": "f69ab251f8351c91abfebb09764c5d777d9273bfe05841af6c166fe724af08a9"
+        },
+        {
+          "browser": "chromium",
+          "state": "unknown",
+          "framework": "passed",
+          "physicalTrial": 1,
+          "retry": 0,
+          "stage": "completed",
+          "savedStrictFields": 30,
+          "loadStrictFields": 30,
+          "proposalRoute": "manual",
+          "wholeReadiness": "manual",
+          "firstAndLoadSearchExamined": [
+            0,
+            0
+          ],
+          "firstAndLoadSearchReasons": [
+            [
+              "air-target-unselected"
+            ],
+            [
+              "air-target-unselected"
+            ]
+          ],
+          "originalGearExact": true,
+          "gearMatchesProposal": null,
+          "rawSHA256": "367ad750e7a173e87e6aeb2499d0de3345a61c9ec3cdbba02cfccf8e8b575412",
+          "summarySHA256": "9ee32f177f818e718eb4698dd9f24fedd544edd624f838d89cc0fa4ec9dd22a2"
+        },
+        {
+          "browser": "webkit",
+          "state": "known",
+          "framework": "passed",
+          "physicalTrial": 1,
+          "retry": 0,
+          "stage": "completed",
+          "savedStrictFields": 30,
+          "loadStrictFields": 30,
+          "proposalRoute": "ready",
+          "wholeReadiness": "manual",
+          "firstAndLoadSearchExamined": [
+            175,
+            0
+          ],
+          "firstAndLoadSearchReasons": [
+            [
+              "air-target-unselected",
+              "beam-limit"
+            ],
+            [
+              "air-target-unselected"
+            ]
+          ],
+          "originalGearExact": false,
+          "gearMatchesProposal": true,
+          "rawSHA256": "a8f887094544b05f0d5a24c6181caabf09fff16def0a0c99d6c8bd6d189bd46d",
+          "summarySHA256": "8d2791a5e7ee4e34b5c2d2a8a53546d42ce26ee888b884e90066b7d025a11afd"
+        },
+        {
+          "browser": "webkit",
+          "state": "stock",
+          "framework": "passed",
+          "physicalTrial": 1,
+          "retry": 0,
+          "stage": "completed",
+          "savedStrictFields": 30,
+          "loadStrictFields": 30,
+          "proposalRoute": "ready",
+          "wholeReadiness": "missing",
+          "firstAndLoadSearchExamined": [
+            873,
+            873
+          ],
+          "firstAndLoadSearchReasons": [
+            [
+              "beam-limit"
+            ],
+            [
+              "beam-limit"
+            ]
+          ],
+          "originalGearExact": true,
+          "gearMatchesProposal": true,
+          "rawSHA256": "4d119cfc495f73a3fbf9c09e48f641ac9cf46e67041bc632180ac1753b544572",
+          "summarySHA256": "07c460b65210e461c34214230281ff1fa1a76121f39704baea3a609b3494c48e"
+        },
+        {
+          "browser": "webkit",
+          "state": "unknown",
+          "framework": "passed",
+          "physicalTrial": 1,
+          "retry": 0,
+          "stage": "completed",
+          "savedStrictFields": 30,
+          "loadStrictFields": 30,
+          "proposalRoute": "manual",
+          "wholeReadiness": "manual",
+          "firstAndLoadSearchExamined": [
+            0,
+            0
+          ],
+          "firstAndLoadSearchReasons": [
+            [
+              "air-target-unselected"
+            ],
+            [
+              "air-target-unselected"
+            ]
+          ],
+          "originalGearExact": true,
+          "gearMatchesProposal": null,
+          "rawSHA256": "f14579763ef87bf5d3a97ee0f935b714e8bc5a9e35b0c1d84ce68dc9873597fc",
+          "summarySHA256": "4d064a0dadf004b704b5a37f65a933f09ddb6f0dbaaa284d9a271df7c6e86d5b"
+        }
+      ],
+      "limits": {
+        "testDeadlineMS": 45000,
+        "resultWaitMS": 12000,
+        "candidateCap": 10000,
+        "beam": 5,
+        "depth": 24,
+        "portOperationsCap": 800,
+        "workers": 1,
+        "retries": 0,
+        "repeatEach": 1,
+        "waitCancelAssertionsUnchanged": true
+      }
+    },
+    "intentionalGearChange": {
+      "knownOriginalGearExact": false,
+      "knownSavedGearMatchesReturnedProposal": true,
+      "stockOriginalGearExact": true,
+      "unknownManualSafeAbortOriginalFullExact": true,
+      "unknownProposalMatch": null,
+      "unknownEquipmentNotConfirmedLegal": true,
+      "identityFieldsStillCompared": [
+        "ship",
+        "rosterId",
+        "gameShipId",
+        "masterId",
+        "metadata"
+      ]
+    },
+    "environment": {
+      "image": "mcr.microsoft.com/playwright:v1.55.0-noble@sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29",
+      "node": "24.21.0",
+      "playwright": "1.55.0",
+      "chromiumRevision": "1187",
+      "webkitRevision": "2203",
+      "actualListPerBrowser": 889,
+      "newTargetCountPerBrowser": 3,
+      "eachSingleSelectorCount": 1,
+      "actualPreflightEnvironmentSHA256": "743ed64009c3c1b9ee46983ac6182bf9b1d23b84d5e27433427c8a7f838650fe"
+    },
+    "sourceBinding": {
+      "publicSourceFilesAtPreparation": 642,
+      "publicManifestSHA256": "bd0be0cfe9ef22c3770bd3dcaff05aafbfaf8e3f0efbe412c64bec5172be58c1",
+      "runtimeFiles": 643,
+      "runtimeManifestSHA256": "d94ad88fe267bec73c81a38dfb735f438238ab70f86dacd8599c152cba14cb7f",
+      "runtimeContainsPrivateConfig1": true,
+      "expectedFinalGitFilesAfterNewRecord": 643,
+      "sameCountIsNotSameFileSet": true,
+      "finalGitComparedToRuntime": null,
+      "actualServedHTTPHashesMeasured": false
+    },
+    "evidence": {
+      "copiedOriginalFiles": 849,
+      "closedManifestFiles": 857,
+      "closedManifestPayloadBytes": 60838897,
+      "manifestSHA256": "bb2491b63fe6aa81e7502627a26f0fc1c26bbee021ce3dfcaf870898125c08dc",
+      "closureSHA256": "8ad74745c0bb3b35c0cd65407cae43247af066b1fd03a3faf06819b985fd4f40",
+      "independentFinalReviewSHA256": "bdbe963df61e6a2453afa45a9a241c3db925ac5635abdcd12e88f64b00b1a0de",
+      "sharedMetadataSHA256": "7327c661fed3f1f5e6680a783074bc2c90fadfe985231485542b862fe0fddab3",
+      "traceZIPCRC": 6,
+      "uniqueVideos": 6,
+      "originalsPrivateAndUnmodified": true,
+      "sharedAllowlistedMetadataOnly": true,
+      "sanitizerOrExternalUpload": false
+    },
+    "matrix": {
+      "before": [
+        25,
+        147,
+        64
+      ],
+      "after": [
+        26,
+        149,
+        61
+      ],
+      "changedCells": [
+        "3-1/0/default.B 未確認→一部",
+        "3-1/0/default.C 未確認→一部",
+        "3-1/0/default.D 未確認→確認済み"
+      ],
+      "statusCellsChanged": 3,
+      "AUnchanged": "一部",
+      "other58RowsUnchanged": true,
+      "definitionsAndLegacy53AndScoutingUnchanged": true,
+      "denominator": 236,
+      "completionPercent": null
+    },
+    "remaining": [
+      "出典一致の既知六隻域だけを確認。潜水母艦・水母・補給・潜水系・練習巡洋艦・揚陸艦・海防戦艦・未知艦・四/五隻は範囲外。",
+      "航戦＋通常軽巡3以上では先行するランダム域を残す。固定CFGの未成立は確定逸れ・到達不可能・装備購入必須ではない。",
+      "空母各艦の攻撃機1枠は既存の任意比較目標。全戦闘目標の十分数量、全在庫/搭載不可/枠競合、実出撃/勝利は未確認。",
+      "海域全体の単一マス制空不要によるneeds空配列と汎用row-upsertの一般仕様は変更しない。",
+      "C-FはNodeによる実renderer/consumer照合。地図タブの実操作と旧goal/history二キーのC/W保持は未検証。",
+      "HTTP配信sourceハッシュとStorage書込み呼出し回数は未採取。試行ごとの直接比較で、異なる試行の保存値全文一致を主張しない。",
+      "旧load非表示・通信例外・自然保存実null/DCLの原因と欠測は未解決。今回の成功で旧未到達を補完しない。"
+    ],
+    "nextPriority": "1-5/index1 ADFGJを独立したsource-only候補として照合する。同海域index0/2の既存証拠を先に確認し、具体欠陥・適用域が未確定なら推測実装しない。3-1の最終HEAD smoke回収と分離する。",
+    "protected": "PR152 draft/unpublished; main conflict and old originals retained; no main integration/PR151/version/SW/production/merge/publish/automerge change"
+  }
 }

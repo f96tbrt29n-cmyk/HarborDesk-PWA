@@ -203,7 +203,15 @@ const HD_MAP_ROUTE_REQUIREMENTS={};
  const northFast={all:[count(['bb'],3),count(['dd'],0,2),{not:{all:[count(['cl'],1),count(['dd'],2)]}}]};
  add('2-5',0,'BFJO',[fleet(6),count(['bb'],0,3),count(['cv','ss','lha'],0,0),count(['de'],0,2),count(['av'],0,1),{any:[{kind:'speedCount',rank:5,min:1,max:7},northFast],reason:'F→J：低速艦が1隻以上なら先にJ。全高速では駆逐3隻以上、軽巡1隻以上かつ駆逐2隻以上が先にE、それ以外の戦艦級3隻はJ。残りはE/Jランダム。速力・艦種情報が不足する条件は未判定とし、別の既知不一致は保持。装備購入ではなく編成・速力を確認'},{kind:'equipmentShips',match:'drum',min:2,max:7,slotPolicy:'valid'}],{useExampleScope:false,selectionAliases:{'航空戦艦':'戦艦級'},keepLow:1,keepLowUnless:northFast,los:los(1,49,42),notes:['Fでは低速艦1隻以上なら先にJ。全高速では駆逐3隻以上、軽巡1隻以上かつ駆逐2隻以上が先にE、その後の戦艦級3隻はJ。軽巡は軽巡洋艦で、重雷装巡洋艦はこの数に含めない。この1戦艦級の編成例では低速艦を維持する。','固定J条件の未成立はボス到達不可能や購入必須を意味しない。速力・艦種情報が不足する場合は未判定とし、既知の不一致は別に表示する。','ドラム缶(輸送用)は異なる2隻に各1個以上。同じ艦に2個は1隻として数える。']});
  add('2-5',1,'CEIO',[fleet(6),speed(10),count(['bb','ss'],0,0),count(['cvn','cav'],0,1),count(['cv'],1),count(['cl'],1),count(['dd'],3)],{minimumSpeed:10,los:los(1,34,31)});
- add('3-1',0,'CFG',[fleet(6),count(['bb','cv'],0,2),count(['escort'],2),count(['bbv','cl','av','ao'],0,2)]);
+ add('3-1',0,'CFG',[
+  {any:[{all:[fleet(6),count(['bb','cv','cav','cl','重雷装巡洋艦','dd','de'],6,6)]},{kind:'unverified',reason:'今回のCFG確認範囲は出典でC→F→Gが一致する既知の六隻編成。潜水母艦・水母・補給艦・潜水系・練習巡洋艦・揚陸艦・海防戦艦や未登録艦、別隻数は確認域外で、経路全体を成立としない。ゲームの最低隻数や到達不可能を意味しません。'}]},
+  count(['bb','cv'],0,2),count(['escort'],2),count(['bbv','cl','av','ao'],0,2)
+ ],{checkedAt:'2026-10-30',useExampleScope:false,sources:['https://zekamashi.net/kancolle-kouryaku/3-1/','https://wikiwiki.jp/kancolle/北方海域/3-1'],notes:[
+  'CFGの元の正規空母2＋重巡1＋雷巡1＋駆逐2は編成例。空母2＋駆逐4、通常戦艦2＋重巡1＋雷巡1＋駆逐2、戦艦1＋空母1＋重巡1＋雷巡1＋駆逐2など、C→F条件を満たす確認済みの六隻を例の艦種内訳へ拘束しない。F→Gは固定。',
+  'Cは駆逐＋海防1以下のDが先行し、特殊な合算群と戦艦級＋空母系3以上などの分岐を確認する。今回の既知六隻確認域では戦艦級＋空母系2以下、駆逐＋海防2以上、航空戦艦＋軽巡2以下を使う。軽巡へ重雷装巡洋艦や練習巡洋艦を足さない。',
+  '水母・補給・潜水母艦・潜水系の分岐には資料差や適用範囲の未確認があり、現在の単純な上限だけで成立へ広げない。別の既知不一致は情報不足で消さず、固定条件を外れる案は編成見直しへ案内する。ランダム到達・別経路は別確認で、手持ちでは不可能・装備購入必須とは断定しない。',
+  'この経路に一律速力統一・数値索敵・特定装備個数の通行必須は掲載されていない。利用者が選択中の艦種・隻数・旗艦の条件と明示した速力は別に確認する。敵パターンを選ぶ制空、空母各艦の攻撃機、対空・夜戦装備は戦闘上の推奨または利用者指定で、経路成立や勝利を保証しない。'
+ ]});
  for(const i of [0,1])add('3-2',i,'選択したC…L目標',[],{engine:'verified-graph'});
  const threeThreeLight={all:[count(['bb','cv'],1,1),count(['cl'],1,1),count(['dd'],4,4)]};
  add('3-3',0,'ACGM',[fleet(6),

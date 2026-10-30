@@ -473,7 +473,8 @@
       "source": "https://zekamashi.net/kancolle-kouryaku/3-1/",
       "status": "partial",
       "existingEvidence": [
-        "全マスター仮想所持の直接構造選択・未知艦拒否（全論理枝ではない）"
+        "全マスター仮想所持の直接構造選択・未知艦拒否（全論理枝ではない）",
+        "3-1 CFGの出典一致六隻代替・任意空母攻撃機の有限在庫配備/具体不足、C/W各3初回の保存/編集または安全中止・同一文書load全文保持（限定範囲、全探索未完）。docs/pr152-three-one-cfg-ja.md"
       ],
       "remaining": [
         {
@@ -489,7 +490,98 @@
           "detail": "境界と在庫競合を組み合わせた生成→配備→最適化→艦/装備交換→保存再読込→同期更新→プランナーの全操作列"
         }
       ],
-      "strategyTargets": []
+      "strategyTargets": [],
+      "representativeWorkflowRecord": {
+        "record": "threeOneLocal20261031",
+        "document": "docs/pr152-three-one-cfg-ja.md",
+        "recordDateJST": "2026-10-31",
+        "executionUTCDate": "2026-10-30",
+        "stage": "local-six-firsts-completed-and-collection-independently-closed; final feature HEAD/CI pending",
+        "baseHead": "7ef98ad4775856eee1d921962e6c5cde5720cd80",
+        "sourceIsUncommittedWIP": true,
+        "finalSourceHEAD": null,
+        "CI": {
+          "state": "not-started",
+          "runId": null,
+          "attempt": null
+        },
+        "scope": "3-1/index0/CFG source-confirmed known six-hull alternatives, optional per-carrier attack guidance and C-F graph edge",
+        "sourceBinding": {
+          "publicSourceFilesAtPreparation": 642,
+          "publicManifestSHA256": "bd0be0cfe9ef22c3770bd3dcaff05aafbfaf8e3f0efbe412c64bec5172be58c1",
+          "runtimeFiles": 643,
+          "runtimeManifestSHA256": "d94ad88fe267bec73c81a38dfb735f438238ab70f86dacd8599c152cba14cb7f",
+          "runtimeContainsPrivateConfig1": true,
+          "expectedFinalGitFilesAfterNewRecord": 643,
+          "sameCountIsNotSameFileSet": true,
+          "finalGitComparedToRuntime": null,
+          "actualServedHTTPHashesMeasured": false
+        },
+        "evidence": {
+          "copiedOriginalFiles": 849,
+          "closedManifestFiles": 857,
+          "closedManifestPayloadBytes": 60838897,
+          "manifestSHA256": "bb2491b63fe6aa81e7502627a26f0fc1c26bbee021ce3dfcaf870898125c08dc",
+          "closureSHA256": "8ad74745c0bb3b35c0cd65407cae43247af066b1fd03a3faf06819b985fd4f40",
+          "independentFinalReviewSHA256": "bdbe963df61e6a2453afa45a9a241c3db925ac5635abdcd12e88f64b00b1a0de",
+          "sharedMetadataSHA256": "7327c661fed3f1f5e6680a783074bc2c90fadfe985231485542b862fe0fddab3",
+          "traceZIPCRC": 6,
+          "uniqueVideos": 6,
+          "originalsPrivateAndUnmodified": true,
+          "sharedAllowlistedMetadataOnly": true,
+          "sanitizerOrExternalUpload": false
+        },
+        "matrix": {
+          "before": [
+            25,
+            147,
+            64
+          ],
+          "after": [
+            26,
+            149,
+            61
+          ],
+          "changedCells": [
+            "3-1/0/default.B 未確認→一部",
+            "3-1/0/default.C 未確認→一部",
+            "3-1/0/default.D 未確認→確認済み"
+          ],
+          "statusCellsChanged": 3,
+          "AUnchanged": "一部",
+          "other58RowsUnchanged": true,
+          "definitionsAndLegacy53AndScoutingUnchanged": true,
+          "denominator": 236,
+          "completionPercent": null
+        },
+        "remaining": [
+          "出典一致の既知六隻域だけを確認。潜水母艦・水母・補給・潜水系・練習巡洋艦・揚陸艦・海防戦艦・未知艦・四/五隻は範囲外。",
+          "航戦＋通常軽巡3以上では先行するランダム域を残す。固定CFGの未成立は確定逸れ・到達不可能・装備購入必須ではない。",
+          "空母各艦の攻撃機1枠は既存の任意比較目標。全戦闘目標の十分数量、全在庫/搭載不可/枠競合、実出撃/勝利は未確認。",
+          "海域全体の単一マス制空不要によるneeds空配列と汎用row-upsertの一般仕様は変更しない。",
+          "C-FはNodeによる実renderer/consumer照合。地図タブの実操作と旧goal/history二キーのC/W保持は未検証。",
+          "HTTP配信sourceハッシュとStorage書込み呼出し回数は未採取。試行ごとの直接比較で、異なる試行の保存値全文一致を主張しない。",
+          "旧load非表示・通信例外・自然保存実null/DCLの原因と欠測は未解決。今回の成功で旧未到達を補完しない。"
+        ],
+        "nextPriority": "1-5/index1 ADFGJを独立したsource-only候補として照合する。同海域index0/2の既存証拠を先に確認し、具体欠陥・適用域が未確定なら推測実装しない。3-1の最終HEAD smoke回収と分離する。",
+        "browser": {
+          "physicalFirsts": 6,
+          "passed": 6,
+          "retry": 0,
+          "saveEditCases": 4,
+          "safeAbortOriginalFullCases": 2,
+          "savedReadReached": 6,
+          "sameReloadDocumentCompleteLoadWholeComparisons": 6,
+          "savedStrictIdentityFields": 180,
+          "loadStrictIdentityFields": 180,
+          "pageerrorCount": 0,
+          "navigationCollectionFailures": 0,
+          "preservationPositive": 0,
+          "unknownInputCases": 2,
+          "missingFrameworkResults": 0,
+          "allSearchesIncomplete": true
+        }
+      }
     },
     {
       "map": "3-2",
@@ -2226,5 +2318,26 @@
       145,
       67
     ]
+  },
+  "threeOneLocal20261031": {
+    "record": "docs/pr152-three-one-cfg-ja.md",
+    "legacySummaryUnchanged": true,
+    "remainingCodesRetained": [
+      "U",
+      "I",
+      "P"
+    ],
+    "fullRouteCompletion": false,
+    "matrixBefore": [
+      25,
+      147,
+      64
+    ],
+    "matrixAfter": [
+      26,
+      149,
+      61
+    ],
+    "changedProgressCells": 3
   }
 }

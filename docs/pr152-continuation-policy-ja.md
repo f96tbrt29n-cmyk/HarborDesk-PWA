@@ -1,3 +1,5 @@
+> 3-1 CFGの限定局所確定（2026-10-31 JST／実行UTC30日）：[記録](pr152-three-one-cfg-ja.md)。出典一致の既知六隻代替を元の艦種例へ拘束せず、任意の空母攻撃機と合法枠の不足案内、C→F接続を限定補完。Node新8＋影響親7はユニーク15（必要再検証を含む成功実行16）、通常C/W各3は全6初回成功・retries0。4件保存編集＋未知2件原文安全中止、全6同一文書load全文/保存strict180・loadstrict180/他編成metadata保持、例外・保持不一致0。knownは意図した艦戦交換で元gear差あり・提案保存一致、stockは元gear保持、unknownはmanual/元全文保持。全探索incomplete、制空未選択で全目標充足にはしない。3-1B/C未確認→一部・D未確認→確認済みだけ、25/147/64→26/149/61。A/他58/旧53/基準236は維持。最終feature HEAD/通常CIはpending。以下は各時点の履歴。
+
 > 第3 CI確定結果（2026-10-31 JST）：source1b4f9ab6／CI41086731653 attempt1・受理1回は5smoke成功/W4失敗、Full skipped・取消0。公式C886/0/0・W869/11/6はpassed/flaky/failed case outcomeで、failed6を注記タイトル件数へ縮約しない。自身初回5full＋W不足retry1fullで6代表のD直接証拠が揃い、Dだけ一部→確認済み、25/147/64。最終source/env/closureと独立PASSをpinし、旧local/初回未到達を埋めない。
 
 > 7-5第3の限定局所記録（2026-10-31 JST／実試行UTC30日）：[ABDFJOPT](pr152-seven-five-third-ja.md)は訂正後C/W各3で5完了・W成立1件が保存編集後strict30通過後のload再探索非表示待機で総45秒終了、全文null。旧Cknown期待失敗1件と必要訂正後再検証を分離し、物理7/成功目的反復0。B/C/Dだけ未確認→一部、24/145/67→24/148/64。D確認済み・海域全体完了にはしない。最終HEAD/CIはpending。

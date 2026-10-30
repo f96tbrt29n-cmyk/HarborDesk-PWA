@@ -110,17 +110,18 @@ test('chosen requirements, complete details, flagship and each explicit speed in
  const explicit=context(),selected=explicit.makeActual(native);selected.routeInfo=plain(p.routeInfo);assert.equal(explicit.c.hdFERoute(selected).status,'ready');assert.deepEqual(plain(explicit.c.hdFERoute(selected).requirements),selected.routeInfo.requirements.map(x=>({token:x.token,need:x.count,got:x.count,ok:true})));
 });
 // The independent second-gauge oracle in seven-five-second-routes.test.cjs owns changed7-5/1.
-test('before/new isolated implementations preserve full outputs for every other51 presets and4 modes',()=>{
+// Exact3-1/index0 intentionally uses the independent three-one-cfg oracle; other rows keep this legacy reverse comparison.
+test('before/new isolated implementations preserve full outputs for the other50 presets and4 modes; 3-1/0 has its dedicated oracle',()=>{
  const now=context(),old=context(true);let presets=0,comparisons=0;
  for(const [map,data]of Object.entries(now.maps))for(const [index,preset]of data.presets.entries()){
-  if(map==='7-5'&&(index===0||index===1))continue;presets++;
+  if(map==='3-1'&&index===0||map==='7-5'&&(index===0||index===1))continue;presets++;
   assert.deepEqual(plain(now.all[map][index]),plain(old.all[map][index]),map+'/'+index+' unchanged route data');
   for(const mode of ['canonical','chosen-manual','explicit-speed','unknown']){
    const make=h=>{const p=h.make(['CL','DD','DD','DD','DD','DD'],mode==='unknown'?null:10);p.map=map;p.routeIndex=index;p.preset=h.maps[map].presets[index];p.routeInfo=plain(h.c.hdFSPresetInfo(p.preset));p.score=100;if(mode==='chosen-manual')p.suggestion={preset:p.preset,info:{...plain(p.routeInfo),conditionManual:true}};if(mode==='explicit-speed')p.routeInfo={...p.routeInfo,text:'利用者指定 高速+統一',speedRequired:true};return p},a=make(now),b=make(old);
    assert.deepEqual(plain(now.c.hdFERoute(a)),plain(old.c.hdFERoute(b)),map+'/'+index+'/'+mode+' full route output');assert.equal(now.c.hdFEPlanSpeedTarget(a),old.c.hdFEPlanSpeedTarget(b),map+'/'+index+'/'+mode+' speed target');comparisons++;
   }
  }
- assert.equal(presets,51);assert.equal(comparisons,204);
+ assert.equal(presets,50);assert.equal(comparisons,200);
 });
 test('canonical key and third gauge declaration stay unchanged; second uses its dedicated oracle and first guidance preserves policy limits',()=>{
  const {all,maps}=context(),preset=maps['7-5'].presets[0],d=all['7-5'][0],s=fs.readFileSync(path.join(root,'map-plans.js'),'utf8');assert.equal(preset.name,'第1ゲージ 1');assert.equal(preset.ships,'航巡1＋雷巡1＋軽巡1＋駆逐2＋水母1');assert.equal(d.useExampleScope,false);assert.deepEqual(plain(d.equipmentKinds),['制空','防空','対潜','夜戦']);

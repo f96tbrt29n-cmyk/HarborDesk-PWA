@@ -1756,9 +1756,41 @@
       "verification": "partial",
       "conditions": [
         {
-          "kind": "fleetCount",
-          "min": 6,
-          "max": 6
+          "any": [
+            {
+              "all": [
+                {
+                  "kind": "fleetCount",
+                  "min": 6,
+                  "max": 6
+                },
+                {
+                  "kind": "typeCount",
+                  "types": [
+                    "戦艦",
+                    "高速戦艦",
+                    "航空戦艦",
+                    "正規空母",
+                    "装甲空母",
+                    "軽空母",
+                    "重巡洋艦",
+                    "航空巡洋艦",
+                    "軽巡洋艦",
+                    "重雷装巡洋艦",
+                    "駆逐艦",
+                    "海防艦"
+                  ],
+                  "matchPolicy": "exact",
+                  "min": 6,
+                  "max": 6
+                }
+              ]
+            },
+            {
+              "kind": "unverified",
+              "reason": "今回のCFG確認範囲は出典でC→F→Gが一致する既知の六隻編成。潜水母艦・水母・補給艦・潜水系・練習巡洋艦・揚陸艦・海防戦艦や未登録艦、別隻数は確認域外で、経路全体を成立としない。ゲームの最低隻数や到達不可能を意味しません。"
+            }
+          ]
         },
         {
           "kind": "typeCount",
@@ -1807,6 +1839,10 @@
         "夜戦"
       ],
       "notes": [
+        "CFGの元の正規空母2＋重巡1＋雷巡1＋駆逐2は編成例。空母2＋駆逐4、通常戦艦2＋重巡1＋雷巡1＋駆逐2、戦艦1＋空母1＋重巡1＋雷巡1＋駆逐2など、C→F条件を満たす確認済みの六隻を例の艦種内訳へ拘束しない。F→Gは固定。",
+        "Cは駆逐＋海防1以下のDが先行し、特殊な合算群と戦艦級＋空母系3以上などの分岐を確認する。今回の既知六隻確認域では戦艦級＋空母系2以下、駆逐＋海防2以上、航空戦艦＋軽巡2以下を使う。軽巡へ重雷装巡洋艦や練習巡洋艦を足さない。",
+        "水母・補給・潜水母艦・潜水系の分岐には資料差や適用範囲の未確認があり、現在の単純な上限だけで成立へ広げない。別の既知不一致は情報不足で消さず、固定条件を外れる案は編成見直しへ案内する。ランダム到達・別経路は別確認で、手持ちでは不可能・装備購入必須とは断定しない。",
+        "この経路に一律速力統一・数値索敵・特定装備個数の通行必須は掲載されていない。利用者が選択中の艦種・隻数・旗艦の条件と明示した速力は別に確認する。敵パターンを選ぶ制空、空母各艦の攻撃機、対空・夜戦装備は戦闘上の推奨または利用者指定で、経路成立や勝利を保証しない。",
         "空母の攻撃機は各艦の搭載枠へ配備する推奨目標。艦戦・偵察機だけの配置と区別。陸上型への攻撃制限・命中・撃破は別評価。"
       ],
       "requiredConnectionClass": "D",
@@ -1852,7 +1888,114 @@
           "limit": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
         }
       },
-      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)"
+      "connectionSnapshot": "connections-before.json / real loaded functions, empty ships for connection-only inspection (no fleet legality claim)",
+      "sourceScopeAudit": {
+        "record": "docs/pr152-three-one-cfg-ja.md",
+        "useExampleScope": false,
+        "knownSixOnly": true,
+        "checkedAt": "2026-10-30",
+        "cachedSources": [
+          "https://zekamashi.net/kancolle-kouryaku/3-1/",
+          "https://wikiwiki.jp/kancolle/北方海域/3-1"
+        ],
+        "Cpriority": "escort<=1 precedes group/heavy conditions; reviewed known-six domain keeps heavy<=2, escort>=2, BBV+plainCL<=2",
+        "FtoG": "fixed in cited source",
+        "plainCLExcludesCLTAndCT": true,
+        "legacyConnectionClassesUnchanged": true,
+        "scoutingUnchanged": true,
+        "fullSourceOrCombatQuantityCoverage": false
+      },
+      "representativeWorkflowRecord": {
+        "record": "threeOneLocal20261031",
+        "document": "docs/pr152-three-one-cfg-ja.md",
+        "recordDateJST": "2026-10-31",
+        "executionUTCDate": "2026-10-30",
+        "stage": "local-six-firsts-completed-and-collection-independently-closed; final feature HEAD/CI pending",
+        "baseHead": "7ef98ad4775856eee1d921962e6c5cde5720cd80",
+        "sourceIsUncommittedWIP": true,
+        "finalSourceHEAD": null,
+        "CI": {
+          "state": "not-started",
+          "runId": null,
+          "attempt": null
+        },
+        "scope": "3-1/index0/CFG source-confirmed known six-hull alternatives, optional per-carrier attack guidance and C-F graph edge",
+        "sourceBinding": {
+          "publicSourceFilesAtPreparation": 642,
+          "publicManifestSHA256": "bd0be0cfe9ef22c3770bd3dcaff05aafbfaf8e3f0efbe412c64bec5172be58c1",
+          "runtimeFiles": 643,
+          "runtimeManifestSHA256": "d94ad88fe267bec73c81a38dfb735f438238ab70f86dacd8599c152cba14cb7f",
+          "runtimeContainsPrivateConfig1": true,
+          "expectedFinalGitFilesAfterNewRecord": 643,
+          "sameCountIsNotSameFileSet": true,
+          "finalGitComparedToRuntime": null,
+          "actualServedHTTPHashesMeasured": false
+        },
+        "evidence": {
+          "copiedOriginalFiles": 849,
+          "closedManifestFiles": 857,
+          "closedManifestPayloadBytes": 60838897,
+          "manifestSHA256": "bb2491b63fe6aa81e7502627a26f0fc1c26bbee021ce3dfcaf870898125c08dc",
+          "closureSHA256": "8ad74745c0bb3b35c0cd65407cae43247af066b1fd03a3faf06819b985fd4f40",
+          "independentFinalReviewSHA256": "bdbe963df61e6a2453afa45a9a241c3db925ac5635abdcd12e88f64b00b1a0de",
+          "sharedMetadataSHA256": "7327c661fed3f1f5e6680a783074bc2c90fadfe985231485542b862fe0fddab3",
+          "traceZIPCRC": 6,
+          "uniqueVideos": 6,
+          "originalsPrivateAndUnmodified": true,
+          "sharedAllowlistedMetadataOnly": true,
+          "sanitizerOrExternalUpload": false
+        },
+        "matrix": {
+          "before": [
+            25,
+            147,
+            64
+          ],
+          "after": [
+            26,
+            149,
+            61
+          ],
+          "changedCells": [
+            "3-1/0/default.B 未確認→一部",
+            "3-1/0/default.C 未確認→一部",
+            "3-1/0/default.D 未確認→確認済み"
+          ],
+          "statusCellsChanged": 3,
+          "AUnchanged": "一部",
+          "other58RowsUnchanged": true,
+          "definitionsAndLegacy53AndScoutingUnchanged": true,
+          "denominator": 236,
+          "completionPercent": null
+        },
+        "remaining": [
+          "出典一致の既知六隻域だけを確認。潜水母艦・水母・補給・潜水系・練習巡洋艦・揚陸艦・海防戦艦・未知艦・四/五隻は範囲外。",
+          "航戦＋通常軽巡3以上では先行するランダム域を残す。固定CFGの未成立は確定逸れ・到達不可能・装備購入必須ではない。",
+          "空母各艦の攻撃機1枠は既存の任意比較目標。全戦闘目標の十分数量、全在庫/搭載不可/枠競合、実出撃/勝利は未確認。",
+          "海域全体の単一マス制空不要によるneeds空配列と汎用row-upsertの一般仕様は変更しない。",
+          "C-FはNodeによる実renderer/consumer照合。地図タブの実操作と旧goal/history二キーのC/W保持は未検証。",
+          "HTTP配信sourceハッシュとStorage書込み呼出し回数は未採取。試行ごとの直接比較で、異なる試行の保存値全文一致を主張しない。",
+          "旧load非表示・通信例外・自然保存実null/DCLの原因と欠測は未解決。今回の成功で旧未到達を補完しない。"
+        ],
+        "nextPriority": "1-5/index1 ADFGJを独立したsource-only候補として照合する。同海域index0/2の既存証拠を先に確認し、具体欠陥・適用域が未確定なら推測実装しない。3-1の最終HEAD smoke回収と分離する。",
+        "browser": {
+          "physicalFirsts": 6,
+          "passed": 6,
+          "retry": 0,
+          "saveEditCases": 4,
+          "safeAbortOriginalFullCases": 2,
+          "savedReadReached": 6,
+          "sameReloadDocumentCompleteLoadWholeComparisons": 6,
+          "savedStrictIdentityFields": 180,
+          "loadStrictIdentityFields": 180,
+          "pageerrorCount": 0,
+          "navigationCollectionFailures": 0,
+          "preservationPositive": 0,
+          "unknownInputCases": 2,
+          "missingFrameworkResults": 0,
+          "allSearchesIncomplete": true
+        }
+      }
     },
     {
       "id": "3-2/0/normal",
