@@ -62,20 +62,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 37,
-      "未確認": 22,
+      "一部": 38,
+      "未確認": 21,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 37,
-      "未確認": 22,
+      "一部": 38,
+      "未確認": 21,
       "非該当": 0
     },
     "D": {
       "確認済み": 24,
-      "一部": 15,
-      "未確認": 20,
+      "一部": 16,
+      "未確認": 19,
       "非該当": 0
     }
   },
@@ -2946,22 +2946,122 @@
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じ第3の同期有限入力で探索し、元装備の保持と合法/在庫内の提案を限定確認。改善して新配備できた証拠や全目標/全在庫/全代替の確認へは広げない。",
+          "evidence": [
+            "docs/pr152-seven-five-third-ja.md",
+            "tests/route-seven-five-third.spec.js"
+          ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "経路成立、既存任意航空攻撃0/1不足、制空manual、部品不足と未知安全中止を分離する限定実操作を確認。thirdのcarrier/ASW具体搭載先helperは未接続、全装備/競合は未網羅。",
+          "evidence": [
+            "docs/pr152-seven-five-third-ja.md",
+            "tests/route-seven-five-third.spec.js"
+          ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "C3とW不足/未知の5件は保存または安全中止・適用可能な編集・同一reload文書load全文/strict30/他保持完了。W成立は保存編集後保持通過後、総45秒のloadclick非表示停止で全文null。Dは一部。",
+          "evidence": [
+            "docs/pr152-seven-five-third-ja.md",
+            "tests/route-seven-five-third.spec.js"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "CA/DE低速453と63未満帯の出典待ち、全目標数量/在庫/枠/代替、third carrier/ASW具体搭載先、旧goal/history2キー未seed、W成立load全文とload後停止文書の表示変更元/原因は欠測。初回文書guide stackをload欠測へ流用しない。実ゲージ/到達/勝利を検証済みにしない。",
+      "representativeWorkflowRecord": {
+        "record": "sevenFiveThirdLocal20261031",
+        "document": "docs/pr152-seven-five-third-ja.md",
+        "recordDateJST": "2026-10-31",
+        "sourceReviewDateRetained": "2026-10-30",
+        "stage": "local-six-terminal-private-final-ready-for-root-review; Git HEAD and CI pending",
+        "baseHead": "253734f34a01052d0480ea7a9d6696b7f1448432",
+        "sourceIsUncommittedWIP": true,
+        "publicSourceAtPreparation": 635,
+        "runtimeSourceBinding": "a59a07723a37e58f952c1688422804fec0200b75e3a49ed3466eacc0ad3d4ede",
+        "publicSourceManifest": "7945493f9ed458303eff4409d5098cf7981ed83a1c3485826bf2bbdaad10ffc8",
+        "initialDifferentSourceFailure": {
+          "browser": "chromium",
+          "state": "known",
+          "classification": "unsupported expected whole manual; actual missing after result",
+          "stage": "after-result",
+          "savedOrSafeAbortReadReached": false,
+          "loadWholeReadReached": false,
+          "preservationPositiveObserved": false,
+          "runtimeManifest": "4c1d83cc872c15fbf087231175b871477377100856864efce904cc03b5e8bdfb",
+          "specSHA256": "5f38d90c6859ebabe83e1520b1b1664c14106201bc3e0544f91b8e9042b928f0",
+          "originalPhaseCopiedFiles": 839,
+          "retained": true,
+          "laterSuccessFillsOldGap": false
+        },
+        "groundedKnownExpectationCorrection": {
+          "productAndFixtureInputsChanged": false,
+          "specOneLineOnly": true,
+          "routeAndLOSReady": true,
+          "existingOptionalCarrierAttack": {
+            "purpose": "recommendation",
+            "target": 1,
+            "count": 0
+          },
+          "airManual": true,
+          "wholeReadiness": "missing",
+          "searchIncomplete": true,
+          "airOnlyEndReasonClaimRemoved": true,
+          "normalDeadlinesLimitsWaitCancelAssertionsRetained": true,
+          "necessaryKnownRevalidation": "completed in corrected phase; not success-purpose repetition",
+          "pureContractsReusedWithoutRerun": "ed4cf062d5b9f633aef5669ae678c1497c509c9b5ad846b965194a7b8ad742ca"
+        },
+        "oldGoalHistoryStorage": {
+          "keys": [
+            "harbordesk-active-sortie-session-v1",
+            "harbordesk-sortie-objective-pref-v1"
+          ],
+          "seeded": false,
+          "newG3RealOperationsVerified": false,
+          "codeAndPriorEvidenceAreNotNewStorageCompatibilityProof": true
+        },
+        "ledger": {
+          "countsBefore": [
+            24,
+            145,
+            67
+          ],
+          "countsAfter": [
+            24,
+            148,
+            64
+          ],
+          "G3": {
+            "A": "一部",
+            "B": "一部",
+            "C": "一部",
+            "D": "一部"
+          },
+          "changedCells": [
+            "7-5/2/default.B",
+            "7-5/2/default.C",
+            "7-5/2/default.D"
+          ],
+          "DConfirmed": false,
+          "reason": "identified same-row partial deployment/guidance/operation evidence only; Wknown load whole comparison unreached",
+          "definitionsOther58Legacy53ScoutingRetained": true
+        },
+        "browser": {
+          "correctedTrials": 6,
+          "passed": 5,
+          "timedOut": 1,
+          "loadWhole": 5,
+          "savedOrSafeAbortReads": 6,
+          "DConfirmed": false,
+          "loadStopDocumentCallerMissing": true,
+          "initialDocumentGuideStackSeparate": true
+        },
+        "CI": "not-started",
+        "collectorCombinedClosureSHA256": "26ec31ff8ac8e4030b12950da7ad2b58cb6609358f23b3a7638bce44b8c557cb",
+        "independentCombinedReviewSHA256": "b8ad7279546fc6f0540ce53b79c5f3cf3e36785f578f84f8edfaf57ffe95aebd"
+      }
     }
   ],
   "limits": [
@@ -2972,11 +3072,11 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "7-5/1/default",
-    "baselineHead": "972b63a4a7761903c1f8d88fa04c61b136c89984",
-    "record": "sevenFiveSecondCIFinalization20261030",
-    "evidence": "docs/pr152-seven-five-second-ja.md",
-    "state": "ownCI first5full + identified Wknown retry1full directly cover six same-row representatives; Dconfirmed only; old first/local gaps and whole-map limits retained"
+    "id": "7-5/2/default",
+    "baselineHead": "253734f34a01052d0480ea7a9d6696b7f1448432",
+    "record": "sevenFiveThirdLocal20261031",
+    "evidence": "docs/pr152-seven-five-third-ja.md",
+    "state": "local corrected six5full/1Wknownloadunreached; original Cknown expected-failure separate; A/B/C/D partial, final Git/CI pending"
   },
   "nextPriority": "7-5第3ABDFJOPTの選択表示scopeを独立確認する。G3草稿・未実施ブラウザーはG2証拠へ加算せず、その後の候補は3-1のsource-only確認とする。",
   "previousSelected": {
@@ -9372,5 +9472,579 @@
     "collectorClosureSHA256": "454d55146cc55e119b7df2c25d89c86270988635f4fc13b828b6d508dd0dfdaf",
     "collectorFinalClosurePending": false
   },
-  "nextPriorityBeforeSevenFiveSecondCIFinalization20261030": "7-5第3ABDFJOPTの先行分岐・P索敵・旧目標保持を独立確認する。第2の最終HEAD smoke回収と分離し、出典未確定は未判定を維持、成功目的の反復をしない。"
+  "nextPriorityBeforeSevenFiveSecondCIFinalization20261030": "7-5第3ABDFJOPTの先行分岐・P索敵・旧目標保持を独立確認する。第2の最終HEAD smoke回収と分離し、出典未確定は未判定を維持、成功目的の反復をしない。",
+  "sevenFiveThirdLocal20261031": {
+    "record": "sevenFiveThirdLocal20261031",
+    "document": "docs/pr152-seven-five-third-ja.md",
+    "recordDateJST": "2026-10-31",
+    "sourceReviewDateRetained": "2026-10-30",
+    "stage": "local-six-terminal-private-final-ready-for-root-review; Git HEAD and CI pending",
+    "baseHead": "253734f34a01052d0480ea7a9d6696b7f1448432",
+    "sourceIsUncommittedWIP": true,
+    "rootReportedWIPFiles": 14,
+    "publicSourceAtPreparation": 635,
+    "sourceManifestAtPublicBrowserPreparation": "28791686ae3468fa28bed3c65e1d1210d203955c7acfb48239c594c2aa26cae2",
+    "finalGitHead": null,
+    "finalGitFileCount": null,
+    "runtimeSourceBinding": "a59a07723a37e58f952c1688422804fec0200b75e3a49ed3466eacc0ad3d4ede",
+    "scope": "7-5/index2/ABDFJOPT selected third display; source assumes F->J/O->P and unlock conditions, not observed game phase",
+    "productChanges": [
+      {
+        "path": "owned-equipment-planner.js",
+        "bytes": 150203,
+        "sha256": "60d5e6c2cb66d3c9487129ad8fabae9c689b0b5f991843b98f5b2fbb08d08bac"
+      },
+      {
+        "path": "sortie-equipment-check.js",
+        "bytes": 51195,
+        "sha256": "47d0ec7a694d715ce042c425134c15f73db748b70c67406c4b4725e5259fa0f3"
+      },
+      {
+        "path": "map-node-data-2-7.js",
+        "bytes": 54762,
+        "sha256": "1c1f03b97626356d673856ba8f197d55f92e082b71393514db36e348ac4de14d"
+      }
+    ],
+    "independentDisplayIntents": 11,
+    "sourceDesignReadOnlyReferences": [
+      {
+        "path": "G2/private/seven-five-third-design-resume-20261030/sourcefacts.json",
+        "bytes": 23991,
+        "sha256": "e45a938a57b2b24ebbe96c2c448e326a10328e2cc932aa5a2032c48bad747ccc"
+      },
+      {
+        "path": "G2/private/seven-five-third-design-resume-20261030/fresh-third-expectations.json",
+        "bytes": 16360,
+        "sha256": "a8729a555cb61f5570606e2f367aa0d223d75259ce925662a1b977ac3831ecee"
+      },
+      {
+        "path": "G2/private/seven-five-third-design-resume-20261030/closure-manifest.json",
+        "bytes": 2047,
+        "sha256": "cf0c0bd3b64827e8b0013d834d7f664462089a6eb62b831403b3529a1439ec30"
+      }
+    ],
+    "newExternalSourceFetches": 0,
+    "productDisplayNode": {
+      "receiptBase": "972b63a4a7761903c1f8d88fa04c61b136c89984",
+      "displayTrialSourceFiles": 633,
+      "reuseBasis": "253 is a G2 docs-only successor; product3 and protected code retained, browser spec/input additions do not turn earlier Node receipts into a new635-source run",
+      "before": {
+        "tests": 1,
+        "pass": 0,
+        "expectedSemanticFail": 1
+      },
+      "newAfter": {
+        "tests": 6,
+        "pass": 6,
+        "fail": 0
+      },
+      "affectedParentAfter": {
+        "tests": 4,
+        "pass": 4,
+        "fail": 0
+      },
+      "sameSuccessfulTitlesRepeated": false
+    },
+    "privateFixtureContract": {
+      "initial": {
+        "tests": 2,
+        "pass": 1,
+        "fail": 1
+      },
+      "initialFailure": "unknown fixture incorrectly expected overall manual despite five unknown-type predicates manual and explicit registered numeric target unmet/missing",
+      "correctedFailedTitleOnly": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0
+      },
+      "knownAndPublicTenRepeated": false,
+      "productAndInputsChangedForCorrection": false
+    },
+    "oneActualStockGenerator": {
+      "executions": 1,
+      "examined": 748,
+      "yields": 14,
+      "endReason": "beam-limit",
+      "exhaustive": false,
+      "returnedGearMatchesOriginal": true,
+      "routeReady": true,
+      "browserOperationOrTimingEvidence": false
+    },
+    "pureMetadata": {
+      "families": 5,
+      "producer": {
+        "tests": 2,
+        "pass": 2
+      },
+      "pythonConsumer": {
+        "tests": 2,
+        "pass": 2
+      },
+      "specSyntaxPass": true,
+      "initialHostReporterParsingError": "spec reporter stdout was incorrectly treated as TAP; original stdout reparsed only, test processes already exit0",
+      "testsRepeatedForParserRepair": 0,
+      "oldFourBodiesRetained": true
+    },
+    "browserCandidate": {
+      "spec": {
+        "path": "tests/route-seven-five-third.spec.js",
+        "bytes": 31992,
+        "sha256": "26d5624a61f1058cca73abe201d6f3878605ead737aae9227e4a432135a72961"
+      },
+      "input": {
+        "path": "tests/fixtures/seven-five-third-browser-inputs.json",
+        "bytes": 7921,
+        "sha256": "1fd1196a35429d3e83fd1a51425ad59e671428d98ea1d2f695780325b55f2e15"
+      },
+      "formatter": {
+        "name": "hd75ThirdSummary",
+        "bytes": 4991,
+        "sha256": "23214d26f68a6b1aaa177ea1915c5e84c88379ca74f6fe160c7952be2ab9134f"
+      },
+      "expectedListPerBrowser": 886,
+      "actualListPerBrowser": {
+        "chromium": 886,
+        "webkit": 886
+      },
+      "registryVerified": true,
+      "newTargetCountPerBrowser": 3,
+      "eachSixLocalSelectorCount": 1
+    },
+    "browser": {
+      "state": "six-terminal-five-pass-one-WebKit-known-unreached",
+      "trialsObserved": 6,
+      "controls": {
+        "projects": [
+          "chromium",
+          "webkit"
+        ],
+        "states": [
+          "known",
+          "stock",
+          "unknown"
+        ],
+        "workers": 1,
+        "retries": 0,
+        "testDeadlineMS": 45000,
+        "resultWaitMS": 12000,
+        "candidateCap": 10000,
+        "beam": 5,
+        "depth": 24,
+        "unchangedWaitCancelAndAssertions": true
+      },
+      "cases": [
+        {
+          "browser": "chromium",
+          "state": "known",
+          "trial": "necessary-known-revalidation",
+          "exitCode": 0,
+          "stage": "completed",
+          "savedOrSafeAbortRead": true,
+          "edited": true,
+          "sameDocumentLoadWholeComparison": true,
+          "strictIdentityMatch": true,
+          "otherFleetsAndMetadataMatch": true,
+          "preservationMismatch": false,
+          "drop": null,
+          "collectionFailure": null,
+          "sourceSchemaValid": true,
+          "allExpectedComparisonsMatch": true,
+          "summarySHA256": "8bfa9ddbeeacb7791bc34558291a1aa49ea8eff0c601e509ab0ba047b089b82b",
+          "operation": "apply/save and memo-edit"
+        },
+        {
+          "browser": "chromium",
+          "state": "stock",
+          "trial": "initial",
+          "exitCode": 0,
+          "stage": "completed",
+          "savedOrSafeAbortRead": true,
+          "edited": true,
+          "sameDocumentLoadWholeComparison": true,
+          "strictIdentityMatch": true,
+          "otherFleetsAndMetadataMatch": true,
+          "preservationMismatch": false,
+          "drop": null,
+          "collectionFailure": null,
+          "sourceSchemaValid": true,
+          "allExpectedComparisonsMatch": true,
+          "summarySHA256": "0da4ca4b72555198fddf10b73fb9ba0ef561aac3b64bd3c747de620ffc299206",
+          "operation": "apply/save and memo-edit"
+        },
+        {
+          "browser": "chromium",
+          "state": "unknown",
+          "trial": "initial",
+          "exitCode": 0,
+          "stage": "completed",
+          "savedOrSafeAbortRead": true,
+          "edited": false,
+          "sameDocumentLoadWholeComparison": true,
+          "strictIdentityMatch": true,
+          "otherFleetsAndMetadataMatch": true,
+          "preservationMismatch": false,
+          "drop": null,
+          "collectionFailure": null,
+          "sourceSchemaValid": true,
+          "allExpectedComparisonsMatch": true,
+          "summarySHA256": "5d4106012ad726234c8d739cfc8fdfdfe11b41c56b9447c8dd816d236e4e6123",
+          "operation": "safe abort / original full exact"
+        },
+        {
+          "browser": "webkit",
+          "state": "known",
+          "trial": "initial",
+          "exitCode": 1,
+          "stage": "after-load-search",
+          "savedOrSafeAbortRead": true,
+          "edited": true,
+          "sameDocumentLoadWholeComparison": null,
+          "strictIdentityMatch": null,
+          "otherFleetsAndMetadataMatch": null,
+          "preservationMismatch": false,
+          "drop": null,
+          "collectionFailure": null,
+          "sourceSchemaValid": true,
+          "allExpectedComparisonsMatch": false,
+          "summarySHA256": "bd246db629c2d611c9e69c663f7901ef675886a432b4bfb9f2ffe817afab3485",
+          "operation": "apply/save and memo-edit",
+          "failure": "search button resolved but not visible at total45s test deadline",
+          "clickDeliveryHandlerSearchStartDisplayChangeCaller": null,
+          "resultWait12sAssertionReached": false,
+          "savedStrict30And6Anchors": true,
+          "savedAllEightPreservationBooleans": true,
+          "loadComparison": null,
+          "pageerrorsCaptured": 0,
+          "navigationCollectionFailures": 1,
+          "helperLocation": "82:47",
+          "testCaller": "116:44",
+          "unknownCallerFieldScope": "after-reload load-stop document only",
+          "initialDocumentGuideNavigation": {
+            "collected": true,
+            "doc": 1793374997643.0002,
+            "sequence": 8,
+            "drop": 0,
+            "failures": 0,
+            "stack": [
+              "hdWSRevealElement",
+              "hdWSShowElement",
+              "hdMSNGoGuide",
+              "navigator click handler:89"
+            ],
+            "expectedEarlierFleetRouteEntry": true,
+            "canFillLoadDocumentGap": false
+          },
+          "loadStopDocumentNavigation": {
+            "collectionFailure": 1,
+            "displayChangeCaller": null,
+            "cause": null
+          }
+        },
+        {
+          "browser": "webkit",
+          "state": "stock",
+          "trial": "initial",
+          "exitCode": 0,
+          "stage": "completed",
+          "savedOrSafeAbortRead": true,
+          "edited": true,
+          "sameDocumentLoadWholeComparison": true,
+          "strictIdentityMatch": true,
+          "otherFleetsAndMetadataMatch": true,
+          "preservationMismatch": false,
+          "drop": null,
+          "collectionFailure": null,
+          "sourceSchemaValid": true,
+          "allExpectedComparisonsMatch": true,
+          "summarySHA256": "c3cdf48be16ea79fcbb25776f9f02d40eefc1f22cd8da6376b5bf3aca8f01fae",
+          "operation": "apply/save and memo-edit"
+        },
+        {
+          "browser": "webkit",
+          "state": "unknown",
+          "trial": "initial",
+          "exitCode": 0,
+          "stage": "completed",
+          "savedOrSafeAbortRead": true,
+          "edited": false,
+          "sameDocumentLoadWholeComparison": true,
+          "strictIdentityMatch": true,
+          "otherFleetsAndMetadataMatch": true,
+          "preservationMismatch": false,
+          "drop": null,
+          "collectionFailure": null,
+          "sourceSchemaValid": true,
+          "allExpectedComparisonsMatch": true,
+          "summarySHA256": "9ec615c96b7d5cd167202ed374ef091e4f8dbfb6ed3e0463fb7b54bb4c9d29ae",
+          "operation": "safe abort / original full exact"
+        }
+      ],
+      "correctedPhaseAggregate": {
+        "terminal": 6,
+        "passed": 5,
+        "timedOut": 1,
+        "pending": 0,
+        "savedOrSafeAbortReads": 6,
+        "loadWholeReads": 5,
+        "applyMemoCases": 4,
+        "safeAbortNoEditCases": 2,
+        "storageWriteCallCount": null,
+        "oldInitialDifferentSourceFailureAdditional": 1,
+        "physicalTrialsObservedAcrossSources": 7,
+        "successPurposeRepeats": 0,
+        "failedWebKitKnownRepeated": false
+      },
+      "identityObservationTotals": {
+        "savedFields": 180,
+        "loadedFields": 150,
+        "reachedExpectedMatch": true,
+        "preservationPositive": 0,
+        "WknownLoad": null
+      },
+      "correctedTraceRetention": {
+        "traceZIPCRC": 6,
+        "videoPhysicalPaths": 7,
+        "videoUniqueSHA256": 6,
+        "oldInitialFailureSeparate": true
+      }
+    },
+    "CI": {
+      "state": "pending-after-supported-local-results-and-normal-push",
+      "source": null,
+      "runId": null,
+      "officialCaseOutcomes": null
+    },
+    "unknownDistinctDomains": {
+      "originalSavedFleet": "unrecognized original equipment retained, raw reload expected manual; not executed in browser",
+      "proposal": "Build omits unsafe unrecognized gear in derived proposal and raises preservation issue that forbids writing original; explicit numeric target missing is separate from five unknown type predicates manual",
+      "sourceLowerBandResolved": false
+    },
+    "oldGoalHistoryStorage": {
+      "keys": [
+        "harbordesk-active-sortie-session-v1",
+        "harbordesk-sortie-objective-pref-v1"
+      ],
+      "seeded": false,
+      "newG3RealOperationsVerified": false,
+      "codeAndPriorEvidenceAreNotNewStorageCompatibilityProof": true
+    },
+    "ledger": {
+      "countsBefore": [
+        24,
+        145,
+        67
+      ],
+      "countsAfter": [
+        24,
+        148,
+        64
+      ],
+      "G3": {
+        "A": "一部",
+        "B": "一部",
+        "C": "一部",
+        "D": "一部"
+      },
+      "changedCells": [
+        "7-5/2/default.B",
+        "7-5/2/default.C",
+        "7-5/2/default.D"
+      ],
+      "DConfirmed": false,
+      "reason": "identified same-row partial deployment/guidance/operation evidence only; Wknown load whole comparison unreached",
+      "definitionsOther58Legacy53ScoutingRetained": true
+    },
+    "remaining": [
+      "CA/DE-low453 source application and lower/random LOS bands below registered63",
+      "all combat sufficient counts, finite stock, alternatives and slots",
+      "WebKit known load whole comparison and final exception assertion unreached; load-stop-document display-change caller/cause missing; initial-document guide stack retained separately",
+      "old goal/history two storage keys not seeded or operationally checked",
+      "live unlock, arrival and victory not verified",
+      "legacy single-target unknown-capability status remains a bounded display limitation",
+      "third-specific carrier/ASW legal destination helpers not connected; all inventory and slot combinations unverified"
+    ],
+    "nextIndependent": "3-1 source-only design9 plus alternative addendum; source-clear CV2+DD4 etc can route CFG but legacy example mismatch leaves manual/change-hull guidance; actual candidate placement and UI unexecuted, no cell credit",
+    "evidenceReceipts": [
+      {
+        "path": "private/node-display-v2-20261030/result.json",
+        "bytes": 1717,
+        "sha256": "24c741a0d47c66b22b7f22aadd0455203fb09e004673892ee2ed9bb0e0938adc"
+      },
+      {
+        "path": "private/node-parent-after-v2-20261030/result.json",
+        "bytes": 1093,
+        "sha256": "dbc25a23aab5fb358f29eae14fa1f39e3e646b876364e55a88e2866565acadf4"
+      },
+      {
+        "path": "private/node-browser-fixture-first-20261030/result.json",
+        "bytes": 900,
+        "sha256": "1d579db89fc337fd3947dd5765f7c58344bcb34871ffdc564008dfd21e34854b"
+      },
+      {
+        "path": "private/node-browser-fixture-corrected-search-20261030/result.json",
+        "bytes": 711,
+        "sha256": "fe27c68d636982b2e1a5c402802bb6c7b73143df1be755aa6cce12334e83aa5b"
+      },
+      {
+        "path": "private/pure-contracts-final-20261030/host-parser-correction-and-four-pass.json",
+        "bytes": 1235,
+        "sha256": "a5657ed06968ecfb520ce81f889679cad6db9ee2ef2e7b6ff32a4a688343476a"
+      },
+      {
+        "path": "private/public-browser-draft-20261030/handoff-result.json",
+        "bytes": 3185,
+        "sha256": "059cb8450d2807174c0e5040bfeedf4203fbfef00abcb4e1b29de97c5b714220"
+      },
+      {
+        "path": "private/browser-fixture-contract-v2-20261030/correction-and-search-plan.json",
+        "bytes": 2304,
+        "sha256": "ded4a02a66fd50d6ed464d7d190c79fdfe8190793a65f280582bcf65d357a082"
+      },
+      {
+        "path": "private/final-phase1-static-review-20261030/review.json",
+        "bytes": 7774,
+        "sha256": "f40c4de3d001827964726be3210ddd203e3a70573504696477095758b8d6f558"
+      },
+      {
+        "path": "private/browser-preparation-corrected-known-20261030/private/root-authorized-firsts-result.json",
+        "bytes": 5868,
+        "sha256": "7ef78dfaaed3908513a4db62dc13b9d8fc9c96affa1d0de5b4cca45ef67c4131"
+      },
+      {
+        "path": "private/local-browser-first-phase-collection-20261030/closure-result.json",
+        "bytes": 1201,
+        "sha256": "db766dfd81d1207bc7270264457ef5262b3aca54f51d52a35597f4351625931d"
+      },
+      {
+        "path": "private/local-browser-first-phase-collection-20261030/private/source-and-case-binding.json",
+        "bytes": 975,
+        "sha256": "15390cc15bf1e0903f773a3cc2bf65d6b16240ccc7023a230c303fc7f2fffa68"
+      },
+      {
+        "path": "private/local-browser-corrected-phase-collection-20261030/result.json",
+        "bytes": 1497,
+        "sha256": "349ff7df1b8b9d7a3e6129350b3c39b91db42db37ee23c6a1d5dba940e696299"
+      },
+      {
+        "path": "private/final-g3-independent-review-20261030/corrected-known-review.json",
+        "bytes": 4559,
+        "sha256": "d853e72b8f7536920b8862cf4f5ad33d88230335c99665b3abe601091fdcb9b3"
+      },
+      {
+        "path": "private/ci-generation-corrected-known-20261030/root-pure-reuse-result.json",
+        "bytes": 1930,
+        "sha256": "ed4cf062d5b9f633aef5669ae678c1497c509c9b5ad846b965194a7b8ad742ca"
+      },
+      {
+        "path": "private/browser-phase2-corrected-known-20261030/private/root-authorized-remaining-result.json",
+        "bytes": 3703,
+        "sha256": "28001c9987b014589544b2a66bd7d6867c79109df347e2ff78a3d8b69d31476b"
+      },
+      {
+        "path": "private/browser-phase2-corrected-known-20261030/private/fixed-selection-result.json",
+        "bytes": 2674,
+        "sha256": "06d7cf2bc731c0fe6e42a7e7a64fc6767f2d38c31b737710ccc1ebea8ed2fe8f"
+      },
+      {
+        "path": "private/local-browser-corrected-phase-collection-20261030/closure-result.json",
+        "bytes": 1523,
+        "sha256": "8eaedb4658850b672a026c1a8a4a8e2c008bba58c44c89369e115711922f4c13"
+      },
+      {
+        "path": "private/local-browser-phase2-corrected-collection-20261030/closure-result.json",
+        "bytes": 1895,
+        "sha256": "26ec31ff8ac8e4030b12950da7ad2b58cb6609358f23b3a7638bce44b8c557cb"
+      },
+      {
+        "path": "private/local-browser-phase2-corrected-collection-20261030/collection-manifest.json",
+        "bytes": 137582,
+        "sha256": "0016be3cd9a7393f2a7dd0a57753e79f3b599f2c4702dd4da90c4805d4add78f"
+      },
+      {
+        "path": "private/local-browser-phase2-corrected-collection-20261030/result.json",
+        "bytes": 1965,
+        "sha256": "03581896d56b68be2d8b1aeeaa20465fe2fdedece70868295041eba6673c553d"
+      },
+      {
+        "path": "private/phase2-combined-independent-review-20261030/review.json",
+        "bytes": 13911,
+        "sha256": "b8ad7279546fc6f0540ce53b79c5f3cf3e36785f578f84f8edfaf57ffe95aebd"
+      },
+      {
+        "path": "private/phase2-combined-independent-review-20261030/closure-manifest.json",
+        "bytes": 262,
+        "sha256": "fac6b343e408e137c48c378792c674edca23841498c96686d8b0c2e0249ab7b7"
+      }
+    ],
+    "rawAndPrivateValuesRemainPrivate": true,
+    "originalSanitizerAndExternalUpload": false,
+    "publicSourceManifest": "7945493f9ed458303eff4409d5098cf7981ed83a1c3485826bf2bbdaad10ffc8",
+    "initialDifferentSourceFailure": {
+      "browser": "chromium",
+      "state": "known",
+      "classification": "unsupported expected whole manual; actual missing after result",
+      "stage": "after-result",
+      "savedOrSafeAbortReadReached": false,
+      "loadWholeReadReached": false,
+      "preservationPositiveObserved": false,
+      "runtimeManifest": "4c1d83cc872c15fbf087231175b871477377100856864efce904cc03b5e8bdfb",
+      "specSHA256": "5f38d90c6859ebabe83e1520b1b1664c14106201bc3e0544f91b8e9042b928f0",
+      "originalPhaseCopiedFiles": 839,
+      "retained": true,
+      "laterSuccessFillsOldGap": false
+    },
+    "groundedKnownExpectationCorrection": {
+      "productAndFixtureInputsChanged": false,
+      "specOneLineOnly": true,
+      "routeAndLOSReady": true,
+      "existingOptionalCarrierAttack": {
+        "purpose": "recommendation",
+        "target": 1,
+        "count": 0
+      },
+      "airManual": true,
+      "wholeReadiness": "missing",
+      "searchIncomplete": true,
+      "airOnlyEndReasonClaimRemoved": true,
+      "normalDeadlinesLimitsWaitCancelAssertionsRetained": true,
+      "necessaryKnownRevalidation": "completed in corrected phase; not success-purpose repetition",
+      "pureContractsReusedWithoutRerun": "ed4cf062d5b9f633aef5669ae678c1497c509c9b5ad846b965194a7b8ad742ca"
+    },
+    "localCapacity": {
+      "beforeCorrectedPhaseAvailableBytes": 11999797248,
+      "afterLastTwoAvailableBytes": 11857141760,
+      "phaseBoundaryMeasurementsNotCurrentPostCollectionDF": true
+    },
+    "collectorCombinedClosure": {
+      "path": "private/local-browser-phase2-corrected-collection-20261030/closure-result.json",
+      "bytes": 1895,
+      "sha256": "26ec31ff8ac8e4030b12950da7ad2b58cb6609358f23b3a7638bce44b8c557cb",
+      "manifest": {
+        "path": "private/local-browser-phase2-corrected-collection-20261030/collection-manifest.json",
+        "manifestFileBytes": 137582,
+        "rows": 721,
+        "sha256": "0016be3cd9a7393f2a7dd0a57753e79f3b599f2c4702dd4da90c4805d4add78f"
+      },
+      "phase2CopiedOriginalPayloadBytes": 23598632,
+      "manifestFileBytesArePayloadBytes": false,
+      "originalExpectedFailureSeparate": true,
+      "independentReview": {
+        "path": "private/phase2-combined-independent-review-20261030/review.json",
+        "bytes": 13911,
+        "sha256": "b8ad7279546fc6f0540ce53b79c5f3cf3e36785f578f84f8edfaf57ffe95aebd",
+        "closureManifestSHA256": "fac6b343e408e137c48c378792c674edca23841498c96686d8b0c2e0249ab7b7"
+      }
+    },
+    "executionWindowUTC": {
+      "correctedStart": "2026-10-30T15:41:07.859976+00:00",
+      "lastTwoFinished": "2026-10-30T15:51:54.968215+00:00"
+    }
+  },
+  "selectedBeforeSevenFiveThirdLocal20261031": {
+    "id": "7-5/1/default",
+    "baselineHead": "972b63a4a7761903c1f8d88fa04c61b136c89984",
+    "record": "sevenFiveSecondCIFinalization20261030",
+    "evidence": "docs/pr152-seven-five-second-ja.md",
+    "state": "ownCI first5full + identified Wknown retry1full directly cover six same-row representatives; Dconfirmed only; old first/local gaps and whole-map limits retained"
+  }
 }

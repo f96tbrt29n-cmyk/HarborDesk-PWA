@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "sourceHead": "972b63a4a7761903c1f8d88fa04c61b136c89984",
+  "scope": "Third selected display/intent only; route/LOS/source-wait items unchanged",
+  "basis": {
+    "sourceDesignPath": "private/seven-five-third-design-resume-20261030/fresh-third-expectations.json",
+    "sourceDesignSHA256": "a8729a555cb61f5570606e2f367aa0d223d75259ce925662a1b977ac3831ecee",
+    "articleThirdLines": "445-472/499-506",
+    "articleSecondContrastLines": "373-427"
+  },
+  "proposalDomainCount": 11,
+  "cases": [
+    {
+      "id": "third-auto-filter-P2-defaults",
+      "syntheticInput": {
+        "map": "7-5",
+        "selectedIndex": 2,
+        "path": "ABDFJOPT",
+        "policy": "auto"
+      },
+      "independentExpected": {
+        "scopedLabel": "third/T",
+        "automaticLandOrPTCapabilityCards": false,
+        "existingAA_ASWComparisonCardsRetained": true,
+        "newAutoNightCISetTarget": false
+      },
+      "sourceOrProductContractBasis": "selected T source domain plus existing user-intent/save contracts; not taken from first52 or second31 arrays",
+      "executed": false
+    },
+    {
+      "id": "third-selected-versus-saved-second",
+      "syntheticInput": {
+        "selectedIndex": 2,
+        "savedFleetRouteIndex": 1,
+        "policy": "auto"
+      },
+      "independentExpected": {
+        "selectedThirdControlsProfileScope": true,
+        "noP2LandCardBecauseSavedRouteDiffers": true,
+        "savedFleetOrAssessmentWrittenByRendering": false
+      },
+      "sourceOrProductContractBasis": "selected T source domain plus existing user-intent/save contracts; not taken from first52 or second31 arrays",
+      "executed": false
+    },
+    {
+      "id": "third-explicit-torpedo-strategy",
+      "syntheticInput": {
+        "selectedIndex": 2,
+        "policy": "torpedo",
+        "existingGoalCount": 2,
+        "metadataSentinel": true
+      },
+      "independentExpected": {
+        "existingTorpedoStrategyCardVisible": true,
+        "existingGoalCountPurposeAndMetadataPreserved": true,
+        "purpose": "strategy",
+        "defaultNightCICountInvented": false
+      },
+      "sourceOrProductContractBasis": "selected T source domain plus existing user-intent/save contracts; not taken from first52 or second31 arrays",
+      "executed": false
+    },
+    {
+      "id": "third-explicit-main-strategy",
+      "syntheticInput": {
+        "selectedIndex": 2,
+        "policy": "main",
+        "existingGoalCount": 4,
+        "metadataSentinel": true
+      },
+      "independentExpected": {
+        "existingMainStrategyCardVisible": true,
+        "chosenKindCountAndMetadataNotReset": true,
+        "purpose": "strategy",
+        "generatedRecommendationSubstitution": false
+      },
+      "sourceOrProductContractBasis": "selected T source domain plus existing user-intent/save contracts; not taken from first52 or second31 arrays",
+      "executed": false
+    },
+    {
+      "id": "third-auto-old-raw-night-unit",
+      "syntheticInput": {
+        "selectedIndex": 2,
+        "policy": "auto",
+        "existingRow": {
+          "kind": "夜戦",
+          "minCount": 1
+        }
+      },
+      "independentExpected": {
+        "rawOneItemOptionalComparisonRetained": true,
+        "oneItemDoesNotMeanOneCISet": true,
+        "newAutoNightCISet": false
+      },
+      "sourceOrProductContractBasis": "selected T source domain plus existing user-intent/save contracts; not taken from first52 or second31 arrays",
+      "executed": false
+    },
+    {
+      "id": "third-preserve-explicit-user-land-row",
+      "syntheticInput": {
+        "selectedIndex": 2,
+        "existingUserRow": {
+          "kind": "cap-land-mixed",
+          "generatedFromMap": false,
+          "purpose": "strategy",
+          "minCount": 2,
+          "metadataSentinel": true
+        }
+      },
+      "independentExpected": {
+        "P2AutomaticDefaultCardHidden": true,
+        "explicitUserRowAndMetadataNotDeletedByRendering": true,
+        "noAllEnemyPhysicalInvalidityClaim": true
+      },
+      "sourceOrProductContractBasis": "selected T source domain plus existing user-intent/save contracts; not taken from first52 or second31 arrays",
+      "executed": false
+    },
+    {
+      "id": "third-first-protection-reference",
+      "syntheticInput": {
+        "selectedIndex": 0,
+        "policy": "auto"
+      },
+      "independentExpected": {
+        "firstFiniteBehaviorUnchanged": true,
+        "reuseExistingFirstEvidence": true,
+        "countsAsNewFirstSuccess": false
+      },
+      "sourceOrProductContractBasis": "selected T source domain plus existing user-intent/save contracts; not taken from first52 or second31 arrays",
+      "executed": false
+    },
+    {
+      "id": "third-second-protection-reference",
+      "syntheticInput": {
+        "selectedIndex": 1,
+        "policy": "torpedo"
+      },
+      "independentExpected": {
+        "secondPTOriginAndPolicyBehaviorUnchanged": true,
+        "reuseCurrentG2NodeAndCWEvidenceWhereUnchanged": true,
+        "countsAsNewSecondSuccess": false
+      },
+      "sourceOrProductContractBasis": "selected T source domain plus existing user-intent/save contracts; not taken from first52 or second31 arrays",
+      "executed": false
+    },
+    {
+      "id": "third-legacy-mapwide-call",
+      "syntheticInput": {
+        "argumentCount": 2,
+        "map": "7-5"
+      },
+      "independentExpected": {
+        "legacyMapwideMeaningUnchanged": true,
+        "notRelabeledAsSelectedThird": true
+      },
+      "sourceOrProductContractBasis": "selected T source domain plus existing user-intent/save contracts; not taken from first52 or second31 arrays",
+      "executed": false
+    },
+    {
+      "id": "third-invalid-selection-manual",
+      "syntheticInput": {
+        "argumentCount": 4,
+        "selectedIndex": 2,
+        "descriptorMissingOrWrongPath": true
+      },
+      "independentExpected": {
+        "manualNoQuantityCard": true,
+        "noP2Fallback": true,
+        "sourceNumericCountsNotInvented": true
+      },
+      "sourceOrProductContractBasis": "selected T source domain plus existing user-intent/save contracts; not taken from first52 or second31 arrays",
+      "executed": false
+    },
+    {
+      "id": "third-unknown-input-does-not-green-route",
+      "syntheticInput": {
+        "selectedIndex": 2,
+        "missingFleetOrSyncInfo": true
+      },
+      "independentExpected": {
+        "noP2DefaultDisplayLeak": true,
+        "manualReasonPreserved": true,
+        "notOwnedImpossibleOrPurchaseRequired": true,
+        "noNewStorageWrites": true
+      },
+      "sourceOrProductContractBasis": "selected T source domain plus existing user-intent/save contracts; not taken from first52 or second31 arrays",
+      "executed": false
+    }
+  ],
+  "isRecordedRuntimeResult": false,
+  "sharedBoundaryRule": "Common first/second protection references are reused boundaries, not new source/route evidence or236-cell credit."
+}

@@ -1,0 +1,63 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
+const root=path.resolve(__dirname,'..'),legacy=require('./fixtures/seven-five-third-legacy-display.json'),expected=require('./fixtures/seven-five-third-display-expectations.json');
+const text=file=>fs.readFileSync(path.join(root,file),'utf8'),plain=value=>JSON.parse(JSON.stringify(value)),hash=value=>crypto.createHash('sha256').update(value).digest('hex');
+function fn(source,name){const a=source.indexOf('function '+name+'('),b=source.indexOf('\nfunction ',a+1);assert.ok(a>=0,name);return source.slice(a,b<0?undefined:b)}
+function load(file,name,context){vm.runInNewContext(fn(text(file),name),context);return context[name]}
+function mapData(){const c={window:{}};vm.runInNewContext(text('map-plans.js')+'\nthis.maps=MAP_PLANS;this.contracts=HD_MAP_ROUTE_REQUIREMENTS;',c);return c}
+function renderer(){
+ const data=mapData(),routes={};for(const [map,rows]of Object.entries(data.contracts))for(const row of rows)routes[map+'/'+row.index]=row;
+ const state={policy:'auto',actual:0,stock:0,unresolved:false},counts={profiles:0,lookups:0,fleets:0,builds:0,stock:0},fleet={id:'saved',routePreset:plain(data.maps['7-5'].presets[1]),goalId:'legacy-unmapped-target',traversal:[{goalId:'legacy-unmapped-target',node:'Q',metadata:{keep:'old-history'}}],metadata:{keep:'fleet'},ships:[]};
+ const c={hdSEEsc:value=>String(value??''),hdSENightPolicy:()=>state.policy,HD_SE_NIGHT_POLICIES:{auto:'自動',torpedo:'魚雷CI',main:'主砲CI'},HD_SE_CAP_SOURCE:{aa:'#aa',asw:'#asw',land:'#land'},hdSENightPolicyHtml:()=>'<policy '+state.policy+'/>',hdMapEquipNeeds:()=>({needs:['制空','防空','対潜','対地','夜戦','PT対策','索敵'].map(id=>({id}))}),hdMapPresetRequirements:(map,preset)=>{counts.lookups++;return routes[map+'/'+preset?.index]||null},hdSPSFleets:()=>{counts.fleets++;return [fleet]},hdFEPlanFromSavedFleet:(map,value)=>{counts.builds++;return {map,sourceFleet:value,ships:value.ships}},hdSECapabilityStock:(_plan,_kind,target=1)=>{counts.stock++;return {recipe:{name:'比較用装備例'},complete:state.stock>=target,usable:{complete:state.stock>0,ship:'候補'},parts:[{part:'one',label:'装備例',need:target,have:state.stock,items:[]}]}},hdSECapabilityMeasure:()=>({count:state.actual,unresolved:state.unresolved,ships:Array.from({length:state.actual},(_,i)=>'候補'+i)}),HD_SE_PARTS:{one:{examples:['例']}},HD_SE_RECIPES:Object.fromEntries(['cap-aa','cap-asw','cap-land-mixed','cap-night-torpedo','cap-night-main'].map(kind=>[kind,[{name:'任意比較'}]])),localStorage:new Proxy({},{get(){throw Error('render must not access Storage')}}),hdOCBuild:()=>{throw Error('render must not allocate')}};
+ load('sortie-equipment-check.js','hdSENightKind',c);const profiles=load('sortie-equipment-check.js','hdSEProfiles',c);c.hdSEProfiles=map=>{counts.profiles++;return profiles(map)};
+ const previous=vm.runInNewContext('('+legacy.hdSECapabilityHtml+'\n)',c),current=load('sortie-equipment-check.js','hdSECapabilityHtml',c);return {c,data,routes,fleet,state,counts,previous,current};
+}
+const cardKinds=html=>[...html.matchAll(/data-hd-se-capability="([^"]+)"/g)].map(match=>match[1]);
+function panelExpression(source){const a=source.indexOf("${typeof hdSECapabilityHtml==='function'?"),b=source.indexOf('}<strong>手持ち装備で攻略条件を満たす',a);assert.ok(a>=0&&b>a);return source.slice(a+2,b)}
+
+test('7-5 third selected display removes second land defaults without adding an auto CI set',()=>{
+ const h=renderer(),input=JSON.stringify([h.fleet,h.routes]),before=h.previous('7-5','saved',null,{index:2});assert.ok(cardKinds(before).includes('cap-land-mixed'),'isolated previous third display was map-wide');
+ const globalBefore=plain(h.c.hdSEProfiles('7-5')),html=h.current('7-5','saved',null,{index:2});assert.deepEqual(cardKinds(html),['cap-aa','cap-asw']);assert.match(html,/data-hd-se-route-scope="ABDFJOPT"/);assert.doesNotMatch(html,/data-hd-se-capability="cap-land-|data-hd-se-capability="cap-pt"|data-hd-se-capability="cap-night-/);
+ for(const phrase of ['第3目標T','F→J・O→P','第2ゲージ撃破とMマスS勝利1回','実際の開放状態を推定しません','第2向けの対地・PT比較','夜戦補助1個','夜戦CI1組へ読み替えません','第3の既定CI組数を追加した意味ではありません','購入数量ではありません','索敵閾値や低速例外の未確認範囲','到達・勝利を保証しません'])assert.ok(html.includes(phrase),phrase);
+ assert.deepEqual(plain(h.c.hdSEProfiles('7-5')),globalBefore,'no global profile mutation');assert.equal(JSON.stringify([h.fleet,h.routes]),input,'selected third does not rewrite the saved second route, old target or history');
+});
+
+test('7-5 third independent display intents retain raw one-item night and explicit user strategy counts metadata and old targets',()=>{
+ assert.equal(expected.proposalDomainCount,11);assert.equal(expected.cases.length,11);assert.equal(new Set(expected.cases.map(row=>row.id)).size,11);assert.equal(expected.isRecordedRuntimeResult,false);assert.equal(hash(fs.readFileSync(path.join(__dirname,'fixtures/seven-five-third-display-expectations.json'))),'ac94a597918e1ff8ecea4e2c4ccfdee74eb39e94261f7765c6fa29cb126dfe90');assert.equal(hash(fs.readFileSync(path.join(__dirname,'fixtures/seven-five-third-legacy-display.json'))),'359b52c607e6b1e070ba0da08c521f48e1da8ddeae98d7e9dea6fee077e7efb4');
+ const h=renderer(),contract=h.routes['7-5/2'],raw={kind:'夜戦',label:'夜戦補助',minCount:1,generatedFromMap:true,metadata:{keep:'raw-item'}},userLand={kind:'cap-land-mixed',baseKind:'対地',minCount:2,generatedFromMap:false,purpose:'strategy',metadata:{keep:'explicit-land'}};
+ const requirementsContext={hdFERouteRequirementData:()=>contract,hdFEScoutingExemption:()=>({status:'manual'}),hdSENightPolicy:()=>h.state.policy},requirements=load('fleet-readiness-evaluator.js','hdFEEquipmentRequirements',requirementsContext),owned=text('owned-equipment-planner.js'),declaration=owned.match(/^ const ptContract=.*$/m)?.[0],purposeLoop=owned.match(/^ for\(const goal of goals\)\{goal\.purpose=.*$/m)?.[0];assert.ok(declaration&&purposeLoop);
+ for(const [policy,minCount]of [['torpedo',2],['main',4]]){
+  h.state.policy=policy;const explicit={kind:'cap-night-'+policy,baseKind:'夜戦',label:'利用者指定',minCount,generatedFromMap:true,purpose:'strategy',choice:{keep:policy},metadata:{keep:'explicit-night'}},rows=[raw,userLand,explicit],input=JSON.stringify(rows),goals=requirements({map:'7-5',ships:[]},rows);assert.deepEqual(plain(goals),rows);const c={goals,plan:{map:'7-5'},route:{contract:{data:contract}},hdFERouteRequirementData:()=>contract,hdSENightPolicy:()=>policy};vm.runInNewContext(declaration+'\n'+purposeLoop,c);assert.equal(goals[0].minCount,1);assert.equal(goals[0].purpose,'recommendation');assert.equal(goals[1].purpose,'strategy');assert.equal(goals[2].purpose,'strategy');assert.equal(goals[2].minCount,minCount);assert.deepEqual(plain(goals[2].choice),{keep:policy});assert.deepEqual(plain(goals[2].metadata),{keep:'explicit-night'});assert.equal(JSON.stringify(rows),input);
+  const before=JSON.stringify(h.fleet),html=h.current('7-5','saved',null,{index:2});assert.deepEqual(cardKinds(html),['cap-aa','cap-asw','cap-night-'+policy]);assert.match(html,/利用者指定の戦略目標/);assert.match(html,/個別に指定した対地等の目標も削除しません/);assert.equal(JSON.stringify(h.fleet),before);
+ }
+ h.state.policy='auto';const result=requirements({map:'7-5',ships:[]},[raw,userLand]);assert.deepEqual(plain(result),[raw,userLand]);assert.equal(result.some(row=>row.kind.startsWith('cap-night-')),false);assert.equal(contract.equipmentTargets,undefined);
+ const se=text('sortie-equipment-check.js'),rules=se.slice(se.indexOf('const HD_SORTIE_EQUIP_RULES='),se.indexOf('\n};')+3),ruleContext={};vm.runInNewContext(rules+'\nthis.nightRule=HD_SORTIE_EQUIP_RULES["夜戦"];',ruleContext);assert.equal(ruleContext.nightRule.minCount,1);assert.equal(ruleContext.nightRule.label,'夜戦補助');
+});
+
+test('7-5 third invalid selected descriptors stay manual without a second-gauge fallback or added storage work',()=>{
+ const h=renderer(),valid=h.routes['7-5/2'],cases=[null,{}, {...valid,map:'7-4'},{...valid,index:'2'},{...valid,index:1},{...valid,path:'ABDFJOQ'},{...valid,path:''},{...valid,equipmentKinds:undefined}];
+ for(const row of cases){h.routes['7-5/2']=row;Object.keys(h.counts).forEach(key=>h.counts[key]=0);const html=h.current('7-5','saved',null,{index:2});assert.match(html,/data-hd-se-route-scope="manual"/);assert.doesNotMatch(html,/data-hd-se-capability=|所持不足/);assert.deepEqual(h.counts,{profiles:0,lookups:1,fleets:0,builds:0,stock:0});}
+ h.routes['7-5/2']=valid;const input=JSON.stringify([h.fleet,valid]),html=h.current('7-5','missing-fleet',null,{index:2});assert.match(html,/data-hd-se-route-scope="ABDFJOPT"/);assert.deepEqual(cardKinds(html),['cap-aa','cap-asw']);assert.equal(JSON.stringify([h.fleet,valid]),input);assert.doesNotMatch(html,/手持ちでは不可能|購入必須/);
+});
+
+test('7-5 third selected scope preserves complete finite first second other-route and legacy output and work',()=>{
+ const h=renderer(),args=[['7-5','saved'],['7-5','saved',{ships:[]}],['7-5','saved',null,{index:0}],['7-5','saved',null,{index:1}],['7-4','saved',null,{index:0}],['7-2','saved',null,{index:0}],['7-2','saved',null,{index:1}],['7-3','saved',null,{index:0}],['7-3','saved',null,{index:1}],['6-5','saved',null,{index:0}],['6-5','saved',null,{index:1}],['4-1','saved']];let comparisons=0;
+ for(const mode of [{actual:0,stock:0,unresolved:false,policy:'auto'},{actual:1,stock:1,unresolved:false,policy:'auto'},{actual:2,stock:3,unresolved:true,policy:'torpedo'}]){Object.assign(h.state,mode);for(const row of args){Object.keys(h.counts).forEach(key=>h.counts[key]=0);const before=h.previous(...row),work={...h.counts};Object.keys(h.counts).forEach(key=>h.counts[key]=0);assert.equal(h.current(...row),before,JSON.stringify([mode,row]));assert.deepEqual(h.counts,work);comparisons++;}}
+ assert.equal(comparisons,36);assert.ok(cardKinds(h.current('7-5','saved')).includes('cap-land-mixed'),'legacy two-argument call intentionally remains map-wide');
+});
+
+test('7-5 third panel forwards only selected third while preserving all prior finite call contracts',()=>{
+ const current=panelExpression(text('owned-equipment-planner.js')),preset={name:'selected',metadata:{keep:true}};let unchanged=0;
+ for(const [map,index]of [['7-5',0],['7-5',1],['7-5',2],['7-5','2'],['7-5',3],['7-4',0],['7-4',1],['7-3',0],['7-3',1],['7-2',0],['6-5',1],['4-1',0]]){
+  const c={map,c:{map,index,preset,fleet:{id:'saved'}},hdSECapabilityHtml:(...args)=>args},before=vm.runInNewContext(legacy.panelExpression,c),after=vm.runInNewContext(current,c);
+  if(map==='7-5'&&index===2){assert.equal(before.length,2);assert.equal(after.length,4);assert.equal(after[0],map);assert.equal(after[1],'saved');assert.equal(after[2],null);assert.equal(after[3],preset)}else{assert.deepEqual(plain(after),plain(before));unchanged++;}
+ }assert.equal(unchanged,11);
+});
+
+test('7-5 third display keeps route LOS save search and global policies byte exact and changes only the T air field',()=>{
+ for(const [name,row]of Object.entries(legacy.protectedFunctions))assert.equal(hash(fn(text(row.file),name)),row.sha256,name+' byte-exact protection');
+ const owned=text('owned-equipment-planner.js'),after="map==='7-5'&&[0,1,2].includes(c.index)?hdSECapabilityHtml",before="map==='7-5'&&[0,1].includes(c.index)?hdSECapabilityHtml";assert.equal(owned.split(after).length,2);assert.equal(hash(owned.replace(after,before)),legacy.beforeProductSHA256['owned-equipment-planner.js']);
+ for(const file of ['fleet-readiness-evaluator.js','map-plans.js'])assert.equal(hash(text(file)),legacy.beforeProductSHA256[file],file+' route/LOS/goal mapping remains unchanged');
+ const node=text('map-node-data-2-7.js'),oldAir='最終段階に合わせて本隊制空・対地装備・夜戦火力を再調整。基地航空隊は使用できない。',newAir='最終段階に合わせて本隊制空・夜戦火力を再調整。基地航空隊は使用できない。';assert.equal(node.split(newAir).length,2);assert.equal(hash(node.replace(newAir,oldAir)),legacy.beforeProductSHA256['map-node-data-2-7.js']);const c={HD_NODE_DETAIL_OVERRIDES:{}};vm.runInNewContext(node,c);assert.equal(c.HD_NODE_DETAIL_OVERRIDES['7-5'].T.air,newAir);assert.ok(c.HD_NODE_DETAIL_OVERRIDES['7-5'].G2.air.includes('対地'),'registered second-gauge G2 guidance remains separate');
+ const data=mapData(),third=data.contracts['7-5'][2];assert.equal(third.path,'ABDFJOPT');assert.deepEqual(plain(third.equipmentKinds),['制空','防空','対潜','夜戦','索敵']);assert.equal(third.los.coef,4);assert.deepEqual(plain(third.los.checks),[{label:'選択経路の索敵分岐',safe:63}]);assert.equal(third.equipmentTargets,undefined);
+});

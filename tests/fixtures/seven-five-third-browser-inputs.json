@@ -1,0 +1,308 @@
+{
+  "schemaVersion": 1,
+  "unit": "seven-five-third",
+  "status": "Synthetic finite browser inputs and independent source/model expectations; execution evidence is separate",
+  "variantId": "canonical-cvl1-cav2-cl1-dd2",
+  "sourceLiteralId": "third-canonical-cav2-native5",
+  "selectedRoute": {
+    "map": "7-5",
+    "index": 2,
+    "path": "ABDFJOPT",
+    "chosenEdges": [
+      "F->J",
+      "O->P"
+    ],
+    "gaugePrecondition": "Synthetic selected third T; second-gauge completion and M S victory1 are assumptions for this selected case, not inferred actual game progress",
+    "sourceComposition": [
+      "CVL",
+      "CAV",
+      "CAV",
+      "CL",
+      "DD",
+      "DD"
+    ],
+    "publishedSelectedLOSTarget": {
+      "coefficient": 4,
+      "safe": 63,
+      "hqReference": 120
+    },
+    "lowerOrRandomBandConfirmed": false,
+    "sources": [
+      "https://zekamashi.net/kancolle-kouryaku/7-5/",
+      "https://zh.kcwiki.cn/wiki/南西海域/7-5"
+    ],
+    "articleScope": "Third canonical low-speed exception CVL1+CAV2+CL1+DD2; alternatives with CA/DE and lower LOS bands remain separate source-wait scope"
+  },
+  "ships": [
+    {
+      "shipIndex": 0,
+      "masterId": 408,
+      "name": "隼鷹改二",
+      "type": "軽空母",
+      "stype": 7,
+      "baseSpeed": 5,
+      "normalSlots": [
+        24,
+        18,
+        20,
+        4
+      ],
+      "masterType": "軽空母",
+      "curatedType": "軽空母"
+    },
+    {
+      "shipIndex": 1,
+      "masterId": 506,
+      "name": "最上改二特",
+      "type": "航空巡洋艦",
+      "stype": 6,
+      "baseSpeed": 10,
+      "normalSlots": [
+        2,
+        2,
+        7,
+        3
+      ],
+      "masterType": "航空巡洋艦",
+      "curatedType": "航空巡洋艦"
+    },
+    {
+      "shipIndex": 2,
+      "masterId": 503,
+      "name": "鈴谷改二",
+      "type": "航空巡洋艦",
+      "stype": 6,
+      "baseSpeed": 10,
+      "normalSlots": [
+        3,
+        3,
+        7,
+        11
+      ],
+      "masterType": "航空巡洋艦",
+      "curatedType": "航空巡洋艦"
+    },
+    {
+      "shipIndex": 3,
+      "masterId": 668,
+      "name": "矢矧改二乙",
+      "type": "軽巡洋艦",
+      "stype": 3,
+      "baseSpeed": 10,
+      "normalSlots": [
+        1,
+        1,
+        2,
+        2
+      ],
+      "masterType": "軽巡洋艦",
+      "curatedType": "軽巡洋艦"
+    },
+    {
+      "shipIndex": 4,
+      "masterId": 951,
+      "name": "天津風改二",
+      "type": "駆逐艦",
+      "stype": 2,
+      "baseSpeed": 10,
+      "normalSlots": [
+        0,
+        0,
+        0
+      ],
+      "masterType": "駆逐艦",
+      "curatedType": "駆逐艦"
+    },
+    {
+      "shipIndex": 5,
+      "masterId": 588,
+      "name": "山風改二",
+      "type": "駆逐艦",
+      "stype": 2,
+      "baseSpeed": 10,
+      "normalSlots": [
+        0,
+        0,
+        0
+      ],
+      "masterType": "駆逐艦",
+      "curatedType": "駆逐艦"
+    }
+  ],
+  "nativeFleetRank": 5,
+  "known": {
+    "finiteInventory": [
+      {
+        "name": "試製烈風 後期型",
+        "count": 2,
+        "star": 0
+      },
+      {
+        "name": "零式水上観測機",
+        "count": 3,
+        "star": 0
+      },
+      {
+        "name": "90mm単装高角砲",
+        "count": 2,
+        "star": 0
+      },
+      {
+        "name": "13号対空電探改",
+        "count": 1,
+        "star": 0
+      },
+      {
+        "name": "三式水中探信儀",
+        "count": 1,
+        "star": 0
+      },
+      {
+        "name": "三式爆雷投射機",
+        "count": 1,
+        "star": 0
+      },
+      {
+        "name": "熟練見張員",
+        "count": 1,
+        "star": 0
+      }
+    ],
+    "plannedRosterGear": [
+      [
+        "試製烈風 後期型",
+        "試製烈風 後期型"
+      ],
+      [
+        "零式水上観測機",
+        "零式水上観測機",
+        "零式水上観測機"
+      ],
+      [
+        "90mm単装高角砲",
+        "90mm単装高角砲",
+        "13号対空電探改"
+      ],
+      [
+        "三式水中探信儀",
+        "三式爆雷投射機"
+      ],
+      [
+        "熟練見張員"
+      ],
+      []
+    ],
+    "initialGear": [
+      [
+        "試製烈風 後期型",
+        "試製烈風 後期型"
+      ],
+      [
+        "零式水上観測機",
+        "零式水上観測機",
+        "零式水上観測機"
+      ],
+      [
+        "90mm単装高角砲",
+        "90mm単装高角砲",
+        "13号対空電探改"
+      ],
+      [
+        "三式水中探信儀",
+        "三式爆雷投射機"
+      ],
+      [
+        "熟練見張員"
+      ],
+      []
+    ],
+    "finitePieceCount": 11,
+    "independentScore": 91.2187454245971,
+    "meaning": "Already synchronized legal finite optional loadout; search/save retention, not newly improved allocation",
+    "gearRetentionPolicy": "proposal-exact-with-original-identity"
+  },
+  "stock": {
+    "finiteInventory": [
+      {
+        "name": "零式水上観測機",
+        "count": 3,
+        "star": 0
+      },
+      {
+        "name": "三式水中探信儀",
+        "count": 1,
+        "star": 0
+      }
+    ],
+    "plannedRosterGear": [
+      [],
+      [
+        "零式水上観測機",
+        "零式水上観測機",
+        "零式水上観測機"
+      ],
+      [],
+      [],
+      [],
+      []
+    ],
+    "initialGear": [
+      [],
+      [
+        "零式水上観測機",
+        "零式水上観測機",
+        "零式水上観測機"
+      ],
+      [],
+      [],
+      [],
+      []
+    ],
+    "finitePieceCount": 4,
+    "independentScore": 76.81874542459708,
+    "expectedASWParts": [
+      {
+        "part": "sonar",
+        "have": 1,
+        "need": 1
+      },
+      {
+        "part": "projector",
+        "have": 0,
+        "need": 1
+      }
+    ],
+    "meaning": "Initially synchronized recon3 plus one owned unassigned sonar. Actual original search retains mandatory numeric route while this optional sonar/projector example remains incomplete.",
+    "gearRetentionPolicy": "proposal-exact-with-original-identity"
+  },
+  "unknown": {
+    "replaceShipIndex": 5,
+    "name": "合成・7-5第3艦情報未登録",
+    "masterId": 0,
+    "gear": "合成・7-5第3性能未登録装備",
+    "finiteInventory": [],
+    "finitePieceCount": 0,
+    "independentScore": -9.581254575402909,
+    "meaning": "Unknown master/type and source-data preservation refusal coexist with explicitly supplied synthetic IDs/empty known gear/bareLOS41/HQ120. Exactly the registered numeric63 target is missing; all five typeCount conditions remain manual. This is not actual game S/impossibility proof.",
+    "gearRetentionPolicy": "original-full-exact"
+  },
+  "numericSyntheticInputs": {
+    "bareLOS": 41,
+    "baseASW": 90,
+    "hq": 120,
+    "level": 99,
+    "openingAswCount": 0,
+    "nightPolicy": "auto",
+    "expansion": 0
+  },
+  "limits": [
+    "Third selected scope excludes second-gauge automatic land/PT capability comparisons; global profiles and explicit user strategies remain unchanged.",
+    "Raw night-support1 item is not night-CI1 set. No new default CI quantity is introduced.",
+    "Known11 and stock4 are finite synthetic test choices, not source-required procurement quantities or universal sufficient combat loadouts.",
+    "P numeric target63 is separate from uncertain lower/random bands; no score is injected or unknown replaced with0/sufficient.",
+    "Unselected combat-air input remains unresolved; route-ready is not overall ready, arrival or victory.",
+    "Third-specific shortage destination helper coverage is limited to unchanged generic models; no new ASW destination helper is claimed.",
+    "Old session/pref/history schemas are unchanged; this trial seeds no additional legacy keys and makes no new old-history operation claim.",
+    "G2 actual six ships, CVL2/667 variant and its six trials remain separate; no G2 result is counted as G3 success."
+  ]
+}

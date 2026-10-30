@@ -71,8 +71,8 @@ test('7-5 second selected display shows optional PT comparison and guards unreso
  const valid=selected(),bad=[null,{}, {...valid,map:'7-4'},{...valid,index:'1'},{...valid,index:0},{...valid,path:'wrongpath'},{...valid,equipmentKinds:undefined},{...valid,equipmentTargets:undefined},{...valid,equipmentTargets:[]},{...valid,equipmentTargets:[{kind:'cap-pt',minCount:0}]}];
  for(const row of bad){h.routes.second=row;Object.keys(h.counts).forEach(k=>h.counts[k]=0);const result=h.current('7-5','saved',null,{id:'second'});assert.match(result,/data-hd-se-route-scope="manual"/);assert.doesNotMatch(result,/data-hd-se-capability=|所持不足/);assert.deepEqual(h.counts,{profiles:0,lookups:1,fleets:0,builds:0,stock:0});}
 });
-test('7-5 second display leaves first third legacy and other-map output and work unchanged',()=>{
- const h=rendererContext(),args=[['7-5','saved'],['7-5','saved',{ships:[]}],['7-5','saved',null,{id:'first'}],['7-5','saved',null,{id:'third'}],['7-2','saved',null,{id:'other'}],['4-1','saved']];
+test('7-5 second display leaves first legacy and other-map output and work unchanged; third has its dedicated oracle',()=>{
+ const h=rendererContext(),args=[['7-5','saved'],['7-5','saved',{ships:[]}],['7-5','saved',null,{id:'first'}],['7-2','saved',null,{id:'other'}],['4-1','saved']];
  for(const mode of [{actual:0,stock:0,unresolved:false},{actual:1,stock:1,unresolved:false},{actual:2,stock:3,unresolved:true}]){Object.assign(h.state,mode);for(const row of args){Object.keys(h.counts).forEach(k=>h.counts[k]=0);const old=h.before(...row),counts={...h.counts};Object.keys(h.counts).forEach(k=>h.counts[k]=0);assert.equal(h.current(...row),old);assert.deepEqual(h.counts,counts);}}
 });
 test('7-5 second catalog helpers require complete distinct normal frames and retain unknown and blocked classifications',()=>{

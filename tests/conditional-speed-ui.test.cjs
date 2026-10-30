@@ -7,6 +7,7 @@ require('./seven-five-first-placement.test.cjs');
 require('./seven-five-second-routes.test.cjs');
 require('./seven-five-second-placement.test.cjs');
 require('./seven-five-second-audit.test.cjs');
+require('./seven-five-third-display.test.cjs');
 require('./seven-four-placement.test.cjs');
 require('./route-audit-binding.test.cjs');
 require('./five-four-battleship.test.cjs');

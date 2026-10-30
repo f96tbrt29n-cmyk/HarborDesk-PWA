@@ -104,6 +104,7 @@ jobs:
             test-results/route-seven-four-*/route-guidance-summary.json
             test-results/route-seven-five-first-*/route-guidance-summary.json
             test-results/route-seven-five-second-*/route-guidance-summary.json
+            test-results/route-seven-five-third-*/route-guidance-summary.json
           if-no-files-found: ignore
           retention-days: 14
 

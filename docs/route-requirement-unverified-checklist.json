@@ -1979,7 +1979,98 @@
           "detail": "境界と在庫競合を組み合わせた生成→配備→最適化→艦/装備交換→保存再読込→同期更新→プランナーの全操作列"
         }
       ],
-      "strategyTargets": []
+      "strategyTargets": [],
+      "representativeWorkflowRecord": {
+        "record": "sevenFiveThirdLocal20261031",
+        "document": "docs/pr152-seven-five-third-ja.md",
+        "recordDateJST": "2026-10-31",
+        "sourceReviewDateRetained": "2026-10-30",
+        "stage": "local-six-terminal-private-final-ready-for-root-review; Git HEAD and CI pending",
+        "baseHead": "253734f34a01052d0480ea7a9d6696b7f1448432",
+        "sourceIsUncommittedWIP": true,
+        "publicSourceAtPreparation": 635,
+        "runtimeSourceBinding": "a59a07723a37e58f952c1688422804fec0200b75e3a49ed3466eacc0ad3d4ede",
+        "publicSourceManifest": "7945493f9ed458303eff4409d5098cf7981ed83a1c3485826bf2bbdaad10ffc8",
+        "initialDifferentSourceFailure": {
+          "browser": "chromium",
+          "state": "known",
+          "classification": "unsupported expected whole manual; actual missing after result",
+          "stage": "after-result",
+          "savedOrSafeAbortReadReached": false,
+          "loadWholeReadReached": false,
+          "preservationPositiveObserved": false,
+          "runtimeManifest": "4c1d83cc872c15fbf087231175b871477377100856864efce904cc03b5e8bdfb",
+          "specSHA256": "5f38d90c6859ebabe83e1520b1b1664c14106201bc3e0544f91b8e9042b928f0",
+          "originalPhaseCopiedFiles": 839,
+          "retained": true,
+          "laterSuccessFillsOldGap": false
+        },
+        "groundedKnownExpectationCorrection": {
+          "productAndFixtureInputsChanged": false,
+          "specOneLineOnly": true,
+          "routeAndLOSReady": true,
+          "existingOptionalCarrierAttack": {
+            "purpose": "recommendation",
+            "target": 1,
+            "count": 0
+          },
+          "airManual": true,
+          "wholeReadiness": "missing",
+          "searchIncomplete": true,
+          "airOnlyEndReasonClaimRemoved": true,
+          "normalDeadlinesLimitsWaitCancelAssertionsRetained": true,
+          "necessaryKnownRevalidation": "completed in corrected phase; not success-purpose repetition",
+          "pureContractsReusedWithoutRerun": "ed4cf062d5b9f633aef5669ae678c1497c509c9b5ad846b965194a7b8ad742ca"
+        },
+        "oldGoalHistoryStorage": {
+          "keys": [
+            "harbordesk-active-sortie-session-v1",
+            "harbordesk-sortie-objective-pref-v1"
+          ],
+          "seeded": false,
+          "newG3RealOperationsVerified": false,
+          "codeAndPriorEvidenceAreNotNewStorageCompatibilityProof": true
+        },
+        "ledger": {
+          "countsBefore": [
+            24,
+            145,
+            67
+          ],
+          "countsAfter": [
+            24,
+            148,
+            64
+          ],
+          "G3": {
+            "A": "一部",
+            "B": "一部",
+            "C": "一部",
+            "D": "一部"
+          },
+          "changedCells": [
+            "7-5/2/default.B",
+            "7-5/2/default.C",
+            "7-5/2/default.D"
+          ],
+          "DConfirmed": false,
+          "reason": "identified same-row partial deployment/guidance/operation evidence only; Wknown load whole comparison unreached",
+          "definitionsOther58Legacy53ScoutingRetained": true
+        },
+        "browser": {
+          "correctedTrials": 6,
+          "passed": 5,
+          "timedOut": 1,
+          "loadWhole": 5,
+          "savedOrSafeAbortReads": 6,
+          "DConfirmed": false,
+          "loadStopDocumentCallerMissing": true,
+          "initialDocumentGuideStackSeparate": true
+        },
+        "CI": "not-started",
+        "collectorCombinedClosureSHA256": "26ec31ff8ac8e4030b12950da7ad2b58cb6609358f23b3a7638bce44b8c557cb",
+        "independentCombinedReviewSHA256": "b8ad7279546fc6f0540ce53b79c5f3cf3e36785f578f84f8edfaf57ffe95aebd"
+      }
     }
   ],
   "sevenFiveFirstLocal20261030": {
