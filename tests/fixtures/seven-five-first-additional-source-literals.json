@@ -1,0 +1,25 @@
+{
+  "status": "additional independent source consequence, kept separate from original52/actual3/policy8",
+  "cases": [
+    {
+      "id": "one-unknown-cannot-fill-cl-and-second-escort",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "AV",
+        "AS",
+        "DD",
+        "UNKNOWN"
+      ],
+      "speedRank": 5,
+      "sourceArticleB": "C",
+      "sourceKcB": "C",
+      "expectedSelectedPathStatus": "missing",
+      "basis": "With uniform15 ruled out by one knownslow AS, the only unknown cannot be both missingplainCL and missingsecondescort. CL+escort possible count<=2<3; all completions B-C. No new minimum3 rule; this follows from plainCL>=1 andescort>=2."
+    }
+  ],
+  "sourceAnchors": [
+    "article103-105",
+    "KC109-111"
+  ]
+}

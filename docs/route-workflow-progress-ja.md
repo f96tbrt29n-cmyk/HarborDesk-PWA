@@ -1,3 +1,5 @@
+> 最新7-5第1：2026-10-30 [7-5第1ABDFGHK](pr152-seven-five-first-ja.md)：駆逐1＋海防1の出典一致代替、選択第1への第2対地表示除外、対潜部品/合法通常枠案内を接続。独立Node21・純4とC/W各3初回を分離し、5件は保存/安全中止・適用編集・同一reload文書load全文まで完了。Wstockは保存後strict30通過後の第2click非表示45秒、load全文未到達/nav1/caller欠測を保持。既存夜戦補助1個を任意比較として残し、第1専用CI1組を追加しない。B/C/Dだけ未確認→一部、22/141/73→22/144/70の3セル。A/他58行/旧53/基準236は不変。最終sourceの通常push/smokeは未開始。
+
 
 > 最新追記（2026-10-30）：[訂正後CI633](pr152-seven-four-ja.md#2026-10-30-訂正後ci633の確定)／41014041261 attempt1は5smoke成功・W4は45分job上限で取消、run cancelled・Full skipped。公式C877/0/0、W1〜3小計658/0/0、W4と全W集計はnull。generic訂正Cは完結reporterと元assert制御フローからstrict59・保存/load/回復の通過を導出するが、Wはcase結果/strict59到達とも不明。新7-4初回summaryは4完了＋Wknown/stock未到達2、各retry完了は別記録。旧local5＋旧7fdCIWknownを根拠とするDと22/141/73は変更0。以下の旧「最終」「準備中」は各時点の履歴として保持する。
 
@@ -142,7 +144,7 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 |7-3/0/default ACE|一部|一部|一部|確認済み|[P開放前の出典一致域・代表操作](pr152-seven-three-first-ja.md)|
 |7-3/1/default ACDGJP / ACDGIJP（G分岐未確認）|一部|一部|一部|確認済み|[pr152-seven-three-gij-ja](pr152-seven-three-gij-ja.md) / [pr152-seven-three-speed-ja](pr152-seven-three-speed-ja.md)|
 |7-4/0/default ABEJLP|一部|一部|一部|確認済み|[六隻例・式未照合・代表操作](pr152-seven-four-ja.md)|
-|7-5/0/default ABDFGHK|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
+|7-5/0/default ABDFGHK|一部|一部|一部|一部|第1限定Node21・C/W6初回5完了。Wstock load全文未到達/原因未確定|
 |7-5/1/default ABDFJOQ|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
 |7-5/2/default ABDFJOPT|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
 
@@ -332,3 +334,8 @@ generic unknown-ASW訂正対象はC/W2件の別分母。Cは自身の完結し�
 236セル22確認済み/141一部/73未確認から変更0。Dは旧局所C3＋Wstock/unknownの5完了と、旧source7fd CI41007168230のWknown初回完了を6代表へ直接対応した根拠を維持し、新633の未到達で消さず、retryで補完もしない。A/B/C、全59行、旧53区分・定義・分母、canonicalなscouting係数4/37/33/preserveRandomBand trueと独立説明metadataを保持する。実索敵式/HQの未照合、出典域、全在庫/枠競合/戦闘方針、graph/旧履歴、旧非表示・通信原因は未完。PR152ドラフト・未公開、main競合・版/SW/本番/公開等の保護対象と停止条件を変えない。
 
 別7-5第1ABDFGHKはこの記録作業開始時点で22WIP/source616、Node21ユニーク・純契約4＋preflight成功、代表操作C/Wは0の準備範囲で、7-4や7-5のセルcreditへ換算しない。後続操作は別原本・別記録とする。本8記録作業による追加試験/CI/API/commit/pushは0。旧履歴・旧firstCI記録を削除せず、欠測を成功や保存異常解決へ変換しない。
+
+
+## 2026-10-30 7-5第1Kの限定操作
+
+2026-10-30 [7-5第1ABDFGHK](pr152-seven-five-first-ja.md)：駆逐1＋海防1の出典一致代替、選択第1への第2対地表示除外、対潜部品/合法通常枠案内を接続。独立Node21・純4とC/W各3初回を分離し、5件は保存/安全中止・適用編集・同一reload文書load全文まで完了。Wstockは保存後strict30通過後の第2click非表示45秒、load全文未到達/nav1/caller欠測を保持。既存夜戦補助1個を任意比較として残し、第1専用CI1組を追加しない。B/C/Dだけ未確認→一部、22/141/73→22/144/70の3セル。A/他58行/旧53/基準236は不変。最終sourceの通常push/smokeは未開始。

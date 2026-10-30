@@ -1,0 +1,294 @@
+{
+  "status": "Independent source-to-six-hull scope expectations; not executed",
+  "adjustments": {
+    "cd-model-gap": {
+      "expectedRuntimeStatus": "manual",
+      "reason": "Source DE/CD inclusion is separate from unsupported runtime CD model."
+    },
+    "known-heavy3-plus-unknown-speed20": {
+      "expectedRuntimeStatus": "manual",
+      "reason": "The source speed20 priority fixes B/D, but a product unknown hull remains manual."
+    },
+    "five-table-deduction": {
+      "expectedRuntimeStatus": "manual",
+      "reason": "Source table allows the smaller fleet; this implementation only establishes six-hull scope, not minimum6."
+    },
+    "three-cl-dd-de": {
+      "expectedRuntimeStatus": "manual",
+      "reason": "Three-hull source deduction is preserved outside the six-hull implementation scope."
+    },
+    "two-cl-dd-speed15": {
+      "expectedRuntimeStatus": "manual",
+      "reason": "Two-hull abstract speed deduction is preserved outside current six-hull scope."
+    }
+  },
+  "cases": [
+    {
+      "id": "original-six",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "original-speed-unknown",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "original-speed20",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "old-bbv-cl-dd3-example",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "bbv-cav-clt-cl-dd2",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "ca-for-cav",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "ct-for-clt-with-cl",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "de2-for-dd2",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "dd1-de1",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "cd-model-gap",
+      "expectedRuntimeStatus": "manual",
+      "reason": "Source DE/CD inclusion is separate from unsupported runtime CD model."
+    },
+    {
+      "id": "clt-is-not-cl",
+      "expectedRuntimeStatus": "missing",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "ct-is-not-cl",
+      "expectedRuntimeStatus": "missing",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "no-cl-speed15-rescue",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "no-cl-speed-unknown",
+      "expectedRuntimeStatus": "manual",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "cv1-escort4",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "cvb1-escort4",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "cvl2-escort3",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "bb2-escort3-slow",
+      "expectedRuntimeStatus": "missing",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "bb2-speed15",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "bbv2-escort3",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "fbb2-escort3",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "cv2-speed15-d-e",
+      "expectedRuntimeStatus": "missing",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "cv2-speed20",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "cv-cvb-speed20",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "bbv3-speed15-d-e",
+      "expectedRuntimeStatus": "missing",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "bbv3-speed20",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "cav3-speed15-d-e",
+      "expectedRuntimeStatus": "missing",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "cav3-speed20",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "cvl3-speed15-d-e",
+      "expectedRuntimeStatus": "missing",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "cvl3-speed20",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "d-priority-difference-speed15",
+      "expectedRuntimeStatus": "manual",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "d-priority-same-speed20",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "d-priority-same-slow",
+      "expectedRuntimeStatus": "missing",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "plain-dd6-slow",
+      "expectedRuntimeStatus": "missing",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "plain-dd6-speed15",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "de6-speed15",
+      "expectedRuntimeStatus": "missing",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "de6-speed20",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "cl-de5",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "ao-is-not-cvl",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "ss-is-not-as",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "ssv-is-not-av",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "as-is-not-ss",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "ar-free-table-deduction",
+      "expectedRuntimeStatus": "ready",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "lha-carrier-influence",
+      "expectedRuntimeStatus": "manual",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "one-unknown-hull",
+      "expectedRuntimeStatus": "manual",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "known-heavy3-plus-unknown-slow",
+      "expectedRuntimeStatus": "missing",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "known-heavy3-plus-unknown-speed20",
+      "expectedRuntimeStatus": "manual",
+      "reason": "The source speed20 priority fixes B/D, but a product unknown hull remains manual."
+    },
+    {
+      "id": "known-heavy3-speed-unknown",
+      "expectedRuntimeStatus": "manual",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "known-heavy3-one-known-slow-others-unknown",
+      "expectedRuntimeStatus": "missing",
+      "reason": "Same status as independent two-accessible-source literal."
+    },
+    {
+      "id": "five-table-deduction",
+      "expectedRuntimeStatus": "manual",
+      "reason": "Source table allows the smaller fleet; this implementation only establishes six-hull scope, not minimum6."
+    },
+    {
+      "id": "three-cl-dd-de",
+      "expectedRuntimeStatus": "manual",
+      "reason": "Three-hull source deduction is preserved outside the six-hull implementation scope."
+    },
+    {
+      "id": "two-cl-dd-speed15",
+      "expectedRuntimeStatus": "manual",
+      "reason": "Two-hull abstract speed deduction is preserved outside current six-hull scope."
+    }
+  ],
+  "expectedCounts": {
+    "ready": 30,
+    "missing": 12,
+    "manual": 10
+  },
+  "sourceProposalsSHA256": "3a638a06d280dc5121dfdeae45692cfb05af1dac101079f48f7755618a50aff4",
+  "concreteProposalsSHA256": "0f76fb1c1585cf94b251c8aa62d227e3e211dc428308be8a1bc0a142248e1ad6"
+}

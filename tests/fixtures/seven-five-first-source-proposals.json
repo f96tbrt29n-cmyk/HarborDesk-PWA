@@ -1,0 +1,1556 @@
+{
+  "status": "independent source-literal proposals only; no product/Node/browser execution",
+  "cases": [
+    {
+      "id": "original-six",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CL",
+        "DD",
+        "DD",
+        "AV"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "Article300-305 exact current example; KC B/D table agreement",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "original-speed-unknown",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CL",
+        "DD",
+        "DD",
+        "AV"
+      ],
+      "speedRank": null,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "Every possible speed branch for this known family yields D/F; no blanket speed requirement",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "original-speed20",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CL",
+        "DD",
+        "DD",
+        "AV"
+      ],
+      "speedRank": 20,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "B speed15 then D speed20 have first priority",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "old-bbv-cl-dd3-example",
+      "hulls": [
+        "BBV",
+        "CAV",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "Article323-324 explicit old example",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "bbv-cav-clt-cl-dd2",
+      "hulls": [
+        "BBV",
+        "CAV",
+        "CLT",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "Article339-340 and KC210 explicit first-route alternative",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "ca-for-cav",
+      "hulls": [
+        "CA",
+        "CLT",
+        "CL",
+        "DD",
+        "DD",
+        "AV"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "CA-family permits CA/CAV; no CAV-only general rule",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "ct-for-clt-with-cl",
+      "hulls": [
+        "CAV",
+        "CT",
+        "CL",
+        "DD",
+        "DD",
+        "AV"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "Plain CL remains present; CT is not counted as a second plain CL",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "de2-for-dd2",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CL",
+        "DE",
+        "DE",
+        "AV"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "B escort grouping DD+DE and D plainCL+DD remains positive due CL1",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "dd1-de1",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CL",
+        "DD",
+        "DE",
+        "AV"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "Two grouped escorts; no general DD2 requirement",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "cd-model-gap",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CL",
+        "DD",
+        "CD",
+        "AV"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "source-ready/runtime-model-unknown",
+      "JP": "unavailable HTTP403",
+      "basis": "KC97 counts CD in sourceDE; product model cannot rename CD",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "clt-is-not-cl",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CLT",
+        "DD",
+        "DD",
+        "AV"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "C",
+        "D": "not-reached"
+      },
+      "KC": {
+        "B": "C",
+        "D": "not-reached"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "missing",
+      "JP": "unavailable HTTP403",
+      "basis": "B plainCL0 C precedes escorts",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "ct-is-not-cl",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CT",
+        "DD",
+        "DD",
+        "AV"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "C",
+        "D": "not-reached"
+      },
+      "KC": {
+        "B": "C",
+        "D": "not-reached"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "missing",
+      "JP": "unavailable HTTP403",
+      "basis": "CT cannot satisfy B plainCL",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "no-cl-speed15-rescue",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CT",
+        "DD",
+        "DD",
+        "AV"
+      ],
+      "speedRank": 15,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "B speed15 precedes CL0; D DD2 avoids CL+DD0",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "no-cl-speed-unknown",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CT",
+        "DD",
+        "DD",
+        "AV"
+      ],
+      "speedRank": null,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "C or D",
+        "D": "not-reached or F"
+      },
+      "KC": {
+        "B": "C or D",
+        "D": "not-reached or F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "manual",
+      "JP": "unavailable HTTP403",
+      "basis": "Unknown speed can enable an earlier rescue; do not assert missing or mandatory20",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "cv1-escort4",
+      "hulls": [
+        "CV",
+        "CL",
+        "DD",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "B escort>=3 D precedes later CV1 C; D ordinary checks allow F",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "cvb1-escort4",
+      "hulls": [
+        "CVB",
+        "CL",
+        "DD",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "CVB counted with CV in same ordered branch",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "cvl2-escort3",
+      "hulls": [
+        "CVL",
+        "CVL",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "B escort>=3 D precedes later CVL2 C",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "bb2-escort3-slow",
+      "hulls": [
+        "BB",
+        "BB",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "C",
+        "D": "not-reached"
+      },
+      "KC": {
+        "B": "C",
+        "D": "not-reached"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "missing",
+      "JP": "unavailable HTTP403",
+      "basis": "B ordinaryBB2 C precedes escort3 D",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "bb2-speed15",
+      "hulls": [
+        "BB",
+        "BB",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 15,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "B speed rescue; D escort3 precedes late BB+CVL cap",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "bbv2-escort3",
+      "hulls": [
+        "BBV",
+        "BBV",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "BBV2 not ordinaryBB2; totalBB2 below3 and escorts3",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "fbb2-escort3",
+      "hulls": [
+        "FBB",
+        "FBB",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "Original FBB distinct from ordinary low-BB; input speed does not rewrite class",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "cv2-speed15-d-e",
+      "hulls": [
+        "CV",
+        "CV",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 15,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "E"
+      },
+      "KC": {
+        "B": "D",
+        "D": "E"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "missing",
+      "JP": "unavailable HTTP403",
+      "basis": "B speed rescue is not D rescue: CV2 E before D speed15",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "cv2-speed20",
+      "hulls": [
+        "CV",
+        "CV",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 20,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "D first-priority speed20 precedes CV2 E; oldg75 CV0 is example restriction",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "cv-cvb-speed20",
+      "hulls": [
+        "CV",
+        "CVB",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 20,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "CVB belongs to same count; first-priority speed20",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "bbv3-speed15-d-e",
+      "hulls": [
+        "BBV",
+        "BBV",
+        "BBV",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 15,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "E"
+      },
+      "KC": {
+        "B": "D",
+        "D": "E"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "missing",
+      "JP": "unavailable HTTP403",
+      "basis": "D BB-family+CA-family3 E before speed15",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "bbv3-speed20",
+      "hulls": [
+        "BBV",
+        "BBV",
+        "BBV",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 20,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "D speed20 precedes heavy3 E; no general BB<=1 cap",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "cav3-speed15-d-e",
+      "hulls": [
+        "CAV",
+        "CAV",
+        "CAV",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 15,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "E"
+      },
+      "KC": {
+        "B": "D",
+        "D": "E"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "missing",
+      "JP": "unavailable HTTP403",
+      "basis": "D CA-family3 E before speed15",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "cav3-speed20",
+      "hulls": [
+        "CAV",
+        "CAV",
+        "CAV",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 20,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "D speed20 precedes CA-family3 E",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "cvl3-speed15-d-e",
+      "hulls": [
+        "CVL",
+        "CVL",
+        "CVL",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 15,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "E"
+      },
+      "KC": {
+        "B": "D",
+        "D": "E"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "missing",
+      "JP": "unavailable HTTP403",
+      "basis": "D CVL3 E before speed15",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "cvl3-speed20",
+      "hulls": [
+        "CVL",
+        "CVL",
+        "CVL",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 20,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "D first-priority speed20 precedes CVL3 E",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "d-priority-difference-speed15",
+      "hulls": [
+        "CV",
+        "BBV",
+        "CA",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 15,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "E"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "manual",
+      "JP": "unavailable HTTP403",
+      "basis": "Article116 speed15 before117 aggregate; KC123 aggregate before124 speed15",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "d-priority-same-speed20",
+      "hulls": [
+        "CV",
+        "BBV",
+        "CA",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 20,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "D speed20 precedes both conflicting later rows",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "d-priority-same-slow",
+      "hulls": [
+        "CV",
+        "BBV",
+        "CA",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "C",
+        "D": "not-reached"
+      },
+      "KC": {
+        "B": "C",
+        "D": "not-reached"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "missing",
+      "JP": "unavailable HTTP403",
+      "basis": "B CV1 C before default when escort2, so D disagreement irrelevant",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "plain-dd6-slow",
+      "hulls": [
+        "DD",
+        "DD",
+        "DD",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "C",
+        "D": "not-reached"
+      },
+      "KC": {
+        "B": "C",
+        "D": "not-reached"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "missing",
+      "JP": "unavailable HTTP403",
+      "basis": "B CL0 first",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "plain-dd6-speed15",
+      "hulls": [
+        "DD",
+        "DD",
+        "DD",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 15,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "D CL+DD positive; no unconditional CL minimum after speed rescue",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "de6-speed15",
+      "hulls": [
+        "DE",
+        "DE",
+        "DE",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 15,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "E"
+      },
+      "KC": {
+        "B": "D",
+        "D": "E"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "missing",
+      "JP": "unavailable HTTP403",
+      "basis": "D CL+DD0 E precedes speed15; grouped DE not counted as DD here",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "de6-speed20",
+      "hulls": [
+        "DE",
+        "DE",
+        "DE",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 20,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "Abstract source-speed20 input; legal attainability not established",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "cl-de5",
+      "hulls": [
+        "CL",
+        "DE",
+        "DE",
+        "DE",
+        "DE",
+        "DE"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "PlainCL present, escort5 D/F; routing deduction not combat recommendation",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "ao-is-not-cvl",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CL",
+        "DD",
+        "DD",
+        "AO"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "Source AO separate from CVL even for aircraft-capable auxiliary",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "ss-is-not-as",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CL",
+        "DD",
+        "DD",
+        "SS"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "Retrieved B/D tables do not prohibit SS; table deduction only, no legal sortie/arrival proof",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "ssv-is-not-av",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CL",
+        "DD",
+        "DD",
+        "SSV"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "SSV not CV/CVL/AV; no invented blanket prohibition",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "as-is-not-ss",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CL",
+        "DD",
+        "DD",
+        "AS"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "AS not SS/SSV/AV; original B/D grouping unchanged",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "ar-free-table-deduction",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CL",
+        "DD",
+        "DD",
+        "AR"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "No AR-specific row in retrieved table; no actual sortie evidence",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "lha-carrier-influence",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CL",
+        "DD",
+        "DD",
+        "LHA"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "unverified",
+        "D": "unverified"
+      },
+      "KC": {
+        "B": "unverified",
+        "D": "unverified"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "manual",
+      "JP": "unavailable HTTP403",
+      "basis": "Article185 carrier-equivalence warning lacks7-5 application; never allLHA=CVL",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "one-unknown-hull",
+      "hulls": [
+        "CAV",
+        "CLT",
+        "CL",
+        "DD",
+        "DD",
+        "UNKNOWN"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "unverified",
+        "D": "unverified"
+      },
+      "KC": {
+        "B": "unverified",
+        "D": "unverified"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "manual",
+      "JP": "unavailable HTTP403",
+      "basis": "Unknown may change B/D counts; no invented known type",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "known-heavy3-plus-unknown-slow",
+      "hulls": [
+        "BBV",
+        "BBV",
+        "BBV",
+        "DD",
+        "DD",
+        "UNKNOWN"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "C",
+        "D": "not-reached"
+      },
+      "KC": {
+        "B": "C",
+        "D": "not-reached"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "missing",
+      "JP": "unavailable HTTP403",
+      "basis": "KnownBB-family3 guarantees B-C across the unknown hull possibilities, speed known below15",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "known-heavy3-plus-unknown-speed20",
+      "hulls": [
+        "BBV",
+        "BBV",
+        "BBV",
+        "DD",
+        "DD",
+        "UNKNOWN"
+      ],
+      "speedRank": 20,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "source-ready/runtime-model-unknown",
+      "JP": "unavailable HTTP403",
+      "basis": "Abstract source-speed priority fixes B/D, but unresolved product hull remains manual",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "known-heavy3-speed-unknown",
+      "hulls": [
+        "BBV",
+        "BBV",
+        "BBV",
+        "CL",
+        "DD",
+        "DD"
+      ],
+      "speedRank": null,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "C or D",
+        "D": "not-reached/E/F"
+      },
+      "KC": {
+        "B": "C or D",
+        "D": "not-reached/E/F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "manual",
+      "JP": "unavailable HTTP403",
+      "basis": "Unknown speed may allow B15/D20; known heavy count alone cannot erase an earlier possible speed rescue",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "known-heavy3-one-known-slow-others-unknown",
+      "hulls": [
+        "BBV",
+        "BBV",
+        "BBV",
+        "DD",
+        "DD",
+        "UNKNOWN"
+      ],
+      "speedRank": null,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "C",
+        "D": "not-reached"
+      },
+      "KC": {
+        "B": "C",
+        "D": "not-reached"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "missing",
+      "JP": "unavailable HTTP403",
+      "basis": "One known rank5 hull rules out uniform15/20; knownBB-family3 C survives other missing inputs",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred",
+      "speedEvidence": {
+        "oneKnownRank5": true,
+        "otherSpeedsUnknown": true
+      }
+    },
+    {
+      "id": "five-table-deduction",
+      "hulls": [
+        "CA",
+        "CL",
+        "DD",
+        "DD",
+        "DD"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "No source fleet6 minimum in B/D; smaller deduction not recommended deployment",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "three-cl-dd-de",
+      "hulls": [
+        "CL",
+        "DD",
+        "DE"
+      ],
+      "speedRank": 5,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "Two escorts and plainCL satisfy ordered B/D; scope boundary separate from source rule",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    },
+    {
+      "id": "two-cl-dd-speed15",
+      "hulls": [
+        "CL",
+        "DD"
+      ],
+      "speedRank": 15,
+      "selectedPath": "ABDFGHK",
+      "article": {
+        "B": "D",
+        "D": "F"
+      },
+      "KC": {
+        "B": "D",
+        "D": "F"
+      },
+      "twoAccessibleSourceSelectedPathStatus": "ready",
+      "JP": "unavailable HTTP403",
+      "basis": "Abstract small-fleet speed rescue table deduction; no minimum6 assertion",
+      "activeChoices": [
+        "F->G",
+        "H->K"
+      ],
+      "liveGaugeUnlockState": "not inferred"
+    }
+  ],
+  "count": 52,
+  "twoSourceStatusCounts": {
+    "ready": 33,
+    "source-ready/runtime-model-unknown": 2,
+    "missing": 12,
+    "manual": 5
+  },
+  "policyExpectations": [
+    {
+      "id": "first-target-state-boundary",
+      "expected": "Index0 K and active F->G/H->K are selected contract; never infer live first-gauge or M/Q/T unlock state from fleet/preset label."
+    },
+    {
+      "id": "no-k-scouting-threshold",
+      "expected": "No K LOS condition retrieved. HQ/ship/equipment LOS absence does not become0 or missing. Do not use I53/59/65, prose58, or P58/63/68/73 and olderKC56/62."
+    },
+    {
+      "id": "speed-choices-not-mandate",
+      "expected": "Original slow/unknown-speed family is a valid2-source candidate. rank15 disagreement is manual; rank20 common rescue is optional, not universal required speed or proof of legal sets."
+    },
+    {
+      "id": "asw-comparison-not-people",
+      "expected": "OASW or smoke is combat strategy. No source sufficient people/set count established. Preserve unspecified/explicit0/saved OASW targets; cap-asw1 is a generic comparison."
+    },
+    {
+      "id": "night-air-user-policy",
+      "expected": "Night1 and air2/LOS2 are generic comparisons. Article air88 and thresholds123/62 are combat targets and says air loss possible; respect selected user air/night goals."
+    },
+    {
+      "id": "no-base-for-seven-five",
+      "expected": "7-5 base aviation unavailable. Do not copy7-4 base1/radius2 or suggest base purchase as route repair."
+    },
+    {
+      "id": "type-stock-action-separation",
+      "expected": "Known B-C/D-E requires fleet/speed review, not equipment purchase count. Distinguish finite stock, legal slots, missing input and search incomplete; no failure-to-find proof of impossibility."
+    },
+    {
+      "id": "jp-source-gap",
+      "expected": "Two accessible source candidates and JP403 gap remain explicit; no three-source agreement or new sortie evidence claimed."
+    }
+  ],
+  "allCasesLimits": [
+    "JP unavailable403; each case preserves source-specific B/D result",
+    "F->G/H->K active choice precondition; no live gauge inference",
+    "speedRank supplied as abstract routing input, not proof of master legality or owned items",
+    "no actual arrival/victory/finite-stock/saved-workflow or236-cell credit"
+  ]
+}

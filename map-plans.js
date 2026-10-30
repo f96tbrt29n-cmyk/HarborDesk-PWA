@@ -485,7 +485,36 @@ const HD_MAP_ROUTE_REQUIREMENTS={};
  ]});
  MAP_PLANS['7-4'].presets[0].gear='ABEJLPの六隻出典一致域を確認。元編成は初攻略例で、対潜3組・夜戦・制空・基地は戦闘比較や利用者指定。Eの指定familyによるG、JのL/P例外、索敵係数4の33/37と式未照合を分ける。基地は開放後1部隊・P半径2で任意。';
  const g75=[fleet(6),count(['bb'],0,1),count(['cvn'],0,0),count(['cvl'],0,1),count(['bb','cav'],0,2),count(['cl'],1)];
- add('7-5',0,'ABDFGHK',[...g75,count(['dd'],2)],{equipmentKinds:['制空','防空','対潜','夜戦'],notes:['第1ゲージKへの例では数値索敵不要。M到達ギミックを行う場合は別に33式係数4で59以上必要。']});
+ // 7-5 first target only: B/D are evaluated in each retrieved source's
+ // order. JP content was unavailable; these are the two-source common cases.
+ const sevenFiveFirstEscortsThree={all:[count(['escort'],3),count(['cl','escort'],4)]};
+ // The second count is a consequence of CL>=1 and escort>=3. It prevents
+ // one unknown hull from supplying both disjoint roles at the same time.
+ const sevenFiveFirstB={any:[speed(15),{all:[
+  count(['cvn'],0,1),{kind:'slowBattleshipCount',min:0,max:1},count(['cl'],1),count(['escort'],2),count(['cl','escort'],3),
+  {any:[sevenFiveFirstEscortsThree,{all:[count(['cvn'],0,0),count(['cvl'],0,1),count(['bb'],0,2),count(['cav'],0,2)]}]}
+ ]}]};
+ const sevenFiveFirstDEarly={all:[count(['cvn'],0,1),count(['cvl'],0,2),count(['bb','cav'],0,2),count(['cl','dd'],1)]};
+ const sevenFiveFirstDLater={any:[count(['escort'],3),{all:[count(['escort'],2),count(['bb','cvl'],0,2)]}]};
+ const sevenFiveFirstDArticle={any:[speed(20),{all:[sevenFiveFirstDEarly,{any:[speed(15),{all:[count(['bb','cvn','cav'],0,2),sevenFiveFirstDLater]}]}]}]};
+ const sevenFiveFirstDKc={any:[speed(20),{all:[sevenFiveFirstDEarly,count(['bb','cvn','cav'],0,2),{any:[speed(15),sevenFiveFirstDLater]}]}]};
+ const sevenFiveFirstSources=[{all:[sevenFiveFirstB,sevenFiveFirstDArticle]},{all:[sevenFiveFirstB,sevenFiveFirstDKc]}];
+ add('7-5',0,'ABDFGHK',[
+  {any:[{all:sevenFiveFirstSources},{all:[{any:sevenFiveFirstSources},{kind:'unverified',reason:'B/Dの候補が二資料で一致しないか、必要な艦種・速力情報が不足。Dの高速＋Fと戦艦級＋正空＋重巡級3以上Eの優先差を手動確認する。最速を一律必須へ読み替えない'}]}],reason:'B→DかつD→F：記事とKCの優先順を別々に評価し、一致する成立/不一致を残す'},
+  {any:[count(['lha'],0,0),{kind:'unverified',reason:'揚陸艦の空母相当算入は7-5固有の適用が未確認。あきつ丸や他揚陸艦を正空・軽空へ推測変換しない。別の既知不一致は保持する'}]},
+  {any:[fleet(6),{kind:'unverified',reason:'今回の成立入力範囲は六隻。少数隻の表導出は別確認とし、実ゲームの最低六隻やボス到達不可能とは断定しない'}]}
+ ],{checkedAt:'2026-10-30',useExampleScope:false,equipmentKinds:['制空','防空','対潜','夜戦'],sources:['https://zekamashi.net/kancolle-kouryaku/7-5/','https://zh.kcwiki.cn/wiki/南西海域/7-5'],sourceUnavailable:[{url:'https://wikiwiki.jp/kancolle/南西海域/7-5',status:403}],notes:[
+  'この選択は第1目標KへのABDFGHK。A空襲→B潜水→D通常→F能動分岐→G通常→H能動分岐→Kボス。FでG、HでKを選ぶ契約で、選択や艦隊から実際のゲージ開放・Mギミックの状態を推定しない。',
+  '元の航巡1＋雷巡1＋軽巡1＋駆逐2＋水母1は六隻の編成例。駆逐1＋海防1への置換など、確認できた二資料のB/Dが一致する六隻の代替も扱う。日本語wiki本文は今回未取得で未照合。実到達・勝利や全経路を確認した意味ではない。',
+  'Bは高速＋以上のDが最優先。その後は正空2・通常の低戦2・軽巡0・護衛1以下がC、護衛3以上がD、その後の正空1・軽空2・戦艦級3・重巡級3がC。軽巡0は護衛3より先なので、低速/高速の駆逐3だけでは軽巡0を救済しない。',
+  'Dは最速のFが最優先。その後の正空2・軽空3・戦艦級＋重巡級3・軽巡＋駆逐0のEは高速＋より先。戦艦級＋正空＋重巡級3のEと高速＋Fの順は記事/KCで異なるため、結果が分かれる域は未判定。通常条件で成立する艦隊へ最速を新しく要求しない。',
+  'Bの護衛は駆逐＋海防で、Dの軽巡＋駆逐には海防を足さない。軽巡は軽巡洋艦のみで雷巡・練巡とは別。重巡級は重巡＋航巡、戦艦級は戦艦・高速戦艦・航戦、正空は正規＋装甲空母で軽空を含めない。装備で元艦種を書き換えない。',
+  '潜水艦・潜水空母・潜水母艦・水母・補給艦を名称で同一視しない。取得したB/D表にない潜水系一律禁止を追加せず、揚陸艦の算入、CD/海防戦艦や未知マスターは未確認理由を残す。既知の不一致は別の情報不足で消さないが、未確認の先行する速力救済を無視して不一致へ確定しない。',
+  '選択K経路に数値索敵・装備個数/装備艦数の通行必須は掲載されていない。索敵非適用を0点へ置き換えず、I→Mの53/59や記事本文58等の差、第三経路Pの閾値を流用しない。基地航空隊は使用できず、7-4の基地1部隊や半径2を持ち込まない。',
+  '先制対潜または煙幕、開幕雷撃・夜戦・対空CIは戦闘推奨または利用者指定。既定の対潜シナジー1組・夜戦補助1個や制空装備2個等は比較用で、先制対潜人数・全編成の必要十分数・購入数量ではない。未指定・明示0・保存済みの利用者目標を上書きしない。',
+  'Aの制空値88は記事例で、拮抗123/劣勢62などの戦闘目標と通行条件は別。制空喪失でも攻略可能とされ、航空・防空・夜戦目標は利用者が選ぶ。高速化装備も実マスター・通常枠・搭載可否・所持数を確認し、源表の最速入力だけで実在する配備や戦闘十分性を証明しない。',
+  '艦種/隻数/速力の不一致は編成見直しへ案内する。在庫不足・搭載不可・枠競合・情報不足・探索未完了を区別し、未発見を手持ちでは不可能・購入必須・最適と断定しない。旧図・出撃目標・通過履歴は変更せず、保存互換や実到達を確認済みにしない。'
+ ]});
  add('7-5',1,'ABDFJOQ',[...g75,count(['dd'],3)],{equipmentKinds:['制空','防空','対潜','対地','PT対策'],equipmentTargets:[{kind:'cap-pt',baseKind:'PT対策',label:'PT小鬼群対策セット',minCount:1,source:'https://zekamashi.net/kancolle-kouryaku/ptboat-taisaku/'}],notes:['第2ゲージQの対地攻略例。第1ゲージ撃破を確認。Mギミックは第3ゲージ開放に必要。']});
  add('7-5',2,'ABDFJOPT',[fleet(6),count(['bb','cvn'],0,0),count(['cvl'],1,1),count(['航空巡洋艦'],2,2),count(['cl'],1,1),count(['dd'],2,2)],{los:los(4,63),equipmentKinds:['制空','防空','対潜','夜戦','索敵'],notes:['軽空母入りの第3ゲージ例は63以上。航空戦艦入りの別例の58を流用しない。低速可。第2ゲージ撃破とMマスS勝利1回が開放条件。']});
  for(const [map,d] of Object.entries(MAP_PLANS)){
@@ -550,6 +579,6 @@ function hdMapRequirementsHtml(map,preset){
  HD_MAP_ROUTE_REQUIREMENTS['1-5'][1].openingAsw={...asw15,note:'航空戦艦を含む二巡型は、先制対潜人数の明記がありません。対潜セット3組・水上爆撃機の推奨とは別に人数を選んでください。'};
  HD_MAP_ROUTE_REQUIREMENTS['1-5'][2].openingAsw={...asw15,recommended:4,fleetSize:4,shipTypes:['駆逐艦'],note:'駆逐4隻のキラ付け編成例で各艦の先制対潜条件を満たす装備案を初期目標に使用。初攻略全般の最低人数ではなく、他の艦種構成へ一律適用しません。'};
  HD_MAP_ROUTE_REQUIREMENTS['7-2'][0].openingAsw={choose:true,source:'https://zekamashi.net/kancolle-kouryaku/7-2/',checkedAt:'2026-10-25',note:'第1ゲージの4隻初攻略例には先制対潜人数の明記がありません。5隻育成例の「先制対潜できる海防艦3隻」はこの編成へ流用せず、人数を選んでください。'};
- MAP_PLANS['7-5'].presets[0].gear='第1ゲージの対潜・制空・夜戦装備を準備。対地とPT対策は第2ゲージ用。';
+ MAP_PLANS['7-5'].presets[0].gear='第1目標KへF→G・H→Kを選択。元六隻は編成例で駆逐1＋海防1等の二資料一致代替も確認。B/Dの艦種・速力優先を守り、D高速＋の出典差や未知艦は未判定。対潜・夜戦・航空・対空は任意の戦闘比較、Kに数値索敵・基地必須はない。';
  MAP_PLANS['3-5'].presets[0].gear='夜戦連撃と索敵装備。33式係数4で28以上を確認。';
 })();

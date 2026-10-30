@@ -1689,7 +1689,22 @@
           "detail": "境界と在庫競合を組み合わせた生成→配備→最適化→艦/装備交換→保存再読込→同期更新→プランナーの全操作列"
         }
       ],
-      "strategyTargets": []
+      "strategyTargets": [],
+      "representativeWorkflowRecord": {
+        "record": "sevenFiveFirstLocal20261030",
+        "document": "docs/pr152-seven-five-first-ja.md",
+        "sourceBase": "633b079cb1cd4e375fd095cabc33f60f08e9229d",
+        "initialLocalPass": 5,
+        "initialLocalPartial": 1,
+        "retries": 0,
+        "savedStrict30Reads": 6,
+        "loadStrict30Reads": 5,
+        "safeAbortCases": 2,
+        "DStillPartial": true,
+        "preservationPositive": false,
+        "sourceBindingSHA256": "48fb64f54f76f9833fa202f2b7d3fc7f45f1f2be25723dee88d4c7f7c894f153",
+        "explicitLimits": "ASW1set and raw night1item optional; D15 sourcepriority/JP403/manual and Wstock load/caller gaps retained"
+      }
     },
     {
       "map": "7-5",
@@ -1758,5 +1773,15 @@
       ],
       "strategyTargets": []
     }
-  ]
+  ],
+  "sevenFiveFirstLocal20261030": {
+    "record": "docs/pr152-seven-five-first-ja.md",
+    "legacySummaryUnchanged": true,
+    "remainingCodesRetained": [
+      "U",
+      "I",
+      "P"
+    ],
+    "newLimitedScopeNotFullRouteCompletion": true
+  }
 }

@@ -2,6 +2,8 @@
 require('./seven-three-gij.test.cjs');
 require('./seven-three-first-routes.test.cjs');
 require('./seven-four-routes.test.cjs');
+require('./seven-five-first-routes.test.cjs');
+require('./seven-five-first-placement.test.cjs');
 require('./seven-four-placement.test.cjs');
 require('./route-audit-binding.test.cjs');
 require('./five-four-battleship.test.cjs');
