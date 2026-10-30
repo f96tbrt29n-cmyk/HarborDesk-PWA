@@ -1,3 +1,5 @@
+> 最新確定（2026-10-30）：訂正後source0cb16ded／CI41029470607は5smoke成功・W4はjob45分上限取消、smoke自体cancelled。公式C880/0/0、W1〜3小計660/0/0、全Wはnull。自身7-5第1の6初回操作summaryは保存/適用編集・同一文書load全文/strict30・他保持まで完了し、同じ行のDだけ確認済み、23/143/70。旧local未到達/caller欠測やW4物理case outcomeは補完しない。[確定記録](pr152-seven-five-first-ja.md#2026-10-30-訂正後ci0cbの確定)。以下は各時点の履歴。
+
 # 登録53例：未検証項目の台帳
 
 > 最新追記（2026-10-30）：[訂正後CI633](pr152-seven-four-ja.md#2026-10-30-訂正後ci633の確定)／41014041261 attempt1は5smoke成功・W4は45分job上限で取消、run cancelled・Full skipped。公式C877/0/0、W1〜3小計658/0/0、W4と全W集計はnull。generic訂正Cは完結reporterと元assert制御フローからstrict59・保存/load/回復の通過を導出するが、Wはcase結果/strict59到達とも不明。新7-4初回summaryは4完了＋Wknown/stock未到達2、各retry完了は別記録。旧local5＋旧7fdCIWknownを根拠とするDと22/141/73は変更0。以下の旧「最終」「準備中」は各時点の履歴として保持する。
@@ -105,3 +107,6 @@ iPhone Safari・ホーム画面PWAの実機操作とWebKitオフラインは未�
 2026-10-30 [7-5第1ABDFGHK](pr152-seven-five-first-ja.md)：駆逐1＋海防1の出典一致代替、選択第1への第2対地表示除外、対潜部品/合法通常枠案内を接続。独立Node21・純4とC/W各3初回を分離し、5件は保存/安全中止・適用編集・同一reload文書load全文まで完了。Wstockは保存後strict30通過後の第2click非表示45秒、load全文未到達/nav1/caller欠測を保持。既存夜戦補助1個を任意比較として残し、第1専用CI1組を追加しない。B/C/Dだけ未確認→一部、22/141/73→22/144/70の3セル。A/他58行/旧53/基準236は不変。最終sourceの通常push/smokeは未開始。
 
 既知の非表示停止は未到達と原本を保持し、失敗したWstockは反復せず未実施Wunknownだけ同一617ソース/一覧証拠の別phaseで初回完了した。新たな保存不一致や破壊疑いは認めず、旧障害と同原因/解決とは断定しない。PR152ドラフト・未公開、main競合・保護対象と継続/停止基準を維持する。
+
+
+2026-10-30 7-5第1の訂正後CI：検証source `0cb16ded18d52e95151a783459660c5526a7e4ce`／[CI41029470607](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41029470607)、attempt1・dispatch1・再実行0・手動取消0。5smoke成功、W4 jobは公式45分上限で取消、smoke step自体もcancelledであり「smoke失敗終了後に取消」ではない。run cancelled、Full skipped・Pages未起動。公式C880 passed/0 flaky/0 failed、W1〜3小計660/0/0、W4と全Wのcase outcome集計はnull。初回成功数や物理試行数へ換算しない。 既存D定義の全列挙操作に同じ行の直接証拠を対応できたため、7-5/0/defaultのDだけ一部→確認済み。22/144/70→23/143/70の1セル変更。自身の一連では旧22/141/73からdistinctはB/C/Dの3セル、今回依頼基準20/137/79からは7-3第1・7-4・7-5第1のB/C/D計9セルだけ。A/B/C・他58行、判定基準・59行×4項目=236・旧53区分・一部を割合換算しない基準は維持する。全在庫/枠競合/数量根拠や海域全体完了・公開可能を意味しない。 残件はD高速＋の出典優先差・JP403・六隻外/LHA等のモデル境界、全目標数量/在庫/競合、旧非表示/通信/自然実null/DCLの原因、旧目標/履歴互換の対象外範囲。PR152ドラフト・未公開/main競合を維持し、main統合/PR151/版/SW/本番/マージ/公開/自動マージは行わない。次は7-5第2ABDFJOQの独立改善であり、旧原因を解くための反復や推測修正をしない。

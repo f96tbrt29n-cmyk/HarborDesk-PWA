@@ -73,8 +73,8 @@
       "非該当": 0
     },
     "D": {
-      "確認済み": 22,
-      "一部": 16,
+      "確認済み": 23,
+      "一部": 15,
       "未確認": 21,
       "非該当": 0
     }
@@ -2652,8 +2652,8 @@
           ]
         },
         "D": {
-          "status": "一部",
-          "reason": "Cknown/stock/unknownとWknown/unknownの5件は保存または安全中止・適用可能なメモ編集・同一reload文書load全文/strict30・他編成/metadata保持まで完了。Wstockは保存後strict30通過後load後click非表示45秒、全文未到達/nav1/caller欠測のため一部。",
+          "status": "確認済み",
+          "reason": "同じ第1Kの局所5完了と訂正後CI41029470607自身6初回summaryの全列挙操作を直接対応。保存または安全中止、適用編集、同一reload文書load後再探索/再表示、CUSTOM全文/strict30と他編成/metadata保持まで元assert通過。旧local Wstock未到達/caller欠測は別履歴で維持。case物理PASSやraw独立再読を推定しない。",
           "evidence": [
             "docs/pr152-seven-five-first-ja.md",
             "tests/route-seven-five-first.spec.js",
@@ -2662,15 +2662,133 @@
           ]
         }
       },
-      "remaining": "D高速＋の出典優先差/JP本文403/六隻外・LHA等のモデル境界、全戦闘目標の数量根拠、全在庫・枠競合・代替は未完。Wstock load後非表示の全文比較とcaller/原因は欠測、保存消失や同原因を断定しない。第2/第3/旧目標履歴互換・実ゲーム到達は今回対象外。",
+      "remaining": "D高速＋の出典優先差/JP本文403/六隻外・LHA等のモデル境界、全戦闘目標の数量根拠、全在庫・枠競合・代替は未完。旧local Wstock load全文/caller/原因の欠測は別試行として維持。第2/第3/旧目標履歴互換・実ゲーム到達は今回対象外。",
       "representativeWorkflowRecord": {
-        "record": "sevenFiveFirstLocal20261030",
-        "fullLocalCases": 5,
-        "partialCases": 1,
-        "savedStrict30Reached": 6,
-        "loadStrict30Reached": 5,
-        "DStillPartial": true
-      }
+        "record": "sevenFiveFirstCorrectedCIFinalization20261030",
+        "document": "docs/pr152-seven-five-first-ja.md",
+        "source": "0cb16ded18d52e95151a783459660c5526a7e4ce",
+        "run": 41029470607,
+        "attempt": 1,
+        "dispatches": 1,
+        "reruns": 0,
+        "manualCancels": 0,
+        "runConclusion": "cancelled",
+        "smokeJobs": {
+          "success": 5,
+          "cancelled": 1,
+          "failed": 0
+        },
+        "full": "skipped",
+        "webkitFourthSmokeConclusion": "cancelled",
+        "webkitFourthCause": "official 45-minute job limit; no completed Playwright footer",
+        "officialCaseOutcomes": {
+          "chromium": {
+            "passed": 880,
+            "flaky": 0,
+            "failed": 0
+          },
+          "webkitFirstThreeSubtotal": {
+            "passed": 660,
+            "flaky": 0,
+            "failed": 0
+          },
+          "webkitFourth": null,
+          "webkitTotal": null
+        },
+        "initialPhysicalCountsInferred": false,
+        "nodeEachMeasured": {
+          "tests": 546,
+          "pass": 546,
+          "fail": 0
+        },
+        "fixedEnvironmentJobs": 6,
+        "sourceCheckoutJobs": 6,
+        "sourceExpectedFiles": 617,
+        "independentServedFileHashMeasured": false,
+        "summaryOriginals": {
+          "primarySevenFiveFirst": 6,
+          "sevenFour": 7,
+          "sevenThreeFirst": 6,
+          "total": 19
+        },
+        "primaryInitialSummary": {
+          "completed": 6,
+          "savedStrict30Reached": 6,
+          "loadStrict30Reached": 6,
+          "knownStockApplyMemoCases": 4,
+          "unknownSafeAbortCases": 2,
+          "comparisonSources": 7,
+          "preservationPositive": false
+        },
+        "primaryOperationEvidence": "same-source own initial summaries emitted only after source assertions for apply or safe abort, applicable memo edit, same reload document capture, second search and full CUSTOM comparison with other-fleet/metadata preservation; not independent raw-body re-read or physical framework PASS",
+        "sevenFour": "initial5 completed; Wstock initial after-load-search hidden45s, saved strict30 passed/load unreached/nav failure1; retry1 completed is separate",
+        "sevenThreeFirst": "all6 initial operation summaries completed; no filling of old source/trial gaps",
+        "genericUnknownASW": "C case result and strict59 path derived from its own complete reporter/footer and source control flow; W case/physical result/strict59 reached null",
+        "oldLocalGapRetained": "first Wstock after-load click hidden45s, load full comparison and caller/handler/cause missing; new CI success is separate",
+        "wholeRunLog": {
+          "bytes": 11570409,
+          "members": 101,
+          "sha256": "75a0132b6344bb6758cf0ebc311a38980a674e3237507c65056b40960f41a88b",
+          "requests": 1,
+          "crc": "pass"
+        },
+        "unrequestedOverLimitArchives": [
+          {
+            "label": "C2 attempt",
+            "bytes": 1658082732
+          },
+          {
+            "label": "W4 attempt",
+            "bytes": 686716946
+          }
+        ],
+        "archiveLimitBytes": 536870912,
+        "rangeOrSplitRequests": 0,
+        "artifacts": {
+          "published": 10,
+          "received": 8,
+          "receivedBytes": 322695,
+          "rawBodiesTracesVideosReceived": 0,
+          "zeroReceivedIsMissingNotZeroFailures": true
+        },
+        "failureLogBlocks": {
+          "diagnosticBlocks": 15,
+          "officialCaseCount": false,
+          "moduleRecoveryCounterAssert": 1,
+          "nightPostReloadAccessControlErrors": 1,
+          "locatorClickNotVisible": 13,
+          "lastSyncMergeCaseResult": null
+        },
+        "closureSHA256": "4b4475a22ceac5a82d8625d2b647959849a7938f3dce262d8f72613ca218a545",
+        "DDecision": {
+          "before": "一部",
+          "after": "確認済み",
+          "basis": "identified same-row own initial CI operation evidence plus retained local operation evidence under unchanged D definition",
+          "otherABCUnchanged": true,
+          "oldMissingTrialNotFilled": true
+        },
+        "countsBefore": [
+          22,
+          144,
+          70
+        ],
+        "countsAfter": [
+          23,
+          143,
+          70
+        ],
+        "next": "7-5第2ABDFJOQの独立したroute/Node草稿。出典一致域とJ優先順、旧利用者PT目標の保持を確認し、今回CIとは別に必要検証へ進む。"
+      },
+      "representativeWorkflowHistory": [
+        {
+          "record": "sevenFiveFirstLocal20261030",
+          "fullLocalCases": 5,
+          "partialCases": 1,
+          "savedStrict30Reached": 6,
+          "loadStrict30Reached": 5,
+          "DStillPartial": true
+        }
+      ]
     },
     {
       "id": "7-5/1/default",
@@ -2757,9 +2875,11 @@
     "evidence": "docs/pr152-seven-five-first-ja.md",
     "state": "local six firsts five complete, Wstock afterloadhidden/loadfullunreached; no new preservationpositive; first-gauge limited scope not whole-map complete",
     "record": "sevenFiveFirstLocal20261030",
-    "panelContractCorrection": "sevenFiveFirstPanelContractCorrection20261030"
+    "panelContractCorrection": "sevenFiveFirstPanelContractCorrection20261030",
+    "correctedCIFinalization": "sevenFiveFirstCorrectedCIFinalization20261030",
+    "currentState": "own corrected-source CI initial6 completed all D operations; D confirmed, A/B/C partial, old local Wstock load/caller gap retained separately; next independent7-5second draft not executed"
   },
-  "nextPriority": "旧7-4の隣接文字列前提を実引数/案内分岐の限定VM契約へ訂正し当該1Node成功、製品/fixture/CW局所入力不変。独立commit/通常push後の訂正source smokeを1回確認。旧f090CIは各Node546/545/1・browser未開始、旧Wstock load全文未到達は保持。停止条件がなければ次の独立7-5第2ABDFJOQのsource/判定/装備接続へ進む。",
+  "nextPriority": "7-5第2ABDFJOQの独立したroute/Node草稿。出典一致域とJ優先順、旧利用者PT目標の保持を確認し、今回CIとは別に必要検証へ進む。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -8616,5 +8736,122 @@
     "oldLocalWstockLoadGapRetained": true,
     "newCorrectedSourceCIStartedAtRecord": false
   },
-  "nextPriorityBeforeSevenFivePanelContractCorrection20261030": "7-5第1の限定製品/通常試験/記録を根拠別にまとめて通常pushし、最終sourceのsmoke1回を重複なく確認。Wstock初回load後非表示/全文未到達・caller欠測を再試行で埋めず、既知原因未確定を保持。停止条件がなければ独立した7-5第2ABDFJOQのB/D/F/J/O条件・対地/PTの接続へ進む。"
+  "nextPriorityBeforeSevenFivePanelContractCorrection20261030": "7-5第1の限定製品/通常試験/記録を根拠別にまとめて通常pushし、最終sourceのsmoke1回を重複なく確認。Wstock初回load後非表示/全文未到達・caller欠測を再試行で埋めず、既知原因未確定を保持。停止条件がなければ独立した7-5第2ABDFJOQのB/D/F/J/O条件・対地/PTの接続へ進む。",
+  "sevenFiveFirstCorrectedCIFinalization20261030": {
+    "record": "sevenFiveFirstCorrectedCIFinalization20261030",
+    "document": "docs/pr152-seven-five-first-ja.md",
+    "source": "0cb16ded18d52e95151a783459660c5526a7e4ce",
+    "run": 41029470607,
+    "attempt": 1,
+    "dispatches": 1,
+    "reruns": 0,
+    "manualCancels": 0,
+    "runConclusion": "cancelled",
+    "smokeJobs": {
+      "success": 5,
+      "cancelled": 1,
+      "failed": 0
+    },
+    "full": "skipped",
+    "webkitFourthSmokeConclusion": "cancelled",
+    "webkitFourthCause": "official 45-minute job limit; no completed Playwright footer",
+    "officialCaseOutcomes": {
+      "chromium": {
+        "passed": 880,
+        "flaky": 0,
+        "failed": 0
+      },
+      "webkitFirstThreeSubtotal": {
+        "passed": 660,
+        "flaky": 0,
+        "failed": 0
+      },
+      "webkitFourth": null,
+      "webkitTotal": null
+    },
+    "initialPhysicalCountsInferred": false,
+    "nodeEachMeasured": {
+      "tests": 546,
+      "pass": 546,
+      "fail": 0
+    },
+    "fixedEnvironmentJobs": 6,
+    "sourceCheckoutJobs": 6,
+    "sourceExpectedFiles": 617,
+    "independentServedFileHashMeasured": false,
+    "summaryOriginals": {
+      "primarySevenFiveFirst": 6,
+      "sevenFour": 7,
+      "sevenThreeFirst": 6,
+      "total": 19
+    },
+    "primaryInitialSummary": {
+      "completed": 6,
+      "savedStrict30Reached": 6,
+      "loadStrict30Reached": 6,
+      "knownStockApplyMemoCases": 4,
+      "unknownSafeAbortCases": 2,
+      "comparisonSources": 7,
+      "preservationPositive": false
+    },
+    "primaryOperationEvidence": "same-source own initial summaries emitted only after source assertions for apply or safe abort, applicable memo edit, same reload document capture, second search and full CUSTOM comparison with other-fleet/metadata preservation; not independent raw-body re-read or physical framework PASS",
+    "sevenFour": "initial5 completed; Wstock initial after-load-search hidden45s, saved strict30 passed/load unreached/nav failure1; retry1 completed is separate",
+    "sevenThreeFirst": "all6 initial operation summaries completed; no filling of old source/trial gaps",
+    "genericUnknownASW": "C case result and strict59 path derived from its own complete reporter/footer and source control flow; W case/physical result/strict59 reached null",
+    "oldLocalGapRetained": "first Wstock after-load click hidden45s, load full comparison and caller/handler/cause missing; new CI success is separate",
+    "wholeRunLog": {
+      "bytes": 11570409,
+      "members": 101,
+      "sha256": "75a0132b6344bb6758cf0ebc311a38980a674e3237507c65056b40960f41a88b",
+      "requests": 1,
+      "crc": "pass"
+    },
+    "unrequestedOverLimitArchives": [
+      {
+        "label": "C2 attempt",
+        "bytes": 1658082732
+      },
+      {
+        "label": "W4 attempt",
+        "bytes": 686716946
+      }
+    ],
+    "archiveLimitBytes": 536870912,
+    "rangeOrSplitRequests": 0,
+    "artifacts": {
+      "published": 10,
+      "received": 8,
+      "receivedBytes": 322695,
+      "rawBodiesTracesVideosReceived": 0,
+      "zeroReceivedIsMissingNotZeroFailures": true
+    },
+    "failureLogBlocks": {
+      "diagnosticBlocks": 15,
+      "officialCaseCount": false,
+      "moduleRecoveryCounterAssert": 1,
+      "nightPostReloadAccessControlErrors": 1,
+      "locatorClickNotVisible": 13,
+      "lastSyncMergeCaseResult": null
+    },
+    "closureSHA256": "4b4475a22ceac5a82d8625d2b647959849a7938f3dce262d8f72613ca218a545",
+    "DDecision": {
+      "before": "一部",
+      "after": "確認済み",
+      "basis": "identified same-row own initial CI operation evidence plus retained local operation evidence under unchanged D definition",
+      "otherABCUnchanged": true,
+      "oldMissingTrialNotFilled": true
+    },
+    "countsBefore": [
+      22,
+      144,
+      70
+    ],
+    "countsAfter": [
+      23,
+      143,
+      70
+    ],
+    "next": "7-5第2ABDFJOQの独立したroute/Node草稿。出典一致域とJ優先順、旧利用者PT目標の保持を確認し、今回CIとは別に必要検証へ進む。"
+  },
+  "nextPriorityBeforeSevenFiveFirstCorrectedCIFinalization20261030": "旧7-4の隣接文字列前提を実引数/案内分岐の限定VM契約へ訂正し当該1Node成功、製品/fixture/CW局所入力不変。独立commit/通常push後の訂正source smokeを1回確認。旧f090CIは各Node546/545/1・browser未開始、旧Wstock load全文未到達は保持。停止条件がなければ次の独立7-5第2ABDFJOQのsource/判定/装備接続へ進む。"
 }

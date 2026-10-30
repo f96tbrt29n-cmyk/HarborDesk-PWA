@@ -1691,20 +1691,138 @@
       ],
       "strategyTargets": [],
       "representativeWorkflowRecord": {
-        "record": "sevenFiveFirstLocal20261030",
+        "record": "sevenFiveFirstCorrectedCIFinalization20261030",
         "document": "docs/pr152-seven-five-first-ja.md",
-        "sourceBase": "633b079cb1cd4e375fd095cabc33f60f08e9229d",
-        "initialLocalPass": 5,
-        "initialLocalPartial": 1,
-        "retries": 0,
-        "savedStrict30Reads": 6,
-        "loadStrict30Reads": 5,
-        "safeAbortCases": 2,
-        "DStillPartial": true,
-        "preservationPositive": false,
-        "sourceBindingSHA256": "48fb64f54f76f9833fa202f2b7d3fc7f45f1f2be25723dee88d4c7f7c894f153",
-        "explicitLimits": "ASW1set and raw night1item optional; D15 sourcepriority/JP403/manual and Wstock load/caller gaps retained"
-      }
+        "source": "0cb16ded18d52e95151a783459660c5526a7e4ce",
+        "run": 41029470607,
+        "attempt": 1,
+        "dispatches": 1,
+        "reruns": 0,
+        "manualCancels": 0,
+        "runConclusion": "cancelled",
+        "smokeJobs": {
+          "success": 5,
+          "cancelled": 1,
+          "failed": 0
+        },
+        "full": "skipped",
+        "webkitFourthSmokeConclusion": "cancelled",
+        "webkitFourthCause": "official 45-minute job limit; no completed Playwright footer",
+        "officialCaseOutcomes": {
+          "chromium": {
+            "passed": 880,
+            "flaky": 0,
+            "failed": 0
+          },
+          "webkitFirstThreeSubtotal": {
+            "passed": 660,
+            "flaky": 0,
+            "failed": 0
+          },
+          "webkitFourth": null,
+          "webkitTotal": null
+        },
+        "initialPhysicalCountsInferred": false,
+        "nodeEachMeasured": {
+          "tests": 546,
+          "pass": 546,
+          "fail": 0
+        },
+        "fixedEnvironmentJobs": 6,
+        "sourceCheckoutJobs": 6,
+        "sourceExpectedFiles": 617,
+        "independentServedFileHashMeasured": false,
+        "summaryOriginals": {
+          "primarySevenFiveFirst": 6,
+          "sevenFour": 7,
+          "sevenThreeFirst": 6,
+          "total": 19
+        },
+        "primaryInitialSummary": {
+          "completed": 6,
+          "savedStrict30Reached": 6,
+          "loadStrict30Reached": 6,
+          "knownStockApplyMemoCases": 4,
+          "unknownSafeAbortCases": 2,
+          "comparisonSources": 7,
+          "preservationPositive": false
+        },
+        "primaryOperationEvidence": "same-source own initial summaries emitted only after source assertions for apply or safe abort, applicable memo edit, same reload document capture, second search and full CUSTOM comparison with other-fleet/metadata preservation; not independent raw-body re-read or physical framework PASS",
+        "sevenFour": "initial5 completed; Wstock initial after-load-search hidden45s, saved strict30 passed/load unreached/nav failure1; retry1 completed is separate",
+        "sevenThreeFirst": "all6 initial operation summaries completed; no filling of old source/trial gaps",
+        "genericUnknownASW": "C case result and strict59 path derived from its own complete reporter/footer and source control flow; W case/physical result/strict59 reached null",
+        "oldLocalGapRetained": "first Wstock after-load click hidden45s, load full comparison and caller/handler/cause missing; new CI success is separate",
+        "wholeRunLog": {
+          "bytes": 11570409,
+          "members": 101,
+          "sha256": "75a0132b6344bb6758cf0ebc311a38980a674e3237507c65056b40960f41a88b",
+          "requests": 1,
+          "crc": "pass"
+        },
+        "unrequestedOverLimitArchives": [
+          {
+            "label": "C2 attempt",
+            "bytes": 1658082732
+          },
+          {
+            "label": "W4 attempt",
+            "bytes": 686716946
+          }
+        ],
+        "archiveLimitBytes": 536870912,
+        "rangeOrSplitRequests": 0,
+        "artifacts": {
+          "published": 10,
+          "received": 8,
+          "receivedBytes": 322695,
+          "rawBodiesTracesVideosReceived": 0,
+          "zeroReceivedIsMissingNotZeroFailures": true
+        },
+        "failureLogBlocks": {
+          "diagnosticBlocks": 15,
+          "officialCaseCount": false,
+          "moduleRecoveryCounterAssert": 1,
+          "nightPostReloadAccessControlErrors": 1,
+          "locatorClickNotVisible": 13,
+          "lastSyncMergeCaseResult": null
+        },
+        "closureSHA256": "4b4475a22ceac5a82d8625d2b647959849a7938f3dce262d8f72613ca218a545",
+        "DDecision": {
+          "before": "一部",
+          "after": "確認済み",
+          "basis": "identified same-row own initial CI operation evidence plus retained local operation evidence under unchanged D definition",
+          "otherABCUnchanged": true,
+          "oldMissingTrialNotFilled": true
+        },
+        "countsBefore": [
+          22,
+          144,
+          70
+        ],
+        "countsAfter": [
+          23,
+          143,
+          70
+        ],
+        "next": "7-5第2ABDFJOQの独立したroute/Node草稿。出典一致域とJ優先順、旧利用者PT目標の保持を確認し、今回CIとは別に必要検証へ進む。"
+      },
+      "representativeWorkflowHistory": [
+        {
+          "record": "sevenFiveFirstLocal20261030",
+          "document": "docs/pr152-seven-five-first-ja.md",
+          "sourceBase": "633b079cb1cd4e375fd095cabc33f60f08e9229d",
+          "initialLocalPass": 5,
+          "initialLocalPartial": 1,
+          "retries": 0,
+          "savedStrict30Reads": 6,
+          "loadStrict30Reads": 5,
+          "safeAbortCases": 2,
+          "DStillPartial": true,
+          "preservationPositive": false,
+          "sourceBindingSHA256": "48fb64f54f76f9833fa202f2b7d3fc7f45f1f2be25723dee88d4c7f7c894f153",
+          "explicitLimits": "ASW1set and raw night1item optional; D15 sourcepriority/JP403/manual and Wstock load/caller gaps retained"
+        }
+      ]
     },
     {
       "map": "7-5",
@@ -1776,6 +1894,21 @@
   ],
   "sevenFiveFirstLocal20261030": {
     "record": "docs/pr152-seven-five-first-ja.md",
+    "legacySummaryUnchanged": true,
+    "remainingCodesRetained": [
+      "U",
+      "I",
+      "P"
+    ],
+    "newLimitedScopeNotFullRouteCompletion": true
+  },
+  "sevenFiveFirstCorrectedCIFinalization20261030": {
+    "record": "docs/pr152-seven-five-first-ja.md",
+    "matrix": [
+      23,
+      143,
+      70
+    ],
     "legacySummaryUnchanged": true,
     "remainingCodesRetained": [
       "U",

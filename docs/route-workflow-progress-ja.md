@@ -1,3 +1,5 @@
+> 最新確定（2026-10-30）：訂正後source0cb16ded／CI41029470607は5smoke成功・W4はjob45分上限取消、smoke自体cancelled。公式C880/0/0、W1〜3小計660/0/0、全Wはnull。自身7-5第1の6初回操作summaryは保存/適用編集・同一文書load全文/strict30・他保持まで完了し、同じ行のDだけ確認済み、23/143/70。旧local未到達/caller欠測やW4物理case outcomeは補完しない。[確定記録](pr152-seven-five-first-ja.md#2026-10-30-訂正後ci0cbの確定)。以下は各時点の履歴。
+
 > 最新契約訂正：source `f090e9c40b8d7d0f4ee90f51fb0c5fec0b87822c`／CI41026417307 attempt1・dispatch1/再実行0は、全6jobのNode546 tests/545pass/1failで停止し、C/Wのbrowser検証・smokeは未開始。Full skipped、公開artifact0、PW case outcomeはnullである。ステップ名にservice workerを含むが、その製品障害と分類しない。正式attempt ZIP427,167bytes/90members/CRC正常を1回取得し、初回原本を保持した。 当該test1の局所訂正確認は成功、製品/C/W入力不変、22/144/70変更0。詳細は[7-5記録](pr152-seven-five-first-ja.md#2026-10-30-初回ciのnode契約訂正)。
 
 > 最新7-5第1：2026-10-30 [7-5第1ABDFGHK](pr152-seven-five-first-ja.md)：駆逐1＋海防1の出典一致代替、選択第1への第2対地表示除外、対潜部品/合法通常枠案内を接続。独立Node21・純4とC/W各3初回を分離し、5件は保存/安全中止・適用編集・同一reload文書load全文まで完了。Wstockは保存後strict30通過後の第2click非表示45秒、load全文未到達/nav1/caller欠測を保持。既存夜戦補助1個を任意比較として残し、第1専用CI1組を追加しない。B/C/Dだけ未確認→一部、22/141/73→22/144/70の3セル。A/他58行/旧53/基準236は不変。最終sourceの通常push/smokeは未開始。
@@ -57,12 +59,14 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 
 2026-10-30 CI追記：[7-4 ABEJLP](pr152-seven-four-ja.md#2026-10-30-自身初回ci確定)の検証source`7fd5298e7248ebeb6b71c67dae7c0a579e0b7991`／[41007168230](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41007168230)、attempt1・dispatch1/再実行0。4smoke成功/2失敗・Full skipped・取消/timeout0。自身6初回summaryの全厳密比較完了を確認し、局所C3＋Wstock/unknownの5完了と自身CI Wknown初回を6代表へ直接対応してDだけ一部→確認済み。21/142/73→22/141/73の1追加セル、一連の695基準21/139/76からdistinctはB/C/D3セル。A/B/C・他58行/旧53/基準236は不変。
 
+以下は最新JSONの59行を集計した現表。旧Markdown主表は7-4時点22/141/73の表示が残っていたため同期し、今回のセル状態変更は7-5第1Dの1件だけ（JSON基準22/144/70→23/143/70）。B/Cの表示差は前回7-5局所分の転記補正であり、新たな確認creditではない。
+
 |項目|確認済み|一部|未確認|非該当|分母|
 |---|---:|---:|---:|---:|---:|
 |A|0|56|3|0|59|
-|B|0|35|24|0|59|
-|C|0|35|24|0|59|
-|D|22|15|22|0|59|
+|B|0|36|23|0|59|
+|C|0|36|23|0|59|
+|D|23|15|21|0|59|
 
 2026-10-28追補：[5-4最終整理](pr152-five-four-closeout-ja.md)は既存証拠で終了し、追加実行0・状態変更0。基準236セル3/115/118の下に閉じた限定残件と4分類を別記した。続く[2-5北F分岐](pr152-two-five-north-f-ja.md)では高速3戦艦の有効枝と選艦/不足案内を接続し、C/W各1初回で保存・編集・同一文書load後の完全一致まで確認したためDだけ一部→確認済み。前3/115/118→後4/114/118、変更1セル。A/B/Cの全条件完了へは広げない。7-3 Gと他行は維持。
 
@@ -146,7 +150,7 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 |7-3/0/default ACE|一部|一部|一部|確認済み|[P開放前の出典一致域・代表操作](pr152-seven-three-first-ja.md)|
 |7-3/1/default ACDGJP / ACDGIJP（G分岐未確認）|一部|一部|一部|確認済み|[pr152-seven-three-gij-ja](pr152-seven-three-gij-ja.md) / [pr152-seven-three-speed-ja](pr152-seven-three-speed-ja.md)|
 |7-4/0/default ABEJLP|一部|一部|一部|確認済み|[六隻例・式未照合・代表操作](pr152-seven-four-ja.md)|
-|7-5/0/default ABDFGHK|一部|一部|一部|一部|第1限定Node21・C/W6初回5完了。Wstock load全文未到達/原因未確定|
+|7-5/0/default ABDFGHK|一部|一部|一部|確認済み|局所5完了＋自身CI41029470607初回6の全指定操作。旧Wstock欠測は別履歴で維持|
 |7-5/1/default ABDFJOQ|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
 |7-5/2/default ABDFJOPT|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
 
@@ -341,3 +345,16 @@ generic unknown-ASW訂正対象はC/W2件の別分母。Cは自身の完結し�
 ## 2026-10-30 7-5第1Kの限定操作
 
 2026-10-30 [7-5第1ABDFGHK](pr152-seven-five-first-ja.md)：駆逐1＋海防1の出典一致代替、選択第1への第2対地表示除外、対潜部品/合法通常枠案内を接続。独立Node21・純4とC/W各3初回を分離し、5件は保存/安全中止・適用編集・同一reload文書load全文まで完了。Wstockは保存後strict30通過後の第2click非表示45秒、load全文未到達/nav1/caller欠測を保持。既存夜戦補助1個を任意比較として残し、第1専用CI1組を追加しない。B/C/Dだけ未確認→一部、22/141/73→22/144/70の3セル。A/他58行/旧53/基準236は不変。最終sourceの通常push/smokeは未開始。
+
+
+## 2026-10-30 7-5第1の訂正後CI確定
+
+検証source `0cb16ded18d52e95151a783459660c5526a7e4ce`／[CI41029470607](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41029470607)、attempt1・dispatch1・再実行0・手動取消0。5smoke成功、W4 jobは公式45分上限で取消、smoke step自体もcancelledであり「smoke失敗終了後に取消」ではない。run cancelled、Full skipped・Pages未起動。公式C880 passed/0 flaky/0 failed、W1〜3小計660/0/0、W4と全Wのcase outcome集計はnull。初回成功数や物理試行数へ換算しない。
+
+同source自身7-5第1の初回summary6件はすべてcompleted。known/stock4件は自動配備・保存・メモ編集、unknown2件は安全中止・元保持を区別し、同一reload文書のload後再探索/再表示とCUSTOM全文の元assert、30識別項目/6anchor/6行・追加0、比較元7キー・他編成/metadata保持を通過した到達証拠である。summary本文を保存実値の独立再読やW4個別物理PASSへ変換しない。旧local Wstockの45秒非表示/load全文未到達/nav1/caller・handler・原因欠測は別試行のまま保持する。
+
+既存D定義の全列挙操作に同じ行の直接証拠を対応できたため、7-5/0/defaultのDだけ一部→確認済み。22/144/70→23/143/70の1セル変更。自身の一連では旧22/141/73からdistinctはB/C/Dの3セル、今回依頼基準20/137/79からは7-3第1・7-4・7-5第1のB/C/D計9セルだけ。A/B/C・他58行、判定基準・59行×4項目=236・旧53区分・一部を割合換算しない基準は維持する。全在庫/枠競合/数量根拠や海域全体完了・公開可能を意味しない。
+
+全6job自身の完全checkout HEAD・固定image実pull・Node24.21.0/PW1.55.0/C1187/W2203と、実測Node546 tests/546 pass/0 failを確認。Git期待source617ファイルの照合はCI配信ファイルhashの独立実測とは別である。正式attempt run-log ZIP11,570,409bytes/101membersを1回取得、CRC正常、SHA-256 `75a0132b6344bb6758cf0ebc311a38980a674e3237507c65056b40960f41a88b`。C2 attempt1,658,082,732bytes/W4 attempt686,716,946bytesは512MiB上限超で要求/分割0、詳細raw/trace欠測を保持する。発行10成果物中8件322,695bytesを受領し、body/trace/video受領0は生成0や失敗0ではなく欠測。15診断block（module回復counter検査1、night reload後通信例外1、click非表示13）は公式failed件数へ換算せず、試行別に保持した。末尾sync-mergeケースは開始後取消で個別結果/比較とも不明。閉鎖receipt SHA-256 `4b4475a22ceac5a82d8625d2b647959849a7938f3dce262d8f72613ca218a545`。原本加工・外部アップロード0、記録のみの追加CIは起動しない。
+
+残件はD高速＋の出典優先差・JP403・六隻外/LHA等のモデル境界、全目標数量/在庫/競合、旧非表示/通信/自然実null/DCLの原因、旧目標/履歴互換の対象外範囲。PR152ドラフト・未公開/main競合を維持し、main統合/PR151/版/SW/本番/マージ/公開/自動マージは行わない。次は7-5第2ABDFJOQの独立改善であり、旧原因を解くための反復や推測修正をしない。

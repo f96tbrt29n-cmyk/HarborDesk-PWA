@@ -1,3 +1,5 @@
+> 最新確定（2026-10-30）：訂正後source0cb16ded／CI41029470607は5smoke成功・W4はjob45分上限取消、smoke自体cancelled。公式C880/0/0、W1〜3小計660/0/0、全Wはnull。自身7-5第1の6初回操作summaryは保存/適用編集・同一文書load全文/strict30・他保持まで完了し、同じ行のDだけ確認済み、23/143/70。旧local未到達/caller欠測やW4物理case outcomeは補完しない。[確定記録](pr152-seven-five-first-ja.md#2026-10-30-訂正後ci0cbの確定)。以下は各時点の履歴。
+
 > 最新：初回CI41026417307はNodeの旧隣接文字列契約1件で停止しbrowser未開始。製品不変で当該1検査だけを意味に沿うVM確認へ訂正、局所1成功。訂正後CIは未開始。旧local5完了/Wstock未到達と22/144/70は別証拠のまま保持する。
 
 # 7-5第1ABDFGHK：経路判定と選択装備の接続
@@ -44,3 +46,18 @@ source `f090e9c40b8d7d0f4ee90f51fb0c5fec0b87822c`／CI41026417307 attempt1・dis
 唯一の失敗は旧7-4 placement末尾検査の、panel呼出しORの隣接文字列assertだった。7-5のfirstscopeを追加すると同じ4引数呼出しでも文字列が隣接しなくなる。後段ASWの同様な隣接前提も静的に確認したが、このCIでは最初のassertで未到達。製品・保存処理の欠陥とせず、元の引数/対象scopeを保つ検査へ訂正した。実panel式8境界と実capability branchのASW3艦/night4艦、strict生成フラグ/目的/経路/型付きindex9境界×2をVMで確認し、基地quantity/FEfilterの元assertと旧6タイトル本文を維持する。単に期待文字列へ合わせたりassertを削除したりしない。
 
 独立静的レビュー後、固定image/Node24.21.0で失敗したこの1titleだけを1回実行し成功。旧CIをbefore根拠として再利用し、他545検査・製品ソース・fixture・C/W局所6は変更/反復0。旧Wstockのload全文未到達や旧CIの未開始を、この単体成功で補完しない。236セル22/144/70は変更0。関連する試験契約訂正と本記録を独立commit・通常pushし、訂正後sourceの通常smokeを1回確認する。これは具体的な訂正後検証であり、同じHEADの成功目的の再実行ではない。
+
+
+## 2026-10-30 訂正後CI0cbの確定
+
+検証source `0cb16ded18d52e95151a783459660c5526a7e4ce`／[CI41029470607](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41029470607)、attempt1・dispatch1・再実行0・手動取消0。5smoke成功、W4 jobは公式45分上限で取消、smoke step自体もcancelledであり「smoke失敗終了後に取消」ではない。run cancelled、Full skipped・Pages未起動。公式C880 passed/0 flaky/0 failed、W1〜3小計660/0/0、W4と全Wのcase outcome集計はnull。初回成功数や物理試行数へ換算しない。
+
+同source自身7-5第1の初回summary6件はすべてcompleted。known/stock4件は自動配備・保存・メモ編集、unknown2件は安全中止・元保持を区別し、同一reload文書のload後再探索/再表示とCUSTOM全文の元assert、30識別項目/6anchor/6行・追加0、比較元7キー・他編成/metadata保持を通過した到達証拠である。summary本文を保存実値の独立再読やW4個別物理PASSへ変換しない。旧local Wstockの45秒非表示/load全文未到達/nav1/caller・handler・原因欠測は別試行のまま保持する。
+
+小summaryは計19原本で7-5第1初回6、別unit7-3第1初回6、別unit7-4初回6＋retry1を分離。7-4 Wstock初回は保存後strict30通過後のafter-load-searchでclick非表示45秒、load比較未到達/nav1、別retry1はcompleted。caller/handler/原因は欠測で、retryや別unit成功で補完しない。generic unknown-ASWのCは自身の完結440passed reporterと元assert制御フローからcase outcome/strict59経路通過を導出するが、Wは初回開始→次case開始のみで個別PASS/完結footerがなくcase/物理結果/strict59到達はnull。
+
+既存D定義の全列挙操作に同じ行の直接証拠を対応できたため、7-5/0/defaultのDだけ一部→確認済み。22/144/70→23/143/70の1セル変更。自身の一連では旧22/141/73からdistinctはB/C/Dの3セル、今回依頼基準20/137/79からは7-3第1・7-4・7-5第1のB/C/D計9セルだけ。A/B/C・他58行、判定基準・59行×4項目=236・旧53区分・一部を割合換算しない基準は維持する。全在庫/枠競合/数量根拠や海域全体完了・公開可能を意味しない。
+
+全6job自身の完全checkout HEAD・固定image実pull・Node24.21.0/PW1.55.0/C1187/W2203と、実測Node546 tests/546 pass/0 failを確認。Git期待source617ファイルの照合はCI配信ファイルhashの独立実測とは別である。正式attempt run-log ZIP11,570,409bytes/101membersを1回取得、CRC正常、SHA-256 `75a0132b6344bb6758cf0ebc311a38980a674e3237507c65056b40960f41a88b`。C2 attempt1,658,082,732bytes/W4 attempt686,716,946bytesは512MiB上限超で要求/分割0、詳細raw/trace欠測を保持する。発行10成果物中8件322,695bytesを受領し、body/trace/video受領0は生成0や失敗0ではなく欠測。15診断block（module回復counter検査1、night reload後通信例外1、click非表示13）は公式failed件数へ換算せず、試行別に保持した。末尾sync-mergeケースは開始後取消で個別結果/比較とも不明。閉鎖receipt SHA-256 `4b4475a22ceac5a82d8625d2b647959849a7938f3dce262d8f72613ca218a545`。原本加工・外部アップロード0、記録のみの追加CIは起動しない。
+
+残件はD高速＋の出典優先差・JP403・六隻外/LHA等のモデル境界、全目標数量/在庫/競合、旧非表示/通信/自然実null/DCLの原因、旧目標/履歴互換の対象外範囲。PR152ドラフト・未公開/main競合を維持し、main統合/PR151/版/SW/本番/マージ/公開/自動マージは行わない。次は7-5第2ABDFJOQの独立改善であり、旧原因を解くための反復や推測修正をしない。
