@@ -2756,9 +2756,10 @@
     "integrationRecordHead": "d347aad828161781bd7504bc2a6b1005e68f9b5f",
     "evidence": "docs/pr152-seven-five-first-ja.md",
     "state": "local six firsts five complete, Wstock afterloadhidden/loadfullunreached; no new preservationpositive; first-gauge limited scope not whole-map complete",
-    "record": "sevenFiveFirstLocal20261030"
+    "record": "sevenFiveFirstLocal20261030",
+    "panelContractCorrection": "sevenFiveFirstPanelContractCorrection20261030"
   },
-  "nextPriority": "7-5第1の限定製品/通常試験/記録を根拠別にまとめて通常pushし、最終sourceのsmoke1回を重複なく確認。Wstock初回load後非表示/全文未到達・caller欠測を再試行で埋めず、既知原因未確定を保持。停止条件がなければ独立した7-5第2ABDFJOQのB/D/F/J/O条件・対地/PTの接続へ進む。",
+  "nextPriority": "旧7-4の隣接文字列前提を実引数/案内分岐の限定VM契約へ訂正し当該1Node成功、製品/fixture/CW局所入力不変。独立commit/通常push後の訂正source smokeを1回確認。旧f090CIは各Node546/545/1・browser未開始、旧Wstock load全文未到達は保持。停止条件がなければ次の独立7-5第2ABDFJOQのsource/判定/装備接続へ進む。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -8573,5 +8574,47 @@
       }
     ]
   },
-  "nextPriorityBeforeSevenFiveFirstLocal20261030": "訂正source633/CI41014041261は5smoke成功・W4job45分取消で閉鎖、公式C877/0/0、W4/全W集計とgeneric Wの個別結果/strict59到達は欠測。旧初回7fdの監査失敗と新trialのload非表示/全文未到達は別保持し、22/141/73を維持。次は独立7-5第1ABDFGHKの実操作結果を別原本へ閉鎖・レビューし、必要な限定記録/通常pushと同source smoke1回へ進む。新保存不一致等がなければ第2等の独立した次条件を選ぶ。"
+  "nextPriorityBeforeSevenFiveFirstLocal20261030": "訂正source633/CI41014041261は5smoke成功・W4job45分取消で閉鎖、公式C877/0/0、W4/全W集計とgeneric Wの個別結果/strict59到達は欠測。旧初回7fdの監査失敗と新trialのload非表示/全文未到達は別保持し、22/141/73を維持。次は独立7-5第1ABDFGHKの実操作結果を別原本へ閉鎖・レビューし、必要な限定記録/通常pushと同source smoke1回へ進む。新保存不一致等がなければ第2等の独立した次条件を選ぶ。",
+  "sevenFiveFirstPanelContractCorrection20261030": {
+    "sourceBefore": "f090e9c40b8d7d0f4ee90f51fb0c5fec0b87822c",
+    "beforeRun": 41026417307,
+    "attempt": 1,
+    "dispatches": 1,
+    "reruns": 0,
+    "jobsNodeFailed": 6,
+    "NodeEach": {
+      "tests": 546,
+      "pass": 545,
+      "fail": 1
+    },
+    "failure": "seven-four-placement final panel call source-adjacency assumption; next ASW adjacency also stale statically but not reached in CI",
+    "browserSteps": "not started / skipped",
+    "officialPlaywrightCaseOutcomes": null,
+    "Full": "skipped",
+    "artifactsPublished": 0,
+    "formalAttemptLog": {
+      "requests": 1,
+      "bytes": 427167,
+      "members": 90,
+      "CRC": "PASS",
+      "sha256": "8ed908c462571da8a40f0b4a36395ecbbd4b94a62b016fc01176509ce77ae1f8"
+    },
+    "correction": "one existing test executes panel args and scoped ASW/night producer behavior, retaining strict gates and basequantity assertions",
+    "productFixtureBrowserSpecChanged": false,
+    "oldSixTitlesUnchanged": true,
+    "localAfter": {
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "workers": "Node only, no browser",
+      "repeatsOfOther545OrLocalCW": 0,
+      "fixedNode": "v24.21.0",
+      "resultSHA256": "e00eda2f13c464a82127294a2d1099697a50fb420ebfa02d93aae84038697f9c"
+    },
+    "matrixBefore": "22/144/70",
+    "matrixAfter": "22/144/70",
+    "oldLocalWstockLoadGapRetained": true,
+    "newCorrectedSourceCIStartedAtRecord": false
+  },
+  "nextPriorityBeforeSevenFivePanelContractCorrection20261030": "7-5第1の限定製品/通常試験/記録を根拠別にまとめて通常pushし、最終sourceのsmoke1回を重複なく確認。Wstock初回load後非表示/全文未到達・caller欠測を再試行で埋めず、既知原因未確定を保持。停止条件がなければ独立した7-5第2ABDFJOQのB/D/F/J/O条件・対地/PTの接続へ進む。"
 }

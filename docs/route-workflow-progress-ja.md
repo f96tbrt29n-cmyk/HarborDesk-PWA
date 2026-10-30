@@ -1,3 +1,5 @@
+> 最新契約訂正：source `f090e9c40b8d7d0f4ee90f51fb0c5fec0b87822c`／CI41026417307 attempt1・dispatch1/再実行0は、全6jobのNode546 tests/545pass/1failで停止し、C/Wのbrowser検証・smokeは未開始。Full skipped、公開artifact0、PW case outcomeはnullである。ステップ名にservice workerを含むが、その製品障害と分類しない。正式attempt ZIP427,167bytes/90members/CRC正常を1回取得し、初回原本を保持した。 当該test1の局所訂正確認は成功、製品/C/W入力不変、22/144/70変更0。詳細は[7-5記録](pr152-seven-five-first-ja.md#2026-10-30-初回ciのnode契約訂正)。
+
 > 最新7-5第1：2026-10-30 [7-5第1ABDFGHK](pr152-seven-five-first-ja.md)：駆逐1＋海防1の出典一致代替、選択第1への第2対地表示除外、対潜部品/合法通常枠案内を接続。独立Node21・純4とC/W各3初回を分離し、5件は保存/安全中止・適用編集・同一reload文書load全文まで完了。Wstockは保存後strict30通過後の第2click非表示45秒、load全文未到達/nav1/caller欠測を保持。既存夜戦補助1個を任意比較として残し、第1専用CI1組を追加しない。B/C/Dだけ未確認→一部、22/141/73→22/144/70の3セル。A/他58行/旧53/基準236は不変。最終sourceの通常push/smokeは未開始。
 
 
