@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..');
-function load(file,name,c){const s=fs.readFileSync(path.join(root,file),'utf8'),a=s.indexOf('function '+name+'('),b=s.indexOf('\nfunction ',a+1);assert.ok(a>=0,name);vm.runInContext(s.slice(a,b<0?undefined:b),c);}
+function load(file,name,c){if(file==='fleet-readiness-evaluator.js'&&name==='hdFEEquipmentRequirements'&&!c.hdFEOneFiveAswSelection)load(file,'hdFEOneFiveAswSelection',c);const s=fs.readFileSync(path.join(root,file),'utf8'),a=s.indexOf('function '+name+'('),b=s.indexOf('\nfunction ',a+1);assert.ok(a>=0,name);vm.runInContext(s.slice(a,b<0?undefined:b),c);}
 // Manually transcribed source expectations, before product execution:
 // https://zekamashi.net/kancolle-kouryaku/5-5/ and its KCwiki reference.
 // These isolate branch predicates. Numeric/speed/type fixtures do not prove a

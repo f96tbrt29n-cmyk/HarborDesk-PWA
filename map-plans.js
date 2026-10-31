@@ -573,7 +573,7 @@ function hdMapRequirementConditionText(c){
 function hdMapRequirementsHtml(map,preset){
  const r=hdMapPresetRequirements(map,preset);if(!r)return '';
  const los=r.los.kind==='required'?`${r.los.exemptNote?r.los.exemptNote+' ':''}33式・分岐点係数${r.los.coef}、${r.los.exemptWhen?'免除対象外の':''}必要索敵値${r.los.checks.map(c=>c.safe+'以上').join('・')}`:r.los.note;
- return `<div class="plan-card" data-hd-route-requirements="${planEsc(map+':'+r.index)}"><b>${planEsc(r.path)}の攻略条件${r.scopeIncomplete?'（検証中）':''}</b><ul>${r.conditions.map(c=>`<li>${planEsc(hdMapRequirementConditionText(c))}</li>`).join('')}<li>${planEsc(los)}</li></ul>${r.equipmentTargets?.length?`<p>装備の推奨目標：${planEsc(r.equipmentTargets.map(x=>x.label+' '+x.minCount+'組').join(' / '))}。先制対潜の発動や戦闘勝利とは別判定。</p>`:''}${r.notes.map(n=>`<p>${planEsc(n)}</p>`).join('')}${r.los.kind==='required'?`<small>${planEsc(r.los.marginNote)}</small>`:''}<p><a href="${planEsc(r.source)}" target="_blank" rel="noopener noreferrer">経路条件の出典 ↗</a></p></div>`;
+ return `<div class="plan-card" data-hd-route-requirements="${planEsc(map+':'+r.index)}"><b>${planEsc(r.path)}の攻略条件${r.scopeIncomplete?'（検証中）':''}</b><ul>${r.conditions.map(c=>`<li>${planEsc(hdMapRequirementConditionText(c))}</li>`).join('')}<li>${planEsc(los)}</li></ul>${r.map==='1-5'&&r.index===1?'<p>装備の任意比較目標：対潜装備セットの組数は編成ごとの選択で確認します。未選択のときは必要数・不足数を出さず、利用者指定と既存例の比較モデルを区別します。別編成への一律適用、通行条件・先制対潜人数・戦闘勝利の保証ではありません。</p>':r.equipmentTargets?.length?`<p>装備の推奨目標：${planEsc(r.equipmentTargets.map(x=>x.label+' '+x.minCount+'組').join(' / '))}。先制対潜の発動や戦闘勝利とは別判定。</p>`:''}${r.notes.map(n=>`<p>${planEsc(n)}</p>`).join('')}${r.los.kind==='required'?`<small>${planEsc(r.los.marginNote)}</small>`:''}<p><a href="${planEsc(r.source)}" target="_blank" rel="noopener noreferrer">経路条件の出典 ↗</a></p></div>`;
 }
 // Scope generated recommendations to the documented route, rather than enemy
 // names or requirements belonging to another path/stage in the same sea.
@@ -601,10 +601,24 @@ function hdMapRequirementsHtml(map,preset){
  HD_MAP_ROUTE_REQUIREMENTS['6-3'][0].waterAttackTypes=['水上機母艦'];
  HD_MAP_ROUTE_REQUIREMENTS['1-5'][1].waterAttackTarget=true;
  HD_MAP_ROUTE_REQUIREMENTS['1-5'][1].waterAttackTypes=['航空戦艦'];
+ HD_MAP_ROUTE_REQUIREMENTS['1-5'][1].conditions.splice(2,0,{kind:'typeCount',types:['補給艦'],matchPolicy:'exact',min:0,max:0,reason:'ADFGJ全体ではFで潜水艦・潜水空母0が必要です。潜水なしのD先行条件で補給艦1以上はEへ進むため補給艦0を確認します。潜水を含む場合もF→Iで不一致となるため、装備購入ではなく編成を見直してください。'});
+ HD_MAP_ROUTE_REQUIREMENTS['1-5'][1].sourceFourHullTypes=['航空戦艦','軽巡洋艦','駆逐艦','海防艦','軽空母'];
+ HD_MAP_ROUTE_REQUIREMENTS['1-5'][1].sourceFourHullExamples=[
+  {id:'bbv-dd3',label:'航空戦艦1＋駆逐3',counts:[1,0,3,0,0]},
+  {id:'bbv-cl1-dd2',label:'航空戦艦1＋軽巡1＋駆逐2',counts:[1,1,2,0,0]},
+  {id:'bbv-cl2-dd1',label:'航空戦艦1＋軽巡2＋駆逐1',counts:[1,2,1,0,0]},
+  {id:'cl2-dd2',label:'軽巡2＋駆逐2',counts:[0,2,2,0,0]},
+  {id:'cl1-dd3',label:'軽巡1＋駆逐3',counts:[0,1,3,0,0]},
+  {id:'dd4',label:'駆逐4',counts:[0,0,4,0,0]},
+  {id:'cvl-dd3',label:'軽空母1＋駆逐3',counts:[0,0,3,0,1]},
+  {id:'dd3-de1',label:'駆逐3＋海防1',counts:[0,0,3,1,0]}
+ ];
+ // These are historical optional comparison models, not source sufficiency claims.
+ HD_MAP_ROUTE_REQUIREMENTS['1-5'][1].legacyAswSetFamilies=['bbv-dd3','bbv-cl1-dd2','bbv-cl2-dd1','cl2-dd2'];
  // Strategy targets, never passage predicates. A set count does not imply OASW.
  const asw15={choose:true,source:'https://zekamashi.net/kancolle-kouryaku/1-5/',checkedAt:'2026-10-25'};
  HD_MAP_ROUTE_REQUIREMENTS['1-5'][0].openingAsw={...asw15,note:'海防艦4隻例は「可能な範囲」で先制対潜を準備する攻略案。人数は一意に指定されていません。対潜セット4組とは別に人数を選んでください。'};
- HD_MAP_ROUTE_REQUIREMENTS['1-5'][1].openingAsw={...asw15,note:'航空戦艦を含む二巡型は、先制対潜人数の明記がありません。対潜セット3組・水上爆撃機の推奨とは別に人数を選んでください。'};
+ HD_MAP_ROUTE_REQUIREMENTS['1-5'][1].openingAsw={...asw15,note:'この登録経路には一意の先制対潜人数が明記されていません。対潜装備セットの組数や水上爆撃機等の任意比較と人数は別です。現在の艦種・改造・表示対潜値を確認し、人数を指定してください。'};
  HD_MAP_ROUTE_REQUIREMENTS['1-5'][2].openingAsw={...asw15,recommended:4,fleetSize:4,shipTypes:['駆逐艦'],note:'駆逐4隻のキラ付け編成例で各艦の先制対潜条件を満たす装備案を初期目標に使用。初攻略全般の最低人数ではなく、他の艦種構成へ一律適用しません。'};
  HD_MAP_ROUTE_REQUIREMENTS['7-2'][0].openingAsw={choose:true,source:'https://zekamashi.net/kancolle-kouryaku/7-2/',checkedAt:'2026-10-25',note:'第1ゲージの4隻初攻略例には先制対潜人数の明記がありません。5隻育成例の「先制対潜できる海防艦3隻」はこの編成へ流用せず、人数を選んでください。'};
  MAP_PLANS['7-5'].presets[0].gear='第1目標KへF→G・H→Kを選択。元六隻は編成例で駆逐1＋海防1等の二資料一致代替も確認。B/Dの艦種・速力優先を守り、D高速＋の出典差や未知艦は未判定。対潜・夜戦・航空・対空は任意の戦闘比較、Kに数値索敵・基地必須はない。';

@@ -104,6 +104,7 @@ jobs:
             test-results/route-one-five-bbv-cl-*/route-guidance-summary.json
             test-results/route-one-five-bbv-cl2-*/route-guidance-summary.json
             test-results/route-one-five-cl2-dd2-*/route-guidance-summary.json
+            test-results/route-one-five-cl1-dd3-*/route-guidance-summary.json
             test-results/route-three-one-cfg-*/route-guidance-summary.json
             test-results/route-seven-three-first-*/route-guidance-summary.json
             test-results/route-seven-four-*/route-guidance-summary.json

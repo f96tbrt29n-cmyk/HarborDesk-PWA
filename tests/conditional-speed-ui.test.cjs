@@ -19,6 +19,7 @@ require('./one-five-middle-boundaries.test.cjs');
 require('./one-five-bbv-cl-boundaries.test.cjs');
 require('./one-five-bbv-cl2-boundaries.test.cjs');
 require('./one-five-cl2-dd2-boundaries.test.cjs');
+require('./one-five-cl1-dd3-boundaries.test.cjs');
 require('./three-three-acgm.test.cjs');
 require('./three-three-placement.test.cjs');
 require('./three-four-acegjp.test.cjs');
@@ -70,7 +71,7 @@ require('./seven-two-graph.test.cjs');
 require('./seven-two-placement.test.cjs');
 require('./seven-two-sortie-compatibility.test.cjs');
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
-function load(file,name,c){const s=fs.readFileSync(path.join(__dirname,'..',file),'utf8'),start=s.indexOf('function '+name+'('),end=s.indexOf('\nfunction ',start+1);assert.ok(start>=0);vm.runInNewContext(s.slice(start,end<0?undefined:end),c);return c[name]}
+function load(file,name,c){if(file==='owned-equipment-planner.js'&&name==='hdOCSignature'&&!c.hdOCAswSetInput)load(file,'hdOCAswSetInput',c);const s=fs.readFileSync(path.join(__dirname,'..',file),'utf8'),start=s.indexOf('function '+name+'('),end=s.indexOf('\nfunction ',start+1);assert.ok(start>=0);vm.runInNewContext(s.slice(start,end<0?undefined:end),c);return c[name]}
 function routes(){const c=vm.createContext({window:{}});vm.runInContext(fs.readFileSync(path.join(__dirname,'../map-plans.js'),'utf8'),c);return vm.runInContext('({maps:MAP_PLANS,rules:HD_MAP_ROUTE_REQUIREMENTS})',c)}
 function predicate(){const raw=fs.readFileSync(path.join(__dirname,'../ship-master-snapshot.js'),'utf8'),snap=JSON.parse(raw.slice(raw.indexOf('=')+1).trim().replace(/;$/,'')),rows=Object.values(snap.allShips),c={HD_FS_TYPE_ALIASES:{},hdShipDbMasterRowFor:input=>rows.find(r=>r.name===input.name&&(input.masterId==null||input.masterId===r.id))};load('fleet-readiness-evaluator.js','hdFESpeedLabel',c);return load('fleet-readiness-evaluator.js','hdFEBranchPredicate',c)}
 test('7-3 route speed never counts invalid speed equipment as a confirmed fast hull',()=>{

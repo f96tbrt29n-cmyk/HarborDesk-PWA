@@ -3,6 +3,7 @@ const HD_OC_CACHE=new Map();
 const HD_OC_PENDING=new Map();
 const HD_OC_ASW_TARGET_KEY='harbordesk-opening-asw-targets-v1';
 const HD_OC_ROUTE_GOAL_KEY='harbordesk-route-goals-v1';
+const HD_OC_ASW_SET_CHOICE_KEY='harbordesk-asw-set-choices-v1';
 // A user-selected equipment preparation goal, not a route or victory rule.
 // Each registered source specifies a same-hull set, not a sufficient count.
 function hdOCPortRoute(c){
@@ -89,6 +90,82 @@ function hdOCRouteGoal(c){
  const value=stored??c.fleet?.routeGoal??data.defaultGoal;return value===''?data.defaultGoal:value;
 }
 function hdOCRouteGoalHtml(c,attrs){const goals=MAP_PLANS[c.map]?.routeBranches?.goals;if(!goals)return '';const current=hdOCRouteGoal(c),known=typeof current==='string'&&Object.prototype.hasOwnProperty.call(goals,current);return `<label>ルート目標<select data-hd-oc-route-goal ${attrs}>${known?'':`<option value="${hdFEEsc(current)}" selected>未登録の目標・選び直してください</option>`}${Object.entries(goals).map(([id,g])=>`<option value="${hdFEEsc(id)}" ${current===id?'selected':''}>${hdFEEsc(g.label)}</option>`).join('')}</select></label><small>経由がランダムでも、全候補が登録した目標経路に入るか検証します。戦闘勝利は保証しません。</small>${known&&goals[current].airNotRequired?'<small data-hd-oc-route-air>この選択経路に数値制空目標はありません。別経路や任意の制空計算とは区別します。</small>':''}`}
+// ASW equipment-set quantity is separate from the opening-ASW headcount.
+// Missing settings retain only the documented compatibility families' old model.
+// Explicit unselected/off/count states are not interchangeable.
+function hdOCAswSetKey(c){
+ const id=c?.fleet?.id;if(c?.map!=='1-5'||c.index!==1||!['string','number'].includes(typeof id)||typeof id==='number'&&!Number.isFinite(id)||!String(id).trim())return null;
+ return `${c.map}:${id}:${c.index}`;
+}
+function hdOCAswSetStored(value){
+ if(!value||typeof value!=='object'||Array.isArray(value))return {state:'invalid',reason:'unsupported-active-choice'};
+ if(value.state==='count'&&Number.isInteger(value.count)&&value.count>=1&&value.count<=4)return {state:'count',count:value.count};
+ if(['off','unselected'].includes(value.state)&&!Object.prototype.hasOwnProperty.call(value,'count'))return {state:value.state};
+ return {state:'invalid',reason:'unsupported-active-choice'};
+}
+function hdOCAswSetRead(c){
+ const key=hdOCAswSetKey(c);if(key===null)return {error:'fleet-required',key,root:null,present:false};
+ let raw;try{raw=localStorage.getItem(HD_OC_ASW_SET_CHOICE_KEY);if(raw===null&&Object.prototype.hasOwnProperty.call(localStorage,HD_OC_ASW_SET_CHOICE_KEY))return {error:'storage-read',key,root:null,present:false}}catch{return {error:'storage-read',key,root:null,present:false}}
+ if(raw!==null&&typeof raw!=='string')return {error:'storage-read',key,root:null,present:false};
+ let root;try{root=raw===null?{}:JSON.parse(raw)}catch{return {error:'storage-json',key,root:null,present:false}}
+ if(!root||typeof root!=='object'||Array.isArray(root))return {error:'storage-shape',key,root:null,present:false};
+ const present=Object.prototype.hasOwnProperty.call(root,key);return {error:null,key,root,present,active:present?root[key]:undefined};
+}
+function hdOCAswSetInput(c){
+ if(c?.map!=='1-5'||c.index!==1)return null;
+ if(!c.fleet)return {snapshot:undefined,signatureToken:undefined};
+ const stored=hdOCAswSetRead(c),snapshot=stored.error?{state:'invalid',reason:stored.error}:stored.present?hdOCAswSetStored(stored.active):undefined;
+ return {snapshot,signatureToken:snapshot===undefined?undefined:{...snapshot}};
+}
+function hdOCAswSetContextPlan(c){
+ const plan=hdFEPlanFromSavedFleet(c.map,c.fleet);plan.preset=c.preset;plan.routeInfo=c.preset?hdFSPresetInfo(c.preset):null;plan.routeIndex=c.index;return plan;
+}
+function hdOCAswSetApply(plan,choice){
+ if(choice?.snapshot!==undefined&&choice.scope?.applicable!==false)plan.aswSetSelection={...choice.snapshot};return plan;
+}
+function hdOCAswSetCapture(c){
+ const input=hdOCAswSetInput(c);if(!input||typeof hdFEOneFiveAswScope!=='function'||typeof hdFEOneFiveAswSelection!=='function')return null;
+ const plan=hdOCAswSetContextPlan(c);hdOCAswSetApply(plan,input);const scope=hdFEOneFiveAswScope(plan),selection=hdFEOneFiveAswSelection(plan);return {...input,plan,scope,selection};
+}
+function hdOCAswSetHasOtherGoal(plan,requirements){
+ if(Number.isInteger(plan.openingAswCount)&&plan.openingAswCount>0&&plan.openingAswCount<=7)return true;
+ return (requirements||[]).some(row=>row.kind!=='cap-asw'&&Number.isFinite(Number(row.minCount))&&Number(row.minCount)>0&&(row.purpose==='strategy'||row.purpose==='route'||row.generatedFromMap===false||row.kind?.startsWith('cap-night-')&&hdSENightPolicy(plan.map)!=='auto'));
+}
+function hdOCAswSetCanSearch(choice,c=null,requirements=null,plan=null){
+ if(!choice?.scope?.applicable)return true;
+ if(choice.selection.state==='invalid')return false;
+ if(choice.selection.state!=='unselected')return true;
+ const current=plan||(c?{...choice.plan,openingAswCount:hdOCOaswTarget(c)}:choice.plan),rows=requirements||hdFEEquipmentRequirements(current,hdSEChecks(current.map).rows);
+ return hdOCAswSetHasOtherGoal(current,rows);
+}
+function hdOCAswSetRequire(choice,c=null,requirements=null,plan=null){
+ if(hdOCAswSetCanSearch(choice,c,requirements,plan))return;
+ const invalid=choice?.selection?.state==='invalid',error=new Error(invalid?'保存した対潜組数設定を確認できません。元の値は変更していません':'対潜装備セットの比較目標が未選択です。組数か「比較しない」を選んでください');error.code=invalid?'HD_OC_ASW_SET_INVALID':'HD_OC_ASW_SET_UNSELECTED';throw error;
+}
+function hdOCAswSetSave(c,value){
+ const stored=hdOCAswSetRead(c);if(stored.error||stored.present&&hdOCAswSetStored(stored.active).state==='invalid')throw Error('保存済みの対潜組数設定を確認できません');
+ const plan=hdOCAswSetContextPlan(c),scope=typeof hdFEOneFiveAswScope==='function'?hdFEOneFiveAswScope(plan):null;if(!scope?.applicable)throw Error('対象経路ではありません');
+ const next={...stored.root};
+ if(value==='legacy'){if(!scope.legacyAllowed)throw Error('この編成は既存例モデルの適用範囲外です');if(stored.present)throw Error('明示した設定は既存例への復帰で削除しません。必要なら利用者指定3組を選んでください');return false}
+ else{
+  let selected;if(value==='unselected'||value==='off')selected={state:value};else if(['1','2','3','4'].includes(value))selected={state:'count',count:Number(value)};else throw Error('対潜組数は未選択・比較しない・1〜4組から選んでください');
+  const previous=stored.present?hdOCAswSetStored(stored.active):null;if(previous&&previous.state===selected.state&&previous.count===selected.count)return false;
+  const retained={...(stored.present?stored.active:{}),...selected};if(selected.state!=='count')delete retained.count;next[stored.key]=retained;
+ }
+ localStorage.setItem(HD_OC_ASW_SET_CHOICE_KEY,JSON.stringify(next));return true;
+}
+function hdOCAswSetUserGoal(plan,goal,data=null){
+ if(plan?.map!=='1-5'||goal?.kind!=='cap-asw'||goal.generatedFromMap===true||goal.purpose!=='strategy'||!Object.prototype.hasOwnProperty.call(plan,'aswSetSelection')||typeof hdFEOneFiveAswSelection!=='function')return false;
+ const route=data||hdFERouteRequirementData(plan);if(route?.map!=='1-5'||route.index!==1||route.path!=='ADFGJ')return false;
+ const choice=hdFEOneFiveAswSelection(plan);return choice.state==='count'&&Number.isInteger(choice.count)&&choice.count>=1&&choice.count<=4&&goal.minCount===choice.count;
+}
+function hdOCAswSetHtml(c,attrs,choice=hdOCAswSetCapture(c)){
+ if(!choice?.scope?.applicable)return '';
+ const state=choice.selection.state,value=state==='legacy-default'?'legacy':state==='count'?String(choice.selection.count):state,esc=hdFEEsc;
+ const options=[...(choice.scope.legacyAllowed&&state==='legacy-default'?[['legacy','既存例モデル：3組（互換・表示のみ）']]:[]),['unselected','未選択（組数を指定）'],['off','比較しない'],...Array.from({length:4},(_,i)=>[String(i+1),`利用者指定：${i+1}組`])];
+ const note=state==='legacy-default'?'既存の編成例に限る3組の比較モデルです。新たな推奨数・通行必須数ではありません。':state==='off'?'対潜装備セットは今回の比較対象外です。0組充足の判定ではありません。':state==='count'?`利用者指定の${choice.selection.count}組を比較します。3組へ引き上げません。`:state==='invalid'?'保存した組数設定を確認できません。元の値を変更せず、探索を止めています。':'組数は未選択です。組数か「比較しない」を選んでください。別に指定した目標の探索はできますが、対潜セットは数量・調達を評価しません。';
+ return `<label>対潜装備セットの比較目標 <select data-hd-oc-asw-sets ${attrs} ${c.fleet&&state!=='invalid'?'':'disabled'}>${state==='invalid'?'<option value="invalid" selected>保存済み設定を確認できません</option>':''}${options.map(([id,label])=>`<option value="${id}" ${value===id?'selected':''} ${id==='legacy'?'disabled':''}>${esc(label)}</option>`).join('')}</select></label><small data-hd-oc-asw-set-source>${esc(note)} 同じ艦のソナー＋投射機の組数です。先制対潜の人数・発動条件、通行必須条件、購入数・勝利保証とは別です。</small>`;
+}
 function hdOCOaswTargets(){try{return JSON.parse(localStorage.getItem(HD_OC_ASW_TARGET_KEY)||'{}')||{}}catch{return {}}}
 function hdOCOaswKey(c,index=c.index??0){return `${c.map}:${c.fleet?.id||''}:${index}`}
 function hdOCOaswFleetGoal(c){
@@ -148,7 +225,7 @@ function hdOCContext(map,fleetId='',route=''){
  const presets=typeof hdMSNPresets==='function'?hdMSNPresets(map):[],index=route===''?(typeof hdMSNRouteIndex==='function'?hdMSNRouteIndex(map,presets):0):Number(route);
  return {map,fleet,preset:presets[index]||null,index};
 }
-function hdOCSignature(c){return JSON.stringify([c.map,c.fleet,c.preset,typeof HD_APP_BUILD==='undefined'?null:HD_APP_BUILD,hdOCRouteGoal(c),typeof MAP_PLANS!=='undefined'?MAP_PLANS[c.map]?.routeBranches:null,hdOCOaswTarget(c),hdFEAswConfirmed(),hdSENightPolicy(c.map),hdFLRows(),hdFERoster(),localStorage.getItem('harbordesk-kancolle-sync-v1'),typeof hdMapAirSelection==='function'?hdMapAirSelection(c.map):null])}
+function hdOCSignature(c,aswSetChoice=undefined){const values=[c.map,c.fleet,c.preset,typeof HD_APP_BUILD==='undefined'?null:HD_APP_BUILD,hdOCRouteGoal(c),typeof MAP_PLANS!=='undefined'?MAP_PLANS[c.map]?.routeBranches:null,hdOCOaswTarget(c),hdFEAswConfirmed(),hdSENightPolicy(c.map),hdFLRows(),hdFERoster(),localStorage.getItem('harbordesk-kancolle-sync-v1'),typeof hdMapAirSelection==='function'?hdMapAirSelection(c.map):null],choice=aswSetChoice===undefined?hdOCAswSetInput(c):aswSetChoice;if(choice?.signatureToken!==undefined)values.push(choice.signatureToken);return JSON.stringify(values)}
 function hdOCUseFleet(map,id){
  if(!hdSPSFleets(map).some(f=>String(f.id)===String(id)))return false;
  if(typeof hdMSNFleetByMap!=='undefined')hdMSNFleetByMap[map]=id;
@@ -184,8 +261,8 @@ function hdOCCompatible(slot,candidate){
  return hdShipDbEquipCompatible(meta,db)&&!hdShipDbSlotRejects(slot.profile,slot.index,meta)&&(!HD_FE_AIR_CATS.has(meta.category)||Number(slot.capacity)>0);
 }
 function hdOCEquipment(candidate,slot){return {name:candidate.name,star:candidate.star,stackKey:candidate.key,category:candidate.item.category,slotIndex:slot.index,capacity:slot.capacity}}
-function hdOCBuild(c){
- const plan=hdFEPlanFromSavedFleet(c.map,c.fleet);plan.preset=c.preset;plan.routeInfo=c.preset?hdFSPresetInfo(c.preset):null;plan.routeIndex=c.index;plan.openingAswCount=hdOCOaswTarget(c);plan.routeGoal=hdOCRouteGoal(c);
+function hdOCBuild(c,aswSetChoice=undefined){
+ const plan=hdFEPlanFromSavedFleet(c.map,c.fleet);plan.preset=c.preset;plan.routeInfo=c.preset?hdFSPresetInfo(c.preset):null;plan.routeIndex=c.index;plan.openingAswCount=hdOCOaswTarget(c);plan.routeGoal=hdOCRouteGoal(c);hdOCAswSetApply(plan,aswSetChoice===undefined?hdOCAswSetCapture(c):aswSetChoice);
  plan.preservationIssues=[];
  const inventory=[...hdFLInventory().values()],counts=new Map(inventory.map(x=>[x.key,x.count])),slots=[],unknown=[];
  for(let si=0;si<plan.ships.length;si++){
@@ -250,6 +327,7 @@ function hdOCRevalidateResult(result){
 function hdOCMeasure(plan,requirements,unknown=[]){
  unknown=[...new Set([...unknown,...(plan.preservationIssues||[])])];
  requirements=hdFEEquipmentRequirements(plan,requirements);
+ const aswSets=typeof hdFEOneFiveAswSelection==='function'?hdFEOneFiveAswSelection(plan,requirements):null,aswSetUnresolved=aswSets?.applicable&&['unselected','invalid'].includes(aswSets.state),aswSetBlocks=aswSetUnresolved&&(aswSets.state==='invalid'||!hdOCAswSetHasOtherGoal(plan,requirements));
  const items=hdOCAssigned(plan),air=hdFEAirCheck(plan.map,hdFEAir(items),plan),scouting=hdFEPlanScouting(plan,items),speedTarget=hdFEPlanSpeedTarget(plan),speedGoals=speedTarget?(plan.ships||[]).flatMap((s,shipIndex)=>s.ship?[{...hdFESpeedGoal(s,speedTarget),shipIndex,targetRank:speedTarget}]:[]):[];
  const goals=requirements.filter(r=>!['opening-asw','radar-ships','drum-ships','port-attacker-set'].includes(r.kind)&&(!speedTarget||r.kind!=='高速化')).map(r=>{const cap=typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[r.kind]?hdSECapabilityMeasure(plan,r.kind):null,m=cap||hdFEKindCount(r.kind,items),count=r.kind==='高速化'?plan.ships.reduce((n,ship)=>n+Number(hdFEKindCount('高速化',hdOCAssigned({ships:[ship]})).count>0),0):Number(m.count)||0;return {...r,count,...(cap?.unresolved?{unresolved:true}:{}),ok:count>=r.minCount,detail:cap?`同じ艦の推奨セット ${count} / 目安 ${r.minCount}組${r.kind==='cap-night-auto'&&cap.matches?.length?'（'+cap.matches.map(x=>x.ship+'：'+x.attacks.join('・')).join(' / ')+ '）':''}` :r.kind==='高速化'?`同じ艦の標準セット ${count} / 目安 ${r.minCount}組`:`配備 ${count} / 目安 ${r.minCount}`,ratio:cap?Math.min(1,count?count/r.minCount:cap.ratio/r.minCount):Math.min(1,count/r.minCount)}});
  if(air.enemy&&!(typeof hdSEAirOptional==='function'&&hdSEAirOptional(plan.map)))goals.push({kind:'air-value',label:air.goal==='superiority'?'制空優勢の目安':`制空${HD_MAP_AIR_GOALS[air.goal]}の目安`,count:air.ours,minCount:air.required,ok:air.status==='ready',unresolved:air.status==='manual',ratio:air.status==='manual'?0:Math.min(1,air.ours/Math.max(1,air.required),air.routeLoss?.known?air.routeLoss.minimumRatio:1),detail:air.status==='manual'?`制空の充足は未判定：${air.detail}`:`基礎制空 ${air.ours} / 目安 ${air.required}（あと ${Math.max(0,air.required-air.ours)}）${air.routeLoss?.firstGap?`。連戦モデル ${air.routeLoss.firstGap.id}・${air.routeLoss.firstGap.round}回目であと${air.routeLoss.firstGap.gap}不足`:''}`});
@@ -273,7 +351,7 @@ function hdOCMeasure(plan,requirements,unknown=[]){
   const count=items.filter(x=>hdOCSpeedPart(x)===part).length;
   goals.push({kind:'speed-'+part,label,count,minCount:required,ok:count>=required,ratio:Math.min(1,count/required),detail:`配備 ${count} / ${speedTarget?'速力条件の最低必要数':'標準セットの目安'} ${required}個。各艦の必要な組み合わせ・改修値も確認してね`});
  }
- const manual=[...unknown];for(const row of hdFLRows())if(Number(row.count)>0&&!hdFEFind(row.name))manual.push(`装備性能が未登録：${row.name}。台帳の装備名を確認`);
+ const manual=[...unknown];if(aswSetUnresolved)manual.push(aswSets.state==='invalid'?'対潜装備セット：保存した組数設定を確認できません。元の値を保持しています':'対潜装備セット：組数未選択のため数量・調達は未評価です');for(const row of hdFLRows())if(Number(row.count)>0&&!hdFEFind(row.name))manual.push(`装備性能が未登録：${row.name}。台帳の装備名を確認`);
  if(speedGoals.some(g=>g.unresolved))manual.push('艦娘の速力区分が未登録のため未判定：'+speedGoals.filter(g=>g.unresolved).map(g=>g.label).join('、'));
  if(typeof hdSEAirOptional==='function'&&hdSEAirOptional(plan.map))manual.push('1-6下ルート：制空優勢は必須ではありません。対空CI・対潜装備を優先し、水戦や水爆は搭載できる軽巡での選択肢');
  else if(air.status==='manual')manual.push(`制空：${air.detail}`);
@@ -285,7 +363,7 @@ function hdOCMeasure(plan,requirements,unknown=[]){
  for(const goal of goals){goal.purpose=['route-branches','route-requirements','radar-ships','drum-ships','low-speed-ships','speed-ship','los-value'].includes(goal.kind)?'route':goal.kind==='cap-pt'&&sevenFiveSecondPT?goal.purpose==='strategy'||goal.generatedFromMap!==true?'strategy':'recommendation':goal.generatedFromMap&&!(goal.kind.startsWith('cap-night-')&&hdSENightPolicy(plan.map)!=='auto')?'recommendation':'strategy';}
  const requiredChecks=hdOCRequiredChecks(plan,route,true);
  const score=goals.reduce((s,g)=>s+g.ratio*100+(g.ok?25:0),0)+requiredChecks.reduce((n,c)=>n+(c.ok?10000:Math.max(0,c.ratio||0)*1000),0);
- return {goals,requiredChecks,manual,score,scoutingExempt:scouting.reason==='exempt',routeStatus:route.status,speedTarget,...(lowSpeedAlternative===undefined?{}:{lowSpeedAlternative}),complete:goals.length>0&&goals.every(x=>x.ok&&!x.unresolved)&&!unknown.length&&air.reason!=='anti-air'&&route.status==='ready'};
+ return {goals,requiredChecks,manual,score,scoutingExempt:scouting.reason==='exempt',routeStatus:route.status,speedTarget,...(lowSpeedAlternative===undefined?{}:{lowSpeedAlternative}),complete:goals.length>0&&goals.every(x=>x.ok&&!x.unresolved)&&!unknown.length&&air.reason!=='anti-air'&&route.status==='ready'&&!aswSetBlocks};
 }
 // An unresolved goal lacks evidence; it is not a confirmed equipment deficit.
 function hdOCShortageGoals(measure){return measure.goals.filter(x=>!x.ok&&!x.unresolved&&!['route-branches','route-requirements','port-attacker-set'].includes(x.kind))}
@@ -399,14 +477,15 @@ function hdOCFiveFourFixedInputStop(plan,measure,inventory,airUnselected=false){
  if(!raw.available||raw.coef!==2||!Number.isFinite(raw.score)||raw.score>0||speedBranch.status!=='manual'||branch.ratio!==Math.max(speedBranch.ratio,Math.max(0,raw.score/45)))return '';
  return 'five-four-fixed-data';
 }
-function* hdOCSearchSteps(c,limits={}){
+function* hdOCSearchSteps(c,limits={},aswSetChoice=undefined){
+ const aswChoice=aswSetChoice===undefined?hdOCAswSetCapture(c):aswSetChoice;if(aswChoice?.selection?.state==='invalid')hdOCAswSetRequire(aswChoice,c);
  // Joint sets are seeded as a unit before the ordinary beam. Bound subsequent
  // substitutions for these selected port-set routes: an unavailable unrelated goal must not keep the UI searching
  // through 10,000 expensive fleet evaluations. An incomplete result stays such.
  const portKey=hdOCPortRoute(c)?.key,portSearch=!!portKey&&Array.isArray(c.fleet?.portAttackersByRoute?.[portKey])&&c.fleet.portAttackersByRoute[portKey].length>0;
  const maxExamined=Math.max(50,Math.min(portSearch?500:10000,Number(limits.maxExamined)||10000)),maxDepth=Math.max(1,Math.min(24,Number(limits.maxDepth)||24));
- const signature=hdOCSignature(c),airUnselected=hdOCUnselectedAir(c.map);
- const {plan,inventory,slots,unknown}=hdOCBuild(c),requirements=hdFEEquipmentRequirements(plan,hdSEChecks(c.map).rows);
+ const signature=hdOCSignature(c,aswChoice),airUnselected=hdOCUnselectedAir(c.map);
+ const {plan,inventory,slots,unknown}=hdOCBuild(c,aswChoice),requirements=hdFEEquipmentRequirements(plan,hdSEChecks(c.map).rows);hdOCAswSetRequire(aswChoice,c,requirements,plan);
  const routeData=hdFERouteRequirementData(plan);for(const condition of routeData?.conditions||[])if(condition.kind==='equipmentShips'&&condition.match==='drum')requirements.push({kind:'drum-ships',label:'ルート用ドラム缶装備艦',minCount:condition.min});
  // Keep the raw conditional recommendation for candidate re-evaluation: a
  // later loadout can lose the exemption. hdOCMeasure filters each current plan.
@@ -468,7 +547,7 @@ function* hdOCSearchSteps(c,limits={}){
  const shortages=hdOCShortageGoals(best.measure).map(goal=>{
   if(goal.kind==='low-speed-ships')return {...goal,goalKind:goal.kind,owned:0,placement:true,shortfall:Math.max(0,goal.minCount-goal.count),candidates:[],detail:goal.detail+'。低速艦を編成するか、高速化装備を外して速力を再確認。'};
   if(goal.kind==='opening-asw')return {...goal,goalKind:goal.kind,kind:'対潜',owned:0,placement:false,shortfall:goal.minCount-goal.count,candidates:inventory.filter(x=>hdOCItemMatches('opening-asw',x)).map(x=>x.name),asw:true};
-  if(typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[goal.kind]){const contract=['1-5','3-1','7-4','7-5'].includes(c.map)?hdFERouteRequirementData(best.plan):null,oneFiveRecommendation=c.map==='1-5'&&contract?.map==='1-5'&&contract.index===1&&contract.path==='ADFGJ'&&goal.generatedFromMap===true&&goal.purpose==='recommendation',threeOneCarrierRecommendation=c.map==='3-1'&&contract?.map==='3-1'&&contract.index===0&&contract.path==='CFG'&&goal.generatedFromMap===true&&goal.purpose==='recommendation',sevenFourRecommendation=c.map==='7-4'&&contract?.map==='7-4'&&contract.index===0&&contract.path==='ABEJLP'&&goal.generatedFromMap===true&&goal.purpose==='recommendation',sevenFiveFirstRecommendation=c.map==='7-5'&&contract?.map==='7-5'&&contract.index===0&&contract.path==='ABDFGHK'&&goal.generatedFromMap===true&&goal.purpose==='recommendation',sevenFiveSecondRecommendation=c.map==='7-5'&&contract?.map==='7-5'&&contract.index===1&&contract.path==='ABDFJOQ'&&goal.generatedFromMap===true&&goal.purpose==='recommendation',profile=hdSEProfiles(c.map).find(x=>x.kind===goal.kind),stock=hdSECapabilityStock(best.plan,goal.kind,goal.minCount);return {...goal,kind:profile?.baseKind||goal.baseKind||goal.label||goal.kind,goalKind:goal.kind,capability:true,stock,...((threeOneCarrierRecommendation||['3-3','3-4','4-1','4-2','4-4','4-5','5-1','5-2','5-5','6-2','6-5','7-2'].includes(c.map))&&goal.kind==='cap-carrier-attack'?{carrierTargets:hdOCThreeThreeCarrierTargets(best.plan,goal)}:{}),...((['4-1','4-2','4-4','4-5','6-5','7-1','7-2'].includes(c.map)||oneFiveRecommendation||sevenFourRecommendation||sevenFiveFirstRecommendation||sevenFiveSecondRecommendation)&&goal.kind==='cap-asw'?{aswTargets:hdOCFourOneAswTargets(best.plan,goal,stock),...(oneFiveRecommendation?{aswScopeNote:'対潜組数は選択中の任意比較目標です。元の航空戦艦1＋駆逐3の四隻例では対潜3組を比較しますが、通行必須・先制対潜人数・全編成への必要十分数・購入数量ではありません。'}:c.map==='7-2'&&hdFERouteRequirementData(best.plan)?.path==='CEG'&&goal.minCount===4&&goal.generatedFromMap&&goal.purpose==='recommendation'?{aswScopeNote:'4組は元の軽巡1＋駆逐3向けの戦闘比較目標です。別の有効編成の必要・十分な組数は未確認で、購入数量ではありません。'}:sevenFourRecommendation?{aswScopeNote:'対潜3組は元の航空戦艦1＋重巡1＋雷巡1＋駆逐2＋海防1の六隻例に対する任意の戦闘比較目標です。先制対潜人数・通行の必須条件・全編成への必要十分数・購入数量ではありません。'}:sevenFiveFirstRecommendation?{aswScopeNote:'対潜シナジー1組は第1目標Kへの既存の任意比較目標です。F→G・H→Kを選ぶ経路の通行必須・先制対潜人数・全編成への必要十分数・購入数量ではありません。'}:sevenFiveSecondRecommendation?{aswScopeNote:'対潜シナジー1組は第2目標Qへの既存の任意比較目標です。通行必須・先制対潜人数・全編成への必要十分数・購入数量ではありません。'}:{})}:{}),...((c.map==='5-1'||c.map==='7-3'&&hdFERouteRequirementData(best.plan)?.index===0||sevenFourRecommendation)&&goal.kind==='cap-night-auto'?{nightTargets:hdOCFiveOneNightTargets(best.plan,goal,stock)}:{}),...(c.map==='6-1'&&goal.kind==='cap-night-auto'?{subNightTargets:hdOCSixOneNightTargets(best.plan,goal,stock)}:{}),...((c.map==='6-4'||sevenFiveSecondRecommendation)&&goal.kind==='cap-land-mixed'?{landTargets:hdOCSixFourLandTargets(best.plan,goal,stock),...(sevenFiveSecondRecommendation?{landScopeNote:'第2目標Q向けの既存の任意比較です。この装備例1組は通行必須・砲台撃破・全編成への必要十分数・購入数量ではありません。'}:{})}:{}),...(sevenFiveSecondRecommendation&&goal.kind==='cap-pt'?{ptTargets:hdOCSevenFiveSecondPTTargets(best.plan,goal,stock),ptScopeNote:'既存の汎用PT装備モデルの任意比較です。第2目標Qでの十分性は未確認で、PT・砲台の撃破、ゲージ進行、到達・勝利を保証しません。1組は通行必須・購入数量ではなく、単品のPT対策目安と足して追加の必要組数にしません。2部品例を第2固有の3部品例の成立へ読み替えません。'}:{}),...((c.map==='6-3'||oneFiveRecommendation)&&goal.kind==='cap-water-attack'?{waterTargets:hdOCSixThreeWaterTargets(best.plan,goal),...(oneFiveRecommendation?{waterScope:'one-five-bbv'}:{})}:{}),owned:stock?.parts?.length?Math.min(...stock.parts.map(p=>Math.floor(p.have/(p.need/goal.minCount)))):0,placement:true,shortfall:Math.max(1,goal.minCount-goal.count),candidates:stock?.parts.filter(x=>x.have<x.need).flatMap(x=>HD_SE_PARTS[x.part].examples)||[]}}
+  if(typeof HD_SE_RECIPES!=='undefined'&&HD_SE_RECIPES[goal.kind]){const contract=['1-5','3-1','7-4','7-5'].includes(c.map)?hdFERouteRequirementData(best.plan):null,oneFiveRecommendation=c.map==='1-5'&&contract?.map==='1-5'&&contract.index===1&&contract.path==='ADFGJ'&&goal.generatedFromMap===true&&goal.purpose==='recommendation',oneFiveUser=hdOCAswSetUserGoal(best.plan,goal,contract),threeOneCarrierRecommendation=c.map==='3-1'&&contract?.map==='3-1'&&contract.index===0&&contract.path==='CFG'&&goal.generatedFromMap===true&&goal.purpose==='recommendation',sevenFourRecommendation=c.map==='7-4'&&contract?.map==='7-4'&&contract.index===0&&contract.path==='ABEJLP'&&goal.generatedFromMap===true&&goal.purpose==='recommendation',sevenFiveFirstRecommendation=c.map==='7-5'&&contract?.map==='7-5'&&contract.index===0&&contract.path==='ABDFGHK'&&goal.generatedFromMap===true&&goal.purpose==='recommendation',sevenFiveSecondRecommendation=c.map==='7-5'&&contract?.map==='7-5'&&contract.index===1&&contract.path==='ABDFJOQ'&&goal.generatedFromMap===true&&goal.purpose==='recommendation',profile=hdSEProfiles(c.map).find(x=>x.kind===goal.kind),stock=hdSECapabilityStock(best.plan,goal.kind,goal.minCount);return {...goal,kind:profile?.baseKind||goal.baseKind||goal.label||goal.kind,goalKind:goal.kind,capability:true,stock,...((threeOneCarrierRecommendation||['3-3','3-4','4-1','4-2','4-4','4-5','5-1','5-2','5-5','6-2','6-5','7-2'].includes(c.map))&&goal.kind==='cap-carrier-attack'?{carrierTargets:hdOCThreeThreeCarrierTargets(best.plan,goal)}:{}),...((['4-1','4-2','4-4','4-5','6-5','7-1','7-2'].includes(c.map)||oneFiveRecommendation||oneFiveUser||sevenFourRecommendation||sevenFiveFirstRecommendation||sevenFiveSecondRecommendation)&&goal.kind==='cap-asw'?{aswTargets:hdOCFourOneAswTargets(best.plan,goal,stock),...(oneFiveUser?{aswScopeNote:`利用者指定の${goal.minCount}組を比較しています。各組は同じ艦の別々の通常枠へ配備します。通行必須数・先制対潜人数・全編成への必要十分数・購入数量とは別で、他目標との枠競合や探索未完了を区別してください。`}:oneFiveRecommendation?{aswScopeNote:'対潜組数は選択中の任意比較目標です。元の航空戦艦1＋駆逐3の四隻例では対潜3組を比較しますが、通行必須・先制対潜人数・全編成への必要十分数・購入数量ではありません。'}:c.map==='7-2'&&hdFERouteRequirementData(best.plan)?.path==='CEG'&&goal.minCount===4&&goal.generatedFromMap&&goal.purpose==='recommendation'?{aswScopeNote:'4組は元の軽巡1＋駆逐3向けの戦闘比較目標です。別の有効編成の必要・十分な組数は未確認で、購入数量ではありません。'}:sevenFourRecommendation?{aswScopeNote:'対潜3組は元の航空戦艦1＋重巡1＋雷巡1＋駆逐2＋海防1の六隻例に対する任意の戦闘比較目標です。先制対潜人数・通行の必須条件・全編成への必要十分数・購入数量ではありません。'}:sevenFiveFirstRecommendation?{aswScopeNote:'対潜シナジー1組は第1目標Kへの既存の任意比較目標です。F→G・H→Kを選ぶ経路の通行必須・先制対潜人数・全編成への必要十分数・購入数量ではありません。'}:sevenFiveSecondRecommendation?{aswScopeNote:'対潜シナジー1組は第2目標Qへの既存の任意比較目標です。通行必須・先制対潜人数・全編成への必要十分数・購入数量ではありません。'}:{})}:{}),...((c.map==='5-1'||c.map==='7-3'&&hdFERouteRequirementData(best.plan)?.index===0||sevenFourRecommendation)&&goal.kind==='cap-night-auto'?{nightTargets:hdOCFiveOneNightTargets(best.plan,goal,stock)}:{}),...(c.map==='6-1'&&goal.kind==='cap-night-auto'?{subNightTargets:hdOCSixOneNightTargets(best.plan,goal,stock)}:{}),...((c.map==='6-4'||sevenFiveSecondRecommendation)&&goal.kind==='cap-land-mixed'?{landTargets:hdOCSixFourLandTargets(best.plan,goal,stock),...(sevenFiveSecondRecommendation?{landScopeNote:'第2目標Q向けの既存の任意比較です。この装備例1組は通行必須・砲台撃破・全編成への必要十分数・購入数量ではありません。'}:{})}:{}),...(sevenFiveSecondRecommendation&&goal.kind==='cap-pt'?{ptTargets:hdOCSevenFiveSecondPTTargets(best.plan,goal,stock),ptScopeNote:'既存の汎用PT装備モデルの任意比較です。第2目標Qでの十分性は未確認で、PT・砲台の撃破、ゲージ進行、到達・勝利を保証しません。1組は通行必須・購入数量ではなく、単品のPT対策目安と足して追加の必要組数にしません。2部品例を第2固有の3部品例の成立へ読み替えません。'}:{}),...((c.map==='6-3'||oneFiveRecommendation)&&goal.kind==='cap-water-attack'?{waterTargets:hdOCSixThreeWaterTargets(best.plan,goal),...(oneFiveRecommendation?{waterScope:'one-five-bbv'}:{})}:{}),owned:stock?.parts?.length?Math.min(...stock.parts.map(p=>Math.floor(p.have/(p.need/goal.minCount)))):0,placement:true,shortfall:Math.max(1,goal.minCount-goal.count),candidates:stock?.parts.filter(x=>x.have<x.need).flatMap(x=>HD_SE_PARTS[x.part].examples)||[]}}
   const kind=goal.kind==='air-value'?'制空':goal.kind==='los-value'?'索敵':goal.kind==='radar-ships'?'電探':goal.kind==='drum-ships'?'ドラム缶':goal.kind==='speed-ship'?'高速化':goal.kind;
   const compatible=hdFLCatalog().filter(x=>hdOCItemMatches(kind,x)&&slots.some(slot=>hdOCCompatible(slot,{item:x,star:0}))).sort((a,b)=>hdOCScore(kind,b)-hdOCScore(kind,a));
   const candidates=(kind==='高速化'?['turbine','boiler'].flatMap(part=>compatible.filter(x=>hdOCSpeedPart(x)===part).slice(0,1)):compatible.slice(0,3)).map(x=>x.name);
@@ -486,7 +565,7 @@ function* hdOCSearchSteps(c,limits={}){
 }
 function hdOCSearch(c){const steps=hdOCSearchSteps(c);let step;do{step=hdFEWithShipLookup(()=>steps.next())}while(!step.done);return step.value}
 async function hdOCSearchAsync(c){
- const signature=hdOCSignature(c),steps=hdOCSearchSteps(c);
+ const aswChoice=hdOCAswSetCapture(c);hdOCAswSetRequire(aswChoice,c);const signature=hdOCSignature(c,aswChoice),steps=hdOCSearchSteps(c,{},aswChoice);
  // Give the loading state a paint opportunity before evaluating combinations.
  await new Promise(resolve=>setTimeout(resolve,25));
  while(true){
@@ -520,7 +599,9 @@ function hdOCThreeThreeCarrierTargets(plan,goal){
 // This is a catalog inspection, not inventory allocation or an opening-ASW claim.
 function hdOCFourOneAswTargets(plan,goal,stock){
  const scopedContract=['1-5','7-4','7-5'].includes(plan?.map)?hdFERouteRequirementData(plan):null,oneFive=plan?.map==='1-5'&&scopedContract?.map==='1-5'&&scopedContract.index===1&&scopedContract.path==='ADFGJ',sevenFour=plan?.map==='7-4'&&scopedContract?.map==='7-4'&&scopedContract.index===0&&scopedContract.path==='ABEJLP',sevenFiveFirst=plan?.map==='7-5'&&scopedContract?.map==='7-5'&&scopedContract.index===0&&scopedContract.path==='ABDFGHK',sevenFiveSecond=plan?.map==='7-5'&&scopedContract?.map==='7-5'&&scopedContract.index===1&&scopedContract.path==='ABDFJOQ',scopedRecommendation=oneFive||sevenFour||sevenFiveFirst||sevenFiveSecond;
- if(!(['4-1','4-2','4-4','4-5','6-5','7-1','7-2'].includes(plan?.map)||scopedRecommendation)||goal?.kind!=='cap-asw'||scopedRecommendation&&goal.generatedFromMap!==true||!goal.generatedFromMap||goal.purpose!=='recommendation'||!scopedRecommendation&&(plan.map==='7-2'?!['CEG','BCDIM'].includes(hdFERouteRequirementData(plan)?.path):hdFERouteRequirementData(plan)?.path!==({'4-1':'CFDGJ / ABDGJ','4-2':'ACL / BDCL','4-4':'AEIK','4-5':'ADHKT / CDHKT','6-5':'BFIJM','7-1':'DEGHK'}[plan.map]))||stock?.recipe?.id!=='sonar-projector'||(oneFive||sevenFiveSecond)&&(stock.recipe.parts?.length!==2||stock.recipe.parts[0]!=='sonar'||stock.recipe.parts[1]!=='projector'))return null;
+ const choice=oneFive&&typeof hdFEOneFiveAswSelection==='function'?hdFEOneFiveAswSelection(plan,[goal]):null,selectedUser=hdOCAswSetUserGoal(plan,goal,scopedContract);
+ if(oneFive&&choice?.applicable&&(['off','unselected','invalid'].includes(choice.state)||choice.state==='count'&&!selectedUser))return null;
+ if(!(['4-1','4-2','4-4','4-5','6-5','7-1','7-2'].includes(plan?.map)||scopedRecommendation)||goal?.kind!=='cap-asw'||!selectedUser&&(scopedRecommendation&&goal.generatedFromMap!==true||!goal.generatedFromMap||goal.purpose!=='recommendation')||!scopedRecommendation&&(plan.map==='7-2'?!['CEG','BCDIM'].includes(hdFERouteRequirementData(plan)?.path):hdFERouteRequirementData(plan)?.path!==({'4-1':'CFDGJ / ABDGJ','4-2':'ACL / BDCL','4-4':'AEIK','4-5':'ADHKT / CDHKT','6-5':'BFIJM','7-1':'DEGHK'}[plan.map]))||stock?.recipe?.id!=='sonar-projector'||(oneFive||sevenFiveSecond)&&(stock.recipe.parts?.length!==2||stock.recipe.parts[0]!=='sonar'||stock.recipe.parts[1]!=='projector'))return null;
  const catalog=hdFLCatalog(),parts=['sonar','projector'];
  return (plan.ships||[]).flatMap((ship,shipIndex)=>{
   const db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db);
@@ -756,7 +837,8 @@ function hdOCReview(plan,measure){
   const issues=ownership.filter(x=>x.status===kind);if(!issues.length)continue;
   add('owned-ships-'+kind,kind,kind==='missing'?'手持ちの艦娘で編成を組めません':'艦娘の所持を確認できません',issues.map(x=>`第${x.index+1}艦 ${x.ship}：${x.detail}`).join(' / '),'ゲーム連携で艦隊台帳を更新し、保存編成の個体・改造段階・所持隻数を確認して再探索してね。',kind==='data'?'sync':'ships');
  }
- const asw=hdOCOaswMeasure(plan);
+ const asw=hdOCOaswMeasure(plan),aswSets=typeof hdFEOneFiveAswSelection==='function'?hdFEOneFiveAswSelection(plan,measure.goals):null;
+ if(aswSets?.applicable&&['unselected','invalid'].includes(aswSets.state))add('asw-set-selection','manual',aswSets.state==='invalid'?'対潜組数の保存設定が未確認':'対潜セットの組数が未選択',aswSets.state==='invalid'?'保存した組数設定を確認できません。元の値を保持しています。':'対潜装備セットは組数未選択のため数量・調達を評価していません。','対潜装備セットの組数か「比較しない」を選んでください。先制対潜の人数は別設定です。');
  if(asw.minCount&&!asw.ok)add('opening-asw',asw.unresolved?'data':'missing','先制対潜艦の目標が未達',asw.detail,'下の艦別判定で装備条件・対潜値を確認。表示対潜値は同期値か実測値を使い、艦固有ボーナスを推測で加算しません。','equipment',HD_FE_OASW_SOURCE);
  for(const ship of plan.ships||[])if(!hdFEFindShip(ship.ship))add('ship:'+ship.ship,'data','艦娘情報が未登録',ship.ship+' のスロット・装備可否を確認できません。','艦娘名と改造段階を艦娘データベースで確認してね。','ships');
  const unknown=hdFLRows().filter(x=>Number(x.count)>0&&!hdFEFind(x.name));
@@ -827,7 +909,7 @@ function hdOCReadiness(plan,measure,rows=hdOCReview(plan,measure)){
  return {status,checks,registeredReady:status==='ready',complete:false,detail:status==='missing'?'登録条件に不足があります':status==='manual'?'情報不足・未判定の条件があります':'登録範囲の条件を充足。全ルート条件の網羅・戦闘勝利は保証できません'};
 }
 async function hdOCFindAlternatives(c,result,limits={}){
- const signature=hdOCSignature(c);if(!result||result.signature!==signature)throw Object.assign(new Error('Stale proposal'),{code:'HD_OC_STALE'});
+ const aswChoice=hdOCAswSetCapture(c);hdOCAswSetRequire(aswChoice,c);const signature=hdOCSignature(c,aswChoice);if(!result||result.signature!==signature)throw Object.assign(new Error('Stale proposal'),{code:'HD_OC_STALE'});
  hdOCRevalidateResult(result);
  const original=hdFEPlanFromSavedFleet(c.map,c.fleet),target=hdFSLevelTarget(c.map),live=hdFSLiveState();
  const roster=hdFERoster().filter(row=>hdFEFindShip(row.name)&&hdFSOperational(row,live).available);
@@ -836,7 +918,7 @@ async function hdOCFindAlternatives(c,result,limits={}){
  // Different hulls can remove speed goals entirely. Compare mean achievement,
  // so extra already-satisfied goals cannot outweigh a verified route repair.
  const quality=r=>{const route=hdFERoute(r.plan);return r.measure.score/Math.max(1,r.measure.goals.length)-hdOCShipOwnership(r.plan).filter(x=>x.status!=='ready').length*500-(route.status==='missing'?200:route.status==='manual'?100:0)};
- let best=result,changed=false,examined=0;const maxCandidates=Math.max(1,Math.min(40,Number(limits.maxCandidates)||24));
+ let best=result,changed=false,examined=0,aswSelectionSkipped=0;const maxCandidates=Math.max(1,Math.min(40,Number(limits.maxCandidates)||24));
  const problems=hdOCShipOwnership(original),order=original.ships.map((s,i)=>i).sort((a,b)=>Number(problems.find(x=>x.index===b)?.status!=='ready')-Number(problems.find(x=>x.index===a)?.status!=='ready'));
  for(const index of order){
   let selected=best,considered=0;
@@ -850,7 +932,7 @@ async function hdOCFindAlternatives(c,result,limits={}){
    const fleet={...c.fleet,ships},plan=hdFEPlanFromSavedFleet(c.map,fleet);plan.routeInfo=c.preset?hdFSPresetInfo(c.preset):null;
    // Reject reusing an individual even if the remaining source fleet still has unowned ships.
    if(hdOCShipOwnership(plan).some(x=>x.status==='missing'&&x.detail.includes('1隻を複数枠')))continue;
-   examined++;considered++;const steps=hdOCSearchSteps({...c,fleet},{maxExamined:limits.maxExamined||700,maxDepth:12});let step;
+   examined++;considered++;const candidateContext={...c,fleet},aswChoice=hdOCAswSetCapture(candidateContext);if(!hdOCAswSetCanSearch(aswChoice,candidateContext)){aswSelectionSkipped++;continue}const steps=hdOCSearchSteps(candidateContext,{maxExamined:limits.maxExamined||700,maxDepth:12},aswChoice);let step;
    do{step=steps.next();if(!step.done)await new Promise(resolve=>setTimeout(resolve,0));if(hdOCSignature(c)!==signature){steps.return();throw Object.assign(new Error('Data changed'),{code:'HD_OC_STALE'})}}while(!step.done);
    const candidate=step.value;candidate.signature=signature;
    if(!hdOCGoalRegressions(best.measure,candidate.measure).length&&quality(candidate)>quality(selected))selected=candidate;
@@ -859,9 +941,9 @@ async function hdOCFindAlternatives(c,result,limits={}){
   if(examined>=maxCandidates)break;
  }
  const ownership=hdOCShipOwnership(best.plan),route=hdFERoute(best.plan),assessment=hdOCReadiness(best.plan,best.measure);
- if(!changed||ownership.some(x=>x.status!=='ready')||route.status!=='ready')return {proposal:null,examined,search:{status:'incomplete',exhaustive:false,examined,maxCandidates,reasons:[examined>=maxCandidates?'ship-candidate-limit':'bounded-ship-search']},detail:'探索未完了：確認済みのルート条件と重複防止を満たす代替編成は見つかりませんでした。探索範囲外の組み合わせや不足艦の入手・育成も確認してね。'};
+ if(!changed||ownership.some(x=>x.status!=='ready')||route.status!=='ready')return {proposal:null,examined,search:{status:'incomplete',exhaustive:false,examined,maxCandidates,reasons:[examined>=maxCandidates?'ship-candidate-limit':'bounded-ship-search',...(aswSelectionSkipped?['asw-set-target-unselected']:[])]},detail:'探索未完了：確認済みのルート条件と重複防止を満たす代替編成は見つかりませんでした。探索範囲外の組み合わせや不足艦の入手・育成も確認してね。'+(aswSelectionSkipped?` 対潜組数が未選択で他に比較する目標がない${aswSelectionSkipped}候補は比較対象外です。手持ちで不可能・購入必須という結果ではありません。`:'')};
  best.replacements=best.plan.ships.flatMap((s,index)=>s.ship!==original.ships[index]?.ship||Number(s.gameShipId)!==Number(original.ships[index]?.gameShipId)||s.rosterId!==original.ships[index]?.rosterId?[{index,from:original.ships[index]?.ship||'',to:s.ship,level:hdFEAswRoster(s)?.level||null}]:[]);
- best.alternativeAssessment=assessment;return {proposal:best,examined,detail:'艦種・隻数・速力の登録条件と所持個体を確認した代替案です。装備・索敵・制空・先制対潜の不足は別途表示します。'};
+ best.alternativeAssessment=assessment;return {proposal:best,examined,detail:'艦種・隻数・速力の登録条件と所持個体を確認した代替案です。装備・索敵・制空・先制対潜の不足は別途表示します。'+(aswSelectionSkipped?` 対潜組数が未選択で他に比較する目標がない${aswSelectionSkipped}候補は比較対象外にしました。`:'')};
 }
 function hdOCOaswHtml(plan,attrs){
  const esc=hdFEEsc;
@@ -911,10 +993,10 @@ window.addEventListener('hd:land-base-changed',hdOCReviewRefresh);
 
 function hdOCPanel(map,fleetId='',route=''){
  if(typeof hdFLInventory!=='function')return '';
- const c=hdOCContext(map,fleetId,route),key=`${map}:${c.fleet?.id||''}:${c.index}`,signature=hdOCSignature(c),cached=HD_OC_CACHE.get(key),result=cached&&cached.signature===signature?cached:null,searching=HD_OC_PENDING.get(key)?.signature===signature,esc=hdFEEsc;
+ const c=hdOCContext(map,fleetId,route),aswChoice=hdOCAswSetCapture(c),aswCanSearch=hdOCAswSetCanSearch(aswChoice,c),key=`${map}:${c.fleet?.id||''}:${c.index}`,signature=hdOCSignature(c,aswChoice),cached=HD_OC_CACHE.get(key),result=aswCanSearch&&cached&&cached.signature===signature?cached:null,searching=HD_OC_PENDING.get(key)?.signature===signature,esc=hdFEEsc;
  const attrs=`data-hd-oc-map="${esc(map)}" data-hd-oc-fleet="${esc(c.fleet?.id||'')}" data-hd-oc-route="${c.index}"`;
  const reviews=result?hdOCReview(result.plan,result.measure):[],readiness=result?hdOCReadiness(result.plan,result.measure,reviews):null;
- return `<section class="hd-oc-panel" ${attrs}>${typeof hdSECapabilityHtml==='function'?(['6-5','7-2'].includes(map)||map==='1-5'&&c.index===1||map==='7-3'&&c.index===0||map==='7-4'&&c.index===0||map==='7-5'&&[0,1,2].includes(c.index)?hdSECapabilityHtml(map,c.fleet?.id||'',null,c.preset):hdSECapabilityHtml(map,c.fleet?.id||'')):''}<strong>手持ち装備で攻略条件を満たす</strong><p>${c.fleet?`対象：${esc(c.fleet.name||'保存編成')}。所持数・改修値・装備可否・空きスロットから配備案を探します。他の艦の装備も移し替える前提です。`:'先に自分用編成を保存・選択すると、艦ごとに手持ち装備を配備できます。'}</p>${hdMapRequirementsHtml(map,c.preset)}${hdOCRouteGoalHtml(c,attrs)}${hdOCOaswTargetHtml(c,attrs)}${hdOCPortHtml(c,result,attrs)}${result?'':hdOCSavedSearchHtml(c)}<button type="button" class="primary small" data-hd-oc-search ${attrs} ${c.fleet&&!searching?'':'disabled'}>${searching?'手持ち装備を確認中…':'手持ちで条件を満たす配備を探す'}</button><button type="button" class="ghost small" data-hd-oc-select-fleet ${attrs}>艦隊を選ぶ・保存する</button>${result?`<div class="hd-oc-result"><b data-hd-oc-headline>${hdOCReviewHeadline(result.measure,reviews)}</b><p data-hd-oc-readiness>${esc(readiness.detail)}</p>${result.replacements?.length?`<p data-hd-oc-replacements>${result.replacements.map(x=>esc('第'+(x.index+1)+'艦：'+x.from+' → '+x.to+' Lv'+(x.level||'未確認'))).join(' / ')}</p>`:''}${hdOCSearchStatusHtml(result)}${hdOCRequiredChecksHtml(result.plan,result.measure)}${result.measure.goals.map(g=>`<div class="hd-oc-goal ${g.ok?'ready':g.unresolved?'manual':'missing'}"><strong>${esc(g.label)}：${g.ok?'充足':g.unresolved?(g.kind==='los-value'?'未確認':'未判定'):'不足'}</strong><small>${g.purpose==='route'?'経路必須':g.purpose==='recommendation'?'戦闘推奨':'選択した方針の目標'}</small><span>${esc(g.detail)}</span></div>`).join('')}${hdOCScoutingOptionsHtml(c,result)}${result.shortages.map((g,index)=>`<div class="hd-oc-shortage"><b>${esc(hdOCScoutingOptional(c,g)?g.label+'（任意目安）':g.label+'に必要なもの')}</b><p>${esc(g.detail)}。${g.routeEquipment?(g.goalKind==='drum-ships'?'ドラム缶':'電探')+'装備艦があと'+Math.ceil(g.shortfall)+'隻必要。同じ艦の複数装備では増えません。装備可能な別の艦と空き枠も確認してください':g.asw?'艦別判定で必要装備・対潜値を確認。装備の個数に換算できない不足です':g.capability?'同じ艦の推奨セットが未完成。下の装備別不足・配備可否を確認してね':g.kind==='高速化'?(g.goalKind==='speed-ship'?'缶の種類・改修値・同じ艦への配備、到達可能な速力を確認':`同じ艦のセットがあと ${Math.ceil(g.shortfall)}組。タービン・缶の内訳を確認してね`):['制空','索敵'].includes(g.kind)&&['air-value','los-value'].includes(g.goalKind||g.kind)?'性能・搭載枠を増やす必要あり':`配備不足 ${Math.ceil(g.shortfall)}個 / 同種の所持 ${g.owned}個`}。${g.placement&&!g.blocked&&!g.capability?'所持数は足りています。装備可否・配備枠・他の条件との両立を見直してね。':''}${g.candidates.length?'装備候補：'+esc(g.candidates.join('、')):'この編成に載せられる候補なし。艦種や装備枠を見直してね。'}</p><button type="button" class="ghost small" data-hd-oc-acquire="${esc(g.kind.startsWith('speed-')?'高速化':g.kind)}" ${attrs}>入手方法を見る</button>${hdOCPlacementHtml(g,c)}${hdOCCapabilityStockHtml(g)}${hdOCProcurementHtml(g,index,attrs,c)}</div>`).join('')}<div class="hd-oc-ships">${result.plan.ships.map(s=>`<p><b>${esc(s.ship)}</b><span>${esc([...s.items.map(x=>`第${x.slotIndex+1}：${x.name}${x.star?' ★'+x.star:''}`),...(s.expansion?[`増設：${s.expansion.name}${s.expansion.star?' ★'+s.expansion.star:''}`]:[])].join(' / ')||'配備なし')}</span></p>`).join('')}</div>${hdOCMissingShipsHtml(result.plan)}${hdOCOaswTarget(c)?hdOCOaswHtml(result.plan,attrs):''}${hdOCReviewHtml(reviews,attrs)}<button type="button" class="ghost small" data-hd-oc-alternatives ${attrs} ${searching?'disabled':''}>所持艦娘・代替装備で再探索</button>${result.alternativeNote?`<p data-hd-oc-alternative-note>${esc(result.alternativeNote)}</p>`:''}${hdOCProcurementUpdateHtml(c,result,attrs)}<button type="button" class="primary small" data-hd-oc-calculator ${attrs}>この配備で制空・索敵を確認</button><small>探索した配備案を制空・索敵プランナーへ反映済み。司令部Lvは同期値を使用します。</small><button type="button" class="ghost small" data-hd-oc-apply ${attrs}>${readiness.registeredReady?'この配備を保存編成に反映':readiness.status==='manual'?'未確認を含む配備案を保存':'不足を残した配備案を保存'}</button><small>登録済み目安・制空は熟練度なしの推定。探索で見つからない組み合わせもあります。保存後はゲーム側の装備を変更し、基地航空隊・ルート条件も確認してね。</small></div>`:''}</section>`;
+ return `<section class="hd-oc-panel" ${attrs}>${typeof hdSECapabilityHtml==='function'?(['6-5','7-2'].includes(map)||map==='1-5'&&c.index===1||map==='7-3'&&c.index===0||map==='7-4'&&c.index===0||map==='7-5'&&[0,1,2].includes(c.index)?hdSECapabilityHtml(map,c.fleet?.id||'',null,c.preset):hdSECapabilityHtml(map,c.fleet?.id||'')):''}<strong>手持ち装備で攻略条件を満たす</strong><p>${c.fleet?`対象：${esc(c.fleet.name||'保存編成')}。所持数・改修値・装備可否・空きスロットから配備案を探します。他の艦の装備も移し替える前提です。`:'先に自分用編成を保存・選択すると、艦ごとに手持ち装備を配備できます。'}</p>${hdMapRequirementsHtml(map,c.preset)}${hdOCRouteGoalHtml(c,attrs)}${hdOCAswSetHtml(c,attrs,aswChoice)}${hdOCOaswTargetHtml(c,attrs)}${hdOCPortHtml(c,result,attrs)}${result?'':hdOCSavedSearchHtml(c)}<button type="button" class="primary small" data-hd-oc-search ${attrs} ${c.fleet&&!searching&&aswCanSearch?'':'disabled'}>${searching?'手持ち装備を確認中…':'手持ちで条件を満たす配備を探す'}</button><button type="button" class="ghost small" data-hd-oc-select-fleet ${attrs}>艦隊を選ぶ・保存する</button>${result?`<div class="hd-oc-result"><b data-hd-oc-headline>${hdOCReviewHeadline(result.measure,reviews)}</b><p data-hd-oc-readiness>${esc(readiness.detail)}</p>${result.replacements?.length?`<p data-hd-oc-replacements>${result.replacements.map(x=>esc('第'+(x.index+1)+'艦：'+x.from+' → '+x.to+' Lv'+(x.level||'未確認'))).join(' / ')}</p>`:''}${hdOCSearchStatusHtml(result)}${hdOCRequiredChecksHtml(result.plan,result.measure)}${result.measure.goals.map(g=>`<div class="hd-oc-goal ${g.ok?'ready':g.unresolved?'manual':'missing'}"><strong>${esc(g.label)}：${g.ok?'充足':g.unresolved?(g.kind==='los-value'?'未確認':'未判定'):'不足'}</strong><small>${g.purpose==='route'?'経路必須':g.purpose==='recommendation'?'戦闘推奨':'選択した方針の目標'}</small><span>${esc(g.detail)}</span></div>`).join('')}${hdOCScoutingOptionsHtml(c,result)}${result.shortages.map((g,index)=>`<div class="hd-oc-shortage"><b>${esc(hdOCScoutingOptional(c,g)?g.label+'（任意目安）':g.label+'に必要なもの')}</b><p>${esc(g.detail)}。${g.routeEquipment?(g.goalKind==='drum-ships'?'ドラム缶':'電探')+'装備艦があと'+Math.ceil(g.shortfall)+'隻必要。同じ艦の複数装備では増えません。装備可能な別の艦と空き枠も確認してください':g.asw?'艦別判定で必要装備・対潜値を確認。装備の個数に換算できない不足です':g.capability?'同じ艦の推奨セットが未完成。下の装備別不足・配備可否を確認してね':g.kind==='高速化'?(g.goalKind==='speed-ship'?'缶の種類・改修値・同じ艦への配備、到達可能な速力を確認':`同じ艦のセットがあと ${Math.ceil(g.shortfall)}組。タービン・缶の内訳を確認してね`):['制空','索敵'].includes(g.kind)&&['air-value','los-value'].includes(g.goalKind||g.kind)?'性能・搭載枠を増やす必要あり':`配備不足 ${Math.ceil(g.shortfall)}個 / 同種の所持 ${g.owned}個`}。${g.placement&&!g.blocked&&!g.capability?'所持数は足りています。装備可否・配備枠・他の条件との両立を見直してね。':''}${g.candidates.length?'装備候補：'+esc(g.candidates.join('、')):'この編成に載せられる候補なし。艦種や装備枠を見直してね。'}</p><button type="button" class="ghost small" data-hd-oc-acquire="${esc(g.kind.startsWith('speed-')?'高速化':g.kind)}" ${attrs}>入手方法を見る</button>${hdOCPlacementHtml(g,c)}${hdOCCapabilityStockHtml(g)}${hdOCProcurementHtml(g,index,attrs,c)}</div>`).join('')}<div class="hd-oc-ships">${result.plan.ships.map(s=>`<p><b>${esc(s.ship)}</b><span>${esc([...s.items.map(x=>`第${x.slotIndex+1}：${x.name}${x.star?' ★'+x.star:''}`),...(s.expansion?[`増設：${s.expansion.name}${s.expansion.star?' ★'+s.expansion.star:''}`]:[])].join(' / ')||'配備なし')}</span></p>`).join('')}</div>${hdOCMissingShipsHtml(result.plan)}${hdOCOaswTarget(c)?hdOCOaswHtml(result.plan,attrs):''}${hdOCReviewHtml(reviews,attrs)}<button type="button" class="ghost small" data-hd-oc-alternatives ${attrs} ${searching?'disabled':''}>所持艦娘・代替装備で再探索</button>${result.alternativeNote?`<p data-hd-oc-alternative-note>${esc(result.alternativeNote)}</p>`:''}${hdOCProcurementUpdateHtml(c,result,attrs)}<button type="button" class="primary small" data-hd-oc-calculator ${attrs}>この配備で制空・索敵を確認</button><small>探索した配備案を制空・索敵プランナーへ反映済み。司令部Lvは同期値を使用します。</small><button type="button" class="ghost small" data-hd-oc-apply ${attrs}>${readiness.registeredReady?'この配備を保存編成に反映':readiness.status==='manual'?'未確認を含む配備案を保存':'不足を残した配備案を保存'}</button><small>登録済み目安・制空は熟練度なしの推定。探索で見つからない組み合わせもあります。保存後はゲーム側の装備を変更し、基地航空隊・ルート条件も確認してね。</small></div>`:''}</section>`;
 }
 function hdOCInlineResult(map,fleetId){
  const c=hdOCContext(map,fleetId),result=HD_OC_CACHE.get(`${map}:${fleetId}:${c.index}`);
@@ -935,10 +1017,11 @@ function hdOCInlineRefresh(){if(typeof renderCustomFleets==='function'&&typeof s
 document.addEventListener('change',e=>{if(e.target.id==='hdMapStrategyRoute'){setTimeout(hdOCInlineRefresh,0);return}if(!e.target.matches?.('[data-hd-oc-inline-route]'))return;const map=e.target.dataset.hdOcMap,index=Number(e.target.value);if(typeof hdMapRouteSet==='function'){if(!hdMapRouteSet(map,index))hdOCRefresh();return}if(typeof hdMSNRouteByMap!=='undefined')hdMSNRouteByMap[map]=index;hdOCRefresh()});
 window.addEventListener('hd:map-route-changed',hdOCRefresh);
 ['hd:night-ci-policy','hd:equipment-changed','hd:kancolle-sync','hd:custom-fleets-changed','hd:ship-identity-changed','hd:workspace-refresh'].forEach(event=>window.addEventListener(event,hdOCInlineRefresh));
-window.addEventListener('storage',e=>{if(e.key==='harbordesk-map-routes-v1'){hdOCRefresh();return}if(e.key===null||[HD_SE_NIGHT_POLICY_KEY,'harbordesk-custom-fleets-v1','harbordesk-equipment-v1','harbordesk-ship-roster-v1','harbordesk-kancolle-sync-v1'].includes(e.key))hdOCInlineRefresh()});
+window.addEventListener('storage',e=>{if(e.key==='harbordesk-map-routes-v1'){hdOCRefresh();return}if(e.key===null||[HD_SE_NIGHT_POLICY_KEY,HD_OC_ASW_SET_CHOICE_KEY,'harbordesk-custom-fleets-v1','harbordesk-equipment-v1','harbordesk-ship-roster-v1','harbordesk-kancolle-sync-v1'].includes(e.key))hdOCInlineRefresh()});
 window.addEventListener('hd:map-air-changed',()=>hdOCRefresh());
 function hdOCRefresh(){hdOCInlineRefresh();if(typeof hdRenderMapEquipmentRecommendations==='function')hdRenderMapEquipmentRecommendations();if(typeof hdMSNRender==='function')hdMSNRender()}
 document.addEventListener('change',e=>{
+ const aswSets=e.target.closest?.('[data-hd-oc-asw-sets]');if(aswSets){const c=hdOCContext(aswSets.dataset.hdOcMap,aswSets.dataset.hdOcFleet,aswSets.dataset.hdOcRoute);try{hdOCAswSetSave(c,aswSets.value);window.dispatchEvent(new Event('hd:asw-set-choice'));hdOCRefresh()}catch{hdToast('対潜組数設定を保存できませんでした。元の値を保持しています','warn');hdOCRefresh()}return}
  const port=e.target.closest?.('[data-hd-oc-port-ship]');if(port){const c=hdOCContext(port.dataset.hdOcMap,port.dataset.hdOcFleet,port.dataset.hdOcRoute);try{hdOCPortSave(c,Number(port.dataset.hdOcPortShip),port.checked);hdOCRefresh()}catch{port.checked=!port.checked;hdToast('担当艦を保存できませんでした。保存値・個体を確認して再操作してください','warn')}return}
  const route=e.target.closest?.('[data-hd-oc-route-goal]');if(route){const auto=String(route.dataset.hdOcFleet||'').startsWith('auto:')?HD_FL_CACHE[route.dataset.hdOcMap+':'+String(route.dataset.hdOcFleet).split(':').at(-1)]:null,c=auto?hdFLContext(auto):hdOCContext(route.dataset.hdOcMap,route.dataset.hdOcFleet,route.dataset.hdOcRoute);if(!MAP_PLANS[c.map]?.routeBranches?.goals?.[route.value])return;let stored={};try{stored=JSON.parse(localStorage.getItem(HD_OC_ROUTE_GOAL_KEY)||'{}');stored[`${c.map}:${c.fleet?.id||''}`]=route.value;localStorage.setItem(HD_OC_ROUTE_GOAL_KEY,JSON.stringify(stored))}catch{hdToast('ルート目標を保存できませんでした','warn');return}if(auto){const card=route.closest('.hd-fs-card');if(card){hdFLRender(auto.index,card);hdFSRender()}}else hdOCRefresh();return}
  const input=e.target.closest?.('[data-hd-oc-asw-target],[data-hd-oc-oasw-ship][data-hd-oasw-value]');if(!input)return;
@@ -957,6 +1040,7 @@ document.addEventListener('change',e=>{
  if(typeof hdFCImportOwnedPlanForUI==='function')hdFCImportOwnedPlanForUI(c,result);hdOCRefresh();
 });
 window.addEventListener('hd:opening-asw-target',()=>{if(typeof hdFLInvalidate==='function')hdFLInvalidate()});
+window.addEventListener('hd:asw-set-choice',()=>{if(typeof hdFLInvalidate==='function')hdFLInvalidate()});
 document.addEventListener('click',e=>{
  const clear=e.target.closest?.('[data-hd-oc-port-clear]');if(clear){try{hdOCPortSave(hdOCContext(clear.dataset.hdOcMap,clear.dataset.hdOcFleet,clear.dataset.hdOcRoute),-1,false);hdOCRefresh()}catch{hdToast('担当艦を解除できませんでした。保存値を確認してください','warn')}return}
  const button=e.target.closest?.('[data-hd-oc-alternatives],[data-hd-oc-search],[data-hd-oc-calculator],[data-hd-oc-apply],[data-hd-oc-acquire],[data-hd-oc-select-fleet],[data-hd-oc-procure],[data-hd-oc-procurement-update],[data-hd-oc-review]');if(!button)return;
@@ -980,7 +1064,8 @@ document.addEventListener('click',e=>{
  const key=`${c.map}:${c.fleet.id}:${c.index}`;
  if(button.hasAttribute('data-hd-oc-acquire')){if(typeof hdAGOpen==='function')hdAGOpen(button.dataset.hdOcAcquire,c.map);return}
  if(button.hasAttribute('data-hd-oc-search')){
-  const signature=hdOCSignature(c);if(HD_OC_PENDING.get(key)?.signature===signature)return;
+  const aswChoice=hdOCAswSetCapture(c);if(!hdOCAswSetCanSearch(aswChoice,c)){hdToast(aswChoice?.selection?.state==='invalid'?'保存した対潜組数設定を確認できません。元の値を保持しています':'対潜装備セットの組数か「比較しない」を選んでください','warn');return}
+  const signature=hdOCSignature(c,aswChoice);if(HD_OC_PENDING.get(key)?.signature===signature)return;
   const pending={signature};HD_OC_PENDING.set(key,pending);button.disabled=true;button.textContent='手持ち装備を確認中…';
   const finish=()=>{if(HD_OC_PENDING.get(key)===pending)HD_OC_PENDING.delete(key)};
   hdOCSearchAsync(c).then(result=>{finish();HD_OC_CACHE.set(key,result);if(typeof hdFCImportOwnedPlanForUI==='function')hdFCImportOwnedPlanForUI(c,result);hdOCRefresh()}).catch(err=>{

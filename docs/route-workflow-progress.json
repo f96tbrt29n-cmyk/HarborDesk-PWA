@@ -464,7 +464,7 @@
           ]
         }
       },
-      "remaining": "CL2DD2の有限接続/新6代表保持も確認（原本/独立照合閉鎖）。BBV1CL2DD1の限定接続とC/W6代表/保持・原本独立照合も確認。BBV1CL1DD2の限定接続とC/W6代表の操作保持は確認。軽巡1＋駆逐3など他の既知四隻例、三隻CL2DDの検査済み不一致以外の2–3隻各構成、全目標/在庫/改修/枠競合/全機種/同期操作、装備の必要十分性・先制人数/火力/勝利は未確認。新source6c08381fのsmokeは5成功/W4 smoke取消で、全W最終結果は未確定。自身C3初回成功/W3 framework未確定を分け、6件の保存/load保持metadataと回収独立照合を確認。旧操作不安定の原因は別に保持。 新BBV1CL2DD1検証sourcead793f1aのCIは全C897/0/1・全W886/10/2で確定。新W不足初回load未到達とretry1完了を分け、metadata19の観測保持比較・他最終3件の停止境界・復旧後原本/独立照合を追補した。raw大容量3件・counter/呼出し元/原因の欠測は保持。 index2/DD4は別スコープで、新CL2DD2検証source48399416のCIはC901/0/0・W1–3小計675/1/0、W4/fullW未確定で記録を閉鎖。新light6保持metadataとC3pass/W3 framework不明を分け、旧cohort2初回load/nav欠測を保持。"
+      "remaining": "CL2DD2の有限接続/新6代表保持も確認（原本/独立照合閉鎖）。BBV1CL2DD1の限定接続とC/W6代表/保持・原本独立照合も確認。BBV1CL1DD2の限定接続とC/W6代表の操作保持は確認。共通四隻scopeの未実施個別構成、登録四隻対象外で出典本文/G/Dの適用隻数不一致が残る2–3隻、全目標/在庫/改修/枠競合/全機種/同期操作、装備の必要十分性・先制人数/火力/勝利は未確認。新source6c08381fのsmokeは5成功/W4 smoke取消で、全W最終結果は未確定。自身C3初回成功/W3 framework未確定を分け、6件の保存/load保持metadataと回収独立照合を確認。旧操作不安定の原因は別に保持。 新BBV1CL2DD1検証sourcead793f1aのCIは全C897/0/1・全W886/10/2で確定。新W不足初回load未到達とretry1完了を分け、metadata19の観測保持比較・他最終3件の停止境界・復旧後原本/独立照合を追補した。raw大容量3件・counter/呼出し元/原因の欠測は保持。 index2/DD4は別スコープで、新CL2DD2検証source48399416のCIはC901/0/0・W1–3小計675/1/0、W4/fullW未確定で記録を閉鎖。新light6保持metadataとC3pass/W3 framework不明を分け、旧cohort2初回load/nav欠測を保持。 今回CL1DD3と独立ASW数量選択を有限確認。新6は5初回成功＋C不足の文言期待訂正後成功、旧代表4は3完了/knownWloadクリック非表示で全文未到達。Node論理67/物理92・現行model7、保存200/load180と原本独立照合を記録し、旧欠測を補完しない。source/CIは新記録時pending。 invalid/未知形式は原値保持readonly停止で復旧UI対象外、旧API5–7の新select非対応・丸めなし、全モード保存操作は未実証。"
     },
     {
       "id": "1-5/2/default",
@@ -3232,12 +3232,12 @@
   ],
   "selected": {
     "id": "1-5/1/default",
-    "baselineHead": "48399416013bf54b9fff7ea53ceee2ba97958239",
-    "record": "oneFiveCl2Dd2CIFinalization20261031",
-    "evidence": "docs/pr152-one-five-cl2-dd2-ja.md",
-    "state": "CI source483 finalized with W4 gaps: C901complete/W1-3subtotal675/1/0/fullWnull; current6metadata complete/C3pass/W3frameworknull; related2 initial-load gaps retained; whole route partial"
+    "baselineHead": "d36087d2",
+    "record": "oneFiveCl1Dd3Local20261031",
+    "evidence": "docs/pr152-one-five-cl1-dd3-ja.md",
+    "state": "qualified local scope closed; new6 completed after one concrete fixture correction; oldcanonicalWknown load comparison unreached; source commit/CI pending"
   },
-  "nextPriority": "次CL1DD3は出典/DFGのsource-only照合まで完了、実装/操作未実施。現sourceM当時の未実施記録と旧CI欠測を保持し、記録only通常push[skip ci]後に独立単位として進める。不足を埋める追加試験/CIは起動しない。",
+  "nextPriority": "2-5/index1 CEIO：Iの索敵係数1で31以上34未満のランダム域が最終route/readinessで固定O成立に変わらない接続を優先確認。source-only根拠/26境界案は閉鎖、実装/操作は未着手。Eの軽巡1以上＋駆逐4以上の先行条件は別候補。旧1-5Wのload全文/呼出し元欠測と2–3隻の出典不一致は保持し、推測調査や同型helperの無制限追加をしない。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -17813,5 +17813,511 @@
     "evidence": "docs/pr152-one-five-cl2-dd2-ja.md",
     "state": "finite knownCL2DD2 route/goal guidance and local6 first passes with original/independent closure complete; new sourceCI pending; whole route partial"
   },
-  "nextPriorityBeforeOneFiveCl2Dd2CIFinalization20261031": "まずCL2DD2の最終source/通常CIを確定する（局所原本/独立sealは完了）。次は同じ1-5/index1 ADFGJ軽巡1＋駆逐3の出典/DFG優先/例拘束を独立確認する（今回literalではmanual維持、次対象未実施）。index2/DD4、全在庫/枠/同期と旧欠測を分ける。"
+  "nextPriorityBeforeOneFiveCl2Dd2CIFinalization20261031": "まずCL2DD2の最終source/通常CIを確定する（局所原本/独立sealは完了）。次は同じ1-5/index1 ADFGJ軽巡1＋駆逐3の出典/DFG優先/例拘束を独立確認する（今回literalではmanual維持、次対象未実施）。index2/DD4、全在庫/枠/同期と旧欠測を分ける。",
+  "oneFiveCl1Dd3Local20261031": {
+    "record": "oneFiveCl1Dd3Local20261031",
+    "document": "docs/pr152-one-five-cl1-dd3-ja.md",
+    "baseHeadReportedShort": "d36087d2",
+    "finalSourceHEAD": null,
+    "state": "local-qualified-complete-with-one-legacy-load-checkpoint-unreached; source-commit-and-CI-pending",
+    "sourceFindings": {
+      "CL1DD3Applicable": true,
+      "mandatoryOrDefaultASW3Or4QuantityGrounded": false,
+      "ASWQuantityDifferentFromRoutingOASWAndBBVWater": true
+    },
+    "productDesign": {
+      "files": [
+        "fleet-readiness-evaluator.js",
+        "sortie-equipment-check.js",
+        "map-plans.js",
+        "owned-equipment-planner.js"
+      ],
+      "sharedFourHullRouteScopeAndAO0": true,
+      "ASWSetSelectionIndependent": [
+        {
+          "state": "legacy-default3",
+          "meaning": "old4 exact families + known ships/frames/equipment + no explicit setting only",
+          "quantityBasis": "compatibility comparison, not a new source recommendation",
+          "search": "existing3 comparison retained by design; actual regression pending"
+        },
+        {
+          "state": "unselected",
+          "meaning": "ASW quantity not selected; no needed/missing/purchase number asserted",
+          "search": "other explicit goals may be searched; otherwise require quantity or off choice"
+        },
+        {
+          "state": "off",
+          "meaning": "user excludes ASW-set comparison; not zero-set fulfilment",
+          "search": "ASW goal excluded; other conditions remain"
+        },
+        {
+          "state": "user-count1-4",
+          "meaning": "new UI explicit user comparison; no minimum3 lift",
+          "search": "selected count compared subject to fitting/stock/route checks"
+        },
+        {
+          "state": "invalid",
+          "meaning": "stored setting unverified; preserve raw value",
+          "search": "stop; no unconditional overwrite/clear"
+        }
+      ],
+      "old4KnownStockCompatibilityPreservedByDesign": true,
+      "old4UnknownUnselectedIsIntentionalChange": true,
+      "explicitExistingAPIGoalRange": "explicit 1-7 retained by tested limited strategy normalization; newUI1-4 is a separate domain",
+      "newUIRange": "1-4 only; no UI5+ implementation in this unit",
+      "currentApprovedSourcePins": {
+        "fleet-readiness-evaluator.js": "21d3d329bd71f3ddf4c6fef71b71db83093deb3d89838c5010f4cc311f6103ba",
+        "sortie-equipment-check.js": "3930c870e2dd4c1b6b3f361cd5c115cc5f690dd250135852e99d162d650d48ff",
+        "map-plans.js": "d95ee0297842fe4a92c854911db495cc86dbb7611fb124aec4a0242849b360a8",
+        "owned-equipment-planner.js": "39d9e276a20e6166708f76217ecd27c293fc5ba136f9e2413bff877ed6a9eebd"
+      },
+      "initialProposalInverseAtRead": {
+        "path": "private/combined-source-inverses.json",
+        "historicalSHA256": "acba272096d5ea1f2da273e6876c44231e1e5767ee442d627d72833ccdedfc8c",
+        "notFinalApproval": true
+      },
+      "materialOnlyNamelessRowGuard": "quantity eligibility only; route and save guards unchanged; seven named-row model executions valid for final predicate without repetition"
+    },
+    "verification": {
+      "initialSyntax": "4 files passed; not runtime initialization proof",
+      "initialNode": {
+        "tests": 20,
+        "pass": 1,
+        "fail": 19,
+        "newModelCalls": 0,
+        "classification": "draft product initialization defect: added AO predicate used local count across IIFE scope",
+        "originalPhase": "private/node-initial",
+        "failuresRetained": true
+      },
+      "repairsUnderway": [],
+      "requiredRevalidationPlanned": "completed staged necessary Node and representative browser phases; source commit and single normal smoke remain pending",
+      "NodeAfterRepair": {
+        "logicalTestsCovered": 67,
+        "new": 20,
+        "historicalLightGuards": 4,
+        "physicalExecutions": 92,
+        "phases": [
+          {
+            "phase": "initial",
+            "tests": 20,
+            "pass": 1,
+            "fail": 19,
+            "failureClass": "product draft initialization defect",
+            "actualModels": 0
+          },
+          {
+            "phase": "source-corrected-v2",
+            "tests": 20,
+            "pass": 17,
+            "fail": 3,
+            "failureClass": "harness expectation/slice defects retained for necessary correction",
+            "actualModels": 7
+          },
+          {
+            "phase": "targeted-v3",
+            "tests": 9,
+            "pass": 9,
+            "fail": 0,
+            "scope": "necessary corrected light checks5 plus previously unexecuted historical light guards4",
+            "actualModels": 0
+          },
+          {
+            "phase": "generic-integration",
+            "commands": 17,
+            "tests": 43,
+            "pass": 43,
+            "fail": 0,
+            "skip": 0,
+            "cancel": 0,
+            "actualModels": 0,
+            "scope": "actual dependency loading and approved historical inverse/condition binding only"
+          }
+        ],
+        "allInitiallyPassed": false,
+        "successfulModelsRepeated": false,
+        "node": "24.21.0",
+        "playwright": "1.55.0",
+        "browserExecutedInNode": false,
+        "receiptRefs": [
+          {
+            "path": "private/node-initial/node-result.json",
+            "sha256": "7105aa0e4d3dcf2d745cd235bb85362279b63e030f74bda4ab8e1664598aea92"
+          },
+          {
+            "path": "private/node-source-corrected/node-result.json",
+            "sha256": "01bd9646615c6304745ca153fd1b1d27dd7ffe5ea0bf28e9d2f8aca37aef3725"
+          },
+          {
+            "path": "private/node-targeted-v3/node-result.json",
+            "sha256": "63a4245db4c5a166ff758e2d9a7b3aa1d13affaef4ec0a76ecf38cb0394fdac6"
+          },
+          {
+            "path": "private/node-generic-integration/node-result.json",
+            "bytes": 13403,
+            "sha256": "8d8c21ff624e3501fd5ccf23bc795aa8d02e0c7a5c77478cd391ca1622368ca9"
+          }
+        ],
+        "genericLightAssertions": 43
+      },
+      "modelResults": {
+        "currentCalls": 7,
+        "passed": 7,
+        "phase": "source-corrected-v2 only",
+        "oldKnownStockAndHistoricalSearchCalls": 0,
+        "modelObservationSHA256": "d7810e01a625ed46fd8c6019052a1642aee6f83d08a6666645e3835eaefb5ba7",
+        "independentFinalBinding": {
+          "path": "private/independent-product-review/final-product-and-model-reuse-review.json",
+          "bytes": 32593,
+          "sha256": "8b59bc6d9b467b751e5c82c252bd5f56be0c537a74b8d2b4d9b09f8448beeb09"
+        },
+        "sourceAfterModelQualification": "v3 quantity material-name guard only; all seven input and returned rows named, result unchanged; actual model rerun0",
+        "directOldKnownStockParityStates": 8
+      },
+      "browserResults": {
+        "logicalTargets": 10,
+        "completedSuccessfulLogicalTargets": 9,
+        "observedPhysicalExecutions": 11,
+        "plannedPhysicalExecutionsIfAllRemainingRun": null,
+        "phases": [
+          {
+            "phase": "runtime-v1",
+            "cases": [
+              {
+                "id": "currentCknown",
+                "attempt": "first",
+                "frameworkResult": "passed",
+                "savedIdentityComparisons": 20,
+                "loadIdentityComparisons": 20,
+                "extraRows": 2,
+                "extraRowsAllEmpty": true,
+                "allPreservationComparisons": true,
+                "stage": "completed"
+              },
+              {
+                "id": "currentCstock",
+                "attempt": "first",
+                "frameworkResult": "failed",
+                "elapsedSecondsApprox": 19,
+                "firstFailure": "spec108 expected obsolete phrase 購入数量ではありません; actual correct phrase 購入数量とは別で",
+                "classification": "single stock-branch literal expectation defect",
+                "reached": "first search completed; finite stock and four targets checked",
+                "gapSaveEditLoadReached": false,
+                "savedIdentityComparisons": null,
+                "loadIdentityComparisons": null,
+                "originalsRetained": true
+              }
+            ]
+          },
+          {
+            "phase": "runtime-v2",
+            "runtimePrefixReported": "12cc2",
+            "specCorrectionSHA256PrefixReported": "ea0b19fc",
+            "onlyChangedScope": "one stock-branch expected literal; product4, fixture and other spec unchanged",
+            "necessaryTargets": 9,
+            "results": {
+              "necessaryTargets": 9,
+              "passed": 8,
+              "failed": 1,
+              "retry": 0,
+              "failedTarget": "oldCanonicalWknown",
+              "failureStage": "after-load-search-click",
+              "failure": "button not visible; timeout",
+              "savedIdentityComparisons": 20,
+              "loadIdentityComparisons": null,
+              "displayChangeCaller": null,
+              "sameCauseAsOldFailure": null,
+              "originalsRetained": true,
+              "classification": "legacy operation instability at same observed stage only; caller/cause unknown"
+            }
+          }
+        ],
+        "reusedCknown": {
+          "sourceBranchUnaffected": true,
+          "reexecutions": 0
+        },
+        "successfulCknownDoesNotFillFirstCstockMissingStages": true,
+        "finalSourceBindingAndIndependentReview": {
+          "path": "private/local-independent-review/final-primary-browser-join-review.json",
+          "bytes": 7919,
+          "sha256": "22574d64a968684eb114395a5d31a4259a481754718ab83e38c7962498a51bc8"
+        },
+        "logicalFinalSummary": {
+          "completed": 9,
+          "oldCanonicalWknownLoadClickTimeout": 1,
+          "allLogicalPassed": false,
+          "oneFailedLoadNotCompleted": true
+        },
+        "physicalFinalSummary": {
+          "pass": 9,
+          "literalExpectationFail": 1,
+          "timedOut": 1,
+          "frameworkAttempts": 11,
+          "retryIndex": "all0; necessary correction is separate execution"
+        },
+        "currentSix": {
+          "initialPass": 5,
+          "firstLiteralExpectationFailure": 1,
+          "requiredCorrectionPass": 1,
+          "logicalCompleted": 6,
+          "notAllInitialPass": true
+        },
+        "preservationAggregateIndependent": {
+          "savedTrials": 10,
+          "savedIdentityComparisons": 200,
+          "savedBlankRows": 12,
+          "loadTrials": 9,
+          "loadIdentityComparisons": 180,
+          "loadBlankRows": 10,
+          "observedPositivePreservationMismatch": 0,
+          "savedAll10FullValueKeyComparisonsExact": true,
+          "loadObserved9FullValueKeyComparisonsExact": true,
+          "missingFirstStockAfterValuesAndLegacyWLoadValuesRemainNull": true,
+          "quantityModes": "current6 explicit count3; off/unset toggled only in current-known C/W2; other modes are Node boundaries, not all persisted browser workflows",
+          "reference": "private/local-independent-review/independent-trial-aggregate.json",
+          "sha256": "d699011b2f283aa77c798cf01ea9b3dd0234126e3b65204da279cb08dcde4926",
+          "finalManifestJoin": {
+            "path": "private/local-independent-review/final-primary-browser-join-review.json",
+            "bytes": 7919,
+            "sha256": "22574d64a968684eb114395a5d31a4259a481754718ab83e38c7962498a51bc8"
+          }
+        }
+      },
+      "collectionAndIndependentClosure": {
+        "status": "closed with one legacy load operation still unconfirmed",
+        "finalSeal": true,
+        "references": {
+          "browserCanonical": {
+            "path": "private/local-final-records/canonical.json",
+            "bytes": 2524,
+            "sha256": "ddd49176b35e8f65c08d543a873682427ccc55f8d998177d7ee9db4d143b48b0"
+          },
+          "browserManifest": {
+            "path": "private/local-final-records/manifest.json",
+            "bytes": 119014,
+            "sha256": "0e05ca8039902973fe31ecb33c58e06181eddc48ed9254ff5ba682715484a4ef"
+          },
+          "browserClosure": {
+            "path": "private/local-final-records/closure.json",
+            "bytes": 822,
+            "sha256": "8f7610ca6601580f273828958f30be8d206cec5597cd76ed0b10ed5f7693c5fc"
+          },
+          "independentJoin": {
+            "path": "private/local-independent-review/final-primary-browser-join-review.json",
+            "bytes": 7919,
+            "sha256": "22574d64a968684eb114395a5d31a4259a481754718ab83e38c7962498a51bc8"
+          },
+          "independentManifest": {
+            "path": "private/local-independent-review/manifest.json",
+            "bytes": 6375,
+            "sha256": "70a09ccea1734a5653a52ada36edebfa673aeb7a88bf5f29fd904db4b7e6c25b"
+          },
+          "independentClosure": {
+            "path": "private/local-independent-review/closure.json",
+            "bytes": 1566,
+            "sha256": "e8ba32982b2c0509bff5debc63495123b75cd1e9aa08b1ed6aa67f2b930aa0f3"
+          }
+        },
+        "traceZIPs": 11,
+        "traceCRCMembers": 1300,
+        "videoFiles": 11,
+        "videoPlayback": 0,
+        "sharedAllowlistedCandidates": 9,
+        "externalUpload": 0,
+        "qualifiedRawOriginalScope": "trial originals371files + preflight74files; before/after full contents and captured attributes unchanged; no global old-workspace claim"
+      },
+      "repairsAppliedBeforeVerification": [
+        "map AO predicate literal normalization after initialization failure",
+        "FE-only normalization preserving existing explicit true+strategy rows",
+        "quantity-only rejection of material-only nameless row; route/save guard unchanged"
+      ],
+      "browserPlan": {
+        "logicalTargets": 10,
+        "allScheduledCasesExecuted": true,
+        "additionalExecutionsPlanned": 0,
+        "successfulTargetReexecutions": 0
+      },
+      "genericNodeAuditCorrection": {
+        "commands": 17,
+        "tests": 43,
+        "pass": 43,
+        "fail": 0,
+        "skip": 0,
+        "cancel": 0,
+        "actualModelCalls": 0,
+        "state": "completed",
+        "actualResults": {
+          "path": "private/node-generic-integration/node-result.json",
+          "bytes": 13403,
+          "sha256": "8d8c21ff624e3501fd5ccf23bc795aa8d02e0c7a5c77478cd391ca1622368ca9"
+        },
+        "actualNoModelsReceipt": {
+          "path": "private/node-generic-integration/observations.json",
+          "bytes": 251,
+          "sha256": "03572fedcaa98b604ae725e86dc716927fcb47582248b016e78d0f511e9573a9"
+        },
+        "correctionProof": {
+          "path": "private/generic-node-harness-correction-001/proposal-proof.json",
+          "bytes": 3527,
+          "sha256": "f5c2eacd25080b1a89683f4c3f8db0565bd34319f141fb77de2c37df6e57241c"
+        },
+        "current6ConditionsRef": {
+          "path": "private/generic-node-harness-correction-001/current-one-five-six-conditions.json",
+          "bytes": 1579,
+          "sha256": "0f53638a69fe183bcc66ea6b51da2eb7ef3cc80354cad76080bfeadd69cf653c"
+        },
+        "conditionsBindings": "only route-goal-guidance-audit.json row7 and route-requirement-validation-scope.json example5 add source-required AO0 atindex2; checker projects only approved AO0 to original historical hash",
+        "sourceAndFixtureAndBrowserChanged": false,
+        "preserved": "all59statuses/other58whole rows/scouting/other52whole examples/original baseline hash fixtures",
+        "unverifiedChecklistNewConditionsField": false
+      }
+    },
+    "fourHullOverview": [
+      {
+        "formation": "BBV1DD3",
+        "sourceRouteScope": "index1 ADFGJ finite/shared source scope",
+        "newDefaultWhenKnownStockAndNoSetting": "legacy-default3 compatibility only",
+        "newDefaultWhenUnknownAndNoSetting": "unselected, intentional change",
+        "waterBBVScope": "separate existing BBV water comparison",
+        "currentNodeUIOutcome": "knownstock direct parity; unknown material classification intentionally unselected without explicit goal; representative legacyC/W4 gives3pass/knownWload-click timeout",
+        "priorEvidence": "docs/pr152-one-five-middle-ja.md"
+      },
+      {
+        "formation": "BBV1CL1DD2",
+        "sourceRouteScope": "index1 ADFGJ finite/shared source scope",
+        "newDefaultWhenKnownStockAndNoSetting": "legacy-default3 compatibility only",
+        "newDefaultWhenUnknownAndNoSetting": "unselected, intentional change",
+        "waterBBVScope": "separate existing BBV water comparison",
+        "currentNodeUIOutcome": "oldknownstock direct parity and actual unknown usercount3 model; old operation successes reused only in unchanged scope, no new all-family browser claim",
+        "priorEvidence": "docs/pr152-one-five-bbv-cl-ja.md"
+      },
+      {
+        "formation": "BBV1CL2DD1",
+        "sourceRouteScope": "index1 ADFGJ finite/shared source scope",
+        "newDefaultWhenKnownStockAndNoSetting": "legacy-default3 compatibility only",
+        "newDefaultWhenUnknownAndNoSetting": "unselected, intentional change",
+        "waterBBVScope": "separate existing BBV water comparison",
+        "currentNodeUIOutcome": "oldknownstock direct parity and actual unknown usercount3 model; old operation successes reused only in unchanged scope, no new all-family browser claim",
+        "priorEvidence": "docs/pr152-one-five-bbv-cl2-ja.md"
+      },
+      {
+        "formation": "CL2DD2",
+        "sourceRouteScope": "index1 ADFGJ finite/shared source scope",
+        "newDefaultWhenKnownStockAndNoSetting": "legacy-default3 compatibility only",
+        "newDefaultWhenUnknownAndNoSetting": "unselected, intentional change",
+        "waterBBVScope": "known noBBV default water non-applicable; not zero-fulfilled",
+        "currentNodeUIOutcome": "oldknownstock direct parity and actual unknown usercount3 model; old operation successes reused only in unchanged scope, no new all-family browser claim",
+        "priorEvidence": "docs/pr152-one-five-cl2-dd2-ja.md"
+      },
+      {
+        "formation": "CL1DD3",
+        "sourceRouteScope": "source confirmed index1 ADFGJ; new6 completed under explicit usercount3",
+        "newDefaultWhenKnownStockAndNoSetting": "unselected",
+        "newDefaultWhenUnknownAndNoSetting": "unselected",
+        "waterBBVScope": "known noBBV non-applicable; unknown cannot prove noBBV",
+        "currentNodeUIOutcome": "current6:5 initial pass +Cstock after necessary literal-expectation correction pass; selection-state boundaries Node; not all modes persisted in every browser case",
+        "priorEvidence": "source-only plan, not operation evidence"
+      }
+    ],
+    "currentCIHistory": "CI411975 C901/0/0 complete; W1-3 subtotal675/1/0; W4cancel/fullWnull; oldcohorts C3pass/W3frameworknull and all load/nav/raw/atime gaps retained",
+    "progress": {
+      "before": [
+        27,
+        151,
+        58
+      ],
+      "after": [
+        27,
+        151,
+        58
+      ],
+      "cellDelta": 0,
+      "noSameRowPromotion": true
+    },
+    "remaining": [
+      "2–3 hulls are outside this registered four-hull scope; source narrative four / G table at most4 / D2–4 differ; applicability waits for source resolution, not a general impassability claim",
+      "rare classes outside confirmed source domain remain unverified; names do not establish membership",
+      "legacy canonical WebKit known load click was hidden after saved20 comparisons; load full value comparison, click delivery/handler/display caller and cause unobserved",
+      "all ordinary four-hull combinations, optional modes across every save operation, finite inventories/slot conflicts/upgrades/sync updates and other routes not exhaustively verified",
+      "invalid/unknown-format ASW setting user recovery UI and new select UI for explicitAPI5-7 are not implemented; values are retained without clamp/reinitialization; no all-mode save-operation proof"
+    ],
+    "nextProposedTarget": {
+      "row": "2-5/1/default",
+      "path": "CEIO",
+      "priorityCondition": "I node coefficient1 score31<=x<34 random band must remain partial through final route/readiness, not fixed-O fulfilment",
+      "state": "source-only plan closed; concrete static connection candidate, no product execution or implementation",
+      "secondaryCandidate": "E earlier CL1+/DD4+ bypasses general fast-uniform condition; separate bounded condition",
+      "sourcePlan": {
+        "path": "private/next-two-five-source-only/plan.json",
+        "bytes": 15232,
+        "sha256": "67996ca703acc39c234d9fcb03c56dc537dfe63ad793f7725b8e774a90e576cc"
+      },
+      "doNotPromoteSafety34ToNewMandatoryGearOrPurchaseQuantity": true
+    },
+    "oldLocalCIHistoryPreserved": true,
+    "wholeRouteOrPublicationReady": false,
+    "commonScopeBoundaryExamples": [
+      {
+        "formation": "DD4",
+        "evidenceKind": "shared ship-class/count connection and representative Node boundary matrix; not individual proof for every ordinary composition",
+        "realOperationResultThisUnit": null
+      },
+      {
+        "formation": "CVL1DD3",
+        "evidenceKind": "shared ship-class/count connection and representative Node boundary matrix; not individual proof for every ordinary composition",
+        "realOperationResultThisUnit": null
+      },
+      {
+        "formation": "DD3DE1",
+        "evidenceKind": "shared ship-class/count connection and representative Node boundary matrix; not individual proof for every ordinary composition",
+        "realOperationResultThisUnit": null
+      }
+    ],
+    "noEveryOrdinaryCompositionClaim": true,
+    "baseHead": "d36087d2d285553f2fe1ab1b101eed3012f3b7b3",
+    "recordedDateUTC": "2026-10-31",
+    "CI": {
+      "state": "not-started-for-final-source",
+      "runID": null,
+      "result": null,
+      "priorCIHistoryUnchanged": true
+    },
+    "evidenceReferences": {
+      "productReview": {
+        "path": "private/independent-product-review/final-product-and-model-reuse-review.json",
+        "bytes": 32593,
+        "sha256": "8b59bc6d9b467b751e5c82c252bd5f56be0c537a74b8d2b4d9b09f8448beeb09"
+      },
+      "modelReview": {
+        "path": "private/root-model-review-v3.json",
+        "bytes": 13767,
+        "sha256": "df0dccab86ba6aaea9403eed3e60782ed4de6a129fccae29abfa85016caffa9c"
+      },
+      "currentConditions": {
+        "path": "private/generic-node-harness-correction-001/current-one-five-six-conditions.json",
+        "bytes": 1579,
+        "sha256": "0f53638a69fe183bcc66ea6b51da2eb7ef3cc80354cad76080bfeadd69cf653c"
+      },
+      "nextSourcePlan": {
+        "path": "private/next-two-five-source-only/plan.json",
+        "bytes": 15232,
+        "sha256": "67996ca703acc39c234d9fcb03c56dc537dfe63ad793f7725b8e774a90e576cc"
+      }
+    },
+    "previousTargetRemainingAtBase": "CL2DD2の有限接続/新6代表保持も確認（原本/独立照合閉鎖）。BBV1CL2DD1の限定接続とC/W6代表/保持・原本独立照合も確認。BBV1CL1DD2の限定接続とC/W6代表の操作保持は確認。軽巡1＋駆逐3など他の既知四隻例、三隻CL2DDの検査済み不一致以外の2–3隻各構成、全目標/在庫/改修/枠競合/全機種/同期操作、装備の必要十分性・先制人数/火力/勝利は未確認。新source6c08381fのsmokeは5成功/W4 smoke取消で、全W最終結果は未確定。自身C3初回成功/W3 framework未確定を分け、6件の保存/load保持metadataと回収独立照合を確認。旧操作不安定の原因は別に保持。 新BBV1CL2DD1検証sourcead793f1aのCIは全C897/0/1・全W886/10/2で確定。新W不足初回load未到達とretry1完了を分け、metadata19の観測保持比較・他最終3件の停止境界・復旧後原本/独立照合を追補した。raw大容量3件・counter/呼出し元/原因の欠測は保持。 index2/DD4は別スコープで、新CL2DD2検証source48399416のCIはC901/0/0・W1–3小計675/1/0、W4/fullW未確定で記録を閉鎖。新light6保持metadataとC3pass/W3 framework不明を分け、旧cohort2初回load/nav欠測を保持。",
+    "outOfScopeAndLimitedOperation": {
+      "invalidOrUnknownFormat": "original opaque value preserved; read-only stop, no automatic recovery or initialization",
+      "invalidRecoveryUI": "not implemented; outside this unit",
+      "legacyExplicitAPI5To7": "value retained without clamping; new select UI is not supported",
+      "allModesSavedOperationProven": false,
+      "browserModesObserved": "explicit count3 in current6; off/unset toggles only in known C/W2; remaining modes are Node boundaries"
+    }
+  },
+  "selectedBeforeOneFiveCl1Dd3Local20261031": {
+    "id": "1-5/1/default",
+    "baselineHead": "48399416013bf54b9fff7ea53ceee2ba97958239",
+    "record": "oneFiveCl2Dd2CIFinalization20261031",
+    "evidence": "docs/pr152-one-five-cl2-dd2-ja.md",
+    "state": "CI source483 finalized with W4 gaps: C901complete/W1-3subtotal675/1/0/fullWnull; current6metadata complete/C3pass/W3frameworknull; related2 initial-load gaps retained; whole route partial"
+  },
+  "nextPriorityBeforeOneFiveCl1Dd3Local20261031": "次CL1DD3は出典/DFGのsource-only照合まで完了、実装/操作未実施。現sourceM当時の未実施記録と旧CI欠測を保持し、記録only通常push[skip ci]後に独立単位として進める。不足を埋める追加試験/CIは起動しない。"
 }

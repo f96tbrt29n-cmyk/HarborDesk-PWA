@@ -556,11 +556,16 @@ function hdFEEquipmentRequirements(plan,rows){
  const contract=hdFERouteRequirementData(plan),noLos=contract?.los.kind==='none'||hdFEScoutingExemption(plan,contract)?.status==='ready';
  const scopedPT=plan?.map==='7-5'&&contract?.map==='7-5'&&contract.index===1&&contract.path==='ABDFJOQ';let previousPT;
  if(scopedPT)for(const row of rows||[])if(row.kind==='cap-pt')previousPT=row;
- const result=new Map((rows||[]).filter(r=>r.kind!=='基地航空隊').filter(r=>!r.generatedFromMap||r.kind.startsWith('cap-night-')&&hdSENightPolicy(plan.map)!=='auto'||(!contract?.equipmentKinds||contract.equipmentKinds.includes(r.baseKind||r.kind))&&!(noLos&&r.kind==='索敵')).map(r=>[r.kind,{...r,minCount:Math.max(1,Number(r.minCount)||1)}]));
+ const aswSelection=hdFEOneFiveAswSelection(plan,rows),explicitAsw=(rows||[]).filter(row=>row?.kind==='cap-asw'&&(row.generatedFromMap!==true||row.purpose==='strategy')).at(-1),omitAsw=aswSelection.applicable&&!['legacy-default','count'].includes(aswSelection.state);
+ const result=new Map((rows||[]).filter(r=>r.kind!=='基地航空隊'&&!(omitAsw&&r.kind==='cap-asw')).filter(r=>!r.generatedFromMap||r.kind.startsWith('cap-night-')&&hdSENightPolicy(plan.map)!=='auto'||(!contract?.equipmentKinds||contract.equipmentKinds.includes(r.baseKind||r.kind))&&!(noLos&&r.kind==='索敵')).map(r=>[r.kind,{...r,minCount:Math.max(1,Number(r.minCount)||1)}]));
  const recommended=(rows||[]).some(r=>r.generatedFromMap)||!rows?.length&&plan?.ships?.length&&(plan?.map==='3-1'&&contract?.map==='3-1'&&contract.index===0&&contract.path==='CFG'?hdFERoute(plan).status==='ready':hdFERouteBasic(plan).status==='ready');
  if(recommended&&contract?.carrierAttackTarget){const n=(plan.ships||[]).filter(s=>['軽空母','正規空母','装甲空母'].includes(hdFEFindShip(s.ship)?.type)).length;if(n)result.set('cap-carrier-attack',{kind:'cap-carrier-attack',baseKind:'航空攻撃',label:'空母の攻撃機配備',minCount:n,generatedFromMap:true});}
  if(recommended&&contract?.waterAttackTarget){const n=(plan.ships||[]).filter(s=>(contract.waterAttackTypes||['水上機母艦']).includes(hdFEFindShip(s.ship)?.type)).length;if(n)result.set('cap-water-attack',{kind:'cap-water-attack',baseKind:'航空攻撃',label:'水上爆撃機配備',minCount:n,generatedFromMap:true});}
  for(const r of hdFERouteRequirementData(plan)?.equipmentTargets||[]){
+  if(aswSelection.applicable&&r.kind==='cap-asw'){
+   if(omitAsw){result.delete(r.kind);continue;}
+   if(aswSelection.state==='count'){const old=result.get(r.kind),value={...r,...old,...explicitAsw,minCount:aswSelection.count};if(aswSelection.reason==='user-setting'||explicitAsw?.purpose==='strategy'){value.generatedFromMap=false;value.purpose='strategy';}result.set(r.kind,value);continue;}
+  }
   // This existing optional PT comparison gets an origin only when no input row
   // exists. Preserve the last user row even if the generic filter omitted it.
   if(scopedPT&&r.kind==='cap-pt'){const target=previousPT?{...r,...previousPT,minCount:Math.max(1,Number(previousPT.minCount)||1)}:{...r,minCount:Math.max(1,Number(r.minCount)||1),generatedFromMap:true};if(previousPT&&!Object.hasOwn(previousPT,'generatedFromMap'))delete target.generatedFromMap;result.set(r.kind,target);continue;}
@@ -598,10 +603,42 @@ function hdFEOneFiveLightExample(plan,data){
  const types=ships.map(s=>hdFEFindShip(s.ship)?.type);
  return types.every(type=>['軽巡洋艦','駆逐艦'].includes(type))&&types.filter(type=>type==='軽巡洋艦').length===2&&types.filter(type=>type==='駆逐艦').length===2;
 }
+function hdFEOneFiveRouteScope(plan,data=null){
+ const empty={applicable:false,known:false,eligible:false,family:'outside',sourceKind:'unverified',label:'選択編成',counts:[]};
+ if(plan?.map!=='1-5')return empty;data=data||(typeof hdFERouteRequirementData==='function'?hdFERouteRequirementData(plan):null);
+ if(data?.map!=='1-5'||data.index!==1||data.path!=='ADFGJ')return empty;
+ const ships=Array.isArray(plan.ships)?plan.ships.filter(s=>s?.ship):[],dbs=ships.map(s=>typeof hdFEFindShip==='function'?hdFEFindShip(s.ship):null),known=ships.length>0&&dbs.every(db=>!!db?.type),types=data.sourceFourHullTypes||[],counts=types.map(type=>dbs.filter(db=>db?.type===type).length),four=ships.length===4,covered=four&&known&&types.length===5&&['航空戦艦','軽巡洋艦','駆逐艦','海防艦','軽空母'].every((type,i)=>types[i]===type)&&dbs.every(db=>types.includes(db.type));
+ const allowed=covered&&counts[1]<=2&&counts[3]<=3&&counts[4]<=1,example=covered?(data.sourceFourHullExamples||[]).find(row=>Array.isArray(row.counts)&&row.counts.length===counts.length&&row.counts.every((value,i)=>value===counts[i])):null;
+ return {applicable:true,known,eligible:allowed,family:example?.id||(allowed?'table-derived':'unverified'),sourceKind:example?'explicit-example':allowed?'condition-table':'unverified',label:example?.label||(covered?types.map((type,i)=>counts[i]?type+counts[i]:'').filter(Boolean).join('＋'):'選択編成'),counts};
+}
+function hdFEOneFiveAswScope(plan){
+ const scope=hdFEOneFiveRouteScope(plan);if(!scope.applicable)return {...scope,materialKnown:false,legacyAllowed:false};
+ const data=hdFERouteRequirementData(plan),ships=(plan.ships||[]).filter(s=>s?.ship),c=scope.counts,legacy=c.length===5&&c[3]===0&&c[4]===0&&(c[0]===1&&c[1]>=0&&c[1]<=2&&c[2]===3-c[1]||c[0]===0&&c[1]===2&&c[2]===2)&&(data.legacyAswSetFamilies||[]).includes(scope.family);
+ const materialKnown=scope.eligible&&(plan.ships||[]).every(ship=>!!ship?.ship)&&!plan.preservationIssues?.length&&ships.every(ship=>{
+  const db=hdFEFindShip(ship.ship),profile=db&&typeof hdShipDbSlotProfile==='function'?hdShipDbSlotProfile(db):null;
+  if(!profile||!Number.isInteger(profile.count)||profile.count<0||!Array.isArray(profile.slots)||profile.slots.length<profile.count||profile.slots.slice(0,profile.count).some(value=>!Number.isFinite(value)||value<0))return false;
+  const items=Array.isArray(ship.items)?ship.items:typeof hdFEGearTokens==='function'?hdFEGearTokens(ship.gear||'').map(hdFEParseGearLabel):[];
+  return items.every(item=>!item.name||typeof hdFEFind==='function'&&!!hdFEFind(item.name))&&(!ship.expansion?.name||typeof hdFEFind==='function'&&!!hdFEFind(ship.expansion.name));
+ });
+ return {...scope,materialKnown,legacyAllowed:materialKnown&&legacy};
+}
+function hdFEOneFiveAswSelection(plan,rows=null){
+ const data=plan?.map==='1-5'&&typeof hdFERouteRequirementData==='function'?hdFERouteRequirementData(plan):null,applicable=data?.map==='1-5'&&data.index===1&&data.path==='ADFGJ';
+ const result=(state,count=null,explicit=false,reason='')=>({applicable,state,count,explicit,reason});if(!applicable)return result('unselected');
+ if(Object.hasOwn(plan,'aswSetSelection')){
+  const choice=plan.aswSetSelection;if(!choice||typeof choice!=='object'||Array.isArray(choice)||Object.keys(choice).some(key=>!['state','count','reason'].includes(key)))return result('invalid',null,true,'invalid-selection');
+  if((choice.state==='off'||choice.state==='unselected')&&!Object.hasOwn(choice,'count'))return result(choice.state,null,true,'user-setting');
+  if(choice.state==='count'&&typeof choice.count==='number'&&Number.isInteger(choice.count)&&choice.count>=1&&choice.count<=4)return result('count',choice.count,true,'user-setting');
+  return result('invalid',null,true,'invalid-selection');
+ }
+ const explicit=Array.isArray(rows)?rows.filter(row=>row?.kind==='cap-asw'&&(row.generatedFromMap!==true||row.purpose==='strategy')).at(-1):null;
+ if(explicit){const count=Number(explicit.minCount);return Number.isInteger(count)&&count>=1&&count<=7?result('count',count,true,'explicit-requirement'):result('invalid',null,true,'invalid-requirement');}
+ const scope=hdFEOneFiveAswScope(plan);return scope.legacyAllowed?result('legacy-default',3,false,'legacy-known-family'):result('unselected',null,false,scope.known?'quantity-not-selected':'ship-material-unverified');
+}
 function hdFERoute(plan){
  const basic=hdFERouteBasic(plan),branch=hdFEBranchRoute(plan);
  if(!branch.available){const contract=hdFERouteContract(plan);if(!contract)return {...basic,branch};
-  const info=plan?.suggestion?.info||plan?.routeInfo,canonical=hdFSPresetInfo(MAP_PLANS[plan.map].presets[contract.data.index]),keys=['text','requirements','total','conditionManual','speedRequired','flagship'],oneFiveAlternate=contract.data.map==='1-5'&&contract.data.index===1&&contract.data.path==='ADFGJ'&&basic.status!=='ready'&&!!info&&[plan?.routeInfo,plan?.suggestion?.info].filter(Boolean).every(x=>keys.every(k=>JSON.stringify(x[k])===JSON.stringify(canonical[k])))&&(typeof hdFEOneFiveAlternateExample==='function'&&hdFEOneFiveAlternateExample(plan,contract.data)||typeof hdFEOneFiveLightExample==='function'&&hdFEOneFiveLightExample(plan,contract.data)),general=contract.data.useExampleScope===false||oneFiveAlternate,conditionalExample=contract.data.map==='6-4'&&contract.data.index===0&&contract.data.useExampleFlagshipScope===false;
+  const info=plan?.suggestion?.info||plan?.routeInfo,canonical=hdFSPresetInfo(MAP_PLANS[plan.map].presets[contract.data.index]),keys=['text','requirements','total','conditionManual','speedRequired','flagship'],oneFiveAlternate=contract.data.map==='1-5'&&contract.data.index===1&&contract.data.path==='ADFGJ'&&basic.status!=='ready'&&!!info&&[plan?.routeInfo,plan?.suggestion?.info].filter(Boolean).every(x=>keys.every(k=>JSON.stringify(x[k])===JSON.stringify(canonical[k])))&&(typeof hdFEOneFiveRouteScope==='function'&&hdFEOneFiveRouteScope(plan,contract.data).eligible),general=contract.data.useExampleScope===false||oneFiveAlternate,conditionalExample=contract.data.map==='6-4'&&contract.data.index===0&&contract.data.useExampleFlagshipScope===false;
   const customInfo=plan.routeInfo&&['requirements','total','conditionManual','speedRequired','flagship'].some(k=>JSON.stringify(plan.routeInfo[k])!==JSON.stringify(canonical[k]))||conditionalExample&&info&&keys.some(k=>JSON.stringify(info[k])!==JSON.stringify(canonical[k]));
   const chosenScopedInfo=(contract.data.map==='3-1'&&contract.data.index===0&&contract.data.path==='CFG'||contract.data.map==='6-5'&&[0,1].includes(contract.data.index)||contract.data.map==='7-1'&&contract.data.index===0||contract.data.map==='7-2'&&[0,1].includes(contract.data.index)||contract.data.map==='7-3'&&contract.data.index===0||contract.data.map==='7-4'&&contract.data.index===0||contract.data.map==='7-5'&&[0,1].includes(contract.data.index))&&general&&!!info&&keys.some(k=>JSON.stringify(info[k])!==JSON.stringify(canonical[k]));
   const explicitSpeed=(contract.data.map==='3-1'&&contract.data.index===0&&contract.data.path==='CFG'||contract.data.map==='7-2'&&[0,1].includes(contract.data.index)||contract.data.map==='7-3'&&contract.data.index===0||contract.data.map==='7-4'&&contract.data.index===0||contract.data.map==='7-5'&&[0,1].includes(contract.data.index))&&general?Math.max(0,...[plan?.routeInfo,plan?.suggestion?.info].filter(x=>x&&keys.some(k=>JSON.stringify(x[k])!==JSON.stringify(canonical[k]))).map(hdFESpeedTarget)):0;

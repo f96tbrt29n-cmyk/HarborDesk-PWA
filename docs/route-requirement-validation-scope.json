@@ -977,6 +977,16 @@
         {
           "kind": "typeCount",
           "types": [
+            "補給艦"
+          ],
+          "matchPolicy": "exact",
+          "min": 0,
+          "max": 0,
+          "reason": "ADFGJ全体ではFで潜水艦・潜水空母0が必要です。潜水なしのD先行条件で補給艦1以上はEへ進むため補給艦0を確認します。潜水を含む場合もF→Iで不一致となるため、装備購入ではなく編成を見直してください。"
+        },
+        {
+          "kind": "typeCount",
+          "types": [
             "軽巡洋艦"
           ],
           "matchPolicy": "exact",

@@ -4,7 +4,7 @@ const root=path.resolve(__dirname,'..'),legacy=require('./fixtures/seven-five-th
 const text=file=>fs.readFileSync(path.join(root,file),'utf8'),plain=value=>JSON.parse(JSON.stringify(value)),hash=value=>crypto.createHash('sha256').update(value).digest('hex');
 const {createOneFiveBbvClHistoricalProjection}=require('./fixtures/one-five-bbv-cl-source-layer.cjs'),projectBbvCl=createOneFiveBbvClHistoricalProjection(root);
 function fn(source,name){const a=source.indexOf('function '+name+'('),b=source.indexOf('\nfunction ',a+1);assert.ok(a>=0,name);return source.slice(a,b<0?undefined:b)}
-function load(file,name,context){vm.runInNewContext(fn(text(file),name),context);return context[name]}
+function load(file,name,context){if(file==='fleet-readiness-evaluator.js'&&name==='hdFEEquipmentRequirements'&&!context.hdFEOneFiveAswSelection)load(file,'hdFEOneFiveAswSelection',context);vm.runInNewContext(fn(text(file),name),context);return context[name]}
 function mapData(){const c={window:{}};vm.runInNewContext(text('map-plans.js')+'\nthis.maps=MAP_PLANS;this.contracts=HD_MAP_ROUTE_REQUIREMENTS;',c);return c}
 function renderer(){
  const data=mapData(),routes={};for(const [map,rows]of Object.entries(data.contracts))for(const row of rows)routes[map+'/'+row.index]=row;

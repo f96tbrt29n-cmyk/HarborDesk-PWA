@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..'),legacyCapabilityRenderer=require('./fixtures/six-five-legacy-capability-renderer.cjs');
-function load(file,name,c){const s=fs.readFileSync(path.join(root,file),'utf8'),a=s.indexOf('function '+name+'('),b=s.indexOf('\nfunction ',a+1);assert.ok(a>=0,name);vm.runInNewContext(s.slice(a,b<0?undefined:b),c);return c[name]}
+function load(file,name,c){if(file==='owned-equipment-planner.js'&&name==='hdOCFourOneAswTargets'&&!c.hdOCAswSetUserGoal)load(file,'hdOCAswSetUserGoal',c);const s=fs.readFileSync(path.join(root,file),'utf8'),a=s.indexOf('function '+name+'('),b=s.indexOf('\nfunction ',a+1);assert.ok(a>=0,name);vm.runInNewContext(s.slice(a,b<0?undefined:b),c);return c[name]}
 function context(){
  const items=[{name:'流星',category:'艦上攻撃機'},{name:'彗星',category:'艦上爆撃機'},{name:'零式水上観測機',category:'水上偵察機'}];
  const hulls={赤城改:{type:'正規空母',profile:{id:1,count:3,slots:[20,0,10],flags:[]}},加賀改:{type:'正規空母',profile:{id:2,count:3,slots:[20,0,12],flags:[]}},鳥海改二:{type:'重巡洋艦',profile:{id:3,count:4,slots:[3,3,3,3],flags:[]}},長門改二:{type:'戦艦',profile:{id:4,count:4,slots:[3,3,6,3],flags:[]}},空母枠不明:{type:'正規空母'},空母搭載不明:{type:'正規空母',profile:{id:5,count:2,slots:[null,NaN],flags:[]}},空母搭載零:{type:'正規空母',profile:{id:6,count:2,slots:[0,0],flags:[]}},空母制限枠:{type:'正規空母',profile:{id:7,count:2,slots:[10,10],flags:[]}}};

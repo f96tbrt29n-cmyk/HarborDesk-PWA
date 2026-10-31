@@ -3,9 +3,10 @@
 // Synthetic Node contracts do not establish live sortie or save behavior.
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
 const root=process.env.HD_THREE_ONE_ORACLE_ROOT||path.resolve(__dirname,'..'),baseline=require('./fixtures/three-one-cfg-before.json'),expected=require('./fixtures/three-one-cfg-expectations.json');
+const {createOneFiveCl1Dd3HistoricalProjection}=require('./fixtures/one-five-cl1-dd3-source-layer.cjs'),projectOneFiveQuantity=createOneFiveCl1Dd3HistoricalProjection(root);
 const text=name=>fs.readFileSync(path.join(root,name),'utf8'),plain=value=>JSON.parse(JSON.stringify(value)),hash=value=>crypto.createHash('sha256').update(value).digest('hex');
 function fn(source,name){const a=source.indexOf('function '+name+'('),b=source.indexOf('\nfunction ',a+1);assert.ok(a>=0,name);return source.slice(a,b<0?undefined:b)}
-function load(source,name,c){vm.runInContext(fn(source,name),c);return c[name]}
+function load(source,name,c){if(name==='hdFEEquipmentRequirements'&&!c.hdFEOneFiveAswSelection)load(source,'hdFEOneFiveAswSelection',c);vm.runInContext(fn(source,name),c);return c[name]}
 const STYPES={BB:9,FBB:8,BBV:10,CV:11,CVB:18,CVL:7,CA:5,CAV:6,CL:3,CLT:4,CT:21,DD:2,DE:1,AS:20,AV:16,AO:22,SS:13,SSV:14,LHA:17,CD:12};
 function routeContext(old=false){
  const evaluator=text('fleet-readiness-evaluator.js'),fleet=text('fleet-suggester.js'),masters=new Map(),ids=new Map(),c=vm.createContext({window:{},localStorage:{getItem:()=>null},hdFEFind:()=>({}),hdFEFindShip:name=>masters.get(name)||null,hdShipDbMasterRowFor:row=>ids.get(Number(row?.masterId))||masters.get(typeof row==='string'?row:row?.name||row?.final)||null,hdShipDbSlotProfile:()=>null,hdFEExpansionAvailability:()=>({allowed:false,status:'manual'})});
@@ -52,12 +53,12 @@ test('3-1 CFG selected user conditions and both speed inputs remain effective',(
  for(const [first,second]of [[20,15],[15,20]]){const plan=h.make(canonical,15);plan.routeInfo={...plain(plan.routeInfo),text:first===20?'利用者 最速統一':'利用者 高速+統一',speedRequired:true};plan.suggestion={preset:plan.preset,info:{...plain(plan.routeInfo),text:second===20?'利用者 最速統一':'利用者 高速+統一'}};assert.equal(h.c.hdFEPlanSpeedTarget(plan),20);assert.equal(h.c.hdFERoute(plan).status,'missing','both explicit inputs remain effective')}
 });
 
-test('3-1 CFG scoped changes preserve every other52 preset route and speed finite outputs',()=>{
+test('3-1 CFG scoped changes preserve other51 preset route and speed outputs outside independently covered 1-5/1',()=>{
  const now=routeContext(),old=routeContext(true);let presets=0,comparisons=0;
  for(const [map,data]of Object.entries(now.maps))for(const [index,preset]of data.presets.entries()){
-  if(map==='3-1'&&index===0)continue;presets++;assert.deepEqual(plain(now.contracts[map][index]),plain(old.contracts[map][index]));
+  if(map==='3-1'&&index===0||map==='1-5'&&index===1)continue;presets++;assert.deepEqual(plain(now.contracts[map][index]),plain(old.contracts[map][index]));
   for(const mode of ['canonical','chosen-manual','explicit-speed','unknown']){const make=h=>{const plan=h.make(['CL','DD','DD','DD','DD','DD'],mode==='unknown'?null:10);plan.map=map;plan.routeIndex=index;plan.preset=h.maps[map].presets[index];plan.routeInfo=plain(h.c.hdFSPresetInfo(plan.preset));plan.score=100;if(mode==='chosen-manual')plan.suggestion={preset:plan.preset,info:{...plain(plan.routeInfo),conditionManual:true}};if(mode==='explicit-speed')plan.routeInfo={...plan.routeInfo,text:'利用者 高速+統一',speedRequired:true};return plan},a=make(now),b=make(old);assert.deepEqual(plain(now.c.hdFERoute(a)),plain(old.c.hdFERoute(b)),map+'/'+index+'/'+mode);assert.equal(now.c.hdFEPlanSpeedTarget(a),old.c.hdFEPlanSpeedTarget(b));comparisons++}
- }assert.equal(presets,52);assert.equal(comparisons,208);
+ }assert.equal(presets,51);assert.equal(comparisons,204);
 });
 
 test('3-1 CFG audit snapshots bind reviewed conditions scopes and current oracle registration',()=>{
@@ -79,7 +80,7 @@ function placement(){
  const c=vm.createContext({hdFEEsc:value=>String(value).replaceAll('<','&lt;').replaceAll('>','&gt;'),HD_SE_PARTS:{carrierAttackPlane:{examples:['流星','彗星']}},HD_SE_RECIPES:{'cap-carrier-attack':[{id:'carrier-attack',name:'空母：搭載枠に攻撃機',parts:['carrierAttackPlane'],ship:'carrier-attack'}]},HD_FE_AIR_CATS:new Set(['艦上戦闘機','艦上攻撃機','艦上爆撃機']),hdFLCatalog:()=>items,hdFEFind:name=>items.find(row=>row.name===name),hdFEFindShip:name=>rows[name],hdShipDbSlotProfile:db=>db?.profile||null,hdShipDbMasterCompatible:()=>null,HD_SLOT_EXCLUSION_RULES:[{shipIds:[1],slot:1,allowOnly:[6]},{shipIds:[5],slot:0,allowOnly:[6]}],hdShipDbPickerTypeId:item=>({'艦上戦闘機':6,'艦上攻撃機':8,'艦上爆撃機':7})[item.category],hdFERouteRequirementData:plan=>({map:plan.contractMap??plan.map,index:plan.routeIndex??0,path:plan.path??'CFG'}),localStorage:new Proxy({},{get(){throw Error('hint must not read Storage')}})});
  for(const name of ['hdShipDbSlotRules','hdShipDbSlotRejects','hdShipDbEquipCompatible'])load(text('ship-database.js'),name,c);
  for(const name of ['hdSEPartMatches','hdSERecipeAllows','hdSEPool','hdSERecipeParts','hdSEShipPool','hdSECapabilityMeasure'])load(text('sortie-equipment-check.js'),name,c);
- for(const name of ['hdOCCompatible','hdOCThreeThreeCarrierTargets','hdOCCapabilityStockHtml','hdOCStockGap'])load(text('owned-equipment-planner.js'),name,c);
+ for(const name of ['hdOCAswSetUserGoal','hdOCCompatible','hdOCThreeThreeCarrierTargets','hdOCCapabilityStockHtml','hdOCStockGap'])load(text('owned-equipment-planner.js'),name,c);
  const old=vm.runInContext('('+baseline.carrierTargetsBefore+'\n)',c),stock={recipe:{id:'carrier-attack',name:'空母：搭載枠に攻撃機',parts:['carrierAttackPlane']},parts:[{part:'carrierAttackPlane',label:'艦上攻撃機・艦上爆撃機',need:2,have:1,items:['流星']}],complete:false};c.hdSEProfiles=()=>[{kind:'cap-carrier-attack',baseKind:'航空攻撃'}];c.hdSECapabilityStock=()=>stock;
  const plan=()=>({map:'3-1',routeIndex:0,path:'CFG',ships:[{ship:'carrierA',items:[],metadata:{keep:1}},{ship:'carrierB',items:[],metadata:{keep:2}}],metadata:{keep:true}});return {c,old,plan,stock};
 }
@@ -99,15 +100,15 @@ test('3-1 CFG carrier intent types zero unknown duplicate frames and old scopes 
  assert.deepEqual(plain(h.c.hdOCThreeThreeCarrierTargets({...h.plan(),ships:[]},generated)),[],'no adopted carrier does not manufacture one');
  const oldPaths={'3-3':'ACGM','3-4':'ACEGJP','4-1':'CFDGJ / ABDGJ','4-2':'ACL / BDCL','4-4':'AEIK','4-5':'ADHKT / CDHKT','5-1':'BCFJ','5-2':'BCEFO','5-5':'BKPS','6-2':'CEJK','6-5':'ACDGM','7-2':'BCDIM'};
  for(const [map,path]of Object.entries(oldPaths))for(const origin of [true,'true',1,false]){const p={...h.plan(),map,path},g={...generated,generatedFromMap:origin};assert.deepEqual(plain(h.c.hdOCThreeThreeCarrierTargets(p,g)),plain(h.old(p,g)),map+' prior origin semantics retained')}
- assert.equal(hash(restoreCarrierFallback(fn(text('fleet-readiness-evaluator.js'),'hdFEEquipmentRequirements'))),baseline.equipmentRequirementsBeforeSHA256,'only the exact3-1 empty-row recommendation fallback changes; generic FE row-upsert stays byte-identical');
+ assert.equal(hash(restoreCarrierFallback(fn(projectOneFiveQuantity('fleet-readiness-evaluator.js',text('fleet-readiness-evaluator.js')),'hdFEEquipmentRequirements'))),baseline.equipmentRequirementsBeforeSHA256,'only the exact3-1 empty-row recommendation fallback changes; generic FE row-upsert stays byte-identical');
 });
 
-// The full-route fallback is the only change to this actual FE function. Its
-// inverse is pinned to the already-published old function hash; behavior below
+// The approved 1-5 quantity layer is removed for the historical hash only.
+// Current 3-1 behavior remains actual; its fallback inverse is pinned to the already-published old function hash; behavior below
 // has independent source literals instead of accepting the new return value.
 function restoreCarrierFallback(source){const before="const recommended=(rows||[]).some(r=>r.generatedFromMap)||!rows?.length&&plan?.ships?.length&&hdFERouteBasic(plan).status==='ready';",after="const recommended=(rows||[]).some(r=>r.generatedFromMap)||!rows?.length&&plan?.ships?.length&&(plan?.map==='3-1'&&contract?.map==='3-1'&&contract.index===0&&contract.path==='CFG'?hdFERoute(plan).status==='ready':hdFERouteBasic(plan).status==='ready');";assert.equal(source.split(after).length,2,'one scoped fallback anchor');return source.replace(after,before)}
 test('3-1 CFG empty-row carrier recommendation follows the verified full route rather than the canonical example',()=>{
- const h=routeContext(),source=h.evaluator,actual=load(source,'hdFEEquipmentRequirements',h.c),currentSource=fn(source,'hdFEEquipmentRequirements'),legacySource=restoreCarrierFallback(currentSource);assert.equal(hash(legacySource),baseline.equipmentRequirementsBeforeSHA256);const old=vm.runInContext('('+legacySource+'\n)',h.c);load(source,'hdFEScoutingExemption',h.c);h.c.hdSENightPolicy=()=> 'auto';
+ const h=routeContext(),source=h.evaluator,actual=load(source,'hdFEEquipmentRequirements',h.c),currentSource=fn(source,'hdFEEquipmentRequirements'),legacySource=restoreCarrierFallback(fn(projectOneFiveQuantity('fleet-readiness-evaluator.js',source),'hdFEEquipmentRequirements'));assert.equal(hash(legacySource),baseline.equipmentRequirementsBeforeSHA256);const old=vm.runInContext('('+legacySource+'\n)',h.c);load(source,'hdFEScoutingExemption',h.c);h.c.hdSENightPolicy=()=> 'auto';
  for(const [index,literal]of expected.sourceReady.entries()){
   const plan=h.make(literal.hulls),before=JSON.stringify(plan),prior=old(plan,[]),now=actual(plan,[]),carrierN=literal.hulls.filter(kind=>['CV','CVB','CVL'].includes(kind)).length;assert.equal(h.c.hdFERoute(plan).status,'ready');assert.equal(prior.filter(row=>row.kind==='cap-carrier-attack').length,index===0?1:0,'old canonical example dependence remains explicit');assert.equal(now.length,carrierN?1:0);if(carrierN){assert.equal(now[0].kind,'cap-carrier-attack');assert.equal(now[0].minCount,carrierN);assert.equal(now[0].generatedFromMap,true);assert.equal(now[0].label,'空母の攻撃機配備')}assert.equal(JSON.stringify(plan),before);
  }
@@ -123,8 +124,8 @@ test('3-1 CFG empty-row carrier recommendation follows the verified full route r
  const rowsModes=[[{kind:'cap-carrier-attack',minCount:4,generatedFromMap:false,purpose:'strategy',label:'利用者指定',choice:'keep',metadata:{keep:[1,2]}}],[{kind:'cap-carrier-attack',minCount:3,purpose:'strategy',count:2,metadata:{keep:true}}],[{kind:'制空',minCount:1,generatedFromMap:true,metadata:{keep:true}}]];
  for(const rows of rowsModes){const plan=h.make(['CV','CV','DD','DD','DD','DD']),before=JSON.stringify([plan,rows]);assert.deepEqual(plain(actual(plan,rows)),plain(old(plan,rows)),'nonempty explicit/generated rows retain their prior semantics');assert.equal(JSON.stringify([plan,rows]),before)}
  let presets=0,comparisons=0;for(const [map,data]of Object.entries(h.maps))for(const [index,preset]of data.presets.entries()){
-  if(map==='3-1'&&index===0)continue;presets++;const plan=h.make(['CL','DD','DD','DD','DD','DD']);plan.map=map;plan.routeIndex=index;plan.preset=preset;plan.routeInfo=plain(h.c.hdFSPresetInfo(preset));for(const rows of [[],...rowsModes]){const before=JSON.stringify([plan,rows]);assert.deepEqual(plain(actual(plan,rows)),plain(old(plan,rows)),map+'/'+index+' exact old fallback and row behavior');assert.equal(JSON.stringify([plan,rows]),before);comparisons++}
- }assert.equal(presets,52);assert.equal(comparisons,208);
+  if(map==='3-1'&&index===0||map==='1-5'&&index===1)continue;presets++;const plan=h.make(['CL','DD','DD','DD','DD','DD']);plan.map=map;plan.routeIndex=index;plan.preset=preset;plan.routeInfo=plain(h.c.hdFSPresetInfo(preset));for(const rows of [[],...rowsModes]){const before=JSON.stringify([plan,rows]);assert.deepEqual(plain(actual(plan,rows)),plain(old(plan,rows)),map+'/'+index+' exact old fallback and row behavior');assert.equal(JSON.stringify([plan,rows]),before);comparisons++}
+ }assert.equal(presets,51);assert.equal(comparisons,204);
 });
 
 // One source-confirmed structural edge. Existing node labels/objective IDs and

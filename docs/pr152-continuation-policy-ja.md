@@ -1,3 +1,5 @@
+> 1-5 CL1DD3・四隻共通規則の限定確認（2026-10-31 UTC）：[記録](pr152-one-five-cl1-dd3-ja.md)。経路とASW数量を分離し旧4既知materialのみ比較3互換。Node論理67/物理92の初回製品欠陥・必要な検査訂正を保持、現行model7だけ/成功反復0。新C/W6は5初回成功＋C不足文言期待の必要訂正後1成功。局所論理10中9完了/旧canonical W成立1件load非表示停止、保存200/load180項目と空行12/10を原本/独立照合。未到達/原因不明を残し27/151/58変更0。invalid/未知形式は原値保持のreadonly停止・復旧UI対象外、API5–7新select非対応、全モード保存操作は未実証。新source/通常CIはpending、次2-5 CEIOの索敵ランダム域はsource-onlyまで・実装未着手。以下は各時点の履歴。
+
 > CL2DD2のCI追補確定（2026-10-31 JST）：source `48399416`／[CI41197582954](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41197582954) attempt1は5job成功/W4 smoke+job取消、Full skipped。全6Node628成功、C901/0/0完全・W1–3小計675/1/0だけで全W null。新light6metadataは保持/load完了だがrunnerはC3pass/W3不明。4cohort26記録の観測保持陽性0、初回2件load/nav欠測はretryで埋めない。主原本と外部独立joinを閉鎖、27/151/58変更0。次CL1DD3はsource-only照合まで・実装/操作未実施。以下は各時点の履歴。
 
 > 1-5 CL2DD2の限定局所記録（2026-10-31 JST）：[記録](pr152-one-five-cl2-dd2-ja.md)。既知軽巡2＋駆逐2の例拘束を接続し、航戦の水爆/二巡とは分けて任意ASW3・不足/未知を案内。Node初回13=10成功/3検査不備失敗を保持、必要訂正7成功で論理17、新gen3/旧0。通常C/W6は全初回成功・retry0、保存編集4/安全中止2・同一文書load6/保存load各120/空8+8保持。原本/独立sealは閉鎖、新sourceCIはpending、27/151/58変更0。三隻CL2DDは検査済み不一致、他構成は未網羅。次CL1DD3は未実施。以下は各時点の履歴。

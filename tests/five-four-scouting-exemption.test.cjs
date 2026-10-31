@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..');
-function load(file,name,c){const s=fs.readFileSync(path.join(root,file),'utf8'),a=s.indexOf('function '+name+'('),b=s.indexOf('\nfunction ',a+1);assert.ok(a>=0,name);vm.runInContext(s.slice(a,b<0?undefined:b),c);return c[name]}
+function load(file,name,c){if(file==='fleet-readiness-evaluator.js'&&name==='hdFEEquipmentRequirements'&&!c.hdFEOneFiveAswSelection)load(file,'hdFEOneFiveAswSelection',c);const s=fs.readFileSync(path.join(root,file),'utf8'),a=s.indexOf('function '+name+'('),b=s.indexOf('\nfunction ',a+1);assert.ok(a>=0,name);vm.runInContext(s.slice(a,b<0?undefined:b),c);return c[name]}
 function context(){
  const raw=fs.readFileSync(path.join(root,'ship-master-snapshot.js'),'utf8'),masters=Object.values(JSON.parse(raw.slice(raw.indexOf('=')+1).trim().replace(/;$/,'')).allShips);
  const c=vm.createContext({window:{},HD_FS_TYPE_ALIASES:{},hdFEFind:()=>({}),hdShipDbMasterRowFor:r=>masters.find(m=>m.name===r.name),hdFEGameMatch:()=>({status:'ready'}),hdFEAssigned:()=>[],localStorage:{getItem:()=>'{"admiralLevel":120}'},hdFCProposalShipLos:s=>s.bareLos,hdFEAir:()=>({}),hdFEAirCheck:()=>({status:'ready',enemy:0}),hdFEPlanSpeedTarget:()=>0,hdOCPortMeasure:()=>[],hdOCOaswMeasure:()=>({minCount:0}),hdFLRows:()=>[],hdSEChecks:()=>({rows:[],adv:{}}),hdFEKindCount:()=>({count:0})});

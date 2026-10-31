@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..');
-function load(file,name,c){const s=fs.readFileSync(path.join(root,file),'utf8'),a=s.indexOf('function '+name+'('),b=s.indexOf('\nfunction ',a+1);assert.ok(a>=0,name);vm.runInNewContext(s.slice(a,b<0?undefined:b),c);return c[name]}
+function load(file,name,c){if(file==='owned-equipment-planner.js'&&name==='hdOCFourOneAswTargets'&&!c.hdOCAswSetUserGoal)load(file,'hdOCAswSetUserGoal',c);const s=fs.readFileSync(path.join(root,file),'utf8'),a=s.indexOf('function '+name+'('),b=s.indexOf('\nfunction ',a+1);assert.ok(a>=0,name);vm.runInNewContext(s.slice(a,b<0?undefined:b),c);return c[name]}
 function context(){
  const items=[{name:'三式水中探信儀',category:'小型ソナー'},{name:'三式爆雷投射機',category:'爆雷投射機'}];
  const hulls={軽巡候補:{type:'軽巡洋艦',profile:{id:1,count:3,slots:[0,0,0],flags:[]}},駆逐候補:{type:'駆逐艦',profile:{id:2,count:3,slots:[0,0,0],flags:[]}},海防候補:{type:'海防艦',profile:{id:3,count:2,slots:[0,0],flags:[]}},一枠艦:{type:'駆逐艦',profile:{id:4,count:1,slots:[0],flags:[]}},同一枠のみ:{type:'駆逐艦',profile:{id:5,count:2,slots:[0,0],flags:[]}},分離枠:{type:'駆逐艦',profile:{id:6,count:2,slots:[0,0],flags:[]}},未登録枠:{type:'海防艦'}};

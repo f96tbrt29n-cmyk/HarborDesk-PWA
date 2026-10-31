@@ -31,7 +31,7 @@ test('owned async search keeps its existing UI yields and cancels changed inputs
  const c=shipLookupContext(),queue=[];let live='same',next=0,closed=0;
  c.setTimeout=(fn,ms)=>queue.push({fn,ms});c.hdOCSignature=x=>x.signature;c.hdOCContext=()=>({signature:live});
  c.hdOCSearchSteps=()=>({next(){next++;c.hdFEFindShip('A');c.hdFEFindShip('A');return {done:false,value:50}},return(){closed++}});
- const source=fs.readFileSync(path.join(__dirname,'../owned-equipment-planner.js'),'utf8'),start=source.indexOf('async function hdOCSearchAsync('),end=source.indexOf('\nfunction ',start+1);vm.runInNewContext(source.slice(start,end),c);
+ const source=fs.readFileSync(path.join(__dirname,'../owned-equipment-planner.js'),'utf8'),start=source.indexOf('async function hdOCSearchAsync('),end=source.indexOf('\nfunction ',start+1);for(const dependency of ['hdOCAswSetInput','hdOCAswSetCapture','hdOCAswSetCanSearch','hdOCAswSetRequire'])load('owned-equipment-planner.js',dependency,c);vm.runInNewContext(source.slice(start,end),c);
  const task=c.hdOCSearchAsync({map:'1-6',fleet:{id:'x'},index:0,signature:'same'});assert.equal(queue[0].ms,25);queue.shift().fn();await Promise.resolve();assert.equal(next,1);assert.equal(c.calls,1);assert.equal(queue[0].ms,0);
  live='changed';c.revision=2;const rejected=assert.rejects(task,e=>e.code==='HD_OC_STALE');queue.shift().fn();await rejected;assert.equal(next,1);assert.equal(closed,1);assert.equal(c.hdFEFindShip('A').revision,2);assert.equal(c.calls,2);
 });
@@ -59,7 +59,7 @@ test('saved bounded search remains visible only for its route and is explicitly 
 });
 test('bounded port search applies only to selected central-route targets and leaves ordinary limits intact',()=>{
  const source=fs.readFileSync(path.join(__dirname,'../owned-equipment-planner.js'),'utf8'),start=source.indexOf('function* hdOCSearchSteps('),end=source.indexOf(' const signature=',start),header=source.slice(start,end).replace('function* hdOCSearchSteps','function limits');
- const c={};load('owned-equipment-planner.js','hdOCPortRoute',c);load('owned-equipment-planner.js','hdOCPortScope',c);vm.runInNewContext(header+'return {maxExamined,maxDepth,portSearch};}',c);
+ const c={};for(const dependency of ['hdOCAswSetInput','hdOCAswSetCapture','hdOCAswSetCanSearch','hdOCAswSetRequire'])load('owned-equipment-planner.js',dependency,c);load('owned-equipment-planner.js','hdOCPortRoute',c);load('owned-equipment-planner.js','hdOCPortScope',c);vm.runInNewContext(header+'return {maxExamined,maxDepth,portSearch};}',c);
  const fleet={portAttackersByRoute:{'4-5:1':[{}]}};
  for(const ctx of [{map:'1-6',index:0,fleet},{map:'4-5',index:0,fleet},{map:'4-5',index:1,fleet:{portAttackersByRoute:{'4-5:1':[]}}},{map:'4-5',index:1,fleet:{}}])assert.equal(c.limits(ctx).maxExamined,10000);
  assert.equal(c.limits({map:'4-3',index:0,fleet}).maxExamined,10000);assert.equal(c.limits({map:'4-3',index:0,fleet:{portAttackersByRoute:{'4-3:0':[{}]}}}).maxExamined,500);assert.equal(c.limits({map:'4-5',index:1,fleet}).maxExamined,500);assert.equal(c.limits({map:'4-5',index:1,fleet},{maxExamined:50}).maxExamined,50);assert.equal(c.limits({map:'1-6',index:0,fleet}).maxDepth,24);
