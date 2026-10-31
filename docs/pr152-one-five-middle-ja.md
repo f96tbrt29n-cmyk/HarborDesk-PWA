@@ -1,5 +1,7 @@
 # 1-5/index1 ADFGJ：任意装備表示と搭載先の限定改善
 
+> 1-5訂正後CI確定（2026-10-31 JST）：検証source `de34b66e`／[CI41151020734](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41151020734) attempt1は5smoke成功、W4はsmoke失敗を完結出力した後の診断upload中に45分上限でjob/run取消。全shardの正式footerと公式注記でC892/0/0・W878/12/2（passed/flaky/failed）を確認し、取消からcaseを増減しない。自身1-5はC/W各3の全6初回成功・retry0で、同じ試行のmetadataも保存/安全中止・編集対象・同一文書load保持まで確認。旧CI/初回失敗の未到達・欠測は補完せず、27/151/58は変更0。次は同じ1-5/index1の既知BBV1CL1DD2の元例scope/任意目標。以下のpending等は各時点の履歴として保持する。
+
 > 1-5初回CIと試験契約訂正（2026-10-31 JST）：source96f9ec47／CI41149583450 attempt1は全6smokeジョブがNode前段の同じ旧caller文字列期待で失敗（各581件＝580成功/1失敗）、Full skipped・取消0。ブラウザー起動検証とsmokeは未実施で、C/Wのpassed/flaky/failed・保存/load比較はnull、route metadataは未生成、公式artifactは0件。7-3の既存条件自体は保持され、1-5条件の挿入で隣接文字列assertだけが不成立になった。7-3の有限indexによる実caller評価へ訂正し、新1-5 Node8件の通常wrapper登録漏れを1requireで補完した。固定環境の必要登録検証9件は9成功/0失敗・source変更0。元の局所Node26ユニーク＋Python2とは別の必要検証実行として記録し、ユニーク件数へ9を加えない。製品/browser spec/入力は変更せず局所C/W6を再利用する。セル27/151/58は変更0。訂正後HEAD/CIはpending、次は同じ1-5/1 ADFGJの既知四隻代替。以下のpending等は各時点の履歴として保持する。
 
 基準HEAD `7c5c81349be318c626f3b423a5b69bbfb5d543e7`。専用領域へ分離し、旧草稿・原本を上書きせず再開した。旧v2は実ファイル/manifestを照合して再取得したが、最終v3は旧原本として復元したものではなく、新しく作成した。最終HEAD/通常CIは未反映でpending。PR152はドラフト・未公開。
@@ -66,3 +68,19 @@ CI41149583450ではブラウザー環境検証とsmoke実行が全てskippedで�
 正式attempt1ログZIPは445,017B・90項目、CRCおよびSHA-256 `0438dc2aa49fb961031889b0567ed68d4cae8fe22869b74a2a0c001f43ca5d4c` が一致した。run/jobs・全6check/公式注記・artifact一覧を取得し、取得不能0。各6jobのcheckoutは上記96f9ec47の完全SHA、実pullは固定image digest b27e719e…、Setup Node実測は24.21.0だった。ブラウザーrevisionとHTTP配信filehashは検証step未到達により未採取で、期待ソース648件のGit/作業ツリー/manifest完全一致をその実測へ置き換えない。collectorの134件・2,403,610Bは独立SHA/bytes照合済みで、manifest SHA-256は `1ef4bdf0bdea2d7062da3a7574ad1e89299bba1bf733d75ef997eee87af4824c`。原ログ・実値はprivateを維持し、sanitizer/外部upload0。
 
 236セル27確認済み/151一部/58未確認は今回変更0。CIの未到達を局所成功で補完せず、局所証拠の範囲も拡張しない。旧CI41113618989の5smoke成功/W4失敗・ケース内訳/保存比較欠測は不変。訂正後HEAD/通常CIはpendingであり、具体的な試験契約・登録漏れ訂正後の必要検証として通常CIを1回確認する。同じHEADの成功目的の再実行とはしない。次優先は同じ1-5/index1 ADFGJの出典が明確な既知四隻代替（CL2DD2/BBV1CL1DD2）の元例scopeと任意目標適用で、今回のcanonical局所6件を別構成の成功へ無条件流用しない。PR152ドラフト・未公開/main競合・既知残件を保持し、main統合/PR151/版/SW/本番/マージ/公開/自動マージは行わない。
+
+## 2026-10-31 訂正後CIの確定と残件
+
+検証sourceは `de34b66e464d4a348a2f55a371f2e86bf09eea42`、製品/実画面は96f9ec47と同一。CI41151020734 attempt1・受理1回・再実行0は、5smoke成功/W4 job取消・Full skippedでrun cancelledとなった。W4は10:20:05 JSTにbrowserの失敗結果を完結出力し、その後の診断upload中10:20:49 JSTに45分上限で取り消された。全shardの正式footerと公式注記はC892/0/0、W878/12/2（passed/flaky/failed）で一致する。これは厳密な初回成功数/物理試行数ではなく、後のjob取消でケースを追加しない。全6ジョブのNodeは各589/589/0、Node登録漏れと旧caller期待の訂正を確認した。
+
+自身1-5のknown/stock/unknownはC/W各3、正式個別ログで全6初回成功・retry0。別の同一試行metadata6件もcompleted・保存または安全中止後読取り/load読取り・同一文書loadが各6、元4艦×5識別項目を保存側120/load側120で直接確認し、他編成/他海域/planner/調達sentinel/metadataを保持した。known/stockの4→6行・提案装備/メモ変更に伴う元全文差分は意図したものとして保持し、unknownは4行の元全文保持・提案比較nullと分ける。保持不一致の陽性0。metadata自体には数値attempt、埋込みrun/source、独立frame ID、明示drop値がなく、公式artifact対応と個別ログで束縛する。completedだけで試験成功にはしない。
+
+最終失敗2件は6-1 AFGHK stockと7-5第1ABDFGHK stock。各初回/retryとも保存・編集後の指定比較を通過してから、load後再探索clickの非表示待機で総45秒停止し、load全文比較は未到達。表示変更元・原因・今回変更との関連は未確定として原本を保持し、追加診断/成功再実行へ広げない。12 flakyの初回失敗も後の成功で消さない。
+
+実測環境は全6のNode24.21.0/Playwright1.55.0、Chromium1187/WebKit2203、実checkout de34とimage digest b27e719e…が一致。期待Git648件の独立照合は不一致0だが、HTTP配信ソースhashは未採取で別観測である。正式attempt ZIPは11,863,812B/102項目・CRC正常。公式artifact11件のうち、CLIのplain Forbidden検出漏れで異なる8件を0B受領した事実を記録した。認識後の同経路再試行/認証変更はなく、既存GitHub連携の別経路で同8件343,352B/66項目・CRCを回収した。512MiB超の3archiveは未要求で内部inventoryを照合しておらず、内包するraw JSON/trace/動画の存在・件数は未確認(null)。原本を加工せず、保存値本文・trace・動画・資格情報・signed URL/queryを公開記録へ含めない。
+
+collector401件と別fallback17件は全bytes/SHA独立一致、最終review PASS。canonical summary SHA `290ffd0b0bd15c47b6f35c252b34b7124c90aaf50fde6442064f836ce9d142da`、collector manifest `b243c35a5cd6f37bb4580c464d39e19cbec01d89c551d236b67c0d627226163c`、独立review `1ff294aefdca1b23056cf85b07d8deb9661e369c33ccaf9107ce1c367ae2b5bc`。容量は回収後11,166,965,760B（約10.40GiB）、inode使用9.49%。
+
+旧local記録の未コミット/CI未開始は当時の履歴として保持する。Cknownは旧spec9a、残5局所と最終CIは訂正spec470であり、spec全文同一とはしない。製品/入力とknown操作枝の直接一致を確認した再利用で、局所Node26ユニーク/Python2と必要な登録経路9検査を重複加算せず、追加局所ブラウザー反復0。旧CI41113618989の5成功/W4失敗とケース/保存比較欠測、初回CI41149583450の全6Node581/580/1・browser未到達も別記録のまま。
+
+236セル27/151/58、他58行/判定基準/旧53区分は今回変更0。次は同じ1-5/index1の既知BBV1CL1DD2について、D/F/G先行条件を保持し元例scopeと航戦水爆の任意目標適用を接続する限定単位。generalフラグだけの一般化、CL2DD2/2–3隻への推測適用、canonical成功の無条件流用はしない。後続の記録HEADは検証sourceと区別してPR現状欄へ記す。PR152ドラフト・未公開/main競合/既知残件を保持し、main統合/PR151/版/SW/本番/マージ/公開/自動マージは変更しない。

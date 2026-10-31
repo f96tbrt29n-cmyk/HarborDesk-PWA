@@ -2564,5 +2564,230 @@
       "UI": "hdMapRequirementsHtml displays general ADFGJ conditions; hdOCRequiredChecksHtml uses final hdFERoute status/detail so example scope remains a separate unassessed layer.",
       "notNodeOrBrowserExecutedForAlternatives": true
     }
+  },
+  "oneFiveMiddleCIFinalization20261031": {
+    "record": "oneFiveMiddleCIFinalization20261031",
+    "recordDateJST": "2026-10-31",
+    "sourceHead": "de34b66e464d4a348a2f55a371f2e86bf09eea42",
+    "featureProductHead": "96f9ec474b44d0e1ab251b756e85698dd0ae2a06",
+    "laterRecordingHeadIsSeparate": true,
+    "runId": 41151020734,
+    "attempt": 1,
+    "event": "workflow_dispatch",
+    "acceptedDispatches": 1,
+    "reruns": 0,
+    "manualCancelsByThisWork": 0,
+    "runConclusion": "cancelled",
+    "smokeJobs": {
+      "success": 5,
+      "cancelled": 1
+    },
+    "full": "skipped",
+    "officialCaseOutcomes": {
+      "chromium": {
+        "passed": 892,
+        "flaky": 0,
+        "failed": 0
+      },
+      "webkit": {
+        "passed": 878,
+        "flaky": 12,
+        "failed": 2
+      }
+    },
+    "allSixShardFootersCompleteAndOfficialNoticesReconciled": true,
+    "caseOutcomeCountsAreStrictInitialSuccessCounts": false,
+    "strictGlobalInitialSuccessCount": null,
+    "globalPhysicalAttemptCount": null,
+    "W4Cancellation": {
+      "browserStepConclusion": "failure",
+      "browserStepCompletedAt": "2026-10-31T01:20:05Z",
+      "completeBrowserFooter": true,
+      "postBrowserUploadConclusion": "cancelled",
+      "postBrowserUploadStartedAt": "2026-10-31T01:20:06Z",
+      "postBrowserUploadCompletedAt": "2026-10-31T01:20:49Z",
+      "jobConclusion": "cancelled",
+      "runConclusion": "cancelled"
+    },
+    "cancelledJobAddsNoTestOutcomes": true,
+    "node": {
+      "jobs": 6,
+      "eachJob": {
+        "tests": 589,
+        "pass": 589,
+        "fail": 0
+      }
+    },
+    "ownOneFive": {
+      "caseCount": 6,
+      "initialPassCount": 6,
+      "retryCountObservedForOwnCases": 0,
+      "flakyCaseCount": 0,
+      "failedCaseCount": 0,
+      "processedMetadataDirectReadCount": 6,
+      "completedMetadataCount": 6,
+      "savedReadReachedCount": 6,
+      "loadReadReachedCount": 6,
+      "savedIdentity": {
+        "summaryCount": 6,
+        "originalRowsPerSummary": 4,
+        "strictExactFieldsPerSummary": 20,
+        "strictExactFieldComparisonRecords": 120
+      },
+      "loadIdentity": {
+        "summaryCount": 6,
+        "originalRowsPerSummary": 4,
+        "strictExactFieldsPerSummary": 20,
+        "strictExactFieldComparisonRecords": 120
+      },
+      "expectedInvariantMismatchCount": 0,
+      "newSaveMismatchPositiveCount": 0,
+      "allPreservationFieldsTrue": true,
+      "allLoadCustomExactTrue": true,
+      "loadSameDocumentTrueCount": 6,
+      "crossProjectMetadataEqualByStateIgnoringMemberAndProject": {
+        "known": true,
+        "stock": true,
+        "unknown": true
+      },
+      "collectionFailureCounts": {
+        "pageerror": 0,
+        "navigation": 0,
+        "savedIdentity": 0,
+        "loadIdentity": 0
+      },
+      "officialLogEvidenceSHA256": "a434327c70a3b4c12cd5e66a9d57eabeb86bbedc926792ee667e55430cb147a3",
+      "directMetadataAuditSHA256": "e1376aeee21c16a9dc30a93a8076c142e49d9203257c29bae5dd2c7bda640f29"
+    },
+    "ownEvidenceLimits": {
+      "officialInitialPass6ComesFromIndividualLogEvidence": true,
+      "metadataNumericAttemptFieldPresent": false,
+      "metadataEmbeddedRunIDOrSourceSHAPresent": false,
+      "metadataBoundByOfficialArtifactMapping": true,
+      "independentFrameIDObserved": false,
+      "explicitDropFieldObserved": false,
+      "missingFrameOrDropCounts": null,
+      "metadataCompletedIsNotFrameworkPassByItself": true,
+      "knownStockFourToSixAndProposalChangesAreIntentional": true,
+      "unknownFourRowsOriginalFullExactAndProposalComparisonNull": true
+    },
+    "environment": {
+      "allSixNodeActual": "v24.21.0",
+      "allSixPlaywrightActual": "1.55.0",
+      "chromiumRevisionActual": 1187,
+      "webkitRevisionActual": 2203,
+      "allSixVerified": true,
+      "actualPulledImageDigestFromLogs": "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29",
+      "actualCheckoutSHAFromAllSixLogs": "de34b66e464d4a348a2f55a371f2e86bf09eea42",
+      "httpServedSourceHashes": null
+    },
+    "source": {
+      "expectedGitFiles": 648,
+      "expectedGitManifestSHA256": "dab8c1daeba08c329226fe186ed3a7c579b55ae6f531abf13129f5e39b0d7e26",
+      "expectedSourceMismatches": 0,
+      "expectedSourceIsNotHTTPServedHashMeasurement": true,
+      "productSourcesUnchangedAcrossReusedLocalProof": true,
+      "inputFixtureUnchanged": true,
+      "fullFirstVsCorrectedSpecFileIdentity": false,
+      "knownBranchAndOperationDirectExact": true,
+      "localKnownChromiumSpecSHA256": "9a142a7cdb8e632f14f6bcdfadbb39e981612947146781b8ead2efd8c471597a",
+      "otherFiveLocalAndFinalCISpecSHA256": "470fc8b7e5015056eec7a21ff40b3a308c0514e831eb6451f89bbe4446782721",
+      "otherFiveLocalCasesUseCorrectedSpec": true
+    },
+    "localEvidenceReused": {
+      "historicalRecord": "oneFiveMiddleLocal20261031",
+      "representatives": 6,
+      "nodeUniqueFinalTitles": 26,
+      "pythonPureTitles": 2,
+      "necessaryNodeWrapperVerificationExecutions": 9,
+      "nineAddedToUniqueTitleCount": false,
+      "additionalLocalBrowserTrialsForNodeCorrection": 0
+    },
+    "otherFailures": {
+      "finalFailedCases": [
+        "6-1 AFGHK stock",
+        "7-5 first ABDFGHK stock"
+      ],
+      "initialAndRetryObservedForEach": true,
+      "savedAndEditorSpecifiedComparisonsPassedBeforeStop": true,
+      "stop": "after-load search click not visible at45s total deadline",
+      "loadWholeComparison": null,
+      "displayChangeCaller": null,
+      "cause": null,
+      "sameCauseAsOldFailuresEstablished": false,
+      "relationshipToOneFiveChangeEstablished": false,
+      "newInvestigationOrSuccessReruns": 0
+    },
+    "acquisition": {
+      "officialArtifacts": 11,
+      "cliDistinctUnderCapArchiveRequests": 8,
+      "cliZeroBytePlainForbiddenReceives": 8,
+      "cliGuardMiss": "plain Forbidden not detected by original explicit HTTP401/403 guard before eight distinct endpoints were attempted",
+      "cliSameArtifactRetryRequests": 0,
+      "existingConnectorFallbackReceived": 8,
+      "fallbackArchiveBytes": 343352,
+      "fallbackArchiveMembersCRCVerified": 66,
+      "over512MiBArchivesNotRequested": 3,
+      "unretrievedArchiveMemberInventoryInspected": false,
+      "unretrievedRawJSONTraceVideoFileCounts": null,
+      "credentialChanges": 0,
+      "rangeOrSplitRequests": 0,
+      "rawOriginalsRewritten": false,
+      "formalAttemptLog": {
+        "requests": 1,
+        "bytes": 11863812,
+        "sha256": "1f6a2eab96c1e47915a151dca8bc66f1c8d125dfb5acc69ade20f92486d94a54",
+        "memberCount": 102,
+        "crcPassed": true,
+        "sizeCapBytes": 536870912,
+        "rangeRequests": 0,
+        "splitRequests": 0
+      }
+    },
+    "proof": {
+      "canonicalSummarySHA256": "290ffd0b0bd15c47b6f35c252b34b7124c90aaf50fde6442064f836ce9d142da",
+      "collectorManifestSHA256": "b243c35a5cd6f37bb4580c464d39e19cbec01d89c551d236b67c0d627226163c",
+      "collectorPayloadFiles": 401,
+      "collectorPayloadBytes": 132623779,
+      "fallbackManifestSHA256": "b83d7b138f29645468f6bfa22389621070fee9fb1a92b6f3a7ae505278d40bb3",
+      "independentFinalReviewSHA256": "1ff294aefdca1b23056cf85b07d8deb9661e369c33ccaf9107ce1c367ae2b5bc",
+      "independentFinalReviewClosureSHA256": "e16d323485576b923a21cb355e4a1c178a82c22a1a5f7a747b1137a0d6a45dad",
+      "independentFinalReviewPassed": true
+    },
+    "historyNotBackfilled": {
+      "CI41113618989": "five successful smoke jobs and W4 failed; case breakdown/save comparison remain missing",
+      "CI41149583450": "all6 Node581/580/1; browser case outcomes and save/load comparisons remain null; zero generated browser metadata/artifacts"
+    },
+    "countsBefore": [
+      27,
+      151,
+      58
+    ],
+    "countsAfter": [
+      27,
+      151,
+      58
+    ],
+    "changedCells": [],
+    "other58RowsCriteriaAndLegacy53Unchanged": true,
+    "nextTarget": {
+      "composition": "BBV1CL1DD2",
+      "scope": "same1-5/index1 ADFGJ example scope and optional BBV-water target applicability",
+      "precedingD_F_GConditionsMustBeChecked": true,
+      "generalFlagOnlyChangeForbidden": true,
+      "CL2DD2AndTwoOrThreeHullCasesSeparate": true,
+      "newAlternativeImplementationOrBrowserTrialsCompleted": false
+    },
+    "capacityAfterAcquisition": {
+      "measuredAtUTC": "2026-10-31T01:33:14.466511+00:00",
+      "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-restart-20261031",
+      "freeBytes": 11166965760,
+      "totalBytes": 33770192896,
+      "inodeTotal": 2097152,
+      "inodeFree": 1898198,
+      "inodeUsedPercent": 9.4869
+    },
+    "wholeRouteOrPublicationReady": false,
+    "PR152DraftUnpublishedAndProtectedTargetsMaintained": true
   }
 }
