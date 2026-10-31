@@ -321,6 +321,12 @@
           "localSixInitialPassed": true,
           "newSourceCIState": "pending",
           "doesNotReplaceCanonicalHistoricalRepresentativeWorkflowRecord": true
+        },
+        {
+          "record": "oneFiveBbvClCIFinalization20261031",
+          "document": "docs/pr152-one-five-bbv-cl-ja.md",
+          "source": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "state": "CI finalized with gaps: C895 complete/W1-3 subtotal672 only; own C3initialpass/W3frameworkunknown; all6 preservation metadata and independent collection complete; no cell promotion"
         }
       ]
     },
@@ -3777,6 +3783,1450 @@
       "generalFlagOnlyForbidden": true,
       "CL2DD2AndTwoOrThreeHullCasesSeparate": true,
       "newImplementationOrBrowserTrialForNextTarget": false
+    }
+  },
+  "oneFiveBbvClCIFinalization20261031": {
+    "record": "oneFiveBbvClCIFinalization20261031",
+    "document": "docs/pr152-one-five-bbv-cl-ja.md",
+    "recordDateJST": "2026-10-31",
+    "state": "CI-finalized-with-explicit-W4-and-unreceived-archive-gaps",
+    "localRecordPreserved": "oneFiveBbvClLocal20261031",
+    "localRecordIsHistoricalObservation": true,
+    "source": {
+      "baseHead": "d62153ed830c6e50257e9b4b7127f1f3de11f528",
+      "testedCommitSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+      "recordCommitSHA": null,
+      "remoteHeadAtFinalization": null,
+      "sourceVsRecordRelationship": "CI tested source is 6c08381f; later documentation finalization is not committed at this draft stage",
+      "productAndTestSourceBinding": {
+        "publicFiles": 654,
+        "missing": 0,
+        "extra": 0,
+        "mismatches": 0,
+        "immutableGitSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+        "parentSHA": "d62153ed830c6e50257e9b4b7127f1f3de11f528",
+        "changedPaths": 18,
+        "sourceManifestSHA256": "14654d468f24134458985746491188ba9bf231841657a2cf3d096dc82cd10cc2",
+        "reference": {
+          "path": "source-audit/source-audit.json",
+          "bytes": 7798,
+          "sha256": "ba53bdccdba27867be8d2678dfb6faac73b9d9f07683e6f3e1527f58f88a53ea"
+        },
+        "closure": {
+          "path": "source-audit/closure.json",
+          "bytes": 401,
+          "sha256": "dda697e2d56d24a347d1fd9c58e7655830263907ed03acbb0510ff2acbd54217"
+        },
+        "historicalLocalFreeze": "public653/runtime654 remain historical, not overwritten or reinterpreted",
+        "distinction": "expected local manifest/Git bytes are separate from CI checkout and unmeasured served-source hashes"
+      },
+      "localRuntimeManifestIsNotCIHeadBinding": true,
+      "localRuntimeManifestSHA256": "c64cf6f928a4b30725a167aa42d236a6c3479dd0c18153cbdd75a531a4e037ea",
+      "finalPrecommitPublicSourceCount": 654,
+      "finalPrecommitPublicSourceManifest": {
+        "path": "private/root-control/final-precommit-public-source-manifest.json",
+        "sha256": "14654d468f24134458985746491188ba9bf231841657a2cf3d096dc82cd10cc2"
+      },
+      "HTTPServedSourceHashes": null
+    },
+    "expectationsOnlyNotActualResults": {
+      "normalNodeUniqueCases": 602,
+      "fullChromiumSelectedCases": 895,
+      "fullWebKitSelectedCases": 895,
+      "officialSmokeJobs": 6,
+      "reference": "root-provided final-source forecast; actual official output must be checked; not a result or completion claim"
+    },
+    "CI": {
+      "runId": 41175351013,
+      "runAttempt": 1,
+      "event": "workflow_dispatch",
+      "createdUTC": "2026-10-31T06:08:19Z",
+      "updatedUTC": "2026-10-31T06:54:10Z",
+      "runStatus": "completed",
+      "runConclusion": "cancelled",
+      "officialSmokeJobCount": 6,
+      "workflowFile": ".github/workflows/browser-regression.yml",
+      "manualDispatchCount": 1,
+      "rerunCount": 0,
+      "autoTriggeredEquivalentRunChecked": true,
+      "singleAcceptedRunOnly": true,
+      "officialAnnotationsReviewed": true,
+      "jobs": [
+        {
+          "jobId": 124461647515,
+          "name": "Smoke / chromium / shard 1 of 2",
+          "project": "chromium",
+          "shard": 1,
+          "status": "completed",
+          "conclusion": "success",
+          "startedUTC": "2026-10-31T06:08:23Z",
+          "completedUTC": "2026-10-31T06:36:36Z",
+          "testedSourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "NodeVersion": "24.21.0",
+          "NodeTests": {
+            "tests": 602,
+            "pass": 602,
+            "fail": 0
+          },
+          "smokeStepConclusion": "success",
+          "smokeCompletedBeforeJobCancellation": null,
+          "officialFooter": {
+            "passed": 448,
+            "flaky": 0,
+            "failed": 0,
+            "scope": "completed shard footer"
+          },
+          "plannedSelectedCases": 448,
+          "annotations": {
+            "count": 3,
+            "reportedCounts": {
+              "passed": 448
+            },
+            "matchesAvailableFooter": true
+          },
+          "ownTargetTests": [],
+          "rawEvidenceReferences": [
+            {
+              "path": "private/ci-execution-41175351013/log-audit/job-log-evidence.json",
+              "sha256": "10e5bf54307e893aece1f5374e461034558d307109a5290320b36b156f6cebf6"
+            }
+          ],
+          "missing": [],
+          "jobCancellationDoesNotReplaceTestOutcome": true
+        },
+        {
+          "jobId": 124461647442,
+          "name": "Smoke / chromium / shard 2 of 2",
+          "project": "chromium",
+          "shard": 2,
+          "status": "completed",
+          "conclusion": "success",
+          "startedUTC": "2026-10-31T06:08:23Z",
+          "completedUTC": "2026-10-31T06:53:13Z",
+          "testedSourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "NodeVersion": "24.21.0",
+          "NodeTests": {
+            "tests": 602,
+            "pass": 602,
+            "fail": 0
+          },
+          "smokeStepConclusion": "success",
+          "smokeCompletedBeforeJobCancellation": null,
+          "officialFooter": {
+            "passed": 447,
+            "flaky": 0,
+            "failed": 0,
+            "scope": "completed shard footer"
+          },
+          "plannedSelectedCases": 447,
+          "annotations": {
+            "count": 3,
+            "reportedCounts": {
+              "passed": 447
+            },
+            "matchesAvailableFooter": true
+          },
+          "ownTargetTests": [
+            {
+              "state": "known",
+              "frameworkOutcome": "passed"
+            },
+            {
+              "state": "stock",
+              "frameworkOutcome": "passed"
+            },
+            {
+              "state": "unknown",
+              "frameworkOutcome": "passed"
+            }
+          ],
+          "rawEvidenceReferences": [
+            {
+              "path": "private/ci-execution-41175351013/log-audit/job-log-evidence.json",
+              "sha256": "10e5bf54307e893aece1f5374e461034558d307109a5290320b36b156f6cebf6"
+            }
+          ],
+          "missing": [],
+          "jobCancellationDoesNotReplaceTestOutcome": true
+        },
+        {
+          "jobId": 124461647379,
+          "name": "Smoke / webkit / shard 1 of 4",
+          "project": "webkit",
+          "shard": 1,
+          "status": "completed",
+          "conclusion": "success",
+          "startedUTC": "2026-10-31T06:08:23Z",
+          "completedUTC": "2026-10-31T06:22:09Z",
+          "testedSourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "NodeVersion": "24.21.0",
+          "NodeTests": {
+            "tests": 602,
+            "pass": 602,
+            "fail": 0
+          },
+          "smokeStepConclusion": "success",
+          "smokeCompletedBeforeJobCancellation": null,
+          "officialFooter": {
+            "passed": 224,
+            "flaky": 0,
+            "failed": 0,
+            "scope": "completed shard footer"
+          },
+          "plannedSelectedCases": 224,
+          "annotations": {
+            "count": 3,
+            "reportedCounts": {
+              "passed": 224
+            },
+            "matchesAvailableFooter": true
+          },
+          "ownTargetTests": [],
+          "rawEvidenceReferences": [
+            {
+              "path": "private/ci-execution-41175351013/log-audit/job-log-evidence.json",
+              "sha256": "10e5bf54307e893aece1f5374e461034558d307109a5290320b36b156f6cebf6"
+            }
+          ],
+          "missing": [],
+          "jobCancellationDoesNotReplaceTestOutcome": true
+        },
+        {
+          "jobId": 124461647480,
+          "name": "Smoke / webkit / shard 2 of 4",
+          "project": "webkit",
+          "shard": 2,
+          "status": "completed",
+          "conclusion": "success",
+          "startedUTC": "2026-10-31T06:08:23Z",
+          "completedUTC": "2026-10-31T06:26:10Z",
+          "testedSourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "NodeVersion": "24.21.0",
+          "NodeTests": {
+            "tests": 602,
+            "pass": 602,
+            "fail": 0
+          },
+          "smokeStepConclusion": "success",
+          "smokeCompletedBeforeJobCancellation": null,
+          "officialFooter": {
+            "passed": 224,
+            "flaky": 0,
+            "failed": 0,
+            "scope": "completed shard footer"
+          },
+          "plannedSelectedCases": 224,
+          "annotations": {
+            "count": 4,
+            "reportedCounts": {
+              "passed": 224
+            },
+            "matchesAvailableFooter": true
+          },
+          "ownTargetTests": [],
+          "rawEvidenceReferences": [
+            {
+              "path": "private/ci-execution-41175351013/log-audit/job-log-evidence.json",
+              "sha256": "10e5bf54307e893aece1f5374e461034558d307109a5290320b36b156f6cebf6"
+            }
+          ],
+          "missing": [],
+          "jobCancellationDoesNotReplaceTestOutcome": true
+        },
+        {
+          "jobId": 124461647435,
+          "name": "Smoke / webkit / shard 3 of 4",
+          "project": "webkit",
+          "shard": 3,
+          "status": "completed",
+          "conclusion": "success",
+          "startedUTC": "2026-10-31T06:08:23Z",
+          "completedUTC": "2026-10-31T06:21:35Z",
+          "testedSourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "NodeVersion": "24.21.0",
+          "NodeTests": {
+            "tests": 602,
+            "pass": 602,
+            "fail": 0
+          },
+          "smokeStepConclusion": "success",
+          "smokeCompletedBeforeJobCancellation": null,
+          "officialFooter": {
+            "passed": 224,
+            "flaky": 0,
+            "failed": 0,
+            "scope": "completed shard footer"
+          },
+          "plannedSelectedCases": 224,
+          "annotations": {
+            "count": 4,
+            "reportedCounts": {
+              "passed": 224
+            },
+            "matchesAvailableFooter": true
+          },
+          "ownTargetTests": [],
+          "rawEvidenceReferences": [
+            {
+              "path": "private/ci-execution-41175351013/log-audit/job-log-evidence.json",
+              "sha256": "10e5bf54307e893aece1f5374e461034558d307109a5290320b36b156f6cebf6"
+            }
+          ],
+          "missing": [],
+          "jobCancellationDoesNotReplaceTestOutcome": true
+        },
+        {
+          "jobId": 124461647460,
+          "name": "Smoke / webkit / shard 4 of 4",
+          "project": "webkit",
+          "shard": 4,
+          "status": "completed",
+          "conclusion": "cancelled",
+          "startedUTC": "2026-10-31T06:08:22Z",
+          "completedUTC": "2026-10-31T06:54:09Z",
+          "testedSourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "NodeVersion": "24.21.0",
+          "NodeTests": {
+            "tests": 602,
+            "pass": 602,
+            "fail": 0
+          },
+          "smokeStepConclusion": "cancelled",
+          "smokeCompletedBeforeJobCancellation": false,
+          "officialFooter": {
+            "passed": null,
+            "flaky": null,
+            "failed": null,
+            "scope": "no final footer; Running 223 tests line only"
+          },
+          "plannedSelectedCases": 223,
+          "annotations": {
+            "count": 4,
+            "reportedCounts": {},
+            "matchesAvailableFooter": true
+          },
+          "ownTargetTests": [
+            {
+              "state": "known",
+              "frameworkOutcome": null
+            },
+            {
+              "state": "stock",
+              "frameworkOutcome": null
+            },
+            {
+              "state": "unknown",
+              "frameworkOutcome": null
+            }
+          ],
+          "rawEvidenceReferences": [
+            {
+              "path": "private/ci-execution-41175351013/log-audit/job-log-evidence.json",
+              "sha256": "10e5bf54307e893aece1f5374e461034558d307109a5290320b36b156f6cebf6"
+            }
+          ],
+          "missing": [
+            "final smoke footer and complete case outcomes"
+          ],
+          "jobCancellationDoesNotReplaceTestOutcome": true
+        }
+      ],
+      "fullJobState": "skipped",
+      "cancelledJobs": [
+        124461647460
+      ],
+      "unstartedJobs": null,
+      "missingJobs": [],
+      "workflowId": 361880120,
+      "acceptedObservation": {
+        "timestampUTC": "2026-10-31T06:08:19Z",
+        "stateAtAcceptance": "queued",
+        "sameHeadAutomaticEquivalentRunsObserved": 0,
+        "sourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+        "laterCurrentStatusOrFinalResultNotInferred": true
+      },
+      "officialAnnotationsReviewedForAvailableFooters": true,
+      "officialAnnotationsReviewScope": "all available official pages; case footer reconciliation complete only for C1-2/W1-3, W4 footer absent",
+      "unstartedSmokeJobs": []
+    },
+    "actualTotals": {
+      "chromium": {
+        "passed": 895,
+        "flaky": 0,
+        "failed": 0,
+        "officialSelectionCount": 895,
+        "coverage": "both Chromium shard final footers complete",
+        "forecast895MatchedCompleteOfficialFooters": true
+      },
+      "webkit": {
+        "passed": null,
+        "flaky": null,
+        "failed": null,
+        "officialSelectionCount": 895,
+        "coverage": "scheduled895 observed; only W1-3 subtotal has final outcomes; W4 final footer missing",
+        "completedW1ToW3Subtotal": {
+          "passed": 672,
+          "flaky": 0,
+          "failed": 0,
+          "plannedW4Cases": 223,
+          "wholeWebKitOutcome": null,
+          "W4PlannedCountIsNotObservedOutcome": true
+        },
+        "forecast895NotPromotedToMeasuredWholeTotal": true,
+        "observedScheduledCases": 895,
+        "forecast895MatchedObservedScheduledOnly": true
+      },
+      "node": {
+        "perJobResults": [
+          {
+            "jobId": 124461647515,
+            "tests": 602,
+            "pass": 602,
+            "fail": 0
+          },
+          {
+            "jobId": 124461647442,
+            "tests": 602,
+            "pass": 602,
+            "fail": 0
+          },
+          {
+            "jobId": 124461647379,
+            "tests": 602,
+            "pass": 602,
+            "fail": 0
+          },
+          {
+            "jobId": 124461647480,
+            "tests": 602,
+            "pass": 602,
+            "fail": 0
+          },
+          {
+            "jobId": 124461647435,
+            "tests": 602,
+            "pass": 602,
+            "fail": 0
+          },
+          {
+            "jobId": 124461647460,
+            "tests": 602,
+            "pass": 602,
+            "fail": 0
+          }
+        ],
+        "uniformObservedVersion": "24.21.0",
+        "uniformNodeCaseCount": 602,
+        "forecast602MatchedAllSixActualJobs": true
+      },
+      "outcomesAreNotStrictFirstPassOrPhysicalAttemptCounts": true,
+      "cancelledOrMissingCasesNotInferred": true
+    },
+    "ownSix": {
+      "caseResults": [
+        {
+          "project": "chromium",
+          "state": "known",
+          "caseUnit": "one-five-bbv-cl",
+          "jobId": 124461647442,
+          "sourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "observedInitialProgressCount": 1,
+          "observedRetryErrorReferences": 0,
+          "finalFrameworkOutcome": "passed",
+          "finalOutcomeScope": "complete C2 passed footer plus own initial progress",
+          "savedAndLoadComparison": {
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "sameDocument": true,
+            "savedStrictIdentityFields": 20,
+            "loadStrictIdentityFields": 20,
+            "savedExtraPureBlankRows": 2,
+            "loadExtraPureBlankRows": 2,
+            "allOriginalIdentityFieldsExact": true,
+            "allExtraRowsPureBlank": true,
+            "loadWholeCustomExact": true,
+            "savedOriginalWholeExact": false,
+            "savedOriginalArrayIdentityExact": false,
+            "savedOriginalGearArrayExact": false,
+            "savedProposalGearMatches": true,
+            "sourceAndOtherMetadataExact": true,
+            "loadRouteReady": true,
+            "loadRouteManual": false,
+            "observedInvariantMismatchCount": 0,
+            "missingCheckpoints": 0,
+            "metadataSHA256": "cc8486f4462f77cc53612f51b27c78a774b3d07214ec5a3e6cd1d34130879b15",
+            "artifactId": 13034375251,
+            "member": "route-one-five-bbv-cl-1-5--952db-save-or-safe-abort-and-load-chromium/route-guidance-summary.json"
+          },
+          "metadataCompletedMustNotPromoteFrameworkOutcome": true,
+          "evidence": {
+            "path": "private/ci-execution-41175351013/failure-audit/one-five-log-progress-result-evidence.json",
+            "sha256": "3fd9ec54669644f01c5edf91f67ffd08861113445191a35073a1f570021be2f9"
+          },
+          "independentFrameIdOrDropCountersAbsent": true,
+          "numericJSONRetryIndexAbsent": true
+        },
+        {
+          "project": "chromium",
+          "state": "stock",
+          "caseUnit": "one-five-bbv-cl",
+          "jobId": 124461647442,
+          "sourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "observedInitialProgressCount": 1,
+          "observedRetryErrorReferences": 0,
+          "finalFrameworkOutcome": "passed",
+          "finalOutcomeScope": "complete C2 passed footer plus own initial progress",
+          "savedAndLoadComparison": {
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "sameDocument": true,
+            "savedStrictIdentityFields": 20,
+            "loadStrictIdentityFields": 20,
+            "savedExtraPureBlankRows": 2,
+            "loadExtraPureBlankRows": 2,
+            "allOriginalIdentityFieldsExact": true,
+            "allExtraRowsPureBlank": true,
+            "loadWholeCustomExact": true,
+            "savedOriginalWholeExact": false,
+            "savedOriginalArrayIdentityExact": false,
+            "savedOriginalGearArrayExact": false,
+            "savedProposalGearMatches": true,
+            "sourceAndOtherMetadataExact": true,
+            "loadRouteReady": true,
+            "loadRouteManual": false,
+            "observedInvariantMismatchCount": 0,
+            "missingCheckpoints": 0,
+            "metadataSHA256": "81a33c21279f7c20a359c69df514362c757505ee04aaec7515b266e594453c19",
+            "artifactId": 13034375251,
+            "member": "route-one-five-bbv-cl-1-5--fbeea-save-or-safe-abort-and-load-chromium/route-guidance-summary.json"
+          },
+          "metadataCompletedMustNotPromoteFrameworkOutcome": true,
+          "evidence": {
+            "path": "private/ci-execution-41175351013/failure-audit/one-five-log-progress-result-evidence.json",
+            "sha256": "3fd9ec54669644f01c5edf91f67ffd08861113445191a35073a1f570021be2f9"
+          },
+          "independentFrameIdOrDropCountersAbsent": true,
+          "numericJSONRetryIndexAbsent": true
+        },
+        {
+          "project": "chromium",
+          "state": "unknown",
+          "caseUnit": "one-five-bbv-cl",
+          "jobId": 124461647442,
+          "sourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "observedInitialProgressCount": 1,
+          "observedRetryErrorReferences": 0,
+          "finalFrameworkOutcome": "passed",
+          "finalOutcomeScope": "complete C2 passed footer plus own initial progress",
+          "savedAndLoadComparison": {
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "sameDocument": true,
+            "savedStrictIdentityFields": 20,
+            "loadStrictIdentityFields": 20,
+            "savedExtraPureBlankRows": 0,
+            "loadExtraPureBlankRows": 0,
+            "allOriginalIdentityFieldsExact": true,
+            "allExtraRowsPureBlank": true,
+            "loadWholeCustomExact": true,
+            "savedOriginalWholeExact": true,
+            "savedOriginalArrayIdentityExact": true,
+            "savedOriginalGearArrayExact": true,
+            "savedProposalGearMatches": null,
+            "sourceAndOtherMetadataExact": true,
+            "loadRouteReady": false,
+            "loadRouteManual": true,
+            "observedInvariantMismatchCount": 0,
+            "missingCheckpoints": 0,
+            "metadataSHA256": "e11868889115fe5f908323290310b8ab845414352fdf8b9f9ab1394b49298113",
+            "artifactId": 13034375251,
+            "member": "route-one-five-bbv-cl-1-5--d7dd5-save-or-safe-abort-and-load-chromium/route-guidance-summary.json"
+          },
+          "metadataCompletedMustNotPromoteFrameworkOutcome": true,
+          "evidence": {
+            "path": "private/ci-execution-41175351013/failure-audit/one-five-log-progress-result-evidence.json",
+            "sha256": "3fd9ec54669644f01c5edf91f67ffd08861113445191a35073a1f570021be2f9"
+          },
+          "independentFrameIdOrDropCountersAbsent": true,
+          "numericJSONRetryIndexAbsent": true
+        },
+        {
+          "project": "webkit",
+          "state": "known",
+          "caseUnit": "one-five-bbv-cl",
+          "jobId": 124461647460,
+          "sourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "observedInitialProgressCount": 1,
+          "observedRetryErrorReferences": 0,
+          "finalFrameworkOutcome": null,
+          "finalOutcomeScope": "W4 own progress and next-case transition; no final footer, outcome unknown",
+          "savedAndLoadComparison": {
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "sameDocument": true,
+            "savedStrictIdentityFields": 20,
+            "loadStrictIdentityFields": 20,
+            "savedExtraPureBlankRows": 2,
+            "loadExtraPureBlankRows": 2,
+            "allOriginalIdentityFieldsExact": true,
+            "allExtraRowsPureBlank": true,
+            "loadWholeCustomExact": true,
+            "savedOriginalWholeExact": false,
+            "savedOriginalArrayIdentityExact": false,
+            "savedOriginalGearArrayExact": false,
+            "savedProposalGearMatches": true,
+            "sourceAndOtherMetadataExact": true,
+            "loadRouteReady": true,
+            "loadRouteManual": false,
+            "observedInvariantMismatchCount": 0,
+            "missingCheckpoints": 0,
+            "metadataSHA256": "de1ce07d2fc01f14533c18a0e1eb91a104d29275229c3f12f6584188ce6b8c20",
+            "artifactId": 13033458502,
+            "member": "route-one-five-bbv-cl-1-5--952db-save-or-safe-abort-and-load-webkit/route-guidance-summary.json"
+          },
+          "metadataCompletedMustNotPromoteFrameworkOutcome": true,
+          "evidence": {
+            "path": "private/ci-execution-41175351013/failure-audit/one-five-log-progress-result-evidence.json",
+            "sha256": "3fd9ec54669644f01c5edf91f67ffd08861113445191a35073a1f570021be2f9"
+          },
+          "independentFrameIdOrDropCountersAbsent": true,
+          "numericJSONRetryIndexAbsent": true
+        },
+        {
+          "project": "webkit",
+          "state": "stock",
+          "caseUnit": "one-five-bbv-cl",
+          "jobId": 124461647460,
+          "sourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "observedInitialProgressCount": 1,
+          "observedRetryErrorReferences": 0,
+          "finalFrameworkOutcome": null,
+          "finalOutcomeScope": "W4 own progress and next-case transition; no final footer, outcome unknown",
+          "savedAndLoadComparison": {
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "sameDocument": true,
+            "savedStrictIdentityFields": 20,
+            "loadStrictIdentityFields": 20,
+            "savedExtraPureBlankRows": 2,
+            "loadExtraPureBlankRows": 2,
+            "allOriginalIdentityFieldsExact": true,
+            "allExtraRowsPureBlank": true,
+            "loadWholeCustomExact": true,
+            "savedOriginalWholeExact": false,
+            "savedOriginalArrayIdentityExact": false,
+            "savedOriginalGearArrayExact": false,
+            "savedProposalGearMatches": true,
+            "sourceAndOtherMetadataExact": true,
+            "loadRouteReady": true,
+            "loadRouteManual": false,
+            "observedInvariantMismatchCount": 0,
+            "missingCheckpoints": 0,
+            "metadataSHA256": "88f77728c071b94f7b9cd2c8715af3e889b0ba8efb586bba9ca04aada3825e43",
+            "artifactId": 13033458502,
+            "member": "route-one-five-bbv-cl-1-5--fbeea-save-or-safe-abort-and-load-webkit/route-guidance-summary.json"
+          },
+          "metadataCompletedMustNotPromoteFrameworkOutcome": true,
+          "evidence": {
+            "path": "private/ci-execution-41175351013/failure-audit/one-five-log-progress-result-evidence.json",
+            "sha256": "3fd9ec54669644f01c5edf91f67ffd08861113445191a35073a1f570021be2f9"
+          },
+          "independentFrameIdOrDropCountersAbsent": true,
+          "numericJSONRetryIndexAbsent": true
+        },
+        {
+          "project": "webkit",
+          "state": "unknown",
+          "caseUnit": "one-five-bbv-cl",
+          "jobId": 124461647460,
+          "sourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "observedInitialProgressCount": 1,
+          "observedRetryErrorReferences": 0,
+          "finalFrameworkOutcome": null,
+          "finalOutcomeScope": "W4 own progress and next-case transition; no final footer, outcome unknown",
+          "savedAndLoadComparison": {
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "sameDocument": true,
+            "savedStrictIdentityFields": 20,
+            "loadStrictIdentityFields": 20,
+            "savedExtraPureBlankRows": 0,
+            "loadExtraPureBlankRows": 0,
+            "allOriginalIdentityFieldsExact": true,
+            "allExtraRowsPureBlank": true,
+            "loadWholeCustomExact": true,
+            "savedOriginalWholeExact": true,
+            "savedOriginalArrayIdentityExact": true,
+            "savedOriginalGearArrayExact": true,
+            "savedProposalGearMatches": null,
+            "sourceAndOtherMetadataExact": true,
+            "loadRouteReady": false,
+            "loadRouteManual": true,
+            "observedInvariantMismatchCount": 0,
+            "missingCheckpoints": 0,
+            "metadataSHA256": "1a55c063d3884a4117b0bb15ac622f33a693e4946b6c88f480f4207a29a147eb",
+            "artifactId": 13033458502,
+            "member": "route-one-five-bbv-cl-1-5--d7dd5-save-or-safe-abort-and-load-webkit/route-guidance-summary.json"
+          },
+          "metadataCompletedMustNotPromoteFrameworkOutcome": true,
+          "evidence": {
+            "path": "private/ci-execution-41175351013/failure-audit/one-five-log-progress-result-evidence.json",
+            "sha256": "3fd9ec54669644f01c5edf91f67ffd08861113445191a35073a1f570021be2f9"
+          },
+          "independentFrameIdOrDropCountersAbsent": true,
+          "numericJSONRetryIndexAbsent": true
+        }
+      ],
+      "initialSuccessCases": 3,
+      "retrySuccessCases": null,
+      "finalFailureCases": null,
+      "cancelledOrUnstartedCases": null,
+      "unknownCases": 3,
+      "savedReadReached": 6,
+      "loadReadReached": 6,
+      "savedStrictIdentityFields": 120,
+      "loadStrictIdentityFields": 120,
+      "sameDocumentLoadCount": 6,
+      "newSaveMismatchPositiveCount": 0,
+      "oldLocalOrOtherAttemptSuccessDoesNotFillCIGaps": true,
+      "summaryCountScope": "confirmed C3 pass only; W3 framework final outcome unknown; retry/error absence is observation not complete run outcome",
+      "completedMetadataCount": 6,
+      "missingCheckpoints": 0,
+      "pageerrorCount": 0,
+      "navigationCollectionFailures": 0,
+      "explicitCollectionCounterGaps": [],
+      "independentDropCount": null,
+      "independentFrameId": null,
+      "physicalAttemptCountFromMetadata": null,
+      "numericRetryIndexPresentInJSON": false,
+      "metadataCompletedIsNotFrameworkPass": true,
+      "wholeInputAndReturnedPlanAndHTTPServedHashesNotCaptured": true,
+      "localTrialFalseMarkerIsNotCIBinding": true,
+      "binding": "same run official artifact ID + exact unit-specific member prefix + JSON unit/state/project + same-job progress log; no common basename-only binding",
+      "metadataAuditSummarySHA256": "1fa8d61975d5f6d5bf75a34374b5e88b0c656924461bbd7edd77cc8bc1a35ca0"
+    },
+    "environment": {
+      "imageDigestByJob": {
+        "124461647515": "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29",
+        "124461647442": "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29",
+        "124461647379": "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29",
+        "124461647480": "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29",
+        "124461647435": "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29",
+        "124461647460": "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29"
+      },
+      "imageIDByJob": null,
+      "nodeVersionByJob": {
+        "124461647515": "24.21.0",
+        "124461647442": "24.21.0",
+        "124461647379": "24.21.0",
+        "124461647480": "24.21.0",
+        "124461647435": "24.21.0",
+        "124461647460": "24.21.0"
+      },
+      "playwrightVersionByJob": {
+        "124461647515": "1.55.0",
+        "124461647442": "1.55.0",
+        "124461647379": "1.55.0",
+        "124461647480": "1.55.0",
+        "124461647435": "1.55.0",
+        "124461647460": "1.55.0"
+      },
+      "browserRevisionsByProject": {
+        "chromium": "1187",
+        "webkit": "2203"
+      },
+      "workersByJob": null,
+      "retryPolicyByJob": null,
+      "sourceBindingByJob": null,
+      "environmentDifferencesNotProductDifferences": true,
+      "checkoutSourceByJob": {
+        "124461647515": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+        "124461647442": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+        "124461647379": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+        "124461647480": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+        "124461647435": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+        "124461647460": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0"
+      },
+      "observedImageDigestPrefixAllSix": "sha256:b27e",
+      "allSixRootLogAuditEnvironmentConfirmed": true,
+      "servedSourceHashesMeasured": false,
+      "HTTPServedHashesAndIndependentImageIDNotCollected": true
+    },
+    "collection": {
+      "state": "closed-collector-and-independent-final-review-passed",
+      "officialMetadataAndAnnotations": {
+        "terminalRun": {
+          "path": "private/ci-execution-41175351013/terminal-run.raw.json",
+          "sha256": "8ff05b1236edd45efd1612bfaf2f6193b54fd43565f44de7bd77baf75d86839c"
+        },
+        "terminalJobs": {
+          "path": "private/ci-execution-41175351013/terminal-jobs.raw.json",
+          "sha256": "fede088c84ce6949b85f1fd6033e12219e95098cfc43b06219d0b9701a0929f6"
+        },
+        "annotationsReview": null
+      },
+      "artifactInventory": {
+        "totalOfficialArtifacts": 10,
+        "within512MiBAppCandidates": 8,
+        "over512MiBNotDownloaded": 2,
+        "appReceivedSoFar": 8,
+        "appPending": 0,
+        "receivedAndMissingDetails": null,
+        "acquisitionStatus": "closed-all8-small-app-artifacts-received-two-overcap-unrequested",
+        "eachArtifactIDAttemptedOnce": true,
+        "officialSizeDigestAndCRCMatches": true,
+        "CLIArtifactDownloads": 0,
+        "signedURLSavedOrPrinted": false,
+        "receivedZIPBytes": 344723,
+        "receivedZIPMembers": 72,
+        "internalInventoryOfUnreceivedArchives": null
+      },
+      "rawOriginalReferences": {
+        "collectorManifest": {
+          "path": "private/ci-execution-41175351013/collector-manifest.json",
+          "sha256": "44d4c2af4e6d4114f84bd667127fa3a62182c730868669d3afb60748fb6204e9"
+        },
+        "note": "all acquired original files hashed; two overcap archive contents not received, inventory unknown; no inference from local trace inventory"
+      },
+      "manifestSHA256": "44d4c2af4e6d4114f84bd667127fa3a62182c730868669d3afb60748fb6204e9",
+      "independentReviewSHA256": "010e08f036c4d31d9313d706f262f6185982313b39f56cf9299b93c2e59e9ea0",
+      "receiptsAndMissing": [
+        {
+          "id": 13034375251,
+          "name": "route-summary-chromium-2-41175351013",
+          "officialBytes": 22030,
+          "requested": true,
+          "complete": true,
+          "sha256": "92f469edd94db62cd8835bfafe9208e9bddc8579c0ef001a0b791c631b2bde06",
+          "officialSizeMatches": true,
+          "officialDigestMatches": true,
+          "crcVerified": true,
+          "members": 24,
+          "receipt": {
+            "path": "app-artifacts/13034375251/receipt.json",
+            "bytes": 8158,
+            "sha256": "625571c12913d47620a43280ff3931a86f685ec4f802d142517a1a8cdde92640"
+          }
+        },
+        {
+          "id": 13033458502,
+          "name": "route-summary-webkit-4-41175351013",
+          "officialBytes": 23663,
+          "requested": true,
+          "complete": true,
+          "sha256": "1072dd2f3b61fcfa416bd67767a02e08b9d370e404e2a04dc783f47e9a9f01b2",
+          "officialSizeMatches": true,
+          "officialDigestMatches": true,
+          "crcVerified": true,
+          "members": 26,
+          "receipt": {
+            "path": "app-artifacts/13033458502/receipt.json",
+            "bytes": 8715,
+            "sha256": "629554128ba34b2928e9826660e4f4bf6c6639e0303cc0b1c9517a333e8bc519"
+          }
+        },
+        {
+          "id": 13033711400,
+          "name": "prerequisite-import-webkit-2-41175351013",
+          "officialBytes": 717,
+          "requested": true,
+          "complete": true,
+          "sha256": "8057518baff7af81c3cebebb7ed288068e59db09151655ac49df90adf85f4058",
+          "officialSizeMatches": true,
+          "officialDigestMatches": true,
+          "crcVerified": true,
+          "members": 1,
+          "receipt": {
+            "path": "app-artifacts/13033711400/receipt.json",
+            "bytes": 1174,
+            "sha256": "4163968f844d5cba1b855d5bdb972ca11dd578118baef0961721ecb9999b7156"
+          }
+        },
+        {
+          "id": 13033143873,
+          "name": "prerequisite-import-webkit-4-41175351013",
+          "officialBytes": 2106,
+          "requested": true,
+          "complete": true,
+          "sha256": "415e7668e4d7652be8ec3f01f3952aa3d0be44ed389a07e441f08198ce345206",
+          "officialSizeMatches": true,
+          "officialDigestMatches": true,
+          "crcVerified": true,
+          "members": 2,
+          "receipt": {
+            "path": "app-artifacts/13033143873/receipt.json",
+            "bytes": 1488,
+            "sha256": "79928d6a432c905ea64401d3f5d2af6e4a6dd2bc9e72a0aeeffa25db2a295e55"
+          }
+        },
+        {
+          "id": 13033621095,
+          "name": "prerequisite-import-webkit-3-41175351013",
+          "officialBytes": 2290,
+          "requested": true,
+          "complete": true,
+          "sha256": "341cc267206083f9a22d20637893949e57a03f8dbd531282bac25938c91489a9",
+          "officialSizeMatches": true,
+          "officialDigestMatches": true,
+          "crcVerified": true,
+          "members": 2,
+          "receipt": {
+            "path": "app-artifacts/13033621095/receipt.json",
+            "bytes": 1487,
+            "sha256": "dba60c51507d72a409c4fcb7ea01850fd072ad398434ccfd6f9a1c69c220e1d8"
+          }
+        },
+        {
+          "id": 13034031071,
+          "name": "prerequisite-import-chromium-2-41175351013",
+          "officialBytes": 3840,
+          "requested": true,
+          "complete": true,
+          "sha256": "bb229095c1a17b48b07993792dab722b2ed569854f01944b396c9bc3839f132b",
+          "officialSizeMatches": true,
+          "officialDigestMatches": true,
+          "crcVerified": true,
+          "members": 3,
+          "receipt": {
+            "path": "app-artifacts/13034031071/receipt.json",
+            "bytes": 1811,
+            "sha256": "6ca4ca79d92654284f298ef900a331239f26922b402f5f4017acd8bf3fa3080f"
+          }
+        },
+        {
+          "id": 13032897283,
+          "name": "prerequisite-import-webkit-1-41175351013",
+          "officialBytes": 128013,
+          "requested": true,
+          "complete": true,
+          "sha256": "f5acf7f561f392d4e13a940b2aa8116c2078f232b9c30a256315a002ace75c7d",
+          "officialSizeMatches": true,
+          "officialDigestMatches": true,
+          "crcVerified": true,
+          "members": 7,
+          "receipt": {
+            "path": "app-artifacts/13032897283/receipt.json",
+            "bytes": 3343,
+            "sha256": "bd29de3519828bd7e16c30d4a0594f2c2d9f52f2e8ac8ce43932512446f107f9"
+          }
+        },
+        {
+          "id": 13033142416,
+          "name": "prerequisite-import-chromium-1-41175351013",
+          "officialBytes": 162064,
+          "requested": true,
+          "complete": true,
+          "sha256": "9ce7972081280fb6728cd0b29beae4514b7e05f8fc810763c9a9a8dfbf3ffed4",
+          "officialSizeMatches": true,
+          "officialDigestMatches": true,
+          "crcVerified": true,
+          "members": 7,
+          "receipt": {
+            "path": "app-artifacts/13033142416/receipt.json",
+            "bytes": 3358,
+            "sha256": "b250eb9523aebd1b14e723df7c68a5f355026e9a8c91aca210d64ee13b78759f"
+          }
+        },
+        {
+          "id": 13033443617,
+          "name": "attempt-diagnostics-webkit-4-41175351013",
+          "officialBytes": 703602642,
+          "requested": false,
+          "notRequestedReason": "over512MiB",
+          "memberInventoryRead": false,
+          "actualContainedFiles": null
+        },
+        {
+          "id": 13034315444,
+          "name": "attempt-diagnostics-chromium-2-41175351013",
+          "officialBytes": 1828495098,
+          "requested": false,
+          "notRequestedReason": "over512MiB",
+          "memberInventoryRead": false,
+          "actualContainedFiles": null
+        }
+      ],
+      "boundary": {
+        "maxArtifactBytes": 536870912,
+        "sizeFromApplicationBeforeDownloadRequired": true,
+        "oversizeAction": "stop-before-download; retain missing; no limit bypass",
+        "firstBlockingAcquisitionErrorAction": "record error, use only an already-authorized alternate existing path if available; do not repeat same forbidden/CLI path",
+        "credentialChangeOrExposureAllowed": false,
+        "newCIRunToFillMissingAllowed": false
+      },
+      "rawValuesPrivate": true,
+      "sharedOnlyAllowlistedMetadata": true,
+      "rawOriginalRewriteAllowed": false,
+      "logAuditReferences": {
+        "log-audit-summary.json": {
+          "path": "private/ci-execution-41175351013/log-audit/log-audit-summary.json",
+          "sha256": "17dea529d968041c14effbb59b485a4680af700e399de0742640e6c647ffa28f"
+        },
+        "job-log-evidence.json": {
+          "path": "private/ci-execution-41175351013/log-audit/job-log-evidence.json",
+          "sha256": "10e5bf54307e893aece1f5374e461034558d307109a5290320b36b156f6cebf6"
+        },
+        "closure.json": {
+          "path": "private/ci-execution-41175351013/log-audit/closure.json",
+          "sha256": "235e53edb35aaaf0fd0ec17929b25bbdf8bf4ee710ed76829328891a927f2624"
+        }
+      },
+      "metadataAuditReferences": {
+        "metadata-audit-summary.json": {
+          "path": "private/ci-execution-41175351013/metadata-audit/metadata-audit-summary.json",
+          "sha256": "1fa8d61975d5f6d5bf75a34374b5e88b0c656924461bbd7edd77cc8bc1a35ca0"
+        },
+        "per-trial-metadata.json": {
+          "path": "private/ci-execution-41175351013/metadata-audit/per-trial-metadata.json",
+          "sha256": "6db2ee618d61e1d3d51cb8c34ef0a5fd059d0384cbf4ae65e14b0be7967ccac7"
+        },
+        "manifest.json": {
+          "path": "private/ci-execution-41175351013/metadata-audit/manifest.json",
+          "sha256": "755532e3e4376b48257621f9340a0022bab7a399ebfbeb304b61914ba09628eb"
+        },
+        "closure.json": {
+          "path": "private/ci-execution-41175351013/metadata-audit/closure.json",
+          "sha256": "0c5becafc186560ee2a0eb2c4fb6e795ce7dd1a68d4c0a20e3dfcc21fa7793e4"
+        }
+      },
+      "canonicalSummaryReference": {
+        "path": "private/ci-execution-41175351013/ci-summary.json",
+        "sha256": "c686e8124af8988633afff9b53956c7b0f971e9638ed6d32d350281d9ccfdce9"
+      },
+      "closureReference": {
+        "path": "private/ci-execution-41175351013/collector-closure.json",
+        "sha256": "96c591c9f34b35cf7196045c3783388a8588d2d3c84914d9308e4606aee50430"
+      },
+      "payloadFiles": 435,
+      "payloadBytes": 152705950,
+      "artifactRecoverySummaryReference": {
+        "path": "private/ci-execution-41175351013/artifact-recovery-summary.json",
+        "sha256": "7c6ac73b9f756c506febecb2d02a4e6c2b5ddfb014d70c0c34a38ce2678783c3"
+      },
+      "oversizeDiagnosticArchiveGap": {
+        "unreceivedArchiveCount": 2,
+        "internalMemberInventoryUnobserved": true,
+        "rawSavedBodiesTraceVideoExistenceAndCountsInsideArchives": null,
+        "rawSavedBodiesAndTraceVideoAcquisitionFromThoseArchivesUnverified": true,
+        "localRawTraceInventoryNotTransferredToCI": true,
+        "processedCheckpointComparisonsAreSeparateEvidence": true
+      },
+      "formalLogZIP": {
+        "path": "private/ci-execution-41175351013/attempt-1-logs.zip",
+        "bytes": 11852692,
+        "sha256": "f79eddd68a6c1e833b91a504284691d823d9dbf5b0a7bf0255a1cc79ec7a762e",
+        "members": 101,
+        "CRCVerified": true,
+        "requests": 1
+      },
+      "independentFinalReferences": {
+        "review.json": {
+          "path": "private/ci-final-independent-review/review.json",
+          "sha256": "010e08f036c4d31d9313d706f262f6185982313b39f56cf9299b93c2e59e9ea0"
+        },
+        "manifest.json": {
+          "path": "private/ci-final-independent-review/manifest.json",
+          "sha256": "58d8d939c37511d2b4d1804fcc77062082f48b9fbcf8d27ac6c2226a25f9b894"
+        },
+        "closure.json": {
+          "path": "private/ci-final-independent-review/closure.json",
+          "sha256": "193250f2132f920fc162f89eab37c8be4d0ec3a2d29b9823ba38dc7001f870e4"
+        }
+      },
+      "independentPayloadFiles": 5,
+      "independentPayloadBytes": 51217,
+      "rawOriginalsRewrittenOrDeleted": 0,
+      "sanitizerExecuted": false
+    },
+    "oldFailuresNotBackfilled": {
+      "CI41113618989": "case breakdown and save comparison remain missing",
+      "CI41149583450": "historical Node-stage failure and browser unreached remain unchanged",
+      "CI41151020734": "7-5 first/6-1 stock initial/retry after-load hidden-click stops and missing load-full/caller/cause remain unchanged"
+    },
+    "matrix": {
+      "before": [
+        27,
+        151,
+        58
+      ],
+      "after": [
+        27,
+        151,
+        58
+      ],
+      "changedCells": [],
+      "reason": "same-row finite additional evidence only; all236 status and other58 rows/legacy53 unchanged"
+    },
+    "newFindingsAndResiduals": {
+      "confirmed": "all6 Node 602 pass; Chromium 895/0/0 complete; WebKit W1-3 subtotal672/0/0 only; ownnewC3 and canonicalC3 first pass; W own3+canonical3 final unknown; new and canonical units separately saved120/load120, sameDocument6, metadata completed6 and invariants match",
+      "pending": [],
+      "noNewSaveMismatchClaimBeforeOwnEvidence": false,
+      "nextIndependentTarget": "same1-5/index1 ADFGJ BBV1CL2DD1 after current record closes; not executed by this record preparer",
+      "newSaveMismatchPositiveObserved": false,
+      "retainedMissing": [
+        "W4/full WebKit final reporter case outcomes and unique started/ended/unstarted/interrupted totals",
+        "W4 own new3 and oldcanonical3 final framework outcomes, despite completed preservation metadata",
+        "two over-cap diagnostic archive internal inventories and full raw value/trace/video acquisition",
+        "independent frame ID/URL/drop fields, full input/full returned plan and HTTP served-source hashes"
+      ],
+      "noFullGlobalStorageSafetyProofForUnobservedTrials": true
+    },
+    "nextTarget": {
+      "scope": "same1-5/index1 ADFGJ BBV1CL2DD1",
+      "state": "candidate-after-this-record-application; no success-purpose CI rerun",
+      "generalFlagOnlyForbidden": true,
+      "newImplementationOrBrowserRunByRecordPreparer": false
+    },
+    "PR152DraftUnpublishedAndProtectedTargetsMaintained": true,
+    "wholeRouteOrPublicationReady": false,
+    "ownCanonicalSix": {
+      "unit": "one-five-middle",
+      "caseResults": [
+        {
+          "project": "chromium",
+          "state": "known",
+          "caseUnit": "one-five-middle",
+          "jobId": 124461647442,
+          "sourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "observedInitialProgressCount": 1,
+          "observedRetryErrorReferences": 0,
+          "finalFrameworkOutcome": "passed",
+          "finalOutcomeScope": "complete C2 passed footer plus own initial progress",
+          "savedAndLoadComparison": {
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "sameDocument": true,
+            "savedStrictIdentityFields": 20,
+            "loadStrictIdentityFields": 20,
+            "savedExtraPureBlankRows": 2,
+            "loadExtraPureBlankRows": 2,
+            "allOriginalIdentityFieldsExact": true,
+            "allExtraRowsPureBlank": true,
+            "loadWholeCustomExact": true,
+            "savedOriginalWholeExact": false,
+            "savedOriginalArrayIdentityExact": false,
+            "savedOriginalGearArrayExact": false,
+            "savedProposalGearMatches": true,
+            "sourceAndOtherMetadataExact": true,
+            "loadRouteReady": true,
+            "loadRouteManual": false,
+            "observedInvariantMismatchCount": 0,
+            "missingCheckpoints": 0,
+            "metadataSHA256": "1ed59218e9150614281a87132c21129507ccebfcd8508032a942a171d5715f9f",
+            "artifactId": 13034375251,
+            "member": "route-one-five-middle-1-5--2719a-save-or-safe-abort-and-load-chromium/route-guidance-summary.json"
+          },
+          "metadataCompletedMustNotPromoteFrameworkOutcome": true,
+          "evidence": {
+            "path": "private/ci-execution-41175351013/failure-audit/one-five-log-progress-result-evidence.json",
+            "sha256": "3fd9ec54669644f01c5edf91f67ffd08861113445191a35073a1f570021be2f9"
+          },
+          "independentFrameIdOrDropCountersAbsent": true,
+          "numericJSONRetryIndexAbsent": true
+        },
+        {
+          "project": "chromium",
+          "state": "stock",
+          "caseUnit": "one-five-middle",
+          "jobId": 124461647442,
+          "sourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "observedInitialProgressCount": 1,
+          "observedRetryErrorReferences": 0,
+          "finalFrameworkOutcome": "passed",
+          "finalOutcomeScope": "complete C2 passed footer plus own initial progress",
+          "savedAndLoadComparison": {
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "sameDocument": true,
+            "savedStrictIdentityFields": 20,
+            "loadStrictIdentityFields": 20,
+            "savedExtraPureBlankRows": 2,
+            "loadExtraPureBlankRows": 2,
+            "allOriginalIdentityFieldsExact": true,
+            "allExtraRowsPureBlank": true,
+            "loadWholeCustomExact": true,
+            "savedOriginalWholeExact": false,
+            "savedOriginalArrayIdentityExact": false,
+            "savedOriginalGearArrayExact": false,
+            "savedProposalGearMatches": true,
+            "sourceAndOtherMetadataExact": true,
+            "loadRouteReady": true,
+            "loadRouteManual": false,
+            "observedInvariantMismatchCount": 0,
+            "missingCheckpoints": 0,
+            "metadataSHA256": "438f112e956f4f6d25abfd931402bcf85dfbc3dd9d91084b1e9f8e56eadf88df",
+            "artifactId": 13034375251,
+            "member": "route-one-five-middle-1-5--7d0a0-save-or-safe-abort-and-load-chromium/route-guidance-summary.json"
+          },
+          "metadataCompletedMustNotPromoteFrameworkOutcome": true,
+          "evidence": {
+            "path": "private/ci-execution-41175351013/failure-audit/one-five-log-progress-result-evidence.json",
+            "sha256": "3fd9ec54669644f01c5edf91f67ffd08861113445191a35073a1f570021be2f9"
+          },
+          "independentFrameIdOrDropCountersAbsent": true,
+          "numericJSONRetryIndexAbsent": true
+        },
+        {
+          "project": "chromium",
+          "state": "unknown",
+          "caseUnit": "one-five-middle",
+          "jobId": 124461647442,
+          "sourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "observedInitialProgressCount": 1,
+          "observedRetryErrorReferences": 0,
+          "finalFrameworkOutcome": "passed",
+          "finalOutcomeScope": "complete C2 passed footer plus own initial progress",
+          "savedAndLoadComparison": {
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "sameDocument": true,
+            "savedStrictIdentityFields": 20,
+            "loadStrictIdentityFields": 20,
+            "savedExtraPureBlankRows": 0,
+            "loadExtraPureBlankRows": 0,
+            "allOriginalIdentityFieldsExact": true,
+            "allExtraRowsPureBlank": true,
+            "loadWholeCustomExact": true,
+            "savedOriginalWholeExact": true,
+            "savedOriginalArrayIdentityExact": true,
+            "savedOriginalGearArrayExact": true,
+            "savedProposalGearMatches": null,
+            "sourceAndOtherMetadataExact": true,
+            "loadRouteReady": false,
+            "loadRouteManual": true,
+            "observedInvariantMismatchCount": 0,
+            "missingCheckpoints": 0,
+            "metadataSHA256": "81cdc71d87c5fbc022d431a909c8182e3dd2f5beba3846645204085730815993",
+            "artifactId": 13034375251,
+            "member": "route-one-five-middle-1-5--19343-save-or-safe-abort-and-load-chromium/route-guidance-summary.json"
+          },
+          "metadataCompletedMustNotPromoteFrameworkOutcome": true,
+          "evidence": {
+            "path": "private/ci-execution-41175351013/failure-audit/one-five-log-progress-result-evidence.json",
+            "sha256": "3fd9ec54669644f01c5edf91f67ffd08861113445191a35073a1f570021be2f9"
+          },
+          "independentFrameIdOrDropCountersAbsent": true,
+          "numericJSONRetryIndexAbsent": true
+        },
+        {
+          "project": "webkit",
+          "state": "known",
+          "caseUnit": "one-five-middle",
+          "jobId": 124461647460,
+          "sourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "observedInitialProgressCount": 1,
+          "observedRetryErrorReferences": 0,
+          "finalFrameworkOutcome": null,
+          "finalOutcomeScope": "W4 own progress and next-case transition; no final footer, outcome unknown",
+          "savedAndLoadComparison": {
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "sameDocument": true,
+            "savedStrictIdentityFields": 20,
+            "loadStrictIdentityFields": 20,
+            "savedExtraPureBlankRows": 2,
+            "loadExtraPureBlankRows": 2,
+            "allOriginalIdentityFieldsExact": true,
+            "allExtraRowsPureBlank": true,
+            "loadWholeCustomExact": true,
+            "savedOriginalWholeExact": false,
+            "savedOriginalArrayIdentityExact": false,
+            "savedOriginalGearArrayExact": false,
+            "savedProposalGearMatches": true,
+            "sourceAndOtherMetadataExact": true,
+            "loadRouteReady": true,
+            "loadRouteManual": false,
+            "observedInvariantMismatchCount": 0,
+            "missingCheckpoints": 0,
+            "metadataSHA256": "7e572eaaa5791e7bc448b85e25f064d03588f732b51c3b777e61c33e92261843",
+            "artifactId": 13033458502,
+            "member": "route-one-five-middle-1-5--2719a-save-or-safe-abort-and-load-webkit/route-guidance-summary.json"
+          },
+          "metadataCompletedMustNotPromoteFrameworkOutcome": true,
+          "evidence": {
+            "path": "private/ci-execution-41175351013/failure-audit/one-five-log-progress-result-evidence.json",
+            "sha256": "3fd9ec54669644f01c5edf91f67ffd08861113445191a35073a1f570021be2f9"
+          },
+          "independentFrameIdOrDropCountersAbsent": true,
+          "numericJSONRetryIndexAbsent": true
+        },
+        {
+          "project": "webkit",
+          "state": "stock",
+          "caseUnit": "one-five-middle",
+          "jobId": 124461647460,
+          "sourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "observedInitialProgressCount": 1,
+          "observedRetryErrorReferences": 0,
+          "finalFrameworkOutcome": null,
+          "finalOutcomeScope": "W4 own progress and next-case transition; no final footer, outcome unknown",
+          "savedAndLoadComparison": {
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "sameDocument": true,
+            "savedStrictIdentityFields": 20,
+            "loadStrictIdentityFields": 20,
+            "savedExtraPureBlankRows": 2,
+            "loadExtraPureBlankRows": 2,
+            "allOriginalIdentityFieldsExact": true,
+            "allExtraRowsPureBlank": true,
+            "loadWholeCustomExact": true,
+            "savedOriginalWholeExact": false,
+            "savedOriginalArrayIdentityExact": false,
+            "savedOriginalGearArrayExact": false,
+            "savedProposalGearMatches": true,
+            "sourceAndOtherMetadataExact": true,
+            "loadRouteReady": true,
+            "loadRouteManual": false,
+            "observedInvariantMismatchCount": 0,
+            "missingCheckpoints": 0,
+            "metadataSHA256": "1ab32f08242d8fc22af7334d407ec2074de24b9ac63bb30ab140a2ce37c03903",
+            "artifactId": 13033458502,
+            "member": "route-one-five-middle-1-5--7d0a0-save-or-safe-abort-and-load-webkit/route-guidance-summary.json"
+          },
+          "metadataCompletedMustNotPromoteFrameworkOutcome": true,
+          "evidence": {
+            "path": "private/ci-execution-41175351013/failure-audit/one-five-log-progress-result-evidence.json",
+            "sha256": "3fd9ec54669644f01c5edf91f67ffd08861113445191a35073a1f570021be2f9"
+          },
+          "independentFrameIdOrDropCountersAbsent": true,
+          "numericJSONRetryIndexAbsent": true
+        },
+        {
+          "project": "webkit",
+          "state": "unknown",
+          "caseUnit": "one-five-middle",
+          "jobId": 124461647460,
+          "sourceSHA": "6c08381fdf557e8c5db77457ecded6e92dd9a2c0",
+          "observedInitialProgressCount": 1,
+          "observedRetryErrorReferences": 0,
+          "finalFrameworkOutcome": null,
+          "finalOutcomeScope": "W4 own progress and next-case transition; no final footer, outcome unknown",
+          "savedAndLoadComparison": {
+            "stage": "completed",
+            "savedReadReached": true,
+            "loadReadReached": true,
+            "sameDocument": true,
+            "savedStrictIdentityFields": 20,
+            "loadStrictIdentityFields": 20,
+            "savedExtraPureBlankRows": 0,
+            "loadExtraPureBlankRows": 0,
+            "allOriginalIdentityFieldsExact": true,
+            "allExtraRowsPureBlank": true,
+            "loadWholeCustomExact": true,
+            "savedOriginalWholeExact": true,
+            "savedOriginalArrayIdentityExact": true,
+            "savedOriginalGearArrayExact": true,
+            "savedProposalGearMatches": null,
+            "sourceAndOtherMetadataExact": true,
+            "loadRouteReady": false,
+            "loadRouteManual": true,
+            "observedInvariantMismatchCount": 0,
+            "missingCheckpoints": 0,
+            "metadataSHA256": "0b34144d9b9234e57a3a153b652ea9904345290dd444c7a30ab3857606103337",
+            "artifactId": 13033458502,
+            "member": "route-one-five-middle-1-5--19343-save-or-safe-abort-and-load-webkit/route-guidance-summary.json"
+          },
+          "metadataCompletedMustNotPromoteFrameworkOutcome": true,
+          "evidence": {
+            "path": "private/ci-execution-41175351013/failure-audit/one-five-log-progress-result-evidence.json",
+            "sha256": "3fd9ec54669644f01c5edf91f67ffd08861113445191a35073a1f570021be2f9"
+          },
+          "independentFrameIdOrDropCountersAbsent": true,
+          "numericJSONRetryIndexAbsent": true
+        }
+      ],
+      "initialSuccessCases": 3,
+      "retrySuccessCases": null,
+      "finalFailureCases": null,
+      "unknownCases": 3,
+      "savedAndLoadResults": "six metadata checkpoints completed and expected preservation invariants matched; framework C3pass/W3finalunknown",
+      "newLocalOrOtherAttemptNotUsedToFillCIGaps": true,
+      "savedReadReached": 6,
+      "loadReadReached": 6,
+      "savedStrictIdentityFields": 120,
+      "loadStrictIdentityFields": 120,
+      "sameDocumentLoadCount": 6,
+      "newSaveMismatchPositiveCount": 0,
+      "completedMetadataCount": 6,
+      "missingCheckpoints": 0,
+      "pageerrorCount": 0,
+      "navigationCollectionFailures": 0,
+      "explicitCollectionCounterGaps": [],
+      "independentDropCount": null,
+      "independentFrameId": null,
+      "physicalAttemptCountFromMetadata": null,
+      "numericRetryIndexPresentInJSON": false,
+      "metadataCompletedIsNotFrameworkPass": true,
+      "wholeInputAndReturnedPlanAndHTTPServedHashesNotCaptured": true,
+      "localTrialFalseMarkerIsNotCIBinding": true,
+      "binding": "same run official artifact ID + exact unit-specific member prefix + JSON unit/state/project + same-job progress log; no common basename-only binding",
+      "metadataAuditSummarySHA256": "1fa8d61975d5f6d5bf75a34374b5e88b0c656924461bbd7edd77cc8bc1a35ca0"
+    },
+    "cancellationScope": {
+      "thisRun": "W4 smoke itself cancelled before its final footer; test-unit complete outcomes remain unknown",
+      "previousCI41151020734": "W4 smoke failure completed its footer, then job cancelled during diagnostic upload",
+      "sameCauseEstablished": false,
+      "unrelatedExistingFailureInvestigationExpanded": false,
+      "W4Progress225Of223IncludesRetries": true,
+      "uniqueStartedEndedUnstartedInterruptedCaseCounts": null,
+      "activeBodyVsTeardownAtCancellation": null,
+      "lastStartAndContextCancelDoNotIdentifyInterruptedPhase": true,
+      "finalW4ProcessExitCode": null
+    },
+    "otherCurrentFailureTrialEvidence": {
+      "initialFailureRecordsObserved": 20,
+      "finalResultsForW4Problems": "unconfirmed; no complete footer; do not relabel these as flaky/final-failed",
+      "reference": {
+        "path": "failure-audit/current-run-w4-failure-log-evidence.safe.json",
+        "bytes": 48390,
+        "sha256": "abc29e1c783f58a5f2dbca07f5ba347c491182f2b10a5f32758ff4fb7c0a4b57"
+      },
+      "sourceStageReference": {
+        "path": "failure-audit/source-stage-classification.safe.json",
+        "bytes": 16644,
+        "sha256": "ff074075bc06d2e2d6cbd7670171e18070c6578a0f95ecfa92cd59fb127c1680"
+      },
+      "closure": {
+        "path": "failure-audit/failure-audit-closure.md",
+        "bytes": 4800,
+        "sha256": "a6400f928e60c1ffdad67d4e1c24d3030ec84e1109143f97e8d2e01e8dd36550"
+      },
+      "newPreservationMismatchProven": false,
+      "privateFullValuesAndStacks": "only private failure-audit excerpt files; no sharing or raw-body inference",
+      "lastStartLimit": "literal (retries) and context cancellation alone do not determine attempt index, test-body versus teardown stage, save failure, or data corruption",
+      "finalW4FlakyOrFailedClassification": null,
+      "equalityFailuresClassifiedAfterEarlierSaveLoadComparisons": {
+        "records": 2,
+        "failureTarget": "final errors array assertion",
+        "earlierSaveLoadAssertionsReached": true,
+        "newSaveMismatchEstablished": false,
+        "sourceStageReference": {
+          "path": "failure-audit/source-stage-classification.safe.json",
+          "bytes": 16644,
+          "sha256": "ff074075bc06d2e2d6cbd7670171e18070c6578a0f95ecfa92cd59fb127c1680"
+        }
+      }
+    },
+    "capacityAtCollectorClosure": {
+      "atUTC": "2026-10-31T07:08:55.995772+00:00",
+      "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-bbv-cl-20261031",
+      "freeBytes": 10923155456,
+      "totalBytes": 33770192896,
+      "inodeTotal": 2097152,
+      "inodeFree": 1895649,
+      "inodeUsedPercent": 9.6084
     }
   }
 }

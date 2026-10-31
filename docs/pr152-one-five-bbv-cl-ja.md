@@ -1,3 +1,5 @@
+> 最新CIはsource `6c08381f`／CI41175351013の[確定記録](#2026-10-31-最終source-smoke-ci確定)を参照。C895完結・W1–3小計672/全W未確定、新旧各6の保持metadataと回収独立照合を確認。以下の局所HEAD/CI pendingは当時の履歴として保持する。
+
 # 1-5/index1 ADFGJ：航戦1＋軽巡1＋駆逐2の限定対応
 
 > 限定局所結果。基準HEADは `d62153ed830c6e50257e9b4b7127f1f3de11f528`。既知BBV1CL1DD2のC/W6代表は全初回成功まで確認した。原本一覧と独立照合は閉鎖済みで、新ソースHEAD/通常smokeは未確定。進捗27確認済み/151一部/58未確認・PR152ドラフト/未公開を維持する。
@@ -39,3 +41,21 @@
 同じ`1-5/1/default`行の追加確認なので、27/151/58と全A〜D判定は変更0、他58行/旧53/判定基準を維持する。BBV1CL1DD2の例拘束・水爆表示・有限3状態の保存保持という限定残件だけを閉じ、旧canonicalのD確認済み根拠はそのまま歴史保存した。新6例は同じセルの追加証拠であって全海域/1-5全体の完了ではない。新ソースsmokeの未確定を局所成功で埋めない。
 
 BBV1CL2DD1・CL2DD2、2–3隻、全装備型/全在庫/改修/枠競合/全同期操作、ASW/水爆の必要十分性・火力・勝利は別残件。旧CI411136のケース/保存比較欠測、旧初回CI411495のbrowser未到達、旧CI411510の失敗試行の未到達は今回の成功で埋めない。PR152ドラフト・未公開、main競合/既知残件を維持し、main統合/PR151/版/SW/本番/マージ/公開/自動マージは変更しない。
+
+## 2026-10-31 最終source smoke CI確定
+
+検証sourceは`6c08381fdf557e8c5db77457ecded6e92dd9a2c0`、[CI41175351013](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41175351013) attempt1。workflow_dispatchは1回だけ受理、同HEADの同等自動起動0。runはcompleted/cancelled、5smoke成功・W4取消、Full skippedである。記録追記のcommit HEADはまだ未定で、検証sourceと混同しない。
+
+全6ジョブのNode実測は602検査/602成功/0失敗で期待602と一致した。checkout6c08381f、固定image b27e…、Node24.21.0、Playwright1.55.0、Chromium1187/WebKit2203は6ジョブで照合済み。Cはshard1の448/0/0＋shard2の447/0/0＝895/0/0が完結footerの全範囲。Wはshard1–3各224/0/0の小計672/0/0だけで、W4は予定223のRunning行があるが最終footerがない。予定一覧はC/W各895を実測で照合できたが、W895は終了結果数ではない。W4の最後の進行`[225/223] (retries)`はretryを含み、全開始/終了/未開始/中断case数へ換算できない。最終startとcontext cancelだけで本体/teardown中断を区別できず、これらはnullとする。全WebKitのpassed/flaky/failedはnullを維持し、未開始/途中取消/最終結果不明を推定で足さない。公式case outcomeを厳密な初回成功数や物理試行数へ換算しない。
+
+自身BBV1CL1DD2新3と旧canonical3は、C2で各初回進行1回と完結passed footerが対応して初回成功。W4の新3＋旧3は進行到達/次case移行を確認しretry/error参照はないが、shard最終footer未完結のためframework個別最終結果は未確定である。metadataがcompletedでもframework passedへ格上げしない。新BBV1CL1DD2と旧canonicalは別々に6metadataがcompletedし、各保存120/load120のstrict識別比較、同一文書6、他編成/他海域/planner/調達sentinel/metadata保持、欠測checkpoint0・pageerror0/navigationCollectionFailures0・新保存不一致陽性0を確認した。known/stockの保存は提案・メモ編集の意図差と厳密空行2を、unknownは安全中止/元全文4+0を検査し、load全文は全6一致。metadata summary `1fa8d61975d5f6d5bf75a34374b5e88b0c656924461bbd7edd77cc8bc1a35ca0`へunit別に対応付ける。stage完了と保存保持の確認はWのframework最終結果を補完しない。
+
+対応付けは同じrunの公式artifact ID・専用member prefix・JSON.unit/state/project・同じjobの進行記録で行った。JSONに数値retry indexはなく、no-retry-suffixやlocalTrial=falseを単独のCI結合根拠にしない。独立frame ID/URL/drop欄、全入力/全返却plan/HTTP served hashは未採取で、局所のdrop0等をCIへ移さない。
+
+他対象の初回失敗20記録は試行別private原本/出典stage照合へ対応付けて保持した。W4最終footerがないのでflaky/最終失敗へ再分類しない。うち等値assert2件は、先行する保存/load比較を通過した後の最終errors配列検査であり、保存値の等値不一致とは区別した。未観測試行全体の保存安全性も証明しない。原因調査を広げず、新しい保存不一致が確認された根拠はない。
+
+今回はW4のsmoke処理自体が取消となった。旧CI411510はsmoke失敗を完結出力した後の診断upload中の取消で、停止範囲が異なる。同原因とせず、今回の局所/CI成功から旧試行のload未到達や欠測を補完しない。
+
+公式注記と取得済み完結footerを照合し、immutable log-audit summary `17dea529d968041c14effbb59b485a4680af700e399de0742640e6c647ffa28f`を閉鎖した。artifact10件中8件は512MiB以下を各ID1回のapp経路で取得し、公式size/digestとCRCが一致。残り2件は上限超として未要求・内部inventory未読で、保存値本文・原本trace/動画の内部有無・件数・取得は未確認のまま。局所trace6の存在やraw drop0をCI原本へ流用しない。CLIartifact取得0・署名URL保存/出力0。8ZIPは計344,723B/72member。公式whole logは1要求/11,852,692B/101memberでCRC確認済み。collectorは435payload/152,705,950B、manifest `44d4c2af4e6d4114f84bd667127fa3a62182c730868669d3afb60748fb6204e9`、canonical summary `c686e8124af8988633afff9b53956c7b0f971e9638ed6d32d350281d9ccfdce9`で閉鎖した。独立最終review `010e08f036c4d31d9313d706f262f6185982313b39f56cf9299b93c2e59e9ea0`、manifest `58d8d939c37511d2b4d1804fcc77062082f48b9fbcf8d27ac6c2226a25f9b894`でPASS閉鎖した。W4/全W最終未確定と上限超archiveの内部欠測は解消していない。共有は許可metadataだけとし、原本/実値/trace/動画はprivateに保持する。新しいCIや成功目的の再実行で欠測を埋めない。
+
+同じ行への追加記録なので27/151/58・236status・他58行・旧53を変更しない。局所recordは当時の観測としてそのまま残し、今回の確定結果は別`oneFiveBbvClCIFinalization20261031`に追加する。次候補は同じ1-5 ADFGJのBBV1CL2DD1であり、今回の結果をgeneralフラグだけで一般化しない。
