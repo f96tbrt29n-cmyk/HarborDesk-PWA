@@ -10,7 +10,7 @@ const approvedBytes=fs.readFileSync(INVERSE);assert.equal(hash(approvedBytes),'9
 assert.equal(approved.schemaVersion,1);assert.deepEqual(Object.keys(approved.files).sort(),Object.keys(HASH.after).sort());assert.equal(approved.changes.length,29);
 for(const file of Object.keys(HASH.after)){assert.equal(approved.files[file].beforeSHA256,HASH.before[file]);assert.equal(approved.files[file].approvedAfterSHA256,HASH.after[file])}
 function sources(mode){return Object.fromEntries(Object.keys(HASH[mode]).map(file=>{const bytes=Buffer.from(historicalText(file));assert.equal(hash(bytes),HASH.after[file],file+' approved whole historical source');let text=bytes.toString('utf8');if(mode==='before')for(const change of approved.changes.filter(row=>row.file===file).reverse()){assert.equal(text.split(change.after).length,2,file+' unique inverse');text=text.replace(change.after,change.before)}assert.equal(hash(Buffer.from(text)),HASH[mode][file],file+' frozen '+mode+' whole source');return [file,text]}))}
-const source=sources(MODE),oldSource=sources('before'),MAP=fs.readFileSync(path.join(ROOT,'map-plans.js'),'utf8');
+const source=sources(MODE),oldSource=sources('before'),MAP=historicalText('map-plans.js');
 function span(text,name){const needle='function '+name+'(',start=text.indexOf(needle);assert.ok(start>=0,name);assert.equal(text.indexOf(needle,start+needle.length),-1,name+' unique definition');const end=text.indexOf('\nfunction ',start+needle.length);return text.slice(start,end<0?undefined:end)}
 function esc(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const ASW='cap-asw',WATER='cap-water-attack',SONAR='三式水中探信儀',PROJECTOR='三式爆雷投射機',PLANE='瑞雲';
@@ -23,7 +23,7 @@ function seed(){
 function context(mode,state=seed()){
  const s=state,stockCalls=[],panelCalls=[];
  const c={console,Map,Set,Math,JSON,Number,Object,Array,String,localStorage:new Proxy({},{get(){throw Error('unexpected Storage access in isolated display test')}})};
- c.window=c;vm.createContext(c);vm.runInContext(MAP,c,{filename:'map-plans.js#actual-declarations'});
+ c.window=c;vm.createContext(c);vm.runInContext(MAP,c,{filename:'map-plans.js#historical-approved-declarations'});
  const db=name=>s.types[name]?{name,type:s.types[name]}:null,meta=name=>CATALOG.find(x=>x.name===name)||null;
  const profile=row=>row?s.profiles[row.name]||null:null;
  const compatible=(slot,item)=>{
