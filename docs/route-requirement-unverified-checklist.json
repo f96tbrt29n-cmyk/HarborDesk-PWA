@@ -9044,5 +9044,530 @@
       "allModesSavedOperationProven": false,
       "browserModesObserved": "explicit count3 in current6; off/unset toggles only in known C/W2; remaining modes are Node boundaries"
     }
+  },
+  "oneFiveCl1Dd3CIFinalization20261031": {
+    "record": "oneFiveCl1Dd3CIFinalization20261031",
+    "document": "docs/pr152-one-five-cl1-dd3-ja.md",
+    "state": "closed-qualified-CI1-and-CI2-record; finalWebKit-and-old-trial-gaps-retained",
+    "baselineSourceHEAD": "a1beabbe8b07016511e32ad6d28b62d38c14ca75",
+    "finalRecordHEAD": null,
+    "sourceProductUnchangedFromFirstCI": {
+      "sourceHEAD": "e69746ae81d0f56ad6911cbb72dd8f0db4806a09",
+      "fourProductFilesSHA256": {
+        "fleet-readiness-evaluator.js": "21d3d329bd71f3ddf4c6fef71b71db83093deb3d89838c5010f4cc311f6103ba",
+        "sortie-equipment-check.js": "3930c870e2dd4c1b6b3f361cd5c115cc5f690dd250135852e99d162d650d48ff",
+        "map-plans.js": "d95ee0297842fe4a92c854911db495cc86dbb7611fb124aec4a0242849b360a8",
+        "owned-equipment-planner.js": "39d9e276a20e6166708f76217ecd27c293fc5ba136f9e2413bff877ed6a9eebd"
+      },
+      "currentFourProductHashesDirectlyEqual": true
+    },
+    "priorLocalRecordPreserved": "oneFiveCl1Dd3Local20261031",
+    "localNecessaryAuditCorrection": {
+      "scope": "two Node tests and short document only; product/fixture/browser unchanged",
+      "newLogicalAssertions": 2,
+      "physicalAssertionsExecuted": 3,
+      "pass": 3,
+      "fail": 0,
+      "cumulativeLogical": 69,
+      "cumulativePhysical": 95,
+      "currentFullModels": 7,
+      "newFullModelRuns": 0,
+      "browserPhysicalTrials": 11,
+      "newBrowserRuns": 0,
+      "independentReview": {
+        "necessaryThree": {
+          "path": "private/node-ci-precheck-correction/node-result.json",
+          "bytes": 1626,
+          "sha256": "a6baf5370050ea245abee2638b9a2d7bbda2d1557fa2bf4e9b4c59969c15e96e"
+        },
+        "correctionIndependent": {
+          "path": "private/ci-precheck-correction-independent-review/review.json",
+          "bytes": 6910,
+          "sha256": "fe2983cb8f417effc791ae0129f930fdad0947d60dbb383d26cf1c303626737a"
+        },
+        "correctionClosure": {
+          "path": "private/ci-precheck-correction-independent-review/closure.json",
+          "bytes": 479,
+          "sha256": "308b49c38706dbcbea3967ba7b48367cfab3c12d66e18448add134a21ae1aa4e"
+        }
+      },
+      "phaseQualification": "after first CI audit omissions: this necessary three-light phase has zero additional model/browser runs; prior browser correction remains a separate physical run"
+    },
+    "firstCI": {
+      "runID": 41215372542,
+      "attempt": 1,
+      "dispatches": 1,
+      "sourceHEAD": "e69746ae81d0f56ad6911cbb72dd8f0db4806a09",
+      "status": "completed",
+      "conclusion": "failure",
+      "jobs": {
+        "smokeFailure": 6,
+        "cancelled": 0,
+        "Full": "skipped"
+      },
+      "NodePerEachSixJobs": {
+        "tests": 648,
+        "pass": 646,
+        "fail": 2,
+        "cancel": 0,
+        "skip": 0,
+        "identicalTwoAuditOmissions": true
+      },
+      "browser": {
+        "relatedLogical30": "notStarted",
+        "operationResults": null,
+        "savedAndLoadComparisons": null,
+        "strictPassedFlakyFailed": null
+      },
+      "environment": {
+        "actualCheckoutBoundAcrossSix": true,
+        "actualNodeAcrossSix": "24.21.0",
+        "actualImageDigestAcrossSixVerified": true,
+        "playwrightProbe": "skipped",
+        "actualPlaywright": null,
+        "actualBrowserRevision": null
+      },
+      "acquisition": {
+        "officialAnnotations": 18,
+        "logZIPBytes": 513046,
+        "logCRCCheckedMembers": 90,
+        "officialArtifactIndexCount": 0,
+        "appArtifactDownloads": 0,
+        "artifactAbsenceIsNotDownloadFailure": true
+      },
+      "dataReferences": {
+        "canonical": {
+          "path": "private/ci-execution-41215372542/canonical-ci-collection.json",
+          "bytes": 9826,
+          "sha256": "9972a458495d0df9f283d4f43b05dbceec9e1945b356a71b083319820232b08a"
+        },
+        "manifest": {
+          "path": "private/ci-execution-41215372542/manifest.json",
+          "bytes": 64399,
+          "sha256": "985d46fe3ded5e2c27806784c1e579e52fa177208d1293fbbb2fe082f9c11fc7"
+        },
+        "closure": {
+          "path": "private/ci-execution-41215372542/closure.json",
+          "bytes": 1634,
+          "sha256": "c7f588f8d15c78a30fdfd409ece2b7f7cad0e83c374cada839f53f20a1c2091f"
+        }
+      },
+      "independentFinalReview": {
+        "status": "verified-with-derived-field-correction",
+        "references": {
+          "final-ci1-primary-join.json": {
+            "path": "private/ci-41215372542-independent-review/final-ci1-primary-join.json",
+            "bytes": 6060,
+            "sha256": "7b2b158c6b12ad9fd857eebcace42495e8f0be40ef72c93b7721707b1d541fca"
+          },
+          "manifest.json": {
+            "path": "private/ci-41215372542-independent-review/manifest.json",
+            "bytes": 1898,
+            "sha256": "6082849d8d15fb300b019cdf71dfc61a74a125ac9b13d1c0f632e91ed6cb40a1"
+          },
+          "closure.json": {
+            "path": "private/ci-41215372542-independent-review/closure.json",
+            "bytes": 1866,
+            "sha256": "99c08da47984b19a33e9c7059c8651fedb8236cba79e6e8c15266648e05793d8"
+          },
+          "derived-condition-count-correction.json": {
+            "path": "private/ci-41215372542-independent-review/derived-condition-count-correction.json",
+            "bytes": 7373,
+            "sha256": "e2d046f71ebda40a16086e719a6dbf484ffcfa8cf598eed15f945a3b77e46f0b"
+          }
+        }
+      },
+      "gapsNeverFilledBySecondCI": true,
+      "derivedConditionCountErratum": {
+        "primaryDerivedField": "expectedConditionObjects",
+        "unchangedPrimaryDerivedValue": 6,
+        "actualRawExpectedPerAllSixJobs": 5,
+        "actualRawObservedPerAllSixJobs": 6,
+        "correctionIsExternalAppendOnly": true,
+        "primaryOriginalsAndOldAnalysisUnchanged": true,
+        "officialNodeCountsRelated30NotStartedSaveNullUnchanged": true,
+        "sharedCandidateHadNoSuchField": true,
+        "reference": {
+          "path": "private/ci-41215372542-independent-review/derived-condition-count-correction.json",
+          "bytes": 7373,
+          "sha256": "e2d046f71ebda40a16086e719a6dbf484ffcfa8cf598eed15f945a3b77e46f0b"
+        }
+      }
+    },
+    "secondCI": {
+      "runID": 41216819787,
+      "attempt": 1,
+      "dispatches": 1,
+      "sourceHEAD": "a1beabbe8b07016511e32ad6d28b62d38c14ca75",
+      "statusAtScaffold": "in_progress",
+      "conclusion": "cancelled",
+      "stepsKnownAtScaffold": {
+        "status": "historical in-progress snapshot retained in original scaffold",
+        "currentStatusIsBelow": true
+      },
+      "actualNodePerJobCounts": {
+        "sixJobsEach": {
+          "tests": 648,
+          "pass": 648,
+          "fail": 0,
+          "skip": 0,
+          "cancel": 0
+        },
+        "footersAndSourcesDirectlyBound": true
+      },
+      "actualEnvironment": {
+        "sixCheckoutsExact": "a1beabbe8b07016511e32ad6d28b62d38c14ca75",
+        "Node": "24.21.0",
+        "Playwright": "1.55.0",
+        "ChromiumRevision": "1187",
+        "WebKitRevision": "2203",
+        "actualPulledImageDigest": "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29",
+        "reference": {
+          "path": "private/ci-41216819787-independent-review/formal-footer-environment-source-review.json",
+          "bytes": 24252,
+          "sha256": "a0cac1b048ab40cf2f97f8631383bc132940381cae725d049ed0c5c701318373"
+        }
+      },
+      "officialJobs": {
+        "smokeSuccess": 5,
+        "W4smoke": "cancelled",
+        "W4job": "cancelled",
+        "job45MinuteLimitOfficial": true,
+        "Full": "skipped"
+      },
+      "globalChromiumPassedFlakyFailed": {
+        "passed": 904,
+        "flaky": 0,
+        "failed": 0
+      },
+      "globalWebKitPassedFlakyFailed": null,
+      "cancelledOrUnstartedOrIncomplete": {
+        "W4FinalReporterFooter": "missing",
+        "W4FinalLogicalCategories": null,
+        "unstartedOrPendingCaseCounts": null,
+        "strictGlobalFirstSuccessAndPhysicalCounts": null,
+        "progressOrObservedErrorsNotConvertedToFinalCounts": true
+      },
+      "relatedIndividualInitialRetryResults": {
+        "logical": 30,
+        "explicitProgressAttempts": 32,
+        "C_initialPassed": 15,
+        "W_logicalFinalConfirmed": null,
+        "W_logicalFinalUnconfirmed": 15,
+        "initialFailures": [
+          {
+            "cohort": "canonical",
+            "state": "stock",
+            "project": "webkit",
+            "stage": "after-load hidden search click timeout45s",
+            "savedStrictComparisons": 20,
+            "loadComparisons": null,
+            "displayCallerAndCause": null,
+            "retry1Started": true,
+            "retry1MetadataCompleted": true,
+            "retry1FrameworkFinal": null
+          },
+          {
+            "cohort": "BBVCL2",
+            "state": "stock",
+            "project": "webkit",
+            "stage": "after-load hidden search click timeout45s",
+            "savedStrictComparisons": 20,
+            "loadComparisons": null,
+            "displayCallerAndCause": null,
+            "retry1Started": true,
+            "retry1MetadataCompleted": true,
+            "retry1FrameworkFinal": null
+          }
+        ],
+        "newCL1DD3": {
+          "C3": "initialpassed",
+          "W3FrameworkFinal": null,
+          "sixMetadataCompleted": true,
+          "metadataIsNotFrameworkPass": true
+        },
+        "reference": {
+          "path": "private/ci-execution-41216819787/failure-audit/one-five-five-cohort-log-proof.safe.json",
+          "bytes": 82289,
+          "sha256": "05a14c669faa894332adce2104594e316bc7f3a370fb391854706acf8eb1e1cc"
+        }
+      },
+      "relatedDirectMetadata": {
+        "metadataTrials": 32,
+        "logicalCases": 30,
+        "savedReadTrials": 32,
+        "loadReadTrials": 30,
+        "savedStrictComparisonObservations": 640,
+        "loadStrictComparisonObservations": 600,
+        "newCL1DD3SixSaved": 120,
+        "newCL1DD3SixLoad": 120,
+        "newCL1DD3PerProjectSavedAndLoad": 60,
+        "cohort6Versus7TrialDenominators": {
+          "one-five-middle": {
+            "logicalCases": 6,
+            "metadataTrials": 7,
+            "completedMetadataTrials": 6,
+            "savedReadTrials": 7,
+            "loadReadTrials": 6,
+            "savedStrictComparisonObservations": 140,
+            "loadStrictComparisonObservations": 120,
+            "frameworkCInitialPass": 3,
+            "frameworkWFinal": null,
+            "initialFailedLoadNeverBackfilled": true
+          },
+          "one-five-bbv-cl": {
+            "logicalCases": 6,
+            "metadataTrials": 6,
+            "completedMetadataTrials": 6,
+            "savedReadTrials": 6,
+            "loadReadTrials": 6,
+            "savedStrictComparisonObservations": 120,
+            "loadStrictComparisonObservations": 120,
+            "frameworkCInitialPass": 3,
+            "frameworkWFinal": null,
+            "initialFailedLoadNeverBackfilled": true
+          },
+          "one-five-bbv-cl2": {
+            "logicalCases": 6,
+            "metadataTrials": 7,
+            "completedMetadataTrials": 6,
+            "savedReadTrials": 7,
+            "loadReadTrials": 6,
+            "savedStrictComparisonObservations": 140,
+            "loadStrictComparisonObservations": 120,
+            "frameworkCInitialPass": 3,
+            "frameworkWFinal": null,
+            "initialFailedLoadNeverBackfilled": true
+          },
+          "one-five-cl2-dd2": {
+            "logicalCases": 6,
+            "metadataTrials": 6,
+            "completedMetadataTrials": 6,
+            "savedReadTrials": 6,
+            "loadReadTrials": 6,
+            "savedStrictComparisonObservations": 120,
+            "loadStrictComparisonObservations": 120,
+            "frameworkCInitialPass": 3,
+            "frameworkWFinal": null,
+            "initialFailedLoadNeverBackfilled": true
+          },
+          "one-five-cl1-dd3": {
+            "logicalCases": 6,
+            "metadataTrials": 6,
+            "completedMetadataTrials": 6,
+            "savedReadTrials": 6,
+            "loadReadTrials": 6,
+            "savedStrictComparisonObservations": 120,
+            "loadStrictComparisonObservations": 120,
+            "frameworkCInitialPass": 3,
+            "frameworkWFinal": null,
+            "initialFailedLoadNeverBackfilled": true
+          }
+        },
+        "pageerrorExplicitZeroTrials": 32,
+        "navigationCollectionExplicitZeroTrials": 30,
+        "navigationCollectionMissingTrials": 2,
+        "independentFrameOrOriginID": null,
+        "independentDropCounter": null,
+        "fullInputFullReturnedPlanHTTPServedHashes": null,
+        "observedInvariantMismatchCount": 0,
+        "observedPositivePreservationMismatch": 0,
+        "comparisonScope": "source-produced exact flags at existing reads, independently bound to raw metadata and source contracts; no per-checkpoint complete raw body re-comparison claim",
+        "references": {
+          "summary": {
+            "path": "private/ci-execution-41216819787/metadata-audit/trial-metadata-audit-summary.json",
+            "bytes": 9229,
+            "sha256": "5c70e46f34926d19b6d18b7be731c19e35099cfb06ca323290898e8b3d470e26"
+          },
+          "directRead": {
+            "path": "private/ci-execution-41216819787/metadata-audit/trial-metadata-direct-read.json",
+            "bytes": 128430,
+            "sha256": "8b1086884aaf0c760dca9c5c842a4ded17f6aa17934601d9afb33f92d5d44188"
+          }
+        },
+        "pageerrorScopeQualification": "each of 32 trials explicitly records pageerrors=0; no observed errors/missing fields promoted to a general safety claim"
+      },
+      "preservationMismatchObserved": 0,
+      "acquisition": {
+        "artifactZIPsRetrieved": 8,
+        "artifactZIPTotalBytes": 371779,
+        "artifactCRCRegularMembers": 90,
+        "appRequestsEach": 1,
+        "fileServiceRequestsEach": 1,
+        "overCapacityArtifactsNotRequested": 2,
+        "overCapacityInternalInventory": null,
+        "formalLogZIPBytes": 11850016,
+        "formalLogCRCMembers": 101,
+        "CLIArtifactDownloads": 0,
+        "RangeOrSplitRequests": 0,
+        "signedURLPersisted": false,
+        "reference": {
+          "path": "private/ci-execution-41216819787/collector-transfer-and-request-summary.json",
+          "bytes": 9146,
+          "sha256": "bfacc97d8947eb7bc12ba1b565428f8df1cc71ca63e8e886d41f7f1f6f6352bc"
+        },
+        "authRelatedRequestCounters": null
+      },
+      "canonical": {
+        "path": "private/ci-execution-41216819787/canonical-ci-collection.json",
+        "bytes": 27048,
+        "sha256": "d7e743bcf8162c1792573423c2ddb183ce8fdb2f7f512c39984bd0471454b0f4"
+      },
+      "independentFinalReview": {
+        "status": "closed external join; primary remains unchanged",
+        "references": {
+          "final-ci2-primary-join.json": {
+            "path": "private/ci-41216819787-independent-review/final-ci2-primary-join.json",
+            "bytes": 8725,
+            "sha256": "7b138a9b504346626b5fca5b92a87115b4018a94b410d6ea13cf387e8f2e566a"
+          },
+          "manifest.json": {
+            "path": "private/ci-41216819787-independent-review/manifest.json",
+            "bytes": 1636,
+            "sha256": "c5e03c7982fec6b6bd29b93761d70e2614fe8e803bbf6253486e6aea9e8e7f3f"
+          },
+          "closure.json": {
+            "path": "private/ci-41216819787-independent-review/closure.json",
+            "bytes": 1798,
+            "sha256": "5a278fb51022c65bc8be734d17b540c3776be9b79d0f2e324c067e63286e1583"
+          }
+        },
+        "verifiedPayloadFiles": 536,
+        "verifiedPayloadDirectories": 167,
+        "verifiedPayloadBytes": 159693838,
+        "sourceAndFrameworkAndMetadataNullBoundariesPreserved": true
+      },
+      "status": "completed",
+      "completedWebKit1to3SubtotalOnly": {
+        "passed": 678,
+        "flaky": 0,
+        "failed": 0
+      },
+      "globalObservedFailureBoundaries": {
+        "W4InitialErrorGroups": 17,
+        "explicitRetryErrorBlocks": 2,
+        "observedFailedTrialErrorBlocks": 19,
+        "finalFailedFlakyCaseCounts": null,
+        "carrierPolicy": {
+          "DCLSixKeyAndPolicyCompare": "passed before reload-evidence errors assertion",
+          "laterLoadBlock": "unreached",
+          "cause": null
+        },
+        "sevenThreeUnknown": {
+          "loadSpecifiedComparison": "passed before errors assertion",
+          "cause": null
+        },
+        "otherInitialGroups": {
+          "count": 15,
+          "stage": "after-load button-hidden click timeout; final load comparisons unreached",
+          "handlerSearchStartAndDisplayCaller": null,
+          "cause": null
+        },
+        "sameOldCauseOrSearchSlowdownNotInferred": true,
+        "reference": {
+          "path": "private/ci-execution-41216819787/final-failure-classification/classification.safe.json",
+          "bytes": 23318,
+          "sha256": "32dc9528b004bd2d786ec6e62fe9119183d25796290bb9e0f85a58f2585cf55e"
+        }
+      },
+      "rawOriginalBoundary": {
+        "baselineFiles": 493,
+        "baselineDirectories": 161,
+        "baselineBytes": 158413535,
+        "allFileSHAAndCapturedStatUnchanged": true,
+        "directoryAtimeDifferences": 26,
+        "directoryOtherAttributesUnchanged": true,
+        "allAttributesGloballyUnchanged": false,
+        "timestampWriteback": false,
+        "earlierThanBaselineNotObserved": true,
+        "reference": {
+          "path": "private/ci-execution-41216819787/raw-original-preservation-final.json",
+          "bytes": 7163,
+          "sha256": "6a45a51a9e08cce9b56f0d7e313ace848acde47ec701e3540e08294b5884b9b1"
+        }
+      },
+      "primaryManifestAndClosure": {
+        "manifest": {
+          "path": "private/ci-execution-41216819787/manifest.json",
+          "bytes": 119655,
+          "sha256": "cfaac4ebc54f98e8598da300ff0672b5ac47b8a8eb66d554ca640081d64423d3"
+        },
+        "closure": {
+          "path": "private/ci-execution-41216819787/closure.json",
+          "bytes": 1677,
+          "sha256": "27c1c28d4bb3dcf5ff5b37ec18dd8fbae920f576a13f59ab333a8f83369ef388"
+        },
+        "payloadFiles": 536,
+        "payloadDirectories": 167,
+        "payloadBytes": 159693838,
+        "independentPendingAtPrimarySealClosedOnlyByLaterExternalJoin": true
+      }
+    },
+    "preservationBoundaries": {
+      "localOldCanonicalWknownLoadFullComparison": null,
+      "localOldCanonicalWknownDisplayCallerOrCause": null,
+      "firstCIRelatedBrowserNotStartedMustRemainNotStarted": true,
+      "laterPassDoesNotBackfillEarlierGap": true,
+      "newCIActualResultsNotPredictedFromLocalOrEarlierRuns": true,
+      "rawStorageValuesNotInPublic": true
+    },
+    "progress": {
+      "before": [
+        27,
+        151,
+        58
+      ],
+      "after": [
+        27,
+        151,
+        58
+      ],
+      "cellDelta": 0,
+      "all59RowsAnd236StatusRemainUnchanged": true,
+      "legacy53Unchanged": true
+    },
+    "nextTarget": "2-5/index1 CEIO I random-band31<=score<34 final route/readiness connection; source-only plan already closed, implementation not started in this record",
+    "recordOnlyFinalCommitPlan": "root review then documentation-only normal commit/push with [skip ci]; no further tests or CI",
+    "publication": "PR152 draft/unpublished; no main/PR151/version/SW/production/merge/publish/auto-merge change",
+    "recordedDateUTC": "2026-10-31",
+    "scaffoldPreserved": {
+      "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-cl1-dd3-20261031/private/records-ci-final-scaffold",
+      "draftIndexSHA256": "2e74b295f06e677f735844776cc6c0d6c595e627c491fc746e42310103f4039f"
+    },
+    "scopeQualification": {
+      "registeredPreset": "1-5/index1/default ADFGJ only",
+      "excludedPreservedPresets": [
+        "index0 DE4 ADEJ",
+        "index2 DD4 morale-training ADFGJ, separate purpose"
+      ],
+      "noAllOneFiveFourHullASW4Claim": true
+    },
+    "observationComparisonQualification": {
+      "reference": {
+        "path": "private/local-observation-scope-qualification.json",
+        "bytes": 1037,
+        "sha256": "dda09701675e3e4e5a9aae7466923240afe682e281e24b2248ddd392e2829d57"
+      },
+      "directWithinExistingTestReads": true,
+      "checkpointPerOriginalFields": "presence/type/direct-exact flags",
+      "independentReviewMeaning": "raw observations to typed metadata and actual source contracts; no separately retained whole storage strings independently re-compared at each checkpoint",
+      "local200And180": "observed reached-checkpoint direct comparison counts",
+      "existingRawTraceBodiesRemainPrivate": true,
+      "positiveZeroNotGeneralSafetyProof": true,
+      "extraReadOrTest": 0
+    },
+    "localSeparateExecutionAxes": {
+      "Node": {
+        "logicalAssertions": 69,
+        "physicalAssertionExecutions": 95,
+        "successfulModelReruns": 0
+      },
+      "browser": {
+        "logicalCases": 10,
+        "physicalTrials": 11,
+        "necessaryCorrectionReverification": 1,
+        "successPurposeRepeats": 0
+      }
+    }
   }
 }

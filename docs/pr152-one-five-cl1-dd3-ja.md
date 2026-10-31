@@ -1,3 +1,5 @@
+> 現在の追補（2026-10-31 UTC）：source `a1beabbe`。Nodeは69論理項目/物理95実行、成功model再探索0。browserは10論理/物理11（必要訂正後の再検証1を含む）、成功目的反復0。CI41216819787は5smoke成功/W4のsmoke・job取消、Full skip、全W最終不明。確定した終端結果と観測限定は後段「訂正後CIの結果と観測範囲」を参照する。以下の基準d36087d2・Node67/92・source/CI pendingは初回記録時点の履歴で、現在状態ではない。回収と最終外部独立joinは封鎖済みである。
+
 # 1-5 ADFGJ：四隻経路と対潜セット比較
 
 2026-10-31 UTC。基準 `d36087d2`。新sourceのcommitと通常smoke結果は本記録時点でpending。
@@ -84,3 +86,20 @@ AO0を含む現行6条件を監査JSON2件へ結合し、他58行/52例・全sta
 失敗は監査2件の接続漏れだった。7-5第1の旧不変群へ意図的に変更した1-5/index1を残していたため、独立した現行1-5検査へ分離し、残49経路×4状態の全出力196比較を維持した。歴史的middle検査ではMAPだけが生の現行ソースを読んでいたため、既存の承認逆変換へ統一した。旧hash `aa312e59…` を現在値へ置き換えてはいない。
 
 訂正はNode試験2ファイルだけ。必要な軽量3件は固定環境で成功し、モデル/ブラウザー反復0。局所は計69論理項目・物理95実行となり、既存原本・旧失敗の未到達を保持する。実行計画IDの準備検査で一度停止したが、Node/コンテナ起動前の構成不備として別記し、試験失敗へ数えていない。製品・入力・ブラウザー操作・期限・例外検査は不変で、局所成功をCI未実施へ流用しない。訂正後sourceに通常smokeを1回確認するための変更で、同じe69746aeの再実行は行わない。
+
+
+## 訂正後CIの結果と観測範囲（2026-10-31 UTC）
+
+source `a1beabbe8b07016511e32ad6d28b62d38c14ca75` の[CI41216819787](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41216819787) attempt1/dispatch1は5smokeジョブ成功、W4のsmoke/ジョブが公式45分上限で取消、Full skipped。Cは904/0/0、W1–3小計だけ678/0/0（passed/flaky/failed）。W4に最終footerがなく全WebKitは未確定で、進行数や17初回エラー群＋明示retryエラー2を最終failed/flakyや未開始数へ換算しない。全6Nodeは各648/648/0、checkout/Node24.21.0/PW1.55.0/Chromium1187・WebKit2203/image digestを実測で結合した。
+
+関連30例・明示32試行はC15初回成功、W15のframework最終結果は不明。canonical/航戦1軽巡2のW不足は初回の保存20比較後、load後クリック非表示45秒で停止し、load全文は未到達。retry1開始と別metadata完了を初回やrunner成功の代わりにしない。新CL1DD3はC3初回成功/W3 framework不明だが、6件のmetadataは保存/load完了を記録している。
+
+32metadataの保存比較観測640項目、load30件の観測600項目を直接照合。新6件合計は保存/load各120で、projectごと各60。canonical/BBVCL2は各7trial（失敗初回を含む）、他3cohortは各6trialと分ける。32trialのpageerrors欄が各0、navigation採取失敗は30件明示0/初回2件欠測。frame/drop独立欄、全入力・全返却plan・HTTP配信hashは未採取。観測した保持不一致陽性0を未観測範囲の保存安全証明にしない。
+
+独立照合は、既存の試験読取りで実行した文字列/値の直接比較観測（present/type/exact flags）とtyped metadata/実ソース契約の対応付けである。各checkpointで保存本文全体を別コピーし独立再比較した証拠ではない。局所200/180も到達checkpointでの直接比較観測数で、既存raw/trace/bodyはprivateに保持し追加read/test0。限定は`private/local-observation-scope-qualification.json`（SHA-256 `dda09701675e3e4e5a9aae7466923240afe682e281e24b2248ddd392e2829d57`）に記録した。
+
+一覧と共通数量規則の対象は登録index1 ADFGJだけ。index0海防4のADEJと、index2駆逐4のキラ付け目的の既存設定は対象外として保持する。同じADFGJ表記から別目的までASW数量変更/確認済みへ広げない。
+
+別件の空母夜戦はDCL6キー/方針比較後のerrors検査で後段load未到達、7-3未知は指定load比較後のerrors検査、他15群はload後非表示クリック停止と分類した。原因・表示変更元は不明で調査を広げず、保存不一致とは扱わない。取得8ZIPは371,779B/CRC90member、過容量2件は未要求・内部欠測。正式logZIPは11,850,016B/CRC101member。baseline493fileのSHA/statは一致し、26directoryの自然なatime差だけを残して書戻し0。「全属性不変」とはしない。
+
+旧CI41215372542の関連30未開始/保存比較nullと局所旧Wload未到達は今回成功で補完しない。CI1の派生expected条件数6は外部erratumでraw actual6/expected5へ訂正し、原P/旧解析・公式648/646/2を保持する。27/151/58は変更0。主CI2原本はcanonical `d7e743bcf8162c1792573423c2ddb183ce8fdb2f7f512c39984bd0471454b0f4`・manifest `cfaac4ebc54f98e8598da300ff0672b5ac47b8a8eb66d554ca640081d64423d3`で封鎖済み、最終外部独立join `7b138a9b504346626b5fca5b92a87115b4018a94b410d6ea13cf387e8f2e566a`で照合閉鎖済み。確定した記録だけを[skip ci]で通常pushし、追加試験/CIは起動しない。
