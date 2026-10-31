@@ -18,6 +18,7 @@ require('./three-one-cfg.test.cjs');
 require('./one-five-middle-boundaries.test.cjs');
 require('./one-five-bbv-cl-boundaries.test.cjs');
 require('./one-five-bbv-cl2-boundaries.test.cjs');
+require('./one-five-cl2-dd2-boundaries.test.cjs');
 require('./three-three-acgm.test.cjs');
 require('./three-three-placement.test.cjs');
 require('./three-four-acegjp.test.cjs');

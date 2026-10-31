@@ -1,0 +1,441 @@
+{
+  "schemaVersion": 1,
+  "unit": "one-five-cl2-dd2",
+  "selectedRoute": {
+    "map": "1-5",
+    "index": 1,
+    "path": "ADFGJ"
+  },
+  "variantId": "cl2-dd2-empty-synchronized-finite-model",
+  "ships": [
+    {
+      "name": "神通改二",
+      "masterId": 159,
+      "stype": 3,
+      "type": "軽巡洋艦",
+      "baseSpeed": 10,
+      "normalSlots": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "那珂改二",
+      "masterId": 160,
+      "stype": 3,
+      "type": "軽巡洋艦",
+      "baseSpeed": 10,
+      "normalSlots": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "島風改",
+      "masterId": 229,
+      "stype": 2,
+      "type": "駆逐艦",
+      "baseSpeed": 10,
+      "normalSlots": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "夕立改二",
+      "masterId": 144,
+      "stype": 2,
+      "type": "駆逐艦",
+      "baseSpeed": 10,
+      "normalSlots": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "level": 90,
+  "hq": 120,
+  "normalSlotCount": 12,
+  "noSyntheticBareASWOrLOS": true,
+  "preparationState": "model-observation-frozen",
+  "modelExpectation": {
+    "known": {
+      "initial": {
+        "requirements": [
+          {
+            "kind": "cap-asw",
+            "minCount": 3,
+            "generatedFromMap": true
+          }
+        ],
+        "goals": [
+          {
+            "kind": "cap-asw",
+            "count": 0,
+            "minCount": 3,
+            "ok": false,
+            "unresolved": false,
+            "purpose": "recommendation"
+          },
+          {
+            "kind": "route-requirements",
+            "count": 5,
+            "minCount": 5,
+            "ok": true,
+            "unresolved": false,
+            "purpose": "route"
+          }
+        ],
+        "route": "ready",
+        "readiness": "missing",
+        "measureComplete": false,
+        "measureCompleteExpectationBasis": "Source-derived initial optional ASW3 comparison and exact route/unknown boundaries; searched allocation is intentionally unobserved."
+      },
+      "searched": {
+        "goals": [
+          {
+            "kind": "cap-asw",
+            "count": 3,
+            "minCount": 3,
+            "ok": true,
+            "unresolved": false,
+            "purpose": "recommendation"
+          },
+          {
+            "kind": "route-requirements",
+            "count": 5,
+            "minCount": 5,
+            "ok": true,
+            "unresolved": false,
+            "purpose": "route"
+          }
+        ],
+        "route": "ready",
+        "readiness": "ready",
+        "measureComplete": true,
+        "registeredReady": true,
+        "searchStatus": "targets-met",
+        "requiredChecks": [
+          {
+            "status": "ready",
+            "ok": true,
+            "unresolved": false
+          },
+          {
+            "status": "ready",
+            "ok": true,
+            "unresolved": false
+          },
+          {
+            "status": "ready",
+            "ok": true,
+            "unresolved": false
+          },
+          {
+            "status": "ready",
+            "ok": true,
+            "unresolved": false
+          },
+          {
+            "status": "ready",
+            "ok": true,
+            "unresolved": false
+          }
+        ],
+        "assignedRegistered": 6,
+        "assignedUnregistered": 0,
+        "sourceIssueCount": 0
+      }
+    },
+    "stock": {
+      "initial": {
+        "requirements": [
+          {
+            "kind": "cap-asw",
+            "minCount": 3,
+            "generatedFromMap": true
+          }
+        ],
+        "goals": [
+          {
+            "kind": "cap-asw",
+            "count": 0,
+            "minCount": 3,
+            "ok": false,
+            "unresolved": false,
+            "purpose": "recommendation"
+          },
+          {
+            "kind": "route-requirements",
+            "count": 5,
+            "minCount": 5,
+            "ok": true,
+            "unresolved": false,
+            "purpose": "route"
+          }
+        ],
+        "route": "ready",
+        "readiness": "missing",
+        "measureComplete": false,
+        "measureCompleteExpectationBasis": "Source-derived initial optional ASW3 comparison and exact route/unknown boundaries; searched allocation is intentionally unobserved."
+      },
+      "searched": {
+        "goals": [
+          {
+            "kind": "cap-asw",
+            "count": 2,
+            "minCount": 3,
+            "ok": false,
+            "unresolved": false,
+            "purpose": "recommendation"
+          },
+          {
+            "kind": "route-requirements",
+            "count": 5,
+            "minCount": 5,
+            "ok": true,
+            "unresolved": false,
+            "purpose": "route"
+          }
+        ],
+        "route": "ready",
+        "readiness": "missing",
+        "measureComplete": false,
+        "registeredReady": false,
+        "searchStatus": "incomplete",
+        "requiredChecks": [
+          {
+            "status": "ready",
+            "ok": true,
+            "unresolved": false
+          },
+          {
+            "status": "ready",
+            "ok": true,
+            "unresolved": false
+          },
+          {
+            "status": "ready",
+            "ok": true,
+            "unresolved": false
+          },
+          {
+            "status": "ready",
+            "ok": true,
+            "unresolved": false
+          },
+          {
+            "status": "ready",
+            "ok": true,
+            "unresolved": false
+          }
+        ],
+        "assignedRegistered": 5,
+        "assignedUnregistered": 0,
+        "sourceIssueCount": 0
+      }
+    },
+    "unknown": {
+      "initial": {
+        "requirements": [
+          {
+            "kind": "cap-asw",
+            "minCount": 3,
+            "generatedFromMap": true
+          }
+        ],
+        "goals": [
+          {
+            "kind": "cap-asw",
+            "count": 0,
+            "minCount": 3,
+            "ok": false,
+            "unresolved": false,
+            "purpose": "recommendation"
+          },
+          {
+            "kind": "route-requirements",
+            "count": 1,
+            "minCount": 6,
+            "ok": false,
+            "unresolved": true,
+            "purpose": "route"
+          }
+        ],
+        "route": "manual",
+        "readiness": "missing",
+        "measureComplete": false,
+        "measureCompleteExpectationBasis": "Source-derived initial optional ASW3 comparison and exact route/unknown boundaries; searched allocation is intentionally unobserved."
+      },
+      "searched": {
+        "goals": [
+          {
+            "kind": "cap-asw",
+            "count": 3,
+            "minCount": 3,
+            "ok": true,
+            "unresolved": false,
+            "purpose": "recommendation"
+          },
+          {
+            "kind": "route-requirements",
+            "count": 1,
+            "minCount": 6,
+            "ok": false,
+            "unresolved": true,
+            "purpose": "route"
+          }
+        ],
+        "route": "manual",
+        "readiness": "manual",
+        "measureComplete": false,
+        "registeredReady": false,
+        "searchStatus": "incomplete",
+        "requiredChecks": [
+          {
+            "status": "ready",
+            "ok": true,
+            "unresolved": false
+          },
+          {
+            "status": "manual",
+            "ok": false,
+            "unresolved": true
+          },
+          {
+            "status": "manual",
+            "ok": false,
+            "unresolved": true
+          },
+          {
+            "status": "manual",
+            "ok": false,
+            "unresolved": true
+          },
+          {
+            "status": "manual",
+            "ok": false,
+            "unresolved": true
+          },
+          {
+            "status": "manual",
+            "ok": false,
+            "unresolved": true
+          }
+        ],
+        "assignedRegistered": 6,
+        "assignedUnregistered": 1,
+        "sourceIssueCount": 1
+      }
+    }
+  },
+  "known": {
+    "inventoryItems": 7,
+    "initialGear": [
+      [],
+      [],
+      [],
+      []
+    ],
+    "rosterGear": [
+      [],
+      [],
+      [],
+      []
+    ],
+    "finiteInventory": [
+      {
+        "name": "三式水中探信儀",
+        "count": 3,
+        "star": 0
+      },
+      {
+        "name": "三式爆雷投射機",
+        "count": 3,
+        "star": 0
+      },
+      {
+        "name": "瑞雲",
+        "count": 1,
+        "star": 0
+      }
+    ]
+  },
+  "stock": {
+    "inventoryItems": 6,
+    "initialGear": [
+      [],
+      [],
+      [],
+      []
+    ],
+    "rosterGear": [
+      [],
+      [],
+      [],
+      []
+    ],
+    "finiteInventory": [
+      {
+        "name": "三式水中探信儀",
+        "count": 3,
+        "star": 0
+      },
+      {
+        "name": "三式爆雷投射機",
+        "count": 2,
+        "star": 0
+      },
+      {
+        "name": "瑞雲",
+        "count": 1,
+        "star": 0
+      }
+    ]
+  },
+  "unknown": {
+    "inventoryItems": 8,
+    "initialGear": [
+      [],
+      [],
+      [],
+      []
+    ],
+    "rosterGear": [
+      [],
+      [],
+      [],
+      []
+    ],
+    "finiteInventory": [
+      {
+        "name": "三式水中探信儀",
+        "count": 3,
+        "star": 0
+      },
+      {
+        "name": "三式爆雷投射機",
+        "count": 3,
+        "star": 0
+      },
+      {
+        "name": "瑞雲",
+        "count": 1,
+        "star": 0
+      },
+      {
+        "name": "合成未登録装備1-5CL2DD2",
+        "count": 1,
+        "star": 0
+      }
+    ],
+    "replaceShipIndex": 3,
+    "name": "合成未登録艦1-5CL2DD2",
+    "gear": "合成未登録装備1-5CL2DD2"
+  },
+  "operationScope": "New no-BBV CL2/DD2 four-hull cohort only. ASW3 remains an existing optional comparison; OASW is explicitly0. One owned 瑞雲 is a negative control: no default water request/card/shortage and no illegal deployment. Explicit water strategy remains separate. Initial source expectations are literal; searched projections remain null until first3 actual model observations are reviewed and frozen. Same save/edit/load calls and strict4+2 or unknown4+0 identity rules; old three cohorts remain separate."
+}

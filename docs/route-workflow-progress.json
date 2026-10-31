@@ -381,7 +381,7 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。 追加の既知BBV1CL1DD2は出典D/F/G優先と有限型境界を確認し、元例拘束だけのmanualを限定接続。全経路/全数量根拠の完了ではない。 追加BBV1CL2DD1は独立出典21期待/別Node23境界で有限型と先行順を確認し例拘束を接続。全論理枝完了ではない。",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。 追加の既知BBV1CL1DD2は出典D/F/G優先と有限型境界を確認し、元例拘束だけのmanualを限定接続。全経路/全数量根拠の完了ではない。 追加BBV1CL2DD1は独立出典21期待/別Node23境界で有限型と先行順を確認し例拘束を接続。全論理枝完了ではない。 CL2DD2の既知四隻だけを接続しDFG優先と三隻CL2DDの確定不一致を有限確認。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
@@ -393,12 +393,16 @@
             "docs/pr152-one-five-bbv-cl2-ja.md",
             "tests/one-five-bbv-cl2-boundaries.test.cjs",
             "tests/route-one-five-bbv-cl2.spec.js",
-            "tests/fixtures/one-five-bbv-cl2-browser-inputs.json"
+            "tests/fixtures/one-five-bbv-cl2-browser-inputs.json",
+            "docs/pr152-one-five-cl2-dd2-ja.md",
+            "tests/one-five-cl2-dd2-boundaries.test.cjs",
+            "tests/route-one-five-cl2-dd2.spec.js",
+            "tests/fixtures/one-five-cl2-dd2-browser-inputs.json"
           ]
         },
         "B": {
           "status": "一部",
-          "reason": "同じ登録四隻の有限在庫known/stock/unknownをC/W各1で自動配備または安全中止まで確認。全艦型・全在庫/枠競合の網羅は未完。 既知BBV1CL1DD2のC/W各3でも合法自動配備・有限不足・未知安全中止を確認。 BBV1CL2DD1追加C/W各3も全初回成功し、自動配備/有限不足/未知安全中止を確認。",
+          "reason": "同じ登録四隻の有限在庫known/stock/unknownをC/W各1で自動配備または安全中止まで確認。全艦型・全在庫/枠競合の網羅は未完。 既知BBV1CL1DD2のC/W各3でも合法自動配備・有限不足・未知安全中止を確認。 BBV1CL2DD1追加C/W各3も全初回成功し、自動配備/有限不足/未知安全中止を確認。 CL2DD2追加C/W6初回成功で合法配備/有限不足/未知安全中止を確認。",
           "evidence": [
             "docs/pr152-one-five-middle-ja.md",
             "tests/route-one-five-middle.spec.js",
@@ -410,12 +414,16 @@
             "docs/pr152-one-five-bbv-cl2-ja.md",
             "tests/one-five-bbv-cl2-boundaries.test.cjs",
             "tests/route-one-five-bbv-cl2.spec.js",
-            "tests/fixtures/one-five-bbv-cl2-browser-inputs.json"
+            "tests/fixtures/one-five-bbv-cl2-browser-inputs.json",
+            "docs/pr152-one-five-cl2-dd2-ja.md",
+            "tests/one-five-cl2-dd2-boundaries.test.cjs",
+            "tests/route-one-five-cl2-dd2.spec.js",
+            "tests/fixtures/one-five-cl2-dd2-browser-inputs.json"
           ]
         },
         "C": {
           "status": "一部",
-          "reason": "対潜3組/航戦水爆の任意比較、装備名・数量・合法通常枠、未所持候補と未知manualを同じ登録例C/Wで確認。全目標の必要十分数量は未確認。 追加CL159の合法別通常枠・水爆不可、任意3/1・未知水爆数量非表示と不足案内を有限確認。 追加CL159/160の合法別通常枠・水爆不可、任意3/1、部品/枠競合/未知容量を有限確認。",
+          "reason": "対潜3組/航戦水爆の任意比較、装備名・数量・合法通常枠、未所持候補と未知manualを同じ登録例C/Wで確認。全目標の必要十分数量は未確認。 追加CL159の合法別通常枠・水爆不可、任意3/1・未知水爆数量非表示と不足案内を有限確認。 追加CL159/160の合法別通常枠・水爆不可、任意3/1、部品/枠競合/未知容量を有限確認。 航戦例の水爆/二巡を流用せず任意ASW3・部品/枠/未知を区別。",
           "evidence": [
             "docs/pr152-one-five-middle-ja.md",
             "tests/route-one-five-middle.spec.js",
@@ -427,12 +435,16 @@
             "docs/pr152-one-five-bbv-cl2-ja.md",
             "tests/one-five-bbv-cl2-boundaries.test.cjs",
             "tests/route-one-five-bbv-cl2.spec.js",
-            "tests/fixtures/one-five-bbv-cl2-browser-inputs.json"
+            "tests/fixtures/one-five-bbv-cl2-browser-inputs.json",
+            "docs/pr152-one-five-cl2-dd2-ja.md",
+            "tests/one-five-cl2-dd2-boundaries.test.cjs",
+            "tests/route-one-five-cl2-dd2.spec.js",
+            "tests/fixtures/one-five-cl2-dd2-browser-inputs.json"
           ]
         },
         "D": {
           "status": "確認済み",
-          "reason": "同じ登録例のknown/stock4件は保存・メモ編集、unknown2件は安全中止/編集なし。元4艦strict20＋空2または4+0、同一文書load全文/元8キー/他編成metadataまで全6代表の直接証拠が揃った。 BBV1CL1DD2追加6例も全初回成功で保存/安全中止・編集対象・同一文書load、保存/load各120識別項目/他保持が一致。旧未到達を補完せず同じセルの追加根拠とする。 BBV1CL2DD1追加6例も保存編集4/安全中止2・同一文書load6・保存/load各120識別項目と厳密空行8+8/他保持が一致。同じセルの追加証拠で旧未到達を補完しない。",
+          "reason": "同じ登録例のknown/stock4件は保存・メモ編集、unknown2件は安全中止/編集なし。元4艦strict20＋空2または4+0、同一文書load全文/元8キー/他編成metadataまで全6代表の直接証拠が揃った。 BBV1CL1DD2追加6例も全初回成功で保存/安全中止・編集対象・同一文書load、保存/load各120識別項目/他保持が一致。旧未到達を補完せず同じセルの追加根拠とする。 BBV1CL2DD1追加6例も保存編集4/安全中止2・同一文書load6・保存/load各120識別項目と厳密空行8+8/他保持が一致。同じセルの追加証拠で旧未到達を補完しない。 CL2DD2追加6は保存編集4/安全中止2・同一文書load6/各120識別比較/空行8+8保持が一致。",
           "evidence": [
             "docs/pr152-one-five-middle-ja.md",
             "tests/route-one-five-middle.spec.js",
@@ -444,11 +456,15 @@
             "docs/pr152-one-five-bbv-cl2-ja.md",
             "tests/one-five-bbv-cl2-boundaries.test.cjs",
             "tests/route-one-five-bbv-cl2.spec.js",
-            "tests/fixtures/one-five-bbv-cl2-browser-inputs.json"
+            "tests/fixtures/one-five-bbv-cl2-browser-inputs.json",
+            "docs/pr152-one-five-cl2-dd2-ja.md",
+            "tests/one-five-cl2-dd2-boundaries.test.cjs",
+            "tests/route-one-five-cl2-dd2.spec.js",
+            "tests/fixtures/one-five-cl2-dd2-browser-inputs.json"
           ]
         }
       },
-      "remaining": "BBV1CL2DD1の限定接続とC/W6代表/保持・原本独立照合も確認。BBV1CL1DD2の限定接続とC/W6代表の操作保持は確認。CL2DD2など他の既知四隻例、2–3隻、全目標/在庫/改修/枠競合/全機種/同期操作、装備の必要十分性・先制人数/火力/勝利は未確認。新source6c08381fのsmokeは5成功/W4 smoke取消で、全W最終結果は未確定。自身C3初回成功/W3 framework未確定を分け、6件の保存/load保持metadataと回収独立照合を確認。旧操作不安定の原因は別に保持。 新BBV1CL2DD1検証sourcead793f1aのCIは全C897/0/1・全W886/10/2で確定。新W不足初回load未到達とretry1完了を分け、metadata19の観測保持比較・他最終3件の停止境界・復旧後原本/独立照合を追補した。raw大容量3件・counter/呼出し元/原因の欠測は保持。"
+      "remaining": "CL2DD2の有限接続/新6代表保持も確認（原本/独立照合閉鎖）。BBV1CL2DD1の限定接続とC/W6代表/保持・原本独立照合も確認。BBV1CL1DD2の限定接続とC/W6代表の操作保持は確認。軽巡1＋駆逐3など他の既知四隻例、三隻CL2DDの検査済み不一致以外の2–3隻各構成、全目標/在庫/改修/枠競合/全機種/同期操作、装備の必要十分性・先制人数/火力/勝利は未確認。新source6c08381fのsmokeは5成功/W4 smoke取消で、全W最終結果は未確定。自身C3初回成功/W3 framework未確定を分け、6件の保存/load保持metadataと回収独立照合を確認。旧操作不安定の原因は別に保持。 新BBV1CL2DD1検証sourcead793f1aのCIは全C897/0/1・全W886/10/2で確定。新W不足初回load未到達とretry1完了を分け、metadata19の観測保持比較・他最終3件の停止境界・復旧後原本/独立照合を追補した。raw大容量3件・counter/呼出し元/原因の欠測は保持。 index2/DD4は別スコープで、新CL2DD2 source/CIはpending。"
     },
     {
       "id": "1-5/2/default",
@@ -3216,12 +3232,12 @@
   ],
   "selected": {
     "id": "1-5/1/default",
-    "baselineHead": "ad793f1ae5a9dc58c10290edb967b834aead4882",
-    "record": "oneFiveBbvCl2CIFinalization20261031",
-    "evidence": "docs/pr152-one-five-bbv-cl2-ja.md",
-    "state": "CI sourcead793 finalized by existing-evidence supplement: C897/0/1 W886/10/2; own17 initial pass+CL2Wstock retry1pass; metadata19 observed retention verified with initial load gap; other3 boundaries/independent closure complete; whole route partial"
+    "baselineHead": "b248bf13f53b00b89f80fa696c38070a6b071a36",
+    "record": "oneFiveCl2Dd2Local20261031",
+    "evidence": "docs/pr152-one-five-cl2-dd2-ja.md",
+    "state": "finite knownCL2DD2 route/goal guidance and local6 first passes with original/independent closure complete; new sourceCI pending; whole route partial"
   },
-  "nextPriority": "次は同じ1-5/index1 ADFGJ CL2DD2の独立した改善単位。source-only計画を閉鎖したが実装/新試験は未実施。本CI追補は記録のみ通常commit/push[skip ci]とし、不足を埋める追加試験/CIは起動しない。旧local/CIの初回未到達・raw/archive/counter欠測を保持し、一般化は出典/条件を別確認する。",
+  "nextPriority": "まずCL2DD2の最終source/通常CIを確定する（局所原本/独立sealは完了）。次は同じ1-5/index1 ADFGJ軽巡1＋駆逐3の出典/DFG優先/例拘束を独立確認する（今回literalではmanual維持、次対象未実施）。index2/DD4、全在庫/枠/同期と旧欠測を分ける。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -17441,5 +17457,173 @@
     "evidence": "docs/pr152-one-five-bbv-cl2-ja.md",
     "state": "BBV1CL2DD1 finite source/product, Node17/model3 and all6 first local workflows with original/independent closure complete; new sourceHEAD/CI pending; whole route partial"
   },
-  "nextPriorityBeforeOneFiveBbvCl2CIFinalization20261031": "まずBBV1CL2DD1の最終sourceと通常smoke1回を確定する。局所6初回成功・保存保持/原本独立照合は完了。次候補は同じ1-5/index1 ADFGJ CL2DD2の出典適用範囲と任意目標接続で、今回まだ実装/実行しない。旧CI411753のW4最終未確定と2大容量archive内部欠測を今回で補完しない。"
+  "nextPriorityBeforeOneFiveBbvCl2CIFinalization20261031": "まずBBV1CL2DD1の最終sourceと通常smoke1回を確定する。局所6初回成功・保存保持/原本独立照合は完了。次候補は同じ1-5/index1 ADFGJ CL2DD2の出典適用範囲と任意目標接続で、今回まだ実装/実行しない。旧CI411753のW4最終未確定と2大容量archive内部欠測を今回で補完しない。",
+  "oneFiveCl2Dd2Local20261031": {
+    "record": "oneFiveCl2Dd2Local20261031",
+    "document": "docs/pr152-one-five-cl2-dd2-ja.md",
+    "baseHead": "b248bf13f53b00b89f80fa696c38070a6b071a36",
+    "sourceIsWIPAtObservation": true,
+    "finalSourceHEAD": null,
+    "state": "finite-local-workflow-and-independent-evidence-complete-new-sourceCI-pending",
+    "scope": "1-5/index1 ADFGJ exact four known plainCL2/DD2 only; index2 and other formations separate",
+    "change": {
+      "beforeRoute": "manual",
+      "afterRoute": "ready",
+      "routeHelperSeparatedFromBBVRecipe": true,
+      "knownNoBBVDefaultWater": "non-applicable/absent, never zero-fulfilled; unchanged correct behavior",
+      "BBVTwoRoundClaimForThisCohort": false,
+      "explicitGoalsAndExistingInfoGuardsPreserved": true,
+      "unknownRouteAndReadiness": "manual"
+    },
+    "boundaries": {
+      "D_F_GPriorityAndKnownBlockersPreserved": true,
+      "threeHullCL2DDLiteral": "confirmed mismatch for this registered condition",
+      "otherTwoOrThreeHullFormations": "not exhaustively covered",
+      "CL1DD3": "outside this finite helper; manual retained; next independent target",
+      "oldThreeCohortNineStateParity": "whole build/measure/route and explicit goal assertions passed; known/stock HTML exact; old generators0",
+      "allInventoryFrameAndSyncCoverage": false
+    },
+    "Node": {
+      "logicalContracts": 17,
+      "actualSubtestExecutions": 20,
+      "initial": {
+        "tests": 13,
+        "pass": 10,
+        "harnessFail": 3
+      },
+      "correction": {
+        "tests": 7,
+        "pass": 7,
+        "composition": "failed3 plus previously unreached guards4; only Node1file corrected",
+        "newGeneratorCalls": 0
+      },
+      "causeSummary": "VM OpeningAsw source slice omission and non-applicable null incorrectly expected as []; latent same-test tail corrected; product unchanged",
+      "newGeneratorCallsTotal": 3,
+      "oldGeneratorCallsTotal": 0,
+      "initialFailuresRetained": true
+    },
+    "models": {
+      "known": "route/readiness ready; targets-met",
+      "stock": "route ready/readiness missing; incomplete",
+      "unknown": "route/readiness manual; incomplete",
+      "defaultWaterAbsentDespiteOneOwnedZuikun": true,
+      "ASW3": "existing optional equipment comparison, not route/OASW/purchase/victory quantity",
+      "notBrowserMeasurements": true
+    },
+    "browser": {
+      "projects": [
+        "chromium",
+        "webkit"
+      ],
+      "states": [
+        "known",
+        "stock",
+        "unknown"
+      ],
+      "firstPasses": 6,
+      "retries": 0,
+      "workers": 1,
+      "deadlinesMs": [
+        45000,
+        12000
+      ],
+      "saveEditCases": 4,
+      "safeAbortCases": 2,
+      "sameDocumentLoadCases": 6,
+      "savedStrictFields": 120,
+      "loadStrictFields": 120,
+      "savedBlankTailRows": 8,
+      "loadBlankTailRows": 8,
+      "observedPreservationMismatchPositive": 0,
+      "additionalBrowserReads": 0,
+      "sourceAndSchemaProducerBindingsAllMatch": true,
+      "capturedNamesGearGoalsMeasureOtherTargetsDirectEqual": true,
+      "wholeSearch": "known/stock different; unknown equal",
+      "allTwelveSearchesNonExhaustive": true,
+      "rawNavigation": "12 snapshots; drop/failure/visibleDrop0; independent summary frame/drop fields absent",
+      "fullRawInputReturnedPlanAndEvaluationCount": "not collected",
+      "originalRawInventory": "827files/58462462B; trace6 CRC765members/video6 EBML; replay0; details private"
+    },
+    "environment": {
+      "Node": "24.21.0",
+      "Playwright": "1.55.0",
+      "ChromiumRevision": 1187,
+      "WebKitRevision": 2203,
+      "localPublicFiles": 665,
+      "localRuntimeFiles": 666,
+      "localRuntimeManifestSHA256": "3580c6aedfe52d60533b13b6c67247e9e39fec138f3cdaa487652108031a7d02",
+      "preflightActualListedPerProject": 901,
+      "HTTPServedSourceHashes": null,
+      "notCIBinding": true
+    },
+    "proofs": [
+      {
+        "path": "private/independent-review-20261031/node-and-model-final-proof.json",
+        "sha256": "0849eb60bdfa28ef05ef43f2a361d9f83cbb36d575c6fa2b2492306160d3d2fe"
+      },
+      {
+        "path": "private/root-control/browser-six-firsts-result.json",
+        "sha256": "bc505e2ea5dab909912248b74310a761d9ff5663b6b3fb4bd81e0708ccf60270"
+      },
+      {
+        "path": "private/local-browser-collection/aggregate.json",
+        "sha256": "1906ce7c6b7c59a7ef7dd8f68fe5e4479688670abebf81006e6465494ee3b5e3"
+      },
+      {
+        "path": "private/local-browser-independent-review/review.json",
+        "sha256": "460bf3459ac5f132a6a7631b58bfc72e2ed5162e9babe7d61a3e222c6410f551"
+      }
+    ],
+    "collection": {
+      "manifestSHA256": "38ea1a6357141580773ab7f8f3ca3d65613c687f5071128e07ac51381236670e",
+      "closureSHA256": "4bea40ff6a9685ed9543ec2a7f05e5c38c52cf1d757925757bd16d9ecaaee2a4",
+      "independentReview": {
+        "path": "private/local-browser-independent-review/review.json",
+        "sha256": "460bf3459ac5f132a6a7631b58bfc72e2ed5162e9babe7d61a3e222c6410f551"
+      },
+      "rawAndDetailsPrivate": true,
+      "sanitizerOrExternalUpload": false,
+      "independentManifestSHA256": "78a0382c42ad74e4c88292367eb632e0c6e7bcaf89708bb8d7bd6d60e84649ec",
+      "independentClosureSHA256": "9f6ffa09ad99c7878909c310b75d4c6fa39b1bf79719279e90178844779faf51"
+    },
+    "CI": {
+      "sourceHEAD": null,
+      "runId": null,
+      "state": "pending-not-started"
+    },
+    "progress": {
+      "before": [
+        27,
+        151,
+        58
+      ],
+      "after": [
+        27,
+        151,
+        58
+      ],
+      "cellDelta": 0,
+      "criteriaAndOther58RowsAndOld53Unchanged": true
+    },
+    "oldHistory": "all previous local/CI records retained; prior initial load/nav/raw/atime gaps never filled by this success",
+    "nextTarget": {
+      "scope": "1-5/index1 ADFGJ CL1DD3",
+      "reason": "independent source/DFG priority and example-scope connection; this suite kept it manual",
+      "executed": false
+    },
+    "remaining": [
+      "index2/DD4 and its separate ASW/OASW scope",
+      "other two/three-hull compositions and all inventory/frame/sync coverage",
+      "old operation instability/communication and missing evidence"
+    ],
+    "wholeRouteOrPublicationReady": false
+  },
+  "selectedBeforeOneFiveCl2Dd2Local20261031": {
+    "id": "1-5/1/default",
+    "baselineHead": "ad793f1ae5a9dc58c10290edb967b834aead4882",
+    "record": "oneFiveBbvCl2CIFinalization20261031",
+    "evidence": "docs/pr152-one-five-bbv-cl2-ja.md",
+    "state": "CI sourcead793 finalized by existing-evidence supplement: C897/0/1 W886/10/2; own17 initial pass+CL2Wstock retry1pass; metadata19 observed retention verified with initial load gap; other3 boundaries/independent closure complete; whole route partial"
+  },
+  "nextPriorityBeforeOneFiveCl2Dd2Local20261031": "次は同じ1-5/index1 ADFGJ CL2DD2の独立した改善単位。source-only計画を閉鎖したが実装/新試験は未実施。本CI追補は記録のみ通常commit/push[skip ci]とし、不足を埋める追加試験/CIは起動しない。旧local/CIの初回未到達・raw/archive/counter欠測を保持し、一般化は出典/条件を別確認する。"
 }

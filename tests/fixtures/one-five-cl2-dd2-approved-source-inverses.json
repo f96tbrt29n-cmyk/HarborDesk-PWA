@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "files": {
+    "fleet-readiness-evaluator.js": {
+      "beforeSHA256": "d131894743074264faf9e083ee432123aa6a9959a7c5484d9f1d8a6d247a224b",
+      "approvedAfterSHA256": "c85dd3fa43533a8a94b17200501b51d49643c7ada12595ad4281db562a55b25d",
+      "beforeBytes": 117786,
+      "afterBytes": 118422
+    },
+    "sortie-equipment-check.js": {
+      "beforeSHA256": "9eb644b4d5ba6efbeb23dcdb9e6ebe43e12563a09a105ec69b88c24bf3529b79",
+      "approvedAfterSHA256": "b96625d192be960b23ff7aa4d21be7ee1022558e7c47e0e12b5345f9c88b2c0b",
+      "beforeBytes": 57827,
+      "afterBytes": 58908
+    }
+  },
+  "changes": [
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "before": "function hdFERoute(plan){",
+      "after": "function hdFEOneFiveLightExample(plan,data){\n if(plan?.map!=='1-5'||data?.map!=='1-5'||data.index!==1||data.path!=='ADFGJ'||plan.preservationIssues?.length||typeof hdFEFindShip!=='function')return false;\n const ships=Array.isArray(plan.ships)?plan.ships.filter(s=>s?.ship):[];if(ships.length!==4)return false;\n const types=ships.map(s=>hdFEFindShip(s.ship)?.type);\n return types.every(type=>['軽巡洋艦','駆逐艦'].includes(type))&&types.filter(type=>type==='軽巡洋艦').length===2&&types.filter(type=>type==='駆逐艦').length===2;\n}\nfunction hdFERoute(plan){"
+    },
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "before": "&&typeof hdFEOneFiveAlternateExample==='function'&&hdFEOneFiveAlternateExample(plan,contract.data),general=",
+      "after": "&&(typeof hdFEOneFiveAlternateExample==='function'&&hdFEOneFiveAlternateExample(plan,contract.data)||typeof hdFEOneFiveLightExample==='function'&&hdFEOneFiveLightExample(plan,contract.data)),general="
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "&&hdFEOneFiveAlternateExample(plan,route),oneFiveWaterProfileUnknown=",
+      "after": "&&hdFEOneFiveAlternateExample(plan,route),oneFiveLight=oneFive&&!oneFivePlanUnknown&&!oneFiveCanonical&&!oneFiveAlternate&&typeof hdFEOneFiveLightExample==='function'&&hdFEOneFiveLightExample(plan,route),oneFiveWaterProfileUnknown="
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "const scopeNote=oneFive?(oneFiveAlternate?",
+      "after": "const scopeNote=oneFive?(oneFiveLight?`<small data-hd-se-route-scope=\"1-5:1:ADFGJ\">選択した軽巡2＋駆逐2の四隻例向けの任意比較です。対潜シナジー3組は元の航空戦艦1＋駆逐3例に登録された既存の比較モデルで、この四隻への必要十分な組数と確認した値ではありません。通行必須・先制対潜人数・購入数量ではありません。この編成には航空戦艦がなく、航空戦艦による砲撃二巡は成立扱いしません。航戦用の水爆比較はこの編成には非適用で、既定の水爆目標や不足数を追加しません。利用者が明示した水爆等の目標は別の指定として維持します。艦種・隻数の経路条件、同艦の合法な別通常枠、他目標との競合・同時配備を別々に確認してください。先制対潜人数は別に選択し、火力・勝利は別確認です。</small>`:oneFiveAlternate?"
+    }
+  ]
+}

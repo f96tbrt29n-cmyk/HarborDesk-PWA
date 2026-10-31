@@ -2,12 +2,14 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
+const {createOneFiveCl2Dd2HistoricalProjection}=require('./one-five-cl2-dd2-source-layer.cjs');
 const FIXTURE_SHA256='3ec5bd198c5972a5b5a88cea3d2b9bf466dd2b212305c7771a11b563851b5cf3';
 const BEFORE_SHA256={
  'fleet-readiness-evaluator.js':'b737cba126d29936b797e00593a32aa3513c11003a1409005b8478e08354fdc3',
  'sortie-equipment-check.js':'1600e3bf8efddc226b8e86b99a2053e0b32989acd55bd8d128ad8ff44514af19'
 };
 function createOneFiveBbvCl2HistoricalProjection(root=path.resolve(__dirname,'../..')){
+ const projectLight=createOneFiveCl2Dd2HistoricalProjection(root);
  const bytes=fs.readFileSync(path.join(root,'tests/fixtures/one-five-bbv-cl2-approved-source-inverses.json'));
  assert.equal(hash(bytes),FIXTURE_SHA256,'CL2 inverse fixture is independently pinned');
  const approved=JSON.parse(bytes);assert.equal(approved.schemaVersion,1);
@@ -21,7 +23,7 @@ function createOneFiveBbvCl2HistoricalProjection(root=path.resolve(__dirname,'..
  }
  for(const row of approved.changes){assert.ok(Object.hasOwn(BEFORE_SHA256,row.file));assert.equal(typeof row.before,'string');assert.equal(typeof row.after,'string');assert.ok(row.before&&row.after&&row.before!==row.after)}
  return function project(file,current){
-  assert.equal(typeof current,'string');const entry=approved.files[file];if(!entry)return current;
+  assert.equal(typeof current,'string');current=projectLight(file,current);const entry=approved.files[file];if(!entry)return current;
   assert.equal(hash(current),entry.approvedAfterSHA256,file+' exact approved CL2 source');assert.equal(Buffer.byteLength(current),entry.afterBytes);
   const rows=approved.changes.filter(row=>row.file===file);let restored=current;
   for(const row of rows.slice().reverse()){assert.equal(restored.split(row.after).length,2,file+' unique CL2 inverse anchor');restored=restored.replace(row.after,row.before)}
