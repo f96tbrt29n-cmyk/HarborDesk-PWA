@@ -1,3 +1,5 @@
+> 1-5/index1 ADFGJの限定局所確定（2026-10-31 JST）：[記録](pr152-one-five-middle-ja.md)。上段の任意ASW3/航戦水爆と合法通常枠案内を接続し、C/W各3の6代表は保存編集4＋未知安全中止2・同一文書load全文まで完了。元4艦strict20＋空2または4+0、保存側120/load側120を直接検査。旧Cstock初回の探索後DD-only期待失敗は保存/load未到達として残し、必要訂正後検証と区別する。B/C未確認→一部・D未確認→確認済みだけ26/149/61→27/151/58。A/他58行/旧53/236基準は不変。原本/metadataの独立照合も閉鎖し、最終HEAD/CIだけpending。次優先は同じ1-5/1 ADFGJの既知四隻代替(CL2DD2/BBV1CL1DD2)の元例scope/任意目標適用で、現canonical修正を閉じてから別単位で確認する。局所6件を別構成へ無条件流用せず、2–3隻は別残件として維持する。以下は各時点の履歴。
+
 > 3-1初回CIとguard訂正（2026-10-31 JST）：source940154dd／CI41107517422 attempt1は全6smokeジョブがNode前段の同じ旧2guardで失敗（各580/578/2）、Full skipped・取消0。C/W試行・保存/load比較は未到達、公式case outcomeは両方null、36件のroute metadataは未生成。旧52/208と8857/9abのhashを保持する明示的な歴史射影＋現CFGの新9番目bindへ訂正し、固定imageで失敗2＋新1の3title/構文3が成功。製品/browser/入力は変更せず局所C/W6を再利用する。元局所Node15unique/16成功実行と追加3passは別記。セル26/149/61は変更0、新訂正HEAD/CIはpending。以下の局所時点pendingは履歴として保持する。
 
 > 3-1 CFGの限定局所確定（2026-10-31 JST／実行UTC30日）：[記録](pr152-three-one-cfg-ja.md)。出典一致の既知六隻代替を元の艦種例へ拘束せず、任意の空母攻撃機と合法枠の不足案内、C→F接続を限定補完。Node新8＋影響親7はユニーク15（必要再検証を含む成功実行16）、通常C/W各3は全6初回成功・retries0。4件保存編集＋未知2件原文安全中止、全6同一文書load全文/保存strict180・loadstrict180/他編成metadata保持、例外・保持不一致0。knownは意図した艦戦交換で元gear差あり・提案保存一致、stockは元gear保持、unknownはmanual/元全文保持。全探索incomplete、制空未選択で全目標充足にはしない。3-1B/C未確認→一部・D未確認→確認済みだけ、25/147/64→26/149/61。A/他58/旧53/基準236は維持。最終feature HEAD/通常CIはpending。以下は各時点の履歴。
@@ -73,14 +75,14 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 
 2026-10-30 CI追記：[7-4 ABEJLP](pr152-seven-four-ja.md#2026-10-30-自身初回ci確定)の検証source`7fd5298e7248ebeb6b71c67dae7c0a579e0b7991`／[41007168230](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41007168230)、attempt1・dispatch1/再実行0。4smoke成功/2失敗・Full skipped・取消/timeout0。自身6初回summaryの全厳密比較完了を確認し、局所C3＋Wstock/unknownの5完了と自身CI Wknown初回を6代表へ直接対応してDだけ一部→確認済み。21/142/73→22/141/73の1追加セル、一連の695基準21/139/76からdistinctはB/C/D3セル。A/B/C・他58行/旧53/基準236は不変。
 
-現表は最新JSONの59行集計。3-1 B/C未確認→一部・D未確認→確認済みの3セルだけ、25/147/64→26/149/61。A・他58行・定義236・旧53区分を維持し、割合換算しない。最終feature HEAD/CIはpending。
+現表は最新JSONの59行集計。1-5/index1のB/C未確認→一部・D未確認→確認済みの3セルだけ、26/149/61→27/151/58。A・他58行・定義236・旧53区分を維持し、一部を割合換算しない。最終HEAD/CIはpending。
 
 |項目|確認済み|一部|未確認|非該当|分母|
 |---|---:|---:|---:|---:|---:|
 |A|0|56|3|0|59|
-|B|0|39|20|0|59|
-|C|0|39|20|0|59|
-|D|26|15|18|0|59|
+|B|0|40|19|0|59|
+|C|0|40|19|0|59|
+|D|27|15|17|0|59|
 
 2026-10-28追補：[5-4最終整理](pr152-five-four-closeout-ja.md)は既存証拠で終了し、追加実行0・状態変更0。基準236セル3/115/118の下に閉じた限定残件と4分類を別記した。続く[2-5北F分岐](pr152-two-five-north-f-ja.md)では高速3戦艦の有効枝と選艦/不足案内を接続し、C/W各1初回で保存・編集・同一文書load後の完全一致まで確認したためDだけ一部→確認済み。前3/115/118→後4/114/118、変更1セル。A/B/Cの全条件完了へは広げない。7-3 Gと他行は維持。
 
@@ -115,7 +117,7 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 |1-4/0/normal BCF(E)HL / AD(EH/GJ)L|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
 |1-4/0/j-avoid BCFEHL / ADEHL|一部|未確認|未確認|一部|[route-1-4-verification-ja](route-1-4-verification-ja.md)|
 |1-5/0/default ADEJ|一部|一部|一部|一部|[route-goal-guidance-ja](route-goal-guidance-ja.md)|
-|1-5/1/default ADFGJ|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
+|1-5/1/default ADFGJ|一部|一部|一部|確認済み|[1-5航戦四隻の限定記録](pr152-one-five-middle-ja.md)|
 |1-5/2/default ADFGJ|一部|一部|一部|一部|[asw-route-targets-ja](asw-route-targets-ja.md)|
 |1-6/0/default AEGFBN|一部|一部|一部|一部|[asw-remaining-targets-ja](asw-remaining-targets-ja.md)|
 |2-1/0/default C(E)DH|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|

@@ -1036,6 +1036,129 @@
         "perExampleAllRequirementsPositiveNegative": false,
         "representativeAllRequirementsStages": false,
         "physicalIPhone": false
+      },
+      "representativeWorkflowRecord": {
+        "record": "oneFiveMiddleLocal20261031",
+        "document": "docs/pr152-one-five-middle-ja.md",
+        "recordDateJST": "2026-10-31",
+        "baseHead": "7c5c81349be318c626f3b423a5b69bbfb5d543e7",
+        "stage": "local six representatives completed and original collections independently closed; final HEAD/CI not started",
+        "scope": "1-5/index1/ADFGJ canonical BBV1DD3 optional ASW3 and BBV-water presentation/normal-slot guidance only",
+        "source": {
+          "url": "https://zekamashi.net/kancolle-kouryaku/1-5/",
+          "singleGET": true,
+          "retry": 0,
+          "HTTPStatus": 200,
+          "bodyBytes": 295763,
+          "bodySHA256": "1302d96e0b28173413e4108ada2950a3095e56662f39bbdaf18df261f8b3822a",
+          "articleModified": "2026-09-27T05:36:25+09:00",
+          "canonicalADFGJAndD_F_GPriorityConfirmed": true,
+          "ASW3OrWater1SourceMandatoryQuantitiesEstablished": false,
+          "allSourceBranchesAndSmallerFleetsProven": false
+        },
+        "sourceBinding": {
+          "activePublicFixtureSHA256": "2746d3a30c70a140b4e4632f454cd13d32093c9615e147e957ea42a8fcaf8c4c",
+          "firstRuntimeManifestSHA256": "15ac7d19d72a85bfaecf6d2974abda96b5aae2ed7c3021c8759efc2b2d58f479",
+          "correctedRuntimeManifestSHA256": "68f1d9b36cb0bab5eda6ad1a9ea94ad91b443c00f517df82f5f62cd2839214c5",
+          "firstSpecSHA256": "9a142a7cdb8e632f14f6bcdfadbb39e981612947146781b8ead2efd8c471597a",
+          "correctedSpecSHA256": "470fc8b7e5015056eec7a21ff40b3a308c0514e831eb6451f89bbe4446782721",
+          "sameInputsProductsAndKnownBranchDirectExact": true,
+          "fullFirstVsCorrectedSourceFileIdentity": false,
+          "wholeHTTPServedHashMeasured": false
+        },
+        "matrix": {
+          "before": {
+            "confirmed": 26,
+            "partial": 149,
+            "unconfirmed": 61
+          },
+          "after": {
+            "confirmed": 27,
+            "partial": 151,
+            "unconfirmed": 58
+          },
+          "changedCells": [
+            {
+              "id": "1-5/1/default",
+              "item": "B",
+              "before": "未確認",
+              "after": "一部"
+            },
+            {
+              "id": "1-5/1/default",
+              "item": "C",
+              "before": "未確認",
+              "after": "一部"
+            },
+            {
+              "id": "1-5/1/default",
+              "item": "D",
+              "before": "未確認",
+              "after": "確認済み"
+            }
+          ],
+          "AOther58RowsAndDefinitionsAndLegacy53Unchanged": true
+        },
+        "remaining": {
+          "implementation": [
+            "出典が明示するCL2DD2やBBV1CL1DD2等の別の既知四隻ADFGJ編成は、元BBV1DD3例scopeを解除する接続とその自動配備/保存検証が未完。通常canonical入力では確定不一致ではなくmanual「編成例の登録範囲外・別例は未判定」にする。",
+            "canonical四隻外・全目標/全在庫/枠競合の同時配備十分性は未完。汎用水爆集計の水母+航戦を全編成の航戦配備保証へ変換しない。"
+          ],
+          "verification": [
+            "全艦型/全論理枝/全代替/全在庫/同期/実機は未網羅。完全raw入力/返却plan全体/evaluationcall数は未採取。"
+          ],
+          "source": [
+            "ASW3組/水爆1個の唯一の必要十分性、先制人数、全対潜機代替/火力/発動/勝利は未確認。",
+            "2–3隻は現contractのfleet4でmissingとなる別の範囲。出典の4隻/4隻以下表記差と全先行条件の照合は残り、既知四隻代替manualと一括しない。"
+          ],
+          "operationInstability": [
+            "旧load後非表示/通信/自然保存実null/DCL原因は未解決。今回1-5で再発なしでも旧失敗を補完しない。"
+          ]
+        },
+        "browser": {
+          "representatives": 6,
+          "passedRepresentatives": 6,
+          "physicalTrials": 7,
+          "legacyStockExpectationFailure": 1,
+          "retry": 0,
+          "successPurposeRepeats": 0,
+          "saveAndMemoEditCases": 4,
+          "safeAbortReadOnlyCases": 2,
+          "strictSavedIdentityFields": 120,
+          "strictLoadIdentityFields": 120,
+          "sameDocumentLoadCases": 6,
+          "aggregateSHA256": "1422a29011004f68ca595675f49c6426681ebc6c296af5306682607a06a4283f"
+        },
+        "fullCoverage": false,
+        "collection": {
+          "firstManifestSHA256": "691f06fca7fed960df2e28df82df9ad6d3f804ae340b1971d76e99f83b084b5b",
+          "correctedManifestSHA256": "18d026c050834abff1cf652a738dd7014c5341147c1072d886c604b845baeb0e",
+          "correctedIndependentReviewSHA256": "36520e01ace36a8239193364a8d81fac15b51b46066e9c866f1b8f916a08af9a",
+          "canonicalAggregateSHA256": "1422a29011004f68ca595675f49c6426681ebc6c296af5306682607a06a4283f",
+          "canonicalIndependentReviewSHA256": "aeb010c8d303867108d99bd200d9ad167edcf0ae7011b84123262b0cfd9461f2",
+          "independentStrictCountsBasis": "Independent recount from six primary-evidence perOriginal arrays: actual4 originals*5 fields with presence/exact/type, plus actual extra blank rows8/8 and unknown0. Not assumed20*6 from summary alone."
+        },
+        "sourceScopeStaticClarification": {
+          "useExampleScopeExplicitFalse": false,
+          "canonicalInfoOutsideExampleButKnownContractReady": "manual",
+          "detail": "編成例の登録範囲外。別例の分岐は未判定。",
+          "explicitCustomInfoBasicMissing": "missing, user-defined constraints preserved",
+          "twoOrThreeHulls": "contract fleetCount4 missing, separate from four-hull example scope",
+          "knownFourHullAlternatives": "Source available; implementation/verification insufficient, not source-waiting.",
+          "UI": "hdMapRequirementsHtml displays general ADFGJ conditions; hdOCRequiredChecksHtml uses final hdFERoute status/detail so example scope remains a separate unassessed layer.",
+          "notNodeOrBrowserExecutedForAlternatives": true
+        }
+      },
+      "sourceScopeAudit": {
+        "record": "docs/pr152-one-five-middle-ja.md",
+        "canonicalFourOnly": true,
+        "existingExampleScopeKept": true,
+        "productBranchPredicatesChanged": false,
+        "D_F_GPriorityAndCanonicalExampleConfirmed": true,
+        "sourceBodySHA256": "1302d96e0b28173413e4108ada2950a3095e56662f39bbdaf18df261f8b3822a",
+        "newMandatoryCombatQuantityEstablished": false,
+        "scoutingUnchanged": true,
+        "fullSourceOrCombatQuantityCoverage": false
       }
     },
     {

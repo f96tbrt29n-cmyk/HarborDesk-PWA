@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "scope": "1-5/index1 ADFGJ recommendation card quantities and named legal-frame hints only; no route, goals, generic measure, search or save change",
+  "files": {
+    "owned-equipment-planner.js": {
+      "beforeSHA256": "ea8f63e332cf20ec5a289a806cbc2e6e7c92f4b94d0b69f116a0fe7c324b5088",
+      "approvedAfterSHA256": "c458417d7140978b0a24f1d048804c198535ce288e0f6a236be02d30be13baf9"
+    },
+    "sortie-equipment-check.js": {
+      "beforeSHA256": "47d0ec7a694d715ce042c425134c15f73db748b70c67406c4b4725e5259fa0f3",
+      "approvedAfterSHA256": "d26fa06d8d1fb47898121fbc70f23935cb2f29ca29ba62b5e3e96e1766b405d2"
+    }
+  },
+  "changes": [
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "const contract=['3-1','7-4','7-5'].includes(c.map)?hdFERouteRequirementData(best.plan):null,threeOneCarrierRecommendation=",
+      "after": "const contract=['1-5','3-1','7-4','7-5'].includes(c.map)?hdFERouteRequirementData(best.plan):null,oneFiveRecommendation=c.map==='1-5'&&contract?.map==='1-5'&&contract.index===1&&contract.path==='ADFGJ'&&goal.generatedFromMap===true&&goal.purpose==='recommendation',threeOneCarrierRecommendation="
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "||sevenFourRecommendation||sevenFiveFirstRecommendation||sevenFiveSecondRecommendation)&&goal.kind==='cap-asw'",
+      "after": "||oneFiveRecommendation||sevenFourRecommendation||sevenFiveFirstRecommendation||sevenFiveSecondRecommendation)&&goal.kind==='cap-asw'"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "...(c.map==='7-2'&&hdFERouteRequirementData(best.plan)?.path==='CEG'",
+      "after": "...(oneFiveRecommendation?{aswScopeNote:'対潜組数は選択中の任意比較目標です。元の航空戦艦1＋駆逐3の四隻例では対潜3組を比較しますが、通行必須・先制対潜人数・全編成への必要十分数・購入数量ではありません。'}:c.map==='7-2'&&hdFERouteRequirementData(best.plan)?.path==='CEG'"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "...(c.map==='6-3'&&goal.kind==='cap-water-attack'?{waterTargets:hdOCSixThreeWaterTargets(best.plan,goal)}:{})",
+      "after": "...((c.map==='6-3'||oneFiveRecommendation)&&goal.kind==='cap-water-attack'?{waterTargets:hdOCSixThreeWaterTargets(best.plan,goal),...(oneFiveRecommendation?{waterScope:'one-five-bbv'}:{})}:{})"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "const scopedContract=['7-4','7-5'].includes(plan?.map)?hdFERouteRequirementData(plan):null,sevenFour=",
+      "after": "const scopedContract=['1-5','7-4','7-5'].includes(plan?.map)?hdFERouteRequirementData(plan):null,oneFive=plan?.map==='1-5'&&scopedContract?.map==='1-5'&&scopedContract.index===1&&scopedContract.path==='ADFGJ',sevenFour="
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "scopedRecommendation=sevenFour||sevenFiveFirst||sevenFiveSecond;",
+      "after": "scopedRecommendation=oneFive||sevenFour||sevenFiveFirst||sevenFiveSecond;"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "||sevenFiveSecond&&(stock.recipe.parts?.length!==2||stock.recipe.parts[0]!=='sonar'||stock.recipe.parts[1]!=='projector'))return null;",
+      "after": "||(oneFive||sevenFiveSecond)&&(stock.recipe.parts?.length!==2||stock.recipe.parts[0]!=='sonar'||stock.recipe.parts[1]!=='projector'))return null;"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "function hdOCSixThreeWaterTargets(plan,goal){\n if(plan?.map!=='6-3'||hdFERouteRequirementData(plan)?.path!=='ACEGHJ'||goal?.kind!=='cap-water-attack'||!goal.generatedFromMap||goal.purpose!=='recommendation')return null;",
+      "after": "function hdOCSixThreeWaterTargets(plan,goal){\n const oneFiveContract=plan?.map==='1-5'?hdFERouteRequirementData(plan):null,oneFive=plan?.map==='1-5'&&oneFiveContract?.map==='1-5'&&oneFiveContract.index===1&&oneFiveContract.path==='ADFGJ';\n if(oneFive){if(goal?.kind!=='cap-water-attack'||goal.generatedFromMap!==true||goal.purpose!=='recommendation')return null}\n else if(plan?.map!=='6-3'||hdFERouteRequirementData(plan)?.path!=='ACEGHJ'||goal?.kind!=='cap-water-attack'||!goal.generatedFromMap||goal.purpose!=='recommendation')return null;"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "if(db?.type!=='水上機母艦'||hdSECapabilityMeasure({ships:[ship]},goal.kind).count>0)return [];",
+      "after": "if(db?.type!==(oneFive?'航空戦艦':'水上機母艦')||hdSECapabilityMeasure({ships:[ship]},goal.kind).count>0)return [];"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "const water=goal.waterTargets?.length?",
+      "after": "const oneFiveWater=goal.waterScope==='one-five-bbv'&&goal.generatedFromMap===true&&goal.purpose==='recommendation',water=goal.waterTargets?.length?"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "<b>未配備の水母ごとの搭載先候補</b>",
+      "after": "<b>${oneFiveWater?'未配備の航空戦艦ごとの搭載先候補':'未配備の水母ごとの搭載先候補'}</b>"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "<small>水上爆撃機1個ずつは戦闘上の推奨装備例で、経路の必須条件ではありません。水偵や回転翼機はこの装備例の代用にせず、増設枠は含めません。Hの33式索敵条件、G/Hの航空偵察成功・資源獲得や戦闘勝利を保証しません。候補は未所持品を含み、他の目標と枠を共用し、現在の装備との交換を含みます。同時配備の成立や購入数量を保証しません。</small>",
+      "after": "<small>${oneFiveWater?'航空戦艦1隻に水上爆撃機1個という既存の任意配備例です。通行必須・先制対潜人数・対潜火力・撃破・勝利を保証しません。合法かつ正の搭載数の通常枠だけを示し、増設枠は含めません。水偵・回転翼機・対潜哨戒機など実ゲーム上の他の対潜手段は、この水上爆撃機モデルとは別に確認してください。候補は未所持品や現在装備との交換を含み、他の目標と枠を共用します。同時配備の成立や購入数量を保証しません。':'水上爆撃機1個ずつは戦闘上の推奨装備例で、経路の必須条件ではありません。水偵や回転翼機はこの装備例の代用にせず、増設枠は含めません。Hの33式索敵条件、G/Hの航空偵察成功・資源獲得や戦闘勝利を保証しません。候補は未所持品を含み、他の目標と枠を共用し、現在の装備との交換を含みます。同時配備の成立や購入数量を保証しません。'}</small>"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "<b>装備例「${esc(stock.recipe.name)}」の所持内訳</b>",
+      "after": "<b>装備例「${esc(oneFiveWater?'航空戦艦：搭載枠に水上爆撃機':stock.recipe.name)}」の所持内訳</b>"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "(['6-5','7-2'].includes(map)||map==='7-3'&&c.index===0",
+      "after": "(['6-5','7-2'].includes(map)||map==='1-5'&&c.index===1||map==='7-3'&&c.index===0"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": " const requestedScope=['6-5','7-2','7-3','7-4','7-5'].includes(map)&&arguments.length>=4,candidate=requestedScope&&typeof hdMapPresetRequirements==='function'?hdMapPresetRequirements(map,selectedPreset):null,",
+      "after": " const oneFiveCandidate=map==='1-5'&&arguments.length>=4&&typeof hdMapPresetRequirements==='function'?hdMapPresetRequirements(map,selectedPreset):null;\n if(map==='1-5'&&arguments.length>=4&&(!oneFiveCandidate||oneFiveCandidate.map!=='1-5'||![0,1,2].includes(oneFiveCandidate.index)))return `<div class=\"hd-se-capabilities\" data-hd-se-route-scope=\"manual\">${hdSENightPolicyHtml(map)}<strong>選択経路の装備推奨は未判定</strong><p>経路を選び直して装備例の適用範囲を確認してください。未判定のため不足数は表示していません。</p></div>`;\n const requestedScope=(['6-5','7-2','7-3','7-4','7-5'].includes(map)||oneFiveCandidate?.index===1)&&arguments.length>=4,candidate=oneFiveCandidate?.index===1?oneFiveCandidate:requestedScope&&typeof hdMapPresetRequirements==='function'?hdMapPresetRequirements(map,selectedPreset):null,"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "selectedScope=requestedScope&&(map!=='7-3'||candidate?.index===0),sevenTwo=",
+      "after": "selectedScope=requestedScope&&(map!=='7-3'||candidate?.index===0),oneFive=selectedScope&&map==='1-5'&&candidate?.index===1,sevenTwo="
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "multiTargets=sevenTwo||sevenFour||sevenFiveSecond,route=",
+      "after": "multiTargets=oneFive||sevenTwo||sevenFour||sevenFiveSecond,route="
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "!(map==='7-2'?['CEG','BCDIM']:sevenThreeFirst?",
+      "after": "!(map==='7-2'?['CEG','BCDIM']:oneFive?['ADFGJ']:sevenThreeFirst?"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "||sevenFiveFirst&&(route.map!=='7-5'||route.index!==0)",
+      "after": "||oneFive&&(route.map!=='1-5'||route.index!==1||route.waterAttackTarget!==true||!Array.isArray(route.waterAttackTypes)||route.waterAttackTypes.length!==1||route.waterAttackTypes[0]!=='航空戦艦'||!Array.isArray(route.equipmentTargets)||route.equipmentTargets.filter(t=>t?.kind==='cap-asw').length!==1||!route.equipmentTargets.some(t=>t?.kind==='cap-asw'&&t.minCount===3))||sevenFiveFirst&&(route.map!=='7-5'||route.index!==0)"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "||(sevenFiveSecond||sevenFiveThird)&&p.kind.startsWith('cap-night-')",
+      "after": "||(oneFive||sevenFiveSecond||sevenFiveThird)&&p.kind.startsWith('cap-night-')"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": " if(sevenFiveSecond)profiles.push(",
+      "after": " if(oneFive)profiles.push({kind:'cap-water-attack',baseKind:'航空攻撃',label:'航空戦艦の水上爆撃機',importance:'任意の配備例・対潜の十分性は未確認',reason:'採用した航空戦艦の通常枠へ水上爆撃機を準備する既存比較です。対潜攻撃の可否・火力は別に確認します。',note:'通行必須・先制対潜人数・対潜火力・撃破・勝利を保証しません。水偵・回転翼機・対潜哨戒機など他の対潜手段はこのモデルと別に確認します。候補枠は他の目標と共用し、同時配備や購入数量を保証しません。',source:'https://zekamashi.net/kancolle-kouryaku/1-5/'});\n if(sevenFiveSecond)profiles.push("
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "plan=proposal||(fleet?hdFEPlanFromSavedFleet(map,fleet):null),esc=hdSEEsc;",
+      "after": "plan=proposal||(fleet?hdFEPlanFromSavedFleet(map,fleet):null),esc=hdSEEsc;\n const oneFiveShips=oneFive?(plan?.ships||[]).filter(s=>s.ship):[],oneFiveWaterShips=oneFiveShips.filter(s=>hdFEFindShip(s.ship)?.type==='航空戦艦'),oneFivePlanUnknown=oneFive&&(!plan||!oneFiveShips.length||!!plan.preservationIssues?.length||oneFiveShips.some(s=>{const db=hdFEFindShip(s.ship),profile=db&&hdShipDbSlotProfile(db);return !db||!profile||!Number.isInteger(profile.count)||profile.count<0||(s.items||[]).some(item=>item.name&&!hdFEFind(item.name))||!!s.expansion?.name&&!hdFEFind(s.expansion.name)})),oneFiveCanonical=oneFive&&!oneFivePlanUnknown&&oneFiveShips.length===4&&oneFiveWaterShips.length===1&&oneFiveShips.filter(s=>hdFEFindShip(s.ship)?.type==='駆逐艦').length===3,oneFiveWaterProfileUnknown=oneFiveWaterShips.some(s=>{const profile=hdShipDbSlotProfile(hdFEFindShip(s.ship));return !profile||!Number.isInteger(profile.count)||profile.count<0||!Array.isArray(profile.slots)||profile.slots.length<profile.count||profile.slots.slice(0,profile.count).some(n=>!Number.isFinite(n)||n<0)});"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "const scopeNote=sevenTwo?",
+      "after": "const scopeNote=oneFive?`<small data-hd-se-route-scope=\"1-5:1:ADFGJ\">選択した航空戦艦1＋駆逐3の四隻例向けの任意比較です。対潜シナジー3組と水上爆撃機の既存モデルを別々に比べます。水上爆撃機は、既知の航空戦艦1＋駆逐3の範囲だけで配備を比較します。別構成では探索欄の水爆艦数だけで航空戦艦への配備成立とは判断できないため、このカードは未判定です。組数は通行必須・先制対潜人数・全編成への必要十分数・購入数量ではありません。先制対潜人数は別に選択してください。艦種条件、他目標との枠競合・同時配備、実ゲームの対潜手段・火力・勝利は別確認です。</small>`:sevenTwo?"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "  const target=multiTargets?(route.equipmentTargets||[]).find(t=>t.kind===p.kind)?.minCount||1:1,stock=multiTargets?hdSECapabilityStock(plan,p.kind,target):hdSECapabilityStock(plan,p.kind),actual=hdSECapabilityMeasure(plan,p.kind),unresolved=multiTargets&&!!actual.unresolved,ready=multiTargets?!unresolved&&actual.count>=target:!!actual.count,multiple=multiTargets&&target>1,status=unresolved?'配備は未判定':ready?'配備済み':multiple?(stock?.complete?(plan?'所持数あり・複数艦の配備確認が必要':'所持セットあり・艦隊を選んで確認'):'この比較目標の所持不足'):stock?.usable?.complete?'手持ちで配備可能':stock?.complete?(plan?'艦種・装備枠の確認が必要':'所持セットあり・艦隊を選んで確認'):'所持不足';",
+      "after": "  const oneFiveWater=oneFive&&p.kind==='cap-water-attack';if(oneFiveWater&&plan&&!oneFivePlanUnknown&&!oneFiveWaterShips.length)return '';\n  const target=oneFiveWater?(oneFiveCanonical&&!oneFiveWaterProfileUnknown?oneFiveWaterShips.length:null):multiTargets?(route.equipmentTargets||[]).find(t=>t.kind===p.kind)?.minCount||1:1,stock=oneFive&&oneFivePlanUnknown||oneFiveWater&&(oneFiveWaterProfileUnknown||target===null)?null:oneFiveWater?hdSECapabilityStock({...plan,ships:oneFiveWaterShips},p.kind,target):multiTargets?hdSECapabilityStock(plan,p.kind,target):hdSECapabilityStock(plan,p.kind),actual=oneFiveWater?hdSECapabilityMeasure({ships:oneFiveWaterShips},p.kind):hdSECapabilityMeasure(plan,p.kind),unresolved=oneFiveWater?oneFivePlanUnknown||oneFiveWaterProfileUnknown||target===null:oneFive?oneFivePlanUnknown||!!actual.unresolved:multiTargets&&!!actual.unresolved,ready=multiTargets?!unresolved&&actual.count>=target:!!actual.count,multiple=multiTargets&&target>1,status=unresolved?'配備は未判定':ready?'配備済み':multiple?(stock?.complete?(plan?'所持数あり・複数艦の配備確認が必要':'所持セットあり・艦隊を選んで確認'):'この比較目標の所持不足'):stock?.usable?.complete?'手持ちで配備可能':stock?.complete?(plan?'艦種・装備枠の確認が必要':'所持セットあり・艦隊を選んで確認'):'所持不足';"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "${multiTargets?` data-hd-se-target-count=\"${target}\"`:''}",
+      "after": "${multiTargets&&target!==null?` data-hd-se-target-count=\"${target}\"`:''}"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "${multiTargets?`<p>目標${target}組 / 配備${actual.count}組。経路の必須条件・先制対潜人数・購入数量とは別です。</p>`:''}",
+      "after": "${multiTargets&&target!==null?`<p>目標${target}${oneFiveWater?'隻':'組'} / 配備${oneFive&&unresolved?'未判定':actual.count+(oneFiveWater?'隻':'組')}。${oneFiveWater?'確認できた航空戦艦1隻につき水上爆撃機1個の比較です。':''}経路の必須条件・先制対潜人数・購入数量とは別です。</p>`:oneFiveWater?'<p>元の航空戦艦1＋駆逐3の範囲と、対象艦・スロット情報を確認してから配備を比較します。このカードの数量は未判定です。</p>':''}"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "${esc(stock.recipe.name)}</b><div class=\"hd-se-cap-parts\">",
+      "after": "${esc(oneFiveWater?'航空戦艦：搭載枠に水上爆撃機':stock.recipe.name)}</b><div class=\"hd-se-cap-parts\">"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "${esc(r.name)}${r.ship==='akizuki'?",
+      "after": "${esc(oneFiveWater?'航空戦艦：搭載枠に水上爆撃機':r.name)}${r.ship==='akizuki'?"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "${actual.count?`<p>条件を満たす配備：${esc(actual.ships.join('、'))}</p>`",
+      "after": "${oneFive&&unresolved?'<p>配備状態は未判定です。艦・装備・通常枠の情報を確認してください。</p>':actual.count?`<p>条件を満たす配備：${esc(actual.ships.join('、'))}</p>`"
+    }
+  ]
+}
