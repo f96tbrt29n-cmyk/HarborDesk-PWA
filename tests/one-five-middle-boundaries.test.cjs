@@ -1,14 +1,15 @@
 'use strict';
-// Reviewed source-inverse regression; before mode is an explicit counterexample control.
+// Historical pre-BBV+CL source-inverse regression; current canonical/alternate behavior is covered independently.
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
 const ROOT=path.resolve(process.env.HD15_SOURCE_ROOT||path.join(__dirname,'..')),INVERSE=path.resolve(process.env.HD15_APPROVED_INVERSES||path.join(ROOT,'tests/fixtures/one-five-middle-approved-source-inverses.json')),MODE=process.env.HD15_BOUNDARY_MODE||'after';
 assert.ok(['before','after'].includes(MODE));
+const {createOneFiveBbvClHistoricalProjection}=require('./fixtures/one-five-bbv-cl-source-layer.cjs'),projectBbvCl=createOneFiveBbvClHistoricalProjection(ROOT),historicalText=file=>projectBbvCl(file,fs.readFileSync(path.join(ROOT,file),'utf8'));
 const HASH={before:{'owned-equipment-planner.js':'ea8f63e332cf20ec5a289a806cbc2e6e7c92f4b94d0b69f116a0fe7c324b5088','sortie-equipment-check.js':'47d0ec7a694d715ce042c425134c15f73db748b70c67406c4b4725e5259fa0f3'},after:{'owned-equipment-planner.js':'c458417d7140978b0a24f1d048804c198535ce288e0f6a236be02d30be13baf9','sortie-equipment-check.js':'d26fa06d8d1fb47898121fbc70f23935cb2f29ca29ba62b5e3e96e1766b405d2'}};
 const hash=s=>crypto.createHash('sha256').update(s).digest('hex'),clone=x=>structuredClone(x),plain=x=>JSON.parse(JSON.stringify(x));
 const approvedBytes=fs.readFileSync(INVERSE);assert.equal(hash(approvedBytes),'917765fe143f9bd5f6d9aa04b757ad979873138899a305ab6b5148ba8854423f');const approved=JSON.parse(approvedBytes);
 assert.equal(approved.schemaVersion,1);assert.deepEqual(Object.keys(approved.files).sort(),Object.keys(HASH.after).sort());assert.equal(approved.changes.length,29);
 for(const file of Object.keys(HASH.after)){assert.equal(approved.files[file].beforeSHA256,HASH.before[file]);assert.equal(approved.files[file].approvedAfterSHA256,HASH.after[file])}
-function sources(mode){return Object.fromEntries(Object.keys(HASH[mode]).map(file=>{const bytes=fs.readFileSync(path.join(ROOT,file));assert.equal(hash(bytes),HASH.after[file],file+' approved whole current source');let text=bytes.toString('utf8');if(mode==='before')for(const change of approved.changes.filter(row=>row.file===file).reverse()){assert.equal(text.split(change.after).length,2,file+' unique inverse');text=text.replace(change.after,change.before)}assert.equal(hash(Buffer.from(text)),HASH[mode][file],file+' frozen '+mode+' whole source');return [file,text]}))}
+function sources(mode){return Object.fromEntries(Object.keys(HASH[mode]).map(file=>{const bytes=Buffer.from(historicalText(file));assert.equal(hash(bytes),HASH.after[file],file+' approved whole historical source');let text=bytes.toString('utf8');if(mode==='before')for(const change of approved.changes.filter(row=>row.file===file).reverse()){assert.equal(text.split(change.after).length,2,file+' unique inverse');text=text.replace(change.after,change.before)}assert.equal(hash(Buffer.from(text)),HASH[mode][file],file+' frozen '+mode+' whole source');return [file,text]}))}
 const source=sources(MODE),oldSource=sources('before'),MAP=fs.readFileSync(path.join(ROOT,'map-plans.js'),'utf8');
 function span(text,name){const needle='function '+name+'(',start=text.indexOf(needle);assert.ok(start>=0,name);assert.equal(text.indexOf(needle,start+needle.length),-1,name+' unique definition');const end=text.indexOf('\nfunction ',start+needle.length);return text.slice(start,end<0?undefined:end)}
 function esc(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -76,7 +77,7 @@ function article(html,kind){const m=html.match(new RegExp('<article[^>]*data-hd-
 function goal(kind=ASW,extra={}){return {kind,generatedFromMap:true,purpose:'recommendation',minCount:kind===ASW?3:1,...extra}}
 function untouched(state,operation){const before=clone(state);const value=operation();assert.deepEqual(state,before,'all supplied input/model metadata retained');return value}
 
-test('1-5 selected index1 card aligns with the existing three-set and BBV example',()=>{
+test('historical 1-5 middle: selected index1 card aligns with the existing three-set and BBV example',()=>{
  const x=context(MODE),html=untouched(x.s,()=>x.render()),asw=article(html,ASW),water=article(html,WATER);
  assert.ok(asw);assert.match(asw,/data-hd-se-target-count="3"/);assert.match(asw,/目標3組/);
  assert.ok(water);assert.match(water,/data-hd-se-target-count="1"/);assert.match(water,/航空戦艦/);
@@ -85,7 +86,7 @@ test('1-5 selected index1 card aligns with the existing three-set and BBV exampl
  assert.ok(x.stockCalls.filter(row=>row.kind===WATER).every(row=>row.ships.length===1&&row.ships[0]==='unit-BBV'));
 });
 
-test('1-5 selected propagation and all unchanged preset display outputs retain their old boundaries',t=>{
+test('historical 1-5 middle: selected propagation and all unchanged preset display outputs retain their old boundaries',t=>{
  const rows=vm.runInContext('Object.entries(MAP_PLANS).flatMap(([map,value])=>(value.presets||[]).map((preset,index)=>({map,index})))',context('before').c);
  let compared=0;
  for(const row of rows){
@@ -106,7 +107,7 @@ test('1-5 selected propagation and all unchanged preset display outputs retain t
  t.diagnostic(JSON.stringify({finiteSyntheticPresetDisplayComparisons:compared,notAllRouteLegalityOrBrowserProof:true}));
 });
 
-test('1-5 recommendation hints require exact route and strict origin while other scopes stay unchanged',()=>{
+test('historical 1-5 middle: recommendation hints require exact route and strict origin while other scopes stay unchanged',()=>{
  for(const kind of [ASW,WATER])for(const generatedFromMap of [true,false,1,undefined])for(const purpose of ['recommendation','strategy']){
   const x=context('after'),g=goal(kind,{generatedFromMap,purpose}),stock=x.c.hdSECapabilityStock(x.s.plan,kind,g.minCount);
   const value=kind===ASW?x.c.hdOCFourOneAswTargets(x.s.plan,g,stock):x.c.hdOCSixThreeWaterTargets(x.s.plan,g);
@@ -136,7 +137,7 @@ test('1-5 recommendation hints require exact route and strict origin while other
 
 });
 
-test('1-5 ASW quantity and distinct normal-slot candidates separate stock, slot conflicts and unknown profiles',()=>{
+test('historical 1-5 middle: ASW quantity and distinct normal-slot candidates separate stock, slot conflicts and unknown profiles',()=>{
  const x=context('after');x.s.inventory.projector=2;const html=untouched(x.s,()=>x.render()),asw=article(html,ASW);
  assert.match(asw,/目標3組/);assert.match(asw,/爆雷投射機：2\/3・あと1個/);
  const rows=plain(x.c.hdOCFourOneAswTargets(x.s.plan,goal(),x.c.hdSECapabilityStock(x.s.plan,ASW,3)));
@@ -148,7 +149,7 @@ test('1-5 ASW quantity and distinct normal-slot candidates separate stock, slot 
  const wrongRecipe=context('after');assert.equal(wrongRecipe.c.hdOCFourOneAswTargets(wrongRecipe.s.plan,goal(),{recipe:{id:'sonar-projector',parts:['sonar','sonar']}}),null);
 });
 
-test('1-5 water hints use known positive legal BBV normal slots without borrowing an AV',()=>{
+test('historical 1-5 middle: water hints use known positive legal BBV normal slots without borrowing an AV',()=>{
  const x=context('after'),g=goal(WATER),before=clone(x.s),rows=plain(x.c.hdOCSixThreeWaterTargets(x.s.plan,g));assert.deepEqual(x.s,before);
  assert.deepEqual(rows.map(r=>r.ship),['unit-BBV']);assert.equal(rows[0].status,'candidate');assert.deepEqual(rows[0].slots.map(r=>r.index),[0,1,2,3]);
  const zero=context('after');zero.s.profiles['unit-BBV'].slots=[0,0,0,0];const z=plain(zero.c.hdOCSixThreeWaterTargets(zero.s.plan,g));assert.equal(z[0].status,'blocked');assert.deepEqual(z[0].slots,[]);
@@ -158,7 +159,7 @@ test('1-5 water hints use known positive legal BBV normal slots without borrowin
  assert.equal(av.stockCalls.some(r=>r.kind===WATER),false,'noncanonical water card does not request stock or an AV usability verdict');
 });
 
-test('1-5 unknown equipment and water capacities stay local manual without a numeric goal or verified-name claim',()=>{
+test('historical 1-5 middle: unknown equipment and water capacities stay local manual without a numeric goal or verified-name claim',()=>{
  const cap=context('after');cap.s.profiles['unit-BBV'].slots=[NaN,4,9,23];cap.s.plan.ships[0].items=[{name:PLANE,slotIndex:0}];cap.s.rawMeasure[WATER]={count:1,ships:['unit-BBV'],ratio:1};
  const a=article(untouched(cap.s,()=>cap.render()),WATER);assert.ok(a);assert.match(a,/未判定/);assert.doesNotMatch(a,/data-hd-se-target-count|条件を満たす配備：|あと[0-9]/);
  assert.equal(cap.stockCalls.some(r=>r.kind===WATER),false);
@@ -178,7 +179,7 @@ test('1-5 unknown equipment and water capacities stay local manual without a num
  const noBBV=context('after');noBBV.s.plan.ships[0]={ship:'unit-DD1',items:[]};assert.equal(article(noBBV.render(),WATER),null,'known no-BBV means no water card, never satisfied0');
 });
 
-test('1-5 dedicated text keeps explicit night policy and preserves the old 6-3 water presentation',()=>{
+test('historical 1-5 middle: dedicated text keeps explicit night policy and preserves the old 6-3 water presentation',()=>{
  const x=context('after');x.s.policy='dd';const html=x.render();assert.ok(article(html,'cap-night-dd'));assert.match(html,/航空戦艦/);
  const targets=plain(x.c.hdOCSixThreeWaterTargets(x.s.plan,goal(WATER))),stock=x.c.hdSECapabilityStock(x.s.plan,WATER,1),g={...goal(WATER),goalKind:WATER,capability:true,stock,waterTargets:targets,waterScope:'one-five-bbv'};
  const h=x.c.hdOCCapabilityStockHtml(g);assert.match(h,/未配備の航空戦艦/);assert.doesNotMatch(h,/未配備の水母|Hの33式|G\/Hの航空偵察/);assert.match(h,/購入数量/);
@@ -186,15 +187,15 @@ test('1-5 dedicated text keeps explicit night policy and preserves the old 6-3 w
  const old=context('before'),now=context('after');assert.equal(now.c.hdOCCapabilityStockHtml(clone(legacyGoal)),old.c.hdOCCapabilityStockHtml(clone(legacyGoal)));
 });
 
-test('1-5 changes remain display-only source edits and all recorded inverse anchors restore whole sources',()=>{
+test('historical 1-5 middle: changes remain display-only source edits and all recorded inverse anchors restore whole sources',()=>{
  const edits=approved.changes;assert.equal(edits.length,29);
  for(const file of Object.keys(HASH.after)){
-  let undo=fs.readFileSync(path.join(ROOT,file),'utf8');for(const e of edits.filter(e=>e.file===file).reverse()){assert.equal(undo.split(e.after).length,2);undo=undo.replace(e.after,e.before)}assert.equal(undo,oldSource[file]);
+  let undo=historicalText(file);for(const e of edits.filter(e=>e.file===file).reverse()){assert.equal(undo.split(e.after).length,2);undo=undo.replace(e.after,e.before)}assert.equal(undo,oldSource[file]);
  }
- const a=oldSource['owned-equipment-planner.js'],b=fs.readFileSync(path.join(ROOT,'owned-equipment-planner.js'),'utf8'),start='function* hdOCSearchSteps(',end='const shortages=hdOCShortageGoals(';
+ const a=oldSource['owned-equipment-planner.js'],b=historicalText('owned-equipment-planner.js'),start='function* hdOCSearchSteps(',end='const shortages=hdOCShortageGoals(';
  assert.equal(a.slice(a.indexOf(start),a.indexOf(end,a.indexOf(start))),b.slice(b.indexOf(start),b.indexOf(end,b.indexOf(start))));
- const before=oldSource['sortie-equipment-check.js'],after=fs.readFileSync(path.join(ROOT,'sortie-equipment-check.js'),'utf8'),s='function hdSECapabilityHtml(',e='\nfunction hdSEAirOptional(';
+ const before=oldSource['sortie-equipment-check.js'],after=historicalText('sortie-equipment-check.js'),s='function hdSECapabilityHtml(',e='\nfunction hdSEAirOptional(';
  assert.equal(before.slice(0,before.indexOf(s)),after.slice(0,after.indexOf(s)));assert.equal(before.slice(before.indexOf(e)),after.slice(after.indexOf(e)));
- assert.equal(hash(fs.readFileSync(path.join(ROOT,'fleet-readiness-evaluator.js'))),'bc7ffb6aa9efa012ee7baab4540fa8961190d9e9a39cdf2342ae42aba34bb409');
+ assert.equal(hash(Buffer.from(historicalText('fleet-readiness-evaluator.js'))),'bc7ffb6aa9efa012ee7baab4540fa8961190d9e9a39cdf2342ae42aba34bb409');
  assert.equal(hash(Buffer.from(MAP)),'aa312e59cf5533ac32dcff9036d57e8b6c049d7de8660d69020140ddafa9af7a');
 });

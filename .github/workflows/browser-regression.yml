@@ -101,6 +101,7 @@ jobs:
           name: route-summary-${{ matrix.browser }}-${{ matrix.shard }}-${{ github.run_id }}
           path: |
             test-results/route-one-five-middle-*/route-guidance-summary.json
+            test-results/route-one-five-bbv-cl-*/route-guidance-summary.json
             test-results/route-three-one-cfg-*/route-guidance-summary.json
             test-results/route-seven-three-first-*/route-guidance-summary.json
             test-results/route-seven-four-*/route-guidance-summary.json

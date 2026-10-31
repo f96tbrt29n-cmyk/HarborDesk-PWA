@@ -2,11 +2,13 @@
 // Independent second-target source/model proposals; no browser or arrival claim.
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
 const root=path.join(__dirname,'..'),fixtures=path.join(__dirname,'fixtures');
+const {createOneFiveBbvClHistoricalProjection}=require('./fixtures/one-five-bbv-cl-source-layer.cjs'),projectBbvCl=createOneFiveBbvClHistoricalProjection(root);
 const source=require('./fixtures/seven-five-second-source-cases.json'),actual=require('./fixtures/seven-five-second-actual-masters.json'),scope=require('./fixtures/seven-five-second-scope-expectations.json'),baseline=require('./fixtures/seven-five-second-before-baseline.json');
 const plain=x=>JSON.parse(JSON.stringify(x)),sha=x=>crypto.createHash('sha256').update(x).digest('hex');
 const STYPES={BB:9,FBB:8,BBV:10,CL:3,CLT:4,CT:21,CA:5,CAV:6,CV:11,CVB:18,CVL:7,DD:2,DE:1,CD:12,AV:16,SS:13,SSV:14,AS:20,AO:22,LHA:17,AR:19};
 const original=['BBV','CAV','CL','DD','DD','DD'];
 function historicalThreeOneSource(file,body){
+ body=projectBbvCl(file,body);
  // This legacy comparison owns the pre-3-1 projection. Actual CFG semantics
  // remain covered by the independent three-one-cfg suite in the same wrapper.
  const bytes=fs.readFileSync(path.join(fixtures,'three-one-approved-source-inverses.json'));

@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "scope": "1-5/index1/ADFGJ exact known BBV1CL1DD2 only; original canonical and explicit constraints retained",
+  "baseRecordHead": "d62153ed830c6e50257e9b4b7127f1f3de11f528",
+  "files": {
+    "fleet-readiness-evaluator.js": {
+      "beforeSHA256": "bc7ffb6aa9efa012ee7baab4540fa8961190d9e9a39cdf2342ae42aba34bb409",
+      "approvedAfterSHA256": "b737cba126d29936b797e00593a32aa3513c11003a1409005b8478e08354fdc3"
+    },
+    "sortie-equipment-check.js": {
+      "beforeSHA256": "d26fa06d8d1fb47898121fbc70f23935cb2f29ca29ba62b5e3e96e1766b405d2",
+      "approvedAfterSHA256": "1600e3bf8efddc226b8e86b99a2053e0b32989acd55bd8d128ad8ff44514af19"
+    }
+  },
+  "changes": [
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "before": "function hdFERoute(plan){",
+      "after": "function hdFEOneFiveAlternateExample(plan,data){\n if(plan?.map!=='1-5'||data?.map!=='1-5'||data.index!==1||data.path!=='ADFGJ'||plan.preservationIssues?.length||typeof hdFEFindShip!=='function')return false;\n const ships=Array.isArray(plan.ships)?plan.ships.filter(s=>s?.ship):[];if(ships.length!==4)return false;\n const types=ships.map(s=>hdFEFindShip(s.ship)?.type);\n return types.every(type=>['航空戦艦','軽巡洋艦','駆逐艦'].includes(type))&&types.filter(type=>type==='航空戦艦').length===1&&types.filter(type=>type==='軽巡洋艦').length===1&&types.filter(type=>type==='駆逐艦').length===2;\n}\nfunction hdFERoute(plan){",
+      "reason": "Pure finite known BBV1CL1DD2 classifier; no source general flag, profile, cache, timer, Storage or mutation."
+    },
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "before": "  const info=plan?.suggestion?.info||plan?.routeInfo,general=contract.data.useExampleScope===false,canonical=hdFSPresetInfo(MAP_PLANS[plan.map].presets[contract.data.index]),conditionalExample=contract.data.map==='6-4'&&contract.data.index===0&&contract.data.useExampleFlagshipScope===false,keys=['text','requirements','total','conditionManual','speedRequired','flagship'];",
+      "after": "  const info=plan?.suggestion?.info||plan?.routeInfo,canonical=hdFSPresetInfo(MAP_PLANS[plan.map].presets[contract.data.index]),keys=['text','requirements','total','conditionManual','speedRequired','flagship'],oneFiveAlternate=contract.data.map==='1-5'&&contract.data.index===1&&contract.data.path==='ADFGJ'&&basic.status!=='ready'&&!!info&&[plan?.routeInfo,plan?.suggestion?.info].filter(Boolean).every(x=>keys.every(k=>JSON.stringify(x[k])===JSON.stringify(canonical[k])))&&typeof hdFEOneFiveAlternateExample==='function'&&hdFEOneFiveAlternateExample(plan,contract.data),general=contract.data.useExampleScope===false||oneFiveAlternate,conditionalExample=contract.data.map==='6-4'&&contract.data.index===0&&contract.data.useExampleFlagshipScope===false;",
+      "reason": "Bypass only the old example mismatch for strict alternative under both unmodified canonical info projections. Canonical ready skips helper and retains old general=false output."
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": ",oneFiveWaterProfileUnknown=oneFiveWaterShips.some(s=>",
+      "after": ",oneFiveAlternate=oneFive&&!oneFivePlanUnknown&&!oneFiveCanonical&&typeof hdFEOneFiveAlternateExample==='function'&&hdFEOneFiveAlternateExample(plan,route),oneFiveWaterProfileUnknown=oneFiveWaterShips.some(s=>",
+      "reason": "Existing canonical classifier unchanged and short-circuits new helper. Unknown input remains excluded."
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "oneFiveCanonical&&!oneFiveWaterProfileUnknown?oneFiveWaterShips.length:null",
+      "after": "(oneFiveCanonical||oneFiveAlternate)&&!oneFiveWaterProfileUnknown?oneFiveWaterShips.length:null",
+      "reason": "Allow known alternative BBV1 water comparator without changing ASW3 or stock/measure logic."
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "oneFive?`<small data-hd-se-route-scope=\"1-5:1:ADFGJ\">選択した航空戦艦1＋駆逐3の四隻例向けの任意比較です。対潜シナジー3組と水上爆撃機の既存モデルを別々に比べます。水上爆撃機は、既知の航空戦艦1＋駆逐3の範囲だけで配備を比較します。別構成では探索欄の水爆艦数だけで航空戦艦への配備成立とは判断できないため、このカードは未判定です。組数は通行必須・先制対潜人数・全編成への必要十分数・購入数量ではありません。先制対潜人数は別に選択してください。艦種条件、他目標との枠競合・同時配備、実ゲームの対潜手段・火力・勝利は別確認です。</small>`:sevenTwo?",
+      "after": "oneFive?(oneFiveAlternate?`<small data-hd-se-route-scope=\"1-5:1:ADFGJ\">選択した航空戦艦1＋軽巡1＋駆逐2の四隻例向けの任意比較です。対潜シナジー3組と航空戦艦の水上爆撃機1個は既存の比較モデルで、通行必須・先制対潜人数・全編成への必要十分数・購入数量ではありません。砲撃二巡は航空戦艦によるもので、水爆1個を二巡の条件へ読み替えません。軽巡を含む各艦の装備可否・別通常枠、他目標との枠競合・同時配備は下の配備案で確認してください。先制対潜人数は別に選択し、実火力・勝利は別確認です。</small>`:oneFiveCanonical?`<small data-hd-se-route-scope=\"1-5:1:ADFGJ\">選択した航空戦艦1＋駆逐3の四隻例向けの任意比較です。対潜シナジー3組と水上爆撃機の既存モデルを別々に比べます。水上爆撃機は、既知の航空戦艦1＋駆逐3の範囲だけで配備を比較します。別構成では探索欄の水爆艦数だけで航空戦艦への配備成立とは判断できないため、このカードは未判定です。組数は通行必須・先制対潜人数・全編成への必要十分数・購入数量ではありません。先制対潜人数は別に選択してください。艦種条件、他目標との枠競合・同時配備、実ゲームの対潜手段・火力・勝利は別確認です。</small>`:`<small data-hd-se-route-scope=\"1-5:1:ADFGJ\">選択したADFGJの戦闘上の任意比較です。編成・装備情報または登録範囲を確認できず、航空戦艦1＋駆逐3／航空戦艦1＋軽巡1＋駆逐2の水爆比較を成立とは判定していません。他の編成が通行できないという意味ではありません。対潜シナジー3組等は既存比較モデルで、通行必須・先制対潜人数・全編成への必要十分数・購入数量ではありません。先制対潜人数は別に選択し、艦種・通常枠・他目標との競合を確認してください。不足数量をこの注記だけで断定しません。</small>`):sevenTwo?",
+      "reason": "Known canonical complete HTML retained; new known alternative gets precise model disclaimer; unknown/other family gets conservative applicability reason, not a purchase count."
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "元の航空戦艦1＋駆逐3の範囲と、対象艦・スロット情報を確認してから配備を比較します。このカードの数量は未判定です。",
+      "after": "対応済みの四隻例（航空戦艦1＋駆逐3／航空戦艦1＋軽巡1＋駆逐2）と、対象艦・通常枠情報を確認してから配備を比較します。このカードの数量は未判定です。",
+      "reason": "manual water-card fallback must name both supported four-hull scopes without asserting unknown capacity or a numeric target"
+    }
+  ]
+}
