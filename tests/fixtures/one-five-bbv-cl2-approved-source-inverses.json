@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "files": {
+    "fleet-readiness-evaluator.js": {
+      "beforeSHA256": "b737cba126d29936b797e00593a32aa3513c11003a1409005b8478e08354fdc3",
+      "approvedAfterSHA256": "d131894743074264faf9e083ee432123aa6a9959a7c5484d9f1d8a6d247a224b",
+      "beforeBytes": 117679,
+      "afterBytes": 117786
+    },
+    "sortie-equipment-check.js": {
+      "beforeSHA256": "1600e3bf8efddc226b8e86b99a2053e0b32989acd55bd8d128ad8ff44514af19",
+      "approvedAfterSHA256": "9eb644b4d5ba6efbeb23dcdb9e6ebe43e12563a09a105ec69b88c24bf3529b79",
+      "beforeBytes": 57635,
+      "afterBytes": 57827
+    }
+  },
+  "changes": [
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "before": "return types.every(type=>['航空戦艦','軽巡洋艦','駆逐艦'].includes(type))&&types.filter(type=>type==='航空戦艦').length===1&&types.filter(type=>type==='軽巡洋艦').length===1&&types.filter(type=>type==='駆逐艦').length===2;",
+      "after": "return types.every(type=>['航空戦艦','軽巡洋艦','駆逐艦'].includes(type))&&types.filter(type=>type==='航空戦艦').length===1&&(types.filter(type=>type==='軽巡洋艦').length===1&&types.filter(type=>type==='駆逐艦').length===2||types.filter(type=>type==='軽巡洋艦').length===2&&types.filter(type=>type==='駆逐艦').length===1);"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "選択した航空戦艦1＋軽巡1＋駆逐2の四隻例向けの任意比較です。",
+      "after": "選択した${oneFiveShips.filter(s=>hdFEFindShip(s.ship)?.type==='軽巡洋艦').length===2?'航空戦艦1＋軽巡2＋駆逐1':'航空戦艦1＋軽巡1＋駆逐2'}の四隻例向けの任意比較です。"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "航空戦艦1＋駆逐3／航空戦艦1＋軽巡1＋駆逐2の水爆比較を成立とは判定していません。",
+      "after": "航空戦艦1＋駆逐3／航空戦艦1＋軽巡1＋駆逐2／航空戦艦1＋軽巡2＋駆逐1の水爆比較を成立とは判定していません。"
+    },
+    {
+      "file": "sortie-equipment-check.js",
+      "before": "対応済みの四隻例（航空戦艦1＋駆逐3／航空戦艦1＋軽巡1＋駆逐2）",
+      "after": "対応済みの四隻例（航空戦艦1＋駆逐3／航空戦艦1＋軽巡1＋駆逐2／航空戦艦1＋軽巡2＋駆逐1）"
+    }
+  ]
+}

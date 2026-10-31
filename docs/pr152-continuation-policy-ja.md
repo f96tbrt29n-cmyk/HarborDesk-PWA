@@ -1,3 +1,5 @@
+> 1-5 BBV1CL2DD1の限定局所確定（2026-10-31 JST）：[記録](pr152-one-five-bbv-cl2-ja.md)。既知航戦1＋軽巡2＋駆逐1だけを例拘束から接続し、任意ASW3/水爆1・合法2CL別枠/不足/未知を整合した。新actual13＋既存guard4は17成功、新gen3/旧gen0。通常C/W各3は全6初回成功・retry0、保存編集4/安全中止2・同一文書load6・保存/load各120/厳密空行8+8/他保持が一致。原本812件・独立照合を閉鎖し、rawtrace6のCRC実669memberを確認した。27/151/58・旧CI全W未確定/2大容量archive欠測は変更0。新sourceHEAD/CIはpending、次候補CL2DD2は未実施。以下は各時点の履歴。
+
 > 1-5 BBV1CL1DD2の通常CI確定記録（2026-10-31 JST）：source `6c08381f`／[CI41175351013](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41175351013) attempt1は5smoke成功/W4 smoke自体取消、Full skipped。全6Node実測602/602/0、C895/0/0は全2shard完結、Wは1–3小計672/0/0だけで全W null。自身新/旧canonical各C3初回成功・W3 framework最終未確定を、各6metadataの保存120/load120・同一文書6/全保持一致と分けた。回収8ZIP/未要求上限超2、原本と独立照合を閉鎖。局所raw drop/traceをCIへ流用せず、旧失敗を補完しない。27/151/58は変更0。次候補は同じ1-5 BBV1CL2DD1。以下は各時点の履歴。
 
 > 1-5 BBV1CL1DD2の限定局所確認（2026-10-31 JST）：[記録](pr152-one-five-bbv-cl-ja.md)。出典一致の既知航戦1＋軽巡1＋駆逐2だけを接続し、任意ASW3/航戦水爆1と合法通常枠/未判定案内を整合した。Node602件の異なる公開検査（新actual13を含む）を確認し、通常C/W各3は全6初回成功・retries0。保存編集4＋未知安全中止2、同一文書load全文/元4艦strict20＋空2または4+0・他保持まで確認。旧試行を補完せず、同じ行追加なので27/151/58は変更0。原本一覧と独立照合を閉鎖済み、新ソースHEAD/CIは未確定。以下は各時点の履歴。

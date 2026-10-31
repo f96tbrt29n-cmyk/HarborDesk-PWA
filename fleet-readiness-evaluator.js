@@ -590,7 +590,7 @@ function hdFEOneFiveAlternateExample(plan,data){
  if(plan?.map!=='1-5'||data?.map!=='1-5'||data.index!==1||data.path!=='ADFGJ'||plan.preservationIssues?.length||typeof hdFEFindShip!=='function')return false;
  const ships=Array.isArray(plan.ships)?plan.ships.filter(s=>s?.ship):[];if(ships.length!==4)return false;
  const types=ships.map(s=>hdFEFindShip(s.ship)?.type);
- return types.every(type=>['航空戦艦','軽巡洋艦','駆逐艦'].includes(type))&&types.filter(type=>type==='航空戦艦').length===1&&types.filter(type=>type==='軽巡洋艦').length===1&&types.filter(type=>type==='駆逐艦').length===2;
+ return types.every(type=>['航空戦艦','軽巡洋艦','駆逐艦'].includes(type))&&types.filter(type=>type==='航空戦艦').length===1&&(types.filter(type=>type==='軽巡洋艦').length===1&&types.filter(type=>type==='駆逐艦').length===2||types.filter(type=>type==='軽巡洋艦').length===2&&types.filter(type=>type==='駆逐艦').length===1);
 }
 function hdFERoute(plan){
  const basic=hdFERouteBasic(plan),branch=hdFEBranchRoute(plan);

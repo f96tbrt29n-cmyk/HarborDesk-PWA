@@ -1,8 +1,10 @@
 'use strict';
-// Actual source modules in a pure Node VM. Fixed clocks here are unit-test inputs;
+// Historical BBV1CL1DD2 source modules projected byte-exactly from the newer CL2 source.
+// Current CL2 semantics have separate tests. Fixed clocks here are unit-test inputs;
 // the browser clock, waits, search caps and product source are never wrapped.
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
 const ROOT=path.resolve(process.env.HD15CL_SOURCE_ROOT||path.join(__dirname,'..')),INVERSE=path.join(ROOT,'tests/fixtures/one-five-bbv-cl-approved-source-inverses.json'),INPUT=path.resolve(process.env.HD15CL_INPUT_FIXTURE||path.join(ROOT,'tests/fixtures/one-five-bbv-cl-browser-inputs.json'));
+const {createOneFiveBbvCl2HistoricalProjection}=require('./fixtures/one-five-bbv-cl2-source-layer.cjs'),projectCl2=createOneFiveBbvCl2HistoricalProjection(ROOT);
 const input=JSON.parse(fs.readFileSync(INPUT,'utf8')),canonicalInput=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/one-five-middle-browser-inputs.json'),'utf8')),approvedBytes=fs.readFileSync(INVERSE),approved=JSON.parse(approvedBytes),hash=x=>crypto.createHash('sha256').update(x).digest('hex'),host=x=>JSON.parse(JSON.stringify(x)),exact=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 assert.equal(hash(approvedBytes),'96a45cfa2d5754962619e11645c2613d6f3175b5832c6ddbc161dc4bda409cfd');assert.equal(approved.schemaVersion,1);assert.equal(approved.files['fleet-readiness-evaluator.js'].beforeSHA256,'bc7ffb6aa9efa012ee7baab4540fa8961190d9e9a39cdf2342ae42aba34bb409');assert.equal(approved.files['sortie-equipment-check.js'].beforeSHA256,'d26fa06d8d1fb47898121fbc70f23935cb2f29ca29ba62b5e3e96e1766b405d2');assert.equal(approved.changes.length,6);
 const SELECTORS=[
@@ -242,7 +244,7 @@ const SELECTORS=[
 ];
 const sourceCache=new Map(),observations={schemaVersion:1,unit:'one-five-bbv-cl',privateNodeModelOnly:true,browserExecuted:false,sourceHashes:{},initialCounterexample:null,canonicalParity:null,modelCases:[],generatorInvocations:[]};let unsafeMutation=false;
 if(process.env.HD15_BBV_CL_PRIVATE_OBSERVATIONS)process.on('exit',()=>fs.writeFileSync(process.env.HD15_BBV_CL_PRIVATE_OBSERVATIONS,JSON.stringify(observations,null,2)+'\n'));
-function source(file,role){const key=role+':'+file;if(sourceCache.has(key))return sourceCache.get(key);let value=fs.readFileSync(path.join(ROOT,file),'utf8');const rule=approved.files[file];if(rule){assert.equal(hash(value),rule.approvedAfterSHA256,file+' approved current bytes');if(role==='before'){for(const change of approved.changes.filter(x=>x.file===file).reverse()){assert.equal(value.split(change.after).length,2,file+' inverse unique');value=value.replace(change.after,change.before)}assert.equal(hash(value),rule.beforeSHA256,file+' exact d621 bytes restored')}}sourceCache.set(key,value);(observations.sourceHashes[role]??={})[file]=hash(value);return value}
+function source(file,role){const key=role+':'+file;if(sourceCache.has(key))return sourceCache.get(key);let value=projectCl2(file,fs.readFileSync(path.join(ROOT,file),'utf8'));const rule=approved.files[file];if(rule){assert.equal(hash(value),rule.approvedAfterSHA256,file+' approved current bytes');if(role==='before'){for(const change of approved.changes.filter(x=>x.file===file).reverse()){assert.equal(value.split(change.after).length,2,file+' inverse unique');value=value.replace(change.after,change.before)}assert.equal(hash(value),rule.beforeSHA256,file+' exact d621 bytes restored')}}sourceCache.set(key,value);(observations.sourceHashes[role]??={})[file]=hash(value);return value}
 function slice(text,selector){const locate=anchor=>{assert.equal(text.split(anchor).length,2,'module boundary unique');return text.indexOf(anchor)},a=selector.from===null?0:locate(selector.from),b=selector.to===null?text.length:locate(selector.to);assert.ok(b>a);return text.slice(a,b)}
 function context(role='after'){
  assert.ok(['before','after'].includes(role));const store=new Map(),writes=[],reads=[];

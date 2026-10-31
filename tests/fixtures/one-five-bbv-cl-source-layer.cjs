@@ -2,12 +2,14 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
+const {createOneFiveBbvCl2HistoricalProjection}=require('./one-five-bbv-cl2-source-layer.cjs');
 const FIXTURE_SHA256='96a45cfa2d5754962619e11645c2613d6f3175b5832c6ddbc161dc4bda409cfd';
 const BEFORE_SHA256={
  'fleet-readiness-evaluator.js':'bc7ffb6aa9efa012ee7baab4540fa8961190d9e9a39cdf2342ae42aba34bb409',
  'sortie-equipment-check.js':'d26fa06d8d1fb47898121fbc70f23935cb2f29ca29ba62b5e3e96e1766b405d2'
 };
 function createOneFiveBbvClHistoricalProjection(root=path.resolve(__dirname,'../..')){
+ const projectCl2=createOneFiveBbvCl2HistoricalProjection(root);
  assert.match(FIXTURE_SHA256,/^[0-9a-f]{64}$/,'bind the new reviewed fixture before using this projection');
  const bytes=fs.readFileSync(path.join(root,'tests/fixtures/one-five-bbv-cl-approved-source-inverses.json'));
  assert.equal(hash(bytes),FIXTURE_SHA256,'new BBV+CL inverse fixture remains independently pinned');
@@ -21,7 +23,7 @@ function createOneFiveBbvClHistoricalProjection(root=path.resolve(__dirname,'../
  }
  for(const row of approved.changes){assert.ok(Object.hasOwn(BEFORE_SHA256,row.file));assert.equal(typeof row.before,'string');assert.equal(typeof row.after,'string');assert.ok(row.before&&row.after&&row.before!==row.after)}
  return function project(file,current){
-  assert.equal(typeof current,'string');const entry=approved.files[file];if(!entry)return current;
+  assert.equal(typeof current,'string');current=projectCl2(file,current);const entry=approved.files[file];if(!entry)return current;
   assert.equal(hash(current),entry.approvedAfterSHA256,file+' exact approved BBV+CL source');
   const rows=approved.changes.filter(row=>row.file===file);let restored=current;
   for(const row of rows.slice().reverse()){assert.equal(restored.split(row.after).length,2,file+' unique new inverse anchor');restored=restored.replace(row.after,row.before)}
