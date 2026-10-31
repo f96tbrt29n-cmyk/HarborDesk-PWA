@@ -344,6 +344,11 @@
           "record": "oneFiveCl2Dd2Local20261031",
           "document": "docs/pr152-one-five-cl2-dd2-ja.md",
           "state": "finite CL2DD2 local6 first-pass and original/independent closure complete; new sourceCI pending; no status promotion"
+        },
+        {
+          "record": "oneFiveCl2Dd2CIFinalization20261031",
+          "document": "docs/pr152-one-five-cl2-dd2-ja.md",
+          "state": "CI record closed with explicit gaps: current6completed metadata/C3pass/W3frameworknull; related26 checkpoints retained; no status change"
         }
       ]
     },
@@ -8354,6 +8359,186 @@
       "other two/three-hull compositions and all inventory/frame/sync coverage",
       "old operation instability/communication and missing evidence"
     ],
+    "wholeRouteOrPublicationReady": false
+  },
+  "oneFiveCl2Dd2CIFinalization20261031": {
+    "record": "oneFiveCl2Dd2CIFinalization20261031",
+    "document": "docs/pr152-one-five-cl2-dd2-ja.md",
+    "state": "CI-evidence-record-finalized-with-explicit-W4-framework-load-counter-raw-and-monitor-gaps",
+    "source": {
+      "testedCommitSHA": "48399416013bf54b9fff7ea53ceee2ba97958239",
+      "recordCommitSHA": null,
+      "publicFiles": 666,
+      "localSourceAndOldHistoryRemainDated": true,
+      "HTTPServedSourceHashes": null
+    },
+    "CI": {
+      "runId": 41197582954,
+      "attempt": 1,
+      "workflowId": 361880120,
+      "dispatchCount": 1,
+      "sameHeadRunsBefore": 0,
+      "sameHeadRunsAfter": 1,
+      "runStatus": "completed",
+      "runConclusion": "cancelled",
+      "smokeJobs": "5success; W4 smoke and job cancelled; Full skipped",
+      "nodeAllSix": {
+        "tests": 628,
+        "pass": 628,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "perJob": true,
+        "jobs": 6
+      },
+      "environmentAllSix": "checkout48399416, Node24.21.0/PW1.55.0/C1187-W2203/imageb27e",
+      "chromiumPassedFlakyFailed": [
+        901,
+        0,
+        0
+      ],
+      "webkitCompleted1To3Subtotal": [
+        675,
+        1,
+        0
+      ],
+      "webkitAllPassedFlakyFailed": null,
+      "W4FooterAbsent": true,
+      "W4Progress195Of225DoesNotCountUnstartedOrFinalOutcomes": true,
+      "strictGlobalInitialOrPhysicalCounts": null
+    },
+    "relatedTrials": {
+      "logicalCases": 24,
+      "explicitAttemptStarts": 26,
+      "CInitialPass": 12,
+      "WLogicalFinalFrameworkUnknown": 12,
+      "explicitInitialFailures": 2,
+      "retry1FrameworkForThoseTwo": null,
+      "cohortMetadata": {
+        "one-five-middle": {
+          "metadataTrials": 7,
+          "completedMetadataTrials": 6,
+          "savedStrictFields": 140,
+          "loadStrictFields": 120,
+          "CInitialFrameworkPass": 3,
+          "WLogicalFinalFramework": null
+        },
+        "one-five-bbv-cl": {
+          "metadataTrials": 7,
+          "completedMetadataTrials": 6,
+          "savedStrictFields": 140,
+          "loadStrictFields": 120,
+          "CInitialFrameworkPass": 3,
+          "WLogicalFinalFramework": null
+        },
+        "one-five-bbv-cl2": {
+          "metadataTrials": 6,
+          "completedMetadataTrials": 6,
+          "savedStrictFields": 120,
+          "loadStrictFields": 120,
+          "CInitialFrameworkPass": 3,
+          "WLogicalFinalFramework": null
+        },
+        "one-five-cl2-dd2": {
+          "metadataTrials": 6,
+          "completedMetadataTrials": 6,
+          "savedStrictFields": 120,
+          "loadStrictFields": 120,
+          "CInitialFrameworkPass": 3,
+          "WLogicalFinalFramework": null
+        }
+      },
+      "savedStrictTotal": 520,
+      "loadStrictTotal": 480,
+      "newLightMetadataCompleted": 6,
+      "newLightSameDocumentLoads": 6,
+      "observedInvariantOrPreservationMismatch": 0,
+      "counterScope": "own26 pageerror explicit0; nav explicit0 records24 and missing2; not global counters",
+      "initialLoadGaps": [
+        "canonical Wknown initial saved20/loadnull/navnull",
+        "BBVCL1 Wstock initial saved20/loadnull/navnull"
+      ],
+      "metadataCompletedIsNotFrameworkPass": true,
+      "rawSavedBodyRecomparisonPerformed": false,
+      "independentFrameOriginDropFullInputFullPlanEvaluationCounts": "unobserved"
+    },
+    "failureBoundaries": {
+      "W2Getter": "proposed-gear star field12s poll mismatch; retry1 passed; real Storage-getter chain, but selected key/origin/document/rawStorage/successful-write/default-init branch unobserved; no dedicated save/load block",
+      "W4Observed": "18initial-case error groups (including related2) plus2explicit retry failures; 5-3speedexempt failed final access-control pageerror-array assert after specified save/load comparison; other17 hidden-click45s/loadunreached",
+      "W4FinalFailedFlakyOrUnstartedCounts": null,
+      "causeCallerOrMemoryOnlyPersistenceLossConclusion": false,
+      "unobservedStorageSafetyEstablished": false
+    },
+    "collection": {
+      "state": "primary-collection-and-external-independent-final-join-closed",
+      "receivedZIPs": 9,
+      "receivedBytes": 2890071,
+      "receivedMembers": 88,
+      "sizeDigestSHAReceiptCRCVerified": true,
+      "overcapArchivesUnrequested": 2,
+      "overcapInternalInventory": null,
+      "formalLogZIPBytes": 11701766,
+      "formalLogZIPRegularMembers": 101,
+      "CLIArtifactOrRangeOrSavedSignedURLs": 0,
+      "monitorGap": "poll11 local-controller ARG_MAX saving failure before process creation, not product or exec-transport failure; v2poll12 separate saved observation; missing poll11 not reconstructed; no same-fetch retry",
+      "rawAndDetailedManifestsPrivate": true,
+      "finalIndependentReference": {
+        "path": "private/ci-independent-review-preparation/final-primary-manifest-join-review.json",
+        "sha256": "56d372a013758ca40c403d7baee851c65c4680bba453fc2b5bb561b9a2a3ede2"
+      },
+      "canonicalReference": {
+        "path": "private/ci-execution-41197582954/canonical-ci-collection.json",
+        "sha256": "40af3205b145d95d1661fdb47c20f6b09e5226f2a7cebae5aa7e98b4bc4b6cc2"
+      },
+      "primaryManifestSHA256": "0a0d81bace08a0aafd3b0acbd504896a85846c04a1f8d2cc795a49db82bf5dd3",
+      "primaryClosureSHA256": "d727dfb58c287c7b84d24bf41750782efbdebbe29db73341368f851c9446d508",
+      "independentManifestSHA256": "7135b8da47a074d3f97132a8577d413e74a0d8f8a476c1ff879baad03d4e646b",
+      "independentClosureSHA256": "ad7a5149e073601e418d78f272cfecb7baf9427008353c1385865444d1d2ba85",
+      "externalIndependentAppendClosesPrimaryDatedPending": true,
+      "rawOriginalIntegrity": "514files/154dirs/162438951B content/all observed attributes/file-set unchanged within the two snapshots; earlier state unobserved; old atime1 history unchanged"
+    },
+    "proofs": [
+      {
+        "path": "private/ci-execution-41197582954/canonical-ci-collection.json",
+        "sha256": "40af3205b145d95d1661fdb47c20f6b09e5226f2a7cebae5aa7e98b4bc4b6cc2"
+      },
+      {
+        "path": "private/ci-independent-review-preparation/final-primary-manifest-join-review.json",
+        "sha256": "56d372a013758ca40c403d7baee851c65c4680bba453fc2b5bb561b9a2a3ede2"
+      }
+    ],
+    "progress": {
+      "before": [
+        27,
+        151,
+        58
+      ],
+      "after": [
+        27,
+        151,
+        58
+      ],
+      "cellDelta": 0
+    },
+    "nextTarget": {
+      "scope": "1-5/index1 ADFGJ CL1DD3",
+      "state": "source-only source/DFG comparison completed; implementation and operation unperformed",
+      "sourcePlan": {
+        "path": "private/next-cl1-dd3-source-only/source-only-plan.json",
+        "sha256": "da295dc53547e97c98c3c07303a7b1455b0046f9bcc05247a1357e1423cfb9f6"
+      },
+      "manifestSHA256": "c2765902cda1d92215338aca02514486e6eae0a8e06b57196e92f17fc51ee30f",
+      "sourceBasis": "cached L191 explicit CL1DD3 footnote and independent D/F/G priorities",
+      "currentManualIsStaticCandidateNotRuntimeCounterexample": true,
+      "defaultWaterAlreadyCorrectNoChangePlanned": true,
+      "productImplementation": false,
+      "NodeVMOrBrowserOrCIRuns": 0,
+      "gitActionsByThisPlan": 0,
+      "sourceMUnperformedWordingRemainsHistorical": true
+    },
+    "oldHistoryNotBackfilled": true,
+    "recordOnlySkipCI": true,
+    "additionalTrialsOrCIRunsForThisSupplement": 0,
     "wholeRouteOrPublicationReady": false
   }
 }

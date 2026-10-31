@@ -464,7 +464,7 @@
           ]
         }
       },
-      "remaining": "CL2DD2の有限接続/新6代表保持も確認（原本/独立照合閉鎖）。BBV1CL2DD1の限定接続とC/W6代表/保持・原本独立照合も確認。BBV1CL1DD2の限定接続とC/W6代表の操作保持は確認。軽巡1＋駆逐3など他の既知四隻例、三隻CL2DDの検査済み不一致以外の2–3隻各構成、全目標/在庫/改修/枠競合/全機種/同期操作、装備の必要十分性・先制人数/火力/勝利は未確認。新source6c08381fのsmokeは5成功/W4 smoke取消で、全W最終結果は未確定。自身C3初回成功/W3 framework未確定を分け、6件の保存/load保持metadataと回収独立照合を確認。旧操作不安定の原因は別に保持。 新BBV1CL2DD1検証sourcead793f1aのCIは全C897/0/1・全W886/10/2で確定。新W不足初回load未到達とretry1完了を分け、metadata19の観測保持比較・他最終3件の停止境界・復旧後原本/独立照合を追補した。raw大容量3件・counter/呼出し元/原因の欠測は保持。 index2/DD4は別スコープで、新CL2DD2 source/CIはpending。"
+      "remaining": "CL2DD2の有限接続/新6代表保持も確認（原本/独立照合閉鎖）。BBV1CL2DD1の限定接続とC/W6代表/保持・原本独立照合も確認。BBV1CL1DD2の限定接続とC/W6代表の操作保持は確認。軽巡1＋駆逐3など他の既知四隻例、三隻CL2DDの検査済み不一致以外の2–3隻各構成、全目標/在庫/改修/枠競合/全機種/同期操作、装備の必要十分性・先制人数/火力/勝利は未確認。新source6c08381fのsmokeは5成功/W4 smoke取消で、全W最終結果は未確定。自身C3初回成功/W3 framework未確定を分け、6件の保存/load保持metadataと回収独立照合を確認。旧操作不安定の原因は別に保持。 新BBV1CL2DD1検証sourcead793f1aのCIは全C897/0/1・全W886/10/2で確定。新W不足初回load未到達とretry1完了を分け、metadata19の観測保持比較・他最終3件の停止境界・復旧後原本/独立照合を追補した。raw大容量3件・counter/呼出し元/原因の欠測は保持。 index2/DD4は別スコープで、新CL2DD2検証source48399416のCIはC901/0/0・W1–3小計675/1/0、W4/fullW未確定で記録を閉鎖。新light6保持metadataとC3pass/W3 framework不明を分け、旧cohort2初回load/nav欠測を保持。"
     },
     {
       "id": "1-5/2/default",
@@ -3232,12 +3232,12 @@
   ],
   "selected": {
     "id": "1-5/1/default",
-    "baselineHead": "b248bf13f53b00b89f80fa696c38070a6b071a36",
-    "record": "oneFiveCl2Dd2Local20261031",
+    "baselineHead": "48399416013bf54b9fff7ea53ceee2ba97958239",
+    "record": "oneFiveCl2Dd2CIFinalization20261031",
     "evidence": "docs/pr152-one-five-cl2-dd2-ja.md",
-    "state": "finite knownCL2DD2 route/goal guidance and local6 first passes with original/independent closure complete; new sourceCI pending; whole route partial"
+    "state": "CI source483 finalized with W4 gaps: C901complete/W1-3subtotal675/1/0/fullWnull; current6metadata complete/C3pass/W3frameworknull; related2 initial-load gaps retained; whole route partial"
   },
-  "nextPriority": "まずCL2DD2の最終source/通常CIを確定する（局所原本/独立sealは完了）。次は同じ1-5/index1 ADFGJ軽巡1＋駆逐3の出典/DFG優先/例拘束を独立確認する（今回literalではmanual維持、次対象未実施）。index2/DD4、全在庫/枠/同期と旧欠測を分ける。",
+  "nextPriority": "次CL1DD3は出典/DFGのsource-only照合まで完了、実装/操作未実施。現sourceM当時の未実施記録と旧CI欠測を保持し、記録only通常push[skip ci]後に独立単位として進める。不足を埋める追加試験/CIは起動しない。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -17625,5 +17625,193 @@
     "evidence": "docs/pr152-one-five-bbv-cl2-ja.md",
     "state": "CI sourcead793 finalized by existing-evidence supplement: C897/0/1 W886/10/2; own17 initial pass+CL2Wstock retry1pass; metadata19 observed retention verified with initial load gap; other3 boundaries/independent closure complete; whole route partial"
   },
-  "nextPriorityBeforeOneFiveCl2Dd2Local20261031": "次は同じ1-5/index1 ADFGJ CL2DD2の独立した改善単位。source-only計画を閉鎖したが実装/新試験は未実施。本CI追補は記録のみ通常commit/push[skip ci]とし、不足を埋める追加試験/CIは起動しない。旧local/CIの初回未到達・raw/archive/counter欠測を保持し、一般化は出典/条件を別確認する。"
+  "nextPriorityBeforeOneFiveCl2Dd2Local20261031": "次は同じ1-5/index1 ADFGJ CL2DD2の独立した改善単位。source-only計画を閉鎖したが実装/新試験は未実施。本CI追補は記録のみ通常commit/push[skip ci]とし、不足を埋める追加試験/CIは起動しない。旧local/CIの初回未到達・raw/archive/counter欠測を保持し、一般化は出典/条件を別確認する。",
+  "oneFiveCl2Dd2CIFinalization20261031": {
+    "record": "oneFiveCl2Dd2CIFinalization20261031",
+    "document": "docs/pr152-one-five-cl2-dd2-ja.md",
+    "state": "CI-evidence-record-finalized-with-explicit-W4-framework-load-counter-raw-and-monitor-gaps",
+    "source": {
+      "testedCommitSHA": "48399416013bf54b9fff7ea53ceee2ba97958239",
+      "recordCommitSHA": null,
+      "publicFiles": 666,
+      "localSourceAndOldHistoryRemainDated": true,
+      "HTTPServedSourceHashes": null
+    },
+    "CI": {
+      "runId": 41197582954,
+      "attempt": 1,
+      "workflowId": 361880120,
+      "dispatchCount": 1,
+      "sameHeadRunsBefore": 0,
+      "sameHeadRunsAfter": 1,
+      "runStatus": "completed",
+      "runConclusion": "cancelled",
+      "smokeJobs": "5success; W4 smoke and job cancelled; Full skipped",
+      "nodeAllSix": {
+        "tests": 628,
+        "pass": 628,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "perJob": true,
+        "jobs": 6
+      },
+      "environmentAllSix": "checkout48399416, Node24.21.0/PW1.55.0/C1187-W2203/imageb27e",
+      "chromiumPassedFlakyFailed": [
+        901,
+        0,
+        0
+      ],
+      "webkitCompleted1To3Subtotal": [
+        675,
+        1,
+        0
+      ],
+      "webkitAllPassedFlakyFailed": null,
+      "W4FooterAbsent": true,
+      "W4Progress195Of225DoesNotCountUnstartedOrFinalOutcomes": true,
+      "strictGlobalInitialOrPhysicalCounts": null
+    },
+    "relatedTrials": {
+      "logicalCases": 24,
+      "explicitAttemptStarts": 26,
+      "CInitialPass": 12,
+      "WLogicalFinalFrameworkUnknown": 12,
+      "explicitInitialFailures": 2,
+      "retry1FrameworkForThoseTwo": null,
+      "cohortMetadata": {
+        "one-five-middle": {
+          "metadataTrials": 7,
+          "completedMetadataTrials": 6,
+          "savedStrictFields": 140,
+          "loadStrictFields": 120,
+          "CInitialFrameworkPass": 3,
+          "WLogicalFinalFramework": null
+        },
+        "one-five-bbv-cl": {
+          "metadataTrials": 7,
+          "completedMetadataTrials": 6,
+          "savedStrictFields": 140,
+          "loadStrictFields": 120,
+          "CInitialFrameworkPass": 3,
+          "WLogicalFinalFramework": null
+        },
+        "one-five-bbv-cl2": {
+          "metadataTrials": 6,
+          "completedMetadataTrials": 6,
+          "savedStrictFields": 120,
+          "loadStrictFields": 120,
+          "CInitialFrameworkPass": 3,
+          "WLogicalFinalFramework": null
+        },
+        "one-five-cl2-dd2": {
+          "metadataTrials": 6,
+          "completedMetadataTrials": 6,
+          "savedStrictFields": 120,
+          "loadStrictFields": 120,
+          "CInitialFrameworkPass": 3,
+          "WLogicalFinalFramework": null
+        }
+      },
+      "savedStrictTotal": 520,
+      "loadStrictTotal": 480,
+      "newLightMetadataCompleted": 6,
+      "newLightSameDocumentLoads": 6,
+      "observedInvariantOrPreservationMismatch": 0,
+      "counterScope": "own26 pageerror explicit0; nav explicit0 records24 and missing2; not global counters",
+      "initialLoadGaps": [
+        "canonical Wknown initial saved20/loadnull/navnull",
+        "BBVCL1 Wstock initial saved20/loadnull/navnull"
+      ],
+      "metadataCompletedIsNotFrameworkPass": true,
+      "rawSavedBodyRecomparisonPerformed": false,
+      "independentFrameOriginDropFullInputFullPlanEvaluationCounts": "unobserved"
+    },
+    "failureBoundaries": {
+      "W2Getter": "proposed-gear star field12s poll mismatch; retry1 passed; real Storage-getter chain, but selected key/origin/document/rawStorage/successful-write/default-init branch unobserved; no dedicated save/load block",
+      "W4Observed": "18initial-case error groups (including related2) plus2explicit retry failures; 5-3speedexempt failed final access-control pageerror-array assert after specified save/load comparison; other17 hidden-click45s/loadunreached",
+      "W4FinalFailedFlakyOrUnstartedCounts": null,
+      "causeCallerOrMemoryOnlyPersistenceLossConclusion": false,
+      "unobservedStorageSafetyEstablished": false
+    },
+    "collection": {
+      "state": "primary-collection-and-external-independent-final-join-closed",
+      "receivedZIPs": 9,
+      "receivedBytes": 2890071,
+      "receivedMembers": 88,
+      "sizeDigestSHAReceiptCRCVerified": true,
+      "overcapArchivesUnrequested": 2,
+      "overcapInternalInventory": null,
+      "formalLogZIPBytes": 11701766,
+      "formalLogZIPRegularMembers": 101,
+      "CLIArtifactOrRangeOrSavedSignedURLs": 0,
+      "monitorGap": "poll11 local-controller ARG_MAX saving failure before process creation, not product or exec-transport failure; v2poll12 separate saved observation; missing poll11 not reconstructed; no same-fetch retry",
+      "rawAndDetailedManifestsPrivate": true,
+      "finalIndependentReference": {
+        "path": "private/ci-independent-review-preparation/final-primary-manifest-join-review.json",
+        "sha256": "56d372a013758ca40c403d7baee851c65c4680bba453fc2b5bb561b9a2a3ede2"
+      },
+      "canonicalReference": {
+        "path": "private/ci-execution-41197582954/canonical-ci-collection.json",
+        "sha256": "40af3205b145d95d1661fdb47c20f6b09e5226f2a7cebae5aa7e98b4bc4b6cc2"
+      },
+      "primaryManifestSHA256": "0a0d81bace08a0aafd3b0acbd504896a85846c04a1f8d2cc795a49db82bf5dd3",
+      "primaryClosureSHA256": "d727dfb58c287c7b84d24bf41750782efbdebbe29db73341368f851c9446d508",
+      "independentManifestSHA256": "7135b8da47a074d3f97132a8577d413e74a0d8f8a476c1ff879baad03d4e646b",
+      "independentClosureSHA256": "ad7a5149e073601e418d78f272cfecb7baf9427008353c1385865444d1d2ba85",
+      "externalIndependentAppendClosesPrimaryDatedPending": true,
+      "rawOriginalIntegrity": "514files/154dirs/162438951B content/all observed attributes/file-set unchanged within the two snapshots; earlier state unobserved; old atime1 history unchanged"
+    },
+    "proofs": [
+      {
+        "path": "private/ci-execution-41197582954/canonical-ci-collection.json",
+        "sha256": "40af3205b145d95d1661fdb47c20f6b09e5226f2a7cebae5aa7e98b4bc4b6cc2"
+      },
+      {
+        "path": "private/ci-independent-review-preparation/final-primary-manifest-join-review.json",
+        "sha256": "56d372a013758ca40c403d7baee851c65c4680bba453fc2b5bb561b9a2a3ede2"
+      }
+    ],
+    "progress": {
+      "before": [
+        27,
+        151,
+        58
+      ],
+      "after": [
+        27,
+        151,
+        58
+      ],
+      "cellDelta": 0
+    },
+    "nextTarget": {
+      "scope": "1-5/index1 ADFGJ CL1DD3",
+      "state": "source-only source/DFG comparison completed; implementation and operation unperformed",
+      "sourcePlan": {
+        "path": "private/next-cl1-dd3-source-only/source-only-plan.json",
+        "sha256": "da295dc53547e97c98c3c07303a7b1455b0046f9bcc05247a1357e1423cfb9f6"
+      },
+      "manifestSHA256": "c2765902cda1d92215338aca02514486e6eae0a8e06b57196e92f17fc51ee30f",
+      "sourceBasis": "cached L191 explicit CL1DD3 footnote and independent D/F/G priorities",
+      "currentManualIsStaticCandidateNotRuntimeCounterexample": true,
+      "defaultWaterAlreadyCorrectNoChangePlanned": true,
+      "productImplementation": false,
+      "NodeVMOrBrowserOrCIRuns": 0,
+      "gitActionsByThisPlan": 0,
+      "sourceMUnperformedWordingRemainsHistorical": true
+    },
+    "oldHistoryNotBackfilled": true,
+    "recordOnlySkipCI": true,
+    "additionalTrialsOrCIRunsForThisSupplement": 0,
+    "wholeRouteOrPublicationReady": false
+  },
+  "selectedBeforeOneFiveCl2Dd2CIFinalization20261031": {
+    "id": "1-5/1/default",
+    "baselineHead": "b248bf13f53b00b89f80fa696c38070a6b071a36",
+    "record": "oneFiveCl2Dd2Local20261031",
+    "evidence": "docs/pr152-one-five-cl2-dd2-ja.md",
+    "state": "finite knownCL2DD2 route/goal guidance and local6 first passes with original/independent closure complete; new sourceCI pending; whole route partial"
+  },
+  "nextPriorityBeforeOneFiveCl2Dd2CIFinalization20261031": "まずCL2DD2の最終source/通常CIを確定する（局所原本/独立sealは完了）。次は同じ1-5/index1 ADFGJ軽巡1＋駆逐3の出典/DFG優先/例拘束を独立確認する（今回literalではmanual維持、次対象未実施）。index2/DD4、全在庫/枠/同期と旧欠測を分ける。"
 }
