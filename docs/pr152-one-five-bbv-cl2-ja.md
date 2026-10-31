@@ -1,3 +1,5 @@
+> 最新CI追補はsource `ad793f1a`／CI41185492724の[末尾記録](#2026-10-31-通常smoke-ci証拠追補)を参照。復旧後に既存試行JSONと原本を照合し、初回未到達・raw欠測・atime差を保持。下の局所WIP/pendingと切断前未完了は当時の履歴とする。
+
 # 1-5/index1 ADFGJ：航戦1＋軽巡2＋駆逐1の限定対応
 
 > 基準HEAD `a3a6c6a749fe02a26a535613d9665c6a1e762fb9`。新sourceは未commit。出典/製品・Node/modelと新C/W6代表の全初回成功までを確認した。原本回収/独立closureまで閉鎖し、新sourceHEAD/通常CIだけ未確定である。27/151/58・PR152ドラフト/未公開を維持する。
@@ -37,3 +39,21 @@ collectionは原本812件/54,636,607Bをbytes/hash・許容atimeを除く属性/
 旧CI41175351013/source6c08381fはC895/0/0完全、W1–3小計672/0/0、W4 smoke取消・全W最終結果nullのまま。旧新/旧canonical各W3の保持metadata完了はframework passedと分け、未取得2大容量archiveの内部inventory/保存値本文/trace/videoは今回の資料で補完しない。
 
 同じ1-5行の代替追加なので全236status・27/151/58・他58行・旧53と旧local/CI履歴は変更0。今回の有限source/Node/model/6代表の操作保持を、海域全体完成へ広げない。次候補CL2DD2は今回未実施で、2–3隻・全目標/在庫/機種/改修/枠競合/同期/実ゲームと分けて独立確認する。新たな保存不一致・破壊疑い等の停止条件、PR152ドラフト/未公開・main競合・既知残件・保護対象を維持する。
+
+## 2026-10-31 通常smoke CI証拠追補
+
+検証sourceは`ad793f1ae5a9dc58c10290edb967b834aead4882`、[CI41185492724](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41185492724) attempt1。dispatch1回・同HEAD同等自動起動0、4job成功/C2W4 job取消・Full skipped。両smokeはexit1で完結し、C2は後続step10 upload取消、W4は10/11/12/25成功と分ける。旧CI411753のW4 smoke自体取消・全W未確定を今回で補完しない。
+
+全6Node実測615/615成功/0失敗、全C897/0/1・全W886/10/2が完結footerのpassed/flaky/failed。各Running件数を満たすC/W898と実測したが、厳密な全体初回成功数/物理試行数へ換算しない。全6checkout ad793f1a・image b27e…・Node24.21.0/PW1.55.0/C1187/W2203をログで照合した。HTTP served hashは未採取。記録追記HEADは未定で検証sourceと区別する。
+
+新CL2/前CL1/元canonicalの18caseは、新CL2 W不足だけ初回load後search-click timeout→retry1pass、他17初回pass。復旧後の別追補で既存metadata19記録を直接読み、canonical/CL1各6trialの保存120/load120、新CL2全7trialの保存140/load120（成功6trialだけ120/120）を照合した。savedは保存後または安全中止後の読取りであり、保存書込み回数へ換算しない。CL2W不足初回は保存/編集後strict20・reload/reopen通過後のclick待機停止、load読取り/全文比較未到達・load=null。retry1の保存/load成功を初回へ戻さない。同じ停止段階でも同原因・保存消失・探索遅延とは断定しない。
+
+対象19metadataの観測保持不一致/保存陽性は0。pageerrorは19明示0、navigationCollectionFailuresは18明示0＋CL2W不足初回1件nullで、nullを0やdropへ変換しない。独立frame/origin ID/drop、全入力/全返却planは未採取。unit専用prefix・JSON.unit/state/project・公式artifact/job・同じjobの明示retry記録で束縛し、JSON自体に数値attempt欄はない。これはmetadataの比較flagを直接照合した証拠であり、未取得raw保存値本文を別に再比較した証拠ではない。known/stockの元snapshot falseは提案/編集/厳密空行の意図差、unknownの提案nullは非該当として保持する。
+
+他最終failed3件は各初回/retryを分離した。C2の7-5第3knownはload後click awaitを通過し、結果要素未発見で12秒の表示待機停止。W4の7-3第2type-mismatchと7-3第1ACE readyはbuttonへ解決したが非表示で総45秒のclick待機停止。全6試行は保存/編集後の指定比較とreload/reopenを通過し、load読取り/全文比較は未到達。C保存metadata strict30とW第1strict20は一致、W type-mismatchの実値JSONは欠測で、比較通過は同じsource順序/stack由来と分ける。W第1ACE初回/retryのnavigationCollectionFailuresは各1明示で、対象19記録のcounterと混ぜない。handler/探索開始・結果生成・表示変更caller・原因は未確認で、新保存不一致根拠なしを未観測範囲の安全証明へ広げない。
+
+切断前はtrialJSON最終照合/global監査sealが未完了だった。実exec復旧と現物確認後、この新追補を別領域で作成し、旧停止・旧案を上書きせずに補完した。既存9 artifactは計3,534,328B/84member、公式log ZIP11,997,377B/102regular memberをsize/SHA/receipt/digest/CRCで再確認し、追加取得/試験/CIは0。3大容量archiveは未要求のままで内部inventory・raw値/trace/video取得は未確認。
+
+元Pの450file/129dir/159,805,877Bは復旧後2snapshot間でcontent・file-set・非atime属性が一致したが、artifacts-page1.raw.jsonの読取atimeだけ1差があり『全属性不変』はfalse。timestamp書戻し0、最初のsnapshot以前の通常readによるatime差は未観測とする。resume canonical `d64360950f07867c0b04dbb96eb9cdb914cffcc43f704b9ca84f0cc31dce3e48`、trial audit `c15d3427cc30bc23fbe561e05357bdd476d7cc96ecf3c2329bd7c0a676bfefff`、他3分類 `c7a4fab39619860e986e2f1cad23fde64399804d3f28f95bd4a0d40c9d820e2f`を保存し、親最終独立review `fbef6a51833e32cf034591754572e09bd027c913879b62be6b14cd5e7b857122`、manifest `540f6bd938f0afb5b28b6d52a023d296c826cb229c271bc490200b6312ecd186`、closure `c54d4af4ab4c742e88ee7d9956ab833a41de1be93c702ffa6caebdf8e0aa62ab`でPASS閉鎖した。切断前の未実施だった照合を当時実施済みとはせず、復旧後の追補として記録する。
+
+記録だけを別commit/通常push（skip ci）し追加CIは起動しない。27/151/58・236status・旧local/CI履歴は変更0。次CL2DD2はsource-only計画までで、実装/新試験は記録commit後の別単位とする。PR152ドラフト/未公開、main競合/既知残件、PR151/版/SW/本番/merge/publish/auto-merge保留を維持する。

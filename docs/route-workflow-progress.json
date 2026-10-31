@@ -448,7 +448,7 @@
           ]
         }
       },
-      "remaining": "BBV1CL2DD1の限定接続とC/W6代表/保持・原本独立照合も確認。BBV1CL1DD2の限定接続とC/W6代表の操作保持は確認。CL2DD2など他の既知四隻例、2–3隻、全目標/在庫/改修/枠競合/全機種/同期操作、装備の必要十分性・先制人数/火力/勝利は未確認。新source6c08381fのsmokeは5成功/W4 smoke取消で、全W最終結果は未確定。自身C3初回成功/W3 framework未確定を分け、6件の保存/load保持metadataと回収独立照合を確認。旧操作不安定の原因は別に保持。 新BBV1CL2DD1 sourceHEAD/通常CIは未確定。"
+      "remaining": "BBV1CL2DD1の限定接続とC/W6代表/保持・原本独立照合も確認。BBV1CL1DD2の限定接続とC/W6代表の操作保持は確認。CL2DD2など他の既知四隻例、2–3隻、全目標/在庫/改修/枠競合/全機種/同期操作、装備の必要十分性・先制人数/火力/勝利は未確認。新source6c08381fのsmokeは5成功/W4 smoke取消で、全W最終結果は未確定。自身C3初回成功/W3 framework未確定を分け、6件の保存/load保持metadataと回収独立照合を確認。旧操作不安定の原因は別に保持。 新BBV1CL2DD1検証sourcead793f1aのCIは全C897/0/1・全W886/10/2で確定。新W不足初回load未到達とretry1完了を分け、metadata19の観測保持比較・他最終3件の停止境界・復旧後原本/独立照合を追補した。raw大容量3件・counter/呼出し元/原因の欠測は保持。"
     },
     {
       "id": "1-5/2/default",
@@ -3216,12 +3216,12 @@
   ],
   "selected": {
     "id": "1-5/1/default",
-    "baselineHead": "a3a6c6a749fe02a26a535613d9665c6a1e762fb9",
-    "record": "oneFiveBbvCl2Local20261031",
+    "baselineHead": "ad793f1ae5a9dc58c10290edb967b834aead4882",
+    "record": "oneFiveBbvCl2CIFinalization20261031",
     "evidence": "docs/pr152-one-five-bbv-cl2-ja.md",
-    "state": "BBV1CL2DD1 finite source/product, Node17/model3 and all6 first local workflows with original/independent closure complete; new sourceHEAD/CI pending; whole route partial"
+    "state": "CI sourcead793 finalized by existing-evidence supplement: C897/0/1 W886/10/2; own17 initial pass+CL2Wstock retry1pass; metadata19 observed retention verified with initial load gap; other3 boundaries/independent closure complete; whole route partial"
   },
-  "nextPriority": "まずBBV1CL2DD1の最終sourceと通常smoke1回を確定する。局所6初回成功・保存保持/原本独立照合は完了。次候補は同じ1-5/index1 ADFGJ CL2DD2の出典適用範囲と任意目標接続で、今回まだ実装/実行しない。旧CI411753のW4最終未確定と2大容量archive内部欠測を今回で補完しない。",
+  "nextPriority": "次は同じ1-5/index1 ADFGJ CL2DD2の独立した改善単位。source-only計画を閉鎖したが実装/新試験は未実施。本CI追補は記録のみ通常commit/push[skip ci]とし、不足を埋める追加試験/CIは起動しない。旧local/CIの初回未到達・raw/archive/counter欠測を保持し、一般化は出典/条件を別確認する。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -15438,5 +15438,2008 @@
     "evidence": "docs/pr152-one-five-bbv-cl-ja.md",
     "state": "CI source6c finalized with gaps: 5smoke success/W4 smoke cancelled; C895 complete, W1-3 subtotal672 only; own C3initialpass/W3frameworkunknown, all6 preservation metadata complete; whole route partial"
   },
-  "nextPriorityBeforeOneFiveBbvCl2Local20261031": "次は同じ1-5/index1 ADFGJのBBV1CL2DD1の有限適用範囲・任意目標接続。BBV1CL1DD2の局所6初回成功とCI C3初回成功/W3 framework未確定・保持metadata6は分離記録済み。W4/footerと大容量2archiveの欠測を埋める再実行はしない。generalフラグだけで一般化せず、CL2DD2/2–3隻は別に確認する。"
+  "nextPriorityBeforeOneFiveBbvCl2Local20261031": "次は同じ1-5/index1 ADFGJのBBV1CL2DD1の有限適用範囲・任意目標接続。BBV1CL1DD2の局所6初回成功とCI C3初回成功/W3 framework未確定・保持metadata6は分離記録済み。W4/footerと大容量2archiveの欠測を埋める再実行はしない。generalフラグだけで一般化せず、CL2DD2/2–3隻は別に確認する。",
+  "oneFiveBbvCl2CIFinalization20261031": {
+    "record": "oneFiveBbvCl2CIFinalization20261031",
+    "document": "docs/pr152-one-five-bbv-cl2-ja.md",
+    "state": "finalized-existing-CI-evidence-supplement-with-explicit-initial-load-counter-archive-and-atime-gaps",
+    "source": {
+      "testedCommitSHA": "ad793f1ae5a9dc58c10290edb967b834aead4882",
+      "recordCommitSHA": null,
+      "publicSourceCount": 660,
+      "publicManifestSHA256": "90efb2a81d25e42706f573fd4ab9f9495654e3c78d5cc34a83053d65a80b13da",
+      "localRuntime660Public659AreHistoricalDifferentScopes": true,
+      "HTTPServedSourceHashes": null,
+      "actualSourceAuditReferences": [
+        {
+          "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-bbv-cl2-20261031/private/ci-execution-41185492724/source-audit/source-audit.json",
+          "bytes": 7742,
+          "sha256": "4fc0d13a6ee990dad649f9d4908d3b94fea04a2604e379a1db2b2605eb232ef4"
+        },
+        {
+          "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-bbv-cl2-20261031/private/ci-execution-41185492724/source-audit/source-files.json",
+          "bytes": 365552,
+          "sha256": "df1eca6c1b930da0cedfc4ab6cff4cabb6539f58ea9ec4a4c7cb570d8ba5a248"
+        },
+        {
+          "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-bbv-cl2-20261031/private/ci-execution-41185492724/source-audit/closure.json",
+          "bytes": 401,
+          "sha256": "908e389a73d8e687a1f696c190a2cb89b12d0b67cf773c1d8159ac64a85ec21c"
+        }
+      ]
+    },
+    "CI": {
+      "runId": 41185492724,
+      "runAttempt": 1,
+      "workflowId": 361880120,
+      "suite": "smoke",
+      "dispatchCount": 1,
+      "acceptedUTC": "2026-10-31T08:39:28Z",
+      "sameHEADAutomaticEquivalentRunsObserved": 0,
+      "statusAtInitialObservation": "in_progress",
+      "finalStatus": "completed",
+      "conclusion": "cancelled",
+      "officialJobs": [
+        {
+          "id": 124491472858,
+          "name": "Smoke / webkit / shard 2 of 4",
+          "project": "webkit",
+          "shard": 2,
+          "status": "completed",
+          "conclusion": "success",
+          "smokeStepConclusion": "success",
+          "officialFooterPassedFlakyFailed": {
+            "passed": 225,
+            "flaky": 0,
+            "failed": 0
+          },
+          "actualNodeCounts": {
+            "tests": 615,
+            "pass": 615,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "actualEnvironment": {
+            "checkoutSHA": "ad793f1ae5a9dc58c10290edb967b834aead4882",
+            "Node": "24.21.0",
+            "Playwright": "1.55.0",
+            "ChromiumRevision": 1187,
+            "WebKitRevision": 2203,
+            "imageDigestPrefixReported": "b27",
+            "fullDigestReferencePending": false,
+            "pulledImageDigest": "b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29"
+          },
+          "ownTrials": null,
+          "footerFillsRunningCaseCount": true
+        },
+        {
+          "id": 124491473031,
+          "name": "Smoke / chromium / shard 2 of 2",
+          "project": "chromium",
+          "shard": 2,
+          "status": "completed",
+          "conclusion": "cancelled",
+          "smokeStepConclusion": "failure",
+          "officialFooterPassedFlakyFailed": {
+            "passed": 448,
+            "flaky": 0,
+            "failed": 1
+          },
+          "actualNodeCounts": {
+            "tests": 615,
+            "pass": 615,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "actualEnvironment": {
+            "checkoutSHA": "ad793f1ae5a9dc58c10290edb967b834aead4882",
+            "Node": "24.21.0",
+            "Playwright": "1.55.0",
+            "ChromiumRevision": 1187,
+            "WebKitRevision": 2203,
+            "imageDigestPrefixReported": "b27",
+            "fullDigestReferencePending": false,
+            "pulledImageDigest": "b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29"
+          },
+          "ownTrials": null,
+          "footerFillsRunningCaseCount": true
+        },
+        {
+          "id": 124491473045,
+          "name": "Smoke / webkit / shard 1 of 4",
+          "project": "webkit",
+          "shard": 1,
+          "status": "completed",
+          "conclusion": "success",
+          "smokeStepConclusion": "success",
+          "officialFooterPassedFlakyFailed": {
+            "passed": 224,
+            "flaky": 1,
+            "failed": 0
+          },
+          "actualNodeCounts": {
+            "tests": 615,
+            "pass": 615,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "actualEnvironment": {
+            "checkoutSHA": "ad793f1ae5a9dc58c10290edb967b834aead4882",
+            "Node": "24.21.0",
+            "Playwright": "1.55.0",
+            "ChromiumRevision": 1187,
+            "WebKitRevision": 2203,
+            "imageDigestPrefixReported": "b27",
+            "fullDigestReferencePending": false,
+            "pulledImageDigest": "b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29"
+          },
+          "ownTrials": null,
+          "footerFillsRunningCaseCount": true
+        },
+        {
+          "id": 124491473113,
+          "name": "Smoke / webkit / shard 4 of 4",
+          "project": "webkit",
+          "shard": 4,
+          "status": "completed",
+          "conclusion": "cancelled",
+          "smokeStepConclusion": "failure",
+          "officialFooterPassedFlakyFailed": {
+            "passed": 213,
+            "flaky": 9,
+            "failed": 2
+          },
+          "actualNodeCounts": {
+            "tests": 615,
+            "pass": 615,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "actualEnvironment": {
+            "checkoutSHA": "ad793f1ae5a9dc58c10290edb967b834aead4882",
+            "Node": "24.21.0",
+            "Playwright": "1.55.0",
+            "ChromiumRevision": 1187,
+            "WebKitRevision": 2203,
+            "imageDigestPrefixReported": "b27",
+            "fullDigestReferencePending": false,
+            "pulledImageDigest": "b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29"
+          },
+          "ownTrials": null,
+          "footerFillsRunningCaseCount": true
+        },
+        {
+          "id": 124491473123,
+          "name": "Smoke / chromium / shard 1 of 2",
+          "project": "chromium",
+          "shard": 1,
+          "status": "completed",
+          "conclusion": "success",
+          "smokeStepConclusion": "success",
+          "officialFooterPassedFlakyFailed": {
+            "passed": 449,
+            "flaky": 0,
+            "failed": 0
+          },
+          "actualNodeCounts": {
+            "tests": 615,
+            "pass": 615,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "actualEnvironment": {
+            "checkoutSHA": "ad793f1ae5a9dc58c10290edb967b834aead4882",
+            "Node": "24.21.0",
+            "Playwright": "1.55.0",
+            "ChromiumRevision": 1187,
+            "WebKitRevision": 2203,
+            "imageDigestPrefixReported": "b27",
+            "fullDigestReferencePending": false,
+            "pulledImageDigest": "b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29"
+          },
+          "ownTrials": null,
+          "footerFillsRunningCaseCount": true
+        },
+        {
+          "id": 124491473186,
+          "name": "Smoke / webkit / shard 3 of 4",
+          "project": "webkit",
+          "shard": 3,
+          "status": "completed",
+          "conclusion": "success",
+          "smokeStepConclusion": "success",
+          "officialFooterPassedFlakyFailed": {
+            "passed": 224,
+            "flaky": 0,
+            "failed": 0
+          },
+          "actualNodeCounts": {
+            "tests": 615,
+            "pass": 615,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "actualEnvironment": {
+            "checkoutSHA": "ad793f1ae5a9dc58c10290edb967b834aead4882",
+            "Node": "24.21.0",
+            "Playwright": "1.55.0",
+            "ChromiumRevision": 1187,
+            "WebKitRevision": 2203,
+            "imageDigestPrefixReported": "b27",
+            "fullDigestReferencePending": false,
+            "pulledImageDigest": "b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29"
+          },
+          "ownTrials": null,
+          "footerFillsRunningCaseCount": true
+        }
+      ],
+      "passedFlakyFailed": {
+        "chromium": {
+          "passed": 897,
+          "flaky": 0,
+          "failed": 1
+        },
+        "webkit": {
+          "passed": 886,
+          "flaky": 10,
+          "failed": 2
+        }
+      },
+      "cancelledSkippedUnstartedMissing": {
+        "cancelledSmokeJobs": [
+          124491473031,
+          124491473113
+        ],
+        "Full": "skipped",
+        "unstartedTestCases": null,
+        "missingTestResults": null
+      },
+      "terminalUpdatedUTC": "2026-10-31T09:25:55Z",
+      "terminalObservedUTC": "2026-10-31T09:26:01Z",
+      "workflowFile": ".github/workflows/browser-regression.yml",
+      "smokeJobSuccesses": 4,
+      "smokeJobCancelled": 2,
+      "FullJob": "skipped",
+      "officialAnnotations": null,
+      "allSixFooterCaseCoverageComplete": true,
+      "globalStrictInitialSuccessCount": null,
+      "globalPhysicalAttemptCount": null,
+      "smokeExitObservations": {
+        "C2": {
+          "code": 1,
+          "UTC": "2026-10-31T09:23:46.374Z"
+        },
+        "W4": {
+          "code": 1,
+          "UTC": "2026-10-31T09:23:35.687Z"
+        }
+      },
+      "independentOfficialFooterAndEnvironmentReference": {
+        "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-bbv-cl2-20261031/private/ci-resume-20261031-6ul7khxu/independent-footer/receipt.json",
+        "bytes": 53365,
+        "sha256": "5ff964fae7ebbe01fe2ae3f6a3a93b71dec996346297ac1a93559d776b8b7804"
+      }
+    },
+    "forecastAndPriorLocalListingNotCIResults": {
+      "normalNodeCasesForecast": 615,
+      "localActualListedCasesPerProject": 898,
+      "CIObservedNodeCounts": {
+        "jobs": 6,
+        "eachTests": 615,
+        "eachPass": 615,
+        "eachFail": 0
+      },
+      "CIObservedSelectedCaseCounts": {
+        "chromium": 898,
+        "webkit": 898
+      },
+      "note": "forecast/local observation and actual CI counts remain separately labelled; complete case outcomes are not strict first-pass or physical attempt totals",
+      "forecast615MatchesActual": true,
+      "local898MatchedCurrentOfficialRunningAndCompleteFooters": true
+    },
+    "ownCurrentUnitSix": null,
+    "relatedCurrentRunUnits": null,
+    "actualEnvironmentByJob": null,
+    "collection": {
+      "state": "resume-collection-and-final-independent-review-closed",
+      "receiptsAndMissing": null,
+      "manifestSHA256": null,
+      "independentReviewSHA256": null,
+      "artifactBoundaryBytes": 536870912,
+      "appSizeCheckBeforeDownload": true,
+      "overCapAction": "unrequested/missing; internal inventory unknown",
+      "firstBlockingAcquisitionFailure": "record and stop that failing path, no repeated CLI/artifact forbidden path or limit bypass",
+      "rawValuesPrivate": true,
+      "sharedOnlyAllowlistedMetadata": true,
+      "rawRewriteOrSanitizer": false,
+      "terminalMetadataReferences": {
+        "terminal-run.raw.json": {
+          "path": "private/ci-execution-41185492724/terminal-run.raw.json",
+          "sha256": "c31e027ae720787a724361e53d05c7f415b226443317f341f3cf8ae209cb9a4e"
+        },
+        "terminal-jobs.raw.json": {
+          "path": "private/ci-execution-41185492724/terminal-jobs.raw.json",
+          "sha256": "0252a027777fef35c38692235eb853797dd03ee4932cfa7df3d46208a98d60ef"
+        }
+      },
+      "officialArtifacts": {
+        "total": 12,
+        "eligibleWithin512MiB": 9,
+        "overCapUnrequested": 3,
+        "receipts": null,
+        "internalInventoryOfUnreceivedArchives": null,
+        "notReusedFromPrevious8Plus2": true,
+        "received": 9,
+        "receivedBytes": 3534328,
+        "receivedMembers": 84,
+        "allRequestedSizeSHAReceiptDigestCRCPassed": true,
+        "newAcquisitionsDuringResume": 0
+      },
+      "resumeCollectionPath": "private/ci-resume-20261031-6ul7khxu/collection",
+      "finalFailureClassificationPath": "private/ci-resume-20261031-6ul7khxu/final-failures",
+      "resumedDirectTrialJSONReview": null,
+      "resumeManifestSHA256": "d89623e92aa5b5bcba04789ef76d04a4e799b4f3119faf7dbcdc4d9532c35b44",
+      "resumeIndependentReviewSHA256": "fbef6a51833e32cf034591754572e09bd027c913879b62be6b14cd5e7b857122",
+      "resumeCanonicalReference": {
+        "path": "private/ci-resume-20261031-6ul7khxu/collection/canonical-resume-collection.json",
+        "sha256": "d64360950f07867c0b04dbb96eb9cdb914cffcc43f704b9ca84f0cc31dce3e48"
+      },
+      "resumeClosureSHA256": "0dbd2d5f1fd6f2cb2a09fe5e2ab9fefcdaf2caa42c060781861b96b6f7b0533f",
+      "trialMetadataReferences": [
+        {
+          "path": "private/ci-resume-20261031-6ul7khxu/collection/trial-metadata-audit-summary.json",
+          "bytes": 6260,
+          "sha256": "c15d3427cc30bc23fbe561e05357bdd476d7cc96ecf3c2329bd7c0a676bfefff"
+        },
+        {
+          "path": "private/ci-resume-20261031-6ul7khxu/collection/trial-metadata-direct-read.json",
+          "bytes": 76566,
+          "sha256": "56e9aa19de23c06512fe0982678461faaa52e1af045d5d8489429170c657afd8"
+        }
+      ],
+      "trialAuditIsParsedMetadataComparisonNotRawSavedBodyComparison": true,
+      "receivedOriginals": {
+        "officialArtifacts": 12,
+        "receivedArtifacts": 9,
+        "receivedBytes": 3534328,
+        "receivedMembers": 84,
+        "overCapUnrequested": 3,
+        "formalLogArchiveBytes": 11997377,
+        "formalLogArchiveSHA256": "07c9dced2038fc727cd10f2cc23158d1d6c212f3e11028d4d396e9d0cafe08d4",
+        "formalLogRegularMembers": 102,
+        "allRequestedSizeSHAReceiptOfficialDigestCRCPassed": true,
+        "newAcquisitionCount": 0,
+        "overCapInventoryReadOrInferred": false
+      },
+      "originalInvariance": {
+        "scope": "between the two resume snapshots only; prior ordinary-read atime updates were not captured and remain unknown",
+        "files": 450,
+        "dirs": 129,
+        "bytes": 159805877,
+        "contentFileSetAndNonAtimeAttrsUnchanged": true,
+        "allObservedAttributesUnchanged": false,
+        "atimeOnlyDifferenceFiles": [
+          "artifacts-page1.raw.json"
+        ],
+        "priorOrdinaryReadAtimeBeforeBaseline": null,
+        "timestampWritebacks": 0
+      },
+      "rawSavedBodiesTraceVideoFromThreeOvercapArchivesStillUnreceived": true,
+      "overcapInternalInventoryAndCountsUnverified": true,
+      "independentFrameDropFullInputFullReturnedPlanAndHTTPServedHashes": null,
+      "evidenceReferences": {
+        "metadataSummary": {
+          "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-bbv-cl2-20261031/private/ci-resume-20261031-6ul7khxu/collection/trial-metadata-audit-summary.json",
+          "bytes": 6260,
+          "sha256": "c15d3427cc30bc23fbe561e05357bdd476d7cc96ecf3c2329bd7c0a676bfefff"
+        },
+        "metadataDirectRead": {
+          "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-bbv-cl2-20261031/private/ci-resume-20261031-6ul7khxu/collection/trial-metadata-direct-read.json",
+          "bytes": 76566,
+          "sha256": "56e9aa19de23c06512fe0982678461faaa52e1af045d5d8489429170c657afd8"
+        },
+        "originalVerification": {
+          "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-bbv-cl2-20261031/private/ci-resume-20261031-6ul7khxu/collection/received-original-verification.json",
+          "bytes": 8101,
+          "sha256": "965dd10f9ac25872a207e1cc8e2c812fbc8525e3a883630982449c2f8d90d86b"
+        },
+        "originalBefore": {
+          "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-bbv-cl2-20261031/private/ci-resume-20261031-6ul7khxu/collection/originals-before.json",
+          "bytes": 249951,
+          "sha256": "010651ede616f7e2a6ec3b4865a49bc262320cd576255572397d9ecf7ed01b8d"
+        },
+        "originalAfter": {
+          "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-bbv-cl2-20261031/private/ci-resume-20261031-6ul7khxu/collection/originals-after.json",
+          "bytes": 249951,
+          "sha256": "77bf362677d53dfcd8582563df33c8608c65302045a87f888ff1356da3a1538b"
+        },
+        "originalInvariance": {
+          "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-bbv-cl2-20261031/private/ci-resume-20261031-6ul7khxu/collection/originals-invariance.json",
+          "bytes": 1237,
+          "sha256": "f92a1036f98533626984f34b307ce19337adffb50ee6bf1b81279a76dc9aaec8"
+        },
+        "independentFooterEnvironment": {
+          "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-bbv-cl2-20261031/private/ci-resume-20261031-6ul7khxu/independent-footer/receipt.json",
+          "bytes": 53365,
+          "sha256": "5ff964fae7ebbe01fe2ae3f6a3a93b71dec996346297ac1a93559d776b8b7804"
+        },
+        "independentFooterAtimeDisclosure": {
+          "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-bbv-cl2-20261031/private/ci-resume-20261031-6ul7khxu/independent-footer-atime-disclosure/disclosure.json",
+          "bytes": 1688,
+          "sha256": "d5ee34da548f3678b491e325a6bcebae1bf2b8caf5fc1c8e92aa842e9d10e2ac"
+        },
+        "independentFramework": {
+          "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-bbv-cl2-20261031/private/ci-resume-20261031-6ul7khxu/independent-review/own-three-cohort-framework-audit.json",
+          "bytes": 21762,
+          "sha256": "5b356d51b6adcbb532291e357931ab548055f3f0af218e59c2f80b113b9a70c4"
+        },
+        "independentInitialArchiveReview": {
+          "path": "/workspace/harbordesk-handoff-_gnvlnto/continuation-one-five-bbv-cl2-20261031/private/ci-resume-20261031-6ul7khxu/independent-review/initial-revalidation.json",
+          "bytes": 6836,
+          "sha256": "f57310c2831bc3ec6bd1f4025fb0279b84c28864bbd864e69cb273d678fe7961"
+        }
+      },
+      "parentIndependentReferences": {
+        "review.json": {
+          "path": "private/ci-resume-20261031-6ul7khxu/independent-review/review.json",
+          "sha256": "fbef6a51833e32cf034591754572e09bd027c913879b62be6b14cd5e7b857122"
+        },
+        "manifest.json": {
+          "path": "private/ci-resume-20261031-6ul7khxu/independent-review/manifest.json",
+          "sha256": "540f6bd938f0afb5b28b6d52a023d296c826cb229c271bc490200b6312ecd186"
+        },
+        "closure.json": {
+          "path": "private/ci-resume-20261031-6ul7khxu/independent-review/closure.json",
+          "sha256": "c54d4af4ab4c742e88ee7d9956ab833a41de1be93c702ffa6caebdf8e0aa62ab"
+        }
+      },
+      "parentIndependentPayloadFiles": 7,
+      "parentIndependentPayloadBytes": 87451,
+      "resumeCollectionPayloadFiles": 9,
+      "resumeCollectionPayloadBytes": 617609
+    },
+    "matrix": {
+      "before": [
+        27,
+        151,
+        58
+      ],
+      "after": [
+        27,
+        151,
+        58
+      ],
+      "cellDelta": 0,
+      "statusesAndCriteriaUnchanged": true
+    },
+    "history": {
+      "localWIPAndPendingFieldsRemainHistorical": true,
+      "previousCI41175351013CComplete": [
+        895,
+        0,
+        0
+      ],
+      "previousCI41175351013WSubtotal": [
+        672,
+        0,
+        0
+      ],
+      "previousCI41175351013FullWebKit": null,
+      "previousCIWFrameworkUnknownAndOverCap2NotBackfilled": true
+    },
+    "nextTarget": {
+      "scope": "same1-5/index1 ADFGJ CL2DD2",
+      "state": "source-only plan closed; implementation/new trials not started; separate unit after record-only commit",
+      "sourcePlanPath": "private/ci-resume-20261031-6ul7khxu/next-cl2-dd2-source",
+      "executed": false
+    },
+    "wholeRouteOrPublicationReady": false,
+    "PR152DraftUnpublishedAndProtectedTargetsMaintained": true,
+    "recordDateJST": "2026-10-31",
+    "cohorts": {
+      "one-five-bbv-cl2": {
+        "trialOutcomes": [
+          {
+            "project": "chromium",
+            "state": "known",
+            "jobId": 124491473031,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": false,
+                    "originalIdentityArrayExact": false,
+                    "originalGearArrayExact": false,
+                    "proposalGearMatches": true
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037867766,
+                  "artifactName": "route-summary-chromium-2-41185492724",
+                  "member": "route-one-five-bbv-cl2-1-5-f2a2d-save-or-safe-abort-and-load-chromium/route-guidance-summary.json",
+                  "memberSHA256": "23ceb38c13edf4aac69926a6603037f5c7484fce4e73017a07a392a750b3d875",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          },
+          {
+            "project": "chromium",
+            "state": "stock",
+            "jobId": 124491473031,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": false,
+                    "originalIdentityArrayExact": false,
+                    "originalGearArrayExact": false,
+                    "proposalGearMatches": true
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037867766,
+                  "artifactName": "route-summary-chromium-2-41185492724",
+                  "member": "route-one-five-bbv-cl2-1-5-fa1fb-save-or-safe-abort-and-load-chromium/route-guidance-summary.json",
+                  "memberSHA256": "e856b6cb7be3505ecaf5d9086226101ac96a63f56db38e7e7feb571516a36977",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          },
+          {
+            "project": "chromium",
+            "state": "unknown",
+            "jobId": 124491473031,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 0,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "originalIdentityArrayExact": true,
+                    "originalGearArrayExact": true,
+                    "proposalGearMatches": null
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 0,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037867766,
+                  "artifactName": "route-summary-chromium-2-41185492724",
+                  "member": "route-one-five-bbv-cl2-1-5-9e1c8-save-or-safe-abort-and-load-chromium/route-guidance-summary.json",
+                  "memberSHA256": "9bca4bfe96a8c4b6c4461c95cde24e4882efbef48207f1b88258f94e4437e2ca",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          },
+          {
+            "project": "webkit",
+            "state": "known",
+            "jobId": 124491473113,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": false,
+                    "originalIdentityArrayExact": false,
+                    "originalGearArrayExact": false,
+                    "proposalGearMatches": true
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037851673,
+                  "artifactName": "route-summary-webkit-4-41185492724",
+                  "member": "route-one-five-bbv-cl2-1-5-f2a2d-save-or-safe-abort-and-load-webkit/route-guidance-summary.json",
+                  "memberSHA256": "60033347ad366afe4af0f754ded849de269bd51da86f62502584b5739d4542e2",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          },
+          {
+            "project": "webkit",
+            "state": "stock",
+            "jobId": 124491473113,
+            "finalCaseOutcome": "flaky",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "failed",
+                "firstFailureStage": "after-load-search-click timeout",
+                "loadFullComparisonReached": false,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": false,
+                    "originalIdentityArrayExact": false,
+                    "originalGearArrayExact": false,
+                    "proposalGearMatches": true
+                  },
+                  "load": null
+                },
+                "metadataStage": "after-load-search",
+                "savedReadReached": true,
+                "loadReadReached": false,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": null,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [
+                  "load"
+                ],
+                "counterGaps": [
+                  "navigationCollectionFailures"
+                ],
+                "metadataBinding": {
+                  "artifactId": 13037851673,
+                  "artifactName": "route-summary-webkit-4-41185492724",
+                  "member": "route-one-five-bbv-cl2-1-5-fa1fb-save-or-safe-abort-and-load-webkit/route-guidance-summary.json",
+                  "memberSHA256": "a577ff228b419b1a37d30036c22541aaa95e8d66560e9f6455ef8508a4fac91a",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              },
+              {
+                "retryIndex": 1,
+                "framework": "passed",
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": false,
+                    "originalIdentityArrayExact": false,
+                    "originalGearArrayExact": false,
+                    "proposalGearMatches": true
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "doesNotBackfillInitialUnreached": true,
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037851673,
+                  "artifactName": "route-summary-webkit-4-41185492724",
+                  "member": "route-one-five-bbv-cl2-1-5-fa1fb-save-or-safe-abort-and-load-webkit-retry1/route-guidance-summary.json",
+                  "memberSHA256": "98ba38b625e0cb6c9c7d90ef331aa498b0f4b3f3d20c7e2bd208d9e1baaabf5b",
+                  "logBoundRetryIndex": 1,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          },
+          {
+            "project": "webkit",
+            "state": "unknown",
+            "jobId": 124491473113,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 0,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "originalIdentityArrayExact": true,
+                    "originalGearArrayExact": true,
+                    "proposalGearMatches": null
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 0,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037851673,
+                  "artifactName": "route-summary-webkit-4-41185492724",
+                  "member": "route-one-five-bbv-cl2-1-5-9e1c8-save-or-safe-abort-and-load-webkit/route-guidance-summary.json",
+                  "memberSHA256": "7b1671a3ce16c6fdd26220d74b69eb51c5ab15f30e9980fa0e9a01caee3b890a",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          }
+        ],
+        "initialRetryDistinction": {
+          "initialPassCases": 5,
+          "retrySuccessCases": 1,
+          "finalFailedCases": 0
+        },
+        "savedLoadComparisons": {
+          "role": "CL2-current",
+          "logicalCases": 6,
+          "metadataTrials": 7,
+          "initialMetadataTrials": 6,
+          "retryMetadataTrials": 1,
+          "completedMetadataTrials": 6,
+          "frameworkPassedTrials": 6,
+          "frameworkFailedTrials": 1,
+          "savedReadTrials": 7,
+          "loadReadTrials": 6,
+          "allObservedSavedStrictFieldRecords": 140,
+          "allObservedLoadStrictFieldRecords": 120,
+          "successfulTrialSavedStrictFieldRecords": 120,
+          "successfulTrialLoadStrictFieldRecords": 120,
+          "firstFailureTrials": [
+            {
+              "state": "stock",
+              "project": "webkit",
+              "retryIndex": 0,
+              "stage": "after-load-search",
+              "savedReadReached": true,
+              "loadReadReached": false,
+              "savedStrictFields": 20,
+              "loadStrictFields": null,
+              "counterGaps": [
+                "navigationCollectionFailures"
+              ],
+              "ownMetadataReference": "route-one-five-bbv-cl2-1-5-fa1fb-save-or-safe-abort-and-load-webkit/route-guidance-summary.json"
+            }
+          ],
+          "allExplicitPageerrorCounts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "allExplicitNavigationCollectionFailures": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            null,
+            0
+          ],
+          "allObservedLoadSameDocumentTrue": true,
+          "localTrialMarkerValues": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "localRuntimeManifestSHA256Values": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "preservationMismatchPositiveCount": 0,
+          "observedInvariantMismatchCount": 0
+        },
+        "positivePreservationMismatchCount": 0,
+        "footerAndIndividualFlakyListSupport": true,
+        "doesNotInferStageFromAnotherTrial": true,
+        "metadataIsRawSavedBodyRecomparison": false
+      },
+      "one-five-bbv-cl": {
+        "trialOutcomes": [
+          {
+            "project": "chromium",
+            "state": "known",
+            "jobId": 124491473031,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": false,
+                    "originalIdentityArrayExact": false,
+                    "originalGearArrayExact": false,
+                    "proposalGearMatches": true
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037867766,
+                  "artifactName": "route-summary-chromium-2-41185492724",
+                  "member": "route-one-five-bbv-cl-1-5--952db-save-or-safe-abort-and-load-chromium/route-guidance-summary.json",
+                  "memberSHA256": "cc8486f4462f77cc53612f51b27c78a774b3d07214ec5a3e6cd1d34130879b15",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          },
+          {
+            "project": "chromium",
+            "state": "stock",
+            "jobId": 124491473031,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": false,
+                    "originalIdentityArrayExact": false,
+                    "originalGearArrayExact": false,
+                    "proposalGearMatches": true
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037867766,
+                  "artifactName": "route-summary-chromium-2-41185492724",
+                  "member": "route-one-five-bbv-cl-1-5--fbeea-save-or-safe-abort-and-load-chromium/route-guidance-summary.json",
+                  "memberSHA256": "81a33c21279f7c20a359c69df514362c757505ee04aaec7515b266e594453c19",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          },
+          {
+            "project": "chromium",
+            "state": "unknown",
+            "jobId": 124491473031,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 0,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "originalIdentityArrayExact": true,
+                    "originalGearArrayExact": true,
+                    "proposalGearMatches": null
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 0,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037867766,
+                  "artifactName": "route-summary-chromium-2-41185492724",
+                  "member": "route-one-five-bbv-cl-1-5--d7dd5-save-or-safe-abort-and-load-chromium/route-guidance-summary.json",
+                  "memberSHA256": "e11868889115fe5f908323290310b8ab845414352fdf8b9f9ab1394b49298113",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          },
+          {
+            "project": "webkit",
+            "state": "known",
+            "jobId": 124491473113,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": false,
+                    "originalIdentityArrayExact": false,
+                    "originalGearArrayExact": false,
+                    "proposalGearMatches": true
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037851673,
+                  "artifactName": "route-summary-webkit-4-41185492724",
+                  "member": "route-one-five-bbv-cl-1-5--952db-save-or-safe-abort-and-load-webkit/route-guidance-summary.json",
+                  "memberSHA256": "de1ce07d2fc01f14533c18a0e1eb91a104d29275229c3f12f6584188ce6b8c20",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          },
+          {
+            "project": "webkit",
+            "state": "stock",
+            "jobId": 124491473113,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": false,
+                    "originalIdentityArrayExact": false,
+                    "originalGearArrayExact": false,
+                    "proposalGearMatches": true
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037851673,
+                  "artifactName": "route-summary-webkit-4-41185492724",
+                  "member": "route-one-five-bbv-cl-1-5--fbeea-save-or-safe-abort-and-load-webkit/route-guidance-summary.json",
+                  "memberSHA256": "88f77728c071b94f7b9cd2c8715af3e889b0ba8efb586bba9ca04aada3825e43",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          },
+          {
+            "project": "webkit",
+            "state": "unknown",
+            "jobId": 124491473113,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 0,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "originalIdentityArrayExact": true,
+                    "originalGearArrayExact": true,
+                    "proposalGearMatches": null
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 0,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037851673,
+                  "artifactName": "route-summary-webkit-4-41185492724",
+                  "member": "route-one-five-bbv-cl-1-5--d7dd5-save-or-safe-abort-and-load-webkit/route-guidance-summary.json",
+                  "memberSHA256": "1a55c063d3884a4117b0bb15ac622f33a693e4946b6c88f480f4207a29a147eb",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          }
+        ],
+        "initialRetryDistinction": {
+          "initialPassCases": 6,
+          "retrySuccessCases": 0,
+          "finalFailedCases": 0
+        },
+        "savedLoadComparisons": {
+          "role": "CL1",
+          "logicalCases": 6,
+          "metadataTrials": 6,
+          "initialMetadataTrials": 6,
+          "retryMetadataTrials": 0,
+          "completedMetadataTrials": 6,
+          "frameworkPassedTrials": 6,
+          "frameworkFailedTrials": 0,
+          "savedReadTrials": 6,
+          "loadReadTrials": 6,
+          "allObservedSavedStrictFieldRecords": 120,
+          "allObservedLoadStrictFieldRecords": 120,
+          "successfulTrialSavedStrictFieldRecords": 120,
+          "successfulTrialLoadStrictFieldRecords": 120,
+          "firstFailureTrials": [],
+          "allExplicitPageerrorCounts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "allExplicitNavigationCollectionFailures": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "allObservedLoadSameDocumentTrue": true,
+          "localTrialMarkerValues": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "localRuntimeManifestSHA256Values": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "preservationMismatchPositiveCount": 0,
+          "observedInvariantMismatchCount": 0
+        },
+        "positivePreservationMismatchCount": 0,
+        "footerAndIndividualFlakyListSupport": true,
+        "doesNotInferStageFromAnotherTrial": true,
+        "metadataIsRawSavedBodyRecomparison": false
+      },
+      "one-five-middle": {
+        "trialOutcomes": [
+          {
+            "project": "chromium",
+            "state": "known",
+            "jobId": 124491473031,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": false,
+                    "originalIdentityArrayExact": false,
+                    "originalGearArrayExact": false,
+                    "proposalGearMatches": true
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037867766,
+                  "artifactName": "route-summary-chromium-2-41185492724",
+                  "member": "route-one-five-middle-1-5--2719a-save-or-safe-abort-and-load-chromium/route-guidance-summary.json",
+                  "memberSHA256": "1ed59218e9150614281a87132c21129507ccebfcd8508032a942a171d5715f9f",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          },
+          {
+            "project": "chromium",
+            "state": "stock",
+            "jobId": 124491473031,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": false,
+                    "originalIdentityArrayExact": false,
+                    "originalGearArrayExact": false,
+                    "proposalGearMatches": true
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037867766,
+                  "artifactName": "route-summary-chromium-2-41185492724",
+                  "member": "route-one-five-middle-1-5--7d0a0-save-or-safe-abort-and-load-chromium/route-guidance-summary.json",
+                  "memberSHA256": "438f112e956f4f6d25abfd931402bcf85dfbc3dd9d91084b1e9f8e56eadf88df",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          },
+          {
+            "project": "chromium",
+            "state": "unknown",
+            "jobId": 124491473031,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 0,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "originalIdentityArrayExact": true,
+                    "originalGearArrayExact": true,
+                    "proposalGearMatches": null
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 0,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037867766,
+                  "artifactName": "route-summary-chromium-2-41185492724",
+                  "member": "route-one-five-middle-1-5--19343-save-or-safe-abort-and-load-chromium/route-guidance-summary.json",
+                  "memberSHA256": "81cdc71d87c5fbc022d431a909c8182e3dd2f5beba3846645204085730815993",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          },
+          {
+            "project": "webkit",
+            "state": "known",
+            "jobId": 124491473113,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": false,
+                    "originalIdentityArrayExact": false,
+                    "originalGearArrayExact": false,
+                    "proposalGearMatches": true
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037851673,
+                  "artifactName": "route-summary-webkit-4-41185492724",
+                  "member": "route-one-five-middle-1-5--2719a-save-or-safe-abort-and-load-webkit/route-guidance-summary.json",
+                  "memberSHA256": "7e572eaaa5791e7bc448b85e25f064d03588f732b51c3b777e61c33e92261843",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          },
+          {
+            "project": "webkit",
+            "state": "stock",
+            "jobId": 124491473113,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": false,
+                    "originalIdentityArrayExact": false,
+                    "originalGearArrayExact": false,
+                    "proposalGearMatches": true
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 2,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037851673,
+                  "artifactName": "route-summary-webkit-4-41185492724",
+                  "member": "route-one-five-middle-1-5--7d0a0-save-or-safe-abort-and-load-webkit/route-guidance-summary.json",
+                  "memberSHA256": "1ab32f08242d8fc22af7334d407ec2074de24b9ac63bb30ab140a2ce37c03903",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          },
+          {
+            "project": "webkit",
+            "state": "unknown",
+            "jobId": 124491473113,
+            "finalCaseOutcome": "passed",
+            "attempts": [
+              {
+                "retryIndex": 0,
+                "framework": "passed",
+                "firstFailureStage": null,
+                "savedLoadComparisons": {
+                  "saved": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 0,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "originalIdentityArrayExact": true,
+                    "originalGearArrayExact": true,
+                    "proposalGearMatches": null
+                  },
+                  "load": {
+                    "strictIdentityFields": 20,
+                    "extraPureBlankRows": 0,
+                    "allOriginalIdentityFieldsExact": true,
+                    "allExtraRowsPureBlank": true,
+                    "sourceAndOtherMetadataExact": true,
+                    "wholeCustomExact": true,
+                    "sameDocument": true
+                  }
+                },
+                "metadataStage": "completed",
+                "savedReadReached": true,
+                "loadReadReached": true,
+                "pageerrorCount": 0,
+                "navigationCollectionFailures": 0,
+                "independentFrameOrOriginID": null,
+                "independentDropCounter": null,
+                "missingCheckpoints": [],
+                "counterGaps": [],
+                "metadataBinding": {
+                  "artifactId": 13037851673,
+                  "artifactName": "route-summary-webkit-4-41185492724",
+                  "member": "route-one-five-middle-1-5--19343-save-or-safe-abort-and-load-webkit/route-guidance-summary.json",
+                  "memberSHA256": "0b34144d9b9234e57a3a153b652ea9904345290dd444c7a30ab3857606103337",
+                  "logBoundRetryIndex": 0,
+                  "JSONExplicitAttemptIndex": null
+                }
+              }
+            ],
+            "savedLoadEvidencePending": false
+          }
+        ],
+        "initialRetryDistinction": {
+          "initialPassCases": 6,
+          "retrySuccessCases": 0,
+          "finalFailedCases": 0
+        },
+        "savedLoadComparisons": {
+          "role": "canonical",
+          "logicalCases": 6,
+          "metadataTrials": 6,
+          "initialMetadataTrials": 6,
+          "retryMetadataTrials": 0,
+          "completedMetadataTrials": 6,
+          "frameworkPassedTrials": 6,
+          "frameworkFailedTrials": 0,
+          "savedReadTrials": 6,
+          "loadReadTrials": 6,
+          "allObservedSavedStrictFieldRecords": 120,
+          "allObservedLoadStrictFieldRecords": 120,
+          "successfulTrialSavedStrictFieldRecords": 120,
+          "successfulTrialLoadStrictFieldRecords": 120,
+          "firstFailureTrials": [],
+          "allExplicitPageerrorCounts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "allExplicitNavigationCollectionFailures": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "allObservedLoadSameDocumentTrue": true,
+          "localTrialMarkerValues": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "localRuntimeManifestSHA256Values": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "preservationMismatchPositiveCount": 0,
+          "observedInvariantMismatchCount": 0
+        },
+        "positivePreservationMismatchCount": 0,
+        "footerAndIndividualFlakyListSupport": true,
+        "doesNotInferStageFromAnotherTrial": true,
+        "metadataIsRawSavedBodyRecomparison": false
+      }
+    },
+    "cancellationScope": {
+      "thisRun": "both smoke steps completed failure before later job cancellation; post-step statuses differ",
+      "previousCI41175351013": "W4 smoke step itself cancelled without final footer; not backfilled",
+      "differentObservedStepStatusDoesNotIdentifyRootCause": true,
+      "C2": "smoke failure/exit1 then step10 upload cancelled; job cancelled",
+      "W4": "smoke failure/exit1 then steps10/11/12/25 success; job still cancelled",
+      "bothJobsHadUploadCancellation": false,
+      "jobCancellationCause": null
+    },
+    "currentCIStorageRetentionVerified": {
+      "scope": "observed metadata checkpoints only; not raw body re-comparison or global storage safety",
+      "observedInvariantMismatches": 0,
+      "preservationMismatchPositiveCount": 0,
+      "CL2InitialWstockLoadStillUnreached": true,
+      "noRetryBackfillsInitialGap": true
+    },
+    "noCIRetentionResultInferredFromLocalSixPasses": true,
+    "newCL2WStockInitial": {
+      "firstFailureStage": "load-after-reopen search button click timeout",
+      "loadFullComparisonReached": false,
+      "retry1": "passed separately",
+      "sameStoppingStageAsEarlierHiddenButtons": true,
+      "sameCauseOrSavedDataLossEstablished": false,
+      "callerAndActualRawDetails": null,
+      "noSuccessPurposeRepeatBeyondExistingCIRetryPolicy": true,
+      "savedStrictFields": 20,
+      "loadStrictFields": null,
+      "savedReadReached": true,
+      "loadReadReached": false,
+      "pageerrorCount": 0,
+      "navigationCollectionFailures": null,
+      "counterGapNotDropZero": true
+    },
+    "resume": {
+      "newDedicatedRecordArea": "private/ci-resume-20261031-6ul7khxu/records",
+      "oldDraftIndexSHA256": "7bc366fcf5fb2fa710f7afef78e24c3c83d331f7c385e12c7bffbc64dee1312d",
+      "oldDraftReadOnlyPreserved": true,
+      "existingCurrentWTMatchesClosedLocalDrafts": true,
+      "reportedLocalAndRemoteHead": "ad793f1ae5a9dc58c10290edb967b834aead4882",
+      "reportedWTStatus": "clean",
+      "newTrialOrCIRunForThisSupplement": false,
+      "recordOnlyCommitNormalPushSkipCIPlannedByRoot": true,
+      "supplementRecordHEAD": null,
+      "actualExecReadResumptionVerified": true,
+      "oldDisconnectStopRemainsDatedHistory": true,
+      "priorUnperformedJSONAuditPromotedRetroactively": false,
+      "currentSupplementDirectTrialAuditCompleted": true
+    },
+    "observedCohortCounters": {
+      "metadataTrials": 19,
+      "explicitPageerrorZeroRecords": 19,
+      "explicitNavigationCollectionFailureZeroRecords": 18,
+      "navigationCollectionFailureNullRecords": 1,
+      "independentFrameOriginAndDrop": null,
+      "notExtendedToOtherCIFailures": true
+    },
+    "otherFinalFailures": {
+      "reference": {
+        "path": "private/ci-resume-20261031-6ul7khxu/final-failures/classification.safe.json",
+        "sha256": "c7a4fab39619860e986e2f1cad23fde64399804d3f28f95bd4a0d40c9d820e2f"
+      },
+      "manifestSHA256": "95a905d02f76bf9bb1a645a1082392cbd81b5e3226987f38098de19cc88aa8ec",
+      "projectCases": 3,
+      "failedAttempts": 6,
+      "cases": [
+        {
+          "browser": "chromium",
+          "jobId": 124491473031,
+          "case": "7-5 third ABDFJOPT known",
+          "finalResult": "failed",
+          "firstFailureBoundary": "after-load result element visibility wait after click await completed",
+          "safeDetailReference": "chromium-audit/classification.safe.json",
+          "attempts": [
+            {
+              "retryIndex": 0,
+              "result": "failed",
+              "firstErrorCategory": "result-locator-not-found-at-12s",
+              "clickAwaitCompleted": true,
+              "resultVisibilityWaitReached": true,
+              "resultElementFound": false,
+              "productHandlerOrSearchStartObserved": null,
+              "savedEditAndSpecifiedComparisonPassed": true,
+              "reloadReadyAndReopenPassed": true,
+              "loadReadReached": false,
+              "loadFullComparisonReached": false,
+              "postLoadPreservationOutcome": null,
+              "sourceReferences": {
+                "file": "tests/route-seven-five-third.spec.js",
+                "failingLine": 82,
+                "callerLine": 116
+              }
+            },
+            {
+              "retryIndex": 1,
+              "result": "failed",
+              "firstErrorCategory": "result-locator-not-found-at-12s",
+              "clickAwaitCompleted": true,
+              "resultVisibilityWaitReached": true,
+              "resultElementFound": false,
+              "productHandlerOrSearchStartObserved": null,
+              "savedEditAndSpecifiedComparisonPassed": true,
+              "reloadReadyAndReopenPassed": true,
+              "loadReadReached": false,
+              "loadFullComparisonReached": false,
+              "postLoadPreservationOutcome": null,
+              "sourceReferences": {
+                "file": "tests/route-seven-five-third.spec.js",
+                "failingLine": 82,
+                "callerLine": 116
+              }
+            }
+          ],
+          "savedCheckpointTypedMetadataAvailable": true,
+          "savedStrictIdentityFieldsPerAttempt": 30,
+          "savedExpectedOtherPreservationFlagsTrue": true,
+          "loadCheckpointMetadata": null,
+          "displayChangeCaller": null,
+          "cause": null,
+          "counterMetadata": {
+            "initial": {
+              "pageerrorCount": 0,
+              "navigationCollectionFailures": 0
+            },
+            "retry1": {
+              "pageerrorCount": 0,
+              "navigationCollectionFailures": 0
+            }
+          }
+        },
+        {
+          "browser": "webkit",
+          "jobId": 124491473113,
+          "case": "7-3 second route speed type-mismatch",
+          "finalResult": "failed",
+          "firstFailureBoundary": "after-load search button click wait before result wait",
+          "safeDetailReference": "webkit-audit/classification.safe.json",
+          "attempts": [
+            {
+              "retryIndex": 0,
+              "result": "failed",
+              "firstErrorCategory": "search-button-not-visible-at-45s-total",
+              "clickAwaitCompleted": false,
+              "resultVisibilityWaitReached": false,
+              "searchButtonResolved": true,
+              "searchButtonVisible": false,
+              "productHandlerOrSearchStartObserved": null,
+              "savedEditAndSpecifiedComparisonPassed": true,
+              "savedComparisonEvidenceKind": "same-source sequential control flow and failure stack; raw values missing",
+              "reloadReadyAndReopenPassed": true,
+              "loadReadReached": false,
+              "loadFullComparisonReached": false,
+              "postLoadPreservationOutcome": null,
+              "sourceReferences": {
+                "file": "tests/route-complex-boundaries.spec.js",
+                "failingLine": 182,
+                "callerLine": 218
+              }
+            },
+            {
+              "retryIndex": 1,
+              "result": "failed",
+              "firstErrorCategory": "search-button-not-visible-at-45s-total",
+              "clickAwaitCompleted": false,
+              "resultVisibilityWaitReached": false,
+              "searchButtonResolved": true,
+              "searchButtonVisible": false,
+              "productHandlerOrSearchStartObserved": null,
+              "savedEditAndSpecifiedComparisonPassed": true,
+              "savedComparisonEvidenceKind": "same-source sequential control flow and failure stack; raw values missing",
+              "reloadReadyAndReopenPassed": true,
+              "loadReadReached": false,
+              "loadFullComparisonReached": false,
+              "postLoadPreservationOutcome": null,
+              "sourceReferences": {
+                "file": "tests/route-complex-boundaries.spec.js",
+                "failingLine": 182,
+                "callerLine": 218
+              }
+            }
+          ],
+          "savedCheckpointTypedMetadataAvailable": false,
+          "savedStrictIdentityFieldsPerAttempt": null,
+          "savedExpectedOtherPreservationFlagsTrue": null,
+          "loadCheckpointMetadata": null,
+          "displayChangeCaller": null,
+          "cause": null,
+          "counterMetadata": null
+        },
+        {
+          "browser": "webkit",
+          "jobId": 124491473113,
+          "case": "7-3 first ACE ready",
+          "finalResult": "failed",
+          "firstFailureBoundary": "after-load search button click wait before result wait",
+          "safeDetailReference": "webkit-audit/classification.safe.json",
+          "attempts": [
+            {
+              "retryIndex": 0,
+              "result": "failed",
+              "firstErrorCategory": "search-button-not-visible-at-45s-total",
+              "clickAwaitCompleted": false,
+              "resultVisibilityWaitReached": false,
+              "searchButtonResolved": true,
+              "searchButtonVisible": false,
+              "productHandlerOrSearchStartObserved": null,
+              "savedEditAndSpecifiedComparisonPassed": true,
+              "savedComparisonEvidenceKind": "same-attempt typedmetadata plus sequential source",
+              "reloadReadyAndReopenPassed": true,
+              "loadReadReached": false,
+              "loadFullComparisonReached": false,
+              "postLoadPreservationOutcome": null,
+              "sourceReferences": {
+                "file": "tests/route-seven-three-first.spec.js",
+                "failingLine": 72,
+                "callerLine": 116
+              }
+            },
+            {
+              "retryIndex": 1,
+              "result": "failed",
+              "firstErrorCategory": "search-button-not-visible-at-45s-total",
+              "clickAwaitCompleted": false,
+              "resultVisibilityWaitReached": false,
+              "searchButtonResolved": true,
+              "searchButtonVisible": false,
+              "productHandlerOrSearchStartObserved": null,
+              "savedEditAndSpecifiedComparisonPassed": true,
+              "savedComparisonEvidenceKind": "same-attempt typedmetadata plus sequential source",
+              "reloadReadyAndReopenPassed": true,
+              "loadReadReached": false,
+              "loadFullComparisonReached": false,
+              "postLoadPreservationOutcome": null,
+              "sourceReferences": {
+                "file": "tests/route-seven-three-first.spec.js",
+                "failingLine": 72,
+                "callerLine": 116
+              }
+            }
+          ],
+          "savedCheckpointTypedMetadataAvailable": true,
+          "savedStrictIdentityFieldsPerAttempt": 20,
+          "savedExpectedOtherPreservationFlagsTrue": true,
+          "loadCheckpointMetadata": null,
+          "displayChangeCaller": null,
+          "cause": null,
+          "counterMetadata": {
+            "initial": {
+              "pageerrorCount": 0,
+              "navigationCollectionFailures": 1
+            },
+            "retry1": {
+              "pageerrorCount": 0,
+              "navigationCollectionFailures": 1
+            },
+            "notDisplayCallerOrDropProof": true
+          }
+        }
+      ],
+      "firstBoundaryClassified": true,
+      "causeClassified": false,
+      "newPreservationMismatchEvidenceObserved": false,
+      "postLoadPreservationNotAssumed": true,
+      "relationshipToCurrentFiniteOptimization": null
+    },
+    "recordOnlySupplement": {
+      "commitMode": "normal record-only commit and push with skip-ci",
+      "additionalTrials": 0,
+      "additionalCIRuns": 0,
+      "recordCommitSHA": null
+    },
+    "retainedGaps": [
+      "newCL2 Wstock initial load read/full comparison unreached; retry1 never fills it",
+      "newCL2 Wstock initial navigationCollectionFailures null; independent frame/origin/drop fields absent",
+      "W7-3 type-mismatch raw saved-value JSON missing; own-source sequential comparison evidence kept separate",
+      "other finalfailed3 initial/retry load checkpoints unreached; product handler/search start/result generation/display caller/cause unconfirmed",
+      "three overcap archives remain unrequested with internal raw/trace/video inventory unobserved",
+      "metadata direct comparison is not a second raw-saved-body comparison; global storage safety not established",
+      "full input/full returned plan/HTTP served hashes and strict global first-success/physical-attempt totals unobserved",
+      "prior ordinary-read atime before resume baseline unobserved; one later read-atime change disclosed without reset"
+    ]
+  },
+  "selectedBeforeOneFiveBbvCl2CIFinalization20261031": {
+    "id": "1-5/1/default",
+    "baselineHead": "a3a6c6a749fe02a26a535613d9665c6a1e762fb9",
+    "record": "oneFiveBbvCl2Local20261031",
+    "evidence": "docs/pr152-one-five-bbv-cl2-ja.md",
+    "state": "BBV1CL2DD1 finite source/product, Node17/model3 and all6 first local workflows with original/independent closure complete; new sourceHEAD/CI pending; whole route partial"
+  },
+  "nextPriorityBeforeOneFiveBbvCl2CIFinalization20261031": "まずBBV1CL2DD1の最終sourceと通常smoke1回を確定する。局所6初回成功・保存保持/原本独立照合は完了。次候補は同じ1-5/index1 ADFGJ CL2DD2の出典適用範囲と任意目標接続で、今回まだ実装/実行しない。旧CI411753のW4最終未確定と2大容量archive内部欠測を今回で補完しない。"
 }
