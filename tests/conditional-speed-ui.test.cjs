@@ -15,6 +15,7 @@ require('./five-four-scouting-exemption.test.cjs');
 require('./five-four-fixed-input.test.cjs');
 require('./two-five-north-f.test.cjs');
 require('./three-one-cfg.test.cjs');
+require('./one-five-middle-boundaries.test.cjs');
 require('./three-three-acgm.test.cjs');
 require('./three-three-placement.test.cjs');
 require('./three-four-acegjp.test.cjs');
