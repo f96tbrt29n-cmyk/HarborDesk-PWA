@@ -535,6 +535,13 @@ function hdFEBranchRoute(plan){
  const fallback=data.speedFallback,requiredSpeed=[10,15,20].includes(fallback?.rank)&&fallback.unless?.length&&fallback.unless.every(x=>hdFEBranchPredicate(x,ships).status==='missing')?fallback.rank:0;
  return {available:true,path:goal?.path||data.path,goal:goalId,sources:data.sources||[],checkedAt:data.checkedAt,checks,status,graph,next:goal?.next||(data.goals&&!goal?'登録済みのルート目標を選び直してください':''),requiredRadar:goal?.radar||0,requiredSpeed:Math.max(requiredSpeed,goal?.speed||0),arrivalGuaranteed:status==='ready'&&!!graph?.arrivalGuaranteed,fixedPath:status==='ready'&&!!graph?.fixedPath,detail:`${data.goals&&!goal?'未登録のルート目標 '+String(goalId):goal?.label||data.path+'固定'}: ${status==='ready'?'登録した分岐条件を充足':status==='missing'?'固定条件に不足（別経路・ランダム到達は別途確認）':'未判定'} / `+checks.filter(x=>status==='ready'||x.status!=='ready').map(x=>x.label+' '+x.detail+(x.status!=='ready'?'。'+x.next:'')).join(' / ')+(graph?' / '+graph.detail:'')};
 }
+function hdFETwoFiveSouthDD4Scope(plan,data=null){
+ if(plan?.map!=='2-5'||!Array.isArray(plan.ships)||plan.ships.filter(ship=>ship?.ship).length!==6)return false;data=data||hdFERouteRequirementData(plan);
+ if(data?.index!==1||data.path!=='CEIO'||!data.speedOptionalWhen||typeof hdFSPresetInfo!=='function')return false;
+ const canonical=hdFSPresetInfo(MAP_PLANS[plan.map].presets[data.index]),keys=['text','requirements','total','conditionManual','speedRequired','flagship'],infos=[plan.routeInfo,plan.suggestion?.info].filter(Boolean);
+ if(!infos.length||infos.some(info=>keys.some(key=>JSON.stringify(info[key])!==JSON.stringify(canonical[key]))))return false;
+ const ships=hdFERouteShips(plan);return ships.length===6&&ships.every(ship=>ship.typeKnown)&&hdFEBranchPredicate(data.speedOptionalWhen,ships,plan).status==='ready';
+}
 function hdFEPlanSpeedTarget(plan){
  const data=typeof MAP_PLANS!=='undefined'?MAP_PLANS[plan?.map]?.routeBranches:null,goal=hdFEBranchGoal(data,plan?.routeGoal),fallback=data?.speedFallback;
  const required=fallback?.unless?.length&&fallback.unless.every(x=>hdFEBranchPredicate(x,hdFERouteShips(plan),plan).status==='missing')?fallback.rank:0;
@@ -544,7 +551,8 @@ function hdFEPlanSpeedTarget(plan){
   const canonical=hdFSPresetInfo(MAP_PLANS[plan.map].presets[contract.index]),keys=['text','requirements','total','conditionManual','speedRequired','flagship'];
   selected=Math.max(contract.index===1&&contract.useExampleSpeedScope===false?0:hdFESpeedTarget(canonical),...[plan?.routeInfo,plan?.suggestion?.info].filter(info=>info&&keys.some(k=>JSON.stringify(info[k])!==JSON.stringify(canonical[k]))).map(hdFESpeedTarget));
  }
- return Math.max(selected,goal?.speed||0,required||0,contract?.minimumSpeed||0,conditional);
+ const ceioDD4=contract?.map==='2-5'&&contract.index===1&&contract.path==='CEIO'&&hdFETwoFiveSouthDD4Scope(plan,contract);
+ return Math.max(ceioDD4?0:selected,goal?.speed||0,required||0,ceioDD4?0:contract?.minimumSpeed||0,conditional);
 }
 function hdFERouteRequirementData(plan){
  if(typeof hdMapPresetRequirements!=='function')return null;
@@ -638,7 +646,7 @@ function hdFEOneFiveAswSelection(plan,rows=null){
 function hdFERoute(plan){
  const basic=hdFERouteBasic(plan),branch=hdFEBranchRoute(plan);
  if(!branch.available){const contract=hdFERouteContract(plan);if(!contract)return {...basic,branch};
-  const info=plan?.suggestion?.info||plan?.routeInfo,canonical=hdFSPresetInfo(MAP_PLANS[plan.map].presets[contract.data.index]),keys=['text','requirements','total','conditionManual','speedRequired','flagship'],oneFiveAlternate=contract.data.map==='1-5'&&contract.data.index===1&&contract.data.path==='ADFGJ'&&basic.status!=='ready'&&!!info&&[plan?.routeInfo,plan?.suggestion?.info].filter(Boolean).every(x=>keys.every(k=>JSON.stringify(x[k])===JSON.stringify(canonical[k])))&&(typeof hdFEOneFiveRouteScope==='function'&&hdFEOneFiveRouteScope(plan,contract.data).eligible),general=contract.data.useExampleScope===false||oneFiveAlternate,conditionalExample=contract.data.map==='6-4'&&contract.data.index===0&&contract.data.useExampleFlagshipScope===false;
+  const info=plan?.suggestion?.info||plan?.routeInfo,canonical=hdFSPresetInfo(MAP_PLANS[plan.map].presets[contract.data.index]),keys=['text','requirements','total','conditionManual','speedRequired','flagship'],oneFiveAlternate=contract.data.map==='1-5'&&contract.data.index===1&&contract.data.path==='ADFGJ'&&basic.status!=='ready'&&!!info&&[plan?.routeInfo,plan?.suggestion?.info].filter(Boolean).every(x=>keys.every(k=>JSON.stringify(x[k])===JSON.stringify(canonical[k])))&&(typeof hdFEOneFiveRouteScope==='function'&&hdFEOneFiveRouteScope(plan,contract.data).eligible),twoFiveDD4=contract.data.map==='2-5'&&contract.data.index===1&&contract.data.path==='CEIO'&&hdFETwoFiveSouthDD4Scope(plan,contract.data),general=contract.data.useExampleScope===false||oneFiveAlternate||twoFiveDD4,conditionalExample=contract.data.map==='6-4'&&contract.data.index===0&&contract.data.useExampleFlagshipScope===false;
   const customInfo=plan.routeInfo&&['requirements','total','conditionManual','speedRequired','flagship'].some(k=>JSON.stringify(plan.routeInfo[k])!==JSON.stringify(canonical[k]))||conditionalExample&&info&&keys.some(k=>JSON.stringify(info[k])!==JSON.stringify(canonical[k]));
   const chosenScopedInfo=(contract.data.map==='3-1'&&contract.data.index===0&&contract.data.path==='CFG'||contract.data.map==='6-5'&&[0,1].includes(contract.data.index)||contract.data.map==='7-1'&&contract.data.index===0||contract.data.map==='7-2'&&[0,1].includes(contract.data.index)||contract.data.map==='7-3'&&contract.data.index===0||contract.data.map==='7-4'&&contract.data.index===0||contract.data.map==='7-5'&&[0,1].includes(contract.data.index))&&general&&!!info&&keys.some(k=>JSON.stringify(info[k])!==JSON.stringify(canonical[k]));
   const explicitSpeed=(contract.data.map==='3-1'&&contract.data.index===0&&contract.data.path==='CFG'||contract.data.map==='7-2'&&[0,1].includes(contract.data.index)||contract.data.map==='7-3'&&contract.data.index===0||contract.data.map==='7-4'&&contract.data.index===0||contract.data.map==='7-5'&&[0,1].includes(contract.data.index))&&general?Math.max(0,...[plan?.routeInfo,plan?.suggestion?.info].filter(x=>x&&keys.some(k=>JSON.stringify(x[k])!==JSON.stringify(canonical[k]))).map(hdFESpeedTarget)):0;

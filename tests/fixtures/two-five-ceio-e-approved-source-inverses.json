@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "unit": "two-five-ceio-e",
+  "beforeSourceHEAD": "f37b7e2009fa2090059c4569efb066a477714519",
+  "files": {
+    "map-plans.js": {
+      "beforeSHA256": "0e475dcb0952da28d8371f59b5c3205671f883fea09e23dd80d5a7345a55f18a",
+      "approvedAfterSHA256": "3930f0a4e89c2a2a7bf12c40114767814c6aacd05997e4fd6d2cfe4df719362e",
+      "beforeBytes": 163876,
+      "afterBytes": 164988
+    },
+    "fleet-readiness-evaluator.js": {
+      "beforeSHA256": "c82d4dc820990aa1b78d4324521e1385039b56dc98ccca2752953c800c7c7154",
+      "approvedAfterSHA256": "d2748531573c59777704c674541bdbf7da5e1e15770b76beb6b293bda7fe7551",
+      "beforeBytes": 125480,
+      "afterBytes": 126604
+    }
+  },
+  "changes": [
+    {
+      "file": "map-plans.js",
+      "before": "gear:'艦戦＋偵察機・電探。高速統一、索敵33式係数1で34以上を確認（司令部Lv119以下は余裕を取る）。'",
+      "after": "gear:'艦戦＋偵察機・電探。元の軽空母1＋駆逐3例は高速統一。軽巡1＋駆逐4の先行I条件では速力を問いません。Iの索敵は33式係数1・司令部Lv120の固定O条件34以上とランダム域を区別します。'"
+    },
+    {
+      "file": "map-plans.js",
+      "before": "add('2-5',1,'CEIO',[fleet(6),speed(10),count(['bb','ss'],0,0)",
+      "after": "const ceioDD4={all:[fleet(6),count(['cvn'],1,1),count(['cl'],1,1),count(['dd'],4,4)]};\n add('2-5',1,'CEIO',[fleet(6),{any:[ceioDD4,speed(10)],reason:'E→I：先行する軽巡1＋駆逐4（正規・装甲空母1を含む既知6隻）は速力条件なし。それ以外は高速以上統一を確認。戦艦級の先行Gなど他の条件は別に確認'},count(['bb','ss'],0,0)"
+    },
+    {
+      "file": "map-plans.js",
+      "before": "{minimumSpeed:10,los:{...los(1,34,31),preserveRandomBand:true,verifiedHq:120},notes:[",
+      "after": "{minimumSpeed:10,speedOptionalWhen:ceioDD4,los:{...los(1,34,31),preserveRandomBand:true,verifiedHq:120},notes:['Eは戦艦級1以上で先にG、次に軽巡1以上＋駆逐4以上でI。その後に正規・装甲空母＋重巡級2以上でG、軽巡1以上＋駆逐3以上かつ高速以上でI。軽巡は軽巡洋艦のみ、駆逐に海防艦を含めません。今回の既知6隻・正規/装甲空母1＋軽巡1＋駆逐4の範囲は速力によらずIを確認し、元の軽空母1＋駆逐3例や利用者が指定した速力条件は維持します。',"
+    },
+    {
+      "file": "map-plans.js",
+      "before": "元の軽空母1＋駆逐3例や利用者が指定した速力条件は維持します。',",
+      "after": "元の軽空母1＋駆逐3例や利用者が指定した速力条件は維持します。艦種・隻数の不一致は編成を見直す条件で、缶・タービンの購入では解消しません。合法な装備による速力条件の改善とは分けて確認します。',"
+    },
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "before": "function hdFEPlanSpeedTarget(plan){",
+      "after": "function hdFETwoFiveSouthDD4Scope(plan,data=null){\n if(plan?.map!=='2-5')return false;data=data||hdFERouteRequirementData(plan);\n if(data?.index!==1||data.path!=='CEIO'||!data.speedOptionalWhen||typeof hdFSPresetInfo!=='function')return false;\n const canonical=hdFSPresetInfo(MAP_PLANS[plan.map].presets[data.index]),keys=['text','requirements','total','conditionManual','speedRequired','flagship'],infos=[plan.routeInfo,plan.suggestion?.info].filter(Boolean);\n if(!infos.length||infos.some(info=>keys.some(key=>JSON.stringify(info[key])!==JSON.stringify(canonical[key]))))return false;\n const ships=hdFERouteShips(plan);return ships.length===6&&ships.every(ship=>ship.typeKnown)&&hdFEBranchPredicate(data.speedOptionalWhen,ships,plan).status==='ready';\n}\nfunction hdFEPlanSpeedTarget(plan){"
+    },
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "before": "return Math.max(selected,goal?.speed||0,required||0,contract?.minimumSpeed||0,conditional);",
+      "after": "const ceioDD4=contract?.map==='2-5'&&contract.index===1&&contract.path==='CEIO'&&hdFETwoFiveSouthDD4Scope(plan,contract);\n return Math.max(ceioDD4?0:selected,goal?.speed||0,required||0,ceioDD4?0:contract?.minimumSpeed||0,conditional);"
+    },
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "before": "general=contract.data.useExampleScope===false||oneFiveAlternate,conditionalExample",
+      "after": "twoFiveDD4=contract.data.map==='2-5'&&contract.data.index===1&&contract.data.path==='CEIO'&&hdFETwoFiveSouthDD4Scope(plan,contract.data),general=contract.data.useExampleScope===false||oneFiveAlternate||twoFiveDD4,conditionalExample"
+    },
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "before": "if(plan?.map!=='2-5')return false;data=data||hdFERouteRequirementData(plan);",
+      "after": "if(plan?.map!=='2-5'||!Array.isArray(plan.ships)||plan.ships.filter(ship=>ship?.ship).length!==6)return false;data=data||hdFERouteRequirementData(plan);"
+    }
+  ]
+}

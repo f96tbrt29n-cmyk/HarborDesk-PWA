@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "unit": "two-five-ceio-e",
+  "scope": "Canonical ordinary six-hull CEIO scope only. The I35 arithmetic reuses the previous deliberately synthetic synchronized input, not attainable game stats or a victory guarantee. Unknown speed on a known CL is a separate Node boundary, not synthesized by changing the browser master database.",
+  "reuse": "two-five-ceio-browser-inputs.json: gun, level, guaranteed.bareLos (independent 33 formula coefficient1/HQ120 score35)",
+  "dd4": {"names":["翔鶴改二","夕張改二特","島風改","夕立改二","時雨改二","雪風改"],"types":["正規空母","軽巡洋艦","駆逐艦","駆逐艦","駆逐艦","駆逐艦"]},
+  "dd3": {"names":["翔鶴改二","瑞鳳改二","夕張改二特","島風改","夕立改二","時雨改二"],"types":["正規空母","軽空母","軽巡洋艦","駆逐艦","駆逐艦","駆逐艦"]},
+  "slowCL": {"name":"夕張改二特","masterId":623,"nativeSpeed":5,"group":"LS"},
+  "boiler": "新型高温高圧缶",
+  "turbine": "改良型艦本式タービン",
+  "known": {"fleet":"dd4","hq":120,"clIndex":1,"boilerStock":0,"recoverObservedGun":true,"expectedScope":true,"expectedE":"ready","expectedI":"ready","expectedRoute":"ready","expectedSpeedTarget":0},
+  "missing": {"fleet":"dd3","hq":120,"clIndex":2,"boilerStock":1,"recoverObservedGun":true,"expectedScope":false,"expectedE":"missing","expectedI":"ready","expectedRoute":"missing","expectedSpeedTarget":10},
+  "unknown": {"fleet":"dd4","hq":null,"clIndex":1,"boilerStock":0,"recoverObservedGun":false,"expectedScope":true,"expectedE":"ready","expectedI":"manual","expectedRoute":"manual","expectedSpeedTarget":0},
+  "inventoryLimit": "Finite observed gun1 and, only for DD3 missing, observed boiler1 on the same CL. Turbine0 and radar0 in every state. No unassigned optional scouting item may invalidate the known I input. LS needs turbine1 alone for speed10; boiler1 is a counterexample, not a required extra boiler."
+}

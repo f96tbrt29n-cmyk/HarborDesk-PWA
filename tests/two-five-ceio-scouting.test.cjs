@@ -5,6 +5,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {createTwoFiveCeioModelContext}=require('./fixtures/two-five-ceio-model-context.cjs');
 const {createTwoFiveCeioHistoricalProjection}=require('./fixtures/two-five-ceio-source-layer.cjs');
+const {createTwoFiveCeioEHistoricalProjection}=require('./fixtures/two-five-ceio-e-source-layer.cjs');
 const ROOT=path.resolve(__dirname,'..'),host=x=>JSON.parse(JSON.stringify(x)),hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 const observations={schemaVersion:1,scope:'synthetic Node source-counterexample and literal routing boundaries only',fullGeneratorCalls:0,browserExecuted:false,boundaries:[],precedingSource:[]};
 if(process.env.HD25_CEIO_PRIVATE_OBSERVATIONS)process.on('exit',()=>fs.writeFileSync(process.env.HD25_CEIO_PRIVATE_OBSERVATIONS,JSON.stringify(observations,null,2)+'\n'));
@@ -31,8 +32,10 @@ function unchanged(h){assert.equal(JSON.stringify([...h.store]),h.storeBefore,'s
 function beforeContext(){return createTwoFiveCeioModelContext({project:createTwoFiveCeioHistoricalProjection(ROOT)})}
 
 test('CEIO approved inverse restores and replays exact preceding product files',()=>{
- const project=createTwoFiveCeioHistoricalProjection(ROOT),approved=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/two-five-ceio-approved-source-inverses.json'),'utf8'));
- for(const [file,row]of Object.entries(approved.files)){const current=fs.readFileSync(path.join(ROOT,file),'utf8'),previous=project(file,current);assert.equal(hash(current),row.approvedAfterSHA256);assert.equal(hash(previous),row.beforeSHA256);assert.notEqual(current,previous)}
+ const project=createTwoFiveCeioHistoricalProjection(ROOT),projectE=createTwoFiveCeioEHistoricalProjection(ROOT),approved=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/two-five-ceio-approved-source-inverses.json'),'utf8'));
+ // Current I semantics are tested below against raw current modules. This exact
+ // historical endpoint check restores E once on each independent raw input.
+ for(const [file,row]of Object.entries(approved.files)){const raw=fs.readFileSync(path.join(ROOT,file),'utf8'),current=projectE(file,raw),previous=project(file,raw);assert.equal(hash(current),row.approvedAfterSHA256);assert.equal(hash(previous),row.beforeSHA256);assert.notEqual(current,previous)}
 });
 
 test('CEIO I coefficient1 HQ120 literal 31 and34 adjacent boundaries remain distinct through actual final route',()=>{
