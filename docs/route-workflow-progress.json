@@ -3270,9 +3270,10 @@
       "2-4/0/default"
     ],
     "record": "optionalAaBatch20261106",
-    "state": "local UI4 initialpass reused; full704Node passes after four delimiter-only harness repairs; corrected-source smoke pending"
+    "state": "optional AA limited display batch complete; CI42119476156 4success/W2failure/C2cancel; W895/15/2, C1subtotal456/0/0, fullCnull; target4initialpass; old originals/gaps retained",
+    "sourceHEAD": "88a3c0a44a59309e00aa5157ce42fb10c569cc9d"
   },
-  "nextPriority": "1-3/0 normal・cfj＋1-4/0 normal・j-avoid：既存任意空母攻撃機目標の艦別合法枠・不足案内の接続漏れを共通確認。目標数/探索/保存は変えず、適用する選択経路と既存出典を先に照合する。静的候補で未実装・未検証。",
+  "nextPriority": "1-3 normal/cfj＋1-4 normal/j-avoidの任意空母攻撃機：既存目標は生成されるが艦別搭載先案内が接続されない4条件を、現source88の実Node対照4件で確認済み。共通helper/callerの適用範囲だけを最小修正する次バッチへ進む。製品修正・新UI操作は未実施で、既存成功を新案内へ流用しない。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -7219,8 +7220,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "local UI4 initialpass reused; full704Node passes after four delimiter-only harness repairs; corrected-source smoke pending",
-    "nextUnit": "1-3/0 normal・cfj＋1-4/0 normal・j-avoid：既存任意空母攻撃機目標の艦別合法枠・不足案内の接続漏れを共通確認。目標数/探索/保存は変えず、適用する選択経路と既存出典を先に照合する。静的候補で未実装・未検証。",
+    "activeUnit": "optional AA limited display batch complete; CI42119476156 4success/W2failure/C2cancel; W895/15/2, C1subtotal456/0/0, fullCnull; target4initialpass; old originals/gaps retained",
+    "nextUnit": "1-3 normal/cfj＋1-4 normal/j-avoidの任意空母攻撃機：既存目標は生成されるが艦別搭載先案内が接続されない4条件を、現source88の実Node対照4件で確認済み。共通helper/callerの適用範囲だけを最小修正する次バッチへ進む。製品修正・新UI操作は未実施で、既存成功を新案内へ流用しない。",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -21388,7 +21389,7 @@
       "firstPrivateSelectorDefectBrowserExecutions": 0
     },
     "ci": {
-      "state": "initialsource97 Nodegatefailure retained; delimiter-only four-test repair passes all704; corrected new-source normal smoke pending; sameHEADrerun0",
+      "state": "optional AA limited display batch complete; CI42119476156 4success/W2failure/C2cancel; W895/15/2, C1subtotal456/0/0, fullCnull; target4initialpass; old originals/gaps retained",
       "partition": "same four WebKit jobs; whole-file LPT using one prior run occupancy estimates; all fixed cases retained",
       "smallResults": "atomic per-attempt metadata before retained existing raw artifact upload; incomplete is not final success"
     },
@@ -21412,7 +21413,7 @@
       "2-4 automatic placement/save/edit full route operation",
       "3-1 HQ-dependent enemy-pattern applicability"
     ],
-    "next": "1-3/0 normal・cfj＋1-4/0 normal・j-avoid：既存任意空母攻撃機目標の艦別合法枠・不足案内の接続漏れを共通確認。目標数/探索/保存は変えず、適用する選択経路と既存出典を先に照合する。静的候補で未実装・未検証。",
+    "next": "1-3 normal/cfj＋1-4 normal/j-avoidの任意空母攻撃機：既存目標は生成されるが艦別搭載先案内が接続されない4条件を、現source88の実Node対照4件で確認済み。共通helper/callerの適用範囲だけを最小修正する次バッチへ進む。製品修正・新UI操作は未実施で、既存成功を新案内へ流用しない。",
     "nodeFullAfterHarnessRepair": {
       "pass": 704,
       "fail": 0,
@@ -21432,6 +21433,140 @@
       "sameHEADRerun": 0,
       "record": "private/ci-97a4f317/analysis/canonical-ci-collection.json",
       "sha256": "a15daa82f2259983bd537ef92f2f5faa789e53fed9325326a9696774250a0d23"
+    },
+    "ciFinal": {
+      "source": "88a3c0a44a59309e00aa5157ce42fb10c569cc9d",
+      "run": 42119476156,
+      "attempt": 1,
+      "runConclusion": "failure",
+      "smokeJobs": {
+        "success": 4,
+        "failure": 1,
+        "cancelled": 1
+      },
+      "full": "skipped",
+      "W": [
+        895,
+        15,
+        2
+      ],
+      "C": null,
+      "C1": [
+        456,
+        0,
+        0
+      ],
+      "C2": {
+        "scheduled": 456,
+        "beginObserved": 456,
+        "passedEndObserved": 455,
+        "beginWithoutEnd": 1,
+        "retryObserved": 0,
+        "runFinished": false,
+        "fullStatus": null,
+        "allFinalOutcomes": null,
+        "processExit": null,
+        "reason": "smoke step cancelled at job45m; no native onEnd/footer; last case end callback not observed; not a product failure classification"
+      },
+      "targetInitialPass": 4,
+      "targetStorageAndGoalVectorExact": true,
+      "localNodePass": 704,
+      "localUIPass": 4,
+      "sameHEADRerun": 0,
+      "initialSourceCI": {
+        "source": "97a4f317",
+        "run": 42117858350,
+        "nodePerJob": {
+          "tests": 704,
+          "pass": 700,
+          "fail": 4
+        },
+        "browserStarted": false,
+        "repair": "four test extraction boundaries only; product/browser/input unchanged"
+      },
+      "jobText": "4smoke成功・W2最終失敗・C2がsmoke本体で45分上限取消、Full skipped",
+      "countText": "passed/flaky/failedは全W895/15/2、C1小計456/0/0で全C未確定",
+      "C2Text": "C2は456件の開始と455件のpassed終了を採取したが、最後の1件は終了callback/全体footer欠測のためfailed/interruptedへ換算しない。",
+      "state": "optional AA limited display batch complete; CI42119476156 4success/W2failure/C2cancel; W895/15/2, C1subtotal456/0/0, fullCnull; target4initialpass; old originals/gaps retained",
+      "timing": {
+        "priorW4": {
+          "runId": 42024915243,
+          "preSeconds": 87,
+          "smokeSeconds": 2613,
+          "postSeconds": 55,
+          "rawUploadSeconds": 42,
+          "smokeConclusion": "cancelled at 45m job budget"
+        },
+        "currentW4": {
+          "preSeconds": 81.0,
+          "smokeSeconds": 958.0,
+          "postSeconds": 16.0,
+          "jobSeconds": 1055.0,
+          "uploadSteps": [
+            {
+              "name": "Preserve compact smoke results",
+              "conclusion": "success",
+              "seconds": 1.0
+            },
+            {
+              "name": "Preserve seven-three first-gauge comparison summary",
+              "conclusion": "success",
+              "seconds": 2.0
+            },
+            {
+              "name": "Upload Playwright diagnostics",
+              "conclusion": "skipped",
+              "seconds": 0.0
+            },
+            {
+              "name": "Preserve failed-attempt diagnostics after successful retries",
+              "conclusion": "success",
+              "seconds": 7.0
+            },
+            {
+              "name": "Preserve prerequisite import evidence including successful retries",
+              "conclusion": "success",
+              "seconds": 1.0
+            }
+          ]
+        },
+        "currentMaximumWebKitSmokeSeconds": 1832.0,
+        "currentMaximumWebKitJobSeconds": 1928.0,
+        "currentMaximumAllJobSeconds": 2770.0,
+        "limits": "one fixed-source CI run per configuration; whole-file redistribution changed the W4 workload. Completion/timing observation is not a hardware-independent guarantee or a cause claim for every older cancellation. Current C2 timed out during smoke, before 63s diagnostic upload."
+      },
+      "knownGaps": [
+        "C2 current final case end callback/native final aggregate absent",
+        "exact Node job-footer counts absent in five jobs; official gate passed in all six",
+        "own pull-log registry digest unavailable in five jobs; per-job verified environment receipts retained",
+        "some flaky initial-attempt detailed error boundaries missing from official annotation limit and raw logs; no retry used to fill them"
+      ],
+      "fixedEnvironmentReceiptsMatched": 6,
+      "nodeExactCountCIJobs": {
+        "webkit3": 704,
+        "otherFive": null
+      },
+      "canonicalReference": "analysis/canonical-ci-collection.json SHA256 5ad5a0b6634b359d3395c28df8131c69229895e8e3b59ad9f50179c12b5ab1da",
+      "manifestSHA256": "7754a3ab999e97ecb4fabf6060402554584455531852996f70a28cc2ba0a6189",
+      "independentReviewSHA256": "3b054ba4a800ec6d8a5cf03e1fabd4ef956d5364607a8876378c9180c0a977e4",
+      "independentManifestMatched": 29,
+      "smallArchives": {
+        "count": 13,
+        "bytes": 442666,
+        "membersSHAAndCRCMatched": 52
+      },
+      "cellChange": 0,
+      "storageValueBodiesIncluded": false,
+      "ciResidual": "Chromium native case-count partition C2 smoke budget remains; use existing duration evidence in a later batch, no run solely to fill missing case."
+    },
+    "nextBaselineCountercases": {
+      "pass": 4,
+      "fail": 0,
+      "source": "88a3c0a44a59309e00aa5157ce42fb10c569cc9d",
+      "record": "shared/next-carrier-baseline.json",
+      "productEdits": 0,
+      "browserExecutions": 0,
+      "cellChange": 0
     }
   }
 }
