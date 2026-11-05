@@ -4,13 +4,14 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
 const root=process.env.HD_THREE_ONE_ORACLE_ROOT||path.resolve(__dirname,'..'),baseline=require('./fixtures/three-one-cfg-before.json'),expected=require('./fixtures/three-one-cfg-expectations.json');
 const {createOneFiveCl1Dd3HistoricalProjection}=require('./fixtures/one-five-cl1-dd3-source-layer.cjs'),projectOneFiveQuantity=createOneFiveCl1Dd3HistoricalProjection(root);
+const {createTwoFiveCeioHistoricalProjection}=require('./fixtures/two-five-ceio-source-layer.cjs'),projectCEIO=createTwoFiveCeioHistoricalProjection(root);
 const text=name=>fs.readFileSync(path.join(root,name),'utf8'),plain=value=>JSON.parse(JSON.stringify(value)),hash=value=>crypto.createHash('sha256').update(value).digest('hex');
 function fn(source,name){const a=source.indexOf('function '+name+'('),b=source.indexOf('\nfunction ',a+1);assert.ok(a>=0,name);return source.slice(a,b<0?undefined:b)}
 function load(source,name,c){if(name==='hdFEEquipmentRequirements'&&!c.hdFEOneFiveAswSelection)load(source,'hdFEOneFiveAswSelection',c);vm.runInContext(fn(source,name),c);return c[name]}
 const STYPES={BB:9,FBB:8,BBV:10,CV:11,CVB:18,CVL:7,CA:5,CAV:6,CL:3,CLT:4,CT:21,DD:2,DE:1,AS:20,AV:16,AO:22,SS:13,SSV:14,LHA:17,CD:12};
-function routeContext(old=false){
- const evaluator=text('fleet-readiness-evaluator.js'),fleet=text('fleet-suggester.js'),masters=new Map(),ids=new Map(),c=vm.createContext({window:{},localStorage:{getItem:()=>null},hdFEFind:()=>({}),hdFEFindShip:name=>masters.get(name)||null,hdShipDbMasterRowFor:row=>ids.get(Number(row?.masterId))||masters.get(typeof row==='string'?row:row?.name||row?.final)||null,hdShipDbSlotProfile:()=>null,hdFEExpansionAvailability:()=>({allowed:false,status:'manual'})});
- vm.runInContext(old?baseline.mapPlanSource:text('map-plans.js'),c);const maps=vm.runInContext('MAP_PLANS',c),contracts=vm.runInContext('HD_MAP_ROUTE_REQUIREMENTS',c),a=fleet.indexOf('const HD_FS_TYPE_ALIASES='),b=fleet.indexOf('\n};',a)+3;vm.runInContext(old?baseline.fleetTypeAliasesSource:fleet.slice(a,b),c);
+function routeContext(old=false,historicalCEIO=false){
+ const evaluator=historicalCEIO?projectCEIO('fleet-readiness-evaluator.js',text('fleet-readiness-evaluator.js')):text('fleet-readiness-evaluator.js'),fleet=text('fleet-suggester.js'),masters=new Map(),ids=new Map(),c=vm.createContext({window:{},localStorage:{getItem:()=>null},hdFEFind:()=>({}),hdFEFindShip:name=>masters.get(name)||null,hdShipDbMasterRowFor:row=>ids.get(Number(row?.masterId))||masters.get(typeof row==='string'?row:row?.name||row?.final)||null,hdShipDbSlotProfile:()=>null,hdFEExpansionAvailability:()=>({allowed:false,status:'manual'})});
+ vm.runInContext(old?baseline.mapPlanSource:historicalCEIO?projectCEIO('map-plans.js',text('map-plans.js')):text('map-plans.js'),c);const maps=vm.runInContext('MAP_PLANS',c),contracts=vm.runInContext('HD_MAP_ROUTE_REQUIREMENTS',c),a=fleet.indexOf('const HD_FS_TYPE_ALIASES='),b=fleet.indexOf('\n};',a)+3;vm.runInContext(old?baseline.fleetTypeAliasesSource:fleet.slice(a,b),c);
  for(const name of ['hdFSTypeMatches','hdFSRequirementPatterns','hdFSPresetInfo'])vm.runInContext(old?baseline.fleetFunctions[name]:fn(fleet,name),c);
  for(const name of Object.keys(baseline.functions))vm.runInContext(old?baseline.functions[name]:fn(evaluator,name),c);
  c.hdFEAssigned=()=>[];c.hdFEGameMatch=()=>({status:'ready'});
@@ -53,8 +54,9 @@ test('3-1 CFG selected user conditions and both speed inputs remain effective',(
  for(const [first,second]of [[20,15],[15,20]]){const plan=h.make(canonical,15);plan.routeInfo={...plain(plan.routeInfo),text:first===20?'利用者 最速統一':'利用者 高速+統一',speedRequired:true};plan.suggestion={preset:plan.preset,info:{...plain(plan.routeInfo),text:second===20?'利用者 最速統一':'利用者 高速+統一'}};assert.equal(h.c.hdFEPlanSpeedTarget(plan),20);assert.equal(h.c.hdFERoute(plan).status,'missing','both explicit inputs remain effective')}
 });
 
-test('3-1 CFG scoped changes preserve other51 preset route and speed outputs outside independently covered 1-5/1',()=>{
- const now=routeContext(),old=routeContext(true);let presets=0,comparisons=0;
+// The changed CEIO contract is reversed by its approved whole-source layer only here; its current semantics have an independent CEIO oracle.
+test('3-1 CFG scoped changes preserve other51 historical preset outputs with approved CEIO projection and independent current 1-5/1 oracle',()=>{
+ const now=routeContext(false,true),old=routeContext(true);let presets=0,comparisons=0;
  for(const [map,data]of Object.entries(now.maps))for(const [index,preset]of data.presets.entries()){
   if(map==='3-1'&&index===0||map==='1-5'&&index===1)continue;presets++;assert.deepEqual(plain(now.contracts[map][index]),plain(old.contracts[map][index]));
   for(const mode of ['canonical','chosen-manual','explicit-speed','unknown']){const make=h=>{const plan=h.make(['CL','DD','DD','DD','DD','DD'],mode==='unknown'?null:10);plan.map=map;plan.routeIndex=index;plan.preset=h.maps[map].presets[index];plan.routeInfo=plain(h.c.hdFSPresetInfo(plan.preset));plan.score=100;if(mode==='chosen-manual')plan.suggestion={preset:plan.preset,info:{...plain(plan.routeInfo),conditionManual:true}};if(mode==='explicit-speed')plan.routeInfo={...plan.routeInfo,text:'利用者 高速+統一',speedRequired:true};return plan},a=make(now),b=make(old);assert.deepEqual(plain(now.c.hdFERoute(a)),plain(old.c.hdFERoute(b)),map+'/'+index+'/'+mode);assert.equal(now.c.hdFEPlanSpeedTarget(a),old.c.hdFEPlanSpeedTarget(b));comparisons++}

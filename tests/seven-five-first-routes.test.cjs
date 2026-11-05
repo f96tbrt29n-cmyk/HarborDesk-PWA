@@ -2,14 +2,15 @@
 // Independent source/model proposals; finite Node evidence is recorded separately from browser arrival.
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
 const root=path.join(__dirname,'..'),fixtureRoot=path.join(__dirname,'fixtures');
+const {createTwoFiveCeioHistoricalProjection}=require('./fixtures/two-five-ceio-source-layer.cjs'),projectCEIO=createTwoFiveCeioHistoricalProjection(root);
 const source=require('./fixtures/seven-five-first-source-proposals.json'),concrete=require('./fixtures/seven-five-first-concrete-proposals.json'),scope=require('./fixtures/seven-five-first-scope-expectations.json'),baseline=require('./fixtures/seven-five-first-baseline.json'),additional=require('./fixtures/seven-five-first-additional-source-literals.json');
 const TYPES={CA:'重巡洋艦',CAV:'航空巡洋艦',CL:'軽巡洋艦',CLT:'重雷装巡洋艦',CT:'練習巡洋艦',DD:'駆逐艦',DE:'海防艦',CD:'海防戦艦',BB:'戦艦',FBB:'高速戦艦',BBV:'航空戦艦',CV:'正規空母',CVB:'装甲空母',CVL:'軽空母',AV:'水上機母艦',AO:'補給艦',AS:'潜水母艦',SS:'潜水艦',SSV:'潜水空母',LHA:'揚陸艦',AR:'工作艦',UNKNOWN:'?'};
 const STYPES={BB:9,FBB:8,BBV:10,CL:3,CLT:4,CT:21,CA:5,CAV:6,CV:11,CVB:18,CVL:7,DD:2,DE:1,CD:12,AV:16,SS:13,SSV:14,AS:20,AO:22,LHA:17,AR:19};
 const original=['CAV','CLT','CL','DD','DD','AV'],plain=x=>JSON.parse(JSON.stringify(x)),sha=x=>crypto.createHash('sha256').update(x).digest('hex');
 function fn(sourceText,name){const a=sourceText.indexOf('function '+name+'('),b=sourceText.indexOf('\nfunction ',a+1);assert.ok(a>=0,name+' exists');return sourceText.slice(a,b<0?undefined:b)}
 function load(sourceText,name,c){vm.runInContext(fn(sourceText,name),c)}
-function context(old=false){
- const evaluator=old?baseline.evaluatorSource:fs.readFileSync(path.join(root,'fleet-readiness-evaluator.js'),'utf8'),plans=old?baseline.mapPlanSource:fs.readFileSync(path.join(root,'map-plans.js'),'utf8'),masters=new Map(),ids=new Map();
+function context(old=false,historicalCEIO=false){
+ const evaluator=old?baseline.evaluatorSource:historicalCEIO?projectCEIO('fleet-readiness-evaluator.js',fs.readFileSync(path.join(root,'fleet-readiness-evaluator.js'),'utf8')):fs.readFileSync(path.join(root,'fleet-readiness-evaluator.js'),'utf8'),plans=old?baseline.mapPlanSource:historicalCEIO?projectCEIO('map-plans.js',fs.readFileSync(path.join(root,'map-plans.js'),'utf8')):fs.readFileSync(path.join(root,'map-plans.js'),'utf8'),masters=new Map(),ids=new Map();
  const c=vm.createContext({window:{},localStorage:{getItem:()=>null},hdFEFind:()=>({}),hdFEFindShip:name=>masters.get(name)||null,hdShipDbMasterRowFor:x=>ids.get(Number(x?.masterId))||masters.get(typeof x==='string'?x:x?.name||x?.final)||null,hdShipDbSlotProfile:()=>null,hdFEExpansionAvailability:()=>({allowed:false,status:'manual'})});
  vm.runInContext(plans,c);const all=vm.runInContext('HD_MAP_ROUTE_REQUIREMENTS',c),maps=vm.runInContext('MAP_PLANS',c);
  const fleetSource=fs.readFileSync(path.join(root,'fleet-suggester.js'),'utf8'),a=fleetSource.indexOf('const HD_FS_TYPE_ALIASES='),b=fleetSource.indexOf('\n};',a)+3;vm.runInContext(old?baseline.fleetTypeAliasesSource:fleetSource.slice(a,b),c);
@@ -112,8 +113,9 @@ test('chosen requirements, complete details, flagship and each explicit speed in
 // The independent second-gauge oracle in seven-five-second-routes.test.cjs owns changed7-5/1.
 // Changed3-1/index0 and1-5/index1 use their independent current oracles.
 // Keep every field/output of the remaining49 presets in this legacy reverse comparison.
-test('before/new isolated implementations preserve full outputs for the other49 presets and4 modes; 3-1/0 and1-5/1 have dedicated oracles',()=>{
- const now=context(),old=context(true);let presets=0,comparisons=0;
+// CEIO is intentionally historical only in this reverse comparison; its current band has its own literal oracle.
+test('before/new isolated implementations preserve full outputs for other49 historical presets and4 modes with approved CEIO projection',()=>{
+ const now=context(false,true),old=context(true);let presets=0,comparisons=0;
  for(const [map,data]of Object.entries(now.maps))for(const [index,preset]of data.presets.entries()){
   if(map==='3-1'&&index===0||map==='7-5'&&(index===0||index===1)||map==='1-5'&&index===1)continue;presets++;
   assert.deepEqual(plain(now.all[map][index]),plain(old.all[map][index]),map+'/'+index+' unchanged route data');

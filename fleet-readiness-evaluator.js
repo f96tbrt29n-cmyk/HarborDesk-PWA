@@ -468,7 +468,7 @@ function hdFEBranchPredicate(condition,ships,plan=null){
   if(condition.kind==='scoutingValue'&&m.available===false)return manual(m.detail||'索敵計算に必要な情報が不足しています');
   if(condition.coef!=null&&(!Number.isInteger(condition.coef)||condition.coef<1||condition.coef>4||m.coef!==condition.coef))return manual('索敵の分岐点係数が一致していません');
   if(!Number.isFinite(value)||items.some(x=>x.name&&!hdFEFind(x.name))||m.status==='manual'||condition.kind==='airValue'&&m.capacityKnown<m.count)return manual('索敵・制空の計算情報が不足');
-  return {status:value>=condition.min?'ready':condition.failBelow!=null&&value>=condition.failBelow?'partial':'missing',ratio:Math.min(1,value/Math.max(1,condition.min)),count:value,min:condition.min,...(condition.failBelow!=null?{failBelow:condition.failBelow,knownRandom:value>=condition.failBelow&&value<condition.min}:{}),detail:`${condition.kind==='scoutingValue'?'索敵':'制空'} ${value}/${condition.min}（あと${Math.max(0,condition.min-value)}）${condition.failBelow!=null&&value>=condition.failBelow&&value<condition.min?'（既知ランダム域。固定経路は未成立）':''}`};
+  return {status:value>=condition.min?'ready':condition.failBelow!=null&&value>=condition.failBelow?'partial':'missing',ratio:Math.min(1,value/Math.max(1,condition.min)),count:value,min:condition.min,...(condition.failBelow!=null?{failBelow:condition.failBelow,knownRandom:value>=condition.failBelow&&value<condition.min}:{}),detail:condition.kind==='scoutingValue'&&plan.map==='2-5'&&m.route==='CEIO'&&m.hq===120&&condition.min===34&&condition.failBelow===31?`Iの33式係数1・司令部Lv120：${value}。${value<31?'31未満はHへ進む条件です。':value<34?'31以上34未満のランダム域です。固定Oは未成立です。':'Iの固定O条件は成立しています。'}固定O条件34を目指す差は ${Math.max(0,34-value)}。装備の必要個数・購入必須や経路全体・戦闘勝利は示しません。`:`${condition.kind==='scoutingValue'?'索敵':'制空'} ${value}/${condition.min}（あと${Math.max(0,condition.min-value)}）${condition.failBelow!=null&&value>=condition.failBelow&&value<condition.min?'（既知ランダム域。固定経路は未成立）':''}`};
  }
  if(condition.kind==='minSpeed'){
   if(![10,15,20].includes(condition.rank)||!ships.length)return manual('速力条件を確認してください');
@@ -644,7 +644,7 @@ function hdFERoute(plan){
   const explicitSpeed=(contract.data.map==='3-1'&&contract.data.index===0&&contract.data.path==='CFG'||contract.data.map==='7-2'&&[0,1].includes(contract.data.index)||contract.data.map==='7-3'&&contract.data.index===0||contract.data.map==='7-4'&&contract.data.index===0||contract.data.map==='7-5'&&[0,1].includes(contract.data.index))&&general?Math.max(0,...[plan?.routeInfo,plan?.suggestion?.info].filter(x=>x&&keys.some(k=>JSON.stringify(x[k])!==JSON.stringify(canonical[k]))).map(hdFESpeedTarget)):0;
   const explicitSpeedCheck=explicitSpeed?hdFEBranchPredicate({kind:'minSpeed',rank:explicitSpeed},hdFERouteShips(plan),plan):null;
   const exampleFlagship=conditionalExample&&general&&!customInfo&&info&&keys.every(k=>JSON.stringify(info[k])===JSON.stringify(canonical[k])),flagshipBad=!exampleFlagship&&!hdFERouteFlagshipOk(hdFERouteShips(plan),info);
-  const status=flagshipBad||contract.status==='missing'||customInfo&&basic.status==='missing'||explicitSpeedCheck?.status==='missing'?'missing':!['ready','partial'].includes(contract.status)||customInfo&&basic.status==='manual'||chosenScopedInfo&&basic.status!=='ready'||explicitSpeedCheck?.status==='manual'?'manual':general?contract.status==='partial'?'partial':'ready':basic.status==='ready'?'ready':'manual';return {...basic,branch,contract,status,requirements:general&&!customInfo&&!chosenScopedInfo?[]:basic.requirements,detail:(customInfo||chosenScopedInfo?basic.detail+' / ':general?'':basic.status==='missing'?'編成例の登録範囲外。別例の分岐は未判定。 / ':basic.detail+' / ')+(flagshipBad?'旗艦条件未充足。 / ':'')+(explicitSpeedCheck&&explicitSpeedCheck.status!=='ready'?explicitSpeedCheck.detail+' / ':'')+contract.detail};}
+  const status=flagshipBad||contract.status==='missing'||customInfo&&basic.status==='missing'||explicitSpeedCheck?.status==='missing'?'missing':!['ready','partial'].includes(contract.status)||customInfo&&basic.status==='manual'||chosenScopedInfo&&basic.status!=='ready'||explicitSpeedCheck?.status==='manual'?'manual':general?contract.status==='partial'?'partial':'ready':basic.status==='ready'?contract.status==='partial'&&contract.data.map==='2-5'&&contract.data.index===1&&contract.data.path==='CEIO'?'partial':'ready':'manual';return {...basic,branch,contract,status,requirements:general&&!customInfo&&!chosenScopedInfo?[]:basic.requirements,detail:(customInfo||chosenScopedInfo?basic.detail+' / ':general?'':basic.status==='missing'?'編成例の登録範囲外。別例の分岐は未判定。 / ':basic.detail+' / ')+(flagshipBad?'旗艦条件未充足。 / ':'')+(explicitSpeedCheck&&explicitSpeedCheck.status!=='ready'?explicitSpeedCheck.detail+' / ':'')+contract.detail};}
  const info=plan?.suggestion?.info||plan?.routeInfo;
  // The canonical preset is an example; verified AE alternatives need not contain
  // a light cruiser. Explicit quest/flagship constraints remain in force.
@@ -685,9 +685,10 @@ function hdFEScouting(plan,items){
  const shipTerm=losRows.reduce((s,v)=>s+Math.sqrt(Math.max(0,v)),0);let equipRaw=0;
  for(const x of items||[]){const los=Number(x.meta?.stats?.索敵)||0,star=Math.max(0,Math.min(10,Number(x.star)||0));equipRaw+=(los+hdFEImproveCoef(x.meta)*Math.sqrt(star))*hdFEEquipCoef(x.meta)}
  const count=Math.max(1,Math.min(7,ships.length||6)),score=shipTerm+equipRaw*coef-Math.ceil(hq*.4)+2*(6-count);
+ if(contract?.map==='2-5'&&contract.index===1&&contract.path==='CEIO'&&adv.verifiedHq===120&&hq!==120)return {status:'manual',available:false,reason:'hq-scope',score:null,referenceScore:score,coef,hq,checks,source:contract.source,route:contract.path,detail:`参考33式 ${score.toFixed(2)}（係数${coef} / 司令部Lv${hq}）。Iの31/34境界は司令部Lv120で確認した範囲です。120未満の+1以上は余裕の推奨で、35を確定閾値にはしません。この司令部Lvでの分岐は未判定です。`};
  const rows=checks.map(x=>{const safe=Number(x.safe)||0,fail=Number(x.failBelow)||0,status=safe&&score>=safe?'ready':fail&&score<fail?'missing':'partial';return {...x,status,score}});
  const status=rows.some(x=>x.status==='missing')?'missing':rows.every(x=>x.status==='ready')?'ready':'partial';
- return {status,available:true,score,coef,hq,checks:rows,source:contract?.source||'',route:contract?.path||'',detail:`推定33式 ${score.toFixed(2)}（係数${coef} / 司令部Lv${hq}）${contract?' / '+contract.path+' / 必要 '+checks.map(x=>x.safe).join('・'):''}`};
+ return {status,available:true,score,coef,hq,checks:rows,source:contract?.source||'',route:contract?.path||'',detail:contract?.map==='2-5'&&contract.index===1&&contract.path==='CEIO'?`推定33式 ${score.toFixed(2)}（係数${coef} / 司令部Lv${hq}） / I→O：${status==='missing'?'31未満はHへ進む条件':status==='partial'?'31以上34未満のランダム域・固定O未成立':'Iの固定O条件34以上を充足'}。他の分岐・経路全体・戦闘勝利は別です。`:`推定33式 ${score.toFixed(2)}（係数${coef} / 司令部Lv${hq}）${contract?' / '+contract.path+' / 必要 '+checks.map(x=>x.safe).join('・'):''}`};
 }
 function hdFEPlanScouting(plan,items){
  const scouting=hdFEScouting(plan,items);
@@ -696,7 +697,8 @@ function hdFEPlanScouting(plan,items){
  const numeric=c=>c?.kind==='scoutingValue'||c?.all?.some(numeric)||c?.any?.some(numeric)||c?.not&&numeric(c.not);
  const required=[...(hdFERouteContract(plan)?.checks||[]),...(hdFEBranchRoute(plan).checks||[])].some(x=>numeric(x.condition));
  if(!required||hdFEGameMatch(plan).status==='ready')return scouting;
- return {status:'manual',available:false,score:null,reason:'bonus',coef:scouting.coef,checks:scouting.checks.map(({score,status,...check})=>check),detail:'装備変更に伴う艦固有索敵ボーナスの差分が未確認。同期した同じ配備で再確認してください'};
+ const ceio=plan?.map==='2-5'&&scouting.route==='CEIO';
+ return {status:'manual',available:false,score:null,reason:'bonus',coef:scouting.coef,checks:scouting.checks.map(({score,status,...check})=>check),...(ceio?{referenceScore:scouting.score,route:scouting.route}:{}),detail:(ceio?`参考33式 ${scouting.score.toFixed(2)}（係数${scouting.coef} / 司令部Lv${scouting.hq}）。この参考値ではランダム域・固定O成立を判定しません。`:'')+'装備変更に伴う艦固有索敵ボーナスの差分が未確認。同期した同じ配備で再確認してください'};
 }
 function hdFEAutoVerdict(plan,e){
  const live=hdFELiveFleet(plan),supply=hdFESupply(plan),freshness=hdFESyncFreshness(),gameMatch=hdFEGameMatch(plan),route=hdFERoute(plan),air=hdFEAirCheck(plan?.map,e.air,plan),scouting=hdFEPlanScouting(plan,e.items),equipment={status:e.missing?'missing':e.partial?'partial':'ready',detail:`海域装備 ${e.ready}/${e.requirements.length} 準備`},master={status:e.master.invalid.length?'missing':e.master.unresolved.length?'partial':'ready',detail:e.master.invalid.length?`装備不可 ${e.master.invalid.length}件`:e.master.unresolved.length?`未解決 ${e.master.unresolved.length}件`:'装備可否OK'},unknownHealth=live.details.filter(x=>x.status==='unknown').length,health={status:live.status,detail:live.blocked?`出撃不可候補 ${live.blocked}隻（${Object.entries(live.reasons).map(x=>x[0]+' '+x[1]).join(' / ')}）`:live.caution?`注意艦 ${live.caution}隻${unknownHealth?` / 同期状態不明 ${unknownHealth}隻`:''}`:unknownHealth?`同期状態不明 ${unknownHealth}隻。ゲーム連携を確認`:'艦状態OK'};
@@ -707,6 +709,7 @@ function hdFEAutoVerdict(plan,e){
 function hdFEAutoStatusLabel(s){return s==='ready'?'OK':s==='missing'?'不足/不可':s==='partial'?'注意':'要確認'}
 function hdFEActionForCheck(check){
  if(!check||check.status==='ready')return '';
+ if(check.status==='partial'&&(check.id==='route'&&check.contract?.data?.map==='2-5'&&check.contract.data.index===1&&check.contract.data.path==='CEIO'||check.id==='scouting'&&check.route==='CEIO'))return 'Iの索敵ランダム域と固定O条件を確認する';
  const actions={
   health:check.status==='missing'?'大破・遠征中・入渠中の艦を編成から外す':'損傷・疲労している艦を確認する',
   supply:'燃料・弾薬を補給する',

@@ -3,6 +3,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
+const {createTwoFiveCeioHistoricalProjection}=require('./two-five-ceio-source-layer.cjs');
 const FIXTURE_SHA256="c876767f33bec6aecd878b77ba206a8dd43bacbb5ec01256f908cf3f16a71626";
 const BEFORE_SHA256={
  "fleet-readiness-evaluator.js": "c85dd3fa43533a8a94b17200501b51d49643c7ada12595ad4281db562a55b25d",
@@ -11,6 +12,7 @@ const BEFORE_SHA256={
  "owned-equipment-planner.js": "c458417d7140978b0a24f1d048804c198535ce288e0f6a236be02d30be13baf9"
 };
 function createOneFiveCl1Dd3HistoricalProjection(root=path.resolve(__dirname,'../..')){
+ const projectCEIO=createTwoFiveCeioHistoricalProjection(root);
  const bytes=fs.readFileSync(path.join(root,'tests/fixtures/one-five-cl1-dd3-approved-source-inverses.json'));
  assert.equal(hash(bytes),FIXTURE_SHA256,'CL1DD3 inverse fixture independently pinned');
  const approved=JSON.parse(bytes);assert.equal(approved.schemaVersion,1);
@@ -24,7 +26,7 @@ function createOneFiveCl1Dd3HistoricalProjection(root=path.resolve(__dirname,'..
  }
  for(const row of approved.changes){assert.ok(Object.hasOwn(BEFORE_SHA256,row.file));assert.equal(typeof row.before,'string');assert.equal(typeof row.after,'string');assert.ok(row.before&&row.after&&row.before!==row.after)}
  return function project(file,current){
-  assert.equal(typeof current,'string');const entry=approved.files[file];if(!entry)return current;
+  assert.equal(typeof current,'string');current=projectCEIO(file,current);const entry=approved.files[file];if(!entry)return current;
   assert.equal(hash(current),entry.approvedAfterSHA256,file+' exact approved current CL1DD3 source');assert.equal(Buffer.byteLength(current),entry.afterBytes);
   const rows=approved.changes.filter(row=>row.file===file);let restored=current;
   for(const row of rows.slice().reverse()){assert.equal(restored.split(row.after).length,2,file+' unique CL1DD3 inverse anchor');restored=restored.replace(row.after,row.before)}

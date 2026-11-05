@@ -14,6 +14,7 @@ require('./five-four-battleship.test.cjs');
 require('./five-four-scouting-exemption.test.cjs');
 require('./five-four-fixed-input.test.cjs');
 require('./two-five-north-f.test.cjs');
+require('./two-five-ceio-scouting.test.cjs');
 require('./three-one-cfg.test.cjs');
 require('./one-five-middle-boundaries.test.cjs');
 require('./one-five-bbv-cl-boundaries.test.cjs');

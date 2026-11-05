@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "unit": "two-five-ceio-scouting",
+  "beforeSourceHEAD": "dffa443645383b0df51ba5190b130f161edda031",
+  "scope": "Approved current CEIO product source to exact preceding dffa source for independent before controls and historical comparisons only. Never intercepts live product code.",
+  "files": {
+    "map-plans.js": {
+      "beforeSHA256": "d95ee0297842fe4a92c854911db495cc86dbb7611fb124aec4a0242849b360a8",
+      "approvedAfterSHA256": "0e475dcb0952da28d8371f59b5c3205671f883fea09e23dd80d5a7345a55f18a",
+      "beforeBytes": 162922,
+      "afterBytes": 163876
+    },
+    "fleet-readiness-evaluator.js": {
+      "beforeSHA256": "21d3d329bd71f3ddf4c6fef71b71db83093deb3d89838c5010f4cc311f6103ba",
+      "approvedAfterSHA256": "c82d4dc820990aa1b78d4324521e1385039b56dc98ccca2752953c800c7c7154",
+      "beforeBytes": 123383,
+      "afterBytes": 125480
+    },
+    "owned-equipment-planner.js": {
+      "beforeSHA256": "39d9e276a20e6166708f76217ecd27c293fc5ba136f9e2413bff877ed6a9eebd",
+      "approvedAfterSHA256": "a486c471f2f93593c9ec46a6ccdd3c780e55800aefb462a3b2992b3a2421bf6d",
+      "beforeBytes": 165049,
+      "afterBytes": 167523
+    },
+    "fleet-calculator.js": {
+      "beforeSHA256": "983db383d21bd8ed6fbd6a0e58329a24f68da251ab3fe0d51827bc39bd780635",
+      "approvedAfterSHA256": "9ea6e786a195534cea7907988b349a2d7b3e3ee767733e3f2d0c84660a5d68df",
+      "beforeBytes": 33120,
+      "afterBytes": 33436
+    }
+  },
+  "changes": [
+    {
+      "file": "map-plans.js",
+      "before": "{minimumSpeed:10,los:los(1,34,31)});",
+      "after": "{minimumSpeed:10,los:{...los(1,34,31),preserveRandomBand:true,verifiedHq:120},notes:['I→Oの索敵は33式係数1・司令部Lv120で確認。31未満はH、31以上34未満はH/Oランダムで固定O未成立、34以上はIの固定O条件を満たします。他の分岐条件や戦闘勝利は別です。','司令部Lv120未満は出典が+1以上の余裕を推奨しますが、同じ31/34や35を確定閾値として適用せず参考値と未判定理由を表示します。','固定Oを目指す追加索敵と、利用者が選ぶ装備目標は別です。ランダム域だけで装備の購入必須や必要個数を断定しません。交換後の艦固有ボーナスが不明なら参考値・未判定を保持します。']});"
+    },
+    {
+      "file": "map-plans.js",
+      "before": "const los=r.los.kind==='required'?`${r.los.exemptNote?",
+      "after": "const los=r.map==='2-5'&&r.index===1&&r.path==='CEIO'?'I→O：33式・分岐点係数1、司令部Lv120で31未満はH、31以上34未満はランダム域、34以上は固定O条件。確率や経路全体・勝利の保証は示しません。':r.los.kind==='required'?`${r.los.exemptNote?"
+    },
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "before": ":basic.status==='ready'?'ready':'manual';return {...basic,branch,contract,status",
+      "after": ":basic.status==='ready'?contract.status==='partial'&&contract.data.map==='2-5'&&contract.data.index===1&&contract.data.path==='CEIO'?'partial':'ready':'manual';return {...basic,branch,contract,status"
+    },
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "before": "const count=Math.max(1,Math.min(7,ships.length||6)),score=shipTerm+equipRaw*coef-Math.ceil(hq*.4)+2*(6-count);",
+      "after": "const count=Math.max(1,Math.min(7,ships.length||6)),score=shipTerm+equipRaw*coef-Math.ceil(hq*.4)+2*(6-count);\n if(contract?.map==='2-5'&&contract.index===1&&contract.path==='CEIO'&&adv.verifiedHq===120&&hq!==120)return {status:'manual',available:false,reason:'hq-scope',score:null,referenceScore:score,coef,hq,checks,source:contract.source,route:contract.path,detail:`参考33式 ${score.toFixed(2)}（係数${coef} / 司令部Lv${hq}）。Iの31/34境界は司令部Lv120で確認した範囲です。120未満の+1以上は余裕の推奨で、35を確定閾値にはしません。この司令部Lvでの分岐は未判定です。`};"
+    },
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "before": "if(!check||check.status==='ready')return '';",
+      "after": "if(!check||check.status==='ready')return '';\n if(check.status==='partial'&&(check.id==='route'&&check.contract?.data?.map==='2-5'&&check.contract.data.index===1&&check.contract.data.path==='CEIO'||check.id==='scouting'&&check.route==='CEIO'))return 'Iの索敵ランダム域と固定O条件を確認する';"
+    },
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "before": "detail:`${condition.kind==='scoutingValue'?'索敵':'制空'} ${value}/${condition.min}（あと${Math.max(0,condition.min-value)}）${condition.failBelow!=null&&value>=condition.failBelow&&value<condition.min?'（既知ランダム域。固定経路は未成立）':''}`",
+      "after": "detail:condition.kind==='scoutingValue'&&plan.map==='2-5'&&m.route==='CEIO'&&m.hq===120&&condition.min===34&&condition.failBelow===31?`Iの33式係数1・司令部Lv120：${value}。${value<31?'31未満はHへ進む条件です。':value<34?'31以上34未満のランダム域です。固定Oは未成立です。':'Iの固定O条件は成立しています。'}固定O条件34を目指す差は ${Math.max(0,34-value)}。装備の必要個数・購入必須や経路全体・戦闘勝利は示しません。`:`${condition.kind==='scoutingValue'?'索敵':'制空'} ${value}/${condition.min}（あと${Math.max(0,condition.min-value)}）${condition.failBelow!=null&&value>=condition.failBelow&&value<condition.min?'（既知ランダム域。固定経路は未成立）':''}`"
+    },
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "before": "detail:`推定33式 ${score.toFixed(2)}（係数${coef} / 司令部Lv${hq}）${contract?' / '+contract.path+' / 必要 '+checks.map(x=>x.safe).join('・'):''}`",
+      "after": "detail:contract?.map==='2-5'&&contract.index===1&&contract.path==='CEIO'?`推定33式 ${score.toFixed(2)}（係数${coef} / 司令部Lv${hq}） / I→O：${status==='missing'?'31未満はHへ進む条件':status==='partial'?'31以上34未満のランダム域・固定O未成立':'Iの固定O条件34以上を充足'}。他の分岐・経路全体・戦闘勝利は別です。`:`推定33式 ${score.toFixed(2)}（係数${coef} / 司令部Lv${hq}）${contract?' / '+contract.path+' / 必要 '+checks.map(x=>x.safe).join('・'):''}`"
+    },
+    {
+      "file": "fleet-readiness-evaluator.js",
+      "before": "return {status:'manual',available:false,score:null,reason:'bonus',coef:scouting.coef,checks:scouting.checks.map(({score,status,...check})=>check),detail:'装備変更に伴う艦固有索敵ボーナスの差分が未確認。同期した同じ配備で再確認してください'};",
+      "after": "const ceio=plan?.map==='2-5'&&scouting.route==='CEIO';\n return {status:'manual',available:false,score:null,reason:'bonus',coef:scouting.coef,checks:scouting.checks.map(({score,status,...check})=>check),...(ceio?{referenceScore:scouting.score,route:scouting.route}:{}),detail:(ceio?`参考33式 ${scouting.score.toFixed(2)}（係数${scouting.coef} / 司令部Lv${scouting.hq}）。この参考値ではランダム域・固定O成立を判定しません。`:'')+'装備変更に伴う艦固有索敵ボーナスの差分が未確認。同期した同じ配備で再確認してください'};"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "const route=hdFERoute(plan),label=s=>s==='ready'?'成立':s==='missing'?'不成立':'未確認';",
+      "after": "const route=hdFERoute(plan),ceio=plan?.map==='2-5'&&route.contract?.data?.index===1&&route.contract.data.path==='CEIO',label=s=>s==='ready'?'成立':s==='missing'?'不成立':ceio&&s==='partial'?'ランダム域（固定O未成立）':'未確認';"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "if(scouting.available){const target=Math.max(...scouting.checks.map(x=>Number(x.safe)||0));goals.push({kind:'los-value',label:'索敵分岐の安全域',count:scouting.score,minCount:target,ok:scouting.status==='ready',ratio:Math.max(0,Math.min(1,scouting.score/Math.max(1,target))),detail:`33式 ${scouting.score.toFixed(2)} / 安全域 ${target}（あと ${Math.max(0,target-scouting.score).toFixed(2)}）`})}",
+      "after": "if(scouting.available){const target=Math.max(...scouting.checks.map(x=>Number(x.safe)||0)),ceio=plan.map==='2-5'&&scouting.route==='CEIO';goals.push({kind:'los-value',label:ceio?'Iの固定Oを目指す索敵条件':'索敵分岐の安全域',count:scouting.score,minCount:target,ok:scouting.status==='ready',...(ceio?{knownRandom:scouting.status==='partial',routeAim:'fixed-O'}:{}),ratio:Math.max(0,Math.min(1,scouting.score/Math.max(1,target))),detail:ceio?`${scouting.detail}。${scouting.status==='partial'?'31以上34未満はランダム域で、固定Oは未成立です。':scouting.status==='missing'?'31未満はIからHへ進む条件です。':'Iの固定O条件は成立しています。他の分岐・戦闘勝利は別です。'}固定O条件34を目指す差は ${Math.max(0,target-scouting.score).toFixed(2)}。装備の必要個数や購入必須を示しません。`:`33式 ${scouting.score.toFixed(2)} / 安全域 ${target}（あと ${Math.max(0,target-scouting.score).toFixed(2)}）`})}"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "if(route.contract){const r=route.contract;goals.push({kind:'route-requirements'",
+      "after": "if(route.contract){const r=route.contract;goals.push({...((r.data.map==='2-5'&&r.data.index===1&&r.data.path==='CEIO'&&route.status==='partial')?{knownRandom:true}:{}),kind:'route-requirements'"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "function hdOCShortageGoals(measure){return measure.goals.filter(x=>!x.ok&&!x.unresolved&&!['route-branches','route-requirements','port-attacker-set'].includes(x.kind))}",
+      "after": "function hdOCShortageGoals(measure){return measure.goals.filter(x=>!x.ok&&!x.unresolved&&!x.knownRandom&&!['route-branches','route-requirements','port-attacker-set'].includes(x.kind))}"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "function hdOCScoutingOptional(c,goal){return hdOCSouthScouting(c)&&goal?.kind==='索敵'",
+      "after": "function hdOCScoutingOptional(c,goal){return (hdOCSouthScouting(c)||c?.map==='2-5'&&Number(c.index)===1)&&goal?.kind==='索敵'"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "if(!hdOCSouthScouting(c))return '';\n const {inventory,slots,unknown}=hdOCBuild(c)",
+      "after": "if(!hdOCSouthScouting(c)&&!(c?.map==='2-5'&&Number(c.index)===1))return '';\n const {inventory,slots,unknown}=hdOCBuild(c)"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "<b>手持ちから検討する索敵装備の交換候補</b><p>",
+      "after": "<b>手持ちから検討する索敵装備の交換候補</b>${c?.map==='2-5'?'<p>Iのランダム域から固定O条件を目指す追加索敵の検討です。ランダム域にいるだけで購入必須とは案内しません。司令部Lv120で確認した境界であり、他の分岐条件・戦闘勝利は別です。</p>':''}<p>"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "if(scouting.reason==='bonus')add('scouting'",
+      "after": "if(scouting.reason==='hq-scope')add('scouting','manual','司令部Lvによる索敵分岐の適用範囲が未確認',scouting.detail,'司令部Lv120の境界や余裕推奨を、この入力の確定条件へ置き換えないでください。','calculator');\n  else if(scouting.reason==='bonus')add('scouting'"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "add('equipment',measure.goals.some(x=>!x.ok&&!x.unresolved)?'missing':measure.goals.some(x=>!x.ok)?'manual':measure.goals.length?'ready':'manual'",
+      "after": "add('equipment',measure.goals.some(x=>!x.ok&&!x.unresolved&&!x.knownRandom)?'missing':measure.goals.some(x=>!x.ok&&x.unresolved)?'manual':measure.goals.some(x=>x.knownRandom)?'partial':measure.goals.length?'ready':'manual'"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "const status=checks.some(x=>x.status==='missing')?'missing':checks.some(x=>x.status!=='ready')?'manual':'ready';\n return {status,checks,registeredReady:status==='ready',complete:false,detail:status==='missing'?'登録条件に不足があります':status==='manual'?'情報不足・未判定の条件があります':'登録範囲の条件を充足。全ルート条件の網羅・戦闘勝利は保証できません'};",
+      "after": "const ceioRandom=plan?.map==='2-5'&&route.contract?.data?.index===1&&route.contract.data.path==='CEIO'&&route.status==='partial',status=checks.some(x=>x.status==='missing')?'missing':checks.some(x=>x.status!=='ready')?ceioRandom&&checks.every(x=>['ready','partial'].includes(x.status))?'partial':'manual':'ready';\n return {status,checks,registeredReady:status==='ready',complete:false,detail:status==='missing'?'登録条件に不足があります':status==='partial'?'Iの索敵はランダム域です。固定O条件は未成立で、装備購入必須や経路全体・戦闘勝利を意味しません。':status==='manual'?ceioRandom?'Iの索敵はランダム域です。ほかの情報不足・未判定の条件も確認してください。':'情報不足・未判定の条件があります':'登録範囲の条件を充足。全ルート条件の網羅・戦闘勝利は保証できません'};"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "if(!measure.complete)return '配備案に未充足・未判定の装備条件あり';",
+      "after": "if(!measure.complete)return measure.goals.some(g=>g.knownRandom)?'索敵ランダム域・未充足や未判定を含む配備案':'配備案に未充足・未判定の装備条件あり';"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "class=\"hd-oc-goal ${g.ok?'ready':g.unresolved?'manual':'missing'}\"><strong>${esc(g.label)}：${g.ok?'充足':g.unresolved?(g.kind==='los-value'?'未確認':'未判定'):'不足'}</strong><small>${g.purpose==='route'?'経路必須'",
+      "after": "class=\"hd-oc-goal ${g.ok?'ready':g.knownRandom?'partial':g.unresolved?'manual':'missing'}\"><strong>${esc(g.label)}：${g.ok?'充足':g.knownRandom?'ランダム域（固定O未成立）':g.unresolved?(g.kind==='los-value'?'未確認':'未判定'):'不足'}</strong><small>${g.routeAim==='fixed-O'?'固定Oを目指す追加索敵条件':g.purpose==='route'?'経路必須'"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "${readiness.registeredReady?'この配備を保存編成に反映':readiness.status==='manual'?'未確認を含む配備案を保存':'不足を残した配備案を保存'}",
+      "after": "${readiness.registeredReady?'この配備を保存編成に反映':readiness.status==='partial'?'ランダム域を含む配備案を保存':readiness.status==='manual'?'未確認を含む配備案を保存':'不足を残した配備案を保存'}"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "goals.push({kind:'los-value',label:'索敵分岐の安全域',count:null,minCount:target,ok:false,unresolved:true,ratio:0,detail:scouting.detail})",
+      "after": "goals.push({kind:'los-value',label:'索敵分岐の安全域',count:null,minCount:target,ok:false,unresolved:true,ratio:0,...(plan.map==='2-5'&&scouting.route==='CEIO'?{referenceScore:scouting.referenceScore,routeAim:'fixed-O'}:{}),detail:scouting.detail})"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "Iのランダム域から固定O条件を目指す追加索敵の検討です。",
+      "after": "Iで固定O条件を目指す追加索敵の検討です。"
+    },
+    {
+      "file": "fleet-calculator.js",
+      "before": "p.routeRequirements.los.kind==='required'?`33式分岐点係数${p.routeRequirements.los.coef} / 必要索敵値${p.routeRequirements.los.checks.map(x=>x.safe+'以上').join('・')}`",
+      "after": "p.map==='2-5'&&Number(p.route)===1&&p.routeRequirements.path==='CEIO'?`I→Oは33式係数1・司令部Lv120で31未満H、31以上34未満はランダム域、34以上は固定O条件。追加索敵は固定Oを目指す目的で、装備購入必須や経路全体・戦闘勝利の保証ではありません。`:p.routeRequirements.los.kind==='required'?`33式分岐点係数${p.routeRequirements.los.coef} / 必要索敵値${p.routeRequirements.los.checks.map(x=>x.safe+'以上').join('・')}`"
+    }
+  ]
+}

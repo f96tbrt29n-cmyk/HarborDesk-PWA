@@ -62,20 +62,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 40,
-      "未確認": 19,
+      "一部": 41,
+      "未確認": 18,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 40,
-      "未確認": 19,
+      "一部": 41,
+      "未確認": 18,
       "非該当": 0
     },
     "D": {
-      "確認済み": 27,
+      "確認済み": 28,
       "一部": 15,
-      "未確認": 17,
+      "未確認": 16,
       "非該当": 0
     }
   },
@@ -763,30 +763,45 @@
       "items": {
         "A": {
           "status": "一部",
-          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。",
+          "reason": "登録構造条件の直接検査/出典対応あり。全目標の数量根拠・全論理枝の実操作は未完。 Iの係数1/HQ120の31・34境界とランダム域を必須検査から最終判定へ接続。先行条件・HQ域外・全任意目標数量は別の未確認域を保持。",
           "evidence": [
             "docs/route-requirement-validation-scope.json",
             "docs/route-requirement-unverified-checklist.json",
-            "docs/route-goal-guidance-audit.json"
+            "docs/route-goal-guidance-audit.json",
+            "docs/pr152-two-five-ceio-random-ja.md",
+            "tests/two-five-ceio-scouting.test.cjs",
+            "tests/route-two-five-ceio-scouting.spec.js"
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じCEIO行のnumeric4で有限在庫1個の観測済み主砲を合法枠へ戻す自動配備、unknown2で電探在庫1の実案数量/残数と搭載候補を確認。全装備・全在庫・全競合の証明ではない。",
+          "evidence": [
+            "docs/pr152-two-five-ceio-random-ja.md",
+            "tests/two-five-ceio-scouting.test.cjs",
+            "tests/route-two-five-ceio-scouting.spec.js"
+          ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "C/Wのランダム域・固定O側・情報不足代表で区分/理由を確認。ランダムを装備不足/購入必須にせず、HQ不足/交換後ボーナス未確認、有限候補と必要個数を分離。31未満の境界はNodeのみで、全不足区分の実画面は未網羅。",
+          "evidence": [
+            "docs/pr152-two-five-ceio-random-ja.md",
+            "tests/two-five-ceio-scouting.test.cjs",
+            "tests/route-two-five-ceio-scouting.spec.js"
+          ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "確認済み",
+          "reason": "同じCEIO行のC/W各3代表で自動配備→保存→メモ編集→reload(load/complete)後の同一文書再探索/再表示、保存180/load180識別項目、custom全文/元5キー/他編成・他海域・metadata・調達・別planner・保存判定/探索理由の直接一致を確認。初回fixture失敗の保存/load未到達は別記録として保持。",
+          "evidence": [
+            "docs/pr152-two-five-ceio-random-ja.md",
+            "tests/two-five-ceio-scouting.test.cjs",
+            "tests/route-two-five-ceio-scouting.spec.js"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "Iの係数1/HQ120・31/34境界と代表保存操作を限定確認。HQ120外、先行Eの軽巡1＋駆逐4優先と一律高速拘束、CV系/CVL略語差・特殊艦種、全任意目標の数量根拠・全在庫/枠競合/改修/同期ボーナス・全条件組合せは未完。I成立をCEIO全体の到達や戦闘勝利へ広げない。"
     },
     {
       "id": "3-1/0/default",
@@ -3231,13 +3246,14 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "1-5/1/default",
-    "sourceHEAD": "a1beabbe8b07016511e32ad6d28b62d38c14ca75",
-    "record": "oneFiveCl1Dd3CIFinalization20261031",
-    "evidence": "docs/pr152-one-five-cl1-dd3-ja.md",
-    "state": "CI1 and CI2 independent records closed; C904/0/0, W1–3subtotal678/0/0 only; fullW/relatedW final and old trial gaps retained; record-only commit pending"
+    "id": "2-5/1/default",
+    "baselineHead": "dffa4436",
+    "sourceHEAD": null,
+    "record": "twoFiveCeioRandomLocal20261105",
+    "evidence": "docs/pr152-two-five-ceio-random-ja.md",
+    "state": "local6 complete and final independent join closed; source commit and one normal smoke pending"
   },
-  "nextPriority": "2-5/index1 CEIO：Iの索敵係数1で31以上34未満のランダム域が最終route/readinessで固定O成立に変わらない接続を優先確認。source-only根拠/26境界案は閉鎖、実装/操作は未着手。Eの軽巡1以上＋駆逐4以上の先行条件は別候補。旧1-5Wのload全文/呼出し元欠測と2–3隻の出典不一致は保持し、推測調査や同型helperの無制限追加をしない。",
+  "nextPriority": "2-5 CEIO E: source earlier CL>=1/DD>=4→I versus product unconditional fast binding; regularCV1+CL1+DD4 ordinary known hulls only. Selected for next source-backed independent unit, not implemented/tested here.",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -18852,5 +18868,324 @@
     "evidence": "docs/pr152-one-five-cl1-dd3-ja.md",
     "state": "qualified local scope closed; new6 completed after one concrete fixture correction; oldcanonicalWknown load comparison unreached; source commit/CI pending"
   },
-  "nextPriorityBeforeOneFiveCl1Dd3CIFinalization20261031": "2-5/index1 CEIO：Iの索敵係数1で31以上34未満のランダム域が最終route/readinessで固定O成立に変わらない接続を優先確認。source-only根拠/26境界案は閉鎖、実装/操作は未着手。Eの軽巡1以上＋駆逐4以上の先行条件は別候補。旧1-5Wのload全文/呼出し元欠測と2–3隻の出典不一致は保持し、推測調査や同型helperの無制限追加をしない。"
+  "nextPriorityBeforeOneFiveCl1Dd3CIFinalization20261031": "2-5/index1 CEIO：Iの索敵係数1で31以上34未満のランダム域が最終route/readinessで固定O成立に変わらない接続を優先確認。source-only根拠/26境界案は閉鎖、実装/操作は未着手。Eの軽巡1以上＋駆逐4以上の先行条件は別候補。旧1-5Wのload全文/呼出し元欠測と2–3隻の出典不一致は保持し、推測調査や同型helperの無制限追加をしない。",
+  "selectedBeforeTwoFiveCeioRandomLocal20261105": {
+    "id": "1-5/1/default",
+    "sourceHEAD": "a1beabbe8b07016511e32ad6d28b62d38c14ca75",
+    "record": "oneFiveCl1Dd3CIFinalization20261031",
+    "evidence": "docs/pr152-one-five-cl1-dd3-ja.md",
+    "state": "CI1 and CI2 independent records closed; C904/0/0, W1–3subtotal678/0/0 only; fullW/relatedW final and old trial gaps retained; record-only commit pending"
+  },
+  "nextPriorityBeforeTwoFiveCeioRandomLocal20261105": "2-5/index1 CEIO：Iの索敵係数1で31以上34未満のランダム域が最終route/readinessで固定O成立に変わらない接続を優先確認。source-only根拠/26境界案は閉鎖、実装/操作は未着手。Eの軽巡1以上＋駆逐4以上の先行条件は別候補。旧1-5Wのload全文/呼出し元欠測と2–3隻の出典不一致は保持し、推測調査や同型helperの無制限追加をしない。",
+  "twoFiveCeioRandomLocal20261105": {
+    "schemaVersion": 1,
+    "unit": "2-5/1/default CEIO I scouting random band",
+    "recordedAtJST": "2026-11-05T18:16:49.082762+09:00",
+    "state": "local scope completed and independently closed; source commit/one normal smoke pending",
+    "baselineHEAD": "dffa443645383b0df51ba5190b130f161edda031",
+    "previousValidatedSource": "a1beabbe8b07016511e32ad6d28b62d38c14ca75",
+    "sourceHEAD": null,
+    "finalRecordHEAD": null,
+    "product": {
+      "files": {
+        "map-plans.js": "0e475dcb0952da28d8371f59b5c3205671f883fea09e23dd80d5a7345a55f18a",
+        "fleet-readiness-evaluator.js": "c82d4dc820990aa1b78d4324521e1385039b56dc98ccca2752953c800c7c7154",
+        "owned-equipment-planner.js": "a486c471f2f93593c9ec46a6ccdd3c780e55800aefb462a3b2992b3a2421bf6d",
+        "fleet-calculator.js": "9ea6e786a195534cea7907988b349a2d7b3e3ee767733e3f2d0c84660a5d68df"
+      },
+      "changedFiles": 4,
+      "exactForwardReverseAnchors": 24,
+      "syntaxAndRuntimeProofSeparate": true
+    },
+    "sourceContract": {
+      "formula": "33式",
+      "coefficient": 1,
+      "verifiedHQ": 120,
+      "bands": [
+        {
+          "below": 31,
+          "I": "H",
+          "status": "missing"
+        },
+        {
+          "atLeast": 31,
+          "below": 34,
+          "I": "O/H random",
+          "status": "partial"
+        },
+        {
+          "atLeast": 34,
+          "I": "O",
+          "status": "ready"
+        }
+      ],
+      "probabilitiesDisplayed": false,
+      "internal33Split": "not a fixed/random status boundary; no probability display",
+      "lowerHQ": "reference arithmetic/manual with source margin recommendation; no invented mandatory35 or guarantee",
+      "sourceCache": "2026-10-31 saved article/reference reread; no new remote source fetch; cited reference is not independent sortie evidence",
+      "precedingConditions": "canonical regularCV1 CVL1 CL1 DD3 six-known-hull all-fast scope retained; Start/C/E precede I; known blocker retained despite unknown data",
+      "sourceDifferencesRetained": [
+        "old-period33 prose versus current34 table",
+        "CV系/CVL terminology and rare-hull scope",
+        "lowerHQ applicability"
+      ],
+      "notClaimed": [
+        "whole CEIO guarantee",
+        "battle victory",
+        "E DD4 priority implementation"
+      ]
+    },
+    "userFacingChange": {
+      "before": "31<=score<34 could be partial in scouting but mandatory/final route missing, or flag-only correction could promote final route to ready; generic deficit text obscured random aim",
+      "after": "I known random status and reason preserved through mandatory check/route/goal/readiness/UI/saved assessment; random is not equipment deficit or fixedO",
+      "optionalAndUserTargets": "fixedO additional scouting aim separated from selected gear targets; no quantity or mandatory purchase from scalar gap; existing user strategy goals remain",
+      "unknownBonus": "CEIO referenceScore/text retained but availablefalse/score:null/unresolved; no random/ready verdict from reference"
+    },
+    "node": {
+      "logicalTests": 29,
+      "physicalTests": 30,
+      "initialPass": 29,
+      "necessaryFixtureOnlyPass": 1,
+      "initialCommands": 16,
+      "newInitialTests": 14,
+      "relatedInitialLight": 15,
+      "initialFailSkipCancel": 0,
+      "fullGeneratorCalls": 0,
+      "fullGeneratorAccounting": "static callback/literal accounting, not measured counter",
+      "old29Rerun": false,
+      "literalBoundaries": [
+        30.999,
+        31,
+        31.001,
+        33.999,
+        34,
+        34.001
+      ],
+      "realPrecedingSourceContrasts": [
+        31,
+        32,
+        33.999
+      ],
+      "sharedControls": "actual sources/approved inverse outputs, north/HQ/bonus/usergoal/known-blocker controls; no successful old browser case repeated"
+    },
+    "fixedEnvironment": {
+      "imageDigest": "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29",
+      "node": "24.21.0",
+      "playwright": "1.55.0",
+      "chromiumRevision": "1187",
+      "webkitRevision": "2203",
+      "workersLocal": 1,
+      "retriesLocal": 0,
+      "testTimeoutMs": 45000,
+      "expectTimeoutMs": 12000,
+      "searchMaxExamined": 10000,
+      "searchMaxDepth": 24,
+      "capsWaitCancelExceptionAssertionsChanged": false,
+      "newInstallOrImagePull": false
+    },
+    "localBrowsers": {
+      "logicalCases": 6,
+      "physicalTrials": 7,
+      "passedPhysical": 6,
+      "originalFixtureFailure": 1,
+      "necessaryCorrectionRerun": 1,
+      "successPurposeRepeats": 0,
+      "correctedStatesPerProject": [
+        "random",
+        "guaranteed",
+        "unknown"
+      ],
+      "numericFour": "known observed CL gun missing from saved seed restored legally from inventory1; same observed loadout allows numeric routing check; candidates examined0 does not mean exhaustive search",
+      "unknownTwo": "gun present initially, finite radar stock1; actual allocation/current-unused counts/legal slot and unresolved HQ/bonus reasons kept distinct",
+      "allSixOperationTuple": [
+        "owned search and result",
+        "apply/save",
+        "memo edit and confirm",
+        "saved assessment and thirty identity-field comparisons",
+        "reload waitUntilload and ready",
+        "same loaded document complete",
+        "second search",
+        "full custom string/source keys/otherfleets/metadata/assessment-search equality"
+      ],
+      "savedIdentityFields": 180,
+      "loadIdentityFields": 180,
+      "sameDocumentLoadCases": 6,
+      "allPageerrors": 0,
+      "preservationMismatchObserved": false,
+      "searchStillIncomplete": true,
+      "numericSearchReasons": [
+        "bounded-search"
+      ],
+      "unknownSearchReasons": [
+        "beam-limit"
+      ],
+      "oldFailure": {
+        "project": "chromium",
+        "state": "random",
+        "stage": "first-search",
+        "expectedGate": "partial",
+        "actualGate": "manual",
+        "reason": "bonus",
+        "gameMatch": "partial",
+        "durationTestMs": 5716,
+        "reporterDurationMs": 6951.494,
+        "saved": null,
+        "load": null,
+        "postFailureEvaluateOrRead": 0,
+        "productFault": false,
+        "qualification": "incorrect fixture premise that optional radar must remain unused; product correctly kept unsynchronized bonus manual; no loss observed"
+      }
+    },
+    "fixtureCorrection": {
+      "files": [
+        "tests/route-two-five-ceio-scouting.spec.js",
+        "tests/fixtures/two-five-ceio-browser-inputs.json"
+      ],
+      "scope": "numeric inputs radarStock0; unknown input radarStock1; compare actual allocation count and actual reason causally; no assertion deadline/cap removal",
+      "productChanged": false,
+      "originalSpecFixtureAndFailureRetained": true
+    },
+    "preflightAndBindings": {
+      "originalPublicFiles": 679,
+      "originalRuntimeFiles": 681,
+      "originalRuntimeManifestSHA256": "43cda0ad2b8fdf34895607e48c1233f5a830f0f2a2c90083f7f32b2aca37f894",
+      "correctedRuntimeManifestSHA256": "4efe586bca10572dc1dac23be5357cb4813ec276be09b9db4554534514e4f98d",
+      "normalCasesPerProject": 907,
+      "newCasesPerProject": 3,
+      "preflightBrowserLaunches": 0,
+      "actualHTTPServedSourceHashClaim": false,
+      "metadataRegistrationCorrection": "actual truncated route-two-five-ceio-scouti paths matched6/6 after onlyworkflow wildcard broadened to route-two-five-ceio-*",
+      "knownDifferenceAfterFrozenRun": "workflow metadata wildcard1line and these records only; product/test/fixture execution bytes unchanged"
+    },
+    "harnessAndAudits": "approved CEIO source inverse layered into historical readers, prior literal hashes retained, independent current CEIO tests separate; route audit numeric row scoped to present fields, other rows/legacy preserved",
+    "comparisonScope": "Existing reads performed direct comparisons in memory and emitted exact/type/presence observations; independent metadata/source binding is not a second comparison of separately retained full storage-value bodies. Missing initial saved/load observations remain null.",
+    "evidence": {
+      "sourceContract": {
+        "path": "private/source-contract/source-contract.json",
+        "bytes": 12319,
+        "sha256": "cec8f5ee313254b86b5ca4cff07c75c976585bd70117a32a714114cc7aab4b3f"
+      },
+      "productIndependent": {
+        "path": "private/product-independent-review-final/review.json",
+        "bytes": 7468,
+        "sha256": "7b534452db9f0c3f86ccc7325760729b9669c05e6f779b37eeaf9a19f864b2a6"
+      },
+      "harnessStatic": {
+        "path": "private/harness-review/static-final-review.json",
+        "bytes": 11363,
+        "sha256": "55208c07ed678d18db59f3940f72376fd239b7836f417fb5689eead4cd5667b2"
+      },
+      "nodeOriginalIndependent": {
+        "path": "private/execution-independent-node/review.json",
+        "bytes": 2397,
+        "sha256": "c122d54e180066917a746bd42bba3a6196abebf449fc423ae44a6a0f5e486578"
+      },
+      "fixtureCorrection": {
+        "path": "private/browser-fixture-correction/correction-receipt.json",
+        "bytes": 2133,
+        "sha256": "927a5a524f7e49e0334d3acc56c934d815c909ebe3927243597c2c681100324a"
+      },
+      "metadataRegistrationCorrection": {
+        "path": "private/metadata-registration-correction.json",
+        "bytes": 1826,
+        "sha256": "5df96a0b17653883dc1c0e36a27211de491b1d0ce1d64e642b664e98a774d746"
+      },
+      "localPrimaryCanonical": {
+        "path": "private/local-final-records/canonical.json",
+        "bytes": 15188,
+        "sha256": "3ab3d6edb48438be9c721d7912d0db29307408e71c3eb7b449b06b25ef34672a"
+      },
+      "localPrimaryManifest": {
+        "path": "private/local-final-records/manifest.json",
+        "bytes": 405,
+        "sha256": "737c6c544f68f4bbdcdf2f7ba9a7f5b7713b03a3982a013033dddbfb20e8003d"
+      },
+      "localPrimaryClosure": {
+        "path": "private/local-final-records/closure.json",
+        "bytes": 248,
+        "sha256": "57042c0414a16ec714e89815f39baf74e1af5c84941822c674df38ac00fd6d19"
+      },
+      "localFinalIndependentJoin": {
+        "path": "private/local-independent-review/review.json",
+        "bytes": 13949,
+        "sha256": "9bc9c4bbeb332f9b0b44cedab0d2184c805b08d43ee290738d03cf38839962f5"
+      },
+      "localFinalIndependentManifest": {
+        "path": "private/local-independent-review/manifest.json",
+        "bytes": 509,
+        "sha256": "776fa08dd3aea5bd7ed909e8b5d43a3529c9d9c5aae0b7428b8e83f7883dffc0"
+      },
+      "localFinalIndependentClosure": {
+        "path": "private/local-independent-review/closure.json",
+        "bytes": 235,
+        "sha256": "70e6e5ee4029dedfb8cfa010f37315e0eb0ccad6a23317a1cd3e3f56803c4c16"
+      }
+    },
+    "originals": {
+      "files": 280,
+      "bytes": 56725705,
+      "traceZIPs": 7,
+      "traceCRCEntries": 913,
+      "rawBodiesTraceVideo": "private; not committed or newly uploaded",
+      "sharedCandidates": "seven per-trial typed summaries including failed original plus aggregate only",
+      "publicCommitIncludesOnly": "product/tests/source fixture/inverse/public records, no private bodies",
+      "baselineFileSHABytesAndStatExact": true,
+      "directoryStatScope": "all reviewed directory stats unchanged during independent read; pre-primary original directory baseline not asserted",
+      "videoFilesVerifiedPositiveBytes": 7,
+      "videosPlayed": 0
+    },
+    "normalCI": null,
+    "oldCI41216819787": {
+      "smokeSuccessJobs": 5,
+      "webkit4": "cancelled official45minute",
+      "chromiumPassedFlakyFailed": [
+        904,
+        0,
+        0
+      ],
+      "webkit1to3SubtotalPassedFlakyFailed": [
+        678,
+        0,
+        0
+      ],
+      "allWebKit": null,
+      "oldTargetW3FinalFramework": null,
+      "oldMissingFilledByCurrent": false,
+      "rerunForOldGap": false
+    },
+    "progress": {
+      "denominator": 236,
+      "before": [
+        27,
+        151,
+        58
+      ],
+      "after": [
+        28,
+        153,
+        55
+      ],
+      "changedCells": [
+        "2-5/1/default.B 未確認→一部",
+        "2-5/1/default.C 未確認→一部",
+        "2-5/1/default.D 未確認→確認済み"
+      ],
+      "A": "一部 unchanged; I-only scope not all route/goal roots",
+      "B": "一部; numeric4 legal inventory recovery and unknown2 finite radar representative, not all inventory",
+      "C": "一部; random/manual/stock guidance representatives, not every deficit category",
+      "D": "確認済み; all six explicit save/edit/same-documentload tuple comparisons completed",
+      "allOther58RowsStatusExact": true,
+      "definitionsAndLegacy53Unchanged": true,
+      "partialPercentConversion": false
+    },
+    "residuals": [
+      "HQ!=120 numeric branch scope remains manual/reference; missingHQ or ship data manual",
+      "E CL>=1/DD>=4 priority versus unconditional fast target remains independent unimplemented condition",
+      "CV系/CVL source terminology and rarehull/otherroute applicability",
+      "all optional equipment targets quantity sufficiency/all inventory/slots/improvements/bonuses and all condition combinations",
+      "old hidden-load and communication/naturalnull/DCL failures remain unresolved; current local success does not fill old gaps"
+    ],
+    "nextPriority": "2-5 CEIO E: source earlier CL>=1/DD>=4→I versus product unconditional fast binding; regularCV1+CL1+DD4 ordinary known hulls only. Selected for next source-backed independent unit, not implemented/tested here.",
+    "protectedTargetsUnchanged": true
+  }
 }

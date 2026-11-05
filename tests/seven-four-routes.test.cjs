@@ -2,23 +2,24 @@
 // Independent source literals and scope policy; raw-table checks do not validate the runtime formula.
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.join(__dirname,'..'),fixture=require('./fixtures/seven-four-source-cases.json');
+const {createTwoFiveCeioHistoricalProjection}=require('./fixtures/two-five-ceio-source-layer.cjs'),projectCEIO=createTwoFiveCeioHistoricalProjection(root);
 const TYPES={CA:'重巡洋艦',CAV:'航空巡洋艦',CL:'軽巡洋艦',CLT:'重雷装巡洋艦',CT:'練習巡洋艦',DD:'駆逐艦',DE:'海防艦',CD:'海防戦艦',BB:'戦艦',FBB:'高速戦艦',BBV:'航空戦艦',CV:'正規空母',CVB:'装甲空母',CVL:'軽空母',AV:'水上機母艦',AO:'補給艦',AS:'潜水母艦',SS:'潜水艦',SSV:'潜水空母',LHA:'揚陸艦',AR:'工作艦',UNKNOWN:'?'};
 const NAMES={Akitsumaru:'あきつ丸改',Taiyo:'大鷹改二',NonTaiyo:'龍驤改二'};
-function load(file,name,c){const s=fs.readFileSync(path.join(root,file),'utf8'),a=s.indexOf('function '+name+'('),b=s.indexOf('\nfunction ',a+1);assert.ok(a>=0,name);vm.runInContext(s.slice(a,b<0?undefined:b),c);}
-function context(){
+function load(file,name,c,historicalCEIO=false){const raw=fs.readFileSync(path.join(root,file),'utf8'),s=historicalCEIO?projectCEIO(file,raw):raw,a=s.indexOf('function '+name+'('),b=s.indexOf('\nfunction ',a+1);assert.ok(a>=0,name);vm.runInContext(s.slice(a,b<0?undefined:b),c);}
+function context(historicalCEIO=false){
  const masters=new Map(),c=vm.createContext({window:{},localStorage:{getItem:()=>null},HD_FS_TYPE_ALIASES:{},hdFEFind:()=>({}),hdFEFindShip:name=>masters.get(name)||null,hdShipDbMasterRowFor:x=>masters.get(x.name)||null,hdShipDbSlotProfile:()=>null,hdFEExpansionAvailability:()=>({allowed:false,status:'manual'})});
- vm.runInContext(fs.readFileSync(path.join(root,'map-plans.js'),'utf8'),c);const all=vm.runInContext('HD_MAP_ROUTE_REQUIREMENTS',c),maps=vm.runInContext('MAP_PLANS',c);
+ vm.runInContext(historicalCEIO?projectCEIO('map-plans.js',fs.readFileSync(path.join(root,'map-plans.js'),'utf8')):fs.readFileSync(path.join(root,'map-plans.js'),'utf8'),c);const all=vm.runInContext('HD_MAP_ROUTE_REQUIREMENTS',c),maps=vm.runInContext('MAP_PLANS',c);
  c.hdFERouteRequirementData=p=>all[p.map]?.[p.routeIndex??0];
  c.hdFERouteShips=p=>p.ships.map(s=>({ship:s,type:s.type,typeKnown:!['?','海防戦艦'].includes(s.type),speedInfo:{known:p.rank!==null,rank:p.rank,base:p.rank,group:'independent-source',invalid:[]}}));
  c.hdFEAssigned=()=>[];c.hdFEGameMatch=()=>({status:'ready'});
  // This injected raw score is an independent source-table input, not the product
  // HQ/equipment formula. Separate test below calls the real formula entry point.
  c.hdFEScouting=p=>({available:Number.isFinite(p.sourceScore),status:Number.isFinite(p.sourceScore)?p.sourceScore>=37?'ready':p.sourceScore<33?'missing':'partial':'manual',coef:4,score:p.sourceScore,detail:'independent raw source score or missing input'});
- for(const n of ['hdFESpeedLabel','hdFEBranchPredicate','hdFERouteContract'])load('fleet-readiness-evaluator.js',n,c);
+ for(const n of ['hdFESpeedLabel','hdFEBranchPredicate','hdFERouteContract'])load('fleet-readiness-evaluator.js',n,c,historicalCEIO);
  const source=fs.readFileSync(path.join(root,'fleet-suggester.js'),'utf8'),a=source.indexOf('const HD_FS_TYPE_ALIASES='),b=source.indexOf('\n};',a)+3;vm.runInContext(source.slice(a,b),c);
  for(const n of ['hdFSTypeMatches','hdFSRequirementPatterns','hdFSPresetInfo'])load('fleet-suggester.js',n,c);
  c.hdFEInferRoute=()=>({status:'manual'});c.hdFEBranchRoute=()=>({available:false});
- for(const n of ['hdFESpeedTarget','hdFEBranchGoal','hdFEPlanSpeedTarget','hdFERouteFlagshipOk','hdFERouteBasic','hdFERoute'])load('fleet-readiness-evaluator.js',n,c);
+ for(const n of ['hdFESpeedTarget','hdFEBranchGoal','hdFEPlanSpeedTarget','hdFERouteFlagshipOk','hdFERouteBasic','hdFERoute'])load('fleet-readiness-evaluator.js',n,c,historicalCEIO);
  const make=(hulls,rank=5,sourceScore=37)=>{
   const ships=hulls.map((input,index)=>{const [named,kind]=input.includes(':')?input.split(':'):[null,input],ship=named?NAMES[named]:'source-'+input+'-'+index,type=TYPES[kind];if(!['?','海防戦艦'].includes(type))masters.set(ship,{name:ship,type});return {ship,type,items:[]}}),preset=maps['7-4'].presets[0];
   return {map:'7-4',routeIndex:0,preset,routeInfo:JSON.parse(JSON.stringify(c.hdFSPresetInfo(preset))),rank,sourceScore,ships};
@@ -73,8 +74,9 @@ test('7-4 canonical identity, chosen requirements/detail/flagship and both expli
 // The seven-five-first and seven-five-second suites independently cover changed7-5/0 and7-5/1;
 // only those changed scopes are excluded here; every remaining complete output stays compared.
 // Exact3-1/index0 intentionally uses the independent three-one-cfg oracle; other rows keep this legacy reverse comparison.
-test('7-4 reverse comparison preserves full route outputs and speed targets of the other49 unaffected presets; 3-1/0 has its dedicated oracle',()=>{
- const {c,maps}=context(),legacy=require('./fixtures/seven-four-legacy-route-speed.json');
+// Current CEIO semantics are covered independently; retain every old parity comparison via its exact source inverse.
+test('7-4 reverse comparison preserves full route outputs and speed targets of the other49 historical presets with approved CEIO projection; 3-1/0 has its dedicated oracle',()=>{
+ const {c,maps}=context(true),legacy=require('./fixtures/seven-four-legacy-route-speed.json');
  // Baseline helpers are frozen too, so a shared-helper change cannot hide behind
  // equal new-helper calls on both sides of this reverse comparison.
  vm.runInContext(legacy.predicateSource.replaceAll('hdFEBranchPredicate(','hdFEBranchPredicateLegacy('),c);

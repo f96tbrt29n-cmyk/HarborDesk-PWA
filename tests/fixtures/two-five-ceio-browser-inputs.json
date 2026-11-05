@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "unit": "two-five-ceio-scouting",
+  "scope": "Synthetic synchronized displayed values, not attainable game stats, an equipment-bonus model, or a victory claim",
+  "route": {"map":"2-5","index":1,"path":"CEIO","coefficient":1},
+  "ships": [
+    {"name":"翔鶴改二","type":"正規空母"},
+    {"name":"瑞鳳改二","type":"軽空母"},
+    {"name":"矢矧改二","type":"軽巡洋艦"},
+    {"name":"島風改","type":"駆逐艦"},
+    {"name":"夕立改二","type":"駆逐艦"},
+    {"name":"時雨改二","type":"駆逐艦"}
+  ],
+  "gun": "12.7cm連装砲",
+  "radar": "33号水上電探",
+  "level": 90,
+  "random": {"hq":120,"bareLos":[25,225,225,225,225,225],"expectedScore":32,"expectedGate":"partial","expectedRoute":"partial","recoverObservedGun":true,"radarStock":0},
+  "guaranteed": {"hq":120,"bareLos":[64,225,225,225,225,225],"expectedScore":35,"expectedGate":"ready","expectedRoute":"ready","recoverObservedGun":true,"radarStock":0},
+  "unknown": {"hq":null,"bareLos":[25,225,225,225,225,225],"expectedScore":null,"expectedGate":"manual","expectedRoute":"manual","recoverObservedGun":false,"radarStock":1},
+  "independentArithmetic": "sqrt(first bare LOS)+5*sqrt(225)-ceil(120*0.4); observed gun has LOS0 and no aircraft/radar is allocated in the synchronized numeric reference. The finite radar belongs only to the HQ-unknown swap-inspection input; its possible allocation never certifies a changed-loadout bonus."
+}

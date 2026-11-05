@@ -202,7 +202,7 @@ const HD_MAP_ROUTE_REQUIREMENTS={};
  add('2-4',0,'ボス方面・経路ランダム',[fleet(6),count(['bb','cv'],0,3),count(['av','as','ao'],0,0)],{routing:'random',notes:['戦艦＋空母は3隻まで。羅針盤による逸れを残す編成例。']});
  const northFast={all:[count(['bb'],3),count(['dd'],0,2),{not:{all:[count(['cl'],1),count(['dd'],2)]}}]};
  add('2-5',0,'BFJO',[fleet(6),count(['bb'],0,3),count(['cv','ss','lha'],0,0),count(['de'],0,2),count(['av'],0,1),{any:[{kind:'speedCount',rank:5,min:1,max:7},northFast],reason:'F→J：低速艦が1隻以上なら先にJ。全高速では駆逐3隻以上、軽巡1隻以上かつ駆逐2隻以上が先にE、それ以外の戦艦級3隻はJ。残りはE/Jランダム。速力・艦種情報が不足する条件は未判定とし、別の既知不一致は保持。装備購入ではなく編成・速力を確認'},{kind:'equipmentShips',match:'drum',min:2,max:7,slotPolicy:'valid'}],{useExampleScope:false,selectionAliases:{'航空戦艦':'戦艦級'},keepLow:1,keepLowUnless:northFast,los:los(1,49,42),notes:['Fでは低速艦1隻以上なら先にJ。全高速では駆逐3隻以上、軽巡1隻以上かつ駆逐2隻以上が先にE、その後の戦艦級3隻はJ。軽巡は軽巡洋艦で、重雷装巡洋艦はこの数に含めない。この1戦艦級の編成例では低速艦を維持する。','固定J条件の未成立はボス到達不可能や購入必須を意味しない。速力・艦種情報が不足する場合は未判定とし、既知の不一致は別に表示する。','ドラム缶(輸送用)は異なる2隻に各1個以上。同じ艦に2個は1隻として数える。']});
- add('2-5',1,'CEIO',[fleet(6),speed(10),count(['bb','ss'],0,0),count(['cvn','cav'],0,1),count(['cv'],1),count(['cl'],1),count(['dd'],3)],{minimumSpeed:10,los:los(1,34,31)});
+ add('2-5',1,'CEIO',[fleet(6),speed(10),count(['bb','ss'],0,0),count(['cvn','cav'],0,1),count(['cv'],1),count(['cl'],1),count(['dd'],3)],{minimumSpeed:10,los:{...los(1,34,31),preserveRandomBand:true,verifiedHq:120},notes:['I→Oの索敵は33式係数1・司令部Lv120で確認。31未満はH、31以上34未満はH/Oランダムで固定O未成立、34以上はIの固定O条件を満たします。他の分岐条件や戦闘勝利は別です。','司令部Lv120未満は出典が+1以上の余裕を推奨しますが、同じ31/34や35を確定閾値として適用せず参考値と未判定理由を表示します。','固定Oを目指す追加索敵と、利用者が選ぶ装備目標は別です。ランダム域だけで装備の購入必須や必要個数を断定しません。交換後の艦固有ボーナスが不明なら参考値・未判定を保持します。']});
  add('3-1',0,'CFG',[
   {any:[{all:[fleet(6),count(['bb','cv','cav','cl','重雷装巡洋艦','dd','de'],6,6)]},{kind:'unverified',reason:'今回のCFG確認範囲は出典でC→F→Gが一致する既知の六隻編成。潜水母艦・水母・補給艦・潜水系・練習巡洋艦・揚陸艦・海防戦艦や未登録艦、別隻数は確認域外で、経路全体を成立としない。ゲームの最低隻数や到達不可能を意味しません。'}]},
   count(['bb','cv'],0,2),count(['escort'],2),count(['bbv','cl','av','ao'],0,2)
@@ -572,7 +572,7 @@ function hdMapRequirementConditionText(c){
 }
 function hdMapRequirementsHtml(map,preset){
  const r=hdMapPresetRequirements(map,preset);if(!r)return '';
- const los=r.los.kind==='required'?`${r.los.exemptNote?r.los.exemptNote+' ':''}33式・分岐点係数${r.los.coef}、${r.los.exemptWhen?'免除対象外の':''}必要索敵値${r.los.checks.map(c=>c.safe+'以上').join('・')}`:r.los.note;
+ const los=r.map==='2-5'&&r.index===1&&r.path==='CEIO'?'I→O：33式・分岐点係数1、司令部Lv120で31未満はH、31以上34未満はランダム域、34以上は固定O条件。確率や経路全体・勝利の保証は示しません。':r.los.kind==='required'?`${r.los.exemptNote?r.los.exemptNote+' ':''}33式・分岐点係数${r.los.coef}、${r.los.exemptWhen?'免除対象外の':''}必要索敵値${r.los.checks.map(c=>c.safe+'以上').join('・')}`:r.los.note;
  return `<div class="plan-card" data-hd-route-requirements="${planEsc(map+':'+r.index)}"><b>${planEsc(r.path)}の攻略条件${r.scopeIncomplete?'（検証中）':''}</b><ul>${r.conditions.map(c=>`<li>${planEsc(hdMapRequirementConditionText(c))}</li>`).join('')}<li>${planEsc(los)}</li></ul>${r.map==='1-5'&&r.index===1?'<p>装備の任意比較目標：対潜装備セットの組数は編成ごとの選択で確認します。未選択のときは必要数・不足数を出さず、利用者指定と既存例の比較モデルを区別します。別編成への一律適用、通行条件・先制対潜人数・戦闘勝利の保証ではありません。</p>':r.equipmentTargets?.length?`<p>装備の推奨目標：${planEsc(r.equipmentTargets.map(x=>x.label+' '+x.minCount+'組').join(' / '))}。先制対潜の発動や戦闘勝利とは別判定。</p>`:''}${r.notes.map(n=>`<p>${planEsc(n)}</p>`).join('')}${r.los.kind==='required'?`<small>${planEsc(r.los.marginNote)}</small>`:''}<p><a href="${planEsc(r.source)}" target="_blank" rel="noopener noreferrer">経路条件の出典 ↗</a></p></div>`;
 }
 // Scope generated recommendations to the documented route, rather than enemy
