@@ -10208,5 +10208,1752 @@
     "protectedTargetsUnchanged": true,
     "recordOnlyFinalization": "ordinary commit/push [skip ci]; no added browser or CI to obtain success",
     "newPreservationMismatchStopPolicyUnchanged": true
+  },
+  "twoFiveCeioEPriorityLocal20261105": {
+    "schemaVersion": 1,
+    "recordKey": "twoFiveCeioEPriorityLocal20261105",
+    "preparedAtJST": "2026-11-05T21:13:39.846379+09:00",
+    "state": "local-qualified-evidence-primary-and-independent-sealed; source committed; normal CI dispatched/results pending",
+    "applicationReady": true,
+    "baselineHEAD": "f37b7e2009fa2090059c4569efb066a477714519",
+    "previousValidatedSource": "32a87a092ff0df35cb7ba7f95a901577f6d50553",
+    "sourceHEAD": "03c4759ba4ecf594b1f96daf608ae9a36968cc11",
+    "finalRecordHEAD": null,
+    "sourceScope": {
+      "path": "CEIO",
+      "map": "2-5",
+      "index": 1,
+      "condition": "E CL>=1 DD>=4 precedes later fastDD3 rule",
+      "earlierBB": "BBclass>=1→G stays first",
+      "boundedFamily": "known ordinary six hulls regularCV/CVB1+CL1+DD4 with all present canonical6key routeinfo",
+      "speedUnknown": "known types/speed-onlyunknown isolated Nodepredicate boundary; browser master not changed",
+      "outsideFamily": "DD3 keeps its established fast rule; CVL-only/rare/other-hull inputs are outside this newly verified family. No new guarantee that every existing UI path displays manual or any one verdict for those inputs. Unknown/custom cases retain old independent constraints without being promoted by this helper.",
+      "I": "31/34 coefficient1/HQ120/bonus unknown safeguards unchanged"
+    },
+    "product": {
+      "files": {
+        "map-plans.js": "3930f0a4e89c2a2a7bf12c40114767814c6aacd05997e4fd6d2cfe4df719362e",
+        "fleet-readiness-evaluator.js": "d2748531573c59777704c674541bdbf7da5e1e15770b76beb6b293bda7fe7551"
+      },
+      "filesChanged": 2,
+      "inverseAnchors": 8,
+      "newHelper": "hdFETwoFiveSouthDD4Scope",
+      "unchanged": "FS/OC/FC/save/FEequipmentrequirements/I formula/predicate/contract",
+      "explicitGoalLimit": "usual generatedFromMap:false user quantity preserved; existing routeInfo||suggestion.info precedence unchanged, no max-merging of shadowed secondary custom info",
+      "fleetGeneratorLimit": "canonical originalCVL/DD3 generation unchanged; newly evaluated selected saved DD4 is not an automatic fleet-generator output claim"
+    },
+    "node": {
+      "logicalTests": 30,
+      "physicalTests": 30,
+      "commands": 16,
+      "newE": 15,
+      "relatedLight": 15,
+      "initialPassed": 30,
+      "fail": 0,
+      "skip": 0,
+      "cancel": 0,
+      "sourceFilesAfterExact": true,
+      "fullGeneratorCalls": 0,
+      "fullGeneratorMeaning": "static selected callback path/declaration, not instrumented counter",
+      "actualBefore": [
+        {
+          "e": "missing",
+          "i": "ready",
+          "route": "missing",
+          "speedTarget": 10,
+          "scope": false,
+          "speedGoalKinds": [
+            "speed-ship",
+            "speed-ship",
+            "speed-ship",
+            "speed-ship",
+            "speed-ship",
+            "speed-ship",
+            "speed-turbine"
+          ]
+        }
+      ],
+      "actualAfter": [
+        {
+          "e": "ready",
+          "i": "ready",
+          "route": "ready",
+          "speedTarget": 0,
+          "scope": true,
+          "speedGoalKinds": []
+        }
+      ],
+      "unknownSpeedBoundary": "actual normalized predicate rows only; no master/DB alteration or whole browser unknownspeed guarantee",
+      "reusedAfterSpecOnlyCorrection": true,
+      "reuseReason": "product/input fixture/prepareE prefix/generator unchanged; existing30 tests were not repeated; spec detail/read projection assertion change only"
+    },
+    "browser": {
+      "logicalCases": 6,
+      "physicalTrials": 7,
+      "correctedFinalPassed": 6,
+      "initialFixtureFailure": 1,
+      "necessaryKnownRecheck": 1,
+      "successPurposeRepeats": 0,
+      "resultsBasis": "sealed primary and separate raw/hash/projection independent join; separately retained complete storage bodies absent",
+      "perTrialResults": [
+        {
+          "phase": "initial-fixture-reason-layer-failure",
+          "project": "chromium",
+          "state": "known",
+          "stage": "saved-read",
+          "exitCode": 1,
+          "frameworkStatus": "failed",
+          "frameworkRetry": 0,
+          "testDurationMs": 10444,
+          "sourceFilesAfterExact": true,
+          "postFailureEvaluateOrRead": 0,
+          "savedIdentityFieldsExact": 30,
+          "loadIdentityFieldsExact": 0,
+          "savedSourceAndOtherDataComparisons": true,
+          "loadFullStringComparison": null,
+          "savedReasonLayerRelationshipExact": true,
+          "recomputedReasonFieldObserved": false,
+          "loadReasonAndAssessmentExact": null,
+          "typedProjectionDirectExact": true,
+          "pageerrorCount": 0,
+          "samples": [
+            {
+              "E": "ready",
+              "I": "ready",
+              "registeredRoute": "ready",
+              "DD4Scope": true,
+              "speedTarget": 0,
+              "candidateExaminedCounter": 0,
+              "evaluationCallCount": null,
+              "searchStatus": "incomplete",
+              "searchReasons": [
+                "bounded-search"
+              ],
+              "searchExhaustive": false,
+              "readinessRegisteredReady": false,
+              "masterValid": true,
+              "finiteUsageWithinInventory": true
+            }
+          ]
+        },
+        {
+          "phase": "corrected-required-verification",
+          "project": "chromium",
+          "state": "known",
+          "stage": "completed",
+          "exitCode": 0,
+          "frameworkStatus": "passed",
+          "frameworkRetry": 0,
+          "testDurationMs": 19175,
+          "sourceFilesAfterExact": true,
+          "postFailureEvaluateOrRead": 0,
+          "savedIdentityFieldsExact": 30,
+          "loadIdentityFieldsExact": 30,
+          "savedSourceAndOtherDataComparisons": true,
+          "loadFullStringComparison": true,
+          "savedReasonLayerRelationshipExact": true,
+          "recomputedReasonFieldObserved": true,
+          "loadReasonAndAssessmentExact": true,
+          "typedProjectionDirectExact": true,
+          "pageerrorCount": 0,
+          "samples": [
+            {
+              "E": "ready",
+              "I": "ready",
+              "registeredRoute": "ready",
+              "DD4Scope": true,
+              "speedTarget": 0,
+              "candidateExaminedCounter": 0,
+              "evaluationCallCount": null,
+              "searchStatus": "incomplete",
+              "searchReasons": [
+                "bounded-search"
+              ],
+              "searchExhaustive": false,
+              "readinessRegisteredReady": false,
+              "masterValid": true,
+              "finiteUsageWithinInventory": true
+            },
+            {
+              "E": "ready",
+              "I": "ready",
+              "registeredRoute": "ready",
+              "DD4Scope": true,
+              "speedTarget": 0,
+              "candidateExaminedCounter": 0,
+              "evaluationCallCount": null,
+              "searchStatus": "incomplete",
+              "searchReasons": [
+                "bounded-search"
+              ],
+              "searchExhaustive": false,
+              "readinessRegisteredReady": false,
+              "masterValid": true,
+              "finiteUsageWithinInventory": true
+            }
+          ]
+        },
+        {
+          "phase": "initial-on-corrected-final-source",
+          "project": "chromium",
+          "state": "missing",
+          "stage": "completed",
+          "exitCode": 0,
+          "frameworkStatus": "passed",
+          "frameworkRetry": 0,
+          "testDurationMs": 17247,
+          "sourceFilesAfterExact": true,
+          "postFailureEvaluateOrRead": 0,
+          "savedIdentityFieldsExact": 30,
+          "loadIdentityFieldsExact": 30,
+          "savedSourceAndOtherDataComparisons": true,
+          "loadFullStringComparison": true,
+          "savedReasonLayerRelationshipExact": true,
+          "recomputedReasonFieldObserved": true,
+          "loadReasonAndAssessmentExact": true,
+          "typedProjectionDirectExact": true,
+          "pageerrorCount": 0,
+          "samples": [
+            {
+              "E": "missing",
+              "I": "ready",
+              "registeredRoute": "missing",
+              "DD4Scope": false,
+              "speedTarget": 10,
+              "candidateExaminedCounter": 20,
+              "evaluationCallCount": null,
+              "searchStatus": "incomplete",
+              "searchReasons": [
+                "beam-limit"
+              ],
+              "searchExhaustive": false,
+              "readinessRegisteredReady": false,
+              "masterValid": true,
+              "finiteUsageWithinInventory": true
+            },
+            {
+              "E": "missing",
+              "I": "ready",
+              "registeredRoute": "missing",
+              "DD4Scope": false,
+              "speedTarget": 10,
+              "candidateExaminedCounter": 41,
+              "evaluationCallCount": null,
+              "searchStatus": "incomplete",
+              "searchReasons": [
+                "beam-limit"
+              ],
+              "searchExhaustive": false,
+              "readinessRegisteredReady": false,
+              "masterValid": true,
+              "finiteUsageWithinInventory": true
+            }
+          ]
+        },
+        {
+          "phase": "initial-on-corrected-final-source",
+          "project": "chromium",
+          "state": "unknown",
+          "stage": "completed",
+          "exitCode": 0,
+          "frameworkStatus": "passed",
+          "frameworkRetry": 0,
+          "testDurationMs": 11953,
+          "sourceFilesAfterExact": true,
+          "postFailureEvaluateOrRead": 0,
+          "savedIdentityFieldsExact": 30,
+          "loadIdentityFieldsExact": 30,
+          "savedSourceAndOtherDataComparisons": true,
+          "loadFullStringComparison": true,
+          "savedReasonLayerRelationshipExact": true,
+          "recomputedReasonFieldObserved": true,
+          "loadReasonAndAssessmentExact": true,
+          "typedProjectionDirectExact": true,
+          "pageerrorCount": 0,
+          "samples": [
+            {
+              "E": "ready",
+              "I": "manual",
+              "registeredRoute": "manual",
+              "DD4Scope": true,
+              "speedTarget": 0,
+              "candidateExaminedCounter": 0,
+              "evaluationCallCount": null,
+              "searchStatus": "incomplete",
+              "searchReasons": [
+                "bounded-search"
+              ],
+              "searchExhaustive": false,
+              "readinessRegisteredReady": false,
+              "masterValid": true,
+              "finiteUsageWithinInventory": true
+            },
+            {
+              "E": "ready",
+              "I": "manual",
+              "registeredRoute": "manual",
+              "DD4Scope": true,
+              "speedTarget": 0,
+              "candidateExaminedCounter": 0,
+              "evaluationCallCount": null,
+              "searchStatus": "incomplete",
+              "searchReasons": [
+                "bounded-search"
+              ],
+              "searchExhaustive": false,
+              "readinessRegisteredReady": false,
+              "masterValid": true,
+              "finiteUsageWithinInventory": true
+            }
+          ]
+        },
+        {
+          "phase": "initial-on-corrected-final-source",
+          "project": "webkit",
+          "state": "known",
+          "stage": "completed",
+          "exitCode": 0,
+          "frameworkStatus": "passed",
+          "frameworkRetry": 0,
+          "testDurationMs": 10277,
+          "sourceFilesAfterExact": true,
+          "postFailureEvaluateOrRead": 0,
+          "savedIdentityFieldsExact": 30,
+          "loadIdentityFieldsExact": 30,
+          "savedSourceAndOtherDataComparisons": true,
+          "loadFullStringComparison": true,
+          "savedReasonLayerRelationshipExact": true,
+          "recomputedReasonFieldObserved": true,
+          "loadReasonAndAssessmentExact": true,
+          "typedProjectionDirectExact": true,
+          "pageerrorCount": 0,
+          "samples": [
+            {
+              "E": "ready",
+              "I": "ready",
+              "registeredRoute": "ready",
+              "DD4Scope": true,
+              "speedTarget": 0,
+              "candidateExaminedCounter": 0,
+              "evaluationCallCount": null,
+              "searchStatus": "incomplete",
+              "searchReasons": [
+                "bounded-search"
+              ],
+              "searchExhaustive": false,
+              "readinessRegisteredReady": false,
+              "masterValid": true,
+              "finiteUsageWithinInventory": true
+            },
+            {
+              "E": "ready",
+              "I": "ready",
+              "registeredRoute": "ready",
+              "DD4Scope": true,
+              "speedTarget": 0,
+              "candidateExaminedCounter": 0,
+              "evaluationCallCount": null,
+              "searchStatus": "incomplete",
+              "searchReasons": [
+                "bounded-search"
+              ],
+              "searchExhaustive": false,
+              "readinessRegisteredReady": false,
+              "masterValid": true,
+              "finiteUsageWithinInventory": true
+            }
+          ]
+        },
+        {
+          "phase": "initial-on-corrected-final-source",
+          "project": "webkit",
+          "state": "missing",
+          "stage": "completed",
+          "exitCode": 0,
+          "frameworkStatus": "passed",
+          "frameworkRetry": 0,
+          "testDurationMs": 11887,
+          "sourceFilesAfterExact": true,
+          "postFailureEvaluateOrRead": 0,
+          "savedIdentityFieldsExact": 30,
+          "loadIdentityFieldsExact": 30,
+          "savedSourceAndOtherDataComparisons": true,
+          "loadFullStringComparison": true,
+          "savedReasonLayerRelationshipExact": true,
+          "recomputedReasonFieldObserved": true,
+          "loadReasonAndAssessmentExact": true,
+          "typedProjectionDirectExact": true,
+          "pageerrorCount": 0,
+          "samples": [
+            {
+              "E": "missing",
+              "I": "ready",
+              "registeredRoute": "missing",
+              "DD4Scope": false,
+              "speedTarget": 10,
+              "candidateExaminedCounter": 20,
+              "evaluationCallCount": null,
+              "searchStatus": "incomplete",
+              "searchReasons": [
+                "beam-limit"
+              ],
+              "searchExhaustive": false,
+              "readinessRegisteredReady": false,
+              "masterValid": true,
+              "finiteUsageWithinInventory": true
+            },
+            {
+              "E": "missing",
+              "I": "ready",
+              "registeredRoute": "missing",
+              "DD4Scope": false,
+              "speedTarget": 10,
+              "candidateExaminedCounter": 41,
+              "evaluationCallCount": null,
+              "searchStatus": "incomplete",
+              "searchReasons": [
+                "beam-limit"
+              ],
+              "searchExhaustive": false,
+              "readinessRegisteredReady": false,
+              "masterValid": true,
+              "finiteUsageWithinInventory": true
+            }
+          ]
+        },
+        {
+          "phase": "initial-on-corrected-final-source",
+          "project": "webkit",
+          "state": "unknown",
+          "stage": "completed",
+          "exitCode": 0,
+          "frameworkStatus": "passed",
+          "frameworkRetry": 0,
+          "testDurationMs": 12718,
+          "sourceFilesAfterExact": true,
+          "postFailureEvaluateOrRead": 0,
+          "savedIdentityFieldsExact": 30,
+          "loadIdentityFieldsExact": 30,
+          "savedSourceAndOtherDataComparisons": true,
+          "loadFullStringComparison": true,
+          "savedReasonLayerRelationshipExact": true,
+          "recomputedReasonFieldObserved": true,
+          "loadReasonAndAssessmentExact": true,
+          "typedProjectionDirectExact": true,
+          "pageerrorCount": 0,
+          "samples": [
+            {
+              "E": "ready",
+              "I": "manual",
+              "registeredRoute": "manual",
+              "DD4Scope": true,
+              "speedTarget": 0,
+              "candidateExaminedCounter": 0,
+              "evaluationCallCount": null,
+              "searchStatus": "incomplete",
+              "searchReasons": [
+                "bounded-search"
+              ],
+              "searchExhaustive": false,
+              "readinessRegisteredReady": false,
+              "masterValid": true,
+              "finiteUsageWithinInventory": true
+            },
+            {
+              "E": "ready",
+              "I": "manual",
+              "registeredRoute": "manual",
+              "DD4Scope": true,
+              "speedTarget": 0,
+              "candidateExaminedCounter": 0,
+              "evaluationCallCount": null,
+              "searchStatus": "incomplete",
+              "searchReasons": [
+                "bounded-search"
+              ],
+              "searchExhaustive": false,
+              "readinessRegisteredReady": false,
+              "masterValid": true,
+              "finiteUsageWithinInventory": true
+            }
+          ]
+        }
+      ],
+      "states": [
+        "known",
+        "missing",
+        "unknown"
+      ],
+      "projects": [
+        "chromium",
+        "webkit"
+      ],
+      "numericFour": "known/missing have one missing observed gun restored from finite inventory; unknown two start with observed gun and HQmissing",
+      "correctedSavedIdentityFields": 180,
+      "correctedLoadIdentityFields": 180,
+      "initialFailedSavedIdentityFields": 30,
+      "initialFailedLoad": null,
+      "allPhysicalSavedObservationFields": 210,
+      "allPhysicalLoadObservationFields": 180,
+      "initialFailedSavedObservationNotPromotedToPass": true,
+      "pageerrorsActualPerTrial": [
+        {
+          "phase": "initial-fixture-reason-layer-failure",
+          "project": "chromium",
+          "state": "known",
+          "pageerrors": 0
+        },
+        {
+          "phase": "corrected-required-verification",
+          "project": "chromium",
+          "state": "known",
+          "pageerrors": 0
+        },
+        {
+          "phase": "initial-on-corrected-final-source",
+          "project": "chromium",
+          "state": "missing",
+          "pageerrors": 0
+        },
+        {
+          "phase": "initial-on-corrected-final-source",
+          "project": "chromium",
+          "state": "unknown",
+          "pageerrors": 0
+        },
+        {
+          "phase": "initial-on-corrected-final-source",
+          "project": "webkit",
+          "state": "known",
+          "pageerrors": 0
+        },
+        {
+          "phase": "initial-on-corrected-final-source",
+          "project": "webkit",
+          "state": "missing",
+          "pageerrors": 0
+        },
+        {
+          "phase": "initial-on-corrected-final-source",
+          "project": "webkit",
+          "state": "unknown",
+          "pageerrors": 0
+        }
+      ],
+      "comparisonScope": "direct comparisons at existing reads plus typed observations/source contract; not independent second comparison of separately retained full storage-value bodies",
+      "initialFailure": {
+        "case": "Chromium known",
+        "stage": "saved-read",
+        "testDurationMs": 10444,
+        "measureRouteSavedAnnotatedDetailsExact": true,
+        "recomputedBareDetailComparedToAnnotatedIncorrectly": true,
+        "conditionReasonStatusRatioChildrenRetained": true,
+        "observedIdentityFieldsExact": 30,
+        "sourcesOtherFleetOtherMapMetadataExact": true,
+        "loadComparison": null,
+        "pageerrors": 0,
+        "postFailurePageEvaluateOrRead": 0,
+        "productSaveMismatchEstablished": false
+      },
+      "preExecutionLiteralCorrection": "DD3 turbine stockGap0→1 corrected before any browser trial; not a failed/repeated test",
+      "specCorrection": {
+        "SHA256": "46597d16c5ed18b9d7185b4706064de79dcd684d2af7dc1471903c3c03e6c29a",
+        "scope": "same-layer contract condition/reason/status/ratio/children/detail exact; annotated===reason+colon+bare; postload bare/reason exact; no stripping/omission",
+        "productInputPrepareEAPIReadWriteOrderLimitsUnchanged": true
+      },
+      "firstRuntimeManifestSHA256": "fb207a8a41ad9fa88240a2bf91c0d7ab844728b9cd84b0983875e38e2cbd41cc",
+      "correctedRuntimeManifestSHA256": "6fbf781aac3f6dafe70a1adc1ef8f57035e91289613192cc3091eb097ed80234",
+      "actualSourceBindingFinalP/O": {
+        "primarySourceGuard": {
+          "path": "private/local-primary/source-and-node-reuse-proof.json",
+          "bytes": 3528,
+          "sha256": "6171f552a63d2fbb32ad01e54a62787ed704eca24d6718f247df3ff5f48d1b6c"
+        },
+        "independent": {
+          "path": "private/local-independent-review/final-primary-join.json",
+          "bytes": 13948,
+          "sha256": "a9b6dfe71942419ef0758374b0a06c2a36cc8fb0639b41f2fe44623bba1ee8c7"
+        },
+        "committedPublic685EqualsFinalRuntimeSubset": true
+      },
+      "operationTupleCompleteObserved": 6,
+      "searchOutcomeQualification": "Every observed first/load sample remains incomplete and non-exhaustive; bounded-search for known/unknown, beam-limit for DD3 missing. Registered E/I ready is not whole readinessRegisteredReady; no optimal/impossible/purchase-required verdict. Evaluation call counts are not collected.",
+      "actualHTTPServedSourceHashes": null,
+      "genericFrameDropInstrumentation": null
+    },
+    "expectedFixedEnvironment": {
+      "image": "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29",
+      "Node": "24.21.0",
+      "Playwright": "1.55.0",
+      "Chromium": "1187",
+      "WebKit": "2203",
+      "localWorkers": 1,
+      "localRetries": 0,
+      "testMs": 45000,
+      "resultMs": 12000,
+      "maxExamined": 10000,
+      "maxDepth": 24,
+      "actualBrowserProbeAndTrial": {
+        "node": "v24.21.0",
+        "playwright": "1.55.0",
+        "revisions": {
+          "chromium": "1187",
+          "webkit": "2203"
+        },
+        "browserVersionsObserved": {
+          "chromium": "140.0.7339.16",
+          "webkit": "26.0"
+        },
+        "probeBrowserLaunches": 0,
+        "perTrialSourceFilesExact": true,
+        "source": {
+          "path": "private/local-primary/trial-results.json",
+          "bytes": 35146,
+          "sha256": "4134b71ba3b23e66c7c317893cf175672b64fb205b9739094f82ce2ba7d5e42e"
+        }
+      }
+    },
+    "registration": {
+      "expectedNormalListPerProject": 910,
+      "expectedNewPerProject": 3,
+      "actualPreflight": [
+        {
+          "directory": "private/browser-preflight-01",
+          "result": {
+            "path": "private/browser-preflight-01/preflight-result.json",
+            "bytes": 1721,
+            "sha256": "58542920ce8f3518dbdb2616a09fa4266eb3794d57fe8f7c7721d16ded1d7c83"
+          },
+          "normalSmokeCountPerProject": 910,
+          "newCasesSelectedExactlyOncePerProject": 3,
+          "browserExecutions": 0,
+          "testExecutions": 0,
+          "runtimeManifestSHA256": "fb207a8a41ad9fa88240a2bf91c0d7ab844728b9cd84b0983875e38e2cbd41cc"
+        },
+        {
+          "directory": "private/browser-preflight-after-reason-01",
+          "result": {
+            "path": "private/browser-preflight-after-reason-01/preflight-result.json",
+            "bytes": 1721,
+            "sha256": "58542920ce8f3518dbdb2616a09fa4266eb3794d57fe8f7c7721d16ded1d7c83"
+          },
+          "normalSmokeCountPerProject": 910,
+          "newCasesSelectedExactlyOncePerProject": 3,
+          "browserExecutions": 0,
+          "testExecutions": 0,
+          "runtimeManifestSHA256": "6fbf781aac3f6dafe70a1adc1ef8f57035e91289613192cc3091eb097ed80234"
+        }
+      ],
+      "actualOutputWildcard": {
+        "pattern": "test-results/route-two-five-ceio-*/route-guidance-summary.json",
+        "actualSixSelected": true,
+        "scope": "observed local basenames projected to workflow default root; CI paths not yet observed",
+        "source": {
+          "path": "private/local-primary/workflow-path-check/actual-six-path-workflow-selection.json",
+          "bytes": 4697,
+          "sha256": "0c8712c72d24a782ff0cfe83c8067509a1539633906e62ff676ecd349daac4f4"
+        }
+      }
+    },
+    "primaryLocalManifest": {
+      "path": "private/local-primary/manifest.json",
+      "bytes": 1859,
+      "sha256": "796bda68e30fee95fb490e2d66e017d57e7ebec85b5902af388387b478f0fe4d"
+    },
+    "independentLocalJoin": {
+      "path": "private/local-independent-review/final-primary-join.json",
+      "bytes": 13948,
+      "sha256": "a9b6dfe71942419ef0758374b0a06c2a36cc8fb0639b41f2fe44623bba1ee8c7"
+    },
+    "normalCI": {
+      "id": 42024915243,
+      "sourceHEAD": "03c4759ba4ecf594b1f96daf608ae9a36968cc11",
+      "attempt": 1,
+      "event": "workflow_dispatch",
+      "state": "dispatch confirmed; final results pending",
+      "results": null,
+      "sameHEADAutoRunCountBeforeDispatch": [
+        0,
+        0
+      ],
+      "dispatchInvocations": 1,
+      "rerunInvocations": 0,
+      "oldGapsBackfilled": false,
+      "receipt": {
+        "path": "private/root-dispatch-receipt.json",
+        "bytes": 332,
+        "sha256": "8abf3edf06cda4163981493a6d08962ba8b98db8f1c81054d34276b6a741c3da"
+      }
+    },
+    "previousCI42001989505": {
+      "source": "32a87a092ff0df35cb7ba7f95a901577f6d50553",
+      "recordHEAD": "f37b7e2009fa2090059c4569efb066a477714519",
+      "smokeSuccessJobs": 4,
+      "cancelled": [
+        "C2",
+        "W4"
+      ],
+      "officialJob45m": true,
+      "C1Subtotal": [
+        454,
+        0,
+        0
+      ],
+      "W1to3Subtotal": [
+        681,
+        0,
+        0
+      ],
+      "allC": null,
+      "allW": null,
+      "target6MetadataStagesFinalResult": null,
+      "smokeBeforeAlwaysUpload": true,
+      "uploadInitialLimitTrigger": false,
+      "internalSmokeDelayCause": null,
+      "newResultFillsOldMissing": false
+    },
+    "oldCI41216819787": {
+      "C": [
+        904,
+        0,
+        0
+      ],
+      "W1to3Subtotal": [
+        678,
+        0,
+        0
+      ],
+      "W4": "cancelled",
+      "allW": null,
+      "oldW3Final": null,
+      "newResultFillsOldMissing": false
+    },
+    "progress": {
+      "before": [
+        28,
+        153,
+        55
+      ],
+      "after": [
+        28,
+        153,
+        55
+      ],
+      "cellDelta": 0,
+      "sameRow": "2-5/1/default",
+      "A": "一部",
+      "B": "一部",
+      "C": "一部",
+      "D": "確認済み existing local I basis retained; new E6 complete operation tuples primary/independent sealed; status unchanged",
+      "all59StatusAndLegacy53Exact": true,
+      "noSameRowExtraCell": true
+    },
+    "references": {
+      "source": {
+        "path": "private/source-contract/source-contract.json",
+        "bytes": 12334,
+        "sha256": "21ce488e16879963ebdadc7ec7c16bcd2de52ae78cd06c59572a7a3caa2e5476"
+      },
+      "sourceManifest": {
+        "path": "private/source-contract/manifest.json",
+        "bytes": 397,
+        "sha256": "4ef37b8bdd7f78715b1722312d0c01a3b6b26a52e3a8a2656040ba12750b122b"
+      },
+      "sourceClosure": {
+        "path": "private/source-contract/closure.json",
+        "bytes": 208,
+        "sha256": "e9be0c5fca0f9b9d0ff679c408aa08dcdcaad72e64d0fc93ccedf879dffb43fd"
+      },
+      "oldCIUploadOrdering": {
+        "path": "private/old-ci-42001989505-time-boundary/smoke-versus-upload-boundary.json",
+        "bytes": 10810,
+        "sha256": "f6e846405648c0df2f341f9ecce8f8d0b1c063ac8eb88ba7949ac1b7b1ca1204"
+      },
+      "oldCIUploadManifest": {
+        "path": "private/old-ci-42001989505-time-boundary/manifest.json",
+        "bytes": 410,
+        "sha256": "993bc188e96949ead0f5182007dabbe758a430405b2f5aa22510f3afe21cee25"
+      },
+      "oldCIUploadClosure": {
+        "path": "private/old-ci-42001989505-time-boundary/closure.json",
+        "bytes": 208,
+        "sha256": "0d7e2609b62aaf2fff3906ecbe092473206df9a43075c9fcdcf4382dea0b55cb"
+      },
+      "product": {
+        "path": "private/product/replacements-v3.json",
+        "bytes": 5108,
+        "sha256": "f945e6444b935c36803ef9d7ea83a386587ba2870f45b9a6b4994b14664334e4"
+      },
+      "productIndependent": {
+        "path": "private/product-independent-review/review.json",
+        "bytes": 9606,
+        "sha256": "4dabb66163c5d38028612efcc0d112b6045206ddc413d98064e06e4e2c1571b0"
+      },
+      "productIndependentClosure": {
+        "path": "private/product-independent-review/closure.json",
+        "bytes": 660,
+        "sha256": "4474b159e3d12ba016760b52560ab5dbfb3f04b476700bcd1dd0e9b7e6b65863"
+      },
+      "harnessStatic": {
+        "path": "private/harness-review/static-final-review.json",
+        "bytes": 12284,
+        "sha256": "6359721ae9c2d1ff665ca600e5175a484787007281dcf699dc6ea3374b794199"
+      },
+      "harnessClosure": {
+        "path": "private/harness-review/closure.json",
+        "bytes": 336,
+        "sha256": "5e4459a81f303d2847ce16a2093b27d02c49dc77338e57f8e1cfeb974e4af0c0"
+      },
+      "nodePlan": {
+        "path": "private/node-preparation/plan.json",
+        "bytes": 5972,
+        "sha256": "7d6f5818d072fd98044867806bfc5fb4919e2e23804a5261c01eb827b2480458"
+      },
+      "nodeResult": {
+        "path": "private/node-e-and-light-01/node-result.json",
+        "bytes": 8498,
+        "sha256": "f78cca8df86cb9e6511dad14096a93fa584fc28c97c6ef3cd869a0234fba7ae2"
+      },
+      "nodeObservations": {
+        "path": "private/node-e-and-light-01/observations.json",
+        "bytes": 656,
+        "sha256": "b2999a4ecb2993a436156d48d77571c474ef436175ea31a5c3c6b855d6b3e5e1"
+      },
+      "nodeHostStatus": {
+        "path": "private/node-e-and-light-01/host-status.json",
+        "bytes": 317,
+        "sha256": "7ce214fc6127aa68d88f539a1235acb74fe42772eab6ad31ae2da5ce31186cc5"
+      },
+      "browserPlan": {
+        "path": "private/root-browser-plan.json",
+        "bytes": 120620,
+        "sha256": "9210ac0666a7aa8320e05aade41f8a9cf032082375aa031370775e0c13a94320"
+      },
+      "browserDesign": {
+        "path": "private/browser-design/initial-design.json",
+        "bytes": 3143,
+        "sha256": "2db46a7d4dfa5a80252cf7e87d254492bb5dfcdb15cb238750f77ea62eaa2d37"
+      },
+      "firstFixtureClassification": {
+        "path": "private/first-fixture-failure-classification.json",
+        "bytes": 890,
+        "sha256": "4128fda629fd14d0c24601d515d1b67c4b41a6901e80c50bbc478f2489e6665a"
+      },
+      "reasonLayerIndependent": {
+        "path": "private/browser-reason-layer-review/review.json",
+        "bytes": 6483,
+        "sha256": "0d999902685d283276b2eaabb1ea6d0463ee5ed9196a02cbee170f8f09cb4c63"
+      },
+      "reasonLayerManifest": {
+        "path": "private/browser-reason-layer-review/manifest.json",
+        "bytes": 188,
+        "sha256": "94218a5d52e69c878e6355783b00dc421317b43178ad3a20f387ede021654d56"
+      },
+      "reasonLayerClosure": {
+        "path": "private/browser-reason-layer-review/closure.json",
+        "bytes": 238,
+        "sha256": "c9fc28b41e9b0ffd8c96cc2c22067cac0d124cae78aec3dcd4c3562dc906c2b0"
+      },
+      "preExecutionLiteralCorrection": {
+        "path": "private/browser-expectation-correction/correction-contract.json",
+        "bytes": 1780,
+        "sha256": "1c0e0b3759aba8e4fb86404a044dc58be6f47aba95ee8a83add82b5b972f8cf2"
+      },
+      "specSameLayerCorrection": {
+        "path": "private/browser-string-layer-correction/correction-contract.json",
+        "bytes": 2156,
+        "sha256": "93a9d9fc0c1b264bf0fdd8c0c0ec5c112d3722b39f6bde2444b443cc8f2ef29b"
+      },
+      "legacyGearCompatibility": {
+        "path": "private/product/legacy-preset-gear-compatibility-review.json",
+        "bytes": 3552,
+        "sha256": "9defe87b86b1cf31d29db8fc1f56ec279ef7e1827b8aaaf842448b58b07b83f2"
+      },
+      "correctedBrowserBoundPlan": {
+        "path": "private/root-browser-after-reason-plan.json",
+        "bytes": 120831,
+        "sha256": "84580426a047164b2750dbdee1aced396efb5c4085c30f98219fe2c38c21d84d"
+      },
+      "nextStaticTarget": {
+        "path": "private/next-target-static-review/plan.json",
+        "bytes": 5557,
+        "sha256": "4b06ed053c6b2ad5d61a4c4cb077f8a64b56b09047301402af4caf12ff682f68"
+      },
+      "localPrimaryTrials": {
+        "path": "private/local-primary/trial-results.json",
+        "bytes": 35146,
+        "sha256": "4134b71ba3b23e66c7c317893cf175672b64fb205b9739094f82ce2ba7d5e42e"
+      },
+      "localPrimarySourceNodeReuse": {
+        "path": "private/local-primary/source-and-node-reuse-proof.json",
+        "bytes": 3528,
+        "sha256": "6171f552a63d2fbb32ad01e54a62787ed704eca24d6718f247df3ff5f48d1b6c"
+      },
+      "localPrimaryCanonical": {
+        "path": "private/local-primary/canonical.json",
+        "bytes": 4536,
+        "sha256": "cc84ccb05e2eb7d99a4a215a712684a8b24df19f5b23ff49c0e2f2c20f5c1d9f"
+      },
+      "localPrimaryManifest": {
+        "path": "private/local-primary/manifest.json",
+        "bytes": 1859,
+        "sha256": "796bda68e30fee95fb490e2d66e017d57e7ebec85b5902af388387b478f0fe4d"
+      },
+      "localPrimaryClosure": {
+        "path": "private/local-primary/closure.json",
+        "bytes": 505,
+        "sha256": "9a2e8e91e22514c53656518d2de0bf35a5fdb32612b10b0ba504c4f4b35e2613"
+      },
+      "cvlOnlyStaticBoundary": {
+        "path": "private/final-scope-addenda/cvl-only-static-boundary.json",
+        "bytes": 3521,
+        "sha256": "b55a859908d8be12198f03f960c1bfcb094609472fc11698d25853909ba4be3f"
+      },
+      "independentLocalJoin": {
+        "path": "private/local-independent-review/final-primary-join.json",
+        "bytes": 13948,
+        "sha256": "a9b6dfe71942419ef0758374b0a06c2a36cc8fb0639b41f2fe44623bba1ee8c7"
+      },
+      "independentLocalManifest": {
+        "path": "private/local-independent-review/manifest.json",
+        "bytes": 879,
+        "sha256": "85ef4731f57a2fe600a3e8bbd6c77a3a04b8ff54e9c9eb34a73e5d09f69df324"
+      },
+      "independentLocalClosure": {
+        "path": "private/local-independent-review/closure.json",
+        "bytes": 270,
+        "sha256": "9488a05f049f281c981b81075fdeb72a22c8ec7197df5d6a904a07ef23105b71"
+      },
+      "committedSourceManifest": {
+        "path": "private/committed-source-manifest.json",
+        "bytes": 115751,
+        "sha256": "f57cecce50f2aa2a3b20c05646cd222b65d2561e417d536fe5f74295a3e215be"
+      },
+      "normalCIDispatch": {
+        "path": "private/root-dispatch-receipt.json",
+        "bytes": 332,
+        "sha256": "8abf3edf06cda4163981493a6d08962ba8b98db8f1c81054d34276b6a741c3da"
+      }
+    },
+    "privacy": "storedvalue bodies/trace/video remainprivate; sharedonlyallowlisted aggregate/equality/missing metadata",
+    "pending": [
+      "new source normalCI final results and available originals",
+      "final recordHEAD"
+    ],
+    "WTGitNodeBrowserCIAPIActionsByRecordsAgent": 0,
+    "versionFixtureScope": {
+      "versionURLs": "same existing two app-version GET endpoints",
+      "response": "fixed JSON test input",
+      "realNetworkOrProductVersionSuccessVerified": false,
+      "oldAccessControlCauseResolved": false,
+      "oldUpdateUIFinalStateKnown": false
+    },
+    "legacyPresetGearCompatibility": {
+      "method": "static only; no extra trial",
+      "unchangedInputs": "preset.name/ships/flagship",
+      "gearPartOfCanonical6Keys": false,
+      "arbitraryCustomOldPresetCompatibilityClaim": false
+    },
+    "primaryLocalCanonical": {
+      "path": "private/local-primary/canonical.json",
+      "bytes": 4536,
+      "sha256": "cc84ccb05e2eb7d99a4a215a712684a8b24df19f5b23ff49c0e2f2c20f5c1d9f"
+    },
+    "primaryLocalClosure": {
+      "path": "private/local-primary/closure.json",
+      "bytes": 505,
+      "sha256": "9a2e8e91e22514c53656518d2de0bf35a5fdb32612b10b0ba504c4f4b35e2613"
+    },
+    "independentLocalManifest": {
+      "path": "private/local-independent-review/manifest.json",
+      "bytes": 879,
+      "sha256": "85ef4731f57a2fe600a3e8bbd6c77a3a04b8ff54e9c9eb34a73e5d09f69df324"
+    },
+    "independentLocalClosure": {
+      "path": "private/local-independent-review/closure.json",
+      "bytes": 270,
+      "sha256": "9488a05f049f281c981b81075fdeb72a22c8ec7197df5d6a904a07ef23105b71"
+    },
+    "nextPriority": "4-2/index0/default ACL / BDCL：非選択Hの「制空不要」を全nodes文字列へ結合した結果、選択経路の任意対空CI profile/案内が抑制される静的未接続を次に確認する。index1の共通部は重複検証せず、強制CI1・調達数を作らず、任意表示と選択方針を分ける。現段階は静的候補のみ・未実装/未試験・セル変更0。",
+    "scopeLimit": "Newly verified ordinary canonical CV/CVB1 CL1 DD4 family and retained DD3/HQ-unknown representatives only. Source-waiting outside-family applicability is not resolved, generalized to allCL/DD fleets, or certified as universally manual in currentUI.",
+    "localEvidencePreservation": {
+      "originalFiles": 320,
+      "allBytesSHAAndRecordedStatsExact": true,
+      "traceZIPs": 7,
+      "CRCVerifiedMembers": 1047,
+      "videosPresent": 7,
+      "videoPlayback": false,
+      "sharedTypedOnlyCandidates": 7,
+      "sharedStorageBodies": false,
+      "rawCopiesCreatedByCollection": 0,
+      "source": {
+        "path": "private/local-primary/raw-preservation-final.json",
+        "bytes": 362,
+        "sha256": "b5cbfdb386d556f55a980ea3fb6282fa4715aff20b5d197b3ca9ecaa3054e7ef"
+      },
+      "canonicalVideoPaths": 7,
+      "temporaryExactDuplicateVideoPaths": 1,
+      "totalObservedVideoPaths": 8,
+      "videoPathCountNotTrialCount": true
+    },
+    "retainedCVLOnlyStaticLimitation": "CVL-only既知6隻の低速例は既存例/高速arm由来missingが残る。出典待ちという台帳区分はそのUI表示を根拠ある経路不可能/高速化で解決へ格上げしない。今回対象外。",
+    "independentReviewLimits": {
+      "separateRawHashProjectionRecalculation": true,
+      "runtimeRecipeAuthorAlsoReviewer": true,
+      "notIndependentOfRuntimeRecipe": true,
+      "completeStorageBodySecondIndependentComparison": false,
+      "actualHTTPServedSourceHashes": null,
+      "initialStaticAssertionLayerMissDocumented": true
+    }
+  },
+  "twoFiveCeioEPriorityCIFinalization20261105": {
+    "schemaVersion": 1,
+    "recordKey": "twoFiveCeioEPriorityCIFinalization20261105",
+    "preparedAtJST": "2026-11-05T22:26:27.090779+09:00",
+    "state": "closed-qualified-CI-finalization-primary-and-independent-joined",
+    "applicationReady": true,
+    "sourceHEAD": "03c4759ba4ecf594b1f96daf608ae9a36968cc11",
+    "baselineHEAD": "f37b7e2009fa2090059c4569efb066a477714519",
+    "run": {
+      "id": 42024915243,
+      "attempt": 1,
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "smokeSuccessJobs": 5,
+      "cancelledSmokeJobs": [
+        "W4"
+      ],
+      "Full": "skipped",
+      "manualDispatchInvocations": 1,
+      "rerunInvocations": 0,
+      "cancelInvocations": 0
+    },
+    "officialLabels": {
+      "meaning": "passed/flaky/failed labels, not strict initial successes or physical attempts",
+      "CFull": [
+        910,
+        0,
+        0
+      ],
+      "W1to3Subtotal": [
+        683,
+        0,
+        0
+      ],
+      "W4Footer": null,
+      "WFull": null,
+      "W4Official45m0sJobLimit": true,
+      "W4PhysicalTrials": null,
+      "W4FinalCaseResults": null,
+      "unobservedStartsNotInferredAsUnstarted": true
+    },
+    "ownJobs": [
+      {
+        "name": "Smoke / webkit / shard 3 of 4",
+        "conclusion": "success",
+        "Node": {
+          "tests": 677,
+          "pass": 677,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0,
+          "matchesPredictedTests": true
+        },
+        "actualCheckoutSHA": "03c4759ba4ecf594b1f96daf608ae9a36968cc11",
+        "pulledImageDigests": [
+          "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29"
+        ],
+        "environment": {
+          "node": "v24.21.0",
+          "browser": "webkit",
+          "playwright": "1.55.0",
+          "revisions": {
+            "webkit": "2203",
+            "ffmpeg": "1011"
+          },
+          "browserVersion": "26.0"
+        },
+        "officialPassedFlakyFailed": {
+          "passed": 227,
+          "flaky": 0,
+          "failed": 0
+        },
+        "completePlaywrightFooter": true,
+        "officialJob45m": false
+      },
+      {
+        "name": "Smoke / chromium / shard 2 of 2",
+        "conclusion": "success",
+        "Node": {
+          "tests": 677,
+          "pass": 677,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0,
+          "matchesPredictedTests": true
+        },
+        "actualCheckoutSHA": "03c4759ba4ecf594b1f96daf608ae9a36968cc11",
+        "pulledImageDigests": [
+          "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29"
+        ],
+        "environment": {
+          "node": "v24.21.0",
+          "browser": "chromium",
+          "playwright": "1.55.0",
+          "revisions": {
+            "chromium": "1187",
+            "chromium-headless-shell": "1187",
+            "ffmpeg": "1011"
+          },
+          "browserVersion": "140.0.7339.16"
+        },
+        "officialPassedFlakyFailed": {
+          "passed": 455,
+          "flaky": 0,
+          "failed": 0
+        },
+        "completePlaywrightFooter": true,
+        "officialJob45m": false
+      },
+      {
+        "name": "Smoke / chromium / shard 1 of 2",
+        "conclusion": "success",
+        "Node": {
+          "tests": 677,
+          "pass": 677,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0,
+          "matchesPredictedTests": true
+        },
+        "actualCheckoutSHA": "03c4759ba4ecf594b1f96daf608ae9a36968cc11",
+        "pulledImageDigests": [
+          "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29"
+        ],
+        "environment": {
+          "node": "v24.21.0",
+          "browser": "chromium",
+          "playwright": "1.55.0",
+          "revisions": {
+            "chromium": "1187",
+            "chromium-headless-shell": "1187",
+            "ffmpeg": "1011"
+          },
+          "browserVersion": "140.0.7339.16"
+        },
+        "officialPassedFlakyFailed": {
+          "passed": 455,
+          "flaky": 0,
+          "failed": 0
+        },
+        "completePlaywrightFooter": true,
+        "officialJob45m": false
+      },
+      {
+        "name": "Smoke / webkit / shard 2 of 4",
+        "conclusion": "success",
+        "Node": {
+          "tests": 677,
+          "pass": 677,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0,
+          "matchesPredictedTests": true
+        },
+        "actualCheckoutSHA": "03c4759ba4ecf594b1f96daf608ae9a36968cc11",
+        "pulledImageDigests": [
+          "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29"
+        ],
+        "environment": {
+          "node": "v24.21.0",
+          "browser": "webkit",
+          "playwright": "1.55.0",
+          "revisions": {
+            "webkit": "2203",
+            "ffmpeg": "1011"
+          },
+          "browserVersion": "26.0"
+        },
+        "officialPassedFlakyFailed": {
+          "passed": 228,
+          "flaky": 0,
+          "failed": 0
+        },
+        "completePlaywrightFooter": true,
+        "officialJob45m": false
+      },
+      {
+        "name": "Smoke / webkit / shard 1 of 4",
+        "conclusion": "success",
+        "Node": {
+          "tests": 677,
+          "pass": 677,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0,
+          "matchesPredictedTests": true
+        },
+        "actualCheckoutSHA": "03c4759ba4ecf594b1f96daf608ae9a36968cc11",
+        "pulledImageDigests": [
+          "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29"
+        ],
+        "environment": {
+          "node": "v24.21.0",
+          "browser": "webkit",
+          "playwright": "1.55.0",
+          "revisions": {
+            "webkit": "2203",
+            "ffmpeg": "1011"
+          },
+          "browserVersion": "26.0"
+        },
+        "officialPassedFlakyFailed": {
+          "passed": 228,
+          "flaky": 0,
+          "failed": 0
+        },
+        "completePlaywrightFooter": true,
+        "officialJob45m": false
+      },
+      {
+        "name": "Smoke / webkit / shard 4 of 4",
+        "conclusion": "cancelled",
+        "Node": {
+          "tests": 677,
+          "pass": 677,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0,
+          "matchesPredictedTests": true
+        },
+        "actualCheckoutSHA": "03c4759ba4ecf594b1f96daf608ae9a36968cc11",
+        "pulledImageDigests": [
+          "sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29"
+        ],
+        "environment": {
+          "node": "v24.21.0",
+          "browser": "webkit",
+          "playwright": "1.55.0",
+          "revisions": {
+            "webkit": "2203",
+            "ffmpeg": "1011"
+          },
+          "browserVersion": "26.0"
+        },
+        "officialPassedFlakyFailed": null,
+        "completePlaywrightFooter": false,
+        "officialJob45m": true
+      }
+    ],
+    "nodeScope": "Each own job footer677pass/0fail, not multiplied into 4062 unique tests. Actual per-job env and checkout matched.",
+    "target6": {
+      "caseRecords": [
+        {
+          "project": "chromium",
+          "state": "known",
+          "metadataAvailable": true,
+          "rawEvidenceAvailable": false,
+          "finalFrameworkResult": "passed",
+          "numericExitCode": null,
+          "normalStartOrUnstartedInferredFromAbsence": false,
+          "firstErrorStage": null,
+          "missingCheckpointClassification": null,
+          "trials": [
+            {
+              "retryIndex": 0,
+              "framework": {
+                "initialOutcome": "passed",
+                "finalOutcome": "passed",
+                "basis": "own complete all-passed shard footer plus active-step progress, initial metadata namespace and completed expected body",
+                "completeOwnJobFooter": true,
+                "metadataCompletedAloneIsPass": false
+              },
+              "metadataMemberSHA256": "a9a60e462d2e8e84e7eddcf2bbf6cfb1f7f9cbadac737d8e8fc0e67bdd24b049",
+              "stage": "completed",
+              "pageerrorCount": 0,
+              "sampleCount": 2,
+              "checkpoints": {
+                "saved": {
+                  "reached": true,
+                  "typedIdentityFieldCount": 30,
+                  "sourceBoundTypedPreservationFlagsAllExpected": true,
+                  "normalProducerNullFields": [
+                    "sameDocument",
+                    "customExact",
+                    "assessmentExact"
+                  ],
+                  "rawValuesIndependentlyRecompared": false,
+                  "rawPerOriginalReconstructed": false
+                },
+                "load": {
+                  "reached": true,
+                  "typedIdentityFieldCount": 30,
+                  "sourceBoundTypedPreservationFlagsAllExpected": true,
+                  "normalProducerNullFields": [
+                    "gearMatchesProposal"
+                  ],
+                  "rawValuesIndependentlyRecompared": false,
+                  "rawPerOriginalReconstructed": false
+                }
+              },
+              "numericTrialExitCode": null,
+              "rawEvidenceMemberCount": 0,
+              "rawPerOriginalIndependentlyRecomputed": false,
+              "originalStorageBodySecondComparison": false
+            }
+          ]
+        },
+        {
+          "project": "chromium",
+          "state": "missing",
+          "metadataAvailable": true,
+          "rawEvidenceAvailable": false,
+          "finalFrameworkResult": "passed",
+          "numericExitCode": null,
+          "normalStartOrUnstartedInferredFromAbsence": false,
+          "firstErrorStage": null,
+          "missingCheckpointClassification": null,
+          "trials": [
+            {
+              "retryIndex": 0,
+              "framework": {
+                "initialOutcome": "passed",
+                "finalOutcome": "passed",
+                "basis": "own complete all-passed shard footer plus active-step progress, initial metadata namespace and completed expected body",
+                "completeOwnJobFooter": true,
+                "metadataCompletedAloneIsPass": false
+              },
+              "metadataMemberSHA256": "128b3d40487b94f5dc84fd2932815192f0e72de98d91107292dbb74e9706c567",
+              "stage": "completed",
+              "pageerrorCount": 0,
+              "sampleCount": 2,
+              "checkpoints": {
+                "saved": {
+                  "reached": true,
+                  "typedIdentityFieldCount": 30,
+                  "sourceBoundTypedPreservationFlagsAllExpected": true,
+                  "normalProducerNullFields": [
+                    "sameDocument",
+                    "customExact",
+                    "assessmentExact"
+                  ],
+                  "rawValuesIndependentlyRecompared": false,
+                  "rawPerOriginalReconstructed": false
+                },
+                "load": {
+                  "reached": true,
+                  "typedIdentityFieldCount": 30,
+                  "sourceBoundTypedPreservationFlagsAllExpected": true,
+                  "normalProducerNullFields": [
+                    "gearMatchesProposal"
+                  ],
+                  "rawValuesIndependentlyRecompared": false,
+                  "rawPerOriginalReconstructed": false
+                }
+              },
+              "numericTrialExitCode": null,
+              "rawEvidenceMemberCount": 0,
+              "rawPerOriginalIndependentlyRecomputed": false,
+              "originalStorageBodySecondComparison": false
+            }
+          ]
+        },
+        {
+          "project": "chromium",
+          "state": "unknown",
+          "metadataAvailable": true,
+          "rawEvidenceAvailable": false,
+          "finalFrameworkResult": "passed",
+          "numericExitCode": null,
+          "normalStartOrUnstartedInferredFromAbsence": false,
+          "firstErrorStage": null,
+          "missingCheckpointClassification": null,
+          "trials": [
+            {
+              "retryIndex": 0,
+              "framework": {
+                "initialOutcome": "passed",
+                "finalOutcome": "passed",
+                "basis": "own complete all-passed shard footer plus active-step progress, initial metadata namespace and completed expected body",
+                "completeOwnJobFooter": true,
+                "metadataCompletedAloneIsPass": false
+              },
+              "metadataMemberSHA256": "35412c60314a7128f2313e9e338330acc503657bacfd62d061c24996e7cd21b7",
+              "stage": "completed",
+              "pageerrorCount": 0,
+              "sampleCount": 2,
+              "checkpoints": {
+                "saved": {
+                  "reached": true,
+                  "typedIdentityFieldCount": 30,
+                  "sourceBoundTypedPreservationFlagsAllExpected": true,
+                  "normalProducerNullFields": [
+                    "sameDocument",
+                    "customExact",
+                    "assessmentExact"
+                  ],
+                  "rawValuesIndependentlyRecompared": false,
+                  "rawPerOriginalReconstructed": false
+                },
+                "load": {
+                  "reached": true,
+                  "typedIdentityFieldCount": 30,
+                  "sourceBoundTypedPreservationFlagsAllExpected": true,
+                  "normalProducerNullFields": [
+                    "gearMatchesProposal"
+                  ],
+                  "rawValuesIndependentlyRecompared": false,
+                  "rawPerOriginalReconstructed": false
+                }
+              },
+              "numericTrialExitCode": null,
+              "rawEvidenceMemberCount": 0,
+              "rawPerOriginalIndependentlyRecomputed": false,
+              "originalStorageBodySecondComparison": false
+            }
+          ]
+        },
+        {
+          "project": "webkit",
+          "state": "known",
+          "metadataAvailable": false,
+          "rawEvidenceAvailable": null,
+          "finalFrameworkResult": null,
+          "numericExitCode": null,
+          "normalStartOrUnstartedInferredFromAbsence": false,
+          "firstErrorStage": null,
+          "missingCheckpointClassification": "not observed",
+          "trials": []
+        },
+        {
+          "project": "webkit",
+          "state": "missing",
+          "metadataAvailable": false,
+          "rawEvidenceAvailable": null,
+          "finalFrameworkResult": null,
+          "numericExitCode": null,
+          "normalStartOrUnstartedInferredFromAbsence": false,
+          "firstErrorStage": null,
+          "missingCheckpointClassification": "not observed",
+          "trials": []
+        },
+        {
+          "project": "webkit",
+          "state": "unknown",
+          "metadataAvailable": false,
+          "rawEvidenceAvailable": null,
+          "finalFrameworkResult": null,
+          "numericExitCode": null,
+          "normalStartOrUnstartedInferredFromAbsence": false,
+          "firstErrorStage": null,
+          "missingCheckpointClassification": "not observed",
+          "trials": []
+        }
+      ],
+      "CInitialPassed": 3,
+      "CRetrySuccess": 0,
+      "CFinalFailed": 0,
+      "WFinalResults": null,
+      "WMetadataAndCheckpoints": null,
+      "sourceBoundTypedOnlySavedIdentityFields": 90,
+      "sourceBoundTypedOnlyLoadIdentityFields": 90,
+      "typedProducerFlagsOnly": true,
+      "rawEEvidenceAvailable": 0,
+      "rawPerOriginalRegeneration": false,
+      "independentSavedBodyRecomparison": false,
+      "targetTrialExitCodes": null,
+      "metadataCompleteAloneProvesFrameworkPassed": false,
+      "CIFrameworkCBasis": "ownC2 complete455/0/0 footer + within-smoke progress + initial namespace/sourcebound typed expected completed body",
+      "local6NeverBackfillsCIMissing": true
+    },
+    "artifacts": {
+      "eligibleAppDownloads": 8,
+      "eligibleFilesystemZIPs": 8,
+      "eligibleCompressedBytes": 370154,
+      "eligibleRegularMembers": 95,
+      "allCRCSizeSHAExact": true,
+      "over512MiBOriginalsNotRequested": 2,
+      "overCapInternalInventory": null,
+      "allOriginalNonexistenceClaim": false,
+      "newDiagnosisOrTestsToFillMissing": 0
+    },
+    "globalClassification": {
+      "diagnosticHeaders": 16,
+      "headersNotFinalFailedTotalsOrPhysicalTrials": true,
+      "first8Ref": {
+        "path": "private/ci-global-first-eight/classification.json",
+        "bytes": 37624,
+        "sha256": "1eb982c73bcbf08cee5f8a178d65557d6d5740bcc023125c2539e25f9797c388"
+      },
+      "last8Ref": {
+        "path": "private/ci-global-last-eight/classification.json",
+        "bytes": 82616,
+        "sha256": "b98fdc9a835d0abfb26ec8237d22e8d620b8ea4fe60fd5097a437250fc7d76b6"
+      },
+      "last8CommittedSourceBinding": {
+        "path": "private/ci-global-last-eight-source-binding/source-binding.json",
+        "bytes": 5675,
+        "sha256": "71e935ff8001ee9dd37f5b165ebd6a07984546a11ecaeec1486fcb779d328985"
+      },
+      "failureStages": "night-policy exception assertions/access-control and other cases post-load second-search click element-not-visible",
+      "initialRetrySeparatedInSealedClassification": true,
+      "missingRetryOutcomes": null,
+      "finalW4FooterAbsent": true,
+      "fullPostLoadComparisonsAfterHiddenClickUnreached": true,
+      "displayChangeCallerAndCause": null,
+      "sameCauseAsOldFailure": null,
+      "newPositiveSaveOrIdentityMismatchObservedInScopedRecords": false,
+      "storageSafetyProven": false
+    },
+    "coverageAddendum": {
+      "NodeUnknownHull": "executed CV1CL1DD3 + unknown sixth",
+      "browserUnknown": "knownDD4 all hulls + missingHQ",
+      "CL1DD4UnknownCarrier": "static only; canonical info/no other knownmissing ⇒ contract/final manual; not all unknowninputs manual",
+      "knownBBUnknownHQ": "separate executed missing preserved boundary",
+      "newExecution": 0,
+      "cellDelta": 0,
+      "ref": {
+        "path": "private/final-unknown-scope-addendum/review.json",
+        "bytes": 5863,
+        "sha256": "9460e53373273ee0e0ca890a70b171ad6131813324bf0ca279a136300631d8f5"
+      }
+    },
+    "progress": {
+      "before": [
+        28,
+        153,
+        55
+      ],
+      "after": [
+        28,
+        153,
+        55
+      ],
+      "cellDelta": 0,
+      "all236statusAndLegacy53Preserved": true,
+      "row": "2-5/1/default",
+      "A": "一部",
+      "B": "一部",
+      "C": "一部",
+      "D": "確認済み limited local basis retained; C typed-only CI observation adds no status, W remains missing"
+    },
+    "oldCI42001989505": "4smoke success/C2W4 cancelled official45m; C1 subtotal454/0/0 W1–3subtotal681/0/0 fullC/fullW/target6final+checkpointsnull unchanged",
+    "oldCI41216819787": "C904/0/0 W1–3subtotal678/0/0 W4cancel/fullW and oldW3finalnull unchanged",
+    "nextPriority": "4-2/index0 ACL / BDCLの任意対空CI装備例の表示だけを最小候補Aとして確認する。単純なprofile復活はhdSEChecks minCount1を自動生成するため採らず、未選択時にSEgoals/必須数量/不足数を作らない。専用選択UI/keyは現製品に無く、目標化UI・保存互換/ID移行/数量/搭載先案内は別設計B。index1共通部は重複検証せず、CI発動/通行/勝利や調達数を保証しない。今は設計/静的確認だけで未実装・未試験・セル差0。",
+    "references": {
+      "formalLogRefs": {
+        "path": "private/ci-active-03c4759b/formal-log-refs.json",
+        "bytes": 53919,
+        "sha256": "d6724d8260ce73186fc2c7a45d41563f1f586d34cd149616e6fc9efd11647565"
+      },
+      "formalEnvironment": {
+        "path": "private/ci-active-03c4759b/analysis/official-footer-environment-source.json",
+        "bytes": 92391,
+        "sha256": "6359f08abe23ee51ead1a26b084dae7ba2fa6aaca265b5ea42d3cfcf2fb43f0e"
+      },
+      "targetTypedMetadata": {
+        "path": "private/ci-active-03c4759b/analysis/new-ceio-e-metadata.json",
+        "bytes": 44010,
+        "sha256": "9a0a0c64842fb8d612d6ec4b32927fff6ce4d03cd2cdaaf9e92a654c9b4c9b7c"
+      },
+      "globalFirst8": {
+        "path": "private/ci-global-first-eight/classification.json",
+        "bytes": 37624,
+        "sha256": "1eb982c73bcbf08cee5f8a178d65557d6d5740bcc023125c2539e25f9797c388"
+      },
+      "globalLast8": {
+        "path": "private/ci-global-last-eight/classification.json",
+        "bytes": 82616,
+        "sha256": "b98fdc9a835d0abfb26ec8237d22e8d620b8ea4fe60fd5097a437250fc7d76b6"
+      },
+      "globalLast8SourceBinding": {
+        "path": "private/ci-global-last-eight-source-binding/source-binding.json",
+        "bytes": 5675,
+        "sha256": "71e935ff8001ee9dd37f5b165ebd6a07984546a11ecaeec1486fcb779d328985"
+      },
+      "next4_2Design": {
+        "path": "private/next-four-two-design/design.json",
+        "bytes": 13919,
+        "sha256": "499d44fccf5f0fbaab54bbb9ac13185bebc7ed6ae972f73d801cf1d9a4b60c6d"
+      },
+      "unknownStaticScope": {
+        "path": "private/final-unknown-scope-addendum/review.json",
+        "bytes": 5863,
+        "sha256": "9460e53373273ee0e0ca890a70b171ad6131813324bf0ca279a136300631d8f5"
+      },
+      "localCanonical": {
+        "path": "private/local-primary/canonical.json",
+        "bytes": 4536,
+        "sha256": "cc84ccb05e2eb7d99a4a215a712684a8b24df19f5b23ff49c0e2f2c20f5c1d9f"
+      },
+      "localIndependentJoin": {
+        "path": "private/local-independent-review/final-primary-join.json",
+        "bytes": 13948,
+        "sha256": "a9b6dfe71942419ef0758374b0a06c2a36cc8fb0639b41f2fe44623bba1ee8c7"
+      },
+      "localRecordsClosure": {
+        "path": "private/records-local-final-draft/closure.json",
+        "bytes": 770,
+        "sha256": "df9812b02fb5f8879356f6489eb4e9f33436d5bc88ea77c81b46acbb2e06241e"
+      },
+      "directoryAtimeQualification": {
+        "path": "private/ci-active-03c4759b/analysis/raw-directory-atime-differences.json",
+        "bytes": 43632,
+        "sha256": "10b6da6f9eaec874db87eab376fe04de08b47c14a35c6a9af131a6a62cebc8e5"
+      },
+      "primaryCanonical": {
+        "path": "private/ci-active-03c4759b/canonical-ci-collection.json",
+        "bytes": 148152,
+        "sha256": "5b0f3c01197dd6f47d9823043546df5a5dc841da78a11fbdbfc60491a9f7aab1"
+      },
+      "primaryManifest": {
+        "path": "private/ci-active-03c4759b/manifest.json",
+        "bytes": 128802,
+        "sha256": "deef7095b400990b053791a409e84248b11fc2869364bc460ee0741022ef1d81"
+      },
+      "primaryClosure": {
+        "path": "private/ci-active-03c4759b/closure.json",
+        "bytes": 1845,
+        "sha256": "77cebf45ec75d8ee8084973e1a222fd74b373aece4ad9fed7c894600d89f2c51"
+      },
+      "primaryQualification": {
+        "path": "private/ci-qualified-seal-addendum/qualification.json",
+        "bytes": 4723,
+        "sha256": "974720c5be77c2160407d4d2611c23323e76ba4ce2507d6d5dc8f7181a42a214"
+      },
+      "independentJoin": {
+        "path": "private/ci-independent-final-join-42024915243/final-primary-ci-join.json",
+        "bytes": 11853,
+        "sha256": "3dd82d2b9190257019e96e0ce220cbb3b6271f401f84970ae67d393242783a29"
+      },
+      "independentManifest": {
+        "path": "private/ci-independent-final-join-42024915243/manifest.json",
+        "bytes": 250,
+        "sha256": "eef2c62a9b23d5e34e944513ccbae66434a8b589cdfa3764cf507dfb4568b8f7"
+      },
+      "independentClosure": {
+        "path": "private/ci-independent-final-join-42024915243/closure.json",
+        "bytes": 250,
+        "sha256": "4dc07c5e826f0b88ae30855d6bdd1fe2d14f5ac195eb8dafe449cfac123af82f"
+      },
+      "independentMain": {
+        "path": "private/ci-independent-review-42024915243/independent-semantic-review.json",
+        "bytes": 93939,
+        "sha256": "9a3dbb3458324726bab7e35b61e6cf171a4d639f6971bc5a7c22f8fe1efc0bfe"
+      },
+      "independentMainManifest": {
+        "path": "private/ci-independent-review-42024915243/manifest.json",
+        "bytes": 278,
+        "sha256": "59145dfddc253da1cec3e85a302e4de4733f9a7e474425db5229ae23f7538bf4"
+      },
+      "independentMainClosure": {
+        "path": "private/ci-independent-review-42024915243/closure.json",
+        "bytes": 335,
+        "sha256": "a13d4810a4521d3990e85d1cafb315f41df4df88a55e9816754f68a3bbb323fb"
+      }
+    },
+    "primaryCanonical": {
+      "path": "private/ci-active-03c4759b/canonical-ci-collection.json",
+      "bytes": 148152,
+      "sha256": "5b0f3c01197dd6f47d9823043546df5a5dc841da78a11fbdbfc60491a9f7aab1"
+    },
+    "primaryManifest": {
+      "path": "private/ci-active-03c4759b/manifest.json",
+      "bytes": 128802,
+      "sha256": "deef7095b400990b053791a409e84248b11fc2869364bc460ee0741022ef1d81"
+    },
+    "primaryClosure": {
+      "path": "private/ci-active-03c4759b/closure.json",
+      "bytes": 1845,
+      "sha256": "77cebf45ec75d8ee8084973e1a222fd74b373aece4ad9fed7c894600d89f2c51"
+    },
+    "independentJoin": {
+      "path": "private/ci-independent-final-join-42024915243/final-primary-ci-join.json",
+      "bytes": 11853,
+      "sha256": "3dd82d2b9190257019e96e0ce220cbb3b6271f401f84970ae67d393242783a29"
+    },
+    "independentManifest": {
+      "path": "private/ci-independent-final-join-42024915243/manifest.json",
+      "bytes": 250,
+      "sha256": "eef2c62a9b23d5e34e944513ccbae66434a8b589cdfa3764cf507dfb4568b8f7"
+    },
+    "independentClosure": {
+      "path": "private/ci-independent-final-join-42024915243/closure.json",
+      "bytes": 250,
+      "sha256": "4dc07c5e826f0b88ae30855d6bdd1fe2d14f5ac195eb8dafe449cfac123af82f"
+    },
+    "pending": [
+      "final recordHEAD after root-only docs commit"
+    ],
+    "privacy": "metadata-only record; original values/traces/video private, no external upload",
+    "WTGitNodeBrowserCIAPIActionsByRecordsAgent": 0,
+    "rawPreservationQualifier": {
+      "rawFiles": 548,
+      "rawDirectories": 171,
+      "fileSetContentAndAllRecordedFileAttributesExact": true,
+      "directoryAtimeOnlyDifferenceCount": 171,
+      "allOtherDirectoryAttributesExact": true,
+      "causeAndActor": null,
+      "timestampWriteback": false,
+      "oldBaselineChanged": false,
+      "notProductStorageMismatchEvidence": true,
+      "ref": {
+        "path": "private/ci-active-03c4759b/analysis/raw-directory-atime-differences.json",
+        "bytes": 43632,
+        "sha256": "10b6da6f9eaec874db87eab376fe04de08b47c14a35c6a9af131a6a62cebc8e5"
+      },
+      "primaryPayloadFiles": 585,
+      "primaryPayloadDirectories": 173,
+      "primaryPayloadBytes": 160720253,
+      "initialAttributeGuardExit": 1,
+      "qualifiedResumeExit": 0,
+      "qualificationIsNotProductTestFailure": true,
+      "qualificationRef": {
+        "path": "private/ci-qualified-seal-addendum/qualification.json",
+        "bytes": 4723,
+        "sha256": "974720c5be77c2160407d4d2611c23323e76ba4ce2507d6d5dc8f7181a42a214"
+      },
+      "independentAdditionalDifferenceCount": 0
+    },
+    "primaryQualification": {
+      "path": "private/ci-qualified-seal-addendum/qualification.json",
+      "bytes": 4723,
+      "sha256": "974720c5be77c2160407d4d2611c23323e76ba4ce2507d6d5dc8f7181a42a214"
+    },
+    "independentMain": {
+      "path": "private/ci-independent-review-42024915243/independent-semantic-review.json",
+      "bytes": 93939,
+      "sha256": "9a3dbb3458324726bab7e35b61e6cf171a4d639f6971bc5a7c22f8fe1efc0bfe"
+    },
+    "independentMainManifest": {
+      "path": "private/ci-independent-review-42024915243/manifest.json",
+      "bytes": 278,
+      "sha256": "59145dfddc253da1cec3e85a302e4de4733f9a7e474425db5229ae23f7538bf4"
+    },
+    "independentMainClosure": {
+      "path": "private/ci-independent-review-42024915243/closure.json",
+      "bytes": 335,
+      "sha256": "a13d4810a4521d3990e85d1cafb315f41df4df88a55e9816754f68a3bbb323fb"
+    },
+    "independentScope": {
+      "offlineSemanticExecutions": 1,
+      "offlineExitCode": 0,
+      "primaryComparisons": 12,
+      "allPrimaryComparisonsExact": true,
+      "ownAdditionalStatDifferences": 0,
+      "existing171DirectoryAtimeDifferencesPreserved": true,
+      "runtimeRecipeAuthorAlsoReviewer": true,
+      "notFullyIndependentOfRuntimeRecipe": true,
+      "rawToTypedRegenerated": false,
+      "savedBodyIndependentSecondComparison": false,
+      "HTTPServedSourceHashes": null
+    }
   }
 }
