@@ -692,7 +692,7 @@
           "evidence": []
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 任意対空装備例の表示/再読込はC/W代表確認済みだが、自動配備・不足/保存編集の実操作確認には換算しない。"
     },
     {
       "id": "2-5/0/default",
@@ -1370,14 +1370,16 @@
         },
         "C": {
           "status": "一部",
-          "reason": "同じindexの在庫0で空母各1機と同艦ソナー1/投射機1の名称/合法枠と代替搭載先をC/W確認。全失敗区分は未完。",
+          "reason": "同じindexの在庫0で空母各1機と同艦ソナー1/投射機1の名称/合法枠と代替搭載先をC/W確認。全失敗区分は未完。 任意対空装備例の共通表示だけを追加確認（目標・必要組数・不足数は生成しない）。",
           "evidence": [
             "docs/asw-remaining-targets-ja.md",
             "tests/owned-oasw-integration.spec.js",
             "docs/pr152-four-two-routes-ja.md",
             "tests/four-two-routes.test.cjs",
             "tests/four-two-placement.test.cjs",
-            "tests/route-four-two-routes.spec.js"
+            "tests/route-four-two-routes.spec.js",
+            "tests/optional-anti-air-hints.test.cjs",
+            "tests/optional-anti-air-hints.spec.js"
           ]
         },
         "D": {
@@ -1389,7 +1391,7 @@
           ]
         }
       },
-      "remaining": "対潜既定1組の十分性/先制対潜人数、任意対空CI目標のマップ文字列判定による未接続、全戦闘目標数量根拠・全在庫/搭載不可/枠競合、対象外G/H分岐。始点A/Bランダムと既知load後非表示の原因未確定を維持。"
+      "remaining": "対潜既定1組の十分性/先制対潜人数、任意対空装備例は共通表示を修正・代表C/W確認済み。目標化UI/実在庫の対空配備は未実装、全戦闘目標数量根拠・全在庫/搭載不可/枠競合、対象外G/H分岐。始点A/Bランダムと既知load後非表示の原因未確定を維持。"
     },
     {
       "id": "4-2/1/default",
@@ -1424,14 +1426,16 @@
         },
         "C": {
           "status": "一部",
-          "reason": "同じindexの未知入力/未知装備は未判定・安全中止・元編成不変をC/W確認。既存の人数設定隔離証拠を再利用。全不足/枠競合は未完。",
+          "reason": "同じindexの未知入力/未知装備は未判定・安全中止・元編成不変をC/W確認。既存の人数設定隔離証拠を再利用。全不足/枠競合は未完。 任意対空装備例の共通表示だけを追加確認（目標・必要組数・不足数は生成しない）。",
           "evidence": [
             "docs/asw-remaining-targets-ja.md",
             "tests/owned-oasw-integration.spec.js",
             "docs/pr152-four-two-routes-ja.md",
             "tests/four-two-routes.test.cjs",
             "tests/four-two-placement.test.cjs",
-            "tests/route-four-two-routes.spec.js"
+            "tests/route-four-two-routes.spec.js",
+            "tests/optional-anti-air-hints.test.cjs",
+            "tests/optional-anti-air-hints.spec.js"
           ]
         },
         "D": {
@@ -1443,7 +1447,7 @@
           ]
         }
       },
-      "remaining": "対潜既定1組の十分性/先制対潜人数、任意対空CI目標のマップ文字列判定による未接続、全戦闘目標数量根拠・全在庫/搭載不可/枠競合、対象外G/H分岐。始点A/Bランダムと既知load後非表示の原因未確定を維持。"
+      "remaining": "対潜既定1組の十分性/先制対潜人数、任意対空装備例は共通表示を修正・代表C/W確認済み。目標化UI/実在庫の対空配備は未実装、全戦闘目標数量根拠・全在庫/搭載不可/枠競合、対象外G/H分岐。始点A/Bランダムと既知load後非表示の原因未確定を維持。"
     },
     {
       "id": "4-3/0/default",
@@ -3258,14 +3262,17 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "2-5/1/default",
-    "baselineHead": "f37b7e2009fa2090059c4569efb066a477714519",
-    "sourceHEAD": "03c4759ba4ecf594b1f96daf608ae9a36968cc11",
-    "record": "twoFiveCeioEPriorityCIFinalization20261105",
-    "evidence": "docs/pr152-two-five-ceio-e-ja.md",
-    "state": "E local6 sealed; CI42024915243 source03 5success/W4cancel, C3initialpass typed-only/W3missing; qualified P/O final joined"
+    "id": "optional-aa-display-batch",
+    "baselineHead": "ba762601583d06a777420dc2f033180c6b3abb25",
+    "scope": [
+      "4-2/0/default",
+      "4-2/1/default",
+      "2-4/0/default"
+    ],
+    "record": "optionalAaBatch20261106",
+    "state": "local Node30 and C/W two UI entries4 initial pass; final-source normal smoke pending"
   },
-  "nextPriority": "4-2/index0 ACL / BDCLの任意対空CI装備例の表示だけを最小候補Aとして確認する。単純なprofile復活はhdSEChecks minCount1を自動生成するため採らず、未選択時にSEgoals/必須数量/不足数を作らない。専用選択UI/keyは現製品に無く、目標化UI・保存互換/ID移行/数量/搭載先案内は別設計B。index1共通部は重複検証せず、CI発動/通行/勝利や調達数を保証しない。今は設計/静的確認だけで未実装・未試験・セル差0。",
+  "nextPriority": "1-3/0 normal・cfj＋1-4/0 normal・j-avoid：既存任意空母攻撃機目標の艦別合法枠・不足案内の接続漏れを共通確認。目標数/探索/保存は変えず、適用する選択経路と既存出典を先に照合する。静的候補で未実装・未検証。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -7164,6 +7171,14 @@
       ],
       "statusCellChanges": 0,
       "CIRouteOperationsUnreached": true
+    },
+    {
+      "id": "2-5/1/default",
+      "baselineHead": "f37b7e2009fa2090059c4569efb066a477714519",
+      "sourceHEAD": "03c4759ba4ecf594b1f96daf608ae9a36968cc11",
+      "record": "twoFiveCeioEPriorityCIFinalization20261105",
+      "evidence": "docs/pr152-two-five-ceio-e-ja.md",
+      "state": "E local6 sealed; CI42024915243 source03 5success/W4cancel, C3initialpass typed-only/W3missing; qualified P/O final joined"
     }
   ],
   "fiveFourCloseout": {
@@ -7204,8 +7219,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "7-4 own first CI closed 4smoke success/2failure; A/B/C partial, D confirmed by local five plus own CI Wknown initial,22/141/73; old local/secondary gaps preserved, independent audit correction targets preparing",
-    "nextUnit": "7-5 first ABDFGHK independent static WIP12, unexecuted; no7-4 evidence import or cell change",
+    "activeUnit": "optional AA display common batch:4-2 indexes0/1 and2-4 index0; Node30/UI4 local pass; final-source smoke pending",
+    "nextUnit": "1-3/0 normal・cfj＋1-4/0 normal・j-avoid：既存任意空母攻撃機目標の艦別合法枠・不足案内の接続漏れを共通確認。目標数/探索/保存は変えず、適用する選択経路と既存出典を先に照合する。静的候補で未実装・未検証。",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -7217,7 +7232,7 @@
       "stopOnNewPreservationMismatch": true,
       "fiveOneLocalResults": "C/W each3 initial pass; no new mismatch; original old anomaly unknown"
     },
-    "updated": "2026-10-30",
+    "updated": "2026-11-06 JST",
     "autonomousRepairs": [
       "independently grounded expected-value, fixture, selector or fixed-list defects",
       "concrete regressions caused by current changes: minimal repair and necessary validation",
@@ -7650,7 +7665,8 @@
       "sevenThreeOldOriginalsAndGapsChanged": false,
       "stopConditionsUnchanged": true,
       "privateValuesShared": false
-    }
+    },
+    "batchOperation": "common defect and shared logic; representative UI paths, existing preservation reuse, one final-source smoke; no new236-cell resurvey or detailed ledger"
   },
   "auditCorrection": {
     "baselineHead": "b2a1427cc199c18dc4a8af128f342bbc024190b1",
@@ -21299,5 +21315,103 @@
     "evidence": "docs/pr152-two-five-ceio-e-ja.md",
     "state": "E local6 complete with primary/independent closure; source03c4759b committed, CI42024915243 final pending; oldI gaps retained"
   },
-  "nextPriorityBeforeTwoFiveCeioEPriorityCIFinalization20261105": "4-2/index0/default ACL / BDCL：非選択Hの「制空不要」を全nodes文字列へ結合した結果、選択経路の任意対空CI profile/案内が抑制される静的未接続を次に確認する。index1の共通部は重複検証せず、強制CI1・調達数を作らず、任意表示と選択方針を分ける。現段階は静的候補のみ・未実装/未試験・セル変更0。"
+  "nextPriorityBeforeTwoFiveCeioEPriorityCIFinalization20261105": "4-2/index0/default ACL / BDCL：非選択Hの「制空不要」を全nodes文字列へ結合した結果、選択経路の任意対空CI profile/案内が抑制される静的未接続を次に確認する。index1の共通部は重複検証せず、強制CI1・調達数を作らず、任意表示と選択方針を分ける。現段階は静的候補のみ・未実装/未試験・セル変更0。",
+  "optionalAaBatch20261106": {
+    "date": "2026-11-06 JST",
+    "baseHEAD": "ba762601583d06a777420dc2f033180c6b3abb25",
+    "scopes": [
+      "4-2/0/default",
+      "4-2/1/default",
+      "2-4/0/default"
+    ],
+    "implementation": "display-only existing six optional recipes; no generated AA target, required quantity, shortage or procurement change",
+    "node": {
+      "pass": 30,
+      "fail": 0,
+      "browserExecutions": 0
+    },
+    "local": {
+      "logical": 4,
+      "physical": 4,
+      "initialPassed": 4,
+      "retry": 0,
+      "entries": [
+        "navigator",
+        "map-gear"
+      ],
+      "saveEditReexecuted": false,
+      "checkpoints": "seven storage strings, unrelated planner and actual goal vector directly equal; after-reload same complete document",
+      "trialReferences": [
+        {
+          "case": "chromium-navigator",
+          "exit": 0,
+          "retry": 0,
+          "stage": "completed",
+          "checkpointCount": 3,
+          "summary": "private/trial-chromium-navigator/test-results/optional-anti-air-hints-op-be949-and-survives-display-reload-chromium/optional-aa-ui-summary.json",
+          "sha256": "024ea492b15bb1fff43b3ebcc7f8283f289edffee17c77167b2d3d25067a7d31"
+        },
+        {
+          "case": "chromium-map-gear",
+          "exit": 0,
+          "retry": 0,
+          "stage": "completed",
+          "checkpointCount": 2,
+          "summary": "private/trial-chromium-map-gear/test-results/optional-anti-air-hints-op-64542-and-survives-display-reload-chromium/optional-aa-ui-summary.json",
+          "sha256": "736650bbbf19449d6069c707e2b0d890b9ac3a61724054fb925fdeca6101fba6"
+        },
+        {
+          "case": "webkit-navigator",
+          "exit": 0,
+          "retry": 0,
+          "stage": "completed",
+          "checkpointCount": 3,
+          "summary": "private/trial-webkit-navigator/test-results/optional-anti-air-hints-op-be949-and-survives-display-reload-webkit/optional-aa-ui-summary.json",
+          "sha256": "9fa09b972c975dc9937e0cb0d4ad7e4ba134f9d2cca52e900785473e27c2c685"
+        },
+        {
+          "case": "webkit-map-gear",
+          "exit": 0,
+          "retry": 0,
+          "stage": "completed",
+          "checkpointCount": 2,
+          "summary": "private/trial-webkit-map-gear/test-results/optional-anti-air-hints-op-64542-and-survives-display-reload-webkit/optional-aa-ui-summary.json",
+          "sha256": "54a0fb74724d60c6114c7bf16c5fddcf5a4e77b89a41316dfda6ff702e46806d"
+        }
+      ]
+    },
+    "reuse": "unchanged4-2 save/edit/load eight representatives; not transferred to2-4 deployment/save",
+    "preflight": {
+      "normalCasesPerBrowser": 912,
+      "webkitWholeFileCoverageExact": true,
+      "duplicateTestIDs": 0,
+      "firstPrivateSelectorDefectBrowserExecutions": 0
+    },
+    "ci": {
+      "state": "pending final source; one normal smoke; no repeat",
+      "partition": "same four WebKit jobs; whole-file LPT using one prior run occupancy estimates; all fixed cases retained",
+      "smallResults": "atomic per-attempt metadata before retained existing raw artifact upload; incomplete is not final success"
+    },
+    "cellChange": {
+      "before": [
+        28,
+        153,
+        55
+      ],
+      "after": [
+        28,
+        153,
+        55
+      ],
+      "changed": 0,
+      "criteriaChanged": false
+    },
+    "unverified": [
+      "optional AA target selection and finite-stock allocation",
+      "all AA legal mount and slot-conflict variants",
+      "2-4 automatic placement/save/edit full route operation",
+      "3-1 HQ-dependent enemy-pattern applicability"
+    ],
+    "next": "1-3/0 normal・cfj＋1-4/0 normal・j-avoid：既存任意空母攻撃機目標の艦別合法枠・不足案内の接続漏れを共通確認。目標数/探索/保存は変えず、適用する選択経路と既存出典を先に照合する。静的候補で未実装・未検証。"
+  }
 }

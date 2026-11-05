@@ -85,13 +85,40 @@ jobs:
         run: npm install --no-audit --no-fund --no-package-lock
 
       - name: Verify service worker cache lifetime, registration readiness and storage diagnostics
-        run: node --test tests/five-three-branches.test.cjs tests/conditional-speed-ui.test.cjs tests/scouting-options.test.cjs tests/scouting-evidence.test.cjs tests/north-drum-oracle.test.cjs tests/submarine-storage-comparison.test.cjs tests/pwa-prepared-storage.test.cjs tests/hash-navigation-audit.test.cjs tests/response-storage-headers.test.cjs tests/toast-action-retry.test.cjs tests/sw-cache-lifetime.test.cjs tests/module-loader-recovery.test.cjs tests/planner-storage-read.test.cjs tests/storage-null-capture.test.cjs tests/pwa-registration-ready.test.cjs tests/pwa-initial-registration-ready.test.cjs tests/pwa-registration-continuation.test.cjs tests/registration-route-fixture.test.cjs tests/initial-update-fixture.test.cjs tests/initial-document-fixture.test.cjs tests/pwa-storage-audit.test.cjs
+        run: node --test tests/five-three-branches.test.cjs tests/conditional-speed-ui.test.cjs tests/scouting-options.test.cjs tests/scouting-evidence.test.cjs tests/north-drum-oracle.test.cjs tests/submarine-storage-comparison.test.cjs tests/pwa-prepared-storage.test.cjs tests/hash-navigation-audit.test.cjs tests/response-storage-headers.test.cjs tests/toast-action-retry.test.cjs tests/sw-cache-lifetime.test.cjs tests/module-loader-recovery.test.cjs tests/planner-storage-read.test.cjs tests/storage-null-capture.test.cjs tests/pwa-registration-ready.test.cjs tests/pwa-initial-registration-ready.test.cjs tests/pwa-registration-continuation.test.cjs tests/registration-route-fixture.test.cjs tests/initial-update-fixture.test.cjs tests/initial-document-fixture.test.cjs tests/pwa-storage-audit.test.cjs tests/ci-smoke-tools.test.cjs
 
       - name: Verify and launch bundled Playwright browser
         run: node tests/ci-browser-environment.cjs ${{ matrix.browser }}
 
       - name: Run smoke browser regression
-        run: npm run test:browser -- --project=${{ matrix.browser }} --workers=${{ matrix.workers }} --shard=${{ matrix.shard }}/${{ matrix.shards }}
+        shell: bash
+        env:
+          HD_CI_BROWSER: ${{ matrix.browser }}
+          HD_CI_SHARD: ${{ matrix.shard }}/${{ matrix.shards }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ matrix.browser }}" == "webkit" ]]; then
+            # Only the file partition changes. Keep all serial groups in their
+            # file and replace the shell with the unmodified native test runner.
+            node tests/ci-smoke-shards.cjs --shard=${{ matrix.shard }}/${{ matrix.shards }} > "$RUNNER_TEMP/harbordesk-webkit-selected-files.txt"
+            mapfile -t smoke_files < "$RUNNER_TEMP/harbordesk-webkit-selected-files.txt"
+            test "${#smoke_files[@]}" -gt 0
+            exec node node_modules/playwright/cli.js test "${smoke_files[@]}" --config=playwright.ci.config.cjs --project=webkit --workers=${{ matrix.workers }}
+          fi
+          exec npm run test:browser -- --config=playwright.ci.config.cjs --project=${{ matrix.browser }} --workers=${{ matrix.workers }} --shard=${{ matrix.shard }}/${{ matrix.shards }}
+
+      # Small lifecycle results and current-batch metadata are available before
+      # the unchanged large diagnostics uploads, including after cancellation.
+      - name: Preserve compact smoke results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-results-${{ matrix.browser }}-${{ matrix.shard }}-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/harbordesk-ci-smoke/
+            test-results/optional-anti-air-hints-*/optional-aa-ui-summary.json
+          if-no-files-found: warn
+          retention-days: 14
 
       # New producer metadata only; original raw evidence remains in its existing archive.
       - name: Preserve seven-three first-gauge comparison summary

@@ -10,6 +10,46 @@ const HD_SORTIE_EQUIP_RULES={
  '煙幕':{minCount:2,label:'煙幕',hint:'煙幕装置を複数用意すると展開を安定させやすい'}
 };
 
+// Optional display examples stay separate from generated equipment targets.
+function hdSEOptionalAaAdvice(map,selection){
+ const spec=map==='4-2'?{indices:[0,1],path:'ACL / BDCL',nodes:['C','D','L'],conditional:false,note:'ACLではC・L、BDCLではD・C・Lなど、航空戦力を含む敵編成への対策として検討できます。潜水戦の対潜対策とは別の任意装備です。'}:map==='2-4'?{indices:[0],path:'ボス方面・経路ランダム',nodes:['L','M'],conditional:true,note:'経路はランダムです。L・Mなど、敵航空戦力のある戦闘へ進む場合に検討してください。'}:null;
+ if(!spec)return null;
+ const scope=arguments.length>1?'selected':'map',manual={status:'manual',scope,map,path:'',nodes:[],conditional:null,note:'選択した経路への対空装備例の適用は未判定です。経路と通るマスを確認してください。',recipes:[],source:'',routeSource:''};
+ try{
+  if(typeof MAP_PLANS==='undefined'||typeof hdMapPresetRequirements!=='function')return manual;
+  const presets=MAP_PLANS[map]?.presets;if(!Array.isArray(presets))return manual;
+  let indices=spec.indices;
+  if(scope==='selected'){
+   if(!selection||typeof selection!=='object')return manual;
+   const index=Object.getOwnPropertyDescriptor(selection,'index'),preset=Object.getOwnPropertyDescriptor(selection,'preset');
+   if(!index||!Object.hasOwn(index,'value')||!preset||!Object.hasOwn(preset,'value')||!Number.isInteger(index.value)||!spec.indices.includes(index.value))return manual;
+   const canonical=presets[index.value],chosen=preset.value;if(!canonical||!chosen||typeof chosen!=='object')return manual;
+   for(const key of ['name','ships','gear','use','source','flagship']){const item=Object.getOwnPropertyDescriptor(chosen,key),expected=Object.getOwnPropertyDescriptor(canonical,key);if(item&&!Object.hasOwn(item,'value')||expected&&!Object.hasOwn(expected,'value')||item?.value!==expected?.value)return manual;}
+   indices=[index.value];
+  }
+  const routes=[];
+  for(const index of indices){const preset=presets[index],route=preset&&hdMapPresetRequirements(map,preset);if(!route||route.map!==map||route.index!==index||route.path!==spec.path||!Array.isArray(route.equipmentKinds)||!route.equipmentKinds.includes('防空'))return manual;routes.push(route);}
+  const routeSource=routes[0]?.source||presets[indices[0]]?.source;
+  if(typeof HD_SE_RECIPES==='undefined'||typeof HD_SE_PARTS==='undefined'||typeof HD_SE_CAP_SOURCE==='undefined'||!Array.isArray(HD_SE_RECIPES['cap-aa'])||!HD_SE_RECIPES['cap-aa'].length||!HD_SE_PARTS||typeof HD_SE_PARTS!=='object'||typeof HD_SE_CAP_SOURCE.aa!=='string'||!/^https:\/\//.test(HD_SE_CAP_SOURCE.aa)||typeof routeSource!=='string'||!/^https:\/\//.test(routeSource))return {...manual,note:'対空装備例の情報が不足しています。装備条件と経路を確認してから検討してください。'};
+  const recipes=[];
+  for(const recipe of HD_SE_RECIPES['cap-aa']){
+   if(!recipe||typeof recipe.id!=='string'||!recipe.id||typeof recipe.name!=='string'||!recipe.name||!Array.isArray(recipe.parts)||!recipe.parts.length)return {...manual,note:'対空装備例の情報が不足しています。必要数・不足数はまだ判定しません。'};
+   const shipCondition=recipe.ship===undefined?null:recipe.ship;if(shipCondition!==null&&shipCondition!=='akizuki'&&shipCondition!=='not-akizuki'||recipe.ship===null)return {...manual,note:'対空装備例の艦種条件が未判定です。対象艦を確認してから検討してください。'};
+   const counts=new Map();for(const key of recipe.parts){if(typeof key!=='string'||!Object.hasOwn(HD_SE_PARTS,key))return {...manual,note:'対空装備例の情報が不足しています。必要数・不足数はまだ判定しません。'};counts.set(key,(counts.get(key)||0)+1);}
+   const parts=[];
+   for(const [kind,count]of counts){const part=HD_SE_PARTS[kind];if(!part||typeof part.label!=='string'||!part.label||!Array.isArray(part.examples)||!part.examples.length||part.examples.some(name=>typeof name!=='string'||!name))return {...manual,note:'対空装備例の情報が不足しています。必要数・不足数はまだ判定しません。'};parts.push({kind,label:part.label,count,examples:part.examples.slice()});}
+   recipes.push({id:recipe.id,name:recipe.name,shipCondition,parts});
+  }
+  return {status:'ready',scope,map,path:spec.path,nodes:spec.nodes.slice(),conditional:spec.conditional,note:spec.note,recipes,source:HD_SE_CAP_SOURCE.aa,routeSource};
+ }catch{return manual;}
+}
+function hdSEOptionalAaAdviceHtml(map,selection){
+ const advice=arguments.length>1?hdSEOptionalAaAdvice(map,selection):hdSEOptionalAaAdvice(map);if(!advice)return '';
+ const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const attrs=`data-hd-optional-aa="${esc(advice.map)}" data-hd-optional-aa-scope="${esc(advice.scope)}" data-hd-optional-aa-status="${esc(advice.status)}"`;
+ if(advice.status!=='ready')return `<section class="hd-se-optional-aa" ${attrs}><strong>対空装備例の適用は未判定</strong><p>${esc(advice.note)}</p></section>`;
+ return `<section class="hd-se-optional-aa" ${attrs}><strong>対空装備の任意候補</strong><p>${esc(advice.note)}</p><p>同じ艦に載せる任意の構成例です。部品数は構成例の内訳で、艦隊に必要な組数を示すものではありません。この案内では必要組数・不足数を判定しません。</p><details data-hd-optional-aa-examples><summary>対空装備の構成例を見る</summary><ul>${advice.recipes.map(recipe=>`<li data-hd-optional-aa-recipe="${esc(recipe.id)}"><b>${esc(recipe.name)}</b> <span data-hd-optional-aa-ship="${esc(recipe.shipCondition??'unspecified')}">${recipe.shipCondition==='akizuki'?'対象：秋月型':recipe.shipCondition==='not-akizuki'?'対象：秋月型以外':'搭載可否・艦固有条件は別途確認'}</span><ul>${recipe.parts.map(part=>`<li data-hd-optional-aa-part="${esc(part.kind)}" data-hd-optional-aa-count="${part.count}">${esc(part.label)} ×${part.count}（例：${esc(part.examples.join(' / '))}）</li>`).join('')}</ul></li>`).join('')}</ul></details><p>採用する場合は、艦ごとの搭載可否・合法な別枠・他の装備との競合を確認してください。通行条件・対空CIの発動・勝利を保証しません。</p><p><a href="${esc(advice.source)}" target="_blank" rel="noopener noreferrer">対空CI装備条件の出典 ↗</a> / <a href="${esc(advice.routeSource)}" target="_blank" rel="noopener noreferrer">海域の出典 ↗</a></p></section>`;
+}
 function hdSEEsc(s){return typeof hdMapEsc==='function'?hdMapEsc(s):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hdSEOwned(name){
  if(typeof hdOwnedEquipSummary==='function')return hdOwnedEquipSummary(name);
@@ -347,8 +387,8 @@ function hdSEInstall(){
  const prev=hdMapEquipRecommendationsHtml;
  hdMapEquipRecommendationsHtml=function(map){
   const html=prev(map);
-  const panel=hdSortieEquipmentCheckHtml(map);
-  return html.replace('<section class="hd-map-equip-recommend">',`<section class="hd-map-equip-recommend">${panel}`);
+  const panel=hdSortieEquipmentCheckHtml(map),advice=hdSEOptionalAaAdviceHtml(map);
+  return html.replace('<section class="hd-map-equip-recommend">',`<section class="hd-map-equip-recommend">${panel}${advice}`);
  };
  if(typeof hdRenderMapEquipmentRecommendations==='function')setTimeout(hdRenderMapEquipmentRecommendations,0);
  return true;
