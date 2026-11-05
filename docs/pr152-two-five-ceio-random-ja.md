@@ -1,3 +1,5 @@
+> 2-5 CEIO IのCI追補確定（2026-11-05 JST）：検証source `32a87a09`／CI42001989505 attempt1は4smoke成功・C2/W4のjobとsmokestepが両公式45m上限で取消、Full skip。passed/flaky/failedはC1小計454/0/0・W1–3小計681/0/0だけで全C/全W未確定。全6ownNode662/662/0と担当browser/Node/PW/image/checkoutを実測照合。新6例のmetadata/保存/load/終了結果は全null、C2のrunner開始表示2件だけを到達/成功へ換算せず、開始未観測も未開始としない。8取得ZIP/90memberに新unitJSON0だが過容量2内部は未読で、生成未達/退避欠測は未判別。local6完了と旧欠測を別保持し28/153/55変更0。主manifest/外部独立join封鎖済み。以下のsourcecommit前・CI未開始/pendingは各局所記録時点の履歴で、現在状態ではない。
+
 # 2-5 CEIO：Iの索敵ランダム域
 
 2026-11-05 JST。基準 `dffa4436`、旧検証source `a1beabbe`。今回の製品・試験sourceはcommit前、通常CIは未開始。局所原本の主manifestと最終独立joinは封鎖済みの局所記録である。
@@ -44,3 +46,25 @@ HQ120外、先行分岐/特殊艦種・CV系の出典差、全任意目標の数
 旧CI41216819787は5ジョブ成功/W4取消、C904/0/0・W1–3小計678/0/0（passed/flaky/failed）、全Wと旧対象W3最終結果は未確定。今回結果で欠測を補完しない。PR152ドラフト・未公開、main競合/既知残件・旧原本を保持し、main/PR151/版/SW/本番未変更・マージ/公開/自動マージなし。
 
 主canonical SHA `3ab3d6edb48438be9c721d7912d0db29307408e71c3eb7b449b06b25ef34672a`、manifest `737c6c544f68f4bbdcdf2f7ba9a7f5b7713b03a3982a013033dddbfb20e8003d`。その他のrefは進捗JSONの `twoFiveCeioRandomLocal20261105` に対応する。最終外部独立join SHA `9bc9c4bbeb332f9b0b44cedab0d2184c805b08d43ee290738d03cf38839962f5`、closure `70e6e5ee4029dedfb8cfa010f37315e0eb0ccad6a23317a1cd3e3f56803c4c16` で照合を閉鎖した。
+
+
+## 2026-11-05 JST：通常CIの確定結果と欠測
+
+source `32a87a092ff0df35cb7ba7f95a901577f6d50553` を通常pushし、同HEAD自動同等run0を確認後に[CI42001989505](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/42001989505)をdispatch1/attempt1で実行した。同HEADの再実行0。4smoke成功、C2とW4のsmoke/jobがそれぞれ公式45m0s上限で取消、Full skipped。個別試験45秒とは別の境界で、ジョブ上限だけから製品/ブラウザーの原因は決めない。
+
+| 公式に完了した範囲 | passed / flaky / failed | 全体への適用 |
+| --- | --- | --- |
+| Chromium shard1のみ | 454 / 0 / 0 | C2終端footer無し、全Cは未確定 |
+| WebKit shard1–3小計 | 681 / 0 / 0 | W4終端footer無し、全Wは未確定 |
+
+全6ジョブ各自のNodeは662tests/662pass/0fail・skip/cancel0、Node24.21.0/PW1.55.0/担当C1187またはW2203・image digest・checkout32aを実測照合した。662は6ジョブで繰り返す同じ検査群で、3972独立論理項目とはしない。source680のmanifestとcheckout同定はHTTP配信filehashの実測証拠ではない。
+
+今回のCEIO6例は、取得可能な8ZIP全90memberで新unit/prefix JSONが0件。保存/load比較、識別項目、区分/理由、終了コード、初回/retry/最終frameworkは全て欠測である。C-random/guaranteedはrunner開始表示が2件あるだけで、製品探索・保存・load到達は確認できない。他4例も開始未観測で、未開始とは断定しない。過容量2件の内部が未読で、metadataの生成未達・退避選択・処理未到達の区別は不明。保持観測が無いことを「保存不一致なし」や安全性の証明にしない。
+
+別件の既存7-5第3のC2初回/retryは、load後clickのawait完了後に結果可視性待ちが停止。W4は14初回＋明示retry4件がload後search-click非表示で停止した。これら20詳細error試行は後段全文比較/最終例外検査未到達で、別10retryの境界は欠測。全体failed/flaky数へ換算せず、表示変更元・同原因は不明のまま、原因調査を広げない。
+
+公式index10件中8ZIP363,613Bを取得し、90regularmemberのCRC/サイズ/SHAを照合。512MiB超2件は未要求・内部未読。正式logZIP11,718,088B/CRC100member、主616payload/174dirsを封鎖した。raw590file/172dirsはbaseline後の内容・全属性差0、baseline以前の読取りatimeは未観測で書戻し0。この範囲を超える全履歴の属性不変とはしない。
+
+主canonical SHA `1339f4c7225741272f44b9ccdff9b4657fb104d5795188715582bc31ede9104a`、manifest `2d5a02832b3f303b5b05e82b5fc98b65efee5c2ed9d50cf6d6ecc8bf601a0753`、外部独立join `0e002ac35f89e09342cb1d3e99ec4c52b32381efd7cba555379dc15e655dc69d`、closure `b8674107d01a38cacebae4d5448c0b489007973d7186b28ee5430eac47da59f6` で照合を閉鎖した。主canonicalに残るjoin pendingは主seal時点のスナップショットで、別Ojoinで完了させ原Pを上書きしない。
+
+28/153/55・全59行/236statusは変更0。Dの確認済みは局所6操作列の根拠を維持し、このCIの欠測を補完しない。旧CI41216819787のC904/0/0・W1–3小計678/0/0・W4取消/全Wと旧W3未確定、初回fixture失敗の保存/load未到達も保持する。今回の確定記録だけを[skip ci]で通常反映し、追加CI/ブラウザー試験は起動しない。次のE分岐候補は未実装・未検証のまま、PR152ドラフト・未公開と保護対象を維持する。
