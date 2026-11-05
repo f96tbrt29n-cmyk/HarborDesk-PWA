@@ -14,7 +14,7 @@ function renderer(){
  const previous=vm.runInNewContext('('+legacy.hdSECapabilityHtml+'\n)',c),current=load('sortie-equipment-check.js','hdSECapabilityHtml',c);return {c,data,routes,fleet,state,counts,previous,current};
 }
 const cardKinds=html=>[...html.matchAll(/data-hd-se-capability="([^"]+)"/g)].map(match=>match[1]);
-function panelExpression(source){const a=source.indexOf("${typeof hdSECapabilityHtml==='function'?"),b=source.indexOf('}<strong>手持ち装備で攻略条件を満たす',a);assert.ok(a>=0&&b>a);return source.slice(a+2,b)}
+function panelExpression(source){const anchor="${typeof hdSECapabilityHtml==='function'?",tail="hdSECapabilityHtml(map,c.fleet?.id||'')):''}",a=source.indexOf(anchor),b=source.indexOf(tail,a);assert.equal(source.split(anchor).length,2);assert.equal(source.split(tail).length,2);assert.ok(a>=0&&b>a);const expression=source.slice(a+2,b+tail.length-1);assert.equal(expression.includes('${'),false,'capability expression excludes adjacent template expressions');return expression}
 
 test('7-5 third selected display removes second land defaults without adding an auto CI set',()=>{
  const h=renderer(),input=JSON.stringify([h.fleet,h.routes]),before=h.previous('7-5','saved',null,{index:2});assert.ok(cardKinds(before).includes('cap-land-mixed'),'isolated previous third display was map-wide');

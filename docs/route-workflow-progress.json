@@ -3270,7 +3270,7 @@
       "2-4/0/default"
     ],
     "record": "optionalAaBatch20261106",
-    "state": "local Node30 and C/W two UI entries4 initial pass; final-source normal smoke pending"
+    "state": "local UI4 initialpass reused; full704Node passes after four delimiter-only harness repairs; corrected-source smoke pending"
   },
   "nextPriority": "1-3/0 normal・cfj＋1-4/0 normal・j-avoid：既存任意空母攻撃機目標の艦別合法枠・不足案内の接続漏れを共通確認。目標数/探索/保存は変えず、適用する選択経路と既存出典を先に照合する。静的候補で未実装・未検証。",
   "previousSelected": {
@@ -7219,7 +7219,7 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "optional AA display common batch:4-2 indexes0/1 and2-4 index0; Node30/UI4 local pass; final-source smoke pending",
+    "activeUnit": "local UI4 initialpass reused; full704Node passes after four delimiter-only harness repairs; corrected-source smoke pending",
     "nextUnit": "1-3/0 normal・cfj＋1-4/0 normal・j-avoid：既存任意空母攻撃機目標の艦別合法枠・不足案内の接続漏れを共通確認。目標数/探索/保存は変えず、適用する選択経路と既存出典を先に照合する。静的候補で未実装・未検証。",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
@@ -21388,7 +21388,7 @@
       "firstPrivateSelectorDefectBrowserExecutions": 0
     },
     "ci": {
-      "state": "pending final source; one normal smoke; no repeat",
+      "state": "initialsource97 Nodegatefailure retained; delimiter-only four-test repair passes all704; corrected new-source normal smoke pending; sameHEADrerun0",
       "partition": "same four WebKit jobs; whole-file LPT using one prior run occupancy estimates; all fixed cases retained",
       "smallResults": "atomic per-attempt metadata before retained existing raw artifact upload; incomplete is not final success"
     },
@@ -21412,6 +21412,26 @@
       "2-4 automatic placement/save/edit full route operation",
       "3-1 HQ-dependent enemy-pattern applicability"
     ],
-    "next": "1-3/0 normal・cfj＋1-4/0 normal・j-avoid：既存任意空母攻撃機目標の艦別合法枠・不足案内の接続漏れを共通確認。目標数/探索/保存は変えず、適用する選択経路と既存出典を先に照合する。静的候補で未実装・未検証。"
+    "next": "1-3/0 normal・cfj＋1-4/0 normal・j-avoid：既存任意空母攻撃機目標の艦別合法枠・不足案内の接続漏れを共通確認。目標数/探索/保存は変えず、適用する選択経路と既存出典を先に照合する。静的候補で未実装・未検証。",
+    "nodeFullAfterHarnessRepair": {
+      "pass": 704,
+      "fail": 0,
+      "includesEarlier30": true,
+      "additionalUniqueCountIsNot734": true,
+      "browserExecutions": 0,
+      "collection": "test process exit0; private TAP-only footer collector exit1; same spec stdout704cases/footer reclassified without rerun; original collector evidence retained"
+    },
+    "ciInitial": {
+      "source": "97a4f317ab46e08a2eaa2650a797cf69280b9b90",
+      "run": 42117858350,
+      "attempt": 1,
+      "jobs": "six Node gate failures, each704/700pass/4fail; browserlaunch andsmoke skipped",
+      "reason": "four VM capability-expression extractors captured adjacent optional-AA interpolation; delimiter-only repair with original assertions retained",
+      "caseOutcomes": null,
+      "artifacts": 0,
+      "sameHEADRerun": 0,
+      "record": "private/ci-97a4f317/analysis/canonical-ci-collection.json",
+      "sha256": "a15daa82f2259983bd537ef92f2f5faa789e53fed9325326a9696774250a0d23"
+    }
   }
 }
