@@ -1487,7 +1487,7 @@
         },
         "C": {
           "status": "一部",
-          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。 同source CI42289929859でも新案内の同じC/W代表は各初回完了。既存保存操作との分離・セル状態は維持。",
           "evidence": [
             "docs/pr152-land-set-routes-ja.md",
             "tests/port-attacker-set.spec.js",
@@ -1497,7 +1497,7 @@
         },
         "D": {
           "status": "一部",
-          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。 同source CI42289929859でも新案内の同じC/W代表は各初回完了。既存保存操作との分離・セル状態は維持。",
           "evidence": [
             "docs/pr152-land-set-routes-ja.md",
             "tests/port-attacker-set.spec.js",
@@ -1633,7 +1633,7 @@
         },
         "C": {
           "status": "一部",
-          "reason": "同じindexの在庫0で索敵12/登録71の不足59、実数不足と戦闘推奨の空母1機/同艦ASW1組の名前・合法な別枠・代替搭載先をC/W確認。未知は索敵/艦の未判定と安全中止。全失敗区分は未完。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。",
+          "reason": "同じindexの在庫0で索敵12/登録71の不足59、実数不足と戦闘推奨の空母1機/同艦ASW1組の名前・合法な別枠・代替搭載先をC/W確認。未知は索敵/艦の未判定と安全中止。全失敗区分は未完。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。 同source CI42289929859でも新案内の同じC/W代表は各初回完了。既存保存操作との分離・セル状態は維持。",
           "evidence": [
             "docs/pr152-port-attacker-set-ja.md",
             "tests/port-attacker-set.spec.js",
@@ -1648,7 +1648,7 @@
         },
         "D": {
           "status": "確認済み",
-          "reason": "同じindexの成立/在庫不足で保存→メモ編集→reload(load)→同一新文書complete後再探索/再表示、custom保存文字列・同期元・他編成/海域・ID/metadata・計算/調達/他経路担当艦情報をC/W直接一致。未知は編集なし安全中止と元保存値保持。初回stock2失敗は保存前で別記し、期待値2箇所修正後のstock2必要再検証と成功4再利用を区別。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。",
+          "reason": "同じindexの成立/在庫不足で保存→メモ編集→reload(load)→同一新文書complete後再探索/再表示、custom保存文字列・同期元・他編成/海域・ID/metadata・計算/調達/他経路担当艦情報をC/W直接一致。未知は編集なし安全中止と元保存値保持。初回stock2失敗は保存前で別記し、期待値2箇所修正後のstock2必要再検証と成功4再利用を区別。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。 同source CI42289929859でも新案内の同じC/W代表は各初回完了。既存保存操作との分離・セル状態は維持。",
           "evidence": [
             "docs/pr152-port-attacker-set-ja.md",
             "tests/port-attacker-set.spec.js",
@@ -3300,9 +3300,9 @@
       "4-5/1/default"
     ],
     "record": "softLandGuidanceBatch20261107",
-    "state": "shared remedy adapter and representative local operation verified; final-source normal smoke pending"
+    "state": "shared safe guidance/local749 and4 initial UI verified; one final-source smoke collected; next shared scouting consumer baseline and private patch prepared"
   },
-  "nextPriority": "2-5北BFJO／4-5中央ADHKT・CDHKT／6-5上下の、数値索敵と別の汎用索敵個数を任意目安として表示する共通consumer接続。既存の3-5下・2-5南の処理を再利用し、数値不足を個数や購入必須へ換算しない。出典・数値条件・利用者目標・保存形式は維持し、まずactual Node最小対照で残る不備を確認する。",
+  "nextPriority": "2-5北BFJO／4-5中央ADHKT・CDHKT／6-5上下の、数値索敵とは別の汎用装備個数を任意目安として示す共通consumer接続。初回Nodeの到達assertで4scopeの同型不足と既存2scope/明示目標/数値gap0を確認（最終finding JSON未出力）。HQ欠測の数値goal存在を誤期待した原本を保持し、訂正HQ境界＋初回未到達no-LOSの2境界だけを確認、既通過6scope再実行0。private最小1anchor patch・回帰設計まで準備済み、次の製品適用/ブラウザー/追加CIは0。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -22610,10 +22610,10 @@
       "unexecutedScopePromoted": false
     },
     "ci": {
-      "state": "final-source normal smoke pending",
-      "normalRunsPlanned": 1,
+      "state": "terminal collected and independently matched",
+      "normalRuns": 1,
       "reruns": 0,
-      "workflowChange": "one compact summary glob only; no selection/environment/deadline/retry/partition change"
+      "recordOnlyAdditionalCI": false
     },
     "oldCI": {
       "run": 42207401382,
@@ -22637,6 +22637,190 @@
       "unknown recalculation and existing display/access-control/root-cause gaps"
     ],
     "proof": "continuation-soft-land-guidance-batch-20261107/private/; shared/local-results.json contains only allowed metadata",
-    "next": "2-5北BFJO／4-5中央ADHKT・CDHKT／6-5上下の、数値索敵と別の汎用索敵個数を任意目安として表示する共通consumer接続。既存の3-5下・2-5南の処理を再利用し、数値不足を個数や購入必須へ換算しない。出典・数値条件・利用者目標・保存形式は維持し、まずactual Node最小対照で残る不備を確認する。"
+    "next": "2-5北BFJO／4-5中央ADHKT・CDHKT／6-5上下の、数値索敵とは別の汎用装備個数を任意目安として示す共通consumer接続。初回Nodeの到達assertで4scopeの同型不足と既存2scope/明示目標/数値gap0を確認（最終finding JSON未出力）。HQ欠測の数値goal存在を誤期待した原本を保持し、訂正HQ境界＋初回未到達no-LOSの2境界だけを確認、既通過6scope再実行0。private最小1anchor patch・回帰設計まで準備済み、次の製品適用/ブラウザー/追加CIは0。",
+    "ciBeforeFinal": {
+      "state": "final-source normal smoke pending",
+      "normalRunsPlanned": 1,
+      "reruns": 0,
+      "workflowChange": "one compact summary glob only; no selection/environment/deadline/retry/partition change"
+    },
+    "ciFinal": {
+      "sourceSHA": "c040259703d5927ac7899985a3c63a0e59dc3dd9",
+      "runId": 42289929859,
+      "attempt": 1,
+      "runConclusion": "failure",
+      "jobResults": {
+        "success": 4,
+        "cancelled": 1,
+        "failure": 1,
+        "fullSkipped": 1
+      },
+      "passedFlakyFailed": {
+        "chromium": {
+          "passed": 918,
+          "flaky": 0,
+          "failed": 0
+        },
+        "webkit": {
+          "passed": 903,
+          "flaky": 14,
+          "failed": 1
+        }
+      },
+      "countsMeaning": "passed/flaky/failed logical outcomes, not initial or physical trial arithmetic",
+      "targetMetadataLogical": 4,
+      "targetMetadataAttempts": 4,
+      "targetInitialPassedCompleted": 4,
+      "targetGoalMinCount": 1,
+      "targetLiveGoalCount": 0,
+      "targetVirtualApplication": false,
+      "saveEditReexecuted": false,
+      "C2": {
+        "smokeConclusion": "success",
+        "runFinished": true,
+        "caseOutcomes": [
+          459,
+          0,
+          0
+        ],
+        "jobConclusion": "cancelled",
+        "officialJobTimeout45mAnnotated": true,
+        "timing": {
+          "preSeconds": 88.0,
+          "smokeSeconds": 2605.0,
+          "postSeconds": 65.0,
+          "jobSeconds": 2758.0,
+          "uploadSteps": [
+            {
+              "name": "Preserve compact smoke results",
+              "conclusion": "success",
+              "seconds": 1.0
+            },
+            {
+              "name": "Preserve seven-three first-gauge comparison summary",
+              "conclusion": "success",
+              "seconds": 1.0
+            },
+            {
+              "name": "Upload Playwright diagnostics",
+              "conclusion": "skipped",
+              "seconds": 0.0
+            },
+            {
+              "name": "Preserve failed-attempt diagnostics after successful retries",
+              "conclusion": "success",
+              "seconds": 59.0
+            },
+            {
+              "name": "Preserve prerequisite import evidence including successful retries",
+              "conclusion": "success",
+              "seconds": 1.0
+            }
+          ]
+        },
+        "limit": "post upload steps report success; exact cancellation occurrence time/command not acquired; do not claim upload cancellation"
+      },
+      "W4Timing": {
+        "preSeconds": 91.0,
+        "smokeSeconds": 1214.0,
+        "postSeconds": 15.0,
+        "jobSeconds": 1320.0,
+        "uploadSteps": [
+          {
+            "name": "Preserve compact smoke results",
+            "conclusion": "success",
+            "seconds": 1.0
+          },
+          {
+            "name": "Preserve seven-three first-gauge comparison summary",
+            "conclusion": "success",
+            "seconds": 1.0
+          },
+          {
+            "name": "Upload Playwright diagnostics",
+            "conclusion": "skipped",
+            "seconds": 0.0
+          },
+          {
+            "name": "Preserve failed-attempt diagnostics after successful retries",
+            "conclusion": "success",
+            "seconds": 9.0
+          },
+          {
+            "name": "Preserve prerequisite import evidence including successful retries",
+            "conclusion": "success",
+            "seconds": 1.0
+          }
+        ]
+      },
+      "finalFailed": {
+        "title": "fixed CEFL stock keeps selected route targets through save and load",
+        "map": "3-2",
+        "index": 1,
+        "initial": "failed",
+        "retry1": "failed",
+        "firstStop": "errors-empty assertion after specified3-key and other fleet/map load checks; two collected version access-control messages",
+        "outsideContract": [
+          "CUSTOM full-value comparison",
+          "same-document comparison"
+        ],
+        "missing": [
+          "raw value JSON",
+          "exception occurrence time/document/caller"
+        ],
+        "relevance": "new owned soft adapter excludes3-2; spec/version-fetch unchanged; no concrete causal relation established; not a storage mismatch observation"
+      },
+      "flakyInitialStages": {
+        "access-control-check": 3,
+        "hidden-load-click": 10,
+        "reload-wait": 1
+      },
+      "flakyRetryOutcomes": "each retry status passed in own compact; initial missing observations not backfilled",
+      "gaps": [
+        "Raw saved-value JSON and traces were not retrieved; detailed check reachability uses same-attempt annotation plus source control-flow.",
+        "Per-job exact Node footer counts were not acquired; official Node gate status is separate.",
+        "Actual registry image digest was not observed; configured pin and receipt image name are separate."
+      ],
+      "proof": {
+        "canonicalSHA256": "dc1a5f44b61d2a495730c343abf89e2d7a763cbe31b93e37b12b579ae881f239",
+        "manifestSHA256": "f32818f6e2bf3b4fbc02ac410f7e6ccd2d199cb022f17bb6f09267a355aec772",
+        "independentReviewSHA256": "90875f69fdc4d2a943c70422336c16df426dbd6129b774d919d25f15b7af0fe2",
+        "smallZIPs": 12,
+        "smallZIPBytes": 445768,
+        "membersCRCAndSHA256": 48,
+        "officialCompactJoins": 6,
+        "ownEnvironmentJoins": 6
+      },
+      "old422074GapsBackfilled": false,
+      "oldSevenThreeAndMixedUIClaimChanged": false,
+      "cellsBefore": [
+        28,
+        157,
+        51
+      ],
+      "cellsAfter": [
+        28,
+        157,
+        51
+      ]
+    },
+    "nextBaseline": {
+      "unit": "next-scouting-consumer-baseline",
+      "sourceSHA": "c040259703d5927ac7899985a3c63a0e59dc3dd9",
+      "initialExit": 1,
+      "necessaryResumeExit": 0,
+      "affectedScopesConfirmedByAssertions": 4,
+      "existingControlsPassedByAssertions": 2,
+      "firstFindingJSONMissing": true,
+      "completedProducerReruns": 0,
+      "correctedBoundaryControlsPassed": 2,
+      "productChanges": 0,
+      "browserRuns": 0,
+      "additionalNormalCI": 0,
+      "cellsChanged": 0,
+      "classificationSHA256": "d02760c37de52414ed8e042dfd27ebbac69814a8eba29ecb9fd1e18781bfe1c5"
+    },
+    "nextProductApplied": false,
+    "nextPatchTemplate": "private/next-batch-design/scouting-optional-predicate-patch-template-v1.json"
   }
 }

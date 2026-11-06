@@ -1,3 +1,15 @@
+## 2026-11-07 JST：4-3／4-5 対地交換案バッチ・最終結果
+
+1. **改善**：不足欄に装備名・担当艦・合法通常枠・交換対象と、その任意案を選ぶ場合だけの追加数を表示。既存交換案エンジンを再利用し、成立済み条件/必須・利用者目標/担当セット必要部品を失う案は除外。搭載不可・許可枠競合・情報不足を在庫不足へ変換しない。三式弾系/ロケット系は別効果で、装備例準備・通行必須・攻撃可否・撃破/勝利を区別。
+2. **範囲**：4-3 index0 CDHN/CFHNと4-5 index1 ADHKT/CDHKT。N/T港湾棲姫、最終形態は別に扱い、3-5上・4-5他index・既存4点担当セットへ拡張しない。旧2対照再実行0。保存形式は不変、既存保存編集の証拠と今回のreadonly案・新表示保持を分離。
+3. **検証と重要未到達**：source `c040259703d5927ac7899985a3c63a0e59dc3dd9`／[CI42289929859](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/42289929859) attempt1・通常dispatch1/再実行0。4job成功・W3失敗・C2取消、Full skipped。公式passed/flaky/failedは **C918/0/0、W903/14/1**。C2はsmoke success/onEndあり・459/0/0、job45分上限注記cancelledを分離。前88秒/本2605秒/後65秒、後段保存も公式successで、取消発生時刻/命令は欠測のためupload取消とは断定しない。W4は本1214秒/後15秒/job1320秒、1回観測で安定解決とはしない。対象4例は各retry0 passed/completed、10キー＋方針別/他編成・metadata/port選択/目標定義exact、合法variant・再測定・未判定理由・同じreload文書新表示/一時情報非保存を同試行JSONで直接確認。live目標0/1と仮想交換後の準備を混同しない。局所Node749/749（新11）・UI4各初回成功は別証拠。明示保存編集・新案の適用/保存/調達は今回再実行0、形式不変の既存保持証拠を再利用。
+4. **セル**：**28確認済み/157一部/51未確認→同じ（変更0）**。同じ2行C/Dへ限定成果を追記し、未実操作行や列全体の完了へ格上げしない。全82ファイル/C-W各918・test-ID重複0、配分重み/固定環境/期限/探索上限/待機/取消/例外検査は維持。
+5. **次**：2-5北/4-5中央/6-5上下の汎用索敵個数を任意目安として示す共通consumer。初回Nodeは4scope等のassert通過後にHQ欠測の誤期待で停止、最後のfinding JSON未出力を保持。訂正HQ境界＋未到達no-LOSだけを確認し、既通過6scopeは再実行0。private1anchor patch/回帰設計まで、次の製品適用・ブラウザー・追加CIは0。
+
+W最終失敗は3-2 CEFLstock：初回/retryとも3指定キー＋他fleet/mapのload比較後のerrors検査で版access-control2件。CUSTOM全文・同一文書比較は当該試験の契約外、原値JSON・例外発生時刻/文書/callerは欠測。新soft適用外・spec/版fetch不変で関連根拠は未確認、推測修正/新診断へ広げない。W14 flakyの初回はload後click非表示10・通信例外検査3・reload待機1、各retry成功を初回未到達へ流用しない。新保存不一致の陽性観測はないが全保存安全の証明ではない。旧422074の全C未確定/W899/11/6・旧caller/trace等、7-3新案内/主魚Nodeのみ、自然実null/DCL等の既知残件も補完・解決扱いにしない。
+
+12小ZIP445,768bytesのserver digest/CRC・48memberSHA、38manifest項目、6公式compact/自身環境を独立照合。CI各Node件数footer・registry実digest・大raw JSON/trace/logは欠測で、設定pin/局所749と混同しない。証拠 `continuation-soft-land-guidance-batch-20261107/private/`、canonical SHA256 `dc1a5f44b61d2a495730c343abf89e2d7a763cbe31b93e37b12b579ae881f239`、manifest `f32818f6e2bf3b4fbc02ac410f7e6ccd2d199cb022f17bb6f09267a355aec772`、独立reader `90875f69fdc4d2a943c70422336c16df426dbd6129b774d919d25f15b7af0fe2`。原本private・許可metadataだけshared、sanitizer0/大ZIP重複取得0。記録追補は `[skip ci]`、追加CIなし。PR152ドラフト・未公開/main競合/保護対象を維持。以下は各時点の履歴。
+
 ## 2026-11-07 JST：4-3／4-5 対地交換案バッチ（局所確認）
 
 1. **改善**：任意の対地不足欄から既存交換案へ接続し、具体装備・担当艦・合法通常枠・交換対象と、その案だけの追加数を表示。搭載不可/許可枠競合/情報不足を在庫不足へ変換せず、三式弾系とロケット系を同等効果としない。装備準備、通行必須、攻撃可否、撃破/勝利は別。
