@@ -3,6 +3,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {createTwoFiveCeioModelContext}=require('./fixtures/two-five-ceio-model-context.cjs');
 const {createCarrierGuidanceHistoricalProjection}=require('./fixtures/carrier-guidance-source-layer.cjs');
+const {createSurfaceNightPlacementHistoricalProjection}=require('./fixtures/surface-night-placement-source-layer.cjs');
 const ROOT=path.resolve(__dirname,'..'),host=x=>JSON.parse(JSON.stringify(x)),hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 const DD=['夕立改二','時雨改二','綾波改二','島風改'];
 // Identical input names, IDs, empty inventory and fleet order to the four retained
@@ -36,8 +37,8 @@ function row(h,p){const rows=targets(h,p);assert.equal(rows.length,1);return row
 function assertReason(result,status,reason){assert.equal(result.status,status);assert.equal(result.reason,reason);assert.equal(result.placementScope,'starter-carrier');assert.equal(result.normalOnly,true);assert.equal(result.count,1)}
 
 test('starter-carrier approved inverse restores exact preceding source and rejects unapproved or double projection',()=>{
- const approved=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/carrier-guidance-approved-source-inverses.json'),'utf8')),project=createCarrierGuidanceHistoricalProjection(ROOT);assert.equal(approved.schemaVersion,1);assert.equal(approved.beforeSourceHEAD,'76357fe00d44ed3a2ef2e22fbbb4f111e12380b3');assert.deepEqual(Object.keys(approved.files),['owned-equipment-planner.js']);
- const file='owned-equipment-planner.js',current=fs.readFileSync(path.join(ROOT,file),'utf8'),before=project(file,current);assert.equal(hash(before),'09559c3b7365b84141b65f3f58b3d9f91bb93c971ecccf20378086348597fbdd');assert.equal(hash(current),approved.files[file].approvedAfterSHA256);assert.notEqual(before,current);assert.throws(()=>project(file,current+'\n'));assert.throws(()=>project(file,before));assert.equal(project('unrelated.js','unchanged'),'unchanged');
+ const approved=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/carrier-guidance-approved-source-inverses.json'),'utf8')),project=createCarrierGuidanceHistoricalProjection(ROOT),projectSurfaceNight=createSurfaceNightPlacementHistoricalProjection(ROOT);assert.equal(approved.schemaVersion,1);assert.equal(approved.beforeSourceHEAD,'76357fe00d44ed3a2ef2e22fbbb4f111e12380b3');assert.deepEqual(Object.keys(approved.files),['owned-equipment-planner.js']);
+ const file='owned-equipment-planner.js',raw=fs.readFileSync(path.join(ROOT,file),'utf8'),current=projectSurfaceNight(file,raw),before=project(file,raw);assert.equal(hash(before),'09559c3b7365b84141b65f3f58b3d9f91bb93c971ecccf20378086348597fbdd');assert.equal(hash(current),approved.files[file].approvedAfterSHA256);assert.notEqual(before,current);assert.throws(()=>project(file,raw+'\n'));assert.throws(()=>project(file,before));assert.equal(project('unrelated.js','unchanged'),'unchanged');
 });
 
 for(const [map,routeGoal,names,carriers]of CASES)test(map+' '+routeGoal+' actual shortage producer identifies each unequipped carrier and its four normal slots',()=>{

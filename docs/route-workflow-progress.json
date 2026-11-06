@@ -1719,11 +1719,14 @@
         },
         "C": {
           "status": "一部",
-          "reason": "C/Wの不足代表で空母攻撃機1個/魚雷2個の名称・数量・合法候補艦/通常枠、未知と編成不一致の区別、探索未完了の保存を確認。全在庫/搭載不可/枠競合・全推奨数量は未完。",
+          "reason": "C/Wの不足代表で空母攻撃機1個/魚雷2個の名称・数量・合法候補艦/通常枠、未知と編成不一致の区別、探索未完了の保存を確認。全在庫/搭載不可/枠競合・全推奨数量は未完。 共通night-main/main-secondary/mixedの構成内訳/合法通常別枠/未判定・搭載不可理由を追加。本行の新案内は代表C/W初回で表示・同一load後保持を確認し、構成個数/所持/現在配備を区別。",
           "evidence": [
             "docs/pr152-five-one-bcfj-ja.md",
             "tests/route-five-one-bcfj.spec.js",
-            "tests/five-one-placement.test.cjs"
+            "tests/five-one-placement.test.cjs",
+            "tests/surface-night-placement-guidance.test.cjs",
+            "docs/route-workflow-progress-ja.md#2026-11-06-jst夜戦ci主砲レシピ案内バッチ",
+            "tests/owned-equipment-planner.spec.js"
           ]
         },
         "D": {
@@ -2593,11 +2596,13 @@
         },
         "C": {
           "status": "一部",
-          "reason": "任意夜戦1組の魚雷必要2/登録0/あと2個、同艦2通常枠と候補艦を表示。全候補への配備を要求せず、未知艦manualは元保存編成を安全中止。編成不一致・出典差・探索未完了を購入数量や手持ち不可能へ変換しない。全区分の組合せは未網羅。",
+          "reason": "任意夜戦1組の魚雷必要2/登録0/あと2個、同艦2通常枠と候補艦を表示。全候補への配備を要求せず、未知艦manualは元保存編成を安全中止。編成不一致・出典差・探索未完了を購入数量や手持ち不可能へ変換しない。全区分の組合せは未網羅。 共通night-main/main-secondary/mixedの構成内訳/合法通常別枠/未判定・搭載不可理由を追加。本行はNodeで接続確認のみ、新案内の実操作成功へ換算しない。",
           "evidence": [
             "docs/pr152-seven-three-first-ja.md",
             "tests/seven-three-first-routes.test.cjs",
-            "tests/route-seven-three-first.spec.js"
+            "tests/route-seven-three-first.spec.js",
+            "tests/surface-night-placement-guidance.test.cjs",
+            "docs/route-workflow-progress-ja.md#2026-11-06-jst夜戦ci主砲レシピ案内バッチ"
           ]
         },
         "D": {
@@ -2706,12 +2711,15 @@
         },
         "C": {
           "status": "一部",
-          "reason": "stockのソナー/投射機各登録0・必要3・あと3個、魚雷登録0・必要2・あと2個と同じ艦の別通常枠候補を表示。unknownは元保存編成の上書きを安全中止。formula/艦情報未判定と確定した編成不一致を数量不足へ変換せず、全候補への配備や購入量を保証しない。全区分の組合せは未網羅。",
+          "reason": "stockのソナー/投射機各登録0・必要3・あと3個、魚雷登録0・必要2・あと2個と同じ艦の別通常枠候補を表示。unknownは元保存編成の上書きを安全中止。formula/艦情報未判定と確定した編成不一致を数量不足へ変換せず、全候補への配備や購入量を保証しない。全区分の組合せは未網羅。 共通night-main/main-secondary/mixedの構成内訳/合法通常別枠/未判定・搭載不可理由を追加。本行の新案内は代表C/W初回で表示・同一load後保持を確認し、構成個数/所持/現在配備を区別。",
           "evidence": [
             "docs/pr152-seven-four-ja.md",
             "tests/seven-four-routes.test.cjs",
             "tests/seven-four-placement.test.cjs",
-            "tests/route-seven-four.spec.js"
+            "tests/route-seven-four.spec.js",
+            "tests/surface-night-placement-guidance.test.cjs",
+            "docs/route-workflow-progress-ja.md#2026-11-06-jst夜戦ci主砲レシピ案内バッチ",
+            "tests/owned-equipment-planner.spec.js"
           ]
         },
         "D": {
@@ -3273,22 +3281,21 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "carrier-placement-guidance-batch",
-    "baselineHead": "76357fe00d44ed3a2ef2e22fbbb4f111e12380b3",
+    "id": "surface-night-placement-batch",
+    "baselineHead": "7c9e4accef6115b22b74aaccde15fe4a57dd6c02",
     "scope": [
-      "1-3/0/normal",
-      "1-3/0/cfj",
-      "1-4/0/normal",
-      "1-4/0/j-avoid"
+      "5-1/0/default",
+      "7-3/0/default",
+      "7-4/0/default"
     ],
     "executedUIScopes": [
-      "1-3/0/cfj",
-      "1-4/0/normal"
+      "5-1/0/default",
+      "7-4/0/default"
     ],
-    "record": "carrierGuidanceBatch20261106",
-    "state": "shared guidance and local proof complete; final-source CI collected/independently matched; next shared-night baseline3 confirmed, implementation pending"
+    "record": "surfaceNightGuidanceBatch20261106",
+    "state": "shared recipe guidance complete; Node738 and four initial UI passes, final-source smoke pending"
   },
-  "nextPriority": "5-1 BCFJ／7-3第1 ACE／7-4 ABEJLP：auto夜戦CIの選択済主砲3レシピで艦別搭載先が欠ける共通不備。actual modelの3論理/5物理対照で確定（最初2件のfixtureデータ未読込み失敗を別保持し、実map-details-57読込み後は当該2件だけ再確認）。魚雷2の正対照も維持。主砲2副砲1・主砲1魚雷1は静的候補のまま、合法増設等の相違を統一せず次に境界確認する。次バッチ製品修正/実操作/CIはまだ0、進捗セル追加0。空母夜戦の既知停止へ広げない。",
+  "nextPriority": "次は3-5上/4-3/4-5の保存艦隊OCにあるsoft対地目標の不足欄。既存FLSetRemediesは艦名・合法通常枠・交換/在庫不足を既に扱うため、製品全体の機能欠落や新しい並行エンジンとせず、OCへの限定再利用を最小対照で確認する。3-5下FGKは対象外、4-3/4-5中央の既存4点担当セットを保持。auto文脈の調達button・OASW確認scopeをownedへ流用しない。静的候補のみ・次の製品/実画面未実施、セル追加0。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -7207,6 +7214,22 @@
       "record": "optionalAaBatch20261106",
       "state": "optional AA limited display batch complete; CI42119476156 4success/W2failure/C2cancel; W895/15/2, C1subtotal456/0/0, fullCnull; target4initialpass; old originals/gaps retained",
       "sourceHEAD": "88a3c0a44a59309e00aa5157ce42fb10c569cc9d"
+    },
+    {
+      "id": "carrier-placement-guidance-batch",
+      "baselineHead": "76357fe00d44ed3a2ef2e22fbbb4f111e12380b3",
+      "scope": [
+        "1-3/0/normal",
+        "1-3/0/cfj",
+        "1-4/0/normal",
+        "1-4/0/j-avoid"
+      ],
+      "executedUIScopes": [
+        "1-3/0/cfj",
+        "1-4/0/normal"
+      ],
+      "record": "carrierGuidanceBatch20261106",
+      "state": "shared guidance and local proof complete; final-source CI collected/independently matched; next shared-night baseline3 confirmed, implementation pending"
     }
   ],
   "fiveFourCloseout": {
@@ -7247,8 +7270,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "shared guidance and local proof complete; final-source CI collected/independently matched; next shared-night baseline3 confirmed, implementation pending",
-    "nextUnit": "5-1 BCFJ／7-3第1 ACE／7-4 ABEJLP：auto夜戦CIの選択済主砲3レシピで艦別搭載先が欠ける共通不備。actual modelの3論理/5物理対照で確定（最初2件のfixtureデータ未読込み失敗を別保持し、実map-details-57読込み後は当該2件だけ再確認）。魚雷2の正対照も維持。主砲2副砲1・主砲1魚雷1は静的候補のまま、合法増設等の相違を統一せず次に境界確認する。次バッチ製品修正/実操作/CIはまだ0、進捗セル追加0。空母夜戦の既知停止へ広げない。",
+    "activeUnit": "shared recipe guidance complete; Node738 and four initial UI passes, final-source smoke pending",
+    "nextUnit": "次は3-5上/4-3/4-5の保存艦隊OCにあるsoft対地目標の不足欄。既存FLSetRemediesは艦名・合法通常枠・交換/在庫不足を既に扱うため、製品全体の機能欠落や新しい並行エンジンとせず、OCへの限定再利用を最小対照で確認する。3-5下FGKは対象外、4-3/4-5中央の既存4点担当セットを保持。auto文脈の調達button・OASW確認scopeをownedへ流用しない。静的候補のみ・次の製品/実画面未実施、セル追加0。",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -21845,5 +21868,145 @@
       },
       "privateValueBodiesIncluded": false
     }
+  },
+  "surfaceNightGuidanceBatch20261106": {
+    "date": "2026-11-06 JST",
+    "baseHEAD": "7c9e4accef6115b22b74aaccde15fe4a57dd6c02",
+    "previousVerifiedSource": "c41a01cb72110b30331d7fe9c6fd50ca3de36f03",
+    "sharedScopes": [
+      "5-1/0/default",
+      "7-3/0/default",
+      "7-4/0/default"
+    ],
+    "executedUIScopes": [
+      "5-1/0/default",
+      "7-4/0/default"
+    ],
+    "newRecipes": [
+      "night-main",
+      "night-main-secondary",
+      "night-mixed"
+    ],
+    "existingTorpedoGuide": "old helper1641B/SHA37888bf37376ee4e6784d738017de3f1bd959e7d25e3dc4d79a7c50837d1a76e and old output preserved",
+    "source": {
+      "wiki": "https://wikiwiki.jp/kancolle/夜戦#dfcb6e1f",
+      "crosscheck": "https://github.com/KC3Kai/KC3Kai/blob/42eecc3b82127bcd498d34a3a6b5b5adb260c929/src/library/objects/Ship.js#L4645",
+      "contract": "per-hull recipe composition only, ordinary surface targets/current FE supported hulls; no new activation/rate/count/route criterion",
+      "priority": [
+        "main3",
+        "main2-secondary1",
+        "torpedo2",
+        "main1-torpedo1",
+        "double"
+      ],
+      "legalExpansion": "still counted by actual FE; normal-slot-only new hints do not declare expansion impossible",
+      "reviewRef": "private/evidence-source-review.json"
+    },
+    "productSHA256": "c591e8e568469e0efa03efb81fe9e14eb66eb2c30c5ec6823b30ec03c48d91d9",
+    "baselineReuse": {
+      "logical": 3,
+      "physical": 5,
+      "actualOmissions": 3,
+      "oldNegativeRerun": 0,
+      "path": "continuation-carrier-guidance-batch-20261106/shared/next-night-baseline.json",
+      "oldFixtureFailures": 2,
+      "notNewTrialSuccess": true
+    },
+    "node": {
+      "passed": 738,
+      "failed": 0,
+      "new": 17,
+      "runs": 1,
+      "normalRegistration": true,
+      "sourceExact": true,
+      "UISeedInputsCheckedByActualProducer": true
+    },
+    "local": {
+      "logical": 4,
+      "physical": 4,
+      "initialPass": 4,
+      "failed": 0,
+      "workers": 1,
+      "retries": 0,
+      "saveEditReexecuted": false,
+      "newDisplayOnly": "10 core storage strings plus separate night-policy exact flag, same-document reload/search/new guidance; other planner/goals/definitions/metadata exact",
+      "newUIRecipeCoverage": [
+        "5-1 navigator main3 finite2",
+        "7-4 inline main2-secondary1 finite main1/secondary1, DD secondary blocked"
+      ],
+      "notUIConfirmed": [
+        "7-3 new main recipe display",
+        "mixed recipe operation",
+        "newly saved proposal restore/apply/edit"
+      ],
+      "preBrowserCorrection": "one guard scope -> placementScope matches actual ephemeral field; product/input/operations unchanged, browser executions before correction0, Node738 reused",
+      "proof": "shared/local-results.json"
+    },
+    "preflight": {
+      "casesPerBrowser": 916,
+      "files": 82,
+      "webkitCaseBins": [
+        339,
+        164,
+        229,
+        184
+      ],
+      "wholeFileUnionExact": true,
+      "duplicateIDs": 0,
+      "partitionOrWeightsChanged": false
+    },
+    "oldCI": {
+      "run": 42194493112,
+      "source": "c41a01cb72110b30331d7fe9c6fd50ca3de36f03",
+      "C": [
+        914,
+        0,
+        0
+      ],
+      "W": [
+        899,
+        11,
+        4
+      ],
+      "countsMeaning": "passed/flaky/failed",
+      "finalFour": [
+        "7-1 ready",
+        "7-5 first stock",
+        "5-1 ready",
+        "7-4 known"
+      ],
+      "eachInitialAndRetry": "post-load re-search click hidden; full comparison unreached, caller/cause unknown",
+      "rawGapsPreserved": true,
+      "newDiagnosis": false,
+      "oldResultBackfilled": false
+    },
+    "matrix": {
+      "before": [
+        28,
+        157,
+        51
+      ],
+      "after": [
+        28,
+        157,
+        51
+      ],
+      "changes": [],
+      "criteriaChanged": false,
+      "unexecutedScopesPromoted": false
+    },
+    "ci": {
+      "state": "pending final source; one normal smoke only",
+      "onlyWorkflowChange": "one small target-summary glob; same82files/partition/weights/workers/image/Node/deadlines/retries/exception/exit",
+      "recordOnlyAdditionalCI": false
+    },
+    "remaining": [
+      "all hull/item/slot/inventory and unknown UI combinations",
+      "activation eligibility/damage/enemy/luck/rate and victory are not guaranteed by preparation",
+      "additional required fleet sets or universal procurement counts not inferred",
+      "save/edit/newly saved proposal operation not newly reexecuted",
+      "7-3 new-guide UI and mixed new-guide UI unexecuted; older route evidence separate"
+    ],
+    "next": "次は3-5上/4-3/4-5の保存艦隊OCにあるsoft対地目標の不足欄。既存FLSetRemediesは艦名・合法通常枠・交換/在庫不足を既に扱うため、製品全体の機能欠落や新しい並行エンジンとせず、OCへの限定再利用を最小対照で確認する。3-5下FGKは対象外、4-3/4-5中央の既存4点担当セットを保持。auto文脈の調達button・OASW確認scopeをownedへ流用しない。静的候補のみ・次の製品/実画面未実施、セル追加0。"
   }
 }

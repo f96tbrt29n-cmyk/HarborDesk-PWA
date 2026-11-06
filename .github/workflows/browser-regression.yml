@@ -118,6 +118,7 @@ jobs:
             ${{ runner.temp }}/harbordesk-ci-smoke/
             test-results/optional-anti-air-hints-*/optional-aa-ui-summary.json
             test-results/owned-equipment-planner-*/carrier-placement-ui-summary.json
+            test-results/owned-equipment-planner-*/surface-night-placement-ui-summary.json
           if-no-files-found: warn
           retention-days: 14
 
