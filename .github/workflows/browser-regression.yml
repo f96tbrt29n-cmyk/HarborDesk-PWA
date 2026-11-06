@@ -120,6 +120,7 @@ jobs:
             test-results/owned-equipment-planner-*/carrier-placement-ui-summary.json
             test-results/owned-equipment-planner-*/surface-night-placement-ui-summary.json
             test-results/owned-equipment-planner-*/soft-land-remedy-ui-summary.json
+            test-results/owned-equipment-planner-*/scouting-optional-ui-summary.json
           if-no-files-found: warn
           retention-days: 14
 

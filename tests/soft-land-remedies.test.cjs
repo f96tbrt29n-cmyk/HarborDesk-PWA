@@ -3,6 +3,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {createSurfaceNightModelContext}=require('./fixtures/surface-night-model-context.cjs');
 const {createSoftLandRemediesHistoricalProjection}=require('./fixtures/soft-land-remedies-source-layer.cjs');
+const {createScoutingOptionalHistoricalProjection}=require('./fixtures/scouting-optional-guidance-source-layer.cjs');
 const ROOT=path.resolve(__dirname,'..'),host=x=>JSON.parse(JSON.stringify(x)),hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 const SOFT_ROUTES=[['4-3',0,'CDHN / CFHN',['妙高改','羽黒改','赤城改','加賀改','時雨改','綾波改']],['4-5',1,'ADHKT / CDHKT',['長門改','陸奥改','妙高改二','羽黒改二','赤城改','飛鷹改']]];
 const soft=(n=1)=>({kind:'cap-land-soft',baseKind:'対地',label:'任意のソフトスキン対地装備',minCount:n,generatedFromMap:true,purpose:'recommendation'});
@@ -21,7 +22,7 @@ function trialChange(h,p,si,slot,name,star=0){const trial=h.c.hdFOClone(p),ship=
 function verdict(h,u,variant,rechecks=[]){const after=h.c.hdOCMeasure(variant,u.r),input={plan:u.p,variant,before:u.m,after,goal:u.g,shipIndex:0,changes:[],rechecks},before=JSON.stringify(input),decision=h.c.hdOCSoftLandAcceptVariant(input);assert.equal(JSON.stringify(input),before);return {after,decision}}
 
 test('soft-land historical projection restores both preceding sources and rejects unknown or repeated input',()=>{
- const project=createSoftLandRemediesHistoricalProjection(ROOT),approved=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/soft-land-remedies-approved-source-inverses.json'),'utf8'));assert.equal(approved.schemaVersion,1);assert.equal(approved.beforeSourceHEAD,'a4bb8857e73abe51ca2a62bd66e0dc3f6ccf75c7');assert.deepEqual(Object.keys(approved.files).sort(),['fleet-loadout-planner.js','owned-equipment-planner.js']);for(const [file,row]of Object.entries(approved.files)){const current=fs.readFileSync(path.join(ROOT,file),'utf8'),previous=project(file,current);assert.equal(hash(current),row.approvedAfterSHA256);assert.equal(hash(previous),row.beforeSHA256);assert.throws(()=>project(file,current+'\n'));assert.throws(()=>project(file,previous))}assert.equal(project('unrelated.js','same'),'same');
+ const project=createSoftLandRemediesHistoricalProjection(ROOT),projectScoutingOptional=createScoutingOptionalHistoricalProjection(ROOT),approved=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/soft-land-remedies-approved-source-inverses.json'),'utf8'));assert.equal(approved.schemaVersion,1);assert.equal(approved.beforeSourceHEAD,'a4bb8857e73abe51ca2a62bd66e0dc3f6ccf75c7');assert.deepEqual(Object.keys(approved.files).sort(),['fleet-loadout-planner.js','owned-equipment-planner.js']);for(const [file,row]of Object.entries(approved.files)){const raw=fs.readFileSync(path.join(ROOT,file),'utf8'),current=projectScoutingOptional(file,raw),previous=project(file,raw);assert.equal(hash(current),row.approvedAfterSHA256);assert.equal(hash(previous),row.beforeSHA256);assert.throws(()=>project(file,raw+'\n'));assert.throws(()=>project(file,previous))}assert.equal(project('unrelated.js','same'),'same');
 });
 
 test('current two-route producers reuse original soft goals final measures and requirements and emit legal read-only variants',()=>{

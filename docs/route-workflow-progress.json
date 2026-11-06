@@ -739,26 +739,29 @@
         },
         "C": {
           "status": "一部",
-          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。 高速の有効3戦艦枝から不要な低速目標/不足/強制差替えを除外し、上位E/ランダム/未知を軽い独立期待値で区別。全不足区分は未網羅。",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。 高速の有効3戦艦枝から不要な低速目標/不足/強制差替えを除外し、上位E/ランダム/未知を軽い独立期待値で区別。全不足区分は未網羅。 任意索敵個数は数値経路条件/確定調達数と別。有限在庫・現在案・合法艦/枠/交換対象のreadonly inspectionを共通Nodeで確認し、交換後の数値/条件維持は未評価。 同じ行の代表C/W初回で新表示を確認。",
           "evidence": [
             "docs/pr152-north-los-ui-ja.md",
             "docs/pr152-north-drum-domain-ja.md",
             "tests/route-completion-2-5.spec.js",
             "docs/pr152-two-five-north-f-ja.md",
             "tests/two-five-north-f.test.cjs",
-            "tests/route-north-f-branch.spec.js"
+            "tests/route-north-f-branch.spec.js",
+            "tests/scouting-optional-guidance.test.cjs",
+            "docs/route-workflow-progress.json#scoutingOptionalGuidanceBatch20261107"
           ]
         },
         "D": {
           "status": "確認済み",
-          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。 新しい高速3戦艦代表で自動配備→保存→メモ編集→同一文書load/complete後再探索・再表示をC/W各1初回成功。直接保存文字列/入力完全一致、他編成・他海域・個体・metadata・他planner・調達案保持。",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。 新しい高速3戦艦代表で自動配備→保存→メモ編集→同一文書load/complete後再探索・再表示をC/W各1初回成功。直接保存文字列/入力完全一致、他編成・他海域・個体・metadata・他planner・調達案保持。 保存編集の既存根拠を分離再利用し、今回の新表示/任意説明だけreload保持を追加確認。",
           "evidence": [
             "docs/pr152-north-los-ui-ja.md",
             "docs/pr152-north-drum-domain-ja.md",
             "tests/route-completion-2-5.spec.js",
             "docs/pr152-two-five-north-f-ja.md",
             "tests/two-five-north-f.test.cjs",
-            "tests/route-north-f-branch.spec.js"
+            "tests/route-north-f-branch.spec.js",
+            "docs/route-workflow-progress.json#scoutingOptionalGuidanceBatch20261107"
           ]
         }
       },
@@ -1633,7 +1636,7 @@
         },
         "C": {
           "status": "一部",
-          "reason": "同じindexの在庫0で索敵12/登録71の不足59、実数不足と戦闘推奨の空母1機/同艦ASW1組の名前・合法な別枠・代替搭載先をC/W確認。未知は索敵/艦の未判定と安全中止。全失敗区分は未完。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。 同source CI42289929859でも新案内の同じC/W代表は各初回完了。既存保存操作との分離・セル状態は維持。",
+          "reason": "同じindexの在庫0で索敵12/登録71の不足59、実数不足と戦闘推奨の空母1機/同艦ASW1組の名前・合法な別枠・代替搭載先をC/W確認。未知は索敵/艦の未判定と安全中止。全失敗区分は未完。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。 同source CI42289929859でも新案内の同じC/W代表は各初回完了。既存保存操作との分離・セル状態は維持。 任意索敵個数は数値経路条件/確定調達数と別。有限在庫・現在案・合法艦/枠/交換対象のreadonly inspectionを共通Nodeで確認し、交換後の数値/条件維持は未評価。 同じ行の代表C/W初回で新表示を確認。",
           "evidence": [
             "docs/pr152-port-attacker-set-ja.md",
             "tests/port-attacker-set.spec.js",
@@ -1643,12 +1646,14 @@
             "tests/four-five-central-placement.test.cjs",
             "tests/route-four-five-central.spec.js",
             "tests/soft-land-remedies.test.cjs",
-            "tests/owned-equipment-planner.spec.js"
+            "tests/owned-equipment-planner.spec.js",
+            "tests/scouting-optional-guidance.test.cjs",
+            "docs/route-workflow-progress.json#scoutingOptionalGuidanceBatch20261107"
           ]
         },
         "D": {
           "status": "確認済み",
-          "reason": "同じindexの成立/在庫不足で保存→メモ編集→reload(load)→同一新文書complete後再探索/再表示、custom保存文字列・同期元・他編成/海域・ID/metadata・計算/調達/他経路担当艦情報をC/W直接一致。未知は編集なし安全中止と元保存値保持。初回stock2失敗は保存前で別記し、期待値2箇所修正後のstock2必要再検証と成功4再利用を区別。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。 同source CI42289929859でも新案内の同じC/W代表は各初回完了。既存保存操作との分離・セル状態は維持。",
+          "reason": "同じindexの成立/在庫不足で保存→メモ編集→reload(load)→同一新文書complete後再探索/再表示、custom保存文字列・同期元・他編成/海域・ID/metadata・計算/調達/他経路担当艦情報をC/W直接一致。未知は編集なし安全中止と元保存値保持。初回stock2失敗は保存前で別記し、期待値2箇所修正後のstock2必要再検証と成功4再利用を区別。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。 同source CI42289929859でも新案内の同じC/W代表は各初回完了。既存保存操作との分離・セル状態は維持。 保存編集の既存根拠を分離再利用し、今回の新表示/任意説明だけreload保持を追加確認。",
           "evidence": [
             "docs/pr152-port-attacker-set-ja.md",
             "tests/port-attacker-set.spec.js",
@@ -1658,7 +1663,8 @@
             "tests/four-five-central-placement.test.cjs",
             "tests/route-four-five-central.spec.js",
             "tests/soft-land-remedies.test.cjs",
-            "tests/owned-equipment-planner.spec.js"
+            "tests/owned-equipment-planner.spec.js",
+            "docs/route-workflow-progress.json#scoutingOptionalGuidanceBatch20261107"
           ]
         }
       },
@@ -2321,11 +2327,13 @@
         },
         "C": {
           "status": "一部",
-          "reason": "上CV1不足の空母攻撃機1個と正搭載数の合法通常枠、安全域索敵不足のポイント表示/購入数なし、入力不足の未判定をC/Wで確認。全搭載不可/枠競合/代替は未網羅。",
+          "reason": "上CV1不足の空母攻撃機1個と正搭載数の合法通常枠、安全域索敵不足のポイント表示/購入数なし、入力不足の未判定をC/Wで確認。全搭載不可/枠競合/代替は未網羅。 任意索敵個数は数値経路条件/確定調達数と別。有限在庫・現在案・合法艦/枠/交換対象のreadonly inspectionを共通Nodeで確認し、交換後の数値/条件維持は未評価。 この行の新UI操作は未実施で、別行の成功を流用しない。",
           "evidence": [
             "docs/pr152-six-five-routes-ja.md",
             "tests/route-six-five-routes.spec.js",
-            "tests/six-five-placement.test.cjs"
+            "tests/six-five-placement.test.cjs",
+            "tests/scouting-optional-guidance.test.cjs",
+            "docs/route-workflow-progress.json#scoutingOptionalGuidanceBatch20261107"
           ]
         },
         "D": {
@@ -2369,11 +2377,13 @@
         },
         "C": {
           "status": "一部",
-          "reason": "下の任意ソナー/投射機各1個と同艦の別合法通常枠、安全域索敵不足のポイント表示/購入数なし、入力不足の未判定をC/Wで確認。全搭載不可/枠競合/代替は未網羅。",
+          "reason": "下の任意ソナー/投射機各1個と同艦の別合法通常枠、安全域索敵不足のポイント表示/購入数なし、入力不足の未判定をC/Wで確認。全搭載不可/枠競合/代替は未網羅。 任意索敵個数は数値経路条件/確定調達数と別。有限在庫・現在案・合法艦/枠/交換対象のreadonly inspectionを共通Nodeで確認し、交換後の数値/条件維持は未評価。 この行の新UI操作は未実施で、別行の成功を流用しない。",
           "evidence": [
             "docs/pr152-six-five-routes-ja.md",
             "tests/route-six-five-routes.spec.js",
-            "tests/six-five-placement.test.cjs"
+            "tests/six-five-placement.test.cjs",
+            "tests/scouting-optional-guidance.test.cjs",
+            "docs/route-workflow-progress.json#scoutingOptionalGuidanceBatch20261107"
           ]
         },
         "D": {
@@ -3289,20 +3299,26 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "soft-land-guidance-batch",
-    "baselineHead": "a4bb8857e73abe51ca2a62bd66e0dc3f6ccf75c7",
+    "id": "scouting-optional-guidance-batch",
+    "baselineHead": "48f6ebc89b24ca6d20991314551d8377bc98b6b6",
     "scope": [
-      "4-3/0/default",
-      "4-5/1/default"
+      "2-5/0/default",
+      "4-5/1/default",
+      "6-5/0/default",
+      "6-5/1/default"
     ],
     "executedUIScopes": [
-      "4-3/0/default",
+      "2-5/0/default",
       "4-5/1/default"
     ],
-    "record": "softLandGuidanceBatch20261107",
-    "state": "shared safe guidance/local749 and4 initial UI verified; one final-source smoke collected; next shared scouting consumer baseline and private patch prepared"
+    "NodeOnlyScopes": [
+      "6-5/0/default",
+      "6-5/1/default"
+    ],
+    "record": "scoutingOptionalGuidanceBatch20261107",
+    "state": "shared inspection and optional qualification/local760 and4 initial UI verified; final-source smoke pending"
   },
-  "nextPriority": "2-5北BFJO／4-5中央ADHKT・CDHKT／6-5上下の、数値索敵とは別の汎用装備個数を任意目安として示す共通consumer接続。初回Nodeの到達assertで4scopeの同型不足と既存2scope/明示目標/数値gap0を確認（最終finding JSON未出力）。HQ欠測の数値goal存在を誤期待した原本を保持し、訂正HQ境界＋初回未到達no-LOSの2境界だけを確認、既通過6scope再実行0。private最小1anchor patch・回帰設計まで準備済み、次の製品適用/ブラウザー/追加CIは0。",
+  "nextPriority": "1-6下/7-5第3の既存任意ASW sonar-projectorセットの艦別具体搭載先。同型caller/helper除外の静的候補、既存set1と先制対潜人数を分離。actual2producer対照準備中・製品/新実画面未実施。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -22822,5 +22838,170 @@
     },
     "nextProductApplied": false,
     "nextPatchTemplate": "private/next-batch-design/scouting-optional-predicate-patch-template-v1.json"
-  }
+  },
+  "scoutingOptionalGuidanceBatch20261107": {
+    "key": "scoutingOptionalGuidanceBatch20261107",
+    "matrix": {
+      "before": [
+        28,
+        157,
+        51
+      ],
+      "after": [
+        28,
+        157,
+        51
+      ],
+      "changes": [],
+      "criteriaChanged": false,
+      "newRouteCreditFromCommonCode": false
+    },
+    "scope": [
+      "2-5/0/default",
+      "4-5/1/default",
+      "6-5/0/default",
+      "6-5/1/default"
+    ],
+    "inspection": "Only canonical required-LOS nonexempt new scopes reuse existing owned inventory inspection. Rows distinguish registered/current-plan/unused, actual final hulls including alternatives, confirmed normal/open expansion destinations, same/replace/empty and missing compatibility data.",
+    "notSolved": "No post-swap numeric score, legal joint allocation or goal-preserving exchange variant is computed. References are not an auto-apply, purchase requirement or victory claim. Existing FC manual editing remains reference-value/conditions-unconfirmed.",
+    "readOnly": "New inspection model is transient and never saved. Original plan, measured goals and required checks, explicit/assigned targets, source inventory and other metadata remain unmodified; actual test results must be inserted only after verification.",
+    "evidenceReuse": "Existing same-route fleet save/edit/same-document load/full-string and other-fleet/metadata proofs remain separately cited. New UI supplements only changed guidance and new optional procurement-description persistence; do not claim full workflow rerun.",
+    "countercases": "Private v1 passed four new scope + two old + explicit/numeric assertions before a wrong missing-HQ oracle; final per-scope finding JSON absent. Source-based correction moves HQ to actual manual/scouting/requiredChecks boundary; two-control resume is separate, no six-case repetition.",
+    "node": {
+      "passed": 760,
+      "failed": 0,
+      "newTests": 11,
+      "runs": 1,
+      "normalRegistration": true,
+      "historicalLayers": 13,
+      "exactEndpoints": 28
+    },
+    "local": {
+      "logical": 4,
+      "physical": 4,
+      "initialPassed": 4,
+      "failed": 0,
+      "workers": 1,
+      "retries": 0,
+      "executedUI": [
+        "2-5/0 navigator",
+        "4-5/1 inline"
+      ],
+      "NodeOnly": [
+        "6-5/0",
+        "6-5/1"
+      ],
+      "fleetSaveEditReexecuted": false,
+      "equipmentSwapApplied": false,
+      "procurementActionPerNavigator": 1,
+      "navigatorPostAddWholeExpected": null,
+      "navigatorPostReloadWholeExpected": true,
+      "immutableKeyCounts": {
+        "initial": 10,
+        "navigatorAfterAddAndReload": 9,
+        "inline": 10
+      },
+      "summarySHA256": "9140602028925f1f900bac85bd063411be249b6a059bedeb3eac7ff2ec0129df"
+    },
+    "finalSource": null,
+    "ci": {
+      "state": "final-source normal smoke pending",
+      "normalRunsPlanned": 1,
+      "reruns": 0,
+      "workflowChange": "one compact summary upload glob only"
+    },
+    "oldCIPreserved": "CI42289929859 and earlier failures/caller/value gaps remain trial-specific, not filled by new local results.",
+    "date": "2026-11-07 JST",
+    "baseHEAD": "48f6ebc89b24ca6d20991314551d8377bc98b6b6",
+    "priorSource": "c040259703d5927ac7899985a3c63a0e59dc3dd9",
+    "productSHA256": "1470d556098809aa0a4b6978de95545ececdbf57935828ab5dafbed71b1ff284",
+    "source": "Existing registered evidence reused. Preserve numeric coefficients/safety thresholds 1/49,2/71,3/50,3/35, north42 lower bound, central70/71/HQ formula discrepancy, HQ-sync and bonus uncertainty. Existing CEIO-only I/31/34/HQ120 wording remains index1 only. No new route/source numeric rule.",
+    "preflight": {
+      "ok": true,
+      "normalCounts": {
+        "chromium": 920,
+        "webkit": 920
+      },
+      "wholeFileBins": [
+        {
+          "shard": 1,
+          "files": 16,
+          "cases": 339,
+          "estimatedSeconds": 1957
+        },
+        {
+          "shard": 2,
+          "files": 22,
+          "cases": 164,
+          "estimatedSeconds": 1967
+        },
+        {
+          "shard": 3,
+          "files": 22,
+          "cases": 233,
+          "estimatedSeconds": 1957
+        },
+        {
+          "shard": 4,
+          "files": 22,
+          "cases": 184,
+          "estimatedSeconds": 1956
+        }
+      ],
+      "webkitUnionExact": true,
+      "uniqueTestIDsExact": true,
+      "cases": [
+        {
+          "id": "chromium-navigator",
+          "selected": 1
+        },
+        {
+          "id": "chromium-inline",
+          "selected": 1
+        },
+        {
+          "id": "webkit-navigator",
+          "selected": 1
+        },
+        {
+          "id": "webkit-inline",
+          "selected": 1
+        }
+      ],
+      "browserExecutions": 0
+    },
+    "oldCI": {
+      "run": 42289929859,
+      "C": [
+        918,
+        0,
+        0
+      ],
+      "W": [
+        903,
+        14,
+        1
+      ],
+      "C2": "smoke passed/onEnd available, job45m cancelled; uploads official success, cancellation time/command missing",
+      "WFinal": "3-2 CEFL stock initial/retry errors guard after specified3-key+otherfleet/map load checks;2access-control messages; occurrence/doc/caller/raw values missing; no concrete newbatch relation",
+      "backfill": false
+    },
+    "proof": "continuation-scouting-optional-guidance-batch-20261107/private/; shared/local-results.json allowed metadata only",
+    "next": "1-6下/7-5第3の既存任意ASW sonar-projectorセットの艦別具体搭載先。同型caller/helper除外の静的候補、既存set1と先制対潜人数を分離。actual2producer対照準備中・製品/新実画面未実施。"
+  },
+  "selectedBeforeScoutingOptionalGuidanceBatch20261107": {
+    "id": "soft-land-guidance-batch",
+    "baselineHead": "a4bb8857e73abe51ca2a62bd66e0dc3f6ccf75c7",
+    "scope": [
+      "4-3/0/default",
+      "4-5/1/default"
+    ],
+    "executedUIScopes": [
+      "4-3/0/default",
+      "4-5/1/default"
+    ],
+    "record": "softLandGuidanceBatch20261107",
+    "state": "shared safe guidance/local749 and4 initial UI verified; one final-source smoke collected; next shared scouting consumer baseline and private patch prepared"
+  },
+  "nextPriorityBeforeScoutingOptionalGuidanceBatch20261107": "2-5北BFJO／4-5中央ADHKT・CDHKT／6-5上下の、数値索敵とは別の汎用装備個数を任意目安として示す共通consumer接続。初回Nodeの到達assertで4scopeの同型不足と既存2scope/明示目標/数値gap0を確認（最終finding JSON未出力）。HQ欠測の数値goal存在を誤期待した原本を保持し、訂正HQ境界＋初回未到達no-LOSの2境界だけを確認、既通過6scope再実行0。private最小1anchor patch・回帰設計まで準備済み、次の製品適用/ブラウザー/追加CIは0。"
 }

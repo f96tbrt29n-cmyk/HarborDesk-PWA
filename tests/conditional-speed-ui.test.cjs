@@ -112,3 +112,4 @@ require('./optional-anti-air-hints.test.cjs');
 require('./carrier-placement-guidance.test.cjs');
 require('./surface-night-placement-guidance.test.cjs');
 require('./soft-land-remedies.test.cjs');
+require('./scouting-optional-guidance.test.cjs');

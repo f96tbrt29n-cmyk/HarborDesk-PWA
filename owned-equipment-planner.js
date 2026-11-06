@@ -816,10 +816,43 @@ function hdOCPlacementInfo(kind,inventory,slots,catalog){
 }
 // FGK's numeric route threshold is independent of the generic equipment-count
 // recommendation. These are inspection candidates, never solved allocations.
+function hdOCScoutingInspection(c,result){
+ const index=c?.index,paths={'2-5':{0:'BFJO'},'4-5':{1:'ADHKT / CDHKT'},'6-5':{0:'ACDGM',1:'BFIJM'}},path=Number.isInteger(index)?paths[c?.map]?.[index]:null;
+ if(!path||!result?.plan||!result?.measure)return null;
+ const plan=result.plan,contract=hdFERouteRequirementData(plan);
+ if(plan.map!==c.map||contract?.map!==c.map||contract.index!==index||contract.path!==path||contract.los?.kind!=='required'||result.measure.scoutingExempt||hdFEScoutingExemption(plan,contract)?.status==='ready')return null;
+ // Inspect the delivered hulls, including alternatives, without changing the
+ // original context, the delivered plan, or any allocation or saved value.
+ const fleet={...c.fleet,ships:(plan.ships||[]).map(ship=>{const db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db);return {ship:ship.ship,rosterId:ship.rosterId||'',gameShipId:ship.gameShipId||0,masterId:ship.masterId||0,gear:db&&!profile?'':hdOCShipGear(ship)};})},built=hdOCBuild({...c,fleet}),inventory=built.inventory,slots=built.slots,used=hdFOAssignedUsage(plan),unknown=[...new Set([...built.unknown,...(plan.preservationIssues||[])])],all=inventory.filter(x=>x.count>0&&Number(x.item?.stats?.索敵)>0),limit=12;
+ const rows=all.slice(0,limit).map(x=>{
+  const destinations=[];let unknownSlots=0,blockedSlots=0;
+  for(const slot of slots){
+   const ship=plan.ships[slot.si],master=hdShipDbMasterRowFor(slot.db),profile=slot.profile;
+   if(!master||Number(profile?.id)!==Number(master.id)||Number(ship.masterId)&&Number(ship.masterId)!==Number(master.id)||!Array.isArray(profile?.slots)||profile.count!==profile.slots.length){unknownSlots++;continue;}
+   if(slot.expansion){if(!hdShipDbMasterMeta(x.item)){unknownSlots++;continue;}}
+   else{const normal=hdShipDbMasterCompatible(x.item,slot.db);if(normal===null||normal&&HD_FE_AIR_CATS.has(x.item.category)&&!Number.isFinite(slot.capacity)){unknownSlots++;continue;}}
+   if(!hdOCCompatible(slot,x)){blockedSlots++;continue;}
+   const current=slot.expansion?ship.expansion:(ship.items||[]).find(item=>item.slotIndex===slot.index),value=current?.name?{name:current.name,star:Number(current.star)||0}:null;
+   destinations.push({shipIndex:slot.si,ship:ship.ship,slotIndex:slot.index,expansion:slot.expansion===true,mode:value?hdFOStackKey(current)===x.key?'same':'replace':'empty',current:value});
+  }
+  const assigned=used[x.key]||0;
+  return {name:x.name,star:x.star,registered:x.count,assigned,unused:Math.max(0,x.count-assigned),status:destinations.length?'candidate':unknownSlots||unknown.length?'manual':'blocked',unknownSlots,blockedSlots,destinations};
+ });
+ const numeric=(result.measure.goals||[]).find(goal=>goal.kind==='los-value'),manual=(result.measure.manual||[]).find(text=>text.startsWith('索敵：'));
+ return {scope:'owned-scouting-inspection',map:c.map,index,path,rows,unknown,remaining:Math.max(0,all.length-limit),assessment:{status:numeric&&!numeric.unresolved&&Number.isFinite(numeric.count)?'current':'manual',detail:numeric?.detail||manual||'現在案の索敵判定は未確認です。'}};
+}
+function hdOCScoutingInspectionHtml(view){
+ if(!view||view.scope!=='owned-scouting-inspection')return '';
+ const esc=hdFEEsc,label=item=>item.name+(item.star?' ★'+item.star:'');
+ return `<div data-hd-oc-scouting-options data-hd-oc-scouting-inspection><b>手持ちから検討する索敵装備の交換候補</b><p>対象：${esc(view.path)}。登録経路の数値索敵条件と、任意の索敵装備数の目安を分けて確認します。装備数だけで経路成立や購入必須を判断しません。</p><p data-hd-oc-scouting-current>${esc(view.assessment.detail)}。これは現在案の判定で、交換後の値ではありません。</p><p>交換後の索敵値は未計算です。艦固有ボーナス差分も未確認です。以下は搭載条件を確認するための検討先で、成立済みの条件や利用者指定目標を保つ交換案を計算したものではありません。</p>${view.rows.length?`<ul>${view.rows.map((row,i)=>`<li data-hd-oc-scouting-row="${i}" data-hd-oc-scouting-status="${row.status}"><b>${esc(label(row))}</b>：登録${row.registered}個 / 現在案${row.assigned}個 / 未使用${row.unused}個。${row.destinations.length?`搭載条件に合う検討先：<ul>${row.destinations.map(target=>`<li data-hd-oc-scouting-destination data-hd-oc-scouting-mode="${target.mode}">第${target.shipIndex+1}艦 ${esc(target.ship)} / ${target.expansion?'確認済み増設':'通常'+(target.slotIndex+1)}：${target.mode==='empty'?'空き枠（新しく置く場合の検討先）':`現在 ${esc(label(target.current))}（${target.mode==='same'?'同じ装備を配備済み':'交換対象。既存条件の維持は未確認'}）`}</li>`).join('')}</ul>`:row.status==='manual'?'確認済み枠に候補はなく、未確認の艦・枠が残ります。搭載不可や所持不足とは断定しません。':'確認済みの通常枠・開放確認済み増設枠に、この装備の搭載候補はありません。装備を増やすだけで解決する不足とは限りません。'}${row.unknownSlots?`<small>別に${row.unknownSlots}枠の搭載可否が未確認です。</small>`:''}${row.assigned>row.registered?'<small>現在案の使用数が登録数を超えています。所持数と配備を確認してください。</small>':''}</li>`).join('')}</ul>`:'<p>登録台帳から表示できる交換候補はありません。性能未登録の装備も含め、所持情報を確認してください。手持ちでは不可能という判定ではありません。</p>'}${view.remaining?`<small>表示は12種類まで（残り${view.remaining}種類）。探索の打切りとは別です。</small>`:''}${view.unknown.length?'<p>艦・装備情報が足りない箇所は未確認として残しています。他の艦で確認できた搭載先とは分けて判断してください。</p>':''}<p>未使用数は現在案との差です。他艦から移す場合も同じ装備を二重使用できません。枠は他の必須装備・目標と共用するため、各候補を同時に置けることや条件維持を保証しません。増設は開放と装備条件を確認できた枠だけを表示しています。不足欄のカタログ候補は未所持品を含みます。</p><p>下の「この配備で制空・索敵を確認」から、表示した艦・枠と交換対象を確認して試してください。手動編集後は入力を前提とする参考値で、攻略条件は未判定です。新しい配備での素索敵＋ボーナス・司令部Lv・改修値と、成立済み条件・利用者指定目標を確認してから再探索してください。交換候補や計算画面の編集を保存編成へ自動適用しません。</p></div>`;
+}
 function hdOCSouthScouting(c){return c?.map==='3-5'&&Number(c.index)===0}
-function hdOCScoutingOptional(c,goal){return (hdOCSouthScouting(c)||c?.map==='2-5'&&Number(c.index)===1)&&goal?.kind==='索敵'&&goal.generatedFromMap===true&&goal.purpose==='recommendation'&&(goal.goalKind||goal.kind)==='索敵'}
+function hdOCScoutingOptional(c,goal){
+ const index=c?.index,added=Number.isInteger(index)&&(c?.map==='2-5'&&index===0||c?.map==='4-5'&&index===1||c?.map==='6-5'&&[0,1].includes(index));
+ return (hdOCSouthScouting(c)||c?.map==='2-5'&&Number(c.index)===1||added)&&goal?.kind==='索敵'&&goal.generatedFromMap===true&&goal.purpose==='recommendation'&&(goal.goalKind||goal.kind)==='索敵';
+}
 function hdOCScoutingOptionsHtml(c,result){
- if(!hdOCSouthScouting(c)&&!(c?.map==='2-5'&&Number(c.index)===1))return '';
+ if(!hdOCSouthScouting(c)&&!(c?.map==='2-5'&&Number(c.index)===1)){const index=c?.index;if(!Number.isInteger(index)||!(c?.map==='2-5'&&index===0||c?.map==='4-5'&&index===1||c?.map==='6-5'&&[0,1].includes(index)))return '';const inspection=hdOCScoutingInspection(c,result);return inspection?hdOCScoutingInspectionHtml(inspection):'';}
  const {inventory,slots,unknown}=hdOCBuild(c),used=hdFOAssignedUsage(result.plan),esc=hdFEEsc;
  const rows=inventory.filter(x=>x.count>0&&Number(x.item?.stats?.索敵)>0),limit=12;
  const list=rows.slice(0,limit).map(x=>{
@@ -829,7 +862,7 @@ function hdOCScoutingOptionsHtml(c,result){
   });
   return `<li><b>${esc(x.name)}${x.star?' ★'+x.star:''}</b>：登録${x.count}個 / 現在案${assigned}個 / 未使用${Math.max(0,x.count-assigned)}個。${esc(destinations.length?'搭載条件に合う枠：'+destinations.join(' / '):'確認済み枠には搭載できません。艦情報・通常枠・増設条件を確認してください')}</li>`;
  }).join('');
- return `<div data-hd-oc-scouting-options><b>手持ちから検討する索敵装備の交換候補</b>${c?.map==='2-5'?'<p>Iで固定O条件を目指す追加索敵の検討です。ランダム域にいるだけで購入必須とは案内しません。司令部Lv120で確認した境界であり、他の分岐条件・戦闘勝利は別です。</p>':''}<p>交換後の索敵値は未計算です。各装備の艦固有ボーナス差分も未確認です。索敵不足の数値を装備の必要個数や購入必須へ換算しません。</p>${list?`<ul>${list}</ul>`:'<p>登録台帳から表示できる交換候補はありません。性能未登録の装備も含め、所持情報を確認してください。手持ちでは不可能という判定ではありません。</p>'}${rows.length>limit?`<small>表示は${limit}種類まで（残り${rows.length-limit}種類）。探索の打切りとは別です。</small>`:''}${unknown.length?'<p>艦情報が足りない枠は搭載可否を未確認として残しています。</p>':''}<p>未使用数は現在案との差です。他艦から移す場合も同じ装備を二重使用できません。上の枠は他の必須装備と共用し、同時配備の成立を保証しません。不足欄の「装備候補」はカタログ候補で、未所持品を含みます。</p><p>下の「この配備で制空・索敵を確認」から、艦・枠を確認して交換を試せます。手動編集の数値は入力を前提とした参考値で、攻略条件は未判定のまま保存・再表示できます。新しい配備での素索敵＋ボーナス、司令部Lv、改修値などを確認してから判断してください。同期なしでも検討を続けられます。計算画面の編集は保存編成への自動適用ではありません。</p></div>`;
+ return `<div data-hd-oc-scouting-options><b>手持ちから検討する索敵装備の交換候補</b>${c?.map==='2-5'&&Number(c.index)===1?'<p>Iで固定O条件を目指す追加索敵の検討です。ランダム域にいるだけで購入必須とは案内しません。司令部Lv120で確認した境界であり、他の分岐条件・戦闘勝利は別です。</p>':''}<p>交換後の索敵値は未計算です。各装備の艦固有ボーナス差分も未確認です。索敵不足の数値を装備の必要個数や購入必須へ換算しません。</p>${list?`<ul>${list}</ul>`:'<p>登録台帳から表示できる交換候補はありません。性能未登録の装備も含め、所持情報を確認してください。手持ちでは不可能という判定ではありません。</p>'}${rows.length>limit?`<small>表示は${limit}種類まで（残り${rows.length-limit}種類）。探索の打切りとは別です。</small>`:''}${unknown.length?'<p>艦情報が足りない枠は搭載可否を未確認として残しています。</p>':''}<p>未使用数は現在案との差です。他艦から移す場合も同じ装備を二重使用できません。上の枠は他の必須装備と共用し、同時配備の成立を保証しません。不足欄の「装備候補」はカタログ候補で、未所持品を含みます。</p><p>下の「この配備で制空・索敵を確認」から、艦・枠を確認して交換を試せます。手動編集の数値は入力を前提とした参考値で、攻略条件は未判定のまま保存・再表示できます。新しい配備での素索敵＋ボーナス、司令部Lv、改修値などを確認してから判断してください。同期なしでも検討を続けられます。計算画面の編集は保存編成への自動適用ではありません。</p></div>`;
 }
 function hdOCPlacementHtml(goal,c=null){
  if(!goal.blocked)return '';

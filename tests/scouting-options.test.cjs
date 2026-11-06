@@ -2,12 +2,12 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const source=fs.readFileSync(path.join(__dirname,'../owned-equipment-planner.js'),'utf8');
 function load(name,c){const start=source.indexOf('function '+name+'('),end=source.indexOf('\nfunction ',start+1);assert.ok(start>=0,name);vm.runInNewContext(source.slice(start,end<0?undefined:end),c);return c[name]}
-function context(){const c={hdFEEsc:String,hdPLSave(){}};for(const n of ['hdOCSouthScouting','hdOCScoutingOptional','hdOCPlacementHtml','hdOCStockGap','hdOCProcurementHtml'])load(n,c);return c}
+function context(){const c={hdFEEsc:String,hdPLSave(){}};for(const n of ['hdOCSouthScouting','hdOCScoutingOptional','hdOCScoutingInspection','hdOCScoutingInspectionHtml','hdOCPlacementHtml','hdOCStockGap','hdOCProcurementHtml'])load(n,c);return c}
 const south={map:'3-5',index:0};
 const goal={kind:'索敵',goalKind:'索敵',generatedFromMap:true,purpose:'recommendation',minCount:2,owned:0,usableOwned:0,compatibleSlots:18,blocked:[],candidates:['radar']};
-test('optional count is scoped to generated FGK recommendation, never a numeric route requirement',()=>{
- const c=context();assert.equal(c.hdOCScoutingOptional(south,goal),true);
- for(const [where,g] of [[{map:'3-5',index:1},goal],[{map:'2-5',index:0},goal],[south,{...goal,generatedFromMap:false}],[south,{...goal,purpose:'route'}],[south,{...goal,goalKind:'los-value'}]])assert.equal(c.hdOCScoutingOptional(where,g),false);
+test('optional count is scoped to verified generated recommendations, never a numeric route requirement',()=>{
+ const c=context();assert.equal(c.hdOCScoutingOptional(south,goal),true);assert.equal(c.hdOCScoutingOptional({map:'2-5',index:0},goal),true,'north generic count is a verified optional recommendation');
+ for(const [where,g] of [[{map:'3-5',index:1},goal],[{map:'4-5',index:0},goal],[south,{...goal,generatedFromMap:false}],[south,{...goal,purpose:'route'}],[south,{...goal,goalKind:'los-value'}]])assert.equal(c.hdOCScoutingOptional(where,g),false);
  assert.match(c.hdOCPlacementHtml(goal,south),/経路に必要な個数や確定調達数ではありません/);assert.doesNotMatch(c.hdOCPlacementHtml(goal,south),/あと 2個必要/);
  assert.match(c.hdOCProcurementHtml(goal,0,'',south),/任意目安の候補2個/);assert.match(c.hdOCProcurementHtml(goal,0,'',{map:'1-1',index:0}),/候補をあと2個/);
 });
