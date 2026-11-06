@@ -3293,9 +3293,9 @@
       "7-4/0/default"
     ],
     "record": "surfaceNightGuidanceBatch20261106",
-    "state": "shared recipe guidance complete; Node738 and four initial UI passes, final-source smoke pending"
+    "state": "shared guidance complete; local738 and4 initial UI passed; final-source CI facts/gaps recorded, next soft-reuse baseline2 confirmed"
   },
-  "nextPriority": "次は3-5上/4-3/4-5の保存艦隊OCにあるsoft対地目標の不足欄。既存FLSetRemediesは艦名・合法通常枠・交換/在庫不足を既に扱うため、製品全体の機能欠落や新しい並行エンジンとせず、OCへの限定再利用を最小対照で確認する。3-5下FGKは対象外、4-3/4-5中央の既存4点担当セットを保持。auto文脈の調達button・OASW確認scopeをownedへ流用しない。静的候補のみ・次の製品/実画面未実施、セル追加0。",
+  "nextPriority": "4-3/0 CDHN・CFHN／4-5/1 ADHKT・CDHKTの保存艦隊OC soft対地不足欄へ、既存FLSetRemediesの艦名・合法通常枠・有限在庫の具体交換案を再利用するバッチ。actual modelの3試験中2成功で再利用経路を確認、auto/ownedの調達ボタンと先制対潜確認namespaceのadapterを設計中。3-5上は元目標が生成されず最初のgoal検査で停止し、engine/後段保持未到達。H撃破が通行必須でない出典を確認し、通常上経路の目標欠如だけを欠陥とせず、目標選択と必要十分な組数を別件にし、強制目標や成功目的再実行を行わない。次の製品/実画面は未実施、セル追加0。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -7270,8 +7270,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "shared recipe guidance complete; Node738 and four initial UI passes, final-source smoke pending",
-    "nextUnit": "次は3-5上/4-3/4-5の保存艦隊OCにあるsoft対地目標の不足欄。既存FLSetRemediesは艦名・合法通常枠・交換/在庫不足を既に扱うため、製品全体の機能欠落や新しい並行エンジンとせず、OCへの限定再利用を最小対照で確認する。3-5下FGKは対象外、4-3/4-5中央の既存4点担当セットを保持。auto文脈の調達button・OASW確認scopeをownedへ流用しない。静的候補のみ・次の製品/実画面未実施、セル追加0。",
+    "activeUnit": "shared guidance complete; local738 and4 initial UI passed; final-source CI facts/gaps recorded, next soft-reuse baseline2 confirmed",
+    "nextUnit": "4-3/0 CDHN・CFHN／4-5/1 ADHKT・CDHKTの保存艦隊OC soft対地不足欄へ、既存FLSetRemediesの艦名・合法通常枠・有限在庫の具体交換案を再利用するバッチ。actual modelの3試験中2成功で再利用経路を確認、auto/ownedの調達ボタンと先制対潜確認namespaceのadapterを設計中。3-5上は元目標が生成されず最初のgoal検査で停止し、engine/後段保持未到達。H撃破が通行必須でない出典を確認し、通常上経路の目標欠如だけを欠陥とせず、目標選択と必要十分な組数を別件にし、強制目標や成功目的再実行を行わない。次の製品/実画面は未実施、セル追加0。",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -21996,7 +21996,7 @@
       "unexecutedScopesPromoted": false
     },
     "ci": {
-      "state": "pending final source; one normal smoke only",
+      "state": "terminal run collected and independently matched; source2f35b952, normal smoke42207401382 attempt1 once",
       "onlyWorkflowChange": "one small target-summary glob; same82files/partition/weights/workers/image/Node/deadlines/retries/exception/exit",
       "recordOnlyAdditionalCI": false
     },
@@ -22007,6 +22007,505 @@
       "save/edit/newly saved proposal operation not newly reexecuted",
       "7-3 new-guide UI and mixed new-guide UI unexecuted; older route evidence separate"
     ],
-    "next": "次は3-5上/4-3/4-5の保存艦隊OCにあるsoft対地目標の不足欄。既存FLSetRemediesは艦名・合法通常枠・交換/在庫不足を既に扱うため、製品全体の機能欠落や新しい並行エンジンとせず、OCへの限定再利用を最小対照で確認する。3-5下FGKは対象外、4-3/4-5中央の既存4点担当セットを保持。auto文脈の調達button・OASW確認scopeをownedへ流用しない。静的候補のみ・次の製品/実画面未実施、セル追加0。"
+    "next": "4-3/0 CDHN・CFHN／4-5/1 ADHKT・CDHKTの保存艦隊OC soft対地不足欄へ、既存FLSetRemediesの艦名・合法通常枠・有限在庫の具体交換案を再利用するバッチ。actual modelの3試験中2成功で再利用経路を確認、auto/ownedの調達ボタンと先制対潜確認namespaceのadapterを設計中。3-5上は元目標が生成されず最初のgoal検査で停止し、engine/後段保持未到達。H撃破が通行必須でない出典を確認し、通常上経路の目標欠如だけを欠陥とせず、目標選択と必要十分な組数を別件にし、強制目標や成功目的再実行を行わない。次の製品/実画面は未実施、セル追加0。",
+    "ciFinal": {
+      "sourceSHA": "2f35b952e5a78c12bb234926f49a8445b46ae291",
+      "runId": 42207401382,
+      "runAttempt": 1,
+      "runConclusion": "failure",
+      "jobResults": {
+        "success": 2,
+        "failure": 3,
+        "cancelled": 1,
+        "fullSkipped": 1
+      },
+      "passedFlakyFailed": {
+        "chromium": null,
+        "webkit": {
+          "passed": 899,
+          "flaky": 11,
+          "failed": 6
+        }
+      },
+      "coverage": {
+        "webkit": {
+          "scheduledCases": 916,
+          "uniqueCaseIds": 916,
+          "duplicateCaseIds": 0,
+          "uniqueSourceFiles": 82,
+          "meaning": "scheduled suite declarations; completion is separate"
+        },
+        "chromium": {
+          "scheduledCases": 916,
+          "uniqueCaseIds": 916,
+          "duplicateCaseIds": 0,
+          "uniqueSourceFiles": 82,
+          "meaning": "scheduled suite declarations; completion is separate"
+        }
+      },
+      "localUI": {
+        "logical": 4,
+        "physical": 4,
+        "initialPassed": 4,
+        "workers": 1,
+        "retries": 0,
+        "saveEditReexecuted": false,
+        "preBrowserGuardCorrection": true
+      },
+      "gaps": [
+        "exact numeric Node footer counts and registry pull-log digest not acquired; own gates/receipts retained",
+        "three final W timeout attempt boundaries unclassified beyond timeout",
+        "C2 onEnd, last two end callbacks and fifteen begin callbacks absent in retained snapshot",
+        "some initial flaky details absent from official annotations; no successful retry backfill",
+        "large raw trace/video/log materials not downloaded"
+      ],
+      "oldC41FinalFourGapsUnchanged": true,
+      "normalSmokeRuns": 1,
+      "reruns": 0,
+      "recordOnlyAdditionalCI": false,
+      "wholeFiles": 82,
+      "partitionWeightsOrDeadlinesChanged": false,
+      "proof": {
+        "canonicalSHA256": "7f98ab30b8cc5e645b456c8bac545cadfa44e5222327533079ee6a2c1a1194fa",
+        "manifestSHA256": "3c1e0b07bc41c829797bdd4f376ed4c2394d5bb544c400e17172f28a72ae0f39",
+        "independentReviewSHA256": "e918126cb9287d24cca6523e751a84ca241fa4e88660e7c79eec5f8f1bd4a7b9",
+        "smallZIPs": 13,
+        "smallZIPBytes": 438329,
+        "membersCRCAndSHA": 61
+      },
+      "cellsBefore": [
+        28,
+        157,
+        51
+      ],
+      "cellsAfter": [
+        28,
+        157,
+        51
+      ],
+      "storageValueBodiesIncluded": false,
+      "legacySavedComparisonReview": {
+        "oneFiveKnownLegacyArrayFalseExpected": true,
+        "originalRows": 4,
+        "afterRows": 6,
+        "pureBlankExtraRows": 2,
+        "originalIdentityFieldsExact": 20,
+        "sameAttemptRetriesReviewed": [
+          0,
+          1
+        ],
+        "loadFullComparisonReached": false,
+        "sourceReviewSHA256": "4aa90a91b4962892b3113888694379e802b5fa4db020baa6cd4b7b4ba410d6e8"
+      },
+      "nextSourceScope": {
+        "sourceEvidenceSHA256": "d44eb6bac611a8744f709a1a90f47086c6b7323cfb48c4003b084e4d576618b1",
+        "sourceConditionClosed": true,
+        "ordinaryUpperGoalAbsenceIsProductDefect": false,
+        "unconfirmedConditionCount": 3,
+        "forcedGoalCount": 0,
+        "cellChange": 0
+      },
+      "nextSourceScopeSHA256": "878a7e9affb05b42c4b73a38d017ad5ac89f87e86bf24b689796e9971a37fa52",
+      "localNode": {
+        "passed": 738,
+        "new": 17,
+        "runs": 1,
+        "numericCIJobFooters": "not acquired; gate success is separate"
+      },
+      "partialChromium": {
+        "shard1Official": {
+          "passed": 458,
+          "flaky": 0,
+          "failed": 0
+        },
+        "shard2Scheduled": 458,
+        "shard2PassedEndCallbacks": 441,
+        "shard2BeginWithoutEnd": 2,
+        "shard2NoBeginObserved": 15,
+        "shard2ActualFailedOrInterruptedResults": 0,
+        "fullStatus": null,
+        "logicalFinalOutcomes": "all458 null because onEnd not observed",
+        "limit": "completed callbacks are not a full Chromium result; no-begin means absent in retained atomic snapshot, not an invented test result"
+      },
+      "targetAttempts": [
+        {
+          "project": "chromium",
+          "entry": "inline",
+          "retry": 0,
+          "status": "passed",
+          "stage": "completed",
+          "checkpointCount": 2,
+          "preservationAndBindingExact": true,
+          "legalityAndFiniteStockExact": true,
+          "sameDocumentAfterLoad": true,
+          "coreKeyCount": 10,
+          "goalMinCount": 1,
+          "goalCount": 0,
+          "recipePartCounts": [
+            2,
+            1
+          ],
+          "registeredPartCounts": [
+            1,
+            1
+          ],
+          "assignedPartCounts": [
+            1,
+            1
+          ],
+          "pageerrorDropMissing": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "project": "chromium",
+          "entry": "navigator",
+          "retry": 0,
+          "status": "passed",
+          "stage": "completed",
+          "checkpointCount": 2,
+          "preservationAndBindingExact": true,
+          "legalityAndFiniteStockExact": true,
+          "sameDocumentAfterLoad": true,
+          "coreKeyCount": 10,
+          "goalMinCount": 1,
+          "goalCount": 0,
+          "recipePartCounts": [
+            3
+          ],
+          "registeredPartCounts": [
+            2
+          ],
+          "assignedPartCounts": [
+            2
+          ],
+          "pageerrorDropMissing": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "project": "webkit",
+          "entry": "inline",
+          "retry": 0,
+          "status": "passed",
+          "stage": "completed",
+          "checkpointCount": 2,
+          "preservationAndBindingExact": true,
+          "legalityAndFiniteStockExact": true,
+          "sameDocumentAfterLoad": true,
+          "coreKeyCount": 10,
+          "goalMinCount": 1,
+          "goalCount": 0,
+          "recipePartCounts": [
+            2,
+            1
+          ],
+          "registeredPartCounts": [
+            1,
+            1
+          ],
+          "assignedPartCounts": [
+            1,
+            1
+          ],
+          "pageerrorDropMissing": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "project": "webkit",
+          "entry": "navigator",
+          "retry": 0,
+          "status": "passed",
+          "stage": "completed",
+          "checkpointCount": 2,
+          "preservationAndBindingExact": true,
+          "legalityAndFiniteStockExact": true,
+          "sameDocumentAfterLoad": true,
+          "coreKeyCount": 10,
+          "goalMinCount": 1,
+          "goalCount": 0,
+          "recipePartCounts": [
+            3
+          ],
+          "registeredPartCounts": [
+            2
+          ],
+          "assignedPartCounts": [
+            2
+          ],
+          "pageerrorDropMissing": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "finalFailures": [
+        {
+          "test": "1-5 ADFGJ BBV1CL1DD2 known keeps optional ASW and BBV-water guidance through save or safe abort and load",
+          "perAttemptStages": [
+            {
+              "retry": 0,
+              "status": "timedOut",
+              "stage": "same-attempt small summary confirms after-load-search, one sample, saved read reached, load read not reached/load null; same-attempt annotation confirms hidden search click"
+            },
+            {
+              "retry": 1,
+              "status": "timedOut",
+              "stage": "same-attempt small summary confirms after-load-search, one sample, saved read reached, load read not reached/load null; same-attempt annotation confirms hidden search click"
+            }
+          ]
+        },
+        {
+          "test": "7-5 second ABDFJOQ stock keeps a native CVL2 alternative through save or safe abort and load",
+          "perAttemptStages": [
+            {
+              "retry": 0,
+              "status": "timedOut",
+              "stage": "same-attempt small summary confirms after-load-search, one sample, saved read reached, load read not reached/load null; same-attempt annotation confirms hidden search click"
+            },
+            {
+              "retry": 1,
+              "status": "timedOut",
+              "stage": "same-attempt small summary confirms after-load-search, one sample, saved read reached, load read not reached/load null; same-attempt annotation confirms hidden search click"
+            }
+          ]
+        },
+        {
+          "test": "6-5 ACDGM stock preserves selected branch and optional combat distinctions through save and load",
+          "perAttemptStages": [
+            {
+              "retry": 0,
+              "status": "timedOut",
+              "stage": "after-load re-search click hidden for this initial attempt; post-load full comparison not reached"
+            },
+            {
+              "retry": 1,
+              "status": "timedOut",
+              "stage": "detailed first operation missing; compact status/category/location only"
+            }
+          ]
+        },
+        {
+          "test": "6-5 BFIJM ready preserves selected branch and optional combat distinctions through save and load",
+          "perAttemptStages": [
+            {
+              "retry": 0,
+              "status": "timedOut",
+              "stage": "detailed first operation missing; compact status/category/location only"
+            },
+            {
+              "retry": 1,
+              "status": "timedOut",
+              "stage": "detailed first operation missing; compact status/category/location only"
+            }
+          ]
+        },
+        {
+          "test": "south scouting unknown keeps coefficient and reasons through save and load",
+          "perAttemptStages": [
+            {
+              "retry": 0,
+              "status": "failed",
+              "stage": "post-load equality assertions passed by code control-flow, then version access-control errors failed exception-array assertion at source44:797; raw value JSON not independently inspected"
+            },
+            {
+              "retry": 1,
+              "status": "failed",
+              "stage": "post-load equality assertions passed by code control-flow, then version access-control errors failed exception-array assertion at source44:797; raw value JSON not independently inspected"
+            }
+          ]
+        },
+        {
+          "test": "7-2 BCDIM stock keeps selected branch and optional combat targets through save and load",
+          "perAttemptStages": [
+            {
+              "retry": 0,
+              "status": "timedOut",
+              "stage": "after-load re-search click hidden; post-load full comparison not reached; saved/edit assertions passed by code control-flow only"
+            },
+            {
+              "retry": 1,
+              "status": "timedOut",
+              "stage": "after-load re-search click hidden; post-load full comparison not reached; saved/edit assertions passed by code control-flow only"
+            }
+          ]
+        }
+      ],
+      "jobSummaries": [
+        {
+          "name": "Smoke / chromium / shard 1 of 2",
+          "conclusion": "success",
+          "smokeConclusion": "success",
+          "officialPassedFlakyFailed": {
+            "passed": 458,
+            "flaky": 0,
+            "failed": 0
+          },
+          "nodeAndLaunchGates": [
+            "success",
+            "success"
+          ],
+          "actualNode": "v24.21.0",
+          "actualPlaywright": "1.55.0",
+          "actualRevision": "1187",
+          "registryDigestObserved": null,
+          "runFinished": true,
+          "fullStatus": "passed",
+          "scheduledCases": 458,
+          "observedAttemptEnds": 458,
+          "noBeginObserved": 0,
+          "activeBeginWithoutEnd": 0
+        },
+        {
+          "name": "Smoke / chromium / shard 2 of 2",
+          "conclusion": "cancelled",
+          "smokeConclusion": "cancelled",
+          "officialPassedFlakyFailed": null,
+          "nodeAndLaunchGates": [
+            "success",
+            "success"
+          ],
+          "actualNode": "v24.21.0",
+          "actualPlaywright": "1.55.0",
+          "actualRevision": "1187",
+          "registryDigestObserved": null,
+          "runFinished": false,
+          "fullStatus": null,
+          "scheduledCases": 458,
+          "observedAttemptEnds": 441,
+          "noBeginObserved": 15,
+          "activeBeginWithoutEnd": 2
+        },
+        {
+          "name": "Smoke / webkit / shard 1 of 4",
+          "conclusion": "failure",
+          "smokeConclusion": "failure",
+          "officialPassedFlakyFailed": {
+            "passed": 336,
+            "flaky": 2,
+            "failed": 1
+          },
+          "nodeAndLaunchGates": [
+            "success",
+            "success"
+          ],
+          "actualNode": "v24.21.0",
+          "actualPlaywright": "1.55.0",
+          "actualRevision": "2203",
+          "registryDigestObserved": null,
+          "runFinished": true,
+          "fullStatus": "failed",
+          "scheduledCases": 339,
+          "observedAttemptEnds": 342,
+          "noBeginObserved": 0,
+          "activeBeginWithoutEnd": 0
+        },
+        {
+          "name": "Smoke / webkit / shard 2 of 4",
+          "conclusion": "failure",
+          "smokeConclusion": "failure",
+          "officialPassedFlakyFailed": {
+            "passed": 158,
+            "flaky": 5,
+            "failed": 1
+          },
+          "nodeAndLaunchGates": [
+            "success",
+            "success"
+          ],
+          "actualNode": "v24.21.0",
+          "actualPlaywright": "1.55.0",
+          "actualRevision": "2203",
+          "registryDigestObserved": null,
+          "runFinished": true,
+          "fullStatus": "failed",
+          "scheduledCases": 164,
+          "observedAttemptEnds": 170,
+          "noBeginObserved": 0,
+          "activeBeginWithoutEnd": 0
+        },
+        {
+          "name": "Smoke / webkit / shard 3 of 4",
+          "conclusion": "success",
+          "smokeConclusion": "success",
+          "officialPassedFlakyFailed": {
+            "passed": 227,
+            "flaky": 2,
+            "failed": 0
+          },
+          "nodeAndLaunchGates": [
+            "success",
+            "success"
+          ],
+          "actualNode": "v24.21.0",
+          "actualPlaywright": "1.55.0",
+          "actualRevision": "2203",
+          "registryDigestObserved": null,
+          "runFinished": true,
+          "fullStatus": "passed",
+          "scheduledCases": 229,
+          "observedAttemptEnds": 231,
+          "noBeginObserved": 0,
+          "activeBeginWithoutEnd": 0
+        },
+        {
+          "name": "Smoke / webkit / shard 4 of 4",
+          "conclusion": "failure",
+          "smokeConclusion": "failure",
+          "officialPassedFlakyFailed": {
+            "passed": 178,
+            "flaky": 2,
+            "failed": 4
+          },
+          "nodeAndLaunchGates": [
+            "success",
+            "success"
+          ],
+          "actualNode": "v24.21.0",
+          "actualPlaywright": "1.55.0",
+          "actualRevision": "2203",
+          "registryDigestObserved": null,
+          "runFinished": true,
+          "fullStatus": "failed",
+          "scheduledCases": 184,
+          "observedAttemptEnds": 190,
+          "noBeginObserved": 0,
+          "activeBeginWithoutEnd": 0
+        }
+      ],
+      "nextBaseline": {
+        "sourceSHA": "2f35b952e5a78c12bb234926f49a8445b46ae291",
+        "logicalTests": 3,
+        "physicalNodeRuns": 1,
+        "passed": 2,
+        "failed": 1,
+        "retry": 0,
+        "provenReuseScopes": [
+          "4-3/0",
+          "4-5/1"
+        ],
+        "provenOptionsPerScope": [
+          2,
+          2
+        ],
+        "newPublicImplementation": false,
+        "browserOperations": 0,
+        "cellChange": 0,
+        "actionContextAdapterRequired": true,
+        "ownedOaswNamespaceAdapterRequired": true,
+        "classificationSHA256": "e1abef370bfb777095bb5f3b754abda2d228befaa602bc36fad20ced1962b771",
+        "originalTAPSHA256": "e800922420a3ffa492dc8c891a9c34123432b7e4bc65ef8e912a914760f09a7b",
+        "threeFiveScope": "goal absent before remedy/load checks; H defeat optional, absence alone not product defect; no forced goal or repeat"
+      },
+      "supplementaryReviewSHA256": "2dd8a88224c642a16008edab2acebaed207dd5e850a7409050095da989ef69b9"
+    }
   }
 }
