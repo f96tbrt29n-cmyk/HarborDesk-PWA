@@ -278,8 +278,8 @@ function hdFLRemediesHtml(goal,options){
 }
 function hdFLGoalKey(goal){return JSON.stringify([goal.kind,goal.label,goal.shipIndex??null])}
 function hdFLGoalMatch(a,b){return a.kind===b.kind&&a.label===b.label&&(b.shipIndex==null||a.shipIndex===b.shipIndex)}
-function hdFLRemedyRechecks(plan,trial,si){
- const scope=hdFLOaswScope(plan,si),before=hdFEOpeningAsw(plan.ships[si],scope);if(before.status!=='ready')return [];
+function hdFLRemedyRechecks(plan,trial,si,scopeOverride=undefined){
+ const scope=scopeOverride===undefined?hdFLOaswScope(plan,si):scopeOverride,before=hdFEOpeningAsw(plan.ships[si],scope);if(before.status!=='ready')return [];
  const after=hdFEOpeningAsw(trial.ships[si],scope);return after.status==='ready'?[]:[`${plan.ships[si].ship}：${after.status==='missing'?'先制対潜が不可になります。':'交換後の表示対潜値が未確認になるため、先制対潜は再同期・入力で再確認してね。'}`];
 }
 function hdFLRemedyPartMatches(part,row){
@@ -293,18 +293,21 @@ function hdFLRemedyRecipes(plan,goal){
  const ship=plan.ships[goal.shipIndex];if(!ship||!goal.targetRank)return [];
  return hdFESpeedRecipes(goal.speed.group,goal.targetRank,goal.speed.base).map((r,i)=>({id:'speed-'+i,name:hdFESpeedLabel(goal.targetRank)+'：'+hdFESpeedRecipeText(r),mode:'speed',parts:[...Array.from({length:r.t||0},()=>({speed:'t'})),...Array.from({length:r.h||0},()=>({speed:'h'})),...Array.from({length:Math.max(0,(r.n||0)-(r.h||0))},()=>({speed:'n'})),...Array.from({length:Math.max(0,(r.c||0)-Math.max(r.n||0,r.h||0))},()=>({speed:'c'}))]}));
 }
-function hdFLSetRemedies(plan,goal){
+function hdFLSetRemedies(plan,goal,context=null){
  const recipes=hdFLRemedyRecipes(plan,goal);if(goal.ok||goal.unresolved||!recipes.length)return [];
  const inventory=hdFLInventory(),catalog=hdFLCatalog(),usageBefore=hdFOAssignedUsage(plan),requirements=plan.assessment?.requirements||hdFLRequirements(plan),before=plan.assessment?.measure||hdOCMeasure(plan,requirements),options=[];
+ const report=(status,reason,si,recipe,labels=[])=>{if(typeof context?.report==='function')context.report({status,reason,shipIndex:si,recipeId:recipe?.id||'',labels})};
  for(const [si,ship] of plan.ships.entries()){
-  const db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db);if(!profile)continue;
+  const db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db);if(!profile){report('manual','profile-unknown',si,null,[ship.ship]);continue;}
+  if(context&&(!Number.isInteger(profile.count)||profile.count<0||!Array.isArray(profile.slots)||profile.slots.length!==profile.count)){report('manual','profile-unknown',si,null,[ship.ship]);continue;}
   if(goal.kind==='speed-ship'&&si!==goal.shipIndex)continue;
   for(const recipe of recipes){
    const required=recipe.parts.slice();
    // Reuse an existing, confirmed expansion item, without proposing a new expansion allocation.
    if((recipe.mode?.startsWith('speed')||['night-dd','night-sub','night-cv'].includes(recipe.ship))&&ship.expansion&&hdFLHasExpansion(hdFEAswRoster(ship))){const item=hdFEFind(ship.expansion.name),part=required.findIndex(p=>hdFLRemedyPartMatches(p,{item,star:ship.expansion.star}));if(item&&part>=0&&hdShipDbExpansionInfo(item,db,ship.expansion.star).allowed)required.splice(part,1)}
-   if(!hdSERecipeAllows(recipe,ship)||required.length>profile.count)continue;
-   const slots=Array.from({length:profile.count},(_,index)=>({si,index,db,profile,capacity:profile.slots[index]}));
+   if(!hdSERecipeAllows(recipe,ship)||required.length>profile.count){report('blocked','normal-slot-count-or-eligibility',si,recipe,[ship.ship]);continue;}
+   const slots=Array.from({length:profile.count},(_,index)=>({si,index,db,profile,capacity:profile.slots[index]})).filter(slot=>typeof context?.allowSlot!=='function'||context.allowSlot(slot));
+   if(context&&required.length>slots.length){report('blocked','permitted-slots',si,recipe,[ship.ship]);continue;}
    const parts=required.map(part=>({part,choices:slots.flatMap(slot=>{
     const old=ship.items.find(x=>x.slotIndex===slot.index),owned=[...inventory.values()].filter(x=>hdFLRemedyPartMatches(part,x)&&hdOCCompatible(slot,x));
     owned.sort((a,b)=>Number(hdFOStackKey(old)===b.key)-Number(hdFOStackKey(old)===a.key)||Number(b.count>(usageBefore[b.key]||0))-Number(a.count>(usageBefore[a.key]||0))||hdOCScore(goal.kind,b)-hdOCScore(goal.kind,a));
@@ -312,9 +315,13 @@ function hdFLSetRemedies(plan,goal){
     if(example)rows.push({key:hdFLInventoryStackKey(example.name,exampleStar),name:example.name,star:exampleStar,item:example,count:0});
     return rows.map(row=>({slot,row}));
    })})).sort((a,b)=>a.choices.length-b.choices.length);
+   if(context&&parts.some(part=>!part.choices.length)){
+    const failed=parts.filter(part=>!part.choices.length),unknown=failed.some(part=>{const matches=catalog.filter(item=>hdFLRemedyPartMatches(part.part,{item,star:part.part.speed==='h'?7:0}));return !matches.length||matches.some(item=>hdShipDbMasterCompatible(item,db)===null&&slots.some(slot=>!hdShipDbSlotRejects(profile,slot.index,item)))});
+    report(unknown?'manual':'blocked',unknown?'compatibility-unconfirmed':'no-compatible-normal-slot',si,recipe,[ship.ship]);continue;
+   }
    const taken=new Set(),chosen=[];let leaves=0;
    const place=index=>{
-    if(leaves>=24)return;
+    if(leaves>=24){report('manual','bounded-remedies',si,recipe,[ship.ship]);return;}
     if(index<parts.length){for(const choice of parts[index].choices){if(taken.has(choice.slot.index))continue;taken.add(choice.slot.index);chosen.push(choice);place(index+1);chosen.pop();taken.delete(choice.slot.index)}return}
     leaves++;
     const trial=hdFOClone(plan),changes=[];
@@ -325,10 +332,13 @@ function hdFLSetRemedies(plan,goal){
     for(let mask=0;mask<2**extras.length;mask++){
      const variant=mask?hdFOClone(trial):trial,swaps=changes.slice();for(let i=0;i<extras.length;i++)if(mask&(1<<i)){const x=extras[i];if(x.nightExpansion)variant.ships[si].expansion=null;else variant.ships[si].items=variant.ships[si].items.filter(v=>v.slotIndex!==x.slotIndex);swaps.push({slot:x.nightExpansion?'増設':x.slotIndex+1,expansion:!!x.nightExpansion,old:x.name,name:'空き枠',star:0,owned:0,free:0})}
      if(goal.kind.startsWith('cap-night-')&&!hdSENightRecipeReady(variant.ships[si],recipe))continue;
-     const after=hdOCMeasure(variant,requirements),target=after.goals.find(g=>hdFLGoalMatch(g,goal));if(!target||target.count<=goal.count)continue;
+     const after=hdOCMeasure(variant,requirements),target=after.goals.find(g=>hdFLGoalMatch(g,goal));if(!target||target.count<=goal.count){if(context)report(target?.unresolved?'manual':'blocked',target?.unresolved?'target-unconfirmed':'no-target-improvement',si,recipe,[ship.ship]);continue;}
+     const scopedRechecks=context?hdFLRemedyRechecks(plan,variant,si,typeof context.oaswScope==='function'?context.oaswScope(plan,si):undefined):null;
+     const decision=typeof context?.acceptVariant==='function'?context.acceptVariant({plan,variant,before,after,goal,shipIndex:si,changes:swaps,rechecks:scopedRechecks||[]}):null;
+     if(typeof context?.acceptVariant==='function'&&decision?.ok!==true){const rejected=decision?.diagnostics?.length?decision.diagnostics:[decision||{}];for(const event of rejected)report(event.status||'manual',event.reason||'variant-unconfirmed',si,recipe,event.labels||[ship.ship]);continue;}
      const usage=hdFOAssignedUsage(variant),missing=Object.entries(usage).filter(([key,count])=>count>(inventory.get(key)?.count||0)).map(([key,count])=>({name:inventory.get(key)?.name||chosen.find(x=>x.row.key===key)?.row.name||key.split('@@')[0],star:inventory.get(key)?.star||chosen.find(x=>x.row.key===key)?.row.star||0,need:count-(inventory.get(key)?.count||0),owned:inventory.get(key)?.count||0}));
      const tradeoffs=before.goals.filter(g=>g.ok&&after.goals.some(n=>hdFLGoalMatch(n,g)&&!n.ok)).map(g=>g.label);
-     options.push({ship:ship.ship,shipIndex:si,recipe:recipe.name,recipeId:recipe.id,mode:recipe.mode||'capability',detail:target.detail,changes:swaps,missing,available:!missing.length,tradeoffs,rechecks:hdFLRemedyRechecks(plan,variant,si),count:target.count,targetReady:target.ok});
+     options.push({ship:ship.ship,shipIndex:si,recipe:recipe.name,recipeId:recipe.id,mode:recipe.mode||'capability',detail:target.detail,changes:swaps,missing,available:!missing.length,tradeoffs,rechecks:scopedRechecks||hdFLRemedyRechecks(plan,variant,si),count:target.count,targetReady:target.ok,...(decision?.postReview?{postReview:decision.postReview}:{})});
     }
    };place(0);
   }

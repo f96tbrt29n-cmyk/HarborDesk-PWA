@@ -3,6 +3,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {createSurfaceNightModelContext}=require('./fixtures/surface-night-model-context.cjs');
 const {createSurfaceNightPlacementHistoricalProjection}=require('./fixtures/surface-night-placement-source-layer.cjs');
+const {createSoftLandRemediesHistoricalProjection}=require('./fixtures/soft-land-remedies-source-layer.cjs');
 const ROOT=path.resolve(__dirname,'..'),host=x=>JSON.parse(JSON.stringify(x)),hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 const ROUTES=[['5-1','BCFJ',['長門改二','飛鷹改','鳥海改二','阿武隈改二','秋月改','夕立改二']],['7-3','ACE',['羽黒改二','夕立改二','時雨改二','占守改']],['7-4','ABEJLP',['伊勢改二','羽黒改二','北上改二','夕立改二','時雨改二','占守改']]];
 const EXPECTED={'night-main':[['nightMain',3]],'night-main-secondary':[['nightMain',2],['nightSecondary',1]],'night-mixed':[['nightMain',1],['nightTorpedo',1]]};
@@ -25,7 +26,7 @@ function seedUIProducer(h,map,names){
 }
 
 test('surface-night inverse restores exact previous source and rejects unapproved or repeated projection',()=>{
- const project=createSurfaceNightPlacementHistoricalProjection(ROOT),approved=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/surface-night-placement-approved-source-inverses.json'),'utf8'));assert.equal(approved.schemaVersion,1);assert.equal(approved.beforeSourceHEAD,'7c9e4accef6115b22b74aaccde15fe4a57dd6c02');assert.deepEqual(Object.keys(approved.files),['owned-equipment-planner.js']);const file='owned-equipment-planner.js',current=fs.readFileSync(path.join(ROOT,file),'utf8'),previous=project(file,current);assert.equal(hash(previous),'11b7ddbf74b6ed585a9c4f64d382b41d2d2cac7680284ef3e8e7a510069a2e7b');assert.equal(hash(current),approved.files[file].approvedAfterSHA256);assert.throws(()=>project(file,current+'\n'));assert.throws(()=>project(file,previous));assert.equal(project('unrelated.js','same'),'same');
+ const project=createSurfaceNightPlacementHistoricalProjection(ROOT),projectSoftLand=createSoftLandRemediesHistoricalProjection(ROOT),approved=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/surface-night-placement-approved-source-inverses.json'),'utf8'));assert.equal(approved.schemaVersion,1);assert.equal(approved.beforeSourceHEAD,'7c9e4accef6115b22b74aaccde15fe4a57dd6c02');assert.deepEqual(Object.keys(approved.files),['owned-equipment-planner.js']);const file='owned-equipment-planner.js',raw=fs.readFileSync(path.join(ROOT,file),'utf8'),current=projectSoftLand(file,raw),previous=project(file,raw);assert.equal(hash(previous),'11b7ddbf74b6ed585a9c4f64d382b41d2d2cac7680284ef3e8e7a510069a2e7b');assert.equal(hash(current),approved.files[file].approvedAfterSHA256);assert.throws(()=>project(file,raw+'\n'));assert.throws(()=>project(file,previous));assert.equal(project('unrelated.js','same'),'same');
 });
 
 test('the scoped real details57 fixture supplies all three existing generated night goals without changing the common loader',()=>{

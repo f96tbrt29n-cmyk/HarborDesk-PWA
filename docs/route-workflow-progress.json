@@ -1487,18 +1487,22 @@
         },
         "C": {
           "status": "一部",
-          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。",
           "evidence": [
             "docs/pr152-land-set-routes-ja.md",
-            "tests/port-attacker-set.spec.js"
+            "tests/port-attacker-set.spec.js",
+            "tests/soft-land-remedies.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
           ]
         },
         "D": {
           "status": "一部",
-          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。",
           "evidence": [
             "docs/pr152-land-set-routes-ja.md",
-            "tests/port-attacker-set.spec.js"
+            "tests/port-attacker-set.spec.js",
+            "tests/soft-land-remedies.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
           ]
         }
       },
@@ -1629,7 +1633,7 @@
         },
         "C": {
           "status": "一部",
-          "reason": "同じindexの在庫0で索敵12/登録71の不足59、実数不足と戦闘推奨の空母1機/同艦ASW1組の名前・合法な別枠・代替搭載先をC/W確認。未知は索敵/艦の未判定と安全中止。全失敗区分は未完。",
+          "reason": "同じindexの在庫0で索敵12/登録71の不足59、実数不足と戦闘推奨の空母1機/同艦ASW1組の名前・合法な別枠・代替搭載先をC/W確認。未知は索敵/艦の未判定と安全中止。全失敗区分は未完。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。",
           "evidence": [
             "docs/pr152-port-attacker-set-ja.md",
             "tests/port-attacker-set.spec.js",
@@ -1637,12 +1641,14 @@
             "tests/four-five-central-routes.test.cjs",
             "tests/four-five-central-graph.test.cjs",
             "tests/four-five-central-placement.test.cjs",
-            "tests/route-four-five-central.spec.js"
+            "tests/route-four-five-central.spec.js",
+            "tests/soft-land-remedies.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
           ]
         },
         "D": {
           "status": "確認済み",
-          "reason": "同じindexの成立/在庫不足で保存→メモ編集→reload(load)→同一新文書complete後再探索/再表示、custom保存文字列・同期元・他編成/海域・ID/metadata・計算/調達/他経路担当艦情報をC/W直接一致。未知は編集なし安全中止と元保存値保持。初回stock2失敗は保存前で別記し、期待値2箇所修正後のstock2必要再検証と成功4再利用を区別。",
+          "reason": "同じindexの成立/在庫不足で保存→メモ編集→reload(load)→同一新文書complete後再探索/再表示、custom保存文字列・同期元・他編成/海域・ID/metadata・計算/調達/他経路担当艦情報をC/W直接一致。未知は編集なし安全中止と元保存値保持。初回stock2失敗は保存前で別記し、期待値2箇所修正後のstock2必要再検証と成功4再利用を区別。 2026-11-07 soft対地交換案の新表示/未判定理由/一時情報非保存を同じ行の代表C/Wで確認。明示保存編集・案の適用は再実行せず既存保持証拠と分離。",
           "evidence": [
             "docs/pr152-port-attacker-set-ja.md",
             "tests/port-attacker-set.spec.js",
@@ -1650,7 +1656,9 @@
             "tests/four-five-central-routes.test.cjs",
             "tests/four-five-central-graph.test.cjs",
             "tests/four-five-central-placement.test.cjs",
-            "tests/route-four-five-central.spec.js"
+            "tests/route-four-five-central.spec.js",
+            "tests/soft-land-remedies.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
           ]
         }
       },
@@ -3281,21 +3289,20 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "surface-night-placement-batch",
-    "baselineHead": "7c9e4accef6115b22b74aaccde15fe4a57dd6c02",
+    "id": "soft-land-guidance-batch",
+    "baselineHead": "a4bb8857e73abe51ca2a62bd66e0dc3f6ccf75c7",
     "scope": [
-      "5-1/0/default",
-      "7-3/0/default",
-      "7-4/0/default"
+      "4-3/0/default",
+      "4-5/1/default"
     ],
     "executedUIScopes": [
-      "5-1/0/default",
-      "7-4/0/default"
+      "4-3/0/default",
+      "4-5/1/default"
     ],
-    "record": "surfaceNightGuidanceBatch20261106",
-    "state": "shared guidance complete; local738 and4 initial UI passed; final-source CI facts/gaps recorded, next soft-reuse baseline2 confirmed"
+    "record": "softLandGuidanceBatch20261107",
+    "state": "shared remedy adapter and representative local operation verified; final-source normal smoke pending"
   },
-  "nextPriority": "4-3/0 CDHN・CFHN／4-5/1 ADHKT・CDHKTの保存艦隊OC soft対地不足欄へ、既存FLSetRemediesの艦名・合法通常枠・有限在庫の具体交換案を再利用するバッチ。actual modelの3試験中2成功で再利用経路を確認、auto/ownedの調達ボタンと先制対潜確認namespaceのadapterを設計中。3-5上は元目標が生成されず最初のgoal検査で停止し、engine/後段保持未到達。H撃破が通行必須でない出典を確認し、通常上経路の目標欠如だけを欠陥とせず、目標選択と必要十分な組数を別件にし、強制目標や成功目的再実行を行わない。次の製品/実画面は未実施、セル追加0。",
+  "nextPriority": "2-5北BFJO／4-5中央ADHKT・CDHKT／6-5上下の、数値索敵と別の汎用索敵個数を任意目安として表示する共通consumer接続。既存の3-5下・2-5南の処理を再利用し、数値不足を個数や購入必須へ換算しない。出典・数値条件・利用者目標・保存形式は維持し、まずactual Node最小対照で残る不備を確認する。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -22507,5 +22514,129 @@
       },
       "supplementaryReviewSHA256": "2dd8a88224c642a16008edab2acebaed207dd5e850a7409050095da989ef69b9"
     }
+  },
+  "selectedBeforeSoftLandGuidanceBatch20261107": {
+    "id": "surface-night-placement-batch",
+    "baselineHead": "7c9e4accef6115b22b74aaccde15fe4a57dd6c02",
+    "scope": [
+      "5-1/0/default",
+      "7-3/0/default",
+      "7-4/0/default"
+    ],
+    "executedUIScopes": [
+      "5-1/0/default",
+      "7-4/0/default"
+    ],
+    "record": "surfaceNightGuidanceBatch20261106",
+    "state": "shared guidance complete; local738 and4 initial UI passed; final-source CI facts/gaps recorded, next soft-reuse baseline2 confirmed"
+  },
+  "nextPriorityBeforeSoftLandGuidanceBatch20261107": "4-3/0 CDHN・CFHN／4-5/1 ADHKT・CDHKTの保存艦隊OC soft対地不足欄へ、既存FLSetRemediesの艦名・合法通常枠・有限在庫の具体交換案を再利用するバッチ。actual modelの3試験中2成功で再利用経路を確認、auto/ownedの調達ボタンと先制対潜確認namespaceのadapterを設計中。3-5上は元目標が生成されず最初のgoal検査で停止し、engine/後段保持未到達。H撃破が通行必須でない出典を確認し、通常上経路の目標欠如だけを欠陥とせず、目標選択と必要十分な組数を別件にし、強制目標や成功目的再実行を行わない。次の製品/実画面は未実施、セル追加0。",
+  "softLandGuidanceBatch20261107": {
+    "date": "2026-11-07 JST",
+    "baseHEAD": "a4bb8857e73abe51ca2a62bd66e0dc3f6ccf75c7",
+    "priorSource": "2f35b952e5a78c12bb234926f49a8445b46ae291",
+    "scope": [
+      "4-3/0 CDHN / CFHN",
+      "4-5/1 ADHKT / CDHKT"
+    ],
+    "excluded": [
+      "3-5 upper",
+      "4-5 indices0/2",
+      "enemy-phase damage or sufficient attacker count"
+    ],
+    "source": "Registered Zekamashi evidence reused; current Wiki extraction identifies N/T 港湾棲姫 and separate final form. Fixed current Wiki revision/raw HTML unacquired. Type3 and rocket are separate preparation examples, not equal damage/attack eligibility/kill/victory.",
+    "implementation": "Reuse existing FL remedies once after OC search with exact requirements/final measure, actual owned OASW scope and permitted normal slots. Reject loss or new uncertainty of established conditions, mandatory/explicit progress and assigned-set components before old output cap; preserve partial/manual reasons. Read-only option rendering, conditional whole-variant missing count only.",
+    "productSHA256": {
+      "fleet-loadout-planner.js": "6cd45a50a8aecd62c26efd24e525e5d2a77b1d0da43ed21bb6e100764ccbfcf1",
+      "owned-equipment-planner.js": "67aec284a14dfa667de52d92cc6c1f806b0f02f0b11c615ddb0326c19ecd2737"
+    },
+    "baselineReuse": {
+      "confirmedCounterexamples": 2,
+      "oldNegativeRerun": 0,
+      "separateThreeFive": "old goal absence and later source scope do not establish a product defect; old failure/unreached preserved"
+    },
+    "node": {
+      "passed": 749,
+      "failed": 0,
+      "newTests": 11,
+      "runs": 1,
+      "normalRegistration": true,
+      "sourceExact": true
+    },
+    "local": {
+      "logical": 4,
+      "physical": 4,
+      "completed": 4,
+      "initialPassed": 4,
+      "failed": 0,
+      "workers": 1,
+      "retries": 0,
+      "saveEditReexecuted": false,
+      "variantApplied": false,
+      "procurementReexecuted": false,
+      "newDisplayOnly": "10 raw keys plus policy/other planner/port selection/goal definitions and metadata exact; same-document reload redisplay; ephemeral not persisted",
+      "notNewlyVerified": [
+        "explicit save/edit",
+        "application and persistence of a new virtual remedy"
+      ],
+      "proof": "shared/local-results.json, SHA256 30d4b3d4562676a3fe507120108fd6774db5331a67d9ea8ca73f4af1a03bf6cf"
+    },
+    "preflight": {
+      "casesPerBrowser": 918,
+      "files": 82,
+      "webkitCaseBins": [
+        339,
+        164,
+        231,
+        184
+      ],
+      "wholeFileUnionExact": true,
+      "duplicateIDs": 0,
+      "partitionWeightsOrDeadlinesChanged": false
+    },
+    "matrix": {
+      "before": [
+        28,
+        157,
+        51
+      ],
+      "after": [
+        28,
+        157,
+        51
+      ],
+      "changes": [],
+      "criteriaChanged": false,
+      "unexecutedScopePromoted": false
+    },
+    "ci": {
+      "state": "final-source normal smoke pending",
+      "normalRunsPlanned": 1,
+      "reruns": 0,
+      "workflowChange": "one compact summary glob only; no selection/environment/deadline/retry/partition change"
+    },
+    "oldCI": {
+      "run": 42207401382,
+      "C": null,
+      "C1": [
+        458,
+        0,
+        0
+      ],
+      "W": [
+        899,
+        11,
+        6
+      ],
+      "meaning": "passed/flaky/failed; full C and three W attempt operations remain missing; original gaps and Node-only7-3/mixed scope preserved",
+      "backfill": false
+    },
+    "remaining": [
+      "all enemy phases, equipment variants and sufficient attacker counts",
+      "new virtual exchanges are not applied/saved; unchanged old save/edit tests reused separately",
+      "unknown recalculation and existing display/access-control/root-cause gaps"
+    ],
+    "proof": "continuation-soft-land-guidance-batch-20261107/private/; shared/local-results.json contains only allowed metadata",
+    "next": "2-5北BFJO／4-5中央ADHKT・CDHKT／6-5上下の、数値索敵と別の汎用索敵個数を任意目安として表示する共通consumer接続。既存の3-5下・2-5南の処理を再利用し、数値不足を個数や購入必須へ換算しない。出典・数値条件・利用者目標・保存形式は維持し、まずactual Node最小対照で残る不備を確認する。"
   }
 }

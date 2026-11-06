@@ -111,3 +111,4 @@ test('air input stop requires actual selectable map data, never a fallback capac
 require('./optional-anti-air-hints.test.cjs');
 require('./carrier-placement-guidance.test.cjs');
 require('./surface-night-placement-guidance.test.cjs');
+require('./soft-land-remedies.test.cjs');
