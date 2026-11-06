@@ -3286,9 +3286,9 @@
       "1-4/0/normal"
     ],
     "record": "carrierGuidanceBatch20261106",
-    "state": "shared hints implemented; local721Node/current4UI finalpass, one pre-search fixture guard failure retained; final-source smoke pending"
+    "state": "shared guidance and local proof complete; final-source CI collected/independently matched; next shared-night baseline3 confirmed, implementation pending"
   },
-  "nextPriority": "5-1 BCFJ／7-3第1 ACE／7-4 ABEJLP：既存auto夜戦CIの主砲3・主砲2副砲1・主砲1魚雷1レシピが選択された時、魚雷2専用の艦別搭載先helperがnullになる共通候補。既存数量/任意推奨を維持し、実モデルの最小対照で先に確定する。静的候補のみ・未実装/実操作未実施。空母夜戦の既知停止調査へは広げない。",
+  "nextPriority": "5-1 BCFJ／7-3第1 ACE／7-4 ABEJLP：auto夜戦CIの選択済主砲3レシピで艦別搭載先が欠ける共通不備。actual modelの3論理/5物理対照で確定（最初2件のfixtureデータ未読込み失敗を別保持し、実map-details-57読込み後は当該2件だけ再確認）。魚雷2の正対照も維持。主砲2副砲1・主砲1魚雷1は静的候補のまま、合法増設等の相違を統一せず次に境界確認する。次バッチ製品修正/実操作/CIはまだ0、進捗セル追加0。空母夜戦の既知停止へ広げない。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -7247,8 +7247,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "shared hints implemented; local721Node/current4UI finalpass, one pre-search fixture guard failure retained; final-source smoke pending",
-    "nextUnit": "5-1 BCFJ／7-3第1 ACE／7-4 ABEJLP：既存auto夜戦CIの主砲3・主砲2副砲1・主砲1魚雷1レシピが選択された時、魚雷2専用の艦別搭載先helperがnullになる共通候補。既存数量/任意推奨を維持し、実モデルの最小対照で先に確定する。静的候補のみ・未実装/実操作未実施。空母夜戦の既知停止調査へは広げない。",
+    "activeUnit": "shared guidance and local proof complete; final-source CI collected/independently matched; next shared-night baseline3 confirmed, implementation pending",
+    "nextUnit": "5-1 BCFJ／7-3第1 ACE／7-4 ABEJLP：auto夜戦CIの選択済主砲3レシピで艦別搭載先が欠ける共通不備。actual modelの3論理/5物理対照で確定（最初2件のfixtureデータ未読込み失敗を別保持し、実map-details-57読込み後は当該2件だけ再確認）。魚雷2の正対照も維持。主砲2副砲1・主砲1魚雷1は静的候補のまま、合法増設等の相違を統一せず次に境界確認する。次バッチ製品修正/実操作/CIはまだ0、進捗セル追加0。空母夜戦の既知停止へ広げない。",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -21714,7 +21714,7 @@
       "DConfirmedAdded": 0
     },
     "ci": {
-      "state": "pending final source, one normal smoke; no record-only CI",
+      "state": "completed, final source c41a01cb; one normal smoke42194493112, no rerun or record-only CI",
       "WPartitionUnchanged": true,
       "onlyWorkflowChange": "add new small target-summary file glob; same82files/split/workers/environment/deadlines/retries/exit"
     },
@@ -21724,6 +21724,126 @@
       "all inventory/mount/slot/unknown UI variants",
       "all route-goal sufficiency and battle guarantees"
     ],
-    "next": "5-1 BCFJ／7-3第1 ACE／7-4 ABEJLP：既存auto夜戦CIの主砲3・主砲2副砲1・主砲1魚雷1レシピが選択された時、魚雷2専用の艦別搭載先helperがnullになる共通候補。既存数量/任意推奨を維持し、実モデルの最小対照で先に確定する。静的候補のみ・未実装/実操作未実施。空母夜戦の既知停止調査へは広げない。"
+    "next": "5-1 BCFJ／7-3第1 ACE／7-4 ABEJLP：auto夜戦CIの選択済主砲3レシピで艦別搭載先が欠ける共通不備。actual modelの3論理/5物理対照で確定（最初2件のfixtureデータ未読込み失敗を別保持し、実map-details-57読込み後は当該2件だけ再確認）。魚雷2の正対照も維持。主砲2副砲1・主砲1魚雷1は静的候補のまま、合法増設等の相違を統一せず次に境界確認する。次バッチ製品修正/実操作/CIはまだ0、進捗セル追加0。空母夜戦の既知停止へ広げない。",
+    "ciFinal": {
+      "sourceSHA": "c41a01cb72110b30331d7fe9c6fd50ca3de36f03",
+      "runId": 42194493112,
+      "runAttempt": 1,
+      "runConclusion": "failure",
+      "jobResults": {
+        "success": 3,
+        "failure": 3,
+        "cancelled": 0,
+        "fullSkipped": 1
+      },
+      "passedFlakyFailed": {
+        "C": [
+          914,
+          0,
+          0
+        ],
+        "W": [
+          899,
+          11,
+          4
+        ]
+      },
+      "targetInitialPass": 4,
+      "targetChecks": "10 keys, goals, other planner, legal normal slots and ephemeral nonpersistence exact; after-load same document; errors/drop/missing0",
+      "localNodePass": 721,
+      "localLogicalPhysical": [
+        4,
+        5
+      ],
+      "localFixtureFailureRetained": true,
+      "saveEditReexecuted": false,
+      "unexecutedUIScopes": [
+        "1-3/0/normal",
+        "1-4/0/j-avoid"
+      ],
+      "finalFailures": [
+        {
+          "test": "7-1 DEGHK ready keeps the source-backed DE alternative and optional ASW distinctions through save and load",
+          "attempts": [
+            0,
+            1
+          ],
+          "stage": "after-load re-search click blocked by hidden element in both initial/retry; specified save/edit assertions passed by code control-flow; full post-load comparison not reached"
+        },
+        {
+          "test": "7-5 first ABDFGHK stock keeps a native DD1-DE1 alternative through save or safe abort and load",
+          "attempts": [
+            0,
+            1
+          ],
+          "stage": "after-load re-search click blocked by hidden element in both initial/retry; specified save/edit assertions passed by code control-flow; full post-load comparison not reached"
+        },
+        {
+          "test": "5-1 BCFJ ready keeps branch and equipment distinctions through save and load",
+          "attempts": [
+            0,
+            1
+          ],
+          "stage": "after-load re-search click blocked by hidden element in both initial/retry; specified save/edit assertions passed by code control-flow; full post-load comparison not reached"
+        },
+        {
+          "test": "7-4 ABEJLP known keeps formula uncertainty and six identities through save or safe abort and load",
+          "attempts": [
+            0,
+            1
+          ],
+          "stage": "after-load re-search click blocked by hidden element in both initial/retry; specified save/edit assertions passed by code control-flow; full post-load comparison not reached"
+        }
+      ],
+      "otherFlaky": {
+        "count": 11,
+        "initialSameDocumentFalsePlanExactTrue": 1,
+        "manualStarPollBeforeHQSync": 1,
+        "otherFirstStages": "hidden-click caller or timeout-only as available; per-attempt originals retained; no cause inference"
+      },
+      "gaps": [
+        "numeric per-job Node footer counts not acquired; official gates success only",
+        "registry pull-log digest not acquired; per-job verified browser receipts retained",
+        "some initial flaky first-operation details omitted by available official annotations; compact categories/locations retained",
+        "large raw trace/video/log materials not downloaded; no success trial fills a missing failure boundary"
+      ],
+      "oldRunGapsUnchanged": true,
+      "normalSmokeCount": 1,
+      "reruns": 0,
+      "wholeFileCount": 82,
+      "currentW4SmokeSeconds": 1252,
+      "priorW4SmokeSeconds": 958,
+      "W4Limit": "one observation each, not stability or cause proof",
+      "proof": {
+        "canonicalSHA256": "e5837601ea5db5f698a8c7f226335ebfc56c4223b46765a8477e7154301d430c",
+        "manifestSHA256": "99e215184aacf5ce51d72777c497fc124c2137bffbabb2bfa2251b701b532697",
+        "rootReviewSHA256": "c85463a16441d0bede1059eb574fd27149c92184b836a9423c6574b9849a2133",
+        "smallZIPs": 13,
+        "smallZIPBytes": 430111,
+        "CRCAndMemberSHAChecked": 56
+      },
+      "cellsBefore": [
+        28,
+        153,
+        55
+      ],
+      "cellsAfter": [
+        28,
+        157,
+        51
+      ],
+      "recordOnlyAdditionalCI": false,
+      "nextBaseline": {
+        "logical": 3,
+        "physical": 5,
+        "provenMissingGuidance": 3,
+        "initialFixtureFailures": 2,
+        "productEdits": 0,
+        "browserRuns": 0,
+        "cellChange": 0,
+        "summarySHA256": "a9ac9931630fe1b7d3952d1773c5e166096ca128a593a8e7412a8a60d71cb20b"
+      },
+      "privateValueBodiesIncluded": false
+    }
   }
 }
