@@ -62,20 +62,20 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 41,
-      "未確認": 18,
+      "一部": 42,
+      "未確認": 17,
       "非該当": 0
     },
     "C": {
       "確認済み": 0,
-      "一部": 41,
-      "未確認": 18,
+      "一部": 43,
+      "未確認": 16,
       "非該当": 0
     },
     "D": {
       "確認済み": 28,
-      "一部": 15,
-      "未確認": 16,
+      "一部": 16,
+      "未確認": 15,
       "非該当": 0
     }
   },
@@ -202,7 +202,7 @@
           "evidence": []
         }
       },
-      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。 艦別攻撃機案内は共通接続済み。実操作は1-3/cfj在庫0と1-4/normal有限1機の2入口だけで、他の選択目標へ流用しない。通常枠/増設対象外/在庫と現在配備を区別し、全目標十分性・全失敗区分は残る。"
     },
     {
       "id": "1-3/0/cfj",
@@ -223,30 +223,32 @@
         },
         "B": {
           "status": "未確認",
-          "reason": "既存の同じ選択目標の所持艦代替/保存は空在庫・装備目標を省く経路専用対照。実装備の自動配備/不足案内の証拠へ換算しない。",
+          "reason": "既存の同じ選択目標の所持艦代替/保存は空在庫・装備目標を省く経路専用対照。実装備の自動配備/不足案内の証拠へ換算しない。 今回は攻撃機在庫0で実攻撃機の自動配備は未実施、案内確認をBへ換算しない。",
           "evidence": [
             "docs/route-1-3-verification-ja.md",
             "tests/route-1-3.spec.js"
           ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "既存の同じ選択目標の所持艦代替/保存は空在庫・装備目標を省く経路専用対照。実装備の自動配備/不足案内の証拠へ換算しない。",
+          "status": "一部",
+          "reason": "同じCFJ目標の攻撃機在庫0で、既存任意1個の不足と実空母名・装備名・合法な正搭載数の通常枠候補をC/W表示確認。増設対象外・未所持候補/現在配備/共同利用を区別。全搭載不可/枠競合/情報不足の実操作は未完。",
           "evidence": [
-            "docs/route-1-3-verification-ja.md",
-            "tests/route-1-3.spec.js"
+            "tests/carrier-placement-guidance.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
           ]
         },
         "D": {
           "status": "一部",
-          "reason": "空在庫の経路専用対照で所持艦変更/保存/再表示あり。DCL待ちで、編集・同一文書load/complete全体は未確認。",
+          "reason": "空在庫の経路専用対照で所持艦変更/保存/再表示あり。DCL待ちで、編集・同一文書load/complete全体は未確認。 今回C/Wでは保存済fixtureのreload後、参照取得した同一文書内で再探索・新案内と10キー等を保持。明示保存・編集・新配備案の保存後復元は再実行せず、旧未到達を補完しない。",
           "evidence": [
             "docs/route-1-3-verification-ja.md",
-            "tests/route-1-3.spec.js"
+            "tests/route-1-3.spec.js",
+            "tests/carrier-placement-guidance.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
           ]
         }
       },
-      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。 艦別攻撃機案内は共通接続済み。実操作は1-3/cfj在庫0と1-4/normal有限1機の2入口だけで、他の選択目標へ流用しない。通常枠/増設対象外/在庫と現在配備を区別し、全目標十分性・全失敗区分は残る。"
     },
     {
       "id": "1-4/0/normal",
@@ -266,22 +268,31 @@
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じnormal目標で有限在庫の流星1機を2空母の片方へ実自動配備し、通常枠合法性・配備数1/既存任意目標2・増設配備0をC/W確認。全在庫/目標/枠競合は未完。",
+          "evidence": [
+            "tests/carrier-placement-guidance.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じnormal目標で残る未配備1空母の実艦名・装備名・合法通常枠と、既存例の所持1/比較目標2をC/W表示確認。調達数量/通行必須へ変換せず、全失敗区分の実操作は未完。",
+          "evidence": [
+            "tests/carrier-placement-guidance.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "保存済み合成編成をreload(load)後に読み、参照取得した同一文書内で再探索/新案内再表示と10キー/他編成/metadata/他planner保持をC/W確認。明示保存・編集・新配備案の保存後復元は今回未実施。ownProposal存在を既存案の復元証明にしない。",
+          "evidence": [
+            "tests/carrier-placement-guidance.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 艦別攻撃機案内は共通接続済み。実操作は1-3/cfj在庫0と1-4/normal有限1機の2入口だけで、他の選択目標へ流用しない。通常枠/増設対象外/在庫と現在配備を区別し、全目標十分性・全失敗区分は残る。"
     },
     {
       "id": "1-4/0/j-avoid",
@@ -325,7 +336,7 @@
           ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 艦別攻撃機案内は共通接続済み。実操作は1-3/cfj在庫0と1-4/normal有限1機の2入口だけで、他の選択目標へ流用しない。通常枠/増設対象外/在庫と現在配備を区別し、全目標十分性・全失敗区分は残る。"
     },
     {
       "id": "1-5/0/default",
@@ -3262,18 +3273,22 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "optional-aa-display-batch",
-    "baselineHead": "ba762601583d06a777420dc2f033180c6b3abb25",
+    "id": "carrier-placement-guidance-batch",
+    "baselineHead": "76357fe00d44ed3a2ef2e22fbbb4f111e12380b3",
     "scope": [
-      "4-2/0/default",
-      "4-2/1/default",
-      "2-4/0/default"
+      "1-3/0/normal",
+      "1-3/0/cfj",
+      "1-4/0/normal",
+      "1-4/0/j-avoid"
     ],
-    "record": "optionalAaBatch20261106",
-    "state": "optional AA limited display batch complete; CI42119476156 4success/W2failure/C2cancel; W895/15/2, C1subtotal456/0/0, fullCnull; target4initialpass; old originals/gaps retained",
-    "sourceHEAD": "88a3c0a44a59309e00aa5157ce42fb10c569cc9d"
+    "executedUIScopes": [
+      "1-3/0/cfj",
+      "1-4/0/normal"
+    ],
+    "record": "carrierGuidanceBatch20261106",
+    "state": "shared hints implemented; local721Node/current4UI finalpass, one pre-search fixture guard failure retained; final-source smoke pending"
   },
-  "nextPriority": "1-3 normal/cfj＋1-4 normal/j-avoidの任意空母攻撃機：既存目標は生成されるが艦別搭載先案内が接続されない4条件を、現source88の実Node対照4件で確認済み。共通helper/callerの適用範囲だけを最小修正する次バッチへ進む。製品修正・新UI操作は未実施で、既存成功を新案内へ流用しない。",
+  "nextPriority": "5-1 BCFJ／7-3第1 ACE／7-4 ABEJLP：既存auto夜戦CIの主砲3・主砲2副砲1・主砲1魚雷1レシピが選択された時、魚雷2専用の艦別搭載先helperがnullになる共通候補。既存数量/任意推奨を維持し、実モデルの最小対照で先に確定する。静的候補のみ・未実装/実操作未実施。空母夜戦の既知停止調査へは広げない。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -7180,6 +7195,18 @@
       "record": "twoFiveCeioEPriorityCIFinalization20261105",
       "evidence": "docs/pr152-two-five-ceio-e-ja.md",
       "state": "E local6 sealed; CI42024915243 source03 5success/W4cancel, C3initialpass typed-only/W3missing; qualified P/O final joined"
+    },
+    {
+      "id": "optional-aa-display-batch",
+      "baselineHead": "ba762601583d06a777420dc2f033180c6b3abb25",
+      "scope": [
+        "4-2/0/default",
+        "4-2/1/default",
+        "2-4/0/default"
+      ],
+      "record": "optionalAaBatch20261106",
+      "state": "optional AA limited display batch complete; CI42119476156 4success/W2failure/C2cancel; W895/15/2, C1subtotal456/0/0, fullCnull; target4initialpass; old originals/gaps retained",
+      "sourceHEAD": "88a3c0a44a59309e00aa5157ce42fb10c569cc9d"
     }
   ],
   "fiveFourCloseout": {
@@ -7220,8 +7247,8 @@
       "environment or permission blocker preventing safe work",
       "specification, cost, external publication or destructive action requiring user decision"
     ],
-    "activeUnit": "optional AA limited display batch complete; CI42119476156 4success/W2failure/C2cancel; W895/15/2, C1subtotal456/0/0, fullCnull; target4initialpass; old originals/gaps retained",
-    "nextUnit": "1-3 normal/cfj＋1-4 normal/j-avoidの任意空母攻撃機：既存目標は生成されるが艦別搭載先案内が接続されない4条件を、現source88の実Node対照4件で確認済み。共通helper/callerの適用範囲だけを最小修正する次バッチへ進む。製品修正・新UI操作は未実施で、既存成功を新案内へ流用しない。",
+    "activeUnit": "shared hints implemented; local721Node/current4UI finalpass, one pre-search fixture guard failure retained; final-source smoke pending",
+    "nextUnit": "5-1 BCFJ／7-3第1 ACE／7-4 ABEJLP：既存auto夜戦CIの主砲3・主砲2副砲1・主砲1魚雷1レシピが選択された時、魚雷2専用の艦別搭載先helperがnullになる共通候補。既存数量/任意推奨を維持し、実モデルの最小対照で先に確定する。静的候補のみ・未実装/実操作未実施。空母夜戦の既知停止調査へは広げない。",
     "environmentStop": "recovered by actual exec + unchanged hashes; PR status updated; original environment preserved",
     "preservationStopReview": {
       "state": "limited investigation ended; five-one resumed by user",
@@ -21568,5 +21595,135 @@
       "browserExecutions": 0,
       "cellChange": 0
     }
+  },
+  "carrierGuidanceBatch20261106": {
+    "date": "2026-11-06 JST",
+    "baseHEAD": "76357fe00d44ed3a2ef2e22fbbb4f111e12380b3",
+    "sharedScopes": [
+      "1-3/0/normal",
+      "1-3/0/cfj",
+      "1-4/0/normal",
+      "1-4/0/j-avoid"
+    ],
+    "executedUIScopes": [
+      "1-3/0/cfj",
+      "1-4/0/normal"
+    ],
+    "product": "owned planner shortage-only scope helper and catalogue normal-slot reason display; same quantities, route/math/search/save",
+    "baselineNegative4": {
+      "source": "88a3c0a44a59309e00aa5157ce42fb10c569cc9d",
+      "sameCodeAt763": true,
+      "rerun": false,
+      "record": "continuation-optional-aa-batch-20261106/shared/next-carrier-baseline.json"
+    },
+    "node": {
+      "pass": 721,
+      "fail": 0,
+      "new": 17,
+      "old": 704,
+      "runs": 1
+    },
+    "local": {
+      "logical": 4,
+      "physical": 5,
+      "finalPass": 4,
+      "initialFixtureFailure": 1,
+      "initialFailureStage": "seed, prior to search; purpose belongs to OCMeasure goal, not raw FE requirements",
+      "fixtureCorrectedExpectationsUnchanged": true,
+      "retrySetting": 0,
+      "normalSourceResultReusedAfterUIOnlyFix": true,
+      "saveEditReexecuted": false,
+      "retention": "10storage strings/other fleet/metadata/goal definitions exact; new ephemeral fields not persisted; own planner autoimport treated separately",
+      "proof": "shared/local-results.json"
+    },
+    "preflight": {
+      "normalCasesPerBrowser": 914,
+      "normalSpecFiles": 82,
+      "webkitBins": [
+        339,
+        164,
+        227,
+        184
+      ],
+      "unionExact": true,
+      "duplicateIDs": 0
+    },
+    "oldCI": {
+      "run": 42119476156,
+      "source": "88a3c0a44a59309e00aa5157ce42fb10c569cc9d",
+      "W": [
+        895,
+        15,
+        2
+      ],
+      "C1": [
+        456,
+        0,
+        0
+      ],
+      "C": null,
+      "finalFailedScopes": [
+        "5-4 required-missing",
+        "6-2 ready"
+      ],
+      "failedAttempts": "initial/retry load-click hidden; final full comparison unreached",
+      "C2": "455passed end plus begin/noend1, nativeonEndmissing; not productfailed",
+      "newRecoveryRuns": 0,
+      "W4Seconds": 958,
+      "W4Conclusion": "smoke completed in one observed run, not stable resolution"
+    },
+    "matrix": {
+      "before": [
+        28,
+        153,
+        55
+      ],
+      "after": [
+        28,
+        157,
+        51
+      ],
+      "changes": [
+        {
+          "id": "1-3/0/cfj",
+          "item": "C",
+          "before": "未確認",
+          "after": "一部"
+        },
+        {
+          "id": "1-4/0/normal",
+          "item": "B",
+          "before": "未確認",
+          "after": "一部"
+        },
+        {
+          "id": "1-4/0/normal",
+          "item": "C",
+          "before": "未確認",
+          "after": "一部"
+        },
+        {
+          "id": "1-4/0/normal",
+          "item": "D",
+          "before": "未確認",
+          "after": "一部"
+        }
+      ],
+      "criteriaChanged": false,
+      "unexecutedScopesPromoted": false,
+      "DConfirmedAdded": 0
+    },
+    "ci": {
+      "state": "pending final source, one normal smoke; no record-only CI",
+      "WPartitionUnchanged": true,
+      "onlyWorkflowChange": "add new small target-summary file glob; same82files/split/workers/environment/deadlines/retries/exit"
+    },
+    "remaining": [
+      "explicit apply/save/edit/newly saved proposal reload not run in new display tests",
+      "unexecuted1-3normal/1-4javoid operation",
+      "all inventory/mount/slot/unknown UI variants",
+      "all route-goal sufficiency and battle guarantees"
+    ],
+    "next": "5-1 BCFJ／7-3第1 ACE／7-4 ABEJLP：既存auto夜戦CIの主砲3・主砲2副砲1・主砲1魚雷1レシピが選択された時、魚雷2専用の艦別搭載先helperがnullになる共通候補。既存数量/任意推奨を維持し、実モデルの最小対照で先に確定する。静的候補のみ・未実装/実操作未実施。空母夜戦の既知停止調査へは広げない。"
   }
 }

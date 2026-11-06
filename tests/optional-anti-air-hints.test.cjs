@@ -3,6 +3,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
 const {createTwoFiveCeioModelContext}=require('./fixtures/two-five-ceio-model-context.cjs');
 const {createOptionalAntiAirHistoricalProjection}=require('./fixtures/optional-anti-air-source-layer.cjs');
+const {createCarrierGuidanceHistoricalProjection}=require('./fixtures/carrier-guidance-source-layer.cjs');
 const ROOT=path.resolve(__dirname,'..'),host=x=>JSON.parse(JSON.stringify(x)),hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 function context(options={}){return createTwoFiveCeioModelContext(options)}
 function selected(h,map,index){return {index,preset:host(h.value(`MAP_PLANS[${JSON.stringify(map)}].presets[${index}]`))}}
@@ -31,9 +32,9 @@ function material(map,index){
 function actualGoals(h){const {c,plan}=h,se=c.hdSEChecks(h.map).rows,fe=c.hdFEEquipmentRequirements(plan,se),fl=c.hdFLRequirements(plan),measure=c.hdOCMeasure(plan,fl);return host({profiles:c.hdSEProfiles(h.map),se,fe,fl,goals:measure.goals,requiredChecks:measure.requiredChecks})}
 
 test('optional AA approved inverse restores and replays the exact preceding UI sources',()=>{
- const project=createOptionalAntiAirHistoricalProjection(ROOT),approved=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/optional-anti-air-approved-source-inverses.json'),'utf8'));
+ const project=createOptionalAntiAirHistoricalProjection(ROOT),projectCarrier=createCarrierGuidanceHistoricalProjection(ROOT),approved=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/optional-anti-air-approved-source-inverses.json'),'utf8'));
  assert.equal(approved.schemaVersion,1);assert.equal(approved.beforeSourceHEAD,'ba762601583d06a777420dc2f033180c6b3abb25');assert.deepEqual(Object.keys(approved.files).sort(),['owned-equipment-planner.js','sortie-equipment-check.js']);
- for(const [file,row]of Object.entries(approved.files)){const current=fs.readFileSync(path.join(ROOT,file),'utf8'),previous=project(file,current);assert.equal(hash(current),row.approvedAfterSHA256);assert.equal(hash(previous),row.beforeSHA256);assert.notEqual(previous,current);assert.throws(()=>project(file,current+'\n'));assert.throws(()=>project(file,previous))}assert.equal(project('unrelated-source.js','unchanged'),'unchanged');
+ for(const [file,row]of Object.entries(approved.files)){const raw=fs.readFileSync(path.join(ROOT,file),'utf8'),current=projectCarrier(file,raw),previous=project(file,raw);assert.equal(hash(current),row.approvedAfterSHA256);assert.equal(hash(previous),row.beforeSHA256);assert.notEqual(previous,current);assert.throws(()=>project(file,raw+'\n'));assert.throws(()=>project(file,previous))}assert.equal(project('unrelated-source.js','unchanged'),'unchanged');
 });
 
 test('the old map-wide negative omits AA examples while the new independent display channel leaves old needs untouched',()=>{

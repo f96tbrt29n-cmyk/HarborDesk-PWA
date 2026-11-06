@@ -907,3 +907,100 @@ test('owned ship warnings appear despite complete equipment and refresh without 
  await panel.locator('[data-hd-oc-search]').click();await expect(panel.locator('[data-hd-oc-review-id^="owned-ships-"]')).toHaveCount(0);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
+
+// Starter-carrier batch: real registered requirements, aircraft legality and
+// bounded search. Existing helpers above install synthetic rules and are not used.
+const starterCarrierExpect=expect.configure({timeout:12000});
+async function bootStarterCarrierGuidance(page,errors){
+ const version=require('../app-version.json');
+ page.on('pageerror',error=>errors.push('pageerror: '+error.message));
+ page.on('console',message=>{if(message.type()==='error'&&!/Failed to load resource/i.test(message.text()))errors.push('console: '+message.text())});
+ await page.context().route('**/*',route=>{
+  const request=route.request();let url;try{url=new URL(request.url())}catch{return route.continue()}
+  const versionUrl=(url.origin==='https://raw.githubusercontent.com'&&url.pathname==='/f96tbrt29n-cmyk/HarborDesk-PWA/main/app-version.json')||(url.origin==='http://127.0.0.1:4173'&&url.pathname==='/app-version.json');
+  if(request.method()==='GET'&&versionUrl)return route.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:JSON.stringify({version:version.version,build:version.build})});
+  return ['localhost','127.0.0.1'].includes(url.hostname)||['blob:','data:'].includes(url.protocol)?route.continue():route.fulfill({status:204,body:''});
+ });
+ await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCStarterCarrierScope==='function'&&typeof hdOCSearchAsync==='function'&&typeof hdSelectGuideMap==='function',null,{timeout:12000});
+}
+function seedStarterCarrierGuidance({map,id}){
+ const names=map==='1-3'?['飛鷹改','夕張改二特','夕立改二','時雨改二','綾波改二','島風改']:['飛鷹改','隼鷹改','夕立改二','時雨改二','綾波改二','島風改'];
+ const rows=names.map((name,index)=>{
+  const db=hdFEFindShip(name),master=db&&hdShipDbMasterRowFor(db),profile=db&&hdShipDbSlotProfile(db);
+  if(!master||!Number.isInteger(profile?.count))throw Error('starter-carrier fixture hull or normal slots missing');
+  const isCarrier=index===0||map==='1-4'&&index===1,gear=Array(profile.count).fill('');if(isCarrier)gear[0]='試製烈風 後期型';
+  return {id:id+'-'+index,name,masterId:master.id,gameShipId:680000+(map==='1-4'?10:0)+index,level:90,gameSlotEx:1,gameAswGearKnown:true,gameGearSlots:gear,gameGearExpansion:'',metadata:{keep:index,nested:{keep:true}}};
+ });
+ const carrierCount=map==='1-3'?1:2,inventory=[{name:'試製烈風 後期型',star:0,count:carrierCount},...(map==='1-4'?[{name:'流星',star:0,count:1}]:[])];
+ localStorage.setItem(SHIP_ROSTER_KEY,JSON.stringify(rows));localStorage.setItem(HD_FL_KEY,JSON.stringify(inventory));
+ localStorage.setItem('harbordesk-kancolle-sync-v1',JSON.stringify({admiralLevel:120,metadata:{keep:true}}));
+ localStorage.setItem('harbordesk-kancolle-fleets-v1',JSON.stringify([{deckId:1,ships:rows.map(row=>({gameShipId:row.gameShipId,gearKnown:true}))}]));
+ localStorage.setItem('harbordesk-pwa-v1',JSON.stringify(blankState()));
+ const fleet={id,name:'synthetic starter-carrier placement',memo:'keep existing memo',routeGoal:map==='1-3'?'cfj':'normal',openingAswCount:0,routePreset:{...MAP_PLANS[map].presets[0]},metadata:{keep:true,nested:{order:['one','two']}},ships:rows.map(row=>({ship:row.name,rosterId:row.id,masterId:row.masterId,gameShipId:row.gameShipId,gear:row.gameGearSlots.join(' / '),metadata:row.metadata}))};
+ saveCustomFleets({[map]:[fleet],'1-1':[{id:'starter-carrier-other',name:'other fleet',memo:'keep other memo',ships:[],metadata:{keep:true}}]});
+ localStorage.setItem(HD_PROCUREMENT_KEY,JSON.stringify([{id:'starter-carrier-untouched',map:'1-1',gearItems:[],metadata:{keep:true}}]));
+ localStorage.setItem(HD_FC_KEY,JSON.stringify({'1-1:unrelated':{metadata:{keep:true}}}));hdMapRouteSet(map,0);
+ const c=hdOCContext(map,id,0),built=hdOCBuild(c),requirements=hdFEEquipmentRequirements(built.plan,hdSEChecks(map).rows),goal=hdOCMeasure(built.plan,hdSEChecks(map).rows,built.unknown).goals.find(row=>row.kind==='cap-carrier-attack');
+ if(!goal||goal.minCount!==carrierCount||goal.purpose!=='recommendation')throw Error('registered optional carrier goal differs from fixture expectation');
+ const keys=[CUSTOM_FLEET_KEY,SHIP_ROSTER_KEY,HD_FL_KEY,'harbordesk-kancolle-sync-v1','harbordesk-kancolle-fleets-v1','harbordesk-pwa-v1',HD_PROCUREMENT_KEY,HD_OC_ROUTE_GOAL_KEY,HD_OC_ASW_TARGET_KEY,HD_OC_ASW_SET_CHOICE_KEY];
+ return {values:keys.map(key=>[key,localStorage.getItem(key)]),otherPlanner:JSON.stringify(hdFCLoadAll()['1-1:unrelated']),definitions:JSON.stringify({plans:MAP_PLANS[map],requirements:HD_MAP_ROUTE_REQUIREMENTS[map]}),goals:JSON.stringify(requirements.map(({kind,minCount,purpose,generatedFromMap})=>({kind,minCount,purpose,generatedFromMap}))),carrierCount,routeGoal:fleet.routeGoal};
+}
+async function openStarterCarrierEntry(page,{map,id,entry}){
+ if(entry==='navigator'){
+  await page.evaluate(map=>hdMSNOpen(map),map);
+  const panel=page.locator('#mapStrategyNavigator .hd-oc-panel');await starterCarrierExpect(panel).toHaveAttribute('data-hd-oc-fleet',id);return panel;
+ }
+ await page.evaluate(map=>hdSelectGuideMap(map),map);
+ await page.locator('[data-hd-ws-group="guide"]').click();await page.locator('#selectedMapCard [data-map-tab="mine"]').click();
+ const card=page.locator('#customFleetPanel [data-cf-id="'+id+'"]');await starterCarrierExpect(card).toBeVisible();return card;
+}
+function inspectStarterCarrierGuidance({map,id,ref,doc}){
+ const c=hdOCContext(map,id,0),result=HD_OC_CACHE.get(map+':'+id+':0');if(!result)throw Error('starter-carrier search result missing');
+ const goal=result.measure.goals.find(row=>row.kind==='cap-carrier-attack'),shortage=result.shortages.find(row=>row.goalKind==='cap-carrier-attack');
+ if(!goal||!shortage||!Array.isArray(shortage.carrierTargets))throw Error('starter-carrier optional placement result missing');
+ const requirements=hdFEEquipmentRequirements(result.plan,hdSEChecks(map).rows),rows=shortage.carrierTargets,unfilled=[],assigned=[],names=[];
+ let attackCount=0,normalAircraftLegal=true,expansionAircraftAbsent=true;
+ for(const [shipIndex,ship] of result.plan.ships.entries()){
+  const db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db),carrier=['軽空母','正規空母','装甲空母'].includes(db?.type),complete=carrier&&hdSECapabilityMeasure({ships:[ship]},'cap-carrier-attack').count>0;
+  if(carrier)(complete?assigned:unfilled).push(shipIndex);
+  for(const item of ship.items||[]){const meta=hdFEFind(item.name);if(meta&&hdSEPartMatches('carrierAttackPlane',meta)){attackCount++;names.push(item.name);normalAircraftLegal&&=Number.isInteger(item.slotIndex)&&item.slotIndex>=0&&item.slotIndex<profile.count&&Number(profile.slots[item.slotIndex])>0&&hdOCCompatible({si:shipIndex,index:item.slotIndex,db,profile,capacity:profile.slots[item.slotIndex]},{item:meta,star:item.star||0});}}
+  if(ship.expansion?.name&&hdSEPartMatches('carrierAttackPlane',hdFEFind(ship.expansion.name)))expansionAircraftAbsent=false;
+ }
+ const planner=hdFCLoadAll(),own=planner[map+':owned:'+id+':0'],ownProposal=own?.proposal;
+ const noEphemeralKeys=value=>!value||typeof value!=='object'||Object.entries(value).every(([key,child])=>!['placementScope','carrierTargets','normalOnly'].includes(key)&&noEphemeralKeys(child));
+ return {storageExact:ref.values.every(([key,value])=>localStorage.getItem(key)===value),stableKeyCount:ref.values.length,otherPlannerExact:JSON.stringify(planner['1-1:unrelated'])===ref.otherPlanner,definitionsExact:JSON.stringify({plans:MAP_PLANS[map],requirements:HD_MAP_ROUTE_REQUIREMENTS[map]})===ref.definitions,goalDefinitionsExact:JSON.stringify(requirements.map(({kind,minCount,purpose,generatedFromMap})=>({kind,minCount,purpose,generatedFromMap})))===ref.goals,routeGoalExact:result.plan.routeGoal===ref.routeGoal,routeStatus:hdFEBranchRoute(result.plan).status,routeFixed:hdFEBranchRoute(result.plan).fixedPath,goalMinCount:goal.minCount,goalCount:goal.count,goalPurpose:goal.purpose,attackCount,assigned,unfilled,attackNames:names,normalAircraftLegal,expansionAircraftAbsent,masterInvalidCount:hdFEMasterValidation(result.plan).invalid.length,rows:rows.map(row=>({ship:row.ship,shipIndex:row.shipIndex,status:row.status,reason:row.reason,count:row.count,normalOnly:row.normalOnly,placementScope:row.placementScope,slots:row.slots})),ownPlannerPresent:!!ownProposal,ownPlannerRouteGoalExact:ownProposal?.routeGoal===ref.routeGoal,ownPlannerGearCount:own?.gear?.length??null,ephemeralNotSaved:noEphemeralKeys(planner),sameDocument:doc==null?null:doc===performance.timeOrigin};
+}
+function starterCarrierSharedSummary(evidence,project,retry){
+ const int=x=>Number.isSafeInteger(x)&&x>=0?x:null,bool=x=>typeof x==='boolean'?x:null;
+ return {schemaVersion:1,unit:'starter-carrier-placement',entry:evidence.entry,project:['chromium','webkit'].includes(project)?project:null,sourceSHA:/^[0-9a-f]{40}$/.test(process.env.GITHUB_SHA||'')?process.env.GITHUB_SHA:null,version:require('../app-version.json').version,stage:evidence.stage,retry:int(retry),pageerrorCount:int(evidence.pageerrorCount),checkpoints:evidence.checkpoints.map(row=>({id:row.id,goalMinCount:int(row.goalMinCount),goalCount:int(row.goalCount),attackCount:int(row.attackCount),candidateRowCount:int(row.candidateRowCount),normalAircraftLegal:bool(row.normalAircraftLegal),expansionAircraftAbsent:bool(row.expansionAircraftAbsent),storageExact:bool(row.storageExact),stableKeyCount:int(row.stableKeyCount),otherPlannerExact:bool(row.otherPlannerExact),definitionsExact:bool(row.definitionsExact),goalDefinitionsExact:bool(row.goalDefinitionsExact),routeGoalExact:bool(row.routeGoalExact),ownPlannerPresent:bool(row.ownPlannerPresent),ownPlannerRouteGoalExact:bool(row.ownPlannerRouteGoalExact),ephemeralNotSaved:bool(row.ephemeralNotSaved),sameDocument:bool(row.sameDocument),uiCandidateBindingExact:bool(row.uiCandidateBindingExact)})),checkpointDroppedCount:0,missingCheckpointCount:2-evidence.checkpoints.length,saveEditReexecuted:false,diagnosticObserverInstalled:false,storageValueBodiesIncluded:false};
+}
+for(const scenario of [{map:'1-3',id:'starter-c13',entry:'navigator',attackCount:0},{map:'1-4',id:'starter-c14',entry:'inline',attackCount:1}])test('starter carrier guidance '+scenario.entry+' names legal normal-slot candidates and preserves existing goals on reload',async({page},info)=>{
+ test.setTimeout(45000);const errors=[],evidence={entry:scenario.entry,stage:'boot',checkpoints:[],pageerrorCount:null};
+ try{
+  await bootStarterCarrierGuidance(page,errors);evidence.stage='seed';const ref=await page.evaluate(seedStarterCarrierGuidance,scenario);
+  for(const phase of ['initial','after-load']){
+   let doc=null;
+   if(phase==='after-load'){
+    evidence.stage='reload';await page.reload({waitUntil:'load'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCStarterCarrierScope==='function',null,{timeout:12000});doc=await page.evaluate(()=>performance.timeOrigin);
+   }
+   evidence.stage=phase+'-open';const host=await openStarterCarrierEntry(page,scenario);await starterCarrierExpect(host.locator('[data-hd-oc-route-goal]')).toHaveValue(ref.routeGoal);
+   evidence.stage=phase+'-search';await host.locator('[data-hd-oc-search]').click();await starterCarrierExpect(host.locator('.hd-oc-result')).toBeVisible();
+   evidence.stage=phase+'-candidate-display';const model=await page.evaluate(inspectStarterCarrierGuidance,{map:scenario.map,id:scenario.id,ref,doc});
+   expect(model).toMatchObject({storageExact:true,stableKeyCount:10,otherPlannerExact:true,definitionsExact:true,goalDefinitionsExact:true,routeGoalExact:true,routeStatus:'ready',goalMinCount:ref.carrierCount,goalCount:scenario.attackCount,goalPurpose:'recommendation',attackCount:scenario.attackCount,normalAircraftLegal:true,expansionAircraftAbsent:true,masterInvalidCount:0,ownPlannerPresent:true,ownPlannerRouteGoalExact:true,ephemeralNotSaved:true});
+   expect(model.rows).toHaveLength(1);expect(model.unfilled).toHaveLength(1);expect(model.rows.map(row=>row.shipIndex)).toEqual(model.unfilled);expect(model.assigned).toHaveLength(scenario.attackCount);if(scenario.attackCount)expect(model.attackNames).toEqual(['流星']);if(doc!=null)expect(model.sameDocument).toBe(true);if(scenario.map==='1-3')expect(model.routeFixed).toBe(true);
+   const hints=host.locator('[data-hd-oc-carrier-targets]');await starterCarrierExpect(hints).toHaveCount(1);await starterCarrierExpect(hints).toBeVisible();await starterCarrierExpect(hints.locator('[data-hd-oc-carrier-target-row]')).toHaveCount(1);
+   await starterCarrierExpect(hints.locator('..')).toContainText('艦上攻撃機・艦上爆撃機：所持'+scenario.attackCount+' / この装備例に必要'+ref.carrierCount);
+   for(const target of model.rows){
+    expect(target).toMatchObject({status:'candidate',reason:'candidate',count:1,normalOnly:true,placementScope:'starter-carrier'});expect(target.slots.length).toBeGreaterThan(0);
+    const row=hints.locator('[data-hd-oc-carrier-target-row="'+target.shipIndex+'"]');await starterCarrierExpect(row).toHaveAttribute('data-hd-oc-carrier-target-status','candidate');await starterCarrierExpect(row).toHaveAttribute('data-hd-oc-carrier-target-reason','candidate');await starterCarrierExpect(row).toContainText(target.ship+'：攻撃機の装備例1個');
+    for(const slot of target.slots){expect(slot.candidates.length).toBeGreaterThan(0);await starterCarrierExpect(row).toContainText('通常第'+(slot.index+1)+'枠');for(const name of slot.candidates)await starterCarrierExpect(row).toContainText(name);}
+   }
+   await starterCarrierExpect(hints.locator('[data-hd-oc-carrier-scope-note]')).toContainText('搭載先は通常枠のみ');await starterCarrierExpect(hints).toContainText('補強増設はこの攻撃機配備の対象に含めません');await starterCarrierExpect(hints).toContainText('通行の必須数や購入数量ではありません');await starterCarrierExpect(hints).toContainText('現在の装備との交換');await starterCarrierExpect(hints).toContainText('同時配備の成立や購入数量を保証しません');await starterCarrierExpect(hints).not.toContainText('購入必須');
+   evidence.checkpoints.push({id:phase,...model,candidateRowCount:model.rows.length,uiCandidateBindingExact:true});
+  }
+  expect(errors).toEqual([]);evidence.stage='completed';
+ }finally{
+  evidence.pageerrorCount=errors.filter(error=>error.startsWith('pageerror: ')).length;const path=info.outputPath('carrier-placement-ui-summary.json');await require('node:fs/promises').writeFile(path,JSON.stringify(starterCarrierSharedSummary(evidence,info.project.name,info.retry),null,2)+'\n');await info.attach('carrier-placement-ui-summary',{path,contentType:'application/json'});
+ }
+});

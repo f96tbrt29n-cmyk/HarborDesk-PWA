@@ -109,3 +109,4 @@ test('air input stop requires actual selectable map data, never a fallback capac
  const c={hdMapAirData:map=>map==='5-3'?{nodes:{Q:{}}}:null,hdMapAirTarget:()=>({selected:false})},check=load('owned-equipment-planner.js','hdOCUnselectedAir',c);assert.equal(check('5-3'),true);assert.equal(check('fallback-only'),false);c.hdMapAirTarget=()=>({selected:true});assert.equal(check('5-3'),false);c.hdMapAirTarget=()=>null;assert.equal(check('5-3'),false);
 });
 require('./optional-anti-air-hints.test.cjs');
+require('./carrier-placement-guidance.test.cjs');
