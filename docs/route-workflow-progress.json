@@ -3316,9 +3316,9 @@
       "6-5/1/default"
     ],
     "record": "scoutingOptionalGuidanceBatch20261107",
-    "state": "shared inspection and optional qualification/local760 and4 initial UI verified; final-source smoke pending"
+    "state": "shared inspection/local760 and4 initial UI verified; pushed sourcee625d5d8; one CI dispatch request returned500, run unconfirmed; next ASW2 counterexamples verified without product change"
   },
-  "nextPriority": "1-6下/7-5第3の既存任意ASW sonar-projectorセットの艦別具体搭載先。同型caller/helper除外の静的候補、既存set1と先制対潜人数を分離。actual2producer対照準備中・製品/新実画面未実施。",
+  "nextPriority": "1-6下AEGFBN／7-5第3ABDFJOPTの既存任意ASWセット具体搭載先。actual2producer対照が初回2成功で同型未接続を確認、supported helper対照1回、製品/実画面は未変更。現索敵sourceのCI起動API500/登録未確認を残し、再POSTは行わない。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -22901,14 +22901,29 @@
         "navigatorAfterAddAndReload": 9,
         "inline": 10
       },
-      "summarySHA256": "9140602028925f1f900bac85bd063411be249b6a059bedeb3eac7ff2ec0129df"
+      "summarySHA256": "9140602028925f1f900bac85bd063411be249b6a059bedeb3eac7ff2ec0129df",
+      "independentReviewSHA256": "17dc3427b4ef544707c88fcdf0f731626750ab2d0d8c0eae1f85291aaee84c9a"
     },
-    "finalSource": null,
+    "finalSource": "e625d5d89a7a328c465ec05e36fac217e7046152",
     "ci": {
-      "state": "final-source normal smoke pending",
-      "normalRunsPlanned": 1,
+      "state": "initiation blocked; registered run unconfirmed",
+      "sourceSHA": "e625d5d89a7a328c465ec05e36fac217e7046152",
+      "dispatchRequests": 1,
+      "dispatchHTTPStatus": 500,
+      "dispatchCLIExit": 1,
+      "registeredRunId": null,
+      "observedRunCount": 0,
+      "sameSHAReadOnlyChecks": "before dispatch twice; immediately after and independent94s+ after claim all0",
+      "acceptanceNotInferred": true,
+      "passedFlakyFailed": {
+        "chromium": null,
+        "webkit": null
+      },
       "reruns": 0,
-      "workflowChange": "one compact summary upload glob only"
+      "repeatPOST": false,
+      "notesAndArtifacts": "No runID available; no official case outcomes or trial artifacts. Local passes do not fill this gap.",
+      "proof": "private/ci-bootstrap/dispatch-claim.json,dispatch-response.json,runs-after-dispatch.json; independent delayed query record",
+      "safeIndependentWork": "Next optional-ASW named-destination counter only, no further product changes/new browser run/normalCI."
     },
     "oldCIPreserved": "CI42289929859 and earlier failures/caller/value gaps remain trial-specific, not filled by new local results.",
     "date": "2026-11-07 JST",
@@ -22987,7 +23002,26 @@
       "backfill": false
     },
     "proof": "continuation-scouting-optional-guidance-batch-20261107/private/; shared/local-results.json allowed metadata only",
-    "next": "1-6下/7-5第3の既存任意ASW sonar-projectorセットの艦別具体搭載先。同型caller/helper除外の静的候補、既存set1と先制対潜人数を分離。actual2producer対照準備中・製品/新実画面未実施。"
+    "next": "1-6下AEGFBN／7-5第3ABDFJOPTの既存任意ASWセット具体搭載先。actual2producer対照が初回2成功で同型未接続を確認、supported helper対照1回、製品/実画面は未変更。現索敵sourceのCI起動API500/登録未確認を残し、再POSTは行わない。",
+    "ciBeforeInitiation": {
+      "state": "final-source normal smoke pending",
+      "normalRunsPlanned": 1,
+      "reruns": 0,
+      "workflowChange": "one compact summary upload glob only"
+    },
+    "nextBaseline": {
+      "sourceSHA": "e625d5d89a7a328c465ec05e36fac217e7046152",
+      "logicalCases": 2,
+      "physicalNodeRuns": 1,
+      "initialPassed": 2,
+      "failed": 0,
+      "supportedHelperControlCount": 1,
+      "productChanges": 0,
+      "browserRuns": 0,
+      "newNormalCI": 0,
+      "proofSHA256": "2ed0ae8586e53e51b454ccf6ad99e3ed229a903640e3863e41cc5c48e21369a1",
+      "finding": "Actual optional cap-asw1/sonar-projector shortage and legal same-hull two-normal-slot witness exist on1-6lower and7-5third, but actual producer/helper omit named destinations. Opening unselected and explicit0 remain separate."
+    }
   },
   "selectedBeforeScoutingOptionalGuidanceBatch20261107": {
     "id": "soft-land-guidance-batch",
