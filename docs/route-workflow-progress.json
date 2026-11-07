@@ -3318,7 +3318,7 @@
       "7-5/2/default"
     ],
     "record": "optionalAswDestinationBatch20261107",
-    "state": "shared optional ASW guidance; first CI classified; old stock UI oracle corrected, necessary ordinary C/W save/edit/load passed; corrected-source smoke pending"
+    "state": "shared optional ASW named-pair guidance complete in the limited scope; local771/newUI4/necessary ordinary stock2 and corrected-source CI target6 complete; unrelated hidden-click failures/gaps retained; next AIR private prep ready"
   },
   "nextPriority": "3-3 ACGM／3-4 ACEGJPの汎用制空2個と数値制空条件の案内分離。実producer2scopeの不備をNodeで確認。初回群は4-1のgoal未生成で停止、未到達3controlだけ別群で成功。4-1は除外（制空不要記述が既存全体推論に作用、goal強制なし）。private5anchor案まで・次製品/実画面未実施。",
   "previousSelected": {
@@ -23250,8 +23250,100 @@
       "canonicalSHA256": "2f23f8ab07d1553e1f1e662b91e046e5f8aad732bcbc49dfae8e86ba087ce1a4",
       "manifestSHA256": "a7dff3c34f5e43af757d6a3d3374aaf4cf971cb95ae75cc733e80bb01ed3ec9e",
       "independentReviewSHA256": "828ad6c9954116b2e49e08f0d4b149d17ad3f3501f657cc29d9747ae4df46416",
-      "correctedSourceSmoke": "one necessary run pending after grounded test-oracle correction; no same-SHA rerun",
-      "priorSourceBackfilled": false
+      "correctedSourceSmoke": "completed after one necessary corrected-source run; no same-SHA rerun",
+      "priorSourceBackfilled": false,
+      "correctedNormalSmoke": {
+        "sourceSHA": "c71d3896da70f957ee5cc9ff8f164ce0b00cfaf5",
+        "runId": 42376362757,
+        "runAttempt": 1,
+        "conclusion": "failure",
+        "jobTotals": {
+          "success": 5,
+          "failure": 1,
+          "fullSkipped": 1
+        },
+        "passedFlakyFailed": {
+          "chromium": {
+            "passed": 922,
+            "flaky": 0,
+            "failed": 0
+          },
+          "webkit": {
+            "passed": 902,
+            "flaky": 19,
+            "failed": 1
+          }
+        },
+        "newASWLogical": 4,
+        "newASWInitialCompletedPassed": 4,
+        "ordinaryG3StockInitialCompletedPassed": 2,
+        "ordinaryG3SavedAndLoadIdentityFieldsPerCase": 30,
+        "ordinaryG3LoadWholeStringSameDocument": true,
+        "ordinaryG3SavedCustomDifference": "intentional application/memo edit, not a mismatch",
+        "remainingFinalFailure": "WebKit6-1 AFGHK stock initial/retry: load after re-search click not visible; post-load whole comparison not reached, caller/cause/raw values missing. No new ASW relationship established.",
+        "otherAttemptLimit": "19flaky are logical final outcomes, not a strict initial-success/physical-trial conversion.5-3 unknown initial sameDocument=false is distinct; CUSTOM standalone result missing. All initial/retry annotations/gaps remain separate.",
+        "canonicalSHA256": "70b8dccc968f7c7180076a587742f09f68329a08dae4adaefdb20f5a8949b889",
+        "manifestSHA256": "3a1446a23d0056eb33a7e8e9c1bc714db7e7652ab51ca6b8f36028f48edb936c",
+        "independentReviewSHA256": "a01730bec0dc207bb66fe98d8b3f7ec185d3f71ef429afb6e56edce06d05a6a8",
+        "audit": "PASS",
+        "gaps": [
+          "Raw saved-value JSON and traces were not retrieved; detailed check reachability uses same-attempt annotation plus source control-flow.",
+          "Unknown per-attempt stopping checks stay explicitly unknown; retry success does not fill the initial attempt.",
+          "Large raw diagnostic archives are not locally acquired; job/post-upload status is separate from completed compact case results.",
+          "Prior e625 HTTP500 request acceptance remains unknown; this different-source CI does not backfill it.",
+          "Prior ebcc case failures, stopping stages and missing evidence remain frozen separately.",
+          "Per-job exact Node footer counts were not acquired; official Node gate status is separate.",
+          "Actual registry image digest was not observed; configured pin and receipt image name are separate."
+        ],
+        "sameHeadReruns": 0,
+        "priorSourceBackfilled": false,
+        "timingObservations": {
+          "priorW4Observations": [],
+          "currentW4": {
+            "preSeconds": 87.0,
+            "smokeSeconds": 919.0,
+            "postSeconds": 15.0,
+            "jobSeconds": 1021.0,
+            "uploadSteps": [
+              {
+                "name": "Preserve compact smoke results",
+                "conclusion": "success",
+                "seconds": 1.0
+              },
+              {
+                "name": "Preserve seven-three first-gauge comparison summary",
+                "conclusion": "success",
+                "seconds": 2.0
+              },
+              {
+                "name": "Upload Playwright diagnostics",
+                "conclusion": "skipped",
+                "seconds": 0.0
+              },
+              {
+                "name": "Preserve failed-attempt diagnostics after successful retries",
+                "conclusion": "success",
+                "seconds": 6.0
+              },
+              {
+                "name": "Preserve prerequisite import evidence including successful retries",
+                "conclusion": "success",
+                "seconds": 1.0
+              }
+            ]
+          },
+          "currentMaximumWebKitSmokeSeconds": 1704.0,
+          "currentMaximumWebKitJobSeconds": 1813.0,
+          "currentMaximumAllJobSeconds": 2114.0,
+          "currentChromiumFileWorkloadRef": {
+            "path": "analysis/chromium-workload-observation.json",
+            "bytes": 3552,
+            "sha256": "e51b79f050a08194dad90070bc04f0d528612f07bf99fd9354473f3b96d8392a"
+          },
+          "C2Cancellation": null,
+          "limit": "Necessary CI observation, not a performance experiment, stable guarantee or proof of older cancellation causes."
+        }
+      }
     },
     "matrix": {
       "before": [
@@ -23305,6 +23397,15 @@
       "baselineMetadataSHA256": "37864a991a4dce06d20fb7e3ef8c39781e7d026e3406a442da84a64433ffccec",
       "publicProductApplied": false,
       "browserExecutions": 0
+    },
+    "proofFinalization": "Both CI collections and local originals are separately source-bound/independently joined. Final inventory seal follows this record-only commit; no additional CI/browser execution.",
+    "nextPrivatePreparation": {
+      "product": "private/next-batch-design/air-count-optional-replacements-template-v1.json",
+      "node": "private/node-preparation/next-air-private-draft.json",
+      "ui": "private/next-air-ui-preparation/plan-v2.json",
+      "publicApplied": false,
+      "browserExecuted": false,
+      "oldOracleStaticScan": "private/next-air-ui-preparation/existing-oracle-static-review-v1.json"
     }
   },
   "selectedBeforeOptionalAswDestinationBatch20261107": {
