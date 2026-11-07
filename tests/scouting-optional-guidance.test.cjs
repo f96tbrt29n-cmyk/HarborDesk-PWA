@@ -3,6 +3,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
 const {createSurfaceNightModelContext}=require('./fixtures/surface-night-model-context.cjs');
 const {createScoutingOptionalHistoricalProjection}=require('./fixtures/scouting-optional-guidance-source-layer.cjs');
+const {createOptionalAswGuidanceHistoricalProjection}=require('./fixtures/optional-asw-guidance-source-layer.cjs');
 const ROOT=path.resolve(__dirname,'..'),host=x=>JSON.parse(JSON.stringify(x)),hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 const SCOPES=[
  {map:'2-5',index:0,path:'BFJO',coef:1,safe:49,los:41,names:['金剛改二','榛名改二','霧島改二','鈴谷改二','熊野改二','妙高改二']},
@@ -25,7 +26,7 @@ function inspection(u,result){const before=JSON.stringify({ctx:u.ctx,result}),st
 const generic=()=>({kind:'索敵',goalKind:'索敵',minCount:2,count:0,generatedFromMap:true,purpose:'recommendation'});
 
 test('scouting historical projection preserves exact preceding source and rejects unapproved or repeated projection',()=>{
- const project=createScoutingOptionalHistoricalProjection(ROOT),approved=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/scouting-optional-guidance-approved-source-inverses.json'),'utf8'));assert.equal(approved.schemaVersion,1);assert.equal(approved.beforeSourceHEAD,'48f6ebc89b24ca6d20991314551d8377bc98b6b6');assert.deepEqual(Object.keys(approved.files),['owned-equipment-planner.js']);const file='owned-equipment-planner.js',current=fs.readFileSync(path.join(ROOT,file),'utf8'),before=project(file,current);assert.equal(hash(before),'67aec284a14dfa667de52d92cc6c1f806b0f02f0b11c615ddb0326c19ecd2737');assert.equal(hash(current),approved.files[file].approvedAfterSHA256);assert.throws(()=>project(file,current+'\n'));assert.throws(()=>project(file,before));assert.equal(project('unrelated.js','same'),'same');
+ const project=createScoutingOptionalHistoricalProjection(ROOT),projectOptionalAsw=createOptionalAswGuidanceHistoricalProjection(ROOT),approved=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/scouting-optional-guidance-approved-source-inverses.json'),'utf8'));assert.equal(approved.schemaVersion,1);assert.equal(approved.beforeSourceHEAD,'48f6ebc89b24ca6d20991314551d8377bc98b6b6');assert.deepEqual(Object.keys(approved.files),['owned-equipment-planner.js']);const file='owned-equipment-planner.js',raw=fs.readFileSync(path.join(ROOT,file),'utf8'),current=projectOptionalAsw(file,raw),before=project(file,raw);assert.equal(hash(before),'67aec284a14dfa667de52d92cc6c1f806b0f02f0b11c615ddb0326c19ecd2737');assert.equal(hash(current),approved.files[file].approvedAfterSHA256);assert.throws(()=>project(file,raw+'\n'));assert.throws(()=>project(file,before));assert.equal(project('unrelated.js','same'),'same');
 });
 
 test('only source-generated recommendation counts qualify on the four added selected scopes',()=>{

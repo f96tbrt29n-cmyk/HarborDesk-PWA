@@ -548,18 +548,22 @@
         },
         "C": {
           "status": "一部",
-          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。",
+          "reason": "同じ行の不足/未判定の代表を確認。全装備・全失敗区分の案内は未完。 任意ASW1組の部品内訳・同艦の合法別通常枠pair、登録/現在案/未使用、交換対象と未知/枠競合を共通処理で追加確認。実交換・交換後数値/条件維持は未評価。",
           "evidence": [
             "docs/asw-remaining-targets-ja.md",
-            "tests/owned-oasw-integration.spec.js"
+            "tests/owned-oasw-integration.spec.js",
+            "tests/optional-asw-destination-guidance.test.cjs",
+            "tests/owned-equipment-planner.spec.js",
+            "docs/route-workflow-progress.json#optionalAswDestinationBatch20261107"
           ]
         },
         "D": {
           "status": "一部",
-          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。",
+          "reason": "保存/load・目標変更等の同じ行の代表証拠あり。編集を含む全列挙の操作/比較を一括確認とはしない。 保存形式不変の同じ行の既存保持証拠を分離再利用し、今回のreadonly案内だけC/W同reload文書の再表示・10キー/metadata/非永続を追加確認。新しい保存編集の実行とはしない。",
           "evidence": [
             "docs/asw-remaining-targets-ja.md",
-            "tests/owned-oasw-integration.spec.js"
+            "tests/owned-oasw-integration.spec.js",
+            "docs/route-workflow-progress.json#optionalAswDestinationBatch20261107"
           ]
         }
       },
@@ -3095,18 +3099,22 @@
         },
         "C": {
           "status": "一部",
-          "reason": "経路成立、既存任意航空攻撃0/1不足、制空manual、部品不足と未知安全中止を分離する限定実操作を確認。thirdのcarrier/ASW具体搭載先helperは未接続、全装備/競合は未網羅。",
+          "reason": "経路成立、既存任意航空攻撃0/1不足、制空manual、部品不足と未知安全中止を分離する限定実操作を確認。thirdのcarrier/ASW具体搭載先helperは未接続、全装備/競合は未網羅。 任意ASW1組の部品内訳・同艦の合法別通常枠pair、登録/現在案/未使用、交換対象と未知/枠競合を共通処理で追加確認。実交換・交換後数値/条件維持は未評価。",
           "evidence": [
             "docs/pr152-seven-five-third-ja.md",
-            "tests/route-seven-five-third.spec.js"
+            "tests/route-seven-five-third.spec.js",
+            "tests/optional-asw-destination-guidance.test.cjs",
+            "tests/owned-equipment-planner.spec.js",
+            "docs/route-workflow-progress.json#optionalAswDestinationBatch20261107"
           ]
         },
         "D": {
           "status": "確認済み",
-          "reason": "source1b4/CI41086731653の同定済みinitial C3+W成立/未知5fullとW不足retry1fullで、同じ行6代表の保存/適用可能な編集/同一reload文書load全文・strict30・他編成/metadata保持を直接確認。初回限定/flaky除外を追加しない。W不足初回と旧localW成立の未到達・旧Cknown期待失敗は別履歴として保持。",
+          "reason": "source1b4/CI41086731653の同定済みinitial C3+W成立/未知5fullとW不足retry1fullで、同じ行6代表の保存/適用可能な編集/同一reload文書load全文・strict30・他編成/metadata保持を直接確認。初回限定/flaky除外を追加しない。W不足初回と旧localW成立の未到達・旧Cknown期待失敗は別履歴として保持。 保存形式不変の同じ行の既存保持証拠を分離再利用し、今回のreadonly案内だけC/W同reload文書の再表示・10キー/metadata/非永続を追加確認。新しい保存編集の実行とはしない。",
           "evidence": [
             "docs/pr152-seven-five-third-ja.md",
-            "tests/route-seven-five-third.spec.js"
+            "tests/route-seven-five-third.spec.js",
+            "docs/route-workflow-progress.json#optionalAswDestinationBatch20261107"
           ]
         }
       },
@@ -3299,26 +3307,20 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "scouting-optional-guidance-batch",
-    "baselineHead": "48f6ebc89b24ca6d20991314551d8377bc98b6b6",
+    "id": "optional-asw-destination-guidance-batch",
+    "baselineHead": "3217e5aba223cac52526e132a22a3f8ac8ff516f",
     "scope": [
-      "2-5/0/default",
-      "4-5/1/default",
-      "6-5/0/default",
-      "6-5/1/default"
+      "1-6/0/default",
+      "7-5/2/default"
     ],
     "executedUIScopes": [
-      "2-5/0/default",
-      "4-5/1/default"
+      "1-6/0/default",
+      "7-5/2/default"
     ],
-    "NodeOnlyScopes": [
-      "6-5/0/default",
-      "6-5/1/default"
-    ],
-    "record": "scoutingOptionalGuidanceBatch20261107",
-    "state": "shared inspection/local760 and4 initial UI verified; pushed sourcee625d5d8; one CI dispatch request returned500, run unconfirmed; next ASW2 counterexamples verified without product change"
+    "record": "optionalAswDestinationBatch20261107",
+    "state": "shared named normal-pair guidance/local coverage771 with one necessary fixture repair;4 first UI passed; final-source smoke pending"
   },
-  "nextPriority": "1-6下AEGFBN／7-5第3ABDFJOPTの既存任意ASWセット具体搭載先。actual2producer対照が初回2成功で同型未接続を確認、supported helper対照1回、製品/実画面は未変更。現索敵sourceのCI起動API500/登録未確認を残し、再POSTは行わない。",
+  "nextPriority": "3-3 ACGM／3-4 ACEGJP／4-1 CFDGJ・ABDGJの汎用制空2個を任意目安と数値制空から分離する共通consumer候補。静的gapとprivate対照準備までで、新actualcounter/製品/実画面は未実施。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -23037,5 +23039,221 @@
     "record": "softLandGuidanceBatch20261107",
     "state": "shared safe guidance/local749 and4 initial UI verified; one final-source smoke collected; next shared scouting consumer baseline and private patch prepared"
   },
-  "nextPriorityBeforeScoutingOptionalGuidanceBatch20261107": "2-5北BFJO／4-5中央ADHKT・CDHKT／6-5上下の、数値索敵とは別の汎用装備個数を任意目安として示す共通consumer接続。初回Nodeの到達assertで4scopeの同型不足と既存2scope/明示目標/数値gap0を確認（最終finding JSON未出力）。HQ欠測の数値goal存在を誤期待した原本を保持し、訂正HQ境界＋初回未到達no-LOSの2境界だけを確認、既通過6scope再実行0。private最小1anchor patch・回帰設計まで準備済み、次の製品適用/ブラウザー/追加CIは0。"
+  "nextPriorityBeforeScoutingOptionalGuidanceBatch20261107": "2-5北BFJO／4-5中央ADHKT・CDHKT／6-5上下の、数値索敵とは別の汎用装備個数を任意目安として示す共通consumer接続。初回Nodeの到達assertで4scopeの同型不足と既存2scope/明示目標/数値gap0を確認（最終finding JSON未出力）。HQ欠測の数値goal存在を誤期待した原本を保持し、訂正HQ境界＋初回未到達no-LOSの2境界だけを確認、既通過6scope再実行0。private最小1anchor patch・回帰設計まで準備済み、次の製品適用/ブラウザー/追加CIは0。",
+  "optionalAswDestinationBatch20261107": {
+    "date": "2026-11-07 JST",
+    "baseHEAD": "3217e5aba223cac52526e132a22a3f8ac8ff516f",
+    "priorSource": "e625d5d89a7a328c465ec05e36fac217e7046152",
+    "scope": [
+      "1-6/0/default AEGFBN",
+      "7-5/2/default ABDFJOPT"
+    ],
+    "source": "Existing registered route references and docs/asw-remaining-targets-ja.md reused. Existing optional set1 preserved; sufficient set quantity, opening-ASW people/activation, passage and victory are separate.",
+    "recipe": {
+      "id": "sonar-projector",
+      "perSetParts": [
+        {
+          "part": "sonar",
+          "count": 1
+        },
+        {
+          "part": "projector",
+          "count": 1
+        }
+      ],
+      "quantityBasis": "existing optional comparison only, not required procurement or sufficient fleet count"
+    },
+    "implementation": "Reuse existing hdOCFourOneAswTargets once in thin new-scope projection, canonical selected paths and generated recommendation only. Same-hull distinct permitted normal frames form explicit pairs; independent part fit never proves a set. Keep catalog validity separate from registered/current/unused and reference joint stock. Show actual current equipment/replacement; no new solver or automatic apply/save.",
+    "classification": "Known incompatibility/permitted-frame or joint-frame conflict remain blocked, unknown hull/master/compatibility stays manual; definite impossible part survives another unknown. A known pair outside allowed frames cannot settle unknown compatibility inside.",
+    "unassessed": [
+      "post-swap ASW values and opening-ASW activation",
+      "preservation of already-ready conditions/user goals after a proposed replacement",
+      "expansion alternative configurations",
+      "all inventory/equipment variants and sufficient fleet-wide set count"
+    ],
+    "productSHA256": "f4abc1ca94c9a24092121277d006f40d607e50dd2d0ee136493b681c9a770ffd",
+    "beforeCounterReuse": {
+      "logical": 2,
+      "physicalNodeRuns": 1,
+      "reruns": 0,
+      "sourceSHA": "e625d5d89a7a328c465ec05e36fac217e7046152",
+      "proofSHA256": "2ed0ae8586e53e51b454ccf6ad99e3ed229a903640e3863e41cc5c48e21369a1"
+    },
+    "node": {
+      "requiredLogicalTests": 771,
+      "firstFull": {
+        "ok": false,
+        "results": [
+          {
+            "id": "normal-node-suite",
+            "exit": 1,
+            "signal": null,
+            "tests": 771,
+            "pass": 770,
+            "fail": 1,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        ]
+      },
+      "necessaryScopedRepair": {
+        "ok": true,
+        "results": [
+          {
+            "id": "scoped-node-repair",
+            "exit": 0,
+            "signal": null,
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        ],
+        "browserExecutions": 0
+      },
+      "firstFailure": "test fixture selected undefined nonexistent preset, so the actual saved-route fallback remained valid",
+      "onlyFailedGroupCorrected": true,
+      "unchangedSuccessfulTestsReused": 770,
+      "fullSuiteRerun": false,
+      "coverageCompleteAfterScopedRepair": true,
+      "productSourceChangedDuringRepair": false
+    },
+    "local": {
+      "logical": 4,
+      "physical": 4,
+      "initialPassed": 4,
+      "failed": 0,
+      "workers": 1,
+      "retries": 0,
+      "executedUI": [
+        "1-6/0 navigator",
+        "7-5/2 inline"
+      ],
+      "storageKeysExact": 10,
+      "sameReloadDocumentNewDisplay": true,
+      "fleetSaveEditReexecuted": false,
+      "equipmentSwapsApplied": false,
+      "procurementReexecuted": false,
+      "scopeNotPersisted": true,
+      "summarySHA256": "7c0c8bb69ef7be49a63b158bb8de403f25c32c10520c922a24d0bd347cc7f087"
+    },
+    "preflight": {
+      "ok": true,
+      "normalCounts": {
+        "chromium": 922,
+        "webkit": 922
+      },
+      "wholeFileBins": [
+        {
+          "shard": 1,
+          "files": 16,
+          "cases": 339,
+          "estimatedSeconds": 1957
+        },
+        {
+          "shard": 2,
+          "files": 22,
+          "cases": 164,
+          "estimatedSeconds": 1967
+        },
+        {
+          "shard": 3,
+          "files": 22,
+          "cases": 235,
+          "estimatedSeconds": 1957
+        },
+        {
+          "shard": 4,
+          "files": 22,
+          "cases": 184,
+          "estimatedSeconds": 1956
+        }
+      ],
+      "webkitUnionExact": true,
+      "uniqueTestIDsExact": true,
+      "cases": [
+        {
+          "id": "chromium-navigator",
+          "selected": 1
+        },
+        {
+          "id": "chromium-inline",
+          "selected": 1
+        },
+        {
+          "id": "webkit-navigator",
+          "selected": 1
+        },
+        {
+          "id": "webkit-inline",
+          "selected": 1
+        }
+      ],
+      "browserExecutions": 0
+    },
+    "history": {
+      "layers": 14,
+      "exactEndpoints": 29,
+      "oldApprovedFixturesRepinned": false
+    },
+    "priorCIRequest": {
+      "sourceSHA": "e625d5d89a7a328c465ec05e36fac217e7046152",
+      "requestUTC": "2026-11-06T23:45:24.344470+00:00",
+      "workflow": "browser-regression.yml",
+      "branch": "codex/required-route-invariants",
+      "visibleMatchingRuns": 0,
+      "accepted": null,
+      "unacceptedProven": false,
+      "newDispatchRequestsForPriorSource": 0,
+      "currentViews": "full-SHA all-event and workflow/branch/since-request all-event views complete within returned view, both0",
+      "proofSHA256": "77abff61fd13908c327e1721f5ba3fff4507dd20bf659adfe9c5eb3935c63cdc",
+      "newBatchCIBackfillsPriorSource": false
+    },
+    "ci": {
+      "state": "final-source normal smoke pending",
+      "plannedNormalRuns": 1,
+      "reruns": 0,
+      "workflowChange": "one compact summary glob only"
+    },
+    "matrix": {
+      "before": [
+        28,
+        157,
+        51
+      ],
+      "after": [
+        28,
+        157,
+        51
+      ],
+      "changes": [],
+      "criteriaChanged": false,
+      "unexecutedRoutePromoted": false
+    },
+    "proof": "continuation-optional-asw-guidance-batch-20261107/private/; shared/local-results.json contains only allowed metadata",
+    "remaining": "All set quantities/source sufficiency and inventory variants;1-6D remains partial; unchanged old saving/display/access-control root causes/gaps; no actual swap or new fleet save/edit reexecution.",
+    "next": "3-3 ACGM／3-4 ACEGJP／4-1 CFDGJ・ABDGJの汎用制空2個を任意目安と数値制空から分離する共通consumer候補。静的gapとprivate対照準備までで、新actualcounter/製品/実画面は未実施。"
+  },
+  "selectedBeforeOptionalAswDestinationBatch20261107": {
+    "id": "scouting-optional-guidance-batch",
+    "baselineHead": "48f6ebc89b24ca6d20991314551d8377bc98b6b6",
+    "scope": [
+      "2-5/0/default",
+      "4-5/1/default",
+      "6-5/0/default",
+      "6-5/1/default"
+    ],
+    "executedUIScopes": [
+      "2-5/0/default",
+      "4-5/1/default"
+    ],
+    "NodeOnlyScopes": [
+      "6-5/0/default",
+      "6-5/1/default"
+    ],
+    "record": "scoutingOptionalGuidanceBatch20261107",
+    "state": "shared inspection/local760 and4 initial UI verified; pushed sourcee625d5d8; one CI dispatch request returned500, run unconfirmed; next ASW2 counterexamples verified without product change"
+  },
+  "nextPriorityBeforeOptionalAswDestinationBatch20261107": "1-6下AEGFBN／7-5第3ABDFJOPTの既存任意ASWセット具体搭載先。actual2producer対照が初回2成功で同型未接続を確認、supported helper対照1回、製品/実画面は未変更。現索敵sourceのCI起動API500/登録未確認を残し、再POSTは行わない。"
 }
