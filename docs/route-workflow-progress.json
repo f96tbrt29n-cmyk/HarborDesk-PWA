@@ -3318,9 +3318,9 @@
       "7-5/2/default"
     ],
     "record": "optionalAswDestinationBatch20261107",
-    "state": "shared named normal-pair guidance/local coverage771 with one necessary fixture repair;4 first UI passed; final-source smoke pending"
+    "state": "shared optional ASW guidance; first CI classified; old stock UI oracle corrected, necessary ordinary C/W save/edit/load passed; corrected-source smoke pending"
   },
-  "nextPriority": "3-3 ACGM／3-4 ACEGJP／4-1 CFDGJ・ABDGJの汎用制空2個を任意目安と数値制空から分離する共通consumer候補。静的gapとprivate対照準備までで、新actualcounter/製品/実画面は未実施。",
+  "nextPriority": "3-3 ACGM／3-4 ACEGJPの汎用制空2個と数値制空条件の案内分離。実producer2scopeの不備をNodeで確認。初回群は4-1のgoal未生成で停止、未到達3controlだけ別群で成功。4-1は除外（制空不要記述が既存全体推論に作用、goal強制なし）。private5anchor案まで・次製品/実画面未実施。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -23211,10 +23211,47 @@
       "newBatchCIBackfillsPriorSource": false
     },
     "ci": {
-      "state": "final-source normal smoke pending",
-      "plannedNormalRuns": 1,
-      "reruns": 0,
-      "workflowChange": "one compact summary glob only"
+      "firstSourceSHA": "ebcc3411d6c2547945f20c6cedb052063d0ecc85",
+      "firstRun": 42372040106,
+      "attempt": 1,
+      "conclusion": "failure",
+      "jobTotals": {
+        "success": 2,
+        "failure": 3,
+        "cancelled": 1,
+        "fullSkipped": 1
+      },
+      "passedFlakyFailed": {
+        "chromium": [
+          921,
+          0,
+          1
+        ],
+        "webkit": [
+          910,
+          8,
+          4
+        ]
+      },
+      "targetNewASW": {
+        "logical": 4,
+        "initialPassed": 4,
+        "metadataContractSatisfied": 4
+      },
+      "firstSourceStockFailure": "Chromium and WebKit initial/retry stopped before apply/save at the obsolete generic ASW-card selector; expectation1 observed0. No saved-value mismatch observed.",
+      "otherFinalFailures": "WebKit7-5 known,5-2 ready,6-5 stock initial/retry: after-load re-search button not visible; post-load full comparison not reached; raw values/display caller/cause missing.",
+      "C2": "Smoke completed with460/0/1 and failure before upload. Job cancelled at45m while full diagnostics upload was cancelled; case footer is complete.",
+      "W4": {
+        "smokeSeconds": 947,
+        "postSeconds": 28,
+        "jobSeconds": 1063,
+        "limit": "Necessary CI observation only; no claim of stable resolution or older common cause."
+      },
+      "canonicalSHA256": "2f23f8ab07d1553e1f1e662b91e046e5f8aad732bcbc49dfae8e86ba087ce1a4",
+      "manifestSHA256": "a7dff3c34f5e43af757d6a3d3374aaf4cf971cb95ae75cc733e80bb01ed3ec9e",
+      "independentReviewSHA256": "828ad6c9954116b2e49e08f0d4b149d17ad3f3501f657cc29d9747ae4df46416",
+      "correctedSourceSmoke": "one necessary run pending after grounded test-oracle correction; no same-SHA rerun",
+      "priorSourceBackfilled": false
     },
     "matrix": {
       "before": [
@@ -23232,8 +23269,43 @@
       "unexecutedRoutePromoted": false
     },
     "proof": "continuation-optional-asw-guidance-batch-20261107/private/; shared/local-results.json contains only allowed metadata",
-    "remaining": "All set quantities/source sufficiency and inventory variants;1-6D remains partial; unchanged old saving/display/access-control root causes/gaps; no actual swap or new fleet save/edit reexecution.",
-    "next": "3-3 ACGM／3-4 ACEGJP／4-1 CFDGJ・ABDGJの汎用制空2個を任意目安と数値制空から分離する共通consumer候補。静的gapとprivate対照準備までで、新actualcounter/製品/実画面は未実施。"
+    "remaining": "All set quantities/source sufficiency and inventory variants;1-6D remains partial. Proposed exchanges are not evaluated or applied. Historical hidden-button/access-control/preservation causes and missing evidence remain separate.",
+    "next": "3-3 ACGM／3-4 ACEGJPの汎用制空2個と数値制空条件の案内分離。実producer2scopeの不備をNodeで確認。初回群は4-1のgoal未生成で停止、未到達3controlだけ別群で成功。4-1は除外（制空不要記述が既存全体推論に作用、goal強制なし）。private5anchor案まで・次製品/実画面未実施。",
+    "stockOracleCorrection": {
+      "scope": "Only stock UI-oracle block in tests/route-seven-five-third.spec.js; original input/assertions through98 and apply/save/edit/load/error checks retained byte-for-byte.",
+      "beforeSHA256": "26d5624a61f1058cca73abe201d6f3878605ead737aae9227e4a432135a72961",
+      "afterSHA256": "d77fa6c346d73e359fe41230a3500fd02245c33754fd0cb9898cea09a27cc390",
+      "reason": "Dedicated optional ASW guidance intentionally replaced generic purchase-quantity card. Assert actual recipe, named hull/legal distinct normal frames, current/registered/unused, limitations and no procurement controls.",
+      "productChanged": false,
+      "newASWUIOrNodeChanged": false,
+      "localNecessaryValidation": {
+        "logical": 2,
+        "physical": 2,
+        "initialPassed": 2,
+        "workers": 1,
+        "retries": 0,
+        "savedIdentityFieldsPerCase": 30,
+        "loadIdentityFieldsPerCase": 30,
+        "loadFullStringAndSameDocument": true,
+        "otherKeysMetadataPreserved": true,
+        "savedCustomDifference": "expected intentional apply and memo edit",
+        "summarySHA256": "c0621e69ff7729e6aee014436d8cbfcba467b0bf6699dee78f735452a0f8bcae",
+        "independentReviewSHA256": "ab848daf9df7573a4e6550d17d10c2a2553c41d6a693c405eed59dd3ce1044db"
+      },
+      "unchanged770NodeAndNew4UIReexecuted": false,
+      "failedCIRewrittenByLocalSuccess": false
+    },
+    "nextEvidence": {
+      "firstGroupExit": 1,
+      "confirmedProducerScopesBeforeStop": 2,
+      "firstStop": "4-1 actual producer generated no capability goal",
+      "necessaryPreviouslyUnreachedControls": 3,
+      "controlResumePassed": 1,
+      "successfulProducerReruns": 0,
+      "baselineMetadataSHA256": "37864a991a4dce06d20fb7e3ef8c39781e7d026e3406a442da84a64433ffccec",
+      "publicProductApplied": false,
+      "browserExecutions": 0
+    }
   },
   "selectedBeforeOptionalAswDestinationBatch20261107": {
     "id": "scouting-optional-guidance-batch",
