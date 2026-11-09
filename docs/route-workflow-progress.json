@@ -1148,7 +1148,7 @@
         },
         "C": {
           "status": "一部",
-          "reason": "代表の在庫不足・艦情報不足・経路不一致を区別。搭載不可/枠競合は軽い検査と既存共通証拠を併記し、全適用案内の完了へ広げない。 2026-11-09：任意制空個数と数値条件を分け、登録/現在/未使用と実艦・正の搭載枠/交換対象を共通案内へ接続。3-3は任意調達説明のreload保持、3-4は有限在庫の搭載先案内reload後再表示を代表C/Wで確認。交換後の値・連戦損耗・全候補の同時配備は未評価。",
+          "reason": "代表の在庫不足・艦情報不足・経路不一致を区別。搭載不可/枠競合は軽い検査と既存共通証拠を併記し、全適用案内の完了へ広げない。 2026-11-09：任意制空個数と数値条件を分け、登録/現在/未使用と実艦・正の搭載枠/交換対象を共通案内へ接続。3-3は任意調達説明のreload保持、3-4は有限在庫の搭載先案内reload後再表示を代表C/Wで確認。交換後の値・連戦損耗・全候補の同時配備は未評価。 最終source e524のCI42601537383でも代表C/Wは各初回・新案内保持適合。全体CIはWebKit最終3件失敗/C2途中取消で別記録、限定C一部・既存D確認済みを変更しない。",
           "evidence": [
             "docs/current-auto-loadout-coverage-ja.md",
             "tests/owned-equipment-planner.spec.js",
@@ -1200,7 +1200,7 @@
         },
         "C": {
           "status": "一部",
-          "reason": "同じ行の在庫0で空母3隻へ各攻撃機1機と実搭載枠、対空装備例の部品数、未知艦/装備の未判定をC/Wで区別。搭載不可/枠競合は軽い検査と既存共通証拠、全失敗案内の網羅は未完。 2026-11-09：任意制空個数と数値条件を分け、登録/現在/未使用と実艦・正の搭載枠/交換対象を共通案内へ接続。3-3は任意調達説明のreload保持、3-4は有限在庫の搭載先案内reload後再表示を代表C/Wで確認。交換後の値・連戦損耗・全候補の同時配備は未評価。",
+          "reason": "同じ行の在庫0で空母3隻へ各攻撃機1機と実搭載枠、対空装備例の部品数、未知艦/装備の未判定をC/Wで区別。搭載不可/枠競合は軽い検査と既存共通証拠、全失敗案内の網羅は未完。 2026-11-09：任意制空個数と数値条件を分け、登録/現在/未使用と実艦・正の搭載枠/交換対象を共通案内へ接続。3-3は任意調達説明のreload保持、3-4は有限在庫の搭載先案内reload後再表示を代表C/Wで確認。交換後の値・連戦損耗・全候補の同時配備は未評価。 最終source e524のCI42601537383でも代表C/Wは各初回・新案内保持適合。全体CIはWebKit最終3件失敗/C2途中取消で別記録、限定C一部・既存D確認済みを変更しない。",
           "evidence": [
             "docs/pr152-three-four-acegjp-ja.md",
             "tests/route-three-four-acegjp.spec.js",
@@ -3318,9 +3318,9 @@
       "3-4/0/default"
     ],
     "record": "airCountOptionalBatch20261109",
-    "state": "limited shared air-count/named-slot guidance local complete after grounded fixture/oracle/product corrections; final-source smoke pending"
+    "state": "limited shared air-count guidance complete; final-source target four initial passes; normal smoke suite failure/C2 incomplete recorded separately"
   },
-  "nextPriority": "2-1〜2-4の既存空母攻撃機目標から艦別合法搭載先への接続候補。4行C未確認を直接候補に、caller/helperの2-x除外を静的確認。実producerの目標生成・推奨origin/適用範囲を先に確認し、未生成を推測補完しない。private counter6入力は未実行、次製品・ブラウザー未実施。",
+  "nextPriority": "2-1〜2-4の任意攻撃機目標→艦別通常枠案内を次バッチに選択。BASE1bの実producer4対象＋既存positive/無空母negativeのNode1群6対照は完了し、4対象の生成済み推奨goal/shortageにcaller/helper案内がないことを確認。関連8関数は現306版とbyte同一だが現source実行へ付け替えない。任意艦隊目標、実登録/使用/未使用、recipe照合数、固定/交換未判定を分けるprivate最小案v4と共通Node6群案まで準備。次製品未適用・構文/モデル/実画面/保存操作/CI未実施、C4セルは未確認のまま。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -23636,10 +23636,211 @@
       "browserExecutions": 0
     },
     "ci": {
-      "state": "final-source normal smoke pending",
-      "plannedFinalSourceRuns": 1,
+      "state": "one final-source normal smoke terminal; target four initial successes; suite failure and incomplete C2 retained",
+      "sourceSHA": "e524f1d70b67f6bd84b9c82fe0ee6f217cada875",
+      "runId": 42601537383,
+      "runAttempt": 1,
+      "url": "https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/42601537383",
+      "conclusion": "failure",
+      "jobTotals": {
+        "success": 3,
+        "cancelled": 1,
+        "failure": 2,
+        "fullSkipped": 1
+      },
+      "passedFlakyFailed": {
+        "chromium": null,
+        "webkit": {
+          "passed": 903,
+          "flaky": 18,
+          "failed": 3
+        }
+      },
+      "meaning": "Logical passed/flaky/failed, not an initial-success or physical-trial conversion.",
+      "runsRequested": 1,
       "sameHEADReruns": 0,
-      "workflowChange": "one compact metadata summary glob only"
+      "recordOnlyAdditionalRuns": 0,
+      "evidence": {
+        "canonical": {
+          "path": "private/ci-e524f1d7-v1/analysis/canonical-ci-collection.json",
+          "bytes": 154331,
+          "sha256": "183d71b3194bd7746bfa0e6e3cc13dd7cb6fcb81e0a2914a7314b004c71aac0e"
+        },
+        "manifest": {
+          "path": "private/ci-e524f1d7-v1/analysis/manifest.json",
+          "bytes": 8137,
+          "sha256": "b828c8a7c4d962ad74087b13c4feb97b3f198dcb02d4120bf2dee9daccf75755"
+        },
+        "audit": {
+          "path": "private/ci-e524f1d7-v1/analysis/harness-independent-review-AIR-v2.json",
+          "bytes": 32847,
+          "sha256": "9a8dc5de40d0f0d3f0e48ade7799e1c2db093f9d0547eec7eadce7e04ad06a5c"
+        }
+      },
+      "independentVerification": "PASS_WITH_GAPS",
+      "auditGaps": [
+        {
+          "kind": "onEnd-unobserved",
+          "jobId": 129106956562,
+          "browser": "chromium",
+          "scheduled": 462,
+          "observedEndCallbacks": 434,
+          "beginWithoutEnd": 2,
+          "noBeginObserved": 26
+        },
+        {
+          "kind": "smoke-observations-incomplete",
+          "jobId": 129106956562,
+          "interrupted": false,
+          "noBeginObserved": 26,
+          "beginWithoutEnd": 2
+        }
+      ],
+      "oldTrialsBackfilled": false,
+      "priorE625Acceptance": null,
+      "priorE625Reposts": 0,
+      "localSourceHistoryLimit": "New CI executes final e524/306/715 for all four target cases. It does not relabel the earlier local Cnav source8dd/ae315 or fill its first-failure gaps.",
+      "partialChromium": {
+        "C1PassedFlakyFailed": {
+          "passed": 462,
+          "flaky": 0,
+          "failed": 0
+        },
+        "C2": {
+          "scheduledCases": 462,
+          "runFinished": false,
+          "fullStatus": null,
+          "passedEndCallbacks": 434,
+          "beginWithoutEnd": 2,
+          "noAttemptCallbackCases": 26,
+          "retryAttemptEntries": 0,
+          "logicalFinalOutcomesAllNull": true,
+          "activeCases": [
+            "2-5 CEIO scouting guaranteed",
+            "2-5 CEIO scouting unknown"
+          ],
+          "limit": "These are callback observations, not a full Chromium logical result. Active begins are not interrupted end results; no-begin cases are not guessed passed or failed."
+        }
+      },
+      "physicalTrialStatusCounts": {
+        "chromium": {
+          "observedAttemptEntries": 898,
+          "initialAttemptEntries": 898,
+          "retryAttemptEntries": 0,
+          "initialStatusCounts": {
+            "passed": 896,
+            "null": 2
+          },
+          "retryStatusCounts": {},
+          "observedEndCallbacks": 896,
+          "beginWithoutEnd": 2,
+          "noAttemptCallbackCases": 26
+        },
+        "webkit": {
+          "observedAttemptEntries": 945,
+          "initialAttemptEntries": 924,
+          "retryAttemptEntries": 21,
+          "initialStatusCounts": {
+            "passed": 903,
+            "failed": 1,
+            "timedOut": 20
+          },
+          "retryStatusCounts": {
+            "passed": 18,
+            "timedOut": 3
+          },
+          "observedEndCallbacks": 945,
+          "beginWithoutEnd": 0,
+          "noAttemptCallbackCases": 0
+        }
+      },
+      "targets": [
+        {
+          "project": "chromium",
+          "entry": "navigator",
+          "retry": 0,
+          "status": "passed",
+          "completed": true,
+          "contract": "satisfied",
+          "criticalComparisonFalseObserved": false
+        },
+        {
+          "project": "chromium",
+          "entry": "inline",
+          "retry": 0,
+          "status": "passed",
+          "completed": true,
+          "contract": "satisfied",
+          "criticalComparisonFalseObserved": false
+        },
+        {
+          "project": "webkit",
+          "entry": "navigator",
+          "retry": 0,
+          "status": "passed",
+          "completed": true,
+          "contract": "satisfied",
+          "criticalComparisonFalseObserved": false
+        },
+        {
+          "project": "webkit",
+          "entry": "inline",
+          "retry": 0,
+          "status": "passed",
+          "completed": true,
+          "contract": "satisfied",
+          "criticalComparisonFalseObserved": false
+        }
+      ],
+      "finalFailedCases": [
+        {
+          "title": "7-3 second route speed stock preserves named hulls and saved data",
+          "browser": "webkit",
+          "shard": "2/4",
+          "initial": "timedOut; after-load search click hidden; following full comparison unreached",
+          "retry": "timedOut; same stopping stage independently established, not inferred from initial",
+          "causeAndAIRRelation": "unestablished"
+        },
+        {
+          "title": "6-2 CEJK ready keeps prior branches and scouting distinctions through save and load",
+          "browser": "webkit",
+          "shard": "2/4",
+          "initial": "timedOut; after-load search click hidden; following full comparison unreached",
+          "retry": "timedOut; same stopping stage independently established, not inferred from initial",
+          "causeAndAIRRelation": "unestablished"
+        },
+        {
+          "title": "7-5 second ABDFJOQ stock keeps a native CVL2 alternative through save or safe abort and load",
+          "browser": "webkit",
+          "shard": "4/4",
+          "initial": "timedOut; after-load search click hidden; following full comparison unreached",
+          "retry": "timedOut; same stopping stage independently established, not inferred from initial",
+          "causeAndAIRRelation": "unestablished"
+        }
+      ],
+      "otherImportantGaps": [
+        "5-3 exempt initial: terminal pageerrors check stopped after specified load/full/source/planner/same-document comparisons; two version access-control errors, occurrence time/caller/cause missing.",
+        "6-5 ready initial: individual exception annotation missing; retry success does not fill it.",
+        "C2 job45m annotation: pre107/body2594 cancelled/post125 seconds; post-upload115 seconds began after body cancellation.",
+        "Raw saved-value JSON and traces, CI Node numeric footers and actual registry digest were not acquired."
+      ],
+      "environment": {
+        "ownReceiptsJoined": 6,
+        "Node": "24.21.0",
+        "Playwright": "1.55.0",
+        "ChromiumRevision": "1187",
+        "WebKitRevision": "2203",
+        "nodeGateSuccessJobs": 6,
+        "exactNodeFootersAcquired": 0,
+        "registryDigestObserved": null
+      },
+      "retention": {
+        "smallZIPs": 12,
+        "smallZIPBytes": 471233,
+        "largeArtifactsAcquired": 0,
+        "fullLocalSummaryPath": "continuation-air-count-optional-guidance-batch-20261109/shared/ci-results.json",
+        "fullLocalSummarySHA256": "47e106db1a6c479aa1d90c7b3af775aeda252deb45d44dcef8237ba162789a5a"
+      }
     },
     "oldCI": {
       "runId": 42376362757,
@@ -23680,6 +23881,39 @@
       "sufficient optional quantity/source and actual game victory remain unverified"
     ],
     "proof": "continuation-air-count-optional-guidance-batch-20261109/private/; shared metadata only, originals retained",
-    "next": "2-1〜2-4の既存空母攻撃機目標から艦別合法搭載先への接続候補。4行C未確認を直接候補に、caller/helperの2-x除外を静的確認。実producerの目標生成・推奨origin/適用範囲を先に確認し、未生成を推測補完しない。private counter6入力は未実行、次製品・ブラウザー未実施。"
+    "next": "2-1〜2-4の任意攻撃機目標→艦別通常枠案内を次バッチに選択。BASE1bの実producer4対象＋既存positive/無空母negativeのNode1群6対照は完了し、4対象の生成済み推奨goal/shortageにcaller/helper案内がないことを確認。関連8関数は現306版とbyte同一だが現source実行へ付け替えない。任意艦隊目標、実登録/使用/未使用、recipe照合数、固定/交換未判定を分けるprivate最小案v4と共通Node6群案まで準備。次製品未適用・構文/モデル/実画面/保存操作/CI未実施、C4セルは未確認のまま。",
+    "sourceSHA": "e524f1d70b67f6bd84b9c82fe0ee6f217cada875",
+    "nextIndependentBefore": {
+      "sourceSHA": "1b8082f7700ef2717ead21735ffb4b540f26d325",
+      "currentSourceExecutionClaimed": false,
+      "logicalCases": 6,
+      "nodeGroups": 1,
+      "passed": 1,
+      "fourActualGeneratedGoalAndShortageDecorationGaps": true,
+      "inputAndSyntheticStoreUnchanged": true,
+      "browsers": 0,
+      "CI": 0,
+      "cellPromotions": 0,
+      "summary": {
+        "path": "shared/next-carrier-before.json",
+        "bytes": 9719,
+        "sha256": "ac279461d28526ba9e433d6f676a477c3ab0b4226f7a2af61eb467cfb48ce716"
+      },
+      "privateDesign": {
+        "path": "private/next-carrier-product-design/product-replacements-template-v4.json",
+        "bytes": 13939,
+        "sha256": "77eebbba3b168ddf6181fa25c9bac8331069362345da4ed6bf1311569304a9c1"
+      },
+      "privateRootStaticReview": {
+        "path": "private/next-carrier-product-design/root-static-review-v4.json",
+        "bytes": 1505,
+        "sha256": "2d4c20f0c6791001d5186321a2132e5285ef8da7401bff63244ae7ab97a13e02"
+      },
+      "privateNodePlan": {
+        "path": "private/next-carrier-node-preparation/implementation-plan-v1.json",
+        "bytes": 7257,
+        "sha256": "6c9946590855ff3cd0c3c6af607d29b673c41625e705cf66edd490cdbe63c16b"
+      }
+    }
   }
 }
