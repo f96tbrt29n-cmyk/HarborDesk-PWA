@@ -68,8 +68,8 @@
     },
     "C": {
       "確認済み": 0,
-      "一部": 43,
-      "未確認": 16,
+      "一部": 45,
+      "未確認": 14,
       "非該当": 0
     },
     "D": {
@@ -592,9 +592,13 @@
           "evidence": []
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "2026-11-10：既存任意攻撃機目標→艦別合法通常枠の接続を修正。2-1ナビの空在庫/カタログ例を代表C/W各初回で確認し、新案内の同一reload文書再表示と10キー/他編成/metadata不変を照合。全在庫・全艦種/枠、固定/他目標との競合解消、交換後数値/条件維持は未評価。任意目標を通行必須/購入数/全戦闘保証へ変換しない。",
+          "evidence": [
+            "tests/two-area-carrier-reference.test.cjs",
+            "tests/owned-equipment-planner.spec.js",
+            "docs/route-workflow-progress-ja.md"
+          ]
         },
         "D": {
           "status": "未確認",
@@ -628,7 +632,7 @@
         },
         "C": {
           "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。 2026-11-10：共通案内接続と実生成Node対照を確認。行別の実画面/新案内load保持は未実施で、未確認を維持。",
           "evidence": []
         },
         "D": {
@@ -663,7 +667,7 @@
         },
         "C": {
           "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
+          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。 2026-11-10：共通案内接続と実生成Node対照を確認。行別の実画面/新案内load保持は未実施で、未確認を維持。",
           "evidence": []
         },
         "D": {
@@ -697,9 +701,13 @@
           "evidence": []
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "2026-11-10：既存任意攻撃機目標→艦別合法通常枠の接続を修正。2-4編成内の有限登録/現在配備1/未使用0を代表C/W各初回で確認し、新案内の同一reload文書再表示と10キー/他編成/metadata不変を照合。全在庫・全艦種/枠、固定/他目標との競合解消、交換後数値/条件維持は未評価。任意目標を通行必須/購入数/全戦闘保証へ変換しない。",
+          "evidence": [
+            "tests/two-area-carrier-reference.test.cjs",
+            "tests/owned-equipment-planner.spec.js",
+            "docs/route-workflow-progress-ja.md"
+          ]
         },
         "D": {
           "status": "未確認",
@@ -3311,16 +3319,18 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "air-count-optional-guidance-batch",
-    "baselineHead": "1b8082f7700ef2717ead21735ffb4b540f26d325",
+    "id": "two-area-carrier-reference-batch",
+    "baselineHead": "1394b31afcd0414999cfa98a4430db8b12747abc",
     "scope": [
-      "3-3/0/default",
-      "3-4/0/default"
+      "2-1/0 C(E)DH",
+      "2-2/0 CE(GH)K",
+      "2-3/0 random boss directions",
+      "2-4/0 random boss directions"
     ],
-    "record": "airCountOptionalBatch20261109",
-    "state": "limited shared air-count guidance complete; final-source target four initial passes; normal smoke suite failure/C2 incomplete recorded separately"
+    "record": "twoAreaCarrierReferenceBatch20261110",
+    "state": "four shared implementations; representative two routes local complete, final-source smoke pending"
   },
-  "nextPriority": "2-1〜2-4の任意攻撃機目標→艦別通常枠案内を次バッチに選択。BASE1bの実producer4対象＋既存positive/無空母negativeのNode1群6対照は完了し、4対象の生成済み推奨goal/shortageにcaller/helper案内がないことを確認。関連8関数は現306版とbyte同一だが現source実行へ付け替えない。任意艦隊目標、実登録/使用/未使用、recipe照合数、固定/交換未判定を分けるprivate最小案v4と共通Node6群案まで準備。次製品未適用・構文/モデル/実画面/保存操作/CI未実施、C4セルは未確認のまま。",
+  "nextPriority": "4-5 index0高速＋最短／index2軽量最短の対地交換案内を次候補とする。2行C未確認、同じ敵profileと共通callerに対しhelperがindex1だけを承認する静的差を確認。実goal/shortage生成とhelper非接続は未計測のため、次に限定Node対照で確認する。速力・索敵・既存必須/利用者目標の動的保護を維持し、3-5上は別敵/別適用として除外。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -23915,5 +23925,155 @@
         "sha256": "6c9946590855ff3cd0c3c6af607d29b673c41625e705cf66edd490cdbe63c16b"
       }
     }
+  },
+  "selectedBeforeTwoAreaCarrierReferenceBatch20261110": {
+    "id": "air-count-optional-guidance-batch",
+    "baselineHead": "1b8082f7700ef2717ead21735ffb4b540f26d325",
+    "scope": [
+      "3-3/0/default",
+      "3-4/0/default"
+    ],
+    "record": "airCountOptionalBatch20261109",
+    "state": "limited shared air-count guidance complete; final-source target four initial passes; normal smoke suite failure/C2 incomplete recorded separately"
+  },
+  "nextPriorityBeforeTwoAreaCarrierReferenceBatch20261110": "2-1〜2-4の任意攻撃機目標→艦別通常枠案内を次バッチに選択。BASE1bの実producer4対象＋既存positive/無空母negativeのNode1群6対照は完了し、4対象の生成済み推奨goal/shortageにcaller/helper案内がないことを確認。関連8関数は現306版とbyte同一だが現source実行へ付け替えない。任意艦隊目標、実登録/使用/未使用、recipe照合数、固定/交換未判定を分けるprivate最小案v4と共通Node6群案まで準備。次製品未適用・構文/モデル/実画面/保存操作/CI未実施、C4セルは未確認のまま。",
+  "twoAreaCarrierReferenceBatch20261110": {
+    "dateJST": "2026-11-10",
+    "baseHEAD": "1394b31afcd0414999cfa98a4430db8b12747abc",
+    "sourceSHA": null,
+    "state": "local complete; final-source smoke pending",
+    "scope": [
+      "2-1/0 C(E)DH",
+      "2-2/0 CE(GH)K",
+      "2-3/0 random boss directions",
+      "2-4/0 random boss directions"
+    ],
+    "beforeEvidence": "sealed previous shared/next-carrier-before.json: actual4 generated goals/shortages missing named carrier target guidance, existing1-3 positive and no-carrier actual-goal-absent negative; old baseline generator reruns0",
+    "implementation": "Three-anchor shared optional reference only. Goal target is existing known carrier count, not a fixed2 or required purchase quantity. Named confirmed equipment registration/current assignment/unused stacks are separate from recipe-target-capped matching. Actual legal positive normal frames/current gear are displayed; fixed/exchangeability and simultaneous frame competition remain unassessed. Unknown performance/category-only entries are not included in confirmed totals. Blank hdOCBuild placeholders remain empty frames.",
+    "distinctions": [
+      "optional equipment counts vs carrier attack capability vs numerical air target vs route requirement",
+      "registered/assigned/unused and recipe capped matches",
+      "known incompatibility vs unknown profile/capacity vs unassessed fixed/other-goal frame competition",
+      "legal individual catalogue candidates vs joint available allocation",
+      "post-swap air/scouting/protected goals/user objectives and proficiency/stars/remaining aircraft/attrition unassessed"
+    ],
+    "preserved": [
+      "old carrier helper/renderer and9 protected functions byte exact",
+      "allocation/route/numeric formulas/search budgets/order/waits/cancel/45s total/12s expect",
+      "source fleet/measure/stock/inventory/storage and explicit save/import DTOs exclude shortage projection",
+      "registered quantities and user goals; no new permanent cache, save fields or apply action"
+    ],
+    "productSHA256": "c017aa0772792c1a5e52739594e9dedff5d4199ae914c9be893d3631325698c1",
+    "syntaxAndHistory": {
+      "strictInverseLayers": 16,
+      "sourceEndpoints": 31,
+      "oldGoldensRepinned": false
+    },
+    "node": {
+      "logicalTests": 788,
+      "firstPassed": 788,
+      "failed": 0,
+      "retries": 0,
+      "actualCurrentProducerCases": 6,
+      "newGroupedTests": 6,
+      "beforeSourceGeneratorReruns": 0
+    },
+    "localUI": {
+      "logicalCases": 4,
+      "physicalTrials": 4,
+      "initialPassed": 4,
+      "retryTrials": 0,
+      "workers": 1,
+      "retries": 0,
+      "representatives": [
+        "2-1 navigator: empty inventory, catalogue/named normal frames; initial and same reload-document hint redisplay",
+        "2-4 inline: registered/current attack1, unused0; finite usage and unserved carrier references; initial and same reload-document hint redisplay"
+      ],
+      "preservedKeysPerPhase": 10,
+      "fullFleetSaveEditRepeated": false,
+      "sameRowDFromOtherEvidencePromoted": false,
+      "unexecuted": [
+        "2-2/2-3 UI",
+        "2-x full save/edit/load workflow",
+        "new from-empty finite allocation in the UI; inline begins with one equipped registered aircraft",
+        "all inventories, hulls, fixed locks, joint swaps/condition preservation and attrition"
+      ]
+    },
+    "evidence": {
+      "summary": {
+        "path": "shared/local-results.json",
+        "bytes": 31699,
+        "sha256": "3a3325baaa9d8581e5508dc634d3115139e69f4ceaca23732dd4955229c6b370"
+      },
+      "manifest": {
+        "path": "private/local-trials-manifest-local-results.json",
+        "bytes": 123217,
+        "sha256": "22cb59968287f095e7b9dac1a8ae506079263ad78abb24e51293b12cb91081ea"
+      },
+      "independentAudit": {
+        "path": "private/harness-review/local-independent-review.json",
+        "bytes": 2826,
+        "sha256": "9354042cbfb856791a653af10fbf89bcc72a56ee5f0b8df1d1c076c408ce3937"
+      }
+    },
+    "preflight": {
+      "publicFiles": 717,
+      "normalFiles": 82,
+      "casesPerBrowser": 926,
+      "webkitBins": [
+        339,
+        164,
+        239,
+        184
+      ],
+      "unionAndTestIDsExact": true,
+      "allFourTargetsSelected": true
+    },
+    "ci": {
+      "state": "final-source normal smoke pending",
+      "plannedRuns": 1,
+      "sameHEADReruns": 0,
+      "workflowChange": "one small summary glob only"
+    },
+    "priorCI": {
+      "sourceSHA": "e524f1d70b67f6bd84b9c82fe0ee6f217cada875",
+      "runId": 42601537383,
+      "runConclusion": "failure",
+      "jobs": "3success/2failure/1cancelled plusFull skipped",
+      "webkitPassedFlakyFailed": [
+        903,
+        18,
+        3
+      ],
+      "fullChromium": null,
+      "C1": [
+        462,
+        0,
+        0
+      ],
+      "C2": "onEnd absent;434 passed end callbacks/2begins without end/26no-start-records, all462 finalOutcome null; no guessed interrupted end",
+      "webkitFinalFailures": "6-2ready/7-3secondstock/7-5secondstock initial/retry after-load click hidden, full comparison unreached; cause/caller/AIR relation unknown",
+      "oldHTTP500Acceptance": null,
+      "oldHTTP500Reposts": 0,
+      "backfilled": false
+    },
+    "matrix": {
+      "before": [
+        28,
+        157,
+        51
+      ],
+      "after": [
+        28,
+        159,
+        49
+      ],
+      "changes": [
+        "2-1/0/default C:未確認→一部",
+        "2-4/0/default C:未確認→一部"
+      ],
+      "criteriaChanged": false
+    },
+    "next": "4-5 index0高速＋最短／index2軽量最短の対地交換案内を次候補とする。2行C未確認、同じ敵profileと共通callerに対しhelperがindex1だけを承認する静的差を確認。実goal/shortage生成とhelper非接続は未計測のため、次に限定Node対照で確認する。速力・索敵・既存必須/利用者目標の動的保護を維持し、3-5上は別敵/別適用として除外。"
   }
 }
