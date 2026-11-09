@@ -1148,12 +1148,14 @@
         },
         "C": {
           "status": "一部",
-          "reason": "代表の在庫不足・艦情報不足・経路不一致を区別。搭載不可/枠競合は軽い検査と既存共通証拠を併記し、全適用案内の完了へ広げない。",
+          "reason": "代表の在庫不足・艦情報不足・経路不一致を区別。搭載不可/枠競合は軽い検査と既存共通証拠を併記し、全適用案内の完了へ広げない。 2026-11-09：任意制空個数と数値条件を分け、登録/現在/未使用と実艦・正の搭載枠/交換対象を共通案内へ接続。3-3は任意調達説明のreload保持、3-4は有限在庫の搭載先案内reload後再表示を代表C/Wで確認。交換後の値・連戦損耗・全候補の同時配備は未評価。",
           "evidence": [
             "docs/current-auto-loadout-coverage-ja.md",
             "tests/owned-equipment-planner.spec.js",
             "docs/pr152-three-three-acgm-ja.md",
-            "tests/route-three-three-acgm.spec.js"
+            "tests/route-three-three-acgm.spec.js",
+            "tests/air-count-optional-guidance.test.cjs",
+            "docs/route-workflow-progress-ja.md"
           ]
         },
         "D": {
@@ -1198,12 +1200,14 @@
         },
         "C": {
           "status": "一部",
-          "reason": "同じ行の在庫0で空母3隻へ各攻撃機1機と実搭載枠、対空装備例の部品数、未知艦/装備の未判定をC/Wで区別。搭載不可/枠競合は軽い検査と既存共通証拠、全失敗案内の網羅は未完。",
+          "reason": "同じ行の在庫0で空母3隻へ各攻撃機1機と実搭載枠、対空装備例の部品数、未知艦/装備の未判定をC/Wで区別。搭載不可/枠競合は軽い検査と既存共通証拠、全失敗案内の網羅は未完。 2026-11-09：任意制空個数と数値条件を分け、登録/現在/未使用と実艦・正の搭載枠/交換対象を共通案内へ接続。3-3は任意調達説明のreload保持、3-4は有限在庫の搭載先案内reload後再表示を代表C/Wで確認。交換後の値・連戦損耗・全候補の同時配備は未評価。",
           "evidence": [
             "docs/pr152-three-four-acegjp-ja.md",
             "tests/route-three-four-acegjp.spec.js",
             "tests/three-four-placement.test.cjs",
-            "tests/three-three-placement.test.cjs"
+            "tests/three-three-placement.test.cjs",
+            "tests/air-count-optional-guidance.test.cjs",
+            "docs/route-workflow-progress-ja.md"
           ]
         },
         "D": {
@@ -3307,20 +3311,16 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "optional-asw-destination-guidance-batch",
-    "baselineHead": "3217e5aba223cac52526e132a22a3f8ac8ff516f",
+    "id": "air-count-optional-guidance-batch",
+    "baselineHead": "1b8082f7700ef2717ead21735ffb4b540f26d325",
     "scope": [
-      "1-6/0/default",
-      "7-5/2/default"
+      "3-3/0/default",
+      "3-4/0/default"
     ],
-    "executedUIScopes": [
-      "1-6/0/default",
-      "7-5/2/default"
-    ],
-    "record": "optionalAswDestinationBatch20261107",
-    "state": "shared optional ASW named-pair guidance complete in the limited scope; local771/newUI4/necessary ordinary stock2 and corrected-source CI target6 complete; unrelated hidden-click failures/gaps retained; next AIR private prep ready"
+    "record": "airCountOptionalBatch20261109",
+    "state": "limited shared air-count/named-slot guidance local complete after grounded fixture/oracle/product corrections; final-source smoke pending"
   },
-  "nextPriority": "3-3 ACGM／3-4 ACEGJPの汎用制空2個と数値制空条件の案内分離。実producer2scopeの不備をNodeで確認。初回群は4-1のgoal未生成で停止、未到達3controlだけ別群で成功。4-1は除外（制空不要記述が既存全体推論に作用、goal強制なし）。private5anchor案まで・次製品/実画面未実施。",
+  "nextPriority": "2-1〜2-4の既存空母攻撃機目標から艦別合法搭載先への接続候補。4行C未確認を直接候補に、caller/helperの2-x除外を静的確認。実producerの目標生成・推奨origin/適用範囲を先に確認し、未生成を推測補完しない。private counter6入力は未実行、次製品・ブラウザー未実施。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -23428,5 +23428,258 @@
     "record": "scoutingOptionalGuidanceBatch20261107",
     "state": "shared inspection/local760 and4 initial UI verified; pushed sourcee625d5d8; one CI dispatch request returned500, run unconfirmed; next ASW2 counterexamples verified without product change"
   },
-  "nextPriorityBeforeOptionalAswDestinationBatch20261107": "1-6下AEGFBN／7-5第3ABDFJOPTの既存任意ASWセット具体搭載先。actual2producer対照が初回2成功で同型未接続を確認、supported helper対照1回、製品/実画面は未変更。現索敵sourceのCI起動API500/登録未確認を残し、再POSTは行わない。"
+  "nextPriorityBeforeOptionalAswDestinationBatch20261107": "1-6下AEGFBN／7-5第3ABDFJOPTの既存任意ASWセット具体搭載先。actual2producer対照が初回2成功で同型未接続を確認、supported helper対照1回、製品/実画面は未変更。現索敵sourceのCI起動API500/登録未確認を残し、再POSTは行わない。",
+  "selectedBeforeAirCountOptionalBatch20261109": {
+    "id": "optional-asw-destination-guidance-batch",
+    "baselineHead": "3217e5aba223cac52526e132a22a3f8ac8ff516f",
+    "scope": [
+      "1-6/0/default",
+      "7-5/2/default"
+    ],
+    "executedUIScopes": [
+      "1-6/0/default",
+      "7-5/2/default"
+    ],
+    "record": "optionalAswDestinationBatch20261107",
+    "state": "shared optional ASW named-pair guidance complete in the limited scope; local771/newUI4/necessary ordinary stock2 and corrected-source CI target6 complete; unrelated hidden-click failures/gaps retained; next AIR private prep ready"
+  },
+  "nextPriorityBeforeAirCountOptionalBatch20261109": "3-3 ACGM／3-4 ACEGJPの汎用制空2個と数値制空条件の案内分離。実producer2scopeの不備をNodeで確認。初回群は4-1のgoal未生成で停止、未到達3controlだけ別群で成功。4-1は除外（制空不要記述が既存全体推論に作用、goal強制なし）。private5anchor案まで・次製品/実画面未実施。",
+  "airCountOptionalBatch20261109": {
+    "date": "2026-11-09 JST",
+    "baseHEAD": "1b8082f7700ef2717ead21735ffb4b540f26d325",
+    "scope": [
+      "3-3/0/default ACGM",
+      "3-4/0/default ACEGJP"
+    ],
+    "sourceReuse": [
+      "docs/pr152-three-three-acgm-ja.md",
+      "docs/pr152-three-four-acegjp-ja.md",
+      "existing route references and generated recommendation flags"
+    ],
+    "meaning": "Existing optional count2 retained. It is neither a route requirement, a selected numerical air target nor a sufficient number/purchase obligation. No new game quantity claim.",
+    "implementation": "Canonical generated recommendation only. Shared named aircraft inspection uses existing build/stock/master/slot compatibility. Registered/improvement-separated rows,current assignment,unused references,catalog examples,actual delivered hull/known positive-capacity frame/current gear and same/replace/empty are distinct. Unknown capacity is not zero; master/profile disagreement is manual.",
+    "bounds": {
+      "registeredStarSeparatedEntries": 12,
+      "catalogScanned": 12,
+      "catalogDisplayed": 3,
+      "currentAircraftDisplayed": 32,
+      "countUpperBoundsAreNotSearchExhaustion": true
+    },
+    "preserved": [
+      "numeric air formulas/counts/scoring/route predicates/stock allocation",
+      "existing attack gear,user goals,current allocations and metadata are readonly",
+      "search limits/waits/cancel/45s total/12s assertions",
+      "old LOS functions/DTO/text",
+      "save APIs/schema/old entries; only new explicit optional procurement loadout description prefix changes"
+    ],
+    "unassessed": [
+      "after-swap numerical air and preservation of conditions/user goals",
+      "proficiency/stars/current remaining aircraft/order/attrition/full battle sequence",
+      "all inventories/ship variants/slots and simultaneous allocations"
+    ],
+    "productSHA256": "30631723f13a266e15d8c0df8e39192523c6b4c09e9e9191c2aeaa87a15919ec",
+    "beforeCounterReuse": {
+      "reachedProducerScopes": 2,
+      "initialNodeGroupExit": 1,
+      "fourOneActualGoalAbsent": true,
+      "necessaryResumeLogicalControls": 3,
+      "successfulBaselineGeneratorReruns": 0,
+      "proofSHA256": "37864a991a4dce06d20fb7e3ef8c39781e7d026e3406a442da84a64433ffccec"
+    },
+    "node": {
+      "requiredLogicalTests": 782,
+      "totalPhysicalTests": 786,
+      "firstFull": {
+        "ok": false,
+        "results": [
+          {
+            "id": "normal-node-suite",
+            "exit": 1,
+            "signal": null,
+            "tests": 782,
+            "pass": 780,
+            "fail": 2,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        ]
+      },
+      "necessaryScopedRepair": {
+        "ok": true,
+        "results": [
+          {
+            "id": "scoped-two-air-fixture-repair",
+            "exit": 0,
+            "signal": null,
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        ],
+        "browserExecutions": 0
+      },
+      "necessaryProductRepair": {
+        "ok": true,
+        "results": [
+          {
+            "id": "scoped-air-product-fix",
+            "exit": 0,
+            "signal": null,
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        ],
+        "browserExecutions": 0
+      },
+      "unchangedSuccessfulTestsReused": 778,
+      "initialSuccessfulTestRecordsRetained": 780,
+      "initialSuccessesNecessarilyReverified": 2,
+      "neverRerunInitialSuccesses": 778,
+      "fullSuiteRerun": false
+    },
+    "local": {
+      "logicalCases": 4,
+      "physicalTrials": 6,
+      "initialLogicalTrialPassed": 2,
+      "initialLogicalTrialFailed": 2,
+      "necessaryPostOracleRepairPassed": 1,
+      "necessaryPostProductRepairPassed": 1,
+      "finalLogicalPassed": 4,
+      "finalFailed": 0,
+      "workers": 1,
+      "retries": 0,
+      "executedUIScopes": [
+        "3-3 navigator: requested optional-plan addition then reload/list redisplay",
+        "3-4 inline: finite current fighter1+AA0 attack1, readonly inspection then reload/re-search"
+      ],
+      "cnavReused": "Completed 8dd/ae315 source under plan901; actual currentAircraft count0 means the later one-argument classifier delta and expected-array delta are not evaluated. This is not relabeled as execution on the later source.",
+      "fleetSaveEditReexecuted": false,
+      "summarySHA256": "90f8db1726441b8ab4590926e704e513b3928b7efbd7cce34ae344fe57aa44fb",
+      "manifestSHA256": "8fbe3a7167788a87c34777b3e6b1f02171a16f2efb33c36d8961a93b469d151d",
+      "independentReviewSHA256": "ed861b5a25bc56a922365e1d10d2b2c5d8d72f28a68fa513dffed6270f92618a"
+    },
+    "necessaryCorrections": [
+      {
+        "kind": "Node fixture",
+        "initial": "782 tests780pass/2fail: missing handwritten Akagi slot entry dereferenced before product boundary",
+        "fix": "Use actual master snapshot row, prove fallback identity/profile response; only failed2 groups rerun2pass"
+      },
+      {
+        "kind": "UI oracle",
+        "initial": "Cnav initial display reached, incorrect assumption that only unselected air causes search termination; procurement/reload unreached",
+        "fix": "Independently check bounded incomplete search and unresolved numerical air; source/input/operations unchanged; necessary Cnav completed under original source"
+      },
+      {
+        "kind": "product display regression",
+        "initial": "Cinline initial guide mislabeled current fighter as outside recommended count while actual goal counted1; reload unreached",
+        "fix": "Pass named meta directly instead of nameless wrapper to existing matcher. Only7-byte argument delta, no count/allocation/save effects. Strengthen existing finite Node group for both scopes plus inverse verification; necessary Cinline completed."
+      }
+    ],
+    "history": {
+      "layers": 15,
+      "exactEndpoints": 30,
+      "oldGoldensRepinned": false
+    },
+    "preflight": {
+      "ok": true,
+      "normalCounts": {
+        "chromium": 924,
+        "webkit": 924
+      },
+      "wholeFileBins": [
+        {
+          "shard": 1,
+          "files": 16,
+          "cases": 339,
+          "estimatedSeconds": 1957
+        },
+        {
+          "shard": 2,
+          "files": 22,
+          "cases": 164,
+          "estimatedSeconds": 1967
+        },
+        {
+          "shard": 3,
+          "files": 22,
+          "cases": 237,
+          "estimatedSeconds": 1957
+        },
+        {
+          "shard": 4,
+          "files": 22,
+          "cases": 184,
+          "estimatedSeconds": 1956
+        }
+      ],
+      "webkitUnionExact": true,
+      "uniqueTestIDsExact": true,
+      "cases": [
+        {
+          "id": "chromium-inline",
+          "selected": 1
+        },
+        {
+          "id": "webkit-navigator",
+          "selected": 1
+        },
+        {
+          "id": "webkit-inline",
+          "selected": 1
+        }
+      ],
+      "browserExecutions": 0
+    },
+    "ci": {
+      "state": "final-source normal smoke pending",
+      "plannedFinalSourceRuns": 1,
+      "sameHEADReruns": 0,
+      "workflowChange": "one compact metadata summary glob only"
+    },
+    "oldCI": {
+      "runId": 42376362757,
+      "sourceSHA": "c71d3896da70f957ee5cc9ff8f164ce0b00cfaf5",
+      "chromium": [
+        922,
+        0,
+        0
+      ],
+      "webkit": [
+        902,
+        19,
+        1
+      ],
+      "sixOneStock": "WebKit initial/retry after-load search button not visible; full comparison not reached; cause/caller/raw values missing. Not filled by current success.",
+      "priorHTTP500Accepted": null,
+      "priorHTTP500Reposts": 0,
+      "oldTrialsBackfilled": false
+    },
+    "matrix": {
+      "before": [
+        28,
+        157,
+        51
+      ],
+      "after": [
+        28,
+        157,
+        51
+      ],
+      "changes": [],
+      "criteriaChanged": false
+    },
+    "remaining": [
+      "new3-3 inspection after-load re-search; navigator verifies requested-plan list redisplay instead",
+      "numeric selected-M/basic boundaries are Node only",
+      "all inventory variants/proficiency/stars/attrition/full battle sequence and safe swaps",
+      "sufficient optional quantity/source and actual game victory remain unverified"
+    ],
+    "proof": "continuation-air-count-optional-guidance-batch-20261109/private/; shared metadata only, originals retained",
+    "next": "2-1〜2-4の既存空母攻撃機目標から艦別合法搭載先への接続候補。4行C未確認を直接候補に、caller/helperの2-x除外を静的確認。実producerの目標生成・推奨origin/適用範囲を先に確認し、未生成を推測補完しない。private counter6入力は未実行、次製品・ブラウザー未実施。"
+  }
 }

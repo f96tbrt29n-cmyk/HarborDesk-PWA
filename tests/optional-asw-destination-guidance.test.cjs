@@ -3,6 +3,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {createSurfaceNightModelContext}=require('./fixtures/surface-night-model-context.cjs');
 const {createOptionalAswGuidanceHistoricalProjection}=require('./fixtures/optional-asw-guidance-source-layer.cjs');
+const {createAirCountOptionalHistoricalProjection}=require('./fixtures/air-count-optional-guidance-source-layer.cjs');
 const ROOT=path.resolve(__dirname,'..'),host=x=>JSON.parse(JSON.stringify(x)),hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 const THIRD=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/seven-five-third-browser-inputs.json'),'utf8'));
 function context(options={}){return createSurfaceNightModelContext({root:ROOT,...options})}
@@ -27,7 +28,7 @@ function project(u,{goal=u.goal,stock=u.stock,inventory=u.built.inventory,slots=
 function onlyCatalog(u,names){const items=names.map(name=>{const item=u.c.hdFEFind(name);assert.ok(item,name+' real equipment');return item});u.c.HD_EQUIPMENT_CATALOG=items;assert.equal(u.c.hdFLCatalog(),items)}
 
 test('optional-ASW historical inverse restores and replays the exact preceding owned source',()=>{
- const project=createOptionalAswGuidanceHistoricalProjection(ROOT),approved=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/optional-asw-guidance-approved-source-inverses.json'),'utf8'));assert.equal(approved.schemaVersion,1);assert.equal(approved.beforeSourceHEAD,'3217e5aba223cac52526e132a22a3f8ac8ff516f');assert.deepEqual(Object.keys(approved.files),['owned-equipment-planner.js']);const file='owned-equipment-planner.js',current=fs.readFileSync(path.join(ROOT,file),'utf8'),before=project(file,current);assert.equal(hash(before),'1470d556098809aa0a4b6978de95545ececdbf57935828ab5dafbed71b1ff284');assert.equal(hash(current),approved.files[file].approvedAfterSHA256);assert.throws(()=>project(file,current+'\n'));assert.throws(()=>project(file,before));assert.equal(project('unrelated.js','same'),'same');
+ const project=createOptionalAswGuidanceHistoricalProjection(ROOT),approved=JSON.parse(fs.readFileSync(path.join(ROOT,'tests/fixtures/optional-asw-guidance-approved-source-inverses.json'),'utf8'));assert.equal(approved.schemaVersion,1);assert.equal(approved.beforeSourceHEAD,'3217e5aba223cac52526e132a22a3f8ac8ff516f');assert.deepEqual(Object.keys(approved.files),['owned-equipment-planner.js']);const file='owned-equipment-planner.js',current=fs.readFileSync(path.join(ROOT,file),'utf8'),before=project(file,current);assert.equal(hash(before),'1470d556098809aa0a4b6978de95545ececdbf57935828ab5dafbed71b1ff284');assert.equal(hash(createAirCountOptionalHistoricalProjection(ROOT)(file,current)),approved.files[file].approvedAfterSHA256);assert.throws(()=>project(file,current+'\n'));assert.throws(()=>project(file,before));assert.equal(project('unrelated.js','same'),'same');
 });
 
 test('current lower1-6 and third7-5 producers expose the existing optional one-set goal without changing opening targets',()=>{
