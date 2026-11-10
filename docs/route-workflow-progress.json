@@ -197,7 +197,7 @@
           "evidence": [
             "tests/carrier-placement-guidance.test.cjs",
             "tests/owned-equipment-planner.spec.js",
-            "docs/route-workflow-progress-ja.md#2026-11-10-jst選択別艦載機案内13-normal14-j回避"
+            "docs/route-workflow-progress-ja.md#starter-selection-carrier-20261110"
           ]
         },
         "D": {
@@ -329,7 +329,7 @@
           "evidence": [
             "tests/carrier-placement-guidance.test.cjs",
             "tests/owned-equipment-planner.spec.js",
-            "docs/route-workflow-progress-ja.md#2026-11-10-jst選択別艦載機案内13-normal14-j回避"
+            "docs/route-workflow-progress-ja.md#starter-selection-carrier-20261110"
           ]
         },
         "D": {
@@ -3339,7 +3339,7 @@
       "1-4/0/j-avoid"
     ],
     "record": "starterSelectionCarrierBatch20261110",
-    "state": "local verification complete; tests/records only, final-source CI pending"
+    "state": "limited selection verification complete; smoke4success1failure1cancelled; fullC unresolved; gaps retained"
   },
   "nextPriority": "3-2の任意電探1個の案内と、必須電探装備艦数1/4隻・速力条件の分離。normal(index0/1)・fastPlus(index1)の未確認Cを共通処理から実生成対照し、既存fastPlus(index0)/fastest(index1)の成功はその範囲で再利用。欠陥確認前の製品修正なし。",
   "previousSelected": {
@@ -24480,8 +24480,8 @@
   "starterSelectionCarrierBatch20261110": {
     "dateJST": "2026-11-10",
     "baseHEAD": "662768e3a4bc300654fa644797b030dbe05fe0af",
-    "sourceSHA": null,
-    "state": "local verification complete; tests/records only, final-source CI pending",
+    "sourceSHA": "522ca924275a06de6166e0da6932ce42988c1318",
+    "state": "limited selection verification complete; smoke4success1failure1cancelled; fullC unresolved; gaps retained",
     "scope": [
       "1-3/0/normal",
       "1-4/0/j-avoid"
@@ -24532,10 +24532,91 @@
       "newTitlesSelected": 2
     },
     "ci": {
-      "state": "pending",
-      "runId": null,
+      "state": "completed",
+      "runId": 42779888152,
+      "sourceSHA": "522ca924275a06de6166e0da6932ce42988c1318",
+      "runAttempt": 1,
+      "event": "workflow_dispatch",
+      "postRequests": 1,
+      "reruns": 0,
+      "runConclusion": "failure",
+      "smokeJobs": {
+        "success": 4,
+        "failure": 1,
+        "cancelled": 1
+      },
+      "full": "skipped",
       "configuredNodeTests": 796,
-      "normalRunsRequested": 0
+      "numericNodeFooterObserved": false,
+      "chromium": {
+        "officialSummarySubtotal": [
+          465,
+          0,
+          0
+        ],
+        "officialSummaryJobs": 1,
+        "expectedJobs": 2,
+        "wholePFF": null,
+        "C2DeclaredCases": 465,
+        "C2LogicalOutcomeNull": 465,
+        "C2InitialCallbacks": 433,
+        "C2InitialEndPassed": 430,
+        "C2InitialEndFailed": 1,
+        "C2BeginWithoutEnd": 2,
+        "C2RetryEndFailed": 1,
+        "C2NoAttemptCallbacks": 32,
+        "interruptedOrUnstartedInferred": false
+      },
+      "webkitOfficialPassedFlakyFailed": [
+        919,
+        10,
+        1
+      ],
+      "PFFNotPhysicalFirstAttemptCounts": true,
+      "targets": {
+        "physicalPassedAtRetry0": 4,
+        "typed4PhaseSatisfied": 4,
+        "preservationCriticalFalse": 0,
+        "CLogicalFinalOutcome": null,
+        "WLogicalFinalOutcome": "expected",
+        "CPhysicalPassNotRunnerFinalSuccess": true
+      },
+      "finalWFailure": "W2 5-4 M-to-P scouting exempt: initial/retry load-after re-search click hidden/45s timeout; editing-after specified comparison passed; full post-load comparison not reached; actual value JSON/display caller missing",
+      "C2ObservedFailedAttempts": "7-5 third ABDFJOPT known initial/retry at shared search helper result-visible assertion82:100 after click returned; first search vs load-after search and save comparisons unknown; no individual official stack or case JSON",
+      "C2Timing": {
+        "preSeconds": 105,
+        "smokeSeconds": 2596,
+        "smokeConclusion": "cancelled",
+        "postSeconds": 121,
+        "postFailedAttemptPreservationSuccessSeconds": 113,
+        "cancellationStage": "Browser smoke step",
+        "maximumJobMinutes": 45,
+        "laterUploadNotCancellationCause": true
+      },
+      "artifacts": {
+        "requestedOnce": 12,
+        "downloaded": 11,
+        "bytes": 473140,
+        "officialSHA256CRC": "matched",
+        "missingArtifactId": 13747605380,
+        "missingName": "smoke-results-webkit-2-42779888152",
+        "failureKind": "connector-tool-failed",
+        "code": "UNKNOWN",
+        "message": "RemoteProtocolError: Server disconnected without sending a response.",
+        "sameRouteRetries": 0,
+        "CLIArtifactZIPGET": 0,
+        "largeZIPRequests": 0
+      },
+      "environment": "all6 receipts Node24.21.0/PW1.55.0/C1187/W2203; registry digest direct observation absent; configured Node796 is not numeric footer observation",
+      "independentResult": "PASS_WITH_GAPS",
+      "evidence": "shared/ci-results.json",
+      "gaps": [
+        "W2 compact artifact missing; official fullW PFF exists but individual physical record coverage incomplete",
+        "C2 onEnd/official PFF absent, 465 final outcomes null;2begin/end missing+32no callbacks not inferred statuses",
+        "C2 7-5 individual stack/first-vs-post-load phase/save comparison unknown",
+        "old local W first planner difference values not captured; new success does not fill them",
+        "failed-case raw values,display caller and underlying causes remain unknown"
+      ]
     },
     "matrix": {
       "before": [
@@ -24572,7 +24653,8 @@
     },
     "evidenceRoot": "continuation-starter-selection-batch-20261110/private/",
     "sharedMetadata": [
-      "shared/local-results.json"
+      "shared/local-results.json",
+      "shared/ci-results.json"
     ],
     "remaining": [
       "empty attack stock representatives only; no new actual attack-aircraft allocation or fleet save/edit",
