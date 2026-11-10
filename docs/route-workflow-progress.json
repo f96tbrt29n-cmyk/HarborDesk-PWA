@@ -925,7 +925,7 @@
         },
         "C": {
           "status": "一部",
-          "reason": "2026-11-10のナビChromium代表で任意電探0/目安1と必須電探艦数/速力指定なしを分離し、合法な0航空容量通常枠・具体カタログ搭載先、切替とreadonly load再表示を確認。保存編集・実配備・全不足区分は今回未確認。",
+          "reason": "2026-11-10のナビChromium代表で任意電探0/目安1と必須電探艦数/速力指定なしを分離し、合法な0航空容量通常枠・具体カタログ搭載先、切替とreadonly load再表示を確認。保存編集・実配備・全不足区分は今回未確認。 同source CI42804708964のW3新2代表でも初回4phase適合（normal1はcontrolのみ）。今回CIのC2 callbackは欠測で補完しない。",
           "evidence": [
             "docs/pr152-three-two-radar-guidance-ja.md",
             "tests/three-two-radar-guidance.test.cjs",
@@ -1052,7 +1052,7 @@
         },
         "C": {
           "status": "一部",
-          "reason": "2026-11-10のindex1 WebKit controlでnormalへ実切替・実検索し、任意電探0/1と必須電探艦数/速力指定なし、catalog3/合法54搭載先・current turbine/他9キー/目標保持と実画面案内を照合。normal選択のままのreload・保存編集・実配備は今回未確認。",
+          "reason": "2026-11-10のindex1 WebKit controlでnormalへ実切替・実検索し、任意電探0/1と必須電探艦数/速力指定なし、catalog3/合法54搭載先・current turbine/他9キー/目標保持と実画面案内を照合。normal選択のままのreload・保存編集・実配備は今回未確認。 同source CI42804708964のW3新2代表でも初回4phase適合（normal1はcontrolのみ）。今回CIのC2 callbackは欠測で補完しない。",
           "evidence": [
             "docs/pr152-three-two-radar-guidance-ja.md",
             "tests/three-two-radar-guidance.test.cjs",
@@ -1091,7 +1091,7 @@
         },
         "C": {
           "status": "一部",
-          "reason": "2026-11-10の編成内WebKit代表で任意電探0/1と必須電探1艦/高速＋15を分離し、現在turbine占有枠の交換対象・条件維持未評価と具体合法搭載先、切替とreadonly load再表示を確認。保存編集・実配備・全不足区分は今回未確認。",
+          "reason": "2026-11-10の編成内WebKit代表で任意電探0/1と必須電探1艦/高速＋（判定rank15）を分離し、現在turbine占有枠の交換対象・条件維持未評価と具体合法搭載先、切替とreadonly load再表示を確認。保存編集・実配備・全不足区分は今回未確認。 同source CI42804708964のW3新2代表でも初回4phase適合（normal1はcontrolのみ）。今回CIのC2 callbackは欠測で補完しない。",
           "evidence": [
             "docs/pr152-three-two-radar-guidance-ja.md",
             "tests/three-two-radar-guidance.test.cjs",
@@ -3352,9 +3352,9 @@
       "3-2/1/fastPlus"
     ],
     "record": "threeTwoRadarCountGuidanceBatch20261110",
-    "state": "limited guidance complete; final source smoke pending"
+    "state": "limited guidance complete; smoke2success3failure1cancelled; fullC unknown; acquisition and old gaps retained"
   },
-  "nextPriority": "3-5上BDHK／5-5中央下BFDHNOSの任意索敵2個と数値経路条件の分離・艦別合法交換先を共通候補にする。既存登録根拠と接続差のprivate対照計画／scriptまで、次の実生成・実装・ブラウザーは未実施。まずactual producerで具体的欠陥がある場合だけ最小修正する。",
+  "nextPriority": "3-5上BDHK／5-5中央下BFDHNOSの任意索敵2個と数値条件の分離・艦別合法交換先。source66dfのNode1群/4actual対照で2対象の必要/調達誤表現とinspection未接続を確認。登録在庫viewへ接続するprivate最小案は未適用。空在庫named catalogは別残件、fresh数値出典・新UI・現在セル加算0。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -24713,7 +24713,77 @@
       "Old C final unresolved/W2 ZIP gap and Night/held4-5 preserved"
     ],
     "ci": {
-      "state": "not started; one final-source smoke pending"
+      "state": "terminal failure recorded; missing compact and old concerns retained",
+      "sourceSHA": "66df3f498b4ffb8e51a473e967c41ecf96816741",
+      "runId": 42804708964,
+      "runAttempt": 1,
+      "smokeJobs": {
+        "success": 2,
+        "failure": 3,
+        "cancelled": 1
+      },
+      "Full": "skipped",
+      "runConclusion": "failure",
+      "officialPFF": {
+        "chromium": null,
+        "chromiumC1Subtotal": {
+          "passed": 466,
+          "flaky": 0,
+          "failed": 0
+        },
+        "webkit": {
+          "passed": 917,
+          "flaky": 11,
+          "failed": 4
+        }
+      },
+      "targetWebKit": "both retry0 physical passed/4phase satisfied in W3",
+      "targetChromium": "unknown; C2 compact gap, never filled from local or W",
+      "verifiedSmallZIPs": 10,
+      "verifiedSmallZIPBytes": 385968,
+      "responseReferenceMissingArtifactIds": [
+        13761304061,
+        13760391607
+      ],
+      "remoteDownloadSuccessOrFailureForThose": "unknown; interruption before response references persisted",
+      "artifactReGETs": 0,
+      "C2SeparateDecodedLogRoute": "one Transport closed/no bytes/no retry",
+      "individualObservedNonPassed": 14,
+      "classificationCounts": {
+        "total": 14,
+        "postReloadClickNonvisible": 10,
+        "nightPostReloadPageerrorInspection": 1,
+        "firstOperationUnknown": 3
+      },
+      "W1AnnotationAttemptsSeparateFromMissingCallbacks": true,
+      "C2Cancellation": {
+        "stage": "browser smoke",
+        "preSeconds": 109,
+        "browserSeconds": 2592,
+        "postSeconds": 117,
+        "postFailureEvidenceSeconds": 109
+      },
+      "CIIndependent": "PASS_WITH_GAPS",
+      "classificationIsSeparatePrivateEvidence": true,
+      "newSaveMismatchPositiveEvidence": false,
+      "notGeneralSafetyProof": true,
+      "oldGapsNotFilled": true
+    },
+    "sourceSHA": "66df3f498b4ffb8e51a473e967c41ecf96816741",
+    "nextPreparation": {
+      "scope": [
+        "3-5/1/default BDHK",
+        "5-5/1/default BFDHNOS"
+      ],
+      "sourceSHA": "66df3f498b4ffb8e51a473e967c41ecf96816741",
+      "actualCounterGroups": 1,
+      "actualContexts": 4,
+      "targetConsumerDefectsConfirmed": 2,
+      "privateMinimumProposalOnly": true,
+      "implementationApplied": false,
+      "newUIOrCurrentCellCredit": 0,
+      "emptyInventoryNamedCatalogStillUnresolved": true,
+      "numericalThresholdsFreshSourceVerified": false
     }
   }
 }

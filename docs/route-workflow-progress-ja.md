@@ -3,10 +3,10 @@
 ## 2026-11-10 JST：3-2 任意電探個数と必須装備艦数・速力
 
 1. **改善**：任意電探1個を必須個数／確定調達数としていた案内を訂正。電探装備艦1／4隻は別判定のまま、装備名・登録／現在／未使用、実艦の合法通常／実開放増設枠・現在装備の交換対象を表示。交換後の速力・必須艦数・利用者目標維持は未評価と明示し、自動適用しない。
-2. **範囲**：3-2両indexのcanonical生成目安。通常H許容、H回避＝高速＋15＋電探1艦、最速CEFL＝最速20＋別4艦を分離し、同艦複数は1艦。FE／探索／保存schema・既存制空／索敵は不変。
-3. **検証と欠測**：修正前3actual対照で同じ欠落を確認。Node803初回成功、UI設定1アンカーだけの訂正後も722ファイル不変と逆変換一致で再利用／全体反復0。C初回はtrace function形式のfixture起動失敗で製品操作・metadata未到達。その原本を保持し、literal offへ訂正した必要C1回と未実施W1回は4phase成功。通常一覧82/各932・W339/164/245/184和集合/重複0、新2例選択確認。19top/53checkpointの新案内・10キーの意図差と他9キー／他編成metadata／保存済み利用者目標保持を同試行で直接照合。54原本/trace0・独立PASS_WITH_GAPS。旧C未到達／旧W未実施を補完しない。詳細は[限定記録](pr152-three-two-radar-guidance-ja.md)。通常smokeは最終sourceでこれから1回確認する。旧全C未確定／W2 ZIP欠測も維持。
+2. **範囲**：3-2両indexのcanonical生成目安。通常H許容、H回避＝高速＋（判定rank15）＋電探1艦、最速CEFL＝最速（rank20）＋別4艦を分離し、同艦複数は1艦。FE／探索／保存schema・既存制空／索敵は不変。
+3. **検証と欠測**：修正前3actual対照で同じ欠落を確認。Node803初回成功、UI設定1アンカーだけの訂正後も722ファイル不変と逆変換一致で再利用／全体反復0。C初回はtrace function形式のfixture起動失敗で製品操作・metadata未到達。その原本を保持し、literal offへ訂正した必要C1回と未実施W1回は4phase成功。通常一覧82/各932・W339/164/245/184和集合/重複0、新2例選択確認。19top/53checkpointの新案内・10キーの意図差と他9キー／他編成metadata／保存済み利用者目標保持を同試行で直接照合。54原本/trace0・独立PASS_WITH_GAPS。旧C未到達／旧W未実施を補完しない。詳細は[限定記録](pr152-three-two-radar-guidance-ja.md)。最終source**66df3f49**の[smoke42804708964](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/42804708964) attempt1は**2成功/3失敗/1取消（Full skipped/run failure）**。公式C1小計466/0/0のみで全C未確定、全W917/11/4。新WebKit2例はretry0/4phase適合、C新2例はC2 compact欠測で未確認。10小ZIP385968BのSHA/CRC一致、exec一時切断時のC2/W1応答参照未保持2件はremote成否不明/再GET0、C2別job-log connector1回もTransport closed。CI独立PASS_WITH_GAPSと失敗分類を分離。WebKit最終4ケースは3-5下unknownのload全文後access-control検査、7-2stock/5-5ready/7-4stockの保存編集比較後load-click非表示・全文未到達。観測nonpassed14は10同停止/1night例外検査/3操作未確定、W1注記を欠測物理数へ加算しない。night getter旧懸念は凍結。C2取消はBrowser2592秒（前109秒）、後段保持117秒/資料109秒成功を取消原因へ混ぜない。6job実測Node24.21.0/PW1.55/C1187/W2203、Node数値footer/実registry digest未観測。新保存不一致の陽性証拠なしを安全性へ換算せず、旧全C未確定/旧W2 ZIP欠測/根因未確定を維持。
 4. **セル**：28/163/45→**28確認済み／166一部／42未確認**。normal0、normal1、fastPlus1の案内列Cだけ未→一部。normal1はWcontrolの実検索・表示であり、normalのままのreload・保存編集・実配備は未確認。A/B/D・236基準・旧53区分を維持。4-5隔離12件／別草稿と夜戦方針凍結は合算しない。
-5. **次バッチ**：3-5上BDHK／5-5中央下BFDHNOSの任意索敵2個と数値条件の分離・艦別交換先。private対照準備のみで、新実装や試験成功を加算しない。
+5. **次バッチ**：3-5上BDHK／5-5中央下BFDHNOSの任意索敵2個と数値条件の分離・艦別交換先。privateで4実生成対照を1群・全件採取し、2対象の任意2個の必要/調達表現・案内未接続を確認。最小案は未適用、空在庫named catalogは別残件。新実装・UI・現在セルの加算0。
 
 原本 `continuation-three-two-radar-batch-20261110/private/`、sharedは許可metadataのみ。PR152ドラフト・未公開、保護対象と既知残件を維持。以下は履歴。
 
