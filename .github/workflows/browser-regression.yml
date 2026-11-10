@@ -125,6 +125,7 @@ jobs:
             test-results/owned-equipment-planner-*/air-count-optional-ui-summary.json
             test-results/owned-equipment-planner-*/two-area-carrier-ui-summary.json
             test-results/owned-equipment-planner-*/two-area-air-count-ui-summary.json
+            test-results/owned-equipment-planner-*/starter-selection-ui-summary.json
           if-no-files-found: warn
           retention-days: 14
 

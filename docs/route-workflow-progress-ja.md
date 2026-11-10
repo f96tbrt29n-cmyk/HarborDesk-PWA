@@ -1,3 +1,13 @@
+## 2026-11-10 JST：選択別艦載機案内（1-3 normal／1-4 J回避）
+
+1. **改善**：既存案内が選択別でも正しく接続されており、製品変更は不要と確認。任意の攻撃機目標は同じ既知空母数（今回1）で、通行必須・十分な戦力/購入数ではない。装備名・正容量の合法通常枠・現在艦戦との対応を確認し、交換後数値/条件維持・同時配備は未評価のまま。
+2. **範囲**：1-3 normalナビ（飛鷹改＋軽巡＋駆逐4）と1-4 J回避編成内（飛鷹改＋大鯨＋駆逐4）。同じ艦隊でnormal↔CFJ／normal↔J回避を対照。艦載機目標/担当艦/合法4枠は共通だが、選択ID・経路表記・必須チェックは3↔4／3↔5へ変化。1-3は実経路CFJ固定、1-4はADEHL/BCFEHLのランダムで、ボス到達条件と戦闘勝利を区別。既存normal軽空母2例とは入力が異なる。
+3. **検証と欠測**：既存4actual Node探索と境界成功を24module/旧Node prefix一致で再利用し、新しい保存キー優先/切替/未知ID/利用者carrier3保持のNode1群だけ初回成功。局所は固定image/Node24.21.0/PW1.55/C1187/W2203、workers1/retries0・45秒/12秒。最初のlistはdescribe内trace設定の制約で失敗（browser0）、新2例専用test.extendへ訂正。Cは4phase初回成功。W初回はinitial-adviceの対象外planner全体一致falseで、switch/loadは未到達・実差分内訳未採取。通常inline表示のplanner初期追加も禁止していたfixture誤前提を静的確認し、inlineだけactual hdFCStateで比較前初期化。全体一致検査は変えずW必要再検証1回で4phase成功、Cは影響なしで再実行0。旧Wの差分が初期追加だけだったと後続成功から断定しない。各完了例はtarget→control→target→reload後の4検索/2切替、19/51項目。対象route keyの意図した1entry更新と他9キー/他目標/保存fleet全文/他編成metadataを分けて比較。元cache削除は要求せず、切替直後の旧結果非表示と新結果の現選択/own metadataを確認。保存/編集共通部は既存証拠の範囲で再利用し、新規保存編集/配備成功へ広げない。原本64・新trace/動画/画像0、独立照合PASS_WITH_GAPSは旧Wの欠測を保持。通常固定82ファイル/各930例・W339/164/243/184の和集合と新2例選択を確認。最終source smoke1回はpending。旧CI42747178222の最終5失敗は同試行で、3-5はload全文比較後の例外検査、他4件は保存編集比較後のload click非表示/全文未到達。保存不一致陽性なしを安全性保証にせず、原因/caller/実値欠測、2-5未知初回の個別注記欠測も維持。
+4. **セル**：28確認済み/161一部/47未確認→**28/163/45**。1-3/0/normal・1-4/0/j-avoidの案内列Cだけ未→一部。A/B/D・基準/旧53区分は維持。readonly再表示を保存編集Dへ加算しない。4-5の12差分/原本/草稿28/161/47（別セル）は隔離保持、push/CI保留。夜戦方針経路も未解決/凍結。
+5. **次バッチ**：3-2の任意電探個数と必須電探装備艦数・速力条件の案内。まず既存出典とactual producerを照合し、根拠のある差分だけ扱う。
+
+証拠 `continuation-starter-selection-batch-20261110/private/`、sharedは許可metadataのみ。PR152ドラフト・未公開、main競合/PR151/版/SW/本番と原本を維持。以下は履歴。
+
 ## 2026-11-10 JST：2-1〜2-4任意制空個数案内（4-5と独立）
 
 1. **改善**：既存の制空装備2個という任意目安を、数値制空目標・通行必須条件・空母別攻撃機目標から分離。装備名・改修別登録／現在／未使用、合法艦・正の搭載数の確認済み枠、現在装備との交換対象を共通表示。情報不足・搭載不可を在庫不足や購入必須へ変換しない。交換後の制空値／条件維持・熟練度／残機／連戦は未評価と表示。
@@ -324,10 +334,10 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 |---|---|---|---|---|---|
 |1-1/0/default AC|一部|一部|一部|一部|[pr152-registered-example-completion-ja](pr152-registered-example-completion-ja.md)|
 |1-2/0/default AE|一部|一部|一部|一部|[pr152-ae-speed-ui-ja](pr152-ae-speed-ui-ja.md)|
-|1-3/0/normal CFJ / A(DB)EFJ|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）／[共通実装・Nodeのみ](#2026-11-06-jst1-31-4-艦別搭載先案内バッチ局所確定ci待ち)|
+|1-3/0/normal CFJ / A(DB)EFJ|一部|未確認|一部|未確認|選択別代表Cの4phase案内/readonly load確認。B/Dは未加算。|
 |1-3/0/cfj CFJ|一部|未確認|一部|一部|[route-1-3-verification-ja](route-1-3-verification-ja.md)／[共通搭載先案内](#2026-11-06-jst1-31-4-艦別搭載先案内バッチ局所確定ci待ち)|
 |1-4/0/normal BCF(E)HL / AD(EH/GJ)L|一部|一部|一部|一部|今回C/W局所：配備・不足案内・load再表示（保存編集全体未完）／[共通搭載先案内](#2026-11-06-jst1-31-4-艦別搭載先案内バッチ局所確定ci待ち)|
-|1-4/0/j-avoid BCFEHL / ADEHL|一部|未確認|未確認|一部|[route-1-4-verification-ja](route-1-4-verification-ja.md)／[共通実装・Nodeのみ](#2026-11-06-jst1-31-4-艦別搭載先案内バッチ局所確定ci待ち)|
+|1-4/0/j-avoid BCFEHL / ADEHL|一部|未確認|一部|一部|選択別代表Wのfixture訂正後4phase確認。初回差分内容欠測は別保持、Dは旧範囲。|
 |1-5/0/default ADEJ|一部|一部|一部|一部|[route-goal-guidance-ja](route-goal-guidance-ja.md)|
 |1-5/1/default ADFGJ|一部|一部|一部|確認済み|[1-5航戦四隻の限定記録](pr152-one-five-middle-ja.md)|
 |1-5/2/default ADFGJ|一部|一部|一部|一部|[asw-route-targets-ja](asw-route-targets-ja.md)|

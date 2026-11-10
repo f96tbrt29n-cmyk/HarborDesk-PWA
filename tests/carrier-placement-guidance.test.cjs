@@ -112,3 +112,44 @@ test('carrier inspection has no Storage or inventory reads writes timers or DOM 
 test('unmodified legacy carrier target rows and HTML remain byte-equivalent for the existing 3-3 route',()=>{
  const h=context(),before=context({project:createCarrierGuidanceHistoricalProjection(ROOT)}),p=plan(h,'3-3','', ['飛鷹改']),old=host(p),g=recommendation(),current=targets(h,p,g),previous=before.c.hdOCThreeThreeCarrierTargets(old,g);assert.deepEqual(host(current),host(previous));assert.equal(Object.hasOwn(current[0],'placementScope'),false);const stock=h.c.hdSECapabilityStock(p,g.kind,1),goal={...g,goalKind:g.kind,capability:true,stock,carrierTargets:current};assert.equal(h.c.hdOCCapabilityStockHtml(goal),before.c.hdOCCapabilityStockHtml({...goal,carrierTargets:previous}));
 });
+
+
+test('stored starter-route choices keep per-fleet precedence without leaving prior goals',()=>{
+ // Read the actual synthetic Storage value through the product getter. These
+ // are build/measure checks only: none of the four retained searches is rerun.
+ for(const [map,alternate,names,paths] of [
+  ['1-3','cfj',CASES[0][2],{normal:'CFJ / A(DB)EFJ',cfj:'CFJ'}],
+  ['1-4','j-avoid',CASES[3][2],{normal:'BCF(E)HL / AD(EH/GJ)L','j-avoid':'BCFEHL / ADEHL'}]
+ ]){
+  const h=context(),{c}=h,ctx=input(h,map,alternate,names),key=h.value('HD_OC_ROUTE_GOAL_KEY'),entry=map+':'+ctx.fleet.id;
+  const outside=JSON.stringify([...h.store]),user={kind:'cap-carrier-attack',label:'explicit carrier quantity',minCount:3,generatedFromMap:false,purpose:'strategy'},userBefore=JSON.stringify(user);
+  const build=(entries,saved=alternate)=>{
+   ctx.fleet.routeGoal=saved;h.seed(key,entries);const before=JSON.stringify(ctx),stored=JSON.stringify([...h.store]),selected=c.hdOCRouteGoal(ctx),built=c.hdOCBuild(ctx);
+   assert.equal(JSON.stringify(built.plan.routeGoal)===JSON.stringify(selected),true,'the actual build consumes the selected value');
+   assert.equal(JSON.stringify(ctx)===before,true,'selection and build preserve the saved fleet');assert.equal(JSON.stringify([...h.store])===stored,true,'selection and build do not write Storage');
+   assert.equal(JSON.stringify([...h.store].filter(([k])=>k!==key))===outside,true,'all unrelated synthetic keys remain exact');assert.equal(h.writes.length,0);
+   return {...built,selected,branch:c.hdFEBranchRoute(built.plan)};
+  };
+  for(const [entries,saved,expected] of [
+   [{},alternate,alternate],
+   [{[entry]:'normal'},alternate,'normal'],
+   [{[entry]:alternate},'normal',alternate],
+   [{[map+':another-fleet']:'normal',['another-map:'+ctx.fleet.id]:'normal'},alternate,alternate],
+   [{[entry]:null},alternate,alternate],
+   [{[entry]:''},alternate,'normal'],
+   [{},null,'normal'],
+   [{},'','normal']
+  ]){const result=build(entries,saved);assert.equal(result.selected,expected);assert.equal(result.branch.goal,expected);assert.equal(result.branch.path,paths[expected]);}
+  const seen=new Map(),signatures=new Map();for(const selected of ['normal',alternate,'normal']){
+   const result=build({[entry]:selected}),measure=c.hdOCMeasure(result.plan,c.hdSEChecks(map).rows,result.unknown),route=measure.goals.filter(g=>g.kind==='route-branches'),carrier=measure.goals.filter(g=>g.kind==='cap-carrier-attack');
+   assert.equal(result.branch.goal,selected);assert.equal(result.branch.path,paths[selected]);assert.equal(result.branch.status,'ready');
+   assert.equal(route.length,1);assert.equal(route[0].label,paths[selected]+'の分岐条件','only the current branch selection is displayed');
+   assert.equal(carrier.length,1);assert.equal(carrier[0].minCount,1);assert.equal(carrier[0].count,0);assert.equal(carrier[0].purpose,'recommendation');assert.equal(carrier[0].generatedFromMap,true);
+   const explicit=c.hdOCMeasure(result.plan,[user],result.unknown).goals.find(g=>g.kind===user.kind);assert.equal(explicit.minCount,3);assert.equal(explicit.purpose,'strategy');assert.equal(explicit.generatedFromMap,false);assert.equal(c.hdOCThreeThreeCarrierTargets(result.plan,explicit)===null,true);assert.equal(JSON.stringify(user)===userBefore,true,'selection does not rewrite the existing explicit goal');
+   const signature=c.hdOCSignature(ctx),snapshot=JSON.stringify({measure,signature});signatures.set(selected,signature);if(seen.has(selected))assert.equal(snapshot===seen.get(selected),true,'returning to a selection yields the same fresh model and signature');else seen.set(selected,snapshot);
+  }
+  assert.equal(signatures.get('normal')!==signatures.get(alternate),true,'different selected goals cannot share a result signature');
+  for(const unknown of ['unknown','constructor','__proto__',0]){const result=build({[entry]:unknown});assert.equal(result.selected,unknown);assert.equal(result.branch.status,'manual');assert.equal(result.branch.goal,unknown);assert.equal(c.hdOCStarterCarrierScope(result.plan,recommendation()),false);assert.equal(c.hdOCThreeThreeCarrierTargets(result.plan,recommendation())===null,true);assert.match(c.hdOCRouteGoalHtml(ctx,''),/未登録の目標・選び直してください/);}
+  h.store.set(key,'{');assert.equal(c.hdOCRouteGoal(ctx),alternate,'malformed stored JSON falls back to the saved fleet, not an arbitrary normal goal');assert.equal(h.writes.length,0);
+ }
+});

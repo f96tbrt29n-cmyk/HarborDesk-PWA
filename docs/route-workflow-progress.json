@@ -68,8 +68,8 @@
     },
     "C": {
       "確認済み": 0,
-      "一部": 47,
-      "未確認": 12,
+      "一部": 49,
+      "未確認": 10,
       "非該当": 0
     },
     "D": {
@@ -192,9 +192,13 @@
           "evidence": []
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "1-3normalナビC／1-4j-avoid編成内Wの各代表でtarget→control→target→reload/load後の4段階、任意攻撃機1例・実艦/通常枠/現在装備との対応を確認。1-4は通常planner初期化のfixture誤前提を訂正後、全体一致を維持して必要再検証成功。初回W実差分内訳は欠測として別保持。全在庫/全艦・新規配備/保存編集を確認済みへ広げない。",
+          "evidence": [
+            "tests/carrier-placement-guidance.test.cjs",
+            "tests/owned-equipment-planner.spec.js",
+            "docs/route-workflow-progress-ja.md#2026-11-10-jst選択別艦載機案内13-normal14-j回避"
+          ]
         },
         "D": {
           "status": "未確認",
@@ -202,7 +206,7 @@
           "evidence": []
         }
       },
-      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。 艦別攻撃機案内は共通接続済み。実操作は1-3/cfj在庫0と1-4/normal有限1機の2入口だけで、他の選択目標へ流用しない。通常枠/増設対象外/在庫と現在配備を区別し、全目標十分性・全失敗区分は残る。"
+      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。 艦別攻撃機案内は共通接続済み。実操作は1-3/cfj在庫0と1-4/normal有限1機の2入口だけで、他の選択目標へ流用しない。通常枠/増設対象外/在庫と現在配備を区別し、全目標十分性・全失敗区分は残る。 今回は指定選択の任意攻撃機案内と切替/readonly load再表示を確認。新規実配備・保存/編集・全艦/枠・交換後数値/条件維持・十分な数量・勝利は未確認。初回Wのplanner差分内訳は未採取で後続成功から補完しない。"
     },
     {
       "id": "1-3/0/cfj",
@@ -320,11 +324,12 @@
           ]
         },
         "C": {
-          "status": "未確認",
-          "reason": "既存の同じ選択目標の所持艦代替/保存は空在庫・装備目標を省く経路専用対照。実装備の自動配備/不足案内の証拠へ換算しない。",
+          "status": "一部",
+          "reason": "1-3normalナビC／1-4j-avoid編成内Wの各代表でtarget→control→target→reload/load後の4段階、任意攻撃機1例・実艦/通常枠/現在装備との対応を確認。1-4は通常planner初期化のfixture誤前提を訂正後、全体一致を維持して必要再検証成功。初回W実差分内訳は欠測として別保持。全在庫/全艦・新規配備/保存編集を確認済みへ広げない。",
           "evidence": [
-            "docs/route-1-4-verification-ja.md",
-            "tests/route-1-4.spec.js"
+            "tests/carrier-placement-guidance.test.cjs",
+            "tests/owned-equipment-planner.spec.js",
+            "docs/route-workflow-progress-ja.md#2026-11-10-jst選択別艦載機案内13-normal14-j回避"
           ]
         },
         "D": {
@@ -336,7 +341,7 @@
           ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 艦別攻撃機案内は共通接続済み。実操作は1-3/cfj在庫0と1-4/normal有限1機の2入口だけで、他の選択目標へ流用しない。通常枠/増設対象外/在庫と現在配備を区別し、全目標十分性・全失敗区分は残る。"
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 艦別攻撃機案内は共通接続済み。実操作は1-3/cfj在庫0と1-4/normal有限1機の2入口だけで、他の選択目標へ流用しない。通常枠/増設対象外/在庫と現在配備を区別し、全目標十分性・全失敗区分は残る。 今回は指定選択の任意攻撃機案内と切替/readonly load再表示を確認。新規実配備・保存/編集・全艦/枠・交換後数値/条件維持・十分な数量・勝利は未確認。初回Wのplanner差分内訳は未採取で後続成功から補完しない。"
     },
     {
       "id": "1-5/0/default",
@@ -3327,18 +3332,16 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "two-area-air-count-batch",
-    "baselineHead": "90eb4a8743c854c8d20a98b0901b0fca63414f90",
+    "id": "starter-selection-carrier-guidance",
+    "baselineHead": "662768e3a4bc300654fa644797b030dbe05fe0af",
     "scope": [
-      "2-1/0/default",
-      "2-2/0/default",
-      "2-3/0/default",
-      "2-4/0/default"
+      "1-3/0/normal",
+      "1-4/0/j-avoid"
     ],
-    "record": "twoAreaAirCountBatch20261110",
-    "state": "limited batch committed; final-source CI completed with five other-route WebKit final failures; source and missing observations retained"
+    "record": "starterSelectionCarrierBatch20261110",
+    "state": "local verification complete; tests/records only, final-source CI pending"
   },
-  "nextPriority": "1-3/normal and1-4/j-avoid existing common carrier guidance: verify selection-specific gaps, reuse other selectors’ successes, no guessed product fix",
+  "nextPriority": "3-2の任意電探1個の案内と、必須電探装備艦数1/4隻・速力条件の分離。normal(index0/1)・fastPlus(index1)の未確認Cを共通処理から実生成対照し、既存fastPlus(index0)/fastest(index1)の成功はその範囲で再利用。欠陥確認前の製品修正なし。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -7273,6 +7276,18 @@
       ],
       "record": "carrierGuidanceBatch20261106",
       "state": "shared guidance and local proof complete; final-source CI collected/independently matched; next shared-night baseline3 confirmed, implementation pending"
+    },
+    {
+      "id": "two-area-air-count-batch",
+      "baselineHead": "90eb4a8743c854c8d20a98b0901b0fca63414f90",
+      "scope": [
+        "2-1/0/default",
+        "2-2/0/default",
+        "2-3/0/default",
+        "2-4/0/default"
+      ],
+      "record": "twoAreaAirCountBatch20261110",
+      "state": "limited batch committed; final-source CI completed with five other-route WebKit final failures; source and missing observations retained"
     }
   ],
   "fiveFourCloseout": {
@@ -24449,5 +24464,122 @@
     ],
     "record": "twoAreaCarrierReferenceBatch20261110",
     "state": "shared four-route guide locally and CI target verified; suite and frozen night-policy concern recorded separately"
+  },
+  "selectedBeforeStarterSelectionBatch20261110": {
+    "id": "two-area-air-count-batch",
+    "baselineHead": "90eb4a8743c854c8d20a98b0901b0fca63414f90",
+    "scope": [
+      "2-1/0/default",
+      "2-2/0/default",
+      "2-3/0/default",
+      "2-4/0/default"
+    ],
+    "record": "twoAreaAirCountBatch20261110",
+    "state": "limited batch committed; final-source CI completed with five other-route WebKit final failures; source and missing observations retained"
+  },
+  "starterSelectionCarrierBatch20261110": {
+    "dateJST": "2026-11-10",
+    "baseHEAD": "662768e3a4bc300654fa644797b030dbe05fe0af",
+    "sourceSHA": null,
+    "state": "local verification complete; tests/records only, final-source CI pending",
+    "scope": [
+      "1-3/0/normal",
+      "1-4/0/j-avoid"
+    ],
+    "controls": [
+      "1-3/0/cfj",
+      "1-4/0/normal with same new single-carrier fleet"
+    ],
+    "productChange": false,
+    "productionJSFilesUnchanged": 89,
+    "before": "既存4実生成対照/境界は正常。選択ID・登録経路・必須チェックは変化し、同じ艦隊の任意目標/艦/合法通常枠は共通保持。未接続・誤表示の製品差分なし。",
+    "node": "既存4actual producerと境界の成功を24module/旧17643B prefix一致で再利用。新stored priority/切替/未知ID/利用者carrier3保持1群は初回1成功、旧4探索再実行0。全Node gateの局所再実行なし。",
+    "local": {
+      "logicalCases": 2,
+      "physicalTrials": 3,
+      "chromium": "navigator normal initial pass, four phases; reused after inline-only fixture correction",
+      "webkitInitial": "initial-advice unrelatedPlannerExact false; one search, no switch/reload/checkpoint; actual planner key/value differences not captured; no after-failure read",
+      "webkitCorrected": "only inline synthetic fixture actual hdFCState(map,id) before baseline, original whole-object comparison unchanged; necessary single target rerun passed all four phases",
+      "phases": [
+        "initial",
+        "control",
+        "returned",
+        "after-load"
+      ],
+      "searchesPerCompletedCase": 4,
+      "selectorChangesPerCompletedCase": 2,
+      "reloadsPerCompletedCase": 1,
+      "metadataContract": "19 top/51 checkpoint fields",
+      "preservation": "expected single active route entry change; nine other keys, other route entries, original whole saved fleet/goals, other fleets/metadata and non-owned planner whole equality; own derived proposal follows current choice",
+      "privateRawFiles": 64,
+      "newTraceVideoScreenshot": 0,
+      "independentResult": "PASS_WITH_GAPS; old W missing phases retained"
+    },
+    "fixtureCorrections": [
+      "Playwright1.55 forbids trace use within describe; new2cases dedicated test.extend fixture keeps privacy off without changing old prefix or assertions; initial failed list involved no browser",
+      "inline normal calculator initializes missing ordinary planner; synthetic snapshot moved after actual initialization only for inline; old actual difference exclusivity remains unconfirmed"
+    ],
+    "preflight": {
+      "filesPerBrowser": 82,
+      "casesPerBrowser": 930,
+      "WebKitBins": [
+        339,
+        164,
+        243,
+        184
+      ],
+      "uniqueIDsAndWholeUnionExact": true,
+      "newTitlesSelected": 2
+    },
+    "ci": {
+      "state": "pending",
+      "runId": null,
+      "configuredNodeTests": 796,
+      "normalRunsRequested": 0
+    },
+    "matrix": {
+      "before": [
+        28,
+        161,
+        47
+      ],
+      "after": [
+        28,
+        163,
+        45
+      ],
+      "changes": [
+        {
+          "id": "1-3/0/normal",
+          "item": "C",
+          "before": "未確認",
+          "after": "一部"
+        },
+        {
+          "id": "1-4/0/j-avoid",
+          "item": "C",
+          "before": "未確認",
+          "after": "一部"
+        }
+      ],
+      "criteriaChanged": false,
+      "A_B_DUnchanged": true
+    },
+    "holds": {
+      "fourFiveUncommitted12": "held branch/worktree/originals; no push/CI; draft28/161/47 excluded",
+      "nightPolicy": "unresolved/frozen; no targeted diagnosis or modification",
+      "oldCI42747178222": "C927/1/0 W914/9/5; final5 classified by same attempt, no new corruption positive evidence, raw/caller gaps retained"
+    },
+    "evidenceRoot": "continuation-starter-selection-batch-20261110/private/",
+    "sharedMetadata": [
+      "shared/local-results.json"
+    ],
+    "remaining": [
+      "empty attack stock representatives only; no new actual attack-aircraft allocation or fleet save/edit",
+      "all hull/frame/inventory combinations and fixed/conflicting slots",
+      "numeric air/LOS, goal preservation after actual exchanges, battle losses/victory",
+      "old W initial difference contents not recovered"
+    ],
+    "next": "3-2の任意電探1個の案内と、必須電探装備艦数1/4隻・速力条件の分離。normal(index0/1)・fastPlus(index1)の未確認Cを共通処理から実生成対照し、既存fastPlus(index0)/fastest(index1)の成功はその範囲で再利用。欠陥確認前の製品修正なし。"
   }
 }
