@@ -3336,7 +3336,7 @@
       "2-4/0/default"
     ],
     "record": "twoAreaAirCountBatch20261110",
-    "state": "local complete; source commit and final-source CI pending"
+    "state": "limited batch committed; final-source CI completed with five other-route WebKit final failures; source and missing observations retained"
   },
   "nextPriority": "1-3/normal and1-4/j-avoid existing common carrier guidance: verify selection-specific gaps, reuse other selectors’ successes, no guessed product fix",
   "previousSelected": {
@@ -24294,8 +24294,8 @@
   "twoAreaAirCountBatch20261110": {
     "dateJST": "2026-11-10",
     "baseHEAD": "90eb4a8743c854c8d20a98b0901b0fca63414f90",
-    "sourceSHA": null,
-    "state": "local complete; source commit and final-source CI pending",
+    "sourceSHA": "07ed4dfb80149b22f5adfc7aa3124e0c2f7ba8fd",
+    "state": "limited batch committed; final-source CI completed with five other-route WebKit final failures; source and missing observations retained",
     "scope": [
       "2-1/0/default",
       "2-2/0/default",
@@ -24314,9 +24314,65 @@
     "node": "通常Node795項目は初回793成功/2隔離fixture読込み漏れ。アサーションと製品を変えず、実Path/Optional宣言の読込みだけ補い、失敗2群のみ2成功。793成功を再利用し、795ユニークの確認と全体反復0を区別した。厳密逆変換は2ファイル・11アンカー、旧golden更新0",
     "local": "代表2-2ナビChromium（登録0）／2-3編成内WebKit（艦戦1・対空0攻撃機1）は各初回1回で完了。各initial/after-loadの2段階・41項目、新案内・10キー・他編成metadata・同一新文書再表示を直接照合。局所原本46ファイル・新trace/動画/画像0、独立照合PASS",
     "ci": {
-      "runId": null,
-      "state": "pending",
-      "note": "最終ソースの通常smoke1回は未起動・結果pending。完全source SHAは反映後のCI追記で確定する"
+      "runId": 42747178222,
+      "sourceSHA": "07ed4dfb80149b22f5adfc7aa3124e0c2f7ba8fd",
+      "runAttempt": 1,
+      "event": "workflow_dispatch",
+      "postRequests": 1,
+      "reruns": 0,
+      "state": "completed",
+      "runConclusion": "failure",
+      "smokeJobs": {
+        "success": 2,
+        "failure": 4,
+        "cancelled": 0
+      },
+      "full": "skipped",
+      "passedFlakyFailed": {
+        "chromium": [
+          927,
+          1,
+          0
+        ],
+        "webkit": [
+          914,
+          9,
+          5
+        ]
+      },
+      "logicalNotStrictFirstAttemptCounts": true,
+      "scheduledCasesPerBrowser": 928,
+      "filesPerBrowser": 82,
+      "currentTargetPhysicalCases": 4,
+      "currentTargetsFirstAttemptPassed": 4,
+      "currentTargetsTypedMetadata": "same-job/source/attempt, two phases and 17 top/41 checkpoint fields satisfied; no save/edit/procurement action added",
+      "finalFailureClassification": {
+        "W1 south-scouting ready 3-5": "initial/retry: specified post-load full/custom/source/other-planner and same-document comparisons passed, then final access-control exception check failed",
+        "W2 5-4 exempt and submarine-carrier; W3 6-1 ready; W4 5-5 stock": "each initial/retry: specified save/edit comparisons passed; post-reload search click nonvisible until45s; subsequent full-string comparison not reached"
+      },
+      "cause": "unknown; no concrete link to this batch or same cause as older trials established",
+      "smallArtifacts": {
+        "recovered": 12,
+        "bytes": 447132,
+        "officialSHA256AndCRC": "matched",
+        "initialCLIGetFailures": 12,
+        "initialFailureCause": "unknown; stderr bodies not retained",
+        "alternate": "existing GitHub connector, one request per artifact; original failed receipt preserved",
+        "largeArchivesDownloaded": 0
+      },
+      "gaps": [
+        "raw failed-case values and trace not newly recovered",
+        "display-change caller and exception caller unknown",
+        "CI numeric Node footer and actual registry digest unobserved",
+        "2-5 CEIO scouting unknown initial: individual annotation/stack missing; compact timedOut retained; retry pass does not fill it"
+      ],
+      "evidence": "shared/ci-results.json",
+      "nonPassedPhysicalAttempts": {
+        "observed": 20,
+        "sameAttemptIndividualAnnotations": 19,
+        "missingIndividualAnnotation": 1,
+        "notDerivedFromPFF": true
+      }
     },
     "productMeaning": "Restore existing optional 制空 count only for2-x positive map-level fighter summaries; unrelated node-local no-air notes do not cancel the summary. Defense/other maps/numeric air/routes/thresholds/Night/save schema remain unchanged.",
     "procurementMetadataLimit": "調達案loadoutの新scopeでの任意説明prefixはNodeの実式と旧3-3の明示保存機構証拠を分離して確認。今回2-xでの新規調達案の明示追加・保存、編成の保存・編集は未実施で、成功とは主張しない",
@@ -24371,7 +24427,8 @@
     "evidenceRoot": "continuation-two-area-air-count-batch-20261110/private/",
     "sharedMetadata": [
       "shared/before-results.json",
-      "shared/local-results.json"
+      "shared/local-results.json",
+      "shared/ci-results.json"
     ],
     "remaining": [
       "2-1/2-4 UI not reexecuted for this count guide",
