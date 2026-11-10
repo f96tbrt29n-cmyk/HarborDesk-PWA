@@ -1,3 +1,15 @@
+<a id="three-two-radar-count-20261110"></a>
+
+## 2026-11-10 JST：3-2 任意電探個数と必須装備艦数・速力
+
+1. **改善**：任意電探1個を必須個数／確定調達数としていた案内を訂正。電探装備艦1／4隻は別判定のまま、装備名・登録／現在／未使用、実艦の合法通常／実開放増設枠・現在装備の交換対象を表示。交換後の速力・必須艦数・利用者目標維持は未評価と明示し、自動適用しない。
+2. **範囲**：3-2両indexのcanonical生成目安。通常H許容、H回避＝高速＋15＋電探1艦、最速CEFL＝最速20＋別4艦を分離し、同艦複数は1艦。FE／探索／保存schema・既存制空／索敵は不変。
+3. **検証と欠測**：修正前3actual対照で同じ欠落を確認。Node803初回成功、UI設定1アンカーだけの訂正後も722ファイル不変と逆変換一致で再利用／全体反復0。C初回はtrace function形式のfixture起動失敗で製品操作・metadata未到達。その原本を保持し、literal offへ訂正した必要C1回と未実施W1回は4phase成功。通常一覧82/各932・W339/164/245/184和集合/重複0、新2例選択確認。19top/53checkpointの新案内・10キーの意図差と他9キー／他編成metadata／保存済み利用者目標保持を同試行で直接照合。54原本/trace0・独立PASS_WITH_GAPS。旧C未到達／旧W未実施を補完しない。詳細は[限定記録](pr152-three-two-radar-guidance-ja.md)。通常smokeは最終sourceでこれから1回確認する。旧全C未確定／W2 ZIP欠測も維持。
+4. **セル**：28/163/45→**28確認済み／166一部／42未確認**。normal0、normal1、fastPlus1の案内列Cだけ未→一部。normal1はWcontrolの実検索・表示であり、normalのままのreload・保存編集・実配備は未確認。A/B/D・236基準・旧53区分を維持。4-5隔離12件／別草稿と夜戦方針凍結は合算しない。
+5. **次バッチ**：3-5上BDHK／5-5中央下BFDHNOSの任意索敵2個と数値条件の分離・艦別交換先。private対照準備のみで、新実装や試験成功を加算しない。
+
+原本 `continuation-three-two-radar-batch-20261110/private/`、sharedは許可metadataのみ。PR152ドラフト・未公開、保護対象と既知残件を維持。以下は履歴。
+
 <a id="starter-selection-carrier-20261110"></a>
 
 ## 2026-11-10 JST：選択別艦載機案内（1-3 normal／1-4 J回避）
@@ -351,11 +363,11 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 |2-5/0/default BFJO|一部|一部|一部|確認済み|[pr152-north-los-ui-ja](pr152-north-los-ui-ja.md) / [pr152-north-drum-domain-ja](pr152-north-drum-domain-ja.md) / [F分岐と代表操作](pr152-two-five-north-f-ja.md)|
 |2-5/1/default CEIO|一部|一部|一部|確認済み|[Iランダム域・有限配備/案内・C/W各3保存→編集→同文書load保持](pr152-two-five-ceio-random-ja.md)。HQ域外/他分岐・全目標は残件|
 |3-1/0/default CFG|一部|一部|一部|確認済み|[六隻代替・有限配備/不足・C/W各3保存または安全中止→編集/同一文書load全文](pr152-three-one-cfg-ja.md)。全目標/全在庫/旧履歴は残件|
-|3-2/0/normal CG(H)FL / CEFL|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
+|3-2/0/normal CG(H)FL / CEFL|一部|未確認|一部|未確認|[電探案内](pr152-three-two-radar-guidance-ja.md)C通常の4phase/readonly load。B/D未加算。|
 |3-2/0/fastPlus CEFL / CGFL|一部|一部|一部|一部|[pr152-fastplus-route-ui-ja](pr152-fastplus-route-ui-ja.md)|
 |3-2/0/fastest CEFL|一部|一部|一部|一部|[route-3-2-verification-ja](route-3-2-verification-ja.md)|
-|3-2/1/normal CG(H)FL / CEFL|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
-|3-2/1/fastPlus CEFL / CGFL|一部|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
+|3-2/1/normal CG(H)FL / CEFL|一部|未確認|一部|未確認|[電探案内](pr152-three-two-radar-guidance-ja.md)Wcontrolでnormal実検索/表示のみ。normalのreload/保存編集・B/D未確認。|
+|3-2/1/fastPlus CEFL / CGFL|一部|未確認|一部|未確認|[電探案内](pr152-three-two-radar-guidance-ja.md)W高速＋の4phase/readonly load、turbine枠交換は条件維持未評価。B/D未加算。|
 |3-2/1/fastest CEFL|一部|一部|一部|一部|[pr152-route-target-scope-ja](pr152-route-target-scope-ja.md)|
 |3-3/0/default ACGM|一部|一部|一部|確認済み|[current-auto-loadout-coverage-ja](current-auto-loadout-coverage-ja.md) / [A/C/G分岐と代表操作](pr152-three-three-acgm-ja.md)|
 |3-4/0/default ACEGJP|一部|一部|一部|確認済み|[分岐・配備・代表操作](pr152-three-four-acegjp-ja.md)|

@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "beforeSourceHEAD": "1b5165d11f93801b4609ac7278838177c8cfb3ae",
+  "files": {
+    "owned-equipment-planner.js": {
+      "beforeBytes": 232009,
+      "beforeSHA256": "507c34c3c7c168d14ffbaeafa5162e374b4576de3beb4e60500530b8b35ec7fe",
+      "afterBytes": 247201,
+      "approvedAfterSHA256": "03c034c48e35c6e9013cfa46dff1eebb2daeae58c56aa3846d35444e8d709715"
+    }
+  },
+  "changes": [
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "function hdOCScoutingInspection(c,result){",
+      "after": "// Generic item-count advice is separate from mandatory equipped-ship goals.\nfunction hdOCRadarCountOptional(c,goal){\n if(c?.map!=='3-2'||!Number.isInteger(c.index)||![0,1].includes(c.index)||goal?.kind!=='電探'||(goal.goalKind||goal.kind)!=='電探'||goal.routeEquipment===true||goal.generatedFromMap!==true||goal.purpose!=='recommendation'||goal.minCount!==1)return false;\n try{\n  if(typeof MAP_PLANS==='undefined'||typeof hdMapPresetRequirements!=='function'||!c.preset)return false;\n  const canonical=MAP_PLANS[c.map]?.presets?.[c.index];if(!canonical)return false;\n  for(const key of ['name','ships','gear','use','source','flagship'])if(c.preset[key]!==canonical[key])return false;\n  const route=hdMapPresetRequirements(c.map,c.preset);return route?.map===c.map&&route.index===c.index&&route.path==='選択したC…L目標'&&route.engine==='verified-graph'&&route.equipmentKinds?.includes('電探')===true;\n }catch{return false;}\n}\nfunction hdOCRadarCountInspection(c,result){\n const goal=result?.measure?.goals?.find(row=>hdOCRadarCountOptional(c,row));\n if(!result?.plan||!goal)return null;\n const plan=result.plan,contract=hdFERouteRequirementData(plan);\n if(plan.map!==c.map||contract?.map!==c.map||contract.index!==c.index||contract.path!=='選択したC…L目標'||contract.engine!=='verified-graph')return null;\n // Build only a new readonly view of the delivered hulls. Keep the original\n // context, result, assignment, goals, inventory and persistent values intact.\n const fleet={...c.fleet,ships:(plan.ships||[]).map(ship=>{const db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db);return {ship:ship.ship,rosterId:ship.rosterId||'',gameShipId:ship.gameShipId||0,masterId:ship.masterId||0,gear:db&&!profile?'':hdOCShipGear(ship)};})},built=hdOCBuild({...c,fleet}),inventory=built.inventory,slots=built.slots,used=hdFOAssignedUsage(plan),unconfirmedHulls=(plan.ships||[]).filter(ship=>{const db=hdFEFindShip(ship.ship),profile=db&&hdShipDbSlotProfile(db),master=db&&hdShipDbMasterRowFor(db);return !profile||!master||!Number.isInteger(profile.count)||profile.count<0||!Array.isArray(profile.slots)||profile.count!==profile.slots.length||profile.count!==(master.slots||[]).length||Number(profile.id)!==Number(master.id)||Number(ship.masterId)&&Number(ship.masterId)!==Number(master.id);}),unknown=[...new Set([...built.unknown,...unconfirmedHulls.map(ship=>ship.ship+'：艦・通常枠の対応が未確認'),...(plan.preservationIssues||[]),...inventory.filter(row=>row.count>0&&!hdFEFind(row.name)).map(row=>'装備性能が未登録：'+row.name),...(plan.ships||[]).filter(ship=>hdFEExpansionAvailability(ship).status==='manual').map(ship=>ship.ship+'：増設の開放状態が未確認')])];\n const inspect=(entry,source)=>{\n  const destinations=[];let unknownSlots=0,blockedSlots=0;\n  for(const slot of slots){\n   const ship=plan.ships[slot.si],master=hdShipDbMasterRowFor(slot.db),profile=slot.profile;\n   if(!master||Number(profile?.id)!==Number(master.id)||Number(ship.masterId)&&Number(ship.masterId)!==Number(master.id)||!Array.isArray(profile?.slots)||profile.count!==profile.slots.length||profile.count!==(master.slots||[]).length){unknownSlots++;continue;}\n   if(slot.expansion){\n    if(hdFEExpansionAvailability(ship).status!=='ready'||!hdShipDbMasterMeta(entry.item)){unknownSlots++;continue;}\n    if(!hdShipDbExpansionInfo(entry.item,slot.db,entry.star).allowed){blockedSlots++;continue;}\n   }else{const normal=hdShipDbMasterCompatible(entry.item,slot.db);if(normal===null){unknownSlots++;continue;}if(!normal){blockedSlots++;continue;}}\n   // Radar is non-aircraft. Zero aircraft capacity is not a rejection reason.\n   if(!hdOCCompatible(slot,entry)){blockedSlots++;continue;}\n   const item=slot.expansion?ship.expansion:(ship.items||[]).find(row=>row.slotIndex===slot.index),current=item?.name?{name:item.name,star:Number(item.star)||0}:null;\n   destinations.push({shipIndex:slot.si,ship:ship.ship,slotIndex:slot.index,expansion:slot.expansion===true,current,mode:current?hdFOStackKey(current)===entry.key?'same':'replace':'empty'});\n  }\n  const registered=source==='registered'?entry.count:0,assigned=used[entry.key]||0,status=destinations.length?'candidate':unknownSlots||unknown.length?'manual':'blocked';\n  return {source,name:entry.name,star:entry.star,registered,assigned,unused:Math.max(0,registered-assigned),countsTowardRequiredShips:/電探/.test(entry.item?.category||''),status,reason:status==='candidate'?'confirmed-slot':status==='manual'?'slot-information-unknown':'equipment-incompatible',unknownSlots,blockedSlots,destinations};\n };\n const all=inventory.filter(row=>row.count>0&&hdOCItemMatches('電探',row)).sort((a,b)=>Number((used[b.key]||0)>0)-Number((used[a.key]||0)>0)),limit=12,rows=all.slice(0,limit).map(row=>inspect(row,'registered'));\n const currentAll=(plan.ships||[]).flatMap((ship,shipIndex)=>[...(ship.items||[]).map(item=>({item,expansion:false})),...(ship.expansion?[{item:ship.expansion,expansion:true}]:[])].flatMap(({item,expansion})=>{\n  const meta=hdFEFind(item.name);if(!meta||!hdOCItemMatches('電探',meta))return [];\n  const key=hdFOStackKey(item);return [{shipIndex,ship:ship.ship,slotIndex:expansion?null:Number.isInteger(item.slotIndex)?item.slotIndex:null,expansion,name:item.name,star:Number(item.star)||0,registered:inventory.find(row=>row.key===key)?.count||0,assigned:used[key]||0}];\n }));\n const registeredNames=new Set(inventory.filter(row=>row.count>0).map(row=>hdFLNorm(row.item?.name||row.name))),currentNames=new Set(currentAll.map(row=>hdFLNorm(row.name))),catalog=hdFLCatalog().filter(item=>hdOCItemMatches('電探',item)),shortage=result.shortages?.find(row=>row.kind==='電探'&&row.goalKind==='電探'),preferred=(shortage?.candidates||[]).map(name=>catalog.find(item=>hdFLNorm(item.name)===hdFLNorm(name))).filter(Boolean),seen=new Set(),pool=[...preferred,...catalog].filter(item=>{const key=hdFLNorm(item.name);if(seen.has(key)||registeredNames.has(key)||currentNames.has(key))return false;seen.add(key);return true;}),scanned=pool.slice(0,12).map(item=>inspect({name:item.name,star:0,key:hdFLInventoryStackKey(item.name,0),item},'catalog'));\n scanned.sort((a,b)=>({candidate:0,manual:1,blocked:2}[a.status])-({candidate:0,manual:1,blocked:2}[b.status]));\n const branch=hdFEBranchRoute(plan),required=(result.measure.goals||[]).find(row=>row.kind==='radar-ships');\n return {scope:'owned-radar-count-inspection',map:c.map,index:c.index,path:branch.path||contract.path,routeGoal:branch.goal||plan.routeGoal,rows,catalogExamples:scanned.slice(0,3),currentRadars:currentAll.slice(0,32),unknown,unconfirmedHullCount:unconfirmedHulls.length,remaining:Math.max(0,all.length-limit),currentRemaining:Math.max(0,currentAll.length-32),catalogueLimited:pool.length>12||scanned.length>3,catalogueScanned:Math.min(12,pool.length),assessment:{optionalCount:goal.count,optionalMin:goal.minCount,requiredRadarShips:Number(branch.requiredRadar)||0,requiredRadarDetail:required?.detail||'選択中の通常目標に必須の電探装備艦数はありません。実際の速力・電探による分岐先は別に判定します。',speedTarget:result.measure.speedTarget||0,branchStatus:branch.status,branchDetail:branch.detail}};\n}\nfunction hdOCRadarCountInspectionHtml(view){\n if(view?.scope!=='owned-radar-count-inspection')return '';\n const esc=hdFEEsc,label=item=>item.name+(item.star?' ★'+item.star:''),renderRows=(rows,source)=>rows.map((row,i)=>`<li data-hd-oc-radar-count-row=\"${i}\" data-hd-oc-radar-count-source=\"${source}\" data-hd-oc-radar-count-status=\"${row.status}\" data-hd-oc-radar-count-reason=\"${row.reason}\"><b>${esc(label(row))}</b>：${source==='catalog'?'台帳登録なし（非所持を確認した値ではありません）':`登録${row.registered}個 / 現在案${row.assigned}個 / 未使用${row.unused}個`}。${row.destinations.length?`<ul>${row.destinations.map(target=>`<li data-hd-oc-radar-count-destination data-hd-oc-radar-count-mode=\"${target.mode}\">第${target.shipIndex+1}艦 ${esc(target.ship)} / ${target.expansion?'開放確認済み増設':'通常第'+(target.slotIndex+1)+'枠'}：${target.mode==='empty'?'空き枠への配置を検討':`現在 ${esc(label(target.current))}（${target.mode==='same'?'この枠の同じ装備を継続':'現在装備との交換対象・条件維持は未評価'}）`}</li>`).join('')}</ul>`:`<p>${row.status==='manual'?'艦・枠・装備・増設開放の情報が足りず、搭載先は未確認です。':'確認した通常枠・開放済み増設の艦別装備条件では、この装備の搭載先がありません。'}登録数の不足や追加購入の必要とは区別してください。</p>`}${row.unknownSlots?`<small>別に${row.unknownSlots}枠の搭載可否が未確認です。</small>`:''}${row.assigned>row.registered?'<small>現在案の使用数と登録数の対応を確認してください。</small>':''}</li>`).join('');\n return `<section data-hd-oc-radar-count-inspection><b>手持ちから検討する電探と搭載先</b><p>対象：${esc(view.path)}。任意の装備個数目安は配備${view.assessment.optionalCount} / 目安${view.assessment.optionalMin}個で、通行の必須個数や確定調達数ではありません。</p><p data-hd-oc-radar-count-required>${esc(view.assessment.requiredRadarDetail)}。現在案の判定の引用で、交換後の条件ではありません。電探の個数と電探装備艦の隻数は別です。同じ艦の複数電探を複数艦に数えません。</p><p data-hd-oc-radar-count-route>現在案の分岐判定：${esc(view.assessment.branchDetail)}。選択中の速力目標は${view.assessment.speedTarget?esc(hdFESpeedLabel(view.assessment.speedTarget))+'以上':'必須指定なし'}です。通常のH許容、H回避の高速＋以上・電探1艦、最速CEFLの最速・電探4艦を同じ条件へ置き換えません。先行する艦種・隻数条件、E/Gのランダム分岐、未確認理由も元の判定を確認してください。</p><div data-hd-oc-radar-count-current><b>現在案に配備した電探</b>${view.currentRadars.length?`<ul>${view.currentRadars.map(item=>`<li>第${item.shipIndex+1}艦 ${esc(item.ship)} / ${item.expansion?'増設':item.slotIndex==null?'通常枠未確認':'通常第'+(item.slotIndex+1)+'枠'}：${esc(label(item))}</li>`).join('')}</ul>`:'<p>現在案に確認できる電探はありません。情報未登録を、実際の非配備とは断定しません。</p>'}${view.currentRemaining?`<small>現在配備の表示は32件まで（残り${view.currentRemaining}件）。</small>`:''}</div><div data-hd-oc-radar-count-registered><b>登録在庫からの検討</b>${view.rows.length?`<ul>${renderRows(view.rows,'registered')}</ul>`:'<p>電探として確認できる登録装備がありません。登録なし・性能未登録を、手持ちでは不可能という判定へ変換しません。</p>'}${view.remaining?`<small>登録品は現在案で使う装備を優先した改修別12件まで（残り${view.remaining}件）。</small>`:''}</div><div data-hd-oc-radar-count-catalog><b>登録のないカタログ例（最大3種類）</b>${view.catalogExamples.length?`<ul>${renderRows(view.catalogExamples,'catalog')}</ul>`:'<p>この確認範囲で表示できるカタログ例はありません。全候補の不存在や購入の必要を示しません。</p>'}<small>登録なしは台帳との照合で、ゲーム内の非所持を確認した値ではありません。入手・購入の推奨や確定数量ではありません。カタログは最大12種類を確認し、最大3種類だけを表示します。${view.catalogueLimited?'未表示・未確認の候補が残ります。':''}</small></div>${view.unknown.length?'<p>元の艦・装備・増設情報に未確認が残ります。他の艦で確認できた搭載先や既知の条件不一致とは分けて判断してください。</p>':''}<p>通常枠の航空機搭載数0は、非航空機の電探を排除する理由ではありません。増設は実際の開放と、その艦・装備・改修値の許可を確認できた枠だけを表示しています。</p><p>未使用数は現在案との差です。他艦から移す場合も同じ装備を二重使用できず、各候補は缶・タービン、固定装備や他目標と枠を共用します。空き枠と現在装備の交換対象を分けていますが、全候補の同時配備、交換後の速力・必須電探装備艦数・索敵等の条件や利用者指定目標を保つ交換案は計算していません。装備できる枠数を必須の別艦数へ換算しません。</p><p>装備個数だけで経路成立、索敵値、勝利や購入必須を判断しません。表示だけで配備・元目標・保存編成を変更せず、交換を自動適用しません。変更した配備で既存条件を再確認してください。</p></section>`;\n}\n\nfunction hdOCScoutingInspection(c,result){"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "numeric=['air-value','los-value'].includes(goal.goalKind||goal.kind),airOptional=hdOCAirCountOptional(c,goal),optional=hdOCScoutingOptional(c,goal)||airOptional;",
+      "after": "numeric=['air-value','los-value'].includes(goal.goalKind||goal.kind),airOptional=hdOCAirCountOptional(c,goal),radarOptional=hdOCRadarCountOptional(c,goal),optional=hdOCScoutingOptional(c,goal)||airOptional||radarOptional;"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "if(optional)lines.push(airOptional?",
+      "after": "if(optional)lines.push(radarOptional?`任意目安${goal.minCount}個に対する登録数の差です。通行の必須個数や確定調達数ではありません。選択中の速力と電探装備艦数を別に確認し、同じ艦の複数電探を複数艦に数えません`:airOptional?"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "const airOptional=hdOCAirCountOptional(c,goal),optional=hdOCScoutingOptional(c,goal)||airOptional;",
+      "after": "const airOptional=hdOCAirCountOptional(c,goal),radarOptional=hdOCRadarCountOptional(c,goal),optional=hdOCScoutingOptional(c,goal)||airOptional||radarOptional;"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "<small>${airOptional?",
+      "after": "<small>${radarOptional?'利用者が選ぶ任意の電探個数目安の計画です。H回避・最速CEFLの必須電探装備艦数・速力条件や、確定調達数・購入必須を示しません。':airOptional?"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "(hdOCScoutingOptional(c,goal)||hdOCAirCountOptional(c,goal)?'任意目安（経路必要個数は未確定）：'",
+      "after": "(hdOCScoutingOptional(c,goal)||hdOCAirCountOptional(c,goal)||hdOCRadarCountOptional(c,goal)?'任意目安（経路必要個数は未確定）：'"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "${hdOCAirCountInspectionHtml(hdOCAirCountInspection(c,result))}",
+      "after": "${hdOCAirCountInspectionHtml(hdOCAirCountInspection(c,result))}${hdOCRadarCountInspectionHtml(hdOCRadarCountInspection(c,result))}"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "hdOCScoutingOptional(c,g)||hdOCAirCountOptional(c,g)?g.label+'（任意目安）'",
+      "after": "hdOCScoutingOptional(c,g)||hdOCAirCountOptional(c,g)||hdOCRadarCountOptional(c,g)?g.label+'（任意目安）'"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "${g.routeEquipment?",
+      "after": "${hdOCRadarCountOptional(c,g)?'任意目安の未達です。装備個数の差を通行必須数・確定調達数へ換算しません':g.routeEquipment?"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "'この編成に載せられる候補なし。艦種や装備枠を見直してね。'",
+      "after": "hdOCRadarCountOptional(c,g)?'この確認範囲で装備候補を確認できません。艦・枠・装備情報を見直してください。搭載不可や在庫不足とは断定しません。':'この編成に載せられる候補なし。艦種や装備枠を見直してね。'"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "const esc=hdFEEsc,numeric=['air-value','los-value'].includes(goal.goalKind||goal.kind),airOptional=",
+      "after": "const esc=hdFEEsc,radarShips=c?.map==='3-2'&&goal.kind==='電探'&&goal.goalKind==='radar-ships'&&goal.routeEquipment===true&&goal.purpose==='route',numeric=radarShips||['air-value','los-value'].includes(goal.goalKind||goal.kind),airOptional="
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "if(goal.blocked.length)lines.push(",
+      "after": "if(radarShips)lines.push(`経路の目標は電探装備艦${goal.minCount}隻に対して現在${goal.count}隻です。同じ艦の複数電探は1隻です。上の在庫は物理的な装備個数、枠数は参考の上限で、必要な別艦数・同時配備・成立済み速力の維持や確定調達数を示しません`);\n if(goal.blocked.length)lines.push("
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "const airOptional=hdOCAirCountOptional(c,goal),radarOptional=hdOCRadarCountOptional(c,goal),optional=",
+      "after": "const radarShips=c?.map==='3-2'&&goal.kind==='電探'&&goal.goalKind==='radar-ships'&&goal.routeEquipment===true&&goal.purpose==='route',airOptional=hdOCAirCountOptional(c,goal),radarOptional=hdOCRadarCountOptional(c,goal),optional="
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "${optional?'任意目安を補う候補':'所持不足を補う候補'}",
+      "after": "${optional?'任意目安を補う候補':radarShips?'電探装備艦を改善する参考候補':'所持不足を補う候補'}"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "${optional?'任意目安の候補'+gap+'個を調達リストへ':'候補をあと'+gap+'個、調達リストへ'}",
+      "after": "${optional?'任意目安の候補'+gap+'個を調達リストへ':radarShips?'参考候補'+gap+'個を調達リストへ':'候補をあと'+gap+'個、調達リストへ'}"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "<small>${radarOptional?",
+      "after": "<small>${radarShips?'ここでの個数は登録した物理在庫との差を使う参考計画です。別々の艦への合法な配備、速力装備との枠競合や条件維持は未確認で、入手・購入による経路成立を保証しません。':radarOptional?"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "requiredRadarDetail:required?.detail||'選択中の通常目標に必須の電探装備艦数はありません。実際の速力・電探による分岐先は別に判定します。'",
+      "after": "requiredRadarDetail:required?.detail||(branch.goal==='normal'?'選択中の通常目標に必須の電探装備艦数はありません。実際の速力・電探による分岐先は別に判定します。':'選択目標の必須電探装備艦数は未確認です。登録済みの目標と分岐判定を確認してください。')"
+    },
+    {
+      "file": "owned-equipment-planner.js",
+      "before": "esc(hdFESpeedLabel(view.assessment.speedTarget))+'以上':'必須指定なし'",
+      "after": "esc(hdFESpeedLabel(view.assessment.speedTarget))+'以上':view.routeGoal==='normal'?'必須指定なし':'未確認'"
+    }
+  ]
+}

@@ -44,7 +44,7 @@ test('named carrier candidates escape displayed hull and catalog text without ch
 });
 test('owned counts and compatible slot upper bounds do not establish simultaneous radar and fighter allocation',()=>{
  const c=placement();for(const name of ['hdFOItemMeta','hdFOItemMatches'])load('fleet-loadout-optimizer.js',name,c);
- for(const name of ['hdOCItemMatches','hdOCPlacementInfo','hdOCSouthScouting','hdOCScoutingOptional','hdOCAirCountPath','hdOCAirCountOptional','hdOCPlacementHtml','hdOCStockGap'])load('owned-equipment-planner.js',name,c);
+ for(const name of ['hdOCItemMatches','hdOCPlacementInfo','hdOCSouthScouting','hdOCScoutingOptional','hdOCAirCountPath','hdOCAirCountOptional','hdOCRadarCountOptional','hdOCPlacementHtml','hdOCStockGap'])load('owned-equipment-planner.js',name,c);
  const db={type:'正規空母',profile:{id:7,count:1,slots:[18],flags:[]}},slots=[{db,profile:db.profile,index:0,capacity:18}];
  const inventory=['零式艦戦','22号対水上電探'].map(name=>({name,key:name,star:0,count:1,item:c.hdFEFind(name)})),before=JSON.stringify(inventory);
  for(const kind of ['制空','電探']){

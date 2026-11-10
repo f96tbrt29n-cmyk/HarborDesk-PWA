@@ -68,8 +68,8 @@
     },
     "C": {
       "確認済み": 0,
-      "一部": 49,
-      "未確認": 10,
+      "一部": 52,
+      "未確認": 7,
       "非該当": 0
     },
     "D": {
@@ -924,9 +924,13 @@
           "evidence": []
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "2026-11-10のナビChromium代表で任意電探0/目安1と必須電探艦数/速力指定なしを分離し、合法な0航空容量通常枠・具体カタログ搭載先、切替とreadonly load再表示を確認。保存編集・実配備・全不足区分は今回未確認。",
+          "evidence": [
+            "docs/pr152-three-two-radar-guidance-ja.md",
+            "tests/three-two-radar-guidance.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         },
         "D": {
           "status": "未確認",
@@ -1047,9 +1051,13 @@
           "evidence": []
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "2026-11-10のindex1 WebKit controlでnormalへ実切替・実検索し、任意電探0/1と必須電探艦数/速力指定なし、catalog3/合法54搭載先・current turbine/他9キー/目標保持と実画面案内を照合。normal選択のままのreload・保存編集・実配備は今回未確認。",
+          "evidence": [
+            "docs/pr152-three-two-radar-guidance-ja.md",
+            "tests/three-two-radar-guidance.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         },
         "D": {
           "status": "未確認",
@@ -1082,9 +1090,13 @@
           "evidence": []
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "2026-11-10の編成内WebKit代表で任意電探0/1と必須電探1艦/高速＋15を分離し、現在turbine占有枠の交換対象・条件維持未評価と具体合法搭載先、切替とreadonly load再表示を確認。保存編集・実配備・全不足区分は今回未確認。",
+          "evidence": [
+            "docs/pr152-three-two-radar-guidance-ja.md",
+            "tests/three-two-radar-guidance.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         },
         "D": {
           "status": "未確認",
@@ -3332,16 +3344,17 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "starter-selection-carrier-guidance",
-    "baselineHead": "662768e3a4bc300654fa644797b030dbe05fe0af",
+    "id": "three-two-radar-count-guidance",
+    "baselineHead": "1b5165d11f93801b4609ac7278838177c8cfb3ae",
     "scope": [
-      "1-3/0/normal",
-      "1-4/0/j-avoid"
+      "3-2/0/normal",
+      "3-2/1/normal",
+      "3-2/1/fastPlus"
     ],
-    "record": "starterSelectionCarrierBatch20261110",
-    "state": "limited selection verification complete; smoke4success1failure1cancelled; fullC unresolved; gaps retained"
+    "record": "threeTwoRadarCountGuidanceBatch20261110",
+    "state": "limited guidance complete; final source smoke pending"
   },
-  "nextPriority": "3-2の任意電探1個の案内と、必須電探装備艦数1/4隻・速力条件の分離。normal(index0/1)・fastPlus(index1)の未確認Cを共通処理から実生成対照し、既存fastPlus(index0)/fastest(index1)の成功はその範囲で再利用。欠陥確認前の製品修正なし。",
+  "nextPriority": "3-5上BDHK／5-5中央下BFDHNOSの任意索敵2個と数値経路条件の分離・艦別合法交換先を共通候補にする。既存登録根拠と接続差のprivate対照計画／scriptまで、次の実生成・実装・ブラウザーは未実施。まずactual producerで具体的欠陥がある場合だけ最小修正する。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -24663,5 +24676,44 @@
       "old W initial difference contents not recovered"
     ],
     "next": "3-2の任意電探1個の案内と、必須電探装備艦数1/4隻・速力条件の分離。normal(index0/1)・fastPlus(index1)の未確認Cを共通処理から実生成対照し、既存fastPlus(index0)/fastest(index1)の成功はその範囲で再利用。欠陥確認前の製品修正なし。"
+  },
+  "selectedBeforeThreeTwoRadarBatch20261110": {
+    "id": "starter-selection-carrier-guidance",
+    "baselineHead": "662768e3a4bc300654fa644797b030dbe05fe0af",
+    "scope": [
+      "1-3/0/normal",
+      "1-4/0/j-avoid"
+    ],
+    "record": "starterSelectionCarrierBatch20261110",
+    "state": "limited selection verification complete; smoke4success1failure1cancelled; fullC unresolved; gaps retained"
+  },
+  "threeTwoRadarCountGuidanceBatch20261110": {
+    "record": "docs/pr152-three-two-radar-guidance-ja.md",
+    "baselineHead": "1b5165d11f93801b4609ac7278838177c8cfb3ae",
+    "before": [
+      28,
+      163,
+      45
+    ],
+    "after": [
+      28,
+      166,
+      42
+    ],
+    "changedCells": [
+      "3-2/0/normal C",
+      "3-2/1/normal C",
+      "3-2/1/fastPlus C"
+    ],
+    "sourceChanges": "Owned readonly guidance only; route/search/save schema unchanged.",
+    "local": "Node803 initial success reused across one recording-fixture correction; C startup failure preserved, corrected C1 and W initial1 passed four phases;54 raw files/trace0; independent PASS_WITH_GAPS.",
+    "limits": [
+      "index1 normal only Wcontrol phase, no normal reload/save/edit/apply proof",
+      "No new save/edit or evaluated exchange; A/B/D unchanged",
+      "Old C final unresolved/W2 ZIP gap and Night/held4-5 preserved"
+    ],
+    "ci": {
+      "state": "not started; one final-source smoke pending"
+    }
   }
 }
