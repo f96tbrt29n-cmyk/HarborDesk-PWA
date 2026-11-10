@@ -33,10 +33,12 @@ function hdMapEquipNeeds(map){
   if(subPositive)add('対潜','対潜','潜水マス・潜水艦対策。先制対潜や対潜シナジーを組みやすい装備を優先。');
   const airExplicitNone=/航空戦力(?:は|が)?(?:基本)?不要|制空(?:は|より)?[^。]*(?:不要|優先度が低い)/.test(text);
   const airPositive=(g.air||[]).length||(!airExplicitNone&&/航空戦(?!力)|空襲|航空優勢|航空均衡|制空値|制空確保|制空を(?:確保|取る|調整)|制空調整|制空重視|艦戦/.test(text));
-  if(airPositive){
-    if(map!=='1-6')add('制空','制空','航空優勢・拮抗などの制空調整用。艦戦/水戦から編成に合うものを選ぶ。');
-    add('防空','防空','空襲・航空戦の被害軽減用。対空CIや噴進弾幕を組める艦では特に有効。');
-  }
+  // These registered two-area examples retain their own fighter reference. A
+  // resource node's local no-air note must not cancel the map air summary.
+  const airCountSummary=['2-1','2-2','2-3','2-4'].includes(map)&&typeof MAP_DETAILS!=='undefined'?MAP_DETAILS[map]?.air||'':'';
+  const airCountReference=/艦戦/.test(airCountSummary)&&!/航空戦力(?:は|が)?(?:基本)?不要|(?:制空|艦戦)(?:は|より)?[^。]*(?:不要|優先度が低い)/.test(airCountSummary);
+  if(map!=='1-6'&&(airPositive||airCountReference))add('制空','制空','航空優勢・拮抗などの制空調整用。艦戦/水戦から編成に合うものを選ぶ。');
+  if(airPositive)add('防空','防空','空襲・航空戦の被害軽減用。対空CIや噴進弾幕を組める艦では特に有効。');
   if(/陸上型|対地|集積地|砲台|離島|飛行場姫/.test(text))add('対地','対地','陸上型への特効装備。艦種ごとの搭載可否と組み合わせを確認。');
   if(adv.los||/索敵/.test(text))add('索敵','索敵','ボス前などの索敵分岐対策。必要係数・閾値に余裕を持たせる。');
   if((g.night||[]).length||/夜戦/.test(text))add('夜戦','夜戦','夜戦マス・ボス夜戦向け。夜偵・見張員・照明弾などを編成に合わせて使用。');

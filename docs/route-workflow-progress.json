@@ -68,8 +68,8 @@
     },
     "C": {
       "確認済み": 0,
-      "一部": 45,
-      "未確認": 14,
+      "一部": 47,
+      "未確認": 12,
       "非該当": 0
     },
     "D": {
@@ -631,9 +631,13 @@
           "evidence": []
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。 2026-11-10：共通案内接続と実生成Node対照を確認。行別の実画面/新案内load保持は未実施で、未確認を維持。",
-          "evidence": []
+          "reason": "2026-11-10：同じ行の代表操作で任意制空個数と数値目標の分離、改修別登録／現在／未使用、合法搭載艦・確認済み正容量枠・交換対象・不足情報／交換後未評価を確認。通常reload後に同じ新文書で案内再生成と10キー／他編成metadata保持を直接照合。全在庫・全艦枠・固定競合・交換後計算・全操作の確認ではない。",
+          "evidence": [
+            "tests/two-area-air-count.test.cjs",
+            "tests/owned-equipment-planner.spec.js",
+            "docs/route-workflow-progress-ja.md"
+          ],
+          "status": "一部"
         },
         "D": {
           "status": "未確認",
@@ -641,7 +645,7 @@
           "evidence": []
         }
       },
-      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。"
+      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。 任意制空個数案内の新表示／readonly loadを限定確認。固定枠・全在庫／全艦枠・交換後の制空／条件維持・新規明示調達保存・編成保存編集全列は未確認。"
     },
     {
       "id": "2-3/0/default",
@@ -666,9 +670,13 @@
           "evidence": []
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。 2026-11-10：共通案内接続と実生成Node対照を確認。行別の実画面/新案内load保持は未実施で、未確認を維持。",
-          "evidence": []
+          "reason": "2026-11-10：同じ行の代表操作で任意制空個数と数値目標の分離、改修別登録／現在／未使用、合法搭載艦・確認済み正容量枠・交換対象・不足情報／交換後未評価を確認。通常reload後に同じ新文書で案内再生成と10キー／他編成metadata保持を直接照合。全在庫・全艦枠・固定競合・交換後計算・全操作の確認ではない。",
+          "evidence": [
+            "tests/two-area-air-count.test.cjs",
+            "tests/owned-equipment-planner.spec.js",
+            "docs/route-workflow-progress-ja.md"
+          ],
+          "status": "一部"
         },
         "D": {
           "status": "未確認",
@@ -676,7 +684,7 @@
           "evidence": []
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 任意制空個数案内の新表示／readonly loadを限定確認。固定枠・全在庫／全艦枠・交換後の制空／条件維持・新規明示調達保存・編成保存編集全列は未確認。"
     },
     {
       "id": "2-4/0/default",
@@ -3319,18 +3327,18 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "two-area-carrier-reference-batch",
-    "baselineHead": "1394b31afcd0414999cfa98a4430db8b12747abc",
+    "id": "two-area-air-count-batch",
+    "baselineHead": "90eb4a8743c854c8d20a98b0901b0fca63414f90",
     "scope": [
-      "2-1/0 C(E)DH",
-      "2-2/0 CE(GH)K",
-      "2-3/0 random boss directions",
-      "2-4/0 random boss directions"
+      "2-1/0/default",
+      "2-2/0/default",
+      "2-3/0/default",
+      "2-4/0/default"
     ],
-    "record": "twoAreaCarrierReferenceBatch20261110",
-    "state": "shared four-route guide locally and CI target verified; suite and frozen night-policy concern recorded separately"
+    "record": "twoAreaAirCountBatch20261110",
+    "state": "local complete; source commit and final-source CI pending"
   },
-  "nextPriority": "4-5/0高速＋最短・4-5/2軽量最短の条件を保つ対地交換/再判定案内。現source0acのNode1群4実生成対照で2未接続を確認（既存stock/候補は存在、既存4-5/1・4-3/0はprojection生成）。高速＋未達/索敵未判定/分岐manualは保持、全経路成立/勝利へ広げない。承認経路1アンカーだけのprivate修正案と最小Node/代表UI案まで、次製品・実画面・CIは未実施。夜戦方針経路の凍結は別に維持。",
+  "nextPriority": "1-3/normal and1-4/j-avoid existing common carrier guidance: verify selection-specific gaps, reuse other selectors’ successes, no guessed product fix",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -24282,5 +24290,107 @@
         "sha256": "a09ca63caaa631c24251257ddecff947ebf22c2313e5ba0ae0a63df2f45788fa"
       }
     }
+  },
+  "twoAreaAirCountBatch20261110": {
+    "dateJST": "2026-11-10",
+    "baseHEAD": "90eb4a8743c854c8d20a98b0901b0fca63414f90",
+    "sourceSHA": null,
+    "state": "local complete; source commit and final-source CI pending",
+    "scope": [
+      "2-1/0/default",
+      "2-2/0/default",
+      "2-3/0/default",
+      "2-4/0/default"
+    ],
+    "controls": [
+      "3-3/0/default",
+      "3-4/0/default"
+    ],
+    "executedLocalUIScopes": [
+      "2-2/0/default Chromium navigator",
+      "2-3/0/default WebKit inline"
+    ],
+    "before": "修正前6実生成対照は、初回2-1完了後に2-2の「目標がある」という前提で停止した原本を保持し、初回未完了の2-2と未開始4例だけを別群で確認。2-1/2-3は目標0/2の案内未接続、2-2/2-4は局所否定による目標未生成、3-3/3-4は接続済みで、6件を独立に対応付けた",
+    "node": "通常Node795項目は初回793成功/2隔離fixture読込み漏れ。アサーションと製品を変えず、実Path/Optional宣言の読込みだけ補い、失敗2群のみ2成功。793成功を再利用し、795ユニークの確認と全体反復0を区別した。厳密逆変換は2ファイル・11アンカー、旧golden更新0",
+    "local": "代表2-2ナビChromium（登録0）／2-3編成内WebKit（艦戦1・対空0攻撃機1）は各初回1回で完了。各initial/after-loadの2段階・41項目、新案内・10キー・他編成metadata・同一新文書再表示を直接照合。局所原本46ファイル・新trace/動画/画像0、独立照合PASS",
+    "ci": {
+      "runId": null,
+      "state": "pending",
+      "note": "最終ソースの通常smoke1回は未起動・結果pending。完全source SHAは反映後のCI追記で確定する"
+    },
+    "productMeaning": "Restore existing optional 制空 count only for2-x positive map-level fighter summaries; unrelated node-local no-air notes do not cancel the summary. Defense/other maps/numeric air/routes/thresholds/Night/save schema remain unchanged.",
+    "procurementMetadataLimit": "調達案loadoutの新scopeでの任意説明prefixはNodeの実式と旧3-3の明示保存機構証拠を分離して確認。今回2-xでの新規調達案の明示追加・保存、編成の保存・編集は未実施で、成功とは主張しない",
+    "matrix": {
+      "before": [
+        28,
+        159,
+        49
+      ],
+      "after": [
+        28,
+        161,
+        47
+      ],
+      "changes": [
+        {
+          "id": "2-2/0/default",
+          "item": "C",
+          "before": "未確認",
+          "after": "一部"
+        },
+        {
+          "id": "2-3/0/default",
+          "item": "C",
+          "before": "未確認",
+          "after": "一部"
+        }
+      ],
+      "criteriaChanged": false,
+      "DUnchanged": true,
+      "creditFromUnexecutedRoutes": false
+    },
+    "heldFourFive": {
+      "baseHEAD": "90eb4a8743c854c8d20a98b0901b0fca63414f90",
+      "branch": "research/soft-land-routes-batch-20261110",
+      "worktree": "continuation-soft-land-routes-batch-20261110/worktree",
+      "uncommittedDraftCounts": [
+        28,
+        161,
+        47
+      ],
+      "draftCells": [
+        "4-5/2/default C",
+        "4-5/2/default D"
+      ],
+      "importedProductOrTestChanges": false,
+      "importedProgressCredit": false,
+      "pushAndCI": "held",
+      "status": "約11.68秒で候補探索継続、交換案生成・結果反映は未到達。正確な12秒境界と遅延原因は未確認。追加診断なし。"
+    },
+    "nightPolicy": "Dedicated module/setter/key unchanged; old two initial getter concerns unresolved/frozen. Existing82 smoke list retained; no new targeted diagnostic or assumption of resolution.",
+    "evidenceRoot": "continuation-two-area-air-count-batch-20261110/private/",
+    "sharedMetadata": [
+      "shared/before-results.json",
+      "shared/local-results.json"
+    ],
+    "remaining": [
+      "2-1/2-4 UI not reexecuted for this count guide",
+      "same-row save/edit and explicit2-x optional-plan save unexecuted",
+      "all inventory/hull/frame/conflict combinations",
+      "post-exchange numeric conditions, experience, remaining planes and cumulative losses"
+    ],
+    "next": "1-3/normal and1-4/j-avoid existing common carrier guidance: verify selection-specific gaps, reuse other selectors’ successes, no guessed product fix"
+  },
+  "selectedBeforeTwoAreaAirCountBatch20261110": {
+    "id": "two-area-carrier-reference-batch",
+    "baselineHead": "1394b31afcd0414999cfa98a4430db8b12747abc",
+    "scope": [
+      "2-1/0 C(E)DH",
+      "2-2/0 CE(GH)K",
+      "2-3/0 random boss directions",
+      "2-4/0 random boss directions"
+    ],
+    "record": "twoAreaCarrierReferenceBatch20261110",
+    "state": "shared four-route guide locally and CI target verified; suite and frozen night-policy concern recorded separately"
   }
 }

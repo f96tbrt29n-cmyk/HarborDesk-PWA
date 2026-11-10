@@ -116,3 +116,4 @@ require('./scouting-optional-guidance.test.cjs');
 require('./optional-asw-destination-guidance.test.cjs');
 require('./air-count-optional-guidance.test.cjs');
 require('./two-area-carrier-reference.test.cjs');
+require('./two-area-air-count.test.cjs');

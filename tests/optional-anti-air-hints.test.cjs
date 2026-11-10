@@ -4,6 +4,7 @@ const {test}=require('node:test'),assert=require('node:assert/strict'),fs=requir
 const {createTwoFiveCeioModelContext}=require('./fixtures/two-five-ceio-model-context.cjs');
 const {createOptionalAntiAirHistoricalProjection}=require('./fixtures/optional-anti-air-source-layer.cjs');
 const {createCarrierGuidanceHistoricalProjection}=require('./fixtures/carrier-guidance-source-layer.cjs');
+const {createTwoAreaAirCountHistoricalProjection}=require('./fixtures/two-area-air-count-source-layer.cjs');
 const ROOT=path.resolve(__dirname,'..'),host=x=>JSON.parse(JSON.stringify(x)),hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 function context(options={}){return createTwoFiveCeioModelContext(options)}
 function selected(h,map,index){return {index,preset:host(h.value(`MAP_PLANS[${JSON.stringify(map)}].presets[${index}]`))}}
@@ -38,7 +39,7 @@ test('optional AA approved inverse restores and replays the exact preceding UI s
 });
 
 test('the old map-wide negative omits AA examples while the new independent display channel leaves old needs untouched',()=>{
- const project=createOptionalAntiAirHistoricalProjection(ROOT),old=context({project}),current=context();
+ const project=createOptionalAntiAirHistoricalProjection(ROOT),old=context({project}),current=context({project:createTwoAreaAirCountHistoricalProjection(ROOT)}); // Compare the AA change at its historical source boundary; current air-count producers are tested separately.
  for(const map of ['4-2','2-4']){const previous=host(old.c.hdMapEquipNeeds(map));assert.equal(previous.needs.some(x=>x.id==='防空'),false,map+' previous omission');assert.deepEqual(host(current.c.hdMapEquipNeeds(map)),previous,'display fix must not create a generic equipment goal');assert.equal(old.c.hdSEProfiles(map).some(x=>x.kind==='cap-aa'),false);assert.equal(current.c.hdSEProfiles(map).some(x=>x.kind==='cap-aa'),false);assert.equal(old.c.hdSEOptionalAaAdvice,undefined);assert.equal(marker(old.c.hdMapEquipRecommendationsHtml(map)),0);assert.equal(current.c.hdSEOptionalAaAdvice(map).status,'ready')}
  const oldNormal=host(old.c.hdSEProfiles('5-2'));assert.equal(oldNormal.some(x=>x.kind==='cap-aa'),true,'already graph-air-positive route is an independent control');assert.deepEqual(host(current.c.hdSEProfiles('5-2')),oldNormal);
 });
