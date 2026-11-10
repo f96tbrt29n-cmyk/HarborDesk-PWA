@@ -593,7 +593,7 @@
         },
         "C": {
           "status": "一部",
-          "reason": "2026-11-10：既存任意攻撃機目標→艦別合法通常枠の接続を修正。2-1ナビの空在庫/カタログ例を代表C/W各初回で確認し、新案内の同一reload文書再表示と10キー/他編成/metadata不変を照合。全在庫・全艦種/枠、固定/他目標との競合解消、交換後数値/条件維持は未評価。任意目標を通行必須/購入数/全戦闘保証へ変換しない。",
+          "reason": "2026-11-10：既存任意攻撃機目標→艦別合法通常枠の接続を修正。2-1ナビの空在庫/カタログ例を代表C/W各初回で確認し、新案内の同一reload文書再表示と10キー/他編成/metadata不変を照合。全在庫・全艦種/枠、固定/他目標との競合解消、交換後数値/条件維持は未評価。任意目標を通行必須/購入数/全戦闘保証へ変換しない。 最終source0acのCI42720410802も当該C/W初回・新案内保持適合。全CI失敗/夜戦専用getter不一致は別記録、当該行全体の完了へ広げない。",
           "evidence": [
             "tests/two-area-carrier-reference.test.cjs",
             "tests/owned-equipment-planner.spec.js",
@@ -702,7 +702,7 @@
         },
         "C": {
           "status": "一部",
-          "reason": "2026-11-10：既存任意攻撃機目標→艦別合法通常枠の接続を修正。2-4編成内の有限登録/現在配備1/未使用0を代表C/W各初回で確認し、新案内の同一reload文書再表示と10キー/他編成/metadata不変を照合。全在庫・全艦種/枠、固定/他目標との競合解消、交換後数値/条件維持は未評価。任意目標を通行必須/購入数/全戦闘保証へ変換しない。",
+          "reason": "2026-11-10：既存任意攻撃機目標→艦別合法通常枠の接続を修正。2-4編成内の有限登録/現在配備1/未使用0を代表C/W各初回で確認し、新案内の同一reload文書再表示と10キー/他編成/metadata不変を照合。全在庫・全艦種/枠、固定/他目標との競合解消、交換後数値/条件維持は未評価。任意目標を通行必須/購入数/全戦闘保証へ変換しない。 最終source0acのCI42720410802も当該C/W初回・新案内保持適合。全CI失敗/夜戦専用getter不一致は別記録、当該行全体の完了へ広げない。",
           "evidence": [
             "tests/two-area-carrier-reference.test.cjs",
             "tests/owned-equipment-planner.spec.js",
@@ -3328,9 +3328,9 @@
       "2-4/0 random boss directions"
     ],
     "record": "twoAreaCarrierReferenceBatch20261110",
-    "state": "four shared implementations; representative two routes local complete, final-source smoke pending"
+    "state": "shared four-route guide locally and CI target verified; suite and frozen night-policy concern recorded separately"
   },
-  "nextPriority": "4-5 index0高速＋最短／index2軽量最短の対地交換案内を次候補とする。2行C未確認、同じ敵profileと共通callerに対しhelperがindex1だけを承認する静的差を確認。実goal/shortage生成とhelper非接続は未計測のため、次に限定Node対照で確認する。速力・索敵・既存必須/利用者目標の動的保護を維持し、3-5上は別敵/別適用として除外。",
+  "nextPriority": "4-5/0高速＋最短・4-5/2軽量最短の条件を保つ対地交換/再判定案内。現source0acのNode1群4実生成対照で2未接続を確認（既存stock/候補は存在、既存4-5/1・4-3/0はprojection生成）。高速＋未達/索敵未判定/分岐manualは保持、全経路成立/勝利へ広げない。承認経路1アンカーだけのprivate修正案と最小Node/代表UI案まで、次製品・実画面・CIは未実施。夜戦方針経路の凍結は別に維持。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -23940,8 +23940,8 @@
   "twoAreaCarrierReferenceBatch20261110": {
     "dateJST": "2026-11-10",
     "baseHEAD": "1394b31afcd0414999cfa98a4430db8b12747abc",
-    "sourceSHA": null,
-    "state": "local complete; final-source smoke pending",
+    "sourceSHA": "0ac49f4845635be2c9e487e6179cda9141654c1f",
+    "state": "limited guide complete; final-source CI recorded; night-policy concern separately frozen",
     "scope": [
       "2-1/0 C(E)DH",
       "2-2/0 CE(GH)K",
@@ -24030,10 +24030,195 @@
       "allFourTargetsSelected": true
     },
     "ci": {
-      "state": "final-source normal smoke pending",
-      "plannedRuns": 1,
+      "state": "one final-source normal smoke completed; target four initial passes; whole run failure retained",
+      "sourceSHA": "0ac49f4845635be2c9e487e6179cda9141654c1f",
+      "runId": 42720410802,
+      "runAttempt": 1,
+      "url": "https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/42720410802",
+      "conclusion": "failure",
+      "jobTotals": {
+        "success": 5,
+        "failure": 1,
+        "fullSkipped": 1
+      },
+      "passedFlakyFailed": {
+        "chromium": {
+          "passed": 926,
+          "flaky": 0,
+          "failed": 0
+        },
+        "webkit": {
+          "passed": 909,
+          "flaky": 16,
+          "failed": 1
+        }
+      },
+      "meaning": "Logical passed/flaky/failed; actual initial/retry counts follow raw per-attempt callbacks separately.",
+      "physicalTrialCounts": {
+        "chromium": {
+          "observedAttemptEntries": 926,
+          "initialAttemptEntries": 926,
+          "retryAttemptEntries": 0,
+          "initialStatusCounts": {
+            "passed": 926
+          },
+          "retryStatusCounts": {},
+          "byRetry": {
+            "0": {
+              "passed": 926
+            }
+          },
+          "observedBeginCallbacks": 926,
+          "observedEndCallbacks": 926,
+          "beginWithoutEnd": 0,
+          "endWithoutBegin": 0,
+          "noAttemptCallbackCases": 0,
+          "limit": "Direct per-retry reporter observations, not a conversion from logical passed/flaky/failed. Missing callbacks/onEnd do not invent trials or final outcomes; expected failures and interruptions stay actual physical statuses."
+        },
+        "webkit": {
+          "observedAttemptEntries": 943,
+          "initialAttemptEntries": 926,
+          "retryAttemptEntries": 17,
+          "initialStatusCounts": {
+            "passed": 909,
+            "timedOut": 13,
+            "failed": 4
+          },
+          "retryStatusCounts": {
+            "passed": 16,
+            "failed": 1
+          },
+          "byRetry": {
+            "0": {
+              "passed": 909,
+              "timedOut": 13,
+              "failed": 4
+            },
+            "1": {
+              "passed": 16,
+              "failed": 1
+            }
+          },
+          "observedBeginCallbacks": 943,
+          "observedEndCallbacks": 943,
+          "beginWithoutEnd": 0,
+          "endWithoutBegin": 0,
+          "noAttemptCallbackCases": 0,
+          "limit": "Direct per-retry reporter observations, not a conversion from logical passed/flaky/failed. Missing callbacks/onEnd do not invent trials or final outcomes; expected failures and interruptions stay actual physical statuses."
+        }
+      },
+      "targets": [
+        {
+          "project": "chromium",
+          "entry": "navigator",
+          "retry": 0,
+          "physicalStatus": "passed",
+          "completionConfirmed": true,
+          "metadataContract": "satisfied",
+          "criticalFalseObserved": false
+        },
+        {
+          "project": "chromium",
+          "entry": "inline",
+          "retry": 0,
+          "physicalStatus": "passed",
+          "completionConfirmed": true,
+          "metadataContract": "satisfied",
+          "criticalFalseObserved": false
+        },
+        {
+          "project": "webkit",
+          "entry": "navigator",
+          "retry": 0,
+          "physicalStatus": "passed",
+          "completionConfirmed": true,
+          "metadataContract": "satisfied",
+          "criticalFalseObserved": false
+        },
+        {
+          "project": "webkit",
+          "entry": "inline",
+          "retry": 0,
+          "physicalStatus": "passed",
+          "completionConfirmed": true,
+          "metadataContract": "satisfied",
+          "criticalFalseObserved": false
+        }
+      ],
+      "finalFailure": {
+        "title": "5-3 conditional speed ready",
+        "initialAndRetry": "terminal pageerrors/access-control exception check after specified load full/source/otherPlanner/same-document comparisons",
+        "exceptionOccurrenceTimeCallerCause": "unconfirmed",
+        "rawSavedValueBody": "unacquired",
+        "saveComparisonMismatchProven": false
+      },
+      "retentionConcern": {
+        "state": "night-policy path frozen unresolved; no new diagnosis/test/product correction",
+        "initialGetterMismatchCases": 2,
+        "map": "1-1",
+        "key": "harbordesk-night-ci-policy-v1",
+        "observed": "getter returned auto instead of selected cv-fighter2/cv-three after reload",
+        "logicalOutcomes": "flaky; retry passed, initial remains failed",
+        "rawDedicatedValueWriteCompletionConsumedReadOrException": "missing; not a proof of saved-value loss or restoration arrival",
+        "preReloadCapabilityPollNotAWriteOrDedicatedGetterProof": true,
+        "sixKeyComparisonDoesNotIncludeDedicatedKey": true,
+        "directNewFunctionalOrWritePathFound": false,
+        "indirectTimingOriginInitializationCausesExcluded": false,
+        "review": {
+          "path": "private/retention-review/night-policy-static-relation-v2.json",
+          "bytes": 8020,
+          "sha256": "13cb23b59f53ba4d53247abdc5ba37215920720987ab4b17a5c92d5e5b82c539"
+        },
+        "existing1_1D": "already partial; arbitrary battle-policy key outside the cited six-key evidence; no automatic cell downgrade",
+        "nextRequiredObservation": "Only actual consumed dedicated-key read/exception and parsed mode across existing getter invocations before/after reload, with map/origin/document; no additional getItem/save/reload/waits. Planning only."
+      },
+      "otherUnreached": "Initial hidden-load-click trials and 2-5 north initial individual-annotation gap stay per-attempt in retained canonical; retry success never fills missing observations.",
+      "environment": {
+        "ownEnvironmentJoins": 6,
+        "Node": "24.21.0",
+        "Playwright": "1.55.0",
+        "ChromiumRevision": "1187",
+        "WebKitRevision": "2203",
+        "exactNodeFootersAcquired": 0,
+        "registryDigestObserved": null
+      },
+      "evidence": {
+        "canonical": {
+          "path": "private/ci-0ac49f48-v1/analysis/canonical-ci-collection.json",
+          "bytes": 131295,
+          "sha256": "00089f67753138715a6a5b0f5333b38488e0eb69ba16aad158ec986d8b27b6ef"
+        },
+        "manifest": {
+          "path": "private/ci-0ac49f48-v1/analysis/manifest.json",
+          "bytes": 12618,
+          "sha256": "832695f8dc14d954c5ac07d796baaea2d9eefdd6a27bab4455ef69c1ed9004c3"
+        },
+        "audit": {
+          "path": "private/ci-0ac49f48-v1/analysis/harness-independent-review-carrier-v1.json",
+          "bytes": 33224,
+          "sha256": "8a28422935b5067a419a57e8ca6cd80d06a9856072e18c20a9d033193df5ab0f"
+        }
+      },
+      "independentByteVerification": "PASS",
+      "auditGaps": [],
+      "retainedGaps": [
+        "Raw saved-value JSON and traces were not retrieved; detailed check reachability uses same-attempt annotation plus source control-flow.",
+        "Unknown per-attempt stopping checks stay explicitly unknown; retry success does not fill the initial attempt.",
+        "Large raw diagnostic archives are not locally acquired; job/post-upload status is separate from completed compact case results.",
+        "Prior e625 HTTP500 request acceptance remains unknown; this different-source CI does not backfill it. Prior AIR C2 remains incomplete and its three final WebKit load-hidden cases remain unreached.",
+        "All prior AIR and optional-ASW failures, incomplete project outcomes, stopping stages and missing evidence remain sealed separately.",
+        "Per-job exact Node footer counts were not acquired; official Node gate status is separate.",
+        "Actual registry image digest was not observed; configured pin and receipt image name are separate."
+      ],
+      "smallZIPs": 12,
+      "smallZIPBytes": 392771,
+      "largeZIPsAcquired": 0,
+      "runsRequested": 1,
       "sameHEADReruns": 0,
-      "workflowChange": "one small summary glob only"
+      "recordOnlyAdditionalCIRequested": 0,
+      "oldE524FullCUncertaintyBackfilled": false,
+      "oldHTTP500Acceptance": null,
+      "oldHTTP500Reposts": 0
     },
     "priorCI": {
       "sourceSHA": "e524f1d70b67f6bd84b9c82fe0ee6f217cada875",
@@ -24074,6 +24259,28 @@
       ],
       "criteriaChanged": false
     },
-    "next": "4-5 index0高速＋最短／index2軽量最短の対地交換案内を次候補とする。2行C未確認、同じ敵profileと共通callerに対しhelperがindex1だけを承認する静的差を確認。実goal/shortage生成とhelper非接続は未計測のため、次に限定Node対照で確認する。速力・索敵・既存必須/利用者目標の動的保護を維持し、3-5上は別敵/別適用として除外。"
+    "next": "4-5/0高速＋最短・4-5/2軽量最短の条件を保つ対地交換/再判定案内。現source0acのNode1群4実生成対照で2未接続を確認（既存stock/候補は存在、既存4-5/1・4-3/0はprojection生成）。高速＋未達/索敵未判定/分岐manualは保持、全経路成立/勝利へ広げない。承認経路1アンカーだけのprivate修正案と最小Node/代表UI案まで、次製品・実画面・CIは未実施。夜戦方針経路の凍結は別に維持。",
+    "nextBefore": {
+      "sourceSHA": "0ac49f4845635be2c9e487e6179cda9141654c1f",
+      "formalNodeGroups": 1,
+      "observedAndCompletedCases": 4,
+      "dynamicProjectionGaps": 2,
+      "existingControls": 2,
+      "genericStockGuidanceAlreadyPresent": true,
+      "sourceModules": 24,
+      "publicApply": false,
+      "browserOrCI": 0,
+      "cellPromotions": 0,
+      "summary": {
+        "path": "shared/next-soft-land-before.json",
+        "bytes": 9110,
+        "sha256": "306ecdd583fbe356dabcab074c9b894b410bdd239275ff44df7fd78ff1a0c7c3"
+      },
+      "privateDesign": {
+        "path": "private/next-soft-land-product-design/product-replacements-template-v1.json",
+        "bytes": 1453,
+        "sha256": "a09ca63caaa631c24251257ddecff947ebf22c2313e5ba0ae0a63df2f45788fa"
+      }
+    }
   }
 }
