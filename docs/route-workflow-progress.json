@@ -68,8 +68,8 @@
     },
     "C": {
       "確認済み": 0,
-      "一部": 52,
-      "未確認": 7,
+      "一部": 54,
+      "未確認": 5,
       "非該当": 0
     },
     "D": {
@@ -1327,9 +1327,13 @@
           "evidence": []
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じ行の代表で任意索敵2個と数値条件の分離、装備名・登録/現在/未使用・合法枠/未判定理由、実選択切替とreadonly reload後の新案内保持を確認。交換適用/全失敗区分/編成保存編集は未確認。",
+          "evidence": [
+            "docs/pr152-upper-central-scouting-guidance-ja.md",
+            "tests/upper-central-scouting-guidance.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         },
         "D": {
           "status": "未確認",
@@ -1337,7 +1341,7 @@
           "evidence": []
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 今回は新案内の読取り専用表示だけ。実配備B、保存・編集D、交換後33式/他条件、実発進・残機、全在庫/枠競合は未確認。"
     },
     {
       "id": "4-1/0/default",
@@ -2032,9 +2036,13 @@
           "evidence": []
         },
         "C": {
-          "status": "未確認",
-          "reason": "同じ行の不足案内実操作を対象記録から特定できない。共通処理の代表結果は加算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じ行の代表で任意索敵2個と数値条件の分離、装備名・登録/現在/未使用・合法枠/未判定理由、実選択切替とreadonly reload後の新案内保持を確認。交換適用/全失敗区分/編成保存編集は未確認。",
+          "evidence": [
+            "docs/pr152-upper-central-scouting-guidance-ja.md",
+            "tests/upper-central-scouting-guidance.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         },
         "D": {
           "status": "未確認",
@@ -2042,7 +2050,7 @@
           "evidence": []
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 今回は新案内の読取り専用表示だけ。実配備B、保存・編集D、交換後33式/他条件、実発進・残機、全在庫/枠競合は未確認。"
     },
     {
       "id": "5-6/0/default",
@@ -3344,17 +3352,16 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "three-two-radar-count-guidance",
-    "baselineHead": "1b5165d11f93801b4609ac7278838177c8cfb3ae",
+    "id": "upper-central-scouting-guidance",
+    "baselineHead": "78307c4b69f23429aed50b77593df50260fad2bd",
     "scope": [
-      "3-2/0/normal",
-      "3-2/1/normal",
-      "3-2/1/fastPlus"
+      "3-5/1/default",
+      "5-5/1/default"
     ],
-    "record": "threeTwoRadarCountGuidanceBatch20261110",
-    "state": "limited guidance complete; smoke2success3failure1cancelled; fullC unknown; acquisition and old gaps retained"
+    "record": "upperCentralScoutingGuidanceBatch20261111",
+    "state": "limited guidance locally verified; final-source ordinary smoke pending; no new B or D credit"
   },
-  "nextPriority": "3-5上BDHK／5-5中央下BFDHNOSの任意索敵2個と数値条件の分離・艦別合法交換先。source66dfのNode1群/4actual対照で2対象の必要/調達誤表現とinspection未接続を確認。登録在庫viewへ接続するprivate最小案は未適用。空在庫named catalogは別残件、fresh数値出典・新UI・現在セル加算0。",
+  "nextPriority": "2-1〜2-4の有限在庫からの攻撃機実配備。既存B未確認の検証不足を対象に、4canonical counterと代表C/Wのprivate設計まで。静的に追加製品欠陥は未確認、正しければ製品変更なし。次counter/実操作/現在セル加算はまだ0。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -24785,5 +24792,122 @@
       "emptyInventoryNamedCatalogStillUnresolved": true,
       "numericalThresholdsFreshSourceVerified": false
     }
+  },
+  "selectedBeforeUpperCentralScoutingGuidance20261111": {
+    "id": "three-two-radar-count-guidance",
+    "baselineHead": "1b5165d11f93801b4609ac7278838177c8cfb3ae",
+    "scope": [
+      "3-2/0/normal",
+      "3-2/1/normal",
+      "3-2/1/fastPlus"
+    ],
+    "record": "threeTwoRadarCountGuidanceBatch20261110",
+    "state": "limited guidance complete; smoke2success3failure1cancelled; fullC unknown; acquisition and old gaps retained"
+  },
+  "upperCentralScoutingGuidanceBatch20261111": {
+    "record": "docs/pr152-upper-central-scouting-guidance-ja.md",
+    "baselineHead": "78307c4b69f23429aed50b77593df50260fad2bd",
+    "before": [
+      28,
+      166,
+      42
+    ],
+    "after": [
+      28,
+      168,
+      40
+    ],
+    "changedCells": [
+      "3-5/1/default C",
+      "5-5/1/default C"
+    ],
+    "priorThreeCCellAudit": "No correction: normal1 is search/display control only; no normal1 reload/save or D credit.",
+    "sourceChanges": "Canonical generated optional scouting2 consumers and readonly catalog/registered destinations; existing numeric formula/FE/solver/save schema unchanged.",
+    "node": {
+      "qualifiedUniquePassed": 810,
+      "reusedEstablishedPassed": 803,
+      "currentNewPassed": 4,
+      "correctedRegistrationPassed": 3,
+      "physicalTrials": [
+        {
+          "tests": 810,
+          "passed": 808,
+          "failed": 2
+        },
+        {
+          "tests": 2,
+          "passed": 1,
+          "failed": 1
+        },
+        {
+          "tests": 7,
+          "passed": 4,
+          "failed": 3
+        },
+        {
+          "tests": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      ],
+      "allReportedSkipped": 0,
+      "physicalTestExecutions": 822,
+      "fullGateRepeats": 0,
+      "failureOriginalsRetained": true
+    },
+    "local": {
+      "browserAttempts": 2,
+      "retries": 0,
+      "workers": 1,
+      "passed": 2,
+      "searchedPhasesEach": 2,
+      "selectorChangesEach": 2,
+      "reloadEach": 1,
+      "controlSearches": 0,
+      "newFleetSaveEditActions": 0,
+      "newApplyOrProcurementActions": 0,
+      "immutableKeys": 10,
+      "intentionalPresetStorageKeySeparate": true,
+      "metadataTop": 19,
+      "metadataCheckpoint": 52,
+      "rawFiles": 62,
+      "traceArchives": 0,
+      "independent": "PASS_WITH_GAPS; 3 retained Node failures; initial-plan unobserved declarations retained separately",
+      "actualCatalogReplacementDestinations": 0,
+      "combatAircraftUIDestinations": 0,
+      "replacementAndCombatCapacityBounds": "Node only"
+    },
+    "normalPreflight": {
+      "files": 82,
+      "casesPerBrowser": 934,
+      "webkitCases": [
+        339,
+        164,
+        247,
+        184
+      ],
+      "unionExact": true,
+      "newTargetsSelected": true
+    },
+    "markdownAggregateCorrection": {
+      "displayBefore": {
+        "CPartial": 47,
+        "CUnknown": 12
+      },
+      "authoritativeBaselineJSONAnd59MDRows": {
+        "CPartial": 52,
+        "CUnknown": 7
+      },
+      "extraCellCredit": 0
+    },
+    "ci": {
+      "state": "pending final source commit and one normal smoke"
+    },
+    "limits": [
+      "Only C of each operated row is partial; no A/B/D upgrade.",
+      "No post-exchange numeric/mandatory-condition or simultaneous-placement guarantee.",
+      "Water recon zero-capacity legal placement is distinct from launch/remaining aircraft/scouting success.",
+      "Old full-C/compact gaps, held4-5, and frozen Night paths are not filled by these local successes."
+    ]
   }
 }

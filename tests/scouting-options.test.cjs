@@ -2,7 +2,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const source=fs.readFileSync(path.join(__dirname,'../owned-equipment-planner.js'),'utf8');
 function load(name,c){const start=source.indexOf('function '+name+'('),end=source.indexOf('\nfunction ',start+1);assert.ok(start>=0,name);vm.runInNewContext(source.slice(start,end<0?undefined:end),c);return c[name]}
-function context(){const c={hdFEEsc:String,hdPLSave(){}};for(const n of ['hdOCSouthScouting','hdOCScoutingOptional','hdOCScoutingInspection','hdOCScoutingInspectionHtml','hdOCAirCountPath','hdOCAirCountOptional','hdOCRadarCountOptional','hdOCPlacementHtml','hdOCStockGap','hdOCProcurementHtml'])load(n,c);return c}
+function context(){const c={hdFEEsc:String,hdPLSave(){}};for(const n of ['hdOCSouthScouting','hdOCUpperCentralScoutingScope','hdOCScoutingOptional','hdOCScoutingInspection','hdOCScoutingInspectionHtml','hdOCAirCountPath','hdOCAirCountOptional','hdOCRadarCountOptional','hdOCPlacementHtml','hdOCStockGap','hdOCProcurementHtml'])load(n,c);return c}
 const south={map:'3-5',index:0};
 const goal={kind:'索敵',goalKind:'索敵',generatedFromMap:true,purpose:'recommendation',minCount:2,owned:0,usableOwned:0,compatibleSlots:18,blocked:[],candidates:['radar']};
 test('optional count is scoped to verified generated recommendations, never a numeric route requirement',()=>{
