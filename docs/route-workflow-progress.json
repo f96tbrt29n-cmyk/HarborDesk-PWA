@@ -3377,7 +3377,7 @@
       "2-4/0/default"
     ],
     "record": "finiteCarrierDeploymentBatch20261111",
-    "state": "no product defect observed; finite Node4contexts and same-row C2-1/W2-4 saved deployment4phases verified; final-source ordinary smoke pending"
+    "state": "limited same-row finite allocation/save/load verified locally; final-source CI jobs terminal3success3failure/no cancellation; CI case detail collection and final local closure blocked by unavailable execution environment; no B/D expansion"
   },
   "nextPriority": "1-3 normal/CFJ・1-4 J回避の有限攻撃機配備。既存案内/分岐条件/実在庫証拠を静的照合し、異なる操作経路の代表だけ確認する候補。現在2-x成功を別行B/Dへ流用せず、出典不足/固定条件不明は保持。2-2/2-3の現在B/DはNode-onlyで未確認のまま。",
   "previousSelected": {
