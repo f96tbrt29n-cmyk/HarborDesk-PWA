@@ -3359,9 +3359,9 @@
       "5-5/1/default"
     ],
     "record": "upperCentralScoutingGuidanceBatch20261111",
-    "state": "limited guidance locally verified; final-source ordinary smoke pending; no new B or D credit"
+    "state": "limited guidance verified locally and four CI physical initial attempts; full Chromium logical outcome unconfirmed; no B/D upgrade"
   },
-  "nextPriority": "2-1〜2-4の有限在庫からの攻撃機実配備。既存B未確認の検証不足を対象に、4canonical counterと代表C/Wのprivate設計まで。静的に追加製品欠陥は未確認、正しければ製品変更なし。次counter/実操作/現在セル加算はまだ0。",
+  "nextPriority": "2-1〜2-4の有限攻撃機実配備の検証不足。private Node1群・4contextで別艦配備2/1/2/1を確認、全beam-limit・追加製品欠陥未確認。次は同艦2機境界と代表UIのload保持。Node2群・C/W2案はprivate未実行/未反映、B/Dセル加算0。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -24901,7 +24901,60 @@
       "extraCellCredit": 0
     },
     "ci": {
-      "state": "pending final source commit and one normal smoke"
+      "sourceSHA": "fa0ca1c4701e9b52b8972b7127d9726354e8fa84",
+      "runId": 42919946051,
+      "attempt": 1,
+      "dispatches": 1,
+      "reexecutions": 0,
+      "runConclusion": "failure",
+      "smokeJobs": {
+        "success": 4,
+        "failure": 1,
+        "cancelled": 1
+      },
+      "Full": "skipped",
+      "officialWPassedFlakyFailed": [
+        921,
+        12,
+        1
+      ],
+      "officialC1SubtotalPassedFlakyFailed": [
+        467,
+        0,
+        0
+      ],
+      "allCConfirmed": false,
+      "targetInitialPhysicalPassed": 4,
+      "targetSameAttemptTwoPhaseContractSatisfied": 4,
+      "cancelledC2TargetFinalLogicalOutcome": null,
+      "C2PhysicalCallbacks": {
+        "initialEntries": 456,
+        "passed": 454,
+        "beginWithoutEnd": 2,
+        "noAttemptCallbackCases": 11
+      },
+      "C2TimingSeconds": {
+        "before": 109,
+        "smoke": 2591,
+        "after": 103,
+        "failedAttemptPreservation": 96
+      },
+      "smallZIPsVerified": 12,
+      "smallZIPBytes": 517282,
+      "officialAnnotations": 6,
+      "independentIntegrity": "PASS, not a claim that all tests or jobs passed",
+      "NodeGateStepsSuccess": 6,
+      "Node810IsConfiguredCountNumericFooterUnobserved": true,
+      "registryDigestDirectlyObserved": false,
+      "nonPassedPhysicalAttempts": 14,
+      "sameAttemptStageCounts": {
+        "afterReloadHiddenSearchClickWholeUnreached": 10,
+        "afterLoadWholeComparisonAccessControlAssertion": 3,
+        "dropHuntAddAExpected3Read2": 1
+      },
+      "dropHuntCounter": "operation delivery/handler/write completion unobserved; product source and test unchanged from baseline; affected path held, no guessed fix/repeat; retry does not fill initial",
+      "oldGapsFilled": false,
+      "CIReexecutedForMissingEvidence": false
     },
     "limits": [
       "Only C of each operated row is partial; no A/B/D upgrade.",
@@ -24909,5 +24962,24 @@
       "Water recon zero-capacity legal placement is distinct from launch/remaining aircraft/scouting success.",
       "Old full-C/compact gaps, held4-5, and frozen Night paths are not filled by these local successes."
     ]
+  },
+  "twoAreaFiniteCarrierPrivateCounter20261111": {
+    "sourceSHA": "fa0ca1c4701e9b52b8972b7127d9726354e8fa84",
+    "nodeGroups": 1,
+    "contexts": 4,
+    "runs": 1,
+    "equippedDistinctHullCounts": [
+      2,
+      1,
+      2,
+      1
+    ],
+    "allSearches": "incomplete/beam-limit",
+    "productDefectShown": false,
+    "newBrowserExecutions": 0,
+    "nextNodeDraftGroups": 2,
+    "nextBrowserDraftCases": 2,
+    "draftsPromoted": false,
+    "BOrDCellCredit": 0
   }
 }

@@ -1,3 +1,11 @@
+## 2026-11-11 JST：任意索敵案内の通常smoke確定（記録追補）
+
+source **fa0ca1c4**／[CI42919946051](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/42919946051) attempt1・1起動・再実行0。4成功／W1失敗／C2取消、全W921/12/1・C1小計467/0/0（passed/flaky/failed）、全C未確定。C2取消はBrowser2591秒・前109秒、後段103秒と分離。今回C/W各2タイトルは全4初回physical passedで、同試行の2phase／選択切替／案内load保持契約を満たす。C2のlogical最終null、end欠測2／callbackなし11は成功へ変換しない。
+
+nonpassed14は10初回load-click非表示・全文未到達、3試行はload全文比較後のaccess-control例外検査、release初回1件は掘り＋A後の試験側読取りpoll期待3／実測2。最後は操作配送・保存完了未観測で原因未確定、掘り周回経路を保留する。retry成功や今回4対象の成功で補完しない。小12ZIP517282bytes／注記6件・独立照合PASSは全CI成功や保存安全性を意味しない。旧全C・compact/caller/実値欠測、Night凍結・4-5隔離12件を維持。
+
+236セルは下の局所根拠どおり **28／168／40**、このCI追補で追加変更0。次は2-1〜2-4の有限攻撃機実配備の検証不足。private counter1群・4contextで別艦配備2/1/2/1を確認したが全案beam-limitで、製品欠陥・B/D完了を示さない。Node境界2群と代表UI2経路はprivate草稿のみ、未実行・未反映。[詳細と限界](pr152-upper-central-scouting-guidance-ja.md)。以下のpendingは局所記録当時の履歴として保持する。
+
 <a id="upper-central-scouting-20261111"></a>
 
 ## 2026-11-11 JST：3-5上／5-5中央下の任意索敵案内（局所確認）

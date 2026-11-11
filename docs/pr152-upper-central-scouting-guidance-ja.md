@@ -39,3 +39,17 @@ Nodeは810ユニークを確認した。初回810項目は808成功・2失敗、
 原本は `continuation-upper-central-scouting-batch-20261111/private/`、共有用は許可した集計metadataだけを別生成する。既存原本、4-5隔離12件・別草稿、夜戦方針の対象経路凍結、旧HTTP500受付不明を維持する。PR152ドラフト・未公開、main競合と保護対象を維持し、main統合・PR151・版・SW・本番・マージ・公開・自動マージは行わない。
 
 次は2-1〜2-4の有限在庫からの攻撃機実配備という独立した検証不足を優先する。private counter／代表操作設計までで、静的に追加製品欠陥は未確認。今回のUI成功や共通コードを未実操作行のB/Dへ流用しない。
+
+## 最終sourceの通常smokeと独立した次の対照
+
+製品・試験sourceは `fa0ca1c4701e9b52b8972b7127d9726354e8fa84`。[通常smoke42919946051](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/42919946051) はattempt1・dispatch1・再実行0で、4ジョブ成功／W1失敗／C2取消、Full skipped・run failure。公式passed／flaky／failedは全W **921／12／1**、C1小計 **467／0／0**。C2はBrowser本体2591秒（前109秒）で45分上限取消、後段保持103秒・うち失敗試行資料96秒は別で、全Cの論理集計は未確定。C2の467宣言中、初回callback456（passed454・end欠測2）とcallbackなし11を区別し、未観測分を成功／失敗に換算しない。
+
+今回2タイトル×C/Wの4試行は全てretry0で、同じjob・試行の2phase、新案内／selector切替／新文書load後保持の19top・52checkpoint契約に適合した。C対象のphysical passedを、取消ジョブのlogical最終成功へ読み替えない。6ジョブの実測Node24.21.0／PW1.55.0／C1187・W2203は一致、Node gateは全て成功だが810は設定値でCI数値footerは未取得。registry digestの直接観測も未取得。
+
+同試行の14 nonpassedは、10初回が保存・編集の指定比較後、reload後の再探索click非表示で全文比較未到達。別3-5下unknownの初回／retryと7-3第2speed unknown初回は、指定load全文比較通過後のaccess-control例外検査で停止。各retryの成功は初回未到達を埋めない。最終失敗は3-5下unknownの2試行であり、表示変更元・通信例外発生元や今回変更との具体的関連は未確認。
+
+残るW1 release-smoke初回は、掘り周回の＋A操作後に試験側のlocalStorage読取りpollが期待runs3／実測2となって停止し、retryは成功した。これは保存済み編成の全文不一致ではなく、製品getterが消費した値の観測でもない。click配送・handler開始・setItem完了・書込み後の巻戻りは未観測で、操作未反映と保存異常を区別できない。`drop-hunting.js`／当該通常試験は基準から無変更。掘り周回加算経路は未解決として保留し、推測修正／追加反復を行わない。陽性の編成保持不一致がないことを全保存安全性の証明にしない。
+
+小型12ZIP（合計517282bytes）の公式SHA／CRCと公式注記6件を回収・照合。CI独立readerのPASSは原本と集計／4対象metadataの整合性であり、全CI成功ではない。途中のGH run取得失敗（stderr未保持・原因不明）と、連携が対応しないannotations endpointの400を別記録に保持し、失敗したrun経路は反復しなかった。全ての連携応答参照をローカル転送前に保持し、ZIP再GET0。大型trace／実値JSONや切替callerは新規取得せず、旧全C未確定・旧compact欠測を今回で補完しない。
+
+次の独立対照は同sourceの2-1〜2-4で、有限攻撃機を別空母へ配備できる数が2／1／2／1であることをprivate Node1群・4contextで1回確認した。全案はincomplete／beam-limit、数値制空のstrategy目標は存在するが未判定であり、攻撃機の配備数を制空成立へ換算しない。追加製品欠陥は示されず、B/Dセル加算0。次は同艦2機を別2艦と数えない境界と、異なる代表UI経路の配備／load保持の不足確認をまとめる。Node2群・代表C/Wの案はprivate準備だけで未実行・未反映。記録だけの追補ではCIを追加しない。
