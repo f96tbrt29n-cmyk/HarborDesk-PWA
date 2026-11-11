@@ -62,8 +62,8 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 42,
-      "未確認": 17,
+      "一部": 44,
+      "未確認": 15,
       "非該当": 0
     },
     "C": {
@@ -74,8 +74,8 @@
     },
     "D": {
       "確認済み": 28,
-      "一部": 16,
-      "未確認": 15,
+      "一部": 18,
+      "未確認": 13,
       "非該当": 0
     }
   },
@@ -592,9 +592,13 @@
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "2026-11-11：Chromiumナビ・在庫2/2艦配備を初回workers1/retries0で実操作。九七式艦攻AA0の有限在庫・合法通常枠・枠重複/stack超過なしを独立小集合oracleと照合。任意攻撃能力目標だけの確認で、数値制空/全条件/固定枠/実装備個体IDの一般保証ではない。",
+          "evidence": [
+            "docs/pr152-finite-carrier-deployment-ja.md",
+            "tests/two-area-finite-carrier.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         },
         "C": {
           "status": "一部",
@@ -606,12 +610,16 @@
           ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "2026-11-11：Chromiumナビ・在庫2/2艦配備の配備をnormal apply1回で実保存。保存直後・再探索前のload済み保存全文と探索終了理由・同一reload文書で再探索後表示の4phaseを同試行で確認。customの意図差/他10キー/全6艦識別/他編成metadata/利用者目標を保持。新しい編集操作は未実施で、D確認済みへ格上げしない。",
+          "evidence": [
+            "docs/pr152-finite-carrier-deployment-ja.md",
+            "tests/two-area-finite-carrier.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 有限攻撃機の限定B/Dは今回確認したが、全装備・全目標・固定枠・編集を含む全保存操作・全在庫探索は未確認。"
     },
     {
       "id": "2-2/0/default",
@@ -709,9 +717,13 @@
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "2026-11-11：WebKit編成内・在庫1/1艦配備・残る1艦案内を初回workers1/retries0で実操作。九七式艦攻AA0の有限在庫・合法通常枠・枠重複/stack超過なしを独立小集合oracleと照合。任意攻撃能力目標だけの確認で、数値制空/全条件/固定枠/実装備個体IDの一般保証ではない。",
+          "evidence": [
+            "docs/pr152-finite-carrier-deployment-ja.md",
+            "tests/two-area-finite-carrier.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         },
         "C": {
           "status": "一部",
@@ -723,12 +735,16 @@
           ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "2026-11-11：WebKit編成内・在庫1/1艦配備・残る1艦案内の配備をnormal apply1回で実保存。保存直後・再探索前のload済み保存全文と探索終了理由・同一reload文書で再探索後表示の4phaseを同試行で確認。customの意図差/他10キー/全6艦識別/他編成metadata/利用者目標を保持。新しい編集操作は未実施で、D確認済みへ格上げしない。",
+          "evidence": [
+            "docs/pr152-finite-carrier-deployment-ja.md",
+            "tests/two-area-finite-carrier.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 任意対空装備例の表示/再読込はC/W代表確認済みだが、自動配備・不足/保存編集の実操作確認には換算しない。"
+      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 任意対空装備例の表示/再読込はC/W代表確認済みだが、自動配備・不足/保存編集の実操作確認には換算しない。 有限攻撃機の限定B/Dは今回確認したが、全装備・全目標・固定枠・編集を含む全保存操作・全在庫探索は未確認。"
     },
     {
       "id": "2-5/0/default",
@@ -3352,16 +3368,18 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "upper-central-scouting-guidance",
-    "baselineHead": "78307c4b69f23429aed50b77593df50260fad2bd",
+    "id": "two-area-finite-carrier",
+    "baselineHead": "2bb83101f5bf3743f16085a330b6a3a363f7a73a",
     "scope": [
-      "3-5/1/default",
-      "5-5/1/default"
+      "2-1/0/default",
+      "2-2/0/default",
+      "2-3/0/default",
+      "2-4/0/default"
     ],
-    "record": "upperCentralScoutingGuidanceBatch20261111",
-    "state": "limited guidance verified locally and four CI physical initial attempts; full Chromium logical outcome unconfirmed; no B/D upgrade"
+    "record": "finiteCarrierDeploymentBatch20261111",
+    "state": "no product defect observed; finite Node4contexts and same-row C2-1/W2-4 saved deployment4phases verified; final-source ordinary smoke pending"
   },
-  "nextPriority": "2-1〜2-4の有限攻撃機実配備の検証不足。private Node1群・4contextで別艦配備2/1/2/1を確認、全beam-limit・追加製品欠陥未確認。次は同艦2機境界と代表UIのload保持。Node2群・C/W2案はprivate未実行/未反映、B/Dセル加算0。",
+  "nextPriority": "1-3 normal/CFJ・1-4 J回避の有限攻撃機配備。既存案内/分岐条件/実在庫証拠を静的照合し、異なる操作経路の代表だけ確認する候補。現在2-x成功を別行B/Dへ流用せず、出典不足/固定条件不明は保持。2-2/2-3の現在B/DはNode-onlyで未確認のまま。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -24981,5 +24999,153 @@
     "nextBrowserDraftCases": 2,
     "draftsPromoted": false,
     "BOrDCellCredit": 0
+  },
+  "selectedBeforeFiniteCarrier20261111": {
+    "id": "upper-central-scouting-guidance",
+    "baselineHead": "78307c4b69f23429aed50b77593df50260fad2bd",
+    "scope": [
+      "3-5/1/default",
+      "5-5/1/default"
+    ],
+    "record": "upperCentralScoutingGuidanceBatch20261111",
+    "state": "limited guidance verified locally and four CI physical initial attempts; full Chromium logical outcome unconfirmed; no B/D upgrade"
+  },
+  "nextPriorityBeforeFiniteCarrier20261111": "2-1〜2-4の有限攻撃機実配備の検証不足。private Node1群・4contextで別艦配備2/1/2/1を確認、全beam-limit・追加製品欠陥未確認。次は同艦2機境界と代表UIのload保持。Node2群・C/W2案はprivate未実行/未反映、B/Dセル加算0。",
+  "finiteCarrierDeploymentBatch20261111": {
+    "record": "docs/pr152-finite-carrier-deployment-ja.md",
+    "baseHEAD": "2bb83101f5bf3743f16085a330b6a3a363f7a73a",
+    "productChanges": 0,
+    "before": [
+      28,
+      168,
+      40
+    ],
+    "after": [
+      28,
+      172,
+      36
+    ],
+    "cellTransitions": [
+      {
+        "id": "2-1/0/default",
+        "item": "B",
+        "before": "未確認",
+        "after": "一部"
+      },
+      {
+        "id": "2-1/0/default",
+        "item": "D",
+        "before": "未確認",
+        "after": "一部"
+      },
+      {
+        "id": "2-4/0/default",
+        "item": "B",
+        "before": "未確認",
+        "after": "一部"
+      },
+      {
+        "id": "2-4/0/default",
+        "item": "D",
+        "before": "未確認",
+        "after": "一部"
+      }
+    ],
+    "oracle": {
+      "input": "九七式艦攻 AA0 stock2/1/2/1; CV2 of赤城改/隼鷹改; eight legal positive normal frames; fixed-frame0",
+      "independentStates": [
+        73,
+        9,
+        73,
+        9
+      ],
+      "expectedEquippedHulls": [
+        2,
+        1,
+        2,
+        1
+      ],
+      "searchResultsUsedAsExpected": false,
+      "realGameEquipmentInstanceIdsProvided": false,
+      "symbolicInjectionNoReuse": true
+    },
+    "node": {
+      "newGroups": 2,
+      "freshPass": 2,
+      "fail": 0,
+      "skip": 0,
+      "establishedGroupsReused": 810,
+      "configuredNormalCI": 812,
+      "freshLocal812Executed": false,
+      "oldSixBoundariesReused": true,
+      "allFourActualSearches": "incomplete/beam-limit; numericalair strategy goal exists/unresolved"
+    },
+    "local": {
+      "C": {
+        "map": "2-1",
+        "entry": "navigator",
+        "retry": 0,
+        "passed": true,
+        "durationMs": 5459,
+        "registered": 2,
+        "assigned": 2,
+        "equippedHulls": 2
+      },
+      "W": {
+        "map": "2-4",
+        "entry": "inline",
+        "retry": 0,
+        "passed": true,
+        "durationMs": 8881,
+        "registered": 1,
+        "assigned": 1,
+        "equippedHulls": 1,
+        "unservedHulls": 1
+      },
+      "phases": [
+        "initial",
+        "after-save",
+        "after-load-saved",
+        "after-load"
+      ],
+      "searchesEach": 2,
+      "applyEach": 1,
+      "reloadEach": 1,
+      "newEdits": 0,
+      "checkedKeys": 11,
+      "intentionalCustomFleetDeltaSeparate": true,
+      "otherImmutableKeys": 10,
+      "preservedDropHuntSyntheticSentinel": true,
+      "metadataTop": 21,
+      "metadataCheckpoint": 57,
+      "rawFiles": 38,
+      "traceVideoImages": 0,
+      "independentResult": "PASS",
+      "NodeOnlyRows": [
+        "2-2/0/default",
+        "2-3/0/default"
+      ]
+    },
+    "normalPreflight": {
+      "files": 82,
+      "casesPerBrowser": 936,
+      "Wbins": [
+        339,
+        164,
+        249,
+        184
+      ],
+      "exactUnion": true,
+      "new2Selected": true
+    },
+    "ci": {
+      "state": "pending final source and one normal smoke"
+    },
+    "limits": [
+      "Only two same-row B/D partial credits; no fullD/newedit/allconditions guarantee.",
+      "No fixed-frame schema or real equipmentinstance IDs in finite input.",
+      "Stock1 maxone covers onlycurrenttinyinput andoptional2hull goal; not purchase necessity/generalsearchimpossibility.",
+      "Frozen drop counter/Night/held4-5, all old C/compact gaps remain distinct."
+    ]
   }
 }
