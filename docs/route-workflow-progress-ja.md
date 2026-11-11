@@ -1,3 +1,13 @@
+## 2026-11-11 JST：有限攻撃機のCI確定・実行環境停止
+
+source **00927721**／[CI42951416369](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/42951416369) attempt1・要求1/再実行0は**3成功3失敗・取消0**、Full skipped/run failure。C1/C2/W3成功、W1/W2/W4失敗。W2のみ公式ログ162/1/1（passed/flaky/failed）とNode812/812/0/skip0を確認。他5 decoded-logは各1回Transport closed、全C/W内訳・対象CI4試行metadata/保持比較・公式注記取得は欠測。局所成功やジョブ成功で補完しない。
+
+W2の5-4 required-missing初回/retry1と3-4 stock初回は、保存編集後の指定比較を通過し、reload後search click非表示・45秒停止で全文比較未到達。3-4のretry成功（flaky）は別試行。表示変更元/原因/今回関連は未確認。他失敗は未分類、新保存異常の有無は取得範囲だけでは未確定。
+
+実行環境unavailable/exec切断により、監視run-041ローカル保存、CI原本ZIP照合・最終manifest/独立照合は未完。exec再試行/環境再作成なし。局所38原本PASSは切断前の事実で、現在のローカル現物・容量は未確認（最後の容量約8.287GiB）。未push資料は専用private領域、GitHub保存済みsource/台帳と区別する。[所在・再開条件](pr152-finite-carrier-deployment-ja.md#通常smoke確定と実行環境停止github側の記録追補)。
+
+236セルは **28／172／36** のまま、このCI記録で追加変更0。次1-3 normal/CFJ・1-4 J回避はprivate静的草稿だけ、追加実行0。既存workspace保持・原本/作業状態/容量とremote docs差分の確認が再開条件。旧C/compact等欠測・掘り/Night凍結・4-5隔離12件、PR152ドラフト未公開/保護対象を維持。以下は履歴。
+
 ## 2026-11-11 JST：2-1〜2-4有限攻撃機配備（局所確認）
 
 1. **改善**：製品変更なし。実在庫からの自動配備と実際の保存・再表示の検証不足を補い、任意攻撃機装備艦数を装備個数・数値制空・通行必須から分離した。

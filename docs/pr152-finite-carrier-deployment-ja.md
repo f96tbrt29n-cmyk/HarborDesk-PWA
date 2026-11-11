@@ -49,3 +49,20 @@
 局所確認後の最終sourceで通常smokeを1回確認する。この局所記録時点では未開始。前CI42919946051の4成功1失敗1取消、W921/12/1・C1小計467/0/0・全C未確定、旧compact等の欠測は別に保持する。
 
 次候補は1-3 normal/CFJ・1-4 J回避の有限攻撃機配備。既存案内・分岐条件・実在庫証拠の不足を静的に照合し、現在の2-x成功を別行の操作成功へ流用しない。PR152ドラフト・未公開、main競合と保護対象を維持し、main統合・PR151・版・SW・本番・マージ・公開・自動マージは行わない。
+
+
+## 通常smoke確定と実行環境停止（GitHub側の記録追補）
+
+検証sourceは `00927721aff37f51a8e524c2dde8909890f63a32`。[CI42951416369](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/42951416369) はattempt1・起動要求1回・再実行0で終了し、**3ジョブ成功／3失敗／取消0、Full skipped・run failure**。C1/C2/W3は成功、W1/W2/W4は失敗で、各WebKit失敗はsmoke step自体もfailureだった。C2はsmoke2485秒・job2653秒・後段63秒で成功したが、この1試行で過去の取消や偏りを解決扱いにしない。
+
+GitHub連携で取得できたW2（job130296351729）のdecoded logでは、公式noticeのpassed／flaky／failedが **162／1／1**、Node footerがtests812/pass812/fail0/cancelled0/skipped0/todo0と確認できる。これを全C/W集計や他ジョブの数値footerへ広げない。他5ジョブのdecoded-log取得はそれぞれ1回のTransport closedとなり、同じ経路は再試行していない。公式注記の専用API取得・全C/Wのケース内訳・今回対象4試行の個別metadata/保持比較は欠測で、C2/W3のジョブ成功から初回成功・全比較通過を推測しない。
+
+W2の5-4 M→P required-missingは初回・retry1とも試験45秒上限でload後searchボタンのlocator.clickが非表示待機となった。同sourceの通常コードとstack50行目を照合すると、保存・編集後の指定比較を通過してreloadへ進み、その後の全文比較（51行目）は未到達。3-4 ACEGJP stockの初回もafter-load-search（162行目）の非表示click待機で45秒、後段全文比較は未到達。3-4の最終分類はflakyでretry成功と分離する。表示変更元・click配送/handler開始・旧障害との同原因、今回変更との具体的関連は未確認。今回の取得範囲で新しい保存不一致を分類できたとはせず、他ジョブの未分類・実値JSON欠測を保持する。
+
+実行環境は監視のローカル保存時に利用不能となった。初回exec-server transport disconnected（recovery timed out after45s）後のexec再試行・環境削除/初期化/再作成は0。最後にdisk保存を確認した監視はrun-040 receipt（03:57:01.484Z）、jobs-008 receipt（03:54:01.963Z、raw jobs-007参照）まで。03:58:01.486Zのrun-041はAPI取得成功・応答保持後にローカル書込みが失敗し、receipt未保存。その後のterminal run/jobs/artifact-listとW2ログはGitHub連携で確認したが、workspaceへの原本保存・ZIPの取得/公式SHA・CRC照合は未実施である。
+
+切断前に局所38原本・独立reader PASS・7ファイルの通常commit/pushとclean HEADを確認済み。これを現在のローカル現物確認へ流用しない。最後の容量読取りは約8.287GiBで、切断後の容量・作業ツリー・原本は未確認。最終manifestとCI canonical/sharedの生成・独立照合は未完で、準備済みclosureスクリプトの存在を実行成功へ数えない。
+
+未pushの所在は専用領域 `/workspace/harbordesk-handoff-_gnvlnto/continuation-finite-carrier-allocation-batch-20261111/private/`。局所原本・収集/レビュー・CI準備・監視原本はここだけにあり、GitHub保存済みの製品/試験/この記録と区別する。次候補の `private/next-batch-preparation/plan.json` は16747B・SHA-256 `0415852dbd670919f5c765cd04574cc7ee2a86b5609e0c4f4513d0b538a7c392` の静的草稿で、試験/製品変更/セル加算0。最後の保存確認後は現物未確認とする。旧領域の原本、4-5隔離12件・別草稿、夜戦・掘り周回の保留も維持し、削除していない。
+
+236セルは局所の同定済み根拠に基づく **28／172／36** を維持し、この追補で変更0。復旧時は新たなexec反復や環境再作成を行わず、既存workspaceを保持できる実行手段が利用可能になった場合に、remote記録HEADとの差（docsのみ）・現在の作業状態・38原本・容量を先に照合する。未取得のCI資料を必要な範囲で回収し、最終manifest/独立照合を閉じてから次バッチへ進む。通常CI再起動・成功目的の反復は不要。記録だけの追補に追加CIは要求しない。

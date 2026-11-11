@@ -25139,7 +25139,75 @@
       "new2Selected": true
     },
     "ci": {
-      "state": "pending final source and one normal smoke"
+      "state": "terminal jobs confirmed through GitHub; detailed collection incomplete after execution environment unavailable",
+      "sourceSHA": "00927721aff37f51a8e524c2dde8909890f63a32",
+      "runId": 42951416369,
+      "runAttempt": 1,
+      "requests": 1,
+      "reexecutions": 0,
+      "runConclusion": "failure",
+      "smokeJobs": {
+        "success": 3,
+        "failure": 3,
+        "cancelled": 0
+      },
+      "Full": "skipped",
+      "successfulJobNames": [
+        "C1",
+        "C2",
+        "W3"
+      ],
+      "failedJobNames": [
+        "W1",
+        "W2",
+        "W4"
+      ],
+      "officialW2PassedFlakyFailed": [
+        162,
+        1,
+        1
+      ],
+      "allCPassedFlakyFailed": null,
+      "allWPassedFlakyFailed": null,
+      "otherJobPFF": null,
+      "W2NodeFooter": {
+        "tests": 812,
+        "pass": 812,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0,
+        "todo": 0
+      },
+      "otherNodeNumericFooters": "uncollected; all six gate steps success",
+      "targetCIPhysicalAttemptsAndRetention": "uncollected; successful C2/W3 jobs do not fill individual trial metadata",
+      "W2ClassifiedFailures": {
+        "fiveFourRequiredMissing": "initial/retry1: specified saved/edited checks passed, after-reload search click hidden45000ms, later whole comparison unreached; cause unknown",
+        "threeFourStock": "initial after-load-search click hidden45000ms; specified saved/edited checks before reload passed; later whole comparison unreached; retry success by flaky classification"
+      },
+      "otherFailureDetails": "missing; five decoded-log calls each Transport closed/no repeat",
+      "officialAnnotations": "uncollected; no execution environment for existing annotation-only CLI path",
+      "newSaveAnomalyClassification": "local same-row checks passed; CI targets and other unclassified trials remain missing, no global safety verdict",
+      "C2TimingSeconds": {
+        "smoke": 2485,
+        "job": 2653,
+        "after": 63
+      },
+      "artifactListingReceived": 25,
+      "ZIPDownloadsRequested": 0,
+      "officialZIPDigestAndCRCVerified": false,
+      "environment": {
+        "state": "unavailable",
+        "execFailure": "exec-server transport disconnected / recovery timed out after45s",
+        "execRetries": 0,
+        "deletedInitializedRecreated": false,
+        "lastSavedMonitor": "run04003:57:01.484Z/jobs00803:54:01.963Z",
+        "run041": "MCPsuccess03:58:01.486Z/response retained/local receipt unsaved",
+        "lastReadFreeGiB": 8.287,
+        "currentLocalStateCapacityAndRawEvidence": "unverified after loss",
+        "localFinalManifestAndIndependentClosure": "not executed"
+      },
+      "oldCIAndCompactGapsFilled": false,
+      "additionalCIRequestedForRecords": false
     },
     "limits": [
       "Only two same-row B/D partial credits; no fullD/newedit/allconditions guarantee.",
