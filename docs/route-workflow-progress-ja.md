@@ -1,8 +1,14 @@
+## 2026-11-12 JST：有限配備CI確定・1-5文書識別要件を別保留
+
+検証source4ecd1799／[CI43154691544](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/43154691544)は3job成功3失敗・取消0、C937/1/0 W926/7/5（passed/flaky/failed、各938/82file完了）。今回2タイトル×C/Wの4試行はretry0 passed・6/4phase保存保持適合、criticalfalse/pageerror/drop/missing0。CI全体はfailureで、局所や旧欠測を補完しない。
+
+1-5/1 unknown W4初回はload-read aggregateで文書識別一致false。保存全文/入力/他保持/identityの露出比較は同試行true、未露出項目/識別実値/callerは欠測。当該操作保留・新規試験0。retry成功と分離し、旧Dの同定済直接証拠が無効という根拠はないため状態を維持。**28/175/33はCI追補で変更0**。[停止段階・欠測・再開判断](pr152-starter-finite-carrier-deployment-ja.md)。CFJ空枠配備/2-2・2-3は読取り計画のみ、凍結/隔離/旧原本・PR152未公開を保持。以下は履歴。
+
 ## 2026-11-12 JST：1-3 normal/CFJ・1-4 J回避の有限配備
 
 製品変更0。独立5状態/4合法枠のNode2群は初回の誤った夜戦目標期待で0/2、根拠付きfixture訂正後2/2。初回原本・同定sourceを保持。Cナビ5412ms/W編成内8303ms各retry0で保存1/reload1・同一新文書load保持を確認。Cはnormal保存→CFJ既存配備再評価→normalへ戻す6phase、W4phase。Cの再探索前gear本文DOMは未実施、raw配備/理由全文比較と再探索後DOMを分離。
 
-**28確認済み／172一部／36未確認→28／175／33**。normal B/DとJ回避Bの3セルだけ未確認→一部。CFJ空枠配備はNodeのみでB未確認を維持、CFJ切替保持を新規配備/保存成功へ広げない。編集再実行なし。通常smokeは最終sourceで重複なく1回確認予定。[限定記録](pr152-starter-finite-carrier-deployment-ja.md)。旧CI42951416369のC936/0/0・W928/5/3、原本・旧欠測・凍結/4-5隔離を別保持。以下は履歴。
+**28確認済み／172一部／36未確認→28／175／33**。normal B/DとJ回避Bの3セルだけ未確認→一部。CFJ空枠配備はNodeのみでB未確認を維持、CFJ切替保持を新規配備/保存成功へ広げない。編集再実行なし。通常smokeは最終sourceで1回確認済み（確定結果は先頭のCI追補）。[限定記録](pr152-starter-finite-carrier-deployment-ja.md)。旧CI42951416369のC936/0/0・W928/5/3、原本・旧欠測・凍結/4-5隔離を別保持。以下は履歴。
 
 ## 2026-11-12 JST：復旧・有限攻撃機の証拠追補
 

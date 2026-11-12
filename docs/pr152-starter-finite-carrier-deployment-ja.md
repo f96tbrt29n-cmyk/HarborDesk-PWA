@@ -6,7 +6,7 @@
 
 既存のstock0案内・参照表示を、新しい実配備成功へ流用しない。対象は1-3/0/normal、同CFJ、1-4/0/j-avoid。登録出典・分岐範囲を再利用し、低速対応・DD4・1-4潜水母艦の区別と初期分岐ランダムを維持した。
 
-共通は飛鷹改1、空通常枠、九七式艦攻★0・AA0を1機。1-3は夕張改二特＋DD4、1-4は大鯨＋DD4。既知マスターのtype8許可・通常4枠18/18/18/12を独立確認し、未配備＋4配備先の5状態、最大1機/1艦を期待値とした。探索結果を期待値へ写していない。
+共通は飛鷹改1、空通常枠、九七式艦攻★0・AA0を装備1個。1-3は夕張改二特＋DD4、1-4は大鯨＋DD4。既知マスターのtype8許可・通常4枠18/18/18/12を独立確認し、未配備＋4配備先の5状態、最大1機/1艦を期待値とした。探索結果を期待値へ写していない。
 
 任意攻撃能力目標1、装備個数、数値制空、経路必須と勝利を分離。実艦の識別は合成gameShipId/rosterId等で検査するが、実装備個体IDや固定枠指定は入力にない。その保護・実個体の重複防止は未確認。
 
@@ -33,7 +33,7 @@
 
 Cの完了案は未完了用saved-searchカードを表示しない。再探索前はナビ保存元の見出しと保存raw保持を確認し、gear本文DOMは再探索後に確認。Wは再探索前の保存カードgearと未完了記録を表示確認。明示false/nullを成功へ変換していない。編集は再実行せず、既存の変更しない証拠を再利用する。全D確認済みへは格上げしない。
 
-収集と独立readerは46原本/2plan/物理試行を照合しPASS_WITH_GAPS。gapは保持した初回Node失敗で、後の成功で補完していない。C/Wは各1回ともsourceExact・同試行metadata契約適合、pageerror/drop/missing0。trace/video/screenshotは0。保存不一致の陽性はなかったが、全保存安全性の証明へ広げない。
+収集と独立readerは46原本/2plan/物理試行を照合しPASS_WITH_GAPS。gapは保持した初回Node失敗で、後の成功で補完していない。C/Wは各1回ともsourceExact・同試行metadata契約適合、pageerror/drop/missing0。trace/video/screenshotは0。この局所C/Wで保存不一致の陽性はなかったが、全保存安全性の証明へ広げない。
 
 ## 236セルと残件
 
@@ -46,3 +46,36 @@ Cの完了案は未完了用saved-searchカードを表示しない。再探索�
 前CI42951416369は既存資料だけでC936/0/0 W928/5/3・3成功3失敗/取消0を回収。10件load後click非表示/全文未到達とNight既知getter初回1件、3最終失敗を試行別保持し、旧根因/実値/5ログ欠測は未確定のまま。今回の成功で補完しない。
 
 証拠専用領域：/workspace/harbordesk-handoff-_gnvlnto/continuation-one-area-finite-carrier-batch-20261112。private原本/shared許可metadataを分離、Gitへは製品/通常試験/記録だけ。PR152ドラフト・未公開、4-5隔離12件と別草稿、Night/掘り凍結、旧原本・main競合と保護対象を保持。main統合・PR151・版・SW・本番・マージ・公開・自動マージは行わない。
+
+
+## 2026-11-12 JST：通常CIの確定結果と別件保留
+
+検証source **4ecd179907e91731c8bf4c38bc3b0289b43fb21c**／[CI43154691544](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/43154691544) attempt1。通常push後に同SHAの自動起動0を2回照合し、smoke要求1回・再実行0。C1/C2/W2 job success、W1/W3/W4 failure、取消0、Full skipped、run failure。
+
+公式passed/flaky/failedは **C937/1/0、W926/7/5**。各938例/82fileの完了をcompactと照合した。logical集計を厳密な初回成功数・物理試行数へ換算しない。Nodeゲートは6job成功、実測Node patchはv24.21.0。814は通常設定値であり、CI数値footerは未採取。CI registryの実pull digestも独立取得したとは記載しない。
+
+今回対象2タイトル×C/Wの4試行は全てretry0 passed。navigator6/inline4phase・保存配備/理由/全文の再探索前比較が同試行で適合、criticalfalse/pageerror/drop/missing0。navigator完了案のカード非適用false、inlineカード適用true、他phaseの未実施nullをそのまま扱う。CFJ controlは既存配備の保持で、新規CFJ配備Bへは加算しない。
+
+非成功18物理試行は、load後search-click非表示12、pageerror末尾比較3、後続reload navigation停止1、load後aggregateの文書識別不一致1、操作位置欠測timeout1に分類。個別詳細例外が欠測の3試行、raw実値JSON未採取18、hidden表示変更元12の欠測を保持する。
+
+最終失敗5 logicalケースは、WebKitの7-1 DEGHK ready、7-5第1ABDFGHK stock、5-5 BKPS exempt、同readyのload後クリック非表示（各初回/retry）と、carrier bomber CIの末尾pageerror比較（初回/retry）。前者の後段全文比較は未到達、後者は同試行のgetter復元比較後の外部access-control例外検査で停止した。旧cv-three/cv-fighter2 getter不一致を今回解決したとは扱わない。Cのsortie初回は後続boot/navigation段階で停止しretry成功。6-5ready初回timeoutの正確な操作位置は欠測。いずれも保存破壊や今回との因果を推測しない。
+
+### 1-5 unknown初回：当該操作を保留
+
+同CI/W4/job130971778255/testId735200b5db9b4482d896-f143ddd0985ea38f3445/retry0は、route-one-five-middle.spec.js:126:25のload後aggregate比較で停止。unknownの安全中止経路で、配備反映・memo編集は行っていない。load-readには到達しており、非表示クリック未到達とは別経路である。
+
+既存の追加small route-summary 1件を同run/source/job/member/retryへ対応付け、初回の **sameDocument=false** を確認した。これはperformance.timeOriginと先に採取したdocの完全一致比較であり、実際に文書が切り替わったとの断定ではない。初回のcustomExact/sourcesExact/other/otherMap/otherPlanner/procurement、readyStateComplete/routeManual、identity比較はtrueだった。保存全文・露出した保持項目の不一致陽性は確認していない。
+
+一方、aggregateのmetadata/openingAswCount等はsummaryへ全て露出しておらず、timeOrigin実値・変更元も欠測。sameDocumentだけが失敗原因、保存安全性、データ喪失とは確定しない。retryのsameDocument=true/成功は別試行として保持し、初回の欠測を補完しない。summary自体にはsource/run/testId/retryの自己束縛がなく、公式artifactと一意のspec/state・通常/retry1 member directory・compactによる対応付けという限界を明記した。
+
+独立レビューでは、旧known/stock保存編集・unknown安全中止の6代表や追加代替の直接証拠を無効にする根拠はないため、1-5/1 Dの既存確認済みを機械的に格下げしない。ただし今回の当該操作は成功にせず保留し、行の残件へ追記した。今回3セル変更とは別で **28/175/33を維持**する。
+
+次に必要な観測は、既存load-readの戻り値から未露出のaggregate期待項目を、集約assert前に許可boolとして残すこと。追加Storage read/保存/reload/待機は不要だが、今回は実行しない。製品の保存処理は0変更である一方、共通経路の間接影響や原因を否定する証拠でもない。推測修正・追加診断・成功目的反復は行わない。
+
+### 回収・閉鎖
+
+terminal原文3、公式注記6、主small12ZIP（453697B/88members）を公式size/digest/CRCと照合し、canonical/sharedの独立readerはPASS（CI自体はfailure）。追加W4 summaryは14838B/16membersとして別領域へ保持し、主12のsealed collectionは変更していない。rootの独立読取りも初回/retryの分離・露出bool・公式source/run対応を照合しPASS_WITH_GAPS。
+
+W4の同文Run Summary2コピーは同じjobの本文完全一致を確認して1論理注記とし、原本2件を残した。非TTY転送準備のEOFはURL投入前/GET0として別記録し、専用TTYのecho無効を確認後にstdinだけで受け渡した。URL/token/保存値本文は共有せず、各File Service GET1・connector再要求0、資格情報変更0・原本sanitizer実行0。
+
+証拠は専用領域のprivate/ci-4ecd1799-v1/、shared/ci-results.json、private/ci-review/。最終manifest/独立照合はこの記録pushとwriter停止後に別保存し、確定結果をPR現状欄へ記載する。記録だけの追加CI/ブラウザー0。CFJ空枠/2-2・2-3の計画はprivate/next-batch-preparation/plan.jsonへ保持し、今回の保留を欠測回収だけの新実験へ広げない。

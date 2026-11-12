@@ -472,7 +472,7 @@
         },
         "D": {
           "status": "確認済み",
-          "reason": "同じ登録例のknown/stock4件は保存・メモ編集、unknown2件は安全中止/編集なし。元4艦strict20＋空2または4+0、同一文書load全文/元8キー/他編成metadataまで全6代表の直接証拠が揃った。 BBV1CL1DD2追加6例も全初回成功で保存/安全中止・編集対象・同一文書load、保存/load各120識別項目/他保持が一致。旧未到達を補完せず同じセルの追加根拠とする。 BBV1CL2DD1追加6例も保存編集4/安全中止2・同一文書load6・保存/load各120識別項目と厳密空行8+8/他保持が一致。同じセルの追加証拠で旧未到達を補完しない。 CL2DD2追加6は保存編集4/安全中止2・同一文書load6/各120識別比較/空行8+8保持が一致。",
+          "reason": "同じ登録例のknown/stock4件は保存・メモ編集、unknown2件は安全中止/編集なし。元4艦strict20＋空2または4+0、同一文書load全文/元8キー/他編成metadataまで全6代表の直接証拠が揃った。 BBV1CL1DD2追加6例も全初回成功で保存/安全中止・編集対象・同一文書load、保存/load各120識別項目/他保持が一致。旧未到達を補完せず同じセルの追加根拠とする。 BBV1CL2DD1追加6例も保存編集4/安全中止2・同一文書load6・保存/load各120識別項目と厳密空行8+8/他保持が一致。同じセルの追加証拠で旧未到達を補完しない。 CL2DD2追加6は保存編集4/安全中止2・同一文書load6/各120識別比較/空行8+8保持が一致。 2026-11-12 CI43154691544のunknown W4初回はload-readでperformance.timeOrigin一致false。露出した保存全文/入力/他保持/identityは同試行trueだが、未露出aggregate項目・識別実値/callerは欠測で当該操作保留。旧6代表等の同定済成功根拠を無効にする証拠はなく、D状態は維持。retryで初回を補完しない。",
           "evidence": [
             "docs/pr152-one-five-middle-ja.md",
             "tests/route-one-five-middle.spec.js",
@@ -488,11 +488,12 @@
             "docs/pr152-one-five-cl2-dd2-ja.md",
             "tests/one-five-cl2-dd2-boundaries.test.cjs",
             "tests/route-one-five-cl2-dd2.spec.js",
-            "tests/fixtures/one-five-cl2-dd2-browser-inputs.json"
+            "tests/fixtures/one-five-cl2-dd2-browser-inputs.json",
+            "docs/pr152-starter-finite-carrier-deployment-ja.md"
           ]
         }
       },
-      "remaining": "CL2DD2の有限接続/新6代表保持も確認（原本/独立照合閉鎖）。BBV1CL2DD1の限定接続とC/W6代表/保持・原本独立照合も確認。BBV1CL1DD2の限定接続とC/W6代表の操作保持は確認。共通四隻scopeの未実施個別構成、登録四隻対象外で出典本文/G/Dの適用隻数不一致が残る2–3隻、全目標/在庫/改修/枠競合/全機種/同期操作、装備の必要十分性・先制人数/火力/勝利は未確認。新source6c08381fのsmokeは5成功/W4 smoke取消で、全W最終結果は未確定。自身C3初回成功/W3 framework未確定を分け、6件の保存/load保持metadataと回収独立照合を確認。旧操作不安定の原因は別に保持。 新BBV1CL2DD1検証sourcead793f1aのCIは全C897/0/1・全W886/10/2で確定。新W不足初回load未到達とretry1完了を分け、metadata19の観測保持比較・他最終3件の停止境界・復旧後原本/独立照合を追補した。raw大容量3件・counter/呼出し元/原因の欠測は保持。 index2/DD4は別スコープで、新CL2DD2検証source48399416のCIはC901/0/0・W1–3小計675/1/0、W4/fullW未確定で記録を閉鎖。新light6保持metadataとC3pass/W3 framework不明を分け、旧cohort2初回load/nav欠測を保持。 今回CL1DD3と独立ASW数量選択を有限確認。新6は5初回成功＋C不足の文言期待訂正後成功、旧代表4は3完了/knownWloadクリック非表示で全文未到達。Node論理67/物理92・現行model7、保存200/load180と原本独立照合を記録し、旧欠測を補完しない。source/CIは新記録時pending。 invalid/未知形式は原値保持readonly停止で復旧UI対象外、旧API5–7の新select非対応・丸めなし、全モード保存操作は未実証。"
+      "remaining": "CL2DD2の有限接続/新6代表保持も確認（原本/独立照合閉鎖）。BBV1CL2DD1の限定接続とC/W6代表/保持・原本独立照合も確認。BBV1CL1DD2の限定接続とC/W6代表の操作保持は確認。共通四隻scopeの未実施個別構成、登録四隻対象外で出典本文/G/Dの適用隻数不一致が残る2–3隻、全目標/在庫/改修/枠競合/全機種/同期操作、装備の必要十分性・先制人数/火力/勝利は未確認。新source6c08381fのsmokeは5成功/W4 smoke取消で、全W最終結果は未確定。自身C3初回成功/W3 framework未確定を分け、6件の保存/load保持metadataと回収独立照合を確認。旧操作不安定の原因は別に保持。 新BBV1CL2DD1検証sourcead793f1aのCIは全C897/0/1・全W886/10/2で確定。新W不足初回load未到達とretry1完了を分け、metadata19の観測保持比較・他最終3件の停止境界・復旧後原本/独立照合を追補した。raw大容量3件・counter/呼出し元/原因の欠測は保持。 index2/DD4は別スコープで、新CL2DD2検証source48399416のCIはC901/0/0・W1–3小計675/1/0、W4/fullW未確定で記録を閉鎖。新light6保持metadataとC3pass/W3 framework不明を分け、旧cohort2初回load/nav欠測を保持。 今回CL1DD3と独立ASW数量選択を有限確認。新6は5初回成功＋C不足の文言期待訂正後成功、旧代表4は3完了/knownWloadクリック非表示で全文未到達。Node論理67/物理92・現行model7、保存200/load180と原本独立照合を記録し、旧欠測を補完しない。source/CIは新記録時pending。 invalid/未知形式は原値保持readonly停止で復旧UI対象外、旧API5–7の新select非対応・丸めなし、全モード保存操作は未実証。 操作不安定：CI43154691544 unknown初回の文書識別一致が不適合。保存値喪失は未確認、非露出比較項目/識別実値/変更元は欠測。当該操作を保留し、新規診断/試験なし。"
     },
     {
       "id": "1-5/2/default",
@@ -3386,9 +3387,9 @@
       "1-4/0/j-avoid"
     ],
     "record": "starterFiniteCarrierDeploymentBatch20261112",
-    "state": "limited local finite deployment and preservation passed; CFJ UI only retains existing gear so B remains unconfirmed; final-source normal CI pending"
+    "state": "limited local and same-source CI target4 success; CFJ remains Node-only for fresh allocation; CI overall failure and 1-5 initial document-identity mismatch held separately"
   },
-  "nextPriority": "CFJ自身の空枠からの有限配備と2-2/2-3のNode-only有限配備・保存/loadの不足を既存証拠との差から選ぶ。今回CFJの既存配備保持を新規配備へ換算せず、4-5隔離/夜戦・掘り凍結は除外。",
+  "nextPriority": "1-5 ADFGJ unknownの現行初回・文書識別一致false/非露出aggregate項目を保留記録。新規試験/推測修正なし。CFJ自身の空枠配備と2-2/2-3 Node-onlyの共通補完計画は保持し、既存成功を繰返さない。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -25330,7 +25331,7 @@
   "starterFiniteCarrierDeploymentBatch20261112": {
     "atJST": "2026-11-12",
     "baseHEAD": "87c8f0539e7753aa1ac55b9b67b108797dc9d95f",
-    "sourceSHA": null,
+    "sourceSHA": "4ecd179907e91731c8bf4c38bc3b0289b43fb21c",
     "productChanges": 0,
     "targets": [
       "1-3/0/normal",
@@ -25447,10 +25448,104 @@
     ],
     "CFJBRemainsUnconfirmed": true,
     "CI": {
-      "state": "pending final source commit and deduplicated single normal smoke",
-      "newRequests": 0
+      "state": "terminal official/small-artifact results and same-attempt classification verified; no rerun",
+      "sourceSHA": "4ecd179907e91731c8bf4c38bc3b0289b43fb21c",
+      "runId": 43154691544,
+      "attempt": 1,
+      "requests": 1,
+      "reexecutions": 0,
+      "runConclusion": "failure",
+      "jobs": {
+        "success": 3,
+        "failure": 3,
+        "cancelled": 0
+      },
+      "Full": "skipped",
+      "officialCPassedFlakyFailed": [
+        937,
+        1,
+        0
+      ],
+      "officialWPassedFlakyFailed": [
+        926,
+        7,
+        5
+      ],
+      "logicalPFFNotPhysicalFirstCounts": true,
+      "fullCoverageBothBrowsers": true,
+      "declared938Cases82FilesEach": true,
+      "targetInitialPassed": 4,
+      "targetMetadataMatched": 4,
+      "targetCriticalFalse": 0,
+      "targetPageerrorDropMissing": 0,
+      "explicitFalseAndNullPreserved": true,
+      "nonPassedPhysicalAttempts": 18,
+      "classification": {
+        "later-reload-navigation-aborted": 1,
+        "after-reload-search-click-hidden-timeout": 12,
+        "after-reload-browser-pageerror-assertion": 3,
+        "post-load-sameDocument-false-aggregate-assertion": 1,
+        "same-attempt-timeout-operation-unlocated": 1
+      },
+      "detailedExceptionMissingPhysicalRows": 3,
+      "failedOperationUnlocatedPhysicalRows": 1,
+      "rawTrialValueJSONMissing": 18,
+      "hiddenCallerMissing": 12,
+      "rawTraceVideoFullLogsNotCollected": true,
+      "finalFailedCaseTitles": [
+        "7-1 DEGHK ready keeps the source-backed DE alternative and optional ASW distinctions through save and load",
+        "7-5 first ABDFGHK stock keeps a native DD1-DE1 alternative through save or safe abort and load",
+        "5-5 BKPS exempt keeps prior branches and scouting distinctions through save and load",
+        "5-5 BKPS ready keeps prior branches and scouting distinctions through save and load",
+        "carrier bomber CI policy persists and regenerates the mobile loadout"
+      ],
+      "NodeGateSuccessJobs": 6,
+      "normalNode814IsConfiguredNotObservedFooter": true,
+      "measuredNodePatches": [
+        "v24.21.0"
+      ],
+      "smallZIPs": 12,
+      "smallZIPBytes": 453697,
+      "smallMembers": 88,
+      "supplementalZIPs": 1,
+      "supplementalBytes": 14838,
+      "supplementalMembers": 16,
+      "coreIntegrityReader": "PASS; CI remains failure",
+      "rootSupplementalReader": "PASS_WITH_GAPS",
+      "oldMissingFilledByCurrent": false,
+      "oneFiveUnknownInitialHold": {
+        "row": "1-5/1/default",
+        "retry": 0,
+        "source": "tests/route-one-five-middle.spec.js:126:25",
+        "sameDocument": false,
+        "sameDocumentDefinition": "performance.timeOrigin === captured doc operand",
+        "exposedStorageIdentityComparisons": true,
+        "soleFailedFieldConfirmed": false,
+        "metadataOpeningAswSubfieldsMissing": true,
+        "timeOriginOperandsCallerMissing": true,
+        "storedValueLossConfirmed": false,
+        "retryUsedToFillInitial": false,
+        "operationHeld": true,
+        "oldDDirectEvidenceNotInvalidated": true,
+        "newExperiments": 0
+      }
     },
     "frozenNightAndDropHuntsPreserved": true,
     "heldFourFiveImported": false
+  },
+  "starterFiniteCarrierCIClosing20261112": {
+    "progress": [
+      28,
+      175,
+      33
+    ],
+    "additionalCellChangesByCI": 0,
+    "oneFiveExistingDKeptByIndependentReview": true,
+    "oneFiveHeldOperationNotCountedAsSuccess": true,
+    "nextMissingObservation": "At the existing load-read return, retain currently unexposed aggregate expectation results as allowlisted booleans before collapsing the assertion; no extra read/save/reload/wait.",
+    "observationExecuted": false,
+    "PR152DraftUnpublished": true,
+    "mainIntegrated": false,
+    "protectedAreasChanged": false
   }
 }
