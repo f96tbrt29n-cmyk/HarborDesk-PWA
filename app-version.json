@@ -1,20 +1,22 @@
 {
-  "version": "1.0.580",
-  "build": 580,
-  "releasedAt": "2026-10-26T05:56:28.661+09:00",
-  "notes": "艦これマスター自動同期。api_start2 23637be / 装備picker 7250299 を反映。艦娘変更 0件 / 新装備 0件 / 装備変更 0件 / 増設ルール 0件。",
+  "version": "1.0.581",
+  "build": 581,
+  "releasedAt": "2026-11-12T09:48:37.629+09:00",
+  "notes": "艦これマスター自動同期。api_start2 9881cb5 / 装備picker 7250299 を反映。艦娘変更 0件 / 新装備 1件 / 装備変更 0件 / 増設ルール 0件。",
   "masterChanges": {
     "baseline": false,
     "from": "23637be57ac23a7b4281f193b836fa568ead8ee4",
-    "to": "23637be57ac23a7b4281f193b836fa568ead8ee4",
-    "at": "2026-10-25T20:56:28.654Z",
+    "to": "9881cb5169a8878cf197b1e5e414fef42f348e41",
+    "at": "2026-11-12T00:48:37.619Z",
     "ships": {
       "added": [],
       "removed": [],
       "changed": []
     },
     "equipment": {
-      "added": [],
+      "added": [
+        "XF6F-6"
+      ],
       "removed": [],
       "changed": []
     },

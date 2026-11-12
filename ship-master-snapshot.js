@@ -3,8 +3,8 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
   "source": {
     "repo": "Tibowl/api_start2",
     "ref": "master",
-    "commit": "23637be57ac23a7b4281f193b836fa568ead8ee4",
-    "updated": "2026-10-14T11:32:44Z",
+    "commit": "9881cb5169a8878cf197b1e5e414fef42f348e41",
+    "updated": "2026-11-11T23:52:12Z",
     "basis": "api_start2 / player equipment api_id < 1500"
   },
   "clientRules": {
@@ -16869,6 +16869,25 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "range": "",
       "radius": 4,
       "cost": 5
+    },
+    "XF6F-6": {
+      "id": 589,
+      "typeId": 6,
+      "typeName": "艦上戦闘機",
+      "stats": {
+        "火力": 1,
+        "雷装": 0,
+        "爆装": 0,
+        "対空": 12,
+        "対潜": 0,
+        "索敵": 1,
+        "命中": 1,
+        "回避": 3,
+        "装甲": 0
+      },
+      "range": "",
+      "radius": 4,
+      "cost": 8
     }
   },
   "exslotBaseTypeIds": [
@@ -47424,15 +47443,17 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
   "changes": {
     "baseline": false,
     "from": "23637be57ac23a7b4281f193b836fa568ead8ee4",
-    "to": "23637be57ac23a7b4281f193b836fa568ead8ee4",
-    "at": "2026-10-25T20:56:28.654Z",
+    "to": "9881cb5169a8878cf197b1e5e414fef42f348e41",
+    "at": "2026-11-12T00:48:37.619Z",
     "ships": {
       "added": [],
       "removed": [],
       "changed": []
     },
     "equipment": {
-      "added": [],
+      "added": [
+        "XF6F-6"
+      ],
       "removed": [],
       "changed": []
     },
