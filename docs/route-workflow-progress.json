@@ -25574,7 +25574,7 @@
   "finiteCarrierGapBatch20261112": {
     "dateJST": "2026-11-12",
     "baseHEAD": "4e2323b929c557651c3c2281fd491c263507058d",
-    "sourceSHA": null,
+    "sourceSHA": "ab81d0c5d094a0c4191ac831ed9399b144b8fed4",
     "productChanges": 0,
     "oneFiveReview": {
       "expectedDocument": "new reload document captured after load/hdReady and diagnostic-install invocation, before opening navigator",
@@ -25759,9 +25759,196 @@
       }
     ],
     "CI": {
-      "state": "pending one deduplicated normal smoke after source push",
-      "requested": 0
+      "state": "completed failure; target six initial passed; evidence PASS_WITH_GAPS",
+      "sourceSHA": "ab81d0c5d094a0c4191ac831ed9399b144b8fed4",
+      "runId": 43228941365,
+      "runAttempt": 1,
+      "requested": 1,
+      "reexecutions": 0,
+      "recordOnlyExtraCIRequested": false,
+      "officialLogicalPassedFlakyFailed": {
+        "chromium": {
+          "passed": 940,
+          "flaky": 1,
+          "failed": 0
+        },
+        "webkit": {
+          "passed": 916,
+          "flaky": 15,
+          "failed": 10
+        }
+      },
+      "logicalCountsNotInitialOrPhysicalCounts": true,
+      "smokeJobs": {
+        "success": 3,
+        "failure": 3,
+        "cancelled": 0
+      },
+      "targets": [
+        {
+          "project": "chromium",
+          "caseId": "cfj-empty",
+          "retry": 0,
+          "physicalStatus": "passed",
+          "phases": 4,
+          "completed": true,
+          "preservationCriticalFalse": false,
+          "drop": 0,
+          "missing": 0,
+          "pageerror": 0
+        },
+        {
+          "project": "chromium",
+          "caseId": "two-two-partial",
+          "retry": 0,
+          "physicalStatus": "passed",
+          "phases": 4,
+          "completed": true,
+          "preservationCriticalFalse": false,
+          "drop": 0,
+          "missing": 0,
+          "pageerror": 0
+        },
+        {
+          "project": "chromium",
+          "caseId": "two-three-full",
+          "retry": 0,
+          "physicalStatus": "passed",
+          "phases": 4,
+          "completed": true,
+          "preservationCriticalFalse": false,
+          "drop": 0,
+          "missing": 0,
+          "pageerror": 0
+        },
+        {
+          "project": "webkit",
+          "caseId": "cfj-empty",
+          "retry": 0,
+          "physicalStatus": "passed",
+          "phases": 4,
+          "completed": true,
+          "preservationCriticalFalse": false,
+          "drop": 0,
+          "missing": 0,
+          "pageerror": 0
+        },
+        {
+          "project": "webkit",
+          "caseId": "two-two-partial",
+          "retry": 0,
+          "physicalStatus": "passed",
+          "phases": 4,
+          "completed": true,
+          "preservationCriticalFalse": false,
+          "drop": 0,
+          "missing": 0,
+          "pageerror": 0
+        },
+        {
+          "project": "webkit",
+          "caseId": "two-three-full",
+          "retry": 0,
+          "physicalStatus": "passed",
+          "phases": 4,
+          "completed": true,
+          "preservationCriticalFalse": false,
+          "drop": 0,
+          "missing": 0,
+          "pageerror": 0
+        }
+      ],
+      "acquiredSmallZIPs": 11,
+      "acquiredZIPBytes": 435850,
+      "verifiedZIPMembers": 91,
+      "unrequestedC2PrerequisiteBytes": 4873759,
+      "unrequestedReason": "outside authorized 2MiB bound; no split or large fallback",
+      "nonpassedPhysicalRecordsObserved": 36,
+      "firstStageClassifications": {
+        "repair-safe-abort-aggregate-assertion-diagnostic-body-missing": 1,
+        "unknown": 15,
+        "post-load-search-click-timeout": 13,
+        "post-load-final-pageerror-array-assertion": 2,
+        "dcl-pageerror-array-assertion-before-post-load-checks": 2,
+        "dcl-pageerror-array-assertion-diagnostic-body-missing": 1,
+        "post-load-six-key-aggregate-exactMatch-assertion-diagnostic-body-missing": 1,
+        "upstream-layout-diagnostic-null-bounding-box": 1
+      },
+      "missingFailedAttemptAnnotationBodies": 18,
+      "individualErrorOrdinalAmbiguityRetained": true,
+      "auditResult": "PASS_WITH_GAPS",
+      "canonical": {
+        "path": "private/ci-ab81d0c5-v1/analysis/canonical-ci-results.json",
+        "bytes": 159394,
+        "sha256": "ac9b1f8d27ce3964f7aeebbee0e31aa7c67a7ac1db05b4d0cc42b6fe4155cfd2"
+      },
+      "shared": {
+        "path": "shared/ci-results.json",
+        "bytes": 148025,
+        "sha256": "4f69210a2d881431b9a628b03db2a03c6842ed2bb65c8f06aa201084951738ff"
+      },
+      "independentAudit": {
+        "path": "private/ci-review/new-ci-independent-review-v2.json",
+        "bytes": 8251,
+        "sha256": "443b7aaecce269ccdb41cdda37665e3faae9d8d17d466334d506d88eb9e1b8f1"
+      },
+      "oldMissingNotFilled": true,
+      "newNightLoadAggregateConcern": {
+        "scope": "submarine Night policy post-load six-key aggregate comparison",
+        "jobId": 131219362652,
+        "testId": "60c90c2ba9dde6a78d19-8e16765ad72c8efe9ca1",
+        "retry": 0,
+        "firstErrorLocation": {
+          "file": "tests/night-policy-reload.spec.js",
+          "line": 144,
+          "column": 88
+        },
+        "documentAssertionPassed": true,
+        "readyStateAssertionPassed": true,
+        "individualKeyAndOperandsMissing": true,
+        "nightPolicyRawAndSelectedPolicyFinalAssertionsReached": false,
+        "finalExceptionAssertionReached": false,
+        "retryPassedDoesNotFillInitial": true,
+        "oldFirstGetterConcernIsSeparate": true,
+        "storageDestructionOrCauseConfirmed": false,
+        "operationHeld": true,
+        "newReproduction": 0,
+        "smallVerdictArtifactConfirmed": false,
+        "largeDiagnosticsNotRequested": true,
+        "nextObservation": "same initial-trial after-load verdict for each of the six keys (presence/length/exactMatch), identifying the mismatching key before selecting a fix",
+        "reopenCondition": "identify the mismatching key and expected versus unintended change from existing same-trial verdict or a separately selected bounded observation; no automatic reproduction",
+        "sharedBoundary": "generic Storage and boot/reload are shared; dedicated Night selection and Node-binding comparison helper are not used by this finite batch; six successful target trials do not prove generic storage safety"
+      },
+      "newRepairFaultAggregateConcern": {
+        "scope": "identity repair roster throw fault/safe-abort aggregate",
+        "retry": 0,
+        "firstErrorLocation": {
+          "file": "tests/diagnostics-repair-storage.spec.js",
+          "line": 68
+        },
+        "faultClickAndVerdictReturned": true,
+        "aggregateExpectedFields": [
+          "writes=[]",
+          "completed=0",
+          "allExact=true",
+          "otherKeysExact=true",
+          "own=true",
+          "warning=true"
+        ],
+        "failingFieldsAndExceptionMissing": true,
+        "recoveryReached": false,
+        "reloadCount": 0,
+        "writesOccurredOrStorageMismatchConfirmed": false,
+        "operationHeld": true,
+        "retryDoesNotFillInitial": true,
+        "dedicatedRepairAndFaultInjectionUsedByFiniteBatch": false,
+        "genericStorageCustomRosterBoundaryShared": true,
+        "nextObservation": "same initial fault verdict fields identifying which aggregate expectation failed",
+        "reopenCondition": "identify failed fault-verdict fields before selecting a fix; no automatic new reproduction"
+      }
     },
-    "nightDropFourFiveAndOneFiveHoldsPreserved": true
+    "nightDropFourFiveAndOneFiveHoldsPreserved": true,
+    "newNightLoadAggregateConcernHeld": true,
+    "newRepairFaultAggregateUnresolvedHeld": true
   }
 }

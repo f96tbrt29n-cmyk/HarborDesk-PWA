@@ -1,3 +1,5 @@
+> 最新CI確定（2026-11-12 JST）：source ab81d0c5／CI43228941365。C940/1/0、W916/15/10はpassed/flaky/failed、smoke3成功3失敗・取消0。新対象CFJ/2-2/2-3×C/W6は全初回・同試行4phase保持適合。11小型ZIPの公式digest/CRC一致、C2 prerequisite約4.87MBは上限超で未要求。独立照合PASS_WITH_GAPS。1-5旧識別値欠測/後段未到達は補完せず保留。Night W4初回load後6キーaggregateとrepair roster-throw初回safe-abort aggregateの当該操作を追加保留（内訳/原因欠測、旧Night getter懸念と別）。製品0、記録だけ追加CI0、28/180/28を維持。以下は履歴。
+
 ## 2026-11-12 JST：CFJ／2-2・2-3の有限配備ギャップ
 
 製品0、旧Node4群の実source資格を再利用しfresh Node0。局所はC-CFJ5241ms・W2-2 9817ms・C2-3 4859msの各retry0、各空枠開始/4phase/検索2/保存1/reload1。保存配備・理由・全文を新探索前に直接比較し同一文書再表示、他10キー不変、46原本の独立照合PASS。1-5は期待/実timeOrigin数値欠測・同文書比較falseの旧当該操作保留、新再現0。診断wrapperは今回非共有だがboot/保存/同一文書比較は共有し、共通runtime原因なしとは断定しない。

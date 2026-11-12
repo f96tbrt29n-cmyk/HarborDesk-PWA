@@ -1,6 +1,6 @@
 # CFJ／2-2・2-3：有限配備の未確認部分をまとめた検証
 
-2026-11-12 JST。起点4e2323b929c557651c3c2281fd491c263507058d／前回検証source4ecd1799。旧証拠・専用領域・保留を保持し、新worktreeで実施。製品の具体的な不備は見つからず、製品・保存処理の変更は0。通常UI試験3件と小型summary登録、限定記録のみを追加する。
+2026-11-12 JST。起点4e2323b929c557651c3c2281fd491c263507058d／前回検証source4ecd1799。旧証拠・専用領域・保留を保持し、新worktreeで実施。製品の具体的な不備は見つからず、製品・保存処理の変更は0。通常UI試験3件と小型summary登録、限定記録のみを追加した。
 
 ## 1-5の既存資料と独立性gate
 
@@ -52,7 +52,7 @@ WebKit編成内の2-2は再探索前の保存カードgear表示も確認。ナ�
 
 ## 登録・セル・残件
 
-実preflightはC/W各941・82file、WebKit339/164/254/184、C/W×caseId3のtargetMatrix6が各selected1。これは同じnormal --list原文による登録確認で、追加browser実行や反対側browser成功ではない。通常smokeは最終sourceの通常push後、同SHA自動起動と照合して重複なく1回確認する。記録だけで追加CIを起動しない。
+実preflightはC/W各941・82file、WebKit339/164/254/184、C/W×caseId3のtargetMatrix6が各selected1。これは同じnormal --list原文による登録確認で、追加browser実行や反対側browser成功ではない。通常smokeは最終sourceの通常push後、同SHA自動起動と照合して重複なく1回要求した。確定結果は後段に記載する。記録だけで追加CIを起動しない。
 
 28/175/33→**28/180/28**。CFJ B、2-2 B/D、2-3 B/Dの5セルだけ未確認→一部。CFJ Dは既存一部へ追加証拠で変更0。A/C・旧1-5D・定義236/59行/旧53は維持。一部を50%換算せず、未実施browserや全条件へ流用しない。
 
@@ -61,3 +61,35 @@ WebKit編成内の2-2は再探索前の保存カードgear表示も確認。ナ�
 旧CI43154691544はC937/1/0 W926/7/5・3job成功3失敗/取消0、旧target4初回成功、旧1-5文書識別不適合と欠測を別保持。今回のCIを旧単独バッチ結果や旧欠測の補完には使わない。夜戦/掘り/1-5保留、4-5隔離12差分・別草稿・原本・main競合を保持する。
 
 証拠専用領域：/workspace/harbordesk-handoff-_gnvlnto/continuation-finite-carrier-gap-batch-20261112。PR152はドラフト・未公開。main統合・PR151・版・SW・本番・マージ・公開・自動マージは変更しない。
+
+## 最終sourceの通常smokeと残す欠測
+
+source **ab81d0c5d094a0c4191ac831ed9399b144b8fed4**、[CI43228941365](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/43228941365)。同SHAのrun一覧2回とbranchを照合し、未受付を確認して通常smokeを1回要求、再実行0。smokeはC1/C2/W1成功・W2/W3/W4失敗、取消0。C940/1/0・W916/15/10は各941 logical例のpassed/flaky/failedで、初回成功数・物理試行数へ換算しない。
+
+| caseId | Chromium | WebKit |
+| --- | --- | --- |
+| cfj-empty | 初回passed・4phase保持適合 | 初回passed・4phase保持適合 |
+| two-two-partial | 初回passed・4phase保持適合 | 初回passed・4phase保持適合 |
+| two-three-full | 初回passed・4phase保持適合 | 初回passed・4phase保持適合 |
+
+対象6はcaseId/browser/retry/sourceを対応付け、各保存直後・reload後再探索前・再探索後の配備/理由/全文/対象外データと同一文書を確認。critical false・missing/drop/pageerror0。局所3例は別証拠とし、CI全体の成功へ広げない。セルは自経路の限定証拠による5遷移だけで28/180/28を維持する。
+
+11 small ZIP（435,850B/91members）は公式digest/size/CRC一致。C2 prerequisite-import（4,873,759B）は2MiB上限超で未要求、split/大ZIP fallbackなし。36件のnonpass物理記録を同試行で分類：load後再探索click待機13、load後末尾pageerror配列2、DCL pageerror配列3、safe-abort aggregate1、Night load後6キーaggregate1、layout診断null1、最初の操作未特定15。個別例外本文18件欠測、複数の異なる注記のerror順も不明を保持する。同じ段階を同原因とは扱わない。
+
+独立CI照合はPASS_WITH_GAPS。監査bindingのscope参照が説明文字列で上書きされていたため、原binding/旧reader/初回監査失敗を保持し、開始前にhash固定したbeforeReview内の同じscope資料を実file/bytes/hashで照合する限定v2 readerへ訂正した。絶対/相対パスは同じ解決済みファイルへ正規化した。canonical/shared/試験結果と原本は不変、新試験・CI0。
+
+### 新しいNight load後保持の懸念を別保留
+
+同CI W4/job131219362652、submarine night policy、testId60c90c2ba9dde6a78d19-8e16765ad72c8efe9ca1の初回はnight-policy-reload.spec.js:144:88で停止。文書比較142とreadyState143は通過し、load後の先頭6キー完全一致aggregateが失敗した。対象はcustom-fleets/equipment/ship-roster/fleet-calculator/kancolle-sync/pwaの6キーで、専用helperが実getItem文字列/nullをNode memory内のpost-selection baselineと直接比較する。
+
+不一致キー・各exactMatch/実値・個別例外本文は欠測。夜戦方針自体の第7キー完全一致145、最終選択policy146、末尾例外147は未到達。retry成功で初回を補完せず、旧初回getter懸念とも同原因にしない。保存破壊・製品欠陥は未確定のまま、Nightの当該load後保持操作を追加保留する。
+
+有限配備とgeneric Storage/boot/reloadは共有するが、専用Night選択UI・専用Node binding比較helperは今回使わない。対象6例の保持成功はこの初回の欠測や一般保存安全性を解消しない。確実にverdictを含む小型artifactは確認できず、大容量diagnosticsは取得せず打切。次に必要な観測は同じ初回の6キー別present/length/exactMatchで、不一致キーを識別する1点。既存資料または別途選択する限定観測で期待した変更かを判断できることが再開条件で、新規診断・再試験・推測修正は0。
+
+### repair故障注入のsafe-abort検査も未確定として分離
+
+同CI W2初回の`identity repair roster throw stops writes and recovers through the real button`はdiagnostics-repair-storage.spec.js:68のfault aggregateで停止した。故障clickとverdict採取は返却したが、writes空/完了0/全体・他キー完全一致/own/warningという期待のどの項目が不適合かと個別例外本文は欠測。recovery操作は未到達、reload0。書込み発生・保存不一致・原因は確定せず、retry成功で初回を補完しない。当該roster-throw故障注入の修復/safe-abort確認を追加保留し、次の観測は同初回fault verdictのフィールド別判定1点とする。
+
+今回有限配備は専用repair入口と故障注入helperを使わない。generic Storage/custom/rosterは共有するため一般原因を排除したとはせず、自経路の実比較と独立した読取りだけを続ける。保存比較不適合を正常化する修正や追加再現は行っていない。
+
+旧1-5・Night getter・掘り・4-5隔離12件と原本を保持する。次の3-2有限電探装備艦数/速力セットは独立読取り設計までで、新実装/操作は未実施。記録追補は別commitとし追加CIを要求しない。PR152ドラフト・未公開、保護対象は維持する。

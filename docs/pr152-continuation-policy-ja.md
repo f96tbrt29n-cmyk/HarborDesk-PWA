@@ -1,3 +1,5 @@
+> 最新CI確定（2026-11-12 JST）：source ab81d0c5／CI43228941365。C940/1/0、W916/15/10はpassed/flaky/failed、smoke3成功3失敗・取消0。新対象CFJ/2-2/2-3×C/W6は全初回・同試行4phase保持適合。11小型ZIPの公式digest/CRC一致、C2 prerequisite約4.87MBは上限超で未要求。独立照合PASS_WITH_GAPS。1-5旧識別値欠測/後段未到達は補完せず保留。Night W4初回load後6キーaggregateとrepair roster-throw初回safe-abort aggregateの当該操作を追加保留（内訳/原因欠測、旧Night getter懸念と別）。製品0、記録だけ追加CI0、28/180/28を維持。以下は履歴。
+
 > 最新局所（2026-11-12 JST）：CFJ/2-2・2-3の有限配備を共通バッチで補完。製品0、既存Node4source資格再利用・fresh0、localC/W/C各初回で空枠→有限配備→保存→同新文書load保持成功。28/175/33→28/180/28の5セルのみ一部、他browserや全条件へ流用しない。1-5旧unknownはtimeOrigin二値/caller/未露出項目欠測・当該操作hold、診断wrapper非共有/strictsameDoc保持の限定gateで独立続行、新再現なし。最終source通常smoke1回待ち、記録だけ追加CI0、原本と保護対象・draft未公開を維持。以下は履歴。
 
 > 最新確定（2026-11-12 JST）：source4ecd1799/CI43154691544はC937/1/0 W926/7/5、3成功3失敗/取消0。新対象4は初回・同試行6/4phase適合。current1-5unknown初回はload-read文書識別一致false、保存全文等の露出比較true、未露出項目/実値/callerは欠測で当該操作を保留。retry補完/保存喪失断定/新診断なし。旧D直接根拠維持、28/175/33は追補変更0。CFJ空枠/2-2・2-3は読取り計画を保持。原本/凍結/4-5隔離/保護対象・ドラフト未公開を維持し、記録だけ追加CI0。以下は履歴。
