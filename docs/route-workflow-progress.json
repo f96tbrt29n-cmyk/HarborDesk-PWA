@@ -593,7 +593,7 @@
         },
         "B": {
           "status": "一部",
-          "reason": "2026-11-11：Chromiumナビ・在庫2/2艦配備を初回workers1/retries0で実操作。九七式艦攻AA0の有限在庫・合法通常枠・枠重複/stack超過なしを独立小集合oracleと照合。任意攻撃能力目標だけの確認で、数値制空/全条件/固定枠/実装備個体IDの一般保証ではない。",
+          "reason": "2026-11-11：Chromiumナビ・在庫2/2艦配備を初回workers1/retries0で実操作。九七式艦攻AA0の有限在庫・合法通常枠・枠重複/stack超過なしを独立小集合oracleと照合。任意攻撃能力目標だけの確認で、数値制空/全条件/固定枠/実装備個体IDの一般保証ではない。 固定枠指定・実装備個体IDは入力になく、その保護・同一実個体の重複防止は今回未確認。",
           "evidence": [
             "docs/pr152-finite-carrier-deployment-ja.md",
             "tests/two-area-finite-carrier.test.cjs",
@@ -718,7 +718,7 @@
         },
         "B": {
           "status": "一部",
-          "reason": "2026-11-11：WebKit編成内・在庫1/1艦配備・残る1艦案内を初回workers1/retries0で実操作。九七式艦攻AA0の有限在庫・合法通常枠・枠重複/stack超過なしを独立小集合oracleと照合。任意攻撃能力目標だけの確認で、数値制空/全条件/固定枠/実装備個体IDの一般保証ではない。",
+          "reason": "2026-11-11：WebKit編成内・在庫1/1艦配備・残る1艦案内を初回workers1/retries0で実操作。九七式艦攻AA0の有限在庫・合法通常枠・枠重複/stack超過なしを独立小集合oracleと照合。任意攻撃能力目標だけの確認で、数値制空/全条件/固定枠/実装備個体IDの一般保証ではない。 固定枠指定・実装備個体IDは入力になく、その保護・同一実個体の重複防止は今回未確認。",
           "evidence": [
             "docs/pr152-finite-carrier-deployment-ja.md",
             "tests/two-area-finite-carrier.test.cjs",
@@ -3377,7 +3377,7 @@
       "2-4/0/default"
     ],
     "record": "finiteCarrierDeploymentBatch20261111",
-    "state": "limited same-row finite allocation/save/load verified locally; final-source CI jobs terminal3success3failure/no cancellation; CI case detail collection and final local closure blocked by unavailable execution environment; no B/D expansion"
+    "state": "same-row local Chromium2-1/WebKit2-4 partial B/D retained; restored raw38 and existing CI small artifacts/4target retention independently verified; no new test for recovery; final private closure then next batch"
   },
   "nextPriority": "1-3 normal/CFJ・1-4 J回避の有限攻撃機配備。既存案内/分岐条件/実在庫証拠を静的照合し、異なる操作経路の代表だけ確認する候補。現在2-x成功を別行B/Dへ流用せず、出典不足/固定条件不明は保持。2-2/2-3の現在B/DはNode-onlyで未確認のまま。",
   "previousSelected": {
@@ -25067,7 +25067,10 @@
       ],
       "searchResultsUsedAsExpected": false,
       "realGameEquipmentInstanceIdsProvided": false,
-      "symbolicInjectionNoReuse": true
+      "symbolicInjectionNoReuse": true,
+      "fixedFrameProtectionVerified": false,
+      "realEquipmentInstanceDuplicatePreventionVerified": false,
+      "symbolicInjectionMeaning": "post-hoc injective existence witness for returned stack/frame placements, not observation of allocator equipment instance IDs"
     },
     "node": {
       "newGroups": 2,
@@ -25139,6 +25142,82 @@
       "new2Selected": true
     },
     "ci": {
+      "state": "terminal small artifacts and official annotations collected and independently verified after execution recovery; no rerun",
+      "sourceSHA": "00927721aff37f51a8e524c2dde8909890f63a32",
+      "runId": 42951416369,
+      "runAttempt": 1,
+      "requests": 1,
+      "reexecutions": 0,
+      "runConclusion": "failure",
+      "smokeJobs": {
+        "success": 3,
+        "failure": 3,
+        "cancelled": 0
+      },
+      "Full": "skipped",
+      "officialCPassedFlakyFailed": [
+        936,
+        0,
+        0
+      ],
+      "officialWPassedFlakyFailed": [
+        928,
+        5,
+        3
+      ],
+      "allCaseCompletionsConfirmed": true,
+      "declaredCasesPerBrowser": 936,
+      "filesPerBrowser": 82,
+      "targetInitialPhysicalPassed": 4,
+      "targetSameAttempt4PhaseContractSatisfied": 4,
+      "targetPreservationCriticalFalseObserved": 0,
+      "physical": {
+        "CInitialEntries": 936,
+        "CInitialPassed": 936,
+        "WInitialEntries": 936,
+        "WInitialPassed": 928,
+        "WInitialNonPassed": 8,
+        "WRetryEntries": 8,
+        "WRetryPassed": 5,
+        "WRetryNonPassed": 3,
+        "logicalCountsNotUsedToDerivePhysicalCounts": true
+      },
+      "smallZIPsVerified": 12,
+      "smallZIPBytes": 440637,
+      "officialAnnotationsReceived": 6,
+      "independentIntegrity": "PASS; not all tests/jobs passed",
+      "nonPassedAttempts": 11,
+      "classification": {
+        "afterLoadSearchClickHidden45000ms": 10,
+        "frozenNightGetterCvThreeToAuto": 1,
+        "finalFailedCases": [
+          "6-4 BDCFN stock",
+          "5-4 M-to-P required-missing",
+          "5-1 BCFJ ready"
+        ],
+        "saveMemoSpecifiedComparisonsBeforeHiddenClick": "passed by same-attempt source order; raw value bodies not backfilled",
+        "afterHiddenClickLoadWholeComparison": "unreached",
+        "callerAndCause": "unknown; no guessed repair"
+      },
+      "oldFiveDecodedLogsRetried": false,
+      "rawTraceStorageValuesAndCaller": "uncollected",
+      "oldGapsFilledByOtherAttempts": false,
+      "newTestOrCIForEvidenceRecovery": 0,
+      "finalPrivateClosure": "separate frozen manifest/reader step after this record commit; actual result recorded in PR status"
+    },
+    "limits": [
+      "Only two same-row B/D partial credits; no fullD/newedit/allconditions guarantee.",
+      "No fixed-frame schema or real equipmentinstance IDs in finite input.",
+      "Stock1 maxone covers onlycurrenttinyinput andoptional2hull goal; not purchase necessity/generalsearchimpossibility.",
+      "Frozen drop counter/Night/held4-5, all old C/compact gaps remain distinct."
+    ],
+    "cellEvidenceBasis": {
+      "2-1/0/default B,D": "local Chromium retry0/5459ms/4phase; CI is supplemental, not replacement",
+      "2-4/0/default B,D": "local WebKit retry0/8881ms/4phase; CI is supplemental, not replacement",
+      "fixedFrameProtectionVerified": false,
+      "realEquipmentInstanceDuplicatePreventionVerified": false
+    },
+    "ciBeforeRecoveryAt5962c77b": {
       "state": "terminal jobs confirmed through GitHub; detailed collection incomplete after execution environment unavailable",
       "sourceSHA": "00927721aff37f51a8e524c2dde8909890f63a32",
       "runId": 42951416369,
@@ -25209,11 +25288,22 @@
       "oldCIAndCompactGapsFilled": false,
       "additionalCIRequestedForRecords": false
     },
-    "limits": [
-      "Only two same-row B/D partial credits; no fullD/newedit/allconditions guarantee.",
-      "No fixed-frame schema or real equipmentinstance IDs in finite input.",
-      "Stock1 maxone covers onlycurrenttinyinput andoptional2hull goal; not purchase necessity/generalsearchimpossibility.",
-      "Frozen drop counter/Night/held4-5, all old C/compact gaps remain distinct."
-    ]
+    "recovery20261112": {
+      "actualConnectionCheckCount": 1,
+      "actualReadOnlyCommand": "pwd",
+      "succeeded": true,
+      "managementStatusAloneUsed": false,
+      "localHEADBefore": "00927721aff37f51a8e524c2dde8909890f63a32",
+      "recordFastForward": "5962c77bb27384fa30fc917df17f088522f1a3f8",
+      "docsOnly": true,
+      "original38Matched": true,
+      "testedNonDoc726Matched": true,
+      "held12AndPatchMatched": true,
+      "old7ReferencesMatched": true,
+      "capacityAtOriginalVerificationGiB": 8.287,
+      "environmentDeletedInitializedRecreated": false,
+      "evidenceRecoveryNodeBrowserCIRuns": 0,
+      "previousInterruptionPreserved": true
+    }
   }
 }

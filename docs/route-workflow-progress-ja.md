@@ -1,3 +1,11 @@
+## 2026-11-12 JST：復旧・有限攻撃機の証拠追補
+
+実execの接続確認1回成功、既存workspace/局所38原本・非doc726/旧7参照・4-5隔離12件とpatch/3copyを現物照合した。local009→remote5962は記録2コミット/4docsだけでfast-forward。再作成/削除/原本加工なし、空き約8.287GiB。
+
+CI42951416369は再実行0。既存小12ZIP440637bytesの公式SHA/CRC・注記6件・独立照合PASS、C936/0/0 W928/5/3（passed/flaky/failed）、3job成功3失敗/取消0。今回4試行は各初回・同試行4phase保持適合。11nonpassは10件が保存memo指定比較後のload-search click非表示45秒/全文未到達、Night1件が既知専用getter cv-three→auto。最終3失敗は6-4stock/5-4required-missing/5-1ready、各初回retryを分離し、caller/根因/同原因は未確定。旧5ログ/trace/実値欠測を維持、診断追加なし。
+
+**28確認済み／172一部／36未確認は変更0**。変更4セルの根拠は2-1/0のlocal Chromium、2-4/0のlocal WebKitのB/D一部。固定枠・実装備個体IDは未入力で、その保護・実個体重複防止は今回未確認。単射ラベルの存在証明と区別する。2-2/2-3はNode-onlyのまま。[記録と再開条件](pr152-finite-carrier-deployment-ja.md)。最終private閉鎖後、1-3normal/CFJ・1-4J回避の既存証拠との差を専用領域で進める。以下の停止記録は各時点の履歴として保持。
+
 ## 2026-11-11 JST：有限攻撃機のCI確定・実行環境停止
 
 source **00927721**／[CI42951416369](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/42951416369) attempt1・要求1/再実行0は**3成功3失敗・取消0**、Full skipped/run failure。C1/C2/W3成功、W1/W2/W4失敗。W2のみ公式ログ162/1/1（passed/flaky/failed）とNode812/812/0/skip0を確認。他5 decoded-logは各1回Transport closed、全C/W内訳・対象CI4試行metadata/保持比較・公式注記取得は欠測。局所成功やジョブ成功で補完しない。
