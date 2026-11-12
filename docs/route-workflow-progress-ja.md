@@ -1,3 +1,9 @@
+## 2026-11-12 JST：CFJ／2-2・2-3の有限配備ギャップ
+
+製品0、旧Node4群の実source資格を再利用しfresh Node0。局所はC-CFJ5241ms・W2-2 9817ms・C2-3 4859msの各retry0、各空枠開始/4phase/検索2/保存1/reload1。保存配備・理由・全文を新探索前に直接比較し同一文書再表示、他10キー不変、46原本の独立照合PASS。1-5は期待/実timeOrigin数値欠測・同文書比較falseの旧当該操作保留、新再現0。診断wrapperは今回非共有だがboot/保存/同一文書比較は共有し、共通runtime原因なしとは断定しない。
+
+**28/175/33→28確認済み／180一部／28未確認**。CFJ Bと2-2/2-3 B/Dの5セルだけ追加一部。未実施の反対側browserや全目標/固定枠/実装備IDへ広げず、新編集なし。通常941/82file・3case×C/W6の登録を実listで確認、最終sourceのsmoke1回待ち。[確認範囲と1-5旧資料](pr152-finite-carrier-gaps-ja.md)。原本/凍結/隔離・PR152ドラフト未公開を保持。以下は履歴。
+
 ## 2026-11-12 JST：有限配備CI確定・1-5文書識別要件を別保留
 
 検証source4ecd1799／[CI43154691544](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/43154691544)は3job成功3失敗・取消0、C937/1/0 W926/7/5（passed/flaky/failed、各938/82file完了）。今回2タイトル×C/Wの4試行はretry0 passed・6/4phase保存保持適合、criticalfalse/pageerror/drop/missing0。CI全体はfailureで、局所や旧欠測を補完しない。
@@ -371,14 +377,14 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 
 2026-10-30 CI追記：[7-4 ABEJLP](pr152-seven-four-ja.md#2026-10-30-自身初回ci確定)の検証source`7fd5298e7248ebeb6b71c67dae7c0a579e0b7991`／[41007168230](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41007168230)、attempt1・dispatch1/再実行0。4smoke成功/2失敗・Full skipped・取消/timeout0。自身6初回summaryの全厳密比較完了を確認し、局所C3＋Wstock/unknownの5完了と自身CI Wknown初回を6代表へ直接対応してDだけ一部→確認済み。21/142/73→22/141/73の1追加セル、一連の695基準21/139/76からdistinctはB/C/D3セル。A/B/C・他58行/旧53/基準236は不変。
 
-現表は最新JSONの59行集計。今回1-3normal B/D・1-4J回避Bの3セルだけ未確認→一部、28/172/36→28/175/33。CFJ BはNode-only新規配備のため未確認を維持。定義236・旧53区分を維持し、一部を割合換算しない。先頭節・集計・行別主表が現在値で、日付付き追補と旧次の対象は各時点の履歴。最終sourceのsmokeは局所記録時点でpending。
+現表は最新JSONの59行集計。今回CFJ B、2-2 B/D、2-3 B/Dの5セルだけ未確認→一部、28/175/33→28/180/28。CFJ Dと1-5 Dの既存状態・定義236/旧53を維持し、一部を割合換算しない。先頭節・集計・行別主表が現在値、日付付き旧追補は各時点の履歴。
 
 |項目|確認済み|一部|未確認|非該当|分母|
 |---|---:|---:|---:|---:|---:|
 |A|0|56|3|0|59|
-|B|0|46|13|0|59|
+|B|0|49|10|0|59|
 |C|0|54|5|0|59|
-|D|28|19|12|0|59|
+|D|28|21|10|0|59|
 
 2026-10-28追補：[5-4最終整理](pr152-five-four-closeout-ja.md)は既存証拠で終了し、追加実行0・状態変更0。基準236セル3/115/118の下に閉じた限定残件と4分類を別記した。続く[2-5北F分岐](pr152-two-five-north-f-ja.md)では高速3戦艦の有効枝と選艦/不足案内を接続し、C/W各1初回で保存・編集・同一文書load後の完全一致まで確認したためDだけ一部→確認済み。前3/115/118→後4/114/118、変更1セル。A/B/Cの全条件完了へは広げない。7-3 Gと他行は維持。
 
@@ -409,7 +415,7 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 |1-1/0/default AC|一部|一部|一部|一部|[pr152-registered-example-completion-ja](pr152-registered-example-completion-ja.md)|
 |1-2/0/default AE|一部|一部|一部|一部|[pr152-ae-speed-ui-ja](pr152-ae-speed-ui-ja.md)|
 | 1-3/0/normal CFJ / A(DB)EFJ | 一部 | 一部 | 一部 | 一部 | [選択別C](#starter-selection-carrier-20261110)の4phase案内/readonly load時点ではB/D未加算。今回の有限配備は別根拠。 / [有限配備の限定証拠](pr152-starter-finite-carrier-deployment-ja.md) |
-| 1-3/0/cfj CFJ | 一部 | 未確認 | 一部 | 一部 | [route-1-3-verification-ja](route-1-3-verification-ja.md)／[共通搭載先案内](#2026-11-06-jst1-31-4-艦別搭載先案内バッチ局所確定ci待ち) / [有限配備の限定証拠](pr152-starter-finite-carrier-deployment-ja.md) |
+| 1-3/0/cfj CFJ | 一部 | 一部 | 一部 | 一部 | [route-1-3-verification-ja](route-1-3-verification-ja.md)／[共通搭載先案内](#2026-11-06-jst1-31-4-艦別搭載先案内バッチ局所確定ci待ち) / [有限配備の限定証拠](pr152-starter-finite-carrier-deployment-ja.md) / [空枠有限配備と保存保持](pr152-finite-carrier-gaps-ja.md) |
 |1-4/0/normal BCF(E)HL / AD(EH/GJ)L|一部|一部|一部|一部|今回C/W局所：配備・不足案内・load再表示（保存編集全体未完）／[共通搭載先案内](#2026-11-06-jst1-31-4-艦別搭載先案内バッチ局所確定ci待ち)|
 | 1-4/0/j-avoid BCFEHL / ADEHL | 一部 | 一部 | 一部 | 一部 | [選択別C](#starter-selection-carrier-20261110)のfixture訂正後4phase確認。初回差分内容欠測は別保持、[Dは旧範囲](route-1-4-verification-ja.md)。 / [有限配備の限定証拠](pr152-starter-finite-carrier-deployment-ja.md) |
 |1-5/0/default ADEJ|一部|一部|一部|一部|[route-goal-guidance-ja](route-goal-guidance-ja.md)|
@@ -417,8 +423,8 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 |1-5/2/default ADFGJ|一部|一部|一部|一部|[asw-route-targets-ja](asw-route-targets-ja.md)|
 |1-6/0/default AEGFBN|一部|一部|一部|一部|[asw-remaining-targets-ja](asw-remaining-targets-ja.md)|
 |2-1/0/default C(E)DH|一部|一部|一部|一部|[有限攻撃機配備](pr152-finite-carrier-deployment-ja.md)：同じ行の代表で実配備→実保存→load済み全文→再探索後再表示。編集・全条件/固定枠未確認、B/D限定一部|
-|2-2/0/default CE(GH)K|一部|未確認|一部|未確認|任意制空個数の共通実装修正・Node確認。同じ行の代表で新案内／readonly load再表示を確認（D据置）|
-|2-3/0/default ボス方面・経路ランダム|一部|未確認|一部|未確認|任意制空個数の共通実装修正・Node確認。同じ行の代表で新案内／readonly load再表示を確認（D据置）|
+| 2-2/0/default CE(GH)K | 一部 | 一部 | 一部 | 一部 | 任意制空個数の共通実装修正・Node確認。旧案内時点はreadonly loadのみでD据置。今回の保存/loadは別根拠 / [空枠有限配備と保存保持](pr152-finite-carrier-gaps-ja.md) |
+| 2-3/0/default ボス方面・経路ランダム | 一部 | 一部 | 一部 | 一部 | 任意制空個数の共通実装修正・Node確認。旧案内時点はreadonly loadのみでD据置。今回の保存/loadは別根拠 / [空枠有限配備と保存保持](pr152-finite-carrier-gaps-ja.md) |
 |2-4/0/default ボス方面・経路ランダム|一部|一部|一部|一部|[有限攻撃機配備](pr152-finite-carrier-deployment-ja.md)：同じ行の代表で実配備→実保存→load済み全文→再探索後再表示。編集・全条件/固定枠未確認、B/D限定一部|
 |2-5/0/default BFJO|一部|一部|一部|確認済み|[pr152-north-los-ui-ja](pr152-north-los-ui-ja.md) / [pr152-north-drum-domain-ja](pr152-north-drum-domain-ja.md) / [F分岐と代表操作](pr152-two-five-north-f-ja.md)|
 |2-5/1/default CEIO|一部|一部|一部|確認済み|[Iランダム域・有限配備/案内・C/W各3保存→編集→同文書load保持](pr152-two-five-ceio-random-ja.md)。HQ域外/他分岐・全目標は残件|

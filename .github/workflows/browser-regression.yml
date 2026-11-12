@@ -130,6 +130,7 @@ jobs:
             test-results/owned-equipment-planner-*/upper-central-scouting-ui-summary.json
             test-results/owned-equipment-planner-*/finite-carrier-allocation-ui-summary.json
             test-results/owned-equipment-planner-*/starter-finite-carrier-ui-summary.json
+            test-results/owned-equipment-planner-*/finite-carrier-gap-ui-summary.json
           if-no-files-found: warn
           retention-days: 14
 
