@@ -62,8 +62,8 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 44,
-      "未確認": 15,
+      "一部": 46,
+      "未確認": 13,
       "非該当": 0
     },
     "C": {
@@ -74,8 +74,8 @@
     },
     "D": {
       "確認済み": 28,
-      "一部": 18,
-      "未確認": 13,
+      "一部": 19,
+      "未確認": 12,
       "非該当": 0
     }
   },
@@ -187,9 +187,13 @@
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "2026-11-12：局所Chromiumナビ初回、空通常枠から九七式艦攻AA0在庫1を飛鷹改へ1機配備。独立4合法枠/5状態と有限stockを照合。任意攻撃機1艦の限定確認で、固定枠・実装備個体ID・全目標/全編成/戦闘勝利は未確認。",
+          "evidence": [
+            "tests/one-area-finite-carrier.test.cjs",
+            "tests/owned-equipment-planner.spec.js",
+            "docs/pr152-starter-finite-carrier-deployment-ja.md"
+          ]
         },
         "C": {
           "status": "一部",
@@ -201,12 +205,15 @@
           ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "2026-11-12：同じnormal行で保存1・選択切替2・reload1・同一新文書再探索、6phase。保存配備/理由/全文をload直後の新探索前に完全比較し、その後の配備DOM表示を確認。他編成metadata/識別を保持。完了案の保存記録カードと新探索前gear本文表示は非適用/未実施、編集は再実行せずD一部のみ。",
+          "evidence": [
+            "tests/owned-equipment-planner.spec.js",
+            "docs/pr152-starter-finite-carrier-deployment-ja.md"
+          ]
         }
       },
-      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。 艦別攻撃機案内は共通接続済み。実操作は1-3/cfj在庫0と1-4/normal有限1機の2入口だけで、他の選択目標へ流用しない。通常枠/増設対象外/在庫と現在配備を区別し、全目標十分性・全失敗区分は残る。 今回は指定選択の任意攻撃機案内と切替/readonly load再表示を確認。新規実配備・保存/編集・全艦/枠・交換後数値/条件維持・十分な数量・勝利は未確認。初回Wのplanner差分内訳は未採取で後続成功から補完しない。"
+      "remaining": "限定stock1/既知CVL1で新規配備・保存/load保持を確認。固定装備・実装備個体ID、他在庫/他編成・全目標十分性、搭載不可/枠競合/情報不足の全UI区分と新規編集は未確認。完了は登録比較目標のみで、全経路固定・撃破・勝利を保証しない。"
     },
     {
       "id": "1-3/0/cfj",
@@ -227,10 +234,12 @@
         },
         "B": {
           "status": "未確認",
-          "reason": "既存の同じ選択目標の所持艦代替/保存は空在庫・装備目標を省く経路専用対照。実装備の自動配備/不足案内の証拠へ換算しない。 今回は攻撃機在庫0で実攻撃機の自動配備は未実施、案内確認をBへ換算しない。",
+          "reason": "既存の同じ選択目標の所持艦代替/保存は空在庫・装備目標を省く経路専用対照。実装備の自動配備/不足案内の証拠へ換算しない。 今回は攻撃機在庫0で実攻撃機の自動配備は未実施、案内確認をBへ換算しない。 2026-11-12：空枠CFJ配備はNode成功。局所Cではnormal保存済配備1を選択切替後に有限在庫/合法性とともに保持再評価したが、新規配備の実操作ではないためB未確認を維持。",
           "evidence": [
             "docs/route-1-3-verification-ja.md",
-            "tests/route-1-3.spec.js"
+            "tests/route-1-3.spec.js",
+            "tests/one-area-finite-carrier.test.cjs",
+            "docs/pr152-starter-finite-carrier-deployment-ja.md"
           ]
         },
         "C": {
@@ -252,7 +261,7 @@
           ]
         }
       },
-      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。 艦別攻撃機案内は共通接続済み。実操作は1-3/cfj在庫0と1-4/normal有限1機の2入口だけで、他の選択目標へ流用しない。通常枠/増設対象外/在庫と現在配備を区別し、全目標十分性・全失敗区分は残る。"
+      "remaining": "明示推奨の装備条件。先制対潜人数/発動・撃破・勝利は別。 艦別攻撃機案内は共通接続済み。実操作は1-3/cfj在庫0と1-4/normal有限1機の2入口だけで、他の選択目標へ流用しない。通常枠/増設対象外/在庫と現在配備を区別し、全目標十分性・全失敗区分は残る。 2026-11-12：CFJ切替後の既存配備保持を実確認。CFJ自身の空枠→有限在庫配備はNodeのみ、CFJ保存・編集の新実操作は未実施。"
     },
     {
       "id": "1-4/0/normal",
@@ -316,11 +325,12 @@
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "既存の同じ選択目標の所持艦代替/保存は空在庫・装備目標を省く経路専用対照。実装備の自動配備/不足案内の証拠へ換算しない。",
+          "status": "一部",
+          "reason": "2026-11-12：局所WebKit編成内初回、空通常枠から九七式艦攻AA0在庫1を飛鷹改へ1機配備。潜水母艦1/DD4の既知範囲と有限在庫・合法4通常枠を独立照合。制空/対空目標は未充足で探索未完了を維持。固定枠・実装備個体ID/全目標十分性は未確認。",
           "evidence": [
-            "docs/route-1-4-verification-ja.md",
-            "tests/route-1-4.spec.js"
+            "tests/one-area-finite-carrier.test.cjs",
+            "tests/owned-equipment-planner.spec.js",
+            "docs/pr152-starter-finite-carrier-deployment-ja.md"
           ]
         },
         "C": {
@@ -334,14 +344,16 @@
         },
         "D": {
           "status": "一部",
-          "reason": "空在庫の経路専用対照で所持艦変更/保存/再表示あり。DCL待ちで、編集・同一文書load/complete全体は未確認。",
+          "reason": "空在庫の経路専用対照で所持艦変更/保存/再表示あり。DCL待ちで、編集・同一文書load/complete全体は未確認。 2026-11-12：局所W初回で新配備案の保存1/reload1/同一新文書再探索、4phaseの配備・理由・保存全文/他編成metadataを保持。再探索前の保存カードgear/未完了記録を確認。新規編集なしで一部を維持。",
           "evidence": [
             "docs/route-1-4-verification-ja.md",
-            "tests/route-1-4.spec.js"
+            "tests/route-1-4.spec.js",
+            "tests/owned-equipment-planner.spec.js",
+            "docs/pr152-starter-finite-carrier-deployment-ja.md"
           ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 艦別攻撃機案内は共通接続済み。実操作は1-3/cfj在庫0と1-4/normal有限1機の2入口だけで、他の選択目標へ流用しない。通常枠/増設対象外/在庫と現在配備を区別し、全目標十分性・全失敗区分は残る。 今回は指定選択の任意攻撃機案内と切替/readonly load再表示を確認。新規実配備・保存/編集・全艦/枠・交換後数値/条件維持・十分な数量・勝利は未確認。初回Wのplanner差分内訳は未採取で後続成功から補完しない。"
+      "remaining": "既知CVL1/潜水母艦1/DD4・在庫1の新規配備と保存/load保持を確認。制空個数/対空推奨・他目標は未充足、数値制空/全戦闘・ルート固定/勝利は未保証。未知艦・搭載不可・枠競合・他在庫の全UI区分、固定枠・実装備個体ID、新規編集は未確認。"
     },
     {
       "id": "1-5/0/default",
@@ -3368,18 +3380,15 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "id": "two-area-finite-carrier",
-    "baselineHead": "2bb83101f5bf3743f16085a330b6a3a363f7a73a",
-    "scope": [
-      "2-1/0/default",
-      "2-2/0/default",
-      "2-3/0/default",
-      "2-4/0/default"
+    "ids": [
+      "1-3/0/normal",
+      "1-3/0/cfj",
+      "1-4/0/j-avoid"
     ],
-    "record": "finiteCarrierDeploymentBatch20261111",
-    "state": "same-row local Chromium2-1/WebKit2-4 partial B/D retained; restored raw38 and existing CI small artifacts/4target retention independently verified; no new test for recovery; final private closure then next batch"
+    "record": "starterFiniteCarrierDeploymentBatch20261112",
+    "state": "limited local finite deployment and preservation passed; CFJ UI only retains existing gear so B remains unconfirmed; final-source normal CI pending"
   },
-  "nextPriority": "1-3 normal/CFJ・1-4 J回避の有限攻撃機配備。既存案内/分岐条件/実在庫証拠を静的照合し、異なる操作経路の代表だけ確認する候補。現在2-x成功を別行B/Dへ流用せず、出典不足/固定条件不明は保持。2-2/2-3の現在B/DはNode-onlyで未確認のまま。",
+  "nextPriority": "CFJ自身の空枠からの有限配備と2-2/2-3のNode-only有限配備・保存/loadの不足を既存証拠との差から選ぶ。今回CFJの既存配備保持を新規配備へ換算せず、4-5隔離/夜戦・掘り凍結は除外。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -25305,5 +25314,143 @@
       "evidenceRecoveryNodeBrowserCIRuns": 0,
       "previousInterruptionPreserved": true
     }
+  },
+  "previousSelectedBeforeStarterFinite20261112": {
+    "id": "two-area-finite-carrier",
+    "baselineHead": "2bb83101f5bf3743f16085a330b6a3a363f7a73a",
+    "scope": [
+      "2-1/0/default",
+      "2-2/0/default",
+      "2-3/0/default",
+      "2-4/0/default"
+    ],
+    "record": "finiteCarrierDeploymentBatch20261111",
+    "state": "same-row local Chromium2-1/WebKit2-4 partial B/D retained; restored raw38 and existing CI small artifacts/4target retention independently verified; no new test for recovery; final private closure then next batch"
+  },
+  "starterFiniteCarrierDeploymentBatch20261112": {
+    "atJST": "2026-11-12",
+    "baseHEAD": "87c8f0539e7753aa1ac55b9b67b108797dc9d95f",
+    "sourceSHA": null,
+    "productChanges": 0,
+    "targets": [
+      "1-3/0/normal",
+      "1-3/0/cfj",
+      "1-4/0/j-avoid"
+    ],
+    "input": {
+      "attack": "九七式艦攻",
+      "AA": 0,
+      "count": 1,
+      "carrier": "飛鷹改",
+      "normalFrames": [
+        18,
+        18,
+        18,
+        12
+      ],
+      "fixedFrameFlagsProvided": false,
+      "realEquipmentInstanceIDsProvided": false
+    },
+    "oracle": {
+      "states": 5,
+      "legalNonemptyStates": 4,
+      "maximumAssigned": 1,
+      "maximumEquippedCarriers": 1,
+      "solverResultUsedAsExpectation": false
+    },
+    "node": {
+      "initial": {
+        "tests": 2,
+        "passed": 0,
+        "failed": 2,
+        "classification": "fixture night goal presence was mistaken; retained"
+      },
+      "corrected": {
+        "tests": 2,
+        "passed": 2,
+        "failed": 0
+      },
+      "established812Reused": true,
+      "fresh814Claimed": false,
+      "correctionIsNotSuccessPurposeRepeat": true
+    },
+    "local": {
+      "C": {
+        "row": "1-3/0/normal",
+        "durationMs": 5412,
+        "physicalRetry": 0,
+        "searches": 3,
+        "selectionChanges": 2,
+        "apply": 1,
+        "reload": 1,
+        "phases": 6,
+        "CFJControlMeaning": "existing saved gear preserved and reevaluated; no fresh CFJ UI allocation credit",
+        "beforeResearchSavedGearDOMDisplayed": false
+      },
+      "W": {
+        "row": "1-4/0/j-avoid",
+        "durationMs": 8303,
+        "physicalRetry": 0,
+        "searches": 2,
+        "apply": 1,
+        "reload": 1,
+        "phases": 4,
+        "beforeResearchSavedGearDOMDisplayed": true
+      },
+      "completeInitialPassed": 2,
+      "rawFilesMatched": 46,
+      "traceVideoScreenshot": 0,
+      "independentResult": "PASS_WITH_GAPS",
+      "gap": "initial failed Node kept separate",
+      "expectedStorageKeys": 11,
+      "intentionalDeltaKeys": [
+        "custom fleets",
+        "route goals"
+      ],
+      "remainingImmutableKeys": 9,
+      "newEditorExecution": false,
+      "newStorageMismatchObserved": false
+    },
+    "goalSeparation": {
+      "1-3": "generated attack1 target met; no default night goal in actual needs; targets-met is not victory guarantee",
+      "1-4": "attack1 met; generic air2 and AA1 remain unmet; incomplete/bounded-search is not proof of purchase necessity"
+    },
+    "cellsBefore": [
+      28,
+      172,
+      36
+    ],
+    "cellsAfter": [
+      28,
+      175,
+      33
+    ],
+    "cellTransitions": [
+      {
+        "id": "1-3/0/normal",
+        "item": "B",
+        "before": "未確認",
+        "after": "一部"
+      },
+      {
+        "id": "1-3/0/normal",
+        "item": "D",
+        "before": "未確認",
+        "after": "一部"
+      },
+      {
+        "id": "1-4/0/j-avoid",
+        "item": "B",
+        "before": "未確認",
+        "after": "一部"
+      }
+    ],
+    "CFJBRemainsUnconfirmed": true,
+    "CI": {
+      "state": "pending final source commit and deduplicated single normal smoke",
+      "newRequests": 0
+    },
+    "frozenNightAndDropHuntsPreserved": true,
+    "heldFourFiveImported": false
   }
 }

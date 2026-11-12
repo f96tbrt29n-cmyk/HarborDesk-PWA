@@ -1,3 +1,9 @@
+## 2026-11-12 JST：1-3 normal/CFJ・1-4 J回避の有限配備
+
+製品変更0。独立5状態/4合法枠のNode2群は初回の誤った夜戦目標期待で0/2、根拠付きfixture訂正後2/2。初回原本・同定sourceを保持。Cナビ5412ms/W編成内8303ms各retry0で保存1/reload1・同一新文書load保持を確認。Cはnormal保存→CFJ既存配備再評価→normalへ戻す6phase、W4phase。Cの再探索前gear本文DOMは未実施、raw配備/理由全文比較と再探索後DOMを分離。
+
+**28確認済み／172一部／36未確認→28／175／33**。normal B/DとJ回避Bの3セルだけ未確認→一部。CFJ空枠配備はNodeのみでB未確認を維持、CFJ切替保持を新規配備/保存成功へ広げない。編集再実行なし。通常smokeは最終sourceで重複なく1回確認予定。[限定記録](pr152-starter-finite-carrier-deployment-ja.md)。旧CI42951416369のC936/0/0・W928/5/3、原本・旧欠測・凍結/4-5隔離を別保持。以下は履歴。
+
 ## 2026-11-12 JST：復旧・有限攻撃機の証拠追補
 
 実execの接続確認1回成功、既存workspace/局所38原本・非doc726/旧7参照・4-5隔離12件とpatch/3copyを現物照合した。local009→remote5962は記録2コミット/4docsだけでfast-forward。再作成/削除/原本加工なし、空き約8.287GiB。
@@ -359,14 +365,14 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 
 2026-10-30 CI追記：[7-4 ABEJLP](pr152-seven-four-ja.md#2026-10-30-自身初回ci確定)の検証source`7fd5298e7248ebeb6b71c67dae7c0a579e0b7991`／[41007168230](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41007168230)、attempt1・dispatch1/再実行0。4smoke成功/2失敗・Full skipped・取消/timeout0。自身6初回summaryの全厳密比較完了を確認し、局所C3＋Wstock/unknownの5完了と自身CI Wknown初回を6代表へ直接対応してDだけ一部→確認済み。21/142/73→22/141/73の1追加セル、一連の695基準21/139/76からdistinctはB/C/D3セル。A/B/C・他58行/旧53/基準236は不変。
 
-現表は最新JSONの59行集計。今回3-5/1・5-5/1のCだけ未確認→一部、28/166/42→28/168/40。A/B/D・定義236・旧53区分を維持し、一部を割合換算しない。先頭節・集計・行別主表が現在値で、日付付き追補と旧次の対象は各時点の履歴。最終sourceのsmokeは局所記録時点でpending。
+現表は最新JSONの59行集計。今回1-3normal B/D・1-4J回避Bの3セルだけ未確認→一部、28/172/36→28/175/33。CFJ BはNode-only新規配備のため未確認を維持。定義236・旧53区分を維持し、一部を割合換算しない。先頭節・集計・行別主表が現在値で、日付付き追補と旧次の対象は各時点の履歴。最終sourceのsmokeは局所記録時点でpending。
 
 |項目|確認済み|一部|未確認|非該当|分母|
 |---|---:|---:|---:|---:|---:|
 |A|0|56|3|0|59|
-|B|0|44|15|0|59|
+|B|0|46|13|0|59|
 |C|0|54|5|0|59|
-|D|28|18|13|0|59|
+|D|28|19|12|0|59|
 
 2026-10-28追補：[5-4最終整理](pr152-five-four-closeout-ja.md)は既存証拠で終了し、追加実行0・状態変更0。基準236セル3/115/118の下に閉じた限定残件と4分類を別記した。続く[2-5北F分岐](pr152-two-five-north-f-ja.md)では高速3戦艦の有効枝と選艦/不足案内を接続し、C/W各1初回で保存・編集・同一文書load後の完全一致まで確認したためDだけ一部→確認済み。前3/115/118→後4/114/118、変更1セル。A/B/Cの全条件完了へは広げない。7-3 Gと他行は維持。
 
@@ -396,10 +402,10 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 |---|---|---|---|---|---|
 |1-1/0/default AC|一部|一部|一部|一部|[pr152-registered-example-completion-ja](pr152-registered-example-completion-ja.md)|
 |1-2/0/default AE|一部|一部|一部|一部|[pr152-ae-speed-ui-ja](pr152-ae-speed-ui-ja.md)|
-|1-3/0/normal CFJ / A(DB)EFJ|一部|未確認|一部|未確認|[選択別C](#starter-selection-carrier-20261110)の4phase案内/readonly load確認。B/Dは未加算。|
-|1-3/0/cfj CFJ|一部|未確認|一部|一部|[route-1-3-verification-ja](route-1-3-verification-ja.md)／[共通搭載先案内](#2026-11-06-jst1-31-4-艦別搭載先案内バッチ局所確定ci待ち)|
+| 1-3/0/normal CFJ / A(DB)EFJ | 一部 | 一部 | 一部 | 一部 | [選択別C](#starter-selection-carrier-20261110)の4phase案内/readonly load時点ではB/D未加算。今回の有限配備は別根拠。 / [有限配備の限定証拠](pr152-starter-finite-carrier-deployment-ja.md) |
+| 1-3/0/cfj CFJ | 一部 | 未確認 | 一部 | 一部 | [route-1-3-verification-ja](route-1-3-verification-ja.md)／[共通搭載先案内](#2026-11-06-jst1-31-4-艦別搭載先案内バッチ局所確定ci待ち) / [有限配備の限定証拠](pr152-starter-finite-carrier-deployment-ja.md) |
 |1-4/0/normal BCF(E)HL / AD(EH/GJ)L|一部|一部|一部|一部|今回C/W局所：配備・不足案内・load再表示（保存編集全体未完）／[共通搭載先案内](#2026-11-06-jst1-31-4-艦別搭載先案内バッチ局所確定ci待ち)|
-|1-4/0/j-avoid BCFEHL / ADEHL|一部|未確認|一部|一部|[選択別C](#starter-selection-carrier-20261110)のfixture訂正後4phase確認。初回差分内容欠測は別保持、[Dは旧範囲](route-1-4-verification-ja.md)。|
+| 1-4/0/j-avoid BCFEHL / ADEHL | 一部 | 一部 | 一部 | 一部 | [選択別C](#starter-selection-carrier-20261110)のfixture訂正後4phase確認。初回差分内容欠測は別保持、[Dは旧範囲](route-1-4-verification-ja.md)。 / [有限配備の限定証拠](pr152-starter-finite-carrier-deployment-ja.md) |
 |1-5/0/default ADEJ|一部|一部|一部|一部|[route-goal-guidance-ja](route-goal-guidance-ja.md)|
 |1-5/1/default ADFGJ|一部|一部|一部|確認済み|[1-5航戦四隻の限定記録](pr152-one-five-middle-ja.md)|
 |1-5/2/default ADFGJ|一部|一部|一部|一部|[asw-route-targets-ja](asw-route-targets-ja.md)|
