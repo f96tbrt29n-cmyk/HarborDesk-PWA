@@ -62,8 +62,8 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 49,
-      "未確認": 10,
+      "一部": 51,
+      "未確認": 8,
       "非該当": 0
     },
     "C": {
@@ -74,8 +74,8 @@
     },
     "D": {
       "確認済み": 28,
-      "一部": 21,
-      "未確認": 10,
+      "一部": 23,
+      "未確認": 8,
       "非該当": 0
     }
   },
@@ -962,9 +962,13 @@
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "2026-11-13のChromiumナビ代表で有限stackから合法通常枠へ実配備。電探個数/装備艦数とH回避の同艦速力セットを分離し、配備・在庫・既存目標を確認。小入力限定、固定枠/実装備個体ID/全在庫/最適性は未確認。",
+          "evidence": [
+            "docs/pr152-three-two-finite-placement-ja.md",
+            "tests/three-two-finite-placement.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         },
         "C": {
           "status": "一部",
@@ -976,9 +980,13 @@
           ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "2026-11-13のChromiumナビ同試行で配備→保存1→reload1→再探索前の配備/理由/全文/対象外データ比較→同一新文書再探索後表示の4phaseが初回成功。新編集は未実施で一部に限定。normalは未選択参考制空の未判定、H回避は成立区分を保持。",
+          "evidence": [
+            "docs/pr152-three-two-finite-placement-ja.md",
+            "tests/three-two-finite-placement.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         }
       },
       "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
@@ -1128,9 +1136,13 @@
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "2026-11-13のWebKit編成内代表で有限stackから合法通常枠へ実配備。電探個数/装備艦数とH回避の同艦速力セットを分離し、配備・在庫・既存目標を確認。小入力限定、固定枠/実装備個体ID/全在庫/最適性は未確認。",
+          "evidence": [
+            "docs/pr152-three-two-finite-placement-ja.md",
+            "tests/three-two-finite-placement.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         },
         "C": {
           "status": "一部",
@@ -1142,9 +1154,13 @@
           ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "2026-11-13のWebKit編成内同試行で配備→保存1→reload1→再探索前の配備/理由/全文/対象外データ比較→同一新文書再探索後表示の4phaseが初回成功。新編集は未実施で一部に限定。normalは未選択参考制空の未判定、H回避は成立区分を保持。",
+          "evidence": [
+            "docs/pr152-three-two-finite-placement-ja.md",
+            "tests/three-two-finite-placement.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         }
       },
       "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。"
@@ -3395,15 +3411,16 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "ids": [
-      "1-3/0/cfj",
-      "2-2/0/default",
-      "2-3/0/default"
+    "batch": "3-2 finite radar-hull and same-hull speed-set",
+    "rows": [
+      "3-2/0/normal",
+      "3-2/1/fastPlus"
     ],
-    "record": "finiteCarrierGapBatch20261112",
-    "state": "local3 same-row empty-source finite allocation and save/load passed; Node4 source-qualified reuse, freshNode0; normal final-source CI pending; one-five hold unchanged"
+    "NodeOnlyControl": "3-2/1/normal",
+    "state": "local completed; final source normal smoke pending",
+    "record": "docs/pr152-three-two-finite-placement-ja.md"
   },
-  "nextPriority": "残る3-2選択別の有限電探装備艦数/速力セット配備・保存/loadを共通候補として既存根拠との差だけ静的確認。1-5当該文書識別不一致、夜戦/掘り、4-5隔離は保留を維持し、欠測だけを埋める実験へ拡張しない。",
+  "nextPriority": "3-5上BDHK／5-5中央下BFDHNOSの有限索敵装備配備と保存/loadを共通候補として読取り設計。既存案内と実配備を分離し、33式/HQ/ボーナス未判定は充足へ変換しない。3-2 normal1はNode-onlyのまま、4-5隔離・Night/repair/1-5/掘りの保留を維持。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -25950,5 +25967,261 @@
     "nightDropFourFiveAndOneFiveHoldsPreserved": true,
     "newNightLoadAggregateConcernHeld": true,
     "newRepairFaultAggregateUnresolvedHeld": true
+  },
+  "previousSelectedBeforeThreeTwoFinite20261113": {
+    "ids": [
+      "1-3/0/cfj",
+      "2-2/0/default",
+      "2-3/0/default"
+    ],
+    "record": "finiteCarrierGapBatch20261112",
+    "state": "local3 same-row empty-source finite allocation and save/load passed; Node4 source-qualified reuse, freshNode0; normal final-source CI pending; one-five hold unchanged"
+  },
+  "nextPriorityBeforeThreeTwoFinite20261113": "残る3-2選択別の有限電探装備艦数/速力セット配備・保存/loadを共通候補として既存根拠との差だけ静的確認。1-5当該文書識別不一致、夜戦/掘り、4-5隔離は保留を維持し、欠測だけを埋める実験へ拡張しない。",
+  "threeTwoFiniteBatch20261113": {
+    "dateJST": "2026-11-13",
+    "baseHEAD": "e956db13d6c6b28b06b68be9a2e14e327d9effb4",
+    "sourceSHA": null,
+    "productChanges": 0,
+    "node": {
+      "currentFileTests": 5,
+      "initialReporter": "spec",
+      "initialRawFooter": {
+        "tests": 5,
+        "pass": 4,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "initialControllerFooterWasNull": true,
+      "initialProcessExit": 1,
+      "initialSourceExact": true,
+      "initialFailure": "normal0 complete expected true while unselected map-wide numeric air reference remains unresolved",
+      "initialHPostAssertionsReached": false,
+      "correctedReporter": "tap-explicit",
+      "correctedFooter": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "correctedProcessExit": 0,
+      "physicalGroupedCommands": 2,
+      "actualContextsPerCommand": 5,
+      "oldNode7CurrentExactReuse": false,
+      "oldNode7HistoricalOnly": true,
+      "normalGateConfigured": 819,
+      "normalGateConfiguredBefore": 814,
+      "normalNodeFiles": 27,
+      "expectationEvidence": "raw map H0/K56 and map-wide fallback56*1.5=84 plus manual/unresolved/shortage/pending-source checks; no air0 or goal deletion"
+    },
+    "oracles": {
+      "normal0": {
+        "rawSlots": 20,
+        "freeRadarFrames": 18,
+        "statesIncludingUnassigned": 19
+      },
+      "HbothMissing": {
+        "rawSlots": 19,
+        "freeFrames": 6,
+        "fillOnlyStates": 43,
+        "bothAssignedStates": 30,
+        "routeWitnesses": 10
+      },
+      "speedReadyRadarOnly": {
+        "statesIncludingUnassigned": 6,
+        "witnesses": 5
+      },
+      "radarReadyTurbineOnly": {
+        "statesIncludingUnassigned": 6,
+        "witnesses": 1
+      }
+    },
+    "limits": {
+      "fixedFramesProvided": false,
+      "realEquipmentInstanceIDsProvided": false,
+      "globalExhaustiveOrOptimalClaimed": false,
+      "fillOnlyOracleIsEquipmentLock": false,
+      "normal1BrowserCredited": false,
+      "newEditingExecuted": false
+    },
+    "rules": {
+      "normal": {
+        "optionalRadarCopies": 1,
+        "routeRadarHulls": 0,
+        "routeSpeedRank": 0,
+        "actualGoals": 4,
+        "complete": false,
+        "unselectedAirReference": 84,
+        "unselectedAirEnemyMapWide": 56,
+        "airOnH": 0,
+        "airVerdict": "manual/strategy reference; not a route requirement or confirmed procurement deficit"
+      },
+      "Havoidance": {
+        "optionalRadarCopies": 1,
+        "routeRadarHulls": 1,
+        "routeSpeedRank": 15,
+        "actualGoals": 12,
+        "complete": true,
+        "actualStar0WitnessTurbines": 6,
+        "actualStar0WitnessCans": 6,
+        "aggregateTurbineRecipeLowerBound": 4,
+        "paths": [
+          "CEFL",
+          "CGFL"
+        ],
+        "singleFixedPath": false
+      },
+      "fastestBoundaryNodeOnly": {
+        "routeSpeedRank": 20,
+        "routeRadarHulls": 4,
+        "sameHullTwoRadarsCountAsHulls": 1
+      }
+    },
+    "local": [
+      {
+        "caseId": "fastplus-inline",
+        "project": "webkit",
+        "retry": 0,
+        "status": "passed",
+        "durationMs": 13312,
+        "metadataPhases": 4,
+        "sourceExact": true
+      },
+      {
+        "caseId": "normal-navigator",
+        "project": "chromium",
+        "retry": 0,
+        "status": "passed",
+        "durationMs": 8957,
+        "metadataPhases": 4,
+        "sourceExact": true
+      }
+    ],
+    "operationsPerBrowserCase": {
+      "search": 2,
+      "apply": 1,
+      "reload": 1,
+      "goalSelectionChanges": 0,
+      "editing": 0,
+      "worker": 1,
+      "retry": 0,
+      "testTimeoutMs": 45000,
+      "resultTimeoutMs": 12000
+    },
+    "preservation": {
+      "rawKeys": 11,
+      "intentionalCustomDelta": 1,
+      "otherRawKeysUnchanged": 10,
+      "sharedNightRawKeys": 5,
+      "fleetCalculatorSeparateParsedComparison": true,
+      "directSavedDeploymentReasonsBeforeSecondSearch": true,
+      "sameDocumentStrict": true,
+      "newSaveMismatchObserved": false,
+      "pageerrorDropMissing": 0,
+      "normalSavedMarkerApplicable": true,
+      "fastplusSavedMarkerApplicable": false,
+      "normalPresearchGearDOM": false,
+      "inlinePresearchGearDOM": true
+    },
+    "localEvidence": {
+      "rawFiles": 50,
+      "auditResult": "PASS_WITH_GAPS",
+      "auditGaps": [
+        {
+          "output": "private/node-01",
+          "kind": "raw reporter counters differ from retained controller fields or reporter parse is incomplete; original fields not overwritten"
+        },
+        {
+          "output": "private/node-01",
+          "kind": "Node process/controller gate incomplete or failed; retained without product inference"
+        }
+      ],
+      "traceVideoScreenshot": 0,
+      "summary": {
+        "path": "shared/local-results.json",
+        "bytes": 47292,
+        "sha256": "6d17b3de797abd688cffe0a0439b712b4c4e8dc27c5e4d976e0320eeaaa3741a"
+      },
+      "manifest": {
+        "path": "private/local-trials-manifest-local-results.json",
+        "bytes": 9902,
+        "sha256": "40948b49afcc388865534de10ba32ded12e5f18024b4be2eaf1ee2fc0cbff823"
+      },
+      "audit": {
+        "path": "private/harness/v2/local-independent-review.json",
+        "bytes": 6322,
+        "sha256": "55785a2be1ca6b74c9383aa8a0f605aab99068230409b1f42ffc2d4829190fee"
+      }
+    },
+    "preflight": {
+      "C": 943,
+      "W": 943,
+      "files": 82,
+      "normalTargets4SelectedOnce": true,
+      "Wbins": [
+        339,
+        164,
+        256,
+        184
+      ],
+      "listingNotBrowserSuccess": true
+    },
+    "holds": {
+      "NightInitialGetter": true,
+      "NightLoadSixKeyAggregate": true,
+      "repairRosterThrowFaultAggregate": true,
+      "oneFiveDocumentOperandsMissing": true,
+      "dropHunts": true,
+      "fourFiveIsolated12": true,
+      "dedicatedNightRepairHelpersInvoked": false,
+      "genericStorageBootReloadSharedCauseExcluded": false,
+      "newReproductionsOfHeldPaths": 0,
+      "oldMissingFilled": false
+    },
+    "cellsBefore": [
+      28,
+      180,
+      28
+    ],
+    "cellsAfter": [
+      28,
+      184,
+      24
+    ],
+    "cellTransitions": [
+      {
+        "id": "3-2/0/normal",
+        "item": "B",
+        "before": "未確認",
+        "after": "一部"
+      },
+      {
+        "id": "3-2/0/normal",
+        "item": "D",
+        "before": "未確認",
+        "after": "一部"
+      },
+      {
+        "id": "3-2/1/fastPlus",
+        "item": "B",
+        "before": "未確認",
+        "after": "一部"
+      },
+      {
+        "id": "3-2/1/fastPlus",
+        "item": "D",
+        "before": "未確認",
+        "after": "一部"
+      }
+    ],
+    "CI": {
+      "state": "pending final-source one deduplicated smoke",
+      "requested": 0,
+      "recordOnlyExtraCIRequested": false
+    }
   }
 }

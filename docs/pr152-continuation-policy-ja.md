@@ -1,3 +1,5 @@
+> 最新局所（2026-11-13 JST）：3-2通常index0／H回避index1の有限電探・同艦速力セットを共通検証。製品0。Node初回4/1は参考制空未選択を落とした期待不備、根拠訂正後5/0（旧H後段未到達・spec採取不備は別保持）。C通常/W H回避各初回4phase配備・保存/load保持成功、50原本独立PASS_WITH_GAPS。通常4目標のair84参考未判定とH12成立を分離し、最速CEFL/20/4艦へ流用しない。B/D4セルのみ28/180/28→28/184/24、新編集/固定枠/実装備IDは未確認。最終source通常smoke1回待ち、各保留/4-5隔離/原本/ドラフト未公開を維持。以下は履歴。
+
 > 最新CI確定（2026-11-12 JST）：source ab81d0c5／CI43228941365。C940/1/0、W916/15/10はpassed/flaky/failed、smoke3成功3失敗・取消0。新対象CFJ/2-2/2-3×C/W6は全初回・同試行4phase保持適合。11小型ZIPの公式digest/CRC一致、C2 prerequisite約4.87MBは上限超で未要求。独立照合PASS_WITH_GAPS。1-5旧識別値欠測/後段未到達は補完せず保留。Night W4初回load後6キーaggregateとrepair roster-throw初回safe-abort aggregateの当該操作を追加保留（内訳/原因欠測、旧Night getter懸念と別）。製品0、記録だけ追加CI0、28/180/28を維持。以下は履歴。
 
 > 最新局所（2026-11-12 JST）：CFJ/2-2・2-3の有限配備を共通バッチで補完。製品0、既存Node4source資格再利用・fresh0、localC/W/C各初回で空枠→有限配備→保存→同新文書load保持成功。28/175/33→28/180/28の5セルのみ一部、他browserや全条件へ流用しない。1-5旧unknownはtimeOrigin二値/caller/未露出項目欠測・当該操作hold、診断wrapper非共有/strictsameDoc保持の限定gateで独立続行、新再現なし。最終source通常smoke1回待ち、記録だけ追加CI0、原本と保護対象・draft未公開を維持。以下は履歴。

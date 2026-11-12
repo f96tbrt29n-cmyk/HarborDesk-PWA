@@ -1,3 +1,5 @@
+> 最新局所（2026-11-13 JST）：3-2通常index0／H回避index1の有限電探・同艦速力セットを共通検証。製品0。Node初回4/1は参考制空未選択を落とした期待不備、根拠訂正後5/0（旧H後段未到達・spec採取不備は別保持）。C通常/W H回避各初回4phase配備・保存/load保持成功、50原本独立PASS_WITH_GAPS。通常4目標のair84参考未判定とH12成立を分離し、最速CEFL/20/4艦へ流用しない。B/D4セルのみ28/180/28→28/184/24、新編集/固定枠/実装備IDは未確認。最終source通常smoke1回待ち、各保留/4-5隔離/原本/ドラフト未公開を維持。以下は履歴。
+
 > 最新CI確定（2026-11-12 JST）：source ab81d0c5／CI43228941365。C940/1/0、W916/15/10はpassed/flaky/failed、smoke3成功3失敗・取消0。新対象CFJ/2-2/2-3×C/W6は全初回・同試行4phase保持適合。11小型ZIPの公式digest/CRC一致、C2 prerequisite約4.87MBは上限超で未要求。独立照合PASS_WITH_GAPS。1-5旧識別値欠測/後段未到達は補完せず保留。Night W4初回load後6キーaggregateとrepair roster-throw初回safe-abort aggregateの当該操作を追加保留（内訳/原因欠測、旧Night getter懸念と別）。製品0、記録だけ追加CI0、28/180/28を維持。以下は履歴。
 
 ## 2026-11-12 JST：CFJ／2-2・2-3の有限配備ギャップ
@@ -379,14 +381,14 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 
 2026-10-30 CI追記：[7-4 ABEJLP](pr152-seven-four-ja.md#2026-10-30-自身初回ci確定)の検証source`7fd5298e7248ebeb6b71c67dae7c0a579e0b7991`／[41007168230](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/41007168230)、attempt1・dispatch1/再実行0。4smoke成功/2失敗・Full skipped・取消/timeout0。自身6初回summaryの全厳密比較完了を確認し、局所C3＋Wstock/unknownの5完了と自身CI Wknown初回を6代表へ直接対応してDだけ一部→確認済み。21/142/73→22/141/73の1追加セル、一連の695基準21/139/76からdistinctはB/C/D3セル。A/B/C・他58行/旧53/基準236は不変。
 
-現表は最新JSONの59行集計。今回CFJ B、2-2 B/D、2-3 B/Dの5セルだけ未確認→一部、28/175/33→28/180/28。CFJ Dと1-5 Dの既存状態・定義236/旧53を維持し、一部を割合換算しない。先頭節・集計・行別主表が現在値、日付付き旧追補は各時点の履歴。
+現表は最新JSONの59行集計。今回3-2/0/normal B/D、3-2/1/fastPlus B/Dの4セルだけ未確認→一部、28/180/28→28/184/24。normal1はNode-only、A/C・既存確認済み28・定義236/旧53を維持し、一部を割合換算しない。先頭節・集計・行別主表が現在値、日付付き旧追補は各時点の履歴。
 
 |項目|確認済み|一部|未確認|非該当|分母|
 |---|---:|---:|---:|---:|---:|
-|A|0|56|3|0|59|
-|B|0|49|10|0|59|
-|C|0|54|5|0|59|
-|D|28|21|10|0|59|
+|A| 0 | 56 | 3 | 0 |59|
+|B| 0 | 51 | 8 | 0 |59|
+|C| 0 | 54 | 5 | 0 |59|
+|D| 28 | 23 | 8 | 0 |59|
 
 2026-10-28追補：[5-4最終整理](pr152-five-four-closeout-ja.md)は既存証拠で終了し、追加実行0・状態変更0。基準236セル3/115/118の下に閉じた限定残件と4分類を別記した。続く[2-5北F分岐](pr152-two-five-north-f-ja.md)では高速3戦艦の有効枝と選艦/不足案内を接続し、C/W各1初回で保存・編集・同一文書load後の完全一致まで確認したためDだけ一部→確認済み。前3/115/118→後4/114/118、変更1セル。A/B/Cの全条件完了へは広げない。7-3 Gと他行は維持。
 
@@ -431,11 +433,11 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 |2-5/0/default BFJO|一部|一部|一部|確認済み|[pr152-north-los-ui-ja](pr152-north-los-ui-ja.md) / [pr152-north-drum-domain-ja](pr152-north-drum-domain-ja.md) / [F分岐と代表操作](pr152-two-five-north-f-ja.md)|
 |2-5/1/default CEIO|一部|一部|一部|確認済み|[Iランダム域・有限配備/案内・C/W各3保存→編集→同文書load保持](pr152-two-five-ceio-random-ja.md)。HQ域外/他分岐・全目標は残件|
 |3-1/0/default CFG|一部|一部|一部|確認済み|[六隻代替・有限配備/不足・C/W各3保存または安全中止→編集/同一文書load全文](pr152-three-one-cfg-ja.md)。全目標/全在庫/旧履歴は残件|
-|3-2/0/normal CG(H)FL / CEFL|一部|未確認|一部|未確認|[電探案内](pr152-three-two-radar-guidance-ja.md)C通常の4phase/readonly load。B/D未加算。|
+|3-2/0/normal CG(H)FL / CEFL|一部| 一部 |一部| 一部 | 旧案内時点はreadonly loadのみ。今回Chromiumナビで有限配備・保存/load前後4phase保持を確認、新編集は未実施 / [有限電探・同艦速力セット](pr152-three-two-finite-placement-ja.md) |
 |3-2/0/fastPlus CEFL / CGFL|一部|一部|一部|一部|[pr152-fastplus-route-ui-ja](pr152-fastplus-route-ui-ja.md)|
 |3-2/0/fastest CEFL|一部|一部|一部|一部|[route-3-2-verification-ja](route-3-2-verification-ja.md)|
 |3-2/1/normal CG(H)FL / CEFL|一部|未確認|一部|未確認|[電探案内](pr152-three-two-radar-guidance-ja.md)Wcontrolでnormal実検索/表示のみ。normalのreload/保存編集・B/D未確認。|
-|3-2/1/fastPlus CEFL / CGFL|一部|未確認|一部|未確認|[電探案内](pr152-three-two-radar-guidance-ja.md)W高速＋の4phase/readonly load、turbine枠交換は条件維持未評価。B/D未加算。|
+|3-2/1/fastPlus CEFL / CGFL|一部| 一部 |一部| 一部 | 旧案内時点はreadonly loadのみ。今回WebKit編成内で有限配備・保存/load前後4phase保持を確認、新編集は未実施 / [有限電探・同艦速力セット](pr152-three-two-finite-placement-ja.md) |
 |3-2/1/fastest CEFL|一部|一部|一部|一部|[pr152-route-target-scope-ja](pr152-route-target-scope-ja.md)|
 |3-3/0/default ACGM|一部|一部|一部|確認済み|[current-auto-loadout-coverage-ja](current-auto-loadout-coverage-ja.md) / [A/C/G分岐と代表操作](pr152-three-three-acgm-ja.md)|
 |3-4/0/default ACEGJP|一部|一部|一部|確認済み|[分岐・配備・代表操作](pr152-three-four-acegjp-ja.md)|
