@@ -1,9 +1,10 @@
 const {test,expect}=require('@playwright/test');
+const {normalVersionRouteFixture}=require('./normal-version-route-fixture.cjs');
 test.use({viewport:{width:390,height:844},isMobile:true,hasTouch:true,serviceWorkers:'block',trace:{mode:'on',snapshots:false,screenshots:true,sources:true},video:'on'});
 for(const state of ['baseline','drum-two','drum-one','unknown','random','tender'])test(`5-3 remaining branches ${state} retain scope and reasons through save and load`,async({page},info)=>{
  const evidence={state},errors=[];page.on('pageerror',e=>errors.push(e.message));
  try{
-  await page.route('**/*',r=>['127.0.0.1','localhost'].includes(new URL(r.request().url()).hostname)?r.continue():r.fulfill({status:204,body:''}));await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCSearch==='function');
+  await page.route('**/*',normalVersionRouteFixture);await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCSearch==='function');
   const reference=await page.evaluate(state=>{
    const names=state==='random'?['金剛改二','榛名改二','妙高改二','北上改二','時雨改二','綾波改二']:['金剛改二','妙高改二','北上改二','矢矧改二','時雨改二','綾波改二'];
    if(state==='tender')names[2]='迅鯨改';if(state==='unknown'){names[4]='合成・艦情報未登録A';names[5]='合成・艦情報未登録B'}

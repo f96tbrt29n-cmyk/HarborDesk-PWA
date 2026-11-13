@@ -67,6 +67,9 @@ test('receiver retains entry records after DCL, exposes per-document drops, and 
  for(let i=0;i<26;i++)page.emit('console',{text:()=> '__HD_VERSION_CALL__'+JSON.stringify({stage:'call',doc:123,timeOrigin:123,at:i,api:'hdFetchVersionMeta',id:i+1,parentId:0,origin:'automatic-load-timer',role:'external-callsite',caller:[{line:31,column:3,secret:'never'}],argument:'never',authorization:'never'})});
  await retain();const data=JSON.parse(await fs.readFile(path.join(dir,'reload-navigation-evidence.json'),'utf8'));
  assert.equal(data.events.filter(e=>e.kind==='version-entry').length,24);assert.equal(data.versionCalls.dropped,2);
- assert.equal(data.versionCalls.sites.automaticLine,484);assert.ok(!JSON.stringify(data).includes('never'));
+ const sourceLines=(await fs.readFile(path.join(__dirname,'../update-manager.js'),'utf8')).split(/\r?\n/);
+ const automaticLines=sourceLines.flatMap((line,index)=>line.includes('setTimeout(()=>hdCheckForUpdate(false),1200)')?[index+1]:[]);
+ assert.equal(automaticLines.length,1,'Automatic version-check timer must have one source callsite');
+ assert.equal(data.versionCalls.sites.automaticLine,automaticLines[0]);assert.ok(!JSON.stringify(data).includes('never'));
  await fs.rm(dir,{recursive:true});
 });

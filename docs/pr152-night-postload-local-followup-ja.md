@@ -1,3 +1,5 @@
+> CI追補 2026-11-13T23:23:45+09:00：末尾「CI43433457977の確定結果と残る版fixture監査」が現在の結果。c397成功と後続訂正ソースの最終CIを分離する。
+
 > 通信・分割追補 2026-11-13T22:23:21+09:00：末尾「通信fixtureとChromium分割の追補」が現在の作業。旧CI43418204272と新しい最終ソースの検証を区別する。
 
 > 最終CI追補 2026-11-13T21:24:48+09:00：本文末尾「修正後CI43418204272の確定結果」が現在の結果。CIソース2a2792e3と記録追補HEADを分離する。
@@ -237,3 +239,44 @@ Chromiumだけnative shardを2から3へ変更し、各workers2・45分上限・
 旧C2の終了欠測2/未開始43は全ID/file/titleを特定した。45例はsync-merge18/sync-receive6/target-scope3/three-four3/three-one3/three-three3/CEIO-E3/CEIO-scouting3/seven-two2/south-scouting1。局所成功で旧CI状態を更新しない。残りを含むCI全体の完了確認には、分割変更後の全945例とWの変更fixtureを同じ最終ソースで実行する通常smoke1回が必要であり、旧runの成功目的再実行はしない。自動runがあれば利用し、なければ同sourceの通常smokeを1回だけ要求する。
 
 証拠は新領域の `private/followup-43418204272/`、`private/communication-followup-investigation.json`、`private/ci43418204272-duration-analysis.json` と `private/trials/followup-*` に分離し、CI結果はこの既存追補へ集約する。新規個人データ/保存値本文を共有せず、旧原本保持照合へ流用しない。セル28/188/20・59行236セル、PR152ドラフト・未マージ・本番未公開と保護対象は維持。製品コード/版/SWの変更0。
+
+## CI43433457977の確定結果と残る版fixture監査
+
+[CI43433457977](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/43433457977) はsource c397c7a08a04ae9b2e1d26412b90071ead8b7594/attempt1で全7smokeジョブ成功、Full skipped。C3分割は各315例、全Chromium945 passed/0 flaky/0 failed、物理初回945成功・retry0。WebKitは943 passed/2 flaky/0 failedで、物理初回943成功/2失敗、retry2成功。両browserの945例集合は一致し、内部重複/未開始/終了欠測0。旧C2の45例は元ID/file/titleで一意に対応し、新ソースでは全初回成功した。旧43418204272の終了欠測2/未開始43を成功へ書き換えない。
+
+NightはC/W各5例が初回成功し、両carrierの同一文書load後6キー完全一致/policy/例外検査まで到達した（2非null/4nullを保持）。d9d5ff3dはc397c7a0の祖先で補正を含む。旧保存不一致や旧通信原因の解明とはしない。
+
+新Cジョブの終端は23分29秒/10分21秒/21分58秒で、45分延長なしに全体を完了できた。ただし変更fixture消費例を除く旧新897組の所要時間比は中央値0.5407で、old C1→new C1はほぼ同等、新C2/C3は約半分だった。host/runner/順序等の未測定差を除外できないため、短縮すべてを分割効果や環境要因へ帰属しない。今回の完了観測を将来の安定完了保証としない。
+
+小19ZIP計613073bytesの公式digest/sizeと、新CI資料280ファイル・抽出184memberを独立readbackした。全7compact/公式job/注記・945集合/旧45対応と一致した。`private/followup-43418204272/CI-receipts/43433457977/` は固定済み、独立記録は `independent-ci43433457977-review.json`。旧42原本の照合や、後続修正後ソースのCI結果へ流用しない。
+
+### 2つのflakyと、5-3の限定訂正
+
+W1のsouth scouting unknownは初回が `route-south-scouting.spec.js:44:797`、W3の5-3 remaining branches unknownは `route-5-3-branches-ui.spec.js:28:900` の元errors=[]検査でremote/local版URLのaccess-control2例外を検出し、それぞれretryが成功した。同じ初回の先行load全文/理由等の比較は通過していた。これは例外検査で失敗した順序の証拠であり、例外そのものが比較後に発生したという時刻の証拠ではない。
+
+southは既に2版URL GETに正常JSON+CORSを返すfixtureを持つため、204不整合と同じ原因とはしない。5-3 branchesには外部204空本文が残り、states baseline/drum-two/drum-one/unknown/random/tenderは編成/経路の入力で、版故障注入の意図はなかった。既存normalVersionRouteFixtureへimportとroute引数だけを接続し、指定2URL GETのみ正常JSON、他URL/非GET/故障注入/操作/assert/Storage数/期限を維持した。逆置換でc397原文byteに完全一致し、helper自体は不変である。固定JSONはテスト入力で実ネットワーク・旧CORS原因の証明ではない。
+
+この訂正後の5-3 unknownはW/C各1回/retries0で初回成功した。2艦が未登録の元入力、manual/ratio0と理由表示を維持し、保存を安全中止して元custom/装備/他編成/metadataを保持、同一文書load後の全文・未判定区分・例外検査まで通過した。元ケースにないメモ編集/load後再探索や、理由本文byte一致を確認済みに加えない。
+
+### south正常JSON下の限定観測
+
+旧初回のwire応答/redirect/header/発生文書と直接callerは、取得済み小資料では確認できない。大型raw ZIPは未取得なので、元producerが記録していなかったかも未確認である。前節の「未採取」はこの取得済み資料での欠測を指し、raw原本に記録がないと断定する意味ではない。
+
+公開ソースを変えず、元south specへ逆変換できる私有copyで、対象2URLのroute到達・request/response/失敗・document/版入口だけを上限64件で採取した。URL query/hash/userinfo/保存値本文/認証情報を新規記録せず、headerはContent-Type/ACAO/Locationのorigin+pathだけ。SW block、元の操作/保存/read/reload/待機/45秒/12秒/例外検査は維持し、追加timer/失敗後evaluateは0。init/console/stack/Node event採取のtiming影響があるため無計測同一とはしない。
+
+準備・実行履歴を混ぜない。
+
+- Node初回は私有5成功、既存6契約中5成功/1失敗、合計10成功/1失敗でbrowser未開始。receiver監査が古い固定484行を期待し、実ソースの一意な1200ms自動入口535行と不一致だった。製品や出力へ期待値を合わせず、実ソース中の一意な元anchorを独立oracleとする等値検査へ訂正した。synthetic484行の分類検査や他保証は不変で、訂正した公開6件だけの必要再検証は全成功。この既存契約を通常Node gateへ登録する。
+- 最初の私有browser設置は、Playwright変換後のfn.toString書式とcap文字列anchorが合わず374msで失敗した。page.goto前で、通信/保存操作には未到達。原本を保持し製品失敗へ数えない。
+- 私有serializerだけを、公開probe raw functionのunique境界抽出/構文/逆変換guardへ補正した。変換済み/throwするtoStringに依存しない新契約を含め、変更した私有5件だけを再検証し全成功。製品・元probe・private spec/configは不変、公開6件は再実行していない。
+- 設置補正後の実アプリ観測はsouth unknown/Wを1回・retries0で成功。元の保存/load全文・元例外検査まで通過しpageerror0。再発を求める追加反復はしない。
+
+実観測は28events、receiver drop0/採取失敗0。両文書で初期設置と版3入口の設置を確認した。旧文書の535行自動呼出しからexternal/local GET2件がfixtureへ到達し、実page responseは200 / application/json / ACAO*、Location/redirectedFromはnull、fromSW=false、両requestfinishedがreload-beforeより前に記録された。これは固定応答の正常経路で、実外部ネットワーク成功ではない。新文書の版call/requestは終了まで未観測。producer最終counterは不完全で、request IDと文書を直接結べない限界も残す。
+
+結論は「診断設置・今回再発なし」。旧CIの正常JSON下例外、以前のNight例外、旧W2と同原因とも環境原因とも確定しない。例外除外・握り潰し・期限延長・推測製品修正はしない。私有診断はcommit対象へ混ぜない。
+
+### 最終ソース確認へ
+
+c397のCI成功後に、同runで判明した5-3 fixtureと、観測準備で確定した既存source監査期待値を訂正した。よって最終ソースはc397と区別し、旧HEADの再実行ではなく、これらの具体的訂正を含む新ソースで通常smokeを1回だけ確認する。既存workflowは必須全smokeを検証するため全945例が対象であり、局所の成功済み個別例は理由なく反復しない。
+
+新しい証拠は `private/followup-43418204272/` と `private/trials/followup-south-network-*`、`followup-five-three-fixture-first` へ分離。初回失敗・setup未到達・修正後契約・実観測・旧CI/新CIを区別する。既存の再開worktreeの診断5差分は保持し、旧ハンドオフ領域の復元と混同しない。セル28/188/20は変更0、旧42原本/旧保留/4-5隔離12件の保持照合はアクセス待ち・未完了。PR152ドラフト・未マージ・本番未公開、main競合・既知凍結、PR151/版/SW/本番未変更を維持する。
