@@ -1,3 +1,5 @@
+> 最終CI追補 2026-11-13T21:24:48+09:00：本文末尾「修正後CI43418204272の確定結果」が現在の結果。CIソース2a2792e3と記録追補HEADを分離する。
+
 > 最新採用追補 2026-11-13T20:31:28+09:00：本文末尾「採用・修正後CI」が現在の方針。従前の禁止/未コミット記述は各時点の履歴として保持する。
 
 > 最新追補 2026-11-13T19:19:21+09:00：本文末尾「CEIO表示巻き戻りの原因・最小修正・関連検証」が現在の結果。従前本文は初期局所調査の履歴として原文を保持する。
@@ -154,3 +156,45 @@ Nightには版mock・外部204置換・故障注入がなく、SWは元のnetwor
 pushでは正しい作業ブランチ `codex/required-route-invariants` とリモートHEADを照合し、forceを使わない。自動起動した通常smokeがあれば利用する。自動起動がない場合だけ同じ対象SHAの通常smokeを1回要求し、重複を避ける。旧CIの失敗・今回の初回/retry・修正後CIの結果を分離する。CI対象SHA・URL・確定結果は受付/終了後にこの追補とPR現状欄へ記録する。
 
 セル28/188/20・59行236セル、旧原本のアクセス待ち、PR152ドラフト・未マージ・未公開、版/SW/main/PR151/本番未変更を維持する。
+
+## 修正後CI43418204272の確定結果
+
+CI対象は製品修正commit `2a2792e3fb2a4f19e4a88ec5a49ac687c17c39c0`、親は恒久metadata保持commit `d9d5ff3dcee75876b2e2abad6e381f6c39dc173c`。通常push先はPR152の `codex/required-route-invariants`。自動runがないことをworkflow・branch・完全SHAで照合した後、通常smokeを1回だけ要求した。[CI43418204272](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/43418204272) はworkflow_dispatch/attempt1で、再要求・再実行・条件変更は0。この追補は終了後の記録だけであり、CI対象ソースと記録HEADを区別する。
+
+|ジョブ|最終状態|ケース結果と限界|
+|---|---|---|
+|Chromium C1|成功|473例が初回passed、retryなし|
+|Chromium C2|取消|472予定、427初回passed、beginのみ2、未開始43。runFinished=false/fullStatus=null、全472のfinalOutcome=null|
+|WebKit W1|成功|339 passed / 0 flaky / 0 failed|
+|WebKit W2|失敗|163 passed / 0 flaky / 1 failed|
+|WebKit W3|成功|257 passed / 1 flaky / 0 failed|
+|WebKit W4|成功|184 passed / 0 flaky / 0 failed|
+
+smokeは4成功/1失敗/1取消、run全体failure、Fullは意図どおりskipped。WebKitの論理集計は943 passed/1 flaky/1 failed。物理初回945試行は943 passed/2 failed、retry2試行は1 passed/1 failedであり、初回成功とretry成功を分ける。Chromiumは初回終了900 passedを観測したが、終了欠測2・未開始43を含み、全Cの論理最終集計には換算しない。
+
+C2の公式理由は45m0sの最大実行時間超過。smoke本体がcancelledで、その後の資料uploadだけが上限原因とはしない。beginのみの2例は `route-south-scouting` のunknownと `route-target-scope` のfixed CEFL ready。最初の停止操作・後段比較は欠測であり、探索遅延や非表示と推定しない。C2原job logは既存gh通常経路がForbidden、既存GitHub連携がTransport closedで各1回失敗したため打切り。認証変更・同経路反復・大容量ZIP全回収はしない。
+
+### 対象の到達とNight
+
+- 起動復元の拡張release回帰はC/Wとも初回成功。通常復元と正当scrollを残し、新しい明示選択を優先する既存局所証拠を再利用した。stale-scroll15契約は実Open/Handleの境界、既存hash7は診断保持関連であり、startup全動作の7検査とは呼ばない。6smokeジョブのNode gateとbrowser verifyも成功した。
+- CEIOの成立/ランダム域/情報不足、3-1 CFGのknown/stock/unknownはWebKitで全6例初回成功。保存・編集・同一文書load後の元の全文/配備/理由/対象外データ比較まで到達。CEIO/CFGのChromium計6例はC2取消により未開始で、W成功や局所成功で補完しない。
+- NightはW4全5例が初回成功/retryなし。C2でも5例それぞれの初回onTestEnd passed/errorCount0を観測したが、runner全体は未完で各finalOutcome=null。これを全CやC2の最終成功へ広げない。
+- 対象carrier NightはC/Wそれぞれ、元のDCL後6キー比較、同一文書load後の完全一致、policy、元の例外検査まで通過した。同じ物理試行の新metadataも6キーexactMatch=true、先頭2非null/残4nullを維持。全6非nullの証拠ではない。旧CI初回の2キーnull読取り、局所Nightの版取得2例外と別試行の結果であり、旧原因の解明・保存安全性の一般証明にはしない。
+
+### 今回の失敗と修正判断
+
+W2のH回避stockは初回/retryとも `route-fastplus-ui.spec.js:50:509` の元errors=[]検査で、remote main/local app-version.jsonのaccess-control2例外により失敗。先行するload全文・他編成/他海域比較は通過した。W3のfixed CEFL stock初回も `route-target-scope.spec.js:39:382` の同じ種類の例外検査で失敗し、retryは成功した。これは非表示待機や保存比較不一致として分類しない。
+
+同SHAのコードと公式注記では版取得処理の直接変更はないが、今回の修正との間接timing影響は除外できない。製品/試験/実行環境の原因を選べず、環境要因や旧Nightと同原因とは断定しない。今回変更に関連する新規製品回帰や、無関係と確定できる失敗の根拠は得られていない。推測修正・mock追加・例外除外・期限延長・成功目的の再実行は行わない。C2取消の下位原因も原ログ欠測のため未確定であり、次の限定観測/修正を選ぶ前に必要な証拠を区別する。
+
+公開判断上は版取得例外によるCI失敗、C2取消と未検証範囲、旧保存不一致・凍結対象の原因未確定、main競合が残る。今回の正常Nightで旧保留を解除しない。追加の仕様判断を要する変更や、根拠のない修正には進んでいない。
+
+### 回収と保持
+
+新CIの資料は新領域 `private/adoption/ci/43418204272/` に分離した。小17ZIP計574465bytesは公式artifact SHA-256/byteと一致。collectorの `final-classification.json`、`final-manifest.json`、`retrieval-gaps-final.json` と、Nightの `night-review/night-compact-analysis-v2.json` が今回の引継ぎ先。巨大raw trace/video ZIPとC2原job logは未取得。受領・未取得・比較未到達は別に記録する。
+
+一時診断4ファイルとworkflowのobserver登録tokenは未コミットのまま保持し、採用commitへ混ぜていない。旧局所42原本・旧保留・4-5隔離12件/旧作業ツリーの保持照合はアクセス待ち・未完了。新CI資料の照合や旧CI専用245ファイルの一致で代用しない。元領域の復旧探索は反復していない。
+
+236セルは28確認済み/188一部/20未確認のまま、変更0。装備個体単位の配備/重複防止と固定枠保護は未確認のまま。PR152ドラフト・未マージ・本番未公開、main競合、PR151/版/SW/本番未変更、マージ・デプロイ・ドラフト解除・自動マージなしを維持する。この記録だけの通常pushでは追加CIを要求しない。
+
+新CI資料だけの独立readbackはPASS_WITH_RECORDED_GAPS。collector manifest244件の実一覧/bytes/SHA-256、17ZIPの公式digest/size、抽出173memberが一致し、raw6compact/公式注記/ジョブ結果と集計も一致した。記録は `private/adoption/ci/43418204272/independent-readback-review.json`。既知の未取得/未開始/終了欠測を含む判定であり、旧原本保持照合や全CI成功を意味しない。
