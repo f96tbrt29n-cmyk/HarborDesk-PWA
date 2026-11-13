@@ -1,3 +1,5 @@
+> 通信・分割追補 2026-11-13T22:23:21+09:00：末尾「通信fixtureとChromium分割の追補」が現在の作業。旧CI43418204272と新しい最終ソースの検証を区別する。
+
 > 最終CI追補 2026-11-13T21:24:48+09:00：本文末尾「修正後CI43418204272の確定結果」が現在の結果。CIソース2a2792e3と記録追補HEADを分離する。
 
 > 最新採用追補 2026-11-13T20:31:28+09:00：本文末尾「採用・修正後CI」が現在の方針。従前の禁止/未コミット記述は各時点の履歴として保持する。
@@ -198,3 +200,40 @@ W2のH回避stockは初回/retryとも `route-fastplus-ui.spec.js:50:509` の元
 236セルは28確認済み/188一部/20未確認のまま、変更0。装備個体単位の配備/重複防止と固定枠保護は未確認のまま。PR152ドラフト・未マージ・本番未公開、main競合、PR151/版/SW/本番未変更、マージ・デプロイ・ドラフト解除・自動マージなしを維持する。この記録だけの通常pushでは追加CIを要求しない。
 
 新CI資料だけの独立readbackはPASS_WITH_RECORDED_GAPS。collector manifest244件の実一覧/bytes/SHA-256、17ZIPの公式digest/size、抽出173memberが一致し、raw6compact/公式注記/ジョブ結果と集計も一致した。記録は `private/adoption/ci/43418204272/independent-readback-review.json`。既知の未取得/未開始/終了欠測を含む判定であり、旧原本保持照合や全CI成功を意味しない。
+
+## 通信fixtureとChromium分割の追補（CI43418204272後）
+
+開始時のリモート/HEADは926bcce999906a366ee76467cb4b07e8b157c144で一致。旧CI対象2a2792e3fb2a4f19e4a88ec5a49ac687c17c39c0はNight metadata補正d9d5ff3dcee75876b2e2abad6e381f6c39dc173cの直接の子で、補正は旧CIに含まれていた。2a2792e3から926bcce9は本Markdown1件の記録差分だけである。
+
+既存worktreeの診断4ファイル/登録tokenを上書きせず、926bcce9から別linked worktree `followup-worktree` を作り、今回の差分だけを分離した。元worktreeの5差分/ハッシュは保持。旧局所42原本/旧保留/4-5隔離12件/旧作業ツリーの保持照合はアクセス待ち・未完了のままで、探索していない。
+
+### 版取得例外と限定fixture訂正
+
+同CIのW2 H回避stockは、初回/retryとも保存・load後完全一致に先行失敗はなく、末尾の元errors=[]検査でremote mainとlocalのapp-version.jsonに対するaccess-control2例外を検出した。URL cachebusterから生成時刻は初回11:45:07.751/.752Z、retry11:45:15.599Zと分かるが、これはpageerror発生時刻の実測ではない。直接の要求caller stack/発生文書、応答status/redirect/headerは旧試行資料では未採取であり、別試行で埋めない。
+
+製品の版readerはok応答をJSONとして解釈する。一方、H回避とCEFL固定の2specは、外部要求を204空本文へ置換し、local要求はcontinueするfixtureだった。版故障注入の仕様/アサーションはなく、ルート/在庫/保存保持を検査するケースである。正常な版入力のJSON契約に対するfixture不整合を確定した。既存south版fixtureの適用範囲/根拠を再利用し、固定JSONを対象版のテスト入力としてだけ扱う。
+
+fixture commit `1accecad5d05449be0b7cadf202ac020ea41aeb6` は、2spec共通のhelperで指定remote origin+pathとlocal127.0.0.1:4173/app-version.jsonのGETだけを200 JSON+CORSへ訂正した。非GET/非対象URL/他local/external204の元挙動を維持する。固定値は未変更app-version.jsonのversion/buildを使う。製品fetch/SW/例外検査/Storage呼出し/操作順/待機/期限/探索条件を変えていない。importとroute引数を逆置換すると2specの元ソースbyteと完全一致する。
+
+local版URLも旧例外に含まれ、元はcontinueだったため、204不整合だけで両URLの旧原因を説明したとはしない。製品/試験/実行環境の原因区分は未確定。固定応答の成功を実通信・実CORS・製品の実版取得成功へ読み替えない。Nightの旧保存不一致/版例外とも別記録である。
+
+### C2の所要時間と分割
+
+旧compact/公式stepを分析した。C1は473終了・報告所要時間合計3644.4 worker秒・smoke1840秒、C2は427終了・4920.5 worker秒・smoke2584秒で取消。C2両parallel workerは約2465/2456秒の終了済み処理を記録し、gapは約109/105秒。終了済み最大41.94秒、個別失敗/timeout/retryは0。終了欠測2は期限直前に新規開始しており、単一試験hangより累積負荷とnative件数分割の偏りを示す。setupはC1/C2で約128/124秒と近く、取消後upload103秒は上限原因ではない。C/W所要時間比はbrowser/worker差を含むので、環境遅延原因を断定しない。原joblog欠測は維持する。
+
+Chromiumだけnative shardを2から3へ変更し、各workers2・45分上限・既存テスト期限を維持した。WebKit4分割/worker1、固定image/Node、Full起動条件、全smokeファイル一覧、各assert/待機/取消は不変。新plannerや時間延長は追加しない。3分割は余裕を増やす対処であり、将来の45分内完了保証ではない。
+
+固定Node24.21.0/PW1.55.0で、82ファイルのunsharded945例を分母に実--listを実行した。旧2分割473+472、新3分割315+315+315のidentity unionは分母と一致し、内部/分割間の重複、欠落、追加はすべて0。case metadata/expectedStatus/既存timeoutも同一である。listは試験実行成功の証拠ではない。
+
+### 局所実行と未検証範囲
+
+元の固定image digest/Node24.21.0/PW1.55.0/C1187/W2203、single container、workers1/retries0、元操作/上限/期限/例外検査を維持した。sourceはreadonly、各phase後に全ファイルbytes/SHA一致とcontainer残0を確認した。
+
+- Node契約はfixture3+CI tools14=17件が初回成功。追加のprivate実列挙検査は初回に専用ファイルの権限で未実行だったことをrequired verdict不在から検出し、17成功へ含めていない。権限だけ補正した後、列挙検査1件だけを別phase初回で実行して成功。Node期待値変更やブラウザーの成功目的再実行はない。
+- Chromiumの未実施CEIO random/unknownとCFG known/stock/unknownの5例を各初回1回実行し全成功。CEIOとCFG known/stockは保存・編集・同一文書load後全文/理由/元6艦identity30/他編成・metadataまで通過。CFG unknownは保存を安全中止し、元custom/装備を完全保持してload後再表示を確認、メモ編集は行わない。情報不足/任意不足/探索未完了の区分を保持する。
+- CEIO guaranteed Cの既存初回成功は機能保証として再利用した。clean specは無効opt-in診断6片を除いた差分があり、spec byte同一/timing同一とは記載しない。旧試行は診断OFFで、製品/fixture/操作/assert/Storage/reloadは同一。新たな同例局所反復はしない。
+- fixtureを変更したH回避stock W、fixed CEFL stock W、H回避stock C代表は各初回1回/retry0で全成功。load後complete/全文/他編成/他海域と元errors=[]を通過しpageerror0。C代表は変更したfixture入力のcross-engine確認であり、根拠のない旧成功再実行ではない。
+
+旧C2の終了欠測2/未開始43は全ID/file/titleを特定した。45例はsync-merge18/sync-receive6/target-scope3/three-four3/three-one3/three-three3/CEIO-E3/CEIO-scouting3/seven-two2/south-scouting1。局所成功で旧CI状態を更新しない。残りを含むCI全体の完了確認には、分割変更後の全945例とWの変更fixtureを同じ最終ソースで実行する通常smoke1回が必要であり、旧runの成功目的再実行はしない。自動runがあれば利用し、なければ同sourceの通常smokeを1回だけ要求する。
+
+証拠は新領域の `private/followup-43418204272/`、`private/communication-followup-investigation.json`、`private/ci43418204272-duration-analysis.json` と `private/trials/followup-*` に分離し、CI結果はこの既存追補へ集約する。新規個人データ/保存値本文を共有せず、旧原本保持照合へ流用しない。セル28/188/20・59行236セル、PR152ドラフト・未マージ・本番未公開と保護対象は維持。製品コード/版/SWの変更0。

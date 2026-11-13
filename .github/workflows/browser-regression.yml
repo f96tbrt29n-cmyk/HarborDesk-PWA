@@ -41,16 +41,24 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # C2 previously exhausted the job deadline while passing its route-heavy
+          # tail. Keep native grouping, workers and deadlines; distribute all cases
+          # across three jobs instead of increasing a timeout or filtering cases.
           - browser: chromium
             workers: 2
             timeout_minutes: 45
             shard: 1
-            shards: 2
+            shards: 3
           - browser: chromium
             workers: 2
             timeout_minutes: 45
             shard: 2
-            shards: 2
+            shards: 3
+          - browser: chromium
+            workers: 2
+            timeout_minutes: 45
+            shard: 3
+            shards: 3
           - browser: webkit
             workers: 1
             timeout_minutes: 45

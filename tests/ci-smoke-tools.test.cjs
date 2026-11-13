@@ -183,11 +183,19 @@ test('a prior summary is preserved and bounded global errors cannot leak origina
   assert.ok(!JSON.stringify(data).includes('SECRET'));
 });
 
-function workflowScript(browser) {
+function workflowMatrix() {
+  const workflow = fs.readFileSync(path.join(ROOT, '.github/workflows/browser-regression.yml'), 'utf8');
+  const block = workflow.split('      matrix:\n        include:\n')[1].split('\n    steps:')[0];
+  return [...block.matchAll(/          - browser: (chromium|webkit)\n            workers: (\d+)\n            timeout_minutes: (\d+)\n            shard: (\d+)\n            shards: (\d+)/g)]
+    .map(([, browser, workers, timeoutMinutes, shard, shards]) => ({ browser, workers: Number(workers),
+      timeoutMinutes: Number(timeoutMinutes), shard: Number(shard), shards: Number(shards) }));
+}
+function workflowScript(browser, shard = 1) {
   const workflow = fs.readFileSync(path.join(ROOT, '.github/workflows/browser-regression.yml'), 'utf8');
   const block = workflow.split('      - name: Run smoke browser regression\n')[1].split('\n      # Small lifecycle')[0];
   const script = block.split('        run: |\n')[1].split('\n').map(line => line.startsWith('          ') ? line.slice(10) : line).join('\n');
-  const values = { browser, workers: browser === 'webkit' ? '1' : '2', shard: '1', shards: browser === 'webkit' ? '4' : '2' };
+  const values = workflowMatrix().find(row => row.browser === browser && row.shard === shard);
+  assert.ok(values, 'The exercised shell command must use an actual matrix row');
   return script.replace(/\$\{\{ matrix\.(browser|workers|shard|shards) \}\}/g, (_, key) => values[key]);
 }
 function fakeRunner(t, plannerMode = 'normal') {
@@ -201,14 +209,25 @@ function fakeRunner(t, plannerMode = 'normal') {
 }
 
 test('workflow keeps native arguments and exits and cannot fall through to all tests after planner failure', t => {
-  const w = fakeRunner(t), c = fakeRunner(t);
+  const matrix = workflowMatrix(), chromium = matrix.filter(row => row.browser === 'chromium'), webkit = matrix.filter(row => row.browser === 'webkit');
+  assert.equal(matrix.length, 7);
+  assert.deepEqual(chromium.map(row => [row.shard, row.shards]), [[1, 3], [2, 3], [3, 3]]);
+  assert.deepEqual(webkit.map(row => [row.shard, row.shards]), [[1, 4], [2, 4], [3, 4], [4, 4]]);
+  for (const row of matrix) {
+    assert.equal(row.workers, row.browser === 'chromium' ? 2 : 1);
+    assert.equal(row.timeoutMinutes, 45);
+  }
+  const w = fakeRunner(t);
   const wr = cp.spawnSync('bash', ['-c', workflowScript('webkit')], { cwd: ROOT, env: w.env });
-  const cr = cp.spawnSync('bash', ['-c', workflowScript('chromium')], { cwd: ROOT, env: c.env });
-  assert.equal(wr.status, 19);assert.equal(cr.status, 23);
+  assert.equal(wr.status, 19);
   assert.deepEqual(fs.readFileSync(w.capture, 'utf8').trim().split('\n'), ['node_modules/playwright/cli.js', 'test',
     'tests/a.spec.js', 'tests/b.spec.js', '--config=playwright.ci.config.cjs', '--project=webkit', '--workers=1']);
-  assert.deepEqual(fs.readFileSync(c.capture, 'utf8').trim().split('\n'), ['run', 'test:browser', '--',
-    '--config=playwright.ci.config.cjs', '--project=chromium', '--workers=2', '--shard=1/2']);
+  for (const row of chromium) {
+    const c = fakeRunner(t), cr = cp.spawnSync('bash', ['-c', workflowScript('chromium', row.shard)], { cwd: ROOT, env: c.env });
+    assert.equal(cr.status, 23);
+    assert.deepEqual(fs.readFileSync(c.capture, 'utf8').trim().split('\n'), ['run', 'test:browser', '--',
+      '--config=playwright.ci.config.cjs', '--project=chromium', '--workers=2', `--shard=${row.shard}/3`]);
+  }
   for (const mode of ['fail', 'empty']) {
     const f = fakeRunner(t, mode), r = cp.spawnSync('bash', ['-c', workflowScript('webkit')], { cwd: ROOT, env: f.env });
     assert.notEqual(r.status, 0);assert.equal(fs.existsSync(f.capture), false);
