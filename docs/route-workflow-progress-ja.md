@@ -1,3 +1,5 @@
+> 最新CI・停止記録（2026-11-13 JST）：source 6b46af26／CI43359339548はsmoke3成功・2失敗・C2取消、Full skipped。対象4例はretry0の物理passと同試行16phase保持比較適合、Chromium2例の論理最終はnull。全C PFF未確定、W小型結果928/14/3。Night初回load後配列比較90:27を別保留（値/キー/原因欠測、retry補完なし）。元workspace不可視で原本42件の現在照合・元P最終manifestは未完。別CI回収領域の12ZIP/102membersを独立照合済み。セル28/188/20は変更0、記録のみ追加CI0。以下は各時点の履歴。
+
 > 最新局所（2026-11-13 JST）：3-5上BDHK／5-5中央下BFDHNOSの有限索敵配備。製品0、Node初回2検査/6contextと代表C/W各初回の配備→保存→同一文書load4phaseが成功、42原本独立PASS。任意2個と数値条件/係数/HQ/ボーナス未判定を分離し、既知84/78と成立済み数値保護を確認。取込み詳細IDキーは保持、solver個体割当/固定枠は未確認。B/D4セルだけ28/184/24→28/188/20、新編集/全目標へ広げない。最終source通常smoke1回待ち、旧CI433の未到達/欠測・各保留/4-5隔離/原本/draft未公開を保持。以下は履歴。
 
 > 最新CI確定（2026-11-13 JST）：検証source d05a0751／CI43329894547 attempt1。smoke5成功・W4失敗、Fullは実ジョブskipped。C943/0/0・W932/10/1はpassed/flaky/failedで初回成功数へ換算しない。新対象normal0/H回避1×C/W4は全初回・同試行4phase配備/保存理由/load全文/対象外保持が一致。12小型ZIP計529588Bのsize/公式digest/CRC一致、CI独立照合PASS（CI全体成功ではない）。5-5 BKPS成立は初回/retryともload後click非表示・全文未到達、表示変更元/原因未確定。Node工程6成功、数値footer/registry digestは未観測。28/184/24と旧保留/4-5隔離/原本/draft未公開を維持、記録だけの追加CI0。以下は履歴。
@@ -728,3 +730,4 @@ Node29/29、別audit1・producer2/consumer2、source629＋private設定1を分�
 
 
 旧局所時点の主表説明（履歴）：現表は最新JSONの59行集計。今回7-5第3B/C/Dだけ未確認→一部、24/145/67→24/148/64。W成立load全文は未到達のためD確認済みにせず、他58行・判定基準を維持する。
+

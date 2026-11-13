@@ -47,7 +47,7 @@ Chromium上ナビとWebKit中央下inlineは各初回成功・workers1/retries0�
 
 ## 登録・セル・保留
 
-通常一覧はC/W各945/82ファイル、新2タイトル×C/W4件の選択を実確認。WebKit339/164/258/184の和集合/重複0を確認した。これは登録で実操作成功ではない。通常Nodeは既存819＋新2＝821の設定で、局所に819を繰り返さない。最終sourceを通常push後、既存runと照合して通常smoke1回を確認し、記録だけの追補で追加CIを起動しない。
+通常一覧はC/W各945/82ファイル、新2タイトル×C/W4件の選択を実確認。WebKit339/164/258/184の和集合/重複0を確認した。これは登録で実操作成功ではない。通常Nodeは既存819＋新2＝821の設定で、局所に819を繰り返さない。最終source6b46af26を通常pushし、同SHAのsmoke1回を確認した（結果と停止記録は下節）。記録だけの追補で追加CIを起動しない。
 
 28/184/24→28確認済み/188一部/20未確認。`3-5/1/default`と`5-5/1/default`のB/D計4セルだけ未確認→一部。Bは今回装備・有限入力、Dは保存/load部分に限り、新編集や全目標/全失敗区分を完了へ広げない。A/C、確認済み28、236セル/59行/旧53/基準は不変。
 
@@ -56,3 +56,38 @@ Chromium上ナビとWebKit中央下inlineは各初回成功・workers1/retries0�
 最小残件は同対象の編集操作・全適用目標/全在庫/特殊枠の未確認範囲と、solver個体ID/固定枠を扱わない契約の限界である。本バッチで別海域へ実装を広げない。証拠領域は`/workspace/harbordesk-handoff-_gnvlnto/continuation-finite-los-batch-20261113`。
 
 PR152はドラフト・未公開、main競合を維持。main統合・PR151・版・SW・本番・マージ・公開・デプロイ・ドラフト解除・自動マージを行わない。
+
+## 同source通常CIと実行領域の停止（2026-11-13 JST）
+
+検証source `6b46af267f3a230a1b12a9c9f5ca3c645884cd76`／[CI43359339548](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/43359339548) attempt1。完全SHA・workflow・対象branchの実行一覧を2回確認して未受付0件を照合し、通常smokeを1回だけ要求、12:29:47 JST（03:29:47Z）に受理された。再要求/再実行0。公式job結果はsmoke3成功（C1/W1/W3）・2失敗（W2/W4）・C2取消、実在するFull jobはskipped。C2はsmoke本体が13:14:51 JST（04:14:51Z）にcancelled、後段の資料保持が続き、ジョブも取消終了した。取消原因を期限設定だけで断定しない。
+
+### 対象4例と全体結果を分ける
+
+新2タイトル×C/Wの4例はretry0の物理statusがすべてpassed。同じ試行の4phase×4例＝16phase、53boolean/null×16＝848値と20count×16＝320値がsourceの期待と一致した。新探索前の保存配備・理由・全文、同一reload文書、他編成/metadata、取込み詳細IDキーの比較は適合、対象のcritical false/missing0。期待値falseの28値と、非適用・未実施を表すnull120値をそのまま保持し、trueへ変えない。新編集0、solver個体割当/固定枠は未確認のまま。
+
+Cの対象2例はC2にあり、物理passed・保持比較通過でも、C2の論理finalOutcomeは全472例nullのため論理最終成功とは扱わない。全Chromiumのpassed/flaky/failedは未確定。C1小計はlogical expected473、C2は446物理pass終了・2開始/終了なし・24未開始。全Cの919物理passを945例の論理完結へ換算しない。Wの対象2例は論理expectedで完了した。
+
+全WebKitは小型compact結果のlogical passed/flaky/failedが**928/14/3**、945例完結。初回の物理statusは928passed/14timedOut/3failed、retryは14passed/3timedOutで、論理集計と別の分母。公式ログから直接確認できたのはW2単体158/4/2だけで、全Wの数字は小型JSON集計である。全6ジョブの通常Node検査工程successを確認したが、数値footerとHDLOFINITE原文は今回CI資料では未観測、821は設定数のまま。局所2TAP成功をCIの数値footerへ流用しない。
+
+### 失敗・新しい保留
+
+最終3失敗はW2の2-5 CEIO scouting guaranteed／unknownと、W4の3-1 CFG stock。各初回/retry計6試行はtimedOutだが、取得した同試行資料の停止操作・段階・保存比較の到達は欠測。旧load後非表示と同原因/同段階とは推定しない。
+
+別のflaky初回3failedは、carrier Night、H回避stock、release stale-recoveryであり、最終3失敗と別の試行である。carrier NightのW4初回（job131668885457、test `60c90c2ba9dde6a78d19-ddede08445c7737f9800`、retry0）は `tests/night-policy-reload.spec.js:90:27` の `expect(afterLoad.values).toEqual(saved.values)` が失敗位置。**load後保存配列一致の懸念を新たに保留**する。配列実値・不一致キー・原因は未採取、保存消失は未確定。retry1passedで初回を補完せず、後続policy/例外検査を初回到達済みにしない。旧Night getter・submarineのload6aggregate144・repair fault68とは別の証拠として保持し、Nightの追加実行・推測修正を行わない。
+
+H回避stock初回は末尾の例外配列ゼロ検査位置で、具体的例外と保存比較operandは未取得。release初回はhash観測poll位置で、保存操作の失敗とは特定できない。source順の到達根拠を保存値原文の観測へ変換せず、retry成功と分離する。今回の有限索敵4例の成功は、これらや旧CI43329894547のBKPS/6-5欠測を解決しない。
+
+### 原本の可用性と限定回収
+
+局所検証・42原本の独立PASS・source通常push後にexec-server切断/timeoutが発生し、同じenvironment IDでも元 `/workspace/harbordesk-handoff-_gnvlnto` は不可視となった。提供された起動待機がreadyになった後の実読取りでもH/P/Wはfalse、別receipt領域のみ可視。削除・初期化・環境再作成や元領域の推測復元は行っていない。原本の消失は未確定で、元作業ツリー/容量/原本の現在状態は現物未確認。停止前の確認を現在へ流用しない。
+
+元 `continuation-finite-los-batch-20261113/private/` の42原本・局所plan/manifest/独立照合・レビュー/CI準備/closure v1は最後に確認した所在であり、現在取得済みではない。元PのCI binding/init・最終manifest/最終互換照合は未完。4-5隔離12件/別草稿も停止前一致・現在不可視を分ける。
+
+実装・アプリ実行を停止し、既存GitHub runだけを別の `/workspace/scratch/harbordesk-ci-43359339548-receipts-20261113` へ回収した。小型12ZIP計504026B・102membersの公式size/SHA-256/CRC、安全なpathとsource/run/job/shard/retryの対応を独立再読した。転送再試行0・大容量/対象外archive要求0、署名URLは永続保存せず、private原本とshared型付きmetadataを分離。新しいNode/ブラウザー/CI実行やsanitizerは行っていない。
+
+**CI限定receipt整合性**の独立確認であり、全CI成功、一般保存安全性、元42原本の再取得、元P全体の最終封鎖を意味しない。限定manifest SHA `e9ba173c5d478fa05e09ccc7c1db69e42aef0a9756e2417bb9a05e32f36a86cd`、限定独立review SHA `6c32126f0227f179ba39eefe08cc58bfefd4767f1b047b102636f357501a9978`。一部公式footer/個別例外・保存配列operand・全C論理結果等の欠測を保持する。
+
+GitHubの進捗JSON本文は連携の空応答/HTTP400で再取得できず、推測で再作成・上書きしない。source時点のJSON blob `b26308fce9cdaa5436d3d8c2aa6125ba16b6d847` はそのまま保持し、同JSON内のCI pendingはsource時点の計画記録である。今回CIの確定結果は本節・進捗Markdown先頭・PR現状欄へ記録する。セル表と集計の28確認済み/188一部/20未確認は変更0。
+
+再開の最小作業は元workspaceへの安全なアクセス回復後に、HEAD/差分、42原本/局所manifest、隔離12件を内容照合すること。Night新懸念は同初回の配列内訳が得られるまで対象を保留し、元の欠測を新試行で補わない。別海域への拡張・追加試験は行わず、PR152ドラフト・未公開、main競合、PR151/版/SW/本番未変更、マージ/公開/自動マージなしを維持する。
+
