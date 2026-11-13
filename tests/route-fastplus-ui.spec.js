@@ -1,6 +1,7 @@
 const {test,expect}=require('@playwright/test');
+const {normalVersionRouteFixture}=require('./normal-version-route-fixture.cjs');
 test.use({viewport:{width:390,height:844},isMobile:true,hasTouch:true,serviceWorkers:'block',trace:{mode:'on',snapshots:false,screenshots:true,sources:true},video:'on'});
-async function boot(page){await page.route('**/*',r=>['localhost','127.0.0.1'].includes(new URL(r.request().url()).hostname)?r.continue():r.fulfill({status:204,body:''}));await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdFEGraphRoute==='function')}
+async function boot(page){await page.route('**/*',normalVersionRouteFixture);await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdFEGraphRoute==='function')}
 // Full UI coverage for the distinct H-avoidance goal, without replacing checks.
  for(const state of ['ready','stock','unknown'])test(`H avoidance ${state} preserves route reasons through save and load`,async({page},info)=>{
   const evidence={state},errors=[];page.on('pageerror',e=>errors.push(e.message));

@@ -1,9 +1,10 @@
 const {test,expect}=require('@playwright/test');
+const {normalVersionRouteFixture}=require('./normal-version-route-fixture.cjs');
 test.use({viewport:{width:390,height:844},isMobile:true,hasTouch:true,serviceWorkers:'block',trace:{mode:'on',snapshots:false,screenshots:true,sources:true},video:'on'});
 for(const state of ['ready','stock','unknown'])test(`fixed CEFL ${state} keeps selected route targets through save and load`,async({page},info)=>{
  const evidence={state},errors=[];page.on('pageerror',e=>errors.push(e.message));
  try{
-  await page.route('**/*',r=>['localhost','127.0.0.1'].includes(new URL(r.request().url()).hostname)?r.continue():r.fulfill({status:204,body:''}));
+  await page.route('**/*',normalVersionRouteFixture);
   await page.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.hdReady==='1'&&typeof hdOCSearch==='function');
   const reference=await page.evaluate(state=>{
    const rows=Array.from({length:6},(_,i)=>({id:'scope-'+i,name:'島風改',masterId:hdShipDbMasterRowFor('島風改').id,gameShipId:10800+i,level:90,gameSlotEx:i===5?1:0,metadata:{keep:i}}));
