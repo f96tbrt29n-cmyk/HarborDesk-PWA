@@ -62,8 +62,8 @@
     },
     "B": {
       "確認済み": 0,
-      "一部": 51,
-      "未確認": 8,
+      "一部": 53,
+      "未確認": 6,
       "非該当": 0
     },
     "C": {
@@ -74,8 +74,8 @@
     },
     "D": {
       "確認済み": 28,
-      "一部": 23,
-      "未確認": 8,
+      "一部": 25,
+      "未確認": 6,
       "非該当": 0
     }
   },
@@ -1381,9 +1381,13 @@
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じ行のChromium 上ナビ初回で有限電探配備と同艦魚雷セット/合法通常枠/在庫上限を確認。全適用目標・全装備/在庫/特殊枠・固定枠/個体ID割当は未確認。",
+          "evidence": [
+            "docs/pr152-finite-los-placement-ja.md",
+            "tests/finite-los-placement.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         },
         "C": {
           "status": "一部",
@@ -1395,12 +1399,16 @@
           ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じ行のChromium 上ナビ初回で有限電探配備と同艦魚雷セット/合法通常枠/在庫上限を確認。保存1・reload1・新探索前の配備/理由/全文と同一文書load後再探索、他編成/metadata/取込み詳細IDキー保持を確認。新編集と全目標は未確認。",
+          "evidence": [
+            "docs/pr152-finite-los-placement-ja.md",
+            "tests/finite-los-placement.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 今回は新案内の読取り専用表示だけ。実配備B、保存・編集D、交換後33式/他条件、実発進・残機、全在庫/枠競合は未確認。"
+      "remaining": "任意索敵2個を数値・通行必須・確定購入数へ変換しない。今回の有限電探配備Bと保存/loadDだけ局所Chromiumで一部確認。新編集、全目標/全在庫/特殊枠、solver個体ID割当と固定枠、全優先分岐は未確認。HQ/ボーナスの数値未判定理由を維持。"
     },
     {
       "id": "4-1/0/default",
@@ -2090,9 +2098,13 @@
           ]
         },
         "B": {
-          "status": "未確認",
-          "reason": "同じ行の実在庫配備を対象記録から特定できない。データ/共通コード接続を実操作へ換算しない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じ行のWebKit 中央下inline初回で有限電探配備と同艦魚雷セット/合法通常枠/在庫上限を確認。全適用目標・全装備/在庫/特殊枠・固定枠/個体ID割当は未確認。",
+          "evidence": [
+            "docs/pr152-finite-los-placement-ja.md",
+            "tests/finite-los-placement.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         },
         "C": {
           "status": "一部",
@@ -2104,12 +2116,16 @@
           ]
         },
         "D": {
-          "status": "未確認",
-          "reason": "同じ行の保存/編集/load後表示を対象記録から特定できない。",
-          "evidence": []
+          "status": "一部",
+          "reason": "同じ行のWebKit 中央下inline初回で有限電探配備と同艦魚雷セット/合法通常枠/在庫上限を確認。保存1・reload1・新探索前の配備/理由/全文と同一文書load後再探索、他編成/metadata/取込み詳細IDキー保持を確認。新編集と全目標は未確認。",
+          "evidence": [
+            "docs/pr152-finite-los-placement-ja.md",
+            "tests/finite-los-placement.test.cjs",
+            "tests/owned-equipment-planner.spec.js"
+          ]
         }
       },
-      "remaining": "既定1組はその海域に十分な組数の根拠ではない。戦闘推奨と経路必須を区別。未登録の必要組数を推測しない。 今回は新案内の読取り専用表示だけ。実配備B、保存・編集D、交換後33式/他条件、実発進・残機、全在庫/枠競合は未確認。"
+      "remaining": "任意索敵2個を数値・通行必須・確定購入数へ変換しない。今回の有限電探配備Bと保存/loadDだけ局所WebKitで一部確認。新編集、全目標/全在庫/特殊枠、solver個体ID割当と固定枠、全優先分岐は未確認。HQ/ボーナスの数値未判定理由を維持。"
     },
     {
       "id": "5-6/0/default",
@@ -3411,16 +3427,15 @@
     "実ゲームの全編成・全分岐・任務・勝利・iPhone・一般探索網羅は分母外。"
   ],
   "selected": {
-    "batch": "3-2 finite radar-hull and same-hull speed-set",
+    "batch": "finite LOS placement upper/central",
     "rows": [
-      "3-2/0/normal",
-      "3-2/1/fastPlus"
+      "3-5/1/default",
+      "5-5/1/default"
     ],
-    "NodeOnlyControl": "3-2/1/normal",
-    "state": "source smoke closed (5 jobs success / W4 failure); own4 initial four-phase complete; separate holds unchanged",
-    "record": "docs/pr152-three-two-finite-placement-ja.md"
+    "state": "local complete; final-source normal smoke pending",
+    "record": "docs/pr152-finite-los-placement-ja.md"
   },
-  "nextPriority": "3-5上BDHK／5-5中央下BFDHNOSの有限索敵装備配備と保存/loadを共通候補として読取り設計。既存案内と実配備を分離し、33式/HQ/ボーナス未判定は充足へ変換しない。3-2 normal1はNode-onlyのまま、4-5隔離・Night/repair/1-5/掘りの保留を維持。",
+  "nextPriority": "本バッチは対象2経路に限定。残る最小範囲は同対象の編集操作と全目標/全在庫/特殊枠、solver個体ID/固定枠契約の限界。旧保留は未解決のまま別管理。",
   "previousSelected": {
     "id": "7-3/0/default",
     "baselineHead": "0f44f839be65d96b5627fd5951fb05525787c326",
@@ -26352,5 +26367,133 @@
       "recordOnlyExtraCIRequested": false,
       "historical": true
     }
+  },
+  "previousSelectedBeforeFiniteLos20261113": {
+    "batch": "3-2 finite radar-hull and same-hull speed-set",
+    "rows": [
+      "3-2/0/normal",
+      "3-2/1/fastPlus"
+    ],
+    "NodeOnlyControl": "3-2/1/normal",
+    "state": "source smoke closed (5 jobs success / W4 failure); own4 initial four-phase complete; separate holds unchanged",
+    "record": "docs/pr152-three-two-finite-placement-ja.md"
+  },
+  "nextPriorityBeforeFiniteLos20261113": "3-5上BDHK／5-5中央下BFDHNOSの有限索敵装備配備と保存/loadを共通候補として読取り設計。既存案内と実配備を分離し、33式/HQ/ボーナス未判定は充足へ変換しない。3-2 normal1はNode-onlyのまま、4-5隔離・Night/repair/1-5/掘りの保留を維持。",
+  "finiteLosBatch20261113": {
+    "dateJST": "2026-11-13",
+    "baseHEAD": "a4846ed8c9ae37384e5e8f402dc8c34930da9f9a",
+    "priorTestedSource": "d05a0751713ccede999b7a70b8637c15fa7d6bf6",
+    "sourceSHA": null,
+    "record": "docs/pr152-finite-los-placement-ja.md",
+    "productChanges": 0,
+    "node": {
+      "physicalCommands": 1,
+      "TAPTests": 2,
+      "pass": 2,
+      "fail": 0,
+      "contexts": 6,
+      "retries": 0,
+      "allSearchesIncompleteBeamLimit": true,
+      "knownNumericScores": [
+        84,
+        78
+      ],
+      "normalConfiguredTests": 821,
+      "normalExistingConfiguredTests": 819
+    },
+    "local": {
+      "representatives": {
+        "chromium": "3-5/1/default navigator",
+        "webkit": "5-5/1/default inline"
+      },
+      "initialCompleted": 2,
+      "retryTrials": 0,
+      "phaseCountEach": 4,
+      "searchesEach": 2,
+      "savesEach": 1,
+      "reloadsEach": 1,
+      "newEdits": 0,
+      "pageerrorsDropMissingEach": 0,
+      "importedDetailStoredIDsPreserved": true,
+      "fixedFramesVerified": false,
+      "solverInstanceAssignmentVerified": false,
+      "rawFiles": 42,
+      "independentResult": "PASS",
+      "gaps": 0,
+      "evidence": {
+        "summary": {
+          "path": "shared/local-results.json",
+          "bytes": 72667,
+          "sha256": "1a9193a1057cafb29892008c0f7e4f6ec7cbf2ffa37220fc595c47e416fb7cbd"
+        },
+        "manifest": {
+          "path": "private/local-trials-manifest-local-results.json",
+          "bytes": 8287,
+          "sha256": "2ffeb0f304474e2557c08f869364b3355a64f8a39f4c5bdaa8ba860d2654c05b"
+        },
+        "audit": {
+          "path": "private/harness/local-independent-review.json",
+          "bytes": 3463,
+          "sha256": "50317f9f469bf690b4ab5171848a89902ee65c59c3604f1ec17d4cf575a3f011"
+        }
+      }
+    },
+    "normalPreflight": {
+      "casesPerBrowser": 945,
+      "files": 82,
+      "targetRegistrations": 4,
+      "webkitBinCounts": [
+        339,
+        164,
+        258,
+        184
+      ],
+      "listingIsExecution": false
+    },
+    "ci": {
+      "state": "pending final-source one deduplicated smoke",
+      "requested": 0
+    },
+    "cellsBefore": [
+      28,
+      184,
+      24
+    ],
+    "cellsAfter": [
+      28,
+      188,
+      20
+    ],
+    "cellTransitions": [
+      {
+        "id": "3-5/1/default",
+        "item": "B",
+        "before": "未確認",
+        "after": "一部"
+      },
+      {
+        "id": "3-5/1/default",
+        "item": "D",
+        "before": "未確認",
+        "after": "一部"
+      },
+      {
+        "id": "5-5/1/default",
+        "item": "B",
+        "before": "未確認",
+        "after": "一部"
+      },
+      {
+        "id": "5-5/1/default",
+        "item": "D",
+        "before": "未確認",
+        "after": "一部"
+      }
+    ],
+    "sameRowEditingCompleted": false,
+    "priorHoldsResolved": false,
+    "allCriteriaAndDenominatorsUnchanged": true,
+    "metadataBodiesShared": false,
+    "diagnosticOrPerformanceExperiments": 0
   }
 }

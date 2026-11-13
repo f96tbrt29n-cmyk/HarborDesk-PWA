@@ -1,3 +1,5 @@
+> 最新局所（2026-11-13 JST）：3-5上BDHK／5-5中央下BFDHNOSの有限索敵配備。製品0、Node初回2検査/6contextと代表C/W各初回の配備→保存→同一文書load4phaseが成功、42原本独立PASS。任意2個と数値条件/係数/HQ/ボーナス未判定を分離し、既知84/78と成立済み数値保護を確認。取込み詳細IDキーは保持、solver個体割当/固定枠は未確認。B/D4セルだけ28/184/24→28/188/20、新編集/全目標へ広げない。最終source通常smoke1回待ち、旧CI433の未到達/欠測・各保留/4-5隔離/原本/draft未公開を保持。以下は履歴。
+
 > 最新CI確定（2026-11-13 JST）：検証source d05a0751／CI43329894547 attempt1。smoke5成功・W4失敗、Fullは実ジョブskipped。C943/0/0・W932/10/1はpassed/flaky/failedで初回成功数へ換算しない。新対象normal0/H回避1×C/W4は全初回・同試行4phase配備/保存理由/load全文/対象外保持が一致。12小型ZIP計529588Bのsize/公式digest/CRC一致、CI独立照合PASS（CI全体成功ではない）。5-5 BKPS成立は初回/retryともload後click非表示・全文未到達、表示変更元/原因未確定。Node工程6成功、数値footer/registry digestは未観測。28/184/24と旧保留/4-5隔離/原本/draft未公開を維持、記録だけの追加CI0。以下は履歴。
 
 > 最新局所（2026-11-13 JST）：3-2通常index0／H回避index1の有限電探・同艦速力セットを共通検証。製品0。Node初回4/1は参考制空未選択を落とした期待不備、根拠訂正後5/0（旧H後段未到達・spec採取不備は別保持）。C通常/W H回避各初回4phase配備・保存/load保持成功、50原本独立PASS_WITH_GAPS。通常4目標のair84参考未判定とH12成立を分離し、最速CEFL/20/4艦へ流用しない。B/D4セルのみ28/180/28→28/184/24、新編集/固定枠/実装備IDは未確認。最終source通常smoke1回待ち、各保留/4-5隔離/原本/ドラフト未公開を維持。以下は履歴。
@@ -388,9 +390,9 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 |項目|確認済み|一部|未確認|非該当|分母|
 |---|---:|---:|---:|---:|---:|
 |A| 0 | 56 | 3 | 0 |59|
-|B| 0 | 51 | 8 | 0 |59|
+|B| 0 | 53 | 6 | 0 |59|
 |C| 0 | 54 | 5 | 0 |59|
-|D| 28 | 23 | 8 | 0 |59|
+|D| 28 | 25 | 6 | 0 |59|
 
 2026-10-28追補：[5-4最終整理](pr152-five-four-closeout-ja.md)は既存証拠で終了し、追加実行0・状態変更0。基準236セル3/115/118の下に閉じた限定残件と4分類を別記した。続く[2-5北F分岐](pr152-two-five-north-f-ja.md)では高速3戦艦の有効枝と選艦/不足案内を接続し、C/W各1初回で保存・編集・同一文書load後の完全一致まで確認したためDだけ一部→確認済み。前3/115/118→後4/114/118、変更1セル。A/B/Cの全条件完了へは広げない。7-3 Gと他行は維持。
 
@@ -444,7 +446,7 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 |3-3/0/default ACGM|一部|一部|一部|確認済み|[current-auto-loadout-coverage-ja](current-auto-loadout-coverage-ja.md) / [A/C/G分岐と代表操作](pr152-three-three-acgm-ja.md)|
 |3-4/0/default ACEGJP|一部|一部|一部|確認済み|[分岐・配備・代表操作](pr152-three-four-acegjp-ja.md)|
 |3-5/0/default FGK|一部|一部|一部|一部|[pr152-south-scouting-ui-ja](pr152-south-scouting-ui-ja.md) / [pr152-scouting-options-ja](pr152-scouting-options-ja.md)|
-|3-5/1/default BDHK|一部|未確認|一部|未確認|[任意索敵案内](pr152-upper-central-scouting-guidance-ja.md)の同じ行の代表・実選択切替/readonly reload。B/D・交換適用/全区分は未加算。|
+|3-5/1/default BDHK|一部|一部|一部|一部|[有限索敵配備](pr152-finite-los-placement-ja.md)：同じ行の代表で有限電探・合法通常枠/在庫、保存1/同一文書load後配備・理由/他保持を確認。新編集/全目標は未確認。|
 |4-1/0/default CFDGJ / ABDGJ|一部|一部|一部|確認済み|[共通条件・経路差・代表操作](pr152-four-one-routes-ja.md)|
 |4-2/0/default ACL / BDCL|一部|一部|一部|確認済み|[共通分岐と代表操作](pr152-four-two-routes-ja.md)／[既存ASW設定](asw-remaining-targets-ja.md)|
 |4-2/1/default ACL / BDCL|一部|一部|一部|確認済み|[共通分岐と代表操作](pr152-four-two-routes-ja.md)／[既存ASW設定](asw-remaining-targets-ja.md)|
@@ -458,7 +460,7 @@ remote95c4f3ffは15/133/88、旧6-5草稿は17/137/82。別の6-4自身CIのstoc
 |5-3/0/default DGIOKEQ|一部|一部|一部|一部|[pr152-5-3-speed-ui-ja](pr152-5-3-speed-ui-ja.md) / [pr152-5-3-branches-ja](pr152-5-3-branches-ja.md)|
 |5-4/0/default ADEHIJMP|一部|一部|一部|確認済み|[pr152-five-four-battleship-ja](pr152-five-four-battleship-ja.md) / [潜水艦除外の追加確認](pr152-five-four-submarine-ja.md) / [M→P免除と局所未到達](pr152-five-four-scouting-exemption-ja.md) / [限定仕上げ](pr152-five-four-completion-ja.md)|
 |5-5/0/default BKPS|一部|一部|一部|確認済み|[先行免除・分岐/配備・新W成立の保存確認と旧未到達保持](pr152-five-five-bkps-ja.md)|
-|5-5/1/default BFDHNOS|一部|未確認|一部|未確認|[任意索敵案内](pr152-upper-central-scouting-guidance-ja.md)の同じ行の代表・実選択切替/readonly reload。B/D・交換適用/全区分は未加算。|
+|5-5/1/default BFDHNOS|一部|一部|一部|一部|[有限索敵配備](pr152-finite-los-placement-ja.md)：同じ行の代表で有限電探・合法通常枠/在庫、保存1/同一文書load後配備・理由/他保持を確認。新編集/全目標は未確認。|
 |5-6/0/default ABC2DEG|未確認|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
 |5-6/1/default IJKLN|未確認|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
 |5-6/2/default IOQUXZ|未確認|未確認|未確認|未確認|同定できる個別実行記録なし（構造/接続はJSON参照）|
