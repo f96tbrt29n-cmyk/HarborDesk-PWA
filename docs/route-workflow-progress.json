@@ -3417,7 +3417,7 @@
       "3-2/1/fastPlus"
     ],
     "NodeOnlyControl": "3-2/1/normal",
-    "state": "local completed; final source normal smoke pending",
+    "state": "source smoke closed (5 jobs success / W4 failure); own4 initial four-phase complete; separate holds unchanged",
     "record": "docs/pr152-three-two-finite-placement-ja.md"
   },
   "nextPriority": "3-5上BDHK／5-5中央下BFDHNOSの有限索敵装備配備と保存/loadを共通候補として読取り設計。既存案内と実配備を分離し、33式/HQ/ボーナス未判定は充足へ変換しない。3-2 normal1はNode-onlyのまま、4-5隔離・Night/repair/1-5/掘りの保留を維持。",
@@ -25981,7 +25981,7 @@
   "threeTwoFiniteBatch20261113": {
     "dateJST": "2026-11-13",
     "baseHEAD": "e956db13d6c6b28b06b68be9a2e14e327d9effb4",
-    "sourceSHA": null,
+    "sourceSHA": "d05a0751713ccede999b7a70b8637c15fa7d6bf6",
     "productChanges": 0,
     "node": {
       "currentFileTests": 5,
@@ -26218,10 +26218,139 @@
         "after": "一部"
       }
     ],
-    "CI": {
+    "ci": {
+      "runId": 43329894547,
+      "sourceSHA": "d05a0751713ccede999b7a70b8637c15fa7d6bf6",
+      "attempt": 1,
+      "conclusion": "failure",
+      "smokeJobs": {
+        "success": 5,
+        "failure": 1,
+        "cancelled": 0
+      },
+      "fullJobObserved": true,
+      "fullConclusion": "skipped",
+      "officialCaseOutcomes": {
+        "chromium": {
+          "passed": 943,
+          "flaky": 0,
+          "failed": 0
+        },
+        "webkit": {
+          "passed": 932,
+          "flaky": 10,
+          "failed": 1
+        }
+      },
+      "officialOutcomesAreNotStrictInitialOrPhysicalCounts": true,
+      "targetCaseIds": [
+        "normal-navigator",
+        "fastplus-inline"
+      ],
+      "targetBrowserPairs": 4,
+      "targetInitialCompleted": 4,
+      "targetRetryAttemptsObserved": 0,
+      "targetPhasesEach": 4,
+      "allTargetMandatorySavedDeploymentReasonsWholeComparisonsMatch": true,
+      "targetPreservationCriticalFalseObserved": false,
+      "targetMissingCaptureOrComparisonFailures": 0,
+      "nodeGateStepsSucceeded": 6,
+      "nodeNumericFooterObserved": false,
+      "normalNodeTestsConfigured": 819,
+      "registryImageDigestDirectlyObserved": false,
+      "environmentReceiptsMatched": 6,
+      "coreSmallZIPs": 12,
+      "coreSmallZIPBytes": 529588,
+      "originalSizeDigestCRCMatches": 12,
+      "membersIndependentlyMatched": 98,
+      "acquisitionGaps": 0,
+      "independentIntegrityResult": "PASS",
+      "integrityPassMeansAllCIPassed": false,
+      "soleFinalFailure": {
+        "browser": "webkit",
+        "shard": 4,
+        "case": "5-5 BKPS ready",
+        "initial": "after-load-search hidden click timeout",
+        "retry1": "after-load-search hidden click timeout",
+        "postSearchLoadWholeComparisonReached": false,
+        "displayChangeCaller": "missing",
+        "cause": "unknown",
+        "savedValueLossConfirmed": false
+      },
+      "oldFailedAttemptsCompletedByThisSuccess": false,
+      "newDiagnosisOrSuccessfulReruns": 0,
+      "recordOnlyAdditionalCIDispatchRequested": false,
+      "failureClassification": {
+        "nonPassedPhysicalAttempts": 12,
+        "hiddenAfterLoadSearchClickTimeoutAttempts": 9,
+        "postLoadPageErrorArrayAssertionsWithAccessControlErrors": 2,
+        "timeoutWithFirstOperationAndStageUnobserved": 1,
+        "soleFinalLogicalFailure": {
+          "browser": "webkit",
+          "shard": "4/4",
+          "jobId": 131571682519,
+          "title": "5-5 BKPS ready keeps prior branches and scouting distinctions through save and load",
+          "physicalAttemptStatuses": [
+            {
+              "retry": 0,
+              "status": "timedOut"
+            },
+            {
+              "retry": 1,
+              "status": "timedOut"
+            }
+          ],
+          "bothObservedStoppingStages": "after-load-search",
+          "laterLoadPreservationReadReached": false
+        },
+        "stageGap": {
+          "browser": "webkit",
+          "shard": "4/4",
+          "title": "6-5 ACDGM stock preserves selected branch and optional combat distinctions through save and load",
+          "retry": 0,
+          "physicalStatus": "timedOut",
+          "finalLogicalOutcome": "flaky",
+          "retry1PhysicalStatus": "passed",
+          "firstOperation": null,
+          "stage": null,
+          "reason": "no same-attempt detailed annotation and compact error location null; not filled from retry"
+        }
+      },
+      "boundedNonTargetUnexpectedPreservationFalseObserved": false,
+      "priorNightRepairHoldsResolved": false,
+      "evidenceRefs": {
+        "canonical": {
+          "path": "private/ci-d05a0751-v1/analysis/canonical-ci-results.json",
+          "bytes": 107904,
+          "sha256": "baf47aa607fbbecb619e3f06a4cf5fec03a1a8fcb3d3d88051437eb9fb396e66"
+        },
+        "shared": {
+          "path": "shared/ci-results.json",
+          "bytes": 99205,
+          "sha256": "48857e028b94afbba5d7befd4e339e13bee92b08529d2149991254859af854c3"
+        },
+        "independentReview": {
+          "path": "private/ci-review/new-ci-independent-review-v1.json",
+          "bytes": 10226,
+          "sha256": "cb9008b00d554d86da018334b56dd448d8d8d4f49c42a31ba749bf4ef786d4d9"
+        },
+        "binding": {
+          "path": "private/ci-d05a0751-v1/analysis/collection-binding.json",
+          "bytes": 6396,
+          "sha256": "36c9c8c93e79f609e6e4e1f6a23c99f0d35ac0b883d0683c9f217157967a0bc1"
+        },
+        "classification": {
+          "path": "private/ci-d05a0751-v1/analysis/failure-classification-v1.json",
+          "bytes": 81307,
+          "sha256": "290fc8eac4345ecbc738d7f5df879e5a87c1b73cd5565188a0089c964cd432f5"
+        }
+      }
+    },
+    "CIBeforeSourceSmoke": {
       "state": "pending final-source one deduplicated smoke",
       "requested": 0,
-      "recordOnlyExtraCIRequested": false
+      "recordOnlyExtraCIRequested": false,
+      "historical": true
     }
   }
 }

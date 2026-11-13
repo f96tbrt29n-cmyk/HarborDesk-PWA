@@ -1,3 +1,5 @@
+> 最新CI確定（2026-11-13 JST）：検証source d05a0751／CI43329894547 attempt1。smoke5成功・W4失敗、Fullは実ジョブskipped。C943/0/0・W932/10/1はpassed/flaky/failedで初回成功数へ換算しない。新対象normal0/H回避1×C/W4は全初回・同試行4phase配備/保存理由/load全文/対象外保持が一致。12小型ZIP計529588Bのsize/公式digest/CRC一致、CI独立照合PASS（CI全体成功ではない）。5-5 BKPS成立は初回/retryともload後click非表示・全文未到達、表示変更元/原因未確定。Node工程6成功、数値footer/registry digestは未観測。28/184/24と旧保留/4-5隔離/原本/draft未公開を維持、記録だけの追加CI0。以下は履歴。
+
 > 最新局所（2026-11-13 JST）：3-2通常index0／H回避index1の有限電探・同艦速力セットを共通検証。製品0。Node初回4/1は参考制空未選択を落とした期待不備、根拠訂正後5/0（旧H後段未到達・spec採取不備は別保持）。C通常/W H回避各初回4phase配備・保存/load保持成功、50原本独立PASS_WITH_GAPS。通常4目標のair84参考未判定とH12成立を分離し、最速CEFL/20/4艦へ流用しない。B/D4セルのみ28/180/28→28/184/24、新編集/固定枠/実装備IDは未確認。最終source通常smoke1回待ち、各保留/4-5隔離/原本/ドラフト未公開を維持。以下は履歴。
 
 > 最新CI確定（2026-11-12 JST）：source ab81d0c5／CI43228941365。C940/1/0、W916/15/10はpassed/flaky/failed、smoke3成功3失敗・取消0。新対象CFJ/2-2/2-3×C/W6は全初回・同試行4phase保持適合。11小型ZIPの公式digest/CRC一致、C2 prerequisite約4.87MBは上限超で未要求。独立照合PASS_WITH_GAPS。1-5旧識別値欠測/後段未到達は補完せず保留。Night W4初回load後6キーaggregateとrepair roster-throw初回safe-abort aggregateの当該操作を追加保留（内訳/原因欠測、旧Night getter懸念と別）。製品0、記録だけ追加CI0、28/180/28を維持。以下は履歴。

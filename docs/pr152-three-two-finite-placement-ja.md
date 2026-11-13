@@ -37,9 +37,21 @@ actual default searchはnormal0=38、normal1=18、H両欠=405、速度成立済7
 
 50原本・旧新2planとNode/UI原文版を独立照合しPASS_WITH_GAPS。gapは初回Nodeの不合格とcontroller counter不一致で、今回UI2は各4phase・sameDocument全true・missing/drop/pageerror0。新規保存不一致は観測していない。原本private、sharedは型付き許可metadataのみ、trace/video/screenshot0、sanitizer/保存値本文の共有0。
 
+## 同sourceの通常CI確定
+
+検証source `d05a0751713ccede999b7a70b8637c15fa7d6bf6`／[CI43329894547](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/43329894547) attempt1は、既存実行一覧2観測で同SHAの受付なしを確認して1回だけdispatch。smoke5成功・W4失敗、実在するFull jobはskipped。C943/0/0、W932/10/1はpassed/flaky/failedで、厳密な初回成功数や物理試行数へ換算しない。各943/82fileの宣言範囲と公式集計を照合した。
+
+新対象normal-navigator／fastplus-inline×C/Wの4例は、各retry0・completed・同じ試行の4phaseが一致。保存配備/理由/全文、同一reload文書、他編成/metadataと対象外保持の必須checkpointを照合し、capture/comparison/missingは空、preservationCriticalFalseObservedは全false。局所2成功とCI4成功を別の試行として保つ。normal1・最速・新編集・固定枠・実装備個体IDへ拡張しない。
+
+最終失敗はW4の5-5 BKPS readyで、初回とRetry#1はいずれもafter-load-searchの非表示ボタンclick待機に停止し、後段のload後全文比較は未到達。表示変更元・根因は欠測で、旧非表示待機と同原因/保存消失とは断定しない。今回との具体的関連根拠は確認できず、追加診断・再実行0。別の成功で当該試行を補完しない。
+
+取得済みの非pass物理試行12件は、load後非表示click timeout9、load比較後の版access-control例外配列検査2、6-5 ACDGM在庫不足の初回timeout1に分類した。最後の1件は最初の操作/停止段階が同試行資料にないため欠測を維持し、retry成功から埋めない。5-5の保存/編集/reloadが失敗行に先行するのはソース順の到達根拠で、当該実値本文や比較operandを直接再取得したとはしない。非対象の公開された保持metadataに予期しないaggregate falseは見られなかった範囲に限定し、未露出のNight/repair内訳や一般保存安全性は証明しない。旧保留は未解決のまま保持する。
+
+12小型ZIP計529588Bを1回ずつ取得し、size/公式SHA-256/CRCと98membersを独立照合してPASS。取得gap0は個別stack/callerや未実施観測の充足を意味しない。固定image設定/6環境receiptのNode24.21.0/PW1.55.0/C1187/W2203を確認し、通常Node工程は6成功。ただし数値TAP footerと実registry digestはこの限定回収では未観測で、819は配置設定数のまま。原本private・shared許可metadataのみ、大容量ZIP全回収0。CI全体failureと独立整合PASSを区別する。
+
 ## 登録・進捗・保留
 
-同じnormal --list原文からC/W各943/82file・WebKit339/164/256/184・2case×C/W4が各selected1と確認。これは登録で実操作成功ではない。通常Nodeは既存814配置＋新5＝819/27fileで、局所に既存814を再実行していない。最終sourceの通常push後に既存runと照合してsmokeを重複なく1回確認し、記録だけで追加CIを起動しない。
+同じnormal --list原文からC/W各943/82file・WebKit339/164/256/184・2case×C/W4が各selected1と確認。これは登録で実操作成功ではない。通常Nodeは既存814配置＋新5＝819/27fileで、局所に既存814を再実行していない。最終sourceの通常push後、同SHAのsmokeを重複なく1回確認した（確定結果は上節）。記録だけで追加CIを起動しない。
 
 28/180/28→28/184/24。3-2/0/normal B/D、3-2/1/fastPlus B/Dの4セルのみ未確認→一部。A/C・normal1・最速・定義/236/59行/旧53は不変。全装備/全在庫/全目標・新編集・iPhone実機・最適性は未確認。
 
