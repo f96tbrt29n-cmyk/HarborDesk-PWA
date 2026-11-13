@@ -1,3 +1,5 @@
+> 最終結果：末尾「最終CI43442723772の確定結果」が現在の状態。CI検証source486と記録追補HEADを区別し、旧失敗・新しい保留・再試行を混同しない。
+
 > CI追補 2026-11-13T23:23:45+09:00：末尾「CI43433457977の確定結果と残る版fixture監査」が現在の結果。c397成功と後続訂正ソースの最終CIを分離する。
 
 > 通信・分割追補 2026-11-13T22:23:21+09:00：末尾「通信fixtureとChromium分割の追補」が現在の作業。旧CI43418204272と新しい最終ソースの検証を区別する。
@@ -280,3 +282,48 @@ southは既に2版URL GETに正常JSON+CORSを返すfixtureを持つため、204
 c397のCI成功後に、同runで判明した5-3 fixtureと、観測準備で確定した既存source監査期待値を訂正した。よって最終ソースはc397と区別し、旧HEADの再実行ではなく、これらの具体的訂正を含む新ソースで通常smokeを1回だけ確認する。既存workflowは必須全smokeを検証するため全945例が対象であり、局所の成功済み個別例は理由なく反復しない。
 
 新しい証拠は `private/followup-43418204272/` と `private/trials/followup-south-network-*`、`followup-five-three-fixture-first` へ分離。初回失敗・setup未到達・修正後契約・実観測・旧CI/新CIを区別する。既存の再開worktreeの診断5差分は保持し、旧ハンドオフ領域の復元と混同しない。セル28/188/20は変更0、旧42原本/旧保留/4-5隔離12件の保持照合はアクセス待ち・未完了。PR152ドラフト・未マージ・本番未公開、main競合・既知凍結、PR151/版/SW/本番未変更を維持する。
+
+## 最終CI43442723772の確定結果
+
+最終検証ソースは486e494815685f66068a21ed7cb705a2884a2ea9。[CI43442723772](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/43442723772) はattempt1/通常smoke、同sourceの自動runなしを照合した後にmanual要求1回だけで、同HEADの再実行はない。先のc397/CI43433457977成功後に判明した具体的fixture/監査訂正を含む新ソースの必要検証であり、先の成功を流用しない。
+
+|対象|論理passed/flaky/failed|物理初回|retry|未開始/終了欠測|
+|---|---|---|---|---|
+|Chromium全3分割|945 / 0 / 0|945 passed|0|0 / 0|
+|WebKit全4分割|938 / 7 / 0|938 passed / 6 failed / 1 timedOut|7 passed|0 / 0|
+
+7smokeジョブは全成功、Full skipped。両browser各945例の集合は一致し、重複/欠落0。旧434182の終了欠測2/未開始43は元ID/file/full-titleで全45例を新ソースへ一意対応し、新試行では全初回成功した。旧runの未到達や原本欠測を成功に変更しない。Night metadata d9d5ff3dは旧2a/source486双方に含まれている。
+
+Cジョブは315例ずつを初回成功し、終端所要は12分52秒/15分03秒/39分59秒だった。45分上限を延長せず全体を完了した一方、同数分割でも所要時間の偏りとrun間変動は大きい。今回の回収完了を確認できた範囲に留め、恒久安定や短縮全体の原因解明とはしない。
+
+### WebKitの7初回非成功
+
+7件はいずれもretry1で成功したが、初回の資料/比較未到達を別に保持する。
+
+|初回case|最初の停止と、同試行で確認できた前段|初回で未到達/未確認|
+|---|---|---|
+|1-4 J回避・有限空母のinline例|版取得2URLの元errors=[]検査。4checkpoint/保存配備・理由/identity/11key/load後再探索の指定比較は通過|例外の応答/発生文書/原因は未確認|
+|5-2 BCEFO unknown|版取得2URLの元errors=[]検査。同文書/complete/customExact/sourcesExact/otherPlanner/procurement/manualの指定比較は通過|unknownのsearchAssessment等値比較は元仕様で非適用で、他試行から補わない|
+|sync receive status|版取得2URLの元errors=[]検査。reload前の負例sync-v1単一キー保持と、正常受信/reload後の艦1件・装備1件UIは通過|このcaseにpostreload6key全文比較は存在せず、成功へ数えない|
+|3-1 CFG unknown|版取得2URLの元errors=[]検査。当該のload/identity比較は通過|wire応答/発生文書/原因は未確認|
+|set remedy procurement（1-6）|pre-reload hdPLLoad()返却2項目/需要検査後、page.reloadのDOMContentLoaded待ちで45秒総期限|reload後のhdPLLoad件数比較と後続在庫更新検査は未到達。保存消失とはしない|
+|carrier three-plane Night|DCL後のhdSENightPolicy('1-1')が期待cv-three/実auto|policy-restored markと元hdFSSuggestionHtml限定errorfilterは未到達。raw保存値/書込成否/原因は未確認|
+|7-5第3 ABDFJOPT known|load後searchのclick await完了後、.hd-oc-resultの12秒待機でelement not found。savedReadは通過|初回loadRead未到達。探索開始/継続/結果反映/画面切替の境界は欠測で、探索遅延や旧Nav原因としない|
+
+通信例外4caseの版GETはすべて既に正常JSON+CORSのfixtureで、故障注入の別caseを正規化する根拠はない。今回差分からの具体的な直接経路は未確認で、間接timing/実行環境の影響も除外できない。製品/試験/環境の原因は未確定のまま、追加JSON横展開・例外の無効化・期限延長・成功目的の再実行は行わない。各例で先行比較を通過したことと、例外の実際の発生時刻/原因を分ける。
+
+### Nightの新しい保留
+
+最終sourceのC Night5例は全初回成功。W Nightは4初回成功と、three-plane初回getter不一致→retry成功の1例に分かれる。別のfighter carrier case50のC/W6キー比較metadata（2非null/4null・全6exact）でthree-plane case168/176を補完しない。
+
+three-plane caseには、postloadの再配備比較やraw Storage/6key全文比較自体がない。初回はgetter比較後のmark/限定例外filterだけが未到達であり、存在しない比較を「未到達」へ追加しない。実保存値の消失・誤書込み、旧Night保留との同原因は確定しない。Night three-planeの初回方針getter復元経路は保留を維持し、同じ試行の保存値/復元境界を判別できる資料がないまま推測修正・追加試験へ進まない。
+
+### 公開判断と証拠
+
+今回閉じたのは、正常版入力fixtureのJSON契約不整合、古いsource監査期待値、C2取消で残った45例の新ソースでの回収、および最終smoke全体の完了確認である。今回の製品コード変更は0。正常JSON下通信例外の原因、Night getter初回不一致、調達案DCL待機、7-5初回結果表示待ち、旧保存不一致/既知凍結とmain競合は未解決として分ける。7job成功だけで公開保留を解除しない。
+
+新Rは `private/followup-43418204272/CI-receipts/43442723772/`。`final-classification.json`、`failure-stage-classification.json`、`webkit-first-attempt-stages.json`、`final-manifest.json` が最終引継ぎ先。小19ZIP計558579bytesは公式digest/sizeに一致し、manifestは296ファイル（自身除外）。巨大raw trace/video ZIPは未取得で、ネットワークheader等のproducer内記録有無は未確認。各同一試行・sourceの対応と、未取得/未到達/そのcaseにない比較を区別して保持する。
+
+この追補だけを記録commitへ分離し通常pushする。CI対象source486と記録追補HEADは別であり、記録だけでは追加CIを起動しない。既存の再開worktreeの診断5差分/ハッシュは保持し、私有観測をcommitしない。旧局所42原本/旧保留/4-5隔離12件/旧作業ツリーの保持照合はアクセス待ち・未完了のまま、復旧探索は0。セル28確認済み/188一部/20未確認（59行236セル）は変更0。PR152ドラフト・未マージ・本番未公開、main統合/PR151/版/SW/本番/マージ/デプロイ/ドラフト解除/自動マージなしを維持する。
+
+最終CI資料だけの独立readbackは、記録済み欠測を残して一致した。manifest296件の実一覧/bytes/SHA-256、19ZIPの公式digest/size/CRC、抽出187memberと、7compact/公式job/注記/945集合/旧45対応を再検証して一致した。初回未到達・raw未取得とNight保留は維持し、旧原本保持照合や全初回成功を意味しない。独立reviewは新Rの外、`private/followup-43418204272/`へ分離する。
