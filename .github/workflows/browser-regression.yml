@@ -133,6 +133,7 @@ jobs:
             test-results/owned-equipment-planner-*/finite-carrier-gap-ui-summary.json
             test-results/owned-equipment-planner-*/three-two-finite-ui-summary.json
             test-results/owned-equipment-planner-*/finite-los-ui-summary.json
+            test-results/night-policy-reload-*/carrier-post-load-storage-comparison.json
           if-no-files-found: warn
           retention-days: 14
 

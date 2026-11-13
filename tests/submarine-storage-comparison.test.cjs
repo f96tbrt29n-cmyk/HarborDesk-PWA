@@ -4,7 +4,7 @@ const assert=require('node:assert/strict');
 const vm=require('node:vm');
 const fs=require('node:fs');
 const path=require('node:path');
-const {COMPARISON_KEYS,POLICY_KEY,submarineStorageComparison,retainStorageComparison}=require('./submarine-storage-comparison.cjs');
+const {COMPARISON_KEYS,POLICY_KEY,submarineStorageComparison,retainStorageComparison,carrierStorageSnapshotComparison}=require('./submarine-storage-comparison.cjs');
 async function fixture(){
  const main={},values=new Map([[COMPARISON_KEYS[1],'PRIVATE_EQUIPMENT'],[COMPARISON_KEYS[2],'PRIVATE_ROSTER'],[POLICY_KEY,'{"1-1":"sub-late"}']]);
  let binding,reads=0,error;const args=[];
@@ -57,4 +57,83 @@ test('comparison verdicts survive as standalone JSON and attachment without save
  const os=require('node:os'),fsp=require('node:fs/promises');const dir=await fsp.mkdtemp(path.join(os.tmpdir(),'submarine-comparison-'));t.after(()=>fsp.rm(dir,{recursive:true}));
  const attachments=[];await retainStorageComparison({outputPath:name=>path.join(dir,name),attach:async(...args)=>attachments.push(args)},'pre-reload-storage-presence',report);
  const body=await fsp.readFile(path.join(dir,'pre-reload-storage-presence.json'),'utf8');assert.ok(!body.includes('PRIVATE'));assert.equal(JSON.parse(body).keys.length,7);assert.equal(attachments[0][1].contentType,'application/json');
+});
+
+const CARRIER_KEYS=Object.freeze(['harbordesk-ship-roster-v1','harbordesk-equipment-v1','harbordesk-kancolle-sync-v1','harbordesk-pwa-v1','harbordesk-custom-fleets-v1','harbordesk-fleet-calculator-v1']);
+test('carrier metadata preserves explicit six-key order and frozen inputs without returning bodies',()=>{
+ const before=Object.freeze(['PRIVATE_ROSTER','PRIVATE_EQUIPMENT',null,null,null,null]);
+ const values=Object.freeze(['PRIVATE_ROSTER','PRIVATE_EQUIPMENT',null,null,null,null]);
+ const document=Object.freeze({timeOrigin:20,url:'http://localhost/'});
+ const sample=Object.freeze({document,at:7,readyState:'complete',policy:'cv-fighter2',values,other:'PRIVATE_IGNORED'});
+ const result=carrierStorageSnapshotComparison(CARRIER_KEYS,before,sample);
+ assert.deepEqual(result,{document:{timeOrigin:20,url:'http://localhost/'},at:7,readyState:'complete',policy:'cv-fighter2',keys:[
+  {key:'harbordesk-ship-roster-v1',presentBefore:true,present:true,length:14,exactMatch:true},
+  {key:'harbordesk-equipment-v1',presentBefore:true,present:true,length:17,exactMatch:true},
+  {key:'harbordesk-kancolle-sync-v1',presentBefore:false,present:false,length:0,exactMatch:true},
+  {key:'harbordesk-pwa-v1',presentBefore:false,present:false,length:0,exactMatch:true},
+  {key:'harbordesk-custom-fleets-v1',presentBefore:false,present:false,length:0,exactMatch:true},
+  {key:'harbordesk-fleet-calculator-v1',presentBefore:false,present:false,length:0,exactMatch:true}
+ ]});
+ // Evidence projection is a fresh allowlisted object, not the original document.
+ assert.notEqual(result.document,document);assert.ok(!Object.hasOwn(result,'values'));
+ assert.ok(!JSON.stringify(result).includes('PRIVATE'));
+ assert.deepEqual(before,['PRIVATE_ROSTER','PRIVATE_EQUIPMENT',null,null,null,null]);
+ assert.deepEqual(values,['PRIVATE_ROSTER','PRIVATE_EQUIPMENT',null,null,null,null]);
+ assert.equal(sample.other,'PRIVATE_IGNORED');
+});
+test('carrier metadata distinguishes null/string transitions, changed strings and empty strings exactly',()=>{
+ const before=Object.freeze(['PRIVATE_A',null,'PRIVATE_B','','PRIVATE_CC',null]);
+ const values=Object.freeze(['PRIVATE_A','x',null,' ','PRIVATE_C',null]);
+ const result=carrierStorageSnapshotComparison(CARRIER_KEYS,before,{document:{timeOrigin:30},readyState:'complete',policy:'cv-fighter2',values});
+ assert.deepEqual(result.keys,[
+  {key:'harbordesk-ship-roster-v1',presentBefore:true,present:true,length:9,exactMatch:true},
+  {key:'harbordesk-equipment-v1',presentBefore:false,present:true,length:1,exactMatch:false},
+  {key:'harbordesk-kancolle-sync-v1',presentBefore:true,present:false,length:0,exactMatch:false},
+  {key:'harbordesk-pwa-v1',presentBefore:true,present:true,length:1,exactMatch:false},
+  {key:'harbordesk-custom-fleets-v1',presentBefore:true,present:true,length:9,exactMatch:false},
+  {key:'harbordesk-fleet-calculator-v1',presentBefore:false,present:false,length:0,exactMatch:true}
+ ]);
+ assert.ok(!JSON.stringify(result).includes('PRIVATE'));
+});
+test('carrier metadata rejects malformed keys or six-value samples without coercion',()=>{
+ const values=Object.freeze([null,null,null,null,null,null]),sample={values};
+ for(const keys of [null,CARRIER_KEYS.slice(1),[...CARRIER_KEYS.slice(0,5),CARRIER_KEYS[0]],[...CARRIER_KEYS.slice(0,5),3],[...CARRIER_KEYS.slice(0,5),'unknown-key'],new Array(6)])assert.throws(()=>carrierStorageSnapshotComparison(keys,values,sample),/invalid carrier comparison keys/);
+ for(const before of [null,[],[null,null,null,null,null,0],new Array(6)])assert.throws(()=>carrierStorageSnapshotComparison(CARRIER_KEYS,before,sample),/invalid carrier comparison baseline/);
+ for(const invalid of [null,{}, {values:[]},{values:[null,null,null,null,null,undefined]},{values:new Array(6)}])assert.throws(()=>carrierStorageSnapshotComparison(CARRIER_KEYS,values,invalid),/invalid carrier comparison (sample|values)/);
+});
+test('carrier metadata propagates existing input read exceptions unchanged',()=>{
+ const sentinel=Object.freeze({kind:'existing-read-exception'}),before=[null,null,null,null,null,null];
+ Object.defineProperty(before,0,{get(){throw sentinel}});Object.freeze(before);
+ assert.throws(()=>carrierStorageSnapshotComparison(CARRIER_KEYS,before,{values:[null,null,null,null,null,null]}),error=>error===sentinel);
+ const sample=Object.freeze(Object.defineProperty({},'values',{get(){throw sentinel}}));
+ assert.throws(()=>carrierStorageSnapshotComparison(CARRIER_KEYS,[null,null,null,null,null,null],sample),error=>error===sentinel);
+});
+
+test('carrier document evidence excludes query, fragment, credentials and unknown fields',()=>{
+ const values=Object.freeze([null,null,null,null,null,null]);
+ const document=Object.freeze({timeOrigin:31,url:'https://user:PRIVATE_PASSWORD@fixture.invalid/path/to?q=PRIVATE_QUERY#PRIVATE_FRAGMENT',extra:'PRIVATE_FIELD'});
+ const result=carrierStorageSnapshotComparison(CARRIER_KEYS,values,Object.freeze({document,values,readyState:'complete',policy:'cv-fighter2'}));
+ assert.deepEqual(result.document,{timeOrigin:31,url:'https://fixture.invalid/path/to'});
+ assert.notEqual(result.document,document);
+ assert.equal(document.url,'https://user:PRIVATE_PASSWORD@fixture.invalid/path/to?q=PRIVATE_QUERY#PRIVATE_FRAGMENT');
+ assert.equal(document.extra,'PRIVATE_FIELD');
+ assert.ok(!JSON.stringify(result).includes('PRIVATE'));
+});
+test('carrier document evidence marks unavailable identity fields as null without exposing non-HTTP bodies',()=>{
+ const values=Object.freeze([null,null,null,null,null,null]);
+ const unavailable=Object.freeze({get timeOrigin(){throw Error('unavailable document clock')},get url(){throw Error('unavailable document address')}});
+ for(const [document,expected]of [
+  [undefined,{timeOrigin:null,url:null}],
+  [null,{timeOrigin:null,url:null}],
+  [42,{timeOrigin:null,url:null}],
+  [{timeOrigin:NaN,url:'/relative?PRIVATE_QUERY'},{timeOrigin:null,url:null}],
+  [{timeOrigin:Infinity,url:'data:text/plain,PRIVATE_BODY'},{timeOrigin:null,url:null}],
+  [{timeOrigin:'42',url:'javascript:PRIVATE_BODY'},{timeOrigin:null,url:null}],
+  [unavailable,{timeOrigin:null,url:null}],
+  [{timeOrigin:0,url:'http://localhost:4173/safe?PRIVATE_QUERY#PRIVATE_FRAGMENT'},{timeOrigin:0,url:'http://localhost:4173/safe'}]
+ ]){
+  const result=carrierStorageSnapshotComparison(CARRIER_KEYS,values,{document,values});
+  assert.deepEqual(result.document,expected);
+  assert.ok(!JSON.stringify(result).includes('PRIVATE'));
+ }
 });

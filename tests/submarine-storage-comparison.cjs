@@ -31,4 +31,23 @@ async function retainStorageComparison(info,name,verdict){
  await fs.writeFile(file,JSON.stringify(verdict,null,2)+'\n');
  await info.attach(name,{path:file,contentType:'application/json'});
 }
-module.exports={COMPARISON_KEYS,POLICY_KEY,submarineStorageComparison,retainStorageComparison};
+// Consume the carrier test's existing read results, in its explicit key order.
+// Do not reread Storage or expose either side of the exact string comparison.
+function carrierStorageSnapshotComparison(keys,before,sample){
+ if(!Array.isArray(keys)||keys.length!==6||new Set(keys).size!==6||!Array.from(keys).every(key=>typeof key==='string'&&KEYS.includes(key)))throw new TypeError('invalid carrier comparison keys');
+ const valid=values=>Array.isArray(values)&&values.length===6&&Array.from(values).every(value=>value===null||typeof value==='string');
+ if(!valid(before))throw new TypeError('invalid carrier comparison baseline');
+ if(!sample||typeof sample!=='object')throw new TypeError('invalid carrier comparison sample');
+ const values=sample.values;
+ if(!valid(values))throw new TypeError('invalid carrier comparison values');
+ // Auxiliary evidence keeps only document identity and the public HTTP(S) path.
+ // The original assertion still compares its complete document object separately.
+ const sourceDocument=sample.document,document={timeOrigin:null,url:null};
+ if(sourceDocument&&typeof sourceDocument==='object'){
+  try{const value=sourceDocument.timeOrigin;if(Number.isFinite(value))document.timeOrigin=value}catch{}
+  try{const value=sourceDocument.url;if(typeof value==='string'){const parsed=new URL(value);if(['http:','https:'].includes(parsed.protocol))document.url=parsed.origin+parsed.pathname}}catch{}
+ }
+ return {document,at:sample.at,readyState:sample.readyState,policy:sample.policy,
+  keys:keys.map((key,i)=>({key,presentBefore:before[i]!==null,present:values[i]!==null,length:values[i]?.length??0,exactMatch:values[i]===before[i]}))};
+}
+module.exports={COMPARISON_KEYS,POLICY_KEY,submarineStorageComparison,retainStorageComparison,carrierStorageSnapshotComparison};

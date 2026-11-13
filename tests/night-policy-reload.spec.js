@@ -2,7 +2,7 @@ const { test: baseTest, expect } = require('@playwright/test');
 const test = baseTest.extend({trace:{mode:'retain-on-failure',snapshots:false,screenshots:true,sources:true}});
 const { observeReload } = require('./reload-evidence.cjs');
 const { observeStorage } = require('./pwa-storage-audit.cjs');
-const { submarineStorageComparison, retainStorageComparison } = require('./submarine-storage-comparison.cjs');
+const { submarineStorageComparison, retainStorageComparison, carrierStorageSnapshotComparison } = require('./submarine-storage-comparison.cjs');
 // Keep successful first-attempt diagnostics for the targeted submarine case too.
 const submarineNightTest = test.extend({
  trace:{mode:'on',snapshots:false,screenshots:true,sources:true},video:'on'
@@ -50,6 +50,8 @@ test('night CI policy selection regenerates the quick owned loadout and persists
 test('carrier night CI policy persists and regenerates the mobile loadout',async({page},testInfo)=>{
  const retainReloadEvidence=observeReload(page,testInfo,{storageHeaders:true});
  const storageAudit=await observeStorage(page,testInfo,{scriptErrorBoundary:true,keyPresence:true});
+ let loadStorageComparison=null,priorCaseFailed=false;
+ try {
  try {
  await retainReloadEvidence.installNativeEvents({instrumentSW:!!testInfo.project.metadata?.swProbe||process.env.HD_RELOAD_BUFFER_SW==='1',parserBoundary:testInfo.project.metadata?.parserBoundary!==false,parserLoadBoundary:42,parserSingleScript:true});
  await retainReloadEvidence.installVersionCalls();
@@ -85,6 +87,9 @@ test('carrier night CI policy persists and regenerates the mobile loadout',async
  await page.waitForLoadState('load');
  retainReloadEvidence.mark('reload-load');
  const afterLoad=await page.evaluate(keys=>({document:{timeOrigin:performance.timeOrigin,url:location.href},readyState:document.readyState,values:keys.map(k=>localStorage.getItem(k)),policy:hdSENightPolicy('1-1')}),saved.keys);
+ // Capture verdicts from the existing read, before any assertion can fail.
+ // No extra Storage read or wait; retain the bounded metadata in finally.
+ loadStorageComparison=carrierStorageSnapshotComparison(saved.keys,saved.values,afterLoad);
  expect(afterLoad.document).toEqual(reloadedDocument);
  expect(afterLoad.readyState).toBe('complete');
  expect(afterLoad.values).toEqual(saved.values);
@@ -94,6 +99,15 @@ test('carrier night CI policy persists and regenerates the mobile loadout',async
  await storageAudit.mark('post-load-storage-and-policy-restored');
  await testInfo.attach('post-load-storage-verification',{body:Buffer.from(JSON.stringify({document:afterLoad.document,readyState:afterLoad.readyState,policy:afterLoad.policy,keys:saved.keys.map((key,i)=>({key,present:afterLoad.values[i]!==null,exactMatch:afterLoad.values[i]===saved.values[i]}))})),contentType:'application/json'});
  } catch(error) { retainReloadEvidence.failure(); throw error; } finally { try{await storageAudit.finish()}finally{await retainReloadEvidence();} }
+ } catch(error) { priorCaseFailed=true; throw error; } finally {
+  if(loadStorageComparison){
+   try{await retainStorageComparison(testInfo,'carrier-post-load-storage-comparison',loadStorageComparison)}
+   catch(error){
+    testInfo.annotations.push({type:'carrier-storage-comparison-collection-failed',description:'Comparison metadata retention failed; any original case failure is preserved.'});
+    if(!priorCaseFailed)throw error;
+   }
+  }
+ }
 });
 
 test('carrier bomber CI policy persists and regenerates the mobile loadout',async({page},testInfo)=>{
