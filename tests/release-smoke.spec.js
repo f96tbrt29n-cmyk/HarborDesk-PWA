@@ -653,6 +653,108 @@ test('release smoke: explicit workspace navigation wins over deferred startup re
   expect(result.after).toMatchObject({ group: 'arsenal', section: 'equipmentBook' });
   await expect(page.locator('#equipmentBook')).toBeVisible();
   expect(errors).toEqual([]);
+
+
+  await expect.poll(() => page.evaluate(() =>
+    typeof window.hdMSNOpen === 'function' &&
+    typeof window.hdWSOpenAnchorId === 'function' &&
+    typeof window.hdWSHandleAnchor === 'function' &&
+    window.__hdWorkspaceCompatInstalled === true
+  )).toBe(true);
+
+  for (const kind of ['startup-anchor', 'clicked-anchor']) {
+    const started = await page.evaluate(kind => {
+      const guide = document.getElementById('guide');
+      const navigator = document.getElementById('mapStrategyNavigator');
+      const checkpoint = document.createElement('span');
+      checkpoint.id = 'hdDeferredAnchorCheckpoint';
+      navigator.appendChild(checkpoint);
+      const counts = { oldGuide: 0, checkpoint: 0 };
+      const restores = [];
+      for (const [element, key] of [[guide, 'oldGuide'], [checkpoint, 'checkpoint']]) {
+        const own = Object.getOwnPropertyDescriptor(element, 'scrollIntoView');
+        const original = element.scrollIntoView;
+        element.scrollIntoView = function(...args) {
+          counts[key]++;
+          return Reflect.apply(original, this, args);
+        };
+        restores.push(() => {
+          if (own) Object.defineProperty(element, 'scrollIntoView', own);
+          else delete element.scrollIntoView;
+        });
+      }
+      const anchorFor = id => {
+        const link = document.createElement('a');
+        link.setAttribute('href', '#' + id);
+        return link;
+      };
+      window.__HD_DEFERRED_ANCHOR_REGRESSION = {
+        counts,
+        restore() { for (const restore of restores) restore(); checkpoint.remove(); }
+      };
+      const oldOpened = kind === 'startup-anchor'
+        ? window.hdWSOpenAnchorId('guide', true)
+        : window.hdWSHandleAnchor(anchorFor('guide'));
+      const oldEpoch = Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH) || 0;
+      window.hdMSNOpen('2-5');
+      const afterOpen = window.hdWSCurrentLocation();
+      const newEpoch = Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH) || 0;
+      // This later real product70ms callback is a causal checkpoint: the earlier
+      // 0ms/70ms guide callback must have run or been invalidated before it.
+      const checkpointOpened = window.hdWSHandleAnchor(anchorFor(checkpoint.id));
+      return { oldOpened, oldEpoch, newEpoch, afterOpen, checkpointOpened };
+    }, kind);
+    expect(started.oldOpened).toBe(true);
+    expect(started.newEpoch).toBeGreaterThan(started.oldEpoch);
+    expect(started.afterOpen).toMatchObject({ group: 'guide', section: 'mapStrategyNavigator' });
+    expect(started.checkpointOpened).toBe(true);
+    await expect.poll(() => page.evaluate(() => window.__HD_DEFERRED_ANCHOR_REGRESSION.counts.checkpoint)).toBe(1);
+    const settled = await page.evaluate(() => {
+      const state = window.__HD_DEFERRED_ANCHOR_REGRESSION;
+      const result = { counts: { ...state.counts }, current: window.hdWSCurrentLocation() };
+      state.restore();
+      delete window.__HD_DEFERRED_ANCHOR_REGRESSION;
+      return result;
+    });
+    // A later valid callback could restore navigator even after a stale guide
+    // scroll. Check the old target's call count as well as the final display.
+    expect(settled.counts).toEqual({ oldGuide: 0, checkpoint: 1 });
+    expect(settled.current).toMatchObject({ group: 'guide', section: 'mapStrategyNavigator' });
+    await expect(page.locator('#mapStrategyNavigator')).toBeVisible();
+    await expect(page.locator('#guide')).toBeHidden();
+  }
+
+  const latestGuide = await page.evaluate(() => {
+    const guide = document.getElementById('guide');
+    const own = Object.getOwnPropertyDescriptor(guide, 'scrollIntoView');
+    const original = guide.scrollIntoView;
+    const state = { calls: 0, restore() {
+      if (own) Object.defineProperty(guide, 'scrollIntoView', own);
+      else delete guide.scrollIntoView;
+    } };
+    guide.scrollIntoView = function(...args) {
+      state.calls++;
+      return Reflect.apply(original, this, args);
+    };
+    window.__HD_LATEST_GUIDE_REGRESSION = state;
+    const link = document.createElement('a');
+    link.setAttribute('href', '#guide');
+    return { opened: window.hdWSHandleAnchor(link), current: window.hdWSCurrentLocation() };
+  });
+  expect(latestGuide.opened).toBe(true);
+  expect(latestGuide.current).toMatchObject({ group: 'guide', section: 'guide' });
+  await expect.poll(() => page.evaluate(() => window.__HD_LATEST_GUIDE_REGRESSION.calls)).toBe(1);
+  const legitimate = await page.evaluate(() => {
+    const state = window.__HD_LATEST_GUIDE_REGRESSION;
+    const result = { calls: state.calls, current: window.hdWSCurrentLocation() };
+    state.restore();
+    delete window.__HD_LATEST_GUIDE_REGRESSION;
+    return result;
+  });
+  expect(legitimate).toMatchObject({ calls: 1, current: { group: 'guide', section: 'guide' } });
+  await expect(page.locator('#guide')).toBeVisible();
+  await expect(page.locator('#mapStrategyNavigator')).toBeHidden();
+  expect(errors).toEqual([]);
 });
 
 

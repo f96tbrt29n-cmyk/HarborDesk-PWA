@@ -123,10 +123,12 @@ function hdWSOpenAnchorId(id,scroll=true){
  id=String(id||'').trim();if(!id||id.startsWith('kcimport='))return false;
  const el=document.getElementById(id);if(!el)return false;
  const section=hdWSManagedSectionFor(el);if(!section)return false;
- hdWSMarkDirectNavigation();
+ const epoch=hdWSMarkDirectNavigation();
  const group=section.dataset.hdWorkspaceGroup||hdWSGroupForSection(section);
  hdWSClearPin();hdWSApply(group,section.id,{ignorePin:true});
- if(scroll)setTimeout(()=>el.scrollIntoView({behavior:'auto',block:'start'}),0);
+ // A newer direct destination supersedes this deferred scroll; the compatibility
+ // bridge can otherwise reopen its now-hidden old section.
+ if(scroll)setTimeout(()=>{if(epoch===(Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0))el.scrollIntoView({behavior:'auto',block:'start'})},0);
  return true;
 }
 function hdWSInitialAnchorId(){
@@ -568,7 +570,7 @@ window.hdWSRevealElement=hdWSRevealElement;
 function hdWSPatchQuickNav(){
  window.__hdWSQuickPatched=true;
 }
-function hdWSHandleAnchor(a){const href=a?.getAttribute?.('href')||'';if(!href.startsWith('#')||href==='#')return false;let id='';try{id=decodeURIComponent(href.slice(1))}catch{id=href.slice(1)}const target=document.getElementById(id);if(!target)return false;hdWSMarkUserNavigation();hdWSShowElement(target,false);setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),70);return true}
+function hdWSHandleAnchor(a){const href=a?.getAttribute?.('href')||'';if(!href.startsWith('#')||href==='#')return false;let id='';try{id=decodeURIComponent(href.slice(1))}catch{id=href.slice(1)}const target=document.getElementById(id);if(!target)return false;hdWSMarkUserNavigation();hdWSShowElement(target,false);const epoch=Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0;setTimeout(()=>{if(epoch===(Number(window.__HD_WORKSPACE_DIRECT_NAV_EPOCH)||0))target.scrollIntoView({behavior:'smooth',block:'start'})},70);return true}
 function hdWSRefresh(){if(Date.now()<hdWSNavLockUntil){hdWSScheduleRefresh();return}hdWSApply(hdWSState.group,hdWSState.sections?.[hdWSState.group]);hdWSPatchQuickNav();hdWSUpdateBadges()}
 function hdWSMutationAddsSection(ms){return ms.some(m=>[...m.addedNodes].some(n=>n?.nodeType===1&&(n.matches?.('section')||n.querySelector?.('section'))))}
 function hdWSScheduleRefresh(){clearTimeout(hdWSRefreshTimer);const delay=Math.max(60,hdWSNavLockUntil-Date.now()+20);hdWSRefreshTimer=setTimeout(hdWSRefresh,delay)}
