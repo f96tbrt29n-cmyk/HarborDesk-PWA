@@ -15,8 +15,8 @@ function hdFLCatalogByName(){
  if(!hdFLCatalogIndex||hdFLCatalogIndex.catalog!==catalog||hdFLCatalogIndex.length!==catalog.length||hdFLCatalogIndex.coverage!==coverage)hdFLCatalogIndex={catalog,length:catalog.length,coverage,byName:new Map(catalog.map(x=>[hdFLNorm(x.name),x]))};
  return hdFLCatalogIndex.byName;
 }
-function hdFLInventory(){
- const rows=hdFLRows(),m=new Map();if(!rows.length)return m;
+function hdFLInventory(rows=hdFLRows()){
+ const m=new Map();if(!rows.length)return m;
  const byName=hdFLCatalogByName();
  for(const row of rows){
   const norm=hdFLNorm(row.name),star=Math.max(0,Number(row.star)||0),key=hdFLInventoryStackKey(row.name,star),count=Math.max(0,Number(row.count)||0);if(!norm||!count)continue;

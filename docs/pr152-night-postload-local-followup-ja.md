@@ -327,3 +327,43 @@ three-plane caseには、postloadの再配備比較やraw Storage/6key全文比�
 この追補だけを記録commitへ分離し通常pushする。CI対象source486と記録追補HEADは別であり、記録だけでは追加CIを起動しない。既存の再開worktreeの診断5差分/ハッシュは保持し、私有観測をcommitしない。旧局所42原本/旧保留/4-5隔離12件/旧作業ツリーの保持照合はアクセス待ち・未完了のまま、復旧探索は0。セル28確認済み/188一部/20未確認（59行236セル）は変更0。PR152ドラフト・未マージ・本番未公開、main統合/PR151/版/SW/本番/マージ/デプロイ/ドラフト解除/自動マージなしを維持する。
 
 最終CI資料だけの独立readbackは、記録済み欠測を残して一致した。manifest296件の実一覧/bytes/SHA-256、19ZIPの公式digest/size/CRC、抽出187memberと、7compact/公式job/注記/945集合/旧45対応を再検証して一致した。初回未到達・raw未取得とNight保留は維持し、旧原本保持照合や全初回成功を意味しない。独立reviewは新Rの外、`private/followup-43418204272/`へ分離する。
+
+## CI43442723772の7初回非成功・限定追跡と7-5固定入力終了
+
+開始HEADは72806e4ded6188e65691b08c6b9caf30df66ff70、リモートと一致し、CI source486e494815685f66068a21ed7cb705a2884a2ea9との差分は前節の記録だけだった。旧CIのC945/0/0、W938/7/0（passed/flaky/failed）、W初回938passed/6failed/1timedOutとretry7passedを変更しない。7smoke成功、Full skippedを全初回成功・Full実施へ読み替えない。
+
+新しい追跡は既存7初回を前節のcase/job/attemptへ対応付けた後に限定した。固定Playwright1.55.0 digest、Node24.21.0、WebKit2203/Chromium1187、workers1/retries0、45秒/12秒、元入力・Storage呼出し・待機・取消・例外検査を維持。私有観測は既存ソースへ完全逆変換でき、元this/引数/返却/throwと採取上限を契約で確認した。原値はprivate、外部アップロードなし。一般観測の負荷・cap・未到達を成功に含めない。
+
+### Night・通信・DCL
+
+- Night three-plane：固定Node11契約成功、診断下W初回1成功/retry0。選択changeから元fleet-loadout-planner.js:551のsetItem1回が正常返却。新文書の元getterが実際に消費した読取りは解析可能なcv-threeで、保存引数/最後に記録できた旧文書読取りと文字列直接一致、getterもcv-three。setの正常返却だけを物理flush成功とはしない。旧文書一般readは64capで89drop、反復89件は別途集約。critical2/Node送達drop0・採取失敗0。post-returnのtable確認は実読取り時点とは別。旧初回の保存値/書込み成否/原因は欠測のまま、保存消失・復元競合・試験原因のいずれとも断定しない。
+- 通信4例（1-4 inline、5-2 unknown、sync status、3-1 unknown）：元fixtureは既に正常JSON+CORS/SWblockで、前回の204訂正とは別範囲。固定Node7契約成功、代表sync status W1回成功/retry0。旧文書の自動535経路で両GETの実response200/JSON/ACAO*、redirectなし/fromSW=false、既存allSettledは両fulfilled、元finally到達/catchなし。27events/drop0/採取失敗0。新文書は設置/DCL/loadまでで版fetch未観測、成功としない。旧4初回の応答/要求元/消費境界/更新UI最終状態はこの正常例で補完しない。製品/試験/環境の原因は未確定、追加のモック・例外除外は0。
+- 1-6調達案DCL：既存待機契約7成功を再利用。最初のlist0は私有入力0700/0600をUID1001で読めない準備不備で、browser未開始。読取り権限だけ補正し、実W初回1成功/retry0。report.startTimeからreload開始4.540秒、45秒の名目残予算40.460秒（worker内部deadline未観測）、新文書init→DCLを確認。元hdPLLoad前後2項目検査と後続在庫更新/不足0まで通過。新文書load、保存文字列全文一致、物理flushはこのcaseの確認外。旧CI初回の残予算・DCL境界・原因は未確定のまま。
+
+### 7-5：観測した失敗と修正根拠
+
+私有W初回1は、旧CIのload後とは違い保存前first-searchの12秒result待ちで失敗した。handler/async/最初のnext直前まで到達、Navは可視、done/cache/renderは未観測、drop/採取失敗0。保存・編集・reload・全文比較は未到達。元finally以外の失敗後evaluateは追加しない。
+
+この失敗で欠測だったnext返却と粗い候補進行だけを別コピーへ追加し、固定Node5契約後にW1回/retry0で確認した。初回nextは188msで50候補を返し、既存yieldで500から5500候補まで進行、最後はhandler開始から11.638秒。result待機は12008.750msで失敗し、done/then/cache/render/catch/staleは未観測だった。期限近くまで候補評価を続けていたことを確認し、無配送・画面切替・最初の同期next停止とは区別する。2試行は異なる観測目的で原本を分離し、成功目的の反復をしない。旧CIのload後失敗全体を同原因と確定したわけではない。
+
+当該入力は6艦の経路/係数4・索敵63等と他の装備目標が既知ratio1、唯一の変更可能な未達は任意cap-carrier-attack(count0/min1)。登録11装備にその部品がなく、未選択制空はmanual/ratio0の固定入力である。scoreはgoalのratio/okと必須checkの到達度だけ、best更新はstrictな増加時だけなので、この狭い境界では交換候補を増やしてもbestを改善できない。待機・上限の引下げで通すのではなく、この固定入力を判定できる場合だけ通常列挙を省く。
+
+製品変更は以下に限定した。
+
+- 7-5 index2/ABDFJOPT・6既知艦・LOS4/63・制空未選択・既知の単一攻撃機recipe・全他goal/必須check最大・raw ledger/正規化inventory整合・攻撃機部品在庫なしを厳密に確認する。情報不足・別経路/定義・選択済み制空・他の未達/利用者目標・攻撃機候補がある場合は通常探索を維持する。
+- 既存port/synchronized seedの後で判定し、空き枠補充、最終再計算、不足生成、readiness、保存処理は元の経路を通す。complete=false/exhaustive=falseと不足/未判定を維持し、終了理由seven-five-third-fixed-stockを表示・保存する。網羅性・最適性・購入必須とはしない。
+- hdFLInventoryの既定呼出しを保ち、hdOCBuildで既存1回のledger読取りを同じsnapshotとして受け渡す。新しいStorage呼出し/保存形式/保存値の追加は0。ledgerはplanや保存metadataへ出さない。探索上限10000/beam5/depth24、25ms/0ms待機、取消・署名検査は変更しない。
+
+### 修正後の必要検証と監査訂正
+
+最初の固定Node3filesは24件中23成功/1失敗（新guard10/10、5-4の8/8、7-5 display5/6）。失敗は既存source監査へ今回の承認差分が未投影だった点で、初回rawを保持した。既存golden/hashを変えず、今回2製品の7差分だけを完全逆変換/再適用するstrict fixtureを追加し、不明変更/二重適用の拒否も検査した。影響するdisplay/upper-centralの訂正後14件は全成功。新guardと5-4の成功済み検査は局所で理由なく反復しない。最初のworkflow登録位置の想定不一致も準備記録として分離し、実際のNode一覧へ新guardを1件だけ登録した。
+
+診断を外した製品ソースでknownをC→W各1回、retries0で実行し、両方初回成功。初回/同文書load後の両探索で新終了理由、未達carrier/未選択air、元11装備と索敵・経路区分を維持した。結果表示→不足案保存→メモ編集→同一文書load後再探索→保存後の全文/identity/metadata/他編成・他map・対象外キー比較まで元アサーションを通過した。stock/unknownのUI成功を今回再利用して格上げするのではなく、新guardがそれらを除外するNode境界を確認した。固定枠・装備個体単位の配備/重複防止は今回も未確認。
+
+局所はbase72806e4d上の未commit snapshotで実行し、各trialの全ファイルmanifestと終了後一致を保持した。これらを収録する修正commitが次のCI対象となる。共通2製品と必要なsource監査/既存known期待を変更したため、最終修正ソースで通常7smokeを1回確認する。自動runとの一致を確認し、重複要求・Full・成功目的の再実行は行わない。
+
+### 公開判断・引継ぎ
+
+Night方針getter旧不一致、正常JSON下4通信例外、旧調達案DCLの原因/旧試行欠測は未解決。7-5は今回確認できた固定入力での不要な列挙を修正した範囲であり、旧load後失敗の全原因・一般探索の性能保証ではない。Fullはmanual suite=fullだけのlegacy ship-master監視でsmokeの上位集合/必須公開gateではなく、今回の変更にFull実行義務はない。preparedオフライン2ケース×C/Wはsmoke/Fullに含まれない公開前の別必須確認で、今回未実施。古いprepared成功を現在候補へ流用しない。
+
+新しい証拠は `private/seven-first-attempts-20261114/` と `private/trials/seven-*`。旧CI資料と原本は変更しない。再開worktreeの診断5差分も製品へ混ぜず保持する。旧局所42/旧保留/4-5隔離12件/旧作業ツリーの保持照合はアクセス待ち・未完了のまま、復旧探索0。セル28/188/20（59行236セル）は変更0。PR152ドラフト・未マージ・未公開、main競合/既知凍結、PR151/版/SW/本番未変更、公開/デプロイ/自動マージなしを維持する。
