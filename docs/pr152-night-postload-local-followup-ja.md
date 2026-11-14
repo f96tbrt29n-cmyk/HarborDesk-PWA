@@ -367,3 +367,53 @@ three-plane caseには、postloadの再配備比較やraw Storage/6key全文比�
 Night方針getter旧不一致、正常JSON下4通信例外、旧調達案DCLの原因/旧試行欠測は未解決。7-5は今回確認できた固定入力での不要な列挙を修正した範囲であり、旧load後失敗の全原因・一般探索の性能保証ではない。Fullはmanual suite=fullだけのlegacy ship-master監視でsmokeの上位集合/必須公開gateではなく、今回の変更にFull実行義務はない。preparedオフライン2ケース×C/Wはsmoke/Fullに含まれない公開前の別必須確認で、今回未実施。古いprepared成功を現在候補へ流用しない。
 
 新しい証拠は `private/seven-first-attempts-20261114/` と `private/trials/seven-*`。旧CI資料と原本は変更しない。再開worktreeの診断5差分も製品へ混ぜず保持する。旧局所42/旧保留/4-5隔離12件/旧作業ツリーの保持照合はアクセス待ち・未完了のまま、復旧探索0。セル28/188/20（59行236セル）は変更0。PR152ドラフト・未マージ・未公開、main競合/既知凍結、PR151/版/SW/本番未変更、公開/デプロイ/自動マージなしを維持する。
+
+## 修正source bfe632f4・CI43531997808の確定結果とNight保持停止
+
+修正commitはbfe632f49e748efd4e816a0f24257b5c3b544a38。局所で使用したbase72806e4d上の未commit snapshotについて、記録Markdown以外の9ファイルがこのcommitのbytes/SHA-256と一致することを別receiptで確認した。通常push後、同ブランチ/完全SHAの自動runなし・進行runなしを照合し、[CI43531997808](https://github.com/f96tbrt29n-cmyk/HarborDesk-PWA/actions/runs/43531997808) を2026-11-14 00:07:18 UTCに通常smokeとして1回だけ要求した。attempt1、7smokeジョブは全成功、Fullはskip/未実施。追加要求・成功目的の再実行は0。
+
+|browser|passed / flaky / failed|元結果の初回|retry|未開始・終了欠測・取消|
+|---|---|---|---|---|
+|Chromium|945 / 0 / 0|945 passed|0|0|
+|WebKit|941 / 4 / 0|941 passed / 4 failed|各retry1 passed|0|
+
+両945集合は旧baseline・browser間で一致、重複/欠落0。全7jobのNode/固定browser確認も成功した。旧43442723772の7初回非成功は、今回ソースでは全て初回成功。ただし旧初回の欠測/原因をこの成功で補完しない。7-5第3は実一覧3ケース×C/Wすべて初回成功し、known両browserの2探索・保存後/同文書load後・identity30項目等の指定比較をsummaryでも照合した。保存/編集により初期custom全文は意図的に変わり、保存後→loadで全文一致する区間を確認した意味である。
+
+### 新しい4初回非成功
+
+|case|同じ初回で確認できた境界|retryと原因判定|
+|---|---|---|
+|Night carrier-night（cv-fighter2）|DCL後の方針getter/6キー等値比較を通過後、元errors=[]で版2URLのaccess-control例外。load後完全比較は未到達|retry1成功。旧docの自動535→436→31/32入口が元reload中に実行。例外は旧pagehideより前。実応答/redirect/CORS・settlementは未確認|
+|Night carrier-bomber|DCL後cv-bomber getterを通過後、元errors=[]で診断upstreamのaccess-control例外。このcaseに6キー比較は存在しない|retry1成功。hdDXGithubHead→hdDXUpstreamFreshness→hdDXCollectのstack。どの起動通知がCollectを進めたかは欠測|
+|Night submarine|baselineとDCL方針確認、同じreload文書/completeを通過後、元line158の全文比較で装備台帳/艦台帳がfalse|retry1成功と分離。後述の保持疑いを優先しNight追加実行を停止|
+|5-3 drum-one|load後の指定同文書/complete/custom/他planner/route等の比較を通過後、元errors=[]で版2URLのaccess-control例外|retry1成功。実応答・発生doc等のrawは未取得。W4や旧別試行の資料で補完しない|
+
+Nightの通信には当該テスト側route mock自体がなく、正常版2GETのfixture訂正を流用する根拠はない。carrierの自動版取得と、bomberの `api.github.com/repos/Tibowl/api_start2/commits/master` / `api.github.com/repos/poooi/poi/commits/master` は別の応答契約である。後者は製品diagnostics-center.jsがSHA/date JSONを期待する取得で、試験で新たに作った要求ではない。
+
+取得したW4初回2 traceでは該当request/responseは未観測、.networkも0Bで実応答は未収録だった。『要求が存在しない/空応答/CORS headerが不正』とは判定しない。retryの403/ACAO*を初回へ流用しない。版entry wrapperは元this/引数/返却を転送するだけで、新fetch生成の根拠はなく、bomberにはそのwrapperもない。製品/試験/実行環境の原因は未確定。pagehideより前の例外なので、pagehideでtimerを取消すだけで防げるともいえない。モック横展開・例外除外・推測修正は行わない。
+
+### 新Night潜水艦初回：保持疑いの観測と限界
+
+小資料だけでは判別できなかったため、当該W4原本ZIP1件だけを通常connectorと返されたFileServiceの通常GETで取得した。203,549,391 bytes、公式SHA-256 `15792a56fab61e651143234ace0afdf9fcb17d73dd0e45e29a7d9e84d61815cd` と一致。range取得・認証変更・制限回避は0。他ジョブの大ZIPは取得せず、Night3初回のJSON/traceと別retry JSONだけ17memberを選択抽出した。原ZIP/選択原本は未加工privateで保持し、新たな外部共有はしない。
+
+元helperが実際に比較した読取りは、baselineの装備・艦台帳・Night方針の非null文字列から、load後3件ともnullへ変わり、同時点の方針getterはautoだった。元line158では先頭6キーの装備/艦台帳がfalseとなって失敗し、後続のNight方針全文assert、方針assert、再度の限定error検査・完了markは未到達。ただしその前に保持したpost-load metadataにはNight方針のnull/autoも記録されている。存在しない成功/後続到達を加えない。
+
+同一newdoc/originの別audit読取りでは、policy-restored789msまではStorage列挙10件で対象2キーの存在/own/enumeratedがtrue、first-script-error4175msには列挙0件・getItem null・存在/own/enumerated falseとなり、load4187msも空状態だった。変化範囲は789–4175ms。対象newdocの変更操作ログ0・reported drop0、捕捉したprototype getItemとStorage JS objectのidentityは同じだった。auditの別読取りは元helperの比較値の代用ではなく、同文書の空状態を支持する別観測として扱う。
+
+同じ境界付近でresource-budget.js、fleet-calculator-fix.js、equipment-acquisition-guide.js、expedition-fleet-manager-patch.jsの4要求に `WebKit encountered an internal error` が記録されていた。これは時間的近接であり、内部障害がStorage消去を起こしたと確定する根拠ではない。変更操作loggerの範囲外・native/backend・別realm等は排除できず、物理永続層の消失も断定しない。
+
+traceの元比較call57/call186の返却verdictはpre/post添付JSONと完全一致。生の値配列はbindingのNode closure内だけで、trace/添付に全文は収録されていない。したがって独立した本文/JSON件数/ID比較はできず、合成入力から生値を再生成して証拠へ置換しない。retryの7キー一致は別文書/別試行であり、初回の欠測を埋めない。
+
+今回差分とNight1-1の保存/復元/読取り経路も静的照合した。Night spec、比較/audit、ship-roster、import/advanced、SE等はbyte不変。新7-5 guardはNightの対象外、共有inventoryの既存0引数呼出しとBuildの1回読取りを維持し、装備/艦台帳への新write/remove/clearやその呼出し経路は見つからなかった。ただし間接的なparse/JIT/schedulingや既存処理/native読取りの影響は除外できず、今回変更と無関係とは断定しない。
+
+この試行は合成fixtureであり、実ユーザーデータの物理消失を確認したものではない。一方、同文書で登録値を読み出せない状態は観測しており、Night保存保持の停止/公開保留を維持する。追加Night試験・推測した自動復元/保存書換え・CI再実行は行わない。次に不足する観測は『Storageが最初に空状態へ変わる境界の変更元/バックエンド状態』1点である。旧three-plane初回getter不一致や旧自然実nullと同原因にはしない。
+
+### 最終証拠・公開の扱い
+
+新CI coreは `private/seven-first-attempts-20261114/ci-collection/43531997808/`。334ファイル、公式小19ZIPと184 JSON member、7job/環境/注記/945集合/個別比較を別readbackで照合して一致。core manifestは `37634d6ebcb8463e1ae6c9f290d46eacdfca50010f49d64fea7dac3590b43d42`。後から取得したW4原本/17member/解析・独立レビューは `file-audit-output/` とcore外のexternal receiptへ分離し、取得前のraw欠測記録も時点を付けて残す。局所355ファイルのsnapshot照合と、Night旧doc setter引数/新doc元getter消費値の直接一致も別receiptで確認した。どちらも旧workspace原本の保持証拠ではない。
+
+公式CI成功と公開可否を分ける。今回閉じたのは、7-5第3の確認済み固定入力で不要な列挙を止め、未達理由・保存後loadを保持する範囲。旧通信4/DCL/旧7-5load停止は原因未確定の履歴を保持するが、旧flakyだけで全製品の障害とは断定しない。公開を止める根拠は、利用者のdraft/未公開指定、Nightの新保持疑いと既存凍結、main競合、最新候補のprepared別必須確認未実施。Fullの意図したskipを必須失敗へ変えず、CI greenでNightの初回不一致を解決扱いにしない。
+
+セル28/188/20（59行236セル）は変更0。旧42原本/旧保留/4-5隔離12件/旧作業ツリーの保持照合はアクセス待ち・未完了、復旧探索0。再開worktreeの4診断ファイルhashとworkflow単token差分の計5件は既存基準に一致し保持。今回もPR152ドラフト・未マージ・未公開、PR151/main/版/SW/本番未変更、マージ/公開/デプロイ/自動マージなし。以後はこの結果追補だけを別commit・通常pushし、記録だけの変更で新CI/ブラウザーを起動しない。
+
+追加Night原本の独立レビューも一致した。選択17ファイルのbytes/SHA、3 traceのCRC、元比較2callのverdict/添付JSON、ソース同一性・初回/後続未到達を照合。外部原本/派生解析の最終27件は `file-audit-output/external-night-raw-final-manifest.json`（SHA-256 `90451a3488858b59029b4f703367a12062a9c8a73ae1be8b7f0f16aa71fa7d34`）で別管理する。元helperの各呼出しfunction identityは直接記録しておらず、audit prototype identityと別読取りを同一視しない。この精密化も保持し、原本・旧記録・core manifestは変更しない。
