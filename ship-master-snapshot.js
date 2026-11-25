@@ -3,8 +3,8 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
   "source": {
     "repo": "Tibowl/api_start2",
     "ref": "master",
-    "commit": "9881cb5169a8878cf197b1e5e414fef42f348e41",
-    "updated": "2026-11-11T23:52:12Z",
+    "commit": "0dc89640986d2d6eb1c91c5780063d37e98d541a",
+    "updated": "2026-11-24T11:30:55Z",
     "basis": "api_start2 / player equipment api_id < 1500"
   },
   "clientRules": {
@@ -12,8 +12,8 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "repo": "poooi/poi",
       "ref": "master",
       "path": "views/utils/game-selector/tables.ts",
-      "commit": "026a135ae02cb071bb91f74a34d0f06689195215",
-      "updated": "2026-11-23T11:25:32Z"
+      "commit": "22e207c42a41e48fbf0c6f400b44e940b606460a",
+      "updated": "2026-11-25T02:14:58Z"
     },
     "equipTypeSpOverrides": {
       "128": 38,
@@ -16941,6 +16941,9 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "shipIds": [
         229,
         426,
+        750,
+        751,
+        753,
         961,
         975,
         979,
@@ -16964,6 +16967,9 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         592,
         593,
         694,
+        750,
+        751,
+        753,
         954,
         961,
         975,
@@ -17044,6 +17050,9 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         507,
         508,
         509,
+        750,
+        751,
+        753,
         883,
         888,
         894,
@@ -17097,6 +17106,9 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         592,
         593,
         694,
+        750,
+        751,
+        753,
         954,
         961,
         975,
@@ -17117,6 +17129,9 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "shipIds": [
         229,
         426,
+        750,
+        751,
+        753,
         961,
         975,
         979,
@@ -17196,6 +17211,9 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         507,
         508,
         509,
+        750,
+        751,
+        753,
         883,
         888,
         894,
@@ -17258,6 +17276,9 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         592,
         593,
         694,
+        750,
+        751,
+        753,
         954,
         961,
         975,
@@ -17453,6 +17474,9 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "shipIds": [
         229,
         426,
+        750,
+        751,
+        753,
         961,
         975,
         979,
@@ -17572,6 +17596,10 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         743,
         744,
         745,
+        750,
+        751,
+        752,
+        753,
         955,
         956,
         960,
@@ -17603,6 +17631,9 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         592,
         593,
         694,
+        750,
+        751,
+        753,
         954,
         961,
         975,
@@ -22213,12 +22244,12 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         564
       ],
       "4": [
-        220,
-        524,
-        565,
         10,
         11,
-        66
+        66,
+        220,
+        524,
+        565
       ],
       "5": null,
       "12": null,
@@ -22398,6 +22429,123 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "50": null,
       "54": null,
       "93": null,
+      "95": null
+    },
+    "750": {
+      "1": null,
+      "2": null,
+      "4": null,
+      "5": null,
+      "10": null,
+      "11": null,
+      "12": null,
+      "13": null,
+      "14": null,
+      "15": null,
+      "17": null,
+      "20": null,
+      "21": null,
+      "22": null,
+      "23": null,
+      "24": null,
+      "25": null,
+      "27": null,
+      "29": null,
+      "30": null,
+      "33": null,
+      "34": null,
+      "35": null,
+      "36": null,
+      "37": null,
+      "39": null,
+      "43": null,
+      "45": null,
+      "46": null,
+      "54": null
+    },
+    "751": {
+      "1": null,
+      "2": null,
+      "4": null,
+      "5": null,
+      "10": null,
+      "12": null,
+      "13": null,
+      "14": null,
+      "15": null,
+      "17": null,
+      "20": null,
+      "21": null,
+      "22": null,
+      "23": null,
+      "24": null,
+      "27": null,
+      "29": null,
+      "30": null,
+      "33": null,
+      "34": null,
+      "36": null,
+      "37": null,
+      "39": null,
+      "42": null,
+      "43": null,
+      "54": null
+    },
+    "752": {
+      "1": null,
+      "5": null,
+      "12": null,
+      "14": null,
+      "15": null,
+      "17": null,
+      "20": null,
+      "21": null,
+      "23": null,
+      "24": null,
+      "27": null,
+      "29": null,
+      "30": null,
+      "33": null,
+      "34": null,
+      "36": null,
+      "37": null,
+      "39": null,
+      "43": null,
+      "54": null
+    },
+    "753": {
+      "2": null,
+      "4": null,
+      "5": null,
+      "10": null,
+      "11": null,
+      "12": null,
+      "13": null,
+      "14": null,
+      "16": null,
+      "17": null,
+      "18": null,
+      "20": null,
+      "21": null,
+      "22": null,
+      "23": null,
+      "24": null,
+      "25": null,
+      "27": null,
+      "29": null,
+      "30": null,
+      "33": null,
+      "34": null,
+      "35": null,
+      "36": null,
+      "37": null,
+      "39": null,
+      "40": null,
+      "42": null,
+      "43": null,
+      "45": null,
+      "46": null,
+      "54": null,
       "95": null
     },
     "877": {
@@ -23192,9 +23340,9 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         90
       ],
       "4": [
+        11,
         524,
-        565,
-        11
+        565
       ],
       "12": null,
       "17": null,
@@ -23234,9 +23382,9 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
     "978": {
       "1": null,
       "2": [
-        6,
         50,
-        90
+        90,
+        6
       ],
       "4": [
         10,
@@ -23471,9 +23619,9 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         564
       ],
       "4": [
+        11,
         524,
-        565,
-        11
+        565
       ],
       "5": null,
       "17": null,
@@ -23947,8 +24095,8 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         4
       ],
       "4": [
-        524,
-        11
+        11,
+        524
       ],
       "10": null,
       "12": null,
@@ -23990,8 +24138,8 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         4
       ],
       "4": [
-        11,
-        524
+        524,
+        11
       ],
       "10": null,
       "12": null,
@@ -28143,8 +28291,8 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "type": "軽巡洋艦",
       "ctype": 16,
       "sortno": 158,
-      "afterLv": 0,
-      "afterId": 0,
+      "afterLv": 92,
+      "afterId": 751,
       "speed": 10,
       "range": 2,
       "fuel": 25,
@@ -31009,8 +31157,8 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "type": "重巡洋艦",
       "ctype": 13,
       "sortno": 1364,
-      "afterLv": 0,
-      "afterId": 0,
+      "afterLv": 77,
+      "afterId": 753,
       "speed": 10,
       "range": 2,
       "fuel": 35,
@@ -36706,8 +36854,8 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "type": "軽巡洋艦",
       "ctype": 20,
       "sortno": 288,
-      "afterLv": 0,
-      "afterId": 0,
+      "afterLv": 93,
+      "afterId": 750,
       "speed": 10,
       "range": 1,
       "fuel": 25,
@@ -40909,7 +41057,7 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         "hp": 31,
         "armor": 51,
         "fire": 59,
-        "torp": 85,
+        "torp": 87,
         "aa": 72,
         "luck": 99
       }
@@ -40937,8 +41085,8 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         "armor": 53,
         "fire": 65,
         "torp": 91,
-        "aa": 64,
-        "luck": 78
+        "aa": 67,
+        "luck": 82
       }
     },
     "649": {
@@ -40948,8 +41096,8 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "type": "駆逐艦",
       "ctype": 38,
       "sortno": 449,
-      "afterLv": 0,
-      "afterId": 0,
+      "afterLv": 90,
+      "afterId": 752,
       "speed": 10,
       "range": 1,
       "fuel": 15,
@@ -41371,10 +41519,10 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "stats": {
         "hp": 30,
         "armor": 50,
-        "fire": 58,
-        "torp": 84,
+        "fire": 59,
+        "torp": 86,
         "aa": 76,
-        "luck": 79
+        "luck": 82
       }
     },
     "667": {
@@ -43444,6 +43592,119 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
         "torp": 0,
         "aa": 87,
         "luck": 73
+      }
+    },
+    "750": {
+      "id": 750,
+      "name": "由良改二偵",
+      "stype": 3,
+      "type": "軽巡洋艦",
+      "ctype": 20,
+      "sortno": 1750,
+      "afterLv": 0,
+      "afterId": 0,
+      "speed": 10,
+      "range": 2,
+      "fuel": 25,
+      "ammo": 30,
+      "slots": [
+        1,
+        2,
+        2,
+        1
+      ],
+      "stats": {
+        "hp": 46,
+        "armor": 68,
+        "fire": 56,
+        "torp": 84,
+        "aa": 88,
+        "luck": 82
+      }
+    },
+    "751": {
+      "id": 751,
+      "name": "川内改二偵",
+      "stype": 3,
+      "type": "軽巡洋艦",
+      "ctype": 16,
+      "sortno": 1751,
+      "afterLv": 0,
+      "afterId": 0,
+      "speed": 10,
+      "range": 2,
+      "fuel": 25,
+      "ammo": 35,
+      "slots": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "stats": {
+        "hp": 49,
+        "armor": 69,
+        "fire": 68,
+        "torp": 90,
+        "aa": 71,
+        "luck": 84
+      }
+    },
+    "752": {
+      "id": 752,
+      "name": "高波改二偵",
+      "stype": 2,
+      "type": "駆逐艦",
+      "ctype": 38,
+      "sortno": 1752,
+      "afterLv": 0,
+      "afterId": 0,
+      "speed": 10,
+      "range": 1,
+      "fuel": 15,
+      "ammo": 20,
+      "slots": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "stats": {
+        "hp": 34,
+        "armor": 55,
+        "fire": 67,
+        "torp": 88,
+        "aa": 64,
+        "luck": 80
+      }
+    },
+    "753": {
+      "id": 753,
+      "name": "青葉改偵",
+      "stype": 5,
+      "type": "重巡洋艦",
+      "ctype": 13,
+      "sortno": 1753,
+      "afterLv": 0,
+      "afterId": 0,
+      "speed": 10,
+      "range": 2,
+      "fuel": 35,
+      "ammo": 55,
+      "slots": [
+        1,
+        1,
+        3,
+        3,
+        0
+      ],
+      "stats": {
+        "hp": 51,
+        "armor": 73,
+        "fire": 75,
+        "torp": 76,
+        "aa": 80,
+        "luck": 90
       }
     },
     "877": {
@@ -47443,12 +47704,25 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
   "changes": {
     "baseline": false,
     "from": "9881cb5169a8878cf197b1e5e414fef42f348e41",
-    "to": "9881cb5169a8878cf197b1e5e414fef42f348e41",
-    "at": "2026-11-24T03:58:27.727Z",
+    "to": "0dc89640986d2d6eb1c91c5780063d37e98d541a",
+    "at": "2026-11-25T02:34:04.565Z",
     "ships": {
-      "added": [],
+      "added": [
+        "750",
+        "751",
+        "752",
+        "753"
+      ],
       "removed": [],
-      "changed": []
+      "changed": [
+        "158",
+        "264",
+        "488",
+        "647",
+        "648",
+        "649",
+        "666"
+      ]
     },
     "equipment": {
       "added": [],
@@ -47456,8 +47730,8 @@ window.HD_KANCOLLE_MASTER_SNAPSHOT={
       "changed": []
     },
     "exslot": {
-      "changed": false,
-      "itemRulesChanged": 0,
+      "changed": true,
+      "itemRulesChanged": 10,
       "limitShipsChanged": 0
     },
     "picker": {

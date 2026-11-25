@@ -1,17 +1,30 @@
 {
-  "version": "1.0.583",
-  "build": 583,
-  "releasedAt": "2026-11-24T12:58:27.732+09:00",
-  "notes": "艦これマスター自動同期。api_start2 9881cb5 / 装備picker 026a135 を反映。艦娘変更 0件 / 新装備 0件 / 装備変更 0件 / 増設ルール 0件。",
+  "version": "1.0.584",
+  "build": 584,
+  "releasedAt": "2026-11-25T11:34:04.575+09:00",
+  "notes": "艦これマスター自動同期。api_start2 0dc8964 / 装備picker 22e207c を反映。艦娘変更 11件 / 新装備 0件 / 装備変更 0件 / 増設ルール 10件。",
   "masterChanges": {
     "baseline": false,
     "from": "9881cb5169a8878cf197b1e5e414fef42f348e41",
-    "to": "9881cb5169a8878cf197b1e5e414fef42f348e41",
-    "at": "2026-11-24T03:58:27.727Z",
+    "to": "0dc89640986d2d6eb1c91c5780063d37e98d541a",
+    "at": "2026-11-25T02:34:04.565Z",
     "ships": {
-      "added": [],
+      "added": [
+        "750",
+        "751",
+        "752",
+        "753"
+      ],
       "removed": [],
-      "changed": []
+      "changed": [
+        "158",
+        "264",
+        "488",
+        "647",
+        "648",
+        "649",
+        "666"
+      ]
     },
     "equipment": {
       "added": [],
@@ -19,8 +32,8 @@
       "changed": []
     },
     "exslot": {
-      "changed": false,
-      "itemRulesChanged": 0,
+      "changed": true,
+      "itemRulesChanged": 10,
       "limitShipsChanged": 0
     },
     "picker": {
